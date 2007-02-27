@@ -1,0 +1,68 @@
+= about ServerSide
+
+ServerSide is an HTTP server framework designed to be as fast as possible, and
+as easy as possible to use. ServerSide includes a full-featured HTTP server, a
+controller-view system and a bunch of other tools to easily create servers and
+clusters of servers.
+
+== Resources
+
+* {Project page}[http://code.google.com/p/serverside/]
+* {Source code}[http://serverside.googlecode.com/svn/]
+* {Bug tracking}[http://code.google.com/p/serverside/issues/list]
+* {RubyForge page}[http://rubyforge.org/projects/serverside/]
+
+To check out the source code:
+  
+  svn co http://serverside.googlecode.com/svn/trunk
+
+== Installation
+
+  sudo gem install serverside
+
+== Usage
+
+Once you have the ServerSide gem installed, you can use the <tt>serverside</tt>
+script to control servers. For example:
+
+  serverside start .
+
+will start an HTTP server on port 8000, serving the content of the working 
+directory. You can stop the server by running <tt>serverside stop .</tt>
+
+To run the server without forking, use the 'serve' command:
+
+  serverside serve .
+
+== Serving ERb Templates
+
+ServerSide can render ERb[http://www.ruby-doc.org/stdlib/libdoc/erb/rdoc/] 
+templates in a fashion similar to PHP. You can store templates in .rhtml files, 
+and ServerSide takes care of all the rest. ServerSide is also smart enough to 
+allow you to use nice looking URL's with your templates, and automatically adds 
+the .rhtml extension if the file is there.
+ 
+== Serving Dynamic Content
+
+By default ServerSide serves static files, but you can change the behavior by
+creating custom {routing rules}[classes/ServerSide/Connection/Router.html].
+Here's a simple routing rule:
+
+  ServerSide::Router.route(:path => '/hello/:name') {
+    send_response(200, 'text', "Hello #{@parameters[:name]}!")
+  }
+
+The ServerSide framework also lets you route requests based on any attribute of
+incoming requests, such as host name, path, URL parameters etc.
+
+To run your custom rules, you can either put them in a file called serverside.rb,
+or tell serverside to explicitly load a specific file:
+
+  serverside start ~/myapp/myapp.rb
+
+== Running a Cluster of Servers
+
+ServerSide makes it easy to control a cluster of servers. Just supply a range of
+ports instead of a single port:
+
+  serverside -p 8000..8009 start .
