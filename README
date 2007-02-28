@@ -1,68 +1,124 @@
-= about ServerSide
+== about Sequel
 
-ServerSide is an HTTP server framework designed to be as fast as possible, and
-as easy as possible to use. ServerSide includes a full-featured HTTP server, a
-controller-view system and a bunch of other tools to easily create servers and
-clusters of servers.
+Sequel is an ORM framework for Ruby. Sequel provides thread safety, connection pooling, and a DSL for constructing queries and table schemas.
+
+== Sequel vs. ActiveRecord
+
+Sequel offers the following advantages over ActiveRecord:
+
+* Better performance with large tables: unlike ActiveRecord, Sequel does not load the entire resultset into memory, but fetches each record separately and implements an Enumerable interface.
+* Easy construction of queries using a DSL.
+* Using model classes is possible, but not mandatory.
 
 == Resources
 
-* {Project page}[http://code.google.com/p/serverside/]
-* {Source code}[http://serverside.googlecode.com/svn/]
-* {Bug tracking}[http://code.google.com/p/serverside/issues/list]
-* {RubyForge page}[http://rubyforge.org/projects/serverside/]
+* {Project page}[http://code.google.com/p/ruby-sequel/]
+* {Source code}[http://ruby-sequel.googlecode.com/svn/]
+* {Bug tracking}[http://code.google.com/p/ruby-sequel/issues/list]
+* {RubyForge page}[http://rubyforge.org/projects/sequel/]
 
 To check out the source code:
   
-  svn co http://serverside.googlecode.com/svn/trunk
+  svn co http://ruby-sequel.googlecode.com/svn/trunk
 
 == Installation
 
-  sudo gem install serverside
+  sudo gem install sequel
 
-== Usage
+== A Short Tutorial
 
-Once you have the ServerSide gem installed, you can use the <tt>serverside</tt>
-script to control servers. For example:
+=== Connecting to a database
 
-  serverside start .
+There are two ways to create a connection to a database. The easier way is to provide a connection URL:
 
-will start an HTTP server on port 8000, serving the content of the working 
-directory. You can stop the server by running <tt>serverside stop .</tt>
+  DB = Sequel.connect("postgres://postgres:postgres@localhost:5432/my_db")
 
-To run the server without forking, use the 'serve' command:
+You can also specify optional parameters, such as the connection pool size:
 
-  serverside serve .
+  DB = Sequel.connect("postgres://postgres:postgres@localhost:5432/my_db",
+    :max_connections => 10)
 
-== Serving ERb Templates
+The second, more verbose, way is to create an instance of a database class:
 
-ServerSide can render ERb[http://www.ruby-doc.org/stdlib/libdoc/erb/rdoc/] 
-templates in a fashion similar to PHP. You can store templates in .rhtml files, 
-and ServerSide takes care of all the rest. ServerSide is also smart enough to 
-allow you to use nice looking URL's with your templates, and automatically adds 
-the .rhtml extension if the file is there.
- 
-== Serving Dynamic Content
+  DB = Sequel::Postgres::Database.new(:database => 'my_db', :host => 'localhost',
+    :port => 5432)
 
-By default ServerSide serves static files, but you can change the behavior by
-creating custom {routing rules}[classes/ServerSide/Connection/Router.html].
-Here's a simple routing rule:
+=== Creating Datasets
 
-  ServerSide::Router.route(:path => '/hello/:name') {
-    send_response(200, 'text', "Hello #{@parameters[:name]}!")
-  }
+Dataset is the primary means through which records are retrieved and manipulated. You can create an blank dataset by using the query method:
 
-The ServerSide framework also lets you route requests based on any attribute of
-incoming requests, such as host name, path, URL parameters etc.
+  dataset = DB.query
 
-To run your custom rules, you can either put them in a file called serverside.rb,
-or tell serverside to explicitly load a specific file:
+Or by using the from methods:
 
-  serverside start ~/myapp/myapp.rb
+  posts = DB.from(:posts)
 
-== Running a Cluster of Servers
+You can also use the equivalent shorthand:
 
-ServerSide makes it easy to control a cluster of servers. Just supply a range of
-ports instead of a single port:
+  posts = DB[:posts]
 
-  serverside -p 8000..8009 start .
+Note: the dataset will only fetch records when you explicitly ask for them, as will be shown below. Datasets can be manipulated to filter through records, change record order and even join tables, as will also be shown below.
+
+=== Retrieving Records
+
+You can retrieve records by using the all method:
+
+  posts.all
+
+The all method returns an array of hashes, where each hash corresponds to a record.
+
+You can also iterate through records one at a time:
+
+  posts.each {|row| p row}
+
+Or perform more advanced stuff:
+
+  posts.map(:id)
+  posts.inject({}) {|h, r| h[r[:id]] = r[:name]}
+  
+You can also retrieve the first record in a dataset:
+
+  posts.first
+  
+If the dataset is ordered, you can also ask for the last record:
+
+  posts.order(:stamp).last
+  
+=== Filtering Records
+
+The simplest way to filter records is to provide a hash of values to match:
+
+  my_posts = posts.filter(:category => 'ruby', :author => 'david')
+  
+You can also specify ranges:
+
+  my_posts = posts.filter(:stamp => 2.weeks.ago..1.week.ago)
+  
+Some adapters will also let you specify Regexps:
+
+  my_posts = posts.filter(:category => /ruby/i)
+  
+You can also use an inverse filter:
+
+  my_posts = posts.exclude(:category => /ruby/i)
+
+You can then retrieve the records by using any of the retrieval methods:
+
+  my_posts.each {|row| p row}
+  
+You can also specify a custom WHERE clause:
+
+  posts.filter('(stamp < ?) AND (author <> ?)', 3.days.ago, author_name)
+
+=== Counting Records
+
+  posts.count
+  
+=== Ordering Records
+
+  posts.order(:stamp)
+  
+You can also specify descending order
+
+  posts.order(:stamp.DESC)
+
