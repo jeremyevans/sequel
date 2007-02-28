@@ -1,6 +1,6 @@
 require 'thread'
 
-module ServerSide
+module Sequel
   class ConnectionPool
     attr_reader :max_size, :mutex, :conn_maker
     attr_reader :available_connections, :allocated, :created_count

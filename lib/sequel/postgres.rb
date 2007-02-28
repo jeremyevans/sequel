@@ -24,11 +24,11 @@ class PGconn
   
   def execute(sql)
     begin
-      ServerSide.info(sql)
+      # ServerSide.info(sql)
       async_exec(sql)
     rescue PGError => e
       unless connected?
-        ServerSide.warn('Reconnecting to Postgres server')
+        # ServerSide.warn('Reconnecting to Postgres server')
         reset
         async_exec(sql)
       else
@@ -45,16 +45,16 @@ class PGconn
     if @transaction_in_progress
       return yield
     end
-    ServerSide.info('BEGIN')
+    # ServerSide.info('BEGIN')
     async_exec(SQL_BEGIN)
     begin
       @transaction_in_progress = true
       result = yield
-      ServerSide.info('COMMIT')
+      # ServerSide.info('COMMIT')
       async_exec(SQL_COMMIT)
       result
     rescue => e
-      ServerSide.info('ROLLBACK')
+      # ServerSide.info('ROLLBACK')
       async_exec(SQL_ROLLBACK)
       raise e
     ensure
@@ -85,7 +85,7 @@ class String
   end
 end
 
-module ServerSide
+module Sequel
   module Postgres
     PG_TYPES = {
       16 => :postgres_to_bool,
@@ -98,14 +98,14 @@ module ServerSide
       1114 => :postgres_to_time
     }
 
-    class Database < ServerSide::Database
+    class Database < Sequel::Database
       set_adapter_scheme :postgres
     
       attr_reader :pool
     
       def initialize(opts = {})
         super
-        @pool = ServerSide::ConnectionPool.new(@opts[:max_connections] || 4) do
+        @pool = ConnectionPool.new(@opts[:max_connections] || 4) do
           PGconn.connect(
             @opts[:host] || 'localhost',
             @opts[:port] || 5432,
@@ -157,7 +157,7 @@ module ServerSide
       end
     end
   
-    class Dataset < ServerSide::Dataset
+    class Dataset < Sequel::Dataset
       attr_reader :result, :fields
   
       def literal(v)

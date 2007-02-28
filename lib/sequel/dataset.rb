@@ -1,4 +1,4 @@
-module ServerSide
+module Sequel
   class Dataset
     include Enumerable
     

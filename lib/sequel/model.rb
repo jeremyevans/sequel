@@ -1,7 +1,7 @@
 #require 'rubygems'
 require 'metaid'
 
-module ServerSide
+module Sequel
   class Model
     @@db = nil
     

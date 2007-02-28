@@ -1,7 +1,7 @@
 require 'rubygems'
 require 'postgres'
 
-module ServerSide
+module Sequel
   class Schema
     COMMA_SEPARATOR = ', '.freeze
     COLUMN_DEF = '%s %s'.freeze

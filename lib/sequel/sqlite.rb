@@ -1,14 +1,15 @@
 require 'sqlite3'
 require 'metaid'
 
-module ServerSide
+module Sequel
   module SQLite
-    class Database < ServerSide::Database
+    class Database < Sequel::Database
+      set_adapter_scheme :sqlite
       attr_reader :pool
     
       def initialize(opts = {})
         super
-        @pool = ServerSide::ConnectionPool.new(@opts[:max_connections] || 4) do
+        @pool = ConnectionPool.new(@opts[:max_connections] || 4) do
           db = SQLite3::Database.new(@opts[:database])
           db.type_translation = true
           db
@@ -61,7 +62,7 @@ module ServerSide
       end
     end
     
-    class Dataset < ServerSide::Dataset
+    class Dataset < Sequel::Dataset
       def each(opts = nil, &block)
         @db.result_set(select_sql(opts), @record_class, &block)
         self

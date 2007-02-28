@@ -2,7 +2,7 @@ require 'uri'
 
 require File.join(File.dirname(__FILE__), 'schema')
 
-module ServerSide
+module Sequel
   class Database
     def initialize(opts = {})
       @opts = opts
