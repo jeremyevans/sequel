@@ -25,7 +25,7 @@ Rake::RDocTask.new do |rdoc|
   rdoc.options += RDOC_OPTS
   rdoc.main = "README"
   rdoc.title = "Sequel Documentation"
-  rdoc.rdoc_files.add ['README', 'CHANGELOG', 'COPYING', 'lib/sequel.rb', 'lib/sequel/**/*.rb']
+  rdoc.rdoc_files.add ['README', 'COPYING', 'lib/sequel.rb', 'lib/sequel/**/*.rb']
 end
 
 spec = Gem::Specification.new do |s|

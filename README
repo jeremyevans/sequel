@@ -2,14 +2,6 @@
 
 Sequel is an ORM framework for Ruby. Sequel provides thread safety, connection pooling, and a DSL for constructing queries and table schemas.
 
-== Sequel vs. ActiveRecord
-
-Sequel offers the following advantages over ActiveRecord:
-
-* Better performance with large tables: unlike ActiveRecord, Sequel does not load the entire resultset into memory, but fetches each record separately and implements an Enumerable interface.
-* Easy construction of queries using a DSL.
-* Using model classes is possible, but not mandatory.
-
 == Resources
 
 * {Project page}[http://code.google.com/p/ruby-sequel/]
@@ -24,6 +16,13 @@ To check out the source code:
 == Installation
 
   sudo gem install sequel
+  
+== Supported Databases
+
+Sequel currently supports:
+
+* Postgresql
+* SQLite 3
 
 == A Short Tutorial
 
@@ -31,17 +30,16 @@ To check out the source code:
 
 There are two ways to create a connection to a database. The easier way is to provide a connection URL:
 
-  DB = Sequel.connect("postgres://postgres:postgres@localhost:5432/my_db")
+  DB = Sequel.connect("sqlite:///blog.db")
 
 You can also specify optional parameters, such as the connection pool size:
 
-  DB = Sequel.connect("postgres://postgres:postgres@localhost:5432/my_db",
+  DB = Sequel.connect("postgres://postgres:postgres@localhost/my_db",
     :max_connections => 10)
 
 The second, more verbose, way is to create an instance of a database class:
 
-  DB = Sequel::Postgres::Database.new(:database => 'my_db', :host => 'localhost',
-    :port => 5432)
+  DB = Sequel::Postgres::Database.new(:database => 'my_db', :host => 'localhost')
 
 == Arbitrary SQL queries
 
