@@ -117,7 +117,7 @@ module Sequel
       end
     
     
-      def query(opts = nil)
+      def dataset(opts = nil)
         Postgres::Dataset.new(self, opts)
       end
     

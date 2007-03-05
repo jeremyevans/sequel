@@ -1,3 +1,13 @@
 *SVN*
 
+* More documentation for Dataset.
+
+* Renamed Database#query to Database#dataset.
+
+* Added Dataset#insert_multiple for inserting multiple records.
+
+* Added Dataset#<< as shorthand for inserting records.
+
+* Added Database#<< method for executing arbitrary SQL.
+
 * Imported Sequel code.

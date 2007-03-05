@@ -9,20 +9,31 @@ module Sequel
   class Database
     # Constructs a new instance of a database connection with the specified
     # options hash.
+    #
+    # Sequel::Database is an abstract class that is not useful by itself.
     def initialize(opts = {})
       @opts = opts
     end
 
     # Returns a new dataset with the from method invoked.
-    def from(*args); query.from(*args); end
+    def from(*args); dataset.from(*args); end
     
     # Returns a new dataset with the select method invoked.
-    def select(*args); query.select(*args); end
+    def select(*args); dataset.select(*args); end
 
-    # returns a new dataset with the from parameter set. For example,
+    # Returns a new dataset with the from parameter set. For example,
     #   db[:posts].each {|p| puts p[:title]}
     def [](table)
-      query.from(table)
+      dataset.from(table)
+    end
+    
+    # call-seq:
+    #   db.execute(sql)
+    #   db << sql
+    #
+    # Executes an sql query.
+    def <<(sql)
+      execute(sql)
     end
 
     # Returns a literal SQL representation of a value. This method is usually

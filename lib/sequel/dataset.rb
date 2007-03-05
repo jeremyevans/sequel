@@ -1,16 +1,46 @@
 module Sequel
+  # A Dataset represents a view of a the data in a database, constrained by
+  # specific parameters such as filtering conditions, order, etc. Datasets
+  # can be used to create, retrieve, update and delete records.
+  # 
+  # Query results are always retrieved on demand, so a dataset can be kept
+  # around and reused indefinitely:
+  #   my_posts = DB[:posts].filter(:author => 'david') # no records are retrieved
+  #   p my_posts.all # records are now retrieved
+  #   ...
+  #   p my_posts.all # records are retrieved again
+  #
+  # In order to provide this functionality, dataset methods such as where, 
+  # select, order, etc. return modified copies of the dataset, so you can
+  # use different datasets to access data:
+  #   posts = DB[:posts]
+  #   davids_posts = posts.filter(:author => 'david')
+  #   old_posts = posts.filter('stamp < ?', 1.week.ago)
+  #
+  # Datasets are Enumerable objects, so they can be manipulated using any
+  # of the Enumerable methods, such as map, inject, etc.
   class Dataset
     include Enumerable
     
     attr_reader :db
     attr_accessor :record_class
   
+    # Constructs a new instance of a dataset with a database instance, initial
+    # options and an optional record class. Datasets are usually constructed by
+    # invoking Database methods:
+    #   DB[:posts]
+    # Or:
+    #   DB.dataset # the returned dataset is blank
+    #
+    # Sequel::Dataset is an abstract class that is not useful by itself. Each
+    # database adaptor should provide a descendant class of Sequel::Dataset.
     def initialize(db, opts = {}, record_class = nil)
       @db = db
       @opts = opts || {}
       @record_class = record_class
     end
     
+    # Returns a new instance of the dataset with its options
     def dup_merge(opts)
       self.class.new(@db, @opts.merge(opts), @record_class)
     end
@@ -20,14 +50,18 @@ module Sequel
     DOUBLE_UNDERSCORE = '__'.freeze
     PERIOD = '.'.freeze
     
-    # sql helpers
+    # Returns a valid SQL fieldname as a string. Field names specified as 
+    # symbols can include double underscores to denote a dot separator, e.g.
+    # :posts__id will be converted into posts.id.
     def field_name(field)
       field.is_a?(Symbol) ? field.to_field_name : field
     end
     
     QUALIFIED_REGEXP = /(.*)\.(.*)/.freeze
     QUALIFIED_FORMAT = "%s.%s".freeze
-    
+
+    # Returns a qualified field name (including a table name) if the field
+    # name isn't already qualified.
     def qualified_field_name(field, table)
       fn = field_name(field)
       fn = QUALIFIED_FORMAT % [table, fn] unless fn =~ QUALIFIED_REGEXP
@@ -36,6 +70,7 @@ module Sequel
     WILDCARD = '*'.freeze
     COMMA_SEPARATOR = ", ".freeze
     
+    # Converts a field list into a comma seperated string of field names.
     def field_list(fields)
       case fields
       when Array:
@@ -51,6 +86,7 @@ module Sequel
       end
     end
     
+    # Converts an array of sources into a comma separated list.
     def source_list(source)
       case source
       when Array: source.join(COMMA_SEPARATOR)
@@ -58,6 +94,8 @@ module Sequel
       end 
     end
     
+    # Returns a literal representation of a value to be used as part
+    # of an SQL expression. This method is overriden in descendants.
     def literal(v)
       case v
       when String: "'%s'" % v
@@ -68,10 +106,12 @@ module Sequel
     AND_SEPARATOR = " AND ".freeze
     EQUAL_COND = "(%s = %s)".freeze
     
+    # Formats an equality condition SQL expression.
     def where_equal_condition(left, right)
       EQUAL_COND % [field_name(left), literal(right)]
     end
     
+    # Formats a where clause.
     def where_list(where)
       case where
       when Hash:
@@ -84,6 +124,7 @@ module Sequel
       end
     end
     
+    # Formats a join condition.
     def join_cond_list(cond, join_table)
       cond.map do |kv|
         EQUAL_COND % [
@@ -92,16 +133,18 @@ module Sequel
       end.join(AND_SEPARATOR)
     end
     
-    # DSL constructors
+    # Returns a copy of the dataset with the source changed.
     def from(source)
       dup_merge(:from => source)
     end
     
+    # Returns a copy of the dataset with the selected fields changed.
     def select(*fields)
       fields = fields.first if fields.size == 1
       dup_merge(:select => fields)
     end
 
+    # Returns a copy of the dataset with the order changed.
     def order(*order)
       dup_merge(:order => order)
     end
@@ -118,6 +161,7 @@ module Sequel
       end
     end
     
+    # Returns a copy of the dataset with the where conditions changed.
     def where(*where)
       if where.size == 1
         where = where.first
@@ -139,24 +183,10 @@ module Sequel
     end
 
     alias_method :filter, :where
-
-    def from!(source)
-      @sql = nil
-      @opts[:from] = source
-      self
-    end
-    
-    def select!(*fields)
-      @sql = nil
-      fields = fields.first if fields.size == 1
-      @opts[:select] = fields
-      self
-    end
-
     alias_method :all, :to_a
-    
     alias_method :enum_map, :map
     
+    # 
     def map(field_name = nil, &block)
       if block
         enum_map(&block)
@@ -171,6 +201,18 @@ module Sequel
       inject({}) do |m, r|
         m[r[key_column]] = r[value_column]
         m
+      end
+    end
+    
+    def <<(values)
+      insert(values)
+    end
+    
+    def insert_multiple(array, &block)
+      if block
+        array.each {|i| insert(block[i])}
+      else
+        array.each {|i| insert(i)}
       end
     end
 

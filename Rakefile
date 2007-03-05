@@ -6,7 +6,7 @@ require 'fileutils'
 include FileUtils
 
 NAME = "sequel"
-VERS = "0.1.0"
+VERS = "0.0.1"
 CLEAN.include ['**/.*.sw?', 'pkg/*', '.config', 'doc/*', 'coverage/*']
 RDOC_OPTS = ['--quiet', '--title', "Sequel Documentation",
   "--opname", "index.html",
@@ -45,7 +45,7 @@ spec = Gem::Specification.new do |s|
   s.add_dependency('metaid')
   s.required_ruby_version = '>= 1.8.2'
 
-  s.files = %w(COPYING README Rakefile) + Dir.glob("{doc,spec,lib}/**/*") 
+  s.files = %w(COPYING README Rakefile) + Dir.glob("{doc,spec,lib}/**/*")
       
   s.require_path = "lib"
 end

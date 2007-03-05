@@ -230,7 +230,7 @@ module Sequel
   end
   
   def self.Model(table_name)
-    Class.new(ServerSide::Model) do
+    Class.new(Sequel::Model) do
       meta_def(:inherited) {|c| c.set_table_name(table_name)}
     end
   end

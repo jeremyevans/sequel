@@ -16,7 +16,7 @@ module Sequel
         end
       end
     
-      def query(opts = nil)
+      def dataset(opts = nil)
         SQLite::Dataset.new(self, opts)
       end
     
