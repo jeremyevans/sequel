@@ -53,9 +53,9 @@ Or more succintly:
 
 === Creating Datasets
 
-Dataset is the primary means through which records are retrieved and manipulated. You can create an blank dataset by using the query method:
+Dataset is the primary means through which records are retrieved and manipulated. You can create an blank dataset by using the dataset method:
 
-  dataset = DB.query
+  dataset = DB.dataset
 
 Or by using the from methods:
 
@@ -118,9 +118,13 @@ You can also specify a custom WHERE clause:
 
   posts.filter('(stamp < ?) AND (author <> ?)', 3.days.ago, author_name)
   
-=== Counting Records
+=== Summarizing Records
 
-  posts.count
+Counting records is easy:
+  posts.filter(:category => /ruby/i).count
+
+And you can also query maximum/minimum values:
+  max_value = DB[:history].max(:value)
   
 === Ordering Records
 
