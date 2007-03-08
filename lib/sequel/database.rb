@@ -1,6 +1,7 @@
 require 'uri'
 
 require File.join(File.dirname(__FILE__), 'schema')
+require File.join(File.dirname(__FILE__), 'dataset')
 
 module Sequel
   # A Database object represents a virtual connection to a database.
@@ -14,6 +15,11 @@ module Sequel
     def initialize(opts = {})
       @opts = opts
     end
+    
+    # Returns a blank dataset
+    def dataset
+      Dataset.new(self)
+    end
 
     # Returns a new dataset with the from method invoked.
     def from(*args); dataset.from(*args); end
@@ -25,6 +31,10 @@ module Sequel
     #   db[:posts].each {|p| puts p[:title]}
     def [](table)
       dataset.from(table)
+    end
+    
+    def execute(sql)
+      raise RuntimeError
     end
     
     # call-seq:

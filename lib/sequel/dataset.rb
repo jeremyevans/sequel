@@ -22,7 +22,7 @@ module Sequel
   class Dataset
     include Enumerable
     
-    attr_reader :db
+    attr_reader :db, :opts
     attr_accessor :record_class
   
     # Constructs a new instance of a dataset with a database instance, initial
