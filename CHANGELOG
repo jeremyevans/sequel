@@ -1,3 +1,7 @@
+*SVN*
+
+* Refactored Dataset#first and Dataset#last code. These methods can now accept the number of records to fetch.
+
 *0.0.1*
 
 * More documentation for Dataset.

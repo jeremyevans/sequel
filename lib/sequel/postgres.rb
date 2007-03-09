@@ -192,21 +192,8 @@ module Sequel
         query_each(select_sql(opts), true, &block)
         self
       end
-    
-      LIMIT_1 = {:limit => 1}.freeze
-    
-      def first(opts = nil)
-        opts = opts ? opts.merge(LIMIT_1) : LIMIT_1
-        query_first(select_sql(opts), true)
-      end
-    
-      def last(opts = nil)
-        raise RuntimeError, 'No order specified' unless
-          @opts[:order] || (opts && opts[:order])
       
-        opts = {:order => reverse_order(@opts[:order])}.
-          merge(opts ? opts.merge(LIMIT_1) : LIMIT_1)
-      
+      def first_record(opts = nil)
         query_first(select_sql(opts), true)
       end
     

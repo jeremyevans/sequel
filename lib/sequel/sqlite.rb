@@ -70,20 +70,10 @@ module Sequel
     
       LIMIT_1 = {:limit => 1}.freeze
     
-      def first(opts = nil)
-        opts = opts ? opts.merge(LIMIT_1) : LIMIT_1
+      def first_record(opts = nil)
         @db.result_set(select_sql(opts), @record_class) {|r| return r}
       end
     
-      def last(opts = nil)
-        raise RuntimeError, 'No order specified' unless
-          @opts[:order] || (opts && opts[:order])
-      
-        opts = {:order => reverse_order(@opts[:order])}.
-          merge(opts ? opts.merge(LIMIT_1) : LIMIT_1)
-        @db.result_set(select_sql(opts), @record_class) {|r| return r}
-      end
-      
       def count(opts = nil)
         @db.single_value(count_sql(opts)).to_i
       end

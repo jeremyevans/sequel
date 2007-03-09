@@ -322,6 +322,35 @@ module Sequel
     def max(field)
       select(field.MAX).first[:max]
     end
+    
+    LIMIT_1 = {:limit => 1}.freeze
+    
+    def limit(l)
+      dup_merge(:limit => l)
+    end
+
+    def first(num = 1)
+      if num == 1
+        first_record
+      else
+        limit(num).all
+      end
+    end
+  
+    def last(num = 1)
+      raise RuntimeError, 'No order specified' unless
+        @opts[:order] || (opts && opts[:order])
+      
+      l = {:limit => num}
+      opts = {:order => reverse_order(@opts[:order])}.
+        merge(opts ? opts.merge(l) : l)
+
+      if num == 1
+        first_record(opts)
+      else
+        dup_merge(opts).all
+      end
+    end
   end
 end
 
