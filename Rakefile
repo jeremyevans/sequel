@@ -40,12 +40,13 @@ spec = Gem::Specification.new do |s|
   s.description = s.summary
   s.author = "Sharon Rosner"
   s.email = 'ciconia@gmail.com'
-  s.homepage = 'http://code.google.com/p/ruby-sequel/'
+  s.homepage = 'http://sequel.rubyforge.org'
 
   s.add_dependency('metaid')
   s.required_ruby_version = '>= 1.8.2'
 
-  s.files = %w(COPYING README Rakefile) + Dir.glob("{doc,spec,lib}/**/*")
+#  s.files = %w(COPYING README Rakefile) + Dir.glob("{doc,spec,lib}/**/*")
+  s.files = %w(COPYING README Rakefile) + Dir.glob("{doc,lib}/**/*")
       
   s.require_path = "lib"
 end

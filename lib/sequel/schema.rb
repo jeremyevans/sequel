@@ -11,6 +11,7 @@ module Sequel
     PRIMARY_KEY = ' PRIMARY KEY'.freeze
     REFERENCES = ' REFERENCES %s'.freeze
     ON_DELETE = ' ON DELETE %s'.freeze
+    AUTOINCREMENT = ' AUTOINCREMENT'.freeze
     
     RESTRICT = 'RESTRICT'.freeze
     CASCADE = 'CASCADE'.freeze
@@ -40,6 +41,7 @@ module Sequel
       c << REFERENCES % column[:table] if column[:table]
       c << ON_DELETE % on_delete_action(column[:on_delete]) if 
         column[:on_delete]
+      c << AUTOINCREMENT if column[:auto_increment]
       c
     end
   
