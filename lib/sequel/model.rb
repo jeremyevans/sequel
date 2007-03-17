@@ -42,7 +42,7 @@ module Sequel
         rec
       end
       
-      alias_method :delete, :delete_and_invalidate_cache
+      alias_method :destroy, :destroy_and_invalidate_cache
       alias_method :set, :set_and_update_cache
     end
     
@@ -119,8 +119,8 @@ module Sequel
       self.class.get_hooks(key).each {|h| instance_eval(&h)}
     end
 
-    def self.before_delete(&block)
-      get_hooks(:before_delete).unshift(block)
+    def self.before_destroy(&block)
+      get_hooks(:before_destroy).unshift(block)
     end
     
     def self.after_create(&block)
@@ -168,13 +168,10 @@ module Sequel
     def self.hash_column(column); dataset.hash_column(primary_key, column); end
     def self.join(*args); dataset.join(*args); end
     def self.lock(mode, &block); dataset.lock(mode, &block); end
-    def self.delete_all
-      if has_hooks?(:before_delete)
-        db.transaction {dataset.all.each {|r| r.delete}}
-      else
-        dataset.delete
-      end
+    def self.destroy_all
+      has_hooks?(:before_destroy) ? dataset.destroy : dataset.delete
     end
+    def self.delete_all; dataset.delete; end
     
     def self.[](key)
       find key.is_a?(Hash) ? key : {primary_key => key}
@@ -188,11 +185,15 @@ module Sequel
       end
     end
     
-    def delete
+    def destroy
       db.transaction do
-        run_hooks(:before_delete)
-        model.dataset.filter(primary_key => @pkey).delete
+        run_hooks(:before_destroy)
+        delete
       end
+    end
+    
+    def delete
+      model.dataset.filter(primary_key => @pkey).delete
     end
     
     FIND_BY_REGEXP = /^find_by_(.*)/.freeze

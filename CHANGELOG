@@ -1,5 +1,7 @@
 *SVN*
 
+* Added Dataset#destroy for deleting each record individually as support for models. Renamed Model#delete to Model#destroy (and Model#destroy_all) ala ActiveRecord.
+
 * Refactored Dataset#first and Dataset#last code. These methods can now accept the number of records to fetch.
 
 *0.0.1*

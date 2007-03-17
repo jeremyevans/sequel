@@ -351,6 +351,13 @@ module Sequel
         dup_merge(opts).all
       end
     end
+    
+    def destroy
+      raise RuntimeError, 'Dataset not associated with model' unless
+        @record_class
+      
+      @db.transaction {each {|r| r.destroy}}
+    end
   end
 end
 
