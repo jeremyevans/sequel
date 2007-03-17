@@ -41,7 +41,7 @@ The second, more verbose, way is to create an instance of a database class:
 
   DB = Sequel::Postgres::Database.new(:database => 'my_db', :host => 'localhost')
 
-== Arbitrary SQL queries
+=== Arbitrary SQL queries
 
   DB.execute("create table t (a text, b text)")
   DB.execute("insert into t values ('a', 'b')")
@@ -149,5 +149,3 @@ Or alternatively:
 === Updating Records
 
   posts.filter('stamp < ?', 3.days.ago).update(:state => 'archived')
-  
-=== 
