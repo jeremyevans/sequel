@@ -100,9 +100,13 @@ The simplest way to filter records is to provide a hash of values to match:
   
 You can also specify ranges:
 
-  my_posts = posts.filter(:stamp => 2.weeks.ago..1.week.ago)
+  my_posts = posts.filter(:stamp => (2.weeks.ago)..(1.week.ago))
   
-Some adapters will also let you specify Regexps:
+Or lists of values:
+
+  my_posts = posts.filter(:category => ['ruby', 'postgres', 'linux'])
+  
+Some adapters (like postgresql) will also let you specify Regexps:
 
   my_posts = posts.filter(:category => /ruby/i)
   

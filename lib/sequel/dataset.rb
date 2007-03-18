@@ -94,28 +94,40 @@ module Sequel
       end 
     end
     
+    NULL = "NULL".freeze
+    
     # Returns a literal representation of a value to be used as part
     # of an SQL expression. This method is overriden in descendants.
     def literal(v)
       case v
       when String: "'%s'" % v
+      when Array: v.empty? ? NULL : v.join(COMMA_SEPARATOR)
       else v.to_s
       end
     end
     
     AND_SEPARATOR = " AND ".freeze
     EQUAL_COND = "(%s = %s)".freeze
+    IN_EXPR = "(%s IN (%s))".freeze
+    BETWEEN_EXPR = "(%s BETWEEN %s AND %s)".freeze
     
     # Formats an equality condition SQL expression.
-    def where_equal_condition(left, right)
-      EQUAL_COND % [field_name(left), literal(right)]
+    def where_condition(left, right)
+      case right
+      when Range:
+        BETWEEN_EXPR % [field_name(left), literal(right.begin), literal(right.end)]
+      when Array:
+        IN_EXPR % [field_name(left), literal(right)]
+      else
+        EQUAL_COND % [field_name(left), literal(right)]
+      end
     end
     
     # Formats a where clause.
     def where_list(where)
       case where
       when Hash:
-        where.map {|kv| where_equal_condition(kv[0], kv[1])}.join(AND_SEPARATOR)
+        where.map {|kv| where_condition(*kv)}.join(AND_SEPARATOR)
       when Array:
         fmt = where.shift
         fmt.gsub('?') {|i| literal(where.shift)}

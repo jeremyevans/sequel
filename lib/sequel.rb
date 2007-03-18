@@ -7,7 +7,11 @@ require File.join(dir, 'dataset')
 require File.join(dir, 'model')
 
 module Sequel #:nodoc:
-  def self.connect(url)
-    Database.connect(url)
+  class << self
+    def connect(url)
+      Database.connect(url)
+    end
+    
+    alias_method :open, :connect
   end
 end

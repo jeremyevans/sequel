@@ -1,5 +1,9 @@
 *SVN*
 
+* Added Sequel.open as alias to Sequel.connect.
+
+* Refactored Dataset#where_equal_condition into Dataset#where_condition, allowing arrays and ranges, e.g. posts.filter(:stamp => (3.days.ago)..(1.day.ago)), or posts.filter(:category => ['ruby', 'postgres', 'linux']).
+
 * Added Model#[]= method for changing column values and Model#save 
 method for saving them.
 

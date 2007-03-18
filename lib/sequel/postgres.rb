@@ -162,9 +162,9 @@ module Sequel
   
       def literal(v)
         case v
+        when Array: super
         when Time: v.to_sql_timestamp
         when Symbol: PGconn.quote(v.to_s)
-        when Array: v.empty? ? EMPTY_ARRAY : v.join(COMMA_SEPARATOR)
         else
           PGconn.quote(v)
         end
@@ -173,16 +173,11 @@ module Sequel
       LIKE = '%s ~ %s'.freeze
       LIKE_CI = '%s ~* %s'.freeze
     
-      IN_ARRAY = '%s IN (%s)'.freeze
-      EMPTY_ARRAY = 'NULL'.freeze
-    
-      def where_equal_condition(left, right)
+      def where_condition(left, right)
         case right
         when Regexp:
           (right.casefold? ? LIKE_CI : LIKE) %
             [field_name(left), PGconn.quote(right.source)]
-        when Array:
-          IN_ARRAY % [field_name(left), literal(right)]
         else
           super
         end
