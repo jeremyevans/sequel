@@ -1,4 +1,4 @@
-*SVN*
+*0.0.2*
 
 * Added Sequel.open as alias to Sequel.connect.
 
