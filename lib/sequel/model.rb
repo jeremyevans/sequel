@@ -228,6 +228,12 @@ module Sequel
       model.dataset.filter(primary_key => @pkey).update(values)
       @values.merge!(values)
     end
+
+    def []=(field, value); @values[field] = value; end
+    
+    def save
+      model.dataset.filter(primary_key => @pkey).update(@values)
+    end
   end
   
   def self.Model(table_name)
