@@ -12,6 +12,10 @@ Sequel is an ORM framework for Ruby. Sequel provides thread safety, connection p
 To check out the source code:
   
   svn co http://ruby-sequel.googlecode.com/svn/trunk
+  
+=== Contact
+
+If you have any comments or suggestions please send an email to ciconia at gmail.com and I'll get back to you.
 
 == Installation
 
@@ -167,19 +171,24 @@ Or alternatively:
 
 === Joining Tables
 
-Joining is easy and very beneficial for many-to-many relationships:
+Joining is very useful in a variety of scenarios, for example many-to-many relationships. With Sequel it's really easy:
 
-  order_items = DB[:items]join(:order_items, :item_id => :items__id).filter(:order_items__order_id => 1234)
+  order_items = DB[:items].join(:order_items, :item_id => :id).
+    filter(:order_items__order_id => 1234)
   
 This is equivalent to the SQL:
 
-  SELECT * FROM items LEFT OUTER JOIN order_items ON order_items.item_id = items.id WHERE order_items.order_id = 1234
+  SELECT * FROM items LEFT OUTER JOIN order_items
+  ON order_items.item_id = items.id 
+  WHERE order_items.order_id = 1234
 
-You can of course then do anything you like with the dataset:
+You can then do anything you like with the dataset:
 
   order_total = order_items.sum(:price)
   
 Which is equivalent to the SQL:
 
-  SELECT sum(price) FROM items LEFT OUTER JOIN order_items ON order_items.item_id = items.id WHERE order_items.order_id = 1234
+  SELECT sum(price) FROM items LEFT OUTER JOIN order_items
+  ON order_items.item_id = items.id
+  WHERE order_items.order_id = 1234
   
