@@ -109,17 +109,22 @@ module Sequel
     AND_SEPARATOR = " AND ".freeze
     EQUAL_COND = "(%s = %s)".freeze
     IN_EXPR = "(%s IN (%s))".freeze
-    BETWEEN_EXPR = "(%s BETWEEN %s AND %s)".freeze
+#    BETWEEN_EXPR = "(%s BETWEEN %s AND %s)".freeze
+    INCLUSIVE_RANGE_EXPR = "(%s >= %s AND %s <= %s)".freeze
+    EXCLUSIVE_RANGE_EXPR = "(%s >= %s AND %s < %s)".freeze
     
     # Formats an equality condition SQL expression.
     def where_condition(left, right)
+      left = field_name(left)
       case right
       when Range:
-        BETWEEN_EXPR % [field_name(left), literal(right.begin), literal(right.end)]
+        (right.exclude_end? ? EXCLUSIVE_RANGE_EXPR : INCLUSIVE_RANGE_EXPR) %
+          [left, literal(right.begin), left, literal(right.end)]
+#        BETWEEN_EXPR % [field_name(left), literal(right.begin), literal(right.end)]
       when Array:
-        IN_EXPR % [field_name(left), literal(right)]
+        IN_EXPR % [left, literal(right)]
       else
-        EQUAL_COND % [field_name(left), literal(right)]
+        EQUAL_COND % [left, literal(right)]
       end
     end
     
@@ -328,11 +333,15 @@ module Sequel
     
     # aggregates
     def min(field)
-      select(field.MIN).first[:min]
+      select(field.MIN).first.values.first
     end
     
     def max(field)
-      select(field.MAX).first[:max]
+      select(field.MAX).first.values.first
+    end
+
+    def sum(field)
+      select(field.SUM).first.values.first
     end
     
     LIMIT_1 = {:limit => 1}.freeze
@@ -382,8 +391,9 @@ class Symbol
     "#{field_name} AS #{target}"
   end
   
-  def MIN; "MIN(#{to_field_name})"; end
-  def MAX; "MAX(#{to_field_name})"; end
+  def MIN; "min(#{to_field_name})"; end
+  def MAX; "max(#{to_field_name})"; end
+  def SUM; "sum(#{to_field_name})"; end
 
   AS_REGEXP = /(.*)___(.*)/.freeze
   AS_FORMAT = "%s AS %s".freeze

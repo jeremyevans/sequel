@@ -1,6 +1,12 @@
-*SVN*
+*0.0.3*
 
-* Fixed small bug in Dataset#qualified_field_name.
+* Add Dataset#sum method.
+
+* Added support for exclusive ranges (thanks Christian Neukirchen.)
+
+* Added sequel console for quick'n'dirty access to databases.
+
+* Fixed small bug in Dataset#qualified_field_name for better join support.
 
 *0.0.2*
 

@@ -1,0 +1,42 @@
+#!/usr/bin/env ruby
+
+require 'rubygems'
+require 'sequel'
+
+db = ARGV.shift
+
+if db.nil? || db.empty?
+  puts "Usage: sequel <connection string>"
+  puts "Sequel, an simple ORM framework for Ruby."
+  puts
+  puts "Examples:"
+  puts "  sequel sqlite:///blog.db"
+  puts "  sequel postgres://localhost/blog"
+  puts
+  puts "For more information see http://sequel.rubyforge.org"
+  exit
+end
+
+begin
+  scheme = URI.parse(db).scheme
+  require File.join('sequel', scheme)
+rescue LoadError
+  puts "Invalid or unknown scheme: #{scheme}"
+  exit
+rescue => e
+  puts e.message
+  exit
+end
+
+DB = Sequel.connect db
+begin
+  DB.test_connection
+rescue => e
+  puts e.message
+  puts e.backtrace.first
+  exit
+end
+
+require 'irb'
+puts "Your database is stored in DB..."
+IRB.start

@@ -37,6 +37,10 @@ module Sequel
       raise RuntimeError
     end
     
+    def test_connection
+      @pool.hold {} if @pool
+    end
+    
     # call-seq:
     #   db.execute(sql)
     #   db << sql

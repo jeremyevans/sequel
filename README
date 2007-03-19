@@ -24,6 +24,14 @@ Sequel currently supports:
 * Postgresql
 * SQLite 3
 
+== The Sequel Console
+
+Sequel now includes an IRB console for quick'n'dirty access to databases. You can use it like this:
+
+  sequel sqlite:///test.db
+
+You get an IRB session with the database object stored in DB.
+
 == A Short Tutorial
 
 === Connecting to a database
@@ -130,6 +138,9 @@ Counting records is easy:
 And you can also query maximum/minimum values:
   max_value = DB[:history].max(:value)
   
+Or calculate a sum:
+  total = DB[:items].sum(:price)
+  
 === Ordering Records
 
   posts.order(:stamp)
@@ -153,3 +164,22 @@ Or alternatively:
 === Updating Records
 
   posts.filter('stamp < ?', 3.days.ago).update(:state => 'archived')
+
+=== Joining Tables
+
+Joining is easy and very beneficial for many-to-many relationships:
+
+  order_items = DB[:items]join(:order_items, :item_id => :items__id).filter(:order_items__order_id => 1234)
+  
+This is equivalent to the SQL:
+
+  SELECT * FROM items LEFT OUTER JOIN order_items ON order_items.item_id = items.id WHERE order_items.order_id = 1234
+
+You can of course then do anything you like with the dataset:
+
+  order_total = order_items.sum(:price)
+  
+Which is equivalent to the SQL:
+
+  SELECT sum(price) FROM items LEFT OUTER JOIN order_items ON order_items.item_id = items.id WHERE order_items.order_id = 1234
+  
