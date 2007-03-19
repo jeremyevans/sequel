@@ -64,7 +64,7 @@ module Sequel
     # name isn't already qualified.
     def qualified_field_name(field, table)
       fn = field_name(field)
-      fn = QUALIFIED_FORMAT % [table, fn] unless fn =~ QUALIFIED_REGEXP
+      fn =~ QUALIFIED_REGEXP ? fn : QUALIFIED_FORMAT % [table, fn]
     end
     
     WILDCARD = '*'.freeze

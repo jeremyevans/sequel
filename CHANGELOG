@@ -1,3 +1,7 @@
+*SVN*
+
+* Fixed small bug in Dataset#qualified_field_name.
+
 *0.0.2*
 
 * Added Sequel.open as alias to Sequel.connect.
