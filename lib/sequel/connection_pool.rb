@@ -2,7 +2,8 @@ require 'thread'
 
 module Sequel
   class ConnectionPool
-    attr_reader :max_size, :mutex, :conn_maker
+    attr_reader :max_size, :mutex
+    attr_accessor :conn_maker
     attr_reader :available_connections, :allocated, :created_count
   
     def initialize(max_size = 4, &block)

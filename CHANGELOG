@@ -1,3 +1,9 @@
+*SVN*
+
+* Added preliminary MySQL support.
+
+* Code cleanup.
+
 *0.0.3*
 
 * Add Dataset#sum method.

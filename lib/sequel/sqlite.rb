@@ -5,11 +5,10 @@ module Sequel
   module SQLite
     class Database < Sequel::Database
       set_adapter_scheme :sqlite
-      attr_reader :pool
     
       def initialize(opts = {})
         super
-        @pool = ConnectionPool.new(@opts[:max_connections] || 4) do
+        @pool.conn_maker = proc do
           db = SQLite3::Database.new(@opts[:database])
           db.type_translation = true
           db
@@ -48,17 +47,6 @@ module Sequel
             end
           end
         end
-      end
-      
-      def synchronize(&block)
-        @pool.hold(&block)
-      end
-    
-      def transaction(&block)
-        @pool.hold {|conn| conn.transaction(&block)}
-      end
-
-      def table_exists?(name)
       end
     end
     

@@ -18,10 +18,6 @@ class PGconn
     status == PGconn::CONNECTION_OK
   end
   
-  SQL_BEGIN = 'BEGIN'.freeze
-  SQL_COMMIT = 'COMMIT'.freeze
-  SQL_ROLLBACK = 'ROLLBACK'.freeze
-  
   def execute(sql)
     begin
       # ServerSide.info(sql)
@@ -40,6 +36,10 @@ class PGconn
   end
   
   attr_reader :transaction_in_progress
+  
+  SQL_BEGIN = 'BEGIN'.freeze
+  SQL_COMMIT = 'COMMIT'.freeze
+  SQL_ROLLBACK = 'ROLLBACK'.freeze
   
   def transaction
     if @transaction_in_progress
@@ -101,18 +101,17 @@ module Sequel
     class Database < Sequel::Database
       set_adapter_scheme :postgres
     
-      attr_reader :pool
-    
       def initialize(opts = {})
         super
-        @pool = ConnectionPool.new(@opts[:max_connections] || 4) do
+        @pool.conn_maker = proc do
           PGconn.connect(
             @opts[:host] || 'localhost',
             @opts[:port] || 5432,
             '', '',
             @opts[:database] || 'reality_development',
             @opts[:user] || 'postgres',
-            @opts[:password])
+            @opts[:password]
+          )
         end
       end
     
@@ -158,8 +157,6 @@ module Sequel
     end
   
     class Dataset < Sequel::Dataset
-      attr_reader :result, :fields
-  
       def literal(v)
         case v
         when Array: super
