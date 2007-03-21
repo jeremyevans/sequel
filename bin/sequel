@@ -7,7 +7,7 @@ db = ARGV.shift
 
 if db.nil? || db.empty?
   puts "Usage: sequel <connection string>"
-  puts "Sequel, an simple ORM framework for Ruby."
+  puts "Sequel: Concise ORM for Ruby."
   puts
   puts "Examples:"
   puts "  sequel sqlite:///blog.db"

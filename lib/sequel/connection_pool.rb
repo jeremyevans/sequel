@@ -3,13 +3,13 @@ require 'thread'
 module Sequel
   class ConnectionPool
     attr_reader :max_size, :mutex
-    attr_accessor :conn_maker
+    attr_accessor :connection_proc
     attr_reader :available_connections, :allocated, :created_count
   
     def initialize(max_size = 4, &block)
       @max_size = max_size
       @mutex = Mutex.new
-      @conn_maker = block
+      @connection_proc = block
 
       @available_connections = []
       @allocated = {}
@@ -41,7 +41,7 @@ module Sequel
     
     def acquire(thread)
       @mutex.synchronize do
-        @allocated[thread] ||= available
+        @allocated[thread] = available
       end
     end
     
@@ -52,7 +52,7 @@ module Sequel
     def make_new
       if @created_count < @max_size
         @created_count += 1
-        @conn_maker.call
+        @connection_proc.call
       end
     end
     

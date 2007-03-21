@@ -1,3 +1,11 @@
+*0.0.5*
+
+* Added Dataset#[] method. Refactored Model#find and Model#[].
+
+* Renamed Pool#conn_maker to Pool#connection_proc.
+
+* Added automatic require 'sequel' to all adapters for convenience.
+
 *0.0.4*
 
 * Added preliminary MySQL support.

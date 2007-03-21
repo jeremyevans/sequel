@@ -1,3 +1,7 @@
+if !Object.const_defined?('Sequel')
+  require File.join(File.dirname(__FILE__), '../sequel')
+end
+
 require 'postgres'
 
 class PGconn
@@ -103,7 +107,7 @@ module Sequel
     
       def initialize(opts = {})
         super
-        @pool.conn_maker = proc do
+        @pool.connection_proc = proc do
           PGconn.connect(
             @opts[:host] || 'localhost',
             @opts[:port] || 5432,

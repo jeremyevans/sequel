@@ -1,6 +1,8 @@
-== about Sequel
+== Serquel: Concise ORM for Ruby
 
-Sequel is an ORM framework for Ruby. Sequel provides thread safety, connection pooling, and a DSL for constructing queries and table schemas.
+Sequel is an ORM framework for Ruby. Sequel provides thread safety, connection pooling, and a concise DSL for constructing queries and table schemas.
+
+Sequel makes it easy to deal with multiple records without having to break your teeth on SQL.
 
 == Resources
 
@@ -31,7 +33,7 @@ Sequel currently supports:
 
 == The Sequel Console
 
-Sequel now includes an IRB console for quick'n'dirty access to databases. You can use it like this:
+Sequel includes an IRB console for quick'n'dirty access to databases. You can use it like this:
 
   sequel sqlite:///test.db
 
@@ -40,6 +42,12 @@ You get an IRB session with the database object stored in DB.
 == A Short Tutorial
 
 === Connecting to a database
+
+Before connecting to a database, you should require the corresponding adaptor, for example:
+
+  require 'sequel/sqlite'
+
+Note: you don't need to require 'sequel' separately before that, as each adapter requires 'sequel' if it hasn't yet been required.
 
 There are two ways to create a connection to a database. The easier way is to provide a connection URL:
 
@@ -59,7 +67,7 @@ The second, more verbose, way is to create an instance of a database class:
   DB.execute("create table t (a text, b text)")
   DB.execute("insert into t values ('a', 'b')")
 
-Or more succintly:
+Or more succinctly:
 
   DB << "create table t (a text, b text)"
   DB << "insert into t values ('a', 'b')"
@@ -100,6 +108,10 @@ Or perform more advanced stuff:
 You can also retrieve the first record in a dataset:
 
   posts.first
+  
+Or retrieve a single record with a specific value:
+
+  posts[:id => 1]
   
 If the dataset is ordered, you can also ask for the last record:
 

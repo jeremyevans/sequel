@@ -1,3 +1,7 @@
+if !Object.const_defined?('Sequel')
+  require File.join(File.dirname(__FILE__), '../sequel')
+end
+
 require 'mysql'
 
 module Sequel
@@ -8,7 +12,7 @@ module Sequel
     
       def initialize(opts = {})
         super
-        @pool.conn_maker = proc do
+        @pool.connection_proc = proc do
           Mysql.real_connect(@opts[:host], @opts[:user], @opts[:password], 
             @opts[:database], @opts[:port])
         end

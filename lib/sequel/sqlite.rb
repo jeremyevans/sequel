@@ -1,3 +1,7 @@
+if !Object.const_defined?('Sequel')
+  require File.join(File.dirname(__FILE__), '../sequel')
+end
+
 require 'sqlite3'
 require 'metaid'
 
@@ -8,7 +12,7 @@ module Sequel
     
       def initialize(opts = {})
         super
-        @pool.conn_maker = proc do
+        @pool.connection_proc = proc do
           db = SQLite3::Database.new(@opts[:database])
           db.type_translation = true
           db

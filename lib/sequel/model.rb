@@ -126,6 +126,12 @@ module Sequel
       get_hooks(:after_create) << block
     end
     
+    def self.find(cond)
+      dataset[cond.is_a?(Hash) ? cond : {primary_key => cond}]
+    end
+
+    class << self; alias_method :[], :find; end
+    
     ############################################################################
     
     attr_reader :values, :pkey
@@ -135,7 +141,7 @@ module Sequel
     end
     
     def primary_key
-      model.primary_key
+      self.class.primary_key
     end
     
     def initialize(values)
@@ -154,10 +160,6 @@ module Sequel
       self
     end
     
-    def self.find(cond)
-      dataset.filter(cond).first # || (raise RuntimeError, "Record not found.")
-    end
-    
     def self.each(&block); dataset.each(&block); end
     def self.all; dataset.all; end
     def self.filter(*arg); dataset.filter(*arg); end
@@ -171,10 +173,6 @@ module Sequel
       has_hooks?(:before_destroy) ? dataset.destroy : dataset.delete
     end
     def self.delete_all; dataset.delete; end
-    
-    def self.[](key)
-      find key.is_a?(Hash) ? key : {primary_key => key}
-    end
     
     def self.create(values = nil)
       db.transaction do

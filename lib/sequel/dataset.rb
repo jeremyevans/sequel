@@ -357,6 +357,10 @@ module Sequel
         limit(num).all
       end
     end
+    
+    def [](condition)
+      where(condition).first
+    end
   
     def last(num = 1)
       raise RuntimeError, 'No order specified' unless
