@@ -1,4 +1,4 @@
-== Serquel: Concise ORM for Ruby
+== Sequel: Concise ORM for Ruby
 
 Sequel is an ORM framework for Ruby. Sequel provides thread safety, connection pooling, and a concise DSL for constructing queries and table schemas.
 
