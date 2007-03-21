@@ -1,3 +1,9 @@
+*SVN*
+
+* Changed Sequel::Database#table_exists? to rely on the tables method if it is available.
+
+* Implemented SQLite::Database#tables.
+
 *0.0.5*
 
 * Added Dataset#[] method. Refactored Model#find and Model#[].

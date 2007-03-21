@@ -201,9 +201,8 @@ module Sequel
 
     alias_method :filter, :where
     alias_method :all, :to_a
-    alias_method :enum_map, :map
     
-    # 
+    alias_method :enum_map, :map
     def map(field_name = nil, &block)
       if block
         enum_map(&block)

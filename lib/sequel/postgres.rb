@@ -154,10 +154,6 @@ module Sequel
       def transaction(&block)
         @pool.hold {|conn| conn.transaction(&block)}
       end
-
-      def table_exists?(name)
-        from(:pg_class).filter(:relname => name, :relkind => 'r').count > 0
-      end
     end
   
     class Dataset < Sequel::Dataset

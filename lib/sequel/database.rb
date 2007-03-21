@@ -93,7 +93,11 @@ module Sequel
     # Performs a brute-force check for the existance of a table. This method is
     # usually overriden in descendants.
     def table_exists?(name)
-      from(name).first && true
+      if respond_to?(:tables)
+        tables.include?(name.to_sym)
+      else
+        from(name).first && true
+      end
     rescue
       false
     end

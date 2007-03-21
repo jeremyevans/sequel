@@ -22,9 +22,11 @@ module Sequel
       def dataset(opts = nil)
         SQLite::Dataset.new(self, opts)
       end
+      
+      TABLES_FILTER = "type = 'table' AND NOT name = 'sqlite_sequence'"
     
       def tables
-        # return a list of tables
+        self[:sqlite_master].filter(TABLES_FILTER).map {|r| r[:name].to_sym}
       end
     
       def execute(sql)
