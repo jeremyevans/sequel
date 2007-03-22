@@ -146,6 +146,27 @@ module Sequel
       def execute_and_forget(sql)
         @pool.hold {|conn| conn.execute(sql).clear}
       end
+      
+      SELECT_LASTVAL = 'SELECT lastval()'.freeze
+
+      def execute_insert(sql)
+        @pool.hold do |conn|
+          conn.execute(sql).clear
+          query_single_value(SELECT_LASTVAL)
+        end
+      end
+    
+      def query_single_value(sql)
+        @pool.hold do |conn|
+          result = conn.execute(sql)
+          begin
+            value = result.getvalue(0, 0)
+          ensure
+            result.clear
+          end
+          value
+        end
+      end
     
       def synchronize(&block)
         @pool.hold(&block)
@@ -246,14 +267,11 @@ module Sequel
       end
   
       def count(opts = nil)
-        query_single_value(count_sql(opts)).to_i
+        @db.query_single_value(count_sql(opts)).to_i
       end
     
-      SELECT_LASTVAL = ';SELECT lastval()'.freeze
-    
       def insert(values = nil, opts = nil)
-        @db.execute_and_forget(insert_sql(values, opts))
-        query_single_value(SELECT_LASTVAL).to_i
+        @db.execute_insert(insert_sql(values, opts))
       end
     
       def update(values, opts = nil)
@@ -320,18 +338,6 @@ module Sequel
         end
       end
       
-      def query_single_value(sql)
-        @db.synchronize do
-          result = @db.execute(sql)
-          begin
-            value = result.getvalue(0, 0)
-          ensure
-            result.clear
-          end
-          value
-        end
-      end
-    
       COMMA = ','.freeze
     
       @@converters_mutex = Mutex.new
