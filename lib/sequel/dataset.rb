@@ -178,15 +178,26 @@ module Sequel
       end
     end
     
+    AND_WHERE = "%s AND %s".freeze
+    
     # Returns a copy of the dataset with the where conditions changed.
-    def where(*where)
-      if where.size == 1
-        where = where.first
-        if @opts[:where] && @opts[:where].is_a?(Hash) && where.is_a?(Hash)
-          where = @opts[:where].merge(where)
+    def where(*cond)
+      cond = cond.first if cond.size == 1
+      if @opts[:where]
+        if @opts[:where].is_a?(Hash) && cond.is_a?(Hash)
+          cond = @opts[:where].merge(cond)
+        else
+          cond = AND_WHERE % [where_list(@opts[:where]), where_list(cond)]
         end
       end
-      dup_merge(:where => where)
+      dup_merge(:where => cond)
+    end
+    
+    NOT_WHERE = "NOT %s".freeze
+    
+    def exclude(*cond)
+      cond = cond.first if cond.size == 1
+      where(NOT_WHERE % where_list(cond))
     end
     
     LEFT_OUTER_JOIN = 'LEFT OUTER JOIN'.freeze
@@ -270,6 +281,8 @@ module Sequel
       
       sql
     end
+    
+    alias_method :sql, :select_sql
     
     INSERT = "INSERT INTO %s (%s) VALUES (%s)".freeze
     INSERT_EMPTY = "INSERT INTO %s DEFAULT VALUES".freeze

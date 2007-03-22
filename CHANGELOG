@@ -1,4 +1,12 @@
-*SVN*
+*0.0.6*
+
+* Added Dataset#sql as alias to Dataset#select_sql.
+
+* Dataset#where and Dataset#exclude can now be used for refining dataset conditions, enabling stuff like posts.where(:title => 'abcdef').exclude(:user_id => 3).
+
+* Implemented Dataset#exclude method.
+
+* Added Sequel::Schema#auto_primary_key method for setting an automatic primary key to be added to every table definition. Changed the schema generator to not define a primary key by default.
 
 * Changed Sequel::Database#table_exists? to rely on the tables method if it is available.
 

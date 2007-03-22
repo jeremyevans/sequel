@@ -83,9 +83,9 @@ module Sequel
     class Generator
       attr_reader :table_name
     
-      def initialize(table_name, &block)
+      def initialize(table_name, auto_primary_key, &block)
         @table_name = table_name
-        @primary_key = {:name => :id, :type => :serial, :primary_key => true}
+        @primary_key = auto_primary_key
         @columns = []
         @indexes = []
         instance_eval(&block)
@@ -140,8 +140,16 @@ module Sequel
       instance_eval(&block) if block
     end
     
+    def auto_primary_key(name, type = nil, opts = nil)
+      @auto_primary_key = {
+        :name => name,
+        :type => type || :serial,
+        :primary_key => true
+      }.merge(opts || {})
+    end
+    
     def create_table(table_name, &block)
-      @instructions << Generator.new(table_name, &block)
+      @instructions << Generator.new(table_name, @auto_primary_key, &block)
     end
     
     def create(db)

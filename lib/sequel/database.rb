@@ -102,6 +102,34 @@ module Sequel
       false
     end
     
+    SQL_BEGIN = 'BEGIN'.freeze
+    SQL_COMMIT = 'COMMIT'.freeze
+    SQL_ROLLBACK = 'ROLLBACK'.freeze
+    
+    def transaction
+      @pool.hold do |conn|
+        @transactions ||= []
+        if @transactions.include? Thread.current
+          return yield(conn)
+        end
+        # ServerSide.info('BEGIN')
+        conn.execute(SQL_BEGIN)
+        begin
+          @transactions << Thread.current
+          result = yield(conn)
+          # ServerSide.info('COMMIT')
+          conn.execute(SQL_COMMIT)
+          result
+        rescue => e
+          # ServerSide.info('ROLLBACK')
+          conn.execute(SQL_ROLLBACK)
+          raise e
+        ensure
+          @transactions.delete(Thread.current)
+        end
+      end
+    end
+    
     @@adapters = Hash.new
     
     # Sets the adapter scheme for the database class. Call this method in

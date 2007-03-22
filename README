@@ -51,11 +51,11 @@ Note: you don't need to require 'sequel' separately before that, as each adapter
 
 There are two ways to create a connection to a database. The easier way is to provide a connection URL:
 
-  DB = Sequel.connect("sqlite:///blog.db")
+  DB = Sequel.open("sqlite:///blog.db")
 
 You can also specify optional parameters, such as the connection pool size:
 
-  DB = Sequel.connect("postgres://postgres:postgres@localhost/my_db",
+  DB = Sequel.open("postgres://postgres:postgres@localhost/my_db",
     :max_connections => 10)
 
 The second, more verbose, way is to create an instance of a database class:
