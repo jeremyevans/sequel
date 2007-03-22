@@ -1,3 +1,7 @@
+*0.0.7*
+
+* Fixed bug in Model.schema, duh!
+
 *0.0.6*
 
 * Added Dataset#sql as alias to Dataset#select_sql.

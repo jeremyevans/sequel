@@ -83,7 +83,7 @@ module Sequel
     class Generator
       attr_reader :table_name
     
-      def initialize(table_name, auto_primary_key, &block)
+      def initialize(table_name, auto_primary_key = nil, &block)
         @table_name = table_name
         @primary_key = auto_primary_key
         @columns = []
