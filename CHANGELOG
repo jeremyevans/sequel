@@ -1,6 +1,10 @@
-*SVN*
+*0.0.8*
 
-* Refactored insert code in Postgres adapter in preparation for solving lastval() for pre-8.1 versions of Postgresql.
+* Fixed Dataset#reverse_order to provide chainability. This method can be called without arguments to invert the current order or with arguments to provide a descending order.
+
+* Fixed literal representation of literals in SQLite adapter (thanks Christian Neukirchen!) 
+
+* Refactored insert code in Postgres adapter (in preparation for fetching the last insert id for pre-8.1 versions).
 
 *0.0.7*
 

@@ -57,6 +57,17 @@ module Sequel
     end
     
     class Dataset < Sequel::Dataset
+      def literal(v)
+        case v
+        when String: "'%s'" % v.gsub(/'/, "''")
+        when Time: literal(v.iso8601)
+        when Array: v.empty? ? NULL : v.join(COMMA_SEPARATOR)
+        when Integer, Float: v.to_s
+        else
+          raise "can't express #{v.inspect}:#{v.class} as a SQL literal"
+        end
+      end
+
       def each(opts = nil, &block)
         @db.result_set(select_sql(opts), @record_class, &block)
         self

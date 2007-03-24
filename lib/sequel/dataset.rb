@@ -166,15 +166,17 @@ module Sequel
       dup_merge(:order => order)
     end
     
+    # Returns a copy of the dataset with the order reversed. If no order is
+    # given, the existing order is inverted.
+    def reverse_order(*order)
+      order(invert_order(order.empty? ? @opts[:order] : order))
+    end
+    
     DESC_ORDER_REGEXP = /(.*)\sDESC/.freeze
     
-    def reverse_order(order)
+    def invert_order(order)
       order.map do |f|
-        if f.to_s =~ DESC_ORDER_REGEXP
-          $1
-        else
-          f.DESC
-        end
+        f.to_s =~ DESC_ORDER_REGEXP ? $1 : f.DESC
       end
     end
     
@@ -375,11 +377,10 @@ module Sequel
     end
   
     def last(num = 1)
-      raise RuntimeError, 'No order specified' unless
-        @opts[:order] || (opts && opts[:order])
+      raise 'No order specified' unless @opts[:order] || (opts && opts[:order])
       
       l = {:limit => num}
-      opts = {:order => reverse_order(@opts[:order])}.
+      opts = {:order => invert_order(@opts[:order])}.
         merge(opts ? opts.merge(l) : l)
 
       if num == 1
@@ -390,8 +391,7 @@ module Sequel
     end
     
     def destroy
-      raise RuntimeError, 'Dataset not associated with model' unless
-        @record_class
+      raise 'Dataset not associated with model' unless @record_class
       
       @db.transaction {each {|r| r.destroy}}
     end
