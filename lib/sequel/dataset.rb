@@ -1,3 +1,5 @@
+require 'time'
+
 module Sequel
   # A Dataset represents a view of a the data in a database, constrained by
   # specific parameters such as filtering conditions, order, etc. Datasets
@@ -100,9 +102,12 @@ module Sequel
     # of an SQL expression. This method is overriden in descendants.
     def literal(v)
       case v
-      when String: "'%s'" % v
+      when String: "'%s'" % v.gsub(/'/, "''")
+      when Integer, Float: v.to_s
+      when Symbol: v.to_field_name
       when Array: v.empty? ? NULL : v.join(COMMA_SEPARATOR)
-      else v.to_s
+      else
+        raise "can't express #{v.inspect}:#{v.class} as a SQL literal"
       end
     end
     
@@ -123,6 +128,8 @@ module Sequel
 #        BETWEEN_EXPR % [field_name(left), literal(right.begin), literal(right.end)]
       when Array:
         IN_EXPR % [left, literal(right)]
+      when self.class:
+        IN_EXPR % [left, right.sql]
       else
         EQUAL_COND % [left, literal(right)]
       end
@@ -358,6 +365,16 @@ module Sequel
       select(field.SUM).first.values.first
     end
     
+    def avg(field)
+      select(field.AVG).first.values.first
+    end
+    
+    EXISTS_EXPR = "EXISTS (%s)".freeze
+    
+    def exists(opts = nil)
+      EXISTS_EXPR % sql({:select => 1}.merge(opts || {}))
+    end
+    
     LIMIT_1 = {:limit => 1}.freeze
     
     def limit(l)
@@ -410,6 +427,7 @@ class Symbol
   def MIN; "min(#{to_field_name})"; end
   def MAX; "max(#{to_field_name})"; end
   def SUM; "sum(#{to_field_name})"; end
+  def AVG; "avg(#{to_field_name})"; end
 
   AS_REGEXP = /(.*)___(.*)/.freeze
   AS_FORMAT = "%s AS %s".freeze

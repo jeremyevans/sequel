@@ -1,3 +1,11 @@
+*SVN*
+
+* Added Dataset#exists method for EXISTS where clauses.
+
+* Changed behavior of Dataset#literal to regard symbols as field names.
+
+* Refactored and DRY'd Dataset#literal and overrides therof. Added support for subqueries in where clause.
+
 *0.0.8*
 
 * Fixed Dataset#reverse_order to provide chainability. This method can be called without arguments to invert the current order or with arguments to provide a descending order.

@@ -180,11 +180,10 @@ module Sequel
     class Dataset < Sequel::Dataset
       def literal(v)
         case v
-        when Array: super
+        when String, Fixnum, Float: PGconn.quote(v)
         when Time: v.to_sql_timestamp
-        when Symbol: PGconn.quote(v.to_s)
         else
-          PGconn.quote(v)
+          super
         end
       end
     
