@@ -104,6 +104,7 @@ module Sequel
       case v
       when String: "'%s'" % v.gsub(/'/, "''")
       when Integer, Float: v.to_s
+      when NilClass: NULL
       when Symbol: v.to_field_name
       when Array: v.empty? ? NULL : v.join(COMMA_SEPARATOR)
       else
