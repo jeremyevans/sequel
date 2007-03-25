@@ -146,7 +146,11 @@ You can then retrieve the records by using any of the retrieval methods:
 You can also specify a custom WHERE clause:
 
   posts.filter('(stamp < ?) AND (author <> ?)', 3.days.ago, author_name)
-  
+
+Datasets can also be used as subqueries for filtering:
+
+expensive_stuff = DB[:items].filter(:price => DB[:items].select('AVG(price) + 100'))
+
 === Summarizing Records
 
 Counting records is easy:

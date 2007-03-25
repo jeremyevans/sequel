@@ -65,6 +65,54 @@ class PGconn
       @transaction_in_progress = nil
     end
   end
+
+  SELECT_CURRVAL = "SELECT currval('%s')".freeze
+      
+  def last_insert_id(table)
+    @table_sequences ||= {}
+    seq = @table_sequences[table] ||= pkey_and_sequence(table)[1]
+    r = async_query(SELECT_CURRVAL % seq)
+    r[0][0].to_i unless r.nil? || r.empty?
+  end
+      
+  # Shamelessly appropriated from ActiveRecord's Postgresql adapter.
+  
+  SELECT_PK_AND_SERIAL_SEQUENCE = <<-end_sql
+    SELECT attr.attname, name.nspname, seq.relname
+    FROM pg_class seq, pg_attribute attr, pg_depend dep,
+      pg_namespace name, pg_constraint cons
+    WHERE seq.oid = dep.objid
+      AND seq.relnamespace  = name.oid
+      AND seq.relkind = 'S'
+      AND attr.attrelid = dep.refobjid
+      AND attr.attnum = dep.refobjsubid
+      AND attr.attrelid = cons.conrelid
+      AND attr.attnum = cons.conkey[1]
+      AND cons.contype = 'p'
+      AND dep.refobjid = '%s'::regclass
+  end_sql
+  
+  SELECT_PK_AND_CUSTOM_SEQUENCE = <<-end_sql
+    SELECT attr.attname, name.nspname, split_part(def.adsrc, '''', 2)
+    FROM pg_class t
+    JOIN pg_namespace  name ON (t.relnamespace = name.oid)
+    JOIN pg_attribute  attr ON (t.oid = attrelid)
+    JOIN pg_attrdef    def  ON (adrelid = attrelid AND adnum = attnum)
+    JOIN pg_constraint cons ON (conrelid = adrelid AND adnum = conkey[1])
+    WHERE t.oid = '%s'::regclass
+      AND cons.contype = 'p'
+      AND def.adsrc ~* 'nextval'
+  end_sql
+  
+  def pkey_and_sequence(table)
+    r = async_query(SELECT_PK_AND_SERIAL_SEQUENCE % table)
+    return [r[0].first, r[0].last] unless r.nil? or r.empty?
+
+    r = async_query(SELECT_PK_AND_CUSTOM_SEQUENCE % table)
+    return [r.first, r.last] unless r.nil? or r.empty?
+  rescue
+    nil
+  end
 end
 
 class String
@@ -130,11 +178,11 @@ module Sequel
     
     
       def tables
-        query(RELATION_QUERY).filter(RELATION_FILTER).map(:relname)
+        dataset(RELATION_QUERY).filter(RELATION_FILTER).map(:relname)
       end
       
       def locks
-        query.from("pg_class, pg_locks").
+        dataset.from("pg_class, pg_locks").
           select("pg_class.relname, pg_locks.*").
           filter("pg_class.relfilenode=pg_locks.relation")
       end
@@ -147,24 +195,10 @@ module Sequel
         @pool.hold {|conn| conn.execute(sql).clear}
       end
       
-      SELECT_LASTVAL = 'SELECT lastval()'.freeze
-
-      def execute_insert(sql)
+      def execute_insert(sql, table)
         @pool.hold do |conn|
           conn.execute(sql).clear
-          query_single_value(SELECT_LASTVAL)
-        end
-      end
-    
-      def query_single_value(sql)
-        @pool.hold do |conn|
-          result = conn.execute(sql)
-          begin
-            value = result.getvalue(0, 0)
-          ensure
-            result.clear
-          end
-          value
+          conn.last_insert_id(table)
         end
       end
     
@@ -266,11 +300,11 @@ module Sequel
       end
   
       def count(opts = nil)
-        @db.query_single_value(count_sql(opts)).to_i
+        query_single_value(count_sql(opts)).to_i
       end
     
       def insert(values = nil, opts = nil)
-        @db.execute_insert(insert_sql(values, opts))
+        @db.execute_insert(insert_sql(values, opts), @opts[:from])
       end
     
       def update(values, opts = nil)
@@ -337,6 +371,18 @@ module Sequel
         end
       end
       
+      def query_single_value(sql)
+        @db.synchronize do
+          result = @db.execute(sql)
+          begin
+            value = result.getvalue(0, 0)
+          ensure
+            result.clear
+          end
+          value
+        end
+      end
+    
       COMMA = ','.freeze
     
       @@converters_mutex = Mutex.new

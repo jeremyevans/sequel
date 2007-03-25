@@ -1,4 +1,8 @@
-*SVN*
+*0.0.9*
+
+* Fixed Postgres::Database#tables and #locks methods.
+
+* Added PGconn#last_insert_id method that should support all 7.x and 8.x versions of Postgresql.
 
 * Added Dataset#exists method for EXISTS where clauses.
 
