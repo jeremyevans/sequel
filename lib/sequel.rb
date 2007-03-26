@@ -3,6 +3,7 @@ require File.join(dir, 'core_ext')
 require File.join(dir, 'database')
 require File.join(dir, 'connection_pool')
 require File.join(dir, 'schema')
+require File.join(dir, 'pretty_table')
 require File.join(dir, 'dataset')
 require File.join(dir, 'model')
 

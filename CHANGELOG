@@ -1,3 +1,9 @@
+*0.0.10*
+
+* Added some examples.
+
+* Added Dataset#print method for pretty-printing tables.
+
 *0.0.9*
 
 * Fixed Postgres::Database#tables and #locks methods.

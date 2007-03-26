@@ -413,6 +413,10 @@ module Sequel
       
       @db.transaction {each {|r| r.destroy}}
     end
+    
+    def print(*columns)
+      Sequel::PrettyTable.print(all, columns.empty? ? nil : columns)
+    end
   end
 end
 
