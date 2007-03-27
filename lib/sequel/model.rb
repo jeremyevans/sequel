@@ -1,4 +1,3 @@
-#require 'rubygems'
 require 'metaid'
 
 module Sequel
@@ -8,7 +7,9 @@ module Sequel
     def self.db; @@db; end
     def self.db=(db); @@db = db; end
     
-    def self.table_name; @table_name; end
+    def self.table_name
+      @table_name || ((superclass != Model) && (superclass.table_name))
+    end
     def self.set_table_name(t); @table_name = t; end
 
     def self.dataset
@@ -53,12 +54,15 @@ module Sequel
     def self.primary_key; @primary_key ||= :id; end
     def self.set_primary_key(k); @primary_key = k; end
     
-    def self.schema(name = nil, &block)
+    def self.set_schema(name = nil, &block)
       name ? set_table_name(name) : name = table_name
       @schema = Schema::Generator.new(name, &block)
       if @schema.primary_key_name
         set_primary_key @schema.primary_key_name
       end
+    end
+    def self.schema
+      @schema || ((superclass != Model) && (superclass.schema))
     end
     
     def self.table_exists?
@@ -66,20 +70,16 @@ module Sequel
     end
     
     def self.create_table
-      db.execute get_schema.create_sql
+      db.execute schema.create_sql
     end
     
     def self.drop_table
-      db.execute get_schema.drop_sql
+      db.execute schema.drop_sql
     end
     
     def self.recreate_table
       drop_table if table_exists?
       create_table
-    end
-    
-    def self.get_schema
-      @schema
     end
     
     ONE_TO_ONE_PROC = "proc {i = @values[:%s]; %s[i] if i}".freeze
