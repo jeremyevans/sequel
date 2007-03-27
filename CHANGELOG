@@ -1,4 +1,4 @@
-*SVN*
+*0.0.12*
 
 * Added Model#reload for reloading an object from the database.
 
