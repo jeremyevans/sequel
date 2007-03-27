@@ -1,4 +1,4 @@
-*0.0.13*
+*SVN*
 
 * Fixed bug in Dataset#literal relating to lists of strings (thanks Douglas Koszerek.)
 
