@@ -47,6 +47,13 @@ module Sequel
       self.class.new(@db, @opts.merge(opts), @record_class)
     end
     
+    # Returns a dataset that fetches records as hashes (instead of model 
+    # objects). If no record class is defined for the dataset, self is
+    # returned.
+    def naked
+      @record_class ? self.class.new(@db, @opts) : self
+    end
+    
     AS_REGEXP = /(.*)___(.*)/.freeze
     AS_FORMAT = "%s AS %s".freeze
     DOUBLE_UNDERSCORE = '__'.freeze
@@ -418,7 +425,7 @@ module Sequel
     end
     
     def print(*columns)
-      Sequel::PrettyTable.print(all, columns.empty? ? nil : columns)
+      Sequel::PrettyTable.print(naked.all, columns.empty? ? nil : columns)
     end
   end
 end

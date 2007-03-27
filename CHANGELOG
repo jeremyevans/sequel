@@ -1,5 +1,11 @@
 *SVN*
 
+* Added Model#reload for reloading an object from the database.
+
+* Added Dataset#naked method for getting a version of a dataset that fetches records as hashes.
+
+* Implemented attribute accessors for column values ala ActiveRecord models.
+
 * Fixed filtering using nil values (e.g. dataset.filter(:parent_id => nil)).
 
 *0.0.11*

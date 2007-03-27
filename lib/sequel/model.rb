@@ -215,7 +215,33 @@ module Sequel
     
     def db; @@db; end
     
+    ASSIGN_METHOD_REGEXP = /(.*)=$/.freeze
+    
+    def method_missing(sym, value = nil)
+      if sym.to_s =~ ASSIGN_METHOD_REGEXP
+        @values[$1.to_sym] = value
+      else
+        @values[sym]
+      end
+    end
+    
+    def reload
+      temp = self.class[@pkey]
+      @values = self.class.dataset.naked[primary_key => @pkey]
+    end
+    
     def [](field); @values[field]; end
+    
+    def []=(field, value); @values[field] = value; end
+    
+    def save
+      if @pkey
+        model.dataset.filter(primary_key => @pkey).update(@values)
+      else
+        @pkey = model.dataset.insert(@values)
+        reload
+      end
+    end
     
     def ==(obj)
       (obj.class == model) && (obj.pkey == @pkey)
@@ -224,12 +250,6 @@ module Sequel
     def set(values)
       model.dataset.filter(primary_key => @pkey).update(values)
       @values.merge!(values)
-    end
-
-    def []=(field, value); @values[field] = value; end
-    
-    def save
-      model.dataset.filter(primary_key => @pkey).update(@values)
     end
   end
   

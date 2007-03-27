@@ -1,3 +1,3 @@
-* Add access to column values in model objects like in ActiveRecord, e.g. Node.path and Node.path= using method_missing.
-
 * Refactor schema code to allow adapters to adapt schema definitions to specific capabilities.
+
+* Refactor Dataset and descendants for DRY. Methods like count, select etc. should be defined in Sequel::Dataset.
