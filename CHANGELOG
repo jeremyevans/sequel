@@ -1,3 +1,7 @@
+*SVN*
+
+* Removed require 'postgres' in schema.rb (thanks Douglas Koszerek.)
+
 *0.0.10*
 
 * Added some examples.

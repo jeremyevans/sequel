@@ -1,6 +1,3 @@
-require 'rubygems'
-require 'postgres'
-
 module Sequel
   class Schema
     COMMA_SEPARATOR = ', '.freeze
