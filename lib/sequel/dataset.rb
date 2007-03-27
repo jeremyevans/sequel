@@ -118,6 +118,7 @@ module Sequel
 #    BETWEEN_EXPR = "(%s BETWEEN %s AND %s)".freeze
     INCLUSIVE_RANGE_EXPR = "(%s >= %s AND %s <= %s)".freeze
     EXCLUSIVE_RANGE_EXPR = "(%s >= %s AND %s < %s)".freeze
+    NULL_EXPR = "(%s IS NULL)".freeze
     
     # Formats an equality condition SQL expression.
     def where_condition(left, right)
@@ -129,6 +130,8 @@ module Sequel
 #        BETWEEN_EXPR % [field_name(left), literal(right.begin), literal(right.end)]
       when Array:
         IN_EXPR % [left, literal(right)]
+      when NilClass:
+        NULL_EXPR % left
       when self.class:
         IN_EXPR % [left, right.sql]
       else
