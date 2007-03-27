@@ -113,7 +113,7 @@ module Sequel
       when Integer, Float: v.to_s
       when NilClass: NULL
       when Symbol: v.to_field_name
-      when Array: v.empty? ? NULL : v.join(COMMA_SEPARATOR)
+      when Array: v.empty? ? NULL : v.map {|i| literal(i)}.join(COMMA_SEPARATOR)
       else
         raise "can't express #{v.inspect}:#{v.class} as a SQL literal"
       end

@@ -1,3 +1,7 @@
+*0.0.13*
+
+* Fixed bug in Dataset#literal relating to lists of strings (thanks Douglas Koszerek.)
+
 *0.0.12*
 
 * Model#save now correctly performs an INSERT for new objects.
