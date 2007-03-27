@@ -1,5 +1,7 @@
 *0.0.12*
 
+* Model#save now correctly performs an INSERT for new objects.
+
 * Added Model#reload for reloading an object from the database.
 
 * Added Dataset#naked method for getting a version of a dataset that fetches records as hashes.
