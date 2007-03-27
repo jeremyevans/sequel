@@ -1,5 +1,7 @@
 *0.0.11*
 
+* Renamed Model.schema to Model.set_schema and Model.get_schema to Model.schema.
+
 * Improved Model class to allow descendants of model clases (thanks Pedro Gutierrez.)
 
 * Removed require 'postgres' in schema.rb (thanks Douglas Koszerek.)
