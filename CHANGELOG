@@ -1,8 +1,8 @@
-*SVN*
+*0.0.13*
 
 * Fixed Model#method_missing to do both find, filter and attribute accessors. duh.
 
-* Fixed bug in Dataset#literal relating to lists of strings (thanks Douglas Koszerek.)
+* Fixed bug in Dataset#literal when quoting arrays of strings (thanks Douglas Koszerek.)
 
 *0.0.12*
 
