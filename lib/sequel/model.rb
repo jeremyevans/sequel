@@ -195,6 +195,7 @@ module Sequel
     
     FIND_BY_REGEXP = /^find_by_(.*)/.freeze
     FILTER_BY_REGEXP = /^filter_by_(.*)/.freeze
+    WRITE_ATTR_REGEXP = /(.*)=$/.freeze
     
     def self.method_missing(m, *args)
       Thread.exclusive do
@@ -207,23 +208,15 @@ module Sequel
           c = $1
           meta_def(method_name) {|arg| filter(c => arg)}
           send(m, *args) if respond_to?(m)
+        elsif method_name =~ WRITE_ATTR_REGEXP
+          self[$1.to_sym] = value
         else
-          super
+          self[m]
         end
       end
     end
     
     def db; @@db; end
-    
-    ASSIGN_METHOD_REGEXP = /(.*)=$/.freeze
-    
-    def method_missing(sym, value = nil)
-      if sym.to_s =~ ASSIGN_METHOD_REGEXP
-        @values[$1.to_sym] = value
-      else
-        @values[sym]
-      end
-    end
     
     def reload
       temp = self.class[@pkey]
