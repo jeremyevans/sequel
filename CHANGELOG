@@ -1,3 +1,13 @@
+*SVN*
+
+* Added Model#id to to return the id column.
+
+* Fixed Model's attribute accessors (hopefully for the last time).
+
+* Changed Model.db and Model.db= to allow different databases for different model classes.
+
+* Fixed bug in aggregate methods (max, min, etc) for datasets using record classes.
+
 *0.0.13*
 
 * Fixed Model#method_missing to do both find, filter and attribute accessors. duh.

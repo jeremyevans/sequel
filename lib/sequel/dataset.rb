@@ -365,19 +365,19 @@ module Sequel
     
     # aggregates
     def min(field)
-      select(field.MIN).first.values.first
+      select(field.MIN).naked.first.values.first
     end
     
     def max(field)
-      select(field.MAX).first.values.first
+      select(field.MAX).naked.first.values.first
     end
 
     def sum(field)
-      select(field.SUM).first.values.first
+      select(field.SUM).naked.first.values.first
     end
     
     def avg(field)
-      select(field.AVG).first.values.first
+      select(field.AVG).naked.first.values.first
     end
     
     EXISTS_EXPR = "EXISTS (%s)".freeze

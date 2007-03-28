@@ -3,3 +3,7 @@
 * Refactor schema code to allow adapters to adapt schema definitions to specific capabilities.
 
 * Refactor Dataset and descendants for DRY. Methods like count, select etc. should be defined in Sequel::Dataset.
+
+* Wrap native database exceptions in Sequel::Exception.
+
+* Rename Dataset's record_class attributes to model_class.

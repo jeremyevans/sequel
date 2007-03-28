@@ -4,11 +4,13 @@ module Sequel
   class Model
     @@db = nil
     
-    def self.db; @@db; end
-    def self.db=(db); @@db = db; end
+    def self.db
+      @db ||= ((superclass != Object) && (superclass.db)) || nil
+    end
+    def self.db=(db); @db = db; end
     
     def self.table_name
-      @table_name || ((superclass != Model) && (superclass.table_name))
+      @table_name ||= ((superclass != Model) && (superclass.table_name)) || nil
     end
     def self.set_table_name(t); @table_name = t; end
 
@@ -23,7 +25,12 @@ module Sequel
       @dataset.record_class = self
       @dataset
     end
-    def self.set_dataset(ds); @dataset = ds; @dataset.record_class = self; end
+
+    def self.set_dataset(ds)
+      @db = ds.db
+      @dataset = ds
+      @dataset.record_class = self
+    end
     
     def self.cache_by(column, expiration)
       @cache_column = column
@@ -195,7 +202,6 @@ module Sequel
     
     FIND_BY_REGEXP = /^find_by_(.*)/.freeze
     FILTER_BY_REGEXP = /^filter_by_(.*)/.freeze
-    WRITE_ATTR_REGEXP = /(.*)=$/.freeze
     
     def self.method_missing(m, *args)
       Thread.exclusive do
@@ -208,15 +214,11 @@ module Sequel
           c = $1
           meta_def(method_name) {|arg| filter(c => arg)}
           send(m, *args) if respond_to?(m)
-        elsif method_name =~ WRITE_ATTR_REGEXP
-          self[$1.to_sym] = value
-        else
-          self[m]
         end
       end
     end
     
-    def db; @@db; end
+    def db; self.class.db; end
     
     def reload
       temp = self.class[@pkey]
@@ -226,6 +228,16 @@ module Sequel
     def [](field); @values[field]; end
     
     def []=(field, value); @values[field] = value; end
+    
+    WRITE_ATTR_REGEXP = /(.*)=$/.freeze
+
+    def method_missing(m, value = nil)
+      if m.to_s =~ WRITE_ATTR_REGEXP
+        self[$1.to_sym] = value
+      else
+        self[m]
+      end
+    end
     
     def save
       if @pkey
@@ -246,9 +258,15 @@ module Sequel
     end
   end
   
-  def self.Model(table_name)
+  def self.Model(table)
     Class.new(Sequel::Model) do
-      meta_def(:inherited) {|c| c.set_table_name(table_name)}
+      meta_def(:inherited) do |c|
+        if table.is_a?(Dataset)
+          c.set_dataset(table)
+        else
+          c.set_table_name(table)
+        end
+      end
     end
   end
 end
