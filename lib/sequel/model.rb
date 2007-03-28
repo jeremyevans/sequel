@@ -239,6 +239,8 @@ module Sequel
       end
     end
     
+    def id; @values[:id]; end
+    
     def save
       if @pkey
         model.dataset.filter(primary_key => @pkey).update(@values)

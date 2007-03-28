@@ -1,6 +1,8 @@
-*0.0.14*
+*SVN*
 
 * Added Model#id to to return the id column.
+
+*0.0.14*
 
 * Fixed Model's attribute accessors (hopefully for the last time).
 
