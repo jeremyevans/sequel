@@ -1,3 +1,4 @@
+require 'rubygems'
 require File.join(File.dirname(__FILE__), '../lib/sequel/sqlite')
 
 # Let's open an in-memory database
@@ -22,7 +23,8 @@ items << {:name => 'ghi', :price => rand * 100}
 puts "Item count: #{items.count}"
 
 # Print out the records
-items.each {|i| puts "#{i[:name]} costs #{i[:price]}"}
+items.print(:name, :price)
 
 # Print out the average price
 puts "The average price is: #{items.avg(:price)}"
+

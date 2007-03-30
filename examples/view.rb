@@ -37,4 +37,4 @@ records << [4,4,1,4,'Magenta']
 records << [5,5,2,4,'Blue']
 data = db[:data].filter(:f1 => ['Dave','Douglas'])
 puts data.sql
-data.each {|row| p row }
+data.print(:id, :f1, :f2, :f3, :value)

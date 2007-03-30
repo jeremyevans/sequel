@@ -1,4 +1,4 @@
-*SVN*
+*0.0.15*
 
 * Improved Dataset#insert_sql to allow arrays as well as hashes.
 
