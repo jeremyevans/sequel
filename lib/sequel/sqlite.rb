@@ -80,9 +80,9 @@ module Sequel
         @db.single_value(count_sql(opts)).to_i
       end
     
-      def insert(values = nil, opts = nil)
+      def insert(*values)
         @db.synchronize do
-          @db.execute_insert insert_sql(values, opts)
+          @db.execute_insert insert_sql(*values)
         end
       end
     

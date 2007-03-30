@@ -303,8 +303,8 @@ module Sequel
         query_single_value(count_sql(opts)).to_i
       end
     
-      def insert(values = nil, opts = nil)
-        @db.execute_insert(insert_sql(values, opts), @opts[:from])
+      def insert(*values)
+        @db.execute_insert(insert_sql(*values), @opts[:from])
       end
     
       def update(values, opts = nil)

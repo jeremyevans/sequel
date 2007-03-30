@@ -305,25 +305,25 @@ module Sequel
     alias_method :sql, :select_sql
     
     INSERT = "INSERT INTO %s (%s) VALUES (%s)".freeze
+    INSERT_VALUES = "INSERT INTO %s VALUES (%s)".freeze
     INSERT_EMPTY = "INSERT INTO %s DEFAULT VALUES".freeze
     
-    def insert_sql(values, opts = nil)
-      opts = opts ? @opts.merge(opts) : @opts
-
-      if values.nil? || values.empty?
-        INSERT_EMPTY % opts[:from]
-      else
+    def insert_sql(*values)
+      if values.empty?
+        INSERT_EMPTY % @opts[:from]
+      elsif (values.size == 1) && values[0].is_a?(Hash)
         field_list = []
         value_list = []
-        values.each do |k, v|
+        values[0].each do |k, v|
           field_list << k
           value_list << literal(v)
         end
-      
         INSERT % [
-          opts[:from], 
+          @opts[:from], 
           field_list.join(COMMA_SEPARATOR), 
           value_list.join(COMMA_SEPARATOR)]
+      else
+        INSERT_VALUES % [@opts[:from], literal(values)]
       end
     end
     
