@@ -88,7 +88,7 @@ module Sequel
     # Drops a table.
     def drop_table(*names)
       transaction do
-        names.each {|n execute Schema.drop_table_sql(n)}
+        names.each {|n| execute Schema.drop_table_sql(n)}
       end
     end
     
