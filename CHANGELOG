@@ -1,5 +1,7 @@
 *SVN*
 
+* Database#drop_table now accepts a list of table names.
+
 * Added Model#id to to return the id column.
 
 *0.0.14*

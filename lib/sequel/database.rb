@@ -86,8 +86,10 @@ module Sequel
     end
     
     # Drops a table.
-    def drop_table(name)
-      execute Schema.drop_table_sql(name)
+    def drop_table(*names)
+      transaction do
+        names.each {|n execute Schema.drop_table_sql(n)}
+      end
     end
     
     # Performs a brute-force check for the existance of a table. This method is
