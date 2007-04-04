@@ -1,3 +1,9 @@
+*SVN*
+
+* Added Enumerable#send_each convenience method.
+
+* Changed Dataset#destroy to return the number of deleted records.
+
 *0.0.15*
 
 * Improved Dataset#insert_sql to allow arrays as well as hashes.

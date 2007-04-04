@@ -421,7 +421,9 @@ module Sequel
     def destroy
       raise 'Dataset not associated with model' unless @record_class
       
-      @db.transaction {each {|r| r.destroy}}
+      count = 0
+      @db.transaction {each {|r| count += 1; r.destroy}}
+      count
     end
     
     def print(*columns)
