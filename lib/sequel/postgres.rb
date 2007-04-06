@@ -188,14 +188,17 @@ module Sequel
       end
     
       def execute(sql)
+        @logger.info(sql) if @logger
         @pool.hold {|conn| conn.execute(sql)}
       end
     
       def execute_and_forget(sql)
+        @logger.info(sql) if @logger
         @pool.hold {|conn| conn.execute(sql).clear}
       end
       
       def execute_insert(sql, table)
+        @logger.info(sql) if @logger
         @pool.hold do |conn|
           conn.execute(sql).clear
           conn.last_insert_id(table)

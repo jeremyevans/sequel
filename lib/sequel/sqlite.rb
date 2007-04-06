@@ -30,10 +30,12 @@ module Sequel
       end
     
       def execute(sql)
+        @logger.info(sql) if @logger
         @pool.hold {|conn| conn.execute(sql)}
       end
       
       def execute_insert(sql)
+        @logger.info(sql) if @logger
         @pool.hold {|conn| conn.execute(sql); conn.last_insert_row_id}
       end
       

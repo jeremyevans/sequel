@@ -17,6 +17,7 @@ module Sequel
     def initialize(opts = {})
       @opts = opts
       @pool = ConnectionPool.new(@opts[:max_connections] || 4)
+      @logger = opts[:logger]
     end
     
     # Returns a blank dataset

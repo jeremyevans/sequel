@@ -23,12 +23,14 @@ module Sequel
       end
     
       def execute(sql)
+        @logger.info(sql) if @logger
         @pool.hold do |conn|
           conn.query(sql)
         end
       end
       
       def execute_insert(sql)
+        @logger.info(sql) if @logger
         @pool.hold do |conn|
           conn.query(sql)
           conn.insert_id
@@ -36,6 +38,7 @@ module Sequel
       end
     
       def execute_affected(sql)
+        @logger.info(sql) if @logger
         @pool.hold do |conn|
           conn.query(sql)
           conn.affected_rows

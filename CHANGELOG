@@ -1,5 +1,7 @@
 *SVN*
 
+* Added basic SQL logging to Database.
+
 * Added Enumerable#send_each convenience method.
 
 * Changed Dataset#destroy to return the number of deleted records.
