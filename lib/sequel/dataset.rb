@@ -104,6 +104,7 @@ module Sequel
     end
     
     NULL = "NULL".freeze
+    SUBQUERY = "(%s)".freeze
     
     # Returns a literal representation of a value to be used as part
     # of an SQL expression. This method is overriden in descendants.
@@ -114,6 +115,7 @@ module Sequel
       when NilClass: NULL
       when Symbol: v.to_field_name
       when Array: v.empty? ? NULL : v.map {|i| literal(i)}.join(COMMA_SEPARATOR)
+      when self.class: SUBQUERY % v.sql
       else
         raise "can't express #{v.inspect}:#{v.class} as a SQL literal"
       end
