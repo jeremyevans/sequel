@@ -202,6 +202,7 @@ module Sequel
     
     FIND_BY_REGEXP = /^find_by_(.*)/.freeze
     FILTER_BY_REGEXP = /^filter_by_(.*)/.freeze
+    ALL_BY_REGEXP = /^all_by_(.*)/.freeze
     
     def self.method_missing(m, *args)
       Thread.exclusive do
@@ -209,13 +210,15 @@ module Sequel
         if method_name =~ FIND_BY_REGEXP
           c = $1
           meta_def(method_name) {|arg| find(c => arg)}
-          send(m, *args) if respond_to?(m)
         elsif method_name =~ FILTER_BY_REGEXP
           c = $1
           meta_def(method_name) {|arg| filter(c => arg)}
-          send(m, *args) if respond_to?(m)
+        elsif method_name =~ ALL_BY_REGEXP
+          c = $1
+          meta_def(method_name) {|arg| filter(c => arg).all}
         end
       end
+      respond_to?(m) ? send(m, *args) : super(m, *args)
     end
     
     def db; self.class.db; end
