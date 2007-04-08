@@ -1,5 +1,7 @@
 *0.0.16*
 
+* More documentation.
+
 * Added support for subqueries in Dataset#literal.
 
 * Added support for Model.all_by_XXX methods through Model.method_missing.
