@@ -415,6 +415,8 @@ module Sequel
       end
     end
     
+    # Returns the first record in the dataset. If the num argument is specified,
+    # an array is returned with the first <i>num</i> records.
     def first(num = 1)
       if num == 1
         first_record
@@ -423,8 +425,14 @@ module Sequel
       end
     end
     
+    # Returns the first record matching the condition.
     def [](condition)
       where(condition).first
+    end
+    
+    # Updates all records matching the condition with the values specified.
+    def []=(condition, values)
+      where(condition).update(values)
     end
   
     def last(num = 1)
@@ -441,6 +449,8 @@ module Sequel
       end
     end
     
+    # Deletes all records in the dataset one at a time by invoking the destroy
+    # method of the associated model class.
     def destroy
       raise 'Dataset not associated with model' unless @record_class
       
@@ -449,6 +459,7 @@ module Sequel
       count
     end
     
+    # Pretty prints the records in the dataset as plain-text table.
     def print(*columns)
       Sequel::PrettyTable.print(naked.all, columns.empty? ? nil : columns)
     end
