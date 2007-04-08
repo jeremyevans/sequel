@@ -181,6 +181,11 @@ module Sequel
       dup_merge(:select => fields)
     end
 
+    def uniq
+      dup_merge(:distinct=>true)
+    end
+    alias distinct uniq
+
     # Returns a copy of the dataset with the order changed.
     def order(*order)
       dup_merge(:order => order)
@@ -266,7 +271,9 @@ module Sequel
     end
 
     SELECT = "SELECT %s FROM %s".freeze
+    SELECT_DISTINCT = "SELECT DISTINCT %s FROM %s".freeze
     LIMIT = " LIMIT %s".freeze
+    OFFSET = " OFFSET %s".freeze
     ORDER = " ORDER BY %s".freeze
     WHERE = " WHERE %s".freeze
     JOIN_CLAUSE = " %s %s ON %s".freeze
@@ -281,7 +288,7 @@ module Sequel
       fields = opts[:select]
       select_fields = fields ? field_list(fields) : WILDCARD
       select_source = source_list(opts[:from])
-      sql = SELECT % [select_fields, select_source]
+      sql = (opts[:distinct] ? SELECT_DISTINCT : SELECT) % [select_fields, select_source]
       
       if join_type = opts[:join_type]
         join_table = opts[:join_table]
@@ -299,8 +306,11 @@ module Sequel
       
       if limit = opts[:limit]
         sql << (LIMIT % limit)
+        if offset = opts[:offset]
+          sql << (OFFSET % offset)
+        end
       end
-      
+            
       sql
     end
     
@@ -390,10 +400,17 @@ module Sequel
     
     LIMIT_1 = {:limit => 1}.freeze
     
-    def limit(l)
-      dup_merge(:limit => l)
+    def limit(l, o = nil)
+      if l.is_a? Range
+        lim = (l.exclude_end? ? l.last - l.first : l.last + 1 - l.first)
+        dup_merge(:limit => lim, :offset=>l.first)
+      elsif o
+        dup_merge(:limit => l, :offset => o)
+      else
+        dup_merge(:limit => l)
+      end
     end
-
+    
     def first(num = 1)
       if num == 1
         first_record
