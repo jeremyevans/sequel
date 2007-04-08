@@ -181,8 +181,9 @@ module Sequel
       dup_merge(:select => fields)
     end
 
+    # Returns a copy of the dataset with the distinct option.
     def uniq
-      dup_merge(:distinct=>true)
+      dup_merge(:distinct => true)
     end
     alias distinct uniq
 
@@ -400,6 +401,9 @@ module Sequel
     
     LIMIT_1 = {:limit => 1}.freeze
     
+    # If given an integer, the dataset will contain only the first l results.
+    # If given a range, it will contain only those at offsets within that
+    # range. If a second argument is given, it is used as an offset.
     def limit(l, o = nil)
       if l.is_a? Range
         lim = (l.exclude_end? ? l.last - l.first : l.last + 1 - l.first)
