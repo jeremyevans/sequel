@@ -36,7 +36,7 @@ module Sequel
     #
     # Sequel::Dataset is an abstract class that is not useful by itself. Each
     # database adaptor should provide a descendant class of Sequel::Dataset.
-    def initialize(db, opts = {}, record_class = nil)
+    def initialize(db, opts = nil, record_class = nil)
       @db = db
       @opts = opts || {}
       @record_class = record_class
@@ -149,7 +149,7 @@ module Sequel
     end
     
     # Formats a where clause.
-    def where_list(where)
+    def where_list(where, parenthesize = false)
       case where
       when Hash:
         where.map {|kv| where_condition(*kv)}.join(AND_SEPARATOR)
@@ -157,7 +157,7 @@ module Sequel
         fmt = where.shift
         fmt.gsub('?') {|i| literal(where.shift)}
       else
-        where
+        parenthesize ? "(#{where})" : where
       end
     end
     
@@ -212,13 +212,9 @@ module Sequel
     def where(*cond)
       cond = cond.first if cond.size == 1
       if @opts[:where]
-        if @opts[:where].is_a?(Hash) && cond.is_a?(Hash)
-          cond = @opts[:where].merge(cond)
-        else
-          cond = AND_WHERE % [where_list(@opts[:where]), where_list(cond)]
-        end
+        cond = AND_WHERE % [where_list(@opts[:where]), where_list(cond, true)]
       end
-      dup_merge(:where => cond)
+      dup_merge(:where => where_list(cond))
     end
     
     NOT_WHERE = "NOT %s".freeze
@@ -298,7 +294,7 @@ module Sequel
       end
       
       if where = opts[:where]
-        sql << (WHERE % where_list(where))
+        sql << (WHERE % where)
       end
       
       if order = opts[:order]
@@ -348,25 +344,26 @@ module Sequel
       
       set_list = values.map {|kv| SET_FORMAT % [kv[0], literal(kv[1])]}.
         join(COMMA_SEPARATOR)
-      update_clause = UPDATE % [opts[:from], set_list]
+      sql = UPDATE % [opts[:from], set_list]
       
-      where = opts[:where]
-      where_clause = where ? WHERE % where_list(where) : EMPTY
+      if where = opts[:where]
+        sql << WHERE % where_list(where)
+      end
 
-      [update_clause, where_clause].join(SPACE)
+      sql
     end
     
     DELETE = "DELETE FROM %s".freeze
     
     def delete_sql(opts = nil)
       opts = opts ? @opts.merge(opts) : @opts
+      sql = DELETE % opts[:from]
 
-      delete_source = opts[:from] 
-      
-      where = opts[:where]
-      where_clause = where ? WHERE % where_list(where) : EMPTY
-      
-      [DELETE % delete_source, where_clause].join(SPACE)
+      if where = opts[:where]
+        sql << WHERE % where_list(where)
+      end
+
+      sql
     end
     
     COUNT = "COUNT(*)".freeze

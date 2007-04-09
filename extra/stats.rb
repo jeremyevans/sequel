@@ -30,8 +30,8 @@ class CodeStatistics
     f = File.open(fn)
     while line = f.gets
       stats[:lines]     += 1
-      stats[:classes]   += 1 if line =~ /class [A-Z]/
-      stats[:methods]   += 1 if line =~ /def [a-z]/
+      stats[:classes]   += 1 if line =~ /class [A-Z]/ || line =~ /context/
+      stats[:methods]   += 1 if line =~ /def [a-z]/ || line =~ /specify/
       stats[:codelines] += 1 unless line =~ /^\s*$/ || line =~ /^\s*#/
     end
   end

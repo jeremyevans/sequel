@@ -5,3 +5,7 @@
 * Wrap native database exceptions in Sequel::Error.
 
 * Rename Dataset's record_class attributes to model_class.
+
+* many_to_many smart relationships.
+
+* schema extraction and database dumping and copying.

@@ -1,5 +1,9 @@
 *SVN*
 
+* More specs.
+
+* Refactored Dataset#where for better composability.
+
 * Added Dataset#[]= method.
 
 * Added support for DISTINCT and OFFSET clauses (patches by Alex Bradbury.) Dataset#limit now accepts ranges. Added Dataset#uniq and distinct methods.
