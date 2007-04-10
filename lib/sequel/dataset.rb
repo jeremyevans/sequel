@@ -100,7 +100,7 @@ module Sequel
       case source
       when Array: source.join(COMMA_SEPARATOR)
       else source
-      end 
+      end
     end
     
     NULL = "NULL".freeze
@@ -171,7 +171,8 @@ module Sequel
     end
     
     # Returns a copy of the dataset with the source changed.
-    def from(source)
+    def from(*source)
+      source = source.first if source.size == 1
       dup_merge(:from => source)
     end
     
@@ -380,7 +381,11 @@ module Sequel
     def update_sql(values, opts = nil)
       opts = opts ? @opts.merge(opts) : @opts
       
-      raise "Can't update a grouped dataset" if opts[:group]
+      if opts[:group]
+        raise "Can't update a grouped dataset" 
+      elsif opts[:from].is_a?(Array) && opts[:from].size > 1
+        raise "Can't update in a joined dataset"
+      end
 
       set_list = values.map {|kv| SET_FORMAT % [kv[0], literal(kv[1])]}.
         join(COMMA_SEPARATOR)
@@ -397,7 +402,12 @@ module Sequel
     
     def delete_sql(opts = nil)
       opts = opts ? @opts.merge(opts) : @opts
-      raise "Can't delete a grouped dataset" if opts[:group]
+
+      if opts[:group]
+        raise "Can't delete from a grouped dataset" 
+      elsif opts[:from].is_a?(Array) && opts[:from].size > 1
+        raise "Can't delete from a joined dataset"
+      end
 
       sql = DELETE % opts[:from]
 

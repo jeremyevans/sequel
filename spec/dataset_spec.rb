@@ -83,6 +83,24 @@ context "A simple dataset" do
   end
 end
 
+context "A dataset with multiple tables in its FROM clause" do
+  setup do
+    @dataset = Sequel::Dataset.new(nil).from(:t1, :t2)
+  end
+
+  specify "should raise on #update_sql" do
+    proc {@dataset.update_sql(:a=>1)}.should.raise
+  end
+
+  specify "should raise on #delete_sql" do
+    proc {@dataset.delete_sql}.should.raise
+  end
+
+  specify "should generate a select query FROM all specified tables" do
+    @dataset.select_sql.should == "SELECT * FROM t1, t2"
+  end
+end
+
 context "Dataset#where" do
   setup do
     @dataset = Sequel::Dataset.new(nil).from(:test)
@@ -160,9 +178,13 @@ context "Dataset#where" do
     @d3.filter('(d = ?)', 4).select_sql.should ==
       "SELECT * FROM test WHERE (a = 1) AND (d = 4)"
   end
+  
+  specify "should raise if the dataset is grouped" do
+    proc {@dataset.group(:t).where(:a => 1)}.should.raise
+  end
 end
 
-context "Dataset #having filter" do
+context "Dataset#having filter" do
   setup do
     @dataset = Sequel::Dataset.new(nil).from(:test)
     @grouped = @dataset.group(:region).select(:region, :population.SUM, :gdp.AVG)
@@ -234,7 +256,7 @@ context "Dataset#literal" do
   end
   
   specify "should raise an error for unsupported types" do
-    proc {@dataset.literal({})}.should_raise
+    proc {@dataset.literal({})}.should.raise
   end
   
   specify "should literalize datasets as subqueries" do

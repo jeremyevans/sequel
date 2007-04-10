@@ -1,5 +1,7 @@
 *SVN*
 
+* Fixed Dataset#from to have variable arity, like Dataset#select and Dataset#where (patch by Alex Bradbury.)
+
 * Added support for GROUP BY and HAVING clauses (patches by Alex Bradbury.) Refactored Dataset#filter.
 
 * More specs.
