@@ -1,4 +1,4 @@
-*SVN*
+*0.0.17*
 
 * Fixed Dataset#from to have variable arity, like Dataset#select and Dataset#where (patch by Alex Bradbury.)
 
