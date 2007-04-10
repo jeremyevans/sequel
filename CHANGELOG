@@ -1,5 +1,7 @@
 *SVN*
 
+* Added support for GROUP BY and HAVING clauses (patches by Alex Bradbury.) Refactored Dataset#filter.
+
 * More specs.
 
 * Refactored Dataset#where for better composability.

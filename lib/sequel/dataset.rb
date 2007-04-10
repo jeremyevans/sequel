@@ -206,22 +206,51 @@ module Sequel
       end
     end
     
+    # Returns a copy of the dataset with the results grouped by the value of 
+    # the given fields
+    def group(*fields)
+      dup_merge(:group => fields)
+    end
+
     AND_WHERE = "%s AND %s".freeze
     
-    # Returns a copy of the dataset with the where conditions changed.
-    def where(*cond)
+    # Returns a copy of the dataset with the given conditions imposed upon it.  
+    # If the query has been grouped, then the conditions are imposed in the 
+    # HAVING clause. If not, then they are imposed in the WHERE clause.
+    def filter(*cond)
+      clause = (@opts[:group] ? :having : :where)
       cond = cond.first if cond.size == 1
-      if @opts[:where]
-        cond = AND_WHERE % [where_list(@opts[:where]), where_list(cond, true)]
+      if @opts[clause]
+        cond = AND_WHERE % [where_list(@opts[clause]), where_list(cond, true)]
       end
-      dup_merge(:where => where_list(cond))
+      dup_merge(clause => where_list(cond))
     end
+
+    # Returns a copy of the dataset with the where conditions changed. Raises 
+    # if the dataset has been grouped. See also #filter
+    def where(*cond)
+      if @opts[:group]
+        raise "Can't specify a WHERE clause once the dataset has been grouped"
+      else
+        filter(*cond)
+      end
+    end
+
+    # Returns a copy of the dataset with the having conditions changed. Raises 
+    # if the dataset has not been grouped. See also #filter
+    def having(*cond)
+      unless @opts[:group]
+        raise "Can only specify a HAVING clause on a grouped dataset"
+      else
+        filter(*cond)
+       end
+     end
     
     NOT_WHERE = "NOT %s".freeze
     
     def exclude(*cond)
       cond = cond.first if cond.size == 1
-      where(NOT_WHERE % where_list(cond))
+      filter(NOT_WHERE % where_list(cond))
     end
     
     LEFT_OUTER_JOIN = 'LEFT OUTER JOIN'.freeze
@@ -234,7 +263,6 @@ module Sequel
         :join_cond => cond)
     end
 
-    alias_method :filter, :where
     alias_method :all, :to_a
     
     alias_method :enum_map, :map
@@ -273,6 +301,8 @@ module Sequel
     OFFSET = " OFFSET %s".freeze
     ORDER = " ORDER BY %s".freeze
     WHERE = " WHERE %s".freeze
+    GROUP = " GROUP BY %s".freeze
+    HAVING = " HAVING %s".freeze
     JOIN_CLAUSE = " %s %s ON %s".freeze
     
     EMPTY = ''.freeze
@@ -297,10 +327,18 @@ module Sequel
         sql << (WHERE % where)
       end
       
+      if group = opts[:group]
+        sql << (GROUP % group.join(COMMA_SEPARATOR))
+      end
+
       if order = opts[:order]
         sql << (ORDER % order.join(COMMA_SEPARATOR))
       end
       
+      if having = opts[:having]
+        sql << (HAVING % having)
+      end
+
       if limit = opts[:limit]
         sql << (LIMIT % limit)
         if offset = opts[:offset]
@@ -342,6 +380,8 @@ module Sequel
     def update_sql(values, opts = nil)
       opts = opts ? @opts.merge(opts) : @opts
       
+      raise "Can't update a grouped dataset" if opts[:group]
+
       set_list = values.map {|kv| SET_FORMAT % [kv[0], literal(kv[1])]}.
         join(COMMA_SEPARATOR)
       sql = UPDATE % [opts[:from], set_list]
@@ -357,6 +397,8 @@ module Sequel
     
     def delete_sql(opts = nil)
       opts = opts ? @opts.merge(opts) : @opts
+      raise "Can't delete a grouped dataset" if opts[:group]
+
       sql = DELETE % opts[:from]
 
       if where = opts[:where]

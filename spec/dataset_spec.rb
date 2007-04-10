@@ -71,8 +71,8 @@ context "A simple dataset" do
   
   specify "should format an insert statement" do
     @dataset.insert_sql.should == 'INSERT INTO test DEFAULT VALUES'
-    @dataset.insert_sql(:name => 'wxyz', :price => 342).should ==
-      "INSERT INTO test (name, price) VALUES ('wxyz', 342)"
+    @dataset.insert_sql(:name => 'wxyz', :price => 342).
+      should_match /INSERT INTO test \(name, price\) VALUES \('wxyz', 342\)|INSERT INTO test \(price, name\) VALUES \(342, 'wxyz'\)/
     @dataset.insert_sql('a', 2, 6.5).should ==
       "INSERT INTO test VALUES ('a', 2, 6.5)"
   end
@@ -83,7 +83,7 @@ context "A simple dataset" do
   end
 end
 
-context "Dataset filters" do
+context "Dataset#where" do
   setup do
     @dataset = Sequel::Dataset.new(nil).from(:test)
     @d1 = @dataset.where(:region => 'Asia')
@@ -92,8 +92,8 @@ context "Dataset filters" do
   end
   
   specify "should work with hashes" do
-    @dataset.where(:name => 'xyz', :price => 342).select_sql.should ==
-      "SELECT * FROM test WHERE (name = 'xyz') AND (price = 342)"
+    @dataset.where(:name => 'xyz', :price => 342).select_sql.
+      should_match /WHERE \(name = 'xyz'\) AND \(price = 342\)|WHERE \(price = 342\) AND \(name = 'xyz'\)/
   end
   
   specify "should work with arrays (ala ActiveRecord)" do
@@ -161,6 +161,45 @@ context "Dataset filters" do
       "SELECT * FROM test WHERE (a = 1) AND (d = 4)"
   end
 end
+
+context "Dataset #having filter" do
+  setup do
+    @dataset = Sequel::Dataset.new(nil).from(:test)
+    @grouped = @dataset.group(:region).select(:region, :population.SUM, :gdp.AVG)
+    @d1 = @grouped.having('sum(population) > 10')
+    @d2 = @grouped.having(:region => 'Asia')
+    @fields = "region, sum(population), avg(gdp)"
+  end
+
+  specify "should raise if the dataset is not grouped" do
+    proc {@dataset.having('avg(gdp) > 10')}.should.raise
+  end
+
+  specify "should affect select statements" do
+    @d1.select_sql.should ==
+      "SELECT #{@fields} FROM test GROUP BY region HAVING sum(population) > 10"
+  end
+end
+
+context "a grouped dataset" do
+  setup do
+    @dataset = Sequel::Dataset.new(nil).from(:test).group(:type_id)
+  end
+
+  specify "should raise when trying to generate an update statement" do
+    proc {@dataset.update_sql(:id => 0)}.should.raise
+  end
+
+  specify "should raise when trying to generate a delete statement" do
+    proc {@dataset.delete_sql}.should.raise
+  end
+
+  specify "should specify the grouping in generated select statement" do
+    @dataset.select_sql.should ==
+      "SELECT * FROM test GROUP BY type_id"
+  end
+end
+
 
 context "Dataset#literal" do
   setup do
