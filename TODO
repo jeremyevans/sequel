@@ -9,3 +9,15 @@
 * many_to_many smart relationships.
 
 * schema extraction and database dumping and copying.
+
+* Improve relationship DSL To allow stuff like the following:
+
+class Book
+  one_to_one author, :class => Author
+end
+
+Book.filter_by_author(Author[:name => 'Kurt Vonnegut']).print
+
+#instead of:
+
+Book.filter_by_author_id(Author[:name => 'Kurt Vonnegut'].id).print

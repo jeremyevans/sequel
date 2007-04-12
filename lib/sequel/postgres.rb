@@ -178,7 +178,7 @@ module Sequel
     
     
       def tables
-        dataset(RELATION_QUERY).filter(RELATION_FILTER).map(:relname)
+        dataset(RELATION_QUERY).filter(RELATION_FILTER).map {|r| r[:relname].to_sym}
       end
       
       def locks

@@ -1,5 +1,7 @@
 *0.0.17*
 
+* Fixed Postgres::Database#tables to return table names as symbols (caused problem when using Database#table_exists?).
+
 * Fixed Dataset#from to have variable arity, like Dataset#select and Dataset#where (patch by Alex Bradbury.)
 
 * Added support for GROUP BY and HAVING clauses (patches by Alex Bradbury.) Refactored Dataset#filter.

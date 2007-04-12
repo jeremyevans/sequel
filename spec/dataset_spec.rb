@@ -151,31 +151,31 @@ context "Dataset#where" do
     "SELECT * FROM test WHERE (region = 'Asia') AND ((a > 1) OR (b < 2))"
     
     # hash and array
-    @d1.filter('(GDP > ?)', 1000).select_sql.should == 
+    @d1.where('(GDP > ?)', 1000).select_sql.should == 
       "SELECT * FROM test WHERE (region = 'Asia') AND (GDP > 1000)"
     
     # array and array
-    @d2.filter('(GDP > ?)', 1000).select_sql.should ==
+    @d2.where('(GDP > ?)', 1000).select_sql.should ==
       "SELECT * FROM test WHERE (region = 'Asia') AND (GDP > 1000)"
     
     # array and hash
-    @d2.filter(:name => ['Japan', 'China']).select_sql.should ==
+    @d2.where(:name => ['Japan', 'China']).select_sql.should ==
       "SELECT * FROM test WHERE (region = 'Asia') AND (name IN ('Japan', 'China'))"
       
     # array and string
-    @d2.filter('GDP > ?').select_sql.should ==
+    @d2.where('GDP > ?').select_sql.should ==
       "SELECT * FROM test WHERE (region = 'Asia') AND (GDP > ?)"
     
     # string and string
-    @d3.filter('b = 2').select_sql.should ==
+    @d3.where('b = 2').select_sql.should ==
       "SELECT * FROM test WHERE (a = 1) AND (b = 2)"
     
     # string and hash
-    @d3.filter(:c => 3).select_sql.should == 
+    @d3.where(:c => 3).select_sql.should == 
       "SELECT * FROM test WHERE (a = 1) AND (c = 3)"
       
     # string and array
-    @d3.filter('(d = ?)', 4).select_sql.should ==
+    @d3.where('(d = ?)', 4).select_sql.should ==
       "SELECT * FROM test WHERE (a = 1) AND (d = 4)"
   end
   
