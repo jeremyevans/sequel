@@ -184,6 +184,38 @@ context "Dataset#where" do
   end
 end
 
+context "Dataset#exclude" do
+  setup do
+    @dataset = Sequel::Dataset.new(nil).from(:test)
+  end
+
+  specify "should correctly include the NOT operator when one condition is given" do
+    @dataset.exclude(:region=>'Asia').select_sql.should ==
+      "SELECT * FROM test WHERE NOT (region = 'Asia')"
+  end
+
+  specify "should take multiple conditions as a hash and express the logic correctly in SQL" do
+    @dataset.exclude(:region => 'Asia', :name => 'Japan').select_sql.
+      should_match Regexp.union(/WHERE NOT \(\(region = 'Asia'\) AND \(name = 'Japan'\)\)/,
+                                /WHERE NOT \(\(name = 'Japan'\) AND \(region = 'Asia'\)\)/)
+  end
+
+  specify "should parenthesize a single string condition correctly" do
+    @dataset.exclude("region = 'Asia' AND name = 'Japan'").select_sql.should ==
+      "SELECT * FROM test WHERE NOT (region = 'Asia' AND name = 'Japan')"
+  end
+
+  specify "should parenthesize an array condition correctly" do
+    @dataset.exclude('region = ? AND name = ?', 'Asia', 'Japan').select_sql.should ==
+      "SELECT * FROM test WHERE NOT (region = 'Asia' AND name = 'Japan')"
+  end
+
+  specify "should corrently parenthesize when it is used twice" do
+    @dataset.exclude(:region => 'Asia').exclude(:name => 'Japan').select_sql.should ==
+      "SELECT * FROM test WHERE NOT (region = 'Asia') AND NOT (name = 'Japan')"
+  end
+end
+
 context "Dataset#having filter" do
   setup do
     @dataset = Sequel::Dataset.new(nil).from(:test)
@@ -260,6 +292,29 @@ context "Dataset#literal" do
   end
   
   specify "should literalize datasets as subqueries" do
-    @dataset.literal(@dataset).should == "(#{@dataset.sql})"
+    d = @dataset.from(:test)
+    d.literal(d).should == "(#{d.sql})"
   end
 end
+
+context "Dataset#from" do
+  setup do
+    @dataset = Sequel::Dataset.new(nil)
+  end
+
+  specify "should accept a Dataset" do
+    proc {@dataset.from(@dataset)}.should_not.raise
+  end
+
+  specify "should format a Dataset as a subquery if it has had options set" do
+    @dataset.from(@dataset.from(:a).where(:a=>1)).select_sql.should ==
+      "SELECT * FROM (SELECT * FROM a WHERE (a = 1))"
+  end
+
+  specify "should use the relevant table name if given a simple dataset" do
+    @dataset.from(@dataset.from(:a)).select_sql.should ==
+      "SELECT * FROM a"
+  end
+end
+
+

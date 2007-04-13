@@ -30,13 +30,9 @@ module Sequel
     
     # Returns a new dataset with the select method invoked.
     def select(*args); dataset.select(*args); end
-
-    # Returns a new dataset with the from parameter set. For example,
-    #   db[:posts].each {|p| puts p[:title]}
-    def [](table)
-      dataset.from(table)
-    end
     
+    alias_method :[], :from
+
     def execute(sql)
       raise RuntimeError
     end

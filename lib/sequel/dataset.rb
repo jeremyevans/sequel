@@ -81,26 +81,18 @@ module Sequel
     
     # Converts a field list into a comma seperated string of field names.
     def field_list(fields)
-      case fields
-      when Array:
-        if fields.empty?
-          WILDCARD
-        else
-          fields.map {|i| field_name(i)}.join(COMMA_SEPARATOR)
-        end
-      when Symbol:
-        fields.to_field_name
+      if fields.empty?
+        WILDCARD
       else
-        fields
+        fields.map {|i| field_name(i)}.join(COMMA_SEPARATOR)
       end
     end
     
     # Converts an array of sources into a comma separated list.
     def source_list(source)
-      case source
-      when Array: source.join(COMMA_SEPARATOR)
-      else source
-      end
+      raise 'No source specified for query' unless source
+      source.map {|i| i.is_a?(Dataset) ? i.to_table_reference : i}.
+        join(COMMA_SEPARATOR)
     end
     
     NULL = "NULL".freeze
@@ -115,7 +107,7 @@ module Sequel
       when NilClass: NULL
       when Symbol: v.to_field_name
       when Array: v.empty? ? NULL : v.map {|i| literal(i)}.join(COMMA_SEPARATOR)
-      when self.class: SUBQUERY % v.sql
+      when Dataset: SUBQUERY % v.sql
       else
         raise "can't express #{v.inspect}:#{v.class} as a SQL literal"
       end
@@ -141,24 +133,27 @@ module Sequel
         IN_EXPR % [left, literal(right)]
       when NilClass:
         NULL_EXPR % left
-      when self.class:
+      when Dataset:
         IN_EXPR % [left, right.sql]
       else
         EQUAL_COND % [left, literal(right)]
       end
     end
     
-    # Formats a where clause.
+    # Formats a where clause. If parenthesize is true, then the whole 
+    # generated clause will be enclosed in a set of parentheses.
     def where_list(where, parenthesize = false)
       case where
       when Hash:
-        where.map {|kv| where_condition(*kv)}.join(AND_SEPARATOR)
+        parenthesize = false if where.size == 1
+        fmt = where.map {|kv| where_condition(*kv)}.join(AND_SEPARATOR)
       when Array:
         fmt = where.shift
-        fmt.gsub('?') {|i| literal(where.shift)}
+        fmt.gsub!('?') {|i| literal(where.shift)}
       else
-        parenthesize ? "(#{where})" : where
+        fmt = where
       end
+      parenthesize ? "(#{fmt})" : fmt
     end
     
     # Formats a join condition.
@@ -172,13 +167,11 @@ module Sequel
     
     # Returns a copy of the dataset with the source changed.
     def from(*source)
-      source = source.first if source.size == 1
       dup_merge(:from => source)
     end
     
     # Returns a copy of the dataset with the selected fields changed.
     def select(*fields)
-      fields = fields.first if fields.size == 1
       dup_merge(:select => fields)
     end
 
@@ -221,12 +214,28 @@ module Sequel
     def filter(*cond)
       clause = (@opts[:group] ? :having : :where)
       cond = cond.first if cond.size == 1
+      parenthesize = !(cond.is_a?(Hash) || cond.is_a?(Array))
       if @opts[clause]
-        cond = AND_WHERE % [where_list(@opts[clause]), where_list(cond, true)]
+        cond = AND_WHERE % [where_list(@opts[clause]), where_list(cond, parenthesize)]
       end
       dup_merge(clause => where_list(cond))
     end
 
+    NOT_WHERE = "NOT %s".freeze
+    AND_NOT_WHERE = "%s AND NOT %s".freeze
+    
+    def exclude(*cond)
+      clause = (@opts[:group] ? :having : :where)
+      cond = cond.first if cond.size == 1
+      parenthesize = !(cond.is_a?(Hash) || cond.is_a?(Array))
+      if @opts[clause]
+        cond = AND_NOT_WHERE % [where_list(@opts[clause]), where_list(cond, parenthesize)]
+      else
+        cond = NOT_WHERE % where_list(cond, true)
+      end
+      dup_merge(clause => where_list(cond))
+    end
+    
     # Returns a copy of the dataset with the where conditions changed. Raises 
     # if the dataset has been grouped. See also #filter
     def where(*cond)
@@ -246,13 +255,6 @@ module Sequel
         filter(*cond)
        end
      end
-    
-    NOT_WHERE = "NOT %s".freeze
-    
-    def exclude(*cond)
-      cond = cond.first if cond.size == 1
-      filter(NOT_WHERE % where_list(cond))
-    end
     
     LEFT_OUTER_JOIN = 'LEFT OUTER JOIN'.freeze
     INNER_JOIN = 'INNER JOIN'.freeze
@@ -383,8 +385,8 @@ module Sequel
       
       if opts[:group]
         raise "Can't update a grouped dataset" 
-      elsif opts[:from].is_a?(Array) && opts[:from].size > 1
-        raise "Can't update in a joined dataset"
+      elsif (opts[:from].size > 1) or opts[:join_type]
+        raise "Can't update a joined dataset"
       end
 
       set_list = values.map {|kv| SET_FORMAT % [kv[0], literal(kv[1])]}.
@@ -423,6 +425,14 @@ module Sequel
     
     def count_sql(opts = nil)
       select_sql(opts ? opts.merge(SELECT_COUNT) : SELECT_COUNT)
+    end
+
+    def to_table_reference
+      if opts.keys == [:from] && opts[:from].size == 1
+        opts[:from].first.to_s
+      else
+        SUBQUERY % sql
+      end
     end
     
     # aggregates
@@ -475,8 +485,8 @@ module Sequel
     end
     
     # Returns the first record matching the condition.
-    def [](condition)
-      where(condition).first
+    def [](*conditions)
+      where(*conditions).first
     end
     
     # Updates all records matching the condition with the values specified.

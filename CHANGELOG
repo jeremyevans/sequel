@@ -1,3 +1,11 @@
+*SVN*
+
+* Removed duplication in Database#[].
+
+* :from and :select options are now always arrays (patch by Alex Bradbury.)
+
+* Fixed Dataset#exclude to work correctly (patch and specs by Alex Bradbury.)
+
 *0.0.17*
 
 * Fixed Postgres::Database#tables to return table names as symbols (caused problem when using Database#table_exists?).
