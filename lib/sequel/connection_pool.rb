@@ -33,6 +33,8 @@ module Sequel
       ensure
         release(t)
       end
+    rescue Exception => e
+      raise SequelConnectionError.new(e)
     end
     
     def owned_connection(thread)

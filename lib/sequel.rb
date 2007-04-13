@@ -1,5 +1,6 @@
 dir = File.join(File.dirname(__FILE__), 'sequel')
 require File.join(dir, 'core_ext')
+require File.join(dir, 'error')
 require File.join(dir, 'database')
 require File.join(dir, 'connection_pool')
 require File.join(dir, 'schema')
