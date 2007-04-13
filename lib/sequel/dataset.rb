@@ -233,7 +233,7 @@ module Sequel
       else
         cond = NOT_WHERE % where_list(cond, true)
       end
-      dup_merge(clause => where_list(cond))
+      dup_merge(clause => cond)
     end
     
     # Returns a copy of the dataset with the where conditions changed. Raises 
