@@ -90,7 +90,7 @@ module Sequel
     
     # Converts an array of sources into a comma separated list.
     def source_list(source)
-      raise 'No source specified for query' unless source
+      raise SequelError, 'No source specified for query' unless source
       source.map {|i| i.is_a?(Dataset) ? i.to_table_reference : i}.
         join(COMMA_SEPARATOR)
     end
@@ -109,7 +109,7 @@ module Sequel
       when Array: v.empty? ? NULL : v.map {|i| literal(i)}.join(COMMA_SEPARATOR)
       when Dataset: SUBQUERY % v.sql
       else
-        raise "can't express #{v.inspect}:#{v.class} as a SQL literal"
+        raise SequelError, "can't express #{v.inspect}:#{v.class} as a SQL literal"
       end
     end
     
@@ -240,7 +240,7 @@ module Sequel
     # if the dataset has been grouped. See also #filter
     def where(*cond)
       if @opts[:group]
-        raise "Can't specify a WHERE clause once the dataset has been grouped"
+        raise SequelError, "Can't specify a WHERE clause once the dataset has been grouped"
       else
         filter(*cond)
       end
@@ -250,7 +250,7 @@ module Sequel
     # if the dataset has not been grouped. See also #filter
     def having(*cond)
       unless @opts[:group]
-        raise "Can only specify a HAVING clause on a grouped dataset"
+        raise SequelError, "Can only specify a HAVING clause on a grouped dataset"
       else
         filter(*cond)
        end
@@ -384,9 +384,9 @@ module Sequel
       opts = opts ? @opts.merge(opts) : @opts
       
       if opts[:group]
-        raise "Can't update a grouped dataset" 
+        raise SequelError, "Can't update a grouped dataset" 
       elsif (opts[:from].size > 1) or opts[:join_type]
-        raise "Can't update a joined dataset"
+        raise SequelError, "Can't update a joined dataset"
       end
 
       set_list = values.map {|kv| SET_FORMAT % [kv[0], literal(kv[1])]}.
@@ -406,9 +406,9 @@ module Sequel
       opts = opts ? @opts.merge(opts) : @opts
 
       if opts[:group]
-        raise "Can't delete from a grouped dataset" 
+        raise SequelError, "Can't delete from a grouped dataset" 
       elsif opts[:from].is_a?(Array) && opts[:from].size > 1
-        raise "Can't delete from a joined dataset"
+        raise SequelError, "Can't delete from a joined dataset"
       end
 
       sql = DELETE % opts[:from]
@@ -495,7 +495,7 @@ module Sequel
     end
   
     def last(num = 1)
-      raise 'No order specified' unless @opts[:order] || (opts && opts[:order])
+      raise SequelError, 'No order specified' unless @opts[:order] || (opts && opts[:order])
       
       l = {:limit => num}
       opts = {:order => invert_order(@opts[:order])}.
@@ -511,7 +511,7 @@ module Sequel
     # Deletes all records in the dataset one at a time by invoking the destroy
     # method of the associated model class.
     def destroy
-      raise 'Dataset not associated with model' unless @record_class
+      raise SequelError, 'Dataset not associated with model' unless @record_class
       
       count = 0
       @db.transaction {each {|r| count += 1; r.destroy}}

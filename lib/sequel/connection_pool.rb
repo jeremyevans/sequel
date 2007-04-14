@@ -43,7 +43,9 @@ module Sequel
     
     def acquire(thread)
       @mutex.synchronize do
-        @allocated[thread] = available
+        if conn = available
+          @allocated[thread] = conn
+        end
       end
     end
     

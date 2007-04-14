@@ -34,13 +34,15 @@ module Sequel
     alias_method :[], :from
 
     def execute(sql)
-      raise RuntimeError
+      raise NotImplementedError
     end
     
+    # Acquires a database connection, yielding it to the passed block.
     def synchronize(&block)
       @pool.hold(&block)
     end
-      
+
+    # Returns true if there is a database connection
     def test_connection
       @pool.hold {|conn|} if @pool
       true
@@ -104,23 +106,24 @@ module Sequel
     SQL_BEGIN = 'BEGIN'.freeze
     SQL_COMMIT = 'COMMIT'.freeze
     SQL_ROLLBACK = 'ROLLBACK'.freeze
-    
+
+    # A simple implementation of SQL transactions. Nested transactions are not 
+    # supported - calling #transaction within a transaction will reuse the 
+    # current transaction. May be overridden for databases that support nested 
+    # transactions.
     def transaction
       @pool.hold do |conn|
         @transactions ||= []
         if @transactions.include? Thread.current
           return yield(conn)
         end
-        # ServerSide.info('BEGIN')
         conn.execute(SQL_BEGIN)
         begin
           @transactions << Thread.current
           result = yield(conn)
-          # ServerSide.info('COMMIT')
           conn.execute(SQL_COMMIT)
           result
         rescue => e
-          # ServerSide.info('ROLLBACK')
           conn.execute(SQL_ROLLBACK)
           raise e
         ensure
@@ -132,11 +135,14 @@ module Sequel
     @@adapters = Hash.new
     
     # Sets the adapter scheme for the database class. Call this method in
-    # descendnants of Database to allow connection using a URL. For example:
+    # descendnants of Database to allow connection using a URL. For example the
+    # following:
     #   class DB2::Database < Sequel::Database
     #     set_adapter_scheme :db2
     #     ...
     #   end
+    # would allow connection using:
+    #   Sequel.open('db2://user:password@dbserver/mydb')
     def self.set_adapter_scheme(scheme)
       @@adapters[scheme.to_sym] = self
     end

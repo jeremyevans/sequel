@@ -1,3 +1,7 @@
+*SVN*
+
+* Specs for ConnectionPool.
+
 *0.0.18*
 
 * Implemented SequelError and SequelConnectionError classes. ConnectionPool#hold now catches any connection errors and reraises them SequelConnectionError.
