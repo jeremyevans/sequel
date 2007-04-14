@@ -57,15 +57,6 @@ module Sequel
       execute(sql)
     end
 
-    # Returns a literal SQL representation of a value. This method is usually
-    # overriden in database adapters.
-    def literal(v)
-      case v
-      when String: "'%s'" % v
-      else v.to_s
-      end
-    end
-    
     # Creates a table. The easiest way to use this method is to provide a
     # block:
     #   DB.create_table :posts do
