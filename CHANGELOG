@@ -1,5 +1,7 @@
 *SVN*
 
+* Added SQLite::Dataset#explain. Returns an array of opcode hashes.
+
 * Specs for ConnectionPool.
 
 *0.0.18*

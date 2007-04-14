@@ -101,6 +101,14 @@ module Sequel
         end
         self
       end
+      
+      EXPLAIN = 'EXPLAIN %s'.freeze
+
+      def explain
+        res = []
+        @db.result_set(EXPLAIN % select_sql(opts), nil) {|r| res << r}
+        res
+      end
     end
   end
 end
