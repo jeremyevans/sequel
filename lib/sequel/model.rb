@@ -170,6 +170,7 @@ module Sequel
     def self.each(&block); dataset.each(&block); end
     def self.all; dataset.all; end
     def self.filter(*arg); dataset.filter(*arg); end
+    def self.exclude(*arg); dataset.exclude(*arg); end
     def self.first; dataset.first; end
     def self.count; dataset.count; end
     def self.map(column); dataset.map(column); end

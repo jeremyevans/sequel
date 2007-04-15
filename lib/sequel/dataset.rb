@@ -331,11 +331,11 @@ module Sequel
       end
       
       if group = opts[:group]
-        sql << (GROUP % group.join(COMMA_SEPARATOR))
+        sql << (GROUP % field_list(group))
       end
 
       if order = opts[:order]
-        sql << (ORDER % order.join(COMMA_SEPARATOR))
+        sql << (ORDER % field_list(order))
       end
       
       if having = opts[:having]

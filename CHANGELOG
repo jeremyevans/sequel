@@ -1,5 +1,7 @@
 *SVN*
 
+* Fixed Dataset#order and Dataset#group to behave correctly when supplied with qualified field name symbols.
+
 * Removed Database#literal. Shouldn't have been there.
 
 * Added SQLite::Dataset#explain. Returns an array of opcode hashes.

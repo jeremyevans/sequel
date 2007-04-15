@@ -172,7 +172,7 @@ module Sequel
         Postgres::Dataset.new(self, opts)
       end
     
-      RELATION_QUERY = {:from => :pg_class, :select => :relname}.freeze
+      RELATION_QUERY = {:from => [:pg_class], :select => [:relname]}.freeze
       RELATION_FILTER = "(relkind = 'r') AND (relname !~ '^pg|sql')".freeze
       SYSTEM_TABLE_REGEXP = /^pg|sql/.freeze
     
