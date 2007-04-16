@@ -171,7 +171,8 @@ module Sequel
     def self.all; dataset.all; end
     def self.filter(*arg); dataset.filter(*arg); end
     def self.exclude(*arg); dataset.exclude(*arg); end
-    def self.first; dataset.first; end
+    def self.order(*arg); dataset.order(*arg); end
+    def self.first(*arg); dataset.first(*arg); end
     def self.count; dataset.count; end
     def self.map(column); dataset.map(column); end
     def self.hash_column(column); dataset.hash_column(primary_key, column); end
@@ -255,7 +256,7 @@ module Sequel
     end
     
     def ==(obj)
-      (obj.class == model) && (obj.pkey == @pkey)
+      (obj.class == model) && (obj.values == @values)
     end
     
     def set(values)

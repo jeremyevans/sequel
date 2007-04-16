@@ -1,4 +1,12 @@
-*SVN*
+*0.0.19*
+
+* More specs for Dataset.
+
+* Fixed Dataset#invert_order to work correctly with strings.
+
+* Fixed Model#== to check equality of values.
+
+* Added Model#exclude and Model#order.
 
 * Fixed Dataset#order and Dataset#group to behave correctly when supplied with qualified field name symbols.
 

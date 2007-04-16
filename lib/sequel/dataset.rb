@@ -51,7 +51,7 @@ module Sequel
     # objects). If no record class is defined for the dataset, self is
     # returned.
     def naked
-      @record_class ? self.class.new(@db, @opts) : self
+      @record_class ? self.class.new(@db, @opts.dup) : self
     end
     
     AS_REGEXP = /(.*)___(.*)/.freeze
@@ -195,9 +195,14 @@ module Sequel
     DESC_ORDER_REGEXP = /(.*)\sDESC/.freeze
     
     def invert_order(order)
-      order.map do |f|
-        f.to_s =~ DESC_ORDER_REGEXP ? $1 : f.DESC
+      new_order = []
+      order.each do |f|
+        f.to_s.split(',').map do |p|
+          p.strip!
+          new_order << (p =~ DESC_ORDER_REGEXP ? $1 : p.to_sym.DESC)
+        end
       end
+      new_order
     end
     
     # Returns a copy of the dataset with the results grouped by the value of 
@@ -495,7 +500,8 @@ module Sequel
     end
   
     def last(num = 1)
-      raise SequelError, 'No order specified' unless @opts[:order] || (opts && opts[:order])
+      raise SequelError, 'No order specified' unless 
+        @opts[:order] || (opts && opts[:order])
       
       l = {:limit => num}
       opts = {:order => invert_order(@opts[:order])}.
@@ -531,7 +537,7 @@ class Symbol
   end
   
   def AS(target)
-    "#{field_name} AS #{target}"
+    "#{to_field_name} AS #{target}"
   end
   
   def MIN; "min(#{to_field_name})"; end
@@ -556,4 +562,3 @@ class Symbol
     "#{to_s}.*"
   end
 end
-
