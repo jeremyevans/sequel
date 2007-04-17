@@ -8,15 +8,15 @@ module Sequel
   # The Database class is meant to be subclassed by database adapters in order
   # to provide the functionality needed for executing queries.
   class Database
-    attr_reader :opts, :pool
+    attr_reader :opts, :pool, :logger
     
     # Constructs a new instance of a database connection with the specified
     # options hash.
     #
     # Sequel::Database is an abstract class that is not useful by itself.
-    def initialize(opts = {})
+    def initialize(opts = {}, &block)
       @opts = opts
-      @pool = ConnectionPool.new(@opts[:max_connections] || 4)
+      @pool = ConnectionPool.new(@opts[:max_connections] || 4, &block)
       @logger = opts[:logger]
     end
     
@@ -36,6 +36,7 @@ module Sequel
     def execute(sql)
       raise NotImplementedError
     end
+    alias_method :<<, :execute
     
     # Acquires a database connection, yielding it to the passed block.
     def synchronize(&block)
@@ -44,19 +45,10 @@ module Sequel
 
     # Returns true if there is a database connection
     def test_connection
-      @pool.hold {|conn|} if @pool
+      @pool.hold {|conn|}
       true
     end
     
-    # call-seq:
-    #   db.execute(sql)
-    #   db << sql
-    #
-    # Executes an sql query.
-    def <<(sql)
-      execute(sql)
-    end
-
     # Creates a table. The easiest way to use this method is to provide a
     # block:
     #   DB.create_table :posts do
@@ -78,7 +70,7 @@ module Sequel
     # Drops a table.
     def drop_table(*names)
       transaction do
-        names.each {|n| execute Schema.drop_table_sql(n)}
+        execute(names.map {|n| Schema.drop_table_sql(n)}.join)
       end
     end
     
@@ -153,6 +145,7 @@ module Sequel
     # call-seq:
     #   Sequel::Database.connect(conn_string)
     #   Sequel.connect(conn_string)
+    #   Sequel.open(conn_string)
     #
     # Creates a new database object based on the supplied connection string.
     # The specified scheme determines the database class used, and the rest
