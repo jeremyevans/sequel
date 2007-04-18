@@ -1,5 +1,9 @@
 *SVN*
 
+* Refactored Dataset where clause construction to use expressions.
+
+* Implemented Proc expressions (adapted from a great idea by Sam Smoot.)
+
 * Fixed Model#map.
 
 * Documentation for ConnectionPool.

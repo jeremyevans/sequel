@@ -112,23 +112,19 @@ module Sequel
         raise SequelError, "can't express #{v.inspect}:#{v.class} as a SQL literal"
       end
     end
-    
+
     AND_SEPARATOR = " AND ".freeze
-    EQUAL_COND = "(%s = %s)".freeze
+    EQUAL_EXPR = "(%s = %s)".freeze
     IN_EXPR = "(%s IN (%s))".freeze
-#    BETWEEN_EXPR = "(%s BETWEEN %s AND %s)".freeze
     INCLUSIVE_RANGE_EXPR = "(%s >= %s AND %s <= %s)".freeze
     EXCLUSIVE_RANGE_EXPR = "(%s >= %s AND %s < %s)".freeze
     NULL_EXPR = "(%s IS NULL)".freeze
     
-    # Formats an equality condition SQL expression.
-    def where_condition(left, right)
-      left = field_name(left)
+    def format_eq_expression(left, right)
       case right
       when Range:
         (right.exclude_end? ? EXCLUSIVE_RANGE_EXPR : INCLUSIVE_RANGE_EXPR) %
           [left, literal(right.begin), left, literal(right.end)]
-#        BETWEEN_EXPR % [field_name(left), literal(right.begin), literal(right.end)]
       when Array:
         IN_EXPR % [left, literal(right)]
       when NilClass:
@@ -136,7 +132,25 @@ module Sequel
       when Dataset:
         IN_EXPR % [left, right.sql]
       else
-        EQUAL_COND % [left, literal(right)]
+        EQUAL_EXPR % [left, literal(right)]
+      end
+    end
+    
+    def format_expression(left, op, right)
+      left = field_name(left)
+      case op
+      when :eql:
+        format_eq_expression(left, right)
+      when :not:
+        "NOT #{format_eq_expression(left, right)}"
+      when :lt:
+        "(#{left} < #{literal(right)})"
+      when :lte:
+        "(#{left} <= #{literal(right)})"
+      when :gt:
+        "(#{left} > #{literal(right)})"
+      when :gte:
+        "(#{left} >= #{literal(right)})"
       end
     end
     
@@ -146,10 +160,14 @@ module Sequel
       case where
       when Hash:
         parenthesize = false if where.size == 1
-        fmt = where.map {|kv| where_condition(*kv)}.join(AND_SEPARATOR)
+        fmt = where.map {|i| format_expression(i[0], :eql, i[1])}.
+          join(AND_SEPARATOR)
       when Array:
         fmt = where.shift
         fmt.gsub!('?') {|i| literal(where.shift)}
+      when Proc:
+        fmt = where.to_expressions.map {|e| format_expression(e.left, e.op, e.right)}.
+          join(AND_SEPARATOR)
       else
         fmt = where
       end
@@ -216,48 +234,50 @@ module Sequel
     # Returns a copy of the dataset with the given conditions imposed upon it.  
     # If the query has been grouped, then the conditions are imposed in the 
     # HAVING clause. If not, then they are imposed in the WHERE clause.
-    def filter(*cond)
+    def filter(*cond, &block)
       clause = (@opts[:group] ? :having : :where)
       cond = cond.first if cond.size == 1
       parenthesize = !(cond.is_a?(Hash) || cond.is_a?(Array))
       if @opts[clause]
-        cond = AND_WHERE % [where_list(@opts[clause]), where_list(cond, parenthesize)]
+        cond = AND_WHERE % [where_list(@opts[clause]), where_list(block || cond, parenthesize)]
+        dup_merge(clause => cond)
+      else
+        dup_merge(clause => where_list(block || cond))
       end
-      dup_merge(clause => where_list(cond))
     end
 
     NOT_WHERE = "NOT %s".freeze
     AND_NOT_WHERE = "%s AND NOT %s".freeze
     
-    def exclude(*cond)
+    def exclude(*cond, &block)
       clause = (@opts[:group] ? :having : :where)
       cond = cond.first if cond.size == 1
       parenthesize = !(cond.is_a?(Hash) || cond.is_a?(Array))
       if @opts[clause]
-        cond = AND_NOT_WHERE % [where_list(@opts[clause]), where_list(cond, parenthesize)]
+        cond = AND_NOT_WHERE % [where_list(@opts[clause]), where_list(block || cond, parenthesize)]
       else
-        cond = NOT_WHERE % where_list(cond, true)
+        cond = NOT_WHERE % where_list(block || cond, true)
       end
       dup_merge(clause => cond)
     end
     
     # Returns a copy of the dataset with the where conditions changed. Raises 
     # if the dataset has been grouped. See also #filter
-    def where(*cond)
+    def where(*cond, &block)
       if @opts[:group]
         raise SequelError, "Can't specify a WHERE clause once the dataset has been grouped"
       else
-        filter(*cond)
+        filter(*cond, &block)
       end
     end
 
     # Returns a copy of the dataset with the having conditions changed. Raises 
     # if the dataset has not been grouped. See also #filter
-    def having(*cond)
+    def having(*cond, &block)
       unless @opts[:group]
         raise SequelError, "Can only specify a HAVING clause on a grouped dataset"
       else
-        filter(*cond)
+        filter(*cond, &block)
        end
      end
     

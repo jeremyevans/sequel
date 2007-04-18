@@ -226,10 +226,10 @@ module Sequel
     
       LIKE = '%s ~ %s'.freeze
       LIKE_CI = '%s ~* %s'.freeze
-    
-      def where_condition(left, right)
-        case right
-        when Regexp:
+      
+      def format_expression(left, op, right)
+        case op
+        when :like:
           (right.casefold? ? LIKE_CI : LIKE) %
             [field_name(left), PGconn.quote(right.source)]
         else
@@ -237,6 +237,16 @@ module Sequel
         end
       end
     
+      # def where_condition(left, right)
+      #   case right
+      #   when Regexp:
+      #     (right.casefold? ? LIKE_CI : LIKE) %
+      #       [field_name(left), PGconn.quote(right.source)]
+      #   else
+      #     super
+      #   end
+      # end
+      #     
       def each(opts = nil, &block)
         query_each(select_sql(opts), true, &block)
         self

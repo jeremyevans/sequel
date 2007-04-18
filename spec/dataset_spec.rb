@@ -177,6 +177,10 @@ context "Dataset#where" do
     # string and array
     @d3.where('(d = ?)', 4).select_sql.should ==
       "SELECT * FROM test WHERE (a = 1) AND (d = 4)"
+      
+    # string and proc expr
+    @d3.where {e < 5}.select_sql.should ==
+      "SELECT * FROM test WHERE (a = 1) AND (e < 5)"
   end
   
   specify "should raise if the dataset is grouped" do
@@ -192,11 +196,26 @@ context "Dataset#where" do
   
   specify "should accept a subquery" do
     # select all countries that have GDP greater than the average for Asia
-    @dataset.filter('GDP > ?', @d1.select(:GDP.AVG)).sql.should ==
-      "SELECT * FROM test WHERE GDP > (SELECT avg(GDP) FROM test WHERE (region = 'Asia'))"
+    @dataset.filter('gdp > ?', @d1.select(:gdp.AVG)).sql.should ==
+      "SELECT * FROM test WHERE gdp > (SELECT avg(gdp) FROM test WHERE (region = 'Asia'))"
 
     @dataset.filter(:id => @d1.select(:id)).sql.should ==
       "SELECT * FROM test WHERE (id IN (SELECT id FROM test WHERE (region = 'Asia')))"
+  end
+  
+  specify "should accept proc expressions (nice!)" do
+    d = @d1.select(:gdp.AVG)
+    @dataset.filter {gdp > d}.sql.should ==
+      "SELECT * FROM test WHERE (gdp > (SELECT avg(gdp) FROM test WHERE (region = 'Asia')))"
+    
+    @dataset.filter {id.in 4..7}.sql.should ==
+      'SELECT * FROM test WHERE (id >= 4 AND id <= 7)'
+    
+    @dataset.filter {c == 3}.sql.should ==
+      'SELECT * FROM test WHERE (c = 3)'
+      
+    @dataset.filter {id == :items__id}.sql.should ==
+      'SELECT * FROM test WHERE (id = items.id)'
   end
 end
 
@@ -230,6 +249,11 @@ context "Dataset#exclude" do
     @dataset.exclude(:region => 'Asia').exclude(:name => 'Japan').select_sql.should ==
       "SELECT * FROM test WHERE NOT (region = 'Asia') AND NOT (name = 'Japan')"
   end
+  
+  specify "should support proc expressions" do
+    @dataset.exclude {id == (6...12)}.sql.should == 
+      'SELECT * FROM test WHERE NOT ((id >= 6 AND id < 12))'
+  end
 end
 
 context "Dataset#having" do
@@ -248,6 +272,11 @@ context "Dataset#having" do
   specify "should affect select statements" do
     @d1.select_sql.should ==
       "SELECT #{@fields} FROM test GROUP BY region HAVING sum(population) > 10"
+  end
+
+  specify "should support proc expressions" do
+    @grouped.having {SUM(:population) > 10}.sql.should == 
+      "SELECT #{@fields} FROM test GROUP BY region HAVING (sum(population) > 10)"
   end
 end
 
