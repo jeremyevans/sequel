@@ -177,7 +177,7 @@ module Sequel
     # Formats a join condition.
     def join_cond_list(cond, join_table)
       cond.map do |kv|
-        EQUAL_COND % [
+        EQUAL_EXPR % [
           qualified_field_name(kv[0], join_table), 
           qualified_field_name(kv[1], @opts[:from])]
       end.join(AND_SEPARATOR)
