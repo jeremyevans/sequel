@@ -174,7 +174,7 @@ module Sequel
     def self.order(*arg); dataset.order(*arg); end
     def self.first(*arg); dataset.first(*arg); end
     def self.count; dataset.count; end
-    def self.map(column); dataset.map(column); end
+    def self.map(*arg, &block); dataset.map(*arg, &block); end
     def self.hash_column(column); dataset.hash_column(primary_key, column); end
     def self.join(*args); dataset.join(*args); end
     def self.lock(mode, &block); dataset.lock(mode, &block); end

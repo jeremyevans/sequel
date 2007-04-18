@@ -1,5 +1,7 @@
 *SVN*
 
+* Fixed Model#map.
+
 * Documentation for ConnectionPool.
 
 * Specs for Database.
