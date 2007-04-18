@@ -53,9 +53,9 @@ context "A connection pool handling connections" do
   end
 
   specify "#make_new should not make more than max_size connections" do
-    @cpool.make_new.should == :got_connection
-    @cpool.make_new.should == :got_connection
-    @cpool.make_new.should == nil
+    @cpool.send(:make_new).should == :got_connection
+    @cpool.send(:make_new).should == :got_connection
+    @cpool.send(:make_new).should == nil
     @cpool.created_count.should == 2
   end
 end
