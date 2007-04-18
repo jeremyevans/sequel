@@ -227,14 +227,19 @@ module Sequel
       LIKE = '%s ~ %s'.freeze
       LIKE_CI = '%s ~* %s'.freeze
       
-      def format_expression(left, op, right)
-        case op
-        when :like:
+      def format_eq_expression(left, right)
+        case right
+        when Regexp:
           (right.casefold? ? LIKE_CI : LIKE) %
             [field_name(left), PGconn.quote(right.source)]
         else
           super
         end
+      end
+      
+      def format_expression(left, op, right)
+        op = :eql if op == :like
+        super
       end
     
       # def where_condition(left, right)
