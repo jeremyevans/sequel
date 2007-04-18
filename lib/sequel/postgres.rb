@@ -242,16 +242,6 @@ module Sequel
         super
       end
     
-      # def where_condition(left, right)
-      #   case right
-      #   when Regexp:
-      #     (right.casefold? ? LIKE_CI : LIKE) %
-      #       [field_name(left), PGconn.quote(right.source)]
-      #   else
-      #     super
-      #   end
-      # end
-      #     
       def each(opts = nil, &block)
         query_each(select_sql(opts), true, &block)
         self

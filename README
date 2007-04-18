@@ -161,6 +161,14 @@ Or lists of values:
 
   my_posts = posts.filter(:category => ['ruby', 'postgres', 'linux'])
   
+Sequel now also accepts expressions as closures:
+
+  my_posts = posts.filter {category == ['ruby', 'postgres', 'linux']}
+  
+Which also lets you do stuff like:
+
+  my_posts = posts.filter {stamp > 1.month.ago}
+  
 Some adapters (like postgresql) will also let you specify Regexps:
 
   my_posts = posts.filter(:category => /ruby/i)

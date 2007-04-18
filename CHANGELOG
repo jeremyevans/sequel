@@ -1,4 +1,4 @@
-*SVN*
+*0.0.20*
 
 * Refactored Dataset where clause construction to use expressions.
 
