@@ -18,8 +18,8 @@ module Sequel
       def method_missing(sym, *right)
         @op = case sym
           when :==, :===, :in: :eql
-          when :=~: :like
-          when :"<=>": :not
+          when :=~, :like: :like
+          when :"<=>", :is_not: :not
           when :<: :lt
           when :<=: :lte
           when :>: :gt
@@ -58,6 +58,8 @@ module Sequel
       def __to_a__
         instance_eval(&@block)
         @expressions
+      rescue => e
+        raise SequelError, e.message
       end
     end
   end

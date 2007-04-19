@@ -96,6 +96,30 @@ context "Expression" do
     @e.op.should == :eql
     @e.right.should == nil
   end
+  
+  specify "should support in" do
+    @e.in 1..5
+    @e.op.should == :eql
+    @e.right.should == (1..5)
+  end
+  
+  specify "should support like" do
+    @e.like "1028%"
+    @e.op.should == :like
+    @e.right.should == "1028%"
+  end
+  
+  specify "should support is_not" do
+    @e.is_not 5
+    @e.op.should == :not
+    @e.right.should == 5
+  end
+end
+
+context "An invalid expression" do
+  specify "should raise a SequelError" do
+    proc {proc {abc < Object.vzxczs}.to_expressions}.should_raise SequelError
+  end
 end
 
 context "Expressions" do

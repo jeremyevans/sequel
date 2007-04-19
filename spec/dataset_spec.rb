@@ -203,6 +203,12 @@ context "Dataset#where" do
       "SELECT * FROM test WHERE (id IN (SELECT id FROM test WHERE (region = 'Asia')))"
   end
   
+  specify "should accept a subquery for an EXISTS clause" do
+    a = @dataset.filter {price < 100}
+    @dataset.filter(a.exists).sql.should ==
+      'SELECT * FROM test WHERE EXISTS (SELECT 1 FROM test WHERE (price < 100))'
+  end
+  
   specify "should accept proc expressions (nice!)" do
     d = @d1.select(:gdp.AVG)
     @dataset.filter {gdp > d}.sql.should ==
@@ -216,6 +222,24 @@ context "Dataset#where" do
       
     @dataset.filter {id == :items__id}.sql.should ==
       'SELECT * FROM test WHERE (id = items.id)'
+      
+    @dataset.filter {a < 1}.sql.should ==
+      'SELECT * FROM test WHERE (a < 1)'
+
+    @dataset.filter {a <=> 1}.sql.should ==
+      'SELECT * FROM test WHERE NOT (a = 1)'
+      
+    @dataset.filter {a >= 1 && b <= 2}.sql.should ==
+      'SELECT * FROM test WHERE (a >= 1) AND (b <= 2)'
+      
+    @dataset.filter {c =~ 'ABC%'}.sql.should ==
+      "SELECT * FROM test WHERE (c LIKE 'ABC%')"
+  end
+  
+  specify "should raise SequelError for invalid proc expressions" do
+    proc {@dataset.filter {Object.czxczxcz}}.should_raise SequelError
+    proc {@dataset.filter {a.bcvxv}}.should_raise SequelError
+    proc {@dataset.filter {x}}.should_raise SequelError
   end
 end
 

@@ -151,6 +151,10 @@ module Sequel
         "(#{left} > #{literal(right)})"
       when :gte:
         "(#{left} >= #{literal(right)})"
+      when :like:
+        "(#{left} LIKE #{literal(right)})"
+      else
+        raise SequelError, "Invalid operator specified: #{op}"
       end
     end
     
@@ -480,7 +484,7 @@ module Sequel
     EXISTS_EXPR = "EXISTS (%s)".freeze
     
     def exists(opts = nil)
-      EXISTS_EXPR % sql({:select => 1}.merge(opts || {}))
+      EXISTS_EXPR % sql({:select => [1]}.merge(opts || {}))
     end
     
     LIMIT_1 = {:limit => 1}.freeze
