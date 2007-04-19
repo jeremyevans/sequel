@@ -1,4 +1,5 @@
 require 'time'
+require 'date'
 
 module Sequel
   # A Dataset represents a view of a the data in a database, constrained by

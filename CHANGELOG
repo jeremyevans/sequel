@@ -1,5 +1,7 @@
 *SVN*
 
+* Added require 'date' in dataset.rb. Is this a 1.8.5 thing?
+
 * Refactored Dataset to use literal strings instead of format strings (slight performance improvement and better readability.)
 
 * Added support for literalizing Date objects.
