@@ -1,5 +1,7 @@
 *SVN*
 
+* Refactored Dataset to use literal strings instead of format strings (slight performance improvement and better readability.)
+
 * Added support for literalizing Date objects.
 
 * Refactored literalization of Time objects.

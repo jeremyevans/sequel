@@ -67,13 +67,12 @@ module Sequel
     end
     
     QUALIFIED_REGEXP = /(.*)\.(.*)/.freeze
-    QUALIFIED_FORMAT = "%s.%s".freeze
 
     # Returns a qualified field name (including a table name) if the field
     # name isn't already qualified.
     def qualified_field_name(field, table)
       fn = field_name(field)
-      fn =~ QUALIFIED_REGEXP ? fn : QUALIFIED_FORMAT % [table, fn]
+      fn =~ QUALIFIED_REGEXP ? fn : "#{table}.#{fn}"
     end
     
     WILDCARD = '*'.freeze
@@ -96,7 +95,6 @@ module Sequel
     end
     
     NULL = "NULL".freeze
-    SUBQUERY = "(%s)".freeze
     TIMESTAMP_FORMAT = "TIMESTAMP '%Y-%m-%d %H:%M:%S'".freeze
     DATE_FORMAT = "DATE '%Y-%m-%d'".freeze
     
@@ -111,32 +109,28 @@ module Sequel
       when Array: v.empty? ? NULL : v.map {|i| literal(i)}.join(COMMA_SEPARATOR)
       when Time: v.strftime(TIMESTAMP_FORMAT)
       when Date: v.strftime(DATE_FORMAT)
-      when Dataset: SUBQUERY % v.sql
+      when Dataset: "(#{v.sql})"
       else
         raise SequelError, "can't express #{v.inspect}:#{v.class} as a SQL literal"
       end
     end
 
     AND_SEPARATOR = " AND ".freeze
-    EQUAL_EXPR = "(%s = %s)".freeze
-    IN_EXPR = "(%s IN (%s))".freeze
-    INCLUSIVE_RANGE_EXPR = "(%s >= %s AND %s <= %s)".freeze
-    EXCLUSIVE_RANGE_EXPR = "(%s >= %s AND %s < %s)".freeze
-    NULL_EXPR = "(%s IS NULL)".freeze
     
     def format_eq_expression(left, right)
       case right
       when Range:
-        (right.exclude_end? ? EXCLUSIVE_RANGE_EXPR : INCLUSIVE_RANGE_EXPR) %
-          [left, literal(right.begin), left, literal(right.end)]
+        right.exclude_end? ? 
+          "(#{left} >= #{right.begin} AND #{left} < #{right.end})" :
+          "(#{left} >= #{right.begin} AND #{left} <= #{right.end})"
       when Array:
-        IN_EXPR % [left, literal(right)]
-      when NilClass:
-        NULL_EXPR % left
+        "(#{left} IN (#{literal(right)}))"
       when Dataset:
-        IN_EXPR % [left, right.sql]
+        "(#{left} IN #{literal(right)})"
+      when NilClass:
+        "(#{left} IS NULL)"
       else
-        EQUAL_EXPR % [left, literal(right)]
+        "(#{left} = #{literal(right)})"
       end
     end
     
@@ -185,9 +179,9 @@ module Sequel
     # Formats a join condition.
     def join_cond_list(cond, join_table)
       cond.map do |kv|
-        EQUAL_EXPR % [
-          qualified_field_name(kv[0], join_table), 
-          qualified_field_name(kv[1], @opts[:from])]
+        l = qualified_field_name(kv[0], join_table)
+        r = qualified_field_name(kv[1], @opts[:from])
+        "(#{l} = #{r})"
       end.join(AND_SEPARATOR)
     end
     
@@ -237,8 +231,6 @@ module Sequel
       dup_merge(:group => fields)
     end
 
-    AND_WHERE = "%s AND %s".freeze
-    
     # Returns a copy of the dataset with the given conditions imposed upon it.  
     # If the query has been grouped, then the conditions are imposed in the 
     # HAVING clause. If not, then they are imposed in the WHERE clause.
@@ -247,24 +239,24 @@ module Sequel
       cond = cond.first if cond.size == 1
       parenthesize = !(cond.is_a?(Hash) || cond.is_a?(Array))
       if @opts[clause]
-        cond = AND_WHERE % [where_list(@opts[clause]), where_list(block || cond, parenthesize)]
-        dup_merge(clause => cond)
+        l = where_list(@opts[clause])
+        r = where_list(block || cond, parenthesize)
+        dup_merge(clause => "#{l} AND #{r}")
       else
         dup_merge(clause => where_list(block || cond))
       end
     end
 
-    NOT_WHERE = "NOT %s".freeze
-    AND_NOT_WHERE = "%s AND NOT %s".freeze
-    
     def exclude(*cond, &block)
       clause = (@opts[:group] ? :having : :where)
       cond = cond.first if cond.size == 1
       parenthesize = !(cond.is_a?(Hash) || cond.is_a?(Array))
       if @opts[clause]
-        cond = AND_NOT_WHERE % [where_list(@opts[clause]), where_list(block || cond, parenthesize)]
+        l = where_list(@opts[clause])
+        r = where_list(block || cond, parenthesize)
+        cond = "#{l} AND NOT #{r}"
       else
-        cond = NOT_WHERE % where_list(block || cond, true)
+        cond = "NOT #{where_list(block || cond, true)}"
       end
       dup_merge(clause => cond)
     end
@@ -331,16 +323,6 @@ module Sequel
       end
     end
 
-    SELECT = "SELECT %s FROM %s".freeze
-    SELECT_DISTINCT = "SELECT DISTINCT %s FROM %s".freeze
-    LIMIT = " LIMIT %s".freeze
-    OFFSET = " OFFSET %s".freeze
-    ORDER = " ORDER BY %s".freeze
-    WHERE = " WHERE %s".freeze
-    GROUP = " GROUP BY %s".freeze
-    HAVING = " HAVING %s".freeze
-    JOIN_CLAUSE = " %s %s ON %s".freeze
-    
     EMPTY = ''.freeze
     
     SPACE = ' '.freeze
@@ -351,34 +333,36 @@ module Sequel
       fields = opts[:select]
       select_fields = fields ? field_list(fields) : WILDCARD
       select_source = source_list(opts[:from])
-      sql = (opts[:distinct] ? SELECT_DISTINCT : SELECT) % [select_fields, select_source]
+      sql = opts[:distinct] ?
+        "SELECT DISTINCT #{select_fields} FROM #{select_source}" :
+        "SELECT #{select_fields} FROM #{select_source}"
       
       if join_type = opts[:join_type]
         join_table = opts[:join_table]
         join_cond = join_cond_list(opts[:join_cond], join_table)
-        sql << (JOIN_CLAUSE % [join_type, join_table, join_cond])
+        sql << " #{join_type} #{join_table} ON #{join_cond}"
       end
       
       if where = opts[:where]
-        sql << (WHERE % where)
+        sql << " WHERE #{where}"
       end
       
       if group = opts[:group]
-        sql << (GROUP % field_list(group))
+        sql << " GROUP BY #{field_list(group)}"
       end
 
       if order = opts[:order]
-        sql << (ORDER % field_list(order))
+        sql << " ORDER BY #{field_list(order)}"
       end
       
       if having = opts[:having]
-        sql << (HAVING % having)
+        sql << " HAVING #{having}"
       end
 
       if limit = opts[:limit]
-        sql << (LIMIT % limit)
+        sql << " LIMIT #{limit}"
         if offset = opts[:offset]
-          sql << (OFFSET % offset)
+          sql << " OFFSET #{offset}"
         end
       end
             
@@ -387,13 +371,9 @@ module Sequel
     
     alias_method :sql, :select_sql
     
-    INSERT = "INSERT INTO %s (%s) VALUES (%s)".freeze
-    INSERT_VALUES = "INSERT INTO %s VALUES (%s)".freeze
-    INSERT_EMPTY = "INSERT INTO %s DEFAULT VALUES".freeze
-    
     def insert_sql(*values)
       if values.empty?
-        INSERT_EMPTY % @opts[:from]
+        "INSERT INTO #{@opts[:from]} DEFAULT VALUES"
       elsif (values.size == 1) && values[0].is_a?(Hash)
         field_list = []
         value_list = []
@@ -401,17 +381,13 @@ module Sequel
           field_list << k
           value_list << literal(v)
         end
-        INSERT % [
-          @opts[:from], 
-          field_list.join(COMMA_SEPARATOR), 
-          value_list.join(COMMA_SEPARATOR)]
+        fl = field_list.join(COMMA_SEPARATOR)
+        vl = value_list.join(COMMA_SEPARATOR)
+        "INSERT INTO #{@opts[:from]} (#{fl}) VALUES (#{vl})"
       else
-        INSERT_VALUES % [@opts[:from], literal(values)]
+        "INSERT INTO #{@opts[:from]} VALUES (#{literal(values)})"
       end
     end
-    
-    UPDATE = "UPDATE %s SET %s".freeze
-    SET_FORMAT = "%s = %s".freeze
     
     def update_sql(values, opts = nil)
       opts = opts ? @opts.merge(opts) : @opts
@@ -422,18 +398,16 @@ module Sequel
         raise SequelError, "Can't update a joined dataset"
       end
 
-      set_list = values.map {|kv| SET_FORMAT % [kv[0], literal(kv[1])]}.
+      set_list = values.map {|kv| "#{kv[0]} = #{literal(kv[1])}"}.
         join(COMMA_SEPARATOR)
-      sql = UPDATE % [opts[:from], set_list]
+      sql = "UPDATE #{@opts[:from]} SET #{set_list}"
       
       if where = opts[:where]
-        sql << WHERE % where_list(where)
+        sql << " WHERE #{where}"
       end
 
       sql
     end
-    
-    DELETE = "DELETE FROM %s".freeze
     
     def delete_sql(opts = nil)
       opts = opts ? @opts.merge(opts) : @opts
@@ -444,10 +418,10 @@ module Sequel
         raise SequelError, "Can't delete from a joined dataset"
       end
 
-      sql = DELETE % opts[:from]
+      sql = "DELETE FROM #{opts[:from]}"
 
       if where = opts[:where]
-        sql << WHERE % where_list(where)
+        sql << " WHERE #{where}"
       end
 
       sql
@@ -464,7 +438,7 @@ module Sequel
       if opts.keys == [:from] && opts[:from].size == 1
         opts[:from].first.to_s
       else
-        SUBQUERY % sql
+        "(#{sql})"
       end
     end
     
@@ -485,10 +459,8 @@ module Sequel
       select(field.AVG).naked.first.values.first
     end
     
-    EXISTS_EXPR = "EXISTS (%s)".freeze
-    
     def exists(opts = nil)
-      EXISTS_EXPR % sql({:select => [1]}.merge(opts || {}))
+      "EXISTS (#{sql({:select => [1]}.merge(opts || {}))})"
     end
     
     LIMIT_1 = {:limit => 1}.freeze
