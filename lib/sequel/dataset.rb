@@ -120,8 +120,8 @@ module Sequel
     def format_eq_expression(left, right)
       case right
       when Range:
-        right.exclude_end? ? 
-          "(#{left} >= #{right.begin} AND #{left} < #{right.end})" :
+        right.exclude_end? ? \
+          "(#{left} >= #{right.begin} AND #{left} < #{right.end})" : \
           "(#{left} >= #{right.begin} AND #{left} <= #{right.end})"
       when Array:
         "(#{left} IN (#{literal(right)}))"
@@ -333,8 +333,8 @@ module Sequel
       fields = opts[:select]
       select_fields = fields ? field_list(fields) : WILDCARD
       select_source = source_list(opts[:from])
-      sql = opts[:distinct] ?
-        "SELECT DISTINCT #{select_fields} FROM #{select_source}" :
+      sql = opts[:distinct] ? \
+        "SELECT DISTINCT #{select_fields} FROM #{select_source}" : \
         "SELECT #{select_fields} FROM #{select_source}"
       
       if join_type = opts[:join_type]

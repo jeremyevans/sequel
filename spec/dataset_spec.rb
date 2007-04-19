@@ -192,6 +192,20 @@ context "Dataset#where" do
       'SELECT * FROM test WHERE (id >= 4 AND id <= 7)'
     @dataset.filter(:id => 4...7).sql.should ==
       'SELECT * FROM test WHERE (id >= 4 AND id < 7)'
+
+    @dataset.filter {id == (4..7)}.sql.should ==
+      'SELECT * FROM test WHERE (id >= 4 AND id <= 7)'
+
+    @dataset.filter {id.in 4..7}.sql.should ==
+      'SELECT * FROM test WHERE (id >= 4 AND id <= 7)'
+  end
+  
+  specify "should accept nil" do
+    @dataset.filter(:owner_id => nil).sql.should ==
+      'SELECT * FROM test WHERE (owner_id IS NULL)'
+
+    @dataset.filter{owner_id.nil?}.sql.should ==
+      'SELECT * FROM test WHERE (owner_id IS NULL)'
   end
   
   specify "should accept a subquery" do
