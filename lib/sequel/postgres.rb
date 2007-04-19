@@ -218,7 +218,6 @@ module Sequel
       def literal(v)
         case v
         when String, Fixnum, Float, TrueClass, FalseClass: PGconn.quote(v)
-        when Time: v.to_sql_timestamp
         else
           super
         end
@@ -237,11 +236,6 @@ module Sequel
         end
       end
       
-      def format_expression(left, op, right)
-        op = :eql if op == :like
-        super
-      end
-    
       def each(opts = nil, &block)
         query_each(select_sql(opts), true, &block)
         self

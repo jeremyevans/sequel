@@ -1,3 +1,9 @@
+*SVN*
+
+* Added support for literalizing Date objects.
+
+* Refactored literalization of Time objects.
+
 *0.0.20*
 
 * Refactored Dataset where clause construction to use expressions.

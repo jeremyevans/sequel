@@ -364,6 +364,18 @@ context "Dataset#literal" do
     d = @dataset.from(:test)
     d.literal(d).should == "(#{d.sql})"
   end
+  
+  specify "should literalize Time properly" do
+    t = Time.now
+    s = t.strftime("TIMESTAMP '%Y-%m-%d %H:%M:%S'")
+    @dataset.literal(t).should == s
+  end
+  
+  specify "should literalize Date properly" do
+    d = Date.today
+    s = d.strftime("DATE '%Y-%m-%d'")
+    @dataset.literal(d).should == s
+  end
 end
 
 context "Dataset#from" do
@@ -589,4 +601,8 @@ context "Dataset#uniq" do
   specify "should be aliased by Dataset#distinct" do
     @dataset.distinct.sql.should == 'SELECT DISTINCT name FROM test' 
   end
+end
+
+context "Dataset#count_sql" do
+  
 end

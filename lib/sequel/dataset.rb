@@ -97,6 +97,8 @@ module Sequel
     
     NULL = "NULL".freeze
     SUBQUERY = "(%s)".freeze
+    TIMESTAMP_FORMAT = "TIMESTAMP '%Y-%m-%d %H:%M:%S'".freeze
+    DATE_FORMAT = "DATE '%Y-%m-%d'".freeze
     
     # Returns a literal representation of a value to be used as part
     # of an SQL expression. This method is overriden in descendants.
@@ -107,6 +109,8 @@ module Sequel
       when NilClass: NULL
       when Symbol: v.to_field_name
       when Array: v.empty? ? NULL : v.map {|i| literal(i)}.join(COMMA_SEPARATOR)
+      when Time: v.strftime(TIMESTAMP_FORMAT)
+      when Date: v.strftime(DATE_FORMAT)
       when Dataset: SUBQUERY % v.sql
       else
         raise SequelError, "can't express #{v.inspect}:#{v.class} as a SQL literal"
