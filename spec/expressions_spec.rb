@@ -103,14 +103,33 @@ context "Expression" do
     @e.right.should == (1..5)
   end
   
+  specify "should support in?" do
+    @e.in? 1..5
+    @e.op.should == :eql
+    @e.right.should == (1..5)
+  end
+  
   specify "should support like" do
     @e.like "1028%"
     @e.op.should == :like
     @e.right.should == "1028%"
   end
   
+  specify "should support like?" do
+    @e.like? "1028%"
+    @e.op.should == :like
+    @e.right.should == "1028%"
+  end
+  
   specify "should support is_not" do
     @e.is_not 5
+    @e.op.should == :not
+    @e.right.should == 5
+  end
+  
+  specify "should turn an unknown operator into a qualified field name" do
+    @e.id <=> 5
+    @e.left.should == 'a.id'
     @e.op.should == :not
     @e.right.should == 5
   end

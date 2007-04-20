@@ -248,6 +248,9 @@ context "Dataset#where" do
       
     @dataset.filter {c =~ 'ABC%'}.sql.should ==
       "SELECT * FROM test WHERE (c LIKE 'ABC%')"
+
+    @dataset.filter {test.ccc =~ 'ABC%'}.sql.should ==
+      "SELECT * FROM test WHERE (test.ccc LIKE 'ABC%')"
   end
   
   specify "should raise SequelError for invalid proc expressions" do

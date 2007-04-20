@@ -7,6 +7,7 @@ module Sequel
       instance_methods.each { |m| undef_method m unless m =~ /^(__|instance_eval)/ }
     end
 
+    # An Expression is made of a left side, an operator, and a right side.
     class Expression < BlankSlate
       attr_reader :left, :right
       attr_accessor :op
@@ -17,14 +18,15 @@ module Sequel
 
       def method_missing(sym, *right)
         @op = case sym
-          when :==, :===, :in: :eql
-          when :=~, :like: :like
-          when :"<=>", :is_not: :not
-          when :<: :lt
-          when :<=: :lte
-          when :>: :gt
-          when :>=: :gte
-          else sym
+        when :==, :===, :in, :in?: :eql
+        when :=~, :like, :like?: :like
+        when :"<=>", :is_not: :not
+        when :<: :lt
+        when :<=: :lte
+        when :>: :gt
+        when :>=: :gte
+        else
+          @left = "#{left}.#{sym}"
         end
         @right = right.first
         self
@@ -37,30 +39,32 @@ module Sequel
       end
     end
 
+    # An ExpressionCompiler takes a Proc object and compiles it
+    # into an array of expressions using instance_eval magic.
     class ExpressionCompiler < BlankSlate
-      def initialize(&block)
+      def initialize(&block) #:nodoc:
         @block = block
         @expressions = []
       end
-
-      def method_missing(sym, *args)
-        expr = Expression.new(sym)
-        @expressions << expr
-        expr
-      end
       
-      def SUM(sym)
-        expr = Expression.new(sym.SUM)
-        @expressions << expr
-        expr
-      end
-      
+      # Converts the block into an array of expressions.
       def __to_a__
         instance_eval(&@block)
         @expressions
       rescue => e
         raise SequelError, e.message
       end
+
+      private
+        def __expr(sym) #:nodoc:
+          expr = Expression.new(sym)
+          @expressions << expr
+          expr
+        end
+
+        def method_missing(sym, *args); __expr(sym); end #:nodoc:
+        def test; __expr(:test); end #:nodoc:
+        def SUM(sym); __expr(sym.SUM); end #:nodoc:
     end
   end
 end
