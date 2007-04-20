@@ -236,7 +236,7 @@ class Sequel::Database
   def self.get_adapters; @@adapters; end
 end
 
-context "A database with a scheme" do
+context "A Database adapter with a scheme" do
   setup do
     class CCC < Sequel::Database
       set_adapter_scheme :ccc
@@ -252,6 +252,34 @@ context "A database with a scheme" do
     c.should_be_a_kind_of CCC
     c.opts[:host].should == 'localhost'
     c.opts[:database].should == 'db'
+  end
+  
+  specify "should be accessible through Sequel.connect" do
+    c = Sequel.connect 'ccc://localhost/db'
+    c.should_be_a_kind_of CCC
+    c.opts[:host].should == 'localhost'
+    c.opts[:database].should == 'db'
+  end
+
+  specify "should be accessible through Sequel.open" do
+    c = Sequel.open 'ccc://localhost/db'
+    c.should_be_a_kind_of CCC
+    c.opts[:host].should == 'localhost'
+    c.opts[:database].should == 'db'
+  end
+end
+
+context "An unknown database scheme" do
+  specify "should raise an exception in Sequel::Database.connect" do
+    proc {Sequel::Database.connect('ddd://localhost/db')}.should_raise SequelError
+  end
+
+  specify "should raise an exception in Sequel.connect" do
+    proc {Sequel.connect('ddd://localhost/db')}.should_raise SequelError
+  end
+
+  specify "should raise an exception in Sequel.open" do
+    proc {Sequel.open('ddd://localhost/db')}.should_raise SequelError
   end
 end
 

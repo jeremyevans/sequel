@@ -621,5 +621,42 @@ context "Dataset#uniq" do
 end
 
 context "Dataset#count_sql" do
+  setup do
+    @dataset = Sequel::Dataset.new(nil).from(:test)
+  end
   
+  specify "should format SQL propertly" do
+    @dataset.count_sql.should == 'SELECT COUNT(*) FROM test'
+  end
+  
+  specify "should include the where clause if it's there" do
+    @dataset.filter {abc < 30}.count_sql.should ==
+      'SELECT COUNT(*) FROM test WHERE (abc < 30)'
+  end
+end
+
+context "Dataset#join" do
+  setup do
+    @d = Sequel::Dataset.new(nil).from(:items)
+  end
+  
+  specify "should format the JOIN clause properly" do
+    @d.join(:categories, :category_id => :id).sql.should ==
+      'SELECT * FROM items LEFT OUTER JOIN categories ON (categories.category_id = items.id)'
+  end
+  
+  specify "should include WHERE clause if applicable" do
+    @d.filter {price < 100}.join(:categories, :category_id => :id).sql.should ==
+      'SELECT * FROM items LEFT OUTER JOIN categories ON (categories.category_id = items.id) WHERE (price < 100)'
+  end
+
+  specify "should include ORDER BY clause if applicable" do
+    @d.order(:stamp).join(:categories, :category_id => :id).sql.should ==
+      'SELECT * FROM items LEFT OUTER JOIN categories ON (categories.category_id = items.id) ORDER BY stamp'
+  end
+  
+  specify "should use id as implicit relation primary key if ommited" do
+    @d.join(:categories, :category_id).sql.should ==
+      @d.join(:categories, :category_id => :id).sql
+  end
 end

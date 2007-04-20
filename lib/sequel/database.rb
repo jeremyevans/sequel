@@ -150,11 +150,11 @@ module Sequel
     # Creates a new database object based on the supplied connection string.
     # The specified scheme determines the database class used, and the rest
     # of the string specifies the connection options. For example:
-    #   DB = Sequel.connect('sqlite:///blog.db')
+    #   DB = Sequel.open 'sqlite:///blog.db'
     def self.connect(conn_string)
       uri = URI.parse(conn_string)
       c = @@adapters[uri.scheme.to_sym]
-      raise "Invalid database scheme" unless c
+      raise SequelError, "Invalid database scheme" unless c
       c.new(c.uri_to_options(uri))
     end
   end

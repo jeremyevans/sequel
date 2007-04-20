@@ -159,7 +159,7 @@ module Sequel
     
     # Formats a where clause. If parenthesize is true, then the whole 
     # generated clause will be enclosed in a set of parentheses.
-    def where_list(where, parenthesize = false)
+    def expression_list(where, parenthesize = false)
       case where
       when Hash:
         parenthesize = false if where.size == 1
@@ -240,11 +240,11 @@ module Sequel
       cond = cond.first if cond.size == 1
       parenthesize = !(cond.is_a?(Hash) || cond.is_a?(Array))
       if @opts[clause]
-        l = where_list(@opts[clause])
-        r = where_list(block || cond, parenthesize)
+        l = expression_list(@opts[clause])
+        r = expression_list(block || cond, parenthesize)
         dup_merge(clause => "#{l} AND #{r}")
       else
-        dup_merge(clause => where_list(block || cond))
+        dup_merge(clause => expression_list(block || cond))
       end
     end
 
@@ -253,11 +253,11 @@ module Sequel
       cond = cond.first if cond.size == 1
       parenthesize = !(cond.is_a?(Hash) || cond.is_a?(Array))
       if @opts[clause]
-        l = where_list(@opts[clause])
-        r = where_list(block || cond, parenthesize)
+        l = expression_list(@opts[clause])
+        r = expression_list(block || cond, parenthesize)
         cond = "#{l} AND NOT #{r}"
       else
-        cond = "NOT #{where_list(block || cond, true)}"
+        cond = "NOT #{expression_list(block || cond, true)}"
       end
       dup_merge(clause => cond)
     end
@@ -287,9 +287,10 @@ module Sequel
     RIGHT_OUTER_JOIN = 'RIGHT OUTER JOIN'.freeze
     FULL_OUTER_JOIN = 'FULL OUTER JOIN'.freeze
         
-    def join(table, cond)
+    def join(table, expr)
+      expr = {expr => :id} unless expr.is_a?(Hash)
       dup_merge(:join_type => LEFT_OUTER_JOIN, :join_table => table,
-        :join_cond => cond)
+        :join_cond => expr)
     end
 
     alias_method :all, :to_a

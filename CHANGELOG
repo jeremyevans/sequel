@@ -1,5 +1,7 @@
 *SVN*
 
+* Dataset#where_list Renamed Dataset#expression_list.
+
 * Added support for qualified fields in Proc expressions (e.g. filter {items.id == 1}.)
 
 * Added like? and in? Proc expression operators.

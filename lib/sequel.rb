@@ -11,6 +11,15 @@ require File.join(dir, 'model')
 
 module Sequel #:nodoc:
   class << self
+    # call-seq:
+    #   Sequel::Database.connect(conn_string)
+    #   Sequel.connect(conn_string)
+    #   Sequel.open(conn_string)
+    #
+    # Creates a new database object based on the supplied connection string.
+    # The specified scheme determines the database class used, and the rest
+    # of the string specifies the connection options. For example:
+    #   DB = Sequel.open 'sqlite:///blog.db'
     def connect(url)
       Database.connect(url)
     end
