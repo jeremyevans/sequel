@@ -6,7 +6,7 @@ require 'fileutils'
 include FileUtils
 
 NAME = "sequel"
-VERS = "0.0.20"
+VERS = "0.1.0"
 CLEAN.include ['**/.*.sw?', 'pkg/*', '.config', 'doc/*', 'coverage/*']
 RDOC_OPTS = ['--quiet', '--title', "Sequel: Concise ORM for Ruby",
   "--opname", "index.html",
