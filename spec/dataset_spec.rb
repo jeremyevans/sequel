@@ -701,3 +701,162 @@ context "Dataset#insert_multiple" do
     @d.inserts.should == ["inevitabre", "herro", "the ticking crock"]
   end
 end
+
+context "Dataset aggregate methods" do
+  setup do
+    c = Class.new(Sequel::Dataset) do
+      def first
+        {1 => @opts[:select].first}
+      end
+    end
+    @d = c.new(nil).from(:test)
+  end
+  
+  specify "should include min" do
+    @d.min(:a).should == 'min(a)'
+  end
+  
+  specify "should include max" do
+    @d.max(:b).should == 'max(b)'
+  end
+  
+  specify "should include sum" do
+    @d.sum(:c).should == 'sum(c)'
+  end
+  
+  specify "should include avg" do
+    @d.avg(:d).should == 'avg(d)'
+  end
+  
+  specify "should accept qualified fields" do
+    @d.avg(:test__bc).should == 'avg(test.bc)'
+  end
+end
+
+context "Dataset#first" do
+  setup do
+    @c = Class.new(Sequel::Dataset) do
+      @@last_dataset = nil
+      
+      def self.last_dataset
+        @@last_dataset
+      end
+
+      def first_record
+        {:a => 1, :b => 2}
+      end
+      
+      def all
+        @@last_dataset = self
+        [{:a => 1, :b => 2}] * @opts[:limit]
+      end
+    end
+    @d = @c.new(nil).from(:test)
+  end
+  
+  specify "should return a single record if no argument is given" do
+    @d.first.should == {:a => 1, :b => 2}
+  end
+  
+  specify "should set the limit according to the given number" do
+    i = rand(10) + 10
+    @d.first(i)
+    @c.last_dataset.opts[:limit].should == i
+  end
+  
+  specify "should return an array with the records if argument is greater than 1" do
+    i = rand(10) + 10
+    r = @d.first(i)
+    r.should_be_a_kind_of Array
+    r.size.should == i
+    r.each {|row| row.should == {:a => 1, :b => 2}}
+  end
+end
+
+context "Dataset#last" do
+  setup do
+    @c = Class.new(Sequel::Dataset) do
+      @@last_dataset = nil
+      
+      def self.last_dataset
+        @@last_dataset
+      end
+
+      def first_record(opts = nil)
+        @@last_dataset = dup_merge(opts) if opts
+        {:a => 1, :b => 2}
+      end
+      
+      def all
+        @@last_dataset = self
+        [{:a => 1, :b => 2}] * @opts[:limit]
+      end
+    end
+    @d = @c.new(nil).from(:test)
+  end
+  
+  specify "should raise if no order is given" do
+    proc {@d.last}.should_raise SequelError
+    proc {@d.last(2)}.should_raise SequelError
+    proc {@d.order(:a).last}.should_not_raise
+    proc {@d.order(:a).last(2)}.should_not_raise
+  end
+  
+  specify "should invert the order" do
+    @d.order(:a).last
+    @c.last_dataset.opts[:order].should == ['a DESC']
+    
+    @d.order(:b.DESC).last
+    @c.last_dataset.opts[:order].should == ['b']
+    
+    @d.order(:c, :d).last
+    @c.last_dataset.opts[:order].should == ['c DESC', 'd DESC']
+    
+    @d.order(:e.DESC, :f).last
+    @c.last_dataset.opts[:order].should == ['e', 'f DESC']
+  end
+  
+  specify "should return a single record if no argument is given" do
+    @d.order(:a).last.should == {:a => 1, :b => 2}
+  end
+  
+  specify "should set the limit according to the given number" do
+    i = rand(10) + 10
+    r = @d.order(:a).last(i)
+    @c.last_dataset.opts[:limit].should == i
+  end
+  
+  specify "should return an array with the records if argument is greater than 1" do
+    i = rand(10) + 10
+    r = @d.order(:a).last(i)
+    r.should_be_a_kind_of Array
+    r.size.should == i
+    r.each {|row| row.should == {:a => 1, :b => 2}}
+  end
+end
+
+context "Dataset#[]" do
+  setup do
+    @c = Class.new(Sequel::Dataset) do
+      @@last_dataset = nil
+      
+      def self.last_dataset
+        @@last_dataset
+      end
+
+      def first_record(opts = nil)
+        @@last_dataset = opts ? dup_merge(opts) : self
+        {1 => 2, 3 => 4}
+      end
+    end
+    @d = @c.new(nil).from(:test)
+  end
+  
+  specify "should return a single record filtered according to the given conditions" do
+    @d[:name => 'didi'].should == {1 => 2, 3 => 4}
+    @c.last_dataset.opts[:where].should == "(name = 'didi')"
+
+    @d[:id => 5..45].should == {1 => 2, 3 => 4}
+    @c.last_dataset.opts[:where].should == "(id >= 5 AND id <= 45)"
+  end
+end

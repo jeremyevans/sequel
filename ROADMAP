@@ -1,0 +1,19 @@
+=== 0.1.1
+
+* Cleanup Dataset API and make it simpler (especially count, aggregates, first and last).
+
+* Spec and document Model.
+
+* Complete MySQL adapter.
+
+=== 0.1.2
+
+* Better, more complete relations.
+
+=== 0.1.3
+
+* Refactor Schema.
+
+=== 0.2.0
+
+* Database reflection.

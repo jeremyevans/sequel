@@ -57,14 +57,10 @@ module Sequel
     #     column :content, :text
     #     index :title
     #   end
-    def create_table(name, columns = nil, indexes = nil, &block)
-      if block
-        schema = Schema.new
-        schema.create_table(name, &block)
-        schema.create(self)
-      else
-        execute Schema.create_table_sql(name, columns, indexes)
-      end
+    def create_table(name, &block)
+      schema = Schema.new
+      schema.create_table(name, &block)
+      schema.create(self)
     end
     
     # Drops a table.

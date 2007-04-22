@@ -1,4 +1,8 @@
-*SVN*
+*0.1.0*
+
+* Changed Database#create_table to only accept a block. Nobody's gonna use the other way.
+
+* Removed Dataset#[]= method. Too confusing and not really useful.
 
 * Fixed ConnectionPool#hold to wrap exceptions only once.
 

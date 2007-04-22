@@ -496,11 +496,6 @@ module Sequel
       where(*conditions).first
     end
     
-    # Updates all records matching the condition with the values specified.
-    def []=(condition, values)
-      where(condition).update(values)
-    end
-  
     def last(num = 1)
       raise SequelError, 'No order specified' unless 
         @opts[:order] || (opts && opts[:order])
