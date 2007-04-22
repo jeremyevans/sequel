@@ -1,6 +1,6 @@
 === 0.1.1
 
-* Cleanup Dataset API and make it simpler (especially count, aggregates, first and last).
+* Cleanup Dataset API (especially count, aggregates, first and last).
 
 * Spec and document Model.
 
