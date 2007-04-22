@@ -660,3 +660,44 @@ context "Dataset#join" do
       @d.join(:categories, :category_id => :id).sql
   end
 end
+
+context "Dataset#<<" do
+  setup do
+    c = Class.new(Sequel::Dataset) do
+      def insert(*args)
+        args
+      end
+    end
+    
+    @d = c.new(nil)
+  end
+  
+  specify "should call Dataset#insert" do
+    (@d << {:a => 1, :b => 2}).should == [{:a => 1, :b => 2}]
+  end
+end
+
+context "Dataset#insert_multiple" do
+  setup do
+    c = Class.new(Sequel::Dataset) do
+      attr_reader :inserts
+      def insert(arg)
+        @inserts ||= []
+        @inserts << arg
+      end
+    end
+    
+    @d = c.new(nil)
+  end
+  
+  specify "should insert all items in the supplied array" do
+    @d.insert_multiple [:aa, 5, 3, {1 => 2}]
+    @d.inserts.should == [:aa, 5, 3, {1 => 2}]
+  end
+  
+  specify "should pass array items through the supplied block if given" do
+    a = ["inevitable", "hello", "the ticking clock"]
+    @d.insert_multiple(a) {|i| i.gsub('l', 'r')}
+    @d.inserts.should == ["inevitabre", "herro", "the ticking crock"]
+  end
+end
