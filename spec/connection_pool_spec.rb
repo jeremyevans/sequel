@@ -96,6 +96,16 @@ context "ConnectionPool#hold" do
     proc {@pool.hold {|c| c.foobar}}.should_raise SequelConnectionError
   end
   
+  specify "should wrap exceptions in SequelConnectionError only once" do
+    begin
+      @pool.hold {@pool.hold {@pool.hold {raise "mau"}}}
+      true.should == false # this line should not be reached
+    rescue => e
+      e.should_be_a_kind_of SequelConnectionError
+      e.original_error.should_be_a_kind_of RuntimeError
+    end
+  end
+  
   specify "should provide the original exception wrapped in a SequelConnectionError" do
     begin
       @pool.hold {raise "mau"}

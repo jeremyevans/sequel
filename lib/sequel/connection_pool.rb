@@ -65,6 +65,8 @@ module Sequel
       ensure
         release(t)
       end
+    rescue SequelConnectionError => e
+      raise e
     rescue Exception => e
       raise SequelConnectionError.new(e)
     end
