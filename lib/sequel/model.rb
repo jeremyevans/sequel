@@ -1,3 +1,4 @@
+require 'rubygems'
 require 'metaid'
 
 module Sequel
@@ -22,14 +23,14 @@ module Sequel
         raise RuntimeError, "No database connected."
       end
       @dataset = db[table_name]
-      @dataset.record_class = self
+      @dataset.model_class = self
       @dataset
     end
 
     def self.set_dataset(ds)
       @db = ds.db
       @dataset = ds
-      @dataset.record_class = self
+      @dataset.model_class = self
     end
     
     def self.cache_by(column, expiration)

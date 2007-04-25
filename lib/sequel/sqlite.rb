@@ -43,7 +43,7 @@ module Sequel
         @pool.hold {|conn| conn.get_first_value(sql)}
       end
       
-      def result_set(sql, record_class, &block)
+      def result_set(sql, model_class, &block)
         @pool.hold do |conn|
           conn.query(sql) do |result|
             columns = result.columns
@@ -51,7 +51,7 @@ module Sequel
             result.each do |values|
               row = {}
               column_count.times {|i| row[columns[i].to_sym] = values[i]}
-              block.call(record_class ? record_class.new(row) : row)
+              block.call(model_class ? model_class.new(row) : row)
             end
           end
         end
@@ -68,18 +68,8 @@ module Sequel
       end
 
       def each(opts = nil, &block)
-        @db.result_set(select_sql(opts), @record_class, &block)
+        @db.result_set(select_sql(opts), @model_class, &block)
         self
-      end
-    
-      LIMIT_1 = {:limit => 1}.freeze
-    
-      def first_record(opts = nil)
-        @db.result_set(select_sql(opts), @record_class) {|r| return r}
-      end
-    
-      def count(opts = nil)
-        @db.single_value(count_sql(opts)).to_i
       end
     
       def insert(*values)

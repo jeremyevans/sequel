@@ -5,20 +5,20 @@ context "Dataset" do
     @dataset = Sequel::Dataset.new("db")
   end
   
-  specify "should accept database, opts and record_class in initialize" do
+  specify "should accept database, opts and model_class in initialize" do
     db = 'db'
     opts = {:from => :test}
     a_class = Class.new
     d = Sequel::Dataset.new(db, opts, a_class)
     d.db.should_be db
     d.opts.should_be opts
-    d.record_class.should_be a_class
+    d.model_class.should_be a_class
     
     d = Sequel::Dataset.new(db)
     d.db.should_be db
     d.opts.should_be_a_kind_of Hash
     d.opts.should == {}
-    d.record_class.should_be_nil
+    d.model_class.should_be_nil
   end
   
   specify "should provide dup_merge for chainability." do
@@ -38,17 +38,17 @@ context "Dataset" do
     d2.opts[:order].should == :name
     d1.opts[:order].should_be_nil
     
-    # dup_merge should preserve @record_class
+    # dup_merge should preserve @model_class
     a_class = Class.new
     d3 = Sequel::Dataset.new("db", nil, a_class)
     d3.db.should_not_be @dataset.db
     d4 = @dataset.dup_merge({})
     d4.db.should_be @dataset.db
-    d3.record_class.should_be a_class
-    d4.record_class.should_be_nil
+    d3.model_class.should_be a_class
+    d4.model_class.should_be_nil
     d5 = d3.dup_merge(:from => :test)
     d5.db.should_be d3.db
-    d5.record_class.should == a_class
+    d5.model_class.should == a_class
   end
   
   specify "should include Enumerable" do
@@ -544,7 +544,7 @@ context "Dataset#naked" do
   specify "should return a naked copy of self (no record class)" do
     naked = @d1.naked
     naked.should_not_be @d1
-    naked.record_class.should_be_nil
+    naked.model_class.should_be_nil
     naked.opts.should == @d1.opts
   end
 end
@@ -564,7 +564,6 @@ context "Dataset#qualified_field_name" do
     @dataset.qualified_field_name(:b1, :items).should == 'items.b1'
   end
 end
-
 
 class DummyDataset < Sequel::Dataset
   VALUES = [
@@ -612,26 +611,37 @@ context "Dataset#uniq" do
   end
   
   specify "should include DISTINCT clause in statement" do
-    @dataset.uniq.sql.should == 'SELECT DISTINCT name FROM test' 
+    @dataset.uniq.sql.should == 'SELECT DISTINCT name FROM test'
   end
   
   specify "should be aliased by Dataset#distinct" do
-    @dataset.distinct.sql.should == 'SELECT DISTINCT name FROM test' 
+    @dataset.distinct.sql.should == 'SELECT DISTINCT name FROM test'
   end
 end
 
-context "Dataset#count_sql" do
+context "Dataset#count" do
   setup do
-    @dataset = Sequel::Dataset.new(nil).from(:test)
+    @c = Class.new(Sequel::Dataset) do
+      def self.sql
+        @@sql
+      end
+      
+      def each(opts = nil)
+        @@sql = select_sql(opts)
+        yield({1 => 1})
+      end
+    end
+    @dataset = @c.new(nil).from(:test)
   end
   
   specify "should format SQL propertly" do
-    @dataset.count_sql.should == 'SELECT COUNT(*) FROM test'
+    @dataset.count.should == 1
+    @c.sql.should == 'SELECT COUNT(*) FROM test'
   end
   
   specify "should include the where clause if it's there" do
-    @dataset.filter {abc < 30}.count_sql.should ==
-      'SELECT COUNT(*) FROM test WHERE (abc < 30)'
+    @dataset.filter {abc < 30}.count.should == 1
+    @c.sql.should == 'SELECT COUNT(*) FROM test WHERE (abc < 30)'
   end
 end
 
@@ -705,8 +715,8 @@ end
 context "Dataset aggregate methods" do
   setup do
     c = Class.new(Sequel::Dataset) do
-      def first
-        {1 => @opts[:select].first}
+      def each(opts = nil)
+        yield({1 => opts[:select].first})
       end
     end
     @d = c.new(nil).from(:test)
@@ -742,7 +752,7 @@ context "Dataset#first" do
         @@last_dataset
       end
 
-      def first_record
+      def single_record
         {:a => 1, :b => 2}
       end
       
@@ -782,7 +792,7 @@ context "Dataset#last" do
         @@last_dataset
       end
 
-      def first_record(opts = nil)
+      def single_record(opts = nil)
         @@last_dataset = dup_merge(opts) if opts
         {:a => 1, :b => 2}
       end
@@ -844,7 +854,7 @@ context "Dataset#[]" do
         @@last_dataset
       end
 
-      def first_record(opts = nil)
+      def single_record(opts = nil)
         @@last_dataset = opts ? dup_merge(opts) : self
         {1 => 2, 3 => 4}
       end
@@ -859,4 +869,78 @@ context "Dataset#[]" do
     @d[:id => 5..45].should == {1 => 2, 3 => 4}
     @c.last_dataset.opts[:where].should == "(id >= 5 AND id <= 45)"
   end
+end
+
+context "Dataset#single_record" do
+  setup do
+    @c = Class.new(Sequel::Dataset) do
+      def each(opts = nil)
+        opts = opts ? @opts.merge(opts) : @opts
+        yield opts
+        yield 2
+      end
+    end
+    @d = @c.new(nil).from(:test)
+  end
+  
+  specify "should call each and return the first record" do
+    @d.single_record.should == @d.opts
+  end
+  
+  specify "should pass opts to each" do
+    @d.single_record(:a => :b).should == @d.opts.merge(:a => :b)
+  end
+end
+
+context "Dataset#single_value" do
+  setup do
+    @c = Class.new(Sequel::Dataset) do
+      def each(opts = nil)
+        yield({1 => (opts && opts[:a]) || 2})
+      end
+    end
+    @d = @c.new(nil).from(:test)
+  end
+  
+  specify "should call each and return the first value of the first record" do
+    @d.single_value.should == 2
+  end
+  
+  specify "should pass opts to each" do
+    @d.single_value(:a => :b).should == :b
+  end
+end
+
+context "Dataset#destroy" do
+  setup do
+    @d = Sequel::Dataset.new(nil).from(:test)
+  end
+  
+  specify "should raise exception if no model is associated with the dataset" do
+    proc {@d.destroy}.should_raise SequelError
+  end
+  
+  specify "should call raise for every model in the dataset" do
+    DESTROYED = []
+    m = Class.new do
+      def destroy
+        DESTROYED << self
+      end
+    end
+    MODELS = [m.new, m.new]
+    c = Class.new(Sequel::Dataset) do
+      def each(opts = nil)
+        MODELS.each {|i| yield i}
+      end
+    end
+    db = Class.new do
+      def transaction
+        yield
+      end
+    end
+    
+    count = c.new(db.new, {}, m).destroy
+    count.should == 2
+    DESTROYED.should == MODELS
+  end 
 end

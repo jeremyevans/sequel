@@ -241,10 +241,6 @@ module Sequel
         self
       end
       
-      def first_record(opts = nil)
-        query_first(select_sql(opts), true)
-      end
-    
       FOR_UPDATE = ' FOR UPDATE'.freeze
       FOR_SHARE = ' FOR SHARE'.freeze
     
@@ -301,10 +297,6 @@ module Sequel
         end
       end
   
-      def count(opts = nil)
-        query_single_value(count_sql(opts)).to_i
-      end
-    
       def insert(*values)
         @db.execute_insert(insert_sql(*values), @opts[:from])
       end
@@ -333,25 +325,19 @@ module Sequel
         end
       end
       
-      def query_all(sql, use_record_class = false)
-        @db.synchronize do
-          result = @db.execute(sql)
-          begin
-            conv = row_converter(result, use_record_class)
-            all = []
-            result.each {|r| all << conv[r]}
-          ensure
-            result.clear
-          end
-          all
-        end
+      def single_record(opts = nil)
+        query_single(select_sql(opts), true)
       end
-    
-      def query_each(sql, use_record_class = false)
+      
+      def single_value(opts = nil)
+        query_single_value(select_sql(opts))
+      end
+      
+      def query_each(sql, use_model_class = false)
         @db.synchronize do
           result = @db.execute(sql)
           begin
-            conv = row_converter(result, use_record_class)
+            conv = row_converter(result, use_model_class)
             result.each {|r| yield conv[r]}
           ensure
             result.clear
@@ -359,12 +345,12 @@ module Sequel
         end
       end
       
-      def query_first(sql, use_record_class = false)
+      def query_single(sql, use_model_class = false)
         @db.synchronize do
           result = @db.execute(sql)
           begin
             row = nil
-            conv = row_converter(result, use_record_class)
+            conv = row_converter(result, use_model_class)
             result.each {|r| row = conv.call(r)}
           ensure
             result.clear
@@ -378,6 +364,9 @@ module Sequel
           result = @db.execute(sql)
           begin
             value = result.getvalue(0, 0)
+            if value
+              value = value.send(PG_TYPES[result.type(0)])
+            end
           ensure
             result.clear
           end
@@ -390,10 +379,10 @@ module Sequel
       @@converters_mutex = Mutex.new
       @@converters = {}
 
-      def row_converter(result, use_record_class)
+      def row_converter(result, use_model_class)
         fields = result.fields.map {|s| s.to_sym}
         types = (0..(result.num_fields - 1)).map {|idx| result.type(idx)}
-        klass = use_record_class ? @record_class : nil
+        klass = use_model_class ? @model_class : nil
         
         # create result signature and memoize the converter
         sig = fields.join(COMMA) + types.join(COMMA) + klass.to_s
@@ -403,7 +392,7 @@ module Sequel
       end
     
       CONVERT = "lambda {|r| {%s}}".freeze
-      CONVERT_RECORD_CLASS = "lambda {|r| %2$s.new(%1$s)}".freeze
+      CONVERT_MODEL_CLASS = "lambda {|r| %2$s.new(%1$s)}".freeze
     
       CONVERT_FIELD = '%s => r[%d]'.freeze
       CONVERT_FIELD_TRANSLATE = '%s => ((t = r[%d]) ? t.%s : nil)'.freeze
@@ -419,7 +408,7 @@ module Sequel
           kvs << (translate_fn ? CONVERT_FIELD_TRANSLATE : CONVERT_FIELD) %
             [field.inspect, idx, translate_fn]
         end
-        s = (klass ? CONVERT_RECORD_CLASS : CONVERT) %
+        s = (klass ? CONVERT_MODEL_CLASS : CONVERT) %
           [kvs.join(COMMA), klass]
         eval(s)
       end

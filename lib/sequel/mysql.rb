@@ -56,10 +56,6 @@ module Sequel
         self
       end
       
-      def first_record(opts = nil)
-        query_first(select_sql(opts), true)
-      end
-    
       def count(opts = nil)
         query_single_value(count_sql(opts)).to_i
       end
@@ -76,12 +72,12 @@ module Sequel
         @db.execute_affected(delete_sql(opts))
       end
       
-      def query_each(sql, use_record_class = false)
+      def query_each(sql, use_model_class = false)
         @db.synchronize do
           result = @db.execute(sql)
           begin
-            if use_record_class && @record_class
-              result.each_hash {|r| yield @record_class.new(r)}
+            if use_model_class && @model_class
+              result.each_hash {|r| yield @model_class.new(r)}
             else
               result.each_hash {|r| yield r}
             end
@@ -92,12 +88,20 @@ module Sequel
         self
       end
       
-      def query_first(sql, use_record_class = false)
+      def single_record(opts = nil)
+        query_single(select_sql(opts), true)
+      end
+      
+      def single_value(opts = nil)
+        query_single_value(select_sql(opts))
+      end
+      
+      def query_single(sql, use_model_class = false)
         @db.synchronize do
           result = @db.execute(sql)
           begin
-            if use_record_class && @record_class
-              @record_class.new(result.fetch_hash)
+            if use_model_class && @model_class
+              @model_class.new(result.fetch_hash)
             else
               result.fetch_hash
             end

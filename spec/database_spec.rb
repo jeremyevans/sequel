@@ -186,10 +186,6 @@ class Dummy3Database < Sequel::Database
   attr_reader :sql, :transactions
   def execute(sql); @sql ||= []; @sql << sql; end
 
-  def dataset
-    DummyDataset.new(self)
-  end
-
   class DummyConnection
     def initialize(db); @db = db; end
     def execute(sql); @db.execute(sql); end

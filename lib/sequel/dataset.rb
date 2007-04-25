@@ -26,7 +26,7 @@ module Sequel
     include Enumerable
     
     attr_reader :db, :opts
-    attr_accessor :record_class
+    attr_accessor :model_class
   
     # Constructs a new instance of a dataset with a database instance, initial
     # options and an optional record class. Datasets are usually constructed by
@@ -37,22 +37,22 @@ module Sequel
     #
     # Sequel::Dataset is an abstract class that is not useful by itself. Each
     # database adaptor should provide a descendant class of Sequel::Dataset.
-    def initialize(db, opts = nil, record_class = nil)
+    def initialize(db, opts = nil, model_class = nil)
       @db = db
       @opts = opts || {}
-      @record_class = record_class
+      @model_class = model_class
     end
     
     # Returns a new instance of the dataset with its options
     def dup_merge(opts)
-      self.class.new(@db, @opts.merge(opts), @record_class)
+      self.class.new(@db, @opts.merge(opts), @model_class)
     end
     
     # Returns a dataset that fetches records as hashes (instead of model 
     # objects). If no record class is defined for the dataset, self is
     # returned.
     def naked
-      @record_class ? self.class.new(@db, @opts.dup) : self
+      @model_class ? self.class.new(@db, opts || @opts.dup) : self
     end
     
     AS_REGEXP = /(.*)___(.*)/.freeze
@@ -415,7 +415,7 @@ module Sequel
       opts = opts ? @opts.merge(opts) : @opts
 
       if opts[:group]
-        raise SequelError, "Can't delete from a grouped dataset" 
+        raise SequelError, "Can't delete from a grouped dataset"
       elsif opts[:from].is_a?(Array) && opts[:from].size > 1
         raise SequelError, "Can't delete from a joined dataset"
       end
@@ -429,13 +429,21 @@ module Sequel
       sql
     end
     
-    COUNT = "COUNT(*)".freeze
-    SELECT_COUNT = {:select => COUNT, :order => nil}.freeze
-    
-    def count_sql(opts = nil)
-      select_sql(opts ? opts.merge(SELECT_COUNT) : SELECT_COUNT)
+    def single_record(opts = nil)
+      each(opts) {|r| return r}
     end
-
+    
+    def single_value(opts = nil)
+      naked.each(opts) {|r| return r.values.first}
+    end
+    
+    COUNT = "COUNT(*)".freeze
+    SELECT_COUNT = {:select => [COUNT], :order => nil}.freeze
+    
+    def count
+      single_value(SELECT_COUNT).to_i
+    end
+    
     def to_table_reference
       if opts.keys == [:from] && opts[:from].size == 1
         opts[:from].first.to_s
@@ -446,26 +454,24 @@ module Sequel
     
     # aggregates
     def min(field)
-      select(field.MIN).naked.first.values.first
+      single_value(:select => [field.MIN])
     end
     
     def max(field)
-      select(field.MAX).naked.first.values.first
+      single_value(:select => [field.MAX])
     end
 
     def sum(field)
-      select(field.SUM).naked.first.values.first
+      single_value(:select => [field.SUM])
     end
     
     def avg(field)
-      select(field.AVG).naked.first.values.first
+      single_value(:select => [field.AVG])
     end
     
     def exists(opts = nil)
       "EXISTS (#{sql({:select => [1]}.merge(opts || {}))})"
     end
-    
-    LIMIT_1 = {:limit => 1}.freeze
     
     # If given an integer, the dataset will contain only the first l results.
     # If given a range, it will contain only those at offsets within that
@@ -485,7 +491,7 @@ module Sequel
     # an array is returned with the first <i>num</i> records.
     def first(num = 1)
       if num == 1
-        first_record
+        single_record
       else
         limit(num).all
       end
@@ -505,7 +511,7 @@ module Sequel
         merge(opts ? opts.merge(l) : l)
 
       if num == 1
-        first_record(opts)
+        single_record(opts)
       else
         dup_merge(opts).all
       end
@@ -514,7 +520,7 @@ module Sequel
     # Deletes all records in the dataset one at a time by invoking the destroy
     # method of the associated model class.
     def destroy
-      raise SequelError, 'Dataset not associated with model' unless @record_class
+      raise SequelError, 'Dataset not associated with model' unless @model_class
       
       count = 0
       @db.transaction {each {|r| count += 1; r.destroy}}
