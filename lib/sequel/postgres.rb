@@ -333,12 +333,13 @@ module Sequel
         query_single_value(select_sql(opts))
       end
       
-      def query_each(sql, use_model_class = false)
+      def query_each(sql, use_model_class = false, &block)
         @db.synchronize do
           result = @db.execute(sql)
           begin
-            conv = row_converter(result, use_model_class)
-            result.each {|r| yield conv[r]}
+            each_row(result, use_model_class, &block)
+            # conv = row_converter(result, use_model_class)
+            # result.each {|r| yield conv[r]}
           ensure
             result.clear
           end
@@ -350,7 +351,7 @@ module Sequel
           result = @db.execute(sql)
           begin
             row = nil
-            each_row(result) {|r| row = r}
+            each_row(result, use_model_class) {|r| row = r}
             # conv = row_converter(result, use_model_class)
             # result.each {|r| row = conv.call(r)}
           ensure
@@ -375,9 +376,10 @@ module Sequel
         end
       end
       
-      def each_row(result)
+      def each_row(result, use_model_class)
         fields = result.fields.map {|s| s.to_sym}
         types = (0..(result.num_fields - 1)).map {|idx| PG_TYPES[result.type(idx)]}
+        m_klass = use_model_class && @model_class
         result.each do |row|
           hashed_row = {}
           row.each_index do |cel_index|
@@ -387,7 +389,7 @@ module Sequel
             end
             hashed_row[fields[cel_index]] = column
           end
-          yield hashed_row
+          yield m_klass ? m_klass.new(hashed_row) : hashed_row
         end
       end
     
