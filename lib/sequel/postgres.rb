@@ -350,8 +350,9 @@ module Sequel
           result = @db.execute(sql)
           begin
             row = nil
-            conv = row_converter(result, use_model_class)
-            result.each {|r| row = conv.call(r)}
+            each_row(result) {|r| row = r}
+            # conv = row_converter(result, use_model_class)
+            # result.each {|r| row = conv.call(r)}
           ensure
             result.clear
           end
