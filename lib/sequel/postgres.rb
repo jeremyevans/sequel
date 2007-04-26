@@ -215,8 +215,8 @@ module Sequel
     end
   
     class Dataset < Sequel::Dataset
-      TRUE = 't'.freeze
-      FALSE = 'f'.freeze
+      TRUE = "'t'".freeze
+      FALSE = "'f'".freeze
       
       def literal(v)
         case v
