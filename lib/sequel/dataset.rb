@@ -157,6 +157,8 @@ module Sequel
       end
     end
     
+    QUESTION_MARK = '?'.freeze
+    
     # Formats a where clause. If parenthesize is true, then the whole 
     # generated clause will be enclosed in a set of parentheses.
     def expression_list(where, parenthesize = false)
@@ -166,8 +168,7 @@ module Sequel
         fmt = where.map {|i| format_expression(i[0], :eql, i[1])}.
           join(AND_SEPARATOR)
       when Array:
-        fmt = where.shift
-        fmt.gsub!('?') {|i| literal(where.shift)}
+        fmt = where.shift.gsub(QUESTION_MARK) {literal(where.shift)}
       when Proc:
         fmt = where.to_expressions.map {|e| format_expression(e.left, e.op, e.right)}.
           join(AND_SEPARATOR)
