@@ -220,23 +220,23 @@ module Sequel
       
       def literal(v)
         case v
-        when String: "'%s'" % v.gsub(/'/, "''")
-        when Integer, Float: v.to_s
-        when NilClass: NULL
-        when Symbol: v.to_field_name
-        when Array: v.empty? ? NULL : v.map {|i| literal(i)}.join(COMMA_SEPARATOR)
-        when Time: v.strftime(TIMESTAMP_FORMAT)
-        when Date: v.strftime(DATE_FORMAT)
-        when Dataset: "(#{v.sql})"
-        when true: TRUE
-        when false: FALSE
-        else
-          raise SequelError, "can't express #{v.inspect}:#{v.class} as a SQL literal"
-        end
-        # when String, Fixnum, Float, TrueClass, FalseClass: PGconn.quote(v)
+        # when String: "'%s'" % v.gsub(/'/, "''")
+        # when Integer, Float: v.to_s
+        # when NilClass: NULL
+        # when Symbol: v.to_field_name
+        # when Array: v.empty? ? NULL : v.map {|i| literal(i)}.join(COMMA_SEPARATOR)
+        # when Time: v.strftime(TIMESTAMP_FORMAT)
+        # when Date: v.strftime(DATE_FORMAT)
+        # when Dataset: "(#{v.sql})"
+        # when true: TRUE
+        # when false: FALSE
         # else
-        #   super
+        #   raise SequelError, "can't express #{v.inspect}:#{v.class} as a SQL literal"
         # end
+        when String, Fixnum, Float, TrueClass, FalseClass: PGconn.quote(v)
+        else
+          super
+        end
       end
     
       LIKE = '%s ~ %s'.freeze
