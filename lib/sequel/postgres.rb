@@ -373,6 +373,22 @@ module Sequel
           value
         end
       end
+      
+      def each_row(result)
+        fields = result.fields.map {|s| s.to_sym}
+        types = (0..(result.num_fields - 1)).map {|idx| PG_TYPES[result.type(idx)]}
+        result.each do |row|
+          hashed_row = {}
+          row.each_index do |cel_index|
+            column = row[cel_index]
+            if column && types[cel_index]
+              column = column.send(types[cel_index])
+            end
+            hashed_row[fields[cel_index]] = column
+          end
+          yield hashed_row
+        end
+      end
     
       COMMA = ','.freeze
     
