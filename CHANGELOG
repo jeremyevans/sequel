@@ -1,5 +1,9 @@
 *SVN*
 
+* Changed Database#<< to call execute (instead of being an alias). Thus it will work for descendants as well.
+
+* Fixed Sequel.open to accept variable arity.
+
 * Refactored Model#refresh, Model.create. Removed Model#reload.
 
 * Refactored Model hooks.

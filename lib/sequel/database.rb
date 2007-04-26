@@ -36,7 +36,8 @@ module Sequel
     def execute(sql)
       raise NotImplementedError
     end
-    alias_method :<<, :execute
+    
+    def <<(sql); execute(sql); end
     
     # Acquires a database connection, yielding it to the passed block.
     def synchronize(&block)

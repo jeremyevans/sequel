@@ -20,8 +20,8 @@ module Sequel #:nodoc:
     # The specified scheme determines the database class used, and the rest
     # of the string specifies the connection options. For example:
     #   DB = Sequel.open 'sqlite:///blog.db'
-    def connect(url)
-      Database.connect(url)
+    def connect(*args)
+      Database.connect(*args)
     end
     
     alias_method :open, :connect
