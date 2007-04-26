@@ -353,9 +353,9 @@ module Sequel
         @db.synchronize do
           result = @db.execute(sql)
           begin
-            each_row(result, use_model_class, &block)
-            # conv = row_converter(result, use_model_class)
-            # result.each {|r| yield conv[r]}
+            # each_row(result, use_model_class, &block)
+            conv = row_converter(result, use_model_class)
+            result.each {|r| yield conv[r]}
           ensure
             result.clear
           end
@@ -367,9 +367,9 @@ module Sequel
           result = @db.execute(sql)
           begin
             row = nil
-            each_row(result, use_model_class) {|r| row = r}
-            # conv = row_converter(result, use_model_class)
-            # result.each {|r| row = conv.call(r)}
+            # each_row(result, use_model_class) {|r| row = r}
+            conv = row_converter(result, use_model_class)
+            result.each {|r| row = conv.call(r)}
           ensure
             result.clear
           end
