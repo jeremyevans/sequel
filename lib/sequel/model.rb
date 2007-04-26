@@ -125,9 +125,17 @@ module Sequel
     def run_hooks(key)
       self.class.get_hooks(key).each {|h| instance_eval(&h)}
     end
-
+    
+    def self.before_create(&block)
+      get_hooks(:before_create).unshift(block)
+    end
+    
     def self.before_destroy(&block)
       get_hooks(:before_destroy).unshift(block)
+    end
+    
+    def self.after_destroy(&block)
+      get_hooks(:after_destroy).unshift(block)
     end
     
     def self.after_create(&block)
@@ -162,8 +170,7 @@ module Sequel
     end
     
     def refresh
-      record = self.class.find(primary_key => @pkey)
-      record ? (@values = record.values) : 
+      @values = self.class.dataset.naked[primary_key => @pkey] ||
         (raise RuntimeError, "Record not found")
       self
     end
@@ -186,8 +193,8 @@ module Sequel
     
     def self.create(values = nil)
       db.transaction do
-        obj = find(primary_key => dataset.insert(values))
-        obj.run_hooks(:after_create)
+        obj = new(values || {})
+        obj.save
         obj
       end
     end
@@ -226,11 +233,6 @@ module Sequel
     
     def db; self.class.db; end
     
-    def reload
-      temp = self.class[@pkey]
-      @values = self.class.dataset.naked[primary_key => @pkey]
-    end
-    
     def [](field); @values[field]; end
     
     def []=(field, value); @values[field] = value; end
@@ -248,12 +250,18 @@ module Sequel
     def id; @values[:id]; end
     
     def save
+      run_hooks(:before_save)
       if @pkey
+        # run_hooks(:before_update)
         model.dataset.filter(primary_key => @pkey).update(@values)
+        # run_hooks(:after_update)
       else
+        # run_hooks(:before_create)
         @pkey = model.dataset.insert(@values)
-        reload
+        refresh
+        # run_hooks(:after_create)
       end
+      run_hooks(:after_save)
     end
     
     def ==(obj)

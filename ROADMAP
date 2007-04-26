@@ -2,15 +2,17 @@
 
 * Cleanup Dataset API (especially count, aggregates, first and last).
 
-* Spec and document Model.
-
-* Complete MySQL adapter.
-
 === 0.1.2
+
+* Specs and documentation for Model.
 
 * Better, more complete relations.
 
 === 0.1.3
+
+* Complete MySQL adapter.
+
+=== 0.1.4
 
 * Refactor Schema.
 

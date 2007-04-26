@@ -1,5 +1,9 @@
 *SVN*
 
+* Refactored Model#refresh, Model.create. Removed Model#reload.
+
+* Refactored Model hooks.
+
 * Cleaned up Dataset API.
 
 *0.1.0*
