@@ -331,10 +331,6 @@ module Sequel
     SPACE = ' '.freeze
     
     def select_sql(opts = nil)
-      if !opts && @sql
-        return @sql
-      end
-      
       opts = opts ? @opts.merge(opts) : @opts
 
       fields = opts[:select]
@@ -373,7 +369,6 @@ module Sequel
         end
       end
       
-      @sql = sql      
       sql
     end
     
