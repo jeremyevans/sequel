@@ -215,12 +215,19 @@ module Sequel
     end
   
     class Dataset < Sequel::Dataset
+      TRUE = 't'.freeze
+      FALSE = 'f'.freeze
+      
       def literal(v)
         case v
-        when String, Fixnum, Float, TrueClass, FalseClass: PGconn.quote(v)
-        else
-          super
+        when true: TRUE
+        when false: FALSE
+        else super
         end
+        # when String, Fixnum, Float, TrueClass, FalseClass: PGconn.quote(v)
+        # else
+        #   super
+        # end
       end
     
       LIKE = '%s ~ %s'.freeze
