@@ -43,7 +43,7 @@ module Sequel
       @model_class = model_class
     end
     
-    # Returns a new instance of the dataset with its options
+    # Returns a new instance of the dataset with with the give options merged.
     def dup_merge(opts)
       self.class.new(@db, @opts.merge(opts), @model_class)
     end
@@ -54,11 +54,6 @@ module Sequel
     def naked
       @model_class ? self.class.new(@db, opts || @opts.dup) : self
     end
-    
-    AS_REGEXP = /(.*)___(.*)/.freeze
-    AS_FORMAT = "%s AS %s".freeze
-    DOUBLE_UNDERSCORE = '__'.freeze
-    PERIOD = '.'.freeze
     
     # Returns a valid SQL fieldname as a string. Field names specified as 
     # symbols can include double underscores to denote a dot separator, e.g.
@@ -79,7 +74,8 @@ module Sequel
     WILDCARD = '*'.freeze
     COMMA_SEPARATOR = ", ".freeze
     
-    # Converts a field list into a comma seperated string of field names.
+    # Converts an array of field names into a comma seperated string of 
+    # field names. If the array is empty, a wildcard (*) is returned.
     def field_list(fields)
       if fields.empty?
         WILDCARD
@@ -88,9 +84,11 @@ module Sequel
       end
     end
     
-    # Converts an array of sources into a comma separated list.
+    # Converts an array of sources names into into a comma separated list.
     def source_list(source)
-      raise SequelError, 'No source specified for query' unless source
+      if source.nil? || source.empty?
+        raise SequelError, 'No source specified for query'
+      end
       source.map {|i| i.is_a?(Dataset) ? i.to_table_reference : i}.
         join(COMMA_SEPARATOR)
     end
@@ -100,10 +98,21 @@ module Sequel
     DATE_FORMAT = "DATE '%Y-%m-%d'".freeze
     
     # Returns a literal representation of a value to be used as part
-    # of an SQL expression. This method is overriden in descendants.
+    # of an SQL expression. The stock implementation supports literalization 
+    # of String (with proper escaping to prevent SQL injections), numbers,
+    # Symbol (as field references), Array (as a list of literalized values),
+    # Time (as an SQL TIMESTAMP), Date (as an SQL DATE), Dataset (as a 
+    # subquery) and nil (AS NULL).
+    # 
+    #   dataset.literal("abc'def") #=> "'abc''def'"
+    #   dataset.literal(:items__id) #=> "items.id"
+    #   dataset.literal([1, 2, 3]) => "(1, 2, 3)"
+    #   dataset.literal(DB[:items]) => "(SELECT * FROM items)"
+    #
+    # If an unsupported object is given, an exception is raised.
     def literal(v)
       case v
-      when String: "'%s'" % v.gsub(/'/, "''")
+      when String: "'#{v.gsub(/'/, "''")}'"
       when Integer, Float: v.to_s
       when NilClass: NULL
       when Symbol: v.to_field_name
@@ -112,12 +121,28 @@ module Sequel
       when Date: v.strftime(DATE_FORMAT)
       when Dataset: "(#{v.sql})"
       else
-        raise SequelError, "can't express #{v.inspect}:#{v.class} as a SQL literal"
+        raise SequelError, "can't express #{v.inspect} as a SQL literal"
       end
     end
 
     AND_SEPARATOR = " AND ".freeze
     
+    # Formats an equality expression involving a left value and a right value.
+    # Equality expressions differ according to the class of the right value.
+    # The stock implementation supports Range (inclusive and exclusive), Array
+    # (as a list of values to compare against), Dataset (as a subquery to
+    # compare against), or a regular value.
+    #
+    #   dataset.format_eq_expression('id', 1..20) #=>
+    #     "(id >= 1 AND id <= 20)"
+    #   dataset.format_eq_expression('id', [3,6,10]) #=>
+    #     "(id IN (3, 6, 10))"
+    #   dataset.format_eq_expression('id', DB[:items].select(:id)) #=>
+    #     "(id IN (SELECT id FROM items))"
+    #   dataset.format_eq_expression('id', nil) #=>
+    #     "(id IS NULL)"
+    #   dataset.format_eq_expression('id', 3) #=>
+    #     "(id = 3)"
     def format_eq_expression(left, right)
       case right
       when Range:
@@ -127,7 +152,7 @@ module Sequel
       when Array:
         "(#{left} IN (#{literal(right)}))"
       when Dataset:
-        "(#{left} IN #{literal(right)})"
+        "(#{left} IN (#{right.sql}))"
       when NilClass:
         "(#{left} IS NULL)"
       else
@@ -135,6 +160,16 @@ module Sequel
       end
     end
     
+    # Formats an expression comprising a left value, a binary operator and a
+    # right value. The supported operators are :eql (=), :not (!=), :lt (<),
+    # :lte (<=), :gt (>), :gte (>=) and :like (LIKE operator). Examples:
+    #
+    #   dataset.format_expression('price', :gte, 100) #=> "(price >= 100)"
+    #   dataset.format_expression('id', :not, 30) #=> "NOT (id = 30)"
+    #   dataset.format_expression('name', :like, 'abc%') #=>
+    #     "(name LIKE 'abc%')"
+    #
+    # If an unsupported operator is given, an exception is raised.
     def format_expression(left, op, right)
       left = field_name(left)
       case op
@@ -216,6 +251,12 @@ module Sequel
     
     DESC_ORDER_REGEXP = /(.*)\sDESC/.freeze
     
+    # Inverts the given order by breaking it into a list of field references
+    # and inverting them.
+    #
+    #   dataset.invert_order('id DESC') #=> "id"
+    #   dataset.invert_order('category, price DESC') #=>
+    #     "category DESC, price"
     def invert_order(order)
       new_order = []
       order.each do |f|
@@ -235,7 +276,25 @@ module Sequel
 
     # Returns a copy of the dataset with the given conditions imposed upon it.  
     # If the query has been grouped, then the conditions are imposed in the 
-    # HAVING clause. If not, then they are imposed in the WHERE clause.
+    # HAVING clause. If not, then they are imposed in the WHERE clause. Filter
+    # accepts a Hash (formated into a list of equality expressions), an Array
+    # (formatted ala ActiveRecord conditions), a String (taken literally), or
+    # a block that is converted into expressions.
+    #
+    #   dataset.filter(:id => 3).sql #=>
+    #     "SELECT * FROM items WHERE (id = 3)"
+    #   dataset.filter('price < ?', 100).sql #=>
+    #     "SELECT * FROM items WHERE price < 100"
+    #   dataset.filter('price < 100').sql #=>
+    #     "SELECT * FROM items WHERE price < 100"
+    #   dataset.filter {price < 100}.sql #=>
+    #     "SELECT * FROM items WHERE (price < 100)"
+    # 
+    # Multiple filter calls can be chained for scoping:
+    #
+    #   software = dataset.filter(:category => 'software')
+    #   software.filter {price < 100}.sql #=>
+    #     "SELECT * FROM items WHERE (category = 'software') AND (price < 100)"
     def filter(*cond, &block)
       clause = (@opts[:group] ? :having : :where)
       cond = cond.first if cond.size == 1
@@ -249,6 +308,10 @@ module Sequel
       end
     end
 
+    # Performs the inverse of Dataset#filter.
+    #
+    #   dataset.exclude(:category => 'software').sql #=>
+    #     "SELECT * FROM items WHERE NOT (category = 'software')"
     def exclude(*cond, &block)
       clause = (@opts[:group] ? :having : :where)
       cond = cond.first if cond.size == 1
@@ -264,7 +327,7 @@ module Sequel
     end
     
     # Returns a copy of the dataset with the where conditions changed. Raises 
-    # if the dataset has been grouped. See also #filter
+    # if the dataset has been grouped. See also #filter.
     def where(*cond, &block)
       if @opts[:group]
         raise SequelError, "Can't specify a WHERE clause once the dataset has been grouped"
@@ -287,26 +350,27 @@ module Sequel
     INNER_JOIN = 'INNER JOIN'.freeze
     RIGHT_OUTER_JOIN = 'RIGHT OUTER JOIN'.freeze
     FULL_OUTER_JOIN = 'FULL OUTER JOIN'.freeze
-        
+    
+    # Returns a joined dataset.
     def join(table, expr)
       expr = {expr => :id} unless expr.is_a?(Hash)
       dup_merge(:join_type => LEFT_OUTER_JOIN, :join_table => table,
         :join_cond => expr)
     end
 
-    alias_method :all, :to_a
+    alias all to_a
     
-    alias_method :enum_map, :map
+    # Maps field values for each record in the dataset (if a field name is
+    # given), or performs the stock mapping functionality of Enumerable.
     def map(field_name = nil, &block)
-      if block
-        enum_map(&block)
-      elsif field_name
-        enum_map {|r| r[field_name]}
+      if field_name
+        super() {|r| r[field_name]}
       else
-        []
+        super(&block)
       end
     end
     
+    # Returns a hash with one column used as key and another used as value.
     def hash_column(key_column, value_column)
       inject({}) do |m, r|
         m[r[key_column]] = r[value_column]
@@ -314,10 +378,13 @@ module Sequel
       end
     end
     
+    # Inserts the given values into the table.
     def <<(values)
       insert(values)
     end
     
+    # Inserts multiple values. If a block is given it is invoked for each
+    # item in the given array before inserting it.
     def insert_multiple(array, &block)
       if block
         array.each {|i| insert(block[i])}
@@ -327,9 +394,10 @@ module Sequel
     end
 
     EMPTY = ''.freeze
-    
     SPACE = ' '.freeze
     
+    # Formats a SELECT statement using the given options and the dataset
+    # options.
     def select_sql(opts = nil)
       opts = opts ? @opts.merge(opts) : @opts
 
@@ -371,9 +439,16 @@ module Sequel
       
       sql
     end
-    
-    alias_method :sql, :select_sql
-    
+    alias sql select_sql
+
+    # Formats an INSERT statement using the given values. If a hash is given,
+    # the resulting statement includes field names. If no values are given, 
+    # the resulting statement includes a DEFAULT VALUES clause.
+    #
+    #   dataset.insert_sql() #=> 'INSERT INTO items DEFAULT VALUES'
+    #   dataset.insert_sql(1,2,3) #=> 'INSERT INTO items VALUES (1, 2, 3)'
+    #   dataset.insert_sql(:a => 1, :b => 2) #=>
+    #     'INSERT INTO items (a, b) VALUES (1, 2)'
     def insert_sql(*values)
       if values.empty?
         "INSERT INTO #{@opts[:from]} DEFAULT VALUES"
@@ -392,6 +467,10 @@ module Sequel
       end
     end
     
+    # Formats an UPDATE statement using the given values.
+    #
+    #   dataset.update_sql(:price => 100, :category => 'software') #=>
+    #     "UPDATE items SET price = 100, category = 'software'"
     def update_sql(values, opts = nil)
       opts = opts ? @opts.merge(opts) : @opts
       
@@ -401,7 +480,7 @@ module Sequel
         raise SequelError, "Can't update a joined dataset"
       end
 
-      set_list = values.map {|kv| "#{kv[0]} = #{literal(kv[1])}"}.
+      set_list = values.map {|k, v| "#{k} = #{literal(v)}"}.
         join(COMMA_SEPARATOR)
       sql = "UPDATE #{@opts[:from]} SET #{set_list}"
       
@@ -412,6 +491,10 @@ module Sequel
       sql
     end
     
+    # Formats a DELETE statement using the given options and dataset options.
+    # 
+    #   dataset.filter {price >= 100}.delete_sql #=>
+    #     "DELETE FROM items WHERE (price >= 100)"
     def delete_sql(opts = nil)
       opts = opts ? @opts.merge(opts) : @opts
 
@@ -430,21 +513,27 @@ module Sequel
       sql
     end
     
+    # Returns the first record in the dataset.
     def single_record(opts = nil)
       each(opts) {|r| return r}
     end
     
+    # Returns the first value of the first reecord in the dataset.
     def single_value(opts = nil)
       naked.each(opts) {|r| return r.values.first}
     end
     
-    COUNT = "COUNT(*)".freeze
-    SELECT_COUNT = {:select => [COUNT], :order => nil}.freeze
+    SELECT_COUNT = {:select => ["COUNT(*)"], :order => nil}.freeze
     
+    # Returns the number of records in the dataset.
     def count
       single_value(SELECT_COUNT).to_i
     end
+    alias size count
     
+    # Returns a table reference for use in the FROM clause. If the dataset has
+    # only a :from option refering to a single table, only the table name is 
+    # returned. Otherwise a subquery is returned.
     def to_table_reference
       if opts.keys == [:from] && opts[:from].size == 1
         opts[:from].first.to_s
@@ -453,23 +542,29 @@ module Sequel
       end
     end
     
-    # aggregates
+    # Returns the minimum value for the given field.
     def min(field)
       single_value(:select => [field.MIN])
     end
     
+    # Returns the maximum value for the given field.
     def max(field)
       single_value(:select => [field.MAX])
     end
 
+    # Returns the sum for the given field.
     def sum(field)
       single_value(:select => [field.SUM])
     end
     
+    # Returns the average value for the given field.
     def avg(field)
       single_value(:select => [field.AVG])
     end
     
+    # Returns an EXISTS clause for the dataset.
+    #
+    #   dataset.exists #=> "EXISTS (SELECT 1 FROM items)"
     def exists(opts = nil)
       "EXISTS (#{sql({:select => [1]}.merge(opts || {}))})"
     end
@@ -503,6 +598,10 @@ module Sequel
       where(*conditions).first
     end
     
+    # Returns the last records in the dataset by inverting the order. If no
+    # order is given, an exception is raised. If num is not given, the last
+    # record is returned. Otherwise an array is returned with the last 
+    # <i>num</i> records.
     def last(num = 1)
       raise SequelError, 'No order specified' unless 
         @opts[:order] || (opts && opts[:order])
@@ -550,14 +649,13 @@ class Symbol
   def AVG; "avg(#{to_field_name})"; end
 
   AS_REGEXP = /(.*)___(.*)/.freeze
-  AS_FORMAT = "%s AS %s".freeze
   DOUBLE_UNDERSCORE = '__'.freeze
   PERIOD = '.'.freeze
   
   def to_field_name
     s = to_s
     if s =~ AS_REGEXP
-      s = AS_FORMAT % [$1, $2]
+      s = "#{$1} AS #{$2}"
     end
     s.split(DOUBLE_UNDERSCORE).join(PERIOD)
   end

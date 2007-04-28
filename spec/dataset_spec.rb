@@ -413,6 +413,10 @@ context "Dataset#from" do
     @dataset.from(@dataset.from(:a)).select_sql.should ==
       "SELECT * FROM a"
   end
+  
+  specify "should raise if no source is given" do
+    proc {@dataset.from(@dataset.from).select_sql}.should_raise SequelError
+  end
 end
 
 context "Dataset#select" do
@@ -589,8 +593,8 @@ context "Dataset#map" do
     @d.map(:a).should == [1, 3, 5]
   end
   
-  specify "should provide an empty array if nothing is given" do
-    @d.map.should == []
+  specify "should return the complete dataset values if nothing is given" do
+    @d.map.should == DummyDataset::VALUES
   end
 end
 
@@ -637,6 +641,10 @@ context "Dataset#count" do
   specify "should format SQL propertly" do
     @dataset.count.should == 1
     @c.sql.should == 'SELECT COUNT(*) FROM test'
+  end
+  
+  specify "should be aliased by #size" do
+    @dataset.size.should == 1
   end
   
   specify "should include the where clause if it's there" do

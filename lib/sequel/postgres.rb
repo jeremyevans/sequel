@@ -129,11 +129,12 @@ class String
   TIME_REGEXP = /(\d{4})-(\d{2})-(\d{2})\s(\d{2}):(\d{2}):(\d{2})/
   
   def postgres_to_time
-    if self =~ TIME_REGEXP
-      Time.local($1.to_i, $2.to_i, $3.to_i, $4.to_i, $5.to_i, $6.to_i)
-    else
-      nil
-    end
+    Time.parse(self)
+    # if self =~ TIME_REGEXP
+    #   Time.local($1.to_i, $2.to_i, $3.to_i, $4.to_i, $5.to_i, $6.to_i)
+    # else
+    #   nil
+    # end
   end
 end
 

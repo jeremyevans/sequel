@@ -1,4 +1,8 @@
-*SVN*
+*0.1.1*
+
+* More documentation for Dataset.
+
+* Added Dataset#size as alias to Dataset#count.
 
 * Changed Database#<< to call execute (instead of being an alias). Thus it will work for descendants as well.
 
