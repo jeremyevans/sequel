@@ -1,3 +1,9 @@
+*SVN*
+
+* Added Database#uri method.
+
+* Refactored and removed deprecated code in postgres adapter.
+
 *0.1.1*
 
 * More documentation for Dataset.

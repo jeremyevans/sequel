@@ -20,6 +20,24 @@ module Sequel
       @logger = opts[:logger]
     end
     
+    def uri
+      uri = URI::Generic.new(
+        self.class.adapter_scheme.to_s,
+        nil,
+        @opts[:host],
+        @opts[:port],
+        nil,
+        "/#{@opts[:database]}",
+        nil,
+        nil,
+        nil
+      )
+      uri.user = @opts[:user]
+      uri.password = @opts[:password]
+      uri.to_s
+    end
+    alias url uri # Because I don't care much for the semantic difference.
+    
     # Returns a blank dataset
     def dataset
       Dataset.new(self)
@@ -114,7 +132,7 @@ module Sequel
     
     @@adapters = Hash.new
     
-    # Sets the adapter scheme for the database class. Call this method in
+    # Sets the adapter scheme for the Database class. Call this method in
     # descendnants of Database to allow connection using a URL. For example the
     # following:
     #   class DB2::Database < Sequel::Database
@@ -124,7 +142,13 @@ module Sequel
     # would allow connection using:
     #   Sequel.open('db2://user:password@dbserver/mydb')
     def self.set_adapter_scheme(scheme)
+      @scheme = scheme
       @@adapters[scheme.to_sym] = self
+    end
+    
+    # Returns the scheme for the Database class.
+    def self.adapter_scheme
+      @scheme
     end
     
     # Converts a uri to an options hash. These options are then passed

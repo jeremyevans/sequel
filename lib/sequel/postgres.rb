@@ -24,16 +24,12 @@ class PGconn
   
   def execute(sql)
     begin
-      # ServerSide.info(sql)
       async_exec(sql)
     rescue PGError => e
       unless connected?
-        # ServerSide.warn('Reconnecting to Postgres server')
         reset
         async_exec(sql)
       else
-        p sql
-        p e
         raise e
       end
     end
@@ -49,16 +45,13 @@ class PGconn
     if @transaction_in_progress
       return yield
     end
-    # ServerSide.info('BEGIN')
     async_exec(SQL_BEGIN)
     begin
       @transaction_in_progress = true
       result = yield
-      # ServerSide.info('COMMIT')
       async_exec(SQL_COMMIT)
       result
     rescue => e
-      # ServerSide.info('ROLLBACK')
       async_exec(SQL_ROLLBACK)
       raise e
     ensure
@@ -126,15 +119,8 @@ class String
     end
   end
 
-  TIME_REGEXP = /(\d{4})-(\d{2})-(\d{2})\s(\d{2}):(\d{2}):(\d{2})/
-  
   def postgres_to_time
     Time.parse(self)
-    # if self =~ TIME_REGEXP
-    #   Time.local($1.to_i, $2.to_i, $3.to_i, $4.to_i, $5.to_i, $6.to_i)
-    # else
-    #   nil
-    # end
   end
 end
 
@@ -161,8 +147,8 @@ module Sequel
             @opts[:host] || 'localhost',
             @opts[:port] || 5432,
             '', '',
-            @opts[:database] || 'reality_development',
-            @opts[:user] || 'postgres',
+            @opts[:database],
+            @opts[:user],
             @opts[:password]
           )
         end
@@ -368,7 +354,6 @@ module Sequel
           result = @db.execute(sql)
           begin
             row = nil
-            # each_row(result, use_model_class) {|r| row = r}
             conv = row_converter(result, use_model_class)
             result.each {|r| row = conv.call(r)}
           ensure
@@ -393,60 +378,42 @@ module Sequel
         end
       end
       
-      def each_row(result, use_model_class)
-        fields = result.fields.map {|s| s.to_sym}
-        types = (0..(result.num_fields - 1)).map {|idx| PG_TYPES[result.type(idx)]}
-        m_klass = use_model_class && @model_class
-        result.each do |row|
-          hashed_row = {}
-          row.each_index do |cel_index|
-            column = row[cel_index]
-            if column && types[cel_index]
-              column = column.send(types[cel_index])
-            end
-            hashed_row[fields[cel_index]] = column
-          end
-          yield m_klass ? m_klass.new(hashed_row) : hashed_row
-        end
-      end
-    
-      COMMA = ','.freeze
-    
       @@converters_mutex = Mutex.new
       @@converters = {}
 
       def row_converter(result, use_model_class)
-        fields = result.fields.map {|s| s.to_sym}
-        types = (0..(result.num_fields - 1)).map {|idx| result.type(idx)}
-        klass = use_model_class ? @model_class : nil
+        fields = []; translators = []
+        result.fields.each_with_index do |f, idx|
+          fields << f.to_sym
+          translators << PG_TYPES[result.type(idx)]
+        end
+        klass = use_model_class && @model_class
         
         # create result signature and memoize the converter
-        sig = fields.join(COMMA) + types.join(COMMA) + klass.to_s
+        sig = [fields, translators, klass].hash
         @@converters_mutex.synchronize do
-          @@converters[sig] ||= compile_converter(fields, types, klass)
+          @@converters[sig] ||= compile_converter(fields, translators, klass)
         end
       end
     
-      CONVERT = "lambda {|r| {%s}}".freeze
-      CONVERT_MODEL_CLASS = "lambda {|r| %2$s.new(%1$s)}".freeze
-    
-      CONVERT_FIELD = '%s => r[%d]'.freeze
-      CONVERT_FIELD_TRANSLATE = '%s => ((t = r[%d]) ? t.%s : nil)'.freeze
-
-      def compile_converter(fields, types, klass)
+      def compile_converter(fields, translators, klass)
         used_fields = []
         kvs = []
         fields.each_with_index do |field, idx|
           next if used_fields.include?(field)
           used_fields << field
         
-          translate_fn = PG_TYPES[types[idx]]
-          kvs << (translate_fn ? CONVERT_FIELD_TRANSLATE : CONVERT_FIELD) %
-            [field.inspect, idx, translate_fn]
+          if translator = translators[idx]
+            kvs << ":#{field} => ((t = r[#{idx}]) ? t.#{translator} : nil)"
+          else
+            kvs << ":#{field} => r[#{idx}]"
+          end
         end
-        s = (klass ? CONVERT_MODEL_CLASS : CONVERT) %
-          [kvs.join(COMMA), klass]
-        eval(s)
+        if klass
+          eval("lambda {|r| #{klass}.new(#{kvs.join(COMMA_SEPARATOR)})}")
+        else
+          eval("lambda {|r| {#{kvs.join(COMMA_SEPARATOR)}}}")
+        end
       end
     end
   end
