@@ -126,6 +126,10 @@ module Sequel
       self.class.get_hooks(key).each {|h| instance_eval(&h)}
     end
     
+    def self.before_save(&block)
+      get_hooks(:before_save).unshift(block)
+    end
+    
     def self.before_create(&block)
       get_hooks(:before_create).unshift(block)
     end
@@ -134,12 +138,16 @@ module Sequel
       get_hooks(:before_destroy).unshift(block)
     end
     
-    def self.after_destroy(&block)
-      get_hooks(:after_destroy).unshift(block)
+    def self.after_save(&block)
+      get_hooks(:after_save) << block
     end
     
     def self.after_create(&block)
       get_hooks(:after_create) << block
+    end
+    
+    def self.after_destroy(&block)
+      get_hooks(:after_destroy).unshift(block)
     end
     
     def self.find(cond)
@@ -252,14 +260,14 @@ module Sequel
     def save
       run_hooks(:before_save)
       if @pkey
-        # run_hooks(:before_update)
+        run_hooks(:before_update)
         model.dataset.filter(primary_key => @pkey).update(@values)
-        # run_hooks(:after_update)
+        run_hooks(:after_update)
       else
-        # run_hooks(:before_create)
+        run_hooks(:before_create)
         @pkey = model.dataset.insert(@values)
         refresh
-        # run_hooks(:after_create)
+        run_hooks(:after_create)
       end
       run_hooks(:after_save)
     end
