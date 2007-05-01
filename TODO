@@ -1,3 +1,5 @@
+* Observers!
+
 * Refactor schema code to allow adapters to adapt schema definitions to specific capabilities.
 
 * many_to_many smart relationships.
