@@ -1,5 +1,7 @@
 *SVN*
 
+* Added Model.subset method. Fixed Model.filter and Model.exclude to accept blocks.
+
 * Added Database#uri method.
 
 * Refactored and removed deprecated code in postgres adapter.

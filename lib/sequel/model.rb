@@ -90,6 +90,10 @@ module Sequel
       create_table
     end
     
+    def self.subset(name, *args, &block)
+      meta_def(name) {filter(*args, &block)}
+    end
+    
     ONE_TO_ONE_PROC = "proc {i = @values[:%s]; %s[i] if i}".freeze
     ID_POSTFIX = "_id".freeze
     FROM_DATASET = "db[%s]".freeze
@@ -185,8 +189,8 @@ module Sequel
     
     def self.each(&block); dataset.each(&block); end
     def self.all; dataset.all; end
-    def self.filter(*arg); dataset.filter(*arg); end
-    def self.exclude(*arg); dataset.exclude(*arg); end
+    def self.filter(*arg, &block); dataset.filter(*arg, &block); end
+    def self.exclude(*arg, &block); dataset.exclude(*arg, &block); end
     def self.order(*arg); dataset.order(*arg); end
     def self.first(*arg); dataset.first(*arg); end
     def self.count; dataset.count; end
