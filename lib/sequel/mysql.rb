@@ -101,9 +101,9 @@ module Sequel
           result = @db.execute(sql)
           begin
             if use_model_class && @model_class
-              @model_class.new(result.fetch_hash)
+              row = @model_class.new(result.fetch_hash)
             else
-              result.fetch_hash
+              row = result.fetch_hash
             end
           ensure
             result.free

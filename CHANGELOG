@@ -1,5 +1,7 @@
 *SVN*
 
+* Fixed MySQL::Dataset#query_single (thanks Dries Harnie.)
+
 * Added Model.subset method. Fixed Model.filter and Model.exclude to accept blocks.
 
 * Added Database#uri method.
