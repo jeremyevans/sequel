@@ -157,6 +157,10 @@ module Sequel
     def self.find(cond)
       dataset[cond.is_a?(Hash) ? cond : {primary_key => cond}]
     end
+    
+    def self.find_or_create(cond)
+      find(cond) || create(cond)
+    end
 
     class << self; alias_method :[], :find; end
     
