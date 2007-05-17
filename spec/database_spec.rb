@@ -14,7 +14,7 @@ context "A new Database" do
   end
   
   specify "should create a connection pool" do
-    @db.pool.should_be_a_kind_of Sequel::ConnectionPool
+    @db.pool.should be_a_kind_of(Sequel::ConnectionPool)
     @db.pool.max_size.should == 4
     
     Sequel::Database.new(:max_connections => 10).pool.max_size.should == 10
@@ -35,32 +35,32 @@ context "Database dataset methods" do
   end
   
   specify "should provide a blank dataset through #dataset" do
-    @ds.should_be_a_kind_of Sequel::Dataset
+    @ds.should be_a_kind_of(Sequel::Dataset)
     @ds.opts.should == {}
-    @ds.db.should_be @db
+    @ds.db.should be(@db)
   end
   
   specify "should provide a #from dataset" do
     d = @db.from(:mau)
-    d.should_be_a_kind_of Sequel::Dataset
+    d.should be_a_kind_of(Sequel::Dataset)
     d.sql.should == 'SELECT * FROM mau'
     
     e = @db[:miu]
-    e.should_be_a_kind_of Sequel::Dataset
+    e.should be_a_kind_of(Sequel::Dataset)
     e.sql.should == 'SELECT * FROM miu'
   end
   
   specify "should provide a #select dataset" do
     d = @db.select(:a, :b, :c).from(:mau)
-    d.should_be_a_kind_of Sequel::Dataset
+    d.should be_a_kind_of(Sequel::Dataset)
     d.sql.should == 'SELECT a, b, c FROM mau'
   end
 end
 
 context "Database#execute" do
   specify "should raise NotImplementedError" do
-    proc {Sequel::Database.new.execute('blah blah')}.should_raise NotImplementedError
-    proc {Sequel::Database.new << 'blah blah'}.should_raise NotImplementedError
+    proc {Sequel::Database.new.execute('blah blah')}.should raise_error(NotImplementedError)
+    proc {Sequel::Database.new << 'blah blah'}.should raise_error(NotImplementedError)
   end
 end
 
@@ -78,8 +78,8 @@ context "Database#synchronize" do
     c1.should == 12345
     t2 = Thread.new {@db.synchronize {|c| c2 = c}}
     sleep 0.2
-    @db.pool.available_connections.should_be_empty
-    c2.should_be_nil
+    @db.pool.available_connections.should be_empty
+    c2.should be_nil
     stop = true
     t1.join
     sleep 0.1
@@ -97,11 +97,11 @@ context "Database#test_connection" do
   
   specify "should call pool#hold" do
     @db.test_connection
-    @test.should_not_be_nil
+    @test.should_not be_nil
   end
   
   specify "should return true if successful" do
-    @db.test_connection.should_be true
+    @db.test_connection.should be_true
   end
 end
 
@@ -170,14 +170,14 @@ context "Database#table_exists?" do
   end
   
   specify "should use Database#tables if available" do
-    @db.table_exists?(:a).should_be true
-    @db.table_exists?(:b).should_be true
-    @db.table_exists?(:c).should_be false
+    @db.table_exists?(:a).should be_true
+    @db.table_exists?(:b).should be_true
+    @db.table_exists?(:c).should be_false
   end
   
   specify "should otherise try to select the first record from the table's dataset" do
-    @db2.table_exists?(:a).should_be false
-    @db2.table_exists?(:b).should_be true
+    @db2.table_exists?(:a).should be_false
+    @db2.table_exists?(:b).should be_true
   end
 end
 
@@ -207,7 +207,7 @@ context "Database#transaction" do
     @db.transaction {@db.execute 'DROP TABLE test;'; raise RuntimeError} rescue nil
     @db.sql.should == ['BEGIN', 'DROP TABLE test;', 'ROLLBACK']
     
-    proc {@db.transaction {raise RuntimeError}}.should_raise SequelConnectionError
+    proc {@db.transaction {raise RuntimeError}}.should raise_error(SequelConnectionError)
   end
   
   specify "should be re-entrant" do
@@ -220,11 +220,11 @@ context "Database#transaction" do
       }}}
     end
     while cc.nil?; sleep 0.1; end
-    cc.should_be_a_kind_of Dummy3Database::DummyConnection
+    cc.should be_a_kind_of(Dummy3Database::DummyConnection)
     @db.transactions.should == [t]
     stop = true
     t.join
-    @db.transactions.should_be_empty
+    @db.transactions.should be_empty
   end
 end
 
@@ -245,21 +245,21 @@ context "A Database adapter with a scheme" do
   
   specify "should be instantiated when its scheme is specified" do
     c = Sequel::Database.connect('ccc://localhost/db')
-    c.should_be_a_kind_of CCC
+    c.should be_a_kind_of(CCC)
     c.opts[:host].should == 'localhost'
     c.opts[:database].should == 'db'
   end
   
   specify "should be accessible through Sequel.connect" do
     c = Sequel.connect 'ccc://localhost/db'
-    c.should_be_a_kind_of CCC
+    c.should be_a_kind_of(CCC)
     c.opts[:host].should == 'localhost'
     c.opts[:database].should == 'db'
   end
 
   specify "should be accessible through Sequel.open" do
     c = Sequel.open 'ccc://localhost/db'
-    c.should_be_a_kind_of CCC
+    c.should be_a_kind_of(CCC)
     c.opts[:host].should == 'localhost'
     c.opts[:database].should == 'db'
   end
@@ -267,15 +267,15 @@ end
 
 context "An unknown database scheme" do
   specify "should raise an exception in Sequel::Database.connect" do
-    proc {Sequel::Database.connect('ddd://localhost/db')}.should_raise SequelError
+    proc {Sequel::Database.connect('ddd://localhost/db')}.should raise_error(SequelError)
   end
 
   specify "should raise an exception in Sequel.connect" do
-    proc {Sequel.connect('ddd://localhost/db')}.should_raise SequelError
+    proc {Sequel.connect('ddd://localhost/db')}.should raise_error(SequelError)
   end
 
   specify "should raise an exception in Sequel.open" do
-    proc {Sequel.open('ddd://localhost/db')}.should_raise SequelError
+    proc {Sequel.open('ddd://localhost/db')}.should raise_error(SequelError)
   end
 end
 

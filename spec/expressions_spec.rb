@@ -7,7 +7,7 @@ context "A Proc object containing a single comparison" do
   end
   
   specify "should compile into an array containing a single expression" do
-    @e.should_be_a_kind_of Array
+    @e.should be_a_kind_of(Array)
     @e.size.should == 1
     
     expr = @e.first
@@ -24,7 +24,7 @@ context "A Proc object containing numerous expressions" do
   end
   
   specify "should compile into a list of expressions" do
-    @e.should_be_a_kind_of Array
+    @e.should be_a_kind_of(Array)
     @e.size.should == 3
     
     e1 = @e[0]
@@ -137,7 +137,7 @@ end
 
 context "An invalid expression" do
   specify "should raise a SequelError" do
-    proc {proc {abc < Object.vzxczs}.to_expressions}.should_raise SequelError
+    proc {proc {abc < Object.vzxczs}.to_expressions}.should raise_error(SequelError)
   end
 end
 

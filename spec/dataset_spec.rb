@@ -10,49 +10,49 @@ context "Dataset" do
     opts = {:from => :test}
     a_class = Class.new
     d = Sequel::Dataset.new(db, opts, a_class)
-    d.db.should_be db
-    d.opts.should_be opts
-    d.model_class.should_be a_class
+    d.db.should be(db)
+    d.opts.should be(opts)
+    d.model_class.should be(a_class)
     
     d = Sequel::Dataset.new(db)
-    d.db.should_be db
-    d.opts.should_be_a_kind_of Hash
+    d.db.should be(db)
+    d.opts.should be_a_kind_of(Hash)
     d.opts.should == {}
-    d.model_class.should_be_nil
+    d.model_class.should be_nil
   end
   
   specify "should provide dup_merge for chainability." do
     d1 = @dataset.dup_merge(:from => :test)
     d1.class.should == @dataset.class
     d1.should_not == @dataset
-    d1.db.should_be @dataset.db
+    d1.db.should be(@dataset.db)
     d1.opts[:from].should == :test
-    @dataset.opts[:from].should_be_nil
+    @dataset.opts[:from].should be_nil
     
     d2 = d1.dup_merge(:order => :name)
     d2.class.should == @dataset.class
     d2.should_not == d1
     d2.should_not == @dataset
-    d2.db.should_be @dataset.db
+    d2.db.should be(@dataset.db)
     d2.opts[:from].should == :test
     d2.opts[:order].should == :name
-    d1.opts[:order].should_be_nil
+    d1.opts[:order].should be_nil
     
     # dup_merge should preserve @model_class
     a_class = Class.new
     d3 = Sequel::Dataset.new("db", nil, a_class)
-    d3.db.should_not_be @dataset.db
+    d3.db.should_not be(@dataset.db)
     d4 = @dataset.dup_merge({})
-    d4.db.should_be @dataset.db
-    d3.model_class.should_be a_class
-    d4.model_class.should_be_nil
+    d4.db.should be(@dataset.db)
+    d3.model_class.should be(a_class)
+    d4.model_class.should be_nil
     d5 = d3.dup_merge(:from => :test)
-    d5.db.should_be d3.db
+    d5.db.should be(d3.db)
     d5.model_class.should == a_class
   end
   
   specify "should include Enumerable" do
-    Sequel::Dataset.included_modules.should_include Enumerable
+    Sequel::Dataset.included_modules.should include(Enumerable)
   end
 end
 
@@ -72,7 +72,7 @@ context "A simple dataset" do
   specify "should format an insert statement" do
     @dataset.insert_sql.should == 'INSERT INTO test DEFAULT VALUES'
     @dataset.insert_sql(:name => 'wxyz', :price => 342).
-      should_match /INSERT INTO test \(name, price\) VALUES \('wxyz', 342\)|INSERT INTO test \(price, name\) VALUES \(342, 'wxyz'\)/
+      should match(/INSERT INTO test \(name, price\) VALUES \('wxyz', 342\)|INSERT INTO test \(price, name\) VALUES \(342, 'wxyz'\)/)
     @dataset.insert_sql('a', 2, 6.5).should ==
       "INSERT INTO test VALUES ('a', 2, 6.5)"
   end
@@ -89,11 +89,11 @@ context "A dataset with multiple tables in its FROM clause" do
   end
 
   specify "should raise on #update_sql" do
-    proc {@dataset.update_sql(:a=>1)}.should.raise
+    proc {@dataset.update_sql(:a=>1)}.should raise_error
   end
 
   specify "should raise on #delete_sql" do
-    proc {@dataset.delete_sql}.should.raise
+    proc {@dataset.delete_sql}.should raise_error
   end
 
   specify "should generate a select query FROM all specified tables" do
@@ -111,7 +111,7 @@ context "Dataset#where" do
   
   specify "should work with hashes" do
     @dataset.where(:name => 'xyz', :price => 342).select_sql.
-      should_match /WHERE \(name = 'xyz'\) AND \(price = 342\)|WHERE \(price = 342\) AND \(name = 'xyz'\)/
+      should match(/WHERE \(name = 'xyz'\) AND \(price = 342\)|WHERE \(price = 342\) AND \(name = 'xyz'\)/)
   end
   
   specify "should work with arrays (ala ActiveRecord)" do
@@ -184,7 +184,7 @@ context "Dataset#where" do
   end
   
   specify "should raise if the dataset is grouped" do
-    proc {@dataset.group(:t).where(:a => 1)}.should.raise
+    proc {@dataset.group(:t).where(:a => 1)}.should raise_error
   end
   
   specify "should accept ranges" do
@@ -254,9 +254,9 @@ context "Dataset#where" do
   end
   
   specify "should raise SequelError for invalid proc expressions" do
-    proc {@dataset.filter {Object.czxczxcz}}.should_raise SequelError
-    proc {@dataset.filter {a.bcvxv}}.should_raise SequelError
-    proc {@dataset.filter {x}}.should_raise SequelError
+    proc {@dataset.filter {Object.czxczxcz}}.should raise_error(SequelError)
+    proc {@dataset.filter {a.bcvxv}}.should raise_error(SequelError)
+    proc {@dataset.filter {x}}.should raise_error(SequelError)
   end
 end
 
@@ -272,8 +272,8 @@ context "Dataset#exclude" do
 
   specify "should take multiple conditions as a hash and express the logic correctly in SQL" do
     @dataset.exclude(:region => 'Asia', :name => 'Japan').select_sql.
-      should_match Regexp.union(/WHERE NOT \(\(region = 'Asia'\) AND \(name = 'Japan'\)\)/,
-                                /WHERE NOT \(\(name = 'Japan'\) AND \(region = 'Asia'\)\)/)
+      should match(Regexp.union(/WHERE NOT \(\(region = 'Asia'\) AND \(name = 'Japan'\)\)/,
+                                /WHERE NOT \(\(name = 'Japan'\) AND \(region = 'Asia'\)\)/))
   end
 
   specify "should parenthesize a single string condition correctly" do
@@ -307,7 +307,7 @@ context "Dataset#having" do
   end
 
   specify "should raise if the dataset is not grouped" do
-    proc {@dataset.having('avg(gdp) > 10')}.should.raise
+    proc {@dataset.having('avg(gdp) > 10')}.should raise_error
   end
 
   specify "should affect select statements" do
@@ -327,11 +327,11 @@ context "a grouped dataset" do
   end
 
   specify "should raise when trying to generate an update statement" do
-    proc {@dataset.update_sql(:id => 0)}.should.raise
+    proc {@dataset.update_sql(:id => 0)}.should raise_error
   end
 
   specify "should raise when trying to generate a delete statement" do
-    proc {@dataset.delete_sql}.should.raise
+    proc {@dataset.delete_sql}.should raise_error
   end
 
   specify "should specify the grouping in generated select statement" do
@@ -374,7 +374,7 @@ context "Dataset#literal" do
   end
   
   specify "should raise an error for unsupported types" do
-    proc {@dataset.literal({})}.should.raise
+    proc {@dataset.literal({})}.should raise_error
   end
   
   specify "should literalize datasets as subqueries" do
@@ -401,7 +401,7 @@ context "Dataset#from" do
   end
 
   specify "should accept a Dataset" do
-    proc {@dataset.from(@dataset)}.should_not.raise
+    proc {@dataset.from(@dataset)}.should_not raise_error
   end
 
   specify "should format a Dataset as a subquery if it has had options set" do
@@ -415,7 +415,7 @@ context "Dataset#from" do
   end
   
   specify "should raise if no source is given" do
-    proc {@dataset.from(@dataset.from).select_sql}.should_raise SequelError
+    proc {@dataset.from(@dataset.from).select_sql}.should raise_error(SequelError)
   end
 end
 
@@ -541,14 +541,14 @@ context "Dataset#naked" do
   end
   
   specify "should return self if already naked (no record class)" do
-    @d2.naked.should_be @d2
-    @d1.naked.should_not_be @d1
+    @d2.naked.should be(@d2)
+    @d1.naked.should_not be(@d1)
   end
   
   specify "should return a naked copy of self (no record class)" do
     naked = @d1.naked
-    naked.should_not_be @d1
-    naked.model_class.should_be_nil
+    naked.should_not be(@d1)
+    naked.model_class.should be_nil
     naked.opts.should == @d1.opts
   end
 end
@@ -785,7 +785,7 @@ context "Dataset#first" do
   specify "should return an array with the records if argument is greater than 1" do
     i = rand(10) + 10
     r = @d.first(i)
-    r.should_be_a_kind_of Array
+    r.should be_a_kind_of(Array)
     r.size.should == i
     r.each {|row| row.should == {:a => 1, :b => 2}}
   end
@@ -814,10 +814,10 @@ context "Dataset#last" do
   end
   
   specify "should raise if no order is given" do
-    proc {@d.last}.should_raise SequelError
-    proc {@d.last(2)}.should_raise SequelError
-    proc {@d.order(:a).last}.should_not_raise
-    proc {@d.order(:a).last(2)}.should_not_raise
+    proc {@d.last}.should raise_error(SequelError)
+    proc {@d.last(2)}.should raise_error(SequelError)
+    proc {@d.order(:a).last}.should_not raise_error
+    proc {@d.order(:a).last(2)}.should_not raise_error
   end
   
   specify "should invert the order" do
@@ -847,7 +847,7 @@ context "Dataset#last" do
   specify "should return an array with the records if argument is greater than 1" do
     i = rand(10) + 10
     r = @d.order(:a).last(i)
-    r.should_be_a_kind_of Array
+    r.should be_a_kind_of(Array)
     r.size.should == i
     r.each {|row| row.should == {:a => 1, :b => 2}}
   end
@@ -925,7 +925,7 @@ context "Dataset#destroy" do
   end
   
   specify "should raise exception if no model is associated with the dataset" do
-    proc {@d.destroy}.should_raise SequelError
+    proc {@d.destroy}.should raise_error(SequelError)
   end
   
   specify "should call raise for every model in the dataset" do

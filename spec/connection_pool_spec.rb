@@ -79,21 +79,21 @@ context "ConnectionPool#hold" do
   specify "should pass the result of the connection maker proc to the supplied block" do
     res = nil
     @pool.hold {|c| res = c}
-    res.should_be_a_kind_of DummyConnection
+    res.should be_a_kind_of(DummyConnection)
     res.value.should == 1
     @pool.hold {|c| res = c}
-    res.should_be_a_kind_of DummyConnection
+    res.should be_a_kind_of(DummyConnection)
     res.value.should == 1 # the connection maker is invoked only once
   end
   
   specify "should be re-entrant by the same thread" do
     cc = nil
     @pool.hold {|c| @pool.hold {|c| @pool.hold {|c| cc = c}}}
-    cc.should_be_a_kind_of DummyConnection
+    cc.should be_a_kind_of(DummyConnection)
   end
   
   specify "should catch exceptions and reraise them as SequelConnectionError" do
-    proc {@pool.hold {|c| c.foobar}}.should_raise SequelConnectionError
+    proc {@pool.hold {|c| c.foobar}}.should raise_error(SequelConnectionError)
   end
   
   specify "should wrap exceptions in SequelConnectionError only once" do
@@ -101,8 +101,8 @@ context "ConnectionPool#hold" do
       @pool.hold {@pool.hold {@pool.hold {raise "mau"}}}
       true.should == false # this line should not be reached
     rescue => e
-      e.should_be_a_kind_of SequelConnectionError
-      e.original_error.should_be_a_kind_of RuntimeError
+      e.should be_a_kind_of(SequelConnectionError)
+      e.original_error.should be_a_kind_of(RuntimeError)
     end
   end
   
@@ -110,8 +110,8 @@ context "ConnectionPool#hold" do
     begin
       @pool.hold {raise "mau"}
     rescue => e
-      e.should_be_a_kind_of SequelConnectionError
-      e.original_error.should_be_a_kind_of RuntimeError
+      e.should be_a_kind_of(SequelConnectionError)
+      e.original_error.should be_a_kind_of(RuntimeError)
       e.original_error.message.should == 'mau'
       e.message.should == 'RuntimeError: mau'
     end
@@ -121,8 +121,8 @@ context "ConnectionPool#hold" do
     begin
       @pool.hold {raise Exception}
     rescue => e
-      e.should_be_a_kind_of SequelConnectionError
-      e.original_error.should_be_a_kind_of Exception
+      e.should be_a_kind_of(SequelConnectionError)
+      e.original_error.should be_a_kind_of(Exception)
     end
   end
 end
@@ -133,14 +133,14 @@ context "ConnectionPool#connection_proc" do
   end
   
   specify "should be nil if no block is supplied to the pool" do
-    @pool.connection_proc.should_be_nil
-    proc {@pool.hold {}}.should_raise
+    @pool.connection_proc.should be_nil
+    proc {@pool.hold {}}.should raise_error
   end
   
   specify "should be mutable" do
     @pool.connection_proc = proc {'herro'}
     res = nil
-    proc {@pool.hold {|c| res = c}}.should_not_raise
+    proc {@pool.hold {|c| res = c}}.should_not raise_error
     res.should == 'herro'
   end
 end
@@ -163,40 +163,40 @@ context "A connection pool with a max size of 1" do
     sleep 0.2
     
     # connection held by t1
-    t1.should_be_alive
-    t2.should_be_alive
+    t1.should be_alive
+    t2.should be_alive
     
     cc.should == 'herro'
     c1.should == 'herro'
-    c2.should_be_nil
+    c2.should be_nil
     
-    @pool.available_connections.should_be_empty
+    @pool.available_connections.should be_empty
     @pool.allocated.should == {t1 => cc}
     
     cc.gsub!('rr', 'll')
     sleep 0.2
     
     # connection held by t2
-    t1.should_not_be_alive
-    t2.should_be_alive
+    t1.should_not be_alive
+    t2.should be_alive
 
     c2.should == 'hello'
 
-    @pool.available_connections.should_be_empty
+    @pool.available_connections.should be_empty
     @pool.allocated.should == {t2 => cc}
     
     cc.gsub!('ll', 'rr')
     sleep 0.2
     
     #connection released
-    t2.should_not_be_alive
+    t2.should_not be_alive
     
     cc.should == 'herro'
     
     @invoked_count.should == 1
     @pool.size.should == 1
     @pool.available_connections.should == [cc]
-    @pool.allocated.should_be_empty
+    @pool.allocated.should be_empty
   end
   
   specify "should let the same thread reenter #hold" do
@@ -217,7 +217,7 @@ context "A connection pool with a max size of 1" do
     @invoked_count.should == 1
     @pool.size.should == 1
     @pool.available_connections.size.should == 1
-    @pool.allocated.should_be_empty
+    @pool.allocated.should be_empty
   end
 end
 
@@ -234,11 +234,11 @@ context "A connection pool with a max size of 5" do
     
     5.times {|i| threads << Thread.new {@pool.hold {|c| cc[i] = c; while !stop;sleep 0.1;end}}; sleep 0.1}
     sleep 0.2
-    threads.each {|t| t.should_be_alive}
+    threads.each {|t| t.should be_alive}
     cc.size.should == 5
     @invoked_count.should == 5
     @pool.size.should == 5
-    @pool.available_connections.should_be_empty
+    @pool.available_connections.should be_empty
     @pool.allocated.should == {threads[0] => 1, threads[1] => 2, threads[2] => 3,
       threads[3] => 4, threads[4] => 5}
     
@@ -255,7 +255,7 @@ context "A connection pool with a max size of 5" do
     sleep 0.2
     
     @pool.available_connections.size.should == 5
-    @pool.allocated.should_be_empty
+    @pool.allocated.should be_empty
   end
   
   specify "should block threads until a connection becomes available" do
@@ -265,28 +265,28 @@ context "A connection pool with a max size of 5" do
     
     5.times {|i| threads << Thread.new {@pool.hold {|c| cc[i] = c; while !stop;sleep 0.1;end}}; sleep 0.1}
     sleep 0.2
-    threads.each {|t| t.should_be_alive}
-    @pool.available_connections.should_be_empty
+    threads.each {|t| t.should be_alive}
+    @pool.available_connections.should be_empty
 
     3.times {|i| threads << Thread.new {@pool.hold {|c| cc[i + 5] = c}}}
     
     sleep 0.2
-    threads[5].should_be_alive
-    threads[6].should_be_alive
-    threads[7].should_be_alive
+    threads[5].should be_alive
+    threads[6].should be_alive
+    threads[7].should be_alive
     cc.size.should == 5
-    cc[5].should_be_nil
-    cc[6].should_be_nil
-    cc[7].should_be_nil
+    cc[5].should be_nil
+    cc[6].should be_nil
+    cc[7].should be_nil
     
     stop = true
     sleep 0.3
     
-    threads.each {|t| t.should_not_be_alive}
+    threads.each {|t| t.should_not be_alive}
     
     @pool.size.should == 5
     @invoked_count.should == 5
     @pool.available_connections.size.should == 5
-    @pool.allocated.should_be_empty
+    @pool.allocated.should be_empty
   end
 end

@@ -1,5 +1,9 @@
 *SVN*
 
+* Fixed Dataset#single_record to return nil if no record is found.
+
+* Updated specs to RSpec 0.9.
+
 * Added Model#find_or_create method.
 
 * Fixed MySQL::Dataset#query_single (thanks Dries Harnie.)

@@ -516,6 +516,7 @@ module Sequel
     # Returns the first record in the dataset.
     def single_record(opts = nil)
       each(opts) {|r| return r}
+      nil
     end
     
     # Returns the first value of the first reecord in the dataset.
