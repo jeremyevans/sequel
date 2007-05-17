@@ -888,7 +888,11 @@ context "Dataset#single_record" do
         yield 2
       end
     end
+    @cc = Class.new(@c) do
+      def each(opts = nil); end
+    end
     @d = @c.new(nil).from(:test)
+    @e = @cc.new(nil).from(:test)
   end
   
   specify "should call each and return the first record" do
@@ -897,6 +901,10 @@ context "Dataset#single_record" do
   
   specify "should pass opts to each" do
     @d.single_record(:a => :b).should == @d.opts.merge(:a => :b)
+  end
+  
+  specify "should return nil if no record is present" do
+    @e.single_record.should be_nil
   end
 end
 
