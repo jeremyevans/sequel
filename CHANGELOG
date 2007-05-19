@@ -1,5 +1,7 @@
 *SVN*
 
+* The first opened database is automatically assigned to to Model.db.
+
 * Removed SequelConnectionError. Exception class errors are converted to RuntimeError.
 
 * Added support for UNION, INTERSECT and EXCEPT set operations.

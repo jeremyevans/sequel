@@ -17,5 +17,3 @@ Book.filter_by_author(Author[:name => 'Kurt Vonnegut']).print
 #instead of:
 
 Book.filter_by_author_id(Author[:name => 'Kurt Vonnegut'].id).print
-
-* The first open Database should be assigned as Model.db.

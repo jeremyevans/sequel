@@ -9,6 +9,9 @@ module Sequel
       @db ||= ((superclass != Object) && (superclass.db)) || nil
     end
     def self.db=(db); @db = db; end
+    def self.database_opened(db)
+      @db = db if self == Model && !@db
+    end
     
     def self.table_name
       @table_name ||= ((superclass != Model) && (superclass.table_name)) || nil

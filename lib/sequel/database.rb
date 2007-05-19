@@ -2,6 +2,7 @@ require 'uri'
 
 require File.join(File.dirname(__FILE__), 'schema')
 require File.join(File.dirname(__FILE__), 'dataset')
+require File.join(File.dirname(__FILE__), 'model')
 
 module Sequel
   # A Database object represents a virtual connection to a database.
@@ -15,6 +16,7 @@ module Sequel
     #
     # Sequel::Database is an abstract class that is not useful by itself.
     def initialize(opts = {}, &block)
+      Model.database_opened(self)
       @opts = opts
       @pool = ConnectionPool.new(@opts[:max_connections] || 4, &block)
       @logger = opts[:logger]
