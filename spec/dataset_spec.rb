@@ -853,6 +853,34 @@ context "Dataset#last" do
   end
 end
 
+context "Dataset set operations" do
+  setup do
+    @a = Sequel::Dataset.new(nil).from(:a).filter(:z => 1)
+    @b = Sequel::Dataset.new(nil).from(:b).filter(:z => 2)
+  end
+  
+  specify "should support UNION and UNION ALL" do
+    @a.union(@b).sql.should == \
+      "SELECT * FROM a WHERE (z = 1) UNION SELECT * FROM b WHERE (z = 2)"
+    @b.union(@a, true).sql.should == \
+      "SELECT * FROM b WHERE (z = 2) UNION ALL SELECT * FROM a WHERE (z = 1)"
+  end
+
+  specify "should support INTERSECT and INTERSECT ALL" do
+    @a.intersect(@b).sql.should == \
+      "SELECT * FROM a WHERE (z = 1) INTERSECT SELECT * FROM b WHERE (z = 2)"
+    @b.intersect(@a, true).sql.should == \
+      "SELECT * FROM b WHERE (z = 2) INTERSECT ALL SELECT * FROM a WHERE (z = 1)"
+  end
+
+  specify "should support EXCEPT and EXCEPT ALL" do
+    @a.except(@b).sql.should == \
+      "SELECT * FROM a WHERE (z = 1) EXCEPT SELECT * FROM b WHERE (z = 2)"
+    @b.except(@a, true).sql.should == \
+      "SELECT * FROM b WHERE (z = 2) EXCEPT ALL SELECT * FROM a WHERE (z = 1)"
+  end
+end
+
 context "Dataset#[]" do
   setup do
     @c = Class.new(Sequel::Dataset) do

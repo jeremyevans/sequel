@@ -207,7 +207,7 @@ context "Database#transaction" do
     @db.transaction {@db.execute 'DROP TABLE test;'; raise RuntimeError} rescue nil
     @db.sql.should == ['BEGIN', 'DROP TABLE test;', 'ROLLBACK']
     
-    proc {@db.transaction {raise RuntimeError}}.should raise_error(SequelConnectionError)
+    proc {@db.transaction {raise RuntimeError}}.should raise_error(RuntimeError)
   end
   
   specify "should be re-entrant" do

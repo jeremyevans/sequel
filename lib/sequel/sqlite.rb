@@ -40,10 +40,12 @@ module Sequel
       end
       
       def single_value(sql)
+        @logger.info(sql) if @logger
         @pool.hold {|conn| conn.get_first_value(sql)}
       end
       
       def result_set(sql, model_class, &block)
+        @logger.info(sql) if @logger
         @pool.hold do |conn|
           conn.query(sql) do |result|
             columns = result.columns

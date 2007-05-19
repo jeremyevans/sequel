@@ -50,8 +50,6 @@ module Sequel
     #
     # If no connection is available, Pool#hold will block until a connection
     # is available.
-    #
-    # Errors raised inside a hold call are wrapped in a SequelConnectionError.
     def hold
       t = Thread.current
       if (conn = owned_connection(t))
@@ -65,10 +63,9 @@ module Sequel
       ensure
         release(t)
       end
-    rescue SequelConnectionError => e
-      raise e
     rescue Exception => e
-      raise SequelConnectionError.new(e)
+      # if the error is not a StandardError it is converted into RuntimeError.
+      raise e.is_a?(StandardError) ? e : e.message
     end
     
     private

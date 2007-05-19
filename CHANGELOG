@@ -1,8 +1,12 @@
 *SVN*
 
+* Removed SequelConnectionError. Exception class errors are converted to RuntimeError.
+
+* Added support for UNION, INTERSECT and EXCEPT set operations.
+
 * Fixed Dataset#single_record to return nil if no record is found.
 
-* Updated specs to RSpec 0.9.
+* Updated specs to conform to RSpec 1.0.
 
 * Added Model#find_or_create method.
 

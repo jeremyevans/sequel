@@ -2,7 +2,7 @@ if !Object.const_defined?('Sequel')
   require File.join(File.dirname(__FILE__), '../sequel')
 end
 
-require 'mysql'
+#require 'mysql'
 
 module Sequel
   module MySQL

@@ -343,8 +343,20 @@ module Sequel
         raise SequelError, "Can only specify a HAVING clause on a grouped dataset"
       else
         filter(*cond, &block)
-       end
-     end
+      end
+    end
+    
+    def union(dataset, all = false)
+      dup_merge(:union => dataset, :union_all => all)
+    end
+
+    def intersect(dataset, all = false)
+      dup_merge(:intersect => dataset, :intersect_all => all)
+    end
+
+    def except(dataset, all = false)
+      dup_merge(:except => dataset, :except_all => all)
+    end
     
     LEFT_OUTER_JOIN = 'LEFT OUTER JOIN'.freeze
     INNER_JOIN = 'INNER JOIN'.freeze
@@ -435,6 +447,17 @@ module Sequel
         if offset = opts[:offset]
           sql << " OFFSET #{offset}"
         end
+      end
+      
+      if union = opts[:union]
+        sql << (opts[:union_all] ? \
+          " UNION ALL #{union.sql}" : " UNION #{union.sql}")
+      elsif intersect = opts[:intersect]
+        sql << (opts[:intersect_all] ? \
+          " INTERSECT ALL #{intersect.sql}" : " INTERSECT #{intersect.sql}")
+      elsif except = opts[:except]
+        sql << (opts[:except_all] ? \
+          " EXCEPT ALL #{except.sql}" : " EXCEPT #{except.sql}")
       end
       
       sql

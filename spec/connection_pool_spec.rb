@@ -92,37 +92,15 @@ context "ConnectionPool#hold" do
     cc.should be_a_kind_of(DummyConnection)
   end
   
-  specify "should catch exceptions and reraise them as SequelConnectionError" do
-    proc {@pool.hold {|c| c.foobar}}.should raise_error(SequelConnectionError)
-  end
-  
-  specify "should wrap exceptions in SequelConnectionError only once" do
-    begin
-      @pool.hold {@pool.hold {@pool.hold {raise "mau"}}}
-      true.should == false # this line should not be reached
-    rescue => e
-      e.should be_a_kind_of(SequelConnectionError)
-      e.original_error.should be_a_kind_of(RuntimeError)
-    end
-  end
-  
-  specify "should provide the original exception wrapped in a SequelConnectionError" do
-    begin
-      @pool.hold {raise "mau"}
-    rescue => e
-      e.should be_a_kind_of(SequelConnectionError)
-      e.original_error.should be_a_kind_of(RuntimeError)
-      e.original_error.message.should == 'mau'
-      e.message.should == 'RuntimeError: mau'
-    end
+  specify "should catch exceptions and reraise them" do
+    proc {@pool.hold {|c| c.foobar}}.should raise_error(NoMethodError)
   end
   
   specify "should handle Exception errors (normally not caught be rescue)" do
     begin
       @pool.hold {raise Exception}
     rescue => e
-      e.should be_a_kind_of(SequelConnectionError)
-      e.original_error.should be_a_kind_of(Exception)
+      e.should be_a_kind_of(RuntimeError)
     end
   end
 end
