@@ -20,11 +20,11 @@ module Sequel
       @opts = opts
       @pool = ConnectionPool.new(@opts[:max_connections] || 4, &block)
       @logger = opts[:logger]
-      @pool.connection_proc = proc {connect}
+      @pool.connection_proc = block || proc {connect}
     end
     
     def connect
-      nil
+      true # we can't return nil or false, because then pool will block forever
     end
     
     def uri

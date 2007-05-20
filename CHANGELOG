@@ -1,4 +1,10 @@
-*SVN*
+
+
+* Implemented DBI adapter.
+
+* Refactored database connection code. Now handled through Database#connect.
+
+*0.1.2*
 
 * The first opened database is automatically assigned to to Model.db.
 

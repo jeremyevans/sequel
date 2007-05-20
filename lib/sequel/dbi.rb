@@ -13,8 +13,7 @@ module Sequel
       def connect
         dbname = @opts[:database] =~ /^DBI:/ ? \
           @opts[:database] : @opts[:database] = 'DBI:' + @opts[:database]
-        end
-        DBI.connect(dbname, @opts[:user], @opts[:password])
+        ::DBI.connect(dbname, @opts[:user], @opts[:password])
       end
     
       def dataset(opts = nil)
@@ -48,7 +47,11 @@ module Sequel
       def each(opts = nil, &block)
         @db.synchronize do
           s = @db.execute select_sql(opts)
-          s.fetch {|r| yield hash_row(s, r)}
+          begin
+            s.fetch {|r| yield hash_row(s, r)}
+          ensure
+            s.finish rescue nil
+          end
         end
         self
       end
