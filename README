@@ -30,7 +30,8 @@ Sequel currently supports:
 
 * Postgresql
 * SQLite 3
-* MySQL (preliminary support)
+* DBI
+* MySQL (basic support)
 
 == The Sequel Console
 
