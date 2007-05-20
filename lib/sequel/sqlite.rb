@@ -10,13 +10,10 @@ module Sequel
     class Database < Sequel::Database
       set_adapter_scheme :sqlite
     
-      def initialize(opts = {})
-        super
-        @pool.connection_proc = proc do
-          db = SQLite3::Database.new(@opts[:database])
-          db.type_translation = true
-          db
-        end
+      def connect
+        db = SQLite3::Database.new(@opts[:database])
+        db.type_translation = true
+        db
       end
     
       def dataset(opts = nil)

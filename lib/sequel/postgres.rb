@@ -118,20 +118,16 @@ module Sequel
     class Database < Sequel::Database
       set_adapter_scheme :postgres
     
-      def initialize(opts = {})
-        super
-        @pool.connection_proc = proc do
-          PGconn.connect(
-            @opts[:host] || 'localhost',
-            @opts[:port] || 5432,
-            '', '',
-            @opts[:database],
-            @opts[:user],
-            @opts[:password]
-          )
-        end
+      def connect
+        PGconn.connect(
+          @opts[:host] || 'localhost',
+          @opts[:port] || 5432,
+          '', '',
+          @opts[:database],
+          @opts[:user],
+          @opts[:password]
+        )
       end
-    
     
       def dataset(opts = nil)
         Postgres::Dataset.new(self, opts)
