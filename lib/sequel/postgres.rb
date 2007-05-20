@@ -35,30 +35,8 @@ class PGconn
     end
   end
   
-  attr_reader :transaction_in_progress
+  attr_accessor :transaction_in_progress
   
-  SQL_BEGIN = 'BEGIN'.freeze
-  SQL_COMMIT = 'COMMIT'.freeze
-  SQL_ROLLBACK = 'ROLLBACK'.freeze
-  
-  def transaction
-    if @transaction_in_progress
-      return yield
-    end
-    async_exec(SQL_BEGIN)
-    begin
-      @transaction_in_progress = true
-      result = yield
-      async_exec(SQL_COMMIT)
-      result
-    rescue => e
-      async_exec(SQL_ROLLBACK)
-      raise e
-    ensure
-      @transaction_in_progress = nil
-    end
-  end
-
   SELECT_CURRVAL = "SELECT currval('%s')".freeze
       
   def last_insert_id(table)
@@ -177,11 +155,17 @@ module Sequel
       def execute(sql)
         @logger.info(sql) if @logger
         @pool.hold {|conn| conn.execute(sql)}
+      rescue => e
+        @logger.error(e.message) if @logger
+        raise e
       end
     
       def execute_and_forget(sql)
         @logger.info(sql) if @logger
         @pool.hold {|conn| conn.execute(sql).clear}
+      rescue => e
+        @logger.error(e.message) if @logger
+        raise e
       end
       
       def execute_insert(sql, table)
@@ -190,15 +174,48 @@ module Sequel
           conn.execute(sql).clear
           conn.last_insert_id(table)
         end
+      rescue => e
+        @logger.error(e.message) if @logger
+        raise e
       end
     
       def synchronize(&block)
         @pool.hold(&block)
       end
       
-      def transaction(&block)
-        @pool.hold {|conn| conn.transaction(&block)}
+      SQL_BEGIN = 'BEGIN'.freeze
+      SQL_COMMIT = 'COMMIT'.freeze
+      SQL_ROLLBACK = 'ROLLBACK'.freeze
+  
+      def transaction
+        @pool.hold do |conn|
+          if conn.transaction_in_progress
+            yield conn
+          else
+            @logger.info(SQL_BEGIN) if @logger
+            conn.async_exec(SQL_BEGIN)
+            begin
+              conn.transaction_in_progress = true
+              result = yield
+              begin
+                @logger.info(SQL_COMMIT) if @logger
+                conn.async_exec(SQL_COMMIT)
+              rescue => e
+                @logger.error(e.message) if @logger
+                raise e
+              end
+              result
+            rescue => e
+              @logger.info(SQL_ROLLBACK) if @logger
+              conn.async_exec(SQL_ROLLBACK) rescue nil
+              raise e
+            ensure
+              conn.transaction_in_progress = nil
+            end
+          end
+        end
       end
+
     end
   
     class Dataset < Sequel::Dataset
