@@ -88,6 +88,11 @@ module Sequel
         instance_eval(&block)
       end
       
+      def method_missing(type, name = nil, opts = nil)
+        return super unless name
+        column(name, type, opts)
+      end
+      
       def primary_key(name, type = nil, opts = nil)
         @primary_key = {
           :name => name, 
