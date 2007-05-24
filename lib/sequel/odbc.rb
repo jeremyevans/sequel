@@ -19,7 +19,7 @@ module Sequel
         ODBC::Dataset.new(self, opts)
       end
     
-      def select(sql)
+      def execute(sql)
         @logger.info(sql) if @logger
         @pool.hold do |conn|
           conn.run(sql)
@@ -46,7 +46,7 @@ module Sequel
 
       def each(opts = nil, &block)
         @db.synchronize do
-          s = @db.select select_sql(opts)
+          s = @db.execute select_sql(opts)
           begin
             fetch_rows(s, &block)
             s.fetch {|r| yield hash_row(s, r)}

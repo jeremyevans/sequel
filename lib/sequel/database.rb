@@ -62,7 +62,10 @@ module Sequel
       raise NotImplementedError
     end
     
-    def <<(sql); execute(sql); end
+    # Executes the supplied SQL. The SQL can be supplied as a string or as an
+    # array of strings. Comments and excessive white space are removed. See
+    # also Array#to_sql.
+    def <<(sql); execute(sql.to_sql); end
     
     # Acquires a database connection, yielding it to the passed block.
     def synchronize(&block)

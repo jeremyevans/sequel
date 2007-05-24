@@ -64,6 +64,41 @@ context "Database#execute" do
   end
 end
 
+context "Database#<<" do
+  setup do
+    @c = Class.new(Sequel::Database) do
+      define_method(:execute) {|sql| sql}
+    end
+    @db = @c.new({})
+  end
+  
+  specify "should pass the supplied sql to #execute" do
+    (@db << "DELETE FROM items").should == "DELETE FROM items"
+  end
+  
+  specify "should accept an array and convert it to SQL" do
+    a = "
+      --
+      CREATE TABLE items (a integer, /*b integer*/
+        b text, c integer);
+      DROP TABLE old_items;
+    ".split($/)
+    (@db << a).should == 
+      "CREATE TABLE items (a integer, b text, c integer); DROP TABLE old_items;"
+  end
+  
+  specify "should remove comments and whitespace from strings as well" do
+    s = "
+      --
+      CREATE TABLE items (a integer, /*b integer*/
+        b text, c integer); \r\n
+      DROP TABLE old_items;
+    "
+    (@db << s).should == 
+      "CREATE TABLE items (a integer, b text, c integer); DROP TABLE old_items;"
+  end
+end
+
 context "Database#synchronize" do
   setup do
     @db = Sequel::Database.new(:max_connections => 1)
