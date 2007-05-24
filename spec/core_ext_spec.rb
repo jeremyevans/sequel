@@ -64,3 +64,14 @@ context "String#to_sql" do
   end
 end
 
+context "String#split_sql" do
+  specify "should split a string containing multiple statements" do
+    "DROP TABLE a; DROP TABLE c".split_sql.should ==
+    ['DROP TABLE a', 'DROP TABLE c']
+  end
+  
+  specify "should remove comments from the string" do
+    "DROP TABLE a;/* DROP TABLE b; DROP TABLE c;*/DROP TABLE d".split_sql.should ==
+    ['DROP TABLE a', 'DROP TABLE d']
+  end
+end

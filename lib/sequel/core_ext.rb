@@ -22,4 +22,10 @@ class String
   def to_sql
     split($/).to_sql
   end
+  
+  # Splits a string into separate SQL statements, removing comments
+  # and excessive white-space.
+  def split_sql
+    to_sql.split(';').map {|s| s.strip}
+  end
 end

@@ -1,5 +1,7 @@
 *SVN*
 
+* Added String#split_sql.
+
 * Implemented Array#to_sql and String#to_sql. Database#to_sql can now take an array of strings and convert into an SQL string. Comments and excessive white-space are removed.
 
 * Improved Schema generator to support data types as method names:
