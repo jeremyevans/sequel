@@ -8,7 +8,7 @@ end
 # Array extensions
 class Array
   # Concatenates an array of strings into an SQL string. ANSI SQL and C-style
-  # comments are removed.
+  # comments are removed, as well as excessive white-space.
   def to_sql
     map {|l| (l =~ /^(.*)--/ ? $1 : l).chomp}.join(' '). \
       gsub(/\/\*.*\*\//, '').gsub(/\s+/, ' ').strip
