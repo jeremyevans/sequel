@@ -11,7 +11,7 @@
     ...
   end
 
-* Preliminary ODBC adapter. (not tested yet.)
+* Implemented ODBC adapter.
 
 *0.1.3*
 

@@ -58,7 +58,7 @@ module Sequel
       end
       
       def fetch_rows(stmt)
-        columns = stmt.columns(true)
+        columns = stmt.columns(true).map {|c| c.name.to_sym}
         rows = stmt.fetch_all
         rows.each {|row| yield hash_row(stmt, columns, row)}
       end
@@ -66,7 +66,7 @@ module Sequel
       def hash_row(stmt, columns, row)
         hash = {}
         row.each_with_index do |v, idx|
-          hash[columns[idx].to_sym] = convert_odbc_value(v)
+          hash[columns[idx]] = convert_odbc_value(v)
         end
         hash
       end
@@ -79,12 +79,12 @@ module Sequel
         # The conversions below are consistent with the mappings in
         # ODBCColumn#mapSqlTypeToGenericType and Column#klass.
         case v
-        when ODBC::TimeStamp
+        when ::ODBC::TimeStamp
           Time.gm(v.year, v.month, v.day, v.hour, v.minute, v.second)
-        when ODBC::Time
+        when ::ODBC::Time
           DateTime.now
           Time.gm(now.year, now.month, now.day, v.hour, v.minute, v.second)
-        when ODBC::Date
+        when ::ODBC::Date
           Date.new(v.year, v.month, v.day)
         else
           v
