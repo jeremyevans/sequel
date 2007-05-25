@@ -213,15 +213,6 @@ module Sequel
       parenthesize ? "(#{fmt})" : fmt
     end
     
-    # Formats a join condition.
-    def join_cond_list(cond, join_table)
-      cond.map do |kv|
-        l = qualified_field_name(kv[0], join_table)
-        r = qualified_field_name(kv[1], @opts[:from])
-        "(#{l} = #{r})"
-      end.join(AND_SEPARATOR)
-    end
-    
     # Returns a copy of the dataset with the source changed.
     def from(*source)
       dup_merge(:from => source)
@@ -358,17 +349,44 @@ module Sequel
       dup_merge(:except => dataset, :except_all => all)
     end
     
-    LEFT_OUTER_JOIN = 'LEFT OUTER JOIN'.freeze
-    INNER_JOIN = 'INNER JOIN'.freeze
-    RIGHT_OUTER_JOIN = 'RIGHT OUTER JOIN'.freeze
-    FULL_OUTER_JOIN = 'FULL OUTER JOIN'.freeze
+    JOIN_TYPES = {
+      :left_outer => 'LEFT OUTER JOIN'.freeze,
+      :right_outer => 'RIGHT OUTER JOIN'.freeze,
+      :full_outer => 'FULL OUTER JOIN'.freeze,
+      :inner => 'INNER JOIN'.freeze
+    }
+    
+    def join_expr(type, table, expr)
+      join_type = JOIN_TYPES[type || :left_outer]
+      unless join_type
+        raise SequelError, "Invalid join type: #{type}"
+      end
+      
+      join_expr = expr.map do |k, v|
+        l = qualified_field_name(k, table)
+        r = qualified_field_name(v, @opts[:last_joined_table] || @opts[:from])
+        "(#{l} = #{r})"
+      end.join(AND_SEPARATOR)
+      
+      " #{join_type} #{table} ON #{join_expr}"
+    end
     
     # Returns a joined dataset.
-    def join(table, expr)
-      expr = {expr => :id} unless expr.is_a?(Hash)
-      dup_merge(:join_type => LEFT_OUTER_JOIN, :join_table => table,
-        :join_cond => expr)
+    def join_table(type, table, expr)
+      unless expr.is_a?(Hash)
+        expr = {expr => :id}
+      end
+      clause = join_expr(type, table, expr)
+      join = @opts[:join] ? @opts[:join] + clause : clause
+      dup_merge(:join => join, :last_joined_table => table)
     end
+    
+    def left_outer_join(table, expr); join_table(:left_outer, table, expr); end
+    alias_method :join, :left_outer_join
+    def right_outer_join(table, expr); join_table(:right_outer, table, expr); end
+    def full_outer_join(table, expr); join_table(:full_outer, table, expr); end
+    def inner_join(table, expr); join_table(:inner, table, expr); end
+
 
     alias all to_a
     
@@ -420,10 +438,8 @@ module Sequel
         "SELECT DISTINCT #{select_fields} FROM #{select_source}" : \
         "SELECT #{select_fields} FROM #{select_source}"
       
-      if join_type = opts[:join_type]
-        join_table = opts[:join_table]
-        join_cond = join_cond_list(opts[:join_cond], join_table)
-        sql << " #{join_type} #{join_table} ON #{join_cond}"
+      if join = opts[:join]
+        sql << join
       end
       
       if where = opts[:where]
@@ -499,7 +515,7 @@ module Sequel
       
       if opts[:group]
         raise SequelError, "Can't update a grouped dataset" 
-      elsif (opts[:from].size > 1) or opts[:join_type]
+      elsif (opts[:from].size > 1) or opts[:join]
         raise SequelError, "Can't update a joined dataset"
       end
 

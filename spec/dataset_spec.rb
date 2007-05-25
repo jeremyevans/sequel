@@ -653,29 +653,82 @@ context "Dataset#count" do
   end
 end
 
-context "Dataset#join" do
+context "Dataset#join_table" do
   setup do
     @d = Sequel::Dataset.new(nil).from(:items)
   end
   
   specify "should format the JOIN clause properly" do
-    @d.join(:categories, :category_id => :id).sql.should ==
+    @d.join_table(:left_outer, :categories, :category_id => :id).sql.should ==
       'SELECT * FROM items LEFT OUTER JOIN categories ON (categories.category_id = items.id)'
   end
   
   specify "should include WHERE clause if applicable" do
-    @d.filter {price < 100}.join(:categories, :category_id => :id).sql.should ==
-      'SELECT * FROM items LEFT OUTER JOIN categories ON (categories.category_id = items.id) WHERE (price < 100)'
+    @d.filter {price < 100}.join_table(:right_outer, :categories, :category_id => :id).sql.should ==
+      'SELECT * FROM items RIGHT OUTER JOIN categories ON (categories.category_id = items.id) WHERE (price < 100)'
   end
-
+  
   specify "should include ORDER BY clause if applicable" do
-    @d.order(:stamp).join(:categories, :category_id => :id).sql.should ==
-      'SELECT * FROM items LEFT OUTER JOIN categories ON (categories.category_id = items.id) ORDER BY stamp'
+    @d.order(:stamp).join_table(:full_outer, :categories, :category_id => :id).sql.should ==
+      'SELECT * FROM items FULL OUTER JOIN categories ON (categories.category_id = items.id) ORDER BY stamp'
+  end
+  
+  specify "should support multiple joins" do
+    @d.join_table(:inner, :b, :items_id).join_table(:left_outer, :c, :b_id => :b__id).sql.should ==
+      'SELECT * FROM items INNER JOIN b ON (b.items_id = items.id) LEFT OUTER JOIN c ON (c.b_id = b.id)'
   end
   
   specify "should use id as implicit relation primary key if ommited" do
+    @d.join_table(:left_outer, :categories, :category_id).sql.should ==
+      @d.join_table(:left_outer, :categories, :category_id => :id).sql
+
+    # when doing multiple joins, id should be qualified using the last joined table
+    @d.join_table(:right_outer, :b, :items_id).join_table(:full_outer, :c, :b_id).sql.should ==
+      'SELECT * FROM items RIGHT OUTER JOIN b ON (b.items_id = items.id) FULL OUTER JOIN c ON (c.b_id = b.id)'
+  end
+  
+  specify "should support left outer joins" do
+    @d.join_table(:left_outer, :categories, :category_id).sql.should ==
+      'SELECT * FROM items LEFT OUTER JOIN categories ON (categories.category_id = items.id)'
+
+    @d.left_outer_join(:categories, :category_id).sql.should ==
+      'SELECT * FROM items LEFT OUTER JOIN categories ON (categories.category_id = items.id)'
+  end
+
+  specify "should support right outer joins" do
+    @d.join_table(:right_outer, :categories, :category_id).sql.should ==
+      'SELECT * FROM items RIGHT OUTER JOIN categories ON (categories.category_id = items.id)'
+
+    @d.right_outer_join(:categories, :category_id).sql.should ==
+      'SELECT * FROM items RIGHT OUTER JOIN categories ON (categories.category_id = items.id)'
+  end
+
+  specify "should support full outer joins" do
+    @d.join_table(:full_outer, :categories, :category_id).sql.should ==
+      'SELECT * FROM items FULL OUTER JOIN categories ON (categories.category_id = items.id)'
+
+    @d.full_outer_join(:categories, :category_id).sql.should ==
+      'SELECT * FROM items FULL OUTER JOIN categories ON (categories.category_id = items.id)'
+  end
+
+  specify "should support inner joins" do
+    @d.join_table(:inner, :categories, :category_id).sql.should ==
+      'SELECT * FROM items INNER JOIN categories ON (categories.category_id = items.id)'
+
+    @d.inner_join(:categories, :category_id).sql.should ==
+      'SELECT * FROM items INNER JOIN categories ON (categories.category_id = items.id)'
+  end
+  
+  specify "should default to a left outer join" do
+    @d.join_table(nil, :categories, :category_id).sql.should ==
+      'SELECT * FROM items LEFT OUTER JOIN categories ON (categories.category_id = items.id)'
+
     @d.join(:categories, :category_id).sql.should ==
-      @d.join(:categories, :category_id => :id).sql
+      'SELECT * FROM items LEFT OUTER JOIN categories ON (categories.category_id = items.id)'
+  end
+  
+  specify "should raise if an invalid join type is specified" do
+    proc {@d.join_table(:invalid, :a, :b)}.should raise_error(SequelError)
   end
 end
 
