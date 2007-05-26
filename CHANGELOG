@@ -1,3 +1,7 @@
+*SVN*
+
+* Added Dataset#or, pretty nifty.
+
 *0.1.5*
 
 * Fixed Dataset#join to support multiple joins. Added #left_outer_join, #right_outer_join, #full_outer_join, #inner_join methods.

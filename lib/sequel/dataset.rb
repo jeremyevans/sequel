@@ -298,6 +298,19 @@ module Sequel
         dup_merge(clause => expression_list(block || cond))
       end
     end
+    
+    def or(*cond, &block)
+      clause = (@opts[:group] ? :having : :where)
+      cond = cond.first if cond.size == 1
+      parenthesize = !(cond.is_a?(Hash) || cond.is_a?(Array))
+      if @opts[clause]
+        l = expression_list(@opts[clause])
+        r = expression_list(block || cond, parenthesize)
+        dup_merge(clause => "#{l} OR #{r}")
+      else
+        raise SequelError, "No existing filter found."
+      end
+    end
 
     # Performs the inverse of Dataset#filter.
     #
