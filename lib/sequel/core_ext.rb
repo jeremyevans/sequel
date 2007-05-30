@@ -15,6 +15,11 @@ class Array
   end
 end
 
+module Sequel
+  class ExpressionString < ::String
+  end
+end
+
 # String extensions
 class String
   # Converts a string into an SQL string by removing comments.
@@ -27,5 +32,10 @@ class String
   # and excessive white-space.
   def split_sql
     to_sql.split(';').map {|s| s.strip}
+  end
+  
+  # Convert a string into an Expression String
+  def expr
+    Sequel::ExpressionString.new(self)
   end
 end

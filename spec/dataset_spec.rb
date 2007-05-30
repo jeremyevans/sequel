@@ -409,7 +409,7 @@ end
 
 context "Dataset#literal" do
   setup do
-    @dataset = Sequel::Dataset.new(nil)
+    @dataset = Sequel::Dataset.new(nil).from(:test)
   end
   
   specify "should escape strings properly" do
@@ -458,6 +458,13 @@ context "Dataset#literal" do
     d = Date.today
     s = d.strftime("DATE '%Y-%m-%d'")
     @dataset.literal(d).should == s
+  end
+  
+  specify "should not literalize expression strings" do
+    @dataset.literal('col1 + 2'.expr).should == 'col1 + 2'
+    
+    @dataset.update_sql(:a => 'a + 2'.expr).should == 
+      'UPDATE test SET a = a + 2'
   end
 end
 
@@ -1107,3 +1114,4 @@ context "Dataset#destroy" do
     DESTROYED.should == MODELS
   end 
 end
+

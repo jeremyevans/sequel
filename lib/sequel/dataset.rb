@@ -112,6 +112,7 @@ module Sequel
     # If an unsupported object is given, an exception is raised.
     def literal(v)
       case v
+      when ExpressionString: v
       when String: "'#{v.gsub(/'/, "''")}'"
       when Integer, Float: v.to_s
       when NilClass: NULL

@@ -1,5 +1,7 @@
 *SVN*
 
+* Added support for literal expressions, e.g. DB[:items].filter(:col1 => 'col2 - 10'.expr).
+
 * Added Dataset#and.
 
 * SQLite adapter opens a memory DB if no database is specified, e.g. Sequel.open 'sqlite:/'.
