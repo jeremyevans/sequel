@@ -208,6 +208,9 @@ module Sequel
         fmt = where.to_expressions.map {|e| format_expression(e.left, e.op, e.right)}.
           join(AND_SEPARATOR)
       else
+        # if the expression is compound, it should be parenthesized in order for 
+        # things to be predictable (when using #or and #and.)
+        parenthesize |= where =~ /\).+\(/
         fmt = where
       end
       parenthesize ? "(#{fmt})" : fmt
@@ -310,6 +313,14 @@ module Sequel
       else
         raise SequelError, "No existing filter found."
       end
+    end
+
+    def and(*cond, &block)
+      clause = (@opts[:group] ? :having : :where)
+      unless @opts[clause]
+        raise SequelError, "No existing filter found."
+      end
+      filter(*cond, &block)
     end
 
     # Performs the inverse of Dataset#filter.

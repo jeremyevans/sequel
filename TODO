@@ -1,4 +1,4 @@
-* Observers!
+* Dataset#set as alias to Dataset#update
 
 * Refactor schema code to allow adapters to adapt schema definitions to specific capabilities.
 

@@ -1,5 +1,9 @@
 *SVN*
 
+* Added Dataset#and.
+
+* SQLite adapter opens a memory DB if no database is specified, e.g. Sequel.open 'sqlite:/'.
+
 * Added Dataset#or, pretty nifty.
 
 *0.1.5*

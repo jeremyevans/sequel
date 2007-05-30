@@ -11,7 +11,10 @@ module Sequel
       set_adapter_scheme :sqlite
     
       def connect
-        db = SQLite3::Database.new(@opts[:database])
+        if @opts[:database].empty?
+          @opts[:database] = ':memory:'
+        end
+        db = ::SQLite3::Database.new(@opts[:database])
         db.type_translation = true
         db
       end

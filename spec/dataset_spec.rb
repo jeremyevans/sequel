@@ -283,6 +283,47 @@ context "Dataset#or" do
     (@d1.or {yy > 3}).sql.should ==
       'SELECT * FROM test WHERE (x = 1) OR (yy > 3)'
   end
+  
+  specify "should correctly add parens to give predictable results" do
+    @d1.filter(:y => 2).or(:z => 3).sql.should == 
+      'SELECT * FROM test WHERE ((x = 1) AND (y = 2)) OR (z = 3)'
+
+    @d1.or(:y => 2).filter(:z => 3).sql.should == 
+      'SELECT * FROM test WHERE ((x = 1) OR (y = 2)) AND (z = 3)'
+  end
+end
+
+context "Dataset#and" do
+  setup do
+    @dataset = Sequel::Dataset.new(nil).from(:test)
+    @d1 = @dataset.where(:x => 1)
+  end
+  
+  specify "should raise if no filter exists" do
+    proc {@dataset.and(:a => 1)}.should raise_error(SequelError)
+  end
+  
+  specify "should add an alternative expression to the where clause" do
+    @d1.and(:y => 2).sql.should == 
+      'SELECT * FROM test WHERE (x = 1) AND (y = 2)'
+  end
+  
+  specify "should accept all forms of filters" do
+    # probably not exhaustive, but good enough
+    @d1.and('(y > ?)', 2).sql.should ==
+      'SELECT * FROM test WHERE (x = 1) AND (y > 2)'
+      
+    (@d1.and {yy > 3}).sql.should ==
+      'SELECT * FROM test WHERE (x = 1) AND (yy > 3)'
+  end
+  
+  specify "should correctly add parens to give predictable results" do
+    @d1.or(:y => 2).and(:z => 3).sql.should == 
+      'SELECT * FROM test WHERE ((x = 1) OR (y = 2)) AND (z = 3)'
+
+    @d1.and(:y => 2).or(:z => 3).sql.should == 
+      'SELECT * FROM test WHERE ((x = 1) AND (y = 2)) OR (z = 3)'
+  end
 end
 
 context "Dataset#exclude" do
