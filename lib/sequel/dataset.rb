@@ -303,6 +303,8 @@ module Sequel
       end
     end
     
+    # Adds an alternate filter to an existing filter using OR. If no filter 
+    # exists an error is raised.
     def or(*cond, &block)
       clause = (@opts[:group] ? :having : :where)
       cond = cond.first if cond.size == 1
@@ -316,6 +318,9 @@ module Sequel
       end
     end
 
+    # Adds an further filter to an existing filter using AND. If no filter 
+    # exists an error is raised. This method is identical to #filter except
+    # it expects an existing filter.
     def and(*cond, &block)
       clause = (@opts[:group] ? :having : :where)
       unless @opts[clause]
@@ -362,14 +367,20 @@ module Sequel
       end
     end
     
+    # Adds a UNION clause using a second dataset object. If all is true the
+    # clause used is UNION ALL, which may return duplicate rows.
     def union(dataset, all = false)
       dup_merge(:union => dataset, :union_all => all)
     end
 
+    # Adds an INTERSECT clause using a second dataset object. If all is true 
+    # the clause used is INTERSECT ALL, which may return duplicate rows.
     def intersect(dataset, all = false)
       dup_merge(:intersect => dataset, :intersect_all => all)
     end
 
+    # Adds an EXCEPT clause using a second dataset object. If all is true the
+    # clause used is EXCEPT ALL, which may return duplicate rows.
     def except(dataset, all = false)
       dup_merge(:except => dataset, :except_all => all)
     end
@@ -407,13 +418,12 @@ module Sequel
     end
     
     def left_outer_join(table, expr); join_table(:left_outer, table, expr); end
-    alias_method :join, :left_outer_join
     def right_outer_join(table, expr); join_table(:right_outer, table, expr); end
     def full_outer_join(table, expr); join_table(:full_outer, table, expr); end
     def inner_join(table, expr); join_table(:inner, table, expr); end
+    alias_method :join, :inner_join
 
-
-    alias all to_a
+    alias_method :all, :to_a
     
     # Maps field values for each record in the dataset (if a field name is
     # given), or performs the stock mapping functionality of Enumerable.

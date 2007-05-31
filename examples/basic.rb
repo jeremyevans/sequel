@@ -1,8 +1,8 @@
 require 'rubygems'
-require File.join(File.dirname(__FILE__), '../lib/sequel/sqlite')
+require 'sequel/sqlite'
 
 # Let's open an in-memory database
-DB = Sequel.open 'sqlite:/:memory:'
+DB = Sequel.open 'sqlite:/'
 
 # Create a new table
 DB.create_table :items do

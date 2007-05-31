@@ -1,5 +1,9 @@
 *SVN*
 
+* Model.method_missing now creates stubs for calling Model.dataset methods. Methods like Model.each etc are removed.
+
+* Changed default join type to INNER JOIN (thanks snok.)
+
 * Added support for literal expressions, e.g. DB[:items].filter(:col1 => 'col2 - 10'.expr).
 
 * Added Dataset#and.

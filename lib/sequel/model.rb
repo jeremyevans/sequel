@@ -194,17 +194,17 @@ module Sequel
       self
     end
     
-    def self.each(&block); dataset.each(&block); end
-    def self.all; dataset.all; end
-    def self.filter(*arg, &block); dataset.filter(*arg, &block); end
-    def self.exclude(*arg, &block); dataset.exclude(*arg, &block); end
-    def self.order(*arg); dataset.order(*arg); end
-    def self.first(*arg); dataset.first(*arg); end
-    def self.count; dataset.count; end
-    def self.map(*arg, &block); dataset.map(*arg, &block); end
-    def self.hash_column(column); dataset.hash_column(primary_key, column); end
-    def self.join(*args); dataset.join(*args); end
-    def self.lock(mode, &block); dataset.lock(mode, &block); end
+    # def self.each(&block); dataset.each(&block); end
+    # def self.all; dataset.all; end
+    # def self.filter(*arg, &block); dataset.filter(*arg, &block); end
+    # def self.exclude(*arg, &block); dataset.exclude(*arg, &block); end
+    # def self.order(*arg); dataset.order(*arg); end
+    # def self.first(*arg); dataset.first(*arg); end
+    # def self.count; dataset.count; end
+    # def self.map(*arg, &block); dataset.map(*arg, &block); end
+    # def self.hash_column(column); dataset.hash_column(primary_key, column); end
+    # def self.join(*args); dataset.join(*args); end
+    # def self.lock(mode, &block); dataset.lock(mode, &block); end
     def self.destroy_all
       has_hooks?(:before_destroy) ? dataset.destroy : dataset.delete
     end
@@ -245,6 +245,8 @@ module Sequel
         elsif method_name =~ ALL_BY_REGEXP
           c = $1
           meta_def(method_name) {|arg| filter(c => arg).all}
+        elsif dataset.respond_to?(m)
+          instance_eval("def #{m}(*args, &block); dataset.#{m}(*args, &block); end")
         end
       end
       respond_to?(m) ? send(m, *args) : super(m, *args)
