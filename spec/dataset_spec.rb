@@ -792,12 +792,12 @@ context "Dataset#join_table" do
       'SELECT * FROM items INNER JOIN categories ON (categories.category_id = items.id)'
   end
   
-  specify "should default to a left outer join" do
+  specify "should default to an inner join" do
     @d.join_table(nil, :categories, :category_id).sql.should ==
-      'SELECT * FROM items LEFT OUTER JOIN categories ON (categories.category_id = items.id)'
+      'SELECT * FROM items INNER JOIN categories ON (categories.category_id = items.id)'
 
     @d.join(:categories, :category_id).sql.should ==
-      'SELECT * FROM items LEFT OUTER JOIN categories ON (categories.category_id = items.id)'
+      'SELECT * FROM items INNER JOIN categories ON (categories.category_id = items.id)'
   end
   
   specify "should raise if an invalid join type is specified" do

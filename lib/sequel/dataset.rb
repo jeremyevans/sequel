@@ -393,7 +393,7 @@ module Sequel
     }
     
     def join_expr(type, table, expr)
-      join_type = JOIN_TYPES[type || :left_outer]
+      join_type = JOIN_TYPES[type || :inner]
       unless join_type
         raise SequelError, "Invalid join type: #{type}"
       end
