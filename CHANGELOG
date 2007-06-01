@@ -1,4 +1,4 @@
-*SVN*
+*0.1.6*
 
 * Fixed Model#method_missing to raise for an invalid attribute.
 
