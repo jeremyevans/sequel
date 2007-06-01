@@ -21,9 +21,9 @@ module Sequel
     def self.dataset
       return @dataset if @dataset
       if !table_name
-        raise RuntimeError, "Table name not specified for class #{self}."
+        raise SequelError, "Table name not specified for #{self}."
       elsif !db
-        raise RuntimeError, "No database connected."
+        raise SequelError, "Database not specified for #{self}."
       end
       @dataset = db[table_name]
       @dataset.model_class = self
@@ -190,7 +190,7 @@ module Sequel
     
     def refresh
       @values = self.class.dataset.naked[primary_key => @pkey] ||
-        (raise RuntimeError, "Record not found")
+        (raise SequelError, "Record not found")
       self
     end
     
@@ -233,7 +233,7 @@ module Sequel
     FILTER_BY_REGEXP = /^filter_by_(.*)/.freeze
     ALL_BY_REGEXP = /^all_by_(.*)/.freeze
     
-    def self.method_missing(m, *args)
+    def self.method_missing(m, *args, &block)
       Thread.exclusive do
         method_name = m.to_s
         if method_name =~ FIND_BY_REGEXP
@@ -249,7 +249,7 @@ module Sequel
           instance_eval("def #{m}(*args, &block); dataset.#{m}(*args, &block); end")
         end
       end
-      respond_to?(m) ? send(m, *args) : super(m, *args)
+      respond_to?(m) ? send(m, *args, &block) : super(m, *args)
     end
     
     def db; self.class.db; end
@@ -261,12 +261,16 @@ module Sequel
     WRITE_ATTR_REGEXP = /(.*)=$/.freeze
 
     def method_missing(m, value = nil)
-      if m.to_s =~ WRITE_ATTR_REGEXP
-        self[$1.to_sym] = value
-      else
-        self[m]
-      end
+      write = m.to_s =~ WRITE_ATTR_REGEXP
+      att = write ? $1.to_sym : m
+      # raise unless the att is recognized or this is a new unaved record
+      super unless @values.include?(att) || !@pkey
+      
+      write ? (self[att] = value) : self[att]
     end
+    
+    def each(&block); @values.each(&block); end
+    def keys; @values.keys; end
     
     def id; @values[:id]; end
     

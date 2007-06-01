@@ -1,5 +1,13 @@
 *SVN*
 
+* Fixed Model#method_missing to raise for an invalid attribute.
+
+* Fixed PrettyTable to print model objects (thanks snok.)
+
+* Fixed ODBC timestamp conversion to return DateTime rather than Time object (thanks snok.)
+
+* Fixed Model.method_missing (thanks snok.)
+
 * Model.method_missing now creates stubs for calling Model.dataset methods. Methods like Model.each etc are removed.
 
 * Changed default join type to INNER JOIN (thanks snok.)

@@ -23,9 +23,9 @@ module Sequel
         sizes[c.to_sym] = s if s > sizes[c.to_sym]
       end
       records.each do |r|
-        r.each do |k, v|
-          s = v.to_s.size
-          sizes[k.to_sym] = s if s > sizes[k.to_sym]
+        columns.each do |c|
+          s = r[c].to_s.size
+          sizes[c.to_sym] = s if s > sizes[c.to_sym]
         end
       end
       sizes

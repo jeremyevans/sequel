@@ -80,7 +80,7 @@ module Sequel
         # ODBCColumn#mapSqlTypeToGenericType and Column#klass.
         case v
         when ::ODBC::TimeStamp
-          Time.gm(v.year, v.month, v.day, v.hour, v.minute, v.second)
+          DateTime.new(v.year, v.month, v.day, v.hour, v.minute, v.second)
         when ::ODBC::Time
           DateTime.now
           Time.gm(now.year, now.month, now.day, v.hour, v.minute, v.second)
