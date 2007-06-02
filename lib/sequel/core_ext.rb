@@ -39,3 +39,35 @@ class String
     Sequel::ExpressionString.new(self)
   end
 end
+
+# Symbol extensions
+class Symbol
+  def DESC
+    "#{to_field_name} DESC"
+  end
+  
+  def AS(target)
+    "#{to_field_name} AS #{target}"
+  end
+  
+  AS_REGEXP = /(.*)___(.*)/.freeze
+  DOUBLE_UNDERSCORE = '__'.freeze
+  PERIOD = '.'.freeze
+  
+  def to_field_name
+    s = to_s
+    if s =~ AS_REGEXP
+      s = "#{$1} AS #{$2}"
+    end
+    s.split(DOUBLE_UNDERSCORE).join(PERIOD)
+  end
+  
+  def ALL
+    "#{to_s}.*"
+  end
+
+  def MIN; "min(#{to_field_name})"; end
+  def MAX; "max(#{to_field_name})"; end
+  def SUM; "sum(#{to_field_name})"; end
+  def AVG; "avg(#{to_field_name})"; end
+end

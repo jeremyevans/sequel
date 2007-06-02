@@ -1,3 +1,7 @@
+*SVN*
+
+* Fixed Symbol#DESC to support qualified notation (thanks Pedro Gutierrez).
+
 *0.1.6*
 
 * Fixed Model#method_missing to raise for an invalid attribute.
