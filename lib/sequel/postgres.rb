@@ -44,11 +44,12 @@ class PGconn
     if !@table_sequences.include?(table)
       pkey_and_seq = pkey_and_sequence(table)
       if pkey_and_seq
-        if seq = @table_sequences[table] = pkey_and_seq[1]
-          r = async_query(SELECT_CURRVAL % seq)
-          return r[0][0].to_i unless r.nil? || r.empty?
-        end
+        @table_sequences[table] = pkey_and_seq[1]
       end
+    end
+    if seq = @table_sequences[table]
+      r = async_query(SELECT_CURRVAL % seq)
+      return r[0][0].to_i unless r.nil? || r.empty?
     end
     nil # primary key sequence not found
   end
