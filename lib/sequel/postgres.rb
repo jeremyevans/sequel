@@ -41,9 +41,16 @@ class PGconn
       
   def last_insert_id(table)
     @table_sequences ||= {}
-    seq = @table_sequences[table] ||= pkey_and_sequence(table)[1]
-    r = async_query(SELECT_CURRVAL % seq)
-    r[0][0].to_i unless r.nil? || r.empty?
+    if !@table_sequences.include?(table)
+      pkey_and_seq = pkey_and_sequence(table)
+      if pkey_and_seq
+        if seq = @table_sequences[table] = pkey_and_seq[1]
+          r = async_query(SELECT_CURRVAL % seq)
+          return r[0][0].to_i unless r.nil? || r.empty?
+        end
+      end
+    end
+    nil # primary key sequence not found
   end
       
   # Shamelessly appropriated from ActiveRecord's Postgresql adapter.
@@ -74,6 +81,16 @@ class PGconn
       AND cons.contype = 'p'
       AND def.adsrc ~* 'nextval'
   end_sql
+
+  SELECT_PK = <<-end_sql
+    SELECT pg_attribute.attname
+    FROM pg_class, pg_attribute, pg_index
+    WHERE pg_class.oid = pg_attribute.attrelid AND
+      pg_class.oid = pg_index.indrelid AND
+      pg_index.indkey[0] = pg_attribute.attnum AND
+      pg_index.indisprimary = 't' AND
+      pg_class.relname = '%s'
+  end_sql
   
   def pkey_and_sequence(table)
     r = async_query(SELECT_PK_AND_SERIAL_SEQUENCE % table)
@@ -81,6 +98,14 @@ class PGconn
 
     r = async_query(SELECT_PK_AND_CUSTOM_SEQUENCE % table)
     return [r.first, r.last] unless r.nil? or r.empty?
+  rescue
+    nil
+  end
+  
+  def primary_key(table)
+    r = async_query(SELECT_PK % table)
+    pkey = r[0].first unless r.nil? or r.empty?
+    return pkey.to_sym if pkey
   rescue
     nil
   end
@@ -164,11 +189,42 @@ module Sequel
         raise e
       end
       
-      def execute_insert(sql, table)
+      def primary_key_for_table(conn, table)
+        @primary_keys ||= {}
+        @primary_keys[table] ||= conn.primary_key(table)
+      end
+      
+      RE_CURRVAL_ERROR = /currval of sequence "(.*)" is not yet defined in this session/.freeze
+      
+      def insert_result(conn, table, values)
+        begin
+          result = conn.last_insert_id(table)
+          return result if result
+        rescue PGError => e
+          # An error could occur if the inserted values include a primary key
+          # value, while the primary key is serial.
+          if e.message =~ RE_CURRVAL_ERROR
+            raise SequelError, "Could not return primary key value for the inserted record. Are you specifying a primary key value for a serial primary key?"
+          else
+            raise e
+          end
+        end
+        
+        case values
+        when Hash:
+          values[primary_key_for_table(conn, table)]
+        when Array:
+          values.first
+        else
+          nil
+        end
+      end
+      
+      def execute_insert(sql, table, values)
         @logger.info(sql) if @logger
         @pool.hold do |conn|
           conn.execute(sql).clear
-          conn.last_insert_id(table)
+          insert_result(conn, table, values)
         end
       rescue => e
         @logger.error(e.message) if @logger
@@ -314,7 +370,8 @@ module Sequel
       end
   
       def insert(*values)
-        @db.execute_insert(insert_sql(*values), @opts[:from])
+        @db.execute_insert(insert_sql(*values), @opts[:from],
+          values.size == 1 ? values.first : values)
       end
     
       def update(values, opts = nil)

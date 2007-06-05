@@ -1,5 +1,7 @@
 *SVN*
 
+* Small fix to Postgres driver to return a primary_key value for the inserted record if it is specified in the insertion values (thanks Florian Aßmann and Pedro Gutierrez).
+
 * Fixed Symbol#DESC to support qualified notation (thanks Pedro Gutierrez).
 
 *0.1.6*
