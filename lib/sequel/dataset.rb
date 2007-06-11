@@ -662,7 +662,7 @@ module Sequel
     # an array is returned with the first <i>num</i> records.
     def first(num = 1)
       if num == 1
-        single_record
+        single_record(:limit => 1)
       else
         limit(num).all
       end

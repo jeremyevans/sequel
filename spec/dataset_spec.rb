@@ -881,12 +881,18 @@ context "Dataset#first" do
   setup do
     @c = Class.new(Sequel::Dataset) do
       @@last_dataset = nil
+      @@last_opts = nil
       
       def self.last_dataset
         @@last_dataset
       end
+      
+      def self.last_opts
+        @@last_opts
+      end
 
-      def single_record
+      def single_record(opts = nil)
+        @@last_opts = opts
         {:a => 1, :b => 2}
       end
       
@@ -903,6 +909,9 @@ context "Dataset#first" do
   end
   
   specify "should set the limit according to the given number" do
+    @d.first
+    @c.last_opts[:limit].should == 1
+    
     i = rand(10) + 10
     @d.first(i)
     @c.last_dataset.opts[:limit].should == i
