@@ -98,7 +98,7 @@ class PGconn
     return [r[0].first, r[0].last] unless r.nil? or r.empty?
 
     r = async_query(SELECT_PK_AND_CUSTOM_SEQUENCE % table)
-    return [r.first, r.last] unless r.nil? or r.empty?
+    return [r[0].first, r[0].last] unless r.nil? or r.empty?
   rescue
     nil
   end
