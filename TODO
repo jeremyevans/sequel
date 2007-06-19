@@ -1,3 +1,20 @@
+# Make Dataset#first take a hash:
+
+  DB[:items].first(:name => 'abc')
+
+  # instead of:
+
+  DB[:items].filter(:name => 'abc').first
+  
+# Add Dataset#update_or_create:
+
+  DB[:items].filter(:name => 'abc').update_or_create(:price => 100)
+  
+  # equivalent to:
+  
+  if (DB[:items].filter(:name => 'abc').update(:price => 100) < 1)
+    DB[:items] << {:name => 'abc', :price => 100}
+
 * Dataset#set as alias to Dataset#update
 
 * Refactor schema code to allow adapters to adapt schema definitions to specific capabilities.
