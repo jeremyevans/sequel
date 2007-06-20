@@ -660,35 +660,47 @@ module Sequel
     
     # Returns the first record in the dataset. If the num argument is specified,
     # an array is returned with the first <i>num</i> records.
-    def first(num = 1)
-      if num == 1
-        single_record(:limit => 1)
+    def first(*args)
+      args = args.empty? ? 1 : (args.size == 1) ? args.first : args
+      case args
+      when 1: single_record(:limit => 1)
+      when Fixnum: limit(args).all
       else
-        limit(num).all
+        filter(args).single_record(:limit => 1)
       end
     end
     
     # Returns the first record matching the condition.
     def [](*conditions)
-      where(*conditions).first
+      first(*conditions)
+    end
+    
+    def []=(conditions, values)
+      filter(conditions).update(values)
     end
     
     # Returns the last records in the dataset by inverting the order. If no
     # order is given, an exception is raised. If num is not given, the last
     # record is returned. Otherwise an array is returned with the last 
     # <i>num</i> records.
-    def last(num = 1)
+    def last(*args)
       raise SequelError, 'No order specified' unless 
         @opts[:order] || (opts && opts[:order])
       
-      l = {:limit => num}
-      opts = {:order => invert_order(@opts[:order])}.
-        merge(opts ? opts.merge(l) : l)
-
-      if num == 1
-        single_record(opts)
+      args = args.empty? ? 1 : (args.size == 1) ? args.first : args
+      
+      case args
+      when Fixnum:
+        l = {:limit => args}
+        opts = {:order => invert_order(@opts[:order])}. \
+          merge(opts ? opts.merge(l) : l)
+        if args == 1
+          single_record(opts)
+        else
+          dup_merge(opts).all
+        end
       else
-        dup_merge(opts).all
+        filter(args).last(1)
       end
     end
     

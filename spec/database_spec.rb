@@ -298,6 +298,14 @@ context "A Database adapter with a scheme" do
     c.opts[:host].should == 'localhost'
     c.opts[:database].should == 'db'
   end
+
+  specify "should be accessible through Sequel()" do
+    c = Sequel('ccc://localhost/db')
+    c.should be_a_kind_of(CCC)
+    c.opts[:host].should == 'localhost'
+    c.opts[:database].should == 'db'
+  end
+
 end
 
 context "An unknown database scheme" do

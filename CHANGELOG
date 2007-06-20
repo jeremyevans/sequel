@@ -1,5 +1,11 @@
 *SVN*
 
+* Improved Dataset#first and #last to accept a filter hash.
+
+* Added Dataset#[]= method.
+
+* Added Sequel() convenience method.
+
 * Fixed Dataset#first to include a LIMIT clause for a single record.
 
 * Small fix to Postgres driver to return a primary_key value for the inserted record if it is specified in the insertion values (thanks Florian Aßmann and Pedro Gutierrez).

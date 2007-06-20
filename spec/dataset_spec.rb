@@ -821,6 +821,27 @@ context "Dataset#<<" do
   end
 end
 
+context "Dataset#[]=" do
+  setup do
+    c = Class.new(Sequel::Dataset) do
+      def last_sql
+        @@last_sql
+      end
+      
+      def update(*args)
+        @@last_sql = update_sql(*args)
+      end
+    end
+    
+    @d = c.new(nil).from(:items)
+  end
+  
+  specify "should perform an update on the specified filter" do
+    @d[:a => 1] = {:x => 3}
+    @d.last_sql.should == 'UPDATE items SET x = 3 WHERE (a = 1)'
+  end
+end
+
 context "Dataset#insert_multiple" do
   setup do
     c = Class.new(Sequel::Dataset) do
@@ -892,7 +913,7 @@ context "Dataset#first" do
       end
 
       def single_record(opts = nil)
-        @@last_opts = opts
+        @@last_opts = @opts.merge(opts || {})
         {:a => 1, :b => 2}
       end
       
@@ -902,6 +923,14 @@ context "Dataset#first" do
       end
     end
     @d = @c.new(nil).from(:test)
+  end
+  
+  specify "should return the first matching record if a hash is specified" do
+    @d.first(:z => 26).should == {:a => 1, :b => 2}
+    @c.last_opts[:where].should == ('(z = 26)')
+
+    @d.first('z = ?', 15)
+    @c.last_opts[:where].should == ('z = 15')
   end
   
   specify "should return a single record if no argument is given" do
@@ -967,6 +996,14 @@ context "Dataset#last" do
     
     @d.order(:e.DESC, :f).last
     @c.last_dataset.opts[:order].should == ['e', 'f DESC']
+  end
+  
+  specify "should return the first matching record if a hash is specified" do
+    @d.order(:a).last(:z => 26).should == {:a => 1, :b => 2}
+    @c.last_dataset.opts[:where].should == ('(z = 26)')
+
+    @d.order(:a).last('z = ?', 15)
+    @c.last_dataset.opts[:where].should == ('z = 15')
   end
   
   specify "should return a single record if no argument is given" do

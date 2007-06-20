@@ -27,3 +27,9 @@ module Sequel #:nodoc:
     alias_method :open, :connect
   end
 end
+
+class Object
+  def Sequel(uri)
+    Sequel.connect(uri)
+  end
+end
