@@ -1,11 +1,3 @@
-# Make Dataset#first take a hash:
-
-  DB[:items].first(:name => 'abc')
-
-  # instead of:
-
-  DB[:items].filter(:name => 'abc').first
-  
 # Add Dataset#update_or_create:
 
   DB[:items].filter(:name => 'abc').update_or_create(:price => 100)

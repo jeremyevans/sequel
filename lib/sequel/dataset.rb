@@ -294,12 +294,17 @@ module Sequel
       clause = (@opts[:group] ? :having : :where)
       cond = cond.first if cond.size == 1
       parenthesize = !(cond.is_a?(Hash) || cond.is_a?(Array))
+      filter = cond.is_a?(Hash) && cond
       if @opts[clause]
+        if filter && cond.is_a?(Hash)
+          filter
+        end
+        filter = 
         l = expression_list(@opts[clause])
         r = expression_list(block || cond, parenthesize)
         dup_merge(clause => "#{l} AND #{r}")
       else
-        dup_merge(clause => expression_list(block || cond))
+        dup_merge(:filter => cond, clause => expression_list(block || cond))
       end
     end
     

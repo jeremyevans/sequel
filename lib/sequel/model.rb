@@ -154,7 +154,7 @@ module Sequel
     end
     
     def self.after_destroy(&block)
-      get_hooks(:after_destroy).unshift(block)
+      get_hooks(:after_destroy) << block
     end
     
     def self.find(cond)
@@ -194,17 +194,6 @@ module Sequel
       self
     end
     
-    # def self.each(&block); dataset.each(&block); end
-    # def self.all; dataset.all; end
-    # def self.filter(*arg, &block); dataset.filter(*arg, &block); end
-    # def self.exclude(*arg, &block); dataset.exclude(*arg, &block); end
-    # def self.order(*arg); dataset.order(*arg); end
-    # def self.first(*arg); dataset.first(*arg); end
-    # def self.count; dataset.count; end
-    # def self.map(*arg, &block); dataset.map(*arg, &block); end
-    # def self.hash_column(column); dataset.hash_column(primary_key, column); end
-    # def self.join(*args); dataset.join(*args); end
-    # def self.lock(mode, &block); dataset.lock(mode, &block); end
     def self.destroy_all
       has_hooks?(:before_destroy) ? dataset.destroy : dataset.delete
     end
@@ -222,6 +211,7 @@ module Sequel
       db.transaction do
         run_hooks(:before_destroy)
         delete
+        run_hooks(:after_destroy)
       end
     end
     

@@ -1,5 +1,7 @@
 *SVN*
 
+* Fixed after_destroy hook.
+
 * Improved Dataset#first and #last to accept a filter hash.
 
 * Added Dataset#[]= method.
