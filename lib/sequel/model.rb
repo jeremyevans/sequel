@@ -242,6 +242,11 @@ module Sequel
       respond_to?(m) ? send(m, *args, &block) : super(m, *args)
     end
     
+    def self.join(*args)
+      table_name = dataset.opts[:from].first
+      dataset.join(*args).select(table_name.to_sym.ALL)
+    end
+    
     def db; self.class.db; end
     
     def [](field); @values[field]; end

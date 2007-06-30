@@ -1,5 +1,7 @@
 *SVN*
 
+* Implemented Model.join method to restrict returned columns to the model table (thanks Pedro Gutierrez).
+
 * Implemented Dataset#paginate method.
 
 * Fixed after_destroy hook.
