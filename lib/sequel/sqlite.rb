@@ -75,22 +75,16 @@ module Sequel
       end
     
       def insert(*values)
-        @db.synchronize do
-          @db.execute_insert insert_sql(*values)
-        end
+        @db.execute_insert insert_sql(*values)
       end
     
       def update(values, opts = nil)
-        @db.synchronize do
-          @db.execute update_sql(values, opts)
-        end
+        @db.execute update_sql(values, opts)
         self
       end
     
       def delete(opts = nil)
-        @db.synchronize do
-          @db.execute delete_sql(opts)
-        end
+        @db.execute delete_sql(opts)
         self
       end
       

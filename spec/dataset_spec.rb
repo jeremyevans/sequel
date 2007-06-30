@@ -1160,4 +1160,3 @@ context "Dataset#destroy" do
     DESTROYED.should == MODELS
   end 
 end
-

@@ -1,16 +1,12 @@
-=== 0.1.1
+=== 0.1.8
 
-* Cleanup Dataset API (especially count, aggregates, first and last).
+* Rewrite schema code to allow adapter-specific behavior.
 
 === 0.2.0
 
-* Specs and documentation for Model.
-
-* Better, more complete relations.
+* Overhaul of Model code.
 
 === 0.3.0
-
-* Complete MySQL adapter.
 
 * More adapters.
 

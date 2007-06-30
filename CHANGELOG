@@ -1,4 +1,6 @@
-*SVN*
+*0.1.7*
+
+* Removed db.synchronize wrapping calls in sqlite adapter.
 
 * Implemented Model.join method to restrict returned columns to the model table (thanks Pedro Gutierrez).
 
