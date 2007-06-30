@@ -611,6 +611,30 @@ module Sequel
     end
     alias size count
     
+    # returns a paginated dataset. The resulting dataset also provides the
+    # total number of pages (Dataset#page_count) and the current page number
+    # (Dataset#current_page), as well as Dataset#prev_page and Dataset#next_page
+    # for implementing pagination controls.
+    def paginate(page_no, page_size)
+      total_pages = (count / page_size.to_f).ceil
+      paginated = limit(page_size, (page_no - 1) * page_size)
+      paginated.current_page = page_no
+      paginated.page_count = total_pages
+      paginated
+    end
+    
+    attr_accessor :page_count, :current_page
+    
+    # Returns the previous page number or nil if the current page is the first
+    def prev_page
+      current_page > 1 ? (current_page - 1) : nil
+    end
+    
+    # Returns the next page number or nil if the current page is the last page
+    def next_page
+      current_page < page_count ? (current_page + 1) : nil
+    end
+    
     # Returns a table reference for use in the FROM clause. If the dataset has
     # only a :from option refering to a single table, only the table name is 
     # returned. Otherwise a subquery is returned.
