@@ -26,3 +26,9 @@ Book.filter_by_author(Author[:name => 'Kurt Vonnegut']).print
 #instead of:
 
 Book.filter_by_author_id(Author[:name => 'Kurt Vonnegut'].id).print
+
+* Adapters: 
+
+  db2, frontbase, interbase (http://ruby-dbi.rubyforge.org/)
+  oracle OCI8 (http://ruby-oci8.rubyforge.org/en) 
+  openbase (http://ruby-openbase.rubyforge.org)
