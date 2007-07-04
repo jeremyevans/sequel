@@ -1,3 +1,7 @@
+*SVN*
+
+* Fixed broken Postgres::Dataset#explain.
+
 *0.1.7*
 
 * Removed db.synchronize wrapping calls in sqlite adapter.

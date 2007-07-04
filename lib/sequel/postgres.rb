@@ -340,7 +340,7 @@ module Sequel
     
       def explain(opts = nil)
         analysis = []
-        query_each(select_sql(EXPLAIN + select_sql(opts))) do |r|
+        query_each(EXPLAIN + select_sql(opts)) do |r|
           analysis << r[QUERY_PLAN]
         end
         analysis.join("\r\n")
@@ -475,9 +475,9 @@ module Sequel
           used_fields << field
         
           if translator = translators[idx]
-            kvs << ":#{field} => ((t = r[#{idx}]) ? t.#{translator} : nil)"
+            kvs << ":\"#{field}\" => ((t = r[#{idx}]) ? t.#{translator} : nil)"
           else
-            kvs << ":#{field} => r[#{idx}]"
+            kvs << ":\"#{field}\" => r[#{idx}]"
           end
         end
         if klass
