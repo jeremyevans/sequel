@@ -336,11 +336,20 @@ module Sequel
       end
     
       EXPLAIN = 'EXPLAIN '.freeze
+      EXPLAIN_ANALYZE = 'EXPLAIN ANALYZE '.freeze
       QUERY_PLAN = 'QUERY PLAN'.to_sym
     
       def explain(opts = nil)
         analysis = []
         query_each(EXPLAIN + select_sql(opts)) do |r|
+          analysis << r[QUERY_PLAN]
+        end
+        analysis.join("\r\n")
+      end
+      
+      def analyze(opts = nil)
+        analysis = []
+        query_each(EXPLAIN_ANALYZE + select_sql(opts)) do |r|
           analysis << r[QUERY_PLAN]
         end
         analysis.join("\r\n")
