@@ -1,5 +1,7 @@
 *SVN*
 
+* Added some common pragmas to sqlite adapter.
+
 * Added Postgres::Dataset#analyze for EXPLAIN ANALYZE queries.
 
 * Fixed broken Postgres::Dataset#explain.

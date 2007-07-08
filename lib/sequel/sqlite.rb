@@ -58,6 +58,48 @@ module Sequel
           end
         end
       end
+      
+      def pragma_get(name)
+        single_value("PRAGMA #{name};")
+      end
+      
+      def pragma_set(name, value)
+        execute("PRAGMA #{name} = #{value};")
+      end
+      
+      AUTO_VACUUM = {'0' => :none, '1' => :full, '2' => :incremental}.freeze
+      
+      def auto_vacuum
+        AUTO_VACUUM[pragma_get(:auto_vacuum)]
+      end
+      
+      def auto_vacuum=(value)
+        value = AUTO_VACUUM.index(value) || (raise "Invalid value for auto_vacuum option. Please specify one of :none, :full, :incremental.")
+        pragma_set(:auto_vacuum, value)
+      end
+      
+      SYNCHRONOUS = {'0' => :off, '1' => :normal, '2' => :full}.freeze
+      
+      def synchronous
+        SYNCHRONOUS[pragma_get(:synchronous)]
+      end
+      
+      def synchronous=(value)
+        value = SYNCHRONOUS.index(value) || (raise "Invalid value for synchronous option. Please specify one of :off, :normal, :full.")
+        pragma_set(:synchronous, value)
+      end
+      
+      TEMP_STORE = {'0' => :default, '1' => :file, '2' => :memory}.freeze
+      
+      def temp_store
+        TEMP_STORE[pragma_get(:temp_store)]
+      end
+      
+      def temp_store=(value)
+        value = TEMP_STORE.index(value) || (raise "Invalid value for temp_store option. Please specify one of :default, :file, :memory.")
+        pragma_set(:temp_store, value)
+      end
+      
     end
     
     class Dataset < Sequel::Dataset
