@@ -67,7 +67,7 @@ Sequel also offers convenience methods for extracting data from Datasets, such a
   
 Or getting results as a transposed hash, with one column as key and another as value:
 
-  middle_east.hash_column(:name, :area) #=> {'Israel' => 20000, 'Greece' => 120000, ...}
+  middle_east.to_hash(:name, :area) #=> {'Israel' => 20000, 'Greece' => 120000, ...}
 
 Much of Sequel is still undocumented (especially the part relating to model classes). The following section provides examples of common usage. Feel free to explore...
 

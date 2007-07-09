@@ -671,14 +671,14 @@ context "Dataset#map" do
   end
 end
 
-context "Dataset#hash_column" do
+context "Dataset#to_hash" do
   setup do
     @d = DummyDataset.new(nil)
   end
   
   specify "should provide a hash with the first field as key and the second as value" do
-    @d.hash_column(:a, :b).should == {1 => 2, 3 => 4, 5 => 6}
-    @d.hash_column(:b, :a).should == {2 => 1, 4 => 3, 6 => 5}
+    @d.to_hash(:a, :b).should == {1 => 2, 3 => 4, 5 => 6}
+    @d.to_hash(:b, :a).should == {2 => 1, 4 => 3, 6 => 5}
   end
 end
 

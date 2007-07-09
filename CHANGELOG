@@ -1,5 +1,7 @@
 *SVN*
 
+* Renamed Dataset#hash_column to Dataset#to_hash.
+
 * Added some common pragmas to sqlite adapter.
 
 * Added Postgres::Dataset#analyze for EXPLAIN ANALYZE queries.

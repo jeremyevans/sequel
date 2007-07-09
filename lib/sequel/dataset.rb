@@ -441,7 +441,7 @@ module Sequel
     end
     
     # Returns a hash with one column used as key and another used as value.
-    def hash_column(key_column, value_column)
+    def to_hash(key_column, value_column)
       inject({}) do |m, r|
         m[r[key_column]] = r[value_column]
         m
