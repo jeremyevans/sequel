@@ -44,10 +44,11 @@ module Sequel
         end
       end
 
-      def each(opts = nil, &block)
+      def fetch_rows(sql, &block)
         @db.synchronize do
-          s = @db.execute select_sql(opts)
+          s = @db.execute sql
           begin
+            @columns = stmt.column_names.map {|c| c.to_sym}
             s.fetch {|r| yield hash_row(s, r)}
           ensure
             s.finish rescue nil
@@ -57,8 +58,8 @@ module Sequel
       end
       
       def hash_row(stmt, row)
-        stmt.column_names.inject({}) do |m, n|
-          m[n.to_sym] = row.shift
+        @columns.inject({}) do |m, c|
+          m[c] = row.shift
           m
         end
       end

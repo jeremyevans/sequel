@@ -48,15 +48,6 @@ module Sequel
     end
     
     class Dataset < Sequel::Dataset
-      def each(opts = nil, &block)
-        query_each(select_sql(opts), true, &block)
-        self
-      end
-      
-      def count(opts = nil)
-        query_single_value(count_sql(opts)).to_i
-      end
-    
       def insert(*values)
         @db.execute_insert(insert_sql(*values))
       end
@@ -69,15 +60,12 @@ module Sequel
         @db.execute_affected(delete_sql(opts))
       end
       
-      def query_each(sql, use_model_class = false)
+      def fetch_rows(sql)
         @db.synchronize do
           result = @db.execute(sql)
           begin
-            if use_model_class && @model_class
-              result.each_hash {|r| yield @model_class.new(r)}
-            else
-              result.each_hash {|r| yield r}
-            end
+            fetch_columns(result)
+            result.each_hash {|r| yield r}
           ensure
             result.free
           end
@@ -85,39 +73,8 @@ module Sequel
         self
       end
       
-      def single_record(opts = nil)
-        query_single(select_sql(opts), true)
-      end
-      
-      def single_value(opts = nil)
-        query_single_value(select_sql(opts))
-      end
-      
-      def query_single(sql, use_model_class = false)
-        @db.synchronize do
-          result = @db.execute(sql)
-          begin
-            if use_model_class && @model_class
-              row = @model_class.new(result.fetch_hash)
-            else
-              row = result.fetch_hash
-            end
-          ensure
-            result.free
-          end
-          row
-        end
-      end
-      
-      def query_single_value(sql)
-        @db.synchronize do
-          result = @db.execute(sql)
-          begin
-            return result.fetch_hash.values[0]
-          ensure
-            result.free
-          end
-        end
+      def fetch_columns(result)
+        @columns = result.fetch_fields.map {|c| c.name.to_sym}
       end
     end
   end

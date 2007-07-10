@@ -44,19 +44,9 @@ module Sequel
         @pool.hold {|conn| conn.get_first_value(sql)}
       end
       
-      def result_set(sql, model_class, &block)
+      def query(sql, &block)
         @logger.info(sql) if @logger
-        @pool.hold do |conn|
-          conn.query(sql) do |result|
-            columns = result.columns
-            column_count = columns.size
-            result.each do |values|
-              row = {}
-              column_count.times {|i| row[columns[i].to_sym] = values[i]}
-              block.call(model_class ? model_class.new(row) : row)
-            end
-          end
-        end
+        @pool.hold {|conn| conn.query(sql, &block)}
       end
       
       def pragma_get(name)
@@ -74,7 +64,7 @@ module Sequel
       end
       
       def auto_vacuum=(value)
-        value = AUTO_VACUUM.index(value) || (raise "Invalid value for auto_vacuum option. Please specify one of :none, :full, :incremental.")
+        value = AUTO_VACUUM.index(value) || (raise SequelError, "Invalid value for auto_vacuum option. Please specify one of :none, :full, :incremental.")
         pragma_set(:auto_vacuum, value)
       end
       
@@ -85,7 +75,7 @@ module Sequel
       end
       
       def synchronous=(value)
-        value = SYNCHRONOUS.index(value) || (raise "Invalid value for synchronous option. Please specify one of :off, :normal, :full.")
+        value = SYNCHRONOUS.index(value) || (raise SequelError, "Invalid value for synchronous option. Please specify one of :off, :normal, :full.")
         pragma_set(:synchronous, value)
       end
       
@@ -96,7 +86,7 @@ module Sequel
       end
       
       def temp_store=(value)
-        value = TEMP_STORE.index(value) || (raise "Invalid value for temp_store option. Please specify one of :default, :file, :memory.")
+        value = TEMP_STORE.index(value) || (raise SequelError, "Invalid value for temp_store option. Please specify one of :default, :file, :memory.")
         pragma_set(:temp_store, value)
       end
       
@@ -111,9 +101,16 @@ module Sequel
         end
       end
 
-      def each(opts = nil, &block)
-        @db.result_set(select_sql(opts), @model_class, &block)
-        self
+      def fetch_rows(sql, &block)
+        @db.query(sql) do |result|
+          @columns = result.columns.map {|c| c.to_sym}
+          column_count = @columns.size
+          result.each do |values|
+            row = {}
+            column_count.times {|i| row[@columns[i]] = values[i]}
+            block.call(row)
+          end
+        end
       end
     
       def insert(*values)

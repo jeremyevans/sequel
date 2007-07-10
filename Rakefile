@@ -46,8 +46,7 @@ spec = Gem::Specification.new do |s|
   s.add_dependency('metaid')
   s.required_ruby_version = '>= 1.8.2'
 
-#  s.files = %w(COPYING README Rakefile) + Dir.glob("{doc,spec,lib}/**/*")
-  s.files = %w(COPYING README Rakefile) + Dir.glob("{bin,doc,lib}/**/*")
+  s.files = %w(COPYING README Rakefile) + Dir.glob("{bin,doc,spec,lib}/**/*")
       
   s.require_path = "lib"
   s.bindir = "bin"
@@ -78,6 +77,17 @@ require 'spec/rake/spectask'
 desc "Run specs with coverage"
 Spec::Rake::SpecTask.new('spec') do |t|
   t.spec_files = FileList['spec/*_spec.rb']
+  t.rcov = true
+end
+
+desc "Run adapter specs without coverage"
+Spec::Rake::SpecTask.new('spec_adapters') do |t|
+  t.spec_files = FileList['spec/adapters/*_spec.rb']
+end
+
+desc "Run all specs with coverage"
+Spec::Rake::SpecTask.new('spec_all') do |t|
+  t.spec_files = FileList['spec/*_spec.rb', 'spec/adapters/*_spec.rb']
   t.rcov = true
 end
 

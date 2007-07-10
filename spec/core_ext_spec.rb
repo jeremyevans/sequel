@@ -10,57 +10,45 @@ end
 
 context "Array#to_sql" do
   specify "should concatenate multiple lines into a single string" do
-    "SELECT * 
-     FROM items
-     WHERE a = 1".split.to_sql.should == 'SELECT * FROM items WHERE a = 1'
+    "SELECT * \r\nFROM items\r\n WHERE a = 1".split.to_sql. \
+      should == 'SELECT * FROM items WHERE a = 1'
   end
   
   specify "should remove superfluous white space and line breaks" do
-    "\tSELECT * \r\n
-     FROM items    ".split.to_sql.should == 'SELECT * FROM items'
+    "\tSELECT * \n FROM items    ".split.to_sql. \
+      should == 'SELECT * FROM items'
   end
   
   specify "should remove ANSI SQL comments" do
-    "SELECT *   --comment
-     FROM items
-     --comment".split.to_sql.should == 'SELECT * FROM items'
+    "SELECT *   --comment\r\n  FROM items\r\n  --comment".split.to_sql. \
+      should == 'SELECT * FROM items'
   end
   
   specify "should remove C-style comments" do
-    "SELECT *
-     /* comment comment
-     comment
-     FROM items */
-     FROM items
-     --comment".split.to_sql.should == 'SELECT * FROM items'
+    "SELECT * \r\n /* comment comment\r\n comment\r\n FROM items */\r\n FROM items\r\n--comment".split.to_sql. \
+      should == 'SELECT * FROM items'
   end
 end
 
 context "String#to_sql" do
   specify "should concatenate multiple lines into a single string" do
-    "SELECT * 
-     FROM items
-     WHERE a = 1".to_sql.should == 'SELECT * FROM items WHERE a = 1'
+    "SELECT * \r\nFROM items\r\nWHERE a = 1".to_sql. \
+      should == 'SELECT * FROM items WHERE a = 1'
   end
   
   specify "should remove superfluous white space and line breaks" do
-    "\tSELECT * \r\n
-     FROM items    ".to_sql.should == 'SELECT * FROM items'
+    "\tSELECT * \r\n FROM items    ".to_sql. \
+      should == 'SELECT * FROM items'
   end
   
   specify "should remove ANSI SQL comments" do
-    "SELECT *   --comment
-     FROM items
-     --comment".to_sql.should == 'SELECT * FROM items'
+    "SELECT *   --comment \r\n FROM items\r\n  --comment".to_sql. \
+      should == 'SELECT * FROM items'
   end
   
   specify "should remove C-style comments" do
-    "SELECT *
-     /* comment comment
-     comment
-     FROM items */
-     FROM items
-     --comment".to_sql.should == 'SELECT * FROM items'
+    "SELECT * \r\n/* comment comment\r\ncomment\r\nFROM items */\r\nFROM items\r\n--comment".to_sql. \
+      should == 'SELECT * FROM items'
   end
 end
 
@@ -73,13 +61,13 @@ end
 
 context "String#split_sql" do
   specify "should split a string containing multiple statements" do
-    "DROP TABLE a; DROP TABLE c".split_sql.should ==
-    ['DROP TABLE a', 'DROP TABLE c']
+    "DROP TABLE a; DROP TABLE c".split_sql.should == \
+      ['DROP TABLE a', 'DROP TABLE c']
   end
   
   specify "should remove comments from the string" do
-    "DROP TABLE a;/* DROP TABLE b; DROP TABLE c;*/DROP TABLE d".split_sql.should ==
-    ['DROP TABLE a', 'DROP TABLE d']
+    "DROP TABLE a;/* DROP TABLE b; DROP TABLE c;*/DROP TABLE d".split_sql.should == \
+      ['DROP TABLE a', 'DROP TABLE d']
   end
 end
 

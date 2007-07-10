@@ -277,19 +277,6 @@ module Sequel
       
       def literal(v)
         case v
-        # when String: "'%s'" % v.gsub(/'/, "''")
-        # when Integer, Float: v.to_s
-        # when NilClass: NULL
-        # when Symbol: v.to_field_name
-        # when Array: v.empty? ? NULL : v.map {|i| literal(i)}.join(COMMA_SEPARATOR)
-        # when Time: v.strftime(TIMESTAMP_FORMAT)
-        # when Date: v.strftime(DATE_FORMAT)
-        # when Dataset: "(#{v.sql})"
-        # when true: TRUE
-        # when false: FALSE
-        # else
-        #   raise SequelError, "can't express #{v.inspect}:#{v.class} as a SQL literal"
-        # end
         when String, Fixnum, Float, TrueClass, FalseClass: PGconn.quote(v)
         else
           super
@@ -309,11 +296,6 @@ module Sequel
         end
       end
       
-      def each(opts = nil, &block)
-        query_each(select_sql(opts), true, &block)
-        self
-      end
-      
       FOR_UPDATE = ' FOR UPDATE'.freeze
       FOR_SHARE = ' FOR SHARE'.freeze
     
@@ -328,11 +310,11 @@ module Sequel
       end
     
       def for_update
-        dup_merge(:lock => :update)
+        clone_merge(:lock => :update)
       end
     
       def for_share
-        dup_merge(:lock => :share)
+        clone_merge(:lock => :share)
       end
     
       EXPLAIN = 'EXPLAIN '.freeze
@@ -341,7 +323,7 @@ module Sequel
     
       def explain(opts = nil)
         analysis = []
-        query_each(EXPLAIN + select_sql(opts)) do |r|
+        fetch_rows(EXPLAIN + select_sql(opts)) do |r|
           analysis << r[QUERY_PLAN]
         end
         analysis.join("\r\n")
@@ -349,7 +331,7 @@ module Sequel
       
       def analyze(opts = nil)
         analysis = []
-        query_each(EXPLAIN_ANALYZE + select_sql(opts)) do |r|
+        fetch_rows(EXPLAIN_ANALYZE + select_sql(opts)) do |r|
           analysis << r[QUERY_PLAN]
         end
         analysis.join("\r\n")
@@ -408,20 +390,11 @@ module Sequel
         end
       end
       
-      def single_record(opts = nil)
-        query_single(select_sql(opts), true)
-      end
-      
-      def single_value(opts = nil)
-        query_single_value(select_sql(opts))
-      end
-      
-      def query_each(sql, use_model_class = false, &block)
+      def fetch_rows(sql, &block)
         @db.synchronize do
           result = @db.execute(sql)
           begin
-            # each_row(result, use_model_class, &block)
-            conv = row_converter(result, use_model_class)
+            conv = row_converter(result)
             result.each {|r| yield conv[r]}
           ensure
             result.clear
@@ -429,54 +402,25 @@ module Sequel
         end
       end
       
-      def query_single(sql, use_model_class = false)
-        @db.synchronize do
-          result = @db.execute(sql)
-          begin
-            row = nil
-            conv = row_converter(result, use_model_class)
-            result.each {|r| row = conv.call(r)}
-          ensure
-            result.clear
-          end
-          row
-        end
-      end
-      
-      def query_single_value(sql)
-        @db.synchronize do
-          result = @db.execute(sql)
-          begin
-            value = result.getvalue(0, 0)
-            if value
-              value = value.send(PG_TYPES[result.type(0)])
-            end
-          ensure
-            result.clear
-          end
-          value
-        end
-      end
-      
       @@converters_mutex = Mutex.new
       @@converters = {}
 
-      def row_converter(result, use_model_class)
+      def row_converter(result)
         fields = []; translators = []
         result.fields.each_with_index do |f, idx|
           fields << f.to_sym
           translators << PG_TYPES[result.type(idx)]
         end
-        klass = use_model_class && @model_class
+        @columns = fields
         
         # create result signature and memoize the converter
-        sig = [fields, translators, klass].hash
+        sig = [fields, translators].hash
         @@converters_mutex.synchronize do
-          @@converters[sig] ||= compile_converter(fields, translators, klass)
+          @@converters[sig] ||= compile_converter(fields, translators)
         end
       end
     
-      def compile_converter(fields, translators, klass)
+      def compile_converter(fields, translators)
         used_fields = []
         kvs = []
         fields.each_with_index do |field, idx|
@@ -489,11 +433,7 @@ module Sequel
             kvs << ":\"#{field}\" => r[#{idx}]"
           end
         end
-        if klass
-          eval("lambda {|r| #{klass}.new(#{kvs.join(COMMA_SEPARATOR)})}")
-        else
-          eval("lambda {|r| {#{kvs.join(COMMA_SEPARATOR)}}}")
-        end
+        eval("lambda {|r| {#{kvs.join(COMMA_SEPARATOR)}}}")
       end
     end
   end

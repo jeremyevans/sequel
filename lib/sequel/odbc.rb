@@ -44,12 +44,13 @@ module Sequel
         end
       end
 
-      def each(opts = nil, &block)
+      def fetch_rows(sql, &block)
         @db.synchronize do
-          s = @db.execute select_sql(opts)
+          s = @db.execute select_sql(sql)
           begin
-            fetch_rows(s, &block)
-            s.fetch {|r| yield hash_row(s, r)}
+            @columns = s.columns(true).map {|c| c.name.to_sym}
+            rows = s.fetch_all
+            rows.each {|row| yield hash_row(row)}
           ensure
             s.drop unless s.nil? rescue nil
           end
@@ -57,16 +58,10 @@ module Sequel
         self
       end
       
-      def fetch_rows(stmt)
-        columns = stmt.columns(true).map {|c| c.name.to_sym}
-        rows = stmt.fetch_all
-        rows.each {|row| yield hash_row(stmt, columns, row)}
-      end
-      
-      def hash_row(stmt, columns, row)
+      def hash_row(row)
         hash = {}
         row.each_with_index do |v, idx|
-          hash[columns[idx]] = convert_odbc_value(v)
+          hash[@columns[idx]] = convert_odbc_value(v)
         end
         hash
       end

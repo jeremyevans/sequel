@@ -24,7 +24,7 @@ module Sequel
     end
     
     def connect
-      true # we can't return nil or false, because then pool will block forever
+      raise NotImplementedError, "#connect should be overriden by adapters"
     end
     
     def uri
@@ -47,7 +47,7 @@ module Sequel
     
     # Returns a blank dataset
     def dataset
-      Dataset.new(self)
+      Sequel::Dataset.new(self)
     end
 
     # Returns a new dataset with the from method invoked.

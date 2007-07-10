@@ -28,7 +28,39 @@ context "A new Database" do
   end
 end
 
-context "Database dataset methods" do
+context "Database#connect" do
+  specify "should raise NotImplementedError" do
+    proc {Sequel::Database.new.connect}.should raise_error(NotImplementedError)
+  end
+end
+
+context "Database#uri" do
+  setup do
+    @c = Class.new(Sequel::Database) do
+      set_adapter_scheme :mau
+    end
+    
+    @db = Sequel('mau://user:pass@localhost:9876/maumau')
+  end
+  
+  specify "should return the connection URI for the database" do
+    @db.uri.should == 'mau://user:pass@localhost:9876/maumau'
+  end
+end
+
+context "Database.adapter_scheme" do
+  specify "should return the database schema" do
+    Sequel::Database.adapter_scheme.should be_nil
+
+    @c = Class.new(Sequel::Database) do
+      set_adapter_scheme :mau
+    end
+    
+    @c.adapter_scheme.should == :mau
+  end
+end
+
+context "Database#dataset" do
   setup do
     @db = Sequel::Database.new
     @ds = @db.dataset
@@ -77,23 +109,23 @@ context "Database#<<" do
   end
   
   specify "should accept an array and convert it to SQL" do
-    a = "
+    a = %[
       --
       CREATE TABLE items (a integer, /*b integer*/
         b text, c integer);
       DROP TABLE old_items;
-    ".split($/)
+    ].split($/)
     (@db << a).should == 
       "CREATE TABLE items (a integer, b text, c integer); DROP TABLE old_items;"
   end
   
   specify "should remove comments and whitespace from strings as well" do
-    s = "
+    s = %[
       --
       CREATE TABLE items (a integer, /*b integer*/
         b text, c integer); \r\n
       DROP TABLE old_items;
-    "
+    ]
     (@db << s).should == 
       "CREATE TABLE items (a integer, b text, c integer); DROP TABLE old_items;"
   end

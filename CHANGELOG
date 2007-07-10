@@ -1,5 +1,17 @@
 *SVN*
 
+* Implemented Dataset#columns for retrieving the columns in the result set.
+
+* Updated Model with changes to how model-associated datasets work.
+
+* Beefed-up specs. Coverage is now at 95.0%.
+
+* Added support for polymorphic datasets.
+
+* The adapter dataset interface was simplified and standardized. Only four methods need be overriden: fetch_rows, update, insert and delete.
+
+* The Dataset class was refactored. The bulk of the dataset code was moved into separate modules.
+
 * Renamed Dataset#hash_column to Dataset#to_hash.
 
 * Added some common pragmas to sqlite adapter.

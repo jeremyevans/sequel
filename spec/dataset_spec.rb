@@ -5,31 +5,28 @@ context "Dataset" do
     @dataset = Sequel::Dataset.new("db")
   end
   
-  specify "should accept database, opts and model_class in initialize" do
+  specify "should accept database and opts in initialize" do
     db = 'db'
     opts = {:from => :test}
-    a_class = Class.new
-    d = Sequel::Dataset.new(db, opts, a_class)
+    d = Sequel::Dataset.new(db, opts)
     d.db.should be(db)
     d.opts.should be(opts)
-    d.model_class.should be(a_class)
     
     d = Sequel::Dataset.new(db)
     d.db.should be(db)
     d.opts.should be_a_kind_of(Hash)
     d.opts.should == {}
-    d.model_class.should be_nil
   end
   
-  specify "should provide dup_merge for chainability." do
-    d1 = @dataset.dup_merge(:from => :test)
+  specify "should provide clone_merge for chainability." do
+    d1 = @dataset.clone_merge(:from => :test)
     d1.class.should == @dataset.class
     d1.should_not == @dataset
     d1.db.should be(@dataset.db)
     d1.opts[:from].should == :test
     @dataset.opts[:from].should be_nil
     
-    d2 = d1.dup_merge(:order => :name)
+    d2 = d1.clone_merge(:order => :name)
     d2.class.should == @dataset.class
     d2.should_not == d1
     d2.should_not == @dataset
@@ -37,22 +34,54 @@ context "Dataset" do
     d2.opts[:from].should == :test
     d2.opts[:order].should == :name
     d1.opts[:order].should be_nil
-    
-    # dup_merge should preserve @model_class
-    a_class = Class.new
-    d3 = Sequel::Dataset.new("db", nil, a_class)
-    d3.db.should_not be(@dataset.db)
-    d4 = @dataset.dup_merge({})
-    d4.db.should be(@dataset.db)
-    d3.model_class.should be(a_class)
-    d4.model_class.should be_nil
-    d5 = d3.dup_merge(:from => :test)
-    d5.db.should be(d3.db)
-    d5.model_class.should == a_class
   end
   
   specify "should include Enumerable" do
     Sequel::Dataset.included_modules.should include(Enumerable)
+  end
+  
+  specify "should raise NotImplementedError for the dataset interface methods" do
+    proc {@dataset.fetch_rows('abc')}.should raise_error(NotImplementedError)
+    proc {@dataset.insert(1, 2, 3)}.should raise_error(NotImplementedError)
+    proc {@dataset.update(:name => 'abc')}.should raise_error(NotImplementedError)
+    proc {@dataset.delete}.should raise_error(NotImplementedError)
+  end
+end
+
+context "Dataset#clone_merge" do
+  setup do
+    @dataset = Sequel::Dataset.new(nil).from(:items)
+  end
+  
+  specify "should return a clone self" do
+    clone = @dataset.clone_merge({})
+    clone.class.should == @dataset.class
+    clone.db.should == @dataset.db
+    clone.opts.should == @dataset.opts
+  end
+  
+  specify "should merge the specified options" do
+    clone = @dataset.clone_merge(1 => 2)
+    clone.opts.should == {1 => 2, :from => [:items]}
+  end
+  
+  specify "should overwrite existing options" do
+    clone = @dataset.clone_merge(:from => [:other])
+    clone.opts.should == {:from => [:other]}
+  end
+  
+  specify "should create a clone with a deep copy of options" do
+    clone = @dataset.clone_merge(:from => [:other])
+    @dataset.opts[:from].should == [:items]
+    clone.opts[:from].should == [:other]
+  end
+  
+  specify "should return an object with the same modules included" do
+    m = Module.new do
+      def __xyz__; "xyz"; end
+    end
+    @dataset.extend(m)
+    @dataset.clone_merge({}).should respond_to(:__xyz__)
   end
 end
 
@@ -609,20 +638,18 @@ end
 
 context "Dataset#naked" do
   setup do
-    @d1 = Sequel::Dataset.new(nil, {1 => 2, 3 => 4}, Class.new)
-    @d2 = Sequel::Dataset.new(nil, {5 => 6, 7 => 8})
+    @d1 = Sequel::Dataset.new(nil, {1 => 2, 3 => 4})
+    @d2 = Sequel::Dataset.new(nil, {1 => 2, 3 => 4}).set_model(Object)
   end
   
-  specify "should return self if already naked (no record class)" do
-    @d2.naked.should be(@d2)
-    @d1.naked.should_not be(@d1)
-  end
-  
-  specify "should return a naked copy of self (no record class)" do
+  specify "should return a clone with :naked option set" do
     naked = @d1.naked
-    naked.should_not be(@d1)
-    naked.model_class.should be_nil
-    naked.opts.should == @d1.opts
+    naked.opts[:naked].should be_true
+  end
+  
+  specify "should remove any existing reference to a model class" do
+    naked = @d2.naked
+    naked.opts[:models].should be_nil
   end
 end
 
@@ -648,14 +675,14 @@ class DummyDataset < Sequel::Dataset
     {:a => 3, :b => 4},
     {:a => 5, :b => 6}
   ]
-  def each(&block)
+  def fetch_rows(sql, &block)
     VALUES.each(&block)
   end
 end
 
 context "Dataset#map" do
   setup do
-    @d = DummyDataset.new(nil)
+    @d = DummyDataset.new(nil).from(:items)
   end
   
   specify "should provide the usual functionality if no argument is given" do
@@ -673,7 +700,7 @@ end
 
 context "Dataset#to_hash" do
   setup do
-    @d = DummyDataset.new(nil)
+    @d = DummyDataset.new(nil).from(:items)
   end
   
   specify "should provide a hash with the first field as key and the second as value" do
@@ -703,8 +730,8 @@ context "Dataset#count" do
         @@sql
       end
       
-      def each(opts = nil)
-        @@sql = select_sql(opts)
+      def fetch_rows(sql)
+        @@sql = sql
         yield({1 => 1})
       end
     end
@@ -805,22 +832,6 @@ context "Dataset#join_table" do
   end
 end
 
-context "Dataset#<<" do
-  setup do
-    c = Class.new(Sequel::Dataset) do
-      def insert(*args)
-        args
-      end
-    end
-    
-    @d = c.new(nil)
-  end
-  
-  specify "should call Dataset#insert" do
-    (@d << {:a => 1, :b => 2}).should == [{:a => 1, :b => 2}]
-  end
-end
-
 context "Dataset#[]=" do
   setup do
     c = Class.new(Sequel::Dataset) do
@@ -870,31 +881,31 @@ end
 context "Dataset aggregate methods" do
   setup do
     c = Class.new(Sequel::Dataset) do
-      def each(opts = nil)
-        yield({1 => opts[:select].first})
+      def fetch_rows(sql)
+        yield({1 => sql})
       end
     end
     @d = c.new(nil).from(:test)
   end
   
   specify "should include min" do
-    @d.min(:a).should == 'min(a)'
+    @d.min(:a).should == 'SELECT min(a) FROM test'
   end
   
   specify "should include max" do
-    @d.max(:b).should == 'max(b)'
+    @d.max(:b).should == 'SELECT max(b) FROM test'
   end
   
   specify "should include sum" do
-    @d.sum(:c).should == 'sum(c)'
+    @d.sum(:c).should == 'SELECT sum(c) FROM test'
   end
   
   specify "should include avg" do
-    @d.avg(:d).should == 'avg(d)'
+    @d.avg(:d).should == 'SELECT avg(d) FROM test'
   end
   
   specify "should accept qualified fields" do
-    @d.avg(:test__bc).should == 'avg(test.bc)'
+    @d.avg(:test__bc).should == 'SELECT avg(test.bc) FROM test'
   end
 end
 
@@ -965,7 +976,7 @@ context "Dataset#last" do
       end
 
       def single_record(opts = nil)
-        @@last_dataset = dup_merge(opts) if opts
+        @@last_dataset = clone_merge(opts) if opts
         {:a => 1, :b => 2}
       end
       
@@ -1063,7 +1074,7 @@ context "Dataset#[]" do
       end
 
       def single_record(opts = nil)
-        @@last_dataset = opts ? dup_merge(opts) : self
+        @@last_dataset = opts ? clone_merge(opts) : self
         {1 => 2, 3 => 4}
       end
     end
@@ -1082,25 +1093,23 @@ end
 context "Dataset#single_record" do
   setup do
     @c = Class.new(Sequel::Dataset) do
-      def each(opts = nil)
-        opts = opts ? @opts.merge(opts) : @opts
-        yield opts
-        yield 2
+      def fetch_rows(sql)
+        yield sql
       end
     end
     @cc = Class.new(@c) do
-      def each(opts = nil); end
+      def fetch_rows(sql); end
     end
     @d = @c.new(nil).from(:test)
     @e = @cc.new(nil).from(:test)
   end
   
   specify "should call each and return the first record" do
-    @d.single_record.should == @d.opts
+    @d.single_record.should == 'SELECT * FROM test'
   end
   
   specify "should pass opts to each" do
-    @d.single_record(:a => :b).should == @d.opts.merge(:a => :b)
+    @d.single_record(:limit => 3).should == 'SELECT * FROM test LIMIT 3'
   end
   
   specify "should return nil if no record is present" do
@@ -1111,52 +1120,330 @@ end
 context "Dataset#single_value" do
   setup do
     @c = Class.new(Sequel::Dataset) do
-      def each(opts = nil)
-        yield({1 => (opts && opts[:a]) || 2})
+      def fetch_rows(sql)
+        yield({1 => sql})
       end
     end
     @d = @c.new(nil).from(:test)
   end
   
   specify "should call each and return the first value of the first record" do
-    @d.single_value.should == 2
+    @d.single_value.should == 'SELECT * FROM test'
   end
   
   specify "should pass opts to each" do
-    @d.single_value(:a => :b).should == :b
+    @d.single_value(:limit => 3).should == 'SELECT * FROM test LIMIT 3'
+  end
+end
+
+context "Dataset#set_model" do
+  setup do
+    @c = Class.new(Sequel::Dataset) do
+      def fetch_rows(sql, &block)
+        (1..10).each(&block)
+      end
+    end
+    @dataset = @c.new(nil).from(:items)
+    @m = Class.new do
+      attr_accessor :c
+      def initialize(c); @c = c; end
+      def ==(o); @c == o.c; end
+    end
+  end
+  
+  specify "should clear the models hash and restore the stock #each if nil is specified" do
+    @dataset.set_model(@m)
+    @dataset.set_model(nil)
+    @dataset.first.should == 1
+    @dataset.model_classes.should be_nil
+  end
+  
+  specify "should clear the models hash and restore the stock #each if nothing is specified" do
+    @dataset.set_model(@m)
+    @dataset.set_model
+    @dataset.first.should == 1
+    @dataset.model_classes.should be_nil
+  end
+  
+  specify "should alter #each to provide model instances" do
+    @dataset.first.should == 1
+    @dataset.set_model(@m)
+    @dataset.first.should == @m.new(1)
+  end
+  
+  specify "should extend the dataset with a #destroy method" do
+    @dataset.should_not respond_to(:destroy)
+    @dataset.set_model(@m)
+    @dataset.should respond_to(:destroy)
+  end
+  
+  specify "should set opts[:naked] to nil" do
+    @dataset.opts[:naked] = true
+    @dataset.set_model(@m)
+    @dataset.opts[:naked].should be_nil
+  end
+  
+  specify "should provide support for polymorphic model instantiation" do
+    @m1 = Class.new(@m)
+    @m2 = Class.new(@m)
+    @dataset.set_model(0, 0 => @m1, 1 => @m2)
+    all = @dataset.all
+    all[0].class.should == @m2
+    all[1].class.should == @m1
+    all[2].class.should == @m2
+    all[3].class.should == @m1
+    #...
+  end
+end
+
+context "Dataset#model_classes" do
+  setup do
+    @c = Class.new(Sequel::Dataset) do
+      # # We don't need that for now
+      # def fetch_rows(sql, &block)
+      #   (1..10).each(&block)
+      # end
+    end
+    @dataset = @c.new(nil).from(:items)
+    @m = Class.new do
+      attr_accessor :c
+      def initialize(c); @c = c; end
+      def ==(o); @c == o.c; end
+    end
+  end
+  
+  specify "should return nil for a naked dataset" do
+    @dataset.model_classes.should == nil
+  end
+  
+  specify "should return a {nil => model_class} hash for a model dataset" do
+    @dataset.set_model(@m)
+    @dataset.model_classes.should == {nil => @m}
+  end
+  
+  specify "should return the polymorphic hash for a polymorphic model dataset" do
+    @m1 = Class.new(@m)
+    @m2 = Class.new(@m)
+    @dataset.set_model(0, 0 => @m1, 1 => @m2)
+    @dataset.model_classes.should == {0 => @m1, 1 => @m2}
+  end
+end
+
+context "Dataset#polymorphic_key" do
+  setup do
+    @c = Class.new(Sequel::Dataset) do
+      # # We don't need this for now
+      # def fetch_rows(sql, &block)
+      #   (1..10).each(&block)
+      # end
+    end
+    @dataset = @c.new(nil).from(:items)
+    @m = Class.new do
+      attr_accessor :c
+      def initialize(c); @c = c; end
+      def ==(o); @c == o.c; end
+    end
+  end
+  
+  specify "should return nil for a naked dataset" do
+    @dataset.polymorphic_key.should be_nil
+  end
+  
+  specify "should return the polymorphic key" do
+    @dataset.set_model(:id, nil => @m)
+    @dataset.polymorphic_key.should == :id
+  end
+end
+
+context "A model dataset" do
+  setup do
+    @c = Class.new(Sequel::Dataset) do
+      def fetch_rows(sql, &block)
+        (1..10).each(&block)
+      end
+    end
+    @dataset = @c.new(nil).from(:items)
+    @m = Class.new do
+      attr_accessor :c
+      def initialize(c); @c = c; end
+      def ==(o); @c == o.c; end
+    end
+    @dataset.set_model(@m)
+  end
+  
+  specify "should supply naked records if the naked option is specified" do
+    @dataset.each {|r| r.class.should == @m}
+    @dataset.each(:naked => true) {|r| r.class.should == Fixnum}
+  end
+end
+
+context "A polymorphic model dataset" do
+  setup do
+    @c = Class.new(Sequel::Dataset) do
+      def fetch_rows(sql, &block)
+        (1..10).each(&block)
+      end
+    end
+    @dataset = @c.new(nil).from(:items)
+    @m = Class.new do
+      attr_accessor :c
+      def initialize(c); @c = c; end
+      def ==(o); @c == o.c; end
+    end
+  end
+  
+  specify "should use a nil key in the polymorphic hash to specify the default model class" do
+    @m2 = Class.new(@m)
+    @dataset.set_model(0, nil => @m, 1 => @m2)
+    all = @dataset.all
+    all[0].class.should == @m2
+    all[1].class.should == @m
+    all[2].class.should == @m2
+    all[3].class.should == @m
+    #...
+  end
+  
+  specify "should raise SequelError if no suitable class is found in the polymorphic hash" do
+    @m2 = Class.new(@m)
+    @dataset.set_model(0, 1 => @m2)
+    proc {@dataset.all}.should raise_error(SequelError)
+  end
+
+  specify "should supply naked records if the naked option is specified" do
+    @dataset.set_model(0, nil => @m)
+    @dataset.each(:naked => true) {|r| r.class.should == Fixnum}
   end
 end
 
 context "Dataset#destroy" do
   setup do
-    @d = Sequel::Dataset.new(nil).from(:test)
-  end
-  
-  specify "should raise exception if no model is associated with the dataset" do
-    proc {@d.destroy}.should raise_error(SequelError)
-  end
-  
-  specify "should call raise for every model in the dataset" do
+    db = Object.new
+    m = Module.new do
+      def transaction; yield; end
+    end
+    db.extend(m)
+    
     DESTROYED = []
-    m = Class.new do
+    
+    @m = Class.new do
+      def initialize(c)
+        @c = c
+      end
+      
+      attr_accessor :c
+      
+      def ==(o)
+        @c == o.c
+      end
+      
       def destroy
         DESTROYED << self
       end
     end
-    MODELS = [m.new, m.new]
+    MODELS = [@m.new(12), @m.new(13)]
+
     c = Class.new(Sequel::Dataset) do
-      def each(opts = nil)
-        MODELS.each {|i| yield i}
+      def fetch_rows(sql, &block)
+        (12..13).each(&block)
       end
     end
-    db = Class.new do
-      def transaction
-        yield
-      end
-    end
-    
-    count = c.new(db.new, {}, m).destroy
+
+    @d = c.new(db).from(:test)
+    @d.set_model(@m)
+  end
+  
+  specify "should destroy raise for every model in the dataset" do
+    count = @d.destroy
     count.should == 2
     DESTROYED.should == MODELS
   end 
+end
+
+context "Dataset#<<" do
+  setup do
+    @d = Sequel::Dataset.new(nil)
+    @d.meta_def(:insert) do
+      1234567890
+    end
+  end
+  
+  specify "should call #insert" do
+    (@d << {:name => 1}).should == 1234567890
+  end
+end
+
+context "A paginated dataset" do
+  setup do
+    @d = Sequel::Dataset.new(nil)
+    @d.meta_def(:count) {153}
+    
+    @paginated = @d.paginate(1, 20)
+  end
+  
+  specify "should set the limit and offset options correctly" do
+    @paginated.opts[:limit].should == 20
+    @paginated.opts[:offset].should == 0
+  end
+  
+  specify "should set the page count correctly" do
+    @paginated.page_count.should == 8
+    @d.paginate(1, 50).page_count.should == 4
+  end
+  
+  specify "should set the current page number correctly" do
+    @paginated.current_page.should == 1
+    @d.paginate(3, 50).current_page.should == 3
+  end
+  
+  specify "should return the next page number or nil if we're on the last" do
+    @paginated.next_page.should == 2
+    @d.paginate(4, 50).next_page.should be_nil
+  end
+  
+  specify "should return the previous page number or nil if we're on the last" do
+    @paginated.prev_page.should be_nil
+    @d.paginate(4, 50).prev_page.should == 3
+  end
+end
+
+context "Dataset#columns" do
+  setup do
+    @dataset = DummyDataset.new(nil).from(:items)
+    @dataset.meta_def(:columns=) {|c| @columns = c}
+    @dataset.meta_def(:first) {@columns = select_sql(nil)}
+  end
+  
+  specify "should return the value of @columns" do
+    @dataset.columns = [:a, :b, :c]
+    @dataset.columns.should == [:a, :b, :c]
+  end
+  
+  specify "should call first if @columns is nil" do
+    @dataset.columns = nil
+    @dataset.columns.should == 'SELECT * FROM items'
+    @dataset.opts[:from] = [:nana]
+    @dataset.columns.should == 'SELECT * FROM items'
+  end
+end
+
+require 'stringio'
+
+context "Dataset#print" do
+  setup do
+    @output = StringIO.new
+    @orig_stdout = $stdout
+    $stdout = @output
+    @dataset = DummyDataset.new(nil).from(:items)
+  end
+  
+  teardown do
+    $stdout = @orig_stdout
+  end
+  
+  specify "should print out a table with the values" do
+    @dataset.print(:a, :b)
+    @output.rewind
+    @output.read.should == \
+      "+-+-+\n|a|b|\n+-+-+\n|1|2|\n|3|4|\n|5|6|\n+-+-+\n"
+  end
 end

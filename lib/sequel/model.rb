@@ -26,14 +26,14 @@ module Sequel
         raise SequelError, "Database not specified for #{self}."
       end
       @dataset = db[table_name]
-      @dataset.model_class = self
+      @dataset.set_model(self)
       @dataset
     end
 
     def self.set_dataset(ds)
       @db = ds.db
       @dataset = ds
-      @dataset.model_class = self
+      @dataset.set_model(self)
     end
     
     def self.cache_by(column, expiration)
