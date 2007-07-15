@@ -4,6 +4,20 @@ end
 
 require 'mysql'
 
+# Monkey patch Mysql::Result to return a hash with symbol keys
+class Mysql::Result
+  def fetch_hash(with_table=nil)
+    row = fetch_row
+    return if row == nil
+    hash = {}
+    @fields.each_index do |i|
+      f = with_table ? @fields[i].table+"."+@fields[i].name : @fields[i].name
+      hash[f.to_sym] = row[i]
+    end
+    hash
+  end
+end
+
 module Sequel
   module MySQL
 

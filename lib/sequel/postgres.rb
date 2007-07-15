@@ -283,14 +283,17 @@ module Sequel
         end
       end
     
-      LIKE = '%s ~ %s'.freeze
+      LIKE = '(%s ~ %s)'.freeze
       LIKE_CI = '%s ~* %s'.freeze
       
       def format_eq_expression(left, right)
         case right
         when Regexp:
-          (right.casefold? ? LIKE_CI : LIKE) %
-            [field_name(left), PGconn.quote(right.source)]
+          l = field_name(left)
+          r = PGconn.quote(right.source)
+          right.casefold? ? \
+            "(#{l} ~* #{r})" : \
+            "(#{l} ~ #{r})"
         else
           super
         end
