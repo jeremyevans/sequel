@@ -96,8 +96,8 @@ module Sequel
         case right
         when Range:
           right.exclude_end? ? \
-            "(#{left} >= #{right.begin} AND #{left} < #{right.end})" : \
-            "(#{left} >= #{right.begin} AND #{left} <= #{right.end})"
+            "(#{left} >= #{literal(right.begin)} AND #{left} < #{literal(right.end)})" : \
+            "(#{left} >= #{literal(right.begin)} AND #{left} <= #{literal(right.end)})"
         when Array:
           "(#{left} IN (#{literal(right)}))"
         when Dataset:

@@ -1,5 +1,7 @@
 === SVN
 
+* Fixed bug in Dataset#format_eq_expression where Range objects would not be literalized correctly.
+
 * Added parens around postgres LIKE expressions using regexps.
 
 === 0.1.8 (2007-07-10)
