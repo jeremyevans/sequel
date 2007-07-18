@@ -5,6 +5,26 @@ require File.join(File.dirname(__FILE__), 'dataset')
 require File.join(File.dirname(__FILE__), 'model')
 
 module Sequel
+  # A SingleThreadedPool acts as a replacement for a ConnectionPool for use
+  # in single-threaded applications. ConnectionPool imposes a substantial
+  # performance penalty, so SingleThreadedPool is used to gain some speed.
+  class SingleThreadedPool
+    attr_writer :connection_proc
+    
+    def initialize(&block)
+      @connection_proc = block
+    end
+    
+    def hold
+      @conn ||= @connection_proc.call
+      yield @conn
+    rescue StandardError => e
+      raise e
+    rescue Exception => e
+      raise e.message
+    end
+  end
+  
   # A Database object represents a virtual connection to a database.
   # The Database class is meant to be subclassed by database adapters in order
   # to provide the functionality needed for executing queries.
@@ -18,13 +38,30 @@ module Sequel
     def initialize(opts = {}, &block)
       Model.database_opened(self)
       @opts = opts
-      @pool = ConnectionPool.new(@opts[:max_connections] || 4, &block)
-      @logger = opts[:logger]
+      
+      # Determine if the DB is single threaded or multi threaded
+      @single_threaded = opts[:single_threaded] || @@single_threaded
+      # Construct pool
+      if @single_threaded
+        @pool = SingleThreadedPool.new(&block)
+      else
+        @pool = ConnectionPool.new(opts[:max_connections] || 4, &block)
+      end
       @pool.connection_proc = block || proc {connect}
+
+      @logger = opts[:logger]
     end
     
     def connect
       raise NotImplementedError, "#connect should be overriden by adapters"
+    end
+    
+    def multi_threaded?
+      !@single_threaded
+    end
+    
+    def single_threaded?
+      @single_threaded
     end
     
     def uri
@@ -187,6 +224,12 @@ module Sequel
       c = @@adapters[uri.scheme.to_sym]
       raise SequelError, "Invalid database scheme" unless c
       c.new(c.uri_to_options(uri).merge(more_opts || {}))
+    end
+    
+    @@single_threaded = false
+    
+    def self.single_threaded=(value)
+      @@single_threaded = value
     end
   end
 end

@@ -1,5 +1,7 @@
 === SVN
 
+* Added support for single threaded operation.
+
 * Fixed bug in Dataset#format_eq_expression where Range objects would not be literalized correctly.
 
 * Added parens around postgres LIKE expressions using regexps.

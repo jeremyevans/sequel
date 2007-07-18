@@ -364,3 +364,60 @@ context "Database#uri_to_options" do
     h[:database].should == 'blah'
   end
 end
+
+context "A single threaded database" do
+  teardown do
+    Sequel::Database.single_threaded = false
+  end
+  
+  specify "should use a SingleThreadedPool instead of a ConnectionPool" do
+    db = Sequel::Database.new(:single_threaded => true)
+    db.pool.should be_a_kind_of(Sequel::SingleThreadedPool)
+  end
+  
+  specify "should be constructable using :single_threaded => true option" do
+    db = Sequel::Database.new(:single_threaded => true)
+    db.pool.should be_a_kind_of(Sequel::SingleThreadedPool)
+  end
+  
+  specify "should be constructable using Database.single_threaded = true" do
+    Sequel::Database.single_threaded = true
+    db = Sequel::Database.new
+    db.pool.should be_a_kind_of(Sequel::SingleThreadedPool)
+  end
+end
+
+context "A database" do
+  setup do
+    Sequel::Database.single_threaded = false
+  end
+  
+  teardown do
+    Sequel::Database.single_threaded = false
+  end
+  
+  specify "should be either single_threaded? or multi_threaded?" do
+    db = Sequel::Database.new(:single_threaded => true)
+    db.should be_single_threaded
+    db.should_not be_multi_threaded
+    
+    db = Sequel::Database.new(:max_options => 1)
+    db.should_not be_single_threaded
+    db.should be_multi_threaded
+    
+    db = Sequel::Database.new
+    db.should_not be_single_threaded
+    db.should be_multi_threaded
+    
+    Sequel::Database.single_threaded = true
+    
+    db = Sequel::Database.new
+    db.should be_single_threaded
+    db.should_not be_multi_threaded
+    
+    db = Sequel::Database.new(:max_options => 4)
+    db.should be_single_threaded
+    db.should_not be_multi_threaded
+    
+  end
+end
