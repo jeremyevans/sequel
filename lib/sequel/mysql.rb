@@ -4,17 +4,38 @@ end
 
 require 'mysql'
 
-# Monkey patch Mysql::Result to return a hash with symbol keys
+# Monkey patch Mysql::Result to yield hashes with symbol keys
 class Mysql::Result
-  def fetch_hash(with_table=nil)
-    row = fetch_row
-    return if row == nil
-    hash = {}
-    @fields.each_index do |i|
-      f = with_table ? @fields[i].table+"."+@fields[i].name : @fields[i].name
-      hash[f.to_sym] = row[i]
+  def columns(with_table = nil)
+    @columns ||= fetch_fields.map do |f|
+      (with_table ? (f.table + "." + f.name) : f.name).to_sym
     end
-    hash
+  end
+  
+  def each_hash(with_table=nil)
+    c = columns
+    while row = fetch_row
+      h = {}
+      c.each_with_index {|f, i| h[f] = row[i]}
+      yield h
+    end
+  end
+end
+
+class Mysql::Stmt
+  def columns(with_table = nil)
+    @columns ||= result_metadata.fetch_fields.map do |f|
+      (with_table ? (f.table + "." + f.name) : f.name).to_sym
+    end
+  end
+  
+  def each_hash
+    c = columns
+    while row = fetch
+      h = {}
+      c.each_with_index {|f, i| h[f] = row[i]}
+      yield h
+    end
   end
 end
 
@@ -24,14 +45,22 @@ module Sequel
       set_adapter_scheme :mysql
     
       def connect
-        Mysql.real_connect(@opts[:host], @opts[:user], @opts[:password], 
+        conn = Mysql.real_connect(@opts[:host], @opts[:user], @opts[:password], 
           @opts[:database], @opts[:port])
+        conn.query_with_result = false
+        conn
+      end
+      
+      def tables
+        @pool.hold do |conn|
+          conn.list_tables.map {|t| t.to_sym}
+        end
       end
     
       def dataset(opts = nil)
         MySQL::Dataset.new(self, opts)
       end
-    
+      
       def execute(sql)
         @logger.info(sql) if @logger
         @pool.hold do |conn|
@@ -39,6 +68,23 @@ module Sequel
         end
       end
       
+      def query(sql)
+        @logger.info(sql) if @logger
+        @pool.hold do |conn|
+          conn.query(sql)
+          conn.use_result
+        end
+      end
+      
+      def stmt(sql)
+        @logger.info(sql) if @logger
+        @pool.hold do |conn|
+          stmt = conn.prepare(sql)
+          stmt.execute
+          stmt
+        end
+      end
+    
       def execute_insert(sql)
         @logger.info(sql) if @logger
         @pool.hold do |conn|
@@ -52,6 +98,27 @@ module Sequel
         @pool.hold do |conn|
           conn.query(sql)
           conn.affected_rows
+        end
+      end
+
+      def transaction
+        @pool.hold do |conn|
+          @transactions ||= []
+          if @transactions.include? Thread.current
+            return yield(conn)
+          end
+          conn.query(SQL_BEGIN)
+          begin
+            @transactions << Thread.current
+            result = yield(conn)
+            conn.query(SQL_COMMIT)
+            result
+          rescue => e
+            conn.query(SQL_ROLLBACK)
+            raise e
+          ensure
+            @transactions.delete(Thread.current)
+          end
         end
       end
     end
@@ -71,19 +138,15 @@ module Sequel
       
       def fetch_rows(sql)
         @db.synchronize do
-          result = @db.execute(sql)
+          s = @db.stmt(sql)
           begin
-            fetch_columns(result)
-            result.each_hash {|r| yield r}
+            @columns = s.columns
+            s.each_hash {|r| yield r}
           ensure
-            result.free
+            s.close
           end
         end
         self
-      end
-      
-      def fetch_columns(result)
-        @columns = result.fetch_fields.map {|c| c.name.to_sym}
       end
     end
   end

@@ -1,5 +1,9 @@
 === SVN
 
+* Wrote basic MySQL spec.
+
+* Fixd MySQL::Dataset to return correct data types with symbols as hash keys.
+
 * Removed discunctional MySQL::Database#transaction.
 
 * Added support for single threaded operation.
