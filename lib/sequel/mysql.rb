@@ -20,7 +20,6 @@ end
 
 module Sequel
   module MySQL
-
     class Database < Sequel::Database
       set_adapter_scheme :mysql
     
@@ -54,10 +53,6 @@ module Sequel
           conn.query(sql)
           conn.affected_rows
         end
-      end
-    
-      def transaction(&block)
-        @pool.hold {|conn| conn.transaction(&block)}
       end
     end
     
