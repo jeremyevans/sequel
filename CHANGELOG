@@ -1,5 +1,7 @@
 === SVN
 
+* Improved robustness of MySQL::Dataset#field_name.
+
 * Added Sequel.single_threaded= convenience method.
 
 === 0.1.9 (2007-07-21)

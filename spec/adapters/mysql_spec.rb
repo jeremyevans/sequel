@@ -78,9 +78,21 @@ context "A MySQL dataset" do
     @d.select(:value.MAX).sql.should == \
       'SELECT max(`value`) FROM items'
 
+    @d.select(:items__value.MAX).sql.should == \
+      'SELECT max(items.`value`) FROM items'
+
     @d.order(:name.DESC).sql.should == \
       'SELECT * FROM items ORDER BY `name` DESC'
       
+    @d.select('items.name AS item_name').sql.should == \
+      'SELECT items.`name` AS `item_name` FROM items'
+      
+    @d.select('`name`').sql.should == \
+      'SELECT `name` FROM items'
+
+    @d.select('max(items.`name`) as `max_name`').sql.should == \
+      'SELECT max(items.`name`) AS `max_name` FROM items'
+
     @d.insert_sql(:value => 333).should == \
       'INSERT INTO items (`value`) VALUES (333)'
   end

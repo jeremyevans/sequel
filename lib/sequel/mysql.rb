@@ -126,16 +126,24 @@ module Sequel
     end
     
     class Dataset < Sequel::Dataset
+      FIELD_EXPR_RE = /^([^\(]+\()?([^\.]+\.)?([^\s\)]+)(\))?(\s[Aa][Ss]\s(.+))?$/.freeze
+      FIELD_ORDER_RE = /^(.*) (DESC|ASC)$/.freeze
+      FIELD_NOT_QUOTABLE_RE = /^(`(.+)`)|\*$/.freeze
+
+      def quote_field(field)
+        field =~ FIELD_NOT_QUOTABLE_RE ? field : "`#{field}`"
+      end
+      
       def field_name(field)
         f = field.is_a?(Symbol) ? field.to_field_name : field
-        if f =~ /^(([^\(]*)\(\*\))|\*$/
-          f
-        elsif f =~ /^([^\(]*)\(([^\*\)]*)\)$/
-          "#{$1}(`#{$2}`)"
-        elsif f =~ /^(.*) (DESC|ASC)$/
-          "`#{$1}` #{$2}"
+        case f
+        when FIELD_EXPR_RE:
+          $6 ? \
+            "#{$1}#{$2}#{quote_field($3)}#{$4} AS #{quote_field($6)}" : \
+            "#{$1}#{$2}#{quote_field($3)}#{$4}"
+        when FIELD_ORDER_RE: "#{quote_field($1)} #{$2}"
         else
-          "`#{f}`"
+          quote_field(f)
         end
       end
 
