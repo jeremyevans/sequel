@@ -6,17 +6,45 @@ require 'mysql'
 
 # Monkey patch Mysql::Result to yield hashes with symbol keys
 class Mysql::Result
+  MYSQL_TYPES = {
+    0 => :to_i,
+    1 => :to_i,
+    2 => :to_i,
+    3 => :to_i,
+    4 => :to_f,
+    5 => :to_f,
+    7 => :to_time,
+    8 => :to_i,
+    9 => :to_i,
+    10 => :to_time,
+    11 => :to_time,
+    12 => :to_time,
+    13 => :to_i,
+    14 => :to_time,
+    247 => :to_i,
+    248 => :to_i
+  }
+  
+  def convert_type(v, type)
+    v ? ((t = MYSQL_TYPES[type]) ? v.send(t) : v) : nil
+  end
+  
   def columns(with_table = nil)
-    @columns ||= fetch_fields.map do |f|
-      (with_table ? (f.table + "." + f.name) : f.name).to_sym
+    unless @columns
+      @column_types = []
+      @columns = fetch_fields.map do |f|
+        @column_types << f.type
+        (with_table ? (f.table + "." + f.name) : f.name).to_sym
+      end
     end
+    @columns
   end
   
   def each_hash(with_table=nil)
     c = columns
     while row = fetch_row
       h = {}
-      c.each_with_index {|f, i| h[f] = row[i]}
+      c.each_with_index {|f, i| h[f] = convert_type(row[i], @column_types[i])}
       yield h
     end
   end
@@ -124,6 +152,45 @@ module Sequel
     end
     
     class Dataset < Sequel::Dataset
+      def field_name(field)
+        f = field.is_a?(Symbol) ? field.to_field_name : field
+        if f =~ /^(([^\(]*)\(\*\))|\*$/
+          f
+        elsif f =~ /^([^\(]*)\(([^\*\)]*)\)$/
+          "#{$1}(`#{$2}`)"
+        elsif f =~ /^(.*) (DESC|ASC)$/
+          "`#{$1}` #{$2}"
+        else
+          "`#{f}`"
+        end
+      end
+
+      def literal(v)
+        case v
+        when true: '1'
+        when false: '0'
+        else
+          super
+        end
+      end
+      
+      # MySQL supports ORDER and LIMIT clauses in UPDATE statements.
+      def update_sql(values, opts = nil)
+        sql = super
+
+        opts = opts ? @opts.merge(opts) : @opts
+        
+        if order = opts[:order]
+          sql << " ORDER BY #{field_list(order)}"
+        end
+
+        if limit = opts[:limit]
+          sql << " LIMIT #{limit}"
+        end
+
+        sql
+      end
+
       def insert(*values)
         @db.execute_insert(insert_sql(*values))
       end
@@ -138,16 +205,29 @@ module Sequel
       
       def fetch_rows(sql)
         @db.synchronize do
-          s = @db.stmt(sql)
+          r = @db.query(sql)
           begin
-            @columns = s.columns
-            s.each_hash {|r| yield r}
+            @columns = r.columns
+            r.each_hash {|row| yield row}
           ensure
-            s.close
+            r.free
           end
         end
         self
       end
+
+      # def fetch_rows(sql)
+      #   @db.synchronize do
+      #     s = @db.stmt(sql)
+      #     begin
+      #       @columns = s.columns
+      #       s.each_hash {|r| yield r}
+      #     ensure
+      #       s.close
+      #     end
+      #   end
+      #   self
+      # end
     end
   end
 end

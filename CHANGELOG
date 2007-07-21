@@ -1,5 +1,13 @@
 === SVN
 
+* Implemented automatic data type conversion in mysql adapter.
+
+* Added support for boolean literals in mysql adapter.
+
+* Added support for ORDER and LIMIT clauses in UPDATE statements in mysql adapter.
+
+* Implemented correct field quoting (using back-ticks) in mysql adapter.
+
 * Wrote basic MySQL spec.
 
 * Fixd MySQL::Dataset to return correct data types with symbols as hash keys.

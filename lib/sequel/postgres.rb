@@ -122,10 +122,6 @@ class String
       nil
     end
   end
-
-  def postgres_to_time
-    Time.parse(self)
-  end
 end
 
 module Sequel
@@ -138,7 +134,7 @@ module Sequel
       23 => :to_i,
       700 => :to_f,
       701 => :to_f,
-      1114 => :postgres_to_time
+      1114 => :to_time
     }
 
     class Database < Sequel::Database
@@ -272,9 +268,6 @@ module Sequel
     end
   
     class Dataset < Sequel::Dataset
-      TRUE = "'t'".freeze
-      FALSE = "'f'".freeze
-      
       def literal(v)
         case v
         when String, Fixnum, Float, TrueClass, FalseClass: PGconn.quote(v)

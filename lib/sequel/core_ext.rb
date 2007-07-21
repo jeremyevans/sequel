@@ -38,6 +38,11 @@ class String
   def expr
     Sequel::ExpressionString.new(self)
   end
+  
+  # Convert a string into a Time object
+  def to_time
+    Time.parse(self)
+  end
 end
 
 # Symbol extensions

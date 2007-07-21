@@ -12,7 +12,8 @@ module Sequel
       # Returns the first value of the first reecord in the dataset.
       def single_value(opts = nil)
         opts = opts ? NAKED_HASH.merge(opts) : NAKED_HASH
-        each(opts) {|r| return r.values.first}
+        # reset the columns cache so it won't fuck subsequent calls to columns
+        each(opts) {|r| @columns = nil; return r.values.first}
       end
 
       # Returns the first record in the dataset. If the num argument is specified,
