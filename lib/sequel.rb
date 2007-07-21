@@ -25,6 +25,10 @@ module Sequel #:nodoc:
     end
     
     alias_method :open, :connect
+    
+    def single_threaded=(value)
+      Database.single_threaded = value
+    end
   end
 end
 

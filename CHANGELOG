@@ -1,3 +1,7 @@
+=== SVN
+
+* Added Sequel.single_threaded= convenience method.
+
 === 0.1.9 (2007-07-21)
 
 * Fixed #update_sql and #insert_sql to support field quoting by calling #field_name.
