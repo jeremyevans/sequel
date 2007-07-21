@@ -18,10 +18,9 @@ module Sequel
     def hold
       @conn ||= @connection_proc.call
       yield @conn
-    rescue StandardError => e
-      raise e
     rescue Exception => e
-      raise e.message
+      # if the error is not a StandardError it is converted into RuntimeError.
+      raise e.is_a?(StandardError) ? e : e.message
     end
   end
   

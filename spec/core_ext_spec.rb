@@ -71,6 +71,13 @@ context "String#split_sql" do
   end
 end
 
+context "String#to_time" do
+  specify "should convert the string into a Time object" do
+    "2007-07-11".to_time.should == Time.parse("2007-07-11")
+    "06:30".to_time.should == Time.parse("06:30")
+  end
+end
+
 context "Symbol#DESC" do
   specify "should append the symbol with DESC" do
     :hey.DESC.should == 'hey DESC'

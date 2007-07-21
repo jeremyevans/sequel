@@ -1,5 +1,7 @@
 === SVN
 
+* Fixed #update_sql and #insert_sql to support field quoting by calling #field_name.
+
 * Implemented automatic data type conversion in mysql adapter.
 
 * Added support for boolean literals in mysql adapter.

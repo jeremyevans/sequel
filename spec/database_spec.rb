@@ -387,6 +387,28 @@ context "A single threaded database" do
   end
 end
 
+context "A single threaded database" do
+  setup do
+    conn = 1234567
+    @db = Sequel::Database.new(:single_threaded => true) do
+      conn += 1
+    end
+  end
+  
+  specify "should invoke connection_proc only once" do
+    @db.pool.hold {|c| c.should == 1234568}
+    @db.pool.hold {|c| c.should == 1234568}
+  end
+  
+  specify "should convert an Exception into a RuntimeError" do
+    db = Sequel::Database.new(:single_threaded => true) do
+      raise Exception
+    end
+    
+    proc {db.pool.hold {|c|}}.should raise_error(RuntimeError)
+  end
+end
+
 context "A database" do
   setup do
     Sequel::Database.single_threaded = false

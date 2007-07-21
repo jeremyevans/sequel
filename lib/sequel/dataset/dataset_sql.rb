@@ -464,7 +464,7 @@ module Sequel
           field_list = []
           value_list = []
           values[0].each do |k, v|
-            field_list << k
+            field_list << field_name(k)
             value_list << literal(v)
           end
           fl = field_list.join(COMMA_SEPARATOR)
@@ -488,7 +488,7 @@ module Sequel
           raise SequelError, "Can't update a joined dataset"
         end
 
-        set_list = values.map {|k, v| "#{k} = #{literal(v)}"}.
+        set_list = values.map {|k, v| "#{field_name(k)} = #{literal(v)}"}.
           join(COMMA_SEPARATOR)
         sql = "UPDATE #{@opts[:from]} SET #{set_list}"
 

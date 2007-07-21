@@ -50,23 +50,6 @@ class Mysql::Result
   end
 end
 
-class Mysql::Stmt
-  def columns(with_table = nil)
-    @columns ||= result_metadata.fetch_fields.map do |f|
-      (with_table ? (f.table + "." + f.name) : f.name).to_sym
-    end
-  end
-  
-  def each_hash
-    c = columns
-    while row = fetch
-      h = {}
-      c.each_with_index {|f, i| h[f] = row[i]}
-      yield h
-    end
-  end
-end
-
 module Sequel
   module MySQL
     class Database < Sequel::Database
@@ -104,15 +87,6 @@ module Sequel
         end
       end
       
-      def stmt(sql)
-        @logger.info(sql) if @logger
-        @pool.hold do |conn|
-          stmt = conn.prepare(sql)
-          stmt.execute
-          stmt
-        end
-      end
-    
       def execute_insert(sql)
         @logger.info(sql) if @logger
         @pool.hold do |conn|
@@ -215,19 +189,6 @@ module Sequel
         end
         self
       end
-
-      # def fetch_rows(sql)
-      #   @db.synchronize do
-      #     s = @db.stmt(sql)
-      #     begin
-      #       @columns = s.columns
-      #       s.each_hash {|r| yield r}
-      #     ensure
-      #       s.close
-      #     end
-      #   end
-      #   self
-      # end
     end
   end
 end
