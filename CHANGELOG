@@ -1,4 +1,4 @@
-=== SVN
+=== 0.1.9.1 (2007-07-22)
 
 * Improved robustness of MySQL::Dataset#field_name.
 
