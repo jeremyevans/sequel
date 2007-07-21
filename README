@@ -32,7 +32,7 @@ Sequel currently supports:
 * SQLite 3
 * DBI
 * ODBC
-* MySQL (basic support)
+* MySQL
 
 == The Sequel Console
 
