@@ -43,7 +43,6 @@ spec = Gem::Specification.new do |s|
   s.homepage = 'http://sequel.rubyforge.org'
   s.executables = ['sequel']
 
-  s.add_dependency('metaid')
   s.required_ruby_version = '>= 1.8.2'
 
   s.files = %w(COPYING README Rakefile) + Dir.glob("{bin,doc,spec,lib}/**/*")

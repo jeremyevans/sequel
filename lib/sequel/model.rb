@@ -1,6 +1,3 @@
-require 'rubygems'
-require 'metaid'
-
 module Sequel
   class Model
     @@db = nil

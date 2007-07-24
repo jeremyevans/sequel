@@ -1,3 +1,7 @@
+=== 0.1.9.2 (2007-07-24)
+
+* Removed metaid dependency. Refactored requires in lib/sequel.rb.
+
 === 0.1.9.1 (2007-07-22)
 
 * Improved robustness of MySQL::Dataset#field_name.

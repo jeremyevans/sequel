@@ -385,6 +385,12 @@ context "A single threaded database" do
     db = Sequel::Database.new
     db.pool.should be_a_kind_of(Sequel::SingleThreadedPool)
   end
+
+  specify "should be constructable using Sequel.single_threaded = true" do
+    Sequel.single_threaded = true
+    db = Sequel::Database.new
+    db.pool.should be_a_kind_of(Sequel::SingleThreadedPool)
+  end
 end
 
 context "A single threaded database" do

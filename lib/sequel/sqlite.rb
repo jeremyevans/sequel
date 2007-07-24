@@ -3,7 +3,6 @@ if !Object.const_defined?('Sequel')
 end
 
 require 'sqlite3'
-require 'metaid'
 
 module Sequel
   module SQLite
