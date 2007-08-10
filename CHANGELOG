@@ -1,3 +1,7 @@
+=== SVN
+
+* Added Sequel.dbi convenience method for using DBI connection strings to open DBI databases.
+
 === 0.1.9.3 (2007-08-10)
 
 * Added support for specifying field size in schema definitions (thanks Florian Aßmann.)

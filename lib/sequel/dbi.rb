@@ -5,14 +5,19 @@ end
 require 'dbi'
 
 module Sequel
+  def self.dbi(conn_string, opts = nil)
+    opts ||= {}
+    opts.merge!(:database => conn_string)
+    Sequel::DBI::Database.new(opts)
+  end
+  
   module DBI
-
     class Database < Sequel::Database
       set_adapter_scheme :dbi
     
       def connect
-        dbname = @opts[:database] =~ /^DBI:/ ? \
-          @opts[:database] : @opts[:database] = 'DBI:' + @opts[:database]
+        dbname = @opts[:database]
+        dbname = 'DBI:' + dbname unless dbname =~ /^DBI:/
         ::DBI.connect(dbname, @opts[:user], @opts[:password])
       end
     
