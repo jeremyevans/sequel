@@ -2,6 +2,7 @@ module Sequel
   class Schema
     COMMA_SEPARATOR = ', '.freeze
     COLUMN_DEF = '%s %s'.freeze
+    SIZE_DEF = '(%d)'.freeze
     UNIQUE = ' UNIQUE'.freeze
     NOT_NULL = ' NOT NULL'.freeze
     DEFAULT = ' DEFAULT %s'.freeze
@@ -31,6 +32,8 @@ module Sequel
     
     def self.column_definition(column)
       c = COLUMN_DEF % [column[:name], TYPES[column[:type]]]
+      column[:size] ||= 255 if column[:type] == :varchar
+      c << SIZE_DEF % column[:size] if column[:size]
       c << UNIQUE if column[:unique]
       c << NOT_NULL if column[:null] == false
       c << DEFAULT % PGconn.quote(column[:default]) if column.include?(:default)

@@ -1,5 +1,7 @@
 === SVN
 
+* Added support for specifying field size in schema definitions (thanks Florian Aßmann.)
+
 * Added migration code based on work by Florian Aßmann.
 
 * Reintroduced metaid dependency. No need to keep a local copy of it.
