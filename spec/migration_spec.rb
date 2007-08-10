@@ -137,7 +137,7 @@ context "Sequel::Migrator" do
     File.open('003_create_users.rb', 'w') {|f| f << MIGRATION_003}
     File.open('005_create_attributes.rb', 'w') {|f| f << MIGRATION_005}
     
-    @db[:migration_info].version = nil
+    @db[:schema_info].version = nil
   end
   
   teardown do
@@ -184,25 +184,25 @@ context "Sequel::Migrator" do
       [CreateAttributes, CreateUsers]
   end
   
-  specify "should automatically create the migration_info table" do
-    @db.table_exists?(:migration_info).should be_false
-    Sequel::Migrator.migration_info_dataset(@db)
-    @db.table_exists?(:migration_info).should be_true
+  specify "should automatically create the schema_info table" do
+    @db.table_exists?(:schema_info).should be_false
+    Sequel::Migrator.schema_info_dataset(@db)
+    @db.table_exists?(:schema_info).should be_true
     
     # should not raise if table already exists
-    proc {Sequel::Migrator.migration_info_dataset(@db)}.should_not raise_error
+    proc {Sequel::Migrator.schema_info_dataset(@db)}.should_not raise_error
   end
   
-  specify "should return a dataset for the migration_info table" do
-    d = Sequel::Migrator.migration_info_dataset(@db)
-    d.from.should == :migration_info
+  specify "should return a dataset for the schema_info table" do
+    d = Sequel::Migrator.schema_info_dataset(@db)
+    d.from.should == :schema_info
   end
   
   specify "should get the migration version stored in the database" do
     # default is 0
     Sequel::Migrator.get_current_migration_version(@db).should == 0
     
-    Sequel::Migrator.migration_info_dataset(@db) << {:version => 4321}
+    Sequel::Migrator.schema_info_dataset(@db) << {:version => 4321}
 
     Sequel::Migrator.get_current_migration_version(@db).should == 4321
   end

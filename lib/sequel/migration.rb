@@ -81,7 +81,7 @@ module Sequel
   # To apply a migration, the #apply method must be invoked with the database
   # instance, the directory of migration files and the target version. If
   # no current version is supplied, it is read from the database. The migrator
-  # automatically creates a migration_info table in the database to keep track
+  # automatically creates a schema_info table in the database to keep track
   # of the current migration version. If no migration version is stored in the
   # database, the version is considered to be 0. If no target version is 
   # specified, the database is migrated to the latest version available in the
@@ -98,7 +98,7 @@ module Sequel
   module Migrator
     # Migrates the supplied database in the specified directory from the
     # current version to the target version. If no current version is
-    # supplied, it is extracted from a migration_info table. The migration_info
+    # supplied, it is extracted from a schema_info table. The schema_info
     # table is automatically created and maintained by the apply function.
     def self.apply(db, directory, target = nil, current = nil)
       # determine current and target version and direction
@@ -153,13 +153,13 @@ module Sequel
     # Gets the current migration version stored in the database. If no version
     # number is stored, 0 is returned.
     def self.get_current_migration_version(db)
-      r = migration_info_dataset(db).first
+      r = schema_info_dataset(db).first
       r ? r[:version] : 0
     end
     
     # Sets the current migration  version stored in the database.
     def self.set_current_migration_version(db, version)
-      dataset = migration_info_dataset(db)
+      dataset = schema_info_dataset(db)
       if dataset.first
         dataset.update(:version => version)
       else
@@ -167,14 +167,14 @@ module Sequel
       end
     end
     
-    # Returns the dataset for the migration_info table. If no such table
+    # Returns the dataset for the schema_info table. If no such table
     # exists, it is automatically created.
-    def self.migration_info_dataset(db)
-      unless db.table_exists?(:migration_info)
-        db.create_table(:migration_info) {integer :version}
+    def self.schema_info_dataset(db)
+      unless db.table_exists?(:schema_info)
+        db.create_table(:schema_info) {integer :version}
       end
 
-      db[:migration_info]
+      db[:schema_info]
     end
   end
 end
