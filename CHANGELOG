@@ -1,3 +1,9 @@
+=== SVN
+
+* Added migration code based on work by Florian Aßmann.
+
+* Reintroduced metaid dependency. No need to keep a local copy of it.
+
 === 0.1.9.2 (2007-07-24)
 
 * Removed metaid dependency. Refactored requires in lib/sequel.rb.
