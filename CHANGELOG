@@ -1,6 +1,8 @@
-=== 0.1.9.5 (2007-08-12)
+=== 0.1.9.6
 
 * Fixed migration docs.
+
+=== 0.1.9.5 (2007-08-12)
 
 * Removed dependency on PGconn in Schema class.
 
