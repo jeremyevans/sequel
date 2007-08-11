@@ -1,5 +1,7 @@
 === 0.1.9.5 (2007-08-12)
 
+* Fixed migration docs.
+
 * Removed dependency on PGconn in Schema class.
 
 === 0.1.9.4 (2007-08-11)

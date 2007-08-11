@@ -9,7 +9,7 @@ module Sequel
   #     def up
   #       create_table :sessions do
   #         primary_key :id
-  #         varchar   :session_id, :length => 32, :unique => true
+  #         varchar   :session_id, :size => 32, :unique => true
   #         timestamp :created_at
   #         text      :data
   #       end
@@ -116,7 +116,7 @@ module Sequel
       end
     end
 
-    # Returns a list of migration classes filter for the migration range and
+    # Returns a list of migration classes filtered for the migration range and
     # ordered according to the migration direction.
     def self.migration_classes(directory, target, current, direction)
       range = direction == :up ?
@@ -145,6 +145,7 @@ module Sequel
       filtered ? filtered.compact : []
     end
     
+    # Returns the latest version available in the specified directory.
     def self.latest_migration_version(directory)
       l = migration_files(directory).last
       l ? File.basename(l).to_i : nil
