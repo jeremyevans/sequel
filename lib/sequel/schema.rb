@@ -6,7 +6,7 @@ module Sequel
     
     COMMA_SEPARATOR = ', '.freeze
     COLUMN_DEF = '%s %s'.freeze
-    SIZE_DEF = '(%d)'.freeze
+    COLUMN_MEMBERS_DEF = '(%d)'.freeze
     UNIQUE = ' UNIQUE'.freeze
     NOT_NULL = ' NOT NULL'.freeze
     DEFAULT = ' DEFAULT %s'.freeze
@@ -37,7 +37,8 @@ module Sequel
     def self.column_definition(column)
       c = COLUMN_DEF % [column[:name], TYPES[column[:type]]]
       column[:size] ||= 255 if column[:type] == :varchar
-      c << SIZE_DEF % column[:size] if column[:size]
+      atts = column[:size] || column[:elements]
+      c << COLUMN_MEMBERS_DEF % literal(atts) if atts
       c << UNIQUE if column[:unique]
       c << NOT_NULL if column[:null] == false
       c << DEFAULT % literal(column[:default]) if column.include?(:default)

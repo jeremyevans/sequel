@@ -1,3 +1,7 @@
+=== SVN
+
+* Added :elements option to column definition, in order to support ENUM and SET types.
+
 === 0.1.9.5 (2007-08-12)
 
 * Fixed migration docs.
