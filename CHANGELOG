@@ -1,3 +1,7 @@
+=== 0.1.9.5 (2007-08-12)
+
+* Removed dependency on PGconn in Schema class.
+
 === 0.1.9.4 (2007-08-11)
 
 * Added Sequel.dbi convenience method for using DBI connection strings to open DBI databases.

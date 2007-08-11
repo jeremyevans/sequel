@@ -1,8 +1,8 @@
 require 'metaid'
 
 files = %w[
-  core_ext error database connection_pool
-  schema pretty_table expressions dataset migration model
+  core_ext error database connection_pool pretty_table expressions 
+  dataset schema migration model
 ]
 dir = File.join(File.dirname(__FILE__), 'sequel')
 files.each {|f| require(File.join(dir, f))}

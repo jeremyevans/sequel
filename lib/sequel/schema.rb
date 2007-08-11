@@ -1,5 +1,9 @@
 module Sequel
   class Schema
+    class << self
+      include Dataset::SQL
+    end
+    
     COMMA_SEPARATOR = ', '.freeze
     COLUMN_DEF = '%s %s'.freeze
     SIZE_DEF = '(%d)'.freeze
@@ -36,7 +40,7 @@ module Sequel
       c << SIZE_DEF % column[:size] if column[:size]
       c << UNIQUE if column[:unique]
       c << NOT_NULL if column[:null] == false
-      c << DEFAULT % PGconn.quote(column[:default]) if column.include?(:default)
+      c << DEFAULT % literal(column[:default]) if column.include?(:default)
       c << PRIMARY_KEY if column[:primary_key]
       c << REFERENCES % column[:table] if column[:table]
       c << ON_DELETE % on_delete_action(column[:on_delete]) if 

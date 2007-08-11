@@ -1,9 +1,5 @@
 require 'uri'
 
-require File.join(File.dirname(__FILE__), 'schema')
-require File.join(File.dirname(__FILE__), 'dataset')
-require File.join(File.dirname(__FILE__), 'model')
-
 module Sequel
   # A SingleThreadedPool acts as a replacement for a ConnectionPool for use
   # in single-threaded applications. ConnectionPool imposes a substantial

@@ -64,6 +64,8 @@ module Sequel
         when String: "'#{v.gsub(/'/, "''")}'"
         when Integer, Float: v.to_s
         when NilClass: NULL
+        when TrueClass: 't'
+        when FalseClass: 'f'
         when Symbol: v.to_field_name
         when Array: v.empty? ? NULL : v.map {|i| literal(i)}.join(COMMA_SEPARATOR)
         when Time: v.strftime(TIMESTAMP_FORMAT)
