@@ -1,4 +1,4 @@
-=== SVN
+=== 0.1.9.4 (2007-08-11)
 
 * Added Sequel.dbi convenience method for using DBI connection strings to open DBI databases.
 
