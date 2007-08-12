@@ -1,5 +1,7 @@
 === SVN
 
+* Changed MySQL adapter to automatically reconnect (issue #26).
+
 * Changed Sequel() to acccept variable arity.
 
 * Added :elements option to column definition, in order to support ENUM and SET types.

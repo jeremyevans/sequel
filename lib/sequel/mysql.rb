@@ -59,6 +59,7 @@ module Sequel
         conn = Mysql.real_connect(@opts[:host], @opts[:user], @opts[:password], 
           @opts[:database], @opts[:port])
         conn.query_with_result = false
+        conn.reconnect = true
         conn
       end
       
