@@ -31,7 +31,7 @@ module Sequel #:nodoc:
 end
 
 class Object
-  def Sequel(uri)
-    Sequel.connect(uri)
+  def Sequel(*args)
+    Sequel.connect(*args)
   end
 end
