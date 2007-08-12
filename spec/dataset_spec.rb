@@ -1404,6 +1404,17 @@ context "A paginated dataset" do
     @paginated.prev_page.should be_nil
     @d.paginate(4, 50).prev_page.should == 3
   end
+  
+  specify "should return the page range" do
+    @paginated.page_range.should == (1..8)
+    @d.paginate(4, 50).page_range.should == (1..4)
+  end
+  
+  specify "should return the record range for the current page" do
+    @paginated.current_page_record_range.should == (1..20)
+    @d.paginate(4, 50).current_page_record_range.should == (151..153)
+    @d.paginate(5, 50).current_page_record_range.should == nil
+  end
 end
 
 context "Dataset#columns" do

@@ -80,19 +80,27 @@ module Sequel
         end
       end
 
-      # returns a paginated dataset. The resulting dataset also provides the
+      # Returns a paginated dataset. The resulting dataset also provides the
       # total number of pages (Dataset#page_count) and the current page number
       # (Dataset#current_page), as well as Dataset#prev_page and Dataset#next_page
       # for implementing pagination controls.
       def paginate(page_no, page_size)
-        total_pages = (count / page_size.to_f).ceil
+        record_count = count
+        total_pages = (record_count / page_size.to_f).ceil
         paginated = limit(page_size, (page_no - 1) * page_size)
-        paginated.current_page = page_no
-        paginated.page_count = total_pages
+        paginated.set_pagination_info(page_no, page_size, record_count)
         paginated
       end
+      
+      # Sets the pagination info
+      def set_pagination_info(page_no, page_size, record_count)
+        @current_page = page_no
+        @page_size = page_size
+        @pagination_record_count = record_count
+        @page_count = (record_count / page_size.to_f).ceil
+      end
 
-      attr_accessor :page_count, :current_page
+      attr_accessor :page_size, :page_count, :current_page, :pagination_record_count
 
       # Returns the previous page number or nil if the current page is the first
       def prev_page
@@ -102,6 +110,21 @@ module Sequel
       # Returns the next page number or nil if the current page is the last page
       def next_page
         current_page < page_count ? (current_page + 1) : nil
+      end
+      
+      # Returns the page range
+      def page_range
+        1..page_count
+      end
+      
+      # Returns the record range for the current page
+      def current_page_record_range
+        return nil if @current_page > @page_count
+        
+        a = 1 + (@current_page - 1) * @page_size
+        b = a + @page_size - 1
+        b = @pagination_record_count if b > @pagination_record_count
+        a..b
       end
 
       # Returns the minimum value for the given field.

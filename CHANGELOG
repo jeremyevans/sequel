@@ -1,5 +1,7 @@
 === SVN
 
+* Added #pagination_record_count, #page_range and #current_page_record_range for paginated datasets.
+
 * Changed MySQL adapter to automatically reconnect (issue #26).
 
 * Changed Sequel() to acccept variable arity.
