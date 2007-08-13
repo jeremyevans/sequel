@@ -99,11 +99,11 @@ context "A simple dataset" do
   end
   
   specify "should format an insert statement" do
-    @dataset.insert_sql.should == 'INSERT INTO test DEFAULT VALUES'
+    @dataset.insert_sql.should == 'INSERT INTO test DEFAULT VALUES;'
     @dataset.insert_sql(:name => 'wxyz', :price => 342).
       should match(/INSERT INTO test \(name, price\) VALUES \('wxyz', 342\)|INSERT INTO test \(price, name\) VALUES \(342, 'wxyz'\)/)
     @dataset.insert_sql('a', 2, 6.5).should ==
-      "INSERT INTO test VALUES ('a', 2, 6.5)"
+      "INSERT INTO test VALUES ('a', 2, 6.5);"
   end
   
   specify "should format an update statement" do
@@ -1456,5 +1456,54 @@ context "Dataset#print" do
     @output.rewind
     @output.read.should == \
       "+-+-+\n|a|b|\n+-+-+\n|1|2|\n|3|4|\n|5|6|\n+-+-+\n"
+  end
+end
+
+context "Dataset#multi_insert" do
+  setup do
+    @dbc = Class.new do
+      attr_reader :sqls
+      
+      def execute(sql)
+        @sqls ||= []
+        @sqls << sql
+      end
+      
+      def transaction
+        @sqls ||= []
+        @sqls << 'BEGIN;'
+        yield
+        @sqls << 'COMMIT;'
+      end
+    end
+    @db = @dbc.new
+    
+    @ds = Sequel::Dataset.new(@db).from(:items)
+    
+    @list = [{:name => 'abc'}, {:name => 'def'}, {:name => 'ghi'}]
+  end
+  
+  specify "should join all inserts into a single SQL string" do
+    @ds.multi_insert(@list)
+    @db.sqls.should == [
+      'BEGIN;',
+      "INSERT INTO items (name) VALUES ('abc');",
+      "INSERT INTO items (name) VALUES ('def');",
+      "INSERT INTO items (name) VALUES ('ghi');",
+      'COMMIT;'
+    ]
+  end
+  
+  specify "should accept the commit_every option for commiting every x records" do
+    @ds.multi_insert(@list, :commit_every => 2)
+    @db.sqls.should == [
+      'BEGIN;',
+      "INSERT INTO items (name) VALUES ('abc');",
+      "INSERT INTO items (name) VALUES ('def');",
+      'COMMIT;',
+      'BEGIN;',
+      "INSERT INTO items (name) VALUES ('ghi');",
+      'COMMIT;'
+    ]
   end
 end

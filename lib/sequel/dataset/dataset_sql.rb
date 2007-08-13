@@ -463,7 +463,7 @@ module Sequel
       #     'INSERT INTO items (a, b) VALUES (1, 2)'
       def insert_sql(*values)
         if values.empty?
-          "INSERT INTO #{@opts[:from]} DEFAULT VALUES"
+          "INSERT INTO #{@opts[:from]} DEFAULT VALUES;"
         elsif (values.size == 1) && values[0].is_a?(Hash)
           field_list = []
           value_list = []
@@ -473,9 +473,9 @@ module Sequel
           end
           fl = field_list.join(COMMA_SEPARATOR)
           vl = value_list.join(COMMA_SEPARATOR)
-          "INSERT INTO #{@opts[:from]} (#{fl}) VALUES (#{vl})"
+          "INSERT INTO #{@opts[:from]} (#{fl}) VALUES (#{vl});"
         else
-          "INSERT INTO #{@opts[:from]} VALUES (#{literal(values)})"
+          "INSERT INTO #{@opts[:from]} VALUES (#{literal(values)});"
         end
       end
 

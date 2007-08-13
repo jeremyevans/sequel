@@ -171,21 +171,44 @@ module Sequel
       d
     end
     
-    # Associates the dataset with a model. If 
+    # Associates or disassociates the dataset with a model. If no argument or
+    # nil is specified, the dataset is turned into a naked dataset and returns
+    # records as hashes. If a model class specified, the dataset is modified
+    # to return records as instances of the model class, e.g:
+    #
+    #   class MyModel
+    #     def initialize(values)
+    #       @values = values
+    #     end
+    #   end
+    # 
+    #   dataset.set_model(MyModel)
+    #
+    # The dataset can be made polymorphic by specifying a column name as the
+    # polymorphic key and a hash mapping column values to model classes.
+    #
+    #   dataset.set_model(:kind, {1 => Person, 2 => Business})
+    #
     def set_model(*args)
       if args.empty? || (args.first == nil)
+        # If no argument or nil is provided, the dataset is denuded
         @opts.merge!(:naked => true, :models => nil, :polymorphic_key => nil)
         extend_with_stock_each
       elsif args.size == 1
+        # If a single argument is provided, it is regarded the model class
         c = args.first
         @opts.merge!(:naked => nil, :models => {nil => c}, :polymorphic_key => nil)
         extend_with_model(c)
         extend_with_destroy
-      else
+      elsif args.size == 2
+        # If two arguments are provided, the first is considered the
+        # polymorphic key, and the second a hash of classes.
         key, hash = args
         @opts.merge!(:naked => true, :models => hash, :polymorphic_key => key)
         extend_with_polymorphic_model(key, hash)
         extend_with_destroy
+      else
+        raise SequelError, "Invalid parameters specified"
       end
       self
     end

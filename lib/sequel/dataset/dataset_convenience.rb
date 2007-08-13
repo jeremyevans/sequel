@@ -1,3 +1,5 @@
+require 'enumerator'
+
 module Sequel
   class Dataset
     module Convenience
@@ -150,6 +152,29 @@ module Sequel
       # Pretty prints the records in the dataset as plain-text table.
       def print(*cols)
         Sequel::PrettyTable.print(naked.all, cols.empty? ? columns : cols)
+      end
+      
+      # Inserts multiple records into the associated table. This method can be
+      # to efficiently insert a large amounts of records into a table. Inserts
+      # are automatically wrapped in a transaction. If the :commit_every 
+      # option is specified, the method will generate a separate transaction 
+      # for each batch of records, e.g.:
+      #
+      #   dataset.multi_insert(list, :commit_every => 1000)
+      def multi_insert(list, opts = {})
+        if every = opts[:commit_every]
+          list.each_slice(every) do |s|
+            @db.transaction do
+              s.each {|r| @db.execute(insert_sql(r))}
+              # @db.execute(s.map {|r| insert_sql(r)}.join)
+            end
+          end
+        else
+          @db.transaction do
+            # @db.execute(list.map {|r| insert_sql(r)}.join)
+            list.each {|r| @db.execute(insert_sql(r))}
+          end
+        end
       end
     end
   end
