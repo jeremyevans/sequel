@@ -14,7 +14,7 @@ module Sequel
       end
 
       def connect
-        if @opts[:database].empty?
+        if @opts[:database].nil? || @opts[:database].empty?
           @opts[:database] = ':memory:'
         end
         db = ::SQLite3::Database.new(@opts[:database])

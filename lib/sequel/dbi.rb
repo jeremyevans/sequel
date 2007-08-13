@@ -2,15 +2,9 @@ if !Object.const_defined?('Sequel')
   require File.join(File.dirname(__FILE__), '../sequel')
 end
 
-require 'dbi'
+# require 'dbi'
 
 module Sequel
-  def self.dbi(conn_string, opts = nil)
-    opts ||= {}
-    opts.merge!(:database => conn_string)
-    Sequel::DBI::Database.new(opts)
-  end
-  
   module DBI
     class Database < Sequel::Database
       set_adapter_scheme :dbi

@@ -339,6 +339,24 @@ context "A Database adapter with a scheme" do
     c.opts[:database].should == 'db'
   end
 
+  specify "should register a convenience method on Sequel" do
+    Sequel.should respond_to(:ccc)
+    
+    # invalid parameters
+    proc {Sequel.ccc('abc', 'def')}.should raise_error(SequelError)
+    
+    c = Sequel.ccc('mydb')
+    c.should be_a_kind_of(CCC)
+    c.opts.should == {:database => 'mydb'}
+    
+    c = Sequel.ccc('mydb', :host => 'localhost')
+    c.should be_a_kind_of(CCC)
+    c.opts.should == {:database => 'mydb', :host => 'localhost'}
+    
+    c = Sequel.ccc
+    c.should be_a_kind_of(CCC)
+    c.opts.should == {}
+  end
 end
 
 context "An unknown database scheme" do

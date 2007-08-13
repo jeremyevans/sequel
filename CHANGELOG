@@ -1,3 +1,7 @@
+=== SVN
+
+* Implemented automatic creation of convenience methods for each adapter (e.g. Sequel.sqlite etc.)
+
 === 0.1.9.6 (2007-08-13)
 
 * Refactored schema definition code. Gets rid of famous primary_key problem as well as other issues (e.g. issue #22).
