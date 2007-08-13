@@ -110,6 +110,38 @@ module Sequel
       true
     end
     
+    include Schema::SQL
+    
+    NULL = "NULL".freeze
+    TIMESTAMP_FORMAT = "TIMESTAMP '%Y-%m-%d %H:%M:%S'".freeze
+    DATE_FORMAT = "DATE '%Y-%m-%d'".freeze
+    TRUE = "'t'".freeze
+    FALSE = "'f'".freeze
+
+    # default literal implementation for use in schema definitions
+    def literal(v)
+      case v
+      when ExpressionString: v
+      when String: "'#{v.gsub(/'/, "''")}'"
+      when Integer, Float: v.to_s
+      when NilClass: NULL
+      when TrueClass: TRUE
+      when FalseClass: FALSE
+      when Symbol: v.to_field_name
+      when Array: v.empty? ? NULL : v.map {|i| literal(i)}.join(COMMA_SEPARATOR)
+      when Time: v.strftime(TIMESTAMP_FORMAT)
+      when Date: v.strftime(DATE_FORMAT)
+      when Dataset: "(#{v.sql})"
+      else
+        raise SequelError, "can't express #{v.inspect} as a SQL literal"
+      end
+    end
+    
+    # default serial primary key definition. this should be overriden for each adapter.
+    def serial_primary_key_options
+      {:primary_key => true, :type => :integer, :auto_increment => true}
+    end
+    
     # Creates a table. The easiest way to use this method is to provide a
     # block:
     #   DB.create_table :posts do
@@ -119,16 +151,13 @@ module Sequel
     #     index :title
     #   end
     def create_table(name, &block)
-      schema = Schema.new
-      schema.create_table(name, &block)
-      schema.create(self)
+      g = Schema::Generator.new(self, name, &block)
+      execute(create_table_sql(*g.create_info))
     end
     
     # Drops a table.
     def drop_table(*names)
-      transaction do
-        execute(names.map {|n| Schema.drop_table_sql(n)}.join)
-      end
+      execute(names.map {|n| drop_table_sql(n)}.join)
     end
     
     # Performs a brute-force check for the existance of a table. This method is
@@ -171,7 +200,7 @@ module Sequel
         end
       end
     end
-    
+
     @@adapters = Hash.new
     
     # Sets the adapter scheme for the Database class. Call this method in

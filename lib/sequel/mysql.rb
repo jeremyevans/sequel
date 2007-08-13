@@ -55,6 +55,16 @@ module Sequel
     class Database < Sequel::Database
       set_adapter_scheme :mysql
     
+      def serial_primary_key_options
+        {:primary_key => true, :type => :integer, :auto_increment => true}
+      end
+      
+      AUTO_INCREMENT = 'AUTO_INCREMENT'.freeze
+      
+      def auto_increment_sql
+        AUTO_INCREMENT
+      end
+
       def connect
         conn = Mysql.real_connect(@opts[:host], @opts[:user], @opts[:password], 
           @opts[:database], @opts[:port])

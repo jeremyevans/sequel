@@ -106,6 +106,7 @@ module Sequel
       target ||= latest_migration_version(directory)
       raise SequelError, "No current version available" if current.nil?
       raise SequelError, "No target version available" if target.nil?
+
       direction = current < target ? :up : :down
       
       classes = migration_classes(directory, target, current, direction)
@@ -121,9 +122,14 @@ module Sequel
     def self.migration_classes(directory, target, current, direction)
       range = direction == :up ?
         (current + 1)..target : (target + 1)..current
-        
-      # load migration files
+
+      # Remove class definitions
+      Migration.descendants.each do |c|
+        Object.send(:remove_const, c.to_s) rescue nil
+      end
       Migration.descendants.clear # remove any defined migration classes
+
+      # load migration files
       migration_files(directory, range).each {|fn| load(fn)}
       
       # get migration classes

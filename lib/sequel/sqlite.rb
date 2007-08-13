@@ -9,6 +9,10 @@ module Sequel
     class Database < Sequel::Database
       set_adapter_scheme :sqlite
     
+      def serial_primary_key_options
+        {:primary_key => true, :type => :integer, :auto_increment => true}
+      end
+
       def connect
         if @opts[:database].empty?
           @opts[:database] = ':memory:'

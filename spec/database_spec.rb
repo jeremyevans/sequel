@@ -182,6 +182,7 @@ end
 class DummyDatabase < Sequel::Database
   attr_reader :sql
   def execute(sql); @sql = sql; end
+  def transaction; yield; end
 
   def dataset
     DummyDataset.new(self)
@@ -200,7 +201,7 @@ context "Database#create_table" do
       index :name, :unique => true
     end
     @db.sql.should == 
-      'CREATE TABLE test (id integer NOT NULL PRIMARY KEY, name text);CREATE UNIQUE INDEX test_name_index ON test (name);'
+      'CREATE TABLE test (id integer NOT NULL PRIMARY KEY AUTOINCREMENT, name text);CREATE UNIQUE INDEX test_name_index ON test (name);'
   end
 end
 
@@ -218,13 +219,13 @@ context "Database#drop_table" do
   specify "should construct proper SQL" do
     @db.drop_table :test
     @db.sql.should == 
-      'DROP TABLE test CASCADE;'
+      'DROP TABLE test;'
   end
   
   specify "should accept multiple table names" do
     @db.drop_table :a, :bb, :ccc
     @db.sql.should ==
-      'DROP TABLE a CASCADE;DROP TABLE bb CASCADE;DROP TABLE ccc CASCADE;'
+      'DROP TABLE a;DROP TABLE bb;DROP TABLE ccc;'
   end
 end
 

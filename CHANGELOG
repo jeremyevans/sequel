@@ -1,10 +1,12 @@
-=== SVN
+=== 0.1.9.6 (2007-08-13)
+
+* Refactored schema definition code. Gets rid of famous primary_key problem as well as other issues (e.g. issue #22).
 
 * Added #pagination_record_count, #page_range and #current_page_record_range for paginated datasets.
 
 * Changed MySQL adapter to automatically reconnect (issue #26).
 
-* Changed Sequel() to acccept variable arity.
+* Changed Sequel() to accept variable arity.
 
 * Added :elements option to column definition, in order to support ENUM and SET types.
 
@@ -28,7 +30,7 @@
 
 === 0.1.9.2 (2007-07-24)
 
-* Removed metaid dependency. Refactored requires in lib/sequel.rb.
+* Removed metaid dependency. Re-factored requires in lib/sequel.rb.
 
 === 0.1.9.1 (2007-07-22)
 

@@ -159,7 +159,6 @@ module Sequel
       RELATION_FILTER = "(relkind = 'r') AND (relname !~ '^pg|sql')".freeze
       SYSTEM_TABLE_REGEXP = /^pg|sql/.freeze
     
-    
       def tables
         dataset(RELATION_QUERY).filter(RELATION_FILTER).map {|r| r[:relname].to_sym}
       end
@@ -265,6 +264,13 @@ module Sequel
         end
       end
 
+      def serial_primary_key_options
+        {:primary_key => true, :type => :serial}
+      end
+
+      def drop_table_sql(name)
+        "DROP TABLE #{name} CASCADE;"
+      end
     end
   
     class Dataset < Sequel::Dataset

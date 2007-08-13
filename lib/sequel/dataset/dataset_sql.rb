@@ -44,6 +44,8 @@ module Sequel
       NULL = "NULL".freeze
       TIMESTAMP_FORMAT = "TIMESTAMP '%Y-%m-%d %H:%M:%S'".freeze
       DATE_FORMAT = "DATE '%Y-%m-%d'".freeze
+      TRUE = "'t'".freeze
+      FALSE = "'f'".freeze
 
       # Returns a literal representation of a value to be used as part
       # of an SQL expression. The stock implementation supports literalization 
@@ -64,8 +66,8 @@ module Sequel
         when String: "'#{v.gsub(/'/, "''")}'"
         when Integer, Float: v.to_s
         when NilClass: NULL
-        when TrueClass: 't'
-        when FalseClass: 'f'
+        when TrueClass: TRUE
+        when FalseClass: FALSE
         when Symbol: v.to_field_name
         when Array: v.empty? ? NULL : v.map {|i| literal(i)}.join(COMMA_SEPARATOR)
         when Time: v.strftime(TIMESTAMP_FORMAT)
