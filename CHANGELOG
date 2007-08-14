@@ -1,5 +1,7 @@
 === SVN
 
+* Changed #current_page_record_range to return 0..0 for an invalid page.
+
 * Fixed joining of aliased tables.
 
 * Improved Symbol#to_field_name to prevent false positives.

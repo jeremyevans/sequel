@@ -1418,7 +1418,7 @@ context "A paginated dataset" do
   specify "should return the record range for the current page" do
     @paginated.current_page_record_range.should == (1..20)
     @d.paginate(4, 50).current_page_record_range.should == (151..153)
-    @d.paginate(5, 50).current_page_record_range.should == nil
+    @d.paginate(5, 50).current_page_record_range.should == (0..0)
   end
 end
 

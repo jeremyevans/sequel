@@ -121,7 +121,7 @@ module Sequel
       
       # Returns the record range for the current page
       def current_page_record_range
-        return nil if @current_page > @page_count
+        return (0..0) if @current_page > @page_count
         
         a = 1 + (@current_page - 1) * @page_size
         b = a + @page_size - 1
