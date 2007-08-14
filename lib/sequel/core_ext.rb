@@ -54,21 +54,22 @@ class Symbol
   def AS(target)
     "#{to_field_name} AS #{target}"
   end
-  
-  FIELD_REF_AS_RE = /^([a-z_]+)___([a-z_]+)$/.freeze
-  FIELD_REF_RE = /^([a-z_]+)__([a-z_]+)$/.freeze
+
+  FIELD_REF_RE1 = /^([a-z_]+)__([a-z_]+)___([a-z_]+)/.freeze
+  FIELD_REF_RE2 = /^([a-z_]+)___([a-z_]+)$/.freeze
+  FIELD_REF_RE3 = /^([a-z_]+)__([a-z_]+)$/.freeze
   DOUBLE_UNDERSCORE = '__'.freeze
   PERIOD = '.'.freeze
   
   def to_field_name
     s = to_s
-    if s =~ FIELD_REF_AS_RE
-      s = "#{$1} AS #{$2}"
+    case s
+    when FIELD_REF_RE1: "#{$1}.#{$2} AS #{$3}"
+    when FIELD_REF_RE2: "#{$1} AS #{$2}"
+    when FIELD_REF_RE3: "#{$1}.#{$2}"
+    else
+      s
     end
-    if s =~ FIELD_REF_RE
-      s = "#{$1}.#{$2}"
-    end
-    s
   end
   
   def ALL
