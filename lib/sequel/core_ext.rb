@@ -55,16 +55,20 @@ class Symbol
     "#{to_field_name} AS #{target}"
   end
   
-  AS_REGEXP = /(.*)___(.*)/.freeze
+  FIELD_REF_AS_RE = /^([a-z_]+)___([a-z_]+)$/.freeze
+  FIELD_REF_RE = /^([a-z_]+)__([a-z_]+)$/.freeze
   DOUBLE_UNDERSCORE = '__'.freeze
   PERIOD = '.'.freeze
   
   def to_field_name
     s = to_s
-    if s =~ AS_REGEXP
+    if s =~ FIELD_REF_AS_RE
       s = "#{$1} AS #{$2}"
     end
-    s.split(DOUBLE_UNDERSCORE).join(PERIOD)
+    if s =~ FIELD_REF_RE
+      s = "#{$1}.#{$2}"
+    end
+    s
   end
   
   def ALL
