@@ -1,5 +1,7 @@
 === SVN
 
+* Fixed joining of aliased tables.
+
 * Improved Symbol#to_field_name to prevent false positives.
 
 * Implemented Dataset#multi_insert with :commit_every option.

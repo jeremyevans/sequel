@@ -830,6 +830,11 @@ context "Dataset#join_table" do
   specify "should raise if an invalid join type is specified" do
     proc {@d.join_table(:invalid, :a, :b)}.should raise_error(SequelError)
   end
+  
+  specify "should treat aliased tables correctly" do
+    @d.from('stats s').join('players p', :id => :player_id).sql.should ==
+      'SELECT * FROM stats s INNER JOIN players p ON (p.id = s.player_id)'
+  end
 end
 
 context "Dataset#[]=" do

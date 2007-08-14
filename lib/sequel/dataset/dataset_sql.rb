@@ -10,13 +10,23 @@ module Sequel
         field.is_a?(Symbol) ? field.to_field_name : field
       end
 
-      QUALIFIED_REGEXP = /(.*)\.(.*)/.freeze
+      ALIASED_REGEXP = /^(.*)\s(.*)$/.freeze
+      QUALIFIED_REGEXP = /^(.*)\.(.*)$/.freeze
 
       # Returns a qualified field name (including a table name) if the field
       # name isn't already qualified.
       def qualified_field_name(field, table)
-        fn = field_name(field)
-        fn =~ QUALIFIED_REGEXP ? fn : "#{table}.#{fn}"
+        field = field_name(field)
+        if field =~ QUALIFIED_REGEXP
+          # field is already qualified
+          field
+        else 
+          # check if the table is aliased
+          if table =~ ALIASED_REGEXP
+            table = $2
+          end
+          "#{table}.#{field}"
+        end
       end
 
       WILDCARD = '*'.freeze
@@ -358,7 +368,7 @@ module Sequel
 
         join_expr = expr.map do |k, v|
           l = qualified_field_name(k, table)
-          r = qualified_field_name(v, @opts[:last_joined_table] || @opts[:from])
+          r = qualified_field_name(v, @opts[:last_joined_table] || @opts[:from].first)
           "(#{l} = #{r})"
         end.join(AND_SEPARATOR)
 
