@@ -3,17 +3,21 @@
 require 'rubygems'
 require 'sequel'
 
+usage = <<END
+Usage: sequel <connection URI>
+Sequel: Lightweight ORM library for Ruby
+
+Examples:
+  sequel sqlite:///blog.db
+  sequel postgres://localhost/my_blog
+
+For more information see http://code.google.com/p/ruby-sequel
+END
+
 db = ARGV.shift
 
 if db.nil? || db.empty?
-  puts "Usage: sequel <connection string>"
-  puts "Sequel: Concise ORM for Ruby."
-  puts
-  puts "Examples:"
-  puts "  sequel sqlite:///blog.db"
-  puts "  sequel postgres://localhost/blog"
-  puts
-  puts "For more information see http://sequel.rubyforge.org"
+  puts usage
   exit
 end
 
@@ -21,7 +25,7 @@ begin
   scheme = URI.parse(db).scheme
   require File.join('sequel', scheme)
 rescue LoadError
-  puts "Invalid or unknown scheme: #{scheme}"
+  puts "Invalid adapter specified: #{scheme}"
   exit
 rescue => e
   puts e.message

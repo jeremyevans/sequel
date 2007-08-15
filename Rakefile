@@ -24,7 +24,7 @@ Rake::RDocTask.new do |rdoc|
   rdoc.rdoc_dir = 'doc/rdoc'
   rdoc.options += RDOC_OPTS
   rdoc.main = "README"
-  rdoc.title = "Sequel: Concise ORM for Ruby"
+  rdoc.title = "Sequel: Lightweight ORM library for Ruby"
   rdoc.rdoc_files.add ['README', 'COPYING', 'lib/sequel.rb', 'lib/sequel/**/*.rb']
 end
 
@@ -36,7 +36,7 @@ spec = Gem::Specification.new do |s|
   s.extra_rdoc_files = ["README", "CHANGELOG", "COPYING"]
   s.rdoc_options += RDOC_OPTS + 
     ['--exclude', '^(examples|extras)\/', '--exclude', 'lib/sequel.rb']
-  s.summary = "Concise ORM for Ruby."
+  s.summary = "Lightweight ORM library for Ruby"
   s.description = s.summary
   s.author = "Sharon Rosner"
   s.email = 'ciconia@gmail.com'
