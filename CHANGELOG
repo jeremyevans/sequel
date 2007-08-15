@@ -1,5 +1,7 @@
 === SVN
 
+* Added suppoort for executing batch statements in sqlite adapter.
+
 * Changed #current_page_record_range to return 0..0 for an invalid page.
 
 * Fixed joining of aliased tables.

@@ -34,7 +34,7 @@ module Sequel
     
       def execute(sql)
         @logger.info(sql) if @logger
-        @pool.hold {|conn| conn.execute(sql)}
+        @pool.hold {|conn| conn.execute_batch(sql)}
       end
       
       def execute_insert(sql)

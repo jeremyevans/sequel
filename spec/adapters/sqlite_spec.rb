@@ -60,6 +60,18 @@ context "An SQLite database" do
     
     proc {@db.temp_store = :invalid}.should raise_error(SequelError)
   end
+  
+  specify "should be able to execute multiple statements at once" do
+    @db.create_table :t do
+      text :name
+    end
+    
+    @db << "insert into t (name) values ('abc');insert into t (name) values ('def')"
+
+    @db[:t].count.should == 2
+    
+    @db[:t].order(:name).map(:name).should == ['abc', 'def']
+  end
 end
 
 context "An SQLite dataset" do
