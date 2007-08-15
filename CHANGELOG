@@ -1,4 +1,4 @@
-=== SVN
+=== 0.1.9.7 (2007-08-15)
 
 * Added suppoort for executing batch statements in sqlite adapter.
 
