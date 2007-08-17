@@ -47,7 +47,7 @@ module Sequel
         @db.synchronize do
           s = @db.execute sql
           begin
-            @columns = stmt.column_names.map {|c| c.to_sym}
+            @columns = s.column_names.map {|c| c.to_sym}
             s.fetch {|r| yield hash_row(s, r)}
           ensure
             s.finish rescue nil
