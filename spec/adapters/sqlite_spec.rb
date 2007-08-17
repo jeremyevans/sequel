@@ -114,3 +114,29 @@ context "An SQLite dataset" do
     @d.first[:name].should == 'def'
   end
 end
+
+context "An SQLITE dataset" do
+  setup do
+    @d = SQLITE_DB[:items]
+    @d.delete # remove all records
+    @d << {:name => 'abc', :value => 1.23}
+    @d << {:name => 'def', :value => 4.56}
+    @d << {:name => 'ghi', :value => 7.89}
+  end
+  
+  specify "should correctly return avg" do
+    @d.avg(:value).should == ((1.23 + 4.56 + 7.89) / 3).to_s
+  end
+  
+  specify "should correctly return sum" do
+    @d.sum(:value).should == (1.23 + 4.56 + 7.89).to_s
+  end
+  
+  specify "should correctly return max" do
+    @d.max(:value).should == 7.89.to_s
+  end
+  
+  specify "should correctly return min" do
+    @d.min(:value).should == 1.23.to_s
+  end
+end

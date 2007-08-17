@@ -894,23 +894,23 @@ context "Dataset aggregate methods" do
   end
   
   specify "should include min" do
-    @d.min(:a).should == 'SELECT min(a) FROM test'
+    @d.min(:a).should == 'SELECT min(a) AS v FROM test'
   end
   
   specify "should include max" do
-    @d.max(:b).should == 'SELECT max(b) FROM test'
+    @d.max(:b).should == 'SELECT max(b) AS v FROM test'
   end
   
   specify "should include sum" do
-    @d.sum(:c).should == 'SELECT sum(c) FROM test'
+    @d.sum(:c).should == 'SELECT sum(c) AS v FROM test'
   end
   
   specify "should include avg" do
-    @d.avg(:d).should == 'SELECT avg(d) FROM test'
+    @d.avg(:d).should == 'SELECT avg(d) AS v FROM test'
   end
   
   specify "should accept qualified fields" do
-    @d.avg(:test__bc).should == 'SELECT avg(test.bc) FROM test'
+    @d.avg(:test__bc).should == 'SELECT avg(test.bc) AS v FROM test'
   end
 end
 

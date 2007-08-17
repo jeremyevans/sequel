@@ -1,6 +1,8 @@
 === SVN
 
-* Fixed broken Sequel::DBI::Dataset#fetch_rows (thanks cdcarter.)
+* Added automatic column aliasing to #avg, #sum, #min and #max (#30).
+
+* Fixed broken Sequel::DBI::Dataset#fetch_rows (#29 thanks cdcarter.)
 
 === 0.1.9.8 (2007-08-15)
 

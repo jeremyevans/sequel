@@ -43,10 +43,13 @@ class String
   def to_time
     Time.parse(self)
   end
+  
+  def to_field_name
+    self
+  end
 end
 
-# Symbol extensions
-class Symbol
+module FieldCompositionMethods
   def DESC
     "#{to_field_name} DESC"
   end
@@ -55,12 +58,40 @@ class Symbol
     "#{to_field_name} AS #{target}"
   end
 
+  def ALL
+    "#{to_s}.*"
+  end
+  
+  FIELD_TITLE_RE1 = /^(.*)\sAS\s(.+)$/.freeze
+  FIELD_TITLE_RE2 = /^([^\.]+)\.([^\.]+)$/.freeze
+  
+  def field_title
+    s = to_field_name
+    case s
+    when FIELD_TITLE_RE1, FIELD_TITLE_RE2: $2
+    else
+      s
+    end
+  end
+
+  def MIN; "min(#{to_field_name})"; end
+  def MAX; "max(#{to_field_name})"; end
+  def SUM; "sum(#{to_field_name})"; end
+  def AVG; "avg(#{to_field_name})"; end
+end
+
+class String
+  include FieldCompositionMethods
+end
+
+# Symbol extensions
+class Symbol
+  include FieldCompositionMethods
+  
+
   FIELD_REF_RE1 = /^([a-z_]+)__([a-z_]+)___([a-z_]+)/.freeze
   FIELD_REF_RE2 = /^([a-z_]+)___([a-z_]+)$/.freeze
   FIELD_REF_RE3 = /^([a-z_]+)__([a-z_]+)$/.freeze
-  DOUBLE_UNDERSCORE = '__'.freeze
-  PERIOD = '.'.freeze
-  
   def to_field_name
     s = to_s
     case s
@@ -71,13 +102,6 @@ class Symbol
       s
     end
   end
-  
-  def ALL
-    "#{to_s}.*"
-  end
-
-  def MIN; "min(#{to_field_name})"; end
-  def MAX; "max(#{to_field_name})"; end
-  def SUM; "sum(#{to_field_name})"; end
-  def AVG; "avg(#{to_field_name})"; end
 end
+
+

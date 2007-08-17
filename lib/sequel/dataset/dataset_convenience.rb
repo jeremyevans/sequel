@@ -131,22 +131,22 @@ module Sequel
 
       # Returns the minimum value for the given field.
       def min(field)
-        single_value(:select => [field.MIN])
+        single_value(:select => [field.MIN.AS(:v)])
       end
 
       # Returns the maximum value for the given field.
       def max(field)
-        single_value(:select => [field.MAX])
+        single_value(:select => [field.MAX.AS(:v)])
       end
 
       # Returns the sum for the given field.
       def sum(field)
-        single_value(:select => [field.SUM])
+        single_value(:select => [field.SUM.AS(:v)])
       end
 
       # Returns the average value for the given field.
       def avg(field)
-        single_value(:select => [field.AVG])
+        single_value(:select => [field.AVG.AS(:v)])
       end
 
       # Pretty prints the records in the dataset as plain-text table.
