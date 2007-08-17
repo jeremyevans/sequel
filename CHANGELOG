@@ -1,5 +1,7 @@
 === SVN
 
+* New ADO adapter by cdcarter (#31).
+
 * Added automatic column aliasing to #avg, #sum, #min and #max (#30).
 
 * Fixed broken Sequel::DBI::Dataset#fetch_rows (#29 thanks cdcarter.)
