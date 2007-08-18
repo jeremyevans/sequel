@@ -9,6 +9,12 @@ module Sequel
     class Database < Sequel::Database
       set_adapter_scheme :ado
       
+      AUTO_INCREMENT = 'IDENTITY(1,1)'.freeze
+      
+      def auto_increment_sql
+        AUTO_INCREMENT
+      end
+      
       def connect
         dbname = @opts[:database]
         handle = WIN32OLE.new('ADODB.Connection')
@@ -41,10 +47,10 @@ module Sequel
         @db.synchronize do
           s = @db.execute sql
           
-          num_cols = s.Fields.Count
-          @columns = Array.new(num_cols)
-          0.upto(num_cols-1) {|x| @columns[x] = s.Fields(x).Name.to_sym}
+          fields = s.Fields.extend(Enumerable)
+          @columns = fields.map {|x| x.Name.to_sym}
           
+          s.moveFirst
           s.getRows.transpose.each {|r| yield hash_row(r) }
         end
         self
