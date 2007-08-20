@@ -51,7 +51,7 @@ module Sequel
           @columns = fields.map {|x| x.Name.to_sym}
           
           s.moveFirst
-          s.getRows.transpose.each {|r| yield hash_row(r) }
+          s.getRows.transpose.each {|r| yield hash_row(r)}
         end
         self
       end

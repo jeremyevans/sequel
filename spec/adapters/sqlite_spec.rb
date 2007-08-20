@@ -115,7 +115,7 @@ context "An SQLite dataset" do
   end
 end
 
-context "An SQLITE dataset" do
+context "An SQLite dataset" do
   setup do
     @d = SQLITE_DB[:items]
     @d.delete # remove all records
@@ -140,3 +140,49 @@ context "An SQLITE dataset" do
     @d.min(:value).should == 1.23.to_s
   end
 end
+
+context "SQLite::Dataset#delete" do
+  setup do
+    @d = SQLITE_DB[:items]
+    @d.delete # remove all records
+    @d << {:name => 'abc', :value => 1.23}
+    @d << {:name => 'def', :value => 4.56}
+    @d << {:name => 'ghi', :value => 7.89}
+  end
+  
+  specify "should return the number of records affected when filtered" do
+    @d.count.should == 3
+    @d.filter {value < 3}.delete.should == 1
+    @d.count.should == 2
+
+    @d.filter {value < 3}.delete.should == 0
+    @d.count.should == 2
+  end
+  
+  specify "should return the number of records affected when unfiltered" do
+    @d.count.should == 3
+    @d.delete.should == 3
+    @d.count.should == 0
+
+    @d.delete.should == 0
+  end
+end
+
+context "SQLite::Dataset#update" do
+  setup do
+    @d = SQLITE_DB[:items]
+    @d.delete # remove all records
+    @d << {:name => 'abc', :value => 1.23}
+    @d << {:name => 'def', :value => 4.56}
+    @d << {:name => 'ghi', :value => 7.89}
+  end
+  
+  specify "should return the number of records affected" do
+    @d.filter(:name => 'abc').update(:value => 2).should == 1
+    
+    @d.update(:value => 10).should == 3
+    
+    @d.filter(:name => 'xxx').update(:value => 23).should == 0
+  end
+end
+
