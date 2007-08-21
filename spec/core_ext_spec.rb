@@ -115,6 +115,25 @@ context "Symbol#to_field_name" do
   end
 end
 
+context "FieldCompositionMethods#field_title" do
+  specify "should return the field name for non aliased fields" do
+    :xyz.field_title.should == 'xyz'
+    :abc__xyz.field_title.should == 'xyz'
+    
+    'abc'.field_title.should == 'abc'
+    'abc.def'.field_title.should == 'def'
+  end
+  
+  specify "should return the field alias for aliased fields" do
+    :xyz___x.field_title.should == 'x'
+    :abc__xyz___y.field_title.should == 'y'
+    
+    'abc AS x'.field_title.should == 'x'
+    'abc as y'.field_title.should == 'y'
+    'abc.def AS d'.field_title.should == 'd'
+  end
+end
+
 context "Symbol" do
   specify "should support MIN for specifying min function" do
     :abc__def.MIN.should == 'min(abc.def)'

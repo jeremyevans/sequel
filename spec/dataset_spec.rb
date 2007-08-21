@@ -1204,6 +1204,10 @@ context "Dataset#set_model" do
     all[3].class.should == @m1
     #...
   end
+  
+  specify "should raise an error if more than two arguments are supplied" do
+    proc {@dataset.set_model(1, 2, 3)}.should raise_error(SequelError)
+  end
 end
 
 context "Dataset#model_classes" do

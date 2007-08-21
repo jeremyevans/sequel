@@ -105,5 +105,27 @@ module Sequel
           @allocated.delete(thread)
         end
       end
+  end
+
+  # A SingleThreadedPool acts as a replacement for a ConnectionPool for use
+  # in single-threaded applications. ConnectionPool imposes a substantial
+  # performance penalty, so SingleThreadedPool is used to gain some speed.
+  class SingleThreadedPool
+    attr_writer :connection_proc
+    
+    # Initializes the instance with the supplied block as the connection_proc.
+    def initialize(&block)
+      @connection_proc = block
     end
+    
+    # Yields the connection to the supplied block. This method simulates the
+    # ConnectionPool#hold API.
+    def hold
+      @conn ||= @connection_proc.call
+      yield @conn
+    rescue Exception => e
+      # if the error is not a StandardError it is converted into RuntimeError.
+      raise e.is_a?(StandardError) ? e : e.message
+    end
+  end
 end

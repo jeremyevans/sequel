@@ -1,5 +1,11 @@
 === SVN
 
+* Removed Database#literal and included Dataset::SQL instead.
+
+* Sequel::Dataset:SQL#field_name can now take a hash (as well as #select and any method that uses #field_name) for aliasing column names.  E.g. Dataset.new(nil).from(:test).select(:_qqa => 'Date').sql #=> 'SELECT _qqa AS 'Date' FROM test'.
+
+* Moved SingleThreadedPool to lib/sequel/connection_pool.rb.
+
 * Changed SQLite::Dataset to return affected rows for #delete and #update (#33).
 
 * ADO adapter: Added use of Enumerable for Recordset#Fields, playing it safe and moving to the first row before getting results, and changing the auto_increment constant to work for MSSQL.

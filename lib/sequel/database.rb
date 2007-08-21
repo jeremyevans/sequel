@@ -1,25 +1,6 @@
 require 'uri'
 
 module Sequel
-  # A SingleThreadedPool acts as a replacement for a ConnectionPool for use
-  # in single-threaded applications. ConnectionPool imposes a substantial
-  # performance penalty, so SingleThreadedPool is used to gain some speed.
-  class SingleThreadedPool
-    attr_writer :connection_proc
-    
-    def initialize(&block)
-      @connection_proc = block
-    end
-    
-    def hold
-      @conn ||= @connection_proc.call
-      yield @conn
-    rescue Exception => e
-      # if the error is not a StandardError it is converted into RuntimeError.
-      raise e.is_a?(StandardError) ? e : e.message
-    end
-  end
-  
   # A Database object represents a virtual connection to a database.
   # The Database class is meant to be subclassed by database adapters in order
   # to provide the functionality needed for executing queries.
@@ -110,32 +91,8 @@ module Sequel
       true
     end
     
+    include Dataset::SQL
     include Schema::SQL
-    
-    NULL = "NULL".freeze
-    TIMESTAMP_FORMAT = "TIMESTAMP '%Y-%m-%d %H:%M:%S'".freeze
-    DATE_FORMAT = "DATE '%Y-%m-%d'".freeze
-    TRUE = "'t'".freeze
-    FALSE = "'f'".freeze
-
-    # default literal implementation for use in schema definitions
-    def literal(v)
-      case v
-      when ExpressionString: v
-      when String: "'#{v.gsub(/'/, "''")}'"
-      when Integer, Float: v.to_s
-      when NilClass: NULL
-      when TrueClass: TRUE
-      when FalseClass: FALSE
-      when Symbol: v.to_field_name
-      when Array: v.empty? ? NULL : v.map {|i| literal(i)}.join(COMMA_SEPARATOR)
-      when Time: v.strftime(TIMESTAMP_FORMAT)
-      when Date: v.strftime(DATE_FORMAT)
-      when Dataset: "(#{v.sql})"
-      else
-        raise SequelError, "can't express #{v.inspect} as a SQL literal"
-      end
-    end
     
     # default serial primary key definition. this should be overriden for each adapter.
     def serial_primary_key_options
