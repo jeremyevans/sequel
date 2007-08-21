@@ -551,6 +551,11 @@ context "Dataset#select" do
   specify "should use the wildcard if no arguments are given" do
     @d.select.sql.should == 'SELECT * FROM test'
   end
+  
+  specify "should accept a hash for AS values" do
+    @d.select(:name => 'My Name', :__ggh => 'Age').sql.should == \
+      "SELECT name AS 'My Name', __ggh AS 'Age' FROM test"
+  end
 
   specify "should overrun the previous select option" do
     @d.select(:a, :b, :c).select.sql.should == 'SELECT * FROM test'

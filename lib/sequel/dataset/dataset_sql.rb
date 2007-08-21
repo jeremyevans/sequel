@@ -7,7 +7,14 @@ module Sequel
       # symbols can include double underscores to denote a dot separator, e.g.
       # :posts__id will be converted into posts.id.
       def field_name(field)
-        field.is_a?(Symbol) ? field.to_field_name : field
+        case field
+        when Symbol:
+          field.to_field_name
+        when Hash:
+          field.map {|f,a| "#{field_name(f)} AS '#{field_name(a)}'"}.join(COMMA_SEPARATOR)
+        else
+          field
+        end
       end
 
       ALIASED_REGEXP = /^(.*)\s(.*)$/.freeze
@@ -420,7 +427,7 @@ module Sequel
         sql = opts[:distinct] ? \
           "SELECT DISTINCT #{select_fields} FROM #{select_source}" : \
           "SELECT #{select_fields} FROM #{select_source}"
-
+        
         if join = opts[:join]
           sql << join
         end
