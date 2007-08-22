@@ -129,6 +129,16 @@ module Sequel
         a..b
       end
 
+      # Returns the number of records in the current page
+      def current_page_record_count
+        return 0 if @current_page > @page_count
+        
+        a = 1 + (@current_page - 1) * @page_size
+        b = a + @page_size - 1
+        b = @pagination_record_count if b > @pagination_record_count
+        b - a + 1
+      end
+
       # Returns the minimum value for the given field.
       def min(field)
         single_value(:select => [field.MIN.AS(:v)])
