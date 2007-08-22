@@ -553,8 +553,8 @@ context "Dataset#select" do
   end
   
   specify "should accept a hash for AS values" do
-    @d.select(:name => 'My Name', :__ggh => 'Age').sql.should == \
-      "SELECT name AS 'My Name', __ggh AS 'Age' FROM test"
+    @d.select(:name => 'name', :__ggh => 'age').sql.should == \
+      "SELECT name AS name, __ggh AS age FROM test"
   end
 
   specify "should overrun the previous select option" do

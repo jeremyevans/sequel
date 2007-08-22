@@ -8,15 +8,22 @@ module Sequel
       # :posts__id will be converted into posts.id.
       def field_name(field)
         case field
-        when Symbol:
-          field.to_field_name
+        when Symbol, String:
+          quoted_field_name(field.to_field_name)
         when Hash:
-          field.map {|f,a| "#{field_name(f)} AS '#{field_name(a)}'"}.join(COMMA_SEPARATOR)
+          field.map {|f,a| "#{field_name(f)} AS #{field_name(a)}"}.join(COMMA_SEPARATOR)
         else
           field
         end
       end
 
+      # Adds quoting to field references. This method is just a stub and can
+      # be overriden in adapters in order to provide correct field quoting
+      # behavior.
+      def quoted_field_name(name)
+        name
+      end
+      
       ALIASED_REGEXP = /^(.*)\s(.*)$/.freeze
       QUALIFIED_REGEXP = /^(.*)\.(.*)$/.freeze
 
@@ -210,7 +217,7 @@ module Sequel
       # Returns a copy of the dataset with the order reversed. If no order is
       # given, the existing order is inverted.
       def reverse_order(*order)
-        order(invert_order(order.empty? ? @opts[:order] : order))
+        order(*invert_order(order.empty? ? @opts[:order] : order))
       end
 
       DESC_ORDER_REGEXP = /(.*)\sDESC/.freeze
