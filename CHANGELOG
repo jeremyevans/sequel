@@ -1,5 +1,7 @@
 === 0.19.10 (2007-08-22)
 
+* Changed schema generation code to generate separate statements for CREATE TABLE and each CREATE INDEX (#34).
+
 * Refactored Dataset::SQL#field_name for better support of different quoting schemes by specific adapters.
 
 * Added #current_page_record_count for paginated datasets.

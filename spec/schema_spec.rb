@@ -136,7 +136,7 @@ context "DB#create_table" do
       integer :id
       index :id
     end
-    @db.sqls.should == ["CREATE TABLE cats (id integer);CREATE INDEX cats_id_index ON cats (id);"]
+    @db.sqls.should == ["CREATE TABLE cats (id integer);", "CREATE INDEX cats_id_index ON cats (id);"]
   end
 
   specify "should accept multiple index definitions" do
@@ -145,7 +145,7 @@ context "DB#create_table" do
       index :id
       index :name
     end
-    @db.sqls.should == ["CREATE TABLE cats (id integer);CREATE INDEX cats_id_index ON cats (id);CREATE INDEX cats_name_index ON cats (name);"]
+    @db.sqls.should == ["CREATE TABLE cats (id integer);", "CREATE INDEX cats_id_index ON cats (id);", "CREATE INDEX cats_name_index ON cats (name);"]
   end
   
   specify "should accept custom index names" do
@@ -153,7 +153,7 @@ context "DB#create_table" do
       integer :id
       index :id, :name => 'abc'
     end
-    @db.sqls.should == ["CREATE TABLE cats (id integer);CREATE INDEX abc ON cats (id);"]
+    @db.sqls.should == ["CREATE TABLE cats (id integer);", "CREATE INDEX abc ON cats (id);"]
   end
 
   specify "should accept unique index definitions" do
@@ -161,7 +161,7 @@ context "DB#create_table" do
       integer :id
       index :id, :unique => true
     end
-    @db.sqls.should == ["CREATE TABLE cats (id integer);CREATE UNIQUE INDEX cats_id_index ON cats (id);"]
+    @db.sqls.should == ["CREATE TABLE cats (id integer);", "CREATE UNIQUE INDEX cats_id_index ON cats (id);"]
   end
   
   specify "should accept compound index definitions" do
@@ -169,7 +169,7 @@ context "DB#create_table" do
       integer :id
       index [:id, :name], :unique => true
     end
-    @db.sqls.should == ["CREATE TABLE cats (id integer);CREATE UNIQUE INDEX cats_id_name_index ON cats (id, name);"]
+    @db.sqls.should == ["CREATE TABLE cats (id integer);", "CREATE UNIQUE INDEX cats_id_name_index ON cats (id, name);"]
   end
 end
 

@@ -109,7 +109,7 @@ module Sequel
     #   end
     def create_table(name, &block)
       g = Schema::Generator.new(self, name, &block)
-      execute(create_table_sql(*g.create_info))
+      create_table_sql_list(*g.create_info).each {|sta| execute(sta)}
     end
     
     # Drops a table.

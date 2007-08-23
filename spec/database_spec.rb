@@ -181,7 +181,12 @@ end
 
 class DummyDatabase < Sequel::Database
   attr_reader :sql
-  def execute(sql); @sql = sql; end
+  
+  def execute(sql)
+    @sql ||= ""
+    @sql << sql
+  end
+  
   def transaction; yield; end
 
   def dataset

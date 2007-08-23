@@ -66,16 +66,18 @@ module Sequel
         end
       end
     
-      def index_list_sql(table_name, indexes)
-        indexes.map {|i| index_definition_sql(table_name, i)}.join
+      def index_list_sql_list(table_name, indexes)
+        indexes.map {|i| index_definition_sql(table_name, i)}
       end
   
-      def create_table_sql(name, columns, indexes = nil)
-        sql = "CREATE TABLE #{name} (#{column_list_sql(columns)});"
-        sql << index_list_sql(name, indexes) if indexes && !indexes.empty?
+      def create_table_sql_list(name, columns, indexes = nil)
+        sql = ["CREATE TABLE #{name} (#{column_list_sql(columns)});"]
+        if indexes && !indexes.empty?
+          sql.concat(index_list_sql_list(name, indexes))
+        end
         sql
       end
-    
+      
       def drop_table_sql(name)
         "DROP TABLE #{name};"
       end
