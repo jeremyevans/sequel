@@ -1,4 +1,4 @@
-=== SVN
+=== 0.19.11 (2007-08-24)
 
 * Changed Dataset#set_model to allow supplying additional arguments to the model's initialize method (#35). Thanks Sunny Hirai.
 
