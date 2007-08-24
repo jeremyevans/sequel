@@ -1150,35 +1150,36 @@ context "Dataset#set_model" do
   setup do
     @c = Class.new(Sequel::Dataset) do
       def fetch_rows(sql, &block)
-        (1..10).each(&block)
+        # yield a hash with kind as the 1 bit of a number
+        (1..10).each {|i| block.call({:kind => i[0]})}
       end
     end
     @dataset = @c.new(nil).from(:items)
     @m = Class.new do
-      attr_accessor :c
-      def initialize(c); @c = c; end
-      def ==(o); @c == o.c; end
+      attr_accessor :c, :args
+      def initialize(c, *args); @c = c; @args = args; end
+      def ==(o); (@c == o.c) && (@args = o.args); end
     end
   end
   
   specify "should clear the models hash and restore the stock #each if nil is specified" do
     @dataset.set_model(@m)
     @dataset.set_model(nil)
-    @dataset.first.should == 1
+    @dataset.first.should == {:kind => 1}
     @dataset.model_classes.should be_nil
   end
   
   specify "should clear the models hash and restore the stock #each if nothing is specified" do
     @dataset.set_model(@m)
-    @dataset.set_model
-    @dataset.first.should == 1
+    @dataset.set_model(nil)
+    @dataset.first.should == {:kind => 1}
     @dataset.model_classes.should be_nil
   end
   
   specify "should alter #each to provide model instances" do
-    @dataset.first.should == 1
+    @dataset.first.should == {:kind => 1}
     @dataset.set_model(@m)
-    @dataset.first.should == @m.new(1)
+    @dataset.first.should == @m.new({:kind => 1})
   end
   
   specify "should extend the dataset with a #destroy method" do
@@ -1193,20 +1194,43 @@ context "Dataset#set_model" do
     @dataset.opts[:naked].should be_nil
   end
   
+  specify "should send additional arguments to the models' initialize method" do
+    @dataset.set_model(@m, 7, 6, 5)
+    @dataset.first.should == @m.new({:kind => 1}, 7, 6, 5)
+  end
+  
   specify "should provide support for polymorphic model instantiation" do
     @m1 = Class.new(@m)
     @m2 = Class.new(@m)
-    @dataset.set_model(0, 0 => @m1, 1 => @m2)
+    @dataset.set_model(:kind, 0 => @m1, 1 => @m2)
+    @dataset.opts[:polymorphic_key].should == :kind
     all = @dataset.all
     all[0].class.should == @m2
     all[1].class.should == @m1
     all[2].class.should == @m2
     all[3].class.should == @m1
     #...
+    
+    # denude model
+    @dataset.set_model(nil)
+    @dataset.first.should == {:kind => 1}
   end
   
-  specify "should raise an error if more than two arguments are supplied" do
-    proc {@dataset.set_model(1, 2, 3)}.should raise_error(SequelError)
+  specify "should send additional arguments for polymorphic models as well" do
+    @m1 = Class.new(@m)
+    @m2 = Class.new(@m)
+    @dataset.set_model(:kind, {0 => @m1, 1 => @m2}, :hey => :wow)
+    all = @dataset.all
+    all[0].class.should == @m2; all[0].args.should == [{:hey => :wow}]
+    all[1].class.should == @m1; all[1].args.should == [{:hey => :wow}]
+    all[2].class.should == @m2; all[2].args.should == [{:hey => :wow}]
+    all[3].class.should == @m1; all[3].args.should == [{:hey => :wow}]
+  end
+  
+  specify "should raise for invalid parameters" do
+    proc {@dataset.set_model('kind')}.should raise_error(SequelError)
+    proc {@dataset.set_model(0)}.should raise_error(SequelError)
+    proc {@dataset.set_model(:kind)}.should raise_error(SequelError) # no hash given
   end
 end
 
@@ -1238,7 +1262,7 @@ context "Dataset#model_classes" do
   specify "should return the polymorphic hash for a polymorphic model dataset" do
     @m1 = Class.new(@m)
     @m2 = Class.new(@m)
-    @dataset.set_model(0, 0 => @m1, 1 => @m2)
+    @dataset.set_model(:key, 0 => @m1, 1 => @m2)
     @dataset.model_classes.should == {0 => @m1, 1 => @m2}
   end
 end
@@ -1295,7 +1319,7 @@ context "A polymorphic model dataset" do
   setup do
     @c = Class.new(Sequel::Dataset) do
       def fetch_rows(sql, &block)
-        (1..10).each(&block)
+        (1..10).each {|i| block.call(:bit => i[0])}
       end
     end
     @dataset = @c.new(nil).from(:items)
@@ -1308,7 +1332,7 @@ context "A polymorphic model dataset" do
   
   specify "should use a nil key in the polymorphic hash to specify the default model class" do
     @m2 = Class.new(@m)
-    @dataset.set_model(0, nil => @m, 1 => @m2)
+    @dataset.set_model(:bit, nil => @m, 1 => @m2)
     all = @dataset.all
     all[0].class.should == @m2
     all[1].class.should == @m
@@ -1319,13 +1343,13 @@ context "A polymorphic model dataset" do
   
   specify "should raise SequelError if no suitable class is found in the polymorphic hash" do
     @m2 = Class.new(@m)
-    @dataset.set_model(0, 1 => @m2)
+    @dataset.set_model(:bit, 1 => @m2)
     proc {@dataset.all}.should raise_error(SequelError)
   end
 
   specify "should supply naked records if the naked option is specified" do
-    @dataset.set_model(0, nil => @m)
-    @dataset.each(:naked => true) {|r| r.class.should == Fixnum}
+    @dataset.set_model(:bit, nil => @m)
+    @dataset.each(:naked => true) {|r| r.class.should == Hash}
   end
 end
 

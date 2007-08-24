@@ -1,14 +1,18 @@
+=== SVN
+
+* Changed Dataset#set_model to allow supplying additional arguments to the model's initialize method (#35). Thanks Sunny Hirai.
+
 === 0.19.10 (2007-08-22)
 
 * Changed schema generation code to generate separate statements for CREATE TABLE and each CREATE INDEX (#34).
 
-* Refactored Dataset::SQL#field_name for better support of different quoting schemes by specific adapters.
+* Refactored Dataset::SQL#field_name for better support of different field quoting standards by specific adapters.
 
 * Added #current_page_record_count for paginated datasets.
 
 * Removed Database#literal and included Dataset::SQL instead.
 
-* Sequel::Dataset:SQL#field_name can now take a hash (as well as #select and any method that uses #field_name) for aliasing column names.  E.g. Dataset.new(nil).from(:test).select(:_qqa => 'Date').sql #=> 'SELECT _qqa AS 'Date' FROM test'.
+* Sequel::Dataset:SQL#field_name can now take a hash (as well as #select and any method that uses #field_name) for aliasing column names.  E.g. DB[:test].select(:_qqa => 'Date').sql #=> 'SELECT _qqa AS Date FROM test'.
 
 * Moved SingleThreadedPool to lib/sequel/connection_pool.rb.
 
