@@ -1502,6 +1502,14 @@ context "Dataset#print" do
     @output.read.should == \
       "+-+-+\n|a|b|\n+-+-+\n|1|2|\n|3|4|\n|5|6|\n+-+-+\n"
   end
+
+  specify "should default to the dataset's columns" do
+    @dataset.meta_def(:columns) {[:a, :b]}
+    @dataset.print
+    @output.rewind
+    @output.read.should == \
+      "+-+-+\n|a|b|\n+-+-+\n|1|2|\n|3|4|\n|5|6|\n+-+-+\n"
+  end
 end
 
 context "Dataset#multi_insert" do

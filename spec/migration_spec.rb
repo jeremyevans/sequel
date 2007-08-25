@@ -86,7 +86,7 @@ MIGRATION_001 = %[
       create(1111)
     end
     
-    def drop
+    def down
       drop(1111)
     end
   end
@@ -174,6 +174,11 @@ context "Sequel::Migrator" do
       [CreateSessions, CreateNodes, CreateUsers]
   end
   
+  specify "should load the migration classes for the specified range" do
+    Sequel::Migrator.migration_classes('.', 0, 5, :down).should == \
+      [CreateAttributes, CreateUsers, CreateNodes, CreateSessions]
+  end
+  
   specify "should start from current + 1 for the up direction" do
     Sequel::Migrator.migration_classes('.', 3, 1, :up).should == \
       [CreateNodes, CreateUsers]
@@ -237,5 +242,12 @@ context "Sequel::Migrator" do
     @db.creates.should == [1111, 2222, 3333, 5555]
 
     Sequel::Migrator.get_current_migration_version(@db).should == 5
+  end
+
+  specify "should apply migrations down to 0 version correctly" do
+    Sequel::Migrator.apply(@db, '.', 0, 5)
+    @db.drops.should == [5555, 3333, 2222, 1111]
+
+    Sequel::Migrator.get_current_migration_version(@db).should == 0
   end
 end
