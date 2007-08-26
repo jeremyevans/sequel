@@ -1,4 +1,4 @@
-=== SVN
+=== 0.1.9.12 (2007-08-26)
 
 * Added spec for PrettyTable.
 
@@ -12,11 +12,11 @@
 
 * Better spec code coverage.
 
-=== 0.19.11 (2007-08-24)
+=== 0.1.9.11 (2007-08-24)
 
 * Changed Dataset#set_model to allow supplying additional arguments to the model's initialize method (#35). Thanks Sunny Hirai.
 
-=== 0.19.10 (2007-08-22)
+=== 0.1.9.10 (2007-08-22)
 
 * Changed schema generation code to generate separate statements for CREATE TABLE and each CREATE INDEX (#34).
 
