@@ -1,4 +1,4 @@
-require File.join(File.dirname(__FILE__), '../lib/sequel')
+require File.join(File.dirname(__FILE__), 'spec_helper')
 
 context "Enumerable#send_each" do
   specify "should send the supplied method to each item" do

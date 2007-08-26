@@ -64,7 +64,7 @@ module Sequel
     
     def self.set_schema(name = nil, &block)
       name ? set_table_name(name) : name = table_name
-      @schema = Schema::Generator.new(name, &block)
+      @schema = Schema::Generator.new(db, name, &block)
       if @schema.primary_key_name
         set_primary_key @schema.primary_key_name
       end

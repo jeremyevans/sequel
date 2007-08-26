@@ -1,5 +1,15 @@
 === SVN
 
+* Added spec for PrettyTable.
+
+* Added specs for Schema::Generator and Model (#36 thanks technoweenie).
+
+* Fixed Sequel::Model.set_schema (#36 thanks technoweenie.)
+
+* Added support for no options on Schema::Generator#foreign_key (#36 thanks technoweenie.)
+
+* Implemented (restored?) Schema::Generator#primary_key_name (#36 thanks technoweenie.)
+
 * Better spec code coverage.
 
 === 0.19.11 (2007-08-24)

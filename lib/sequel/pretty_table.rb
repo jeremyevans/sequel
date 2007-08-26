@@ -7,7 +7,7 @@
 # +--+-------+
 
 module Sequel
-  class PrettyTable
+  module PrettyTable
     def self.hash_columns(records)
       columns = []
       records.each do |r|

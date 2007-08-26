@@ -1,4 +1,4 @@
-require File.join(File.dirname(__FILE__), '../lib/sequel')
+require File.join(File.dirname(__FILE__), 'spec_helper')
 
 context "A new Database" do
   setup do

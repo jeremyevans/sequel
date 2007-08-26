@@ -14,6 +14,10 @@ module Sequel
         column(name, type, opts)
       end
       
+      def primary_key_name
+        @primary_key ? @primary_key[:name] : nil
+      end
+      
       def primary_key(name, type = nil, opts = nil)
         @primary_key = @db.serial_primary_key_options.merge({
           :name => name
@@ -27,7 +31,7 @@ module Sequel
         @columns << {:name => name, :type => type}.merge(opts || {})
       end
       
-      def foreign_key(name, opts)
+      def foreign_key(name, opts = nil)
         @columns << {:name => name, :type => :integer}.merge(opts || {})
       end
       
