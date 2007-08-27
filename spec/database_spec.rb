@@ -82,6 +82,12 @@ context "Database#dataset" do
     e.sql.should == 'SELECT * FROM miu'
   end
   
+  specify "should provide a filtered #from dataset if a block is given" do
+    d = @db.from(:mau) {x > 100}
+    d.should be_a_kind_of(Sequel::Dataset)
+    d.sql.should == 'SELECT * FROM mau WHERE (x > 100)'
+  end
+  
   specify "should provide a #select dataset" do
     d = @db.select(:a, :b, :c).from(:mau)
     d.should be_a_kind_of(Sequel::Dataset)

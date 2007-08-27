@@ -150,4 +150,12 @@ context "Symbol" do
   specify "should support AVG for specifying avg function" do
     :abc__def.AVG.should == 'avg(abc.def)'
   end
+  
+  specify "should support COUNT for specifying count function" do
+    :abc__def.COUNT.should == 'count(abc.def)'
+  end
+  
+  specify "should support any other function using upper case letters" do
+    :abc__def.DADA.should == 'dada(abc.def)'
+  end
 end

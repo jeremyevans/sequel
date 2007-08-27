@@ -1,3 +1,9 @@
+=== SVN
+
+* Added support for additional functions on columns using Symbol#method_missing.
+
+* Added support for supplying filter block to DB#[] method, to allow stuff like DB[:nodes] {:path =~ /^icex1/}.
+
 === 0.1.9.12 (2007-08-26)
 
 * Added spec for PrettyTable.

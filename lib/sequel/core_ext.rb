@@ -93,18 +93,6 @@ module FieldCompositionMethods
       s
     end
   end
-
-  # Formats a min(x) expression.
-  def MIN; "min(#{to_field_name})"; end
-
-  # Formats a max(x) expression.
-  def MAX; "max(#{to_field_name})"; end
-
-  # Formats a sum(x) expression.
-  def SUM; "sum(#{to_field_name})"; end
-
-  # Formats an avg(x) expression.
-  def AVG; "avg(#{to_field_name})"; end
 end
 
 class String
@@ -138,6 +126,13 @@ class Symbol
     else
       s
     end
+  end
+  
+  # Converts missing method calls into functions on columns, if the
+  # method name is made of all upper case letters.
+  def method_missing(sym)
+    ((s = sym.to_s) =~ /^([A-Z]+)$/) ? \
+      "#{s.downcase}(#{to_field_name})" : super
   end
 end
 

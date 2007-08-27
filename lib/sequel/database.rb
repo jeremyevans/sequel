@@ -63,8 +63,12 @@ module Sequel
       Sequel::Dataset.new(self)
     end
 
-    # Returns a new dataset with the from method invoked.
-    def from(*args); dataset.from(*args); end
+    # Returns a new dataset with the from method invoked. If a block is given,
+    # it is used as a filter on the dataset.
+    def from(*args, &block)
+      ds = dataset.from(*args)
+      block ? ds.filter(&block) : ds
+    end
     
     # Returns a new dataset with the select method invoked.
     def select(*args); dataset.select(*args); end

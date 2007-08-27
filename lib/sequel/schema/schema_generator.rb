@@ -10,8 +10,7 @@ module Sequel
       end
       
       def method_missing(type, name = nil, opts = nil)
-        return super unless name
-        column(name, type, opts)
+        name ? column(name, type, opts) : super
       end
       
       def primary_key_name
