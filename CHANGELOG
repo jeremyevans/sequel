@@ -1,5 +1,7 @@
 === SVN
 
+* Fixed Model.create_table (#37 thanks Florian Aßmann.)
+
 * Added support for additional functions on columns using Symbol#method_missing.
 
 * Added support for supplying filter block to DB#[] method, to allow stuff like DB[:nodes] {:path =~ /^icex1/}.

@@ -78,7 +78,7 @@ module Sequel
     end
     
     def self.create_table
-      db.execute schema.create_sql
+      db.create_table_sql_list(*schema.create_info).each {|s| db << s}
     end
     
     def self.drop_table
