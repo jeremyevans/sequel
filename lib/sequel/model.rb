@@ -82,7 +82,7 @@ module Sequel
     end
     
     def self.drop_table
-      db.execute schema.drop_sql
+      db.execute db.drop_table_sql(table_name)
     end
     
     def self.recreate_table

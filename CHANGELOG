@@ -1,5 +1,7 @@
 === 0.2.0 (2007-09-02)
 
+* Fixed Model.drop_table (thanks Duane Johnson.)
+
 * Dataset#each can now return rows for arbitrary SQL by specifying :sql option.
 
 * Added spec for postgres adapter.
