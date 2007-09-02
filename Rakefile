@@ -45,7 +45,7 @@ spec = Gem::Specification.new do |s|
 
   s.add_dependency('metaid')
   s.add_dependency('ParseTree')
-  s.add_dependency('Ruby2Ruby')
+  s.add_dependency('ruby2ruby')
   
   s.required_ruby_version = '>= 1.8.4'
 
