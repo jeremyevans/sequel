@@ -285,14 +285,12 @@ module Sequel
       LIKE = '(%s ~ %s)'.freeze
       LIKE_CI = '%s ~* %s'.freeze
       
-      def format_eq_expression(left, right)
-        case right
+      def format_re_expression(l, r)
+        case r
         when Regexp:
-          l = field_name(left)
-          r = PGconn.quote(right.source)
-          right.casefold? ? \
-            "(#{l} ~* #{r})" : \
-            "(#{l} ~ #{r})"
+          r.casefold? ? \
+            "(#{literal(l)} ~* #{literal(r)})" :
+            "(#{literal(l)} ~ #{literal(r)})"
         else
           super
         end

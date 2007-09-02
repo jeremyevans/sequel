@@ -94,7 +94,8 @@ module Sequel
       def make_new
         if @created_count < @max_size
           @created_count += 1
-          @connection_proc.call
+          @connection_proc ? @connection_proc.call : \
+            (raise SequelError, "No connection proc specified")
         end
       end
       

@@ -52,10 +52,33 @@ context "String#to_sql" do
   end
 end
 
+context "String#lit" do
+  specify "should return an LiteralString object" do
+    'xyz'.lit.should be_a_kind_of(Sequel::LiteralString)
+    'xyz'.lit.to_s.should == 'xyz'
+  end
+  
+  specify "should inhibit string literalization" do
+    db = Sequel::Database.new
+    ds = db[:t]
+    
+    ds.update_sql(:stamp => "NOW()".lit).should == \
+      "UPDATE t SET stamp = NOW()"
+  end
+end
+
 context "String#expr" do
-  specify "should return an ExpressionString object" do
-    'xyz'.expr.should be_a_kind_of(Sequel::ExpressionString)
+  specify "should return an LiteralString object" do
+    'xyz'.expr.should be_a_kind_of(Sequel::LiteralString)
     'xyz'.expr.to_s.should == 'xyz'
+  end
+
+  specify "should inhibit string literalization" do
+    db = Sequel::Database.new
+    ds = db[:t]
+    
+    ds.update_sql(:stamp => "NOW()".expr).should == \
+      "UPDATE t SET stamp = NOW()"
   end
 end
 
@@ -157,5 +180,15 @@ context "Symbol" do
   
   specify "should support any other function using upper case letters" do
     :abc__def.DADA.should == 'dada(abc.def)'
+  end
+  
+  specify "should support upper case outer functions" do
+    :COUNT['1'].should == 'COUNT(1)'
+  end
+  
+  specify "should inhibit string literalization" do
+    db = Sequel::Database.new
+    ds = db[:t]
+    ds.select(:COUNT['1']).sql.should == "SELECT COUNT(1) FROM t"
   end
 end

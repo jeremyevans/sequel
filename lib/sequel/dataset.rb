@@ -1,8 +1,9 @@
 require 'time'
 require 'date'
 
-require File.join(File.dirname(__FILE__), 'dataset/dataset_sql')
-require File.join(File.dirname(__FILE__), 'dataset/dataset_convenience')
+require File.join(File.dirname(__FILE__), 'dataset/sequelizer')
+require File.join(File.dirname(__FILE__), 'dataset/sql')
+require File.join(File.dirname(__FILE__), 'dataset/convenience')
 
 module Sequel
   # A Dataset represents a view of a the data in a database, constrained by
@@ -63,8 +64,9 @@ module Sequel
   #   end
   class Dataset
     include Enumerable
-    include SQL # in dataset/dataset_sql.rb
-    include Convenience # in dataset/dataset_convenience.rb
+    include Sequelizer
+    include SQL
+    include Convenience
     
     attr_reader :db
     attr_accessor :opts

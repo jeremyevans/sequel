@@ -18,10 +18,10 @@ class Array
 end
 
 module Sequel
-  # ExpressionString is used to represent literal SQL expressions. An 
-  # ExpressionString is copied verbatim into an SQL statement. Instances of
-  # ExpressionString can be created by calling String#expr.
-  class ExpressionString < ::String
+  # LiteralString is used to represent literal SQL expressions. An 
+  # LiteralString is copied verbatim into an SQL statement. Instances of
+  # LiteralString can be created by calling String#expr.
+  class LiteralString < ::String
   end
 end
 
@@ -39,18 +39,20 @@ class String
     to_sql.split(';').map {|s| s.strip}
   end
 
-  # Converts a string into an ExpressionString, in order to override string
+  # Converts a string into an LiteralString, in order to override string
   # literalization, e.g.:
   #
   #   DB[:items].filter(:abc => 'def').sql #=>
   #     "SELECT * FROM items WHERE (abc = 'def')"
   #
-  #   DB[:items].filter(:abc => 'def'.expr).sql #=>
+  #   DB[:items].filter(:abc => 'def'.lit).sql #=>
   #     "SELECT * FROM items WHERE (abc = def)"
   #
-  def expr
-    Sequel::ExpressionString.new(self)
+  def lit
+    Sequel::LiteralString.new(self)
   end
+  
+  alias_method :expr, :lit
   
   # Converts a string into a Time object.
   def to_time
@@ -133,6 +135,11 @@ class Symbol
   def method_missing(sym)
     ((s = sym.to_s) =~ /^([A-Z]+)$/) ? \
       "#{s.downcase}(#{to_field_name})" : super
+  end
+  
+  # Formats an SQL function with optional parameters
+  def [](*args)
+    "#{to_s}(#{args.join(', ')})".lit
   end
 end
 

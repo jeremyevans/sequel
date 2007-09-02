@@ -86,7 +86,7 @@ module Sequel
       # If an unsupported object is given, an exception is raised.
       def literal(v)
         case v
-        when ExpressionString: v
+        when LiteralString: v
         when String: "'#{v.gsub(/'/, "''")}'"
         when Integer, Float: v.to_s
         when NilClass: NULL
@@ -103,92 +103,24 @@ module Sequel
       end
 
       AND_SEPARATOR = " AND ".freeze
-
-      # Formats an equality expression involving a left value and a right value.
-      # Equality expressions differ according to the class of the right value.
-      # The stock implementation supports Range (inclusive and exclusive), Array
-      # (as a list of values to compare against), Dataset (as a subquery to
-      # compare against), or a regular value.
-      #
-      #   dataset.format_eq_expression('id', 1..20) #=>
-      #     "(id >= 1 AND id <= 20)"
-      #   dataset.format_eq_expression('id', [3,6,10]) #=>
-      #     "(id IN (3, 6, 10))"
-      #   dataset.format_eq_expression('id', DB[:items].select(:id)) #=>
-      #     "(id IN (SELECT id FROM items))"
-      #   dataset.format_eq_expression('id', nil) #=>
-      #     "(id IS NULL)"
-      #   dataset.format_eq_expression('id', 3) #=>
-      #     "(id = 3)"
-      def format_eq_expression(left, right)
-        case right
-        when Range:
-          right.exclude_end? ? \
-            "(#{left} >= #{literal(right.begin)} AND #{left} < #{literal(right.end)})" : \
-            "(#{left} >= #{literal(right.begin)} AND #{left} <= #{literal(right.end)})"
-        when Array:
-          "(#{left} IN (#{literal(right)}))"
-        when Dataset:
-          "(#{left} IN (#{right.sql}))"
-        when NilClass:
-          "(#{left} IS NULL)"
-        else
-          "(#{left} = #{literal(right)})"
-        end
-      end
-
-      # Formats an expression comprising a left value, a binary operator and a
-      # right value. The supported operators are :eql (=), :not (!=), :lt (<),
-      # :lte (<=), :gt (>), :gte (>=) and :like (LIKE operator). Examples:
-      #
-      #   dataset.format_expression('price', :gte, 100) #=> "(price >= 100)"
-      #   dataset.format_expression('id', :not, 30) #=> "NOT (id = 30)"
-      #   dataset.format_expression('name', :like, 'abc%') #=>
-      #     "(name LIKE 'abc%')"
-      #
-      # If an unsupported operator is given, an exception is raised.
-      def format_expression(left, op, right)
-        left = field_name(left)
-        case op
-        when :eql:
-          format_eq_expression(left, right)
-        when :not:
-          "NOT #{format_eq_expression(left, right)}"
-        when :lt:
-          "(#{left} < #{literal(right)})"
-        when :lte:
-          "(#{left} <= #{literal(right)})"
-        when :gt:
-          "(#{left} > #{literal(right)})"
-        when :gte:
-          "(#{left} >= #{literal(right)})"
-        when :like:
-          "(#{left} LIKE #{literal(right)})"
-        else
-          raise SequelError, "Invalid operator specified: #{op}"
-        end
-      end
-
       QUESTION_MARK = '?'.freeze
 
       # Formats a where clause. If parenthesize is true, then the whole 
       # generated clause will be enclosed in a set of parentheses.
-      def expression_list(where, parenthesize = false)
-        case where
+      def expression_list(expr, parenthesize = false)
+        case expr
         when Hash:
-          parenthesize = false if where.size == 1
-          fmt = where.map {|i| format_expression(i[0], :eql, i[1])}.
-            join(AND_SEPARATOR)
+          parenthesize = false if expr.size == 1
+          fmt = expr.map {|i| compare_expr(i[0], i[1])}.join(AND_SEPARATOR)
         when Array:
-          fmt = where.shift.gsub(QUESTION_MARK) {literal(where.shift)}
+          fmt = expr.shift.gsub(QUESTION_MARK) {literal(expr.shift)}
         when Proc:
-          fmt = where.to_expressions.map {|e| format_expression(e.left, e.op, e.right)}.
-            join(AND_SEPARATOR)
+          fmt = proc_to_sql(expr)
         else
           # if the expression is compound, it should be parenthesized in order for 
           # things to be predictable (when using #or and #and.)
-          parenthesize |= where =~ /\).+\(/
-          fmt = where
+          parenthesize |= expr =~ /\).+\(/
+          fmt = expr
         end
         parenthesize ? "(#{fmt})" : fmt
       end
@@ -272,10 +204,6 @@ module Sequel
         parenthesize = !(cond.is_a?(Hash) || cond.is_a?(Array))
         filter = cond.is_a?(Hash) && cond
         if @opts[clause]
-          if filter && cond.is_a?(Hash)
-            filter
-          end
-          filter = 
           l = expression_list(@opts[clause])
           r = expression_list(block || cond, parenthesize)
           clone_merge(clause => "#{l} AND #{r}")
@@ -427,6 +355,11 @@ module Sequel
       # options.
       def select_sql(opts = nil)
         opts = opts ? @opts.merge(opts) : @opts
+
+        # The :sql option means we're using a custom SQL statement
+        if sql = opts[:sql]
+          return sql
+        end
 
         fields = opts[:select]
         select_fields = fields ? field_list(fields) : WILDCARD

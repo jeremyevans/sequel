@@ -1,6 +1,38 @@
 === SVN
 
-* Fixed Model.create_table (#37 thanks Florian Aßmann.)
+* More specs for block filters. Updated README.
+
+* Added support for globals and $X macros in block filters.
+
+* Fixed Sequelizer to not fail if ParseTree or Ruby2Ruby gems are missing.
+
+* Renamed String#expr into String#lit (#expr should be deprecated in future versions).
+
+* Renamed Sequel::ExpressionString into LiteralString.
+
+* Fixed Symbol#[] to return an ExpressionString, so as not to be literalized.
+
+* Renamed Dataset::Expressions to Dataset::Sequelizer.
+
+* Renamed Expressions#format_re_expression to match_expr.
+
+* Renamed Expressions#format_eq_expression to compare_expr.
+
+* Added support for Regexp in MySQL adapter.
+
+* Refactored Regexp expressions into a separate #format_re_expression method.
+
+* Added support for arithmetic in proc filters.
+
+* Added support for nested proc expressions, more specs.
+
+* Added support for SQL function using symbols, e.g. :sum[:x].
+
+* Fixed deadlock bug in ConnectionPool.
+
+* Removed deprecated old expressions.rb.
+
+* Rewrote Proc filter feature using ParseTree.
 
 * Added support for additional functions on columns using Symbol#method_missing.
 

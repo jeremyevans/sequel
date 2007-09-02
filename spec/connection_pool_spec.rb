@@ -152,7 +152,7 @@ context "A connection pool with a max size of 1" do
     @pool.allocated.should == {t1 => cc}
     
     cc.gsub!('rr', 'll')
-    sleep 0.2
+    sleep 0.5
     
     # connection held by t2
     t1.should_not be_alive
@@ -164,7 +164,7 @@ context "A connection pool with a max size of 1" do
     @pool.allocated.should == {t2 => cc}
     
     cc.gsub!('ll', 'rr')
-    sleep 0.2
+    sleep 0.5
     
     #connection released
     t2.should_not be_alive

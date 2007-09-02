@@ -156,10 +156,22 @@ module Sequel
         end
       end
       
+      TRUE = '1'
+      FALSE = '0'
+      
       def literal(v)
         case v
-        when true: '1'
-        when false: '0'
+        when true: TRUE
+        when false: FALSE
+        else
+          super
+        end
+      end
+      
+      def format_re_expression(l, r)
+        case r
+        when Regexp:
+          "(#{literal(l)} REGEXP #{literal(r)})"
         else
           super
         end

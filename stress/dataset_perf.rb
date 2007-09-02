@@ -2,7 +2,7 @@ require 'benchmark'
 require 'rubygems'
 require File.join(File.dirname(__FILE__), '../lib/sequel/sqlite')
 
-DB = Sequel.open 'sqlite:/:memory:'
+DB = Sequel.sqlite
 
 N = 100_000
 

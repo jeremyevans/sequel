@@ -110,6 +110,11 @@ context "A simple dataset" do
     @dataset.update_sql(:name => 'abc').should ==
       "UPDATE test SET name = 'abc'"
   end
+
+  specify "should be able to return rows for arbitrary SQL" do
+    @dataset.select_sql(:sql => 'xxx yyy zzz').should ==
+      "xxx yyy zzz"
+  end
 end
 
 context "A dataset with multiple tables in its FROM clause" do
@@ -208,7 +213,7 @@ context "Dataset#where" do
       "SELECT * FROM test WHERE (a = 1) AND (d = 4)"
       
     # string and proc expr
-    @d3.where {e < 5}.select_sql.should ==
+    @d3.where {:e < 5}.select_sql.should ==
       "SELECT * FROM test WHERE (a = 1) AND (e < 5)"
   end
   
@@ -222,10 +227,10 @@ context "Dataset#where" do
     @dataset.filter(:id => 4...7).sql.should ==
       'SELECT * FROM test WHERE (id >= 4 AND id < 7)'
 
-    @dataset.filter {id == (4..7)}.sql.should ==
+    @dataset.filter {:id == (4..7)}.sql.should ==
       'SELECT * FROM test WHERE (id >= 4 AND id <= 7)'
 
-    @dataset.filter {id.in 4..7}.sql.should ==
+    @dataset.filter {:id.in?(4..7)}.sql.should ==
       'SELECT * FROM test WHERE (id >= 4 AND id <= 7)'
   end
   
@@ -233,7 +238,7 @@ context "Dataset#where" do
     @dataset.filter(:owner_id => nil).sql.should ==
       'SELECT * FROM test WHERE (owner_id IS NULL)'
 
-    @dataset.filter{owner_id.nil?}.sql.should ==
+    @dataset.filter{:owner_id.nil?}.sql.should ==
       'SELECT * FROM test WHERE (owner_id IS NULL)'
   end
   
@@ -247,45 +252,39 @@ context "Dataset#where" do
   end
   
   specify "should accept a subquery for an EXISTS clause" do
-    a = @dataset.filter {price < 100}
+    a = @dataset.filter {:price < 100}
     @dataset.filter(a.exists).sql.should ==
       'SELECT * FROM test WHERE EXISTS (SELECT 1 FROM test WHERE (price < 100))'
   end
   
-  specify "should accept proc expressions (nice!)" do
+  specify "should accept proc expressions" do
     d = @d1.select(:gdp.AVG)
-    @dataset.filter {gdp > d}.sql.should ==
+    @dataset.filter {:gdp > d}.sql.should ==
       "SELECT * FROM test WHERE (gdp > (SELECT avg(gdp) FROM test WHERE (region = 'Asia')))"
     
-    @dataset.filter {id.in 4..7}.sql.should ==
+    @dataset.filter {:id.in(4..7)}.sql.should ==
       'SELECT * FROM test WHERE (id >= 4 AND id <= 7)'
     
-    @dataset.filter {c == 3}.sql.should ==
+    @dataset.filter {:c == 3}.sql.should ==
       'SELECT * FROM test WHERE (c = 3)'
       
-    @dataset.filter {id == :items__id}.sql.should ==
+    @dataset.filter {:id == :items__id}.sql.should ==
       'SELECT * FROM test WHERE (id = items.id)'
       
-    @dataset.filter {a < 1}.sql.should ==
+    @dataset.filter {:a < 1}.sql.should ==
       'SELECT * FROM test WHERE (a < 1)'
 
-    @dataset.filter {a <=> 1}.sql.should ==
-      'SELECT * FROM test WHERE NOT (a = 1)'
+    @dataset.filter {:a != 1}.sql.should ==
+      'SELECT * FROM test WHERE (NOT (a = 1))'
       
-    @dataset.filter {a >= 1 && b <= 2}.sql.should ==
-      'SELECT * FROM test WHERE (a >= 1) AND (b <= 2)'
+    @dataset.filter {:a >= 1 && :b <= 2}.sql.should ==
+      'SELECT * FROM test WHERE ((a >= 1) AND (b <= 2))'
       
-    @dataset.filter {c =~ 'ABC%'}.sql.should ==
+    @dataset.filter {:c.like 'ABC%'}.sql.should ==
       "SELECT * FROM test WHERE (c LIKE 'ABC%')"
 
-    @dataset.filter {test.ccc =~ 'ABC%'}.sql.should ==
-      "SELECT * FROM test WHERE (test.ccc LIKE 'ABC%')"
-  end
-  
-  specify "should raise SequelError for invalid proc expressions" do
-    proc {@dataset.filter {Object.czxczxcz}}.should raise_error(SequelError)
-    proc {@dataset.filter {a.bcvxv}}.should raise_error(SequelError)
-    proc {@dataset.filter {x}}.should raise_error(SequelError)
+    @dataset.filter {:c.like? 'ABC%'}.sql.should ==
+      "SELECT * FROM test WHERE (c LIKE 'ABC%')"
   end
 end
 
@@ -309,7 +308,7 @@ context "Dataset#or" do
     @d1.or('(y > ?)', 2).sql.should ==
       'SELECT * FROM test WHERE (x = 1) OR (y > 2)'
       
-    (@d1.or {yy > 3}).sql.should ==
+    (@d1.or {:yy > 3}).sql.should ==
       'SELECT * FROM test WHERE (x = 1) OR (yy > 3)'
   end
   
@@ -342,7 +341,7 @@ context "Dataset#and" do
     @d1.and('(y > ?)', 2).sql.should ==
       'SELECT * FROM test WHERE (x = 1) AND (y > 2)'
       
-    (@d1.and {yy > 3}).sql.should ==
+    (@d1.and {:yy > 3}).sql.should ==
       'SELECT * FROM test WHERE (x = 1) AND (yy > 3)'
   end
   
@@ -387,7 +386,7 @@ context "Dataset#exclude" do
   end
   
   specify "should support proc expressions" do
-    @dataset.exclude {id == (6...12)}.sql.should == 
+    @dataset.exclude {:id == (6...12)}.sql.should == 
       'SELECT * FROM test WHERE NOT ((id >= 6 AND id < 12))'
   end
 end
@@ -411,7 +410,7 @@ context "Dataset#having" do
   end
 
   specify "should support proc expressions" do
-    @grouped.having {SUM(:population) > 10}.sql.should == 
+    @grouped.having {:sum[:population] > 10}.sql.should == 
       "SELECT #{@fields} FROM test GROUP BY region HAVING (sum(population) > 10)"
   end
 end
@@ -753,7 +752,7 @@ context "Dataset#count" do
   end
   
   specify "should include the where clause if it's there" do
-    @dataset.filter {abc < 30}.count.should == 1
+    @dataset.filter {:abc < 30}.count.should == 1
     @c.sql.should == 'SELECT COUNT(*) FROM test WHERE (abc < 30)'
   end
 end
@@ -769,7 +768,7 @@ context "Dataset#join_table" do
   end
   
   specify "should include WHERE clause if applicable" do
-    @d.filter {price < 100}.join_table(:right_outer, :categories, :category_id => :id).sql.should ==
+    @d.filter {:price < 100}.join_table(:right_outer, :categories, :category_id => :id).sql.should ==
       'SELECT * FROM items RIGHT OUTER JOIN categories ON (categories.category_id = items.id) WHERE (price < 100)'
   end
   
