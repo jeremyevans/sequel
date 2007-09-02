@@ -1,4 +1,4 @@
-=== SVN
+=== 0.2.0 (2007-09-02)
 
 * Dataset#each can now return rows for arbitrary SQL by specifying :sql option.
 
