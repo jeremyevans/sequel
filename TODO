@@ -1,4 +1,10 @@
-# Add Dataset#update_or_create:
+* postgres spec
+
+* adapter specs for using regexps (postgres and mysql)
+
+* adapter specs for Model
+
+* Add Dataset#update_or_create:
 
   DB[:items].filter(:name => 'abc').update_or_create(:price => 100)
   
@@ -8,8 +14,6 @@
     DB[:items] << {:name => 'abc', :price => 100}
 
 * Dataset#set as alias to Dataset#update
-
-* Refactor schema code to allow adapters to adapt schema definitions to specific capabilities.
 
 * many_to_many smart relationships.
 

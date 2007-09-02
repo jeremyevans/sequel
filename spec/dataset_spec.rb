@@ -110,7 +110,7 @@ context "A simple dataset" do
     @dataset.update_sql(:name => 'abc').should ==
       "UPDATE test SET name = 'abc'"
   end
-
+  
   specify "should be able to return rows for arbitrary SQL" do
     @dataset.select_sql(:sql => 'xxx yyy zzz').should ==
       "xxx yyy zzz"

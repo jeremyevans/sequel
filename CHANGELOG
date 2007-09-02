@@ -1,5 +1,15 @@
 === SVN
 
+* Dataset#each can now return rows for arbitrary SQL by specifying :sql option.
+
+* Added spec for postgres adapter.
+
+* Fixed Model.method_missing to work with new SQL generation.
+
+* Fixed #compare_expr to support regexps.
+
+* Fixed postgres, mysql adapters to support regexps.
+
 * More specs for block filters. Updated README.
 
 * Added support for globals and $X macros in block filters.

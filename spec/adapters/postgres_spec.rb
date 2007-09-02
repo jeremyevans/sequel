@@ -1,10 +1,10 @@
-require File.join(File.dirname(__FILE__), '../../lib/sequel/mysql')
+require File.join(File.dirname(__FILE__), '../../lib/sequel/postgres')
 
-MYSQL_DB = Sequel('mysql://root@localhost/sandbox')
-if MYSQL_DB.table_exists?(:items)
-  MYSQL_DB.drop_table :items
+PGSQL_DB = Sequel('postgres://postgres:postgres@localhost:5432/reality_spec')
+if PGSQL_DB.table_exists?(:test)
+  PGSQL_DB.drop_table :test
 end
-MYSQL_DB.create_table :items do
+PGSQL_DB.create_table :test do
   text :name
   integer :value
   
@@ -13,7 +13,7 @@ end
 
 context "A MySQL dataset" do
   setup do
-    @d = MYSQL_DB[:items]
+    @d = PGSQL_DB[:test]
     @d.delete # remove all records
   end
   
@@ -70,47 +70,8 @@ context "A MySQL dataset" do
     proc {@d.literal(false)}.should_not raise_error
   end
   
-  specify "should quote fields using back-ticks" do
-    @d.select(:name).sql.should == \
-      'SELECT `name` FROM items'
-      
-    @d.select('COUNT(*)').sql.should == \
-      'SELECT COUNT(*) FROM items'
-
-    @d.select(:value.MAX).sql.should == \
-      'SELECT max(`value`) FROM items'
-
-    @d.select(:items__value.MAX).sql.should == \
-      'SELECT max(items.`value`) FROM items'
-
-    @d.order(:name.DESC).sql.should == \
-      'SELECT * FROM items ORDER BY `name` DESC'
-      
-    @d.select('items.name AS item_name').sql.should == \
-      'SELECT items.`name` AS `item_name` FROM items'
-      
-    @d.select('`name`').sql.should == \
-      'SELECT `name` FROM items'
-
-    @d.select('max(items.`name`) as `max_name`').sql.should == \
-      'SELECT max(items.`name`) AS `max_name` FROM items'
-
-    @d.insert_sql(:value => 333).should == \
-      'INSERT INTO items (`value`) VALUES (333);'
-  end
-  
-  specify "should support ORDER clause in UPDATE statements" do
-    @d.order(:name).update_sql(:value => 1).should == \
-      'UPDATE items SET `value` = 1 ORDER BY `name`'
-  end
-  
-  specify "should support LIMIT clause in UPDATE statements" do
-    @d.limit(10).update_sql(:value => 1).should == \
-      'UPDATE items SET `value` = 1 LIMIT 10'
-  end
-  
   specify "should support transactions" do
-    MYSQL_DB.transaction do
+    PGSQL_DB.transaction do
       @d << {:name => 'abc', :value => 1}
     end
 

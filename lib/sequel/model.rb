@@ -224,13 +224,13 @@ module Sequel
       Thread.exclusive do
         method_name = m.to_s
         if method_name =~ FIND_BY_REGEXP
-          c = $1
+          c = $1.to_sym
           meta_def(method_name) {|arg| find(c => arg)}
         elsif method_name =~ FILTER_BY_REGEXP
-          c = $1
+          c = $1.to_sym
           meta_def(method_name) {|arg| filter(c => arg)}
         elsif method_name =~ ALL_BY_REGEXP
-          c = $1
+          c = $1.to_sym
           meta_def(method_name) {|arg| filter(c => arg).all}
         elsif dataset.respond_to?(m)
           instance_eval("def #{m}(*args, &block); dataset.#{m}(*args, &block); end")

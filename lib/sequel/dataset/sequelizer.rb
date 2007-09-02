@@ -48,6 +48,8 @@ class Sequel::Dataset
         "(#{literal(l)} IN (#{r.sql}))"
       when NilClass:
         "(#{literal(l)} IS NULL)"
+      when Regexp:
+        match_expr(l, r)
       else
         "(#{literal(l)} = #{literal(r)})"
       end

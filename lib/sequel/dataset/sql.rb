@@ -355,8 +355,7 @@ module Sequel
       # options.
       def select_sql(opts = nil)
         opts = opts ? @opts.merge(opts) : @opts
-
-        # The :sql option means we're using a custom SQL statement
+        
         if sql = opts[:sql]
           return sql
         end

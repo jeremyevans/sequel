@@ -168,10 +168,10 @@ module Sequel
         end
       end
       
-      def format_re_expression(l, r)
+      def match_expr(l, r)
         case r
         when Regexp:
-          "(#{literal(l)} REGEXP #{literal(r)})"
+          "(#{literal(l)} REGEXP #{literal(r.source)})"
         else
           super
         end

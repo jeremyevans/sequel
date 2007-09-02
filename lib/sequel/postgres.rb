@@ -285,12 +285,12 @@ module Sequel
       LIKE = '(%s ~ %s)'.freeze
       LIKE_CI = '%s ~* %s'.freeze
       
-      def format_re_expression(l, r)
+      def match_expr(l, r)
         case r
         when Regexp:
           r.casefold? ? \
-            "(#{literal(l)} ~* #{literal(r)})" :
-            "(#{literal(l)} ~ #{literal(r)})"
+            "(#{literal(l)} ~* #{literal(r.source)})" :
+            "(#{literal(l)} ~ #{literal(r.source)})"
         else
           super
         end
