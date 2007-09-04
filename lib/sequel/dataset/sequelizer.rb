@@ -182,7 +182,11 @@ class Sequel::Dataset
         r = eval_expr(e[1], b)
         compare_expr(l, r)
       when :iter
-        eval_expr(e[3], b)
+        if e[1] == [:fcall, :proc]
+          eval_expr(e[3], b) # inline proc
+        else
+          ext_expr(e, b) # method call with inline proc
+        end
       when :dasgn, :dasgn_curr
         # assignment
         l = e[1]

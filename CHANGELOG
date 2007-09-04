@@ -1,3 +1,7 @@
+=== SVN
+
+* Improved support for invoking methods with inline procs inside block filters.
+
 === 0.2.0 (2007-09-02)
 
 * Fixed Model.drop_table (thanks Duane Johnson.)

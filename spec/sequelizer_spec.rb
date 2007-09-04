@@ -178,15 +178,26 @@ context "Proc#to_sql" do
   end
 
   specify "should support comparison to sub-queries" do
-    @ds2 = DB[:test].select(:node_id)
-    
-    proc {:id == @ds2}.to_sql.should == \
-      "(id IN (SELECT node_id FROM test))"
+    # @ds2 = DB[:test].select(:node_id)
+    # 
+    # proc {:id == @ds2}.to_sql.should == \
+    #   "(id IN (SELECT node_id FROM test))"
+    #   
+    # proc {:id == DB[:test].select(:node_id)}.to_sql.should == \
+    # "(id IN (SELECT node_id FROM test))"
+
+    proc {:id == DB[:test].select(:node_id).filter {:active == true}}.to_sql.should == \
+    "(id IN (SELECT node_id FROM test WHERE (active = 't')))"
   end
 
   specify "should support comparison to arrays" do
     proc {:id == [1, 3, 7, 15]}.to_sql.should == \
       "(id IN (1, 3, 7, 15))"
+  end
+  
+  specify "should not literalize String#expr and String#lit" do
+    proc {'x'.lit == 1}.to_sql.should == "(x = 1)"
+    proc {'x.y'.expr == 1}.to_sql.should == "(x.y = 1)"
   end
 
   specify "should support in/in? operator" do
