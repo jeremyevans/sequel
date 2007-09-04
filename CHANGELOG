@@ -1,4 +1,4 @@
-=== SVN
+=== 0.2.0.1 (2007-09-04)
 
 * Improved support for invoking methods with inline procs inside block filters.
 
