@@ -175,6 +175,12 @@ context "Proc#to_sql" do
 
     proc {:x == (a...b)}.to_sql.should == \
       "(x >= 3 AND x < 5)"
+      
+    t1 = Time.now - 4000
+    t2 = Time.now - 2000
+    
+    proc {:stamp == (t1..t2)}.to_sql.should == \
+      "(stamp >= #{DS.literal(t1)} AND stamp <= #{DS.literal(t2)})"
   end
 
   specify "should support comparison to sub-queries" do
