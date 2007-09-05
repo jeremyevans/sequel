@@ -1,5 +1,13 @@
 === SVN
 
+* Fixed use of sub-queries with all comparison operators in block filters.
+
+* Fixed arithmetic expressions in block filters to not be literalized.
+
+* Changed Symbol#method_missing to return LiteralString.
+
+* Changed PrettyTable to right-align numbers.
+
 * Fixed Model.create_table (thanks Duane Johnson.)
 
 === 0.2.0.1 (2007-09-04)

@@ -36,8 +36,16 @@ module Sequel
       '+' + columns.map {|c| '-' * sizes[c]}.join('+') + '+'
     end
     
+    def self.format_cell(size, v)
+      case v
+      when Bignum, Fixnum: "%#{size}d" % v
+      when Float: "%#{size}g" % v
+      else "%-#{size}s" % v.to_s
+      end
+    end
+    
     def self.data_line(columns, sizes, record)
-      '|' + columns.map {|c| "%-#{sizes[c]}s" % record[c].to_s}.join('|') + '|'
+      '|' + columns.map {|c| format_cell(sizes[c], record[c])}.join('|') + '|'
     end
     
     def self.header_line(columns, sizes)

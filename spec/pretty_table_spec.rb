@@ -39,14 +39,14 @@ context "PrettyTable" do
     Sequel::PrettyTable.print(@data2, [:a, :b])
     @output.rewind
     @output.read.should == \
-      "+--+----+\n|a |b   |\n+--+----+\n|23|45  |\n|45|2377|\n+--+----+\n"
+      "+--+----+\n|a |b   |\n+--+----+\n|23|  45|\n|45|2377|\n+--+----+\n"
   end
 
   specify "should also take header width into account" do
     Sequel::PrettyTable.print(@data3, [:aaa, :bb, :c])
     @output.rewind
     @output.read.should == \
-      "+---+--+-+\n|aaa|bb|c|\n+---+--+-+\n|1  |  | |\n|   |2 | |\n|   |  |3|\n+---+--+-+\n"
+      "+---+--+-+\n|aaa|bb|c|\n+---+--+-+\n|  1|  | |\n|   | 2| |\n|   |  |3|\n+---+--+-+\n"
   end
   
   specify "should print only the specified columns" do

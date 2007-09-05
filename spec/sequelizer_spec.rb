@@ -192,8 +192,11 @@ context "Proc#to_sql" do
     # proc {:id == DB[:test].select(:node_id)}.to_sql.should == \
     # "(id IN (SELECT node_id FROM test))"
 
-    proc {:id == DB[:test].select(:node_id).filter {:active == true}}.to_sql.should == \
-    "(id IN (SELECT node_id FROM test WHERE (active = 't')))"
+    # proc {:id == DB[:test].select(:node_id).filter {:active == true}}.to_sql.should == \
+    #   "(id IN (SELECT node_id FROM test WHERE (active = 't')))"
+    
+    proc {:price >= DB[:items].select(:price)}.to_sql.should == \
+      "(price >= (SELECT price FROM items))"
   end
 
   specify "should support comparison to arrays" do

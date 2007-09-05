@@ -134,7 +134,7 @@ class Symbol
   # method name is made of all upper case letters.
   def method_missing(sym)
     ((s = sym.to_s) =~ /^([A-Z]+)$/) ? \
-      "#{s.downcase}(#{to_field_name})" : super
+      "#{s.downcase}(#{to_field_name})".lit : super
   end
   
   # Formats an SQL function with optional parameters

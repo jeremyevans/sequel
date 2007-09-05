@@ -106,9 +106,9 @@ class Sequel::Dataset
     def call_expr(e, b)
       case op = e[2]
       when :>, :<, :>=, :<=
-        l = pt_expr(e[1], b)
-        r = pt_expr(e[3][1], b)
-        "(#{l} #{op} #{r})"
+        l = eval_expr(e[1], b)
+        r = eval_expr(e[3][1], b)
+        "(#{literal(l)} #{op} #{literal(r)})"
       when :==
         l = eval_expr(e[1], b)
         r = eval_expr(e[3][1], b)
@@ -118,9 +118,9 @@ class Sequel::Dataset
         r = eval_expr(e[3][1], b)
         match_expr(l, r)
       when :+, :-, :*, :/, :%
-        l = pt_expr(e[1], b)
-        r = pt_expr(e[3][1], b)
-        "(#{l} #{op} #{r})"
+        l = eval_expr(e[1], b)
+        r = eval_expr(e[3][1], b)
+        "(#{literal(l)} #{op} #{literal(r)})".lit
       when :in, :in?
         # in/in? operators are supported using two forms:
         #   :x.in([1, 2, 3])
