@@ -45,3 +45,14 @@ describe Sequel::Model do
     # just kidding!
   end
 end
+
+class DummyModelBased < Sequel::Model(:blog)
+end
+
+context "Sequel::Model()" do
+  specify "should allow reopening of descendant classes" do
+    proc do
+      eval "class DummyModelBased < Sequel::Model(:blog); end"
+    end.should_not raise_error
+  end
+end

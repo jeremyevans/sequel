@@ -292,7 +292,8 @@ module Sequel
   end
   
   def self.Model(table)
-    Class.new(Sequel::Model) do
+    @models ||= {}
+    @models[table] ||= Class.new(Sequel::Model) do
       meta_def(:inherited) do |c|
         if table.is_a?(Dataset)
           c.set_dataset(table)

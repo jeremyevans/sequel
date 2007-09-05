@@ -1,5 +1,7 @@
 === SVN
 
+* Changed Sequel::Model() to cache intermediate classes so descendant classes can be reopened.
+
 * Added :charset option to MySQL adapter (#40).
 
 * Fixed Dataset#exclude to add parens around NOT expression (#38).
