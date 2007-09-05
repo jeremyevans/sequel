@@ -361,33 +361,33 @@ context "Dataset#exclude" do
 
   specify "should correctly include the NOT operator when one condition is given" do
     @dataset.exclude(:region=>'Asia').select_sql.should ==
-      "SELECT * FROM test WHERE NOT (region = 'Asia')"
+      "SELECT * FROM test WHERE (NOT (region = 'Asia'))"
   end
 
   specify "should take multiple conditions as a hash and express the logic correctly in SQL" do
     @dataset.exclude(:region => 'Asia', :name => 'Japan').select_sql.
-      should match(Regexp.union(/WHERE NOT \(\(region = 'Asia'\) AND \(name = 'Japan'\)\)/,
-                                /WHERE NOT \(\(name = 'Japan'\) AND \(region = 'Asia'\)\)/))
+      should match(Regexp.union(/WHERE \(NOT \(\(region = 'Asia'\) AND \(name = 'Japan'\)\)\)/,
+                                /WHERE \(NOT \(\(name = 'Japan'\) AND \(region = 'Asia'\)\)\)/))
   end
 
   specify "should parenthesize a single string condition correctly" do
     @dataset.exclude("region = 'Asia' AND name = 'Japan'").select_sql.should ==
-      "SELECT * FROM test WHERE NOT (region = 'Asia' AND name = 'Japan')"
+      "SELECT * FROM test WHERE (NOT (region = 'Asia' AND name = 'Japan'))"
   end
 
   specify "should parenthesize an array condition correctly" do
     @dataset.exclude('region = ? AND name = ?', 'Asia', 'Japan').select_sql.should ==
-      "SELECT * FROM test WHERE NOT (region = 'Asia' AND name = 'Japan')"
+      "SELECT * FROM test WHERE (NOT (region = 'Asia' AND name = 'Japan'))"
   end
 
   specify "should corrently parenthesize when it is used twice" do
     @dataset.exclude(:region => 'Asia').exclude(:name => 'Japan').select_sql.should ==
-      "SELECT * FROM test WHERE NOT (region = 'Asia') AND NOT (name = 'Japan')"
+      "SELECT * FROM test WHERE (NOT (region = 'Asia')) AND (NOT (name = 'Japan'))"
   end
   
   specify "should support proc expressions" do
     @dataset.exclude {:id == (6...12)}.sql.should == 
-      'SELECT * FROM test WHERE NOT ((id >= 6 AND id < 12))'
+      'SELECT * FROM test WHERE (NOT ((id >= 6 AND id < 12)))'
   end
 end
 

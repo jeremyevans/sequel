@@ -249,9 +249,9 @@ module Sequel
         if @opts[clause]
           l = expression_list(@opts[clause])
           r = expression_list(block || cond, parenthesize)
-          cond = "#{l} AND NOT #{r}"
+          cond = "#{l} AND (NOT #{r})"
         else
-          cond = "NOT #{expression_list(block || cond, true)}"
+          cond = "(NOT #{expression_list(block || cond, true)})"
         end
         clone_merge(clause => cond)
       end

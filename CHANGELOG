@@ -1,5 +1,7 @@
 === SVN
 
+* Fixed Dataset#exclude to add parens around NOT expression.
+
 * Fixed use of sub-queries with all comparison operators in block filters.
 
 * Fixed arithmetic expressions in block filters to not be literalized.
