@@ -69,6 +69,11 @@ module Sequel
         conn = Mysql.real_connect(@opts[:host], @opts[:user], @opts[:password], 
           @opts[:database], @opts[:port])
         conn.query_with_result = false
+        if @opts[:charset]
+          conn.query("set character_set_connection = '#{@opts[:charset]}';")
+          conn.query("set character_set_client = '#{@opts[:charset]}';")
+          conn.query("set character_set_results = '#{@opts[:charset]}';")
+        end
         conn.reconnect = true
         conn
       end

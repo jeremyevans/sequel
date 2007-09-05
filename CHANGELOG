@@ -1,8 +1,10 @@
 === SVN
 
-* Fixed Dataset#exclude to add parens around NOT expression.
+* Added :charset option to MySQL adapter (#40).
 
-* Fixed use of sub-queries with all comparison operators in block filters.
+* Fixed Dataset#exclude to add parens around NOT expression (#38).
+
+* Fixed use of sub-queries with all comparison operators in block filters (#38).
 
 * Fixed arithmetic expressions in block filters to not be literalized.
 
