@@ -98,10 +98,22 @@ context "A simple dataset" do
     @dataset.delete_sql.should == 'DELETE FROM test'
   end
   
-  specify "should format an insert statement" do
+  specify "should format an insert statement with default values" do
     @dataset.insert_sql.should == 'INSERT INTO test DEFAULT VALUES;'
+  end
+  
+  specify "should format an insert statement with hash" do
     @dataset.insert_sql(:name => 'wxyz', :price => 342).
       should match(/INSERT INTO test \(name, price\) VALUES \('wxyz', 342\)|INSERT INTO test \(price, name\) VALUES \(342, 'wxyz'\)/)
+  end
+  
+  specify "should format an insert statement with sub-query" do
+    @sub = Sequel::Dataset.new(nil).from(:something).filter(:x => 2)
+    @dataset.insert_sql(@sub).should == \
+      "INSERT INTO test (SELECT * FROM something WHERE (x = 2))"
+  end
+  
+  specify "should format an insert statement with array" do
     @dataset.insert_sql('a', 2, 6.5).should ==
       "INSERT INTO test VALUES ('a', 2, 6.5);"
   end

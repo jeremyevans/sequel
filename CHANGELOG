@@ -1,5 +1,7 @@
 === SVN
 
+* Dataset#insert can now accept subqueries.
+
 * Changed Migrator.apply to return the version.
 
 * Changed Sequel::Model() to cache intermediate classes so descendant classes can be reopened (#39).

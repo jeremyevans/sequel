@@ -420,18 +420,24 @@ module Sequel
       def insert_sql(*values)
         if values.empty?
           "INSERT INTO #{@opts[:from]} DEFAULT VALUES;"
-        elsif (values.size == 1) && values[0].is_a?(Hash)
-          field_list = []
-          value_list = []
-          values[0].each do |k, v|
-            field_list << field_name(k)
-            value_list << literal(v)
-          end
-          fl = field_list.join(COMMA_SEPARATOR)
-          vl = value_list.join(COMMA_SEPARATOR)
-          "INSERT INTO #{@opts[:from]} (#{fl}) VALUES (#{vl});"
         else
-          "INSERT INTO #{@opts[:from]} VALUES (#{literal(values)});"
+          values = values[0] if values.size == 1
+          case values
+          when Hash
+            field_list = []
+            value_list = []
+            values.each do |k, v|
+              field_list << field_name(k)
+              value_list << literal(v)
+            end
+            fl = field_list.join(COMMA_SEPARATOR)
+            vl = value_list.join(COMMA_SEPARATOR)
+            "INSERT INTO #{@opts[:from]} (#{fl}) VALUES (#{vl});"
+          when Dataset
+            "INSERT INTO #{@opts[:from]} #{literal(values)}"
+          else
+            "INSERT INTO #{@opts[:from]} VALUES (#{literal(values)});"
+          end
         end
       end
 
