@@ -115,6 +115,8 @@ module Sequel
         classes.each {|c| c.apply(db, direction)}
         set_current_migration_version(db, target)
       end
+      
+      target
     end
 
     # Returns a list of migration classes filtered for the migration range and

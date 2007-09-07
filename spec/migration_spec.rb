@@ -229,7 +229,7 @@ context "Sequel::Migrator" do
 
     Sequel::Migrator.get_current_migration_version(@db).should == 5
   end
-
+  
   specify "should apply migrations correctly in the down direction" do
     Sequel::Migrator.apply(@db, '.', 1, 5)
     @db.drops.should == [5555, 3333, 2222]
@@ -249,5 +249,13 @@ context "Sequel::Migrator" do
     @db.drops.should == [5555, 3333, 2222, 1111]
 
     Sequel::Migrator.get_current_migration_version(@db).should == 0
+  end
+  
+  specify "should return the target version" do
+    Sequel::Migrator.apply(@db, '.', 3, 2).should == 3
+
+    Sequel::Migrator.apply(@db, '.', 0).should == 0
+
+    Sequel::Migrator.apply(@db, '.').should == 5
   end
 end
