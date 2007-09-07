@@ -1,4 +1,4 @@
-=== SVN
+=== 0.2.0.2 (2007-09-07)
 
 * Dataset#insert can now accept subqueries.
 
