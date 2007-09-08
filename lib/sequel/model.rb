@@ -198,7 +198,7 @@ module Sequel
     
     def self.create(values = nil)
       db.transaction do
-        obj = new(values || {})
+        obj = new(values || {primary_key => nil})
         obj.save
         obj
       end

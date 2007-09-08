@@ -1,6 +1,6 @@
 require File.join(File.dirname(__FILE__), 'spec_helper')
 
-Sequel::Model.db = SchemaDummyDatabase.new
+Sequel::Model.db = MODEL_DB = MockDatabase.new
 
 describe Sequel::Model do
   before do
@@ -54,5 +54,31 @@ context "Sequel::Model()" do
     proc do
       eval "class DummyModelBased < Sequel::Model(:blog); end"
     end.should_not raise_error
+  end
+end
+
+context "A model class" do
+  setup do
+    MODEL_DB.reset
+    @c = Class.new(Sequel::Model(:items))
+  end
+  
+  specify "should be able to create rows in the associated table" do
+    o = @c.create(:x => 1)
+    o.class.should == @c
+    MODEL_DB.sqls.should == ['INSERT INTO items (x) VALUES (1);']
+  end
+  
+  specify "should be able to create rows without any values specified" do
+    o = @c.create
+    o.class.should == @c
+    MODEL_DB.sqls.should == ['INSERT INTO items (id) VALUES (NULL);']
+    
+    MODEL_DB.reset
+    @c.set_primary_key :ququ
+    o = @c.create
+    o.class.should == @c
+    MODEL_DB.sqls.should == ['INSERT INTO items (ququ) VALUES (NULL);']
+    @c.set_primary_key :id
   end
 end

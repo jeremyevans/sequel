@@ -424,15 +424,13 @@ module Sequel
           values = values[0] if values.size == 1
           case values
           when Hash
-            field_list = []
-            value_list = []
-            values.each do |k, v|
-              field_list << field_name(k)
-              value_list << literal(v)
+            if values.empty?
+              "INSERT INTO #{@opts[:from]} DEFAULT VALUES;"
+            else
+              fl, vl = [], []
+              values.each {|k, v| fl << field_name(k); vl << literal(v)}
+              "INSERT INTO #{@opts[:from]} (#{fl.join(COMMA_SEPARATOR)}) VALUES (#{vl.join(COMMA_SEPARATOR)});"
             end
-            fl = field_list.join(COMMA_SEPARATOR)
-            vl = value_list.join(COMMA_SEPARATOR)
-            "INSERT INTO #{@opts[:from]} (#{fl}) VALUES (#{vl});"
           when Dataset
             "INSERT INTO #{@opts[:from]} #{literal(values)}"
           else
