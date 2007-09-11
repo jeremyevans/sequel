@@ -1,5 +1,13 @@
 === SVN
 
+* Changed Model.create to INSERT DEFAULT VALUES instead of (id) VALUES (null) (brings back #41.)
+
+* Fixed Model.new to work without arguments.
+
+* Added Model.no_primary_key method to allow models without primary keys.
+
+* Added Model#this method (#42 thanks Duane Johnson).
+
 * Fixed Dataset#insert_sql to use DEFAULT VALUES clause if argument is an empty hash.
 
 * Fixed Model.create to work correctly when no argument is passed (#41).

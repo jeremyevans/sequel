@@ -72,13 +72,35 @@ context "A model class" do
   specify "should be able to create rows without any values specified" do
     o = @c.create
     o.class.should == @c
-    MODEL_DB.sqls.should == ['INSERT INTO items (id) VALUES (NULL);']
-    
+    MODEL_DB.sqls.should == ['INSERT INTO items DEFAULT VALUES;']
+  end
+end
+
+context "A model class without a primary key" do
+  setup do
     MODEL_DB.reset
-    @c.set_primary_key :ququ
-    o = @c.create
-    o.class.should == @c
-    MODEL_DB.sqls.should == ['INSERT INTO items (ququ) VALUES (NULL);']
-    @c.set_primary_key :id
+    @c = Class.new(Sequel::Model(:items)) do
+      no_primary_key
+    end
+  end
+  
+  specify "should be able to insert records without selecting them back" do
+    i = nil
+    proc {i = @c.create(:x => 1)}.should_not raise_error
+    i.class.should be(@c)
+    i.values.should == {:x => 1}
+    
+    MODEL_DB.sqls.should == ['INSERT INTO items (x) VALUES (1);']
+  end
+  
+  specify "should raise when deleting" do
+    o = @c.new
+    proc {o.delete}.should raise_error
+  end
+
+  specify "should insert a record when saving" do
+    o = @c.new(:x => 2)
+    o.save
+    MODEL_DB.sqls.should == ['INSERT INTO items (x) VALUES (2);']
   end
 end

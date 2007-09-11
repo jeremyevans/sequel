@@ -59,8 +59,9 @@ module Sequel
       @cache_column
     end
     
-    def self.primary_key; @primary_key ||= :id; end
+    def self.primary_key; @primary_key ||= !@no_primary_key && :id; end
     def self.set_primary_key(k); @primary_key = k; end
+    def self.no_primary_key; @no_primary_key = true; end
     
     def self.set_schema(name = nil, &block)
       name ? set_table_name(name) : name = table_name
@@ -176,18 +177,22 @@ module Sequel
       self.class.primary_key
     end
     
-    def initialize(values)
-      @values = values
+    def initialize(values = nil)
+      @values = values || {}
       @pkey = values[self.class.primary_key]
     end
     
     def exists?
-      model.filter(primary_key => @pkey).count == 1
+      this.count > 0
+    end
+    
+    def this
+      @this ||= (pk = primary_key) ? self.class.dataset.filter(pk => @pkey) : \
+        raise(SequelError, "Model class does not have a primary key")
     end
     
     def refresh
-      @values = self.class.dataset.naked[primary_key => @pkey] ||
-        (raise SequelError, "Record not found")
+      @values = this.naked.first || raise(SequelError, "Record not found")
       self
     end
     
@@ -196,9 +201,10 @@ module Sequel
     end
     def self.delete_all; dataset.delete; end
     
-    def self.create(values = nil)
+    def self.create(*values)
       db.transaction do
-        obj = new(values || {primary_key => nil})
+        # values ||= {primary_key => nil} if primary_key
+        obj = new(*values)
         obj.save
         obj
       end
@@ -213,7 +219,8 @@ module Sequel
     end
     
     def delete
-      model.dataset.filter(primary_key => @pkey).delete
+      this.delete
+      self
     end
     
     FIND_BY_REGEXP = /^find_by_(.*)/.freeze
@@ -268,14 +275,18 @@ module Sequel
     
     def save
       run_hooks(:before_save)
-      if @pkey
+      if @pkey # record exists, so we update it
         run_hooks(:before_update)
-        model.dataset.filter(primary_key => @pkey).update(@values)
+        this.update(@values)
         run_hooks(:after_update)
-      else
+      else # no pkey, so we insert a new record
         run_hooks(:before_create)
-        @pkey = model.dataset.insert(@values)
-        refresh
+        if primary_key
+          @pkey = model.dataset.insert(@values)
+          refresh
+        else # this model does not use a primary key
+          model.dataset.insert(@values)
+        end
         run_hooks(:after_create)
       end
       run_hooks(:after_save)
@@ -286,7 +297,7 @@ module Sequel
     end
     
     def set(values)
-      model.dataset.filter(primary_key => @pkey).update(values)
+      this.update(values)
       @values.merge!(values)
     end
   end
