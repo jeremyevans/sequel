@@ -65,6 +65,11 @@ task :install do
   sh %{sudo gem install pkg/#{NAME}-#{VERS}}
 end
 
+task :install_no_doc do
+  sh %{rake package}
+  sh %{sudo gem install pkg/#{NAME}-#{VERS} --no-rdoc --no-ri}
+end
+
 task :uninstall => [:clean] do
   sh %{sudo gem uninstall #{NAME}}
 end

@@ -1,158 +1,17 @@
 module Sequel
   class Model
-    @@db = nil
-    
-    def self.db
-      @db ||= ((superclass != Object) && (superclass.db)) || nil
-    end
-    def self.db=(db); @db = db; end
-    def self.database_opened(db)
-      @db = db if self == Model && !@db
-    end
-    
-    def self.table_name
-      @table_name ||= ((superclass != Model) && (superclass.table_name)) || nil
-    end
-    def self.set_table_name(t); @table_name = t; end
+  end
+end
 
-    def self.dataset
-      return @dataset if @dataset
-      if !table_name
-        raise SequelError, "Table name not specified for #{self}."
-      elsif !db
-        raise SequelError, "Database not specified for #{self}."
-      end
-      @dataset = db[table_name]
-      @dataset.set_model(self)
-      @dataset
-    end
+require File.join(File.dirname(__FILE__), 'model/base')
+require File.join(File.dirname(__FILE__), 'model/hooks')
+require File.join(File.dirname(__FILE__), 'model/schema')
+require File.join(File.dirname(__FILE__), 'model/relations')
 
-    def self.set_dataset(ds)
-      @db = ds.db
-      @dataset = ds
-      @dataset.set_model(self)
-    end
-    
-    def self.cache_by(column, expiration)
-      @cache_column = column
-      
-      prefix = "#{name}.#{column}."
-      define_method(:cache_key) do
-        prefix + @values[column].to_s
-      end
-      
-      define_method("find_by_#{column}".to_sym) do |arg|
-        key = cache_key
-        rec = CACHE[key]
-        if !rec
-          rec = find(column => arg)
-          CACHE.set(key, rec, expiration)
-        end
-        rec
-      end
-      
-      alias_method :destroy, :destroy_and_invalidate_cache
-      alias_method :set, :set_and_update_cache
-    end
-    
-    def self.cache_column
-      @cache_column
-    end
-    
-    def self.primary_key; @primary_key ||= !@no_primary_key && :id; end
-    def self.set_primary_key(k); @primary_key = k; end
-    def self.no_primary_key; @no_primary_key = true; end
-    
-    def self.set_schema(name = nil, &block)
-      name ? set_table_name(name) : name = table_name
-      @schema = Schema::Generator.new(db, name, &block)
-      if @schema.primary_key_name
-        set_primary_key @schema.primary_key_name
-      end
-    end
-    def self.schema
-      @schema || ((superclass != Model) && (superclass.schema))
-    end
-    
-    def self.table_exists?
-      db.table_exists?(table_name)
-    end
-    
-    def self.create_table
-      db.create_table_sql_list(*schema.create_info).each {|s| db << s} 
-    end
-    
-    def self.drop_table
-      db.execute db.drop_table_sql(table_name)
-    end
-    
-    def self.recreate_table
-      drop_table if table_exists?
-      create_table
-    end
-    
+module Sequel
+  class Model
     def self.subset(name, *args, &block)
       meta_def(name) {filter(*args, &block)}
-    end
-    
-    ONE_TO_ONE_PROC = "proc {i = @values[:%s]; %s[i] if i}".freeze
-    ID_POSTFIX = "_id".freeze
-    FROM_DATASET = "db[%s]".freeze
-    
-    def self.one_to_one(name, opts)
-      klass = opts[:class] ? opts[:class] : (FROM_DATASET % name.inspect)
-      key = opts[:key] || (name.to_s + ID_POSTFIX)
-      define_method name, &eval(ONE_TO_ONE_PROC % [key, klass])
-    end
-  
-    ONE_TO_MANY_PROC = "proc {%s.filter(:%s => @pkey)}".freeze
-    ONE_TO_MANY_ORDER_PROC = "proc {%s.filter(:%s => @pkey).order(%s)}".freeze
-    def self.one_to_many(name, opts)
-      klass = opts[:class] ? opts[:class] :
-        (FROM_DATASET % (opts[:table] || name.inspect))
-      key = opts[:on]
-      order = opts[:order]
-      define_method name, &eval(
-        (order ? ONE_TO_MANY_ORDER_PROC : ONE_TO_MANY_PROC) %
-        [klass, key, order.inspect]
-      )
-    end
-    
-    def self.get_hooks(key)
-      @hooks ||= {}
-      @hooks[key] ||= []
-    end
-    
-    def self.has_hooks?(key)
-      !get_hooks(key).empty?
-    end
-    
-    def run_hooks(key)
-      self.class.get_hooks(key).each {|h| instance_eval(&h)}
-    end
-    
-    def self.before_save(&block)
-      get_hooks(:before_save).unshift(block)
-    end
-    
-    def self.before_create(&block)
-      get_hooks(:before_create).unshift(block)
-    end
-    
-    def self.before_destroy(&block)
-      get_hooks(:before_destroy).unshift(block)
-    end
-    
-    def self.after_save(&block)
-      get_hooks(:after_save) << block
-    end
-    
-    def self.after_create(&block)
-      get_hooks(:after_create) << block
-    end
-    
-    def self.after_destroy(&block)
-      get_hooks(:after_destroy) << block
     end
     
     def self.find(cond)
@@ -251,8 +110,6 @@ module Sequel
       dataset.join(*args).select(table_name.to_sym.ALL)
     end
     
-    def db; self.class.db; end
-    
     def [](field); @values[field]; end
     
     def []=(field, value); @values[field] = value; end
@@ -321,16 +178,4 @@ module Sequel
     end
   end
   
-  def self.Model(table)
-    @models ||= {}
-    @models[table] ||= Class.new(Sequel::Model) do
-      meta_def(:inherited) do |c|
-        if table.is_a?(Dataset)
-          c.set_dataset(table)
-        else
-          c.set_table_name(table)
-        end
-      end
-    end
-  end
 end

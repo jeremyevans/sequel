@@ -21,6 +21,23 @@ context "A model class" do
   end
 end
 
+context "A model's primary key" do
+  specify "should default to id" do
+    @m = Class.new(Sequel::Model) do
+    end
+    
+    @m.primary_key.should == :id
+  end
+  
+  specify "should be changeable through Model.set_primary_key" do
+    @m = Class.new(Sequel::Model) do
+      set_primary_key :xxx
+    end
+    
+    @m.primary_key.should == :xxx
+  end
+end
+
 
 describe Sequel::Model do
   before do
@@ -40,8 +57,8 @@ describe Sequel::Model do
     @model.primary_key.should == :ssn
   end
   
-  it "allows table name change" do
-    @model.set_table_name :foo
+  it "allows dataset change" do
+    @model.set_dataset(MODEL_DB[:foo])
     @model.table_name.should == :foo
   end
   

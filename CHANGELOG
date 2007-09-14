@@ -1,5 +1,9 @@
 === SVN
 
+* Added install_no_doc rake task.
+
+* Partial refactoring of model code.
+
 * Refactored dataset-model association and added Dataset#set_row_filter method.
 
 * Added support for case-sensitive regexps to mysql adapter.
