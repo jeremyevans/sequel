@@ -1,5 +1,7 @@
 === SVN
 
+* Implemented Model.serialize (thanks Aman Gupta.)
+
 * Changed Model.create to INSERT DEFAULT VALUES instead of (id) VALUES (null) (brings back #41.)
 
 * Fixed Model.new to work without arguments.

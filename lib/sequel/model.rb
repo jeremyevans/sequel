@@ -300,6 +300,22 @@ module Sequel
       this.update(values)
       @values.merge!(values)
     end
+    
+    SERIALIZE_GET_PROC = "proc {@unserialized_%s ||= YAML.load(@values[:%s]) }".freeze
+    SERIALIZE_SET_PROC = "proc {|v| @values[:%s] = v.to_yaml; @unserialized_%s = v }".freeze
+    
+    def self.serialize(*fields)
+      fields.each do |f|
+        # define getter
+        define_method f, &eval(SERIALIZE_GET_PROC % [f, f])
+        # define setter
+        define_method "#{f}=", &eval(SERIALIZE_SET_PROC % [f, f])
+        # add before_create to serialize values before creation
+        before_create do
+          @values[f] = @values[f].to_yaml
+        end
+      end      
+    end
   end
   
   def self.Model(table)

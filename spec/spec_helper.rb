@@ -2,7 +2,11 @@ require File.join(File.dirname(__FILE__), '../lib/sequel')
 
 class MockDataset < Sequel::Dataset
   def insert(*args)
-    @db << insert_sql(*args)
+    @db.execute insert_sql(*args)
+  end
+  
+  def update(*args)
+    @db.execute update_sql(*args)
   end
   
   def fetch_rows(sql)

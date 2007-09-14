@@ -104,3 +104,43 @@ context "A model class without a primary key" do
     MODEL_DB.sqls.should == ['INSERT INTO items (x) VALUES (2);']
   end
 end
+
+context "Model#serialize" do
+  setup do
+    MODEL_DB.reset
+  end
+  
+  specify "should translate values to YAML when creating records" do
+    @c = Class.new(Sequel::Model(:items)) do
+      no_primary_key
+      serialize :abc
+    end
+
+    o = @c.create(:abc => 1)
+    o.values[:abc].should == "--- 1\n"
+    o = @c.create(:abc => "hello")
+    o.values[:abc].should == "--- hello\n"
+    
+    MODEL_DB.sqls.should == [ \
+      "INSERT INTO items (abc) VALUES ('--- 1\n');", \
+      "INSERT INTO items (abc) VALUES ('--- hello\n');", \
+    ]
+  end
+  
+  specify "should translate values to and from YAML using accessor methods" do
+    @c = Class.new(Sequel::Model(:items)) do
+      serialize :abc, :def
+    end
+    
+    o = @c.new(:id => 1, :abc => "--- 1\n", :def => "--- hello\n")
+    o.values.should == {:id => 1, :abc => "--- 1\n", :def => "--- hello\n"}
+    o.abc.should == 1
+    o.def.should == 'hello'
+    
+    o.abc = 23
+    o.values[:abc].should == "--- 23\n"
+    o.save
+    
+    MODEL_DB.sqls.first.should =~ /abc = '--- 23\n'/
+  end
+end
