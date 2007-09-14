@@ -4,7 +4,20 @@ Sequel::Model.db = MODEL_DB = MockDatabase.new
 
 context "A model class" do
   specify "should be associated with a dataset" do
+    @m = Class.new(Sequel::Model) do
+      set_dataset MODEL_DB[:items]
+    end
     
+    @m.dataset.should be_a_kind_of(MockDataset)
+    @m.dataset.opts[:from].should == [:items]
+
+    @m2 = Class.new(Sequel::Model) do
+      set_dataset MODEL_DB[:zzz]
+    end
+    
+    @m2.dataset.should be_a_kind_of(MockDataset)
+    @m2.dataset.opts[:from].should == [:zzz]
+    @m.dataset.opts[:from].should == [:items]
   end
 end
 

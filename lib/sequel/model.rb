@@ -281,15 +281,18 @@ module Sequel
         run_hooks(:after_update)
       else # no pkey, so we insert a new record
         run_hooks(:before_create)
-        if primary_key
+        p = primary_key
+        if p && !@values[p]
           @pkey = model.dataset.insert(@values)
           refresh
         else # this model does not use a primary key
           model.dataset.insert(@values)
+          @pkey = @values[p] if p
         end
         run_hooks(:after_create)
       end
       run_hooks(:after_save)
+      self
     end
     
     def ==(obj)

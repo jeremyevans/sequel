@@ -152,9 +152,13 @@ module Sequel
     
     # Iterates over the records in the dataset
     def each(opts = nil, &block)
-      fetch_rows(select_sql(opts), &block)
+      if (opts && opts[:naked]) || !@row_filter
+        fetch_rows(select_sql(opts), &block)
+      else
+        fetch_rows(select_sql(opts)) {|r| block[@row_filter[r]]}
+      end
     end
-    
+
     # Returns the the model classes associated with the dataset as a hash.
     def model_classes
       @opts[:models]
@@ -220,17 +224,22 @@ module Sequel
       when nil: # set_model(nil) => no
         # no argument provided, so the dataset is denuded
         @opts.merge!(:naked => true, :models => nil, :polymorphic_key => nil)
-        extend_with_stock_each
+        remove_row_filter
+        # extend_with_stock_each
       when Class:
         # isomorphic model
         @opts.merge!(:naked => nil, :models => {nil => key}, :polymorphic_key => nil)
-        extend_with_model(key, *args)
+        set_row_filter {|h| key.new(h, *args)}
         extend_with_destroy
       when Symbol:
         # polymorphic model
         hash = args.shift || raise(SequelError, "No class hash supplied for polymorphic model")
         @opts.merge!(:naked => true, :models => hash, :polymorphic_key => key)
-        extend_with_polymorphic_model(key, hash, *args)
+        set_row_filter do |h|
+          c = hash[h[key]] || hash[nil] || \
+            raise(SequelError, "No matching model class for record (#{polymorphic_key} => #{h[polymorphic_key].inspect})")
+          c.new(h, *args)
+        end
         extend_with_destroy
       else
         raise SequelError, "Invalid parameters specified"
@@ -247,36 +256,14 @@ module Sequel
     #   dataset.first[:xxx] #=> "yyy" # always!
     #
     def set_row_filter(&filter)
-      meta_def(:row_filter) {|r| filter[r]}
-      m = Module.new do
-        def each(opts = nil, &block)
-          if opts && opts[:naked]
-            fetch_rows(select_sql(opts), &block)
-          else
-            fetch_rows(select_sql(opts)) {|r| block[row_filter(r)]}
-          end
-        end
-      end
-      extend(m)
+      @row_filter = filter
+    end
+    
+    def remove_row_filter
+      @row_filter = nil
     end
     
     private
-    # Overrides the each method to convert records to model instances.
-    def extend_with_model(c, *args)
-      set_row_filter {|h| c.new(h, *args)}
-    end
-    
-    # Overrides the each method to convert records to polymorphic model
-    # instances. The model class is determined according to the value in the
-    # key column.
-    def extend_with_polymorphic_model(key, hash, *args)
-      set_row_filter do |h|
-        c = hash[h[key]] || hash[nil] || \
-          raise(SequelError, "No matching model class for record (#{polymorphic_key} => #{h[polymorphic_key].inspect})")
-        c.new(h, *args)
-      end
-    end
-    
     # Extends the dataset with a destroy method, that calls destroy for each
     # record in the dataset.
     def extend_with_destroy
@@ -288,16 +275,6 @@ module Sequel
           count
         end
       end
-    end
-    
-    # Restores the stock #each implementation.
-    def extend_with_stock_each
-      m = Module.new do
-        def each(opts = nil, &block)
-          fetch_rows(select_sql(opts), &block)
-        end
-      end
-      extend(m)
     end
   end
 end
