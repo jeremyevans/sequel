@@ -141,7 +141,7 @@ module Sequel
       set_adapter_scheme :postgres
     
       def connect
-        PGconn.connect(
+        conn = PGconn.connect(
           @opts[:host] || 'localhost',
           @opts[:port] || 5432,
           '', '',
@@ -149,6 +149,10 @@ module Sequel
           @opts[:user],
           @opts[:password]
         )
+        if encoding = @opts[:encoding] || @opts[:charset]
+          conn.set_client_encoding(encoding)
+        end
+        conn
       end
     
       def dataset(opts = nil)

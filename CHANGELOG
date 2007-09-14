@@ -1,5 +1,9 @@
 === SVN
 
+* Changed mysql adapter to support encoding option as well.
+
+* Added charset/encoding option to postgres adapter.
+
 * Implemented Model.serialize (thanks Aman Gupta.)
 
 * Changed Model.create to INSERT DEFAULT VALUES instead of (id) VALUES (null) (brings back #41.)
