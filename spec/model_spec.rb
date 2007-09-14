@@ -2,6 +2,13 @@ require File.join(File.dirname(__FILE__), 'spec_helper')
 
 Sequel::Model.db = MODEL_DB = MockDatabase.new
 
+context "A model class" do
+  specify "should be associated with a dataset" do
+    
+  end
+end
+
+
 describe Sequel::Model do
   before do
     @model = Class.new(Sequel::Model(:items))

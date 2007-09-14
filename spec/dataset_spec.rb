@@ -1157,6 +1157,33 @@ context "Dataset#single_value" do
   end
 end
 
+context "Dataset#set_row_filter" do
+  setup do
+    @c = Class.new(Sequel::Dataset) do
+      def fetch_rows(sql, &block)
+        # yield a hash with kind as the 1 bit of a number
+        (1..10).each {|i| block.call({:kind => i[0]})}
+      end
+    end
+    @dataset = @c.new(nil).from(:items)
+  end
+  
+  specify "should cause dataset to pass all rows through the filter" do
+    @dataset.set_row_filter {|h| h[:der] = h[:kind] + 2; h}
+    
+    rows = @dataset.all
+    rows.size.should == 10
+    
+    rows.each {|r| r[:der].should == (r[:kind] + 2)}
+  end
+  
+  specify "should be copied over when dataset is cloned" do
+    @dataset.set_row_filter {|h| h[:der] = h[:kind] + 2; h}
+    
+    @dataset.filter(:a => 1).first.should == {:kind => 1, :der => 3}
+  end
+end
+
 context "Dataset#set_model" do
   setup do
     @c = Class.new(Sequel::Dataset) do

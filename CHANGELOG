@@ -1,5 +1,7 @@
 === SVN
 
+* Refactored dataset-model association and added Dataset#set_row_filter method.
+
 * Added support for case-sensitive regexps to mysql adapter.
 
 * Changed mysql adapter to support encoding option as well.

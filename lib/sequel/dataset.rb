@@ -238,41 +238,43 @@ module Sequel
       self
     end
     
-    private
-    # Overrides the each method to convert records to model instances.
-    def extend_with_model(c, *args)
-      meta_def(:make_model_instance) {|r| c.new(r, *args)}
+    # Overrides the each method to pass the values through a filter. The filter
+    # receives as argument a hash containing the column values for the current
+    # record. The filter should return a value which is then passed to the 
+    # iterating block. In order to elucidate, here's a contrived example:
+    #
+    #   dataset.set_row_filter {|h| h.merge(:xxx => 'yyy')}
+    #   dataset.first[:xxx] #=> "yyy" # always!
+    #
+    def set_row_filter(&filter)
+      meta_def(:row_filter) {|r| filter[r]}
       m = Module.new do
         def each(opts = nil, &block)
           if opts && opts[:naked]
             fetch_rows(select_sql(opts), &block)
           else
-            fetch_rows(select_sql(opts)) {|r| block.call(make_model_instance(r))}
+            fetch_rows(select_sql(opts)) {|r| block[row_filter(r)]}
           end
         end
       end
       extend(m)
     end
     
+    private
+    # Overrides the each method to convert records to model instances.
+    def extend_with_model(c, *args)
+      set_row_filter {|h| c.new(h, *args)}
+    end
+    
     # Overrides the each method to convert records to polymorphic model
     # instances. The model class is determined according to the value in the
     # key column.
     def extend_with_polymorphic_model(key, hash, *args)
-      meta_def(:make_model_instance) do |r|
-        c = hash[r[key]] || hash[nil] || \
-          raise(SequelError, "No matching model class for record (#{polymorphic_key} => #{r[polymorphic_key].inspect})")
-        c.new(r, *args)
+      set_row_filter do |h|
+        c = hash[h[key]] || hash[nil] || \
+          raise(SequelError, "No matching model class for record (#{polymorphic_key} => #{h[polymorphic_key].inspect})")
+        c.new(h, *args)
       end
-      m = Module.new do
-        def each(opts = nil, &block)
-          if opts && opts[:naked]
-            fetch_rows(select_sql(opts), &block)
-          else
-            fetch_rows(select_sql(opts)) {|r| block.call(make_model_instance(r))}
-          end
-        end
-      end
-      extend(m)
     end
     
     # Extends the dataset with a destroy method, that calls destroy for each
