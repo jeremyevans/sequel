@@ -176,7 +176,9 @@ module Sequel
       def match_expr(l, r)
         case r
         when Regexp:
-          "(#{literal(l)} REGEXP #{literal(r.source)})"
+          r.casefold? ? \
+            "(#{literal(l)} REGEXP #{literal(r.source)})" :
+            "(#{literal(l)} REGEXP BINARY #{literal(r.source)})"
         else
           super
         end

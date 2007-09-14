@@ -286,9 +286,6 @@ module Sequel
         end
       end
     
-      LIKE = '(%s ~ %s)'.freeze
-      LIKE_CI = '%s ~* %s'.freeze
-      
       def match_expr(l, r)
         case r
         when Regexp:
