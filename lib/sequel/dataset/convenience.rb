@@ -3,6 +3,10 @@ require 'enumerator'
 module Sequel
   class Dataset
     module Convenience
+      def empty?
+        count == 0
+      end
+      
       # Returns the first record in the dataset.
       def single_record(opts = nil)
         each(opts) {|r| return r}

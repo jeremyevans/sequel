@@ -769,6 +769,26 @@ context "Dataset#count" do
   end
 end
 
+context "Dataset#empty?" do
+  specify "should return true if #count == 0" do
+    @c = Class.new(Sequel::Dataset) do
+      def count
+        0
+      end
+    end
+    @dataset = @c.new(nil).from(:test)
+    @dataset.empty?.should be_true
+
+    @c = Class.new(Sequel::Dataset) do
+      def count
+        1
+      end
+    end
+    @dataset = @c.new(nil).from(:test)
+    @dataset.empty?.should be_false
+  end
+end
+
 context "Dataset#join_table" do
   setup do
     @d = Sequel::Dataset.new(nil).from(:items)
