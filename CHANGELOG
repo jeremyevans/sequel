@@ -1,5 +1,7 @@
 === SVN
 
+* Fixed Symbol#to_field_name to support names with numbers and upper-case characters (#45).
+
 * Added install_no_doc rake task.
 
 * Partial refactoring of model code.

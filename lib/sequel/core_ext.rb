@@ -106,9 +106,9 @@ class Symbol
   include FieldCompositionMethods
   
 
-  FIELD_REF_RE1 = /^([a-z_]+)__([a-z_]+)___([a-z_]+)/.freeze
-  FIELD_REF_RE2 = /^([a-z_]+)___([a-z_]+)$/.freeze
-  FIELD_REF_RE3 = /^([a-z_]+)__([a-z_]+)$/.freeze
+  FIELD_REF_RE1 = /^(\w+)__(\w+)___(\w+)/.freeze
+  FIELD_REF_RE2 = /^(\w+)___(\w+)$/.freeze
+  FIELD_REF_RE3 = /^(\w+)__(\w+)$/.freeze
   
   # Converts a symbol into a field name. This method supports underscore
   # notation in order to express qualified (two underscores) and aliased 

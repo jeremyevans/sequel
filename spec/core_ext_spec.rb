@@ -136,6 +136,20 @@ context "Symbol#to_field_name" do
     :xyz___x.to_field_name.should == 'xyz AS x'
     :abc__def___x.to_field_name.should == 'abc.def AS x'
   end
+  
+  specify "should support names with digits" do
+    :abc2.to_field_name.should == 'abc2'
+    :xx__yy3.to_field_name.should == 'xx.yy3'
+    :ab34__temp3_4ax.to_field_name.should == 'ab34.temp3_4ax'
+    :x1___y2.to_field_name.should == 'x1 AS y2'
+    :abc2__def3___ggg4.to_field_name.should == 'abc2.def3 AS ggg4'
+  end
+  
+  specify "should support upper case and lower case" do
+    :ABC.to_field_name.should == 'ABC'
+    :Zvashtoy__aBcD.to_field_name.should == 'Zvashtoy.aBcD'
+    
+  end
 end
 
 context "FieldCompositionMethods#field_title" do
