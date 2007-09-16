@@ -37,9 +37,11 @@ module Sequel
       @dataset ||= self.class.dataset
     end
 
-    def self.primary_key; @primary_key ||= !@no_primary_key && :id; end
-    def self.set_primary_key(k); @primary_key = k; end
-    def self.no_primary_key; @no_primary_key = true; end
+    attr_reader :values, :pkey
+    
+    def model
+      @model ||= self.class
+    end
   end
 
   def self.Model(source)

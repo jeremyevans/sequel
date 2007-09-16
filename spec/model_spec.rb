@@ -36,8 +36,93 @@ context "A model's primary key" do
     
     @m.primary_key.should == :xxx
   end
+  
+  specify "should support composite primary keys" do
+    @m = Class.new(Sequel::Model) do
+      set_primary_key [:node_id, :session_id]
+    end
+    @m.primary_key.should == [:node_id, :session_id]
+  end
 end
 
+context "A model without a primary key" do
+  setup do
+    @m = Class.new(Sequel::Model) do
+      no_primary_key
+    end
+  end
+  
+  specify "should return nil for primary_key" do
+    @m.primary_key.should be_nil
+  end
+  
+  specify "should raise on #this" do
+    o = @m.new
+    proc {o.this}.should raise_error(SequelError)
+  end
+end
+
+context "Model#this" do
+  setup do
+    @m = Class.new(Sequel::Model(:items)) do
+    end
+  end
+  
+  specify "should return a dataset identifying the record" do
+    o = @m.new(:id => 3)
+    o.this.sql.should == "SELECT * FROM items WHERE (id = 3)"
+  end
+  
+  specify "should support arbitrary primary keys" do
+    @m.set_primary_key(:xxx)
+    
+    o = @m.new(:xxx => 3)
+    o.this.sql.should == "SELECT * FROM items WHERE (xxx = 3)"
+  end
+  
+  specify "should support composite primary keys" do
+    @m.set_primary_key [:x, :y]
+    o = @m.new(:x => 4, :y => 5)
+
+    o.this.sql.should =~ /^SELECT \* FROM items WHERE (\(x = 4\) AND \(y = 5\))|(\(y = 5\) AND \(x = 4\))$/
+  end
+end
+
+context "A new model instance" do
+  setup do
+    @m = Class.new(Sequel::Model) do
+      set_dataset MODEL_DB[:items]
+    end
+  end
+  
+  specify "should be marked as new?" do
+    o = @m.new
+    o.should be_new
+  end
+  
+  specify "should not be marked as new? once it is saved" do
+    o = @m.new(:x => 1)
+    o.should be_new
+    o.save
+    o.should_not be_new
+  end
+  
+  specify "should use the last inserted id as primary key if not in values" do
+    d = @m.dataset
+    def d.insert(*args)
+      super
+      1234
+    end
+    
+    o = @m.new(:x => 1)
+    o.save
+    o.id.should == 1234
+    
+    o = @m.new(:x => 1, :id => 333)
+    o.save
+    o.id.should == 333
+  end
+end
 
 describe Sequel::Model do
   before do
@@ -137,6 +222,7 @@ context "A model class without a primary key" do
 
   specify "should insert a record when saving" do
     o = @c.new(:x => 2)
+    o.should be_new
     o.save
     MODEL_DB.sqls.should == ['INSERT INTO items (x) VALUES (2);']
   end
