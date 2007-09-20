@@ -300,4 +300,11 @@ context "Proc#to_sql" do
     
     proc {:x > "#{y}"}.to_sql.should == "(x > '12''34')"
   end
+  
+  specify "should support format strings and literalize the result" do
+    prod = 1
+    proc {:x == "abc%d" % prod}.to_sql.should == "(x = 'abc1')"
+    
+    proc {:x == ("%d" % prod).lit}.to_sql.should == "(x = 1)"
+  end
 end
