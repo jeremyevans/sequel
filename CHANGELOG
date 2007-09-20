@@ -1,5 +1,7 @@
 === SVN
 
+* Added support for dynamic strings in Sequelizer (#49).
+
 * Query branch merged into trunk.
 
 * Implemented self-changing methods.

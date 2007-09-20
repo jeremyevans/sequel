@@ -216,7 +216,7 @@ class Sequel::Dataset
         l = e[1]
         r = eval_expr(e[2], b)
         raise SequelError, "Invalid expression #{l} = #{r}. Did you mean :#{l} == #{r}?"
-      when :if
+      when :if, :dstr
         ext_expr(e, b)
       else
         raise SequelError, "Invalid expression tree: #{e.inspect}"

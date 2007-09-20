@@ -292,4 +292,12 @@ context "Proc#to_sql" do
     
     proc {((1 > 2) ? :x : :y) > 3}.to_sql.should == "(y > 3)"
   end
+  
+  specify "should support strings with embedded Ruby code in them and literalize them" do
+    proc {:n == "#{1+2}"}.to_sql.should == "(n = '3')"
+    
+    y = "12'34"
+    
+    proc {:x > "#{y}"}.to_sql.should == "(x > '12''34')"
+  end
 end
