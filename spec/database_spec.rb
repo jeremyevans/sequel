@@ -476,6 +476,17 @@ context "A database" do
     db = Sequel::Database.new(:max_options => 4)
     db.should be_single_threaded
     db.should_not be_multi_threaded
-    
+  end
+end
+
+context "Database#dataset" do
+  setup do
+    @db = Sequel::Database.new
+  end
+  
+  specify "should delegate to Dataset#query if block is provided" do
+    @d = @db.query {select :x; from :y}
+    @d.should be_a_kind_of(Sequel::Dataset)
+    @d.sql.should == "SELECT x FROM y"
   end
 end

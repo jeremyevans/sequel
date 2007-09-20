@@ -88,6 +88,11 @@ Spec::Rake::SpecTask.new('spec') do |t|
   t.rcov = true
 end
 
+desc "Run specs without coverage"
+Spec::Rake::SpecTask.new('spec_no_cov') do |t|
+  t.spec_files = FileList['spec/*_spec.rb']
+end
+
 desc "Run adapter specs without coverage"
 Spec::Rake::SpecTask.new('spec_adapters') do |t|
   t.spec_files = FileList['spec/adapters/*_spec.rb']

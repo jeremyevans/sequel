@@ -1,5 +1,23 @@
 === SVN
 
+* Query branch merged into trunk.
+
+* Implemented self-changing methods.
+
+* Add support for ternary operator to Sequelizer.
+
+* Fixed sequelizer to evaluate expressions if they don't involve symbols or literal strings.
+
+* Added protection against using #each, #delete, #insert, #update inside query blocks.
+
+* Improved Model#method_missing to deal with invalid attributes.
+
+* Implemented Dataset#query.
+
+* Added Dataset#group_by as alias for Dataset#group.
+
+* Added Dataset#order_by as alias for Dataset#order.
+
 * More model refactoring. Added support for composite keys.
 
 * Added Dataset#empty? method (#46).

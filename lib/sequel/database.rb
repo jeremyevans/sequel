@@ -60,9 +60,15 @@ module Sequel
     
     # Returns a blank dataset
     def dataset
-      Sequel::Dataset.new(self)
+      ds = Sequel::Dataset.new(self)
     end
-
+    
+    # Converts a query block into a dataset. For more information see 
+    # Dataset#query.
+    def query(&block)
+      dataset.query(&block)
+    end
+    
     # Returns a new dataset with the from method invoked. If a block is given,
     # it is used as a filter on the dataset.
     def from(*args, &block)

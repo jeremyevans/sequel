@@ -47,7 +47,7 @@ module Sequel
         @pool.hold {|conn| conn.get_first_value(sql)}
       end
       
-      def query(sql, &block)
+      def execute_select(sql, &block)
         @logger.info(sql) if @logger
         @pool.hold {|conn| conn.query(sql, &block)}
       end
@@ -105,7 +105,7 @@ module Sequel
       end
 
       def fetch_rows(sql, &block)
-        @db.query(sql) do |result|
+        @db.execute_select(sql) do |result|
           @columns = result.columns.map {|c| c.to_sym}
           column_count = @columns.size
           result.each do |values|

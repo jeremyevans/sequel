@@ -64,17 +64,6 @@ module Sequel
     
     def []=(field, value); @values[field] = value; end
     
-    WRITE_ATTR_REGEXP = /(.*)=$/.freeze
-
-    def method_missing(m, value = nil)
-      write = m.to_s =~ WRITE_ATTR_REGEXP
-      att = write ? $1.to_sym : m
-      # raise unless the att is recognized or this is a new unaved record
-      super unless @values.include?(att) || @new
-      
-      write ? (self[att] = value) : self[att]
-    end
-    
     def each(&block); @values.each(&block); end
     def keys; @values.keys; end
     

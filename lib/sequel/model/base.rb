@@ -19,6 +19,10 @@ module Sequel
     def self.dataset
       @dataset || raise(SequelError, "No dataset associated with #{self}.")
     end
+    
+    def self.columns
+      @columns ||= @dataset.columns || raise(SequelError, "Could not fetch columns for #{self}")
+    end
 
     # Sets the dataset associated with the model class.
     def self.set_dataset(ds)
@@ -27,20 +31,22 @@ module Sequel
       @dataset.set_model(self)
     end
     
+    def model
+      @model ||= self.class
+    end
+    
     # Returns the dataset assoiated with the object's model class.
     def db
-      @db ||= self.class.db
+      @db ||= model.db
     end
 
     # Returns the dataset assoiated with the object's model class.
     def dataset
-      @dataset ||= self.class.dataset
+      @dataset ||= model.dataset
     end
-
-    attr_reader :values, :pkey
     
-    def model
-      @model ||= self.class
+    def columns
+      @columns ||= model.columns
     end
   end
 

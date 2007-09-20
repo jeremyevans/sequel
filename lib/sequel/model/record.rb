@@ -1,5 +1,7 @@
 module Sequel
   class Model
+    attr_reader :values
+
     def self.primary_key; :id; end
     
     def self.set_primary_key(key)
@@ -113,5 +115,32 @@ module Sequel
       self
     end
     
+    ATTR_RE = /^([a-zA-Z_]\w*)(=)?$/.freeze
+
+    def method_missing(m, *args)
+      if m.to_s =~ ATTR_RE
+        att = $1.to_sym
+        write = $2 == '='
+        
+        # check wether the column is legal
+        unless columns.include?(att)
+          raise SequelError, "Invalid column (#{att.inspect}) for #{self}"
+        end
+
+        # define the column accessor
+        Thread.exclusive do
+          if write
+            model.class_def(m) {|v| @values[att] = v}
+          else
+            model.class_def(m) {@values[att]}
+          end
+        end
+        
+        # call the accessor
+        respond_to?(m) ? send(m, *args) : super(m, *args)
+      else
+        super(m, *args)
+      end
+    end
   end
 end

@@ -1,8 +1,8 @@
 require 'time'
 require 'date'
 
-require File.join(File.dirname(__FILE__), 'dataset/sequelizer')
 require File.join(File.dirname(__FILE__), 'dataset/sql')
+require File.join(File.dirname(__FILE__), 'dataset/sequelizer')
 require File.join(File.dirname(__FILE__), 'dataset/convenience')
 
 module Sequel

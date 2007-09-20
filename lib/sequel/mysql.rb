@@ -95,7 +95,7 @@ module Sequel
         end
       end
       
-      def query(sql)
+      def execute_select(sql)
         @logger.info(sql) if @logger
         @pool.hold do |conn|
           conn.query(sql)
@@ -215,7 +215,7 @@ module Sequel
       
       def fetch_rows(sql)
         @db.synchronize do
-          r = @db.query(sql)
+          r = @db.execute_select(sql)
           begin
             @columns = r.columns
             r.each_hash {|row| yield row}

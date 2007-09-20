@@ -45,6 +45,12 @@ context "Proc#to_sql" do
     def xyz; 321; end
     proc {:x == xyz}.to_sql.should == "(x = 321)"
     proc {:x == xyz.to_s}.to_sql.should == "(x = '321')"
+    
+    def y1(x); x; end
+    def y2; 111; end
+    
+    proc {:x == y1(222)}.to_sql.should == "(x = 222)"
+    proc {:x == y2}.to_sql.should == "(x = 111)"
   end
   
   specify "should support constants" do
@@ -266,5 +272,24 @@ context "Proc#to_sql" do
   specify "should support Regexp macros" do
     "abc" =~ /(ab)/
     proc {:x == $1}.to_sql.should == "(x = 'ab')"
+  end
+  
+  specify "should evaluate expression not referring to symbols or literal strings." do
+    proc {:x > 2 * 3}.to_sql.should == "(x > 6)"
+    y = 3
+    proc {:x > y * 4}.to_sql.should == "(x > 12)"
+
+    proc {:AVG[:x] > 4}.to_sql.should == "(AVG(x) > 4)"
+
+    proc {:AVG[:x] > 4}.to_sql.should == "(AVG(x) > 4)"
+    
+    proc {:y == (1 > 2)}.to_sql.should == "(y = 'f')"
+  end
+  
+  specify "should support ternary operator" do
+    y = true
+    proc {:x > (y ? 1 : 2)}.to_sql.should == "(x > 1)"
+    
+    proc {((1 > 2) ? :x : :y) > 3}.to_sql.should == "(y > 3)"
   end
 end

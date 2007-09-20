@@ -108,7 +108,11 @@ class Sequel::Dataset
       when :>, :<, :>=, :<=
         l = eval_expr(e[1], b)
         r = eval_expr(e[3][1], b)
-        "(#{literal(l)} #{op} #{literal(r)})"
+        if (Symbol === l) || (Sequel::LiteralString === l) || (Symbol === r) || (Sequel::LiteralString === r)
+          "(#{literal(l)} #{op} #{literal(r)})"
+        else
+          ext_expr(e, b)
+        end
       when :==
         l = eval_expr(e[1], b)
         r = eval_expr(e[3][1], b)
@@ -120,7 +124,11 @@ class Sequel::Dataset
       when :+, :-, :*, :/, :%
         l = eval_expr(e[1], b)
         r = eval_expr(e[3][1], b)
-        "(#{literal(l)} #{op} #{literal(r)})".lit
+        if (Symbol === l) || (Sequel::LiteralString === l) || (Symbol === r) || (Sequel::LiteralString === r)
+          "(#{literal(l)} #{op} #{literal(r)})".lit
+        else
+          ext_expr(e, b)
+        end
       when :in, :in?
         # in/in? operators are supported using two forms:
         #   :x.in([1, 2, 3])
@@ -146,12 +154,32 @@ class Sequel::Dataset
       end
     end
     
+    def fcall_expr(e, b)
+      ext_expr(e, b)
+    end
+    
+    def vcall_expr(e, b)
+      eval(e[1].to_s, b)
+    end
+    
+    def iter_expr(e, b)
+      if e[1] == [:fcall, :proc]
+        eval_expr(e[3], b) # inline proc
+      else
+        ext_expr(e, b) # method call with inline proc
+      end
+    end
+    
     # Evaluates a parse-tree into an SQL expression.
     def eval_expr(e, b)
       case e[0]
       when :call # method call
         call_expr(e, b)
-      when :ivar, :cvar, :dvar, :vcall, :const, :gvar # local ref
+      when :fcall
+        fcall_expr(e, b)
+      when :vcall
+        vcall_expr(e, b)
+      when :ivar, :cvar, :dvar, :const, :gvar # local ref
         eval(e[1].to_s, b)
       when :nth_ref:
         eval("$#{e[1]}", b)
@@ -182,16 +210,14 @@ class Sequel::Dataset
         r = eval_expr(e[1], b)
         compare_expr(l, r)
       when :iter
-        if e[1] == [:fcall, :proc]
-          eval_expr(e[3], b) # inline proc
-        else
-          ext_expr(e, b) # method call with inline proc
-        end
+        iter_expr(e, b)
       when :dasgn, :dasgn_curr
         # assignment
         l = e[1]
         r = eval_expr(e[2], b)
         raise SequelError, "Invalid expression #{l} = #{r}. Did you mean :#{l} == #{r}?"
+      when :if
+        ext_expr(e, b)
       else
         raise SequelError, "Invalid expression tree: #{e.inspect}"
       end

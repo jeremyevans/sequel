@@ -446,6 +446,24 @@ context "a grouped dataset" do
   end
 end
 
+context "Dataset#group_by" do
+  setup do
+    @dataset = Sequel::Dataset.new(nil).from(:test).group_by(:type_id)
+  end
+
+  specify "should raise when trying to generate an update statement" do
+    proc {@dataset.update_sql(:id => 0)}.should raise_error
+  end
+
+  specify "should raise when trying to generate a delete statement" do
+    proc {@dataset.delete_sql}.should raise_error
+  end
+
+  specify "should specify the grouping in generated select statement" do
+    @dataset.select_sql.should ==
+      "SELECT * FROM test GROUP BY type_id"
+  end
+end
 
 context "Dataset#literal" do
   setup do
@@ -596,6 +614,32 @@ context "Dataset#order" do
   
   specify "should accept a string" do
     @dataset.order('dada ASC').sql.should ==
+      'SELECT * FROM test ORDER BY dada ASC'
+  end
+end
+
+context "Dataset#order_by" do
+  setup do
+    @dataset = Sequel::Dataset.new(nil).from(:test)
+  end
+  
+  specify "should include an ORDER BY clause in the select statement" do
+    @dataset.order_by(:name).sql.should == 
+      'SELECT * FROM test ORDER BY name'
+  end
+  
+  specify "should accept multiple arguments" do
+    @dataset.order_by(:name, :price.DESC).sql.should ==
+      'SELECT * FROM test ORDER BY name, price DESC'
+  end
+  
+  specify "should overrun a previous ordering" do
+    @dataset.order_by(:name).order(:stamp).sql.should ==
+      'SELECT * FROM test ORDER BY stamp'
+  end
+  
+  specify "should accept a string" do
+    @dataset.order_by('dada ASC').sql.should ==
       'SELECT * FROM test ORDER BY dada ASC'
   end
 end
@@ -1616,5 +1660,118 @@ context "Dataset#multi_insert" do
       "INSERT INTO items (name) VALUES ('ghi');",
       'COMMIT;'
     ]
+  end
+end
+
+context "Dataset#query" do
+  setup do
+    @d = Sequel::Dataset.new(nil)
+  end
+  
+  specify "should support #from" do
+    q = @d.query {from :xxx}
+    q.class.should == @d.class
+    q.sql.should == "SELECT * FROM xxx"
+  end
+  
+  specify "should support #select" do
+    q = @d.query do
+      select :a, :b___mongo
+      from :yyy
+    end
+    q.class.should == @d.class
+    q.sql.should == "SELECT a, b AS mongo FROM yyy"
+  end
+  
+  specify "should support #where" do
+    q = @d.query do
+      from :zzz
+      where {:x + 2 > :y + 3}
+    end
+    q.class.should == @d.class
+    q.sql.should == "SELECT * FROM zzz WHERE ((x + 2) > (y + 3))"
+
+    q = @d.from(:zzz).query do
+      where {:x > 1 && :y > 2}
+    end
+    q.class.should == @d.class
+    q.sql.should == "SELECT * FROM zzz WHERE ((x > 1) AND (y > 2))"
+
+    q = @d.from(:zzz).query do
+      where :x => 33
+    end
+    q.class.should == @d.class
+    q.sql.should == "SELECT * FROM zzz WHERE (x = 33)"
+  end
+  
+  specify "should support #group_by and #having" do
+    q = @d.query do
+      from :abc
+      group_by :id
+      having {:x >= 2}
+    end
+    q.class.should == @d.class
+    q.sql.should == "SELECT * FROM abc GROUP BY id HAVING (x >= 2)"
+  end
+  
+  specify "should support #order, #order_by" do
+    q = @d.query do
+      from :xyz
+      order_by :stamp
+    end
+    q.class.should == @d.class
+    q.sql.should == "SELECT * FROM xyz ORDER BY stamp"
+  end
+  
+  specify "should raise on non-chainable method calls" do
+    proc {@d.query {count}}.should raise_error(SequelError)
+  end
+  
+  specify "should raise on each, insert, update, delete" do
+    proc {@d.query {each}}.should raise_error(SequelError)
+    proc {@d.query {insert(:x => 1)}}.should raise_error(SequelError)
+    proc {@d.query {update(:x => 1)}}.should raise_error(SequelError)
+    proc {@d.query {delete}}.should raise_error(SequelError)
+  end
+end
+
+context "Dataset" do
+  setup do
+    @d = Sequel::Dataset.new(nil).from(:x)
+  end
+
+  specify "should support self-changing select!" do
+    @d.select!(:y)
+    @d.sql.should == "SELECT y FROM x"
+  end
+  
+  specify "should support self-changing from!" do
+    @d.from!(:y)
+    @d.sql.should == "SELECT * FROM y"
+  end
+
+  specify "should support self-changing order!" do
+    @d.order!(:y)
+    @d.sql.should == "SELECT * FROM x ORDER BY y"
+  end
+  
+  specify "should support self-changing filter!" do
+    @d.filter!(:y => 1)
+    @d.sql.should == "SELECT * FROM x WHERE (y = 1)"
+  end
+
+  specify "should support self-changing filter! with block" do
+    @d.filter! {:y == 2}
+    @d.sql.should == "SELECT * FROM x WHERE (y = 2)"
+  end
+  
+  specify "should raise for ! methods that don't return a dataset" do
+    proc {@d.opts!}.should raise_error(NameError)
+  end
+  
+  specify "should raise for missing methods" do
+    proc {@d.xuyz}.should raise_error(NameError)
+    proc {@d.xyz!}.should raise_error(NameError)
+    proc {@d.xyz?}.should raise_error(NameError)
   end
 end

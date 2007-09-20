@@ -114,6 +114,10 @@ context "A new model instance" do
       1234
     end
     
+    def d.first
+      {:x => 1, :id => 1234}
+    end
+    
     o = @m.new(:x => 1)
     o.save
     o.id.should == 1234
@@ -265,5 +269,42 @@ context "Model#serialize" do
     o.save
     
     MODEL_DB.sqls.first.should =~ /abc = '--- 23\n'/
+  end
+end
+
+context "Model attribute accessors" do
+  setup do
+    MODEL_DB.reset
+
+    @c = Class.new(Sequel::Model(:items)) do
+    end
+    
+    ds = @c.dataset
+    def ds.columns
+      [:id, :x, :y]
+    end
+  end
+  
+  specify "should be created dynamically" do
+    o = @c.new
+    
+    o.should_not be_respond_to(:x)
+    o.x.should be_nil
+    o.should be_respond_to(:x)
+    
+    o.should_not be_respond_to(:x=)
+    o.x = 34
+    o.x.should == 34
+    o.should be_respond_to(:x=)
+  end
+  
+  specify "should raise for a column that doesn't exist in the dataset" do
+    o = @c.new
+    
+    proc {o.x}.should_not raise_error
+    proc {o.xx}.should raise_error(SequelError)
+    
+    proc {o.x = 3}.should_not raise_error
+    proc {o.yy = 4}.should raise_error
   end
 end

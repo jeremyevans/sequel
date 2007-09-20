@@ -190,6 +190,48 @@ module Sequel
           end
         end
       end
+      
+      module QueryBlockCopy
+        def each(*args); raise SequelError, "#each cannot be invoked inside a query block."; end
+        def insert(*args); raise SequelError, "#insert cannot be invoked inside a query block."; end
+        def update(*args); raise SequelError, "#update cannot be invoked inside a query block."; end
+        def delete(*args); raise SequelError, "#delete cannot be invoked inside a query block."; end
+        
+        def clone_merge(opts)
+          @opts.merge!(opts)
+        end
+      end
+      
+      # Translates a query block into a dataset. Query blocks can be useful
+      # when expressing complex SELECT statements, e.g.:
+      #
+      #   dataset = DB[:items].query do
+      #     select :x, :y, :z
+      #     where {:x > 1 && :y > 2}
+      #     order_by :z.DESC
+      #   end
+      #
+      def query(&block)
+        copy = clone_merge({})
+        copy.extend(QueryBlockCopy)
+        copy.instance_eval(&block)
+        clone_merge(copy.opts)
+      end
+      
+      MUTATION_RE = /^(.+)!$/.freeze
+      
+      def method_missing(m, *args, &block)
+        if m.to_s =~ MUTATION_RE
+          m = $1.to_sym
+          super unless respond_to?(m)
+          copy = send(m, *args, &block)
+          super if copy.class != self.class
+          @opts.merge!(copy.opts)
+          self
+        else
+          super
+        end
+      end
     end
   end
 end

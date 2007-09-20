@@ -145,6 +145,8 @@ module Sequel
       def order(*order)
         clone_merge(:order => order)
       end
+      
+      alias_method :order_by, :order
 
       # Returns a copy of the dataset with the order reversed. If no order is
       # given, the existing order is inverted.
@@ -176,6 +178,8 @@ module Sequel
       def group(*fields)
         clone_merge(:group => fields)
       end
+      
+      alias_method :group_by, :group
 
       # Returns a copy of the dataset with the given conditions imposed upon it.  
       # If the query has been grouped, then the conditions are imposed in the 
