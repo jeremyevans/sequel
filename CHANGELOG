@@ -1,5 +1,7 @@
 === SVN
 
+* Added gem spec for Windows (without ParseTree dependency).
+
 * Added support for dynamic strings in Sequelizer (#49).
 
 * Query branch merged into trunk.
