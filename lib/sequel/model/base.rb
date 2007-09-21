@@ -17,7 +17,13 @@ module Sequel
 
     # returns the dataset associated with the model class.
     def self.dataset
-      @dataset || raise(SequelError, "No dataset associated with #{self}.")
+      @dataset || super_dataset || raise(SequelError, "No dataset associated with #{self}.")
+    end
+    
+    def self.super_dataset
+      if superclass && superclass.respond_to?(:dataset) && ds = superclass.dataset
+        ds
+      end
     end
     
     def self.columns
@@ -53,9 +59,10 @@ module Sequel
   def self.Model(source)
     @models ||= {}
     @models[source] ||= Class.new(Sequel::Model) do
-      meta_def(:inherited) do |c|
-        c.set_dataset(source.is_a?(Dataset) ? source : c.db[source])
-      end
+      set_dataset(source.is_a?(Dataset) ? source : db[source])
+      # meta_def(:inherited) do |c|
+      #   c.set_dataset(source.is_a?(Dataset) ? source : c.db[source])
+      # end
     end
   end
 end

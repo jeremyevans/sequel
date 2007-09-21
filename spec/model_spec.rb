@@ -243,10 +243,8 @@ context "Model#serialize" do
       serialize :abc
     end
 
-    o = @c.create(:abc => 1)
-    o.values[:abc].should == "--- 1\n"
-    o = @c.create(:abc => "hello")
-    o.values[:abc].should == "--- hello\n"
+    @c.create(:abc => 1)
+    @c.create(:abc => "hello")
     
     MODEL_DB.sqls.should == [ \
       "INSERT INTO items (abc) VALUES ('--- 1\n');", \
@@ -259,16 +257,44 @@ context "Model#serialize" do
       serialize :abc, :def
     end
     
-    o = @c.new(:id => 1, :abc => "--- 1\n", :def => "--- hello\n")
-    o.values.should == {:id => 1, :abc => "--- 1\n", :def => "--- hello\n"}
+    ds = @c.dataset
+    ds.extend(Module.new {
+      attr_accessor :raw
+      
+      def fetch_rows(sql, &block)
+        block.call(@raw)
+      end
+      
+      @@sqls = nil
+      
+      def insert(*args)
+        @@sqls = insert_sql(*args)
+      end
+
+      def update(*args)
+        @@sqls = update_sql(*args)
+      end
+      
+      def sqls
+        @@sqls
+      end
+      
+      def columns
+        [:id, :abc, :def]
+      end
+    })
+      
+    ds.raw = {:id => 1, :abc => "--- 1\n", :def => "--- hello\n"}
+    o = @c.first
+    o.id.should == 1
     o.abc.should == 1
-    o.def.should == 'hello'
+    o.def.should == "hello"
     
-    o.abc = 23
-    o.values[:abc].should == "--- 23\n"
-    o.save
+    o.set(:abc => 23)
+    ds.sqls.should == "UPDATE items SET abc = '#{23.to_yaml}' WHERE (id = 1)"
     
-    MODEL_DB.sqls.first.should =~ /abc = '--- 23\n'/
+    o = @c.create(:abc => [1, 2, 3])
+    ds.sqls.should == "INSERT INTO items (abc) VALUES ('#{[1, 2, 3].to_yaml}');"
   end
 end
 
@@ -277,12 +303,17 @@ context "Model attribute accessors" do
     MODEL_DB.reset
 
     @c = Class.new(Sequel::Model(:items)) do
+      def columns
+        [:id, :x, :y]
+      end
     end
     
     ds = @c.dataset
-    def ds.columns
-      [:id, :x, :y]
-    end
+    ds.extend(Module.new {
+      def columns
+        [:id, :x, :y]
+      end
+    })
   end
   
   specify "should be created dynamically" do
