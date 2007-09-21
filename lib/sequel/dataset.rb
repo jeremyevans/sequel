@@ -86,6 +86,7 @@ module Sequel
     def initialize(db, opts = nil)
       @db = db
       @opts = opts || {}
+      @row_filter = nil
     end
     
     # Returns a new instance of the dataset with with the give options merged.

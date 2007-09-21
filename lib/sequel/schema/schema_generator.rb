@@ -6,6 +6,7 @@ module Sequel
         @table_name = table_name
         @columns = []
         @indexes = []
+        @primary_key = nil
         instance_eval(&block)
       end
       
