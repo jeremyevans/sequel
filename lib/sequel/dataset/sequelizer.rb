@@ -250,7 +250,6 @@ class Sequel::Dataset
     # Translates a Ruby block into an SQL expression.
     def proc_to_sql(proc)
       c = Class.new {define_method(:m, &proc)}
-      p ParseTree.translate(c, :m)[2][2]
       pt_expr(ParseTree.translate(c, :m)[2][2], proc.binding)
     end
   end

@@ -1221,7 +1221,7 @@ context "Dataset#single_value" do
   end
 end
 
-context "Dataset#set_row_filter" do
+context "Dataset#set_row_proc" do
   setup do
     @c = Class.new(Sequel::Dataset) do
       def fetch_rows(sql, &block)
@@ -1233,7 +1233,7 @@ context "Dataset#set_row_filter" do
   end
   
   specify "should cause dataset to pass all rows through the filter" do
-    @dataset.set_row_filter {|h| h[:der] = h[:kind] + 2; h}
+    @dataset.set_row_proc {|h| h[:der] = h[:kind] + 2; h}
     
     rows = @dataset.all
     rows.size.should == 10
@@ -1242,7 +1242,7 @@ context "Dataset#set_row_filter" do
   end
   
   specify "should be copied over when dataset is cloned" do
-    @dataset.set_row_filter {|h| h[:der] = h[:kind] + 2; h}
+    @dataset.set_row_proc {|h| h[:der] = h[:kind] + 2; h}
     
     @dataset.filter(:a => 1).first.should == {:kind => 1, :der => 3}
   end
@@ -1773,5 +1773,75 @@ context "Dataset" do
     proc {@d.xuyz}.should raise_error(NameError)
     proc {@d.xyz!}.should raise_error(NameError)
     proc {@d.xyz?}.should raise_error(NameError)
+  end
+  
+  specify "should support chaining of bang methods" do
+      @d.order!(:y)
+      @d.filter!(:y => 1)
+      @d.sql.should == "SELECT * FROM x WHERE (y = 1) ORDER BY y"
+  end
+end
+
+context "Dataset#transform" do
+  setup do
+    @c = Class.new(Sequel::Dataset) do
+      attr_accessor :raw
+      attr_accessor :sql
+      
+      def fetch_rows(sql, &block)
+        block[@raw]
+      end
+      
+      def insert(v)
+        @sql = insert_sql(v)
+      end
+      
+      def update(v)
+        @sql = update_sql(v)
+      end
+    end
+
+    @ds = @c.new(nil).from(:items)
+    @ds.transform(:x => [
+      proc {|v| Marshal.load(v)},
+      proc {|v| Marshal.dump(v)}
+    ])
+  end
+  
+  specify "should change the dataset to transform values loaded from the database" do
+    @ds.raw = {:x => Marshal.dump([1, 2, 3]), :y => 'hello'}
+    @ds.first.should == {:x => [1, 2, 3], :y => 'hello'}
+  end
+  
+  specify "should change the dataset to transform values saved to the database" do
+    @ds.insert(:x => :toast)
+    @ds.sql.should == "INSERT INTO items (x) VALUES ('#{Marshal.dump(:toast)}');"
+
+    @ds.insert(:y => 'butter')
+    @ds.sql.should == "INSERT INTO items (y) VALUES ('butter');"
+    
+    @ds.update(:x => ['dream'])
+    @ds.sql.should == "UPDATE items SET x = '#{Marshal.dump(['dream'])}'"
+  end
+  
+  specify "should be transferred to cloned datasets" do
+    @ds2 = @ds.filter(:a => 1)
+
+    @ds2.raw = {:x => Marshal.dump([1, 2, 3]), :y => 'hello'}
+    @ds2.first.should == {:x => [1, 2, 3], :y => 'hello'}
+
+    @ds2.insert(:x => :toast)
+    @ds2.sql.should == "INSERT INTO items (x) VALUES ('#{Marshal.dump(:toast)}');"
+  end
+  
+  specify "should work correctly together with set_row_proc" do
+    @ds.set_row_proc {|r| r[:z] = r[:x] * 2; r}
+    @ds.raw = {:x => Marshal.dump("wow"), :y => 'hello'}
+    @ds.first.should == {:x => "wow", :y => 'hello', :z => "wowwow"}
+
+    f = nil
+    @ds.raw = {:x => Marshal.dump("wow"), :y => 'hello'}
+    @ds.each(:naked => true) {|r| f = r}
+    f.should == {:x => "wow", :y => 'hello'}
   end
 end

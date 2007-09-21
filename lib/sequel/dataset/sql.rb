@@ -428,6 +428,7 @@ module Sequel
           values = values[0] if values.size == 1
           case values
           when Hash
+            values = transform_save(values) if @transform
             if values.empty?
               "INSERT INTO #{@opts[:from]} DEFAULT VALUES;"
             else
@@ -456,6 +457,7 @@ module Sequel
           raise SequelError, "Can't update a joined dataset"
         end
 
+        values = transform_save(values) if @transform
         set_list = values.map {|k, v| "#{field_name(k)} = #{literal(v)}"}.
           join(COMMA_SEPARATOR)
         sql = "UPDATE #{@opts[:from]} SET #{set_list}"
