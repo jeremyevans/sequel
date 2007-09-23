@@ -15,8 +15,13 @@ module Sequel
       meta_def(name) {filter(*args, &block)}
     end
     
+    def primary_key_hash(value)
+      # stock implementation
+      {:id => value}
+    end
+    
     def self.find(cond)
-      dataset[cond.is_a?(Hash) ? cond : {primary_key => cond}]
+      dataset[cond.is_a?(Hash) ? cond : primary_key_hash(cond)]
     end
     
     def self.find_or_create(cond)

@@ -1,5 +1,9 @@
 === SVN
 
+* Added default implementation of Model.primary_key_hash.
+
+* Fixed Sequel::Model() to set dataset for inherited classes.
+
 * Rewrote Model.serialize to use Dataset#transform.
 
 * Implemented Dataset#transform.

@@ -3,6 +3,7 @@ module Sequel
     attr_reader :values
 
     def self.primary_key; :id; end
+    def self.primary_key_hash(v); {:id => v}; end
     
     def self.set_primary_key(key)
       # if k is nil, we go to no_primary_key
@@ -17,15 +18,22 @@ module Sequel
             @values.reject {|k, v| !key.include?(k)} \
           ).naked
         end
+        meta_def(:primary_key_hash) do |v|
+          key.inject({}) {|m, i| m[i] = v.shift; m}
+        end
       else # regular key
         class_def(:this) do
           @this ||= self.class.dataset.filter(key => @values[key]).naked
+        end
+        meta_def(:primary_key_hash) do |v|
+          {key => v}
         end
       end
     end
     
     def self.no_primary_key
       meta_def(:primary_key) {nil}
+      meta_def(:primary_key_hash) {|v| raise SequelError, "#{self} does not have a primary key"}
       class_def(:this) {raise SequelError, "No primary key is associated with this model"}
     end
     
