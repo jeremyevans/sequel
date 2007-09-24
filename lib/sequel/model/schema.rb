@@ -28,9 +28,15 @@ module Sequel
       db.execute db.drop_table_sql(table_name)
     end
     
-    def self.recreate_table
+    def self.create_table!
       drop_table if table_exists?
       create_table
+      
+    end
+    
+    def self.recreate_table
+      warn "Model.recreate_table is deprecated. Please use Model.create_table! instead."
+      create_table!
     end
   end
 end

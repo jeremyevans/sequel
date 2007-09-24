@@ -1,3 +1,7 @@
+=== SVN
+
+* Renamed Model.recreate_table to create_table!. recreate_table is deprecated and will issue a warning (#56).
+
 === 0.2.1 (2007-09-24)
 
 * Added default implementation of Model.primary_key_hash.
