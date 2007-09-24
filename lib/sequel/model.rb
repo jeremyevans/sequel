@@ -77,41 +77,6 @@ module Sequel
     def ==(obj)
       (obj.class == model) && (obj.values == @values)
     end
-    
-    SERIALIZE_FORMATS = {
-      :yaml => [proc {|v| YAML.load v if v}, proc {|v| v.to_yaml}],
-      :marshal => [proc {|v| Marshal.load(v) if v}, proc {|v| Marshal.dump(v)}]
-    }
-
-    def self.serialize(*columns)
-      format = columns.pop[:format] if Hash === columns.last
-      filters = SERIALIZE_FORMATS[format || :yaml]
-      # add error handling here
-      
-      dataset.transform(
-        columns.inject({}) do |m, c|
-          m[c] = filters
-          m
-        end
-      )
-    end
-
-    
-    # SERIALIZE_GET_PROC = "proc {@unserialized_%s ||= YAML.load(@values[:%s]) }".freeze
-    # SERIALIZE_SET_PROC = "proc {|v| @values[:%s] = v.to_yaml; @unserialized_%s = v }".freeze
-    # 
-    # def self.serialize(*fields)
-    #   fields.each do |f|
-    #     # define getter
-    #     define_method f, &eval(SERIALIZE_GET_PROC % [f, f])
-    #     # define setter
-    #     define_method "#{f}=", &eval(SERIALIZE_SET_PROC % [f, f])
-    #     # add before_create to serialize values before creation
-    #     before_create do
-    #       @values[f] = @values[f].to_yaml
-    #     end
-    #   end      
-    # end
   end
   
 end

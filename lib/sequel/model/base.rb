@@ -35,6 +35,7 @@ module Sequel
       @db = ds.db
       @dataset = ds
       @dataset.set_model(self)
+      @dataset.transform(@transform) if @transform
     end
     
     def model
@@ -53,6 +54,22 @@ module Sequel
     
     def columns
       @columns ||= model.columns
+    end
+
+    SERIALIZE_FORMATS = {
+      :yaml => [proc {|v| YAML.load v if v}, proc {|v| v.to_yaml}],
+      :marshal => [proc {|v| Marshal.load(v) if v}, proc {|v| Marshal.dump(v)}]
+    }
+
+    def self.serialize(*columns)
+      format = columns.pop[:format] if Hash === columns.last
+      filters = SERIALIZE_FORMATS[format || :yaml]
+      # add error handling here
+      
+      @transform = columns.inject({}) do |m, c|
+        m[c] = filters
+        m
+      end
     end
   end
 
