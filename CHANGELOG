@@ -1,5 +1,7 @@
 === SVN
 
+* Fixed ODBC::Dataset#fetch_rows (thanks Dusty).
+
 * Renamed Model.recreate_table to create_table!. recreate_table is deprecated and will issue a warning (#56).
 
 === 0.2.1 (2007-09-24)
