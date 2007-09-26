@@ -9,7 +9,18 @@ context "Proc#to_sql" do
       DS.proc_to_sql(self)
     end
   end
-
+  
+  def DS.match_expr(l, r)
+    case r
+    when String:
+      "(#{literal(l)} LIKE #{literal(r)})"
+    when Regexp:
+      "(#{literal(l)} ~ #{literal(r.source)})"
+    else
+      raise SequelError, "Unsupported match pattern class (#{r.class})."
+    end
+  end
+  
   specify "should support <sym> <op> <lit>" do
     proc {:x > 100}.to_sql.should == '(x > 100)'
     proc {:x < 100}.to_sql.should == '(x < 100)'
@@ -79,11 +90,11 @@ context "Proc#to_sql" do
   specify "should support =~ operator" do
     # stock SQL version does not know about regexps
     proc {:x =~ '123'}.to_sql.should == "(x LIKE '123')"
+
+    proc {:x =~ /^123/}.to_sql.should == "(x ~ '^123')"
   end
   
   specify "should raise on =~ operator for unsupported types" do
-    # stock SQL version does not know about regexps
-    proc {proc {:x =~ /123/}.to_sql}.should raise_error(SequelError)
     proc {proc {:x =~ 123}.to_sql}.should raise_error(SequelError)
   end
   

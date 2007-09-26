@@ -1,5 +1,7 @@
 === SVN
 
+* Fixed =~ operator in Sequelizer.
+
 * Fixed ODBC::Dataset#fetch_rows (thanks Dusty).
 
 * Renamed Model.recreate_table to create_table!. recreate_table is deprecated and will issue a warning (#56).

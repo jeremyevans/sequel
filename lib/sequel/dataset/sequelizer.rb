@@ -236,7 +236,7 @@ class Sequel::Dataset
         "(#{e[1..-1].map {|i| pt_expr(i, b)}.join(" AND ")})"
       when :or # x || y
         "(#{pt_expr(e[1], b)} OR #{pt_expr(e[2], b)})"
-      when :call, :vcall, :iter # method calls, blocks
+      when :call, :vcall, :iter, :match3 # method calls, blocks
         eval_expr(e, b)
       else # literals
         if e == [:lvar, :block]
