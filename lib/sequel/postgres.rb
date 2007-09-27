@@ -260,7 +260,7 @@ module Sequel
             rescue => e
               @logger.info(SQL_ROLLBACK) if @logger
               conn.async_exec(SQL_ROLLBACK) rescue nil
-              raise e
+              raise e unless SequelRollbackError === e
             ensure
               conn.transaction_in_progress = nil
             end

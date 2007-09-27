@@ -1,5 +1,7 @@
 === SVN
 
+* Implemented rollback global method for cancelling transactions in progress.
+
 * Fixed =~ operator in Sequelizer.
 
 * Fixed ODBC::Dataset#fetch_rows (thanks Dusty).

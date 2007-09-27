@@ -133,7 +133,7 @@ module Sequel
             result
           rescue => e
             conn.query(SQL_ROLLBACK)
-            raise e
+            raise e unless SequelRollbackError === e
           ensure
             @transactions.delete(Thread.current)
           end
