@@ -5,7 +5,7 @@ class SequelRollbackError < StandardError
 end
 
 class Object
-  def rollback
+  def rollback!
     raise SequelRollbackError
   end
 end

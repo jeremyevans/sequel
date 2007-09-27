@@ -1,6 +1,6 @@
 === SVN
 
-* Implemented rollback global method for cancelling transactions in progress.
+* Implemented rollback! global method for cancelling transactions in progress.
 
 * Fixed =~ operator in Sequelizer.
 

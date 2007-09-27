@@ -289,10 +289,10 @@ context "Database#transaction" do
     proc {@db.transaction {raise RuntimeError}}.should raise_error(RuntimeError)
   end
   
-  specify "should issue ROLLBACK if rollback is called in the transaction" do
+  specify "should issue ROLLBACK if rollback! is called in the transaction" do
     @db.transaction do
       @db.drop_table(:a)
-      rollback
+      rollback!
       @db.drop_table(:b)
     end
     
