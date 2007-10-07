@@ -79,6 +79,9 @@ context "A MySQL dataset" do
 
     @d.select(:value.MAX).sql.should == \
       'SELECT max(`value`) FROM items'
+      
+    @d.select(:NOW[]).sql.should == \
+    'SELECT NOW() FROM items'
 
     @d.select(:items__value.MAX).sql.should == \
       'SELECT max(items.`value`) FROM items'

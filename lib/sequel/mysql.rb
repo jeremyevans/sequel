@@ -144,10 +144,10 @@ module Sequel
     class Dataset < Sequel::Dataset
       UNQUOTABLE_FIELD_RE = /^(`(.+)`)|\*$/.freeze
       def quote_field(f)
-        f =~ UNQUOTABLE_FIELD_RE ? f : "`#{f}`"
+        (f.nil? || f.empty? || f =~ UNQUOTABLE_FIELD_RE) ? f : "`#{f}`"
       end
       
-      FIELD_EXPR_RE = /^([^\(]+\()?([^\.]+\.)?([^\s\)]+)(\))?(\sAS\s(.+))?$/i.freeze
+      FIELD_EXPR_RE = /^([^\(]+\()?([^\.]+\.)?([^\s\)]+)?(\))?(\sAS\s(.+))?$/i.freeze
       FIELD_ORDER_RE = /^(.*) (DESC|ASC)$/i.freeze
       def quoted_field_name(name)
         case name

@@ -1,5 +1,7 @@
 === SVN
 
+* Fixed MySQL quoting of sql functions.
+
 * Implemented rollback! global method for cancelling transactions in progress.
 
 * Fixed =~ operator in Sequelizer.
