@@ -99,6 +99,7 @@ module Sequel
       def literal(v)
         case v
         when Time: literal(v.iso8601)
+        when Date: literal(v.to_s)
         else
           super
         end
