@@ -1,3 +1,7 @@
+=== SVN
+
+* Added before_update, after_update hooks.
+
 === 0.2.1.1 (2007-10-07)
 
 * Added Date literalization to sqlite adapter (#60).

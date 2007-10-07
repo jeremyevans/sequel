@@ -21,6 +21,10 @@ module Sequel
       get_hooks(:before_create).unshift(block)
     end
     
+    def self.before_update(&block)
+      get_hooks(:before_update).unshift(block)
+    end
+    
     def self.before_destroy(&block)
       get_hooks(:before_destroy).unshift(block)
     end
@@ -31,6 +35,10 @@ module Sequel
     
     def self.after_create(&block)
       get_hooks(:after_create) << block
+    end
+    
+    def self.after_update(&block)
+      get_hooks(:after_update) << block
     end
     
     def self.after_destroy(&block)
