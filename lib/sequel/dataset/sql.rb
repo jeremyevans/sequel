@@ -61,8 +61,21 @@ module Sequel
         if source.nil? || source.empty?
           raise SequelError, 'No source specified for query'
         end
-        source.map {|i| i.is_a?(Dataset) ? i.to_table_reference : i}.
-          join(COMMA_SEPARATOR)
+        auto_alias_count = 0
+        source.map do |i|
+          case i
+          when Dataset:
+            auto_alias_count += 1
+            i.to_table_reference(auto_alias_count)
+          when Hash:
+            i.map {|k, v| "#{k.is_a?(Dataset) ? k.to_table_reference : k} #{v}"}.
+              join(COMMA_SEPARATOR)
+          else
+            i
+          end
+        end.join(COMMA_SEPARATOR)
+        # source.map {|i| i.is_a?(Dataset) ? i.to_table_reference : i}.
+        #   join(COMMA_SEPARATOR)
       end
 
       NULL = "NULL".freeze
@@ -494,11 +507,11 @@ module Sequel
       # Returns a table reference for use in the FROM clause. If the dataset has
       # only a :from option refering to a single table, only the table name is 
       # returned. Otherwise a subquery is returned.
-      def to_table_reference
+      def to_table_reference(idx = nil)
         if opts.keys == [:from] && opts[:from].size == 1
           opts[:from].first.to_s
         else
-          "(#{sql})"
+          idx ? "(#{sql}) t#{idx}" : "(#{sql})"
         end
       end
 

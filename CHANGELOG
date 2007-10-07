@@ -1,5 +1,9 @@
 === SVN
 
+* Extended Dataset#from to auto alias sub-queries.
+
+* Extended Dataset#from to accept hash for aliasing tables.
+
 * Added before_update, after_update hooks.
 
 === 0.2.1.1 (2007-10-07)

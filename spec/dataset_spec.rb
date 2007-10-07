@@ -537,7 +537,26 @@ context "Dataset#from" do
 
   specify "should format a Dataset as a subquery if it has had options set" do
     @dataset.from(@dataset.from(:a).where(:a=>1)).select_sql.should ==
-      "SELECT * FROM (SELECT * FROM a WHERE (a = 1))"
+      "SELECT * FROM (SELECT * FROM a WHERE (a = 1)) t1"
+  end
+  
+  specify "should automatically alias sub-queries" do
+    @dataset.from(@dataset.from(:a).group(:b)).select_sql.should ==
+      "SELECT * FROM (SELECT * FROM a GROUP BY b) t1"
+      
+    d1 = @dataset.from(:a).group(:b)
+    d2 = @dataset.from(:c).group(:d)
+    
+    @dataset.from(d1, d2).sql.should == 
+      "SELECT * FROM (SELECT * FROM a GROUP BY b) t1, (SELECT * FROM c GROUP BY d) t2"
+  end
+  
+  specify "should accept a hash for aliasing" do
+    @dataset.from(:a => :b).sql.should ==
+      "SELECT * FROM a b"
+      
+    @dataset.from(@dataset.from(:a).group(:b) => :c).sql.should ==
+      "SELECT * FROM (SELECT * FROM a GROUP BY b) c"
   end
 
   specify "should use the relevant table name if given a simple dataset" do
