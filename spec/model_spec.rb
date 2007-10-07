@@ -339,3 +339,66 @@ context "Model attribute accessors" do
     proc {o.yy = 4}.should raise_error
   end
 end
+
+context "Model#new?" do
+  setup do
+    MODEL_DB.reset
+
+    @c = Class.new(Sequel::Model(:items)) do
+      def columns
+        [:id, :x, :y]
+      end
+    end
+  end
+  
+  specify "should be true for a new instance" do
+    n = @c.new(:x => 1)
+    n.should be_new
+  end
+  
+  specify "should be false after saving" do
+    n = @c.new(:x => 1)
+    n.save
+    n.should_not be_new
+  end
+end
+
+context "Model.after_create" do
+  setup do
+    MODEL_DB.reset
+
+    @c = Class.new(Sequel::Model(:items)) do
+      def columns
+        [:id, :x, :y]
+      end
+    end
+    
+    ds = @c.dataset
+    def ds.insert(*args)
+      super(*args)
+      1
+    end
+  end
+
+  specify "should be called after creation" do
+    s = []
+    
+    @c.after_create do
+      s = MODEL_DB.sqls.dup
+    end
+    
+    n = @c.create(:x => 1)
+    MODEL_DB.sqls.should == ['INSERT INTO items (x) VALUES (1);']
+    s.should == ['INSERT INTO items (x) VALUES (1);']
+  end
+  
+  specify "should allow calling save in the hook" do
+    @c.after_create do
+      self.x = 2
+      save
+    end
+    
+    n = @c.create(:x => 1)
+    MODEL_DB.sqls.should == ['INSERT INTO items (x) VALUES (1);', 'UPDATE items SET id = 1, x = 2 WHERE (id = 1)']
+  end
+end

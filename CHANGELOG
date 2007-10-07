@@ -1,6 +1,8 @@
 === SVN
 
-* Fixed MySQL quoting of sql functions.
+* Fixed after_create hooks to allow calling save inside the hook (#58).
+
+* Fixed MySQL quoting of sql functions (#57).
 
 * Implemented rollback! global method for cancelling transactions in progress.
 

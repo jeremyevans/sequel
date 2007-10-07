@@ -89,6 +89,7 @@ module Sequel
           @this = nil # remove memoized this dataset
           refresh
         end
+        @new = false
         run_hooks(:after_create)
       else
         run_hooks(:before_update)
@@ -96,7 +97,6 @@ module Sequel
         run_hooks(:after_update)
       end
       run_hooks(:after_save)
-      @new = false
       self
     end
 
