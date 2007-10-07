@@ -252,6 +252,38 @@ context "Model#serialize" do
     ]
   end
   
+
+  specify "should support calling after the class is defined" do
+    @c = Class.new(Sequel::Model(:items)) do
+      no_primary_key
+    end
+    
+    @c.serialize :def
+
+    @c.create(:def => 1)
+    @c.create(:def => "hello")
+    
+    MODEL_DB.sqls.should == [ \
+      "INSERT INTO items (def) VALUES ('--- 1\n');", \
+      "INSERT INTO items (def) VALUES ('--- hello\n');", \
+    ]
+  end
+  
+  specify "should support using the Marshal format" do
+    @c = Class.new(Sequel::Model(:items)) do
+      no_primary_key
+      serialize :abc, :format => :marshal
+    end
+
+    @c.create(:abc => 1)
+    @c.create(:abc => "hello")
+    
+    MODEL_DB.sqls.should == [ \
+      "INSERT INTO items (abc) VALUES ('\004\bi\006');", \
+      "INSERT INTO items (abc) VALUES ('\004\b\"\nhello');", \
+    ]
+  end
+  
   specify "should translate values to and from YAML using accessor methods" do
     @c = Class.new(Sequel::Model(:items)) do
       serialize :abc, :def
@@ -394,11 +426,15 @@ context "Model.after_create" do
   
   specify "should allow calling save in the hook" do
     @c.after_create do
-      self.x = 2
+      values.delete(:x)
+      self.id = 2
       save
     end
     
-    n = @c.create(:x => 1)
-    MODEL_DB.sqls.should == ['INSERT INTO items (x) VALUES (1);', 'UPDATE items SET id = 1, x = 2 WHERE (id = 1)']
+    n = @c.create(:id => 1)
+    MODEL_DB.sqls.should == ['INSERT INTO items (id) VALUES (1);', 'UPDATE items SET id = 2 WHERE (id = 1)']
   end
+end
+
+context "Model.serialize" do
 end

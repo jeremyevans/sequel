@@ -1,5 +1,7 @@
 === SVN
 
+* Changed Model.serialize to allow calling it after the class is defined (#59).
+
 * Fixed after_create hooks to allow calling save inside the hook (#58).
 
 * Fixed MySQL quoting of sql functions (#57).

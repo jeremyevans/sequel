@@ -70,6 +70,7 @@ module Sequel
         m[c] = filters
         m
       end
+      @dataset.transform(@transform) if @dataset
     end
   end
 
