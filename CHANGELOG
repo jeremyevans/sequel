@@ -1,5 +1,7 @@
 === SVN
 
+* Hooks can now be prepended or appended by choice.
+
 * Changed Model.subset to define filter method on the underlying dataset instead of the model class.
 
 * Fixed Dataset#transform to work with array fields.
