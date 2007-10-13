@@ -18,12 +18,18 @@ module Sequel
         @primary_key ? @primary_key[:name] : nil
       end
       
-      def primary_key(name, type = nil, opts = nil)
+      def primary_key(name, *args)
         @primary_key = @db.serial_primary_key_options.merge({
           :name => name
         })
-        @primary_key.merge!({:type => type}) if type
-        @primary_key.merge!(opts) if opts
+        
+        if opts = args.pop
+          opts = {:type => opts} unless opts.is_a?(Hash)
+          if type = args.pop
+            opts.merge!(:type => type)
+          end
+          @primary_key.merge!(opts)
+        end
         @primary_key
       end
       

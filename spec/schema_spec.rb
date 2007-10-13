@@ -40,9 +40,16 @@ context "DB#create_table" do
       primary_key :id
     end
     @db.sqls.should == ['CREATE TABLE cats (id integer PRIMARY KEY AUTOINCREMENT);']
+
     @db.sqls.clear
     @db.create_table(:cats) do
       primary_key :id, :serial, :auto_increment => false
+    end
+    @db.sqls.should == ['CREATE TABLE cats (id serial PRIMARY KEY);']
+
+    @db.sqls.clear
+    @db.create_table(:cats) do
+      primary_key :id, :type => :serial, :auto_increment => false
     end
     @db.sqls.should == ['CREATE TABLE cats (id serial PRIMARY KEY);']
   end
