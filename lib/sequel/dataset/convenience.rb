@@ -168,6 +168,22 @@ module Sequel
         Sequel::PrettyTable.print(naked.all, cols.empty? ? columns : cols)
       end
       
+      COMMA_SEPARATOR = ', '.freeze
+      
+      # Returns a string in CSV format containing the dataset records. By 
+      # default the CSV representation includes the column titles in the
+      # first line. You can turn that off by passing false as the 
+      # include_column_titles argument.
+      def to_csv(include_column_titles = true)
+        records = naked.to_a
+        csv = ''
+        if include_column_titles
+          csv << "#{@columns.join(COMMA_SEPARATOR)}\r\n"
+        end
+        records.each {|r| csv << "#{r.join(COMMA_SEPARATOR)}\r\n"}
+        csv
+      end
+
       # Inserts multiple records into the associated table. This method can be
       # to efficiently insert a large amounts of records into a table. Inserts
       # are automatically wrapped in a transaction. If the :commit_every 

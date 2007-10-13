@@ -37,9 +37,9 @@ context "A MySQL dataset" do
     @d << {:name => 'def', :value => 789}
     
     @d.order(:value).all.should == [
-      {:name => 'abc', :value => 123},
-      {:name => 'abc', :value => 456},
-      {:name => 'def', :value => 789}
+      ['abc', 123],
+      ['abc', 456],
+      ['def', 789]
     ]
   end
    

@@ -105,12 +105,28 @@ context "A simple dataset" do
   specify "should format an insert statement with hash" do
     @dataset.insert_sql(:name => 'wxyz', :price => 342).
       should match(/INSERT INTO test \(name, price\) VALUES \('wxyz', 342\)|INSERT INTO test \(price, name\) VALUES \(342, 'wxyz'\)/)
+
+      @dataset.insert_sql({}).should == "INSERT INTO test DEFAULT VALUES;"
+  end
+
+  specify "should format an insert statement with array fields" do
+    v = [1, 2, 3]
+    v.fields = [:a, :b, :c]
+    @dataset.insert_sql(v).should == "INSERT INTO test (a, b, c) VALUES (1, 2, 3);"
+    
+    v = []
+    v.fields = [:a, :b]
+    @dataset.insert_sql(v).should == "INSERT INTO test DEFAULT VALUES;"
+  end
+  
+  specify "should format an insert statement with an arbitrary value" do
+    @dataset.insert_sql(123).should == "INSERT INTO test VALUES (123);"
   end
   
   specify "should format an insert statement with sub-query" do
     @sub = Sequel::Dataset.new(nil).from(:something).filter(:x => 2)
     @dataset.insert_sql(@sub).should == \
-      "INSERT INTO test (SELECT * FROM something WHERE (x = 2))"
+      "INSERT INTO test (SELECT * FROM something WHERE (x = 2));"
   end
   
   specify "should format an insert statement with array" do
@@ -121,6 +137,13 @@ context "A simple dataset" do
   specify "should format an update statement" do
     @dataset.update_sql(:name => 'abc').should ==
       "UPDATE test SET name = 'abc'"
+  end
+  
+  specify "should format an update statement with array fields" do
+    v = ['abc']
+    v.fields = [:name]
+    
+    @dataset.update_sql(v).should == "UPDATE test SET name = 'abc'"
   end
   
   specify "should be able to return rows for arbitrary SQL" do
@@ -1862,5 +1885,41 @@ context "Dataset#transform" do
     @ds.raw = {:x => Marshal.dump("wow"), :y => 'hello'}
     @ds.each(:naked => true) {|r| f = r}
     f.should == {:x => "wow", :y => 'hello'}
+  end
+end
+
+context "Dataset#to_csv" do
+  setup do
+    @c = Class.new(Sequel::Dataset) do
+      attr_accessor :data
+      attr_accessor :cols
+      
+      def fetch_rows(sql, &block)
+        @columns = @cols
+        @data.each {|r| r.fields = @columns; block[r]}
+      end
+      
+      # naked should return self here because to_csv wants a naked result set.
+      def naked
+        self
+      end
+    end
+    
+    @ds = @c.new(nil).from(:items)
+
+    @ds.cols = [:a, :b, :c]
+    @ds.data = [
+      [1, 2, 3], [4, 5, 6], [7, 8, 9]
+    ]
+  end
+  
+  specify "should format a CSV representation of the records" do
+    @ds.to_csv.should ==
+      "a, b, c\r\n1, 2, 3\r\n4, 5, 6\r\n7, 8, 9\r\n"
+  end
+
+  specify "should exclude column titles if so specified" do
+    @ds.to_csv(false).should ==
+      "1, 2, 3\r\n4, 5, 6\r\n7, 8, 9\r\n"
   end
 end

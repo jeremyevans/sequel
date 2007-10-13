@@ -285,25 +285,22 @@ module Sequel
     
     # Applies the value transform for data loaded from the database.
     def transform_load(r)
-      r.inject({}) do |m, kv|
-        k, v = kv[0], kv[1]
-        m[k] = (tt = @transform[k]) ? tt[0][v] : v
-        m
+      @transform.each do |k, tt|
+        if r.has_key?(k)
+          r[k] = tt[0][r[k]]
+        end
       end
-      # 
-      # @transform.each do |k, tt|
-      #   r[k] = tt[0][r[k]]
-      # end
-      # r
+      r
     end
     
     # Applies the value transform for data saved to the database.
     def transform_save(r)
-      r.inject({}) do |m, kv|
-        k, v = kv[0], kv[1]
-        m[k] = (tt = @transform[k]) ? tt[1][v] : v
-        m
+      @transform.each do |k, tt|
+        if r.has_key?(k)
+          r[k] = tt[1][r[k]]
+        end
       end
+      r
     end
     
     private

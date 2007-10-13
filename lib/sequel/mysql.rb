@@ -40,7 +40,20 @@ class Mysql::Result
     @columns
   end
   
-  def each_hash(with_table=nil)
+  def each_array(with_table = nil)
+    c = columns
+    while row = fetch_row
+      c.each_with_index do |f, i|
+        if (t = MYSQL_TYPES[@column_types[i]]) && (v = row[i])
+          row[i] = v.send(t)
+        end
+      end
+      row.fields = c
+      yield row
+    end
+  end
+  
+  def each_hash(with_table = nil)
     c = columns
     while row = fetch_row
       h = {}
@@ -213,12 +226,12 @@ module Sequel
         @db.execute_affected(delete_sql(opts))
       end
       
-      def fetch_rows(sql)
+      def fetch_rows(sql, &block)
         @db.synchronize do
           r = @db.execute_select(sql)
           begin
             @columns = r.columns
-            r.each_hash {|row| yield row}
+            r.each_array(&block)
           ensure
             r.free
           end

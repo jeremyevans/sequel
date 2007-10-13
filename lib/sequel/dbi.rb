@@ -48,7 +48,7 @@ module Sequel
           s = @db.execute sql
           begin
             @columns = s.column_names.map {|c| c.to_sym}
-            s.fetch {|r| yield hash_row(s, r)}
+            s.fetch {|r| r.fields = @columns; yield r}
           ensure
             s.finish rescue nil
           end
@@ -56,13 +56,6 @@ module Sequel
         self
       end
       
-      def hash_row(stmt, row)
-        @columns.inject({}) do |m, c|
-          m[c] = row.shift
-          m
-        end
-      end
-    
       def insert(*values)
         @db.do insert_sql(*values)
       end

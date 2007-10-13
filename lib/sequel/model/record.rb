@@ -2,41 +2,65 @@ module Sequel
   class Model
     attr_reader :values
 
-    def self.primary_key; :id; end
-    def self.primary_key_hash(v); {:id => v}; end
+    # Returns key for primary key.
+    def self.primary_key
+      :id
+    end
+    # Returns primary key attribute hash.
+    def self.primary_key_hash(value)
+      {:id => value}
+    end
     
-    def self.set_primary_key(key)
+    # Sets primary key, regular and composite are possible.
+    #
+    # == Example:
+    #   class Tagging < Sequel::Model(:taggins)
+    #     # composite key
+    #     set_primary_key :taggable_id, :tag_id
+    #   end
+    #
+    #   class Person < Sequel::Model(:person)
+    #     # regular key
+    #     set_primary_key :person_id
+    #   end
+    #
+    # <i>You can even set it to nil!</i>
+    def self.set_primary_key(*key)
       # if k is nil, we go to no_primary_key
       return no_primary_key unless key
       
+      # backwards compat
+      key = (key.length == 1) ? key[0] : key.flatten
+
       # redefine primary_key
       meta_def(:primary_key) {key}
       
-      if key.is_a?(Array) # composite key
+      unless key.is_a? Array # regular primary key
         class_def(:this) do
-          @this ||= self.class.dataset.filter( \
-            @values.reject {|k, v| !key.include?(k)} \
-          ).naked
-        end
-        meta_def(:primary_key_hash) do |v|
-          key.inject({}) {|m, i| m[i] = v.shift; m}
-        end
-      else # regular key
-        class_def(:this) do
-          @this ||= self.class.dataset.filter(key => @values[key]).naked
+          @this ||= dataset.filter(key => @values[key]).naked
         end
         meta_def(:primary_key_hash) do |v|
           {key => v}
         end
+      else # composite key
+        exp_list = key.map {|k| "#{k.inspect} => @values[#{k.inspect}]"}
+        block = eval("proc {@this ||= self.class.dataset.filter(#{exp_list.join(', ')}).naked}")
+        class_def(:this, &block)
+
+        meta_def(:primary_key_hash) do |v|
+          key.inject({}) {|m, i| m[i] = v.shift; m}
+        end
       end
     end
     
-    def self.no_primary_key
+    def self.no_primary_key #:nodoc:
       meta_def(:primary_key) {nil}
       meta_def(:primary_key_hash) {|v| raise SequelError, "#{self} does not have a primary key"}
       class_def(:this) {raise SequelError, "No primary key is associated with this model"}
     end
     
+    # Creates new instance with values set to passed-in Hash ensuring that
+    # new? returns true.
     def self.create(values = {})
       db.transaction do
         obj = new(values, true)
@@ -45,36 +69,54 @@ module Sequel
       end
     end
     
+    # Returns (naked) dataset bound to current instance.
     def this
       @this ||= self.class.dataset.filter(:id => @values[:id]).naked
     end
     
-    # instance method
+    # Returns primary key column(s) for object's Model class.
     def primary_key
       @primary_key ||= self.class.primary_key
     end
     
+    # Returns value for primary key.
     def pkey
       @pkey ||= @values[primary_key]
     end
     
-    def initialize(values = {}, new = false)
-      @values = values
-      @new = new
-      if !new # determine if it's a new record
+    # Creates new instance with values set to passed-in Hash.
+    #
+    # This method guesses whether the record exists when
+    # <tt>new_record</tt> is set to false.
+    def initialize(values = {}, new_record = false)
+      if values.is_a?(Hash)
+        @values = []; @values.fields = []
+        values.each {|k, v| @values[k] = v}
+      else
+        @values = values
+      end
+
+      @new = new_record
+      unless @new # determine if it's a new record
         pk = primary_key
+        # if there's no primary key for the model class, or
+        # @values doesn't contain a primary key value, then 
+        # we regard this instance as new.
         @new = (pk == nil) || (!(Array === pk) && !@values[pk])
       end
     end
     
+    # Returns true if the current instance represents a new record.
     def new?
       @new
     end
     
+    # Returns true when current instance exists, false otherwise.
     def exists?
       this.count > 0
     end
     
+    # Creates or updates dataset for Model and runs hooks.
     def save
       run_hooks(:before_save)
       if @new
@@ -100,16 +142,19 @@ module Sequel
       self
     end
 
+    # Updates and saves values to database from the passed-in Hash.
     def set(values)
       this.update(values)
-      @values.merge!(values)
+      values.each {|k, v| @values[k] = v}
     end
     
+    # Reloads values from database and returns self.
     def refresh
       @values = this.first || raise(SequelError, "Record not found")
       self
     end
 
+    # Like delete but runs hooks before and after delete.
     def destroy
       db.transaction do
         run_hooks(:before_destroy)
@@ -118,6 +163,7 @@ module Sequel
       end
     end
     
+    # Deletes and returns self.
     def delete
       this.delete
       self
@@ -125,7 +171,7 @@ module Sequel
     
     ATTR_RE = /^([a-zA-Z_]\w*)(=)?$/.freeze
 
-    def method_missing(m, *args)
+    def method_missing(m, *args) #:nodoc:
       if m.to_s =~ ATTR_RE
         att = $1.to_sym
         write = $2 == '='

@@ -1,17 +1,20 @@
-# Print nice-looking plain-text tables
-# +--+-------+
-# |id|name   |
-# |--+-------|
-# |1 |fasdfas|
-# |2 |test   |
-# +--+-------+
-
 module Sequel
+  # Prints nice-looking plain-text tables
+  # +--+-------+
+  # |id|name   |
+  # |--+-------|
+  # |1 |fasdfas|
+  # |2 |test   |
+  # +--+-------+
   module PrettyTable
-    def self.hash_columns(records)
+    def self.records_columns(records)
       columns = []
       records.each do |r|
-        r.keys.each {|k| columns << k unless columns.include?(k)}
+        if Array === r && (f = r.fields)
+          return r.fields
+        elsif Hash === r
+          r.keys.each {|k| columns << k unless columns.include?(k)}
+        end
       end
       columns
     end
@@ -53,7 +56,7 @@ module Sequel
     end
     
     def self.print(records, columns = nil) # records is an array of hashes
-      columns ||= hash_columns(records)
+      columns ||= records_columns(records)
       sizes = column_sizes(records, columns)
       
       puts separator_line(columns, sizes)

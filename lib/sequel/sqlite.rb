@@ -99,7 +99,6 @@ module Sequel
       def literal(v)
         case v
         when Time: literal(v.iso8601)
-        when Date: literal(v.to_s)
         else
           super
         end
@@ -108,12 +107,13 @@ module Sequel
       def fetch_rows(sql, &block)
         @db.execute_select(sql) do |result|
           @columns = result.columns.map {|c| c.to_sym}
-          column_count = @columns.size
-          result.each do |values|
-            row = {}
-            column_count.times {|i| row[@columns[i]] = values[i]}
-            block.call(row)
-          end
+          result.each(&block)
+          # column_count = @columns.size
+          # result.each do |values|
+          #   row = {}
+          #   column_count.times {|i| row[@columns[i]] = values[i]}
+          #   block.call(row)
+          # end
         end
       end
     

@@ -1,5 +1,21 @@
 === SVN
 
+* Changed Model.subset to define filter method on the underlying dataset instead of the model class.
+
+* Fixed Dataset#transform to work with array fields.
+
+* Added Dataset#to_csv method.
+
+* PrettyTable can now extract column names from arrayfields.
+
+* Converted ado, dbi, odbc adapters to use arrayfields instead of hashes.
+
+* Fixed composite key support.
+
+* Fixed Dataset#insert_sql, update_sql to support array fields.
+
+* Converted sqlite, mysql, postgres adapters to use arrayfields instead of hashes.
+
 * Extended Dataset#from to auto alias sub-queries.
 
 * Extended Dataset#from to accept hash for aliasing tables.

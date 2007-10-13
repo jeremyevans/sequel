@@ -2,90 +2,154 @@ require File.join(File.dirname(__FILE__), 'spec_helper')
 
 Sequel::Model.db = MODEL_DB = MockDatabase.new
 
-context "A model class" do
-  specify "should be associated with a dataset" do
-    @m = Class.new(Sequel::Model) do
-      set_dataset MODEL_DB[:items]
-    end
-    
-    @m.dataset.should be_a_kind_of(MockDataset)
-    @m.dataset.opts[:from].should == [:items]
+describe Sequel::Model do
 
-    @m2 = Class.new(Sequel::Model) do
-      set_dataset MODEL_DB[:zzz]
-    end
-    
-    @m2.dataset.should be_a_kind_of(MockDataset)
-    @m2.dataset.opts[:from].should == [:zzz]
-    @m.dataset.opts[:from].should == [:items]
+  it "should have class method aliased as model" do
+    Sequel::Model.instance_methods.should include('model')
+
+    model_a = Class.new Sequel::Model
+    model_a.new.model.should be(model_a)
   end
+
+  it "should be associated with a dataset" do
+    model_a = Class.new(Sequel::Model) { set_dataset MODEL_DB[:as] }
+    
+    model_a.dataset.should be_a_kind_of(MockDataset)
+    model_a.dataset.opts[:from].should == [:as]
+
+    model_b = Class.new(Sequel::Model) { set_dataset MODEL_DB[:bs] }
+    
+    model_b.dataset.should be_a_kind_of(MockDataset)
+    model_b.dataset.opts[:from].should == [:bs]
+
+    model_a.dataset.opts[:from].should == [:as]
+  end
+
 end
 
-context "A model's primary key" do
-  specify "should default to id" do
-    @m = Class.new(Sequel::Model) do
-    end
-    
-    @m.primary_key.should == :id
+describe Sequel::Model, 'w/ primary key' do
+
+  it "should default to ':id'" do
+    model_a = Class.new Sequel::Model
+    model_a.primary_key.should be_equal(:id)
   end
-  
-  specify "should be changeable through Model.set_primary_key" do
-    @m = Class.new(Sequel::Model) do
-      set_primary_key :xxx
-    end
-    
-    @m.primary_key.should == :xxx
+
+  it "should be changed through 'set_primary_key'" do
+    model_a = Class.new(Sequel::Model) { set_primary_key :a }
+    model_a.primary_key.should be_equal(:a)
   end
-  
-  specify "should support composite primary keys" do
-    @m = Class.new(Sequel::Model) do
-      set_primary_key [:node_id, :session_id]
-    end
-    @m.primary_key.should == [:node_id, :session_id]
+
+  it "should support multi argument composite keys" do
+    model_a = Class.new(Sequel::Model) { set_primary_key :a, :b }
+    model_a.primary_key.should be_eql([:a, :b])
   end
+
+  it "should accept single argument composite keys" do
+    model_a = Class.new(Sequel::Model) { set_primary_key [:a, :b] }
+    model_a.primary_key.should be_eql([:a, :b])
+  end
+
 end
 
-context "A model without a primary key" do
-  setup do
-    @m = Class.new(Sequel::Model) do
-      no_primary_key
-    end
+describe Sequel::Model, 'w/o primary key' do
+
+  it "should return nil for primary key" do
+    Class.new(Sequel::Model) { no_primary_key }.primary_key.should be_nil
   end
-  
-  specify "should return nil for primary_key" do
-    @m.primary_key.should be_nil
+
+  it "should raise a SequelError on 'this'" do
+    instance = Class.new(Sequel::Model) { no_primary_key }.new
+    proc { instance.this }.should raise_error(SequelError)
   end
-  
-  specify "should raise on #this" do
-    o = @m.new
-    proc {o.this}.should raise_error(SequelError)
-  end
+
 end
 
-context "Model#this" do
-  setup do
-    @m = Class.new(Sequel::Model(:items)) do
+describe Sequel::Model, 'with this' do
+
+  before { @example = Class.new Sequel::Model(:examples) }
+
+  it "should return a dataset identifying the record" do
+    instance = @example.new :id => 3
+    instance.this.sql.should be_eql("SELECT * FROM examples WHERE (id = 3)")
+  end
+
+  it "should support arbitary primary keys" do
+    @example.set_primary_key :a
+
+    instance = @example.new :a => 3
+    instance.this.sql.should be_eql("SELECT * FROM examples WHERE (a = 3)")
+  end
+
+  it "should support composite primary keys" do
+    @example.set_primary_key :x, :y
+    instance = @example.new :x => 4, :y => 5
+
+    parts = ['SELECT * FROM examples WHERE %s',
+      '(x = 4) AND (y = 5)', '(y = 5) AND (x = 4)'
+    ].map { |expr| Regexp.escape expr }
+    regexp = Regexp.new parts.first % "(?:#{parts[1]}|#{parts[2]})"
+
+    instance.this.sql.should match(regexp)
+  end
+
+end
+
+describe Sequel::Model, 'with hooks' do
+
+  before do
+    MODEL_DB.reset
+    Sequel::Model.hooks.clear
+
+    @hooks = %w{
+      before_save before_create before_update before_destroy
+      after_save after_create after_update after_destroy
+    }.select { |hook| !hook.empty? }
+  end
+
+  it "should have hooks for everything" do
+    Sequel::Model.methods.should include('hooks')
+    Sequel::Model.methods.should include(*@hooks)
+    @hooks.each do |hook|
+      Sequel::Model.hooks[hook.to_sym].should be_an_instance_of(Array)
     end
   end
-  
-  specify "should return a dataset identifying the record" do
-    o = @m.new(:id => 3)
-    o.this.sql.should == "SELECT * FROM items WHERE (id = 3)"
-  end
-  
-  specify "should support arbitrary primary keys" do
-    @m.set_primary_key(:xxx)
-    
-    o = @m.new(:xxx => 3)
-    o.this.sql.should == "SELECT * FROM items WHERE (xxx = 3)"
-  end
-  
-  specify "should support composite primary keys" do
-    @m.set_primary_key [:x, :y]
-    o = @m.new(:x => 4, :y => 5)
+  it "should be inherited" do
+    pending 'soon'
 
-    o.this.sql.should =~ /^SELECT \* FROM items WHERE (\(x = 4\) AND \(y = 5\))|(\(y = 5\) AND \(x = 4\))$/
+    @hooks.each do |hook|
+      Sequel::Model.send(hook.to_sym) { nil }
+    end
+
+    model = Class.new Sequel::Model(:models)
+    model.hooks.should == Sequel::Model.hooks
   end
+
+  it "should run hooks" do
+    pending 'soon'
+
+    test = mock 'Test'
+    test.should_receive(:run).exactly(@hooks.length)
+
+    @hooks.each do |hook|
+      Sequel::Model.send(hook.to_sym) { test.run }
+    end
+
+    model = Class.new Sequel::Model(:models)
+    model.hooks.should == Sequel::Model.hooks
+
+    model_instance = model.new
+    @hooks.each { |hook| model_instance.run_hooks(hook) }
+  end
+  it "should run hooks around save and create" do
+    pending 'test execution'
+  end
+  it "should run hooks around save and update" do
+    pending 'test execution'
+  end
+  it "should run hooks around delete" do
+    pending 'test execution'
+  end
+
 end
 
 context "A new model instance" do
@@ -214,7 +278,7 @@ context "A model class without a primary key" do
     i = nil
     proc {i = @c.create(:x => 1)}.should_not raise_error
     i.class.should be(@c)
-    i.values.should == {:x => 1}
+    i.values.to_hash.should == {:x => 1}
     
     MODEL_DB.sqls.should == ['INSERT INTO items (x) VALUES (1);']
   end
@@ -325,6 +389,7 @@ context "Model#serialize" do
     o.set(:abc => 23)
     ds.sqls.should == "UPDATE items SET abc = '#{23.to_yaml}' WHERE (id = 1)"
     
+    ds.raw = {:id => 1, :abc => "--- 1\n", :def => "--- hello\n"}
     o = @c.create(:abc => [1, 2, 3])
     ds.sqls.should == "INSERT INTO items (abc) VALUES ('#{[1, 2, 3].to_yaml}');"
   end
@@ -377,9 +442,6 @@ context "Model#new?" do
     MODEL_DB.reset
 
     @c = Class.new(Sequel::Model(:items)) do
-      def columns
-        [:id, :x, :y]
-      end
     end
   end
   
@@ -436,5 +498,38 @@ context "Model.after_create" do
   end
 end
 
-context "Model.serialize" do
+describe Sequel::Model, "serialize" do
+  it "should serialize" do
+    pending 'Needs to be done!'
+  end
+end
+
+context "Model.subset" do
+  setup do
+    MODEL_DB.reset
+
+    @c = Class.new(Sequel::Model(:items)) do
+      def columns
+        [:id, :x, :y]
+      end
+    end
+  end
+
+  specify "should create a filter on the underlying dataset" do
+    proc {@c.new_only}.should raise_error(NoMethodError)
+    
+    @c.subset(:new_only) {:age == 'new'}
+    
+    @c.new_only.sql.should == "SELECT * FROM items WHERE (age = 'new')"
+    @c.dataset.new_only.sql.should == "SELECT * FROM items WHERE (age = 'new')"
+    
+    @c.subset(:pricey) {:price > 100}
+    
+    @c.pricey.sql.should == "SELECT * FROM items WHERE (price > 100)"
+    @c.dataset.pricey.sql.should == "SELECT * FROM items WHERE (price > 100)"
+    
+    # check if subsets are composable
+    @c.pricey.new_only.sql.should == "SELECT * FROM items WHERE (price > 100) AND (age = 'new')"
+    @c.new_only.pricey.sql.should == "SELECT * FROM items WHERE (age = 'new') AND (price > 100)"
+  end
 end

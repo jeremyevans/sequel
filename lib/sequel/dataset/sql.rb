@@ -74,8 +74,6 @@ module Sequel
             i
           end
         end.join(COMMA_SEPARATOR)
-        # source.map {|i| i.is_a?(Dataset) ? i.to_table_reference : i}.
-        #   join(COMMA_SEPARATOR)
       end
 
       NULL = "NULL".freeze
@@ -440,6 +438,18 @@ module Sequel
         else
           values = values[0] if values.size == 1
           case values
+          when Array
+            if values.fields
+              if values.empty?
+                "INSERT INTO #{@opts[:from]} DEFAULT VALUES;"
+              else
+                fl = values.fields
+                vl = transform_save(values.values).map {|v| literal(v)}
+                "INSERT INTO #{@opts[:from]} (#{fl.join(COMMA_SEPARATOR)}) VALUES (#{vl.join(COMMA_SEPARATOR)});"
+              end
+            else
+              "INSERT INTO #{@opts[:from]} VALUES (#{literal(values)});"
+            end
           when Hash
             values = transform_save(values) if @transform
             if values.empty?
@@ -450,7 +460,7 @@ module Sequel
               "INSERT INTO #{@opts[:from]} (#{fl.join(COMMA_SEPARATOR)}) VALUES (#{vl.join(COMMA_SEPARATOR)});"
             end
           when Dataset
-            "INSERT INTO #{@opts[:from]} #{literal(values)}"
+            "INSERT INTO #{@opts[:from]} #{literal(values)};"
           else
             "INSERT INTO #{@opts[:from]} VALUES (#{literal(values)});"
           end
@@ -470,6 +480,9 @@ module Sequel
           raise SequelError, "Can't update a joined dataset"
         end
 
+        if values.is_a?(Array) && values.fields
+          values = values.to_hash
+        end
         values = transform_save(values) if @transform
         set_list = values.map {|k, v| "#{field_name(k)} = #{literal(v)}"}.
           join(COMMA_SEPARATOR)

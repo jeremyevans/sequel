@@ -1,4 +1,5 @@
 require 'metaid'
+require 'arrayfields'
 
 files = %w[
   core_ext error connection_pool pretty_table

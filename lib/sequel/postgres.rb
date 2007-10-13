@@ -422,19 +422,13 @@ module Sequel
       end
     
       def compile_converter(fields, translators)
-        used_fields = []
-        kvs = []
+        tr = []
         fields.each_with_index do |field, idx|
-          next if used_fields.include?(field)
-          used_fields << field
-        
-          if translator = translators[idx]
-            kvs << ":\"#{field}\" => ((t = r[#{idx}]) ? t.#{translator} : nil)"
-          else
-            kvs << ":\"#{field}\" => r[#{idx}]"
+          if t = translators[idx]
+            tr << "if (v = r[#{idx}]); r[#{idx}] = v.#{t}; end"
           end
         end
-        eval("lambda {|r| {#{kvs.join(COMMA_SEPARATOR)}}}")
+        eval("lambda {|r| r.fields = fields; #{tr.join(';')}; r}")
       end
     end
   end
