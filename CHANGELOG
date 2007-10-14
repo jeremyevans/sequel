@@ -1,5 +1,7 @@
 === SVN
 
+* Changed Schema::Generator#primary_key to accept calls with the type argument omitted.
+
 * Hooks can now be prepended or appended by choice.
 
 * Changed Model.subset to define filter method on the underlying dataset instead of the model class.
