@@ -119,7 +119,7 @@ module Sequel
       model.hooks[key].each { |h| instance_eval &h }
     end
     
-    def has_hooks?(key)
+    def self.has_hooks?(key)
       hooks[key] && !hooks[key].empty?
     end
   end
