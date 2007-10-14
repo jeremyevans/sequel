@@ -125,15 +125,20 @@ context "Database#<<" do
       "CREATE TABLE items (a integer, b text, c integer); DROP TABLE old_items;"
   end
   
-  specify "should remove comments and whitespace from strings as well" do
+  specify "should remove comments and whitespace from arrays" do
     s = %[
       --
       CREATE TABLE items (a integer, /*b integer*/
         b text, c integer); \r\n
       DROP TABLE old_items;
-    ]
+    ].split($/)
     (@db << s).should == 
       "CREATE TABLE items (a integer, b text, c integer); DROP TABLE old_items;"
+  end
+  
+  specify "should not remove comments and whitespace from strings" do
+    s = "INSERT INTO items VALUES ('---abc')"
+    (@db << s).should == s
   end
 end
 

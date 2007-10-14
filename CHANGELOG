@@ -1,5 +1,7 @@
 === SVN
 
+* Changed Database#<< to strip comments and whitespace only when an array is given.
+
 * Changed Schema::Generator#primary_key to accept calls with the type argument omitted.
 
 * Hooks can now be prepended or appended by choice.
