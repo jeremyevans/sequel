@@ -93,6 +93,20 @@ module Sequel
         pragma_set(:temp_store, value)
       end
       
+      def transaction(&block)
+        @pool.hold do |conn|
+          if conn.transaction_active?
+            return yield(conn)
+          end
+          begin
+            result = nil
+            conn.transaction {result = yield(conn)}
+            result
+          rescue => e
+            raise e unless SequelRollbackError === e
+          end
+        end
+      end
     end
     
     class Dataset < Sequel::Dataset

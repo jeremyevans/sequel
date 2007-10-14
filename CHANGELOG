@@ -1,5 +1,7 @@
 === SVN
 
+* Rewrote SQLite::Database#transaction to use sqlite3-ruby library implementation of transactions.
+
 * Fixed Model.destroy_all to work correctly in cases where no before_destroy hook is defined and an after_destroy hook is defined.
 
 * Restored Model.has_hooks? implementation.

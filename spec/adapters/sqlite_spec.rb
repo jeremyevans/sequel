@@ -72,6 +72,47 @@ context "An SQLite database" do
     
     @db[:t].order(:name).map(:name).should == ['abc', 'def']
   end
+  
+  specify "should be able to execute transactions" do
+    @db.transaction do
+      @db.create_table(:t) {text :name}
+    end
+    
+    @db.tables.should == [:t]
+
+    proc {@db.transaction do
+      @db.create_table(:u) {text :name}
+      raise ArgumentError
+    end}.should raise_error(ArgumentError)
+    # no commit
+    @db.tables.should == [:t]
+
+    proc {@db.transaction do
+      @db.create_table(:v) {text :name}
+      rollback!
+    end}.should_not raise_error
+    # no commit
+    @db.tables.should == [:t]
+  end
+
+  specify "should support nested transactions" do
+    @db.transaction do
+      @db.transaction do
+        @db.create_table(:t) {text :name}
+      end
+    end
+    
+    @db.tables.should == [:t]
+
+    proc {@db.transaction do
+      @db.create_table(:v) {text :name}
+      @db.transaction do
+        rollback! # should roll back the top-level transaction
+      end
+    end}.should_not raise_error
+    # no commit
+    @db.tables.should == [:t]
+  end
 end
 
 context "An SQLite dataset" do
@@ -185,4 +226,3 @@ context "SQLite::Dataset#update" do
     @d.filter(:name => 'xxx').update(:value => 23).should == 0
   end
 end
-
