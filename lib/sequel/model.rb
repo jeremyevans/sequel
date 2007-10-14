@@ -197,9 +197,10 @@ module Sequel
 
     ############################################################################
 
-    # Like delete_all, but invokes before_destroy hooks when defined.
+    # Like delete_all, but invokes before_destroy and after_destroy hooks if used.
     def self.destroy_all
-      has_hooks?(:before_destroy) ? dataset.destroy : dataset.delete
+      has_hooks?(:before_destroy) || has_hooks?(:after_destroy) ? \
+        dataset.destroy : dataset.delete
     end
     # Deletes all records.
     def self.delete_all

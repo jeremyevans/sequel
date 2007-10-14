@@ -1,5 +1,9 @@
 === SVN
 
+* Fixed Model.destroy_all to work correctly in cases where no before_destroy hook is defined and an after_destroy hook is defined.
+
+* Restored Model.has_hooks? implementation.
+
 * Changed Database#<< to strip comments and whitespace only when an array is given.
 
 * Changed Schema::Generator#primary_key to accept calls with the type argument omitted.
