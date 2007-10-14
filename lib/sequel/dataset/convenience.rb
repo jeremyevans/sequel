@@ -3,6 +3,12 @@ require 'enumerator'
 module Sequel
   class Dataset
     module Convenience
+      # Iterates through each record, converting it into a hash.
+      def each_hash(&block)
+        each {|a| block[a.to_hash]}
+      end
+      
+      # Returns true if the record count is 0
       def empty?
         count == 0
       end

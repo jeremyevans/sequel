@@ -1923,3 +1923,22 @@ context "Dataset#to_csv" do
       "1, 2, 3\r\n4, 5, 6\r\n7, 8, 9\r\n"
   end
 end
+
+context "Dataset#each_hash" do
+  setup do
+    @c = Class.new(Sequel::Dataset) do
+      def each(&block)
+        a = [[1, 2, 3], [4, 5, 6]]
+        a.each {|r| r.fields = [:a, :b, :c]; block[r]}
+      end
+    end
+    
+    @ds = @c.new(nil).from(:items)
+  end
+  
+  specify "should yield records converted to hashes" do
+    hashes = []
+    @ds.each_hash {|h| hashes << h}
+    hashes.should == [{:a => 1, :b => 2, :c => 3}, {:a => 4, :b => 5, :c => 6}]
+  end
+end
