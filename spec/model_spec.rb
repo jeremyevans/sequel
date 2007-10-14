@@ -498,12 +498,6 @@ context "Model.after_create" do
   end
 end
 
-describe Sequel::Model, "serialize" do
-  it "should serialize" do
-    pending 'Needs to be done!'
-  end
-end
-
 context "Model.subset" do
   setup do
     MODEL_DB.reset
