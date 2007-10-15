@@ -1,8 +1,7 @@
 require 'metaid'
-require 'arrayfields'
 
 files = %w[
-  core_ext error connection_pool pretty_table
+  core_ext array_keys error connection_pool pretty_table
   dataset migration model schema database 
 ]
 dir = File.join(File.dirname(__FILE__), 'sequel')

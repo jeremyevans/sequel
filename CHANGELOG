@@ -1,5 +1,7 @@
 === SVN
 
+* Implemented ArrayKeys as substitute for ArrayFields.
+
 * Added Dataset#each_hash method.
 
 * Rewrote SQLite::Database#transaction to use sqlite3-ruby library implementation of transactions.
