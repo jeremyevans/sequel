@@ -1,11 +1,11 @@
 require File.join(File.dirname(__FILE__), '../lib/sequel/array_keys')
 require 'benchmark'
 
-N = 100_000
+N = 50_000
 
 puts "pid = #{Process.pid}"
 
-Benchmark::bm(25) do |x|
+Benchmark::bm(30) do |x|
   keys = [:a, :b, :c, :d, :e]
 
   rows = []
@@ -17,8 +17,6 @@ Benchmark::bm(25) do |x|
     end
   end
   
-  GC.start; sleep 5;
-
   rows = []
 
   x.report('create array with keys') do
@@ -28,10 +26,6 @@ Benchmark::bm(25) do |x|
       rows << values
     end
   end
-
-  GC.start; sleep 5;
-
-  rows = []
 
   hashes = [{:a => 1, :b => 2, :c => 3, :d => 4, :e => 5}] * N
   values = [rand] * 5
@@ -43,6 +37,26 @@ Benchmark::bm(25) do |x|
   end
 
   x.report('access array with keys') do
+    arrays.each {|a| a[:a]}
+  end
+  
+  require 'rubygems'
+  require 'arrayfields'
+  
+  rows = []
+
+  x.report('create array with arrayfields') do
+    N.times do
+      values = [rand] * 5
+      values.fields = keys
+      rows << values
+    end
+  end
+
+  values = [rand] * 5
+  values.fields = keys
+  arrays = [values] * N
+  x.report('access array with arrayfields') do
     arrays.each {|a| a[:a]}
   end
 end
