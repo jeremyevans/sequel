@@ -90,6 +90,19 @@ context "An array with symbol keys" do
     @a[:c].should == 3
   end
   
+  specify "should separate array keys after #delete/#delete_at" do
+    b = @a.dup
+
+    b.delete(:b)
+
+    @a.keys.should == [:a, :b, :c]
+    b.keys.should == [:a, :c]
+    @a.should == [1, 2, 3]
+    b.should == [1, 3]
+    @a[:b].should == 2
+    b[:b].should == nil
+  end
+  
   specify "should provide #each_key functionality" do
     keys = []
     @a.each_key {|k| keys << k}

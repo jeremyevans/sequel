@@ -21,7 +21,7 @@ module ArrayKeys
   module KeyAccess
     def [](idx, *args)
       if String === idx or Symbol === idx
-        (idx = @keys.key_pos(idx)) ? super : nil
+        (idx = @keys.key_pos(idx)) ? super(idx, *args) : nil
       else
         super
       end
@@ -31,13 +31,13 @@ module ArrayKeys
       if String === idx or Symbol === idx
         idx = @keys.key_pos(idx) || @keys.add_key(idx.to_sym)
       end
-      super
+      super(idx, *args)
     end
     
     def store(k, v); self[k] = v; end
     
     def slice(*args)
-      s = super
+      s = super(*args)
       s.keys = @keys.slice(*args)
       s
     end
@@ -68,7 +68,8 @@ module ArrayKeys
     end
     
     def delete_at(idx)
-      super
+      super(idx)
+      @keys = @keys.clone
       @keys.del_key(idx)
     end
     

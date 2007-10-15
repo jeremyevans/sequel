@@ -1,5 +1,7 @@
 === SVN
 
+* Fixed problem with arrays with keys when using #delete.
+
 * Implemented ArrayKeys as substitute for ArrayFields.
 
 * Added Dataset#each_hash method.
