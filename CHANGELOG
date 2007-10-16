@@ -1,5 +1,7 @@
 === SVN
 
+* Fixed SQLite insert with subquery (#68).
+
 * Reverted back to hashes as default mode. Added Sequel.use_array_tuples and Sequel.use_hash_tuples methods.
 
 * Fixed problem with arrays with keys when using #delete.

@@ -118,6 +118,14 @@ module Sequel
         end
       end
 
+      def insert_sql(*values)
+        if (values.size == 1) && values.first.is_a?(Sequel::Dataset)
+          "INSERT INTO #{@opts[:from]} #{values.first.sql};"
+        else
+          super(*values)
+        end
+      end
+
       def fetch_rows(sql, &block)
         @db.execute_select(sql) do |result|
           @columns = result.columns.map {|c| c.to_sym}

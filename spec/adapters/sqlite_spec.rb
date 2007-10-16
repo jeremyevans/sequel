@@ -263,3 +263,30 @@ context "An SQLite dataset in array tuples mode" do
     ]
   end
 end  
+
+context "SQLite dataset" do
+  setup do
+    SQLITE_DB.create_table :test do
+      integer :id, :primary_key => true, :auto_increment => true
+      text :name
+      float :value
+    end
+
+    @d = SQLITE_DB[:items]
+    @d.delete # remove all records
+    @d << {:name => 'abc', :value => 1.23}
+    @d << {:name => 'def', :value => 4.56}
+    @d << {:name => 'ghi', :value => 7.89}
+  end
+  
+  teardown do
+    SQLITE_DB.drop_table :test
+  end
+  
+  specify "should be able to insert from a subquery" do
+    SQLITE_DB[:test] << @d
+    SQLITE_DB[:test].count.should == 3
+    SQLITE_DB[:test].select(:name, :value).order(:value).to_a.should == \
+      @d.select(:name, :value).order(:value).to_a
+  end
+end
