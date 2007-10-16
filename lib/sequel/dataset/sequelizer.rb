@@ -40,8 +40,8 @@ class Sequel::Dataset
       case r
       when Range:
         r.exclude_end? ? \
-          "(#{l} >= #{literal(r.begin)} AND #{l} < #{literal(r.end)})" : \
-          "(#{l} >= #{literal(r.begin)} AND #{l} <= #{literal(r.end)})"
+          "(#{literal(l)} >= #{literal(r.begin)} AND #{literal(l)} < #{literal(r.end)})" : \
+          "(#{literal(l)} >= #{literal(r.begin)} AND #{literal(l)} <= #{literal(r.end)})"
       when Array:
         "(#{literal(l)} IN (#{literal(r)}))"
       when Sequel::Dataset:

@@ -267,6 +267,16 @@ context "Dataset#where" do
 
     @dataset.filter {:id.in?(4..7)}.sql.should ==
       'SELECT * FROM test WHERE (id >= 4 AND id <= 7)'
+
+    @dataset.filter(:table__id => 4..7).sql.should ==
+      'SELECT * FROM test WHERE (table.id >= 4 AND table.id <= 7)'
+    @dataset.filter(:table__id => 4...7).sql.should ==
+      'SELECT * FROM test WHERE (table.id >= 4 AND table.id < 7)'
+
+    @dataset.filter {:table__id == (4..7)}.sql.should ==
+      'SELECT * FROM test WHERE (table.id >= 4 AND table.id <= 7)'
+    @dataset.filter {:table__id.in?(4..7)}.sql.should ==
+      'SELECT * FROM test WHERE (table.id >= 4 AND table.id <= 7)'
   end
   
   specify "should accept nil" do
@@ -964,6 +974,17 @@ context "Dataset#join_table" do
   specify "should treat aliased tables correctly" do
     @d.from('stats s').join('players p', :id => :player_id).sql.should ==
       'SELECT * FROM stats s INNER JOIN players p ON (p.id = s.player_id)'
+  end
+  
+  specify "should allow for arbitrary conditions in the JOIN clause" do
+    @d.join_table(:left_outer, :categories, :id => :category_id, :status => 0).sql.should ==
+      'SELECT * FROM items LEFT OUTER JOIN categories ON (categories.id = items.category_id) AND (categories.status = 0)'
+    @d.join_table(:left_outer, :categories, :id => :category_id, :categorizable_type => "Post").sql.should ==
+      "SELECT * FROM items LEFT OUTER JOIN categories ON (categories.categorizable_type = 'Post') AND (categories.id = items.category_id)"
+    @d.join_table(:left_outer, :categories, :id => :category_id, :timestamp => "CURRENT_TIMESTAMP".lit).sql.should ==
+      "SELECT * FROM items LEFT OUTER JOIN categories ON (categories.id = items.category_id) AND (categories.timestamp = CURRENT_TIMESTAMP)"
+    @d.join_table(:left_outer, :categories, :id => :category_id, :status => [1, 2, 3]).sql.should ==
+      "SELECT * FROM items LEFT OUTER JOIN categories ON (categories.id = items.category_id) AND (categories.status IN (1, 2, 3))"
   end
 end
 

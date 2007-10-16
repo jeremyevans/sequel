@@ -1,5 +1,9 @@
 === SVN
 
+* Changed Dataset#join methods to correctly literalize values in join conditions (#70).
+
+* Fixed #filter with ranges to correctly literalize field names (#69).
+
 * Implemented Database#each method for quickly retrieving records with arbitrary SQL (thanks Aman Gupta).
 
 * Fixed bug in postgres adapter where a LiteralString would be literalized as a regular String.

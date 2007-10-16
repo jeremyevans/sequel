@@ -124,7 +124,10 @@ module Sequel
         case expr
         when Hash:
           parenthesize = false if expr.size == 1
-          fmt = expr.map {|i| compare_expr(i[0], i[1])}.join(AND_SEPARATOR)
+          # fmt = expr.map {|i| compare_expr(i[0], i[1])}.join(AND_SEPARATOR)
+          # N.B.: We convert this to an array and sort it in order to have a fixed order for testability.
+          # Hash in Ruby 1.8 has no order, so Hash#map is indeterminate, which makes it hard to test.
+          fmt = expr.to_a.sort_by { |k, v| k.to_s }.map {|i| compare_expr(i[0], i[1])}.join(AND_SEPARATOR)
         when Array:
           fmt = expr.shift.gsub(QUESTION_MARK) {literal(expr.shift)}
         when Proc:
@@ -325,13 +328,13 @@ module Sequel
           raise SequelError, "Invalid join type: #{type}"
         end
 
-        join_expr = expr.map do |k, v|
-          l = qualified_field_name(k, table)
-          r = qualified_field_name(v, @opts[:last_joined_table] || @opts[:from].first)
-          "(#{l} = #{r})"
-        end.join(AND_SEPARATOR)
-
-        " #{join_type} #{table} ON #{join_expr}"
+        join_conditions = {}
+        expr.each do |k, v|
+          k = qualified_field_name(k, table).intern if k.is_a?(Symbol)
+          v = qualified_field_name(v, @opts[:last_joined_table] || @opts[:from].first).intern if v.is_a?(Symbol)
+          join_conditions[k] = v
+        end
+        " #{join_type} #{table} ON #{expression_list(join_conditions)}"
       end
 
       # Returns a joined dataset with the specified join type and condition.
