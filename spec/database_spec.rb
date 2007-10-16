@@ -505,3 +505,30 @@ context "Database#dataset" do
     @d.sql.should == "SELECT x FROM y"
   end
 end
+
+context "Database#each" do
+  setup do
+    @db = Sequel::Database.new
+    c = Class.new(Sequel::Dataset) do
+      def fetch_rows(sql); yield({:sql => sql}); end
+    end
+    @db.meta_def(:dataset) {c.new(self)}
+  end
+  
+  specify "should create a dataset and invoke its fetch_rows method with the given sql" do
+    sql = nil
+    @db.each('select * from xyz') {|r| sql = r[:sql]}
+    sql.should == 'select * from xyz'
+  end
+  
+  specify "should format the given sql with any additional arguments" do
+    sql = nil
+    @db.each('select * from xyz where x = ? and y = ?', 15, 'abc') {|r| sql = r[:sql]}
+    sql.should == "select * from xyz where x = 15 and y = 'abc'"
+    
+    # and Aman Gupta's example
+    @db.each('select name from table where name = ? or id in (?)',
+    'aman', [3,4,7]) {|r| sql = r[:sql]}
+    sql.should == "select name from table where name = 'aman' or id in (3, 4, 7)"
+  end
+end

@@ -280,6 +280,7 @@ module Sequel
     class Dataset < Sequel::Dataset
       def literal(v)
         case v
+        when LiteralString: v
         when String, Fixnum, Float, TrueClass, FalseClass: PGconn.quote(v)
         else
           super

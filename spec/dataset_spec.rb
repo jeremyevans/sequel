@@ -602,12 +602,12 @@ context "Dataset#select" do
     @d.select(:a, :b, :test__c).sql.should == 'SELECT a, b, test.c FROM test'
   end
   
-  specify "should accept mixed types (strings and symbols)" do
-    @d.select('aaa').sql.should == 'SELECT aaa FROM test'
-    @d.select(:a, 'b').sql.should == 'SELECT a, b FROM test'
-    @d.select(:test__cc, 'test.d AS e').sql.should == 
+  specify "should accept symbols and literal strings" do
+    @d.select('aaa'.lit).sql.should == 'SELECT aaa FROM test'
+    @d.select(:a, 'b'.lit).sql.should == 'SELECT a, b FROM test'
+    @d.select(:test__cc, 'test.d AS e'.lit).sql.should == 
       'SELECT test.cc, test.d AS e FROM test'
-    @d.select('test.d AS e', :test__cc).sql.should == 
+    @d.select('test.d AS e'.lit, :test__cc).sql.should == 
       'SELECT test.d AS e, test.cc FROM test'
 
     # symbol helpers      
@@ -632,6 +632,14 @@ context "Dataset#select" do
     @d.select(:a, :b, :c).select.sql.should == 'SELECT * FROM test'
     @d.select(:price).select(:name).sql.should == 'SELECT name FROM test'
   end
+  
+  specify "should accept arbitrary objects and literalize them correctly" do
+    @d.select(1, :a, 't').sql.should == "SELECT 1, a, 't' FROM test"
+
+    @d.select(nil, :sum[:t], :x___y).sql.should == "SELECT NULL, sum(t), x AS y FROM test"
+
+    @d.select(nil, 1, :x => :y).sql.should == "SELECT NULL, 1, x AS y FROM test"
+  end
 end
 
 context "Dataset#order" do
@@ -655,7 +663,7 @@ context "Dataset#order" do
   end
   
   specify "should accept a string" do
-    @dataset.order('dada ASC').sql.should ==
+    @dataset.order('dada ASC'.lit).sql.should ==
       'SELECT * FROM test ORDER BY dada ASC'
   end
 end
@@ -681,7 +689,7 @@ context "Dataset#order_by" do
   end
   
   specify "should accept a string" do
-    @dataset.order_by('dada ASC').sql.should ==
+    @dataset.order_by('dada ASC'.lit).sql.should ==
       'SELECT * FROM test ORDER BY dada ASC'
   end
 end

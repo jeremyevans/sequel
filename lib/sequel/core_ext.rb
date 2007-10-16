@@ -70,17 +70,17 @@ end
 module FieldCompositionMethods
   # Constructs a DESC clause for use in an ORDER BY clause.
   def DESC
-    "#{to_field_name} DESC"
+    "#{to_field_name} DESC".lit
   end
   
   # Constructs an AS clause for field aliasing.
   def AS(target)
-    "#{to_field_name} AS #{target}"
+    "#{to_field_name} AS #{target}".lit
   end
 
   # Constructs a qualified wildcard (*) clause.
   def ALL
-    "#{to_s}.*"
+    "#{to_s}.*".lit
   end
   
   FIELD_TITLE_RE1 = /^(.*)\sAS\s(.+)$/i.freeze

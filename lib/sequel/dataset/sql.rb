@@ -52,7 +52,9 @@ module Sequel
         if fields.empty?
           WILDCARD
         else
-          fields.map {|i| field_name(i)}.join(COMMA_SEPARATOR)
+          fields.map do |i|
+            i.is_a?(Hash) ? i.map {|kv| "#{literal(kv[0])} AS #{kv[1]}"} : literal(i)
+          end.join(COMMA_SEPARATOR)
         end
       end
 
@@ -165,7 +167,7 @@ module Sequel
         order(*invert_order(order.empty? ? @opts[:order] : order))
       end
 
-      DESC_ORDER_REGEXP = /(.*)\sDESC/.freeze
+      DESC_ORDER_REGEXP = /(.*)\sDESC/i.freeze
 
       # Inverts the given order by breaking it into a list of field references
       # and inverting them.
@@ -178,7 +180,7 @@ module Sequel
         order.each do |f|
           f.to_s.split(',').map do |p|
             p.strip!
-            new_order << (p =~ DESC_ORDER_REGEXP ? $1 : p.to_sym.DESC)
+            new_order << ((p =~ DESC_ORDER_REGEXP ? $1 : p.to_sym.DESC).lit)
           end
         end
         new_order
@@ -549,7 +551,7 @@ module Sequel
         end
       end
       
-      SELECT_COUNT = {:select => ["COUNT(*)"], :order => nil}.freeze
+      SELECT_COUNT = {:select => ["COUNT(*)".lit], :order => nil}.freeze
 
       # Returns the number of records in the dataset.
       def count

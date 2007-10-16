@@ -89,12 +89,7 @@ module Sequel
     # This method guesses whether the record exists when
     # <tt>new_record</tt> is set to false.
     def initialize(values = {}, new_record = false)
-      if values.is_a?(Hash)
-        @values = []; @values.fields = []
-        values.each {|k, v| @values[k] = v}
-      else
-        @values = values
-      end
+      @values = values
 
       @new = new_record
       unless @new # determine if it's a new record
