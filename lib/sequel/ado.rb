@@ -51,6 +51,26 @@ module Sequel
           @columns = fields.map {|x| x.Name.to_sym}
           
           s.moveFirst
+          s.getRows.transpose.each {|r| yield hash_row(r)}
+        end
+        self
+      end
+      
+      def hash_row(row)
+        @columns.inject({}) do |m, c|
+          m[c] = row.shift
+          m
+        end
+      end
+    
+      def array_tuples_fetch_rows(sql, &block)
+        @db.synchronize do
+          s = @db.execute sql
+          
+          fields = s.Fields.extend(Enumerable)
+          @columns = fields.map {|x| x.Name.to_sym}
+          
+          s.moveFirst
           s.getRows.transpose.each {|r| r.fields = @columns; yield r}
         end
         self

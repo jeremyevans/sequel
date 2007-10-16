@@ -226,7 +226,20 @@ module Sequel
         @db.execute_affected(delete_sql(opts))
       end
       
-      def fetch_rows(sql, &block)
+      def fetch_rows(sql)
+        @db.synchronize do
+          r = @db.execute_select(sql)
+          begin
+            @columns = r.columns
+            r.each_hash {|row| yield row}
+          ensure
+            r.free
+          end
+        end
+        self
+      end
+
+      def array_tuples_fetch_rows(sql, &block)
         @db.synchronize do
           r = @db.execute_select(sql)
           begin

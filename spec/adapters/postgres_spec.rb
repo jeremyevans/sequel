@@ -11,7 +11,7 @@ PGSQL_DB.create_table :test do
   index :value
 end
 
-context "A MySQL dataset" do
+context "A PostgreSQL dataset" do
   setup do
     @d = PGSQL_DB[:test]
     @d.delete # remove all records
@@ -25,24 +25,19 @@ context "A MySQL dataset" do
     @d.count.should == 3
   end
   
-  # specify "should return the last inserted id when inserting records" do
-  #   id = @d << {:name => 'abc', :value => 1.23}
-  #   id.should == @d.first[:id]
-  # end
-  #
-  
-  specify "should return all records" do
+  specify "should return the correct records" do
+    @d.to_a.should == []
     @d << {:name => 'abc', :value => 123}
     @d << {:name => 'abc', :value => 456}
     @d << {:name => 'def', :value => 789}
-    
-    @d.order(:value).all.should == [
-      ['abc', 123],
-      ['abc', 456],
-      ['def', 789]
+
+    @d.order(:value).to_a.should == [
+      {:name => 'abc', :value => 123},
+      {:name => 'abc', :value => 456},
+      {:name => 'def', :value => 789}
     ]
   end
-   
+  
   specify "should update records correctly" do
     @d << {:name => 'abc', :value => 123}
     @d << {:name => 'abc', :value => 456}
@@ -83,5 +78,51 @@ context "A MySQL dataset" do
     @d << {:name => 'bcd', :value => 2}
     @d.filter(:name => /bc/).count.should == 2
     @d.filter(:name => /^bc/).count.should == 1
+  end
+end
+
+context "A PostgreSQL dataset in array tuples mode" do
+  setup do
+    @d = PGSQL_DB[:test]
+    @d.delete # remove all records
+    Sequel.use_array_tuples
+  end
+  
+  teardown do
+    Sequel.use_hash_tuples
+  end
+  
+  specify "should return the correct records" do
+    @d.to_a.should == []
+    @d << {:name => 'abc', :value => 123}
+    @d << {:name => 'abc', :value => 456}
+    @d << {:name => 'def', :value => 789}
+
+    @d.order(:value).select(:name, :value).to_a.should == [
+      ['abc', 123],
+      ['abc', 456],
+      ['def', 789]
+    ]
+  end
+  
+  specify "should work correctly with transforms" do
+    @d.transform(:value => [proc {|v| v.to_s}, proc {|v| v.to_i}])
+
+    @d.to_a.should == []
+    @d << {:name => 'abc', :value => 123}
+    @d << {:name => 'abc', :value => 456}
+    @d << {:name => 'def', :value => 789}
+
+    @d.order(:value).select(:name, :value).to_a.should == [
+      ['abc', '123'],
+      ['abc', '456'],
+      ['def', '789']
+    ]
+    
+    a = @d.order(:value).first
+    a.values.should == ['abc', '123']
+    a.keys.should == [:name, :value]
+    a[:name].should == 'abc'
+    a[:value].should == '123'
   end
 end

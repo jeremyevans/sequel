@@ -147,6 +147,7 @@ module Sequel
       @columns || []
     end
     
+    # Inserts the supplied values into the associated table.
     def <<(*args)
       insert(*args)
     end
@@ -354,6 +355,16 @@ module Sequel
           count
         end
       end
+    end
+
+    @@dataset_classes = []
+
+    def self.dataset_classes
+      @@dataset_classes
+    end
+
+    def self.inherited(c)
+      @@dataset_classes << c
     end
   end
 end

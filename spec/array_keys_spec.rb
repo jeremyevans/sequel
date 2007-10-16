@@ -495,3 +495,40 @@ context "Array.from_hash" do
     a.to_hash.should == h
   end
 end
+
+context "Sequel.use_array_tuples" do
+  setup do
+    @c = Class.new(Sequel::Dataset) do
+      def fetch_rows(sql, &block)
+        block[{:a => 1, :b => 2, :c => 3}]
+      end
+    end
+    
+    @ds = @c.new(nil).from(:items)
+  end
+  
+  teardown do
+    Sequel.use_hash_tuples
+  end
+  
+  specify "should cause the dataset to return array tuples instead of hashes" do
+    @ds.first.should == {:a => 1, :b => 2, :c => 3}
+    Sequel.use_array_tuples
+    a = @ds.first
+    a.class.should == Array
+    a.values.sort.should == [1, 2, 3]
+    a.keys.map {|k| k.to_s}.sort.should == ['a', 'b', 'c']
+    a[:a].should == 1
+    a[:b].should == 2
+    a[:c].should == 3
+    a[:d].should == nil
+  end
+  
+  specify "should be reversible using Sequel.use_hash_tuples" do
+    Sequel.use_array_tuples
+    @ds.first.class.should == Array
+    
+    Sequel.use_hash_tuples
+    @ds.first.should == {:a => 1, :b => 2, :c => 3}
+  end
+end

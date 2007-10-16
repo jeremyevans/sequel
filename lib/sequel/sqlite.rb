@@ -121,13 +121,19 @@ module Sequel
       def fetch_rows(sql, &block)
         @db.execute_select(sql) do |result|
           @columns = result.columns.map {|c| c.to_sym}
+          column_count = @columns.size
+          result.each do |values|
+            row = {}
+            column_count.times {|i| row[@columns[i]] = values[i]}
+            block.call(row)
+          end
+        end
+      end
+      
+      def array_tuples_fetch_rows(sql, &block)
+        @db.execute_select(sql) do |result|
+          @columns = result.columns.map {|c| c.to_sym}
           result.each(&block)
-          # column_count = @columns.size
-          # result.each do |values|
-          #   row = {}
-          #   column_count.times {|i| row[@columns[i]] = values[i]}
-          #   block.call(row)
-          # end
         end
       end
     

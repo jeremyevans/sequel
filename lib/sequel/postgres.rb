@@ -422,6 +422,52 @@ module Sequel
       end
     
       def compile_converter(fields, translators)
+        used_fields = []
+        kvs = []
+        fields.each_with_index do |field, idx|
+          next if used_fields.include?(field)
+          used_fields << field
+        
+          if translator = translators[idx]
+            kvs << ":\"#{field}\" => ((t = r[#{idx}]) ? t.#{translator} : nil)"
+          else
+            kvs << ":\"#{field}\" => r[#{idx}]"
+          end
+        end
+        eval("lambda {|r| {#{kvs.join(COMMA_SEPARATOR)}}}")
+      end
+
+      def array_tuples_fetch_rows(sql, &block)
+        @db.synchronize do
+          result = @db.execute(sql)
+          begin
+            conv = array_tuples_row_converter(result)
+            result.each {|r| yield conv[r]}
+          ensure
+            result.clear
+          end
+        end
+      end
+      
+      @@array_tuples_converters_mutex = Mutex.new
+      @@array_tuples_converters = {}
+
+      def array_tuples_row_converter(result)
+        fields = []; translators = []
+        result.fields.each_with_index do |f, idx|
+          fields << f.to_sym
+          translators << PG_TYPES[result.type(idx)]
+        end
+        @columns = fields
+        
+        # create result signature and memoize the converter
+        sig = [fields, translators].hash
+        @@array_tuples_converters_mutex.synchronize do
+          @@array_tuples_converters[sig] ||= array_tuples_compile_converter(fields, translators)
+        end
+      end
+    
+      def array_tuples_compile_converter(fields, translators)
         tr = []
         fields.each_with_index do |field, idx|
           if t = translators[idx]
