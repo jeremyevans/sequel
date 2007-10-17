@@ -541,3 +541,26 @@ context "Database#fetch" do
       [{:sql => 'select c from d'}]
   end
 end
+
+context "Database#[]" do
+  setup do
+    @db = Sequel::Database.new
+  end
+  
+  specify "should return a dataset when symbols are given" do
+    ds = @db[:items]
+    ds.class.should == Sequel::Dataset
+    ds.opts[:from].should == [:items]
+  end
+  
+  specify "should return an enumerator when a string is given" do
+    c = Class.new(Sequel::Dataset) do
+      def fetch_rows(sql); yield({:sql => sql}); end
+    end
+    @db.meta_def(:dataset) {c.new(self)}
+
+    sql = nil
+    @db['select * from xyz where x = ? and y = ?', 15, 'abc'].each {|r| sql = r[:sql]}
+    sql.should == "select * from xyz where x = 15 and y = 'abc'"
+  end
+end

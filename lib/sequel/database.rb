@@ -72,6 +72,7 @@ module Sequel
         Enumerable::Enumerator.new(ds, :fetch_rows, sql)
       end
     end
+    alias_method :>>, :fetch
     
     # Converts a query block into a dataset. For more information see 
     # Dataset#query.
@@ -89,8 +90,10 @@ module Sequel
     # Returns a new dataset with the select method invoked.
     def select(*args); dataset.select(*args); end
     
-    alias_method :[], :from
-
+    def [](*args)
+      (String === args.first) ? fetch(*args) : from(*args)
+    end
+    
     def execute(sql)
       raise NotImplementedError
     end

@@ -1,5 +1,7 @@
 === SVN
 
+* Changed Database#[] to act as shortcut to #fetch if a string is given.
+
 * Renamed Database#each to #fetch. If no block is given, the method returns an enumerator.
 
 * Changed Dataset#join methods to correctly literalize values in join conditions (#70).
