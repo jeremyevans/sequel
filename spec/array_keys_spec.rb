@@ -522,6 +522,16 @@ context "Sequel.use_array_tuples" do
     a[:b].should == 2
     a[:c].should == 3
     a[:d].should == nil
+    
+    @ds.transform(:a => [proc {|v| v.to_s}, proc {|v| v.to_i}])
+    a = @ds.first
+    a[:a].should == '1'
+    
+    @ds.transform({})
+    a = @ds.first
+    a[:a].should == 1
+
+    @ds.set_model(Hash)
   end
   
   specify "should be reversible using Sequel.use_hash_tuples" do

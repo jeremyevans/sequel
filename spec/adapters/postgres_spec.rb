@@ -11,6 +11,19 @@ PGSQL_DB.create_table :test do
   index :value
 end
 
+context "A PostgreSQL database" do
+  setup do
+    @db = PGSQL_DB
+  end
+  
+  specify "should provide disconnect functionality" do
+    @db.tables
+    @db.pool.size.should == 1
+    @db.disconnect
+    @db.pool.size.should == 0
+  end
+end
+
 context "A PostgreSQL dataset" do
   setup do
     @d = PGSQL_DB[:test]

@@ -105,7 +105,7 @@ module Sequel
         when NilClass: NULL
         when TrueClass: TRUE
         when FalseClass: FALSE
-        when Symbol: v.to_field_name
+        when Symbol: quoted_field_name(v.to_field_name)
         when Array: v.empty? ? NULL : v.map {|i| literal(i)}.join(COMMA_SEPARATOR)
         when Time: v.strftime(TIMESTAMP_FORMAT)
         when Date: v.strftime(DATE_FORMAT)

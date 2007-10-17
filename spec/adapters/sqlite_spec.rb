@@ -113,6 +113,13 @@ context "An SQLite database" do
     # no commit
     @db.tables.should == [:t]
   end
+  
+  specify "should provide disconnect functionality" do
+    @db.tables
+    @db.pool.size.should == 1
+    @db.disconnect
+    @db.pool.size.should == 0
+  end
 end
 
 context "An SQLite dataset" do
@@ -290,3 +297,4 @@ context "SQLite dataset" do
       @d.select(:name, :value).order(:value).to_a
   end
 end
+

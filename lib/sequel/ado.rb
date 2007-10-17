@@ -21,6 +21,10 @@ module Sequel
         handle.Open(dbname)
         handle
       end
+      
+      def disconnect
+        # how do we disconnect? couldn't find anything in the docs
+      end
     
       def dataset(opts = nil)
         ADO::Dataset.new(self, opts)

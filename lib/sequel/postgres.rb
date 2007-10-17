@@ -154,6 +154,10 @@ module Sequel
         end
         conn
       end
+      
+      def disconnect
+        @pool.disconnect {|c| c.close}
+      end
     
       def dataset(opts = nil)
         Postgres::Dataset.new(self, opts)

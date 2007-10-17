@@ -14,6 +14,10 @@ module Sequel
         conn.autocommit = true
         conn
       end
+      
+      def disconnect
+        @pool.disconnect {|c| c.disconnect}
+      end
     
       def dataset(opts = nil)
         ODBC::Dataset.new(self, opts)

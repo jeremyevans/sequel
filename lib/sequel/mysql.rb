@@ -91,6 +91,10 @@ module Sequel
         conn
       end
       
+      def disconnect
+        @pool.disconnect {|c| c.close}
+      end
+      
       def tables
         @pool.hold do |conn|
           conn.list_tables.map {|t| t.to_sym}
@@ -179,6 +183,7 @@ module Sequel
       
       def literal(v)
         case v
+        when LiteralString: quoted_field_name(v)
         when true: TRUE
         when false: FALSE
         else

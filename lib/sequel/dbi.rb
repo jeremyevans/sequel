@@ -14,6 +14,10 @@ module Sequel
         dbname = 'DBI:' + dbname unless dbname =~ /^DBI:/
         ::DBI.connect(dbname, @opts[:user], @opts[:password])
       end
+      
+      def disconnect
+        @pool.disconnect {|c| c.disconnect}
+      end
     
       def dataset(opts = nil)
         DBI::Dataset.new(self, opts)

@@ -11,6 +11,19 @@ MYSQL_DB.create_table :items do
   index :value
 end
 
+context "A MySQL database" do
+  setup do
+    @db = MYSQL_DB
+  end
+  
+  specify "should provide disconnect functionality" do
+    @db.tables
+    @db.pool.size.should == 1
+    @db.disconnect
+    @db.pool.size.should == 0
+  end
+end
+
 context "A MySQL dataset" do
   setup do
     @d = MYSQL_DB[:items]
@@ -69,7 +82,7 @@ context "A MySQL dataset" do
     @d.select(:name).sql.should == \
       'SELECT `name` FROM items'
       
-    @d.select('COUNT(*)').sql.should == \
+    @d.select('COUNT(*)'.lit).sql.should == \
       'SELECT COUNT(*) FROM items'
 
     @d.select(:value.MAX).sql.should == \
@@ -84,13 +97,13 @@ context "A MySQL dataset" do
     @d.order(:name.DESC).sql.should == \
       'SELECT * FROM items ORDER BY `name` DESC'
       
-    @d.select('items.name AS item_name').sql.should == \
+    @d.select('items.name AS item_name'.to_sym).sql.should == \
       'SELECT items.`name` AS `item_name` FROM items'
       
-    @d.select('`name`').sql.should == \
+    @d.select('`name`'.lit).sql.should == \
       'SELECT `name` FROM items'
 
-    @d.select('max(items.`name`) as `max_name`').sql.should == \
+    @d.select('max(items.`name`) AS `max_name`'.lit).sql.should == \
       'SELECT max(items.`name`) AS `max_name` FROM items'
 
     @d.insert_sql(:value => 333).should == \

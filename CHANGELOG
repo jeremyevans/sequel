@@ -1,5 +1,7 @@
 === SVN
 
+* Implemented Database#disconnect method for all adapters.
+
 * Fixed small bug in ArrayKeys module.
 
 * Implemented model caching by primary key.

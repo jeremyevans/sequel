@@ -21,6 +21,10 @@ module Sequel
         db.type_translation = true
         db
       end
+      
+      def disconnect
+        @pool.disconnect {|c| c.close}
+      end
     
       def dataset(opts = nil)
         SQLite::Dataset.new(self, opts)

@@ -268,3 +268,86 @@ context "A connection pool with a max size of 5" do
     @pool.allocated.should be_empty
   end
 end
+
+context "ConnectionPool#disconnect" do
+  setup do
+    @count = 0
+    @pool = Sequel::ConnectionPool.new(5) {{:id => @count += 1}}
+  end
+  
+  specify "should invoke the given block for each available connection" do
+    threads = []
+    stop = nil
+    5.times {|i| threads << Thread.new {@pool.hold {|c| while !stop;sleep 0.1;end}}; sleep 0.1}
+    while @pool.size < 5
+      sleep 0.2
+    end
+    stop = true
+    sleep 0.2
+    
+    @pool.size.should == 5
+    @pool.available_connections.size.should == 5
+    @pool.available_connections.each {|c| c[:id].should_not be_nil}
+    conns = []
+    @pool.disconnect {|c| conns << c}
+    conns.size.should == 5
+  end
+  
+  specify "should remove all available connections" do
+    threads = []
+    stop = nil
+    5.times {|i| threads << Thread.new {@pool.hold {|c| while !stop;sleep 0.1;end}}; sleep 0.1}
+    while @pool.size < 5
+      sleep 0.2
+    end
+    stop = true
+    sleep 0.2
+    
+    @pool.size.should == 5
+    @pool.disconnect
+    @pool.size.should == 0
+  end
+
+  specify "should not touch connections in use" do
+    threads = []
+    stop = nil
+    5.times {|i| threads << Thread.new {@pool.hold {|c| while !stop;sleep 0.1;end}}; sleep 0.1}
+    while @pool.size < 5
+      sleep 0.2
+    end
+    stop = true
+    sleep 0.2
+    
+    @pool.size.should == 5
+    
+    @pool.hold do |conn|
+      @pool.available_connections.size.should == 4
+      @pool.available_connections.each {|c| c.should_not be(conn)}
+      conns = []
+      @pool.disconnect {|c| conns << c}
+      conns.size.should == 4
+    end
+    @pool.size.should == 1
+  end
+end
+
+context "SingleThreadedPool" do
+  setup do
+    @pool = Sequel::SingleThreadedPool.new {1234}
+  end
+  
+  specify "should provide a #hold method" do
+    conn = nil
+    @pool.hold {|c| conn = c}
+    conn.should == 1234
+  end
+  
+  specify "should provide a #disconnect method" do
+    @pool.hold {|c|}
+    @pool.conn.should == 1234
+    conn = nil
+    @pool.disconnect {|c| conn = c}
+    conn.should == 1234
+    @pool.conn.should be_nil
+  end
+end

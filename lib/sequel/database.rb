@@ -32,6 +32,10 @@ module Sequel
       raise NotImplementedError, "#connect should be overriden by adapters"
     end
     
+    def disconnect
+      raise NotImplementedError, "#disconnect should be overriden by adapters"
+    end
+    
     def multi_threaded?
       !@single_threaded
     end

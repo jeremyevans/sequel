@@ -68,6 +68,14 @@ module Sequel
       raise e.is_a?(StandardError) ? e : e.message
     end
     
+    def disconnect(&block)
+      @mutex.synchronize do
+        @available_connections.each {|c| block[c]} if block
+        @available_connections = []
+        @created_count = @allocated.size
+      end
+    end
+    
     private
       # Returns the connection owned by the supplied thread, if any.
       def owned_connection(thread)
@@ -112,6 +120,7 @@ module Sequel
   # in single-threaded applications. ConnectionPool imposes a substantial
   # performance penalty, so SingleThreadedPool is used to gain some speed.
   class SingleThreadedPool
+    attr_reader :conn
     attr_writer :connection_proc
     
     # Initializes the instance with the supplied block as the connection_proc.
@@ -127,6 +136,11 @@ module Sequel
     rescue Exception => e
       # if the error is not a StandardError it is converted into RuntimeError.
       raise e.is_a?(StandardError) ? e : e.message
+    end
+    
+    def disconnect(&block)
+      block[@conn] if block && @conn
+      @conn = nil
     end
   end
 end
