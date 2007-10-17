@@ -527,3 +527,68 @@ context "Model.subset" do
     @c.new_only.pricey.sql.should == "SELECT * FROM items WHERE (age = 'new') AND (price > 100)"
   end
 end
+
+context "A cached model" do
+  setup do
+    MODEL_DB.reset
+    
+    @cache_class = Class.new(Hash) do
+      attr_accessor :ttl
+      def put(k, v, ttl); self[k] = v; @ttl = ttl; end
+      def get(k); self[k]; end
+    end
+    cache = @cache_class.new
+    @cache = cache
+    
+    @c = Class.new(Sequel::Model(:items)) do
+      set_cache cache
+    end
+  end
+  
+  specify "should set the model's cache store" do
+    @c.cache_store.should be(@cache)
+  end
+  
+  specify "should have a default ttl of 3600" do
+    @c.cache_ttl.should == 3600
+  end
+  
+  specify "should take a ttl option" do
+    @c.set_cache @cache, :ttl => 1234
+    @c.cache_ttl.should == 1234
+  end
+  
+  specify "should offer a set_cache_ttl method for setting the ttl" do
+    @c.cache_ttl.should == 3600
+    @c.set_cache_ttl 1234
+    @c.cache_ttl.should == 1234
+  end
+  
+  specify "should generate a cache key appropriate to the class" do
+    m = @c.new
+    m.values[:id] = 1
+    m.cache_key.should == "#{m.class}:1"
+    
+    # custom primary key
+    @c.set_primary_key :ttt
+    m = @c.new
+    m.values[:ttt] = 333
+    m.cache_key.should == "#{m.class}:333"
+    
+    # composite primary key
+    @c.set_primary_key [:a, :b, :c]
+    m = @c.new
+    m.values[:a] = 123
+    m.values[:c] = 456
+    m.values[:b] = 789
+    m.cache_key.should == "#{m.class}:123,789,456"
+  end
+  
+  specify "should raise error if attempting to generate cache_key and primary key value is null" do
+    m = @c.new
+    proc {m.cache_key}.should raise_error(SequelError)
+    
+    m.values[:id] = 1
+    proc {m.cache_key}.should_not raise_error(SequelError)
+  end
+end

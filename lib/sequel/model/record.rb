@@ -6,6 +6,7 @@ module Sequel
     def self.primary_key
       :id
     end
+    
     # Returns primary key attribute hash.
     def self.primary_key_hash(value)
       {:id => value}
@@ -39,13 +40,21 @@ module Sequel
         class_def(:this) do
           @this ||= dataset.filter(key => @values[key]).naked
         end
+        class_def(:cache_key) do
+          pk = @values[key] || (raise SequelError, 'no primary key for this record')
+          @cache_key ||= "#{self.class}:#{pk}"
+        end
         meta_def(:primary_key_hash) do |v|
           {key => v}
         end
       else # composite key
         exp_list = key.map {|k| "#{k.inspect} => @values[#{k.inspect}]"}
-        block = eval("proc {@this ||= self.class.dataset.filter(#{exp_list.join(', ')}).naked}")
+        block = eval("proc {@this ||= self.class.dataset.filter(#{exp_list.join(',')}).naked}")
         class_def(:this, &block)
+        
+        exp_list = key.map {|k| '#{@values[%s]}' % k.inspect}.join(',')
+        block = eval('proc {@cache_key ||= "#{self.class}:%s"}' % exp_list)
+        class_def(:cache_key, &block)
 
         meta_def(:primary_key_hash) do |v|
           key.inject({}) {|m, i| m[i] = v.shift; m}
@@ -57,6 +66,7 @@ module Sequel
       meta_def(:primary_key) {nil}
       meta_def(:primary_key_hash) {|v| raise SequelError, "#{self} does not have a primary key"}
       class_def(:this) {raise SequelError, "No primary key is associated with this model"}
+      class_def(:cache_key) {raise SequelError, "No primary key is associated with this model"}
     end
     
     # Creates new instance with values set to passed-in Hash ensuring that
@@ -74,6 +84,12 @@ module Sequel
       @this ||= self.class.dataset.filter(:id => @values[:id]).naked
     end
     
+    # Returns a key unique to the underlying record for caching
+    def cache_key
+      pk = @values[:id] || (raise SequelError, 'no primary key for this record')
+      @cache_key ||= "#{self.class}:#{pk}"
+    end
+
     # Returns primary key column(s) for object's Model class.
     def primary_key
       @primary_key ||= self.class.primary_key

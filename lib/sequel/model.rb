@@ -159,6 +159,7 @@ require File.join(File.dirname(__FILE__), 'model/hooks')
 require File.join(File.dirname(__FILE__), 'model/record')
 require File.join(File.dirname(__FILE__), 'model/schema')
 require File.join(File.dirname(__FILE__), 'model/relations')
+require File.join(File.dirname(__FILE__), 'model/caching')
 
 module Sequel
   class Model
