@@ -506,7 +506,7 @@ context "Database#dataset" do
   end
 end
 
-context "Database#each" do
+context "Database#fetch" do
   setup do
     @db = Sequel::Database.new
     c = Class.new(Sequel::Dataset) do
@@ -517,18 +517,27 @@ context "Database#each" do
   
   specify "should create a dataset and invoke its fetch_rows method with the given sql" do
     sql = nil
-    @db.each('select * from xyz') {|r| sql = r[:sql]}
+    @db.fetch('select * from xyz') {|r| sql = r[:sql]}
     sql.should == 'select * from xyz'
   end
   
   specify "should format the given sql with any additional arguments" do
     sql = nil
-    @db.each('select * from xyz where x = ? and y = ?', 15, 'abc') {|r| sql = r[:sql]}
+    @db.fetch('select * from xyz where x = ? and y = ?', 15, 'abc') {|r| sql = r[:sql]}
     sql.should == "select * from xyz where x = 15 and y = 'abc'"
     
     # and Aman Gupta's example
-    @db.each('select name from table where name = ? or id in (?)',
+    @db.fetch('select name from table where name = ? or id in (?)',
     'aman', [3,4,7]) {|r| sql = r[:sql]}
     sql.should == "select name from table where name = 'aman' or id in (3, 4, 7)"
+  end
+  
+  specify "should return an enumerator if no block is given" do
+    @db.fetch('select * from xyz').should respond_to(:each)
+    
+    @db.fetch('select a from b').map {|r| r[:sql]}.should == ['select a from b']
+
+    @db.fetch('select c from d').inject([]) {|m, r| m << r; m}.should == \
+      [{:sql => 'select c from d'}]
   end
 end

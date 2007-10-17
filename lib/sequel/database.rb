@@ -63,10 +63,14 @@ module Sequel
       ds = Sequel::Dataset.new(self)
     end
     
-    def each(sql, *args, &block)
+    def fetch(sql, *args, &block)
       ds = dataset
       sql = sql.gsub('?') {|m|  ds.literal(args.shift)}
-      ds.fetch_rows(sql, &block)
+      if block
+        ds.fetch_rows(sql, &block)
+      else
+        Enumerable::Enumerator.new(ds, :fetch_rows, sql)
+      end
     end
     
     # Converts a query block into a dataset. For more information see 

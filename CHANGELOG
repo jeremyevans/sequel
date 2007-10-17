@@ -1,5 +1,7 @@
 === SVN
 
+* Renamed Database#each to #fetch. If no block is given, the method returns an enumerator.
+
 * Changed Dataset#join methods to correctly literalize values in join conditions (#70).
 
 * Fixed #filter with ranges to correctly literalize field names (#69).
