@@ -8,7 +8,7 @@
 
 * Separated Model.find and Model.[] functionality. Model.find takes a filter. Model.[] is strictly for finding by primary keys.
 
-* Enhanced Dataset#first to accept a filter block.
+* Enhanced Dataset#first to accept a filter block. Model#find can also now accept a filter block.
 
 * Changed Database#[] to act as shortcut to #fetch if a string is given.
 
