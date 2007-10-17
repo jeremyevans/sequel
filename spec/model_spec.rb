@@ -70,21 +70,21 @@ describe Sequel::Model, 'with this' do
 
   it "should return a dataset identifying the record" do
     instance = @example.new :id => 3
-    instance.this.sql.should be_eql("SELECT * FROM examples WHERE (id = 3)")
+    instance.this.sql.should be_eql("SELECT * FROM examples WHERE (id = 3) LIMIT 1")
   end
 
   it "should support arbitary primary keys" do
     @example.set_primary_key :a
 
     instance = @example.new :a => 3
-    instance.this.sql.should be_eql("SELECT * FROM examples WHERE (a = 3)")
+    instance.this.sql.should be_eql("SELECT * FROM examples WHERE (a = 3) LIMIT 1")
   end
 
   it "should support composite primary keys" do
     @example.set_primary_key :x, :y
     instance = @example.new :x => 4, :y => 5
 
-    parts = ['SELECT * FROM examples WHERE %s',
+    parts = ['SELECT * FROM examples WHERE %s LIMIT 1',
       '(x = 4) AND (y = 5)', '(y = 5) AND (x = 4)'
     ].map { |expr| Regexp.escape expr }
     regexp = Regexp.new parts.first % "(?:#{parts[1]}|#{parts[2]})"
@@ -528,6 +528,17 @@ context "Model.subset" do
   end
 end
 
+context "Model.find" do
+  specify "should return the first record matching the given filter"
+  specify "should accept filter blocks"
+end
+
+context "Model.[]" do
+  specify "should return the first record for the given pk"
+  specify "should work correctly for custom primary key"
+  specify "should work correctly for composite primary key"
+end
+
 context "A cached model" do
   setup do
     MODEL_DB.reset
@@ -543,6 +554,21 @@ context "A cached model" do
     @c = Class.new(Sequel::Model(:items)) do
       set_cache cache
     end
+    
+    
+    $cache_dataset_row = {:name => 'sharon', :id => 1}
+    @dataset = @c.dataset
+    $sqls = []
+    @dataset.extend(Module.new {
+      def fetch_rows(sql)
+        $sqls << sql
+        yield $cache_dataset_row
+      end
+      
+      def update(values)
+        $cache_dataset_row.merge!(values)
+      end
+    })
   end
   
   specify "should set the model's cache store" do
@@ -590,5 +616,21 @@ context "A cached model" do
     
     m.values[:id] = 1
     proc {m.cache_key}.should_not raise_error(SequelError)
+  end
+  
+  specify "should set the cache when reading from the database" do
+    $sqls.should == []
+    @cache.should be_empty
+    
+    m = @c[1]
+    $sqls.should == ['SELECT * FROM items WHERE (id = 1) LIMIT 1']
+    m.values.should == $cache_dataset_row
+    @cache[m.cache_key].should == m
+    
+    # read from cache
+    m2 = @c[1]
+    $sqls.should == ['SELECT * FROM items WHERE (id = 1) LIMIT 1']
+    m2.should == m
+    m2.values.should == $cache_dataset_row
   end
 end

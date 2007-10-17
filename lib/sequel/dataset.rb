@@ -304,7 +304,6 @@ module Sequel
       r
     end
     
-    private
     # Updates the each method according to whether @row_proc and @transform are
     # set or not.
     def update_each_method

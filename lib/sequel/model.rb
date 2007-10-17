@@ -175,19 +175,19 @@ module Sequel
       {:id => value}
     end
 
-    # Finds records by id or given conditions.
+    # Finds a single record according to the supplied filter, e.g.:
     #
-    # === Example:
-    #   Ticket.find :author => 'Sharon' # => Dataset
-    #   Ticket.find 17 # => Dataset
+    #   Ticket.find :author => 'Sharon' # => record
+    #   Ticket.find {:price}17 # => Dataset
     #
-    # Notice:: Does not support advanded filtering yet.
-    def self.find(cond)
-      dataset[cond.is_a?(Hash) ? cond : primary_key_hash(cond)]
+    def self.find(*args, &block)
+      dataset.filter(*args, &block).limit(1).first
+      # dataset[cond.is_a?(Hash) ? cond : primary_key_hash(cond)]
     end
     
-    class << self
-      alias_method :[], :find
+    def self.[](*args)
+      args = args.first if (args.size == 1)
+      dataset[primary_key_hash(args)]
     end
     
     # Like find but invokes create with given conditions when record does not

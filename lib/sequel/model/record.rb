@@ -38,7 +38,7 @@ module Sequel
       
       unless key.is_a? Array # regular primary key
         class_def(:this) do
-          @this ||= dataset.filter(key => @values[key]).naked
+          @this ||= dataset.filter(key => @values[key]).limit(1).naked
         end
         class_def(:cache_key) do
           pk = @values[key] || (raise SequelError, 'no primary key for this record')
@@ -49,7 +49,7 @@ module Sequel
         end
       else # composite key
         exp_list = key.map {|k| "#{k.inspect} => @values[#{k.inspect}]"}
-        block = eval("proc {@this ||= self.class.dataset.filter(#{exp_list.join(',')}).naked}")
+        block = eval("proc {@this ||= self.class.dataset.filter(#{exp_list.join(',')}).limit(1).naked}")
         class_def(:this, &block)
         
         exp_list = key.map {|k| '#{@values[%s]}' % k.inspect}.join(',')
@@ -81,7 +81,7 @@ module Sequel
     
     # Returns (naked) dataset bound to current instance.
     def this
-      @this ||= self.class.dataset.filter(:id => @values[:id]).naked
+      @this ||= self.class.dataset.filter(:id => @values[:id]).limit(1).naked
     end
     
     # Returns a key unique to the underlying record for caching

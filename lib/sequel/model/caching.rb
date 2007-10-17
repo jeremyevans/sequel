@@ -5,6 +5,14 @@ module Sequel
       if (ttl = opts[:ttl])
         set_cache_ttl(ttl)
       end
+      
+      meta_def(:[]) do |*args|
+        unless obj = @cache_store.get(cache_key_from_values(args))
+          obj = dataset[primary_key_hash((args.size == 1) ? args.first : args)]
+          @cache_store.put(cache_key_from_values(args), obj, cache_ttl)
+        end
+        obj
+      end
     end
     
     def self.set_cache_ttl(ttl)
@@ -17,6 +25,10 @@ module Sequel
     
     def self.cache_ttl
       @cache_ttl ||= 3600
+    end
+    
+    def self.cache_key_from_values(values)
+      "#{self}:#{values.join(',')}"
     end
   end
 end

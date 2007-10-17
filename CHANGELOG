@@ -1,5 +1,9 @@
 === SVN
 
+* Separated Model.find and Model.[] functionality. Model.find takes a filter. Model.[] is strictly for finding by primary keys.
+
+* Enhanced Dataset#first to accept a filter block.
+
 * Changed Database#[] to act as shortcut to #fetch if a string is given.
 
 * Renamed Database#each to #fetch. If no block is given, the method returns an enumerator.

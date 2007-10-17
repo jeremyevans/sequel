@@ -30,13 +30,16 @@ module Sequel
 
       # Returns the first record in the dataset. If the num argument is specified,
       # an array is returned with the first <i>num</i> records.
-      def first(*args)
+      def first(*args, &block)
+        if block
+          return filter(&block).single_record(:limit => 1)
+        end
         args = args.empty? ? 1 : (args.size == 1) ? args.first : args
         case args
         when 1: single_record(:limit => 1)
         when Fixnum: limit(args).all
         else
-          filter(args).single_record(:limit => 1)
+          filter(args, &block).single_record(:limit => 1)
         end
       end
 

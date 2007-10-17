@@ -1100,6 +1100,11 @@ context "Dataset#first" do
     @c.last_opts[:where].should == ('z = 15')
   end
   
+  specify "should return the first matching record if a block is given" do
+    @d.first {:z > 26}.should == {:a => 1, :b => 2}
+    @c.last_opts[:where].should == ('(z > 26)')
+  end
+  
   specify "should return a single record if no argument is given" do
     @d.first.should == {:a => 1, :b => 2}
   end
