@@ -1,5 +1,9 @@
 === SVN
 
+* Fixed small bug in ArrayKeys module.
+
+* Implemented model caching by primary key.
+
 * Separated Model.find and Model.[] functionality. Model.find takes a filter. Model.[] is strictly for finding by primary keys.
 
 * Enhanced Dataset#first to accept a filter block.

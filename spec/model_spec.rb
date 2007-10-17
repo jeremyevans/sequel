@@ -553,8 +553,11 @@ context "A cached model" do
     
     @c = Class.new(Sequel::Model(:items)) do
       set_cache cache
+      
+      def self.columns
+        [:name, :id]
+      end
     end
-    
     
     $cache_dataset_row = {:name => 'sharon', :id => 1}
     @dataset = @c.dataset
@@ -566,7 +569,12 @@ context "A cached model" do
       end
       
       def update(values)
+        $sqls << update_sql(values)
         $cache_dataset_row.merge!(values)
+      end
+      
+      def delete
+        $sqls << delete_sql
       end
     })
   end
@@ -632,5 +640,32 @@ context "A cached model" do
     $sqls.should == ['SELECT * FROM items WHERE (id = 1) LIMIT 1']
     m2.should == m
     m2.values.should == $cache_dataset_row
+  end
+  
+  specify "should delete the cache when writing to the database" do
+    # fill the cache
+    m = @c[1]
+    @cache[m.cache_key].should == m
+    
+    m.set(:name => 'tutu')
+    @cache.has_key?(m.cache_key).should be_false
+    $sqls.last.should == "UPDATE items SET name = 'tutu' WHERE (id = 1)"
+    
+    m = @c[1]
+    @cache[m.cache_key].should == m
+    m.name = 'hey'
+    m.save
+    @cache.has_key?(m.cache_key).should be_false
+    $sqls.last.should == "UPDATE items SET name = 'hey', id = 1 WHERE (id = 1)"
+  end
+  
+  specify "should delete the cache when deleting the record" do
+    # fill the cache
+    m = @c[1]
+    @cache[m.cache_key].should == m
+    
+    m.delete
+    @cache.has_key?(m.cache_key).should be_false
+    $sqls.last.should == "DELETE FROM items WHERE (id = 1)"
   end
 end

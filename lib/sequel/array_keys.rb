@@ -140,11 +140,11 @@ module ArrayKeys
   end
   
   module DatasetExtensions
-    def array_tuple_each(opts = nil, &block)
+    def array_tuples_each(opts = nil, &block)
       fetch_rows(select_sql(opts)) {|h| block[Array.from_hash(h)]}
     end
 
-    def array_tuple_update_each_method
+    def array_tuples_update_each_method
       # warning: ugly code generation ahead
       if @row_proc && @transform
         class << self
@@ -205,8 +205,8 @@ module Sequel
           alias_method :orig_each, :each
           alias_method :orig_update_each_method, :update_each_method
           include ArrayKeys::DatasetExtensions
-          alias_method :each, :array_tuple_each
-          alias_method :update_each_method, :array_tuple_update_each_method
+          alias_method :each, :array_tuples_each
+          alias_method :update_each_method, :array_tuples_update_each_method
         end
       end
     end

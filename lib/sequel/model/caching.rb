@@ -13,6 +13,10 @@ module Sequel
         end
         obj
       end
+      
+      class_def(:set) {|v| store.delete(cache_key); super}
+      class_def(:save) {store.delete(cache_key); super}
+      class_def(:delete) {store.delete(cache_key); super}
     end
     
     def self.set_cache_ttl(ttl)
