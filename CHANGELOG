@@ -1,5 +1,7 @@
 === SVN
 
+* Added stock transforms to Dataset#transform. Refactored Model.serialize.
+
 * Added Database#logger= method for setting the database logger object.
 
 * Fixed Model.[] to act as shortcut to Model.find when a hash is given (#71).

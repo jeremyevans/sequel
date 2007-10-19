@@ -264,6 +264,11 @@ module Sequel
       update_each_method
     end
     
+    STOCK_TRANSFORMS = {
+      :marshal => [proc {|v| Marshal.load(v)}, proc {|v| Marshal.dump(v)}],
+      :yaml => [proc {|v| YAML.load v if v}, proc {|v| v.to_yaml}]
+    }
+    
     # Sets a value transform which is used to convert values loaded and saved
     # to/from the database. The transform should be supplied as a hash. Each
     # value in the hash should be an array containing two proc objects - one
@@ -278,9 +283,28 @@ module Sequel
     #
     #   dataset.insert_sql(:obj => 1234) #=>
     #   "INSERT INTO items (obj) VALUES ('\004\bi\002\322\004')"
-    #   
+    #
+    # Another form of using transform is by specifying stock transforms:
+    # 
+    #   dataset.transform(:obj => :marshal)
+    #
+    # The currently supported stock transforms are :marshal and :yaml.
     def transform(t)
       @transform = t
+      t.each do |k, v|
+        case v
+        when Array:
+          if (v.size != 2) || !v.first.is_a?(Proc) && !v.last.is_a?(Proc)
+            raise SequelError, "Invalid transform specified"
+          end
+        else
+          unless v = STOCK_TRANSFORMS[v]
+            raise SequelError, "Invalid transform specified"
+          else
+            t[k] = v
+          end
+        end
+      end
       update_each_method
     end
     

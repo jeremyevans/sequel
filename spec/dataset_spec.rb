@@ -1922,6 +1922,93 @@ context "Dataset#transform" do
   end
 end
 
+context "Dataset#transform" do
+  setup do
+    @c = Class.new(Sequel::Dataset) do
+      attr_accessor :raw
+      attr_accessor :sql
+      
+      def fetch_rows(sql, &block)
+        block[@raw]
+      end
+      
+      def insert(v)
+        @sql = insert_sql(v)
+      end
+      
+      def update(v)
+        @sql = update_sql(v)
+      end
+    end
+
+    @ds = @c.new(nil).from(:items)
+  end
+  
+  specify "should raise SequelError for invalid transformations" do
+    proc {@ds.transform(:x => 'mau')}.should raise_error(SequelError)
+    proc {@ds.transform(:x => :mau)}.should raise_error(SequelError)
+    proc {@ds.transform(:x => [])}.should raise_error(SequelError)
+    proc {@ds.transform(:x => ['mau'])}.should raise_error(SequelError)
+    proc {@ds.transform(:x => [proc {|v|}, proc {|v|}])}.should_not raise_error(SequelError)
+  end
+  
+  specify "should support stock YAML transformation" do
+    @ds.transform(:x => :yaml)
+
+    @ds.raw = {:x => [1, 2, 3].to_yaml, :y => 'hello'}
+    @ds.first.should == {:x => [1, 2, 3], :y => 'hello'}
+
+    @ds.insert(:x => :toast)
+    @ds.sql.should == "INSERT INTO items (x) VALUES ('#{:toast.to_yaml}');"
+    @ds.insert(:y => 'butter')
+    @ds.sql.should == "INSERT INTO items (y) VALUES ('butter');"
+    @ds.update(:x => ['dream'])
+    @ds.sql.should == "UPDATE items SET x = '#{['dream'].to_yaml}'"
+
+    @ds2 = @ds.filter(:a => 1)
+    @ds2.raw = {:x => [1, 2, 3].to_yaml, :y => 'hello'}
+    @ds2.first.should == {:x => [1, 2, 3], :y => 'hello'}
+    @ds2.insert(:x => :toast)
+    @ds2.sql.should == "INSERT INTO items (x) VALUES ('#{:toast.to_yaml}');"
+
+    @ds.set_row_proc {|r| r[:z] = r[:x] * 2; r}
+    @ds.raw = {:x => "wow".to_yaml, :y => 'hello'}
+    @ds.first.should == {:x => "wow", :y => 'hello', :z => "wowwow"}
+    f = nil
+    @ds.raw = {:x => "wow".to_yaml, :y => 'hello'}
+    @ds.each(:naked => true) {|r| f = r}
+    f.should == {:x => "wow", :y => 'hello'}
+  end
+  
+  specify "should support stock Marshal transformation" do
+    @ds.transform(:x => :marshal)
+
+    @ds.raw = {:x => Marshal.dump([1, 2, 3]), :y => 'hello'}
+    @ds.first.should == {:x => [1, 2, 3], :y => 'hello'}
+
+    @ds.insert(:x => :toast)
+    @ds.sql.should == "INSERT INTO items (x) VALUES ('#{Marshal.dump(:toast)}');"
+    @ds.insert(:y => 'butter')
+    @ds.sql.should == "INSERT INTO items (y) VALUES ('butter');"
+    @ds.update(:x => ['dream'])
+    @ds.sql.should == "UPDATE items SET x = '#{Marshal.dump(['dream'])}'"
+
+    @ds2 = @ds.filter(:a => 1)
+    @ds2.raw = {:x => Marshal.dump([1, 2, 3]), :y => 'hello'}
+    @ds2.first.should == {:x => [1, 2, 3], :y => 'hello'}
+    @ds2.insert(:x => :toast)
+    @ds2.sql.should == "INSERT INTO items (x) VALUES ('#{Marshal.dump(:toast)}');"
+
+    @ds.set_row_proc {|r| r[:z] = r[:x] * 2; r}
+    @ds.raw = {:x => Marshal.dump("wow"), :y => 'hello'}
+    @ds.first.should == {:x => "wow", :y => 'hello', :z => "wowwow"}
+    f = nil
+    @ds.raw = {:x => Marshal.dump("wow"), :y => 'hello'}
+    @ds.each(:naked => true) {|r| f = r}
+    f.should == {:x => "wow", :y => 'hello'}
+  end
+end
+
 context "Dataset#to_csv" do
   setup do
     @c = Class.new(Sequel::Dataset) do

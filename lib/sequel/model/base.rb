@@ -60,20 +60,13 @@ module Sequel
       model.columns
     end
 
-    # Serialization methods used by serialize.
-    SERIALIZE_FORMATS = {
-      :yaml => [proc {|v| YAML.load v if v}, proc {|v| v.to_yaml}],
-      :marshal => [proc {|v| Marshal.load(v) if v}, proc {|v| Marshal.dump(v)}]
-    }
-
     # Serializes column with YAML or through marshalling.
     def self.serialize(*columns)
       format = columns.pop[:format] if Hash === columns.last
-      filters = SERIALIZE_FORMATS[format || :yaml]
-      # add error handling here
+      format ||= :yaml
       
       @transform = columns.inject({}) do |m, c|
-        m[c] = filters
+        m[c] = format
         m
       end
       @dataset.transform(@transform) if @dataset
