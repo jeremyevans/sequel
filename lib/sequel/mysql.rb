@@ -2,27 +2,40 @@ if !Object.const_defined?('Sequel')
   require File.join(File.dirname(__FILE__), '../sequel')
 end
 
+require "bigdecimal"
+require "bigdecimal/util"
 require 'mysql'
 
 # Monkey patch Mysql::Result to yield hashes with symbol keys
 class Mysql::Result
   MYSQL_TYPES = {
-    0 => :to_i,
-    1 => :to_i,
-    2 => :to_i,
-    3 => :to_i,
-    4 => :to_f,
-    5 => :to_f,
-    7 => :to_time,
-    8 => :to_i,
-    9 => :to_i,
-    10 => :to_time,
-    11 => :to_time,
-    12 => :to_time,
-    13 => :to_i,
-    14 => :to_time,
-    247 => :to_i,
-    248 => :to_i
+    0   => :to_d,     # MYSQL_TYPE_DECIMAL
+    1   => :to_i,     # MYSQL_TYPE_TINY
+    2   => :to_i,     # MYSQL_TYPE_SHORT
+    3   => :to_i,     # MYSQL_TYPE_LONG
+    4   => :to_f,     # MYSQL_TYPE_FLOAT
+    5   => :to_f,     # MYSQL_TYPE_DOUBLE
+    # 6   => ??,        # MYSQL_TYPE_NULL
+    7   => :to_time,  # MYSQL_TYPE_TIMESTAMP
+    8   => :to_i,     # MYSQL_TYPE_LONGLONG
+    9   => :to_i,     # MYSQL_TYPE_INT24
+    10  => :to_time,  # MYSQL_TYPE_DATE
+    11  => :to_time,  # MYSQL_TYPE_TIME
+    12  => :to_time,  # MYSQL_TYPE_DATETIME
+    13  => :to_i,     # MYSQL_TYPE_YEAR
+    14  => :to_time,  # MYSQL_TYPE_NEWDATE
+    # 15  => :to_s      # MYSQL_TYPE_VARCHAR
+    # 16  => :to_s,     # MYSQL_TYPE_BIT
+    246 => :to_d,     # MYSQL_TYPE_NEWDECIMAL
+    247 => :to_i,     # MYSQL_TYPE_ENUM
+    248 => :to_i      # MYSQL_TYPE_SET
+    # 249 => :to_s,     # MYSQL_TYPE_TINY_BLOB
+    # 250 => :to_s,     # MYSQL_TYPE_MEDIUM_BLOB
+    # 251 => :to_s,     # MYSQL_TYPE_LONG_BLOB
+    # 252 => :to_s,     # MYSQL_TYPE_BLOB
+    # 253 => :to_s,     # MYSQL_TYPE_VAR_STRING
+    # 254 => :to_s,     # MYSQL_TYPE_STRING
+    # 255 => :to_s      # MYSQL_TYPE_GEOMETRY
   }
   
   def convert_type(v, type)

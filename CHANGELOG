@@ -1,5 +1,7 @@
 === SVN
 
+* Added support for old and new decimal types in MySQL adapter, and updated MYSQL_TYPES with MySQL 5.0 constants.
+
 * Implemented Database#disconnect method for all adapters.
 
 * Fixed small bug in ArrayKeys module.
