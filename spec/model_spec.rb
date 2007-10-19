@@ -529,14 +529,91 @@ context "Model.subset" do
 end
 
 context "Model.find" do
-  specify "should return the first record matching the given filter"
-  specify "should accept filter blocks"
+  setup do
+    MODEL_DB.reset
+    
+    @c = Class.new(Sequel::Model(:items)) do
+      def self.columns
+        [:name, :id]
+      end
+    end
+    
+    $cache_dataset_row = {:name => 'sharon', :id => 1}
+    @dataset = @c.dataset
+    $sqls = []
+    @dataset.extend(Module.new {
+      def fetch_rows(sql)
+        $sqls << sql
+        yield $cache_dataset_row
+      end
+    })
+  end
+  
+  specify "should return the first record matching the given filter" do
+    @c.find(:name => 'sharon').should be_a_kind_of(@c)
+    $sqls.last.should == "SELECT * FROM items WHERE (name = 'sharon') LIMIT 1"
+
+    @c.find {"name LIKE 'abc%'".lit}.should be_a_kind_of(@c)
+    $sqls.last.should == "SELECT * FROM items WHERE name LIKE 'abc%' LIMIT 1"
+  end
+  
+  specify "should accept filter blocks" do
+    @c.find {:id == 1}.should be_a_kind_of(@c)
+    $sqls.last.should == "SELECT * FROM items WHERE (id = 1) LIMIT 1"
+
+    @c.find {:x > 1 && :y < 2}.should be_a_kind_of(@c)
+    $sqls.last.should == "SELECT * FROM items WHERE ((x > 1) AND (y < 2)) LIMIT 1"
+  end
 end
 
 context "Model.[]" do
-  specify "should return the first record for the given pk"
-  specify "should work correctly for custom primary key"
-  specify "should work correctly for composite primary key"
+  setup do
+    MODEL_DB.reset
+    
+    @c = Class.new(Sequel::Model(:items)) do
+      def self.columns
+        [:name, :id]
+      end
+    end
+    
+    $cache_dataset_row = {:name => 'sharon', :id => 1}
+    @dataset = @c.dataset
+    $sqls = []
+    @dataset.extend(Module.new {
+      def fetch_rows(sql)
+        $sqls << sql
+        yield $cache_dataset_row
+      end
+    })
+  end
+  
+  specify "should return the first record for the given pk" do
+    @c[1].should be_a_kind_of(@c)
+    $sqls.last.should == "SELECT * FROM items WHERE (id = 1) LIMIT 1"
+    @c[9999].should be_a_kind_of(@c)
+    $sqls.last.should == "SELECT * FROM items WHERE (id = 9999) LIMIT 1"
+  end
+  
+  specify "should work correctly for custom primary key" do
+    @c.set_primary_key :name
+    @c['sharon'].should be_a_kind_of(@c)
+    $sqls.last.should == "SELECT * FROM items WHERE (name = 'sharon') LIMIT 1"
+  end
+  
+  specify "should work correctly for composite primary key" do
+    @c.set_primary_key [:node_id, :kind]
+    @c[3921, 201].should be_a_kind_of(@c)
+    $sqls.last.should =~ \
+      /^SELECT \* FROM items WHERE (\(node_id = 3921\) AND \(kind = 201\))|(\(kind = 201\) AND \(node_id = 3921\)) LIMIT 1$/
+  end
+  
+  specify "should act as shortcut to find if a hash is given" do
+    @c[:id => 1].should be_a_kind_of(@c)
+    $sqls.last.should == "SELECT * FROM items WHERE (id = 1) LIMIT 1"
+    
+    @c[:name => ['abc', 'def']].should be_a_kind_of(@c)
+    $sqls.last.should == "SELECT * FROM items WHERE (name IN ('abc', 'def')) LIMIT 1"
+  end
 end
 
 context "A cached model" do
@@ -667,5 +744,21 @@ context "A cached model" do
     m.delete
     @cache.has_key?(m.cache_key).should be_false
     $sqls.last.should == "DELETE FROM items WHERE (id = 1)"
+  end
+  
+  specify "should support #[] as a shortcut to #find with hash" do
+    m = @c[:id => 3]
+    @cache[m.cache_key].should be_nil
+    $sqls.last.should == "SELECT * FROM items WHERE (id = 3) LIMIT 1"
+    
+    m = @c[1]
+    @cache[m.cache_key].should == m
+    $sqls.should == ["SELECT * FROM items WHERE (id = 3) LIMIT 1", \
+      "SELECT * FROM items WHERE (id = 1) LIMIT 1"]
+    
+    @c[:id => 4]
+    $sqls.should == ["SELECT * FROM items WHERE (id = 3) LIMIT 1", \
+      "SELECT * FROM items WHERE (id = 1) LIMIT 1", \
+      "SELECT * FROM items WHERE (id = 4) LIMIT 1"]
   end
 end

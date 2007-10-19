@@ -7,6 +7,10 @@ module Sequel
       end
       
       meta_def(:[]) do |*args|
+        if (args.size == 1) && (Hash === (h = args.first))
+          return dataset[h]
+        end
+        
         unless obj = @cache_store.get(cache_key_from_values(args))
           obj = dataset[primary_key_hash((args.size == 1) ? args.first : args)]
           @cache_store.put(cache_key_from_values(args), obj, cache_ttl)

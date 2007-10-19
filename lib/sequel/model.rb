@@ -187,7 +187,7 @@ module Sequel
     
     def self.[](*args)
       args = args.first if (args.size == 1)
-      dataset[primary_key_hash(args)]
+      dataset[(Hash === args) ? args : primary_key_hash(args)]
     end
     
     # Like find but invokes create with given conditions when record does not
