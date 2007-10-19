@@ -5,7 +5,8 @@ module Sequel
   # The Database class is meant to be subclassed by database adapters in order
   # to provide the functionality needed for executing queries.
   class Database
-    attr_reader :opts, :pool, :logger
+    attr_reader :opts, :pool
+    attr_accessor :logger
     
     # Constructs a new instance of a database connection with the specified
     # options hash.

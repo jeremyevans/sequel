@@ -498,6 +498,15 @@ context "A database" do
     db.should be_single_threaded
     db.should_not be_multi_threaded
   end
+  
+  specify "should accept a logger object" do
+    db = Sequel::Database.new
+    s = "I'm a logger"
+    db.logger = s
+    db.logger.should be(s)
+    db.logger = nil
+    db.logger.should be_nil
+  end
 end
 
 context "Database#dataset" do
