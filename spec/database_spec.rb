@@ -547,13 +547,23 @@ context "Database#fetch" do
     sql.should == "select name from table where name = 'aman' or id in (3, 4, 7)"
   end
   
-  specify "should return an enumerator if no block is given" do
-    @db.fetch('select * from xyz').should respond_to(:each)
+  specify "should return the dataset if no block is given" do
+    @db.fetch('select * from xyz').should be_a_kind_of(Sequel::Dataset)
     
     @db.fetch('select a from b').map {|r| r[:sql]}.should == ['select a from b']
 
     @db.fetch('select c from d').inject([]) {|m, r| m << r; m}.should == \
       [{:sql => 'select c from d'}]
+  end
+  
+  specify "should return a dataset that always uses the given sql for SELECTs" do
+    ds = @db.fetch('select * from xyz')
+    ds.select_sql.should == 'select * from xyz'
+    ds.sql.should == 'select * from xyz'
+    
+    ds.filter! {:price < 100}
+    ds.select_sql.should == 'select * from xyz'
+    ds.sql.should == 'select * from xyz'
   end
 end
 

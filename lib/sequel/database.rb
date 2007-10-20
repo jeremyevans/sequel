@@ -74,7 +74,10 @@ module Sequel
       if block
         ds.fetch_rows(sql, &block)
       else
-        Enumerable::Enumerator.new(ds, :fetch_rows, sql)
+        ds.meta_def(:select_sql) {|*args| sql}
+        ds.meta_def(:sql) {|*args| sql}
+        ds
+#        Enumerable::Enumerator.new(ds, :fetch_rows, sql)
       end
     end
     alias_method :>>, :fetch
