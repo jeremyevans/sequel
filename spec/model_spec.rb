@@ -622,7 +622,7 @@ context "A cached model" do
     
     @cache_class = Class.new(Hash) do
       attr_accessor :ttl
-      def put(k, v, ttl); self[k] = v; @ttl = ttl; end
+      def set(k, v, ttl); self[k] = v; @ttl = ttl; end
       def get(k); self[k]; end
     end
     cache = @cache_class.new
