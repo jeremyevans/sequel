@@ -859,3 +859,42 @@ context "Model.one_to_one" do
     $sqls.last.should == "UPDATE nodes SET parent_id = 6677 WHERE (id = 1)"
   end
 end
+
+context "Model.one_to_many" do
+  setup do
+    MODEL_DB.reset
+    
+    @c1 = Class.new(Sequel::Model(:attributes)) do
+    end
+
+    @c2 = Class.new(Sequel::Model(:nodes)) do
+    end
+  end
+  
+  specify "should define a getter method" do
+    @c2.one_to_many :attributes, :from => @c1, :key => :node_id
+    
+    n = @c2.new(:id => 1234)
+    a = n.attributes
+    a.should be_a_kind_of(Sequel::Dataset)
+    a.sql.should == 'SELECT * FROM attributes WHERE (node_id = 1234)'
+  end
+  
+  specify "should support plain dataset in the from option" do
+    @c2.one_to_many :attributes, :from => MODEL_DB[:xyz], :key => :node_id
+    
+    n = @c2.new(:id => 1234)
+    a = n.attributes
+    a.should be_a_kind_of(Sequel::Dataset)
+    a.sql.should == 'SELECT * FROM xyz WHERE (node_id = 1234)'
+  end
+
+  specify "should support table name in the from option" do
+    @c2.one_to_many :attributes, :from => :abc, :key => :node_id
+    
+    n = @c2.new(:id => 1234)
+    a = n.attributes
+    a.should be_a_kind_of(Sequel::Dataset)
+    a.sql.should == 'SELECT * FROM abc WHERE (node_id = 1234)'
+  end
+end

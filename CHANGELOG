@@ -1,6 +1,6 @@
 === SVN
 
-* Specs and docs for Model.one_to_one macro.
+* Specs and docs for Model.one_to_one, Model.one_to_many macros.
 
 === 0.3.0.1 (2007-10-20)
 

@@ -1,9 +1,5 @@
 module Sequel
   class Model
-    ONE_TO_ONE_PROC = "proc {i = @values[:%s]; %s[i] if i}".freeze
-    ID_POSTFIX = "_id".freeze
-    FROM_DATASET = "db[%s]".freeze
-    
     # Creates a 1-1 relationship by defining an association method, e.g.:
     # 
     #   class Session < Sequel::Model(:sessions)
@@ -90,18 +86,23 @@ module Sequel
         warn "The :class option has been deprecated. Please use :from instead."
         opts[:from] = opts[:class]
       end
+      # deprecation
+      if opts[:on]
+        warn "The :on option has been deprecated. Please use :key instead."
+        opts[:key] = opts[:on]
+      end
       
-      from = (Symbol === opts[:from]) ? (FROM_DATASET % opts[:from]) : opts[:from]
+      
+      from = opts[:from]
       from || (raise SequelError, "No association source defined (use :from option)")
+      key = opts[:key] || (self.to_s + '_id').to_sym
       
-      from = opts[:from] ? opts[:from] :
-        (FROM_DATASET % (opts[:from] || name.inspect))
-      key = opts[:on]
-      order = opts[:order]
-      define_method name, &eval(
-        (order ? ONE_TO_MANY_ORDER_PROC : ONE_TO_MANY_PROC) %
-        [klass, key, order.inspect]
-      )
+      case from
+      when Symbol
+        class_def(name) {db[from].filter(key => pkey)}
+      else
+        class_def(name) {from.filter(key => pkey)}
+      end
     end
   end
 end
