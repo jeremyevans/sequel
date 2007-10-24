@@ -1,6 +1,6 @@
 === SVN
 
-* Implemented custom row fetchers in SQLite adapter.
+* Specs and docs for Model.one_to_one macro.
 
 === 0.3.0.1 (2007-10-20)
 

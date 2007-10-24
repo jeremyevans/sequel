@@ -119,6 +119,22 @@ context "A simple dataset" do
     @dataset.insert_sql(v).should == "INSERT INTO test DEFAULT VALUES;"
   end
   
+  specify "should format an insert statement with a model instance" do
+    dbb = Sequel::Database.new
+    
+    @c = Class.new(Sequel::Model) do
+      db = dbb
+      set_dataset Sequel::Dataset.new(dbb)
+    end
+    
+    v = @c.new(:a => 1)
+    
+    @dataset.insert_sql(v).should == "INSERT INTO test (a) VALUES (1);"
+    
+    v = @c.new({})
+    @dataset.insert_sql(v).should == "INSERT INTO test DEFAULT VALUES;"
+  end
+  
   specify "should format an insert statement with an arbitrary value" do
     @dataset.insert_sql(123).should == "INSERT INTO test VALUES (123);"
   end

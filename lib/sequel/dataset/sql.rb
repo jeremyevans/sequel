@@ -443,15 +443,15 @@ module Sequel
         else
           values = values[0] if values.size == 1
           case values
+          when Sequel::Model
+            insert_sql(values.values)
           when Array
-            if values.fields
-              if values.empty?
-                "INSERT INTO #{@opts[:from]} DEFAULT VALUES;"
-              else
-                fl = values.fields
-                vl = transform_save(values.values).map {|v| literal(v)}
-                "INSERT INTO #{@opts[:from]} (#{fl.join(COMMA_SEPARATOR)}) VALUES (#{vl.join(COMMA_SEPARATOR)});"
-              end
+            if values.empty?
+              "INSERT INTO #{@opts[:from]} DEFAULT VALUES;"
+            elsif values.fields
+              fl = values.fields
+              vl = transform_save(values.values).map {|v| literal(v)}
+              "INSERT INTO #{@opts[:from]} (#{fl.join(COMMA_SEPARATOR)}) VALUES (#{vl.join(COMMA_SEPARATOR)});"
             else
               "INSERT INTO #{@opts[:from]} VALUES (#{literal(values)});"
             end

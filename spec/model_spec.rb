@@ -256,13 +256,13 @@ context "A model class" do
   specify "should be able to create rows in the associated table" do
     o = @c.create(:x => 1)
     o.class.should == @c
-    MODEL_DB.sqls.should == ['INSERT INTO items (x) VALUES (1);']
+    MODEL_DB.sqls.should == ['INSERT INTO items (x) VALUES (1);',  "SELECT * FROM items WHERE (id IN ('INSERT INTO items (x) VALUES (1);')) LIMIT 1"]
   end
   
   specify "should be able to create rows without any values specified" do
     o = @c.create
     o.class.should == @c
-    MODEL_DB.sqls.should == ['INSERT INTO items DEFAULT VALUES;']
+    MODEL_DB.sqls.should == ["INSERT INTO items DEFAULT VALUES;", "SELECT * FROM items WHERE (id IN ('INSERT INTO items DEFAULT VALUES;')) LIMIT 1"]
   end
 end
 
@@ -482,8 +482,8 @@ context "Model.after_create" do
     end
     
     n = @c.create(:x => 1)
-    MODEL_DB.sqls.should == ['INSERT INTO items (x) VALUES (1);']
-    s.should == ['INSERT INTO items (x) VALUES (1);']
+    MODEL_DB.sqls.should == ["INSERT INTO items (x) VALUES (1);", "SELECT * FROM items WHERE (id = 1) LIMIT 1"]
+    s.should == ["INSERT INTO items (x) VALUES (1);", "SELECT * FROM items WHERE (id = 1) LIMIT 1"]
   end
   
   specify "should allow calling save in the hook" do
@@ -494,7 +494,7 @@ context "Model.after_create" do
     end
     
     n = @c.create(:id => 1)
-    MODEL_DB.sqls.should == ['INSERT INTO items (id) VALUES (1);', 'UPDATE items SET id = 2 WHERE (id = 1)']
+    MODEL_DB.sqls.should == ["INSERT INTO items (id) VALUES (1);", "SELECT * FROM items WHERE (id = 1) LIMIT 1", "UPDATE items SET id = 2 WHERE (id = 1)"]
   end
 end
 
@@ -760,5 +760,102 @@ context "A cached model" do
     $sqls.should == ["SELECT * FROM items WHERE (id = 3) LIMIT 1", \
       "SELECT * FROM items WHERE (id = 1) LIMIT 1", \
       "SELECT * FROM items WHERE (id = 4) LIMIT 1"]
+  end
+end
+
+context "Model.one_to_one" do
+  setup do
+    MODEL_DB.reset
+    
+    @c1 = Class.new(Sequel::Model(:attributes)) do
+    end
+
+    @c2 = Class.new(Sequel::Model(:nodes)) do
+    end
+    
+    @dataset = @c2.dataset
+
+    $sqls = []
+    @dataset.extend(Module.new {
+      def fetch_rows(sql)
+        $sqls << sql
+        yield({:hey => 1})
+      end
+      
+      def update(values)
+        $sqls << update_sql(values)
+      end
+      
+      def delete
+        $sqls << delete_sql
+      end
+    })
+  end
+  
+  specify "should use implicit key if omitted" do
+    @c2.one_to_one :parent, :from => @c2
+    
+    d = @c2.new(:id => 1, :parent_id => 234)
+    p = d.parent
+    p.class.should == @c2
+    p.values.should == {:hey => 1}
+    
+    $sqls.should == ["SELECT * FROM nodes WHERE (id = 234) LIMIT 1"]
+  end
+  
+  specify "should use explicit key if given" do
+    @c2.one_to_one :parent, :from => @c2, :key => :blah
+    
+    d = @c2.new(:id => 1, :blah => 567)
+    p = d.parent
+    p.class.should == @c2
+    p.values.should == {:hey => 1}
+    
+    $sqls.should == ["SELECT * FROM nodes WHERE (id = 567) LIMIT 1"]
+  end
+  
+  specify "should support plain dataset in the from option" do
+    @c2.one_to_one :parent, :from => MODEL_DB[:xyz]
+
+    d = @c2.new(:id => 1, :parent_id => 789)
+    p = d.parent
+    p.class.should == Hash
+    
+    MODEL_DB.sqls.should == ["SELECT * FROM xyz WHERE (id = 789) LIMIT 1"]
+  end
+
+  specify "should support table name in the from option" do
+    @c2.one_to_one :parent, :from => :abc
+
+    d = @c2.new(:id => 1, :parent_id => 789)
+    p = d.parent
+    p.class.should == Hash
+    
+    MODEL_DB.sqls.should == ["SELECT * FROM abc WHERE (id = 789) LIMIT 1"]
+  end
+  
+  specify "should return nil if key value is nil" do
+    @c2.one_to_one :parent, :from => @c2
+    
+    d = @c2.new(:id => 1)
+    d.parent.should == nil
+  end
+  
+  specify "should define a setter method" do
+    @c2.one_to_one :parent, :from => @c2
+    
+    d = @c2.new(:id => 1)
+    d.parent = {:id => 4321}
+    d.values.should == {:id => 1, :parent_id => 4321}
+    $sqls.last.should == "UPDATE nodes SET parent_id = 4321 WHERE (id = 1)"
+    
+    d.parent = nil
+    d.values.should == {:id => 1, :parent_id => nil}
+    $sqls.last.should == "UPDATE nodes SET parent_id = NULL WHERE (id = 1)"
+    
+    e = @c2.new(:id => 6677)
+    d.parent = e
+    d.values.should == {:id => 1, :parent_id => 6677}
+    $sqls.last.should == "UPDATE nodes SET parent_id = 6677 WHERE (id = 1)"
   end
 end

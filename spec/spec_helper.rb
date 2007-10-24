@@ -10,6 +10,7 @@ class MockDataset < Sequel::Dataset
   end
   
   def fetch_rows(sql)
+    @db.execute(sql)
     yield({:id => 1, :x => 1})
   end
 end

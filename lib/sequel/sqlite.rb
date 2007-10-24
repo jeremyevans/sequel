@@ -4,150 +4,6 @@ end
 
 require 'sqlite3'
 
-class String
-  def sqlite_to_bool
-    !(strip.gsub(/00+/,"0") == "0" ||
-      downcase == "false" ||
-      downcase == "f" ||
-      downcase == "no" ||
-      downcase == "n")
-  end
-end
-
-module SQLite3
-  class ResultSet
-    SQLITE_TYPES = {
-      :date => :to_time,
-      :datetime => :to_time,
-      :time => :to_time,
-      :timestamp => :to_time,
-      
-      :decimal => :to_f,
-      :float => :to_f,
-      :numeric => :to_f,
-      :double => :to_f,
-      :real => :to_f,
-      :dec => :to_f,
-      :fixed => :to_f,
-      
-      :integer => :to_i,
-      :smallint => :to_i,
-      :mediumint => :to_i,
-      :int => :to_i,
-      :bigint => :to_i,
-      
-      :bit => :sqlite_to_bool,
-      :bool => :sqlite_to_bool,
-      :boolean => :sqlite_to_bool,
-      
-      :tinyint => :to_i
-    }
-    
-    COMMA_SEPARATOR = ', '.freeze
-    
-    @@fetchers_mutex = Mutex.new
-    @@fetchers = {}
-
-    def prepare_row_fetcher
-      column_count = @driver.data_count(@stmt.handle)
-      columns = @stmt.columns.map {|c| c.to_sym}
-      translators = []
-      column_count.times do |idx|
-        t = @driver.column_decltype(@stmt.handle, idx) || :text
-        translators << SQLITE_TYPES[t.to_sym]
-      end
-      sig = [columns, translators].hash
-      @@fetchers_mutex.synchronize do
-        fetcher = (@@fetchers[sig] ||= compile_fetcher(columns, translators))
-        meta_def(:fetch_hash, &fetcher)
-      end
-    end
-  
-    def compile_fetcher(columns, translators)
-      used_columns = []
-      kvs = []
-      columns.each_with_index do |column, idx|
-        next if used_columns.include?(column)
-        used_columns << column
-      
-        if translator = translators[idx]
-          kvs << "#{column.inspect} => ((t = @driver.column_text(@stmt.handle, #{idx})) ? t.#{translator} : nil)"
-        else
-          kvs << "#{column.inspect} => @driver.column_text(@stmt.handle, #{idx})"
-        end
-      end
-      eval("lambda {{#{kvs.join(COMMA_SEPARATOR)}}}")
-    end
-
-
-    def next_hash_tuple
-      return nil if @eof
-      @stmt.must_be_open!
-
-      if @first_row
-        prepare_row_fetcher
-        # @row_fetcher = prepare_row_fetcher
-      else
-        result = @driver.step(@stmt.handle)
-        check result
-      end
-      @first_row = false
-      
-      @eof ? nil : fetch_hash # @row_fetcher.call
-    end
-
-    def next_array_tuple
-      return nil if @eof
-      @stmt.must_be_open!
-
-      unless @first_row
-        result = @driver.step(@stmt.handle)
-        check result
-      end
-      @first_row = false
-
-      columns = @stmt.columns
-
-      unless @eof
-        row = []
-        @driver.data_count( @stmt.handle ).times do |idx|
-          case @driver.column_type( @stmt.handle, idx )
-          when Constants::ColumnType::NULL then
-            row << nil
-          when Constants::ColumnType::BLOB then
-            row << @driver.column_blob( @stmt.handle, idx )
-          else
-            v = @driver.column_text( @stmt.handle, idx )
-            row << @db.translator.translate(@driver.column_decltype(@stmt.handle, idx), v)
-          end
-        end
-
-        row.extend FieldsContainer unless row.respond_to?(:fields)
-        row.fields = @stmt.columns
-
-        row.extend TypesContainer
-        row.types = @stmt.types
-
-        return row
-      end
-
-      nil
-    end
-
-    def each_hash
-      while row=self.next_hash_tuple
-        yield row
-      end
-    end
-
-    def each_array
-      while row=self.next_array_tuple
-        yield row
-      end
-    end
-  end
-end
-
 module Sequel
   module SQLite
     class Database < Sequel::Database
@@ -277,14 +133,19 @@ module Sequel
       def fetch_rows(sql, &block)
         @db.execute_select(sql) do |result|
           @columns = result.columns.map {|c| c.to_sym}
-          result.each_hash(&block)
+          column_count = @columns.size
+          result.each do |values|
+            row = {}
+            column_count.times {|i| row[@columns[i]] = values[i]}
+            block.call(row)
+          end
         end
       end
       
       def array_tuples_fetch_rows(sql, &block)
         @db.execute_select(sql) do |result|
           @columns = result.columns.map {|c| c.to_sym}
-          result.each_array(&block)
+          result.each(&block)
         end
       end
     
