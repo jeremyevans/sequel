@@ -1,5 +1,7 @@
 module Sequel
   class Model
+    ID_POSTFIX = '_id'.freeze
+    
     # Creates a 1-1 relationship by defining an association method, e.g.:
     # 
     #   class Session < Sequel::Model(:sessions)
@@ -95,7 +97,7 @@ module Sequel
       
       from = opts[:from]
       from || (raise SequelError, "No association source defined (use :from option)")
-      key = opts[:key] || (self.to_s + '_id').to_sym
+      key = opts[:key] || (self.to_s + ID_POSTFIX).to_sym
       
       case from
       when Symbol
