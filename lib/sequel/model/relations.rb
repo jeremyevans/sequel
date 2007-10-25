@@ -53,7 +53,7 @@ module Sequel
         when nil
           set(key => nil)
         when Sequel::Model
-          set(key => v.pkey)
+          set(key => v.pk)
         when Hash
           set(key => v[:id])
         end
@@ -62,9 +62,6 @@ module Sequel
       # define_method name, &eval(ONE_TO_ONE_PROC % [key, from])
     end
   
-    ONE_TO_MANY_PROC = "proc {%s.filter(:%s => pkey)}".freeze
-    ONE_TO_MANY_ORDER_PROC = "proc {%s.filter(:%s => pkey).order(%s)}".freeze
-
     # Creates a 1-N relationship by defining an association method, e.g.:
     # 
     #   class Book < Sequel::Model(:books)
@@ -101,9 +98,9 @@ module Sequel
       
       case from
       when Symbol
-        class_def(name) {db[from].filter(key => pkey)}
+        class_def(name) {db[from].filter(key => pk)}
       else
-        class_def(name) {from.filter(key => pkey)}
+        class_def(name) {from.filter(key => pk)}
       end
     end
   end

@@ -263,13 +263,14 @@ module Sequel
       @values[:id]
     end
 
-    # Compares models by values.
+    # Compares model instances by values.
     def ==(obj)
       (obj.class == model) && (obj.values == @values)
     end
-    # Compares object by pkey.
+
+    # Compares model instances by pkey.
     def ===(obj)
-      (obj.class == model) && (obj.pkey == pkey)
+      (obj.class == model) && (obj.pk == pk)
     end
 
   end

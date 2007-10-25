@@ -28,7 +28,9 @@ module Sequel
     # <i>You can even set it to nil!</i>
     def self.set_primary_key(*key)
       # if k is nil, we go to no_primary_key
-      return no_primary_key unless key
+      if key.empty? || (key.size == 1 && key.first == nil)
+        return no_primary_key
+      end
       
       # backwards compat
       key = (key.length == 1) ? key[0] : key.flatten
@@ -39,6 +41,9 @@ module Sequel
       unless key.is_a? Array # regular primary key
         class_def(:this) do
           @this ||= dataset.filter(key => @values[key]).limit(1).naked
+        end
+        class_def(:pk) do
+          @pk ||= @values[key]
         end
         class_def(:cache_key) do
           pk = @values[key] || (raise SequelError, 'no primary key for this record')
@@ -51,6 +56,10 @@ module Sequel
         exp_list = key.map {|k| "#{k.inspect} => @values[#{k.inspect}]"}
         block = eval("proc {@this ||= self.class.dataset.filter(#{exp_list.join(',')}).limit(1).naked}")
         class_def(:this, &block)
+        
+        exp_list = key.map {|k| "@values[#{k.inspect}]"}
+        block = eval("proc {@pk ||= [#{exp_list.join(',')}]}")
+        class_def(:pk, &block)
         
         exp_list = key.map {|k| '#{@values[%s]}' % k.inspect}.join(',')
         block = eval('proc {@cache_key ||= "#{self.class}:%s"}' % exp_list)
@@ -66,6 +75,7 @@ module Sequel
       meta_def(:primary_key) {nil}
       meta_def(:primary_key_hash) {|v| raise SequelError, "#{self} does not have a primary key"}
       class_def(:this) {raise SequelError, "No primary key is associated with this model"}
+      class_def(:pk) {raise SequelError, "No primary key is associated with this model"}
       class_def(:cache_key) {raise SequelError, "No primary key is associated with this model"}
     end
     
@@ -97,7 +107,13 @@ module Sequel
     
     # Returns value for primary key.
     def pkey
-      @pkey ||= @values[primary_key]
+      warn "Model#pkey is deprecated. Please use Model#pk instead."
+      @pkey ||= @values[self.class.primary_key]
+    end
+    
+    # Returns the primary key value identifying the model instance. Stock implementation.
+    def pk
+      @pk ||= @values[:id]
     end
     
     # Creates new instance with values set to passed-in Hash.
@@ -109,11 +125,11 @@ module Sequel
 
       @new = new_record
       unless @new # determine if it's a new record
-        pk = primary_key
+        k = self.class.primary_key
         # if there's no primary key for the model class, or
         # @values doesn't contain a primary key value, then 
         # we regard this instance as new.
-        @new = (pk == nil) || (!(Array === pk) && !@values[pk])
+        @new = (k == nil) || (!(Array === k) && !@values[k])
       end
     end
     

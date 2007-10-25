@@ -28,7 +28,6 @@ describe Sequel::Model do
 end
 
 describe Sequel::Model, 'w/ primary key' do
-
   it "should default to ':id'" do
     model_a = Class.new Sequel::Model
     model_a.primary_key.should be_equal(:id)
@@ -48,11 +47,9 @@ describe Sequel::Model, 'w/ primary key' do
     model_a = Class.new(Sequel::Model) { set_primary_key [:a, :b] }
     model_a.primary_key.should be_eql([:a, :b])
   end
-
 end
 
 describe Sequel::Model, 'w/o primary key' do
-
   it "should return nil for primary key" do
     Class.new(Sequel::Model) { no_primary_key }.primary_key.should be_nil
   end
@@ -61,7 +58,6 @@ describe Sequel::Model, 'w/o primary key' do
     instance = Class.new(Sequel::Model) { no_primary_key }.new
     proc { instance.this }.should raise_error(SequelError)
   end
-
 end
 
 describe Sequel::Model, 'with this' do
@@ -433,7 +429,9 @@ context "Model attribute accessors" do
     proc {o.xx}.should raise_error(SequelError)
     
     proc {o.x = 3}.should_not raise_error
-    proc {o.yy = 4}.should raise_error
+    proc {o.yy = 4}.should raise_error(SequelError)
+
+    proc {o.yy?}.should raise_error(NoMethodError)
   end
 end
 
@@ -898,3 +896,37 @@ context "Model.one_to_many" do
     a.sql.should == 'SELECT * FROM abc WHERE (node_id = 1234)'
   end
 end
+
+context "Model#pk" do
+  setup do
+    @m = Class.new(Sequel::Model)
+  end
+  
+  specify "should be default return the value of the :id column" do
+    m = @m.new(:id => 111, :x => 2, :y => 3)
+    m.pk.should == 111
+  end
+
+  specify "should be return the primary key value for custom primary key" do
+    @m.set_primary_key :x
+    m = @m.new(:id => 111, :x => 2, :y => 3)
+    m.pk.should == 2
+  end
+
+  specify "should be return the primary key value for composite primary key" do
+    @m.set_primary_key [:y, :x]
+    m = @m.new(:id => 111, :x => 2, :y => 3)
+    m.pk.should == [3, 2]
+  end
+
+  specify "should raise if no primary key" do
+    @m.set_primary_key nil
+    m = @m.new(:id => 111, :x => 2, :y => 3)
+    proc {m.pk}.should raise_error(SequelError)
+
+    @m.no_primary_key
+    m = @m.new(:id => 111, :x => 2, :y => 3)
+    proc {m.pk}.should raise_error(SequelError)
+  end
+end
+
