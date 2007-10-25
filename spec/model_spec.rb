@@ -907,3 +907,36 @@ context "Model#pk" do
   end
 end
 
+context "Model#pk_hash" do
+  setup do
+    @m = Class.new(Sequel::Model)
+  end
+  
+  specify "should be default return the value of the :id column" do
+    m = @m.new(:id => 111, :x => 2, :y => 3)
+    m.pk_hash.should == {:id => 111}
+  end
+
+  specify "should be return the primary key value for custom primary key" do
+    @m.set_primary_key :x
+    m = @m.new(:id => 111, :x => 2, :y => 3)
+    m.pk_hash.should == {:x => 2}
+  end
+
+  specify "should be return the primary key value for composite primary key" do
+    @m.set_primary_key [:y, :x]
+    m = @m.new(:id => 111, :x => 2, :y => 3)
+    m.pk_hash.should == {:y => 3, :x => 2}
+  end
+
+  specify "should raise if no primary key" do
+    @m.set_primary_key nil
+    m = @m.new(:id => 111, :x => 2, :y => 3)
+    proc {m.pk_hash}.should raise_error(SequelError)
+
+    @m.no_primary_key
+    m = @m.new(:id => 111, :x => 2, :y => 3)
+    proc {m.pk_hash}.should raise_error(SequelError)
+  end
+end
+

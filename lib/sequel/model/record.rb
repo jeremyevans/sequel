@@ -45,6 +45,9 @@ module Sequel
         class_def(:pk) do
           @pk ||= @values[key]
         end
+        class_def(:pk_hash) do
+          @pk ||= {key => @values[key]}
+        end
         class_def(:cache_key) do
           pk = @values[key] || (raise SequelError, 'no primary key for this record')
           @cache_key ||= "#{self.class}:#{pk}"
@@ -61,6 +64,10 @@ module Sequel
         block = eval("proc {@pk ||= [#{exp_list.join(',')}]}")
         class_def(:pk, &block)
         
+        exp_list = key.map {|k| "#{k.inspect} => @values[#{k.inspect}]"}
+        block = eval("proc {@this ||= {#{exp_list.join(',')}}}")
+        class_def(:pk_hash, &block)
+        
         exp_list = key.map {|k| '#{@values[%s]}' % k.inspect}.join(',')
         block = eval('proc {@cache_key ||= "#{self.class}:%s"}' % exp_list)
         class_def(:cache_key, &block)
@@ -74,8 +81,9 @@ module Sequel
     def self.no_primary_key #:nodoc:
       meta_def(:primary_key) {nil}
       meta_def(:primary_key_hash) {|v| raise SequelError, "#{self} does not have a primary key"}
-      class_def(:this) {raise SequelError, "No primary key is associated with this model"}
-      class_def(:pk) {raise SequelError, "No primary key is associated with this model"}
+      class_def(:this)      {raise SequelError, "No primary key is associated with this model"}
+      class_def(:pk)        {raise SequelError, "No primary key is associated with this model"}
+      class_def(:pk_hash)   {raise SequelError, "No primary key is associated with this model"}
       class_def(:cache_key) {raise SequelError, "No primary key is associated with this model"}
     end
     
@@ -114,6 +122,11 @@ module Sequel
     # Returns the primary key value identifying the model instance. Stock implementation.
     def pk
       @pk ||= @values[:id]
+    end
+    
+    # Returns a hash identifying the model instance. Stock implementation.
+    def pk_hash
+      @pk_hash ||= {:id => @values[:id]}
     end
     
     # Creates new instance with values set to passed-in Hash.

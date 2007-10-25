@@ -1,5 +1,7 @@
 === SVN
 
+* Implemented Model#pk_hash. Is it really necessary?
+
 * Deprecated Model#pkey. Implemented better Model#pk method.
 
 * Specs and docs for Model.one_to_one, Model.one_to_many macros.
