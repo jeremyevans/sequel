@@ -400,13 +400,6 @@ context "Model attribute accessors" do
         [:id, :x, :y]
       end
     end
-    
-    ds = @c.dataset
-    ds.extend(Module.new {
-      def columns
-        [:id, :x, :y]
-      end
-    })
   end
   
   specify "should be created dynamically" do
@@ -500,11 +493,7 @@ context "Model.subset" do
   setup do
     MODEL_DB.reset
 
-    @c = Class.new(Sequel::Model(:items)) do
-      def columns
-        [:id, :x, :y]
-      end
-    end
+    @c = Class.new(Sequel::Model(:items))
   end
 
   specify "should create a filter on the underlying dataset" do
@@ -530,11 +519,7 @@ context "Model.find" do
   setup do
     MODEL_DB.reset
     
-    @c = Class.new(Sequel::Model(:items)) do
-      def self.columns
-        [:name, :id]
-      end
-    end
+    @c = Class.new(Sequel::Model(:items))
     
     $cache_dataset_row = {:name => 'sharon', :id => 1}
     @dataset = @c.dataset
@@ -568,11 +553,7 @@ context "Model.[]" do
   setup do
     MODEL_DB.reset
     
-    @c = Class.new(Sequel::Model(:items)) do
-      def self.columns
-        [:name, :id]
-      end
-    end
+    @c = Class.new(Sequel::Model(:items))
     
     $cache_dataset_row = {:name => 'sharon', :id => 1}
     @dataset = @c.dataset
@@ -782,10 +763,6 @@ context "Model.one_to_one" do
       
       def update(values)
         $sqls << update_sql(values)
-      end
-      
-      def delete
-        $sqls << delete_sql
       end
     })
   end
