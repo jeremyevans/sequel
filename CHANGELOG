@@ -1,5 +1,7 @@
 === SVN
 
+* Implemented Oracle adapter based on ruby-oci8 library.
+
 * Implemented Model#pk_hash. Is it really necessary?
 
 * Deprecated Model#pkey. Implemented better Model#pk method.
