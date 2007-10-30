@@ -968,5 +968,11 @@ context "A Model constructor" do
     m.should be_new
   end
   
-  specify "should "
+  specify "should accept a block and yield itself to the block" do
+    block_called = false
+    m = @m.new {|i| block_called = true; i.should be_a_kind_of(@m); i.values[:a] = 1}
+    
+    block_called.should be_true
+    m.values[:a].should == 1
+  end
 end

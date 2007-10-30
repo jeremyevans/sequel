@@ -1,6 +1,14 @@
-* postgres spec
+# Model.create / Model.new with a block
+# magic methods (on Dataset): find_by_xxx, filter_by_xxx, order_by_xxx, first_by_xxx, last_by_xxx
+# Smarter one_to_one: stuff like:
 
-* adapter specs for using regexps (postgres and mysql)
+  # assuming the Author's primary key is :name
+  post = Post.create(:name => 'The Lover', :author => Author['A.B. Yehoshua'])
+  post.set(:author => Author['A.B. Yehoshua'])
+  
+  #and also
+  post = Post.create(:name => 'The Lover', :author => 'A.B. Yehoshua') #=> fetches the author record
+  post.set(:author => 'A.B. Yehoshua')
 
 * adapter specs for Model
 

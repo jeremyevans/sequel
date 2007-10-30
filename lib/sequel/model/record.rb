@@ -133,7 +133,7 @@ module Sequel
     #
     # This method guesses whether the record exists when
     # <tt>new_record</tt> is set to false.
-    def initialize(values = {}, new_record = false)
+    def initialize(values = {}, new_record = false, &block)
       @values = values
 
       @new = new_record
@@ -144,6 +144,8 @@ module Sequel
         # we regard this instance as new.
         @new = (k == nil) || (!(Array === k) && !@values[k])
       end
+      
+      block[self] if block
     end
     
     # Returns true if the current instance represents a new record.

@@ -1,3 +1,7 @@
+=== SVN
+
+* Changed Model.create and Model.new to accept a block.
+
 === 0.3.1 (2007-10-30)
 
 * Typo fixes (#79).
