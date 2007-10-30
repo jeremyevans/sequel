@@ -1,5 +1,7 @@
 === SVN
 
+* Fixed ParseTree dependency to work with version 2.0.0 and later (#74).
+
 * foreign_key definitions now accept :key option for specifying the remote key (#73).
 
 * Fixed Model#method_missing to not raise error for columns not in the table but for which a value exists (#77).
