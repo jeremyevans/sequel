@@ -68,6 +68,10 @@ module Sequel
       raise e.is_a?(StandardError) ? e : e.message
     end
     
+    # Removes all connection currently available, optionally yielding each 
+    # connection to the given block. This method has the effect of 
+    # disconnecting from the database. Once a connection is requested using
+    # #hold, the connection pool creates new connections to the database.
     def disconnect(&block)
       @mutex.synchronize do
         @available_connections.each {|c| block[c]} if block
@@ -138,6 +142,8 @@ module Sequel
       raise e.is_a?(StandardError) ? e : e.message
     end
     
+    # Disconnects from the database. Once a connection is requested using
+    # #hold, the connection is reestablished.
     def disconnect(&block)
       block[@conn] if block && @conn
       @conn = nil

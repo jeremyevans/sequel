@@ -97,6 +97,7 @@ module FieldCompositionMethods
   end
 end
 
+# String extensions
 class String
   include FieldCompositionMethods
 end

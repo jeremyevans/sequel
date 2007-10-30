@@ -359,7 +359,6 @@ module Sequel
       # Returns an INNER joined dataset.
       def inner_join(table, expr); join_table(:inner, table, expr); end
       alias join inner_join
-      
 
       # Inserts multiple values. If a block is given it is invoked for each
       # item in the given array before inserting it.

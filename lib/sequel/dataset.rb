@@ -97,7 +97,7 @@ module Sequel
       new_dataset
     end
     
-    def set_options(opts)
+    def set_options(opts) #:nodoc:
       @opts = opts
       @columns = nil
     end
@@ -383,11 +383,11 @@ module Sequel
 
     @@dataset_classes = []
 
-    def self.dataset_classes
+    def self.dataset_classes #:nodoc:
       @@dataset_classes
     end
 
-    def self.inherited(c)
+    def self.inherited(c) #:nodoc:
       @@dataset_classes << c
     end
   end

@@ -1,6 +1,8 @@
 === SVN
 
-* Documentation for ArrayKeys.
+* Removed long deprecated expressions.rb code.
+
+* Better documentation.
 
 * Implemented Dataset magic methods: order_by_xxx, group_by_xxx, filter_by_xxx, all_by_xxx, first_by_xxx, last_by_xxx.
 

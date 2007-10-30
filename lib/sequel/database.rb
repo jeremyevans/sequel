@@ -29,22 +29,28 @@ module Sequel
       @logger = opts[:logger]
     end
     
+    # Connects to the database. This method should be overriden by descendants.
     def connect
       raise NotImplementedError, "#connect should be overriden by adapters"
     end
     
+    # Disconnects from the database. This method should be overriden by 
+    # descendants.
     def disconnect
       raise NotImplementedError, "#disconnect should be overriden by adapters"
     end
     
+    # Returns true if the database is using a multi-threaded connection pool.
     def multi_threaded?
       !@single_threaded
     end
     
+    # Returns true if the database is using a single-threaded connection pool.
     def single_threaded?
       @single_threaded
     end
     
+    # Returns the URI identifying the database.
     def uri
       uri = URI::Generic.new(
         self.class.adapter_scheme.to_s,
@@ -68,6 +74,25 @@ module Sequel
       ds = Sequel::Dataset.new(self)
     end
     
+    # Fetches records for an arbitrary SQL statement. If a block is given,
+    # it is used to iterate over the records:
+    #
+    #   DB.fetch('SELECT * FROM items') {|r| p r}
+    #
+    # If a block is not given, the method returns a dataset instance:
+    #
+    #   DB.fetch('SELECT * FROM items').print
+    #
+    # Fetch can also perform parameterized queries for protection against SQL
+    # injection:
+    #
+    #   DB.fetch('SELECT * FROM items WHERE name = ?', my_name).print
+    #
+    # A short-hand form for Database#fetch is Database#[]:
+    #
+    #   DB['SELECT * FROM items'] {|r| p r}
+    #
+    # 
     def fetch(sql, *args, &block)
       ds = dataset
       sql = sql.gsub('?') {|m|  ds.literal(args.shift)}
@@ -97,10 +122,22 @@ module Sequel
     # Returns a new dataset with the select method invoked.
     def select(*args); dataset.select(*args); end
     
+    # Returns a dataset from the database. If the first argument is a string,
+    # the method acts as an alias for Database#fetch, returning a dataset for
+    # arbitrary SQL:
+    #
+    #   DB['SELECT * FROM items WHERE name = ?', my_name].print
+    #
+    # Otherwise, the dataset returned has its from option set to the given
+    # arguments:
+    #
+    #   DB[:items].sql #=> "SELECT * FROM items"
+    #
     def [](*args)
       (String === args.first) ? fetch(*args) : from(*args)
     end
-    
+
+    # Raises a NotImplementedError. This method is overriden in descendants.
     def execute(sql)
       raise NotImplementedError
     end
@@ -142,13 +179,12 @@ module Sequel
       create_table_sql_list(*g.create_info).each {|sta| execute(sta)}
     end
     
-    # Drops a table.
+    # Drops one or more tables corresponding to the given table names.
     def drop_table(*names)
       execute(names.map {|n| drop_table_sql(n)}.join)
     end
     
-    # Performs a brute-force check for the existance of a table. This method is
-    # usually overriden in descendants.
+    # Returns true if the given table exists.
     def table_exists?(name)
       if respond_to?(:tables)
         tables.include?(name.to_sym)
@@ -257,6 +293,7 @@ module Sequel
     
     @@single_threaded = false
     
+    # Sets the default single_threaded mode for new databases.
     def self.single_threaded=(value)
       @@single_threaded = value
     end

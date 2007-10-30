@@ -154,15 +154,15 @@ class Sequel::Dataset
       end
     end
     
-    def fcall_expr(e, b)
+    def fcall_expr(e, b) #:nodoc:
       ext_expr(e, b)
     end
     
-    def vcall_expr(e, b)
+    def vcall_expr(e, b) #:nodoc:
       eval(e[1].to_s, b)
     end
     
-    def iter_expr(e, b)
+    def iter_expr(e, b) #:nodoc:
       if e[1] == [:fcall, :proc]
         eval_expr(e[3], b) # inline proc
       else
@@ -223,7 +223,7 @@ class Sequel::Dataset
       end
     end
     
-    def pt_expr(e, b)
+    def pt_expr(e, b) #:nodoc:
       case e[0]
       when :not # negation: !x, (x != y), (x !~ y)
         if (e[1][0] == :lit) && (Symbol === e[1][1])

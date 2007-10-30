@@ -216,7 +216,7 @@ module Sequel
         end
       end
       
-      module QueryBlockCopy
+      module QueryBlockCopy #:nodoc:
         def each(*args); raise SequelError, "#each cannot be invoked inside a query block."; end
         def insert(*args); raise SequelError, "#insert cannot be invoked inside a query block."; end
         def update(*args); raise SequelError, "#update cannot be invoked inside a query block."; end
@@ -245,6 +245,8 @@ module Sequel
       
       MUTATION_RE = /^(.+)!$/.freeze
 
+      # Provides support for mutation methods (filter!, order!, etc.) and magic
+      # methods.
       def method_missing(m, *args, &block)
         if m.to_s =~ MUTATION_RE
           m = $1.to_sym
@@ -253,7 +255,7 @@ module Sequel
           super if copy.class != self.class
           @opts.merge!(copy.opts)
           self
-        elsif magic_method_missing(m, *args)
+        elsif magic_method_missing(m)
           send(m, *args)
         else
            super
@@ -270,7 +272,9 @@ module Sequel
         /^group_by_(.+)$/   => proc {|c| proc {group(c)}}
       }
 
-      def magic_method_missing(m, *args)
+      # Checks if the given method name represents a magic method and 
+      # defines it. Otherwise, nil is returned.
+      def magic_method_missing(m)
         method_name = m.to_s
         MAGIC_METHODS.each_pair do |r, p|
           if method_name =~ r
