@@ -5,6 +5,15 @@ end
 require 'win32ole'
 
 module Sequel
+  # The ADO adapter provides connectivity to ADO databases in Windows. ADO
+  # databases can be opened using a URL with the ado schema:
+  #
+  #   DB = Sequel.open('ado://mydb')
+  # 
+  # or using the Sequel.ado method:
+  #
+  #   DB = Sequel.ado('mydb')
+  #
   module ADO
     class Database < Sequel::Database
       set_adapter_scheme :ado

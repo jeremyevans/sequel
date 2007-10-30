@@ -1,4 +1,3 @@
-# magic methods (on Dataset): find_by_xxx, filter_by_xxx, order_by_xxx, first_by_xxx, last_by_xxx
 # Smarter one_to_one: stuff like:
 
   # assuming the Author's primary key is :name
