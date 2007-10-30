@@ -1,5 +1,7 @@
 === 0.3.1 (2007-10-30)
 
+* Added require 'yaml' to dataset.rb (#78).
+
 * Changed postgres adapter to use the ruby-postgres library's type conversion if available (#76).
 
 * Fixed string literalization in mysql adapter for strings with comment backslashes in them (#75).

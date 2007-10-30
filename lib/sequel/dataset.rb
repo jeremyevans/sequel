@@ -1,5 +1,6 @@
 require 'time'
 require 'date'
+require 'yaml'
 
 require File.join(File.dirname(__FILE__), 'dataset/sql')
 require File.join(File.dirname(__FILE__), 'dataset/sequelizer')
