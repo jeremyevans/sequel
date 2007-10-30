@@ -976,3 +976,62 @@ context "A Model constructor" do
     m.values[:a].should == 1
   end
 end
+
+context "Model magic methods" do
+  setup do
+    @c = Class.new(Sequel::Dataset) do
+      @@sqls = []
+    
+      def self.sqls; @@sqls; end
+    
+      def fetch_rows(sql)
+        @@sqls << sql
+        yield({:id => 123, :name => 'hey'})
+      end
+    end
+  
+    @m = Class.new(Sequel::Model(@c.new(nil).from(:items)))
+  end
+  
+  specify "should support order_by_xxx" do
+    @m.order_by_name.should be_a_kind_of(@c)
+    @m.order_by_name.sql.should == "SELECT * FROM items ORDER BY name"
+  end
+
+  specify "should support group_by_xxx" do
+    @m.group_by_name.should be_a_kind_of(@c)
+    @m.group_by_name.sql.should == "SELECT * FROM items GROUP BY name"
+  end
+
+  specify "should support filter_by_xxx" do
+    @m.filter_by_name('sharon').should be_a_kind_of(@c)
+    @m.filter_by_name('sharon').sql.should == "SELECT * FROM items WHERE (name = 'sharon')"
+  end
+  
+  specify "should support all_by_xxx" do
+    all = @m.all_by_name('sharon')
+    all.class.should == Array
+    all.size.should == 1
+    all.first.should be_a_kind_of(@m)
+    all.first.values.should == {:id => 123, :name => 'hey'}
+    @c.sqls.should == ["SELECT * FROM items WHERE (name = 'sharon')"]
+  end
+  
+  specify "should support find_by_xxx" do
+    @m.find_by_name('sharon').should be_a_kind_of(@m)
+    @m.find_by_name('sharon').values.should == {:id => 123, :name => 'hey'}
+    @c.sqls.should == ["SELECT * FROM items WHERE (name = 'sharon') LIMIT 1"] * 2
+  end
+
+  specify "should support first_by_xxx" do
+    @m.first_by_name('sharon').should be_a_kind_of(@m)
+    @m.first_by_name('sharon').values.should == {:id => 123, :name => 'hey'}
+    @c.sqls.should == ["SELECT * FROM items ORDER BY name LIMIT 1"] * 2
+  end
+
+  specify "should support last_by_xxx" do
+    @m.last_by_name('sharon').should be_a_kind_of(@m)
+    @m.last_by_name('sharon').values.should == {:id => 123, :name => 'hey'}
+    @c.sqls.should == ["SELECT * FROM items ORDER BY name DESC LIMIT 1"] * 2
+  end
+end

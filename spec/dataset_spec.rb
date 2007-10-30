@@ -2079,3 +2079,76 @@ context "Dataset#each_hash" do
     hashes.should == [{:a => 1, :b => 2, :c => 3}, {:a => 4, :b => 5, :c => 6}]
   end
 end
+
+context "Dataset magic methods" do
+  setup do
+    @c = Class.new(Sequel::Dataset) do
+      @@sqls = []
+      
+      def self.sqls; @@sqls; end
+      
+      def fetch_rows(sql)
+        @@sqls << sql
+        yield({:a => 1, :b => 2})
+      end
+    end
+    
+    @ds = @c.new(nil).from(:items)
+  end
+  
+  specify "should support order_by_xxx" do
+    @ds.should_not respond_to(:order_by_name)
+    proc {@ds.order_by_name}.should_not raise_error
+    @ds.should respond_to(:order_by_name)
+    @ds.order_by_name.should be_a_kind_of(@c)
+    @ds.order_by_name.sql.should == "SELECT * FROM items ORDER BY name"
+  end
+
+  specify "should support group_by_xxx" do
+    @ds.should_not respond_to(:group_by_name)
+    proc {@ds.group_by_name}.should_not raise_error
+    @ds.should respond_to(:group_by_name)
+    @ds.group_by_name.should be_a_kind_of(@c)
+    @ds.group_by_name.sql.should == "SELECT * FROM items GROUP BY name"
+  end
+
+  specify "should support filter_by_xxx" do
+    @ds.should_not respond_to(:filter_by_name)
+    proc {@ds.filter_by_name('sharon')}.should_not raise_error
+    @ds.should respond_to(:filter_by_name)
+    @ds.filter_by_name('sharon').should be_a_kind_of(@c)
+    @ds.filter_by_name('sharon').sql.should == "SELECT * FROM items WHERE (name = 'sharon')"
+  end
+  
+  specify "should support all_by_xxx" do
+    @ds.should_not respond_to(:all_by_name)
+    proc {@ds.all_by_name('sharon')}.should_not raise_error
+    @ds.should respond_to(:all_by_name)
+    @ds.all_by_name('sharon').should == [{:a => 1, :b => 2}]
+    @c.sqls.should == ["SELECT * FROM items WHERE (name = 'sharon')"] * 2
+  end
+  
+  specify "should support find_by_xxx" do
+    @ds.should_not respond_to(:find_by_name)
+    proc {@ds.find_by_name('sharon')}.should_not raise_error
+    @ds.should respond_to(:find_by_name)
+    @ds.find_by_name('sharon').should == {:a => 1, :b => 2}
+    @c.sqls.should == ["SELECT * FROM items WHERE (name = 'sharon') LIMIT 1"] * 2
+  end
+
+  specify "should support first_by_xxx" do
+    @ds.should_not respond_to(:first_by_name)
+    proc {@ds.first_by_name('sharon')}.should_not raise_error
+    @ds.should respond_to(:first_by_name)
+    @ds.first_by_name('sharon').should == {:a => 1, :b => 2}
+    @c.sqls.should == ["SELECT * FROM items ORDER BY name LIMIT 1"] * 2
+  end
+
+  specify "should support last_by_xxx" do
+    @ds.should_not respond_to(:last_by_name)
+    proc {@ds.last_by_name('sharon')}.should_not raise_error
+    @ds.should respond_to(:last_by_name)
+    @ds.last_by_name('sharon').should == {:a => 1, :b => 2}
+    @c.sqls.should == ["SELECT * FROM items ORDER BY name DESC LIMIT 1"] * 2
+  end
+end

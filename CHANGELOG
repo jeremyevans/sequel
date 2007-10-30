@@ -1,5 +1,7 @@
 === SVN
 
+* Implemented Dataset magic methods: order_by_xxx, group_by_xxx, filter_by_xxx, all_by_xxx, first_by_xxx, last_by_xxx.
+
 * Changed Model.create and Model.new to accept a block.
 
 === 0.3.1 (2007-10-30)

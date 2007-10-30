@@ -282,24 +282,18 @@ module Sequel
     def self.delete_all
       dataset.delete
     end
-
-    FIND_BY_REGEXP = /^find_by_(.*)/.freeze
-    FILTER_BY_REGEXP = /^filter_by_(.*)/.freeze
-    ALL_BY_REGEXP = /^all_by_(.*)/.freeze
-
+    
+    def self.is_dataset_magic_method?(m)
+      method_name = m.to_s
+      Sequel::Dataset::MAGIC_METHODS.each_key do |r|
+        return true if method_name =~ r
+      end
+      false
+    end
+    
     def self.method_missing(m, *args, &block) #:nodoc:
       Thread.exclusive do
-        method_name = m.to_s
-        if method_name =~ FIND_BY_REGEXP
-          c = $1.to_sym
-          meta_def(method_name) {|arg| find(c => arg)}
-        elsif method_name =~ FILTER_BY_REGEXP
-          c = $1.to_sym
-          meta_def(method_name) {|arg| filter(c => arg)}
-        elsif method_name =~ ALL_BY_REGEXP
-          c = $1.to_sym
-          meta_def(method_name) {|arg| filter(c => arg).all}
-        elsif dataset.respond_to?(m)
+        if dataset.respond_to?(m) || is_dataset_magic_method?(m)
           instance_eval("def #{m}(*args, &block); dataset.#{m}(*args, &block); end")
         end
       end
