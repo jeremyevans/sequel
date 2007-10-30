@@ -1,5 +1,7 @@
 === SVN
 
+* Fixed string literalization in mysql adapter (#75).
+
 * Fixed ParseTree dependency to work with version 2.0.0 and later (#74).
 
 * foreign_key definitions now accept :key option for specifying the remote key (#73).

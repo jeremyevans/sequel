@@ -134,6 +134,13 @@ context "A MySQL dataset" do
     @d.filter(:name => /bc/).count.should == 2
     @d.filter(:name => /^bc/).count.should == 1
   end
+  
+  specify "should correctly literalize strings with comment backslashes in them" do
+    @d.delete
+    proc {@d << {:name => ':\\'}}.should_not raise_error
+    
+    @d.first[:name].should == ':\\'
+  end
 end
 
 context "A MySQL dataset in array tuples mode" do

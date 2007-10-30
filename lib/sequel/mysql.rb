@@ -197,6 +197,7 @@ module Sequel
       def literal(v)
         case v
         when LiteralString: quoted_field_name(v)
+        when String: "'#{v.gsub(/'|\\/, '\&\&')}'"
         when true: TRUE
         when false: FALSE
         else
