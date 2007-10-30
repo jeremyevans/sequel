@@ -137,6 +137,13 @@ module Sequel
       1114 => :to_time
     }
 
+    if PGconn.respond_to?(:translate_results=)
+      PGconn.translate_results = true
+      AUTO_TRANSLATE = true
+    else
+      AUTO_TRANSLATE = false
+    end
+
     class Database < Sequel::Database
       set_adapter_scheme :postgres
     
@@ -433,7 +440,7 @@ module Sequel
           next if used_fields.include?(field)
           used_fields << field
         
-          if translator = translators[idx]
+          if !AUTO_TRANSLATE and translator = translators[idx]
             kvs << ":\"#{field}\" => ((t = r[#{idx}]) ? t.#{translator} : nil)"
           else
             kvs << ":\"#{field}\" => r[#{idx}]"
@@ -475,7 +482,7 @@ module Sequel
       def array_tuples_compile_converter(fields, translators)
         tr = []
         fields.each_with_index do |field, idx|
-          if t = translators[idx]
+          if !AUTO_TRANSLATE and t = translators[idx]
             tr << "if (v = r[#{idx}]); r[#{idx}] = v.#{t}; end"
           end
         end

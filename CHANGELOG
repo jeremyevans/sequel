@@ -1,6 +1,8 @@
 === SVN
 
-* Fixed string literalization in mysql adapter (#75).
+* Changed postgres adapter to use the ruby-postgres library's type conversion if available (#76).
+
+* Fixed string literalization in mysql adapter for strings with comment backslashes in them (#75).
 
 * Fixed ParseTree dependency to work with version 2.0.0 and later (#74).
 
