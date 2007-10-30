@@ -104,6 +104,19 @@ context "DB#create_table" do
     @db.sqls.should == ["CREATE TABLE cats (project_id integer REFERENCES projects);"]
   end
   
+  specify "should accept foreign keys with arbitrary keys" do
+    @db.create_table(:cats) do
+      foreign_key :project_id, :table => :projects, :key => :id
+    end
+    @db.sqls.should == ["CREATE TABLE cats (project_id integer REFERENCES projects(id));"]
+
+    @db.sqls.clear
+    @db.create_table(:cats) do
+      foreign_key :project_id, :table => :projects, :key => :zzz
+    end
+    @db.sqls.should == ["CREATE TABLE cats (project_id integer REFERENCES projects(zzz));"]
+  end
+  
   specify "should accept foreign keys with ON DELETE clause" do
     @db.create_table(:cats) do
       foreign_key :project_id, :table => :projects, :on_delete => :restrict

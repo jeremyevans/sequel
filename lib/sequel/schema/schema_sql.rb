@@ -40,7 +40,10 @@ module Sequel
         sql << NOT_NULL if column[:null] == false
         sql << " DEFAULT #{literal(column[:default])}" if column.include?(:default)
         sql << PRIMARY_KEY if column[:primary_key]
-        sql << " REFERENCES #{column[:table]}" if column[:table]
+        if column[:table]
+          sql << " REFERENCES #{column[:table]}"
+          sql << "(#{column[:key]})" if column[:key]
+        end
         sql << " ON DELETE #{on_delete_clause(column[:on_delete])}" if column[:on_delete]
         sql << " #{auto_increment_sql}" if column[:auto_increment]
         sql
