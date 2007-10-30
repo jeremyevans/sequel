@@ -79,11 +79,20 @@ module Sequel
   # 
   #   post = Post.create(:title => 'hello world')
   # 
-  # You can also create a new instance and save it:
+  # Another way is to construct a new instance and save it:
   # 
   #   post = Post.new
   #   post.title = 'hello world'
   #   post.save
+  # 
+  # You can also supply a block to Model.new and Model.create:
+  # 
+  #   post = Post.create {|p| p.title = 'hello world'}
+  # 
+  #   post = Post.new do |p|
+  #     p.title = 'hello world'
+  #     p.save
+  #   end
   # 
   # === Hooks
   # 
@@ -127,11 +136,14 @@ module Sequel
   #     def posts; Post.filter(:author_id => pk); end
   #   end
   # 
-  # Sequel also provides two macros to assist with common types of associations. The one_to_one macro is roughly equivalent to ActiveRecord's belongs_to macro:
+  # Sequel also provides two macros to assist with common types of associations. The one_to_one macro is roughly equivalent to ActiveRecord?'s belongs_to macro. It defines both getter and setter methods for the association:
   # 
   #   class Post < Sequel::Model(:posts)
   #     one_to_one :author, :from => Author
   #   end
+  #
+  #   post = Post.create(:name => 'hi!')
+  #   post.author = Author[:name => 'Sharon']
   # 
   # The one_to_many macro is roughly equivalent to ActiveRecord's has_many macro:
   # 
