@@ -1,5 +1,9 @@
 === SVN
 
+* Fixed Model#method_missing to not raise error for columns not in the table but for which a value exists (#77).
+
+* New documentation for Model.
+
 * Implemented Oracle adapter based on ruby-oci8 library.
 
 * Implemented Model#pk_hash. Is it really necessary?

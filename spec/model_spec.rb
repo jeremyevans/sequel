@@ -426,6 +426,23 @@ context "Model attribute accessors" do
 
     proc {o.yy?}.should raise_error(NoMethodError)
   end
+  
+  specify "should not raise for a column not in the dataset, but for which there's a value" do
+    o = @c.new
+    
+    proc {o.xx}.should raise_error(SequelError)
+    proc {o.yy}.should raise_error(SequelError)
+    
+    o.values[:xx] = 123
+    o.values[:yy] = nil
+    
+    proc {o.xx; o.yy}.should_not raise_error(SequelError)
+    
+    o.xx.should == 123
+    o.yy.should == nil
+    
+    proc {o.xx = 3}.should raise_error(SequelError)
+  end
 end
 
 context "Model#new?" do
@@ -940,3 +957,16 @@ context "Model#pk_hash" do
   end
 end
 
+context "A Model constructor" do
+  setup do
+    @m = Class.new(Sequel::Model)
+  end
+
+  specify "should accept a hash" do
+    m = @m.new(:a => 1, :b => 2)
+    m.values.should == {:a => 1, :b => 2}
+    m.should be_new
+  end
+  
+  specify "should "
+end

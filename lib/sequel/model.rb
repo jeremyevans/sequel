@@ -1,154 +1,217 @@
 module Sequel
-  # == Cheatsheet:
-  #   class Item < Sequel::Model(:items)
+  # == Sequel Models
+  # 
+  # Models in Sequel are based on the Active Record pattern described by Martin Fowler (http://www.martinfowler.com/eaaCatalog/activeRecord.html). A model class corresponds to a table or a dataset, and an instance of that class wraps a single record in the model's underlying dataset.
+  # 
+  # Model classes are defined as regular Ruby classes:
+  # 
+  #   DB = Sequel('sqlite:/blog.db')
+  #   class Post < Sequel::Model
+  #     set_dataset DB[:posts]
+  #   end
+  # 
+  # You can also use the shorthand form:
+  # 
+  #   DB = Sequel('sqlite:/blog.db')
+  #   class Post < Sequel::Model(:posts)
+  #   end
+  # 
+  # === Model instances
+  # 
+  # Model instance are identified by a primary key. By default, Sequel assumes the primary key column to be :id. The Model#[] method can be used to fetch records by their primary key:
+  # 
+  #   post = Post[123]
+  # 
+  # The Model#pk method is used to retrieve the record's primary key value:
+  # 
+  #   post.pk #=> 123
+  # 
+  # Sequel models allow you to use any column as a primary key, and even composite keys made from multiple columns:
+  # 
+  #   class Post < Sequel::Model(:posts)
+  #     set_primary_key [:category, :title]
+  #   end
+  # 
+  #   post = Post['ruby', 'hello world']
+  #   post.pk #=> ['ruby', 'hello world']
+  # 
+  # You can also define a model class that does not have a primary key, but then you lose the ability to update records.
+  # 
+  # A model instance can also be fetched by specifying a condition:
+  # 
+  #   post = Post[:title => 'hello world']
+  #   post = Post.find {:stamp < 10.days.ago}
+  # 
+  # === Iterating over records
+  # 
+  # A model class lets you iterate over specific records by acting as a proxy to the underlying dataset. This means that you can use the entire Dataset API to create customized queries that return model instances, e.g.:
+  # 
+  #   Post.filter(:category => 'ruby').each {|post| p post}
+  # 
+  # You can also manipulate the records in the dataset:
+  # 
+  #   Post.filter {:stamp < 7.days.ago}.delete
+  #   Post.filter {:title =~ /ruby/}.update(:category => 'ruby')
+  # 
+  # === Accessing record values
+  # 
+  # A model instances stores its values as a hash:
+  # 
+  #   post.values #=> {:id => 123, :category => 'ruby', :title => 'hello world'}
+  # 
+  # You can read the record values as object attributes:
+  # 
+  #   post.id #=> 123
+  #   post.title #=> 'hello world'
+  # 
+  # You can also change record values:
+  # 
+  #   post.title = 'hey there'
+  #   post.save
+  # 
+  # Another way to change values by using the #set method:
+  # 
+  #   post.set(:title => 'hey there')
+  # 
+  # === Creating new records
+  # 
+  # New records can be created by calling Model.create:
+  # 
+  #   post = Post.create(:title => 'hello world')
+  # 
+  # You can also create a new instance and save it:
+  # 
+  #   post = Post.new
+  #   post.title = 'hello world'
+  #   post.save
+  # 
+  # === Hooks
+  # 
+  # You can execute custom code when creating, updating, or deleting records by using hooks. The before_create and after_create hooks wrap record creation. The before_update and after_update wrap record updating. The before_save and after_save wrap record creation and updating. The before_destroy and after_destroy wrap destruction.
+  # 
+  # Hooks are defined by supplying a block:
+  # 
+  #   class Post < Sequel::Model(:posts)
+  #     after_create do
+  #       set(:created_at => Time.now)
+  #     end
+  # 
+  #     after_destroy
+  #       author.update_post_count
+  #     end
+  #   end
+  # 
+  # === Deleting records
+  # 
+  # You can delete individual records by calling #delete or #destroy. The only difference between the two methods is that #destroy invokes before_destroy and after_destroy hooks, while #delete does not:
+  # 
+  #   post.delete #=> bypasses hooks
+  #   post.destroy #=> runs hooks
+  # 
+  # Records can also be deleted en-masse by invoking Model.delete and Model.destroy. As stated above, you can specify filters for the deleted records:
+  # 
+  #   Post.filter(:category => 32).delete #=> bypasses hooks
+  #   Post.filter(:category => 32).destroy #=> runs hooks
+  # 
+  # Please note that if Model.destroy is called, each record is deleted separately, but Model.delete deletes all relevant records with a single SQL statement.
+  # 
+  # === Associations
+  # 
+  # The most straightforward way to define an association in a Sequel model is as a regular instance method:
+  # 
+  #   class Post < Sequel::Model(:posts)
+  #     def author; Author[author_id]; end
+  #   end
+  # 
+  #   class Author < Sequel::Model(:authors)
+  #     def posts; Post.filter(:author_id => pk); end
+  #   end
+  # 
+  # Sequel also provides two macros to assist with common types of associations. The one_to_one macro is roughly equivalent to ActiveRecord's belongs_to macro:
+  # 
+  #   class Post < Sequel::Model(:posts)
+  #     one_to_one :author, :from => Author
+  #   end
+  # 
+  # The one_to_many macro is roughly equivalent to ActiveRecord's has_many macro:
+  # 
+  #   class Author < Sequel::Model(:authors)
+  #     one_to_many :posts, :from => Post, :key => :author_id
+  #   end
+  # 
+  # You will have noticed that in some cases the association macros are actually more verbose than hand-coding instance methods. The one_to_one and one_to_many macros also make assumptions (just like ActiveRecord macros) about the database schema which may not be relevant in many cases.
+  # 
+  # === Caching model instances with memcached
+  # 
+  # Sequel models can be cached using memcached based on their primary keys. The use of memcached can significantly reduce database load by keeping model instances in memory. The set_cache method is used to specify caching:
+  # 
+  #   require 'memcache'
+  #   CACHE = MemCache.new 'localhost:11211', :namespace => 'blog'
+  # 
+  #   class Author < Sequel::Model(:authors)
+  #     set_cache CACHE, :ttl => 3600
+  #   end
+  # 
+  #   Author[333] # database hit
+  #   Author[333] # cache hit
+  # 
+  # === Extending the underlying dataset
+  # 
+  # The obvious way to add table-wide logic is to define class methods to the model class definition. That way you can define subsets of the underlying dataset, change the ordering, or perform actions on multiple records:
+  # 
+  #   class Post < Sequel::Model(:posts)
+  #     def self.old_posts
+  #       filter {:stamp < 30.days.ago}
+  #     end
+  # 
+  #     def self.clean_old_posts
+  #       old_posts.delete
+  #     end
+  #   end
+  # 
+  # You can also implement table-wide logic by defining methods on the dataset:
+  # 
+  #   class Post < Sequel::Model(:posts)
+  #     def dataset.old_posts
+  #       filter {:stamp < 30.days.ago}
+  #     end
+  # 
+  #     def dataset.clean_old_posts
+  #       old_posts.delete
+  #     end
+  #   end
+  # 
+  # This is the recommended way of implementing table-wide operations, and allows you to have access to your model API from filtered datasets as well:
+  # 
+  #   Post.filter(:category => 'ruby').clean_old_posts
+  # 
+  # Sequel models also provide a short hand notation for filters:
+  # 
+  #   class Post < Sequel::Model(:posts)
+  #     subset(:old_posts) {:stamp < 30.days.ago}
+  #     subset :invisible, :visible => false
+  #   end
+  # 
+  # === Defining the underlying schema
+  # 
+  # Model classes can also be used as a place to define your table schema and control it. The schema DSL is exactly the same provided by Sequel::Schema::Generator:
+  # 
+  #   class Post < Sequel::Model(:posts)
   #     set_schema do
   #       primary_key :id
-  #       text :name, :unique => true, :null => false
-  #       boolean :active, :default => true
-  #       integer :grade
-  #
-  #       index :grade
+  #       text :title
+  #       text :category
+  #       foreign_key :author_id, :table => authors
   #     end
   #   end
-  #
-  #   Item.create_table unless Item.table_exists?
-  #   Item.create_table!
-  #
-  #   i = Item.create(:name => 'Shoes', :grade => 0)
-  #
-  #   Item[1].grade #=> 0
-  #
-  #   i.set(:grade => 2)
-  #   i.grade # => 2
-  #
-  #   Item[:name => 'Shoes'].grade # => 2
-  #
-  #   i.grade = 4
-  #   Item[1].grade # => 2
-  #   i.save
-  #   Item[1].grade # => 4
-  #
-  # == Subsets
-  # Subsets are filter mapped to class methods:
-  #
-  #   class Ticket < Sequel::Model(:tickets)
-  #
-  #     subset(:pending) { finished_at == nil }
-  #     subset(:closed)  { finished_at != nil }
-  #
-  #     # ...
-  #
-  #   end
-  #
-  # Now you can do:
-  #
-  #   Ticket.pending.each { |ticket| puts ticket.caption }
-  #
-  # == Advanced filtering methods (or dataset magic)
-  # One of the cool features of Sequel::Model is that it acts as a proxy to
-  # the underlying dataset, so you can invoke methods on the class instead of
-  # on the dataset:
-  #
-  #   Customer.filter(:name =~ 'Roberts')
-  #
-  # In the prevailing style of implementing models (which is actually very
-  # similar to ActiveRecord models) table-wide operations are defined as
-  # class methods:
-  #
-  #   class Node < Sequel::Model(:nodes)
-  #     def self.subtree(path)
-  #       filter(:path => Regexp.new("^#{path}(/.+)?$"))
-  #     end
-  #     def self.alarms
-  #       filter {:kind => ALARM}
-  #     end
-  #     def self.recalculate
-  #       exclude(:expression => nil).each {|n| n.calculate}
-  #     end
-  #   end
-  #
-  # The recalculate class method calls the exclude method. The exclude
-  # call is proxied to the underlying dataset, which lets you call each
-  # method separately:
-  #
-  #   Node.subtree('/test')
-  #   Node.alarms
-  #   Node.recalculate
-  #
-  # ... but this will raise a NoMethodError:
-  #
-  #   Node.subtree('/test').alarms.recalculate
-  #
-  # It turns out the solution is very simple - instead of defining class
-  # methods, define dataset methods:
-  #
-  #   class Node < Sequel::Model(:nodes)
-  #     def dataset.subtree(path)
-  #       filter(:path => Regexp.new("^#{path}(/.+)?$"))
-  #     end
-  #     def dataset.alarms
-  #       filter {:kind => ALARM}
-  #     end
-  #     def dataset.recalculate
-  #       exclude(:expression => nil).each {|n| n.calculate}
-  #     end
-  #   end
-  #
-  # Now you can mix all of these methods any way you like:
-  #
-  #   Node.filter {:stamp < Time.now < 3600}.alarms
-  #   Node.filter(:project_id => 123).subtree('/abc')
-  #   Node.subtree('/test').recalculate
-  #   # ...
-  #
-  # == Schemas
-  # You can define your schema in the Model class itself:
-  #
-  #   class Comment < Sequel::Model(:comments)
-  #     set_schema do
-  #       primary_key :id
-  #       foreign_key :post_id, :table => :posts, :on_delete => :cascade
-  #
-  #       varchar :name
-  #       varchar :email
-  #       text :comment
-  #     end
-  #
-  #     # ...
-  #
-  #   end
-  #
-  # == Hooks
-  # You can setup hooks here:
-  # * before_save calls either
-  # * before_create with
-  # * after_create or if record already exists
-  # * before_update with
-  # * after_update and finally
-  # * after_save
-  # ... and here:
-  # * before_destroy with
-  # * after_destroy
-  #
-  # ...with:
-  #
-  #   class Example < Sequel::Model(:hooks)
-  #     before_create { self.created_at = Time.now }
-  #
-  #     # ...
-  #   end
-  #
-  # == Serialization of complexe attributes
-  # Sometimes there are datatypes you can't natively map to your db. In this
-  # case you can just do serialize:
-  #
-  #   class Serialized < Sequel::Model(:serialized)
-  #     serialize :column1, :format => :yaml    # YAML is the default serialization method
-  #     serialize :column2, :format => :marshal # serializes through marshalling
-  #
-  #     # ...
-  #
-  #   end
+  # 
+  # You can then create the underlying table, drop it, or recreate it:
+  # 
+  #   Post.table_exists?
+  #   Post.create_table
+  #   Post.drop_table
+  #   Post.create_table! # drops the table if it exists and then recreates it
+  # 
   class Model
     alias_method :model, :class
   end

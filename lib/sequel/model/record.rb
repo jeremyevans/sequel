@@ -216,8 +216,14 @@ module Sequel
         att = $1.to_sym
         write = $2 == '='
         
-        # check wether the column is legal
+        # check whether the column is legal
         unless columns.include?(att)
+          # if read accessor and a value exists for the column, we return it
+          if !write && @values.has_key?(att)
+            return @values[att]
+          end
+          
+          # otherwise, raise an error
           raise SequelError, "Invalid column (#{att.inspect}) for #{self}"
         end
 
