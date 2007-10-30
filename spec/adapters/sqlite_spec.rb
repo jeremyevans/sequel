@@ -264,9 +264,9 @@ context "An SQLite dataset in array tuples mode" do
     @d << {:name => 'abc', :value => 4.56}
     @d << {:name => 'def', :value => 7.89}
     @d.select(:name, :value).to_a.sort_by {|h| h[:value]}.should == [
-      Array.from_hash({:name => 'abc', :value => 1.23}),
-      Array.from_hash({:name => 'abc', :value => 4.56}),
-      Array.from_hash({:name => 'def', :value => 7.89})
+      ['abc', 1.23],
+      ['abc', 4.56],
+      ['def', 7.89]
     ]
   end
 end  
