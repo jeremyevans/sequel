@@ -265,7 +265,7 @@ context "Database#table_exists?" do
     @db.table_exists?(:c).should be_false
   end
   
-  specify "should otherise try to select the first record from the table's dataset" do
+  specify "should otherwise try to select the first record from the table's dataset" do
     @db2.table_exists?(:a).should be_false
     @db2.table_exists?(:b).should be_true
   end

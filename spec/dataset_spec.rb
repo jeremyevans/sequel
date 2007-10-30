@@ -441,7 +441,7 @@ context "Dataset#exclude" do
       "SELECT * FROM test WHERE (NOT (region = 'Asia' AND name = 'Japan'))"
   end
 
-  specify "should corrently parenthesize when it is used twice" do
+  specify "should correctly parenthesize when it is used twice" do
     @dataset.exclude(:region => 'Asia').exclude(:name => 'Japan').select_sql.should ==
       "SELECT * FROM test WHERE (NOT (region = 'Asia')) AND (NOT (name = 'Japan'))"
   end
@@ -874,7 +874,7 @@ context "Dataset#count" do
     @dataset = @c.new(nil).from(:test)
   end
   
-  specify "should format SQL propertly" do
+  specify "should format SQL properly" do
     @dataset.count.should == 1
     @c.sql.should == 'SELECT COUNT(*) FROM test'
   end
@@ -934,7 +934,7 @@ context "Dataset#join_table" do
       'SELECT * FROM items INNER JOIN b ON (b.items_id = items.id) LEFT OUTER JOIN c ON (c.b_id = b.id)'
   end
   
-  specify "should use id as implicit relation primary key if ommited" do
+  specify "should use id as implicit relation primary key if omitted" do
     @d.join_table(:left_outer, :categories, :category_id).sql.should ==
       @d.join_table(:left_outer, :categories, :category_id => :id).sql
 
@@ -1741,7 +1741,7 @@ context "Dataset#multi_insert" do
     ]
   end
   
-  specify "should accept the commit_every option for commiting every x records" do
+  specify "should accept the commit_every option for committing every x records" do
     @ds.multi_insert(@list, :commit_every => 2)
     @db.sqls.should == [
       'BEGIN;',

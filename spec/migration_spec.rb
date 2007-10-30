@@ -212,7 +212,7 @@ context "Sequel::Migrator" do
     Sequel::Migrator.get_current_migration_version(@db).should == 4321
   end
   
-  specify "should set the migration versison stored in the datbase" do
+  specify "should set the migration version stored in the database" do
     Sequel::Migrator.get_current_migration_version(@db).should == 0
     Sequel::Migrator.set_current_migration_version(@db, 6666)
     Sequel::Migrator.get_current_migration_version(@db).should == 6666

@@ -1,5 +1,7 @@
 === 0.3.1 (2007-10-30)
 
+* Typo fixes (#79).
+
 * Added require 'yaml' to dataset.rb (#78).
 
 * Changed postgres adapter to use the ruby-postgres library's type conversion if available (#76).

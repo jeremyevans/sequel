@@ -205,7 +205,7 @@ context "A connection pool with a max size of 5" do
     @pool = Sequel::ConnectionPool.new(5) {@invoked_count += 1}
   end
   
-  specify "should let five threads simulatneously access separate connections" do
+  specify "should let five threads simultaneously access separate connections" do
     cc = {}
     threads = []
     stop = nil

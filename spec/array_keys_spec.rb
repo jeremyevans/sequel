@@ -28,7 +28,7 @@ context "An array with symbol keys" do
     @a.keys.should == [:a, :b, :c, :d]
   end
   
-  specify "should provide key acess using strings" do
+  specify "should provide key access using strings" do
     @a['a'].should == 1
     @a['A'].should be_nil
     
@@ -280,7 +280,7 @@ context "An array with string keys" do
     @a.keys.should == ['a', 'b', 'c', :d]
   end
 
-  specify "should provide key acess using strings" do
+  specify "should provide key access using strings" do
     @a['a'].should == 1
     @a['A'].should be_nil
 

@@ -241,7 +241,7 @@ module Sequel
     # Finds a single record according to the supplied filter, e.g.:
     #
     #   Ticket.find :author => 'Sharon' # => record
-    #   Ticket.find {:price}17 # => Dataset
+    #   Ticket.find {:price == 17} # => Dataset
     #
     def self.find(*args, &block)
       dataset.filter(*args, &block).limit(1).first
