@@ -1025,6 +1025,28 @@ context "Dataset#[]=" do
   end
 end
 
+context "Dataset#set" do
+  setup do
+    c = Class.new(Sequel::Dataset) do
+      def last_sql
+        @@last_sql
+      end
+      
+      def update(*args)
+        @@last_sql = update_sql(*args)
+      end
+    end
+    
+    @d = c.new(nil).from(:items)
+  end
+  
+  specify "should act as alis to #update" do
+    @d.set({:x => 3})
+    @d.last_sql.should == 'UPDATE items SET x = 3'
+  end
+end
+
+
 context "Dataset#insert_multiple" do
   setup do
     c = Class.new(Sequel::Dataset) do

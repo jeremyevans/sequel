@@ -152,6 +152,11 @@ module Sequel
     def <<(*args)
       insert(*args)
     end
+  
+    # Updates the dataset with the given values.
+    def set(*args)
+      update(*args)
+    end
     
     # Iterates over the records in the dataset
     def each(opts = nil, &block)

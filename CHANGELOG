@@ -1,5 +1,7 @@
 === SVN
 
+* Added Dataset#set as alias to Dataset#update.
+
 * Removed long deprecated expressions.rb code.
 
 * Better documentation.

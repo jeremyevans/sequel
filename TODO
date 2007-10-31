@@ -19,8 +19,6 @@
   if (DB[:items].filter(:name => 'abc').update(:price => 100) < 1)
     DB[:items] << {:name => 'abc', :price => 100}
 
-* Dataset#set as alias to Dataset#update
-
 * many_to_many smart relationships.
 
 * schema extraction and database dumping and copying.
