@@ -90,9 +90,8 @@ module Sequel
     #
     # A short-hand form for Database#fetch is Database#[]:
     #
-    #   DB['SELECT * FROM items'] {|r| p r}
+    #   DB['SELECT * FROM items'].each {|r| p r}
     #
-    # 
     def fetch(sql, *args, &block)
       ds = dataset
       sql = sql.gsub('?') {|m|  ds.literal(args.shift)}
