@@ -14,7 +14,7 @@ module Sequel
       # def auto_increment_sql
       #   AUTO_INCREMENT
       # end
-      # 
+
       def connect
         if @opts[:database]
           dbname = @opts[:host] ? \

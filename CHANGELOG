@@ -1,5 +1,7 @@
 === SVN
 
+* Experimental DB2 adapter.
+
 * Added Dataset#set as alias to Dataset#update.
 
 * Removed long deprecated expressions.rb code.
