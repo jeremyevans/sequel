@@ -1,5 +1,7 @@
 === SVN
 
+* Added count_by magic method.
+
 * Added Dataset#range method for getting the minimum/maximum values for a column.
 
 * Fixed timestamp translation in SQLite adapter (#83).

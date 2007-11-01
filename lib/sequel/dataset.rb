@@ -312,6 +312,7 @@ module Sequel
         end
       end
       update_each_method
+      self
     end
     
     # Applies the value transform for data loaded from the database.

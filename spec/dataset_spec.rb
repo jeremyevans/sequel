@@ -1122,7 +1122,7 @@ context "Dataset#range" do
     @d.range(:stamp)
     @d.last_sql.should == "SELECT min(stamp) AS v1, max(stamp) AS v2 FROM test LIMIT 1"
 
-    @d.filter(:price > 100).range(:stamp)
+    @d.filter {:price > 100}.range(:stamp)
     @d.last_sql.should == "SELECT min(stamp) AS v1, max(stamp) AS v2 FROM test WHERE (price > 100) LIMIT 1"
   end
   
@@ -2074,6 +2074,10 @@ context "Dataset#transform" do
     @ds.each(:naked => true) {|r| f = r}
     f.should == {:x => "wow", :y => 'hello'}
   end
+  
+  specify "should return self" do
+    @ds.transform(:x => :marshal).should be(@ds)
+  end
 end
 
 context "Dataset#to_csv" do
@@ -2161,6 +2165,14 @@ context "Dataset magic methods" do
     @ds.should respond_to(:group_by_name)
     @ds.group_by_name.should be_a_kind_of(@c)
     @ds.group_by_name.sql.should == "SELECT * FROM items GROUP BY name"
+  end
+
+  specify "should support count_by_xxx" do
+    @ds.should_not respond_to(:count_by_name)
+    proc {@ds.count_by_name}.should_not raise_error
+    @ds.should respond_to(:count_by_name)
+    @ds.count_by_name.should be_a_kind_of(@c)
+    @ds.count_by_name.sql.should == "SELECT name, count(name) AS count FROM items GROUP BY name ORDER BY count"
   end
 
   specify "should support filter_by_xxx" do

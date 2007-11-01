@@ -1003,6 +1003,11 @@ context "Model magic methods" do
     @m.group_by_name.sql.should == "SELECT * FROM items GROUP BY name"
   end
 
+  specify "should support count_by_xxx" do
+    @m.count_by_name.should be_a_kind_of(@c)
+    @m.count_by_name.sql.should == "SELECT name, count(name) AS count FROM items GROUP BY name ORDER BY count"
+  end
+
   specify "should support filter_by_xxx" do
     @m.filter_by_name('sharon').should be_a_kind_of(@c)
     @m.filter_by_name('sharon').sql.should == "SELECT * FROM items WHERE (name = 'sharon')"

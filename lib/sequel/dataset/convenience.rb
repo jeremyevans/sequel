@@ -276,7 +276,8 @@ module Sequel
         /^filter_by_(.+)$/  => proc {|c| proc {|v| filter(c => v)}},
         /^all_by_(.+)$/     => proc {|c| proc {|v| filter(c => v).all}},
         /^find_by_(.+)$/    => proc {|c| proc {|v| filter(c => v).first}},
-        /^group_by_(.+)$/   => proc {|c| proc {group(c)}}
+        /^group_by_(.+)$/   => proc {|c| proc {group(c)}},
+        /^count_by_(.+)$/   => proc {|c| proc {group(c).select(c, :count[c].AS(:count)).order(:count)}}
       }
 
       # Checks if the given method name represents a magic method and 
