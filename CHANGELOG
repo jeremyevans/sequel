@@ -1,6 +1,8 @@
 === SVN
 
-* Fixed timestamp translation in SQLite adapter.
+* Added Dataset#range method for getting the minimum/maximum values for a column.
+
+* Fixed timestamp translation in SQLite adapter (#83).
 
 * Experimental DB2 adapter.
 

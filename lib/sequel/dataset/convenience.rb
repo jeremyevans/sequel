@@ -171,6 +171,13 @@ module Sequel
       def avg(field)
         single_value(:select => [field.AVG.AS(:v)])
       end
+      
+      # Returns a Range object made from the minimum and maximum values for the
+      # given column.
+      def range(column)
+        r = select(column.MIN.AS(:v1), column.MAX.AS(:v2)).first
+        r && (r[:v1]..r[:v2])
+      end
 
       # Pretty prints the records in the dataset as plain-text table.
       def print(*cols)

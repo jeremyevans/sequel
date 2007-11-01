@@ -1103,6 +1103,35 @@ context "Dataset aggregate methods" do
   end
 end
 
+context "Dataset#range" do
+  setup do
+    c = Class.new(Sequel::Dataset) do
+      @@sql = nil
+      
+      def last_sql; @@sql; end
+      
+      def fetch_rows(sql)
+        @@sql = sql
+        yield(:v1 => 1, :v2 => 10)
+      end
+    end
+    @d = c.new(nil).from(:test)
+  end
+  
+  specify "should generate a correct SQL statement" do
+    @d.range(:stamp)
+    @d.last_sql.should == "SELECT min(stamp) AS v1, max(stamp) AS v2 FROM test LIMIT 1"
+
+    @d.filter(:price > 100).range(:stamp)
+    @d.last_sql.should == "SELECT min(stamp) AS v1, max(stamp) AS v2 FROM test WHERE (price > 100) LIMIT 1"
+  end
+  
+  specify "should return a range object" do
+    @d.range(:tryme).should == (1..10)
+    @d.last_sql.should == "SELECT min(tryme) AS v1, max(tryme) AS v2 FROM test LIMIT 1"
+  end
+end
+
 context "Dataset#first" do
   setup do
     @c = Class.new(Sequel::Dataset) do
