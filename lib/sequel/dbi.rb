@@ -65,7 +65,7 @@ module Sequel
           s = @db.execute sql
           begin
             @columns = s.column_names.map {|c| c.to_sym}
-            s.fetch {|r| r.fields = @columns; yield r}
+            s.fetch {|r| r.keys = @columns; yield r}
           ensure
             s.finish rescue nil
           end

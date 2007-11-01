@@ -60,12 +60,12 @@ module Sequel
       end
     
       def index_definition_sql(table_name, index)
-        fields = index[:columns].join(COMMA_SEPARATOR)
+        columns = index[:columns].join(COMMA_SEPARATOR)
         index_name = index[:name] || default_index_name(table_name, index[:columns])
         if index[:unique]
-          "CREATE UNIQUE INDEX #{index_name} ON #{table_name} (#{fields});"
+          "CREATE UNIQUE INDEX #{index_name} ON #{table_name} (#{columns});"
         else
-          "CREATE INDEX #{index_name} ON #{table_name} (#{fields});"
+          "CREATE INDEX #{index_name} ON #{table_name} (#{columns});"
         end
       end
     

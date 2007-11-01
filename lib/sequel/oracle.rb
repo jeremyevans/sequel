@@ -38,7 +38,7 @@ module Sequel
     
       def execute(sql)
         @logger.info(sql) if @logger
-        @pool.hold {|conn| conn.Execute(sql)}
+        @pool.hold {|conn| conn.exec(sql)}
       end
       
       alias_method :do, :execute

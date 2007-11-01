@@ -105,7 +105,7 @@ module Sequel
       end
       
       def array_tuples_make_row(row)
-        row.fields = @columns
+        row.keys = @columns
         row.each_with_index do |v, idx|
           # When fetching a result set, the Ruby ODBC driver converts all ODBC 
           # SQL types to an equivalent Ruby type; with the exception of

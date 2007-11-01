@@ -109,13 +109,13 @@ context "A simple dataset" do
       @dataset.insert_sql({}).should == "INSERT INTO test DEFAULT VALUES;"
   end
 
-  specify "should format an insert statement with array fields" do
+  specify "should format an insert statement with array with keys" do
     v = [1, 2, 3]
-    v.fields = [:a, :b, :c]
+    v.keys = [:a, :b, :c]
     @dataset.insert_sql(v).should == "INSERT INTO test (a, b, c) VALUES (1, 2, 3);"
     
     v = []
-    v.fields = [:a, :b]
+    v.keys = [:a, :b]
     @dataset.insert_sql(v).should == "INSERT INTO test DEFAULT VALUES;"
   end
   
@@ -155,9 +155,9 @@ context "A simple dataset" do
       "UPDATE test SET name = 'abc'"
   end
   
-  specify "should format an update statement with array fields" do
+  specify "should format an update statement with array with keys" do
     v = ['abc']
-    v.fields = [:name]
+    v.keys = [:name]
     
     @dataset.update_sql(v).should == "UPDATE test SET name = 'abc'"
   end
@@ -458,7 +458,7 @@ context "Dataset#having" do
     @grouped = @dataset.group(:region).select(:region, :population.SUM, :gdp.AVG)
     @d1 = @grouped.having('sum(population) > 10')
     @d2 = @grouped.having(:region => 'Asia')
-    @fields = "region, sum(population), avg(gdp)"
+    @columns = "region, sum(population), avg(gdp)"
   end
 
   specify "should raise if the dataset is not grouped" do
@@ -467,12 +467,12 @@ context "Dataset#having" do
 
   specify "should affect select statements" do
     @d1.select_sql.should ==
-      "SELECT #{@fields} FROM test GROUP BY region HAVING sum(population) > 10"
+      "SELECT #{@columns} FROM test GROUP BY region HAVING sum(population) > 10"
   end
 
   specify "should support proc expressions" do
     @grouped.having {:sum[:population] > 10}.sql.should == 
-      "SELECT #{@fields} FROM test GROUP BY region HAVING (sum(population) > 10)"
+      "SELECT #{@columns} FROM test GROUP BY region HAVING (sum(population) > 10)"
   end
 end
 
@@ -789,19 +789,19 @@ context "Dataset#naked" do
   end
 end
 
-context "Dataset#qualified_field_name" do
+context "Dataset#qualified_column_name" do
   setup do
     @dataset = Sequel::Dataset.new(nil).from(:test)
   end
   
   specify "should return the same if already qualified" do
-    @dataset.qualified_field_name('test.a', :items).should == 'test.a'
-    @dataset.qualified_field_name(:ccc__b, :items).should == 'ccc.b'
+    @dataset.qualified_column_name('test.a', :items).should == 'test.a'
+    @dataset.qualified_column_name(:ccc__b, :items).should == 'ccc.b'
   end
   
-  specify "should qualify the field with the supplied table name" do
-    @dataset.qualified_field_name('a', :items).should == 'items.a'
-    @dataset.qualified_field_name(:b1, :items).should == 'items.b1'
+  specify "should qualify the column with the supplied table name" do
+    @dataset.qualified_column_name('a', :items).should == 'items.a'
+    @dataset.qualified_column_name(:b1, :items).should == 'items.b1'
   end
 end
 
@@ -825,7 +825,7 @@ context "Dataset#map" do
     @d.map {|n| n[:a] + n[:b]}.should == [3, 7, 11]
   end
   
-  specify "should map using #[fieldname] if fieldname is given" do
+  specify "should map using #[column name] if column name is given" do
     @d.map(:a).should == [1, 3, 5]
   end
   
@@ -839,7 +839,7 @@ context "Dataset#to_hash" do
     @d = DummyDataset.new(nil).from(:items)
   end
   
-  specify "should provide a hash with the first field as key and the second as value" do
+  specify "should provide a hash with the first column as key and the second as value" do
     @d.to_hash(:a, :b).should == {1 => 2, 3 => 4, 5 => 6}
     @d.to_hash(:b, :a).should == {2 => 1, 4 => 3, 6 => 5}
   end
@@ -889,6 +889,26 @@ context "Dataset#count" do
   end
 end
 
+
+context "Dataset#group_and_count" do
+  setup do
+    @c = Class.new(Sequel::Dataset) do
+      def self.sql
+        @@sql
+      end
+      
+      def fetch_rows(sql)
+        @@sql = sql
+        yield({1 => 1})
+      end
+    end
+    @ds = @c.new(nil).from(:test)
+  end
+  
+  specify "should format SQL properly" do
+    @ds.group_and_count(:name).sql.should == "SELECT name, count(name) AS count FROM test GROUP BY name ORDER BY count"
+  end
+end
 context "Dataset#empty?" do
   specify "should return true if #count == 0" do
     @c = Class.new(Sequel::Dataset) do
@@ -1098,7 +1118,7 @@ context "Dataset aggregate methods" do
     @d.avg(:d).should == 'SELECT avg(d) AS v FROM test'
   end
   
-  specify "should accept qualified fields" do
+  specify "should accept qualified columns" do
     @d.avg(:test__bc).should == 'SELECT avg(test.bc) AS v FROM test'
   end
 end
@@ -1129,6 +1149,35 @@ context "Dataset#range" do
   specify "should return a range object" do
     @d.range(:tryme).should == (1..10)
     @d.last_sql.should == "SELECT min(tryme) AS v1, max(tryme) AS v2 FROM test LIMIT 1"
+  end
+end
+
+context "Dataset#range" do
+  setup do
+    c = Class.new(Sequel::Dataset) do
+      @@sql = nil
+      
+      def last_sql; @@sql; end
+      
+      def fetch_rows(sql)
+        @@sql = sql
+        yield(:v => 1234)
+      end
+    end
+    @d = c.new(nil).from(:test)
+  end
+  
+  specify "should generate a correct SQL statement" do
+    @d.interval(:stamp)
+    @d.last_sql.should == "SELECT (max(stamp) - min(stamp)) AS v FROM test LIMIT 1"
+
+    @d.filter {:price > 100}.interval(:stamp)
+    @d.last_sql.should == "SELECT (max(stamp) - min(stamp)) AS v FROM test WHERE (price > 100) LIMIT 1"
+  end
+  
+  specify "should return a range object" do
+    @d.interval(:tryme).should == 1234
+    @d.last_sql.should == "SELECT (max(tryme) - min(tryme)) AS v FROM test LIMIT 1"
   end
 end
 
@@ -2088,7 +2137,7 @@ context "Dataset#to_csv" do
       
       def fetch_rows(sql, &block)
         @columns = @cols
-        @data.each {|r| r.fields = @columns; block[r]}
+        @data.each {|r| r.keys = @columns; block[r]}
       end
       
       # naked should return self here because to_csv wants a naked result set.
@@ -2121,7 +2170,7 @@ context "Dataset#each_hash" do
     @c = Class.new(Sequel::Dataset) do
       def each(&block)
         a = [[1, 2, 3], [4, 5, 6]]
-        a.each {|r| r.fields = [:a, :b, :c]; block[r]}
+        a.each {|r| r.keys = [:a, :b, :c]; block[r]}
       end
     end
     

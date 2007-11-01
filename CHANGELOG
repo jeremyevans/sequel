@@ -1,5 +1,13 @@
 === SVN
 
+* Added #to_column_name as alias to #to_field_name, #column_title as alias to #field_title.
+
+* Added Dataset#interval method for getting interval between minimum/maximum values for a column.
+
+* Fixed Oracle::Database#execute (#84).
+
+* Added group_and_count as general implementation for count_by_xxx.
+
 * Added count_by magic method.
 
 * Added Dataset#range method for getting the minimum/maximum values for a column.

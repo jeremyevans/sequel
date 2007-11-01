@@ -419,31 +419,30 @@ module Sequel
       @@converters = {}
 
       def row_converter(result)
-        fields = []; translators = []
+        @columns = []; translators = []
         result.fields.each_with_index do |f, idx|
-          fields << f.to_sym
+          @columns << f.to_sym
           translators << PG_TYPES[result.type(idx)]
         end
-        @columns = fields
         
         # create result signature and memoize the converter
-        sig = [fields, translators].hash
+        sig = [@columns, translators].hash
         @@converters_mutex.synchronize do
-          @@converters[sig] ||= compile_converter(fields, translators)
+          @@converters[sig] ||= compile_converter(@columns, translators)
         end
       end
     
-      def compile_converter(fields, translators)
-        used_fields = []
+      def compile_converter(columns, translators)
+        used_columns = []
         kvs = []
-        fields.each_with_index do |field, idx|
-          next if used_fields.include?(field)
-          used_fields << field
+        columns.each_with_index do |column, idx|
+          next if used_columns.include?(column)
+          used_columns << column
         
           if !AUTO_TRANSLATE and translator = translators[idx]
-            kvs << ":\"#{field}\" => ((t = r[#{idx}]) ? t.#{translator} : nil)"
+            kvs << ":\"#{column}\" => ((t = r[#{idx}]) ? t.#{translator} : nil)"
           else
-            kvs << ":\"#{field}\" => r[#{idx}]"
+            kvs << ":\"#{column}\" => r[#{idx}]"
           end
         end
         eval("lambda {|r| {#{kvs.join(COMMA_SEPARATOR)}}}")
@@ -465,28 +464,27 @@ module Sequel
       @@array_tuples_converters = {}
 
       def array_tuples_row_converter(result)
-        fields = []; translators = []
+        @columns = []; translators = []
         result.fields.each_with_index do |f, idx|
-          fields << f.to_sym
+          @columns << f.to_sym
           translators << PG_TYPES[result.type(idx)]
         end
-        @columns = fields
         
         # create result signature and memoize the converter
-        sig = [fields, translators].hash
+        sig = [@columns, translators].hash
         @@array_tuples_converters_mutex.synchronize do
-          @@array_tuples_converters[sig] ||= array_tuples_compile_converter(fields, translators)
+          @@array_tuples_converters[sig] ||= array_tuples_compile_converter(@columns, translators)
         end
       end
     
-      def array_tuples_compile_converter(fields, translators)
+      def array_tuples_compile_converter(columns, translators)
         tr = []
-        fields.each_with_index do |field, idx|
+        columns.each_with_index do |column, idx|
           if !AUTO_TRANSLATE and t = translators[idx]
             tr << "if (v = r[#{idx}]); r[#{idx}] = v.#{t}; end"
           end
         end
-        eval("lambda {|r| r.fields = fields; #{tr.join(';')}; r}")
+        eval("lambda {|r| r.keys = columns; #{tr.join(';')}; r}")
       end
     end
   end

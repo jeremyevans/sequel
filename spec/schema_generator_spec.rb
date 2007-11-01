@@ -13,9 +13,9 @@ describe Sequel::Schema::Generator do
     @table_name, @columns, @indexes = @generator.create_info
   end
   
-  {:name => :id, :primary_key => true}.each do |field, expected|
-    it "uses default primary key #{field}" do
-      @columns.first[field].should == expected
+  {:name => :id, :primary_key => true}.each do |column, expected|
+    it "uses default primary key #{column}" do
+      @columns.first[column].should == expected
     end
   end
   

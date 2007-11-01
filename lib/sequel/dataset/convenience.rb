@@ -77,11 +77,11 @@ module Sequel
         end
       end
       
-      # Maps field values for each record in the dataset (if a field name is
+      # Maps column values for each record in the dataset (if a column name is
       # given), or performs the stock mapping functionality of Enumerable.
-      def map(field_name = nil, &block)
-        if field_name
-          super() {|r| r[field_name]}
+      def map(column_name = nil, &block)
+        if column_name
+          super() {|r| r[column_name]}
         else
           super(&block)
         end
@@ -152,24 +152,29 @@ module Sequel
         b - a + 1
       end
 
-      # Returns the minimum value for the given field.
-      def min(field)
-        single_value(:select => [field.MIN.AS(:v)])
+      # Returns the minimum value for the given column.
+      def min(column)
+        single_value(:select => [column.MIN.AS(:v)])
       end
 
-      # Returns the maximum value for the given field.
-      def max(field)
-        single_value(:select => [field.MAX.AS(:v)])
+      # Returns the maximum value for the given column.
+      def max(column)
+        single_value(:select => [column.MAX.AS(:v)])
       end
 
-      # Returns the sum for the given field.
-      def sum(field)
-        single_value(:select => [field.SUM.AS(:v)])
+      # Returns the sum for the given column.
+      def sum(column)
+        single_value(:select => [column.SUM.AS(:v)])
       end
 
-      # Returns the average value for the given field.
-      def avg(field)
-        single_value(:select => [field.AVG.AS(:v)])
+      # Returns the average value for the given column.
+      def avg(column)
+        single_value(:select => [column.AVG.AS(:v)])
+      end
+      
+      # Returns a dataset grouped by the given column with count by group.
+      def group_and_count(column)
+        group(column).select(column, :count[column].AS(:count)).order(:count)
       end
       
       # Returns a Range object made from the minimum and maximum values for the
@@ -177,6 +182,13 @@ module Sequel
       def range(column)
         r = select(column.MIN.AS(:v1), column.MAX.AS(:v2)).first
         r && (r[:v1]..r[:v2])
+      end
+      
+      # Returns the interval between minimum and maximum values for the given 
+      # column.
+      def interval(column)
+        r = select("(max(#{literal(column)}) - min(#{literal(column)})) AS v".lit).first
+        r && r[:v]
       end
 
       # Pretty prints the records in the dataset as plain-text table.
@@ -277,7 +289,7 @@ module Sequel
         /^all_by_(.+)$/     => proc {|c| proc {|v| filter(c => v).all}},
         /^find_by_(.+)$/    => proc {|c| proc {|v| filter(c => v).first}},
         /^group_by_(.+)$/   => proc {|c| proc {group(c)}},
-        /^count_by_(.+)$/   => proc {|c| proc {group(c).select(c, :count[c].AS(:count)).order(:count)}}
+        /^count_by_(.+)$/   => proc {|c| proc {group_and_count(c)}}
       }
 
       # Checks if the given method name represents a magic method and 

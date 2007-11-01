@@ -60,8 +60,7 @@ module Sequel
         @db.synchronize do
           s = @db.execute sql
           
-          fields = s.Fields.extend(Enumerable)
-          @columns = fields.map {|x| x.Name.to_sym}
+          @columns = s.Fields.extend(Enumerable).map {|x| x.Name.to_sym}
           
           s.moveFirst
           s.getRows.transpose.each {|r| yield hash_row(r)}
@@ -80,11 +79,10 @@ module Sequel
         @db.synchronize do
           s = @db.execute sql
           
-          fields = s.Fields.extend(Enumerable)
-          @columns = fields.map {|x| x.Name.to_sym}
+          @columns = s.Fields.extend(Enumerable).map {|x| x.Name.to_sym}
           
           s.moveFirst
-          s.getRows.transpose.each {|r| r.fields = @columns; yield r}
+          s.getRows.transpose.each {|r| r.keys = @columns; yield r}
         end
         self
       end

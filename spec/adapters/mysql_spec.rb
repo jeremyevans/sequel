@@ -78,7 +78,7 @@ context "A MySQL dataset" do
     proc {@d.literal(false)}.should_not raise_error
   end
   
-  specify "should quote fields using back-ticks" do
+  specify "should quote columns using back-ticks" do
     @d.select(:name).sql.should == \
       'SELECT `name` FROM items'
       

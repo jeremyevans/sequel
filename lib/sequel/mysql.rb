@@ -61,7 +61,7 @@ class Mysql::Result
           row[i] = v.send(t)
         end
       end
-      row.fields = c
+      row.keys = c
       yield row
     end
   end
@@ -173,21 +173,21 @@ module Sequel
     
     class Dataset < Sequel::Dataset
       UNQUOTABLE_FIELD_RE = /^(`(.+)`)|\*$/.freeze
-      def quote_field(f)
+      def quote_column(f)
         (f.nil? || f.empty? || f =~ UNQUOTABLE_FIELD_RE) ? f : "`#{f}`"
       end
       
       FIELD_EXPR_RE = /^([^\(]+\()?([^\.]+\.)?([^\s\)]+)?(\))?(\sAS\s(.+))?$/i.freeze
       FIELD_ORDER_RE = /^(.*) (DESC|ASC)$/i.freeze
-      def quoted_field_name(name)
+      def quoted_column_name(name)
         case name
         when FIELD_EXPR_RE:
           $6 ? \
-            "#{$1}#{$2}#{quote_field($3)}#{$4} AS #{quote_field($6)}" : \
-            "#{$1}#{$2}#{quote_field($3)}#{$4}"
-        when FIELD_ORDER_RE: "#{quote_field($1)} #{$2}"
+            "#{$1}#{$2}#{quote_column($3)}#{$4} AS #{quote_column($6)}" : \
+            "#{$1}#{$2}#{quote_column($3)}#{$4}"
+        when FIELD_ORDER_RE: "#{quote_column($1)} #{$2}"
         else
-          quote_field(name)
+          quote_column(name)
         end
       end
       
@@ -196,7 +196,7 @@ module Sequel
       
       def literal(v)
         case v
-        when LiteralString: quoted_field_name(v)
+        when LiteralString: quoted_column_name(v)
         when String: "'#{v.gsub(/'|\\/, '\&\&')}'"
         when true: TRUE
         when false: FALSE
@@ -223,7 +223,7 @@ module Sequel
         opts = opts ? @opts.merge(opts) : @opts
         
         if order = opts[:order]
-          sql << " ORDER BY #{field_list(order)}"
+          sql << " ORDER BY #{column_list(order)}"
         end
 
         if limit = opts[:limit]

@@ -59,23 +59,24 @@ class String
     Time.parse(self)
   end
   
-  # Converts a string into a field name.
+  # Converts a string into a column name.
   def to_field_name
     self
   end
+  alias_method :to_column_name, :to_field_name
 end
 
-# Methods to format field names and associated constructs. This module is
+# Methods to format column names and associated constructs. This module is
 # included in String and Symbol.
 module FieldCompositionMethods
   # Constructs a DESC clause for use in an ORDER BY clause.
   def DESC
-    "#{to_field_name} DESC".lit
+    "#{to_column_name} DESC".lit
   end
   
-  # Constructs an AS clause for field aliasing.
+  # Constructs an AS clause for column aliasing.
   def AS(target)
-    "#{to_field_name} AS #{target}".lit
+    "#{to_column_name} AS #{target}".lit
   end
 
   # Constructs a qualified wildcard (*) clause.
@@ -86,15 +87,16 @@ module FieldCompositionMethods
   FIELD_TITLE_RE1 = /^(.*)\sAS\s(.+)$/i.freeze
   FIELD_TITLE_RE2 = /^([^\.]+)\.([^\.]+)$/.freeze
   
-  # Returns the field name. If the field name is aliased, the alias is 
+  # Returns the column name. If the column name is aliased, the alias is 
   # returned.
   def field_title
-    case s = to_field_name
+    case s = to_column_name
     when FIELD_TITLE_RE1, FIELD_TITLE_RE2: $2
     else
       s
     end
   end
+  alias_method :column_title, :field_title
 end
 
 # String extensions
@@ -111,14 +113,14 @@ class Symbol
   FIELD_REF_RE2 = /^(\w+)___(\w+)$/.freeze
   FIELD_REF_RE3 = /^(\w+)__(\w+)$/.freeze
   
-  # Converts a symbol into a field name. This method supports underscore
+  # Converts a symbol into a column name. This method supports underscore
   # notation in order to express qualified (two underscores) and aliased 
-  # (three underscores) fields:
+  # (three underscores) columns:
   #
-  #   :abc.to_field_name #=> "abc"
-  #   :abc___a.to_field_name #=> "abc AS a"
-  #   :items__abc.to_field_name #=> "items.abc"
-  #   :items__abc___a.to_field_name #=> "items.abc AS a"
+  #   :abc.to_column_name #=> "abc"
+  #   :abc___a.to_column_name #=> "abc AS a"
+  #   :items__abc.to_column_name #=> "items.abc"
+  #   :items__abc___a.to_column_name #=> "items.abc AS a"
   #
   def to_field_name
     s = to_s
@@ -130,12 +132,13 @@ class Symbol
       s
     end
   end
+  alias_method :to_column_name, :to_field_name
   
   # Converts missing method calls into functions on columns, if the
   # method name is made of all upper case letters.
   def method_missing(sym)
     ((s = sym.to_s) =~ /^([A-Z]+)$/) ? \
-      "#{s.downcase}(#{to_field_name})".lit : super
+      "#{s.downcase}(#{to_column_name})".lit : super
   end
   
   # Formats an SQL function with optional parameters

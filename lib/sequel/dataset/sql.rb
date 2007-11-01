@@ -3,56 +3,56 @@ module Sequel
     # The Dataset SQL module implements all the dataset methods concerned with
     # generating SQL statements for retrieving and manipulating records.
     module SQL
-      # Returns a valid SQL fieldname as a string. Field names specified as 
+      # Returns a valid SQL column name as a string. Column names specified as 
       # symbols can include double underscores to denote a dot separator, e.g.
       # :posts__id will be converted into posts.id.
-      def field_name(field)
-        case field
+      def column_name(column)
+        case column
         when Symbol, String:
-          quoted_field_name(field.to_field_name)
+          quoted_column_name(column.to_column_name)
         when Hash:
-          field.map {|f,a| "#{field_name(f)} AS #{field_name(a)}"}.join(COMMA_SEPARATOR)
+          column.map {|f,a| "#{column_name(f)} AS #{column_name(a)}"}.join(COMMA_SEPARATOR)
         else
-          field
+          column
         end
       end
 
-      # Adds quoting to field references. This method is just a stub and can
-      # be overriden in adapters in order to provide correct field quoting
+      # Adds quoting to column references. This method is just a stub and can
+      # be overriden in adapters in order to provide correct column quoting
       # behavior.
-      def quoted_field_name(name)
+      def quoted_column_name(name)
         name
       end
       
       ALIASED_REGEXP = /^(.*)\s(.*)$/.freeze
       QUALIFIED_REGEXP = /^(.*)\.(.*)$/.freeze
 
-      # Returns a qualified field name (including a table name) if the field
+      # Returns a qualified column name (including a table name) if the column
       # name isn't already qualified.
-      def qualified_field_name(field, table)
-        field = field_name(field)
-        if field =~ QUALIFIED_REGEXP
-          # field is already qualified
-          field
+      def qualified_column_name(column, table)
+        column = column_name(column)
+        if column =~ QUALIFIED_REGEXP
+          # column is already qualified
+          column
         else 
           # check if the table is aliased
           if table =~ ALIASED_REGEXP
             table = $2
           end
-          "#{table}.#{field}"
+          "#{table}.#{column}"
         end
       end
 
       WILDCARD = '*'.freeze
       COMMA_SEPARATOR = ", ".freeze
 
-      # Converts an array of field names into a comma seperated string of 
-      # field names. If the array is empty, a wildcard (*) is returned.
-      def field_list(fields)
-        if fields.empty?
+      # Converts an array of column names into a comma seperated string of 
+      # column names. If the array is empty, a wildcard (*) is returned.
+      def column_list(columns)
+        if columns.empty?
           WILDCARD
         else
-          fields.map do |i|
+          columns.map do |i|
             i.is_a?(Hash) ? i.map {|kv| "#{literal(kv[0])} AS #{kv[1]}"} : literal(i)
           end.join(COMMA_SEPARATOR)
         end
@@ -87,7 +87,7 @@ module Sequel
       # Returns a literal representation of a value to be used as part
       # of an SQL expression. The stock implementation supports literalization 
       # of String (with proper escaping to prevent SQL injections), numbers,
-      # Symbol (as field references), Array (as a list of literalized values),
+      # Symbol (as column references), Array (as a list of literalized values),
       # Time (as an SQL TIMESTAMP), Date (as an SQL DATE), Dataset (as a 
       # subquery) and nil (AS NULL).
       # 
@@ -105,7 +105,7 @@ module Sequel
         when NilClass: NULL
         when TrueClass: TRUE
         when FalseClass: FALSE
-        when Symbol: quoted_field_name(v.to_field_name)
+        when Symbol: quoted_column_name(v.to_column_name)
         when Array: v.empty? ? NULL : v.map {|i| literal(i)}.join(COMMA_SEPARATOR)
         when Time: v.strftime(TIMESTAMP_FORMAT)
         when Date: v.strftime(DATE_FORMAT)
@@ -146,9 +146,9 @@ module Sequel
         clone_merge(:from => source)
       end
 
-      # Returns a copy of the dataset with the selected fields changed.
-      def select(*fields)
-        clone_merge(:select => fields)
+      # Returns a copy of the dataset with the selected columns changed.
+      def select(*columns)
+        clone_merge(:select => columns)
       end
 
       # Returns a copy of the dataset with the distinct option.
@@ -172,7 +172,7 @@ module Sequel
 
       DESC_ORDER_REGEXP = /(.*)\sDESC/i.freeze
 
-      # Inverts the given order by breaking it into a list of field references
+      # Inverts the given order by breaking it into a list of column references
       # and inverting them.
       #
       #   dataset.invert_order('id DESC') #=> "id"
@@ -190,9 +190,9 @@ module Sequel
       end
 
       # Returns a copy of the dataset with the results grouped by the value of 
-      # the given fields
-      def group(*fields)
-        clone_merge(:group => fields)
+      # the given columns
+      def group(*columns)
+        clone_merge(:group => columns)
       end
       
       alias_method :group_by, :group
@@ -330,8 +330,8 @@ module Sequel
 
         join_conditions = {}
         expr.each do |k, v|
-          k = qualified_field_name(k, table).intern if k.is_a?(Symbol)
-          v = qualified_field_name(v, @opts[:last_joined_table] || @opts[:from].first).intern if v.is_a?(Symbol)
+          k = qualified_column_name(k, table).intern if k.is_a?(Symbol)
+          v = qualified_column_name(v, @opts[:last_joined_table] || @opts[:from].first).intern if v.is_a?(Symbol)
           join_conditions[k] = v
         end
         " #{join_type} #{table} ON #{expression_list(join_conditions)}"
@@ -379,12 +379,12 @@ module Sequel
           return sql
         end
 
-        fields = opts[:select]
-        select_fields = fields ? field_list(fields) : WILDCARD
+        columns = opts[:select]
+        select_columns = columns ? column_list(columns) : WILDCARD
         select_source = source_list(opts[:from])
         sql = opts[:distinct] ? \
-          "SELECT DISTINCT #{select_fields} FROM #{select_source}" : \
-          "SELECT #{select_fields} FROM #{select_source}"
+          "SELECT DISTINCT #{select_columns} FROM #{select_source}" : \
+          "SELECT #{select_columns} FROM #{select_source}"
         
         if join = opts[:join]
           sql << join
@@ -395,11 +395,11 @@ module Sequel
         end
 
         if group = opts[:group]
-          sql << " GROUP BY #{field_list(group)}"
+          sql << " GROUP BY #{column_list(group)}"
         end
 
         if order = opts[:order]
-          sql << " ORDER BY #{field_list(order)}"
+          sql << " ORDER BY #{column_list(order)}"
         end
 
         if having = opts[:having]
@@ -429,7 +429,7 @@ module Sequel
       alias sql select_sql
 
       # Formats an INSERT statement using the given values. If a hash is given,
-      # the resulting statement includes field names. If no values are given, 
+      # the resulting statement includes column names. If no values are given, 
       # the resulting statement includes a DEFAULT VALUES clause.
       #
       #   dataset.insert_sql() #=> 'INSERT INTO items DEFAULT VALUES'
@@ -460,7 +460,7 @@ module Sequel
               "INSERT INTO #{@opts[:from]} DEFAULT VALUES;"
             else
               fl, vl = [], []
-              values.each {|k, v| fl << field_name(k); vl << literal(v)}
+              values.each {|k, v| fl << column_name(k); vl << literal(v)}
               "INSERT INTO #{@opts[:from]} (#{fl.join(COMMA_SEPARATOR)}) VALUES (#{vl.join(COMMA_SEPARATOR)});"
             end
           when Dataset
@@ -488,7 +488,7 @@ module Sequel
           values = values.to_hash
         end
         values = transform_save(values) if @transform
-        set_list = values.map {|k, v| "#{field_name(k)} = #{literal(v)}"}.
+        set_list = values.map {|k, v| "#{column_name(k)} = #{literal(v)}"}.
           join(COMMA_SEPARATOR)
         sql = "UPDATE #{@opts[:from]} SET #{set_list}"
 

@@ -307,12 +307,12 @@ module Sequel
     end
 
     # Returns value of attribute.
-    def [](field)
-      @values[field]
+    def [](column)
+      @values[column]
     end
     # Sets value of attribute.
-    def []=(field, value)
-      @values[field] = value
+    def []=(column, value)
+      @values[column] = value
     end
 
     # Enumerates through all attributes.

@@ -127,47 +127,47 @@ context "Symbol#ALL" do
   end
 end
 
-context "Symbol#to_field_name" do
+context "Symbol#to_column_name" do
   specify "should convert qualified symbol notation into dot notation" do
-    :abc__def.to_field_name.should == 'abc.def'
+    :abc__def.to_column_name.should == 'abc.def'
   end
   
   specify "should convert AS symbol notation into SQL AS notation" do
-    :xyz___x.to_field_name.should == 'xyz AS x'
-    :abc__def___x.to_field_name.should == 'abc.def AS x'
+    :xyz___x.to_column_name.should == 'xyz AS x'
+    :abc__def___x.to_column_name.should == 'abc.def AS x'
   end
   
   specify "should support names with digits" do
-    :abc2.to_field_name.should == 'abc2'
-    :xx__yy3.to_field_name.should == 'xx.yy3'
-    :ab34__temp3_4ax.to_field_name.should == 'ab34.temp3_4ax'
-    :x1___y2.to_field_name.should == 'x1 AS y2'
-    :abc2__def3___ggg4.to_field_name.should == 'abc2.def3 AS ggg4'
+    :abc2.to_column_name.should == 'abc2'
+    :xx__yy3.to_column_name.should == 'xx.yy3'
+    :ab34__temp3_4ax.to_column_name.should == 'ab34.temp3_4ax'
+    :x1___y2.to_column_name.should == 'x1 AS y2'
+    :abc2__def3___ggg4.to_column_name.should == 'abc2.def3 AS ggg4'
   end
   
   specify "should support upper case and lower case" do
-    :ABC.to_field_name.should == 'ABC'
-    :Zvashtoy__aBcD.to_field_name.should == 'Zvashtoy.aBcD'
+    :ABC.to_column_name.should == 'ABC'
+    :Zvashtoy__aBcD.to_column_name.should == 'Zvashtoy.aBcD'
     
   end
 end
 
-context "FieldCompositionMethods#field_title" do
-  specify "should return the field name for non aliased fields" do
-    :xyz.field_title.should == 'xyz'
-    :abc__xyz.field_title.should == 'xyz'
+context "FieldCompositionMethods#column_title" do
+  specify "should return the column name for non aliased columns" do
+    :xyz.column_title.should == 'xyz'
+    :abc__xyz.column_title.should == 'xyz'
     
-    'abc'.field_title.should == 'abc'
-    'abc.def'.field_title.should == 'def'
+    'abc'.column_title.should == 'abc'
+    'abc.def'.column_title.should == 'def'
   end
   
-  specify "should return the field alias for aliased fields" do
-    :xyz___x.field_title.should == 'x'
-    :abc__xyz___y.field_title.should == 'y'
+  specify "should return the column alias for aliased columns" do
+    :xyz___x.column_title.should == 'x'
+    :abc__xyz___y.column_title.should == 'y'
     
-    'abc AS x'.field_title.should == 'x'
-    'abc as y'.field_title.should == 'y'
-    'abc.def AS d'.field_title.should == 'd'
+    'abc AS x'.column_title.should == 'x'
+    'abc as y'.column_title.should == 'y'
+    'abc.def AS d'.column_title.should == 'd'
   end
 end
 

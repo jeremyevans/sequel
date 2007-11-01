@@ -10,8 +10,8 @@ module Sequel
     def self.records_columns(records)
       columns = []
       records.each do |r|
-        if Array === r && (f = r.fields)
-          return r.fields
+        if Array === r && (k = r.keys)
+          return k
         elsif Hash === r
           r.keys.each {|k| columns << k unless columns.include?(k)}
         end
