@@ -6,6 +6,7 @@ SQLITE_DB.create_table :items do
   text :name
   float :value
 end
+SQLITE_DB.create_table(:time) {timestamp :t}
 
 context "An SQLite database" do
   setup do
@@ -119,6 +120,13 @@ context "An SQLite database" do
     @db.pool.size.should == 1
     @db.disconnect
     @db.pool.size.should == 0
+  end
+
+  specify "should support timestamps" do
+    t1 = Time.at(Time.now.to_i) #normalize time
+    
+    SQLITE_DB[:time] << {:t => t1}
+    SQLITE_DB[:time].first[:t].should == t1
   end
 end
 

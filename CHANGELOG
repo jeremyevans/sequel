@@ -1,5 +1,7 @@
 === SVN
 
+* Fixed timestamp translation in SQLite adapter.
+
 * Experimental DB2 adapter.
 
 * Added Dataset#set as alias to Dataset#update.

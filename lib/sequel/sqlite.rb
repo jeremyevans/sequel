@@ -19,6 +19,10 @@ module Sequel
         end
         db = ::SQLite3::Database.new(@opts[:database])
         db.type_translation = true
+        # fix for timestamp translation
+        db.translator.add_translator("timestamp") do |t, v|
+          v =~ /^\d+$/ ? Time.at(v.to_i) : Time.parse(v) 
+        end 
         db
       end
       
