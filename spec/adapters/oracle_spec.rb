@@ -81,13 +81,6 @@ context "A Oracle dataset" do
 
     @d.count.should == 1
   end
-  
-  specify "should support regexps" do
-    @d << {:name => 'abc', :value => 1}
-    @d << {:name => 'bcd', :value => 2}
-    @d.filter(:name => /bc/).count.should == 2
-    @d.filter(:name => /^bc/).count.should == 1
-  end
 end
 
 context "A Oracle dataset in array tuples mode" do
