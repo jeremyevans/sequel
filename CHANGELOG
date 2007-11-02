@@ -1,5 +1,9 @@
 === SVN
 
+* Added spec for Oracle adapter.
+
+* Fixed Oracle adapter to format INSERT statements without semicolons (thanks Liming Lian).
+
 * Renamed alias to Array#keys as Array#columns instead of Array#fields.
 
 * Renamed FieldCompositionMethods as ColumnCompositionMethods.
