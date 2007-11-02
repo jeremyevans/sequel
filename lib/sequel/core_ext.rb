@@ -177,7 +177,7 @@ module Sequel
   
     # Returns the time at now - self.
     def ago(t = Time.now); t - self; end
-    alias_method :until, :ago
+    alias_method :before, :ago
 
     # Returns the time at now + self.
     def from_now(t = Time.now); t + self; end

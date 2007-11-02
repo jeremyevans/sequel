@@ -249,7 +249,7 @@ context "Numeric extensions" do
     ((t1 - t2).to_i - 86400).abs.should < 2
     
     t1 = Time.now
-    t2 = 1.day.until(t1)
+    t2 = 1.day.before(t1)
     t2.should == t1 - 1.day
   end
 
