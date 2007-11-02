@@ -12,15 +12,11 @@ ORACLE_DB.create_table :test do
 end
 
 context "A Oracle database" do
-  setup do
-    @db = ORACLE_DB
-  end
-  
   specify "should provide disconnect functionality" do
-    @db.tables
-    @db.pool.size.should == 1
-    @db.disconnect
-    @db.pool.size.should == 0
+    ORACLE_DB.execute("select user from dual")
+    ORACLE_DB.pool.size.should == 1
+    ORACLE_DB.disconnect
+    ORACLE_DB.pool.size.should == 0
   end
 end
 
