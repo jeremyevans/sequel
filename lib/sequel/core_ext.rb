@@ -184,7 +184,7 @@ module Sequel
     alias_method :since, :from_now
     
     # Extends the Numeric class with numeric extensions.
-    def self.use
+    def self.enable
       Numeric.send(:include, self)
     end
   end

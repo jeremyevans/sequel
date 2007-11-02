@@ -219,7 +219,7 @@ end
 
 context "Numeric extensions" do
   setup do
-    Sequel::NumericExtensions.use
+    Sequel::NumericExtensions.enable
   end
   
   specify "should support conversion of minutes to seconds" do
