@@ -1,3 +1,7 @@
+=== SVN
+
+* Implemented Sequel::NumericExtensions to provide stuff like 30.days.ago.
+
 === 0.3.2 (2007-11-01)
 
 * Added #to_column_name as alias to #to_field_name, #column_title as alias to #field_title.

@@ -206,3 +206,61 @@ context "Symbol" do
     ds.select(:COUNT['1']).sql.should == "SELECT COUNT(1) FROM t"
   end
 end
+
+context "Range#interval" do
+  specify "should return the interval between the beginning and end of the range" do
+    (1..10).interval.should == 9
+    
+    r = rand(100000) + 10
+    t1 = Time.now; t2 = t1 + r
+    (t1..t2).interval.should == r
+  end
+end
+
+context "Numeric extensions" do
+  setup do
+    Sequel::NumericExtensions.use
+  end
+  
+  specify "should support conversion of minutes to seconds" do
+    1.minute.should == 60
+    3.minutes.should == 180
+  end
+  
+  specify "should support conversion of hours to seconds" do
+    1.hour.should == 3600
+    3.hours.should == 3600 * 3
+  end
+
+  specify "should support conversion of days to seconds" do
+    1.day.should == 86400
+    3.days.should == 86400 * 3
+  end
+
+  specify "should support conversion of weeks to seconds" do
+    1.week.should == 86400 * 7
+    3.weeks.should == 86400 * 7 * 3
+  end
+  
+  specify "should provide #ago functionality" do
+    t1 = Time.now
+    t2 = 1.day.ago
+    t1.should > t2
+    ((t1 - t2).to_i - 86400).abs.should < 2
+    
+    t1 = Time.now
+    t2 = 1.day.until(t1)
+    t2.should == t1 - 1.day
+  end
+
+  specify "should provide #from_now functionality" do
+    t1 = Time.now
+    t2 = 1.day.from_now
+    t1.should < t2
+    ((t2 - t1).to_i - 86400).abs.should < 2
+    
+    t1 = Time.now
+    t2 = 1.day.since(t1)
+    t2.should == t1 + 1.day
+  end
+end
