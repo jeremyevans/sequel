@@ -149,7 +149,7 @@ module Sequel
       def array_tuples_fetch_rows(sql, &block)
         @db.execute_select(sql) do |result|
           @columns = result.columns.map {|c| c.to_sym}
-          result.each(&block)
+          result.each {|r| r.keys = @columns; block[r]}
         end
       end
     
