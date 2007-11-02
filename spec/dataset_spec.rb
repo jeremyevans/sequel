@@ -99,24 +99,24 @@ context "A simple dataset" do
   end
   
   specify "should format an insert statement with default values" do
-    @dataset.insert_sql.should == 'INSERT INTO test DEFAULT VALUES;'
+    @dataset.insert_sql.should == 'INSERT INTO test DEFAULT VALUES'
   end
   
   specify "should format an insert statement with hash" do
     @dataset.insert_sql(:name => 'wxyz', :price => 342).
       should match(/INSERT INTO test \(name, price\) VALUES \('wxyz', 342\)|INSERT INTO test \(price, name\) VALUES \(342, 'wxyz'\)/)
 
-      @dataset.insert_sql({}).should == "INSERT INTO test DEFAULT VALUES;"
+      @dataset.insert_sql({}).should == "INSERT INTO test DEFAULT VALUES"
   end
 
   specify "should format an insert statement with array with keys" do
     v = [1, 2, 3]
     v.keys = [:a, :b, :c]
-    @dataset.insert_sql(v).should == "INSERT INTO test (a, b, c) VALUES (1, 2, 3);"
+    @dataset.insert_sql(v).should == "INSERT INTO test (a, b, c) VALUES (1, 2, 3)"
     
     v = []
     v.keys = [:a, :b]
-    @dataset.insert_sql(v).should == "INSERT INTO test DEFAULT VALUES;"
+    @dataset.insert_sql(v).should == "INSERT INTO test DEFAULT VALUES"
   end
   
   specify "should format an insert statement with a model instance" do
@@ -129,25 +129,25 @@ context "A simple dataset" do
     
     v = @c.new(:a => 1)
     
-    @dataset.insert_sql(v).should == "INSERT INTO test (a) VALUES (1);"
+    @dataset.insert_sql(v).should == "INSERT INTO test (a) VALUES (1)"
     
     v = @c.new({})
-    @dataset.insert_sql(v).should == "INSERT INTO test DEFAULT VALUES;"
+    @dataset.insert_sql(v).should == "INSERT INTO test DEFAULT VALUES"
   end
   
   specify "should format an insert statement with an arbitrary value" do
-    @dataset.insert_sql(123).should == "INSERT INTO test VALUES (123);"
+    @dataset.insert_sql(123).should == "INSERT INTO test VALUES (123)"
   end
   
   specify "should format an insert statement with sub-query" do
     @sub = Sequel::Dataset.new(nil).from(:something).filter(:x => 2)
     @dataset.insert_sql(@sub).should == \
-      "INSERT INTO test (SELECT * FROM something WHERE (x = 2));"
+      "INSERT INTO test (SELECT * FROM something WHERE (x = 2))"
   end
   
   specify "should format an insert statement with array" do
     @dataset.insert_sql('a', 2, 6.5).should ==
-      "INSERT INTO test VALUES ('a', 2, 6.5);"
+      "INSERT INTO test VALUES ('a', 2, 6.5)"
   end
   
   specify "should format an update statement" do
@@ -1818,9 +1818,9 @@ context "Dataset#multi_insert" do
       
       def transaction
         @sqls ||= []
-        @sqls << 'BEGIN;'
+        @sqls << 'BEGIN'
         yield
-        @sqls << 'COMMIT;'
+        @sqls << 'COMMIT'
       end
     end
     @db = @dbc.new
@@ -1833,24 +1833,24 @@ context "Dataset#multi_insert" do
   specify "should join all inserts into a single SQL string" do
     @ds.multi_insert(@list)
     @db.sqls.should == [
-      'BEGIN;',
-      "INSERT INTO items (name) VALUES ('abc');",
-      "INSERT INTO items (name) VALUES ('def');",
-      "INSERT INTO items (name) VALUES ('ghi');",
-      'COMMIT;'
+      'BEGIN',
+      "INSERT INTO items (name) VALUES ('abc')",
+      "INSERT INTO items (name) VALUES ('def')",
+      "INSERT INTO items (name) VALUES ('ghi')",
+      'COMMIT'
     ]
   end
   
   specify "should accept the commit_every option for committing every x records" do
     @ds.multi_insert(@list, :commit_every => 2)
     @db.sqls.should == [
-      'BEGIN;',
-      "INSERT INTO items (name) VALUES ('abc');",
-      "INSERT INTO items (name) VALUES ('def');",
-      'COMMIT;',
-      'BEGIN;',
-      "INSERT INTO items (name) VALUES ('ghi');",
-      'COMMIT;'
+      'BEGIN',
+      "INSERT INTO items (name) VALUES ('abc')",
+      "INSERT INTO items (name) VALUES ('def')",
+      'COMMIT',
+      'BEGIN',
+      "INSERT INTO items (name) VALUES ('ghi')",
+      'COMMIT'
     ]
   end
 end
@@ -2007,10 +2007,10 @@ context "Dataset#transform" do
   
   specify "should change the dataset to transform values saved to the database" do
     @ds.insert(:x => :toast)
-    @ds.sql.should == "INSERT INTO items (x) VALUES ('#{Marshal.dump(:toast)}');"
+    @ds.sql.should == "INSERT INTO items (x) VALUES ('#{Marshal.dump(:toast)}')"
 
     @ds.insert(:y => 'butter')
-    @ds.sql.should == "INSERT INTO items (y) VALUES ('butter');"
+    @ds.sql.should == "INSERT INTO items (y) VALUES ('butter')"
     
     @ds.update(:x => ['dream'])
     @ds.sql.should == "UPDATE items SET x = '#{Marshal.dump(['dream'])}'"
@@ -2023,7 +2023,7 @@ context "Dataset#transform" do
     @ds2.first.should == {:x => [1, 2, 3], :y => 'hello'}
 
     @ds2.insert(:x => :toast)
-    @ds2.sql.should == "INSERT INTO items (x) VALUES ('#{Marshal.dump(:toast)}');"
+    @ds2.sql.should == "INSERT INTO items (x) VALUES ('#{Marshal.dump(:toast)}')"
   end
   
   specify "should work correctly together with set_row_proc" do
@@ -2075,9 +2075,9 @@ context "Dataset#transform" do
     @ds.first.should == {:x => [1, 2, 3], :y => 'hello'}
 
     @ds.insert(:x => :toast)
-    @ds.sql.should == "INSERT INTO items (x) VALUES ('#{:toast.to_yaml}');"
+    @ds.sql.should == "INSERT INTO items (x) VALUES ('#{:toast.to_yaml}')"
     @ds.insert(:y => 'butter')
-    @ds.sql.should == "INSERT INTO items (y) VALUES ('butter');"
+    @ds.sql.should == "INSERT INTO items (y) VALUES ('butter')"
     @ds.update(:x => ['dream'])
     @ds.sql.should == "UPDATE items SET x = '#{['dream'].to_yaml}'"
 
@@ -2085,7 +2085,7 @@ context "Dataset#transform" do
     @ds2.raw = {:x => [1, 2, 3].to_yaml, :y => 'hello'}
     @ds2.first.should == {:x => [1, 2, 3], :y => 'hello'}
     @ds2.insert(:x => :toast)
-    @ds2.sql.should == "INSERT INTO items (x) VALUES ('#{:toast.to_yaml}');"
+    @ds2.sql.should == "INSERT INTO items (x) VALUES ('#{:toast.to_yaml}')"
 
     @ds.set_row_proc {|r| r[:z] = r[:x] * 2; r}
     @ds.raw = {:x => "wow".to_yaml, :y => 'hello'}
@@ -2103,9 +2103,9 @@ context "Dataset#transform" do
     @ds.first.should == {:x => [1, 2, 3], :y => 'hello'}
 
     @ds.insert(:x => :toast)
-    @ds.sql.should == "INSERT INTO items (x) VALUES ('#{Marshal.dump(:toast)}');"
+    @ds.sql.should == "INSERT INTO items (x) VALUES ('#{Marshal.dump(:toast)}')"
     @ds.insert(:y => 'butter')
-    @ds.sql.should == "INSERT INTO items (y) VALUES ('butter');"
+    @ds.sql.should == "INSERT INTO items (y) VALUES ('butter')"
     @ds.update(:x => ['dream'])
     @ds.sql.should == "UPDATE items SET x = '#{Marshal.dump(['dream'])}'"
 
@@ -2113,7 +2113,7 @@ context "Dataset#transform" do
     @ds2.raw = {:x => Marshal.dump([1, 2, 3]), :y => 'hello'}
     @ds2.first.should == {:x => [1, 2, 3], :y => 'hello'}
     @ds2.insert(:x => :toast)
-    @ds2.sql.should == "INSERT INTO items (x) VALUES ('#{Marshal.dump(:toast)}');"
+    @ds2.sql.should == "INSERT INTO items (x) VALUES ('#{Marshal.dump(:toast)}')"
 
     @ds.set_row_proc {|r| r[:z] = r[:x] * 2; r}
     @ds.raw = {:x => Marshal.dump("wow"), :y => 'hello'}

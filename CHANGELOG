@@ -1,5 +1,7 @@
 === SVN
 
+* Revised code to generate SQL statements without trailing semicolons.
+
 * Added Sequel::Worker implementation of a simple worker thread for asynchronous execution.
 
 * Added spec for Oracle adapter.

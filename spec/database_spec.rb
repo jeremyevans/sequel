@@ -197,11 +197,11 @@ class DummyDataset < Sequel::Dataset
 end
 
 class DummyDatabase < Sequel::Database
-  attr_reader :sql
+  attr_reader :sqls
   
   def execute(sql)
-    @sql ||= ""
-    @sql << sql
+    @sqls ||= []
+    @sqls << sql
   end
   
   def transaction; yield; end
@@ -222,8 +222,10 @@ context "Database#create_table" do
       column :name, :text
       index :name, :unique => true
     end
-    @db.sql.should == 
-      'CREATE TABLE test (id integer NOT NULL PRIMARY KEY AUTOINCREMENT, name text);CREATE UNIQUE INDEX test_name_index ON test (name);'
+    @db.sqls.should == [
+      'CREATE TABLE test (id integer NOT NULL PRIMARY KEY AUTOINCREMENT, name text)',
+      'CREATE UNIQUE INDEX test_name_index ON test (name)'
+    ]
   end
 end
 
@@ -235,19 +237,21 @@ end
 
 context "Database#drop_table" do
   setup do
-    @db = Dummy2Database.new
+    @db = DummyDatabase.new
   end
   
   specify "should construct proper SQL" do
     @db.drop_table :test
-    @db.sql.should == 
-      'DROP TABLE test;'
+    @db.sqls.should == ['DROP TABLE test']
   end
   
   specify "should accept multiple table names" do
     @db.drop_table :a, :bb, :ccc
-    @db.sql.should ==
-      'DROP TABLE a;DROP TABLE bb;DROP TABLE ccc;'
+    @db.sqls.should == [
+      'DROP TABLE a',
+      'DROP TABLE bb',
+      'DROP TABLE ccc'
+    ]
   end
 end
 
@@ -294,8 +298,8 @@ context "Database#transaction" do
   end
   
   specify "should issue ROLLBACK if an exception is raised, and re-raise" do
-    @db.transaction {@db.execute 'DROP TABLE test;'; raise RuntimeError} rescue nil
-    @db.sql.should == ['BEGIN', 'DROP TABLE test;', 'ROLLBACK']
+    @db.transaction {@db.execute 'DROP TABLE test'; raise RuntimeError} rescue nil
+    @db.sql.should == ['BEGIN', 'DROP TABLE test', 'ROLLBACK']
     
     proc {@db.transaction {raise RuntimeError}}.should raise_error(RuntimeError)
   end
@@ -307,7 +311,7 @@ context "Database#transaction" do
       @db.drop_table(:b)
     end
     
-    @db.sql.should == ['BEGIN', 'DROP TABLE a;', 'ROLLBACK']
+    @db.sql.should == ['BEGIN', 'DROP TABLE a', 'ROLLBACK']
   end
   
   specify "should be re-entrant" do

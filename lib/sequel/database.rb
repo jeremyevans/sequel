@@ -180,7 +180,7 @@ module Sequel
     
     # Drops one or more tables corresponding to the given table names.
     def drop_table(*names)
-      execute(names.map {|n| drop_table_sql(n)}.join)
+      names.each {|n| execute(drop_table_sql(n))}
     end
     
     # Returns true if the given table exists.

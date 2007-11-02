@@ -126,7 +126,7 @@ end
 context "A connection pool with a max size of 1" do
   setup do
     @invoked_count = 0
-    @pool = Sequel::ConnectionPool.new(1) {@invoked_count += 1;'herro'}
+    @pool = Sequel::ConnectionPool.new(1) {@invoked_count += 1; 'herro'}
   end
   
   specify "should let only one thread access the connection at any time" do

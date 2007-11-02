@@ -63,9 +63,9 @@ module Sequel
         columns = index[:columns].join(COMMA_SEPARATOR)
         index_name = index[:name] || default_index_name(table_name, index[:columns])
         if index[:unique]
-          "CREATE UNIQUE INDEX #{index_name} ON #{table_name} (#{columns});"
+          "CREATE UNIQUE INDEX #{index_name} ON #{table_name} (#{columns})"
         else
-          "CREATE INDEX #{index_name} ON #{table_name} (#{columns});"
+          "CREATE INDEX #{index_name} ON #{table_name} (#{columns})"
         end
       end
     
@@ -74,7 +74,7 @@ module Sequel
       end
   
       def create_table_sql_list(name, columns, indexes = nil)
-        sql = ["CREATE TABLE #{name} (#{column_list_sql(columns)});"]
+        sql = ["CREATE TABLE #{name} (#{column_list_sql(columns)})"]
         if indexes && !indexes.empty?
           sql.concat(index_list_sql_list(name, indexes))
         end
@@ -82,7 +82,7 @@ module Sequel
       end
       
       def drop_table_sql(name)
-        "DROP TABLE #{name};"
+        "DROP TABLE #{name}"
       end
     end
   end

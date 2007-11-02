@@ -438,7 +438,7 @@ module Sequel
       #     'INSERT INTO items (a, b) VALUES (1, 2)'
       def insert_sql(*values)
         if values.empty?
-          "INSERT INTO #{@opts[:from]} DEFAULT VALUES;"
+          "INSERT INTO #{@opts[:from]} DEFAULT VALUES"
         else
           values = values[0] if values.size == 1
           case values
@@ -446,27 +446,27 @@ module Sequel
             insert_sql(values.values)
           when Array
             if values.empty?
-              "INSERT INTO #{@opts[:from]} DEFAULT VALUES;"
+              "INSERT INTO #{@opts[:from]} DEFAULT VALUES"
             elsif values.keys
               fl = values.keys
               vl = transform_save(values.values).map {|v| literal(v)}
-              "INSERT INTO #{@opts[:from]} (#{fl.join(COMMA_SEPARATOR)}) VALUES (#{vl.join(COMMA_SEPARATOR)});"
+              "INSERT INTO #{@opts[:from]} (#{fl.join(COMMA_SEPARATOR)}) VALUES (#{vl.join(COMMA_SEPARATOR)})"
             else
-              "INSERT INTO #{@opts[:from]} VALUES (#{literal(values)});"
+              "INSERT INTO #{@opts[:from]} VALUES (#{literal(values)})"
             end
           when Hash
             values = transform_save(values) if @transform
             if values.empty?
-              "INSERT INTO #{@opts[:from]} DEFAULT VALUES;"
+              "INSERT INTO #{@opts[:from]} DEFAULT VALUES"
             else
               fl, vl = [], []
               values.each {|k, v| fl << column_name(k); vl << literal(v)}
-              "INSERT INTO #{@opts[:from]} (#{fl.join(COMMA_SEPARATOR)}) VALUES (#{vl.join(COMMA_SEPARATOR)});"
+              "INSERT INTO #{@opts[:from]} (#{fl.join(COMMA_SEPARATOR)}) VALUES (#{vl.join(COMMA_SEPARATOR)})"
             end
           when Dataset
-            "INSERT INTO #{@opts[:from]} #{literal(values)};"
+            "INSERT INTO #{@opts[:from]} #{literal(values)}"
           else
-            "INSERT INTO #{@opts[:from]} VALUES (#{literal(values)});"
+            "INSERT INTO #{@opts[:from]} VALUES (#{literal(values)})"
           end
         end
       end

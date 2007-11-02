@@ -107,7 +107,7 @@ context "A MySQL dataset" do
       'SELECT max(items.`name`) AS `max_name` FROM items'
 
     @d.insert_sql(:value => 333).should == \
-      'INSERT INTO items (`value`) VALUES (333);'
+      'INSERT INTO items (`value`) VALUES (333)'
   end
   
   specify "should support ORDER clause in UPDATE statements" do

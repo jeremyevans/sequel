@@ -56,7 +56,7 @@ context "A worker with a given db" do
     @w = nil
     @db.sqls.should == [
       'BEGIN',
-      'INSERT INTO items (x) VALUES (1);',
+      'INSERT INTO items (x) VALUES (1)',
       'COMMIT'
     ]
   end

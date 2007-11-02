@@ -43,7 +43,7 @@ module Sequel
     # Assigns a connection to the current thread, yielding the connection
     # to the supplied block.
     # 
-    #   pool.hold {|conn| conn.execute('DROP TABLE posts;')}
+    #   pool.hold {|conn| conn.execute('DROP TABLE posts')}
     # 
     # Pool#hold is re-entrant, meaning it can be called recursively in
     # the same thread without blocking.

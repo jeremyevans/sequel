@@ -96,9 +96,9 @@ module Sequel
           @opts[:database], @opts[:port])
         conn.query_with_result = false
         if encoding = @opts[:encoding] || @opts[:charset]
-          conn.query("set character_set_connection = '#{encoding}';")
-          conn.query("set character_set_client = '#{encoding}';")
-          conn.query("set character_set_results = '#{encoding}';")
+          conn.query("set character_set_connection = '#{encoding}'")
+          conn.query("set character_set_client = '#{encoding}'")
+          conn.query("set character_set_results = '#{encoding}'")
         end
         conn.reconnect = true
         conn

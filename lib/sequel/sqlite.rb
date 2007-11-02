@@ -61,11 +61,11 @@ module Sequel
       end
       
       def pragma_get(name)
-        single_value("PRAGMA #{name};")
+        single_value("PRAGMA #{name}")
       end
       
       def pragma_set(name, value)
-        execute("PRAGMA #{name} = #{value};")
+        execute("PRAGMA #{name} = #{value}")
       end
       
       AUTO_VACUUM = {'0' => :none, '1' => :full, '2' => :incremental}.freeze

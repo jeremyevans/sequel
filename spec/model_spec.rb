@@ -252,13 +252,13 @@ context "A model class" do
   specify "should be able to create rows in the associated table" do
     o = @c.create(:x => 1)
     o.class.should == @c
-    MODEL_DB.sqls.should == ['INSERT INTO items (x) VALUES (1);',  "SELECT * FROM items WHERE (id IN ('INSERT INTO items (x) VALUES (1);')) LIMIT 1"]
+    MODEL_DB.sqls.should == ['INSERT INTO items (x) VALUES (1)',  "SELECT * FROM items WHERE (id IN ('INSERT INTO items (x) VALUES (1)')) LIMIT 1"]
   end
   
   specify "should be able to create rows without any values specified" do
     o = @c.create
     o.class.should == @c
-    MODEL_DB.sqls.should == ["INSERT INTO items DEFAULT VALUES;", "SELECT * FROM items WHERE (id IN ('INSERT INTO items DEFAULT VALUES;')) LIMIT 1"]
+    MODEL_DB.sqls.should == ["INSERT INTO items DEFAULT VALUES", "SELECT * FROM items WHERE (id IN ('INSERT INTO items DEFAULT VALUES')) LIMIT 1"]
   end
 end
 
@@ -276,7 +276,7 @@ context "A model class without a primary key" do
     i.class.should be(@c)
     i.values.to_hash.should == {:x => 1}
     
-    MODEL_DB.sqls.should == ['INSERT INTO items (x) VALUES (1);']
+    MODEL_DB.sqls.should == ['INSERT INTO items (x) VALUES (1)']
   end
   
   specify "should raise when deleting" do
@@ -288,7 +288,7 @@ context "A model class without a primary key" do
     o = @c.new(:x => 2)
     o.should be_new
     o.save
-    MODEL_DB.sqls.should == ['INSERT INTO items (x) VALUES (2);']
+    MODEL_DB.sqls.should == ['INSERT INTO items (x) VALUES (2)']
   end
 end
 
@@ -307,8 +307,8 @@ context "Model#serialize" do
     @c.create(:abc => "hello")
     
     MODEL_DB.sqls.should == [ \
-      "INSERT INTO items (abc) VALUES ('--- 1\n');", \
-      "INSERT INTO items (abc) VALUES ('--- hello\n');", \
+      "INSERT INTO items (abc) VALUES ('--- 1\n')", \
+      "INSERT INTO items (abc) VALUES ('--- hello\n')", \
     ]
   end
   
@@ -324,8 +324,8 @@ context "Model#serialize" do
     @c.create(:def => "hello")
     
     MODEL_DB.sqls.should == [ \
-      "INSERT INTO items (def) VALUES ('--- 1\n');", \
-      "INSERT INTO items (def) VALUES ('--- hello\n');", \
+      "INSERT INTO items (def) VALUES ('--- 1\n')", \
+      "INSERT INTO items (def) VALUES ('--- hello\n')", \
     ]
   end
   
@@ -339,8 +339,8 @@ context "Model#serialize" do
     @c.create(:abc => "hello")
     
     MODEL_DB.sqls.should == [ \
-      "INSERT INTO items (abc) VALUES ('\004\bi\006');", \
-      "INSERT INTO items (abc) VALUES ('\004\b\"\nhello');", \
+      "INSERT INTO items (abc) VALUES ('\004\bi\006')", \
+      "INSERT INTO items (abc) VALUES ('\004\b\"\nhello')", \
     ]
   end
   
@@ -387,7 +387,7 @@ context "Model#serialize" do
     
     ds.raw = {:id => 1, :abc => "--- 1\n", :def => "--- hello\n"}
     o = @c.create(:abc => [1, 2, 3])
-    ds.sqls.should == "INSERT INTO items (abc) VALUES ('#{[1, 2, 3].to_yaml}');"
+    ds.sqls.should == "INSERT INTO items (abc) VALUES ('#{[1, 2, 3].to_yaml}')"
   end
 end
 
@@ -490,8 +490,8 @@ context "Model.after_create" do
     end
     
     n = @c.create(:x => 1)
-    MODEL_DB.sqls.should == ["INSERT INTO items (x) VALUES (1);", "SELECT * FROM items WHERE (id = 1) LIMIT 1"]
-    s.should == ["INSERT INTO items (x) VALUES (1);", "SELECT * FROM items WHERE (id = 1) LIMIT 1"]
+    MODEL_DB.sqls.should == ["INSERT INTO items (x) VALUES (1)", "SELECT * FROM items WHERE (id = 1) LIMIT 1"]
+    s.should == ["INSERT INTO items (x) VALUES (1)", "SELECT * FROM items WHERE (id = 1) LIMIT 1"]
   end
   
   specify "should allow calling save in the hook" do
@@ -502,7 +502,7 @@ context "Model.after_create" do
     end
     
     n = @c.create(:id => 1)
-    MODEL_DB.sqls.should == ["INSERT INTO items (id) VALUES (1);", "SELECT * FROM items WHERE (id = 1) LIMIT 1", "UPDATE items SET id = 2 WHERE (id = 1)"]
+    MODEL_DB.sqls.should == ["INSERT INTO items (id) VALUES (1)", "SELECT * FROM items WHERE (id = 1) LIMIT 1", "UPDATE items SET id = 2 WHERE (id = 1)"]
   end
 end
 

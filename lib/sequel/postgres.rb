@@ -284,7 +284,7 @@ module Sequel
       end
 
       def drop_table_sql(name)
-        "DROP TABLE #{name} CASCADE;"
+        "DROP TABLE #{name} CASCADE"
       end
     end
   
@@ -350,7 +350,7 @@ module Sequel
         analysis.join("\r\n")
       end
     
-      LOCK = 'LOCK TABLE %s IN %s MODE;'.freeze
+      LOCK = 'LOCK TABLE %s IN %s MODE'.freeze
     
       ACCESS_SHARE = 'ACCESS SHARE'.freeze
       ROW_SHARE = 'ROW SHARE'.freeze
