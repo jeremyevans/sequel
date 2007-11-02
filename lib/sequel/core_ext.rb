@@ -76,7 +76,7 @@ end
 
 # Methods to format column names and associated constructs. This module is
 # included in String and Symbol.
-module FieldCompositionMethods
+module ColumnCompositionMethods
   # Constructs a DESC clause for use in an ORDER BY clause.
   def DESC
     "#{to_column_name} DESC".lit
@@ -92,14 +92,14 @@ module FieldCompositionMethods
     "#{to_s}.*".lit
   end
   
-  FIELD_TITLE_RE1 = /^(.*)\sAS\s(.+)$/i.freeze
-  FIELD_TITLE_RE2 = /^([^\.]+)\.([^\.]+)$/.freeze
+  COLUMN_TITLE_RE1 = /^(.*)\sAS\s(.+)$/i.freeze
+  COLUMN_TITLE_RE2 = /^([^\.]+)\.([^\.]+)$/.freeze
   
   # Returns the column name. If the column name is aliased, the alias is 
   # returned.
   def field_title
     case s = to_column_name
-    when FIELD_TITLE_RE1, FIELD_TITLE_RE2: $2
+    when COLUMN_TITLE_RE1, COLUMN_TITLE_RE2: $2
     else
       s
     end
@@ -109,17 +109,17 @@ end
 
 # String extensions
 class String
-  include FieldCompositionMethods
+  include ColumnCompositionMethods
 end
 
 # Symbol extensions
 class Symbol
-  include FieldCompositionMethods
+  include ColumnCompositionMethods
   
 
-  FIELD_REF_RE1 = /^(\w+)__(\w+)___(\w+)/.freeze
-  FIELD_REF_RE2 = /^(\w+)___(\w+)$/.freeze
-  FIELD_REF_RE3 = /^(\w+)__(\w+)$/.freeze
+  COLUMN_REF_RE1 = /^(\w+)__(\w+)___(\w+)/.freeze
+  COLUMN_REF_RE2 = /^(\w+)___(\w+)$/.freeze
+  COLUMN_REF_RE3 = /^(\w+)__(\w+)$/.freeze
   
   # Converts a symbol into a column name. This method supports underscore
   # notation in order to express qualified (two underscores) and aliased 
@@ -133,9 +133,9 @@ class Symbol
   def to_field_name
     s = to_s
     case s
-    when FIELD_REF_RE1: "#{$1}.#{$2} AS #{$3}"
-    when FIELD_REF_RE2: "#{$1} AS #{$2}"
-    when FIELD_REF_RE3: "#{$1}.#{$2}"
+    when COLUMN_REF_RE1: "#{$1}.#{$2} AS #{$3}"
+    when COLUMN_REF_RE2: "#{$1} AS #{$2}"
+    when COLUMN_REF_RE3: "#{$1}.#{$2}"
     else
       s
     end

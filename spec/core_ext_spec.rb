@@ -152,7 +152,7 @@ context "Symbol#to_column_name" do
   end
 end
 
-context "FieldCompositionMethods#column_title" do
+context "ColumnCompositionMethods#column_title" do
   specify "should return the column name for non aliased columns" do
     :xyz.column_title.should == 'xyz'
     :abc__xyz.column_title.should == 'xyz'

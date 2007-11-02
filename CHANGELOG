@@ -1,5 +1,9 @@
 === SVN
 
+* Renamed alias to Array#keys as Array#columns instead of Array#fields.
+
+* Renamed FieldCompositionMethods as ColumnCompositionMethods.
+
 * Implemented Sequel::NumericExtensions to provide stuff like 30.days.ago.
 
 === 0.3.2 (2007-11-01)

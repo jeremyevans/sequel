@@ -183,8 +183,8 @@ module ArrayKeys
       end
     end
  
-    alias_method :fields, :keys
-    alias_method :fields=, :keys=
+    alias_method :columns, :keys
+    alias_method :columns=, :keys=
   end
   
   # The DatasetExtensions module provides extensions that modify

@@ -172,20 +172,20 @@ module Sequel
     end
     
     class Dataset < Sequel::Dataset
-      UNQUOTABLE_FIELD_RE = /^(`(.+)`)|\*$/.freeze
+      UNQUOTABLE_COLUMN_RE = /^(`(.+)`)|\*$/.freeze
       def quote_column(f)
-        (f.nil? || f.empty? || f =~ UNQUOTABLE_FIELD_RE) ? f : "`#{f}`"
+        (f.nil? || f.empty? || f =~ UNQUOTABLE_COLUMN_RE) ? f : "`#{f}`"
       end
       
-      FIELD_EXPR_RE = /^([^\(]+\()?([^\.]+\.)?([^\s\)]+)?(\))?(\sAS\s(.+))?$/i.freeze
-      FIELD_ORDER_RE = /^(.*) (DESC|ASC)$/i.freeze
+      COLUMN_EXPR_RE = /^([^\(]+\()?([^\.]+\.)?([^\s\)]+)?(\))?(\sAS\s(.+))?$/i.freeze
+      COLUMN_ORDER_RE = /^(.*) (DESC|ASC)$/i.freeze
       def quoted_column_name(name)
         case name
-        when FIELD_EXPR_RE:
+        when COLUMN_EXPR_RE:
           $6 ? \
             "#{$1}#{$2}#{quote_column($3)}#{$4} AS #{quote_column($6)}" : \
             "#{$1}#{$2}#{quote_column($3)}#{$4}"
-        when FIELD_ORDER_RE: "#{quote_column($1)} #{$2}"
+        when COLUMN_ORDER_RE: "#{quote_column($1)} #{$2}"
         else
           quote_column(name)
         end

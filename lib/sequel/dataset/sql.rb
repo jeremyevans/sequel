@@ -447,8 +447,8 @@ module Sequel
           when Array
             if values.empty?
               "INSERT INTO #{@opts[:from]} DEFAULT VALUES;"
-            elsif values.fields
-              fl = values.fields
+            elsif values.keys
+              fl = values.keys
               vl = transform_save(values.values).map {|v| literal(v)}
               "INSERT INTO #{@opts[:from]} (#{fl.join(COMMA_SEPARATOR)}) VALUES (#{vl.join(COMMA_SEPARATOR)});"
             else
@@ -484,7 +484,7 @@ module Sequel
           raise SequelError, "Can't update a joined dataset"
         end
 
-        if values.is_a?(Array) && values.fields
+        if values.is_a?(Array) && values.keys
           values = values.to_hash
         end
         values = transform_save(values) if @transform

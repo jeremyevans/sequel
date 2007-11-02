@@ -53,9 +53,9 @@ context "An array with symbol keys" do
     @a.to_h.should == {:a => 1, :b => 2, :c => 3}
   end
   
-  specify "should provide #fields as alias to #keys" do
-    @a.fields.should == [:a, :b, :c]
-    @a.fields = [:x, :y, :z]
+  specify "should provide #columns as alias to #keys" do
+    @a.columns.should == [:a, :b, :c]
+    @a.columns = [:x, :y, :z]
     
     @a[:x].should == 1
   end
@@ -305,9 +305,9 @@ context "An array with string keys" do
     @a.to_h.should == {:a => 1, :b => 2, :c => 3}
   end
 
-  specify "should provide #fields as alias to #keys" do
-    @a.fields.should == ['a', 'b', 'c']
-    @a.fields = [:x, :y, :z]
+  specify "should provide #columns as alias to #keys" do
+    @a.columns.should == ['a', 'b', 'c']
+    @a.columns = [:x, :y, :z]
 
     @a[:x].should == 1
   end
