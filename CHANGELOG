@@ -1,5 +1,7 @@
 === SVN
 
+* Added Sequel::Worker implementation of a simple worker thread for asynchronous execution.
+
 * Added spec for Oracle adapter.
 
 * Fixed Oracle adapter to format INSERT statements without semicolons (thanks Liming Lian).
