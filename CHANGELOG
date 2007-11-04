@@ -1,4 +1,4 @@
-=== SVN
+=== 0.3.3 (2007-11-04)
 
 * Revised code to generate SQL statements without trailing semicolons.
 
