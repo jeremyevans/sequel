@@ -116,7 +116,7 @@ module Sequel
 
     # Evaluates specified chain of Hooks through <tt>instance_eval</tt>.
     def run_hooks(key)
-      model.hooks[key].each { |h| instance_eval &h }
+      model.hooks[key].each {|h| instance_eval(&h)}
     end
     
     def self.has_hooks?(key)
