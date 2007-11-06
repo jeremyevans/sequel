@@ -172,31 +172,14 @@ module Sequel
     end
     
     class Dataset < Sequel::Dataset
-      UNQUOTABLE_COLUMN_RE = /^(`(.+)`)|\*$/.freeze
-      def quote_column(f)
-        (f.nil? || f.empty? || f =~ UNQUOTABLE_COLUMN_RE) ? f : "`#{f}`"
-      end
-      
-      COLUMN_EXPR_RE = /^([^\(]+\()?([^\.]+\.)?([^\s\)]+)?(\))?(\sAS\s(.+))?$/i.freeze
-      COLUMN_ORDER_RE = /^(.*) (DESC|ASC)$/i.freeze
-      def quoted_column_name(name)
-        case name
-        when COLUMN_EXPR_RE:
-          $6 ? \
-            "#{$1}#{$2}#{quote_column($3)}#{$4} AS #{quote_column($6)}" : \
-            "#{$1}#{$2}#{quote_column($3)}#{$4}"
-        when COLUMN_ORDER_RE: "#{quote_column($1)} #{$2}"
-        else
-          quote_column(name)
-        end
-      end
+      def quote_column_ref(c); "`#{c}`"; end
       
       TRUE = '1'
       FALSE = '0'
       
       def literal(v)
         case v
-        when LiteralString: quoted_column_name(v)
+        when LiteralString: v
         when String: "'#{v.gsub(/'|\\/, '\&\&')}'"
         when true: TRUE
         when false: FALSE

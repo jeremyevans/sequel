@@ -795,12 +795,12 @@ context "Dataset#qualified_column_name" do
   end
   
   specify "should return the same if already qualified" do
-    @dataset.qualified_column_name('test.a', :items).should == 'test.a'
+    @dataset.qualified_column_name('test.a'.lit, :items).should == 'test.a'
     @dataset.qualified_column_name(:ccc__b, :items).should == 'ccc.b'
   end
   
   specify "should qualify the column with the supplied table name" do
-    @dataset.qualified_column_name('a', :items).should == 'items.a'
+    @dataset.qualified_column_name('a'.lit, :items).should == 'items.a'
     @dataset.qualified_column_name(:b1, :items).should == 'items.b1'
   end
 end
@@ -1274,16 +1274,16 @@ context "Dataset#last" do
   
   specify "should invert the order" do
     @d.order(:a).last
-    @c.last_dataset.opts[:order].should == ['a DESC']
+    @d.literal(@c.last_dataset.opts[:order]).should == @d.literal([:a.DESC])
     
     @d.order(:b.DESC).last
-    @c.last_dataset.opts[:order].should == ['b']
+    @d.literal(@c.last_dataset.opts[:order]).should == @d.literal(:b)
     
     @d.order(:c, :d).last
-    @c.last_dataset.opts[:order].should == ['c DESC', 'd DESC']
+    @d.literal(@c.last_dataset.opts[:order]).should == @d.literal([:c.DESC, :d.DESC])
     
     @d.order(:e.DESC, :f).last
-    @c.last_dataset.opts[:order].should == ['e', 'f DESC']
+    @d.literal(@c.last_dataset.opts[:order]).should == @d.literal([:e, :f.DESC])
   end
   
   specify "should return the first matching record if a hash is specified" do

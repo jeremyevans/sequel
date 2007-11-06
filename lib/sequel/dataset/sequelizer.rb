@@ -108,7 +108,8 @@ class Sequel::Dataset
       when :>, :<, :>=, :<=
         l = eval_expr(e[1], b)
         r = eval_expr(e[3][1], b)
-        if (Symbol === l) || (Sequel::LiteralString === l) || (Symbol === r) || (Sequel::LiteralString === r)
+        if l.is_one_of?(Symbol, Sequel::LiteralString, Sequel::SQL::Expression) || \
+          r.is_one_of?(Symbol, Sequel::LiteralString, Sequel::SQL::Expression)
           "(#{literal(l)} #{op} #{literal(r)})"
         else
           ext_expr(e, b)
@@ -124,7 +125,8 @@ class Sequel::Dataset
       when :+, :-, :*, :/, :%
         l = eval_expr(e[1], b)
         r = eval_expr(e[3][1], b)
-        if (Symbol === l) || (Sequel::LiteralString === l) || (Symbol === r) || (Sequel::LiteralString === r)
+        if l.is_one_of?(Symbol, Sequel::LiteralString, Sequel::SQL::Expression) || \
+          r.is_one_of?(Symbol, Sequel::LiteralString, Sequel::SQL::Expression)
           "(#{literal(l)} #{op} #{literal(r)})".lit
         else
           ext_expr(e, b)
@@ -146,7 +148,7 @@ class Sequel::Dataset
       else
         if (op == :[]) && (e[1][0] == :lit) && (Symbol === e[1][1])
           # SQL Functions, e.g.: :sum[:x]
-          e[1][1][*pt_expr(e[3], b)]
+          e[1][1][*eval_expr(e[3], b)]
         else
           # external code
           ext_expr(e, b)

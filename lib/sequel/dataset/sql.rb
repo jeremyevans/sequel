@@ -3,26 +3,10 @@ module Sequel
     # The Dataset SQL module implements all the dataset methods concerned with
     # generating SQL statements for retrieving and manipulating records.
     module SQL
-      # Returns a valid SQL column name as a string. Column names specified as 
-      # symbols can include double underscores to denote a dot separator, e.g.
-      # :posts__id will be converted into posts.id.
-      def column_name(column)
-        case column
-        when Symbol, String:
-          quoted_column_name(column.to_column_name)
-        when Hash:
-          column.map {|f,a| "#{column_name(f)} AS #{column_name(a)}"}.join(COMMA_SEPARATOR)
-        else
-          column
-        end
-      end
-
       # Adds quoting to column references. This method is just a stub and can
       # be overriden in adapters in order to provide correct column quoting
       # behavior.
-      def quoted_column_name(name)
-        name
-      end
+      def quote_column_ref(name); name.to_s; end
       
       ALIASED_REGEXP = /^(.*)\s(.*)$/.freeze
       QUALIFIED_REGEXP = /^(.*)\.(.*)$/.freeze
@@ -30,7 +14,7 @@ module Sequel
       # Returns a qualified column name (including a table name) if the column
       # name isn't already qualified.
       def qualified_column_name(column, table)
-        column = column_name(column)
+        column = literal(column)
         if column =~ QUALIFIED_REGEXP
           # column is already qualified
           column
@@ -105,7 +89,8 @@ module Sequel
         when NilClass: NULL
         when TrueClass: TRUE
         when FalseClass: FALSE
-        when Symbol: quoted_column_name(v.to_column_name)
+        when Symbol: v.to_column_ref(self)
+        when Sequel::SQL::Expression: v.to_s(self)
         when Array: v.empty? ? NULL : v.map {|i| literal(i)}.join(COMMA_SEPARATOR)
         when Time: v.strftime(TIMESTAMP_FORMAT)
         when Date: v.strftime(DATE_FORMAT)
@@ -170,20 +155,25 @@ module Sequel
         order(*invert_order(order.empty? ? @opts[:order] : order))
       end
 
-      DESC_ORDER_REGEXP = /(.*)\sDESC/i.freeze
+      DESC_ORDER_REGEXP = /^(.*)\sDESC$/i.freeze
 
       # Inverts the given order by breaking it into a list of column references
       # and inverting them.
       #
-      #   dataset.invert_order('id DESC') #=> "id"
-      #   dataset.invert_order('category, price DESC') #=>
-      #     "category DESC, price"
+      #   dataset.invert_order(['id DESC']) #=> ["id"]
+      #   dataset.invert_order(['category, price DESC']) #=>
+      #     ["category DESC, price"]
       def invert_order(order)
         new_order = []
         order.each do |f|
-          f.to_s.split(',').map do |p|
-            p.strip!
-            new_order << ((p =~ DESC_ORDER_REGEXP ? $1 : p.to_sym.DESC).lit)
+          if f.is_a?(String)
+            f.split(',').each do |r|
+              r.strip!
+              new_order << ((r =~ DESC_ORDER_REGEXP ? $1 : r.to_sym.desc).lit)
+            end
+          else
+            r = literal(f).strip
+            new_order << ((r =~ DESC_ORDER_REGEXP ? $1 : r.to_sym.desc).lit)
           end
         end
         new_order
@@ -460,7 +450,7 @@ module Sequel
               "INSERT INTO #{@opts[:from]} DEFAULT VALUES"
             else
               fl, vl = [], []
-              values.each {|k, v| fl << column_name(k); vl << literal(v)}
+              values.each {|k, v| fl << literal(k); vl << literal(v)}
               "INSERT INTO #{@opts[:from]} (#{fl.join(COMMA_SEPARATOR)}) VALUES (#{vl.join(COMMA_SEPARATOR)})"
             end
           when Dataset
@@ -488,7 +478,7 @@ module Sequel
           values = values.to_hash
         end
         values = transform_save(values) if @transform
-        set_list = values.map {|k, v| "#{column_name(k)} = #{literal(v)}"}.
+        set_list = values.map {|k, v| "#{literal(k)} = #{literal(v)}"}.
           join(COMMA_SEPARATOR)
         sql = "UPDATE #{@opts[:from]} SET #{set_list}"
 

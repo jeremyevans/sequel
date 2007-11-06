@@ -1,5 +1,7 @@
 === SVN
 
+* Refactored code relating to column references for better extendibility.
+
 * Tiny fix to Model#run_hooks.
 
 === 0.3.3 (2007-11-04)

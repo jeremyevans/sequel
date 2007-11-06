@@ -97,17 +97,29 @@ context "A MySQL dataset" do
     @d.order(:name.DESC).sql.should == \
       'SELECT * FROM items ORDER BY `name` DESC'
       
-    @d.select('items.name AS item_name'.to_sym).sql.should == \
-      'SELECT items.`name` AS `item_name` FROM items'
+    @d.select('items.name AS item_name'.lit).sql.should == \
+      'SELECT items.name AS item_name FROM items'
       
     @d.select('`name`'.lit).sql.should == \
       'SELECT `name` FROM items'
 
     @d.select('max(items.`name`) AS `max_name`'.lit).sql.should == \
       'SELECT max(items.`name`) AS `max_name` FROM items'
+      
+    @d.select(:test[:abc, 'hello']).sql.should == \
+      "SELECT test(`abc`, 'hello') FROM items"
+
+    @d.select(:test[:abc__def, 'hello']).sql.should == \
+      "SELECT test(abc.`def`, 'hello') FROM items"
+
+    @d.select(:test[:abc__def, 'hello'].as(:x2)).sql.should == \
+      "SELECT test(abc.`def`, 'hello') AS `x2` FROM items"
 
     @d.insert_sql(:value => 333).should == \
       'INSERT INTO items (`value`) VALUES (333)'
+
+      @d.insert_sql(:x => :y).should == \
+        'INSERT INTO items (`x`) VALUES (`y`)'
   end
   
   specify "should support ORDER clause in UPDATE statements" do
@@ -186,5 +198,25 @@ context "A MySQL dataset in array tuples mode" do
     a.keys.should == [:name, :value]
     a[:name].should == 'abc'
     a[:value].should == '123'
+  end
+end
+
+context "Chuck's test stage 1" do
+  setup do
+    @d = MYSQL_DB[:orders]
+  end
+  
+  specify "should correctly quote column references" do
+    market = 'ICE'
+    ack_stamp = Time.now - 15 * 60 # 15 minutes ago
+    @d.query do
+      select :market, :minute[:from_unixtime[:ack]].as(:minute)
+      where do
+        :ack > ack_stamp
+        :market == market
+      end
+      group_by :minute[:from_unixtime[:ack]]
+    end.sql.should == \
+      "SELECT `market`, minute(from_unixtime(`ack`)) AS `minute` FROM orders WHERE ((`ack` > TIMESTAMP '2007-11-06 19:11:01') AND (`market` = 'ICE')) GROUP BY minute(from_unixtime(`ack`))"
   end
 end
