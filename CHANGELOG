@@ -1,6 +1,8 @@
 === SVN
 
-* Refactored code relating to column references for better extendibility.
+* Fixed error message in command-line tool if failed to load adapter (#85).
+
+* Refactored code relating to column references for better extendibility (#88).
 
 * Tiny fix to Model#run_hooks.
 

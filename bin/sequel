@@ -24,8 +24,8 @@ end
 begin
   scheme = URI.parse(db).scheme
   require File.join('sequel', scheme)
-rescue LoadError
-  puts "Invalid adapter specified: #{scheme}"
+rescue LoadError => e
+  puts "Failed to load #{scheme} adapter: #{e.message}"
   exit
 rescue => e
   puts e.message
