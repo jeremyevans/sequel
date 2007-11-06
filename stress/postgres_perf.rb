@@ -1,10 +1,11 @@
 require 'benchmark'
 require 'rubygems'
+# require 'fastthread'
 require File.join(File.dirname(__FILE__), '../lib/sequel/postgres')
 
 DB = Sequel('postgres://postgres:postgres@localhost:5432/reality_development')
 
-N = 10
+N = 100
 
 Benchmark::bmbm(20) do |x|
   x.report('postgres read') do
