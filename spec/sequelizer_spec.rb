@@ -163,6 +163,13 @@ context "Proc#to_sql" do
       "(x(1, (SELECT z FROM y), 'a''b') > 100)"
   end
   
+  specify "should support SQL functions without arguments" do
+    proc {:abc[] > 100}.to_sql.should == "(abc() > 100)"
+    
+    proc {:now[] - :last_stamp > 100}.to_sql.should == \
+      "((now() - last_stamp) > 100)"
+  end
+  
   specify "should do stuff like..." do
     proc {:price < 100 || :category != 'ruby'}.to_sql.should == \
       "((price < 100) OR (NOT (category = 'ruby')))"

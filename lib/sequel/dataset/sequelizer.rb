@@ -148,7 +148,11 @@ class Sequel::Dataset
       else
         if (op == :[]) && (e[1][0] == :lit) && (Symbol === e[1][1])
           # SQL Functions, e.g.: :sum[:x]
-          e[1][1][*eval_expr(e[3], b)]
+          if e[3]
+            e[1][1][*eval_expr(e[3], b)]
+          else
+            e[1][1][]
+          end
         else
           # external code
           ext_expr(e, b)

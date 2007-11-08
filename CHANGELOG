@@ -1,5 +1,7 @@
 === 0.3.4 (2007-11-08)
 
+* Fixed SQL functions without arguments in block filters.
+
 * Implemented super-cool Symbol#cast_as method.
 
 * Fixed error message in command-line tool if failed to load adapter (#85).
