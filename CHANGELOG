@@ -1,5 +1,7 @@
 === SVN
 
+* Implemented super-cool Symbol#cast_as method.
+
 * Fixed error message in command-line tool if failed to load adapter (#85).
 
 * Refactored code relating to column references for better extendibility (#88).

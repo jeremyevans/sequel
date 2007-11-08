@@ -187,6 +187,11 @@ context "Column references" do
     @ds.literal(:xyz.ASC).should == "`xyz` ASC"
     @ds.literal(:avg[:xyz, 1].desc).should == "avg(`xyz`, 1) DESC"
   end
+  
+  specify "should be quoted properly in a cast function" do
+    @ds.literal(:x.cast_as(:integer)).should == "cast(`x` AS integer)"
+    @ds.literal(:x__y.cast_as(:varchar[20])).should == "cast(x.`y` AS varchar(20))"
+  end
 end
 
 context "Symbol#ALL/#all" do
@@ -265,6 +270,10 @@ context "Symbol" do
     db = Sequel::Database.new
     ds = db[:t]
     ds.select(:COUNT['1']).sql.should == "SELECT COUNT('1') FROM t"
+  end
+  
+  specify "should support cast function" do
+    :abc.cast_as(:integer).to_s(@ds).should == "cast(abc AS integer)"
   end
 end
 

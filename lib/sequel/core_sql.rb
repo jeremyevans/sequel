@@ -141,4 +141,11 @@ class Symbol
       super
     end
   end
+  
+  def cast_as(t)
+    if t.is_a?(Symbol)
+      t = t.to_s.lit
+    end
+    Sequel::SQL::Function.new(:cast, self.as(t))
+  end
 end
