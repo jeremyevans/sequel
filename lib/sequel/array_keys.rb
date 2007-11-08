@@ -208,6 +208,7 @@ module ArrayKeys
             else
               fetch_rows(select_sql(opts)) {|r| block[@row_proc[transform_load(Array.from_hash(r))]]}
             end
+            self
           end
         end
       elsif @row_proc
@@ -218,18 +219,21 @@ module ArrayKeys
             else
               fetch_rows(select_sql(opts)) {|r| block[@row_proc[Array.from_hash(r)]]}
             end
+            self
           end
         end
       elsif @transform
         class << self
           def each(opts = nil, &block)
             fetch_rows(select_sql(opts)) {|r| block[transform_load(Array.from_hash(r))]}
+            self
           end
         end
       else
         class << self
           def each(opts = nil, &block)
             fetch_rows(select_sql(opts)) {|r| block[Array.from_hash(r)]}
+            self
           end
         end
       end

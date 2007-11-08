@@ -161,6 +161,7 @@ module Sequel
     # Iterates over the records in the dataset
     def each(opts = nil, &block)
       fetch_rows(select_sql(opts), &block)
+      self
     end
 
     # Returns the the model classes associated with the dataset as a hash.
@@ -347,6 +348,7 @@ module Sequel
             else
               fetch_rows(select_sql(opts)) {|r| block[@row_proc[transform_load(r)]]}
             end
+            self
           end
         end
       elsif @row_proc
@@ -357,18 +359,21 @@ module Sequel
             else
               fetch_rows(select_sql(opts)) {|r| block[@row_proc[r]]}
             end
+            self
           end
         end
       elsif @transform
         class << self
           def each(opts = nil, &block)
             fetch_rows(select_sql(opts)) {|r| block[transform_load(r)]}
+            self
           end
         end
       else
         class << self
           def each(opts = nil, &block)
             fetch_rows(select_sql(opts), &block)
+            self
           end
         end
       end
