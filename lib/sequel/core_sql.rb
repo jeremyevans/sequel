@@ -95,6 +95,16 @@ module Sequel
       
       def asc; ColumnExpr.new(self, ASC); end
       alias_method :ASC, :asc
+
+      def all; Sequel::SQL::ColumnAll.new(self); end
+      alias_method :ALL, :all
+
+      def cast_as(t)
+        if t.is_a?(Symbol)
+          t = t.to_s.lit
+        end
+        Sequel::SQL::Function.new(:cast, self.as(t))
+      end
     end
   end
 end
@@ -129,9 +139,6 @@ class Symbol
     end
   end
   
-  def all; Sequel::SQL::ColumnAll.new(self); end
-  alias_method :ALL, :all
-
   # Converts missing method calls into functions on columns, if the
   # method name is made of all upper case letters.
   def method_missing(sym)
@@ -140,12 +147,5 @@ class Symbol
     else
       super
     end
-  end
-  
-  def cast_as(t)
-    if t.is_a?(Symbol)
-      t = t.to_s.lit
-    end
-    Sequel::SQL::Function.new(:cast, self.as(t))
   end
 end
