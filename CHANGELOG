@@ -1,4 +1,4 @@
-=== 0.3.4 (2007-11-08)
+=== 0.3.4 (2007-11-10)
 
 * Fixed MySQL adapter to allow calling stored procedures (thanks Sebastian).
 
