@@ -371,10 +371,13 @@ module Sequel
 
         columns = opts[:select]
         select_columns = columns ? column_list(columns) : WILDCARD
-        select_source = source_list(opts[:from])
         sql = opts[:distinct] ? \
-          "SELECT DISTINCT #{select_columns} FROM #{select_source}" : \
-          "SELECT #{select_columns} FROM #{select_source}"
+        "SELECT DISTINCT #{select_columns}" : \
+        "SELECT #{select_columns}"
+        
+        if opts[:from]
+          sql << " FROM #{source_list(opts[:from])}"
+        end
         
         if join = opts[:join]
           sql << join

@@ -1,3 +1,7 @@
+=== 0.3.4.1 (2007-11-10)
+
+* Changed Dataset#select_sql to support queries without a FROM clause.
+
 === 0.3.4 (2007-11-10)
 
 * Fixed MySQL adapter to allow calling stored procedures (thanks Sebastian).
