@@ -201,7 +201,7 @@ context "A MySQL dataset in array tuples mode" do
   end
 end
 
-context "Chuck's test stage 1" do
+context "MySQL datasets" do
   setup do
     @d = MYSQL_DB[:orders]
   end
@@ -217,6 +217,20 @@ context "Chuck's test stage 1" do
       end
       group_by :minute[:from_unixtime[:ack]]
     end.sql.should == \
-      "SELECT `market`, minute(from_unixtime(`ack`)) AS `minute` FROM orders WHERE ((`ack` > TIMESTAMP '2007-11-06 19:11:01') AND (`market` = 'ICE')) GROUP BY minute(from_unixtime(`ack`))"
+      "SELECT `market`, minute(from_unixtime(`ack`)) AS `minute` FROM orders WHERE ((`ack` > #{@d.literal(ack_stamp)}) AND (`market` = 'ICE')) GROUP BY minute(from_unixtime(`ack`))"
+  end
+end
+
+context "Simple stored procedure test" do
+  setup do
+    # Create a simple stored procedure but drop it first if there
+    MYSQL_DB.execute("DROP PROCEDURE IF EXISTS sp_get_server_id;")
+    MYSQL_DB.execute("CREATE PROCEDURE sp_get_server_id() SQL SECURITY DEFINER SELECT @@SERVER_ID as server_id;")
+  end
+
+  specify "should return the server-id via a stored procedure call" do
+    @server_id = MYSQL_DB["SELECT @@SERVER_ID as server_id;"].first[:server_id] # grab the server_id via a simple query
+    @server_id_by_sp = MYSQL_DB["CALL sp_get_server_id();"].first[:server_id]
+    @server_id_by_sp.should == @server_id  # compare it to output from stored procedure
   end
 end

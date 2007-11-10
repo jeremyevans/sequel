@@ -1,5 +1,7 @@
 === 0.3.4 (2007-11-08)
 
+* Fixed MySQL adapter to allow calling stored procedures (thanks Sebastian).
+
 * Changed Dataset#each to always return self.
 
 * Fixed SQL functions without arguments in block filters.

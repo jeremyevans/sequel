@@ -28,11 +28,13 @@ If you have any comments or suggestions please send an email to ciconia at gmail
 
 Sequel currently supports:
 
-* Postgresql
-* SQLite 3
+* ADO (on Windows)
 * DBI
-* ODBC
 * MySQL
+* ODBC
+* Oracle
+* PostgreSQL
+* SQLite 3
 
 == The Sequel Console
 
