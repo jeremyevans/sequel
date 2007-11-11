@@ -1,5 +1,7 @@
 === SVN
 
+* Fixed column qualification for joined datasets (thanks Christian).
+
 * Implemented experimental informix adapter.
 
 === 0.3.4.1 (2007-11-10)

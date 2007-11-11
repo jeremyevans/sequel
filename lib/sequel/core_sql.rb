@@ -68,6 +68,14 @@ module Sequel
       end
     end
     
+    class QualifiedColumnRef < Expression
+      def initialize(t, c); @t, @c = t, c; end
+      
+      def to_s(ds)
+        "#{@t}.#{ds.literal(@c)}"
+      end 
+    end
+    
     class Function < Expression
       def initialize(f, *args); @f, @args = f, args; end
 

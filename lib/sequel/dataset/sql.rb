@@ -14,16 +14,15 @@ module Sequel
       # Returns a qualified column name (including a table name) if the column
       # name isn't already qualified.
       def qualified_column_name(column, table)
-        column = literal(column)
-        if column =~ QUALIFIED_REGEXP
-          # column is already qualified
-          column
-        else 
-          # check if the table is aliased
-          if table =~ ALIASED_REGEXP
+        s = literal(column)
+        if s =~ QUALIFIED_REGEXP
+          return column
+        else
+          if (table =~ ALIASED_REGEXP)
             table = $2
           end
-          "#{table}.#{column}"
+          Sequel::SQL::QualifiedColumnRef.new(table, column)
+          # "#{table}.#{column}"
         end
       end
 
@@ -109,10 +108,7 @@ module Sequel
         case expr
         when Hash:
           parenthesize = false if expr.size == 1
-          # fmt = expr.map {|i| compare_expr(i[0], i[1])}.join(AND_SEPARATOR)
-          # N.B.: We convert this to an array and sort it in order to have a fixed order for testability.
-          # Hash in Ruby 1.8 has no order, so Hash#map is indeterminate, which makes it hard to test.
-          fmt = expr.to_a.sort_by { |k, v| k.to_s }.map {|i| compare_expr(i[0], i[1])}.join(AND_SEPARATOR)
+          fmt = expr.map {|i| compare_expr(i[0], i[1])}.join(AND_SEPARATOR)
         when Array:
           fmt = expr.shift.gsub(QUESTION_MARK) {literal(expr.shift)}
         when Proc:
@@ -320,8 +316,8 @@ module Sequel
 
         join_conditions = {}
         expr.each do |k, v|
-          k = qualified_column_name(k, table).intern if k.is_a?(Symbol)
-          v = qualified_column_name(v, @opts[:last_joined_table] || @opts[:from].first).intern if v.is_a?(Symbol)
+          k = qualified_column_name(k, table) if k.is_a?(Symbol)
+          v = qualified_column_name(v, @opts[:last_joined_table] || @opts[:from].first) if v.is_a?(Symbol)
           join_conditions[k] = v
         end
         " #{join_type} #{table} ON #{expression_list(join_conditions)}"

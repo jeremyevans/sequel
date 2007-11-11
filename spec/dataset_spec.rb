@@ -796,12 +796,12 @@ context "Dataset#qualified_column_name" do
   
   specify "should return the same if already qualified" do
     @dataset.qualified_column_name('test.a'.lit, :items).should == 'test.a'
-    @dataset.qualified_column_name(:ccc__b, :items).should == 'ccc.b'
+    @dataset.qualified_column_name(:ccc__b, :items).should == :ccc__b
   end
   
   specify "should qualify the column with the supplied table name" do
-    @dataset.qualified_column_name('a'.lit, :items).should == 'items.a'
-    @dataset.qualified_column_name(:b1, :items).should == 'items.b1'
+    @dataset.qualified_column_name('a'.lit, :items).to_s(@dataset).should == 'items.a'
+    @dataset.qualified_column_name(:b1, :items).to_s(@dataset).should == 'items.b1'
   end
 end
 
@@ -1015,12 +1015,12 @@ context "Dataset#join_table" do
   specify "should allow for arbitrary conditions in the JOIN clause" do
     @d.join_table(:left_outer, :categories, :id => :category_id, :status => 0).sql.should ==
       'SELECT * FROM items LEFT OUTER JOIN categories ON (categories.id = items.category_id) AND (categories.status = 0)'
-    @d.join_table(:left_outer, :categories, :id => :category_id, :categorizable_type => "Post").sql.should ==
-      "SELECT * FROM items LEFT OUTER JOIN categories ON (categories.categorizable_type = 'Post') AND (categories.id = items.category_id)"
-    @d.join_table(:left_outer, :categories, :id => :category_id, :timestamp => "CURRENT_TIMESTAMP".lit).sql.should ==
-      "SELECT * FROM items LEFT OUTER JOIN categories ON (categories.id = items.category_id) AND (categories.timestamp = CURRENT_TIMESTAMP)"
-    @d.join_table(:left_outer, :categories, :id => :category_id, :status => [1, 2, 3]).sql.should ==
-      "SELECT * FROM items LEFT OUTER JOIN categories ON (categories.id = items.category_id) AND (categories.status IN (1, 2, 3))"
+    @d.join_table(:left_outer, :categories, :categorizable_type => "Post").sql.should ==
+      "SELECT * FROM items LEFT OUTER JOIN categories ON (categories.categorizable_type = 'Post')"
+    @d.join_table(:left_outer, :categories, :timestamp => "CURRENT_TIMESTAMP".lit).sql.should ==
+      "SELECT * FROM items LEFT OUTER JOIN categories ON (categories.timestamp = CURRENT_TIMESTAMP)"
+    @d.join_table(:left_outer, :categories, :status => [1, 2, 3]).sql.should ==
+      "SELECT * FROM items LEFT OUTER JOIN categories ON (categories.status IN (1, 2, 3))"
   end
 end
 

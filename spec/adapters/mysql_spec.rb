@@ -234,3 +234,14 @@ context "Simple stored procedure test" do
     @server_id_by_sp.should == @server_id  # compare it to output from stored procedure
   end
 end
+
+context "Joiמed MySQL dataset" do
+  setup do
+    @ds = MYSQL_DB[:nodes].join(:attributes, :node_id => :id)
+  end
+  
+  specify "should quote fields correctly" do
+    @ds.sql.should == \
+      "SELECT * FROM nodes INNER JOIN attributes ON (attributes.`node_id` = nodes.`id`)"
+  end
+end
