@@ -1,3 +1,7 @@
+=== SVN
+
+* Implemented experimental informix adapter.
+
 === 0.3.4.1 (2007-11-10)
 
 * Changed Dataset#select_sql to support queries without a FROM clause.
