@@ -92,6 +92,11 @@ context "A PostgreSQL dataset" do
     @d.filter(:name => /bc/).count.should == 2
     @d.filter(:name => /^bc/).count.should == 1
   end
+
+  specify "should consider strings containing backslashes to be escaped string literals" do
+    PGconn.quote("\\dingo").should == "E'\\\\dingo'"   # literally, E'\\dingo'
+    PGconn.quote("dingo").should == "'dingo'"
+  end
 end
 
 context "A PostgreSQL dataset in array tuples mode" do

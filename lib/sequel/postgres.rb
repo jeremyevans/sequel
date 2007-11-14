@@ -18,6 +18,22 @@ class PGconn
     end
   end
   
+  class << self
+    # The postgres gem's string quoting doesn't render string literals properly, which this fixes.
+    # 
+    #   "a basic string" #=> 'a basic string'
+    #   "this\or that"   #=> E'this\\or that'
+    # 
+    # See <http://www.postgresql.org/docs/8.2/static/sql-syntax-lexical.html> for details.
+    def quote_with_proper_escaping(s)
+      value = quote_without_proper_escaping(s)
+      value = "E#{value}" if value =~ /\\/
+      return value
+    end
+    alias_method :quote_without_proper_escaping, :quote
+    alias_method :quote, :quote_with_proper_escaping
+  end
+
   def connected?
     status == PGconn::CONNECTION_OK
   end

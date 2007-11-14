@@ -1,5 +1,7 @@
 === SVN
 
+* Fixed literalization of strings with escape sequences in postgres adapter.
+
 * Added support for literalizing BigDecimal values (#89).
 
 * Fixed column qualification for joined datasets (thanks Christian).
