@@ -573,6 +573,10 @@ context "Dataset#literal" do
     @dataset.update_sql(:a => 'a + 2'.expr).should == 
       'UPDATE test SET a = a + 2'
   end
+
+  specify "should literalize BigDecimal instances correctly" do
+    @dataset.literal(BigDecimal.new("80")).should == "80.0"
+  end
 end
 
 context "Dataset#from" do

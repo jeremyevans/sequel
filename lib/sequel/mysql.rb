@@ -2,8 +2,6 @@ if !Object.const_defined?('Sequel')
   require File.join(File.dirname(__FILE__), '../sequel')
 end
 
-require "bigdecimal"
-require "bigdecimal/util"
 require 'mysql'
 
 # Monkey patch Mysql::Result to yield hashes with symbol keys

@@ -85,6 +85,7 @@ module Sequel
         when LiteralString: v
         when String: "'#{v.gsub(/'/, "''")}'"
         when Integer, Float: v.to_s
+        when BigDecimal: v.to_s("F")
         when NilClass: NULL
         when TrueClass: TRUE
         when FalseClass: FALSE

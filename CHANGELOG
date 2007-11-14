@@ -1,5 +1,7 @@
 === SVN
 
+* Added support for literalizing BigDecimal values (#89).
+
 * Fixed column qualification for joined datasets (thanks Christian).
 
 * Implemented experimental informix adapter.

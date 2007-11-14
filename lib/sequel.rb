@@ -1,4 +1,6 @@
 require 'metaid'
+require 'bigdecimal'
+require 'bigdecimal/util'
 
 files = %w[
   core_ext core_sql array_keys error connection_pool pretty_table
