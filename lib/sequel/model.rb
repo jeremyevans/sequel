@@ -305,6 +305,11 @@ module Sequel
       table_name = dataset.opts[:from].first
       dataset.join(*args).select(table_name.to_sym.ALL)
     end
+    
+    # Returns an array containing all model records
+    def self.all
+      dataset.all
+    end
 
     # Returns value of attribute.
     def [](column)

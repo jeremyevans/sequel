@@ -1,5 +1,7 @@
 === SVN
 
+* Fixed Model.all.
+
 * Fixed literalization of strings with escape sequences in postgres adapter (#90).
 
 * Added support for literalizing BigDecimal values (#89).
