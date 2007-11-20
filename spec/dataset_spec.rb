@@ -861,6 +861,12 @@ context "Dataset#uniq" do
   specify "should be aliased by Dataset#distinct" do
     @dataset.distinct.sql.should == 'SELECT DISTINCT name FROM test'
   end
+  
+  specify "should accept an expression list" do
+    @dataset.uniq(:a, :b).sql.should == 'SELECT DISTINCT ON (a, b) name FROM test'
+
+    @dataset.uniq(:stamp.cast_as(:integer), :node_id).sql.should == 'SELECT DISTINCT ON (cast(stamp AS integer), node_id) name FROM test'
+  end
 end
 
 context "Dataset#count" do

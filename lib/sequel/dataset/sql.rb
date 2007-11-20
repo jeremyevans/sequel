@@ -134,10 +134,10 @@ module Sequel
       end
 
       # Returns a copy of the dataset with the distinct option.
-      def uniq
-        clone_merge(:distinct => true)
+      def uniq(*args)
+        clone_merge(:distinct => args)
       end
-      alias distinct uniq
+      alias_method :distinct, :uniq
 
       # Returns a copy of the dataset with the order changed.
       def order(*order)
@@ -368,9 +368,13 @@ module Sequel
 
         columns = opts[:select]
         select_columns = columns ? column_list(columns) : WILDCARD
-        sql = opts[:distinct] ? \
-        "SELECT DISTINCT #{select_columns}" : \
-        "SELECT #{select_columns}"
+
+        if distinct = opts[:distinct]
+          distinct_clause = distinct.empty? ? "DISTINCT" : "DISTINCT ON (#{column_list(distinct)})"
+          sql = "SELECT #{distinct_clause} #{select_columns}"
+        else
+          sql = "SELECT #{select_columns}"
+        end
         
         if opts[:from]
           sql << " FROM #{source_list(opts[:from])}"

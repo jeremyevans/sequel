@@ -1,5 +1,7 @@
 === SVN
 
+* Dataset#uniq/distinct can now accept a column list for DISTINCT ON clauses.
+
 * Fixed Model.all.
 
 * Fixed literalization of strings with escape sequences in postgres adapter (#90).
