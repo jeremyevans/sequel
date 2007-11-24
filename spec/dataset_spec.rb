@@ -1028,8 +1028,8 @@ context "Dataset#join_table" do
   end
   
   specify "should allow for arbitrary conditions in the JOIN clause" do
-    @d.join_table(:left_outer, :categories, :id => :category_id, :status => 0).sql.should ==
-      'SELECT * FROM items LEFT OUTER JOIN categories ON (categories.id = items.category_id) AND (categories.status = 0)'
+    @d.join_table(:left_outer, :categories, :status => 0).sql.should ==
+      'SELECT * FROM items LEFT OUTER JOIN categories ON (categories.status = 0)'
     @d.join_table(:left_outer, :categories, :categorizable_type => "Post").sql.should ==
       "SELECT * FROM items LEFT OUTER JOIN categories ON (categories.categorizable_type = 'Post')"
     @d.join_table(:left_outer, :categories, :timestamp => "CURRENT_TIMESTAMP".lit).sql.should ==

@@ -6,7 +6,7 @@ files = %w[
   core_ext core_sql array_keys error connection_pool pretty_table
   dataset migration model schema database worker
 ]
-dir = File.join(File.dirname(__FILE__), 'sequel-common')
+dir = File.join(File.dirname(__FILE__), 'sequel-core')
 files.each {|f| require(File.join(dir, f))}
 
 module Sequel #:nodoc:
