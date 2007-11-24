@@ -6,7 +6,7 @@ require 'fileutils'
 include FileUtils
 
 NAME = "sequel"
-VERS = "0.3.4.1"
+VERS = "0.4.0"
 CLEAN.include ['**/.*.sw?', 'pkg/*', '.config', 'doc/*', 'coverage/*']
 RDOC_OPTS = ['--quiet', '--title', "Sequel: Concise ORM for Ruby",
   "--opname", "index.html",
@@ -25,7 +25,7 @@ Rake::RDocTask.new do |rdoc|
   rdoc.options += RDOC_OPTS
   rdoc.main = "README"
   rdoc.title = "Sequel: Lightweight ORM library for Ruby"
-  rdoc.rdoc_files.add ['README', 'COPYING', 'lib/sequel.rb', 'lib/sequel/**/*.rb']
+  rdoc.rdoc_files.add ['README', 'COPYING', 'lib/sequel.rb', 'lib/**/*.rb']
 end
 
 spec = Gem::Specification.new do |s|
