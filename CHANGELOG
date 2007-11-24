@@ -1,5 +1,7 @@
 === SVN
 
+* Fixed problem in Database#uri where setting the password would raise an error (#87).
+
 * Improved Dataset#insert_sql to correctly handle string keys (#92).
 
 * Improved error-handling for worker threads. Errors are saved to an array and are accessible through #errors (#91).

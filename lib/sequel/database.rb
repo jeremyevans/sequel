@@ -64,7 +64,7 @@ module Sequel
         nil
       )
       uri.user = @opts[:user]
-      uri.password = @opts[:password]
+      uri.password = @opts[:password] if uri.user
       uri.to_s
     end
     alias url uri # Because I don't care much for the semantic difference.
