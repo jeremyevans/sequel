@@ -20,7 +20,7 @@ module Sequel
       loop {next_job}
     rescue WorkerStopError # signals the worker thread to stop
     ensure
-      rollback! if @should_rollback
+      rollback! unless @errors.empty?
     end
     
     def busy?
@@ -50,7 +50,6 @@ module Sequel
       raise e
     rescue Exception => e
       @errors << e
-      @should_rollback = true if @transaction
     ensure
       @cur = nil
     end
