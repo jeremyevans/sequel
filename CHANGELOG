@@ -1,5 +1,7 @@
 === SVN
 
+* Reorganized lib directory structure.
+
 * Added support for dbi-xxx URI schemes (#86).
 
 * Fixed problem in Database#uri where setting the password would raise an error (#87).
