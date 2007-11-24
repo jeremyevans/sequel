@@ -32,7 +32,19 @@ context "A worker" do
     
     @w.join
     values.should == [1, 2, 3]
-    @w = nil
+  end
+  
+  specify "should isolate errors and hold them in #errors" do
+    values = []
+    @w.add {values << 1}
+    @w.async {values << 2}
+    @w.async {raise "bad bad bad"}
+    @w << proc {values << 3}
+    
+    @w.join
+    values.should == [1, 2, 3]
+    @w.errors.size.should == 1
+    @w.errors.first.message.should == 'bad bad bad'
   end
 end
 
@@ -40,7 +52,13 @@ context "A worker with a given db" do
   setup do
     @db = MockDatabase.new
     @m = Module.new do
-      def transaction; execute('BEGIN'); yield; execute('COMMIT'); end
+      def transaction
+        execute('BEGIN')
+        yield
+        execute('COMMIT')
+      rescue
+        execute('ROLLBACK')
+      end
     end
     @db.extend(@m)
     @w = Sequel::Worker.new(@db)
@@ -59,5 +77,20 @@ context "A worker with a given db" do
       'INSERT INTO items (x) VALUES (1)',
       'COMMIT'
     ]
+  end
+
+  specify "should rollback the transaction if any error is raised" do
+    @w.async {@db[:items] << {:x => 1}}
+    @w.async {sleep 0.2; raise "that's bad"}
+    @w.async {@db[:items] << {:x => 2}}
+    @w.join
+    @db.sqls.should == [
+      'BEGIN',
+      'INSERT INTO items (x) VALUES (1)',
+      'INSERT INTO items (x) VALUES (2)',
+      'ROLLBACK'
+    ]
+    @w.errors.size.should == 1
+    @w.errors.first.message.should == "that's bad"
   end
 end
