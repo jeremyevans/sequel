@@ -285,7 +285,9 @@ module Sequel
     #   DB = Sequel.open 'sqlite:///blog.db'
     def self.connect(conn_string, more_opts = nil)
       uri = URI.parse(conn_string)
-      c = @@adapters[uri.scheme.to_sym]
+      scheme = uri.scheme
+      scheme = :dbi if scheme =~ /^dbi-(.+)/
+      c = @@adapters[scheme.to_sym]
       raise SequelError, "Invalid database scheme" unless c
       c.new(c.uri_to_options(uri).merge(more_opts || {}))
     end

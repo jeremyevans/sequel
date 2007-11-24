@@ -1,5 +1,7 @@
 === SVN
 
+* Added support for dbi-xxx URI schemes (#86).
+
 * Fixed problem in Database#uri where setting the password would raise an error (#87).
 
 * Improved Dataset#insert_sql to correctly handle string keys (#92).

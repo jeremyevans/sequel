@@ -8,6 +8,39 @@ module Sequel
   module DBI
     class Database < Sequel::Database
       set_adapter_scheme :dbi
+      
+      DBI_ADAPTERS = {
+        :ado => "ADO",
+        :db2 => "DB2",
+        :frontbase => "FrontBase",
+        :interbase => "InterBase",
+        :msql => "Msql",
+        :mysql => "Mysql",
+        :odbc => "ODBC",
+        :oracle => "Oracle",
+        :pg => "Pg",
+        :proxy => "Proxy",
+        :sqlite => "SQLite",
+        :sqlrelay => "SQLRelay"
+      }
+
+      # Converts a uri to an options hash. These options are then passed
+      # to a newly created database object.
+      def self.uri_to_options(uri)
+        database = (uri.path =~ /\/(.*)/) && ($1)
+        if uri.scheme =~ /dbi-(.+)/
+          adapter = DBI_ADAPTERS[$1.to_sym] || $1
+          database = "#{adapter}:#{database}"
+        end
+        {
+          :user => uri.user,
+          :password => uri.password,
+          :host => uri.host,
+          :port => uri.port,
+          :database => database
+        }
+      end
+
     
       def connect
         dbname = @opts[:database]
