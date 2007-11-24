@@ -36,6 +36,8 @@ Sequel currently supports:
 * PostgreSQL
 * SQLite 3
 
+There are also experimental adapters for DB2 and Informix.
+
 == The Sequel Console
 
 Sequel includes an IRB console for quick'n'dirty access to databases. You can use it like this:
