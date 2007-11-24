@@ -454,7 +454,7 @@ module Sequel
               "INSERT INTO #{@opts[:from]} DEFAULT VALUES"
             else
               fl, vl = [], []
-              values.each {|k, v| fl << literal(k); vl << literal(v)}
+              values.each {|k, v| fl << k.to_s; vl << literal(v)}
               "INSERT INTO #{@opts[:from]} (#{fl.join(COMMA_SEPARATOR)}) VALUES (#{vl.join(COMMA_SEPARATOR)})"
             end
           when Dataset

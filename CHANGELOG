@@ -1,6 +1,8 @@
 === SVN
 
-* Improved error-handling for worker threads. Errors are saved to an array and are accessible through #errors.
+* Improved Dataset#insert_sql to correctly handle string keys (#92).
+
+* Improved error-handling for worker threads. Errors are saved to an array and are accessible through #errors (#91).
 
 * Dataset#uniq/distinct can now accept a column list for DISTINCT ON clauses.
 

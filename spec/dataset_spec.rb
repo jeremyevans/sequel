@@ -119,6 +119,11 @@ context "A simple dataset" do
     @dataset.insert_sql(v).should == "INSERT INTO test DEFAULT VALUES"
   end
   
+  specify "should format an insert statement with string keys" do
+    @dataset.insert_sql('name' => 'wxyz', 'price' => 342).
+      should match(/INSERT INTO test \(name, price\) VALUES \('wxyz', 342\)|INSERT INTO test \(price, name\) VALUES \(342, 'wxyz'\)/)
+  end
+  
   specify "should format an insert statement with a model instance" do
     dbb = Sequel::Database.new
     
