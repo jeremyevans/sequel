@@ -375,9 +375,7 @@ context "A Database adapter with a scheme" do
     c.opts[:database].should == 'db'
   end
 
-  specify "should register a convenience method on Sequel" do
-    Sequel.should respond_to(:ccc)
-    
+  specify "should be accessible through Sequel.<adapter>" do
     # invalid parameters
     proc {Sequel.ccc('abc', 'def')}.should raise_error(SequelError)
     
@@ -396,16 +394,16 @@ context "A Database adapter with a scheme" do
 end
 
 context "An unknown database scheme" do
-  specify "should raise an exception in Sequel::Database.connect" do
-    proc {Sequel::Database.connect('ddd://localhost/db')}.should raise_error(SequelError)
+  specify "should raise an error in Sequel::Database.connect" do
+    proc {Sequel::Database.connect('ddd://localhost/db')}.should raise_error(LoadError)
   end
 
-  specify "should raise an exception in Sequel.connect" do
-    proc {Sequel.connect('ddd://localhost/db')}.should raise_error(SequelError)
+  specify "should raise an error in Sequel.connect" do
+    proc {Sequel.connect('ddd://localhost/db')}.should raise_error(LoadError)
   end
 
-  specify "should raise an exception in Sequel.open" do
-    proc {Sequel.open('ddd://localhost/db')}.should raise_error(SequelError)
+  specify "should raise an error in Sequel.open" do
+    proc {Sequel.open('ddd://localhost/db')}.should raise_error(LoadError)
   end
 end
 

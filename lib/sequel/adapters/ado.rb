@@ -1,5 +1,5 @@
 if !Object.const_defined?('Sequel')
-  require File.join(File.dirname(__FILE__), '../sequel')
+  require File.join(File.dirname(__FILE__), '../../sequel')
 end
 
 require 'win32ole'

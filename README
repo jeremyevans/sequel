@@ -79,14 +79,9 @@ Much of Sequel is still undocumented (especially the part relating to model clas
 
 === Connecting to a database
 
-Before connecting to a database, you should require the corresponding adaptor, for example:
-
-  require 'sequel/sqlite'
-
-Note: you don't need to require 'sequel' separately before that, as each adapter requires 'sequel' if it hasn't yet been required.
-
 To connect to a database you simply provide Sequel with a URL:
 
+  require 'sequel'
   DB = Sequel.open 'sqlite:///blog.db'
   
 The connection URL can also include such stuff as the user name and password:

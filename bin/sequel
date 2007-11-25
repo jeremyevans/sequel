@@ -22,8 +22,7 @@ if db.nil? || db.empty?
 end
 
 begin
-  scheme = URI.parse(db).scheme
-  require File.join('sequel', scheme)
+  DB = Sequel.connect db
 rescue LoadError => e
   puts "Failed to load #{scheme} adapter: #{e.message}"
   exit
@@ -32,7 +31,6 @@ rescue => e
   exit
 end
 
-DB = Sequel.connect db
 begin
   DB.test_connection
 rescue => e

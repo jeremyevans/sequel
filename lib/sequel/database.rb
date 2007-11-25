@@ -237,24 +237,6 @@ module Sequel
     def self.set_adapter_scheme(scheme)
       @scheme = scheme
       @@adapters[scheme.to_sym] = self
-      
-      # Define convenience method for this database class
-      db_class = self
-      Sequel.meta_def(scheme) do |*args|
-        begin
-          case args.size
-          when 1: # Sequel.dbi(db_name)
-            opts = {:database => args[0]}
-          when 0 # Sequel.dbi
-            opts = {}
-          else # Sequel.dbi(db_name, opts)
-            opts = args[1].merge(:database => args[0])
-          end
-        rescue
-          raise SequelError, "Invalid parameters specified"
-        end
-        db_class.new(opts)
-      end
     end
     
     # Returns the scheme for the Database class.
@@ -274,6 +256,15 @@ module Sequel
       }
     end
     
+    def self.adapter_class(scheme)
+      unless c = @@adapters[scheme.to_sym]
+        require File.join(File.dirname(__FILE__), "adapters/#{scheme}")
+        c = @@adapters[scheme.to_sym]
+      end
+      raise SequelError, "Invalid database scheme" unless c
+      c
+    end
+        
     # call-seq:
     #   Sequel::Database.connect(conn_string)
     #   Sequel.connect(conn_string)
@@ -287,8 +278,7 @@ module Sequel
       uri = URI.parse(conn_string)
       scheme = uri.scheme
       scheme = :dbi if scheme =~ /^dbi-(.+)/
-      c = @@adapters[scheme.to_sym]
-      raise SequelError, "Invalid database scheme" unless c
+      c = adapter_class(scheme)
       c.new(c.uri_to_options(uri).merge(more_opts || {}))
     end
     

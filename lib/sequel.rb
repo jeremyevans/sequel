@@ -29,6 +29,23 @@ module Sequel #:nodoc:
     def single_threaded=(value)
       Database.single_threaded = value
     end
+    
+    def method_missing(m, *args)
+      c = Database.adapter_class(m)
+      begin
+        case args.size
+        when 1: # Sequel.dbi(db_name)
+          opts = {:database => args[0]}
+        when 0 # Sequel.dbi
+          opts = {}
+        else # Sequel.dbi(db_name, opts)
+          opts = args[1].merge(:database => args[0])
+        end
+      rescue
+        raise SequelError, "Invalid parameters specified"
+      end
+      c.new(opts)
+    end
   end
 end
 
