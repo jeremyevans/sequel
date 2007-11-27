@@ -49,6 +49,18 @@ module Sequel
         end
       end
 
+      def select_sql(opts = nil)
+        limit = opts.delete(:limit)
+        offset = opts.delete(:offset)
+        sql = super
+        if limit
+          limit = "FIRST #{limit}"
+          offset = offset ? "SKIP #{offset}" : ""
+          sql.sub!(/^select /i,"SELECT #{offset} #{limit} ")
+        end
+        sql
+      end
+      
       def fetch_rows(sql, &block)
         @db.synchronize do
           @db.query(sql) do |cursor|

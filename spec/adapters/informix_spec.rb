@@ -1,28 +1,28 @@
 require File.join(File.dirname(__FILE__), '../../lib/sequel')
 
-ORACLE_DB = Sequel('oracle://hr:hr@loalhost/XE')
-if ORACLE_DB.table_exists?(:test)
-  ORACLE_DB.drop_table :test
+INFORMIX_DB = Sequel('informix://localhost/mydb')
+if INFORMIX_DB.table_exists?(:test)
+  INFORMIX_DB.drop_table :test
 end
-ORACLE_DB.create_table :test do
+INFORMIX_DB.create_table :test do
   text :name
   integer :value
   
   index :value
 end
 
-context "A Oracle database" do
+context "A Informix database" do
   specify "should provide disconnect functionality" do
-    ORACLE_DB.execute("select user from dual")
-    ORACLE_DB.pool.size.should == 1
-    ORACLE_DB.disconnect
-    ORACLE_DB.pool.size.should == 0
+    INFORMIX_DB.execute("select user from dual")
+    INFORMIX_DB.pool.size.should == 1
+    INFORMIX_DB.disconnect
+    INFORMIX_DB.pool.size.should == 0
   end
 end
 
-context "A Oracle dataset" do
+context "A Informix dataset" do
   setup do
-    @d = ORACLE_DB[:test]
+    @d = INFORMIX_DB[:test]
     @d.delete # remove all records
   end
   
@@ -75,17 +75,26 @@ context "A Oracle dataset" do
   end
   
   specify "should support transactions" do
-    ORACLE_DB.transaction do
+    INFORMIX_DB.transaction do
       @d << {:name => 'abc', :value => 1}
     end
 
     @d.count.should == 1
   end
+  
+  specify "should support #first and #last" do
+    @d << {:name => 'abc', :value => 123}
+    @d << {:name => 'abc', :value => 456}
+    @d << {:name => 'def', :value => 789}
+    
+    @d.order(:value).first.should == {:name => 'abc', :value => 123}
+    @d.order(:value).last.should == {:name => 'def', :value => 789}
+  end
 end
 
-context "A Oracle dataset in array tuples mode" do
+context "A Informix dataset in array tuples mode" do
   setup do
-    @d = ORACLE_DB[:test]
+    @d = INFORMIX_DB[:test]
     @d.delete # remove all records
     Sequel.use_array_tuples
   end

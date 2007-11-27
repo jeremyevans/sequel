@@ -1,4 +1,4 @@
-require File.join(File.dirname(__FILE__), '../../lib/sequel/postgres')
+require File.join(File.dirname(__FILE__), '../../lib/sequel')
 
 PGSQL_DB = Sequel('postgres://postgres:postgres@localhost:5432/reality_spec')
 if PGSQL_DB.table_exists?(:test)

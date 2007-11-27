@@ -1,3 +1,7 @@
+=== 0.4.2 (2007-11-27)
+
+* Fixed #first and #last functionality in Informix::Dataset (thanks Gerardo Santana).
+
 === 0.4.1 (2007-11-25)
 
 * Put adapter files in lib/sequel/adapters. Requiring sequel/<adapter> is now deprecated. Users can now just require 'sequel' and adapters are automagically loaded (#93).

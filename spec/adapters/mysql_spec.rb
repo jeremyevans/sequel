@@ -1,4 +1,4 @@
-require File.join(File.dirname(__FILE__), '../../lib/sequel/mysql')
+require File.join(File.dirname(__FILE__), '../../lib/sequel')
 
 MYSQL_DB = Sequel('mysql://root@localhost/sandbox')
 if MYSQL_DB.table_exists?(:items)
