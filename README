@@ -30,13 +30,14 @@ Sequel currently supports:
 
 * ADO (on Windows)
 * DBI
+* Informix
 * MySQL
 * ODBC
 * Oracle
 * PostgreSQL
 * SQLite 3
 
-There are also experimental adapters for DB2 and Informix.
+There is also an experimental adapter for DB2.
 
 == The Sequel Console
 
