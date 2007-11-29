@@ -420,7 +420,7 @@ module Sequel
 
         sql
       end
-      alias sql select_sql
+      alias_method :sql, :select_sql
 
       # Formats an INSERT statement using the given values. If a hash is given,
       # the resulting statement includes column names. If no values are given, 

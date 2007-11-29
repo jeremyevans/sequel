@@ -14,7 +14,7 @@ module Sequel
     # Called when a database is opened in order to automatically associate the
     # first opened database with model classes.
     def self.database_opened(db)
-      @db = db if self == Model && !@db
+      @db = db if (self == Model) && !@db
     end
 
     # Returns the dataset associated with the Model class.
