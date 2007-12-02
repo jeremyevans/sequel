@@ -2,6 +2,42 @@ module Sequel
   class Model
     attr_reader :values
 
+    # Returns value of attribute.
+    def [](column)
+      @values[column]
+    end
+    # Sets value of attribute.
+    def []=(column, value)
+      @values[column] = value
+    end
+
+    # Enumerates through all attributes.
+    #
+    # === Example:
+    #   Ticket.find(7).each { |k, v| puts "#{k} => #{v}" }
+    def each(&block)
+      @values.each(&block)
+    end
+    # Returns attribute names.
+    def keys
+      @values.keys
+    end
+
+    # Returns value for <tt>:id</tt> attribute.
+    def id
+      @values[:id]
+    end
+
+    # Compares model instances by values.
+    def ==(obj)
+      (obj.class == model) && (obj.values == @values)
+    end
+
+    # Compares model instances by pkey.
+    def ===(obj)
+      (obj.class == model) && (obj.pk == pk)
+    end
+
     # Returns key for primary key.
     def self.primary_key
       :id

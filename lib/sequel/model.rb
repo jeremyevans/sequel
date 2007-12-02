@@ -235,21 +235,15 @@ require File.join(File.dirname(__FILE__), 'model/record')
 require File.join(File.dirname(__FILE__), 'model/schema')
 require File.join(File.dirname(__FILE__), 'model/relations')
 require File.join(File.dirname(__FILE__), 'model/caching')
+require File.join(File.dirname(__FILE__), 'model/plugins')
 
 module Sequel
   class Model
-
     # Defines a method that returns a filtered dataset.
     def self.subset(name, *args, &block)
       dataset.meta_def(name) {filter(*args, &block)}
     end
-
-    # Comprehensive description goes here!
-    def primary_key_hash(value)
-      # stock implementation
-      {:id => value}
-    end
-
+    
     # Finds a single record according to the supplied filter, e.g.:
     #
     #   Ticket.find :author => 'Sharon' # => record
@@ -310,42 +304,5 @@ module Sequel
     def self.all
       dataset.all
     end
-
-    # Returns value of attribute.
-    def [](column)
-      @values[column]
-    end
-    # Sets value of attribute.
-    def []=(column, value)
-      @values[column] = value
-    end
-
-    # Enumerates through all attributes.
-    #
-    # === Example:
-    #   Ticket.find(7).each { |k, v| puts "#{k} => #{v}" }
-    def each(&block)
-      @values.each(&block)
-    end
-    # Returns attribute names.
-    def keys
-      @values.keys
-    end
-
-    # Returns value for <tt>:id</tt> attribute.
-    def id
-      @values[:id]
-    end
-
-    # Compares model instances by values.
-    def ==(obj)
-      (obj.class == model) && (obj.values == @values)
-    end
-
-    # Compares model instances by pkey.
-    def ===(obj)
-      (obj.class == model) && (obj.pk == pk)
-    end
-
   end
 end

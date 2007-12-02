@@ -1040,3 +1040,41 @@ context "Model magic methods" do
     @c.sqls.should == ["SELECT * FROM items ORDER BY name DESC LIMIT 1"] * 2
   end
 end
+
+module Sequel::Plugins
+  module Timestamped
+    def self.apply(m, opts)
+      m.class_def(:get_stamp) {@values[:stamp]}
+      m.meta_def(:stamp_opts) {opts}
+      m.before_save {@values[:stamp] = Time.now}
+    end
+  end
+end
+
+context "A model using a plugin" do
+  specify "should fail if the plugin is not found" do
+    proc do
+      c = Class.new(Sequel::Model) do
+        is :something_or_other
+      end
+    end.should raise_error(LoadError)
+  end
+  
+  specify "should apply the plugin to the class" do
+    c = nil
+    proc do
+      c = Class.new(Sequel::Model) do
+        is :timestamped, :a => 1, :b => 2
+      end
+    end.should_not raise_error(LoadError)
+    
+    c.should respond_to(:stamp_opts)
+    c.stamp_opts.should == {:a => 1, :b => 2}
+    
+    m = c.new
+    m.should respond_to(:get_stamp)
+    t = Time.now
+    m[:stamp] = t
+    m.get_stamp.should == t
+  end
+end

@@ -1,5 +1,7 @@
 == SVN
 
+* Implemented plugin loading for model classes.
+
 * Fixed odbc-mssql and odbc adapters (thanks Dusty.)
 
 * Implemented odbc-mssql adapter (thanks Dusty.)
