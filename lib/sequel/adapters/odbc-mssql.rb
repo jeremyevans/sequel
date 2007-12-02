@@ -34,7 +34,7 @@ module Sequel
 
           # ADD TOP to SELECT string for LIMITS
           if limit = opts[:limit]
-            top = "TOP #{limit}"
+            top = "TOP #{limit} "
             raise SequelError, "Offset not supported" if opts[:offset]
           end
 
@@ -43,18 +43,18 @@ module Sequel
 
           if distinct = opts[:distinct]
             distinct_clause = distinct.empty? ? "DISTINCT" : "DISTINCT ON (#{column_list(distinct)})"
-            sql = "SELECT #{top} #{distinct_clause} #{select_columns}"
+            sql = "SELECT #{top}#{distinct_clause} #{select_columns}"
           else
-            sql = "SELECT #{top} #{select_columns}"
+            sql = "SELECT #{top}#{select_columns}"
+          end
+
+          if opts[:from]
+            sql << " FROM #{source_list(opts[:from])}"
           end
 
           # ADD WITH to SELECT string for NOLOCK
           if with = opts[:with]
             sql << " WITH #{with}"
-          end
-
-          if opts[:from]
-            sql << " FROM #{source_list(opts[:from])}"
           end
 
           if join = opts[:join]

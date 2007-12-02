@@ -50,7 +50,7 @@ module Sequel
 
       def fetch_rows(sql, &block)
         @db.synchronize do
-          s = @db.execute select_sql(sql)
+          s = @db.execute sql
           begin
             @columns = s.columns(true).map {|c| c.name.to_sym}
             rows = s.fetch_all
