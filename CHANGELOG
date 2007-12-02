@@ -1,5 +1,7 @@
 == SVN
 
+* Changed Model.is to accept variable arity.
+
 * Implemented plugin loading for model classes.
 
 * Fixed odbc-mssql and odbc adapters (thanks Dusty.)

@@ -4,8 +4,8 @@ module Sequel
   class Model
     class << self
       # Loads a plugin for use with the model class
-      def is(plugin, opts = {})
-        plugin_module(plugin).apply(self, opts)
+      def is(plugin, *args)
+        plugin_module(plugin).apply(self, *args)
       end
       alias_method :is_a, :is
     
