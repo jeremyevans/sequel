@@ -1,5 +1,7 @@
 == SVN
 
+* Fixed odbc-mssql and odbc adapters (thanks Dusty.)
+
 * Implemented odbc-mssql adapter (thanks Dusty.)
 
 === 0.4.1.1 (2007-11-27)

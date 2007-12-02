@@ -10,7 +10,8 @@ module Sequel
   module ODBC
     module MSSQL
       class Database < ODBC::Database
-        set_adapter_scheme :"odbc-mssql"
+        set_adapter_scheme :odbc_mssql
+#        set_adapter_scheme :"odbc-mssql"
         
         def dataset(opts = nil)
           MSSQL::Dataset.new(self, opts)

@@ -257,6 +257,7 @@ module Sequel
     end
     
     def self.adapter_class(scheme)
+      scheme = scheme.to_s =~ /\-/ ? scheme.to_s.gsub('-', '_').to_sym : scheme.to_sym
       unless c = @@adapters[scheme.to_sym]
         require File.join(File.dirname(__FILE__), "adapters/#{scheme}")
         c = @@adapters[scheme.to_sym]

@@ -2,7 +2,7 @@ if !Object.const_defined?('Sequel')
   require File.join(File.dirname(__FILE__), '../../sequel')
 end
 
-# require 'odbc'
+require 'odbc'
 
 module Sequel
   module ODBC
