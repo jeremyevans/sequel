@@ -22,7 +22,7 @@ module Sequel
 
       # Returns the gem name for the given plugin.
       def plugin_gem(plugin)
-        "sequel-#{plugin.to_s.gsub('_', '-')}"
+        "sequel_#{plugin}"
       end
     end
   end
