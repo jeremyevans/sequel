@@ -1,4 +1,6 @@
-== SVN
+== 0.4.1.2 (2007-12-04)
+
+* Added release rake task (using RubyForge).
 
 * Changed Model.is to accept variable arity.
 

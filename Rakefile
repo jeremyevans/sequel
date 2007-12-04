@@ -6,7 +6,7 @@ require 'fileutils'
 include FileUtils
 
 NAME = "sequel"
-VERS = "0.4.1.1"
+VERS = "0.4.1.2"
 CLEAN.include ['**/.*.sw?', 'pkg/*', '.config', 'doc/*', 'coverage/*']
 RDOC_OPTS = ['--quiet', '--title', "Sequel: Concise ORM for Ruby",
   "--opname", "index.html",
@@ -102,6 +102,13 @@ end
 
 task :uninstall => [:clean] do
   sh %{sudo gem uninstall #{NAME}}
+end
+
+task :release => [:package] do
+  sh %{rubyforge login}
+  sh %{rubyforge add_release sequel sequel #{VERS} pkg/sequel-#{VERS}.tgz}
+  sh %{rubyforge add_file sequel sequel #{VERS} pkg/sequel-#{VERS}.gem}
+  sh %{rubyforge add_file sequel sequel #{VERS} pkg/sequel-#{VERS}-x86-mswin32-60.gem}
 end
 
 desc 'Update docs and upload to rubyforge.org'
