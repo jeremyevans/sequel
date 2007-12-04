@@ -1,5 +1,7 @@
 === SVN
 
+* Better plugin conventions.
+
 * Added experimental OpenBase adapter.
 
 * Fixed Sequel.<xxx> methods to accept options hash as well as database name. Fixed Sequel.connect to accept options hash as well as URI (Wayne).

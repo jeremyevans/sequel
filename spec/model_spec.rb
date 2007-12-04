@@ -1048,6 +1048,14 @@ module Sequel::Plugins
       m.meta_def(:stamp_opts) {opts}
       m.before_save {@values[:stamp] = Time.now}
     end
+    
+    module InstanceMethods
+      def abc; timestamped_opts; end
+    end
+    
+    module ClassMethods
+      def deff; timestamped_opts; end
+    end
   end
 end
 
@@ -1073,8 +1081,13 @@ context "A model using a plugin" do
     
     m = c.new
     m.should respond_to(:get_stamp)
+    m.should respond_to(:abc)
+    m.abc.should == {:a => 1, :b => 2}
     t = Time.now
     m[:stamp] = t
     m.get_stamp.should == t
+    
+    c.should respond_to(:deff)
+    c.deff.should == {:a => 1, :b => 2}
   end
 end

@@ -6,7 +6,22 @@ module Sequel
       # Loads a plugin for use with the model class, passing optional arguments
       # to the plugin.
       def is(plugin, *args)
-        plugin_module(plugin).apply(self, *args)
+        m = plugin_module(plugin)
+        if m.respond_to?(:apply)
+          m.apply(self, *args)
+        end
+        if m.const_defined?("InstanceMethods")
+          class_def(:"#{plugin}_opts") {args.first}
+          include(m::InstanceMethods)
+        end
+        if m.const_defined?("ClassMethods")
+          meta_def(:"#{plugin}_opts") {args.first}
+          metaclass.send(:include, m::ClassMethods)
+        end
+        if m.const_defined?("DatasetMethods")
+          dataset.meta_def(:"#{plugin}_opts") {args.first}
+          dataset.metaclass.send(:include, m::DatasetMethods)
+        end
       end
       alias_method :is_a, :is
     
