@@ -390,6 +390,16 @@ context "A Database adapter with a scheme" do
     c = Sequel.ccc
     c.should be_a_kind_of(CCC)
     c.opts.should == {}
+    
+    c = Sequel.ccc(:database => 'mydb', :host => 'localhost')
+    c.should be_a_kind_of(CCC)
+    c.opts.should == {:database => 'mydb', :host => 'localhost'}
+  end
+  
+  specify "should be accessible through Sequel.connect with options" do
+    c = Sequel.connect(:adapter => :ccc, :database => 'mydb')
+    c.should be_a_kind_of(CCC)
+    c.opts.should == {:adapter => :ccc, :database => 'mydb'}
   end
 end
 

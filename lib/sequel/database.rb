@@ -268,19 +268,34 @@ module Sequel
         
     # call-seq:
     #   Sequel::Database.connect(conn_string)
+    #   Sequel::Database.connect(opts)
     #   Sequel.connect(conn_string)
+    #   Sequel.connect(opts)
     #   Sequel.open(conn_string)
+    #   Sequel.open(opts)
     #
-    # Creates a new database object based on the supplied connection string.
-    # The specified scheme determines the database class used, and the rest
-    # of the string specifies the connection options. For example:
+    # Creates a new database object based on the supplied connection string
+    # and or options. If a URI is used, the URI scheme determines the database
+    # class used, and the rest of the string specifies the connection options. 
+    # For example:
+    #
     #   DB = Sequel.open 'sqlite:///blog.db'
-    def self.connect(conn_string, more_opts = nil)
-      uri = URI.parse(conn_string)
-      scheme = uri.scheme
-      scheme = :dbi if scheme =~ /^dbi-(.+)/
-      c = adapter_class(scheme)
-      c.new(c.uri_to_options(uri).merge(more_opts || {}))
+    #
+    # The second form of this method takes an options:
+    #
+    #   DB = Sequel.open :adapter => :sqlite, :database => 'blog.db'
+    def self.connect(conn_string, opts = nil)
+      if conn_string.is_a?(String)
+        uri = URI.parse(conn_string)
+        scheme = uri.scheme
+        scheme = :dbi if scheme =~ /^dbi-(.+)/
+        c = adapter_class(scheme)
+        c.new(c.uri_to_options(uri).merge(opts || {}))
+      else
+        opts = conn_string.merge(opts || {})
+        c = adapter_class(opts[:adapter])
+        c.new(opts)
+      end
     end
     
     @@single_threaded = false

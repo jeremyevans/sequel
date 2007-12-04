@@ -23,7 +23,6 @@ module Sequel #:nodoc:
     def connect(*args)
       Database.connect(*args)
     end
-    
     alias_method :open, :connect
     
     def single_threaded=(value)
@@ -35,7 +34,7 @@ module Sequel #:nodoc:
       begin
         case args.size
         when 1: # Sequel.dbi(db_name)
-          opts = {:database => args[0]}
+          opts = args[0].is_a?(Hash) ? args[0] : {:database => args[0]}
         when 0 # Sequel.dbi
           opts = {}
         else # Sequel.dbi(db_name, opts)
