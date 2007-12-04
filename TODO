@@ -27,5 +27,5 @@
 
 * Adapters: 
 
-  db2, frontbase, interbase (http://ruby-dbi.rubyforge.org/)
+  frontbase, interbase (http://ruby-dbi.rubyforge.org/)
   openbase (http://ruby-openbase.rubyforge.org)

@@ -2,43 +2,34 @@ if !Object.const_defined?('Sequel')
   require File.join(File.dirname(__FILE__), '../../sequel')
 end
 
-require 'oci8'
+require 'openbase'
 
 module Sequel
-  module Oracle
+  module OpenBase
     class Database < Sequel::Database
-      set_adapter_scheme :oracle
+      set_adapter_scheme :openbase
       
-      # AUTO_INCREMENT = 'IDENTITY(1,1)'.freeze
-      # 
-      # def auto_increment_sql
-      #   AUTO_INCREMENT
-      # end
-
       def connect
-        if @opts[:database]
-          dbname = @opts[:host] ? \
-            "//#{@opts[:host]}/#{@opts[:database]}" : @opts[:database]
-        else
-          dbname = @opts[:host]
-        end
-        conn = OCI8.new(@opts[:user], @opts[:password], dbname, @opts[:privilege])
-        conn.autocommit = true
-        conn.non_blocking = true
-        conn
+        OpenBase.new(
+          opts[:database],
+          opts[:host] || 'localhost',
+          opts[:user],
+          opts[:password]
+        )
       end
       
       def disconnect
-        @pool.disconnect {|c| c.logoff}
+        # would this work?
+        @pool.disconnect {|c| c.disconnect}
       end
     
       def dataset(opts = nil)
-        Oracle::Dataset.new(self, opts)
+        OpenBase::Dataset.new(self, opts)
       end
     
       def execute(sql)
         @logger.info(sql) if @logger
-        @pool.hold {|conn| conn.exec(sql)}
+        @pool.hold {|conn| conn.execute(sql)}
       end
       
       alias_method :do, :execute
@@ -55,16 +46,16 @@ module Sequel
 
       def fetch_rows(sql, &block)
         @db.synchronize do
-          cursor = @db.execute sql
+          result = @db.execute sql
           begin
-            @columns = cursor.get_col_names.map {|c| c.to_sym}
-            while r = cursor.fetch
+            @columns = result.column_infos.map {|c| c.name.to_sym}
+            result.each do |r|
               row = {}
               r.each_with_index {|v, i| row[@columns[i]] = v}
               yield row
             end
           ensure
-            cursor.close
+            # result.close
           end
         end
         self
@@ -72,15 +63,15 @@ module Sequel
       
       def array_tuples_fetch_rows(sql, &block)
         @db.synchronize do
-          cursor = @db.execute sql
+          result = @db.execute sql
           begin
-            @columns = cursor.get_col_names.map {|c| c.to_sym}
-            while r = cursor.fetch
-              r.keys = columns
+            @columns = result.column_infos.map {|c| c.name.to_sym}
+            result.each do |r|
+              r.keys = @columns
               yield r
             end
           ensure
-            cursor.close
+            # cursor.close
           end
         end
         self
