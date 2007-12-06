@@ -14,8 +14,19 @@ module Sequel
       set_adapter_scheme :jdbc
       
       def connect
-        JavaSQL::DriverManager.getConnection(@opts[:uri], @opts[:user], @opts[:password]);
+        unless conn_string = @opts[:uri] || @opts[:url] || @opts[:database]
+          raise SequelError, "No connection string specified"
+        end
+        unless conn_string =~ /^jdbc:/
+          conn_string = "jdbc:#{conn_string}"
+        end
+        JavaSQL::DriverManager.getConnection(
+          conn_string, 
+          @opts[:user], 
+          @opts[:password]
+        )
         # "jdbc:mysql://127.0.0.1:3306/ruby?user=root"
+        # "mysql://127.0.0.1:3306/ruby?user=root"
       end
       
       def disconnect
