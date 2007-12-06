@@ -1,3 +1,11 @@
+=== SVN
+
+* Implemented experimental JDBC adapter.
+
+* Added adapter skeleton as starting point for new adapters.
+
+* Cleaned-up adapters and moved automatic requiring of 'sequel' to adapter stubs.
+
 === 0.4.1.3 (2007-12-05)
 
 * Better plugin conventions.

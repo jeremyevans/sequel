@@ -1,7 +1,3 @@
-if !Object.const_defined?('Sequel')
-  require File.join(File.dirname(__FILE__), '../../sequel')
-end
-
 if !Sequel.const_defined?('ODBC')
   require File.join(File.dirname(__FILE__), 'odbc')
 end

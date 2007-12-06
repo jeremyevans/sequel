@@ -1,7 +1,3 @@
-if !Object.const_defined?('Sequel')
-  require File.join(File.dirname(__FILE__), '../../sequel')
-end
-
 require 'db2/db2cli'
 
 module Sequel

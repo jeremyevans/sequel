@@ -1,35 +1,20 @@
-require 'oci8'
+# require 'adapter_lib'
 
 module Sequel
-  module Oracle
+  module Adapter
     class Database < Sequel::Database
-      set_adapter_scheme :oracle
+      set_adapter_scheme :adapter
       
-      # AUTO_INCREMENT = 'IDENTITY(1,1)'.freeze
-      # 
-      # def auto_increment_sql
-      #   AUTO_INCREMENT
-      # end
-
       def connect
-        if @opts[:database]
-          dbname = @opts[:host] ? \
-            "//#{@opts[:host]}/#{@opts[:database]}" : @opts[:database]
-        else
-          dbname = @opts[:host]
-        end
-        conn = OCI8.new(@opts[:user], @opts[:password], dbname, @opts[:privilege])
-        conn.autocommit = true
-        conn.non_blocking = true
-        conn
+        AdapterDB.new(@opts[:database], @opts[:user], @opts[:password])
       end
       
       def disconnect
-        @pool.disconnect {|c| c.logoff}
+        @pool.disconnect {|c| c.disconnect}
       end
     
       def dataset(opts = nil)
-        Oracle::Dataset.new(self, opts)
+        Adapter::Dataset.new(self, opts)
       end
     
       def execute(sql)
@@ -58,22 +43,6 @@ module Sequel
               row = {}
               r.each_with_index {|v, i| row[@columns[i]] = v}
               yield row
-            end
-          ensure
-            cursor.close
-          end
-        end
-        self
-      end
-      
-      def array_tuples_fetch_rows(sql, &block)
-        @db.synchronize do
-          cursor = @db.execute sql
-          begin
-            @columns = cursor.get_col_names.map {|c| c.to_sym}
-            while r = cursor.fetch
-              r.keys = columns
-              yield r
             end
           ensure
             cursor.close
