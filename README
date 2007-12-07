@@ -37,7 +37,7 @@ Sequel currently supports:
 * PostgreSQL
 * SQLite 3
 
-There are also experimental adapters for DB2 and OpenBase.
+There are also experimental adapters for DB2, OpenBase and JDBC (on JRuby).
 
 == The Sequel Console
 
