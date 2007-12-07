@@ -1,3 +1,5 @@
+# Save only changed fields for model.
+
 # Smarter one_to_one: stuff like:
 
   # assuming the Author's primary key is :name

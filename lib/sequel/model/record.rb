@@ -1,14 +1,16 @@
 module Sequel
   class Model
     attr_reader :values
+    attr_reader :changed_columns
 
     # Returns value of attribute.
     def [](column)
       @values[column]
     end
-    # Sets value of attribute.
+    # Sets value of attribute and marks the column as changed.
     def []=(column, value)
       @values[column] = value
+      @changed_columns << column unless @changed_columns.include?(column)
     end
 
     # Enumerates through all attributes.
@@ -171,6 +173,7 @@ module Sequel
     # <tt>new_record</tt> is set to false.
     def initialize(values = {}, new_record = false, &block)
       @values = values
+      @changed_columns = []
 
       @new = new_record
       unless @new # determine if it's a new record
@@ -194,8 +197,9 @@ module Sequel
       this.count > 0
     end
     
-    # Creates or updates dataset for Model and runs hooks.
-    def save
+    # Creates or updates the associated record. This method can also
+    # accept a list of specific columns to update.
+    def save(*columns)
       run_hooks(:before_save)
       if @new
         run_hooks(:before_create)
@@ -213,11 +217,23 @@ module Sequel
         run_hooks(:after_create)
       else
         run_hooks(:before_update)
-        this.update(@values)
+        if columns.empty?
+          this.update(@values)
+          @changed_columns = []
+        else # update only the specified columns
+          this.update(@values.reject {|k, v| !columns.include?(k)})
+          @changed_columns.reject! {|c| columns.include?(c)}
+        end
         run_hooks(:after_update)
       end
       run_hooks(:after_save)
       self
+    end
+    
+    # Saves only changed columns or does nothing if no columns are marked as 
+    # chanaged.
+    def save_changes
+      save(*@changed_columns) unless @changed_columns.empty?
     end
 
     # Updates and saves values to database from the passed-in Hash.
@@ -268,7 +284,10 @@ module Sequel
         # define the column accessor
         Thread.exclusive do
           if write
-            model.class_def(m) {|v| @values[att] = v}
+            model.class_def(m) do |v|
+              @values[att] = v
+              @changed_columns << att unless @changed_columns.include?(att)
+            end
           else
             model.class_def(m) {@values[att]}
           end

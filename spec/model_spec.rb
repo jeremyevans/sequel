@@ -445,6 +445,118 @@ context "Model attribute accessors" do
   end
 end
 
+context "Model attribute setters" do
+  setup do
+    MODEL_DB.reset
+
+    @c = Class.new(Sequel::Model(:items)) do
+      def columns
+        [:id, :x, :y]
+      end
+    end
+  end
+  
+  specify "should mark the column value as changed" do
+    o = @c.new
+    o.changed_columns.should == []
+
+    o.x = 2
+    o.changed_columns.should == [:x]
+    
+    o.y = 3
+    o.changed_columns.should == [:x, :y]
+    
+    o.changed_columns.clear
+    
+    o[:x] = 2
+    o.changed_columns.should == [:x]
+    
+    o[:y] = 3
+    o.changed_columns.should == [:x, :y]
+  end
+end
+
+context "Model#save" do
+  setup do
+    MODEL_DB.reset
+
+    @c = Class.new(Sequel::Model(:items)) do
+      def columns
+        [:id, :x, :y]
+      end
+    end
+  end
+  
+  specify "should insert a record for a new model instance" do
+    o = @c.new(:x => 1)
+    o.save
+    
+    MODEL_DB.sqls.first.should == "INSERT INTO items (x) VALUES (1)"
+  end
+
+  specify "should update a record for an existing model instance" do
+    o = @c.new(:id => 3, :x => 1)
+    o.save
+    
+    MODEL_DB.sqls.first.should == "UPDATE items SET x = 1, id = 3 WHERE (id = 3)"
+  end
+  
+  specify "should update only the given columns if given" do
+    o = @c.new(:id => 3, :x => 1, :y => nil)
+    o.save(:y)
+    
+    MODEL_DB.sqls.first.should == "UPDATE items SET y = NULL WHERE (id = 3)"
+  end
+  
+  specify "should mark saved columns as not changed" do
+    o = @c.new(:id => 3, :x => 1, :y => nil)
+    o[:y] = 4
+    o.changed_columns.should == [:y]
+    o.save(:x)
+    o.changed_columns.should == [:y]
+    o.save(:y)
+    o.changed_columns.should == []
+  end
+end
+
+context "Model#save_changes" do
+  setup do
+    MODEL_DB.reset
+
+    @c = Class.new(Sequel::Model(:items)) do
+      def columns
+        [:id, :x, :y]
+      end
+    end
+  end
+  
+  specify "should do nothing if no changed columns" do
+    o = @c.new(:id => 3, :x => 1, :y => nil)
+    o.save_changes
+    
+    MODEL_DB.sqls.should be_empty
+  end
+  
+  specify "should update only changed columns" do
+    o = @c.new(:id => 3, :x => 1, :y => nil)
+    o.x = 2
+
+    o.save_changes
+    MODEL_DB.sqls.should == ["UPDATE items SET x = 2 WHERE (id = 3)"]
+    o.save_changes
+    o.save_changes
+    MODEL_DB.sqls.should == ["UPDATE items SET x = 2 WHERE (id = 3)"]
+    MODEL_DB.reset
+
+    o.y = 4
+    o.save_changes
+    MODEL_DB.sqls.should == ["UPDATE items SET y = 4 WHERE (id = 3)"]
+    o.save_changes
+    o.save_changes
+    MODEL_DB.sqls.should == ["UPDATE items SET y = 4 WHERE (id = 3)"]
+  end
+end
+
 context "Model#new?" do
   setup do
     MODEL_DB.reset

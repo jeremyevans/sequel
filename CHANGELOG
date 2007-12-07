@@ -1,4 +1,8 @@
-=== SVN
+=== 0.4.2 (2007-12-07)
+
+* Implemented Model#save_changes.
+
+* Extended Model#save to accept specific columns to update.
 
 * Implemented experimental JDBC adapter.
 
