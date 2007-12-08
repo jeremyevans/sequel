@@ -1,3 +1,10 @@
+# block form of Model.new:
+
+  MyModel.new do |model
+    model.field = value
+    model.save
+  end
+
 # Save only changed fields for model.
 
 # Smarter one_to_one: stuff like:
@@ -22,6 +29,10 @@
   
   if (DB[:items].filter(:name => 'abc').update(:price => 100) < 1)
     DB[:items] << {:name => 'abc', :price => 100}
+
+  MySQL also supports a REPLACE INTO syntax which does the same:
+
+    REPLACE INTO items SET price = 100 WHERE name = 'abc'
 
 * many_to_many smart relationships.
 
