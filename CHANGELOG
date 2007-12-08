@@ -1,5 +1,7 @@
 === SVN
 
+* Added Database#create_view, #create_or_replace_view and #drop_view methods. Also implemented Dataset#create_view and #create_or_replace_view convenience methods.
+
 * Keep DRY by re-using Model#[]= from method_missing.
 
 * Added Model.fetch alias for DB.fetch.set_model(Model)

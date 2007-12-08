@@ -194,6 +194,20 @@ module Sequel
       false
     end
     
+    def create_view(name, source)
+      source = source.sql if source.is_a?(Dataset)
+      execute("CREATE VIEW #{name} AS #{source}")
+    end
+    
+    def create_or_replace_view(name, source)
+      source = source.sql if source.is_a?(Dataset)
+      execute("CREATE OR REPLACE VIEW #{name} AS #{source}")
+    end
+    
+    def drop_view(name)
+      execute("DROP VIEW #{name}")
+    end
+    
     SQL_BEGIN = 'BEGIN'.freeze
     SQL_COMMIT = 'COMMIT'.freeze
     SQL_ROLLBACK = 'ROLLBACK'.freeze

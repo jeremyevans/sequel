@@ -284,9 +284,7 @@ module Sequel
         # define the column accessor
         Thread.exclusive do
           if write
-            model.class_def(m) do |v|
-              self[att] = v
-            end
+            model.class_def(m) {|v| self[att] = v}
           else
             model.class_def(m) {self[att]}
           end

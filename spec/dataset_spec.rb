@@ -2279,3 +2279,46 @@ context "Dataset magic methods" do
     @c.sqls.should == ["SELECT * FROM items ORDER BY name DESC LIMIT 1"] * 2
   end
 end
+
+context "Dataset#create_view" do
+  setup do
+    @dbc = Class.new(Sequel::Database) do
+      attr_reader :sqls
+      
+      def execute(sql)
+        @sqls ||= []
+        @sqls << sql
+      end
+    end
+    @db = @dbc.new
+    
+    @ds = @db[:items].order(:abc).filter(:category => 'ruby')
+  end
+  
+  specify "should create a view with the dataset's sql" do
+    @ds.create_view(:xyz)
+    @db.sqls.should == ["CREATE VIEW xyz AS #{@ds.sql}"]
+  end
+end
+
+context "Dataset#create_or_replace_view" do
+  setup do
+    @dbc = Class.new(Sequel::Database) do
+      attr_reader :sqls
+      
+      def execute(sql)
+        @sqls ||= []
+        @sqls << sql
+      end
+    end
+    @db = @dbc.new
+    
+    @ds = @db[:items].order(:abc).filter(:category => 'ruby')
+  end
+  
+  specify "should create a view with the dataset's sql" do
+    @ds.create_or_replace_view(:xyz)
+    @db.sqls.should == ["CREATE OR REPLACE VIEW xyz AS #{@ds.sql}"]
+  end
+end
+
