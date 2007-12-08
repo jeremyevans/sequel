@@ -285,11 +285,10 @@ module Sequel
         Thread.exclusive do
           if write
             model.class_def(m) do |v|
-              @values[att] = v
-              @changed_columns << att unless @changed_columns.include?(att)
+              self[att] = v
             end
           else
-            model.class_def(m) {@values[att]}
+            model.class_def(m) {self[att]}
           end
         end
         
