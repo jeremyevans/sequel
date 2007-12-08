@@ -724,6 +724,17 @@ context "Model.[]" do
   end
 end
 
+context "Model.fetch" do
+  setup do
+    MODEL_DB.reset
+    @c = Class.new(Sequel::Model(:items))
+  end
+  
+  specify "should return instances of Model" do
+    @c.fetch("SELECT * FROM items").first.should be_a_kind_of(@c)
+  end
+end
+
 context "A cached model" do
   setup do
     MODEL_DB.reset

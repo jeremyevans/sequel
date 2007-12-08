@@ -1,3 +1,7 @@
+=== SVN
+
+* Added Model.fetch alias for DB.fetch.set_model(Model)
+
 === 0.4.2 (2007-12-07)
 
 * Implemented Model#save_changes.

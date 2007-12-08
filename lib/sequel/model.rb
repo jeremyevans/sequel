@@ -259,6 +259,10 @@ module Sequel
       dataset[(Hash === args) ? args : primary_key_hash(args)]
     end
     
+    def self.fetch(*args)
+      db.fetch(*args).set_model(self)
+    end
+
     # Like find but invokes create with given conditions when record does not
     # exists.
     def self.find_or_create(cond)
