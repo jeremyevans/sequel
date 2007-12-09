@@ -96,7 +96,7 @@ context "A MySQL dataset" do
 
     @d.order(:name.DESC).sql.should == \
       'SELECT * FROM items ORDER BY `name` DESC'
-      
+
     @d.select('items.name AS item_name'.lit).sql.should == \
       'SELECT items.name AS item_name FROM items'
       
@@ -118,8 +118,22 @@ context "A MySQL dataset" do
     @d.insert_sql(:value => 333).should == \
       'INSERT INTO items (`value`) VALUES (333)'
 
-      @d.insert_sql(:x => :y).should == \
-        'INSERT INTO items (`x`) VALUES (`y`)'
+    @d.insert_sql(:x => :y).should == \
+      'INSERT INTO items (`x`) VALUES (`y`)'
+  end
+  
+  specify "should quote fields correctly when reversing the order" do
+    @d.reverse_order(:name).sql.should == \
+      'SELECT * FROM items ORDER BY `name` DESC'
+
+    @d.reverse_order(:name.DESC).sql.should == \
+      'SELECT * FROM items ORDER BY `name`'
+
+    @d.reverse_order(:name, :test.DESC).sql.should == \
+      'SELECT * FROM items ORDER BY `name` DESC, `test`'
+
+    @d.reverse_order(:name.DESC, :test).sql.should == \
+      'SELECT * FROM items ORDER BY `name`, `test` DESC'
   end
   
   specify "should support ORDER clause in UPDATE statements" do

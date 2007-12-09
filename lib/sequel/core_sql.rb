@@ -59,6 +59,7 @@ module Sequel
     end
     
     class ColumnExpr < Expression
+      attr_reader :l, :op, :r
       def initialize(l, op, r = nil); @l, @op, @r = l, op, r; end
       
       def to_s(ds)

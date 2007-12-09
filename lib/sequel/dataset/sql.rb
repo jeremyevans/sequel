@@ -152,28 +152,21 @@ module Sequel
         order(*invert_order(order.empty? ? @opts[:order] : order))
       end
 
-      DESC_ORDER_REGEXP = /^(.*)\sDESC$/i.freeze
-
       # Inverts the given order by breaking it into a list of column references
       # and inverting them.
       #
-      #   dataset.invert_order(['id DESC']) #=> ["id"]
-      #   dataset.invert_order(['category, price DESC']) #=>
-      #     ["category DESC, price"]
+      #   dataset.invert_order([:id.desc]]) #=> [:id]
+      #   dataset.invert_order(:category, :price.desc]) #=>
+      #     [:category.desc, :price]
       def invert_order(order)
         new_order = []
-        order.each do |f|
-          if f.is_a?(String)
-            f.split(',').each do |r|
-              r.strip!
-              new_order << ((r =~ DESC_ORDER_REGEXP ? $1 : r.to_sym.desc).lit)
-            end
+        order.map do |f|
+          if f.is_a?(Sequel::SQL::ColumnExpr) && (f.op == Sequel::SQL::ColumnMethods::DESC)
+            f.l
           else
-            r = literal(f).strip
-            new_order << ((r =~ DESC_ORDER_REGEXP ? $1 : r.to_sym.desc).lit)
+            f.desc
           end
         end
-        new_order
       end
 
       # Returns a copy of the dataset with the results grouped by the value of 
@@ -442,7 +435,7 @@ module Sequel
             if values.empty?
               "INSERT INTO #{@opts[:from]} DEFAULT VALUES"
             elsif values.keys
-              fl = values.keys
+              fl = values.keys.map {|f| literal(f.to_sym)}
               vl = transform_save(values.values).map {|v| literal(v)}
               "INSERT INTO #{@opts[:from]} (#{fl.join(COMMA_SEPARATOR)}) VALUES (#{vl.join(COMMA_SEPARATOR)})"
             else
@@ -454,7 +447,7 @@ module Sequel
               "INSERT INTO #{@opts[:from]} DEFAULT VALUES"
             else
               fl, vl = [], []
-              values.each {|k, v| fl << k.to_s; vl << literal(v)}
+              values.each {|k, v| fl << literal(k.to_sym); vl << literal(v)}
               "INSERT INTO #{@opts[:from]} (#{fl.join(COMMA_SEPARATOR)}) VALUES (#{vl.join(COMMA_SEPARATOR)})"
             end
           when Dataset

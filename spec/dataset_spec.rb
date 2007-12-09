@@ -752,7 +752,7 @@ context "Dataset#reverse_order" do
   specify "should reverse a previous ordering if no arguments are given" do
     @dataset.order(:name).reverse_order.sql.should ==
       'SELECT * FROM test ORDER BY name DESC'
-    @dataset.order('clumsy DESC, fool').reverse_order.sql.should ==
+    @dataset.order(:clumsy.DESC, :fool).reverse_order.sql.should ==
       'SELECT * FROM test ORDER BY clumsy, fool DESC'
   end
 end
