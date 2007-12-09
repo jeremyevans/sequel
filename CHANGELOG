@@ -1,5 +1,7 @@
 === SVN
 
+* Changed sequelizer code to silently fail on any error when requiring parsetree and ruby2ruby.
+
 * Added Database#create_view, #create_or_replace_view and #drop_view methods. Also implemented Dataset#create_view and #create_or_replace_view convenience methods.
 
 * Keep DRY by re-using Model#[]= from method_missing.
