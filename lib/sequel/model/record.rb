@@ -135,6 +135,13 @@ module Sequel
       end
     end
     
+    class << self
+      def create_with_params(params)
+        create(params.reject {|k, v| !columns.include?(k.to_sym)})
+      end
+      alias_method :create_with, :create_with_params
+    end
+    
     # Returns (naked) dataset bound to current instance.
     def this
       @this ||= self.class.dataset.filter(:id => @values[:id]).limit(1).naked

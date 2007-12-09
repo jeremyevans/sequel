@@ -1214,3 +1214,31 @@ context "A model using a plugin" do
     c.deff.should == {:a => 1, :b => 2}
   end
 end
+
+context "Model#create_with_params" do
+  setup do
+    MODEL_DB.reset
+    
+    @c = Class.new(Sequel::Model(:items)) do
+      def self.columns; [:x, :y]; end
+    end
+  end
+  
+  specify "should filter the given params using the model columns" do
+    @c.create_with_params(:x => 1, :z => 2)
+    MODEL_DB.sqls.first.should == "INSERT INTO items (x) VALUES (1)"
+
+    MODEL_DB.reset
+    @c.create_with_params(:y => 1, :abc => 2)
+    MODEL_DB.sqls.first.should == "INSERT INTO items (y) VALUES (1)"
+  end
+  
+  specify "should be aliased be create_with" do
+    @c.create_with(:x => 1, :z => 2)
+    MODEL_DB.sqls.first.should == "INSERT INTO items (x) VALUES (1)"
+
+    MODEL_DB.reset
+    @c.create_with(:y => 1, :abc => 2)
+    MODEL_DB.sqls.first.should == "INSERT INTO items (y) VALUES (1)"
+  end
+end
