@@ -1,4 +1,4 @@
-=== SVN
+=== 0.4.2.1 (2007-12-09)
 
 * Refactored and fixed Dataset#reverse_order to work with field quoting (thanks Christian).
 
