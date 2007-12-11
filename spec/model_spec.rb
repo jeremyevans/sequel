@@ -498,7 +498,7 @@ context "Model#save" do
     o = @c.new(:id => 3, :x => 1)
     o.save
     
-    MODEL_DB.sqls.first.should == "UPDATE items SET x = 1, id = 3 WHERE (id = 3)"
+    MODEL_DB.sqls.first.should == "UPDATE items SET id = 3, x = 1 WHERE (id = 3)"
   end
   
   specify "should update only the given columns if given" do
@@ -725,6 +725,7 @@ context "Model.[]" do
 end
 
 context "Model.fetch" do
+
   setup do
     MODEL_DB.reset
     @c = Class.new(Sequel::Model(:items))
@@ -733,6 +734,12 @@ context "Model.fetch" do
   specify "should return instances of Model" do
     @c.fetch("SELECT * FROM items").first.should be_a_kind_of(@c)
   end
+
+  specify "should return true for .empty? and not raise an error on empty selection" do
+    rows = @c.fetch("SELECT * FROM items WHERE FALSE")
+    rows.empty?.should_not raise_error
+  end
+
 end
 
 context "A cached model" do
