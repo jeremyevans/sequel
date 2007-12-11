@@ -312,7 +312,6 @@ context "Model#serialize" do
     ]
   end
   
-
   specify "should support calling after the class is defined" do
     @c = Class.new(Sequel::Model(:items)) do
       no_primary_key
@@ -1241,12 +1240,102 @@ context "Model#create_with_params" do
     MODEL_DB.sqls.first.should == "INSERT INTO items (y) VALUES (1)"
   end
   
-  specify "should be aliased be create_with" do
+  specify "should be aliased by create_with" do
     @c.create_with(:x => 1, :z => 2)
     MODEL_DB.sqls.first.should == "INSERT INTO items (x) VALUES (1)"
 
     MODEL_DB.reset
     @c.create_with(:y => 1, :abc => 2)
     MODEL_DB.sqls.first.should == "INSERT INTO items (y) VALUES (1)"
+  end
+end
+
+context "Model.find_or_create" do
+  setup do
+    MODEL_DB.reset
+    @c = Class.new(Sequel::Model(:items)) do
+      no_primary_key
+    end
+  end
+
+  specify "should find the record" do
+    @c.find_or_create(:x => 1)
+    MODEL_DB.sqls.should == ["SELECT * FROM items WHERE (x = 1) LIMIT 1"]
+    
+    MODEL_DB.reset
+  end
+  
+  specify "should create the record if not found" do
+    @c.meta_def(:find) do |*args|
+      dataset.filter(*args).first
+      nil
+    end
+    
+    @c.find_or_create(:x => 1)
+    MODEL_DB.sqls.should == [
+      "SELECT * FROM items WHERE (x = 1) LIMIT 1",
+      "INSERT INTO items (x) VALUES (1)"
+    ]
+  end
+end
+
+context "Model.delete_all" do
+  setup do
+    MODEL_DB.reset
+    @c = Class.new(Sequel::Model(:items)) do
+      no_primary_key
+    end
+    
+    @c.dataset.meta_def(:delete) {MODEL_DB << delete_sql}
+  end
+
+  specify "should delete all records in the dataset" do
+    @c.delete_all
+    MODEL_DB.sqls.should == ["DELETE FROM items"]
+  end
+end
+
+context "Model.destroy_all" do
+  setup do
+    MODEL_DB.reset
+    @c = Class.new(Sequel::Model(:items)) do
+      no_primary_key
+    end
+
+    @c.dataset.meta_def(:delete) {MODEL_DB << delete_sql}
+  end
+
+  specify "should delete all records in the dataset" do
+    @c.destroy_all
+    MODEL_DB.sqls.should == ["DELETE FROM items"]
+  end
+end
+
+context "Model.join" do
+  setup do
+    MODEL_DB.reset
+    @c = Class.new(Sequel::Model(:items)) do
+      no_primary_key
+    end
+  end
+  
+  specify "should format proper SQL" do
+    @c.join(:atts, :item_id => :id).sql.should == \
+      "SELECT items.* FROM items INNER JOIN atts ON (atts.item_id = items.id)"
+  end
+end
+
+context "Model.all" do
+  setup do
+    MODEL_DB.reset
+    @c = Class.new(Sequel::Model(:items)) do
+      no_primary_key
+    end
+    
+    @c.dataset.meta_def(:all) {1234}
+  end
+  
+  specify "should return all records in the dataset" do
+    @c.all.should == 1234
   end
 end

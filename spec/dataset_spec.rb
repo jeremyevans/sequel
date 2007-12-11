@@ -2024,6 +2024,8 @@ context "Dataset#transform" do
   specify "should change the dataset to transform values loaded from the database" do
     @ds.raw = {:x => Marshal.dump([1, 2, 3]), :y => 'hello'}
     @ds.first.should == {:x => [1, 2, 3], :y => 'hello'}
+    @ds.raw = {:x => Marshal.dump([1, 2, 3]), :y => 'hello'}
+    @ds.all.should == [{:x => [1, 2, 3], :y => 'hello'}]
   end
   
   specify "should change the dataset to transform values saved to the database" do

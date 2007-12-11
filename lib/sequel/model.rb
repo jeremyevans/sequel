@@ -250,8 +250,7 @@ module Sequel
     #   Ticket.find {:price == 17} # => Dataset
     #
     def self.find(*args, &block)
-      dataset.filter(*args, &block).limit(1).first
-      # dataset[cond.is_a?(Hash) ? cond : primary_key_hash(cond)]
+      dataset.filter(*args, &block).first
     end
     
     def self.[](*args)
@@ -273,8 +272,11 @@ module Sequel
 
     # Like delete_all, but invokes before_destroy and after_destroy hooks if used.
     def self.destroy_all
-      has_hooks?(:before_destroy) || has_hooks?(:after_destroy) ? \
-        dataset.destroy : dataset.delete
+      if has_hooks?(:before_destroy) || has_hooks?(:after_destroy)
+        dataset.destroy
+      else
+        dataset.delete
+      end
     end
     # Deletes all records.
     def self.delete_all

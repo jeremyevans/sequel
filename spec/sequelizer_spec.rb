@@ -326,3 +326,14 @@ context "Proc#to_sql" do
     proc {:x == ("%d" % prod).lit}.to_sql.should == "(x = 1)"
   end
 end
+
+context "Proc#to_sql stock" do
+  specify "should not support regexps" do
+    db = Sequel::Database.new
+    ds = db[:items]
+
+    p = proc {:x =~ /abc/}
+    proc {ds.proc_to_sql(p)}.should raise_error(SequelError)
+  end
+end
+

@@ -35,9 +35,10 @@ module Sequel
         if columns.empty?
           WILDCARD
         else
-          columns.map do |i|
+          m = columns.map do |i|
             i.is_a?(Hash) ? i.map {|kv| "#{literal(kv[0])} AS #{kv[1]}"} : literal(i)
-          end.join(COMMA_SEPARATOR)
+          end
+          m.join(COMMA_SEPARATOR)
         end
       end
 
@@ -47,7 +48,7 @@ module Sequel
           raise SequelError, 'No source specified for query'
         end
         auto_alias_count = 0
-        source.map do |i|
+        m = source.map do |i|
           case i
           when Dataset:
             auto_alias_count += 1
@@ -58,7 +59,8 @@ module Sequel
           else
             i
           end
-        end.join(COMMA_SEPARATOR)
+        end
+        m.join(COMMA_SEPARATOR)
       end
 
       NULL = "NULL".freeze

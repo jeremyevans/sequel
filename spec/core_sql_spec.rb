@@ -275,5 +275,9 @@ context "Symbol" do
   specify "should support cast function" do
     :abc.cast_as(:integer).to_s(@ds).should == "cast(abc AS integer)"
   end
+  
+  specify "should raise NoMethodError for non-uppercase invalid methods" do
+    proc {:abc.dfaxs}.should raise_error(NoMethodError)
+  end
 end
 
