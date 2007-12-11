@@ -22,10 +22,12 @@ module Sequel
       NAKED_HASH = {:naked => true}.freeze
 
       # Returns the first value of the first reecord in the dataset.
+      # Returns nill if dataset is empty.
       def single_value(opts = nil)
         opts = opts ? NAKED_HASH.merge(opts) : NAKED_HASH
         # reset the columns cache so it won't fuck subsequent calls to columns
         each(opts) {|r| @columns = nil; return r.values.first}
+        nil
       end
 
       # Returns the first record in the dataset. If the num argument is specified,

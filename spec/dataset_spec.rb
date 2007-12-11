@@ -1,4 +1,12 @@
-require File.join(File.dirname(__FILE__), 'spec_helper')
+require File.join(File.dirname(__FILE__), "spec_helper")
+
+SQLITE_DB = Sequel("sqlite:/")
+SQLITE_DB.create_table :items do
+  integer :id, :primary_key => true, :auto_increment => true
+  text    :name
+  float   :value
+end
+SQLITE_DB.create_table(:time) {timestamp :t}
 
 context "Dataset" do
   setup do
@@ -6,7 +14,7 @@ context "Dataset" do
   end
   
   specify "should accept database and opts in initialize" do
-    db = 'db'
+    db = "db"
     opts = {:from => :test}
     d = Sequel::Dataset.new(db, opts)
     d.db.should be(db)
@@ -1398,8 +1406,13 @@ context "Dataset#single_record" do
     @cc = Class.new(@c) do
       def fetch_rows(sql); end
     end
+    
     @d = @c.new(nil).from(:test)
     @e = @cc.new(nil).from(:test)
+
+    @d_empty = SQLITE_DB[:items]
+    @d_empty.delete # remove all records
+    
   end
   
   specify "should call each and return the first record" do
@@ -1411,7 +1424,7 @@ context "Dataset#single_record" do
   end
   
   specify "should return nil if no record is present" do
-    @e.single_record.should be_nil
+    @d_empty.single_record.should be_nil
   end
 end
 
@@ -1423,6 +1436,8 @@ context "Dataset#single_value" do
       end
     end
     @d = @c.new(nil).from(:test)
+    @d_empty = SQLITE_DB[:items]
+    @d_empty.delete # remove all records
   end
   
   specify "should call each and return the first value of the first record" do
@@ -1432,6 +1447,11 @@ context "Dataset#single_value" do
   specify "should pass opts to each" do
     @d.single_value(:limit => 3).should == 'SELECT * FROM test LIMIT 3'
   end
+  
+  specify "should return nil" do
+    @d_empty.single_value.should be_nil
+  end
+
 end
 
 context "Dataset#set_row_proc" do
