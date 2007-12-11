@@ -98,8 +98,7 @@ module Sequel
       if block
         ds.fetch_rows(sql, &block)
       else
-        ds.meta_def(:select_sql) {|*args| sql}
-        ds.meta_def(:sql) {|*args| sql}
+        ds.opts[:sql] = sql
         ds
       end
     end

@@ -1,5 +1,7 @@
 === SVN
 
+* Fixed Dataset#count to work properly with datasets with fixed SQL (when using #fetch).
+
 * Added Model.create_with_params method that filters the given parameters accordring to the model's columns (thanks Aman Gupta). 
 
 === 0.4.2.1 (2007-12-09)

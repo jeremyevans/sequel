@@ -540,11 +540,15 @@ module Sequel
         end
       end
       
-      SELECT_COUNT = {:select => ["COUNT(*)".lit], :order => nil}.freeze
+      STOCK_COUNT_OPTS = {:select => ["COUNT(*)".lit], :order => nil}.freeze
 
       # Returns the number of records in the dataset.
       def count
-        single_value(SELECT_COUNT).to_i
+        opts = @opts[:sql] ? \
+          {:sql => "SELECT COUNT(*) FROM (#{@opts[:sql]}) AS c", :order => nil} : \
+          STOCK_COUNT_OPTS
+
+        single_value(opts).to_i
       end
     end
   end

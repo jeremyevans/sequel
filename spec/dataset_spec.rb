@@ -902,6 +902,12 @@ context "Dataset#count" do
     @dataset.filter {:abc < 30}.count.should == 1
     @c.sql.should == 'SELECT COUNT(*) FROM test WHERE (abc < 30)'
   end
+  
+  specify "should count properly for datasets with fixed sql" do
+    @dataset.opts[:sql] = "select abc from xyz"
+    @dataset.count.should == 1
+    @c.sql.should == "SELECT COUNT(*) FROM (select abc from xyz) AS c"
+  end
 end
 
 
