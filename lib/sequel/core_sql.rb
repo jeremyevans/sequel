@@ -86,6 +86,22 @@ module Sequel
       end
     end
     
+    class Subscript < Expression
+      def initialize(f, sub); @f, @sub = f, sub; end
+      def /(sub)
+        unless Array === sub
+          sub = [sub]
+        end
+        Subscript.new(@f, @sub << sub)
+      end
+      
+      COMMA_SEPARATOR = ", ".freeze
+      
+      def to_s(ds)
+        "#{@f}[#{@sub.join(COMMA_SEPARATOR)}]"
+      end
+    end
+    
     class ColumnAll < Expression
       def initialize(t); @t = t; end
       def to_s(ds); "#{@t}.*"; end
@@ -124,6 +140,12 @@ end
 
 class Symbol
   def [](*args); Sequel::SQL::Function.new(self, *args); end
+  def /(sub)
+    unless Array === sub
+      sub = [sub]
+    end
+    Sequel::SQL::Subscript.new(self, sub)
+  end
   
   COLUMN_REF_RE1 = /^(\w+)__(\w+)___(\w+)/.freeze
   COLUMN_REF_RE2 = /^(\w+)___(\w+)$/.freeze

@@ -279,5 +279,12 @@ context "Symbol" do
   specify "should raise NoMethodError for non-uppercase invalid methods" do
     proc {:abc.dfaxs}.should raise_error(NoMethodError)
   end
+  
+  specify "should support subscript access using / operator" do
+    (:abc/1).to_s(@ds).should == 'abc[1]'
+    (:abc/[1]).to_s(@ds).should == 'abc[1]'
+    (:abc/[1, 2]).to_s(@ds).should == 'abc[1, 2]'
+    (:abc/1/2).to_s(@ds).should == 'abc[1, 2]'
+  end
 end
 
