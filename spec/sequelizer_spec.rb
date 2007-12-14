@@ -8,6 +8,10 @@ context "Proc#to_sql" do
     def to_sql
       DS.proc_to_sql(self)
     end
+    
+    def to_sql_comma_separated
+      DS.proc_to_sql(self, true)
+    end
   end
   
   def DS.match_expr(l, r)
@@ -65,9 +69,9 @@ context "Proc#to_sql" do
   end
   
   specify "sould support subscript access on symbols" do
-    proc {:x/1 > 0}.to_sql.should == "(x[1] > 0)"
-    proc {:x/2/3 > 0}.to_sql.should == "(x[2, 3] > 0)"
-    proc {:x/[4, 5] > 0}.to_sql.should == "(x[4, 5] > 0)"
+    proc {:x|1 > 0}.to_sql.should == "(x[1] > 0)"
+    proc {:x|2|3 > 0}.to_sql.should == "(x[2, 3] > 0)"
+    proc {:x|[4, 5] > 0}.to_sql.should == "(x[4, 5] > 0)"
   end
   
   specify "should support constants" do
@@ -123,10 +127,20 @@ context "Proc#to_sql" do
     proc {:x && :y && :z}.to_sql.should == "(x AND (y AND z))"
   end
   
+  specify "should support << operator for assignment" do
+    proc {:x << 1}.to_sql.should == "x = 1"
+  end
+  
   specify "should concatenate separate statements using AND" do
     proc {:x == 20; :y == 30}.to_sql.should == "((x = 20) AND (y = 30))"
     proc {:x != 1; :y != 2; :z != 3}.to_sql.should == \
       "((NOT (x = 1)) AND (NOT (y = 2)) AND (NOT (z = 3)))"
+  end
+  
+  specify "should concatenate separate statements using custom join argument" do
+    proc {:x << 20; :y << 30}.to_sql_comma_separated.should == "x = 20, y = 30"
+    z = 333
+    proc {:x << :x + 1; :y << z}.to_sql_comma_separated.should == "x = (x + 1), y = 333"
   end
   
   specify "should support || operator" do

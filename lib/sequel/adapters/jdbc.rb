@@ -95,8 +95,8 @@ module Sequel
         @db.execute_and_forget insert_sql(*values)
       end
     
-      def update(values, opts = nil)
-        @db.execute_and_forget update_sql(values, opts)
+      def update(*args, &block)
+        @db.execute_and_forget update_sql(*args, &block)
       end
     
       def delete(opts = nil)

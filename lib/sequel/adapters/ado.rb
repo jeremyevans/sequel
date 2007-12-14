@@ -87,9 +87,8 @@ module Sequel
         @db.do insert_sql(*values)
       end
     
-      def update(values, opts = nil)
-        @db.do update_sql(values, opts)
-        self
+      def update(*args, &block)
+        @db.do update_sql(*args, &block)
       end
     
       def delete(opts = nil)

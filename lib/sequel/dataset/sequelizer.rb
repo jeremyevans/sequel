@@ -122,7 +122,7 @@ class Sequel::Dataset
         l = eval_expr(e[1], b)
         r = eval_expr(e[3][1], b)
         match_expr(l, r)
-      when :+, :-, :*, :%
+      when :+, :-, :*, :%, :/
         l = eval_expr(e[1], b)
         r = eval_expr(e[3][1], b)
         if l.is_one_of?(Symbol, Sequel::LiteralString, Sequel::SQL::Expression) || \
@@ -131,11 +131,15 @@ class Sequel::Dataset
         else
           ext_expr(e, b)
         end
-      when :/
+      when :<<
+        l = eval_expr(e[1], b)
+        r = eval_expr(e[3][1], b)
+        "#{literal(l)} = #{literal(r)}".lit
+      when :|
         l = eval_expr(e[1], b)
         r = eval_expr(e[3][1], b)
         if l.is_one_of?(Symbol, Sequel::SQL::Subscript)
-          l/r
+          l|r
         elsif l.is_one_of?(Symbol, Sequel::LiteralString, Sequel::SQL::Expression) || \
           r.is_one_of?(Symbol, Sequel::LiteralString, Sequel::SQL::Expression)
           "(#{literal(l)} #{op} #{literal(r)})".lit
@@ -240,21 +244,30 @@ class Sequel::Dataset
       end
     end
     
-    def pt_expr(e, b) #:nodoc:
+    JOIN_AND = " AND ".freeze
+    JOIN_COMMA = ", ".freeze
+    
+    def pt_expr(e, b, comma_separated = false) #:nodoc:
       case e[0]
       when :not # negation: !x, (x != y), (x !~ y)
         if (e[1][0] == :lit) && (Symbol === e[1][1])
           # translate (!:x) into (x = 'f')
           compare_expr(e[1][1], false)
         else
-          "(NOT #{pt_expr(e[1], b)})"
+          "(NOT #{pt_expr(e[1], b, comma_separated)})"
         end
-      when :block, :and # block of statements, x && y
-        "(#{e[1..-1].map {|i| pt_expr(i, b)}.join(" AND ")})"
+      when :and # x && y
+        "(#{e[1..-1].map {|i| pt_expr(i, b, comma_separated)}.join(JOIN_AND)})"
       when :or # x || y
-        "(#{pt_expr(e[1], b)} OR #{pt_expr(e[2], b)})"
+        "(#{pt_expr(e[1], b, comma_separated)} OR #{pt_expr(e[2], b, comma_separated)})"
       when :call, :vcall, :iter, :match3 # method calls, blocks
         eval_expr(e, b)
+      when :block # block of statements
+        if comma_separated
+          "#{e[1..-1].map {|i| pt_expr(i, b, comma_separated)}.join(JOIN_COMMA)}"
+        else
+          "(#{e[1..-1].map {|i| pt_expr(i, b, comma_separated)}.join(JOIN_AND)})"
+        end
       else # literals
         if e == [:lvar, :block]
           eval_expr(e, b)
@@ -265,9 +278,9 @@ class Sequel::Dataset
     end
 
     # Translates a Ruby block into an SQL expression.
-    def proc_to_sql(proc)
+    def proc_to_sql(proc, comma_separated = false)
       c = Class.new {define_method(:m, &proc)}
-      pt_expr(ParseTree.translate(c, :m)[2][2], proc.binding)
+      pt_expr(ParseTree.translate(c, :m)[2][2], proc.binding, comma_separated)
     end
   end
 end

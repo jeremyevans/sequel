@@ -391,9 +391,9 @@ module Sequel
           values.size == 1 ? values.first : values)
       end
     
-      def update(values, opts = nil)
+      def update(*args, &block)
         @db.synchronize do
-          result = @db.execute(update_sql(values))
+          result = @db.execute(update_sql(*args, &block))
           begin
             affected = result.cmdtuples
           ensure

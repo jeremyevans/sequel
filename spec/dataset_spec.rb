@@ -166,6 +166,9 @@ context "A simple dataset" do
   specify "should format an update statement" do
     @dataset.update_sql(:name => 'abc').should ==
       "UPDATE test SET name = 'abc'"
+
+    @dataset.update_sql {:x << :y}.should ==
+      "UPDATE test SET x = y"
   end
   
   specify "should format an update statement with array with keys" do
@@ -1081,17 +1084,23 @@ context "Dataset#set" do
         @@last_sql
       end
       
-      def update(*args)
-        @@last_sql = update_sql(*args)
+      def update(*args, &block)
+        @@last_sql = update_sql(*args, &block)
       end
     end
     
     @d = c.new(nil).from(:items)
   end
   
-  specify "should act as alis to #update" do
+  specify "should act as alias to #update" do
     @d.set({:x => 3})
     @d.last_sql.should == 'UPDATE items SET x = 3'
+
+    @d.set {:x << :x + 1}
+    @d.last_sql.should == 'UPDATE items SET x = (x + 1)'
+
+    @d.set {(:x|1) << (:x|2) + 1}
+    @d.last_sql.should == 'UPDATE items SET x[1] = (x[2] + 1)'
   end
 end
 

@@ -51,9 +51,9 @@ module Sequel
   #   end
   #
   #   # Update records.
-  #   def update(values, opts = nil)
+  #   def update(*args, &block)
   #     @db.synchronize do
-  #       @db.execute(update_sql(values, opts)).affected_rows
+  #       @db.execute(update_sql(*args, &block)).affected_rows
   #     end
   #   end
   #
@@ -154,8 +154,8 @@ module Sequel
     end
   
     # Updates the dataset with the given values.
-    def set(*args)
-      update(*args)
+    def set(*args, &block)
+      update(*args, &block)
     end
     
     # Iterates over the records in the dataset

@@ -153,8 +153,8 @@ module Sequel
         @db.execute_insert insert_sql(*values)
       end
     
-      def update(values, opts = nil)
-        @db.execute update_sql(values, opts)
+      def update(*args, &block)
+        @db.execute update_sql(*args, &block)
       end
     
       def delete(opts = nil)

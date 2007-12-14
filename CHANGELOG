@@ -1,5 +1,9 @@
 === SVN
 
+* Added support for using Dataset#update with block.
+
+* Changed subscript access to use | operator.
+
 * Fixed subscript access in sequelizer.
 
 * Added support for subscript access using Symbol#/ operator.

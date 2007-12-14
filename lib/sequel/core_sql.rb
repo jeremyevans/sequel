@@ -88,7 +88,7 @@ module Sequel
     
     class Subscript < Expression
       def initialize(f, sub); @f, @sub = f, sub; end
-      def /(sub)
+      def |(sub)
         unless Array === sub
           sub = [sub]
         end
@@ -140,7 +140,7 @@ end
 
 class Symbol
   def [](*args); Sequel::SQL::Function.new(self, *args); end
-  def /(sub)
+  def |(sub)
     unless Array === sub
       sub = [sub]
     end

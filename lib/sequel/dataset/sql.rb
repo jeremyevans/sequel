@@ -464,7 +464,7 @@ module Sequel
       #
       #   dataset.update_sql(:price => 100, :category => 'software') #=>
       #     "UPDATE items SET price = 100, category = 'software'"
-      def update_sql(values, opts = nil)
+      def update_sql(values = {}, opts = nil, &block)
         opts = opts ? @opts.merge(opts) : @opts
 
         if opts[:group]
@@ -472,15 +472,17 @@ module Sequel
         elsif (opts[:from].size > 1) or opts[:join]
           raise SequelError, "Can't update a joined dataset"
         end
-
-        if values.is_a?(Array) && values.keys
-          values = values.to_hash
+        
+        sql = "UPDATE #{@opts[:from]} SET "
+        if block
+          sql << proc_to_sql(block, true)
+        else
+          if values.is_a?(Array) && values.keys
+            values = values.to_hash
+          end
+          values = transform_save(values) if @transform
+          sql << values.map {|k, v| "#{literal(k)} = #{literal(v)}"}.join(COMMA_SEPARATOR)
         end
-        values = transform_save(values) if @transform
-        set_list = values.map {|k, v| "#{literal(k)} = #{literal(v)}"}.
-          join(COMMA_SEPARATOR)
-        sql = "UPDATE #{@opts[:from]} SET #{set_list}"
-
         if where = opts[:where]
           sql << " WHERE #{where}"
         end

@@ -127,8 +127,8 @@ module Sequel
         @db.do insert_sql(*values)
       end
     
-      def update(values, opts = nil)
-        @db.do update_sql(values, opts)
+      def update(*args, &block)
+        @db.do update_sql(*args, &block)
         self
       end
     
