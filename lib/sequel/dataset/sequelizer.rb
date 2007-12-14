@@ -122,10 +122,21 @@ class Sequel::Dataset
         l = eval_expr(e[1], b)
         r = eval_expr(e[3][1], b)
         match_expr(l, r)
-      when :+, :-, :*, :/, :%
+      when :+, :-, :*, :%
         l = eval_expr(e[1], b)
         r = eval_expr(e[3][1], b)
         if l.is_one_of?(Symbol, Sequel::LiteralString, Sequel::SQL::Expression) || \
+          r.is_one_of?(Symbol, Sequel::LiteralString, Sequel::SQL::Expression)
+          "(#{literal(l)} #{op} #{literal(r)})".lit
+        else
+          ext_expr(e, b)
+        end
+      when :/
+        l = eval_expr(e[1], b)
+        r = eval_expr(e[3][1], b)
+        if l.is_one_of?(Symbol, Sequel::SQL::Subscript)
+          l/r
+        elsif l.is_one_of?(Symbol, Sequel::LiteralString, Sequel::SQL::Expression) || \
           r.is_one_of?(Symbol, Sequel::LiteralString, Sequel::SQL::Expression)
           "(#{literal(l)} #{op} #{literal(r)})".lit
         else

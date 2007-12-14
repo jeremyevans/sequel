@@ -64,6 +64,12 @@ context "Proc#to_sql" do
     proc {:x == y2}.to_sql.should == "(x = 111)"
   end
   
+  specify "sould support subscript access on symbols" do
+    proc {:x/1 > 0}.to_sql.should == "(x[1] > 0)"
+    proc {:x/2/3 > 0}.to_sql.should == "(x[2, 3] > 0)"
+    proc {:x/[4, 5] > 0}.to_sql.should == "(x[4, 5] > 0)"
+  end
+  
   specify "should support constants" do
     ZZZ = 444
     proc {:x == ZZZ}.to_sql.should == "(x = 444)"
