@@ -702,6 +702,12 @@ context "Model.[]" do
     $sqls.last.should == "SELECT * FROM items WHERE (id = 9999) LIMIT 1"
   end
   
+  specify "should raise for boolean argument (mistaken comparison)" do
+    # This in order to prevent stuff like Model[:a == 'b']
+    proc {@c[:a == 1]}.should raise_error(SequelError)
+    proc {@c[:a != 1]}.should raise_error(SequelError)
+  end
+  
   specify "should work correctly for custom primary key" do
     @c.set_primary_key :name
     @c['sharon'].should be_a_kind_of(@c)
