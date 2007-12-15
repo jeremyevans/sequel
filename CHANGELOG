@@ -1,5 +1,7 @@
 === SVN
 
+* Fixed Dataset#update to accept strings (#98).
+
 * Fixed Model.[] to raise for boolean argument (#97).
 
 * Added Database#add_index method (thanks coda.hale).

@@ -480,11 +480,17 @@ module Sequel
         if block
           sql << proc_to_sql(block, true)
         else
-          if values.is_a?(Array) && values.keys
-            values = values.to_hash
+          # check if array with keys
+          values = values.to_hash if values.is_a?(Array) && values.keys
+          if values.is_a?(Hash)
+            # get values from hash
+            values = transform_save(values) if @transform
+            set = values.map {|k, v| "#{literal(k)} = #{literal(v)}"}.join(COMMA_SEPARATOR)
+          else
+            # copy values verbatim
+            set = values
           end
-          values = transform_save(values) if @transform
-          sql << values.map {|k, v| "#{literal(k)} = #{literal(v)}"}.join(COMMA_SEPARATOR)
+          sql << set
         end
         if where = opts[:where]
           sql << " WHERE #{where}"

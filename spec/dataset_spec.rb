@@ -2367,3 +2367,12 @@ context "Dataset#create_or_replace_view" do
   end
 end
 
+context "Dataset#update_sql" do
+  setup do
+    @ds = Sequel::Dataset.new(nil).from(:items)
+  end
+  
+  specify "should accept strings" do
+    @ds.update_sql("a = b").should == "UPDATE items SET a = b"
+  end
+end
