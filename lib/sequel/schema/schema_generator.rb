@@ -51,6 +51,10 @@ module Sequel
         @indexes << {:columns => columns}.merge(opts)
       end
       
+      def unique(columns, opts = {})
+        index(columns, {:unique => true}.merge(opts))
+      end
+      
       def create_info
         if @primary_key && !has_column?(@primary_key[:name])
           @columns.unshift(@primary_key)

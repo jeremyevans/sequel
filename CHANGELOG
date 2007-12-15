@@ -1,5 +1,7 @@
 === SVN
 
+* Added #unique schema method for defining unique indexes (thanks Dado).
+
 * Implemented unfolding of #each calls inside sequelizer blocks (thanks Jim Morris).
 
 === 0.4.3 (2007-12-15)

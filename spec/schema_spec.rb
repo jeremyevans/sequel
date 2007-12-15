@@ -174,6 +174,14 @@ context "DB#create_table" do
     @db.sqls.should == ["CREATE TABLE cats (id integer)", "CREATE INDEX cats_id_index ON cats (id)"]
   end
 
+  specify "should accept unique index definitions" do
+    @db.create_table(:cats) do
+      text :name
+      unique :name
+    end
+    @db.sqls.should == ["CREATE TABLE cats (name text)", "CREATE UNIQUE INDEX cats_name_index ON cats (name)"]
+  end
+
   specify "should accept multiple index definitions" do
     @db.create_table(:cats) do
       integer :id
