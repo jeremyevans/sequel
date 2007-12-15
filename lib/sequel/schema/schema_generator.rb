@@ -10,7 +10,7 @@ module Sequel
         instance_eval(&block)
       end
       
-      def method_missing(type, name = nil, opts = nil)
+      def method_missing(type, name = nil, opts = {})
         name ? column(name, type, opts) : super
       end
       
@@ -19,9 +19,7 @@ module Sequel
       end
       
       def primary_key(name, *args)
-        @primary_key = @db.serial_primary_key_options.merge({
-          :name => name
-        })
+        @primary_key = @db.serial_primary_key_options.merge({:name => name})
         
         if opts = args.pop
           opts = {:type => opts} unless opts.is_a?(Hash)
@@ -33,12 +31,14 @@ module Sequel
         @primary_key
       end
       
-      def column(name, type, opts = nil)
-        @columns << {:name => name, :type => type}.merge(opts || {})
+      def column(name, type, opts = {})
+        @columns << {:name => name, :type => type}.merge(opts)
+        index(name) if opts[:index]
       end
       
-      def foreign_key(name, opts = nil)
-        @columns << {:name => name, :type => :integer}.merge(opts || {})
+      def foreign_key(name, opts = {})
+        @columns << {:name => name, :type => :integer}.merge(opts)
+        index(name) if opts[:index]
       end
       
       def has_column?(name)
@@ -46,9 +46,9 @@ module Sequel
         false
       end
       
-      def index(columns, opts = nil)
+      def index(columns, opts = {})
         columns = [columns] unless columns.is_a?(Array)
-        @indexes << {:columns => columns}.merge(opts || {})
+        @indexes << {:columns => columns}.merge(opts)
       end
       
       def create_info

@@ -151,6 +151,21 @@ context "DB#create_table" do
     @db.sqls.clear
   end
   
+  specify "should accept inline index definition" do
+    @db.create_table(:cats) do
+      integer :id, :index => true
+    end
+    @db.sqls.should == ["CREATE TABLE cats (id integer)", "CREATE INDEX cats_id_index ON cats (id)"]
+  end
+  
+  specify "should accept inline index definition for foreign keys" do
+    @db.create_table(:cats) do
+      foreign_key :project_id, :table => :projects, :on_delete => :cascade, :index => true
+    end
+    @db.sqls.should == ["CREATE TABLE cats (project_id integer REFERENCES projects ON DELETE CASCADE)",
+      "CREATE INDEX cats_project_id_index ON cats (project_id)"]
+  end
+  
   specify "should accept index definitions" do
     @db.create_table(:cats) do
       integer :id
