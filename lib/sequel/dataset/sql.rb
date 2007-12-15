@@ -203,6 +203,9 @@ module Sequel
       def filter(*cond, &block)
         clause = (@opts[:group] ? :having : :where)
         cond = cond.first if cond.size == 1
+        if cond === true || cond === false
+          raise SequelError, "Invalid filter specified. Did you mean to supply a block?"
+        end
         parenthesize = !(cond.is_a?(Hash) || cond.is_a?(Array))
         filter = cond.is_a?(Hash) && cond
         if @opts[clause]

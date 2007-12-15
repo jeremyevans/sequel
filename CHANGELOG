@@ -1,5 +1,7 @@
 === SVN
 
+* Added error reporting for filtering on comparison not in a block (thanks Jim Morris).
+
 * Added support for inline index definition (thanks Dado).
 
 * Added Database#create_table! method for forcibly creating a table (thanks Dado).

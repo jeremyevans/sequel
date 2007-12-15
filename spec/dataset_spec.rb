@@ -363,6 +363,14 @@ context "Dataset#where" do
     @dataset.filter {:c.like? 'ABC%'}.sql.should ==
       "SELECT * FROM test WHERE (c LIKE 'ABC%')"
   end
+  
+  specify "should raise if receiving a single boolean value" do
+    # the result of erroneous use of comparison not in a block
+    # so instead of filter{:x == y} someone writes filter(:x == y)
+    
+    proc {@dataset.filter(:a == 1)}.should raise_error(SequelError)
+    proc {@dataset.filter(:a != 1)}.should raise_error(SequelError)
+  end
 end
 
 context "Dataset#or" do
