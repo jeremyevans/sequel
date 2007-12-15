@@ -188,6 +188,14 @@ module Sequel
       names.each {|n| execute(drop_table_sql(n))}
     end
     
+    # Adds an index to a table for the given columns:
+    # 
+    #   DB.add_index(:posts, :title)
+    #   DB.add_index(:posts, [:author, :title], :unique => true)
+    def add_index(table, columns, options = {})
+      execute(index_definition_sql(table, options.update(:columns => [columns])))
+    end
+    
     # Returns true if the given table exists.
     def table_exists?(name)
       if respond_to?(:tables)

@@ -229,6 +229,26 @@ context "Database#create_table" do
   end
 end
 
+context "Database#add_index" do
+  setup do
+    @db = DummyDatabase.new
+  end
+  
+  specify "should construct proper SQL" do
+    @db.add_index :test, :name, :unique => true
+    @db.sqls.should == [
+      'CREATE UNIQUE INDEX test_name_index ON test (name)'
+    ]
+  end
+  
+  specify "should accept multiple columns" do
+    @db.add_index :test, [:one, :two]
+    @db.sqls.should == [
+      'CREATE INDEX test_one_two_index ON test (one, two)'
+    ]
+  end
+end
+
 class Dummy2Database < Sequel::Database
   attr_reader :sql
   def execute(sql); @sql = sql; end
