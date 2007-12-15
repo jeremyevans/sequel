@@ -1,4 +1,4 @@
-=== SVN
+=== 0.4.3 (2007-12-15)
 
 * Fixed Dataset#update to accept strings (#98).
 
