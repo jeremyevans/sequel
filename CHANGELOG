@@ -1,5 +1,7 @@
 === SVN
 
+* Added Database#create_table! method for forcibly creating a table (thanks Dado).
+
 * Added support for using Dataset#update with block.
 
 * Changed subscript access to use | operator.

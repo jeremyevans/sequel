@@ -177,6 +177,12 @@ module Sequel
       create_table_sql_list(*g.create_info).each {|sta| execute(sta)}
     end
     
+    # Forcibly creates a table. If the table already exists it is dropped.
+    def create_table!(name, &block)
+      drop_table(name) rescue nil
+      create_table(name, &block)
+    end
+    
     # Drops one or more tables corresponding to the given table names.
     def drop_table(*names)
       names.each {|n| execute(drop_table_sql(n))}

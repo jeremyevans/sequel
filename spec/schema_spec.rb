@@ -184,12 +184,23 @@ context "DB#create_table" do
     @db.sqls.should == ["CREATE TABLE cats (id integer)", "CREATE UNIQUE INDEX cats_id_index ON cats (id)"]
   end
   
-  specify "should accept compound index definitions" do
+  specify "should accept composite index definitions" do
     @db.create_table(:cats) do
       integer :id
       index [:id, :name], :unique => true
     end
     @db.sqls.should == ["CREATE TABLE cats (id integer)", "CREATE UNIQUE INDEX cats_id_name_index ON cats (id, name)"]
+  end
+end
+
+context "DB#create_table!" do
+  setup do
+    @db = SchemaDummyDatabase.new
+  end
+  
+  specify "should drop the table and then create it" do
+    @db.create_table!(:cats) {}
+    @db.sqls.should == ['DROP TABLE cats', 'CREATE TABLE cats ()']
   end
 end
 
