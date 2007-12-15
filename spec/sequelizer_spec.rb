@@ -10,7 +10,7 @@ context "Proc#to_sql" do
     end
     
     def to_sql_comma_separated
-      DS.proc_to_sql(self, true)
+      DS.proc_to_sql(self, :comma_separated => true)
     end
   end
   
@@ -274,6 +274,31 @@ context "Proc#to_sql" do
     
     pr {:y > 20}.to_sql.should == \
       "((x > 10) OR (y > 20))"
+  end
+  
+  specify "should support unfolding of calls to #each" do
+    # from http://groups.google.com/group/sequel-talk/browse_thread/thread/54a660568515fbb7
+    periods = [:day, :week, :month, :year, :alltime]
+    idx = 1
+    v = 2
+    pr = proc do
+      periods.each do |p|
+        (p|idx) << (p|idx) + v
+      end
+    end
+    pr.to_sql_comma_separated.should == \
+      "day[1] = (day[1] + 2), week[1] = (week[1] + 2), month[1] = (month[1] + 2), year[1] = (year[1] + 2), alltime[1] = (alltime[1] + 2)"
+  end
+  
+  specify "should support unfolding of calls to Hash#each" do
+    periods = {:month => 3}
+    idx = 1
+    pr = proc do
+      periods.each do |k, v|
+        k << k + v
+      end
+    end
+    pr.to_sql_comma_separated.should == "month = (month + 3)"
   end
   
   specify "should support local arguments" do

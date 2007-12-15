@@ -1,3 +1,7 @@
+=== SVN
+
+* Implemented unfolding of #each calls inside sequelizer blocks (thanks Jim Morris).
+
 === 0.4.3 (2007-12-15)
 
 * Fixed Dataset#update to accept strings (#98).

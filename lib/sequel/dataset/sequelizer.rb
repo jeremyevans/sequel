@@ -75,7 +75,7 @@ class Sequel::Dataset
     #
     # This method depends on the Ruby2Ruby gem. If you do not have Ruby2Ruby 
     # installed, this method will raise an error.
-    def ext_expr(e, b)
+    def ext_expr(e, b, opts)
       eval(RubyToRuby.new.process(e), b)
     end
 
@@ -103,103 +103,151 @@ class Sequel::Dataset
     #   :substring[:x, 5] #=> "substring(x, 5)"
     #
     # All other method calls are evaulated as normal Ruby code.
-    def call_expr(e, b)
+    def call_expr(e, b, opts)
       case op = e[2]
       when :>, :<, :>=, :<=
-        l = eval_expr(e[1], b)
-        r = eval_expr(e[3][1], b)
+        l = eval_expr(e[1], b, opts)
+        r = eval_expr(e[3][1], b, opts)
         if l.is_one_of?(Symbol, Sequel::LiteralString, Sequel::SQL::Expression) || \
           r.is_one_of?(Symbol, Sequel::LiteralString, Sequel::SQL::Expression)
           "(#{literal(l)} #{op} #{literal(r)})"
         else
-          ext_expr(e, b)
+          ext_expr(e, b, opts)
         end
       when :==
-        l = eval_expr(e[1], b)
-        r = eval_expr(e[3][1], b)
+        l = eval_expr(e[1], b, opts)
+        r = eval_expr(e[3][1], b, opts)
         compare_expr(l, r)
       when :=~
-        l = eval_expr(e[1], b)
-        r = eval_expr(e[3][1], b)
+        l = eval_expr(e[1], b, opts)
+        r = eval_expr(e[3][1], b, opts)
         match_expr(l, r)
       when :+, :-, :*, :%, :/
-        l = eval_expr(e[1], b)
-        r = eval_expr(e[3][1], b)
+        l = eval_expr(e[1], b, opts)
+        r = eval_expr(e[3][1], b, opts)
         if l.is_one_of?(Symbol, Sequel::LiteralString, Sequel::SQL::Expression) || \
           r.is_one_of?(Symbol, Sequel::LiteralString, Sequel::SQL::Expression)
           "(#{literal(l)} #{op} #{literal(r)})".lit
         else
-          ext_expr(e, b)
+          ext_expr(e, b, opts)
         end
       when :<<
-        l = eval_expr(e[1], b)
-        r = eval_expr(e[3][1], b)
+        l = eval_expr(e[1], b, opts)
+        r = eval_expr(e[3][1], b, opts)
         "#{literal(l)} = #{literal(r)}".lit
       when :|
-        l = eval_expr(e[1], b)
-        r = eval_expr(e[3][1], b)
+        l = eval_expr(e[1], b, opts)
+        r = eval_expr(e[3][1], b, opts)
         if l.is_one_of?(Symbol, Sequel::SQL::Subscript)
           l|r
         elsif l.is_one_of?(Symbol, Sequel::LiteralString, Sequel::SQL::Expression) || \
           r.is_one_of?(Symbol, Sequel::LiteralString, Sequel::SQL::Expression)
           "(#{literal(l)} #{op} #{literal(r)})".lit
         else
-          ext_expr(e, b)
+          ext_expr(e, b, opts)
         end
       when :in, :in?
         # in/in? operators are supported using two forms:
         #   :x.in([1, 2, 3])
         #   :x.in(1, 2, 3) # variable arity
-        l = eval_expr(e[1], b)
-        r = eval_expr((e[3].size == 2) ? e[3][1] : e[3], b)
+        l = eval_expr(e[1], b, opts)
+        r = eval_expr((e[3].size == 2) ? e[3][1] : e[3], b, opts)
         compare_expr(l, r)
       when :nil, :nil?
-        l = eval_expr(e[1], b)
+        l = eval_expr(e[1], b, opts)
         compare_expr(l, nil)
       when :like, :like?
-        l = eval_expr(e[1], b)
-        r = eval_expr(e[3][1], b)
+        l = eval_expr(e[1], b, opts)
+        r = eval_expr(e[3][1], b, opts)
         match_expr(l, r)
       else
         if (op == :[]) && (e[1][0] == :lit) && (Symbol === e[1][1])
           # SQL Functions, e.g.: :sum[:x]
           if e[3]
-            e[1][1][*eval_expr(e[3], b)]
+            e[1][1][*eval_expr(e[3], b, opts)]
           else
             e[1][1][]
           end
         else
           # external code
-          ext_expr(e, b)
+          ext_expr(e, b, opts)
         end
       end
     end
     
-    def fcall_expr(e, b) #:nodoc:
-      ext_expr(e, b)
+    def fcall_expr(e, b, opts) #:nodoc:
+      ext_expr(e, b, opts)
     end
     
-    def vcall_expr(e, b) #:nodoc:
+    def vcall_expr(e, b, opts) #:nodoc:
       eval(e[1].to_s, b)
     end
     
-    def iter_expr(e, b) #:nodoc:
-      if e[1] == [:fcall, :proc]
-        eval_expr(e[3], b) # inline proc
+    def iter_expr(e, b, opts) #:nodoc:
+      if e[1][0] == :call && e[1][2] == :each
+        unfold_each_expr(e, b, opts)
+      elsif e[1] == [:fcall, :proc]
+        eval_expr(e[3], b, opts) # inline proc
       else
-        ext_expr(e, b) # method call with inline proc
+        ext_expr(e, b, opts) # method call with inline proc
       end
     end
     
+    def replace_dvars(a, values)
+      a.map do |i|
+        if i.is_a?(Array) && (i[0] == :dvar)
+          if v = values[i[1]]
+            value_to_parse_tree(v)
+          else
+            i
+          end
+        elsif Array === i
+          replace_dvars(i, values)
+        else
+          i
+        end
+      end
+    end
+    
+    def value_to_parse_tree(value)
+      c = Class.new
+      c.class_eval("def m; #{value.inspect}; end")
+      ParseTree.translate(c, :m)[2][1][2]
+    end
+    
+    def unfold_each_expr(e, b, opts) #:nodoc:
+      source = eval_expr(e[1][1], b, opts)
+      block_dvars = []
+      if e[2][0] == :dasgn_curr
+        block_dvars << e[2][1]
+      elsif e[2][0] == :masgn
+        e[2][1].each do |i|
+          if i.is_a?(Array) && i[0] == :dasgn_curr
+            block_dvars << i[1]
+          end
+        end
+      end
+      new_block = [:block]
+      
+      source.each do |*dvars|
+        iter_values = (Array === dvars[0]) ? dvars[0] : dvars
+        values = block_dvars.inject({}) {|m, i| m[i] = iter_values.shift; m}
+        iter = replace_dvars(e[3], values)
+        new_block << iter
+      end
+      
+      pt_expr(new_block, b, opts)
+    end
+    
     # Evaluates a parse-tree into an SQL expression.
-    def eval_expr(e, b)
+    def eval_expr(e, b, opts)
       case e[0]
       when :call # method call
-        call_expr(e, b)
+        call_expr(e, b, opts)
       when :fcall
-        fcall_expr(e, b)
+        fcall_expr(e, b, opts)
       when :vcall
-        vcall_expr(e, b)
+        vcall_expr(e, b, opts)
       when :ivar, :cvar, :dvar, :const, :gvar # local ref
         eval(e[1].to_s, b)
       when :nth_ref:
@@ -214,31 +262,31 @@ class Sequel::Dataset
       when :lit, :str # literal
          e[1]
       when :dot2 # inclusive range
-        eval_expr(e[1], b)..eval_expr(e[2], b)
+        eval_expr(e[1], b, opts)..eval_expr(e[2], b, opts)
       when :dot3 # exclusive range
-        eval_expr(e[1], b)...eval_expr(e[2], b)
+        eval_expr(e[1], b, opts)...eval_expr(e[2], b, opts)
       when :colon2 # qualified constant ref
-        eval_expr(e[1], b).const_get(e[2])
+        eval_expr(e[1], b, opts).const_get(e[2])
       when :false: false
       when :true: true
       when :nil: nil
       when :array
         # array
-        e[1..-1].map {|i| eval_expr(i, b)}
+        e[1..-1].map {|i| eval_expr(i, b, opts)}
       when :match3
         # =~/!~ operator
-        l = eval_expr(e[2], b)
-        r = eval_expr(e[1], b)
+        l = eval_expr(e[2], b, opts)
+        r = eval_expr(e[1], b, opts)
         compare_expr(l, r)
       when :iter
-        iter_expr(e, b)
+        iter_expr(e, b, opts)
       when :dasgn, :dasgn_curr
         # assignment
         l = e[1]
-        r = eval_expr(e[2], b)
+        r = eval_expr(e[2], b, opts)
         raise SequelError, "Invalid expression #{l} = #{r}. Did you mean :#{l} == #{r}?"
       when :if, :dstr
-        ext_expr(e, b)
+        ext_expr(e, b, opts)
       else
         raise SequelError, "Invalid expression tree: #{e.inspect}"
       end
@@ -247,40 +295,40 @@ class Sequel::Dataset
     JOIN_AND = " AND ".freeze
     JOIN_COMMA = ", ".freeze
     
-    def pt_expr(e, b, comma_separated = false) #:nodoc:
+    def pt_expr(e, b, opts = {}) #:nodoc:
       case e[0]
       when :not # negation: !x, (x != y), (x !~ y)
         if (e[1][0] == :lit) && (Symbol === e[1][1])
           # translate (!:x) into (x = 'f')
           compare_expr(e[1][1], false)
         else
-          "(NOT #{pt_expr(e[1], b, comma_separated)})"
+          "(NOT #{pt_expr(e[1], b, opts)})"
         end
       when :and # x && y
-        "(#{e[1..-1].map {|i| pt_expr(i, b, comma_separated)}.join(JOIN_AND)})"
+        "(#{e[1..-1].map {|i| pt_expr(i, b, opts)}.join(JOIN_AND)})"
       when :or # x || y
-        "(#{pt_expr(e[1], b, comma_separated)} OR #{pt_expr(e[2], b, comma_separated)})"
+        "(#{pt_expr(e[1], b, opts)} OR #{pt_expr(e[2], b, opts)})"
       when :call, :vcall, :iter, :match3 # method calls, blocks
-        eval_expr(e, b)
+        eval_expr(e, b, opts)
       when :block # block of statements
-        if comma_separated
-          "#{e[1..-1].map {|i| pt_expr(i, b, comma_separated)}.join(JOIN_COMMA)}"
+        if opts[:comma_separated]
+          "#{e[1..-1].map {|i| pt_expr(i, b, opts)}.join(JOIN_COMMA)}"
         else
-          "(#{e[1..-1].map {|i| pt_expr(i, b, comma_separated)}.join(JOIN_AND)})"
+          "(#{e[1..-1].map {|i| pt_expr(i, b, opts)}.join(JOIN_AND)})"
         end
       else # literals
         if e == [:lvar, :block]
-          eval_expr(e, b)
+          eval_expr(e, b, opts)
         else
-          literal(eval_expr(e, b))
+          literal(eval_expr(e, b, opts))
         end
       end
     end
 
     # Translates a Ruby block into an SQL expression.
-    def proc_to_sql(proc, comma_separated = false)
+    def proc_to_sql(proc, opts = {})
       c = Class.new {define_method(:m, &proc)}
-      pt_expr(ParseTree.translate(c, :m)[2][2], proc.binding, comma_separated)
+      pt_expr(ParseTree.translate(c, :m)[2][2], proc.binding, opts)
     end
   end
 end
