@@ -193,12 +193,32 @@ module Sequel
       alter_table_sql_list(name, g.operations).each {|sql| execute(sql)}
     end
     
+    def add_column(table, *args)
+      alter_table(table) {add_column(*args)}
+    end
+    
+    def drop_column(table, *args)
+      alter_table(table) {drop_column(*args)}
+    end
+    
+    def rename_column(table, *args)
+      alter_table(table) {rename_column(*args)}
+    end
+    
+    def set_column_type(table, *args)
+      alter_table(table) {set_column_type(*args)}
+    end
+    
     # Adds an index to a table for the given columns:
     # 
     #   DB.add_index(:posts, :title)
     #   DB.add_index(:posts, [:author, :title], :unique => true)
-    def add_index(table, columns, options = {})
-      execute(index_definition_sql(table, options.update(:columns => [columns])))
+    def add_index(table, *args)
+      alter_table(table) {add_index(*args)}
+    end
+    
+    def drop_index(table, *args)
+      alter_table(table) {drop_index(*args)}
     end
     
     # Returns true if the given table exists.

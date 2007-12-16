@@ -1,5 +1,7 @@
 === SVN
 
+* Added direct Database API for altering tables.
+
 * Added Database#alter_table method with support for adding, dropping, renaming, modifying columns and adding and droppping indexes.
 
 * Added #unique schema method for defining unique indexes (thanks Dado).

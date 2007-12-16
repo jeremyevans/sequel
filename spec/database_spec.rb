@@ -257,6 +257,58 @@ context "Database#alter_table" do
   end
 end
 
+context "Database#add_column" do
+  setup do
+    @db = DummyDatabase.new
+  end
+  
+  specify "should construct proper SQL" do
+    @db.add_column :test, :name, :text, :unique => true
+    @db.sqls.should == [
+      'ALTER TABLE test ADD COLUMN name text UNIQUE'
+    ]
+  end
+end
+
+context "Database#drop_column" do
+  setup do
+    @db = DummyDatabase.new
+  end
+  
+  specify "should construct proper SQL" do
+    @db.drop_column :test, :name
+    @db.sqls.should == [
+      'ALTER TABLE test DROP COLUMN name'
+    ]
+  end
+end
+
+context "Database#rename_column" do
+  setup do
+    @db = DummyDatabase.new
+  end
+  
+  specify "should construct proper SQL" do
+    @db.rename_column :test, :abc, :def
+    @db.sqls.should == [
+      'ALTER TABLE test RENAME COLUMN abc TO def'
+    ]
+  end
+end
+
+context "Database#set_column_type" do
+  setup do
+    @db = DummyDatabase.new
+  end
+  
+  specify "should construct proper SQL" do
+    @db.set_column_type :test, :name, :integer
+    @db.sqls.should == [
+      'ALTER TABLE test ALTER COLUMN name TYPE integer'
+    ]
+  end
+end
+
 context "Database#add_index" do
   setup do
     @db = DummyDatabase.new
@@ -275,6 +327,20 @@ context "Database#add_index" do
       'CREATE INDEX test_one_two_index ON test (one, two)'
     ]
   end
+end
+
+context "Database#drop_index" do
+  setup do
+    @db = DummyDatabase.new
+  end
+  
+  specify "should construct proper SQL" do
+    @db.drop_index :test, :name
+    @db.sqls.should == [
+      'DROP INDEX test_name_index'
+    ]
+  end
+  
 end
 
 class Dummy2Database < Sequel::Database

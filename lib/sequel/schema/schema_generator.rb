@@ -7,7 +7,7 @@ module Sequel
         @columns = []
         @indexes = []
         @primary_key = nil
-        instance_eval(&block)
+        instance_eval(&block) if block
       end
       
       def method_missing(type, name = nil, opts = {})
@@ -70,7 +70,7 @@ module Sequel
         @db = db
         @table_name = table_name
         @operations = []
-        instance_eval(&block)
+        instance_eval(&block) if block
       end
       
       def add_column(name, type, opts = {})

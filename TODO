@@ -1,3 +1,5 @@
+# Database introspection.
+
 # block form of Model.new:
 
   MyModel.new do |model
