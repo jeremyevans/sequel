@@ -62,6 +62,64 @@ module Sequel
         [@table_name, @columns, @indexes]
       end
     end
+  
+    class AlterTableGenerator
+      attr_reader :operations
+      
+      def initialize(db, table_name, &block)
+        @db = db
+        @table_name = table_name
+        @operations = []
+        instance_eval(&block)
+      end
+      
+      def add_column(name, type, opts = {})
+        @operations << {
+          :op => :add_column,
+          :name => name,
+          :type => type
+        }.merge(opts)
+      end
+      
+      def drop_column(name)
+        @operations << {
+          :op => :drop_column,
+          :name => name
+        }
+      end
+      
+      def rename_column(name, new_name)
+        @operations << {
+          :op => :rename_column,
+          :name => name,
+          :new_name => new_name
+        }
+      end
+      
+      def set_column_type(name, type)
+        @operations << {
+          :op => :set_column_type,
+          :name => name,
+          :type => type
+        }
+      end
+      
+      def add_index(columns, opts = {})
+        columns = [columns] unless columns.is_a?(Array)
+        @operations << {
+          :op => :add_index,
+          :columns => columns
+        }.merge(opts)
+      end
+      
+      def drop_index(columns)
+        columns = [columns] unless columns.is_a?(Array)
+        @operations << {
+          :op => :drop_index,
+          :columns => columns
+        }
+      end
+    end
   end
 end
 

@@ -174,7 +174,7 @@ module Sequel
     #   end
     def create_table(name, &block)
       g = Schema::Generator.new(self, name, &block)
-      create_table_sql_list(*g.create_info).each {|sta| execute(sta)}
+      create_table_sql_list(*g.create_info).each {|sql| execute(sql)}
     end
     
     # Forcibly creates a table. If the table already exists it is dropped.
@@ -186,6 +186,11 @@ module Sequel
     # Drops one or more tables corresponding to the given table names.
     def drop_table(*names)
       names.each {|n| execute(drop_table_sql(n))}
+    end
+    
+    def alter_table(name, &block)
+      g = Schema::AlterTableGenerator.new(self, name, &block)
+      alter_table_sql_list(name, g.operations).each {|sql| execute(sql)}
     end
     
     # Adds an index to a table for the given columns:

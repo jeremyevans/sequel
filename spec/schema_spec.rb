@@ -237,3 +237,4 @@ context "DB#drop_table" do
     @db.sqls.should == ['DROP TABLE cats']
   end
 end
+

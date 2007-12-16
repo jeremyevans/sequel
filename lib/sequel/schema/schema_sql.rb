@@ -84,6 +84,27 @@ module Sequel
       def drop_table_sql(name)
         "DROP TABLE #{name}"
       end
+      
+      def alter_table_sql_list(table, operations)
+        operations.map {|op| alter_table_sql(table, op)}
+      end
+      
+      def alter_table_sql(table, op)
+        case op[:op]
+        when :add_column
+          "ALTER TABLE #{table} ADD COLUMN #{column_definition_sql(op)}"
+        when :drop_column
+          "ALTER TABLE #{table} DROP COLUMN #{op[:name]}"
+        when :rename_column
+          "ALTER TABLE #{table} RENAME COLUMN #{op[:name]} TO #{op[:new_name]}"
+        when :set_column_type
+          "ALTER TABLE #{table} ALTER COLUMN #{op[:name]} TYPE #{op[:type]}"
+        when :add_index
+          index_definition_sql(table, op)
+        when :drop_index
+          "DROP INDEX #{default_index_name(table, op[:columns])}"
+        end
+      end
     end
   end
 end

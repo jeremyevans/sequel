@@ -229,6 +229,34 @@ context "Database#create_table" do
   end
 end
 
+context "Database#alter_table" do
+  setup do
+    @db = DummyDatabase.new
+  end
+  
+  specify "should construct proper SQL" do
+    @db.alter_table :xyz do
+      add_column :aaa, :text, :null => false, :unique => true
+      drop_column :bbb
+      rename_column :ccc, :ddd
+      set_column_type :eee, :integer
+      
+      add_index :fff, :unique => true
+      drop_index :ggg
+    end
+    
+    @db.sqls.should == [
+      'ALTER TABLE xyz ADD COLUMN aaa text UNIQUE NOT NULL',
+      'ALTER TABLE xyz DROP COLUMN bbb',
+      'ALTER TABLE xyz RENAME COLUMN ccc TO ddd',
+      'ALTER TABLE xyz ALTER COLUMN eee TYPE integer',
+      
+      'CREATE UNIQUE INDEX xyz_fff_index ON xyz (fff)',
+      'DROP INDEX xyz_ggg_index'
+    ]
+  end
+end
+
 context "Database#add_index" do
   setup do
     @db = DummyDatabase.new
