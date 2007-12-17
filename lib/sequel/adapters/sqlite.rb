@@ -97,6 +97,15 @@ module Sequel
         pragma_set(:temp_store, value)
       end
       
+      def alter_table_sql(table, op)
+        case op[:op]
+        when :add_column
+          "ALTER TABLE #{table} ADD #{column_definition_sql(op)}"
+        else
+          raise SequelError, "Unsupported ALTER TABLE operation"
+        end
+      end
+      
       def transaction(&block)
         @pool.hold do |conn|
           if conn.transaction_active?

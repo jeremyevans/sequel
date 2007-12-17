@@ -143,6 +143,17 @@ module Sequel
         end
       end
 
+      def alter_table_sql(table, op)
+        case op[:op]
+        when :rename_column
+          "ALTER TABLE #{table} CHANGE COLUMN #{op[:name]} #{op[:new_name]} #{op[:type]}"
+        when :set_column_type
+          "ALTER TABLE #{table} CHANGE COLUMN #{op[:name]} #{op[:name]} #{op[:type]}"
+        else
+          super(table, op)
+        end
+      end
+      
       def transaction
         @pool.hold do |conn|
           @transactions ||= []

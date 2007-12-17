@@ -88,12 +88,12 @@ module Sequel
         }
       end
       
-      def rename_column(name, new_name)
+      def rename_column(name, new_name, opts = {})
         @operations << {
           :op => :rename_column,
           :name => name,
           :new_name => new_name
-        }
+        }.merge(opts)
       end
       
       def set_column_type(name, type)

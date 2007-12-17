@@ -1,14 +1,16 @@
 require File.join(File.dirname(__FILE__), '../../lib/sequel')
 
 PGSQL_DB = Sequel('postgres://postgres:postgres@localhost:5432/reality_spec')
-if PGSQL_DB.table_exists?(:test)
-  PGSQL_DB.drop_table :test
-end
+PGSQL_DB.drop_table(:test) if PGSQL_DB.table_exists?(:test)
+PGSQL_DB.drop_table(:test2) if PGSQL_DB.table_exists?(:test2)
+  
 PGSQL_DB.create_table :test do
   text :name
+  integer :value, :index => true
+end
+PGSQL_DB.create_table :test2 do
+  text :name
   integer :value
-  
-  index :value
 end
 
 context "A PostgreSQL database" do
@@ -144,3 +146,44 @@ context "A PostgreSQL dataset in array tuples mode" do
     a[:value].should == '123'
   end
 end
+
+context "A PostgreSQL database" do
+  setup do
+    @db = PGSQL_DB
+  end
+
+  specify "should support add_column operations" do
+    @db.add_column :test2, :xyz, :text, :default => '000'
+    
+    @db[:test2].columns.should == [:name, :value, :xyz]
+    @db[:test2] << {:name => 'mmm', :value => 111}
+    @db[:test2].first[:xyz].should == '000'
+  end
+  
+  specify "should support drop_column operations" do
+    @db[:test2].columns.should == [:name, :value, :xyz]
+    @db.drop_column :test2, :xyz
+    
+    @db[:test2].columns.should == [:name, :value]
+  end
+  
+  specify "should support rename_column operations" do
+    @db[:test2].delete
+    @db.add_column :test2, :xyz, :text, :default => '000'
+    @db[:test2] << {:name => 'mmm', :value => 111, :xyz => 'qqqq'}
+
+    @db[:test2].columns.should == [:name, :value, :xyz]
+    @db.rename_column :test2, :xyz, :zyx
+    @db[:test2].columns.should == [:name, :value, :zyx]
+    @db[:test2].first[:zyx].should == 'qqqq'
+  end
+  
+  specify "should support set_column_type operations" do
+    @db.add_column :test2, :xyz, :float
+    @db[:test2].delete
+    @db[:test2] << {:name => 'mmm', :value => 111, :xyz => 56.78}
+    @db.set_column_type :test2, :xyz, :integer
+    
+    @db[:test2].first[:xyz].should == 57
+  end
+end  
