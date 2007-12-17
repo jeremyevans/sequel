@@ -302,4 +302,12 @@ context "A MySQL database" do
     
     @db[:test2].first[:xyz].should == 57
   end
+  
+  specify "should support add_index" do
+    @db.add_index :test2, :value
+  end
+  
+  specify "should support drop_index" do
+    @db.drop_index :test2, :value
+  end
 end  

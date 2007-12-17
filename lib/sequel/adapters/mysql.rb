@@ -149,6 +149,8 @@ module Sequel
           "ALTER TABLE #{table} CHANGE COLUMN #{op[:name]} #{op[:new_name]} #{op[:type]}"
         when :set_column_type
           "ALTER TABLE #{table} CHANGE COLUMN #{op[:name]} #{op[:name]} #{op[:type]}"
+        when :drop_index
+          "DROP INDEX #{default_index_name(table, op[:columns])} ON #{table}"
         else
           super(table, op)
         end
