@@ -369,6 +369,17 @@ context "Database#drop_table" do
   end
 end
 
+context "Database#rename_table" do
+  setup do
+    @db = DummyDatabase.new
+  end
+  
+  specify "should construct proper SQL" do
+    @db.rename_table :abc, :xyz
+    @db.sqls.should == ['ALTER TABLE abc RENAME TO xyz']
+  end
+end
+
 context "Database#table_exists?" do
   setup do
     @db = DummyDatabase.new

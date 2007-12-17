@@ -1,5 +1,7 @@
 === SVN
 
+* Implemented Database#rename_table (#104).
+
 * Fixed drop_index in mysql adapter (#103).
 
 * Added ALTER TABLE specs for postgres, sqlite and mysql adapters. Added custom alter_table behavior for sqlite and mysql adapters (#101, #102).

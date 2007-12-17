@@ -85,6 +85,10 @@ module Sequel
         "DROP TABLE #{name}"
       end
       
+      def rename_table_sql(name, new_name)
+        "ALTER TABLE #{name} RENAME TO #{new_name}"
+      end
+      
       def alter_table_sql_list(table, operations)
         operations.map {|op| alter_table_sql(table, op)}
       end

@@ -188,6 +188,10 @@ module Sequel
       names.each {|n| execute(drop_table_sql(n))}
     end
     
+    def rename_table(*args)
+      execute(rename_table_sql(*args))
+    end
+    
     def alter_table(name, &block)
       g = Schema::AlterTableGenerator.new(self, name, &block)
       alter_table_sql_list(name, g.operations).each {|sql| execute(sql)}
