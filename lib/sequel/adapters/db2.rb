@@ -16,7 +16,7 @@ module Sequel
         case rc
         when SQL_SUCCESS, SQL_SUCCESS_WITH_INFO: nil
         else
-          raise Sequel::Error, msg
+          raise Error, msg
         end
       end
       

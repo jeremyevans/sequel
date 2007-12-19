@@ -48,11 +48,11 @@ context "Dataset" do
     Sequel::Dataset.included_modules.should include(Enumerable)
   end
   
-  specify "should raise Sequel::Error::NotImplemented for the dataset interface methods" do
-    proc {@dataset.fetch_rows('abc')}.should raise_error(Sequel::Error::NotImplemented)
-    proc {@dataset.insert(1, 2, 3)}.should raise_error(Sequel::Error::NotImplemented)
-    proc {@dataset.update(:name => 'abc')}.should raise_error(Sequel::Error::NotImplemented)
-    proc {@dataset.delete}.should raise_error(Sequel::Error::NotImplemented)
+  specify "should raise ImplementedError for the dataset interface methods" do
+    proc {@dataset.fetch_rows('abc')}.should raise_error(NotImplementedError)
+    proc {@dataset.insert(1, 2, 3)}.should raise_error(NotImplementedError)
+    proc {@dataset.update(:name => 'abc')}.should raise_error(NotImplementedError)
+    proc {@dataset.delete}.should raise_error(NotImplementedError)
   end
 end
 
@@ -1580,9 +1580,9 @@ context "Dataset#set_model" do
   end
   
   specify "should raise for invalid parameters" do
-    proc {@dataset.set_model('kind')}.should raise_error(Sequel::Error)
-    proc {@dataset.set_model(0)}.should raise_error(Sequel::Error)
-    proc {@dataset.set_model(:kind)}.should raise_error(Sequel::Error) # no hash given
+    proc {@dataset.set_model('kind')}.should raise_error(ArgumentError)
+    proc {@dataset.set_model(0)}.should raise_error(ArgumentError)
+    proc {@dataset.set_model(:kind)}.should raise_error(ArgumentError) # no hash given
   end
 end
 
@@ -2016,13 +2016,13 @@ context "Dataset" do
   end
   
   specify "should raise for ! methods that don't return a dataset" do
-    proc {@d.opts!}.should raise_error(Sequel::Error::Name)
+    proc {@d.opts!}.should raise_error(NameError)
   end
   
   specify "should raise for missing methods" do
-    proc {@d.xuyz}.should raise_error(Sequel::Error::Name)
-    proc {@d.xyz!}.should raise_error(Sequel::Error::Name)
-    proc {@d.xyz?}.should raise_error(Sequel::Error::Name)
+    proc {@d.xuyz}.should raise_error(NameError)
+    proc {@d.xyz!}.should raise_error(NameError)
+    proc {@d.xyz?}.should raise_error(NameError)
   end
   
   specify "should support chaining of bang methods" do
@@ -2121,11 +2121,11 @@ context "Dataset#transform" do
   end
   
   specify "should raise Sequel::Error for invalid transformations" do
-    proc {@ds.transform(:x => 'mau')}.should raise_error(Sequel::Error::Transform)
-    proc {@ds.transform(:x => :mau)}.should raise_error(Sequel::Error::Transform)
-    proc {@ds.transform(:x => [])}.should raise_error(Sequel::Error::Transform)
-    proc {@ds.transform(:x => ['mau'])}.should raise_error(Sequel::Error::Transform)
-    proc {@ds.transform(:x => [proc {|v|}, proc {|v|}])}.should_not raise_error(Sequel::Error::Transform)
+    proc {@ds.transform(:x => 'mau')}.should raise_error(Sequel::Error::InvalidTransform)
+    proc {@ds.transform(:x => :mau)}.should raise_error(Sequel::Error::InvalidTransform)
+    proc {@ds.transform(:x => [])}.should raise_error(Sequel::Error::InvalidTransform)
+    proc {@ds.transform(:x => ['mau'])}.should raise_error(Sequel::Error::InvalidTransform)
+    proc {@ds.transform(:x => [proc {|v|}, proc {|v|}])}.should_not raise_error(Sequel::Error::InvalidTransform)
   end
   
   specify "should support stock YAML transformation" do

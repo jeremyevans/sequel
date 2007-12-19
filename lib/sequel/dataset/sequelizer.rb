@@ -63,7 +63,7 @@ class Sequel::Dataset
       when String:
         "(#{literal(l)} LIKE #{literal(r)})"
       else
-        raise Sequel::Error::UnsupportedMatchPatternClass, r.class
+        raise Sequel::Error, "Unsupported match pattern class (#{r.class})."
       end
     end
 
@@ -288,7 +288,7 @@ class Sequel::Dataset
       when :if, :dstr
         ext_expr(e, b, opts)
       else
-        raise Sequel::Error::InvalidExpressionTree, e.inspect
+        raise Sequel::Error::InvalidExpression, "Invalid expression tree: #{e.inspect}"
       end
     end
     

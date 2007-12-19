@@ -59,7 +59,7 @@ module Sequel
       # record is returned. Otherwise an array is returned with the last 
       # <i>num</i> records.
       def last(*args)
-        raise Sequel::Error, 'No order specified' unless 
+        raise Error, 'No order specified' unless 
           @opts[:order] || (opts && opts[:order])
 
         args = args.empty? ? 1 : (args.size == 1) ? args.first : args
@@ -238,10 +238,10 @@ module Sequel
       end
       
       module QueryBlockCopy #:nodoc:
-        def each(*args); raise Sequel::Error, "#each cannot be invoked inside a query block."; end
-        def insert(*args); raise Sequel::Error, "#insert cannot be invoked inside a query block."; end
-        def update(*args); raise Sequel::Error, "#update cannot be invoked inside a query block."; end
-        def delete(*args); raise Sequel::Error, "#delete cannot be invoked inside a query block."; end
+        def each(*args); raise Error, "#each cannot be invoked inside a query block."; end
+        def insert(*args); raise Error, "#insert cannot be invoked inside a query block."; end
+        def update(*args); raise Error, "#update cannot be invoked inside a query block."; end
+        def delete(*args); raise Error, "#delete cannot be invoked inside a query block."; end
         
         def clone_merge(opts)
           @opts.merge!(opts)

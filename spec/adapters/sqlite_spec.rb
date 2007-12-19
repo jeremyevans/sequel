@@ -87,8 +87,8 @@ context "An SQLite database" do
 
     proc {@db.transaction do
       @db.create_table(:u) {text :name}
-      raise Sequel::Error::Argument
-    end}.should raise_error(Sequel::Error::Argument)
+      raise ArgumentError
+    end}.should raise_error(ArgumentError)
     # no commit
     @db.tables.should == [:t]
 

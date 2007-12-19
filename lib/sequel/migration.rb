@@ -53,7 +53,7 @@ module Sequel
       when :up: obj.up
       when :down: obj.down
       else
-        raise Sequel::Error::InvalidMigrationDirection, direction
+        raise ArgumentError, "Invalid migration direction specified (#{direction.inspect})"
       end
     end
 
@@ -104,8 +104,8 @@ module Sequel
       # determine current and target version and direction
       current ||= get_current_migration_version(db)
       target ||= latest_migration_version(directory)
-      raise Sequel::Error::NoCurrentVersionAvailable if current.nil?
-      raise Sequel::Error::NoTargetVersionAvailable if target.nil?
+      raise Error, "No current version available" if current.nil?
+      raise Error, "No target version available" if target.nil?
 
       direction = current < target ? :up : :down
       

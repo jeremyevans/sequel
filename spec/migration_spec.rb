@@ -35,7 +35,7 @@ context "Migration#apply" do
   end
   
   specify "should raise for an invalid direction" do
-    proc {@migration.apply(@db, :hahaha)}.should raise_error(Sequel::Error)
+    proc {@migration.apply(@db, :hahaha)}.should raise_error(ArgumentError)
   end
   
   specify "should apply the up direction correctly" do

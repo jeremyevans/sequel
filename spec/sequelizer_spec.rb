@@ -21,7 +21,7 @@ context "Proc#to_sql" do
     when Regexp:
       "(#{literal(l)} ~ #{literal(r.source)})"
     else
-      raise Sequel::Error::UnsupportedMatchPatternClass, r.class
+      raise Sequel::Error, "Unsupported match pattern class (#{r.class})."
     end
   end
   
@@ -54,7 +54,7 @@ context "Proc#to_sql" do
   end
   
   specify "should support local vars or method references" do
-    proc {proc {:x == a}.to_sql}.should raise_error(Sequel::Error::Name)
+    proc {proc {:x == a}.to_sql}.should raise_error(NameError)
     b = 123
     proc {:x == b}.to_sql.should == "(x = 123)"
     def xyz; 321; end
@@ -201,9 +201,9 @@ context "Proc#to_sql" do
   end
   
   specify "should complain if someone is crazy" do
-    proc {proc {def x; 1; end}.to_sql}.should raise_error(Sequel::Error)
+    proc {proc {def x; 1; end}.to_sql}.should raise_error(Sequel::Error::InvalidExpression)
     a = 1
-    proc {proc {a = 1}.to_sql}.should raise_error(Sequel::Error)
+    proc {proc {a = 1}.to_sql}.should raise_error(Sequel::Error::InvalidExpression)
   end
   
   specify "should support comparison to Range objects" do

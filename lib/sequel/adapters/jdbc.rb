@@ -15,7 +15,7 @@ module Sequel
       
       def connect
         unless conn_string = @opts[:uri] || @opts[:url] || @opts[:database]
-          raise Sequel::Error::NoConnectionString
+          raise Error, "No connection string specified"
         end
         unless conn_string =~ /^jdbc:/
           conn_string = "jdbc:#{conn_string}"

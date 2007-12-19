@@ -71,7 +71,7 @@ module Sequel
       end
       
       def auto_vacuum=(value)
-        value = AUTO_VACUUM.index(value) || (raise Sequel::Error, "Invalid value for auto_vacuum option. Please specify one of :none, :full, :incremental.")
+        value = AUTO_VACUUM.index(value) || (raise Error, "Invalid value for auto_vacuum option. Please specify one of :none, :full, :incremental.")
         pragma_set(:auto_vacuum, value)
       end
       
@@ -82,7 +82,7 @@ module Sequel
       end
       
       def synchronous=(value)
-        value = SYNCHRONOUS.index(value) || (raise Sequel::Error, "Invalid value for synchronous option. Please specify one of :off, :normal, :full.")
+        value = SYNCHRONOUS.index(value) || (raise Error, "Invalid value for synchronous option. Please specify one of :off, :normal, :full.")
         pragma_set(:synchronous, value)
       end
       
@@ -93,7 +93,7 @@ module Sequel
       end
       
       def temp_store=(value)
-        value = TEMP_STORE.index(value) || (raise Sequel::Error, "Invalid value for temp_store option. Please specify one of :default, :file, :memory.")
+        value = TEMP_STORE.index(value) || (raise Error, "Invalid value for temp_store option. Please specify one of :default, :file, :memory.")
         pragma_set(:temp_store, value)
       end
       
@@ -102,7 +102,7 @@ module Sequel
         when :add_column
           "ALTER TABLE #{table} ADD #{column_definition_sql(op)}"
         else
-          raise SequelError, "Unsupported ALTER TABLE operation"
+          raise Error, "Unsupported ALTER TABLE operation"
         end
       end
       
@@ -116,7 +116,7 @@ module Sequel
             conn.transaction {result = yield(conn)}
             result
           rescue => e
-            raise e unless Sequel::Error::Rollback === e
+            raise e unless Error::Rollback === e
           end
         end
       end

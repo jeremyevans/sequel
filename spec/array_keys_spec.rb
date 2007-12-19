@@ -191,7 +191,7 @@ context "An array with symbol keys" do
     @a.fetch(:a).should == 1
     @a.fetch(:b).should == 2
     @a.fetch(:c).should == 3
-    proc {@a.fetch(:d)}.should raise_error(Sequel::Error::Index)
+    proc {@a.fetch(:d)}.should raise_error(IndexError)
     @a.fetch(:d, 4).should == 4
     @a.fetch(:d, nil).should == nil
     
@@ -419,7 +419,7 @@ context "An array with string keys" do
     @a.fetch(:a).should == 1
     @a.fetch(:b).should == 2
     @a.fetch(:c).should == 3
-    proc {@a.fetch(:d)}.should raise_error(Sequel::Error::Index)
+    proc {@a.fetch(:d)}.should raise_error(IndexError)
     @a.fetch(:d, 4).should == 4
     @a.fetch(:d, nil).should == nil
 

@@ -41,7 +41,7 @@ module Sequel #:nodoc:
           opts = args[1].merge(:database => args[0])
         end
       rescue
-        raise Sequel::Error::InvalidParameters
+        raise Error, "Unknown adapter (#{m})"
       end
       c.new(opts)
     end

@@ -87,7 +87,7 @@ module Sequel
           @pk ||= {key => @values[key]}
         end
         class_def(:cache_key) do
-          pk = @values[key] || (raise Sequel::Error, 'no primary key for this record')
+          pk = @values[key] || (raise Error, 'no primary key for this record')
           @cache_key ||= "#{self.class}:#{pk}"
         end
         meta_def(:primary_key_hash) do |v|
@@ -118,11 +118,11 @@ module Sequel
     
     def self.no_primary_key #:nodoc:
       meta_def(:primary_key) {nil}
-      meta_def(:primary_key_hash) {|v| raise Sequel::Error, "#{self} does not have a primary key"}
-      class_def(:this)      {raise Sequel::Error::NoPrimaryKeyForModel}
-      class_def(:pk)        {raise Sequel::Error::NoPrimaryKeyForModel}
-      class_def(:pk_hash)   {raise Sequel::Error::NoPrimaryKeyForModel}
-      class_def(:cache_key) {raise Sequel::Error::NoPrimaryKeyForModel}
+      meta_def(:primary_key_hash) {|v| raise Error, "#{self} does not have a primary key"}
+      class_def(:this)      {raise Error, "No primary key is associated with this model"}
+      class_def(:pk)        {raise Error, "No primary key is associated with this model"}
+      class_def(:pk_hash)   {raise Error, "No primary key is associated with this model"}
+      class_def(:cache_key) {raise Error, "No primary key is associated with this model"}
     end
     
     # Creates new instance with values set to passed-in Hash ensuring that
@@ -149,7 +149,7 @@ module Sequel
     
     # Returns a key unique to the underlying record for caching
     def cache_key
-      pk = @values[:id] || (raise Sequel::Error, 'no primary key for this record')
+      pk = @values[:id] || (raise Error, 'no primary key for this record')
       @cache_key ||= "#{self.class}:#{pk}"
     end
 
@@ -251,7 +251,7 @@ module Sequel
     
     # Reloads values from database and returns self.
     def refresh
-      @values = this.first || raise(Sequel::Error, "Record not found")
+      @values = this.first || raise(Error, "Record not found")
       self
     end
 
@@ -285,7 +285,7 @@ module Sequel
           end
           
           # otherwise, raise an error
-          raise Sequel::Error, "Invalid column (#{att.inspect}) for #{self}"
+          raise Error, "Invalid column (#{att.inspect}) for #{self}"
         end
 
         # define the column accessor

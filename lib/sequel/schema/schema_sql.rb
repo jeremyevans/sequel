@@ -115,7 +115,7 @@ module Sequel
         when :drop_index
           "DROP INDEX #{default_index_name(table, op[:columns])}"
         else
-          raise SequelError, "Unsupported ALTER TABLE operation"
+          raise Error, "Unsupported ALTER TABLE operation"
         end
       end
     end

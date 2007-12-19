@@ -30,13 +30,13 @@ end
 
 context "Database#connect" do
   specify "should raise Sequel::Error::NotImplemented" do
-    proc {Sequel::Database.new.connect}.should raise_error(Sequel::Error::NotImplemented)
+    proc {Sequel::Database.new.connect}.should raise_error(NotImplementedError)
   end
 end
 
 context "Database#disconnect" do
   specify "should raise Sequel::Error::NotImplemented" do
-    proc {Sequel::Database.new.disconnect}.should raise_error(Sequel::Error::NotImplemented)
+    proc {Sequel::Database.new.disconnect}.should raise_error(NotImplementedError)
   end
 end
 
@@ -103,8 +103,8 @@ end
 
 context "Database#execute" do
   specify "should raise Sequel::Error::NotImplemented" do
-    proc {Sequel::Database.new.execute('blah blah')}.should raise_error(Sequel::Error::NotImplemented)
-    proc {Sequel::Database.new << 'blah blah'}.should raise_error(Sequel::Error::NotImplemented)
+    proc {Sequel::Database.new.execute('blah blah')}.should raise_error(NotImplementedError)
+    proc {Sequel::Database.new << 'blah blah'}.should raise_error(NotImplementedError)
   end
 end
 

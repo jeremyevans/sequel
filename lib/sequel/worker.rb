@@ -38,7 +38,7 @@ module Sequel
       while busy?
         sleep 0.1
       end
-      self.raise Sequel::Error::WorkerStop
+      self.raise Error::WorkerStop
       super
     end
 
@@ -46,7 +46,7 @@ module Sequel
     def next_job
       @cur = @queue.pop
       @cur.call
-    rescue Sequel::Error::WorkerStop => e
+    rescue Error::WorkerStop => e
       raise e
     rescue Exception => e
       @errors << e
