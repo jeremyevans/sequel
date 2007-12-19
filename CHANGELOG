@@ -1,5 +1,7 @@
 === SVN
 
+* Fixed sync problem in connection_pool_spec.
+
 * Changed String#to_time to raise Error::InvalidValue if Time.parse fails.
 
 * Refactored sequel error classes.

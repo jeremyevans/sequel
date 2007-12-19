@@ -283,7 +283,8 @@ context "ConnectionPool#disconnect" do
       sleep 0.2
     end
     stop = true
-    sleep 0.2
+    sleep 1
+    threads.each {|t| t.join}
     
     @pool.size.should == 5
     @pool.available_connections.size.should == 5
@@ -301,7 +302,8 @@ context "ConnectionPool#disconnect" do
       sleep 0.2
     end
     stop = true
-    sleep 0.2
+    sleep 1
+    threads.each {|t| t.join}
     
     @pool.size.should == 5
     @pool.disconnect
@@ -316,7 +318,8 @@ context "ConnectionPool#disconnect" do
       sleep 0.2
     end
     stop = true
-    sleep 0.2
+    sleep 1
+    threads.each {|t| t.join}
     
     @pool.size.should == 5
     
