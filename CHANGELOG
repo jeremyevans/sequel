@@ -1,3 +1,9 @@
+=== SVN
+
+* Changed String#to_time to raise Error::InvalidValue if Time.parse fails.
+
+* Refactored sequel error classes.
+
 === 0.4.4.1 (2007-12-19)
 
 * Fixed schema generation code to use fied quoting and support adapter-specific literalization of default values (#108).
