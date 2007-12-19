@@ -111,7 +111,7 @@ module Sequel
       #   r = @db.execute(sql)
       #   r.each(&block)
       # end
-      raise NotImplementedError, NOTIMPL_MSG
+      raise Sequel::Error::NotImplemented, NOTIMPL_MSG
     end
   
     # Inserts values into the associated table. Adapters should override this
@@ -120,7 +120,7 @@ module Sequel
       # @db.synchronize do
       #   @db.execute(insert_sql(*values)).last_insert_id
       # end
-      raise NotImplementedError, NOTIMPL_MSG
+      raise Sequel::Error::NotImplemented, NOTIMPL_MSG
     end
   
     # Updates values for the dataset. Adapters should override this method.
@@ -128,7 +128,7 @@ module Sequel
       # @db.synchronize do
       #   @db.execute(update_sql(values, opts)).affected_rows
       # end
-      raise NotImplementedError, NOTIMPL_MSG
+      raise Sequel::Error::NotImplemented, NOTIMPL_MSG
     end
   
     # Deletes the records in the dataset. Adapters should override this method.
@@ -136,7 +136,7 @@ module Sequel
       # @db.synchronize do
       #   @db.execute(delete_sql(opts)).affected_rows
       # end
-      raise NotImplementedError, NOTIMPL_MSG
+      raise Sequel::Error::NotImplemented, NOTIMPL_MSG
     end
     
     # Returns the columns in the result set in their true order. The stock 
@@ -238,16 +238,16 @@ module Sequel
         extend_with_destroy
       when Symbol:
         # polymorphic model
-        hash = args.shift || raise(SequelError, "No class hash supplied for polymorphic model")
+        hash = args.shift || raise(Sequel::Error, "No class hash supplied for polymorphic model")
         @opts.merge!(:naked => true, :models => hash, :polymorphic_key => key)
         set_row_proc do |h|
           c = hash[h[key]] || hash[nil] || \
-            raise(SequelError, "No matching model class for record (#{polymorphic_key} => #{h[polymorphic_key].inspect})")
+            raise(Sequel::Error, "No matching model class for record (#{polymorphic_key} => #{h[polymorphic_key].inspect})")
           c.new(h, *args)
         end
         extend_with_destroy
       else
-        raise SequelError, "Invalid parameters specified"
+        raise Sequel::Error::InvalidParameters
       end
       self
     end
@@ -302,11 +302,11 @@ module Sequel
         case v
         when Array:
           if (v.size != 2) || !v.first.is_a?(Proc) && !v.last.is_a?(Proc)
-            raise SequelError, "Invalid transform specified"
+            raise Sequel::Error::InvalidTransform
           end
         else
           unless v = STOCK_TRANSFORMS[v]
-            raise SequelError, "Invalid transform specified"
+            raise Sequel::Error::InvalidTransform
           else
             t[k] = v
           end
@@ -384,7 +384,7 @@ module Sequel
     def extend_with_destroy
       unless respond_to?(:destroy)
         meta_def(:destroy) do
-          raise SequelError, 'Dataset not associated with model' unless @opts[:models]
+          raise Sequel::Error::NoDatasetAssociatedWithModel unless @opts[:models]
           count = 0
           @db.transaction {each {|r| count += 1; r.destroy}}
           count

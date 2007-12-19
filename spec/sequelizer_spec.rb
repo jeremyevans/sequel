@@ -21,7 +21,7 @@ context "Proc#to_sql" do
     when Regexp:
       "(#{literal(l)} ~ #{literal(r.source)})"
     else
-      raise SequelError, "Unsupported match pattern class (#{r.class})."
+      raise Sequel::Error::UnsupportedMatchPatternClass, r.class
     end
   end
   
@@ -54,7 +54,7 @@ context "Proc#to_sql" do
   end
   
   specify "should support local vars or method references" do
-    proc {proc {:x == a}.to_sql}.should raise_error(NameError)
+    proc {proc {:x == a}.to_sql}.should raise_error(Sequel::Error::Name)
     b = 123
     proc {:x == b}.to_sql.should == "(x = 123)"
     def xyz; 321; end
@@ -105,7 +105,7 @@ context "Proc#to_sql" do
   end
   
   specify "should raise on =~ operator for unsupported types" do
-    proc {proc {:x =~ 123}.to_sql}.should raise_error(SequelError)
+    proc {proc {:x =~ 123}.to_sql}.should raise_error(Sequel::Error)
   end
   
   specify "should support != operator" do
@@ -201,9 +201,9 @@ context "Proc#to_sql" do
   end
   
   specify "should complain if someone is crazy" do
-    proc {proc {def x; 1; end}.to_sql}.should raise_error(SequelError)
+    proc {proc {def x; 1; end}.to_sql}.should raise_error(Sequel::Error)
     a = 1
-    proc {proc {a = 1}.to_sql}.should raise_error(SequelError)
+    proc {proc {a = 1}.to_sql}.should raise_error(Sequel::Error)
   end
   
   specify "should support comparison to Range objects" do
@@ -378,7 +378,7 @@ context "Proc#to_sql stock" do
     ds = db[:items]
 
     p = proc {:x =~ /abc/}
-    proc {ds.proc_to_sql(p)}.should raise_error(SequelError)
+    proc {ds.proc_to_sql(p)}.should raise_error(Sequel::Error)
   end
 end
 

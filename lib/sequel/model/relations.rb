@@ -35,7 +35,7 @@ module Sequel
       end
       
       from = opts[:from]
-      from || (raise SequelError, "No association source defined (use :from option)")
+      from || (raise Sequel::Error, "No association source defined (use :from option)")
       key = opts[:key] || (name.to_s + ID_POSTFIX).to_sym
       
       setter_name = "#{name}=".to_sym
@@ -93,7 +93,7 @@ module Sequel
       
       
       from = opts[:from]
-      from || (raise SequelError, "No association source defined (use :from option)")
+      from || (raise Sequel::Error, "No association source defined (use :from option)")
       key = opts[:key] || (self.to_s + ID_POSTFIX).to_sym
       
       case from

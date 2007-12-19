@@ -48,11 +48,11 @@ context "Dataset" do
     Sequel::Dataset.included_modules.should include(Enumerable)
   end
   
-  specify "should raise NotImplementedError for the dataset interface methods" do
-    proc {@dataset.fetch_rows('abc')}.should raise_error(NotImplementedError)
-    proc {@dataset.insert(1, 2, 3)}.should raise_error(NotImplementedError)
-    proc {@dataset.update(:name => 'abc')}.should raise_error(NotImplementedError)
-    proc {@dataset.delete}.should raise_error(NotImplementedError)
+  specify "should raise Sequel::Error::NotImplemented for the dataset interface methods" do
+    proc {@dataset.fetch_rows('abc')}.should raise_error(Sequel::Error::NotImplemented)
+    proc {@dataset.insert(1, 2, 3)}.should raise_error(Sequel::Error::NotImplemented)
+    proc {@dataset.update(:name => 'abc')}.should raise_error(Sequel::Error::NotImplemented)
+    proc {@dataset.delete}.should raise_error(Sequel::Error::NotImplemented)
   end
 end
 
@@ -368,8 +368,8 @@ context "Dataset#where" do
     # the result of erroneous use of comparison not in a block
     # so instead of filter{:x == y} someone writes filter(:x == y)
     
-    proc {@dataset.filter(:a == 1)}.should raise_error(SequelError)
-    proc {@dataset.filter(:a != 1)}.should raise_error(SequelError)
+    proc {@dataset.filter(:a == 1)}.should raise_error(Sequel::Error::InvalidFilter)
+    proc {@dataset.filter(:a != 1)}.should raise_error(Sequel::Error::InvalidFilter)
   end
 end
 
@@ -380,7 +380,7 @@ context "Dataset#or" do
   end
   
   specify "should raise if no filter exists" do
-    proc {@dataset.or(:a => 1)}.should raise_error(SequelError)
+    proc {@dataset.or(:a => 1)}.should raise_error(Sequel::Error)
   end
   
   specify "should add an alternative expression to the where clause" do
@@ -413,7 +413,7 @@ context "Dataset#and" do
   end
   
   specify "should raise if no filter exists" do
-    proc {@dataset.and(:a => 1)}.should raise_error(SequelError)
+    proc {@dataset.and(:a => 1)}.should raise_error(Sequel::Error)
   end
   
   specify "should add an alternative expression to the where clause" do
@@ -642,7 +642,7 @@ context "Dataset#from" do
   end
   
   specify "should raise if no source is given" do
-    proc {@dataset.from(@dataset.from).select_sql}.should raise_error(SequelError)
+    proc {@dataset.from(@dataset.from).select_sql}.should raise_error(Sequel::Error)
   end
 end
 
@@ -1044,7 +1044,7 @@ context "Dataset#join_table" do
   end
   
   specify "should raise if an invalid join type is specified" do
-    proc {@d.join_table(:invalid, :a, :b)}.should raise_error(SequelError)
+    proc {@d.join_table(:invalid, :a, :b)}.should raise_error(Sequel::Error)
   end
   
   specify "should treat aliased tables correctly" do
@@ -1312,8 +1312,8 @@ context "Dataset#last" do
   end
   
   specify "should raise if no order is given" do
-    proc {@d.last}.should raise_error(SequelError)
-    proc {@d.last(2)}.should raise_error(SequelError)
+    proc {@d.last}.should raise_error(Sequel::Error)
+    proc {@d.last(2)}.should raise_error(Sequel::Error)
     proc {@d.order(:a).last}.should_not raise_error
     proc {@d.order(:a).last(2)}.should_not raise_error
   end
@@ -1580,9 +1580,9 @@ context "Dataset#set_model" do
   end
   
   specify "should raise for invalid parameters" do
-    proc {@dataset.set_model('kind')}.should raise_error(SequelError)
-    proc {@dataset.set_model(0)}.should raise_error(SequelError)
-    proc {@dataset.set_model(:kind)}.should raise_error(SequelError) # no hash given
+    proc {@dataset.set_model('kind')}.should raise_error(Sequel::Error)
+    proc {@dataset.set_model(0)}.should raise_error(Sequel::Error)
+    proc {@dataset.set_model(:kind)}.should raise_error(Sequel::Error) # no hash given
   end
 end
 
@@ -1693,10 +1693,10 @@ context "A polymorphic model dataset" do
     #...
   end
   
-  specify "should raise SequelError if no suitable class is found in the polymorphic hash" do
+  specify "should raise Sequel::Error if no suitable class is found in the polymorphic hash" do
     @m2 = Class.new(@m)
     @dataset.set_model(:bit, 1 => @m2)
-    proc {@dataset.all}.should raise_error(SequelError)
+    proc {@dataset.all}.should raise_error(Sequel::Error)
   end
 
   specify "should supply naked records if the naked option is specified" do
@@ -1974,14 +1974,14 @@ context "Dataset#query" do
   end
   
   specify "should raise on non-chainable method calls" do
-    proc {@d.query {count}}.should raise_error(SequelError)
+    proc {@d.query {count}}.should raise_error(Sequel::Error)
   end
   
   specify "should raise on each, insert, update, delete" do
-    proc {@d.query {each}}.should raise_error(SequelError)
-    proc {@d.query {insert(:x => 1)}}.should raise_error(SequelError)
-    proc {@d.query {update(:x => 1)}}.should raise_error(SequelError)
-    proc {@d.query {delete}}.should raise_error(SequelError)
+    proc {@d.query {each}}.should raise_error(Sequel::Error)
+    proc {@d.query {insert(:x => 1)}}.should raise_error(Sequel::Error)
+    proc {@d.query {update(:x => 1)}}.should raise_error(Sequel::Error)
+    proc {@d.query {delete}}.should raise_error(Sequel::Error)
   end
 end
 
@@ -2016,13 +2016,13 @@ context "Dataset" do
   end
   
   specify "should raise for ! methods that don't return a dataset" do
-    proc {@d.opts!}.should raise_error(NameError)
+    proc {@d.opts!}.should raise_error(Sequel::Error::Name)
   end
   
   specify "should raise for missing methods" do
-    proc {@d.xuyz}.should raise_error(NameError)
-    proc {@d.xyz!}.should raise_error(NameError)
-    proc {@d.xyz?}.should raise_error(NameError)
+    proc {@d.xuyz}.should raise_error(Sequel::Error::Name)
+    proc {@d.xyz!}.should raise_error(Sequel::Error::Name)
+    proc {@d.xyz?}.should raise_error(Sequel::Error::Name)
   end
   
   specify "should support chaining of bang methods" do
@@ -2120,12 +2120,12 @@ context "Dataset#transform" do
     @ds = @c.new(nil).from(:items)
   end
   
-  specify "should raise SequelError for invalid transformations" do
-    proc {@ds.transform(:x => 'mau')}.should raise_error(SequelError)
-    proc {@ds.transform(:x => :mau)}.should raise_error(SequelError)
-    proc {@ds.transform(:x => [])}.should raise_error(SequelError)
-    proc {@ds.transform(:x => ['mau'])}.should raise_error(SequelError)
-    proc {@ds.transform(:x => [proc {|v|}, proc {|v|}])}.should_not raise_error(SequelError)
+  specify "should raise Sequel::Error for invalid transformations" do
+    proc {@ds.transform(:x => 'mau')}.should raise_error(Sequel::Error::Transform)
+    proc {@ds.transform(:x => :mau)}.should raise_error(Sequel::Error::Transform)
+    proc {@ds.transform(:x => [])}.should raise_error(Sequel::Error::Transform)
+    proc {@ds.transform(:x => ['mau'])}.should raise_error(Sequel::Error::Transform)
+    proc {@ds.transform(:x => [proc {|v|}, proc {|v|}])}.should_not raise_error(Sequel::Error::Transform)
   end
   
   specify "should support stock YAML transformation" do

@@ -41,7 +41,7 @@ context "An SQLite database" do
     @db.auto_vacuum = :none
     @db.auto_vacuum.should == :none
     
-    proc {@db.auto_vacuum = :invalid}.should raise_error(SequelError)
+    proc {@db.auto_vacuum = :invalid}.should raise_error(Sequel::Error)
   end
 
   specify "should support getting and setting the synchronous pragma" do
@@ -52,7 +52,7 @@ context "An SQLite database" do
     @db.synchronous = :full
     @db.synchronous.should == :full
     
-    proc {@db.synchronous = :invalid}.should raise_error(SequelError)
+    proc {@db.synchronous = :invalid}.should raise_error(Sequel::Error)
   end
   
   specify "should support getting and setting the temp_store pragma" do
@@ -63,7 +63,7 @@ context "An SQLite database" do
     @db.temp_store = :memory
     @db.temp_store.should == :memory
     
-    proc {@db.temp_store = :invalid}.should raise_error(SequelError)
+    proc {@db.temp_store = :invalid}.should raise_error(Sequel::Error)
   end
   
   specify "should be able to execute multiple statements at once" do
@@ -87,8 +87,8 @@ context "An SQLite database" do
 
     proc {@db.transaction do
       @db.create_table(:u) {text :name}
-      raise ArgumentError
-    end}.should raise_error(ArgumentError)
+      raise Sequel::Error::Argument
+    end}.should raise_error(Sequel::Error::Argument)
     # no commit
     @db.tables.should == [:t]
 

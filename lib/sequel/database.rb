@@ -31,13 +31,13 @@ module Sequel
     
     # Connects to the database. This method should be overriden by descendants.
     def connect
-      raise NotImplementedError, "#connect should be overriden by adapters"
+      raise Sequel::Error::NotImplemented, "#connect should be overriden by adapters"
     end
     
     # Disconnects from the database. This method should be overriden by 
     # descendants.
     def disconnect
-      raise NotImplementedError, "#disconnect should be overriden by adapters"
+      raise Sequel::Error::NotImplemented, "#disconnect should be overriden by adapters"
     end
     
     # Returns true if the database is using a multi-threaded connection pool.
@@ -135,9 +135,9 @@ module Sequel
       (String === args.first) ? fetch(*args) : from(*args)
     end
 
-    # Raises a NotImplementedError. This method is overriden in descendants.
+    # Raises a Sequel::Error::NotImplemented. This method is overriden in descendants.
     def execute(sql)
-      raise NotImplementedError
+      raise Sequel::Error::NotImplemented
     end
     
     # Executes the supplied SQL statement. The SQL can be supplied as a string
@@ -272,7 +272,7 @@ module Sequel
           result
         rescue => e
           conn.execute(SQL_ROLLBACK)
-          raise e unless SequelRollbackError === e
+          raise e unless Sequel::Error::Rollback === e
         ensure
           @transactions.delete(Thread.current)
         end
@@ -318,7 +318,7 @@ module Sequel
         require File.join(File.dirname(__FILE__), "adapters/#{scheme}")
         c = @@adapters[scheme.to_sym]
       end
-      raise SequelError, "Invalid database scheme" unless c
+      raise Sequel::Error::InvaildDatabaseScheme unless c
       c
     end
         

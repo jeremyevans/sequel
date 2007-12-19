@@ -63,7 +63,7 @@ class Sequel::Dataset
       when String:
         "(#{literal(l)} LIKE #{literal(r)})"
       else
-        raise SequelError, "Unsupported match pattern class (#{r.class})."
+        raise Sequel::Error::UnsupportedMatchPatternClass, r.class
       end
     end
 
@@ -284,11 +284,11 @@ class Sequel::Dataset
         # assignment
         l = e[1]
         r = eval_expr(e[2], b, opts)
-        raise SequelError, "Invalid expression #{l} = #{r}. Did you mean :#{l} == #{r}?"
+        raise Sequel::Error::InvalidExpression, "#{l} = #{r}. Did you mean :#{l} == #{r}?"
       when :if, :dstr
         ext_expr(e, b, opts)
       else
-        raise SequelError, "Invalid expression tree: #{e.inspect}"
+        raise Sequel::Error::InvalidExpressionTree, e.inspect
       end
     end
     
@@ -338,7 +338,7 @@ begin
 rescue Exception
   module Sequel::Dataset::Sequelizer
     def proc_to_sql(proc)
-      raise SequelError, "You must have the ParseTree gem installed in order to use block filters."
+      raise Sequel::Error, "You must have the ParseTree gem installed in order to use block filters."
     end
   end
 end
@@ -348,7 +348,7 @@ begin
 rescue Exception
   module Sequel::Dataset::Sequelizer
     def ext_expr(e)
-      raise SequelError, "You must have the Ruby2Ruby gem installed in order to use this block filter."
+      raise Sequel::Error, "You must have the Ruby2Ruby gem installed in order to use this block filter."
     end
   end
 end

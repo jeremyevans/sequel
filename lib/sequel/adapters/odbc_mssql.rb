@@ -31,7 +31,7 @@ module Sequel
           # ADD TOP to SELECT string for LIMITS
           if limit = opts[:limit]
             top = "TOP #{limit} "
-            raise SequelError, "Offset not supported" if opts[:offset]
+            raise Sequel::Error::OffsetNotSupported if opts[:offset]
           end
 
           columns = opts[:select]

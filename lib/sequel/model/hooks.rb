@@ -1,9 +1,5 @@
 module Sequel
   class Model
-
-    class ChainBroken < RuntimeError # :nodoc:
-    end
-
     # This Hash translates verbs to methodnames used in chain manipulation
     # methods.
     VERB_TO_METHOD = {:prepend => :unshift, :append => :push}

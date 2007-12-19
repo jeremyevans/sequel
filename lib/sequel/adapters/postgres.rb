@@ -227,7 +227,7 @@ module Sequel
           # An error could occur if the inserted values include a primary key
           # value, while the primary key is serial.
           if e.message =~ RE_CURRVAL_ERROR
-            raise SequelError, "Could not return primary key value for the inserted record. Are you specifying a primary key value for a serial primary key?"
+            raise Sequel::Error, "Could not return primary key value for the inserted record. Are you specifying a primary key value for a serial primary key?"
           else
             raise e
           end
@@ -283,7 +283,7 @@ module Sequel
             rescue => e
               @logger.info(SQL_ROLLBACK) if @logger
               conn.async_exec(SQL_ROLLBACK) rescue nil
-              raise e unless SequelRollbackError === e
+              raise e unless Sequel::Error::Rollback === e
             ensure
               conn.transaction_in_progress = nil
             end

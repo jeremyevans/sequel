@@ -256,7 +256,7 @@ module Sequel
     def self.[](*args)
       args = args.first if (args.size == 1)
       if args === true || args === false
-        raise SequelError, "Invalid filter specified. Did you mean to supply a hash?"
+        raise Sequel::Error::InvalidFilter, "Did you mean to supply a hash?"
       end
       dataset[(Hash === args) ? args : primary_key_hash(args)]
     end

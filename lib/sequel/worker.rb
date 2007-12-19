@@ -1,9 +1,9 @@
-require 'thread'
+require "thread"
 
 module Sequel
+
   class Worker < Thread
-    class WorkerStopError < RuntimeError; end
-  
+      
     attr_reader :queue
     attr_reader :errors
   
@@ -18,7 +18,7 @@ module Sequel
     
     def work
       loop {next_job}
-    rescue WorkerStopError # signals the worker thread to stop
+    rescue Sequel::Error::WorkerStop # signals the worker thread to stop
     ensure
       rollback! if @transaction && !@errors.empty?
     end
@@ -38,7 +38,7 @@ module Sequel
       while busy?
         sleep 0.1
       end
-      self.raise WorkerStopError
+      self.raise Sequel::Error::WorkerStop
       super
     end
 
@@ -46,7 +46,7 @@ module Sequel
     def next_job
       @cur = @queue.pop
       @cur.call
-    rescue WorkerStopError => e
+    rescue Sequel::Error::WorkerStop => e
       raise e
     rescue Exception => e
       @errors << e
@@ -54,4 +54,5 @@ module Sequel
       @cur = nil
     end
   end
+
 end

@@ -29,14 +29,14 @@ context "A new Database" do
 end
 
 context "Database#connect" do
-  specify "should raise NotImplementedError" do
-    proc {Sequel::Database.new.connect}.should raise_error(NotImplementedError)
+  specify "should raise Sequel::Error::NotImplemented" do
+    proc {Sequel::Database.new.connect}.should raise_error(Sequel::Error::NotImplemented)
   end
 end
 
 context "Database#disconnect" do
-  specify "should raise NotImplementedError" do
-    proc {Sequel::Database.new.disconnect}.should raise_error(NotImplementedError)
+  specify "should raise Sequel::Error::NotImplemented" do
+    proc {Sequel::Database.new.disconnect}.should raise_error(Sequel::Error::NotImplemented)
   end
 end
 
@@ -102,9 +102,9 @@ context "Database#dataset" do
 end
 
 context "Database#execute" do
-  specify "should raise NotImplementedError" do
-    proc {Sequel::Database.new.execute('blah blah')}.should raise_error(NotImplementedError)
-    proc {Sequel::Database.new << 'blah blah'}.should raise_error(NotImplementedError)
+  specify "should raise Sequel::Error::NotImplemented" do
+    proc {Sequel::Database.new.execute('blah blah')}.should raise_error(Sequel::Error::NotImplemented)
+    proc {Sequel::Database.new << 'blah blah'}.should raise_error(Sequel::Error::NotImplemented)
   end
 end
 
@@ -502,7 +502,7 @@ context "A Database adapter with a scheme" do
 
   specify "should be accessible through Sequel.<adapter>" do
     # invalid parameters
-    proc {Sequel.ccc('abc', 'def')}.should raise_error(SequelError)
+    proc {Sequel.ccc('abc', 'def')}.should raise_error(Sequel::Error)
     
     c = Sequel.ccc('mydb')
     c.should be_a_kind_of(CCC)

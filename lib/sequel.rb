@@ -1,12 +1,12 @@
-require 'metaid'
-require 'bigdecimal'
-require 'bigdecimal/util'
+require "metaid"
+require "bigdecimal"
+require "bigdecimal/util"
 
 files = %w[
-  core_ext core_sql array_keys error connection_pool pretty_table
+  core_ext core_sql array_keys exceptions connection_pool pretty_table
   dataset migration model schema database worker
 ]
-dir = File.join(File.dirname(__FILE__), 'sequel')
+dir = File.join(File.dirname(__FILE__), "sequel")
 files.each {|f| require(File.join(dir, f))}
 
 module Sequel #:nodoc:
@@ -41,7 +41,7 @@ module Sequel #:nodoc:
           opts = args[1].merge(:database => args[0])
         end
       rescue
-        raise SequelError, "Invalid parameters specified"
+        raise Sequel::Error::InvalidParameters
       end
       c.new(opts)
     end

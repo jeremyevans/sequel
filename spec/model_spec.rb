@@ -54,9 +54,9 @@ describe Sequel::Model, 'w/o primary key' do
     Class.new(Sequel::Model) { no_primary_key }.primary_key.should be_nil
   end
 
-  it "should raise a SequelError on 'this'" do
+  it "should raise a Sequel::Error on 'this'" do
     instance = Class.new(Sequel::Model) { no_primary_key }.new
-    proc { instance.this }.should raise_error(SequelError)
+    proc { instance.this }.should raise_error(Sequel::Error)
   end
 end
 
@@ -418,10 +418,10 @@ context "Model attribute accessors" do
     o = @c.new
     
     proc {o.x}.should_not raise_error
-    proc {o.xx}.should raise_error(SequelError)
+    proc {o.xx}.should raise_error(Sequel::Error)
     
     proc {o.x = 3}.should_not raise_error
-    proc {o.yy = 4}.should raise_error(SequelError)
+    proc {o.yy = 4}.should raise_error(Sequel::Error)
 
     proc {o.yy?}.should raise_error(NoMethodError)
   end
@@ -429,18 +429,18 @@ context "Model attribute accessors" do
   specify "should not raise for a column not in the dataset, but for which there's a value" do
     o = @c.new
     
-    proc {o.xx}.should raise_error(SequelError)
-    proc {o.yy}.should raise_error(SequelError)
+    proc {o.xx}.should raise_error(Sequel::Error)
+    proc {o.yy}.should raise_error(Sequel::Error)
     
     o.values[:xx] = 123
     o.values[:yy] = nil
     
-    proc {o.xx; o.yy}.should_not raise_error(SequelError)
+    proc {o.xx; o.yy}.should_not raise_error(Sequel::Error)
     
     o.xx.should == 123
     o.yy.should == nil
     
-    proc {o.xx = 3}.should raise_error(SequelError)
+    proc {o.xx = 3}.should raise_error(Sequel::Error)
   end
 end
 
@@ -704,8 +704,8 @@ context "Model.[]" do
   
   specify "should raise for boolean argument (mistaken comparison)" do
     # This in order to prevent stuff like Model[:a == 'b']
-    proc {@c[:a == 1]}.should raise_error(SequelError)
-    proc {@c[:a != 1]}.should raise_error(SequelError)
+    proc {@c[:a == 1]}.should raise_error(Sequel::Error)
+    proc {@c[:a != 1]}.should raise_error(Sequel::Error)
   end
   
   specify "should work correctly for custom primary key" do
@@ -829,10 +829,10 @@ context "A cached model" do
   
   specify "should raise error if attempting to generate cache_key and primary key value is null" do
     m = @c.new
-    proc {m.cache_key}.should raise_error(SequelError)
+    proc {m.cache_key}.should raise_error(Sequel::Error)
     
     m.values[:id] = 1
-    proc {m.cache_key}.should_not raise_error(SequelError)
+    proc {m.cache_key}.should_not raise_error(Sequel::Error)
   end
   
   specify "should set the cache when reading from the database" do
@@ -1052,11 +1052,11 @@ context "Model#pk" do
   specify "should raise if no primary key" do
     @m.set_primary_key nil
     m = @m.new(:id => 111, :x => 2, :y => 3)
-    proc {m.pk}.should raise_error(SequelError)
+    proc {m.pk}.should raise_error(Sequel::Error)
 
     @m.no_primary_key
     m = @m.new(:id => 111, :x => 2, :y => 3)
-    proc {m.pk}.should raise_error(SequelError)
+    proc {m.pk}.should raise_error(Sequel::Error)
   end
 end
 
@@ -1085,11 +1085,11 @@ context "Model#pk_hash" do
   specify "should raise if no primary key" do
     @m.set_primary_key nil
     m = @m.new(:id => 111, :x => 2, :y => 3)
-    proc {m.pk_hash}.should raise_error(SequelError)
+    proc {m.pk_hash}.should raise_error(Sequel::Error)
 
     @m.no_primary_key
     m = @m.new(:id => 111, :x => 2, :y => 3)
-    proc {m.pk_hash}.should raise_error(SequelError)
+    proc {m.pk_hash}.should raise_error(Sequel::Error)
   end
 end
 

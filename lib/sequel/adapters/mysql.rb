@@ -31,11 +31,11 @@ class Mysql::Result
     # 254 => :to_s,     # MYSQL_TYPE_STRING
     # 255 => :to_s      # MYSQL_TYPE_GEOMETRY
   }
-  
+
   def convert_type(v, type)
     v ? ((t = MYSQL_TYPES[type]) ? v.send(t) : v) : nil
   end
-  
+
   def columns(with_table = nil)
     unless @columns
       @column_types = []
@@ -46,7 +46,7 @@ class Mysql::Result
     end
     @columns
   end
-  
+
   def each_array(with_table = nil)
     c = columns
     while row = fetch_row
@@ -59,7 +59,7 @@ class Mysql::Result
       yield row
     end
   end
-  
+
   def each_hash(with_table = nil)
     c = columns
     while row = fetch_row
@@ -74,20 +74,20 @@ module Sequel
   module MySQL
     class Database < Sequel::Database
       set_adapter_scheme :mysql
-    
+
       def serial_primary_key_options
         {:primary_key => true, :type => :integer, :auto_increment => true}
       end
-      
+
       AUTO_INCREMENT = 'AUTO_INCREMENT'.freeze
-      
+
       def auto_increment_sql
         AUTO_INCREMENT
       end
 
       def connect
         conn = Mysql.real_connect(@opts[:host], @opts[:user], @opts[:password], 
-          @opts[:database], @opts[:port], nil, Mysql::CLIENT_MULTI_RESULTS)
+        @opts[:database], @opts[:port], nil, Mysql::CLIENT_MULTI_RESULTS)
         conn.query_with_result = false
         if encoding = @opts[:encoding] || @opts[:charset]
           conn.query("set character_set_connection = '#{encoding}'")
@@ -97,28 +97,28 @@ module Sequel
         conn.reconnect = true
         conn
       end
-      
+
       def disconnect
         @pool.disconnect {|c| c.close}
       end
-      
+
       def tables
         @pool.hold do |conn|
           conn.list_tables.map {|t| t.to_sym}
         end
       end
-    
+
       def dataset(opts = nil)
         MySQL::Dataset.new(self, opts)
       end
-      
+
       def execute(sql)
         @logger.info(sql) if @logger
         @pool.hold do |conn|
           conn.query(sql)
         end
       end
-      
+
       def execute_select(sql)
         @logger.info(sql) if @logger
         @pool.hold do |conn|
@@ -126,7 +126,7 @@ module Sequel
           conn.use_result
         end
       end
-      
+
       def execute_insert(sql)
         @logger.info(sql) if @logger
         @pool.hold do |conn|
@@ -134,7 +134,7 @@ module Sequel
           conn.insert_id
         end
       end
-    
+
       def execute_affected(sql)
         @logger.info(sql) if @logger
         @pool.hold do |conn|
@@ -155,7 +155,7 @@ module Sequel
           super(table, op)
         end
       end
-      
+
       def transaction
         @pool.hold do |conn|
           @transactions ||= []
@@ -177,13 +177,13 @@ module Sequel
         end
       end
     end
-    
+
     class Dataset < Sequel::Dataset
       def quote_column_ref(c); "`#{c}`"; end
-      
+
       TRUE = '1'
       FALSE = '0'
-      
+
       def literal(v)
         case v
         when LiteralString: v
@@ -194,24 +194,24 @@ module Sequel
           super
         end
       end
-      
+
       def match_expr(l, r)
         case r
         when Regexp:
           r.casefold? ? \
-            "(#{literal(l)} REGEXP #{literal(r.source)})" :
-            "(#{literal(l)} REGEXP BINARY #{literal(r.source)})"
+          "(#{literal(l)} REGEXP #{literal(r.source)})" :
+          "(#{literal(l)} REGEXP BINARY #{literal(r.source)})"
         else
           super
         end
       end
-      
+
       # MySQL supports ORDER and LIMIT clauses in UPDATE statements.
       def update_sql(values, opts = nil)
         sql = super
 
         opts = opts ? @opts.merge(opts) : @opts
-        
+
         if order = opts[:order]
           sql << " ORDER BY #{column_list(order)}"
         end
@@ -226,15 +226,15 @@ module Sequel
       def insert(*values)
         @db.execute_insert(insert_sql(*values))
       end
-    
+
       def update(*args, &block)
         @db.execute_affected(update_sql(*args, &block))
       end
-    
+
       def delete(opts = nil)
         @db.execute_affected(delete_sql(opts))
       end
-      
+
       def fetch_rows(sql)
         @db.synchronize do
           r = @db.execute_select(sql)

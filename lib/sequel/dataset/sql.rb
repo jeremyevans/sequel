@@ -45,7 +45,7 @@ module Sequel
       # Converts an array of sources names into into a comma separated list.
       def source_list(source)
         if source.nil? || source.empty?
-          raise SequelError, 'No source specified for query'
+          raise Sequel::Error, 'No source specified for query'
         end
         auto_alias_count = 0
         m = source.map do |i|
@@ -98,7 +98,7 @@ module Sequel
         when Date: v.strftime(DATE_FORMAT)
         when Dataset: "(#{v.sql})"
         else
-          raise SequelError, "can't express #{v.inspect} as a SQL literal"
+          raise Sequel::Error, "can't express #{v.inspect} as a SQL literal"
         end
       end
 
@@ -204,7 +204,7 @@ module Sequel
         clause = (@opts[:group] ? :having : :where)
         cond = cond.first if cond.size == 1
         if cond === true || cond === false
-          raise SequelError, "Invalid filter specified. Did you mean to supply a block?"
+          raise Sequel::Error, "Invalid filter specified. Did you mean to supply a block?"
         end
         parenthesize = !(cond.is_a?(Hash) || cond.is_a?(Array))
         filter = cond.is_a?(Hash) && cond
@@ -228,7 +228,7 @@ module Sequel
           r = expression_list(block || cond, parenthesize)
           clone_merge(clause => "#{l} OR #{r}")
         else
-          raise SequelError, "No existing filter found."
+          raise Sequel::Error::NoExistingFilter
         end
       end
 
@@ -238,7 +238,7 @@ module Sequel
       def and(*cond, &block)
         clause = (@opts[:group] ? :having : :where)
         unless @opts[clause]
-          raise SequelError, "No existing filter found."
+          raise Sequel::Error::NoExistingFilter
         end
         filter(*cond, &block)
       end
@@ -265,7 +265,7 @@ module Sequel
       # if the dataset has been grouped. See also #filter.
       def where(*cond, &block)
         if @opts[:group]
-          raise SequelError, "Can't specify a WHERE clause once the dataset has been grouped"
+          raise Sequel::Error, "Can't specify a WHERE clause once the dataset has been grouped"
         else
           filter(*cond, &block)
         end
@@ -275,7 +275,7 @@ module Sequel
       # if the dataset has not been grouped. See also #filter
       def having(*cond, &block)
         unless @opts[:group]
-          raise SequelError, "Can only specify a HAVING clause on a grouped dataset"
+          raise Sequel::Error, "Can only specify a HAVING clause on a grouped dataset"
         else
           filter(*cond, &block)
         end
@@ -310,7 +310,7 @@ module Sequel
       def join_expr(type, table, expr)
         join_type = JOIN_TYPES[type || :inner]
         unless join_type
-          raise SequelError, "Invalid join type: #{type}"
+          raise Sequel::Error::InvalidJoinType, type
         end
 
         join_conditions = {}
@@ -471,9 +471,9 @@ module Sequel
         opts = opts ? @opts.merge(opts) : @opts
 
         if opts[:group]
-          raise SequelError, "Can't update a grouped dataset" 
+          raise Sequel::Error::UpdateGroupedDataset
         elsif (opts[:from].size > 1) or opts[:join]
-          raise SequelError, "Can't update a joined dataset"
+          raise Sequel::Error::UpdateJoinedDataset
         end
         
         sql = "UPDATE #{@opts[:from]} SET "
@@ -507,9 +507,9 @@ module Sequel
         opts = opts ? @opts.merge(opts) : @opts
 
         if opts[:group]
-          raise SequelError, "Can't delete from a grouped dataset"
+          raise Sequel::Error::DeleteGroupedDataset
         elsif opts[:from].is_a?(Array) && opts[:from].size > 1
-          raise SequelError, "Can't delete from a joined dataset"
+          raise Sequel::Error::DeleteJoinedDataset
         end
 
         sql = "DELETE FROM #{opts[:from]}"

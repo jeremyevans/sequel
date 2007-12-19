@@ -3,7 +3,7 @@ module Sequel
     # Returns the database associated with the Model class.
     def self.db
       @db ||= (superclass != Object) && superclass.db or
-      raise SequelError, "No database associated with #{self}"
+      raise Sequel::Error, "No database associated with #{self}"
     end
     
     # Sets the database associated with the Model class.
@@ -20,7 +20,7 @@ module Sequel
     # Returns the dataset associated with the Model class.
     def self.dataset
       @dataset || super_dataset or
-      raise SequelError, "No dataset associated with #{self}"
+      raise Sequel::Error, "No dataset associated with #{self}"
     end
     
     def self.super_dataset # :nodoc:
@@ -32,7 +32,7 @@ module Sequel
     # See Dataset#columns for more information.
     def self.columns
       @columns ||= @dataset.columns or
-      raise SequelError, "Could not fetch columns for #{self}"
+      raise Sequel::Error, "Could not fetch columns for #{self}"
     end
 
     # Sets the dataset associated with the Model class.

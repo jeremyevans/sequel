@@ -47,7 +47,12 @@ class String
   
   # Converts a string into a Time object.
   def to_time
-    Time.parse(self)
+    begin
+      Time.parse(self)
+    rescue Exception => error
+      raise Sequel::Error::InvalidValue, "Invalid time value '#{self}' (#{error.message})"
+    end
+     # Why does Time.parse('0000-00-00') bork and not return nil or some such?
   end
 end
 

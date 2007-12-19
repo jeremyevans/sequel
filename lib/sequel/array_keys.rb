@@ -125,7 +125,7 @@ module ArrayKeys
       if idx = @keys.key_pos(k)
         v = at idx
       else
-        !args.empty? ? (v = args.first) : (raise IndexError, "key not found")
+        !args.empty? ? (v = args.first) : (raise Sequel::Error::Index, "key not found")
       end
       block ? block[v] : v
     end

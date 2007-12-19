@@ -107,7 +107,7 @@ module Sequel
         if @created_count < @max_size
           @created_count += 1
           @connection_proc ? @connection_proc.call : \
-            (raise SequelError, "No connection proc specified")
+            (raise Sequel::NoConnectionProcError)
         end
       end
       
