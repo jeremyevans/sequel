@@ -30,9 +30,17 @@ module Sequel
 
       TYPES = Hash.new {|h, k| k}
       TYPES[:double] = 'double precision'
+      
+      def schema_utility_dataset
+        @schema_utility_dataset ||= dataset
+      end
+      
+      def literal(v)
+        schema_utility_dataset.literal(v)
+      end
 
       def column_definition_sql(column)
-        sql = "#{column[:name]} #{TYPES[column[:type]]}"
+        sql = "#{literal(column[:name].to_sym)} #{TYPES[column[:type]]}"
         column[:size] ||= 255 if column[:type] == :varchar
         elements = column[:size] || column[:elements]
         sql << "(#{literal(elements)})" if elements
@@ -60,12 +68,11 @@ module Sequel
       end
     
       def index_definition_sql(table_name, index)
-        columns = index[:columns].join(COMMA_SEPARATOR)
         index_name = index[:name] || default_index_name(table_name, index[:columns])
         if index[:unique]
-          "CREATE UNIQUE INDEX #{index_name} ON #{table_name} (#{columns})"
+          "CREATE UNIQUE INDEX #{index_name} ON #{table_name} (#{literal(index[:columns])})"
         else
-          "CREATE INDEX #{index_name} ON #{table_name} (#{columns})"
+          "CREATE INDEX #{index_name} ON #{table_name} (#{literal(index[:columns])})"
         end
       end
     
@@ -98,11 +105,11 @@ module Sequel
         when :add_column
           "ALTER TABLE #{table} ADD COLUMN #{column_definition_sql(op)}"
         when :drop_column
-          "ALTER TABLE #{table} DROP COLUMN #{op[:name]}"
+          "ALTER TABLE #{table} DROP COLUMN #{literal(op[:name])}"
         when :rename_column
-          "ALTER TABLE #{table} RENAME COLUMN #{op[:name]} TO #{op[:new_name]}"
+          "ALTER TABLE #{table} RENAME COLUMN #{literal(op[:name])} TO #{literal(op[:new_name])}"
         when :set_column_type
-          "ALTER TABLE #{table} ALTER COLUMN #{op[:name]} TYPE #{op[:type]}"
+          "ALTER TABLE #{table} ALTER COLUMN #{literal(op[:name])} TYPE #{op[:type]}"
         when :add_index
           index_definition_sql(table, op)
         when :drop_index

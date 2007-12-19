@@ -6,7 +6,7 @@ module Sequel
     # methods.
     def self.set_schema(name = nil, &block)
       name ? set_dataset(db[name]) : name = table_name
-      @schema = Schema::Generator.new(db, name, &block)
+      @schema = Schema::Generator.new(db, &block)
       if @schema.primary_key_name
         set_primary_key @schema.primary_key_name
       end
@@ -29,7 +29,7 @@ module Sequel
     
     # Creates table.
     def self.create_table
-      db.create_table_sql_list(*schema.create_info).each {|s| db << s} 
+      db.create_table_sql_list(table_name, *schema.create_info).each {|s| db << s} 
     end
     
     # Drops table.

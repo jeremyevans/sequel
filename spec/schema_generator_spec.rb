@@ -2,7 +2,7 @@ require File.join(File.dirname(__FILE__), 'spec_helper')
 
 describe Sequel::Schema::Generator do
   before :all do
-    @generator = Sequel::Schema::Generator.new(SchemaDummyDatabase.new, :items) do
+    @generator = Sequel::Schema::Generator.new(SchemaDummyDatabase.new) do
       string :title
       column :body, :text
       foreign_key :parent_id
@@ -10,7 +10,7 @@ describe Sequel::Schema::Generator do
       index :title
       index [:title, :body]
     end
-    @table_name, @columns, @indexes = @generator.create_info
+    @columns, @indexes = @generator.create_info
   end
   
   {:name => :id, :primary_key => true}.each do |column, expected|

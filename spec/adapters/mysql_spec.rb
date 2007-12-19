@@ -311,3 +311,20 @@ context "A MySQL database" do
     @db.drop_index :test2, :value
   end
 end  
+
+context "A MySQL database" do
+  setup do
+    @db = MYSQL_DB
+  end
+  
+  specify "should support defaults for boolean columns" do
+    g = Sequel::Schema::Generator.new(@db) do
+      boolean :active1, :default => true
+      boolean :active2, :default => false
+    end
+    statements = @db.create_table_sql_list(:items, *g.create_info)
+    statements.should == [
+      "CREATE TABLE items (`active1` boolean DEFAULT 1, `active2` boolean DEFAULT 0)"
+    ]
+  end
+end  

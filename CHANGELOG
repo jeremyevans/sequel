@@ -1,3 +1,7 @@
+=== SVN
+
+* Fixed schema generation code to use fied quoting and support adapter-specific literalization of default values (#108).
+
 === 0.4.4 (2007-12-17)
 
 * Implemented Database#rename_table (#104).

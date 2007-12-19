@@ -156,7 +156,7 @@ module Sequel
       true
     end
     
-    include Dataset::SQL
+    # include Dataset::SQL
     include Schema::SQL
     
     # default serial primary key definition. this should be overriden for each adapter.
@@ -173,8 +173,8 @@ module Sequel
     #     index :title
     #   end
     def create_table(name, &block)
-      g = Schema::Generator.new(self, name, &block)
-      create_table_sql_list(*g.create_info).each {|sql| execute(sql)}
+      g = Schema::Generator.new(self, &block)
+      create_table_sql_list(name, *g.create_info).each {|sql| execute(sql)}
     end
     
     # Forcibly creates a table. If the table already exists it is dropped.
@@ -193,7 +193,7 @@ module Sequel
     end
     
     def alter_table(name, &block)
-      g = Schema::AlterTableGenerator.new(self, name, &block)
+      g = Schema::AlterTableGenerator.new(self, &block)
       alter_table_sql_list(name, g.operations).each {|sql| execute(sql)}
     end
     

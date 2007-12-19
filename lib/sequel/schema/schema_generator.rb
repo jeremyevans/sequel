@@ -1,9 +1,8 @@
 module Sequel
   module Schema
     class Generator
-      def initialize(db, table_name, &block)
+      def initialize(db, &block)
         @db = db
-        @table_name = table_name
         @columns = []
         @indexes = []
         @primary_key = nil
@@ -59,16 +58,15 @@ module Sequel
         if @primary_key && !has_column?(@primary_key[:name])
           @columns.unshift(@primary_key)
         end
-        [@table_name, @columns, @indexes]
+        [@columns, @indexes]
       end
     end
   
     class AlterTableGenerator
       attr_reader :operations
       
-      def initialize(db, table_name, &block)
+      def initialize(db, &block)
         @db = db
-        @table_name = table_name
         @operations = []
         instance_eval(&block) if block
       end

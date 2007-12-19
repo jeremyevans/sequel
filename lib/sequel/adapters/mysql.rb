@@ -146,9 +146,9 @@ module Sequel
       def alter_table_sql(table, op)
         case op[:op]
         when :rename_column
-          "ALTER TABLE #{table} CHANGE COLUMN #{op[:name]} #{op[:new_name]} #{op[:type]}"
+          "ALTER TABLE #{table} CHANGE COLUMN #{literal(op[:name])} #{literal(op[:new_name])} #{op[:type]}"
         when :set_column_type
-          "ALTER TABLE #{table} CHANGE COLUMN #{op[:name]} #{op[:name]} #{op[:type]}"
+          "ALTER TABLE #{table} CHANGE COLUMN #{literal(op[:name])} #{literal(op[:name])} #{op[:type]}"
         when :drop_index
           "DROP INDEX #{default_index_name(table, op[:columns])} ON #{table}"
         else
