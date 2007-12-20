@@ -575,6 +575,11 @@ context "Model#new?" do
     n.save
     n.should_not be_new
   end
+  
+  specify "should alias new_record? to new?" do
+    n = @c.new(:x => 1)
+    n.should respond_to?(:new_record?)
+  end
 end
 
 context "Model.after_create" do

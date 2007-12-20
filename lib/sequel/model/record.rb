@@ -198,6 +198,7 @@ module Sequel
     def new?
       @new
     end
+    alias :new_record? :new?
     
     # Returns true when current instance exists, false otherwise.
     def exists?
