@@ -9,11 +9,16 @@ module Sequel
     
       def on_delete_clause(action)
         case action
-        when :restrict: RESTRICT
-        when :cascade: CASCADE
-        when :set_null: SET_NULL
-        when :set_default: SET_DEFAULT
-        else NO_ACTION
+        when :restrict
+          RESTRICT
+        when :cascade
+          CASCADE
+        when :set_null
+          SET_NULL
+        when :set_default
+          SET_DEFAULT
+        else
+          NO_ACTION
         end
       end
       

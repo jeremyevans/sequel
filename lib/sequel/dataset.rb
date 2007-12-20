@@ -226,17 +226,17 @@ module Sequel
     def set_model(key, *args)
       # pattern matching
       case key
-      when nil: # set_model(nil) => no
+      when nil # set_model(nil) => no
         # no argument provided, so the dataset is denuded
         @opts.merge!(:naked => true, :models => nil, :polymorphic_key => nil)
         remove_row_proc
         # extend_with_stock_each
-      when Class:
+      when Class
         # isomorphic model
         @opts.merge!(:naked => nil, :models => {nil => key}, :polymorphic_key => nil)
         set_row_proc {|h| key.new(h, *args)}
         extend_with_destroy
-      when Symbol:
+      when Symbol
         # polymorphic model
         hash = args.shift || raise(ArgumentError, "No class hash supplied for polymorphic model")
         @opts.merge!(:naked => true, :models => hash, :polymorphic_key => key)
@@ -300,7 +300,7 @@ module Sequel
       @transform = t
       t.each do |k, v|
         case v
-        when Array:
+        when Array
           if (v.size != 2) || !v.first.is_a?(Proc) && !v.last.is_a?(Proc)
             raise Error::InvalidTransform, "Invalid transform specified"
           end

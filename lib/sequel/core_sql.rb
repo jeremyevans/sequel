@@ -168,10 +168,14 @@ class Symbol
   #
   def to_column_ref(ds)
     case s = to_s
-    when COLUMN_REF_RE1: "#{$1}.#{ds.quote_column_ref($2)} AS #{ds.quote_column_ref($3)}"
-    when COLUMN_REF_RE2: "#{ds.quote_column_ref($1)} AS #{ds.quote_column_ref($2)}"
-    when COLUMN_REF_RE3: "#{$1}.#{ds.quote_column_ref($2)}"
-    else                 ds.quote_column_ref(s)
+    when COLUMN_REF_RE1
+      "#{$1}.#{ds.quote_column_ref($2)} AS #{ds.quote_column_ref($3)}"
+    when COLUMN_REF_RE2
+      "#{ds.quote_column_ref($1)} AS #{ds.quote_column_ref($2)}"
+    when COLUMN_REF_RE3
+      "#{$1}.#{ds.quote_column_ref($2)}"
+    else
+      ds.quote_column_ref(s)
     end
   end
   

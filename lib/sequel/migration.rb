@@ -50,8 +50,10 @@ module Sequel
     def self.apply(db, direction)
       obj = new(db)
       case direction
-      when :up: obj.up
-      when :down: obj.down
+      when :up
+        obj.up
+      when :down
+        obj.down
       else
         raise ArgumentError, "Invalid migration direction specified (#{direction.inspect})"
       end

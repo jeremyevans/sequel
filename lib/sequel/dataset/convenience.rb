@@ -38,8 +38,10 @@ module Sequel
         end
         args = args.empty? ? 1 : (args.size == 1) ? args.first : args
         case args
-        when 1: single_record(:limit => 1)
-        when Fixnum: limit(args).all
+        when 1
+          single_record(:limit => 1)
+        when Fixnum
+          limit(args).all
         else
           filter(args, &block).single_record(:limit => 1)
         end
@@ -65,7 +67,7 @@ module Sequel
         args = args.empty? ? 1 : (args.size == 1) ? args.first : args
 
         case args
-        when Fixnum:
+        when Fixnum
           l = {:limit => args}
           opts = {:order => invert_order(@opts[:order])}. \
             merge(opts ? opts.merge(l) : l)

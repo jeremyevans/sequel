@@ -38,17 +38,17 @@ class Sequel::Dataset
     #     "(id = 3)"
     def compare_expr(l, r)
       case r
-      when Range:
+      when Range
         r.exclude_end? ? \
           "(#{literal(l)} >= #{literal(r.begin)} AND #{literal(l)} < #{literal(r.end)})" : \
           "(#{literal(l)} >= #{literal(r.begin)} AND #{literal(l)} <= #{literal(r.end)})"
-      when Array:
+      when Array
         "(#{literal(l)} IN (#{literal(r)}))"
-      when Sequel::Dataset:
+      when Sequel::Dataset
         "(#{literal(l)} IN (#{r.sql}))"
-      when NilClass:
+      when NilClass
         "(#{literal(l)} IS NULL)"
-      when Regexp:
+      when Regexp
         match_expr(l, r)
       else
         "(#{literal(l)} = #{literal(r)})"
@@ -60,7 +60,7 @@ class Sequel::Dataset
     # can override this method to provide support for regular expressions.
     def match_expr(l, r)
       case r
-      when String:
+      when String
         "(#{literal(l)} LIKE #{literal(r)})"
       else
         raise Sequel::Error, "Unsupported match pattern class (#{r.class})."
@@ -250,9 +250,9 @@ class Sequel::Dataset
         vcall_expr(e, b, opts)
       when :ivar, :cvar, :dvar, :const, :gvar # local ref
         eval(e[1].to_s, b)
-      when :nth_ref:
+      when :nth_ref
         eval("$#{e[1]}", b)
-      when :lvar: # local context
+      when :lvar # local context
         if e[1] == :block
           pr = eval(e[1].to_s, b)
           "#{proc_to_sql(pr)}"
@@ -267,9 +267,12 @@ class Sequel::Dataset
         eval_expr(e[1], b, opts)...eval_expr(e[2], b, opts)
       when :colon2 # qualified constant ref
         eval_expr(e[1], b, opts).const_get(e[2])
-      when :false: false
-      when :true: true
-      when :nil: nil
+      when :false
+        false
+      when :true
+        true
+      when :nil
+        nil
       when :array
         # array
         e[1..-1].map {|i| eval_expr(i, b, opts)}

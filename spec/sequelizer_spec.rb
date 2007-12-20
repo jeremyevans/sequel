@@ -16,9 +16,9 @@ context "Proc#to_sql" do
   
   def DS.match_expr(l, r)
     case r
-    when String:
+    when String
       "(#{literal(l)} LIKE #{literal(r)})"
-    when Regexp:
+    when Regexp
       "(#{literal(l)} ~ #{literal(r.source)})"
     else
       raise Sequel::Error, "Unsupported match pattern class (#{r.class})."

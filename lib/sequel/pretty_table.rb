@@ -41,9 +41,12 @@ module Sequel
     
     def self.format_cell(size, v)
       case v
-      when Bignum, Fixnum: "%#{size}d" % v
-      when Float: "%#{size}g" % v
-      else "%-#{size}s" % v.to_s
+      when Bignum, Fixnum
+        "%#{size}d" % v
+      when Float
+        "%#{size}g" % v
+      else
+        "%-#{size}s" % v.to_s
       end
     end
     

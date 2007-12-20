@@ -50,7 +50,7 @@ spec = Gem::Specification.new do |s|
   s.required_ruby_version = ">= 1.8.4"
 
   s.files = %w(COPYING README Rakefile) + Dir.glob("{bin,doc,spec,lib}/**/*")
-      
+
   s.require_path = "lib"
   s.bindir = "bin"
 end

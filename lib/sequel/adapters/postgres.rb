@@ -2,14 +2,23 @@ require 'postgres'
 
 class PGconn
   # the pure-ruby postgres adapter does not have a quote method.
+  TRUE = 't'.freeze
+  FALSE = 'f'.freeze
+  NULL = 'NULL'.freeze
+  
   unless methods.include?('quote')
     def self.quote(obj)
       case obj
-      when true: 't'
-      when false: 'f'
-      when nil: 'NULL'
-      when String: "'#{obj}'"
-      else obj.to_s
+      when true
+        TRUE
+      when false
+        FALSE
+      when nil
+        NULL
+      when String
+        "'#{obj}'"
+      else
+        obj.to_s
       end
     end
   end
@@ -125,10 +134,13 @@ class PGconn
 end
 
 class String
+  POSTGRES_BOOL_TRUE = 't'.freeze
+  POSTGRES_BOOL_FALSE = 'f'.freeze
+  
   def postgres_to_bool
-    if self == 't'
+    if self == POSTGRES_BOOL_TRUE
       true
-    elsif self == 'f'
+    elsif self == POSTGRES_BOOL_FALSE
       false
     else
       nil
@@ -234,9 +246,9 @@ module Sequel
         end
         
         case values
-        when Hash:
+        when Hash
           values[primary_key_for_table(conn, table)]
-        when Array:
+        when Array
           values.first
         else
           nil
@@ -303,8 +315,10 @@ module Sequel
     class Dataset < Sequel::Dataset
       def literal(v)
         case v
-        when LiteralString: v
-        when String, Fixnum, Float, TrueClass, FalseClass: PGconn.quote(v)
+        when LiteralString
+          v
+        when String, Fixnum, Float, TrueClass, FalseClass
+          PGconn.quote(v)
         else
           super
         end
@@ -312,7 +326,7 @@ module Sequel
     
       def match_expr(l, r)
         case r
-        when Regexp:
+        when Regexp
           r.casefold? ? \
             "(#{literal(l)} ~* #{literal(r.source)})" :
             "(#{literal(l)} ~ #{literal(r.source)})"
@@ -328,8 +342,10 @@ module Sequel
         row_lock_mode = opts ? opts[:lock] : @opts[:lock]
         sql = super
         case row_lock_mode
-        when :update : sql << FOR_UPDATE
-        when :share  : sql << FOR_SHARE
+        when :update
+          sql << FOR_UPDATE
+        when :share
+          sql << FOR_SHARE
         end
         sql
       end

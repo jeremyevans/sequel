@@ -1,5 +1,7 @@
 === SVN
 
+* Fixed parsing errors in Ruby 1.9.
+
 * Fixed sync problem in connection_pool_spec.
 
 * Changed String#to_time to raise Error::InvalidValue if Time.parse fails.

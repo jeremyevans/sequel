@@ -14,7 +14,8 @@ module Sequel
       
       def check_error(rc, msg)
         case rc
-        when SQL_SUCCESS, SQL_SUCCESS_WITH_INFO: nil
+        when SQL_SUCCESS, SQL_SUCCESS_WITH_INFO
+          nil
         else
           raise Error, msg
         end
@@ -79,7 +80,8 @@ module Sequel
     class Dataset < Sequel::Dataset
       def literal(v)
         case v
-        when Time: literal(v.iso8601)
+        when Time
+          literal(v.iso8601)
         else
           super
         end

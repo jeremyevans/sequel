@@ -35,10 +35,15 @@ module Sequel
     end
     
     class Dataset < Sequel::Dataset
+      BOOL_TRUE = '1'.freeze
+      BOOL_FALSE = '0'.freeze
+      
       def literal(v)
         case v
-        when true: '1'
-        when false: '0'
+        when true
+          BOOL_TRUE
+        when false
+          BOOL_FALSE
         else
           super
         end

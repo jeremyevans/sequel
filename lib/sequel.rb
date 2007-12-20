@@ -32,12 +32,16 @@ module Sequel #:nodoc:
     def method_missing(m, *args)
       c = Database.adapter_class(m)
       begin
+        # three ways to invoke this:
+        # 0 arguments: Sequel.dbi 
+        # 1 argument:  Sequel.dbi(db_name)
+        # more args:   Sequel.dbi(db_name, opts)
         case args.size
-        when 1: # Sequel.dbi(db_name)
-          opts = args[0].is_a?(Hash) ? args[0] : {:database => args[0]}
-        when 0 # Sequel.dbi
+        when 0
           opts = {}
-        else # Sequel.dbi(db_name, opts)
+        when 1
+          opts = args[0].is_a?(Hash) ? args[0] : {:database => args[0]}
+        else
           opts = args[1].merge(:database => args[0])
         end
       rescue

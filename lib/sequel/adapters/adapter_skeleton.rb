@@ -28,7 +28,8 @@ module Sequel
     class Dataset < Sequel::Dataset
       def literal(v)
         case v
-        when Time: literal(v.iso8601)
+        when Time
+          literal(v.iso8601)
         else
           super
         end

@@ -50,10 +50,10 @@ module Sequel
         auto_alias_count = 0
         m = source.map do |i|
           case i
-          when Dataset:
+          when Dataset
             auto_alias_count += 1
             i.to_table_reference(auto_alias_count)
-          when Hash:
+          when Hash
             i.map {|k, v| "#{k.is_a?(Dataset) ? k.to_table_reference : k} #{v}"}.
               join(COMMA_SEPARATOR)
           else
@@ -84,19 +84,32 @@ module Sequel
       # If an unsupported object is given, an exception is raised.
       def literal(v)
         case v
-        when LiteralString: v
-        when String: "'#{v.gsub(/'/, "''")}'"
-        when Integer, Float: v.to_s
-        when BigDecimal: v.to_s("F")
-        when NilClass: NULL
-        when TrueClass: TRUE
-        when FalseClass: FALSE
-        when Symbol: v.to_column_ref(self)
-        when Sequel::SQL::Expression: v.to_s(self)
-        when Array: v.empty? ? NULL : v.map {|i| literal(i)}.join(COMMA_SEPARATOR)
-        when Time: v.strftime(TIMESTAMP_FORMAT)
-        when Date: v.strftime(DATE_FORMAT)
-        when Dataset: "(#{v.sql})"
+        when LiteralString
+          v
+        when String
+          "'#{v.gsub(/'/, "''")}'"
+        when Integer, Float
+          v.to_s
+        when BigDecimal
+          v.to_s("F")
+        when NilClass
+          NULL
+        when TrueClass
+          TRUE
+        when FalseClass
+          FALSE
+        when Symbol
+          v.to_column_ref(self)
+        when Sequel::SQL::Expression
+          v.to_s(self)
+        when Array
+          v.empty? ? NULL : v.map {|i| literal(i)}.join(COMMA_SEPARATOR)
+        when Time
+          v.strftime(TIMESTAMP_FORMAT)
+        when Date
+          v.strftime(DATE_FORMAT)
+        when Dataset
+          "(#{v.sql})"
         else
           raise Error, "can't express #{v.inspect} as a SQL literal"
         end
@@ -109,12 +122,12 @@ module Sequel
       # generated clause will be enclosed in a set of parentheses.
       def expression_list(expr, parenthesize = false)
         case expr
-        when Hash:
+        when Hash
           parenthesize = false if expr.size == 1
           fmt = expr.map {|i| compare_expr(i[0], i[1])}.join(AND_SEPARATOR)
-        when Array:
+        when Array
           fmt = expr.shift.gsub(QUESTION_MARK) {literal(expr.shift)}
-        when Proc:
+        when Proc
           fmt = proc_to_sql(expr)
         else
           # if the expression is compound, it should be parenthesized in order for 

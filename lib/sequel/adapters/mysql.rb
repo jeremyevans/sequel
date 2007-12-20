@@ -186,10 +186,14 @@ module Sequel
 
       def literal(v)
         case v
-        when LiteralString: v
-        when String: "'#{v.gsub(/'|\\/, '\&\&')}'"
-        when true: TRUE
-        when false: FALSE
+        when LiteralString
+          v
+        when String
+          "'#{v.gsub(/'|\\/, '\&\&')}'"
+        when true
+          TRUE
+        when false
+          FALSE
         else
           super
         end
@@ -197,7 +201,7 @@ module Sequel
 
       def match_expr(l, r)
         case r
-        when Regexp:
+        when Regexp
           r.casefold? ? \
           "(#{literal(l)} REGEXP #{literal(r.source)})" :
           "(#{literal(l)} REGEXP BINARY #{literal(r.source)})"
