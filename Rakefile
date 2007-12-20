@@ -42,40 +42,22 @@ spec = Gem::Specification.new do |s|
   s.email = "ciconia@gmail.com"
   s.homepage = "http://sequel.rubyforge.org"
   s.executables = ["sequel"]
-
-  s.add_dependency("metaid")
-  s.add_dependency("ParseTree", ">= 2.0.0")
-  s.add_dependency("ruby2ruby")
-  
   s.required_ruby_version = ">= 1.8.4"
 
-  s.files = %w(COPYING README Rakefile) + Dir.glob("{bin,doc,spec,lib}/**/*")
-
-  s.require_path = "lib"
-  s.bindir = "bin"
-end
-
-win_spec = Gem::Specification.new do |s|
-  s.name = NAME
-  s.version = VERS
-  s.platform = Gem::Platform::WIN32
-  s.has_rdoc = true
-  s.extra_rdoc_files = ["README", "CHANGELOG", "COPYING"]
-  s.rdoc_options += RDOC_OPTS + 
-    ["--exclude", "^(examples|extras)\/", "--exclude", "lib/sequel.rb"]
-  s.summary = "Lightweight ORM library for Ruby"
-  s.description = s.summary
-  s.author = "Sharon Rosner"
-  s.email = "ciconia@gmail.com"
-  s.homepage = "http://sequel.rubyforge.org"
-  s.executables = ["sequel"]
-
-  s.add_dependency("metaid")
+  case RUBY_PLATFORM
+  when /mswin/
+    s.platform = Gem::Platform::CURRENT
+  when /java/
+    s.platform = "jruby"
+  else
+    s.platform = Gem::Platform::RUBY
+    s.add_dependency("metaid")
+    s.add_dependency("ParseTree", ">= 2.0.0")
+    s.add_dependency("ruby2ruby")
+  end
   
-  s.required_ruby_version = ">= 1.8.4"
-
   s.files = %w(COPYING README Rakefile) + Dir.glob("{bin,doc,spec,lib}/**/*")
-      
+
   s.require_path = "lib"
   s.bindir = "bin"
 end
@@ -83,11 +65,6 @@ end
 Rake::GemPackageTask.new(spec) do |p|
   p.need_tar = true
   p.gem_spec = spec
-end
-
-Rake::GemPackageTask.new(win_spec) do |p|
-  p.need_tar = true
-  p.gem_spec = win_spec
 end
 
 task :install do
