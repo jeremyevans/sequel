@@ -498,7 +498,7 @@ module Sequel
           if values.is_a?(Hash)
             # get values from hash
             values = transform_save(values) if @transform
-            set = values.map {|k, v| "#{literal(k)} = #{literal(v)}"}.join(COMMA_SEPARATOR)
+            set = values.map {|k, v| "#{quote_column_ref(k)} = #{literal(v)}"}.join(COMMA_SEPARATOR)
           else
             # copy values verbatim
             set = values
