@@ -606,7 +606,7 @@ describe "Model#new?" do
   
   it "should alias new_record? to new?" do
     n = @c.new(:x => 1)
-    n.should respond_to?(:new_record?)
+    n.should respond_to(:new_record?)
     n.should be_new_record
     n.save
     n.should_not be_new_record
@@ -1421,19 +1421,44 @@ end
 
 describe Sequel::Model, "Validations" do
 
-  it "should have a hook before validating" do
+  before(:all) do
     class Person < Sequel::Model(:people)
       def columns
-        [:name]
+        [:id,:name,:first_name,:last_name,:middle_name,:initials,:age]
       end
-      
+    end
+
+    class Smurf < Person
+    end
+    
+    class Cow < Sequel::Model(:cows)
+      def columns
+        [:id, :name, :got_milk]
+      end
+    end
+
+    class User < Sequel::Model(:users)
+      def columns
+        [:id, :username, :password]
+      end
+    end
+    
+    class Address < Sequel::Model(:addresses)
+      def columns
+        [:id, :zip_code]
+      end
+    end
+  end
+  
+  it "should have a hook before validating" do
+    class Person < Sequel::Model(:people)      
       before_validation do
         self.name = "default name"
       end
-      
+      validations.clear
       validates_presence_of :name
     end
-    
+
     @person = Person.new
     @person.valid?.should be_true
   end
@@ -1443,11 +1468,7 @@ describe Sequel::Model, "Validations" do
   end
   
   it "should validate the acceptance of a column" do
-    class Cow < Sequel::Model(:cows)
-      def columns
-        [:id, :got_milk]
-      end
-      
+    class Cow < Sequel::Model(:cows)      
       validations.clear
       validates_acceptance_of :got_milk
     end
@@ -1461,11 +1482,7 @@ describe Sequel::Model, "Validations" do
   end
   
   it "should validate the confirmation of a column" do
-    class User < Sequel::Model(:users)
-      def columns
-        [:id, :password]
-      end
-      
+    class User < Sequel::Model(:users)      
       def password_confirmation
         "test"
       end
@@ -1485,11 +1502,7 @@ describe Sequel::Model, "Validations" do
   it "should validate each with logic" do
     class ZipCodeService; end
     
-    class Address < Sequel::Model(:addresses)
-      def columns
-        [:id, :zip_code]
-      end
-      
+    class Address < Sequel::Model(:addresses)      
       validations.clear
       validates_each :zip_code, :logic => lambda { errors.add(:zip_code, "is not valid") unless ZipCodeService.allows(zip_code) }
     end
@@ -1505,25 +1518,22 @@ describe Sequel::Model, "Validations" do
   end
   
   it "should validate format of column" do
-    pending("Does not work that well in Validatable gem. Need to override with custom solution.")
-    #class Person < Sequel::Model(:people)
-    #  def columns
-    #    [:first_name]
-    #  end
-      
-    #  validates_format_of :first_name, :with => /[a-zA-Z]/
-    #end
-    
-    #@person = Person.new :first_name => 'Lancelot99'
-    #@person.valid?.should be_true
+    class Person < Sequel::Model(:people)  
+      validates_format_of :first_name, :with => /^[a-zA-Z]+$/
+    end
+
+    @person = Person.new :first_name => "Lancelot99"
+    @person.valid?.should be_false
+    @person = Person.new :first_name => "Anita"
+    @person.valid?.should be_true
   end
   
+  it "should allow for :with_exactly => /[a-zA-Z/, which wraps the supplied regex with ^<regex>$" do
+    pending("TODO: Add this option to Validatable#validates_format_of")
+  end
+
   it "should validate length of column" do
     class Person < Sequel::Model(:people)
-      def columns
-        [:id, :first_name, :last_name, :middle_name, :initials]
-      end
-      
       validations.clear
       validates_length_of :first_name, :maximum => 30
       validates_length_of :last_name, :minimum => 30
@@ -1553,10 +1563,6 @@ describe Sequel::Model, "Validations" do
   
   it "should validate numericality of column" do
     class Person < Sequel::Model(:people)
-      def columns
-        [:id, :age]
-      end
-      
       validations.clear
       validates_numericality_of :age
     end
@@ -1570,11 +1576,7 @@ describe Sequel::Model, "Validations" do
   end
   
   it "should validate the presence of a column" do
-    class Cow < Sequel::Model(:cows)
-      def columns
-        [:id, :name]
-      end
-      
+    class Cow < Sequel::Model(:cows)      
       validations.clear
       validates_presence_of :name
     end
@@ -1590,43 +1592,34 @@ describe Sequel::Model, "Validations" do
   
   it "should validate true for a column" do
     class Person < Sequel::Model(:people)
-      def columns
-        [:id, :first_name]
-      end
-      
       validations.clear
       validates_true_for :first_name, :logic => lambda { first_name == "Alison" }
     end
 
-    @person = Person.new :name => "Nina"
+    @person = Person.new :first_name => "Nina"
     @person.valid?.should be_false
     @person.errors.on(:first_name).should == "is invalid"
     
     @person.first_name = "Alison"
     @person.valid?.should be_true
   end
-  
-  it "should print an error message if the validatable gem is not available" do
-    pending("Figure out how to test the missing validations case?")
-    #proc { 
-    #  
-    #   }.should raise_error(LoadError)
-  end
-  
-  it "should have a validations block that calls multple validations" do
+    
+  it "should have a validates block that calls multple validations" do
     class Person < Sequel::Model(:people)
-      def columns
-        [:id, :first_name, :last_name, :middle_name, :initials]
-      end
-      validations do
-        format_of :first_name, :with => /\w+/
+      validations.clear
+      validates do
+        format_of :first_name, :with => /^[a-zA-Z]+$/
         length_of :first_name, :maximum => 30
       end
     end
-        
+
+    Person.validations.length.should eql(2)
+    
     @person = Person.new :first_name => "Lancelot99"
-    pending("Figure out how to spec this")
-    @person.valid?.should be_true
+    @person.valid?.should be_false
+    
+    @person2 = Person.new :first_name => "Wayne"
+    @person2.valid?.should be_true
   end
 
   it "should require and include the validatable gem" do
@@ -1638,48 +1631,38 @@ describe Sequel::Model, "Validations" do
   it "should allow 'longhand' validations direcly within the model." do
     lambda {
       class Person < Sequel::Model(:people)
-        def columns
-          [:id, :first_name, :last_name, :middle_name, :initials]
-        end
-
         validations.clear
         validates_length_of :first_name, :maximum => 30
       end
     }.should_not raise_error
-    
+    Person.validations.length.should eql(1)
   end
 
-  it "should define a 'shorthand' method for almost every 'longhand' method" do
-    pending("Figure out how to spec this")
-    Sequel::Model(:items).should respond_to(:format_of)
-    Sequel::Model(:items).should respond_to(:presence_of)
-    Sequel::Model(:items).should respond_to(:acceptance_of)
-    Sequel::Model(:items).should respond_to(:confirmation_of)
-    Sequel::Model(:items).should respond_to(:length_of)
-    Sequel::Model(:items).should respond_to(:true_for)
-    Sequel::Model(:items).should respond_to(:numericality_of)
-    Sequel::Model(:items).should respond_to(:format_of)
+  it "should define a 'shorthand' method for (almost) every 'longhand' method" do
+    Person.should respond_to(:format_of)
+    Person.should respond_to(:presence_of)
+    Person.should respond_to(:acceptance_of)
+    Person.should respond_to(:confirmation_of)
+    Person.should respond_to(:length_of)
+    Person.should respond_to(:true_for)
+    Person.should respond_to(:numericality_of)
+    Person.should respond_to(:format_of)
   end
 
   it "should define a validations? method which returns true if the model has validations, false otherwise" do
     class Person < Sequel::Model(:people)
-      def columns
-        [:id, :first_name, :last_name, :middle_name, :initials]
-      end
-      validations do
+      validations.clear
+      validates do
         format_of :first_name, :with => /\w+/
         length_of :first_name, :maximum => 30
       end
     end
-    class Smurf < Sequel::Model(:smurfs)
-      def columns
-        [:id, :first_name, :last_name, :middle_name, :initials]
-      end
+
+    class Smurf < Person
+      validations.clear
     end
 
-    pending("Figure out how to spec this")
-
-    Person.new.validations?.should be_true
-    Smurf.new.validations?.should be_false
+    Person.validations?.should be_true
+    Smurf.validations?.should be_false
   end
 end
