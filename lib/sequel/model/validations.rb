@@ -7,7 +7,7 @@ module Sequel
   # To assign default validations to a sequel model:
   # 
   # class MyModel < SequelModel(:items)
-  #   validations do
+  #   validates do
   #     format_of...
   #     presence_of...
   #     acceptance_of...
@@ -21,7 +21,7 @@ module Sequel
   #   end
   # end
   #
-  # You may also perform the usual 'longhand' way to assign default model validations 
+  # You may also perform the usual 'longhand' way to assign default model validates 
   # directly within the model class itself:
   #
   #   class MyModel < SequelModel(:items)
@@ -42,42 +42,42 @@ module Sequel
   #
   # =Advanced Sequel Validations
   #
-  # TODO: verify that advanced validations work as stated (aka write specs)
+  # TODO: verify that advanced validates work as stated (aka write specs)
   # NOTE: experimental
   #
-  #  To store validations for conditional usage simply specify a name with which to store them
+  #  To store validates for conditional usage simply specify a name with which to store them
   #    class User < Sequel::Model
   #
-  #      # This set of validations becomes stored as :default and gets injected into the model.
-  #      validations do
-  #        # standard validations calls
+  #      # This set of validates becomes stored as :default and gets injected into the model.
+  #      validates do
+  #        # standard validates calls
   #      end
   #      
-  #      validations(:registration) do
-  #        # user registration specific validations 
+  #      validates(:registration) do
+  #        # user registration specific validates 
   #      end
   #      
-  #      validations(:promotion) do
-  #        # user promotion validations
+  #      validates(:promotion) do
+  #        # user promotion validates
   #      end
   #
   #    end
   #
-  # To use the above validations:
+  # To use the above validates:
   #
   #   @user.valid?                # Runs the default validations only.
   #   @user.valid?(:registration) # Runs both default and registration validations
   #   @user.valid?(:promotion)    # Runs both default and promotion validations
   #
-  # You may determine whether the model has validations via:
+  # You may determine whether the model has validates via:
   #
   #   validations? # will return true / false based on existence of validations on the model.
   #
   # You may also retrieve the validations block if needed:
   #
-  #   validations(:registration) # returns the registration validation block.
+  #   validates(:registration) # returns the registration validation block.
   #
-  # validations() method parameters:
+  # validates() method parameters:
   #   a validations block - runs the validations block on the model & stores as :default
   #   a name and a validations block - stores the block under the name
   #   a name - returns a stored block of that name or nil
@@ -103,7 +103,7 @@ module Sequel
     # a name and a validations block - stores the block under the name
     # a name - returns a stored block of that name or nil
     # nothing - returns true / false based on if validations exist for the model.
-    def validations(block_name, &block)
+    def validates(block_name, &block)
       block_name_given = [Symbol,String].include?(block_name.class)
       if block_given?
         if block_name_given

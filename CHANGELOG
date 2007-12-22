@@ -1,5 +1,7 @@
 === SVN 
 
+* Added initial Model validations (Thanks Lance Carlson)
+
 * Added Database#set_column_default method (thanks Jim Morris.)
 
 * Removed warning on uninitialized @transform value (thanks Jim Morris).
