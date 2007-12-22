@@ -5,19 +5,24 @@ require "rake/rdoctask"
 require "fileutils"
 include FileUtils
 
+##############################################################################
+# Configuration
+##############################################################################
 NAME = "sequel"
 VERS = "0.4.4.2"
 CLEAN.include ["**/.*.sw?", "pkg/*", ".config", "doc/*", "coverage/*"]
-RDOC_OPTS = ["--quiet", "--title", "Sequel: Concise ORM for Ruby",
+RDOC_OPTS = [
+  "--quiet", 
+  "--title", "Sequel: Concise ORM for Ruby",
   "--opname", "index.html",
   "--line-numbers", 
   "--main", "README",
-  "--inline-source"]
+  "--inline-source"
+]
 
-desc "Packages up Sequel."
-task :default => [:package]
-task :package => [:clean]
-
+##############################################################################
+# RDoc
+##############################################################################
 task :doc => [:rdoc]
 
 Rake::RDocTask.new do |rdoc|
@@ -27,6 +32,13 @@ Rake::RDocTask.new do |rdoc|
   rdoc.title = "Sequel: Lightweight ORM library for Ruby"
   rdoc.rdoc_files.add ["README", "COPYING", "lib/sequel.rb", "lib/**/*.rb"]
 end
+
+##############################################################################
+# Gem packaging
+##############################################################################
+desc "Packages up Sequel."
+task :default => [:package]
+task :package => [:clean]
 
 spec = Gem::Specification.new do |s|
   s.name = NAME
@@ -44,6 +56,9 @@ spec = Gem::Specification.new do |s|
   s.executables = ["sequel"]
   s.required_ruby_version = ">= 1.8.4"
 
+  # Instead of requiring this, how about we simply use it if it's available
+  # by rescuing LoadError where we require it in model/validations.rb?
+  # s.add_dependency("validatable")
   case RUBY_PLATFORM
   when /mswin/
     s.platform = Gem::Platform::CURRENT
@@ -67,6 +82,9 @@ Rake::GemPackageTask.new(spec) do |p|
   p.gem_spec = spec
 end
 
+##############################################################################
+# installation & removal
+##############################################################################
 task :install do
   sh %{rake package}
   sh %{sudo gem install pkg/#{NAME}-#{VERS}}
@@ -81,6 +99,9 @@ task :uninstall => [:clean] do
   sh %{sudo gem uninstall #{NAME}}
 end
 
+##############################################################################
+# gem and rdoc release
+##############################################################################
 task :release => [:package] do
   sh %{rubyforge login}
   sh %{rubyforge add_release sequel sequel #{VERS} pkg/sequel-#{VERS}.tgz}
@@ -94,29 +115,44 @@ task :doc_rforge do
   sh %{scp -r doc/rdoc/* ciconia@rubyforge.org:/var/www/gforge-projects/sequel}
 end
 
+##############################################################################
+# specs
+##############################################################################
 require "spec/rake/spectask"
 
 desc "Run specs with coverage"
 Spec::Rake::SpecTask.new("spec") do |t|
   t.spec_files = FileList["spec/*_spec.rb"]
-  t.rcov_opts = ["--exclude", "gems", "--exclude", "spec"]
+  t.spec_opts  = File.read("spec/spec.opts").split("\n")
+  t.rcov_opts  = File.read("spec/rcov.opts").split("\n")
   t.rcov = true
 end
 
 desc "Run specs without coverage"
 Spec::Rake::SpecTask.new("spec_no_cov") do |t|
   t.spec_files = FileList["spec/*_spec.rb"]
+  t.spec_opts  = File.read("spec/spec.opts").split("\n")
 end
 
 desc "Run adapter specs without coverage"
 Spec::Rake::SpecTask.new("spec_adapters") do |t|
   t.spec_files = FileList["spec/adapters/*_spec.rb"]
+  t.spec_opts  = File.read("spec/spec.opts").split("\n")
 end
 
 desc "Run all specs with coverage"
 Spec::Rake::SpecTask.new("spec_all") do |t|
   t.spec_files = FileList["spec/*_spec.rb", "spec/adapters/*_spec.rb"]
-  t.rcov_opts = ["--exclude", "gems", "--exclude", "spec"]
+  t.rcov_opts  = File.read("spec/rcov.opts").split("\n")
+  t.spec_opts  = File.read("spec/spec.opts").split("\n")
+  t.rcov = true
+end
+
+desc "Run rcov only"
+Spec::Rake::SpecTask.new("rcov") do |t|
+  t.rcov_opts  = File.read("spec/rcov.opts").split("\n")
+  t.spec_opts  = File.read("spec/spec.opts").split("\n")
+  t.spec_files = FileList["spec/*_spec.rb"]
   t.rcov = true
 end
 

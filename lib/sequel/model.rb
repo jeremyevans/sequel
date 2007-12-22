@@ -1,4 +1,5 @@
 module Sequel
+
   # == Sequel Models
   # 
   # Models in Sequel are based on the Active Record pattern described by Martin Fowler (http://www.martinfowler.com/eaaCatalog/activeRecord.html). A model class corresponds to a table or a dataset, and an instance of that class wraps a single record in the model's underlying dataset.
@@ -227,18 +228,22 @@ module Sequel
   class Model
     alias_method :model, :class
   end
+
 end
 
-require File.join(File.dirname(__FILE__), 'model/base')
-require File.join(File.dirname(__FILE__), 'model/hooks')
-require File.join(File.dirname(__FILE__), 'model/record')
-require File.join(File.dirname(__FILE__), 'model/schema')
-require File.join(File.dirname(__FILE__), 'model/relations')
-require File.join(File.dirname(__FILE__), 'model/caching')
-require File.join(File.dirname(__FILE__), 'model/plugins')
+require File.join(File.dirname(__FILE__), "model/base")
+require File.join(File.dirname(__FILE__), "model/hooks")
+require File.join(File.dirname(__FILE__), "model/record")
+require File.join(File.dirname(__FILE__), "model/schema")
+require File.join(File.dirname(__FILE__), "model/relations")
+require File.join(File.dirname(__FILE__), "model/caching")
+require File.join(File.dirname(__FILE__), "model/plugins")
+require File.join(File.dirname(__FILE__), "model/validations")
 
 module Sequel
+  
   class Model
+    
     # Defines a method that returns a filtered dataset.
     def self.subset(name, *args, &block)
       dataset.meta_def(name) {filter(*args, &block)}
@@ -253,6 +258,7 @@ module Sequel
       dataset.filter(*args, &block).first
     end
     
+    # TODO: doc
     def self.[](*args)
       args = args.first if (args.size == 1)
       if args === true || args === false
@@ -261,6 +267,7 @@ module Sequel
       dataset[(Hash === args) ? args : primary_key_hash(args)]
     end
     
+    # TODO: doc
     def self.fetch(*args)
       db.fetch(*args).set_model(self)
     end
@@ -273,6 +280,11 @@ module Sequel
 
     ############################################################################
 
+    # Deletes all records in the model's table.
+    def self.delete_all
+      dataset.delete
+    end
+
     # Like delete_all, but invokes before_destroy and after_destroy hooks if used.
     def self.destroy_all
       if has_hooks?(:before_destroy) || has_hooks?(:after_destroy)
@@ -281,11 +293,7 @@ module Sequel
         dataset.delete
       end
     end
-    # Deletes all records.
-    def self.delete_all
-      dataset.delete
-    end
-    
+        
     def self.is_dataset_magic_method?(m)
       method_name = m.to_s
       Sequel::Dataset::MAGIC_METHODS.each_key do |r|
@@ -303,15 +311,16 @@ module Sequel
       respond_to?(m) ? send(m, *args, &block) : super(m, *args)
     end
 
-    # Comprehensive description goes here!
+    # TODO: Comprehensive description goes here!
     def self.join(*args)
       table_name = dataset.opts[:from].first
       dataset.join(*args).select(table_name.to_sym.ALL)
     end
     
-    # Returns an array containing all model records
+    # Returns an array containing all of the models records.
     def self.all
       dataset.all
     end
   end
+
 end
