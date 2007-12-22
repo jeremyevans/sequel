@@ -115,6 +115,8 @@ module Sequel
           "ALTER TABLE #{table} RENAME COLUMN #{literal(op[:name])} TO #{literal(op[:new_name])}"
         when :set_column_type
           "ALTER TABLE #{table} ALTER COLUMN #{literal(op[:name])} TYPE #{op[:type]}"
+        when :set_column_default
+          "ALTER TABLE #{table} ALTER COLUMN #{literal(op[:name])} SET DEFAULT #{literal(op[:default])}"
         when :add_index
           index_definition_sql(table, op)
         when :drop_index

@@ -102,6 +102,14 @@ module Sequel
         }
       end
       
+      def set_column_default(name, default)
+        @operations << {
+          :op => :set_column_default,
+          :name => name,
+          :default => default
+        }
+      end
+      
       def add_index(columns, opts = {})
         columns = [columns] unless columns.is_a?(Array)
         @operations << {

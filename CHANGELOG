@@ -1,5 +1,7 @@
 === SVN 
 
+* Added Database#set_column_default method (thanks Jim Morris.)
+
 * Removed warning on uninitialized @transform value (thanks Jim Morris).
 
 === 0.4.4.2 (2007-12-20)

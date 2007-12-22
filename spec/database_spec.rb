@@ -240,6 +240,7 @@ context "Database#alter_table" do
       drop_column :bbb
       rename_column :ccc, :ddd
       set_column_type :eee, :integer
+      set_column_default :hhh, 'abcd'
       
       add_index :fff, :unique => true
       drop_index :ggg
@@ -250,6 +251,7 @@ context "Database#alter_table" do
       'ALTER TABLE xyz DROP COLUMN bbb',
       'ALTER TABLE xyz RENAME COLUMN ccc TO ddd',
       'ALTER TABLE xyz ALTER COLUMN eee TYPE integer',
+      "ALTER TABLE xyz ALTER COLUMN hhh SET DEFAULT 'abcd'",
       
       'CREATE UNIQUE INDEX xyz_fff_index ON xyz (fff)',
       'DROP INDEX xyz_ggg_index'
@@ -305,6 +307,19 @@ context "Database#set_column_type" do
     @db.set_column_type :test, :name, :integer
     @db.sqls.should == [
       'ALTER TABLE test ALTER COLUMN name TYPE integer'
+    ]
+  end
+end
+
+context "Database#set_column_default" do
+  setup do
+    @db = DummyDatabase.new
+  end
+  
+  specify "should construct proper SQL" do
+    @db.set_column_default :test, :name, 'zyx'
+    @db.sqls.should == [
+      "ALTER TABLE test ALTER COLUMN name SET DEFAULT 'zyx'"
     ]
   end
 end

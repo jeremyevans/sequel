@@ -213,6 +213,10 @@ module Sequel
       alter_table(table) {set_column_type(*args)}
     end
     
+    def set_column_default(table, *args)
+      alter_table(table) {set_column_default(*args)}
+    end
+    
     # Adds an index to a table for the given columns:
     # 
     #   DB.add_index(:posts, :title)
