@@ -1,3 +1,7 @@
+=== SVN 
+
+* Removed warning on uninitialized @transform value (thanks Jim Morris).
+
 === 0.4.4.2 (2007-12-20)
 
 * Fixed parsing errors in Ruby 1.9.
@@ -10,7 +14,7 @@
 
 === 0.4.4.1 (2007-12-19)
 
-* Fixed schema generation code to use fied quoting and support adapter-specific literalization of default values (#108).
+* Fixed schema generation code to use field quoting and support adapter-specific literalization of default values (#108).
 
 === 0.4.4 (2007-12-17)
 

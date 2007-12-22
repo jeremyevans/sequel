@@ -2375,4 +2375,8 @@ context "Dataset#update_sql" do
   specify "should accept strings" do
     @ds.update_sql("a = b").should == "UPDATE items SET a = b"
   end
+  
+  specify "should accept hash with string keys" do
+    @ds.update_sql('c' => 'd').should == "UPDATE items SET c = 'd'"
+  end
 end

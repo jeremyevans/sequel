@@ -158,6 +158,7 @@ context "A new model instance" do
   specify "should be marked as new?" do
     o = @m.new
     o.should be_new
+    o.should be_new_record
   end
   
   specify "should not be marked as new? once it is saved" do
@@ -165,6 +166,7 @@ context "A new model instance" do
     o.should be_new
     o.save
     o.should_not be_new
+    o.should_not be_new_record
   end
   
   specify "should use the last inserted id as primary key if not in values" do
@@ -579,6 +581,9 @@ context "Model#new?" do
   specify "should alias new_record? to new?" do
     n = @c.new(:x => 1)
     n.should respond_to?(:new_record?)
+    n.should be_new_record
+    n.save
+    n.should_not be_new_record
   end
 end
 

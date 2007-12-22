@@ -88,6 +88,7 @@ module Sequel
       @db = db
       @opts = opts || {}
       @row_proc = nil
+      @transform = nil
     end
     
     # Returns a new instance of the dataset with with the give options merged.
