@@ -27,201 +27,30 @@ describe Sequel::Model do
 
 end
 
-describe Sequel::Model, "w/ primary key" do
-  it "should default to ':id'" do
-    model_a = Class.new Sequel::Model
-    model_a.primary_key.should be_equal(:id)
-  end
+describe Sequel::Model, "dataset & schema" do
 
-  it "should be changed through 'set_primary_key'" do
-    model_a = Class.new(Sequel::Model) { set_primary_key :a }
-    model_a.primary_key.should be_equal(:a)
-  end
-
-  it "should support multi argument composite keys" do
-    model_a = Class.new(Sequel::Model) { set_primary_key :a, :b }
-    model_a.primary_key.should be_eql([:a, :b])
-  end
-
-  it "should accept single argument composite keys" do
-    model_a = Class.new(Sequel::Model) { set_primary_key [:a, :b] }
-    model_a.primary_key.should be_eql([:a, :b])
-  end
-end
-
-describe Sequel::Model, "w/o primary key" do
-  it "should return nil for primary key" do
-    Class.new(Sequel::Model) { no_primary_key }.primary_key.should be_nil
-  end
-
-  it "should raise a Sequel::Error on 'this'" do
-    instance = Class.new(Sequel::Model) { no_primary_key }.new
-    proc { instance.this }.should raise_error(Sequel::Error)
-  end
-end
-
-describe Sequel::Model, 'with this' do
-
-  before { @example = Class.new Sequel::Model(:examples) }
-
-  it "should return a dataset identifying the record" do
-    instance = @example.new :id => 3
-    instance.this.sql.should be_eql("SELECT * FROM examples WHERE (id = 3) LIMIT 1")
-  end
-
-  it "should support arbitary primary keys" do
-    @example.set_primary_key :a
-
-    instance = @example.new :a => 3
-    instance.this.sql.should be_eql("SELECT * FROM examples WHERE (a = 3) LIMIT 1")
-  end
-
-  it "should support composite primary keys" do
-    @example.set_primary_key :x, :y
-    instance = @example.new :x => 4, :y => 5
-
-    parts = [
-      'SELECT * FROM examples WHERE %s LIMIT 1',
-      '(x = 4) AND (y = 5)', 
-      '(y = 5) AND (x = 4)'
-    ].map { |expr| Regexp.escape expr }
-    regexp = Regexp.new parts.first % "(?:#{parts[1]}|#{parts[2]})"
-
-    instance.this.sql.should match(regexp)
-  end
-
-end
-
-describe Sequel::Model, 'with hooks' do
-
-  before do
-    MODEL_DB.reset
-    Sequel::Model.hooks.clear
-
-    @hooks = %w{
-      before_save before_create before_update before_destroy
-      after_save after_create after_update after_destroy
-    }.select { |hook| !hook.empty? }
-  end
-  
-  it "should have hooks for everything" do
-    Sequel::Model.methods.should include('hooks')
-    Sequel::Model.methods.should include(*@hooks)
-    @hooks.each do |hook|
-      Sequel::Model.hooks[hook.to_sym].should be_an_instance_of(Array)
-    end
-  end
-
-  it "should be inherited" do
-    pending 'soon'
-
-    @hooks.each do |hook|
-      Sequel::Model.send(hook.to_sym) { nil }
-    end
-
-    model = Class.new Sequel::Model(:models)
-    model.hooks.should == Sequel::Model.hooks
-  end
-
-  it "should run hooks" do
-    pending 'soon'
-
-    test = mock 'Test'
-    test.should_receive(:run).exactly(@hooks.length)
-
-    @hooks.each do |hook|
-      Sequel::Model.send(hook.to_sym) { test.run }
-    end
-
-    model = Class.new Sequel::Model(:models)
-    model.hooks.should == Sequel::Model.hooks
-
-    model_instance = model.new
-    @hooks.each { |hook| model_instance.run_hooks(hook) }
-  end
-
-  it "should run hooks around save and create" do
-    pending 'test execution'
-  end
-
-  it "should run hooks around save and update" do
-    pending 'test execution'
-  end
-
-  it "should run hooks around delete" do
-    pending 'test execution'
-  end
-
-end
-
-describe "A new model instance" do
-
-  before(:each) do
-    @m = Class.new(Sequel::Model) do
-      set_dataset MODEL_DB[:items]
-    end
-  end
-  
-  it "should be marked as new?" do
-    o = @m.new
-    o.should be_new
-    o.should be_new_record
-  end
-  
-  it "should not be marked as new? once it is saved" do
-    o = @m.new(:x => 1)
-    o.should be_new
-    o.save
-    o.should_not be_new
-    o.should_not be_new_record
-  end
-  
-  it "should use the last inserted id as primary key if not in values" do
-    d = @m.dataset
-    def d.insert(*args)
-      super
-      1234
-    end
-    
-    def d.first
-      {:x => 1, :id => 1234}
-    end
-    
-    o = @m.new(:x => 1)
-    o.save
-    o.id.should == 1234
-    
-    o = @m.new(:x => 1, :id => 333)
-    o.save
-    o.id.should == 333
-  end
-  
-end
-
-describe Sequel::Model do
-  
   before do
     @model = Class.new(Sequel::Model(:items))
   end
-  
+
   it "creates dynamic model subclass with set table name" do
     @model.table_name.should == :items
   end
-  
+
   it "defaults to primary key of id" do
     @model.primary_key.should == :id
   end
-  
+
   it "allow primary key change" do
     @model.set_primary_key :ssn
     @model.primary_key.should == :ssn
   end
-  
+
   it "allows dataset change" do
     @model.set_dataset(MODEL_DB[:foo])
     @model.table_name.should == :foo
   end
-  
+
   it "sets schema with implicit table name" do
     @model.set_schema do
       primary_key :ssn, :string
@@ -229,7 +58,7 @@ describe Sequel::Model do
     @model.primary_key.should == :ssn
     @model.table_name.should == :items
   end
-  
+
   it "sets schema with explicit table name" do
     @model.set_schema :foo do
       primary_key :id
@@ -243,421 +72,73 @@ describe Sequel::Model do
   end
 end
 
-class DummyModelBased < Sequel::Model(:blog)
-end
-
-describe "Sequel::Model()" do
+describe Sequel::Model, "constructor" do
   
-  it "should allow reopening of descendant classes" do
-    proc do
-      eval "class DummyModelBased < Sequel::Model(:blog); end"
-    end.should_not raise_error
+  before(:each) do
+    @m = Class.new(Sequel::Model)
   end
 
+  it "should accept a hash" do
+    m = @m.new(:a => 1, :b => 2)
+    m.values.should == {:a => 1, :b => 2}
+    m.should be_new
+  end
+  
+  it "should accept a block and yield itself to the block" do
+    block_called = false
+    m = @m.new {|i| block_called = true; i.should be_a_kind_of(@m); i.values[:a] = 1}
+    
+    block_called.should be_true
+    m.values[:a].should == 1
+  end
+  
 end
 
-describe "A model class" do
+describe Sequel::Model, "new" do
 
   before(:each) do
-    MODEL_DB.reset
-    @c = Class.new(Sequel::Model(:items))
-  end
-  
-  it "should be able to create rows in the associated table" do
-    o = @c.create(:x => 1)
-    o.class.should == @c
-    MODEL_DB.sqls.should == ['INSERT INTO items (x) VALUES (1)',  "SELECT * FROM items WHERE (id IN ('INSERT INTO items (x) VALUES (1)')) LIMIT 1"]
-  end
-  
-  it "should be able to create rows without any values specified" do
-    o = @c.create
-    o.class.should == @c
-    MODEL_DB.sqls.should == ["INSERT INTO items DEFAULT VALUES", "SELECT * FROM items WHERE (id IN ('INSERT INTO items DEFAULT VALUES')) LIMIT 1"]
-  end
-
-end
-
-describe "A model class without a primary key" do
-
-  before(:each) do
-    MODEL_DB.reset
-    @c = Class.new(Sequel::Model(:items)) do
-      no_primary_key
+    @m = Class.new(Sequel::Model) do
+      set_dataset MODEL_DB[:items]
     end
   end
-  
-  it "should be able to insert records without selecting them back" do
-    i = nil
-    proc {i = @c.create(:x => 1)}.should_not raise_error
-    i.class.should be(@c)
-    i.values.to_hash.should == {:x => 1}
-    
-    MODEL_DB.sqls.should == ['INSERT INTO items (x) VALUES (1)']
-  end
-  
-  it "should raise when deleting" do
-    o = @c.new
-    proc {o.delete}.should raise_error
+
+  it "should be marked as new?" do
+    o = @m.new
+    o.should be_new
+    o.should be_new_record
   end
 
-  it "should insert a record when saving" do
-    o = @c.new(:x => 2)
+  it "should not be marked as new? once it is saved" do
+    o = @m.new(:x => 1)
     o.should be_new
     o.save
-    MODEL_DB.sqls.should == ['INSERT INTO items (x) VALUES (2)']
+    o.should_not be_new
+    o.should_not be_new_record
   end
 
-end
-
-describe "Model#serialize" do
-  
-  before(:each) do
-    MODEL_DB.reset
-  end
-  
-  it "should translate values to YAML when creating records" do
-    @c = Class.new(Sequel::Model(:items)) do
-      no_primary_key
-      serialize :abc
+  it "should use the last inserted id as primary key if not in values" do
+    d = @m.dataset
+    def d.insert(*args)
+      super
+      1234
     end
 
-    @c.create(:abc => 1)
-    @c.create(:abc => "hello")
-    
-    MODEL_DB.sqls.should == [ \
-      "INSERT INTO items (abc) VALUES ('--- 1\n')", \
-      "INSERT INTO items (abc) VALUES ('--- hello\n')", \
-    ]
-  end
-  
-  it "should support calling after the class is defined" do
-    @c = Class.new(Sequel::Model(:items)) do
-      no_primary_key
-    end
-    
-    @c.serialize :def
-
-    @c.create(:def => 1)
-    @c.create(:def => "hello")
-    
-    MODEL_DB.sqls.should == [ \
-      "INSERT INTO items (def) VALUES ('--- 1\n')", \
-      "INSERT INTO items (def) VALUES ('--- hello\n')", \
-    ]
-  end
-  
-  it "should support using the Marshal format" do
-    @c = Class.new(Sequel::Model(:items)) do
-      no_primary_key
-      serialize :abc, :format => :marshal
+    def d.first
+      {:x => 1, :id => 1234}
     end
 
-    @c.create(:abc => 1)
-    @c.create(:abc => "hello")
-    
-    MODEL_DB.sqls.should == [ \
-      "INSERT INTO items (abc) VALUES ('\004\bi\006')", \
-      "INSERT INTO items (abc) VALUES ('\004\b\"\nhello')", \
-    ]
-  end
-  
-  it "should translate values to and from YAML using accessor methods" do
-    @c = Class.new(Sequel::Model(:items)) do
-      serialize :abc, :def
-    end
-    
-    ds = @c.dataset
-    ds.extend(Module.new {
-      attr_accessor :raw
-      
-      def fetch_rows(sql, &block)
-        block.call(@raw)
-      end
-      
-      @@sqls = nil
-      
-      def insert(*args)
-        @@sqls = insert_sql(*args)
-      end
-
-      def update(*args)
-        @@sqls = update_sql(*args)
-      end
-      
-      def sqls
-        @@sqls
-      end
-      
-      def columns
-        [:id, :abc, :def]
-      end
-    })
-      
-    ds.raw = {:id => 1, :abc => "--- 1\n", :def => "--- hello\n"}
-    o = @c.first
-    o.id.should == 1
-    o.abc.should == 1
-    o.def.should == "hello"
-    
-    o.set(:abc => 23)
-    ds.sqls.should == "UPDATE items SET abc = '#{23.to_yaml}' WHERE (id = 1)"
-    
-    ds.raw = {:id => 1, :abc => "--- 1\n", :def => "--- hello\n"}
-    o = @c.create(:abc => [1, 2, 3])
-    ds.sqls.should == "INSERT INTO items (abc) VALUES ('#{[1, 2, 3].to_yaml}')"
-  end
-  
-end
-
-describe "Model attribute accessors" do
-  
-  before(:each) do
-    MODEL_DB.reset
-
-    @c = Class.new(Sequel::Model(:items)) do
-      def columns
-        [:id, :x, :y]
-      end
-    end
-  end
-  
-  it "should be created dynamically" do
-    o = @c.new
-    
-    o.should_not be_respond_to(:x)
-    o.x.should be_nil
-    o.should be_respond_to(:x)
-    
-    o.should_not be_respond_to(:x=)
-    o.x = 34
-    o.x.should == 34
-    o.should be_respond_to(:x=)
-  end
-  
-  it "should raise for a column that doesn't exist in the dataset" do
-    o = @c.new
-    
-    proc {o.x}.should_not raise_error
-    proc {o.xx}.should raise_error(Sequel::Error)
-    
-    proc {o.x = 3}.should_not raise_error
-    proc {o.yy = 4}.should raise_error(Sequel::Error)
-
-    proc {o.yy?}.should raise_error(NoMethodError)
-  end
-  
-  it "should not raise for a column not in the dataset, but for which there's a value" do
-    o = @c.new
-    
-    proc {o.xx}.should raise_error(Sequel::Error)
-    proc {o.yy}.should raise_error(Sequel::Error)
-    
-    o.values[:xx] = 123
-    o.values[:yy] = nil
-    
-    proc {o.xx; o.yy}.should_not raise_error(Sequel::Error)
-    
-    o.xx.should == 123
-    o.yy.should == nil
-    
-    proc {o.xx = 3}.should raise_error(Sequel::Error)
-  end
-  
-end
-
-describe "Model attribute setters" do
-  
-  before(:each) do
-    MODEL_DB.reset
-
-    @c = Class.new(Sequel::Model(:items)) do
-      def columns
-        [:id, :x, :y]
-      end
-    end
-  end
-  
-  it "should mark the column value as changed" do
-    o = @c.new
-    o.changed_columns.should == []
-
-    o.x = 2
-    o.changed_columns.should == [:x]
-    
-    o.y = 3
-    o.changed_columns.should == [:x, :y]
-    
-    o.changed_columns.clear
-    
-    o[:x] = 2
-    o.changed_columns.should == [:x]
-    
-    o[:y] = 3
-    o.changed_columns.should == [:x, :y]
-  end
-  
-end
-
-describe "Model#save" do
-  
-  before(:each) do
-    MODEL_DB.reset
-
-    @c = Class.new(Sequel::Model(:items)) do
-      def columns
-        [:id, :x, :y]
-      end
-    end
-  end
-  
-  it "should insert a record for a new model instance" do
-    o = @c.new(:x => 1)
+    o = @m.new(:x => 1)
     o.save
-    
-    MODEL_DB.sqls.first.should == "INSERT INTO items (x) VALUES (1)"
-  end
+    o.id.should == 1234
 
-  it "should update a record for an existing model instance" do
-    o = @c.new(:id => 3, :x => 1)
+    o = @m.new(:x => 1, :id => 333)
     o.save
-    
-    MODEL_DB.sqls.first.should =~ 
-      /UPDATE items SET (id = 3, x = 1|x = 1, id = 3) WHERE \(id = 3\)/
+    o.id.should == 333
   end
-  
-  it "should update only the given columns if given" do
-    o = @c.new(:id => 3, :x => 1, :y => nil)
-    o.save(:y)
-    
-    MODEL_DB.sqls.first.should == "UPDATE items SET y = NULL WHERE (id = 3)"
-  end
-  
-  it "should mark saved columns as not changed" do
-    o = @c.new(:id => 3, :x => 1, :y => nil)
-    o[:y] = 4
-    o.changed_columns.should == [:y]
-    o.save(:x)
-    o.changed_columns.should == [:y]
-    o.save(:y)
-    o.changed_columns.should == []
-  end
-  
+
 end
 
-describe "Model#save_changes" do
-  
-  before(:each) do
-    MODEL_DB.reset
-
-    @c = Class.new(Sequel::Model(:items)) do
-      def columns
-        [:id, :x, :y]
-      end
-    end
-  end
-  
-  it "should do nothing if no changed columns" do
-    o = @c.new(:id => 3, :x => 1, :y => nil)
-    o.save_changes
-    
-    MODEL_DB.sqls.should be_empty
-  end
-  
-  it "should update only changed columns" do
-    o = @c.new(:id => 3, :x => 1, :y => nil)
-    o.x = 2
-
-    o.save_changes
-    MODEL_DB.sqls.should == ["UPDATE items SET x = 2 WHERE (id = 3)"]
-    o.save_changes
-    o.save_changes
-    MODEL_DB.sqls.should == ["UPDATE items SET x = 2 WHERE (id = 3)"]
-    MODEL_DB.reset
-
-    o.y = 4
-    o.save_changes
-    MODEL_DB.sqls.should == ["UPDATE items SET y = 4 WHERE (id = 3)"]
-    o.save_changes
-    o.save_changes
-    MODEL_DB.sqls.should == ["UPDATE items SET y = 4 WHERE (id = 3)"]
-  end
-  
-end
-
-describe "Model#new?" do
-  
-  before(:each) do
-    MODEL_DB.reset
-
-    @c = Class.new(Sequel::Model(:items)) do
-    end
-  end
-  
-  it "should be true for a new instance" do
-    n = @c.new(:x => 1)
-    n.should be_new
-  end
-  
-  it "should be false after saving" do
-    n = @c.new(:x => 1)
-    n.save
-    n.should_not be_new
-  end
-  
-  it "should alias new_record? to new?" do
-    n = @c.new(:x => 1)
-    n.should respond_to(:new_record?)
-    n.should be_new_record
-    n.save
-    n.should_not be_new_record
-  end
-  
-end
-
-describe "Model.after_create" do
-  
-  before(:each) do
-    MODEL_DB.reset
-
-    @c = Class.new(Sequel::Model(:items)) do
-      def columns
-        [:id, :x, :y]
-      end
-    end
-    
-    ds = @c.dataset
-    def ds.insert(*args)
-      super(*args)
-      1
-    end
-  end
-
-  it "should be called after creation" do
-    s = []
-    
-    @c.after_create do
-      s = MODEL_DB.sqls.dup
-    end
-    
-    n = @c.create(:x => 1)
-    MODEL_DB.sqls.should == ["INSERT INTO items (x) VALUES (1)", "SELECT * FROM items WHERE (id = 1) LIMIT 1"]
-    s.should == ["INSERT INTO items (x) VALUES (1)", "SELECT * FROM items WHERE (id = 1) LIMIT 1"]
-  end
-  
-  it "should allow calling save in the hook" do
-    @c.after_create do
-      values.delete(:x)
-      self.id = 2
-      save
-    end
-    
-    n = @c.create(:id => 1)
-    MODEL_DB.sqls.should == ["INSERT INTO items (id) VALUES (1)", "SELECT * FROM items WHERE (id = 1) LIMIT 1", "UPDATE items SET id = 2 WHERE (id = 1)"]
-  end
-  
-end
-
-describe "Model.subset" do
+describe Sequel::Model, ".subset" do
 
   before(:each) do
     MODEL_DB.reset
@@ -685,7 +166,7 @@ describe "Model.subset" do
 
 end
 
-describe "Model.find" do
+describe Sequel::Model, ".find" do
 
   before(:each) do
     MODEL_DB.reset
@@ -721,61 +202,7 @@ describe "Model.find" do
 
 end
 
-describe "Model.[]" do
-  
-  before(:each) do
-    MODEL_DB.reset
-    
-    @c = Class.new(Sequel::Model(:items))
-    
-    $cache_dataset_row = {:name => 'sharon', :id => 1}
-    @dataset = @c.dataset
-    $sqls = []
-    @dataset.extend(Module.new {
-      def fetch_rows(sql)
-        $sqls << sql
-        yield $cache_dataset_row
-      end
-    })
-  end
-  
-  it "should return the first record for the given pk" do
-    @c[1].should be_a_kind_of(@c)
-    $sqls.last.should == "SELECT * FROM items WHERE (id = 1) LIMIT 1"
-    @c[9999].should be_a_kind_of(@c)
-    $sqls.last.should == "SELECT * FROM items WHERE (id = 9999) LIMIT 1"
-  end
-  
-  it "should raise for boolean argument (mistaken comparison)" do
-    # This in order to prevent stuff like Model[:a == 'b']
-    proc {@c[:a == 1]}.should raise_error(Sequel::Error)
-    proc {@c[:a != 1]}.should raise_error(Sequel::Error)
-  end
-  
-  it "should work correctly for custom primary key" do
-    @c.set_primary_key :name
-    @c['sharon'].should be_a_kind_of(@c)
-    $sqls.last.should == "SELECT * FROM items WHERE (name = 'sharon') LIMIT 1"
-  end
-  
-  it "should work correctly for composite primary key" do
-    @c.set_primary_key [:node_id, :kind]
-    @c[3921, 201].should be_a_kind_of(@c)
-    $sqls.last.should =~ \
-      /^SELECT \* FROM items WHERE (\(node_id = 3921\) AND \(kind = 201\))|(\(kind = 201\) AND \(node_id = 3921\)) LIMIT 1$/
-  end
-  
-  it "should act as shortcut to find if a hash is given" do
-    @c[:id => 1].should be_a_kind_of(@c)
-    $sqls.last.should == "SELECT * FROM items WHERE (id = 1) LIMIT 1"
-    
-    @c[:name => ['abc', 'def']].should be_a_kind_of(@c)
-    $sqls.last.should == "SELECT * FROM items WHERE (name IN ('abc', 'def')) LIMIT 1"
-  end
-
-end
-
-describe "Model.fetch" do
+describe Sequel::Model, ".fetch" do
 
   before(:each) do
     MODEL_DB.reset
@@ -794,382 +221,7 @@ describe "Model.fetch" do
   
 end
 
-describe "A cached model" do
-
-  before(:each) do
-    MODEL_DB.reset
-    
-    @cache_class = Class.new(Hash) do
-      attr_accessor :ttl
-      def set(k, v, ttl); self[k] = v; @ttl = ttl; end
-      def get(k); self[k]; end
-    end
-    cache = @cache_class.new
-    @cache = cache
-    
-    @c = Class.new(Sequel::Model(:items)) do
-      set_cache cache
-      
-      def self.columns
-        [:name, :id]
-      end
-    end
-    
-    $cache_dataset_row = {:name => 'sharon', :id => 1}
-    @dataset = @c.dataset
-    $sqls = []
-    @dataset.extend(Module.new {
-      def fetch_rows(sql)
-        $sqls << sql
-        yield $cache_dataset_row
-      end
-      
-      def update(values)
-        $sqls << update_sql(values)
-        $cache_dataset_row.merge!(values)
-      end
-      
-      def delete
-        $sqls << delete_sql
-      end
-    })
-  end
-  
-  it "should set the model's cache store" do
-    @c.cache_store.should be(@cache)
-  end
-  
-  it "should have a default ttl of 3600" do
-    @c.cache_ttl.should == 3600
-  end
-  
-  it "should take a ttl option" do
-    @c.set_cache @cache, :ttl => 1234
-    @c.cache_ttl.should == 1234
-  end
-  
-  it "should offer a set_cache_ttl method for setting the ttl" do
-    @c.cache_ttl.should == 3600
-    @c.set_cache_ttl 1234
-    @c.cache_ttl.should == 1234
-  end
-  
-  it "should generate a cache key appropriate to the class" do
-    m = @c.new
-    m.values[:id] = 1
-    m.cache_key.should == "#{m.class}:1"
-    
-    # custom primary key
-    @c.set_primary_key :ttt
-    m = @c.new
-    m.values[:ttt] = 333
-    m.cache_key.should == "#{m.class}:333"
-    
-    # composite primary key
-    @c.set_primary_key [:a, :b, :c]
-    m = @c.new
-    m.values[:a] = 123
-    m.values[:c] = 456
-    m.values[:b] = 789
-    m.cache_key.should == "#{m.class}:123,789,456"
-  end
-  
-  it "should raise error if attempting to generate cache_key and primary key value is null" do
-    m = @c.new
-    proc {m.cache_key}.should raise_error(Sequel::Error)
-    
-    m.values[:id] = 1
-    proc {m.cache_key}.should_not raise_error(Sequel::Error)
-  end
-  
-  it "should set the cache when reading from the database" do
-    $sqls.should == []
-    @cache.should be_empty
-    
-    m = @c[1]
-    $sqls.should == ['SELECT * FROM items WHERE (id = 1) LIMIT 1']
-    m.values.should == $cache_dataset_row
-    @cache[m.cache_key].should == m
-    
-    # read from cache
-    m2 = @c[1]
-    $sqls.should == ['SELECT * FROM items WHERE (id = 1) LIMIT 1']
-    m2.should == m
-    m2.values.should == $cache_dataset_row
-  end
-  
-  it "should delete the cache when writing to the database" do
-    # fill the cache
-    m = @c[1]
-    @cache[m.cache_key].should == m
-    
-    m.set(:name => 'tutu')
-    @cache.has_key?(m.cache_key).should be_false
-    $sqls.last.should == "UPDATE items SET name = 'tutu' WHERE (id = 1)"
-    
-    m = @c[1]
-    @cache[m.cache_key].should == m
-    m.name = 'hey'
-    m.save
-    @cache.has_key?(m.cache_key).should be_false
-    $sqls.last.should == "UPDATE items SET name = 'hey', id = 1 WHERE (id = 1)"
-  end
-  
-  it "should delete the cache when deleting the record" do
-    # fill the cache
-    m = @c[1]
-    @cache[m.cache_key].should == m
-    
-    m.delete
-    @cache.has_key?(m.cache_key).should be_false
-    $sqls.last.should == "DELETE FROM items WHERE (id = 1)"
-  end
-  
-  it "should support #[] as a shortcut to #find with hash" do
-    m = @c[:id => 3]
-    @cache[m.cache_key].should be_nil
-    $sqls.last.should == "SELECT * FROM items WHERE (id = 3) LIMIT 1"
-    
-    m = @c[1]
-    @cache[m.cache_key].should == m
-    $sqls.should == ["SELECT * FROM items WHERE (id = 3) LIMIT 1", \
-      "SELECT * FROM items WHERE (id = 1) LIMIT 1"]
-    
-    @c[:id => 4]
-    $sqls.should == ["SELECT * FROM items WHERE (id = 3) LIMIT 1", \
-      "SELECT * FROM items WHERE (id = 1) LIMIT 1", \
-      "SELECT * FROM items WHERE (id = 4) LIMIT 1"]
-  end
-  
-end
-
-describe "Model.one_to_one" do
-  
-  before(:each) do
-    MODEL_DB.reset
-    
-    @c1 = Class.new(Sequel::Model(:attributes)) do
-    end
-
-    @c2 = Class.new(Sequel::Model(:nodes)) do
-    end
-    
-    @dataset = @c2.dataset
-
-    $sqls = []
-    @dataset.extend(Module.new {
-      def fetch_rows(sql)
-        $sqls << sql
-        yield({:hey => 1})
-      end
-      
-      def update(values)
-        $sqls << update_sql(values)
-      end
-    })
-  end
-  
-  it "should use implicit key if omitted" do
-    @c2.one_to_one :parent, :from => @c2
-    
-    d = @c2.new(:id => 1, :parent_id => 234)
-    p = d.parent
-    p.class.should == @c2
-    p.values.should == {:hey => 1}
-    
-    $sqls.should == ["SELECT * FROM nodes WHERE (id = 234) LIMIT 1"]
-  end
-  
-  it "should use explicit key if given" do
-    @c2.one_to_one :parent, :from => @c2, :key => :blah
-    
-    d = @c2.new(:id => 1, :blah => 567)
-    p = d.parent
-    p.class.should == @c2
-    p.values.should == {:hey => 1}
-    
-    $sqls.should == ["SELECT * FROM nodes WHERE (id = 567) LIMIT 1"]
-  end
-  
-  it "should support plain dataset in the from option" do
-    @c2.one_to_one :parent, :from => MODEL_DB[:xyz]
-
-    d = @c2.new(:id => 1, :parent_id => 789)
-    p = d.parent
-    p.class.should == Hash
-    
-    MODEL_DB.sqls.should == ["SELECT * FROM xyz WHERE (id = 789) LIMIT 1"]
-  end
-
-  it "should support table name in the from option" do
-    @c2.one_to_one :parent, :from => :abc
-
-    d = @c2.new(:id => 1, :parent_id => 789)
-    p = d.parent
-    p.class.should == Hash
-    
-    MODEL_DB.sqls.should == ["SELECT * FROM abc WHERE (id = 789) LIMIT 1"]
-  end
-  
-  it "should return nil if key value is nil" do
-    @c2.one_to_one :parent, :from => @c2
-    
-    d = @c2.new(:id => 1)
-    d.parent.should == nil
-  end
-  
-  it "should define a setter method" do
-    @c2.one_to_one :parent, :from => @c2
-    
-    d = @c2.new(:id => 1)
-    d.parent = {:id => 4321}
-    d.values.should == {:id => 1, :parent_id => 4321}
-    $sqls.last.should == "UPDATE nodes SET parent_id = 4321 WHERE (id = 1)"
-    
-    d.parent = nil
-    d.values.should == {:id => 1, :parent_id => nil}
-    $sqls.last.should == "UPDATE nodes SET parent_id = NULL WHERE (id = 1)"
-    
-    e = @c2.new(:id => 6677)
-    d.parent = e
-    d.values.should == {:id => 1, :parent_id => 6677}
-    $sqls.last.should == "UPDATE nodes SET parent_id = 6677 WHERE (id = 1)"
-  end
-  
-end
-
-describe "Model.one_to_many" do
-  
-  before(:each) do
-    MODEL_DB.reset
-    
-    @c1 = Class.new(Sequel::Model(:attributes)) do
-    end
-
-    @c2 = Class.new(Sequel::Model(:nodes)) do
-    end
-  end
-  
-  it "should define a getter method" do
-    @c2.one_to_many :attributes, :from => @c1, :key => :node_id
-    
-    n = @c2.new(:id => 1234)
-    a = n.attributes
-    a.should be_a_kind_of(Sequel::Dataset)
-    a.sql.should == 'SELECT * FROM attributes WHERE (node_id = 1234)'
-  end
-  
-  it "should support plain dataset in the from option" do
-    @c2.one_to_many :attributes, :from => MODEL_DB[:xyz], :key => :node_id
-    
-    n = @c2.new(:id => 1234)
-    a = n.attributes
-    a.should be_a_kind_of(Sequel::Dataset)
-    a.sql.should == 'SELECT * FROM xyz WHERE (node_id = 1234)'
-  end
-
-  it "should support table name in the from option" do
-    @c2.one_to_many :attributes, :from => :abc, :key => :node_id
-    
-    n = @c2.new(:id => 1234)
-    a = n.attributes
-    a.should be_a_kind_of(Sequel::Dataset)
-    a.sql.should == 'SELECT * FROM abc WHERE (node_id = 1234)'
-  end
-end
-
-describe "Model#pk" do
-  
-  before(:each) do
-    @m = Class.new(Sequel::Model)
-  end
-  
-  it "should be default return the value of the :id column" do
-    m = @m.new(:id => 111, :x => 2, :y => 3)
-    m.pk.should == 111
-  end
-
-  it "should be return the primary key value for custom primary key" do
-    @m.set_primary_key :x
-    m = @m.new(:id => 111, :x => 2, :y => 3)
-    m.pk.should == 2
-  end
-
-  it "should be return the primary key value for composite primary key" do
-    @m.set_primary_key [:y, :x]
-    m = @m.new(:id => 111, :x => 2, :y => 3)
-    m.pk.should == [3, 2]
-  end
-
-  it "should raise if no primary key" do
-    @m.set_primary_key nil
-    m = @m.new(:id => 111, :x => 2, :y => 3)
-    proc {m.pk}.should raise_error(Sequel::Error)
-
-    @m.no_primary_key
-    m = @m.new(:id => 111, :x => 2, :y => 3)
-    proc {m.pk}.should raise_error(Sequel::Error)
-  end
-  
-end
-
-describe "Model#pk_hash" do
-
-  before(:each) do
-    @m = Class.new(Sequel::Model)
-  end
-  
-  it "should be default return the value of the :id column" do
-    m = @m.new(:id => 111, :x => 2, :y => 3)
-    m.pk_hash.should == {:id => 111}
-  end
-
-  it "should be return the primary key value for custom primary key" do
-    @m.set_primary_key :x
-    m = @m.new(:id => 111, :x => 2, :y => 3)
-    m.pk_hash.should == {:x => 2}
-  end
-
-  it "should be return the primary key value for composite primary key" do
-    @m.set_primary_key [:y, :x]
-    m = @m.new(:id => 111, :x => 2, :y => 3)
-    m.pk_hash.should == {:y => 3, :x => 2}
-  end
-
-  it "should raise if no primary key" do
-    @m.set_primary_key nil
-    m = @m.new(:id => 111, :x => 2, :y => 3)
-    proc {m.pk_hash}.should raise_error(Sequel::Error)
-
-    @m.no_primary_key
-    m = @m.new(:id => 111, :x => 2, :y => 3)
-    proc {m.pk_hash}.should raise_error(Sequel::Error)
-  end
-end
-
-describe "A Model constructor" do
-  
-  before(:each) do
-    @m = Class.new(Sequel::Model)
-  end
-
-  it "should accept a hash" do
-    m = @m.new(:a => 1, :b => 2)
-    m.values.should == {:a => 1, :b => 2}
-    m.should be_new
-  end
-  
-  it "should accept a block and yield itself to the block" do
-    block_called = false
-    m = @m.new {|i| block_called = true; i.should be_a_kind_of(@m); i.values[:a] = 1}
-    
-    block_called.should be_true
-    m.values[:a].should == 1
-  end
-  
-end
-
-describe "Model magic methods" do
+describe Sequel::Model, "magic methods" do
 
   before(:each) do
     @c = Class.new(Sequel::Dataset) do
@@ -1235,92 +287,7 @@ describe "Model magic methods" do
   
 end
 
-module Sequel::Plugins
-
-  module Timestamped
-    def self.apply(m, opts)
-      m.class_def(:get_stamp) {@values[:stamp]}
-      m.meta_def(:stamp_opts) {opts}
-      m.before_save {@values[:stamp] = Time.now}
-    end
-    
-    module InstanceMethods
-      def abc; timestamped_opts; end
-    end
-    
-    module ClassMethods
-      def deff; timestamped_opts; end
-    end
-  end
-
-end
-
-describe "A model using a plugin" do
-
-  it "should fail if the plugin is not found" do
-    proc do
-      c = Class.new(Sequel::Model) do
-        is :something_or_other
-      end
-    end.should raise_error(LoadError)
-  end
-  
-  it "should apply the plugin to the class" do
-    c = nil
-    proc do
-      c = Class.new(Sequel::Model) do
-        is :timestamped, :a => 1, :b => 2
-      end
-    end.should_not raise_error(LoadError)
-    
-    c.should respond_to(:stamp_opts)
-    c.stamp_opts.should == {:a => 1, :b => 2}
-    
-    m = c.new
-    m.should respond_to(:get_stamp)
-    m.should respond_to(:abc)
-    m.abc.should == {:a => 1, :b => 2}
-    t = Time.now
-    m[:stamp] = t
-    m.get_stamp.should == t
-    
-    c.should respond_to(:deff)
-    c.deff.should == {:a => 1, :b => 2}
-  end
-  
-end
-
-describe "Model#create_with_params" do
-
-  before(:each) do
-    MODEL_DB.reset
-    
-    @c = Class.new(Sequel::Model(:items)) do
-      def self.columns; [:x, :y]; end
-    end
-  end
-  
-  it "should filter the given params using the model columns" do
-    @c.create_with_params(:x => 1, :z => 2)
-    MODEL_DB.sqls.first.should == "INSERT INTO items (x) VALUES (1)"
-
-    MODEL_DB.reset
-    @c.create_with_params(:y => 1, :abc => 2)
-    MODEL_DB.sqls.first.should == "INSERT INTO items (y) VALUES (1)"
-  end
-  
-  it "should be aliased by create_with" do
-    @c.create_with(:x => 1, :z => 2)
-    MODEL_DB.sqls.first.should == "INSERT INTO items (x) VALUES (1)"
-
-    MODEL_DB.reset
-    @c.create_with(:y => 1, :abc => 2)
-    MODEL_DB.sqls.first.should == "INSERT INTO items (y) VALUES (1)"
-  end
-  
-end
-
-describe "Model.find_or_create" do
+describe Sequel::Model, ".find_or_create" do
 
   before(:each) do
     MODEL_DB.reset
@@ -1350,7 +317,7 @@ describe "Model.find_or_create" do
   end
 end
 
-describe "Model.delete_all" do
+describe Sequel::Model, ".delete_all" do
 
   before(:each) do
     MODEL_DB.reset
@@ -1368,7 +335,7 @@ describe "Model.delete_all" do
 
 end
 
-describe "Model.destroy_all" do
+describe Sequel::Model, ".destroy_all" do
 
   before(:each) do
     MODEL_DB.reset
@@ -1386,7 +353,7 @@ describe "Model.destroy_all" do
 
 end
 
-describe "Model.join" do
+describe Sequel::Model, ".join" do
 
   before(:each) do
     MODEL_DB.reset  
@@ -1402,7 +369,7 @@ describe "Model.join" do
   
 end
 
-describe "Model.all" do
+describe Sequel::Model, ".all" do
   
   before(:each) do
     MODEL_DB.reset
@@ -1419,253 +386,169 @@ describe "Model.all" do
   
 end
 
-describe Sequel::Model, "Validations" do
+class DummyModelBased < Sequel::Model(:blog)
+end
 
-  before(:all) do
-    class Person < Sequel::Model(:people)
+describe Sequel::Model, "(:tablename)" do
+
+  it "should allow reopening of descendant classes" do
+    proc do
+      eval "class DummyModelBased < Sequel::Model(:blog); end"
+    end.should_not raise_error
+  end
+
+end
+
+describe Sequel::Model, ".create" do
+
+  before(:each) do
+    MODEL_DB.reset
+    @c = Class.new(Sequel::Model(:items))
+  end
+
+  it "should be able to create rows in the associated table" do
+    o = @c.create(:x => 1)
+    o.class.should == @c
+    MODEL_DB.sqls.should == ['INSERT INTO items (x) VALUES (1)',  "SELECT * FROM items WHERE (id IN ('INSERT INTO items (x) VALUES (1)')) LIMIT 1"]
+  end
+
+  it "should be able to create rows without any values specified" do
+    o = @c.create
+    o.class.should == @c
+    MODEL_DB.sqls.should == ["INSERT INTO items DEFAULT VALUES", "SELECT * FROM items WHERE (id IN ('INSERT INTO items DEFAULT VALUES')) LIMIT 1"]
+  end
+
+end
+
+describe Sequel::Model, "A model class without a primary key" do
+
+  before(:each) do
+    MODEL_DB.reset
+    @c = Class.new(Sequel::Model(:items)) do
+      no_primary_key
+    end
+  end
+
+  it "should be able to insert records without selecting them back" do
+    i = nil
+    proc {i = @c.create(:x => 1)}.should_not raise_error
+    i.class.should be(@c)
+    i.values.to_hash.should == {:x => 1}
+
+    MODEL_DB.sqls.should == ['INSERT INTO items (x) VALUES (1)']
+  end
+
+  it "should raise when deleting" do
+    o = @c.new
+    proc {o.delete}.should raise_error
+  end
+
+  it "should insert a record when saving" do
+    o = @c.new(:x => 2)
+    o.should be_new
+    o.save
+    MODEL_DB.sqls.should == ['INSERT INTO items (x) VALUES (2)']
+  end
+
+end
+
+describe Sequel::Model, "attribute accessors" do
+
+  before(:each) do
+    MODEL_DB.reset
+
+    @c = Class.new(Sequel::Model(:items)) do
       def columns
-        [:id,:name,:first_name,:last_name,:middle_name,:initials,:age]
-      end
-    end
-
-    class Smurf < Person
-    end
-    
-    class Cow < Sequel::Model(:cows)
-      def columns
-        [:id, :name, :got_milk]
-      end
-    end
-
-    class User < Sequel::Model(:users)
-      def columns
-        [:id, :username, :password]
-      end
-    end
-    
-    class Address < Sequel::Model(:addresses)
-      def columns
-        [:id, :zip_code]
+        [:id, :x, :y]
       end
     end
   end
-  
-  it "should have a hook before validating" do
-    class Person < Sequel::Model(:people)      
-      before_validation do
-        self.name = "default name"
+
+  it "should be created dynamically" do
+    o = @c.new
+
+    o.should_not be_respond_to(:x)
+    o.x.should be_nil
+    o.should be_respond_to(:x)
+
+    o.should_not be_respond_to(:x=)
+    o.x = 34
+    o.x.should == 34
+    o.should be_respond_to(:x=)
+  end
+
+  it "should raise for a column that doesn't exist in the dataset" do
+    o = @c.new
+
+    proc {o.x}.should_not raise_error
+    proc {o.xx}.should raise_error(Sequel::Error)
+
+    proc {o.x = 3}.should_not raise_error
+    proc {o.yy = 4}.should raise_error(Sequel::Error)
+
+    proc {o.yy?}.should raise_error(NoMethodError)
+  end
+
+  it "should not raise for a column not in the dataset, but for which there's a value" do
+    o = @c.new
+
+    proc {o.xx}.should raise_error(Sequel::Error)
+    proc {o.yy}.should raise_error(Sequel::Error)
+
+    o.values[:xx] = 123
+    o.values[:yy] = nil
+
+    proc {o.xx; o.yy}.should_not raise_error(Sequel::Error)
+
+    o.xx.should == 123
+    o.yy.should == nil
+
+    proc {o.xx = 3}.should raise_error(Sequel::Error)
+  end
+
+end
+
+describe Sequel::Model, ".[]" do
+
+  before(:each) do
+    MODEL_DB.reset
+
+    @c = Class.new(Sequel::Model(:items))
+
+    $cache_dataset_row = {:name => 'sharon', :id => 1}
+    @dataset = @c.dataset
+    $sqls = []
+    @dataset.extend(Module.new {
+      def fetch_rows(sql)
+        $sqls << sql
+        yield $cache_dataset_row
       end
-      validations.clear
-      validates_presence_of :name
-    end
-
-    @person = Person.new
-    @person.valid?.should be_true
-  end
-  
-  it "should include errors from other models" do
-    pending("Waiting for Wayne's amazing associations!")
-  end
-  
-  it "should validate the acceptance of a column" do
-    class Cow < Sequel::Model(:cows)      
-      validations.clear
-      validates_acceptance_of :got_milk
-    end
-    
-    @cow = Cow.new
-    @cow.valid?.should be_false
-    @cow.errors.on(:got_milk).should == "must be accepted"
-    
-    @cow.got_milk = "true"
-    @cow.valid?.should be_true
-  end
-  
-  it "should validate the confirmation of a column" do
-    class User < Sequel::Model(:users)      
-      def password_confirmation
-        "test"
-      end
-      
-      validations.clear
-      validates_confirmation_of :password
-    end
-    
-    @user = User.new
-    @user.valid?.should be_false
-    @user.errors.on(:password).should == "doesn't match confirmation"
-    
-    @user.password = "test"
-    @user.valid?.should be_true
-  end
-  
-  it "should validate each with logic" do
-    class ZipCodeService; end
-    
-    class Address < Sequel::Model(:addresses)      
-      validations.clear
-      validates_each :zip_code, :logic => lambda { errors.add(:zip_code, "is not valid") unless ZipCodeService.allows(zip_code) }
-    end
-    
-    @address = Address.new :zip_code => "48108"
-    ZipCodeService.should_receive(:allows).with("48108").and_return(false)
-    @address.valid?.should be_false
-    @address.errors.on(:zip_code).should == "is not valid"
-    
-    @address2 = Address.new :zip_code => "48104"
-    ZipCodeService.should_receive(:allows).with("48104").and_return(true)
-    @address2.valid?.should be_true
-  end
-  
-  it "should validate format of column" do
-    class Person < Sequel::Model(:people)  
-      validates_format_of :first_name, :with => /^[a-zA-Z]+$/
-    end
-
-    @person = Person.new :first_name => "Lancelot99"
-    @person.valid?.should be_false
-    @person = Person.new :first_name => "Anita"
-    @person.valid?.should be_true
-  end
-  
-  it "should allow for :with_exactly => /[a-zA-Z/, which wraps the supplied regex with ^<regex>$" do
-    pending("TODO: Add this option to Validatable#validates_format_of")
+    })
   end
 
-  it "should validate length of column" do
-    class Person < Sequel::Model(:people)
-      validations.clear
-      validates_length_of :first_name, :maximum => 30
-      validates_length_of :last_name, :minimum => 30
-      validates_length_of :middle_name, :within => 1..5
-      validates_length_of :initials, :is => 2
-    end
-    
-    @person = Person.new(
-      :first_name => "Anamethatiswaytofreakinglongandwayoverthirtycharacters",
-      :last_name => "Alastnameunderthirtychars",
-      :initials => "LGC",
-      :middle_name => "danger"
-    )
-    
-    @person.valid?.should be_false
-    @person.errors.on(:first_name).should  == "is invalid"
-    @person.errors.on(:last_name).should   == "is invalid"
-    @person.errors.on(:initials).should    == "is invalid"
-    @person.errors.on(:middle_name).should == "is invalid"
-    
-    @person.first_name  = "Lancelot"
-    @person.last_name   = "1234567890123456789012345678901"
-    @person.initials    = "LC"
-    @person.middle_name = "Will"
-    @person.valid?.should be_true
-  end
-  
-  it "should validate numericality of column" do
-    class Person < Sequel::Model(:people)
-      validations.clear
-      validates_numericality_of :age
-    end
-    
-    @person = Person.new :age => "Twenty"
-    @person.valid?.should be_false
-    @person.errors.on(:age).should == "must be a number"
-    
-    @person.age = 20
-    @person.valid?.should be_true
-  end
-  
-  it "should validate the presence of a column" do
-    class Cow < Sequel::Model(:cows)      
-      validations.clear
-      validates_presence_of :name
-    end
-    
-    @cow = Cow.new
-    @cow.valid?.should be_false
-    @cow.errors.on(:name).should == "can't be empty"
-    @cow.errors.full_messages.first.should == "Name can't be empty"
-    
-    @cow.name = "Betsy"
-    @cow.valid?.should be_true
-  end
-  
-  it "should validate true for a column" do
-    class Person < Sequel::Model(:people)
-      validations.clear
-      validates_true_for :first_name, :logic => lambda { first_name == "Alison" }
-    end
-
-    @person = Person.new :first_name => "Nina"
-    @person.valid?.should be_false
-    @person.errors.on(:first_name).should == "is invalid"
-    
-    @person.first_name = "Alison"
-    @person.valid?.should be_true
-  end
-    
-  it "should have a validates block that calls multple validations" do
-    class Person < Sequel::Model(:people)
-      validations.clear
-      validates do
-        format_of :first_name, :with => /^[a-zA-Z]+$/
-        length_of :first_name, :maximum => 30
-      end
-    end
-
-    Person.validations.length.should eql(2)
-    
-    @person = Person.new :first_name => "Lancelot99"
-    @person.valid?.should be_false
-    
-    @person2 = Person.new :first_name => "Wayne"
-    @person2.valid?.should be_true
+  it "should return the first record for the given pk" do
+    @c[1].should be_a_kind_of(@c)
+    $sqls.last.should == "SELECT * FROM items WHERE (id = 1) LIMIT 1"
+    @c[9999].should be_a_kind_of(@c)
+    $sqls.last.should == "SELECT * FROM items WHERE (id = 9999) LIMIT 1"
   end
 
-  it "should require and include the validatable gem" do
-    Gem.loaded_specs["validatable"].should_not be_nil
-    Sequel::Model.should respond_to(:validates_format_of) # validatable gem
-    Sequel::Model.should respond_to(:validations)         # Validations module
+  it "should raise for boolean argument (mistaken comparison)" do
+    # This in order to prevent stuff like Model[:a == 'b']
+    proc {@c[:a == 1]}.should raise_error(Sequel::Error)
+    proc {@c[:a != 1]}.should raise_error(Sequel::Error)
   end
 
-  it "should allow 'longhand' validations direcly within the model." do
-    lambda {
-      class Person < Sequel::Model(:people)
-        validations.clear
-        validates_length_of :first_name, :maximum => 30
-      end
-    }.should_not raise_error
-    Person.validations.length.should eql(1)
+  it "should work correctly for custom primary key" do
+    @c.set_primary_key :name
+    @c['sharon'].should be_a_kind_of(@c)
+    $sqls.last.should == "SELECT * FROM items WHERE (name = 'sharon') LIMIT 1"
   end
 
-  it "should allow 'shorthand' validations inside validates block" do
-    proc {Person.validates {format_of :blah, :with => /\w+/}}.should_not raise_error
-    proc {Person.validates {presence_of :blah}}.should_not raise_error
-    proc {Person.validates {acceptance_of :blah}}.should_not raise_error
-    proc {Person.validates {confirmation_of :blah}}.should_not raise_error
-    proc {Person.validates {length_of :blah, :maximum => 30}}.should_not raise_error
-    proc {Person.validates {true_for :blah, :logic => lambda {true}}}.should_not raise_error
-    proc {Person.validates {numericality_of :blah}}.should_not raise_error
-    proc {Person.validates {blah_of :blah}}.should raise_error(NoMethodError)
-  end
-
-  it "should define a has_validations? method which returns true if the model has validations, false otherwise" do
-    class Person < Sequel::Model(:people)
-      validations.clear
-      validates do
-        format_of :first_name, :with => /\w+/
-        length_of :first_name, :maximum => 30
-      end
-    end
-
-    class Smurf < Person
-      validations.clear
-    end
-
-    Person.has_validations?.should be_true
-    Smurf.has_validations?.should be_false
-    
-    Person.should have_validations
-    Smurf.should_not have_validations
+  it "should work correctly for composite primary key" do
+    @c.set_primary_key [:node_id, :kind]
+    @c[3921, 201].should be_a_kind_of(@c)
+    $sqls.last.should =~ \
+    /^SELECT \* FROM items WHERE (\(node_id = 3921\) AND \(kind = 201\))|(\(kind = 201\) AND \(node_id = 3921\)) LIMIT 1$/
   end
 end
