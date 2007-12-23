@@ -1,7 +1,3 @@
-require File.join(File.dirname(__FILE__), "../spec_helper")
-
-Sequel::Model.db = MODEL_DB = MockDatabase.new
-
 module Sequel::Plugins
 
   module Timestamped

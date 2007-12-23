@@ -1,11 +1,7 @@
-require File.join(File.dirname(__FILE__), "../spec_helper")
-
-Sequel::Model.db = DB = MockDatabase.new
-
 describe "Model#save" do
   
   before(:each) do
-    DB.reset
+    MODEL_DB.reset
 
     @c = Class.new(Sequel::Model(:items)) do
       def columns
@@ -18,14 +14,14 @@ describe "Model#save" do
     o = @c.new(:x => 1)
     o.save
     
-    DB.sqls.first.should == "INSERT INTO items (x) VALUES (1)"
+    MODEL_DB.sqls.first.should == "INSERT INTO items (x) VALUES (1)"
   end
 
   it "should update a record for an existing model instance" do
     o = @c.new(:id => 3, :x => 1)
     o.save
     
-    DB.sqls.first.should =~ 
+    MODEL_DB.sqls.first.should =~ 
       /UPDATE items SET (id = 3, x = 1|x = 1, id = 3) WHERE \(id = 3\)/
   end
   
@@ -33,7 +29,7 @@ describe "Model#save" do
     o = @c.new(:id => 3, :x => 1, :y => nil)
     o.save(:y)
     
-    DB.sqls.first.should == "UPDATE items SET y = NULL WHERE (id = 3)"
+    MODEL_DB.sqls.first.should == "UPDATE items SET y = NULL WHERE (id = 3)"
   end
   
   it "should mark saved columns as not changed" do
@@ -51,7 +47,7 @@ end
 describe "Model#save_changes" do
   
   before(:each) do
-    DB.reset
+    MODEL_DB.reset
 
     @c = Class.new(Sequel::Model(:items)) do
       def columns
@@ -64,7 +60,7 @@ describe "Model#save_changes" do
     o = @c.new(:id => 3, :x => 1, :y => nil)
     o.save_changes
     
-    DB.sqls.should be_empty
+    MODEL_DB.sqls.should be_empty
   end
   
   it "should update only changed columns" do
@@ -72,18 +68,18 @@ describe "Model#save_changes" do
     o.x = 2
 
     o.save_changes
-    DB.sqls.should == ["UPDATE items SET x = 2 WHERE (id = 3)"]
+    MODEL_DB.sqls.should == ["UPDATE items SET x = 2 WHERE (id = 3)"]
     o.save_changes
     o.save_changes
-    DB.sqls.should == ["UPDATE items SET x = 2 WHERE (id = 3)"]
-    DB.reset
+    MODEL_DB.sqls.should == ["UPDATE items SET x = 2 WHERE (id = 3)"]
+    MODEL_DB.reset
 
     o.y = 4
     o.save_changes
-    DB.sqls.should == ["UPDATE items SET y = 4 WHERE (id = 3)"]
+    MODEL_DB.sqls.should == ["UPDATE items SET y = 4 WHERE (id = 3)"]
     o.save_changes
     o.save_changes
-    DB.sqls.should == ["UPDATE items SET y = 4 WHERE (id = 3)"]
+    MODEL_DB.sqls.should == ["UPDATE items SET y = 4 WHERE (id = 3)"]
   end
   
 end
@@ -91,7 +87,7 @@ end
 describe "Model#new?" do
   
   before(:each) do
-    DB.reset
+    MODEL_DB.reset
 
     @c = Class.new(Sequel::Model(:items)) do
     end
@@ -257,7 +253,7 @@ end
 describe Sequel::Model, "create_with_params" do
 
   before(:each) do
-    DB.reset
+    MODEL_DB.reset
     
     @c = Class.new(Sequel::Model(:items)) do
       def self.columns; [:x, :y]; end
@@ -266,54 +262,54 @@ describe Sequel::Model, "create_with_params" do
   
   it "should filter the given params using the model columns" do
     @c.create_with_params(:x => 1, :z => 2)
-    DB.sqls.first.should == "INSERT INTO items (x) VALUES (1)"
+    MODEL_DB.sqls.first.should == "INSERT INTO items (x) VALUES (1)"
 
-    DB.reset
+    MODEL_DB.reset
     @c.create_with_params(:y => 1, :abc => 2)
-    DB.sqls.first.should == "INSERT INTO items (y) VALUES (1)"
+    MODEL_DB.sqls.first.should == "INSERT INTO items (y) VALUES (1)"
   end
   
   it "should be aliased by create_with" do
     @c.create_with(:x => 1, :z => 2)
-    DB.sqls.first.should == "INSERT INTO items (x) VALUES (1)"
+    MODEL_DB.sqls.first.should == "INSERT INTO items (x) VALUES (1)"
 
-    DB.reset
+    MODEL_DB.reset
     @c.create_with(:y => 1, :abc => 2)
-    DB.sqls.first.should == "INSERT INTO items (y) VALUES (1)"
+    MODEL_DB.sqls.first.should == "INSERT INTO items (y) VALUES (1)"
   end
   
 end
 
-describe Sequel::Model, ".destroy" do
+describe Sequel::Model, "#destroy" do
 
   before(:each) do
+    MODEL_DB.reset
     @model = Class.new(Sequel::Model(:items))
+    @model.dataset.meta_def(:delete) {MODEL_DB.execute delete_sql}
+    
+    @instance = @model.new(:id => 1234)
     #@model.stub!(:delete).and_return(:true)
   end
 
   it "should run within a transaction" do
     @model.db.should_receive(:transaction)
-    @model.destroy
+    @instance.destroy
   end
 
-  it "should run before_destroy hooks" do
-    @model.should_receive(:run_hooks).with(:before_destroy).and_return(:true)
-    @model.destroy
+  it "should run before_destroy and after_destroy hooks" do
+    @model.before_destroy {MODEL_DB.execute('before blah')}
+    @model.after_destroy {MODEL_DB.execute('after blah')}
+    @instance.destroy
+    
+    MODEL_DB.sqls.should == [
+      "before blah",
+      "DELETE FROM items WHERE (id = 1234)",
+      "after blah"
+    ]
   end
-
-  it "should call delete" do
-    @model.should_receive(:delete).and_return(:true)
-    @model.destroy
-  end
-
-  it "should run after_destroy hooks" do
-    @model.should_receive(:run_hooks).with(:before_destroy).and_return(:true)
-    @model.destroy
-  end
-  
 end
 
-describe ".exists?" do
+describe Sequel::Model, "#exists?" do
 
   before(:each) do
     @model = Class.new(Sequel::Model(:items))

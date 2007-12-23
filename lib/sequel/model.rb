@@ -1,5 +1,4 @@
 module Sequel
-
   # == Sequel Models
   # 
   # Models in Sequel are based on the Active Record pattern described by Martin Fowler (http://www.martinfowler.com/eaaCatalog/activeRecord.html). A model class corresponds to a table or a dataset, and an instance of that class wraps a single record in the model's underlying dataset.

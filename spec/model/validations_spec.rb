@@ -1,7 +1,3 @@
-require File.join(File.dirname(__FILE__), "../spec_helper")
-
-Sequel::Model.db = MODEL_DB = MockDatabase.new
-
 describe Sequel::Model, "Validations" do
 
   before(:all) do
@@ -241,7 +237,7 @@ describe Sequel::Model, "Validations" do
     pending("finish this spec for each case")
   end
 
-  it "should define a validations? method which returns true if the model has validations, false otherwise" do
+  it "should define a has_validations? method which returns true if the model has validations, false otherwise" do
     class Person < Sequel::Model(:people)
       validations.clear
       validates do
@@ -254,8 +250,8 @@ describe Sequel::Model, "Validations" do
       validations.clear
     end
 
-    Person.validations?.should be_true
-    Smurf.validations?.should be_false
+    Person.should have_validations
+    Smurf.should_not have_validations
   end
 
 end

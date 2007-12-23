@@ -148,14 +148,6 @@ Spec::Rake::SpecTask.new("spec_all") do |t|
   t.rcov = true
 end
 
-desc "Run Model specs with coverage"
-Spec::Rake::SpecTask.new("spec_model") do |t|
-  t.spec_files = FileList["spec/model_spec.rb", "spec/model/*_spec.rb"]
-  t.rcov_opts  = File.read("spec/rcov.opts").split("\n")
-  t.spec_opts  = File.read("spec/spec.opts").split("\n")
-  t.rcov = true
-end
-
 desc "Run rcov only"
 Spec::Rake::SpecTask.new("rcov") do |t|
   t.rcov_opts  = File.read("spec/rcov.opts").split("\n")

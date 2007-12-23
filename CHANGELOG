@@ -1,5 +1,9 @@
 === SVN 
 
+* Refactored model specs.
+
+* Added Model#update as alias to #set.
+
 * Refactored validations code. Renamed Model.validations? into Model.has_validations?.
 
 * Added initial Model validations (Thanks Lance Carlson)

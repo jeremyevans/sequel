@@ -249,6 +249,7 @@ module Sequel
       this.update(values)
       values.each {|k, v| @values[k] = v}
     end
+    alias_method :update, :set
     
     # Reloads values from database and returns self.
     def refresh

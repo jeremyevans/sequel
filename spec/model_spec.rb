@@ -2,6 +2,15 @@ require File.join(File.dirname(__FILE__), "spec_helper")
 
 Sequel::Model.db = MODEL_DB = MockDatabase.new
 
+require File.join(File.dirname(__FILE__), "model/base_spec")
+require File.join(File.dirname(__FILE__), "model/caching_spec")
+require File.join(File.dirname(__FILE__), "model/hooks_spec")
+require File.join(File.dirname(__FILE__), "model/record_spec")
+require File.join(File.dirname(__FILE__), "model/schema_spec")
+require File.join(File.dirname(__FILE__), "model/relations_spec")
+require File.join(File.dirname(__FILE__), "model/plugins_spec")
+require File.join(File.dirname(__FILE__), "model/validations_spec")
+
 describe Sequel::Model do
 
   it "should have class method aliased as model" do
