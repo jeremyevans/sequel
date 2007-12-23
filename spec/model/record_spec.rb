@@ -293,18 +293,22 @@ describe Sequel::Model, ".destroy" do
 
   it "should run within a transaction" do
     @model.db.should_receive(:transaction)
+    @model.destroy
   end
 
   it "should run before_destroy hooks" do
     @model.should_receive(:run_hooks).with(:before_destroy).and_return(:true)
+    @model.destroy
   end
 
   it "should call delete" do
     @model.should_receive(:delete).and_return(:true)
+    @model.destroy
   end
 
   it "should run after_destroy hooks" do
     @model.should_receive(:run_hooks).with(:before_destroy).and_return(:true)
+    @model.destroy
   end
   
 end
