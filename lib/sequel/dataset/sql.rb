@@ -454,7 +454,8 @@ module Sequel
               "INSERT INTO #{@opts[:from]} DEFAULT VALUES"
             elsif values.keys
               fl = values.keys.map {|f| literal(f.to_sym)}
-              vl = transform_save(values.values).map {|v| literal(v)}
+              vl = @transform ? transform_save(values.values) : values.values
+              vl.map! {|v| literal(v)}
               "INSERT INTO #{@opts[:from]} (#{fl.join(COMMA_SEPARATOR)}) VALUES (#{vl.join(COMMA_SEPARATOR)})"
             else
               "INSERT INTO #{@opts[:from]} VALUES (#{literal(values)})"

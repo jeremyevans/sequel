@@ -1,5 +1,7 @@
 === SVN 
 
+* Refactored validations code. Renamed Model.validations? into Model.has_validations?.
+
 * Added initial Model validations (Thanks Lance Carlson)
 
 * Added Database#set_column_default method (thanks Jim Morris.)

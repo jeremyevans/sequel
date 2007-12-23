@@ -1,5 +1,4 @@
 module Sequel
-  
   class Model
     # Returns the database associated with the Model class.
     def self.db

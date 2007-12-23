@@ -1638,18 +1638,18 @@ describe Sequel::Model, "Validations" do
     Person.validations.length.should eql(1)
   end
 
-  it "should define a 'shorthand' method for (almost) every 'longhand' method" do
-    Person.should respond_to(:format_of)
-    Person.should respond_to(:presence_of)
-    Person.should respond_to(:acceptance_of)
-    Person.should respond_to(:confirmation_of)
-    Person.should respond_to(:length_of)
-    Person.should respond_to(:true_for)
-    Person.should respond_to(:numericality_of)
-    Person.should respond_to(:format_of)
+  it "should allow 'shorthand' validations inside validates block" do
+    proc {Person.validates {format_of :blah, :with => /\w+/}}.should_not raise_error
+    proc {Person.validates {presence_of :blah}}.should_not raise_error
+    proc {Person.validates {acceptance_of :blah}}.should_not raise_error
+    proc {Person.validates {confirmation_of :blah}}.should_not raise_error
+    proc {Person.validates {length_of :blah, :maximum => 30}}.should_not raise_error
+    proc {Person.validates {true_for :blah, :logic => lambda {true}}}.should_not raise_error
+    proc {Person.validates {numericality_of :blah}}.should_not raise_error
+    proc {Person.validates {blah_of :blah}}.should raise_error(NoMethodError)
   end
 
-  it "should define a validations? method which returns true if the model has validations, false otherwise" do
+  it "should define a has_validations? method which returns true if the model has validations, false otherwise" do
     class Person < Sequel::Model(:people)
       validations.clear
       validates do
@@ -1662,7 +1662,10 @@ describe Sequel::Model, "Validations" do
       validations.clear
     end
 
-    Person.validations?.should be_true
-    Smurf.validations?.should be_false
+    Person.has_validations?.should be_true
+    Smurf.has_validations?.should be_false
+    
+    Person.should have_validations
+    Smurf.should_not have_validations
   end
 end
