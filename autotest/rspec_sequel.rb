@@ -22,9 +22,9 @@ class Autotest::RspecSequel < Autotest
       end,
       %r%^lib/sequel/model/(.*)\.rb$% => kernel.proc do |_, m| 
         [
-          "spec/#{m[1]}_spec.rb", 
-          "spec/sequel/#{m[1]}_spec.rb",
-          "spec/sequel/#{m[1]}_mixin_spec.rb"
+          "spec/model/#{m[1]}_spec.rb"#, 
+          #"spec/sequel/#{m[1]}_spec.rb",
+          #"spec/sequel/#{m[1]}_mixin_spec.rb"
         ] 
       end,
       %r%^lib/sequel\.rb$% => kernel.proc {  files_matching %r%^spec/.*_spec\.rb$% },

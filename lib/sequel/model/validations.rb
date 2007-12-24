@@ -108,9 +108,10 @@ module Sequel
         validations.length > 0 ? true : false
       end
     rescue LoadError
-      STDERR.puts "Install the validatable gem in order to use Sequel Model validations"
-      STDERR.puts "If you would like model validations to work, install the validatable gem."
-      STDERR.puts "  (required for using the merb_helpers gem for example)"
+      STDERR.puts <<-MESSAGE
+      Install the validatable gem in order to use Sequel Model validations
+      If you would like model validations to work, install the validatable gem
+      MESSAGE
     end
   end
 end

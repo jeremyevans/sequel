@@ -359,6 +359,19 @@ describe Sequel::Model, ".destroy_all" do
     @c.destroy_all
     MODEL_DB.sqls.should == ["DELETE FROM items"]
   end
+  
+  it "should call dataset destroy method if *_destroy hooks exist" do
+    @c.dataset.stub!(:destroy).and_return(true)
+    @c.should_receive(:has_hooks?).with(:before_destroy).and_return(true)
+    @c.destroy_all
+  end
+  
+  it "should call dataset delete method if no hooks are present" do
+    @c.dataset.stub!(:delete).and_return(true)
+    @c.should_receive(:has_hooks?).with(:before_destroy).and_return(false)
+    @c.should_receive(:has_hooks?).with(:after_destroy).and_return(false)
+    @c.destroy_all
+  end
 
 end
 

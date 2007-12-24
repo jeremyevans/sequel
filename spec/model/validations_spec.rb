@@ -206,7 +206,13 @@ describe Sequel::Model, "Validations" do
     Sequel::Model.should respond_to(:validates_format_of) # validatable gem
     Sequel::Model.should respond_to(:validations)         # Validations module
   end
-
+  
+  it "should description" do
+    Sequel::Model.should_receive(:require).with("validatable").and_raise(LoadError)
+    STDERR.should_receive(:puts)
+    load File.join(File.dirname(__FILE__), "../../lib/sequel/model/validations.rb")
+  end
+  
   it "should allow 'longhand' validations direcly within the model." do
     lambda {
       class Person < Sequel::Model(:people)

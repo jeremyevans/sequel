@@ -14,6 +14,11 @@ module Sequel::Plugins
     module ClassMethods
       def deff; timestamped_opts; end
     end
+
+    # ??
+    # module DatasetMethods
+    #   def ghi; timestamped_opts; end
+    # end
   end
 
 end
