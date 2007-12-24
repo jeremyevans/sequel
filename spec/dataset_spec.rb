@@ -2379,4 +2379,9 @@ context "Dataset#update_sql" do
   specify "should accept hash with string keys" do
     @ds.update_sql('c' => 'd').should == "UPDATE items SET c = 'd'"
   end
+
+  specify "should accept array subscript references" do
+    @ds.update_sql((:day|1) => 'd').should == "UPDATE items SET day[1] = 'd'"
+  end
+
 end

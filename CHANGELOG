@@ -1,5 +1,7 @@
 === SVN 
 
+* Fixed update_sql with array sub-item keys (#110).
+
 * Refactored model specs.
 
 * Added Model#update as alias to #set.

@@ -42,6 +42,7 @@ task :package => [:clean]
 
 spec = Gem::Specification.new do |s|
   s.name = NAME
+  s.rubyforge_project = NAME
   s.version = VERS
   s.platform = Gem::Platform::RUBY
   s.has_rdoc = true
