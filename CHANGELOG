@@ -1,5 +1,7 @@
 === SVN 
 
+* Added rdoc for new alter_table functionality (#109).
+
 * Fixed update_sql with array sub-item keys (#110).
 
 * Refactored model specs.

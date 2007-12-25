@@ -71,7 +71,7 @@ module Sequel
     #
     # You may determine whether the model has validates via:
     #
-    #   validations? # will return true / false based on existence of validations on the model.
+    #   has_validations? # will return true / false based on existence of validations on the model.
     #
     # You may also retrieve the validations block if needed:
     #
