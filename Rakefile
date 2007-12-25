@@ -105,15 +105,14 @@ end
 ##############################################################################
 task :release => [:package] do
   sh %{rubyforge login}
-  sh %{rubyforge add_release sequel sequel #{VERS} pkg/sequel-#{VERS}.tgz}
-  sh %{rubyforge add_file sequel sequel #{VERS} pkg/sequel-#{VERS}.gem}
-  sh %{rubyforge add_file sequel sequel #{VERS} pkg/sequel-#{VERS}-x86-mswin32-60.gem}
+  sh %{rubyforge add_release sequel #{NAME} #{VERS} pkg/#{NAME}-#{VERS}.tgz}
+  sh %{rubyforge add_file sequel #{NAME} #{VERS} pkg/#{NAME}-#{VERS}.gem}
 end
 
 desc "Update docs and upload to rubyforge.org"
 task :doc_rforge do
   sh %{rake doc}
-  sh %{scp -r doc/rdoc/* ciconia@rubyforge.org:/var/www/gforge-projects/sequel}
+  sh %{scp -r doc/rdoc/* ciconia@rubyforge.org:/var/www/gforge-projects/#{NAME}}
 end
 
 ##############################################################################
