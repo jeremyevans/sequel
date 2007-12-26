@@ -1,0 +1,187 @@
+= Sequel Orderable Plugin
+
+Allows for model instances to be part of an ordered list,
+based on a 'position' field in the database.
+
+== Basic Usage
+
+Load the plugin into the model:
+
+  is :orderable
+
+Given:
+
+class Item < Sequel::Model(:items)
+  set_schema do
+    primary_key :id
+    varchar :name
+    int :position
+  end
+  is :orderable, :field => :position
+end
+
+item = Item[1]
+
+The plugin provides access to the previous and next item in the list
+
+  item.next
+  item.prev
+
+And methods to change the position of an item (and update affected items accordingly)
+
+  item.move_to(new_position)
+  item.move_to_top
+  item.move_to_bottom
+  item.move_up
+  item.move_down
+
+== Scoping
+
+You can scope the position field by another field.
+
+For example, to allow each user to have their own a distinct orderable list:
+
+class UserItem < Sequel::Model(:items)
+  set_schema do
+    primary_key :id
+    varchar :name
+    int :user_id
+    int :pos
+  end
+  is :orderable, :field => :pos, :scope => :user_id
+end
+
+All the defined methods will operate within the 'user_id' field's scope.
+
+== Examples
+
+# Input: irb
+require "sequel"
+
+DB = Sequel.sqlite
+class Item < Sequel::Model(:items)
+  set_schema do
+    primary_key :id
+    varchar :name
+    int :position
+  end
+  is :orderable, :field => :position
+end
+
+Item.create_table!
+Item.create :name => "alice",   :position => 2
+Item.create :name => "bob",     :position => 1
+Item.create :name => "charlie", :position => 4
+Item.create :name => "darwin",  :position => 3
+
+Item.print
+
+Item[:name => "alice"].move_down
+Item.print
+Item[:name => "darwin"].move_to_top
+Item.print
+Item[:name => "alice"].next
+Item.print
+Item[:name => "bob"].prev
+Item.print
+Item[:name => "darwin"].move_to(3)
+Item.print
+Item[:name => "bob"].move_to_bottom
+Item.print
+
+
+# Output
+>> Item.print
++--+-------+--------+
+|id|name   |position|
++--+-------+--------+
+| 2|bob    |       1|
+| 1|alice  |       2|
+| 4|darwin |       3|
+| 3|charlie|       4|
++--+-------+--------+
+=> nil
+
+>> Item[:name => "alice"].move_down
+=> {:position=>3}
+
+>> Item.print
++--+-------+--------+
+|id|name   |position|
++--+-------+--------+
+| 2|bob    |       1|
+| 4|darwin |       2|
+| 1|alice  |       3|
+| 3|charlie|       4|
++--+-------+--------+
+=> nil
+
+>> Item[:name => "darwin"].move_to_top
+=> {:position=>1}
+
+>> Item.print
++--+-------+--------+
+|id|name   |position|
++--+-------+--------+
+| 4|darwin |       1|
+| 2|bob    |       2|
+| 1|alice  |       3|
+| 3|charlie|       4|
++--+-------+--------+
+=> nil
+
+>> Item[:name => "alice"].next
+=> #<Item:0x119dbc8 @values={:position=>4, :name=>"charlie", :id=>3}, newfalse
+
+>> Item.print
++--+-------+--------+
+|id|name   |position|
++--+-------+--------+
+| 4|darwin |       1|
+| 2|bob    |       2|
+| 1|alice  |       3|
+| 3|charlie|       4|
++--+-------+--------+
+=> nil
+
+>> Item[:name => "bob"].prev
+=> #<Item:0x1184bb4 @values={:position=>1, :name=>"darwin", :id=>4}, newfalse
+
+>> Item.print
++--+-------+--------+
+|id|name   |position|
++--+-------+--------+
+| 4|darwin |       1|
+| 2|bob    |       2|
+| 1|alice  |       3|
+| 3|charlie|       4|
++--+-------+--------+
+=> nil
+
+>> Item[:name => "darwin"].move_to(3)
+=> {:position=>3}
+
+>> Item.print
++--+-------+--------+
+|id|name   |position|
++--+-------+--------+
+| 2|bob    |       1|
+| 1|alice  |       2|
+| 4|darwin |       3|
+| 3|charlie|       4|
++--+-------+--------+
+=> nil
+
+>> Item[:name => "bob"].move_to_bottom
+=> {:position=>4}
+
+>> Item.print
++--+-------+--------+
+|id|name   |position|
++--+-------+--------+
+| 1|alice  |       1|
+| 4|darwin |       2|
+| 3|charlie|       3|
+| 2|bob    |       4|
++--+-------+--------+
+=> nil

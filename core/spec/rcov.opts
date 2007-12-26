@@ -1,0 +1,4 @@
+--exclude
+gems
+--exclude
+spec

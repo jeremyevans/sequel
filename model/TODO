@@ -1,0 +1,22 @@
+# block form of Model.new:
+
+  MyModel.new do |model
+    model.field = value
+    model.save
+  end
+
+# Smarter one_to_one: stuff like:
+
+  # assuming the Author's primary key is :name
+  post = Post.create(:name => 'The Lover', :author => Author['A.B. Yehoshua'])
+  post.set(:author => Author['A.B. Yehoshua'])
+  
+  Book.filter_by_author(Author[:name => 'Kurt Vonnegut']).print
+
+  #and also
+  post = Post.create(:name => 'The Lover', :author => 'A.B. Yehoshua') #=> fetches the author record
+  post.set(:author => 'A.B. Yehoshua')
+
+* adapter specs for Model
+
+* many_to_many smart relationships.

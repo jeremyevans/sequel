@@ -9,11 +9,11 @@ include FileUtils
 # Configuration
 ##############################################################################
 NAME = "sequel"
-VERS = "0.4.5"
+VERS = "0.5"
 CLEAN.include ["**/.*.sw?", "pkg/*", ".config", "doc/*", "coverage/*"]
 RDOC_OPTS = [
   "--quiet", 
-  "--title", "Sequel: Concise ORM for Ruby",
+  "--title", "Sequel: Database access for Ruby",
   "--opname", "index.html",
   "--line-numbers", 
   "--main", "README",
@@ -29,7 +29,7 @@ Rake::RDocTask.new do |rdoc|
   rdoc.rdoc_dir = "doc/rdoc"
   rdoc.options += RDOC_OPTS
   rdoc.main = "README"
-  rdoc.title = "Sequel: Lightweight ORM library for Ruby"
+  rdoc.title = "Sequel: Database access for Ruby"
   rdoc.rdoc_files.add ["README", "COPYING", "lib/sequel.rb", "lib/**/*.rb"]
 end
 
@@ -49,7 +49,7 @@ spec = Gem::Specification.new do |s|
   s.extra_rdoc_files = ["README", "CHANGELOG", "COPYING"]
   s.rdoc_options += RDOC_OPTS + 
     ["--exclude", "^(examples|extras)\/", "--exclude", "lib/sequel.rb"]
-  s.summary = "Lightweight ORM library for Ruby"
+  s.summary = "Database access for Ruby"
   s.description = s.summary
   s.author = "Sharon Rosner"
   s.email = "ciconia@gmail.com"
@@ -57,9 +57,6 @@ spec = Gem::Specification.new do |s|
   s.executables = ["sequel"]
   s.required_ruby_version = ">= 1.8.4"
 
-  # Instead of requiring this, how about we simply use it if it's available
-  # by rescuing LoadError where we require it in model/validations.rb?
-  # s.add_dependency("validatable")
   case RUBY_PLATFORM
   when /mswin/
     s.platform = Gem::Platform::CURRENT

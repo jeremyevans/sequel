@@ -1,0 +1,3 @@
+=== 0.1 (2007-12-26)
+
+* Moved model code from sequel into separate model sub-project.

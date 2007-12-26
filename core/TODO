@@ -1,0 +1,19 @@
+* Database introspection. schema extraction and database dumping and copying.
+
+* Add Dataset#update_or_create:
+
+  DB[:items].filter(:name => 'abc').update_or_create(:price => 100)
+  
+  # equivalent to:
+  
+  if (DB[:items].filter(:name => 'abc').update(:price => 100) < 1)
+    DB[:items] << {:name => 'abc', :price => 100}
+
+  MySQL also supports a REPLACE INTO syntax which does the same:
+
+    REPLACE INTO items SET price = 100 WHERE name = 'abc'
+
+* Adapters: 
+
+  frontbase, interbase (http://ruby-dbi.rubyforge.org/)
+  openbase (http://ruby-openbase.rubyforge.org)
