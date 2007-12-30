@@ -104,12 +104,6 @@ task :release => [:package] do
   sh %{rubyforge add_file sequel #{NAME} #{VERS} pkg/#{NAME}-#{VERS}.gem}
 end
 
-desc "Update docs and upload to rubyforge.org"
-task :doc_rforge do
-  sh %{rake doc}
-  sh %{scp -r doc/rdoc/* ciconia@rubyforge.org:/var/www/gforge-projects/#{NAME}}
-end
-
 ##############################################################################
 # specs
 ##############################################################################
