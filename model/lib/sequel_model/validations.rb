@@ -1,3 +1,5 @@
+require 'validatable'
+
 module Sequel
   class Model
     # =Basic Sequel Validations
@@ -96,22 +98,16 @@ module Sequel
         end
       end
     end
-    
-    begin
-      require "validatable"
-      include ::Validatable
-      def self.validates(&block)
-        Validations::Generator.new(self, &block)
-      end
-      # return true if there are validations stored, false otherwise
-      def self.has_validations?
-        validations.length > 0 ? true : false
-      end
-    rescue LoadError
-      STDERR.puts <<-MESSAGE
-      Install the validatable gem in order to use Sequel Model validations
-      If you would like model validations to work, install the validatable gem
-      MESSAGE
+
+    include ::Validatable
+
+    def self.validates(&block)
+      Validations::Generator.new(self, &block)
+    end
+
+    # return true if there are validations stored, false otherwise
+    def self.has_validations?
+      validations.length > 0 ? true : false
     end
   end
 end
