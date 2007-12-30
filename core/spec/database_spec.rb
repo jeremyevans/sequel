@@ -545,15 +545,15 @@ end
 
 context "An unknown database scheme" do
   specify "should raise an error in Sequel::Database.connect" do
-    proc {Sequel::Database.connect('ddd://localhost/db')}.should raise_error(LoadError)
+    proc {Sequel::Database.connect('ddd://localhost/db')}.should raise_error(Sequel::Error::AdapterNotFound)
   end
 
   specify "should raise an error in Sequel.connect" do
-    proc {Sequel.connect('ddd://localhost/db')}.should raise_error(LoadError)
+    proc {Sequel.connect('ddd://localhost/db')}.should raise_error(Sequel::Error::AdapterNotFound)
   end
 
   specify "should raise an error in Sequel.open" do
-    proc {Sequel.open('ddd://localhost/db')}.should raise_error(LoadError)
+    proc {Sequel.open('ddd://localhost/db')}.should raise_error(Sequel::Error::AdapterNotFound)
   end
 end
 

@@ -371,13 +371,23 @@ module Sequel
     end
     
     def self.adapter_class(scheme)
-      scheme = scheme.to_s =~ /\-/ ? scheme.to_s.gsub('-', '_').to_sym : scheme.to_sym
-      unless c = @@adapters[scheme.to_sym]
-        require File.join(File.dirname(__FILE__), "adapters/#{scheme}")
-        c = @@adapters[scheme.to_sym]
+      adapter_name = scheme.to_s =~ /\-/ ? scheme.to_s.gsub('-', '_').to_sym : scheme.to_sym
+      scheme = scheme.to_sym
+      
+      if (klass = @@adapters[scheme]).nil?
+        # attempt to load the adapter file
+        begin
+          require File.join(File.dirname(__FILE__), "adapters/#{scheme}")
+        rescue LoadError => e
+          raise Error::AdapterNotFound, "Could not load #{scheme} adapter:\n  #{e.message}"
+        end
+        
+        # make sure we actually loaded the adapter
+        if (klass = @@adapters[scheme]).nil?
+          raise Error::AdapterNotFound, "Could not load #{scheme} adapter"
+        end
       end
-      raise Error::InvalidDatabaseScheme, "Invalid database scheme" unless c
-      c
+      return klass
     end
         
     # call-seq:

@@ -5,8 +5,6 @@ module Sequel
     # Rollback is a special error used to rollback a transactions.
     # A transaction block will catch this error and wont pass further up the stack.
     class Rollback < Error ; end
-
-    class InvalidDatabaseScheme < Error; end
     
     # Represents an invalid value stored in the database.
     class InvalidValue < Error ; end
@@ -26,7 +24,9 @@ module Sequel
     class InvalidJoinType < Error ; end
                                        
     class WorkerStop < RuntimeError ; end
-
+    
+    # Raised when Sequel is unable to load a specified adapter.
+    class AdapterNotFound < Error ; end
   end  
 end
 
