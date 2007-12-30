@@ -109,7 +109,7 @@ describe Sequel::Model, "Validations" do
     @person.valid?.should be_true
   end
   
-  it "should allow for :with_exactly => /[a-zA-Z/, which wraps the supplied regex with ^<regex>$" do
+  it "should allow for :with_exactly => /[a-zA-Z]/, which wraps the supplied regex with ^<regex>$" do
     pending("TODO: Add this option to Validatable#validates_format_of")
   end
 
@@ -208,13 +208,7 @@ describe Sequel::Model, "Validations" do
     Sequel::Model.should respond_to(:validates_format_of) # validatable gem
     Sequel::Model.should respond_to(:validations)         # Validations module
   end
-  
-  it "should description" do
-    Sequel::Model.should_receive(:require).with("validatable").and_raise(LoadError)
-    STDERR.should_receive(:puts)
-    load File.join(File.dirname(__FILE__), "../lib/sequel_model/validations.rb")
-  end
-  
+    
   it "should allow 'longhand' validations direcly within the model." do
     lambda {
       class Person < Sequel::Model(:people)
@@ -275,20 +269,8 @@ describe Sequel::Model, "validates" do
     end
   end
   
-  it "should runs the validations block on the model & store as :default when only a validations block is passed in" do
-    pending
-  end
-
-  it "should store the block under the name passed in when both a name and a validations block are passed in" do
-    pending
-  end
-
-  it "should return the stored validations block corresponding to the name given, if only a name is given (no block)" do
-    pending
-  end
-
-  it "should return true or false based on if validations exist on the model if no arguments are given" do
-    pending
-  end
-
+  it "should runs the validations block on the model & store as :default when only a validations block is passed in"
+  it "should store the block under the name passed in when both a name and a validations block are passed in"
+  it "should return the stored validations block corresponding to the name given, if only a name is given (no block)"
+  it "should return true or false based on if validations exist on the model if no arguments are given"
 end
