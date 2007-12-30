@@ -60,12 +60,17 @@ spec = Gem::Specification.new do |s|
   case RUBY_PLATFORM
   when /mswin/
     s.platform = Gem::Platform::CURRENT
+    s.add_dependency("RubyInline", ">= 3.6.6")
+    s.add_dependency("ParseTree", ">= 2.1.1")
+    s.add_dependency("ruby2ruby")
   when /java/
     s.platform = "jruby"
   else
     s.platform = Gem::Platform::RUBY
     s.add_dependency("metaid")
-    s.add_dependency("ParseTree", ">= 2.0.0")
+    # ParseTree on win32 requires PT2.1.1 and RI3.6.6
+    s.add_dependency("RubyInline", ">= 3.6.6")
+    s.add_dependency("ParseTree", ">= 2.1.1")
     s.add_dependency("ruby2ruby")
   end
   
