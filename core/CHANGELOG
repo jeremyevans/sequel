@@ -1,4 +1,8 @@
-=== 0.5 (2007-12-26)
+=== SVN
+
+* Fixed behavior of error trap in sequel command line tool.
+
+=== 0.5 (2007-12-30)
 
 * Removed model code into separate sub-project. Rearranged trunk into core, model and model_plugins.
 

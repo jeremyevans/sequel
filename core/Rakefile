@@ -57,6 +57,8 @@ spec = Gem::Specification.new do |s|
   s.executables = ["sequel"]
   s.required_ruby_version = ">= 1.8.4"
 
+  s.add_dependency("metaid")
+
   case RUBY_PLATFORM
   when /mswin/
     s.platform = Gem::Platform::CURRENT
@@ -67,7 +69,6 @@ spec = Gem::Specification.new do |s|
     s.platform = "jruby"
   else
     s.platform = Gem::Platform::RUBY
-    s.add_dependency("metaid")
     # ParseTree on win32 requires PT2.1.1 and RI3.6.6
     s.add_dependency("RubyInline", ">= 3.6.6")
     s.add_dependency("ParseTree", ">= 2.1.1")
@@ -100,6 +101,11 @@ end
 
 task :uninstall => [:clean] do
   sh %{sudo gem uninstall #{NAME}}
+end
+
+task :tag do
+  cwd = FileUtils.pwd
+  sh %{cd ../.. && svn copy #{cwd} tags/#{NAME}-#{VERS} && svn commit -m "#{NAME}-#{VERS} tag." tags}
 end
 
 ##############################################################################

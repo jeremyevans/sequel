@@ -24,7 +24,7 @@ end
 begin
   DB = Sequel.connect db
 rescue LoadError => e
-  puts "Failed to load #{scheme} adapter: #{e.message}"
+  puts "Failed to load adapter: #{e.message}"
   exit
 rescue => e
   puts e.message
