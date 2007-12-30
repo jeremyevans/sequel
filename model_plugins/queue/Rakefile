@@ -61,11 +61,8 @@ spec = Gem::Specification.new do |s|
   # change this to the plugin name, if the plugin has command line portion
   #s.executables = ["sequel"]
 
-  s.add_dependency("sequel")
-  #s.add_dependency("sequel", ">= 0.4.1")
+  s.add_dependency("sequel_model")
   
-  #s.required_ruby_version = ">= 1.8.4" # Sequel should take care of this :)
-
   s.files = %w(COPYING README Rakefile) + Dir.glob("{bin,doc,spec,lib}/**/*")
   
   s.require_path = "lib"
