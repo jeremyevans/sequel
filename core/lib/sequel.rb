@@ -45,7 +45,7 @@ module Sequel #:nodoc:
           opts = args[1].merge(:database => args[0])
         end
       rescue
-        raise Error, "Unknown adapter (#{m})"
+        raise Error::AdapterNotFound, "Unknown adapter (#{m})"
       end
       c.new(opts)
     end

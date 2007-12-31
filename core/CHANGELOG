@@ -1,6 +1,8 @@
-=== SVN
+=== 0.5.0.1 (2007-12-31)
 
 * Added a stub for Sequel::Model that auto-loads sequel_model.
+
+* Changed Sequel.method_missing and Database.adapter_class to raise AdapterNotFound if an adapter could not be loaded.
 
 * Fixed behavior of error trap in sequel command line tool.
 
