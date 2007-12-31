@@ -95,6 +95,11 @@ task :uninstall => [:clean] do
   sh %{sudo gem uninstall #{NAME}}
 end
 
+task :tag do
+  cwd = FileUtils.pwd
+  sh %{cd ../.. && svn copy #{cwd} tags/#{NAME}-#{VERS} && svn commit -m "#{NAME}-#{VERS} tag." tags}
+end
+
 ##############################################################################
 # gem and rdoc release
 ##############################################################################

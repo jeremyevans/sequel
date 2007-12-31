@@ -47,6 +47,10 @@ task :uninstall => [:clean] do
   sh_with_each_project "rake uninstall"
 end
 
+task :tag do
+  sh_with_each_project "rake tag"
+end
+
 ##############################################################################
 # rspec
 ##############################################################################

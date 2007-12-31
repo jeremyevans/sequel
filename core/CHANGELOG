@@ -1,5 +1,7 @@
 === SVN
 
+* Added a stub for Sequel::Model that auto-loads sequel_model.
+
 * Fixed behavior of error trap in sequel command line tool.
 
 === 0.5 (2007-12-30)
