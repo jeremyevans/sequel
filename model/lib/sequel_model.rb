@@ -108,7 +108,7 @@ module Sequel
   #       set(:created_at => Time.now)
   #     end
   # 
-  #     after_destroy
+  #     after_destroy do
   #       author.update_post_count
   #     end
   #   end
