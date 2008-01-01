@@ -534,11 +534,146 @@ context "Sequel.use_array_tuples" do
     @ds.set_model(Hash)
   end
   
+  specify "should work correctly with dataset with transforms" do
+    @ds.first.should == {:a => 1, :b => 2, :c => 3}
+    Sequel.use_array_tuples
+    
+    @ds.transform(:a => [proc {|x| x + 10}, proc {|x| x - 10}])
+    a = @ds.first
+    a.class.should == Array
+    a[:a].should == 11
+    a[:b].should == 2
+    a[:c].should == 3
+    a[:d].should == nil
+
+    a = @ds.all[0]
+    a.class.should == Array
+    a[:a].should == 11
+    a[:b].should == 2
+    a[:c].should == 3
+    a[:d].should == nil
+  end
+  
+  specify "should work correctly with dataset with model" do
+    ccc = Class.new do
+      attr_reader :values
+      def initialize(v)
+        @values = v
+      end
+    end
+    
+    @ds.first.should == {:a => 1, :b => 2, :c => 3}
+    Sequel.use_array_tuples
+    
+    @ds.set_model(ccc)
+    a = @ds.first
+    a.class.should == ccc
+    a.values.class.should == Array
+    a.values[:a].should == 1
+    a.values[:b].should == 2
+    a.values[:c].should == 3
+    a.values[:d].should == nil
+
+    a = @ds.all[0]
+    a.class.should == ccc
+    a.values.class.should == Array
+    a.values[:a].should == 1
+    a.values[:b].should == 2
+    a.values[:c].should == 3
+    a.values[:d].should == nil
+    
+    @ds.each(:naked => true) do |a|
+      a.class.should == Array
+      a[:a].should == 1
+      a[:b].should == 2
+      a[:c].should == 3
+      a[:d].should == nil
+    end
+  end
+  
+  specify "should work correctly with dataset with model and transform" do
+    ccc = Class.new do
+      attr_reader :values
+      def initialize(v)
+        @values = v
+      end
+    end
+    
+    @ds.first.should == {:a => 1, :b => 2, :c => 3}
+    Sequel.use_array_tuples
+    
+    @ds.transform(:a => [proc {|x| x + 10}, proc {|x| x - 10}])
+    @ds.set_model(ccc)
+    a = @ds.first
+    a.class.should == ccc
+    a.values.class.should == Array
+    a.values[:a].should == 11
+    a.values[:b].should == 2
+    a.values[:c].should == 3
+    a.values[:d].should == nil
+
+    a = @ds.all[0]
+    a.class.should == ccc
+    a.values.class.should == Array
+    a.values[:a].should == 11
+    a.values[:b].should == 2
+    a.values[:c].should == 3
+    a.values[:d].should == nil
+
+    @ds.each(:naked => true) do |a|
+      a.class.should == Array
+      a[:a].should == 11
+      a[:b].should == 2
+      a[:c].should == 3
+      a[:d].should == nil
+    end
+  end
+  
+  specify "should work correctly with denuded dataset" do
+    ccc = Class.new do
+      attr_reader :values
+      def initialize(v)
+        @values = v
+      end
+    end
+    
+    @ds.first.should == {:a => 1, :b => 2, :c => 3}
+    Sequel.use_array_tuples
+    
+    @ds.set_model(ccc)
+    @ds.set_model(nil)
+
+    a = @ds.first
+    a.class.should == Array
+    a[:a].should == 1
+    a[:b].should == 2
+    a[:c].should == 3
+    a[:d].should == nil
+    
+    a = @ds.all[0]
+    a.class.should == Array
+    a[:a].should == 1
+    a[:b].should == 2
+    a[:c].should == 3
+    a[:d].should == nil
+  end
+  
   specify "should be reversible using Sequel.use_hash_tuples" do
     Sequel.use_array_tuples
     @ds.first.class.should == Array
     
     Sequel.use_hash_tuples
     @ds.first.should == {:a => 1, :b => 2, :c => 3}
+  end
+  
+  specify "should apply and unapply correctly to dataset with array_tuples_fetch_rows" do
+    @c.class_def(:fetch_rows) {'yo hash'}
+    @c.class_def(:array_tuples_fetch_rows) {'yo array'}
+    Sequel.use_array_tuples
+    
+    @ds.fetch_rows.should == 'yo array'
+    
+    Sequel.use_hash_tuples
+    @ds.fetch_rows.should == 'yo hash'
   end
 end

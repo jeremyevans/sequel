@@ -8,13 +8,6 @@ context "Enumerable#send_each" do
   end
 end
 
-context "String#to_time" do
-  specify "should convert the string into a Time object" do
-    "2007-07-11".to_time.should == Time.parse("2007-07-11")
-    "06:30".to_time.should == Time.parse("06:30")
-  end
-end
-
 context "Range#interval" do
   specify "should return the interval between the beginning and end of the range" do
     (1..10).interval.should == 9

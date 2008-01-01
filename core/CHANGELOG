@@ -1,3 +1,9 @@
+=== 0.5.0.2 (2007-01-01)
+
+* Fixed String#to_time to raise error correctly for invalid time stamps.
+
+* Improved code coverage - now at 99.2%.
+
 === 0.5.0.1 (2007-12-31)
 
 * Added a stub for Sequel::Model that auto-loads sequel_model.

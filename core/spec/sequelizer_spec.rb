@@ -327,6 +327,11 @@ context "Proc#to_sql" do
     proc {:units * :price}.to_sql.should == "(units * price)"
   end
   
+  specify "should support | operator" do
+    proc {(:x | 1) > 0}.to_sql.should == "(x[1] > 0)"
+    proc {10 | 1}.to_sql.should == 11
+  end
+  
   specify "should support globals" do
     $aaaa_zzzz = 400
     proc {:x > $aaaa_zzzz}.to_sql.should == "(x > 400)"

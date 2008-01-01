@@ -288,3 +288,14 @@ context "Symbol" do
   end
 end
 
+context "String#to_time" do
+  specify "should convert the string into a Time object" do
+    "2007-07-11".to_time.should == Time.parse("2007-07-11")
+    "06:30".to_time.should == Time.parse("06:30")
+  end
+  
+  specify "should raise Error::InvalidValue for an invalid time" do
+    proc {'0000-00-00'.to_time}.should raise_error(Sequel::Error::InvalidValue)
+  end
+end
+

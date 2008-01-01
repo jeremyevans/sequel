@@ -557,6 +557,20 @@ context "An unknown database scheme" do
   end
 end
 
+context "A broken adapter (lib is there but the class is not)" do
+  setup do
+    FileUtils.touch('lib/sequel/adapters/blah.rb')
+  end
+  
+  teardown do
+    FileUtils.rm('lib/sequel/adapters/blah.rb')
+  end
+  
+  specify "should raise an error" do
+    proc {Sequel.connect('blah://blow')}.should raise_error(Sequel::Error::AdapterNotFound)
+  end
+end
+
 context "Database#uri_to_options" do
   specify "should convert a URI to an options hash" do
     h = Sequel::Database.uri_to_options(URI.parse('ttt://uuu:ppp@192.168.60.1:1234/blah'))
@@ -785,4 +799,13 @@ context "Database#drop_view" do
   end
 end
 
-
+# TODO: beaf this up with specs for all supported ops
+context "Database#alter_table_sql" do
+  setup do
+    @db = DummyDatabase.new
+  end
+  
+  specify "should raise error for an invalid op" do
+    proc {@db.alter_table_sql(:mau, :op => :blah)}.should raise_error(Sequel::Error)
+  end
+end

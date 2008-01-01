@@ -1,14 +1,5 @@
 require File.join(File.dirname(__FILE__), 'spec_helper')
 
-class SchemaDummyDatabase < Sequel::Database
-  attr_reader :sqls
-  
-  def execute(sql)
-    @sqls ||= []
-    @sqls << sql
-  end
-end
-
 context "DB#create_table" do
   setup do
     @db = SchemaDummyDatabase.new
@@ -237,4 +228,3 @@ context "DB#drop_table" do
     @db.sqls.should == ['DROP TABLE cats']
   end
 end
-

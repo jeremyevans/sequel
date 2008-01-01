@@ -140,9 +140,6 @@ class Sequel::Dataset
         r = eval_expr(e[3][1], b, opts)
         if l.is_one_of?(Symbol, Sequel::SQL::Subscript)
           l|r
-        elsif l.is_one_of?(Symbol, Sequel::LiteralString, Sequel::SQL::Expression) || \
-          r.is_one_of?(Symbol, Sequel::LiteralString, Sequel::SQL::Expression)
-          "(#{literal(l)} #{op} #{literal(r)})".lit
         else
           ext_expr(e, b, opts)
         end

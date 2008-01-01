@@ -72,57 +72,57 @@ module Sequel
       end
       
       def add_column(name, type, opts = {})
-        @operations << {
-          :op => :add_column,
-          :name => name,
-          :type => type
+        @operations << { \
+          :op => :add_column, \
+          :name => name, \
+          :type => type \
         }.merge(opts)
       end
       
       def drop_column(name)
-        @operations << {
-          :op => :drop_column,
-          :name => name
+        @operations << { \
+          :op => :drop_column, \
+          :name => name \
         }
       end
       
       def rename_column(name, new_name, opts = {})
-        @operations << {
-          :op => :rename_column,
-          :name => name,
-          :new_name => new_name
+        @operations << { \
+          :op => :rename_column, \
+          :name => name, \
+          :new_name => new_name \
         }.merge(opts)
       end
       
       def set_column_type(name, type)
-        @operations << {
-          :op => :set_column_type,
-          :name => name,
-          :type => type
+        @operations << { \
+          :op => :set_column_type, \
+          :name => name, \
+          :type => type \
         }
       end
       
       def set_column_default(name, default)
-        @operations << {
-          :op => :set_column_default,
-          :name => name,
-          :default => default
+        @operations << { \
+          :op => :set_column_default, \
+          :name => name, \
+          :default => default \
         }
       end
       
       def add_index(columns, opts = {})
         columns = [columns] unless columns.is_a?(Array)
-        @operations << {
-          :op => :add_index,
-          :columns => columns
+        @operations << { \
+          :op => :add_index, \
+          :columns => columns \
         }.merge(opts)
       end
       
       def drop_index(columns)
         columns = [columns] unless columns.is_a?(Array)
-        @operations << {
-          :op => :drop_index,
-          :columns => columns
+        @operations << { \
+          :op => :drop_index, \
+          :columns => columns \
         }
       end
     end

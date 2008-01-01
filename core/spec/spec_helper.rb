@@ -32,3 +32,13 @@ class MockDatabase < Sequel::Database
   
   def dataset; MockDataset.new(self); end
 end
+
+class SchemaDummyDatabase < Sequel::Database
+  attr_reader :sqls
+  
+  def execute(sql)
+    @sqls ||= []
+    @sqls << sql
+  end
+end
+

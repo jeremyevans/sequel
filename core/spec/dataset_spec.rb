@@ -1,13 +1,5 @@
 require File.join(File.dirname(__FILE__), "spec_helper")
 
-SQLITE_DB = Sequel("sqlite:/")
-SQLITE_DB.create_table :items do
-  integer :id, :primary_key => true, :auto_increment => true
-  text    :name
-  float   :value
-end
-SQLITE_DB.create_table(:time) {timestamp :t}
-
 context "Dataset" do
   setup do
     @dataset = Sequel::Dataset.new("db")
@@ -1425,10 +1417,6 @@ context "Dataset#single_record" do
     
     @d = @c.new(nil).from(:test)
     @e = @cc.new(nil).from(:test)
-
-    @d_empty = SQLITE_DB[:items]
-    @d_empty.delete # remove all records
-    
   end
   
   specify "should call each and return the first record" do
@@ -1440,7 +1428,7 @@ context "Dataset#single_record" do
   end
   
   specify "should return nil if no record is present" do
-    @d_empty.single_record.should be_nil
+    @e.single_record.should be_nil
   end
 end
 
@@ -1451,9 +1439,12 @@ context "Dataset#single_value" do
         yield({1 => sql})
       end
     end
+    @cc = Class.new(@c) do
+      def fetch_rows(sql); end
+    end
+    
     @d = @c.new(nil).from(:test)
-    @d_empty = SQLITE_DB[:items]
-    @d_empty.delete # remove all records
+    @e = @cc.new(nil).from(:test)
   end
   
   specify "should call each and return the first value of the first record" do
@@ -1465,7 +1456,7 @@ context "Dataset#single_value" do
   end
   
   specify "should return nil" do
-    @d_empty.single_value.should be_nil
+    @e.single_value.should be_nil
   end
 
 end
@@ -1741,11 +1732,15 @@ context "Dataset#destroy" do
     @d.set_model(@m)
   end
   
-  specify "should destroy raise for every model in the dataset" do
+  specify "should call destroy for every model instance in the dataset" do
     count = @d.destroy
     count.should == 2
     DESTROYED.should == MODELS
-  end 
+  end
+  
+  specify "should raise error if no models are associated with the dataset" do
+    proc {@d.naked.destroy}.should raise_error(Sequel::Error)
+  end
 end
 
 context "Dataset#<<" do

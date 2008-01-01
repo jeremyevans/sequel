@@ -58,3 +58,29 @@ describe Sequel::Schema::Generator do
     @indexes[1][:columns].should include(:body)
   end
 end
+
+describe Sequel::Schema::AlterTableGenerator do
+  before :all do
+    @generator = Sequel::Schema::AlterTableGenerator.new(SchemaDummyDatabase.new) do
+      add_column :aaa, :text
+      drop_column :bbb
+      rename_column :ccc, :ho
+      set_column_type :ddd, :float
+      set_column_default :eee, 1
+      add_index [:fff, :ggg]
+      drop_index :hhh
+    end
+  end
+  
+  specify "should generate operation records" do
+    @generator.operations.should == [
+      {:op => :add_column, :name => :aaa, :type => :text},
+      {:op => :drop_column, :name => :bbb},
+      {:op => :rename_column, :name => :ccc, :new_name => :ho},
+      {:op => :set_column_type, :name => :ddd, :type => :float},
+      {:op => :set_column_default, :name => :eee, :default => 1},
+      {:op => :add_index, :columns => [:fff, :ggg]},
+      {:op => :drop_index, :columns => [:hhh]}
+    ]
+  end
+end
