@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 
 require 'rubygems'
-require 'sequel'
+require 'sequel_core'
 
 usage = <<END
 Usage: sequel <connection URI>

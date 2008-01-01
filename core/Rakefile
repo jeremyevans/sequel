@@ -8,8 +8,8 @@ include FileUtils
 ##############################################################################
 # Configuration
 ##############################################################################
-NAME = "sequel"
-VERS = "0.5.0.2"
+NAME = "sequel_core"
+VERS = "1.0"
 CLEAN.include ["**/.*.sw?", "pkg/*", ".config", "doc/*", "coverage/*"]
 RDOC_OPTS = [
   "--quiet", 
@@ -42,7 +42,7 @@ task :package => [:clean]
 
 spec = Gem::Specification.new do |s|
   s.name = NAME
-  s.rubyforge_project = NAME
+  s.rubyforge_project = 'sequel'
   s.version = VERS
   s.platform = Gem::Platform::RUBY
   s.has_rdoc = true

@@ -1,5 +1,7 @@
 === SVN
 
+* Changed name to sequel_core.
+
 * 100% code coverage.
 
 * Fixed error behavior when sequel_model is not available.

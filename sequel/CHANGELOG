@@ -1,0 +1,3 @@
+=== SVN
+
+* Created sequel wrapper gem. Bundles sequel_core and sequel_model as dependencies.

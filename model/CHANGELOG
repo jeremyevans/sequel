@@ -1,5 +1,7 @@
 === SVN
 
+* Changed dependency to sequel_core.
+
 * Removed examples from sequel core.
 
 * Additional specs. We're now at 100% coverage.

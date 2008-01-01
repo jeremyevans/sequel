@@ -1,5 +1,5 @@
 require 'rubygems'
-require File.join(File.dirname(__FILE__), "../lib/sequel") 
+require File.join(File.dirname(__FILE__), "../lib/sequel_core") 
 
 class MockDataset < Sequel::Dataset
   def insert(*args)

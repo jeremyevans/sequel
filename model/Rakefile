@@ -9,7 +9,7 @@ include FileUtils
 # Configuration
 ##############################################################################
 NAME = "sequel_model"
-VERS = "0.1"
+VERS = "0.2"
 CLEAN.include ["**/.*.sw?", "pkg/*", ".config", "doc/*", "coverage/*"]
 RDOC_OPTS = [
   "--quiet", 
@@ -42,7 +42,7 @@ task :package => [:clean]
 
 spec = Gem::Specification.new do |s|
   s.name = NAME
-  s.rubyforge_project = NAME
+  s.rubyforge_project = 'sequel'
   s.version = VERS
   s.platform = Gem::Platform::RUBY
   s.has_rdoc = true
@@ -65,7 +65,7 @@ spec = Gem::Specification.new do |s|
     s.platform = Gem::Platform::RUBY
   end
 
-  s.add_dependency("sequel", '>= 0.5')
+  s.add_dependency("sequel_core", '>= 0.5')
   s.add_dependency("validatable")
   
   s.files = %w(COPYING README Rakefile) + Dir.glob("{doc,spec,lib}/**/*")

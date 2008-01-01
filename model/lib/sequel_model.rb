@@ -1,5 +1,7 @@
-gem 'sequel', '>= 0.5'
-require 'sequel'
+unless Object.const_defined?('Sequel')
+  gem 'sequel_core', '>= 0.5'
+  require 'sequel_core'
+end
 
 module Sequel
   # == Sequel Models
