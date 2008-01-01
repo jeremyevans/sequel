@@ -5,7 +5,9 @@ module Sequel
     # This is only needed if you want to use the create_table or drop_table
     # methods.
     def self.set_schema(name = nil, &block)
-      name ? set_dataset(db[name]) : name = table_name
+      if name
+        set_dataset(db[name])
+      end
       @schema = Schema::Generator.new(db, &block)
       if @schema.primary_key_name
         set_primary_key @schema.primary_key_name

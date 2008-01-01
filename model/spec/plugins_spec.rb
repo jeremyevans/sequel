@@ -6,6 +6,8 @@ module Sequel::Plugins
     def self.apply(m, opts)
       m.class_def(:get_stamp) {@values[:stamp]}
       m.meta_def(:stamp_opts) {opts}
+      puts "opts: #{opts.inspect}"
+      puts "stamp_opts: #{m.stamp_opts.inspect}"
       m.before_save {@values[:stamp] = Time.now}
     end
     
@@ -17,10 +19,9 @@ module Sequel::Plugins
       def deff; timestamped_opts; end
     end
 
-    # ??
-    # module DatasetMethods
-    #   def ghi; timestamped_opts; end
-    # end
+    module DatasetMethods
+      def ghi; timestamped_opts; end
+    end
   end
 
 end
@@ -39,6 +40,7 @@ describe Sequel::Model, "using a plugin" do
     c = nil
     proc do
       c = Class.new(Sequel::Model) do
+        set_dataset MODEL_DB[:items]
         is :timestamped, :a => 1, :b => 2
       end
     end.should_not raise_error(LoadError)
@@ -46,6 +48,7 @@ describe Sequel::Model, "using a plugin" do
     c.should respond_to(:stamp_opts)
     c.stamp_opts.should == {:a => 1, :b => 2}
     
+    # instance methods
     m = c.new
     m.should respond_to(:get_stamp)
     m.should respond_to(:abc)
@@ -54,8 +57,20 @@ describe Sequel::Model, "using a plugin" do
     m[:stamp] = t
     m.get_stamp.should == t
     
+    # class methods
     c.should respond_to(:deff)
     c.deff.should == {:a => 1, :b => 2}
+    
+    # dataset methods
+    c.dataset.should respond_to(:ghi)
+    c.dataset.ghi.should == {:a => 1, :b => 2}
   end
   
+  it "should fail to apply if the plugin has DatasetMethod and the model has no datset" do
+    proc do
+      Class.new(Sequel::Model) do
+        is :timestamped, :a => 1, :b => 2
+      end
+    end.should raise_error(Sequel::Error)
+  end
 end

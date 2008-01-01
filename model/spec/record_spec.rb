@@ -217,7 +217,6 @@ describe Sequel::Model, "with this" do
 end
 
 describe "Model#pk" do
-  
   before(:each) do
     @m = Class.new(Sequel::Model)
   end
@@ -248,7 +247,23 @@ describe "Model#pk" do
     m = @m.new(:id => 111, :x => 2, :y => 3)
     proc {m.pk}.should raise_error(Sequel::Error)
   end
+end
+
+describe "Model#pkey" do # deprecated
+  before(:each) do
+    @m = Class.new(Sequel::Model)
+  end
   
+  it "should by default return the value of the :id column" do
+    m = @m.new(:id => 111, :x => 2, :y => 3)
+    m.pkey.should == 111
+  end
+
+  it "should be return the primary key value for custom primary key" do
+    @m.set_primary_key :x
+    m = @m.new(:id => 111, :x => 2, :y => 3)
+    m.pkey.should == 2
+  end
 end
 
 describe "Model#pk_hash" do
@@ -345,18 +360,70 @@ describe Sequel::Model, "#destroy" do
 end
 
 describe Sequel::Model, "#exists?" do
-
   before(:each) do
     @model = Class.new(Sequel::Model(:items))
-    @model_a = @model.new
+    @m = @model.new
   end
 
-  it "should returns true when current instance exists" do
-    @model_a.exists?.should be_true
+  it "should returns true when #this.count > 0" do
+    @m.this.meta_def(:count) {1}
+    @m.exists?.should be_true
   end
 
-  it "should return false when the current instance does not exist" do
-    pending("how would this be false?")
+  it "should return false when #this.count == 0" do
+    @m.this.meta_def(:count) {0}
+    @m.exists?.should be_false
   end
-
 end
+
+describe Sequel::Model, "#each" do
+  setup do
+    @model = Class.new(Sequel::Model(:items))
+    @m = @model.new(:a => 1, :b => 2, :id => 4444)
+  end
+  
+  specify "should iterate over the values" do
+    h = {}
+    @m.each {|k, v| h[k] = v}
+    h.should == {:a => 1, :b => 2, :id => 4444}
+  end
+end
+
+describe Sequel::Model, "#keys" do
+  setup do
+    @model = Class.new(Sequel::Model(:items))
+    @m = @model.new(:a => 1, :b => 2, :id => 4444)
+  end
+  
+  specify "should return the value keys" do
+    @m.keys.size.should == 3
+    @m.keys.should include(:a, :b, :id)
+    
+    @m = @model.new()
+    @m.keys.should == []
+  end
+end
+
+describe Sequel::Model, "#===" do
+  specify "should compare instances by values" do
+    a = Sequel::Model.new(:id => 1, :x => 3)
+    b = Sequel::Model.new(:id => 1, :x => 4)
+    c = Sequel::Model.new(:id => 1, :x => 3)
+    
+    a.should_not == b
+    a.should == c
+    b.should_not == c
+  end
+end
+
+describe Sequel::Model, "#===" do
+  specify "should compare instances by pk only" do
+    a = Sequel::Model.new(:id => 1, :x => 3)
+    b = Sequel::Model.new(:id => 1, :x => 4)
+    c = Sequel::Model.new(:id => 2, :x => 3)
+    
+    a.should === b
+    a.should_not === c
+  end
+end
+

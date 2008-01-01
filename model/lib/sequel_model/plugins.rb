@@ -19,6 +19,9 @@ module Sequel
           metaclass.send(:include, m::ClassMethods)
         end
         if m.const_defined?("DatasetMethods")
+          unless @dataset
+            raise Sequel::Error, "Plugin cannot be applied because the model class has no dataset"
+          end
           dataset.meta_def(:"#{plugin}_opts") {args.first}
           dataset.metaclass.send(:include, m::DatasetMethods)
         end

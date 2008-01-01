@@ -38,6 +38,16 @@ describe Sequel::Model, "one_to_one" do
     $sqls.should == ["SELECT * FROM nodes WHERE (id = 234) LIMIT 1"]
   end
 
+  it "should accept deprecated class option" do
+    @c2.one_to_one :parent, :class => MODEL_DB[:xyz]
+
+    d = @c2.new(:id => 1, :parent_id => 789)
+    p = d.parent
+    p.class.should == Hash
+
+    MODEL_DB.sqls.should == ["SELECT * FROM xyz WHERE (id = 789) LIMIT 1"]
+  end
+
   it "should use explicit key if given" do
     @c2.one_to_one :parent, :from => @c2, :key => :blah
 
@@ -119,6 +129,24 @@ describe Sequel::Model, "one_to_many" do
     a = n.attributes
     a.should be_a_kind_of(Sequel::Dataset)
     a.sql.should == 'SELECT * FROM attributes WHERE (node_id = 1234)'
+  end
+  
+  it "should accept deprecated class option" do
+    @c2.one_to_many :attributes, :class => MODEL_DB[:xyz], :key => :node_id
+
+    n = @c2.new(:id => 1234)
+    a = n.attributes
+    a.should be_a_kind_of(Sequel::Dataset)
+    a.sql.should == 'SELECT * FROM xyz WHERE (node_id = 1234)'
+  end
+
+  it "should accept deprecated on option" do
+    @c2.one_to_many :attributes, :from => MODEL_DB[:xyz], :on => :node_id
+
+    n = @c2.new(:id => 1234)
+    a = n.attributes
+    a.should be_a_kind_of(Sequel::Dataset)
+    a.sql.should == 'SELECT * FROM xyz WHERE (node_id = 1234)'
   end
 
   it "should support plain dataset in the from option" do

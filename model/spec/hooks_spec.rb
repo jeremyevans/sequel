@@ -244,3 +244,26 @@ describe "Model#before_destroy && Model#after_destroy" do
     ]
   end
 end
+
+describe "Model#has_hooks?" do
+  setup do
+    @c = Class.new(Sequel::Model)
+  end
+  
+  specify "should return false if no hooks are defined" do
+    @c.has_hooks?(:before_save).should be_false
+  end
+  
+  specify "should return true if hooks are defined" do
+    @c.before_save {'blah'}
+    @c.has_hooks?(:before_save).should be_true
+  end
+  
+  specify "should return true if hooks are inherited" do
+    @d = Class.new(@c)
+    @d.has_hooks?(:before_save).should be_false
+    
+    @c.before_save :blah
+    @d.has_hooks?(:before_save).should be_true
+  end
+end

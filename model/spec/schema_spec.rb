@@ -19,16 +19,18 @@ describe Sequel::Model, "create_table" do
 
   before(:each) do
     MODEL_DB.reset
-    @model = Class.new(Sequel::Model(:items))
+    @model = Class.new(Sequel::Model) do
+      set_dataset MODEL_DB[:items]
+      set_schema do
+        text :name
+        float :price, :null => false
+      end
+    end
   end
 
   it "should get the create table SQL list from the db and execute it line by line" do
-    #db.create_table_sql_list(table_name, *schema.create_info).each {|s| db << s} 
-    @model.should_receive(:table_name).and_return(:items)
-    @model.schema.should_receive(:create_info)
-    @model.db.should_receive(:create_table_sql_list)
-    pending("Finish specing this")
     @model.create_table
+    MODEL_DB.sqls.should == ['CREATE TABLE items (name text, price float NOT NULL)']
   end
 
 end

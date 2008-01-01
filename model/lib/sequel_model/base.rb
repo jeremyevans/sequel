@@ -19,8 +19,8 @@ module Sequel
 
     # Returns the dataset associated with the Model class.
     def self.dataset
-      @dataset || super_dataset or
-      raise Error, "No dataset associated with #{self}"
+      (@dataset ||= super_dataset) ||
+        (raise Error, "No dataset associated with #{self}")
     end
     
     def self.super_dataset # :nodoc:
