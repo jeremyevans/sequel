@@ -1,3 +1,11 @@
+=== SVN
+
+* 100% code coverage.
+
+* Fixed error behavior when sequel_model is not available.
+
+* Fixed error behavior when parse_tree or ruby2ruby are not available.
+
 === 0.5.0.2 (2007-01-01)
 
 * Fixed String#to_time to raise error correctly for invalid time stamps.

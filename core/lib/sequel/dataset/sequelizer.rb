@@ -337,7 +337,7 @@ begin
   require 'parse_tree'
 rescue Exception
   module Sequel::Dataset::Sequelizer
-    def proc_to_sql(proc)
+    def proc_to_sql(*args)
       raise Sequel::Error, "You must have the ParseTree gem installed in order to use block filters."
     end
   end
@@ -347,7 +347,7 @@ begin
   require 'ruby2ruby'
 rescue Exception
   module Sequel::Dataset::Sequelizer
-    def ext_expr(e)
+    def ext_expr(*args)
       raise Sequel::Error, "You must have the Ruby2Ruby gem installed in order to use this block filter."
     end
   end

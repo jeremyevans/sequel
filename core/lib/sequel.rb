@@ -53,13 +53,9 @@ module Sequel #:nodoc:
     # stub for Sequel::Model()
     def Model(*args)
       require 'sequel_model'
-      if respond_to?(:Model)
-        send(:Model, *args)
-      else
-        raise LoadError
-      end
+      send(:Model, *args)
     rescue LoadError
-      raise SequelError, "The sequel_model library could not be found. In order to use Sequel models please install sequel_model."
+      raise Error, "The sequel_model library could not be found. In order to use Sequel models please install sequel_model."
     end
   end
 end

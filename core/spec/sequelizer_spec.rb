@@ -1,5 +1,64 @@
 require File.join(File.dirname(__FILE__), 'spec_helper')
 
+context "Sequelizer without ParseTree" do
+  setup do
+    module Kernel
+      alias_method :orig_sq_require, :require
+      def require(*args); raise LoadError; end
+    end
+    old_verbose = $VERBOSE
+    $VERBOSE = nil
+    load('lib/sequel/dataset/sequelizer.rb')
+    $VERBOSE = old_verbose
+    @db = Sequel::Database.new
+    @ds = @db[:items]
+  end
+  
+  teardown do
+    module Kernel
+      alias_method :require, :orig_sq_require
+    end
+    old_verbose = $VERBOSE
+    $VERBOSE = nil
+    load('lib/sequel/dataset/sequelizer.rb')
+    $VERBOSE = old_verbose
+  end
+  
+  specify "should raise error when converting proc to SQL" do
+    proc {@ds.proc_to_sql(proc {:x > 1})}.should raise_error(Sequel::Error)
+  end
+end
+
+context "Sequelizer without Ruby2Ruby" do
+  setup do
+    module Kernel
+      alias_method :orig_sq_require, :require
+      def require(name); raise LoadError if name == 'ruby2ruby'; end
+    end
+    old_verbose = $VERBOSE
+    $VERBOSE = nil
+    load('lib/sequel/dataset/sequelizer.rb')
+    $VERBOSE = old_verbose
+    @db = Sequel::Database.new
+    @ds = @db[:items]
+  end
+  
+  teardown do
+    module Kernel
+      alias_method :require, :orig_sq_require
+    end
+    old_verbose = $VERBOSE
+    $VERBOSE = nil
+    load('lib/sequel/dataset/sequelizer.rb')
+    $VERBOSE = old_verbose
+  end
+  
+  specify "should raise error only when using external expressions" do
+    proc {@ds.proc_to_sql(proc {:x > 1})}.should_not raise_error(Sequel::Error)
+    proc {@ds.proc_to_sql(proc {1 + 1})}.should raise_error(Sequel::Error)
+  end
+end
+
 context "Proc#to_sql" do
   DB = Sequel::Database.new
   DS = DB[:items]
