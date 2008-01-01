@@ -192,6 +192,7 @@ module Sequel
       end
       
       block[self] if block
+      after_initialize
     end
     
     # Returns true if the current instance represents a new record.
@@ -208,9 +209,9 @@ module Sequel
     # Creates or updates the associated record. This method can also
     # accept a list of specific columns to update.
     def save(*columns)
-      run_hooks(:before_save)
+      before_save
       if @new
-        run_hooks(:before_create)
+        before_create
         iid = model.dataset.insert(@values)
         # if we have a regular primary key and it's not set in @values,
         # we assume it's the last inserted id
@@ -222,9 +223,9 @@ module Sequel
           refresh
         end
         @new = false
-        run_hooks(:after_create)
+        after_create
       else
-        run_hooks(:before_update)
+        before_update
         if columns.empty?
           this.update(@values)
           @changed_columns = []
@@ -232,9 +233,9 @@ module Sequel
           this.update(@values.reject {|k, v| !columns.include?(k)})
           @changed_columns.reject! {|c| columns.include?(c)}
         end
-        run_hooks(:after_update)
+        after_update
       end
-      run_hooks(:after_save)
+      after_save
       self
     end
     
@@ -260,9 +261,9 @@ module Sequel
     # Like delete but runs hooks before and after delete.
     def destroy
       db.transaction do
-        run_hooks(:before_destroy)
+        before_destroy
         delete
-        run_hooks(:after_destroy)
+        after_destroy
       end
     end
     

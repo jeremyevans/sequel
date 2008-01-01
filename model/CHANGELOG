@@ -1,3 +1,7 @@
+=== SVN
+
+* Refactored hooks code. Hooks are now inheritable, and can be defined by supplying a block or a method name, or by overriding the hook instance method. Hook chains can now be broken by returning false.
+
 === 0.1 (2007-12-30)
 
 * Moved model code from sequel into separate model sub-project.

@@ -1,107 +1,246 @@
 require File.join(File.dirname(__FILE__), "spec_helper")
 
-describe Sequel::Model, "hooks" do
-
+describe "Model hooks" do
   before do
     MODEL_DB.reset
-    Sequel::Model.hooks.clear
 
-    @hooks = %w[
-      before_save before_create before_update before_destroy
-      after_save after_create after_update after_destroy
-    ].select { |hook| !hook.empty? }
+    @hooks = [
+      :after_initialize,
+      :before_create,
+      :after_create,
+      :before_update,
+      :after_update,
+      :before_save,
+      :after_save,
+      :before_destroy,
+      :after_destroy
+    ]
+    
+    # @hooks.each {|h| Sequel::Model.class_def(h) {}}
   end
-
-  it "should have hooks for everything" do
-    Sequel::Model.methods.should include('hooks')
-    Sequel::Model.methods.should include(*@hooks)
-    @hooks.each do |hook|
-      Sequel::Model.hooks[hook.to_sym].should be_an_instance_of(Array)
+  
+  specify "should be definable using def <hook name>" do
+    c = Class.new(Sequel::Model) do
+      def before_save
+        "hi there"
+      end
     end
+    
+    c.new.before_save.should == 'hi there'
   end
-
-  it "should be inherited" do
-    pending 'soon'
-
-    @hooks.each do |hook|
-      Sequel::Model.send(hook.to_sym) { nil }
+  
+  specify "should be definable using a block" do
+    $adds = []
+    c = Class.new(Sequel::Model) do
+      before_save {$adds << 'hi'}
     end
-
-    model = Class.new Sequel::Model(:models)
-    model.hooks.should == Sequel::Model.hooks
+    
+    c.new.before_save
+    $adds.should == ['hi']
   end
-
-  it "should run hooks" do
-    pending 'soon'
-
-    test = mock 'Test'
-    test.should_receive(:run).exactly(@hooks.length)
-
-    @hooks.each do |hook|
-      Sequel::Model.send(hook.to_sym) { test.run }
+  
+  specify "should be definable using a method name" do
+    $adds = []
+    c = Class.new(Sequel::Model) do
+      def bye; $adds << 'bye'; end
+      before_save :bye
     end
-
-    model = Class.new Sequel::Model(:models)
-    model.hooks.should == Sequel::Model.hooks
-
-    model_instance = model.new
-    @hooks.each { |hook| model_instance.run_hooks(hook) }
+    
+    c.new.before_save
+    $adds.should == ['bye']
   end
-
-  it "should run hooks around save and create" do
-    pending 'test execution'
+  
+  specify "should be additive" do
+    $adds = []
+    c = Class.new(Sequel::Model) do
+      before_save {$adds << 'hyiyie'}
+      before_save {$adds << 'byiyie'}
+    end
+    
+    c.new.before_save
+    $adds.should == ['hyiyie', 'byiyie']
   end
-
-  it "should run hooks around save and update" do
-    pending 'test execution'
+  
+  specify "should be inheritable" do
+    # pending
+    
+    $adds = []
+    a = Class.new(Sequel::Model) do
+      before_save {$adds << '123'}
+    end
+    
+    b = Class.new(a) do
+      before_save {$adds << '456'}
+      before_save {$adds << '789'}
+    end
+    
+    b.new.before_save
+    $adds.should == ['123', '456', '789']
   end
-
-  it "should run hooks around delete" do
-    pending 'test execution'
+  
+  specify "should be overridable in descendant classes" do
+    $adds = []
+    a = Class.new(Sequel::Model) do
+      before_save {$adds << '123'}
+    end
+    
+    b = Class.new(a) do
+      def before_save; $adds << '456'; end
+    end
+    
+    a.new.before_save
+    $adds.should == ['123']
+    $adds = []
+    b.new.before_save
+    $adds.should == ['456']
   end
+  
+  specify "should stop processing if a hook returns false" do
+    $flag = true
+    $adds = []
+    
+    a = Class.new(Sequel::Model) do
+      before_save {$adds << 'blah'; $flag}
+      before_save {$adds << 'cruel'}
+    end
+    
+    a.new.before_save
+    $adds.should == ['blah', 'cruel']
 
+    # chain should not break on nil
+    $adds = []
+    $flag = nil
+    a.new.before_save
+    $adds.should == ['blah', 'cruel']
+    
+    $adds = []
+    $flag = false
+    a.new.before_save
+    $adds.should == ['blah']
+    
+    b = Class.new(a) do
+      before_save {$adds << 'mau'}
+    end
+    
+    $adds = []
+    b.new.before_save
+    $adds.should == ['blah']
+  end
 end
 
-describe "Model.after_create" do
+describe "Model#after_initialize" do
+  specify "should be called after initialization" do
+    $values1 = nil
+    
+    a = Class.new(Sequel::Model) do
+      after_initialize do
+        $values1 = @values.clone
+        raise Sequel::Error if @values[:blow]
+      end
+    end
+    
+    a.new(:x => 1, :y => 2)
+    $values1.should == {:x => 1, :y => 2}
+    
+    proc {a.new(:blow => true)}.should raise_error(Sequel::Error)
+  end
+end
 
-  before(:each) do
+describe "Model#before_create && Model#after_create" do
+  setup do
     MODEL_DB.reset
 
     @c = Class.new(Sequel::Model(:items)) do
-      def columns
-        [:id, :x, :y]
-      end
-    end
-
-    ds = @c.dataset
-    def ds.insert(*args)
-      super(*args)
-      1
+      no_primary_key
+      
+      before_create {MODEL_DB << "BLAH before"}
+      after_create {MODEL_DB << "BLAH after"}
     end
   end
-
-  it "should be called after creation" do
-    s = []
-
-    @c.after_create do
-      s = MODEL_DB.sqls.dup
-    end
-
-    n = @c.create(:x => 1)
-    MODEL_DB.sqls.should == ["INSERT INTO items (x) VALUES (1)", "SELECT * FROM items WHERE (id = 1) LIMIT 1"]
-    s.should == ["INSERT INTO items (x) VALUES (1)", "SELECT * FROM items WHERE (id = 1) LIMIT 1"]
+  
+  specify "should be called around new record creation" do
+    @c.create(:x => 2)
+    MODEL_DB.sqls.should == [
+      'BLAH before',
+      'INSERT INTO items (x) VALUES (2)',
+      'BLAH after'
+    ]
   end
-
-  it "should allow calling save in the hook" do
-    @c.after_create do
-      values.delete(:x)
-      self.id = 2
-      save
-    end
-
-    n = @c.create(:id => 1)
-    MODEL_DB.sqls.should == ["INSERT INTO items (id) VALUES (1)", "SELECT * FROM items WHERE (id = 1) LIMIT 1", "UPDATE items SET id = 2 WHERE (id = 1)"]
-  end
-
 end
 
+describe "Model#before_update && Model#after_update" do
+  setup do
+    MODEL_DB.reset
+
+    @c = Class.new(Sequel::Model(:items)) do
+      before_update {MODEL_DB << "BLAH before"}
+      after_update {MODEL_DB << "BLAH after"}
+    end
+  end
+  
+  specify "should be called around record update" do
+    m = @c.new(:id => 2233)
+    m.save
+    MODEL_DB.sqls.should == [
+      'BLAH before',
+      'UPDATE items SET id = 2233 WHERE (id = 2233)',
+      'BLAH after'
+    ]
+  end
+end
+
+describe "Model#before_save && Model#after_save" do
+  setup do
+    MODEL_DB.reset
+
+    @c = Class.new(Sequel::Model(:items)) do
+      before_save {MODEL_DB << "BLAH before"}
+      after_save {MODEL_DB << "BLAH after"}
+    end
+  end
+  
+  specify "should be called around record update" do
+    m = @c.new(:id => 2233)
+    m.save
+    MODEL_DB.sqls.should == [
+      'BLAH before',
+      'UPDATE items SET id = 2233 WHERE (id = 2233)',
+      'BLAH after'
+    ]
+  end
+  
+  specify "should be called around record creation" do
+    @c.no_primary_key
+    @c.create(:x => 2)
+    MODEL_DB.sqls.should == [
+      'BLAH before',
+      'INSERT INTO items (x) VALUES (2)',
+      'BLAH after'
+    ]
+  end
+end
+
+describe "Model#before_destroy && Model#after_destroy" do
+  setup do
+    MODEL_DB.reset
+
+    @c = Class.new(Sequel::Model(:items)) do
+      before_destroy {MODEL_DB << "BLAH before"}
+      after_destroy {MODEL_DB << "BLAH after"}
+      
+      def delete
+        MODEL_DB << "DELETE BLAH"
+      end
+    end
+  end
+  
+  specify "should be called around record update" do
+    m = @c.new(:id => 2233)
+    m.destroy
+    MODEL_DB.sqls.should == [
+      'BLAH before',
+      'DELETE BLAH',
+      'BLAH after'
+    ]
+  end
+end
