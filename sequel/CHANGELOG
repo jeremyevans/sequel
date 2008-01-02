@@ -1,3 +1,3 @@
-=== SVN
+=== 1.0 (2007-01-2)
 
 * Created sequel wrapper gem. Bundles sequel_core and sequel_model as dependencies.
