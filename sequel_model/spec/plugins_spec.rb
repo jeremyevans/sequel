@@ -6,8 +6,6 @@ module Sequel::Plugins
     def self.apply(m, opts)
       m.class_def(:get_stamp) {@values[:stamp]}
       m.meta_def(:stamp_opts) {opts}
-      puts "opts: #{opts.inspect}"
-      puts "stamp_opts: #{m.stamp_opts.inspect}"
       m.before_save {@values[:stamp] = Time.now}
     end
     

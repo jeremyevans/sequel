@@ -1703,7 +1703,7 @@ context "Dataset#destroy" do
     end
     db.extend(m)
     
-    DESTROYED = []
+    $DESTROYED = []
     
     @m = Class.new do
       def initialize(c)
@@ -1717,10 +1717,10 @@ context "Dataset#destroy" do
       end
       
       def destroy
-        DESTROYED << self
+        $DESTROYED << self
       end
     end
-    MODELS = [@m.new(12), @m.new(13)]
+    $MODELS = [@m.new(12), @m.new(13)]
 
     c = Class.new(Sequel::Dataset) do
       def fetch_rows(sql, &block)
@@ -1735,7 +1735,7 @@ context "Dataset#destroy" do
   specify "should call destroy for every model instance in the dataset" do
     count = @d.destroy
     count.should == 2
-    DESTROYED.should == MODELS
+    $DESTROYED.should == $MODELS
   end
   
   specify "should raise error if no models are associated with the dataset" do

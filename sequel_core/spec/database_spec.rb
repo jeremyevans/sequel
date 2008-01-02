@@ -559,11 +559,12 @@ end
 
 context "A broken adapter (lib is there but the class is not)" do
   setup do
-    FileUtils.touch('lib/sequel/adapters/blah.rb')
+    @fn = File.join(File.dirname(__FILE__), '../lib/sequel/adapters/blah.rb')
+    FileUtils.touch(@fn)
   end
   
   teardown do
-    FileUtils.rm('lib/sequel/adapters/blah.rb')
+    FileUtils.rm(@fn)
   end
   
   specify "should raise an error" do

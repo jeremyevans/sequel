@@ -49,14 +49,6 @@ module Sequel #:nodoc:
       end
       c.new(opts)
     end
-    
-    # stub for Sequel::Model()
-    def Model(*args)
-      require 'sequel_model'
-      send(:Model, *args)
-    rescue LoadError
-      raise Error, "The sequel_model library could not be found. In order to use Sequel models please install sequel_model."
-    end
   end
 end
 

@@ -6,7 +6,7 @@ require "fileutils"
 
 include FileUtils
 
-PROJECTS = %w{core model}
+PROJECTS = %w{sequel_core sequel_model}
 
 def with_each_project
   PROJECTS.each do |p|
@@ -54,14 +54,14 @@ end
 ##############################################################################
 # rspec
 ##############################################################################
-task :spec do
-  sh_with_each_project "rake spec"
-end
-
-task :spec_no_cov do
-  sh_with_each_project "rake spec_no_cov"
-end
-
+# task :spec do 
+#   sh_with_each_project "rake spec"
+# end
+# 
+# task :spec_no_cov do
+#   sh_with_each_project "rake spec_no_cov"
+# end
+# 
 ##############################################################################
 # rdoc
 ##############################################################################
@@ -77,11 +77,11 @@ RDOC_OPTS = [
 Rake::RDocTask.new do |rdoc|
   rdoc.rdoc_dir = "sequel/doc/rdoc"
   rdoc.options += RDOC_OPTS
-  rdoc.main = "core/README"
+  rdoc.main = "sequel/README"
   rdoc.title = "Sequel: Lightweight ORM for Ruby"
   rdoc.rdoc_files.add ["sequel/README", "sequel/COPYING", 
-    "core/lib/sequel_core.rb", "core/lib/**/*.rb",
-    "model/lib/sequel_model.rb", "model/lib/**/*.rb",
+    "sequel_core/lib/sequel_core.rb", "sequel_core/lib/**/*.rb",
+    "sequel_model/lib/sequel_model.rb", "sequel_model/lib/**/*.rb",
   ]
 end
 
@@ -90,6 +90,25 @@ task :doc_rforge => [:doc]
 desc "Update docs and upload to rubyforge.org"
 task :doc_rforge do
   # sh %{rake doc}
-  sh %{scp -r doc/rdoc/* ciconia@rubyforge.org:/var/www/gforge-projects/sequel}
+  sh %{scp -r sequel/doc/rdoc/* ciconia@rubyforge.org:/var/www/gforge-projects/sequel}
+end
+
+##############################################################################
+# specs
+##############################################################################
+require "spec/rake/spectask"
+
+desc "Run specs with coverage"
+Spec::Rake::SpecTask.new("spec") do |t|
+  t.spec_files = FileList["sequel_core/spec/*_spec.rb", "sequel_model/spec/*_spec.rb"]
+  t.spec_opts  = File.read("sequel_core/spec/spec.opts").split("\n")
+  t.rcov_opts  = File.read("sequel_core/spec/rcov.opts").split("\n")
+  t.rcov = true
+end
+
+desc "Run specs without coverage"
+Spec::Rake::SpecTask.new("spec_no_cov") do |t|
+  t.spec_files = FileList["sequel_core/spec/*_spec.rb", "sequel_model/spec/*_spec.rb"]
+  # t.spec_opts  = File.read("sequel_core/spec/spec.opts").split("\n")
 end
 
