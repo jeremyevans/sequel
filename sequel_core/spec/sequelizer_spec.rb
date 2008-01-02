@@ -8,7 +8,7 @@ context "Sequelizer without ParseTree" do
     end
     old_verbose = $VERBOSE
     $VERBOSE = nil
-    load(File.join(File.dirname(__FILE__), '../lib/sequel/dataset/sequelizer.rb'))
+    load(File.join(File.dirname(__FILE__), '../lib/sequel_core/dataset/sequelizer.rb'))
     $VERBOSE = old_verbose
     @db = Sequel::Database.new
     @ds = @db[:items]
@@ -20,7 +20,7 @@ context "Sequelizer without ParseTree" do
     end
     old_verbose = $VERBOSE
     $VERBOSE = nil
-    load(File.join(File.dirname(__FILE__), '../lib/sequel/dataset/sequelizer.rb'))
+    load(File.join(File.dirname(__FILE__), '../lib/sequel_core/dataset/sequelizer.rb'))
     $VERBOSE = old_verbose
   end
   
@@ -37,7 +37,7 @@ context "Sequelizer without Ruby2Ruby" do
     end
     old_verbose = $VERBOSE
     $VERBOSE = nil
-    load(File.join(File.dirname(__FILE__), '../lib/sequel/dataset/sequelizer.rb'))
+    load(File.join(File.dirname(__FILE__), '../lib/sequel_core/dataset/sequelizer.rb'))
     $VERBOSE = old_verbose
     @db = Sequel::Database.new
     @ds = @db[:items]
@@ -49,7 +49,7 @@ context "Sequelizer without Ruby2Ruby" do
     end
     old_verbose = $VERBOSE
     $VERBOSE = nil
-    load(File.join(File.dirname(__FILE__), '../lib/sequel/dataset/sequelizer.rb'))
+    load(File.join(File.dirname(__FILE__), '../lib/sequel_core/dataset/sequelizer.rb'))
     $VERBOSE = old_verbose
   end
   

@@ -1,5 +1,5 @@
 require 'rubygems'
-require File.join(File.dirname(__FILE__), '../lib/sequel/sqlite')
+require File.join(File.dirname(__FILE__), '../lib/sequel_core')
 
 db = Sequel.open("sqlite:/:memory:")
 db << "create table k1 (id integer primary key autoincrement, f1 text)"

@@ -1,6 +1,6 @@
 require 'rubygems'
 require 'faster_csv'
-require File.join(File.dirname(__FILE__), '../lib/sequel/sqlite')
+require File.join(File.dirname(__FILE__), '../lib/sequel_core')
 
 DB = Sequel.open 'sqlite:///test.db'
 DB.create_table :countries do

@@ -1,4 +1,4 @@
-require File.join(File.dirname(__FILE__), '../lib/sequel/array_keys')
+require File.join(File.dirname(__FILE__), '../lib/sequel_core/array_keys')
 require 'benchmark'
 
 N = 50_000

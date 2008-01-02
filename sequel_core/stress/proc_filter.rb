@@ -1,5 +1,5 @@
 require 'rubygems'
-require File.join(File.dirname(__FILE__), '../lib/sequel/sqlite')
+require File.join(File.dirname(__FILE__), '../lib/sequel_core/adapters/sqlite')
 
 DB = Sequel.sqlite
 DS = DB[:t]

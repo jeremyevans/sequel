@@ -1,7 +1,7 @@
 require 'benchmark'
 require 'rubygems'
 # require 'fastthread'
-require File.join(File.dirname(__FILE__), '../lib/sequel/postgres')
+require File.join(File.dirname(__FILE__), '../lib/sequel_core/adapters/postgres')
 
 DB = Sequel('postgres://postgres:postgres@localhost:5432/reality_development')
 

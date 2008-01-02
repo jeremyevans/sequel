@@ -14,13 +14,13 @@ class Autotest::RspecSequel < Autotest
     # since Ruby compares the REGEXP source, not the resulting pattern
     @test_mappings = {
       %r%^spec/.*_spec\.rb$% => kernel.proc { |filename, _| filename },
-      %r%^lib/sequel/(.*)\.rb$% => kernel.proc do |_, m| 
+      %r%^lib/sequel_core/(.*)\.rb$% => kernel.proc do |_, m| 
         [
           "spec/#{m[1]}_spec.rb", 
           "spec/sequel/#{m[1]}_spec.rb"
         ]
       end,
-      %r%^lib/sequel/model/(.*)\.rb$% => kernel.proc do |_, m| 
+      %r%^lib/sequel_model/(.*)\.rb$% => kernel.proc do |_, m| 
         [
           "spec/model/#{m[1]}_spec.rb"#, 
           #"spec/sequel/#{m[1]}_spec.rb",
