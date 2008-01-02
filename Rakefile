@@ -6,7 +6,7 @@ require "fileutils"
 
 include FileUtils
 
-PROJECTS = %w{sequel_core sequel_model}
+PROJECTS = %w{sequel_core sequel_model sequel}
 
 def with_each_project
   PROJECTS.each do |p|
