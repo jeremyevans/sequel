@@ -30,7 +30,7 @@ Rake::RDocTask.new do |rdoc|
   rdoc.options += RDOC_OPTS
   rdoc.main = "README"
   rdoc.title = "Sequel: Lightweight ORM for Ruby"
-  rdoc.rdoc_files.add ["README", "COPYING", "lib/sequel.rb", "lib/**/*.rb"]
+  rdoc.rdoc_files.add ["README", "COPYING", "lib/sequel_model.rb", "lib/**/*.rb"]
 end
 
 ##############################################################################
@@ -48,7 +48,7 @@ spec = Gem::Specification.new do |s|
   s.has_rdoc = true
   s.extra_rdoc_files = ["README", "CHANGELOG", "COPYING"]
   s.rdoc_options += RDOC_OPTS + 
-    ["--exclude", "^(examples|extras)\/", "--exclude", "lib/sequel.rb"]
+    ["--exclude", "^(examples|extras)\/", "--exclude", "lib/sequel_model.rb"]
   s.summary = "Lightweight ORM for Ruby"
   s.description = s.summary
   s.author = "Sharon Rosner"

@@ -70,17 +70,17 @@ RDOC_OPTS = [
   "--title", "Sequel Model: Lightweight ORM for Ruby",
   "--opname", "index.html",
   "--line-numbers", 
-  "--main", "core/README",
+  "--main", "sequel/README",
   "--inline-source"
 ]
 
 Rake::RDocTask.new do |rdoc|
-  rdoc.rdoc_dir = "doc/rdoc"
+  rdoc.rdoc_dir = "sequel/doc/rdoc"
   rdoc.options += RDOC_OPTS
   rdoc.main = "core/README"
   rdoc.title = "Sequel: Lightweight ORM for Ruby"
-  rdoc.rdoc_files.add ["core/README", "core/COPYING", 
-    "core/lib/sequel.rb", "core/lib/**/*.rb",
+  rdoc.rdoc_files.add ["sequel/README", "sequel/COPYING", 
+    "core/lib/sequel_core.rb", "core/lib/**/*.rb",
     "model/lib/sequel_model.rb", "model/lib/**/*.rb",
   ]
 end

@@ -48,7 +48,7 @@ spec = Gem::Specification.new do |s|
   s.has_rdoc = true
   s.extra_rdoc_files = ["README", "CHANGELOG", "COPYING"]
   s.rdoc_options += RDOC_OPTS + 
-    ["--exclude", "^(examples|extras)\/", "--exclude", "lib/sequel.rb"]
+    ["--exclude", "^(examples|extras)\/", "--exclude", "lib/sequel_core.rb"]
   s.summary = "Database access for Ruby"
   s.description = s.summary
   s.author = "Sharon Rosner"

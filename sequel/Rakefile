@@ -1,6 +1,7 @@
 require "rake"
 require "rake/clean"
 require "rake/gempackagetask"
+require "rake/rdoctask"
 require "fileutils"
 include FileUtils
 
@@ -10,6 +11,14 @@ include FileUtils
 NAME = "sequel"
 VERS = "1.0"
 CLEAN.include ["**/.*.sw?", "pkg/*", ".config", "doc/*", "coverage/*"]
+RDOC_OPTS = [
+  "--quiet", 
+  "--title", "Sequel: Database access for Ruby",
+  "--opname", "index.html",
+  "--line-numbers", 
+  "--main", "README",
+  "--inline-source"
+]
 
 ##############################################################################
 # Gem packaging
@@ -17,6 +26,15 @@ CLEAN.include ["**/.*.sw?", "pkg/*", ".config", "doc/*", "coverage/*"]
 desc "Packages up Sequel."
 task :default => [:package]
 task :package => [:clean]
+
+RDOC_OPTS = [
+  "--quiet", 
+  "--title", "Sequel Model: Lightweight ORM for Ruby",
+  "--opname", "index.html",
+  "--line-numbers", 
+  "--main", "README",
+  "--inline-source"
+]
 
 spec = Gem::Specification.new do |s|
   s.name = NAME
@@ -29,6 +47,9 @@ spec = Gem::Specification.new do |s|
   s.email = "ciconia@gmail.com"
   s.homepage = "http://sequel.rubyforge.org"
   s.required_ruby_version = ">= 1.8.4"
+
+  s.has_rdoc = true
+  s.extra_rdoc_files = ["README", "COPYING"]
 
   s.add_dependency("sequel_core")
   s.add_dependency("sequel_model")

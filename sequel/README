@@ -1,0 +1,81 @@
+== Sequel: Concise ORM for Ruby
+
+Sequel is an ORM framework for Ruby. Sequel provides thread safety, connection pooling, and a concise DSL for constructing queries and table schemas.
+
+Sequel makes it easy to deal with multiple records without having to break your teeth on SQL.
+
+== Resources
+
+* {Project page}[http://code.google.com/p/ruby-sequel/]
+* {Source code}[http://ruby-sequel.googlecode.com/svn/]
+* {Bug tracking}[http://code.google.com/p/ruby-sequel/issues/list]
+* {Google group}[http://groups.google.com/group/sequel-talk]
+* {RubyForge page}[http://rubyforge.org/projects/sequel/]
+
+To check out the source code:
+  
+  svn co http://ruby-sequel.googlecode.com/svn/trunk
+  
+=== Contact
+
+If you have any comments or suggestions please send an email to ciconia at gmail.com and I'll get back to you.
+
+== Installation
+
+  sudo gem install sequel
+  
+Note: as of version 0.5, Sequel models are distributed in a separate gem. In order to use sequel models, you should install the sequel_model gem:
+
+  sudo gem install sequel_model
+  
+== Supported Databases
+
+Sequel currently supports:
+
+* ADO (on Windows)
+* DBI
+* Informix
+* MySQL
+* ODBC
+* Oracle
+* PostgreSQL
+* SQLite 3
+
+There are also experimental adapters for DB2, OpenBase and JDBC (on JRuby).
+
+== The Sequel Console
+
+Sequel includes an IRB console for quick'n'dirty access to databases. You can use it like this:
+
+  sequel sqlite:///test.db
+
+You get an IRB session with the database object stored in DB.
+
+== An Introduction
+
+Sequel was designed to take the hassle away from connecting to databases and manipulating them. Sequel deals with all the boring stuff like maintaining connections, formatting SQL correctly and fetching records so you can concentrate on your application.
+
+Sequel uses the concept of datasets to retrieve data. A Dataset object encapsulates an SQL query and supports chainability, letting you fetch data using a convenient Ruby DSL that is both concise and infinitely flexible.
+
+For example, the following one-liner returns the average GDP for the five biggest countries in the middle east region:
+
+  DB[:countries].filter(:region => 'Middle East').reverse_order(:area).limit(5).avg(:GDP)
+  
+Which is equivalent to:
+
+  SELECT avg(GDP) FROM countries WHERE region = 'Middle East' ORDER BY area DESC LIMIT 5
+
+Since datasets retrieve records only when needed, they can be stored and later reused. Records are fetched as hashes (they can also be fetched as custom model objects), and are accessed using an Enumerable interface:
+
+  middle_east = DB[:countries].filter(:region => 'Middle East')
+  middle_east.order(:name).each {|r| puts r[:name]}
+  
+Sequel also offers convenience methods for extracting data from Datasets, such as an extended map method:
+
+  middle_east.map(:name) #=> ['Egypt', 'Greece', 'Israel', ...]
+  
+Or getting results as a transposed hash, with one column as key and another as value:
+
+  middle_east.to_hash(:name, :area) #=> {'Israel' => 20000, 'Greece' => 120000, ...}
+
+You can find more information on getting started with Sequel {here}[http://code.google.com/p/ruby-sequel/wiki/GettingStarted]
