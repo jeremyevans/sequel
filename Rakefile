@@ -109,6 +109,6 @@ end
 desc "Run specs without coverage"
 Spec::Rake::SpecTask.new("spec_no_cov") do |t|
   t.spec_files = FileList["sequel_core/spec/*_spec.rb", "sequel_model/spec/*_spec.rb"]
-  # t.spec_opts  = File.read("sequel_core/spec/spec.opts").split("\n")
+  t.spec_opts  = File.read("sequel_core/spec/spec.opts").split("\n")
 end
 
