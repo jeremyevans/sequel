@@ -30,7 +30,7 @@ Rake::RDocTask.new do |rdoc|
   rdoc.options += RDOC_OPTS
   rdoc.main = "README"
   rdoc.title = "Sequel: Database access for Ruby"
-  rdoc.rdoc_files.add ["README", "COPYING", "lib/sequel.rb", "lib/**/*.rb"]
+  rdoc.rdoc_files.add ["README", "COPYING", "lib/sequel_core.rb", "lib/**/*.rb"]
 end
 
 ##############################################################################
