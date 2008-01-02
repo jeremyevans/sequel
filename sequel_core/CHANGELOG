@@ -1,4 +1,8 @@
-=== SVN
+=== 1.0 (2007-01-02)
+
+* Removed deprecated adapter stubs.
+
+* Removed Sequel::Model() stub.
 
 * Changed name to sequel_core.
 
