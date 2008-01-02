@@ -249,25 +249,7 @@ describe "Model#pk" do
   end
 end
 
-describe "Model#pkey" do # deprecated
-  before(:each) do
-    @m = Class.new(Sequel::Model)
-  end
-  
-  it "should by default return the value of the :id column" do
-    m = @m.new(:id => 111, :x => 2, :y => 3)
-    m.pkey.should == 111
-  end
-
-  it "should be return the primary key value for custom primary key" do
-    @m.set_primary_key :x
-    m = @m.new(:id => 111, :x => 2, :y => 3)
-    m.pkey.should == 2
-  end
-end
-
 describe "Model#pk_hash" do
-
   before(:each) do
     @m = Class.new(Sequel::Model)
   end

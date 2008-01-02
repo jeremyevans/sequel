@@ -44,11 +44,5 @@ module Sequel
       drop_table if table_exists?
       create_table
     end
-    
-    # Deprecated, use create_table! instead.
-    def self.recreate_table
-      warn "Model.recreate_table is deprecated. Please use Model.create_table! instead."
-      create_table!
-    end
   end
 end

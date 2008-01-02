@@ -28,12 +28,6 @@ module Sequel
     #   node.producer_id #=> 1234
     #
     def self.one_to_one(name, opts)
-      # deprecation
-      if opts[:class]
-        warn "The :class option has been deprecated. Please use :from instead."
-        opts[:from] = opts[:class]
-      end
-      
       from = opts[:from]
       from || (raise Error, "No association source defined (use :from option)")
       key = opts[:key] || (name.to_s + ID_POSTFIX).to_sym
@@ -80,18 +74,6 @@ module Sequel
     #   one_to_many :books, :from => Book, :key => :author_id
     #
     def self.one_to_many(name, opts)
-      # deprecation
-      if opts[:class]
-        warn "The :class option has been deprecated. Please use :from instead."
-        opts[:from] = opts[:class]
-      end
-      # deprecation
-      if opts[:on]
-        warn "The :on option has been deprecated. Please use :key instead."
-        opts[:key] = opts[:on]
-      end
-      
-      
       from = opts[:from]
       from || (raise Error, "No association source defined (use :from option)")
       key = opts[:key] || (self.to_s + ID_POSTFIX).to_sym

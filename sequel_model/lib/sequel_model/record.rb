@@ -158,12 +158,6 @@ module Sequel
       @primary_key ||= self.class.primary_key
     end
     
-    # Returns value for primary key.
-    def pkey
-      warn "Model#pkey is deprecated. Please use Model#pk instead."
-      @pkey ||= @values[self.class.primary_key]
-    end
-    
     # Returns the primary key value identifying the model instance. Stock implementation.
     def pk
       @pk ||= @values[:id]

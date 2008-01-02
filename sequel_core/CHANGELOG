@@ -1,4 +1,4 @@
-=== 1.0 (2007-01-02)
+=== 1.0 (2008-01-02)
 
 * Removed deprecated adapter stubs.
 
@@ -12,7 +12,7 @@
 
 * Fixed error behavior when parse_tree or ruby2ruby are not available.
 
-=== 0.5.0.2 (2007-01-01)
+=== 0.5.0.2 (2008-01-01)
 
 * Fixed String#to_time to raise error correctly for invalid time stamps.
 

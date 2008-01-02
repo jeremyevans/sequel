@@ -1,4 +1,12 @@
-=== SVN
+=== 0.2 (2008-01-02)
+
+* Removed deprecated Model.recreate_table method.
+
+* Removed deprecated :class and :on options from one_to_many macro.
+
+* Removed deprecated :class option from one_to_one macro.
+
+* Removed deprecated Model#pkey method.
 
 * Changed dependency to sequel_core.
 

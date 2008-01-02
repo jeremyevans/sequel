@@ -112,3 +112,21 @@ Spec::Rake::SpecTask.new("spec_no_cov") do |t|
   t.spec_opts  = File.read("sequel_core/spec/spec.opts").split("\n")
 end
 
+##############################################################################
+# Statistics
+##############################################################################
+
+STATS_DIRECTORIES = [
+  %w(core_code   sequel_core/lib/),
+  %w(core_spec   sequel_core/spec/),
+  %w(model_code  sequel_model/lib/),
+  %w(model_spec  sequel_model/spec/)
+].collect { |name, dir| [ name, "./#{dir}" ] }.select { |name, dir| File.directory?(dir) }
+
+desc "Report code statistics (KLOCs, etc) from the application"
+task :stats do
+  require "sequel_core/extra/stats"
+  verbose = true
+  CodeStatistics.new(*STATS_DIRECTORIES).to_s
+end
+

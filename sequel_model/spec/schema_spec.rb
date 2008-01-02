@@ -67,18 +67,3 @@ describe Sequel::Model, "create_table!" do
   end
 
 end
-
-describe Sequel::Model, "recreate_table" do
-
-  before(:each) do
-    MODEL_DB.reset
-    @model = Class.new(Sequel::Model(:items))
-  end
-
-  it "should raise a depreciation warning and then call create_table!" do
-    @model.should_receive(:warn)
-    @model.should_receive(:create_table!).and_return(true)
-    @model.recreate_table
-  end
-
-end
