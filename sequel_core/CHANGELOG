@@ -1,5 +1,7 @@
 === SVN
 
+* Changed MySQL adapter to support specifying socket option.
+
 * Added support for limiting and paginating datasets with fixed SQL, gotten with DB#fetch (thanks Ruy Diaz). 
 
 * Added new Dataset#from_self method that returns a dataset selecting from the original dataset.
