@@ -56,6 +56,8 @@ module Sequel
           when Hash
             i.map {|k, v| "#{k.is_a?(Dataset) ? k.to_table_reference : k} #{v}"}.
               join(COMMA_SEPARATOR)
+          when Sequel::SQL::Expression
+            literal(i)
           else
             i
           end
@@ -561,14 +563,21 @@ module Sequel
       # If given a range, it will contain only those at offsets within that
       # range. If a second argument is given, it is used as an offset.
       def limit(l, o = nil)
+        opts = {}
         if l.is_a? Range
           lim = (l.exclude_end? ? l.last - l.first : l.last + 1 - l.first)
-          clone_merge(:limit => lim, :offset=>l.first)
+          opts = {:limit => lim, :offset=>l.first}
         elsif o
-          clone_merge(:limit => l, :offset => o)
+          opts = {:limit => l, :offset => o}
         else
-          clone_merge(:limit => l)
+          opts = {:limit => l}
         end
+        # check if fixed SQL dataset
+        if @opts[:sql]
+          opts[:sql] = nil
+          opts[:from] = ["(#{@opts[:sql]})".lit.as(:foo)]
+        end
+        clone_merge(opts)
       end
       
       STOCK_COUNT_OPTS = {:select => ["COUNT(*)".lit], :order => nil}.freeze

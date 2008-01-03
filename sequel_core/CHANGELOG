@@ -1,3 +1,9 @@
+=== SVN
+
+* Added support for limiting and paginating datasets with fixed SQL, gotten with DB#fetch (thanks Ruy Diaz). 
+
+* Added support for aliased subqueries in Dataset#from.
+
 === 1.0 (2008-01-02)
 
 * Removed deprecated adapter stubs.

@@ -627,6 +627,11 @@ context "Dataset#from" do
       "SELECT * FROM (SELECT * FROM a GROUP BY b) c"
   end
 
+  specify "should accept aliased sub queries" do
+    @dataset.from("(select * from blah)".lit.as(:bbllaahh)).sql.should ==
+      "SELECT * FROM (select * from blah) AS bbllaahh"
+  end
+
   specify "should use the relevant table name if given a simple dataset" do
     @dataset.from(@dataset.from(:a)).select_sql.should ==
       "SELECT * FROM a"
@@ -788,6 +793,12 @@ context "Dataset#limit" do
   specify "should include an offset if a second argument is given" do
     @dataset.limit(6, 10).sql.should ==
       'SELECT * FROM test LIMIT 6 OFFSET 10'
+  end
+  
+  specify "should work with fixed sql datasets" do
+    @dataset.opts[:sql] = 'select * from cccc'
+    @dataset.limit(6, 10).sql.should ==
+      'SELECT * FROM (select * from cccc) AS foo LIMIT 6 OFFSET 10'
   end
 end
 
@@ -1805,6 +1816,12 @@ context "A paginated dataset" do
     @d.paginate(3, 50).current_page_record_count.should == 50
     @d.paginate(4, 50).current_page_record_count.should == 3
     @d.paginate(5, 50).current_page_record_count.should == 0
+  end
+  
+  specify "should work with fixed sql" do
+    ds = @d.clone_merge(:sql => 'select * from blah')
+    ds.meta_def(:count) {150}
+    ds.paginate(2, 50).sql.should == 'SELECT * FROM (select * from blah) AS foo LIMIT 50 OFFSET 50'
   end
 end
 
