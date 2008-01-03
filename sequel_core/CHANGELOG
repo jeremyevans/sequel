@@ -1,4 +1,4 @@
-=== SVN
+=== 1.0.0.1 (2008-01-03)
 
 * Changed MySQL adapter to support specifying socket option.
 
