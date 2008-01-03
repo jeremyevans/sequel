@@ -595,13 +595,6 @@ module Sequel
         else
           single_value(STOCK_COUNT_OPTS).to_i
         end
-          
-        # ds = clone_merge(
-        # opts = @opts[:sql] ? \
-        #   {:sql => "SELECT COUNT(*) FROM (#{@opts[:sql]}) t1", :order => nil} : \
-        #   STOCK_COUNT_OPTS
-        #
-        # single_value(opts).to_i
       end
     end
   end
