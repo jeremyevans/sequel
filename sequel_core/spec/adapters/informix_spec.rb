@@ -1,4 +1,4 @@
-require File.join(File.dirname(__FILE__), '../../lib/sequel')
+require File.join(File.dirname(__FILE__), '../../lib/sequel_core')
 
 INFORMIX_DB = Sequel('informix://localhost/mydb')
 if INFORMIX_DB.table_exists?(:test)

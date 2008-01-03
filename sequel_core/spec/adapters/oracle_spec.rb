@@ -1,4 +1,4 @@
-require File.join(File.dirname(__FILE__), '../../lib/sequel')
+require File.join(File.dirname(__FILE__), '../../lib/sequel_core')
 
 ORACLE_DB = Sequel('oracle://hr:hr@loalhost/XE')
 if ORACLE_DB.table_exists?(:test)

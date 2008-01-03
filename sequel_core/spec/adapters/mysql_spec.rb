@@ -1,4 +1,4 @@
-require File.join(File.dirname(__FILE__), '../../lib/sequel')
+require File.join(File.dirname(__FILE__), '../../lib/sequel_core')
 require 'logger'
 
 MYSQL_DB = Sequel('mysql://root@localhost/sandbox')
@@ -328,3 +328,15 @@ context "A MySQL database" do
     ]
   end
 end  
+
+context "A MySQL database" do
+  specify "should accept a socket option" do
+    db = Sequel.mysql('sandbox', :host => 'localhost', :user => 'root', :socket => '/tmp/mysql.sock')
+    proc {db.test_connection}.should_not raise_error
+  end
+  
+  specify "should fail to connect with invalid socket" do
+    db = Sequel.mysql('sandbox', :host => 'localhost', :user => 'root', :socket => 'blah')
+    proc {db.test_connection}.should raise_error
+  end
+end

@@ -1,4 +1,4 @@
-require File.join(File.dirname(__FILE__), '../../lib/sequel')
+require File.join(File.dirname(__FILE__), '../../lib/sequel_core')
 
 SQLITE_DB = Sequel('sqlite:/')
 SQLITE_DB.create_table :items do
