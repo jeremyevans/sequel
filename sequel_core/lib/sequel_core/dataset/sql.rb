@@ -56,8 +56,6 @@ module Sequel
           when Hash
             i.map {|k, v| "#{k.is_a?(Dataset) ? k.to_table_reference : k} #{v}"}.
               join(COMMA_SEPARATOR)
-          when Sequel::SQL::Expression
-            literal(i)
           else
             i
           end
@@ -143,6 +141,15 @@ module Sequel
       # Returns a copy of the dataset with the source changed.
       def from(*source)
         clone_merge(:from => source)
+      end
+      
+      # Returns a dataset selecting from the current dataset.
+      #
+      #   ds = DB[:items].order(:name)
+      #   ds.sql #=> "SELECT * FROM items ORDER BY name"
+      #   ds.from_self #=> "SELECT * FROM (SELECT * FROM items ORDER BY name)"
+      def from_self
+        clone_merge(:sql => nil, :from => [self])
       end
 
       # Returns a copy of the dataset with the selected columns changed.
@@ -563,6 +570,10 @@ module Sequel
       # If given a range, it will contain only those at offsets within that
       # range. If a second argument is given, it is used as an offset.
       def limit(l, o = nil)
+        if @opts[:sql]
+          return from_self.limit(l, o)
+        end
+
         opts = {}
         if l.is_a? Range
           lim = (l.exclude_end? ? l.last - l.first : l.last + 1 - l.first)
@@ -572,11 +583,6 @@ module Sequel
         else
           opts = {:limit => l}
         end
-        # check if fixed SQL dataset
-        if @opts[:sql]
-          opts[:sql] = nil
-          opts[:from] = ["(#{@opts[:sql]})".lit.as(:foo)]
-        end
         clone_merge(opts)
       end
       
@@ -584,11 +590,18 @@ module Sequel
 
       # Returns the number of records in the dataset.
       def count
-        opts = @opts[:sql] ? \
-          {:sql => "SELECT COUNT(*) FROM (#{@opts[:sql]}) AS c", :order => nil} : \
-          STOCK_COUNT_OPTS
-
-        single_value(opts).to_i
+        if @opts[:sql]
+          from_self.count
+        else
+          single_value(STOCK_COUNT_OPTS).to_i
+        end
+          
+        # ds = clone_merge(
+        # opts = @opts[:sql] ? \
+        #   {:sql => "SELECT COUNT(*) FROM (#{@opts[:sql]}) t1", :order => nil} : \
+        #   STOCK_COUNT_OPTS
+        #
+        # single_value(opts).to_i
       end
     end
   end

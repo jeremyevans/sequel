@@ -2,7 +2,7 @@
 
 * Added support for limiting and paginating datasets with fixed SQL, gotten with DB#fetch (thanks Ruy Diaz). 
 
-* Added support for aliased subqueries in Dataset#from.
+* Added new Dataset#from_self method that returns a dataset selecting from the original dataset.
 
 === 1.0 (2008-01-02)
 
