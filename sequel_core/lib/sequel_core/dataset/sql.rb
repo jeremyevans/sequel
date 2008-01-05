@@ -128,7 +128,7 @@ module Sequel
         when Array
           fmt = expr.shift.gsub(QUESTION_MARK) {literal(expr.shift)}
         when Proc
-          fmt = proc_to_sql(expr)
+          fmt = expr.to_sql(self)
         else
           # if the expression is compound, it should be parenthesized in order for 
           # things to be predictable (when using #or and #and.)
@@ -501,7 +501,7 @@ module Sequel
         
         sql = "UPDATE #{@opts[:from]} SET "
         if block
-          sql << proc_to_sql(block, :comma_separated => true)
+          sql << block.to_sql(self, :comma_separated => true)
         else
           # check if array with keys
           values = values.to_hash if values.is_a?(Array) && values.keys

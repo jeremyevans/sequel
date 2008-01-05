@@ -251,8 +251,8 @@ class Sequel::Dataset
         eval("$#{e[1]}", b)
       when :lvar # local context
         if e[1] == :block
-          pr = eval(e[1].to_s, b)
-          "#{proc_to_sql(pr)}"
+          sub_proc = eval(e[1].to_s, b)
+          sub_proc.to_sql(self)
         else
           eval(e[1].to_s, b)
         end
@@ -324,20 +324,20 @@ class Sequel::Dataset
         end
       end
     end
+  end
+end
 
-    # Translates a Ruby block into an SQL expression.
-    def proc_to_sql(proc, opts = {})
-      c = Class.new {define_method(:m, &proc)}
-      pt_expr(ParseTree.translate(c, :m)[2][2], proc.binding, opts)
-    end
+class Proc
+  def to_sql(dataset, opts = {})
+    dataset.pt_expr(to_sexp[2], self.binding, opts)
   end
 end
 
 begin
   require 'parse_tree'
 rescue Exception
-  module Sequel::Dataset::Sequelizer
-    def proc_to_sql(*args)
+  class Proc
+    def to_sql(*args)
       raise Sequel::Error, "You must have the ParseTree gem installed in order to use block filters."
     end
   end
@@ -349,6 +349,17 @@ rescue Exception
   module Sequel::Dataset::Sequelizer
     def ext_expr(*args)
       raise Sequel::Error, "You must have the Ruby2Ruby gem installed in order to use this block filter."
+    end
+  end
+end
+
+class Proc
+  # replacement for Proc#to_sexp, if it's not available
+  unless instance_methods.include?('to_sexp')
+    def to_sexp
+      block = self
+      c = Class.new {define_method(:m, &block)}
+      ParseTree.translate(c, :m)[2]
     end
   end
 end

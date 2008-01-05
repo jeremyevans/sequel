@@ -1,5 +1,7 @@
 === SVN
 
+* Refactored Sequelizer to use Proc#to_sexp (method provided by r2r).
+
 * Enhanced Database.connect to accept options with string keys, so it can now accept options loaded from YAML files. Database.connect also automatically converts :username option into :user for compatibility with existing YAML configuration files for AR and DataMapper.
 
 === 1.0.0.1 (2008-01-03)
