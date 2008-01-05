@@ -810,3 +810,29 @@ context "Database#alter_table_sql" do
     proc {@db.alter_table_sql(:mau, :op => :blah)}.should raise_error(Sequel::Error)
   end
 end
+
+context "Database.connect" do
+  EEE_YAML = "development:\r\n  adapter: eee\r\n  username: mau\r\n  password: tau\r\n  host: alfonso\r\n  database: mydb\r\n"
+  
+  setup do
+    class EEE < Sequel::Database
+      set_adapter_scheme :eee
+    end
+    
+    @fn = File.join(File.dirname(__FILE__), 'eee.yaml')
+    File.open(@fn, 'w') {|f| f << EEE_YAML}
+  end
+  
+  teardown do
+    FileUtils.rm(@fn)
+  end
+  
+  specify "should accept hashes loaded from YAML files" do
+    db = Sequel(YAML.load_file(@fn)['development'])
+    db.class.should == EEE
+    db.opts[:database].should == 'mydb'
+    db.opts[:user].should == 'mau'
+    db.opts[:password].should == 'tau'
+    db.opts[:host].should == 'alfonso'
+  end
+end

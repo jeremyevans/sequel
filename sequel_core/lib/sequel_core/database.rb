@@ -414,12 +414,18 @@ module Sequel
         scheme = uri.scheme
         scheme = :dbi if scheme =~ /^dbi-(.+)/
         c = adapter_class(scheme)
-        c.new(c.uri_to_options(uri).merge(opts || {}))
+        opts = c.uri_to_options(uri).merge(opts || {})
       else
         opts = conn_string.merge(opts || {})
-        c = adapter_class(opts[:adapter])
-        c.new(opts)
+        c = adapter_class(opts[:adapter] || opts['adapter'])
       end
+      # process opts a bit
+      opts = opts.inject({}) do |m, kv| k, v = *kv
+        k = :user if k == 'username'
+        m[k.to_sym] = v
+        m
+      end
+      c.new(opts)
     end
     
     @@single_threaded = false
