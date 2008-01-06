@@ -1,3 +1,7 @@
+=== SVN
+
+* Fixed Model#initialize to accept nil values (#115).
+
 === 0.2 (2008-01-02)
 
 * Removed deprecated Model.recreate_table method.

@@ -1,4 +1,7 @@
 require 'rubygems'
+unless Object.const_defined?('Sequel')
+  require 'sequel_core'
+end
 require File.join(File.dirname(__FILE__), "../lib/sequel_model")
 
 class MockDataset < Sequel::Dataset

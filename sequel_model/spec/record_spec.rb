@@ -409,3 +409,29 @@ describe Sequel::Model, "#===" do
   end
 end
 
+describe Sequel::Model, "#initialize" do
+  setup do
+    @c = Class.new(Sequel::Model) do
+    end
+  end
+  
+  specify "should accept values" do
+    m = @c.new(:id => 1, :x => 2)
+    m.values.should == {:id => 1, :x => 2}
+  end
+  
+  specify "should accept no values" do
+    m = @c.new
+    m.values.should == {}
+  end
+  
+  specify "should accept nil values" do
+    m = @c.new(nil)
+    m.values.should == {}
+  end
+  
+  specify "should accept a block to execute" do
+    m = @c.new {|o| o[:id] = 1234}
+    m.id.should == 1234
+  end
+end
