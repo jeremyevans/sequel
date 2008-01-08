@@ -17,3 +17,7 @@
 
   frontbase, interbase (http://ruby-dbi.rubyforge.org/)
   openbase (http://ruby-openbase.rubyforge.org)
+
+* Sharding
+
+* Generating an object graph from a result-set.
