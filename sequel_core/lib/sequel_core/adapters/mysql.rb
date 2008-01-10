@@ -86,8 +86,15 @@ module Sequel
       end
 
       def connect
-        conn = Mysql.real_connect(@opts[:host], @opts[:user], @opts[:password], 
-        @opts[:database], @opts[:port], @opts[:socket], Mysql::CLIENT_MULTI_RESULTS)
+        conn = Mysql.real_connect(
+          @opts[:host] || 'localhost',
+          @opts[:user],
+          @opts[:password],
+          @opts[:database],
+          @opts[:port],
+          @opts[:socket],
+          Mysql::CLIENT_MULTI_RESULTS
+        )
         conn.query_with_result = false
         if encoding = @opts[:encoding] || @opts[:charset]
           conn.query("set character_set_connection = '#{encoding}'")
