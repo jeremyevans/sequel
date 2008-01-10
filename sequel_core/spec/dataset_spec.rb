@@ -276,7 +276,9 @@ context "Dataset#where" do
   end
   
   specify "should raise if the dataset is grouped" do
-    proc {@dataset.group(:t).where(:a => 1)}.should raise_error
+    proc {@dataset.group(:t).where(:a => 1)}.should_not raise_error
+    @dataset.group(:t).where(:a => 1).sql.should ==
+      "SELECT * FROM test WHERE (a = 1) GROUP BY t"
   end
   
   specify "should accept ranges" do
@@ -405,6 +407,9 @@ context "Dataset#and" do
   
   specify "should raise if no filter exists" do
     proc {@dataset.and(:a => 1)}.should raise_error(Sequel::Error)
+    proc {@dataset.where(:a => 1).group(:t).and(:b => 2)}.should_not raise_error(Sequel::Error)
+    @dataset.where(:a => 1).group(:t).and(:b => 2).sql ==
+      "SELECT * FROM test WHERE (a = 1) AND (b = 2) GROUP BY t"
   end
   
   specify "should add an alternative expression to the where clause" do
@@ -488,6 +493,11 @@ context "Dataset#having" do
   specify "should support proc expressions" do
     @grouped.having {:sum[:population] > 10}.sql.should == 
       "SELECT #{@columns} FROM test GROUP BY region HAVING (sum(population) > 10)"
+  end
+
+  specify "should work with and on the having clause" do
+    @grouped.having{ :a > 1 }.and{ :b < 2 }.sql.should ==
+      "SELECT #{@columns} FROM test GROUP BY region HAVING (a > 1) AND (b < 2)"
   end
 end
 

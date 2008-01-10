@@ -223,14 +223,14 @@ module Sequel
       #   software.filter {price < 100}.sql #=>
       #     "SELECT * FROM items WHERE (category = 'software') AND (price < 100)"
       def filter(*cond, &block)
-        clause = (@opts[:group] ? :having : :where)
+        clause = (@opts[:having] ? :having : :where)
         cond = cond.first if cond.size == 1
         if cond === true || cond === false
           raise Error::InvalidFilter, "Invalid filter specified. Did you mean to supply a block?"
         end
         parenthesize = !(cond.is_a?(Hash) || cond.is_a?(Array))
         filter = cond.is_a?(Hash) && cond
-        if @opts[clause]
+        if !@opts[clause].nil? and @opts[clause].any?
           l = expression_list(@opts[clause])
           r = expression_list(block || cond, parenthesize)
           clone_merge(clause => "#{l} AND #{r}")
@@ -242,7 +242,7 @@ module Sequel
       # Adds an alternate filter to an existing filter using OR. If no filter 
       # exists an error is raised.
       def or(*cond, &block)
-        clause = (@opts[:group] ? :having : :where)
+        clause = (@opts[:having] ? :having : :where)
         cond = cond.first if cond.size == 1
         parenthesize = !(cond.is_a?(Hash) || cond.is_a?(Array))
         if @opts[clause]
@@ -258,7 +258,7 @@ module Sequel
       # exists an error is raised. This method is identical to #filter except
       # it expects an existing filter.
       def and(*cond, &block)
-        clause = (@opts[:group] ? :having : :where)
+        clause = (@opts[:having] ? :having : :where)
         unless @opts[clause]
           raise Error::NoExistingFilter, "No existing filter found."
         end
@@ -270,7 +270,7 @@ module Sequel
       #   dataset.exclude(:category => 'software').sql #=>
       #     "SELECT * FROM items WHERE NOT (category = 'software')"
       def exclude(*cond, &block)
-        clause = (@opts[:group] ? :having : :where)
+        clause = (@opts[:having] ? :having : :where)
         cond = cond.first if cond.size == 1
         parenthesize = !(cond.is_a?(Hash) || cond.is_a?(Array))
         if @opts[clause]
@@ -286,11 +286,7 @@ module Sequel
       # Returns a copy of the dataset with the where conditions changed. Raises 
       # if the dataset has been grouped. See also #filter.
       def where(*cond, &block)
-        if @opts[:group]
-          raise Error, "Can't specify a WHERE clause once the dataset has been grouped"
-        else
-          filter(*cond, &block)
-        end
+        filter(*cond, &block)
       end
 
       # Returns a copy of the dataset with the having conditions changed. Raises 
@@ -299,6 +295,7 @@ module Sequel
         unless @opts[:group]
           raise Error, "Can only specify a HAVING clause on a grouped dataset"
         else
+          @opts[:having] = {}
           filter(*cond, &block)
         end
       end

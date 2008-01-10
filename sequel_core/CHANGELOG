@@ -1,5 +1,7 @@
 === SVN
 
+* Allow for additional filters on a grouped dataset (#119 and #120)
+
 * Changed mysql adapter to default to localhost if :host option is not specified (#114).
 
 * Refactored Sequelizer to use Proc#to_sexp (method provided by r2r).
