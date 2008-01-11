@@ -1,0 +1,53 @@
+= Sequel State Machine Plugin
+
+Allows for model instances to be state machines.
+
+== Configuration options
+
+* +column+ - specifies the column name to use for keeping the state (default: state)
+* +initial+ - specifies an initial state for newly created objects (required)
+
+=== Defining an event.
+
+This takes a block which describes all valid transitions for this event.
+
+==== Example:
+{{{
+class Order < ActiveRecord::Base
+  acts_as_state_machine :initial => :open
+
+  state :open
+  state :closed
+
+  event :close_order do
+    transitions :to => :closed, :from => :open
+  end
+end
+}}}
+
++transitions+ takes a hash where <tt>:to</tt> is the state to transition
+to and <tt>:from</tt> is a state (or Array of states) from which this
+event can be fired.
+
+This creates an instance method used for firing the event.  The method
+created is the name of the event followed by an exclamation point (!).
+
+==== Example:
+ 
+  <tt>order.close_order!</tt>.
+
+== Defining states of the system. 
+
++state+ can take an optional Proc object which will be exe
+cuted every time the system transitions into that state. 
+The proc will be passed the current object.
+
+==== Example:
+{{{
+class Order
+  is :state_machine :initial => :open
+
+  state :open
+  state :closed, :enter => Proc.new { |o| Mailer.send_notice(o) }
+end
+}}}
