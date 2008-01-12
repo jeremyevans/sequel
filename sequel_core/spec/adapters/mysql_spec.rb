@@ -24,6 +24,18 @@ context "A MySQL database" do
     @db.disconnect
     @db.pool.size.should == 0
   end
+
+  specify "should support sequential primary keys" do
+    @db.create_table!(:with_pk) {primary_key :id; text :name}
+    @db[:with_pk] << {:name => 'abc'}
+    @db[:with_pk] << {:name => 'def'}
+    @db[:with_pk] << {:name => 'ghi'}
+    @db[:with_pk].order(:name).all.should == [
+      {:id => 1, :name => 'abc'},
+      {:id => 2, :name => 'def'},
+      {:id => 3, :name => 'ghi'}
+    ]
+  end
 end
 
 context "A MySQL dataset" do

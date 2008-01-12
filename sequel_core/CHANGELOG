@@ -1,4 +1,4 @@
-=== SVN
+=== 1.0.1 (2008-01-12)
 
 * Changed postgres adapter to quote column references using double quotes.
 

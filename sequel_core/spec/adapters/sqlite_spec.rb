@@ -132,6 +132,18 @@ context "An SQLite database" do
     SQLITE_DB[:time] << {:t => t1}
     SQLITE_DB[:time].first[:t].should == t1
   end
+  
+  specify "should support sequential primary keys" do
+    @db.create_table!(:with_pk) {primary_key :id; text :name}
+    @db[:with_pk] << {:name => 'abc'}
+    @db[:with_pk] << {:name => 'def'}
+    @db[:with_pk] << {:name => 'ghi'}
+    @db[:with_pk].order(:name).all.should == [
+      {:id => 1, :name => 'abc'},
+      {:id => 2, :name => 'def'},
+      {:id => 3, :name => 'ghi'}
+    ]
+  end
 end
 
 context "An SQLite dataset" do
@@ -310,6 +322,8 @@ context "SQLite dataset" do
   end
 end
 
+__END__
+
 context "A SQLite database" do
   setup do
     @db = SQLITE_DB
@@ -324,7 +338,7 @@ context "A SQLite database" do
   end
   
   specify "should not support drop_column operations" do
-    proc {@db.drop_column :test2, :xyz}.should raise_error(SequelError)
+    proc {@db.drop_column :test2, :xyz}.should raise_error(Sequel::Error)
   end
   
   specify "should not support rename_column operations" do
@@ -333,13 +347,13 @@ context "A SQLite database" do
     @db[:test2] << {:name => 'mmm', :value => 111, :xyz => 'qqqq'}
 
     @db[:test2].columns.should == [:name, :value, :xyz]
-    proc {@db.rename_column :test2, :xyz, :zyx}.should raise_error(SequelError)
+    proc {@db.rename_column :test2, :xyz, :zyx}.should raise_error(Sequel::Error)
   end
   
   specify "should not support set_column_type operations" do
     @db.add_column :test2, :xyz, :float
     @db[:test2].delete
     @db[:test2] << {:name => 'mmm', :value => 111, :xyz => 56.78}
-    proc {@db.set_column_type :test2, :xyz, :integer}.should raise_error(SequelError)
+    proc {@db.set_column_type :test2, :xyz, :integer}.should raise_error(Sequel::Error)
   end
 end  
