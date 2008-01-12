@@ -80,6 +80,64 @@ context "A PostgreSQL dataset" do
     proc {@d.literal(false)}.should_not raise_error
   end
   
+  specify "should quote columns using double quotes" do
+    @d.select(:name).sql.should == \
+      'SELECT "name" FROM test'
+      
+    @d.select('COUNT(*)'.lit).sql.should == \
+      'SELECT COUNT(*) FROM test'
+
+    @d.select(:value.MAX).sql.should == \
+      'SELECT max("value") FROM test'
+      
+    @d.select(:NOW[]).sql.should == \
+    'SELECT NOW() FROM test'
+
+    @d.select(:items__value.MAX).sql.should == \
+      'SELECT max(items."value") FROM test'
+
+    @d.order(:name.DESC).sql.should == \
+      'SELECT * FROM test ORDER BY "name" DESC'
+
+    @d.select('test.name AS item_name'.lit).sql.should == \
+      'SELECT test.name AS item_name FROM test'
+      
+    @d.select('"name"'.lit).sql.should == \
+      'SELECT "name" FROM test'
+
+    @d.select('max(test."name") AS "max_name"'.lit).sql.should == \
+      'SELECT max(test."name") AS "max_name" FROM test'
+      
+    @d.select(:test[:abc, 'hello']).sql.should == \
+      "SELECT test(\"abc\", 'hello') FROM test"
+
+    @d.select(:test[:abc__def, 'hello']).sql.should == \
+      "SELECT test(abc.\"def\", 'hello') FROM test"
+
+    @d.select(:test[:abc__def, 'hello'].as(:x2)).sql.should == \
+      "SELECT test(abc.\"def\", 'hello') AS \"x2\" FROM test"
+
+    @d.insert_sql(:value => 333).should == \
+      'INSERT INTO test ("value") VALUES (333)'
+
+    @d.insert_sql(:x => :y).should == \
+      'INSERT INTO test ("x") VALUES ("y")'
+  end
+  
+  specify "should quote fields correctly when reversing the order" do
+    @d.reverse_order(:name).sql.should == \
+      'SELECT * FROM test ORDER BY "name" DESC'
+
+    @d.reverse_order(:name.DESC).sql.should == \
+      'SELECT * FROM test ORDER BY "name"'
+
+    @d.reverse_order(:name, :test.DESC).sql.should == \
+      'SELECT * FROM test ORDER BY "name" DESC, "test"'
+
+    @d.reverse_order(:name.DESC, :test).sql.should == \
+      'SELECT * FROM test ORDER BY "name", "test" DESC'
+  end
+  
   specify "should support transactions" do
     PGSQL_DB.transaction do
       @d << {:name => 'abc', :value => 1}

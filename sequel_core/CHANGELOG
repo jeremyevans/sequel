@@ -1,5 +1,7 @@
 === SVN
 
+* Changed postgres adapter to quote column references using double quotes.
+
 * Applied patch for oracle adapter: fix behavior of limit and offset, transactions, #table_exists?, #tables and additional specs (thanks Liming Lian #122).
 
 * Allow for additional filters on a grouped dataset (#119 and #120)
