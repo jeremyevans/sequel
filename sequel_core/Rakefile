@@ -105,6 +105,9 @@ end
 
 task :tag do
   cwd = FileUtils.pwd
+  sh %{rm -rf doc/*}
+  sh %{rm -rf pkg/*}
+  sh %{rm -rf coverage/*}
   sh %{cd ../.. && svn copy #{cwd} tags/#{NAME}-#{VERS} && svn commit -m "#{NAME}-#{VERS} tag." tags}
 end
 
