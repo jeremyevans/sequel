@@ -1,5 +1,7 @@
 === SVN
 
+* Applied patch for oracle adapter: fix behavior of limit and offset, transactions, #table_exists?, #tables and additional specs (thanks Liming Lian #122).
+
 * Allow for additional filters on a grouped dataset (#119 and #120)
 
 * Changed mysql adapter to default to localhost if :host option is not specified (#114).
