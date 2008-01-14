@@ -9,7 +9,7 @@ include FileUtils
 # Configuration
 ##############################################################################
 NAME = "sequel_core"
-VERS = "1.0.1"
+VERS = "1.0.2"
 CLEAN.include ["**/.*.sw?", "pkg/*", ".config", "doc/*", "coverage/*"]
 RDOC_OPTS = [
   "--quiet", 
@@ -58,6 +58,7 @@ spec = Gem::Specification.new do |s|
   s.required_ruby_version = ">= 1.8.4"
 
   s.add_dependency("metaid")
+  s.add_dependency("assistance", ">= 0.1")
 
   case RUBY_PLATFORM
   when /mswin/

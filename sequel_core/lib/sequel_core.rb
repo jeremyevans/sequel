@@ -1,9 +1,12 @@
+gem "assistance", ">= 0.1"
+
 require "metaid"
+require "assistance"
 require "bigdecimal"
 require "bigdecimal/util"
 
 files = %w[
-  core_ext core_sql array_keys exceptions connection_pool pretty_table
+  core_ext core_sql array_keys exceptions pretty_table
   dataset migration model schema database worker
 ]
 dir = File.join(File.dirname(__FILE__), "sequel_core")

@@ -1,3 +1,7 @@
+=== 1.0.2 (2008-01-14)
+
+* Removed ConnectionPool, NumericExtensions. Added dependency on assistance.
+
 === 1.0.1 (2008-01-12)
 
 * Changed postgres adapter to quote column references using double quotes.
