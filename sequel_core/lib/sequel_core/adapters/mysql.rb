@@ -13,11 +13,11 @@ class Mysql::Result
     7   => :to_time,  # MYSQL_TYPE_TIMESTAMP
     8   => :to_i,     # MYSQL_TYPE_LONGLONG
     9   => :to_i,     # MYSQL_TYPE_INT24
-    10  => :to_time,  # MYSQL_TYPE_DATE
+    10  => :to_date,  # MYSQL_TYPE_DATE
     11  => :to_time,  # MYSQL_TYPE_TIME
     12  => :to_time,  # MYSQL_TYPE_DATETIME
     13  => :to_i,     # MYSQL_TYPE_YEAR
-    14  => :to_time,  # MYSQL_TYPE_NEWDATE
+    14  => :to_date,  # MYSQL_TYPE_NEWDATE
     # 15  => :to_s      # MYSQL_TYPE_VARCHAR
     # 16  => :to_s,     # MYSQL_TYPE_BIT
     246 => :to_d,     # MYSQL_TYPE_NEWDECIMAL

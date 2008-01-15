@@ -299,3 +299,13 @@ context "String#to_time" do
   end
 end
 
+context "String#to_date" do
+  specify "should convert the string into a Date object" do
+    "2007-07-11".to_date.should == Date.parse("2007-07-11")
+  end
+  
+  specify "should raise Error::InvalidValue for an invalid date" do
+    proc {'0000-00-00'.to_time}.should raise_error(Sequel::Error::InvalidValue)
+  end
+end
+

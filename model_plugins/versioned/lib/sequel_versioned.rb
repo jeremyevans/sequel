@@ -7,7 +7,7 @@ module Sequel
         # model.class_def(:method_name) do |parameter1,parameter2,...|
         #   dataset... # work with the dataset
         # end
-
+        
         model.send(:include, InstanceMethods)
       end
 

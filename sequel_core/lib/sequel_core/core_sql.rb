@@ -54,6 +54,15 @@ class String
     end
      # Why does Time.parse('0000-00-00') bork and not return nil or some such?
   end
+
+  # Converts a string into a Date object.
+  def to_date
+    begin
+      Date.parse(self)
+    rescue Exception => e
+      raise Sequel::Error::InvalidValue, "Invalid date value '#{self}' (#{e.message})"
+    end
+  end
 end
 
 
