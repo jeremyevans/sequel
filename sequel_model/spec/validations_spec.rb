@@ -1,5 +1,219 @@
 require File.join(File.dirname(__FILE__), "spec_helper")
 
+class Sequel::TrahLahLah < Sequel::Validation
+end
+
+describe "A subclass of Sequel::Validation" do
+  specify "should supply its validation name underscored and symbolized" do
+    Sequel::TrahLahLah.validation_name.should == :trah_lah_lah
+  end
+  
+  specify "should be retrievable using Sequel::Validation[]" do
+    Sequel::Validation[:trah_lah_lah].should == Sequel::TrahLahLah
+  end
+  
+  specify "should initialize using attribute and opts" do
+    t = Sequel::TrahLahLah.new(:big, :bad => 1, :wolf => 2)
+    t.attribute.should == :big
+    t.opts.should == {:bad => 1, :wolf => 2}
+  end
+  
+  specify "should initialize using attribute only" do
+    t = Sequel::TrahLahLah.new(:big)
+    t.attribute.should == :big
+    t.opts.should == {}
+  end
+  
+  specify "should initialize using opts only" do
+    t = Sequel::TrahLahLah.new(:bad => 1, :wolf => 2)
+    t.attribute.should == nil
+    t.opts.should == {:bad => 1, :wolf => 2}
+  end
+  
+  specify "should initialize using no arguments" do
+    t = Sequel::TrahLahLah.new
+    t.attribute.should == nil
+    t.opts.should == {}
+  end
+  
+  specify "should merge opts with default options" do
+    Sequel::TrahLahLah.default :baby => 333
+    
+    Sequel::TrahLahLah.new.opts.should == {:baby => 333}
+    Sequel::TrahLahLah.new(:sss).opts.should == {:baby => 333}
+    Sequel::TrahLahLah.new(:sss, :blow => 1).opts.should == {:baby => 333, :blow => 1}
+    Sequel::TrahLahLah.new(:sss, :blow => 1, :baby => 444).opts.should == {:baby => 444, :blow => 1}
+
+    Sequel::TrahLahLah.new(:blow => 1).opts.should == {:baby => 333, :blow => 1}
+    Sequel::TrahLahLah.new(:baby => 444).opts.should == {:baby => 444}
+  end
+  
+  specify "should provide direct access to options using .option" do
+    Sequel::TrahLahLah.option :bbb
+    Sequel::TrahLahLah.new.should respond_to(:bbb)
+    t = Sequel::TrahLahLah.new
+    t.bbb.should == nil
+    t = Sequel::TrahLahLah.new(:bbb => 1234)
+    t.bbb.should == 1234
+  end
+
+  specify "should provide a failed_message defaulting to @opts[:message] or 'xxx validation failed'" do
+    t = Sequel::TrahLahLah.new(:blah)
+    t.failed_message(nil).should == 'trah_lah_lah blah validation failed'
+      
+    t = Sequel::TrahLahLah.new(:message => 'blah blah')
+    t.failed_message(nil).should == 'blah blah'
+  end
+
+  specify "should check required options when creating new instances" do
+    Sequel::TrahLahLah.required_option :blah
+    proc {Sequel::TrahLahLah.new}.should raise_error(Sequel::Error)
+    proc {Sequel::TrahLahLah.new(:blah => 3)}.should_not raise_error(Sequel::Error)
+  end
+end
+
+describe Sequel::Validation::Generator do
+  setup do
+    @c = Class.new do
+      @@validations = []
+      
+      def self.validates(*args)
+        @@validations << args
+      end
+      
+      def self.validations
+        @@validations
+      end
+    end
+  end
+  
+  specify "should instance_eval the block, sending everything to its receiver" do
+    Sequel::Validation::Generator.new(@c) do
+      presence_of :blah
+      more_blah :blah => 'blah'
+    end
+    @c.validations.should == [
+      [:presence_of, :blah],
+      [:more_blah, {:blah => 'blah'}]
+    ]
+  end
+end
+
+class HighnessOf < Sequel::Validation
+  default :threshold => 100
+  option :threshold
+  
+  def valid?(o)
+    v = o.send(attribute)
+    v && (v >= threshold)
+  end
+  
+  def failed_message(o)
+    "#{attribute} is too low (#{threshold})"
+  end
+end
+
+describe Sequel::Validatable do
+  setup do
+    @c = Class.new do
+      include Sequel::Validatable
+    end
+  end
+  
+  specify "should respond to validates, validations, has_validations?" do
+    @c.should respond_to(:validates)
+    @c.should respond_to(:validations)
+    @c.should respond_to(:has_validations?)
+  end
+  
+  specify "should respond to validates_xxx methods" do
+    @c.should respond_to(:validates_highness_of)
+  end
+  
+  specify "should acccept validation definitions using .validates ..." do
+    @c.validates :highness_of, :blah
+    
+    @c.validations.size.should == 1
+    @c.validations.first.should be_a_kind_of(HighnessOf)
+    @c.validations.first.attribute.should == :blah
+  end
+
+  specify "should acccept validation definitions using .validates {...}" do
+    @c.validates do
+      highness_of :miu
+      highness_of :hey => 1
+    end
+    
+    @c.validations.size.should == 2
+    @c.validations.first.should be_a_kind_of(HighnessOf)
+    @c.validations.last.should be_a_kind_of(HighnessOf)
+    @c.validations.first.attribute.should == :miu
+    @c.validations.last.opts.should == {:hey => 1, :threshold => 100}
+  end
+
+  specify "should acccept validation definitions using .validates_xxx" do
+    @c.validates_highness_of :ohai
+    
+    @c.validations.size.should == 1
+    @c.validations.first.should be_a_kind_of(HighnessOf)
+    @c.validations.first.attribute.should == :ohai
+  end
+  
+  specify "should return true/false for has_validations?" do
+    @c.has_validations?.should be_nil
+    @c.validates_highness_of :ohai
+    @c.has_validations?.should == true
+  end
+  
+  specify "should raise Sequel::Error for unknown validation" do
+    proc {@c.validates :blahblah}.should raise_error(Sequel::Error)
+  end
+end
+
+describe "A Validatable instance" do
+  setup do
+    @c = Class.new do
+      attr_accessor :score
+      
+      include Sequel::Validatable
+      
+      validates_highness_of :score, :threshold => 87
+    end
+    
+    @o = @c.new
+  end
+  
+  specify "should supply a #valid? method that returns true if validations pass" do
+    @o.score = 50
+    @o.should_not be_valid
+    @o.score = 100
+    @o.should be_valid
+  end
+  
+  specify "should give a list of error messages if validations fail" do
+    @o.score = 100
+    @o.valid?
+    @o.validation_errors.should == []
+    
+    @c.send(:attr_accessor, :blah)
+    @c.validates_highness_of :blah
+    
+    @o = @c.new
+    @o.score = 20
+    @o.blah = 30
+    
+    @o.valid?
+    @o.validation_errors.should == [
+      'score is too low (87)',
+      'blah is too low (100)'
+    ]
+  end
+end
+
+
+
+__END__
+
 describe Sequel::Model, "Validations" do
 
   before(:all) do

@@ -1,3 +1,19 @@
+* Model#reload as alias to Model#refresh.
+
+* Rewrite validations.
+
+* Model#save! to save regardless of validations. Model#save should check valid?.
+
+* Observer pattern:
+
+  class MyObserver < Sequel::Observer
+    observe Item, Post
+
+    def after_save
+      ...
+    end
+  end
+
 # block form of Model.new:
 
   MyModel.new do |model

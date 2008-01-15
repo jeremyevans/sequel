@@ -1,3 +1,123 @@
+module Sequel
+  module Validatable
+    module ClassMethods
+      def self.add_validation_method(name)
+        define_method("validates_#{name}".to_sym) {|*args| validates name, *args}
+      end
+
+      def validates(*args, &block)
+        if block
+          return Validation::Generator.new(self, &block)
+        end
+        @validations ||= []
+        @validations << Sequel::Validation[args.shift].new(*args)
+      end
+      
+      def validations
+        @validations
+      end
+      
+      def has_validations?
+        @validations && !@validations.empty?
+      end
+    end
+
+    def self.included(c)
+      c.extend ClassMethods
+    end
+    
+    def valid?
+      @validation_errors = []
+      self.class.validations.each do |v|
+        unless v.valid?(self)
+          @validation_errors << v.failed_message(self)
+        end
+      end
+      @validation_errors.empty?
+    end
+    
+    attr_reader :validation_errors
+  end
+
+  class Validation
+    @@validation_classes = {}
+    
+    def self.validation_name
+      to_s =~ /([^:]+)$/
+      $1.underscore.to_sym
+    end
+    
+    def self.inherited(c)
+      name = c.validation_name
+      @@validation_classes[name] = c
+      Sequel::Validatable::ClassMethods.add_validation_method(name)
+    end
+    
+    def self.[](name)
+      @@validation_classes[name] || \
+        (raise Sequel::Error, "Unknown validation #{name}")
+    end
+    
+    def self.check_required_options(opts)
+      return unless @required_options
+      keys = opts.keys
+      @required_options.each do |o|
+        unless keys.include?(o)
+          raise Sequel::Error, "Missing option #{o} for #{validation_name} validation"
+        end
+      end
+    end
+    
+    def self.required_option(o)
+      @required_options ||= []
+      @required_options << o
+    end
+    
+    def self.default_options
+      @default_options || {}
+    end
+    
+    def self.default(opts)
+      @default_options ||= {}
+      @default_options.merge!(opts)
+    end
+    
+    def self.option(*names)
+      names.each do |n|
+        class_def(n) {@opts[n]}
+      end
+    end
+    
+    attr_reader :attribute, :opts
+
+    def initialize(attribute = nil, opts = {})
+      if Hash === attribute
+        opts = attribute
+        attribute = nil
+      end
+      @attribute, @opts = attribute, self.class.default_options.merge(opts)
+      self.class.check_required_options(@opts)
+    end
+    
+    def failed_message(o)
+      @opts[:message] || "#{self.class.validation_name} #{attribute} validation failed"
+    end
+
+    class Generator
+      def initialize(receiver ,&block)
+        @receiver = receiver
+        instance_eval(&block)
+      end
+
+      def method_missing(*args)
+        @receiver.validates *args
+      end
+    end
+  end
+end
+
+__END__
+
 require 'validatable'
 
 module Sequel
