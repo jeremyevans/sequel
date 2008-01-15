@@ -85,5 +85,70 @@ module Sequel
         class_def(name) {from.filter(key => pk)}
       end
     end
+    
+    # TODO: Add/Replace current relations with the following specifications:
+    # ======================================================================
+    
+    # Database modelling is generally done with an ER (Entity Relationship) diagram.
+    # Shouldn't ORM's facilitate simlilar specification?
+
+    #   class Post < Sequel::Model(:users)
+    #     relationships do
+    #       # Specify the relationships that exist with the User model (users table)
+    #       # These relationships are precisely the ER diagram connecting arrows.
+    #     end
+    #   end
+
+    #
+    # = Relationships 
+    #
+    # are specifications of the ends of the ER diagrams connectors that are touching
+    # the current model.
+    #
+    # one_to_one,   has_one
+    # many_to_one,  belongs_to
+    # many_to_many, has_many
+    # ?parameters may be :zero, :one, :many which specifies the cardinality of the connection
+
+    # Example:
+    #   class Post < Sequel::Model(:users)
+    #     relationships do
+    #       has :one,  :blog, :required => true # blog_id field, cannot be null
+    #       has :one,  :account # account_id field
+    #       has :many, :comments # comments_posts join table
+    #       has :many, :authors, :required => true  # authors_posts join table, requires at least one author
+    #     end
+    #   end
+
+    #
+    # Relationship API Details
+    #
+
+    #
+    # == belongs_to
+    #
+
+    # Defines an blog and blog= method
+    #   belongs_to :blog
+
+    # Same, but uses "b_id" as the blog's id field.
+    #   belongs_to :blog, :key => :b_id
+
+    #   has_many   :comments
+    # * Defines comments method which will query the join table appropriately.
+    # * Checks to see if a "comments_posts" join table exists (alphabetical order)
+    # ** If it does not exist, will create the join table. 
+    # ** If options are passed in these will be used to further define the join table.
+
+
+    # Benefits:
+    # * Normalized DB
+    # * Easy to define join objects
+    # * Efficient queries, database gets to use indexed fields (pkeys) instead of a string field and an id.
+    # 
+    # For example, polymorphic associations now become:
+    # [user]      1-* [addresses_users]     *-1 [addresses]
+    # [companies] 1-* [addresses_companies] *-1 [addresses]
+    # [clients]   1-* [addresses_clients]   *-1 [addresses]
   end
 end
