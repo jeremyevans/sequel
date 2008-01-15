@@ -1,4 +1,1 @@
-# Used to inject methods for converting text from one format to another
-# Takes a 'format', a 'raw' text and a 'formatted' column.
-# It then formats the raw text column, saving the result in either a 'formatted' column or the column specified.
-# The format it was saved in is stored in a 'format' column
+# Role Based Authorization Control
