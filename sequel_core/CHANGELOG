@@ -1,3 +1,7 @@
+=== SVN
+
+* Added String#to_date. Updated mysql adapter to use String#to_date for mysql date types (thanks drfreeze).
+
 === 1.0.2 (2008-01-14)
 
 * Removed ConnectionPool, NumericExtensions. Added dependency on assistance.
