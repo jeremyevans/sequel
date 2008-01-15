@@ -1,6 +1,6 @@
 module Sequel
   module Plugins
-    module Authenticated
+    module Formatted
       # Apply the plugin to the model.
       def self.apply(model, options = {})
         # Define each class method;
@@ -13,7 +13,13 @@ module Sequel
 
       module InstanceMethods
         # Define methods that will be instance-specific here.
+        def textile_to_html
+          # raw... to html
+        end
 
+        def markdown_to_html
+          # raw... to html
+        end
       end
     end
   end
