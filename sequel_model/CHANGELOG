@@ -1,5 +1,7 @@
 === SVN
 
+* Rewrote validations.
+
 * Fixed Model#initialize to accept nil values (#115).
 
 === 0.2 (2008-01-02)

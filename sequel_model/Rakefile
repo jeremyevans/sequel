@@ -66,7 +66,6 @@ spec = Gem::Specification.new do |s|
   end
 
   s.add_dependency("sequel_core", '>= 0.5')
-  s.add_dependency("validatable")
   
   s.files = %w(COPYING README Rakefile) + Dir.glob("{doc,spec,lib}/**/*")
 
