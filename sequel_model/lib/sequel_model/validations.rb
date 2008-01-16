@@ -237,9 +237,9 @@ module Sequel
     include Validatable
     
     alias_method :save!, :save
-    def save
+    def save(*args)
       return false unless valid?
-      save!
+      save!(*args)
     end
   end
 end
