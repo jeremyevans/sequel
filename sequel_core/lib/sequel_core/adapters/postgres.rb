@@ -43,6 +43,10 @@ class PGconn
     status == PGconn::CONNECTION_OK
   end
   
+  unless instance_methods.include?('async_exec')
+    alias_method :async_exec, :exec
+  end
+  
   def execute(sql)
     begin
       async_exec(sql)
