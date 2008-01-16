@@ -40,6 +40,14 @@ module Sequel
         index(name) if opts[:index]
       end
       
+      def check(*args, &block)
+        @columns << {:name => nil, :type => :check, :check => block || args}
+      end
+
+      def constraint(name, *args, &block)
+        @columns << {:name => name, :type => :check, :check => block || args}
+      end
+      
       def has_column?(name)
         @columns.each {|c| return true if c[:name] == name}
         false

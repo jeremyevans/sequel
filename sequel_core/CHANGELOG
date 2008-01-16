@@ -1,5 +1,7 @@
 === SVN
 
+* Implemented constraint definitions inside Database#create_table.
+
 * Fixed postgres adapter to define PGconn#async_exec as alias to #exec if not defined (for pure-ruby postgres driver).
 
 * Added String#to_date. Updated mysql adapter to use String#to_date for mysql date types (thanks drfreeze).

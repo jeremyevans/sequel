@@ -7,6 +7,8 @@ describe Sequel::Schema::Generator do
       column :body, :text
       foreign_key :parent_id
       primary_key :id
+      check 'price > 100'
+      constraint(:xxx) {:yyy == :zzz}
       index :title
       index [:title, :body]
     end
@@ -19,8 +21,8 @@ describe Sequel::Schema::Generator do
     end
   end
   
-  it "counts primary key as column" do
-    @columns.size.should == 4
+  it "counts primary key, column and constraint definitions as columns" do
+    @columns.size.should == 6
   end
   
   it "places primary key first" do
@@ -50,6 +52,16 @@ describe Sequel::Schema::Generator do
       @generator.has_column?(col).should be_true
     end
     @generator.has_column?(:foo).should_not be_true
+  end
+  
+  it "creates constraints" do
+    @columns[4][:name].should == nil
+    @columns[4][:type].should == :check
+    @columns[4][:check].should == ['price > 100']
+
+    @columns[5][:name].should == :xxx
+    @columns[5][:type].should == :check
+    @columns[5][:check].should be_a_kind_of(Proc)
   end
   
   it "creates indexes" do

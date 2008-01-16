@@ -43,8 +43,15 @@ module Sequel
       def literal(v)
         schema_utility_dataset.literal(v)
       end
+      
+      def expression_list(*args, &block)
+        schema_utility_dataset.expression_list(*args, &block)
+      end
 
       def column_definition_sql(column)
+        if column[:type] == :check
+          return constraint_definition_sql(column)
+        end
         sql = "#{literal(column[:name].to_sym)} #{TYPES[column[:type]]}"
         column[:size] ||= 255 if column[:type] == :varchar
         elements = column[:size] || column[:elements]
@@ -59,6 +66,13 @@ module Sequel
         end
         sql << " ON DELETE #{on_delete_clause(column[:on_delete])}" if column[:on_delete]
         sql << " #{auto_increment_sql}" if column[:auto_increment]
+        sql
+      end
+      
+      def constraint_definition_sql(column)
+        sql = column[:name] ? "CONSTRAINT #{literal(column[:name].to_sym)} " : ""
+        
+        sql << "CHECK #{expression_list(column[:check], true)}"
         sql
       end
   
