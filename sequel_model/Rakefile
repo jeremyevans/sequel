@@ -127,6 +127,11 @@ Spec::Rake::SpecTask.new("spec_no_cov") do |t|
   t.spec_opts  = File.read("spec/spec.opts").split("\n")
 end
 
+desc "check documentation coverage"
+task :dcov do
+  sh "find lib -name '*.rb' | xargs dcov"
+end
+
 ##############################################################################
 # Statistics
 ##############################################################################
