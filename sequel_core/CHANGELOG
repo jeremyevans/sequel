@@ -1,5 +1,7 @@
 === SVN
 
+* Added support for UNSIGNED constraint, used in MySQL? (#127).
+
 * Implemented constraint definitions inside Database#create_table.
 
 * Fixed postgres adapter to define PGconn#async_exec as alias to #exec if not defined (for pure-ruby postgres driver).

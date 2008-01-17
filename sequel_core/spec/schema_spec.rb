@@ -69,6 +69,13 @@ context "DB#create_table" do
     @db.sqls.should == ["CREATE TABLE cats (id integer, name text UNIQUE)"]
   end
   
+  specify "should accept unsigned definition" do
+    @db.create_table(:cats) do
+      integer :value, :unsigned => true
+    end
+    @db.sqls.should == ["CREATE TABLE cats (value integer UNSIGNED)"]
+  end
+  
   specify "should accept [SET|ENUM](...) types" do
     @db.create_table(:cats) do
       set :color, :elements => ['black', 'tricolor', 'grey']

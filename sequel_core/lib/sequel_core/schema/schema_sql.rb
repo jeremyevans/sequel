@@ -31,6 +31,7 @@ module Sequel
       COMMA_SEPARATOR = ', '.freeze
       UNIQUE = ' UNIQUE'.freeze
       NOT_NULL = ' NOT NULL'.freeze
+      UNSIGNED = ' UNSIGNED'.freeze
       PRIMARY_KEY = ' PRIMARY KEY'.freeze
 
       TYPES = Hash.new {|h, k| k}
@@ -58,6 +59,7 @@ module Sequel
         sql << "(#{literal(elements)})" if elements
         sql << UNIQUE if column[:unique]
         sql << NOT_NULL if column[:null] == false
+        sql << UNSIGNED if column[:unsigned]
         sql << " DEFAULT #{literal(column[:default])}" if column.include?(:default)
         sql << PRIMARY_KEY if column[:primary_key]
         if column[:table]
