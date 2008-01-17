@@ -401,27 +401,6 @@ describe Sequel::Model, "(:tablename)" do
 
 end
 
-describe Sequel::Model, ".create" do
-
-  before(:each) do
-    MODEL_DB.reset
-    @c = Class.new(Sequel::Model(:items))
-  end
-
-  it "should be able to create rows in the associated table" do
-    o = @c.create(:x => 1)
-    o.class.should == @c
-    MODEL_DB.sqls.should == ['INSERT INTO items (x) VALUES (1)',  "SELECT * FROM items WHERE (id IN ('INSERT INTO items (x) VALUES (1)')) LIMIT 1"]
-  end
-
-  it "should be able to create rows without any values specified" do
-    o = @c.create
-    o.class.should == @c
-    MODEL_DB.sqls.should == ["INSERT INTO items DEFAULT VALUES", "SELECT * FROM items WHERE (id IN ('INSERT INTO items DEFAULT VALUES')) LIMIT 1"]
-  end
-
-end
-
 describe Sequel::Model, "A model class without a primary key" do
 
   before(:each) do

@@ -435,3 +435,35 @@ describe Sequel::Model, "#initialize" do
     m.id.should == 1234
   end
 end
+
+describe Sequel::Model, ".create" do
+
+  before(:each) do
+    MODEL_DB.reset
+    @c = Class.new(Sequel::Model(:items)) do
+      def columns; [:x]; end
+    end
+  end
+
+  it "should be able to create rows in the associated table" do
+    o = @c.create(:x => 1)
+    o.class.should == @c
+    MODEL_DB.sqls.should == ['INSERT INTO items (x) VALUES (1)',  "SELECT * FROM items WHERE (id IN ('INSERT INTO items (x) VALUES (1)')) LIMIT 1"]
+  end
+
+  it "should be able to create rows without any values specified" do
+    o = @c.create
+    o.class.should == @c
+    MODEL_DB.sqls.should == ["INSERT INTO items DEFAULT VALUES", "SELECT * FROM items WHERE (id IN ('INSERT INTO items DEFAULT VALUES')) LIMIT 1"]
+  end
+
+  it "should accept a block and run it" do
+    o1, o2, o3 =  nil, nil, nil
+    o = @c.create {|o3| o1 = o3; o2 = :blah; o3.x = 333}
+    o.class.should == @c
+    o1.should === o
+    o3.should === o
+    o2.should == :blah
+    MODEL_DB.sqls.should == ["INSERT INTO items (x) VALUES (333)", "SELECT * FROM items WHERE (id IN ('INSERT INTO items (x) VALUES (333)')) LIMIT 1"]
+  end
+end

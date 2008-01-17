@@ -127,9 +127,9 @@ module Sequel
     
     # Creates new instance with values set to passed-in Hash ensuring that
     # new? returns true.
-    def self.create(values = {})
+    def self.create(values = {}, &block)
       db.transaction do
-        obj = new(values, true)
+        obj = new(values, true, &block)
         obj.save
         obj
       end

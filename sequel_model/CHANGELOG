@@ -1,5 +1,7 @@
 === SVN
 
+* Changed Model.create to accept a block (#126).
+
 * Rewrote validations.
 
 * Fixed Model#initialize to accept nil values (#115).
