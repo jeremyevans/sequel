@@ -1,9 +1,3 @@
-* Model#reload as alias to Model#refresh.
-
-* Rewrite validations.
-
-* Model#save! to save regardless of validations. Model#save should check valid?.
-
 * Observer pattern:
 
   class MyObserver < Sequel::Observer
@@ -14,14 +8,7 @@
     end
   end
 
-# block form of Model.new:
-
-  MyModel.new do |model
-    model.field = value
-    model.save
-  end
-
-# Smarter one_to_one: stuff like:
+* Smarter one_to_one: stuff like:
 
   # assuming the Author's primary key is :name
   post = Post.create(:name => 'The Lover', :author => Author['A.B. Yehoshua'])
@@ -32,7 +19,5 @@
   #and also
   post = Post.create(:name => 'The Lover', :author => 'A.B. Yehoshua') #=> fetches the author record
   post.set(:author => 'A.B. Yehoshua')
-
-* adapter specs for Model
 
 * many_to_many smart relationships.

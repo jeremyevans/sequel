@@ -251,6 +251,7 @@ module Sequel
       @values = this.first || raise(Error, "Record not found")
       self
     end
+    alias_method :reload, :refresh
 
     # Like delete but runs hooks before and after delete.
     def destroy

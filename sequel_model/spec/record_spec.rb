@@ -467,3 +467,33 @@ describe Sequel::Model, ".create" do
     MODEL_DB.sqls.should == ["INSERT INTO items (x) VALUES (333)", "SELECT * FROM items WHERE (id IN ('INSERT INTO items (x) VALUES (333)')) LIMIT 1"]
   end
 end
+
+describe Sequel::Model, "#refresh" do
+  setup do
+    MODEL_DB.reset
+    @c = Class.new(Sequel::Model(:items)) do
+      def columns; [:x]; end
+    end
+  end
+
+  specify "should reload the instance values from the database" do
+    @m = @c.new(:id => 555)
+    @m[:x] = 'blah'
+    @m.this.should_receive(:first).and_return({:x => 'kaboom', :id => 555})
+    @m.refresh
+    @m[:x].should == 'kaboom'
+  end
+  
+  specify "should raise if the instance is not found" do
+    @m = @c.new(:id => 555)
+    @m.this.should_receive(:first).and_return(nil)
+    proc {@m.refresh}.should raise_error(Sequel::Error)
+  end
+  
+  specify "should be aliased by #reload" do
+    @m = @c.new(:id => 555)
+    @m.this.should_receive(:first).and_return({:x => 'kaboom', :id => 555})
+    @m.reload
+    @m[:x].should == 'kaboom'
+  end
+end
