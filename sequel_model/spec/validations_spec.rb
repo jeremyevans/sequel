@@ -1,130 +1,54 @@
 require File.join(File.dirname(__FILE__), "spec_helper")
 
-class Sequel::TrahLahLah < Sequel::Validation
-end
-
-describe "A subclass of Sequel::Validation" do
-  specify "should supply its validation name underscored and symbolized" do
-    Sequel::TrahLahLah.validation_name.should == :trah_lah_lah
-  end
-  
-  specify "should be retrievable using Sequel::Validation[]" do
-    Sequel::Validation[:trah_lah_lah].should == Sequel::TrahLahLah
-  end
-  
-  specify "should initialize using attribute and opts" do
-    t = Sequel::TrahLahLah.new(:big, :bad => 1, :wolf => 2)
-    t.attribute.should == :big
-    t.opts.should == {:bad => 1, :wolf => 2}
-  end
-  
-  specify "should initialize using attribute only" do
-    t = Sequel::TrahLahLah.new(:big)
-    t.attribute.should == :big
-    t.opts.should == {}
-  end
-  
-  specify "should initialize using opts only" do
-    t = Sequel::TrahLahLah.new(:bad => 1, :wolf => 2)
-    t.attribute.should == nil
-    t.opts.should == {:bad => 1, :wolf => 2}
-  end
-  
-  specify "should initialize using no arguments" do
-    t = Sequel::TrahLahLah.new
-    t.attribute.should == nil
-    t.opts.should == {}
-  end
-  
-  specify "should accept a block" do
-    t = Sequel::TrahLahLah.new {'blah'}
-    t.block.should be_a_kind_of(Proc)
-    t.block.call.should == 'blah'
-  end
-  
-  specify "should accept a block through :logic option" do
-    t = Sequel::TrahLahLah.new(:logic => proc {'bbbbb'})
-    t.block.should be_a_kind_of(Proc)
-    t.block.call.should == 'bbbbb'
-  end
-
-  specify "should merge opts with default options" do
-    Sequel::TrahLahLah.default :baby => 333
-    
-    Sequel::TrahLahLah.new.opts.should == {:baby => 333}
-    Sequel::TrahLahLah.new(:sss).opts.should == {:baby => 333}
-    Sequel::TrahLahLah.new(:sss, :blow => 1).opts.should == {:baby => 333, :blow => 1}
-    Sequel::TrahLahLah.new(:sss, :blow => 1, :baby => 444).opts.should == {:baby => 444, :blow => 1}
-
-    Sequel::TrahLahLah.new(:blow => 1).opts.should == {:baby => 333, :blow => 1}
-    Sequel::TrahLahLah.new(:baby => 444).opts.should == {:baby => 444}
-  end
-  
-  specify "should provide direct access to options using .option" do
-    Sequel::TrahLahLah.option :bbb
-    Sequel::TrahLahLah.new.should respond_to(:bbb)
-    t = Sequel::TrahLahLah.new
-    t.bbb.should == nil
-    t = Sequel::TrahLahLah.new(:bbb => 1234)
-    t.bbb.should == 1234
-  end
-
-  specify "should provide a failed_message defaulting to @opts[:message] or 'xxx validation failed'" do
-    t = Sequel::TrahLahLah.new(:blah)
-    t.failed_message(nil).should == 'blah is invalid'
-
-    t = Sequel::TrahLahLah.new
-    t.failed_message(nil).should == 'trah_lah_lah validation failed'
-      
-    t = Sequel::TrahLahLah.new(:message => 'blah blah')
-    t.failed_message(nil).should == 'blah blah'
-  end
-
-  specify "should check required options when creating new instances" do
-    Sequel::TrahLahLah.required_option :blah
-    proc {Sequel::TrahLahLah.new}.should raise_error(Sequel::Error)
-    proc {Sequel::TrahLahLah.new(:blah => 3)}.should_not raise_error(Sequel::Error)
-  end
-end
-
-describe Sequel::Validation::Generator do
+describe "Sequel::Validatable::Errors" do
   setup do
-    @c = Class.new do
-      @@validations = []
-      
-      def self.validates(*args)
-        @@validations << args
-      end
-      
-      def self.validations
-        @@validations
-      end
+    @errors = Sequel::Validatable::Errors.new
+    class Sequel::Validatable::Errors
+      attr_accessor :errors
     end
   end
   
-  specify "should instance_eval the block, sending everything to its receiver" do
-    Sequel::Validation::Generator.new(@c) do
-      presence_of :blah
-      more_blah :blah => 'blah'
-    end
-    @c.validations.should == [
-      [:presence_of, :blah],
-      [:more_blah, {:blah => 'blah'}]
-    ]
+  specify "should be clearable using #clear" do
+    @errors.errors = {1 => 2, 3 => 4}
+    @errors.clear
+    @errors.errors.should == {}
   end
-end
+  
+  specify "should be empty if no errors are added" do
+    @errors.should be_empty
+    @errors[:blah] << "blah"
+    @errors.should_not be_empty
+  end
+  
+  specify "should return errors for a specific attribute using #on or #[]" do
+    @errors[:blah].should == []
+    @errors.on(:blah).should == []
 
-class HighnessOf < Sequel::Validation
-  default :threshold => 100
-  option :threshold
-  
-  def valid?(o)
-    v = o.send(attribute)
-    v && (v >= threshold)
+    @errors[:blah] << 'blah'
+    @errors[:blah].should == ['blah']
+    @errors.on(:blah).should == ['blah']
+
+    @errors[:bleu].should == []
+    @errors.on(:bleu).should == []
   end
   
-  def failed_message(o)
-    "#{attribute} is too low (#{threshold})"
+  specify "should accept errors using #[] << or #add" do
+    @errors[:blah] << 'blah'
+    @errors[:blah].should == ['blah']
+    
+    @errors.add :blah, 'zzzz'
+    @errors[:blah].should == ['blah', 'zzzz']
+  end
+  
+  specify "should return full messages using #full_messages" do
+    @errors.full_messages.should == []
+    
+    @errors[:blow] << 'blieuh'
+    @errors[:blow] << 'blich'
+    @errors[:blay] << 'bliu'
+    msgs = @errors.full_messages
+    msgs.size.should == 3
+    msgs.should include('blow blieuh', 'blow blich', 'blay bliu')
   end
 end
 
@@ -132,64 +56,54 @@ describe Sequel::Validatable do
   setup do
     @c = Class.new do
       include Sequel::Validatable
+      
+      def self.validates_coolness_of(attr)
+        validates_each(attr) {|o, a, v| o.errors[a] << 'is not cool' if v != :cool}
+      end
+    end
+    
+    @d = Class.new do
+      attr_accessor :errors
+      def initialize; @errors = Sequel::Validatable::Errors.new; end
     end
   end
   
   specify "should respond to validates, validations, has_validations?" do
-    @c.should respond_to(:validates)
     @c.should respond_to(:validations)
     @c.should respond_to(:has_validations?)
   end
   
-  specify "should respond to validates_xxx methods" do
-    @c.should respond_to(:validates_highness_of)
-  end
-  
-  specify "should acccept validation definitions using .validates ..." do
-    @c.validates :highness_of, :blah
+  specify "should acccept validation definitions using validates_each" do
+    @c.validates_each(:xx, :yy) {|o, a, v| o.errors[a] << 'too low' if v < 50}
     
-    @c.validations.size.should == 1
-    @c.validations.first.should be_a_kind_of(HighnessOf)
-    @c.validations.first.attribute.should == :blah
-  end
-
-  specify "should acccept validation definitions using .validates {...}" do
-    @c.validates do
-      highness_of :miu
-      highness_of :hey => 1
-    end
+    @c.validations[:xx].size.should == 1
+    @c.validations[:yy].size.should == 1
     
-    @c.validations.size.should == 2
-    @c.validations.first.should be_a_kind_of(HighnessOf)
-    @c.validations.last.should be_a_kind_of(HighnessOf)
-    @c.validations.first.attribute.should == :miu
-    @c.validations.last.opts.should == {:hey => 1, :threshold => 100}
-  end
-
-  specify "should acccept validation definitions using .validates_xxx" do
-    @c.validates_highness_of :ohai
+    o = @d.new
+    @c.validations[:xx].first.call(o, :aa, 40)
+    @c.validations[:yy].first.call(o, :bb, 60)
     
-    @c.validations.size.should == 1
-    @c.validations.first.should be_a_kind_of(HighnessOf)
-    @c.validations.first.attribute.should == :ohai
-  end
-  
-  specify "should acccept validation definitions using .validates_xxx with block" do
-    @c.validates_highness_of {'blah'}
-
-    @c.validations.size.should == 1
-    @c.validations.first.should be_a_kind_of(HighnessOf)
-    @c.validations.first.block.call.should == 'blah'
+    o.errors.full_messages.should == ['aa too low']
   end
 
   specify "should return true/false for has_validations?" do
     @c.has_validations?.should == false
-    @c.validates_highness_of :ohai
+    @c.validates_each(:xx) {1}
     @c.has_validations?.should == true
   end
   
-  specify "should raise Sequel::Error for unknown validation" do
-    proc {@c.validates :blahblah}.should raise_error(Sequel::Error)
+  specify "should provide a validates method that takes block with validation definitions" do
+    @c.validates do
+      coolness_of :blah
+    end
+    @c.validations[:blah].should_not be_empty
+
+    o = @d.new
+    @c.validations[:blah].first.call(o, :ttt, 40)
+    o.errors.full_messages.should == ['ttt is not cool']
+    o.errors.clear
+    @c.validations[:blah].first.call(o, :ttt, :cool)
+    o.errors.should be_empty
   end
 end
 
@@ -200,7 +114,9 @@ describe "A Validatable instance" do
       
       include Sequel::Validatable
       
-      validates_highness_of :score, :threshold => 87
+      validates_each :score do |o, a, v|
+        o.errors[a] << 'too low' if v < 87
+      end
     end
     
     @o = @c.new
@@ -213,23 +129,36 @@ describe "A Validatable instance" do
     @o.should be_valid
   end
   
-  specify "should give a list of error messages if validations fail" do
+  specify "should provide an errors object" do
     @o.score = 100
-    @o.valid?
-    @o.errors.should == []
+    @o.should be_valid
+    @o.errors.should be_empty
     
-    @c.send(:attr_accessor, :blah)
-    @c.validates_highness_of :blah
+    @o.score = 86
+    @o.should_not be_valid
+    @o.errors[:score].should == ['too low']
+    @o.errors[:blah].should be_empty
+  end
+end
+
+describe Sequel::Validatable::Generator do
+  setup do
+    $testit = nil
     
-    @o = @c.new
-    @o.score = 20
-    @o.blah = 30
-    
-    @o.valid?
-    @o.errors.should == [
-      'score is too low (87)',
-      'blah is too low (100)'
-    ]
+    @c = Class.new do
+      include Sequel::Validatable
+      
+      def self.validates_blah
+        $testit = 1324
+      end
+    end
+  end
+  
+  specify "should instance_eval the block, sending everything to its receiver" do
+    Sequel::Validatable::Generator.new(@c) do
+      blah
+    end
+    $testit.should == 1324
   end
 end
 
@@ -273,15 +202,6 @@ describe "Sequel validations" do
     @m.should be_valid
   end
 
-  specify "should validate confirmation_of without case sensitivity" do
-    @c.send(:attr_accessor, :value_confirmation)
-    @c.validates_confirmation_of :value, :case_sensitive => false
-
-    @m.value = 'blah'
-    @m.value_confirmation = 'BLAH'
-    @m.should be_valid
-  end
-  
   specify "should validate format_of" do
     @c.validates_format_of :value, :with => /.+_.+/
     @m.value = 'abc_'
@@ -290,17 +210,14 @@ describe "Sequel validations" do
     @m.should be_valid
   end
   
-  specify "should validate each (with custom block)" do
-    @c.validates_each {errors << "error" unless value == 1111}
-    @m.value = 1234
-    @m.should_not be_valid
-    @m.value = 1111
-    @m.should be_valid
+  specify "should raise for validate_format_of without regexp" do
+    proc {@c.validates_format_of :value}.should raise_error(Sequel::Error)
+    proc {@c.validates_format_of :value, :with => :blah}.should raise_error(Sequel::Error)
   end
-
+  
   specify "should validate length_of with maximum" do
     @c.validates_length_of :value, :maximum => 5
-    @m.should be_valid #=> nil is taken as a length of 0
+    @m.should_not be_valid
     @m.value = '12345'
     @m.should be_valid
     @m.value = '123456'
@@ -371,17 +288,6 @@ describe "Sequel validations" do
     @m.value = 1234
     @m.should be_valid
   end
-  
-  specify "should validate true_for" do
-    @c.validates_true_for :value, :logic => proc {value == true}
-    @m.should_not be_valid
-    @m.value = 'blah'
-    @m.should_not be_valid
-    @m.value = 1
-    @m.should_not be_valid
-    @m.value = true
-    @m.should be_valid
-  end
 end
 
 describe Sequel::Model, "Validations" do
@@ -415,23 +321,6 @@ describe Sequel::Model, "Validations" do
     end
   end
   
-  it "should have a hook before validating" do
-    class Person < Sequel::Model(:people)
-      before_validation do
-        self.name = "default name"
-      end
-      validations.clear
-      validates_presence_of :name
-    end
-
-    @person = Person.new
-    @person.should be_valid
-  end
-  
-  # it "should include errors from other models" do
-  #   pending("Waiting for Wayne's amazing associations!")
-  # end
-  
   it "should validate the acceptance of a column" do
     class Cow < Sequel::Model(:cows)
       validations.clear
@@ -440,7 +329,7 @@ describe Sequel::Model, "Validations" do
     
     @cow = Cow.new
     @cow.should_not be_valid
-    @cow.errors.should == ["got_milk must be accepted"]
+    @cow.errors.full_messages.should == ["got_milk is not accepted"]
     
     @cow.got_milk = "blah"
     @cow.should be_valid
@@ -458,28 +347,10 @@ describe Sequel::Model, "Validations" do
     
     @user = User.new
     @user.should_not be_valid
-    @user.errors.should == ["password must be confirmed"]
+    @user.errors.full_messages.should == ["password is not confirmed"]
     
     @user.password = "test"
     @user.should be_valid
-  end
-  
-  it "should validate each" do
-    class ZipCodeService
-      def self.allows(zip); zip == '48104'; end
-    end
-    
-    class Address < Sequel::Model(:addresses)
-      validations.clear
-      validates_each {errors << "zip_code is invalid" unless ZipCodeService.allows(zip_code)}
-    end
-    
-    @address = Address.new :zip_code => "48108"
-    @address.should_not be_valid
-    @address.errors.should == ["zip_code is invalid"]
-    
-    @address2 = Address.new :zip_code => "48104"
-    @address2.should be_valid
   end
   
   it "should validate format of column" do
@@ -514,12 +385,13 @@ describe Sequel::Model, "Validations" do
     )
     
     @person.should_not be_valid
-    @person.errors.should == [
-      'first_name is invalid',
-      'last_name is invalid',
-      'middle_name is invalid',
-      'initials is invalid'
-    ]
+    @person.errors.full_messages.size.should == 4
+    @person.errors.full_messages.should include(
+      'first_name is too long',
+      'last_name is too short',
+      'middle_name is the wrong length',
+      'initials is the wrong length'
+    )
     
     @person.first_name  = "Lancelot"
     @person.last_name   = "1234567890123456789012345678901"
@@ -536,7 +408,7 @@ describe Sequel::Model, "Validations" do
     
     @person = Person.new :age => "Twenty"
     @person.should_not be_valid
-    @person.errors.should == ['age must be a number']
+    @person.errors.full_messages.should == ['age is not a number']
     
     @person.age = 20
     @person.should be_valid
@@ -550,26 +422,12 @@ describe Sequel::Model, "Validations" do
     
     @cow = Cow.new
     @cow.should_not be_valid
-    @cow.errors.should == ['name must be present']
+    @cow.errors.full_messages.should == ['name is not present']
     
     @cow.name = "Betsy"
     @cow.should be_valid
   end
   
-  it "should validate true for a column" do
-    class Person < Sequel::Model(:people)
-      validations.clear
-      validates_true_for(:first_name) {first_name == "Alison"}
-    end
-
-    @person = Person.new :first_name => "Nina"
-    @person.should_not be_valid
-    @person.errors.should == ['first_name is invalid']
-    
-    @person.first_name = "Alison"
-    @person.should be_valid
-  end
-    
   it "should have a validates block that calls multple validations" do
     class Person < Sequel::Model(:people)
       validations.clear
@@ -579,7 +437,7 @@ describe Sequel::Model, "Validations" do
       end
     end
 
-    Person.validations.length.should eql(2)
+    Person.validations[:first_name].size.should == 2
     
     @person = Person.new :first_name => "Lancelot99"
     @person.valid?.should be_false
@@ -596,48 +454,6 @@ describe Sequel::Model, "Validations" do
       end
     }.should_not raise_error
     Person.validations.length.should eql(1)
-  end
-
-  it "should validates do should allow shorthand method for every longhand validates_* method" do
-    class Person
-      validations.clear
-      validates do
-        format_of       :first_name, :with => /^[a-zA-Z]+$/
-        length_of       :first_name, :maximum => 30
-        presence_of     :first_name
-        numericality_of :age
-        acceptance_of   :terms
-        confirmation_of :password
-        true_for        :first_name, :blah => 1
-      end
-    end
-    Person.validations.map {|v| v.class}.should == [
-      Sequel::Validation::FormatOf,
-      Sequel::Validation::LengthOf,
-      Sequel::Validation::PresenceOf,
-      Sequel::Validation::NumericalityOf,
-      Sequel::Validation::AcceptanceOf,
-      Sequel::Validation::ConfirmationOf,
-      Sequel::Validation::TrueFor
-    ]
-    Person.validations.map {|v| v.attribute}.should == [
-      :first_name,
-      :first_name,
-      :first_name,
-      :age,
-      :terms,
-      :password,
-      :first_name
-    ]
-    Person.validations.map {|v| v.opts}.should == [
-      {:with => /^[a-zA-Z]+$/},
-      {:maximum => 30},
-      {},
-      {},
-      {:accept=>"1", :allow_nil=>true},
-      {:case_sensitive=>true},
-      {:blah => 1}
-    ]
   end
 
   it "should define a has_validations? method which returns true if the model has validations, false otherwise" do
@@ -663,7 +479,9 @@ describe "Model#save!" do
     @c = Class.new(Sequel::Model(:people)) do
       def columns; [:id]; end
       
-      validates_each {errors << "blah" unless id == 5}
+      validates_each :id do |o, a, v|
+        o.errors[a] << 'blah' unless v == 5
+      end
     end
     @m = @c.new(:id => 4)
     MODEL_DB.reset
@@ -681,7 +499,9 @@ describe "Model#save!" do
     @c = Class.new(Sequel::Model(:people)) do
       def columns; [:id]; end
 
-      validates_each {errors << "blah" unless id == 5}
+      validates_each :id do |o, a, v|
+        o.errors[a] << 'blah' unless v == 5
+      end
     end
     @m = @c.new(:id => 4)
     MODEL_DB.reset

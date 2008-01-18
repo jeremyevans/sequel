@@ -1,5 +1,7 @@
 === SVN
 
+* Implemented Validatable::Errors class.
+
 * Added Model#reload as alias to Model#refresh.
 
 * Changed Model.create to accept a block (#126).

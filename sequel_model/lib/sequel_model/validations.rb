@@ -1,234 +1,176 @@
 module Sequel
   module Validatable
-    module ClassMethods
-      def self.add_validation_method(name)
-        class_eval("def validates_#{name}(*args, &b); validates(#{name.inspect}, *args, &b); end")
-      end
-
-      def validations
-        @validations ||= []
-      end
-
-      def validates(*args, &block)
-        if block && args.empty?
-          return Validation::Generator.new(self, &block)
-        end
-        validations << Sequel::Validation[args.shift].new(*args, &block)
+    class Errors
+      def initialize
+        @errors = Hash.new {|h, k| h[k] = []}
       end
       
-      def has_validations?
-        !validations.empty?
+      def empty?
+        @errors.empty?
       end
       
-      def before_validation_hooks
-        @before_validation_hooks ||= []
+      def clear
+        @errors.clear
       end
       
-      def before_validation(&block)
-        before_validation_hooks << block
+      def on(att)
+        @errors[att]
+      end
+      alias_method :[], :on
+      
+      def add(att, msg)
+        @errors[att] << msg
       end
       
-      def validate(o)
-        before_validation_hooks.each {|b| o.instance_eval(&b)}
-        validations.each do |v|
-          unless v.valid?(o)
-            o.errors << v.failed_message(o)
-          end
-        end
-      end
-    end
-
-    def self.included(c)
-      c.extend ClassMethods
-    end
-    
-    attr_accessor :errors
-
-    def validate
-      @errors = []
-      self.class.validate(self)
-    end
-    
-    def valid?
-      validate
-      errors.empty?
-    end
-  end
-
-  class Validation
-    @@validation_classes = {}
-    
-    def self.validation_name
-      to_s =~ /([^:]+)$/
-      $1.underscore.to_sym
-    end
-    
-    def self.inherited(c)
-      name = c.validation_name
-      @@validation_classes[name] = c
-      Sequel::Validatable::ClassMethods.add_validation_method(name)
-    end
-    
-    def self.[](name)
-      @@validation_classes[name] || \
-        (raise Sequel::Error, "Unknown validation #{name}")
-    end
-    
-    def self.check_required_options(opts)
-      return unless @required_options
-      keys = opts.keys
-      @required_options.each do |o|
-        unless keys.include?(o)
-          raise Sequel::Error, "Missing option #{o} for #{validation_name} validation"
+      def full_messages
+        @errors.inject([]) do |m, kv| att, errors = *kv
+          errors.each {|e| m << "#{att} #{e}"}
+          m
         end
       end
     end
     
-    def self.required_option(o)
-      @required_options ||= []
-      @required_options << o
-      option(o)
-    end
-    
-    def self.default_options
-      @default_options || {}
-    end
-    
-    def self.default(opts)
-      @default_options ||= {}
-      @default_options.merge!(opts)
-    end
-    
-    def self.option(*names)
-      names.each do |n|
-        class_def(n) {@opts[n]}
-      end
-    end
-    
-    attr_reader :attribute, :opts, :block
-
-    def initialize(attribute = nil, opts = {}, &block)
-      if Hash === attribute
-        opts = attribute
-        attribute = nil
-      end
-      @attribute, @opts = attribute, self.class.default_options.merge(opts)
-      @block = block || @opts[:logic]
-      self.class.check_required_options(@opts)
-    end
-    
-    def message(o)
-      attribute ? "#{attribute} is invalid" : \
-        "#{self.class.validation_name} validation failed"
-    end
-    
-    def failed_message(o)
-      @opts[:message] || message(o)
-    end
-
     class Generator
       def initialize(receiver ,&block)
         @receiver = receiver
         instance_eval(&block)
       end
 
-      def method_missing(*args)
-        @receiver.validates *args
+      def method_missing(m, *args)
+        @receiver.send(:"validates_#{m}", *args)
       end
     end
     
-    class AcceptanceOf < Validation
-      option :allow_nil, :accept
-      default :allow_nil => true, :accept => '1'
-    
-      def valid?(o)
-        v = o.send(attribute)
-        (v.nil? && allow_nil) ? true : (v == accept)
+    module ClassMethods
+      def validates(&block)
+        Generator.new(self, &block)
       end
-  
-      def message(o)
-        "#{attribute} must be accepted"
-      end
-    end
-    
-    class ConfirmationOf < Validation
-      option :case_sensitive
-      default :case_sensitive => true
-      
-      def valid?(o)
-        v1 = o.send(attribute).to_s
-        v2 = o.send(:"#{attribute}_confirmation").to_s
-        case_sensitive ? (v1 == v2) : (v1.casecmp(v2) == 0)
+
+      def validations
+        @validations ||= Hash.new {|h, k| h[k] = []}
       end
       
-      def message(o)
-        "#{attribute} must be confirmed"
+      def has_validations?
+        !validations.empty?
       end
-    end
-    
-    class FormatOf < Validation
-      required_option :with
-      
-      def valid?(o)
-        !(o.send(attribute).to_s =~ with).nil?
+
+      def validate(o)
+        validations.each do |att, procs|
+          v = o.send(att)
+          procs.each {|p| p[o, att, v]}
+        end
       end
-    end
-    
-    class Each < Validation
-      def valid?(o)
-        o.instance_eval(&@block)
-        true
+
+      def validates_each(*atts, &block)
+        atts.each {|a| validations[a] << block}
       end
     end
 
-    class LengthOf < Validation
-      option :minimum, :maximum, :is, :within, :allow_nil
-  
-      def valid?(o)
-        valid = true
-        unless v = o.send(self.attribute)
-          return true if allow_nil
-          v = ''
-        end
-  
-        valid &&= v.length <= maximum if maximum
-        valid &&= v.length >= minimum if minimum
-        valid &&= v.length == is if is
-        valid &&= within.include?(v.length) if within
-        valid
-      end
+    def self.included(c)
+      c.extend ClassMethods
+    end
+
+    attr_accessor :errors
+
+    def validate
+      @errors = Errors.new
+      self.class.validate(self)
+    end
+
+    def valid?
+      validate
+      errors.empty?
     end
     
-    class NumericalityOf < Validation
-      option :only_integer
-      
+    module ClassMethods
+      def validates_acceptance_of(*atts)
+        opts = {
+          :message => 'is not accepted',
+          :allow_nil => true,
+          :accept => '1'
+        }.merge!(atts.extract_options!)
+        
+        validates_each(*atts) do |o, a, v|
+          next if (v.nil? && opts[:allow_nil]) || (v.blank? && opts[:allow_blank])
+          o.errors[a] << opts[:message] unless v == opts[:accept]
+        end
+      end
+
+      def validates_confirmation_of(*atts)
+        opts = {
+          :message => 'is not confirmed',
+        }.merge!(atts.extract_options!)
+        
+        validates_each(*atts) do |o, a, v|
+          next if (v.nil? && opts[:allow_nil]) || (v.blank? && opts[:allow_blank])
+          c = o.send(:"#{a}_confirmation")
+          o.errors[a] << opts[:message] unless v == c
+        end
+      end
+
+      def validates_format_of(*atts)
+        opts = {
+          :message => 'is invalid',
+        }.merge!(atts.extract_options!)
+        
+        unless opts[:with].is_a?(Regexp)
+          raise Sequel::Error, "A regular expression must be supplied as the :with option of the options hash"
+        end
+        
+        validates_each(*atts) do |o, a, v|
+          next if (v.nil? && opts[:allow_nil]) || (v.blank? && opts[:allow_blank])
+          o.errors[a] << opts[:message] unless v =~ opts[:with]
+        end
+      end
+
+      def validates_length_of(*atts)
+        opts = {
+          :too_long     => 'is too long',
+          :too_short    => 'is too short',
+          :wrong_length => 'is the wrong length'
+        }.merge!(atts.extract_options!)
+        
+        validates_each(*atts) do |o, a, v|
+          next if (v.nil? && opts[:allow_nil]) || (v.blank? && opts[:allow_blank])
+          if m = opts[:maximum]
+            o.errors[a] << (opts[:message] || opts[:too_long]) unless v && v.size <= m
+          end
+          if m = opts[:minimum]
+            o.errors[a] << (opts[:message] || opts[:too_short]) unless v && v.size >= m
+          end
+          if i = opts[:is]
+            o.errors[a] << (opts[:message] || opts[:wrong_length]) unless v && v.size == i
+          end
+          if w = opts[:within]
+            o.errors[a] << (opts[:message] || opts[:wrong_length]) unless v && w.include?(v.size)
+          end
+        end
+      end
+
       NUMBER_RE = /^\d*\.{0,1}\d+$/
       INTEGER_RE = /\A[+-]?\d+\Z/
-      
-      
-      def valid?(o)
-        v = o.send(attribute).to_s
-        v =~ (only_integer ? INTEGER_RE : NUMBER_RE)
+
+      def validates_numericality_of(*atts)
+        opts = {
+          :message => 'is not a number',
+        }.merge!(atts.extract_options!)
+        
+        re = opts[:only_integer] ? INTEGER_RE : NUMBER_RE
+        
+        validates_each(*atts) do |o, a, v|
+          next if (v.nil? && opts[:allow_nil]) || (v.blank? && opts[:allow_blank])
+          o.errors[a] << opts[:message] unless v.to_s =~ re
+        end
       end
-      
-      def message(o)
-        "#{attribute} must be a number"
-      end
-    end
-    
-    class PresenceOf < Validation
-      def valid?(o)
-        !o.send(attribute).blank?
-      end
-      
-      def message(o)
-        "#{attribute} must be present"
-      end
-    end
-    
-    class TrueFor < Validation
-      def valid?(o)
-        o.instance_eval(&block)
+
+      def validates_presence_of(*atts)
+        opts = {
+          :message => 'is not present',
+        }.merge!(atts.extract_options!)
+        
+        validates_each(*atts) do |o, a, v|
+          o.errors[a] << opts[:message] unless v && !v.blank?
+        end
       end
     end
   end
