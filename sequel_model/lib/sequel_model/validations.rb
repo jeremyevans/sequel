@@ -1,3 +1,5 @@
+gem 'assistance', '>= 0.1.1' # because we need Array#extract_options!
+
 module Sequel
   # The Validatable module provides validation capabilities as a mixin. When
   # included into a class, it enhances the class with class and instance
