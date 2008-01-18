@@ -162,6 +162,11 @@ Spec::Rake::SpecTask.new("rcov") do |t|
   t.rcov = true
 end
 
+desc "check documentation coverage"
+task :dcov do
+  sh "find lib -name '*.rb' | xargs dcov"
+end
+
 ##############################################################################
 # Statistics
 ##############################################################################

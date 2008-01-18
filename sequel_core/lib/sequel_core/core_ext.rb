@@ -22,3 +22,4 @@ class Object
     nil
   end
 end
+
