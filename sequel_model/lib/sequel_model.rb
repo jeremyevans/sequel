@@ -234,7 +234,7 @@ end
 files = %w[
   base hooks record schema relations 
   caching plugins validations
-  relationships core_ext
+  relationships
 ]
 dir = File.join(File.dirname(__FILE__), "sequel_model")
 files.each {|f| require(File.join(dir, f))}
