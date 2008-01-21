@@ -145,7 +145,7 @@ module Sequel
       # returns true if exists, false if not
       def join_table?(first, second)
         # we still have to test this out      
-        DB[join_table(first, second)].exists?
+        db[join_table(first, second)].table_exists?
       end
 
       # TODO: Move this elsewhere? outside relationships?
@@ -170,7 +170,7 @@ module Sequel
 
       def auto_create_join_table(klass, option = {})
         first, second = table_name, klass.to_s.pluralize
-        if join_table? && options[:force] == false
+        if join_table?(first, second) && options[:force] == false
           create_join_table!(first, second)
         else
           create_join_table(first, second)
