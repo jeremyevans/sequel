@@ -101,9 +101,9 @@ module Sequel
           raise Sequel::Error, "Arity must be specified {:one, :many}." 
         end
 
-        unless const_defined?(klass.camel_case)
-          raise Sequel::Error, "#{klass.camel_case} does not exist"
-        end
+        #unless const_defined?(klass.to_s.camel_case)
+          #raise Sequel::Error, "#{klass.to_s.camel_case} does not exist"
+        #end
 
         # Make sure the join table exists
         auto_create_join_table(klass, options)
@@ -169,7 +169,7 @@ module Sequel
       end
 
       def auto_create_join_table(klass, option = {})
-        first, second = table_name, klass.pluralize
+        first, second = table_name, klass.to_s.pluralize
         if join_table? && options[:force] == false
           create_join_table!(first, second)
         else

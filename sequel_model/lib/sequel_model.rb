@@ -232,8 +232,9 @@ end
 
 # TODO: add relationships when complete:
 files = %w[
-  base hooks record schema relations
+  base hooks record schema relations 
   caching plugins validations
+  relationships core_ext
 ]
 dir = File.join(File.dirname(__FILE__), "sequel_model")
 files.each {|f| require(File.join(dir, f))}
