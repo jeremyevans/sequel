@@ -82,11 +82,11 @@ module Sequel
     end
 
     class << self
-      attr_accessor :model_relationships
-      model_relationships = []
+      cattr_accessor :model_relationships
+      @@model_relationships = []
 
       def relationship_exists?(arity,relation)
-        model_relationships.detect do |relation|
+        @@model_relationships.detect do |relation|
           relation[:arity] == arity && 
           relation[:klass] == relation
         end
@@ -108,24 +108,26 @@ module Sequel
         # Make sure the join table exists
         auto_create_join_table(klass, options)
 
-        if relationship_exists?(arity,klass)
+        if relationship_exists?(arity, klass)
           raise Sequel::Error, "The relationship #{self.class.name} has #{arity}, #{klass} is already defined."
         end
 
         # Store the relationship
-        model_relationships << { 
+        @@model_relationships << { 
           :arity => arity, 
           :klass => klass, 
           :options => options 
         }
 
         # Define relationship methods
-        self.define_relationship_method arity, klass, options
+        after_initialize do
+          define_relationship_method arity, klass, options
+        end
 
-        unless normalized
+        #unless normalized
           # :required => true # The relationship must be populated to save
           # can only be used with normalized => false : 
-        end
+        #end
         # save the relationship
       end
       
@@ -152,15 +154,15 @@ module Sequel
       # creates a join table given two table names
       def create_join_table(first, second)
         first_key, second_key = "#{first}_id", "#{second}_id"
-        DB.create_table join_table(first, second).to_sym do
-          primary_key [first_key.to_sym, second_key.to_sym]
+        db.create_table join_table(first, second).to_sym do
+          #primary_key [first_key.to_sym, second_key.to_sym]
           integer first_key, :null => false
           integer second_key, :null => false
-        end
+        end unless join_table?(first, second)
       end
 
       def create_join_table!(first, second)
-        DB.drop_table join_table(first, second)
+        db.drop_table join_table(first, second)
         create_join_table(first, second)
       end
 
@@ -168,9 +170,9 @@ module Sequel
         auto_create_join_table(klass, :force => true)
       end
 
-      def auto_create_join_table(klass, option = {})
+      def auto_create_join_table(klass, options = {})
         first, second = table_name, klass.to_s.pluralize
-        if join_table?(first, second) && options[:force] == false
+        if join_table?(first, second) && options[:force] == true
           create_join_table!(first, second)
         else
           create_join_table(first, second)
@@ -180,11 +182,11 @@ module Sequel
       # Given two models, it outputs the join table name
       # which is sorted alphabetically with each table name pluralized
       # Examples:
-      #   join_table(user, post) #=> posts_users
-      #   join_table(users, posts) #=> posts_users
+      #   join_table(user, post) #=> :posts_users
+      #   join_table(users, posts) #=> :posts_users
       def join_table(first, second)
         first, second = first.to_s.pluralize, second.to_s.pluralize
-        [first, second].sort.join("_")
+        [first, second].sort.join("_").to_sym
       end
 
       # relationships do
