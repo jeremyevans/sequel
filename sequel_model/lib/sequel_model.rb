@@ -230,6 +230,7 @@ module Sequel
 
 end
 
+# TODO: add relationships when complete:
 files = %w[
   base hooks record schema relations
   caching plugins validations
