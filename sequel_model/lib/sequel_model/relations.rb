@@ -4,10 +4,10 @@ module Sequel
     
     # Creates a 1-1 relationship by defining an association method, e.g.:
     # 
-    #   class Session < Sequel::Model(:sessions)
+    #   class Session < Sequel::Model
     #   end
     #
-    #   class Node < Sequel::Model(:nodes)
+    #   class Node < Sequel::Model
     #     one_to_one :producer, :from => Session
     #     # which is equivalent to
     #     def producer
@@ -58,10 +58,10 @@ module Sequel
   
     # Creates a 1-N relationship by defining an association method, e.g.:
     # 
-    #   class Book < Sequel::Model(:books)
+    #   class Book < Sequel::Model
     #   end
     #
-    #   class Author < Sequel::Model(:authors)
+    #   class Author < Sequel::Model
     #     one_to_many :books, :from => Book
     #     # which is equivalent to
     #     def books
@@ -92,7 +92,7 @@ module Sequel
     # Database modelling is generally done with an ER (Entity Relationship) diagram.
     # Shouldn't ORM's facilitate simlilar specification?
 
-    #   class Post < Sequel::Model(:users)
+    #   class Post < Sequel::Model
     #     relationships do
     #       # Specify the relationships that exist with the User model (users table)
     #       # These relationships are precisely the ER diagram connecting arrows.
@@ -111,7 +111,7 @@ module Sequel
     # ?parameters may be :zero, :one, :many which specifies the cardinality of the connection
 
     # Example:
-    #   class Post < Sequel::Model(:users)
+    #   class Post < Sequel::Model
     #     relationships do
     #       has :one,  :blog, :required => true # blog_id field, cannot be null
     #       has :one,  :account # account_id field

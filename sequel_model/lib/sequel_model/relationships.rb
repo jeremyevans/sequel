@@ -2,7 +2,7 @@
 # Database modelling is generally done with an ER (Entity Relationship) diagram.
 # Shouldn't ORM's facilitate simlilar specification?
 
-# class Post < Sequel::Model(:users)
+# class Post < Sequel::Model
 #   relationships do
 #     # Specify the relationships that exist with the User model (users table)
 #     # These relationships are precisely the ER diagram connecting arrows.
@@ -22,7 +22,7 @@
 # ?parameters may be :zero, :one, :many which specifies the cardinality of the connection
 
 # Example:
-# class Post < Sequel::Model(:users)
+# class Post < Sequel::Model
 #   relationships do
 #     has :one,  :blog, :required => true, :normalized => false # uses a blog_id field, which cannot be null, in the Post model
 #     has :one,  :account # uses a join table called accounts_posts to link the post with it's account.

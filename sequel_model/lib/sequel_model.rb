@@ -13,7 +13,7 @@ module Sequel
   # You can also use the shorthand form:
   # 
   #   DB = Sequel('sqlite:/blog.db')
-  #   class Post < Sequel::Model(:posts)
+  #   class Post < Sequel::Model
   #   end
   # 
   # === Model instances
@@ -28,7 +28,7 @@ module Sequel
   # 
   # Sequel models allow you to use any column as a primary key, and even composite keys made from multiple columns:
   # 
-  #   class Post < Sequel::Model(:posts)
+  #   class Post < Sequel::Model
   #     set_primary_key [:category, :title]
   #   end
   # 
@@ -100,7 +100,7 @@ module Sequel
   # 
   # Hooks are defined by supplying a block:
   # 
-  #   class Post < Sequel::Model(:posts)
+  #   class Post < Sequel::Model
   #     after_create do
   #       set(:created_at => Time.now)
   #     end
@@ -128,17 +128,17 @@ module Sequel
   # 
   # The most straightforward way to define an association in a Sequel model is as a regular instance method:
   # 
-  #   class Post < Sequel::Model(:posts)
+  #   class Post < Sequel::Model
   #     def author; Author[author_id]; end
   #   end
   # 
-  #   class Author < Sequel::Model(:authors)
+  #   class Author < Sequel::Model
   #     def posts; Post.filter(:author_id => pk); end
   #   end
   # 
   # Sequel also provides two macros to assist with common types of associations. The one_to_one macro is roughly equivalent to ActiveRecord?'s belongs_to macro. It defines both getter and setter methods for the association:
   # 
-  #   class Post < Sequel::Model(:posts)
+  #   class Post < Sequel::Model
   #     one_to_one :author, :from => Author
   #   end
   #
@@ -147,7 +147,7 @@ module Sequel
   # 
   # The one_to_many macro is roughly equivalent to ActiveRecord's has_many macro:
   # 
-  #   class Author < Sequel::Model(:authors)
+  #   class Author < Sequel::Model
   #     one_to_many :posts, :from => Post, :key => :author_id
   #   end
   # 
@@ -160,7 +160,7 @@ module Sequel
   #   require 'memcache'
   #   CACHE = MemCache.new 'localhost:11211', :namespace => 'blog'
   # 
-  #   class Author < Sequel::Model(:authors)
+  #   class Author < Sequel::Model
   #     set_cache CACHE, :ttl => 3600
   #   end
   # 
@@ -171,7 +171,7 @@ module Sequel
   # 
   # The obvious way to add table-wide logic is to define class methods to the model class definition. That way you can define subsets of the underlying dataset, change the ordering, or perform actions on multiple records:
   # 
-  #   class Post < Sequel::Model(:posts)
+  #   class Post < Sequel::Model
   #     def self.old_posts
   #       filter {:stamp < 30.days.ago}
   #     end
@@ -183,7 +183,7 @@ module Sequel
   # 
   # You can also implement table-wide logic by defining methods on the dataset:
   # 
-  #   class Post < Sequel::Model(:posts)
+  #   class Post < Sequel::Model
   #     def dataset.old_posts
   #       filter {:stamp < 30.days.ago}
   #     end
@@ -199,7 +199,7 @@ module Sequel
   # 
   # Sequel models also provide a short hand notation for filters:
   # 
-  #   class Post < Sequel::Model(:posts)
+  #   class Post < Sequel::Model
   #     subset(:old_posts) {:stamp < 30.days.ago}
   #     subset :invisible, :visible => false
   #   end
@@ -208,7 +208,7 @@ module Sequel
   # 
   # Model classes can also be used as a place to define your table schema and control it. The schema DSL is exactly the same provided by Sequel::Schema::Generator:
   # 
-  #   class Post < Sequel::Model(:posts)
+  #   class Post < Sequel::Model
   #     set_schema do
   #       primary_key :id
   #       text :title
@@ -234,7 +234,6 @@ end
 files = %w[
   base hooks record schema relations 
   caching plugins validations
-  relationships
 ]
 dir = File.join(File.dirname(__FILE__), "sequel_model")
 files.each {|f| require(File.join(dir, f))}

@@ -135,8 +135,7 @@ describe "Model#serialize" do
 end
 
 describe Sequel::Model, "super_dataset" do
-  
-  before(:each) do
+  setup do
     MODEL_DB.reset
     class SubClass < Sequel::Model(:items) ; end
   end
@@ -146,5 +145,41 @@ describe Sequel::Model, "super_dataset" do
     Sequel::Model(:items).should_receive(:dataset)
     SubClass.super_dataset
   end
+end
 
+describe Sequel::Model, "dataset" do
+  setup do
+    @a = Class.new(Sequel::Model(:items))
+    @b = Class.new(Sequel::Model)
+    
+    class Elephant < Sequel::Model(:ele1)
+    end
+    
+    class Maggot < Sequel::Model
+    end
+
+    class ShoeSize < Sequel::Model
+    end
+    
+    class BootSize < ShoeSize
+    end
+  end
+  
+  specify "should default to the plural of the class name" do
+    Maggot.dataset.sql.should == 'SELECT * FROM maggots'
+    ShoeSize.dataset.sql.should == 'SELECT * FROM shoe_sizes'
+  end
+  
+  specify "should return the dataset for the superclass if available" do
+    BootSize.dataset.sql.should == 'SELECT * FROM shoe_sizes'
+  end
+  
+  specify "should return the correct dataset if set explicitly" do
+    Elephant.dataset.sql.should == 'SELECT * FROM ele1'
+    @a.dataset.sql.should == 'SELECT * FROM items'
+  end
+  
+  specify "should raise if no dataset is explicitly set and the class is anonymous" do
+    proc {@b.dataset}.should raise_error(Sequel::Error)
+  end
 end

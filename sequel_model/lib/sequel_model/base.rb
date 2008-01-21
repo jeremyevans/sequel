@@ -19,12 +19,13 @@ module Sequel
 
     # Returns the dataset associated with the Model class.
     def self.dataset
-      (@dataset ||= super_dataset) ||
+      @dataset ||= super_dataset ||
+        (!(n = name).empty? && db[n.underscore.pluralize.to_sym]) ||
         (raise Error, "No dataset associated with #{self}")
     end
     
     def self.super_dataset # :nodoc:
-      superclass.dataset if superclass and superclass.respond_to? :dataset
+      superclass.dataset if (superclass != Sequel::Model) && superclass.respond_to?(:dataset)
     end
     
     # Returns the columns in the result set in their original order.
@@ -79,8 +80,8 @@ module Sequel
   # Makes given dataset inherited.
   #
   # === Example:
-  #   class Comment < Sequel::Model(:comments)
-  #     table_name # => :comments
+  #   class Comment < Sequel::Model(:something)
+  #     table_name # => :something
   #
   #     # ...
   #

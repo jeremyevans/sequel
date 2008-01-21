@@ -53,12 +53,12 @@ module Sequel
     # Sets primary key, regular and composite are possible.
     #
     # == Example:
-    #   class Tagging < Sequel::Model(:taggins)
+    #   class Tagging < Sequel::Model
     #     # composite key
     #     set_primary_key :taggable_id, :tag_id
     #   end
     #
-    #   class Person < Sequel::Model(:person)
+    #   class Person < Sequel::Model
     #     # regular key
     #     set_primary_key :person_id
     #   end

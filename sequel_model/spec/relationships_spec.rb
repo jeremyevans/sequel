@@ -1,5 +1,7 @@
 require File.join(File.dirname(__FILE__), "spec_helper")
 
+__END__
+
 describe Sequel::Model::Relationships, "has :one" do
 end
 

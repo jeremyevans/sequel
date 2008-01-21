@@ -293,7 +293,7 @@ end
 describe Sequel::Model, "Validations" do
 
   before(:all) do
-    class Person < Sequel::Model(:people)
+    class Person < Sequel::Model
       def columns
         [:id,:name,:first_name,:last_name,:middle_name,:initials,:age, :terms]
       end
@@ -302,19 +302,19 @@ describe Sequel::Model, "Validations" do
     class Smurf < Person
     end
     
-    class Cow < Sequel::Model(:cows)
+    class Cow < Sequel::Model
       def columns
         [:id, :name, :got_milk]
       end
     end
 
-    class User < Sequel::Model(:users)
+    class User < Sequel::Model
       def columns
         [:id, :username, :password]
       end
     end
     
-    class Address < Sequel::Model(:addresses)
+    class Address < Sequel::Model
       def columns
         [:id, :zip_code]
       end
@@ -322,7 +322,7 @@ describe Sequel::Model, "Validations" do
   end
   
   it "should validate the acceptance of a column" do
-    class Cow < Sequel::Model(:cows)
+    class Cow < Sequel::Model
       validations.clear
       validates_acceptance_of :got_milk, :accept => 'blah', :allow_nil => false
     end
@@ -336,7 +336,7 @@ describe Sequel::Model, "Validations" do
   end
   
   it "should validate the confirmation of a column" do
-    class User < Sequel::Model(:users)      
+    class User < Sequel::Model
       def password_confirmation
         "test"
       end
@@ -354,7 +354,7 @@ describe Sequel::Model, "Validations" do
   end
   
   it "should validate format of column" do
-    class Person < Sequel::Model(:people)  
+    class Person < Sequel::Model
       validates_format_of :first_name, :with => /^[a-zA-Z]+$/
     end
 
@@ -369,7 +369,7 @@ describe Sequel::Model, "Validations" do
   # end
 
   it "should validate length of column" do
-    class Person < Sequel::Model(:people)
+    class Person < Sequel::Model
       validations.clear
       validates_length_of :first_name, :maximum => 30
       validates_length_of :last_name, :minimum => 30
@@ -401,7 +401,7 @@ describe Sequel::Model, "Validations" do
   end
   
   it "should validate numericality of column" do
-    class Person < Sequel::Model(:people)
+    class Person < Sequel::Model
       validations.clear
       validates_numericality_of :age
     end
@@ -415,7 +415,7 @@ describe Sequel::Model, "Validations" do
   end
   
   it "should validate the presence of a column" do
-    class Cow < Sequel::Model(:cows)
+    class Cow < Sequel::Model
       validations.clear
       validates_presence_of :name
     end
@@ -429,7 +429,7 @@ describe Sequel::Model, "Validations" do
   end
   
   it "should have a validates block that calls multple validations" do
-    class Person < Sequel::Model(:people)
+    class Person < Sequel::Model
       validations.clear
       validates do
         format_of :first_name, :with => /^[a-zA-Z]+$/
@@ -448,7 +448,7 @@ describe Sequel::Model, "Validations" do
 
   it "should allow 'longhand' validations direcly within the model." do
     lambda {
-      class Person < Sequel::Model(:people)
+      class Person < Sequel::Model
         validations.clear
         validates_length_of :first_name, :maximum => 30
       end
@@ -457,7 +457,7 @@ describe Sequel::Model, "Validations" do
   end
 
   it "should define a has_validations? method which returns true if the model has validations, false otherwise" do
-    class Person < Sequel::Model(:people)
+    class Person < Sequel::Model
       validations.clear
       validates do
         format_of :first_name, :with => /\w+/
