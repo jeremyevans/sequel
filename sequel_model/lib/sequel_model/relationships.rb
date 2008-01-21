@@ -82,7 +82,7 @@ module Sequel
     end
 
     class << self
-      cattr_accessor :model_relationships
+      cattr_reader :model_relationships
       @@model_relationships = []
 
       def relationship_exists?(arity,relation)
@@ -215,27 +215,19 @@ module Sequel
 
     # Defines relationship method from the current class to the klass specified
     def define_relationship_method(arity, relation, options)
-
       if arity == :one
-        instance_eval %Q{
+        self.instance_eval "
           def #{relation}
-            DB[:#{table_name}].
-            left_outer_join(#{relation}, 
-            :#{table_name.singularize}_id => #{id}
-            ).limit(1).first
+            self.db.dataset.left_outer_join(#{relation}, :id => :#{relation.to_s.singularize}_id).limit(1)
           end
-        }
+        "
       elsif arity == :many
-        instance_eval %Q{
+        self.instance_eval "
           def #{relation}
-            DB[:#{table_name}].
-            left_outer_join(#{relation}, 
-            :#{table_name.singularize}_id => #{id}
-            )
+            self.db.dataset.left_outer_join(#{relation}, :id => :#{relation.to_s.singularize}_id)
           end
-        }
+        "
       end
-
     end # define_relationship_method
   end # Model
 end # Sequel
