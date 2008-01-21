@@ -2399,5 +2399,58 @@ context "Dataset#update_sql" do
   specify "should accept array subscript references" do
     @ds.update_sql((:day|1) => 'd').should == "UPDATE items SET day[1] = 'd'"
   end
-
 end
+
+class DummyMummyDataset < Sequel::Dataset
+  def first
+    raise if @opts[:from] == [:a]
+    true
+  end
+end
+
+class DummyMummyDatabase < Sequel::Database
+  attr_reader :sqls
+  
+  def execute(sql)
+    @sqls ||= []
+    @sqls << sql
+  end
+  
+  def transaction; yield; end
+
+  def dataset
+    DummyMummyDataset.new(self)
+  end
+end
+
+context "Dataset#table_exists?" do
+  setup do
+    @db = DummyMummyDatabase.new
+    @db.stub!(:tables).and_return([:a, :b])
+    @db2 = DummyMummyDatabase.new
+  end
+  
+  specify "should use Database#tables if available" do
+    @db[:a].table_exists?.should be_true
+    @db[:b].table_exists?.should be_true
+    @db[:c].table_exists?.should be_false
+  end
+  
+  specify "should otherwise try to select the first record from the table's dataset" do
+    @db2[:a].table_exists?.should be_false
+    @db2[:b].table_exists?.should be_true
+  end
+  
+  specify "should raise Sequel::Error if dataset references more than one table" do
+    proc {@db.from(:a, :b).table_exists?}.should raise_error(Sequel::Error)
+  end
+
+  specify "should raise Sequel::Error if dataset is from a subquery" do
+    proc {@db.from(@db[:a]).table_exists?}.should raise_error(Sequel::Error)
+  end
+
+  specify "should raise Sequel::Error if dataset has fixed sql" do
+    proc {@db['select * from blah'].table_exists?}.should raise_error(Sequel::Error)
+  end
+end
+

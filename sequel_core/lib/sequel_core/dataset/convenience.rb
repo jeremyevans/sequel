@@ -316,6 +316,23 @@ module Sequel
       def create_or_replace_view(name)
         @db.create_or_replace_view(name, self)
       end
+      
+      def table_exists?
+        if @opts[:sql]
+          raise Sequel::Error, "this dataset has fixed SQL"
+        end
+        
+        if @opts[:from].size != 1
+          raise Sequel::Error, "this dataset selects from multiple sources"
+        end
+        
+        t = @opts[:from].first
+        if t.is_a?(Dataset)
+          raise Sequel::Error, "this dataset selects from a sub query"
+        end
+        
+        @db.table_exists?(t.to_sym)
+      end
     end
   end
 end

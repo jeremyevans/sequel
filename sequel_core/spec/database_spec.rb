@@ -400,7 +400,6 @@ context "Database#table_exists?" do
     @db = DummyDatabase.new
     @db.stub!(:tables).and_return([:a, :b])
     @db2 = DummyDatabase.new
-    Sequel::Dataset.stub!(:first).and_return(nil)
   end
   
   specify "should use Database#tables if available" do
@@ -414,7 +413,6 @@ context "Database#table_exists?" do
     @db2.table_exists?(:b).should be_true
   end
 end
-
 
 class Dummy3Database < Sequel::Database
   attr_reader :sql, :transactions

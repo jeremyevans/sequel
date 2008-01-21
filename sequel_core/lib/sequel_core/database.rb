@@ -277,7 +277,8 @@ module Sequel
       if respond_to?(:tables)
         tables.include?(name.to_sym)
       else
-        from(name).first && true
+        from(name).first
+        true
       end
     rescue
       false
