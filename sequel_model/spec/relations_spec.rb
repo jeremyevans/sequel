@@ -93,11 +93,6 @@ describe Sequel::Model, "one_to_one" do
     d.values.should == {:id => 1, :parent_id => 6677}
     $sqls.last.should == "UPDATE nodes SET parent_id = 6677 WHERE (id = 1)"
   end
-
-  it "should warn with a depreciation notice if :class option was used" do
-    pending("write this spec")
-  end
-
 end
 
 describe Sequel::Model, "one_to_many" do
@@ -138,13 +133,4 @@ describe Sequel::Model, "one_to_many" do
     a.should be_a_kind_of(Sequel::Dataset)
     a.sql.should == 'SELECT * FROM abc WHERE (node_id = 1234)'
   end
-
-  it "should warn with a depreciation notice if :class option was used" do
-    pending("write this spec")
-  end
-
-  it "should warn with a depreciation notice if :on option was used" do
-    pending("write this spec")
-  end
-
 end
