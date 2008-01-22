@@ -1,4 +1,8 @@
-=== 0.3.1
+=== SVN
+
+* Removed validations code. Now relying on validations in assistance gem.
+
+=== 0.3.1 (2008-01-21)
 
 * Changed Model.dataset to use inflector to pluralize the class name into the table name. Works in similar fashion to table names in AR or DM.
 

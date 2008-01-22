@@ -65,7 +65,8 @@ spec = Gem::Specification.new do |s|
     s.platform = Gem::Platform::RUBY
   end
 
-  s.add_dependency("sequel_core", '>= 0.5')
+  s.add_dependency("assistance", '>= 0.1.2')
+  s.add_dependency("sequel_core", '>= 1.0')
   
   s.files = %w(COPYING README Rakefile) + Dir.glob("{doc,spec,lib}/**/*")
 
