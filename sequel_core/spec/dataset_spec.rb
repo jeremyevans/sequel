@@ -364,6 +364,11 @@ context "Dataset#where" do
     proc {@dataset.filter(:a == 1)}.should raise_error(Sequel::Error::InvalidFilter)
     proc {@dataset.filter(:a != 1)}.should raise_error(Sequel::Error::InvalidFilter)
   end
+
+  specify "should work for grouped datasets" do
+    @dataset.group(:a).filter(:b => 1).sql.should ==
+      'SELECT * FROM test WHERE (b = 1) GROUP BY a'
+  end
 end
 
 context "Dataset#or" do

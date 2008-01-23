@@ -267,11 +267,24 @@ end
 context "Joiמed MySQL dataset" do
   setup do
     @ds = MYSQL_DB[:nodes].join(:attributes, :node_id => :id)
+    @ds2 = MYSQL_DB[:nodes]
   end
   
   specify "should quote fields correctly" do
     @ds.sql.should == \
       "SELECT * FROM nodes INNER JOIN attributes ON (attributes.`node_id` = nodes.`id`)"
+  end
+  
+  specify "should allow a having clause on ungrouped datasets" do
+    proc {@ds2.having('blah')}.should_not raise_error
+
+    @ds2.having('blah').sql.should == \
+      "SELECT * FROM nodes HAVING blah"
+  end
+  
+  specify "should put a having clause before an order by clause" do
+    @ds2.order(:aaa).having(:bbb => :ccc).sql.should == \
+      "SELECT * FROM nodes HAVING (`bbb` = `ccc`) ORDER BY `aaa`"
   end
 end
 

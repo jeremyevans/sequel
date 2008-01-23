@@ -217,6 +217,76 @@ module Sequel
         end
       end
 
+      # MySQL expects the having clause before the order by clause.
+      def select_sql(opts = nil)
+        opts = opts ? @opts.merge(opts) : @opts
+        
+        if sql = opts[:sql]
+          return sql
+        end
+
+        columns = opts[:select]
+        select_columns = columns ? column_list(columns) : WILDCARD
+
+        if distinct = opts[:distinct]
+          distinct_clause = distinct.empty? ? "DISTINCT" : "DISTINCT ON (#{column_list(distinct)})"
+          sql = "SELECT #{distinct_clause} #{select_columns}"
+        else
+          sql = "SELECT #{select_columns}"
+        end
+        
+        if opts[:from]
+          sql << " FROM #{source_list(opts[:from])}"
+        end
+        
+        if join = opts[:join]
+          sql << join
+        end
+
+        if where = opts[:where]
+          sql << " WHERE #{where}"
+        end
+
+        if group = opts[:group]
+          sql << " GROUP BY #{column_list(group)}"
+        end
+
+        if having = opts[:having]
+          sql << " HAVING #{having}"
+        end
+
+        if order = opts[:order]
+          sql << " ORDER BY #{column_list(order)}"
+        end
+
+        if limit = opts[:limit]
+          sql << " LIMIT #{limit}"
+          if offset = opts[:offset]
+            sql << " OFFSET #{offset}"
+          end
+        end
+
+        if union = opts[:union]
+          sql << (opts[:union_all] ? \
+            " UNION ALL #{union.sql}" : " UNION #{union.sql}")
+        elsif intersect = opts[:intersect]
+          sql << (opts[:intersect_all] ? \
+            " INTERSECT ALL #{intersect.sql}" : " INTERSECT #{intersect.sql}")
+        elsif except = opts[:except]
+          sql << (opts[:except_all] ? \
+            " EXCEPT ALL #{except.sql}" : " EXCEPT #{except.sql}")
+        end
+
+        sql
+      end
+      alias_method :sql, :select_sql
+
+      # MySQL allows HAVING clause on ungrouped datasets.
+      def having(*cond, &block)
+        @opts[:having] = {}
+        filter(*cond, &block)
+      end
+
       # MySQL supports ORDER and LIMIT clauses in UPDATE statements.
       def update_sql(values, opts = nil)
         sql = super
