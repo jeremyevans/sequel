@@ -1,5 +1,7 @@
 === SVN
 
+* Added Model#update_with_params method with support for virtual attributes and auto-filtering of unrelated parameters, and changed Model.create_with_params to support virtual attributes (#128).
+
 * Cleaned up gem spec (#132).
 
 * Removed validations code. Now relying on validations in assistance gem.

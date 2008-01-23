@@ -135,9 +135,22 @@ module Sequel
       end
     end
     
+    # Updates the instance with the supplied values with support for virtual
+    # attributes, ignoring any values for which no setter method is available.
+    def update_with_params(values)
+      c = columns
+      values.each do |k, v| m = :"#{k}="
+        send(m, v) if c.include?(k) || respond_to?(m)
+      end
+      save_changes
+    end
+    alias_method :update_with, :update_with_params
+
     class << self
       def create_with_params(params)
-        create(params.reject {|k, v| !columns.include?(k.to_sym)})
+        record = new
+        record.update_with_params(params)
+        record
       end
       alias_method :create_with, :create_with_params
     end
