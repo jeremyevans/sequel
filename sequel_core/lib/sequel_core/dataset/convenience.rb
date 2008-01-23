@@ -176,9 +176,11 @@ module Sequel
         single_value(:select => [column.AVG.AS(:v)])
       end
       
+      COUNT_OF_ALL_AS_COUNT = :count['*'.lit].AS(:count)
+      
       # Returns a dataset grouped by the given column with count by group.
-      def group_and_count(column)
-        group(column).select(column, :count[column].AS(:count)).order(:count)
+      def group_and_count(*columns)
+        group(*columns).select(columns + [COUNT_OF_ALL_AS_COUNT]).order(:count)
       end
       
       # Returns a Range object made from the minimum and maximum values for the

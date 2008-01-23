@@ -1,5 +1,7 @@
 === SVN
 
+* Changed Dataset#group_and_count to accept multiple columns (#134).
+
 * Fixed database spec to open YAML file in binary mode (#131).
 
 * Cleaned up gem spec (#132).

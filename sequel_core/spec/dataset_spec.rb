@@ -953,9 +953,14 @@ context "Dataset#group_and_count" do
   end
   
   specify "should format SQL properly" do
-    @ds.group_and_count(:name).sql.should == "SELECT name, count(name) AS count FROM test GROUP BY name ORDER BY count"
+    @ds.group_and_count(:name).sql.should == "SELECT name, count(*) AS count FROM test GROUP BY name ORDER BY count"
+  end
+
+  specify "should accept multiple columns for grouping" do
+    @ds.group_and_count(:a, :b).sql.should == "SELECT a, b, count(*) AS count FROM test GROUP BY a, b ORDER BY count"
   end
 end
+
 context "Dataset#empty?" do
   specify "should return true if #count == 0" do
     @c = Class.new(Sequel::Dataset) do
@@ -2297,7 +2302,7 @@ context "Dataset magic methods" do
     proc {@ds.count_by_name}.should_not raise_error
     @ds.should respond_to(:count_by_name)
     @ds.count_by_name.should be_a_kind_of(@c)
-    @ds.count_by_name.sql.should == "SELECT name, count(name) AS count FROM items GROUP BY name ORDER BY count"
+    @ds.count_by_name.sql.should == "SELECT name, count(*) AS count FROM items GROUP BY name ORDER BY count"
   end
 
   specify "should support filter_by_xxx" do
