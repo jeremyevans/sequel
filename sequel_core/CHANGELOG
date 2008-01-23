@@ -1,5 +1,7 @@
 === SVN
 
+* Changed ODBC::Database to support connection using driver and database name, also added support for untitled columns in ODBC::Dataset (thanks Leonid Borisenko).
+
 * Fixed MySQL adapter to correctly format foreign key definitions (#123).
 
 * Changed MySQL::Dataset to allow HAVING clause on ungrouped datasets, and put HAVING clause before ORDER BY clause (#133).
