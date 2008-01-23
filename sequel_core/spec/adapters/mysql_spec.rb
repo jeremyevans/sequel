@@ -352,6 +352,16 @@ context "A MySQL database" do
       "CREATE TABLE items (`active1` boolean DEFAULT 1, `active2` boolean DEFAULT 0)"
     ]
   end
+  
+  specify "should correctly format CREATE TABLE statements with foreign keys" do
+    g = Sequel::Schema::Generator.new(@db) do
+      foreign_key :p_id, :table => :users, :key => :id, 
+        :null => false, :on_delete => :cascade
+    end
+    @db.create_table_sql_list(:items, *g.create_info).should == [
+      "CREATE TABLE items (`p_id` integer NOT NULL, FOREIGN KEY (`p_id`) REFERENCES users(`id`) ON DELETE CASCADE)"
+    ]
+  end
 end  
 
 context "A MySQL database" do

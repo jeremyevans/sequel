@@ -162,6 +162,28 @@ module Sequel
           super(table, op)
         end
       end
+      
+      def column_definition_sql(column)
+        if column[:type] == :check
+          return constraint_definition_sql(column)
+        end
+        sql = "#{literal(column[:name].to_sym)} #{TYPES[column[:type]]}"
+        column[:size] ||= 255 if column[:type] == :varchar
+        elements = column[:size] || column[:elements]
+        sql << "(#{literal(elements)})" if elements
+        sql << UNIQUE if column[:unique]
+        sql << NOT_NULL if column[:null] == false
+        sql << UNSIGNED if column[:unsigned]
+        sql << " DEFAULT #{literal(column[:default])}" if column.include?(:default)
+        sql << PRIMARY_KEY if column[:primary_key]
+        sql << " #{auto_increment_sql}" if column[:auto_increment]
+        if column[:table]
+          sql << ", FOREIGN KEY (#{literal(column[:name].to_sym)}) REFERENCES #{column[:table]}"
+          sql << "(#{literal(column[:key])})" if column[:key]
+          sql << " ON DELETE #{on_delete_clause(column[:on_delete])}" if column[:on_delete]
+        end
+        sql
+      end
 
       def transaction
         @pool.hold do |conn|

@@ -1,5 +1,7 @@
 === SVN
 
+* Fixed MySQL adapter to correctly format foreign key definitions (#123).
+
 * Changed MySQL::Dataset to allow HAVING clause on ungrouped datasets, and put HAVING clause before ORDER BY clause (#133).
 
 * Changed Dataset#group_and_count to accept multiple columns (#134).
