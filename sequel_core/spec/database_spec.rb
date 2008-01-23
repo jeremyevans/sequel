@@ -818,7 +818,7 @@ context "Database.connect" do
     end
     
     @fn = File.join(File.dirname(__FILE__), 'eee.yaml')
-    File.open(@fn, 'w') {|f| f << EEE_YAML}
+    File.open(@fn, 'wb') {|f| f << EEE_YAML}
   end
   
   teardown do

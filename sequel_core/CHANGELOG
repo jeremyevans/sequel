@@ -1,5 +1,7 @@
 === SVN
 
+* Fixed database spec to open YAML file in binary mode (#131).
+
 * Cleaned up gem spec (#132).
 
 * Added Dataset#table_exists? convenience method.
