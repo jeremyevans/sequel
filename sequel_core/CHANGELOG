@@ -1,5 +1,7 @@
 === SVN
 
+* Cleaned up gem spec (#132).
+
 * Added Dataset#table_exists? convenience method.
 
 === 1.0.3 (2008-01-17)

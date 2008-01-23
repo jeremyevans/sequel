@@ -57,8 +57,6 @@ spec = Gem::Specification.new do |s|
   s.required_ruby_version = ">= 1.8.4"
 
   case RUBY_PLATFORM
-  when /mswin/
-    s.platform = Gem::Platform::CURRENT
   when /java/
     s.platform = "jruby"
   else

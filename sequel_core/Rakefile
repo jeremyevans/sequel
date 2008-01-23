@@ -61,11 +61,6 @@ spec = Gem::Specification.new do |s|
   s.add_dependency("assistance", ">= 0.1")
 
   case RUBY_PLATFORM
-  when /mswin/
-    s.platform = Gem::Platform::CURRENT
-    s.add_dependency("RubyInline", ">= 3.6.6")
-    s.add_dependency("ParseTree", ">= 2.1.1")
-    s.add_dependency("ruby2ruby")
   when /java/
     s.platform = "jruby"
   else

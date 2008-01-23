@@ -1,5 +1,7 @@
 === SVN
 
+* Cleaned up gem spec (#132).
+
 * Removed validations code. Now relying on validations in assistance gem.
 
 === 0.3.1 (2008-01-21)
