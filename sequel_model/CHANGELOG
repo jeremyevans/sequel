@@ -1,3 +1,7 @@
+=== 0.3.2.1 (2008-01-24)
+
+* Fixed Model.dataset to correctly set the dataset if using implicit naming or inheriting the superclass dataset (thanks celldee).
+
 === 0.3.2 (2008-01-24)
 
 * Added Model#update_with_params method with support for virtual attributes and auto-filtering of unrelated parameters, and changed Model.create_with_params to support virtual attributes (#128).

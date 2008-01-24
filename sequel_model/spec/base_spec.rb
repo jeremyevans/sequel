@@ -183,3 +183,29 @@ describe Sequel::Model, "dataset" do
     proc {@b.dataset}.should raise_error(Sequel::Error)
   end
 end
+
+describe "A model class with implicit table name" do
+  setup do
+    class Donkey < Sequel::Model
+    end
+  end
+  
+  specify "should have a dataset associated with the model class" do
+    Donkey.dataset.model_classes.should == {nil => Donkey}
+  end
+end
+
+describe "A model inheriting from a model" do
+  setup do
+    class Feline < Sequel::Model
+    end
+    
+    class Leopard < Feline
+    end
+  end
+  
+  specify "should have a dataset associated with itself" do
+    Feline.dataset.model_classes.should == {nil => Feline}
+    Leopard.dataset.model_classes.should == {nil => Leopard}
+  end
+end

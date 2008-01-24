@@ -19,10 +19,23 @@ module Sequel
 
     # Returns the dataset associated with the Model class.
     def self.dataset
-      @dataset ||= super_dataset ||
-        (!(n = name).empty? && db[n.underscore.pluralize.to_sym]) ||
-        (raise Error, "No dataset associated with #{self}")
+      unless @dataset
+        if ds = super_dataset
+          set_dataset(ds.clone_merge({}))
+        elsif !(n = name).empty?
+          set_dataset(db[n.underscore.pluralize.to_sym])
+        else
+          raise Error, "No dataset associated with #{self}"
+        end
+      end
+      @dataset
     end
+    
+    # def self.dataset
+    #   @dataset ||= super_dataset ||
+    #     (!(n = name).empty? && db[n.underscore.pluralize.to_sym]) ||
+    #     (raise Error, "No dataset associated with #{self}")
+    # end
     
     def self.super_dataset # :nodoc:
       superclass.dataset if (superclass != Sequel::Model) && superclass.respond_to?(:dataset)
@@ -32,7 +45,7 @@ module Sequel
     #
     # See Dataset#columns for more information.
     def self.columns
-      @columns ||= @dataset.columns or
+      @columns ||= dataset.columns or
       raise Error, "Could not fetch columns for #{self}"
     end
 
