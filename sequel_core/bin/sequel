@@ -2,6 +2,7 @@
 
 require 'rubygems'
 require 'sequel_core'
+require 'sequel_model' rescue nil
 
 usage = <<END
 Usage: sequel <connection URI>
