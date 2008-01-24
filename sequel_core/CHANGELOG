@@ -1,4 +1,4 @@
-=== SVN
+=== 1.0.4.1 (2008-01-24)
 
 * Fixed bin/sequel to require sequel_model if available.
 
