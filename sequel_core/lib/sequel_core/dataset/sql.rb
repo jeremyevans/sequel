@@ -156,6 +156,11 @@ module Sequel
       def select(*columns)
         clone_merge(:select => columns)
       end
+      
+      # Returns a copy of the dataset selecting the wildcard.
+      def select_all
+        clone_merge(:select => nil)
+      end
 
       # Returns a copy of the dataset with the distinct option.
       def uniq(*args)

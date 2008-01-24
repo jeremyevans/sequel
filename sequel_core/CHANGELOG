@@ -1,5 +1,7 @@
 === SVN
 
+* Added Dataset#select_all method.
+
 * Changed ODBC::Database to support connection using driver and database name, also added support for untitled columns in ODBC::Dataset (thanks Leonid Borisenko).
 
 * Fixed MySQL adapter to correctly format foreign key definitions (#123).

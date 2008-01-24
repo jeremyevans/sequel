@@ -41,7 +41,7 @@ class Mysql::Result
       @column_types = []
       @columns = fetch_fields.map do |f|
         @column_types << f.type
-        (with_table ? (f.table + "." + f.name) : f.name).to_sym
+        (with_table ? "#{f.table}.#{f.name}" : f.name).to_sym
       end
     end
     @columns

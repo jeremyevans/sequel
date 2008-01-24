@@ -689,8 +689,8 @@ context "Dataset#select" do
   end
 
   specify "should overrun the previous select option" do
-    @d.select(:a, :b, :c).select.sql.should == 'SELECT * FROM test'
-    @d.select(:price).select(:name).sql.should == 'SELECT name FROM test'
+    @d.select!(:a, :b, :c).select.sql.should == 'SELECT * FROM test'
+    @d.select!(:price).select(:name).sql.should == 'SELECT name FROM test'
   end
   
   specify "should accept arbitrary objects and literalize them correctly" do
@@ -701,6 +701,21 @@ context "Dataset#select" do
     @d.select(nil, 1, :x => :y).sql.should == "SELECT NULL, 1, x AS y FROM test"
   end
 end
+
+context "Dataset#select_all" do
+  setup do
+    @d = Sequel::Dataset.new(nil).from(:test)
+  end
+
+  specify "should select the wildcard" do
+    @d.select_all.sql.should == 'SELECT * FROM test'
+  end
+  
+  specify "should overrun the previous select option" do
+    @d.select!(:a, :b, :c).select_all.sql.should == 'SELECT * FROM test'
+  end
+end
+
 
 context "Dataset#order" do
   setup do
