@@ -9,7 +9,7 @@ include FileUtils
 # Configuration
 ##############################################################################
 NAME = "sequel_model"
-VERS = "0.3.1"
+VERS = "0.3.2"
 CLEAN.include ["**/.*.sw?", "pkg/*", ".config", "doc/*", "coverage/*"]
 RDOC_OPTS = [
   "--quiet", 
@@ -95,6 +95,9 @@ end
 
 task :tag do
   cwd = FileUtils.pwd
+  sh %{rm -rf doc/*}
+  sh %{rm -rf pkg/*}
+  sh %{rm -rf coverage/*}
   sh %{cd ../.. && svn copy #{cwd} tags/#{NAME}-#{VERS} && svn commit -m "#{NAME}-#{VERS} tag." tags}
 end
 
