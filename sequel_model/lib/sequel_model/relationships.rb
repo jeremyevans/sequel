@@ -97,8 +97,14 @@ module Sequel
       # has :one,  :account # account_id field
       # has :many, :comments # comments_posts join table
       def has(arity, klass, options = {})
+
+        # Commence with the sanity checks!
         unless [:one,:many].include? arity
           raise Sequel::Error, "Arity must be specified {:one, :many}." 
+        end
+
+        if relationship_exists?(arity, klass)
+          raise Sequel::Error, "The relationship #{self.class.name} has #{arity}, #{klass} is already defined."
         end
 
         #unless const_defined?(klass.to_s.camel_case)
@@ -107,10 +113,6 @@ module Sequel
 
         # Make sure the join table exists
         auto_create_join_table(klass, options)
-
-        if relationship_exists?(arity, klass)
-          raise Sequel::Error, "The relationship #{self.class.name} has #{arity}, #{klass} is already defined."
-        end
 
         # Store the relationship
         @@model_relationships << { 

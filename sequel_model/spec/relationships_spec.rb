@@ -1,12 +1,122 @@
 require File.join(File.dirname(__FILE__), "spec_helper")
 
-__END__
+#__END__
 
-describe Sequel::Model::Relationships, "has :one" do
-end
+# class Post < Sequel::Model
+#   relationships do
+#     has :one,  :blog, :required => true, :normalized => false # uses a blog_id field, which cannot be null, in the Post model
+#     has :one,  :account # uses a join table called accounts_posts to link the post with it's account.
+#     has :many, :comments # uses a comments_posts join table
+#     has :many, :authors, :required => true  # authors_posts join table, requires at least one author
+#   end
+# end
+describe Sequel::Model "relationships" do
+  before :all do
+    class Smurf < Sequel::Model
+    end
+  end
+  
+  after :all do
+    Smurf.model_relationships.clear
+  end
+  
+  describe "has" do
+    
+    it "should raise an exception if an arity {:one, :many} is not specified" do
+      Smurf.should_not_receive(:auto_create_join_table).with(:smurfette, {}).and_return(true)
+      Smurf.should_not_receive(:relationship_exists?).with(:one, :smurfette).and_return(true)
+      Smurf.stub!(:after_initialize)
+      lambda {
+      class Smurf
+        relationships do
+          has :sex
+        end
+      end
+      }.should_raise Sequel::Error, "Arity must be specified {:one, :many}."
+    end
+    
+    it "should check to see if the relationship exists" do
+      Smurf.should_not_receive(:relationship_exists?).with(:one, :smurfette).and_return(true)
+      Smurf.stub!(:after_initialize)
+      lambda {
+      class Smurf
+        relationships do
+          has :sex
+        end
+      end
+      }.should_raise Sequel::Error, "Arity must be specified {:one, :many}."
+    end
+    
+    it "should raise an exception if the relationship has already been specified" do
+      Smurf.should_receive(:relationship_exists?).with(:one, :smurfette).and_return(true)
+      Smurf.stub!(:after_initialize)
+      lambda {
+      class Smurf
+        relationships do
+          has :one, :smurfette
+        end
+      end
+      }.should_raise Sequel::Error, "The relationship Smurf has :one, :smurfette is already defined."
+    end
+    
+    it "should establish a has :one relationship" do
+      #Smurf.should_receive(:auto_create_join_table).with(:smurfette, {}).and_return(true)
+      #Smurf.should_receive(:relationship_exists?).with(:one, :smurfette).and_return(false)
+      Smurf.should_receive(:define_relationship_method).with(:one, :smurfette, {}).and_return(true)
+      class Smurf
+        relationships do
+          has :one, :smurfette 
+        end
+      end
+    
+    end
+    
+    it "should establish a has :many relationship" do
+      Smurf.should_receive(:auto_create_join_table).with(:smurfette, {}).and_return(true)
+      Smurf.should_receive(:relationship_exists?).with(:one, :smurfette).and_return(false)
+      Smurf.should_receive(:define_relationship_method).with(:one, :smurfette, {}).and_return(true)
+      class Smurf
+        relationships do
+          has :one, :smurfette 
+        end
+      end
+    end
+    
+    # Actually we don't care. 
+    # As long as the tables exist in the database everything here should work.
+    #it "should raise an exception if a relationship is specified with a nonexistant class"
+    #  Smurf.should_receive(:auto_create_join_table).with(:smurfette, {}).and_return(true)
+    #  Smurf.stub!(:after_initialize)
+    #  lambda {
+    #  class Smurf
+    #    relationships do
+    #      has :one, :smurfette
+    #    end
+    #  end
+    #  }.should_raise Sequel::Error, "The relationship Smurf has :one, :smurfette is already defined."
+    #end
+    
+    it "should call the auto_create_join_table method" do
+    Smurf.should_receive(:auto_create_join_table).with(:smurfette, {}).and_return(true)
+    #  Smurf.stub!(:after_initialize)
+    #  lambda {
+    #  class Smurf
+    #    relationships do
+    #      has :one, :smurfette
+    #    end
+    #  end
+    #  }.should_raise Sequel::Error, "The relationship Smurf has :one, :smurfette is already defined."
+    end
+    
+    it "should store the relationship to ensure there is no duplication" do
+    end
+    
+    it "should call the 'define relationship method' method" do
+    end
+  end
 
-describe Sequel::Model::Relationships, "has :many" do
-end
+  describe Sequel::Model, "belongs_to" do
+    it "should put the smack down on yer bitches"
+  end
 
-describe Sequel::Model::Relationships, "belongs_to" do
 end
