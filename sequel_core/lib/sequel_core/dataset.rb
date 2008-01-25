@@ -235,9 +235,9 @@ module Sequel
       when Class
         # isomorphic model
         @opts.merge!(:naked => nil, :models => {nil => key}, :polymorphic_key => nil)
-        if key.instance_methods.include?("values=")
+        if key.respond_to?(:load)
           # the class has a values setter method, so we use it
-          set_row_proc {|h| o = key.new; o.values = h; o}
+          set_row_proc {|h| key.load(h, *args)}
         else
           # otherwise we just pass the hash to the constructor
           set_row_proc {|h| key.new(h, *args)}
@@ -247,12 +247,12 @@ module Sequel
         # polymorphic model
         hash = args.shift || raise(ArgumentError, "No class hash supplied for polymorphic model")
         @opts.merge!(:naked => true, :models => hash, :polymorphic_key => key)
-        if hash.values.first.instance_methods.include?("values=")
+        if hash.values.first.respond_to?(:load)
           # the class has a values setter method, so we use it
           set_row_proc do |h|
             c = hash[h[key]] || hash[nil] || \
               raise(Error, "No matching model class for record (#{polymorphic_key} => #{h[polymorphic_key].inspect})")
-            o = c.new; o.values = h; o
+            c.load(h, *args)
           end
         else
           # otherwise we just pass the hash to the constructor

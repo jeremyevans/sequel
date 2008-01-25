@@ -1,6 +1,6 @@
 === 1.0.5 (2008-01-25)
 
-* Added support for instantiating models by using the values setter method.
+* Added support for instantiating models by using the load constructor method.
 
 === 1.0.4.1 (2008-01-24)
 

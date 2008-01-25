@@ -1749,13 +1749,11 @@ context "A dataset with associated model class(es)" do
       def initialize(v); @v = v; end
     end
     @m2 = Class.new do
-      attr_accessor :v, :values
+      attr_accessor :v, :vv
       def initialize(v = nil); @v = v; end
+      def self.load(v); o = new(nil); o.vv = v; o; end
     end
-    @m3 = Class.new do
-      attr_accessor :v, :values
-      def initialize(v = nil); @v = v; end
-    end
+    @m3 = Class.new(@m2)
   end
 
   specify "should instantiate an instance by passing the record hash as argument" do
@@ -1765,20 +1763,20 @@ context "A dataset with associated model class(es)" do
     o.v.should == {:x => 1, :y => 2}
   end
   
-  specify "should use the values setter if available for initializing an instance" do
+  specify "should use the .load constructor if available" do
     @dataset.set_model(@m2)
     o = @dataset.first
     o.class.should == @m2
     o.v.should == nil
-    o.values.should == {:x => 1, :y => 2}
+    o.vv.should == {:x => 1, :y => 2}
   end
   
-  specify "should use the values setter also for polymorphic datasets" do
+  specify "should use the .load constructor also for polymorphic datasets" do
     @dataset.set_model(:y, 1 => @m2, 2 => @m3)
     o = @dataset.first
     o.class.should == @m3
     o.v.should == nil
-    o.values.should == {:x => 1, :y => 2}
+    o.vv.should == {:x => 1, :y => 2}
   end
 end
 
