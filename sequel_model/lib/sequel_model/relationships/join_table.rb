@@ -7,6 +7,10 @@ module Sequel
     #   JoinTable.new :post, :comment
     class JoinTable
       
+      def self.key(klass)
+        "#{klass}_id"
+      end
+      
       def initialize(first_klass, second_klass)
         @first_klass = first_klass
         @second_klass = second_klass
@@ -24,11 +28,17 @@ module Sequel
       
       # creates a join table
       def create
-        db.create_table name.to_sym do
-          #primary_key [first_key.to_sym, second_key.to_sym]
-          integer key(@first_klass), :null => false
-          integer key(@second_klass), :null => false
-        end unless exists?
+        if !exists?
+          db.create_table name.to_sym do
+            #primary_key [first_key.to_sym, second_key.to_sym]
+            integer self.class.key(@first_klass), :null => false
+            integer self.class.key(@second_klass), :null => false
+          end
+          
+          true
+        else
+          false
+        end
       end
       
       # drops the the table if it exists and creates a new one
@@ -40,10 +50,6 @@ module Sequel
       # returns true if exists, false if not
       def exists?   
         db[name].table_exists?
-      end
-      
-      def key(klass)
-        "#{klass}_id"
       end
       
       def db
