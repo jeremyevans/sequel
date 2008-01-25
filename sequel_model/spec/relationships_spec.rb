@@ -135,10 +135,56 @@ describe Sequel::Model, "relationships" do
       @smurf.should_not respond_to(:smurf)
     end
   end
+  
+  describe "has_one" do
+    it "should be an alias for has :one" do
+      Smurf.should_receive(:has).with(:one, :smurfette, {})
+      class Smurf
+        relationships do
+          has_one :smurfette
+        end
+      end
+    end
+  end
+  
+  describe "has_many" do
+    it "should be an alias for has :many" do
+      Smurf.should_receive(:has).with(:many, :smurfette, {})
+      class Smurf
+        relationships do
+          has_many :smurfette
+        end
+      end
+    end
+  end
 
-  describe Sequel::Model, "belongs_to" do
-    it "should put the smack down on yer bitches" do
-      pending("Need to test")
+  describe "belongs_to" do
+    it "should be an alias for has :one" do
+      Smurf.should_receive(:has).with(:one, :smurfette, {})
+      class Smurf
+        relationships do
+          belongs_to :smurfette
+        end
+      end
+    end
+  end
+  
+  describe "has_relationships?" do
+    it "should return true if the class has any relationships" do
+      class Smurf
+        relationships do
+          belongs_to :smurfette
+        end
+      end
+      
+      Smurf.has_relationships?.should be_true
+    end
+    
+    it "should return false if the class has no relationships" do
+      class Smurf
+      end
+      
+      Smurf.has_relationships?.should be_false
     end
   end
 
