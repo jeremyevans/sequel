@@ -10,13 +10,13 @@ require File.join(File.dirname(__FILE__), "spec_helper")
 #     has :many, :authors, :required => true  # authors_posts join table, requires at least one author
 #   end
 # end
-describe Sequel::Model "relationships" do
+describe Sequel::Model, "relationships" do
   before :all do
     class Smurf < Sequel::Model
     end
   end
   
-  after :all do
+  after :each do
     Smurf.model_relationships.clear
   end
   
@@ -97,11 +97,42 @@ describe Sequel::Model "relationships" do
     end
     
     it "should store the relationship to ensure there is no duplication" do
-      pending("Need to test")
+      class Smurf
+        relationships do
+          has :one, :smurfette
+          has :many, :legs
+        end
+      end
+      
+      Smurf.model_relationships.should == [
+        {:arity=>:one, :options=>{}, :klass=>:smurfette},
+        {:arity=>:many, :options=>{}, :klass=>:legs}
+      ]
+      
     end
     
-    it "should call the 'define relationship method' method" do
-      pending("Need to test")
+    it "should create an instance method for the has one relationship" do
+      class Smurf
+        relationships do
+          has :one, :smurfette
+        end
+      end
+      
+      @smurf = Smurf.new
+      @smurf.should respond_to(:smurfette)
+      @smurf.should_not respond_to(:smurfettes)
+    end
+    
+    it "should create an instance method for the has many relationship" do
+      class Smurf
+        relationships do
+          has :one, :smurfettes
+        end
+      end
+      
+      @smurf = Smurf.new
+      @smurf.should respond_to(:smurfettes)
+      @smurf.should_not respond_to(:smurf)
     end
   end
 
