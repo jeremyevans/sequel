@@ -22,7 +22,24 @@ describe Sequel::Model::JoinTable do
         @join_table_string.name.should == 'comments_posts'
       end
     end
-  
+    
+    describe "join class" do
+      it "should define the join class if it does not exist" do
+        defined?(PostComment).should_not be_nil
+      end
+      it "should not redefine the join class if it already exists" do
+        undef ArticleComment if defined?(ArticleComment)
+        class ArticleComment
+          set_primary_key :id
+        end
+        @join_table = Sequel::Model::JoinTable.new :article, :comment
+        ArticleComment.primary_key.should == :id
+      end
+      it "should return the join class" do
+        @join_table.class.should eql(PostComment)
+      end
+    end
+    
     describe "exists?" do
       before :each do
         @join_table.should_receive(:db).and_return(@db)

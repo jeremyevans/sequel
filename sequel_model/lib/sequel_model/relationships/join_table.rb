@@ -4,8 +4,13 @@ module Sequel
     # Handles join tables.
     # Parameters are the first class and second class:
     #
-    #   JoinTable.new :post, :comment
+    #   @join_table = JoinTable.new :post, :comment
+    #
+    # The join table class object is available via
+    #   @join_table.class #=> PostComment
     class JoinTable
+      
+      attr_accessor :join_class
       
       def self.key(klass)
         "#{klass}_id"
@@ -14,6 +19,16 @@ module Sequel
       def initialize(first_klass, second_klass)
         @first_klass = first_klass
         @second_klass = second_klass
+        
+        # Automatically Define the JoinClass if it does not exist
+        instance_eval <<-JOINCLASS
+        unless defined?(::#{@first_klass.class.name}#{@first_klass.class.name})
+          @class = class ::#{@first_klass.class.name}#{@first_klass.class.name} < Sequel::Model ; end
+          @class.set_primary_key :#{@table_name.singularize}_id, :#{@second_klass.table_name.singularize}_id
+        else
+          @class = ::#{@first_klass.class.name}#{@first_klass.class.name}
+        end
+        JOINCLASS
       end
       
       # Outputs the join table name
@@ -43,7 +58,7 @@ module Sequel
       
       # drops the the table if it exists and creates a new one
       def create!
-        db.drop_table name
+        db.drop_table name if exists?
         create
       end
       
