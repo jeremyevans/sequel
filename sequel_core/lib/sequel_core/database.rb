@@ -103,7 +103,24 @@ module Sequel
       end
     end
     alias_method :>>, :fetch
-    
+
+    def fetch_now(sql, *args, &block)
+      fetch(sql, *args, &block).run
+    end
+
+    def fetch_one(sql, *args, &block)
+      fetch(sql, *args, &block).first
+    end
+    alias_method :fetch_one_now, :fetch_one
+    alias_method :fetch_row, :fetch_one
+
+    def fetch_column( sql, *args )
+      fetch_one( sql, *args ).values[ 0 ]
+    end
+    alias_method :fetch_column_now, :fetch_column
+    alias_method :fetch_value, :fetch_column
+    alias_method :fetch_value_now, :fetch_column
+
     # Converts a query block into a dataset. For more information see 
     # Dataset#query.
     def query(&block)

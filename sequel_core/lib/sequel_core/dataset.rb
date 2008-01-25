@@ -73,6 +73,8 @@ module Sequel
     attr_accessor :opts
     
     alias all to_a
+    alias now to_a
+    alias run to_a
     alias size count
   
     # Constructs a new instance of a dataset with a database instance, initial
