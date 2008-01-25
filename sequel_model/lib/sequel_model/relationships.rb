@@ -1,3 +1,9 @@
+files = %w[
+  abstract_relationship relationship join_table block
+]
+dir = File.join(File.dirname(__FILE__), "relationships")
+files.each {|f| require(File.join(dir, f))}
+
 # = Sequel Relationships
 # Database modelling is generally done with an ER (Entity Relationship) diagram.
 # Shouldn't ORM's facilitate simlilar specification?
@@ -67,59 +73,27 @@
 module Sequel
 
   class Model
-
-    module Relationships
-      class Generator
-        def initialize(model_class, &block)
-          @model_class = model_class
-          instance_eval(&block)
-        end
-
-        def method_missing(method, *args)
-          @model_class.send(method, *args)
-        end
-      end
-    end
     
     class << self
       @@model_relationships = []
-
-      def relationship_exists?(arity,relation)
-        @@model_relationships.detect do |relation|
-          relation[:arity] == arity && 
-          relation[:klass] == relation
-        end
-      end
 
       # has arity<Symbol>, model<Symbol>
       # has :one,  :blog, :required => true # blog_id field, cannot be null
       # has :one,  :account # account_id field
       # has :many, :comments # comments_posts join table
-      def has(arity, klass, options = {})
+      def has(arity, relation, options = {})
 
         # Commence with the sanity checks!
         unless [:one,:many].include? arity
           raise Sequel::Error, "Arity must be specified {:one, :many}." 
         end
 
-        if relationship_exists?(arity, klass)
-          raise Sequel::Error, "The relationship '#{self} has #{arity} #{klass}' is already defined."
-        end
-
-        # Make sure the join table exists
-        auto_create_join_table(klass, options)
-
-        # Store the relationship
-        @@model_relationships << { 
-          :arity => arity, 
-          :klass => klass, 
-          :options => options 
-        }
-
-        # Define relationship methods
-        after_initialize do
-          define_relationship_method arity, klass, options
-        end
+        #if relationship_exists?(arity, relation)
+        #  raise Sequel::Error, "The relationship '#{self} has #{arity} #{relation}' is already defined."
+        #end
+        
+        # Create and store the relationship
+        @@model_relationships << Relationship.new(self, arity, relation, options).create
 
         #unless normalized
           # :required => true # The relationship must be populated to save
@@ -129,96 +103,28 @@ module Sequel
       end
       
       # the proxy methods has_xxx ... , simply pass thru to to has :xxx, ...
-      def has_one(klass, options = {})
-        has :one, klass, options
+      def has_one(relation, options = {})
+        has :one, relation, options
       end
 
-      def has_many(klass, options = {})
-        has :many, klass, options
+      def has_many(relation, options = {})
+        has :many, relation, options
       end
 
-      def belongs_to(klass, options = {})
-        has :one, klass, options
+      def belongs_to(relation, options = {})
+        has :one, relation, options
       end
 
-      # returns true if exists, false if not
-      def join_table?(first, second)
-        # we still have to test this out      
-        db[join_table(first, second)].table_exists?
-      end
-
-      # TODO: Move this elsewhere? outside relationships?
-      # creates a join table given two table names
-      def create_join_table(first, second)
-        first_key, second_key = "#{first}_id", "#{second}_id"
-        db.create_table join_table(first, second).to_sym do
-          #primary_key [first_key.to_sym, second_key.to_sym]
-          integer first_key, :null => false
-          integer second_key, :null => false
-        end unless join_table?(first, second)
-      end
-
-      def create_join_table!(first, second)
-        db.drop_table join_table(first, second)
-        create_join_table(first, second)
-      end
-
-      def auto_create_join_table!(klass)
-        auto_create_join_table(klass, :force => true)
-      end
-
-      def auto_create_join_table(klass, options = {})
-        first, second = table_name, klass.to_s.pluralize
-        if join_table?(first, second) && options[:force] == true
-          create_join_table!(first, second)
-        else
-          create_join_table(first, second)
-        end
-      end
-
-      # Given two models, it outputs the join table name
-      # which is sorted alphabetically with each table name pluralized
-      # Examples:
-      #   join_table(user, post) #=> :posts_users
-      #   join_table(users, posts) #=> :posts_users
-      def join_table(first, second)
-        first, second = first.to_s.pluralize, second.to_s.pluralize
-        [first, second].sort.join("_").to_sym
-      end
-
-      # relationships do
-      #   ...
-      # end
-      def relationships(&block)
-        Relationships::Generator.new(self, &block)
+      def model_relationships
+        @@model_relationships
       end
 
       # return true if there are validations stored, false otherwise
       def has_relationships?
         model_relationships.length > 0 ? true : false
       end
-      
-      def model_relationships
-        @@model_relationships
-      end
 
     end
-
-    # Defines relationship method from the current class to the klass specified
-    def define_relationship_method(arity, relation, options)
-      if arity == :one
-        self.instance_eval "
-          def #{relation}
-            self.dataset.left_outer_join(#{relation}, :id => :#{self.class.table_name.to_s.singularize}_id).limit(1)
-          end
-        "
-      elsif arity == :many
-        self.instance_eval "
-          def #{relation}
-            self.dataset.left_outer_join(#{relation}, :id => :#{self.class.table_name.to_s.singularize}_id)
-          end
-        "
-      end
-    end # define_relationship_method
+    
   end # Model
 end # Sequel
