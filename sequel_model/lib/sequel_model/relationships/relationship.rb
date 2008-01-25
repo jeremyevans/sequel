@@ -9,7 +9,7 @@ module Sequel
       end
 
       def create_join_table
-        join_table = JoinTable.new klass.table_name, relation.to_s.pluralize
+        join_table = JoinTable.new self.klass.table_name, relation.to_s.pluralize
         
         if join_table.exists? && options[:force] == true
           join_table.create!
