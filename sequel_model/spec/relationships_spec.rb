@@ -29,10 +29,10 @@ describe Sequel::Model "relationships" do
       lambda {
       class Smurf
         relationships do
-          has :sex
+          has :sex, :with_smurfette
         end
       end
-      }.should_raise Sequel::Error, "Arity must be specified {:one, :many}."
+      }.should raise_error Sequel::Error, "Arity must be specified {:one, :many}." 
     end
     
     it "should check to see if the relationship exists" do
@@ -41,10 +41,10 @@ describe Sequel::Model "relationships" do
       lambda {
       class Smurf
         relationships do
-          has :sex
+          has :sex, :with_smurfette
         end
       end
-      }.should_raise Sequel::Error, "Arity must be specified {:one, :many}."
+      }.should raise_error Sequel::Error, "Arity must be specified {:one, :many}."
     end
     
     it "should raise an exception if the relationship has already been specified" do
@@ -56,67 +56,59 @@ describe Sequel::Model "relationships" do
           has :one, :smurfette
         end
       end
-      }.should_raise Sequel::Error, "The relationship Smurf has :one, :smurfette is already defined."
+      }.should raise_error Sequel::Error, "The relationship 'Smurf has one smurfette' is already defined."
     end
     
     it "should establish a has :one relationship" do
-      #Smurf.should_receive(:auto_create_join_table).with(:smurfette, {}).and_return(true)
-      #Smurf.should_receive(:relationship_exists?).with(:one, :smurfette).and_return(false)
-      Smurf.should_receive(:define_relationship_method).with(:one, :smurfette, {}).and_return(true)
+      Smurf.stub!(:auto_create_join_table)
+      Smurf.should_receive(:relationship_exists?).with(:one, :smurfette).and_return(false)
+      Smurf.should_receive(:after_initialize)
       class Smurf
         relationships do
           has :one, :smurfette 
         end
       end
+      
+      @smurf = Smurf.new
     
     end
     
     it "should establish a has :many relationship" do
       Smurf.should_receive(:auto_create_join_table).with(:smurfette, {}).and_return(true)
-      Smurf.should_receive(:relationship_exists?).with(:one, :smurfette).and_return(false)
-      Smurf.should_receive(:define_relationship_method).with(:one, :smurfette, {}).and_return(true)
+      Smurf.should_receive(:relationship_exists?).with(:many, :smurfette).and_return(false)
+      Smurf.should_receive(:after_initialize)
       class Smurf
         relationships do
-          has :one, :smurfette 
+          has :many, :smurfette 
+        end
+      end
+      
+      @smurf = Smurf.new
+    end
+    
+    it "should call the auto_create_join_table method" do
+      Smurf.should_receive(:auto_create_join_table).with(:smurfette, {}).and_return(true)
+
+      class Smurf
+        relationships do
+          has :one, :smurfette
         end
       end
     end
     
-    # Actually we don't care. 
-    # As long as the tables exist in the database everything here should work.
-    #it "should raise an exception if a relationship is specified with a nonexistant class"
-    #  Smurf.should_receive(:auto_create_join_table).with(:smurfette, {}).and_return(true)
-    #  Smurf.stub!(:after_initialize)
-    #  lambda {
-    #  class Smurf
-    #    relationships do
-    #      has :one, :smurfette
-    #    end
-    #  end
-    #  }.should_raise Sequel::Error, "The relationship Smurf has :one, :smurfette is already defined."
-    #end
-    
-    it "should call the auto_create_join_table method" do
-    Smurf.should_receive(:auto_create_join_table).with(:smurfette, {}).and_return(true)
-    #  Smurf.stub!(:after_initialize)
-    #  lambda {
-    #  class Smurf
-    #    relationships do
-    #      has :one, :smurfette
-    #    end
-    #  end
-    #  }.should_raise Sequel::Error, "The relationship Smurf has :one, :smurfette is already defined."
-    end
-    
     it "should store the relationship to ensure there is no duplication" do
+      pending("Need to test")
     end
     
     it "should call the 'define relationship method' method" do
+      pending("Need to test")
     end
   end
 
   describe Sequel::Model, "belongs_to" do
-    it "should put the smack down on yer bitches"
+    it "should put the smack down on yer bitches" do
+      pending("Need to test")
+    end
   end
 
 end

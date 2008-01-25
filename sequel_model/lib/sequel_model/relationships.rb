@@ -80,9 +80,8 @@ module Sequel
         end
       end
     end
-
+    
     class << self
-      cattr_reader :model_relationships
       @@model_relationships = []
 
       def relationship_exists?(arity,relation)
@@ -104,12 +103,8 @@ module Sequel
         end
 
         if relationship_exists?(arity, klass)
-          raise Sequel::Error, "The relationship #{self.class.name} has #{arity}, #{klass} is already defined."
+          raise Sequel::Error, "The relationship '#{self} has #{arity} #{klass}' is already defined."
         end
-
-        #unless const_defined?(klass.to_s.camel_case)
-          #raise Sequel::Error, "#{klass.to_s.camel_case} does not exist"
-        #end
 
         # Make sure the join table exists
         auto_create_join_table(klass, options)
@@ -202,17 +197,11 @@ module Sequel
       def has_relationships?
         model_relationships.length > 0 ? true : false
       end
-
-      # TODO: figure out what we want to do with these...
-      # "FooBar".snake_case #=> "foo_bar"
-      def snake_case
-        gsub(/\B[A-Z]/, '_\&').downcase
+      
+      def model_relationships
+        @@model_relationships
       end
 
-      # "foo_bar".camel_case #=> "FooBar"
-      def camel_case
-        split('_').map{|e| e.capitalize}.join
-      end
     end
 
     # Defines relationship method from the current class to the klass specified
@@ -220,13 +209,13 @@ module Sequel
       if arity == :one
         self.instance_eval "
           def #{relation}
-            self.db.dataset.left_outer_join(#{relation}, :id => :#{relation.to_s.singularize}_id).limit(1)
+            self.dataset.left_outer_join(#{relation}, :id => :#{self.class.table_name.to_s.singularize}_id).limit(1)
           end
         "
       elsif arity == :many
         self.instance_eval "
           def #{relation}
-            self.db.dataset.left_outer_join(#{relation}, :id => :#{relation.to_s.singularize}_id)
+            self.dataset.left_outer_join(#{relation}, :id => :#{self.class.table_name.to_s.singularize}_id)
           end
         "
       end
