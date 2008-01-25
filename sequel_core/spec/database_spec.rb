@@ -19,7 +19,7 @@ end
 
 class Float
   def within?( max_error, expected )
-    self - expected <= max_error
+    ( self - expected ).abs <= max_error
   end
 end
 
