@@ -1736,6 +1736,52 @@ context "A polymorphic model dataset" do
   end
 end
 
+context "A dataset with associated model class(es)" do
+  setup do
+    @c = Class.new(Sequel::Dataset) do
+      def fetch_rows(sql, &block)
+        block.call({:x => 1, :y => 2})
+      end
+    end
+    @dataset = @c.new(nil).from(:items)
+    @m1 = Class.new do
+      attr_accessor :v
+      def initialize(v); @v = v; end
+    end
+    @m2 = Class.new do
+      attr_accessor :v, :values
+      def initialize(v = nil); @v = v; end
+    end
+    @m3 = Class.new do
+      attr_accessor :v, :values
+      def initialize(v = nil); @v = v; end
+    end
+  end
+
+  specify "should instantiate an instance by passing the record hash as argument" do
+    @dataset.set_model(@m1)
+    o = @dataset.first
+    o.class.should == @m1
+    o.v.should == {:x => 1, :y => 2}
+  end
+  
+  specify "should use the values setter if available for initializing an instance" do
+    @dataset.set_model(@m2)
+    o = @dataset.first
+    o.class.should == @m2
+    o.v.should == nil
+    o.values.should == {:x => 1, :y => 2}
+  end
+  
+  specify "should use the values setter also for polymorphic datasets" do
+    @dataset.set_model(:y, 1 => @m2, 2 => @m3)
+    o = @dataset.first
+    o.class.should == @m3
+    o.v.should == nil
+    o.values.should == {:x => 1, :y => 2}
+  end
+end
+
 context "Dataset#destroy" do
   setup do
     db = Object.new

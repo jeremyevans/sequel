@@ -305,7 +305,7 @@ context "String#to_date" do
   end
   
   specify "should raise Error::InvalidValue for an invalid date" do
-    proc {'0000-00-00'.to_time}.should raise_error(Sequel::Error::InvalidValue)
+    proc {'0000-00-00'.to_date}.should raise_error(Sequel::Error::InvalidValue)
   end
 end
 

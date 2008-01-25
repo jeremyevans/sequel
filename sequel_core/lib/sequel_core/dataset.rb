@@ -235,16 +235,32 @@ module Sequel
       when Class
         # isomorphic model
         @opts.merge!(:naked => nil, :models => {nil => key}, :polymorphic_key => nil)
-        set_row_proc {|h| key.new(h, *args)}
+        if key.instance_methods.include?("values=")
+          # the class has a values setter method, so we use it
+          set_row_proc {|h| o = key.new; o.values = h; o}
+        else
+          # otherwise we just pass the hash to the constructor
+          set_row_proc {|h| key.new(h, *args)}
+        end
         extend_with_destroy
       when Symbol
         # polymorphic model
         hash = args.shift || raise(ArgumentError, "No class hash supplied for polymorphic model")
         @opts.merge!(:naked => true, :models => hash, :polymorphic_key => key)
-        set_row_proc do |h|
-          c = hash[h[key]] || hash[nil] || \
-            raise(Error, "No matching model class for record (#{polymorphic_key} => #{h[polymorphic_key].inspect})")
-          c.new(h, *args)
+        if hash.values.first.instance_methods.include?("values=")
+          # the class has a values setter method, so we use it
+          set_row_proc do |h|
+            c = hash[h[key]] || hash[nil] || \
+              raise(Error, "No matching model class for record (#{polymorphic_key} => #{h[polymorphic_key].inspect})")
+            o = c.new; o.values = h; o
+          end
+        else
+          # otherwise we just pass the hash to the constructor
+          set_row_proc do |h|
+            c = hash[h[key]] || hash[nil] || \
+              raise(Error, "No matching model class for record (#{polymorphic_key} => #{h[polymorphic_key].inspect})")
+            c.new(h, *args)
+          end
         end
         extend_with_destroy
       else
