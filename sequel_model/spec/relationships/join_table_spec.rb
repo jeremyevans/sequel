@@ -10,12 +10,14 @@ describe Sequel::Model::JoinTable do
   describe "instance methods" do
     before(:each) do
       @join_table = Sequel::Model::JoinTable.new :post, :comment
+      @join_table_plural = Sequel::Model::JoinTable.new :posts, :comments
       @db = mock('db instance')
     end
     
     describe "name" do
       it "should have a proper join table name" do
         @join_table.name.should == 'comments_posts'
+        @join_table_plural.name.should == 'comments_posts'
       end
     end
   
