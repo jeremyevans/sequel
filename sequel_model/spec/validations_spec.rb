@@ -138,7 +138,7 @@ describe Sequel::Model, "Validations" do
     @cow.should be_valid
   end
   
-  it "should have a validates block that calls multple validations" do
+  it "should have a validates block that calls multiple validations" do
     class Person < Sequel::Model
       validations.clear
       validates do

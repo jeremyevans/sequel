@@ -1,3 +1,7 @@
+=== 0.3.3 (2008-01-25)
+
+* Finalized support for virtual attributes.
+
 === 0.3.2.1 (2008-01-24)
 
 * Fixed Model.dataset to correctly set the dataset if using implicit naming or inheriting the superclass dataset (thanks celldee).

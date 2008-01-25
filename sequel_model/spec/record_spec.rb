@@ -476,6 +476,15 @@ describe Sequel::Model, "#initialize" do
     m = @c.new {|o| o[:id] = 1234}
     m.id.should == 1234
   end
+  
+  specify "should accept virtual attributes" do
+    @c.class_def(:blah=) {|x| @blah = x}
+    @c.class_def(:blah) {@blah}
+    
+    m = @c.new(:id => 1, :x => 2, :blah => 3)
+    m.values.should == {:id => 1, :x => 2}
+    m.blah.should == 3
+  end
 end
 
 describe Sequel::Model, ".create" do

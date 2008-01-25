@@ -129,7 +129,7 @@ module Sequel
     # new? returns true.
     def self.create(values = {}, &block)
       db.transaction do
-        obj = new(values, true, &block)
+        obj = new(values, &block)
         obj.save
         obj
       end
@@ -185,13 +185,27 @@ module Sequel
     #
     # This method guesses whether the record exists when
     # <tt>new_record</tt> is set to false.
-    def initialize(values = {}, new_record = false, &block)
-      @values = values || {}
+    def initialize(values = nil, from_db = false, &block)
       @changed_columns = []
+      unless from_db
+        @values = {}
+        if values
+          values.each do |k, v| m = :"#{k}="
+            if respond_to?(m)
+              send(m, v)
+              values.delete(k)
+            end
+          end
+          @values.merge!(values)
+        end
+      else
+        @values = values || {}
+      end
 
-      @new = new_record
-      unless @new # determine if it's a new record
-        k = self.class.primary_key
+      k = primary_key
+      if from_db
+        @new = k == nil
+      else
         # if there's no primary key for the model class, or
         # @values doesn't contain a primary key value, then 
         # we regard this instance as new.
@@ -200,6 +214,10 @@ module Sequel
       
       block[self] if block
       after_initialize
+    end
+    
+    def self.load(values)
+      new(values, true)
     end
     
     # Returns true if the current instance represents a new record.
