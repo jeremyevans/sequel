@@ -1,4 +1,6 @@
-gem 'assistance', '>= 0.1.2' # because we need Validations
+gem "assistance", ">= 0.1.2" # because we need Validations
+
+require "assistance"
 
 module Sequel
   class Model
