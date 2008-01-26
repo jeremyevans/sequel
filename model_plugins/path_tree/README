@@ -1,0 +1,11 @@
+# A Path Tree that stores the path for each element, making it able to retrieve
+# all children (including indirect) with one query while being more flexible
+# and easier than a nested set.
+#
+# == Usage ==
+# +is :path_tree, {}+
+# Please don't forget the empty hash, it's needed with the current sequel.
+# When you apply the plugin with an empty option hash, a default path column
+# named 'path' is created if not present, using a default delimiter of '.'
+#
+# TODO Document customization options

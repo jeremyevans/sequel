@@ -7,7 +7,7 @@ Version    = "0.0.1"
 Title      = "State Machine Sequel Plugin"
 Summary    = "Sequel Plugin"
 Authors    = "Inviz & Wayne E. Seguin"
-Emails     = "wayneeseugin@gmail.com"
+Emails     = "wayneeseguin@gmail.com"
 Homepage   = "http://sequel.rubyforge.org"
 
 ##############################################################################

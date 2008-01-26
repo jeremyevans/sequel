@@ -2,12 +2,12 @@
 # Constants
 ##############################################################################
 
-PluginName = "sequel_orderable"
-Version    = "0.0.3"
-Title      = "Orderable Sequel Plugin"
+PluginName = "sequel_path_tree"
+Version    = "0.0.1"
+Title      = "Path Tree Sequel Plugin"
 Summary    = "Sequel Plugin"
-Authors    = "Wayne E. Seguin & Aman Gupta"
-Emails     = "wayneeseguin@gmail.com,sequel@tmm1.net"
+Authors    = "Wayne E. Seguin & Tobias Habermann"
+Emails     = "wayneeseguin@gmail.com,thabermann@gmail.com"
 Homepage   = "http://sequel.rubyforge.org"
 
 ##############################################################################
@@ -87,7 +87,7 @@ end
 
 task :install_no_docs do
   sh %{rake package}
-  sh %{sudo gem install pkg/#{PluginName}-#{Version} --no-rdoc --no-ri}
+  sh %{sudo gem install pkg/#{PluginName}-#{Version}.gem --no-rdoc --no-ri}
 end
 
 task :uninstall => [:clean] do

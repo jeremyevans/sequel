@@ -7,7 +7,7 @@ Version    = "0.0.1"
 Title      = "Formatted Sequel Plugin"
 Summary    = "Sequel Plugin"
 Authors    = "Wayne E. Seguin & Lance Carlson"
-Emails     = "wayneeseugin@gmail.com,lancecarlson@gmail.com"
+Emails     = "wayneeseguin@gmail.com,lancecarlson@gmail.com"
 Homepage   = "http://sequel.rubyforge.org"
 
 ##############################################################################

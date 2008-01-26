@@ -7,7 +7,7 @@ Version    = "0.0.1"
 Title      = "Dequeue Sequel Plugin (Double ended queue)"
 Summary    = "Sequel Plugin"
 Authors    = "Wayne E. Seguin & Aman Gupta"
-Emails     = "wayneeseugin@gmail.com,sequel@tmm1.net"
+Emails     = "wayneeseguin@gmail.com,sequel@tmm1.net"
 Homepage   = "http://sequel.rubyforge.org"
 
 ##############################################################################
