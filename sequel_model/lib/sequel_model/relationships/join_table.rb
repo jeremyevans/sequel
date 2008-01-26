@@ -24,7 +24,7 @@ module Sequel
         instance_eval <<-JOINCLASS
         unless defined?(::#{@first_klass.class.name}#{@first_klass.class.name})
           @class = class ::#{@first_klass.class.name}#{@first_klass.class.name} < Sequel::Model ; end
-          @class.set_primary_key :#{@table_name.singularize}_id, :#{@second_klass.table_name.singularize}_id
+          @class.set_primary_key :#{Inflector.singularize(@first_klass)}_id, :#{Inflector.singularize(@second_klass)}_id
         else
           @class = ::#{@first_klass.class.name}#{@first_klass.class.name}
         end
