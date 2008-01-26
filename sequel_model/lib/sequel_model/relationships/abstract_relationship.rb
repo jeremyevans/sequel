@@ -18,7 +18,7 @@ module Sequel
       def define_relationship_accessor
         klass.class_eval <<-EOS
           def #{@relation}
-            #self.dataset.left_outer_join(#{@relation}, :id => :#{self.class.table_name.to_s.singularize}_id).limit(1)
+            #self.dataset.left_outer_join(#{@relation}, :id => :#{self.primary_key_string)}).limit(1)
             puts #{relation_class}
           end
           

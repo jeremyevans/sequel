@@ -45,6 +45,18 @@ module Sequel
       :id
     end
     
+    # Returns a string representation of the primary key
+    # Example:
+    #   primary_key [:title, :category]
+    #   title_category
+    def primary_key_string
+      if self.primary_key.class == Array
+        self.primary_key.join("_")
+      else
+        self.primary_key.to_s
+      end
+    end
+    
     # Returns primary key attribute hash.
     def self.primary_key_hash(value)
       {:id => value}
