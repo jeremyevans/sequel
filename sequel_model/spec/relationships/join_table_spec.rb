@@ -3,13 +3,16 @@ require File.join(File.dirname(__FILE__), "../spec_helper")
 describe Sequel::Model::JoinTable do  
   
   describe "class methods" do
+
     it "should have key method" do
       class Monkey < Sequel::Model(:monkeys); end;
       Sequel::Model::JoinTable.key(Monkey).should == "monkey_id"
     end
+
   end
   
   describe "instance methods" do
+
     before(:each) do
       class Post < Sequel::Model(:posts); end;
       class Comment < Sequel::Model(:comments); end;
@@ -67,9 +70,11 @@ describe Sequel::Model::JoinTable do
         @db.should_receive(:table_exists?).and_return(false)
         @join_table.exists?.should == false
       end
+      
     end
     
     describe "create" do
+      
       it "should create the table if it doesn't exist" do
         @join_table.should_receive(:exists?).and_return(false)
         @join_table.should_receive(:db).and_return(@db)
@@ -81,9 +86,11 @@ describe Sequel::Model::JoinTable do
         @join_table.should_receive(:exists?).and_return(true)
         @join_table.create.should be_false
       end
+
     end
     
     describe "create!" do
+
       it "should force the creation of the table it exists" do
         @join_table.should_receive(:exists?).and_return(true)
         @join_table.should_receive(:db).and_return(@db)
@@ -91,15 +98,20 @@ describe Sequel::Model::JoinTable do
         @join_table.should_receive(:create).and_return(true)
         @join_table.create!.should be_true
       end
+
     end
     
     describe "db" do
+
       it "should have access to the db object" do
         class Post; end
       
         Post.should_receive(:db).and_return(@db)
         @join_table.db.should == @db
       end
+
     end
+
   end
+  
 end
