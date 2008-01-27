@@ -124,6 +124,9 @@ module Sequel
         model_relationships.length > 0 ? true : false
       end
 
+      def primary_key_string
+        self.to_s.underscore
+      end
     end
     
   end # Model

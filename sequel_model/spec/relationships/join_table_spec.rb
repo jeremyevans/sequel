@@ -9,6 +9,8 @@ describe Sequel::Model::JoinTable do
   
   describe "instance methods" do
     before(:each) do
+      class Post < Sequel::Model(:posts); end;
+      class Comment < Sequel::Model(:comments); end;
       @join_table = Sequel::Model::JoinTable.new :post, :comment
       @join_table_plural = Sequel::Model::JoinTable.new :posts, :comments
       @join_table_string = Sequel::Model::JoinTable.new 'posts', 'comments'
@@ -72,7 +74,8 @@ describe Sequel::Model::JoinTable do
     end
     
     describe "create!" do
-      it "should allow you to force the creation of the table it does exist" do
+      it "should force the creation of the table it exists" do
+        @join_table.should_receive(:exists?).and_return(true)
         @join_table.should_receive(:db).and_return(@db)
         @db.should_receive(:drop_table).with('comments_posts')
         @join_table.should_receive(:create).and_return(true)

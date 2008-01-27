@@ -13,20 +13,20 @@ module Sequel
       attr_accessor :join_class
       
       def self.key(klass)
-        [ Inflector.singularize(klass.table_name), klass.primary_key_string) ].join("_")
+        [ Inflector.singularize(klass.table_name), klass.primary_key_string ].join("_")
       end
       
       def initialize(first_klass, second_klass)
-        @first_klass  = first_klass
-        @second_klass = second_klass
+        @first_klass  = Inflector.constantize(Inflector.classify(first_klass))
+        @second_klass = Inflector.constantize(Inflector.classify(second_klass))
         
         # Automatically Define the JoinClass if it does not exist
         instance_eval <<-JOINCLASS
-        unless defined?(::#{@first_klass.class}#{@first_klass.class})
-          @class = class ::#{@first_klass.class}#{@first_klass.class} < Sequel::Model ; end
-          @class.set_primary_key :#{key(@first_klass)}, :#{key(@second_klass)}
+        unless defined?(::#{@first_klass}#{@first_klass})
+          @class = class ::#{@first_klass}#{@first_klass} < Sequel::Model ; end
+          @class.set_primary_key :#{self.class.key(@first_klass)}, :#{self.class.key(@second_klass)}
         else
-          @class = ::#{@first_klass.class}#{@first_klass.class}
+          @class = ::#{@first_klass}#{@first_klass}
         end
         JOINCLASS
       end
@@ -66,7 +66,7 @@ module Sequel
       end
       
       def db
-        Inflector.constantize(Inflector.classify(@first_klass)).db
+        @first_klass.db
       end
       
     end
