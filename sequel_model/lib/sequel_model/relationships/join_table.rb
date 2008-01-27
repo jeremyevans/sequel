@@ -25,12 +25,12 @@ module Sequel
         # Automatically Define the JoinClass if it does not exist
         instance_eval <<-JOINCLASS
         unless defined?(::#{@source}#{@destination})
-          @class = 
+          @join_class = 
           class ::#{@source}#{@destination} < Sequel::Model
             set_primary_key :#{self.class.key(@source)}, :#{self.class.key(@destination)}
           end
         else
-          @class = ::#{@source}#{@destination}
+          @join_class = ::#{@source}#{@destination}
         end
         JOINCLASS
       end

@@ -14,9 +14,9 @@ describe Sequel::Model::JoinTable do
   describe "instance methods" do
 
     before(:each) do
-      class Post < Sequel::Model(:posts); end;
-      class Comment < Sequel::Model(:comments); end;
-      class Article < Sequel::Model(:articles); end;
+      class Post < Sequel::Model(:posts); end
+      class Comment < Sequel::Model(:comments); end
+      class Article < Sequel::Model(:articles); end
       @join_table = Sequel::Model::JoinTable.new :post, :comment
       @join_table_plural = Sequel::Model::JoinTable.new :posts, :comments
       @join_table_string = Sequel::Model::JoinTable.new "posts", "comments"
@@ -36,7 +36,10 @@ describe Sequel::Model::JoinTable do
     describe "join class" do
 
       it "should define the join class if it does not exist" do
-        defined?(PostComment).should_not be_nil
+        class Foo < Sequel::Model(:foos); end
+        class Bar < Sequel::Model(:bars); end
+        Sequel::Model::JoinTable.new :foos, :bars
+        defined?(FooBar).should_not be_nil
       end
       
       it "should not redefine the join class if it already exists" do
@@ -49,7 +52,7 @@ describe Sequel::Model::JoinTable do
       end
       
       it "should return the join class" do
-        @join_table.class.should eql(PostComment)
+        @join_table.join_class.should eql(PostComment)
       end
 
     end
