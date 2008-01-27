@@ -11,22 +11,26 @@ module Sequel
     class JoinTable
       
       attr_accessor :join_class
+      attr_accessor :source
+      attr_accessor :destination
       
       def self.key(klass)
-        [ Inflector.singularize(klass.table_name), klass.primary_key_string ].join("_")
+        [ Inflector.singularize(klass.table_name), klass.primary_key_string.to_s ].join("_")
       end
       
-      def initialize(first_klass, second_klass)
-        @first_klass  = Inflector.constantize(Inflector.classify(first_klass))
-        @second_klass = Inflector.constantize(Inflector.classify(second_klass))
+      def initialize(source, destination)
+        @source  = Inflector.constantize(Inflector.classify(source))
+        @destination = Inflector.constantize(Inflector.classify(destination))
         
         # Automatically Define the JoinClass if it does not exist
         instance_eval <<-JOINCLASS
-        unless defined?(::#{@first_klass}#{@first_klass})
-          @class = class ::#{@first_klass}#{@first_klass} < Sequel::Model ; end
-          @class.set_primary_key :#{self.class.key(@first_klass)}, :#{self.class.key(@second_klass)}
+        unless defined?(::#{@source}#{@destination})
+          @class = 
+          class ::#{@source}#{@destination} < Sequel::Model
+            set_primary_key :#{self.class.key(@source)}, :#{self.class.key(@destination)}
+          end
         else
-          @class = ::#{@first_klass}#{@first_klass}
+          @class = ::#{@source}#{@destination}
         end
         JOINCLASS
       end
@@ -37,15 +41,15 @@ module Sequel
       #   join_table(user, post) #=> :posts_users
       #   join_table(users, posts) #=> :posts_users
       def name
-        [ @first_klass.table_name, @second_klass.table_name ].sort.join("_")
+        [source.table_name.to_s, destination.table_name.to_s].sort.join("_")
       end
       
       # creates a join table
       def create
         if !exists?
           db.create_table name.to_sym do
-            integer self.class.key(@first_klass),  :null => false
-            integer self.class.key(@second_klass), :null => false
+            integer self.class.key(@source),  :null => false
+            integer self.class.key(@destination), :null => false
           end
           
           true
@@ -66,7 +70,7 @@ module Sequel
       end
       
       def db
-        @first_klass.db
+        @source.db
       end
       
     end

@@ -49,7 +49,7 @@ module Sequel
     # Example:
     #   primary_key [:title, :category]
     #   title_category
-    def primary_key_string
+    def self.primary_key_string
       if self.primary_key.class == Array
         self.primary_key.join("_")
       else
