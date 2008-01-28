@@ -16,13 +16,19 @@ class User < Sequel::Model; end
 describe Sequel::Model, "relationships" do
   
   describe "has" do
-
+    it "should allow for arity :one with options"
+    it "should allow for arity :many with options"
+    it "should raise an error Sequel::Error, \"Arity must be specified {:one, :many}.\" if arity was not specified."
   end
   
   describe "has_one" do
     it "should pass arguments to has :one" do
-      User.should_receive(:has).with(:one, :boss, {}).and_return(true)
-      User.send(:has_one, :boss)
+      User.should_receive(:has).with(:one, :boss).and_return(true)
+      class User
+        relationships do
+          has :one, :boss
+        end
+      end
     end
   end
   
@@ -42,6 +48,25 @@ describe Sequel::Model, "relationships" do
   
   describe "has_relationships?" do
 
+  end
+
+  describe "relationships block" do
+
+    it "should store the relationship" do
+      User.should_receive(:has).with(:one, :boss).and_return(true)
+      class User
+        relationships do
+          has :one, :boss
+        end
+      end
+      # User.model_relationships.should eql(?)
+    end
+    it "should create relationship methods on the model"
+    it "should allow for has :one relationship"
+    it "should allow for has :many relationship"
+    it "should allow for has_one relationship"
+    it "should allow for has_many relationship"
+    it "should allow for belongs_to"
   end
 
 end
