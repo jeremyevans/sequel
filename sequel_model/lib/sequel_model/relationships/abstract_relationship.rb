@@ -2,7 +2,8 @@ module Sequel
   class Model
     # Manages relationships between to models
     # 
-    #   HasOneRelationship.new Post, :one, :comments    
+    #   HasOneRelationship.new Post, :one, :comments
+    #   HasOneRelationship.new Post, :one, :author, :class => 'User'
     class AbstractRelationship
       
       attr_reader :klass, :relation, :options
@@ -15,6 +16,7 @@ module Sequel
       
       def create
         create_join_table
+        define_accessor
       end
 
       def create_join_table
@@ -28,20 +30,20 @@ module Sequel
       end
       
       # SELECT c.* FROM comments c, comments_posts cp, posts p where c.id = cp.comment_id and cp.post_id = p.id and p.id = ?
-      def define_relationship_accessor
-        klass.class_eval <<-EOS
+      def define_accessor
+        klass.class_eval <<-ACCESSOR
           def #{@relation}
-            #self.dataset.left_outer_join(#{@relation}, :id => :#{self.primary_key_string}).limit(1)
+            #self.dataset.left_outer_join(#{@relation}, :id => :#{klass.primary_key_string}).limit(1)
             puts #{relation_class}
           end
           
           def #{@relation}=(value)
           end
-        EOS
+        ACCESSOR
       end
       
       def relation_class
-        Inflector.constantize(Inflector.classify(@relation))
+        Inflector.constantize(options[:class] ||= Inflector.classify(@relation))
       end
       
     end

@@ -80,10 +80,6 @@ module Sequel
       # has :one,  :account # account_id field
       # has :many, :comments # comments_posts join table
       def has(arity, relation, options = {})
-
-        #if relationship_exists?(arity, relation)
-        #  raise Sequel::Error, "The relationship '#{self} has #{arity} #{relation}' is already defined."
-        #end
         
         # Create and store the relationship
         case arity
@@ -91,6 +87,7 @@ module Sequel
           when :many : HasManyRelationship.new(self, relation, options).create
           else raise Sequel::Error, "Arity must be specified {:one, :many}."
         end
+        
         #unless normalized
           # :required => true # The relationship must be populated to save
           # can only be used with normalized => false : 
@@ -110,6 +107,10 @@ module Sequel
       def belongs_to(relation, options = {})
         BelongsToRelationship.new(self, relation, options).create
       end
+      
+      #def primary_key_string
+      #  "#{self.to_s.tableize.singularize}_id"
+      #end
 
     end
     

@@ -16,9 +16,26 @@ class User < Sequel::Model; end
 describe Sequel::Model, "relationships" do
   
   describe "has" do
-    it "should allow for arity :one with options"
-    it "should allow for arity :many with options"
-    it "should raise an error Sequel::Error, \"Arity must be specified {:one, :many}.\" if arity was not specified."
+    before(:each) do
+      @one = mock(Sequel::Model::HasOneRelationship)
+      @many = mock(Sequel::Model::HasManyRelationship)
+    end
+    
+    it "should allow for arity :one with options" do
+      @one.should_receive(:create)
+      Sequel::Model::HasOneRelationship.should_receive(:new).with(User, :site, {}).and_return(@one)
+      User.send(:has, :one, :site)
+    end
+    
+    it "should allow for arity :many with options" do
+      @many.should_receive(:create)
+      Sequel::Model::HasManyRelationship.should_receive(:new).with(User, :sites, {}).and_return(@many)
+      User.send(:has, :many, :sites)
+    end
+    
+    it "should raise an error Sequel::Error, \"Arity must be specified {:one, :many}.\" if arity was not specified." do
+      lambda { User.send(:has, :so_many, :sites) }.should raise_error Sequel::Error, "Arity must be specified {:one, :many}."
+    end
   end
   
   describe "has_one" do
@@ -42,10 +59,6 @@ describe Sequel::Model, "relationships" do
       Sequel::Model::BelongsToRelationship.should_receive(:new).with(User, :boss, {}).and_return(@belongs_to_relationship)
       User.send(:belongs_to, :boss)
     end
-  end
-  
-  describe "has_relationships?" do
-
   end
 
   describe "relationships block" do
