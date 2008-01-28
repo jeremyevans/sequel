@@ -75,26 +75,22 @@ module Sequel
   class Model
     
     class << self
-      @@model_relationships = []
-
       # has arity<Symbol>, model<Symbol>
       # has :one,  :blog, :required => true # blog_id field, cannot be null
       # has :one,  :account # account_id field
       # has :many, :comments # comments_posts join table
       def has(arity, relation, options = {})
 
-        # Commence with the sanity checks!
-        unless [:one,:many].include? arity
-          raise Sequel::Error, "Arity must be specified {:one, :many}." 
-        end
-
         #if relationship_exists?(arity, relation)
         #  raise Sequel::Error, "The relationship '#{self} has #{arity} #{relation}' is already defined."
         #end
         
         # Create and store the relationship
-        @@model_relationships << Relationship.new(self, arity, relation, options).create
-
+        case arity
+          when :one : HasOneRelationship.new(self, arity, relation, options).create
+          when :many : HasManyRelationship.new(self, arity, relation, options).create
+          else Sequel::Error, "Arity must be specified {:one, :many}." 
+        end
         #unless normalized
           # :required => true # The relationship must be populated to save
           # can only be used with normalized => false : 
@@ -112,16 +108,7 @@ module Sequel
       end
 
       def belongs_to(relation, options = {})
-        has :one, relation, options
-      end
-
-      def model_relationships
-        @@model_relationships
-      end
-
-      # return true if there are validations stored, false otherwise
-      def has_relationships?
-        model_relationships.length > 0 ? true : false
+        BelongsToRelationship.new(self, arity, relation, options).create
       end
 
     end

@@ -1,11 +1,11 @@
 require File.join(File.dirname(__FILE__), "../spec_helper")
 
-describe Sequel::Model::HasNRelationship do
+describe Sequel::Model::AbstractRelationship do
   describe "intance methods" do
     before :each do
       class Post; end
-      @one = Sequel::Model::HasNRelationship.new Post, :one, :author, {}
-      @many = Sequel::Model::HasNRelationship.new Post, :many, :comments, {:force => true}
+      @one = Sequel::Model::AbstractRelationship.new Post, :one, :author, {}
+      @many = Sequel::Model::AbstractRelationship.new Post, :many, :comments, {:force => true}
       @join_table = mock(Sequel::Model::JoinTable)
     end
     

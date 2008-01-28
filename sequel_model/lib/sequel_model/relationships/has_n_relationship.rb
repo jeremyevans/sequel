@@ -3,7 +3,7 @@ module Sequel
     # Manages relationships between to models
     # 
     #   HasOneRelationship.new Post, :one, :comments    
-    class HasNRelationship
+    class AbstractRelationship
       
       attr_reader :klass, :arity, :relation, :options
       
@@ -47,8 +47,8 @@ module Sequel
       
     end
     
-    class HasOneRelationship < HasNRelationship; end
-    class HasManyRelationship < HasNRelationship; end
-    class BelognsToRelationship < HasNRelationship; end
+    class HasOneRelationship < AbstractRelationship; end
+    class HasManyRelationship < AbstractRelationship; end
+    class BelognsToRelationship < HasOneRelationship; end
   end
 end
