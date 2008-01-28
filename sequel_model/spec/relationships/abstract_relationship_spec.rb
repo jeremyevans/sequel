@@ -3,7 +3,7 @@ require File.join(File.dirname(__FILE__), "../spec_helper")
 describe Sequel::Model::AbstractRelationship do
   describe "intance methods" do
     before :each do
-      class Post; end
+      class Post < Sequel::Model(:posts); end
       @one = Sequel::Model::HasOneRelationship.new Post, :author, {}
       @many = Sequel::Model::HasManyRelationship.new Post, :comments, {:force => true}
       @join_table = mock(Sequel::Model::JoinTable)
