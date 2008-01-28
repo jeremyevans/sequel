@@ -1,5 +1,5 @@
 files = %w[
-  block has_n_relationship join_table
+  abstract_relationship block join_table
 ]
 dir = File.join(File.dirname(__FILE__), "relationships")
 files.each {|f| require(File.join(dir, f))}
@@ -87,9 +87,9 @@ module Sequel
         
         # Create and store the relationship
         case arity
-          when :one : HasOneRelationship.new(self, arity, relation, options).create
-          when :many : HasManyRelationship.new(self, arity, relation, options).create
-          else Sequel::Error, "Arity must be specified {:one, :many}." 
+          when :one : HasOneRelationship.new(self, relation, options).create
+          when :many : HasManyRelationship.new(self, relation, options).create
+          else raise Sequel::Error, "Arity must be specified {:one, :many}."
         end
         #unless normalized
           # :required => true # The relationship must be populated to save
@@ -108,7 +108,7 @@ module Sequel
       end
 
       def belongs_to(relation, options = {})
-        BelongsToRelationship.new(self, arity, relation, options).create
+        BelongsToRelationship.new(self, relation, options).create
       end
 
     end

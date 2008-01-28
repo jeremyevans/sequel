@@ -4,8 +4,8 @@ describe Sequel::Model::AbstractRelationship do
   describe "intance methods" do
     before :each do
       class Post; end
-      @one = Sequel::Model::AbstractRelationship.new Post, :one, :author, {}
-      @many = Sequel::Model::AbstractRelationship.new Post, :many, :comments, {:force => true}
+      @one = Sequel::Model::HasOneRelationship.new Post, :author, {}
+      @many = Sequel::Model::HasManyRelationship.new Post, :comments, {:force => true}
       @join_table = mock(Sequel::Model::JoinTable)
     end
     

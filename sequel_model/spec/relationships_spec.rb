@@ -37,7 +37,9 @@ describe Sequel::Model, "relationships" do
 
   describe "belongs_to" do
     it "should pass arguments to has :one" do
-      User.should_receive(:has).with(:one, :boss, {}).and_return(true)
+      @belongs_to_relationship = mock(Sequel::Model::BelongsToRelationship)
+      @belongs_to_relationship.should_receive(:create)
+      Sequel::Model::BelongsToRelationship.should_receive(:new).with(User, :boss, {}).and_return(@belongs_to_relationship)
       User.send(:belongs_to, :boss)
     end
   end

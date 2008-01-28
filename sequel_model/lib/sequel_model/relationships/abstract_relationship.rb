@@ -5,11 +5,10 @@ module Sequel
     #   HasOneRelationship.new Post, :one, :comments    
     class AbstractRelationship
       
-      attr_reader :klass, :arity, :relation, :options
+      attr_reader :klass, :relation, :options
       
-      def initialize(klass, arity, relation, options)
+      def initialize(klass, relation, options)
         @klass = klass
-        @arity = arity
         @relation = relation
         @options = options
       end
@@ -49,6 +48,6 @@ module Sequel
     
     class HasOneRelationship < AbstractRelationship; end
     class HasManyRelationship < AbstractRelationship; end
-    class BelognsToRelationship < HasOneRelationship; end
+    class BelongsToRelationship < HasOneRelationship; end
   end
 end
