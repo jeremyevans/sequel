@@ -1,6 +1,9 @@
 module Sequel
   class Model
-    class AbstractRelationship
+    # Manages relationships between to models
+    # 
+    #   HasOneRelationship.new Post, :one, :comments    
+    class HasNRelationship
       
       attr_reader :klass, :arity, :relation, :options
       
@@ -12,6 +15,17 @@ module Sequel
       end
       
       def create
+        create_join_table
+      end
+
+      def create_join_table
+        join_table = JoinTable.new self.klass.table_name, relation.to_s.pluralize
+        
+        if join_table.exists? && options[:force] == true
+          join_table.create!
+        else
+          join_table.create
+        end
       end
       
       # SELECT c.* FROM comments c, comments_posts cp, posts p where c.id = cp.comment_id and cp.post_id = p.id and p.id = ?
@@ -32,5 +46,9 @@ module Sequel
       end
       
     end
+    
+    class HasOneRelationship < HasNRelationship; end
+    class HasManyRelationship < HasNRelationship; end
+    class BelognsToRelationship < HasNRelationship; end
   end
 end

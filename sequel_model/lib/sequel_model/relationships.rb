@@ -1,5 +1,5 @@
 files = %w[
-  abstract_relationship relationship join_table block
+  block has_n_relationship join_table
 ]
 dir = File.join(File.dirname(__FILE__), "relationships")
 files.each {|f| require(File.join(dir, f))}

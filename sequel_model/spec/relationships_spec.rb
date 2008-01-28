@@ -23,12 +23,8 @@ describe Sequel::Model, "relationships" do
   
   describe "has_one" do
     it "should pass arguments to has :one" do
-      User.should_receive(:has).with(:one, :boss).and_return(true)
-      class User
-        relationships do
-          has :one, :boss
-        end
-      end
+      User.should_receive(:has).with(:one, :boss, {}).and_return(true)
+      User.send(:has_one, :boss)
     end
   end
   
