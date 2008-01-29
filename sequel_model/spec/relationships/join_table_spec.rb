@@ -4,9 +4,24 @@ describe Sequel::Model::JoinTable do
   
   describe "class methods" do
 
-    it "should have key method" do
-      class Monkey < Sequel::Model(:monkeys); end;
-      Sequel::Model::JoinTable.key(Monkey).should == "monkey_id"
+    before(:all) do
+      class Person < Sequel::Model
+        set_primary_key [:first_name, :last_name, :middle_name]
+      end
+      class Address < Sequel::Model
+        set_primary_key [:street,:suite,:zip]
+      end
+      class Monkey < Sequel::Model
+      end
+    end
+    
+    describe "keys" do
+      it "should return an array of the primary keys for a complex primary key" do      
+        # @join_table = Sequel::Model::JoinTable.new :person, :address
+        Sequel::Model::JoinTable.keys(Person).should eql(["person_first_name", "person_last_name", "person_middle_name"])
+        Sequel::Model::JoinTable.keys(Address).should eql(["address_street", "address_suite", "address_zip"])
+        Sequel::Model::JoinTable.keys(Monkey).should eql(["monkey_id"])
+      end
     end
 
   end

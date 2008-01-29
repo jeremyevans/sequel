@@ -44,6 +44,8 @@ describe Sequel::Model::AbstractRelationship do
       it "should define a reader" do
         @one.define_accessor
         @one.should respond_to(:author)
+        @many.define_accessor
+        @many.should respond_to(:comments)
       end
       
       it "should define a writer" do
