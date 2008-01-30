@@ -74,11 +74,14 @@ RDOC_OPTS = [
   "--inline-source"
 ]
 
+ALLISON_TEMPLATE = "#{Gem.dir}/gems/allison-2.0.3/lib/allison.rb"
+
 Rake::RDocTask.new do |rdoc|
   rdoc.rdoc_dir = "sequel/doc/rdoc"
   rdoc.options += RDOC_OPTS
   rdoc.main = "sequel/README"
   rdoc.title = "Sequel: Lightweight ORM for Ruby"
+  rdoc.template = ALLISON_TEMPLATE if File.exists?(ALLISON_TEMPLATE)
   rdoc.rdoc_files.add ["sequel/README", "sequel/COPYING", 
     "sequel_core/lib/sequel_core.rb", "sequel_core/lib/**/*.rb",
     "sequel_model/lib/sequel_model.rb", "sequel_model/lib/**/*.rb",
@@ -89,7 +92,6 @@ task :doc_rforge => [:doc]
 
 desc "Update docs and upload to rubyforge.org"
 task :doc_rforge do
-  # sh %{rake doc}
   sh %{scp -r sequel/doc/rdoc/* ciconia@rubyforge.org:/var/www/gforge-projects/sequel}
 end
 

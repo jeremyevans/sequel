@@ -23,11 +23,11 @@ If you have any comments or suggestions please send an email to ciconia at gmail
 == Installation
 
   sudo gem install sequel
-  
-Note: as of version 0.5, Sequel models are distributed in a separate gem. In order to use sequel models, you should install the sequel_model gem:
 
-  sudo gem install sequel_model
-  
+If you don't need to use Sequel models you can just install the sequel_core gem, which includes all database adapters and dataset functionality:
+
+  sudo gem install sequel_core
+
 == Supported Databases
 
 Sequel currently supports:
