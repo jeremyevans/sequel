@@ -183,7 +183,9 @@ module Sequel
       @primary_key ||= self.class.primary_key
     end
     
-    # Returns the primary key value identifying the model instance. Stock implementation.
+    # Returns the primary key value identifying the model instance. If the
+    # model's primary key is changed (using #set_primary_key or #no_primary_key)
+    # this method is redefined accordingly.
     def pk
       @pk ||= @values[:id]
     end
@@ -208,7 +210,8 @@ module Sequel
               values.delete(k)
             end
           end
-          @values.merge!(values)
+          values.inject(@values) {|m, kv| m[kv[0].to_sym] = kv[1]; m}
+          # @values.merge!(values)
         end
       else
         @values = values || {}

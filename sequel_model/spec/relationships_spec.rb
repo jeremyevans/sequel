@@ -1,6 +1,6 @@
 require File.join(File.dirname(__FILE__), "spec_helper")
 
-#__END__
+__END__
 
 # class Post < Sequel::Model
 #   relationships do

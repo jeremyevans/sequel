@@ -138,7 +138,7 @@ describe Sequel::Model, "Validations" do
     @cow.should be_valid
   end
   
-  it "should have a validates block that calls multiple validations" do
+  it "should have a validates block that contains multiple validations" do
     class Person < Sequel::Model
       validations.clear
       validates do
@@ -182,6 +182,18 @@ describe Sequel::Model, "Validations" do
     Person.should have_validations
     Smurf.should_not have_validations
   end
+
+  it "should validate correctly instances initialized with string keys" do
+    class Can < Sequel::Model
+      def columns; [:id, :name]; end
+      
+      validates_length_of :name, :minimum => 4
+    end
+    
+    Can.new('name' => 'ab').should_not be_valid
+    Can.new('name' => 'abcd').should be_valid
+  end
+  
 end
 
 describe "Model#save!" do

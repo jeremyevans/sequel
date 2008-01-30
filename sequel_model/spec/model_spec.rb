@@ -247,7 +247,7 @@ describe Sequel::Model, "magic methods" do
 
   it "should support count_by_xxx" do
     @m.count_by_name.should be_a_kind_of(@c)
-    @m.count_by_name.sql.should == "SELECT name, count(name) AS count FROM items GROUP BY name ORDER BY count"
+    @m.count_by_name.sql.should == "SELECT name, count(*) AS count FROM items GROUP BY name ORDER BY count"
   end
 
   it "should support filter_by_xxx" do

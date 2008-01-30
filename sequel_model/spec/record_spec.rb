@@ -485,6 +485,11 @@ describe Sequel::Model, "#initialize" do
     m.values.should == {:id => 1, :x => 2}
     m.blah.should == 3
   end
+  
+  specify "should convert string keys into symbol keys" do
+    m = @c.new('id' => 1, 'x' => 2)
+    m.values.should == {:id => 1, :x => 2}
+  end
 end
 
 describe Sequel::Model, ".create" do
