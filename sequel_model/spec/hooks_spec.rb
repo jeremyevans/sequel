@@ -179,7 +179,7 @@ describe "Model#before_update && Model#after_update" do
   end
   
   specify "should be called around record update" do
-    m = @c.new(:id => 2233)
+    m = @c.load(:id => 2233)
     m.save
     MODEL_DB.sqls.should == [
       'BLAH before',
@@ -200,7 +200,7 @@ describe "Model#before_save && Model#after_save" do
   end
   
   specify "should be called around record update" do
-    m = @c.new(:id => 2233)
+    m = @c.load(:id => 2233)
     m.save
     MODEL_DB.sqls.should == [
       'BLAH before',

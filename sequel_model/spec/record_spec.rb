@@ -20,7 +20,7 @@ describe "Model#save" do
   end
 
   it "should update a record for an existing model instance" do
-    o = @c.new(:id => 3, :x => 1)
+    o = @c.load(:id => 3, :x => 1)
     o.save
     
     MODEL_DB.sqls.first.should =~ 
@@ -28,7 +28,7 @@ describe "Model#save" do
   end
   
   it "should update only the given columns if given" do
-    o = @c.new(:id => 3, :x => 1, :y => nil)
+    o = @c.load(:id => 3, :x => 1, :y => nil)
     o.save(:y)
     
     MODEL_DB.sqls.first.should == "UPDATE items SET y = NULL WHERE (id = 3)"
@@ -63,10 +63,15 @@ describe "Model#save_changes" do
     o.save_changes
     
     MODEL_DB.sqls.should be_empty
+
+    o = @c.load(:id => 3, :x => 1, :y => nil)
+    o.save_changes
+    
+    MODEL_DB.sqls.should be_empty
   end
   
   it "should update only changed columns" do
-    o = @c.new(:id => 3, :x => 1, :y => nil)
+    o = @c.load(:id => 3, :x => 1, :y => nil)
     o.x = 2
 
     o.save_changes
@@ -291,7 +296,7 @@ describe Sequel::Model, "update_with_params" do
       def self.columns; [:x, :y]; end
     end
     @o1 = @c.new
-    @o2 = @c.new(:id => 5)
+    @o2 = @c.load(:id => 5)
   end
   
   it "should filter the given params using the model columns" do
@@ -521,6 +526,13 @@ describe Sequel::Model, ".create" do
     o3.should === o
     o2.should == :blah
     MODEL_DB.sqls.should == ["INSERT INTO items (x) VALUES (333)", "SELECT * FROM items WHERE (id IN ('INSERT INTO items (x) VALUES (333)')) LIMIT 1"]
+  end
+  
+  it "should create a row for a model with custom primary key" do
+    @c.set_primary_key :x
+    o = @c.create(:x => 30)
+    o.class.should == @c
+    MODEL_DB.sqls.should == ["INSERT INTO items (x) VALUES (30)", "SELECT * FROM items WHERE (x = 30) LIMIT 1"]
   end
 end
 

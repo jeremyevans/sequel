@@ -1,5 +1,7 @@
 === SVN
 
+* Fixed Model.create to correctly initialize instances marked as new (#135).
+
 * Fixed Model#initialize to convert string keys into symbol keys. This also fixes problem with validating objects initialized with string keys (#136).
 
 === 0.3.3 (2008-01-25)

@@ -205,7 +205,7 @@ describe "Model#save!" do
         o.errors[a] << 'blah' unless v == 5
       end
     end
-    @m = @c.new(:id => 4)
+    @m = @c.load(:id => 4)
     MODEL_DB.reset
   end
   
@@ -216,7 +216,7 @@ describe "Model#save!" do
   end
 end
 
-describe "Model#save!" do
+describe "Model#save" do
   setup do
     @c = Class.new(Sequel::Model(:people)) do
       def columns; [:id]; end
@@ -225,7 +225,7 @@ describe "Model#save!" do
         o.errors[a] << 'blah' unless v == 5
       end
     end
-    @m = @c.new(:id => 4)
+    @m = @c.load(:id => 4)
     MODEL_DB.reset
   end
 
@@ -236,7 +236,7 @@ describe "Model#save!" do
     
     @m.id = 5
     @m.should be_valid
-    @m.save
+    @m.save.should_not be_false
     MODEL_DB.sqls.should == ['UPDATE people SET id = 5 WHERE (id = 5)']
   end
   

@@ -128,7 +128,7 @@ describe Sequel::Model, "new" do
     o.save
     o.id.should == 1234
 
-    o = @m.new(:x => 1, :id => 333)
+    o = @m.load(:x => 1, :id => 333)
     o.save
     o.id.should == 333
   end

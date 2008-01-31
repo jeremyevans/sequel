@@ -218,19 +218,14 @@ module Sequel
       end
 
       k = primary_key
-      if from_db
-        @new = k == nil
-      else
-        # if there's no primary key for the model class, or
-        # @values doesn't contain a primary key value, then 
-        # we regard this instance as new.
-        @new = (k == nil) || (!(Array === k) && !@values[k])
-      end
+      @new = !from_db
       
       block[self] if block
       after_initialize
     end
     
+    # Initializes a model instance as an existing record. This constructor is 
+    # used by Sequel to initialize model instances when fetching records.
     def self.load(values)
       new(values, true)
     end
