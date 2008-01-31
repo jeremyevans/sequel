@@ -1,3 +1,7 @@
+=== SVN
+
+* Added Dataset#select_more, Dataset#order_more methods (#129).
+
 === 1.0.5 (2008-01-25)
 
 * Added support for instantiating models by using the load constructor method.

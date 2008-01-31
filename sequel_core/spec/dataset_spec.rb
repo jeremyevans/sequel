@@ -716,6 +716,22 @@ context "Dataset#select_all" do
   end
 end
 
+context "Dataset#select_more" do
+  setup do
+    @d = Sequel::Dataset.new(nil).from(:test)
+  end
+  
+  specify "should act like #select for datasets with no selection" do
+    @d.select_more(:a, :b).sql.should == 'SELECT a, b FROM test'
+    @d.select_all.select_more(:a, :b).sql.should == 'SELECT a, b FROM test'
+    @d.select(:blah).select_all.select_more(:a, :b).sql.should == 'SELECT a, b FROM test'
+  end
+
+  specify "should add to the currently selected columns" do
+    @d.select(:a).select_more(:b).sql.should == 'SELECT a, b FROM test'
+    @d.select(:a.all).select_more(:b.all).sql.should == 'SELECT a.*, b.* FROM test'
+  end
+end
 
 context "Dataset#order" do
   setup do
@@ -766,6 +782,22 @@ context "Dataset#order_by" do
   specify "should accept a string" do
     @dataset.order_by('dada ASC'.lit).sql.should ==
       'SELECT * FROM test ORDER BY dada ASC'
+  end
+end
+
+context "Dataset#order_more" do
+  setup do
+    @dataset = Sequel::Dataset.new(nil).from(:test)
+  end
+  
+  specify "should include an ORDER BY clause in the select statement" do
+    @dataset.order_more(:name).sql.should == 
+      'SELECT * FROM test ORDER BY name'
+  end
+  
+  specify "should add to a previous ordering" do
+    @dataset.order(:name).order_more(:stamp.DESC).sql.should ==
+      'SELECT * FROM test ORDER BY name, stamp DESC'
   end
 end
 

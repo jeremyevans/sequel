@@ -157,6 +157,15 @@ module Sequel
         clone_merge(:select => columns)
       end
       
+      # Returns a copy of the dataset with additional selected columns.
+      def select_more(*columns)
+        if @opts[:select]
+          clone_merge(:select => @opts[:select] + columns)
+        else
+          clone_merge(:select => columns)
+        end
+      end
+      
       # Returns a copy of the dataset selecting the wildcard.
       def select_all
         clone_merge(:select => nil)
@@ -172,9 +181,17 @@ module Sequel
       def order(*order)
         clone_merge(:order => order)
       end
-      
       alias_method :order_by, :order
-
+      
+      # Returns a copy of the dataset with the order changed.
+      def order_more(*order)
+        if @opts[:order]
+          clone_merge(:order => @opts[:order] + order)
+        else
+          clone_merge(:order => order)
+        end
+      end
+      
       # Returns a copy of the dataset with the order reversed. If no order is
       # given, the existing order is inverted.
       def reverse_order(*order)
