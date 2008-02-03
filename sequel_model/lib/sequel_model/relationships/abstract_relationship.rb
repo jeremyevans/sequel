@@ -6,65 +6,97 @@ module Sequel
     #   HasOneRelationship.new Post, :one, :author, :class => 'User'
     # @has_one = HasOneRelationship.new(Post, :one, :author, :class => 'User').create
     class AbstractRelationship
-      
+
       attr_reader :klass, :relation, :options, :join_table
-      
+
       def initialize(klass, relation, options)
         @klass = klass
         @relation = relation
         @options = options
       end
-      
-      def create
+
+      def create(options = {})
         create_join_table
-        define_accessor
+        define_accessor(options)
       end
 
       def create_join_table
         @join_table = JoinTable.new self.klass.table_name, relation.to_s.pluralize
-        
+
         if @join_table.exists? && options[:force] == true
           @join_table.create!
         else
           @join_table.create
         end
       end
-      
-      # SELECT c.* FROM comments c, comments_posts cp, posts p where c.id = cp.comment_id and cp.post_id = p.id and p.id = ?
-      # @post.comments
-      # SELECT posts.*, comments.*
-      # FROM posts LEFT OUTER JOIN comments_posts LEFT OUTER JOIN comments
-      # ON posts.pk = comments_posts.posts_pk, comments_posts.comments_pk = comments.pk
-      # WHERE where_clause if given
-      # LIMIT limit if given
-      # ORDER order if given
-      # DB[:posts].join(:comments_posts, :post_id => :id, :id => 1).join(:comments, :id => :comment_id).sql
-      # => "SELECT * FROM posts 
-      # INNER JOIN comments_posts ON (comments_posts.`post_id` = posts.`id`) AND (comments_posts.`id` = 1) 
-      # INNER JOIN comments ON (comments.`id` = comments_posts.`comment_id`)"
-      def define_accessor
-        klass.class_eval <<-ACCESSOR
+
+      def define_accessor(options)
+        if options[:type] == :simple
+          klass.class_eval <<-ACCESSOR
           def #{@relation}
-            self.dataset.join(:#{join_table.name}, :#{foreign_key} => :id, :id => self.id).join(:#{@relation.to_s.pluralize}, :id => :#{@relation.to_s.classify.foreign_key})
+            #{foreign_accessor}
           end
-          
+
           def #{@relation}=(value)
           end
-        ACCESSOR
+          ACCESSOR
+        else
+          klass.class_eval <<-ACCESSOR
+          def #{@relation}
+            #{join_accessor}
+          end
+
+          def #{@relation}=(value)
+            return false unless value
+            self.dataset.set(:value => )
+          end
+          ACCESSOR
+        end
+
+        def foreign_accessor
+          <<-QUERYBLOCK
+          self.query do
+            select(:#{relation.to_s.pluralize}.all)
+            join(
+            :#{join_table.name}, 
+            :#{@klass.to_s.foreign_key} => :id
+            )
+            join(:#{@relation.to_s.pluralize}, :id => :#{@relation.to_s.classify.foreign_key})
+            )
+            filter(:#{klass.to_s.tableize}__id => self.id)
+          end
+          QUERYBLOCK
+        end
+
+        def join_accessor
+          <<-QUERYBLOCK
+          self.query do
+            select(:#{relation.to_s.pluralize}.all)
+            join(
+            :#{join_table.name}, 
+            :#{Inflector.singularize(table_name)}_#{join_table.primary_key} => :#{primary_key}
+            )
+            join(
+            :#{relation.to_s.pluralize}, 
+            :#{relation.primary_key} => :#{relation.to_s.pluralize}_#{relation.primary_key}
+            )
+            where(:#{table_name}__id => self.#{primary_key.to_s})
+          end
+          QUERYBLOCK
+        end
+
+        def foreign_key
+          @klass.to_s.foreign_key
+        end 
+
+        def relation_class
+          Inflector.constantize(options[:class] ||= Inflector.classify(@relation))
+        end
+
       end
-      
-      def foreign_key
-        @klass.to_s.foreign_key
-      end 
-      
-      def relation_class
-        Inflector.constantize(options[:class] ||= Inflector.classify(@relation))
-      end
-      
+
+      class HasOneRelationship < AbstractRelationship; end
+      class HasManyRelationship < AbstractRelationship; end
+      class BelongsToRelationship < HasOneRelationship; end
     end
-    
-    class HasOneRelationship < AbstractRelationship; end
-    class HasManyRelationship < AbstractRelationship; end
-    class BelongsToRelationship < HasOneRelationship; end
   end
-end

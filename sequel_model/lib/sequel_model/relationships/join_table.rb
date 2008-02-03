@@ -18,11 +18,11 @@ module Sequel
         singular_klass = Inflector.singularize(klass.table_name)        
         klass.primary_key.to_a.map do |key|
           [ singular_klass, key.to_s ].join("_")
-        end        
+        end
       end
       
       def initialize(source, destination)
-        @source  = Inflector.constantize(Inflector.classify(source))
+        @source      = Inflector.constantize(Inflector.classify(source))
         @destination = Inflector.constantize(Inflector.classify(destination))
 
         # Automatically Define the JoinClass if it does not exist

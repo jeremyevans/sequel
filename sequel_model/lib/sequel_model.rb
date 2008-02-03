@@ -232,7 +232,7 @@ end
 
 # TODO: add relationships when complete:
 files = %w[
-  base hooks record schema relations relationships 
+  base hooks record schema relations 
   caching plugins validations 
 ]
 dir = File.join(File.dirname(__FILE__), "sequel_model")
