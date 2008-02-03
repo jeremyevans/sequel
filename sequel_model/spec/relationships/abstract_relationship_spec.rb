@@ -5,7 +5,7 @@ describe Sequel::Model::AbstractRelationship do
     before :each do
       class Post < Sequel::Model(:posts); end
       class People < Sequel::Model(:people); end
-      class Comment < Sequel::Model(:comment); end
+      class Comment < Sequel::Model(:comments); end
       @one = Sequel::Model::HasOneRelationship.new Post, :author, {:class => "People"}
       @many = Sequel::Model::HasManyRelationship.new Post, :comments, {:force => true}
       @join_table = mock(Sequel::Model::JoinTable)
@@ -45,49 +45,28 @@ describe Sequel::Model::AbstractRelationship do
     end
     
     describe "define_accessor" do      
-      describe "reader" do
-        it "should return an instance for a has :one relationship" do
+      describe "reader" do        
+        it "should return a dataset for a has :one relationship" do
+          @one.stub!(:create_table)
           @one.should_receive(:join_table).and_return(@join_table)
           @join_table.should_receive(:name).and_return(:authors_posts)
-          Post.should_receive(:class_eval).with(
-"          def author
-            self.dataset.join(:authors_posts, :post_id => :id, :id => self.id).join(:authors, :id => :author_id)
-          end
-          
-          def author=(value)
-          end
-")
           @one.define_accessor
-          #@one.should respond_to(:author)
+          @post = Post.new(:id => 1)
+          @post.author.sql.should == "SELECT authors.* FROM posts INNER JOIN authors_posts ON (authors_posts.post_id = posts.id) INNER JOIN authors ON (authors.id = authors_posts.author_id) WHERE (posts.id = #{@post.id})"
         end
         
-        it "should return all of the instances for a has :many relationship" do
+        it "should return a dataset for a has :many relationship" do
           @many.should_receive(:join_table).and_return(@join_table)
           @join_table.should_receive(:name).and_return(:posts_comments)
           @many.define_accessor
-          #@many.should respond_to(:comments)
+          @post = Post.new(:id => 1)
+          @post.comments.sql.should == "SELECT comments.* FROM posts INNER JOIN posts_comments ON (posts_comments.post_id = posts.id) INNER JOIN comments ON (comments.id = posts_comments.comment_id) WHERE (posts.id = #{@post.id})"
         end
       end
       
       describe "writer" do
         it "should be created" do
         end
-      end
-    end
-    
-    describe "foreign_key" do
-      before(:each) do
-        @one.stub!(:create_join_table)
-        @one.stub!(:define_accessor)
-        @one.create
-        @many.stub!(:create_join_table)
-        @many.stub!(:define_accessor)
-        @many.create
-      end
-      
-      it "should give you the foreign key for the current class" do
-        @one.foreign_key.should == "post_id"
-        @many.foreign_key.should == "post_id"
       end
     end
   end
