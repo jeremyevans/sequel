@@ -160,10 +160,15 @@ module Sequel
       21 => :to_i,
       22 => :to_i,
       23 => :to_i,
+      26 => :to_i,
       700 => :to_f,
       701 => :to_f,
+      790 => :to_f,
       1082 => :to_date,
-      1114 => :to_time
+      1083 => :to_time,
+      1114 => :to_time,
+      1184 => :to_time,
+      1186 => :to_i
     }
 
     if PGconn.respond_to?(:translate_results=)
