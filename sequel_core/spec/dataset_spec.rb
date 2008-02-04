@@ -523,6 +523,12 @@ context "a grouped dataset" do
     @dataset.select_sql.should ==
       "SELECT * FROM test GROUP BY type_id"
   end
+  
+  specify "should format the right statement for counting (as a subquery)" do
+    db = MockDatabase.new
+    db[:test].select(:name).group(:name).count
+    db.sqls.should == ["SELECT COUNT(*) FROM (SELECT name FROM test GROUP BY name) t1"]
+  end
 end
 
 context "Dataset#group_by" do

@@ -147,9 +147,12 @@ module Sequel
       #
       #   ds = DB[:items].order(:name)
       #   ds.sql #=> "SELECT * FROM items ORDER BY name"
-      #   ds.from_self #=> "SELECT * FROM (SELECT * FROM items ORDER BY name)"
+      #   ds.from_self.sql #=> "SELECT * FROM (SELECT * FROM items ORDER BY name)"
       def from_self
-        clone_merge(:sql => nil, :from => [self])
+        clone_merge(:from => [self], :select => nil, :group => nil, 
+          :sql => nil, :distinct => nil, :join => nil, :where => nil,
+          :order => nil, :having => nil, :limit => nil, :offset => nil,
+          :union => nil)
       end
 
       # Returns a copy of the dataset with the selected columns changed.
@@ -609,7 +612,7 @@ module Sequel
 
       # Returns the number of records in the dataset.
       def count
-        if @opts[:sql]
+        if @opts[:sql] || @opts[:group]
           from_self.count
         else
           single_value(STOCK_COUNT_OPTS).to_i

@@ -380,3 +380,25 @@ context "A MySQL database" do
     proc {db.test_connection}.should raise_error
   end
 end
+
+context "A grouped MySQL dataset" do
+  setup do
+    MYSQL_DB[:test2].delete
+    MYSQL_DB[:test2] << {:name => '11', :value => 10}
+    MYSQL_DB[:test2] << {:name => '11', :value => 20}
+    MYSQL_DB[:test2] << {:name => '11', :value => 30}
+    MYSQL_DB[:test2] << {:name => '12', :value => 10}
+    MYSQL_DB[:test2] << {:name => '12', :value => 20}
+    MYSQL_DB[:test2] << {:name => '13', :value => 10}
+  end
+  
+  specify "should return the correct count for raw sql query" do
+    ds = MYSQL_DB["select name FROM test2 WHERE name = '11' GROUP BY name"]
+    ds.count.should == 1
+  end
+  
+  specify "should return the correct count for a normal dataset" do
+    ds = MYSQL_DB[:test2].select(:name).where(:name => '11').group(:name)
+    ds.count.should == 1
+  end
+end
