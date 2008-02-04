@@ -16,7 +16,7 @@ module Sequel
       
       def self.keys(klass)
         singular_klass = Inflector.singularize(klass.table_name)        
-        klass.primary_key.to_a.map do |key|
+        [klass.primary_key].flatten.map do |key|
           [ singular_klass, key.to_s ].join("_")
         end
       end
@@ -44,23 +44,21 @@ module Sequel
       #   join_table(user, post) #=> :posts_users
       #   join_table(users, posts) #=> :posts_users
       def name
-        [source.table_name.to_s, destination.table_name.to_s].sort.join("_")
+        [@source.table_name.to_s, @destination.table_name.to_s].sort.join("_")
       end
       
       # creates a join table
       def create
         if !exists?
-          # set_primary_key [:#{(self.class.keys(@source) + self.class.keys(@destination)).join(", :")}]
-          # 
-          (self.class.keys(@source) + self.class.keys(@destination)).
           # tablename_key1, tablename_key2,...
-          # TODO: Inflect!, define primary_key_def
-          instance_eval <<-JOINTABLE
+          # TODO: Inflect!, define a method to return primary_key as an array
+          create_code =  <<-JOINTABLE
           db.create_table name.to_sym do
-            #{@source.primary_key_def.join(" ")}, :null => false
-            #{@destination.primary_key_def.join(" ")}, :null => false
+            #{@source.primary_key_def.reverse.join(" :#{Inflector.singularize(@source.table_name)}_")}, :null => false
+            #{@destination.primary_key_def.reverse.join(" :#{Inflector.singularize(@destination.table_name)}_")}, :null => false
           end
           JOINTABLE
+          instance_eval create_code
           true
         else
           false
@@ -74,8 +72,8 @@ module Sequel
       end
       
       # returns true if exists, false if not
-      def exists?   
-        db[name].table_exists?
+      def exists?
+        self.db[name.to_sym].table_exists?
       end
       
       def db

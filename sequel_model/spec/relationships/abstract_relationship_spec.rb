@@ -1,7 +1,9 @@
 require File.join(File.dirname(__FILE__), "../spec_helper")
 
-describe Sequel::Model::AbstractRelationship do  
+describe Sequel::Model::AbstractRelationship do
+
   describe "intance methods" do
+
     before :each do
       class Post < Sequel::Model(:posts); end
       class People < Sequel::Model(:people); end
@@ -44,13 +46,15 @@ describe Sequel::Model::AbstractRelationship do
       end
     end
     
-    describe "define_accessor" do      
+    describe "define_relationship_accessor" do      
+
       describe "reader" do        
+
         it "should return a dataset for a has :one relationship" do
           @one.stub!(:create_table)
           @one.should_receive(:join_table).and_return(@join_table)
           @join_table.should_receive(:name).and_return(:authors_posts)
-          @one.define_accessor
+          @one.define_relationship_accessor
           @post = Post.new(:id => 1)
           @post.author.sql.should == "SELECT authors.* FROM posts INNER JOIN authors_posts ON (authors_posts.post_id = posts.id) INNER JOIN authors ON (authors.id = authors_posts.author_id) WHERE (posts.id = #{@post.id})"
         end
@@ -58,16 +62,26 @@ describe Sequel::Model::AbstractRelationship do
         it "should return a dataset for a has :many relationship" do
           @many.should_receive(:join_table).and_return(@join_table)
           @join_table.should_receive(:name).and_return(:posts_comments)
-          @many.define_accessor
+          @many.define_relationship_accessor
           @post = Post.new(:id => 1)
           @post.comments.sql.should == "SELECT comments.* FROM posts INNER JOIN posts_comments ON (posts_comments.post_id = posts.id) INNER JOIN comments ON (comments.id = posts_comments.comment_id) WHERE (posts.id = #{@post.id})"
         end
+
       end
       
       describe "writer" do
-        it "should be created" do
+
+        it "should define a writer method 'relation=' for the relation model when the relationship is has :one" do
+          
         end
+
+        it "should define the append method '<<' for the relation model when the relationship is has :many" do
+          
+        end
+
       end
+
     end
+    
   end
 end

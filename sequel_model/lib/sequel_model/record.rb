@@ -45,6 +45,12 @@ module Sequel
       :id
     end
     
+    # Returns key for primary key.
+    # TODO: Figure out how to get the types
+    def self.primary_key_def
+      [:id, :integer]
+    end
+    
     # Returns a string representation of the primary key
     # Example:
     #   primary_key [:title, :category]
