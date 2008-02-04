@@ -1,5 +1,7 @@
 === SVN
 
+* Fixed joining datasets using aliased tables (#140).
+
 * Added support additional field types in postgresql adapter (#146).
 
 * Added support for date field types in postgresql adapter (#145).

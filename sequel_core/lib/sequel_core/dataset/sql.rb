@@ -22,7 +22,6 @@ module Sequel
             table = $2
           end
           Sequel::SQL::QualifiedColumnRef.new(table, column)
-          # "#{table}.#{column}"
         end
       end
 
@@ -61,6 +60,19 @@ module Sequel
           end
         end
         m.join(COMMA_SEPARATOR)
+      end
+      
+      def first_source
+        source = @opts[:from]
+        if source.nil? || source.empty?
+          raise Error, 'No source specified for query'
+        end
+        case s = source.first
+        when Hash
+          s.values.first
+        else
+          s
+        end
       end
 
       NULL = "NULL".freeze
@@ -360,7 +372,7 @@ module Sequel
         join_conditions = {}
         expr.each do |k, v|
           k = qualified_column_name(k, table) if k.is_a?(Symbol)
-          v = qualified_column_name(v, @opts[:last_joined_table] || @opts[:from].first) if v.is_a?(Symbol)
+          v = qualified_column_name(v, @opts[:last_joined_table] || first_source) if v.is_a?(Symbol)
           join_conditions[k] = v
         end
         " #{join_type} #{table} ON #{expression_list(join_conditions)}"

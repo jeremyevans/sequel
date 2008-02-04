@@ -1132,6 +1132,12 @@ context "Dataset#join_table" do
     @d.join_table(:left_outer, :categories, :status => [1, 2, 3]).sql.should ==
       "SELECT * FROM items LEFT OUTER JOIN categories ON (categories.status IN (1, 2, 3))"
   end
+  
+  specify "should support aliased tables" do
+    ds = Sequel::Dataset.new(nil).from(:foo => :f). \
+      join_table(:inner, :bar, :id => :bar_id).sql.should ==
+      'SELECT * FROM foo f INNER JOIN bar ON (bar.id = f.bar_id)'
+  end
 end
 
 context "Dataset#[]=" do
