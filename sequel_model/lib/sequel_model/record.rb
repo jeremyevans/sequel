@@ -288,8 +288,9 @@ module Sequel
 
     # Updates and saves values to database from the passed-in Hash.
     def set(values)
-      this.update(values)
-      values.each {|k, v| @values[k] = v}
+      v = values.inject({}) {|m, kv| m[kv[0].to_sym] = kv[1]; m}
+      this.update(v)
+      v.each {|k, v| @values[k] = v}
     end
     alias_method :update, :set
     

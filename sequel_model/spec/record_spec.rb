@@ -116,6 +116,14 @@ describe "Model#set" do
     o.x.should == 1
   end
   
+  it "should support string keys" do
+    o = @c.new(:id => 1)
+    o.x.should be_nil
+    o.set('x' => 1)
+    o.x.should == 1
+    MODEL_DB.sqls.first.should == "UPDATE items SET x = 1 WHERE (id = 1)"
+  end
+  
   it "should be aliased by #update" do
     o = @c.new(:id => 1)
     o.update(:x => 1)
