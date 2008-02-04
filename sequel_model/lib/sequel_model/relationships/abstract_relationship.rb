@@ -7,7 +7,7 @@ module Sequel
     # @has_one = HasOneRelationship.new(Post, :author, :class => 'User').create
     class AbstractRelationship
 
-      attr_reader :klass, :arity, :relation, :options, :join_table
+      attr_reader :klass, :relation, :options, :join_table #, :arity
 
       def initialize(klass, relation, options = {})
         @klass    = klass
@@ -30,9 +30,8 @@ module Sequel
       end
       
       def define_relationship_accessor(options = {})
-        
-        if @arity == :one
-          klass.class_eval "def #{@relation} ; #{relationship_reader(options[:type])}.first ; end"
+        if arity == :one
+          klass.class_eval "def #{@relation} ; #{relationship_reader(options[:type])} ; end"
           klass.class_eval "def #{@relation}=(value) ; #{relationship_writer(options[:type])} ; end"
         else
           klass.class_eval "def #{@relation} ; #{relationship_reader(options[:type])} ; end"
@@ -105,11 +104,9 @@ module Sequel
         # Post: has :one, :author
         # @post.author = @author
         #
-        #
         # Post: has :many, :comments
         # equals does not make sense however defining << would make sense so:
-        # @post.comments << @comment
-        
+        # @post.comments << @comment        
          <<-QUERYBLOCK
             
           QUERYBLOCK
@@ -119,27 +116,18 @@ module Sequel
         # insert into join table
         # eg CommentPost.create(key1,key2)
         <<-QUERYBLOCK
+           @join_table.create(@source.id,@destination.id)
          QUERYBLOCK
       end
       
     end
       
     class HasOneRelationship    < AbstractRelationship
-      
-      def initialize(klass, relation, options)
-        @arity = :one
-        super(klass, relation, options)
-      end
-      
+      def arity ; :one ; end
     end
 
     class HasManyRelationship   < AbstractRelationship
-
-      def initialize(klass, relation, options)
-        @arity = :many
-        super(klass, relation, options)
-      end
-      
+      def arity ; :many ; end
     end
 
     class BelongsToRelationship < HasOneRelationship ; end
