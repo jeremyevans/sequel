@@ -10,13 +10,14 @@ describe Sequel::Model::AbstractRelationship do
       class Comment < Sequel::Model(:comments); end
       @one = Sequel::Model::HasOneRelationship.new Post, :author, {:class => "People"}
       @many = Sequel::Model::HasManyRelationship.new Post, :comments, {:force => true}
+      @belong = Sequel::Model::BelongsToRelationship.new Post, :author, {:class => "People"}
       @join_table = mock(Sequel::Model::JoinTable)
     end
     
     describe "create" do
       it "should call the create join table method" do
         @one.should_receive(:create_join_table).and_return(true)
-        @one.should_receive(:define_accessor)
+        @one.should_receive(:define_relationship_accessor)
         @one.create
       end
     end
@@ -81,6 +82,20 @@ describe Sequel::Model::AbstractRelationship do
 
       end
 
+    end
+    
+    describe "arity" do
+      it "should return :one when an instance of HasOneRelationship" do
+        @one.arity.should == :one
+      end
+      
+      it "should return :many when an instance of HasManyRelationship" do
+        @many.arity.should == :many
+      end
+      
+      it "should return :one when an instance of BelongsToRelationship" do
+        @belong.arity.should == :one
+      end
     end
     
   end

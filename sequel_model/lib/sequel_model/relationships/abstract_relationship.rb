@@ -39,6 +39,14 @@ module Sequel
         end
       end
       
+      def arity
+        if self.instance_of?(Sequel::Model::HasOneRelationship) || self.instance_of?(Sequel::Model::BelongsToRelationship)
+          :one
+        elsif self.instance_of?(Sequel::Model::HasManyRelationship)
+          :many
+        end
+      end
+      
       private
       
       def relationship_reader(type = nil)
@@ -122,14 +130,8 @@ module Sequel
       
     end
       
-    class HasOneRelationship    < AbstractRelationship
-      def arity ; :one ; end
-    end
-
-    class HasManyRelationship   < AbstractRelationship
-      def arity ; :many ; end
-    end
-
+    class HasOneRelationship    < AbstractRelationship ; end
+    class HasManyRelationship   < AbstractRelationship ; end
     class BelongsToRelationship < HasOneRelationship ; end
       
   end
