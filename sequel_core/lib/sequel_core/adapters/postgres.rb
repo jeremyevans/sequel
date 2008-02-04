@@ -162,6 +162,7 @@ module Sequel
       23 => :to_i,
       700 => :to_f,
       701 => :to_f,
+      1082 => :to_date,
       1114 => :to_time
     }
 

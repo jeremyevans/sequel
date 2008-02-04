@@ -1,5 +1,7 @@
 === SVN
 
+* Added support for date field types in postgresql adapter (#145).
+
 * Fixed Dataset#count to work correctly for grouped datasets (#144).
 
 * Added Dataset#select_more, Dataset#order_more methods (#129).
