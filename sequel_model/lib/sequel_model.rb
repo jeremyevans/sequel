@@ -213,7 +213,7 @@ module Sequel
   #       primary_key :id
   #       text :title
   #       text :category
-  #       foreign_key :author_id, :table => authors
+  #       foreign_key :author_id, :table => :authors
   #     end
   #   end
   # 
