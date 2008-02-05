@@ -1,3 +1,7 @@
-=== 1.0 (2007-01-2)
+=== 1.1 (2008-02-05)
+
+* bundles sequel_core 1.0.6, sequel_model 0.4.
+
+=== 1.0 (2007-01-02)
 
 * Created sequel wrapper gem. Bundles sequel_core and sequel_model as dependencies.
