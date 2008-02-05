@@ -1117,9 +1117,13 @@ context "Dataset#join_table" do
     proc {@d.join_table(:invalid, :a, :b)}.should raise_error(Sequel::Error)
   end
   
-  specify "should treat aliased tables correctly" do
+  specify "should support aliased tables" do
     @d.from('stats s').join('players p', :id => :player_id).sql.should ==
       'SELECT * FROM stats s INNER JOIN players p ON (p.id = s.player_id)'
+
+    ds = Sequel::Dataset.new(nil).from(:foo => :f). \
+      join_table(:inner, :bar, :id => :bar_id).sql.should ==
+      'SELECT * FROM foo f INNER JOIN bar ON (bar.id = f.bar_id)'
   end
   
   specify "should allow for arbitrary conditions in the JOIN clause" do
@@ -1133,11 +1137,11 @@ context "Dataset#join_table" do
       "SELECT * FROM items LEFT OUTER JOIN categories ON (categories.status IN (1, 2, 3))"
   end
   
-  specify "should support aliased tables" do
-    ds = Sequel::Dataset.new(nil).from(:foo => :f). \
-      join_table(:inner, :bar, :id => :bar_id).sql.should ==
-      'SELECT * FROM foo f INNER JOIN bar ON (bar.id = f.bar_id)'
+  specify "should raise error for a table without a source" do
+    proc {Sequel::Dataset.new(nil).join('players p', :id => :player_id)}. \
+      should raise_error(Sequel::Error)
   end
+
 end
 
 context "Dataset#[]=" do
