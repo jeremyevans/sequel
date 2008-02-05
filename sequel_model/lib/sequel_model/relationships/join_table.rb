@@ -7,7 +7,9 @@ module Sequel
     #   @join_table = JoinTable.new :post, :comment
     #
     # The join table class object is available via
+    #
     #   @join_table.class #=> PostComment
+    #
     class JoinTable
       
       attr_accessor :join_class
@@ -47,18 +49,21 @@ module Sequel
         [@source.table_name.to_s, @destination.table_name.to_s].sort.join("_")
       end
       
+      def create(hash = {})
+        @join_class.new(hash).save
+      end
+      
       # creates a join table
-      def create
+      def create_table
         if !exists?
           # tablename_key1, tablename_key2,...
           # TODO: Inflect!, define a method to return primary_key as an array
-          create_code =  <<-JOINTABLE
+          instance_eval <<-JOINTABLE
           db.create_table name.to_sym do
             #{@source.primary_key_def.reverse.join(" :#{Inflector.singularize(@source.table_name)}_")}, :null => false
             #{@destination.primary_key_def.reverse.join(" :#{Inflector.singularize(@destination.table_name)}_")}, :null => false
           end
           JOINTABLE
-          instance_eval create_code
           true
         else
           false
@@ -66,9 +71,9 @@ module Sequel
       end
       
       # drops the the table if it exists and creates a new one
-      def create!
+      def create_table!
         db.drop_table name if exists?
-        create
+        create_table
       end
       
       # returns true if exists, false if not

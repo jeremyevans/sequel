@@ -9,7 +9,8 @@ module Sequel
     #     end
     #   end
     def self.relationships(&block)
-      RelationshipsBlock::Generator.new(self, &block)
+      RelationshipsBlock::Generator.new(self, &block) if block_given?
+      @relationships
     end
     
     module RelationshipsBlock

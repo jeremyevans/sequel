@@ -1,6 +1,4 @@
-files = %w[
-  abstract_relationship block join_table
-]
+files = %w{ scoping relationship block join_table }
 dir = File.join(File.dirname(__FILE__), "relationships")
 files.each {|f| require(File.join(dir, f))}
 
@@ -75,17 +73,22 @@ module Sequel
   class Model
     
     class << self
+      @relationships = []
+      
       # has arity<Symbol>, model<Symbol>
       # has :one,  :blog, :required => true # blog_id field, cannot be null
       # has :one,  :account # account_id field
       # has :many, :comments # comments_posts join table
+      # has :many, :comment # comments_posts join table
       def has(arity, relation, options = {})
-        
         # Create and store the relationship
         case arity
-          when :one : HasOneRelationship.new(self, relation, options).create
-          when :many : HasManyRelationship.new(self, relation, options).create
-          else raise Sequel::Error, "Arity must be specified {:one, :many}."
+        when :one
+          @relationships << HasOne.new(self, relation, options)
+        when :many
+          @relationships << HasMany.new(self, relation, options)
+        else
+          raise Sequel::Error, "Arity must be specified {:one, :many}."
         end
         
         #unless normalized
@@ -105,7 +108,7 @@ module Sequel
       end
 
       def belongs_to(relation, options = {})
-        BelongsToRelationship.new(self, relation, options).create
+        @relationships << BelongsTo.new(self, relation, options)
       end
       
       #def primary_key_string
@@ -115,4 +118,5 @@ module Sequel
     end
     
   end # Model
+
 end # Sequel
