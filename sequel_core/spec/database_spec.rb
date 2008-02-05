@@ -1,28 +1,5 @@
 require File.join(File.dirname(__FILE__), 'spec_helper')
 
-SQLITE_DB = Sequel('sqlite:/')
-SQLITE_DB.create_table :items do
-  integer :id, :primary_key => true, :auto_increment => true
-  text :name
-  float :value
-end
-
-def fresh_sqlite_db
-  d = SQLITE_DB[:items]
-  d.delete
-  d << {:name => 'abc', :value => 1.23}
-  d << {:name => 'def', :value => 4.56}
-  d << {:name => 'ghi', :value => 7.89}
-  d << {:name => 'abc', :value => 0.12}
-  d
-end
-
-class Float
-  def within?( max_error, expected )
-    ( self - expected ).abs <= max_error
-  end
-end
-
 context "A new Database" do
   setup do
     @db = Sequel::Database.new(1 => 2, :logger => 3)
@@ -755,48 +732,6 @@ context "Database#fetch" do
   end
 end
 
-
-context "Database#fetch_now" do
-  setup do
-    fresh_sqlite_db
-  end
-
-  specify "should return an Enumerable of actual rows" do
-    ds = SQLITE_DB.fetch_now("SELECT * FROM items")
-    ds.should be_a_kind_of( Enumerable )
-    ds.size.should == 4
-    item = ds[ 0 ]
-    item[ :name ].should == 'abc'
-    item[ :value ].should == 1.23
-  end
-end
-
-context "Database#fetch_one" do
-  setup do
-    fresh_sqlite_db
-  end
-
-  specify "should return one particular row" do
-    item = SQLITE_DB.fetch_one("SELECT * FROM items ORDER BY name DESC")
-    item[ :name ].should == 'ghi'
-    item[ :value ].should == 7.89
-  end
-end
-
-context "Database#fetch_column" do
-  setup do
-    fresh_sqlite_db
-  end
-
-  specify "should return one value (a row column)" do
-    value = SQLITE_DB.fetch_column( "SELECT value FROM items ORDER BY name DESC")
-    value.should == 7.89
-    sum = SQLITE_DB.fetch_column( "SELECT SUM(value) FROM items")
-    sum.to_f.within?( 0.001, 1.23 + 4.56 + 7.89 + 0.12 )
-    count = SQLITE_DB.fetch_column( "SELECT COUNT(*) FROM items")
-    count.to_i.should == 4
-  end
-end
 
 context "Database#[]" do
   setup do

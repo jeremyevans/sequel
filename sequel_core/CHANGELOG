@@ -1,5 +1,7 @@
 === SVN
 
+* Removed code pollution introduced in revs 814, 817 (really bad patch, IMO).
+
 * Fixed joining datasets using aliased tables (#140).
 
 * Added support additional field types in postgresql adapter (#146).

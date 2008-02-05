@@ -72,10 +72,8 @@ module Sequel
     attr_reader :db
     attr_accessor :opts
     
-    alias all to_a
-    alias now to_a
-    alias run to_a
-    alias size count
+    alias_method :all, :to_a
+    alias_method :size, :count
   
     # Constructs a new instance of a dataset with a database instance, initial
     # options and an optional record class. Datasets are usually constructed by
