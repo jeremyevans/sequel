@@ -474,6 +474,17 @@ context "Proc#to_sql" do
     
     proc {:x == ("%d" % prod).lit}.sql.should == "(x = 1)"
   end
+  
+  specify "should support conditional filters" do
+    @criteria = nil
+    proc {if @criteria; :x.like @criteria; end}.sql.should == nil
+    
+    @criteria = 'blah'
+    proc {if @criteria; :x.like @criteria; end}.sql.should == "(x LIKE 'blah')"
+
+    @criteria = nil
+    proc {if @criteria; :x.like @criteria; else; :x.like 'ddd'; end}.sql.should == "(x LIKE 'ddd')"
+  end
 end
 
 context "Proc#to_sql stock" do

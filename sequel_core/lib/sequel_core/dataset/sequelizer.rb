@@ -285,7 +285,14 @@ class Sequel::Dataset
         l = e[1]
         r = eval_expr(e[2], b, opts)
         raise Sequel::Error::InvalidExpression, "#{l} = #{r}. Did you mean :#{l} == #{r}?"
-      when :if, :dstr
+      when :if
+        op, c, br1, br2 = *e
+        if ext_expr(c, b, opts)
+          eval_expr(br1, b, opts)
+        elsif br2
+          eval_expr(br2, b, opts)
+        end
+      when :dstr
         ext_expr(e, b, opts)
       else
         raise Sequel::Error::InvalidExpression, "Invalid expression tree: #{e.inspect}"
@@ -308,7 +315,7 @@ class Sequel::Dataset
         "(#{e[1..-1].map {|i| pt_expr(i, b, opts)}.join(JOIN_AND)})"
       when :or # x || y
         "(#{pt_expr(e[1], b, opts)} OR #{pt_expr(e[2], b, opts)})"
-      when :call, :vcall, :iter, :match3 # method calls, blocks
+      when :call, :vcall, :iter, :match3, :if # method calls, blocks
         eval_expr(e, b, opts)
       when :block # block of statements
         if opts[:comma_separated]

@@ -1,3 +1,7 @@
+=== 1.0.7 (2008-02-05)
+
+* Added support for conditional filters (using if else statements) inside block filters (thanks Kee).
+
 === 1.0.6 (2008-02-05)
 
 * Removed code pollution introduced in revs 814, 817 (really bad patch, IMO).
