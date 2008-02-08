@@ -49,9 +49,19 @@ class Sequel::Dataset
       when NilClass
         "(#{literal(l)} IS NULL)"
       when Regexp
-        match_expr(l, r)
+        collate_match_expr(l, r)
       else
         "(#{literal(l)} = #{literal(r)})"
+      end
+    end
+    
+    # Formats a string matching expression with support for multiple choices. 
+    # For more information see #match_expr.
+    def collate_match_expr(l, r)
+      if r.is_a?(Array)
+        "(#{r.map {|i| match_expr(l, i)}.join(' OR ')})"
+      else
+        match_expr(l, r)
       end
     end
     
@@ -121,7 +131,7 @@ class Sequel::Dataset
       when :=~
         l = eval_expr(e[1], b, opts)
         r = eval_expr(e[3][1], b, opts)
-        match_expr(l, r)
+        collate_match_expr(l, r)
       when :+, :-, :*, :%, :/
         l = eval_expr(e[1], b, opts)
         r = eval_expr(e[3][1], b, opts)
@@ -156,7 +166,7 @@ class Sequel::Dataset
       when :like, :like?
         l = eval_expr(e[1], b, opts)
         r = eval_expr(e[3][1], b, opts)
-        match_expr(l, r)
+        collate_match_expr(l, r)
       else
         if (op == :[]) && (e[1][0] == :lit) && (Symbol === e[1][1])
           # SQL Functions, e.g.: :sum[:x]

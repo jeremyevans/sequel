@@ -1,5 +1,7 @@
 === SVN
 
+* Added support for multiple choices in string matching expressions (#147).
+
 * Renamed Dataset#clone_merge to Dataset#clone, works with or without options for merging (#148).
 
 * Fixed MySQL::Database#<< method to always free the result in order to allow multiple calls in a row (#149). Same also for PostgreSQL adapter.

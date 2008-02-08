@@ -373,6 +373,9 @@ context "Dataset#where" do
 
     @dataset.filter {:c.like? 'ABC%'}.sql.should ==
       "SELECT * FROM test WHERE (c LIKE 'ABC%')"
+
+    @dataset.filter {:c.like? ['ABC%', '%XYZ']}.sql.should ==
+      "SELECT * FROM test WHERE ((c LIKE 'ABC%') OR (c LIKE '%XYZ'))"
   end
   
   specify "should raise if receiving a single boolean value" do

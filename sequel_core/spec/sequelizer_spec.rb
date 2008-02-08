@@ -196,11 +196,25 @@ context "Proc#to_sql" do
     proc {:x.like? '%abc'}.sql.should == "(x LIKE '%abc')"
   end
   
+  specify "should support like? pattern with multiple choices" do
+    proc {:x.like? ['%abc', '%def', '%ghi']}.sql.should == \
+      "((x LIKE '%abc') OR (x LIKE '%def') OR (x LIKE '%ghi'))"
+  end
+  
   specify "should support =~ operator" do
     # stock SQL version does not know about regexps
     proc {:x =~ '123'}.sql.should == "(x LIKE '123')"
 
     proc {:x =~ /^123/}.sql.should == "(x ~ '^123')"
+  end
+  
+  specify "should support =~ operator with multiple choices" do
+    # stock SQL version does not know about regexps
+    proc {:x =~ ['123', '456', '789']}.sql.should == "((x LIKE '123') OR (x LIKE '456') OR (x LIKE '789'))"
+
+    proc {:x =~ [/^123/, /^456/, /^789/]}.sql.should == "((x ~ '^123') OR (x ~ '^456') OR (x ~ '^789'))"
+
+    proc {:x =~ [/^123/, '456%', /^789/]}.sql.should == "((x ~ '^123') OR (x LIKE '456%') OR (x ~ '^789'))"
   end
   
   specify "should raise on =~ operator for unsupported types" do
@@ -211,8 +225,16 @@ context "Proc#to_sql" do
     proc {:x != 100}.sql.should == "(NOT (x = 100))"
   end
 
+  specify "should support != operator with multiple choices" do
+    proc {:x != [100, 200, 300]}.sql.should == "(NOT (x IN (100, 200, 300)))"
+  end
+
   specify "should support !~ operator" do
     proc {:x !~ '123'}.sql.should == "(NOT (x LIKE '123'))"
+  end
+  
+  specify "should support !~ operator with multiple choices" do
+    proc {:x !~ ['123', '456']}.sql.should == "(NOT ((x LIKE '123') OR (x LIKE '456')))"
   end
   
   specify "should support ! operator" do
