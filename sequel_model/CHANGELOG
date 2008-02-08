@@ -1,3 +1,7 @@
+=== SVN
+
+* Updated to reflect changes in sequel_core (Dataset#clone_merge renamed to Dataset#clone).
+
 === 0.4 (2008-02-05)
 
 * Fixed Model#set to work with string keys (#143).

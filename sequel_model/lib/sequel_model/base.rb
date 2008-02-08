@@ -21,7 +21,7 @@ module Sequel
     def self.dataset
       unless @dataset
         if ds = super_dataset
-          set_dataset(ds.clone_merge({}))
+          set_dataset(ds.clone)
         elsif !(n = name).empty?
           set_dataset(db[n.underscore.pluralize.to_sym])
         else

@@ -97,6 +97,7 @@ module Sequel
       c.set_options @opts.merge(opts)
       c
     end
+    alias_method :clone_merge, :clone # should be deprecated in the next major release.
     
     def set_options(opts) #:nodoc:
       @opts = opts
