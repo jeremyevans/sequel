@@ -152,7 +152,7 @@ module Sequel
 
       # Returns a copy of the dataset with the source changed.
       def from(*source)
-        clone_merge(:from => source)
+        clone(:from => source)
       end
       
       # Returns a dataset selecting from the current dataset.
@@ -161,7 +161,7 @@ module Sequel
       #   ds.sql #=> "SELECT * FROM items ORDER BY name"
       #   ds.from_self.sql #=> "SELECT * FROM (SELECT * FROM items ORDER BY name)"
       def from_self
-        clone_merge(:from => [self], :select => nil, :group => nil, 
+        clone(:from => [self], :select => nil, :group => nil, 
           :sql => nil, :distinct => nil, :join => nil, :where => nil,
           :order => nil, :having => nil, :limit => nil, :offset => nil,
           :union => nil)
@@ -169,41 +169,41 @@ module Sequel
 
       # Returns a copy of the dataset with the selected columns changed.
       def select(*columns)
-        clone_merge(:select => columns)
+        clone(:select => columns)
       end
       
       # Returns a copy of the dataset with additional selected columns.
       def select_more(*columns)
         if @opts[:select]
-          clone_merge(:select => @opts[:select] + columns)
+          clone(:select => @opts[:select] + columns)
         else
-          clone_merge(:select => columns)
+          clone(:select => columns)
         end
       end
       
       # Returns a copy of the dataset selecting the wildcard.
       def select_all
-        clone_merge(:select => nil)
+        clone(:select => nil)
       end
 
       # Returns a copy of the dataset with the distinct option.
       def uniq(*args)
-        clone_merge(:distinct => args)
+        clone(:distinct => args)
       end
       alias_method :distinct, :uniq
 
       # Returns a copy of the dataset with the order changed.
       def order(*order)
-        clone_merge(:order => order)
+        clone(:order => order)
       end
       alias_method :order_by, :order
       
       # Returns a copy of the dataset with the order changed.
       def order_more(*order)
         if @opts[:order]
-          clone_merge(:order => @opts[:order] + order)
+          clone(:order => @opts[:order] + order)
         else
-          clone_merge(:order => order)
+          clone(:order => order)
         end
       end
       
@@ -233,7 +233,7 @@ module Sequel
       # Returns a copy of the dataset with the results grouped by the value of 
       # the given columns
       def group(*columns)
-        clone_merge(:group => columns)
+        clone(:group => columns)
       end
       
       alias_method :group_by, :group
@@ -270,9 +270,9 @@ module Sequel
         if !@opts[clause].nil? and @opts[clause].any?
           l = expression_list(@opts[clause])
           r = expression_list(block || cond, parenthesize)
-          clone_merge(clause => "#{l} AND #{r}")
+          clone(clause => "#{l} AND #{r}")
         else
-          clone_merge(:filter => cond, clause => expression_list(block || cond))
+          clone(:filter => cond, clause => expression_list(block || cond))
         end
       end
 
@@ -285,7 +285,7 @@ module Sequel
         if @opts[clause]
           l = expression_list(@opts[clause])
           r = expression_list(block || cond, parenthesize)
-          clone_merge(clause => "#{l} OR #{r}")
+          clone(clause => "#{l} OR #{r}")
         else
           raise Error::NoExistingFilter, "No existing filter found."
         end
@@ -317,7 +317,7 @@ module Sequel
         else
           cond = "(NOT #{expression_list(block || cond, true)})"
         end
-        clone_merge(clause => cond)
+        clone(clause => cond)
       end
 
       # Returns a copy of the dataset with the where conditions changed. Raises 
@@ -340,19 +340,19 @@ module Sequel
       # Adds a UNION clause using a second dataset object. If all is true the
       # clause used is UNION ALL, which may return duplicate rows.
       def union(dataset, all = false)
-        clone_merge(:union => dataset, :union_all => all)
+        clone(:union => dataset, :union_all => all)
       end
 
       # Adds an INTERSECT clause using a second dataset object. If all is true 
       # the clause used is INTERSECT ALL, which may return duplicate rows.
       def intersect(dataset, all = false)
-        clone_merge(:intersect => dataset, :intersect_all => all)
+        clone(:intersect => dataset, :intersect_all => all)
       end
 
       # Adds an EXCEPT clause using a second dataset object. If all is true the
       # clause used is EXCEPT ALL, which may return duplicate rows.
       def except(dataset, all = false)
-        clone_merge(:except => dataset, :except_all => all)
+        clone(:except => dataset, :except_all => all)
       end
 
       JOIN_TYPES = {
@@ -385,7 +385,7 @@ module Sequel
         end
         clause = join_expr(type, table, expr)
         join = @opts[:join] ? @opts[:join] + clause : clause
-        clone_merge(:join => join, :last_joined_table => table)
+        clone(:join => join, :last_joined_table => table)
       end
 
       # Returns a LEFT OUTER joined dataset.
@@ -617,7 +617,7 @@ module Sequel
         else
           opts = {:limit => l}
         end
-        clone_merge(opts)
+        clone(opts)
       end
       
       STOCK_COUNT_OPTS = {:select => ["COUNT(*)".lit], :order => nil}.freeze

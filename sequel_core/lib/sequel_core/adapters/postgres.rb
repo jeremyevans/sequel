@@ -357,11 +357,11 @@ module Sequel
       end
     
       def for_update
-        clone_merge(:lock => :update)
+        clone(:lock => :update)
       end
     
       def for_share
-        clone_merge(:lock => :share)
+        clone(:lock => :share)
       end
     
       EXPLAIN = 'EXPLAIN '.freeze

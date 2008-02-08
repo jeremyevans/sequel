@@ -18,15 +18,15 @@ context "Dataset" do
     d.opts.should == {}
   end
   
-  specify "should provide clone_merge for chainability." do
-    d1 = @dataset.clone_merge(:from => :test)
+  specify "should provide clone for chainability." do
+    d1 = @dataset.clone(:from => :test)
     d1.class.should == @dataset.class
     d1.should_not == @dataset
     d1.db.should be(@dataset.db)
     d1.opts[:from].should == :test
     @dataset.opts[:from].should be_nil
     
-    d2 = d1.clone_merge(:order => :name)
+    d2 = d1.clone(:order => :name)
     d2.class.should == @dataset.class
     d2.should_not == d1
     d2.should_not == @dataset
@@ -48,30 +48,48 @@ context "Dataset" do
   end
 end
 
-context "Dataset#clone_merge" do
+context "Dataset#clone" do
   setup do
     @dataset = Sequel::Dataset.new(nil).from(:items)
   end
   
+  specify "should create an exact copy of the dataset" do
+    @c = Class.new
+    @dataset.set_model(@c)
+    @clone = @dataset.clone
+
+    @clone.should_not === @dataset
+    @clone.class.should == @dataset.class
+    @clone.model_classes.should == @dataset.model_classes
+  end
+  
+  specify "should deep-copy the dataset opts" do
+    @clone = @dataset.clone
+
+    @clone.opts.should_not eql(@dataset.opts)
+    @dataset.filter!(:a => 'b')
+    @clone.opts[:filter].should be_nil
+  end
+  
   specify "should return a clone self" do
-    clone = @dataset.clone_merge({})
+    clone = @dataset.clone({})
     clone.class.should == @dataset.class
     clone.db.should == @dataset.db
     clone.opts.should == @dataset.opts
   end
   
   specify "should merge the specified options" do
-    clone = @dataset.clone_merge(1 => 2)
+    clone = @dataset.clone(1 => 2)
     clone.opts.should == {1 => 2, :from => [:items]}
   end
   
   specify "should overwrite existing options" do
-    clone = @dataset.clone_merge(:from => [:other])
+    clone = @dataset.clone(:from => [:other])
     clone.opts.should == {:from => [:other]}
   end
   
   specify "should create a clone with a deep copy of options" do
-    clone = @dataset.clone_merge(:from => [:other])
+    clone = @dataset.clone(:from => [:other])
     @dataset.opts[:from].should == [:items]
     clone.opts[:from].should == [:other]
   end
@@ -81,7 +99,7 @@ context "Dataset#clone_merge" do
       def __xyz__; "xyz"; end
     end
     @dataset.extend(m)
-    @dataset.clone_merge({}).should respond_to(:__xyz__)
+    @dataset.clone({}).should respond_to(:__xyz__)
   end
 end
 
@@ -1379,7 +1397,7 @@ context "Dataset#last" do
       end
 
       def single_record(opts = nil)
-        @@last_dataset = clone_merge(opts) if opts
+        @@last_dataset = clone(opts) if opts
         {:a => 1, :b => 2}
       end
       
@@ -1477,7 +1495,7 @@ context "Dataset#[]" do
       end
 
       def single_record(opts = nil)
-        @@last_dataset = opts ? clone_merge(opts) : self
+        @@last_dataset = opts ? clone(opts) : self
         {1 => 2, 3 => 4}
       end
     end
@@ -1941,7 +1959,7 @@ context "A paginated dataset" do
   end
   
   specify "should work with fixed sql" do
-    ds = @d.clone_merge(:sql => 'select * from blah')
+    ds = @d.clone(:sql => 'select * from blah')
     ds.meta_def(:count) {150}
     ds.paginate(2, 50).sql.should == 'SELECT * FROM (select * from blah) t1 LIMIT 50 OFFSET 50'
   end

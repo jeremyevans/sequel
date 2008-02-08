@@ -16,7 +16,7 @@ module Sequel
       class Dataset < ODBC::Dataset
         # Allows you to do .nolock on a query
         def nolock
-          clone_merge(:with => "(NOLOCK)")
+          clone(:with => "(NOLOCK)")
         end
 
         # Formats a SELECT statement using the given options and the dataset

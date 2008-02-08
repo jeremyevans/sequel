@@ -1,5 +1,7 @@
 === SVN
 
+* Renamed Dataset#clone_merge to Dataset#clone, works with or without options for merging (#148).
+
 * Fixed MySQL::Database#<< method to always free the result in order to allow multiple calls in a row (#149). Same also for PostgreSQL adapter.
 
 === 1.0.7 (2008-02-05)

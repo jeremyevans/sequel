@@ -74,7 +74,7 @@ module Sequel
           if args == 1
             single_record(opts)
           else
-            clone_merge(opts).all
+            clone(opts).all
           end
         else
           filter(args).last(1)
@@ -247,7 +247,7 @@ module Sequel
         def update(*args); raise Error, "#update cannot be invoked inside a query block."; end
         def delete(*args); raise Error, "#delete cannot be invoked inside a query block."; end
         
-        def clone_merge(opts)
+        def clone(opts)
           @opts.merge!(opts)
         end
       end
@@ -262,10 +262,10 @@ module Sequel
       #   end
       #
       def query(&block)
-        copy = clone_merge({})
+        copy = clone({})
         copy.extend(QueryBlockCopy)
         copy.instance_eval(&block)
-        clone_merge(copy.opts)
+        clone(copy.opts)
       end
       
       MUTATION_RE = /^(.+)!$/.freeze

@@ -91,11 +91,11 @@ module Sequel
       @transform = nil
     end
     
-    # Returns a new instance of the dataset with with the give options merged.
-    def clone_merge(opts)
-      new_dataset = clone
-      new_dataset.set_options(@opts.merge(opts))
-      new_dataset
+    # Returns a new clone of the dataset with with the given options merged.
+    def clone(opts = {})
+      c = super()
+      c.set_options @opts.merge(opts)
+      c
     end
     
     def set_options(opts) #:nodoc:
@@ -178,7 +178,7 @@ module Sequel
     # Returns a naked dataset clone - i.e. a dataset that returns records as
     # hashes rather than model objects.
     def naked
-      d = clone_merge(:naked => true, :models => nil, :polymorphic_key => nil)
+      d = clone(:naked => true, :models => nil, :polymorphic_key => nil)
       d.set_model(nil)
       d
     end
