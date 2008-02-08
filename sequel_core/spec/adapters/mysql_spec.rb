@@ -362,6 +362,17 @@ context "A MySQL database" do
       "CREATE TABLE items (`p_id` integer NOT NULL, FOREIGN KEY (`p_id`) REFERENCES users(`id`) ON DELETE CASCADE)"
     ]
   end
+  
+  specify "should accept repeated raw sql statements using Database#<<" do
+    @db << 'DELETE FROM items'
+    @db[:items].count.should == 0
+    
+    @db << "INSERT INTO items (name, value) VALUES ('tutu', 1234)"
+    @db[:items].first.should == {:name => 'tutu', :value => 1234}
+    
+    @db << 'DELETE FROM items'
+    @db[:items].first.should == nil
+  end
 end  
 
 context "A MySQL database" do
@@ -402,3 +413,4 @@ context "A grouped MySQL dataset" do
     ds.count.should == 1
   end
 end
+

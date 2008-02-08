@@ -119,34 +119,22 @@ module Sequel
         MySQL::Dataset.new(self, opts)
       end
 
-      def execute(sql)
+      def execute(sql, &block)
         @logger.info(sql) if @logger
         @pool.hold do |conn|
           conn.query(sql)
+          block[conn] if block
         end
       end
 
-      def execute_select(sql)
-        @logger.info(sql) if @logger
-        @pool.hold do |conn|
-          conn.query(sql)
-          conn.use_result
-        end
-      end
-
-      def execute_insert(sql)
-        @logger.info(sql) if @logger
-        @pool.hold do |conn|
-          conn.query(sql)
-          conn.insert_id
-        end
-      end
-
-      def execute_affected(sql)
-        @logger.info(sql) if @logger
-        @pool.hold do |conn|
-          conn.query(sql)
-          conn.affected_rows
+      def execute_select(sql, &block)
+        execute(sql) do |c|
+          r = c.use_result
+          begin
+            block[r]
+          ensure
+            r.free
+          end
         end
       end
 
@@ -327,39 +315,29 @@ module Sequel
       end
 
       def insert(*values)
-        @db.execute_insert(insert_sql(*values))
+        @db.execute(insert_sql(*values)) {|c| c.insert_id}
       end
 
       def update(*args, &block)
-        @db.execute_affected(update_sql(*args, &block))
+        @db.execute(update_sql(*args, &block)) {|c| c.affected_rows}
       end
 
       def delete(opts = nil)
-        @db.execute_affected(delete_sql(opts))
+        @db.execute(delete_sql(opts)) {|c| c.affected_rows}
       end
 
       def fetch_rows(sql)
-        @db.synchronize do
-          r = @db.execute_select(sql)
-          begin
-            @columns = r.columns
-            r.each_hash {|row| yield row}
-          ensure
-            r.free
-          end
+        @db.execute_select(sql) do |r|
+          @columns = r.columns
+          r.each_hash {|row| yield row}
         end
         self
       end
 
       def array_tuples_fetch_rows(sql, &block)
-        @db.synchronize do
-          r = @db.execute_select(sql)
-          begin
-            @columns = r.columns
-            r.each_array(&block)
-          ensure
-            r.free
-          end
+        @db.execute_select(sql) do |r|
+          @columns = r.columns
+          r.each_array(&block)
         end
         self
       end

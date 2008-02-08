@@ -47,16 +47,22 @@ class PGconn
     alias_method :async_exec, :exec
   end
   
-  def execute(sql)
+  def execute(sql, &block)
+    q = nil
     begin
-      async_exec(sql)
+      q = async_exec(sql)
     rescue PGError => e
       unless connected?
         reset
-        async_exec(sql)
+        q = async_exec(sql)
       else
         raise e
       end
+    end
+    begin
+      block ? block[q] : q.cmdtuples
+    ensure
+      q.clear
     end
   end
   
@@ -218,22 +224,14 @@ module Sequel
           filter("pg_class.relfilenode=pg_locks.relation")
       end
     
-      def execute(sql)
+      def execute(sql, &block)
         @logger.info(sql) if @logger
-        @pool.hold {|conn| conn.execute(sql)}
+        @pool.hold {|conn| conn.execute(sql, &block)}
       rescue => e
         @logger.error(e.message) if @logger
         raise e
       end
     
-      def execute_and_forget(sql)
-        @logger.info(sql) if @logger
-        @pool.hold {|conn| conn.execute(sql).clear}
-      rescue => e
-        @logger.error(e.message) if @logger
-        raise e
-      end
-      
       def primary_key_for_table(conn, table)
         @primary_keys ||= {}
         @primary_keys[table] ||= conn.primary_key(table)
@@ -268,7 +266,7 @@ module Sequel
       def execute_insert(sql, table, values)
         @logger.info(sql) if @logger
         @pool.hold do |conn|
-          conn.execute(sql).clear
+          conn.execute(sql)
           insert_result(conn, table, values)
         end
       rescue => e
@@ -276,10 +274,6 @@ module Sequel
         raise e
       end
     
-      def synchronize(&block)
-        @pool.hold(&block)
-      end
-      
       SQL_BEGIN = 'BEGIN'.freeze
       SQL_COMMIT = 'COMMIT'.freeze
       SQL_ROLLBACK = 'ROLLBACK'.freeze
@@ -406,9 +400,9 @@ module Sequel
         sql = LOCK % [@opts[:from], mode]
         @db.synchronize do
           if block # perform locking inside a transaction and yield to block
-            @db.transaction {@db.execute_and_forget(sql); yield}
+            @db.transaction {@db.execute(sql); yield}
           else
-            @db.execute_and_forget(sql) # lock without a transaction
+            @db.execute(sql) # lock without a transaction
             self
           end
         end
@@ -420,38 +414,17 @@ module Sequel
       end
     
       def update(*args, &block)
-        @db.synchronize do
-          result = @db.execute(update_sql(*args, &block))
-          begin
-            affected = result.cmdtuples
-          ensure
-            result.clear
-          end
-          affected
-        end
+        @db.execute(update_sql(*args, &block))
       end
     
       def delete(opts = nil)
-        @db.synchronize do
-          result = @db.execute(delete_sql(opts))
-          begin
-            affected = result.cmdtuples
-          ensure
-            result.clear
-          end
-          affected
-        end
+        @db.execute(delete_sql(opts))
       end
       
       def fetch_rows(sql, &block)
-        @db.synchronize do
-          result = @db.execute(sql)
-          begin
-            conv = row_converter(result)
-            result.each {|r| yield conv[r]}
-          ensure
-            result.clear
-          end
+        @db.execute(sql) do |q|
+          conv = row_converter(q)
+          q.each {|r| yield conv[r]}
         end
       end
       
@@ -489,14 +462,9 @@ module Sequel
       end
 
       def array_tuples_fetch_rows(sql, &block)
-        @db.synchronize do
-          result = @db.execute(sql)
-          begin
-            conv = array_tuples_row_converter(result)
-            result.each {|r| yield conv[r]}
-          ensure
-            result.clear
-          end
+        @db.execute(sql) do |q|
+          conv = array_tuples_row_converter(q)
+          q.each {|r| yield conv[r]}
         end
       end
       

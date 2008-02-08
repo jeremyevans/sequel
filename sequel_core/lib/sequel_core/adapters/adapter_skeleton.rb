@@ -16,7 +16,7 @@ module Sequel
       def dataset(opts = nil)
         Adapter::Dataset.new(self, opts)
       end
-    
+      
       def execute(sql)
         @logger.info(sql) if @logger
         @pool.hold {|conn| conn.exec(sql)}

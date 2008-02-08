@@ -134,7 +134,7 @@ module Sequel
     def [](*args)
       (String === args.first) ? fetch(*args) : from(*args)
     end
-
+    
     # Raises a Sequel::Error::NotImplemented. This method is overriden in descendants.
     def execute(sql)
       raise NotImplementedError, "#execute should be overriden by adapters"
