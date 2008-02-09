@@ -131,6 +131,15 @@ module Sequel
         }.merge(opts)
       end
       
+      def add_full_text_index(columns, opts = {})
+        columns = [columns] unless columns.is_a?(Array)
+        @operations << { \
+          :op => :add_index, \
+          :columns => columns, \
+          :full_text => true
+        }.merge(opts)
+      end
+      
       def drop_index(columns)
         columns = [columns] unless columns.is_a?(Array)
         @operations << { \

@@ -81,6 +81,7 @@ describe Sequel::Schema::AlterTableGenerator do
       set_column_default :eee, 1
       add_index [:fff, :ggg]
       drop_index :hhh
+      add_full_text_index :blah
     end
   end
   
@@ -93,6 +94,7 @@ describe Sequel::Schema::AlterTableGenerator do
       {:op => :set_column_default, :name => :eee, :default => 1},
       {:op => :add_index, :columns => [:fff, :ggg]},
       {:op => :drop_index, :columns => [:hhh]}
+      {:op => :add_index, :columns => [:blah], :full_text => true},
     ]
   end
 end
