@@ -507,6 +507,38 @@ context "Proc#to_sql" do
     @criteria = nil
     proc {if @criteria; :x.like @criteria; else; :x.like 'ddd'; end}.sql.should == "(x LIKE 'ddd')"
   end
+  
+  specify "should support more complex conditional filters" do
+    x, y = true, false
+    proc {
+      if x || y
+        :a.like 'a'
+      else
+        :b.like 'b'
+      end
+    }.sql.should == "(a LIKE 'a')"
+
+    proc {
+      if y
+        :a.like 'a'
+      elsif x
+        :b.like 'b'
+      else
+        :c.like 'c'
+      end
+    }.sql.should == "(b LIKE 'b')"
+    
+    @title = 'blah'
+    use_title = true
+    
+    proc {
+      if !@title.blank? && use_title
+        :title.like "%#{@title}%"
+      end
+    }.sql.should == "(title LIKE '%blah%')"
+    
+    
+  end
 end
 
 context "Proc#to_sql stock" do

@@ -413,4 +413,3 @@ context "A grouped MySQL dataset" do
     ds.count.should == 1
   end
 end
-
