@@ -496,7 +496,7 @@ module Sequel
             if values.empty?
               "INSERT INTO #{@opts[:from]} DEFAULT VALUES"
             elsif values.keys
-              fl = values.keys.map {|f| literal(f.to_sym)}
+              fl = values.keys.map {|f| literal(f.is_a?(String) ? f.to_sym : f)}
               vl = @transform ? transform_save(values.values) : values.values
               vl.map! {|v| literal(v)}
               "INSERT INTO #{@opts[:from]} (#{fl.join(COMMA_SEPARATOR)}) VALUES (#{vl.join(COMMA_SEPARATOR)})"
@@ -509,7 +509,7 @@ module Sequel
               "INSERT INTO #{@opts[:from]} DEFAULT VALUES"
             else
               fl, vl = [], []
-              values.each {|k, v| fl << literal(k.to_sym); vl << literal(v)}
+              values.each {|k, v| fl << literal(k.is_a?(String) ? k.to_sym : k); vl << literal(v)}
               "INSERT INTO #{@opts[:from]} (#{fl.join(COMMA_SEPARATOR)}) VALUES (#{vl.join(COMMA_SEPARATOR)})"
             end
           when Dataset

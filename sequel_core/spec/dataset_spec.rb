@@ -2539,6 +2539,24 @@ context "Dataset#update_sql" do
   end
 end
 
+context "Dataset#insert_sql" do
+  setup do
+    @ds = Sequel::Dataset.new(nil).from(:items)
+  end
+  
+  specify "should accept hash with symbol keys" do
+    @ds.insert_sql(:c => 'd').should == "INSERT INTO items (c) VALUES ('d')"
+  end
+
+  specify "should accept hash with string keys" do
+    @ds.insert_sql('c' => 'd').should == "INSERT INTO items (c) VALUES ('d')"
+  end
+
+  specify "should accept array subscript references" do
+    @ds.insert_sql((:day|1) => 'd').should == "INSERT INTO items (day[1]) VALUES ('d')"
+  end
+end
+
 class DummyMummyDataset < Sequel::Dataset
   def first
     raise if @opts[:from] == [:a]
