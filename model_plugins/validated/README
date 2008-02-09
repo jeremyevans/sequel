@@ -1,0 +1,60 @@
+= Validated - A validation framework
+
+<b>Features:</b>
+* API compatible to Sequel as plugin (see Sequel::Plugins::Validated for
+  details):
+
+   class User < Sequel::Model
+     is :validated
+     validates { presence_of :username and length_of :username, :within => 4..16 }
+     has_validations? # => true
+     
+     # ...
+   end
+
+* Syntactical Sugar with Builder methods:
+
+   validates(:username, :password) {length :minimum => 6}
+   validates(:password) {confirmed and complexity :level => :high}
+   validates(:if => :necessary?) {bunchyness_of :crap}
+
+* Beautiful error messages:
+
+   validates_presence_of :person,
+     :message => '#{"%s".humanize} is gone missing.'
+
+* Conditional Validations:
+
+   validates(:if => :necessary?) {...}
+   validates(:unless => proc {|obj| obj.vip?}) {...}
+
+* Easy to adapt and to extent:
+
+  _adapt_
+   Person = Struct.new(:name) do
+     extend(Validated).def_validator
+     validates(:name) { presence and length :minimum => 4 }
+     def_validated_before :clone
+     def_validated_before :dup, :without => :exception
+   end
+   Person.new('Horst').valid? # => true
+   Person.new('Foo').valid? # => false
+   Person.new('Foo').clone # goes *boom* with Validated::ValidationException
+   Person.new('Foo').dup # => false
+
+  _extend_
+   class BunchynessValidation < Validated::Validation
+     def initialize(opts, attributes)
+       __message = opts[:message] || '#{"%s".humanize} is not bunchy.'
+       super opts, attributes do |o, a, v|
+         o.errors.add(a, __message) unless v.respond_to? :to_bunchy
+       end
+     end
+   end
+   
+   Thingy = Struct.new(:bunchy_item) do
+     extend(Validated).def_validator
+     validates_bunchyness_of :bunchy_item
+   end
+
+:include: COPYING
