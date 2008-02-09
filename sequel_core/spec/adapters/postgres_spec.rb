@@ -245,3 +245,43 @@ context "A PostgreSQL database" do
     @db[:test2].first[:xyz].should == 57
   end
 end  
+
+context "A PostgreSSQL database" do
+  setup do
+  end
+  
+  specify "should support fulltext indexes" do
+    g = Sequel::Schema::Generator.new(PGSQL_DB) do
+      text :title
+      text :body
+      full_text_index [:title, :body]
+    end
+    PGSQL_DB.create_table_sql_list(:posts, *g.create_info).should == [
+      "CREATE TABLE posts (\"title\" text, \"body\" text)",
+      "CREATE INDEX posts_title_body_index ON posts USING gin(to_tsvector(\"title\" || \"body\"))"
+    ]
+  end
+  
+  specify "should support fulltext indexes with a specific language" do
+    g = Sequel::Schema::Generator.new(PGSQL_DB) do
+      text :title
+      text :body
+      full_text_index [:title, :body], :language => 'french'
+    end
+    PGSQL_DB.create_table_sql_list(:posts, *g.create_info).should == [
+      "CREATE TABLE posts (\"title\" text, \"body\" text)",
+      "CREATE INDEX posts_title_body_index ON posts USING gin(to_tsvector('french', \"title\" || \"body\"))"
+    ]
+  end
+  
+  specify "should support full_text_search" do
+    PGSQL_DB[:posts].full_text_search(:title, 'ruby').sql.should ==
+      "SELECT * FROM posts WHERE (to_tsvector(\"title\") @@ to_tsquery('ruby'))"
+    
+    PGSQL_DB[:posts].full_text_search([:title, :body], ['ruby', 'sequel']).sql.should ==
+      "SELECT * FROM posts WHERE (to_tsvector(\"title\" || \"body\") @@ to_tsquery('ruby | sequel'))"
+      
+    PGSQL_DB[:posts].full_text_search(:title, 'ruby', :language => 'french').sql.should ==
+      "SELECT * FROM posts WHERE (to_tsvector('french', \"title\") @@ to_tsquery('french', 'ruby'))"
+  end
+end

@@ -180,12 +180,13 @@ context "DB#create_table" do
     @db.sqls.should == ["CREATE TABLE cats (name text)", "CREATE UNIQUE INDEX cats_name_index ON cats (name)"]
   end
 
-  specify "should accept full-text index definitions" do
-    @db.create_table(:cats) do
-      text :name
-      full_text_index :name
-    end
-    @db.sqls.should == ["CREATE TABLE cats (name text)", "CREATE FULLTEXT INDEX cats_name_index ON cats (name)"]
+  specify "should raise on full-text index definitions" do
+    proc {
+      @db.create_table(:cats) do
+        text :name
+        full_text_index :name
+      end
+    }.should raise_error(Sequel::Error)
   end
 
   specify "should accept multiple index definitions" do

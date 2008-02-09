@@ -91,7 +91,7 @@ module Sequel
       def index_definition_sql(table_name, index)
         index_name = index[:name] || default_index_name(table_name, index[:columns])
         if index[:full_text]
-          "CREATE FULLTEXT INDEX #{index_name} ON #{table_name} (#{literal(index[:columns])})"
+          raise Error, "Full-text indexes are not supported for this database"
         elsif index[:unique]
           "CREATE UNIQUE INDEX #{index_name} ON #{table_name} (#{literal(index[:columns])})"
         else

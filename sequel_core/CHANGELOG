@@ -1,5 +1,7 @@
 === SVN
 
+* Implemented full_text indexing and searching for PostgreSQL adapter (thanks David Lee).
+
 * Implemented full_text indexing and searching for MySQL adapter (thanks David Lee).
 
 * Fixed Dataset#insert_sql to work with array subscript references (thanks Jim Morris).

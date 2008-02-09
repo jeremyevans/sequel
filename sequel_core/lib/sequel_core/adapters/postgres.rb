@@ -311,6 +311,20 @@ module Sequel
         {:primary_key => true, :type => :serial}
       end
 
+      def index_definition_sql(table_name, index)
+        index_name = index[:name] || default_index_name(table_name, index[:columns])
+        if index[:full_text]
+          lang = index[:language] ? "#{literal(index[:language])}, " : ""
+          cols = index[:columns].map {|c| literal(c)}.join(" || ")
+          expr = "gin(to_tsvector(#{lang}#{cols}))"
+          "CREATE INDEX #{index_name} ON #{table_name} USING #{expr}"
+        elsif index[:unique]
+          "CREATE UNIQUE INDEX #{index_name} ON #{table_name} (#{literal(index[:columns])})"
+        else
+          "CREATE INDEX #{index_name} ON #{table_name} (#{literal(index[:columns])})"
+        end
+      end
+    
       def drop_table_sql(name)
         "DROP TABLE #{name} CASCADE"
       end
@@ -341,6 +355,13 @@ module Sequel
         end
       end
       
+      def full_text_search(cols, terms, opts = {})
+        lang = opts[:language] ? "#{literal(opts[:language])}, " : ""
+        cols = cols.is_a?(Array) ? cols.map {|c| literal(c)}.join(" || ") : literal(cols)
+        terms = terms.is_a?(Array) ? literal(terms.join(" | ")) : literal(terms)
+        filter("to_tsvector(#{lang}#{cols}) @@ to_tsquery(#{lang}#{terms})")
+      end
+
       FOR_UPDATE = ' FOR UPDATE'.freeze
       FOR_SHARE = ' FOR SHARE'.freeze
     
