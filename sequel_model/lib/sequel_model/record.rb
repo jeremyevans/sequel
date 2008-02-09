@@ -299,20 +299,15 @@ module Sequel
     end
     
     ATTR_RE = /^([a-zA-Z_]\w*)(=)?$/.freeze
+    EQUAL_SIGN = '='.freeze
 
     def method_missing(m, *args) #:nodoc:
       if m.to_s =~ ATTR_RE
         att = $1.to_sym
-        write = $2 == '='
+        write = $2 == EQUAL_SIGN
         
         # check whether the column is legal
-        unless columns.include?(att)
-          # if read accessor and a value exists for the column, we return it
-          if !write && @values.has_key?(att)
-            return @values[att]
-          end
-          
-          # otherwise, raise an error
+        unless @values.has_key?(att) || columns.include?(att)
           raise Error, "Invalid column (#{att.inspect}) for #{self}"
         end
 

@@ -439,10 +439,9 @@ describe Sequel::Model, "attribute accessors" do
     MODEL_DB.reset
 
     @c = Class.new(Sequel::Model(:items)) do
-      def columns
-        [:id, :x, :y]
-      end
     end
+    
+    @c.dataset.meta_def(:columns) {[:id, :x, :y]}
   end
 
   it "should be created dynamically" do
@@ -469,7 +468,7 @@ describe Sequel::Model, "attribute accessors" do
 
     proc {o.yy?}.should raise_error(NoMethodError)
   end
-
+  
   it "should not raise for a column not in the dataset, but for which there's a value" do
     o = @c.new
 
@@ -484,9 +483,8 @@ describe Sequel::Model, "attribute accessors" do
     o.xx.should == 123
     o.yy.should == nil
 
-    proc {o.xx = 3}.should raise_error(Sequel::Error)
+    proc {o.xx = 3}.should_not raise_error(Sequel::Error)
   end
-
 end
 
 describe Sequel::Model, ".[]" do
