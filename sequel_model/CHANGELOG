@@ -1,6 +1,6 @@
 === SVN
 
-* Changed Model#method_missing to short-circuit and bypass checking #columns if the values hash already contains the relevant column.
+* Changed Model#method_missing to short-circuit and bypass checking #columns if the values hash already contains the relevant column (#150).
 
 * Updated to reflect changes in sequel_core (Dataset#clone_merge renamed to Dataset#clone).
 
