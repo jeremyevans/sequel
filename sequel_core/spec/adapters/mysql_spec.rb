@@ -413,3 +413,31 @@ context "A grouped MySQL dataset" do
     ds.count.should == 1
   end
 end
+
+context "A MySQL database" do
+  setup do
+  end
+  
+  specify "should support fulltext indexes" do
+    g = Sequel::Schema::Generator.new(MYSQL_DB) do
+      text :title
+      text :body
+      full_text_index [:title, :body]
+    end
+    MYSQL_DB.create_table_sql_list(:posts, *g.create_info).should == [
+      "CREATE TABLE posts (`title` text, `body` text)",
+      "CREATE FULLTEXT INDEX posts_title_body_index ON posts (`title`, `body`)"
+    ]
+  end
+  
+  specify "should support full_text_search" do
+    MYSQL_DB[:posts].full_text_search(:title, 'ruby').sql.should ==
+      "SELECT * FROM posts WHERE (MATCH (`title`) AGAINST ('ruby'))"
+    
+    MYSQL_DB[:posts].full_text_search([:title, :body], ['ruby', 'sequel']).sql.should ==
+      "SELECT * FROM posts WHERE (MATCH (`title`, `body`) AGAINST ('ruby', 'sequel'))"
+      
+    MYSQL_DB[:posts].full_text_search(:title, '+ruby -rails', :boolean => true).sql.should ==
+      "SELECT * FROM posts WHERE (MATCH (`title`) AGAINST ('+ruby -rails' IN BOOLEAN MODE))"
+  end
+end

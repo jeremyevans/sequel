@@ -1,5 +1,7 @@
 === SVN
 
+* Implemented full_text indexing and searching for MySQL adapter (thanks David Lee).
+
 * Fixed Dataset#insert_sql to work with array subscript references (thanks Jim Morris).
 
 === 1.0.8 (2008-02-08)

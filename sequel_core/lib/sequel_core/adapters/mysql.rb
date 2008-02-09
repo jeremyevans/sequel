@@ -173,6 +173,17 @@ module Sequel
         sql
       end
 
+      def index_definition_sql(table_name, index)
+        index_name = index[:name] || default_index_name(table_name, index[:columns])
+        if index[:full_text]
+          "CREATE FULLTEXT INDEX #{index_name} ON #{table_name} (#{literal(index[:columns])})"
+        elsif index[:unique]
+          "CREATE UNIQUE INDEX #{index_name} ON #{table_name} (#{literal(index[:columns])})"
+        else
+          "CREATE INDEX #{index_name} ON #{table_name} (#{literal(index[:columns])})"
+        end
+      end
+    
       def transaction
         @pool.hold do |conn|
           @transactions ||= []
@@ -290,6 +301,11 @@ module Sequel
         sql
       end
       alias_method :sql, :select_sql
+      
+      def full_text_search(cols, terms, opts = {})
+        mode = opts[:boolean] ? " IN BOOLEAN MODE" : ""
+        filter("MATCH (#{literal(cols)}) AGAINST (#{literal(terms)}#{mode})")
+      end
 
       # MySQL allows HAVING clause on ungrouped datasets.
       def having(*cond, &block)

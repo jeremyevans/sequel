@@ -58,6 +58,11 @@ module Sequel
         @indexes << {:columns => columns}.merge(opts)
       end
       
+      def full_text_index(columns, opts = {})
+        columns = [columns] unless columns.is_a?(Array)
+        @indexes << {:columns => columns, :full_text => true}.merge(opts)
+      end
+      
       def unique(columns, opts = {})
         index(columns, {:unique => true}.merge(opts))
       end
