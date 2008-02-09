@@ -87,6 +87,10 @@ module Sequel
           sql
         end
         alias_method :sql, :select_sql
+        
+        def full_text_search(cols, terms, opts = {})
+          filter("CONTAINS (#{literal(cols)}, #{literal(terms)})")
+        end
       end
     end
   end

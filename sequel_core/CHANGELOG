@@ -1,5 +1,7 @@
 === SVN
 
+* Added full-text searching for odbc_mssql adapter (thanks Joseph Love).
+
 * Added AlterTableGenerator#add_full_text_index method.
 
 * Implemented full_text indexing and searching for PostgreSQL adapter (thanks David Lee).
