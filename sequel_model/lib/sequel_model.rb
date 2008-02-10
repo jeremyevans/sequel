@@ -1,4 +1,18 @@
 module Sequel
+  class Model
+    alias_method :model, :class
+  end
+end
+
+# TODO: add relationships when complete:
+files = %w[
+  base hooks record schema relations 
+  caching plugins validations
+]
+dir = File.join(File.dirname(__FILE__), "sequel_model")
+files.each {|f| require(File.join(dir, f))}
+
+module Sequel
   # == Sequel Models
   # 
   # Models in Sequel are based on the Active Record pattern described by Martin Fowler (http://www.martinfowler.com/eaaCatalog/activeRecord.html). A model class corresponds to a table or a dataset, and an instance of that class wraps a single record in the model's underlying dataset.
@@ -225,22 +239,11 @@ module Sequel
   #   Post.create_table! # drops the table if it exists and then recreates it
   # 
   class Model
-    alias_method :model, :class
-  end
-
-end
-
-# TODO: add relationships when complete:
-files = %w[
-  base hooks record schema relations 
-  caching plugins validations
-]
-dir = File.join(File.dirname(__FILE__), "sequel_model")
-files.each {|f| require(File.join(dir, f))}
-
-module Sequel
-  
-  class Model
+    # Returns a string representation of the model instance including
+    # the class name and values.
+    def inspect
+      "#<%s @values=%s>" % [self.class.name, @values.inspect]
+    end
     
     # Defines a method that returns a filtered dataset.
     def self.subset(name, *args, &block)
@@ -316,5 +319,4 @@ module Sequel
       dataset.all
     end
   end
-
 end

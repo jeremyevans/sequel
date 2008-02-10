@@ -531,3 +531,13 @@ describe Sequel::Model, ".[]" do
     /^SELECT \* FROM items WHERE (\(node_id = 3921\) AND \(kind = 201\))|(\(kind = 201\) AND \(node_id = 3921\)) LIMIT 1$/
   end
 end
+
+context "Model#inspect" do
+  setup do
+    @o = Sequel::Model.load(:x => 333)
+  end
+  
+  specify "should include the class name and the values" do
+    @o.inspect.should == '#<Sequel::Model @values={:x=>333}>'
+  end
+end
