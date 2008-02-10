@@ -93,8 +93,8 @@ describe Sequel::Schema::AlterTableGenerator do
       {:op => :set_column_type, :name => :ddd, :type => :float},
       {:op => :set_column_default, :name => :eee, :default => 1},
       {:op => :add_index, :columns => [:fff, :ggg]},
-      {:op => :drop_index, :columns => [:hhh]}
-      {:op => :add_index, :columns => [:blah], :full_text => true},
+      {:op => :drop_index, :columns => [:hhh]},
+      {:op => :add_index, :columns => [:blah], :full_text => true}
     ]
   end
 end

@@ -136,7 +136,7 @@ module Sequel
         @operations << { \
           :op => :add_index, \
           :columns => columns, \
-          :full_text => true
+          :full_text => true \
         }.merge(opts)
       end
       

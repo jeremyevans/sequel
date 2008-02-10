@@ -421,6 +421,12 @@ module Sequel
     def self.inherited(c) #:nodoc:
       @@dataset_classes << c
     end
+    
+    # Returns a string representation of the dataset including the class name 
+    # and the corresponding SQL select statement.
+    def inspect
+      '#<%s: %s>' % [self.class.to_s, sql.inspect]
+    end
   end
 end
 

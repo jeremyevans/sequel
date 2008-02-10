@@ -18,21 +18,21 @@ context "Dataset" do
     d.opts.should == {}
   end
   
-  specify "should provide clone for chainability." do
-    d1 = @dataset.clone(:from => :test)
+  specify "should provide clone for chainability" do
+    d1 = @dataset.clone(:from => [:test])
     d1.class.should == @dataset.class
     d1.should_not == @dataset
     d1.db.should be(@dataset.db)
-    d1.opts[:from].should == :test
+    d1.opts[:from].should == [:test]
     @dataset.opts[:from].should be_nil
     
-    d2 = d1.clone(:order => :name)
+    d2 = d1.clone(:order => [:name])
     d2.class.should == @dataset.class
     d2.should_not == d1
     d2.should_not == @dataset
     d2.db.should be(@dataset.db)
-    d2.opts[:from].should == :test
-    d2.opts[:order].should == :name
+    d2.opts[:from].should == [:test]
+    d2.opts[:order].should == [:name]
     d1.opts[:order].should be_nil
   end
   
@@ -2610,3 +2610,12 @@ context "Dataset#table_exists?" do
   end
 end
 
+context "Dataset#inspect" do
+  setup do
+    @ds = Sequel::Dataset.new(nil).from(:blah)
+  end
+  
+  specify "should include the class name and the corresponding SQL statement" do
+    @ds.inspect.should == '#<%s: %s>' % [@ds.class.to_s, @ds.sql.inspect]
+  end
+end

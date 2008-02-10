@@ -835,3 +835,15 @@ context "Database.connect" do
     db.opts[:host].should == 'alfonso'
   end
 end
+
+context "Database#inspect" do
+  setup do
+    @db = DummyDatabase.new
+    
+    @db.meta_def(:uri) {'blah://blahblah/blah'}
+  end
+  
+  specify "should include the class name and the connection url" do
+    @db.inspect.should == '#<DummyDatabase: "blah://blahblah/blah">'
+  end
+end

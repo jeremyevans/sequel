@@ -1,5 +1,7 @@
 === SVN
 
+* Implemented Dataset#inspect and Database#inspect (#151).
+
 * Added full-text searching for odbc_mssql adapter (thanks Joseph Love).
 
 * Added AlterTableGenerator#add_full_text_index method.
