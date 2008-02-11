@@ -182,6 +182,15 @@ describe Sequel::Model, "dataset" do
   specify "should raise if no dataset is explicitly set and the class is anonymous" do
     proc {@b.dataset}.should raise_error(Sequel::Error)
   end
+  
+  specify "should disregard namespaces for the table name" do
+    module BlahBlah
+      class MwaHaHa < Sequel::Model
+      end
+    end
+    
+    BlahBlah::MwaHaHa.dataset.sql.should == 'SELECT * FROM mwa_ha_has'
+  end
 end
 
 describe "A model class with implicit table name" do

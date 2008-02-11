@@ -16,14 +16,21 @@ module Sequel
     def self.database_opened(db)
       @db = db if (self == Model) && !@db
     end
+    
+    NAMESPACE_EXCLUSIVE_REGEXP = /([^:]+)$/.freeze
+    
+    # Returns the implicit table name for the model class.
+    def self.implicit_table_name
+      name[NAMESPACE_EXCLUSIVE_REGEXP].underscore.pluralize.to_sym
+    end
 
     # Returns the dataset associated with the Model class.
     def self.dataset
       unless @dataset
         if ds = super_dataset
           set_dataset(ds.clone)
-        elsif !(n = name).empty?
-          set_dataset(db[n.underscore.pluralize.to_sym])
+        elsif !name.empty?
+          set_dataset(db[implicit_table_name])
         else
           raise Error, "No dataset associated with #{self}"
         end
