@@ -72,8 +72,16 @@ module Sequel
     attr_reader :db
     attr_accessor :opts
     
-    alias_method :all, :to_a
     alias_method :size, :count
+    
+    # Returns an array with all records in the dataset. If a block is given,
+    # the array is iterated over.
+    def all(opts = nil, &block)
+      a = []
+      each(opts) {|r| a << r}
+      a.each(&block) if block
+      a
+    end
   
     # Constructs a new instance of a dataset with a database instance, initial
     # options and an optional record class. Datasets are usually constructed by

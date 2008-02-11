@@ -2619,3 +2619,42 @@ context "Dataset#inspect" do
     @ds.inspect.should == '#<%s: %s>' % [@ds.class.to_s, @ds.sql.inspect]
   end
 end
+
+context "Dataset#all" do
+  setup do
+    @c = Class.new(Sequel::Dataset) do
+      def fetch_rows(sql, &block)
+        block.call({:x => 1, :y => 2})
+        block.call({:x => 3, :y => 4})
+        block.call(sql)
+      end
+    end
+    @dataset = @c.new(nil).from(:items)
+  end
+
+  specify "should return an array with all records" do
+    @dataset.all.should == [
+      {:x => 1, :y => 2},
+      {:x => 3, :y => 4},
+      "SELECT * FROM items"
+    ]
+  end
+  
+  specify "should accept options and pass them to #each" do
+    @dataset.all(:limit => 33).should == [
+      {:x => 1, :y => 2},
+      {:x => 3, :y => 4},
+      "SELECT * FROM items LIMIT 33"
+    ]
+  end
+
+  specify "should iterate over the array if a block is given" do
+    a = []
+    
+    @dataset.all do |r|
+      a << (r.is_a?(Hash) ? r[:x] : r)
+    end
+    
+    a.should == [1, 3, "SELECT * FROM items"]
+  end
+end

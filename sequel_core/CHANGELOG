@@ -1,3 +1,7 @@
+=== SVN
+
+* Changed Dataset#all to accept opts and iteration block.
+
 === 1.0.9 (2008-02-10)
 
 * Implemented Dataset#inspect and Database#inspect (#151).
