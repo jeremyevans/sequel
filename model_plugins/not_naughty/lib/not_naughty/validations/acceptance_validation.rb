@@ -1,4 +1,4 @@
-module Validated
+module NotNaughty
   class AcceptanceValidation < Validation
     
     def initialize(opts, attributes)

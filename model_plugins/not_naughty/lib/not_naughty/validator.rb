@@ -1,4 +1,4 @@
-module Validated
+module NotNaughty
 
   # == Superclass for all Adapters.
   #
@@ -11,9 +11,9 @@ module Validated
     # provided.
     #
     # <b>Example:</b>
-    #   Validated::Validator.new
+    #   NotNaughty::Validator.new
     #     # has the :default state
-    #   Validated::Validator.new :create, :update
+    #   NotNaughty::Validator.new :create, :update
     #     # has the :create and :update states
     #
     # <em>Adapters should overwrite this method.</em>

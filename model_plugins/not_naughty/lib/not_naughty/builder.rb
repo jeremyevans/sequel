@@ -1,10 +1,15 @@
-module Validated
+module NotNaughty
+  
+  # == Builder that builds
+  #
+  # With this you get syntactical sugar for all descendants of Validation, see
+  # validates for details.
   module Builder
-
+    
     # Observer method that creates Validation builder methods.
     #
     # A Validation with the class name TestValidation will get the
-    # builder-method <tt>validate_test_of</tt> that'll be added via
+    # builder method <tt>validate_test_of</tt> that adds a validation via
     # add_validation in the current <tt>validator</tt>.
     def self.update(validation)
       if basename = validation.name[/([^:]+)Validation$/, 1]
@@ -14,7 +19,7 @@ module Validated
       end
     end
     
-    # Syntactic sugar.
+    # == Syntactic sugar.
     #
     # <b>Example:</b>
     #   validates { presence_of :example, :if => :reading? }
@@ -32,8 +37,6 @@ module Validated
     def validates_each(*attributes, &block)
       validator.add_validation(*attributes, &block)
     end
-    
-    require 'delegate'
     
     class ValidationDelegator < SimpleDelegator #:nodoc:all
       def initialize(receiver, *params)

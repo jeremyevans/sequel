@@ -1,20 +1,20 @@
 require "#{ File.dirname(__FILE__) }/sequel_spec_helper.rb"
 
-describe sequel do
+describe Sequel::Plugins::NotNaughty do
   
   before(:each) do
-    @obj = Class.new(Sequel::Model) { is :validated }
+    @obj = Class.new(Sequel::Model) { is :not_naughty }
   end
   
   it "should delegate validation methods in receiver" do
     @instance = @obj.new
 
-    @obj.validator.should be_an_instance_of(sequel)
+    @obj.validator.should be_an_instance_of(Sequel::Plugins::NotNaughty)
     @obj.validator.should_receive(:states).and_return({})
     @obj.validator.should_receive(:has_validations?)
     @obj.validator.should_receive(:invoke).with(@instance)
     
-    @instance.errors.should be_an_instance_of(Validated::Errors)
+    @instance.errors.should be_an_instance_of(subject::Errors)
     @instance.should respond_to(:validate)
     @instance.should respond_to(:valid?)
     @instance.should respond_to(:save_without_validations)
@@ -30,7 +30,7 @@ describe sequel do
     @obj.has_validations?.should == false
   end
   it "should add_validation instance of validation" do
-    validation = Class.new(Validated::Validation)
+    validation = Class.new(subject::Validation)
     
     @obj.validator.add_validation validation, :attribute
     
@@ -54,7 +54,7 @@ describe sequel do
     validations.first.should be_an_instance_of(validation)
   end
   it "should have validations" do
-    validation = Class.new(Validated::Validation)
+    validation = Class.new(subject::Validation)
     @obj.validator.add_validation validation, :attribute
     
     @obj.has_validations?.should == true
@@ -63,9 +63,9 @@ describe sequel do
     @obj.validator.add_validation(:attribute) { |o, a, v| }
     
     @obj.validator.states[:create][:attribute].first.
-    should be_kind_of(Validated::Validation)
+    should be_kind_of(subject::Validation)
     @obj.validator.states[:update][:attribute].first.
-    should be_kind_of(Validated::Validation)
+    should be_kind_of(subject::Validation)
   end
   it "should run validations on object when it's invoked" do
     probe = mock 'Probe', :new? => true
@@ -88,7 +88,7 @@ describe sequel do
     instance.validate
   end
   it "should not run hooks if validated" do
-    i = Class.new(Sequel::Model) { is :validated, :without => :hooks }.new
+    i = Class.new(Sequel::Model) { is :not_naughty, :without => :hooks }.new
     i.should_not_receive(:before_validate)
     i.should_not_receive(:after_validate)
     i.validate

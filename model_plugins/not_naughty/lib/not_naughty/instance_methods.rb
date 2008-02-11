@@ -1,8 +1,8 @@
-module Validated
+module NotNaughty
   module InstanceMethods
     
     # Returns instance of Errors.
-    def errors() @errors ||= ::Validated::Errors.new end
+    def errors() @errors ||= ::NotNaughty::Errors.new end
     
     # Returns true if all validations passed
     def valid?

@@ -1,4 +1,4 @@
-module Validated
+module NotNaughty
   class FormatValidation < Validation
     
     def initialize(opts, attributes)

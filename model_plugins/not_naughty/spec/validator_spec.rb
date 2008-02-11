@@ -13,7 +13,7 @@ describe subject::Validator, 'with default state' do
 
 end
 
-describe Validated::Validator, 'with custom states' do
+describe NotNaughty::Validator, 'with custom states' do
   
   before(:each) do
     @states = [:create, :update]
@@ -96,15 +96,15 @@ describe Validated::Validator, 'with custom states' do
   
 end
 
-describe Validated::Validator::State do
+describe NotNaughty::Validator::State do
   
-  before(:each) { @state = Validated::Validator::State.new }
+  before(:each) { @state = NotNaughty::Validator::State.new }
   
   it "should initialize with name and validations" do
     @state.name.should == :default
     @state.validations.should be_an_instance_of(Hash)
     
-    @state = Validated::Validator::State.new :foo
+    @state = NotNaughty::Validator::State.new :foo
     @state.name.should == :foo
   end
   it "should add validation" do

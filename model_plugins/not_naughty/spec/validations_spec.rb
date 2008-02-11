@@ -1,5 +1,10 @@
 require "#{ File.dirname(__FILE__) }/spec_helper.rb"
 
+::NotNaughty::Validation.load(
+  :acceptance, :confirmation, :format,
+  :length, :numericality, :presence
+)
+
 describe subject::LengthValidation do
   
   before(:each) { @receiver, @errors = mock('Receiver'), mock('Errors') }
@@ -62,10 +67,7 @@ describe subject::LengthValidation do
   
 end
 
-LengthExample = Struct.new(:name) do
-  extend(Validated).def_validator
-end
-
+LengthExample = Struct.new(:name).extend(subject)
 describe LengthExample do
   
   before(:each) { @example = LengthExample.clone }
@@ -87,10 +89,7 @@ describe LengthExample do
   
 end
 
-FormatExample = Struct.new(:email) do
-  extend(Validated).def_validator
-end
-
+FormatExample = Struct.new(:email).extend(subject)
 describe FormatExample do
   
   before(:each) { @example = FormatExample.clone }
@@ -136,10 +135,7 @@ describe FormatExample do
   
 end
 
-PresenceExample = Struct.new(:name) do
-  extend(Validated).def_validator
-end
-
+PresenceExample = Struct.new(:name).extend(subject)
 describe PresenceExample do
   
   before(:each) { @example = PresenceExample.clone }
@@ -159,10 +155,7 @@ describe PresenceExample do
   
 end
 
-AcceptanceExample = Struct.new(:conditions) do
-  extend(Validated).def_validator
-end
-
+AcceptanceExample = Struct.new(:conditions).extend(subject)
 describe AcceptanceExample do
   
   before(:each) { @example = AcceptanceExample.clone }
@@ -210,10 +203,7 @@ describe AcceptanceExample do
   
 end
 
-ConfirmationExample = Struct.new(:name, :name_confirmation) do
-  extend(Validated).def_validator
-end
-
+ConfirmationExample = Struct.new(:name, :name_confirmation).extend(subject)
 describe ConfirmationExample do
   
   before(:each) { @example = ConfirmationExample.clone }
@@ -248,10 +238,7 @@ describe ConfirmationExample do
   
 end
 
-NumericalityExample = Struct.new(:weight) do
-  extend(Validated).def_validator
-end
-
+NumericalityExample = Struct.new(:weight).extend(subject)
 describe NumericalityExample do
   
   before(:each) { @example = NumericalityExample.clone }

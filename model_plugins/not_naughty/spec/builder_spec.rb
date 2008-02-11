@@ -24,19 +24,19 @@ describe subject::Builder do
   end
   it "should add validation for :name via :validates" do
     @validatable.validator.should_receive(:add_validation).
-      with(Validated::PresenceValidation, :name, {}).twice
+      with(NotNaughty::PresenceValidation, :name, {}).twice
     @validatable.validates { presence_of :name }
     @validatable.validates(:name) { presence }
   end
   it "should add validation for :name on update via :validates" do
     @validatable.validator.should_receive(:add_validation).
-      with(Validated::PresenceValidation, :name, {:on => :update}).twice
+      with(NotNaughty::PresenceValidation, :name, {:on => :update}).twice
     @validatable.validates { presence_of :name, :on => :update }
     @validatable.validates(:on => :update) { presence_of :name }
   end
   it "should add validation for :firstname and :lastname via :validates" do
     @validatable.validator.should_receive(:add_validation).
-      with(Validated::PresenceValidation, :firstname, :lastname, {}).twice
+      with(NotNaughty::PresenceValidation, :firstname, :lastname, {}).twice
     @validatable.validates { presence_of :firstname, :lastname }
     @validatable.validates(:firstname, :lastname) { presence :name }
   end

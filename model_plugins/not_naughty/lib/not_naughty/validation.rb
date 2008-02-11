@@ -1,11 +1,20 @@
-require 'observer'
-
-module Validated
+module NotNaughty
   
   # == The superclass for Validations.
   #
   # See new for more information.
   class Validation
+    
+    BASEDIR = File.dirname __FILE__
+    # Loader pattern
+    PATTERN = File.join BASEDIR, %w[validations %s_validation.rb]
+    
+    # Loads validations.
+    def self.load(*validations)
+      validations.each do |validation|
+        Dir.glob(PATTERN % validation).each { |path| require path }
+      end
+    end
     
     extend Observable
     def self.inherited(descendant) #:nodoc:
@@ -18,12 +27,12 @@ module Validated
     # Builds validations.
     #
     # <b>Example:</b>
-    #   Validated::Validation.new :temp, :if => :water? do |obj, attr, val|
+    #   NotNaughty::Validation.new :temp, :if => :water? do |obj, attr, val|
     #     obj.errors.add attr, 'too hot' unless val < 100
     #   end
     #
     # <b>Like:</b>
-    #   class TempValidation < Validated::Validation
+    #   class TempValidation < NotNaughty::Validation
     #     def initialize(opts, attributes)
     #       super opts, attributes method(:temp_validation)
     #     end
@@ -38,7 +47,7 @@ module Validated
     # ValidationBuilder#update). If ValidationBuilder#update is called because
     # <Name>Validation is inherited from Validation the ValidationBuilder gets
     # the method validates_<name>_of and so does the classes that included the
-    # ValidationBuilder.
+    # Builder.
     def self.new(*params, &block)
       attributes = if params.first.is_a? Class and params.first < self
         klass = params.shift
@@ -80,7 +89,7 @@ module Validated
       end if @conditions.any?
     end
     
-    # Conditions for use in Validations are usually used with Validations
+    # Conditions for use in Validations are usually used with Validations.
     class Condition
 
       # An instance of Condition accepts Symbols, UnboundMethods or anything
@@ -88,9 +97,9 @@ module Validated
       #
       # The following examples are similiar to each other:
       #
-      #   Validated::Validation::Condition.new proc {|o| o.nil?}
-      #   Validated::Validation::Condition.new :nil?
-      #   Validated::Validation::Condition.new Object.instance_method(:nil?)
+      #   NotNaughty::Validation::Condition.new proc {|o| o.nil?}
+      #   NotNaughty::Validation::Condition.new :nil?
+      #   NotNaughty::Validation::Condition.new Object.instance_method(:nil?)
       def self.new(condition, positive = true)
         instance = allocate
         instance.instance_variable_set :@condition, condition

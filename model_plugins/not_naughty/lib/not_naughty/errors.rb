@@ -1,6 +1,8 @@
-module Validated
+module NotNaughty
   
-  # Container for failed validations
+  # == Container for failed validations.
+  #
+  # ...
   class Errors
     extend Forwardable
     
@@ -35,6 +37,9 @@ module Validated
     end
   end
   
+  # == Exception class for NotNaughty
+  #
+  # Includes the instance of Errors that caused the Exception.
   class ValidationException < RuntimeError
     extend Forwardable
     

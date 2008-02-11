@@ -1,6 +1,6 @@
-require "#{ File.dirname(__FILE__) }/../lib/validated.rb"
+require File.dirname(__FILE__) + '/../lib/not_naughty.rb'
 
-def subject() ::Validated end
+def subject() ::NotNaughty end
 def h(something)
   puts '<pre>%s</pre>' %
   something.inspect.gsub(/[<>]/) {|m| (m == '<')? '&lt;': '&gt;'}

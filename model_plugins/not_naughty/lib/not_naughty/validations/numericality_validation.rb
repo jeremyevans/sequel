@@ -1,4 +1,4 @@
-module Validated
+module NotNaughty
   class NumericalityValidation < FormatValidation
     
     def initialize(opts, attributes)

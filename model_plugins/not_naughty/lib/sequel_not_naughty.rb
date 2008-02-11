@@ -1,4 +1,4 @@
-require File.dirname(__FILE__) + '/validated'
+require File.dirname(__FILE__) + '/not_naughty'
 require 'sequel'
 
 module Sequel #:nodoc:
@@ -12,55 +12,46 @@ module Sequel #:nodoc:
     # <b>To make it overall available:</b>
     #
     #   class Sequel::Model
-    #     is :validated
+    #     is :not_naughty
     #   end
     #
     # <b>To turn off before_validate and after_validate hooks:</b>
     #
     #   class User < Sequel::Model
-    #     is :validated, :without => :hooks
+    #     is :not_naughty, :without => :hooks
     #   end
     #
     # <b>To turn off raised Exceptions if validation before save fails:</b>
     #
     #   class User < Sequel::Model
     #     # save on invalid users will return false
-    #     is :validated, :without => :exceptions
+    #     is :not_naughty, :without => :exceptions
     #   end
     #
     # <b>To combine those:</b>
     #
     #   class User < Sequel::Model
-    #     is :validated, :without => [:exceptions, :hooks]
+    #     is :not_naughty, :without => [:exceptions, :hooks]
     #   end
     #
-    class Validated < Validated::Validator
+    class NotNaughty < NotNaughty::Validator
       
       # Applies plugin to a Sequel::Model.
       def self.apply(receiver, *args)
-        receiver.extend ::Validated
-        receiver.def_validator self, :create, :update
+        receiver.extend ::NotNaughty
+        receiver.validator self, :create, :update
+        
+        ::NotNaughty::Validation.load(
+          :acceptance, :confirmation, :format,
+          :length, :numericality, :presence
+        )
+        
         receiver.extend ClassMethods
         receiver.instance_eval { alias_method :save, :save! }
-        receiver.def_validated_before :save, *args
+        receiver.validated_before :save, *args
         
         without = args.extract_options![:without]
-        unless [*without].include? :hooks
-          receiver.instance_eval do
-            [:before_validate, :after_validate].each do |m|
-              define_method(m) {}
-              def_hook_method(m)
-            end
-            
-            alias_method :validate_without_hooks, :validate
-            
-            define_method :validate do
-              before_validate
-              validate_without_hooks
-              after_validate
-            end
-          end
-        end
+        receiver.send! :include, Hooks unless [*without].include? :hooks
       end
       
       # Returns state for given instance.
@@ -68,6 +59,28 @@ module Sequel #:nodoc:
         if instance.new? then @states[:create] else @states[:update] end
       end
       
+      # Adds validation hooks to Sequel::Model.
+      module Hooks
+        def self.included(base)
+          base.instance_eval do
+            def_hook_method :before_validate
+            def_hook_method :after_validate
+            alias_method :validate_without_hooks, :validate
+            alias_method :validate, :validate_with_hooks
+          end
+        end
+        
+        def before_validate() end
+        def after_validate() end
+        
+        def validate_with_hooks
+          before_validate
+          validate_without_hooks
+          after_validate
+        end
+      end
+      
+      # Ensures Sequel::Model API compatibility.
       module ClassMethods
         
         # Returns the validations hash for the class.

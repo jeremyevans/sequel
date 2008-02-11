@@ -1,4 +1,4 @@
-module Validated
+module NotNaughty
   class PresenceValidation < Validation
     
     def initialize(opts, attributes)
