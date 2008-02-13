@@ -1,5 +1,7 @@
 === SVN
 
+* Changed Marshal stock transform to use Base64 encoding with backward-compatibility to support existing marshaled values (#154).
+
 * Added support for inserting multiple records in a single statement using #multi_insert in MySQL adapter (#153).
 
 * Added support for :slice option (same as :commit_every) in Dataset#multi_insert.

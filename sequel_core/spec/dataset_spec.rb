@@ -2323,32 +2323,39 @@ context "Dataset#transform" do
     f.should == {:x => "wow", :y => 'hello'}
   end
   
-  specify "should support stock Marshal transformation" do
+  specify "should support stock Marshal transformation with Base64 encoding" do
     @ds.transform(:x => :marshal)
 
-    @ds.raw = {:x => Marshal.dump([1, 2, 3]), :y => 'hello'}
+    @ds.raw = {:x => Base64.encode64(Marshal.dump([1, 2, 3])), :y => 'hello'}
     @ds.first.should == {:x => [1, 2, 3], :y => 'hello'}
 
     @ds.insert(:x => :toast)
-    @ds.sql.should == "INSERT INTO items (x) VALUES ('#{Marshal.dump(:toast)}')"
+    @ds.sql.should == "INSERT INTO items (x) VALUES ('#{Base64.encode64(Marshal.dump(:toast))}')"
     @ds.insert(:y => 'butter')
     @ds.sql.should == "INSERT INTO items (y) VALUES ('butter')"
     @ds.update(:x => ['dream'])
-    @ds.sql.should == "UPDATE items SET x = '#{Marshal.dump(['dream'])}'"
+    @ds.sql.should == "UPDATE items SET x = '#{Base64.encode64(Marshal.dump(['dream']))}'"
 
     @ds2 = @ds.filter(:a => 1)
-    @ds2.raw = {:x => Marshal.dump([1, 2, 3]), :y => 'hello'}
+    @ds2.raw = {:x => Base64.encode64(Marshal.dump([1, 2, 3])), :y => 'hello'}
     @ds2.first.should == {:x => [1, 2, 3], :y => 'hello'}
     @ds2.insert(:x => :toast)
-    @ds2.sql.should == "INSERT INTO items (x) VALUES ('#{Marshal.dump(:toast)}')"
+    @ds2.sql.should == "INSERT INTO items (x) VALUES ('#{Base64.encode64(Marshal.dump(:toast))}')"
 
     @ds.set_row_proc {|r| r[:z] = r[:x] * 2; r}
-    @ds.raw = {:x => Marshal.dump("wow"), :y => 'hello'}
+    @ds.raw = {:x => Base64.encode64(Marshal.dump("wow")), :y => 'hello'}
     @ds.first.should == {:x => "wow", :y => 'hello', :z => "wowwow"}
     f = nil
-    @ds.raw = {:x => Marshal.dump("wow"), :y => 'hello'}
+    @ds.raw = {:x => Base64.encode64(Marshal.dump("wow")), :y => 'hello'}
     @ds.each(:naked => true) {|r| f = r}
     f.should == {:x => "wow", :y => 'hello'}
+  end
+  
+  specify "should support loading of Marshalled values without Base64 encoding" do
+    @ds.transform(:x => :marshal)
+
+    @ds.raw = {:x => Marshal.dump([1,2,3]), :y => nil}
+    @ds.first.should == {:x => [1,2,3], :y => nil}
   end
   
   specify "should return self" do
