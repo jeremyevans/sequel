@@ -265,8 +265,13 @@ module Sequel
         if cond === true || cond === false
           raise Error::InvalidFilter, "Invalid filter specified. Did you mean to supply a block?"
         end
+        
+        if cond.is_a?(Hash)
+          cond = transform_save(cond) if @transform
+          filter = cond
+        end
         parenthesize = !(cond.is_a?(Hash) || cond.is_a?(Array))
-        filter = cond.is_a?(Hash) && cond
+
         if !@opts[clause].nil? and @opts[clause].any?
           l = expression_list(@opts[clause])
           r = expression_list(block || cond, parenthesize)

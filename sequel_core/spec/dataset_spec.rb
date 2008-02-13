@@ -2363,6 +2363,19 @@ context "Dataset#transform" do
   end
 end
 
+context "A dataset with a transform" do
+  setup do
+    @ds = Sequel::Dataset.new(nil).from(:items)
+    @ds.transform(:x => :marshal)
+  end
+  
+  specify "should automatically transform hash filters" do
+    @ds.filter(:y => 2).sql.should == 'SELECT * FROM items WHERE (y = 2)'
+    
+    @ds.filter(:x => 2).sql.should == "SELECT * FROM items WHERE (x = '#{Base64.encode64(Marshal.dump(2))}')"
+  end
+end
+
 context "Dataset#to_csv" do
   setup do
     @c = Class.new(Sequel::Dataset) do
