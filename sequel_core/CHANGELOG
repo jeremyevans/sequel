@@ -1,4 +1,4 @@
-=== SVN
+=== 1.0.10 (2008-02-13)
 
 * Fixed Datset#group_and_count to work inside a query block (#152).
 
