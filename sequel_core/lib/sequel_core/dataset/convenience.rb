@@ -221,12 +221,12 @@ module Sequel
       # Inserts multiple records into the associated table. This method can be
       # to efficiently insert a large amounts of records into a table. Inserts
       # are automatically wrapped in a transaction. If the :commit_every 
-      # option is specified, the method will generate a separate transaction 
-      # for each batch of records, e.g.:
+      # or :slice option is specified, the method will generate a separate 
+      # transaction for each batch of records, e.g.:
       #
       #   dataset.multi_insert(list, :commit_every => 1000)
       def multi_insert(list, opts = {})
-        if every = opts[:commit_every]
+        if every = (opts[:commit_every] || opts[:slice])
           list.each_slice(every) do |s|
             @db.transaction do
               s.each {|r| @db.execute(insert_sql(r))}

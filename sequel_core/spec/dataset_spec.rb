@@ -2053,8 +2053,21 @@ context "Dataset#multi_insert" do
     ]
   end
   
-  specify "should accept the commit_every option for committing every x records" do
+  specify "should accept the :commit_every option for committing every x records" do
     @ds.multi_insert(@list, :commit_every => 2)
+    @db.sqls.should == [
+      'BEGIN',
+      "INSERT INTO items (name) VALUES ('abc')",
+      "INSERT INTO items (name) VALUES ('def')",
+      'COMMIT',
+      'BEGIN',
+      "INSERT INTO items (name) VALUES ('ghi')",
+      'COMMIT'
+    ]
+  end
+
+  specify "should accept the :slice option for committing every x records" do
+    @ds.multi_insert(@list, :slice => 2)
     @db.sqls.should == [
       'BEGIN',
       "INSERT INTO items (name) VALUES ('abc')",

@@ -264,7 +264,7 @@ end
 #   end
 # end
 # 
-context "Joiמed MySQL dataset" do
+context "Joined MySQL dataset" do
   setup do
     @ds = MYSQL_DB[:nodes].join(:attributes, :node_id => :id)
     @ds2 = MYSQL_DB[:nodes]
@@ -439,5 +439,102 @@ context "A MySQL database" do
       
     MYSQL_DB[:posts].full_text_search(:title, '+ruby -rails', :boolean => true).sql.should ==
       "SELECT * FROM posts WHERE (MATCH (`title`) AGAINST ('+ruby -rails' IN BOOLEAN MODE))"
+  end
+end
+
+class Sequel::MySQL::Database
+  alias_method :orig_execute, :execute
+  attr_accessor :sqls
+  def execute(sql, &block)
+    @sqls ||= []; @sqls << sql
+    orig_execute(sql, &block)
+  end
+
+  def transaction
+    @pool.hold do |conn|
+      @transactions ||= []
+      if @transactions.include? Thread.current
+        return yield(conn)
+      end
+      @sqls ||= []; @sqls << SQL_BEGIN
+      conn.query(SQL_BEGIN)
+      begin
+        @transactions << Thread.current
+        result = yield(conn)
+        @sqls ||= []; @sqls << SQL_COMMIT
+        conn.query(SQL_COMMIT)
+        result
+      rescue => e
+        @sqls ||= []; @sqls << SQL_ROLLBACK
+        conn.query(SQL_ROLLBACK)
+        raise e unless Sequel::Error::Rollback === e
+      ensure
+        @transactions.delete(Thread.current)
+      end
+    end
+  end
+end
+
+context "MySQL::Dataset#multi_insert" do
+  setup do
+    @d = MYSQL_DB[:items]
+    @d.delete # remove all records
+    MYSQL_DB.sqls.clear
+  end
+  
+  specify "should insert multiple records in a single statement" do
+    @d.multi_insert([{:name => 'abc'}, {:name => 'def'}])
+    
+    MYSQL_DB.sqls.should == [
+      'BEGIN',
+      "INSERT INTO items (`name`) VALUES ('abc'), ('def')",
+      'COMMIT'
+    ]
+
+    @d.all.should == [
+      {:name => 'abc', :value => nil}, {:name => 'def', :value => nil}
+    ]
+  end
+
+  specify "should split the list of records into batches if :commit_every option is given" do
+    @d.multi_insert([{:value => 1}, {:value => 2}, {:value => 3}, {:value => 4}],
+      :commit_every => 2)
+
+    MYSQL_DB.sqls.should == [
+      'BEGIN',
+      "INSERT INTO items (`value`) VALUES (1), (2)",
+      'COMMIT',
+      'BEGIN',
+      "INSERT INTO items (`value`) VALUES (3), (4)",
+      'COMMIT'
+    ]
+    
+    @d.all.should == [
+      {:name => nil, :value => 1}, 
+      {:name => nil, :value => 2},
+      {:name => nil, :value => 3}, 
+      {:name => nil, :value => 4}
+    ]
+  end
+
+  specify "should split the list of records into batches if :slice option is given" do
+    @d.multi_insert([{:value => 1}, {:value => 2}, {:value => 3}, {:value => 4}],
+      :slice => 2)
+
+    MYSQL_DB.sqls.should == [
+      'BEGIN',
+      "INSERT INTO items (`value`) VALUES (1), (2)",
+      'COMMIT',
+      'BEGIN',
+      "INSERT INTO items (`value`) VALUES (3), (4)",
+      'COMMIT'
+    ]
+    
+    @d.all.should == [
+      {:name => nil, :value => 1}, 
+      {:name => nil, :value => 2},
+      {:name => nil, :value => 3}, 
+      {:name => nil, :value => 4}
+    ]
   end
 end
