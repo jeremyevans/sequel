@@ -246,9 +246,10 @@ module Sequel
         def insert(*args); raise Error, "#insert cannot be invoked inside a query block."; end
         def update(*args); raise Error, "#update cannot be invoked inside a query block."; end
         def delete(*args); raise Error, "#delete cannot be invoked inside a query block."; end
-        
-        def clone(opts)
+
+        def clone(opts = nil)
           @opts.merge!(opts)
+          self
         end
       end
       

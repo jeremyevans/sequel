@@ -1,5 +1,7 @@
 === SVN
 
+* Fixed Datset#group_and_count to work inside a query block (#152).
+
 * Changed datasets with transforms to automatically transform hash filters (#155).
 
 * Changed Marshal stock transform to use Base64 encoding with backward-compatibility to support existing marshaled values (#154).

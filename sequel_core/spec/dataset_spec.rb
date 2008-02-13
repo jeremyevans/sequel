@@ -1032,11 +1032,18 @@ context "Dataset#group_and_count" do
   end
   
   specify "should format SQL properly" do
-    @ds.group_and_count(:name).sql.should == "SELECT name, count(*) AS count FROM test GROUP BY name ORDER BY count"
+    @ds.group_and_count(:name).sql.should == 
+      "SELECT name, count(*) AS count FROM test GROUP BY name ORDER BY count"
   end
 
   specify "should accept multiple columns for grouping" do
-    @ds.group_and_count(:a, :b).sql.should == "SELECT a, b, count(*) AS count FROM test GROUP BY a, b ORDER BY count"
+    @ds.group_and_count(:a, :b).sql.should == 
+      "SELECT a, b, count(*) AS count FROM test GROUP BY a, b ORDER BY count"
+  end
+  
+  specify "should work within query block" do
+    @ds.query{group_and_count(:a, :b)}.sql.should == 
+      "SELECT a, b, count(*) AS count FROM test GROUP BY a, b ORDER BY count"
   end
 end
 
