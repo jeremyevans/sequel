@@ -24,7 +24,7 @@ module NotNaughty
       end
     end
     
-    # Returns an array of evaluated error messages for given attribute/
+    # Returns an array of evaluated error messages for given attribute.
     def on(attribute)
       @errors[attribute].map do |message|
         eval(message.inspect.delete('\\') % attribute)

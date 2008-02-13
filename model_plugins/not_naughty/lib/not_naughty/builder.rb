@@ -3,7 +3,7 @@ module NotNaughty
   # == Builder that builds
   #
   # With this you get syntactical sugar for all descendants of Validation, see
-  # validates for details.
+  # validates for examples.
   module Builder
     
     # Observer method that creates Validation builder methods.

@@ -44,10 +44,9 @@ module NotNaughty
     #   Validation.new TempValidation, :temp, :if => :water?
     #
     # The last one also notifies all Observers of Validation (see
-    # ValidationBuilder#update). If ValidationBuilder#update is called because
-    # <Name>Validation is inherited from Validation the ValidationBuilder gets
-    # the method validates_<name>_of and so does the classes that included the
-    # Builder.
+    # Builder#update). If Builder#update is called because <Name>Validation
+    # is inherited from Validation the ValidationBuilder gets the method
+    # validates_<name>_of and so does the classes that included the Builder.
     def self.new(*params, &block)
       attributes = if params.first.is_a? Class and params.first < self
         klass = params.shift

@@ -1,4 +1,21 @@
 module NotNaughty
+  
+  # == Validates acceptance of obj's attribute against a fixed value.
+  #
+  # Unless the validation succeeds an error hash (:attribute => :message)
+  # is added to the obj's instance of Errors.
+  #
+  # <b>Options:</b>
+  # <tt>:accept</tt>::   object that that'll check via a <tt>:match</tt> call
+  # <tt>:message</tt>:: see NotNaughty::Errors for details
+  # <tt>:if</tt>::      see NotNaughty::Validation::Condition for details
+  # <tt>:unless</tt>::  see NotNaughty::Validation::Condition for details
+  #
+  # <b>Example:</b>
+  #
+  #   obj = 'abc'
+  #   def obj.errors() @errors ||= NotNauthy::Errors.new end
+  #
   class AcceptanceValidation < Validation
     
     def initialize(opts, attributes)
