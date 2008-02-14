@@ -341,6 +341,14 @@ module Sequel
           filter(*cond, &block)
         end
       end
+      
+      def grep(cols, terms)
+        conds = [];
+        cols = [cols] unless cols.is_a?(Array)
+        terms = [terms] unless terms.is_a?(Array)
+        cols.each {|c| terms.each {|t| conds << match_expr(c, t)}}
+        filter(conds.join(' OR '))
+      end
 
       # Adds a UNION clause using a second dataset object. If all is true the
       # clause used is UNION ALL, which may return duplicate rows.

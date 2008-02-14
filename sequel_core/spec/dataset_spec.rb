@@ -2698,3 +2698,48 @@ context "Dataset#all" do
     a.should == [1, 3, "SELECT * FROM items"]
   end
 end
+
+context "Dataset#grep" do
+  setup do
+    @ds = Sequel::Dataset.new(nil).from(:posts)
+  end
+  
+  specify "should format a SQL filter correctly" do
+    @ds.grep(:title, 'ruby').sql.should ==
+      "SELECT * FROM posts WHERE (title LIKE 'ruby')"
+  end
+
+  specify "should support multiple columns" do
+    @ds.grep([:title, :body], 'ruby').sql.should ==
+      "SELECT * FROM posts WHERE ((title LIKE 'ruby') OR (body LIKE 'ruby'))"
+  end
+  
+  specify "should support multiple search terms" do
+    @ds.grep(:title, ['abc', 'def']).sql.should == 
+      "SELECT * FROM posts WHERE ((title LIKE 'abc') OR (title LIKE 'def'))"
+  end
+  
+  specify "should support multiple columns and search terms" do
+    @ds.grep([:title, :body], ['abc', 'def']).sql.should ==
+      "SELECT * FROM posts WHERE ((title LIKE 'abc') OR (title LIKE 'def') OR (body LIKE 'abc') OR (body LIKE 'def'))"
+  end
+  
+  specify "should support regexps if the dataset allows it" do
+    @ds.meta_def(:match_expr) do |l, r|
+      case r
+      when String
+        "(#{literal(l)} LIKE #{literal(r)})"
+      when Regexp
+        "(#{literal(l)} =~ #{literal(r.source)})"
+      else
+        raise Sequel::Error, "Unsupported match pattern class (#{r.class})."
+      end
+    end
+    
+    @ds.grep(:title, /ruby/).sql.should ==
+      "SELECT * FROM posts WHERE (title =~ 'ruby')"
+
+    @ds.grep(:title, [/^ruby/, 'ruby']).sql.should ==
+      "SELECT * FROM posts WHERE ((title =~ '^ruby') OR (title LIKE 'ruby'))"
+  end
+end
