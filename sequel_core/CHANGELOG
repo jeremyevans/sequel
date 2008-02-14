@@ -1,6 +1,8 @@
 === SVN
 
-* Implemented Dataset#grep method.
+* Implemented Dataset#get, a replacement for select(column).first[column].
+
+* Implemented Dataset#grep method, poor man's text search.
 
 === 1.0.10 (2008-02-13)
 

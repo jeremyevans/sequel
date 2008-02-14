@@ -8,10 +8,6 @@
 
 
 
-* Find a shorter way for stuff like:
-
-  DB[:table].select(:name)[:id => @id][:name]
-
 * Database introspection. schema extraction and database dumping and copying.
 
 * Add Dataset#update_or_create:

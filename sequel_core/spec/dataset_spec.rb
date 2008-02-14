@@ -1575,7 +1575,34 @@ context "Dataset#single_value" do
   specify "should return nil" do
     @e.single_value.should be_nil
   end
+end
 
+context "Dataset#get" do
+  setup do
+    @c = Class.new(Sequel::Dataset) do
+      attr_reader :last_sql
+      
+      def fetch_rows(sql)
+        @last_sql = sql
+        yield(:name => sql)
+      end
+    end
+    
+    @d = @c.new(nil).from(:test)
+  end
+  
+  specify "should select the specified column and fetch its value" do
+    @d.get(:name).should == "SELECT name FROM test"
+    @d.get(:abc).should == "SELECT abc FROM test" # the first available value is returned always
+  end
+  
+  specify "should work with filters" do
+    @d.filter(:id => 1).get(:name).should == "SELECT name FROM test WHERE (id = 1)"
+  end
+  
+  specify "should work with aliased fields" do
+    @d.get(:x__b.as(:name)).should == "SELECT x.b AS name FROM test"
+  end
 end
 
 context "Dataset#set_row_proc" do

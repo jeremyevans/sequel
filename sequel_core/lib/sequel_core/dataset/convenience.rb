@@ -29,6 +29,10 @@ module Sequel
         each(opts) {|r| @columns = nil; return r.values.first}
         nil
       end
+      
+      def get(column)
+        select(column).single_value
+      end
 
       # Returns the first record in the dataset. If the num argument is specified,
       # an array is returned with the first <i>num</i> records.
