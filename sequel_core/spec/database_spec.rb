@@ -847,3 +847,25 @@ context "Database#inspect" do
     @db.inspect.should == '#<DummyDatabase: "blah://blahblah/blah">'
   end
 end
+
+context "Database#get" do
+  setup do
+    @c = Class.new(DummyDatabase) do
+      def dataset
+        ds = super
+        ds.meta_def(:get) {|c| @db.execute select(c).sql; c}
+        ds
+      end
+    end
+    
+    @db = @c.new
+  end
+  
+  specify "should use Dataset#get to get a single value" do
+    @db.get(1).should == 1
+    @db.sqls.last.should == 'SELECT 1'
+    
+    @db.get(:version[])
+    @db.sqls.last.should == 'SELECT version()'
+  end
+end

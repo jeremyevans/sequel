@@ -135,6 +135,17 @@ module Sequel
       (String === args.first) ? fetch(*args) : from(*args)
     end
     
+    # Returns a single value from the database, e.g.:
+    #
+    #   # SELECT 1
+    #   DB.get(1) #=> 1 
+    #
+    #   # SELECT version()
+    #   DB.get(:version[]) #=> ...
+    def get(expr)
+      dataset.get(expr)
+    end
+    
     # Raises a Sequel::Error::NotImplemented. This method is overriden in descendants.
     def execute(sql)
       raise NotImplementedError, "#execute should be overriden by adapters"

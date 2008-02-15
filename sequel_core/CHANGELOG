@@ -1,5 +1,11 @@
 === SVN
 
+* Implemented insertion of multiple records in a single statement for postgres adapter. This feature is available only in postgres 8.2 and newer.
+
+* Implemented Postgres::Database#server_version.
+
+* Implemented Database#get, short for dataset.get(...).
+
 * Refactored Dataset#multi_insert, added #import alias, added support for calling #multi_insert using array of columns and array of value arrays (thanks David Lee).
 
 * Implemented Dataset#get, a replacement for select(column).first[column].

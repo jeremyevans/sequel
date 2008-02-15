@@ -263,6 +263,17 @@ module Sequel
         end
       end
       
+      def server_version
+        @server_version ||= pool.hold do |conn|
+          if conn.respond_to?(:server_version)
+            pool.hold {|c| c.server_version}
+          else
+            get(:version[]) =~ /PostgreSQL (\d+)\.(\d+)\.(\d+)/
+            ($1.to_i * 10000) + ($2.to_i * 100) + $3.to_i
+          end
+        end
+      end
+      
       def execute_insert(sql, table, values)
         @logger.info(sql) if @logger
         @pool.hold do |conn|
@@ -429,6 +440,15 @@ module Sequel
         end
       end
       
+      def multi_insert_sql(columns, values)
+        return super if @db.server_version < 80200
+        
+        # postgresql 8.2 introduces support for insert
+        columns = literal(columns)
+        values = values.map {|r| "(#{literal(r)})"}.join(COMMA_SEPARATOR)
+        ["INSERT INTO #{@opts[:from]} (#{columns}) VALUES #{values}"]
+      end
+
       def insert(*values)
         @db.execute_insert(insert_sql(*values), @opts[:from],
           values.size == 1 ? values.first : values)

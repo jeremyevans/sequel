@@ -24,6 +24,10 @@ context "A PostgreSQL database" do
     @db.disconnect
     @db.pool.size.should == 0
   end
+  
+  specify "should provide the server version" do
+    @db.server_version.should > 70000
+  end
 end
 
 context "A PostgreSQL dataset" do
@@ -283,5 +287,34 @@ context "A PostgreSQL database" do
       
     PGSQL_DB[:posts].full_text_search(:title, 'ruby', :language => 'french').sql.should ==
       "SELECT * FROM posts WHERE (to_tsvector('french', \"title\") @@ to_tsquery('french', 'ruby'))"
+  end
+end
+
+context "Postgres::Dataset#multi_insert_sql / #import" do
+  setup do
+    @ds = PGSQL_DB[:test]
+  end
+  
+  specify "should return separate insert statements if server_version < 80200" do
+    @ds.db.meta_def(:server_version) {80199}
+    
+    @ds.multi_insert_sql([:x, :y], [[1, 2], [3, 4]]).should == [
+      'INSERT INTO test ("x", "y") VALUES (1, 2)',
+      'INSERT INTO test ("x", "y") VALUES (3, 4)'
+    ]
+  end
+  
+  specify "should a single insert statement if server_version >= 80200" do
+    @ds.db.meta_def(:server_version) {80200}
+    
+    @ds.multi_insert_sql([:x, :y], [[1, 2], [3, 4]]).should == [
+      'INSERT INTO test ("x", "y") VALUES (1, 2), (3, 4)'
+    ]
+
+    @ds.db.meta_def(:server_version) {80201}
+    
+    @ds.multi_insert_sql([:x, :y], [[1, 2], [3, 4]]).should == [
+      'INSERT INTO test ("x", "y") VALUES (1, 2), (3, 4)'
+    ]
   end
 end
