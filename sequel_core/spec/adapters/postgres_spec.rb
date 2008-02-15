@@ -246,7 +246,7 @@ context "A PostgreSQL database" do
   end
 end  
 
-context "A PostgreSSQL database" do
+context "A PostgreSQL database" do
   setup do
   end
   

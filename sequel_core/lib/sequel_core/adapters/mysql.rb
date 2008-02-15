@@ -358,33 +358,10 @@ module Sequel
         self
       end
       
-      def multi_insert_sql(keys, array)
-        values = array.map {|r| "(#{literal(keys.map {|k| r[k]})})"}.join(COMMA_SEPARATOR)
-        columns = keys.map {|c| literal(c)}.join(COMMA_SEPARATOR)
-        "INSERT INTO #{@opts[:from]} (#{columns}) VALUES #{values}"
-      end
-      
-      # Inserts multiple records into the associated table. This method can be
-      # to efficiently insert a large amounts of records into a table. Inserts
-      # are automatically wrapped in a transaction. If the :commit_every 
-      # option is specified, the method will generate a separate transaction 
-      # for each batch of records, e.g.:
-      #
-      #   dataset.multi_insert(list, :commit_every => 1000)
-      def multi_insert(list, opts = {})
-        keys = list.first.keys
-        
-        if every = (opts[:commit_every] || opts[:slice])
-          list.each_slice(every) do |s|
-            @db.transaction do
-              @db.execute(multi_insert_sql(keys, s))
-            end
-          end
-        else
-          @db.transaction do
-            @db.execute(multi_insert_sql(keys, list))
-          end
-        end
+      def multi_insert_sql(columns, values)
+        columns = literal(columns)
+        values = values.map {|r| "(#{literal(r)})"}.join(COMMA_SEPARATOR)
+        ["INSERT INTO #{@opts[:from]} (#{columns}) VALUES #{values}"]
       end
     end
   end

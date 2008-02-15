@@ -537,4 +537,19 @@ context "MySQL::Dataset#multi_insert" do
       {:name => nil, :value => 4}
     ]
   end
+  
+  specify "should support inserting using columns and values arrays" do
+    @d.multi_insert([:name, :value], [['abc', 1], ['def', 2]])
+
+    MYSQL_DB.sqls.should == [
+      'BEGIN',
+      "INSERT INTO items (`name`, `value`) VALUES ('abc', 1), ('def', 2)",
+      'COMMIT'
+    ]
+    
+    @d.all.should == [
+      {:name => 'abc', :value => 1}, 
+      {:name => 'def', :value => 2}
+    ]
+  end
 end

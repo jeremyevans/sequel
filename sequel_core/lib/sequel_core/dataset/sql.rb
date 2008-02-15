@@ -532,6 +532,19 @@ module Sequel
           end
         end
       end
+      
+      # Returns an array of insert statements for inserting multiple records.
+      # This method is used by #multi_insert to format insert statements and
+      # expects a keys array and and an array of value arrays.
+      #
+      # This method may be overriden by descendants.
+      def multi_insert_sql(columns, values)
+        table = @opts[:from]
+        columns = literal(columns)
+        values.map do |r|
+          "INSERT INTO #{table} (#{columns}) VALUES (#{literal(r)})"
+        end
+      end
 
       # Formats an UPDATE statement using the given values.
       #

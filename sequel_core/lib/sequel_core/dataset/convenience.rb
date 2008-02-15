@@ -221,29 +221,49 @@ module Sequel
         records.each {|r| csv << "#{r.join(COMMA_SEPARATOR)}\r\n"}
         csv
       end
-
+      
       # Inserts multiple records into the associated table. This method can be
       # to efficiently insert a large amounts of records into a table. Inserts
-      # are automatically wrapped in a transaction. If the :commit_every 
-      # or :slice option is specified, the method will generate a separate 
-      # transaction for each batch of records, e.g.:
+      # are automatically wrapped in a transaction.
+      # 
+      # This method can be called either with an array of hashes:
+      # 
+      #   dataset.multi_insert({:x => 1}, {:x => 2})
       #
-      #   dataset.multi_insert(list, :commit_every => 1000)
-      def multi_insert(list, opts = {})
-        if every = (opts[:commit_every] || opts[:slice])
-          list.each_slice(every) do |s|
-            @db.transaction do
-              s.each {|r| @db.execute(insert_sql(r))}
-              # @db.execute(s.map {|r| insert_sql(r)}.join)
-            end
+      # Or with a columns array and an array of value arrays:
+      #
+      #   dataset.multi_insert([:x, :y], [[1, 2], [3, 4]])
+      #
+      # The method also accepts a :slice or :commit_every option that specifies
+      # the number of records to insert per transaction. This is useful especially
+      # when inserting a large number of records, e.g.:
+      #
+      #   # this will commit every 50 records
+      #   dataset.multi_insert(lots_of_records, :slice => 50)
+      def multi_insert(*args)
+        if args[0].is_a?(Array) && args[1].is_a?(Array)
+          columns, values, opts = *args
+        else
+          # we assume that an array of hashes is given
+          hashes, opts = *args
+          columns = hashes.first.keys
+          # convert the hashes into arrays
+          values = hashes.map {|h| columns.map {|c| h[c]}}
+        end
+        
+        slice_size = opts && (opts[:commit_every] || opts[:slice])
+        
+        if slice_size
+          values.each_slice(slice_size) do |slice|
+            statements = multi_insert_sql(columns, slice)
+            @db.transaction {statements.each {|st| @db.execute(st)}}
           end
         else
-          @db.transaction do
-            # @db.execute(list.map {|r| insert_sql(r)}.join)
-            list.each {|r| @db.execute(insert_sql(r))}
-          end
+          statements = multi_insert_sql(columns, values)
+          @db.transaction {statements.each {|st| @db.execute(st)}}
         end
       end
+      alias_method :import, :multi_insert
       
       module QueryBlockCopy #:nodoc:
         def each(*args); raise Error, "#each cannot be invoked inside a query block."; end

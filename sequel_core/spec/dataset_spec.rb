@@ -2112,6 +2112,42 @@ context "Dataset#multi_insert" do
       'COMMIT'
     ]
   end
+  
+  specify "should accept a columns array and a values array" do
+    @ds.multi_insert([:x, :y], [[1, 2], [3, 4]])
+    @db.sqls.should == [
+      'BEGIN',
+      "INSERT INTO items (x, y) VALUES (1, 2)",
+      "INSERT INTO items (x, y) VALUES (3, 4)",
+      'COMMIT'
+    ]
+  end
+
+  specify "should accept a columns array and a values array with slice option" do
+    @ds.multi_insert([:x, :y], [[1, 2], [3, 4], [5, 6]], :slice => 2)
+    @db.sqls.should == [
+      'BEGIN',
+      "INSERT INTO items (x, y) VALUES (1, 2)",
+      "INSERT INTO items (x, y) VALUES (3, 4)",
+      'COMMIT',
+      'BEGIN',
+      "INSERT INTO items (x, y) VALUES (5, 6)",
+      'COMMIT'
+    ]
+  end
+  
+  specify "should be aliased by #import" do
+    @ds.import([:x, :y], [[1, 2], [3, 4], [5, 6]], :slice => 2)
+    @db.sqls.should == [
+      'BEGIN',
+      "INSERT INTO items (x, y) VALUES (1, 2)",
+      "INSERT INTO items (x, y) VALUES (3, 4)",
+      'COMMIT',
+      'BEGIN',
+      "INSERT INTO items (x, y) VALUES (5, 6)",
+      'COMMIT'
+    ]
+  end
 end
 
 context "Dataset#query" do

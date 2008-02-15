@@ -428,7 +428,7 @@ module Sequel
           end
         end
       end
-  
+      
       def insert(*values)
         @db.execute_insert(insert_sql(*values), @opts[:from],
           values.size == 1 ? values.first : values)
