@@ -621,9 +621,10 @@ module Sequel
 
       # Returns an EXISTS clause for the dataset.
       #
-      #   dataset.exists #=> "EXISTS (SELECT 1 FROM items)"
+      #   DB.select(1).where(DB[:items].exists).sql
+      #   #=> "SELECT 1 WHERE EXISTS (SELECT * FROM items)"
       def exists(opts = nil)
-        "EXISTS (#{sql({:select => [1]}.merge(opts || {}))})"
+        "EXISTS (#{select_sql(opts)})"
       end
 
       # If given an integer, the dataset will contain only the first l results.

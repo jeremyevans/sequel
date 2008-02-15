@@ -342,7 +342,7 @@ context "Dataset#where" do
   specify "should accept a subquery for an EXISTS clause" do
     a = @dataset.filter {:price < 100}
     @dataset.filter(a.exists).sql.should ==
-      'SELECT * FROM test WHERE EXISTS (SELECT 1 FROM test WHERE (price < 100))'
+      'SELECT * FROM test WHERE EXISTS (SELECT * FROM test WHERE (price < 100))'
   end
   
   specify "should accept proc expressions" do
@@ -1048,22 +1048,34 @@ context "Dataset#group_and_count" do
 end
 
 context "Dataset#empty?" do
-  specify "should return true if #count == 0" do
-    @c = Class.new(Sequel::Dataset) do
-      def count
-        0
+  specify "should return true if records exist in the dataset" do
+    @db = Sequel::Database.new
+    @db.meta_def(:execute) {|sql| puts "blah";@sqls ||=[]; @sqls << sql}
+    @db.meta_def(:sqls) {@sqls ||= []}
+    
+    $cccc = Class.new(Sequel::Dataset) do
+      def fetch_rows(sql)
+        @db.execute(sql)
+        yield(:x => 'blah')
       end
     end
-    @dataset = @c.new(nil).from(:test)
-    @dataset.empty?.should be_true
+    
+    @db.meta_def(:dataset) do
+      $cccc.new(self)
+    end
+    
+    @dataset = Sequel::Dataset.new(@db).from(:test)
+    
+    @dataset.should_not be_empty
+    @db.sqls.last.should == 'SELECT 1 WHERE EXISTS (SELECT * FROM test)'
+    
+    @db.meta_def(:dataset) do
+      ds = $cccc.new(self)
+      ds.meta_def(:get) {|c| nil}
+      ds
+    end
 
-    @c = Class.new(Sequel::Dataset) do
-      def count
-        1
-      end
-    end
-    @dataset = @c.new(nil).from(:test)
-    @dataset.empty?.should be_false
+    @dataset.should be_empty
   end
 end
 

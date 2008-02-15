@@ -8,9 +8,10 @@ module Sequel
         each {|a| block[a.to_hash]}
       end
       
-      # Returns true if the record count is 0
+      # Returns true if no records exists in the dataset
       def empty?
-        count == 0
+        db.dataset.where(exists).get(1) == nil
+        # count == 0
       end
       
       # Returns the first record in the dataset.
