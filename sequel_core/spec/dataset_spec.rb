@@ -1182,6 +1182,17 @@ context "Dataset#join_table" do
       should raise_error(Sequel::Error)
   end
 
+  specify "should support joining datasets" do
+    ds = Sequel::Dataset.new(nil).from(:categories)
+    
+    @d.join_table(:left_outer, ds, :item_id => :id).sql.should ==
+      'SELECT * FROM items LEFT OUTER JOIN (SELECT * FROM categories) t1 ON (t1.item_id = items.id)'
+      
+    ds.filter!(:active => true)
+
+    @d.join_table(:left_outer, ds, :item_id => :id).sql.should ==
+      'SELECT * FROM items LEFT OUTER JOIN (SELECT * FROM categories WHERE (active = \'t\')) t1 ON (t1.item_id = items.id)'
+  end
 end
 
 context "Dataset#[]=" do

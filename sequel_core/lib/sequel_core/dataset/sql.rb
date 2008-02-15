@@ -18,7 +18,9 @@ module Sequel
         if s =~ QUALIFIED_REGEXP
           return column
         else
-          if (table =~ ALIASED_REGEXP)
+          if table.is_a?(Dataset)
+            table = :t1
+          elsif (table =~ ALIASED_REGEXP)
             table = $2
           end
           Sequel::SQL::QualifiedColumnRef.new(table, column)
@@ -387,6 +389,9 @@ module Sequel
           k = qualified_column_name(k, table) if k.is_a?(Symbol)
           v = qualified_column_name(v, @opts[:last_joined_table] || first_source) if v.is_a?(Symbol)
           join_conditions[k] = v
+        end
+        if table.is_a?(Dataset)
+          table = "(#{table.sql}) t1"
         end
         " #{join_type} #{table} ON #{expression_list(join_conditions)}"
       end

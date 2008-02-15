@@ -1,5 +1,7 @@
 === SVN
 
+* Fixed Dataset#join_table to support joining of datasets (#156).
+
 * Changed Dataset#empty? to use EXISTS condition instead of counting records, for much better performance (#158).
 
 * Implemented insertion of multiple records in a single statement for postgres adapter. This feature is available only in postgres 8.2 and newer.
