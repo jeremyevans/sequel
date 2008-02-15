@@ -1,29 +1,76 @@
 #!/usr/bin/env ruby
 
 require 'rubygems'
+require 'optparse'
+require 'sequel' rescue nil
 require 'sequel_core'
 require 'sequel_model' rescue nil
+require 'logger'
 
-usage = <<END
-Usage: sequel <connection URI>
-Sequel: Lightweight ORM library for Ruby
+$uri = nil
+$logfile = nil
+$echo = nil
 
-Examples:
-  sequel sqlite:///blog.db
-  sequel postgres://localhost/my_blog
+opts = OptionParser.new do |opts|
+  opts.banner = "Sequel: Lightweight ORM for Ruby"
+  opts.define_head "Usage: sequel <uri> [options]"
+  opts.separator ""
+  opts.separator "Examples:"
+  opts.separator "  sequel sqlite:///blog.db"
+  opts.separator "  sequel postgres://localhost/my_blog"
+  
+  opts.separator ""
+  opts.separator "For more information see http://code.google.com/p/ruby-sequel"
+  opts.separator ""
+  opts.separator "Options:"
 
-For more information see http://code.google.com/p/ruby-sequel
-END
+  opts.on("-l", "--log logfile", "log SQL statements to log file") do |v|
+    $logfile = v
+  end
+  
+  # opts.on("-e", "--echo", "echo SQL statements") do |v|
+  #   $echo = v
+  # end
+  
+  opts.on_tail("-?", "--help", "Show this message") do
+    puts opts
+    exit
+  end
+
+  opts.on_tail("-v", "--version", "Show version") do
+    class << Gem; attr_accessor :loaded_specs; end
+    specs = Gem.loaded_specs['sequel']
+    puts "sequel #{specs.version} (#{specs.date.strftime '%Y-%m-%d'})"
+    specs = Gem.loaded_specs['sequel_core']
+    puts "sequel_core #{specs.version} (#{specs.date.strftime '%Y-%m-%d'})"
+    begin
+      specs = Gem.loaded_specs['sequel_model']
+      puts "sequel_model #{specs.version} (#{specs.date.strftime '%Y-%m-%d'})"
+    rescue
+    end
+    exit
+  end
+end
+opts.parse!
 
 db = ARGV.shift
 
-if db.nil? || db.empty?
-  puts usage
+if db.blank?
+  puts opts
   exit
 end
 
+db_opts = {}
+if $logfile
+  db_opts[:logger] = Logger.new($logfile)
+end
+if $echo
+  db_opts[:echo] = true
+end
+
 begin
-  DB = Sequel.connect db
+  puts "db_opts = #{db_opts.inspect}"
+  DB = Sequel.connect db, db_opts
 rescue => e
   puts e.message
   exit
@@ -40,3 +87,85 @@ end
 require 'irb'
 puts "Your database is stored in DB..."
 IRB.start
+
+__END__
+
+#!/usr/bin/env ruby
+
+require 'rubygems'
+require 'optparse'
+require 'bulkmail'
+
+$helo = nil
+$from = nil
+$recipients = []
+$content = nil
+$delay = 60..300
+
+opts = OptionParser.new do |opts|
+  opts.banner = "Usage: bulkmail <options>"
+  opts.define_head "Simple bulk-mailer."
+  opts.separator ""
+  opts.separator "Options:"
+
+  opts.on("-h", "--helo HOSTNAME", "HELO host name.") do |v|
+    $helo = v
+  end
+  
+  opts.on("-r", "--recipients filename", "Recipients file name") do |v|
+    $recipients = IO.readlines(v).map {|l| l =~ /(.*)(\r\n|\n)$/ ? $1 : l}.compact
+  end
+  
+  opts.on("-c", "--content filename", "Content file name") do |v|
+    $content = IO.read(v)
+  end
+  
+  opts.on("-f", "--from from", "From address") do |v|
+    $from = v
+  end
+  
+  opts.on('-n', "--nodelay", "No delay") do |v|
+    $delay = 0
+  end
+  
+  # No argument, shows at tail.  This will print an options summary.
+  # Try it and see!
+  opts.on_tail("-?", "--help", "Show this message") do
+    puts opts
+    exit
+  end
+
+  # Another typical switch to print the version.
+  opts.on_tail("-v", "--version", "Show version") do
+    class << Gem; attr_accessor :loaded_specs; end
+    specs = Gem.loaded_specs['bulkmail']
+    puts "bulkmail #{specs.version} (#{specs.date.strftime '%Y-%m-%d'})"
+    exit
+  end
+end
+
+begin
+  opts.parse! ARGV
+rescue => e
+  puts e.message
+  puts e.backtrace.first
+  exit
+end
+
+unless $content
+  puts opts
+  exit
+end
+
+trap('INT') {exit}
+
+puts "Please hold on..."
+
+sender = BulkMail::Sender.new({
+  :list => $recipients,
+  :from => $from,
+  :message => $content,
+  :helo => $helo,
+  :delay => $delay
+})
+sender.start

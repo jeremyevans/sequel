@@ -1,3 +1,7 @@
+=== SVN
+
+* Added log option, help for sequel script (#157).
+
 === 1.1 (2008-02-15)
 
 * Fixed Dataset#join_table to support joining of datasets (#156).
