@@ -1,4 +1,4 @@
-=== SVN
+=== 1.1 (2008-02-15)
 
 * Fixed Dataset#join_table to support joining of datasets (#156).
 
