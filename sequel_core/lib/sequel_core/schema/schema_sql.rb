@@ -45,6 +45,10 @@ module Sequel
         schema_utility_dataset.literal(v)
       end
       
+      def type_literal(t)
+        t.is_a?(Symbol) ? t.to_s : literal(t)
+      end
+      
       def expression_list(*args, &block)
         schema_utility_dataset.expression_list(*args, &block)
       end
@@ -53,7 +57,7 @@ module Sequel
         if column[:type] == :check
           return constraint_definition_sql(column)
         end
-        sql = "#{literal(column[:name].to_sym)} #{TYPES[column[:type]]}"
+        sql = "#{literal(column[:name].to_sym)} #{type_literal(TYPES[column[:type]])}"
         column[:size] ||= 255 if column[:type] == :varchar
         elements = column[:size] || column[:elements]
         sql << "(#{literal(elements)})" if elements

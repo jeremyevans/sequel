@@ -1,5 +1,7 @@
 === SVN
 
+* Added support for :varchar[100] like type declarations in #create_table.
+
 * Fixed #rename_column in mysql adapter to support types like varchar(255) (#159).
 
 * Added support for order and limit in DELETE statement in MySQL adapter (#160).

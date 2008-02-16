@@ -94,6 +94,13 @@ context "DB#create_table" do
     end
     @db.sqls.should == ["CREATE TABLE cats (name varchar(51))"]
   end
+  
+  specify "should accept varchar size as sql function" do
+    @db.create_table(:cats) do
+      column :name, :varchar[102]
+    end
+    @db.sqls.should == ["CREATE TABLE cats (name varchar(102))"]
+  end
 
   specify "should accept foreign keys" do
     @db.create_table(:cats) do
