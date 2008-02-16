@@ -139,11 +139,15 @@ module Sequel
       end
 
       def alter_table_sql(table, op)
+        if type = op[:type]
+          type = type.is_a?(Symbol) ? type : literal(type)
+        end
+
         case op[:op]
         when :rename_column
-          "ALTER TABLE #{table} CHANGE COLUMN #{literal(op[:name])} #{literal(op[:new_name])} #{op[:type]}"
+          "ALTER TABLE #{table} CHANGE COLUMN #{literal(op[:name])} #{literal(op[:new_name])} #{type}"
         when :set_column_type
-          "ALTER TABLE #{table} CHANGE COLUMN #{literal(op[:name])} #{literal(op[:name])} #{op[:type]}"
+          "ALTER TABLE #{table} CHANGE COLUMN #{literal(op[:name])} #{literal(op[:name])} #{type}"
         when :drop_index
           "DROP INDEX #{default_index_name(table, op[:columns])} ON #{table}"
         else

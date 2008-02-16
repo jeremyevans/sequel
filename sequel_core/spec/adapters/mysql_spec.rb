@@ -319,6 +319,17 @@ context "A MySQL database" do
     @db[:test2].first[:zyx].should == 'qqqq'
   end
   
+  specify "should support rename_column operations with types like varchar(255)" do
+    @db[:test2].delete
+    @db.add_column :test2, :tre, :text
+    @db[:test2] << {:name => 'mmm', :value => 111, :tre => 'qqqq'}
+
+    @db[:test2].columns.should == [:name, :value, :zyx, :tre]
+    @db.rename_column :test2, :tre, :ert, :type => :varchar[255]
+    @db[:test2].columns.should == [:name, :value, :zyx, :ert]
+    @db[:test2].first[:ert].should == 'qqqq'
+  end
+  
   specify "should support set_column_type operations" do
     @db.add_column :test2, :xyz, :float
     @db[:test2].delete
