@@ -371,12 +371,12 @@ rescue Exception
 end
 
 class Proc
-  # replacement for Proc#to_sexp, if it's not available
-  unless instance_methods.include?('to_sexp')
-    def to_sexp
-      block = self
-      c = Class.new {define_method(:m, &block)}
-      ParseTree.translate(c, :m)[2]
-    end
+  # replacement for Proc#to_sexp as defined in ruby2ruby.
+  # see also: http://rubyforge.org/tracker/index.php?func=detail&aid=18095&group_id=1513&atid=5921
+  # The ruby2ruby implementation leaks memory, so we fix it.
+  def to_sexp
+    block = self
+    c = Class.new {define_method(:m, &block)}
+    ParseTree.translate(c, :m)[2]
   end
 end

@@ -59,46 +59,6 @@ context "Sequelizer without Ruby2Ruby" do
   end
 end
 
-context "Proc without #to_sexp method (Ruby2Ruby missing)" do
-  setup do
-    class Proc
-      alias_method :orig_to_sexp, :to_sexp
-      remove_method :to_sexp
-    end
-    
-    module Kernel
-      alias_method :orig_sq_require, :require
-      def require(name); raise LoadError if name == 'ruby2ruby'; end
-    end
-    old_verbose = $VERBOSE
-    $VERBOSE = nil
-    load(File.join(File.dirname(__FILE__), '../lib/sequel_core/dataset/sequelizer.rb'))
-    $VERBOSE = old_verbose
-    @db = Sequel::Database.new
-    @ds = @db[:items]
-  end
-  
-  teardown do
-    module Kernel
-      alias_method :require, :orig_sq_require
-    end
-    old_verbose = $VERBOSE
-    $VERBOSE = nil
-    load(File.join(File.dirname(__FILE__), '../lib/sequel_core/dataset/sequelizer.rb'))
-    $VERBOSE = old_verbose
-    
-    class Proc
-      alias_method :to_sexp, :orig_to_sexp
-    end
-  end
-  
-  specify "should define a replacement Proc#to_sexp implementation" do
-    pr = proc {1 + 1}
-    proc {pr.to_sexp}.should_not raise_error
-    pr.to_sexp.should == [:bmethod, nil, [:call, [:lit, 1], :+, [:array, [:lit, 1]]]]
-  end
-end
-
 context "Proc#to_sql" do
   DB = Sequel::Database.new
   DS = DB[:items]

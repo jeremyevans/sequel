@@ -2,9 +2,6 @@
 
 * option echo for Database.new, adds a logger to STDOUT
 
-* enhance sequel shell utility to accept a log file parameter, -h and -v parameters.
-
-
 
 
 

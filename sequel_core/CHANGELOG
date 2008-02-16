@@ -1,5 +1,7 @@
 === SVN
 
+* Override ruby2ruby implementation of Proc#to_sexp which leaks memory (#161).
+
 * Added log option, help for sequel script (#157).
 
 === 1.1 (2008-02-15)
