@@ -242,15 +242,20 @@ module Sequel
       #   # this will commit every 50 records
       #   dataset.multi_insert(lots_of_records, :slice => 50)
       def multi_insert(*args)
-        if args[0].is_a?(Array) && args[1].is_a?(Array)
+        if args.empty?
+          return
+        elsif args[0].is_a?(Array) && args[1].is_a?(Array)
           columns, values, opts = *args
         else
           # we assume that an array of hashes is given
           hashes, opts = *args
+          return if hashes.empty?
           columns = hashes.first.keys
           # convert the hashes into arrays
           values = hashes.map {|h| columns.map {|c| h[c]}}
         end
+        # make sure there's work to do
+        return if columns.empty? || values.empty?
         
         slice_size = opts && (opts[:commit_every] || opts[:slice])
         

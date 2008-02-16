@@ -1050,7 +1050,7 @@ end
 context "Dataset#empty?" do
   specify "should return true if records exist in the dataset" do
     @db = Sequel::Database.new
-    @db.meta_def(:execute) {|sql| puts "blah";@sqls ||=[]; @sqls << sql}
+    @db.meta_def(:execute) {|sql| @sqls ||=[]; @sqls << sql}
     @db.meta_def(:sqls) {@sqls ||= []}
     
     $cccc = Class.new(Sequel::Dataset) do
@@ -2171,6 +2171,35 @@ context "Dataset#multi_insert" do
       'COMMIT'
     ]
   end
+
+  specify "should not do anything if no columns or values are given" do
+    @ds.multi_insert
+    @db.sqls.should be_nil
+    
+    @ds.multi_insert([])
+    @db.sqls.should be_nil
+    
+    @ds.multi_insert([], [])
+    @db.sqls.should be_nil
+
+    @ds.multi_insert([{}, {}])
+    @db.sqls.should be_nil
+    
+    @ds.multi_insert([:a, :b], [])
+    @db.sqls.should be_nil
+    
+    @ds.multi_insert([:x, :y], [[1, 2], [3, 4], [5, 6]], :slice => 2)
+    @db.sqls.should == [
+      'BEGIN',
+      "INSERT INTO items (x, y) VALUES (1, 2)",
+      "INSERT INTO items (x, y) VALUES (3, 4)",
+      'COMMIT',
+      'BEGIN',
+      "INSERT INTO items (x, y) VALUES (5, 6)",
+      'COMMIT'
+    ]
+  end
+  
 end
 
 context "Dataset#query" do

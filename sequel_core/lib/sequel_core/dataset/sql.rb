@@ -550,7 +550,7 @@ module Sequel
           "INSERT INTO #{table} (#{columns}) VALUES (#{literal(r)})"
         end
       end
-
+      
       # Formats an UPDATE statement using the given values.
       #
       #   dataset.update_sql(:price => 100, :category => 'software') #=>
