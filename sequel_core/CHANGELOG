@@ -1,5 +1,7 @@
 === SVN
 
+* Added support for order and limit in DELETE statement in MySQL adapter (#160).
+
 * Added checks to Dataset#multi_insert to prevent work if no values are given (#162).
 
 * Override ruby2ruby implementation of Proc#to_sexp which leaks memory (#161).

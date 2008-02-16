@@ -316,13 +316,26 @@ module Sequel
       # MySQL supports ORDER and LIMIT clauses in UPDATE statements.
       def update_sql(values, opts = nil)
         sql = super
-
         opts = opts ? @opts.merge(opts) : @opts
 
         if order = opts[:order]
           sql << " ORDER BY #{column_list(order)}"
         end
+        if limit = opts[:limit]
+          sql << " LIMIT #{limit}"
+        end
 
+        sql
+      end
+      
+      # MySQL supports ORDER and LIMIT clauses in DELETE statements.
+      def delete_sql(opts = nil)
+        sql = super
+        opts = opts ? @opts.merge(opts) : @opts
+
+        if order = opts[:order]
+          sql << " ORDER BY #{column_list(order)}"
+        end
         if limit = opts[:limit]
           sql << " LIMIT #{limit}"
         end
