@@ -1,3 +1,7 @@
+=== SVN
+
+* Implemented MySQL::Dataset#replace (#163).
+
 === 1.2 (2008-02-15)
 
 * Added support for :varchar[100] like type declarations in #create_table.

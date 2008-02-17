@@ -314,7 +314,7 @@ module Sequel
       end
 
       # MySQL supports ORDER and LIMIT clauses in UPDATE statements.
-      def update_sql(values, opts = nil)
+      def update_sql(values, opts = nil, &block)
         sql = super
         opts = opts ? @opts.merge(opts) : @opts
 
@@ -326,6 +326,42 @@ module Sequel
         end
 
         sql
+      end
+      
+      def replace_sql(*values)
+        if values.empty?
+          "REPLACE INTO #{@opts[:from]} DEFAULT VALUES"
+        else
+          values = values[0] if values.size == 1
+          case values
+          when Sequel::Model
+            insert_sql(values.values)
+          when Array
+            if values.empty?
+              "REPLACE INTO #{@opts[:from]} DEFAULT VALUES"
+            elsif values.keys
+              fl = values.keys.map {|f| literal(f.is_a?(String) ? f.to_sym : f)}
+              vl = @transform ? transform_save(values.values) : values.values
+              vl.map! {|v| literal(v)}
+              "REPLACE INTO #{@opts[:from]} (#{fl.join(COMMA_SEPARATOR)}) VALUES (#{vl.join(COMMA_SEPARATOR)})"
+            else
+              "REPLACE INTO #{@opts[:from]} VALUES (#{literal(values)})"
+            end
+          when Hash
+            values = transform_save(values) if @transform
+            if values.empty?
+              "REPLACE INTO #{@opts[:from]} DEFAULT VALUES"
+            else
+              fl, vl = [], []
+              values.each {|k, v| fl << literal(k.is_a?(String) ? k.to_sym : k); vl << literal(v)}
+              "REPLACE INTO #{@opts[:from]} (#{fl.join(COMMA_SEPARATOR)}) VALUES (#{vl.join(COMMA_SEPARATOR)})"
+            end
+          when Dataset
+            "REPLACE INTO #{@opts[:from]} #{literal(values)}"
+          else
+            "REPLACE INTO #{@opts[:from]} VALUES (#{literal(values)})"
+          end
+        end
       end
       
       # MySQL supports ORDER and LIMIT clauses in DELETE statements.
@@ -350,7 +386,11 @@ module Sequel
       def update(*args, &block)
         @db.execute(update_sql(*args, &block)) {|c| c.affected_rows}
       end
-
+      
+      def replace(*args)
+        @db.execute(replace_sql(*args)) {|c| c.insert_id}
+      end
+      
       def delete(opts = nil)
         @db.execute(delete_sql(opts)) {|c| c.affected_rows}
       end

@@ -564,3 +564,27 @@ context "MySQL::Dataset#multi_insert" do
     ]
   end
 end
+
+context "MySQL::Dataset#replace" do
+  setup do
+    MYSQL_DB.drop_table(:items) if MYSQL_DB.table_exists?(:items)
+    MYSQL_DB.create_table :items do
+      integer :id, :unique => true
+      integer :value, :index => true
+    end
+    @d = MYSQL_DB[:items]
+    MYSQL_DB.sqls.clear
+  end
+  
+  specify "should create a record if the condition is not met" do
+    @d.replace(:id => 111, :value => 333)
+    @d.all.should == [{:id => 111, :value => 333}]
+  end
+  
+  specify "should update a record if the condition is met" do
+    @d << {:id => 111}
+    @d.all.should == [{:id => 111, :value => nil}]
+    @d.replace(:id => 111, :value => 333)
+    @d.all.should == [{:id => 111, :value => 333}]
+  end
+end
