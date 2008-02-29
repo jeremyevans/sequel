@@ -854,6 +854,11 @@ context "Dataset#reverse_order" do
     @dataset.order(:clumsy.DESC, :fool).reverse_order.sql.should ==
       'SELECT * FROM test ORDER BY clumsy, fool DESC'
   end
+  
+  specify "should have #reverse alias" do
+    @dataset.order(:name).reverse.sql.should ==
+      'SELECT * FROM test ORDER BY name DESC'
+  end
 end
 
 context "Dataset#limit" do

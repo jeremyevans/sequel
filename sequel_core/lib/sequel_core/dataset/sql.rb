@@ -214,6 +214,7 @@ module Sequel
       def reverse_order(*order)
         order(*invert_order(order.empty? ? @opts[:order] : order))
       end
+      alias_method :reverse, :reverse_order
 
       # Inverts the given order by breaking it into a list of column references
       # and inverting them.

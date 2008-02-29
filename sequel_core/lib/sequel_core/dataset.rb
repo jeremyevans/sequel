@@ -70,7 +70,7 @@ module Sequel
     include SQL
     include Convenience
     
-    attr_reader :db
+    attr_accessor :db
     attr_accessor :opts
     
     alias_method :size, :count

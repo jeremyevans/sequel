@@ -1,5 +1,7 @@
 === SVN
 
+* Added Dataset#reverse alias to Dataset#reverse_order (#174).
+
 * Fixed Dataset#transform_load and #transform_save to create a trasnformed copy of the supplied hash instead of transforming it in place (#184).
 
 * Implemented MySQL::Dataset#replace (#163).
