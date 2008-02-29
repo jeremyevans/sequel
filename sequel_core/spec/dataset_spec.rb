@@ -2184,6 +2184,17 @@ context "Dataset#multi_insert" do
     ]
   end
 
+  specify "should accept a columns array and a dataset" do
+    @ds2 = Sequel::Dataset.new(@db).from(:cats).filter(:purr => true).select(:a, :b)
+    
+    @ds.multi_insert([:x, :y], @ds2)
+    @db.sqls.should == [
+      'BEGIN',
+      "INSERT INTO items (x, y) VALUES (SELECT a, b FROM cats WHERE (purr = 't'))",
+      'COMMIT'
+    ]
+  end
+
   specify "should accept a columns array and a values array with slice option" do
     @ds.multi_insert([:x, :y], [[1, 2], [3, 4], [5, 6]], :slice => 2)
     @db.sqls.should == [

@@ -1,5 +1,7 @@
 === SVN
 
+* Enhanced Dataset#multi_insert to accept datasets (#179).
+
 * Added MySQL::Database#use method for switching database (#180).
 
 * Enhanced Database.uri_to_options to accept uri strings (#178).

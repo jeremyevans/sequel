@@ -545,7 +545,7 @@ module Sequel
       #
       # This method may be overriden by descendants.
       def multi_insert_sql(columns, values)
-        table = @opts[:from]
+        table = @opts[:from].first
         columns = literal(columns)
         values.map do |r|
           "INSERT INTO #{table} (#{columns}) VALUES (#{literal(r)})"
