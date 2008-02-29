@@ -20,11 +20,9 @@ module Sequel
       @db = db if (self == Model) && !@db
     end
     
-    NAMESPACE_EXCLUSIVE_REGEXP = /([^:]+)$/.freeze
-    
     # Returns the implicit table name for the model class.
     def self.implicit_table_name
-      name[NAMESPACE_EXCLUSIVE_REGEXP].underscore.pluralize.to_sym
+      name.demodulize.underscore.pluralize.to_sym
     end
 
     # Returns the dataset associated with the Model class.

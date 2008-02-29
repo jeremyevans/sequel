@@ -76,7 +76,7 @@ module Sequel
     def self.one_to_many(name, opts)
       from = opts[:from]
       from || (raise Error, "No association source defined (use :from option)")
-      key = opts[:key] || (self.to_s + ID_POSTFIX).to_sym
+      key = opts[:key] || (self.name.demodulize.underscore.to_s + ID_POSTFIX).to_sym
       
       case from
       when Symbol

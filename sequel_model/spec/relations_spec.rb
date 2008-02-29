@@ -133,4 +133,17 @@ describe Sequel::Model, "one_to_many" do
     a.should be_a_kind_of(Sequel::Dataset)
     a.sql.should == 'SELECT * FROM abc WHERE (node_id = 1234)'
   end
+  
+  it "should support implicit key names" do
+    module Music
+      class BlueNote < Sequel::Model
+        one_to_many :attributes, :from => :abc
+      end
+    end
+    
+    n = Music::BlueNote.new(:id => 1234)
+    a = n.attributes
+    a.should be_a_kind_of(Sequel::Dataset)
+    a.sql.should == 'SELECT * FROM abc WHERE (blue_note_id = 1234)'
+  end
 end

@@ -1,5 +1,7 @@
 === SVN
 
+* Fixed one_to_many implicit key to work correctly for namespaced classes (#167).
+
 * Fixed Model.db= to affect the underlying dataset (#183).
 
 * Fixed Model.implicit_table_name to disregard namespaces.
