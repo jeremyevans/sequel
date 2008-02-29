@@ -1,4 +1,4 @@
-=== SVN
+=== 0.4.2 (2008-02-29)
 
 * Fixed one_to_many implicit key to work correctly for namespaced classes (#167).
 
