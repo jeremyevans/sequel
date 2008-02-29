@@ -204,6 +204,14 @@ module Sequel
           end
         end
       end
+
+      # Changes the database in use by issuing a USE statement.
+      def use(db_name, opts = {})
+        disconnect
+        @opts[:database] = db_name
+        self << "USE #{db_name}"
+        self
+      end
     end
 
     class Dataset < Sequel::Dataset

@@ -1,5 +1,7 @@
 === SVN
 
+* Added MySQL::Database#use method for switching database (#180).
+
 * Enhanced Database.uri_to_options to accept uri strings (#178).
 
 * Added Dataset#columns! method that always makes a roundtrip to the DB (#177).
