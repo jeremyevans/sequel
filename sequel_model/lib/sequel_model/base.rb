@@ -8,8 +8,10 @@ module Sequel
     
     # Sets the database associated with the Model class.
     def self.db=(db)
-      @dataset.db = db if @dataset
       @db = db
+      if @dataset
+        set_dataset(db[table_name])
+      end
     end
     
     # Called when a database is opened in order to automatically associate the
