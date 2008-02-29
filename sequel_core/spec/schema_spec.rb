@@ -279,3 +279,30 @@ context "DB#drop_table" do
     @db.sqls.should == ['DROP TABLE cats']
   end
 end
+
+context "DB#alter_table" do
+  setup do
+    @db = SchemaDummyDatabase.new
+  end
+
+  specify "should accept add constraint definitions" do
+    @db.alter_table(:cats) do
+      add_constraint :valid_score, 'score <= 100'
+    end
+    @db.sqls.should == ["ALTER TABLE cats ADD CONSTRAINT valid_score CHECK (score <= 100)"]
+    @db.sqls.clear
+
+    @db.alter_table(:cats) do
+      add_constraint(:blah_blah) {:x > 0 && :y < 1}
+    end
+    @db.sqls.should == ["ALTER TABLE cats ADD CONSTRAINT blah_blah CHECK (((x > 0) AND (y < 1)))"]
+  end
+
+  specify "should accept drop constraint definitions" do
+    @db.alter_table(:cats) do
+      drop_constraint :valid_score
+    end
+    @db.sqls.should == ["ALTER TABLE cats DROP CONSTRAINT valid_score"]
+  end
+
+end

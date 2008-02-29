@@ -147,6 +147,22 @@ module Sequel
           :columns => columns \
         }
       end
+
+      def add_constraint(name, *args, &block)
+        @operations << { \
+          :op => :add_constraint, \
+          :name => name, \
+          :type => :check, \
+          :check => block || args \
+        }
+      end
+
+      def drop_constraint(name)
+        @operations << { \
+          :op => :drop_constraint, \
+          :name => name \
+        }
+      end
     end
   end
 end

@@ -143,6 +143,10 @@ module Sequel
           index_definition_sql(table, op)
         when :drop_index
           "DROP INDEX #{default_index_name(table, op[:columns])}"
+        when :add_constraint
+          "ALTER TABLE #{table} ADD #{constraint_definition_sql(op)}"
+        when :drop_constraint
+          "ALTER TABLE #{table} DROP CONSTRAINT #{literal(op[:name])}"
         else
           raise Error, "Unsupported ALTER TABLE operation"
         end

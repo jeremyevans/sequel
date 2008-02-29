@@ -1,5 +1,7 @@
 === SVN
 
+* Added add_constraint and drop_constraint functionality to Database#alter_table (#182).
+
 * Enhanced Dataset#multi_insert to accept datasets (#179).
 
 * Added MySQL::Database#use method for switching database (#180).

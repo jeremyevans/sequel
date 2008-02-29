@@ -82,6 +82,8 @@ describe Sequel::Schema::AlterTableGenerator do
       add_index [:fff, :ggg]
       drop_index :hhh
       add_full_text_index :blah
+      add_constraint :con1, ':fred > 100'
+      drop_constraint :con2
     end
   end
   
@@ -94,7 +96,9 @@ describe Sequel::Schema::AlterTableGenerator do
       {:op => :set_column_default, :name => :eee, :default => 1},
       {:op => :add_index, :columns => [:fff, :ggg]},
       {:op => :drop_index, :columns => [:hhh]},
-      {:op => :add_index, :columns => [:blah], :full_text => true}
+      {:op => :add_index, :columns => [:blah], :full_text => true},
+      {:op => :add_constraint, :type => :check, :name => :con1, :check => [':fred > 100']},
+      {:op => :drop_constraint, :name => :con2}
     ]
   end
 end
