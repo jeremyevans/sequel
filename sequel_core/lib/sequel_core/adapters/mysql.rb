@@ -206,7 +206,7 @@ module Sequel
       end
 
       # Changes the database in use by issuing a USE statement.
-      def use(db_name, opts = {})
+      def use(db_name)
         disconnect
         @opts[:database] = db_name
         self << "USE #{db_name}"
