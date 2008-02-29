@@ -62,7 +62,7 @@ module ArrayKeys
     # Converts the array into a hash.
     def to_hash
       h = {}
-      each_with_index {|v, i| h[@keys[i].to_sym] = v}
+      each_with_index {|v, i| h[(k = @keys[i]) ? k.to_sym : nil] = v}
       h
     end
     alias_method :to_h, :to_hash
@@ -238,6 +238,23 @@ module ArrayKeys
         end
       end
     end
+
+    def array_tuples_transform_load(r)
+      a = []; a.keys = []
+      r.each_pair do |k, v|
+        a[k] = (tt = @transform[k]) ? tt[0][v] : v
+      end
+      a
+    end
+    
+    # Applies the value transform for data saved to the database.
+    def array_tuples_transform_save(r)
+      a = []; a.keys = []
+      r.each_pair do |k, v|
+        a[k] = (tt = @transform[k]) ? tt[1][v] : v
+      end
+      a
+    end
   end
 end
 
@@ -266,9 +283,13 @@ module Sequel
         else
           alias_method :orig_each, :each
           alias_method :orig_update_each_method, :update_each_method
+          
           include ArrayKeys::DatasetExtensions
           alias_method :each, :array_tuples_each
           alias_method :update_each_method, :array_tuples_update_each_method
+
+          alias_method :transform_load, :array_tuples_transform_load
+          alias_method :transform_save, :array_tuples_transform_save
         end
       end
     end

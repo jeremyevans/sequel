@@ -1,5 +1,7 @@
 === SVN
 
+* Fixed Dataset#transform_load and #transform_save to create a trasnformed copy of the supplied hash instead of transforming it in place (#184).
+
 * Implemented MySQL::Dataset#replace (#163).
 
 === 1.2 (2008-02-15)

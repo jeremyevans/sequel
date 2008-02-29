@@ -2385,6 +2385,12 @@ context "Dataset#transform" do
     @ds.each(:naked => true) {|r| f = r}
     f.should == {:x => "wow", :y => 'hello'}
   end
+  
+  specify "should leave the supplied values intact" do
+    h = {:x => :toast}
+    @ds.insert(h)
+    h.should == {:x => :toast}
+  end
 end
 
 context "Dataset#transform" do

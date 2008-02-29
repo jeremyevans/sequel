@@ -552,6 +552,9 @@ context "Sequel.use_array_tuples" do
     a[:b].should == 2
     a[:c].should == 3
     a[:d].should == nil
+    
+    b = [12]; b.keys = [:a]
+    @ds.insert_sql(b).should == "INSERT INTO items (a) VALUES (2)"
   end
   
   specify "should work correctly with dataset with model" do
