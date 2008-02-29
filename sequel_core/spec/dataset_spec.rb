@@ -2030,6 +2030,24 @@ context "A paginated dataset" do
   end
 end
 
+context "Dataset#each_page" do
+  setup do
+    @d = Sequel::Dataset.new(nil).from(:items)
+    @d.meta_def(:count) {153}
+  end
+  
+  specify "should iterate over each page in the resultset as a paginated dataset" do
+    a = []
+    @d.each_page(50) {|p| a << p}
+    a.map {|p| p.sql}.should == [
+      'SELECT * FROM items LIMIT 50 OFFSET 0',
+      'SELECT * FROM items LIMIT 50 OFFSET 50',
+      'SELECT * FROM items LIMIT 50 OFFSET 100',
+      'SELECT * FROM items LIMIT 50 OFFSET 150',
+    ]
+  end
+end
+
 context "Dataset#columns" do
   setup do
     @dataset = DummyDataset.new(nil).from(:items)

@@ -123,6 +123,19 @@ module Sequel
         @pagination_record_count = record_count
         @page_count = (record_count / page_size.to_f).ceil
       end
+      
+      def each_page(page_size)
+        record_count = count
+        total_pages = (record_count / page_size.to_f).ceil
+        
+        (1..total_pages).each do |page_no|
+          paginated = limit(page_size, (page_no - 1) * page_size)
+          paginated.set_pagination_info(page_no, page_size, record_count)
+          yield paginated
+        end
+        
+        self
+      end
 
       attr_accessor :page_size, :page_count, :current_page, :pagination_record_count
 
