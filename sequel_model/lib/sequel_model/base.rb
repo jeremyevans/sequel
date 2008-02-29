@@ -8,6 +8,7 @@ module Sequel
     
     # Sets the database associated with the Model class.
     def self.db=(db)
+      @dataset.db = db if @dataset
       @db = db
     end
     

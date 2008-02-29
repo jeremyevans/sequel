@@ -80,8 +80,8 @@ describe "Model#serialize" do
     @c.create(:abc => "hello")
 
     MODEL_DB.sqls.should == [ \
-      "INSERT INTO items (abc) VALUES ('\004\bi\006')", \
-      "INSERT INTO items (abc) VALUES ('\004\b\"\nhello')", \
+      "INSERT INTO items (abc) VALUES ('BAhpBg==\n')", \
+      "INSERT INTO items (abc) VALUES ('BAgiCmhlbGxv\n')", \
     ]
   end
 
@@ -218,3 +218,22 @@ describe "A model inheriting from a model" do
     Leopard.dataset.model_classes.should == {nil => Leopard}
   end
 end
+
+describe "Model.db=" do
+  setup do
+    $db1 = Sequel::Database.new
+    $db2 = Sequel::Database.new
+    
+    class BlueBlue < Sequel::Model
+      set_dataset $db1[:blue]
+    end
+  end
+  
+  specify "should affect the underlying dataset" do
+    BlueBlue.db = $db2
+    
+    BlueBlue.dataset.db.should === $db2
+    BlueBlue.dataset.db.should_not === $db1
+  end
+end
+

@@ -1,5 +1,7 @@
 === SVN
 
+* Fixed Model.db= to affect the underlying dataset (#183).
+
 * Fixed Model.implicit_table_name to disregard namespaces.
 
 === 0.4.1 (2008-02-10)
