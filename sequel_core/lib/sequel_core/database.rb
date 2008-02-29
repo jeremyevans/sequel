@@ -379,6 +379,9 @@ module Sequel
     # Converts a uri to an options hash. These options are then passed
     # to a newly created database object.
     def self.uri_to_options(uri)
+      if uri.is_a?(String)
+        uri = URI.parse(uri)
+      end
       {
         :user => uri.user,
         :password => uri.password,

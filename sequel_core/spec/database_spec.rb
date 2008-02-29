@@ -579,6 +579,15 @@ context "Database#uri_to_options" do
     h[:port].should == 1234
     h[:database].should == 'blah'
   end
+
+  specify "should accept a string and convert it to an options hash" do
+    h = Sequel::Database.uri_to_options('ttt://uuu:ppp@192.168.60.1:1234/blah')
+    h[:user].should == 'uuu'
+    h[:password].should == 'ppp'
+    h[:host].should == '192.168.60.1'
+    h[:port].should == 1234
+    h[:database].should == 'blah'
+  end
 end
 
 context "A single threaded database" do
