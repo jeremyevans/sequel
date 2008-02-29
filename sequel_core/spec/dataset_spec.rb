@@ -2068,6 +2068,21 @@ context "Dataset#columns" do
   end
 end
 
+context "Dataset#columns!" do
+  setup do
+    @dataset = DummyDataset.new(nil).from(:items)
+    @dataset.meta_def(:columns=) {|c| @columns = c}
+    @dataset.meta_def(:first) {@columns = select_sql(nil)}
+  end
+  
+  specify "should always call first" do
+    @dataset.columns = nil
+    @dataset.columns!.should == 'SELECT * FROM items'
+    @dataset.opts[:from] = [:nana]
+    @dataset.columns!.should == 'SELECT * FROM nana'
+  end
+end
+
 require 'stringio'
 
 context "Dataset#print" do

@@ -159,6 +159,11 @@ module Sequel
       @columns || []
     end
     
+    def columns!
+      first
+      @columns || []
+    end
+    
     # Inserts the supplied values into the associated table.
     def <<(*args)
       insert(*args)
