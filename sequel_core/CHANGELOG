@@ -1,3 +1,7 @@
+=== SVN
+
+* Fixed Symbol#method_missing to accept variable arity (#185).
+
 === 1.2.1 (2008-02-29)
 
 * Added add_constraint and drop_constraint functionality to Database#alter_table (#182).

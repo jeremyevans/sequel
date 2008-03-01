@@ -189,7 +189,7 @@ class Symbol
   
   # Converts missing method calls into functions on columns, if the
   # method name is made of all upper case letters.
-  def method_missing(sym)
+  def method_missing(sym, *args)
     if ((s = sym.to_s) =~ /^([A-Z]+)$/)
       Sequel::SQL::Function.new(s.downcase, self)
     else

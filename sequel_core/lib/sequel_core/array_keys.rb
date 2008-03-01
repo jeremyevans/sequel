@@ -190,8 +190,7 @@ module ArrayKeys
   # The DatasetExtensions module provides extensions that modify
   # a dataset to return Array tuples instead of Hash tuples.
   module DatasetExtensions
-    # Fetches a dataset's records, converting each tuple into an array with 
-    # keys.
+    # Fetches a dataset's records, converting each tuple into an array with keys.
     def array_tuples_each(opts = nil, &block)
       fetch_rows(select_sql(opts)) {|h| block[Array.from_hash(h)]}
     end
