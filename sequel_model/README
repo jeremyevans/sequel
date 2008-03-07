@@ -1,6 +1,6 @@
-== Sequel: Concise ORM for Ruby
+== Sequel: The Database Toolkit for Ruby
 
-Sequel is an ORM framework for Ruby. Sequel provides thread safety, connection pooling, and a concise DSL for constructing queries and table schemas.
+Sequel is a database access toolkit for Ruby. Sequel provides thread safety, connection pooling, and a concise DSL for constructing queries and table schemas.
 
 Sequel makes it easy to deal with multiple records without having to break your teeth on SQL.
 
@@ -49,7 +49,7 @@ You get an IRB session with the database object stored in DB.
 
 == An Introduction
 
-Sequel was designed to take the hassle away from connecting to databases and manipulating them. Sequel deals with all the boring stuff like maintaining connections, formatting SQL correctly and fetching records so you can concentrate on your application.
+Sequel is designed to take the hassle away from connecting to databases and manipulating them. Sequel deals with all the boring stuff like maintaining connections, formatting SQL correctly and fetching records so you can concentrate on your application.
 
 Sequel uses the concept of datasets to retrieve data. A Dataset object encapsulates an SQL query and supports chainability, letting you fetch data using a convenient Ruby DSL that is both concise and infinitely flexible.
 

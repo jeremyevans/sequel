@@ -1,3 +1,29 @@
+=== SVN
+
+* Merged new associations branch into trunk.
+
+* Rewrote RDoc for associations.
+
+* Added has_and_belongs_to_many alias for many_to_many.
+
+* Added support for optional dataset block.
+
+* Added :order option to order association datasets.
+
+* Added :cache option to return and cache array of objects for association.
+
+* Changed one_to_many, many_to_many associations to return dataset by default.
+
+* Added has_many, belongs_to aliases.
+
+* Refactored associations code.
+
+* Added deprecations for old-style relations.
+
+* Completed specs for new associations code.
+
+* New associations code by Jeremy Evans (replaces relations code.)
+
 === 0.4.2 (2008-02-29)
 
 * Fixed one_to_many implicit key to work correctly for namespaced classes (#167).

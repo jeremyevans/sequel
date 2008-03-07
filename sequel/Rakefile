@@ -29,7 +29,7 @@ task :package => [:clean]
 
 RDOC_OPTS = [
   "--quiet", 
-  "--title", "Sequel Model: Lightweight ORM for Ruby",
+  "--title", "Sequel Model: The Database Toolkit for Ruby",
   "--opname", "index.html",
   "--line-numbers", 
   "--main", "README",

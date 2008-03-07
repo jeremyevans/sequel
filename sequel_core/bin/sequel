@@ -12,7 +12,7 @@ $logfile = nil
 $echo = nil
 
 opts = OptionParser.new do |opts|
-  opts.banner = "Sequel: Lightweight ORM for Ruby"
+  opts.banner = "Sequel: The Database Toolkit for Ruby"
   opts.define_head "Usage: sequel <uri> [options]"
   opts.separator ""
   opts.separator "Examples:"

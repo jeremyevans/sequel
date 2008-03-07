@@ -2,15 +2,15 @@ module Sequel
   class Model
     attr_reader :values
     attr_reader :changed_columns
-
+    
     # Returns value of attribute.
     def [](column)
       @values[column]
     end
     # Sets value of attribute and marks the column as changed.
     def []=(column, value)
-      @values[column] = value
       @changed_columns << column unless @changed_columns.include?(column)
+      @values[column] = value
     end
 
     # Enumerates through all attributes.

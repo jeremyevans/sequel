@@ -67,7 +67,7 @@ end
 ##############################################################################
 RDOC_OPTS = [
   "--quiet", 
-  "--title", "Sequel Model: Lightweight ORM for Ruby",
+  "--title", "Sequel: The Database Toolkit for Ruby",
   "--opname", "index.html",
   "--line-numbers", 
   "--main", "sequel/README",
@@ -80,7 +80,7 @@ Rake::RDocTask.new do |rdoc|
   rdoc.rdoc_dir = "sequel/doc/rdoc"
   rdoc.options += RDOC_OPTS
   rdoc.main = "sequel/README"
-  rdoc.title = "Sequel: Lightweight ORM for Ruby"
+  rdoc.title = "Sequel: The Database Toolkit for Ruby"
   rdoc.template = ALLISON_TEMPLATE if File.exists?(ALLISON_TEMPLATE)
   rdoc.rdoc_files.add ["sequel/README", "sequel/COPYING", 
     "sequel_core/lib/sequel_core.rb", "sequel_core/lib/**/*.rb",

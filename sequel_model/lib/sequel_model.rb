@@ -6,7 +6,7 @@ end
 
 # TODO: add relationships when complete:
 files = %w[
-  base hooks record schema relations 
+  base hooks record schema associations 
   caching plugins validations
 ]
 dir = File.join(File.dirname(__FILE__), "sequel_model")
@@ -136,11 +136,28 @@ module Sequel
   #   Post.filter(:category => 32).delete #=> bypasses hooks
   #   Post.filter(:category => 32).destroy #=> runs hooks
   # 
-  # Please note that if Model.destroy is called, each record is deleted separately, but Model.delete deletes all relevant records with a single SQL statement.
+  # Please note that if Model.destroy is called, each record is deleted 
+  # separately, but Model.delete deletes all relevant records with a single 
+  # SQL statement.
   # 
   # === Associations
   # 
-  # The most straightforward way to define an association in a Sequel model is as a regular instance method:
+  # Sequel provides macros for the three most common types of associations: 
+  # many_to_one, one_to_many and many_to_many (equivalent to ActiveRecord's
+  # belongs_to, has_many and has_and_belongs_to_many).
+  # 
+  # Associations are defined in similar fashion to ActiveRecord:
+  #
+  #   class Post < Sequel::Model
+  #     belongs_to :author
+  #   end
+  #
+  #   class Author < Sequel::Model
+  #     has_many :posts
+  #   end
+  # 
+  # Another way to define an association in a Sequel model is as a regular
+  # instance method:
   # 
   #   class Post < Sequel::Model
   #     def author; Author[author_id]; end
@@ -149,23 +166,6 @@ module Sequel
   #   class Author < Sequel::Model
   #     def posts; Post.filter(:author_id => pk); end
   #   end
-  # 
-  # Sequel also provides two macros to assist with common types of associations. The one_to_one macro is roughly equivalent to ActiveRecord?'s belongs_to macro. It defines both getter and setter methods for the association:
-  # 
-  #   class Post < Sequel::Model
-  #     one_to_one :author, :from => Author
-  #   end
-  #
-  #   post = Post.create(:name => 'hi!')
-  #   post.author = Author[:name => 'Sharon']
-  # 
-  # The one_to_many macro is roughly equivalent to ActiveRecord's has_many macro:
-  # 
-  #   class Author < Sequel::Model
-  #     one_to_many :posts, :from => Post, :key => :author_id
-  #   end
-  # 
-  # You will have noticed that in some cases the association macros are actually more verbose than hand-coding instance methods. The one_to_one and one_to_many macros also make assumptions (just like ActiveRecord macros) about the database schema which may not be relevant in many cases.
   # 
   # === Caching model instances with memcached
   # 
@@ -239,6 +239,7 @@ module Sequel
   #   Post.create_table! # drops the table if it exists and then recreates it
   # 
   class Model
+    extend Associations
     # Returns a string representation of the model instance including
     # the class name and values.
     def inspect

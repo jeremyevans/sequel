@@ -13,6 +13,10 @@ class MockDataset < Sequel::Dataset
     @db.execute update_sql(*args)
   end
   
+  def delete(*args)
+    @db.execute delete_sql(*args)
+  end
+  
   def fetch_rows(sql)
     @db.execute(sql)
     yield({:id => 1, :x => 1})
