@@ -279,8 +279,8 @@ module Sequel
     #
     #   DB.drop_index :posts, :title
     #   DB.drop_index :posts, [:author, :title]
-    def drop_index(table, *args)
-      alter_table(table) {drop_index(*args)}
+    def drop_index(table, columns)
+      alter_table(table) {drop_index(columns)}
     end
     
     # Returns true if the given table exists.

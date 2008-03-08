@@ -1,5 +1,7 @@
 === SVN
 
+* Changed Database#drop_index to accept fixed arity (#173).
+
 * Changed column definition sql to put UNSIGNED constraint before unique in order to satisfy MySQL (#171).
 
 * Enhanced MySQL adapter to support load data local infile_, added compress option for mysql connection by default (#172).
