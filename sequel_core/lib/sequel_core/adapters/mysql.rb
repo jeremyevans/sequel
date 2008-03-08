@@ -163,10 +163,10 @@ module Sequel
         column[:size] ||= 255 if column[:type] == :varchar
         elements = column[:size] || column[:elements]
         sql << "(#{literal(elements)})" if elements
+        sql << UNSIGNED if column[:unsigned]
         sql << UNIQUE if column[:unique]
         sql << NOT_NULL if column[:null] == false
         sql << NULL if column[:null] == true
-        sql << UNSIGNED if column[:unsigned]
         sql << " DEFAULT #{literal(column[:default])}" if column.include?(:default)
         sql << PRIMARY_KEY if column[:primary_key]
         sql << " #{auto_increment_sql}" if column[:auto_increment]
