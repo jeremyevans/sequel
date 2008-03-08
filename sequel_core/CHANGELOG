@@ -1,5 +1,7 @@
 === SVN
 
+* Added support for :null => true option when defining table columns (#192).
+
 * Fixed Symbol#method_missing to accept variable arity (#185).
 
 === 1.2.1 (2008-02-29)
