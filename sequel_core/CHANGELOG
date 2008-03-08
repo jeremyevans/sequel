@@ -1,5 +1,9 @@
 === SVN
 
+* Enhanced MySQL adapter to support load data local infile_, added compress option for mysql connection by default (#172).
+
+* Fixed bug when inserting hashes in array tuples mode.
+
 * Changed SQLite adapter to catch RuntimeError raised when executing a statement and raise an Error::InvalidStatement with the offending SQL and error message (#188).
 
 * Added Error::InvalidStatement class.

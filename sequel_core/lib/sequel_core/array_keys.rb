@@ -239,6 +239,8 @@ module ArrayKeys
     end
 
     def array_tuples_transform_load(r)
+      puts "transform_load"
+      
       a = []; a.keys = []
       r.each_pair do |k, v|
         a[k] = (tt = @transform[k]) ? tt[0][v] : v
@@ -286,8 +288,12 @@ module Sequel
           include ArrayKeys::DatasetExtensions
           alias_method :each, :array_tuples_each
           alias_method :update_each_method, :array_tuples_update_each_method
-
+        end
+        
+        if method_defined?(:array_tuples_transform_load)
           alias_method :transform_load, :array_tuples_transform_load
+        end
+        if method_defined?(:array_tuples_transform_save)
           alias_method :transform_save, :array_tuples_transform_save
         end
       end

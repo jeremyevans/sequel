@@ -86,14 +86,18 @@ module Sequel
       end
 
       def connect
-        conn = Mysql.real_connect(
+        conn = Mysql.init
+        conn.options(Mysql::OPT_LOCAL_INFILE, "client")
+        conn.real_connect(
           @opts[:host] || 'localhost',
           @opts[:user],
           @opts[:password],
           @opts[:database],
           @opts[:port],
           @opts[:socket],
-          Mysql::CLIENT_MULTI_RESULTS
+          Mysql::CLIENT_MULTI_RESULTS +
+          Mysql::CLIENT_MULTI_STATEMENTS +
+          Mysql::CLIENT_COMPRESS
         )
         conn.query_with_result = false
         if encoding = @opts[:encoding] || @opts[:charset]
@@ -342,6 +346,12 @@ module Sequel
           "REPLACE INTO #{@opts[:from]} DEFAULT VALUES"
         else
           values = values[0] if values.size == 1
+          
+          # if hash or array with keys we need to transform the values
+          if @transform && (values.is_a?(Hash) || (values.is_a?(Array) && values.keys))
+            values = transform_save(values)
+          end
+
           case values
           when Sequel::Model
             insert_sql(values.values)
@@ -350,14 +360,12 @@ module Sequel
               "REPLACE INTO #{@opts[:from]} DEFAULT VALUES"
             elsif values.keys
               fl = values.keys.map {|f| literal(f.is_a?(String) ? f.to_sym : f)}
-              vl = @transform ? transform_save(values.values) : values.values
-              vl.map! {|v| literal(v)}
+              vl = values.values.map {|v| literal(v)}
               "REPLACE INTO #{@opts[:from]} (#{fl.join(COMMA_SEPARATOR)}) VALUES (#{vl.join(COMMA_SEPARATOR)})"
             else
               "REPLACE INTO #{@opts[:from]} VALUES (#{literal(values)})"
             end
           when Hash
-            values = transform_save(values) if @transform
             if values.empty?
               "REPLACE INTO #{@opts[:from]} DEFAULT VALUES"
             else
@@ -420,6 +428,23 @@ module Sequel
         self
       end
       
+      def array_tuples_transform_load(r)
+        a = []; a.keys = []
+        r.each_pair do |k, v|
+          a[k] = (tt = @transform[k]) ? tt[0][v] : v
+        end
+        a
+      end
+
+      # Applies the value transform for data saved to the database.
+      def array_tuples_transform_save(r)
+        a = []; a.keys = []
+        r.each_pair do |k, v|
+          a[k] = (tt = @transform[k]) ? tt[1][v] : v
+        end
+        a
+      end
+
       def multi_insert_sql(columns, values)
         columns = literal(columns)
         values = values.map {|r| "(#{literal(r)})"}.join(COMMA_SEPARATOR)

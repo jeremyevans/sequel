@@ -526,6 +526,12 @@ module Sequel
           "INSERT INTO #{@opts[:from]} DEFAULT VALUES"
         else
           values = values[0] if values.size == 1
+          
+          # if hash or array with keys we need to transform the values
+          if @transform && (values.is_a?(Hash) || (values.is_a?(Array) && values.keys))
+            values = transform_save(values)
+          end
+
           case values
           when Sequel::Model
             insert_sql(values.values)
@@ -534,14 +540,12 @@ module Sequel
               "INSERT INTO #{@opts[:from]} DEFAULT VALUES"
             elsif values.keys
               fl = values.keys.map {|f| literal(f.is_a?(String) ? f.to_sym : f)}
-              vl = @transform ? transform_save(values.values) : values.values
-              vl.map! {|v| literal(v)}
+              vl = values.values.map {|v| literal(v)}
               "INSERT INTO #{@opts[:from]} (#{fl.join(COMMA_SEPARATOR)}) VALUES (#{vl.join(COMMA_SEPARATOR)})"
             else
               "INSERT INTO #{@opts[:from]} VALUES (#{literal(values)})"
             end
           when Hash
-            values = transform_save(values) if @transform
             if values.empty?
               "INSERT INTO #{@opts[:from]} DEFAULT VALUES"
             else
