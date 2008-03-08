@@ -1,5 +1,7 @@
 require File.join(File.dirname(__FILE__), '../../lib/sequel_core')
-require File.join(File.dirname(__FILE__), '../spec_config.rb')
+require File.join(File.dirname(__FILE__), '../spec_helper.rb')
+
+unless defined?(ORACLE_URL); ORACLE_URL = 'oracle://hr:hr@localhost/XE' ;end
 
 ORACLE_DB = Sequel(ORACLE_URL)
 

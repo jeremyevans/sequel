@@ -1,6 +1,10 @@
 require 'rubygems'
 require File.join(File.dirname(__FILE__), "../lib/sequel_core") 
 
+if File.exists?(File.join(File.dirname(__FILE__), 'spec_config.rb'))
+  require File.join(File.dirname(__FILE__), 'spec_config.rb')
+end
+
 class MockDataset < Sequel::Dataset
   def insert(*args)
     @db.execute insert_sql(*args)
