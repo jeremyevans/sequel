@@ -843,6 +843,11 @@ context "Dataset#reverse_order" do
       'SELECT * FROM test ORDER BY name'
   end
   
+  specify "should invert the order for ASC expressions" do
+    @dataset.reverse_order(:name.ASC).sql.should ==
+      'SELECT * FROM test ORDER BY name DESC'
+  end
+  
   specify "should accept multiple arguments" do
     @dataset.reverse_order(:name, :price.DESC).sql.should ==
       'SELECT * FROM test ORDER BY name DESC, price'

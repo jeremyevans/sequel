@@ -1,5 +1,7 @@
 === SVN
 
+* Fixed reversing order of ASC expression (#164).
+
 * Added support for :null => true option when defining table columns (#192).
 
 * Fixed Symbol#method_missing to accept variable arity (#185).

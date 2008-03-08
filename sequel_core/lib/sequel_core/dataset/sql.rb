@@ -227,6 +227,8 @@ module Sequel
         order.map do |f|
           if f.is_a?(Sequel::SQL::ColumnExpr) && (f.op == Sequel::SQL::ColumnMethods::DESC)
             f.l
+          elsif f.is_a?(Sequel::SQL::ColumnExpr) && (f.op == Sequel::SQL::ColumnMethods::ASC)
+            f.l.desc
           else
             f.desc
           end
