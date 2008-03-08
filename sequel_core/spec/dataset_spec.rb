@@ -881,6 +881,11 @@ context "Dataset#reverse_order" do
       'SELECT * FROM test ORDER BY clumsy, fool DESC'
   end
   
+  specify "should return an unordered dataset for a dataset with no order" do
+    @dataset.unordered.reverse_order.sql.should == 
+      'SELECT * FROM test'
+  end
+  
   specify "should have #reverse alias" do
     @dataset.order(:name).reverse.sql.should ==
       'SELECT * FROM test ORDER BY name DESC'

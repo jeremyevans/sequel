@@ -1,5 +1,7 @@
 === SVN
 
+* Fixed Dataset#reverse to not raise for unordered dataset (#189).
+
 * Added Dataset#unordered method and changed #order to remove order if nil is specified (#190).
 
 * Fixed reversing order of ASC expression (#164).

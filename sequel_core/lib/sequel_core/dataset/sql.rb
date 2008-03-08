@@ -233,6 +233,7 @@ module Sequel
       #   dataset.invert_order(:category, :price.desc]) #=>
       #     [:category.desc, :price]
       def invert_order(order)
+        return nil unless order
         new_order = []
         order.map do |f|
           if f.is_a?(Sequel::SQL::ColumnExpr) && (f.op == Sequel::SQL::ColumnMethods::DESC)
