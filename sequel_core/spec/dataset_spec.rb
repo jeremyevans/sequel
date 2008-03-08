@@ -784,6 +784,22 @@ context "Dataset#order" do
     @dataset.order('dada ASC'.lit).sql.should ==
       'SELECT * FROM test ORDER BY dada ASC'
   end
+  
+  specify "should accept a nil to remove ordering" do
+    @dataset.order(:bah).order(nil).sql.should == 
+      'SELECT * FROM test'
+  end
+end
+
+context "Dataset#unordered" do
+  setup do
+    @dataset = Sequel::Dataset.new(nil).from(:test)
+  end
+  
+  specify "should remove ordering from the dataset" do
+    @dataset.order(:name).unordered.sql.should ==
+      'SELECT * FROM test'
+  end
 end
 
 context "Dataset#order_by" do
@@ -809,6 +825,11 @@ context "Dataset#order_by" do
   specify "should accept a string" do
     @dataset.order_by('dada ASC'.lit).sql.should ==
       'SELECT * FROM test ORDER BY dada ASC'
+  end
+
+  specify "should accept a nil to remove ordering" do
+    @dataset.order_by(:bah).order_by(nil).sql.should == 
+      'SELECT * FROM test'
   end
 end
 

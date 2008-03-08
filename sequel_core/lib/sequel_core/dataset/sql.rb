@@ -194,9 +194,19 @@ module Sequel
       end
       alias_method :distinct, :uniq
 
-      # Returns a copy of the dataset with the order changed.
+      # Returns a copy of the dataset with the order changed. If a nil is given
+      # the returned dataset has no order. This can accept multiple arguments
+      # of varying kinds, and even SQL functions.
+      #
+      #   ds.order(:name).sql #=> 'SELECT * FROM items ORDER BY name'
+      #   ds.order(:a, :b).sql #=> 'SELECT * FROM items ORDER BY a, b'
+      #   ds.order('a + b'.lit).sql #=> 'SELECT * FROM items ORDER BY a + b'
+      #   ds.order(:name.desc).sql #=> 'SELECT * FROM items ORDER BY name DESC'
+      #   ds.order(:name.asc).sql #=> 'SELECT * FROM items ORDER BY name ASC'
+      #   ds.order(:arr|1).sql #=> 'SELECT * FROM items ORDER BY arr[1]'
+      #   ds.order(nil).sql #=> 'SELECT * FROM items'
       def order(*order)
-        clone(:order => order)
+        clone(:order => (order == [nil]) ? nil : order)
       end
       alias_method :order_by, :order
       
@@ -233,6 +243,11 @@ module Sequel
             f.desc
           end
         end
+      end
+      
+      # Returns a copy of the dataset with no order.
+      def unordered
+        clone(:order => nil)
       end
 
       # Returns a copy of the dataset with the results grouped by the value of 

@@ -1,5 +1,7 @@
 === SVN
 
+* Added Dataset#unordered method and changed #order to remove order if nil is specified (#190).
+
 * Fixed reversing order of ASC expression (#164).
 
 * Added support for :null => true option when defining table columns (#192).
