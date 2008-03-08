@@ -1,6 +1,9 @@
 module Sequel
   # Represents an error raised in Sequel code.
   class Error < StandardError
+    
+    # Error raised when an invalid statement is executed.
+    class InvalidStatement < Error; end
 
     # Rollback is a special error used to rollback a transactions.
     # A transaction block will catch this error and wont pass further up the stack.

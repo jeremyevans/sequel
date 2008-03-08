@@ -144,6 +144,20 @@ context "An SQLite database" do
       {:id => 3, :name => 'ghi'}
     ]
   end
+  
+  specify "should catch invalid SQL errors and raise them as Error::InvalidStatement" do
+    proc {@db.execute 'blah blah'}.should raise_error(
+      Sequel::Error::InvalidStatement, "blah blah\r\nnear \"blah\": syntax error")
+
+    proc {@db.execute_insert 'blah blah'}.should raise_error(
+      Sequel::Error::InvalidStatement, "blah blah\r\nnear \"blah\": syntax error")
+
+    proc {@db.execute_select 'blah blah'}.should raise_error(
+      Sequel::Error::InvalidStatement, "blah blah\r\nnear \"blah\": syntax error")
+
+    proc {@db.single_value 'blah blah'}.should raise_error(
+      Sequel::Error::InvalidStatement, "blah blah\r\nnear \"blah\": syntax error")
+  end
 end
 
 context "An SQLite dataset" do

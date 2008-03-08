@@ -39,21 +39,29 @@ module Sequel
       def execute(sql)
         @logger.info(sql) if @logger
         @pool.hold {|conn| conn.execute_batch(sql); conn.changes}
+      rescue RuntimeError => e
+        raise Error::InvalidStatement, "#{sql}\r\n#{e.message}"
       end
       
       def execute_insert(sql)
         @logger.info(sql) if @logger
         @pool.hold {|conn| conn.execute(sql); conn.last_insert_row_id}
+      rescue RuntimeError => e
+        raise Error::InvalidStatement, "#{sql}\r\n#{e.message}"
       end
       
       def single_value(sql)
         @logger.info(sql) if @logger
         @pool.hold {|conn| conn.get_first_value(sql)}
+      rescue RuntimeError => e
+        raise Error::InvalidStatement, "#{sql}\r\n#{e.message}"
       end
       
       def execute_select(sql, &block)
         @logger.info(sql) if @logger
         @pool.hold {|conn| conn.query(sql, &block)}
+      rescue RuntimeError => e
+        raise Error::InvalidStatement, "#{sql}\r\n#{e.message}"
       end
       
       def pragma_get(name)

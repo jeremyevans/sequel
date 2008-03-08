@@ -1,5 +1,9 @@
 === SVN
 
+* Changed SQLite adapter to catch RuntimeError raised when executing a statement and raise an Error::InvalidStatement with the offending SQL and error message (#188).
+
+* Added Error::InvalidStatement class.
+
 * Fixed Dataset#reverse to not raise for unordered dataset (#189).
 
 * Added Dataset#unordered method and changed #order to remove order if nil is specified (#190).
