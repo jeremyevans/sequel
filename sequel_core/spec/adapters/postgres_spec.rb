@@ -1,6 +1,7 @@
 require File.join(File.dirname(__FILE__), '../../lib/sequel_core')
+require File.join(File.dirname(__FILE__), '../spec_config.rb')
 
-PGSQL_DB = Sequel('postgres://postgres:postgres@localhost:5432/reality_spec')
+PGSQL_DB = Sequel(POSTGRES_URL)
 PGSQL_DB.drop_table(:test) if PGSQL_DB.table_exists?(:test)
 PGSQL_DB.drop_table(:test2) if PGSQL_DB.table_exists?(:test2)
   

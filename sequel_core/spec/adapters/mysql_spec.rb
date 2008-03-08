@@ -1,7 +1,8 @@
 require File.join(File.dirname(__FILE__), '../../lib/sequel_core')
+require File.join(File.dirname(__FILE__), '../spec_config.rb')
 require 'logger'
 
-MYSQL_DB = Sequel('mysql://root@localhost/sandbox')
+MYSQL_DB = Sequel(MYSQL_URL)
 MYSQL_DB.drop_table(:items) if MYSQL_DB.table_exists?(:items)
 MYSQL_DB.drop_table(:test2) if MYSQL_DB.table_exists?(:test2)
 MYSQL_DB.create_table :items do

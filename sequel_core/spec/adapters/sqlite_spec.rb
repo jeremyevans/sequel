@@ -1,6 +1,7 @@
 require File.join(File.dirname(__FILE__), '../../lib/sequel_core')
+require File.join(File.dirname(__FILE__), '../spec_config.rb')
 
-SQLITE_DB = Sequel('sqlite:/')
+SQLITE_DB = Sequel(SQLITE_URL)
 SQLITE_DB.create_table :items do
   integer :id, :primary_key => true, :auto_increment => true
   text :name

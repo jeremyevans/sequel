@@ -1,6 +1,7 @@
 require File.join(File.dirname(__FILE__), '../../lib/sequel_core')
+require File.join(File.dirname(__FILE__), '../spec_config.rb')
 
-ORACLE_DB = Sequel('oracle://hr:hr@localhost/XE')
+ORACLE_DB = Sequel(ORACLE_URL)
 
 if ORACLE_DB.table_exists?(:items)
   ORACLE_DB.drop_table :items

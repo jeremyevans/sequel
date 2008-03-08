@@ -1,5 +1,7 @@
 === SVN
 
+* Added configuration file for running specs (#186).
+
 * Changed Database#drop_index to accept fixed arity (#173).
 
 * Changed column definition sql to put UNSIGNED constraint before unique in order to satisfy MySQL (#171).
