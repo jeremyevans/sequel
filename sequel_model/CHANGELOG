@@ -1,4 +1,4 @@
-=== SVN
+=== 0.5.0.1 (2008-03-09)
 
 * Fixed Model.associate to accept class and class name in :class option.
 
