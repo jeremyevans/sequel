@@ -80,12 +80,9 @@ module Sequel::Model::Associations
   #
   # The following options can be supplied:
   # * *ALL types*:
-  #   - :class_name - The name of the associated class as a string.  If not
+  #   - :class - The associated class or its name. If not
   #     given, uses the association's name, which is camelized (and
   #     singularized if type is :{one,many}_to_many)
-  #   - :class - The associated class itself.  Simpler than using
-  #     :class_name, but can't be used always due to dependencies not being
-  #     loaded.
   # * :many_to_one:
   #   - :key - foreign_key in current model's table that references
   #     associated model's primary key, as a symbol.  Defaults to :"#{name}_id".
@@ -117,7 +114,7 @@ module Sequel::Model::Associations
     end
 
     # prepare options
-    opts[:class_name] ||= opts[:class].name if opts[:class]
+    opts[:class_name] ||= opts[:class].to_s if opts[:class]
     opts = association_reflections[name] = opts.merge(:type => type, :name => name, :block => block)
 
     send(:"def_#{type}", name, opts)

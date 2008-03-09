@@ -150,9 +150,8 @@ describe Sequel::Model, "one_to_many" do
     @c2 = Class.new(Sequel::Model(:nodes)) do
       attr_accessor :xxx
       
-      def self.name
-        'Node'
-      end
+      def self.name; 'Node'; end
+      def self.to_s; 'Node'; end
     end
     @dataset = @c2.dataset
     
@@ -353,17 +352,15 @@ describe Sequel::Model, "many_to_many" do
     MODEL_DB.reset
 
     @c1 = Class.new(Sequel::Model(:attributes)) do
-      def self.name
-        'Attribute'
-      end
+      def self.name; 'Attribute'; end
+      def self.to_s; 'Attribute'; end
     end
 
     @c2 = Class.new(Sequel::Model(:nodes)) do
       attr_accessor :xxx
       
-      def self.name
-        'Node'
-      end
+      def self.name; 'Node'; end
+      def self.to_s; 'Node'; end
     end
     @dataset = @c2.dataset
 
@@ -546,9 +543,8 @@ describe Sequel::Model, "all_association_reflections" do
   before(:each) do
     MODEL_DB.reset
     @c1 = Class.new(Sequel::Model(:nodes)) do
-      def self.name
-        'Node'
-      end
+      def self.name; 'Node'; end
+      def self.to_s; 'Node'; end
     end
   end
   
@@ -572,9 +568,8 @@ describe Sequel::Model, "association_reflection" do
   before(:each) do
     MODEL_DB.reset
     @c1 = Class.new(Sequel::Model(:nodes)) do
-      def self.name
-        'Node'
-      end
+      def self.name; 'Node'; end
+      def self.to_s; 'Node'; end
     end
   end
 
@@ -600,9 +595,8 @@ describe Sequel::Model, "associations" do
   before(:each) do
     MODEL_DB.reset
     @c1 = Class.new(Sequel::Model(:nodes)) do
-      def self.name
-        'Node'
-      end
+      def self.name; 'Node'; end
+      def self.to_s; 'Node'; end
     end
   end
 
