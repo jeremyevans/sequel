@@ -665,6 +665,12 @@ context "Dataset#from" do
     @dataset.from(:a => :b).sql.should ==
       "SELECT * FROM a b"
       
+    @dataset.from(:a => 'b').sql.should ==
+      "SELECT * FROM a b"
+
+    @dataset.from(:a => :c[:d]).sql.should ==
+      "SELECT * FROM a c(d)"
+
     @dataset.from(@dataset.from(:a).group(:b) => :c).sql.should ==
       "SELECT * FROM (SELECT * FROM a GROUP BY b) c"
   end
@@ -681,12 +687,15 @@ context "Dataset#from" do
   specify "should accept sql functions" do
     @dataset.from(:abc[:def]).select_sql.should ==
       "SELECT * FROM abc(def)"
-
+    
     @dataset.from(:a|:i).select_sql.should ==
       "SELECT * FROM a[i]"
-
+    
     @dataset.from(:generate_series[1, 2].as(:a[:i])).select_sql.should ==
       "SELECT * FROM generate_series(1, 2) AS a(i)"
+      
+    @dataset.from(:generate_series[1, 2] => :a[:i]).select_sql.should ==
+      "SELECT * FROM generate_series(1, 2) a(i)"
   end
 end
 

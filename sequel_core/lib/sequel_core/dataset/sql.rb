@@ -42,25 +42,33 @@ module Sequel
           m.join(COMMA_SEPARATOR)
         end
       end
-
+      
+      def table_ref(t)
+        case t
+        when Dataset
+          t.to_table_reference
+        when Hash
+          t.map {|k, v| "#{table_ref(k)} #{table_ref(v)}"}.join(COMMA_SEPARATOR)
+        when Symbol, String
+          t
+        else
+          literal(t)
+        end
+      end
+      
       # Converts an array of sources names into into a comma separated list.
       def source_list(source)
         if source.nil? || source.empty?
           raise Error, 'No source specified for query'
         end
         auto_alias_count = 0
-        m = source.map do |i|
-          case i
+        m = source.map do |s|
+          case s
           when Dataset
             auto_alias_count += 1
-            i.to_table_reference(auto_alias_count)
-          when Hash
-            i.map {|k, v| "#{k.is_a?(Dataset) ? k.to_table_reference : k} #{v}"}.
-              join(COMMA_SEPARATOR)
-          when Symbol, String
-            i
+            s.to_table_reference(auto_alias_count)
           else
-            literal(i)
+            table_ref(s)
           end
         end
         m.join(COMMA_SEPARATOR)
