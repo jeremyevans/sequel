@@ -57,8 +57,10 @@ module Sequel
           when Hash
             i.map {|k, v| "#{k.is_a?(Dataset) ? k.to_table_reference : k} #{v}"}.
               join(COMMA_SEPARATOR)
-          else
+          when Symbol, String
             i
+          else
+            literal(i)
           end
         end
         m.join(COMMA_SEPARATOR)

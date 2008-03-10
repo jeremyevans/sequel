@@ -677,6 +677,17 @@ context "Dataset#from" do
   specify "should raise if no source is given" do
     proc {@dataset.from(@dataset.from).select_sql}.should raise_error(Sequel::Error)
   end
+  
+  specify "should accept sql functions" do
+    @dataset.from(:abc[:def]).select_sql.should ==
+      "SELECT * FROM abc(def)"
+
+    @dataset.from(:a|:i).select_sql.should ==
+      "SELECT * FROM a[i]"
+
+    @dataset.from(:generate_series[1, 2].as(:a[:i])).select_sql.should ==
+      "SELECT * FROM generate_series(1, 2) AS a(i)"
+  end
 end
 
 context "Dataset#select" do
