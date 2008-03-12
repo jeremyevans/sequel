@@ -107,17 +107,28 @@ module Sequel::Model::Associations
     # check arguments
     raise ArgumentError unless [:many_to_one, :one_to_many, :many_to_many].include?(type) && Symbol === name
 
+    # merge early so we don't modify opts
+    opts = opts.merge(:type => type, :name => name, :block => block)
+
     # deprecation
     if opts[:from]
       STDERR << "The :from option is deprecated, please use the :class option instead.\r\n"
       opts[:class] = opts[:from]
     end
 
-    # prepare options
-    opts[:class_name] ||= opts[:class].to_s if opts[:class]
-    opts = association_reflections[name] = opts.merge(:type => type, :name => name, :block => block)
+    # find class
+    case opts[:class]
+      when String, Symbol
+        # Delete :class to allow late binding
+        opts[:class_name] ||= opts.delete(:class).to_s
+      when Class
+        opts[:class_name] ||= opts[:class].name
+    end
 
     send(:"def_#{type}", name, opts)
+
+    # don't add to association_reflections until we are sure there are no errors
+    association_reflections[name] = opts
   end
   
   # The association reflection hash for the association of the given name.

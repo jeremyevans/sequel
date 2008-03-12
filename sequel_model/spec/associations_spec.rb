@@ -1,5 +1,22 @@
 require File.join(File.dirname(__FILE__), "spec_helper")
 
+describe Sequel::Model, "associate" do
+  it "should use explicit class if given a class, symbol, or string" do
+    MODEL_DB.reset
+    klass = Class.new(Sequel::Model(:nodes))
+    class ParParent < Sequel::Model
+    end
+    
+    klass.associate :many_to_one, :par_parent0, :class=>ParParent
+    klass.associate :one_to_many, :par_parent1s, :class=>'ParParent'
+    klass.associate :many_to_many, :par_parent2s, :class=>:ParParent
+    
+    klass.send(:associated_class, klass.association_reflection(:"par_parent0")).should == ParParent
+    klass.send(:associated_class, klass.association_reflection(:"par_parent1s")).should == ParParent
+    klass.send(:associated_class, klass.association_reflection(:"par_parent2s")).should == ParParent
+  end
+end
+
 describe Sequel::Model, "many_to_one" do
 
   before(:each) do
