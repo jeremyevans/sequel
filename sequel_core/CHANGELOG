@@ -1,5 +1,7 @@
 === SVN
 
+* Renamed schema files.
+
 * Fixed Dataset#from to work correctly with SQL functions (#193).
 
 === 1.3 (2008-03-08)

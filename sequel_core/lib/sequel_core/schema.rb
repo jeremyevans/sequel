@@ -3,6 +3,6 @@ module Sequel
   end
 end
 
-require File.join(File.dirname(__FILE__), 'schema/schema_sql')
-require File.join(File.dirname(__FILE__), 'schema/schema_generator')
+require File.join(File.dirname(__FILE__), 'schema/sql')
+require File.join(File.dirname(__FILE__), 'schema/generator')
 
