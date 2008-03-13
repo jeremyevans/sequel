@@ -14,6 +14,9 @@ module Sequel
                                        
     # Represents an Invalid transform.
     class InvalidTransform < Error ; end
+    
+    # Raised on an invalid operation.
+    class InvalidOperation < Error; end
                                        
     # Represents an Invalid filter.    
     class InvalidFilter < Error ; end

@@ -366,7 +366,7 @@ module Sequel
       # if the dataset has not been grouped. See also #filter
       def having(*cond, &block)
         unless @opts[:group]
-          raise Error, "Can only specify a HAVING clause on a grouped dataset"
+          raise Error::InvalidOperation, "Can only specify a HAVING clause on a grouped dataset"
         else
           @opts[:having] = {}
           filter(*cond, &block)

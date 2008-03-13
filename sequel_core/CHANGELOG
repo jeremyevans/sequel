@@ -1,5 +1,7 @@
 === SVN
 
+* Added Sequel::Error::InvalidOperation class for invalid operations (#198).
+
 * Implemented MySQL::Database#server_version (#199).
 
 * Added spec configuration for MySQL socket file.
