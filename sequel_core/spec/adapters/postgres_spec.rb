@@ -1,25 +1,25 @@
 require File.join(File.dirname(__FILE__), '../../lib/sequel_core')
 require File.join(File.dirname(__FILE__), '../spec_helper.rb')
 
-unless defined?(POSTGRES_URL); POSTGRES_URL = 'postgres://postgres:postgres@localhost:5432/reality_spec' ;end
+unless defined?(POSTGRES_DB)
+  POSTGRES_DB = Sequel('postgres://postgres:postgres@localhost:5432/reality_spec')
+end
 
-
-PGSQL_DB = Sequel(POSTGRES_URL)
-PGSQL_DB.drop_table(:test) if PGSQL_DB.table_exists?(:test)
-PGSQL_DB.drop_table(:test2) if PGSQL_DB.table_exists?(:test2)
+POSTGRES_DB.drop_table(:test) if POSTGRES_DB.table_exists?(:test)
+POSTGRES_DB.drop_table(:test2) if POSTGRES_DB.table_exists?(:test2)
   
-PGSQL_DB.create_table :test do
+POSTGRES_DB.create_table :test do
   text :name
   integer :value, :index => true
 end
-PGSQL_DB.create_table :test2 do
+POSTGRES_DB.create_table :test2 do
   text :name
   integer :value
 end
 
 context "A PostgreSQL database" do
   setup do
-    @db = PGSQL_DB
+    @db = POSTGRES_DB
   end
   
   specify "should provide disconnect functionality" do
@@ -36,7 +36,7 @@ end
 
 context "A PostgreSQL dataset" do
   setup do
-    @d = PGSQL_DB[:test]
+    @d = POSTGRES_DB[:test]
     @d.delete # remove all records
   end
   
@@ -147,7 +147,7 @@ context "A PostgreSQL dataset" do
   end
   
   specify "should support transactions" do
-    PGSQL_DB.transaction do
+    POSTGRES_DB.transaction do
       @d << {:name => 'abc', :value => 1}
     end
 
@@ -169,7 +169,7 @@ end
 
 context "A PostgreSQL dataset in array tuples mode" do
   setup do
-    @d = PGSQL_DB[:test]
+    @d = POSTGRES_DB[:test]
     @d.delete # remove all records
     Sequel.use_array_tuples
   end
@@ -215,7 +215,7 @@ end
 
 context "A PostgreSQL database" do
   setup do
-    @db = PGSQL_DB
+    @db = POSTGRES_DB
   end
 
   specify "should support add_column operations" do
@@ -259,44 +259,44 @@ context "A PostgreSQL database" do
   end
   
   specify "should support fulltext indexes" do
-    g = Sequel::Schema::Generator.new(PGSQL_DB) do
+    g = Sequel::Schema::Generator.new(POSTGRES_DB) do
       text :title
       text :body
       full_text_index [:title, :body]
     end
-    PGSQL_DB.create_table_sql_list(:posts, *g.create_info).should == [
+    POSTGRES_DB.create_table_sql_list(:posts, *g.create_info).should == [
       "CREATE TABLE posts (\"title\" text, \"body\" text)",
       "CREATE INDEX posts_title_body_index ON posts USING gin(to_tsvector(\"title\" || \"body\"))"
     ]
   end
   
   specify "should support fulltext indexes with a specific language" do
-    g = Sequel::Schema::Generator.new(PGSQL_DB) do
+    g = Sequel::Schema::Generator.new(POSTGRES_DB) do
       text :title
       text :body
       full_text_index [:title, :body], :language => 'french'
     end
-    PGSQL_DB.create_table_sql_list(:posts, *g.create_info).should == [
+    POSTGRES_DB.create_table_sql_list(:posts, *g.create_info).should == [
       "CREATE TABLE posts (\"title\" text, \"body\" text)",
       "CREATE INDEX posts_title_body_index ON posts USING gin(to_tsvector('french', \"title\" || \"body\"))"
     ]
   end
   
   specify "should support full_text_search" do
-    PGSQL_DB[:posts].full_text_search(:title, 'ruby').sql.should ==
+    POSTGRES_DB[:posts].full_text_search(:title, 'ruby').sql.should ==
       "SELECT * FROM posts WHERE (to_tsvector(\"title\") @@ to_tsquery('ruby'))"
     
-    PGSQL_DB[:posts].full_text_search([:title, :body], ['ruby', 'sequel']).sql.should ==
+    POSTGRES_DB[:posts].full_text_search([:title, :body], ['ruby', 'sequel']).sql.should ==
       "SELECT * FROM posts WHERE (to_tsvector(\"title\" || \"body\") @@ to_tsquery('ruby | sequel'))"
       
-    PGSQL_DB[:posts].full_text_search(:title, 'ruby', :language => 'french').sql.should ==
+    POSTGRES_DB[:posts].full_text_search(:title, 'ruby', :language => 'french').sql.should ==
       "SELECT * FROM posts WHERE (to_tsvector('french', \"title\") @@ to_tsquery('french', 'ruby'))"
   end
 end
 
 context "Postgres::Dataset#multi_insert_sql / #import" do
   setup do
-    @ds = PGSQL_DB[:test]
+    @ds = POSTGRES_DB[:test]
   end
   
   specify "should return separate insert statements if server_version < 80200" do

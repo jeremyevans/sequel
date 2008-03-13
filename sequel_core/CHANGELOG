@@ -1,5 +1,9 @@
 === SVN
 
+* Fixed transform with array tuples in postgres adapter.
+
+* Changed spec configuration to Database objects instead of URIs in order to support custom options for spec databases.
+
 * Renamed schema files.
 
 * Fixed Dataset#from to work correctly with SQL functions (#193).

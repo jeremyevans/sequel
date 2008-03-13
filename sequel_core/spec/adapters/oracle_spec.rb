@@ -1,9 +1,9 @@
 require File.join(File.dirname(__FILE__), '../../lib/sequel_core')
 require File.join(File.dirname(__FILE__), '../spec_helper.rb')
 
-unless defined?(ORACLE_URL); ORACLE_URL = 'oracle://hr:hr@localhost/XE' ;end
-
-ORACLE_DB = Sequel(ORACLE_URL)
+unless defined?(ORACLE_DB)
+  ORACLE_DB = Sequel('oracle://hr:hr@localhost/XE')
+end
 
 if ORACLE_DB.table_exists?(:items)
   ORACLE_DB.drop_table :items

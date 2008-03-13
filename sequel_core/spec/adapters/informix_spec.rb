@@ -1,9 +1,10 @@
 require File.join(File.dirname(__FILE__), '../../lib/sequel_core')
 require File.join(File.dirname(__FILE__), '../spec_helper.rb')
 
-unless defined?(INFORMIX_URL); INFORMIX_URL = 'informix://localhost/mydb' ;end
+unless defined?(INFORMIX_DB)
+  INFORMIX_DB = Sequel('informix://localhost/mydb')
+end
 
-INFORMIX_DB = Sequel(INFORMIX_URL)
 if INFORMIX_DB.table_exists?(:test)
   INFORMIX_DB.drop_table :test
 end
