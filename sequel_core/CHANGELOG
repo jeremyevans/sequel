@@ -1,5 +1,7 @@
 === SVN
 
+* Added spec configuration for MySQL socket file.
+
 * Fixed transform with array tuples in postgres adapter.
 
 * Changed spec configuration to Database objects instead of URIs in order to support custom options for spec databases.

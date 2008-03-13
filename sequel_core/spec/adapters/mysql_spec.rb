@@ -5,6 +5,12 @@ require 'logger'
 unless defined?(MYSQL_DB)
   MYSQL_DB = Sequel('mysql://root@localhost/sandbox')
 end
+unless defined?(MYSQL_SOCKET_FILE)
+  MYSQL_SOCKET_FILE = '/tmp/mysql.sock'
+end
+
+MYSQL_URI = URI.parse(MYSQL_DB.uri)
+MYSQL_DB_NAME = MYSQL_URI.path =~ /\/(.*)/ && $1
 
 MYSQL_DB.drop_table(:items) if MYSQL_DB.table_exists?(:items)
 MYSQL_DB.drop_table(:test2) if MYSQL_DB.table_exists?(:test2)
@@ -392,17 +398,17 @@ end
 
 context "A MySQL database" do
   specify "should accept a socket option" do
-    db = Sequel.mysql('sandbox', :host => 'localhost', :user => 'root', :socket => '/tmp/mysql.sock')
+    db = Sequel.mysql(MYSQL_DB_NAME, :host => 'localhost', :user => 'root', :socket => MYSQL_SOCKET_FILE)
     proc {db.test_connection}.should_not raise_error
   end
   
   specify "should accept a socket option without host option" do
-    db = Sequel.mysql('sandbox', :user => 'root', :socket => '/tmp/mysql.sock')
+    db = Sequel.mysql(MYSQL_DB_NAME, :user => 'root', :socket => MYSQL_SOCKET_FILE)
     proc {db.test_connection}.should_not raise_error
   end
   
   specify "should fail to connect with invalid socket" do
-    db = Sequel.mysql('sandbox', :host => 'localhost', :user => 'root', :socket => 'blah')
+    db = Sequel.mysql(MYSQL_DB_NAME, :host => 'localhost', :user => 'root', :socket => 'blah')
     proc {db.test_connection}.should raise_error
   end
 end
