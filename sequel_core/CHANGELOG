@@ -1,5 +1,7 @@
 === SVN
 
+* Implemented MySQL::Database#server_version (#199).
+
 * Added spec configuration for MySQL socket file.
 
 * Fixed transform with array tuples in postgres adapter.

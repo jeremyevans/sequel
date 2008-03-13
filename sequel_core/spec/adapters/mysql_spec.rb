@@ -35,6 +35,10 @@ context "A MySQL database" do
     @db.pool.size.should == 0
   end
 
+  specify "should provide the server version" do
+    @db.server_version.should >= 40000
+  end
+
   specify "should support sequential primary keys" do
     @db.create_table!(:with_pk) {primary_key :id; text :name}
     @db[:with_pk] << {:name => 'abc'}
