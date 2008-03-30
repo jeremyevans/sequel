@@ -111,7 +111,7 @@ describe Sequel::Model, "one_to_many" do
     @c2.one_to_many :attributes, :from => @c1, :key => :node_id
 
     n = @c2.new(:id => 1234)
-    a = n.attributes
+    a = n.attributes_dataset
     a.should be_a_kind_of(Sequel::Dataset)
     a.sql.should == 'SELECT * FROM attributes WHERE (node_id = 1234)'
   end
@@ -146,7 +146,7 @@ describe Sequel::Model, "one_to_many" do
     end
     
     n = Music::BlueNote.new(:id => 1234)
-    a = n.attributes
+    a = n.attributes_dataset
     a.should be_a_kind_of(Sequel::Dataset)
     a.sql.should == 'SELECT * FROM attributes WHERE (blue_note_id = 1234)'
   end

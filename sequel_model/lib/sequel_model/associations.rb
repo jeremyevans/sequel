@@ -12,7 +12,8 @@
 # 
 # The project class now has the following methods:
 # * Project#portfolio, Project#portfolio=
-# * Project#milestones, Project#add_milestone, Project#remove_milestone
+# * Project#milestones, Project#add_milestone, Project#remove_milestone,
+#   Project#milestones_dataset
 #
 # By default the classes for the associations are inferred from the association
 # name, so for example the Project#portfolio will return an instance of 
@@ -24,7 +25,7 @@
 #   >> Project.associations
 #   => [:portfolio, :milestones]
 #   >> Project.association_reflection(:portfolio)
-#   => {:kind => :many_to_one, :name => :portfolio, :class_name => "Portfolio"}
+#   => {:type => :many_to_one, :name => :portfolio, :class_name => "Portfolio"}
 #
 # The following association kinds are supported:
 # * :many_to_one - Foreign key in current model's table points to 
@@ -48,10 +49,11 @@
 # calling one of the three methods: many_to_one, one_to_many, many_to_many.
 # Sequel::Model also provides aliases for these methods that conform to
 # ActiveRecord conventions: belongs_to, has_many, has_and_belongs_to_many.
-# For example, the following two statements are equivalent:
+# For example, the following three statements are equivalent:
 #
 #   associate :one_to_many, :attributes
 #   one_to_many :attributes
+#   has_many :attributes
 module Sequel::Model::Associations
   # Array of all association reflections
   def all_association_reflections
@@ -83,6 +85,10 @@ module Sequel::Model::Associations
   #   - :class - The associated class or its name. If not
   #     given, uses the association's name, which is camelized (and
   #     singularized if type is :{one,many}_to_many)
+  #   - :eager - The associations to eagerly load when loading the associated object.
+  #     For many_to_one associations, this is ignored unless this association is
+  #     being eagerly loaded, as it doesn't save queries unless multiple objects
+  #     can be loaded at once.
   # * :many_to_one:
   #   - :key - foreign_key in current model's table that references
   #     associated model's primary key, as a symbol.  Defaults to :"#{name}_id".
@@ -91,7 +97,6 @@ module Sequel::Model::Associations
   #     current model's primary key, as a symbol.  Defaults to
   #     :"#{self.name.underscore}_id".
   #   - :order - the column by which to order the association dataset.
-  #   - :cache - set to true to cache and return an array of objects instead of a dataset.
   # * :many_to_many:
   #   - :join_table - name of table that includes the foreign keys to both
   #     the current model and the associated model, as a symbol.  Defaults to the name
@@ -102,13 +107,12 @@ module Sequel::Model::Associations
   #   - :right_key - foreign key in join table that points to associated
   #     model's primary key, as a symbol.
   #   - :order - the column by which to order the association dataset.
-  #   - :cache - set to true to cache and return an array of objects instead of a dataset.
   def associate(type, name, opts = {}, &block)
     # check arguments
     raise ArgumentError unless [:many_to_one, :one_to_many, :many_to_many].include?(type) && Symbol === name
 
     # merge early so we don't modify opts
-    opts = opts.merge(:type => type, :name => name, :block => block)
+    opts = opts.merge(:type => type, :name => name, :block => block, :cache => true)
 
     # deprecation
     if opts[:from]
@@ -249,7 +253,8 @@ module Sequel::Model::Associations
     def_association_dataset_methods(name, opts) do
       klass = assoc_class[opts]
       key = (opts[:right_primary_key] ||= :"#{klass.table_name}__#{klass.primary_key}")
-      klass.inner_join(join_table, right => key, left => pk)
+      selection = (opts[:selection] ||= "#{klass.table_name}.*".lit)
+      klass.select(selection).inner_join(join_table, right => key, left => pk)
     end
 
     class_def(association_add_method_name(name)) do |o|
@@ -285,6 +290,7 @@ module Sequel::Model::Associations
   # Defines an association
   def def_association_dataset_methods(name, opts, &block)
     dataset_method = :"#{name}_dataset"
+    helper_method = :"#{name}_helper"
     dataset_block = opts[:block]
     ivar = association_ivar(name)
     
@@ -294,32 +300,48 @@ module Sequel::Model::Associations
     else
       class_def(dataset_method, &block)
     end
-
-    if opts[:cache]
-      # if the :cache option is set to true, the association method should return
-      # an array of association objects
-      class_def(name) do |*reload|
-        if !reload[0] && obj = instance_variable_get(ivar)
-          obj
-        else
-          ds = send(dataset_method)
-          # if the a dataset block was specified, we need to call it and use
-          # the result as the dataset to fetch records from.
-          if dataset_block
-            ds = dataset_block[ds]
-          end
-          instance_variable_set(ivar, ds.all)
+    
+    # If a block is given, define a helper method for it, because it takes
+    # an argument.  This is unnecessary in Ruby 1.9, as that has instance_exec.
+    if dataset_block
+      class_def(helper_method, &dataset_block)
+    end
+    
+    class_def(name) do |*reload|
+      if !reload[0] && obj = instance_variable_get(ivar)
+        obj
+      else
+        ds = send(dataset_method)
+        # if the a dataset block was specified, we need to call it and use
+        # the result as the dataset to fetch records from.
+        if dataset_block
+          ds = send(helper_method, ds)
+        end
+        if eager = opts[:eager]
+          ds = ds.eager(eager)
+        end
+        objs = ds.all
+        if reciprocal = self.class.send(:reciprocal_association, opts)
+          objs.each{|o| o.instance_variable_set(reciprocal, self)}
+        end
+        instance_variable_set(ivar, objs)
+      end
+    end
+  end
+  
+  def reciprocal_association(reflection)
+    if reflection[:type] != :one_to_many
+      nil
+    elsif reflection.include?(:reciprocal)
+      reflection[:reciprocal]
+    else
+      key = reflection[:key]
+      associated_class(reflection).all_association_reflections.each do |assoc_reflect|
+        if assoc_reflect[:type] == :many_to_one && assoc_reflect[:key] == key
+          return reflection[:reciprocal] = "@#{assoc_reflect[:name]}".freeze
         end
       end
-    elsif dataset_block
-      # no cache, but we still need to check if a dataset block was given.
-      # define helper so the supplied block will be instance_eval'ed
-      class_def(:"#{name}_helper", &dataset_block)
-      class_def(name) {send(:"#{name}_helper", send(dataset_method))}
-    else
-      # otherwise (by default), the association method is an alias to the 
-      # association dataset method.
-      alias_method name, dataset_method
+      reflection[:reciprocal] = nil
     end
   end
 end

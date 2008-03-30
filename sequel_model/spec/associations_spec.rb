@@ -191,7 +191,7 @@ describe Sequel::Model, "one_to_many" do
     @c2.one_to_many :attributes, :class => @c1 
 
     n = @c2.new(:id => 1234)
-    a = n.attributes
+    a = n.attributes_dataset
     a.should be_a_kind_of(Sequel::Dataset)
     a.sql.should == 'SELECT * FROM attributes WHERE (node_id = 1234)'
   end
@@ -203,7 +203,7 @@ describe Sequel::Model, "one_to_many" do
     @c2.one_to_many :historical_values
     
     n = @c2.new(:id => 1234)
-    v = n.historical_values
+    v = n.historical_values_dataset
     v.should be_a_kind_of(Sequel::Dataset)
     v.sql.should == 'SELECT * FROM historical_values WHERE (node_id = 1234)'
     v.model_classes.should == {nil => HistoricalValue}
@@ -213,7 +213,7 @@ describe Sequel::Model, "one_to_many" do
     @c2.one_to_many :attributes, :class => @c1, :key => :nodeid
     
     n = @c2.new(:id => 1234)
-    a = n.attributes
+    a = n.attributes_dataset
     a.should be_a_kind_of(Sequel::Dataset)
     a.sql.should == 'SELECT * FROM attributes WHERE (nodeid = 1234)'
   end
@@ -240,34 +240,15 @@ describe Sequel::Model, "one_to_many" do
     MODEL_DB.sqls.should == ['UPDATE attributes SET node_id = NULL WHERE (id = 2345)']
   end
   
-  it "should accept a block" do
-    @c2.one_to_many :attributes, :class => @c1 do |ds|
-      ds.filter(:xxx => @xxx)
-    end
-
-    n = @c2.new(:id => 1234)
-    n.xxx = 'blah'
-    n.attributes.sql.should == "SELECT * FROM attributes WHERE (node_id = 1234) AND (xxx = 'blah')"
-  end
-  
   it "should support an order option" do
     @c2.one_to_many :attributes, :class => @c1, :order => :kind
 
     n = @c2.new(:id => 1234)
-    n.attributes.sql.should == "SELECT * FROM attributes WHERE (node_id = 1234) ORDER BY kind"
+    n.attributes_dataset.sql.should == "SELECT * FROM attributes WHERE (node_id = 1234) ORDER BY kind"
   end
   
-  it "should support order option with block" do
-    @c2.one_to_many :attributes, :class => @c1, :order => :kind do |ds|
-      ds.filter(:xxx => @xxx)
-    end
-
-    n = @c2.new(:id => 1234)
-    n.attributes.sql.should == "SELECT * FROM attributes WHERE (node_id = 1234) AND (xxx IS NULL) ORDER BY kind"
-  end
-  
-  it "should support :cache option for returning array with all members of the association" do
-    @c2.one_to_many :attributes, :class => @c1, :cache => true
+  it "should return array with all members of the association" do
+    @c2.one_to_many :attributes, :class => @c1
     
     n = @c2.new(:id => 1234)
     atts = n.attributes
@@ -279,8 +260,8 @@ describe Sequel::Model, "one_to_many" do
     MODEL_DB.sqls.should == ['SELECT * FROM attributes WHERE (node_id = 1234)']
   end
   
-  it "should support :cache option with a block" do
-    @c2.one_to_many :attributes, :class => @c1, :cache => true do |ds|
+  it "should accept a block" do
+    @c2.one_to_many :attributes, :class => @c1 do |ds|
       ds.filter(:xxx => @xxx)
     end
     
@@ -294,8 +275,23 @@ describe Sequel::Model, "one_to_many" do
     MODEL_DB.sqls.should == ['SELECT * FROM attributes WHERE (node_id = 1234) AND (xxx IS NULL)']
   end
   
+  it "should support order option with block" do
+    @c2.one_to_many :attributes, :class => @c1, :order => :kind do |ds|
+      ds.filter(:xxx => @xxx)
+    end
+    
+    n = @c2.new(:id => 1234)
+    atts = n.attributes
+    atts.should be_a_kind_of(Array)
+    atts.size.should == 1
+    atts.first.should be_a_kind_of(@c1)
+    atts.first.values.should == {}
+    
+    MODEL_DB.sqls.should == ['SELECT * FROM attributes WHERE (node_id = 1234) AND (xxx IS NULL) ORDER BY kind']
+  end
+  
   it "should set cached instance variable when accessed" do
-    @c2.one_to_many :attributes, :class => @c1, :cache => true
+    @c2.one_to_many :attributes, :class => @c1
 
     n = @c2.new(:id => 1234)
     MODEL_DB.reset
@@ -306,7 +302,7 @@ describe Sequel::Model, "one_to_many" do
   end
 
   it "should use cached instance variable if available" do
-    @c2.one_to_many :attributes, :class => @c1, :cache => true
+    @c2.one_to_many :attributes, :class => @c1
 
     n = @c2.new(:id => 1234)
     MODEL_DB.reset
@@ -316,7 +312,7 @@ describe Sequel::Model, "one_to_many" do
   end
 
   it "should not use cached instance variable if asked to reload" do
-    @c2.one_to_many :attributes, :class => @c1, :cache => true
+    @c2.one_to_many :attributes, :class => @c1
 
     n = @c2.new(:id => 1234)
     MODEL_DB.reset
@@ -326,7 +322,7 @@ describe Sequel::Model, "one_to_many" do
   end
 
   it "should add item to cached instance variable if it exists when calling add_" do
-    @c2.one_to_many :attributes, :class => @c1, :cache => true
+    @c2.one_to_many :attributes, :class => @c1
 
     n = @c2.new(:id => 1234)
     att = @c1.new(:id => 345)
@@ -338,7 +334,7 @@ describe Sequel::Model, "one_to_many" do
   end
 
   it "should remove item from cached instance variable if it exists when calling remove_" do
-    @c2.one_to_many :attributes, :class => @c1, :cache => true
+    @c2.one_to_many :attributes, :class => @c1
 
     n = @c2.new(:id => 1234)
     att = @c1.new(:id => 345)
@@ -350,7 +346,7 @@ describe Sequel::Model, "one_to_many" do
   end
 
   it "should have has_many alias" do
-    @c2.has_many :attributes, :class => @c1, :cache => true
+    @c2.has_many :attributes, :class => @c1
     
     n = @c2.new(:id => 1234)
     atts = n.attributes
@@ -360,6 +356,37 @@ describe Sequel::Model, "one_to_many" do
     atts.first.values.should == {}
     
     MODEL_DB.sqls.should == ['SELECT * FROM attributes WHERE (node_id = 1234)']
+  end
+  
+  it "should populate the reciprocal many_to_one instance variable when loading the one_to_many association" do
+    @c2.one_to_many :attributes, :class => @c1, :key => :node_id
+    @c1.many_to_one :node, :class => @c2, :key => :node_id
+    
+    n = @c2.new(:id => 1234)
+    atts = n.attributes
+    MODEL_DB.sqls.should == ['SELECT * FROM attributes WHERE (node_id = 1234)']
+    atts.should be_a_kind_of(Array)
+    atts.size.should == 1
+    atts.first.should be_a_kind_of(@c1)
+    atts.first.values.should == {}
+    atts.first.node.should == n
+    
+    MODEL_DB.sqls.length.should == 1
+  end
+  
+  it "should use an explicit reciprocal instance variable if given" do
+    @c2.one_to_many :attributes, :class => @c1, :key => :node_id, :reciprocal=>'@wxyz'
+    
+    n = @c2.new(:id => 1234)
+    atts = n.attributes
+    MODEL_DB.sqls.should == ['SELECT * FROM attributes WHERE (node_id = 1234)']
+    atts.should be_a_kind_of(Array)
+    atts.size.should == 1
+    atts.first.should be_a_kind_of(@c1)
+    atts.first.values.should == {}
+    atts.first.instance_variable_get('@wxyz').should == n
+    
+    MODEL_DB.sqls.length.should == 1
   end
 end
 
@@ -395,10 +422,10 @@ describe Sequel::Model, "many_to_many" do
     @c2.many_to_many :attributes, :class => @c1 
 
     n = @c2.new(:id => 1234)
-    a = n.attributes
+    a = n.attributes_dataset
     a.should be_a_kind_of(Sequel::Dataset)
-    ['SELECT * FROM attributes INNER JOIN attributes_nodes ON (attributes_nodes.attribute_id = attributes.id) AND (attributes_nodes.node_id = 1234)',
-     'SELECT * FROM attributes INNER JOIN attributes_nodes ON (attributes_nodes.node_id = 1234) AND (attributes_nodes.attribute_id = attributes.id)'
+    ['SELECT attributes.* FROM attributes INNER JOIN attributes_nodes ON (attributes_nodes.attribute_id = attributes.id) AND (attributes_nodes.node_id = 1234)',
+     'SELECT attributes.* FROM attributes INNER JOIN attributes_nodes ON (attributes_nodes.node_id = 1234) AND (attributes_nodes.attribute_id = attributes.id)'
     ].should(include(a.sql))
   end
   
@@ -409,10 +436,10 @@ describe Sequel::Model, "many_to_many" do
     @c2.many_to_many :tags
 
     n = @c2.new(:id => 1234)
-    a = n.tags
+    a = n.tags_dataset
     a.should be_a_kind_of(Sequel::Dataset)
-    ['SELECT * FROM tags INNER JOIN nodes_tags ON (nodes_tags.tag_id = tags.id) AND (nodes_tags.node_id = 1234)',
-     'SELECT * FROM tags INNER JOIN nodes_tags ON (nodes_tags.node_id = 1234) AND (nodes_tags.tag_id = tags.id)'
+    ['SELECT tags.* FROM tags INNER JOIN nodes_tags ON (nodes_tags.tag_id = tags.id) AND (nodes_tags.node_id = 1234)',
+     'SELECT tags.* FROM tags INNER JOIN nodes_tags ON (nodes_tags.node_id = 1234) AND (nodes_tags.tag_id = tags.id)'
     ].should(include(a.sql))
   end
   
@@ -420,10 +447,10 @@ describe Sequel::Model, "many_to_many" do
     @c2.many_to_many :attributes, :class => @c1, :left_key => :nodeid, :right_key => :attributeid, :join_table => :attribute2node
     
     n = @c2.new(:id => 1234)
-    a = n.attributes
+    a = n.attributes_dataset
     a.should be_a_kind_of(Sequel::Dataset)
-    ['SELECT * FROM attributes INNER JOIN attribute2node ON (attribute2node.nodeid = 1234) AND (attribute2node.attributeid = attributes.id)',
-     'SELECT * FROM attributes INNER JOIN attribute2node ON (attribute2node.attributeid = attributes.id) AND (attribute2node.nodeid = 1234)'
+    ['SELECT attributes.* FROM attributes INNER JOIN attribute2node ON (attribute2node.nodeid = 1234) AND (attribute2node.attributeid = attributes.id)',
+     'SELECT attributes.* FROM attributes INNER JOIN attribute2node ON (attribute2node.attributeid = attributes.id) AND (attribute2node.nodeid = 1234)'
     ].should(include(a.sql))
   end
   
@@ -431,10 +458,10 @@ describe Sequel::Model, "many_to_many" do
     @c2.many_to_many :attributes, :class => @c1, :order => :blah
 
     n = @c2.new(:id => 1234)
-    a = n.attributes
+    a = n.attributes_dataset
     a.should be_a_kind_of(Sequel::Dataset)
-    ['SELECT * FROM attributes INNER JOIN attributes_nodes ON (attributes_nodes.attribute_id = attributes.id) AND (attributes_nodes.node_id = 1234) ORDER BY blah',
-     'SELECT * FROM attributes INNER JOIN attributes_nodes ON (attributes_nodes.node_id = 1234) AND (attributes_nodes.attribute_id = attributes.id) ORDER BY blah'
+    ['SELECT attributes.* FROM attributes INNER JOIN attributes_nodes ON (attributes_nodes.attribute_id = attributes.id) AND (attributes_nodes.node_id = 1234) ORDER BY blah',
+     'SELECT attributes.* FROM attributes INNER JOIN attributes_nodes ON (attributes_nodes.node_id = 1234) AND (attributes_nodes.attribute_id = attributes.id) ORDER BY blah'
     ].should(include(a.sql))
   end
   
@@ -446,10 +473,12 @@ describe Sequel::Model, "many_to_many" do
     n = @c2.new(:id => 1234)
     n.xxx = 555
     a = n.attributes
-    a.should be_a_kind_of(Sequel::Dataset)
-    ['SELECT * FROM attributes INNER JOIN attributes_nodes ON (attributes_nodes.attribute_id = attributes.id) AND (attributes_nodes.node_id = 1234) WHERE (xxx = 555)',
-     'SELECT * FROM attributes INNER JOIN attributes_nodes ON (attributes_nodes.node_id = 1234) AND (attributes_nodes.attribute_id = attributes.id) WHERE (xxx = 555)'
-    ].should(include(a.sql))
+    a.should be_a_kind_of(Array)
+    a.size.should == 1
+    a.first.should be_a_kind_of(@c1)
+    ['SELECT attributes.* FROM attributes INNER JOIN attributes_nodes ON (attributes_nodes.attribute_id = attributes.id) AND (attributes_nodes.node_id = 1234) WHERE (xxx = 555)',
+     'SELECT attributes.* FROM attributes INNER JOIN attributes_nodes ON (attributes_nodes.node_id = 1234) AND (attributes_nodes.attribute_id = attributes.id) WHERE (xxx = 555)'
+    ].should(include(MODEL_DB.sqls.first))
   end
 
   it "should define an add_ method" do
@@ -474,8 +503,8 @@ describe Sequel::Model, "many_to_many" do
     ].should(include(MODEL_DB.sqls.first))
   end
 
-  it "should provide an array with all members of the association (if cache option is specified)" do
-    @c2.many_to_many :attributes, :class => @c1, :cache => true
+  it "should provide an array with all members of the association" do
+    @c2.many_to_many :attributes, :class => @c1
     
     n = @c2.new(:id => 1234)
     atts = n.attributes
@@ -483,13 +512,13 @@ describe Sequel::Model, "many_to_many" do
     atts.size.should == 1
     atts.first.should be_a_kind_of(@c1)
 
-    ['SELECT * FROM attributes INNER JOIN attributes_nodes ON (attributes_nodes.attribute_id = attributes.id) AND (attributes_nodes.node_id = 1234)',
-     'SELECT * FROM attributes INNER JOIN attributes_nodes ON (attributes_nodes.node_id = 1234) AND (attributes_nodes.attribute_id = attributes.id)'
+    ['SELECT attributes.* FROM attributes INNER JOIN attributes_nodes ON (attributes_nodes.attribute_id = attributes.id) AND (attributes_nodes.node_id = 1234)',
+     'SELECT attributes.* FROM attributes INNER JOIN attributes_nodes ON (attributes_nodes.node_id = 1234) AND (attributes_nodes.attribute_id = attributes.id)'
     ].should(include(MODEL_DB.sqls.first))
   end
 
   it "should set cached instance variable when accessed" do
-    @c2.many_to_many :attributes, :class => @c1, :cache => true
+    @c2.many_to_many :attributes, :class => @c1
 
     n = @c2.new(:id => 1234)
     MODEL_DB.reset
@@ -500,7 +529,7 @@ describe Sequel::Model, "many_to_many" do
   end
 
   it "should use cached instance variable if available" do
-    @c2.many_to_many :attributes, :class => @c1, :cache => true
+    @c2.many_to_many :attributes, :class => @c1
 
     n = @c2.new(:id => 1234)
     MODEL_DB.reset
@@ -510,7 +539,7 @@ describe Sequel::Model, "many_to_many" do
   end
 
   it "should not use cached instance variable if asked to reload" do
-    @c2.many_to_many :attributes, :class => @c1, :cache => true
+    @c2.many_to_many :attributes, :class => @c1
 
     n = @c2.new(:id => 1234)
     MODEL_DB.reset
@@ -520,7 +549,7 @@ describe Sequel::Model, "many_to_many" do
   end
 
   it "should add item to cached instance variable if it exists when calling add_" do
-    @c2.many_to_many :attributes, :class => @c1, :cache => true
+    @c2.many_to_many :attributes, :class => @c1
 
     n = @c2.new(:id => 1234)
     att = @c1.new(:id => 345)
@@ -532,7 +561,7 @@ describe Sequel::Model, "many_to_many" do
   end
 
   it "should remove item from cached instance variable if it exists when calling remove_" do
-    @c2.many_to_many :attributes, :class => @c1, :cache => true
+    @c2.many_to_many :attributes, :class => @c1
 
     n = @c2.new(:id => 1234)
     att = @c1.new(:id => 345)
@@ -547,10 +576,10 @@ describe Sequel::Model, "many_to_many" do
     @c2.has_and_belongs_to_many :attributes, :class => @c1 
 
     n = @c2.new(:id => 1234)
-    a = n.attributes
+    a = n.attributes_dataset
     a.should be_a_kind_of(Sequel::Dataset)
-    ['SELECT * FROM attributes INNER JOIN attributes_nodes ON (attributes_nodes.attribute_id = attributes.id) AND (attributes_nodes.node_id = 1234)',
-     'SELECT * FROM attributes INNER JOIN attributes_nodes ON (attributes_nodes.node_id = 1234) AND (attributes_nodes.attribute_id = attributes.id)'
+    ['SELECT attributes.* FROM attributes INNER JOIN attributes_nodes ON (attributes_nodes.attribute_id = attributes.id) AND (attributes_nodes.node_id = 1234)',
+     'SELECT attributes.* FROM attributes INNER JOIN attributes_nodes ON (attributes_nodes.node_id = 1234) AND (attributes_nodes.attribute_id = attributes.id)'
     ].should(include(a.sql))
   end
   
@@ -570,14 +599,14 @@ describe Sequel::Model, "all_association_reflections" do
     @c1.associate :many_to_one, :parent, :class => @c1
     @c1.all_association_reflections.should == [{
       :type => :many_to_one, :name => :parent, :class_name => 'Node', 
-      :class => @c1, :key => :parent_id, :block => nil
+      :class => @c1, :key => :parent_id, :block => nil, :cache => true
     }]
     @c1.associate :one_to_many, :children, :class => @c1
     @c1.all_association_reflections.sort_by{|x|x[:name].to_s}.should == [{
       :type => :one_to_many, :name => :children, :class_name => 'Node', 
-      :class => @c1, :key => :node_id, :block => nil}, {
+      :class => @c1, :key => :node_id, :block => nil, :cache => true}, {
       :type => :many_to_one, :name => :parent, :class_name => 'Node',
-      :class => @c1, :key => :parent_id, :block => nil}]
+      :class => @c1, :key => :parent_id, :block => nil, :cache => true}]
   end
 end
 
@@ -598,12 +627,12 @@ describe Sequel::Model, "association_reflection" do
     @c1.associate :many_to_one, :parent, :class => @c1
     @c1.association_reflection(:parent).should == {
       :type => :many_to_one, :name => :parent, :class_name => 'Node', 
-      :class => @c1, :key => :parent_id, :block => nil
+      :class => @c1, :key => :parent_id, :block => nil, :cache => true
     }
     @c1.associate :one_to_many, :children, :class => @c1
     @c1.association_reflection(:children).should == {
       :type => :one_to_many, :name => :children, :class_name => 'Node', 
-      :class => @c1, :key => :node_id, :block => nil
+      :class => @c1, :key => :node_id, :block => nil, :cache => true
     }
   end
 end

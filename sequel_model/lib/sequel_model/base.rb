@@ -62,6 +62,7 @@ module Sequel
       @db = ds.db
       @dataset = ds
       @dataset.set_model(self)
+      @dataset.extend(Associations::EagerLoading)
       @dataset.transform(@transform) if @transform
     end
     

@@ -6,6 +6,7 @@ require 'base64'
 require File.join(File.dirname(__FILE__), 'dataset/sql')
 require File.join(File.dirname(__FILE__), 'dataset/sequelizer')
 require File.join(File.dirname(__FILE__), 'dataset/convenience')
+require File.join(File.dirname(__FILE__), 'dataset/callback')
 
 module Sequel
   # A Dataset represents a view of a the data in a database, constrained by
@@ -69,6 +70,7 @@ module Sequel
     include Sequelizer
     include SQL
     include Convenience
+    include Callback
     
     attr_accessor :db
     attr_accessor :opts
@@ -80,6 +82,7 @@ module Sequel
     def all(opts = nil, &block)
       a = []
       each(opts) {|r| a << r}
+      run_callback(:post_load, a)
       a.each(&block) if block
       a
     end
