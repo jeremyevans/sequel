@@ -1,10 +1,11 @@
+require 'sequel_core'
+
 module Sequel
   class Model
     alias_method :model, :class
   end
 end
 
-# TODO: add relationships when complete:
 files = %w[
   base hooks record schema associations 
   caching plugins validations eager_loading

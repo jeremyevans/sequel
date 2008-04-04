@@ -1,0 +1,9 @@
+* Observer pattern:
+
+  class MyObserver < Sequel::Observer
+    observe Item, Post
+
+    def after_save
+      ...
+    end
+  end

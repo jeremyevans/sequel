@@ -9,7 +9,7 @@ include FileUtils
 # Configuration
 ##############################################################################
 NAME = "sequel_core"
-VERS = "1.3"
+VERS = "1.4.0"
 CLEAN.include ["**/.*.sw?", "pkg/*", ".config", "doc/*", "coverage/*"]
 RDOC_OPTS = [
   "--quiet", 
@@ -49,10 +49,10 @@ spec = Gem::Specification.new do |s|
   s.extra_rdoc_files = ["README", "CHANGELOG", "COPYING"]
   s.rdoc_options += RDOC_OPTS + 
     ["--exclude", "^(examples|extras)\/", "--exclude", "lib/sequel_core.rb"]
-  s.summary = "The Database Toolkit for Ruby"
+  s.summary = "The Database Toolkit for Ruby: Core Library and Adapters"
   s.description = s.summary
-  s.author = "Sharon Rosner"
-  s.email = "ciconia@gmail.com"
+  s.author = "Aman Gupta"
+  s.email = "themastermind1@gmail.com"
   s.homepage = "http://sequel.rubyforge.org"
   s.executables = ["sequel"]
   s.required_ruby_version = ">= 1.8.4"
@@ -97,14 +97,6 @@ end
 
 task :uninstall => [:clean] do
   sh %{sudo gem uninstall #{NAME}}
-end
-
-task :tag do
-  cwd = FileUtils.pwd
-  sh %{rm -rf doc/*}
-  sh %{rm -rf pkg/*}
-  sh %{rm -rf coverage/*}
-  sh %{cd ../.. && svn copy #{cwd} tags/#{NAME}-#{VERS} && svn commit -m "#{NAME}-#{VERS} tag." tags}
 end
 
 ##############################################################################

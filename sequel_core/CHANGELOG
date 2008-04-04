@@ -1,4 +1,6 @@
-=== SVN
+=== 1.4.0 (2008-04-03) 
+
+* Add simple callback mechanism to make model eager loading implementation easier (jeremyevans)
 
 * Added Sequel::Error::InvalidOperation class for invalid operations (#198).
 
