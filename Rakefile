@@ -70,14 +70,11 @@ RDOC_OPTS = [
   "--inline-source"
 ]
 
-ALLISON_TEMPLATE = "#{Gem.dir}/gems/allison-2.0.3/lib/allison.rb"
-
 Rake::RDocTask.new do |rdoc|
   rdoc.rdoc_dir = "sequel/doc/rdoc"
   rdoc.options += RDOC_OPTS
   rdoc.main = "sequel/README"
   rdoc.title = "Sequel: The Database Toolkit for Ruby"
-  rdoc.template = ALLISON_TEMPLATE if File.exists?(ALLISON_TEMPLATE)
   rdoc.rdoc_files.add ["sequel/README", "sequel/COPYING", 
     "sequel_core/lib/sequel_core.rb", "sequel_core/lib/**/*.rb",
     "sequel/lib/sequel_model.rb", "sequel/lib/**/*.rb",
