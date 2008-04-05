@@ -247,6 +247,13 @@ describe Sequel::Model, "one_to_many" do
     n.attributes_dataset.sql.should == "SELECT * FROM attributes WHERE (node_id = 1234) ORDER BY kind"
   end
   
+  it "should support an array for the order option" do
+    @c2.one_to_many :attributes, :class => @c1, :order => [:kind1, :kind2]
+
+    n = @c2.new(:id => 1234)
+    n.attributes_dataset.sql.should == "SELECT * FROM attributes WHERE (node_id = 1234) ORDER BY kind1, kind2"
+  end
+  
   it "should return array with all members of the association" do
     @c2.one_to_many :attributes, :class => @c1
     
@@ -454,7 +461,7 @@ describe Sequel::Model, "many_to_many" do
     ].should(include(a.sql))
   end
   
-  it "should support order option" do
+  it "should support an order option" do
     @c2.many_to_many :attributes, :class => @c1, :order => :blah
 
     n = @c2.new(:id => 1234)
@@ -465,7 +472,40 @@ describe Sequel::Model, "many_to_many" do
     ].should(include(a.sql))
   end
   
-  it "should support optional dataset block" do
+  it "should support an array for the order option" do
+    @c2.many_to_many :attributes, :class => @c1, :order => [:blah1, :blah2]
+
+    n = @c2.new(:id => 1234)
+    a = n.attributes_dataset
+    a.should be_a_kind_of(Sequel::Dataset)
+    ['SELECT attributes.* FROM attributes INNER JOIN attributes_nodes ON (attributes_nodes.attribute_id = attributes.id) AND (attributes_nodes.node_id = 1234) ORDER BY blah1, blah2',
+     'SELECT attributes.* FROM attributes INNER JOIN attributes_nodes ON (attributes_nodes.node_id = 1234) AND (attributes_nodes.attribute_id = attributes.id) ORDER BY blah1, blah2'
+    ].should(include(a.sql))
+  end
+  
+  it "should support a select option" do
+    @c2.many_to_many :attributes, :class => @c1, :select => :blah
+
+    n = @c2.new(:id => 1234)
+    a = n.attributes_dataset
+    a.should be_a_kind_of(Sequel::Dataset)
+    ['SELECT blah FROM attributes INNER JOIN attributes_nodes ON (attributes_nodes.attribute_id = attributes.id) AND (attributes_nodes.node_id = 1234)',
+     'SELECT blah FROM attributes INNER JOIN attributes_nodes ON (attributes_nodes.node_id = 1234) AND (attributes_nodes.attribute_id = attributes.id)'
+    ].should(include(a.sql))
+  end
+  
+  it "should support an array for the select option" do
+    @c2.many_to_many :attributes, :class => @c1, :select => [:attributes.all, :attribute_nodes__blah2]
+
+    n = @c2.new(:id => 1234)
+    a = n.attributes_dataset
+    a.should be_a_kind_of(Sequel::Dataset)
+    ['SELECT attributes.*, attribute_nodes.blah2 FROM attributes INNER JOIN attributes_nodes ON (attributes_nodes.attribute_id = attributes.id) AND (attributes_nodes.node_id = 1234)',
+     'SELECT attributes.*, attribute_nodes.blah2 FROM attributes INNER JOIN attributes_nodes ON (attributes_nodes.node_id = 1234) AND (attributes_nodes.attribute_id = attributes.id)'
+    ].should(include(a.sql))
+  end
+  
+  it "should accept a block" do
     @c2.many_to_many :attributes, :class => @c1 do |ds|
       ds.filter(:xxx => @xxx)
     end
@@ -478,6 +518,22 @@ describe Sequel::Model, "many_to_many" do
     a.first.should be_a_kind_of(@c1)
     ['SELECT attributes.* FROM attributes INNER JOIN attributes_nodes ON (attributes_nodes.attribute_id = attributes.id) AND (attributes_nodes.node_id = 1234) WHERE (xxx = 555)',
      'SELECT attributes.* FROM attributes INNER JOIN attributes_nodes ON (attributes_nodes.node_id = 1234) AND (attributes_nodes.attribute_id = attributes.id) WHERE (xxx = 555)'
+    ].should(include(MODEL_DB.sqls.first))
+  end
+
+  it "should allow the order option while accepting a block" do
+    @c2.many_to_many :attributes, :class => @c1, :order=>[:blah1, :blah2] do |ds|
+      ds.filter(:xxx => @xxx)
+    end
+
+    n = @c2.new(:id => 1234)
+    n.xxx = 555
+    a = n.attributes
+    a.should be_a_kind_of(Array)
+    a.size.should == 1
+    a.first.should be_a_kind_of(@c1)
+    ['SELECT attributes.* FROM attributes INNER JOIN attributes_nodes ON (attributes_nodes.attribute_id = attributes.id) AND (attributes_nodes.node_id = 1234) WHERE (xxx = 555) ORDER BY blah1, blah2',
+     'SELECT attributes.* FROM attributes INNER JOIN attributes_nodes ON (attributes_nodes.node_id = 1234) AND (attributes_nodes.attribute_id = attributes.id) WHERE (xxx = 555) ORDER BY blah1, blah2'
     ].should(include(MODEL_DB.sqls.first))
   end
 

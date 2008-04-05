@@ -10,7 +10,7 @@
 #
 # This implementation avoids the complexity of extracting an object graph out
 # of a single dataset, by building the object graph out of multiple datasets,
-# one for each model.  By using a separate dataset for each association,
+# one for each association.  By using a separate dataset for each association,
 # it avoids problems such as aliasing conflicts and creating cartesian product
 # result sets if multiple *_to_many eager associations are requested.
 #
@@ -131,14 +131,16 @@ module Sequel::Model::Associations::EagerLoading
               reciprocal = model.send(:reciprocal_association, reflection)
               ds = assoc_class.filter(key=>h.keys)
             else
+              assoc_table = assoc_class.table_name
               left = reflection[:left_key]
               right = reflection[:right_key]
-              right_pk = (reflection[:right_primary_key] || :"#{assoc_class.table_name}__#{assoc_class.primary_key}")
+              right_pk = (reflection[:right_primary_key] || :"#{assoc_table}__#{assoc_class.primary_key}")
               join_table = reflection[:join_table]
-              fkey = (opts[:eager_foreign_key] ||= :"x_foreign_key_x")
-              selection = (opts[:eager_selection] ||= "#{assoc_class.table_name}.*, #{join_table}.#{left} AS #{fkey}".lit)
+              fkey = (opts[:left_key_alias] ||= :"x_foreign_key_x")
+              table_selection = (opts[:select] ||= assoc_table.all)
+              key_selection = (opts[:left_key_select] ||= :"#{join_table}__#{left}___#{fkey}")
               h = key_hash[model.primary_key]
-              ds = assoc_class.select(selection).inner_join(join_table, right=>right_pk, left=>h.keys)
+              ds = assoc_class.select(table_selection, key_selection).inner_join(join_table, right=>right_pk, left=>h.keys)
             end
             if order = reflection[:order]
               ds = ds.order(order)
