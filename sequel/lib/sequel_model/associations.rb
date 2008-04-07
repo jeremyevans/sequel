@@ -78,6 +78,10 @@ module Sequel::Model::Associations
   #   - :key - foreign key in associated model's table that references
   #     current model's primary key, as a symbol.  Defaults to
   #     :"#{self.name.underscore}_id".
+  #   - :reciprocal - the string name of the instance variable of the reciprocal many_to_one association,
+  #     if it exists.  By default, sequel will try to determine it by looking at the
+  #     associated model's assocations for a many_to_one association that matches
+  #     the current association's key.  Set to nil to not use a reciprocal.
   #   - :order - the column(s) by which to order the association dataset.  Can be a
   #     singular column or an array.
   # * :many_to_many:

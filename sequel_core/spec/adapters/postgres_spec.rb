@@ -2,7 +2,7 @@ require File.join(File.dirname(__FILE__), '../../lib/sequel_core')
 require File.join(File.dirname(__FILE__), '../spec_helper.rb')
 
 unless defined?(POSTGRES_DB)
-  POSTGRES_DB = Sequel('postgres://postgres:postgres@localhost:5432/reality_spec')
+  POSTGRES_DB = Sequel(ENV['SEQUEL_PG_SPEC_DB']||'postgres://postgres:postgres@localhost:5432/reality_spec')
 end
 
 POSTGRES_DB.drop_table(:test) if POSTGRES_DB.table_exists?(:test)
