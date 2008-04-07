@@ -2,8 +2,8 @@ require 'postgres'
 
 class PGconn
   # the pure-ruby postgres adapter does not have a quote method.
-  TRUE = 't'.freeze
-  FALSE = 'f'.freeze
+  TRUE = 'true'.freeze
+  FALSE = 'false'.freeze
   NULL = 'NULL'.freeze
   
   unless methods.include?('quote')
