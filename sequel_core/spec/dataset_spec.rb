@@ -1249,6 +1249,14 @@ context "Dataset#join_table" do
     @d.join_table(:left_outer, ds, :item_id => :id).sql.should ==
       'SELECT * FROM items LEFT OUTER JOIN (SELECT * FROM categories WHERE (active = \'t\')) t1 ON (t1.item_id = items.id)'
   end
+
+  specify "should support joining objects that respond to :table_name" do
+    ds = Object.new
+    def ds.table_name; :categories end
+    
+    @d.join(ds, :item_id => :id).sql.should ==
+      'SELECT * FROM items INNER JOIN categories ON (categories.item_id = items.id)'
+  end
 end
 
 context "Dataset#[]=" do

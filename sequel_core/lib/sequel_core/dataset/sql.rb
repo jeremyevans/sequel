@@ -412,6 +412,8 @@ module Sequel
         unless join_type
           raise Error::InvalidJoinType, "Invalid join type: #{type}"
         end
+        
+        table = table.table_name if table.respond_to?(:table_name)
 
         join_conditions = {}
         expr.each do |k, v|
