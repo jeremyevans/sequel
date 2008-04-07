@@ -47,6 +47,10 @@ class PGconn
     alias_method :async_exec, :exec
   end
   
+  unless instance_methods.include?('async_query')
+    alias_method :async_query, :query
+  end
+  
   def execute(sql, &block)
     q = nil
     begin
@@ -80,7 +84,7 @@ class PGconn
     end
     if seq = @table_sequences[table]
       r = async_query(SELECT_CURRVAL % seq)
-      return r[0][0].to_i unless r.nil? || r.empty?
+      return r[0][0].to_i unless r.nil? || (r.respond_to?(:empty?) && r.empty?)
     end
     nil # primary key sequence not found
   end
@@ -126,17 +130,17 @@ class PGconn
   
   def pkey_and_sequence(table)
     r = async_query(SELECT_PK_AND_SERIAL_SEQUENCE % table)
-    return [r[0].first, r[0].last] unless r.nil? or r.empty?
+    return [r[0].first, r[0].last] unless r.nil? || (r.respond_to?(:empty?) && r.empty?)
 
     r = async_query(SELECT_PK_AND_CUSTOM_SEQUENCE % table)
-    return [r[0].first, r[0].last] unless r.nil? or r.empty?
+    return [r[0].first, r[0].last] unless r.nil? || (r.respond_to?(:empty?) && r.empty?)
   rescue
     nil
   end
   
   def primary_key(table)
     r = async_query(SELECT_PK % table)
-    pkey = r[0].first unless r.nil? or r.empty?
+    pkey = r[0].first unless r.nil? || (r.respond_to?(:empty?) && r.empty?)
     return pkey.to_sym if pkey
   rescue
     nil
