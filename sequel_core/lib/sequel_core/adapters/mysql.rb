@@ -239,15 +239,15 @@ module Sequel
       # joins are SQL:2003 consistent.
       JOIN_TYPES  =  { :cross => 'INNER JOIN'.freeze,
         :straight => 'STRAIGHT_JOIN'.freeze,
-        :natural_left => 'NATRUAL LEFT JOIN'.freeze,
-        :natural_right => 'NATRUAL RIGHT JOIN'.freeze,
+        :natural_left => 'NATURAL LEFT JOIN'.freeze,
+        :natural_right => 'NATURAL RIGHT JOIN'.freeze,
         :natural_left_outer => 'NATURAL LEFT OUTER JOIN'.freeze,
         :natural_right_outer => 'NATURAL RIGHT OUTER JOIN'.freeze,
         :left => 'LEFT JOIN'.freeze,
         :right => 'RIGHT JOIN'.freeze,
         :left_outer => 'LEFT OUTER JOIN'.freeze,
         :right_outer => 'RIGHT OUTER JOIN'.freeze,
-        :natural_inner => 'NATRUAL LEFT JOIN'.freeze,
+        :natural_inner => 'NATURAL LEFT JOIN'.freeze,
         # :full_outer => 'FULL OUTER JOIN'.freeze,
         #
         # A full outer join, nor a workaround implementation of
@@ -288,7 +288,7 @@ module Sequel
       # === Example
       #   @ds = MYSQL_DB[:nodes]
       #   @ds.join_expr(:natural_left_outer, :nodes)
-      #   # 'NATRUAL LEFT OUTER JOIN nodes'
+      #   # 'NATURAL LEFT OUTER JOIN nodes'
       #
       def join_expr(type, table, expr = nil)
         join_type = JOIN_TYPES[type || :inner]

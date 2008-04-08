@@ -3,7 +3,7 @@ require File.join(File.dirname(__FILE__), '../spec_helper.rb')
 require 'logger'
 
 unless defined?(MYSQL_DB)
-  MYSQL_URL = 'mysql://root@localhost/sandbox' unless MYSQL_URL
+  MYSQL_URL = 'mysql://root@localhost/sandbox' unless defined? MYSQL_URL
   MYSQL_DB = Sequel(MYSQL_URL)
 end
 unless defined?(MYSQL_SOCKET_FILE)
