@@ -1,6 +1,6 @@
 === 1.4.0 (2008-04-08)
 
-* Don't marked a column as changed unless the new value is different from the current value (tamas.denes, jeremyevans) (#203).
+* Don't mark a column as changed unless the new value is different from the current value (tamas.denes, jeremyevans) (#203).
 
 * Switch gem name from "sequel_model" to just "sequel", which required large version bump (jeremyevans).
 
