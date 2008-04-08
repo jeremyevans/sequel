@@ -89,6 +89,24 @@ describe "Model#save_changes" do
     MODEL_DB.sqls.should == ["UPDATE items SET y = 4 WHERE (id = 3)"]
   end
   
+  it "should not consider columns changed if the values did not change" do
+    o = @c.load(:id => 3, :x => 1, :y => nil)
+    o.x = 1
+
+    o.save_changes
+    MODEL_DB.sqls.should == []
+    o.x = 3
+    o.save_changes
+    MODEL_DB.sqls.should == ["UPDATE items SET x = 3 WHERE (id = 3)"]
+    MODEL_DB.reset
+
+    o[:y] = nil
+    o.save_changes
+    MODEL_DB.sqls.should == []
+    o[:y] = 4
+    o.save_changes
+    MODEL_DB.sqls.should == ["UPDATE items SET y = 4 WHERE (id = 3)"]
+  end
 end
 
 describe "Model#set" do

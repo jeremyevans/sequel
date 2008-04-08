@@ -9,8 +9,14 @@ module Sequel
     end
     # Sets value of attribute and marks the column as changed.
     def []=(column, value)
-      @changed_columns << column unless @changed_columns.include?(column)
-      @values[column] = value
+      # If it is new, it doesn't have a value yet, so we should
+      # definitely set the new value.
+      # If the column isn't in @values, we can't assume it is
+      # NULL in the database, so assume it has changed.
+      if new? || !@values.include?(column) || value != @values[column]
+        @changed_columns << column unless @changed_columns.include?(column)
+        @values[column] = value
+      end
     end
 
     # Enumerates through all attributes.
