@@ -224,8 +224,7 @@ module Sequel
       # Changes the database in use by issuing a USE statement.
       def use(db_name)
         disconnect
-        @opts[:database] = db_name
-        self << "USE #{db_name}"
+        @opts[:database] = db_name if self << "USE #{db_name}"
         self
       end
     end
@@ -235,6 +234,28 @@ module Sequel
 
       TRUE = '1'
       FALSE = '0'
+
+      # Join processing changed after MySQL v5.0.12. NATURAL
+      # joins are SQL:2003 consistent.
+      JOIN_TYPES  =  { :cross => 'INNER JOIN'.freeze,
+        :straight => 'STRAIGHT_JOIN'.freeze,
+        :natural_left => 'NATRUAL LEFT JOIN'.freeze,
+        :natural_right => 'NATRUAL RIGHT JOIN'.freeze,
+        :natural_left_outer => 'NATURAL LEFT OUTER JOIN'.freeze,
+        :natural_right_outer => 'NATURAL RIGHT OUTER JOIN'.freeze,
+        :left => 'LEFT JOIN'.freeze,
+        :right => 'RIGHT JOIN'.freeze,
+        :left_outer => 'LEFT OUTER JOIN'.freeze,
+        :right_outer => 'RIGHT OUTER JOIN'.freeze,
+        :natural_inner => 'NATRUAL LEFT JOIN'.freeze,
+        # :full_outer => 'FULL OUTER JOIN'.freeze,
+        #
+        # A full outer join, nor a workaround implementation of
+        # :full_outer, is not yet possible in Sequel. See issue
+        # #195 which probably depends on issue #113 being
+        # resolved.
+        :inner => 'INNER JOIN'.freeze
+      }
 
       def literal(v)
         case v
@@ -249,6 +270,46 @@ module Sequel
         else
           super
         end
+      end
+
+      # Returns a join clause based on the specified join type
+      # and condition.  MySQL's NATURAL join is 'semantically
+      # equivalent to a JOIN with a USING clause that names all
+      # columns that exist in both tables.  The constraint
+      # expression may be nil, so join expression can accept two
+      # arguments.
+      #
+      # === Note
+      # Full outer joins (:full_outer) are not implemented in
+      # MySQL (as of v6.0), nor is there currently a work around
+      # implementation in Sequel.  Straight joins with 'ON
+      # <condition>' are not yet implemented.
+      #
+      # === Example
+      #   @ds = MYSQL_DB[:nodes]
+      #   @ds.join_expr(:natural_left_outer, :nodes)
+      #   # 'NATRUAL LEFT OUTER JOIN nodes'
+      #
+      def join_expr(type, table, expr = nil)
+        join_type = JOIN_TYPES[type || :inner]
+        unless join_type
+          raise Error::InvalidJoinType, "Invalid join type: #{type}"
+        end
+        @opts[:server_version] = @db.server_version unless @opts[:server_version]
+        type = :inner if type == :cross && !expr.nil?
+        if type.to_s =~ /natural|cross|straight/ &&  @opts[:server_version] >= 50014
+          tbl_factor = table.to_s
+          if table.is_a?(Dataset)
+            tbl_factor = table.sql << " AS t1"
+          end
+          if table.is_a?(Array)
+            tbl_factor = "( #{literal(table)} )"
+          end
+          join_string = "#{join_type} " << tbl_factor
+          return join_string
+        end
+
+        super
       end
 
       def match_expr(l, r)

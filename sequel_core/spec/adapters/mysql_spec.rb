@@ -3,7 +3,8 @@ require File.join(File.dirname(__FILE__), '../spec_helper.rb')
 require 'logger'
 
 unless defined?(MYSQL_DB)
-  MYSQL_DB = Sequel('mysql://root@localhost/sandbox')
+  MYSQL_URL = 'mysql://root@localhost/sandbox' unless MYSQL_URL
+  MYSQL_DB = Sequel(MYSQL_URL)
 end
 unless defined?(MYSQL_SOCKET_FILE)
   MYSQL_SOCKET_FILE = '/tmp/mysql.sock'
@@ -278,6 +279,53 @@ end
 #   end
 # end
 # 
+context "MySQL join expressions" do
+  setup do
+    @ds = MYSQL_DB[:nodes]
+    @ds.db.meta_def(:server_version) {50014}
+  end
+
+  specify "should raise error for :full_outer join requests." do
+    lambda{@ds.join_expr(:full_outer, :nodes)}.should raise_error(Sequel::Error::InvalidJoinType)
+  end
+  specify "should support natural left joins" do
+    @ds.join_expr(:natural_left, :nodes).should == \
+      'NATURAL LEFT JOIN nodes'
+  end
+  specify "should support natural right joins" do
+    @ds.join_expr(:natural_right, :nodes).should == \
+      'NATURAL RIGHT JOIN nodes'
+  end
+  specify "should support natural left outer joins" do
+    @ds.join_expr(:natural_left_outer, :nodes).should == \
+      'NATURAL LEFT OUTER JOIN nodes'
+  end
+  specify "should support natural right outer joins" do
+    @ds.join_expr(:natural_right_outer, :nodes).should == \
+      'NATURAL RIGHT OUTER JOIN nodes'
+  end
+  specify "should support natural inner joins" do
+    @ds.join_expr(:natural_inner, :nodes).should == \
+      'NATURAL LEFT JOIN nodes'
+  end
+  specify "should support cross joins (equivalent to inner join in MySQL, not in std SQL)" do
+    @ds.join_expr(:cross, :nodes).should == \
+      'INNER JOIN nodes'
+  end
+  specify "should support straight joins (force left table to be read before right)" do
+    @ds.join_expr(:straight, :nodes).should == \
+      'STRAIGHT_JOIN nodes'
+  end
+  specify "should support natural joins on multiple tables." do
+    @ds.join_expr(:natural_left_outer, [:nodes, :branches]).should == \
+      'NATURAL LEFT OUTER JOIN ( `nodes`, `branches` )'
+  end
+  specify "should support straight joins on multiple tables." do
+    @ds.join_expr(:straight, [:nodes,:branches]).should == \
+      'STRAIGHT_JOIN ( `nodes`, `branches` )'
+  end
+end
+
 context "Joined MySQL dataset" do
   setup do
     @ds = MYSQL_DB[:nodes].join(:attributes, :node_id => :id)
