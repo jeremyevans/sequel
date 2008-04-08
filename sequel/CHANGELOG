@@ -1,8 +1,18 @@
-=== 1.4.0 (2008-04-03)
+=== 1.4.0 (2008-04-08)
 
-* Add eager loading implementation (jeremyevans)
+* Don't marked a column as changed unless the new value is different from the current value (tamas.denes, jeremyevans) (#203).
 
-* Switch gem name from "sequel_model" to just "sequel", which required large version bump (jeremyevans)
+* Switch gem name from "sequel_model" to just "sequel", which required large version bump (jeremyevans).
+
+* Add :select option to many_to_many associations, default to selecting only the associated model table and not the join table (jeremyevans) (#208).
+
+* Add :reciprocal one_to_many association option, for setting corresponding many_to_one instance variable (jeremyevans).
+
+* Add eager loading implementation (jeremyevans).
+
+* Change *_to_many associations so that the all associations are considered :cache=>true (jeremyevans).
+
+* Fix associations with block arguments and :cache=>true (jeremyevans).
 
 === 0.5.0.2 (2008-03-12)
 
