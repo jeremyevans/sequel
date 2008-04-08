@@ -92,9 +92,12 @@ end
 # specs
 ##############################################################################
 require "spec/rake/spectask"
+sqcdir = File.join(File.dirname(__FILE__), 'sequel_core', 'lib')
+fixRUBYLIB = Proc.new{ENV['RUBYLIB'] ? (ENV['RUBYLIB'] += ":#{sqcdir}") : (ENV['RUBYLIB'] = sqcdir)}
 
 desc "Run specs with coverage"
 Spec::Rake::SpecTask.new("spec") do |t|
+  fixRUBYLIB.call
   t.spec_files = FileList["sequel_core/spec/*_spec.rb", "sequel/spec/*_spec.rb"]
   t.spec_opts  = File.read("sequel_core/spec/spec.opts").split("\n")
   t.rcov_opts  = File.read("sequel_core/spec/rcov.opts").split("\n")
@@ -103,6 +106,7 @@ end
 
 desc "Run specs without coverage"
 Spec::Rake::SpecTask.new("spec_no_cov") do |t|
+  fixRUBYLIB.call
   t.spec_files = FileList["sequel_core/spec/*_spec.rb", "sequel/spec/*_spec.rb"]
   t.spec_opts  = File.read("sequel_core/spec/spec.opts").split("\n")
 end
