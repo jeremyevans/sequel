@@ -425,8 +425,6 @@ module Sequel
           end
 
           case values
-          when Sequel::Model
-            insert_sql(values.values)
           when Array
             if values.empty?
               "REPLACE INTO #{@opts[:from]} DEFAULT VALUES"
@@ -448,7 +446,11 @@ module Sequel
           when Dataset
             "REPLACE INTO #{@opts[:from]} #{literal(values)}"
           else
-            "REPLACE INTO #{@opts[:from]} VALUES (#{literal(values)})"
+            if values.respond_to?(:values)
+              replace_sql(values.values)
+            else  
+              "REPLACE INTO #{@opts[:from]} VALUES (#{literal(values)})"
+            end
           end
         end
       end

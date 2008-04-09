@@ -2,8 +2,10 @@ module Sequel
   class Model
     # Returns the database associated with the Model class.
     def self.db
-      @db ||= (superclass != Object) && superclass.db or
-      raise Error, "No database associated with #{self}"
+      return @db if @db
+      @db = self == Model ? ::Sequel::DATABASES.first : superclass.db
+      raise(Error, "No database associated with #{self}") unless @db
+      @db
     end
     
     # Sets the database associated with the Model class.
