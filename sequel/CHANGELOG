@@ -1,3 +1,7 @@
+=== HEAD
+
+* Remove pretty_table.rb from sequel, since it is in sequel_core (jeremyevans)
+
 === 1.4.0 (2008-04-08)
 
 * Don't mark a column as changed unless the new value is different from the current value (tamas.denes, jeremyevans) (#203).

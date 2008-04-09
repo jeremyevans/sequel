@@ -1,3 +1,9 @@
+=== HEAD
+
+* Remove sequel_core's knowledge of Sequel::Model (jeremyevans)
+
+* Use "\n" instead of $/ (since $/ can be redefined in ways we do not want) (jeremyevans)
+
 === 1.4.0 (2008-04-08) 
 
 * Merge 3 mysql patches from the bugtracker (mvyver) (#200, #201, #202).
