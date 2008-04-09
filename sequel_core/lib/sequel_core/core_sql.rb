@@ -21,7 +21,7 @@ class String
   # Converts a string into an SQL string by removing comments.
   # See also Array#to_sql.
   def to_sql
-    split($/).to_sql
+    split("\n").to_sql
   end
   
   # Splits a string into separate SQL statements, removing comments
