@@ -85,7 +85,8 @@ task :doc_rforge => [:doc]
 
 desc "Update docs and upload to rubyforge.org"
 task :doc_rforge do
-  sh %{scp -r sequel/doc/rdoc/* rubyforge.org:/var/www/gforge-projects/sequel}
+  sh %{chmod -R g+w sequel/doc/rdoc/*}
+  sh %{scp -rp sequel/doc/rdoc/* rubyforge.org:/var/www/gforge-projects/sequel}
 end
 
 ##############################################################################
