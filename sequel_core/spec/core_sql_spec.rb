@@ -309,3 +309,19 @@ context "String#to_date" do
   end
 end
 
+context "Sequel::SQL::Function#==" do
+  specify "should be true for functions with the same name and arguments, false otherwise" do
+    a = :date[:t]
+    b = :date[:t]
+    a.should == b
+    (a == b).should == true
+    c = :date[:c]
+    a.should_not == c
+    (a == c).should == false
+    d = :time[:c]
+    a.should_not == d
+    c.should_not == d
+    (a == d).should == false
+    (c == d).should == false
+  end
+end

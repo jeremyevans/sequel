@@ -1,5 +1,7 @@
 === HEAD
 
+* Add Sequel::SQL::Function#==, for comparing SQL Functions (jeremyevans) (#209)
+
 * Update Informix adapter to work with Ruby/Informix 0.7.0 (gerardo.santana@gmail.com)
 
 * Remove sequel_core's knowledge of Sequel::Model (jeremyevans)

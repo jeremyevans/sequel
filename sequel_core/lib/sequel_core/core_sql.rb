@@ -91,7 +91,14 @@ module Sequel
     end
     
     class Function < Expression
+      attr_reader :f, :args
       def initialize(f, *args); @f, @args = f, args; end
+
+      # Functions are considered equivalent if they
+      # have the same class, function, and arguments.
+      def ==(x)
+         x.class == self.class && @f == x.f && @args == x.args
+      end
 
       def to_s(ds)
         args = @args.empty? ? '' : ds.literal(@args)
