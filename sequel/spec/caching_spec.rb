@@ -16,9 +16,7 @@ describe Sequel::Model, "caching" do
     @c = Class.new(Sequel::Model(:items)) do
       set_cache cache
       
-      def self.columns
-        [:name, :id]
-      end
+      columns :name, :id
     end
     
     $cache_dataset_row = {:name => 'sharon', :id => 1}

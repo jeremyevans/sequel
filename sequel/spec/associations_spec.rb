@@ -23,7 +23,7 @@ describe Sequel::Model, "many_to_one" do
     MODEL_DB.reset
 
     @c2 = Class.new(Sequel::Model(:nodes)) do
-      def columns; [:id, :parent_id]; end
+      columns :id, :parent_id, :par_parent_id, :blah
     end
 
     @dataset = @c2.dataset
@@ -161,7 +161,7 @@ describe Sequel::Model, "one_to_many" do
     MODEL_DB.reset
 
     @c1 = Class.new(Sequel::Model(:attributes)) do
-      def columns; [:id, :node_id]; end
+      columns :id, :node_id
     end
 
     @c2 = Class.new(Sequel::Model(:nodes)) do
@@ -169,6 +169,7 @@ describe Sequel::Model, "one_to_many" do
       
       def self.name; 'Node'; end
       def self.to_s; 'Node'; end
+      columns :id
     end
     @dataset = @c2.dataset
     
@@ -405,6 +406,7 @@ describe Sequel::Model, "many_to_many" do
     @c1 = Class.new(Sequel::Model(:attributes)) do
       def self.name; 'Attribute'; end
       def self.to_s; 'Attribute'; end
+      columns :id
     end
 
     @c2 = Class.new(Sequel::Model(:nodes)) do
@@ -412,6 +414,7 @@ describe Sequel::Model, "many_to_many" do
       
       def self.name; 'Node'; end
       def self.to_s; 'Node'; end
+      columns :id
     end
     @dataset = @c2.dataset
 

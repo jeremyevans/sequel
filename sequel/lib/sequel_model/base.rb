@@ -55,8 +55,16 @@ module Sequel
     #
     # See Dataset#columns for more information.
     def self.columns
-      @columns ||= dataset.columns or
+      return @columns if @columns
+      @columns = dataset.naked.columns or
       raise Error, "Could not fetch columns for #{self}"
+      def_column_accessor(*@columns)
+      @columns
+    end
+
+    # Returns the columns as a list of frozen strings.
+    def self.str_columns
+      @str_columns ||= columns.map{|c| c.to_s.freeze}
     end
 
     # Sets the dataset associated with the Model class.
@@ -66,6 +74,26 @@ module Sequel
       @dataset.set_model(self)
       @dataset.extend(Associations::EagerLoading)
       @dataset.transform(@transform) if @transform
+    end
+
+    class << self
+      private
+        def def_column_accessor(*columns)
+          Thread.exclusive do
+            columns.each do |column|
+              im = instance_methods
+              meth = "#{column}="
+              define_method(column){self[column]} unless im.include?(column.to_s)
+              unless im.include?(meth)
+                define_method(meth) do |*v|
+                  len = v.length
+                  raise(ArgumentError, "wrong number of arguments (#{len} for 1)") unless len == 1
+                  self[column] = v.first 
+                end
+              end
+            end
+          end
+        end
     end
     
     # Returns the database assoiated with the object's Model class.
@@ -83,6 +111,11 @@ module Sequel
     # Returns the columns associated with the object's Model class.
     def columns
       model.columns
+    end
+
+    # Returns the str_columns associated with the object's Model class.
+    def str_columns
+      model.str_columns
     end
 
     # Serializes column with YAML or through marshalling.

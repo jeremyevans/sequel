@@ -5,30 +5,30 @@ describe Sequel::Model, "eager" do
     MODEL_DB.reset
     
     class EagerAlbum < Sequel::Model(:albums)
-      def columns; [:id, :band_id]; end
+      columns :id, :band_id
       many_to_one :band, :class=>'EagerBand', :key=>:band_id
       one_to_many :tracks, :class=>'EagerTrack', :key=>:album_id
       many_to_many :genres, :class=>'EagerGenre', :left_key=>:album_id, :right_key=>:genre_id, :join_table=>:ag
     end
 
     class EagerBand < Sequel::Model(:bands)
-      def columns; [:id]; end
+      columns :id
       one_to_many :albums, :class=>'EagerAlbum', :key=>:band_id, :eager=>:tracks
       many_to_many :members, :class=>'EagerBandMember', :left_key=>:band_id, :right_key=>:member_id, :join_table=>:bm
     end
     
     class EagerTrack < Sequel::Model(:tracks)
-      def columns; [:id, :album_id]; end
+      columns :id, :album_id
       many_to_one :album, :class=>'EagerAlbum', :key=>:album_id
     end
     
     class EagerGenre < Sequel::Model(:genres)
-      def columns; [:id]; end
+      columns :id
       many_to_many :albums, :class=>'EagerAlbum', :left_key=>:genre_id, :right_key=>:album_id, :join_table=>:ag
     end
     
     class EagerBandMember < Sequel::Model(:members)
-      def columns; [:id]; end
+      columns :id
       many_to_many :bands, :class=>'EagerBand', :left_key=>:member_id, :right_key=>:band_id, :join_table=>:bm, :order =>:id
     end
     

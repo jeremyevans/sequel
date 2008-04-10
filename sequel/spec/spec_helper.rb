@@ -40,4 +40,13 @@ class MockDatabase < Sequel::Database
   def dataset; MockDataset.new(self); end
 end
 
+class << Sequel::Model
+  alias orig_columns columns
+  def columns(*cols)
+    define_method(:columns){cols}
+    define_method(:str_columns){cols.map{|x|x.to_s.freeze}}
+    def_column_accessor(*cols)
+  end
+end
+
 Sequel::Model.db = MODEL_DB = MockDatabase.new

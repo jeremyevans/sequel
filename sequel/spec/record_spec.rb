@@ -6,9 +6,7 @@ describe "Model#save" do
     MODEL_DB.reset
 
     @c = Class.new(Sequel::Model(:items)) do
-      def columns
-        [:id, :x, :y]
-      end
+      columns :id, :x, :y
     end
   end
   
@@ -52,9 +50,7 @@ describe "Model#save_changes" do
     MODEL_DB.reset
 
     @c = Class.new(Sequel::Model(:items)) do
-      def columns
-        [:id, :x, :y]
-      end
+      columns :id, :x, :y
     end
   end
   
@@ -115,9 +111,7 @@ describe "Model#set" do
     MODEL_DB.reset
 
     @c = Class.new(Sequel::Model(:items)) do
-      def columns
-        [:id, :x, :y]
-      end
+      columns :id, :x, :y
     end
   end
   
@@ -217,7 +211,7 @@ end
 
 describe Sequel::Model, "with this" do
 
-  before { @example = Class.new Sequel::Model(:examples) }
+  before { @example = Class.new Sequel::Model(:examples); @example.columns :id, :a, :x, :y }
 
   it "should return a dataset identifying the record" do
     instance = @example.new :id => 3
@@ -250,6 +244,7 @@ end
 describe "Model#pk" do
   before(:each) do
     @m = Class.new(Sequel::Model)
+    @m.columns :id, :x, :y
   end
   
   it "should be default return the value of the :id column" do
@@ -283,6 +278,7 @@ end
 describe "Model#pk_hash" do
   before(:each) do
     @m = Class.new(Sequel::Model)
+    @m.columns :id, :x, :y
   end
   
   it "should be default return the value of the :id column" do
@@ -319,7 +315,7 @@ describe Sequel::Model, "update_with_params" do
     MODEL_DB.reset
     
     @c = Class.new(Sequel::Model(:items)) do
-      def self.columns; [:x, :y]; end
+      columns :x, :y, :id
     end
     @o1 = @c.new
     @o2 = @c.load(:id => 5)
@@ -356,7 +352,7 @@ describe Sequel::Model, "create_with_params" do
     MODEL_DB.reset
     
     @c = Class.new(Sequel::Model(:items)) do
-      def self.columns; [:x, :y]; end
+      columns :x, :y
     end
   end
   
@@ -390,6 +386,7 @@ describe Sequel::Model, "#destroy" do
   before(:each) do
     MODEL_DB.reset
     @model = Class.new(Sequel::Model(:items))
+    @model.columns :id
     @model.dataset.meta_def(:delete) {MODEL_DB.execute delete_sql}
     
     @instance = @model.new(:id => 1234)
@@ -434,6 +431,7 @@ end
 describe Sequel::Model, "#each" do
   setup do
     @model = Class.new(Sequel::Model(:items))
+    @model.columns :a, :b, :id
     @m = @model.new(:a => 1, :b => 2, :id => 4444)
   end
   
@@ -447,6 +445,7 @@ end
 describe Sequel::Model, "#keys" do
   setup do
     @model = Class.new(Sequel::Model(:items))
+    @model.columns :a, :b, :id
     @m = @model.new(:a => 1, :b => 2, :id => 4444)
   end
   
@@ -461,9 +460,11 @@ end
 
 describe Sequel::Model, "#===" do
   specify "should compare instances by values" do
-    a = Sequel::Model.new(:id => 1, :x => 3)
-    b = Sequel::Model.new(:id => 1, :x => 4)
-    c = Sequel::Model.new(:id => 1, :x => 3)
+    z = Class.new(Sequel::Model)
+    z.columns :id, :x
+    a = z.new(:id => 1, :x => 3)
+    b = z.new(:id => 1, :x => 4)
+    c = z.new(:id => 1, :x => 3)
     
     a.should_not == b
     a.should == c
@@ -473,9 +474,11 @@ end
 
 describe Sequel::Model, "#===" do
   specify "should compare instances by pk only" do
-    a = Sequel::Model.new(:id => 1, :x => 3)
-    b = Sequel::Model.new(:id => 1, :x => 4)
-    c = Sequel::Model.new(:id => 2, :x => 3)
+    z = Class.new(Sequel::Model)
+    z.columns :id, :x
+    a = z.new(:id => 1, :x => 3)
+    b = z.new(:id => 1, :x => 4)
+    c = z.new(:id => 2, :x => 3)
     
     a.should === b
     a.should_not === c
@@ -485,6 +488,7 @@ end
 describe Sequel::Model, "#initialize" do
   setup do
     @c = Class.new(Sequel::Model) do
+      columns :id, :x
     end
   end
   
@@ -528,7 +532,7 @@ describe Sequel::Model, ".create" do
   before(:each) do
     MODEL_DB.reset
     @c = Class.new(Sequel::Model(:items)) do
-      def columns; [:x]; end
+      columns :x
     end
   end
 
@@ -566,7 +570,7 @@ describe Sequel::Model, "#refresh" do
   setup do
     MODEL_DB.reset
     @c = Class.new(Sequel::Model(:items)) do
-      def columns; [:x]; end
+      columns :x
     end
   end
 

@@ -73,6 +73,7 @@ describe Sequel::Model, "constructor" do
   
   before(:each) do
     @m = Class.new(Sequel::Model)
+    @m.columns :a, :b
   end
 
   it "should accept a hash" do
@@ -290,6 +291,7 @@ describe Sequel::Model, ".find_or_create" do
     MODEL_DB.reset
     @c = Class.new(Sequel::Model(:items)) do
       no_primary_key
+      columns :x
     end
   end
 
@@ -406,6 +408,7 @@ describe Sequel::Model, "A model class without a primary key" do
   before(:each) do
     MODEL_DB.reset
     @c = Class.new(Sequel::Model(:items)) do
+      columns :x
       no_primary_key
     end
   end
@@ -438,52 +441,36 @@ describe Sequel::Model, "attribute accessors" do
   before(:each) do
     MODEL_DB.reset
 
-    @c = Class.new(Sequel::Model(:items)) do
+    @c = Class.new(Sequel::Model) do
+      @dataset = Object.new
+      def @dataset.naked; self; end
+      def @dataset.columns; [:x, :y]; end
+      def self.columns; orig_columns; end
     end
-    
-    @c.dataset.meta_def(:columns) {[:id, :x, :y]}
   end
 
-  it "should be created dynamically" do
+  it "should be created on first initialization" do
+    %w'x y x= y='.each do |x|
+      @c.instance_methods.include?(x).should == false
+    end
     o = @c.new
+    %w'x y x= y='.each do |x|
+      @c.instance_methods.include?(x).should == true
+      o.methods.include?(x).should == true
+    end
 
-    o.should_not be_respond_to(:x)
     o.x.should be_nil
-    o.should be_respond_to(:x)
-
-    o.should_not be_respond_to(:x=)
     o.x = 34
     o.x.should == 34
-    o.should be_respond_to(:x=)
   end
 
-  it "should raise for a column that doesn't exist in the dataset" do
+  it "should be only accept one argument for the write accessor" do
     o = @c.new
 
-    proc {o.x}.should_not raise_error
-    proc {o.xx}.should raise_error(Sequel::Error)
-
-    proc {o.x = 3}.should_not raise_error
-    proc {o.yy = 4}.should raise_error(Sequel::Error)
-
-    proc {o.yy?}.should raise_error(NoMethodError)
-  end
-  
-  it "should not raise for a column not in the dataset, but for which there's a value" do
-    o = @c.new
-
-    proc {o.xx}.should raise_error(Sequel::Error)
-    proc {o.yy}.should raise_error(Sequel::Error)
-
-    o.values[:xx] = 123
-    o.values[:yy] = nil
-
-    proc {o.xx; o.yy}.should_not raise_error(Sequel::Error)
-
-    o.xx.should == 123
-    o.yy.should == nil
-
-    proc {o.xx = 3}.should_not raise_error(Sequel::Error)
+    o.x = 34
+    o.x.should == 34
+    proc{o.send(:x=)}.should raise_error
+    proc{o.send(:x=, 3, 4)}.should raise_error
   end
 end
 

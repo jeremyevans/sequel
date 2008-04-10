@@ -6,9 +6,7 @@ describe "Model attribute setters" do
     MODEL_DB.reset
 
     @c = Class.new(Sequel::Model(:items)) do
-      def columns
-        [:id, :x, :y]
-      end
+      columns :id, :x, :y
     end
   end
 
@@ -43,6 +41,7 @@ describe "Model#serialize" do
     @c = Class.new(Sequel::Model(:items)) do
       no_primary_key
       serialize :abc
+      columns :abc
     end
 
     @c.create(:abc => 1)
@@ -57,6 +56,7 @@ describe "Model#serialize" do
   it "should support calling after the class is defined" do
     @c = Class.new(Sequel::Model(:items)) do
       no_primary_key
+      columns :def
     end
 
     @c.serialize :def
@@ -74,6 +74,7 @@ describe "Model#serialize" do
     @c = Class.new(Sequel::Model(:items)) do
       no_primary_key
       serialize :abc, :format => :marshal
+      columns :abc
     end
 
     @c.create(:abc => 1)
@@ -88,6 +89,7 @@ describe "Model#serialize" do
   it "should translate values to and from YAML using accessor methods" do
     @c = Class.new(Sequel::Model(:items)) do
       serialize :abc, :def
+      columns :abc, :def
     end
 
     ds = @c.dataset
