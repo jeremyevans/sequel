@@ -86,6 +86,11 @@ describe Sequel::Model, "caching" do
     proc {m.cache_key}.should_not raise_error(Sequel::Error)
   end
   
+  it "should not raise error if trying to save a new record" do
+    proc {@c.new(:name=>'blah').save}.should_not raise_error
+    proc {@c.create(:name=>'blah')}.should_not raise_error
+  end
+  
   it "should set the cache when reading from the database" do
     $sqls.should == []
     @cache.should be_empty

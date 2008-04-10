@@ -1,5 +1,7 @@
 === HEAD
 
+* Allow creation of new records that don't have primary keys when the cache is on (jeremyevans) (#213)
+
 * Define Model column accessors on first initialization, remove Model#method_missing (jeremyevans)
 
 * Make Model#initialize, Model#set, and Model#update_with invulnerable to memory exhaustion (jeremyevans) (#210)
