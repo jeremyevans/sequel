@@ -129,6 +129,31 @@ describe Sequel::Model, "Validations" do
     @cow.name = "Betsy"
     @cow.should be_valid
   end
+ 
+  it "should validate the uniqueness of a column" do
+    class User < Sequel::Model
+      validations.clear
+      validates do
+        uniqueness_of :username
+      end
+    end
+    User.dataset.extend(Module.new {
+      def fetch_rows(sql)
+        @db << sql
+         
+        if sql == "SELECT * FROM users WHERE (username = 'willy') LIMIT 1" then
+          yield({:id => 1, :username => "willy", :password => "test"})
+        end
+      end
+    })
+    
+    @user = User.new(:username => "willy", :password => "anothertest")
+    @user.should_not be_valid
+    @user.errors.full_messages.should == ['username is already taken']
+
+    @user.username = "pinky"
+    @user.should be_valid
+  end
   
   it "should have a validates block that contains multiple validations" do
     class Person < Sequel::Model
