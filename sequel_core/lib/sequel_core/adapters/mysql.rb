@@ -154,11 +154,13 @@ module Sequel
       end
 
       def alter_table_sql(table, op)
+        type = type_literal(op[:type])
+        type << '(255)' if type == 'varchar'
         case op[:op]
         when :rename_column
-          "ALTER TABLE #{table} CHANGE COLUMN #{literal(op[:name])} #{literal(op[:new_name])} #{type_literal(op[:type])}"
+          "ALTER TABLE #{table} CHANGE COLUMN #{literal(op[:name])} #{literal(op[:new_name])} #{type}"
         when :set_column_type
-          "ALTER TABLE #{table} CHANGE COLUMN #{literal(op[:name])} #{literal(op[:name])} #{type_literal(op[:type])}"
+          "ALTER TABLE #{table} CHANGE COLUMN #{literal(op[:name])} #{literal(op[:name])} #{type}"
         when :drop_index
           "DROP INDEX #{default_index_name(table, op[:columns])} ON #{table}"
         else
