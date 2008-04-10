@@ -142,18 +142,15 @@ context "A simple dataset" do
       should match(/INSERT INTO test \(name, price\) VALUES \('wxyz', 342\)|INSERT INTO test \(price, name\) VALUES \(342, 'wxyz'\)/)
   end
   
-  specify "should format an insert statement with a model instance" do
+  specify "should format an insert statement with an object that respond_to? :values" do
     dbb = Sequel::Database.new
     
-    @c = Class.new(Sequel::Model) do
-      attr_accessor :values
-    end
-    
-    v = @c.new; v.values = {:a => 1}
+    v = Object.new
+    def v.values; {:a => 1}; end
     
     @dataset.insert_sql(v).should == "INSERT INTO test (a) VALUES (1)"
     
-    v = @c.new; v.values = {}
+    def v.values; {}; end
     @dataset.insert_sql(v).should == "INSERT INTO test DEFAULT VALUES"
   end
   
