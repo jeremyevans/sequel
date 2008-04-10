@@ -1,5 +1,11 @@
 === HEAD
 
+* Define Model column accessors on first initialization, remove Model#method_missing (jeremyevans)
+
+* Make Model#initialize, Model#set, and Model#update_with invulnerable to memory exhaustion (jeremyevans) (#210)
+
+* Add Model.str_columns, which gives a list of columns as frozen strings (jeremyevans)
+
 * Remove pretty_table.rb from sequel, since it is in sequel_core (jeremyevans)
 
 === 1.4.0 (2008-04-08)
