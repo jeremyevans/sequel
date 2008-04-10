@@ -21,9 +21,9 @@ module Sequel
       end
       
       def connect
-        dbname = @opts[:database]
+        s = "driver=#{@opts[:driver] || 'SQL Server'};server=#{@opts[:host]};database=#{@opts[:database]}#{";uid=#{@opts[:user]};pwd=#{@opts[:password]}" if @opts[:user]}"
         handle = WIN32OLE.new('ADODB.Connection')
-        handle.Open(dbname)
+        handle.Open(s)
         handle
       end
       
