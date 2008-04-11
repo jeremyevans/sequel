@@ -1,5 +1,7 @@
 === HEAD
 
+* Fix many_to_many associations with classes inside modules without an explicit join table (jeremyevans)
+
 * Allow creation of new records that don't have primary keys when the cache is on (jeremyevans) (#213)
 
 * Define Model column accessors on first initialization, remove Model#method_missing (jeremyevans)
