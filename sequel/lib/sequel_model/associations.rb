@@ -323,7 +323,7 @@ module Sequel::Model::Associations
   
   # Name symbol for default join table
   def default_join_table_name(opts)
-    ([opts[:class_name], self.name.demodulize]. \
+    ([opts[:class_name].demodulize, name.demodulize]. \
       map{|i| i.pluralize.underscore}.sort.join('_')).to_sym
   end
   
