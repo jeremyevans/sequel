@@ -548,6 +548,50 @@ class Sequel::MySQL::Database
   end
 end
 
+context "MySQL::Dataset#insert" do
+  setup do
+    @d = MYSQL_DB[:items]
+    @d.delete # remove all records
+    MYSQL_DB.sqls.clear
+  end
+
+  specify "should insert record with default values when no arguments given" do
+    @d.insert
+    
+    MYSQL_DB.sqls.should == [
+      "INSERT INTO items () VALUES ()"
+    ]
+    
+    @d.all.should == [
+      {:name => nil, :value => nil}
+    ]
+  end
+
+  specify "should insert record with default values when empty hash given" do
+    @d.insert {}
+    
+    MYSQL_DB.sqls.should == [
+      "INSERT INTO items () VALUES ()"
+    ]
+    
+    @d.all.should == [
+      {:name => nil, :value => nil}
+    ]
+  end
+
+  specify "should insert record with default values when empty array given" do
+    @d.insert []
+    
+    MYSQL_DB.sqls.should == [
+      "INSERT INTO items () VALUES ()"
+    ]
+    
+    @d.all.should == [
+      {:name => nil, :value => nil}
+    ]
+  end
+end
+
 context "MySQL::Dataset#multi_insert" do
   setup do
     @d = MYSQL_DB[:items]

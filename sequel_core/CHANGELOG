@@ -1,5 +1,7 @@
 === HEAD
 
+* Fix MySQL default values insert (matt.binary) (#196)
+
 * Fix ODBC adapter improperly escaping date and timestamp values (leo.borisenko) (#165)
 
 * Fix renaming columns on MySQL with type :varchar (jeremyevans) (#206)

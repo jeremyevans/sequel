@@ -525,6 +525,11 @@ module Sequel
       end
       alias_method :sql, :select_sql
 
+      # Returns the SQL for formatting an insert statement with default values
+      def insert_default_values_sql
+        "INSERT INTO #{@opts[:from]} DEFAULT VALUES"
+      end
+
       # Formats an INSERT statement using the given values. If a hash is given,
       # the resulting statement includes column names. If no values are given, 
       # the resulting statement includes a DEFAULT VALUES clause.
@@ -535,7 +540,7 @@ module Sequel
       #     'INSERT INTO items (a, b) VALUES (1, 2)'
       def insert_sql(*values)
         if values.empty?
-          "INSERT INTO #{@opts[:from]} DEFAULT VALUES"
+          insert_default_values_sql
         else
           values = values[0] if values.size == 1
           
@@ -547,7 +552,7 @@ module Sequel
           case values
           when Array
             if values.empty?
-              "INSERT INTO #{@opts[:from]} DEFAULT VALUES"
+              insert_default_values_sql
             elsif values.keys
               fl = values.keys.map {|f| literal(f.is_a?(String) ? f.to_sym : f)}
               vl = values.values.map {|v| literal(v)}
@@ -557,7 +562,7 @@ module Sequel
             end
           when Hash
             if values.empty?
-              "INSERT INTO #{@opts[:from]} DEFAULT VALUES"
+              insert_default_values_sql
             else
               fl, vl = [], []
               values.each {|k, v| fl << literal(k.is_a?(String) ? k.to_sym : k); vl << literal(v)}

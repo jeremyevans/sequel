@@ -314,6 +314,10 @@ module Sequel
         super
       end
 
+      def insert_default_values_sql
+        "INSERT INTO #{@opts[:from]} () VALUES ()"
+      end
+
       def match_expr(l, r)
         case r
         when Regexp
