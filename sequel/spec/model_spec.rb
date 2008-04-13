@@ -442,20 +442,25 @@ describe Sequel::Model, "attribute accessors" do
     MODEL_DB.reset
 
     @c = Class.new(Sequel::Model) do
-      @dataset = Object.new
-      def @dataset.naked; self; end
-      def @dataset.columns; [:x, :y]; end
       def self.columns; orig_columns; end
     end
+    @dataset = Object.new
+    def @dataset.db; end
+    def @dataset.set_model(blah); end
+    def @dataset.naked; self; end
+    def @dataset.columns; [:x, :y]; end
   end
 
-  it "should be created on first initialization" do
+  it "should be created on set_dataset" do
     %w'x y x= y='.each do |x|
       @c.instance_methods.include?(x).should == false
     end
-    o = @c.new
+    @c.set_dataset(@dataset)
     %w'x y x= y='.each do |x|
       @c.instance_methods.include?(x).should == true
+    end
+    o = @c.new
+    %w'x y x= y='.each do |x|
       o.methods.include?(x).should == true
     end
 
@@ -465,6 +470,7 @@ describe Sequel::Model, "attribute accessors" do
   end
 
   it "should be only accept one argument for the write accessor" do
+    @c.set_dataset(@dataset)
     o = @c.new
 
     o.x = 34

@@ -43,6 +43,7 @@ end
 class << Sequel::Model
   alias orig_columns columns
   def columns(*cols)
+    return if cols.empty?
     define_method(:columns){cols}
     define_method(:str_columns){cols.map{|x|x.to_s.freeze}}
     def_column_accessor(*cols)

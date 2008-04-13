@@ -201,7 +201,6 @@ module Sequel
     # This method guesses whether the record exists when
     # <tt>new_record</tt> is set to false.
     def initialize(values = nil, from_db = false, &block)
-      columns
       values ||=  {}
       @changed_columns = []
       if from_db

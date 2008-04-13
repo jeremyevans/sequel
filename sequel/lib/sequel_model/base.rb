@@ -59,6 +59,7 @@ module Sequel
       @columns = dataset.naked.columns or
       raise Error, "Could not fetch columns for #{self}"
       def_column_accessor(*@columns)
+      @str_columns = nil
       @columns
     end
 
@@ -74,6 +75,11 @@ module Sequel
       @dataset.set_model(self)
       @dataset.extend(Associations::EagerLoading)
       @dataset.transform(@transform) if @transform
+      begin
+        @columns = nil
+        columns
+      rescue ::Sequel::Error
+      end
     end
 
     class << self
@@ -151,5 +157,4 @@ module Sequel
       end
     end
   end
-  
 end
