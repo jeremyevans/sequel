@@ -6,8 +6,8 @@ require "bigdecimal"
 require "bigdecimal/util"
 
 files = %w[
-  core_ext core_sql array_keys exceptions pretty_table
-  dataset migration schema database worker
+  core_ext core_sql exceptions pretty_table
+  dataset migration schema database worker object_graph
 ]
 dir = File.join(File.dirname(__FILE__), "sequel_core")
 files.each {|f| require(File.join(dir, f))}

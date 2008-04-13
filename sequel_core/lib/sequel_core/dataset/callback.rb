@@ -1,19 +1,17 @@
 module Sequel
   class Dataset
+    # Module with empty methods that can be
+    # override to provide callback behavior
     module Callback
-      # Add a symbol with the name of a method to the list of callbacks for name.
-      def add_callback(name, sym)
-        cbs = (@opts[:callbacks] ||= {})
-        cb = (cbs[name] ||= [])
-        cb.push(sym)
-      end
-      
-      # Run all callbacks for name with the given args
-      def run_callback(name, *args)
-        return unless cbs = @opts[:callbacks]
-        return unless cb = cbs[name]
-        cb.each{|sym| send(sym, *args)}
-      end
+      private
+        # This is run inside .all, after all
+        # of the records have been loaded
+        # via .each, but before any block passed
+        # to all is called.  It is called with
+        # a single argument, an array of all
+        # returned records.
+        def post_load(all_records)
+        end
     end
   end
 end
