@@ -553,10 +553,6 @@ module Sequel
           when Array
             if values.empty?
               insert_default_values_sql
-            elsif values.keys
-              fl = values.keys.map {|f| literal(f.is_a?(String) ? f.to_sym : f)}
-              vl = values.values.map {|v| literal(v)}
-              "INSERT INTO #{@opts[:from]} (#{fl.join(COMMA_SEPARATOR)}) VALUES (#{vl.join(COMMA_SEPARATOR)})"
             else
               "INSERT INTO #{@opts[:from]} VALUES (#{literal(values)})"
             end

@@ -127,16 +127,6 @@ context "A simple dataset" do
       @dataset.insert_sql({}).should == "INSERT INTO test DEFAULT VALUES"
   end
 
-  specify "should format an insert statement with array with keys" do
-    v = [1, 2, 3]
-    v.keys = [:a, :b, :c]
-    @dataset.insert_sql(v).should == "INSERT INTO test (a, b, c) VALUES (1, 2, 3)"
-    
-    v = []
-    v.keys = [:a, :b]
-    @dataset.insert_sql(v).should == "INSERT INTO test DEFAULT VALUES"
-  end
-  
   specify "should format an insert statement with string keys" do
     @dataset.insert_sql('name' => 'wxyz', 'price' => 342).
       should match(/INSERT INTO test \(name, price\) VALUES \('wxyz', 342\)|INSERT INTO test \(price, name\) VALUES \(342, 'wxyz'\)/)
@@ -175,13 +165,6 @@ context "A simple dataset" do
 
     @dataset.update_sql {:x << :y}.should ==
       "UPDATE test SET x = y"
-  end
-  
-  specify "should format an update statement with array with keys" do
-    v = ['abc']
-    v.keys = [:name]
-    
-    @dataset.update_sql(v).should == "UPDATE test SET name = 'abc'"
   end
   
   specify "should be able to return rows for arbitrary SQL" do
@@ -2616,11 +2599,10 @@ context "Dataset#to_csv" do
   setup do
     @c = Class.new(Sequel::Dataset) do
       attr_accessor :data
-      attr_accessor :cols
+      attr_accessor :columns
       
       def fetch_rows(sql, &block)
-        @columns = @cols
-        @data.each {|r| r.keys = @columns; block[r]}
+        @data.each(&block)
       end
       
       # naked should return self here because to_csv wants a naked result set.
@@ -2630,11 +2612,8 @@ context "Dataset#to_csv" do
     end
     
     @ds = @c.new(nil).from(:items)
-
-    @ds.cols = [:a, :b, :c]
-    @ds.data = [
-      [1, 2, 3], [4, 5, 6], [7, 8, 9]
-    ]
+    @ds.columns = [:a, :b, :c]
+    @ds.data = [ {:a=>1, :b=>2, :c=>3}, {:a=>4, :b=>5, :c=>6}, {:a=>7, :b=>8, :c=>9} ]
   end
   
   specify "should format a CSV representation of the records" do
@@ -2645,25 +2624,6 @@ context "Dataset#to_csv" do
   specify "should exclude column titles if so specified" do
     @ds.to_csv(false).should ==
       "1, 2, 3\r\n4, 5, 6\r\n7, 8, 9\r\n"
-  end
-end
-
-context "Dataset#each_hash" do
-  setup do
-    @c = Class.new(Sequel::Dataset) do
-      def each(&block)
-        a = [[1, 2, 3], [4, 5, 6]]
-        a.each {|r| r.keys = [:a, :b, :c]; block[r]}
-      end
-    end
-    
-    @ds = @c.new(nil).from(:items)
-  end
-  
-  specify "should yield records converted to hashes" do
-    hashes = []
-    @ds.each_hash {|h| hashes << h}
-    hashes.should == [{:a => 1, :b => 2, :c => 3}, {:a => 4, :b => 5, :c => 6}]
   end
 end
 

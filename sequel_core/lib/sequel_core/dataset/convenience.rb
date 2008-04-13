@@ -3,11 +3,6 @@ require 'enumerator'
 module Sequel
   class Dataset
     module Convenience
-      # Iterates through each record, converting it into a hash.
-      def each_hash(&block)
-        each {|a| block[a.to_hash]}
-      end
-      
       # Returns true if no records exists in the dataset
       def empty?
         db.dataset.where(exists).get(1) == nil
@@ -227,12 +222,11 @@ module Sequel
       # first line. You can turn that off by passing false as the 
       # include_column_titles argument.
       def to_csv(include_column_titles = true)
-        records = naked.to_a
+        n = naked
+        cols = n.columns
         csv = ''
-        if include_column_titles
-          csv << "#{@columns.join(COMMA_SEPARATOR)}\r\n"
-        end
-        records.each {|r| csv << "#{r.join(COMMA_SEPARATOR)}\r\n"}
+        csv << "#{cols.join(COMMA_SEPARATOR)}\r\n" if include_column_titles
+        n.each{|r| csv << "#{cols.collect{|c| r[c]}.join(COMMA_SEPARATOR)}\r\n"}
         csv
       end
       
