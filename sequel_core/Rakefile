@@ -37,7 +37,7 @@ end
 # Gem packaging
 ##############################################################################
 desc "Packages up Sequel."
-task :default => [:package]
+task :default => [:spec_no_cov]
 task :package => [:clean]
 
 spec = Gem::Specification.new do |s|

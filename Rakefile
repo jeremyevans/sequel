@@ -27,7 +27,7 @@ end
 # gem packaging and release
 ##############################################################################
 desc "Packages up sequel and sequel_core."
-task :default => [:package]
+task :default => [:spec_no_cov]
 task :package => [:clean]
 task :doc => [:rdoc]
 
