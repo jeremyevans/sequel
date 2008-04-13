@@ -1,5 +1,15 @@
 === HEAD
 
+* Fix backslash escaping of strings (davidlee@berkeley.edu)
+
+* Add ability to create a graph of objects from a query, with the result split into corresponding tables (jeremyevans) (#113)
+
+* Add attr_accessor for dataset row_proc (jeremyevans)
+
+* Don't redefine Dataset#each when adding a transform or row_proc (jeremyevans)
+
+* Remove array_keys.rb from sequel_core, it was partially broken (since the arrays came from hashes), and redefined Dataset#each (jeremyevans)
+
 * Fix MySQL default values insert (matt.binary) (#196)
 
 * Fix ODBC adapter improperly escaping date and timestamp values (leo.borisenko) (#165)
