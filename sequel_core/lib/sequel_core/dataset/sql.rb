@@ -100,7 +100,7 @@ module Sequel
       # Time (as an SQL TIMESTAMP), Date (as an SQL DATE), Dataset (as a 
       # subquery) and nil (AS NULL).
       # 
-      #   dataset.literal("abc'def") #=> "'abc''def'"
+      #   dataset.literal("abc'def\\") #=> "'abc''def\\\\'"
       #   dataset.literal(:items__id) #=> "items.id"
       #   dataset.literal([1, 2, 3]) => "(1, 2, 3)"
       #   dataset.literal(DB[:items]) => "(SELECT * FROM items)"
@@ -111,7 +111,7 @@ module Sequel
         when LiteralString
           v
         when String
-          "'#{v.gsub(/'/, "''")}'"
+          "'#{v.gsub(/\\/, "\\\\\\\\").gsub(/'/, "''")}'"
         when Integer, Float
           v.to_s
         when BigDecimal

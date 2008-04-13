@@ -578,6 +578,9 @@ context "Dataset#literal" do
     @dataset.literal('a"x"bc').should == "'a\"x\"bc'"
     @dataset.literal("a'bc").should == "'a''bc'"
     @dataset.literal("a''bc").should == "'a''''bc'"
+    @dataset.literal("a\\bc").should == "'a\\\\bc'"
+    @dataset.literal("a\\\\bc").should == "'a\\\\\\\\bc'"
+    @dataset.literal("a\\'bc").should == "'a\\\\''bc'"
   end
   
   specify "should literalize numbers properly" do
