@@ -407,24 +407,18 @@ module Sequel
       }
 
       # Returns a join clause based on the specified join type and condition.
-      def join_expr(type, table, expr)
-        join_type = JOIN_TYPES[type || :inner]
-        unless join_type
-          raise Error::InvalidJoinType, "Invalid join type: #{type}"
-        end
+      def join_expr(type, table, expr, options)
+        raise(Error::InvalidJoinType, "Invalid join type: #{type}") unless join_type = JOIN_TYPES[type || :inner]
         
-        table = table.table_name if table.respond_to?(:table_name)
+        table_alias = options[:table_alias]
 
         join_conditions = {}
         expr.each do |k, v|
-          k = qualified_column_name(k, table) if k.is_a?(Symbol)
+          k = qualified_column_name(k, table_alias || table) if k.is_a?(Symbol)
           v = qualified_column_name(v, @opts[:last_joined_table] || first_source) if v.is_a?(Symbol)
           join_conditions[k] = v
         end
-        if table.is_a?(Dataset)
-          table = "(#{table.sql}) t1"
-        end
-        " #{join_type} #{table} ON #{expression_list(join_conditions)}"
+        " #{join_type} #{table} #{"#{table_alias} " if table_alias}ON #{expression_list(join_conditions)}"
       end
 
       # Returns a joined dataset with the specified join type and condition.
@@ -432,9 +426,20 @@ module Sequel
         unless expr.is_a?(Hash)
           expr = {expr => :id}
         end
-        clause = join_expr(type, table, expr)
-        join = @opts[:join] ? @opts[:join] + clause : clause
-        clone(:join => join, :last_joined_table => table)
+        options = {}
+
+        if Dataset === table
+          table = "(#{table.sql})"
+          table_alias_num = @opts[:num_dataset_joins] || 1
+          options[:table_alias] = "t#{table_alias_num}"
+        elsif table.respond_to?(:table_name)
+          table = table.table_name
+        end
+        
+        clause = join_expr(type, table, expr, options)
+        opts = {:join => @opts[:join] ? @opts[:join] + clause : clause, :last_joined_table => options[:table_alias] || table}
+        opts[:num_dataset_joins] = table_alias_num + 1 if table_alias_num
+        clone(opts)
       end
 
       # Returns a LEFT OUTER joined dataset.

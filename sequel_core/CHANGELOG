@@ -1,6 +1,8 @@
 === HEAD
 
-* Fix backslash escaping of strings (davidlee@berkeley.edu)
+* Allow joining of multiple datasets, by making the table alias different for each dataset joined (jeremyevans)
+
+* SECURITY: Fix backslash escaping of strings (davidlee@berkeley.edu)
 
 * Add ability to create a graph of objects from a query, with the result split into corresponding tables (jeremyevans) (#113)
 

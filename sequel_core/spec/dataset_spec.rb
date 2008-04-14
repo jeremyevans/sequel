@@ -1233,6 +1233,17 @@ context "Dataset#join_table" do
       'SELECT * FROM items LEFT OUTER JOIN (SELECT * FROM categories WHERE (active = \'t\')) t1 ON (t1.item_id = items.id)'
   end
 
+  specify "should support joining multiple datasets" do
+    ds = Sequel::Dataset.new(nil).from(:categories)
+    ds2 = Sequel::Dataset.new(nil).from(:nodes).select(:name)
+    ds3 = Sequel::Dataset.new(nil).from(:attributes).filter("name = 'blah'")
+
+    @d.join_table(:left_outer, ds, :item_id => :id).join_table(:inner, ds2, :node_id=>:id).join_table(:right_outer, ds3, :attribute_id=>:id).sql.should ==
+      'SELECT * FROM items LEFT OUTER JOIN (SELECT * FROM categories) t1 ON (t1.item_id = items.id) ' \
+      'INNER JOIN (SELECT name FROM nodes) t2 ON (t2.node_id = t1.id) ' \
+      "RIGHT OUTER JOIN (SELECT * FROM attributes WHERE name = 'blah') t3 ON (t3.attribute_id = t2.id)"
+  end
+
   specify "should support joining objects that respond to :table_name" do
     ds = Object.new
     def ds.table_name; :categories end
