@@ -1,5 +1,7 @@
 === HEAD
 
+* Support storing microseconds in postgres timestamp fields (schnarch...@rootimage.msu.edu) (#215)
+
 * Allow joining of multiple datasets, by making the table alias different for each dataset joined (jeremyevans)
 
 * SECURITY: Fix backslash escaping of strings (davidlee@berkeley.edu)

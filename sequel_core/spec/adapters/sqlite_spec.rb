@@ -288,31 +288,6 @@ context "SQLite::Dataset#update" do
   end
 end
 
-context "An SQLite dataset in array tuples mode" do
-  setup do
-    @d = SQLITE_DB[:items]
-    @d.delete # remove all records
-    
-    Sequel.use_array_tuples
-  end
-  
-  teardown do
-    Sequel.use_hash_tuples
-  end
-  
-  specify "should return the correct records" do
-    @d.to_a.should == []
-    @d << {:name => 'abc', :value => 1.23}
-    @d << {:name => 'abc', :value => 4.56}
-    @d << {:name => 'def', :value => 7.89}
-    @d.select(:name, :value).to_a.sort_by {|h| h[:value]}.should == [
-      ['abc', 1.23],
-      ['abc', 4.56],
-      ['def', 7.89]
-    ]
-  end
-end  
-
 context "SQLite dataset" do
   setup do
     SQLITE_DB.create_table :test do

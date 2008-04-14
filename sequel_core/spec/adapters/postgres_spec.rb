@@ -7,6 +7,7 @@ end
 
 POSTGRES_DB.drop_table(:test) if POSTGRES_DB.table_exists?(:test)
 POSTGRES_DB.drop_table(:test2) if POSTGRES_DB.table_exists?(:test2)
+POSTGRES_DB.drop_table(:test3) if POSTGRES_DB.table_exists?(:test3)
   
 POSTGRES_DB.create_table :test do
   text :name
@@ -15,6 +16,10 @@ end
 POSTGRES_DB.create_table :test2 do
   text :name
   integer :value
+end
+POSTGRES_DB.create_table :test3 do
+  integer :value
+  timestamp :time
 end
 
 context "A PostgreSQL database" do
@@ -167,49 +172,17 @@ context "A PostgreSQL dataset" do
   end
 end
 
-context "A PostgreSQL dataset in array tuples mode" do
+context "A PostgreSQL dataaset with a timestamp field" do
   setup do
-    @d = POSTGRES_DB[:test]
-    @d.delete # remove all records
-    Sequel.use_array_tuples
+    @d = POSTGRES_DB[:test3]
+    @d.delete
   end
-  
-  teardown do
-    Sequel.use_hash_tuples
-  end
-  
-  specify "should return the correct records" do
-    @d.to_a.should == []
-    @d << {:name => 'abc', :value => 123}
-    @d << {:name => 'abc', :value => 456}
-    @d << {:name => 'def', :value => 789}
 
-    @d.order(:value).select(:name, :value).to_a.should == [
-      ['abc', 123],
-      ['abc', 456],
-      ['def', 789]
-    ]
-  end
-  
-  specify "should work correctly with transforms" do
-    @d.transform(:value => [proc {|v| v.to_s}, proc {|v| v.to_i}])
-
-    @d.to_a.should == []
-    @d << {:name => 'abc', :value => 123}
-    @d << {:name => 'abc', :value => 456}
-    @d << {:name => 'def', :value => 789}
-
-    @d.order(:value).select(:name, :value).to_a.should == [
-      ['abc', '123'],
-      ['abc', '456'],
-      ['def', '789']
-    ]
-    
-    a = @d.order(:value).first
-    a.values.should == ['abc', '123']
-    a.keys.should == [:name, :value]
-    a[:name].should == 'abc'
-    a[:value].should == '123'
+  specify "should store milliseconds in time fields" do
+    t = Time.now
+    @d << {:value=>1, :time=>t}
+    @d[:value =>'1'][:time].should == t
+    @d[:value=>'1'][:time].usec.should == t.usec
   end
 end
 
