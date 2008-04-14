@@ -78,7 +78,7 @@ module Sequel
       begin
         @columns = nil
         columns
-      rescue ::Sequel::Error
+      rescue StandardError
       end
     end
 
