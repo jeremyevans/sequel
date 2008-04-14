@@ -312,6 +312,7 @@ module Sequel
         delete
         after_destroy
       end
+      self
     end
     
     # Deletes and returns self.

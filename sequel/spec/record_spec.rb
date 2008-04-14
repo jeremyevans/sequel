@@ -393,6 +393,12 @@ describe Sequel::Model, "#destroy" do
     #@model.stub!(:delete).and_return(:true)
   end
 
+  it "should return self" do
+    @model.db.should_receive(:transaction)
+    @model.after_destroy{3}
+    @instance.destroy.should == @instance
+  end
+
   it "should run within a transaction" do
     @model.db.should_receive(:transaction)
     @instance.destroy
