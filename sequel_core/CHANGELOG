@@ -1,5 +1,7 @@
 === HEAD
 
+* Fix connecting to a database via the ADO adapter (now requires options instead of URI) (timuckun, jeremyevans) (#204)
+
 * Support storing microseconds in postgres timestamp fields (schnarch...@rootimage.msu.edu) (#215)
 
 * Allow joining of multiple datasets, by making the table alias different for each dataset joined (jeremyevans)
