@@ -141,8 +141,10 @@ module Sequel
       end
     end
     
-    # Updates the values without saving the record
-    def modify_values(hash)
+    # Updates the instance with the supplied values with support for virtual
+    # attributes, ignoring any values for which no setter method is available.
+    # Does not save the record.
+    def set_with_params(hash)
       meths = setter_methods
       hash.each do |k,v|
         m = "#{k}="
@@ -150,11 +152,9 @@ module Sequel
       end
     end
 
-    # Updates the instance with the supplied values with support for virtual
-    # attributes, ignoring any values for which no setter method is available.
-    # Saves the changes and runs any callback methods.
+    # Runs set_with_params and saves the changes (which runs any callback methods).
     def update_with_params(values)
-      modify_values(values)
+      set_with_params(values)
       save_changes
     end
     alias_method :update_with, :update_with_params
@@ -209,7 +209,7 @@ module Sequel
       else
         @values = {}
         @new = true
-        modify_values(values)
+        set_with_params(values)
       end
       @changed_columns.clear 
       

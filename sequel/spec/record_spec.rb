@@ -309,6 +309,49 @@ describe "Model#pk_hash" do
   end
 end
 
+describe Sequel::Model, "set_with_params" do
+
+  before(:each) do
+    MODEL_DB.reset
+    
+    @c = Class.new(Sequel::Model(:items)) do
+      columns :x, :y, :id
+    end
+    @o1 = @c.new
+    @o2 = @c.load(:id => 5)
+  end
+  
+  it "should filter the given params using the model columns" do
+    @o1.set_with_params(:x => 1, :z => 2)
+    @o1.values.should == {:x => 1}
+    MODEL_DB.sqls.should == []
+
+    @o2.set_with_params(:y => 1, :abc => 2)
+    @o2.values.should == {:y => 1, :id=> 5}
+    MODEL_DB.sqls.should == []
+  end
+  
+  it "should work with both strings and symbols" do
+    @o1.set_with_params('x'=> 1, 'z'=> 2)
+    @o1.values.should == {:x => 1}
+    MODEL_DB.sqls.should == []
+
+    @o2.set_with_params('y'=> 1, 'abc'=> 2)
+    @o2.values.should == {:y => 1, :id=> 5}
+    MODEL_DB.sqls.should == []
+  end
+  
+  it "should support virtual attributes" do
+    @c.class_def(:blah=) {|v| self.x = v}
+    @o1.set_with_params(:blah => 333)
+    @o1.values.should == {:x => 333}
+    MODEL_DB.sqls.should == []
+    @o1.set_with_params('blah'=> 334)
+    @o1.values.should == {:x => 334}
+    MODEL_DB.sqls.should == []
+  end
+end
+
 describe Sequel::Model, "update_with_params" do
 
   before(:each) do
@@ -330,7 +373,7 @@ describe Sequel::Model, "update_with_params" do
     MODEL_DB.sqls.first.should == "UPDATE items SET y = 1 WHERE (id = 5)"
   end
   
-  it "should be aliased by create_with" do
+  it "should be aliased by update_with" do
     @o1.update_with(:x => 1, :z => 2)
     MODEL_DB.sqls.first.should == "INSERT INTO items (x) VALUES (1)"
 

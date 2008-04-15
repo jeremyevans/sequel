@@ -1,5 +1,7 @@
 === HEAD
 
+* Add Model#set_with_params, which is Model#update_with_params without the save (jeremyevans)
+
 * Fix Model#destroy so that it returns self, not the result of after_destroy (jeremyevans)
 
 * Define Model column accessors in set_dataset, so they should always be avaiable, remove Model#method_missing (jeremyevans)
@@ -10,7 +12,7 @@
 
 * Allow creation of new records that don't have primary keys when the cache is on (jeremyevans) (#213)
 
-* Make Model#initialize, Model#set, and Model#update_with invulnerable to memory exhaustion (jeremyevans) (#210)
+* Make Model#initialize, Model#set, and Model#update_with_params invulnerable to memory exhaustion (jeremyevans) (#210)
 
 * Add Model.str_columns, which gives a list of columns as frozen strings (jeremyevans)
 
