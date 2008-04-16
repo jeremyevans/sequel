@@ -26,7 +26,7 @@ module Sequel
       # Returns number of rows affected
       def execute(sql)
         @logger.info(sql) if @logger
-        @pool.hold {|c| c.do(sql)}
+        @pool.hold {|c| c.immediate(sql)}
       end
       alias_method :do, :execute
       
@@ -62,7 +62,7 @@ module Sequel
         @db.synchronize do
           @db.query(sql) do |cursor|
             begin
-              cursor.open.each_hash {|r| block[r]}
+              cursor.open.each_hash(&block)
             ensure
               cursor.drop
             end

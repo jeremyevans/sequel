@@ -100,7 +100,7 @@ module Sequel
       # Time (as an SQL TIMESTAMP), Date (as an SQL DATE), Dataset (as a 
       # subquery) and nil (AS NULL).
       # 
-      #   dataset.literal("abc'def") #=> "'abc''def'"
+      #   dataset.literal("abc'def\\") #=> "'abc''def\\\\'"
       #   dataset.literal(:items__id) #=> "items.id"
       #   dataset.literal([1, 2, 3]) => "(1, 2, 3)"
       #   dataset.literal(DB[:items]) => "(SELECT * FROM items)"
@@ -111,7 +111,7 @@ module Sequel
         when LiteralString
           v
         when String
-          "'#{v.gsub(/'/, "''")}'"
+          "'#{v.gsub(/\\/, "\\\\\\\\").gsub(/'/, "''")}'"
         when Integer, Float
           v.to_s
         when BigDecimal
@@ -407,24 +407,18 @@ module Sequel
       }
 
       # Returns a join clause based on the specified join type and condition.
-      def join_expr(type, table, expr)
-        join_type = JOIN_TYPES[type || :inner]
-        unless join_type
-          raise Error::InvalidJoinType, "Invalid join type: #{type}"
-        end
+      def join_expr(type, table, expr, options)
+        raise(Error::InvalidJoinType, "Invalid join type: #{type}") unless join_type = JOIN_TYPES[type || :inner]
         
-        table = table.table_name if table.respond_to?(:table_name)
+        table_alias = options[:table_alias]
 
         join_conditions = {}
         expr.each do |k, v|
-          k = qualified_column_name(k, table) if k.is_a?(Symbol)
+          k = qualified_column_name(k, table_alias || table) if k.is_a?(Symbol)
           v = qualified_column_name(v, @opts[:last_joined_table] || first_source) if v.is_a?(Symbol)
           join_conditions[k] = v
         end
-        if table.is_a?(Dataset)
-          table = "(#{table.sql}) t1"
-        end
-        " #{join_type} #{table} ON #{expression_list(join_conditions)}"
+        " #{join_type} #{table} #{"#{table_alias} " if table_alias}ON #{expression_list(join_conditions)}"
       end
 
       # Returns a joined dataset with the specified join type and condition.
@@ -432,9 +426,20 @@ module Sequel
         unless expr.is_a?(Hash)
           expr = {expr => :id}
         end
-        clause = join_expr(type, table, expr)
-        join = @opts[:join] ? @opts[:join] + clause : clause
-        clone(:join => join, :last_joined_table => table)
+        options = {}
+
+        if Dataset === table
+          table = "(#{table.sql})"
+          table_alias_num = @opts[:num_dataset_joins] || 1
+          options[:table_alias] = "t#{table_alias_num}"
+        elsif table.respond_to?(:table_name)
+          table = table.table_name
+        end
+        
+        clause = join_expr(type, table, expr, options)
+        opts = {:join => @opts[:join] ? @opts[:join] + clause : clause, :last_joined_table => options[:table_alias] || table}
+        opts[:num_dataset_joins] = table_alias_num + 1 if table_alias_num
+        clone(opts)
       end
 
       # Returns a LEFT OUTER joined dataset.
@@ -525,6 +530,11 @@ module Sequel
       end
       alias_method :sql, :select_sql
 
+      # Returns the SQL for formatting an insert statement with default values
+      def insert_default_values_sql
+        "INSERT INTO #{@opts[:from]} DEFAULT VALUES"
+      end
+
       # Formats an INSERT statement using the given values. If a hash is given,
       # the resulting statement includes column names. If no values are given, 
       # the resulting statement includes a DEFAULT VALUES clause.
@@ -535,7 +545,7 @@ module Sequel
       #     'INSERT INTO items (a, b) VALUES (1, 2)'
       def insert_sql(*values)
         if values.empty?
-          "INSERT INTO #{@opts[:from]} DEFAULT VALUES"
+          insert_default_values_sql
         else
           values = values[0] if values.size == 1
           
@@ -545,21 +555,15 @@ module Sequel
           end
 
           case values
-          when Sequel::Model
-            insert_sql(values.values)
           when Array
             if values.empty?
-              "INSERT INTO #{@opts[:from]} DEFAULT VALUES"
-            elsif values.keys
-              fl = values.keys.map {|f| literal(f.is_a?(String) ? f.to_sym : f)}
-              vl = values.values.map {|v| literal(v)}
-              "INSERT INTO #{@opts[:from]} (#{fl.join(COMMA_SEPARATOR)}) VALUES (#{vl.join(COMMA_SEPARATOR)})"
+              insert_default_values_sql
             else
               "INSERT INTO #{@opts[:from]} VALUES (#{literal(values)})"
             end
           when Hash
             if values.empty?
-              "INSERT INTO #{@opts[:from]} DEFAULT VALUES"
+              insert_default_values_sql
             else
               fl, vl = [], []
               values.each {|k, v| fl << literal(k.is_a?(String) ? k.to_sym : k); vl << literal(v)}
@@ -568,7 +572,11 @@ module Sequel
           when Dataset
             "INSERT INTO #{@opts[:from]} #{literal(values)}"
           else
-            "INSERT INTO #{@opts[:from]} VALUES (#{literal(values)})"
+            if values.respond_to?(:values)
+              insert_sql(values.values)
+            else
+              "INSERT INTO #{@opts[:from]} VALUES (#{literal(values)})"
+            end
           end
         end
       end

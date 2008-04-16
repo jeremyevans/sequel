@@ -21,7 +21,7 @@ class String
   # Converts a string into an SQL string by removing comments.
   # See also Array#to_sql.
   def to_sql
-    split($/).to_sql
+    split("\n").to_sql
   end
   
   # Splits a string into separate SQL statements, removing comments
@@ -91,7 +91,14 @@ module Sequel
     end
     
     class Function < Expression
+      attr_reader :f, :args
       def initialize(f, *args); @f, @args = f, args; end
+
+      # Functions are considered equivalent if they
+      # have the same class, function, and arguments.
+      def ==(x)
+         x.class == self.class && @f == x.f && @args == x.args
+      end
 
       def to_s(ds)
         args = @args.empty? ? '' : ds.literal(@args)

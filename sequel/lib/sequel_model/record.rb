@@ -9,8 +9,14 @@ module Sequel
     end
     # Sets value of attribute and marks the column as changed.
     def []=(column, value)
-      @changed_columns << column unless @changed_columns.include?(column)
-      @values[column] = value
+      # If it is new, it doesn't have a value yet, so we should
+      # definitely set the new value.
+      # If the column isn't in @values, we can't assume it is
+      # NULL in the database, so assume it has changed.
+      if new? || !@values.include?(column) || value != @values[column]
+        @changed_columns << column unless @changed_columns.include?(column)
+        @values[column] = value
+      end
     end
 
     # Enumerates through all attributes.
@@ -137,11 +143,18 @@ module Sequel
     
     # Updates the instance with the supplied values with support for virtual
     # attributes, ignoring any values for which no setter method is available.
-    def update_with_params(values)
-      c = columns
-      values.each do |k, v| m = :"#{k}="
-        send(m, v) if c.include?(k) || respond_to?(m)
+    # Does not save the record.
+    def set_with_params(hash)
+      meths = setter_methods
+      hash.each do |k,v|
+        m = "#{k}="
+        send(m, v) if meths.include?(m)
       end
+    end
+
+    # Runs set_with_params and saves the changes (which runs any callback methods).
+    def update_with_params(values)
+      set_with_params(values)
       save_changes
     end
     alias_method :update_with, :update_with_params
@@ -188,25 +201,17 @@ module Sequel
     # This method guesses whether the record exists when
     # <tt>new_record</tt> is set to false.
     def initialize(values = nil, from_db = false, &block)
+      values ||=  {}
       @changed_columns = []
-      unless from_db
-        @values = {}
-        if values
-          values.each do |k, v| m = :"#{k}="
-            if respond_to?(m)
-              send(m, v)
-              values.delete(k)
-            end
-          end
-          values.inject(@values) {|m, kv| m[kv[0].to_sym] = kv[1]; m}
-          # @values.merge!(values)
-        end
+      if from_db
+        @new = false
+        @values = values
       else
-        @values = values || {}
+        @values = {}
+        @new = true
+        set_with_params(values)
       end
-
-      k = primary_key
-      @new = !from_db
+      @changed_columns.clear 
       
       block[self] if block
       after_initialize
@@ -268,9 +273,26 @@ module Sequel
       save(*@changed_columns) unless @changed_columns.empty?
     end
 
-    # Updates and saves values to database from the passed-in Hash.
+    # Updates and saves values to database from the passed-in Hash. Does not call
+    # any callback methods.
     def set(values)
-      v = values.inject({}) {|m, kv| m[kv[0].to_sym] = kv[1]; m}
+      s = str_columns
+      v = values.inject({}) do |m, kv| 
+        k, v = kv
+        k = case k
+        when Symbol
+          k
+        when String
+          # Prevent denial of service via memory exhaustion by only 
+          # calling to_sym if the symbol already exists.
+          raise(ArgumentError, "all string keys must be a valid columns") unless s.include?(k)
+          k.to_sym
+        else
+          raise ArgumentError, "Only symbols and strings allows as keys"
+        end
+        m[k] = v
+        m
+      end
       this.update(v)
       v.each {|k, v| @values[k] = v}
     end
@@ -290,6 +312,7 @@ module Sequel
         delete
         after_destroy
       end
+      self
     end
     
     # Deletes and returns self.
@@ -298,33 +321,9 @@ module Sequel
       self
     end
     
-    ATTR_RE = /^([a-zA-Z_]\w*)(=)?$/.freeze
-    EQUAL_SIGN = '='.freeze
-
-    def method_missing(m, *args) #:nodoc:
-      if m.to_s =~ ATTR_RE
-        att = $1.to_sym
-        write = $2 == EQUAL_SIGN
-        
-        # check whether the column is legal
-        unless @values.has_key?(att) || columns.include?(att)
-          raise Error, "Invalid column (#{att.inspect}) for #{self}"
-        end
-
-        # define the column accessor
-        Thread.exclusive do
-          if write
-            model.class_def(m) {|v| self[att] = v}
-          else
-            model.class_def(m) {self[att]}
-          end
-        end
-        
-        # call the accessor
-        respond_to?(m) ? send(m, *args) : super(m, *args)
-      else
-        super(m, *args)
+    private
+      def setter_methods
+        methods.grep(/=$/)
       end
-    end
   end
 end

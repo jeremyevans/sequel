@@ -6,7 +6,7 @@ require "fileutils"
 
 include FileUtils
 
-PROJECTS = %w{sequel_core sequel_model sequel}
+PROJECTS = %w{sequel_core sequel}
 
 def with_each_project
   PROJECTS.each do |p|
@@ -26,8 +26,8 @@ end
 ##############################################################################
 # gem packaging and release
 ##############################################################################
-desc "Packages up Sequel and Sequel Model."
-task :default => [:package]
+desc "Packages up sequel and sequel_core."
+task :default => [:spec_no_cov]
 task :package => [:clean]
 task :doc => [:rdoc]
 
@@ -45,10 +45,6 @@ end
 
 task :uninstall => [:clean] do
   sh_with_each_project "rake uninstall"
-end
-
-task :tag do
-  sh_with_each_project "rake tag"
 end
 
 ##############################################################################
@@ -81,7 +77,7 @@ Rake::RDocTask.new do |rdoc|
   rdoc.title = "Sequel: The Database Toolkit for Ruby"
   rdoc.rdoc_files.add ["sequel/README", "sequel/COPYING", 
     "sequel_core/lib/sequel_core.rb", "sequel_core/lib/**/*.rb",
-    "sequel_model/lib/sequel_model.rb", "sequel_model/lib/**/*.rb",
+    "sequel/lib/sequel_model.rb", "sequel/lib/**/*.rb",
   ]
 end
 
@@ -89,17 +85,21 @@ task :doc_rforge => [:doc]
 
 desc "Update docs and upload to rubyforge.org"
 task :doc_rforge do
-  sh %{scp -r sequel/doc/rdoc/* ciconia@rubyforge.org:/var/www/gforge-projects/sequel}
+  sh %{chmod -R g+w sequel/doc/rdoc/*}
+  sh %{scp -rp sequel/doc/rdoc/* rubyforge.org:/var/www/gforge-projects/sequel}
 end
 
 ##############################################################################
 # specs
 ##############################################################################
 require "spec/rake/spectask"
+sqcdir = File.join(File.dirname(__FILE__), 'sequel_core', 'lib')
+fixRUBYLIB = Proc.new{ENV['RUBYLIB'] ? (ENV['RUBYLIB'] += ":#{sqcdir}") : (ENV['RUBYLIB'] = sqcdir)}
 
 desc "Run specs with coverage"
 Spec::Rake::SpecTask.new("spec") do |t|
-  t.spec_files = FileList["sequel_core/spec/*_spec.rb", "sequel_model/spec/*_spec.rb"]
+  fixRUBYLIB.call
+  t.spec_files = FileList["sequel_core/spec/*_spec.rb", "sequel/spec/*_spec.rb"]
   t.spec_opts  = File.read("sequel_core/spec/spec.opts").split("\n")
   t.rcov_opts  = File.read("sequel_core/spec/rcov.opts").split("\n")
   t.rcov = true
@@ -107,7 +107,8 @@ end
 
 desc "Run specs without coverage"
 Spec::Rake::SpecTask.new("spec_no_cov") do |t|
-  t.spec_files = FileList["sequel_core/spec/*_spec.rb", "sequel_model/spec/*_spec.rb"]
+  fixRUBYLIB.call
+  t.spec_files = FileList["sequel_core/spec/*_spec.rb", "sequel/spec/*_spec.rb"]
   t.spec_opts  = File.read("sequel_core/spec/spec.opts").split("\n")
 end
 
@@ -118,8 +119,8 @@ end
 STATS_DIRECTORIES = [
   %w(core_code   sequel_core/lib/),
   %w(core_spec   sequel_core/spec/),
-  %w(model_code  sequel_model/lib/),
-  %w(model_spec  sequel_model/spec/)
+  %w(model_code  sequel/lib/),
+  %w(model_spec  sequel/spec/)
 ].collect { |name, dir| [ name, "./#{dir}" ] }.select { |name, dir| File.directory?(dir) }
 
 desc "Report code statistics (KLOCs, etc) from the application"

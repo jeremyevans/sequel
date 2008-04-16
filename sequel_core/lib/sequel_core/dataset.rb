@@ -72,8 +72,7 @@ module Sequel
     include Convenience
     include Callback
     
-    attr_accessor :db
-    attr_accessor :opts
+    attr_accessor :db, :opts, :row_proc
     
     alias_method :size, :count
     
@@ -82,7 +81,7 @@ module Sequel
     def all(opts = nil, &block)
       a = []
       each(opts) {|r| a << r}
-      run_callback(:post_load, a)
+      post_load(a)
       a.each(&block) if block
       a
     end
@@ -179,7 +178,17 @@ module Sequel
     
     # Iterates over the records in the dataset
     def each(opts = nil, &block)
-      fetch_rows(select_sql(opts), &block)
+      if graph = @opts[:graph]
+        graph_each(opts, &block)
+      else
+        row_proc = @row_proc unless opts && opts[:naked]
+        transform = @transform
+        fetch_rows(select_sql(opts)) do |r|
+          r = transform_load(r) if transform
+          r = row_proc[r] if row_proc
+          block[r]
+        end
+      end
       self
     end
 
@@ -297,13 +306,11 @@ module Sequel
     #
     def set_row_proc(&filter)
       @row_proc = filter
-      update_each_method
     end
     
     # Removes the row making proc.
     def remove_row_proc
       @row_proc = nil
-      update_each_method
     end
     
     STOCK_TRANSFORMS = {
@@ -354,7 +361,6 @@ module Sequel
           end
         end
       end
-      update_each_method
       self
     end
     
@@ -373,49 +379,6 @@ module Sequel
         k, v = *kv
         m[k] = (tt = @transform[k]) ? tt[1][v] : v
         m
-      end
-    end
-    
-    # Updates the each method according to whether @row_proc and @transform are
-    # set or not.
-    def update_each_method
-      # warning: ugly code generation ahead
-      if @row_proc && @transform
-        class << self
-          def each(opts = nil, &block)
-            if opts && opts[:naked]
-              fetch_rows(select_sql(opts)) {|r| block[transform_load(r)]}
-            else
-              fetch_rows(select_sql(opts)) {|r| block[@row_proc[transform_load(r)]]}
-            end
-            self
-          end
-        end
-      elsif @row_proc
-        class << self
-          def each(opts = nil, &block)
-            if opts && opts[:naked]
-              fetch_rows(select_sql(opts), &block)
-            else
-              fetch_rows(select_sql(opts)) {|r| block[@row_proc[r]]}
-            end
-            self
-          end
-        end
-      elsif @transform
-        class << self
-          def each(opts = nil, &block)
-            fetch_rows(select_sql(opts)) {|r| block[transform_load(r)]}
-            self
-          end
-        end
-      else
-        class << self
-          def each(opts = nil, &block)
-            fetch_rows(select_sql(opts), &block)
-            self
-          end
-        end
       end
     end
     

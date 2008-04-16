@@ -131,18 +131,19 @@ end
 describe "Model#after_initialize" do
   specify "should be called after initialization" do
     $values1 = nil
+    $reached_after_initialized = false
     
     a = Class.new(Sequel::Model) do
+      columns :x, :y
       after_initialize do
         $values1 = @values.clone
-        raise Sequel::Error if @values[:blow]
+        $reached_after_initialized = true
       end
     end
     
     a.new(:x => 1, :y => 2)
     $values1.should == {:x => 1, :y => 2}
-    
-    proc {a.new(:blow => true)}.should raise_error(Sequel::Error)
+    $reached_after_initialized.should == true
   end
 end
 
@@ -151,6 +152,7 @@ describe "Model#before_create && Model#after_create" do
     MODEL_DB.reset
 
     @c = Class.new(Sequel::Model(:items)) do
+      columns :x
       no_primary_key
       
       before_create {MODEL_DB << "BLAH before"}
@@ -194,6 +196,7 @@ describe "Model#before_save && Model#after_save" do
     MODEL_DB.reset
 
     @c = Class.new(Sequel::Model(:items)) do
+      columns :x
       before_save {MODEL_DB << "BLAH before"}
       after_save {MODEL_DB << "BLAH after"}
     end

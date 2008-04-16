@@ -1,4 +1,46 @@
-=== SVN
+=== HEAD
+
+* Fix connecting to a database via the ADO adapter (now requires options instead of URI) (timuckun, jeremyevans) (#204)
+
+* Support storing microseconds in postgres timestamp fields (schnarch...@rootimage.msu.edu) (#215)
+
+* Allow joining of multiple datasets, by making the table alias different for each dataset joined (jeremyevans)
+
+* SECURITY: Fix backslash escaping of strings (davidlee@berkeley.edu)
+
+* Add ability to create a graph of objects from a query, with the result split into corresponding tables (jeremyevans) (#113)
+
+* Add attr_accessor for dataset row_proc (jeremyevans)
+
+* Don't redefine Dataset#each when adding a transform or row_proc (jeremyevans)
+
+* Remove array_keys.rb from sequel_core, it was partially broken (since the arrays came from hashes), and redefined Dataset#each (jeremyevans)
+
+* Fix MySQL default values insert (matt.binary) (#196)
+
+* Fix ODBC adapter improperly escaping date and timestamp values (leo.borisenko) (#165)
+
+* Fix renaming columns on MySQL with type :varchar (jeremyevans) (#206)
+
+* Add Sequel::SQL::Function#==, for comparing SQL Functions (jeremyevans) (#209)
+
+* Update Informix adapter to work with Ruby/Informix 0.7.0 (gerardo.santana@gmail.com)
+
+* Remove sequel_core's knowledge of Sequel::Model (jeremyevans)
+
+* Use "\n" instead of $/ (since $/ can be redefined in ways we do not want) (jeremyevans)
+
+=== 1.4.0 (2008-04-08) 
+
+* Merge 3 mysql patches from the bugtracker (mvyver) (#200, #201, #202).
+
+* Merge 2 postgresql patches from the bugtracker (a...@mellowtone.co.jp) (#211, 212).
+
+* Allow overriding of default posgres spec database via ENV['SEQUEL_PG_SPEC_DB'] (jeremyevans).
+
+* Allow using the Sequel::Model as the first argument in a dataset join selection (jeremyevans) (#170).
+
+* Add simple callback mechanism to make model eager loading implementation easier (jeremyevans).
 
 * Added Sequel::Error::InvalidOperation class for invalid operations (#198).
 

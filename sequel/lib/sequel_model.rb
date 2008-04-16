@@ -1,10 +1,11 @@
+require 'sequel_core'
+
 module Sequel
   class Model
     alias_method :model, :class
   end
 end
 
-# TODO: add relationships when complete:
 files = %w[
   base hooks record schema associations 
   caching plugins validations eager_loading
@@ -149,22 +150,11 @@ module Sequel
   # Associations are defined in similar fashion to ActiveRecord:
   #
   #   class Post < Sequel::Model
-  #     belongs_to :author
+  #     many_to_one :author
   #   end
   #
   #   class Author < Sequel::Model
-  #     has_many :posts
-  #   end
-  # 
-  # Another way to define an association in a Sequel model is as a regular
-  # instance method:
-  # 
-  #   class Post < Sequel::Model
-  #     def author; Author[author_id]; end
-  #   end
-  # 
-  #   class Author < Sequel::Model
-  #     def posts; Post.filter(:author_id => pk); end
+  #     one_to_many :posts
   #   end
   # 
   # === Caching model instances with memcached

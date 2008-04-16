@@ -7,18 +7,19 @@ Sequel makes it easy to deal with multiple records without having to break your 
 == Resources
 
 * {Project page}[http://code.google.com/p/ruby-sequel/]
-* {Source code}[http://ruby-sequel.googlecode.com/svn/]
+* {Source code}[http://github.com/jeremyevans/sequel]
 * {Bug tracking}[http://code.google.com/p/ruby-sequel/issues/list]
 * {Google group}[http://groups.google.com/group/sequel-talk]
 * {RubyForge page}[http://rubyforge.org/projects/sequel/]
+* {API RDoc}[http://sequel.rubyforge.org]
 
 To check out the source code:
   
-  svn co http://ruby-sequel.googlecode.com/svn/trunk
+  git clone git://github.com/jeremyevans/sequel.git
   
 === Contact
 
-If you have any comments or suggestions please send an email to ciconia at gmail.com and I'll get back to you.
+If you have any comments or suggestions please post to the Google group.
 
 == Installation
 
@@ -208,7 +209,7 @@ Or calculate a sum:
   
 You can also specify descending order
 
-  posts.order(:stamp.DESC)
+  posts.order(:stamp.desc)
 
 === Deleting Records
 

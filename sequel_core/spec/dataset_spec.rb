@@ -127,33 +127,20 @@ context "A simple dataset" do
       @dataset.insert_sql({}).should == "INSERT INTO test DEFAULT VALUES"
   end
 
-  specify "should format an insert statement with array with keys" do
-    v = [1, 2, 3]
-    v.keys = [:a, :b, :c]
-    @dataset.insert_sql(v).should == "INSERT INTO test (a, b, c) VALUES (1, 2, 3)"
-    
-    v = []
-    v.keys = [:a, :b]
-    @dataset.insert_sql(v).should == "INSERT INTO test DEFAULT VALUES"
-  end
-  
   specify "should format an insert statement with string keys" do
     @dataset.insert_sql('name' => 'wxyz', 'price' => 342).
       should match(/INSERT INTO test \(name, price\) VALUES \('wxyz', 342\)|INSERT INTO test \(price, name\) VALUES \(342, 'wxyz'\)/)
   end
   
-  specify "should format an insert statement with a model instance" do
+  specify "should format an insert statement with an object that respond_to? :values" do
     dbb = Sequel::Database.new
     
-    @c = Class.new(Sequel::Model) do
-      attr_accessor :values
-    end
-    
-    v = @c.new; v.values = {:a => 1}
+    v = Object.new
+    def v.values; {:a => 1}; end
     
     @dataset.insert_sql(v).should == "INSERT INTO test (a) VALUES (1)"
     
-    v = @c.new; v.values = {}
+    def v.values; {}; end
     @dataset.insert_sql(v).should == "INSERT INTO test DEFAULT VALUES"
   end
   
@@ -178,13 +165,6 @@ context "A simple dataset" do
 
     @dataset.update_sql {:x << :y}.should ==
       "UPDATE test SET x = y"
-  end
-  
-  specify "should format an update statement with array with keys" do
-    v = ['abc']
-    v.keys = [:name]
-    
-    @dataset.update_sql(v).should == "UPDATE test SET name = 'abc'"
   end
   
   specify "should be able to return rows for arbitrary SQL" do
@@ -581,6 +561,9 @@ context "Dataset#literal" do
     @dataset.literal('a"x"bc').should == "'a\"x\"bc'"
     @dataset.literal("a'bc").should == "'a''bc'"
     @dataset.literal("a''bc").should == "'a''''bc'"
+    @dataset.literal("a\\bc").should == "'a\\\\bc'"
+    @dataset.literal("a\\\\bc").should == "'a\\\\\\\\bc'"
+    @dataset.literal("a\\'bc").should == "'a\\\\''bc'"
   end
   
   specify "should literalize numbers properly" do
@@ -1248,6 +1231,17 @@ context "Dataset#join_table" do
 
     @d.join_table(:left_outer, ds, :item_id => :id).sql.should ==
       'SELECT * FROM items LEFT OUTER JOIN (SELECT * FROM categories WHERE (active = \'t\')) t1 ON (t1.item_id = items.id)'
+  end
+
+  specify "should support joining multiple datasets" do
+    ds = Sequel::Dataset.new(nil).from(:categories)
+    ds2 = Sequel::Dataset.new(nil).from(:nodes).select(:name)
+    ds3 = Sequel::Dataset.new(nil).from(:attributes).filter("name = 'blah'")
+
+    @d.join_table(:left_outer, ds, :item_id => :id).join_table(:inner, ds2, :node_id=>:id).join_table(:right_outer, ds3, :attribute_id=>:id).sql.should ==
+      'SELECT * FROM items LEFT OUTER JOIN (SELECT * FROM categories) t1 ON (t1.item_id = items.id) ' \
+      'INNER JOIN (SELECT name FROM nodes) t2 ON (t2.node_id = t1.id) ' \
+      "RIGHT OUTER JOIN (SELECT * FROM attributes WHERE name = 'blah') t3 ON (t3.attribute_id = t2.id)"
   end
 
   specify "should support joining objects that respond to :table_name" do
@@ -2616,11 +2610,10 @@ context "Dataset#to_csv" do
   setup do
     @c = Class.new(Sequel::Dataset) do
       attr_accessor :data
-      attr_accessor :cols
+      attr_accessor :columns
       
       def fetch_rows(sql, &block)
-        @columns = @cols
-        @data.each {|r| r.keys = @columns; block[r]}
+        @data.each(&block)
       end
       
       # naked should return self here because to_csv wants a naked result set.
@@ -2630,11 +2623,8 @@ context "Dataset#to_csv" do
     end
     
     @ds = @c.new(nil).from(:items)
-
-    @ds.cols = [:a, :b, :c]
-    @ds.data = [
-      [1, 2, 3], [4, 5, 6], [7, 8, 9]
-    ]
+    @ds.columns = [:a, :b, :c]
+    @ds.data = [ {:a=>1, :b=>2, :c=>3}, {:a=>4, :b=>5, :c=>6}, {:a=>7, :b=>8, :c=>9} ]
   end
   
   specify "should format a CSV representation of the records" do
@@ -2645,25 +2635,6 @@ context "Dataset#to_csv" do
   specify "should exclude column titles if so specified" do
     @ds.to_csv(false).should ==
       "1, 2, 3\r\n4, 5, 6\r\n7, 8, 9\r\n"
-  end
-end
-
-context "Dataset#each_hash" do
-  setup do
-    @c = Class.new(Sequel::Dataset) do
-      def each(&block)
-        a = [[1, 2, 3], [4, 5, 6]]
-        a.each {|r| r.keys = [:a, :b, :c]; block[r]}
-      end
-    end
-    
-    @ds = @c.new(nil).from(:items)
-  end
-  
-  specify "should yield records converted to hashes" do
-    hashes = []
-    @ds.each_hash {|h| hashes << h}
-    hashes.should == [{:a => 1, :b => 2, :c => 3}, {:a => 4, :b => 5, :c => 6}]
   end
 end
 

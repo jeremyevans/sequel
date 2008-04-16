@@ -346,6 +346,9 @@ module Sequel
     end
   
     class Dataset < Sequel::Dataset
+      
+      PG_TIMESTAMP_FORMAT = "TIMESTAMP '%Y-%m-%d %H:%M:%S".freeze
+
       def quote_column_ref(c); "\"#{c}\""; end
       
       def literal(v)
@@ -354,6 +357,8 @@ module Sequel
           v
         when String, Fixnum, Float, TrueClass, FalseClass
           PGconn.quote(v)
+        when Time
+          "#{v.strftime(PG_TIMESTAMP_FORMAT)}.#{sprintf("%06d",v.usec)}'"
         else
           super
         end

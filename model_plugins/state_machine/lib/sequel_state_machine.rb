@@ -8,6 +8,8 @@ module Sequel                        #:nodoc:
       # * +column+ - specifies the column name to use for keeping the state (default: state)
       # * +initial+ - specifies an initial state for newly created objects (required)
       def self.apply(klass, options = {})
+        klass.extend(::Sequel::Plugins::StateMachine::ClassMethods)
+        klass.include(::Sequel::Plugins::StateMachine::InstanceMethods)
         klass.states = Array.from_hash({}) #Array keyset by sequel
         klass.events = Array.from_hash({})
         klass.transitions = {}

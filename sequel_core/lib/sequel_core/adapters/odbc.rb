@@ -59,6 +59,10 @@ module Sequel
     class Dataset < Sequel::Dataset
       BOOL_TRUE = '1'.freeze
       BOOL_FALSE = '0'.freeze
+      ODBC_TIMESTAMP_FORMAT = "{ts '%Y-%m-%d %H:%M:%S'}".freeze
+      ODBC_TIMESTAMP_AFTER_SECONDS =
+        ODBC_TIMESTAMP_FORMAT.index( '%S' ).succ - ODBC_TIMESTAMP_FORMAT.length
+      ODBC_DATE_FORMAT = "{d '%Y-%m-%d'}".freeze
       
       def literal(v)
         case v
@@ -66,6 +70,15 @@ module Sequel
           BOOL_TRUE
         when false
           BOOL_FALSE
+        when Time
+          formatted = v.strftime(ODBC_TIMESTAMP_FORMAT)
+          if v.usec >= 1000
+            msec = ( v.usec.to_f / 1000 ).round
+            formatted.insert ODBC_TIMESTAMP_AFTER_SECONDS, ".#{msec}"
+          end
+          formatted
+        when Date
+          v.strftime(ODBC_DATE_FORMAT)
         else
           super
         end

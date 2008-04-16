@@ -16,9 +16,7 @@ describe Sequel::Model, "caching" do
     @c = Class.new(Sequel::Model(:items)) do
       set_cache cache
       
-      def self.columns
-        [:name, :id]
-      end
+      columns :name, :id
     end
     
     $cache_dataset_row = {:name => 'sharon', :id => 1}
@@ -86,6 +84,11 @@ describe Sequel::Model, "caching" do
     
     m.values[:id] = 1
     proc {m.cache_key}.should_not raise_error(Sequel::Error)
+  end
+  
+  it "should not raise error if trying to save a new record" do
+    proc {@c.new(:name=>'blah').save}.should_not raise_error
+    proc {@c.create(:name=>'blah')}.should_not raise_error
   end
   
   it "should set the cache when reading from the database" do

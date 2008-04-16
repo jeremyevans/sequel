@@ -3,7 +3,8 @@ require File.join(File.dirname(__FILE__), '../spec_helper.rb')
 require 'logger'
 
 unless defined?(MYSQL_DB)
-  MYSQL_DB = Sequel('mysql://root@localhost/sandbox')
+  MYSQL_URL = 'mysql://root@localhost/sandbox' unless defined? MYSQL_URL
+  MYSQL_DB = Sequel(MYSQL_URL)
 end
 unless defined?(MYSQL_SOCKET_FILE)
   MYSQL_SOCKET_FILE = '/tmp/mysql.sock'
@@ -197,52 +198,6 @@ context "A MySQL dataset" do
   end
 end
 
-context "A MySQL dataset in array tuples mode" do
-  setup do
-    @d = MYSQL_DB[:items]
-    @d.delete # remove all records
-    Sequel.use_array_tuples
-  end
-  
-  teardown do
-    Sequel.use_hash_tuples
-  end
-  
-  specify "should return the correct records" do
-    @d.to_a.should == []
-    @d << {:name => 'abc', :value => 123}
-    @d << {:name => 'abc', :value => 456}
-    @d << {:name => 'def', :value => 789}
-
-    @d.order(:value).select(:name, :value).to_a.should == [
-      ['abc', 123],
-      ['abc', 456],
-      ['def', 789]
-    ]
-  end
-  
-  specify "should work correctly with transforms" do
-    @d.transform(:value => [proc {|v| v.to_s}, proc {|v| v.to_i}])
-
-    @d.to_a.should == []
-    @d << {:name => 'abc', :value => 123}
-    @d << {:name => 'abc', :value => 456}
-    @d << {:name => 'def', :value => 789}
-
-    @d.order(:value).select(:name, :value).to_a.should == [
-      ['abc', '123'],
-      ['abc', '456'],
-      ['def', '789']
-    ]
-    
-    a = @d.order(:value).first
-    a.values.should == ['abc', '123']
-    a.keys.should == [:name, :value]
-    a[:name].should == 'abc'
-    a[:value].should == '123'
-  end
-end
-
 context "MySQL datasets" do
   setup do
     @d = MYSQL_DB[:orders]
@@ -278,6 +233,53 @@ end
 #   end
 # end
 # 
+context "MySQL join expressions" do
+  setup do
+    @ds = MYSQL_DB[:nodes]
+    @ds.db.meta_def(:server_version) {50014}
+  end
+
+  specify "should raise error for :full_outer join requests." do
+    lambda{@ds.join_expr(:full_outer, :nodes)}.should raise_error(Sequel::Error::InvalidJoinType)
+  end
+  specify "should support natural left joins" do
+    @ds.join_expr(:natural_left, :nodes).should == \
+      'NATURAL LEFT JOIN nodes'
+  end
+  specify "should support natural right joins" do
+    @ds.join_expr(:natural_right, :nodes).should == \
+      'NATURAL RIGHT JOIN nodes'
+  end
+  specify "should support natural left outer joins" do
+    @ds.join_expr(:natural_left_outer, :nodes).should == \
+      'NATURAL LEFT OUTER JOIN nodes'
+  end
+  specify "should support natural right outer joins" do
+    @ds.join_expr(:natural_right_outer, :nodes).should == \
+      'NATURAL RIGHT OUTER JOIN nodes'
+  end
+  specify "should support natural inner joins" do
+    @ds.join_expr(:natural_inner, :nodes).should == \
+      'NATURAL LEFT JOIN nodes'
+  end
+  specify "should support cross joins (equivalent to inner join in MySQL, not in std SQL)" do
+    @ds.join_expr(:cross, :nodes).should == \
+      'INNER JOIN nodes'
+  end
+  specify "should support straight joins (force left table to be read before right)" do
+    @ds.join_expr(:straight, :nodes).should == \
+      'STRAIGHT_JOIN nodes'
+  end
+  specify "should support natural joins on multiple tables." do
+    @ds.join_expr(:natural_left_outer, [:nodes, :branches]).should == \
+      'NATURAL LEFT OUTER JOIN ( `nodes`, `branches` )'
+  end
+  specify "should support straight joins on multiple tables." do
+    @ds.join_expr(:straight, [:nodes,:branches]).should == \
+      'STRAIGHT_JOIN ( `nodes`, `branches` )'
+  end
+end
+
 context "Joined MySQL dataset" do
   setup do
     @ds = MYSQL_DB[:nodes].join(:attributes, :node_id => :id)
@@ -497,6 +499,50 @@ class Sequel::MySQL::Database
         @transactions.delete(Thread.current)
       end
     end
+  end
+end
+
+context "MySQL::Dataset#insert" do
+  setup do
+    @d = MYSQL_DB[:items]
+    @d.delete # remove all records
+    MYSQL_DB.sqls.clear
+  end
+
+  specify "should insert record with default values when no arguments given" do
+    @d.insert
+    
+    MYSQL_DB.sqls.should == [
+      "INSERT INTO items () VALUES ()"
+    ]
+    
+    @d.all.should == [
+      {:name => nil, :value => nil}
+    ]
+  end
+
+  specify "should insert record with default values when empty hash given" do
+    @d.insert {}
+    
+    MYSQL_DB.sqls.should == [
+      "INSERT INTO items () VALUES ()"
+    ]
+    
+    @d.all.should == [
+      {:name => nil, :value => nil}
+    ]
+  end
+
+  specify "should insert record with default values when empty array given" do
+    @d.insert []
+    
+    MYSQL_DB.sqls.should == [
+      "INSERT INTO items () VALUES ()"
+    ]
+    
+    @d.all.should == [
+      {:name => nil, :value => nil}
+    ]
   end
 end
 

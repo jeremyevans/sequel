@@ -9,7 +9,7 @@ describe Sequel::Model, "one_to_one" do
     end
 
     @c2 = Class.new(Sequel::Model(:nodes)) do
-      def columns; [:id, :parent_id]; end
+      columns :id, :parent_id, :blah
     end
 
     @dataset = @c2.dataset
@@ -104,6 +104,7 @@ describe Sequel::Model, "one_to_many" do
     end
 
     @c2 = Class.new(Sequel::Model(:nodes)) do
+      columns :id
     end
   end
 
@@ -142,6 +143,7 @@ describe Sequel::Model, "one_to_many" do
     module Music
       class BlueNote < Sequel::Model
         one_to_many :attributes, :from => $c1
+        columns :id
       end
     end
     

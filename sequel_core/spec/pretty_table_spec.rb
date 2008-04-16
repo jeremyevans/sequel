@@ -35,14 +35,6 @@ context "PrettyTable" do
       /\n(\|x\|y\|)|(\|y\|x\|)\n/
   end
   
-  specify "should infer columns from array with keys" do
-    a = [1, 2, 3]
-	  a.keys = [:a, :b, :c]
-	  Sequel::PrettyTable.print([a])
-    @output.rewind
-    @output.read.should =~ /\n\|a\|b\|c\|\n/
-  end
-  
   specify "should calculate the maximum width of each column correctly" do
     Sequel::PrettyTable.print(@data2, [:a, :b])
     @output.rewind

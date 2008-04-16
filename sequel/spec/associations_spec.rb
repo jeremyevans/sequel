@@ -23,7 +23,7 @@ describe Sequel::Model, "many_to_one" do
     MODEL_DB.reset
 
     @c2 = Class.new(Sequel::Model(:nodes)) do
-      def columns; [:id, :parent_id]; end
+      columns :id, :parent_id, :par_parent_id, :blah
     end
 
     @dataset = @c2.dataset
@@ -51,6 +51,21 @@ describe Sequel::Model, "many_to_one" do
     p.class.should == ParParent
     
     MODEL_DB.sqls.should == ["SELECT * FROM par_parents WHERE (id = 234) LIMIT 1"]
+  end
+
+  it "should use class inside module if given as a string" do
+    module Par 
+      class Parent < Sequel::Model
+      end
+    end
+    
+    @c2.many_to_one :par_parent, :class=>"Par::Parent"
+    
+    d = @c2.new(:id => 1, :par_parent_id => 234)
+    p = d.par_parent
+    p.class.should == Par::Parent
+    
+    MODEL_DB.sqls.should == ["SELECT * FROM parents WHERE (id = 234) LIMIT 1"]
   end
 
   it "should use explicit key if given" do
@@ -161,7 +176,7 @@ describe Sequel::Model, "one_to_many" do
     MODEL_DB.reset
 
     @c1 = Class.new(Sequel::Model(:attributes)) do
-      def columns; [:id, :node_id]; end
+      columns :id, :node_id
     end
 
     @c2 = Class.new(Sequel::Model(:nodes)) do
@@ -169,6 +184,7 @@ describe Sequel::Model, "one_to_many" do
       
       def self.name; 'Node'; end
       def self.to_s; 'Node'; end
+      columns :id
     end
     @dataset = @c2.dataset
     
@@ -209,6 +225,21 @@ describe Sequel::Model, "one_to_many" do
     v.model_classes.should == {nil => HistoricalValue}
   end
   
+  it "should use class inside a module if given as a string" do
+    module Historical
+      class Value < Sequel::Model
+      end
+    end
+    
+    @c2.one_to_many :historical_values, :class=>'Historical::Value'
+    
+    n = @c2.new(:id => 1234)
+    v = n.historical_values_dataset
+    v.should be_a_kind_of(Sequel::Dataset)
+    v.sql.should == 'SELECT * FROM values WHERE (node_id = 1234)'
+    v.model_classes.should == {nil => Historical::Value}
+  end
+
   it "should use explicit key if given" do
     @c2.one_to_many :attributes, :class => @c1, :key => :nodeid
     
@@ -405,6 +436,7 @@ describe Sequel::Model, "many_to_many" do
     @c1 = Class.new(Sequel::Model(:attributes)) do
       def self.name; 'Attribute'; end
       def self.to_s; 'Attribute'; end
+      columns :id
     end
 
     @c2 = Class.new(Sequel::Model(:nodes)) do
@@ -412,6 +444,7 @@ describe Sequel::Model, "many_to_many" do
       
       def self.name; 'Node'; end
       def self.to_s; 'Node'; end
+      columns :id
     end
     @dataset = @c2.dataset
 
@@ -441,6 +474,22 @@ describe Sequel::Model, "many_to_many" do
     end
     
     @c2.many_to_many :tags
+
+    n = @c2.new(:id => 1234)
+    a = n.tags_dataset
+    a.should be_a_kind_of(Sequel::Dataset)
+    ['SELECT tags.* FROM tags INNER JOIN nodes_tags ON (nodes_tags.tag_id = tags.id) AND (nodes_tags.node_id = 1234)',
+     'SELECT tags.* FROM tags INNER JOIN nodes_tags ON (nodes_tags.node_id = 1234) AND (nodes_tags.tag_id = tags.id)'
+    ].should(include(a.sql))
+  end
+  
+  it "should use class inside module if given as a string" do
+    module Historical
+      class Tag < Sequel::Model
+      end
+    end
+    
+    @c2.many_to_many :tags, :class=>'::Historical::Tag'
 
     n = @c2.new(:id => 1234)
     a = n.tags_dataset

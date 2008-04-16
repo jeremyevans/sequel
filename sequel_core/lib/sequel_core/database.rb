@@ -1,19 +1,19 @@
 require 'uri'
 
 module Sequel
+  DATABASES = []
   # A Database object represents a virtual connection to a database.
   # The Database class is meant to be subclassed by database adapters in order
   # to provide the functionality needed for executing queries.
   class Database
     attr_reader :opts, :pool
     attr_accessor :logger
-    
+
     # Constructs a new instance of a database connection with the specified
     # options hash.
     #
     # Sequel::Database is an abstract class that is not useful by itself.
     def initialize(opts = {}, &block)
-      Model.database_opened(self)
       @opts = opts
       
       # Determine if the DB is single threaded or multi threaded
@@ -27,6 +27,7 @@ module Sequel
       @pool.connection_proc = block || proc {connect}
 
       @logger = opts[:logger]
+      ::Sequel::DATABASES.push(self)
     end
     
     # Connects to the database. This method should be overriden by descendants.
