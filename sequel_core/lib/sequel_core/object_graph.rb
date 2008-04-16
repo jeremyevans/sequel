@@ -44,19 +44,20 @@ module Sequel
         table = dataset
         dataset = @db[dataset]
       when ::Sequel::Dataset
-        from = dataset.opts[:from]
-        raise(ArgumentError, "The dataset doesn't have an associated table") unless from
-        table = from.first
+        table = dataset.first_source
       else
-        raise ArgumentError, "The dataset argument should be a symbol, dataset, or model"
+        raise Error, "The dataset argument should be a symbol, dataset, or model"
+      end
+
+      # Raise Sequel::Error with explanation that the table alias has been used
+      raise_alias_error = lambda do
+        raise(Error, "this #{options[:table_alias] ? 'alias' : 'table'} has already been been used, please specify " \
+          "#{options[:table_alias] ? 'a different alias' : 'an alias via the :table_alias option'}") 
       end
 
       # Only allow table aliases that haven't been used
       table_alias = options[:table_alias] || table
-      if @opts[:graph] && @opts[:graph][:table_aliases] && @opts[:graph][:table_aliases].include?(table_alias)
-        raise(ArgumentError, "this #{options[:table_alias] ? 'alias' : 'table'} has already been been used, please specify " \
-          "#{options[:table_alias] ? 'a different alias' : 'an alias via the :table_alias option'}") 
-      end
+      raise_alias_error.call if @opts[:graph] && @opts[:graph][:table_aliases] && @opts[:graph][:table_aliases].include?(table_alias)
 
       # Join the table early in order to avoid cloning the dataset twice
       ds = join_table(options[:join_type] || :left_outer, table == table_alias ? table : "#{table} #{table_alias}", join_conditions)
@@ -69,7 +70,8 @@ module Sequel
 
       # Setup the initial graph data structure if it doesn't exist
       unless graph = opts[:graph]
-        master = opts[:from].first
+        master = ds.first_source
+        raise_alias_error.call if master == table_alias
         # Master hash storing all .graph related information
         graph = opts[:graph] = {}
         # Associates column aliases back to tables and columns
@@ -83,7 +85,7 @@ module Sequel
         # has been used.
         if add_columns
           select = (opts[:select] ||= [])
-          @db[master].columns.each do |column|
+          columns.each do |column|
             column_aliases[column] = [master, column]
             select.push(:"#{master}__#{column}")
           end
@@ -107,7 +109,7 @@ module Sequel
         # If that has been used, try table_column_N 
         # using the next value of N that we know hasn't been
         # used
-        @db[table].columns.each do |column|
+        dataset.columns.each do |column|
           col_alias, c = if column_aliases[column]
             tc = :"#{table_alias}_#{column}"
             if column_aliases[tc]
