@@ -1,5 +1,7 @@
 === HEAD
 
+* Deprecate Dataset#method_missing, add real mutation methods (e.g. filter!) (jeremyevans)
+
 * Fix connecting to an MSSQL server via ODBC using domain user credentials (jeremyevans) (#216)
 
 * No longer depend on the assistance gem, merge in the ConnectionPool and .blank methods (jeremyevans)
