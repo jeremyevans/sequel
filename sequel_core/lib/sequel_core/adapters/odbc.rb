@@ -148,43 +148,6 @@ module Sequel
         end
       end
       
-      def array_tuples_fetch_rows(sql, &block)
-        @db.synchronize do
-          s = @db.execute sql
-          begin
-            @columns = s.columns(true).map {|c| c.name.to_sym}
-            rows = s.fetch_all
-            rows.each {|r| yield array_tuples_make_row(r)}
-          ensure
-            s.drop unless s.nil? rescue nil
-          end
-        end
-        self
-      end
-      
-      def array_tuples_make_row(row)
-        row.keys = @columns
-        row.each_with_index do |v, idx|
-          # When fetching a result set, the Ruby ODBC driver converts all ODBC 
-          # SQL types to an equivalent Ruby type; with the exception of
-          # SQL_TYPE_DATE, SQL_TYPE_TIME and SQL_TYPE_TIMESTAMP.
-          #
-          # The conversions below are consistent with the mappings in
-          # ODBCColumn#mapSqlTypeToGenericType and Column#klass.
-          case v
-          when ::ODBC::TimeStamp
-            row[idx] = DateTime.new(v.year, v.month, v.day, v.hour, v.minute, v.second)
-          when ::ODBC::Time
-            now = DateTime.now
-            row[idx] = Time.gm(now.year, now.month, now.day, v.hour, v.minute, v.second)
-          when ::ODBC::Date
-            row[idx] = Date.new(v.year, v.month, v.day)
-          end
-        end
-        row
-      end
-      
-
       def insert(*values)
         @db.do insert_sql(*values)
       end

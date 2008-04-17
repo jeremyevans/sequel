@@ -72,18 +72,6 @@ module Sequel
         end
       end
     
-      def array_tuples_fetch_rows(sql, &block)
-        @db.synchronize do
-          s = @db.execute sql
-          
-          @columns = s.Fields.extend(Enumerable).map {|x| x.Name.to_sym}
-          
-          s.moveFirst
-          s.getRows.transpose.each {|r| r.keys = @columns; yield r}
-        end
-        self
-      end
-      
       def insert(*values)
         @db.do insert_sql(*values)
       end

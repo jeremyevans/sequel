@@ -500,31 +500,6 @@ module Sequel
         self
       end
 
-      def array_tuples_fetch_rows(sql, &block)
-        @db.execute_select(sql) do |r|
-          @columns = r.columns
-          r.each_array(&block)
-        end
-        self
-      end
-      
-      def array_tuples_transform_load(r)
-        a = []; a.keys = []
-        r.each_pair do |k, v|
-          a[k] = (tt = @transform[k]) ? tt[0][v] : v
-        end
-        a
-      end
-
-      # Applies the value transform for data saved to the database.
-      def array_tuples_transform_save(r)
-        a = []; a.keys = []
-        r.each_pair do |k, v|
-          a[k] = (tt = @transform[k]) ? tt[1][v] : v
-        end
-        a
-      end
-
       def multi_insert_sql(columns, values)
         columns = literal(columns)
         values = values.map {|r| "(#{literal(r)})"}.join(COMMA_SEPARATOR)
