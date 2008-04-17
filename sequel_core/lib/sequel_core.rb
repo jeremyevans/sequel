@@ -3,13 +3,15 @@ require "bigdecimal"
 require "bigdecimal/util"
 
 files = %w[
-  core_ext core_sql connection_pool exceptions pretty_table
+  deprecated core_ext core_sql connection_pool exceptions pretty_table
   dataset migration schema database worker object_graph
 ]
 dir = File.join(File.dirname(__FILE__), "sequel_core")
 files.each {|f| require(File.join(dir, f))}
 
 module Sequel #:nodoc:
+  Deprecation.deprecation_message_stream = STDERR
+  #Deprecation.print_tracebacks = true
   class << self
     # call-seq:
     #   Sequel::Database.connect(conn_string)

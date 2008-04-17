@@ -311,49 +311,6 @@ module Sequel
         clone(copy.opts)
       end
       
-      MUTATION_RE = /^(.+)!$/.freeze
-
-      # Provides support for mutation methods (filter!, order!, etc.) and magic
-      # methods.
-      def method_missing(m, *args, &block)
-        if m.to_s =~ MUTATION_RE
-          m = $1.to_sym
-          super unless respond_to?(m)
-          copy = send(m, *args, &block)
-          super if copy.class != self.class
-          @opts.merge!(copy.opts)
-          self
-        elsif magic_method_missing(m)
-          send(m, *args)
-        else
-           super
-        end
-      end
-      
-      MAGIC_METHODS = {
-        /^order_by_(.+)$/   => proc {|c| proc {order(c)}},
-        /^first_by_(.+)$/   => proc {|c| proc {order(c).first}},
-        /^last_by_(.+)$/    => proc {|c| proc {order(c).last}},
-        /^filter_by_(.+)$/  => proc {|c| proc {|v| filter(c => v)}},
-        /^all_by_(.+)$/     => proc {|c| proc {|v| filter(c => v).all}},
-        /^find_by_(.+)$/    => proc {|c| proc {|v| filter(c => v).first}},
-        /^group_by_(.+)$/   => proc {|c| proc {group(c)}},
-        /^count_by_(.+)$/   => proc {|c| proc {group_and_count(c)}}
-      }
-
-      # Checks if the given method name represents a magic method and 
-      # defines it. Otherwise, nil is returned.
-      def magic_method_missing(m)
-        method_name = m.to_s
-        MAGIC_METHODS.each_pair do |r, p|
-          if method_name =~ r
-            impl = p[$1.to_sym]
-            return Dataset.class_def(m, &impl)
-          end
-        end
-        nil
-      end
-      
       def create_view(name)
         @db.create_view(name, self)
       end
