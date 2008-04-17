@@ -1,5 +1,7 @@
 === HEAD
 
+* Fix connecting to an MSSQL server via ODBC using domain user credentials (jeremyevans) (#216)
+
 * No longer depend on the assistance gem, merge in the ConnectionPool and .blank methods (jeremyevans)
 
 * No longer depend on ParseTree, RubyInline, or ruby2ruby, but you still need them if you want to use the block filters (jeremyevans)

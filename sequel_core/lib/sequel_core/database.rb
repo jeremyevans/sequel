@@ -353,7 +353,7 @@ module Sequel
     # Returns a string representation of the database object including the
     # class name and the connection URI.
     def inspect
-      '#<%s: %s>' % [self.class.to_s, uri.inspect]
+      "#<#{self.class}: #{(uri rescue opts).inspect}>" 
     end
 
     @@adapters = Hash.new
