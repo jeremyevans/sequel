@@ -412,6 +412,26 @@ module Sequel
     def inspect
       '#<%s: %s>' % [self.class.to_s, sql.inspect]
     end
+
+    # Setup mutation (e.g. filter!) methods
+    def self.def_mutation_method(meth)
+      class_eval("def #{meth}!(*args, &block); mutation_method(:#{meth}, *args, &block) end")
+    end
+
+    %w'and distinct exclude exists filter from from_self full_outer_join graph
+    group group_and_count group_by having inner_join intersect invert_order join
+    left_outer_join limit naked or order order_by order_more paginate query reject
+    reverse reverse_order right_outer_join select select_all select_more
+    set_graph_aliases set_model sort sort_by union unordered where'.each do |meth|
+      def_mutation_method(meth)
+    end
+
+    private
+      def mutation_method(meth, *args, &block)
+        copy = send(meth, *args, &block)
+        @opts.merge!(copy.opts)
+        self
+      end
   end
 end
 
