@@ -57,7 +57,6 @@ spec = Gem::Specification.new do |s|
   s.required_ruby_version = ">= 1.8.4"
 
   s.add_dependency("metaid")
-  s.add_dependency("assistance", ">= 0.1")
 
   case RUBY_PLATFORM
   when /java/

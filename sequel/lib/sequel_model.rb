@@ -7,7 +7,7 @@ module Sequel
 end
 
 files = %w[
-  base hooks record schema associations 
+  inflector inflections base hooks record schema associations 
   caching plugins validations eager_loading
 ]
 dir = File.join(File.dirname(__FILE__), "sequel_model")

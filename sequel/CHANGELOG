@@ -1,5 +1,7 @@
 === HEAD
 
+* No longer depend on the assistance gem, merge the Inflector and Validations code (jeremyevans)
+
 * Add Model#set_with_params, which is Model#update_with_params without the save (jeremyevans)
 
 * Fix Model#destroy so that it returns self, not the result of after_destroy (jeremyevans)

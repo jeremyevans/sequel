@@ -1,5 +1,9 @@
 === HEAD
 
+* No longer depend on the assistance gem, merge in the ConnectionPool and .blank methods (jeremyevans)
+
+* No longer depend on ParseTree, RubyInline, or ruby2ruby, but you still need them if you want to use the block filters (jeremyevans)
+
 * Fix JDBC adapter by issuing index things start at 1 (pdamer)
 
 * Fix connecting to a database via the ADO adapter (now requires options instead of URI) (timuckun, jeremyevans) (#204)
