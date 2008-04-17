@@ -80,8 +80,8 @@ module Sequel::Model::Associations::EagerLoading
   # of model objects.
   #
   # Be very careful when using this with multiple *_to_many associations, as you can
-  # create large cartesian products.  If you must use multiple *_to_many associations,
-  # make sure your filters are very specific.
+  # create large cartesian products.  If you must graph multiple *_to_many associations,
+  # make sure your filters are specific if you have a large database.
   # 
   # This does not respect each association's order, as all associations are loaded in
   # a single query.  If you want to order the results, which may be necessary if you are
@@ -97,7 +97,7 @@ module Sequel::Model::Associations::EagerLoading
       # :requirements - array of requirements for this association
       # :alias_association_type_map - the type of association for this association
       # :alias_association_name_map - the name of the association for this association
-      clone(:eager_graph=>{:requirements=>{}, :master=>model.table_name, :alias_association_type_map=>{}, :alias_association_name_map=>{}})
+      clone(:eager_graph=>{:requirements=>{}, :master=>model.table_name, :alias_association_type_map=>{}, :alias_association_name_map=>{}, :reciprocals=>{}})
     end
     ds.eager_graph_associations(ds, model, table_name, [], *associations)
   end
@@ -119,11 +119,13 @@ module Sequel::Model::Associations::EagerLoading
       klass = model.send(:associated_class, r)
       assoc_name = r[:name]
       assoc_table_alias = ds.eager_unique_table_alias(ds, assoc_name)
-      ds = case r[:type]
+      ds = case assoc_type = r[:type]
       when :many_to_one
         ds.graph(klass, {klass.primary_key=>:"#{ta}__#{r[:key]}"}, :table_alias=>assoc_table_alias)
       when :one_to_many
-        ds.graph(klass, {r[:key]=>:"#{ta}__#{model.primary_key}"}, :table_alias=>assoc_table_alias)
+        ds = ds.graph(klass, {r[:key]=>:"#{ta}__#{model.primary_key}"}, :table_alias=>assoc_table_alias)
+        ds.opts[:eager_graph][:reciprocals][assoc_table_alias] = model.send(:reciprocal_association, r)
+        ds
       when :many_to_many
         ds = ds.graph(r[:join_table], {r[:left_key]=>:"#{ta}__#{model.primary_key}"}, :select=>false, :table_alias=>ds.eager_unique_table_alias(ds, r[:join_table]))
         ds.graph(klass, {klass.primary_key=>r[:right_key]}, :table_alias=>assoc_table_alias)
@@ -131,7 +133,7 @@ module Sequel::Model::Associations::EagerLoading
       eager_graph = ds.opts[:eager_graph]
       eager_graph[:requirements][assoc_table_alias] = requirements.dup
       eager_graph[:alias_association_name_map][assoc_table_alias] = assoc_name
-      eager_graph[:alias_association_type_map][assoc_table_alias] = r[:type]
+      eager_graph[:alias_association_type_map][assoc_table_alias] = assoc_type
       ds = ds.eager_graph_associations(ds, klass, assoc_table_alias, requirements + [assoc_table_alias], *associations) unless associations.empty?
       ds
     end
@@ -165,15 +167,13 @@ module Sequel::Model::Associations::EagerLoading
     # Build associations out of the array of returned object graphs.
     def eager_graph_build_associations(record_graphs)
       # Dup the tables that will be used, so that self is not modified.
-      eager_graph = @opts[:eager_graph].dup
+      eager_graph = @opts[:eager_graph]
       master = eager_graph[:master]
-      requirements = eager_graph[:requirements].dup
-      alias_assoc_name_map = eager_graph[:alias_association_name_map].dup
-      alias_assoc_type_map = eager_graph[:alias_association_type_map].dup
+      requirements = eager_graph[:requirements]
+      alias_map = eager_graph[:alias_association_name_map]
+      type_map = eager_graph[:alias_association_type_map]
+      reciprocal_map = eager_graph[:reciprocals]
 
-      # Determine if this graph could possibly be a cartesian product
-      possible_cartesian_product = alias_assoc_type_map.reject{|k,v| v == :many_to_one}.length > 1
-  
       # Make dependency map hash out of requirements array for each association.
       # This builds a tree of dependencies that will be used for recursion
       # to ensure that all parts of the object graph are loaded into the
@@ -202,59 +202,30 @@ module Sequel::Model::Associations::EagerLoading
       # We map by primary key, if available, or by the object's entire values,
       # if not. The mapping must be per table, so create sub maps for each table
       # alias.
-      eager_graph_records_map = {master=>{}}
-      alias_assoc_name_map.keys.each{|ta| eager_graph_records_map[ta] = {}}
+      records_map = {master=>{}}
+      alias_map.keys.each{|ta| records_map[ta] = {}}
 
       # This will hold the final record set that we will be replacing the object graph with.
       records = []
       record_graphs.each do |record_graph|
         primary_record = record_graph[master]
         key = primary_record.pk || primary_record.values.sort_by{|x| x[0].to_s}
-        if cached_pr = eager_graph_records_map[master][key]
+        if cached_pr = records_map[master][key]
           primary_record = cached_pr
         else
-          eager_graph_records_map[master][key] = primary_record
+          records_map[master][key] = primary_record
           # Only add it to the list of records to return if it is a new record
           records.push(primary_record)
         end
         # Build all associations for the current object and it's dependencies
-        eager_graph_build_associations_graph(dependency_map, alias_assoc_name_map, alias_assoc_type_map, eager_graph_records_map, possible_cartesian_product, primary_record, record_graph)
+        eager_graph_build_associations_graph(dependency_map, alias_map, type_map, reciprocal_map, records_map, primary_record, record_graph)
       end
+
+      # Remove duplicate records from all associations if this graph could possibly be a cartesian product
+      eager_graph_make_associations_unique(records, dependency_map, alias_map, type_map) if type_map.reject{|k,v| v == :many_to_one}.length > 1
+      
       # Replace the array of object graphs with an array of model objects
       record_graphs.replace(records)
-    end
-  
-    # Build associations for the current object.  This is called recursively
-    # to build object's dependencies.
-    def eager_graph_build_associations_graph(dependency_map, alias_map, type_map, records_map, pos_cart_prod, current, record_graph)
-      return if dependency_map.empty?
-      # Don't clobber the instance variable array for *_to_many associations if it has already been setup
-      dependency_map.keys.each do |ta|
-        current.instance_variable_set("@#{alias_map[ta]}", []) unless type_map[ta] == :many_to_one || current.instance_variable_get("@#{alias_map[ta]}")
-      end
-      dependency_map.each do |ta, deps|
-        rec = record_graph[ta]
-        key = rec.pk || rec.values.values.sort_by{|x| x[0].to_s}
-        if cached_rec = records_map[ta][key]
-          rec = cached_rec
-        else
-          records_map[ta][rec.pk] = rec
-        end
-        ivar = "@#{alias_map[ta]}"
-        case type_map[ta]
-        when :many_to_one
-          current.instance_variable_set(ivar, rec)
-        else
-          list = current.instance_variable_get(ivar)
-          # If the result set is the result of a cartesian product, then it is possible that
-          # there a multiple records for each association when there should only be one.
-          # Assume that if there are multiple records, the follow each other directly.
-          # The documentation already tells the user to order the dataset so this is the case.
-          list.push(rec) unless pos_cart_prod && list.last == rec
-        end
-        # Recurse into dependencies of the current object
-        eager_graph_build_associations_graph(deps, alias_map, type_map, records_map, pos_cart_prod, rec, record_graph)
-      end
     end
 
     # Creates a unique table alias that hasn't already been used in the query.
@@ -285,6 +256,56 @@ module Sequel::Model::Associations::EagerLoading
       raise(ArgumentError, 'Invalid association') unless reflection = model.association_reflection(association)
       raise(ArgumentError, 'Cannot eagerly load associations with block arguments') if reflection[:block]
       reflection
+    end
+  
+    # Build associations for the current object.  This is called recursively
+    # to build object's dependencies.
+    def eager_graph_build_associations_graph(dependency_map, alias_map, type_map, reciprocal_map, records_map, current, record_graph)
+      return if dependency_map.empty?
+      # Don't clobber the instance variable array for *_to_many associations if it has already been setup
+      dependency_map.keys.each do |ta|
+        current.instance_variable_set("@#{alias_map[ta]}", []) unless type_map[ta] == :many_to_one || current.instance_variable_get("@#{alias_map[ta]}")
+      end
+      dependency_map.each do |ta, deps|
+        rec = record_graph[ta]
+        key = rec.pk || rec.values.sort_by{|x| x[0].to_s}
+        if cached_rec = records_map[ta][key]
+          rec = cached_rec
+        else
+          records_map[ta][rec.pk] = rec
+        end
+        ivar = "@#{alias_map[ta]}"
+        case assoc_type = type_map[ta]
+        when :many_to_one
+          current.instance_variable_set(ivar, rec)
+        else
+          list = current.instance_variable_get(ivar)
+          list.push(rec) 
+          if assoc_type == :one_to_many && reciprocal = reciprocal_map[ta]
+            rec.instance_variable_set(reciprocal, current)
+          end
+        end
+        # Recurse into dependencies of the current object
+        eager_graph_build_associations_graph(deps, alias_map, type_map, reciprocal_map, records_map, rec, record_graph)
+      end
+    end
+
+    # If the result set is the result of a cartesian product, then it is possible that
+    # there a multiple records for each association when there should only be one.
+    def eager_graph_make_associations_unique(records, dependency_map, alias_map, type_map)
+      records.each do |record|
+        dependency_map.each do |ta, deps|
+          list = if type_map[ta] == :many_to_one
+            item = record.send(alias_map[ta])
+            [item] if item
+          else
+            list = record.send(alias_map[ta])
+            list.uniq!
+            # Recurse into dependencies
+            list.each{|rec| eager_graph_make_associations_unique(rec, deps, alias_map, type_map)}
+          end
+        end
+      end
     end
 
     # Eagerly load all specified associations 
@@ -360,9 +381,9 @@ module Sequel::Model::Associations::EagerLoading
               right = reflection[:right_key]
               right_pk = (reflection[:right_primary_key] || :"#{assoc_table}__#{assoc_class.primary_key}")
               join_table = reflection[:join_table]
-              fkey = (opts[:left_key_alias] ||= :"x_foreign_key_x")
-              table_selection = (opts[:select] ||= assoc_table.all)
-              key_selection = (opts[:left_key_select] ||= :"#{join_table}__#{left}___#{fkey}")
+              fkey = (reflection[:left_key_alias] ||= :"x_foreign_key_x")
+              table_selection = (reflection[:select] ||= assoc_table.all)
+              key_selection = (reflection[:left_key_select] ||= :"#{join_table}__#{left}___#{fkey}")
               h = key_hash[model.primary_key]
               ds = assoc_class.select(table_selection, key_selection).inner_join(join_table, right=>right_pk, left=>h.keys)
             end

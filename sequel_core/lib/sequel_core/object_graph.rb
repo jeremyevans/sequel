@@ -185,10 +185,10 @@ module Sequel
           # For each dataset, transform and run the row
           # row_proc if applicable
           datasets.each do |ta,ds,tr,rp|
-            r = graph[ta]
-            r = ds.transform_load(r) if tr
-            r = rp[r] if rp
-            graph[ta] = r
+            g = graph[ta]
+            g = ds.transform_load(g) if tr
+            g = rp[g] if rp
+            graph[ta] = g
           end
 
           yield graph
