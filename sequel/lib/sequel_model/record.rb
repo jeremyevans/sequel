@@ -301,6 +301,9 @@ module Sequel
     # Reloads values from database and returns self.
     def refresh
       @values = this.first || raise(Error, "Record not found")
+      model.all_association_reflections.each do |r|
+        instance_variable_set("@#{r[:name]}", nil)
+      end
       self
     end
     alias_method :reload, :refresh

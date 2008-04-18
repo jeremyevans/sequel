@@ -643,4 +643,18 @@ describe Sequel::Model, "#refresh" do
     @m.reload
     @m[:x].should == 'kaboom'
   end
+
+  specify "should remove cached associations" do
+    @c.many_to_one :node, :class=>@c
+    @c.one_to_many :attributes, :class=>@c
+    @c.many_to_many :tags, :class=>@c
+    @m = @c.new(:id => 555)
+    @m.instance_variable_set(:@node, 15)
+    @m.instance_variable_set(:@attributes, [15])
+    @m.instance_variable_set(:@tags, [15])
+    @m.reload
+    @m.instance_variable_get(:@node).should == nil
+    @m.instance_variable_get(:@attributes).should == nil
+    @m.instance_variable_get(:@tags).should == nil
+  end
 end

@@ -118,7 +118,7 @@ describe Sequel::Model, "many_to_one" do
     d = @c2.create(:id => 1)
     MODEL_DB.reset
     d.parent_id = 234
-    d.instance_variables.include?("@parent").should == false
+    d.instance_variable_get("@parent").should == nil
     e = d.parent 
     MODEL_DB.sqls.should == ["SELECT * FROM nodes WHERE (id = 234) LIMIT 1"]
     d.instance_variable_get("@parent").should == e
@@ -129,7 +129,7 @@ describe Sequel::Model, "many_to_one" do
 
     d = @c2.create(:id => 1)
     MODEL_DB.reset
-    d.instance_variables.include?("@parent").should == false
+    d.instance_variable_get("@parent").should == nil
     d.parent = @c2.new(:id => 234)
     e = d.parent 
     d.instance_variable_get("@parent").should == e
@@ -163,7 +163,7 @@ describe Sequel::Model, "many_to_one" do
     d = @c2.create(:id => 1)
     MODEL_DB.reset
     d.parent_id = 234
-    d.instance_variables.include?("@parent").should == false
+    d.instance_variable_get("@parent").should == nil
     e = d.parent 
     MODEL_DB.sqls.should == ["SELECT * FROM nodes WHERE (id = 234) LIMIT 1"]
     d.instance_variable_get("@parent").should == e

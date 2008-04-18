@@ -1,5 +1,7 @@
 === HEAD
 
+* Make Model#reload clear any cached associations (jeremyevans)
+
 * No longer depend on the assistance gem, merge the Inflector and Validations code (jeremyevans)
 
 * Add Model#set_with_params, which is Model#update_with_params without the save (jeremyevans)
