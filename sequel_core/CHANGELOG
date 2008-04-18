@@ -1,5 +1,7 @@
 === HEAD
 
+* Move dataset methods applicable only to paginated datasets into Sequel::Dataset::Pagination (jeremyevans)
+
 * Make Sequel::Dataset::Sequelizer methods private (jeremyevans)
 
 * Deprecate Dataset#method_missing, add real mutation methods (e.g. filter!) (jeremyevans)

@@ -7,6 +7,7 @@ require File.join(File.dirname(__FILE__), 'dataset/sql')
 require File.join(File.dirname(__FILE__), 'dataset/sequelizer')
 require File.join(File.dirname(__FILE__), 'dataset/convenience')
 require File.join(File.dirname(__FILE__), 'dataset/callback')
+require File.join(File.dirname(__FILE__), 'dataset/pagination')
 
 module Sequel
   # A Dataset represents a view of a the data in a database, constrained by
