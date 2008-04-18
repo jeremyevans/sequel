@@ -8,7 +8,7 @@ end
 
 files = %w[
   inflector inflections base hooks record schema associations 
-  caching plugins validations eager_loading
+  caching plugins validations eager_loading deprecated
 ]
 dir = File.join(File.dirname(__FILE__), "sequel_model")
 files.each {|f| require(File.join(dir, f))}
@@ -270,8 +270,6 @@ module Sequel
       find(cond) || create(cond)
     end
 
-    ############################################################################
-
     # Deletes all records in the model's table.
     def self.delete_all
       dataset.delete
@@ -281,33 +279,23 @@ module Sequel
     def self.destroy_all
       dataset.destroy
     end
-        
-    def self.is_dataset_magic_method?(m)
-      method_name = m.to_s
-      Sequel::Dataset::MAGIC_METHODS.each_key do |r|
-        return true if method_name =~ r
-      end
-      false
-    end
-    
-    def self.method_missing(m, *args, &block) #:nodoc:
-      Thread.exclusive do
-        if dataset.respond_to?(m) || is_dataset_magic_method?(m)
-          instance_eval("def #{m}(*args, &block); dataset.#{m}(*args, &block); end")
-        end
-      end
-      respond_to?(m) ? send(m, *args, &block) : super(m, *args)
-    end
+
+    # Add dataset methods via metaprogramming
+    %w'all avg count delete distinct eager eager_graph each each_page 
+       empty? except exclude filter first from_self full_outer_join graph 
+       group group_and_count group_by having import inner_join insert 
+       insert_multiple intersect interval invert_order join join_table last 
+       left_outer_join limit multi_insert naked order order_by order_more 
+       paginate print query range reverse_order right_outer_join select 
+       select_all select_more set set_graph_aliases single_value size to_csv 
+       transform union uniq unordered update where'.each do |m|
+         eval("def self.#{m}(*args, &block); dataset.#{m}(*args, &block) end")
+       end
 
     # TODO: Comprehensive description goes here!
     def self.join(*args)
       table_name = dataset.opts[:from].first
       dataset.join(*args).select(table_name.to_sym.ALL)
-    end
-    
-    # Returns an array containing all of the models records.
-    def self.all
-      dataset.all
     end
   end
 end
