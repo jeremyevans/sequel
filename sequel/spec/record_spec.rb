@@ -534,20 +534,39 @@ describe Sequel::Model, "#==" do
 end
 
 describe Sequel::Model, "#===" do
-  specify "should compare instances by pk only" do
+  specify "should compare instances by class and pk if pk is not nil" do
     z = Class.new(Sequel::Model)
     z.columns :id, :x
+    y = Class.new(Sequel::Model)
+    y.columns :id, :x
     a = z.new(:id => 1, :x => 3)
     b = z.new(:id => 1, :x => 4)
     c = z.new(:id => 2, :x => 3)
+    d = y.new(:id => 1, :x => 3)
     
     a.should === b
     a.should_not === c
+    a.should_not === d
+  end
+
+  specify "should always be false if the primary key is nil" do
+    z = Class.new(Sequel::Model)
+    z.columns :id, :x
+    y = Class.new(Sequel::Model)
+    y.columns :id, :x
+    a = z.new(:x => 3)
+    b = z.new(:x => 4)
+    c = z.new(:x => 3)
+    d = y.new(:x => 3)
+    
+    a.should_not === b
+    a.should_not === c
+    a.should_not === d
   end
 end
 
 describe Sequel::Model, "#hash" do
-  specify "should be the same only for objects with the same class and pk" do
+  specify "should be the same only for objects with the same class and pk if the pk is not nil" do
     z = Class.new(Sequel::Model)
     z.columns :id, :x
     y = Class.new(Sequel::Model)
@@ -559,6 +578,21 @@ describe Sequel::Model, "#hash" do
     
     a.hash.should == b.hash
     a.hash.should_not == c.hash
+    a.hash.should_not == d.hash
+  end
+
+  specify "should be the same only for objects with the same class and values if the pk is nil" do
+    z = Class.new(Sequel::Model)
+    z.columns :id, :x
+    y = Class.new(Sequel::Model)
+    y.columns :id, :x
+    a = z.new(:x => 3)
+    b = z.new(:x => 4)
+    c = z.new(:x => 3)
+    d = y.new(:x => 3)
+    
+    a.hash.should_not == b.hash
+    a.hash.should == c.hash
     a.hash.should_not == d.hash
   end
 end

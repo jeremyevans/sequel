@@ -42,14 +42,16 @@ module Sequel
     end
     alias_method :eql?, :"=="
 
-    # Compares model instances by pkey.
+    # If pk is not nil, true only if the objects have the same class and pk.
+    # If pk is nil, false.
     def ===(obj)
-      (obj.class == model) && (obj.pk == pk)
+      pk.nil? ? false : (obj.class == model) && (obj.pk == pk)
     end
 
-    # Unique for a given class and primary key
+    # Unique for objects with the same class and pk (if pk is not nil), or
+    # the same class and values (if pk is nil).
     def hash
-      [model, pk].hash
+      [model, pk.nil? ? @values.sort_by{|k,v| k.to_s} : pk].hash
     end
 
     # Returns key for primary key.
