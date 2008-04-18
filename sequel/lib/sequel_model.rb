@@ -291,11 +291,5 @@ module Sequel
        transform union uniq unordered update where'.each do |m|
          eval("def self.#{m}(*args, &block); dataset.#{m}(*args, &block) end")
        end
-
-    # TODO: Comprehensive description goes here!
-    def self.join(*args)
-      table_name = dataset.opts[:from].first
-      dataset.join(*args).select(table_name.to_sym.ALL)
-    end
   end
 end
