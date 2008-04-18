@@ -1,5 +1,7 @@
 === HEAD
 
+* Use reciprocal associations for all types of associations in the getter/setter/add_/remove_ methods (jeremyevans)
+
 * Fix many_to_one associations to cache negative lookups (jeremyevans)
 
 * Change Model#=== to always be false if the primary key is nil (jeremyevans)

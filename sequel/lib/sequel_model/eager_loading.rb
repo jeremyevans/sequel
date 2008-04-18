@@ -124,6 +124,7 @@ module Sequel::Model::Associations::EagerLoading
         ds.graph(klass, {klass.primary_key=>:"#{ta}__#{r[:key]}"}, :table_alias=>assoc_table_alias)
       when :one_to_many
         ds = ds.graph(klass, {r[:key]=>:"#{ta}__#{model.primary_key}"}, :table_alias=>assoc_table_alias)
+        # We only load reciprocals for one_to_many associations, as other reciprocals don't make sense
         ds.opts[:eager_graph][:reciprocals][assoc_table_alias] = model.send(:reciprocal_association, r)
         ds
       when :many_to_many
@@ -281,7 +282,7 @@ module Sequel::Model::Associations::EagerLoading
         else
           list = current.instance_variable_get(ivar)
           list.push(rec) 
-          if assoc_type == :one_to_many && reciprocal = reciprocal_map[ta]
+          if (assoc_type == :one_to_many) && (reciprocal = reciprocal_map[ta])
             rec.instance_variable_set(reciprocal, current)
           end
         end
