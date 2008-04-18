@@ -1,5 +1,9 @@
 === HEAD
 
+* Deprecate Model.method_missing, add dataset methods to Model via metaprogramming (jeremyevans)
+
+* Remove Model.join, so it is the same as Dataset#join (jeremyevans)
+
 * Use reciprocal associations for all types of associations in the getter/setter/add_/remove_ methods (jeremyevans)
 
 * Fix many_to_one associations to cache negative lookups (jeremyevans)

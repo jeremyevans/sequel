@@ -229,6 +229,7 @@ module Sequel
   #   Post.create_table! # drops the table if it exists and then recreates it
   # 
   class Model
+    extend Enumerable
     extend Associations
     # Returns a string representation of the model instance including
     # the class name and values.
