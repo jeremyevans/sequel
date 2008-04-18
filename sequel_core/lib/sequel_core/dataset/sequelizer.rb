@@ -20,6 +20,7 @@ class Sequel::Dataset
   #   sudo gem install parsetree
   #   sudo gem install ruby2ruby
   module Sequelizer
+   private
     # Formats an comparison expression involving a left value and a right
     # value. Comparison expressions differ according to the class of the right
     # value. The stock implementation supports Range (inclusive and exclusive),
@@ -311,7 +312,7 @@ class Sequel::Dataset
     
     JOIN_AND = " AND ".freeze
     JOIN_COMMA = ", ".freeze
-    
+  
     def pt_expr(e, b, opts = {}) #:nodoc:
       case e[0]
       when :not # negation: !x, (x != y), (x !~ y)
@@ -346,7 +347,7 @@ end
 
 class Proc
   def to_sql(dataset, opts = {})
-    dataset.pt_expr(to_sexp[2], self.binding, opts)
+    dataset.send(:pt_expr, to_sexp[2], self.binding, opts)
   end
 end
 
