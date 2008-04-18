@@ -40,6 +40,7 @@ module Sequel
     def ==(obj)
       (obj.class == model) && (obj.values == @values)
     end
+    alias_method :eql?, :"=="
 
     # Compares model instances by pkey.
     def ===(obj)

@@ -1,5 +1,7 @@
 === HEAD
 
+* Add Model#eql? as a alias to Model#== (jeremyevans)
+
 * Make Model#reload clear any cached associations (jeremyevans)
 
 * No longer depend on the assistance gem, merge the Inflector and Validations code (jeremyevans)

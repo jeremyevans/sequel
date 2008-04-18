@@ -507,7 +507,7 @@ describe Sequel::Model, "#keys" do
   end
 end
 
-describe Sequel::Model, "#===" do
+describe Sequel::Model, "#==" do
   specify "should compare instances by values" do
     z = Class.new(Sequel::Model)
     z.columns :id, :x
@@ -518,6 +518,18 @@ describe Sequel::Model, "#===" do
     a.should_not == b
     a.should == c
     b.should_not == c
+  end
+
+  specify "should be aliased to #eql?" do
+    z = Class.new(Sequel::Model)
+    z.columns :id, :x
+    a = z.new(:id => 1, :x => 3)
+    b = z.new(:id => 1, :x => 4)
+    c = z.new(:id => 1, :x => 3)
+    
+    a.eql?(b).should == false
+    a.eql?(c).should == true
+    b.eql?(c).should == false
   end
 end
 
