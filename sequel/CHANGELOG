@@ -1,5 +1,7 @@
 === HEAD
 
+* Fix many_to_one associations to cache negative lookups (jeremyevans)
+
 * Change Model#=== to always be false if the primary key is nil (jeremyevans)
 
 * Add Model#hash, which should be unique for a given class and primary key (or values if primary key is nil) (jeremyevans)

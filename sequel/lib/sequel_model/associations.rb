@@ -239,9 +239,11 @@ module Sequel::Model::Associations
     ivar = association_ivar(name)
     class_def(name) do |*reload|
       if !reload[0] && obj = instance_variable_get(ivar)
-        obj
+        obj == :null ? nil : obj
       else
-        instance_variable_set(ivar, instance_eval(&block))
+        res = instance_eval(&block)
+        instance_variable_set(ivar, res.nil? ? :null : res)
+        res
       end
     end
   end

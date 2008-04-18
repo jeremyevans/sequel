@@ -86,6 +86,21 @@ describe Sequel::Model, "many_to_one" do
     d.parent.should == nil
   end
 
+  it "should cache negative lookup" do
+    @c2.many_to_one :parent, :class => @c2
+    ds = @c2.dataset
+    def ds.fetch_rows(sql, &block)
+      MODEL_DB.sqls << sql
+    end
+
+    d = @c2.new(:id => 1, :parent_id=>555)
+    MODEL_DB.sqls.should == []
+    d.parent.should == nil
+    MODEL_DB.sqls.should == ['SELECT * FROM nodes WHERE (id = 555) LIMIT 1']
+    d.parent.should == nil
+    MODEL_DB.sqls.should == ['SELECT * FROM nodes WHERE (id = 555) LIMIT 1']
+  end
+
   it "should define a setter method" do
     @c2.many_to_one :parent, :class => @c2
 
