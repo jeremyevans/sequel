@@ -546,6 +546,23 @@ describe Sequel::Model, "#===" do
   end
 end
 
+describe Sequel::Model, "#hash" do
+  specify "should be the same only for objects with the same class and pk" do
+    z = Class.new(Sequel::Model)
+    z.columns :id, :x
+    y = Class.new(Sequel::Model)
+    y.columns :id, :x
+    a = z.new(:id => 1, :x => 3)
+    b = z.new(:id => 1, :x => 4)
+    c = z.new(:id => 2, :x => 3)
+    d = y.new(:id => 1, :x => 3)
+    
+    a.hash.should == b.hash
+    a.hash.should_not == c.hash
+    a.hash.should_not == d.hash
+  end
+end
+
 describe Sequel::Model, "#initialize" do
   setup do
     @c = Class.new(Sequel::Model) do

@@ -1,5 +1,7 @@
 === HEAD
 
+* Add Model#hash, which should be unique for a given class and primary key (jeremyevans)
+
 * Add Model#eql? as a alias to Model#== (jeremyevans)
 
 * Make Model#reload clear any cached associations (jeremyevans)

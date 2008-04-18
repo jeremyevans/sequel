@@ -47,6 +47,11 @@ module Sequel
       (obj.class == model) && (obj.pk == pk)
     end
 
+    # Unique for a given class and primary key
+    def hash
+      [model, pk].hash
+    end
+
     # Returns key for primary key.
     def self.primary_key
       :id
