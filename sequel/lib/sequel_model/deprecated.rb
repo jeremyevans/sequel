@@ -14,7 +14,7 @@ module Sequel
     def self.method_missing(m, *args, &block) #:nodoc:
       Thread.exclusive do
         if dataset.respond_to?(m) || is_dataset_magic_method?(m)
-          instance_eval("def #{m}(*args, &block); deprecate(#{m.inspect}, 'is not a defined method'); dataset.#{m}(*args, &block); end")
+          instance_eval("def #{m}(*args, &block); deprecate('Sequel::Model.method_missing', 'Please define Sequel::Model.#{m} or use def_dataset_method :#{m}'); dataset.#{m}(*args, &block); end")
         end
       end
       respond_to?(m) ? send(m, *args, &block) : super(m, *args)

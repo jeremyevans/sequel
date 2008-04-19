@@ -15,8 +15,33 @@ module Sequel
       end
     end
 
-    def deprecate(meth, message)
-      ::Sequel::Deprecation.deprecate("#{meth} #{message}. #{meth} is deprecated, and will be removed in Sequel 2.0.")
+    def deprecate(meth, message = nil)
+      ::Sequel::Deprecation.deprecate("#{meth} is deprecated, and will be removed in Sequel 2.0.#{"  #{message}." if message}")
+    end
+  end
+  
+  class << self
+    include Sequel::Deprecation
+    def method_missing(m, *args)
+      deprecate("Sequel.method_missing", "You should define Sequel.#{m} for the adapter.")
+      c = Database.adapter_class(m)
+      begin
+        # three ways to invoke this:
+        # 0 arguments: Sequel.dbi
+        # 1 argument:  Sequel.dbi(db_name)
+        # more args:   Sequel.dbi(db_name, opts)
+        case args.size
+        when 0
+          opts = {}
+        when 1
+          opts = args[0].is_a?(Hash) ? args[0] : {:database => args[0]}
+        else
+          opts = args[1].merge(:database => args[0])
+        end
+      rescue
+        raise Error::AdapterNotFound, "Unknown adapter (#{m})"
+      end
+      c.new(opts)
     end
   end
 
@@ -33,7 +58,7 @@ module Sequel
         super unless respond_to?(meth)
         copy = send(meth, *args, &block)
         super if copy.class != self.class
-        deprecate(m, "is not a defined method")
+        deprecate("Sequel::Dataset#method_missing", "Define Sequel::Dataset##{m}, or use Sequel::Dataset.def_mutation_method(:#{meth})")
         @opts.merge!(copy.opts)
         self
       elsif magic_method_missing(m)
@@ -44,14 +69,14 @@ module Sequel
     end
 
     MAGIC_METHODS = {
-      /^order_by_(.+)$/   => proc {|c| proc {deprecate("order_by_#{c}", "is not a defined_method, please use order(#{c.inspect})"); order(c)}},
-      /^first_by_(.+)$/   => proc {|c| proc {deprecate("first_by_#{c}", "is not a defined_method, please use order(#{c.inspect}).first"); order(c).first}},
-      /^last_by_(.+)$/    => proc {|c| proc {deprecate("last_by_#{c}", "is not a defined_method, please use order(#{c.inspect}).last"); order(c).last}},
-      /^filter_by_(.+)$/  => proc {|c| proc {|v| deprecate("filter_by_#{c}", "is not a defined_method, please use filter(#{c.inspect}=>#{v.inspect})"); filter(c => v)}},
-      /^all_by_(.+)$/     => proc {|c| proc {|v| deprecate("all_by_#{c}", "is not a defined_method, please use filter(#{c.inspect}=>#{v.inspect}).all"); filter(c => v).all}},
-      /^find_by_(.+)$/    => proc {|c| proc {|v| deprecate("find_by_#{c}", "is not a defined_method, please use filter(#{c.inspect}=>#{v.inspect}).find"); filter(c => v).first}},
-      /^group_by_(.+)$/   => proc {|c| proc {deprecate("group_by_#{c}", "is not a defined_method, please use group(#{c.inspect})"); group(c)}},
-      /^count_by_(.+)$/   => proc {|c| proc {deprecate("count_by_#{c}", "is not a defined_method, please use group_and_count(#{c.inspect})"); group_and_count(c)}}
+      /^order_by_(.+)$/   => proc {|c| proc {deprecate("Sequel::Dataset#method_missing", "Use order(#{c.inspect}) or define order_by_#{c}"); order(c)}},
+      /^first_by_(.+)$/   => proc {|c| proc {deprecate("Sequel::Dataset#method_missing", "Use order(#{c.inspect}).first or define first_by_#{c}"); order(c).first}},
+      /^last_by_(.+)$/    => proc {|c| proc {deprecate("Sequel::Dataset#method_missing", "Use order(#{c.inspect}).last or define last_by_#{c}"); order(c).last}},
+      /^filter_by_(.+)$/  => proc {|c| proc {|v| deprecate("Sequel::Dataset#method_missing", "Use filter(#{c.inspect}=>#{v.inspect}) or define filter_by_#{c}"); filter(c => v)}},
+      /^all_by_(.+)$/     => proc {|c| proc {|v| deprecate("Sequel::Dataset#method_missing", "Use filter(#{c.inspect}=>#{v.inspect}).all or define all_by_#{c}"); filter(c => v).all}},
+      /^find_by_(.+)$/    => proc {|c| proc {|v| deprecate("Sequel::Dataset#method_missing", "Use filter(#{c.inspect}=>#{v.inspect}).find or define find_by_#{c}"); filter(c => v).first}},
+      /^group_by_(.+)$/   => proc {|c| proc {deprecate("Sequel::Dataset#method_missing", "Use group(#{c.inspect}) or define group_by_#{c}"); group(c)}},
+      /^count_by_(.+)$/   => proc {|c| proc {deprecate("Sequel::Dataset#method_missing", "Use group_and_count(#{c.inspect}) or define count_by_#{c})"); group_and_count(c)}}
     }
 
     # Checks if the given method name represents a magic method and
@@ -66,6 +91,13 @@ module Sequel
       end
       nil
     end
-
   end
 end
+
+class Object
+  def Sequel(*args)
+    Sequel::Deprecation.deprecate("Object#Sequel is deprecated and will be removed in Sequel 2.0.  Use Sequel.connect.")
+    Sequel.connect(*args)
+  end
+end
+

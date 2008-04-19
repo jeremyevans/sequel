@@ -1,5 +1,7 @@
 === HEAD
 
+* Deprecate Sequel.method_missing and Object#Sequel, add real Sequel.adapter methods (jeremyevans)
+
 * Move dataset methods applicable only to paginated datasets into Sequel::Dataset::Pagination (jeremyevans)
 
 * Make Sequel::Dataset::Sequelizer methods private (jeremyevans)
