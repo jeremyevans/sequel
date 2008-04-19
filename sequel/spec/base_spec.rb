@@ -195,6 +195,37 @@ describe Sequel::Model, "dataset" do
   end
 end
 
+describe Sequel::Model, "def_dataset_method" do
+  setup do
+    @c = Sequel::Model(:items)
+    @c.instance_eval do
+      @dataset = Object.new
+    end
+  end
+  
+  it "should add a method to the dataset and model if called with a block argument" do
+    @c.instance_eval do
+      def_dataset_method(:return_3){3}
+    end
+    @c.return_3.should == 3
+    @c.dataset.return_3.should == 3
+  end
+
+  it "should add all passed methods to the model if called without a block argument" do
+    @c.instance_eval do
+      def_dataset_method(:return_3, :return_4)
+    end
+    proc{@c.return_3}.should raise_error(NoMethodError)
+    proc{@c.return_4}.should raise_error(NoMethodError)
+    @c.dataset.instance_eval do
+      def return_3; 3; end
+      def return_4; 4; end
+    end
+    @c.return_3.should == 3
+    @c.return_4.should == 4
+  end
+end
+
 describe "A model class with implicit table name" do
   setup do
     class Donkey < Sequel::Model

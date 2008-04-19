@@ -1,5 +1,7 @@
 === HEAD
 
+* Add Model.def_dataset_method, for defining methods on the model that reference methods on the dataset (jeremyevans)
+
 * Deprecate Model.method_missing, add dataset methods to Model via metaprogramming (jeremyevans)
 
 * Remove Model.join, so it is the same as Dataset#join (jeremyevans)

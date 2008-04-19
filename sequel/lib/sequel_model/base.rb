@@ -40,12 +40,15 @@ module Sequel
       end
       @dataset
     end
-    
-    # def self.dataset
-    #   @dataset ||= super_dataset ||
-    #     (!(n = name).empty? && db[n.underscore.pluralize.to_sym]) ||
-    #     (raise Error, "No dataset associated with #{self}")
-    # end
+
+    def self.def_dataset_method(*args, &block)
+      raise(Error, "No arguments given") if args.empty?
+      if block_given?
+        raise(Error, "Defining a dataset method using a block requires only one argument") if args.length > 1
+        dataset.meta_def(args.first, &block)
+      end
+      args.each{|arg| instance_eval("def #{arg}(*args, &block); dataset.#{arg}(*args, &block) end", __FILE__, __LINE__)}
+    end
     
     def self.super_dataset # :nodoc:
       superclass.dataset if (superclass != Sequel::Model) && superclass.respond_to?(:dataset)
