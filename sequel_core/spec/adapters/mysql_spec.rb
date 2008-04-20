@@ -467,6 +467,39 @@ context "A MySQL database" do
     MYSQL_DB[:posts].full_text_search(:title, '+ruby -rails', :boolean => true).sql.should ==
       "SELECT * FROM posts WHERE (MATCH (`title`) AGAINST ('+ruby -rails' IN BOOLEAN MODE))"
   end
+
+  specify "should support spatial indexes" do
+    g = Sequel::Schema::Generator.new(MYSQL_DB) do
+      point :geom
+      spatial_index [:geom]
+    end
+    MYSQL_DB.create_table_sql_list(:posts, *g.create_info).should == [
+      "CREATE TABLE posts (`geom` point)",
+      "CREATE SPATIAL INDEX posts_geom_index ON posts (`geom`)"
+    ]
+  end
+
+  specify "should support indexes with index type" do
+    g = Sequel::Schema::Generator.new(MYSQL_DB) do
+      text :title
+      index :title, :type => :hash
+    end
+    MYSQL_DB.create_table_sql_list(:posts, *g.create_info).should == [
+      "CREATE TABLE posts (`title` text)",
+      "CREATE INDEX posts_title_index ON posts (`title`) USING hash"
+    ]
+  end
+
+  specify "should support unique indexes with index type" do
+    g = Sequel::Schema::Generator.new(MYSQL_DB) do
+      text :title
+      index :title, :type => :hash, :unique => true
+    end
+    MYSQL_DB.create_table_sql_list(:posts, *g.create_info).should == [
+      "CREATE TABLE posts (`title` text)",
+      "CREATE UNIQUE INDEX posts_title_index ON posts (`title`) USING hash"
+    ]
+  end
 end
 
 class Sequel::MySQL::Database

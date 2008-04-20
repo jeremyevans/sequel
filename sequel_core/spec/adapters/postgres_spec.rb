@@ -239,7 +239,7 @@ context "A PostgreSQL database" do
     end
     POSTGRES_DB.create_table_sql_list(:posts, *g.create_info).should == [
       "CREATE TABLE posts (\"title\" text, \"body\" text)",
-      "CREATE INDEX posts_title_body_index ON posts USING gin(to_tsvector(\"title\" || \"body\"))"
+      "CREATE INDEX posts_title_body_index ON posts USING gin (to_tsvector(\"title\" || \"body\"))"
     ]
   end
   
@@ -251,7 +251,7 @@ context "A PostgreSQL database" do
     end
     POSTGRES_DB.create_table_sql_list(:posts, *g.create_info).should == [
       "CREATE TABLE posts (\"title\" text, \"body\" text)",
-      "CREATE INDEX posts_title_body_index ON posts USING gin(to_tsvector('french', \"title\" || \"body\"))"
+      "CREATE INDEX posts_title_body_index ON posts USING gin (to_tsvector('french', \"title\" || \"body\"))"
     ]
   end
   
@@ -264,6 +264,50 @@ context "A PostgreSQL database" do
       
     POSTGRES_DB[:posts].full_text_search(:title, 'ruby', :language => 'french').sql.should ==
       "SELECT * FROM posts WHERE (to_tsvector('french', \"title\") @@ to_tsquery('french', 'ruby'))"
+  end
+
+  specify "should support spatial indexes" do
+    g = Sequel::Schema::Generator.new(POSTGRES_DB) do
+      point :geom
+      spatial_index [:geom]
+    end
+    POSTGRES_DB.create_table_sql_list(:posts, *g.create_info).should == [
+      "CREATE TABLE posts (\"geom\" point)",
+      "CREATE INDEX posts_geom_index ON posts USING gist (geom)"
+    ]
+  end
+  
+  specify "should support indexes with index type" do
+    g = Sequel::Schema::Generator.new(POSTGRES_DB) do
+      varchar :title
+      index :title, :type => 'hash'
+    end
+    POSTGRES_DB.create_table_sql_list(:posts, *g.create_info).should == [
+      "CREATE TABLE posts (\"title\" varchar)",
+      "CREATE INDEX posts_title_index ON posts USING hash (title)"
+    ]
+  end
+  
+  specify "should support unique indexes with index type" do
+    g = Sequel::Schema::Generator.new(POSTGRES_DB) do
+      varchar :title
+      index :title, :type => 'hash', :unique => true
+    end
+    POSTGRES_DB.create_table_sql_list(:posts, *g.create_info).should == [
+      "CREATE TABLE posts (\"title\" varchar)",
+      "CREATE UNIQUE INDEX posts_title_index ON posts USING hash (title)"
+    ]
+  end
+  
+  specify "should support partial indexes" do
+    g = Sequel::Schema::Generator.new(POSTGRES_DB) do
+      varchar :title
+      index :title, :where => {:something => 5}
+    end
+    POSTGRES_DB.create_table_sql_list(:posts, *g.create_info).should == [
+      "CREATE TABLE posts (\"title\" varchar)",
+      "CREATE INDEX posts_title_index ON posts (title) WHERE something = 5"
+    ]
   end
 end
 

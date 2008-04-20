@@ -328,16 +328,20 @@ module Sequel
 
       def index_definition_sql(table_name, index)
         index_name = index[:name] || default_index_name(table_name, index[:columns])
-        if index[:full_text]
+        expr = "(#{literal(index[:columns])})"
+        unique = "UNIQUE " if index[:unique]
+        index_type = index[:type]
+        where = " WHERE #{literal(index[:where])}" if index[:where]
+        case index_type
+        when :full_text
           lang = index[:language] ? "#{literal(index[:language])}, " : ""
           cols = index[:columns].map {|c| literal(c)}.join(" || ")
-          expr = "gin(to_tsvector(#{lang}#{cols}))"
-          "CREATE INDEX #{index_name} ON #{table_name} USING #{expr}"
-        elsif index[:unique]
-          "CREATE UNIQUE INDEX #{index_name} ON #{table_name} (#{literal(index[:columns])})"
-        else
-          "CREATE INDEX #{index_name} ON #{table_name} (#{literal(index[:columns])})"
+          expr = "(to_tsvector(#{lang}#{cols}))"
+          index_type = :gin
+        when :spatial
+          index_type = :gist
         end
+        "CREATE #{unique}INDEX #{index_name} ON #{table_name} #{"USING #{index_type} " if index_type}#{expr}#{where}"
       end
     
       def drop_table_sql(name)
