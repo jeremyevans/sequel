@@ -79,12 +79,12 @@ module Sequel
             meta = result.getMetaData
             column_count = meta.getColumnCount
             @columns = []
-            column_count.times {|i| @columns << meta.getColumnName(i).to_sym}
+            column_count.times {|i| @columns << meta.getColumnName(i+1).to_sym}
 
             # get rows
             while result.next
               row = {}
-              @columns.each_with_index {|v, i| row[v] = result.getObject(i)}
+              @columns.each_with_index {|v, i| row[v] = result.getObject(i+1)}
               yield row
             end
           end

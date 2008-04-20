@@ -45,6 +45,7 @@ class << Sequel::Model
   def columns(*cols)
     return if cols.empty?
     define_method(:columns){cols}
+    @dataset.instance_variable_set(:@columns, cols) if @dataset
     define_method(:str_columns){cols.map{|x|x.to_s.freeze}}
     def_column_accessor(*cols)
   end

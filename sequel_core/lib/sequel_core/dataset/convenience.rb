@@ -99,76 +99,6 @@ module Sequel
         end
       end
 
-      # Returns a paginated dataset. The resulting dataset also provides the
-      # total number of pages (Dataset#page_count) and the current page number
-      # (Dataset#current_page), as well as Dataset#prev_page and Dataset#next_page
-      # for implementing pagination controls.
-      def paginate(page_no, page_size)
-        record_count = count
-        total_pages = (record_count / page_size.to_f).ceil
-        paginated = limit(page_size, (page_no - 1) * page_size)
-        paginated.set_pagination_info(page_no, page_size, record_count)
-        paginated
-      end
-      
-      # Sets the pagination info
-      def set_pagination_info(page_no, page_size, record_count)
-        @current_page = page_no
-        @page_size = page_size
-        @pagination_record_count = record_count
-        @page_count = (record_count / page_size.to_f).ceil
-      end
-      
-      def each_page(page_size)
-        record_count = count
-        total_pages = (record_count / page_size.to_f).ceil
-        
-        (1..total_pages).each do |page_no|
-          paginated = limit(page_size, (page_no - 1) * page_size)
-          paginated.set_pagination_info(page_no, page_size, record_count)
-          yield paginated
-        end
-        
-        self
-      end
-
-      attr_accessor :page_size, :page_count, :current_page, :pagination_record_count
-
-      # Returns the previous page number or nil if the current page is the first
-      def prev_page
-        current_page > 1 ? (current_page - 1) : nil
-      end
-
-      # Returns the next page number or nil if the current page is the last page
-      def next_page
-        current_page < page_count ? (current_page + 1) : nil
-      end
-      
-      # Returns the page range
-      def page_range
-        1..page_count
-      end
-      
-      # Returns the record range for the current page
-      def current_page_record_range
-        return (0..0) if @current_page > @page_count
-        
-        a = 1 + (@current_page - 1) * @page_size
-        b = a + @page_size - 1
-        b = @pagination_record_count if b > @pagination_record_count
-        a..b
-      end
-
-      # Returns the number of records in the current page
-      def current_page_record_count
-        return 0 if @current_page > @page_count
-        
-        a = 1 + (@current_page - 1) * @page_size
-        b = a + @page_size - 1
-        b = @pagination_record_count if b > @pagination_record_count
-        b - a + 1
-      end
-
       # Returns the minimum value for the given column.
       def min(column)
         single_value(:select => [column.MIN.AS(:v)])
@@ -309,49 +239,6 @@ module Sequel
         copy.extend(QueryBlockCopy)
         copy.instance_eval(&block)
         clone(copy.opts)
-      end
-      
-      MUTATION_RE = /^(.+)!$/.freeze
-
-      # Provides support for mutation methods (filter!, order!, etc.) and magic
-      # methods.
-      def method_missing(m, *args, &block)
-        if m.to_s =~ MUTATION_RE
-          m = $1.to_sym
-          super unless respond_to?(m)
-          copy = send(m, *args, &block)
-          super if copy.class != self.class
-          @opts.merge!(copy.opts)
-          self
-        elsif magic_method_missing(m)
-          send(m, *args)
-        else
-           super
-        end
-      end
-      
-      MAGIC_METHODS = {
-        /^order_by_(.+)$/   => proc {|c| proc {order(c)}},
-        /^first_by_(.+)$/   => proc {|c| proc {order(c).first}},
-        /^last_by_(.+)$/    => proc {|c| proc {order(c).last}},
-        /^filter_by_(.+)$/  => proc {|c| proc {|v| filter(c => v)}},
-        /^all_by_(.+)$/     => proc {|c| proc {|v| filter(c => v).all}},
-        /^find_by_(.+)$/    => proc {|c| proc {|v| filter(c => v).first}},
-        /^group_by_(.+)$/   => proc {|c| proc {group(c)}},
-        /^count_by_(.+)$/   => proc {|c| proc {group_and_count(c)}}
-      }
-
-      # Checks if the given method name represents a magic method and 
-      # defines it. Otherwise, nil is returned.
-      def magic_method_missing(m)
-        method_name = m.to_s
-        MAGIC_METHODS.each_pair do |r, p|
-          if method_name =~ r
-            impl = p[$1.to_sym]
-            return Dataset.class_def(m, &impl)
-          end
-        end
-        nil
       end
       
       def create_view(name)

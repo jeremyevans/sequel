@@ -357,22 +357,6 @@ describe Sequel::Model, ".destroy_all" do
   end
 end
 
-describe Sequel::Model, ".join" do
-
-  before(:each) do
-    MODEL_DB.reset  
-    @c = Class.new(Sequel::Model(:items)) do
-      no_primary_key
-    end
-  end
-  
-  it "should format proper SQL" do
-    @c.join(:atts, :item_id => :id).sql.should == \
-      "SELECT items.* FROM items INNER JOIN atts ON (atts.item_id = items.id)"
-  end
-  
-end
-
 describe Sequel::Model, ".all" do
   
   before(:each) do

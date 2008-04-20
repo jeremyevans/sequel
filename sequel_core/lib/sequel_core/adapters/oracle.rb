@@ -100,24 +100,6 @@ module Sequel
         self
       end
       
-      def array_tuples_fetch_rows(sql, &block)
-        @db.synchronize do
-          cursor = @db.execute sql
-          begin
-            @columns = cursor.get_col_names.map {|c| c.downcase.to_sym}
-            raw_rnum_index = columns.index(:raw_rnum_)
-            while r = cursor.fetch
-              r.delete_at(raw_rnum_index) if raw_rnum_index
-              r.keys =  columns.delete_if{|x| x == :raw_rnum_}
-              yield r
-            end
-          ensure
-            cursor.close
-          end
-        end
-        self
-      end
-      
       def insert(*values)
         @db.do insert_sql(*values)
       end

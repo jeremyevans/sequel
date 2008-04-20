@@ -1,18 +1,17 @@
-gem "assistance", ">= 0.1"
-
 require "metaid"
-require "assistance"
 require "bigdecimal"
 require "bigdecimal/util"
 
 files = %w[
-  core_ext core_sql exceptions pretty_table
+  deprecated core_ext core_sql connection_pool exceptions pretty_table
   dataset migration schema database worker object_graph
 ]
 dir = File.join(File.dirname(__FILE__), "sequel_core")
 files.each {|f| require(File.join(dir, f))}
 
 module Sequel #:nodoc:
+  Deprecation.deprecation_message_stream = STDERR
+  #Deprecation.print_tracebacks = true
   class << self
     # call-seq:
     #   Sequel::Database.connect(conn_string)
@@ -31,32 +30,19 @@ module Sequel #:nodoc:
     def single_threaded=(value)
       Database.single_threaded = value
     end
-    
-    def method_missing(m, *args)
-      c = Database.adapter_class(m)
-      begin
-        # three ways to invoke this:
-        # 0 arguments: Sequel.dbi 
-        # 1 argument:  Sequel.dbi(db_name)
-        # more args:   Sequel.dbi(db_name, opts)
-        case args.size
-        when 0
-          opts = {}
-        when 1
-          opts = args[0].is_a?(Hash) ? args[0] : {:database => args[0]}
-        else
-          opts = args[1].merge(:database => args[0])
-        end
-      rescue
-        raise Error::AdapterNotFound, "Unknown adapter (#{m})"
-      end
-      c.new(opts)
-    end
-  end
-end
 
-class Object
-  def Sequel(*args)
-    Sequel.connect(*args)
+    def self.def_adapter_method(*adapters)
+      adapters.each do |adapter|
+        define_method(adapter) do |*args|
+          raise(::Sequel::Error, "Wrong number of arguments, 0-2 arguments valid") if args.length > 2
+          opts = {:adapter=>adapter.to_sym}
+          opts[:database] = args.shift if args.length >= 1 && !(args[0].is_a?(Hash))
+          opts.merge!(args[0]) if args[0].is_a?(Hash)
+          ::Sequel::Database.connect(opts)
+        end
+      end
+    end
+
+    def_adapter_method(*Database::ADAPTERS)
   end
 end

@@ -44,28 +44,6 @@ describe Sequel::Model, "one_to_one" do
     MODEL_DB.sqls.should == ["SELECT * FROM nodes WHERE (id = 567) LIMIT 1"]
   end
 
-  # the new implementation doesn't support plain datasets as associations
-  # it "should support plain dataset in the from option" do
-  #   @c2.one_to_one :parent, :from => MODEL_DB[:xyz]
-  #   
-  #   d = @c2.new(:id => 1, :parent_id => 789)
-  #   p = d.parent
-  #   p.class.should == Hash
-  #   
-  #   MODEL_DB.sqls.should == ["SELECT * FROM xyz WHERE (id = 789) LIMIT 1"]
-  # end
-
-  # the new implementation doesn't support plain datasets as associations
-  # it "should support table name in the from option" do
-  #   @c2.one_to_one :parent, :from => :abc
-  # 
-  #   d = @c2.new(:id => 1, :parent_id => 789)
-  #   p = d.parent
-  #   p.class.should == Hash
-  # 
-  #   MODEL_DB.sqls.should == ["SELECT * FROM abc WHERE (id = 789) LIMIT 1"]
-  # end
-
   it "should return nil if key value is nil" do
     @c2.one_to_one :parent, :from => @c2
 
@@ -116,26 +94,6 @@ describe Sequel::Model, "one_to_many" do
     a.should be_a_kind_of(Sequel::Dataset)
     a.sql.should == 'SELECT * FROM attributes WHERE (node_id = 1234)'
   end
-  
-  # the new implementation doesn't support plain datasets as associations
-  # it "should support plain dataset in the from option" do
-  #   @c2.one_to_many :attributes, :from => MODEL_DB[:xyz], :key => :node_id
-  # 
-  #   n = @c2.new(:id => 1234)
-  #   a = n.attributes
-  #   a.should be_a_kind_of(Sequel::Dataset)
-  #   a.sql.should == 'SELECT * FROM xyz WHERE (node_id = 1234)'
-  # end
-
-  # the new implementation doesn't support plain datasets as associations
-  # it "should support table name in the from option" do
-  #   @c2.one_to_many :attributes, :from => :abc, :key => :node_id
-  # 
-  #   n = @c2.new(:id => 1234)
-  #   a = n.attributes
-  #   a.should be_a_kind_of(Sequel::Dataset)
-  #   a.sql.should == 'SELECT * FROM abc WHERE (node_id = 1234)'
-  # end
   
   it "should support implicit key names" do
     $c1 = @c1

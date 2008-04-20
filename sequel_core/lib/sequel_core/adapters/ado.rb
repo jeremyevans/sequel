@@ -21,9 +21,9 @@ module Sequel
       end
       
       def connect
-        dbname = @opts[:database]
+        s = "driver=#{@opts[:driver] || 'SQL Server'};server=#{@opts[:host]};database=#{@opts[:database]}#{";uid=#{@opts[:user]};pwd=#{@opts[:password]}" if @opts[:user]}"
         handle = WIN32OLE.new('ADODB.Connection')
-        handle.Open(dbname)
+        handle.Open(s)
         handle
       end
       
@@ -72,18 +72,6 @@ module Sequel
         end
       end
     
-      def array_tuples_fetch_rows(sql, &block)
-        @db.synchronize do
-          s = @db.execute sql
-          
-          @columns = s.Fields.extend(Enumerable).map {|x| x.Name.to_sym}
-          
-          s.moveFirst
-          s.getRows.transpose.each {|r| r.keys = @columns; yield r}
-        end
-        self
-      end
-      
       def insert(*values)
         @db.do insert_sql(*values)
       end

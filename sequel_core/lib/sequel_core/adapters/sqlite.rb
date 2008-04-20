@@ -160,13 +160,6 @@ module Sequel
         end
       end
       
-      def array_tuples_fetch_rows(sql, &block)
-        @db.execute_select(sql) do |result|
-          @columns = result.columns.map {|c| c.to_sym}
-          result.each {|r| r.keys = @columns; block[r]}
-        end
-      end
-    
       def insert(*values)
         @db.execute_insert insert_sql(*values)
       end

@@ -37,6 +37,8 @@
 #   one_to_many :attributes
 #   has_many :attributes
 module Sequel::Model::Associations
+  RECIPROCAL_ASSOCIATIONS = {:many_to_one=>:one_to_many, :one_to_many=>:many_to_one, :many_to_many=>:many_to_many}
+
   # Array of all association reflections
   def all_association_reflections
     association_reflections.values
@@ -71,6 +73,13 @@ module Sequel::Model::Associations
   #     For many_to_one associations, this is ignored unless this association is
   #     being eagerly loaded, as it doesn't save queries unless multiple objects
   #     can be loaded at once.
+  #   - :reciprocal - the symbol name of the instance variable of the reciprocal association,
+  #     if it exists.  By default, sequel will try to determine it by looking at the
+  #     associated model's assocations for a association that matches
+  #     the current association's key(s).  Set to nil to not use a reciprocal.
+  # * :one_to_many/:many_to_many:
+  #   - :order - the column(s) by which to order the association dataset.  Can be a
+  #     singular column or an array.
   # * :many_to_one:
   #   - :key - foreign_key in current model's table that references
   #     associated model's primary key, as a symbol.  Defaults to :"#{name}_id".
@@ -78,12 +87,6 @@ module Sequel::Model::Associations
   #   - :key - foreign key in associated model's table that references
   #     current model's primary key, as a symbol.  Defaults to
   #     :"#{self.name.underscore}_id".
-  #   - :reciprocal - the string name of the instance variable of the reciprocal many_to_one association,
-  #     if it exists.  By default, sequel will try to determine it by looking at the
-  #     associated model's assocations for a many_to_one association that matches
-  #     the current association's key.  Set to nil to not use a reciprocal.
-  #   - :order - the column(s) by which to order the association dataset.  Can be a
-  #     singular column or an array.
   # * :many_to_many:
   #   - :join_table - name of table that includes the foreign keys to both
   #     the current model and the associated model, as a symbol.  Defaults to the name
@@ -99,8 +102,6 @@ module Sequel::Model::Associations
   #     use this option, but beware that the join table attributes can clash with
   #     attributes from the model table, so you should alias any attributes that have
   #     the same name in both the join table and the associated table.
-  #   - :order - the column(s) by which to order the association dataset. Can be a
-  #     singular column or an array.
   def associate(type, name, opts = {}, &block)
     # check arguments
     raise ArgumentError unless [:many_to_one, :one_to_many, :many_to_many].include?(type) && Symbol === name
@@ -224,7 +225,8 @@ module Sequel::Model::Associations
           ds = ds.eager(eager)
         end
         objs = ds.all
-        if reciprocal = self.class.send(:reciprocal_association, opts)
+        # Only one_to_many associations should set the reciprocal object
+        if (opts[:type] == :one_to_many) && (reciprocal = model.send(:reciprocal_association, opts))
           objs.each{|o| o.instance_variable_set(reciprocal, self)}
         end
         instance_variable_set(ivar, objs)
@@ -239,9 +241,11 @@ module Sequel::Model::Associations
     ivar = association_ivar(name)
     class_def(name) do |*reload|
       if !reload[0] && obj = instance_variable_get(ivar)
-        obj
+        obj == :null ? nil : obj
       else
-        instance_variable_set(ivar, instance_eval(&block))
+        obj = instance_eval(&block)
+        instance_variable_set(ivar, obj || :null)
+        obj
       end
     end
   end
@@ -249,6 +253,7 @@ module Sequel::Model::Associations
   # Adds many_to_many association instance methods
   def def_many_to_many(name, opts)
     assoc_class = method(:associated_class) # late binding of association dataset
+    recip_assoc = method(:reciprocal_association) # late binding of the reciprocal association
     ivar = association_ivar(name)
     left = (opts[:left_key] ||= default_remote_key)
     right = (opts[:right_key] ||= :"#{name.to_s.singularize}_id")
@@ -268,12 +273,19 @@ module Sequel::Model::Associations
       if arr = instance_variable_get(ivar)
         arr.push(o)
       end
+      if (reciprocal = recip_assoc[opts]) && (list = o.instance_variable_get(reciprocal)) \
+         && !(list.include?(self))
+        list.push(self)
+      end
       o
     end
     class_def(association_remove_method_name(name)) do |o|
       database[join_table].filter(left => pk, right => o.pk).delete
       if arr = instance_variable_get(ivar)
         arr.delete(o)
+      end
+      if (reciprocal = recip_assoc[opts]) && (list = o.instance_variable_get(reciprocal))
+        list.delete(self)
       end
       o
     end
@@ -282,6 +294,7 @@ module Sequel::Model::Associations
   # Adds many_to_one association instance methods
   def def_many_to_one(name, opts)
     assoc_class = method(:associated_class) # late binding of association dataset
+    recip_assoc = method(:reciprocal_association) # late binding of the reciprocal association
     ivar = association_ivar(name)
     
     key = (opts[:key] ||= :"#{name}_id")
@@ -289,14 +302,25 @@ module Sequel::Model::Associations
     
     def_association_getter(name) {(fk = send(key)) ? assoc_class[opts][fk] : nil}
     class_def(:"#{name}=") do |o|
+      old_val = instance_variable_get(ivar) if reciprocal = recip_assoc[opts]
       instance_variable_set(ivar, o)
       send(:"#{key}=", (o.pk if o))
+      if reciprocal && (old_val != o)
+        if old_val && (list = old_val.instance_variable_get(reciprocal))
+          list.delete(self)
+        end
+        if o && (list = o.instance_variable_get(reciprocal)) && !(list.include?(self))
+          list.push(self) 
+        end
+      end
+      o
     end
   end
   
   # Adds one_to_many association instance methods
   def def_one_to_many(name, opts)
     assoc_class = method(:associated_class) # late binding of association dataset
+    recip_assoc = method(:reciprocal_association) # late binding of the reciprocal association
     ivar = association_ivar(name)
     key = (opts[:key] ||= default_remote_key)
     opts[:class_name] ||= name.to_s.singularize.camelize
@@ -309,6 +333,9 @@ module Sequel::Model::Associations
       if arr = instance_variable_get(ivar)
         arr.push(o)
       end
+      if reciprocal = recip_assoc[opts]
+        o.instance_variable_set(reciprocal, self)
+      end
       o
     end
     class_def(association_remove_method_name(name)) do |o|
@@ -316,6 +343,9 @@ module Sequel::Model::Associations
       o.save!
       if arr = instance_variable_get(ivar)
         arr.delete(o)
+      end
+      if reciprocal = recip_assoc[opts]
+        o.instance_variable_set(reciprocal, :null)
       end
       o
     end
@@ -334,18 +364,26 @@ module Sequel::Model::Associations
 
   # Sets the reciprocal association variable in the reflection, if one exists
   def reciprocal_association(reflection)
-    if reflection[:type] != :one_to_many
-      nil
-    elsif reflection.include?(:reciprocal)
-      reflection[:reciprocal]
+    return reflection[:reciprocal] if reflection.include?(:reciprocal)
+    reciprocal_type = ::Sequel::Model::Associations::RECIPROCAL_ASSOCIATIONS[reflection[:type]]
+    if reciprocal_type == :many_to_many
+      left_key = reflection[:left_key]
+      right_key = reflection[:right_key]
+      join_table = reflection[:join_table]
+      associated_class(reflection).all_association_reflections.each do |assoc_reflect|
+        if assoc_reflect[:type] == :many_to_many && assoc_reflect[:left_key] == right_key \
+           && assoc_reflect[:right_key] == left_key && assoc_reflect[:join_table] == join_table
+          return reflection[:reciprocal] = association_ivar(assoc_reflect[:name]).to_s.freeze
+        end
+      end
     else
       key = reflection[:key]
       associated_class(reflection).all_association_reflections.each do |assoc_reflect|
-        if assoc_reflect[:type] == :many_to_one && assoc_reflect[:key] == key
-          return reflection[:reciprocal] = "@#{assoc_reflect[:name]}".freeze
+        if assoc_reflect[:type] == reciprocal_type && assoc_reflect[:key] == key
+          return reflection[:reciprocal] = association_ivar(assoc_reflect[:name])
         end
       end
-      reflection[:reciprocal] = nil
     end
+    reflection[:reciprocal] = nil
   end
 end

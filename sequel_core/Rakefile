@@ -47,28 +47,22 @@ spec = Gem::Specification.new do |s|
   s.platform = Gem::Platform::RUBY
   s.has_rdoc = true
   s.extra_rdoc_files = ["README", "CHANGELOG", "COPYING"]
-  s.rdoc_options += RDOC_OPTS + 
-    ["--exclude", "^(examples|extras)\/", "--exclude", "lib/sequel_core.rb"]
+  s.rdoc_options += RDOC_OPTS + ["--exclude", "^(examples|extras)\/"]
   s.summary = "The Database Toolkit for Ruby: Core Library and Adapters"
   s.description = s.summary
-  s.author = "Aman Gupta"
-  s.email = "themastermind1@gmail.com"
+  s.author = "Jeremy Evans"
+  s.email = "code@jeremyevans.net"
   s.homepage = "http://sequel.rubyforge.org"
   s.executables = ["sequel"]
   s.required_ruby_version = ">= 1.8.4"
 
   s.add_dependency("metaid")
-  s.add_dependency("assistance", ">= 0.1")
 
   case RUBY_PLATFORM
   when /java/
     s.platform = "jruby"
   else
     s.platform = Gem::Platform::RUBY
-    # ParseTree on win32 requires PT2.1.1 and RI3.6.6
-    s.add_dependency("RubyInline", ">= 3.6.6")
-    s.add_dependency("ParseTree", ">= 2.1.1")
-    s.add_dependency("ruby2ruby")
   end
   
   s.files = %w(COPYING README Rakefile) + Dir.glob("{bin,doc,spec,lib}/**/*")

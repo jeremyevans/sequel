@@ -90,19 +90,6 @@ module Sequel
         self
       end
       
-      def array_tuples_fetch_rows(sql, &block)
-        @db.synchronize do
-          s = @db.execute sql
-          begin
-            @columns = s.column_names.map {|c| c.to_sym}
-            s.fetch {|r| r.keys = @columns; yield r}
-          ensure
-            s.finish rescue nil
-          end
-        end
-        self
-      end
-      
       def hash_row(stmt, row)
         @columns.inject({}) do |m, c|
           m[c] = row.shift
