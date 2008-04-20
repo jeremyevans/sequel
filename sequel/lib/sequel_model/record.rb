@@ -139,14 +139,12 @@ module Sequel
       class_def(:cache_key) {raise Error, "No primary key is associated with this model"}
     end
     
-    # Creates new instance with values set to passed-in Hash ensuring that
-    # new? returns true.
+    # Creates new instance with values set to passed-in Hash, saves it
+    # (running any callbacks), and returns the instance.
     def self.create(values = {}, &block)
-      db.transaction do
-        obj = new(values, &block)
-        obj.save
-        obj
-      end
+      obj = new(values, &block)
+      obj.save
+      obj
     end
     
     # Updates the instance with the supplied values with support for virtual
@@ -165,17 +163,7 @@ module Sequel
       set_with_params(values)
       save_changes
     end
-    alias_method :update_with, :update_with_params
 
-    class << self
-      def create_with_params(params)
-        record = new
-        record.update_with_params(params)
-        record
-      end
-      alias_method :create_with, :create_with_params
-    end
-    
     # Returns (naked) dataset bound to current instance.
     def this
       @this ||= self.class.dataset.filter(:id => @values[:id]).limit(1).naked
@@ -221,7 +209,7 @@ module Sequel
       end
       @changed_columns.clear 
       
-      block[self] if block
+      yield self if block
       after_initialize
     end
     
@@ -235,7 +223,6 @@ module Sequel
     def new?
       @new
     end
-    alias :new_record? :new?
     
     # Returns true when current instance exists, false otherwise.
     def exists?
@@ -281,11 +268,14 @@ module Sequel
       save(*@changed_columns) unless @changed_columns.empty?
     end
 
-    # Updates and saves values to database from the passed-in Hash. Does not call
-    # any callback methods.
-    def set(values)
+    # Sets the value attributes without saving the record.  Returns
+    # the values changed.  Raises an error if the keys are not symbols
+    # or strings or a string key was passed that was not a valid column.
+    # This is a low level method that not respect virtual attributes.  It
+    # should probably be avoided.  Look into using set_with_params instead.
+    def set_values(values)
       s = str_columns
-      v = values.inject({}) do |m, kv| 
+      vals = values.inject({}) do |m, kv| 
         k, v = kv
         k = case k
         when Symbol
@@ -293,18 +283,25 @@ module Sequel
         when String
           # Prevent denial of service via memory exhaustion by only 
           # calling to_sym if the symbol already exists.
-          raise(ArgumentError, "all string keys must be a valid columns") unless s.include?(k)
+          raise(::Sequel::Error, "all string keys must be a valid columns") unless s.include?(k)
           k.to_sym
         else
-          raise ArgumentError, "Only symbols and strings allows as keys"
+          raise(::Sequel::Error, "Only symbols and strings allows as keys")
         end
         m[k] = v
         m
       end
-      this.update(v)
-      v.each {|k, v| @values[k] = v}
+      vals.each {|k, v| @values[k] = v}
+      vals
     end
-    alias_method :update, :set
+
+    # Sets the values attributes with set_values and then updates
+    # the record in the database using those values.  This is a
+    # low level method that does not run the usual save callbacks.
+    # It should probably be avoided.  Look into using update_with_params instead.
+    def update_values(values)
+      this.update(set_values(values))
+    end
     
     # Reloads values from database and returns self.
     def refresh
@@ -326,13 +323,16 @@ module Sequel
       self
     end
     
-    # Deletes and returns self.
+    # Deletes and returns self.  Does not run callbacks.
+    # Look into using destroy instead.
     def delete
       this.delete
       self
     end
     
     private
+      # Returns all methods that can be used for attribute
+      # assignment (those that end with =)
       def setter_methods
         methods.grep(/=$/)
       end

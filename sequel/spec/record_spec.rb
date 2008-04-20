@@ -105,8 +105,7 @@ describe "Model#save_changes" do
   end
 end
 
-describe "Model#set" do
-  
+describe "Model#update_values" do
   before(:each) do
     MODEL_DB.reset
 
@@ -117,32 +116,55 @@ describe "Model#set" do
   
   it "should generate an update statement" do
     o = @c.new(:id => 1)
-    o.set(:x => 1)
+    o.update_values(:x => 1)
     MODEL_DB.sqls.first.should == "UPDATE items SET x = 1 WHERE (id = 1)"
   end
   
   it "should update attribute values" do
     o = @c.new(:id => 1)
     o.x.should be_nil
-    o.set(:x => 1)
+    o.update_values(:x => 1)
     o.x.should == 1
   end
   
   it "should support string keys" do
     o = @c.new(:id => 1)
     o.x.should be_nil
-    o.set('x' => 1)
+    o.update_values('x' => 1)
     o.x.should == 1
-    MODEL_DB.sqls.first.should == "UPDATE items SET x = 1 WHERE (id = 1)"
-  end
-  
-  it "should be aliased by #update" do
-    o = @c.new(:id => 1)
-    o.update(:x => 1)
     MODEL_DB.sqls.first.should == "UPDATE items SET x = 1 WHERE (id = 1)"
   end
 end
 
+describe "Model#set_values" do
+  before(:each) do
+    MODEL_DB.reset
+
+    @c = Class.new(Sequel::Model(:items)) do
+      columns :id, :x, :y
+    end
+  end
+  
+  it "should not touch the database" do
+    o = @c.new(:id => 1)
+    o.set_values(:x => 1)
+    MODEL_DB.sqls.should == []
+  end
+  
+  it "should update attribute values" do
+    o = @c.new(:id => 1)
+    o.x.should be_nil
+    o.set_values(:x => 1)
+    o.x.should == 1
+  end
+  
+  it "should support string keys" do
+    o = @c.new(:id => 1)
+    o.x.should be_nil
+    o.set_values('x' => 1)
+    o.x.should == 1
+  end
+end
 
 describe "Model#new?" do
   
