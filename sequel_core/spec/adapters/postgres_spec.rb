@@ -268,11 +268,11 @@ context "A PostgreSQL database" do
 
   specify "should support spatial indexes" do
     g = Sequel::Schema::Generator.new(POSTGRES_DB) do
-      point :geom
+      geometry :geom
       spatial_index [:geom]
     end
     POSTGRES_DB.create_table_sql_list(:posts, *g.create_info).should == [
-      "CREATE TABLE posts (\"geom\" point)",
+      "CREATE TABLE posts (\"geom\" geometry)",
       "CREATE INDEX posts_geom_index ON posts USING gist (geom)"
     ]
   end
