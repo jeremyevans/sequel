@@ -1,5 +1,6 @@
 require 'rubygems'
 unless Object.const_defined?('Sequel')
+  $:.unshift(File.join(File.dirname(__FILE__), "../../sequel_core/lib/"))
   require 'sequel_core'
 end
 require File.join(File.dirname(__FILE__), "../lib/sequel_model")
