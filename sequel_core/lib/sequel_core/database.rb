@@ -169,7 +169,6 @@ module Sequel
       true
     end
     
-    # include Dataset::SQL
     include Schema::SQL
     
     # default serial primary key definition. this should be overriden for each adapter.
