@@ -1,5 +1,15 @@
 === HEAD
 
+* Deprecate Dataset methods #set_options, #set_row_proc, #remove_row_proc, and #clone_merge (jeremyevans)
+
+* Add Symbol#*, a replacement for Symbol#all (jeremyevans)
+
+* Deprecate including ColumnMethods in Object, include it in Symbol and String (jeremyevans)
+
+* Deprecate Symbol#method_missing, and #AS, #DESC, #ASC, #ALL, and #all from ColumnMethods (jeremyevans)
+
+* Fix table joining in MySQL (jeremyevans)
+
 * Deprecate Sequel.method_missing and Object#Sequel, add real Sequel.adapter methods (jeremyevans)
 
 * Move dataset methods applicable only to paginated datasets into Sequel::Dataset::Pagination (jeremyevans)

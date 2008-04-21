@@ -50,6 +50,27 @@ module Sequel
 
     MUTATION_RE = /^(.+)!$/.freeze
 
+    def clone_merge(opts = {})
+      deprecate("Sequel::Dataset#clone", "Use clone")
+      clone(opts)
+    end
+
+    def set_options(opts)
+      deprecate("Sequel::Dataset#set_options")
+      @opts = opts
+      @columns = nil
+    end
+
+    def set_row_proc(&filter)
+      deprecate("Sequel::Dataset#set_row_proc", "Use row_proc=")
+      @row_proc = filter
+    end
+
+    def remove_row_proc
+      deprecate("Sequel::Dataset#remove_row_proc", "Use row_proc=nil")
+      @row_proc = nil
+    end
+
     # Provides support for mutation methods (filter!, order!, etc.) and magic
     # methods.
     def method_missing(m, *args, &block)
