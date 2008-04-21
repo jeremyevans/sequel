@@ -92,12 +92,74 @@ module Sequel
       nil
     end
   end
+  
+  module SQL
+    module DeprecatedColumnMethods
+      AS = 'AS'.freeze
+      DESC = 'DESC'.freeze
+      ASC = 'ASC'.freeze
+
+      def as(a)
+        Sequel::Deprecation.deprecate("Object#as is deprecated and will be removed in Sequel 2.0.  Use Symbol#as or String#as.")
+        ColumnExpr.new(self, AS, a)
+      end
+      def AS(a)
+        Sequel::Deprecation.deprecate("Object#AS is deprecated and will be removed in Sequel 2.0.  Use Symbol#as or String#as.")
+        ColumnExpr.new(self, AS, a)
+      end
+      def desc
+        Sequel::Deprecation.deprecate("Object#desc is deprecated and will be removed in Sequel 2.0.  Use Symbol#desc or String#desc.")
+        ColumnExpr.new(self, DESC)
+      end
+      def DESC
+        Sequel::Deprecation.deprecate("Object#DESC is deprecated and will be removed in Sequel 2.0.  Use Symbol#desc or String#desc.")
+        ColumnExpr.new(self, DESC)
+      end
+      def asc
+        Sequel::Deprecation.deprecate("Object#asc is deprecated and will be removed in Sequel 2.0.  Use Symbol#asc or String#asc.")
+        ColumnExpr.new(self, ASC)
+      end
+      def ASC
+        Sequel::Deprecation.deprecate("Object#ASC is deprecated and will be removed in Sequel 2.0.  Use Symbol#asc or String#asc.")
+        ColumnExpr.new(self, ASC)
+      end
+      def all
+        Sequel::Deprecation.deprecate("Object#all is deprecated and will be removed in Sequel 2.0.  Use :#{self}.* or '#{self}.*'.lit.")
+        Sequel::SQL::ColumnAll.new(self)
+      end
+      def ALL
+        Sequel::Deprecation.deprecate("Object#ALL is deprecated and will be removed in Sequel 2.0.  Use :#{self}.* or '#{self}.*'.lit.")
+        Sequel::SQL::ColumnAll.new(self)
+      end
+
+      def cast_as(t)
+        Sequel::Deprecation.deprecate("Object#cast_as is deprecated and will be removed in Sequel 2.0.  Use Symbol#cast_as or String#cast_as.")
+        if t.is_a?(Symbol)
+          t = t.to_s.lit
+        end
+        Sequel::SQL::Function.new(:cast, self.as(t))
+      end
+    end
+  end
 end
 
 class Object
+  include Sequel::SQL::DeprecatedColumnMethods
   def Sequel(*args)
     Sequel::Deprecation.deprecate("Object#Sequel is deprecated and will be removed in Sequel 2.0.  Use Sequel.connect.")
     Sequel.connect(*args)
   end
 end
 
+class Symbol
+  # Converts missing method calls into functions on columns, if the
+  # method name is made of all upper case letters.
+  def method_missing(sym, *args)
+    if ((s = sym.to_s) =~ /^([A-Z]+)$/)
+      Sequel::Deprecation.deprecate("Symbol#method_missing is deprecated and will be removed in Sequel 2.0.  Use :#{sym}[:#{self}].")
+      Sequel::SQL::Function.new(s.downcase, self)
+    else
+      super
+    end
+  end
+end
