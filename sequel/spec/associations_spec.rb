@@ -24,6 +24,11 @@ describe Sequel::Model, "many_to_one" do
 
     @c2 = Class.new(Sequel::Model(:nodes)) do
       columns :id, :parent_id, :par_parent_id, :blah
+      def self.create_new(values)
+        obj = self.new(values)
+        obj.instance_variable_set(:@new, false)
+        obj
+      end
     end
 
     @dataset = @c2.dataset
@@ -119,7 +124,7 @@ describe Sequel::Model, "many_to_one" do
   it "should not persist changes until saved" do
     @c2.many_to_one :parent, :class => @c2
 
-    d = @c2.create(:id => 1)
+    d = @c2.create_new(:id => 1)
     MODEL_DB.reset
     d.parent = @c2.new(:id => 345)
     MODEL_DB.sqls.should == []
@@ -130,10 +135,12 @@ describe Sequel::Model, "many_to_one" do
   it "should set cached instance variable when accessed" do
     @c2.many_to_one :parent, :class => @c2
 
-    d = @c2.create(:id => 1)
+    d = @c2.create_new(:id => 1)
     MODEL_DB.reset
     d.parent_id = 234
     d.instance_variable_get("@parent").should == nil
+    ds = @c2.dataset
+    def ds.fetch_rows(sql, &block); MODEL_DB.sqls << sql; yield({:id=>234}) end
     e = d.parent 
     MODEL_DB.sqls.should == ["SELECT * FROM nodes WHERE (id = 234) LIMIT 1"]
     d.instance_variable_get("@parent").should == e
@@ -224,10 +231,12 @@ describe Sequel::Model, "many_to_one" do
   it "should have belongs_to alias" do
     @c2.belongs_to :parent, :class => @c2
 
-    d = @c2.create(:id => 1)
+    d = @c2.create_new(:id => 1)
     MODEL_DB.reset
     d.parent_id = 234
     d.instance_variable_get("@parent").should == nil
+    ds = @c2.dataset
+    def ds.fetch_rows(sql, &block); MODEL_DB.sqls << sql; yield({:id=>234}) end
     e = d.parent 
     MODEL_DB.sqls.should == ["SELECT * FROM nodes WHERE (id = 234) LIMIT 1"]
     d.instance_variable_get("@parent").should == e

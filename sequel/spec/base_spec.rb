@@ -136,21 +136,8 @@ describe "Model#serialize" do
 
 end
 
-describe Sequel::Model, "super_dataset" do
-  setup do
-    MODEL_DB.reset
-    class SubClass < Sequel::Model(:items) ; end
-  end
-  
-  it "should call the superclass's dataset" do
-    SubClass.should_receive(:superclass).exactly(3).times.and_return(Sequel::Model(:items))
-    Sequel::Model(:items).should_receive(:dataset)
-    SubClass.super_dataset
-  end
-end
-
 describe Sequel::Model, "dataset" do
-  setup do
+  before do
     @a = Class.new(Sequel::Model(:items))
     @b = Class.new(Sequel::Model)
     
@@ -197,8 +184,7 @@ end
 
 describe Sequel::Model, "def_dataset_method" do
   setup do
-    @c = Sequel::Model(:items)
-    @c.instance_eval do
+    @c = Class.new(Sequel::Model(:items)) do
       @dataset = Object.new
     end
   end
