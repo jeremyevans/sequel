@@ -2,7 +2,6 @@ require 'delegate'
 require 'observer'
 
 require 'rubygems'
-require 'assistance'
 
 module Kernel#:nodoc:all
   methods.include? 'send!' or

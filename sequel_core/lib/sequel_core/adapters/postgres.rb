@@ -515,56 +515,6 @@ module Sequel
         eval("lambda {|r| {#{kvs.join(COMMA_SEPARATOR)}}}")
       end
 
-      def array_tuples_fetch_rows(sql, &block)
-        @db.execute(sql) do |q|
-          conv = array_tuples_row_converter(q)
-          q.each {|r| yield conv[r]}
-        end
-      end
-      
-      @@array_tuples_converters_mutex = Mutex.new
-      @@array_tuples_converters = {}
-
-      def array_tuples_row_converter(result)
-        @columns = []; translators = []
-        result.fields.each_with_index do |f, idx|
-          @columns << f.to_sym
-          translators << PG_TYPES[result.type(idx)]
-        end
-        
-        # create result signature and memoize the converter
-        sig = [@columns, translators].hash
-        @@array_tuples_converters_mutex.synchronize do
-          @@array_tuples_converters[sig] ||= array_tuples_compile_converter(@columns, translators)
-        end
-      end
-    
-      def array_tuples_compile_converter(columns, translators)
-        tr = []
-        columns.each_with_index do |column, idx|
-          if !AUTO_TRANSLATE and t = translators[idx]
-            tr << "if (v = r[#{idx}]); r[#{idx}] = v.#{t}; end"
-          end
-        end
-        eval("lambda {|r| r.keys = columns; #{tr.join(';')}; r}")
-      end
-
-      def array_tuples_transform_load(r)
-        a = []; a.keys = []
-        r.each_pair do |k, v|
-          a[k] = (tt = @transform[k]) ? tt[0][v] : v
-        end
-        a
-      end
-
-      # Applies the value transform for data saved to the database.
-      def array_tuples_transform_save(r)
-        a = []; a.keys = []
-        r.each_pair do |k, v|
-          a[k] = (tt = @transform[k]) ? tt[1][v] : v
-        end
-        a
-      end
     end
   end
 end

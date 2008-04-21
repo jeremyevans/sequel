@@ -136,21 +136,8 @@ describe "Model#serialize" do
 
 end
 
-describe Sequel::Model, "super_dataset" do
-  setup do
-    MODEL_DB.reset
-    class SubClass < Sequel::Model(:items) ; end
-  end
-  
-  it "should call the superclass's dataset" do
-    SubClass.should_receive(:superclass).exactly(3).times.and_return(Sequel::Model(:items))
-    Sequel::Model(:items).should_receive(:dataset)
-    SubClass.super_dataset
-  end
-end
-
 describe Sequel::Model, "dataset" do
-  setup do
+  before do
     @a = Class.new(Sequel::Model(:items))
     @b = Class.new(Sequel::Model)
     
@@ -192,6 +179,36 @@ describe Sequel::Model, "dataset" do
     end
     
     BlahBlah::MwaHaHa.dataset.sql.should == 'SELECT * FROM mwa_ha_has'
+  end
+end
+
+describe Sequel::Model, "def_dataset_method" do
+  setup do
+    @c = Class.new(Sequel::Model(:items)) do
+      @dataset = Object.new
+    end
+  end
+  
+  it "should add a method to the dataset and model if called with a block argument" do
+    @c.instance_eval do
+      def_dataset_method(:return_3){3}
+    end
+    @c.return_3.should == 3
+    @c.dataset.return_3.should == 3
+  end
+
+  it "should add all passed methods to the model if called without a block argument" do
+    @c.instance_eval do
+      def_dataset_method(:return_3, :return_4)
+    end
+    proc{@c.return_3}.should raise_error(NoMethodError)
+    proc{@c.return_4}.should raise_error(NoMethodError)
+    @c.dataset.instance_eval do
+      def return_3; 3; end
+      def return_4; 4; end
+    end
+    @c.return_3.should == 3
+    @c.return_4.should == 4
   end
 end
 

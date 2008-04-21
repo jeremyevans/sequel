@@ -1,5 +1,18 @@
 module Sequel
   class Model
+    def self.inherited(subclass)
+      begin
+        if subclass.superclass == Model
+          unless subclass.name.empty?
+            subclass.set_dataset(Model.db[subclass.implicit_table_name])
+          end
+        elsif ds = subclass.superclass.instance_variable_get(:@dataset)
+          subclass.set_dataset(ds.clone)
+        end
+      rescue StandardError
+      end
+    end
+
     # Returns the database associated with the Model class.
     def self.db
       return @db if @db
@@ -29,26 +42,16 @@ module Sequel
 
     # Returns the dataset associated with the Model class.
     def self.dataset
-      unless @dataset
-        if ds = super_dataset
-          set_dataset(ds.clone)
-        elsif !name.empty?
-          set_dataset(db[implicit_table_name])
-        else
-          raise Error, "No dataset associated with #{self}"
-        end
-      end
-      @dataset
+      @dataset || raise(Error, "No dataset associated with #{self}")
     end
-    
-    # def self.dataset
-    #   @dataset ||= super_dataset ||
-    #     (!(n = name).empty? && db[n.underscore.pluralize.to_sym]) ||
-    #     (raise Error, "No dataset associated with #{self}")
-    # end
-    
-    def self.super_dataset # :nodoc:
-      superclass.dataset if (superclass != Sequel::Model) && superclass.respond_to?(:dataset)
+
+    def self.def_dataset_method(*args, &block)
+      raise(Error, "No arguments given") if args.empty?
+      if block_given?
+        raise(Error, "Defining a dataset method using a block requires only one argument") if args.length > 1
+        dataset.meta_def(args.first, &block)
+      end
+      args.each{|arg| instance_eval("def #{arg}(*args, &block); dataset.#{arg}(*args, &block) end", __FILE__, __LINE__)}
     end
     
     # Returns the columns in the result set in their original order.
@@ -149,12 +152,11 @@ module Sequel
   #     # ...
   #
   #   end
+  @models = {}
   def self.Model(source)
-    @models ||= {}
-    @models[source] ||= Class.new(Sequel::Model) do
-      meta_def(:inherited) do |c|
-        c.set_dataset(source.is_a?(Dataset) ? source : c.db[source])
-      end
-    end
+    return @models[source] if @models[source]
+    klass = Class.new(Sequel::Model)
+    klass.set_dataset(source.is_a?(Dataset) ? source : Model.db[source])
+    @models[source] = klass
   end
 end

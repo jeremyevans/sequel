@@ -105,8 +105,7 @@ describe "Model#save_changes" do
   end
 end
 
-describe "Model#set" do
-  
+describe "Model#update_values" do
   before(:each) do
     MODEL_DB.reset
 
@@ -117,32 +116,55 @@ describe "Model#set" do
   
   it "should generate an update statement" do
     o = @c.new(:id => 1)
-    o.set(:x => 1)
+    o.update_values(:x => 1)
     MODEL_DB.sqls.first.should == "UPDATE items SET x = 1 WHERE (id = 1)"
   end
   
   it "should update attribute values" do
     o = @c.new(:id => 1)
     o.x.should be_nil
-    o.set(:x => 1)
+    o.update_values(:x => 1)
     o.x.should == 1
   end
   
   it "should support string keys" do
     o = @c.new(:id => 1)
     o.x.should be_nil
-    o.set('x' => 1)
+    o.update_values('x' => 1)
     o.x.should == 1
-    MODEL_DB.sqls.first.should == "UPDATE items SET x = 1 WHERE (id = 1)"
-  end
-  
-  it "should be aliased by #update" do
-    o = @c.new(:id => 1)
-    o.update(:x => 1)
     MODEL_DB.sqls.first.should == "UPDATE items SET x = 1 WHERE (id = 1)"
   end
 end
 
+describe "Model#set_values" do
+  before(:each) do
+    MODEL_DB.reset
+
+    @c = Class.new(Sequel::Model(:items)) do
+      columns :id, :x, :y
+    end
+  end
+  
+  it "should not touch the database" do
+    o = @c.new(:id => 1)
+    o.set_values(:x => 1)
+    MODEL_DB.sqls.should == []
+  end
+  
+  it "should update attribute values" do
+    o = @c.new(:id => 1)
+    o.x.should be_nil
+    o.set_values(:x => 1)
+    o.x.should == 1
+  end
+  
+  it "should support string keys" do
+    o = @c.new(:id => 1)
+    o.x.should be_nil
+    o.set_values('x' => 1)
+    o.x.should == 1
+  end
+end
 
 describe "Model#new?" do
   
@@ -309,6 +331,49 @@ describe "Model#pk_hash" do
   end
 end
 
+describe Sequel::Model, "set_with_params" do
+
+  before(:each) do
+    MODEL_DB.reset
+    
+    @c = Class.new(Sequel::Model(:items)) do
+      columns :x, :y, :id
+    end
+    @o1 = @c.new
+    @o2 = @c.load(:id => 5)
+  end
+  
+  it "should filter the given params using the model columns" do
+    @o1.set_with_params(:x => 1, :z => 2)
+    @o1.values.should == {:x => 1}
+    MODEL_DB.sqls.should == []
+
+    @o2.set_with_params(:y => 1, :abc => 2)
+    @o2.values.should == {:y => 1, :id=> 5}
+    MODEL_DB.sqls.should == []
+  end
+  
+  it "should work with both strings and symbols" do
+    @o1.set_with_params('x'=> 1, 'z'=> 2)
+    @o1.values.should == {:x => 1}
+    MODEL_DB.sqls.should == []
+
+    @o2.set_with_params('y'=> 1, 'abc'=> 2)
+    @o2.values.should == {:y => 1, :id=> 5}
+    MODEL_DB.sqls.should == []
+  end
+  
+  it "should support virtual attributes" do
+    @c.class_def(:blah=) {|v| self.x = v}
+    @o1.set_with_params(:blah => 333)
+    @o1.values.should == {:x => 333}
+    MODEL_DB.sqls.should == []
+    @o1.set_with_params('blah'=> 334)
+    @o1.values.should == {:x => 334}
+    MODEL_DB.sqls.should == []
+  end
+end
+
 describe Sequel::Model, "update_with_params" do
 
   before(:each) do
@@ -330,7 +395,7 @@ describe Sequel::Model, "update_with_params" do
     MODEL_DB.sqls.first.should == "UPDATE items SET y = 1 WHERE (id = 5)"
   end
   
-  it "should be aliased by create_with" do
+  it "should be aliased by update_with" do
     @o1.update_with(:x => 1, :z => 2)
     MODEL_DB.sqls.first.should == "INSERT INTO items (x) VALUES (1)"
 
@@ -464,7 +529,7 @@ describe Sequel::Model, "#keys" do
   end
 end
 
-describe Sequel::Model, "#===" do
+describe Sequel::Model, "#==" do
   specify "should compare instances by values" do
     z = Class.new(Sequel::Model)
     z.columns :id, :x
@@ -476,18 +541,81 @@ describe Sequel::Model, "#===" do
     a.should == c
     b.should_not == c
   end
-end
 
-describe Sequel::Model, "#===" do
-  specify "should compare instances by pk only" do
+  specify "should be aliased to #eql?" do
     z = Class.new(Sequel::Model)
     z.columns :id, :x
     a = z.new(:id => 1, :x => 3)
     b = z.new(:id => 1, :x => 4)
+    c = z.new(:id => 1, :x => 3)
+    
+    a.eql?(b).should == false
+    a.eql?(c).should == true
+    b.eql?(c).should == false
+  end
+end
+
+describe Sequel::Model, "#===" do
+  specify "should compare instances by class and pk if pk is not nil" do
+    z = Class.new(Sequel::Model)
+    z.columns :id, :x
+    y = Class.new(Sequel::Model)
+    y.columns :id, :x
+    a = z.new(:id => 1, :x => 3)
+    b = z.new(:id => 1, :x => 4)
     c = z.new(:id => 2, :x => 3)
+    d = y.new(:id => 1, :x => 3)
     
     a.should === b
     a.should_not === c
+    a.should_not === d
+  end
+
+  specify "should always be false if the primary key is nil" do
+    z = Class.new(Sequel::Model)
+    z.columns :id, :x
+    y = Class.new(Sequel::Model)
+    y.columns :id, :x
+    a = z.new(:x => 3)
+    b = z.new(:x => 4)
+    c = z.new(:x => 3)
+    d = y.new(:x => 3)
+    
+    a.should_not === b
+    a.should_not === c
+    a.should_not === d
+  end
+end
+
+describe Sequel::Model, "#hash" do
+  specify "should be the same only for objects with the same class and pk if the pk is not nil" do
+    z = Class.new(Sequel::Model)
+    z.columns :id, :x
+    y = Class.new(Sequel::Model)
+    y.columns :id, :x
+    a = z.new(:id => 1, :x => 3)
+    b = z.new(:id => 1, :x => 4)
+    c = z.new(:id => 2, :x => 3)
+    d = y.new(:id => 1, :x => 3)
+    
+    a.hash.should == b.hash
+    a.hash.should_not == c.hash
+    a.hash.should_not == d.hash
+  end
+
+  specify "should be the same only for objects with the same class and values if the pk is nil" do
+    z = Class.new(Sequel::Model)
+    z.columns :id, :x
+    y = Class.new(Sequel::Model)
+    y.columns :id, :x
+    a = z.new(:x => 3)
+    b = z.new(:x => 4)
+    c = z.new(:x => 3)
+    d = y.new(:x => 3)
+    
+    a.hash.should_not == b.hash
+    a.hash.should == c.hash
+    a.hash.should_not == d.hash
   end
 end
 
@@ -599,5 +727,19 @@ describe Sequel::Model, "#refresh" do
     @m.this.should_receive(:first).and_return({:x => 'kaboom', :id => 555})
     @m.reload
     @m[:x].should == 'kaboom'
+  end
+
+  specify "should remove cached associations" do
+    @c.many_to_one :node, :class=>@c
+    @c.one_to_many :attributes, :class=>@c
+    @c.many_to_many :tags, :class=>@c
+    @m = @c.new(:id => 555)
+    @m.instance_variable_set(:@node, 15)
+    @m.instance_variable_set(:@attributes, [15])
+    @m.instance_variable_set(:@tags, [15])
+    @m.reload
+    @m.instance_variable_get(:@node).should == nil
+    @m.instance_variable_get(:@attributes).should == nil
+    @m.instance_variable_get(:@tags).should == nil
   end
 end

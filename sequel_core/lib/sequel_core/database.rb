@@ -6,6 +6,7 @@ module Sequel
   # The Database class is meant to be subclassed by database adapters in order
   # to provide the functionality needed for executing queries.
   class Database
+    ADAPTERS = %w'ado db2 dbi informix jdbc mysql odbc odbc_mssql openbase oracle postgres sqlite'.collect{|x| x.to_sym}
     attr_reader :opts, :pool
     attr_accessor :logger
 
@@ -353,7 +354,7 @@ module Sequel
     # Returns a string representation of the database object including the
     # class name and the connection URI.
     def inspect
-      '#<%s: %s>' % [self.class.to_s, uri.inspect]
+      "#<#{self.class}: #{(uri rescue opts).inspect}>" 
     end
 
     @@adapters = Hash.new
@@ -393,7 +394,6 @@ module Sequel
     end
     
     def self.adapter_class(scheme)
-      adapter_name = scheme.to_s =~ /\-/ ? scheme.to_s.gsub('-', '_').to_sym : scheme.to_sym
       scheme = scheme.to_sym
       
       if (klass = @@adapters[scheme]).nil?

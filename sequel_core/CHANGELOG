@@ -1,5 +1,23 @@
 === HEAD
 
+* Deprecate Sequel.method_missing and Object#Sequel, add real Sequel.adapter methods (jeremyevans)
+
+* Move dataset methods applicable only to paginated datasets into Sequel::Dataset::Pagination (jeremyevans)
+
+* Make Sequel::Dataset::Sequelizer methods private (jeremyevans)
+
+* Deprecate Dataset#method_missing, add real mutation methods (e.g. filter!) (jeremyevans)
+
+* Fix connecting to an MSSQL server via ODBC using domain user credentials (jeremyevans) (#216)
+
+* No longer depend on the assistance gem, merge in the ConnectionPool and .blank methods (jeremyevans)
+
+* No longer depend on ParseTree, RubyInline, or ruby2ruby, but you still need them if you want to use the block filters (jeremyevans)
+
+* Fix JDBC adapter by issuing index things start at 1 (pdamer)
+
+* Fix connecting to a database via the ADO adapter (now requires options instead of URI) (timuckun, jeremyevans) (#204)
+
 * Support storing microseconds in postgres timestamp fields (schnarch...@rootimage.msu.edu) (#215)
 
 * Allow joining of multiple datasets, by making the table alias different for each dataset joined (jeremyevans)

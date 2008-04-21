@@ -58,22 +58,6 @@ module Sequel
         self
       end
       
-      def array_tuples_fetch_rows(sql, &block)
-        @db.synchronize do
-          result = @db.execute sql
-          begin
-            @columns = result.column_infos.map {|c| c.name.to_sym}
-            result.each do |r|
-              r.keys = @columns
-              yield r
-            end
-          ensure
-            # cursor.close
-          end
-        end
-        self
-      end
-      
       def insert(*values)
         @db.do insert_sql(*values)
       end

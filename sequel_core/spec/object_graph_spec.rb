@@ -1,0 +1,202 @@
+require File.join(File.dirname(__FILE__), 'spec_helper')
+
+describe Sequel::Dataset, " graphing" do
+  before do
+    dbc = Class.new
+    @db = dbc.new
+    @ds1 = Sequel::Dataset.new(@db).from(:points)
+    @ds2 = Sequel::Dataset.new(@db).from(:lines)
+    @ds3 = Sequel::Dataset.new(@db).from(:graphs)
+    dss = {:points=>@ds1, :lines=>@ds2, :graphs=>@ds3}
+    dbc.send(:define_method, :[]){|ds| dss[ds]} 
+    def @ds1.columns; [:id, :x, :y] end
+    def @ds2.columns; [:id, :x, :y, :graph_id] end
+    def @ds3.columns; [:id, :name, :x, :y, :lines_x] end
+  end
+
+  it "#graph should not modify the current dataset's opts" do
+    o1 = @ds1.opts
+    o2 = o1.dup
+    ds1 = @ds1.graph(@ds2, :x=>:id)
+    @ds1.opts.should == o1
+    @ds1.opts.should == o2
+    ds1.opts.should_not == o1
+  end
+
+  it "#graph should accept a dataset as the dataset" do
+    ds = @ds1.graph(@ds2, :x=>:id)
+    ds.sql.should == 'SELECT points.id, points.x, points.y, lines.id AS lines_id, lines.x AS lines_x, lines.y AS lines_y, lines.graph_id FROM points LEFT OUTER JOIN lines ON (lines.x = points.id)'
+  end
+
+  it "#graph should accept a symbol table name as the dataset" do
+    ds = @ds1.graph(:lines, :x=>:id)
+    ds.sql.should == 'SELECT points.id, points.x, points.y, lines.id AS lines_id, lines.x AS lines_x, lines.y AS lines_y, lines.graph_id FROM points LEFT OUTER JOIN lines ON (lines.x = points.id)'
+  end
+
+  it "#graph should accept an object that responds to dataset as the dataset" do
+    oc = Class.new
+    o = oc.new
+    ds = @ds2
+    oc.send(:define_method, :dataset){ds} 
+    ds = @ds1.graph(o, :x=>:id)
+    ds.sql.should == 'SELECT points.id, points.x, points.y, lines.id AS lines_id, lines.x AS lines_x, lines.y AS lines_y, lines.graph_id FROM points LEFT OUTER JOIN lines ON (lines.x = points.id)'
+    ds = :lines
+    oc.send(:define_method, :dataset){ds} 
+    ds = @ds1.graph(o, :x=>:id)
+    ds.sql.should == 'SELECT points.id, points.x, points.y, lines.id AS lines_id, lines.x AS lines_x, lines.y AS lines_y, lines.graph_id FROM points LEFT OUTER JOIN lines ON (lines.x = points.id)'
+  end
+
+  it "#graph should accept a :table_alias option" do
+    ds = @ds1.graph(:lines, {:x=>:id}, :table_alias=>:planes)
+    ds.sql.should == 'SELECT points.id, points.x, points.y, planes.id AS planes_id, planes.x AS planes_x, planes.y AS planes_y, planes.graph_id FROM points LEFT OUTER JOIN lines planes ON (planes.x = points.id)'
+  end
+
+  it "#graph should accept a :join_type option" do
+    ds = @ds1.graph(:lines, {:x=>:id}, :join_type=>:inner)
+    ds.sql.should == 'SELECT points.id, points.x, points.y, lines.id AS lines_id, lines.x AS lines_x, lines.y AS lines_y, lines.graph_id FROM points INNER JOIN lines ON (lines.x = points.id)'
+  end
+
+  it "#graph should accept a :select_option" do
+    ds = @ds1.graph(:lines, {:x=>:id}, :select=>false).graph(:graphs, :id=>:graph_id)
+    ds.sql.should == 'SELECT points.id, points.x, points.y, graphs.id AS graphs_id, graphs.name, graphs.x AS graphs_x, graphs.y AS graphs_y, graphs.lines_x FROM points LEFT OUTER JOIN lines ON (lines.x = points.id) LEFT OUTER JOIN graphs ON (graphs.id = lines.graph_id)'
+  end
+
+  it "#graph should pass all join_conditions to join_table" do
+    ds = @ds1.graph(@ds2, :x=>:id, :y=>:id)
+    ['SELECT points.id, points.x, points.y, lines.id AS lines_id, lines.x AS lines_x, lines.y AS lines_y, lines.graph_id FROM points LEFT OUTER JOIN lines ON (lines.x = points.id) AND (lines.y = points.id)',
+    'SELECT points.id, points.x, points.y, lines.id AS lines_id, lines.x AS lines_x, lines.y AS lines_y, lines.graph_id FROM points LEFT OUTER JOIN lines ON (lines.y = points.id) AND (lines.x = points.id)'
+    ].should(include(ds.sql))
+  end
+
+  it "#graph should not add columns if graph is called after set_graph_aliases" do
+    ds = @ds1.set_graph_aliases(:x=>[:points, :x], :y=>[:lines, :y])
+    ['SELECT points.x, lines.y FROM points',
+    'SELECT lines.y, points.x FROM points'
+    ].should(include(ds.sql))
+    ds = ds.graph(:lines, :x=>:id)
+    ['SELECT points.x, lines.y FROM points LEFT OUTER JOIN lines ON (lines.x = points.id)',
+    'SELECT lines.y, points.x FROM points LEFT OUTER JOIN lines ON (lines.x = points.id)'
+    ].should(include(ds.sql))
+  end
+
+  it "#graph should allow graphing of multiple datasets" do
+    ds = @ds1.graph(@ds2, :x=>:id).graph(@ds3, :id=>:graph_id)
+    ds.sql.should == 'SELECT points.id, points.x, points.y, lines.id AS lines_id, lines.x AS lines_x, lines.y AS lines_y, lines.graph_id, graphs.id AS graphs_id, graphs.name, graphs.x AS graphs_x, graphs.y AS graphs_y, graphs.lines_x AS graphs_lines_x FROM points LEFT OUTER JOIN lines ON (lines.x = points.id) LEFT OUTER JOIN graphs ON (graphs.id = lines.graph_id)'
+  end
+
+  it "#graph should allow graphing of the same dataset multiple times" do
+    ds = @ds1.graph(@ds2, :x=>:id).graph(@ds2, {:y=>:points__id}, :table_alias=>:graph)
+    ds.sql.should == 'SELECT points.id, points.x, points.y, lines.id AS lines_id, lines.x AS lines_x, lines.y AS lines_y, lines.graph_id, graph.id AS graph_id_0, graph.x AS graph_x, graph.y AS graph_y, graph.graph_id AS graph_graph_id FROM points LEFT OUTER JOIN lines ON (lines.x = points.id) LEFT OUTER JOIN lines graph ON (graph.y = points.id)'
+  end
+
+  it "#graph should raise an error if the table/table alias has already been used" do
+    proc{@ds1.graph(@ds1, :x=>:id)}.should raise_error(Sequel::Error)
+    proc{@ds1.graph(@ds2, :x=>:id)}.should_not raise_error
+    proc{@ds1.graph(@ds2, :x=>:id).graph(@ds2, :x=>:id)}.should raise_error(Sequel::Error)
+    proc{@ds1.graph(@ds2, :x=>:id).graph(@ds2, {:x=>:id}, :table_alias=>:blah)}.should_not raise_error
+  end
+
+  it "#set_graph_aliases should not modify the current dataset's opts" do
+    o1 = @ds1.opts
+    o2 = o1.dup
+    ds1 = @ds1.set_graph_aliases(:x=>[:graphs,:id])
+    @ds1.opts.should == o1
+    @ds1.opts.should == o2
+    ds1.opts.should_not == o1
+  end
+
+  it "#set_graph_aliases should specify the graph mapping" do
+    ds = @ds1.graph(:lines, :x=>:id)
+    ds.sql.should == 'SELECT points.id, points.x, points.y, lines.id AS lines_id, lines.x AS lines_x, lines.y AS lines_y, lines.graph_id FROM points LEFT OUTER JOIN lines ON (lines.x = points.id)'
+    ds = ds.set_graph_aliases(:x=>[:points, :x], :y=>[:lines, :y])
+    ['SELECT points.x, lines.y FROM points LEFT OUTER JOIN lines ON (lines.x = points.id)',
+    'SELECT lines.y, points.x FROM points LEFT OUTER JOIN lines ON (lines.x = points.id)'
+    ].should(include(ds.sql))
+  end
+
+  it "#set_graph_aliases should only alias columns if necessary" do
+    ds = @ds1.set_graph_aliases(:x=>[:points, :x], :y=>[:lines, :y])
+    ['SELECT points.x, lines.y FROM points',
+    'SELECT lines.y, points.x FROM points'
+    ].should(include(ds.sql))
+
+    ds = @ds1.set_graph_aliases(:x1=>[:points, :x], :y=>[:lines, :y])
+    ['SELECT points.x AS x1, lines.y FROM points',
+    'SELECT lines.y, points.x AS x1 FROM points'
+    ].should(include(ds.sql))
+  end
+
+  it "#graph_each should split the result set into component tables" do
+    ds = @ds1.graph(@ds2, :x=>:id)
+    def ds.fetch_rows(sql, &block)
+      yield({:id=>1,:x=>2,:y=>3,:lines_id=>4,:lines_x=>5,:lines_y=>6,:graph_id=>7})
+    end
+    results = ds.all
+    results.length.should == 1
+    results.first.should == {:points=>{:id=>1, :x=>2, :y=>3}, :lines=>{:id=>4, :x=>5, :y=>6, :graph_id=>7}}
+
+    ds = @ds1.graph(@ds2, :x=>:id).graph(@ds3, :id=>:graph_id)
+    def ds.fetch_rows(sql, &block)
+      yield({:id=>1,:x=>2,:y=>3,:lines_id=>4,:lines_x=>5,:lines_y=>6,:graph_id=>7, :graphs_id=>8, :name=>9, :graphs_x=>10, :graphs_y=>11, :graphs_lines_x=>12})
+    end
+    results = ds.all
+    results.length.should == 1
+    results.first.should == {:points=>{:id=>1, :x=>2, :y=>3}, :lines=>{:id=>4, :x=>5, :y=>6, :graph_id=>7}, :graphs=>{:id=>8, :name=>9, :x=>10, :y=>11, :lines_x=>12}}
+
+    ds = @ds1.graph(@ds2, :x=>:id).graph(@ds2, {:y=>:points__id}, :table_alias=>:graph)
+    def ds.fetch_rows(sql, &block)
+      yield({:id=>1,:x=>2,:y=>3,:lines_id=>4,:lines_x=>5,:lines_y=>6,:graph_id=>7, :graph_id_0=>8, :graph_x=>9, :graph_y=>10, :graph_graph_id=>11})
+    end
+    results = ds.all
+    results.length.should == 1
+    results.first.should == {:points=>{:id=>1, :x=>2, :y=>3}, :lines=>{:id=>4, :x=>5, :y=>6, :graph_id=>7}, :graph=>{:id=>8, :x=>9, :y=>10, :graph_id=>11}}
+  end
+
+  it "#graph_each should not included tables graphed with the :select option in the result set" do
+    ds = @ds1.graph(:lines, {:x=>:id}, :select=>false).graph(:graphs, :id=>:graph_id)
+    def ds.fetch_rows(sql, &block)
+      yield({:id=>1,:x=>2,:y=>3,:graphs_id=>8, :name=>9, :graphs_x=>10, :graphs_y=>11, :lines_x=>12})
+    end
+    results = ds.all
+    results.length.should == 1
+    results.first.should == {:points=>{:id=>1, :x=>2, :y=>3}, :graphs=>{:id=>8, :name=>9, :x=>10, :y=>11, :lines_x=>12}}
+  end
+
+  it "#graph_each should only include the columns selected with #set_graph_aliases, if called" do
+    ds = @ds1.graph(:lines, :x=>:id).set_graph_aliases(:x=>[:points, :x], :y=>[:lines, :y])
+    def ds.fetch_rows(sql, &block)
+      yield({:x=>2,:y=>3})
+    end
+    results = ds.all
+    results.length.should == 1
+    results.first.should == {:points=>{:x=>2}, :lines=>{:y=>3}}
+
+    ds = @ds1.graph(:lines, :x=>:id).set_graph_aliases(:x=>[:points, :x])
+    def ds.fetch_rows(sql, &block)
+      yield({:x=>2})
+    end
+    results = ds.all
+    results.length.should == 1
+    results.first.should == {:points=>{:x=>2}, :lines=>{}}
+  end
+
+  it "#graph_each should run the row_proc and transform for graphed datasets" do
+    @ds1.row_proc = proc{|h| h.keys.each{|k| h[k] *= 2}; h}
+    @ds2.row_proc = proc{|h| h.keys.each{|k| h[k] *= 3}; h}
+    @ds1.transform(:x=>[
+      proc{|v| 123},
+      proc{|v| 123}
+    ])
+    @ds2.transform(:x=>[
+      proc{|v| 321},
+      proc{|v| 321}
+    ])
+    ds = @ds1.graph(@ds2, :x=>:id)
+    def ds.fetch_rows(sql, &block)
+      yield({:id=>1,:x=>2,:y=>3,:lines_id=>4,:lines_x=>5,:lines_y=>6,:graph_id=>7})
+    end
+    results = ds.all
+    results.length.should == 1
+    results.first.should == {:points=>{:id=>2, :x=>246, :y=>6}, :lines=>{:id=>12, :x=>963, :y=>18, :graph_id=>21}}
+  end
+end

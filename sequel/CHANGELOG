@@ -1,5 +1,29 @@
 === HEAD
 
+* Deprecate .create_with_params, .create_with, #set, #update, #update_with, and #new_record from Sequel::Model (jeremyevans)
+
+* Add Model.def_dataset_method, for defining methods on the model that reference methods on the dataset (jeremyevans)
+
+* Deprecate Model.method_missing, add dataset methods to Model via metaprogramming (jeremyevans)
+
+* Remove Model.join, so it is the same as Dataset#join (jeremyevans)
+
+* Use reciprocal associations for all types of associations in the getter/setter/add_/remove_ methods (jeremyevans)
+
+* Fix many_to_one associations to cache negative lookups (jeremyevans)
+
+* Change Model#=== to always be false if the primary key is nil (jeremyevans)
+
+* Add Model#hash, which should be unique for a given class and primary key (or values if primary key is nil) (jeremyevans)
+
+* Add Model#eql? as a alias to Model#== (jeremyevans)
+
+* Make Model#reload clear any cached associations (jeremyevans)
+
+* No longer depend on the assistance gem, merge the Inflector and Validations code (jeremyevans)
+
+* Add Model#set_with_params, which is Model#update_with_params without the save (jeremyevans)
+
 * Fix Model#destroy so that it returns self, not the result of after_destroy (jeremyevans)
 
 * Define Model column accessors in set_dataset, so they should always be avaiable, remove Model#method_missing (jeremyevans)
@@ -10,7 +34,7 @@
 
 * Allow creation of new records that don't have primary keys when the cache is on (jeremyevans) (#213)
 
-* Make Model#initialize, Model#set, and Model#update_with invulnerable to memory exhaustion (jeremyevans) (#210)
+* Make Model#initialize, Model#set, and Model#update_with_params invulnerable to memory exhaustion (jeremyevans) (#210)
 
 * Add Model.str_columns, which gives a list of columns as frozen strings (jeremyevans)
 
