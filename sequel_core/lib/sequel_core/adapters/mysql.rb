@@ -292,26 +292,18 @@ module Sequel
       #   @ds.join_expr(:natural_left_outer, :nodes)
       #   # 'NATURAL LEFT OUTER JOIN nodes'
       #
-      def join_expr(type, table, expr = nil)
-        join_type = JOIN_TYPES[type || :inner]
-        unless join_type
-          raise Error::InvalidJoinType, "Invalid join type: #{type}"
-        end
-        @opts[:server_version] = @db.server_version unless @opts[:server_version]
+      def join_expr(type, table, expr = nil, options = {})
+        raise Error::InvalidJoinType, "Invalid join type: #{type}" unless join_type = JOIN_TYPES[type || :inner]
+        
+        server_version = @opts[:server_version] ||= @db.server_version
         type = :inner if type == :cross && !expr.nil?
-        if type.to_s =~ /natural|cross|straight/ &&  @opts[:server_version] >= 50014
-          tbl_factor = table.to_s
-          if table.is_a?(Dataset)
-            tbl_factor = table.sql << " AS t1"
-          end
-          if table.is_a?(Array)
-            tbl_factor = "( #{literal(table)} )"
-          end
-          join_string = "#{join_type} " << tbl_factor
-          return join_string
-        end
 
-        super
+        if (server_version >= 50014) && /\Anatural|cross|straight\z/.match(type.to_s)
+          table = "( #{literal(table)} )" if table.is_a?(Array)
+          "#{join_type} #{table}"
+        else
+          super
+        end
       end
 
       def insert_default_values_sql
