@@ -387,7 +387,7 @@ module Sequel::Model::Associations::EagerLoading
               right_pk = (reflection[:right_primary_key] || :"#{assoc_table}__#{assoc_class.primary_key}")
               join_table = reflection[:join_table]
               fkey = (reflection[:left_key_alias] ||= :"x_foreign_key_x")
-              table_selection = (reflection[:select] ||= assoc_table.all)
+              table_selection = (reflection[:select] ||= assoc_table.*)
               key_selection = (reflection[:left_key_select] ||= :"#{join_table}__#{left}___#{fkey}")
               h = key_hash[model.primary_key]
               ds = assoc_class.select(table_selection, key_selection).inner_join(join_table, right=>right_pk, left=>h.keys)

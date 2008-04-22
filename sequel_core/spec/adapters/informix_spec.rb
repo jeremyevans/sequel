@@ -2,7 +2,7 @@ require File.join(File.dirname(__FILE__), '../../lib/sequel_core')
 require File.join(File.dirname(__FILE__), '../spec_helper.rb')
 
 unless defined?(INFORMIX_DB)
-  INFORMIX_DB = Sequel('informix://localhost/mydb')
+  INFORMIX_DB = Sequel.connect('informix://localhost/mydb')
 end
 
 if INFORMIX_DB.table_exists?(:test)

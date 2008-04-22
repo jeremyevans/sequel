@@ -18,7 +18,7 @@ module Sequel
         obj
       end
       
-      class_def(:set) {|v| store.delete(cache_key); super}
+      class_def(:update_values) {|v| store.delete(cache_key); super}
       class_def(:save) {store.delete(cache_key) unless new?; super}
       class_def(:delete) {store.delete(cache_key); super}
     end

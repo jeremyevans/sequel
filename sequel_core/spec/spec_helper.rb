@@ -1,6 +1,8 @@
 require 'rubygems'
-require File.join(File.dirname(__FILE__), "../lib/sequel_core") 
-
+unless Object.const_defined?('Sequel')
+  $:.unshift(File.join(File.dirname(__FILE__), "../lib/"))
+  require 'sequel_core'
+end
 if File.exists?(File.join(File.dirname(__FILE__), 'spec_config.rb'))
   require File.join(File.dirname(__FILE__), 'spec_config.rb')
 end

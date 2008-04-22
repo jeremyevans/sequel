@@ -3,6 +3,8 @@ module Sequel
     include Sequel::Deprecation
     extend Sequel::Deprecation
 
+    # Check the Model.associate method to remove the :from option
+
     def self.is_dataset_magic_method?(m)
       method_name = m.to_s
       Sequel::Dataset::MAGIC_METHODS.each_key do |r|
@@ -48,6 +50,12 @@ module Sequel
     def update(values)
       deprecate("Sequel::Model#update", "Use #update_values")
       update_values(values)
+    end
+
+    # deprecated, please use many_to_one instead
+    def self.one_to_one(*args, &block)
+      deprecate("Sequel::Model.one_to_one", "Use many_to_one")
+      many_to_one(*args, &block)
     end
   end
 end
