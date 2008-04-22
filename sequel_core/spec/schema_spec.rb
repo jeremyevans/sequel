@@ -204,6 +204,33 @@ context "DB#create_table" do
     }.should raise_error(Sequel::Error)
   end
 
+  specify "should raise on spatial index definitions" do
+    proc {
+      @db.create_table(:cats) do
+        point :geom
+        spatial_index :geom
+      end
+    }.should raise_error(Sequel::Error)
+  end
+
+  specify "should raise on partial index definitions" do
+    proc {
+      @db.create_table(:cats) do
+        text :name
+        index :name, :where => {:something => true}
+      end
+    }.should raise_error(Sequel::Error)
+  end
+
+  specify "should raise index definitions with type" do
+    proc {
+      @db.create_table(:cats) do
+        text :name
+        index :name, :type => :hash
+      end
+    }.should raise_error(Sequel::Error)
+  end
+
   specify "should accept multiple index definitions" do
     @db.create_table(:cats) do
       integer :id

@@ -86,74 +86,62 @@ context "String#split_sql" do
   end
 end
 
-context "#DESC/#desc" do
+context "#desc" do
   setup do
     @ds = Sequel::Dataset.new(nil)
   end
   
   specify "should format a DESC clause for a column ref" do
-    :test.DESC.to_s(@ds).should == 'test DESC'
     :test.desc.to_s(@ds).should == 'test DESC'
     
-    :items__price.DESC.to_s(@ds).should == 'items.price DESC'
     :items__price.desc.to_s(@ds).should == 'items.price DESC'
   end
 
   specify "should format a DESC clause for a function" do
-    :avg[:test].DESC.to_s(@ds).should == 'avg(test) DESC'
     :avg[:test].desc.to_s(@ds).should == 'avg(test) DESC'
   end
   
   specify "should format a DESC clause for a literal value" do
-    1.DESC.to_s(@ds).should == '1 DESC'
     'abc'.desc.to_s(@ds).should == "'abc' DESC"
   end
 end
 
-context "#ASC/#asc" do
+context "#asc" do
   setup do
     @ds = Sequel::Dataset.new(nil)
   end
   
   specify "should format a ASC clause for a column ref" do
-    :test.ASC.to_s(@ds).should == 'test ASC'
     :test.asc.to_s(@ds).should == 'test ASC'
     
-    :items__price.ASC.to_s(@ds).should == 'items.price ASC'
     :items__price.asc.to_s(@ds).should == 'items.price ASC'
   end
 
   specify "should format a ASC clause for a function" do
-    :avg[:test].ASC.to_s(@ds).should == 'avg(test) ASC'
     :avg[:test].asc.to_s(@ds).should == 'avg(test) ASC'
   end
   
   specify "should format a ASC clause for a literal value" do
-    1.ASC.to_s(@ds).should == '1 ASC'
     'abc'.asc.to_s(@ds).should == "'abc' ASC"
   end
 end
 
-context "#AS/#as" do
+context "#as" do
   setup do
     @ds = Sequel::Dataset.new(nil)
   end
   
   specify "should format a AS clause for a column ref" do
-    :test.AS(:t).to_s(@ds).should == 'test AS t'
     :test.as(:t).to_s(@ds).should == 'test AS t'
     
-    :items__price.AS(:p).to_s(@ds).should == 'items.price AS p'
     :items__price.as(:p).to_s(@ds).should == 'items.price AS p'
   end
 
   specify "should format a AS clause for a function" do
-    :avg[:test].AS(:avg).to_s(@ds).should == 'avg(test) AS avg'
     :avg[:test].as(:avg).to_s(@ds).should == 'avg(test) AS avg'
   end
   
   specify "should format a AS clause for a literal value" do
-    1.AS(:one).to_s(@ds).should == '1 AS one'
     'abc'.as(:abc).to_s(@ds).should == "'abc' AS abc"
   end
 end
@@ -184,7 +172,7 @@ context "Column references" do
   end
 
   specify "should be quoted properly in ASC/DESC clauses" do
-    @ds.literal(:xyz.ASC).should == "`xyz` ASC"
+    @ds.literal(:xyz.asc).should == "`xyz` ASC"
     @ds.literal(:avg[:xyz, 1].desc).should == "avg(`xyz`, 1) DESC"
   end
   
@@ -233,6 +221,7 @@ context "Symbol#to_column_ref" do
   end
 end
 
+### DEPRECATED
 context "Symbol" do
   setup do
     @ds = Sequel::Dataset.new(nil)

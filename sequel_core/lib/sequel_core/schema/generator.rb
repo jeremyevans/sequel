@@ -59,12 +59,15 @@ module Sequel
       end
       
       def full_text_index(columns, opts = {})
-        columns = [columns] unless columns.is_a?(Array)
-        @indexes << {:columns => columns, :full_text => true}.merge(opts)
+        index(columns, opts.merge(:type => :full_text))
       end
       
+      def spatial_index(columns, opts = {})
+        index(columns, opts.merge(:type => :spatial))
+      end
+
       def unique(columns, opts = {})
-        index(columns, {:unique => true}.merge(opts))
+        index(columns, opts.merge(:unique => true))
       end
       
       def create_info
@@ -136,7 +139,16 @@ module Sequel
         @operations << { \
           :op => :add_index, \
           :columns => columns, \
-          :full_text => true \
+          :type => :full_text \
+        }.merge(opts)
+      end
+      
+      def add_spatial_index(columns, opts = {})
+        columns = [columns] unless columns.is_a?(Array)
+        @operations << { \
+          :op => :add_index, \
+          :columns => columns, \
+          :type => :spatial \
         }.merge(opts)
       end
       

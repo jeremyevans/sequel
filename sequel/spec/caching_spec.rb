@@ -112,7 +112,7 @@ describe Sequel::Model, "caching" do
     m = @c[1]
     @cache[m.cache_key].should == m
     
-    m.set(:name => 'tutu')
+    m.update_values(:name => 'tutu')
     @cache.has_key?(m.cache_key).should be_false
     $sqls.last.should == "UPDATE items SET name = 'tutu' WHERE (id = 1)"
     

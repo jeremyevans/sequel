@@ -2,7 +2,7 @@ require File.join(File.dirname(__FILE__), '../../lib/sequel_core')
 require File.join(File.dirname(__FILE__), '../spec_helper.rb')
 
 unless defined?(ORACLE_DB)
-  ORACLE_DB = Sequel('oracle://hr:hr@localhost/XE')
+  ORACLE_DB = Sequel.connect('oracle://hr:hr@localhost/XE')
 end
 
 if ORACLE_DB.table_exists?(:items)

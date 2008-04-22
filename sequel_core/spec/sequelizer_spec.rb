@@ -247,8 +247,8 @@ context "Proc#to_sql" do
   end
   
   specify "should support functions on columns" do
-    proc {:x.MAX > 100}.sql.should == "(max(x) > 100)"
-    proc {:x.COUNT > 100}.sql.should == "(count(x) > 100)"
+    proc {:max[:x] > 100}.sql.should == "(max(x) > 100)"
+    proc {:count[:x] > 100}.sql.should == "(count(x) > 100)"
   end
   
   specify "should support SQL functions" do

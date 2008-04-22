@@ -639,7 +639,7 @@ describe Sequel::Model, "many_to_many" do
   end
   
   it "should support an array for the select option" do
-    @c2.many_to_many :attributes, :class => @c1, :select => [:attributes.all, :attribute_nodes__blah2]
+    @c2.many_to_many :attributes, :class => @c1, :select => [:attributes.*, :attribute_nodes__blah2]
 
     n = @c2.new(:id => 1234)
     a = n.attributes_dataset

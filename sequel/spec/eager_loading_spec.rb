@@ -206,7 +206,7 @@ describe Sequel::Model, "#eager" do
     a.first.values.should == {:id => 2}
     MODEL_DB.sqls.should == ['SELECT * FROM bands']
     a = a.first
-    a.albums.all
+    a.albums
     MODEL_DB.sqls.should == ['SELECT * FROM bands', 
                              'SELECT * FROM albums WHERE (band_id = 2)',
                              'SELECT * FROM tracks WHERE (album_id IN (1))']
@@ -271,7 +271,7 @@ describe Sequel::Model, "#eager_graph" do
       alias orig_clone clone
       def clone(opts = {})
         c = super()
-        c.set_options(@opts.merge(opts))
+        c.opts = @opts.merge(opts)
         c.instance_variable_set(:@columns, (@columns.dup if @columns))
         c
       end

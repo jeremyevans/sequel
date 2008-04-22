@@ -100,16 +100,16 @@ context "A PostgreSQL dataset" do
     @d.select('COUNT(*)'.lit).sql.should == \
       'SELECT COUNT(*) FROM test'
 
-    @d.select(:value.MAX).sql.should == \
+    @d.select(:max[:value]).sql.should == \
       'SELECT max("value") FROM test'
       
     @d.select(:NOW[]).sql.should == \
     'SELECT NOW() FROM test'
 
-    @d.select(:items__value.MAX).sql.should == \
+    @d.select(:max[:items__value]).sql.should == \
       'SELECT max(items."value") FROM test'
 
-    @d.order(:name.DESC).sql.should == \
+    @d.order(:name.desc).sql.should == \
       'SELECT * FROM test ORDER BY "name" DESC'
 
     @d.select('test.name AS item_name'.lit).sql.should == \
@@ -141,13 +141,13 @@ context "A PostgreSQL dataset" do
     @d.reverse_order(:name).sql.should == \
       'SELECT * FROM test ORDER BY "name" DESC'
 
-    @d.reverse_order(:name.DESC).sql.should == \
+    @d.reverse_order(:name.desc).sql.should == \
       'SELECT * FROM test ORDER BY "name"'
 
-    @d.reverse_order(:name, :test.DESC).sql.should == \
+    @d.reverse_order(:name, :test.desc).sql.should == \
       'SELECT * FROM test ORDER BY "name" DESC, "test"'
 
-    @d.reverse_order(:name.DESC, :test).sql.should == \
+    @d.reverse_order(:name.desc, :test).sql.should == \
       'SELECT * FROM test ORDER BY "name", "test" DESC'
   end
   
@@ -239,7 +239,7 @@ context "A PostgreSQL database" do
     end
     POSTGRES_DB.create_table_sql_list(:posts, *g.create_info).should == [
       "CREATE TABLE posts (\"title\" text, \"body\" text)",
-      "CREATE INDEX posts_title_body_index ON posts USING gin(to_tsvector(\"title\" || \"body\"))"
+      "CREATE INDEX posts_title_body_index ON posts USING gin (to_tsvector(\"title\" || \"body\"))"
     ]
   end
   
@@ -251,7 +251,7 @@ context "A PostgreSQL database" do
     end
     POSTGRES_DB.create_table_sql_list(:posts, *g.create_info).should == [
       "CREATE TABLE posts (\"title\" text, \"body\" text)",
-      "CREATE INDEX posts_title_body_index ON posts USING gin(to_tsvector('french', \"title\" || \"body\"))"
+      "CREATE INDEX posts_title_body_index ON posts USING gin (to_tsvector('french', \"title\" || \"body\"))"
     ]
   end
   
@@ -264,6 +264,50 @@ context "A PostgreSQL database" do
       
     POSTGRES_DB[:posts].full_text_search(:title, 'ruby', :language => 'french').sql.should ==
       "SELECT * FROM posts WHERE (to_tsvector('french', \"title\") @@ to_tsquery('french', 'ruby'))"
+  end
+
+  specify "should support spatial indexes" do
+    g = Sequel::Schema::Generator.new(POSTGRES_DB) do
+      geometry :geom
+      spatial_index [:geom]
+    end
+    POSTGRES_DB.create_table_sql_list(:posts, *g.create_info).should == [
+      "CREATE TABLE posts (\"geom\" geometry)",
+      "CREATE INDEX posts_geom_index ON posts USING gist (\"geom\")"
+    ]
+  end
+  
+  specify "should support indexes with index type" do
+    g = Sequel::Schema::Generator.new(POSTGRES_DB) do
+      varchar :title, :size => 5
+      index :title, :type => 'hash'
+    end
+    POSTGRES_DB.create_table_sql_list(:posts, *g.create_info).should == [
+      "CREATE TABLE posts (\"title\" varchar(5))",
+      "CREATE INDEX posts_title_index ON posts USING hash (\"title\")"
+    ]
+  end
+  
+  specify "should support unique indexes with index type" do
+    g = Sequel::Schema::Generator.new(POSTGRES_DB) do
+      varchar :title, :size => 5
+      index :title, :type => 'hash', :unique => true
+    end
+    POSTGRES_DB.create_table_sql_list(:posts, *g.create_info).should == [
+      "CREATE TABLE posts (\"title\" varchar(5))",
+      "CREATE UNIQUE INDEX posts_title_index ON posts USING hash (\"title\")"
+    ]
+  end
+  
+  specify "should support partial indexes" do
+    g = Sequel::Schema::Generator.new(POSTGRES_DB) do
+      varchar :title, :size => 5
+      index :title, :where => {:something => 5}
+    end
+    POSTGRES_DB.create_table_sql_list(:posts, *g.create_info).should == [
+      "CREATE TABLE posts (\"title\" varchar(5))",
+      "CREATE INDEX posts_title_index ON posts (\"title\") WHERE (\"something\" = 5)"
+    ]
   end
 end
 

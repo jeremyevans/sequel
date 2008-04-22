@@ -312,7 +312,7 @@ context "Dataset#where" do
   
   specify "should accept a subquery" do
     # select all countries that have GDP greater than the average for Asia
-    @dataset.filter('gdp > ?', @d1.select(:gdp.AVG)).sql.should ==
+    @dataset.filter('gdp > ?', @d1.select(:avg[:gdp])).sql.should ==
       "SELECT * FROM test WHERE gdp > (SELECT avg(gdp) FROM test WHERE (region = 'Asia'))"
 
     @dataset.filter(:id => @d1.select(:id)).sql.should ==
@@ -326,7 +326,7 @@ context "Dataset#where" do
   end
   
   specify "should accept proc expressions" do
-    d = @d1.select(:gdp.AVG)
+    d = @d1.select(:avg[:gdp])
     @dataset.filter {:gdp > d}.sql.should ==
       "SELECT * FROM test WHERE (gdp > (SELECT avg(gdp) FROM test WHERE (region = 'Asia')))"
     
@@ -481,7 +481,7 @@ end
 context "Dataset#having" do
   setup do
     @dataset = Sequel::Dataset.new(nil).from(:test)
-    @grouped = @dataset.group(:region).select(:region, :population.SUM, :gdp.AVG)
+    @grouped = @dataset.group(:region).select(:region, :sum[:population], :avg[:gdp])
     @d1 = @grouped.having('sum(population) > 10')
     @d2 = @grouped.having(:region => 'Asia')
     @columns = "region, sum(population), avg(gdp)"
@@ -701,9 +701,9 @@ context "Dataset#select" do
       'SELECT test.d AS e, test.cc FROM test'
 
     # symbol helpers      
-    @d.select(:test.ALL).sql.should ==
+    @d.select(:test.*).sql.should ==
       'SELECT test.* FROM test'
-    @d.select(:test__name.AS(:n)).sql.should ==
+    @d.select(:test__name.as(:n)).sql.should ==
       'SELECT test.name AS n FROM test'
     @d.select(:test__name___n).sql.should ==
       'SELECT test.name AS n FROM test'
@@ -759,7 +759,7 @@ context "Dataset#select_more" do
 
   specify "should add to the currently selected columns" do
     @d.select(:a).select_more(:b).sql.should == 'SELECT a, b FROM test'
-    @d.select(:a.all).select_more(:b.all).sql.should == 'SELECT a.*, b.* FROM test'
+    @d.select(:a.*).select_more(:b.*).sql.should == 'SELECT a.*, b.* FROM test'
   end
 end
 
@@ -774,7 +774,7 @@ context "Dataset#order" do
   end
   
   specify "should accept multiple arguments" do
-    @dataset.order(:name, :price.DESC).sql.should ==
+    @dataset.order(:name, :price.desc).sql.should ==
       'SELECT * FROM test ORDER BY name, price DESC'
   end
   
@@ -816,7 +816,7 @@ context "Dataset#order_by" do
   end
   
   specify "should accept multiple arguments" do
-    @dataset.order_by(:name, :price.DESC).sql.should ==
+    @dataset.order_by(:name, :price.desc).sql.should ==
       'SELECT * FROM test ORDER BY name, price DESC'
   end
   
@@ -847,7 +847,7 @@ context "Dataset#order_more" do
   end
   
   specify "should add to a previous ordering" do
-    @dataset.order(:name).order_more(:stamp.DESC).sql.should ==
+    @dataset.order(:name).order_more(:stamp.desc).sql.should ==
       'SELECT * FROM test ORDER BY name, stamp DESC'
   end
 end
@@ -863,24 +863,24 @@ context "Dataset#reverse_order" do
   end
   
   specify "should invert the order given" do
-    @dataset.reverse_order(:name.DESC).sql.should ==
+    @dataset.reverse_order(:name.desc).sql.should ==
       'SELECT * FROM test ORDER BY name'
   end
   
   specify "should invert the order for ASC expressions" do
-    @dataset.reverse_order(:name.ASC).sql.should ==
+    @dataset.reverse_order(:name.asc).sql.should ==
       'SELECT * FROM test ORDER BY name DESC'
   end
   
   specify "should accept multiple arguments" do
-    @dataset.reverse_order(:name, :price.DESC).sql.should ==
+    @dataset.reverse_order(:name, :price.desc).sql.should ==
       'SELECT * FROM test ORDER BY name DESC, price'
   end
 
   specify "should reverse a previous ordering if no arguments are given" do
     @dataset.order(:name).reverse_order.sql.should ==
       'SELECT * FROM test ORDER BY name DESC'
-    @dataset.order(:clumsy.DESC, :fool).reverse_order.sql.should ==
+    @dataset.order(:clumsy.desc, :fool).reverse_order.sql.should ==
       'SELECT * FROM test ORDER BY clumsy, fool DESC'
   end
   
@@ -1509,16 +1509,16 @@ context "Dataset#last" do
   
   specify "should invert the order" do
     @d.order(:a).last
-    @d.literal(@c.last_dataset.opts[:order]).should == @d.literal([:a.DESC])
+    @d.literal(@c.last_dataset.opts[:order]).should == @d.literal([:a.desc])
     
-    @d.order(:b.DESC).last
+    @d.order(:b.desc).last
     @d.literal(@c.last_dataset.opts[:order]).should == @d.literal(:b)
     
     @d.order(:c, :d).last
-    @d.literal(@c.last_dataset.opts[:order]).should == @d.literal([:c.DESC, :d.DESC])
+    @d.literal(@c.last_dataset.opts[:order]).should == @d.literal([:c.desc, :d.desc])
     
-    @d.order(:e.DESC, :f).last
-    @d.literal(@c.last_dataset.opts[:order]).should == @d.literal([:e, :f.DESC])
+    @d.order(:e.desc, :f).last
+    @d.literal(@c.last_dataset.opts[:order]).should == @d.literal([:e, :f.desc])
   end
   
   specify "should return the first matching record if a hash is specified" do
@@ -1698,7 +1698,7 @@ context "Dataset#set_row_proc" do
   end
   
   specify "should cause dataset to pass all rows through the filter" do
-    @dataset.set_row_proc {|h| h[:der] = h[:kind] + 2; h}
+    @dataset.row_proc = proc{|h| h[:der] = h[:kind] + 2; h}
     
     rows = @dataset.all
     rows.size.should == 10
@@ -1707,7 +1707,7 @@ context "Dataset#set_row_proc" do
   end
   
   specify "should be copied over when dataset is cloned" do
-    @dataset.set_row_proc {|h| h[:der] = h[:kind] + 2; h}
+    @dataset.row_proc = proc{|h| h[:der] = h[:kind] + 2; h}
     
     @dataset.filter(:a => 1).first.should == {:kind => 1, :der => 3}
   end
@@ -2478,7 +2478,7 @@ context "Dataset#transform" do
   end
   
   specify "should work correctly together with set_row_proc" do
-    @ds.set_row_proc {|r| r[:z] = r[:x] * 2; r}
+    @ds.row_proc = proc{|r| r[:z] = r[:x] * 2; r}
     @ds.raw = {:x => Marshal.dump("wow"), :y => 'hello'}
     @ds.first.should == {:x => "wow", :y => 'hello', :z => "wowwow"}
 
@@ -2544,7 +2544,7 @@ context "Dataset#transform" do
     @ds2.insert(:x => :toast)
     @ds2.sql.should == "INSERT INTO items (x) VALUES ('#{:toast.to_yaml}')"
 
-    @ds.set_row_proc {|r| r[:z] = r[:x] * 2; r}
+    @ds.row_proc = proc{|r| r[:z] = r[:x] * 2; r}
     @ds.raw = {:x => "wow".to_yaml, :y => 'hello'}
     @ds.first.should == {:x => "wow", :y => 'hello', :z => "wowwow"}
     f = nil
@@ -2572,7 +2572,7 @@ context "Dataset#transform" do
     @ds2.insert(:x => :toast)
     @ds2.sql.should == "INSERT INTO items (x) VALUES ('#{Base64.encode64(Marshal.dump(:toast))}')"
 
-    @ds.set_row_proc {|r| r[:z] = r[:x] * 2; r}
+    @ds.row_proc = proc{|r| r[:z] = r[:x] * 2; r}
     @ds.raw = {:x => Base64.encode64(Marshal.dump("wow")), :y => 'hello'}
     @ds.first.should == {:x => "wow", :y => 'hello', :z => "wowwow"}
     f = nil
@@ -2638,6 +2638,7 @@ context "Dataset#to_csv" do
   end
 end
 
+### DEPRECATED
 context "Dataset magic methods" do
   setup do
     @c = Class.new(Sequel::Dataset) do
