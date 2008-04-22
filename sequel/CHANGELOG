@@ -1,6 +1,6 @@
 === HEAD
 
-* Make some Model class methods private: def_hook_method, hooks, add_hook (jeremyevans)
+* Make some Model class methods private: def_hook_method, hooks, add_hook, plugin_module, plugin_gem (jeremyevans)
 
 * Add the eager! and eager_graph! mutation methods to model datasets (jeremyevans)
 
