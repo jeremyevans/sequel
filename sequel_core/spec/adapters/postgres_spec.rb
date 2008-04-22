@@ -273,40 +273,40 @@ context "A PostgreSQL database" do
     end
     POSTGRES_DB.create_table_sql_list(:posts, *g.create_info).should == [
       "CREATE TABLE posts (\"geom\" geometry)",
-      "CREATE INDEX posts_geom_index ON posts USING gist (geom)"
+      "CREATE INDEX posts_geom_index ON posts USING gist (\"geom\")"
     ]
   end
   
   specify "should support indexes with index type" do
     g = Sequel::Schema::Generator.new(POSTGRES_DB) do
-      varchar :title
+      varchar :title, :size => 5
       index :title, :type => 'hash'
     end
     POSTGRES_DB.create_table_sql_list(:posts, *g.create_info).should == [
-      "CREATE TABLE posts (\"title\" varchar)",
-      "CREATE INDEX posts_title_index ON posts USING hash (title)"
+      "CREATE TABLE posts (\"title\" varchar(5))",
+      "CREATE INDEX posts_title_index ON posts USING hash (\"title\")"
     ]
   end
   
   specify "should support unique indexes with index type" do
     g = Sequel::Schema::Generator.new(POSTGRES_DB) do
-      varchar :title
+      varchar :title, :size => 5
       index :title, :type => 'hash', :unique => true
     end
     POSTGRES_DB.create_table_sql_list(:posts, *g.create_info).should == [
-      "CREATE TABLE posts (\"title\" varchar)",
-      "CREATE UNIQUE INDEX posts_title_index ON posts USING hash (title)"
+      "CREATE TABLE posts (\"title\" varchar(5))",
+      "CREATE UNIQUE INDEX posts_title_index ON posts USING hash (\"title\")"
     ]
   end
   
   specify "should support partial indexes" do
     g = Sequel::Schema::Generator.new(POSTGRES_DB) do
-      varchar :title
+      varchar :title, :size => 5
       index :title, :where => {:something => 5}
     end
     POSTGRES_DB.create_table_sql_list(:posts, *g.create_info).should == [
-      "CREATE TABLE posts (\"title\" varchar)",
-      "CREATE INDEX posts_title_index ON posts (title) WHERE something = 5"
+      "CREATE TABLE posts (\"title\" varchar(5))",
+      "CREATE INDEX posts_title_index ON posts (\"title\") WHERE (\"something\" = 5)"
     ]
   end
 end
