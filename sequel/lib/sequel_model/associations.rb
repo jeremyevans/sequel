@@ -111,7 +111,7 @@ module Sequel::Model::Associations
 
     # deprecation
     if opts[:from]
-      STDERR << "The :from option is deprecated, please use the :class option instead.\r\n"
+      Sequel::Deprecation.deprecate("The :from option to Sequel::Model.associate is deprecated and will be removed in Sequel 2.0.  Use the :class option.")
       opts[:class] = opts[:from]
     end
 
@@ -138,12 +138,6 @@ module Sequel::Model::Associations
   # Array of association name symbols
   def associations
     association_reflections.keys
-  end
-
-  # deprecated, please use many_to_one instead
-  def one_to_one(*args, &block)
-    STDERR << "one_to_one relation definitions are deprecated, please use many_to_one instead.\r\n"
-    many_to_one(*args, &block)
   end
 
   # Shortcut for adding a one_to_many association, see associate
