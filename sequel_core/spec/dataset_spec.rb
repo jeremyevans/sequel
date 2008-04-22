@@ -948,13 +948,13 @@ context "Dataset#qualified_column_name" do
   end
   
   specify "should return the same if already qualified" do
-    @dataset.qualified_column_name('test.a'.lit, :items).should == 'test.a'
-    @dataset.qualified_column_name(:ccc__b, :items).should == :ccc__b
+    @dataset.send(:qualified_column_name, 'test.a'.lit, :items).should == 'test.a'
+    @dataset.send(:qualified_column_name, :ccc__b, :items).should == :ccc__b
   end
   
   specify "should qualify the column with the supplied table name" do
-    @dataset.qualified_column_name('a'.lit, :items).to_s(@dataset).should == 'items.a'
-    @dataset.qualified_column_name(:b1, :items).to_s(@dataset).should == 'items.b1'
+    @dataset.send(:qualified_column_name, 'a'.lit, :items).to_s(@dataset).should == 'items.a'
+    @dataset.send(:qualified_column_name, :b1, :items).to_s(@dataset).should == 'items.b1'
   end
 end
 

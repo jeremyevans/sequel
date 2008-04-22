@@ -67,7 +67,27 @@ end
 
 module Sequel
   module SQL
+    module ColumnMethods
+      AS = 'AS'.freeze
+      DESC = 'DESC'.freeze
+      ASC = 'ASC'.freeze
+      
+      def as(a); ColumnExpr.new(self, AS, a); end
+      
+      def desc; ColumnExpr.new(self, DESC); end
+      
+      def asc; ColumnExpr.new(self, ASC); end
+
+      def cast_as(t)
+        if t.is_a?(Symbol)
+          t = t.to_s.lit
+        end
+        Sequel::SQL::Function.new(:cast, self.as(t))
+      end
+    end
+
     class Expression
+      include ColumnMethods
       def lit; self; end
     end
     
@@ -125,25 +145,6 @@ module Sequel
     class ColumnAll < Expression
       def initialize(t); @t = t; end
       def to_s(ds); "#{@t}.*"; end
-    end
-    
-    module ColumnMethods
-      AS = 'AS'.freeze
-      DESC = 'DESC'.freeze
-      ASC = 'ASC'.freeze
-      
-      def as(a); ColumnExpr.new(self, AS, a); end
-      
-      def desc; ColumnExpr.new(self, DESC); end
-      
-      def asc; ColumnExpr.new(self, ASC); end
-
-      def cast_as(t)
-        if t.is_a?(Symbol)
-          t = t.to_s.lit
-        end
-        Sequel::SQL::Function.new(:cast, self.as(t))
-      end
     end
   end
 end

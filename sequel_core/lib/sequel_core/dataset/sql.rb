@@ -8,8 +8,8 @@ module Sequel
       # behavior.
       def quote_column_ref(name); name.to_s; end
       
-      ALIASED_REGEXP = /^(.*)\s(.*)$/.freeze
-      QUALIFIED_REGEXP = /^(.*)\.(.*)$/.freeze
+      ALIASED_REGEXP = /\A(.*)\s(.*)\z/.freeze
+      QUALIFIED_REGEXP = /\A(.*)\.(.*)\z/.freeze
 
       # Returns a qualified column name (including a table name) if the column
       # name isn't already qualified.
@@ -161,6 +161,7 @@ module Sequel
         end
         parenthesize ? "(#{fmt})" : fmt
       end
+      private :qualified_column_name, :column_list, :table_ref, :source_list
 
       # Returns a copy of the dataset with the source changed.
       def from(*source)

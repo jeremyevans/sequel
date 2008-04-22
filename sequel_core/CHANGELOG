@@ -1,10 +1,12 @@
 === HEAD
 
+* Make some Dataset methods private (qualified_column_name, column_list, table_ref, source_list) (jeremyevans)
+
 * Deprecate Dataset methods #set_options, #set_row_proc, #remove_row_proc, and #clone_merge (jeremyevans)
 
 * Add Symbol#*, a replacement for Symbol#all (jeremyevans)
 
-* Deprecate including ColumnMethods in Object, include it in Symbol and String (jeremyevans)
+* Deprecate including ColumnMethods in Object, include it in Symbol, String, and Sequel::SQL::Expression (jeremyevans)
 
 * Deprecate Symbol#method_missing, and #AS, #DESC, #ASC, #ALL, and #all from ColumnMethods (jeremyevans)
 
