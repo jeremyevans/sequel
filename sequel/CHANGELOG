@@ -1,5 +1,7 @@
 === HEAD
 
+* Make some Model class methods private: def_hook_method, hooks, add_hook (jeremyevans)
+
 * Add the eager! and eager_graph! mutation methods to model datasets (jeremyevans)
 
 * Remove Model.database_opened (jeremyevans)
