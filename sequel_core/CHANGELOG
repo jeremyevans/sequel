@@ -1,5 +1,9 @@
 === HEAD
 
+* Add support for PostgreSQL partial indexes (dlee)
+
+* Added support for arbitrary index types (including spatial indexes) (dlee)
+
 * Quote column names in SQL generated for SQLite (tmm1)
 
 * Deprecate Object#rollback! (jeremyevans)
@@ -38,7 +42,7 @@
 
 * Allow joining of multiple datasets, by making the table alias different for each dataset joined (jeremyevans)
 
-* SECURITY: Fix backslash escaping of strings (davidlee@berkeley.edu)
+* SECURITY: Fix backslash escaping of strings (dlee)
 
 * Add ability to create a graph of objects from a query, with the result split into corresponding tables (jeremyevans) (#113)
 
