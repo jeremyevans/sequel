@@ -95,7 +95,7 @@ module Sequel
       /^last_by_(.+)$/    => proc {|c| proc {deprecate("Sequel::Dataset#method_missing", "Use order(#{c.inspect}).last or define last_by_#{c}"); order(c).last}},
       /^filter_by_(.+)$/  => proc {|c| proc {|v| deprecate("Sequel::Dataset#method_missing", "Use filter(#{c.inspect}=>#{v.inspect}) or define filter_by_#{c}"); filter(c => v)}},
       /^all_by_(.+)$/     => proc {|c| proc {|v| deprecate("Sequel::Dataset#method_missing", "Use filter(#{c.inspect}=>#{v.inspect}).all or define all_by_#{c}"); filter(c => v).all}},
-      /^find_by_(.+)$/    => proc {|c| proc {|v| deprecate("Sequel::Dataset#method_missing", "Use filter(#{c.inspect}=>#{v.inspect}).find or define find_by_#{c}"); filter(c => v).first}},
+      /^find_by_(.+)$/    => proc {|c| proc {|v| deprecate("Sequel::Dataset#method_missing", "Use filter(#{c.inspect}=>#{v.inspect}).first or define find_by_#{c}"); filter(c => v).first}},
       /^group_by_(.+)$/   => proc {|c| proc {deprecate("Sequel::Dataset#method_missing", "Use group(#{c.inspect}) or define group_by_#{c}"); group(c)}},
       /^count_by_(.+)$/   => proc {|c| proc {deprecate("Sequel::Dataset#method_missing", "Use group_and_count(#{c.inspect}) or define count_by_#{c})"); group_and_count(c)}}
     }
