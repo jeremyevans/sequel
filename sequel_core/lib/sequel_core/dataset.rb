@@ -106,14 +106,9 @@ module Sequel
     # Returns a new clone of the dataset with with the given options merged.
     def clone(opts = {})
       c = super()
-      c.set_options @opts.merge(opts)
+      c.opts = @opts.merge(opts)
+      c.instance_variable_set(:@columns, nil)
       c
-    end
-    alias_method :clone_merge, :clone # should be deprecated in the next major release.
-    
-    def set_options(opts) #:nodoc:
-      @opts = opts
-      @columns = nil
     end
     
     NOTIMPL_MSG = "This method must be overriden in Sequel adapters".freeze
@@ -187,7 +182,7 @@ module Sequel
         fetch_rows(select_sql(opts)) do |r|
           r = transform_load(r) if transform
           r = row_proc[r] if row_proc
-          block[r]
+          yield r
         end
       end
       self
@@ -258,17 +253,17 @@ module Sequel
       when nil # set_model(nil) => no
         # no argument provided, so the dataset is denuded
         @opts.merge!(:naked => true, :models => nil, :polymorphic_key => nil)
-        remove_row_proc
+        self.row_proc = nil
         # extend_with_stock_each
       when Class
         # isomorphic model
         @opts.merge!(:naked => nil, :models => {nil => key}, :polymorphic_key => nil)
         if key.respond_to?(:load)
           # the class has a values setter method, so we use it
-          set_row_proc {|h| key.load(h, *args)}
+          self.row_proc = proc{|h| key.load(h, *args)}
         else
           # otherwise we just pass the hash to the constructor
-          set_row_proc {|h| key.new(h, *args)}
+          self.row_proc = proc{|h| key.new(h, *args)}
         end
         extend_with_destroy
       when Symbol
@@ -277,14 +272,14 @@ module Sequel
         @opts.merge!(:naked => true, :models => hash, :polymorphic_key => key)
         if hash.values.first.respond_to?(:load)
           # the class has a values setter method, so we use it
-          set_row_proc do |h|
+          self.row_proc = proc do |h|
             c = hash[h[key]] || hash[nil] || \
               raise(Error, "No matching model class for record (#{polymorphic_key} => #{h[polymorphic_key].inspect})")
             c.load(h, *args)
           end
         else
           # otherwise we just pass the hash to the constructor
-          set_row_proc do |h|
+          self.row_proc = proc do |h|
             c = hash[h[key]] || hash[nil] || \
               raise(Error, "No matching model class for record (#{polymorphic_key} => #{h[polymorphic_key].inspect})")
             c.new(h, *args)
@@ -295,23 +290,6 @@ module Sequel
         raise ArgumentError, "Invalid model specified"
       end
       self
-    end
-    
-    # Overrides the each method to pass the values through a filter. The filter
-    # receives as argument a hash containing the column values for the current
-    # record. The filter should return a value which is then passed to the 
-    # iterating block. In order to elucidate, here's a contrived example:
-    #
-    #   dataset.set_row_proc {|h| h.merge(:xxx => 'yyy')}
-    #   dataset.first[:xxx] #=> "yyy" # always!
-    #
-    def set_row_proc(&filter)
-      @row_proc = filter
-    end
-    
-    # Removes the row making proc.
-    def remove_row_proc
-      @row_proc = nil
     end
     
     STOCK_TRANSFORMS = {
