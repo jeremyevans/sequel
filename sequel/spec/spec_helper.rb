@@ -3,7 +3,10 @@ unless Object.const_defined?('Sequel')
   $:.unshift(File.join(File.dirname(__FILE__), "../../sequel_core/lib/"))
   require 'sequel_core'
 end
-require File.join(File.dirname(__FILE__), "../lib/sequel_model")
+unless Sequel.const_defined?('Model')
+  $:.unshift(File.join(File.dirname(__FILE__), "../lib/"))
+  require 'sequel_model'
+end
 
 class MockDataset < Sequel::Dataset
   def insert(*args)
