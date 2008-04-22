@@ -1,5 +1,7 @@
 === HEAD
 
+* Quote column names in SQL generated for SQLite (tmm1)
+
 * Deprecate Object#rollback! (jeremyevans)
 
 * Make some Dataset methods private (qualified_column_name, column_list, table_ref, source_list) (jeremyevans)
