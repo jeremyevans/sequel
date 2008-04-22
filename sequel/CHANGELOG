@@ -1,5 +1,7 @@
 === HEAD
 
+* Add the eager! and eager_graph! mutation methods to model datasets (jeremyevans)
+
 * Remove Model.database_opened (jeremyevans)
 
 * Remove Model.super_dataset (jeremyevans)

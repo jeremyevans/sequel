@@ -393,17 +393,24 @@ module Sequel
     end
 
     # Setup mutation (e.g. filter!) methods
-    def self.def_mutation_method(meth)
-      class_eval("def #{meth}!(*args, &block); mutation_method(:#{meth}, *args, &block) end")
+    def self.def_mutation_method(*meths)
+      meths.each do |meth|
+        class_eval("def #{meth}!(*args, &block); mutation_method(:#{meth}, *args, &block) end")
+      end
+    end
+    def def_mutation_method(*meths)
+      meths.each do |meth|
+        instance_eval("def #{meth}!(*args, &block); mutation_method(:#{meth}, *args, &block) end")
+      end
     end
 
-    %w'and distinct exclude exists filter from from_self full_outer_join graph
+    MUTATION_METHODS = %w'and distinct exclude exists filter from from_self full_outer_join graph
     group group_and_count group_by having inner_join intersect invert_order join
     left_outer_join limit naked or order order_by order_more paginate query reject
     reverse reverse_order right_outer_join select select_all select_more
-    set_graph_aliases set_model sort sort_by union unordered where'.each do |meth|
-      def_mutation_method(meth)
-    end
+    set_graph_aliases set_model sort sort_by union unordered where'.collect{|x| x.to_sym}
+
+    def_mutation_method(*MUTATION_METHODS)
 
     private
       def mutation_method(meth, *args, &block)
