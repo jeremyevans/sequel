@@ -34,7 +34,7 @@
 
 * Fix Model#destroy so that it returns self, not the result of after_destroy (jeremyevans)
 
-* Define Model column accessors in set_dataset, so they should always be avaiable, remove Model#method_missing (jeremyevans)
+* Define Model column accessors in set_dataset, so they should always be avaiable, deprecate Model#method_missing (jeremyevans)
 
 * Add eager loading of associations via new sequel_core object graphing feature (jeremyevans)
 

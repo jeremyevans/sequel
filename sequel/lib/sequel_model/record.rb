@@ -334,7 +334,7 @@ module Sequel
       # Returns all methods that can be used for attribute
       # assignment (those that end with =)
       def setter_methods
-        methods.grep(/=$/)
+        methods.grep(/=\z/)
       end
   end
 end

@@ -22,6 +22,26 @@ module Sequel
       respond_to?(m) ? send(m, *args, &block) : super(m, *args)
     end
 
+    def method_missing(m, *args, &block)
+      if m.to_s =~ /=\z/
+        attribute = m.to_s.chop
+        values.keys.each do |k|
+          next unless k.to_s == attribute
+          deprecate("Sequel::Model#method_missing", "Use model[:#{attribute}] = ...")
+          return self[attribute.to_sym] = args.first
+        end
+        super
+      else
+        attribute = m.to_s
+        values.keys.each do |k|
+          next unless k.to_s == attribute
+          deprecate("Sequel::Model#method_missing", "Use model[:#{attribute}]")
+          return self[attribute.to_sym]
+        end
+        super
+      end
+    end
+
     def self.create_with_params(params)
       deprecate("Sequel::Model.create_with_params", "Use .create")
       create(params)
