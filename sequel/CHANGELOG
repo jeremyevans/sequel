@@ -1,5 +1,13 @@
 === HEAD
 
+* Make some Model class methods private: def_hook_method, hooks, add_hook, plugin_module, plugin_gem (jeremyevans)
+
+* Add the eager! and eager_graph! mutation methods to model datasets (jeremyevans)
+
+* Remove Model.database_opened (jeremyevans)
+
+* Remove Model.super_dataset (jeremyevans)
+
 * Deprecate .create_with_params, .create_with, #set, #update, #update_with, and #new_record from Sequel::Model (jeremyevans)
 
 * Add Model.def_dataset_method, for defining methods on the model that reference methods on the dataset (jeremyevans)

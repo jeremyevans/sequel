@@ -433,6 +433,7 @@ describe Sequel::Model, "attribute accessors" do
     def @dataset.set_model(blah); end
     def @dataset.naked; self; end
     def @dataset.columns; [:x, :y]; end
+    def @dataset.def_mutation_method(*names);  end
   end
 
   it "should be created on set_dataset" do

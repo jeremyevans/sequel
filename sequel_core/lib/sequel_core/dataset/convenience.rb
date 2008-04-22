@@ -6,7 +6,6 @@ module Sequel
       # Returns true if no records exists in the dataset
       def empty?
         db.dataset.where(exists).get(1) == nil
-        # count == 0
       end
       
       # Returns the first record in the dataset.
@@ -18,10 +17,10 @@ module Sequel
       NAKED_HASH = {:naked => true}.freeze
 
       # Returns the first value of the first reecord in the dataset.
-      # Returns nill if dataset is empty.
+      # Returns nil if dataset is empty.
       def single_value(opts = nil)
         opts = opts ? NAKED_HASH.merge(opts) : NAKED_HASH
-        # reset the columns cache so it won't fuck subsequent calls to columns
+        # don't cache the columns
         each(opts) {|r| @columns = nil; return r.values.first}
         nil
       end
@@ -101,25 +100,25 @@ module Sequel
 
       # Returns the minimum value for the given column.
       def min(column)
-        single_value(:select => [column.MIN.AS(:v)])
+        single_value(:select => [:min[column].as(:v)])
       end
 
       # Returns the maximum value for the given column.
       def max(column)
-        single_value(:select => [column.MAX.AS(:v)])
+        single_value(:select => [:max[column].as(:v)])
       end
 
       # Returns the sum for the given column.
       def sum(column)
-        single_value(:select => [column.SUM.AS(:v)])
+        single_value(:select => [:sum[column].as(:v)])
       end
 
       # Returns the average value for the given column.
       def avg(column)
-        single_value(:select => [column.AVG.AS(:v)])
+        single_value(:select => [:avg[column].as(:v)])
       end
       
-      COUNT_OF_ALL_AS_COUNT = :count['*'.lit].AS(:count)
+      COUNT_OF_ALL_AS_COUNT = :count['*'.lit].as(:count)
       
       # Returns a dataset grouped by the given column with count by group.
       def group_and_count(*columns)
@@ -129,15 +128,17 @@ module Sequel
       # Returns a Range object made from the minimum and maximum values for the
       # given column.
       def range(column)
-        r = select(column.MIN.AS(:v1), column.MAX.AS(:v2)).first
-        r && (r[:v1]..r[:v2])
+        if r = select(:min[column].as(:v1), :max[column].as(:v2)).first
+          (r[:v1]..r[:v2])
+        end
       end
       
       # Returns the interval between minimum and maximum values for the given 
       # column.
       def interval(column)
-        r = select("(max(#{literal(column)}) - min(#{literal(column)})) AS v".lit).first
-        r && r[:v]
+        if r = select("(max(#{literal(column)}) - min(#{literal(column)})) AS v".lit).first
+          r[:v]
+        end
       end
 
       # Pretty prints the records in the dataset as plain-text table.

@@ -194,14 +194,14 @@ context "Column references" do
   end
 end
 
-context "Symbol#ALL/#all" do
+context "Symbol#*" do
   setup do
     @ds = Sequel::Dataset.new(nil)
   end
   
   specify "should format a qualified wildcard" do
-    :xyz.ALL.to_s(@ds).should == 'xyz.*'
-    :abc.all.to_s(@ds).should == 'abc.*'
+    :xyz.*.to_s(@ds).should == 'xyz.*'
+    :abc.*.to_s(@ds).should == 'abc.*'
   end
 end
 
