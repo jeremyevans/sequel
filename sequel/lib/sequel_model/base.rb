@@ -29,12 +29,6 @@ module Sequel
       end
     end
     
-    # Called when a database is opened in order to automatically associate the
-    # first opened database with model classes.
-    def self.database_opened(db)
-      @db = db if (self == Model) && !@db
-    end
-    
     # Returns the implicit table name for the model class.
     def self.implicit_table_name
       name.demodulize.underscore.pluralize.to_sym
