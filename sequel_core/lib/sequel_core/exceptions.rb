@@ -35,17 +35,3 @@ module Sequel
     class AdapterNotFound < Error ; end
   end  
 end
-
-# Object extensions
-class Object
-  # Cancels the current transaction without an error:
-  #
-  #   DB.tranaction do
-  #     ...
-  #     rollback! if failed_to_contact_client
-  #     ...
-  #   end
-  def rollback!
-    raise Sequel::Error::Rollback
-  end
-end

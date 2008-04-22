@@ -331,7 +331,8 @@ module Sequel
         expr = "(#{literal(index[:columns])})"
         unique = "UNIQUE " if index[:unique]
         index_type = index[:type]
-        where = " WHERE #{literal(index[:where])}" if index[:where]
+        filter = index[:where] || index[:filter]
+        filter = " WHERE #{expression_list(filter)}" if filter
         case index_type
         when :full_text
           lang = index[:language] ? "#{literal(index[:language])}, " : ""
@@ -341,7 +342,7 @@ module Sequel
         when :spatial
           index_type = :gist
         end
-        "CREATE #{unique}INDEX #{index_name} ON #{table_name} #{"USING #{index_type} " if index_type}#{expr}#{where}"
+        "CREATE #{unique}INDEX #{index_name} ON #{table_name} #{"USING #{index_type} " if index_type}#{expr}#{filter}"
       end
     
       def drop_table_sql(name)

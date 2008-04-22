@@ -30,6 +30,10 @@
 #  Artist.eager(:albums=>{:tracks=>:genre}).all
 #  Artist.eager_graph(:albums=>{:tracks=>:genre}).all
 module Sequel::Model::Associations::EagerLoading
+  def self.extended(obj)
+    obj.def_mutation_method(:eager, :eager_graph)
+  end
+
   # The preferred eager loading method.  Loads all associated records using one
   # query for each association.
   #

@@ -170,6 +170,10 @@ class Object
     Sequel::Deprecation.deprecate("Object#Sequel is deprecated and will be removed in Sequel 2.0.  Use Sequel.connect.")
     Sequel.connect(*args)
   end
+  def rollback!
+    Sequel::Deprecation.deprecate("Object#rollback! is deprecated and will be removed in Sequel 2.0.  Use raise Sequel::Error::Rollback.")
+    raise Sequel::Error::Rollback
+  end
 end
 
 class Symbol
