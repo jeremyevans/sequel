@@ -7,6 +7,7 @@ module Sequel
     # (Dataset#current_page), as well as Dataset#prev_page and Dataset#next_page
     # for implementing pagination controls.
     def paginate(page_no, page_size)
+      raise(Error, "You cannot paginate a dataset that already has a limit") if @opts[:limit]
       record_count = count
       total_pages = (record_count / page_size.to_f).ceil
       paginated = limit(page_size, (page_no - 1) * page_size)
@@ -16,6 +17,7 @@ module Sequel
     end
       
     def each_page(page_size)
+      raise(Error, "You cannot paginate a dataset that already has a limit") if @opts[:limit]
       record_count = count
       total_pages = (record_count / page_size.to_f).ceil
       

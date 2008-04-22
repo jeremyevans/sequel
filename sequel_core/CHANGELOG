@@ -1,5 +1,7 @@
 === HEAD
 
+* Paginating an already paginated/limited dataset now raises an error (jeremyevans)
+
 * Add support for PostgreSQL partial indexes (dlee)
 
 * Added support for arbitrary index types (including spatial indexes) (dlee)
