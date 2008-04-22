@@ -37,7 +37,11 @@ module Sequel #:nodoc:
           raise(::Sequel::Error, "Wrong number of arguments, 0-2 arguments valid") if args.length > 2
           opts = {:adapter=>adapter.to_sym}
           opts[:database] = args.shift if args.length >= 1 && !(args[0].is_a?(Hash))
-          opts.merge!(args[0]) if args[0].is_a?(Hash)
+          if Hash === (arg = args[0])
+            opts.merge!(arg)
+          elsif !arg.nil?
+            raise ::Sequel::Error, "Wrong format of arguments, either use (), (String), (Hash), or (String, Hash)"
+          end
           ::Sequel::Database.connect(opts)
         end
       end

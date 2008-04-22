@@ -186,6 +186,7 @@ describe "Model#new?" do
     n.should_not be_new
   end
   
+  ### DEPRECATED
   it "should alias new_record? to new?" do
     n = @c.new(:x => 1)
     n.should respond_to(:new_record?)
@@ -395,6 +396,7 @@ describe Sequel::Model, "update_with_params" do
     MODEL_DB.sqls.first.should == "UPDATE items SET y = 1 WHERE (id = 5)"
   end
   
+  ### DEPRECATE
   it "should be aliased by update_with" do
     @o1.update_with(:x => 1, :z => 2)
     MODEL_DB.sqls.first.should == "INSERT INTO items (x) VALUES (1)"
@@ -406,11 +408,12 @@ describe Sequel::Model, "update_with_params" do
   
   it "should support virtual attributes" do
     @c.class_def(:blah=) {|v| self.x = v}
-    @o1.update_with(:blah => 333)
+    @o1.update_with_params(:blah => 333)
     MODEL_DB.sqls.first.should == "INSERT INTO items (x) VALUES (333)"
   end
 end
 
+### DEPRECATE
 describe Sequel::Model, "create_with_params" do
 
   before(:each) do

@@ -126,7 +126,7 @@ describe "Model#serialize" do
     o.abc.should == 1
     o.def.should == "hello"
 
-    o.set(:abc => 23)
+    o.update_values(:abc => 23)
     ds.sqls.should == "UPDATE items SET abc = '#{23.to_yaml}' WHERE (id = 1)"
 
     ds.raw = {:id => 1, :abc => "--- 1\n", :def => "--- hello\n"}

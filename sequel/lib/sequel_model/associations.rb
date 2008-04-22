@@ -258,7 +258,7 @@ module Sequel::Model::Associations
     def_association_dataset_methods(name, opts) do
       klass = assoc_class[opts]
       key = (opts[:right_primary_key] ||= :"#{klass.table_name}__#{klass.primary_key}")
-      selection = (opts[:select] ||= klass.table_name.all)
+      selection = (opts[:select] ||= klass.table_name.*)
       klass.select(selection).inner_join(join_table, right => key, left => pk)
     end
 

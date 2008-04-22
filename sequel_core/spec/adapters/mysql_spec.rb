@@ -114,16 +114,16 @@ context "A MySQL dataset" do
     @d.select('COUNT(*)'.lit).sql.should == \
       'SELECT COUNT(*) FROM items'
 
-    @d.select(:value.MAX).sql.should == \
+    @d.select(:max[:value]).sql.should == \
       'SELECT max(`value`) FROM items'
       
     @d.select(:NOW[]).sql.should == \
     'SELECT NOW() FROM items'
 
-    @d.select(:items__value.MAX).sql.should == \
+    @d.select(:max[:items__value]).sql.should == \
       'SELECT max(items.`value`) FROM items'
 
-    @d.order(:name.DESC).sql.should == \
+    @d.order(:name.desc).sql.should == \
       'SELECT * FROM items ORDER BY `name` DESC'
 
     @d.select('items.name AS item_name'.lit).sql.should == \
@@ -155,13 +155,13 @@ context "A MySQL dataset" do
     @d.reverse_order(:name).sql.should == \
       'SELECT * FROM items ORDER BY `name` DESC'
 
-    @d.reverse_order(:name.DESC).sql.should == \
+    @d.reverse_order(:name.desc).sql.should == \
       'SELECT * FROM items ORDER BY `name`'
 
-    @d.reverse_order(:name, :test.DESC).sql.should == \
+    @d.reverse_order(:name, :test.desc).sql.should == \
       'SELECT * FROM items ORDER BY `name` DESC, `test`'
 
-    @d.reverse_order(:name.DESC, :test).sql.should == \
+    @d.reverse_order(:name.desc, :test).sql.should == \
       'SELECT * FROM items ORDER BY `name`, `test` DESC'
   end
   

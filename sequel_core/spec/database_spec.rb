@@ -46,7 +46,7 @@ context "Database#uri" do
       set_adapter_scheme :mau
     end
     
-    @db = Sequel('mau://user:pass@localhost:9876/maumau')
+    @db = Sequel.connect('mau://user:pass@localhost:9876/maumau')
   end
   
   specify "should return the connection URI for the database" do
@@ -506,6 +506,7 @@ context "A Database adapter with a scheme" do
     c.opts[:database].should == 'db'
   end
 
+  ### DEPRECATED
   specify "should be accessible through Sequel()" do
     c = Sequel('ccc://localhost/db')
     c.should be_a_kind_of(CCC)
@@ -514,24 +515,27 @@ context "A Database adapter with a scheme" do
   end
 
   specify "should be accessible through Sequel.<adapter>" do
+    class << Sequel
+      def_adapter_method(:ccc)
+    end
     # invalid parameters
     proc {Sequel.ccc('abc', 'def')}.should raise_error(Sequel::Error)
     
     c = Sequel.ccc('mydb')
     c.should be_a_kind_of(CCC)
-    c.opts.should == {:database => 'mydb'}
+    c.opts.should == {:adapter=>:ccc, :database => 'mydb'}
     
     c = Sequel.ccc('mydb', :host => 'localhost')
     c.should be_a_kind_of(CCC)
-    c.opts.should == {:database => 'mydb', :host => 'localhost'}
+    c.opts.should == {:adapter=>:ccc, :database => 'mydb', :host => 'localhost'}
     
     c = Sequel.ccc
     c.should be_a_kind_of(CCC)
-    c.opts.should == {}
+    c.opts.should == {:adapter=>:ccc}
     
     c = Sequel.ccc(:database => 'mydb', :host => 'localhost')
     c.should be_a_kind_of(CCC)
-    c.opts.should == {:database => 'mydb', :host => 'localhost'}
+    c.opts.should == {:adapter=>:ccc, :database => 'mydb', :host => 'localhost'}
   end
   
   specify "should be accessible through Sequel.connect with options" do
@@ -836,7 +840,7 @@ context "Database.connect" do
   end
   
   specify "should accept hashes loaded from YAML files" do
-    db = Sequel(YAML.load_file(@fn)['development'])
+    db = Sequel.connect(YAML.load_file(@fn)['development'])
     db.class.should == EEE
     db.opts[:database].should == 'mydb'
     db.opts[:user].should == 'mau'

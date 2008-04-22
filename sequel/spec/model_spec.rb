@@ -103,7 +103,6 @@ describe Sequel::Model, "new" do
   it "should be marked as new?" do
     o = @m.new
     o.should be_new
-    o.should be_new_record
   end
 
   it "should not be marked as new? once it is saved" do
@@ -111,7 +110,6 @@ describe Sequel::Model, "new" do
     o.should be_new
     o.save
     o.should_not be_new
-    o.should_not be_new_record
   end
 
   it "should use the last inserted id as primary key if not in values" do
@@ -219,6 +217,7 @@ describe Sequel::Model, ".fetch" do
   
 end
 
+### DEPRECATED
 describe Sequel::Model, "magic methods" do
 
   before(:each) do

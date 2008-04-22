@@ -53,7 +53,7 @@ module Sequel
     end
 
     # deprecated, please use many_to_one instead
-    def one_to_one(*args, &block)
+    def self.one_to_one(*args, &block)
       deprecate("Sequel::Model.one_to_one", "Use many_to_one")
       many_to_one(*args, &block)
     end
