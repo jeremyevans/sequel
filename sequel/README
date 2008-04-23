@@ -15,7 +15,7 @@ You can also use the shorthand form:
   class Post < Sequel::Model
   end
 
-== Resources
+=== Resources
 
 * {Project page}[http://code.google.com/p/ruby-sequel/]
 * {Source code}[http://github.com/jeremyevans/sequel]
@@ -32,7 +32,7 @@ To check out the source code:
 
 If you have any comments or suggestions please post to the Google group.
 
-== Installation
+=== Installation
 
   sudo gem install sequel
 
