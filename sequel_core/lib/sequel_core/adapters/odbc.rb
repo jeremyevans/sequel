@@ -41,6 +41,10 @@ module Sequel
         ODBC::Dataset.new(self, opts)
       end
     
+      # ODBC returns native statement objects, which must be dropped if
+      # you call execute manually, or you will get warnings.  See the
+      # fetch_rows method source code for an example of how to drop
+      # the statements.
       def execute(sql)
         @logger.info(sql) if @logger
         @pool.hold do |conn|

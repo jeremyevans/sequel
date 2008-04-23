@@ -1,5 +1,7 @@
 === HEAD
 
+* Document that calling Sequel::ODBC::Database#execute manually requires you to manually drop the returned object (jeremyevans) (#217)
+
 * Paginating an already paginated/limited dataset now raises an error (jeremyevans)
 
 * Add support for PostgreSQL partial indexes (dlee)
