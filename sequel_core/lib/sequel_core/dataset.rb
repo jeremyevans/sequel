@@ -26,7 +26,7 @@ module Sequel
   # use different datasets to access data:
   #   posts = DB[:posts]
   #   davids_posts = posts.filter(:author => 'david')
-  #   old_posts = posts.filter('stamp < ?', 1.week.ago)
+  #   old_posts = posts.filter('stamp < ?', Date.today - 7)
   #
   # Datasets are Enumerable objects, so they can be manipulated using any
   # of the Enumerable methods, such as map, inject, etc.

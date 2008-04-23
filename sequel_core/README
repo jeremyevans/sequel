@@ -158,19 +158,19 @@ The simplest way to filter records is to provide a hash of values to match:
   
 You can also specify ranges:
 
-  my_posts = posts.filter(:stamp => (2.weeks.ago)..(1.week.ago))
+  my_posts = posts.filter(:stamp => (Date.today - 14)..(Date.today - 7))
   
 Or lists of values:
 
   my_posts = posts.filter(:category => ['ruby', 'postgres', 'linux'])
   
-Sequel now also accepts expressions as closures, AKA block filters:
+If ParseTree is installed, Sequel also accepts expressions as closures, AKA block filters:
 
   my_posts = posts.filter {:category == ['ruby', 'postgres', 'linux']}
   
 Which also lets you do stuff like:
 
-  my_posts = posts.filter {:stamp > 1.month.ago}
+  my_posts = posts.filter {:stamp > Date.today << 1}
   
 Some adapters (like postgresql) will also let you specify Regexps:
 
@@ -186,7 +186,7 @@ You can then retrieve the records by using any of the retrieval methods:
   
 You can also specify a custom WHERE clause:
 
-  posts.filter('(stamp < ?) AND (author <> ?)', 3.days.ago, author_name)
+  posts.filter('(stamp < ?) AND (author <> ?)', Date.today - 3, author_name)
 
 Datasets can also be used as subqueries:
 
@@ -213,7 +213,7 @@ You can also specify descending order
 
 === Deleting Records
 
-  posts.filter('stamp < ?', 3.days.ago).delete
+  posts.filter('stamp < ?', Date.today - 3).delete
   
 === Inserting Records
 
@@ -225,7 +225,7 @@ Or alternatively:
   
 === Updating Records
 
-  posts.filter('stamp < ?', 3.days.ago).update(:state => 'archived')
+  posts.filter('stamp < ?', Date.today - 7).update(:state => 'archived')
 
 === Joining Tables
 
@@ -250,3 +250,14 @@ Which is equivalent to the SQL:
   ON order_items.item_id = items.id
   WHERE order_items.order_id = 1234
   
+=== Graphing Datasets
+
+When retrieving records from joined datasets, you get the results in a single hash, which is subject to clobbering:
+
+  DB[:items].join(:order_items, :item_id => :id).first
+  => {:id=>(could be items.id or order_items.id), :item_id=>order_items.order_id}
+
+Using graph, you can split the resulting dataset into separate hashes:
+
+  DB[:items].graph(:order_items, :item_id => :id).first
+  => {:items->{:id=>items.id}, :order_items=>{:id=>order_items.id, :item_id=>order_items.item_id}}

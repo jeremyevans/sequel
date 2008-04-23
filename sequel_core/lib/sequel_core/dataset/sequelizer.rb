@@ -4,7 +4,7 @@ class Sequel::Dataset
   # blocks, e.g.:
   #
   #   DB[:items].filter {:price < 100}
-  #   DB[:items].filter {:category == 'ruby' && :date < 3.days.ago}
+  #   DB[:items].filter {:category == 'ruby' && :date < Date.today - 7}
   #
   # Block filters can refer to literals, variables, constants, arguments, 
   # instance variables or anything else in order to create parameterized 
