@@ -1,5 +1,7 @@
 module Sequel
   class Model
+    # If possible, set the dataset for the model subclass as soon as it
+    # is created.
     def self.inherited(subclass)
       begin
         if subclass.superclass == Model
@@ -39,6 +41,12 @@ module Sequel
       @dataset || raise(Error, "No dataset associated with #{self}")
     end
 
+    # If a block is given, define a method on the dataset with the given argument name using
+    # the given block as well as a method on the model that calls the
+    # dataset method.
+    #
+    # If a block is not given, define a method on the model for each argument
+    # that calls the dataset method of the same argument name.
     def self.def_dataset_method(*args, &block)
       raise(Error, "No arguments given") if args.empty?
       if block_given?

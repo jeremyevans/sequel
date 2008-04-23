@@ -11,7 +11,7 @@ end
 module Sequel
   # LiteralString is used to represent literal SQL expressions. An 
   # LiteralString is copied verbatim into an SQL statement. Instances of
-  # LiteralString can be created by calling String#expr.
+  # LiteralString can be created by calling String#lit.
   class LiteralString < ::String
   end
 end

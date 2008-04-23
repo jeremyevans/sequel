@@ -10,10 +10,15 @@
 #     one_to_many :milestones
 #   end
 # 
-# The project class now has the following methods:
-# * Project#portfolio, Project#portfolio=
-# * Project#milestones, Project#add_milestone, Project#remove_milestone,
-#   Project#milestones_dataset
+# The project class now has the following instance methods:
+# * portfolio - Returns the associated portfolio
+# * portfolio=(obj) - Sets the associated portfolio to the object,
+#   but the change is not persisted until you save the record.
+# * milestones - Returns an array of associated milestones
+# * milestones_dataset - Returns a dataset that would return the associated
+#   milestones, allowing for further filtering/limiting/etc.
+# * add_milestone(obj) - Associates the passed milestone with this object
+# * remove_milestone(obj) - Removes the association with the passed milestone
 #
 # By default the classes for the associations are inferred from the association
 # name, so for example the Project#portfolio will return an instance of 
@@ -68,7 +73,7 @@ module Sequel::Model::Associations
   # * *ALL types*:
   #   - :class - The associated class or its name. If not
   #     given, uses the association's name, which is camelized (and
-  #     singularized if type is :{one,many}_to_many)
+  #     singularized unless the type is :many_to_one)
   #   - :eager - The associations to eagerly load when loading the associated object.
   #     For many_to_one associations, this is ignored unless this association is
   #     being eagerly loaded, as it doesn't save queries unless multiple objects
@@ -97,7 +102,7 @@ module Sequel::Model::Associations
   #   - :right_key - foreign key in join table that points to associated
   #     model's primary key, as a symbol.
   #   - :select - the attributes to select.  Defaults to the associated class's
-  #     table_name.*, which means it doesn't include the attributes from the join
+  #     table_name.*, which means it doesn't include the attributes from the
   #     join table.  If you want to include the join table attributes, you can
   #     use this option, but beware that the join table attributes can clash with
   #     attributes from the model table, so you should alias any attributes that have

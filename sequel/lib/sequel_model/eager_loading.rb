@@ -3,7 +3,7 @@
 #
 # Two separate implementations are provided.  .eager should be used most of the
 # time, as it loads associated records using one query per association.  However,
-# You cannot filter based on columns in associated tables.  .eager_graph loads
+# it does not allow you the ability to filter based on columns in associated tables.  .eager_graph loads
 # all records in one query.  Using .eager_graph you can filter based on columns in associated
 # tables.  However, .eager_graph can be much slower than .eager, especially if multiple
 # *_to_many associations are joined.
@@ -16,7 +16,7 @@
 # You cannot eagerly load an association with a block argument, as the block argument is
 # evaluated in terms of a specific instance of the model, and no specific instance exists.
 #
-# Associations can be a symbol or a hash with symbol keys (for cascaded
+# The arguments can be symbols or hashes with symbol keys (for cascaded
 # eager loading). Examples:
 #
 #  Album.eager(:artist).all
@@ -30,6 +30,7 @@
 #  Artist.eager(:albums=>{:tracks=>:genre}).all
 #  Artist.eager_graph(:albums=>{:tracks=>:genre}).all
 module Sequel::Model::Associations::EagerLoading
+  # Add the .eager! and .eager_graph! mutation methods to the dataset.
   def self.extended(obj)
     obj.def_mutation_method(:eager, :eager_graph)
   end
@@ -88,9 +89,7 @@ module Sequel::Model::Associations::EagerLoading
   # make sure your filters are specific if you have a large database.
   # 
   # This does not respect each association's order, as all associations are loaded in
-  # a single query.  If you want to order the results, which may be necessary if you are
-  # including multiple *_to_many associations and don't want duplicate items in your
-  # associations, you must manually call .order.
+  # a single query.  If you want to order the results, you must manually call .order.
   def eager_graph(*associations)
     model = check_model
     table_name = model.table_name
@@ -113,12 +112,12 @@ module Sequel::Model::Associations::EagerLoading
     # (which would be dependencies of the current association)
     #
     # Arguments:
-    # ds - Current dataset
-    # model - Current Model
-    # ta - table_alias used for the parent association
-    # requirements - an array, used as a stack for requirements
-    # r - association reflection for the current association
-    # *associations - any associations dependent on this one
+    # * ds - Current dataset
+    # * model - Current Model
+    # * ta - table_alias used for the parent association
+    # * requirements - an array, used as a stack for requirements
+    # * r - association reflection for the current association
+    # * *associations - any associations dependent on this one
     def eager_graph_association(ds, model, ta, requirements, r, *associations)
       klass = model.send(:associated_class, r)
       assoc_name = r[:name]
@@ -147,11 +146,11 @@ module Sequel::Model::Associations::EagerLoading
     # Call eager_graph_association on each association.
     #
     # Arguments:
-    # ds - Current dataset
-    # model - Current Model
-    # ta - table_alias used for the parent association
-    # requirements - an array, used as a stack for requirements
-    # *associations - the associations to add to the graph
+    # * ds - Current dataset
+    # * model - Current Model
+    # * ta - table_alias used for the parent association
+    # * requirements - an array, used as a stack for requirements
+    # * *associations - the associations to add to the graph
     def eager_graph_associations(ds, model, ta, requirements, *associations)
       return ds if associations.empty?
       associations.flatten.each do |association|

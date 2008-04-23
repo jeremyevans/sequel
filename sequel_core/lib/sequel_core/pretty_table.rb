@@ -1,13 +1,27 @@
 module Sequel
-  # Prints nice-looking plain-text tables
-  # +--+-------+
-  # |id|name   |
-  # |--+-------|
-  # |1 |fasdfas|
-  # |2 |test   |
-  # +--+-------+
   module PrettyTable
-    def self.records_columns(records)
+    # Prints nice-looking plain-text tables
+    # 
+    #   +--+-------+
+    #   |id|name   |
+    #   |--+-------|
+    #   |1 |fasdfas|
+    #   |2 |test   |
+    #   +--+-------+
+    def self.print(records, columns = nil) # records is an array of hashes
+      columns ||= records_columns(records)
+      sizes = column_sizes(records, columns)
+      
+      puts separator_line(columns, sizes)
+      puts header_line(columns, sizes)
+      puts separator_line(columns, sizes)
+      records.each {|r| puts data_line(columns, sizes, r)}
+      puts separator_line(columns, sizes)
+    end
+  end
+  class << PrettyTable
+    private
+    def records_columns(records)
       columns = []
       records.each do |r|
         if Array === r && (k = r.keys)
@@ -19,7 +33,7 @@ module Sequel
       columns
     end
     
-    def self.column_sizes(records, columns)
+    def column_sizes(records, columns)
       sizes = Hash.new {0}
       columns.each do |c|
         s = c.to_s.size
@@ -34,12 +48,12 @@ module Sequel
       sizes
     end
     
-    def self.separator_line(columns, sizes)
+    def separator_line(columns, sizes)
       l = ''
       '+' + columns.map {|c| '-' * sizes[c]}.join('+') + '+'
     end
     
-    def self.format_cell(size, v)
+    def format_cell(size, v)
       case v
       when Bignum, Fixnum
         "%#{size}d" % v
@@ -50,23 +64,12 @@ module Sequel
       end
     end
     
-    def self.data_line(columns, sizes, record)
+    def data_line(columns, sizes, record)
       '|' + columns.map {|c| format_cell(sizes[c], record[c])}.join('|') + '|'
     end
     
-    def self.header_line(columns, sizes)
+    def header_line(columns, sizes)
       '|' + columns.map {|c| "%-#{sizes[c]}s" % c.to_s}.join('|') + '|'
-    end
-    
-    def self.print(records, columns = nil) # records is an array of hashes
-      columns ||= records_columns(records)
-      sizes = column_sizes(records, columns)
-      
-      puts separator_line(columns, sizes)
-      puts header_line(columns, sizes)
-      puts separator_line(columns, sizes)
-      records.each {|r| puts data_line(columns, sizes, r)}
-      puts separator_line(columns, sizes)
     end
   end
 end

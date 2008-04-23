@@ -271,7 +271,7 @@ module Sequel
     # Sets the value attributes without saving the record.  Returns
     # the values changed.  Raises an error if the keys are not symbols
     # or strings or a string key was passed that was not a valid column.
-    # This is a low level method that not respect virtual attributes.  It
+    # This is a low level method that does not respect virtual attributes.  It
     # should probably be avoided.  Look into using set_with_params instead.
     def set_values(values)
       s = str_columns
