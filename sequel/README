@@ -6,14 +6,24 @@ Model classes are defined as regular Ruby classes:
 
   DB = Sequel.connect('sqlite:/blog.db')
   class Post < Sequel::Model
-    set_dataset DB[:posts]
   end
 
-You can also use the shorthand form:
+Just like in DataMapper or ActiveRecord, Sequel model classes assume that the table name is a plural of the class name:
 
-  DB = Sequel.connect('sqlite:/blog.db')
-  class Post < Sequel::Model
+  Post.table_name #=> :posts
+
+You can, however, explicitly set the table name or even the dataset used:
+
+  class Post < Sequel::Model(:my_posts)
   end
+
+  # or:
+
+  Post.set_dataset :my_posts
+
+  # or:
+
+  Post.set_dataset DB[:my_posts].where(:category => 'ruby')
 
 === Resources
 
@@ -60,7 +70,7 @@ You can also define a model class that does not have a primary key, but then you
 A model instance can also be fetched by specifying a condition:
 
   post = Post[:title => 'hello world']
-  post = Post.find{:num_comments < 10.}
+  post = Post.find{:num_comments < 10}
 
 === Iterating over records
 
