@@ -27,7 +27,6 @@ end
 # gem packaging and release
 ##############################################################################
 desc "Packages up sequel and sequel_core."
-task :default => [:spec_no_cov]
 task :package => [:clean]
 task :doc => [:rdoc]
 
@@ -61,32 +60,22 @@ end
 ##############################################################################
 # rdoc
 ##############################################################################
-RDOC_OPTS = [
-  "--quiet", 
-  "--title", "Sequel: The Database Toolkit for Ruby",
-  "--opname", "index.html",
-  "--line-numbers", 
-  "--main", "sequel/README",
-  "--inline-source"
-]
+RDOC_OPTS = ["--quiet", "--line-numbers", "--inline-source"]
 
 Rake::RDocTask.new do |rdoc|
-  rdoc.rdoc_dir = "sequel/doc/rdoc"
+  rdoc.rdoc_dir = "doc/rdoc"
   rdoc.options += RDOC_OPTS
-  rdoc.main = "sequel/README"
+  rdoc.main = "sequel_core/README"
   rdoc.title = "Sequel: The Database Toolkit for Ruby"
-  rdoc.rdoc_files.add ["sequel/README", "sequel/COPYING", 
-    "sequel_core/lib/sequel_core.rb", "sequel_core/lib/**/*.rb",
-    "sequel/lib/sequel_model.rb", "sequel/lib/**/*.rb",
-  ]
+  rdoc.rdoc_files.add ["sequel*/README", "sequel*/COPYING", "sequel*/lib/**/*.rb"]
 end
 
 task :doc_rforge => [:doc]
 
 desc "Update docs and upload to rubyforge.org"
 task :doc_rforge do
-  sh %{chmod -R g+w sequel/doc/rdoc/*}
-  sh %{scp -rp sequel/doc/rdoc/* rubyforge.org:/var/www/gforge-projects/sequel}
+  sh %{chmod -R g+w doc/rdoc/*}
+  sh %{scp -rp doc/rdoc/* rubyforge.org:/var/www/gforge-projects/sequel}
 end
 
 ##############################################################################
@@ -106,6 +95,7 @@ Spec::Rake::SpecTask.new("spec") do |t|
 end
 
 desc "Run specs without coverage"
+task :default => [:spec_no_cov]
 Spec::Rake::SpecTask.new("spec_no_cov") do |t|
   fixRUBYLIB.call
   t.spec_files = FileList["sequel_core/spec/*_spec.rb", "sequel/spec/*_spec.rb"]

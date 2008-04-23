@@ -11,14 +11,7 @@ include FileUtils
 NAME = "sequel_core"
 VERS = "1.4.0"
 CLEAN.include ["**/.*.sw?", "pkg/*", ".config", "doc/*", "coverage/*"]
-RDOC_OPTS = [
-  "--quiet", 
-  "--title", "Sequel: The Database Toolkit for Ruby",
-  "--opname", "index.html",
-  "--line-numbers", 
-  "--main", "README",
-  "--inline-source"
-]
+RDOC_OPTS = ["--quiet", "--line-numbers", "--inline-source"]
 
 ##############################################################################
 # RDoc
@@ -29,15 +22,14 @@ Rake::RDocTask.new do |rdoc|
   rdoc.rdoc_dir = "doc/rdoc"
   rdoc.options += RDOC_OPTS
   rdoc.main = "README"
-  rdoc.title = "Sequel: The Database Toolkit for Ruby"
-  rdoc.rdoc_files.add ["README", "COPYING", "lib/sequel_core.rb", "lib/**/*.rb"]
+  rdoc.title = "Sequel: The Database Toolkit for Ruby: Core Library and Adapters"
+  rdoc.rdoc_files.add ["README", "COPYING", "lib/**/*.rb"]
 end
 
 ##############################################################################
 # Gem packaging
 ##############################################################################
 desc "Packages up Sequel."
-task :default => [:spec_no_cov]
 task :package => [:clean]
 
 spec = Gem::Specification.new do |s|
@@ -116,6 +108,7 @@ Spec::Rake::SpecTask.new("spec") do |t|
 end
 
 desc "Run specs without coverage"
+task :default => [:spec_no_cov]
 Spec::Rake::SpecTask.new("spec_no_cov") do |t|
   t.spec_files = FileList["spec/*_spec.rb"]
   t.spec_opts  = File.read("spec/spec.opts").split("\n")
