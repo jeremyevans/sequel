@@ -51,7 +51,7 @@ module Sequel
       end
       
       def expression_list(*args, &block)
-        schema_utility_dataset.expression_list(*args, &block)
+        schema_utility_dataset.send(:expression_list, *args, &block)
       end
 
       def column_definition_sql(column)

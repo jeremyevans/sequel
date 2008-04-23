@@ -161,7 +161,7 @@ module Sequel
         end
         parenthesize ? "(#{fmt})" : fmt
       end
-      private :qualified_column_name, :column_list, :table_ref, :source_list
+      private :qualified_column_name, :column_list, :table_ref, :source_list, :expression_list
 
       # Returns a copy of the dataset with the source changed.
       def from(*source)

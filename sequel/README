@@ -164,7 +164,7 @@ Or lists of values:
 
   my_posts = posts.filter(:category => ['ruby', 'postgres', 'linux'])
   
-Sequel now also accepts expressions as closures, AKA block filters:
+If ParseTree is installed, Sequel also accepts expressions as closures, AKA block filters:
 
   my_posts = posts.filter {:category == ['ruby', 'postgres', 'linux']}
   
@@ -250,3 +250,14 @@ Which is equivalent to the SQL:
   ON order_items.item_id = items.id
   WHERE order_items.order_id = 1234
   
+=== Graphing Datasets
+
+When retrieving records from joined datasets, you get the results in a single hash, which is subject to clobbering:
+
+  DB[:items].join(:order_items, :item_id => :id).first
+  => {:id=>(could be items.id or order_items.id), :item_id=>order_items.order_id}
+
+Using graph, you can split the resulting dataset into separate hashes:
+
+  DB[:items].graph(:order_items, :item_id => :id).first
+  => {:items->{:id=>items.id}, :order_items=>{:id=>order_items.id, :item_id=>order_items.item_id}}

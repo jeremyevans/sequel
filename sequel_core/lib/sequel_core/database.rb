@@ -358,18 +358,21 @@ module Sequel
 
     @@adapters = Hash.new
     
-    # Sets the adapter scheme for the Database class. Call this method in
-    # descendnants of Database to allow connection using a URL. For example the
-    # following:
-    #   class DB2::Database < Sequel::Database
-    #     set_adapter_scheme :db2
-    #     ...
-    #   end
-    # would allow connection using:
-    #   Sequel.open('db2://user:password@dbserver/mydb')
-    def self.set_adapter_scheme(scheme)
-      @scheme = scheme
-      @@adapters[scheme.to_sym] = self
+    class << self
+    private
+      # Sets the adapter scheme for the Database class. Call this method in
+      # descendnants of Database to allow connection using a URL. For example the
+      # following:
+      #   class DB2::Database < Sequel::Database
+      #     set_adapter_scheme :db2
+      #     ...
+      #   end
+      # would allow connection using:
+      #   Sequel.open('db2://user:password@dbserver/mydb')
+      def set_adapter_scheme(scheme)
+        @scheme = scheme
+        @@adapters[scheme.to_sym] = self
+      end
     end
     
     # Returns the scheme for the Database class.
