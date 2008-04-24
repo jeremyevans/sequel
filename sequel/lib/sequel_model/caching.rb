@@ -32,9 +32,9 @@ module Sequel
         obj
       end
       
-      class_def(:update_values) {|v| store.delete(cache_key); super}
-      class_def(:save) {store.delete(cache_key) unless new?; super}
-      class_def(:delete) {store.delete(cache_key); super}
+      class_def(:update_values) {|v| store.delete(cache_key) rescue nil; super}
+      class_def(:save) {unless new?; store.delete(cache_key) rescue nil; end; super}
+      class_def(:delete) {store.delete(cache_key) rescue nil; super}
     end
     
     def self.set_cache_ttl(ttl)
