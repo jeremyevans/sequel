@@ -8,9 +8,9 @@ module Sequel
     #
     #   # CREATE TABLE artists (id INTEGER, name TEXT);
     #   # CREATE TABLE albums (id INTEGER, name TEXT, artist_id INTEGER);
-    #   DB[:artists].left_outer_join(:albums, :id=>:artist_id).first
+    #   DB[:artists].left_outer_join(:albums, :artist_id=>:id).first
     #   => {:id=>(albums.id||artists.id), :name=>(albums.name||artist.names), :artist_id=>albums.artist_id}
-    #   DB[:artists].graph(:albums, :id=>:artist_id).first
+    #   DB[:artists].graph(:albums, :artist_id=>:id).first
     #   => {:artists=>{:id=>artists.id, :name=>artists.name}, :albums=>{:id=>albums.id, :name=>albums.name, :artist_id=>albums.artist_id}}
     #
     # Using a join such as left_outer_join, the attribute names that are shared between
@@ -139,7 +139,7 @@ module Sequel
     # graphed dataset, and must be used instead of .select whenever
     # graphing is used. Example:
     #
-    #   DB[:artists].graph(:albums, :id=>:artist_id).set_graph_aliases(:artist_name=>[:artists, :name], :album_name=>[:albums, :name]).first
+    #   DB[:artists].graph(:albums, :artist_id=>:id).set_graph_aliases(:artist_name=>[:artists, :name], :album_name=>[:albums, :name]).first
     #   => {:artists=>{:name=>artists.name}, :albums=>{:name=>albums.name}}
     #
     # Arguments:
