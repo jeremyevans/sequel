@@ -1,5 +1,7 @@
 === HEAD
 
+* Alias Model#dataset= to Model#set_dataset (tmm1)
+
 * Add support for caching with the Memcached client, which returns Memcached::NotFound instead of nil (tmm1)
 
 * Make some Model class methods private: def_hook_method, hooks, add_hook, plugin_module, plugin_gem (jeremyevans)

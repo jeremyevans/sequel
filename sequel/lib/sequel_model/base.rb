@@ -86,6 +86,7 @@ module Sequel
       rescue StandardError
       end
     end
+    class << self; alias :dataset= :set_dataset; end
 
     class << self
       private
