@@ -1,5 +1,7 @@
 === HEAD
 
+* Add support for caching with the Memcached client, which returns Memcached::NotFound instead of nil (tmm1)
+
 * Make some Model class methods private: def_hook_method, hooks, add_hook, plugin_module, plugin_gem (jeremyevans)
 
 * Add the eager! and eager_graph! mutation methods to model datasets (jeremyevans)

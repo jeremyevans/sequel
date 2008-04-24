@@ -1,4 +1,10 @@
 module Sequel
+  class Error
+    class CacheNotFound < Error; end
+  end
+end
+
+module Sequel
   class Model
     def self.set_cache(store, opts = {})
       @cache_store = store
@@ -11,10 +17,18 @@ module Sequel
           return dataset[h]
         end
         
-        unless obj = @cache_store.get(cache_key_from_values(args))
-          obj = dataset[primary_key_hash((args.size == 1) ? args.first : args)]
-          @cache_store.set(cache_key_from_values(args), obj, cache_ttl)
+        begin
+          obj = @cache_store.get(cache_key_from_values(args))
+          raise Sequel::Error::CacheNotFound unless obj
+        rescue Exception => e
+          if e.is_a?(Sequel::Error::CacheNotFound) or (defined?(Memcached) and e.is_a?(Memcached::NotFound))
+            obj = dataset[primary_key_hash((args.size == 1) ? args.first : args)]
+            @cache_store.set(cache_key_from_values(args), obj, cache_ttl)
+          else
+            raise
+          end
         end
+
         obj
       end
       
