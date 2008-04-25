@@ -67,6 +67,16 @@ module Validation
       @errors.clear
     end
     
+    # Returns size of errors array
+    def size
+      @errors.size
+    end
+    
+    # Iterates over errors
+    def each(&block)
+      @errors.each(&block)
+    end
+    
     # Returns the errors for the given attribute.
     def on(att)
       @errors[att]
@@ -266,7 +276,7 @@ module Validation
       }.merge!(atts.extract_options!)
 
       validates_each(*atts) do |o, a, v|
-        o.errors[a] << opts[:message] unless v && !v.blank? && !o.class[a => v]
+        o.errors[a] << opts[:message] unless v && !v.blank? && !o.filter[a => v].count.zero?
       end
     end
   end
