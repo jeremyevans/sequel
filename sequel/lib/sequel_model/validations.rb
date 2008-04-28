@@ -276,7 +276,25 @@ module Validation
       }.merge!(atts.extract_options!)
 
       validates_each(*atts) do |o, a, v|
-        o.errors[a] << opts[:message] unless v && !v.blank? && !o.filter[a => v].count.zero?
+        next if v.blank? 
+        num_dups = o.class.filter(a => v).count
+        allow = if num_dups == 0
+          # No unique value in the database
+          true
+        elsif num_dups > 1
+          # Multiple "unique" values in the database!!
+          # Someone didn't add a unique index
+          false
+        elsif o.new?
+          # New record, but unique value already exists in the database
+          false
+        elsif o.class[a => v].pk == o.pk
+          # Unique value exists in database, but for the same record, so the update won't cause a duplicate record
+          true
+        else
+          false
+        end
+        o.errors[a] << opts[:message] unless allow
       end
     end
   end

@@ -501,19 +501,40 @@ describe Sequel::Model, "Validations" do
     User.dataset.extend(Module.new {
       def fetch_rows(sql)
         @db << sql
-         
-        if sql == "SELECT * FROM users WHERE (username = 'willy') LIMIT 1" then
-          yield({:id => 1, :username => "willy", :password => "test"})
+        
+        case sql
+        when /COUNT.*username = '0records'/
+        when /COUNT.*username = '2records'/
+          yield({:v => 2})
+        when /COUNT.*username = '1record'/
+          yield({:v => 1})
+        when /username = '1record'/
+          yield({:id => 3, :username => "1record", :password => "test"})
         end
       end
     })
     
-    @user = User.new(:username => "willy", :password => "anothertest")
+    @user = User.new(:username => "2records", :password => "anothertest")
     @user.should_not be_valid
     @user.errors.full_messages.should == ['username is already taken']
 
-    @user.username = "pinky"
+    @user = User.new(:username => "1record", :password => "anothertest")
+    @user.should_not be_valid
+    @user.errors.full_messages.should == ['username is already taken']
+
+    @user = User.new(:id=>4, :username => "1record", :password => "anothertest")
+    @user.instance_variable_set(:@new, false)
+    @user.should_not be_valid
+    @user.errors.full_messages.should == ['username is already taken']
+
+    @user = User.new(:id=>3, :username => "1record", :password => "anothertest")
+    @user.instance_variable_set(:@new, false)
     @user.should be_valid
+    @user.errors.full_messages.should == []
+
+    @user = User.new(:username => "0records", :password => "anothertest")
+    @user.should be_valid
+    @user.errors.full_messages.should == []
   end
   
   it "should have a validates block that contains multiple validations" do
