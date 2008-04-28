@@ -21,8 +21,7 @@ module Sequel
           obj = @cache_store.get(cache_key_from_values(args))
           raise Sequel::Error::CacheNotFound unless obj
         rescue Exception => e
-          if e.is_a? Sequel::Error::CacheNotFound or
-            (defined? Memcached and e.is_a? Memcached::NotFound)
+          if e.is_a?(Sequel::Error::CacheNotFound) or (defined?(Memcached) and e.is_a?(Memcached::NotFound))
             obj = dataset[primary_key_hash((args.size == 1) ? args.first : args)]
             @cache_store.set(cache_key_from_values(args), obj, cache_ttl)
           else
@@ -32,7 +31,7 @@ module Sequel
 
         obj
       end
-
+      
       class_def(:update_values){|v| self.class.cache_del(cache_key); super }
       class_def(:save){ self.class.cache_del(cache_key) unless new?; super }
       class_def(:delete){ self.class.cache_del(cache_key); super }
@@ -54,7 +53,7 @@ module Sequel
       begin
         cache_store.delete(key)
       rescue Exception => e
-        raise unless defined? Memcached and e.is_a? Memcached::NotFound
+        raise unless defined?(Memcached) and e.is_a?(Memcached::NotFound)
       end
     end
     
