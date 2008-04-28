@@ -32,9 +32,9 @@ module Sequel
         obj
       end
       
-      class_def(:update_values){|v| self.class.cache_del(cache_key); super }
-      class_def(:save){ self.class.cache_del(cache_key) unless new?; super }
-      class_def(:delete){ self.class.cache_del(cache_key); super }
+      class_def(:update_values) {|v| store.delete(cache_key) rescue nil; super}
+      class_def(:save) {unless new?; store.delete(cache_key) rescue nil; end; super}
+      class_def(:delete) {store.delete(cache_key) rescue nil; super}
     end
     
     def self.set_cache_ttl(ttl)
@@ -47,14 +47,6 @@ module Sequel
     
     def self.cache_ttl
       @cache_ttl ||= 3600
-    end
-
-    def self.cache_del key
-      begin
-        cache_store.delete(key)
-      rescue Exception => e
-        raise unless defined?(Memcached) and e.is_a?(Memcached::NotFound)
-      end
     end
     
     def self.cache_key_from_values(values)
