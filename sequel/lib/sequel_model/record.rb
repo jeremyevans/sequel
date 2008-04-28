@@ -150,11 +150,19 @@ module Sequel
     # Updates the instance with the supplied values with support for virtual
     # attributes, ignoring any values for which no setter method is available.
     # Does not save the record.
+    #
+    # If no columns have been set for this model (very unlikely), assume symbol
+    # keys are valid column names, and assign the column value based on that.
     def set_with_params(hash)
+      columns_not_set = !model.instance_variable_get(:@columns)
       meths = setter_methods
       hash.each do |k,v|
         m = "#{k}="
-        send(m, v) if meths.include?(m)
+        if meths.include?(m)
+          send(m, v)
+        elsif columns_not_set && (Symbol === k)
+          self[k] = v
+        end
       end
     end
 
