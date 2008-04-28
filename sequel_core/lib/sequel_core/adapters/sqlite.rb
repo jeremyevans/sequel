@@ -144,7 +144,7 @@ module Sequel
 
       def insert_sql(*values)
         if (values.size == 1) && values.first.is_a?(Sequel::Dataset)
-          "INSERT INTO #{@opts[:from]} #{values.first.sql};"
+          "INSERT INTO #{source_list(@opts[:from])} #{values.first.sql};"
         else
           super(*values)
         end

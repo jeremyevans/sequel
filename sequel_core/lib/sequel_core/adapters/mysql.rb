@@ -311,7 +311,7 @@ module Sequel
       end
 
       def insert_default_values_sql
-        "INSERT INTO #{@opts[:from]} () VALUES ()"
+        "INSERT INTO #{source_list(@opts[:from])} () VALUES ()"
       end
 
       def match_expr(l, r)
@@ -416,8 +416,9 @@ module Sequel
       end
       
       def replace_sql(*values)
+        from = source_list(@opts[:from])
         if values.empty?
-          "REPLACE INTO #{@opts[:from]} DEFAULT VALUES"
+          "REPLACE INTO #{from} DEFAULT VALUES"
         else
           values = values[0] if values.size == 1
           
@@ -429,29 +430,29 @@ module Sequel
           case values
           when Array
             if values.empty?
-              "REPLACE INTO #{@opts[:from]} DEFAULT VALUES"
+              "REPLACE INTO #{from} DEFAULT VALUES"
             elsif values.keys
               fl = values.keys.map {|f| literal(f.is_a?(String) ? f.to_sym : f)}
               vl = values.values.map {|v| literal(v)}
-              "REPLACE INTO #{@opts[:from]} (#{fl.join(COMMA_SEPARATOR)}) VALUES (#{vl.join(COMMA_SEPARATOR)})"
+              "REPLACE INTO #{from} (#{fl.join(COMMA_SEPARATOR)}) VALUES (#{vl.join(COMMA_SEPARATOR)})"
             else
-              "REPLACE INTO #{@opts[:from]} VALUES (#{literal(values)})"
+              "REPLACE INTO #{from} VALUES (#{literal(values)})"
             end
           when Hash
             if values.empty?
-              "REPLACE INTO #{@opts[:from]} DEFAULT VALUES"
+              "REPLACE INTO #{from} DEFAULT VALUES"
             else
               fl, vl = [], []
               values.each {|k, v| fl << literal(k.is_a?(String) ? k.to_sym : k); vl << literal(v)}
-              "REPLACE INTO #{@opts[:from]} (#{fl.join(COMMA_SEPARATOR)}) VALUES (#{vl.join(COMMA_SEPARATOR)})"
+              "REPLACE INTO #{from} (#{fl.join(COMMA_SEPARATOR)}) VALUES (#{vl.join(COMMA_SEPARATOR)})"
             end
           when Dataset
-            "REPLACE INTO #{@opts[:from]} #{literal(values)}"
+            "REPLACE INTO #{from} #{literal(values)}"
           else
             if values.respond_to?(:values)
               replace_sql(values.values)
             else  
-              "REPLACE INTO #{@opts[:from]} VALUES (#{literal(values)})"
+              "REPLACE INTO #{from} VALUES (#{literal(values)})"
             end
           end
         end
@@ -499,7 +500,7 @@ module Sequel
       def multi_insert_sql(columns, values)
         columns = literal(columns)
         values = values.map {|r| "(#{literal(r)})"}.join(COMMA_SEPARATOR)
-        ["INSERT INTO #{@opts[:from]} (#{columns}) VALUES #{values}"]
+        ["INSERT INTO #{source_list(@opts[:from])} (#{columns}) VALUES #{values}"]
       end
     end
   end

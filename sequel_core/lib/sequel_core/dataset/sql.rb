@@ -533,7 +533,7 @@ module Sequel
 
       # Returns the SQL for formatting an insert statement with default values
       def insert_default_values_sql
-        "INSERT INTO #{@opts[:from]} DEFAULT VALUES"
+        "INSERT INTO #{source_list(@opts[:from])} DEFAULT VALUES"
       end
 
       # Formats an INSERT statement using the given values. If a hash is given,
@@ -554,13 +554,14 @@ module Sequel
           if @transform && (values.is_a?(Hash) || (values.is_a?(Array) && values.keys))
             values = transform_save(values)
           end
+          from = source_list(@opts[:from])
 
           case values
           when Array
             if values.empty?
               insert_default_values_sql
             else
-              "INSERT INTO #{@opts[:from]} VALUES (#{literal(values)})"
+              "INSERT INTO #{from} VALUES (#{literal(values)})"
             end
           when Hash
             if values.empty?
@@ -568,15 +569,15 @@ module Sequel
             else
               fl, vl = [], []
               values.each {|k, v| fl << literal(k.is_a?(String) ? k.to_sym : k); vl << literal(v)}
-              "INSERT INTO #{@opts[:from]} (#{fl.join(COMMA_SEPARATOR)}) VALUES (#{vl.join(COMMA_SEPARATOR)})"
+              "INSERT INTO #{from} (#{fl.join(COMMA_SEPARATOR)}) VALUES (#{vl.join(COMMA_SEPARATOR)})"
             end
           when Dataset
-            "INSERT INTO #{@opts[:from]} #{literal(values)}"
+            "INSERT INTO #{from} #{literal(values)}"
           else
             if values.respond_to?(:values)
               insert_sql(values.values)
             else
-              "INSERT INTO #{@opts[:from]} VALUES (#{literal(values)})"
+              "INSERT INTO #{from} VALUES (#{literal(values)})"
             end
           end
         end
@@ -608,7 +609,7 @@ module Sequel
           raise Error::InvalidOperation, "A joined dataset cannot be updated"
         end
         
-        sql = "UPDATE #{@opts[:from]} SET "
+        sql = "UPDATE #{source_list(@opts[:from])} SET "
         if block
           sql << block.to_sql(self, :comma_separated => true)
         else
@@ -648,7 +649,7 @@ module Sequel
           raise Error::InvalidOperation, "Joined datasets cannot be deleted from"
         end
 
-        sql = "DELETE FROM #{opts[:from]}"
+        sql = "DELETE FROM #{source_list(opts[:from])}"
 
         if where = opts[:where]
           sql << " WHERE #{where}"
