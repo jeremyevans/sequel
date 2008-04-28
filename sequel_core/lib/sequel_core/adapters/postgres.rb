@@ -443,7 +443,7 @@ module Sequel
     
       # Locks the table with the specified mode.
       def lock(mode, &block)
-        sql = LOCK % [@opts[:from], mode]
+        sql = LOCK % [source_list(@opts[:from]), mode]
         @db.synchronize do
           if block # perform locking inside a transaction and yield to block
             @db.transaction {@db.execute(sql); yield}
@@ -460,11 +460,11 @@ module Sequel
         # postgresql 8.2 introduces support for insert
         columns = literal(columns)
         values = values.map {|r| "(#{literal(r)})"}.join(COMMA_SEPARATOR)
-        ["INSERT INTO #{@opts[:from]} (#{columns}) VALUES #{values}"]
+        ["INSERT INTO #{source_list(@opts[:from])} (#{columns}) VALUES #{values}"]
       end
 
       def insert(*values)
-        @db.execute_insert(insert_sql(*values), @opts[:from],
+        @db.execute_insert(insert_sql(*values), source_list(@opts[:from]),
           values.size == 1 ? values.first : values)
       end
     

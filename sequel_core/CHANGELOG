@@ -1,5 +1,7 @@
 === HEAD
 
+* Set a timeout in the Sqlite adapter, default to 5 seconds (hrvoje.marjanovic) (#218)
+
 * Document that calling Sequel::ODBC::Database#execute manually requires you to manually drop the returned object (jeremyevans) (#217)
 
 * Paginating an already paginated/limited dataset now raises an error (jeremyevans)
