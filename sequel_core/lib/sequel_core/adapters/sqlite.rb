@@ -14,6 +14,7 @@ module Sequel
           @opts[:database] = ':memory:'
         end
         db = ::SQLite3::Database.new(@opts[:database])
+        db.busy_timeout(@opts.fetch(:timeout, 5000))
         db.type_translation = true
         # fix for timestamp translation
         db.translator.add_translator("timestamp") do |t, v|
