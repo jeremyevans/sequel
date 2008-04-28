@@ -340,6 +340,7 @@ describe Sequel::Model, "set_with_params" do
     @c = Class.new(Sequel::Model(:items)) do
       columns :x, :y, :id
     end
+    @c.instance_variable_set(:@columns, true)
     @o1 = @c.new
     @o2 = @c.load(:id => 5)
   end
@@ -383,6 +384,7 @@ describe Sequel::Model, "update_with_params" do
     @c = Class.new(Sequel::Model(:items)) do
       columns :x, :y, :id
     end
+    @c.instance_variable_set(:@columns, true)
     @o1 = @c.new
     @o2 = @c.load(:id => 5)
   end
@@ -422,6 +424,7 @@ describe Sequel::Model, "create_with_params" do
     @c = Class.new(Sequel::Model(:items)) do
       columns :x, :y
     end
+    @c.instance_variable_set(:@columns, true)
   end
   
   it "should filter the given params using the model columns" do
