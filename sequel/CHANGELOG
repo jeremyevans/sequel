@@ -1,5 +1,7 @@
 === HEAD
 
+* Make the validation errors API compatible with Merb (Inviz)
+
 * Add validates_uniqueness_of, for protecting against duplicate entries in the database (neaf, jeremyevans)
 
 * Alias Model#dataset= to Model#set_dataset (tmm1)
