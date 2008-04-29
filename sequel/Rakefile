@@ -9,8 +9,8 @@ include FileUtils
 # Configuration
 ##############################################################################
 NAME = "sequel"
-VERS = "1.4.0"
-SEQUEL_CORE_VERS= "1.4.0"
+VERS = "1.5.0"
+SEQUEL_CORE_VERS= "1.5.0"
 CLEAN.include ["**/.*.sw?", "pkg/*", ".config", "doc/*", "coverage/*"]
 RDOC_OPTS = ["--quiet", "--line-numbers", "--inline-source"]
 
