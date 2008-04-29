@@ -227,6 +227,9 @@ Associations can be eagerly loaded via .eager and the :eager association option.
 
   # Eager loading via .eager
   Post.eager(:person).all
+
+  # eager is a dataset method, so it works with filters/orders/limits/etc.
+  Post.filter("topic > 'M'").order(:date).limit(5).eager(:person).all
   
   person = Person.first
   # Eager loading via :eager (will eagerly load the tags for this person's posts)

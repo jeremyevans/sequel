@@ -58,7 +58,8 @@ module Sequel::Model::Associations::EagerLoading
   # need to filter based on columns in associated tables, look at .eager_graph
   # or join the tables you need to filter on manually. 
   #
-  # Each association's order, if definied, is respected.
+  # Each association's order, if definied, is respected. Eager also works
+  # on a limited dataset.
   def eager(*associations)
     model = check_model
     opt = @opts[:eager]
@@ -90,6 +91,9 @@ module Sequel::Model::Associations::EagerLoading
   # 
   # This does not respect each association's order, as all associations are loaded in
   # a single query.  If you want to order the results, you must manually call .order.
+  #
+  # eager_graph probably won't work the way you suspect with limit, unless you are
+  # only graphing many_to_one associations.
   def eager_graph(*associations)
     model = check_model
     table_name = model.table_name
