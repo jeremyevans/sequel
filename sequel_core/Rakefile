@@ -16,8 +16,6 @@ RDOC_OPTS = ["--quiet", "--line-numbers", "--inline-source"]
 ##############################################################################
 # RDoc
 ##############################################################################
-task :doc => [:rdoc]
-
 Rake::RDocTask.new do |rdoc|
   rdoc.rdoc_dir = "doc/rdoc"
   rdoc.options += RDOC_OPTS
@@ -71,16 +69,19 @@ end
 ##############################################################################
 # installation & removal
 ##############################################################################
+desc "Install sequel_core gem"
 task :install do
   sh %{rake package}
   sh %{sudo gem install pkg/#{NAME}-#{VERS}}
 end
 
+desc "Install sequel_core gem without docs"
 task :install_no_docs do
   sh %{rake package}
   sh %{sudo gem install pkg/#{NAME}-#{VERS} --no-rdoc --no-ri}
 end
 
+desc "Uninstall sequel_core gem"
 task :uninstall => [:clean] do
   sh %{sudo gem uninstall #{NAME}}
 end
@@ -88,6 +89,7 @@ end
 ##############################################################################
 # gem and rdoc release
 ##############################################################################
+desc "Upload sequel_core gem to rubyforge"
 task :release => [:package] do
   sh %{rubyforge login}
   sh %{rubyforge add_release sequel #{NAME} #{VERS} pkg/#{NAME}-#{VERS}.tgz}
