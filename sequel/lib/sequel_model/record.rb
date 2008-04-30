@@ -2,127 +2,9 @@ module Sequel
   class Model
     alias_method :model, :class
 
-    attr_reader :values
-    attr_reader :changed_columns
+    attr_reader :changed_columns, :values
 
     class_attr_reader :db, :dataset, :columns, :str_columns, :primary_key
-    
-    # Returns a string representation of the model instance including
-    # the class name and values.
-    def inspect
-      "#<%s @values=%s>" % [model.name, @values.inspect]
-    end
-
-    # Returns value of attribute.
-    def [](column)
-      @values[column]
-    end
-    # Sets value of attribute and marks the column as changed.
-    def []=(column, value)
-      # If it is new, it doesn't have a value yet, so we should
-      # definitely set the new value.
-      # If the column isn't in @values, we can't assume it is
-      # NULL in the database, so assume it has changed.
-      if new? || !@values.include?(column) || value != @values[column]
-        @changed_columns << column unless @changed_columns.include?(column)
-        @values[column] = value
-      end
-    end
-
-    # Enumerates through all attributes.
-    #
-    # === Example:
-    #   Ticket.find(7).each { |k, v| puts "#{k} => #{v}" }
-    def each(&block)
-      @values.each(&block)
-    end
-    # Returns attribute names.
-    def keys
-      @values.keys
-    end
-
-    # Returns value for <tt>:id</tt> attribute.
-    def id
-      @values[:id]
-    end
-
-    # Compares model instances by values.
-    def ==(obj)
-      (obj.class == model) && (obj.values == @values)
-    end
-    alias_method :eql?, :"=="
-
-    # If pk is not nil, true only if the objects have the same class and pk.
-    # If pk is nil, false.
-    def ===(obj)
-      pk.nil? ? false : (obj.class == model) && (obj.pk == pk)
-    end
-
-    # Unique for objects with the same class and pk (if pk is not nil), or
-    # the same class and values (if pk is nil).
-    def hash
-      [model, pk.nil? ? @values.sort_by{|k,v| k.to_s} : pk].hash
-    end
-
-    # Updates the instance with the supplied values with support for virtual
-    # attributes, ignoring any values for which no setter method is available.
-    # Does not save the record.
-    #
-    # If no columns have been set for this model (very unlikely), assume symbol
-    # keys are valid column names, and assign the column value based on that.
-    def set_with_params(hash)
-      columns_not_set = !model.instance_variable_get(:@columns)
-      meths = setter_methods
-      hash.each do |k,v|
-        m = "#{k}="
-        if meths.include?(m)
-          send(m, v)
-        elsif columns_not_set && (Symbol === k)
-          self[k] = v
-        end
-      end
-    end
-
-    # Runs set_with_params and saves the changes (which runs any callback methods).
-    def update_with_params(values)
-      set_with_params(values)
-      save_changes
-    end
-
-    # Returns (naked) dataset bound to current instance.
-    def this
-      @this ||= dataset.filter(pk_hash).limit(1).naked
-    end
-    
-    # Returns a key unique to the underlying record for caching
-    def cache_key
-      raise(Error, "No primary key is associated with this model") unless key = primary_key
-      pk = case key
-      when Array
-        key.collect{|k| @values[k]}.join(',')
-      else
-        @values[key] || (raise Error, 'no primary key for this record')
-      end
-      "#{model}:#{pk}"
-    end
-
-    # Returns the primary key value identifying the model instance. If the
-    # model's primary key is changed (using #set_primary_key or #no_primary_key)
-    # this method is redefined accordingly.
-    def pk
-      raise(Error, "No primary key is associated with this model") unless key = primary_key
-      case key
-      when Array
-        key.collect{|k| @values[k]}
-      else
-        @values[key]
-      end
-    end
-    
-    # Returns a hash identifying the model instance. Stock implementation.
-    def pk_hash
-      model.primary_key_hash(pk)
-    end
     
     # Creates new instance with values set to passed-in Hash.
     #
@@ -145,16 +27,132 @@ module Sequel
       after_initialize
     end
     
-    # Returns true if the current instance represents a new record.
-    def new?
-      @new
+    # Returns value of attribute.
+    def [](column)
+      @values[column]
+    end
+
+    # Sets value of attribute and marks the column as changed.
+    def []=(column, value)
+      # If it is new, it doesn't have a value yet, so we should
+      # definitely set the new value.
+      # If the column isn't in @values, we can't assume it is
+      # NULL in the database, so assume it has changed.
+      if new? || !@values.include?(column) || value != @values[column]
+        @changed_columns << column unless @changed_columns.include?(column)
+        @values[column] = value
+      end
+    end
+
+    # Compares model instances by values.
+    def ==(obj)
+      (obj.class == model) && (obj.values == @values)
+    end
+    alias_method :eql?, :"=="
+
+    # If pk is not nil, true only if the objects have the same class and pk.
+    # If pk is nil, false.
+    def ===(obj)
+      pk.nil? ? false : (obj.class == model) && (obj.pk == pk)
+    end
+
+    # Returns a key unique to the underlying record for caching
+    def cache_key
+      raise(Error, "No primary key is associated with this model") unless key = primary_key
+      pk = case key
+      when Array
+        key.collect{|k| @values[k]}.join(',')
+      else
+        @values[key] || (raise Error, 'no primary key for this record')
+      end
+      "#{model}:#{pk}"
+    end
+
+    # Deletes and returns self.  Does not run callbacks.
+    # Look into using destroy instead.
+    def delete
+      this.delete
+      self
     end
     
+    # Like delete but runs hooks before and after delete.
+    def destroy
+      db.transaction do
+        before_destroy
+        delete
+        after_destroy
+      end
+      self
+    end
+    
+    # Enumerates through all attributes.
+    #
+    # === Example:
+    #   Ticket.find(7).each { |k, v| puts "#{k} => #{v}" }
+    def each(&block)
+      @values.each(&block)
+    end
+
     # Returns true when current instance exists, false otherwise.
     def exists?
       this.count > 0
     end
     
+    # Unique for objects with the same class and pk (if pk is not nil), or
+    # the same class and values (if pk is nil).
+    def hash
+      [model, pk.nil? ? @values.sort_by{|k,v| k.to_s} : pk].hash
+    end
+
+    # Returns value for <tt>:id</tt> attribute.
+    def id
+      @values[:id]
+    end
+
+    # Returns a string representation of the model instance including
+    # the class name and values.
+    def inspect
+      "#<%s @values=%s>" % [model.name, @values.inspect]
+    end
+
+    # Returns attribute names.
+    def keys
+      @values.keys
+    end
+
+    # Returns true if the current instance represents a new record.
+    def new?
+      @new
+    end
+    
+    # Returns the primary key value identifying the model instance. If the
+    # model's primary key is changed (using #set_primary_key or #no_primary_key)
+    # this method is redefined accordingly.
+    def pk
+      raise(Error, "No primary key is associated with this model") unless key = primary_key
+      case key
+      when Array
+        key.collect{|k| @values[k]}
+      else
+        @values[key]
+      end
+    end
+    
+    # Returns a hash identifying the model instance. Stock implementation.
+    def pk_hash
+      model.primary_key_hash(pk)
+    end
+    
+    # Reloads values from database and returns self.
+    def refresh
+      @values = this.first || raise(Error, "Record not found")
+      model.all_association_reflections.each do |r|
+        instance_variable_set("@#{r[:name]}", nil)
+      end
+      self
+    end
+    alias_method :reload, :refresh
+
     # Creates or updates the associated record. This method can also
     # accept a list of specific columns to update.
     def save(*columns)
@@ -221,6 +219,30 @@ module Sequel
       vals
     end
 
+    # Updates the instance with the supplied values with support for virtual
+    # attributes, ignoring any values for which no setter method is available.
+    # Does not save the record.
+    #
+    # If no columns have been set for this model (very unlikely), assume symbol
+    # keys are valid column names, and assign the column value based on that.
+    def set_with_params(hash)
+      columns_not_set = !model.instance_variable_get(:@columns)
+      meths = setter_methods
+      hash.each do |k,v|
+        m = "#{k}="
+        if meths.include?(m)
+          send(m, v)
+        elsif columns_not_set && (Symbol === k)
+          self[k] = v
+        end
+      end
+    end
+
+    # Returns (naked) dataset bound to current instance.
+    def this
+      @this ||= dataset.filter(pk_hash).limit(1).naked
+    end
+    
     # Sets the values attributes with set_values and then updates
     # the record in the database using those values.  This is a
     # low level method that does not run the usual save callbacks.
@@ -229,33 +251,12 @@ module Sequel
       this.update(set_values(values))
     end
     
-    # Reloads values from database and returns self.
-    def refresh
-      @values = this.first || raise(Error, "Record not found")
-      model.all_association_reflections.each do |r|
-        instance_variable_set("@#{r[:name]}", nil)
-      end
-      self
+    # Runs set_with_params and saves the changes (which runs any callback methods).
+    def update_with_params(values)
+      set_with_params(values)
+      save_changes
     end
-    alias_method :reload, :refresh
 
-    # Like delete but runs hooks before and after delete.
-    def destroy
-      db.transaction do
-        before_destroy
-        delete
-        after_destroy
-      end
-      self
-    end
-    
-    # Deletes and returns self.  Does not run callbacks.
-    # Look into using destroy instead.
-    def delete
-      this.delete
-      self
-    end
-    
     private
       # Returns all methods that can be used for attribute
       # assignment (those that end with =)
