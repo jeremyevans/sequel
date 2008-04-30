@@ -1,5 +1,9 @@
 === HEAD
 
+* Have Dataset#graph give a nil value instead of a hash with all nil values if no matching rows exist in the graphed table (jeremyevans)
+
+=== 1.5.0 (2008-04-29)
+
 * Set a timeout in the Sqlite adapter, default to 5 seconds (hrvoje.marjanovic) (#218)
 
 * Document that calling Sequel::ODBC::Database#execute manually requires you to manually drop the returned object (jeremyevans) (#217)

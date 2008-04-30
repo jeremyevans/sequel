@@ -20,6 +20,14 @@ module Sequel
     # any row_proc or transform attributes of the current dataset and the datasets
     # you use with graph.
     #
+    # If you are graphing a table and all columns for that table are nil, this
+    # indicates that no matching rows existed in the table, so graph will return nil
+    # instead of a hash with all nil values:
+    #
+    #   # If the artist doesn't have any albums
+    #   DB[:artists].graph(:albums, :artist_id=>:id).first
+    #   => {:artists=>{:id=>artists.id, :name=>artists.name}, :albums=>nil}
+    #
     # Arguments:
     # * dataset -  Can be a symbol (specifying a table), another dataset,
     #   or an object that responds to .dataset and yields a symbol or a dataset
@@ -186,9 +194,13 @@ module Sequel
           # row_proc if applicable
           datasets.each do |ta,ds,tr,rp|
             g = graph[ta]
-            g = ds.transform_load(g) if tr
-            g = rp[g] if rp
-            graph[ta] = g
+            graph[ta] = if g.values.any?
+              g = ds.transform_load(g) if tr
+              g = rp[g] if rp
+              g
+            else
+              nil
+            end
           end
 
           yield graph

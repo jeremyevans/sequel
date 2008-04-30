@@ -1,5 +1,9 @@
 === HEAD
 
+* Fix Dataset#eager_graph when not all objects have associated objects (jeremyevans)
+
+=== 1.5.0 (2008-04-29)
+
 * Make the validation errors API compatible with Merb (Inviz)
 
 * Add validates_uniqueness_of, for protecting against duplicate entries in the database (neaf, jeremyevans)

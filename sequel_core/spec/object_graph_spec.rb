@@ -152,6 +152,30 @@ describe Sequel::Dataset, " graphing" do
     results.first.should == {:points=>{:id=>1, :x=>2, :y=>3}, :lines=>{:id=>4, :x=>5, :y=>6, :graph_id=>7}, :graph=>{:id=>8, :x=>9, :y=>10, :graph_id=>11}}
   end
 
+  it "#graph_each should give a nil value instead of a hash when all values for a table are nil" do
+    ds = @ds1.graph(@ds2, :x=>:id)
+    def ds.fetch_rows(sql, &block)
+      yield({:id=>1,:x=>2,:y=>3,:lines_id=>nil,:lines_x=>nil,:lines_y=>nil,:graph_id=>nil})
+    end
+    results = ds.all
+    results.length.should == 1
+    results.first.should == {:points=>{:id=>1, :x=>2, :y=>3}, :lines=>nil}
+
+    ds = @ds1.graph(@ds2, :x=>:id).graph(@ds3, :id=>:graph_id)
+    def ds.fetch_rows(sql, &block)
+      yield({:id=>1,:x=>2,:y=>3,:lines_id=>4,:lines_x=>5,:lines_y=>6,:graph_id=>7, :graphs_id=>nil, :name=>nil, :graphs_x=>nil, :graphs_y=>nil, :graphs_lines_x=>nil})
+      yield({:id=>2,:x=>4,:y=>5,:lines_id=>nil,:lines_x=>nil,:lines_y=>nil,:graph_id=>nil, :graphs_id=>nil, :name=>nil, :graphs_x=>nil, :graphs_y=>nil, :graphs_lines_x=>nil})
+      yield({:id=>3,:x=>5,:y=>6,:lines_id=>4,:lines_x=>5,:lines_y=>6,:graph_id=>7, :graphs_id=>7, :name=>8, :graphs_x=>9, :graphs_y=>10, :graphs_lines_x=>11})
+      yield({:id=>3,:x=>5,:y=>6,:lines_id=>7,:lines_x=>5,:lines_y=>8,:graph_id=>9, :graphs_id=>9, :name=>10, :graphs_x=>10, :graphs_y=>11, :graphs_lines_x=>12})
+    end
+    results = ds.all
+    results.length.should == 4
+    results[0].should == {:points=>{:id=>1, :x=>2, :y=>3}, :lines=>{:id=>4, :x=>5, :y=>6, :graph_id=>7}, :graphs=>nil}
+    results[1].should == {:points=>{:id=>2, :x=>4, :y=>5}, :lines=>nil, :graphs=>nil}
+    results[2].should == {:points=>{:id=>3, :x=>5, :y=>6}, :lines=>{:id=>4, :x=>5, :y=>6, :graph_id=>7}, :graphs=>{:id=>7, :name=>8, :x=>9, :y=>10, :lines_x=>11}}
+    results[3].should == {:points=>{:id=>3, :x=>5, :y=>6}, :lines=>{:id=>7, :x=>5, :y=>8, :graph_id=>9}, :graphs=>{:id=>9, :name=>10, :x=>10, :y=>11, :lines_x=>12}}
+  end
+
   it "#graph_each should not included tables graphed with the :select option in the result set" do
     ds = @ds1.graph(:lines, {:x=>:id}, :select=>false).graph(:graphs, :id=>:graph_id)
     def ds.fetch_rows(sql, &block)
@@ -177,7 +201,7 @@ describe Sequel::Dataset, " graphing" do
     end
     results = ds.all
     results.length.should == 1
-    results.first.should == {:points=>{:x=>2}, :lines=>{}}
+    results.first.should == {:points=>{:x=>2}, :lines=>nil}
   end
 
   it "#graph_each should run the row_proc and transform for graphed datasets" do

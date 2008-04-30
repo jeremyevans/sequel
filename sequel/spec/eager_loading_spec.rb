@@ -545,4 +545,104 @@ describe Sequel::Model, "#eager_graph" do
      "SELECT genres.*, ag.album_id AS x_foreign_key_x FROM genres INNER JOIN ag ON (ag.album_id IN (1)) AND (ag.genre_id = genres.id)"
     ].should(include(MODEL_DB.sqls[1]))
   end
+
+  it "should handle no associated records for a single many_to_one association" do
+    ds = GraphAlbum.eager_graph(:band)
+    ds.sql.should == 'SELECT albums.id, albums.band_id, band.id AS band_id_0, band.vocalist_id FROM albums LEFT OUTER JOIN bands band ON (band.id = albums.band_id)'
+    def ds.fetch_rows(sql, &block)
+      yield({:id=>1, :band_id=>2, :band_id_0=>nil, :vocalist_id=>nil})
+    end
+    a = ds.all
+    a.should be_a_kind_of(Array)
+    a.size.should == 1
+    a.first.should be_a_kind_of(GraphAlbum)
+    a.first.values.should == {:id => 1, :band_id => 2}
+    a.first.instance_variable_get(:@band).should == :null
+  end
+
+  it "should handle no associated records for a single one_to_many association" do
+    ds = GraphAlbum.eager_graph(:tracks)
+    ds.sql.should == 'SELECT albums.id, albums.band_id, tracks.id AS tracks_id, tracks.album_id FROM albums LEFT OUTER JOIN tracks ON (tracks.album_id = albums.id)'
+    def ds.fetch_rows(sql, &block)
+      yield({:id=>1, :band_id=>2, :tracks_id=>nil, :album_id=>nil})
+    end
+    a = ds.all
+    a.should be_a_kind_of(Array)
+    a.size.should == 1
+    a.first.should be_a_kind_of(GraphAlbum)
+    a.first.values.should == {:id => 1, :band_id => 2}
+    a.first.tracks.should == []
+  end
+
+  it "should handle no associated records for a single many_to_many association" do
+    ds = GraphAlbum.eager_graph(:genres)
+    ds.sql.should == 'SELECT albums.id, albums.band_id, genres.id AS genres_id FROM albums LEFT OUTER JOIN ag ON (ag.album_id = albums.id) LEFT OUTER JOIN genres ON (genres.id = ag.genre_id)'
+    def ds.fetch_rows(sql, &block)
+      yield({:id=>1, :band_id=>2, :genres_id=>nil})
+    end
+    a = ds.all
+    a.should be_a_kind_of(Array)
+    a.size.should == 1
+    a.first.should be_a_kind_of(GraphAlbum)
+    a.first.values.should == {:id => 1, :band_id => 2}
+    a.first.genres.should == []
+  end
+
+  it "should handle missing associated records when loading multiple associations" do 
+    ds = GraphAlbum.eager_graph(:genres, :tracks, :band)
+    ds.sql.should == 'SELECT albums.id, albums.band_id, genres.id AS genres_id, tracks.id AS tracks_id, tracks.album_id, band.id AS band_id_0, band.vocalist_id FROM albums LEFT OUTER JOIN ag ON (ag.album_id = albums.id) LEFT OUTER JOIN genres ON (genres.id = ag.genre_id) LEFT OUTER JOIN tracks ON (tracks.album_id = albums.id) LEFT OUTER JOIN bands band ON (band.id = albums.band_id)'
+    def ds.fetch_rows(sql, &block)
+      yield({:id=>1, :band_id=>2, :genres_id=>nil, :tracks_id=>3, :album_id=>1, :band_id_0=>nil, :vocalist_id=>nil})
+      yield({:id=>1, :band_id=>2, :genres_id=>nil, :tracks_id=>4, :album_id=>1, :band_id_0=>nil, :vocalist_id=>nil})
+      yield({:id=>1, :band_id=>2, :genres_id=>nil, :tracks_id=>5, :album_id=>1, :band_id_0=>nil, :vocalist_id=>nil})
+      yield({:id=>1, :band_id=>2, :genres_id=>nil, :tracks_id=>6, :album_id=>1, :band_id_0=>nil, :vocalist_id=>nil})
+    end
+    a = ds.all
+    a.should be_a_kind_of(Array)
+    a.size.should == 1
+    a.first.should be_a_kind_of(GraphAlbum)
+    a.first.values.should == {:id => 1, :band_id => 2}
+    a = a.first
+    a.tracks.should be_a_kind_of(Array)
+    a.tracks.size.should == 4
+    a.tracks.first.should be_a_kind_of(GraphTrack)
+    a.tracks.collect{|x|x[:id]}.should == [3,4,5,6]
+    a.instance_variable_get(:@band).should == :null
+    a.genres.should == []
+  end
+
+  it "should handle missing associated records when cascading eager loading for associations of associated models" do
+    ds = GraphTrack.eager_graph(:album=>{:band=>:members})
+    ds.sql.should == 'SELECT tracks.id, tracks.album_id, album.id AS album_id_0, album.band_id, band.id AS band_id_0, band.vocalist_id, members.id AS members_id FROM tracks LEFT OUTER JOIN albums album ON (album.id = tracks.album_id) LEFT OUTER JOIN bands band ON (band.id = album.band_id) LEFT OUTER JOIN bm ON (bm.band_id = band.id) LEFT OUTER JOIN members ON (members.id = bm.member_id)'
+    def ds.fetch_rows(sql, &block)
+      yield({:id=>2, :album_id=>2, :album_id_0=>nil, :band_id=>nil, :members_id=>nil, :band_id_0=>nil, :vocalist_id=>nil})
+      yield({:id=>3, :album_id=>3, :album_id_0=>3, :band_id=>3, :members_id=>nil, :band_id_0=>nil, :vocalist_id=>nil})
+      yield({:id=>4, :album_id=>4, :album_id_0=>4, :band_id=>2, :members_id=>nil, :band_id_0=>2, :vocalist_id=>6})
+      yield({:id=>5, :album_id=>1, :album_id_0=>1, :band_id=>4, :members_id=>5, :band_id_0=>4, :vocalist_id=>8})
+      yield({:id=>5, :album_id=>1, :album_id_0=>1, :band_id=>4, :members_id=>6, :band_id_0=>4, :vocalist_id=>8})
+    end
+    a = ds.all
+    a.should be_a_kind_of(Array)
+    a.size.should == 4
+    a.first.should be_a_kind_of(GraphTrack)
+    a.collect{|x|x[:id]}.should == [2,3,4,5]
+    a[0].instance_variable_get(:@album).should == :null
+    a[1].album.should be_a_kind_of(GraphAlbum)
+    a[1].album.values.should == {:id => 3, :band_id => 3}
+    a[1].album.instance_variable_get(:@band).should == :null
+    a[2].album.should be_a_kind_of(GraphAlbum)
+    a[2].album.values.should == {:id => 4, :band_id => 2}
+    a[2].album.band.should be_a_kind_of(GraphBand)
+    a[2].album.band.values.should == {:id => 2, :vocalist_id=>6}
+    a[2].album.band.members.should == []
+    a[3].album.should be_a_kind_of(GraphAlbum)
+    a[3].album.values.should == {:id => 1, :band_id => 4}
+    a[3].album.band.should be_a_kind_of(GraphBand)
+    a[3].album.band.values.should == {:id => 4, :vocalist_id=>8}
+    a[3].album.band.members.size.should == 2
+    a[3].album.band.members.first.should be_a_kind_of(GraphBandMember)
+    a[3].album.band.members.first.values.should == {:id => 5}
+    a[3].album.band.members.last.should be_a_kind_of(GraphBandMember)
+    a[3].album.band.members.last.values.should == {:id => 6}
+  end
 end

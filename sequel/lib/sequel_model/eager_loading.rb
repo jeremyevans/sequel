@@ -272,10 +272,10 @@ module Sequel::Model::Associations::EagerLoading
       return if dependency_map.empty?
       # Don't clobber the instance variable array for *_to_many associations if it has already been setup
       dependency_map.keys.each do |ta|
-        current.instance_variable_set("@#{alias_map[ta]}", []) unless type_map[ta] == :many_to_one || current.instance_variable_get("@#{alias_map[ta]}")
+        current.instance_variable_set("@#{alias_map[ta]}", type_map[ta] == :many_to_one ? :null : []) unless current.instance_variable_get("@#{alias_map[ta]}")
       end
       dependency_map.each do |ta, deps|
-        rec = record_graph[ta]
+        next unless rec = record_graph[ta]
         key = rec.pk || rec.values.sort_by{|x| x[0].to_s}
         if cached_rec = records_map[ta][key]
           rec = cached_rec
