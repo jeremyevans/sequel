@@ -27,6 +27,16 @@ class Class
       metaclass.instance_eval{alias_method to, from}
     end
     
+    # Make a singleton/class attribute reader method(s).
+    # Replaces the construct:
+    #
+    #   class << self
+    #     attr_reader *meths
+    #   end
+    def metaattr_reader(*meths)
+      metaclass.instance_eval{attr_reader *meths}
+    end
+
     # Make a singleton/class method(s) private.
     # Replaces the construct:
     #

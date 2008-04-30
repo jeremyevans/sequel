@@ -1,5 +1,10 @@
 module Sequel
   class Model
+    @primary_key = :id
+
+    # Returns key for primary key.
+    metaattr_reader :primary_key
+
     # Add dataset methods via metaprogramming
     DATASET_METHODS = %w'all avg count delete distinct eager eager_graph each each_page 
        empty? except exclude filter first from_self full_outer_join graph 
@@ -106,15 +111,18 @@ module Sequel
     # If possible, set the dataset for the model subclass as soon as it
     # is created.
     def self.inherited(subclass)
-      begin
-        if subclass.superclass == Model
-          unless subclass.name.empty?
-            subclass.set_dataset(Model.db[subclass.implicit_table_name])
+      sup_class = subclass.superclass
+      ivs = subclass.instance_variables
+      subclass.instance_variable_set(:@primary_key, sup_class.primary_key) unless ivs.include?("@primary_key")
+      unless ivs.include?("@dataset")
+        begin
+          if sup_class == Model
+            subclass.set_dataset(Model.db[subclass.implicit_table_name]) unless subclass.name.empty?
+          elsif ds = sup_class.instance_variable_get(:@dataset)
+            subclass.set_dataset(ds.clone)
           end
-        elsif ds = subclass.superclass.instance_variable_get(:@dataset)
-          subclass.set_dataset(ds.clone)
+        rescue StandardError
         end
-      rescue StandardError
       end
     end
   
@@ -130,22 +138,20 @@ module Sequel
     end
 
     def self.no_primary_key #:nodoc:
-      meta_def(:primary_key) {nil}
-      meta_def(:primary_key_hash) {|v| raise Error, "#{self} does not have a primary key"}
-      class_def(:this)      {raise Error, "No primary key is associated with this model"}
-      class_def(:pk)        {raise Error, "No primary key is associated with this model"}
-      class_def(:pk_hash)   {raise Error, "No primary key is associated with this model"}
-      class_def(:cache_key) {raise Error, "No primary key is associated with this model"}
-    end
-
-    # Returns key for primary key.
-    def self.primary_key
-      :id
+      @primary_key = nil
     end
 
     # Returns primary key attribute hash.
     def self.primary_key_hash(value)
-      {:id => value}
+      raise(Error, "#{self} does not have a primary key") unless key = @primary_key
+      case key
+      when Array
+        hash = {}
+        key.each_with_index{|k,i| hash[k] = value[i]}
+        hash
+      else
+        {key => value}
+      end
     end
 
     # Serializes column with YAML or through marshalling.
@@ -191,55 +197,7 @@ module Sequel
     #
     # <i>You can even set it to nil!</i>
     def self.set_primary_key(*key)
-      # if k is nil, we go to no_primary_key
-      if key.empty? || (key.size == 1 && key.first == nil)
-        return no_primary_key
-      end
-
-      # backwards compat
-      key = (key.length == 1) ? key[0] : key.flatten
-
-      # redefine primary_key
-      meta_def(:primary_key) {key}
-
-      unless key.is_a? Array # regular primary key
-        class_def(:this) do
-          @this ||= dataset.filter(key => @values[key]).limit(1).naked
-        end
-        class_def(:pk) do
-          @pk ||= @values[key]
-        end
-        class_def(:pk_hash) do
-          @pk ||= {key => @values[key]}
-        end
-        class_def(:cache_key) do
-          pk = @values[key] || (raise Error, 'no primary key for this record')
-          @cache_key ||= "#{self.class}:#{pk}"
-        end
-        meta_def(:primary_key_hash) do |v|
-          {key => v}
-        end
-      else # composite key
-        exp_list = key.map {|k| "#{k.inspect} => @values[#{k.inspect}]"}
-        block = eval("proc {@this ||= self.class.dataset.filter(#{exp_list.join(',')}).limit(1).naked}")
-        class_def(:this, &block)
-
-        exp_list = key.map {|k| "@values[#{k.inspect}]"}
-        block = eval("proc {@pk ||= [#{exp_list.join(',')}]}")
-        class_def(:pk, &block)
-
-        exp_list = key.map {|k| "#{k.inspect} => @values[#{k.inspect}]"}
-        block = eval("proc {@this ||= {#{exp_list.join(',')}}}")
-        class_def(:pk_hash, &block)
-
-        exp_list = key.map {|k| '#{@values[%s]}' % k.inspect}.join(',')
-        block = eval('proc {@cache_key ||= "#{self.class}:%s"}' % exp_list)
-        class_def(:cache_key, &block)
-
-        meta_def(:primary_key_hash) do |v|
-          key.inject({}) {|m, i| m[i] = v.shift; m}
-        end
-      end
+      @primary_key = (key.length == 1) ? key[0] : key.flatten
     end
 
     # Returns the columns as a list of frozen strings.

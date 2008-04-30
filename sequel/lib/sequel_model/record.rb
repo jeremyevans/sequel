@@ -111,30 +111,42 @@ module Sequel
 
     # Returns (naked) dataset bound to current instance.
     def this
-      @this ||= self.class.dataset.filter(:id => @values[:id]).limit(1).naked
+      @this ||= dataset.filter(pk_hash).limit(1).naked
     end
     
     # Returns a key unique to the underlying record for caching
     def cache_key
-      pk = @values[:id] || (raise Error, 'no primary key for this record')
-      @cache_key ||= "#{self.class}:#{pk}"
+      raise(Error, "No primary key is associated with this model") unless key = primary_key
+      pk = case key
+      when Array
+        key.collect{|k| @values[k]}.join(',')
+      else
+        @values[key] || (raise Error, 'no primary key for this record')
+      end
+      "#{model}:#{pk}"
     end
 
     # Returns primary key column(s) for object's Model class.
     def primary_key
-      @primary_key ||= self.class.primary_key
+      model.primary_key
     end
     
     # Returns the primary key value identifying the model instance. If the
     # model's primary key is changed (using #set_primary_key or #no_primary_key)
     # this method is redefined accordingly.
     def pk
-      @pk ||= @values[:id]
+      raise(Error, "No primary key is associated with this model") unless key = primary_key
+      case key
+      when Array
+        key.collect{|k| @values[k]}
+      else
+        @values[key]
+      end
     end
     
     # Returns a hash identifying the model instance. Stock implementation.
     def pk_hash
-      @pk_hash ||= {:id => @values[:id]}
+      model.primary_key_hash(pk)
     end
     
     # Creates new instance with values set to passed-in Hash.
