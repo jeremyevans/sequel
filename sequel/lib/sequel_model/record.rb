@@ -84,99 +84,6 @@ module Sequel
       [model, pk.nil? ? @values.sort_by{|k,v| k.to_s} : pk].hash
     end
 
-    # Returns key for primary key.
-    def self.primary_key
-      :id
-    end
-    
-    # Returns primary key attribute hash.
-    def self.primary_key_hash(value)
-      {:id => value}
-    end
-    
-    # Sets primary key, regular and composite are possible.
-    #
-    # == Example:
-    #   class Tagging < Sequel::Model
-    #     # composite key
-    #     set_primary_key :taggable_id, :tag_id
-    #   end
-    #
-    #   class Person < Sequel::Model
-    #     # regular key
-    #     set_primary_key :person_id
-    #   end
-    #
-    # <i>You can even set it to nil!</i>
-    def self.set_primary_key(*key)
-      # if k is nil, we go to no_primary_key
-      if key.empty? || (key.size == 1 && key.first == nil)
-        return no_primary_key
-      end
-      
-      # backwards compat
-      key = (key.length == 1) ? key[0] : key.flatten
-
-      # redefine primary_key
-      meta_def(:primary_key) {key}
-      
-      unless key.is_a? Array # regular primary key
-        class_def(:this) do
-          @this ||= dataset.filter(key => @values[key]).limit(1).naked
-        end
-        class_def(:pk) do
-          @pk ||= @values[key]
-        end
-        class_def(:pk_hash) do
-          @pk ||= {key => @values[key]}
-        end
-        class_def(:cache_key) do
-          pk = @values[key] || (raise Error, 'no primary key for this record')
-          @cache_key ||= "#{self.class}:#{pk}"
-        end
-        meta_def(:primary_key_hash) do |v|
-          {key => v}
-        end
-      else # composite key
-        exp_list = key.map {|k| "#{k.inspect} => @values[#{k.inspect}]"}
-        block = eval("proc {@this ||= self.class.dataset.filter(#{exp_list.join(',')}).limit(1).naked}")
-        class_def(:this, &block)
-        
-        exp_list = key.map {|k| "@values[#{k.inspect}]"}
-        block = eval("proc {@pk ||= [#{exp_list.join(',')}]}")
-        class_def(:pk, &block)
-        
-        exp_list = key.map {|k| "#{k.inspect} => @values[#{k.inspect}]"}
-        block = eval("proc {@this ||= {#{exp_list.join(',')}}}")
-        class_def(:pk_hash, &block)
-        
-        exp_list = key.map {|k| '#{@values[%s]}' % k.inspect}.join(',')
-        block = eval('proc {@cache_key ||= "#{self.class}:%s"}' % exp_list)
-        class_def(:cache_key, &block)
-
-        meta_def(:primary_key_hash) do |v|
-          key.inject({}) {|m, i| m[i] = v.shift; m}
-        end
-      end
-    end
-    
-    def self.no_primary_key #:nodoc:
-      meta_def(:primary_key) {nil}
-      meta_def(:primary_key_hash) {|v| raise Error, "#{self} does not have a primary key"}
-      class_def(:this)      {raise Error, "No primary key is associated with this model"}
-      class_def(:pk)        {raise Error, "No primary key is associated with this model"}
-      class_def(:pk_hash)   {raise Error, "No primary key is associated with this model"}
-      class_def(:cache_key) {raise Error, "No primary key is associated with this model"}
-    end
-    
-    # Creates new instance with values set to passed-in Hash, saves it
-    # (running any callbacks), and returns the instance.
-    def self.create(values = {}, &block)
-      obj = new(values, &block)
-      obj.save
-      obj
-    end
-    
     # Updates the instance with the supplied values with support for virtual
     # attributes, ignoring any values for which no setter method is available.
     # Does not save the record.
@@ -249,12 +156,6 @@ module Sequel
       
       yield self if block
       after_initialize
-    end
-    
-    # Initializes a model instance as an existing record. This constructor is 
-    # used by Sequel to initialize model instances when fetching records.
-    def self.load(values)
-      new(values, true)
     end
     
     # Returns true if the current instance represents a new record.
