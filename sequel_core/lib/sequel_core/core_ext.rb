@@ -17,6 +17,17 @@ end
 
 class Class
   private
+    # Define an instance method(s) that class the class method of the
+    # same name.
+    # Replaces the construct:
+    #
+    #   class << self
+    #     attr_reader *meths
+    #   end
+    def class_attr_reader(*meths)
+      meths.each{|meth| define_method(meth){self.class.send(meth)}}
+    end
+
     # Create an alias for a singleton/class method.
     # Replaces the construct:
     #

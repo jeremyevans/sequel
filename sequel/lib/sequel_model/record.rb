@@ -4,33 +4,13 @@ module Sequel
 
     attr_reader :values
     attr_reader :changed_columns
+
+    class_attr_reader :db, :dataset, :columns, :str_columns, :primary_key
     
-    # Returns the database assoiated with the object's Model class.
-    def db
-      @db ||= model.db
-    end
-
-    # Returns the dataset assoiated with the object's Model class.
-    #
-    # See Dataset for more information.
-    def dataset
-      model.dataset
-    end
-
-    # Returns the columns associated with the object's Model class.
-    def columns
-      model.columns
-    end
-
-    # Returns the str_columns associated with the object's Model class.
-    def str_columns
-      model.str_columns
-    end
-
     # Returns a string representation of the model instance including
     # the class name and values.
     def inspect
-      "#<%s @values=%s>" % [self.class.name, @values.inspect]
+      "#<%s @values=%s>" % [model.name, @values.inspect]
     end
 
     # Returns value of attribute.
@@ -126,11 +106,6 @@ module Sequel
       "#{model}:#{pk}"
     end
 
-    # Returns primary key column(s) for object's Model class.
-    def primary_key
-      model.primary_key
-    end
-    
     # Returns the primary key value identifying the model instance. If the
     # model's primary key is changed (using #set_primary_key or #no_primary_key)
     # this method is redefined accordingly.
