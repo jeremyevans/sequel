@@ -1,8 +1,38 @@
 module Sequel
   class Model
+    alias_method :model, :class
+
     attr_reader :values
     attr_reader :changed_columns
     
+    # Returns the database assoiated with the object's Model class.
+    def db
+      @db ||= model.db
+    end
+
+    # Returns the dataset assoiated with the object's Model class.
+    #
+    # See Dataset for more information.
+    def dataset
+      model.dataset
+    end
+
+    # Returns the columns associated with the object's Model class.
+    def columns
+      model.columns
+    end
+
+    # Returns the str_columns associated with the object's Model class.
+    def str_columns
+      model.str_columns
+    end
+
+    # Returns a string representation of the model instance including
+    # the class name and values.
+    def inspect
+      "#<%s @values=%s>" % [self.class.name, @values.inspect]
+    end
+
     # Returns value of attribute.
     def [](column)
       @values[column]

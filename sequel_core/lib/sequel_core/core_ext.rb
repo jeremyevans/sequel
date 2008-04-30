@@ -15,6 +15,29 @@ class Range
   end
 end
 
+class Class
+  private
+    # Create an alias for a singleton/class method.
+    # Replaces the construct:
+    #
+    #   class << self
+    #     alias_method to, from
+    #   end
+    def metaalias(to, from)
+      metaclass.instance_eval{alias_method to, from}
+    end
+    
+    # Make a singleton/class method(s) private.
+    # Replaces the construct:
+    #
+    #   class << self
+    #     private *meths
+    #   end
+    def metaprivate(*meths)
+      metaclass.instance_eval{private *meths}
+    end
+end
+
 # Object extensions
 class Object
   # Returns true if the object is a object of one of the classes
