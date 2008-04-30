@@ -27,23 +27,28 @@ end
 # gem packaging and release
 ##############################################################################
 desc "Packages up sequel and sequel_core."
-task :package => [:clean]
-task :doc => [:rdoc]
-
 task :package do
   sh_with_each_project "rake package"
 end
 
+desc "Install sequel and sequel_core gems"
 task :install do
   sh_with_each_project "rake install"
 end
 
+desc "Install sequel and sequel_core gems without RDoc"
 task :install_no_docs do
   sh_with_each_project "rake install_no_docs"
 end
 
-task :uninstall => [:clean] do
+desc "Uninstall sequel and sequel_core gems"
+task :uninstall do
   sh_with_each_project "rake uninstall"
+end
+
+desc "Upload sequel and sequel_core gems to rubyforge"
+task :release do
+  sh_with_each_project "rake release"
 end
 
 ##############################################################################
@@ -70,9 +75,8 @@ Rake::RDocTask.new do |rdoc|
   rdoc.rdoc_files.add ["sequel*/README", "sequel*/COPYING", "sequel*/lib/**/*.rb"]
 end
 
-task :doc_rforge => [:doc]
-
 desc "Update docs and upload to rubyforge.org"
+task :doc_rforge => [:rdoc]
 task :doc_rforge do
   sh %{chmod -R g+w doc/rdoc/*}
   sh %{scp -rp doc/rdoc/* rubyforge.org:/var/www/gforge-projects/sequel}
