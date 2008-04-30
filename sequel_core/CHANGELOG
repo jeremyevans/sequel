@@ -1,3 +1,7 @@
+=== HEAD
+
+* Make the DBI adapter work with PostgreSQL (Seb)
+
 === 1.5.1 (2008-04-30)
 
 * Have Dataset#graph give a nil value instead of a hash with all nil values if no matching rows exist in the graphed table (jeremyevans)

@@ -14,7 +14,7 @@ module Sequel
         :mysql => "Mysql",
         :odbc => "ODBC",
         :oracle => "Oracle",
-        :pg => "Pg",
+        :pg => "pg",
         :proxy => "Proxy",
         :sqlite => "SQLite",
         :sqlrelay => "SQLRelay"
@@ -26,7 +26,7 @@ module Sequel
         database = (uri.path =~ /\/(.*)/) && ($1)
         if uri.scheme =~ /dbi-(.+)/
           adapter = DBI_ADAPTERS[$1.to_sym] || $1
-          database = "#{adapter}:#{database}"
+          database = "#{adapter}:dbname=#{database}"
         end
         {
           :user => uri.user,
@@ -40,7 +40,10 @@ module Sequel
     
       def connect
         dbname = @opts[:database]
-        dbname = 'DBI:' + dbname unless dbname =~ /^DBI:/
+        if dbname !~ /^DBI:/ then
+          dbname = "DBI:#{dbname}"
+          [:host, :port].each{|sym| dbname += ";#{sym}=#{@opts[sym]}" unless @opts[sym].blank?}
+        end
         ::DBI.connect(dbname, @opts[:user], @opts[:password])
       end
       
