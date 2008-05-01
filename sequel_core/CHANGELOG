@@ -1,6 +1,8 @@
 === HEAD
 
-* Make the DBI adapter work with PostgreSQL (Seb)
+* Fix some issues when running on Ruby 1.9 (Zverok, jeremyevans)
+
+* Make the DBI adapter work (partially) with PostgreSQL (Seb)
 
 === 1.5.1 (2008-04-30)
 

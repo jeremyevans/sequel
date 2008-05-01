@@ -1,7 +1,6 @@
 require 'time'
 require 'date'
 require 'yaml'
-require 'base64'
 
 require File.join(File.dirname(__FILE__), 'dataset/sql')
 require File.join(File.dirname(__FILE__), 'dataset/sequelizer')
@@ -295,8 +294,8 @@ module Sequel
     STOCK_TRANSFORMS = {
       :marshal => [
         # for backwards-compatibility we support also non-base64-encoded values.
-        proc {|v| Marshal.load(Base64.decode64(v)) rescue Marshal.load(v)}, 
-        proc {|v| Base64.encode64(Marshal.dump(v))}
+        proc {|v| Marshal.load(v.unpack('m')[0]) rescue Marshal.load(v)}, 
+        proc {|v| [Marshal.dump(v)].pack('m')}
       ],
       :yaml => [
         proc {|v| YAML.load v if v}, 

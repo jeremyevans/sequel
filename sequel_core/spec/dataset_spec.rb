@@ -66,7 +66,7 @@ context "Dataset#clone" do
   specify "should deep-copy the dataset opts" do
     @clone = @dataset.clone
 
-    @clone.opts.should_not eql(@dataset.opts)
+    @clone.opts.should_not equal(@dataset.opts)
     @dataset.filter!(:a => 'b')
     @clone.opts[:filter].should be_nil
   end
@@ -983,7 +983,7 @@ context "Dataset#map" do
   end
   
   specify "should return the complete dataset values if nothing is given" do
-    @d.map.should == DummyDataset::VALUES
+    @d.map.to_a.should == DummyDataset::VALUES
   end
 end
 
@@ -2015,7 +2015,7 @@ end
 context "Dataset#<<" do
   setup do
     @d = Sequel::Dataset.new(nil)
-    @d.meta_def(:insert) do
+    @d.meta_def(:insert) do |*args|
       1234567890
     end
   end
@@ -2565,27 +2565,27 @@ context "Dataset#transform" do
   specify "should support stock Marshal transformation with Base64 encoding" do
     @ds.transform(:x => :marshal)
 
-    @ds.raw = {:x => Base64.encode64(Marshal.dump([1, 2, 3])), :y => 'hello'}
+    @ds.raw = {:x => [Marshal.dump([1, 2, 3])].pack('m'), :y => 'hello'}
     @ds.first.should == {:x => [1, 2, 3], :y => 'hello'}
 
     @ds.insert(:x => :toast)
-    @ds.sql.should == "INSERT INTO items (x) VALUES ('#{Base64.encode64(Marshal.dump(:toast))}')"
+    @ds.sql.should == "INSERT INTO items (x) VALUES ('#{[Marshal.dump(:toast)].pack('m')}')"
     @ds.insert(:y => 'butter')
     @ds.sql.should == "INSERT INTO items (y) VALUES ('butter')"
     @ds.update(:x => ['dream'])
-    @ds.sql.should == "UPDATE items SET x = '#{Base64.encode64(Marshal.dump(['dream']))}'"
+    @ds.sql.should == "UPDATE items SET x = '#{[Marshal.dump(['dream'])].pack('m')}'"
 
     @ds2 = @ds.filter(:a => 1)
-    @ds2.raw = {:x => Base64.encode64(Marshal.dump([1, 2, 3])), :y => 'hello'}
+    @ds2.raw = {:x => [Marshal.dump([1, 2, 3])].pack('m'), :y => 'hello'}
     @ds2.first.should == {:x => [1, 2, 3], :y => 'hello'}
     @ds2.insert(:x => :toast)
-    @ds2.sql.should == "INSERT INTO items (x) VALUES ('#{Base64.encode64(Marshal.dump(:toast))}')"
+    @ds2.sql.should == "INSERT INTO items (x) VALUES ('#{[Marshal.dump(:toast)].pack('m')}')"
 
     @ds.row_proc = proc{|r| r[:z] = r[:x] * 2; r}
-    @ds.raw = {:x => Base64.encode64(Marshal.dump("wow")), :y => 'hello'}
+    @ds.raw = {:x => [Marshal.dump("wow")].pack('m'), :y => 'hello'}
     @ds.first.should == {:x => "wow", :y => 'hello', :z => "wowwow"}
     f = nil
-    @ds.raw = {:x => Base64.encode64(Marshal.dump("wow")), :y => 'hello'}
+    @ds.raw = {:x => [Marshal.dump("wow")].pack('m'), :y => 'hello'}
     @ds.each(:naked => true) {|r| f = r}
     f.should == {:x => "wow", :y => 'hello'}
   end
@@ -2611,7 +2611,7 @@ context "A dataset with a transform" do
   specify "should automatically transform hash filters" do
     @ds.filter(:y => 2).sql.should == 'SELECT * FROM items WHERE (y = 2)'
     
-    @ds.filter(:x => 2).sql.should == "SELECT * FROM items WHERE (x = '#{Base64.encode64(Marshal.dump(2))}')"
+    @ds.filter(:x => 2).sql.should == "SELECT * FROM items WHERE (x = '#{[Marshal.dump(2)].pack('m')}')"
   end
 end
 

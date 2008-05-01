@@ -217,7 +217,7 @@ module Sequel
       #   ds.order(:arr|1).sql #=> 'SELECT * FROM items ORDER BY arr[1]'
       #   ds.order(nil).sql #=> 'SELECT * FROM items'
       def order(*order)
-        clone(:order => (order == [nil]) ? nil : order)
+        clone(:order => (order.compact.empty?) ? nil : order)
       end
       alias_method :order_by, :order
       
@@ -304,7 +304,7 @@ module Sequel
         end
         parenthesize = !(cond.is_a?(Hash) || cond.is_a?(Array))
 
-        if !@opts[clause].nil? and @opts[clause].any?
+        if !@opts[clause].blank?
           l = expression_list(@opts[clause])
           r = expression_list(block || cond, parenthesize)
           clone(clause => "#{l} AND #{r}")
