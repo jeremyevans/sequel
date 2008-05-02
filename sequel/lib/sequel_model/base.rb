@@ -175,6 +175,12 @@ module Sequel
       @db = ds.db
       @dataset = ds
       @dataset.set_model(self)
+      def_dataset_method(:destroy) do
+        raise(Error, "No model associated with this dataset") unless @opts[:models]
+        count = 0
+        @db.transaction {each {|r| count += 1; r.destroy}}
+        count
+      end
       @dataset.extend(Associations::EagerLoading)
       @dataset.transform(@transform) if @transform
       begin

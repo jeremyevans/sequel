@@ -1749,12 +1749,6 @@ context "Dataset#set_model" do
     @dataset.first.should == @m.new({:kind => 1})
   end
   
-  specify "should extend the dataset with a #destroy method" do
-    @dataset.should_not respond_to(:destroy)
-    @dataset.set_model(@m)
-    @dataset.should respond_to(:destroy)
-  end
-  
   specify "should set opts[:naked] to nil" do
     @dataset.opts[:naked] = true
     @dataset.set_model(@m)
@@ -1961,54 +1955,6 @@ context "A dataset with associated model class(es)" do
     o.class.should == @m3
     o.v.should == nil
     o.vv.should == {:x => 1, :y => 2}
-  end
-end
-
-context "Dataset#destroy" do
-  setup do
-    db = Object.new
-    m = Module.new do
-      def transaction; yield; end
-    end
-    db.extend(m)
-    
-    $DESTROYED = []
-    
-    @m = Class.new do
-      def initialize(c)
-        @c = c
-      end
-      
-      attr_accessor :c
-      
-      def ==(o)
-        @c == o.c
-      end
-      
-      def destroy
-        $DESTROYED << self
-      end
-    end
-    $MODELS = [@m.new(12), @m.new(13)]
-
-    c = Class.new(Sequel::Dataset) do
-      def fetch_rows(sql, &block)
-        (12..13).each(&block)
-      end
-    end
-
-    @d = c.new(db).from(:test)
-    @d.set_model(@m)
-  end
-  
-  specify "should call destroy for every model instance in the dataset" do
-    count = @d.destroy
-    count.should == 2
-    $DESTROYED.should == $MODELS
-  end
-  
-  specify "should raise error if no models are associated with the dataset" do
-    proc {@d.naked.destroy}.should raise_error(Sequel::Error)
   end
 end
 

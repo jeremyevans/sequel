@@ -48,6 +48,13 @@ describe Sequel::Model, "dataset & schema" do
     @model.table_name.should == :foo
   end
 
+  it "set_dataset should add the destroy method to the dataset" do
+    ds = MODEL_DB[:foo]
+    ds.should_not respond_to(:destroy)
+    @model.set_dataset(ds)
+    ds.should respond_to(:destroy)
+  end
+
   it "sets schema with implicit table name" do
     @model.set_schema do
       primary_key :ssn, :string

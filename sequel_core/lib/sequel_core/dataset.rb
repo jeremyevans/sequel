@@ -253,7 +253,6 @@ module Sequel
         # no argument provided, so the dataset is denuded
         @opts.merge!(:naked => true, :models => nil, :polymorphic_key => nil)
         self.row_proc = nil
-        # extend_with_stock_each
       when Class
         # isomorphic model
         @opts.merge!(:naked => nil, :models => {nil => key}, :polymorphic_key => nil)
@@ -264,7 +263,6 @@ module Sequel
           # otherwise we just pass the hash to the constructor
           self.row_proc = proc{|h| key.new(h, *args)}
         end
-        extend_with_destroy
       when Symbol
         # polymorphic model
         hash = args.shift || raise(ArgumentError, "No class hash supplied for polymorphic model")
@@ -284,7 +282,6 @@ module Sequel
             c.new(h, *args)
           end
         end
-        extend_with_destroy
       else
         raise ArgumentError, "Invalid model specified"
       end
@@ -360,21 +357,6 @@ module Sequel
       end
     end
     
-    # Extends the dataset with a destroy method, that calls destroy for each
-    # record in the dataset.
-    def extend_with_destroy
-      unless respond_to?(:destroy)
-        meta_def(:destroy) do
-          unless @opts[:models]
-            raise Error, "No model associated with this dataset"
-          end
-          count = 0
-          @db.transaction {each {|r| count += 1; r.destroy}}
-          count
-        end
-      end
-    end
-
     @@dataset_classes = []
 
     def self.dataset_classes #:nodoc:
