@@ -1,5 +1,7 @@
 === HEAD
 
+* Add Sequel::DBI::Database#lowercase, for lowercasing column names (jamesearl)
+
 * Remove Dataset#extend_with_destroy, which may break code that uses Dataset#set_model directly and expects the destroy method to be added (jeremyevans)
 
 * Fix some issues when running on Ruby 1.9 (Zverok, jeremyevans)
