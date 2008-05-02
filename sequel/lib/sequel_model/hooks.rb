@@ -1,8 +1,11 @@
 module Sequel
   class Model
-    # List of all hook methods
+    # Hooks that are safe for public use
     HOOKS = [:after_initialize, :before_create, :after_create, :before_update,
       :after_update, :before_save, :after_save, :before_destroy, :after_destroy]
+
+    # Hooks that are only for internal use
+    PRIVATE_HOOKS = [:before_update_values, :before_delete]
     
     # Returns true if the model class or any of its ancestors have defined
     # hooks for the given hook key. Notice that this method cannot detect 
@@ -47,7 +50,7 @@ module Sequel
     end
     metaprivate :add_hook, :all_hooks, :hooks, :run_hooks
 
-    HOOKS.each do |hook|
+    (HOOKS + PRIVATE_HOOKS).each do |hook|
       instance_eval("def self.#{hook}(method = nil, &block); add_hook(:#{hook}, method, &block) end")
       define_method(hook){model.send(:run_hooks, hook, self)}
     end

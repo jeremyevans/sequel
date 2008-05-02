@@ -18,10 +18,13 @@ module Sequel
     # TODO: doc
     def self.[](*args)
       args = args.first if (args.size == 1)
-      if args === true || args === false
-        raise Error::InvalidFilter, "Did you mean to supply a hash?"
+      raise(Error::InvalidFilter, "Did you mean to supply a hash?") if args === true || args === false
+
+      if Hash === args
+        dataset[args]
+      else
+        @cache_store ? cache_lookup(args) : dataset[primary_key_hash(args)]
       end
-      dataset[(Hash === args) ? args : primary_key_hash(args)]
     end
     
     # Returns the columns in the result set in their original order.

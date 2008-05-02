@@ -56,21 +56,10 @@ module Sequel
       pk.nil? ? false : (obj.class == model) && (obj.pk == pk)
     end
 
-    # Returns a key unique to the underlying record for caching
-    def cache_key
-      raise(Error, "No primary key is associated with this model") unless key = primary_key
-      pk = case key
-      when Array
-        key.collect{|k| @values[k]}.join(',')
-      else
-        @values[key] || (raise Error, 'no primary key for this record')
-      end
-      "#{model}:#{pk}"
-    end
-
     # Deletes and returns self.  Does not run callbacks.
     # Look into using destroy instead.
     def delete
+      before_delete
       this.delete
       self
     end
@@ -248,6 +237,7 @@ module Sequel
     # low level method that does not run the usual save callbacks.
     # It should probably be avoided.  Look into using update_with_params instead.
     def update_values(values)
+      before_update_values
       this.update(set_values(values))
     end
     
