@@ -1,3 +1,7 @@
+=== HEAD
+
+* Change hook methods so that if a tag/method is specified it overwrites an existing hook block with the same tag/method (jeremyevans)
+
 === 1.5.1 (2008-04-30)
 
 * Fix Dataset#eager_graph when not all objects have associated objects (jeremyevans)

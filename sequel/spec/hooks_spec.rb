@@ -3,20 +3,6 @@ require File.join(File.dirname(__FILE__), "spec_helper")
 describe "Model hooks" do
   before do
     MODEL_DB.reset
-
-    @hooks = [
-      :after_initialize,
-      :before_create,
-      :after_create,
-      :before_update,
-      :after_update,
-      :before_save,
-      :after_save,
-      :before_destroy,
-      :after_destroy
-    ]
-    
-    # @hooks.each {|h| Sequel::Model.class_def(h) {}}
   end
   
   specify "should be definable using def <hook name>" do
@@ -59,6 +45,47 @@ describe "Model hooks" do
     
     c.new.before_save
     $adds.should == ['hyiyie', 'byiyie']
+  end
+
+  specify "should not be additive if the method or tag already exists" do
+    $adds = []
+    c = Class.new(Sequel::Model) do
+      def bye; $adds << 'bye'; end
+      before_save :bye
+      before_save :bye
+    end
+    
+    c.new.before_save
+    $adds.should == ['bye']
+
+    $adds = []
+    d = Class.new(Sequel::Model) do
+      before_save(:bye){$adds << 'hyiyie'}
+      before_save(:bye){$adds << 'byiyie'}
+    end
+    
+    d.new.before_save
+    $adds.should == ['byiyie']
+
+    $adds = []
+    e = Class.new(Sequel::Model) do
+      def bye; $adds << 'bye'; end
+      before_save :bye
+      before_save(:bye){$adds << 'byiyie'}
+    end
+    
+    e.new.before_save
+    $adds.should == ['byiyie']
+
+    $adds = []
+    e = Class.new(Sequel::Model) do
+      def bye; $adds << 'bye'; end
+      before_save(:bye){$adds << 'byiyie'}
+      before_save :bye
+    end
+    
+    e.new.before_save
+    $adds.should == ['bye']
   end
   
   specify "should be inheritable" do
@@ -248,9 +275,9 @@ describe "Model#before_destroy && Model#after_destroy" do
   end
 end
 
-describe "Model#has_hooks?" do
+describe "Model.has_hooks?" do
   setup do
-    @c = Class.new(Sequel::Model)
+    @c = Class.new(Sequel::Model(:items))
   end
   
   specify "should return false if no hooks are defined" do
