@@ -42,8 +42,6 @@
 #   one_to_many :attributes
 #   has_many :attributes
 module Sequel::Model::Associations
-  RECIPROCAL_ASSOCIATIONS = {:many_to_one=>:one_to_many, :one_to_many=>:many_to_one, :many_to_many=>:many_to_many}
-
   # Array of all association reflections
   def all_association_reflections
     association_reflections.values
@@ -113,6 +111,7 @@ module Sequel::Model::Associations
 
     # merge early so we don't modify opts
     opts = opts.merge(:type => type, :name => name, :block => block, :cache => true)
+    opts = AssociationReflection.new.merge!(opts)
 
     # deprecation
     if opts[:from]
@@ -166,7 +165,7 @@ module Sequel::Model::Associations
   private
   # The class related to the given association reflection
   def associated_class(opts)
-    opts[:class] ||= opts[:class_name].constantize
+    opts.associated_class
   end
 
   # Name symbol for add association method
@@ -363,26 +362,6 @@ module Sequel::Model::Associations
 
   # Sets the reciprocal association variable in the reflection, if one exists
   def reciprocal_association(reflection)
-    return reflection[:reciprocal] if reflection.include?(:reciprocal)
-    reciprocal_type = ::Sequel::Model::Associations::RECIPROCAL_ASSOCIATIONS[reflection[:type]]
-    if reciprocal_type == :many_to_many
-      left_key = reflection[:left_key]
-      right_key = reflection[:right_key]
-      join_table = reflection[:join_table]
-      associated_class(reflection).all_association_reflections.each do |assoc_reflect|
-        if assoc_reflect[:type] == :many_to_many && assoc_reflect[:left_key] == right_key \
-           && assoc_reflect[:right_key] == left_key && assoc_reflect[:join_table] == join_table
-          return reflection[:reciprocal] = association_ivar(assoc_reflect[:name]).to_s.freeze
-        end
-      end
-    else
-      key = reflection[:key]
-      associated_class(reflection).all_association_reflections.each do |assoc_reflect|
-        if assoc_reflect[:type] == reciprocal_type && assoc_reflect[:key] == key
-          return reflection[:reciprocal] = association_ivar(assoc_reflect[:name])
-        end
-      end
-    end
-    reflection[:reciprocal] = nil
+    reflection.reciprocal
   end
 end

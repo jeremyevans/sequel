@@ -1,6 +1,6 @@
 require 'sequel_core'
-%w"inflector inflections base hooks record schema associations 
-  caching plugins validations eager_loading deprecated".each do |f|
+%w"inflector inflections base hooks record schema association_reflection 
+  associations caching plugins validations eager_loading deprecated".each do |f|
   require "sequel_model/#{f}"
 end
 
