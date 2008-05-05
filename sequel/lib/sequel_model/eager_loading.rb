@@ -13,9 +13,6 @@
 # with the keys being associations of the current model and values being
 # associations of the model associated with the current model via the key.
 #  
-# You cannot eagerly load an association with a block argument, as the block argument is
-# evaluated in terms of a specific instance of the model, and no specific instance exists.
-#
 # The arguments can be symbols or hashes with symbol keys (for cascaded
 # eager loading). Examples:
 #
@@ -59,7 +56,8 @@ module Sequel::Model::Associations::EagerLoading
   # or join the tables you need to filter on manually. 
   #
   # Each association's order, if definied, is respected. Eager also works
-  # on a limited dataset.
+  # on a limited dataset.  If the association uses a block or has an :eager_block
+  # argument, it is used.
   def eager(*associations)
     model = check_model
     opt = @opts[:eager]
@@ -72,7 +70,7 @@ module Sequel::Model::Associations::EagerLoading
         when Hash
           association.keys.each{|assoc| check_association(model, assoc)}
           opt.merge!(association)
-        else raise(ArgumentError, 'Associations must be in the form of a symbol or hash')
+        else raise(Sequel::Error, 'Associations must be in the form of a symbol or hash')
       end
     end
     clone(:eager=>opt)
@@ -94,6 +92,10 @@ module Sequel::Model::Associations::EagerLoading
   #
   # eager_graph probably won't work the way you suspect with limit, unless you are
   # only graphing many_to_one associations.
+  # 
+  # Does not use the block defined for the association, since it does a single query for
+  # all objects.  You can use the :join_table, :graph_conditions, and :graph_join_conditions
+  # association options to modify the SQL query.
   def eager_graph(*associations)
     model = check_model
     table_name = model.table_name
@@ -101,6 +103,7 @@ module Sequel::Model::Associations::EagerLoading
       self
     else
       # Each of the following have a symbol key for the table alias, with the following values: 
+      # :reciprocals - the reciprocal instance variable to use for this association
       # :requirements - array of requirements for this association
       # :alias_association_type_map - the type of association for this association
       # :alias_association_name_map - the name of the association for this association
@@ -168,7 +171,7 @@ module Sequel::Model::Associations::EagerLoading
             ds = ds.eager_graph_association(ds, model, ta, requirements, check_association(model, assoc), assoc_assocs)
           end
           ds
-        else raise(ArgumentError, 'Associations must be in the form of a symbol or hash')
+        else raise(Sequel::Error, 'Associations must be in the form of a symbol or hash')
         end
       end
       ds
@@ -257,14 +260,14 @@ module Sequel::Model::Associations::EagerLoading
   private
     # Make sure a standard (non-polymorphic model) is used for this dataset, and return the model
     def check_model
-      raise(ArgumentError, 'No model for this dataset') unless @opts[:models] && model = @opts[:models][nil]
+      raise(Sequel::Error, 'No model for this dataset') unless @opts[:models] && model = @opts[:models][nil]
       model
     end
 
     # Make sure the association is valid for this model, and return the association's reflection
     def check_association(model, association)
-      raise(ArgumentError, 'Invalid association') unless reflection = model.association_reflection(association)
-      raise(ArgumentError, 'Cannot eagerly load associations with block arguments') if reflection[:block]
+      raise(Sequel::Error, 'Invalid association') unless reflection = model.association_reflection(association)
+      raise(Sequel::Error, "Eager loading is not allowed for #{model.name} association #{association}") if reflection[:allow_eager] == false
       reflection
     end
   
@@ -355,13 +358,20 @@ module Sequel::Model::Associations::EagerLoading
       reflections.each do |reflection|
         assoc_class = reflection.associated_class
         assoc_name = reflection[:name]
+        assoc_iv = :"@#{assoc_name}"
         # Proc for setting cascaded eager loading
-        cascade = Proc.new do |d|
+        assoc_block = Proc.new do |d|
+          if order = reflection[:order]
+            d = d.order(order)
+          end
           if c = eager_assoc[assoc_name]
             d = d.eager(c)
           end
           if c = reflection[:eager]
             d = d.eager(c)
+          end
+          if b = reflection[:eager_block]
+            d = b.call(d)
           end
           d
         end
@@ -372,19 +382,17 @@ module Sequel::Model::Associations::EagerLoading
             keys = h.keys
             # No records have the foreign key set for this association, so skip it
             next unless keys.length > 0
-            ds = assoc_class.filter(assoc_class.primary_key=>keys)
-            ds = cascade.call(ds)
-            ds.all do |assoc_object|
+            assoc_block.call(assoc_class.filter(assoc_class.primary_key=>keys)).all do |assoc_object|
               h[assoc_object.pk].each do |object|
-                object.instance_variable_set(:"@#{assoc_name}", assoc_object)
+                object.instance_variable_set(assoc_iv, assoc_object)
               end
             end
           when :one_to_many, :many_to_many
-            if rtype == :one_to_many
+            ds = if rtype == :one_to_many
               fkey = key = reflection[:key]
               h = key_hash[model.primary_key]
               reciprocal = reflection.reciprocal
-              ds = assoc_class.filter(key=>h.keys)
+              assoc_class.filter(key=>h.keys)
             else
               assoc_table = assoc_class.table_name
               left = reflection[:left_key]
@@ -395,26 +403,21 @@ module Sequel::Model::Associations::EagerLoading
               table_selection = (reflection[:select] ||= assoc_table.*)
               key_selection = (reflection[:left_key_select] ||= :"#{join_table}__#{left}___#{fkey}")
               h = key_hash[model.primary_key]
-              ds = assoc_class.select(table_selection, key_selection).inner_join(join_table, right=>right_pk, left=>h.keys)
+              assoc_class.select(table_selection, key_selection).inner_join(join_table, right=>right_pk, left=>h.keys)
             end
-            if order = reflection[:order]
-              ds = ds.order(order)
-            end
-            ds = cascade.call(ds)
-            ivar = :"@#{assoc_name}"
             h.values.each do |object_array|
               object_array.each do |object|
-                object.instance_variable_set(ivar, [])
+                object.instance_variable_set(assoc_iv, [])
               end
             end
-            ds.all do |assoc_object|
+            assoc_block.call(ds).all do |assoc_object|
               fk = if rtype == :many_to_many
                 assoc_object.values.delete(fkey)
               else
                 assoc_object[fkey]
               end
               h[fk].each do |object|
-                object.instance_variable_get(ivar) << assoc_object
+                object.instance_variable_get(assoc_iv) << assoc_object
                 assoc_object.instance_variable_set(reciprocal, object) if reciprocal
               end
             end

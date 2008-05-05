@@ -4,6 +4,7 @@ module Sequel
       class AssociationReflection < Hash
         RECIPROCAL_ASSOCIATIONS = {:many_to_one=>:one_to_many, :one_to_many=>:many_to_one, :many_to_many=>:many_to_many}
   
+        # The class associated to the current model class via this association
         def associated_class
           self[:class] ||= self[:class_name].constantize
         end

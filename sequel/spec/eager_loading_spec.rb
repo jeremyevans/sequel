@@ -9,12 +9,22 @@ describe Sequel::Model, "#eager" do
       many_to_one :band, :class=>'EagerBand', :key=>:band_id
       one_to_many :tracks, :class=>'EagerTrack', :key=>:album_id
       many_to_many :genres, :class=>'EagerGenre', :left_key=>:album_id, :right_key=>:genre_id, :join_table=>:ag
+      one_to_many :good_tracks, :class=>'EagerTrack', :key=>:album_id do |ds|
+        ds.filter(:name=>'Good')
+      end
     end
 
     class EagerBand < Sequel::Model(:bands)
       columns :id
       one_to_many :albums, :class=>'EagerAlbum', :key=>:band_id, :eager=>:tracks
       many_to_many :members, :class=>'EagerBandMember', :left_key=>:band_id, :right_key=>:member_id, :join_table=>:bm
+      one_to_many :good_albums, :class=>'EagerAlbum', :key=>:band_id, :eager_block=>proc{|ds| ds.filter(:name=>'good')} do |ds|
+        ds.filter(:name=>'Good')
+      end
+      one_to_many :self_titled_albums, :class=>'EagerAlbum', :key=>:band_id, :allow_eager=>false do |ds|
+        ds.filter(:name=>name)
+      end
+      one_to_many :albums_by_name, :class=>'EagerAlbum', :key=>:band_id, :order=>:name, :allow_eager=>false
     end
     
     class EagerTrack < Sequel::Model(:tracks)
@@ -256,6 +266,24 @@ describe Sequel::Model, "#eager" do
     a.tracks.first.album.should be_a_kind_of(EagerAlbum)
     a.tracks.first.album.should == a
     MODEL_DB.sqls.length.should == 2
+  end
+
+  it "should use the association's block when eager loading by default" do
+    EagerAlbum.eager(:good_tracks).all
+    MODEL_DB.sqls.should == ['SELECT * FROM albums', "SELECT * FROM tracks WHERE (album_id IN (1)) AND (name = 'Good')"]
+  end
+
+  it "should use the eager_block option when eager loading if given" do
+    EagerBand.eager(:good_albums).all
+    MODEL_DB.sqls.should == ['SELECT * FROM bands', "SELECT * FROM albums WHERE (band_id IN (2)) AND (name = 'good')"]
+    MODEL_DB.sqls.clear
+    EagerBand.eager(:good_albums=>:good_tracks).all
+    MODEL_DB.sqls.should == ['SELECT * FROM bands', "SELECT * FROM albums WHERE (band_id IN (2)) AND (name = 'good')", "SELECT * FROM tracks WHERE (album_id IN (1)) AND (name = 'Good')"]
+  end
+
+  it "should raise an error when attempting to eagerly load an association with the :allow_eager option set to false" do
+    proc{EagerBand.eager(:self_titled_albums).all}.should raise_error(Sequel::Error)
+    proc{EagerBand.eager(:albums_by_name).all}.should raise_error(Sequel::Error)
   end
 end
 
