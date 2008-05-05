@@ -83,7 +83,7 @@ module Sequel::Model::Associations
   #     use nil.
   #   - :graph_conditions - The conditions to use on the SQL join when eagerly loading
   #     the association via eager_graph
-  #   - :join_type - The type of SQL join to use when eagerly loading the association via
+  #   - :graph_join_type - The type of SQL join to use when eagerly loading the association via
   #     eager_graph
   #   - :order - the column(s) by which to order the association dataset.  Can be a
   #     singular column or an array.
@@ -123,7 +123,7 @@ module Sequel::Model::Associations
     opts = opts.merge(:type => type, :name => name, :block => block, :cache => true, :model => self)
     opts = AssociationReflection.new.merge!(opts)
     opts[:eager_block] = block unless opts.include?(:eager_block)
-    opts[:join_type] ||= :left_outer
+    opts[:graph_join_type] ||= :left_outer
     opts[:graph_conditions] = opts[:graph_conditions] ? opts[:graph_conditions].to_a : []
 
     # deprecation

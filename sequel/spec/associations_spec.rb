@@ -822,16 +822,16 @@ describe Sequel::Model, "all_association_reflections" do
     @c1.all_association_reflections.should == [{
       :type => :many_to_one, :name => :parent, :class_name => 'Node', 
       :class => @c1, :key => :parent_id, :block => nil, :cache => true,
-      :join_type=>:left_outer, :graph_conditions=>[], :eager_block => nil, :model => @c1
+      :graph_join_type=>:left_outer, :graph_conditions=>[], :eager_block => nil, :model => @c1
     }]
     @c1.associate :one_to_many, :children, :class => @c1
     @c1.all_association_reflections.sort_by{|x|x[:name].to_s}.should == [{
       :type => :one_to_many, :name => :children, :class_name => 'Node', 
       :class => @c1, :key => :node_id, :block => nil, :cache => true,
-      :join_type=>:left_outer, :graph_conditions=>[], :eager_block => nil, :model => @c1}, {
+      :graph_join_type=>:left_outer, :graph_conditions=>[], :eager_block => nil, :model => @c1}, {
       :type => :many_to_one, :name => :parent, :class_name => 'Node',
       :class => @c1, :key => :parent_id, :block => nil, :cache => true,
-      :join_type=>:left_outer, :graph_conditions=>[], :eager_block => nil, :model => @c1}]
+      :graph_join_type=>:left_outer, :graph_conditions=>[], :eager_block => nil, :model => @c1}]
   end
 end
 
@@ -853,13 +853,13 @@ describe Sequel::Model, "association_reflection" do
     @c1.association_reflection(:parent).should == {
       :type => :many_to_one, :name => :parent, :class_name => 'Node', 
       :class => @c1, :key => :parent_id, :block => nil, :cache => true,
-      :join_type=>:left_outer, :graph_conditions=>[], :eager_block => nil, :model => @c1
+      :graph_join_type=>:left_outer, :graph_conditions=>[], :eager_block => nil, :model => @c1
     }
     @c1.associate :one_to_many, :children, :class => @c1
     @c1.association_reflection(:children).should == {
       :type => :one_to_many, :name => :children, :class_name => 'Node', 
       :class => @c1, :key => :node_id, :block => nil, :cache => true,
-      :join_type=>:left_outer, :graph_conditions=>[], :eager_block => nil, :model => @c1
+      :graph_join_type=>:left_outer, :graph_conditions=>[], :eager_block => nil, :model => @c1
     }
   end
 end

@@ -129,7 +129,7 @@ module Sequel::Model::Associations::EagerLoading
       klass = r.associated_class
       assoc_name = r[:name]
       assoc_table_alias = ds.eager_unique_table_alias(ds, assoc_name)
-      join_type = r[:join_type]
+      join_type = r[:graph_join_type]
       conditions = r[:graph_conditions]
       ds = case assoc_type = r[:type]
       when :many_to_one
