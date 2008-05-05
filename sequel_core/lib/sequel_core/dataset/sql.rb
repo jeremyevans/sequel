@@ -142,26 +142,34 @@ module Sequel
       AND_SEPARATOR = " AND ".freeze
       QUESTION_MARK = '?'.freeze
 
+      def expression_list_map(expr)
+        expr.map {|i| compare_expr(i[0], i[1])}.join(AND_SEPARATOR)
+      end
+
       # Formats a where clause. If parenthesize is true, then the whole 
       # generated clause will be enclosed in a set of parentheses.
       def expression_list(expr, parenthesize = false)
-        case expr
+        fmt = case expr
         when Hash
           parenthesize = false if expr.size == 1
-          fmt = expr.map {|i| compare_expr(i[0], i[1])}.join(AND_SEPARATOR)
+          expression_list_map(expr)
         when Array
-          fmt = expr.shift.gsub(QUESTION_MARK) {literal(expr.shift)}
+          if String === expr[0]
+            expr.shift.gsub(QUESTION_MARK) {literal(expr.shift)}
+          else
+            expression_list_map(expr)
+          end
         when Proc
-          fmt = expr.to_sql(self)
+          expr.to_sql(self)
         else
           # if the expression is compound, it should be parenthesized in order for 
           # things to be predictable (when using #or and #and.)
           parenthesize |= expr =~ /\).+\(/
-          fmt = expr
+          expr
         end
         parenthesize ? "(#{fmt})" : fmt
       end
-      private :qualified_column_name, :column_list, :table_ref, :source_list, :expression_list
+      private :qualified_column_name, :column_list, :table_ref, :source_list, :expression_list, :expression_list_map
 
       # Returns a copy of the dataset with the source changed.
       def from(*source)
@@ -413,20 +421,18 @@ module Sequel
         
         table_alias = options[:table_alias]
 
-        join_conditions = {}
+        join_conditions = []
         expr.each do |k, v|
           k = qualified_column_name(k, table_alias || table) if k.is_a?(Symbol)
           v = qualified_column_name(v, @opts[:last_joined_table] || first_source) if v.is_a?(Symbol)
-          join_conditions[k] = v
+          join_conditions << [k,v]
         end
         " #{join_type} #{table} #{"#{table_alias} " if table_alias}ON #{expression_list(join_conditions)}"
       end
 
       # Returns a joined dataset with the specified join type and condition.
       def join_table(type, table, expr)
-        unless expr.is_a?(Hash)
-          expr = {expr => :id}
-        end
+        expr = [[expr, :id]] unless (Hash === expr) || (Array === expr)
         options = {}
 
         if Dataset === table

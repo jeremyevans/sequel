@@ -1128,6 +1128,11 @@ context "Dataset#join_table" do
       'SELECT * FROM items LEFT OUTER JOIN categories ON (categories.category_id = items.id)'
   end
   
+  specify "should handle multiple conditions on the same join table column" do
+    @d.join_table(:left_outer, :categories, [[:category_id, :id], [:category_id, 0..100]]).sql.should ==
+      'SELECT * FROM items LEFT OUTER JOIN categories ON (categories.category_id = items.id) AND (categories.category_id >= 0 AND categories.category_id <= 100)'
+  end
+  
   specify "should include WHERE clause if applicable" do
     @d.filter {:price < 100}.join_table(:right_outer, :categories, :category_id => :id).sql.should ==
       'SELECT * FROM items RIGHT OUTER JOIN categories ON (categories.category_id = items.id) WHERE (price < 100)'
