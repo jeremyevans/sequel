@@ -1,5 +1,7 @@
 === HEAD
 
+* Make all associations support the :select option, not just many_to_many (jeremyevans)
+
 * Allow the use of blocks when eager loading, and add the :eager_block and :allow_eager association options for configuration (jeremyevans)
 
 * Add the :graph_join_type, :graph_conditions, and :graph_join_conditions association options, used when eager graphing (jeremyevans)

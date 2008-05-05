@@ -1,5 +1,7 @@
 === HEAD
 
+* Add ColumnAll#==, for checking the equality of two ColumnAlls (jeremyevans)
+
 * Allow an array of arrays instead of a hash when specifying conditions (jeremyevans)
 
 * Add Sequel::DBI::Database#lowercase, for lowercasing column names (jamesearl)
