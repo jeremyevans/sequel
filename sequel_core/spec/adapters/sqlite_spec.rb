@@ -37,13 +37,15 @@ context "An SQLite database" do
   specify "should support setting pragma values" do
     @db.pragma_set(:auto_vacuum, '1')
     @db.pragma_get(:auto_vacuum).should == '1'
+    @db.pragma_set(:auto_vacuum, '2')
+    @db.pragma_get(:auto_vacuum).should == '2'
   end
   
   specify "should support getting and setting the auto_vacuum pragma" do
     @db.auto_vacuum = :full
     @db.auto_vacuum.should == :full
-    @db.auto_vacuum = :none
-    @db.auto_vacuum.should == :none
+    @db.auto_vacuum = :incremental
+    @db.auto_vacuum.should == :incremental
     
     proc {@db.auto_vacuum = :invalid}.should raise_error(Sequel::Error)
   end

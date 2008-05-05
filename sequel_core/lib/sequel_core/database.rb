@@ -386,13 +386,22 @@ module Sequel
       if uri.is_a?(String)
         uri = URI.parse(uri)
       end
-      {
-        :user => uri.user,
-        :password => uri.password,
-        :host => uri.host,
-        :port => uri.port,
-        :database => (uri.path =~ /\/(.*)/) && ($1)
-      }
+      # special case for sqlite
+      if uri.scheme == 'sqlite'
+        {
+          :user => uri.user,
+          :password => uri.password,
+          :database => (uri.host.nil? && uri.path == '/') ? nil : "#{uri.host}#{uri.path}"
+        }
+      else
+        {
+          :user => uri.user,
+          :password => uri.password,
+          :host => uri.host,
+          :port => uri.port,
+          :database => (uri.path =~ /\/(.*)/) && ($1)
+        }
+      end
     end
     
     def self.adapter_class(scheme)
@@ -427,7 +436,8 @@ module Sequel
     # class used, and the rest of the string specifies the connection options. 
     # For example:
     #
-    #   DB = Sequel.open 'sqlite:///blog.db'
+    #   DB = Sequel.open 'sqlite://blog.db'
+    #   # opens database at ./blog.db
     #
     # The second form of this method takes an options:
     #
