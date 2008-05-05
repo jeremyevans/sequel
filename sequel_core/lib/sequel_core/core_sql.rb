@@ -145,6 +145,13 @@ module Sequel
     class ColumnAll < Expression
       def initialize(t); @t = t; end
       def to_s(ds); "#{@t}.*"; end
+
+      # ColumnAll expressions are considered equivalent if they
+      # have the same class and string representation
+      def ==(x)
+        x.class == self.class && to_s(nil) == x.to_s(nil)
+      end
+
     end
   end
 end

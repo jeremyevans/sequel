@@ -18,6 +18,24 @@ describe Sequel::Model::Associations::AssociationReflection, "#associated_class"
   end
 end
 
+describe Sequel::Model::Associations::AssociationReflection, "#associated_primary_key" do
+  before do
+    @c = Class.new(Sequel::Model)
+    class ParParent < Sequel::Model; end
+  end
+
+  it "should use the :right_primary_key value if present" do
+    @c.many_to_one :c, :class=>ParParent, :associated_primary_key=>:blah__blah
+    @c.association_reflection(:c).should include(:associated_primary_key)
+    @c.association_reflection(:c).associated_primary_key.should == :blah__blah
+  end
+  it "should use the associated table's primary key if :associated_primary_key is not present" do
+    @c.many_to_one :c, :class=>'ParParent'
+    @c.association_reflection(:c).should_not include(:associated_primary_key)
+    @c.association_reflection(:c).associated_primary_key.should == :id
+  end
+end
+
 describe Sequel::Model::Associations::AssociationReflection, "#reciprocal" do
   it "should use the :reciprocal value if present" do
     @c = Class.new(Sequel::Model)
@@ -46,3 +64,22 @@ describe Sequel::Model::Associations::AssociationReflection, "#reciprocal" do
     ParParentThree.association_reflection(:par_parents).reciprocal.should == :@par_parent_threes
   end
 end
+
+describe Sequel::Model::Associations::AssociationReflection, "#select" do
+  before do
+    @c = Class.new(Sequel::Model)
+    class ParParent < Sequel::Model; end
+  end
+
+  it "should use the :select value if present" do
+    @c.many_to_one :c, :class=>ParParent, :select=>[:par_parents__id]
+    @c.association_reflection(:c).should include(:select)
+    @c.association_reflection(:c).select.should == [:par_parents__id]
+  end
+  it "should use the associated_table.* if :select is not present" do
+    @c.many_to_one :c, :class=>'ParParent'
+    @c.association_reflection(:c).should_not include(:select)
+    @c.association_reflection(:c).select.should == :par_parents.*
+  end
+end
+

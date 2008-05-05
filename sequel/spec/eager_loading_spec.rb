@@ -9,12 +9,25 @@ describe Sequel::Model, "#eager" do
       many_to_one :band, :class=>'EagerBand', :key=>:band_id
       one_to_many :tracks, :class=>'EagerTrack', :key=>:album_id
       many_to_many :genres, :class=>'EagerGenre', :left_key=>:album_id, :right_key=>:genre_id, :join_table=>:ag
+      one_to_many :good_tracks, :class=>'EagerTrack', :key=>:album_id do |ds|
+        ds.filter(:name=>'Good')
+      end
+      many_to_one :band_name, :class=>'EagerBand', :key=>:band_id, :select=>[:id, :name]
+      one_to_many :track_names, :class=>'EagerTrack', :key=>:album_id, :select=>[:id, :name]
+      many_to_many :genre_names, :class=>'EagerGenre', :left_key=>:album_id, :right_key=>:genre_id, :join_table=>:ag, :select=>[:id]
     end
 
     class EagerBand < Sequel::Model(:bands)
       columns :id
       one_to_many :albums, :class=>'EagerAlbum', :key=>:band_id, :eager=>:tracks
       many_to_many :members, :class=>'EagerBandMember', :left_key=>:band_id, :right_key=>:member_id, :join_table=>:bm
+      one_to_many :good_albums, :class=>'EagerAlbum', :key=>:band_id, :eager_block=>proc{|ds| ds.filter(:name=>'good')} do |ds|
+        ds.filter(:name=>'Good')
+      end
+      one_to_many :self_titled_albums, :class=>'EagerAlbum', :key=>:band_id, :allow_eager=>false do |ds|
+        ds.filter(:name=>name)
+      end
+      one_to_many :albums_by_name, :class=>'EagerAlbum', :key=>:band_id, :order=>:name, :allow_eager=>false
     end
     
     class EagerTrack < Sequel::Model(:tracks)
@@ -82,7 +95,7 @@ describe Sequel::Model, "#eager" do
     a.size.should == 1
     a.first.should be_a_kind_of(EagerAlbum)
     a.first.values.should == {:id => 1, :band_id => 2}
-    MODEL_DB.sqls.should == ['SELECT * FROM albums', 'SELECT * FROM bands WHERE (id IN (2))']
+    MODEL_DB.sqls.should == ['SELECT * FROM albums', 'SELECT bands.* FROM bands WHERE (id IN (2))']
     a = a.first
     a.band.should be_a_kind_of(EagerBand)
     a.band.values.should == {:id => 2}
@@ -95,7 +108,7 @@ describe Sequel::Model, "#eager" do
     a.size.should == 1
     a.first.should be_a_kind_of(EagerAlbum)
     a.first.values.should == {:id => 1, :band_id => 2}
-    MODEL_DB.sqls.should == ['SELECT * FROM albums', 'SELECT * FROM tracks WHERE (album_id IN (1))']
+    MODEL_DB.sqls.should == ['SELECT * FROM albums', 'SELECT tracks.* FROM tracks WHERE (album_id IN (1))']
     a = a.first
     a.tracks.should be_a_kind_of(Array)
     a.tracks.size.should == 1
@@ -110,11 +123,7 @@ describe Sequel::Model, "#eager" do
     a.size.should == 1
     a.first.should be_a_kind_of(EagerAlbum)
     a.first.values.should == {:id => 1, :band_id => 2}
-    MODEL_DB.sqls.length.should == 2
-    MODEL_DB.sqls[0].should == 'SELECT * FROM albums'
-    ["SELECT genres.*, ag.album_id AS x_foreign_key_x FROM genres INNER JOIN ag ON (ag.genre_id = genres.id) AND (ag.album_id IN (1))",
-     "SELECT genres.*, ag.album_id AS x_foreign_key_x FROM genres INNER JOIN ag ON (ag.album_id IN (1)) AND (ag.genre_id = genres.id)"
-    ].should(include(MODEL_DB.sqls[1]))
+    MODEL_DB.sqls.should == ['SELECT * FROM albums', "SELECT genres.*, ag.album_id AS x_foreign_key_x FROM genres INNER JOIN ag ON (ag.genre_id = genres.id) AND (ag.album_id IN (1))"]
     a = a.first
     a.genres.should be_a_kind_of(Array)
     a.genres.size.should == 1
@@ -131,12 +140,9 @@ describe Sequel::Model, "#eager" do
     a.first.values.should == {:id => 1, :band_id => 2}
     MODEL_DB.sqls.length.should == 4
     MODEL_DB.sqls[0].should == 'SELECT * FROM albums'
-    MODEL_DB.sqls[1..-1].should(include('SELECT * FROM bands WHERE (id IN (2))'))
-    MODEL_DB.sqls[1..-1].should(include('SELECT * FROM tracks WHERE (album_id IN (1))'))
-    sqls = MODEL_DB.sqls[1..-1] - ['SELECT * FROM bands WHERE (id IN (2))', 'SELECT * FROM tracks WHERE (album_id IN (1))']
-    ["SELECT genres.*, ag.album_id AS x_foreign_key_x FROM genres INNER JOIN ag ON (ag.genre_id = genres.id) AND (ag.album_id IN (1))",
-     "SELECT genres.*, ag.album_id AS x_foreign_key_x FROM genres INNER JOIN ag ON (ag.album_id IN (1)) AND (ag.genre_id = genres.id)"
-    ].should(include(sqls[0]))
+    MODEL_DB.sqls[1..-1].should(include('SELECT bands.* FROM bands WHERE (id IN (2))'))
+    MODEL_DB.sqls[1..-1].should(include('SELECT tracks.* FROM tracks WHERE (album_id IN (1))'))
+    MODEL_DB.sqls[1..-1].should(include('SELECT genres.*, ag.album_id AS x_foreign_key_x FROM genres INNER JOIN ag ON (ag.genre_id = genres.id) AND (ag.album_id IN (1))'))
     a = a.first
     a.band.should be_a_kind_of(EagerBand)
     a.band.values.should == {:id => 2}
@@ -158,12 +164,10 @@ describe Sequel::Model, "#eager" do
     a.first.should be_a_kind_of(EagerTrack)
     a.first.values.should == {:id => 3, :album_id => 1}
     MODEL_DB.sqls.length.should == 4
-    MODEL_DB.sqls[0...-1].should == ['SELECT * FROM tracks', 
-                             'SELECT * FROM albums WHERE (id IN (1))',
-                             'SELECT * FROM bands WHERE (id IN (2))']
-    ["SELECT members.*, bm.band_id AS x_foreign_key_x FROM members INNER JOIN bm ON (bm.member_id = members.id) AND (bm.band_id IN (2))",
-     "SELECT members.*, bm.band_id AS x_foreign_key_x FROM members INNER JOIN bm ON (bm.band_id IN (2)) AND (bm.member_id = members.id)"
-    ].should(include(MODEL_DB.sqls[-1]))
+    MODEL_DB.sqls.should == ['SELECT * FROM tracks', 
+      'SELECT albums.* FROM albums WHERE (id IN (1))',
+      'SELECT bands.* FROM bands WHERE (id IN (2))',
+      "SELECT members.*, bm.band_id AS x_foreign_key_x FROM members INNER JOIN bm ON (bm.member_id = members.id) AND (bm.band_id IN (2))"]
     a = a.first
     a.album.should be_a_kind_of(EagerAlbum)
     a.album.values.should == {:id => 1, :band_id => 2}
@@ -183,8 +187,8 @@ describe Sequel::Model, "#eager" do
     a.first.should be_a_kind_of(EagerBand)
     a.first.values.should == {:id => 2}
     MODEL_DB.sqls.should == ['SELECT * FROM bands', 
-                             'SELECT * FROM albums WHERE (band_id IN (2))',
-                             'SELECT * FROM tracks WHERE (album_id IN (1))']
+                             'SELECT albums.* FROM albums WHERE (band_id IN (2))',
+                             'SELECT tracks.* FROM tracks WHERE (album_id IN (1))']
     a = a.first
     a.albums.should be_a_kind_of(Array)
     a.albums.size.should == 1
@@ -208,8 +212,8 @@ describe Sequel::Model, "#eager" do
     a = a.first
     a.albums
     MODEL_DB.sqls.should == ['SELECT * FROM bands', 
-                             'SELECT * FROM albums WHERE (band_id = 2)',
-                             'SELECT * FROM tracks WHERE (album_id IN (1))']
+                             'SELECT albums.* FROM albums WHERE (band_id = 2)',
+                             'SELECT tracks.* FROM tracks WHERE (album_id IN (1))']
     a.albums.should be_a_kind_of(Array)
     a.albums.size.should == 1
     a.albums.first.should be_a_kind_of(EagerAlbum)
@@ -228,11 +232,7 @@ describe Sequel::Model, "#eager" do
     a.size.should == 1
     a.first.should be_a_kind_of(EagerBandMember)
     a.first.values.should == {:id => 5}
-    MODEL_DB.sqls.length.should == 2
-    MODEL_DB.sqls[0].should == 'SELECT * FROM members'
-    ['SELECT bands.*, bm.member_id AS x_foreign_key_x FROM bands INNER JOIN bm ON (bm.band_id = bands.id) AND (bm.member_id IN (5)) ORDER BY id',
-     'SELECT bands.*, bm.member_id AS x_foreign_key_x FROM bands INNER JOIN bm ON (bm.member_id IN (5)) AND (bm.band_id = bands.id) ORDER BY id'
-    ].should(include(MODEL_DB.sqls[1]))
+    MODEL_DB.sqls.should == ['SELECT * FROM members', 'SELECT bands.*, bm.member_id AS x_foreign_key_x FROM bands INNER JOIN bm ON (bm.band_id = bands.id) AND (bm.member_id IN (5)) ORDER BY id']
     a = a.first
     a.bands.should be_a_kind_of(Array)
     a.bands.size.should == 1
@@ -247,7 +247,7 @@ describe Sequel::Model, "#eager" do
     a.size.should == 1
     a.first.should be_a_kind_of(EagerAlbum)
     a.first.values.should == {:id => 1, :band_id => 2}
-    MODEL_DB.sqls.should == ['SELECT * FROM albums', 'SELECT * FROM tracks WHERE (album_id IN (1))']
+    MODEL_DB.sqls.should == ['SELECT * FROM albums', 'SELECT tracks.* FROM tracks WHERE (album_id IN (1))']
     a = a.first
     a.tracks.should be_a_kind_of(Array)
     a.tracks.size.should == 1
@@ -256,6 +256,35 @@ describe Sequel::Model, "#eager" do
     a.tracks.first.album.should be_a_kind_of(EagerAlbum)
     a.tracks.first.album.should == a
     MODEL_DB.sqls.length.should == 2
+  end
+
+  it "should use the association's block when eager loading by default" do
+    EagerAlbum.eager(:good_tracks).all
+    MODEL_DB.sqls.should == ['SELECT * FROM albums', "SELECT tracks.* FROM tracks WHERE (album_id IN (1)) AND (name = 'Good')"]
+  end
+
+  it "should use the eager_block option when eager loading if given" do
+    EagerBand.eager(:good_albums).all
+    MODEL_DB.sqls.should == ['SELECT * FROM bands', "SELECT albums.* FROM albums WHERE (band_id IN (2)) AND (name = 'good')"]
+    MODEL_DB.sqls.clear
+    EagerBand.eager(:good_albums=>:good_tracks).all
+    MODEL_DB.sqls.should == ['SELECT * FROM bands', "SELECT albums.* FROM albums WHERE (band_id IN (2)) AND (name = 'good')", "SELECT tracks.* FROM tracks WHERE (album_id IN (1)) AND (name = 'Good')"]
+  end
+
+  it "should raise an error when attempting to eagerly load an association with the :allow_eager option set to false" do
+    proc{EagerBand.eager(:self_titled_albums).all}.should raise_error(Sequel::Error)
+    proc{EagerBand.eager(:albums_by_name).all}.should raise_error(Sequel::Error)
+  end
+
+  it "should respect the association's :select option" do
+    EagerAlbum.eager(:band_name).all
+    MODEL_DB.sqls.should == ['SELECT * FROM albums', "SELECT id, name FROM bands WHERE (id IN (2))"]
+    MODEL_DB.sqls.clear
+    EagerAlbum.eager(:track_names).all
+    MODEL_DB.sqls.should == ['SELECT * FROM albums', "SELECT id, name FROM tracks WHERE (album_id IN (1))"]
+    MODEL_DB.sqls.clear
+    EagerAlbum.eager(:genre_names).all
+    MODEL_DB.sqls.should == ['SELECT * FROM albums', "SELECT id, ag.album_id AS x_foreign_key_x FROM genres INNER JOIN ag ON (ag.genre_id = genres.id) AND (ag.album_id IN (1))"]
   end
 end
 
@@ -646,14 +675,14 @@ describe Sequel::Model, "#eager_graph" do
     a[3].album.band.members.last.values.should == {:id => 6}
   end
 
-  it "should respect the association's :join_table option" do 
-    GraphAlbum.many_to_one :inner_band, :class=>'GraphBand', :key=>:band_id, :join_type=>:inner
+  it "should respect the association's :graph_join_type option" do 
+    GraphAlbum.many_to_one :inner_band, :class=>'GraphBand', :key=>:band_id, :graph_join_type=>:inner
     GraphAlbum.eager_graph(:inner_band).sql.should == 'SELECT albums.id, albums.band_id, inner_band.id AS inner_band_id, inner_band.vocalist_id FROM albums INNER JOIN bands inner_band ON (inner_band.id = albums.band_id)'
 
-    GraphAlbum.one_to_many :right_tracks, :class=>'GraphTrack', :key=>:album_id, :join_type=>:right_outer
+    GraphAlbum.one_to_many :right_tracks, :class=>'GraphTrack', :key=>:album_id, :graph_join_type=>:right_outer
     GraphAlbum.eager_graph(:right_tracks).sql.should == 'SELECT albums.id, albums.band_id, right_tracks.id AS right_tracks_id, right_tracks.album_id FROM albums RIGHT OUTER JOIN tracks right_tracks ON (right_tracks.album_id = albums.id)'
 
-    GraphAlbum.many_to_many :inner_genres, :class=>'GraphGenre', :left_key=>:album_id, :right_key=>:genre_id, :join_table=>:ag, :join_type=>:inner
+    GraphAlbum.many_to_many :inner_genres, :class=>'GraphGenre', :left_key=>:album_id, :right_key=>:genre_id, :join_table=>:ag, :graph_join_type=>:inner
     GraphAlbum.eager_graph(:inner_genres).sql.should == 'SELECT albums.id, albums.band_id, inner_genres.id AS inner_genres_id FROM albums INNER JOIN ag ON (ag.album_id = albums.id) INNER JOIN genres inner_genres ON (inner_genres.id = ag.genre_id)'
   end
 

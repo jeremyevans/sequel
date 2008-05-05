@@ -30,7 +30,7 @@ describe Sequel::Model, "one_to_one" do
     p.class.should == @c2
     p.values.should == {:hey => 1}
 
-    MODEL_DB.sqls.should == ["SELECT * FROM nodes WHERE (id = 234) LIMIT 1"]
+    MODEL_DB.sqls.should == ["SELECT nodes.* FROM nodes WHERE (id = 234) LIMIT 1"]
   end
 
   it "should use explicit key if given" do
@@ -41,7 +41,7 @@ describe Sequel::Model, "one_to_one" do
     p.class.should == @c2
     p.values.should == {:hey => 1}
 
-    MODEL_DB.sqls.should == ["SELECT * FROM nodes WHERE (id = 567) LIMIT 1"]
+    MODEL_DB.sqls.should == ["SELECT nodes.* FROM nodes WHERE (id = 567) LIMIT 1"]
   end
 
   it "should return nil if key value is nil" do
@@ -92,7 +92,7 @@ describe Sequel::Model, "one_to_many" do
     n = @c2.new(:id => 1234)
     a = n.attributes_dataset
     a.should be_a_kind_of(Sequel::Dataset)
-    a.sql.should == 'SELECT * FROM attributes WHERE (node_id = 1234)'
+    a.sql.should == 'SELECT attributes.* FROM attributes WHERE (node_id = 1234)'
   end
   
   it "should support implicit key names" do
@@ -108,6 +108,6 @@ describe Sequel::Model, "one_to_many" do
     n = Music::BlueNote.new(:id => 1234)
     a = n.attributes_dataset
     a.should be_a_kind_of(Sequel::Dataset)
-    a.sql.should == 'SELECT * FROM attributes WHERE (blue_note_id = 1234)'
+    a.sql.should == 'SELECT attributes.* FROM attributes WHERE (blue_note_id = 1234)'
   end
 end
