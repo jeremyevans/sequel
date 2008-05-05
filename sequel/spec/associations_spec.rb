@@ -11,9 +11,9 @@ describe Sequel::Model, "associate" do
     klass.associate :one_to_many, :par_parent1s, :class=>'ParParent'
     klass.associate :many_to_many, :par_parent2s, :class=>:ParParent
     
-    klass.send(:associated_class, klass.association_reflection(:"par_parent0")).should == ParParent
-    klass.send(:associated_class, klass.association_reflection(:"par_parent1s")).should == ParParent
-    klass.send(:associated_class, klass.association_reflection(:"par_parent2s")).should == ParParent
+    klass.association_reflection(:"par_parent0").associated_class.should == ParParent
+    klass.association_reflection(:"par_parent1s").associated_class.should == ParParent
+    klass.association_reflection(:"par_parent2s").associated_class.should == ParParent
   end
 end
 

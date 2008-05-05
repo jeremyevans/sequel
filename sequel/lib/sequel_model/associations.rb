@@ -163,11 +163,6 @@ module Sequel::Model::Associations
   alias_method :has_and_belongs_to_many, :many_to_many
   
   private
-  # The class related to the given association reflection
-  def associated_class(opts)
-    opts.associated_class
-  end
-
   # Name symbol for add association method
   def association_add_method_name(name)
     :"add_#{name.to_s.singularize}"
@@ -224,7 +219,7 @@ module Sequel::Model::Associations
         end
         objs = ds.all
         # Only one_to_many associations should set the reciprocal object
-        if (opts[:type] == :one_to_many) && (reciprocal = model.send(:reciprocal_association, opts))
+        if (opts[:type] == :one_to_many) && (reciprocal = opts.reciprocal)
           objs.each{|o| o.instance_variable_set(reciprocal, self)}
         end
         instance_variable_set(ivar, objs)
@@ -250,8 +245,6 @@ module Sequel::Model::Associations
 
   # Adds many_to_many association instance methods
   def def_many_to_many(name, opts)
-    assoc_class = method(:associated_class) # late binding of association dataset
-    recip_assoc = method(:reciprocal_association) # late binding of the reciprocal association
     ivar = association_ivar(name)
     left = (opts[:left_key] ||= default_remote_key)
     right = (opts[:right_key] ||= :"#{name.to_s.singularize}_id")
@@ -260,7 +253,7 @@ module Sequel::Model::Associations
     database = db
     
     def_association_dataset_methods(name, opts) do
-      klass = assoc_class[opts]
+      klass = opts.associated_class
       key = (opts[:right_primary_key] ||= :"#{klass.table_name}__#{klass.primary_key}")
       selection = (opts[:select] ||= klass.table_name.*)
       klass.select(selection).inner_join(join_table, right => key, left => pk)
@@ -271,7 +264,7 @@ module Sequel::Model::Associations
       if arr = instance_variable_get(ivar)
         arr.push(o)
       end
-      if (reciprocal = recip_assoc[opts]) && (list = o.instance_variable_get(reciprocal)) \
+      if (reciprocal = opts.reciprocal) && (list = o.instance_variable_get(reciprocal)) \
          && !(list.include?(self))
         list.push(self)
       end
@@ -282,7 +275,7 @@ module Sequel::Model::Associations
       if arr = instance_variable_get(ivar)
         arr.delete(o)
       end
-      if (reciprocal = recip_assoc[opts]) && (list = o.instance_variable_get(reciprocal))
+      if (reciprocal = opts.reciprocal) && (list = o.instance_variable_get(reciprocal))
         list.delete(self)
       end
       o
@@ -291,16 +284,14 @@ module Sequel::Model::Associations
   
   # Adds many_to_one association instance methods
   def def_many_to_one(name, opts)
-    assoc_class = method(:associated_class) # late binding of association dataset
-    recip_assoc = method(:reciprocal_association) # late binding of the reciprocal association
     ivar = association_ivar(name)
     
     key = (opts[:key] ||= :"#{name}_id")
     opts[:class_name] ||= name.to_s.camelize
     
-    def_association_getter(name) {(fk = send(key)) ? assoc_class[opts][fk] : nil}
+    def_association_getter(name) {(fk = send(key)) ? opts.associated_class[fk] : nil}
     class_def(:"#{name}=") do |o|
-      old_val = instance_variable_get(ivar) if reciprocal = recip_assoc[opts]
+      old_val = instance_variable_get(ivar) if reciprocal = opts.reciprocal
       instance_variable_set(ivar, o)
       send(:"#{key}=", (o.pk if o))
       if reciprocal && (old_val != o)
@@ -317,13 +308,11 @@ module Sequel::Model::Associations
   
   # Adds one_to_many association instance methods
   def def_one_to_many(name, opts)
-    assoc_class = method(:associated_class) # late binding of association dataset
-    recip_assoc = method(:reciprocal_association) # late binding of the reciprocal association
     ivar = association_ivar(name)
     key = (opts[:key] ||= default_remote_key)
     opts[:class_name] ||= name.to_s.singularize.camelize
     
-    def_association_dataset_methods(name, opts) {assoc_class[opts].filter(key => pk)}
+    def_association_dataset_methods(name, opts) {opts.associated_class.filter(key => pk)}
     
     class_def(association_add_method_name(name)) do |o|
       o.send(:"#{key}=", pk)
@@ -331,7 +320,7 @@ module Sequel::Model::Associations
       if arr = instance_variable_get(ivar)
         arr.push(o)
       end
-      if reciprocal = recip_assoc[opts]
+      if reciprocal = opts.reciprocal
         o.instance_variable_set(reciprocal, self)
       end
       o
@@ -342,7 +331,7 @@ module Sequel::Model::Associations
       if arr = instance_variable_get(ivar)
         arr.delete(o)
       end
-      if reciprocal = recip_assoc[opts]
+      if reciprocal = opts.reciprocal
         o.instance_variable_set(reciprocal, :null)
       end
       o
@@ -358,10 +347,5 @@ module Sequel::Model::Associations
   # Name symbol for default foreign key
   def default_remote_key
     :"#{name.demodulize.underscore}_id"
-  end
-
-  # Sets the reciprocal association variable in the reflection, if one exists
-  def reciprocal_association(reflection)
-    reflection.reciprocal
   end
 end

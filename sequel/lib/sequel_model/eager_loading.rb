@@ -123,7 +123,7 @@ module Sequel::Model::Associations::EagerLoading
     # * r - association reflection for the current association
     # * *associations - any associations dependent on this one
     def eager_graph_association(ds, model, ta, requirements, r, *associations)
-      klass = model.send(:associated_class, r)
+      klass = r.associated_class
       assoc_name = r[:name]
       assoc_table_alias = ds.eager_unique_table_alias(ds, assoc_name)
       ds = case assoc_type = r[:type]
@@ -132,7 +132,7 @@ module Sequel::Model::Associations::EagerLoading
       when :one_to_many
         ds = ds.graph(klass, {r[:key]=>:"#{ta}__#{model.primary_key}"}, :table_alias=>assoc_table_alias)
         # We only load reciprocals for one_to_many associations, as other reciprocals don't make sense
-        ds.opts[:eager_graph][:reciprocals][assoc_table_alias] = model.send(:reciprocal_association, r)
+        ds.opts[:eager_graph][:reciprocals][assoc_table_alias] = r.reciprocal
         ds
       when :many_to_many
         ds = ds.graph(r[:join_table], {r[:left_key]=>:"#{ta}__#{model.primary_key}"}, :select=>false, :table_alias=>ds.eager_unique_table_alias(ds, r[:join_table]))
@@ -351,7 +351,7 @@ module Sequel::Model::Associations::EagerLoading
       # Iterate through eager associations and assign instance variables
       # for the association for all model objects
       reflections.each do |reflection|
-        assoc_class = model.send(:associated_class, reflection)
+        assoc_class = reflection.associated_class
         assoc_name = reflection[:name]
         # Proc for setting cascaded eager loading
         cascade = Proc.new do |d|
@@ -381,7 +381,7 @@ module Sequel::Model::Associations::EagerLoading
             if rtype == :one_to_many
               fkey = key = reflection[:key]
               h = key_hash[model.primary_key]
-              reciprocal = model.send(:reciprocal_association, reflection)
+              reciprocal = reflection.reciprocal
               ds = assoc_class.filter(key=>h.keys)
             else
               assoc_table = assoc_class.table_name
