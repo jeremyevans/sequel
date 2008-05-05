@@ -645,4 +645,34 @@ describe Sequel::Model, "#eager_graph" do
     a[3].album.band.members.last.should be_a_kind_of(GraphBandMember)
     a[3].album.band.members.last.values.should == {:id => 6}
   end
+
+  it "should respect the association's :join_table option" do 
+    GraphAlbum.many_to_one :inner_band, :class=>'GraphBand', :key=>:band_id, :join_type=>:inner
+    GraphAlbum.eager_graph(:inner_band).sql.should == 'SELECT albums.id, albums.band_id, inner_band.id AS inner_band_id, inner_band.vocalist_id FROM albums INNER JOIN bands inner_band ON (inner_band.id = albums.band_id)'
+
+    GraphAlbum.one_to_many :right_tracks, :class=>'GraphTrack', :key=>:album_id, :join_type=>:right_outer
+    GraphAlbum.eager_graph(:right_tracks).sql.should == 'SELECT albums.id, albums.band_id, right_tracks.id AS right_tracks_id, right_tracks.album_id FROM albums RIGHT OUTER JOIN tracks right_tracks ON (right_tracks.album_id = albums.id)'
+
+    GraphAlbum.many_to_many :inner_genres, :class=>'GraphGenre', :left_key=>:album_id, :right_key=>:genre_id, :join_table=>:ag, :join_type=>:inner
+    GraphAlbum.eager_graph(:inner_genres).sql.should == 'SELECT albums.id, albums.band_id, inner_genres.id AS inner_genres_id FROM albums INNER JOIN ag ON (ag.album_id = albums.id) INNER JOIN genres inner_genres ON (inner_genres.id = ag.genre_id)'
+  end
+
+  it "should respect the association's :graph_conditions option" do 
+    GraphAlbum.many_to_one :active_band, :class=>'GraphBand', :key=>:band_id, :graph_conditions=>{:active=>true}
+    GraphAlbum.eager_graph(:active_band).sql.should == "SELECT albums.id, albums.band_id, active_band.id AS active_band_id, active_band.vocalist_id FROM albums LEFT OUTER JOIN bands active_band ON (active_band.id = albums.band_id) AND (active_band.active = 't')"
+
+    GraphAlbum.many_to_many :active_genres, :class=>'GraphGenre', :left_key=>:album_id, :right_key=>:genre_id, :join_table=>:ag, :graph_conditions=>{true=>:active}
+    GraphAlbum.eager_graph(:active_genres).sql.should == "SELECT albums.id, albums.band_id, active_genres.id AS active_genres_id FROM albums LEFT OUTER JOIN ag ON (ag.album_id = albums.id) LEFT OUTER JOIN genres active_genres ON (active_genres.id = ag.genre_id) AND ('t' = ag.active)"
+
+    GraphAlbum.many_to_one :active_band, :class=>'GraphBand', :key=>:band_id, :graph_conditions=>{:id=>(0..100)}
+    GraphAlbum.eager_graph(:active_band).sql.should == "SELECT albums.id, albums.band_id, active_band.id AS active_band_id, active_band.vocalist_id FROM albums LEFT OUTER JOIN bands active_band ON (active_band.id = albums.band_id) AND (active_band.id >= 0 AND active_band.id <= 100)"
+  end
+
+  it "should respect the association's :graph_join_conditions option" do 
+    GraphAlbum.many_to_many :active_genres, :class=>'GraphGenre', :left_key=>:album_id, :right_key=>:genre_id, :join_table=>:ag, :graph_join_conditions=>{:active=>true}
+    GraphAlbum.eager_graph(:active_genres).sql.should == "SELECT albums.id, albums.band_id, active_genres.id AS active_genres_id FROM albums LEFT OUTER JOIN ag ON (ag.album_id = albums.id) AND (ag.active = 't') LEFT OUTER JOIN genres active_genres ON (active_genres.id = ag.genre_id)"
+
+    GraphAlbum.many_to_many :active_genres, :class=>'GraphGenre', :left_key=>:album_id, :right_key=>:genre_id, :join_table=>:ag, :graph_conditions=>{true=>:active}, :graph_join_conditions=>{true=>:active}
+    GraphAlbum.eager_graph(:active_genres).sql.should == "SELECT albums.id, albums.band_id, active_genres.id AS active_genres_id FROM albums LEFT OUTER JOIN ag ON (ag.album_id = albums.id) AND ('t' = albums.active) LEFT OUTER JOIN genres active_genres ON (active_genres.id = ag.genre_id) AND ('t' = ag.active)"
+  end
 end

@@ -112,6 +112,8 @@ module Sequel::Model::Associations
     # merge early so we don't modify opts
     opts = opts.merge(:type => type, :name => name, :block => block, :cache => true)
     opts = AssociationReflection.new.merge!(opts)
+    opts[:join_type] ||= :left_outer
+    opts[:graph_conditions] = opts[:graph_conditions] ? opts[:graph_conditions].to_a : []
 
     # deprecation
     if opts[:from]
@@ -250,6 +252,7 @@ module Sequel::Model::Associations
     right = (opts[:right_key] ||= :"#{name.to_s.singularize}_id")
     opts[:class_name] ||= name.to_s.singularize.camelize
     join_table = (opts[:join_table] ||= default_join_table_name(opts))
+    opts[:graph_join_conditions] = opts[:graph_join_conditions] ? opts[:graph_join_conditions].to_a : []
     database = db
     
     def_association_dataset_methods(name, opts) do
