@@ -1,12 +1,20 @@
 module Sequel
   class Model
     module Associations
+      # AssociationReflection is a Hash subclass that keeps information on Sequel::Model associations. It
+      # provides a few methods to reduce the amount of internal code duplication.  It should not
+      # be instantiated by the user.
       class AssociationReflection < Hash
         RECIPROCAL_ASSOCIATIONS = {:many_to_one=>:one_to_many, :one_to_many=>:many_to_one, :many_to_many=>:many_to_many}
   
         # The class associated to the current model class via this association
         def associated_class
           self[:class] ||= self[:class_name].constantize
+        end
+  
+        # The associated class's primary key (used for caching)
+        def associated_primary_key
+         self[:associated_primary_key] ||= associated_class.primary_key
         end
   
         # Returns/sets the reciprocal association variable, if one exists
@@ -32,6 +40,11 @@ module Sequel
             end
           end
           self[:reciprocal] = nil
+        end
+
+        # The columns to select when loading the association
+        def select
+         self[:select] ||= associated_class.table_name.*
         end
   
         private

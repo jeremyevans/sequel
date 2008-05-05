@@ -91,6 +91,12 @@ module Sequel::Model::Associations
   #     if it exists.  By default, sequel will try to determine it by looking at the
   #     associated model's assocations for a association that matches
   #     the current association's key(s).  Set to nil to not use a reciprocal.
+  #   - :select - the attributes to select.  Defaults to the associated class's
+  #     table_name.*, which means it doesn't include the attributes from the
+  #     join table.  If you want to include the join table attributes in a many_to_many association, you can
+  #     use this option, but beware that the join table attributes can clash with
+  #     attributes from the model table, so you should alias any attributes that have
+  #     the same name in both the join table and the associated table.
   # * :many_to_one:
   #   - :key - foreign_key in current model's table that references
   #     associated model's primary key, as a symbol.  Defaults to :"#{name}_id".
@@ -109,12 +115,6 @@ module Sequel::Model::Associations
   #     model's primary key, as a symbol.
   #   - :graph_join_conditions - The conditions to use on the SQL join for the join_table when eagerly loading
   #     the association via eager_graph
-  #   - :select - the attributes to select.  Defaults to the associated class's
-  #     table_name.*, which means it doesn't include the attributes from the
-  #     join table.  If you want to include the join table attributes, you can
-  #     use this option, but beware that the join table attributes can clash with
-  #     attributes from the model table, so you should alias any attributes that have
-  #     the same name in both the join table and the associated table.
   def associate(type, name, opts = {}, &block)
     # check arguments
     raise ArgumentError unless [:many_to_one, :one_to_many, :many_to_many].include?(type) && Symbol === name
@@ -263,18 +263,17 @@ module Sequel::Model::Associations
     right = (opts[:right_key] ||= :"#{name.to_s.singularize}_id")
     opts[:class_name] ||= name.to_s.singularize.camelize
     join_table = (opts[:join_table] ||= default_join_table_name(opts))
+    opts[:left_key_alias] ||= :"x_foreign_key_x"
+    opts[:left_key_select] ||= :"#{join_table}__#{left}___#{opts[:left_key_alias]}"
     opts[:graph_join_conditions] = opts[:graph_join_conditions] ? opts[:graph_join_conditions].to_a : []
     database = db
     
     def_association_dataset_methods(name, opts) do
-      klass = opts.associated_class
-      key = (opts[:right_primary_key] ||= :"#{klass.table_name}__#{klass.primary_key}")
-      selection = (opts[:select] ||= klass.table_name.*)
-      klass.select(selection).inner_join(join_table, right => key, left => pk)
+      opts.associated_class.select(opts.select).inner_join(join_table, [[right, opts.associated_primary_key], [left, pk]])
     end
 
     class_def(association_add_method_name(name)) do |o|
-      database[join_table].insert(left => pk, right => o.pk)
+      database[join_table].insert(left=>pk, right=>o.pk)
       if arr = instance_variable_get(ivar)
         arr.push(o)
       end
@@ -285,7 +284,7 @@ module Sequel::Model::Associations
       o
     end
     class_def(association_remove_method_name(name)) do |o|
-      database[join_table].filter(left => pk, right => o.pk).delete
+      database[join_table].filter([[left, pk], [right, o.pk]]).delete
       if arr = instance_variable_get(ivar)
         arr.delete(o)
       end
@@ -303,7 +302,7 @@ module Sequel::Model::Associations
     key = (opts[:key] ||= :"#{name}_id")
     opts[:class_name] ||= name.to_s.camelize
     
-    def_association_getter(name) {(fk = send(key)) ? opts.associated_class[fk] : nil}
+    def_association_getter(name) {(fk = send(key)) ? opts.associated_class.select(opts.select).filter(opts.associated_primary_key=>fk).first : nil}
     class_def(:"#{name}=") do |o|
       old_val = instance_variable_get(ivar) if reciprocal = opts.reciprocal
       instance_variable_set(ivar, o)
@@ -326,7 +325,7 @@ module Sequel::Model::Associations
     key = (opts[:key] ||= default_remote_key)
     opts[:class_name] ||= name.to_s.singularize.camelize
     
-    def_association_dataset_methods(name, opts) {opts.associated_class.filter(key => pk)}
+    def_association_dataset_methods(name, opts) {opts.associated_class.select(opts.select).filter(key => pk)}
     
     class_def(association_add_method_name(name)) do |o|
       o.send(:"#{key}=", pk)

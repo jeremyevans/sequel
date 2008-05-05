@@ -382,28 +382,20 @@ module Sequel::Model::Associations::EagerLoading
             keys = h.keys
             # No records have the foreign key set for this association, so skip it
             next unless keys.length > 0
-            assoc_block.call(assoc_class.filter(assoc_class.primary_key=>keys)).all do |assoc_object|
+            assoc_block.call(assoc_class.select(reflection.select).filter(assoc_class.primary_key=>keys)).all do |assoc_object|
               h[assoc_object.pk].each do |object|
                 object.instance_variable_set(assoc_iv, assoc_object)
               end
             end
           when :one_to_many, :many_to_many
+            h = key_hash[model.primary_key]
             ds = if rtype == :one_to_many
-              fkey = key = reflection[:key]
-              h = key_hash[model.primary_key]
+              fkey = reflection[:key]
               reciprocal = reflection.reciprocal
-              assoc_class.filter(key=>h.keys)
+              assoc_class.select(reflection.select).filter(fkey=>h.keys)
             else
-              assoc_table = assoc_class.table_name
-              left = reflection[:left_key]
-              right = reflection[:right_key]
-              right_pk = (reflection[:right_primary_key] || :"#{assoc_table}__#{assoc_class.primary_key}")
-              join_table = reflection[:join_table]
-              fkey = (reflection[:left_key_alias] ||= :"x_foreign_key_x")
-              table_selection = (reflection[:select] ||= assoc_table.*)
-              key_selection = (reflection[:left_key_select] ||= :"#{join_table}__#{left}___#{fkey}")
-              h = key_hash[model.primary_key]
-              assoc_class.select(table_selection, key_selection).inner_join(join_table, right=>right_pk, left=>h.keys)
+              fkey = reflection[:left_key_alias]
+              assoc_class.select(reflection.select, reflection[:left_key_select]).inner_join(reflection[:join_table], [[reflection[:right_key], reflection.associated_primary_key], [reflection[:left_key], h.keys]])
             end
             h.values.each do |object_array|
               object_array.each do |object|
