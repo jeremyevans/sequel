@@ -136,6 +136,10 @@ module Sequel
 
       def literal(v)
         case v
+        when LiteralString
+          v
+        when String
+          "'#{::SQLite3::Database.quote(v)}'"
         when Time
           literal(v.iso8601)
         else

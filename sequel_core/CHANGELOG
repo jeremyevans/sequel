@@ -1,5 +1,7 @@
 === HEAD
 
+* Use the database driver provided string quoting methods for MySQL and SQLite (jeremyevans)
+
 * Add ColumnAll#==, for checking the equality of two ColumnAlls (jeremyevans)
 
 * Allow an array of arrays instead of a hash when specifying conditions (jeremyevans)

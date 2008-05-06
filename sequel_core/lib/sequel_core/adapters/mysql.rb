@@ -268,7 +268,7 @@ module Sequel
         when LiteralString
           v
         when String
-          "'#{v.gsub(/'|\\/, '\&\&')}'"
+          "'#{::Mysql.quote(v)}'"
         when true
           TRUE
         when false
