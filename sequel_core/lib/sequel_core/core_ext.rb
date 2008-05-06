@@ -29,7 +29,7 @@ class Range
   end
 end
 
-class Class
+class Module
   private
     # Define an instance method(s) that class the class method of the
     # same name.
