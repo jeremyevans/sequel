@@ -1,5 +1,7 @@
 === HEAD
 
+* Fixed uri handler to interpret sqlite:// URI like file:// URI
+
 * Add ColumnAll#==, for checking the equality of two ColumnAlls (jeremyevans)
 
 * Allow an array of arrays instead of a hash when specifying conditions (jeremyevans)
