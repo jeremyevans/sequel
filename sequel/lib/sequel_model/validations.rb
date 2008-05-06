@@ -1,17 +1,3 @@
-class Array
-  # Removes and returns the last member of the array if it is a hash. Otherwise,
-  # an empty hash is returned This method is useful when writing methods that
-  # take an options hash as the last parameter. For example:
-  #
-  #   def validate_each(*args, &block)
-  #     opts = args.extract_options!
-  #     ...
-  #   end
-  def extract_options!
-    last.is_a?(Hash) ? pop : {}
-  end
-end
-
 # The Validations module provides validation capabilities as a mixin. When
 # included into a class, it enhances the class with class and instance
 # methods for defining validations and validating class instances.
@@ -41,7 +27,9 @@ module Validation
   # Validates the object.
   def validate
     errors.clear
+    before_validation
     self.class.validate(self)
+    after_validation
   end
 
   # Validates the object and returns true if no errors are reported.
@@ -296,18 +284,6 @@ module Validation
         end
         o.errors[a] << opts[:message] unless allow
       end
-    end
-  end
-end
-
-module Sequel
-  class Model
-    include Validation
-    
-    alias_method :save!, :save
-    def save(*args)
-      return false unless valid?
-      save!(*args)
     end
   end
 end

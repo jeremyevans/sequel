@@ -2,7 +2,8 @@ module Sequel
   class Model
     # Hooks that are safe for public use
     HOOKS = [:after_initialize, :before_create, :after_create, :before_update,
-      :after_update, :before_save, :after_save, :before_destroy, :after_destroy]
+      :after_update, :before_save, :after_save, :before_destroy, :after_destroy,
+      :before_validation, :after_validation]
 
     # Hooks that are only for internal use
     PRIVATE_HOOKS = [:before_update_values, :before_delete]

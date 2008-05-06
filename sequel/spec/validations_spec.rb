@@ -56,6 +56,7 @@ describe Validation do
   setup do
     @c = Class.new do
       include Validation
+      attr_reader :before_validation, :after_validation
       
       def self.validates_coolness_of(attr)
         validates_each(attr) {|o, a, v| o.errors[a] << 'is not cool' if v != :cool}
@@ -64,6 +65,7 @@ describe Validation do
     
     @d = Class.new do
       attr_accessor :errors
+      attr_reader :before_validation, :after_validation
       def initialize; @errors = Validation::Errors.new; end
     end
   end
@@ -111,6 +113,7 @@ describe "A Validation instance" do
   setup do
     @c = Class.new do
       attr_accessor :score
+      attr_reader :before_validation, :after_validation
       
       include Validation
       
@@ -147,6 +150,7 @@ describe Validation::Generator do
     
     @c = Class.new do
       include Validation
+      attr_reader :before_validation, :after_validation
       
       def self.validates_blah
         $testit = 1324
@@ -166,6 +170,7 @@ describe "Validations" do
   setup do
     @c = Class.new do
       attr_accessor :value
+      attr_reader :before_validation, :after_validation
       include Validation
     end
     @m = @c.new
@@ -294,6 +299,7 @@ context "Superclass validations" do
   setup do
     @c1 = Class.new do
       include Validation
+      attr_reader :before_validation, :after_validation
       attr_accessor :value
       validates_length_of :value, :minimum => 5
     end
@@ -344,6 +350,7 @@ context ".validates with block" do
   specify "should support calling .each" do
     @c = Class.new do
       attr_accessor :vvv
+      attr_reader :before_validation, :after_validation
       
       include Validation
       validates do
