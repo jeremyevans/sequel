@@ -1,4 +1,3 @@
-require File.join(File.dirname(__FILE__), '../../lib/sequel_core')
 require File.join(File.dirname(__FILE__), '../spec_helper.rb')
 require 'logger'
 
@@ -402,20 +401,23 @@ context "A MySQL database" do
   end
 end  
 
-context "A MySQL database" do
-  specify "should accept a socket option" do
-    db = Sequel.mysql(MYSQL_DB_NAME, :host => 'localhost', :user => 'root', :socket => MYSQL_SOCKET_FILE)
-    proc {db.test_connection}.should_not raise_error
-  end
-  
-  specify "should accept a socket option without host option" do
-    db = Sequel.mysql(MYSQL_DB_NAME, :user => 'root', :socket => MYSQL_SOCKET_FILE)
-    proc {db.test_connection}.should_not raise_error
-  end
-  
-  specify "should fail to connect with invalid socket" do
-    db = Sequel.mysql(MYSQL_DB_NAME, :host => 'localhost', :user => 'root', :socket => 'blah')
-    proc {db.test_connection}.should raise_error
+# Socket tests should only be run if the MySQL server is on localhost
+if %w'localhost 127.0.0.1 ::1'.include? MYSQL_URI.host
+  context "A MySQL database" do
+    specify "should accept a socket option" do
+      db = Sequel.mysql(MYSQL_DB_NAME, :host => 'localhost', :user => 'root', :socket => MYSQL_SOCKET_FILE)
+      proc {db.test_connection}.should_not raise_error
+    end
+    
+    specify "should accept a socket option without host option" do
+      db = Sequel.mysql(MYSQL_DB_NAME, :user => 'root', :socket => MYSQL_SOCKET_FILE)
+      proc {db.test_connection}.should_not raise_error
+    end
+    
+    specify "should fail to connect with invalid socket" do
+      db = Sequel.mysql(MYSQL_DB_NAME, :host => 'localhost', :user => 'root', :socket => 'blah')
+      proc {db.test_connection}.should raise_error
+    end
   end
 end
 

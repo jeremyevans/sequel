@@ -1,6 +1,6 @@
 === HEAD
 
-* Use the database driver provided string quoting methods for MySQL and SQLite (jeremyevans)
+* Use the database driver provided string quoting methods for MySQL and SQLite (jeremyevans) (#223)
 
 * Add ColumnAll#==, for checking the equality of two ColumnAlls (jeremyevans)
 

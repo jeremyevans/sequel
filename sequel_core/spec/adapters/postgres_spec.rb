@@ -1,4 +1,3 @@
-require File.join(File.dirname(__FILE__), '../../lib/sequel_core')
 require File.join(File.dirname(__FILE__), '../spec_helper.rb')
 
 unless defined?(POSTGRES_DB)
