@@ -2049,6 +2049,12 @@ context "A paginated dataset" do
     proc {@d.paginate(0, 20)}.should raise_error(Sequel::Error)
   end
   
+  specify "should not raise error if page_no is 1 and record count is 0" do
+    ds = @d.clone(:sql => 'select * from blah')
+    ds.meta_def(:count) {0}
+    proc {ds.paginate(1, 20)}.should_not raise_error(Sequel::Error)
+  end
+
   specify "should work with fixed sql" do
     ds = @d.clone(:sql => 'select * from blah')
     ds.meta_def(:count) {150}
