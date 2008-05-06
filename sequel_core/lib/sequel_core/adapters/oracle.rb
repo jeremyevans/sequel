@@ -64,7 +64,7 @@ module Sequel
             result
           rescue => e
             conn.rollback
-            raise e unless SequelRollbackError === e
+            raise e unless Error::Rollback === e
           ensure
             conn.autocommit = true
             @transactions.delete(Thread.current)
@@ -76,8 +76,8 @@ module Sequel
     class Dataset < Sequel::Dataset
       def literal(v)
         case v
-        when Time
-          literal(v.iso8601)
+        when OraDate
+          literal(Time.local(*v.to_a))
         else
           super
         end
@@ -112,6 +112,9 @@ module Sequel
         @db.do delete_sql(opts)
       end
 
+      def empty?
+        db[:dual].where(exists).get(1) == nil
+      end
 
       # Formats a SELECT statement using the given options and the dataset
       # options.
