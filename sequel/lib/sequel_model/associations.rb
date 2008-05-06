@@ -260,7 +260,7 @@ module Sequel::Model::Associations
   def def_many_to_many(name, opts)
     ivar = association_ivar(name)
     left = (opts[:left_key] ||= default_remote_key)
-    right = (opts[:right_key] ||= :"#{name.to_s.singularize}_id")
+    right = (opts[:right_key] ||= default_foreign_key(opts))
     opts[:class_name] ||= name.to_s.singularize.camelize
     join_table = (opts[:join_table] ||= default_join_table_name(opts))
     opts[:left_key_alias] ||= :"x_foreign_key_x"
@@ -299,7 +299,7 @@ module Sequel::Model::Associations
   def def_many_to_one(name, opts)
     ivar = association_ivar(name)
     
-    key = (opts[:key] ||= :"#{name}_id")
+    key = (opts[:key] ||= default_foreign_key(opts))
     opts[:class_name] ||= name.to_s.camelize
     
     def_association_getter(name) {(fk = send(key)) ? opts.associated_class.select(opts.select).filter(opts.associated_primary_key=>fk).first : nil}
@@ -351,13 +351,21 @@ module Sequel::Model::Associations
     end
   end
   
+  # Default foreign key name symbol for foreign key in current model's table that points to
+  # the given association's table's primary key.
+  def default_foreign_key(reflection)
+    name = reflection[:name]
+    :"#{reflection[:type] == :many_to_one ? name : name.to_s.singularize}_id"
+  end
+
   # Name symbol for default join table
   def default_join_table_name(opts)
     ([opts[:class_name].demodulize, name.demodulize]. \
       map{|i| i.pluralize.underscore}.sort.join('_')).to_sym
   end
   
-  # Name symbol for default foreign key
+  # Default foreign key name symbol for key in associated table that points to
+  # current table's primary key.
   def default_remote_key
     :"#{name.demodulize.underscore}_id"
   end
