@@ -1,5 +1,7 @@
 === HEAD
 
+* Cache negative lookup when eagerly loading many_to_one associations (jeremyevans)
+
 * Make all associations support the :select option, not just many_to_many (jeremyevans)
 
 * Allow the use of blocks when eager loading, and add the :eager_block and :allow_eager association options for configuration (jeremyevans)

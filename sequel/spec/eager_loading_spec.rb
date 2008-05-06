@@ -47,7 +47,11 @@ describe Sequel::Model, "#eager" do
     
     EagerAlbum.dataset.extend(Module.new {
       def fetch_rows(sql)
-        h = {:id => 1, :band_id=> 2}
+        h = if sql =~ /101/
+          {:id => 101, :band_id=> 101}
+        else
+          {:id => 1, :band_id=> 2}
+        end
         h.merge!(:x_foreign_key_x=>4) if sql =~ /ag\.genre_id/
         @db << sql
         yield h
@@ -59,7 +63,14 @@ describe Sequel::Model, "#eager" do
         h = {:id => 2}
         h.merge!(:x_foreign_key_x=>5) if sql =~ /bm\.member_id/
         @db << sql
-        yield h
+        case sql
+        when /id IN (101)/
+        when /id > 100/
+          yield({:id => 101})
+          yield({:id => 102})
+        else
+          yield h
+        end
       end
     })
     
@@ -258,6 +269,35 @@ describe Sequel::Model, "#eager" do
     MODEL_DB.sqls.length.should == 2
   end
 
+  it "should cache the negative lookup when eagerly loading a many_to_one association" do
+    a = EagerAlbum.eager(:band).filter(:id=>101).all
+    a.should be_a_kind_of(Array)
+    a.size.should == 1
+    a.first.should be_a_kind_of(EagerAlbum)
+    a.first.values.should == {:id => 101, :band_id => 101}
+    MODEL_DB.sqls.should == ['SELECT * FROM albums WHERE (id = 101)', 'SELECT bands.* FROM bands WHERE (id IN (101))']
+    a = a.first
+    a.instance_variable_get(:@band).should == :null
+    a.band.should == nil
+    MODEL_DB.sqls.length.should == 2
+  end
+  
+  it "should cache the negative lookup when eagerly loading a *_to_many associations" do
+    a = EagerBand.eager(:albums).filter('id > 100').all
+    a.should be_a_kind_of(Array)
+    a.size.should == 2
+    a.first.should be_a_kind_of(EagerBand)
+    a.first.values.should == {:id => 101}
+    a.last.values.should == {:id => 102}
+    MODEL_DB.sqls.should == ['SELECT * FROM bands WHERE id > 100', 'SELECT albums.* FROM albums WHERE (band_id IN (101, 102))', "SELECT tracks.* FROM tracks WHERE (album_id IN (101))"]
+    a.first.instance_variable_get(:@albums).should be_a_kind_of(Array)
+    a.first.albums.length.should == 1
+    a.first.albums.first.should be_a_kind_of(EagerAlbum)
+    a.last.instance_variable_get(:@albums).should == []
+    a.last.albums.should == []
+    MODEL_DB.sqls.length.should == 3
+  end
+  
   it "should use the association's block when eager loading by default" do
     EagerAlbum.eager(:good_tracks).all
     MODEL_DB.sqls.should == ['SELECT * FROM albums', "SELECT tracks.* FROM tracks WHERE (album_id IN (1)) AND (name = 'Good')"]
