@@ -2022,14 +2022,31 @@ context "A paginated dataset" do
   specify "should return the record range for the current page" do
     @paginated.current_page_record_range.should == (1..20)
     @d.paginate(4, 50).current_page_record_range.should == (151..153)
-    @d.paginate(5, 50).current_page_record_range.should == (0..0)
   end
 
   specify "should return the record count for the current page" do
     @paginated.current_page_record_count.should == 20
     @d.paginate(3, 50).current_page_record_count.should == 50
     @d.paginate(4, 50).current_page_record_count.should == 3
-    @d.paginate(5, 50).current_page_record_count.should == 0
+  end
+
+  specify "should know if current page is last page" do
+    @paginated.last_page?.should be_false
+    @d.paginate(2, 20).last_page?.should be_false
+    @d.paginate(5, 30).last_page?.should be_false
+    @d.paginate(6, 30).last_page?.should be_true
+  end
+
+  specify "should know if current page is first page" do
+    @paginated.first_page?.should be_true
+    @d.paginate(1, 20).first_page?.should be_true
+    @d.paginate(2, 20).first_page?.should be_false
+  end
+
+  specify "should raise error if page_no outside 1 and total page count" do
+    proc {@d.paginate(2, 154)}.should raise_error(Sequel::Error)
+    proc {@d.paginate(3, 80)}.should raise_error(Sequel::Error)
+    proc {@d.paginate(0, 20)}.should raise_error(Sequel::Error)
   end
   
   specify "should work with fixed sql" do

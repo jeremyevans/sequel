@@ -1,5 +1,9 @@
 === HEAD
 
+* raise error in Dataset#paginate if page_no is out of bounds (thanks apeiros)
+
+* Add Pagination#last_page? and Pagination#first_page? (thanks apeiros)
+
 * Fixed uri handler to interpret sqlite:// URI like file:// URI (dlee)
 
 * Add ColumnAll#==, for checking the equality of two ColumnAlls (jeremyevans)
