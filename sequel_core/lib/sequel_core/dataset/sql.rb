@@ -687,19 +687,14 @@ module Sequel
       # If given a range, it will contain only those at offsets within that
       # range. If a second argument is given, it is used as an offset.
       def limit(l, o = nil)
-        if @opts[:sql]
-          return from_self.limit(l, o)
-        end
+        return from_self.limit(l, o) if @opts[:sql]
 
-        opts = {}
-        if l.is_a? Range
-          lim = (l.exclude_end? ? l.last - l.first : l.last + 1 - l.first)
-          opts = {:limit => lim, :offset=>l.first}
-        elsif o
-          opts = {:limit => l, :offset => o}
-        else
-          opts = {:limit => l}
+        if Range === l
+          o = l.first
+          l = l.last - o + (l.exclude_end? ? 0 : 1)
         end
+        opts = {:limit => l.to_i}
+        opts[:offset] = o.to_i if o
         clone(opts)
       end
       
