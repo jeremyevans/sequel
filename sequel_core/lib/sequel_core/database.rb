@@ -19,13 +19,8 @@ module Sequel
       
       # Determine if the DB is single threaded or multi threaded
       @single_threaded = opts[:single_threaded] || @@single_threaded
-      # Construct pool
-      if @single_threaded
-        @pool = SingleThreadedPool.new(&block)
-      else
-        @pool = ConnectionPool.new(opts[:max_connections] || 4, &block)
-      end
-      @pool.connection_proc = block || proc {connect}
+      @pool = (@single_threaded ? SingleThreadedPool : ConnectionPool).new(connection_pool_default_options.merge(opts), &block)
+      @pool.connection_proc = proc {connect} unless block
 
       @logger = opts[:logger]
       ::Sequel::DATABASES.push(self)
@@ -41,6 +36,29 @@ module Sequel
     def disconnect
       raise NotImplementedError, "#disconnect should be overriden by adapters"
     end
+
+    # Default options for the connection pool.
+    #
+    # * :max_connections - The maximum number of connections the connection pool
+    #   will open (default 4)
+    # * :pool_timeout - The amount of seconds waiting to acquirea connection
+    #   before raising a PoolTimeoutError (default 5)
+    # * :pool_sleep_time - The amount of time to sleep before attempting to acquire
+    #   a connection again (default 0.001)
+    # * :pool_reuse_connections - Which strategy to follow in regards to reusing connections:
+    #   * :always - Always reuse a connection that belongs to the same thread
+    #   * :allow - Only reuse a connection that belongs to the same thread if
+    #     another cannot be acquired immediately (default)
+    #   * :last_resort - Only reuse a connection that belongs to the same thread if
+    #     the pool timeout has expired
+    #   * :never - Never reuse a connection that belongs to the same thread
+    # * :pool_convert_exceptions - Whether to convert non-StandardError based exceptions
+    #   to RuntimeError exceptions (default true)
+    def connection_pool_default_options
+      {:pool_timeout=>5, :pool_sleep_time=>0.001, :pool_reuse_connections=>:allow,
+       :pool_convert_exceptions=>true, :max_connections=>4}
+    end
+    private :connection_pool_default_options
     
     # Returns true if the database is using a multi-threaded connection pool.
     def multi_threaded?

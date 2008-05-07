@@ -233,6 +233,11 @@ module Sequel
         @opts[:database] = db_name if self << "USE #{db_name}"
         self
       end
+
+      private
+        def connection_pool_default_options
+          super.merge(:pool_reuse_connections=>:last_resort)
+        end
     end
 
     class Dataset < Sequel::Dataset

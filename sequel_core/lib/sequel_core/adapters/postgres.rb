@@ -348,6 +348,11 @@ module Sequel
       def drop_table_sql(name)
         "DROP TABLE #{name} CASCADE"
       end
+
+      private
+        def connection_pool_default_options
+          super.merge(:pool_reuse_connections=>:always)
+        end
     end
   
     class Dataset < Sequel::Dataset

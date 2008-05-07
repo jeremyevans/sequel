@@ -1,5 +1,11 @@
 === HEAD
 
+* Using a memory database with SQLite now defaults to a single connection, so all queries it uses run against the same database (jeremyevans)
+
+* Fix attempting to query MySQL using the same connection being used to concurrently execute another query (jeremyevans)
+
+* Add options to the connection pool to configure reusing connections and converting exceptions (jeremyevans)
+
 * Use the database driver provided string quoting methods for MySQL and SQLite (jeremyevans) (#223)
 
 * Add ColumnAll#==, for checking the equality of two ColumnAlls (jeremyevans)

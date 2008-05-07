@@ -10,9 +10,7 @@ module Sequel
       end
 
       def connect
-        if @opts[:database].nil?
-          @opts[:database] = ':memory:'
-        end
+        @opts[:database] = ':memory:' if @opts[:database].blank?
         db = ::SQLite3::Database.new(@opts[:database])
         db.busy_timeout(@opts.fetch(:timeout, 5000))
         db.type_translation = true
@@ -129,6 +127,15 @@ module Sequel
           end
         end
       end
+      
+      private
+        def connection_pool_default_options
+          o = super.merge(:pool_reuse_connections=>:always)
+          # Default to only a single connection if a memory database is used,
+          # because otherwise each connection will get a separate database
+          o[:max_connections] = 1 if @opts[:database] == ':memory:' || @opts[:database].blank?
+          o
+        end
     end
     
     class Dataset < Sequel::Dataset
