@@ -1,5 +1,7 @@
 === HEAD
 
+* Change PostgreSQL adapter to raise Sequel::Error instead of PGError if a database error occurs (jeremyevans)
+
 * Using a memory database with SQLite now defaults to a single connection, so all queries it uses run against the same database (jeremyevans)
 
 * Fix attempting to query MySQL using the same connection being used to concurrently execute another query (jeremyevans)

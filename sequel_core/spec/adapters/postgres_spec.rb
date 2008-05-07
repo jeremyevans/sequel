@@ -36,6 +36,10 @@ context "A PostgreSQL database" do
   specify "should provide the server version" do
     @db.server_version.should > 70000
   end
+
+  specify "should raise Sequel::Error on error" do
+    proc{@db << "SELECT 1 + 'a'"}.should raise_error(Sequel::Error)
+  end
 end
 
 context "A PostgreSQL dataset" do

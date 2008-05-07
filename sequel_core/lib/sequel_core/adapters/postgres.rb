@@ -229,11 +229,13 @@ module Sequel
       end
     
       def execute(sql, &block)
-        @logger.info(sql) if @logger
-        @pool.hold {|conn| conn.execute(sql, &block)}
-      rescue => e
-        @logger.error(e.message) if @logger
-        raise e
+        begin
+          @logger.info(sql) if @logger
+          @pool.hold {|conn| conn.execute(sql, &block)}
+        rescue => e
+          @logger.error(e.message) if @logger
+          raise convert_pgerror(e)
+        end
       end
     
       def primary_key_for_table(conn, table)
@@ -279,14 +281,16 @@ module Sequel
       end
       
       def execute_insert(sql, table, values)
-        @logger.info(sql) if @logger
-        @pool.hold do |conn|
-          conn.execute(sql)
-          insert_result(conn, table, values)
+        begin 
+          @logger.info(sql) if @logger
+          @pool.hold do |conn|
+            conn.execute(sql)
+            insert_result(conn, table, values)
+          end
+        rescue => e
+          @logger.error(e.message) if @logger
+          raise convert_pgerror(e)
         end
-      rescue => e
-        @logger.error(e.message) if @logger
-        raise e
       end
     
       SQL_BEGIN = 'BEGIN'.freeze
@@ -308,13 +312,13 @@ module Sequel
                 conn.async_exec(SQL_COMMIT)
               rescue => e
                 @logger.error(e.message) if @logger
-                raise e
+                raise convert_pgerror(e)
               end
               result
             rescue => e
               @logger.info(SQL_ROLLBACK) if @logger
               conn.async_exec(SQL_ROLLBACK) rescue nil
-              raise e unless Error::Rollback === e
+              raise convert_pgerror(e) unless Error::Rollback === e
             ensure
               conn.transaction_in_progress = nil
             end
@@ -350,8 +354,15 @@ module Sequel
       end
 
       private
+        # If the given exception is a PGError, return a Sequel::Error with the same message, otherwise
+        # just return the given exception
+        def convert_pgerror(e)
+          PGError === e ? Error.new(e.message) : e
+        end
+
+        # PostgreSQL currently can always reuse connections.  It doesn't need the pool to convert exceptions, either.
         def connection_pool_default_options
-          super.merge(:pool_reuse_connections=>:always)
+          super.merge(:pool_reuse_connections=>:always, :pool_convert_exceptions=>false)
         end
     end
   
