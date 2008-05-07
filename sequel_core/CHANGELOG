@@ -2,7 +2,7 @@
 
 * Change SQLite adapter so it doesn't swallow exceptions other than SQLite3::Exception (such as Interrupt) (jeremyevans)
 
-* Change PostgreSQL adapter to raise Sequel::Error instead of PGError if a database error occurs (jeremyevans)
+* Change PostgreSQL and MySQL adapters to raise Sequel::Error instead of database specific errors if a database error occurs (jeremyevans)
 
 * Using a memory database with SQLite now defaults to a single connection, so all queries it uses run against the same database (jeremyevans)
 

@@ -135,10 +135,14 @@ module Sequel
       end
 
       def execute(sql, &block)
-        @logger.info(sql) if @logger
-        @pool.hold do |conn|
-          conn.query(sql)
-          block[conn] if block
+        begin
+          @logger.info(sql) if @logger
+          @pool.hold do |conn|
+            conn.query(sql)
+            block[conn] if block
+          end
+        rescue Mysql::Error => e
+          raise Error.new(e.message)
         end
       end
 
@@ -220,7 +224,7 @@ module Sequel
             result
           rescue => e
             conn.query(SQL_ROLLBACK)
-            raise e unless Error::Rollback === e
+            raise (Mysql::Error === e ? Error.new(e.message) : e) unless Error::Rollback === e
           ensure
             @transactions.delete(Thread.current)
           end
@@ -236,7 +240,7 @@ module Sequel
 
       private
         def connection_pool_default_options
-          super.merge(:pool_reuse_connections=>:last_resort)
+          super.merge(:pool_reuse_connections=>:last_resort, :pool_convert_exceptions=>false)
         end
     end
 

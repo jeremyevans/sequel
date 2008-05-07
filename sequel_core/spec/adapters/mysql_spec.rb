@@ -50,6 +50,10 @@ context "A MySQL database" do
       {:id => 3, :name => 'ghi'}
     ]
   end
+
+  specify "Should convert Mysql::Errors to Sequel::Errors" do
+   proc{@db << "SELECT 1 + blah;"}.should raise_error(Sequel::Error)
+  end
 end
 
 context "A MySQL dataset" do
