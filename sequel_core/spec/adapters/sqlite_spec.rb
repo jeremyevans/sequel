@@ -1,7 +1,7 @@
 require File.join(File.dirname(__FILE__), '../spec_helper.rb')
 
 unless defined?(SQLITE_DB)
-  SQLITE_DB = Sequel.connect('sqlite:/')
+  SQLITE_DB = Sequel.connect('sqlite:/', :max_connections=>1)
 end
 
 SQLITE_DB.create_table :items do
@@ -16,8 +16,11 @@ end
 SQLITE_DB.create_table(:time) {timestamp :t}
 
 context "An SQLite database" do
-  setup do
-    @db = Sequel.connect('sqlite:/')
+  before do
+    @db = Sequel.connect('sqlite:/', :max_connections=>1)
+  end
+  after do
+    @db.disconnect
   end
   
   specify "should provide a list of existing tables" do

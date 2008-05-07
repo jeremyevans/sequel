@@ -1,6 +1,6 @@
 module Sequel
   # Represents an error raised in Sequel code.
-  class Error < StandardError
+  class Error < ::StandardError
     
     # Error raised when an invalid statement is executed.
     class InvalidStatement < Error; end
@@ -33,5 +33,8 @@ module Sequel
     
     # Raised when Sequel is unable to load a specified adapter.
     class AdapterNotFound < Error ; end
+
+    # There was an error while waiting on a connection from the connection pool
+    class PoolTimeoutError < Error ; end
   end  
 end

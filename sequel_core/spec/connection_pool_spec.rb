@@ -10,7 +10,7 @@ context "An empty ConnectionPool" do
   end
 
   specify "should have no allocated connections" do
-    @cpool.allocated.should == {}
+    @cpool.allocated.should == []
   end
 
   specify "should have a created_count of zero" do
@@ -27,15 +27,16 @@ context "A connection pool handling connections" do
   specify "#hold should increment #created_count" do
     @cpool.hold do
       @cpool.created_count.should == 1
-      @cpool.hold {@cpool.created_count.should == 1}
+      @cpool.hold {@cpool.created_count.should == 2}
+      @cpool.hold {@cpool.hold {@cpool.created_count.should == 2}}
     end
   end
 
-  specify "#hold should add the connection to the #allocated hash" do
+  specify "#hold should add the connection to the #allocated array" do
     @cpool.hold do
       @cpool.allocated.size.should == 1
   
-      @cpool.allocated.values.should == [:got_connection]
+      @cpool.allocated.should == [[Thread.current, :got_connection]]
     end
   end
 
@@ -151,7 +152,7 @@ context "A connection pool with a max size of 1" do
     c2.should be_nil
     
     @pool.available_connections.should be_empty
-    @pool.allocated.should == {t1 => cc}
+    @pool.allocated.should == [[t1, cc]]
     
     cc.gsub!('rr', 'll')
     sleep 0.5
@@ -163,7 +164,7 @@ context "A connection pool with a max size of 1" do
     c2.should == 'hello'
 
     @pool.available_connections.should be_empty
-    @pool.allocated.should == {t2 => cc}
+    @pool.allocated.should == [[t2, cc]]
     
     cc.gsub!('ll', 'rr')
     sleep 0.5
@@ -219,8 +220,8 @@ context "A connection pool with a max size of 5" do
     @invoked_count.should == 5
     @pool.size.should == 5
     @pool.available_connections.should be_empty
-    @pool.allocated.should == {threads[0] => 1, threads[1] => 2, threads[2] => 3,
-      threads[3] => 4, threads[4] => 5}
+    i = 0
+    @pool.allocated.should == threads.collect{|t| [t,i+=1]}
     
     threads[0].raise "your'e dead"
     sleep 0.1
@@ -229,7 +230,7 @@ context "A connection pool with a max size of 5" do
     sleep 0.1
     
     @pool.available_connections.should == [1, 4]
-    @pool.allocated.should == {threads[1] => 2, threads[2] => 3, threads[4] => 5}
+    @pool.allocated.should == [[threads[1], 2], [threads[2], 3], [threads[4], 5]]
     
     stop = true
     sleep 0.2
