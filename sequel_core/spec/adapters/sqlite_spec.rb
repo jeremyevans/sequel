@@ -166,6 +166,10 @@ context "An SQLite database" do
     proc {@db.single_value 'blah blah'}.should raise_error(
       Sequel::Error::InvalidStatement, "blah blah\r\nnear \"blah\": syntax error")
   end
+  
+  specify "should not swallow non-SQLite based exceptions" do
+    proc {@db.pool.hold{raise Interrupt, "test"}}.should raise_error(Interrupt)
+  end
 end
 
 context "An SQLite dataset" do
