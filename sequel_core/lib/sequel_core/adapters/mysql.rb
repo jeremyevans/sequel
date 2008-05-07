@@ -222,7 +222,7 @@ module Sequel
             result = yield(conn)
             conn.query(SQL_COMMIT)
             result
-          rescue => e
+          rescue ::Exception => e
             conn.query(SQL_ROLLBACK)
             raise (Mysql::Error === e ? Error.new(e.message) : e) unless Error::Rollback === e
           ensure

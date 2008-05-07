@@ -252,11 +252,7 @@ module Sequel
         rescue PGError => e
           # An error could occur if the inserted values include a primary key
           # value, while the primary key is serial.
-          if e.message =~ RE_CURRVAL_ERROR
-            raise Error, "Could not return primary key value for the inserted record. Are you specifying a primary key value for a serial primary key?"
-          else
-            raise e
-          end
+          raise Error.new(e.message =~ RE_CURRVAL_ERROR ? "Could not return primary key value for the inserted record. Are you specifying a primary key value for a serial primary key?" : e.message)
         end
         
         case values
@@ -315,7 +311,7 @@ module Sequel
                 raise convert_pgerror(e)
               end
               result
-            rescue => e
+            rescue ::Exception => e
               @logger.info(SQL_ROLLBACK) if @logger
               conn.async_exec(SQL_ROLLBACK) rescue nil
               raise convert_pgerror(e) unless Error::Rollback === e

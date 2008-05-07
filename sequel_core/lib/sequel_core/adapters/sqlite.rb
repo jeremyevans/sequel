@@ -130,7 +130,7 @@ module Sequel
             result = nil
             conn.transaction {result = yield(conn)}
             result
-          rescue => e
+          rescue ::Exception => e
             raise (SQLite3::Exception === e ? Error.new(e.message) : e) unless Error::Rollback === e
           end
         end
