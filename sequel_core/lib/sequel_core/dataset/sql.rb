@@ -758,6 +758,7 @@ module Sequel
           single_value(STOCK_COUNT_OPTS).to_i
         end
       end
+      alias_method :size, :count
     end
   end
 end

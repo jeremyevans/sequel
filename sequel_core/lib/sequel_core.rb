@@ -1,8 +1,6 @@
-require "bigdecimal"
-require "bigdecimal/util"
-require "metaid"
-require "uri"
-
+%w'bigdecimal bigdecimal/util time date metaid uri yaml'.each do |f|
+  require f
+end
 %w"deprecated core_ext core_sql connection_pool exceptions pretty_table
   dataset migration schema database worker object_graph".each do |f|
   require "sequel_core/#{f}"
