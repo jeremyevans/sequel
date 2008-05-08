@@ -1,7 +1,8 @@
 require File.join(File.dirname(__FILE__), '../spec_helper.rb')
 
 unless defined?(POSTGRES_DB)
-  POSTGRES_DB = Sequel.connect(ENV['SEQUEL_PG_SPEC_DB']||'postgres://postgres:postgres@localhost:5432/reality_spec')
+  POSTGRES_URL = 'postgres://postgres:postgres@localhost:5432/reality_spec' unless defined? POSTGRES_URL
+  POSTGRES_DB = Sequel.connect(ENV['SEQUEL_PG_SPEC_DB']||POSTGRES_URL)
 end
 
 POSTGRES_DB.drop_table(:test) if POSTGRES_DB.table_exists?(:test)
@@ -160,6 +161,17 @@ context "A PostgreSQL dataset" do
     end
 
     @d.count.should == 1
+  end
+  
+  specify "should correctly rollback transactions" do
+    proc do
+      POSTGRES_DB.transaction do
+        @d << {:name => 'abc', :value => 1}
+        raise Interrupt, 'asdf'
+      end
+    end.should raise_error(Interrupt)
+
+    @d.count.should == 0
   end
   
   specify "should support regexps" do

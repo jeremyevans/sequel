@@ -216,13 +216,16 @@ module Sequel
           if @transactions.include? Thread.current
             return yield(conn)
           end
+          @logger.info(SQL_BEGIN) if @logger
           conn.query(SQL_BEGIN)
           begin
             @transactions << Thread.current
             result = yield(conn)
+            @logger.info(SQL_COMMIT) if @logger
             conn.query(SQL_COMMIT)
             result
           rescue ::Exception => e
+            @logger.info(SQL_ROLLBACK) if @logger
             conn.query(SQL_ROLLBACK)
             raise (Mysql::Error === e ? Error.new(e.message) : e) unless Error::Rollback === e
           ensure
