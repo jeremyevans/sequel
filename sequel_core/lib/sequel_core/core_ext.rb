@@ -12,32 +12,28 @@ class Array
   end
 end
 
-# Enumerable extensions.
 module Enumerable
   # Invokes the specified method for each item, along with the supplied
   # arguments.
   def send_each(sym, *args)
-    each {|i| i.send(sym, *args)}
+    each{|i| i.send(sym, *args)}
   end
 end
 
-# Range extensions
 class Range
   # Returns the interval between the beginning and end of the range.
   def interval
-    last - first
+    last - first - (exclude_end? ? 1 : 0)
   end
 end
 
+# Add some metaprogramming methods to avoid class << self
 class Module
   private
     # Define an instance method(s) that class the class method of the
-    # same name.
-    # Replaces the construct:
+    # same name. Replaces the construct:
     #
-    #   class << self
-    #     attr_reader *meths
-    #   end
+    #   define_method(meth){self.class.send(meth)}
     def class_attr_reader(*meths)
       meths.each{|meth| define_method(meth){self.class.send(meth)}}
     end
@@ -73,17 +69,15 @@ class Module
     end
 end
 
-# Object extensions
 class Object
   # Returns true if the object is a object of one of the classes
   def is_one_of?(*classes)
-    classes.each {|c| return c if is_a?(c)}
-    nil
+    !!classes.find{|c| is_a?(c)}
   end
 
   # Objects are blank if they respond true to empty?
   def blank?
-    nil? || (respond_to?(:empty?) && empty?)
+    respond_to?(:empty?) && empty?
   end
 end
 
@@ -116,9 +110,8 @@ class FalseClass
 end
 
 class String
-  BLANK_STRING_REGEXP = /\A\s*\z/
   # Strings are blank if they are empty or include only whitespace
   def blank?
-    empty? || BLANK_STRING_REGEXP.match(self)
+    strip.empty?
   end
 end

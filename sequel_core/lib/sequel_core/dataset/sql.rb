@@ -691,7 +691,7 @@ module Sequel
 
         if Range === l
           o = l.first
-          l = l.last - o + (l.exclude_end? ? 0 : 1)
+          l = l.interval + 1
         end
         opts = {:limit => l.to_i}
         opts[:offset] = o.to_i if o
