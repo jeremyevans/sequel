@@ -3,13 +3,66 @@ module Sequel
     # The Dataset SQL module implements all the dataset methods concerned with
     # generating SQL statements for retrieving and manipulating records.
     module SQL
+      ALIASED_REGEXP = /\A(.*)\s(.*)\z/.freeze
+      QUALIFIED_REGEXP = /\A(.*)\.(.*)\z/.freeze
+      WILDCARD = '*'.freeze
+      COMMA_SEPARATOR = ", ".freeze
+      COLUMN_REF_RE1 = /^(\w+)__(\w+)___(\w+)/.freeze
+      COLUMN_REF_RE2 = /\A(\w+)___(\w+)\z/.freeze
+      COLUMN_REF_RE3 = /\A(\w+)__(\w+)\z/.freeze
+
+
+      # Converts a symbol into a column name. This method supports underscore
+      # notation in order to express qualified (two underscores) and aliased
+      # (three underscores) columns:
+      #
+      #   ds = DB[:items]
+      #   :abc.to_column_ref(ds) #=> "abc"
+      #   :abc___a.to_column_ref(ds) #=> "abc AS a"
+      #   :items__abc.to_column_ref(ds) #=> "items.abc"
+      #   :items__abc___a.to_column_ref(ds) #=> "items.abc AS a"
+      #
+      def symbol_to_column_ref(sym)
+        s = sym.to_s
+        if m = COLUMN_REF_RE1.match(s)
+          "#{m[1]}.#{quote_column_ref(m[2])} AS #{quote_column_ref(m[3])}"
+        elsif m = COLUMN_REF_RE2.match(s)
+          "#{quote_column_ref(m[1])} AS #{quote_column_ref(m[2])}"
+        elsif m = COLUMN_REF_RE3.match(s)
+          "#{m[1]}.#{quote_column_ref(m[2])}"
+        else
+          quote_column_ref(s)
+        end
+      end
+
+      def column_all_sql(ca)
+        "#{ca.table}.*"
+      end
+
+      def subscript_sql(s)
+        "#{s.f}[#{s.sub.join(COMMA_SEPARATOR)}]"
+      end
+
+      def function_sql(f)
+        args = f.args
+        "#{f.f}(#{literal(args) unless args.empty?})"
+      end
+
+      def qualified_column_ref_sql(qcr)
+        "#{qcr.table}.#{literal(qcr.column)}"
+      end
+
+      def column_expr_sql(ce)
+        r = ce.r
+        "#{literal(ce.l)} #{ce.op}#{" #{literal(r)}" if r}"
+      end
+
       # Adds quoting to column references. This method is just a stub and can
       # be overriden in adapters in order to provide correct column quoting
       # behavior.
-      def quote_column_ref(name); name.to_s; end
-      
-      ALIASED_REGEXP = /\A(.*)\s(.*)\z/.freeze
-      QUALIFIED_REGEXP = /\A(.*)\.(.*)\z/.freeze
+      def quote_column_ref(name);
+        name.to_s;
+      end
 
       # Returns a qualified column name (including a table name) if the column
       # name isn't already qualified.
@@ -26,9 +79,6 @@ module Sequel
           Sequel::SQL::QualifiedColumnRef.new(table, column)
         end
       end
-
-      WILDCARD = '*'.freeze
-      COMMA_SEPARATOR = ", ".freeze
 
       # Converts an array of column names into a comma seperated string of 
       # column names. If the array is empty, a wildcard (*) is returned.
