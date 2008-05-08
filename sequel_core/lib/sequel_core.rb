@@ -1,6 +1,7 @@
-require "metaid"
 require "bigdecimal"
 require "bigdecimal/util"
+require "metaid"
+require "uri"
 
 %w"deprecated core_ext core_sql connection_pool exceptions pretty_table
   dataset migration schema database worker object_graph".each do |f|

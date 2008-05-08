@@ -17,25 +17,43 @@ class ConnectionPool
   # Constructs a new pool with a maximum size. If a block is supplied, it
   # is used to create new connections as they are needed.
   #
-  #   pool = ConnectionPool.new(10) {MyConnection.new(opts)}
+  #   pool = ConnectionPool.new(:max_connections=>10) {MyConnection.new(opts)}
   #
   # The connection creation proc can be changed at any time by assigning a 
   # Proc to pool#connection_proc.
   #
-  #   pool = ConnectionPool.new(10)
+  #   pool = ConnectionPool.new(:max_connections=>10)
   #   pool.connection_proc = proc {MyConnection.new(opts)}
-  def initialize(opts, &block)
-    @max_size = opts[:max_connections]
+  #
+  # The connection pool takes the following options:
+  #
+  # * :max_connections - The maximum number of connections the connection pool
+  #   will open (default 4)
+  # * :pool_convert_exceptions - Whether to convert non-StandardError based exceptions
+  #   to RuntimeError exceptions (default true)
+  # * :pool_reuse_connections - Which strategy to follow in regards to reusing connections:
+  #   * :always - Always reuse a connection that belongs to the same thread
+  #   * :allow - Only reuse a connection that belongs to the same thread if
+  #     another cannot be acquired immediately (default)
+  #   * :last_resort - Only reuse a connection that belongs to the same thread if
+  #     the pool timeout has expired
+  #   * :never - Never reuse a connection that belongs to the same thread
+  # * :pool_sleep_time - The amount of time to sleep before attempting to acquire
+  #   a connection again (default 0.001)
+  # * :pool_timeout - The amount of seconds waiting to acquirea connection
+  #   before raising a PoolTimeoutError (default 5)
+  def initialize(opts = {}, &block)
+    @max_size = opts[:max_connections] || 4
     @mutex = Mutex.new
     @connection_proc = block
 
     @available_connections = []
     @allocated = []
     @created_count = 0
-    @timeout = opts[:pool_timeout]
-    @sleep_time = opts[:pool_sleep_time]
-    @reuse_connections = opts[:pool_reuse_connections]
-    @convert_exceptions = opts[:pool_convert_exceptions]
+    @timeout = opts[:pool_timeout] || 5
+    @sleep_time = opts[:pool_sleep_time] || 0.001
+    @reuse_connections = opts[:pool_reuse_connections] || :allow
+    @convert_exceptions = opts.include?(:pool_convert_exceptions) ? opts[:pool_convert_exceptions] : true
   end
   
   # Returns the number of created connections.
@@ -150,9 +168,9 @@ class SingleThreadedPool
   attr_writer :connection_proc
   
   # Initializes the instance with the supplied block as the connection_proc.
-  def initialize(opts, &block)
+  def initialize(opts={}, &block)
     @connection_proc = block
-    @convert_exceptions = opts[:pool_convert_exceptions]
+    @convert_exceptions = opts.include?(:pool_convert_exceptions) ? opts[:pool_convert_exceptions] : true
   end
   
   # Yields the connection to the supplied block. This method simulates the
