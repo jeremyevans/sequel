@@ -51,25 +51,14 @@ context "String#lit" do
   end
   
   specify "should inhibit string literalization" do
-    db = Sequel::Database.new
-    ds = db[:t]
-    
-    ds.update_sql(:stamp => "NOW()".lit).should == \
+    Sequel::Database.new[:t].update_sql(:stamp => "NOW()".expr).should == \
       "UPDATE t SET stamp = NOW()"
   end
-end
 
-context "String#expr" do
-  specify "should return an LiteralString object" do
+  specify "should be aliased as expr" do
     'xyz'.expr.should be_a_kind_of(Sequel::LiteralString)
     'xyz'.expr.to_s.should == 'xyz'
-  end
-
-  specify "should inhibit string literalization" do
-    db = Sequel::Database.new
-    ds = db[:t]
-    
-    ds.update_sql(:stamp => "NOW()".expr).should == \
+    Sequel::Database.new[:t].update_sql(:stamp => "NOW()".expr).should == \
       "UPDATE t SET stamp = NOW()"
   end
 end
@@ -295,6 +284,16 @@ context "String#to_date" do
   
   specify "should raise Error::InvalidValue for an invalid date" do
     proc {'0000-00-00'.to_date}.should raise_error(Sequel::Error::InvalidValue)
+  end
+end
+
+context "String#to_datetime" do
+  specify "should convert the string into a DateTime object" do
+    "2007-07-11 10:11:12a".to_datetime.should == DateTime.parse("2007-07-11 10:11:12a")
+  end
+  
+  specify "should raise Error::InvalidValue for an invalid date" do
+    proc {'0000-00-00'.to_datetime}.should raise_error(Sequel::Error::InvalidValue)
   end
 end
 

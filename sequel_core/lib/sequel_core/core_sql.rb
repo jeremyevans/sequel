@@ -49,7 +49,7 @@ class String
   def to_time
     begin
       Time.parse(self)
-    rescue Exception => e
+    rescue => e
       raise Sequel::Error::InvalidValue, "Invalid time value '#{self}' (#{e.message})"
     end
   end
@@ -58,7 +58,16 @@ class String
   def to_date
     begin
       Date.parse(self)
-    rescue Exception => e
+    rescue => e
+      raise Sequel::Error::InvalidValue, "Invalid date value '#{self}' (#{e.message})"
+    end
+  end
+
+  # Converts a string into a DateTime object.
+  def to_datetime
+    begin
+      DateTime.parse(self)
+    rescue => e
       raise Sequel::Error::InvalidValue, "Invalid date value '#{self}' (#{e.message})"
     end
   end
