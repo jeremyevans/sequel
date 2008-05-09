@@ -229,11 +229,13 @@ module Sequel
       end
     
       def execute(sql, &block)
-        @logger.info(sql) if @logger
-        @pool.hold {|conn| conn.execute(sql, &block)}
-      rescue => e
-        @logger.error(e.message) if @logger
-        raise e
+        begin
+          @logger.info(sql) if @logger
+          @pool.hold {|conn| conn.execute(sql, &block)}
+        rescue => e
+          @logger.error(e.message) if @logger
+          raise convert_pgerror(e)
+        end
       end
     
       def primary_key_for_table(conn, table)
@@ -250,11 +252,7 @@ module Sequel
         rescue PGError => e
           # An error could occur if the inserted values include a primary key
           # value, while the primary key is serial.
-          if e.message =~ RE_CURRVAL_ERROR
-            raise Error, "Could not return primary key value for the inserted record. Are you specifying a primary key value for a serial primary key?"
-          else
-            raise e
-          end
+          raise Error.new(e.message =~ RE_CURRVAL_ERROR ? "Could not return primary key value for the inserted record. Are you specifying a primary key value for a serial primary key?" : e.message)
         end
         
         case values
@@ -279,14 +277,16 @@ module Sequel
       end
       
       def execute_insert(sql, table, values)
-        @logger.info(sql) if @logger
-        @pool.hold do |conn|
-          conn.execute(sql)
-          insert_result(conn, table, values)
+        begin 
+          @logger.info(sql) if @logger
+          @pool.hold do |conn|
+            conn.execute(sql)
+            insert_result(conn, table, values)
+          end
+        rescue => e
+          @logger.error(e.message) if @logger
+          raise convert_pgerror(e)
         end
-      rescue => e
-        @logger.error(e.message) if @logger
-        raise e
       end
     
       SQL_BEGIN = 'BEGIN'.freeze
@@ -308,13 +308,13 @@ module Sequel
                 conn.async_exec(SQL_COMMIT)
               rescue => e
                 @logger.error(e.message) if @logger
-                raise e
+                raise convert_pgerror(e)
               end
               result
-            rescue => e
+            rescue ::Exception => e
               @logger.info(SQL_ROLLBACK) if @logger
               conn.async_exec(SQL_ROLLBACK) rescue nil
-              raise e unless Error::Rollback === e
+              raise convert_pgerror(e) unless Error::Rollback === e
             ensure
               conn.transaction_in_progress = nil
             end
@@ -348,6 +348,18 @@ module Sequel
       def drop_table_sql(name)
         "DROP TABLE #{name} CASCADE"
       end
+
+      private
+        # If the given exception is a PGError, return a Sequel::Error with the same message, otherwise
+        # just return the given exception
+        def convert_pgerror(e)
+          PGError === e ? Error.new(e.message) : e
+        end
+
+        # PostgreSQL currently can always reuse connections.  It doesn't need the pool to convert exceptions, either.
+        def connection_pool_default_options
+          super.merge(:pool_reuse_connections=>:always, :pool_convert_exceptions=>false)
+        end
     end
   
     class Dataset < Sequel::Dataset

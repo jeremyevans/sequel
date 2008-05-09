@@ -1,6 +1,4 @@
-require File.join(File.dirname(__FILE__), '../../lib/sequel_core')
 require File.join(File.dirname(__FILE__), '../spec_helper.rb')
-require 'logger'
 
 unless defined?(MYSQL_DB)
   MYSQL_URL = (ENV['SEQUEL_MY_SPEC_DB']||'mysql://root@localhost/sandbox') unless defined? MYSQL_URL
@@ -23,6 +21,15 @@ MYSQL_DB.create_table :test2 do
   text :name
   integer :value
 end
+class Sequel::MySQL::Database
+  attr_accessor :sqls
+end
+logger = Object.new
+def logger.method_missing(m, msg)
+  MYSQL_DB.sqls << msg
+end
+MYSQL_DB.logger = logger
+MYSQL_DB.sqls = []
 
 context "A MySQL database" do
   setup do
@@ -51,12 +58,17 @@ context "A MySQL database" do
       {:id => 3, :name => 'ghi'}
     ]
   end
+
+  specify "Should convert Mysql::Errors to Sequel::Errors" do
+   proc{@db << "SELECT 1 + blah;"}.should raise_error(Sequel::Error)
+  end
 end
 
 context "A MySQL dataset" do
   setup do
     @d = MYSQL_DB[:items]
     @d.delete # remove all records
+    MYSQL_DB.sqls.clear
   end
   
   specify "should return the correct record count" do
@@ -181,6 +193,17 @@ context "A MySQL dataset" do
     end
 
     @d.count.should == 1
+  end
+  
+  specify "should correctly rollback transactions" do
+    proc do
+      MYSQL_DB.transaction do
+        @d << {:name => 'abc'}
+        raise Interrupt, 'asdf'
+      end
+    end.should raise_error(Interrupt)
+
+    MYSQL_DB.sqls.should == ['BEGIN', "INSERT INTO items (`name`) VALUES ('abc')", 'ROLLBACK']
   end
   
   specify "should support regexps" do
@@ -402,20 +425,23 @@ context "A MySQL database" do
   end
 end  
 
-context "A MySQL database" do
-  specify "should accept a socket option" do
-    db = Sequel.mysql(MYSQL_DB_NAME, :host => 'localhost', :user => 'root', :socket => MYSQL_SOCKET_FILE)
-    proc {db.test_connection}.should_not raise_error
-  end
-  
-  specify "should accept a socket option without host option" do
-    db = Sequel.mysql(MYSQL_DB_NAME, :user => 'root', :socket => MYSQL_SOCKET_FILE)
-    proc {db.test_connection}.should_not raise_error
-  end
-  
-  specify "should fail to connect with invalid socket" do
-    db = Sequel.mysql(MYSQL_DB_NAME, :host => 'localhost', :user => 'root', :socket => 'blah')
-    proc {db.test_connection}.should raise_error
+# Socket tests should only be run if the MySQL server is on localhost
+if %w'localhost 127.0.0.1 ::1'.include? MYSQL_URI.host
+  context "A MySQL database" do
+    specify "should accept a socket option" do
+      db = Sequel.mysql(MYSQL_DB_NAME, :host => 'localhost', :user => 'root', :socket => MYSQL_SOCKET_FILE)
+      proc {db.test_connection}.should_not raise_error
+    end
+    
+    specify "should accept a socket option without host option" do
+      db = Sequel.mysql(MYSQL_DB_NAME, :user => 'root', :socket => MYSQL_SOCKET_FILE)
+      proc {db.test_connection}.should_not raise_error
+    end
+    
+    specify "should fail to connect with invalid socket" do
+      db = Sequel.mysql(MYSQL_DB_NAME, :host => 'localhost', :user => 'root', :socket => 'blah')
+      proc {db.test_connection}.should raise_error
+    end
   end
 end
 
@@ -502,39 +528,6 @@ context "A MySQL database" do
   end
 end
 
-class Sequel::MySQL::Database
-  alias_method :orig_execute, :execute
-  attr_accessor :sqls
-  def execute(sql, &block)
-    @sqls ||= []; @sqls << sql
-    orig_execute(sql, &block)
-  end
-
-  def transaction
-    @pool.hold do |conn|
-      @transactions ||= []
-      if @transactions.include? Thread.current
-        return yield(conn)
-      end
-      @sqls ||= []; @sqls << SQL_BEGIN
-      conn.query(SQL_BEGIN)
-      begin
-        @transactions << Thread.current
-        result = yield(conn)
-        @sqls ||= []; @sqls << SQL_COMMIT
-        conn.query(SQL_COMMIT)
-        result
-      rescue => e
-        @sqls ||= []; @sqls << SQL_ROLLBACK
-        conn.query(SQL_ROLLBACK)
-        raise e unless Sequel::Error::Rollback === e
-      ensure
-        @transactions.delete(Thread.current)
-      end
-    end
-  end
-end
-
 context "MySQL::Dataset#insert" do
   setup do
     @d = MYSQL_DB[:items]
@@ -555,7 +548,7 @@ context "MySQL::Dataset#insert" do
   end
 
   specify "should insert record with default values when empty hash given" do
-    @d.insert {}
+    @d.insert({})
     
     MYSQL_DB.sqls.should == [
       "INSERT INTO items () VALUES ()"

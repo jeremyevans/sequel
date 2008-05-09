@@ -1,5 +1,3 @@
-require 'enumerator'
-
 module Sequel
   class Dataset
     # Returns a paginated dataset. The resulting dataset also provides the

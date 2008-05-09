@@ -62,6 +62,10 @@ describe Sequel::Model, "using a plugin" do
     # dataset methods
     c.dataset.should respond_to(:ghi)
     c.dataset.ghi.should == {:a => 1, :b => 2}
+
+    # dataset methods called on the class
+    c.should respond_to(:ghi)
+    c.ghi.should == {:a => 1, :b => 2}
   end
   
   it "should fail to apply if the plugin has DatasetMethod and the model has no datset" do

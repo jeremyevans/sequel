@@ -923,6 +923,15 @@ context "Dataset#limit" do
     @dataset.limit(6, 10).sql.should ==
       'SELECT * FROM (select * from cccc) t1 LIMIT 6 OFFSET 10'
   end
+  
+  specify "should raise an error if an invalid limit or offset is used" do
+    proc{@dataset.limit(-1)}.should raise_error(Sequel::Error)
+    proc{@dataset.limit(0)}.should raise_error(Sequel::Error)
+    proc{@dataset.limit(1)}.should_not raise_error(Sequel::Error)
+    proc{@dataset.limit(1, -1)}.should raise_error(Sequel::Error)
+    proc{@dataset.limit(1, 0)}.should_not raise_error(Sequel::Error)
+    proc{@dataset.limit(1, 1)}.should_not raise_error(Sequel::Error)
+  end
 end
 
 context "Dataset#naked" do
@@ -1421,135 +1430,66 @@ context "Dataset#range" do
   end
 end
 
-context "Dataset#first" do
+context "Dataset #first and #last" do
   setup do
     @c = Class.new(Sequel::Dataset) do
-      @@last_dataset = nil
-      @@last_opts = nil
-      
-      def self.last_dataset
-        @@last_dataset
-      end
-      
-      def self.last_opts
-        @@last_opts
-      end
-
-      def single_record(opts = nil)
-        @@last_opts = @opts.merge(opts || {})
-        {:a => 1, :b => 2}
-      end
-      
-      def all
-        @@last_dataset = self
-        [{:a => 1, :b => 2}] * @opts[:limit]
+      def each(opts = nil, &block)
+        s = select_sql(opts)
+        x = [:a,1,:b,2,s]
+        i = /LIMIT (\d+)/.match(s)[1].to_i.times{yield x}
       end
     end
     @d = @c.new(nil).from(:test)
-  end
-  
-  specify "should return the first matching record if a hash is specified" do
-    @d.first(:z => 26).should == {:a => 1, :b => 2}
-    @c.last_opts[:where].should == ('(z = 26)')
-
-    @d.first('z = ?', 15)
-    @c.last_opts[:where].should == ('z = 15')
-  end
-  
-  specify "should return the first matching record if a block is given" do
-    @d.first {:z > 26}.should == {:a => 1, :b => 2}
-    @c.last_opts[:where].should == ('(z > 26)')
   end
   
   specify "should return a single record if no argument is given" do
-    @d.first.should == {:a => 1, :b => 2}
+    @d.order(:a).first.should == [:a,1,:b,2, 'SELECT * FROM test ORDER BY a LIMIT 1']
+    @d.order(:a).last.should == [:a,1,:b,2, 'SELECT * FROM test ORDER BY a DESC LIMIT 1']
   end
-  
-  specify "should set the limit according to the given number" do
-    @d.first
-    @c.last_opts[:limit].should == 1
-    
-    i = rand(10) + 10
-    @d.first(i)
-    @c.last_dataset.opts[:limit].should == i
-  end
-  
-  specify "should return an array with the records if argument is greater than 1" do
-    i = rand(10) + 10
-    r = @d.first(i)
-    r.should be_a_kind_of(Array)
-    r.size.should == i
-    r.each {|row| row.should == {:a => 1, :b => 2}}
-  end
-end
 
-context "Dataset#last" do
-  setup do
-    @c = Class.new(Sequel::Dataset) do
-      @@last_dataset = nil
-      
-      def self.last_dataset
-        @@last_dataset
-      end
-
-      def single_record(opts = nil)
-        @@last_dataset = clone(opts) if opts
-        {:a => 1, :b => 2}
-      end
-      
-      def all
-        @@last_dataset = self
-        [{:a => 1, :b => 2}] * @opts[:limit]
-      end
-    end
-    @d = @c.new(nil).from(:test)
+  specify "should return the first/last matching record if argument is not an Integer" do
+    @d.order(:a).first(:z => 26).should == [:a,1,:b,2, 'SELECT * FROM test WHERE (z = 26) ORDER BY a LIMIT 1']
+    @d.order(:a).first('z = ?', 15).should == [:a,1,:b,2, 'SELECT * FROM test WHERE z = 15 ORDER BY a LIMIT 1']
+    @d.order(:a).last(:z => 26).should == [:a,1,:b,2, 'SELECT * FROM test WHERE (z = 26) ORDER BY a DESC LIMIT 1']
+    @d.order(:a).last('z = ?', 15).should == [:a,1,:b,2, 'SELECT * FROM test WHERE z = 15 ORDER BY a DESC LIMIT 1']
   end
   
-  specify "should raise if no order is given" do
+  specify "should set the limit and return an array of records if the given number is > 1" do
+    i = rand(10) + 10
+    r = @d.order(:a).first(i).should == [[:a,1,:b,2, "SELECT * FROM test ORDER BY a LIMIT #{i}"]] * i
+    i = rand(10) + 10
+    r = @d.order(:a).last(i).should == [[:a,1,:b,2, "SELECT * FROM test ORDER BY a DESC LIMIT #{i}"]] * i
+  end
+  
+  specify "should return the first matching record if a block is given without an argument" do
+    @d.first{:z > 26}.should == [:a,1,:b,2, 'SELECT * FROM test WHERE (z > 26) LIMIT 1']
+    @d.order(:name).last{:z > 26}.should == [:a,1,:b,2, 'SELECT * FROM test WHERE (z > 26) ORDER BY name DESC LIMIT 1']
+  end
+  
+  specify "should combine block and standard argument filters if argument is not an Integer" do
+    @d.first(:y=>25){:z > 26}.should == [:a,1,:b,2, 'SELECT * FROM test WHERE (z > 26) AND (y = 25) LIMIT 1']
+    @d.order(:name).last('y = ?', 16){:z > 26}.should == [:a,1,:b,2, 'SELECT * FROM test WHERE (z > 26) AND y = 16 ORDER BY name DESC LIMIT 1']
+  end
+  
+  specify "should filter and return an array of records if an Integer argument is provided and a block is given" do
+    i = rand(10) + 10
+    r = @d.order(:a).first(i){:z > 26}.should == [[:a,1,:b,2, "SELECT * FROM test WHERE (z > 26) ORDER BY a LIMIT #{i}"]] * i
+    i = rand(10) + 10
+    r = @d.order(:a).last(i){:z > 26}.should == [[:a,1,:b,2, "SELECT * FROM test WHERE (z > 26) ORDER BY a DESC LIMIT #{i}"]] * i
+  end
+  
+  specify "#last should raise if no order is given" do
     proc {@d.last}.should raise_error(Sequel::Error)
     proc {@d.last(2)}.should raise_error(Sequel::Error)
     proc {@d.order(:a).last}.should_not raise_error
     proc {@d.order(:a).last(2)}.should_not raise_error
   end
   
-  specify "should invert the order" do
-    @d.order(:a).last
-    @d.literal(@c.last_dataset.opts[:order]).should == @d.literal([:a.desc])
-    
-    @d.order(:b.desc).last
-    @d.literal(@c.last_dataset.opts[:order]).should == @d.literal(:b)
-    
-    @d.order(:c, :d).last
-    @d.literal(@c.last_dataset.opts[:order]).should == @d.literal([:c.desc, :d.desc])
-    
-    @d.order(:e.desc, :f).last
-    @d.literal(@c.last_dataset.opts[:order]).should == @d.literal([:e, :f.desc])
-  end
-  
-  specify "should return the first matching record if a hash is specified" do
-    @d.order(:a).last(:z => 26).should == {:a => 1, :b => 2}
-    @c.last_dataset.opts[:where].should == ('(z = 26)')
-
-    @d.order(:a).last('z = ?', 15)
-    @c.last_dataset.opts[:where].should == ('z = 15')
-  end
-  
-  specify "should return a single record if no argument is given" do
-    @d.order(:a).last.should == {:a => 1, :b => 2}
-  end
-  
-  specify "should set the limit according to the given number" do
-    i = rand(10) + 10
-    r = @d.order(:a).last(i)
-    @c.last_dataset.opts[:limit].should == i
-  end
-  
-  specify "should return an array with the records if argument is greater than 1" do
-    i = rand(10) + 10
-    r = @d.order(:a).last(i)
-    r.should be_a_kind_of(Array)
-    r.size.should == i
-    r.each {|row| row.should == {:a => 1, :b => 2}}
+  specify "#last should invert the order" do
+    @d.order(:a).last.pop.should == 'SELECT * FROM test ORDER BY a DESC LIMIT 1'
+    @d.order(:b.desc).last.pop.should == 'SELECT * FROM test ORDER BY b LIMIT 1'
+    @d.order(:c, :d).last.pop.should == 'SELECT * FROM test ORDER BY c DESC, d DESC LIMIT 1'
+    @d.order(:e.desc, :f).last.pop.should == 'SELECT * FROM test ORDER BY e, f DESC LIMIT 1'
   end
 end
 
@@ -1622,14 +1562,18 @@ context "Dataset#single_record" do
     @e = @cc.new(nil).from(:test)
   end
   
-  specify "should call each and return the first record" do
-    @d.single_record.should == 'SELECT * FROM test'
+  specify "should call each with a limit of 1 and return the record" do
+    @d.single_record.should == 'SELECT * FROM test LIMIT 1'
   end
   
   specify "should pass opts to each" do
-    @d.single_record(:limit => 3).should == 'SELECT * FROM test LIMIT 3'
+    @d.single_record(:order => [:name]).should == 'SELECT * FROM test ORDER BY name LIMIT 1'
   end
   
+  specify "should override the limit if passed as an option" do
+    @d.single_record(:limit => 3).should == 'SELECT * FROM test LIMIT 1'
+  end
+
   specify "should return nil if no record is present" do
     @e.single_record.should be_nil
   end
@@ -2065,34 +2009,35 @@ context "Dataset#columns" do
   setup do
     @dataset = DummyDataset.new(nil).from(:items)
     @dataset.meta_def(:columns=) {|c| @columns = c}
-    @dataset.meta_def(:first) {@columns = select_sql(nil)}
+    i = 'a' 
+    @dataset.meta_def(:each) {|o| @columns = select_sql(o||@opts) + i; i = i.next}
   end
   
-  specify "should return the value of @columns" do
+  specify "should return the value of @columns if @columns is not nil" do
     @dataset.columns = [:a, :b, :c]
     @dataset.columns.should == [:a, :b, :c]
   end
   
-  specify "should call first if @columns is nil" do
+  specify "should attempt to get a single record and return @columns if @columns is nil" do
     @dataset.columns = nil
-    @dataset.columns.should == 'SELECT * FROM items'
+    @dataset.columns.should == 'SELECT * FROM items LIMIT 1a'
     @dataset.opts[:from] = [:nana]
-    @dataset.columns.should == 'SELECT * FROM items'
+    @dataset.columns.should == 'SELECT * FROM items LIMIT 1a'
   end
 end
 
 context "Dataset#columns!" do
   setup do
     @dataset = DummyDataset.new(nil).from(:items)
-    @dataset.meta_def(:columns=) {|c| @columns = c}
-    @dataset.meta_def(:first) {@columns = select_sql(nil)}
+    i = 'a' 
+    @dataset.meta_def(:each) {|o| @columns = select_sql(o||@opts) + i; i = i.next}
   end
   
-  specify "should always call first" do
-    @dataset.columns = nil
-    @dataset.columns!.should == 'SELECT * FROM items'
+  specify "should always attempt to get a record and return @columns" do
+    @dataset.columns!.should == 'SELECT * FROM items LIMIT 1a'
+    @dataset.columns!.should == 'SELECT * FROM items LIMIT 1b'
     @dataset.opts[:from] = [:nana]
-    @dataset.columns!.should == 'SELECT * FROM nana'
+    @dataset.columns!.should == 'SELECT * FROM nana LIMIT 1c'
   end
 end
 

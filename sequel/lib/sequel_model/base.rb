@@ -226,17 +226,15 @@ module Sequel
     
     # Create the column accessors
     def self.def_column_accessor(*columns) # :nodoc:
-      Thread.exclusive do
-        columns.each do |column|
-          im = instance_methods
-          meth = "#{column}="
-          define_method(column){self[column]} unless im.include?(column.to_s)
-          unless im.include?(meth)
-            define_method(meth) do |*v|
-              len = v.length
-              raise(ArgumentError, "wrong number of arguments (#{len} for 1)") unless len == 1
-              self[column] = v.first 
-            end
+      columns.each do |column|
+        im = instance_methods
+        meth = "#{column}="
+         define_method(column){self[column]} unless im.include?(column.to_s)
+        unless im.include?(meth)
+          define_method(meth) do |*v|
+            len = v.length
+            raise(ArgumentError, "wrong number of arguments (#{len} for 1)") unless len == 1
+            self[column] = v.first 
           end
         end
       end

@@ -515,9 +515,8 @@ context "A Database adapter with a scheme" do
   end
 
   specify "should be accessible through Sequel.<adapter>" do
-    class << Sequel
-      def_adapter_method(:ccc)
-    end
+    Sequel.send(:def_adapter_method, :ccc)
+
     # invalid parameters
     proc {Sequel.ccc('abc', 'def')}.should raise_error(Sequel::Error)
     

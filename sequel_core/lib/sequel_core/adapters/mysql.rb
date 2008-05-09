@@ -135,10 +135,14 @@ module Sequel
       end
 
       def execute(sql, &block)
-        @logger.info(sql) if @logger
-        @pool.hold do |conn|
-          conn.query(sql)
-          block[conn] if block
+        begin
+          @logger.info(sql) if @logger
+          @pool.hold do |conn|
+            conn.query(sql)
+            block[conn] if block
+          end
+        rescue Mysql::Error => e
+          raise Error.new(e.message)
         end
       end
 
@@ -212,15 +216,18 @@ module Sequel
           if @transactions.include? Thread.current
             return yield(conn)
           end
+          @logger.info(SQL_BEGIN) if @logger
           conn.query(SQL_BEGIN)
           begin
             @transactions << Thread.current
             result = yield(conn)
+            @logger.info(SQL_COMMIT) if @logger
             conn.query(SQL_COMMIT)
             result
-          rescue => e
+          rescue ::Exception => e
+            @logger.info(SQL_ROLLBACK) if @logger
             conn.query(SQL_ROLLBACK)
-            raise e unless Error::Rollback === e
+            raise (Mysql::Error === e ? Error.new(e.message) : e) unless Error::Rollback === e
           ensure
             @transactions.delete(Thread.current)
           end
@@ -233,6 +240,11 @@ module Sequel
         @opts[:database] = db_name if self << "USE #{db_name}"
         self
       end
+
+      private
+        def connection_pool_default_options
+          super.merge(:pool_reuse_connections=>:last_resort, :pool_convert_exceptions=>false)
+        end
     end
 
     class Dataset < Sequel::Dataset
@@ -268,7 +280,7 @@ module Sequel
         when LiteralString
           v
         when String
-          "'#{v.gsub(/'|\\/, '\&\&')}'"
+          "'#{::Mysql.quote(v)}'"
         when true
           TRUE
         when false

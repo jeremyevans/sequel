@@ -1,4 +1,3 @@
-# Array extensions
 class Array
   # Concatenates an array of strings into an SQL string. ANSI SQL and C-style
   # comments are removed, as well as excessive white-space.
@@ -16,20 +15,7 @@ module Sequel
   end
 end
 
-# String extensions
 class String
-  # Converts a string into an SQL string by removing comments.
-  # See also Array#to_sql.
-  def to_sql
-    split("\n").to_sql
-  end
-  
-  # Splits a string into separate SQL statements, removing comments
-  # and excessive white-space.
-  def split_sql
-    to_sql.split(';').map {|s| s.strip}
-  end
-
   # Converts a string into an LiteralString, in order to override string
   # literalization, e.g.:
   #
@@ -42,24 +28,44 @@ class String
   def lit
     Sequel::LiteralString.new(self)
   end
-  
   alias_method :expr, :lit
   
-  # Converts a string into a Time object.
-  def to_time
-    begin
-      Time.parse(self)
-    rescue Exception => e
-      raise Sequel::Error::InvalidValue, "Invalid time value '#{self}' (#{e.message})"
-    end
+  # Splits a string into separate SQL statements, removing comments
+  # and excessive white-space.
+  def split_sql
+    to_sql.split(';').map {|s| s.strip}
   end
 
+  # Converts a string into an SQL string by removing comments.
+  # See also Array#to_sql.
+  def to_sql
+    split("\n").to_sql
+  end
+  
   # Converts a string into a Date object.
   def to_date
     begin
       Date.parse(self)
-    rescue Exception => e
+    rescue => e
       raise Sequel::Error::InvalidValue, "Invalid date value '#{self}' (#{e.message})"
+    end
+  end
+
+  # Converts a string into a DateTime object.
+  def to_datetime
+    begin
+      DateTime.parse(self)
+    rescue => e
+      raise Sequel::Error::InvalidValue, "Invalid date value '#{self}' (#{e.message})"
+    end
+  end
+
+  # Converts a string into a Time object.
+  def to_time
+    begin
+      Time.parse(self)
+    rescue => e
+      raise Sequel::Error::InvalidValue, "Invalid time value '#{self}' (#{e.message})"
     end
   end
 end
@@ -79,40 +85,47 @@ module Sequel
       def asc; ColumnExpr.new(self, ASC); end
 
       def cast_as(t)
-        if t.is_a?(Symbol)
-          t = t.to_s.lit
-        end
+        t = t.to_s.lit if t.is_a?(Symbol)
         Sequel::SQL::Function.new(:cast, self.as(t))
       end
     end
 
     class Expression
       include ColumnMethods
+
       def lit; self; end
     end
     
     class ColumnExpr < Expression
       attr_reader :l, :op, :r
-      def initialize(l, op, r = nil); @l, @op, @r = l, op, r; end
+
+      def initialize(l, op, r = nil)
+        @l, @op, @r = l, op, r
+      end
       
       def to_s(ds)
-        @r ? \
-          "#{ds.literal(@l)} #{@op} #{ds.literal(@r)}" : \
-          "#{ds.literal(@l)} #{@op}"
+        ds.column_expr_sql(self)
       end
     end
     
     class QualifiedColumnRef < Expression
-      def initialize(t, c); @t, @c = t, c; end
+      attr_reader :table, :column
+
+      def initialize(table, column)
+        @table, @column = table, column
+      end
       
       def to_s(ds)
-        "#{@t}.#{ds.literal(@c)}"
+        ds.qualified_column_ref_sql(self)
       end 
     end
     
     class Function < Expression
       attr_reader :f, :args
-      def initialize(f, *args); @f, @args = f, args; end
+
+      def initialize(f, *args)
+        @f, @args = f, args
+      end
 
       # Functions are considered equivalent if they
       # have the same class, function, and arguments.
@@ -121,37 +134,42 @@ module Sequel
       end
 
       def to_s(ds)
-        args = @args.empty? ? '' : ds.literal(@args)
-        "#{@f}(#{args})"
+        ds.function_sql(self)
       end
     end
     
     class Subscript < Expression
-      def initialize(f, sub); @f, @sub = f, sub; end
+      attr_reader :f, :sub
+
+      def initialize(f, sub)
+        @f, @sub = f, sub
+      end
+
       def |(sub)
-        unless Array === sub
-          sub = [sub]
-        end
-        Subscript.new(@f, @sub << sub)
+        Subscript.new(@f, @sub << Array(sub))
       end
       
-      COMMA_SEPARATOR = ", ".freeze
-      
       def to_s(ds)
-        "#{@f}[#{@sub.join(COMMA_SEPARATOR)}]"
+        ds.subscript_sql(self)
       end
     end
     
     class ColumnAll < Expression
-      def initialize(t); @t = t; end
-      def to_s(ds); "#{@t}.*"; end
+      attr_reader :table
+
+      def initialize(table)
+        @table = table
+      end
 
       # ColumnAll expressions are considered equivalent if they
       # have the same class and string representation
       def ==(x)
-        x.class == self.class && to_s(nil) == x.to_s(nil)
+        x.class == self.class && @table == x.table
       end
 
+      def to_s(ds)
+        ds.column_all_sql(self)
+      end
     end
   end
 end
@@ -162,42 +180,20 @@ end
 
 class Symbol
   include Sequel::SQL::ColumnMethods
+
   def *
     Sequel::SQL::ColumnAll.new(self);
   end
 
-  def [](*args); Sequel::SQL::Function.new(self, *args); end
+  def [](*args)
+    Sequel::SQL::Function.new(self, *args)
+  end
+
   def |(sub)
-    unless Array === sub
-      sub = [sub]
-    end
-    Sequel::SQL::Subscript.new(self, sub)
+    Sequel::SQL::Subscript.new(self, Array(sub))
   end
   
-  COLUMN_REF_RE1 = /^(\w+)__(\w+)___(\w+)/.freeze
-  COLUMN_REF_RE2 = /^(\w+)___(\w+)$/.freeze
-  COLUMN_REF_RE3 = /^(\w+)__(\w+)$/.freeze
-
-  # Converts a symbol into a column name. This method supports underscore
-  # notation in order to express qualified (two underscores) and aliased 
-  # (three underscores) columns:
-  #
-  #   ds = DB[:items]
-  #   :abc.to_column_ref(ds) #=> "abc"
-  #   :abc___a.to_column_ref(ds) #=> "abc AS a"
-  #   :items__abc.to_column_ref(ds) #=> "items.abc"
-  #   :items__abc___a.to_column_ref(ds) #=> "items.abc AS a"
-  #
   def to_column_ref(ds)
-    case s = to_s
-    when COLUMN_REF_RE1
-      "#{$1}.#{ds.quote_column_ref($2)} AS #{ds.quote_column_ref($3)}"
-    when COLUMN_REF_RE2
-      "#{ds.quote_column_ref($1)} AS #{ds.quote_column_ref($2)}"
-    when COLUMN_REF_RE3
-      "#{$1}.#{ds.quote_column_ref($2)}"
-    else
-      ds.quote_column_ref(s)
-    end
+    ds.symbol_to_column_ref(self)
   end
 end

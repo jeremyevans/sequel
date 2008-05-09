@@ -10,9 +10,7 @@ module Sequel
       end
 
       def connect
-        if @opts[:database].nil?
-          @opts[:database] = ':memory:'
-        end
+        @opts[:database] = ':memory:' if @opts[:database].blank?
         db = ::SQLite3::Database.new(@opts[:database])
         db.busy_timeout(@opts.fetch(:timeout, 5000))
         db.type_translation = true
@@ -38,31 +36,39 @@ module Sequel
       end
     
       def execute(sql)
-        @logger.info(sql) if @logger
-        @pool.hold {|conn| conn.execute_batch(sql); conn.changes}
-      rescue RuntimeError => e
-        raise Error::InvalidStatement, "#{sql}\r\n#{e.message}"
+        begin
+          @logger.info(sql) if @logger
+          @pool.hold {|conn| conn.execute_batch(sql); conn.changes}
+        rescue SQLite3::Exception => e
+          raise Error::InvalidStatement, "#{sql}\r\n#{e.message}"
+        end
       end
       
       def execute_insert(sql)
-        @logger.info(sql) if @logger
-        @pool.hold {|conn| conn.execute(sql); conn.last_insert_row_id}
-      rescue RuntimeError => e
-        raise Error::InvalidStatement, "#{sql}\r\n#{e.message}"
+        begin
+          @logger.info(sql) if @logger
+          @pool.hold {|conn| conn.execute(sql); conn.last_insert_row_id}
+        rescue SQLite3::Exception => e
+          raise Error::InvalidStatement, "#{sql}\r\n#{e.message}"
+        end
       end
       
       def single_value(sql)
-        @logger.info(sql) if @logger
-        @pool.hold {|conn| conn.get_first_value(sql)}
-      rescue RuntimeError => e
-        raise Error::InvalidStatement, "#{sql}\r\n#{e.message}"
+        begin
+          @logger.info(sql) if @logger
+          @pool.hold {|conn| conn.get_first_value(sql)}
+        rescue SQLite3::Exception => e
+          raise Error::InvalidStatement, "#{sql}\r\n#{e.message}"
+        end
       end
       
       def execute_select(sql, &block)
-        @logger.info(sql) if @logger
-        @pool.hold {|conn| conn.query(sql, &block)}
-      rescue RuntimeError => e
-        raise Error::InvalidStatement, "#{sql}\r\n#{e.message}"
+        begin
+          @logger.info(sql) if @logger
+          @pool.hold {|conn| conn.query(sql, &block)}
+        rescue SQLite3::Exception => e
+          raise Error::InvalidStatement, "#{sql}\r\n#{e.message}"
+        end
       end
       
       def pragma_get(name)
@@ -124,11 +130,20 @@ module Sequel
             result = nil
             conn.transaction {result = yield(conn)}
             result
-          rescue => e
-            raise e unless Error::Rollback === e
+          rescue ::Exception => e
+            raise (SQLite3::Exception === e ? Error.new(e.message) : e) unless Error::Rollback === e
           end
         end
       end
+      
+      private
+        def connection_pool_default_options
+          o = super.merge(:pool_reuse_connections=>:always, :pool_convert_exceptions=>false)
+          # Default to only a single connection if a memory database is used,
+          # because otherwise each connection will get a separate database
+          o[:max_connections] = 1 if @opts[:database] == ':memory:' || @opts[:database].blank?
+          o
+        end
     end
     
     class Dataset < Sequel::Dataset
@@ -136,6 +151,10 @@ module Sequel
 
       def literal(v)
         case v
+        when LiteralString
+          v
+        when String
+          "'#{::SQLite3::Database.quote(v)}'"
         when Time
           literal(v.iso8601)
         else

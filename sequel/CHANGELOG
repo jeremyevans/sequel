@@ -1,5 +1,11 @@
 === HEAD
 
+* Add before_validation and after_validation hooks, called whenever the model is validated (jeremyevans)
+
+* Add Model.default_foreign_key, a private class method that allows changing the default foreign key that Sequel will use in associations (jeremyevans)
+
+* Cache negative lookup when eagerly loading many_to_one associations (jeremyevans)
+
 * Make all associations support the :select option, not just many_to_many (jeremyevans)
 
 * Allow the use of blocks when eager loading, and add the :eager_block and :allow_eager association options for configuration (jeremyevans)

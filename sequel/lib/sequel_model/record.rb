@@ -142,9 +142,17 @@ module Sequel
     end
     alias_method :reload, :refresh
 
-    # Creates or updates the associated record. This method can also
-    # accept a list of specific columns to update.
+    # Creates or updates the record, after making sure the record
+    # is valid.  If the record is not valid, returns false.
     def save(*columns)
+      return false unless valid?
+      save!(*columns)
+    end
+
+    # Creates or updates the record, without attempting to validate
+    # it first. You can provide an optional list of columns to update,
+    # in which case it only updates those columns
+    def save!(*columns)
       before_save
       if @new
         before_create

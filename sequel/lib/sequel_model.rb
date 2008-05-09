@@ -32,5 +32,6 @@ module Sequel
   class Model
     extend Enumerable
     extend Associations
+    include Validation
   end
 end
