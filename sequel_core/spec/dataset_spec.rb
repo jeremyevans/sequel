@@ -1435,7 +1435,7 @@ context "Dataset #first and #last" do
     @c = Class.new(Sequel::Dataset) do
       def each(opts = nil, &block)
         s = select_sql(opts)
-        x = [:a,1,:b,2,sql]
+        x = [:a,1,:b,2,s]
         i = /LIMIT (\d+)/.match(s)[1].to_i.times{yield x}
       end
     end
@@ -2009,34 +2009,35 @@ context "Dataset#columns" do
   setup do
     @dataset = DummyDataset.new(nil).from(:items)
     @dataset.meta_def(:columns=) {|c| @columns = c}
-    @dataset.meta_def(:first) {@columns = select_sql(nil)}
+    i = 'a' 
+    @dataset.meta_def(:each) {|o| @columns = select_sql(o||@opts) + i; i = i.next}
   end
   
-  specify "should return the value of @columns" do
+  specify "should return the value of @columns if @columns is not nil" do
     @dataset.columns = [:a, :b, :c]
     @dataset.columns.should == [:a, :b, :c]
   end
   
-  specify "should call first if @columns is nil" do
+  specify "should attempt to get a single record and return @columns if @columns is nil" do
     @dataset.columns = nil
-    @dataset.columns.should == 'SELECT * FROM items'
+    @dataset.columns.should == 'SELECT * FROM items LIMIT 1a'
     @dataset.opts[:from] = [:nana]
-    @dataset.columns.should == 'SELECT * FROM items'
+    @dataset.columns.should == 'SELECT * FROM items LIMIT 1a'
   end
 end
 
 context "Dataset#columns!" do
   setup do
     @dataset = DummyDataset.new(nil).from(:items)
-    @dataset.meta_def(:columns=) {|c| @columns = c}
-    @dataset.meta_def(:first) {@columns = select_sql(nil)}
+    i = 'a' 
+    @dataset.meta_def(:each) {|o| @columns = select_sql(o||@opts) + i; i = i.next}
   end
   
-  specify "should always call first" do
-    @dataset.columns = nil
-    @dataset.columns!.should == 'SELECT * FROM items'
+  specify "should always attempt to get a record and return @columns" do
+    @dataset.columns!.should == 'SELECT * FROM items LIMIT 1a'
+    @dataset.columns!.should == 'SELECT * FROM items LIMIT 1b'
     @dataset.opts[:from] = [:nana]
-    @dataset.columns!.should == 'SELECT * FROM nana'
+    @dataset.columns!.should == 'SELECT * FROM nana LIMIT 1c'
   end
 end
 

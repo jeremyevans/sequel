@@ -66,6 +66,7 @@ module Sequel
     include Convenience
     include Callback
     
+    COLUMN_CHANGE_OPTS = [:select, :sql, :from, :join].freeze
     MUTATION_METHODS = %w'and distinct exclude exists filter from from_self full_outer_join graph
     group group_and_count group_by having inner_join intersect invert_order join
     left_outer_join limit naked or order order_by order_more paginate query reject
@@ -142,7 +143,7 @@ module Sequel
     def clone(opts = {})
       c = super()
       c.opts = @opts.merge(opts)
-      c.instance_variable_set(:@columns, nil)
+      c.instance_variable_set(:@columns, nil) unless (opts.keys & COLUMN_CHANGE_OPTS).empty?
       c
     end
     
@@ -151,13 +152,13 @@ module Sequel
     # a query is performed. Adapters are expected to fill @columns with the
     # column information when a query is performed.
     def columns
-      first unless @columns
+      single_record unless @columns
       @columns || []
     end
     
     def columns!
-      first
-      @columns || []
+      @columns = nil
+      columns
     end
     
     def def_mutation_method(*meths)

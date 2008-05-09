@@ -14,7 +14,7 @@ module Sequel
 
       # Returns the first record in the dataset.
       def single_record(opts = nil)
-        clone((opts||{}).merge(:limit=>1)).each{|r| return r}
+        each((opts||{}).merge(:limit=>1)){|r| return r}
         nil
       end
 
