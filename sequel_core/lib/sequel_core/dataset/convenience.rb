@@ -1,20 +1,22 @@
-require 'enumerator'
-
 module Sequel
   class Dataset
     module Convenience
+      NAKED_HASH = {:naked => true}.freeze
+
       # Returns true if no records exists in the dataset
       def empty?
         db.dataset.where(exists).get(1) == nil
       end
       
+      def get(column)
+        select(column).single_value
+      end
+
       # Returns the first record in the dataset.
       def single_record(opts = nil)
-        each(opts) {|r| return r}
+        clone((opts||{}).merge(:limit=>1)).each{|r| return r}
         nil
       end
-      
-      NAKED_HASH = {:naked => true}.freeze
 
       # Returns the first value of the first reecord in the dataset.
       # Returns nil if dataset is empty.
@@ -25,24 +27,39 @@ module Sequel
         nil
       end
       
-      def get(column)
-        select(column).single_value
-      end
-
-      # Returns the first record in the dataset. If the num argument is specified,
-      # an array is returned with the first <i>num</i> records.
+      # Returns the first record in the dataset. If a numeric argument is
+      # given, it is interpreted as a limit, and then returns all 
+      # matching records up to that limit.  If no argument is passed,
+      # it returns the first matching record.  If any other type of
+      # argument(s) is passed, they are given to filter and the
+      # first matching record is returned. If a block is given, it is used
+      # to filter the dataset before returning anything.
+      #
+      # Examples:
+      # 
+      #   ds.first => {:id=>7}
+      #   ds.first(2) => [{:id=>6}, {:id=>4}]
+      #   ds.order(:id).first(2) => [{:id=>1}, {:id=>2}]
+      #   ds.first(:id=>2) => {:id=>2}
+      #   ds.first("id = 3") => {:id=>3}
+      #   ds.first("id = ?", 4) => {:id=>4}
+      #   ds.first{:id > 2} => {:id=>5}
+      #   ds.order(:id).first{:id > 2} => {:id=>3}
+      #   ds.first{:id > 2} => {:id=>5}
+      #   ds.first("id > ?", 4){:id < 6) => {:id=>5}
+      #   ds.order(:id).first(2){:id < 2} => [{:id=>1}]
       def first(*args, &block)
-        if block
-          return filter(&block).single_record(:limit => 1)
-        end
-        args = args.empty? ? 1 : (args.size == 1) ? args.first : args
-        case args
-        when 1
-          single_record(:limit => 1)
-        when Fixnum
-          limit(args).all
+        ds = block ? filter(&block) : self
+
+        if args.empty?
+          ds.single_record
         else
-          filter(args, &block).single_record(:limit => 1)
+          args = (args.size == 1) ? args.first : args
+          if Integer === args
+            ds.limit(args).all
+          else
+            ds.filter(args).single_record
+          end
         end
       end
 
@@ -55,29 +72,13 @@ module Sequel
         filter(conditions).update(values)
       end
 
-      # Returns the last records in the dataset by inverting the order. If no
-      # order is given, an exception is raised. If num is not given, the last
-      # record is returned. Otherwise an array is returned with the last 
-      # <i>num</i> records.
-      def last(*args)
-        raise Error, 'No order specified' unless 
-          @opts[:order] || (opts && opts[:order])
-
-        args = args.empty? ? 1 : (args.size == 1) ? args.first : args
-
-        case args
-        when Fixnum
-          l = {:limit => args}
-          opts = {:order => invert_order(@opts[:order])}. \
-            merge(opts ? opts.merge(l) : l)
-          if args == 1
-            single_record(opts)
-          else
-            clone(opts).all
-          end
-        else
-          filter(args).last(1)
-        end
+      # Reverses the order and then runs first.  Note that this
+      # will not necessarily give you the last record in the dataset,
+      # unless you have an unambiguous order.  If there is not
+      # currently an order for this dataset, raises an Error.
+      def last(*args, &block)
+        raise(Error, 'No order specified') unless @opts[:order]
+        reverse.first(*args, &block)
       end
       
       # Maps column values for each record in the dataset (if a column name is

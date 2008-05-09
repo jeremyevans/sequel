@@ -1,4 +1,4 @@
-%w'bigdecimal bigdecimal/util time date metaid uri yaml'.each do |f|
+%w'bigdecimal bigdecimal/util date enumerator metaid time uri yaml'.each do |f|
   require f
 end
 %w"deprecated core_ext core_sql connection_pool exceptions pretty_table
