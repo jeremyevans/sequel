@@ -78,7 +78,7 @@ class ConnectionPool
       timeout = time + @timeout
       sleep_time = @sleep_time
       reuse = @reuse_connections
-      if reuse == :always && conn = owned_connection(t)
+      if (reuse == :always) && (conn = owned_connection(t))
         return yield(conn)
       end
       reuse = reuse == :allow ? true : false
@@ -154,8 +154,8 @@ class ConnectionPool
     # Releases the connection assigned to the supplied thread.
     def release(thread, conn)
       @mutex.synchronize do
-        x = @allocated.delete([thread, conn])
-        @available_connections << x[1] if x
+        @allocated.delete([thread, conn])
+        @available_connections << conn
       end
     end
 end
