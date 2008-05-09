@@ -743,8 +743,14 @@ module Sequel
           o = l.first
           l = l.interval + 1
         end
-        opts = {:limit => l.to_i}
-        opts[:offset] = o.to_i if o
+        l = l.to_i
+        raise(Error, 'Limits must be greater than or equal to 1') unless l >= 1
+        opts = {:limit => l}
+        if o
+          o = o.to_i
+          raise(Error, 'Offsets must be greater than or equal to 0') unless o >= 0
+          opts[:offset] = o
+        end
         clone(opts)
       end
       

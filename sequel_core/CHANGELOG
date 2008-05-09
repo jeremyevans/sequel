@@ -1,5 +1,13 @@
 === HEAD
 
+* Raise a Sequel::Error if an invalid limit or offset is used (jeremyevans)
+
+* Refactor and beef up Dataset#first and Dataset#last, with some change in functionality (jeremyevans)
+
+* Add String#to_datetime, for consistency (jeremyevans)
+
+* Fix Range#interval so that it returns 1 less for an exclusive range
+
 * Change SQLite adapter so it doesn't swallow exceptions other than SQLite3::Exception (such as Interrupt) (jeremyevans)
 
 * Change PostgreSQL and MySQL adapters to raise Sequel::Error instead of database specific errors if a database error occurs (jeremyevans)

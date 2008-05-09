@@ -923,6 +923,15 @@ context "Dataset#limit" do
     @dataset.limit(6, 10).sql.should ==
       'SELECT * FROM (select * from cccc) t1 LIMIT 6 OFFSET 10'
   end
+  
+  specify "should raise an error if an invalid limit or offset is used" do
+    proc{@dataset.limit(-1)}.should raise_error(Sequel::Error)
+    proc{@dataset.limit(0)}.should raise_error(Sequel::Error)
+    proc{@dataset.limit(1)}.should_not raise_error(Sequel::Error)
+    proc{@dataset.limit(1, -1)}.should raise_error(Sequel::Error)
+    proc{@dataset.limit(1, 0)}.should_not raise_error(Sequel::Error)
+    proc{@dataset.limit(1, 1)}.should_not raise_error(Sequel::Error)
+  end
 end
 
 context "Dataset#naked" do
