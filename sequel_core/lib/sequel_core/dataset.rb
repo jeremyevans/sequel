@@ -61,10 +61,6 @@ module Sequel
   #   end
   class Dataset
     include Enumerable
-    include Sequelizer
-    include SQL
-    include Convenience
-    include Callback
     
     COLUMN_CHANGE_OPTS = [:select, :sql, :from, :join].freeze
     MUTATION_METHODS = %w'and distinct exclude exists filter from from_self full_outer_join graph

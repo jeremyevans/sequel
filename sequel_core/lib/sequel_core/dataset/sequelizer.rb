@@ -1,5 +1,5 @@
-class Sequel::Dataset
-  module Sequelizer
+module Sequel
+  class Dataset
     # Formats an comparison expression involving a left value and a right
     # value. Comparison expressions differ according to the class of the right
     # value. The stock implementation supports Range (inclusive and exclusive),
@@ -79,7 +79,7 @@ begin
         ParseTree.translate(c, :m)[2]
       end
     end
-    module Sequel::Dataset::Sequelizer
+    class Sequel::Dataset
       # Evaluates a method call. This method is used to evaluate Ruby expressions
       # referring to indirect values, e.g.:
       #
@@ -93,7 +93,7 @@ begin
       end
     end
   rescue LoadError
-    module Sequel::Dataset::Sequelizer
+    class Sequel::Dataset
       def ext_expr(*args)
         raise Sequel::Error, "You must have the Ruby2Ruby gem installed in order to use this block filter."
       end
