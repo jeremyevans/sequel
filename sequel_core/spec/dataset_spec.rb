@@ -528,7 +528,7 @@ context "a grouped dataset" do
   specify "should format the right statement for counting (as a subquery)" do
     db = MockDatabase.new
     db[:test].select(:name).group(:name).count
-    db.sqls.should == ["SELECT COUNT(*) FROM (SELECT name FROM test GROUP BY name) t1"]
+    db.sqls.should == ["SELECT COUNT(*) FROM (SELECT name FROM test GROUP BY name) t1 LIMIT 1"]
   end
 end
 
@@ -1044,7 +1044,7 @@ context "Dataset#count" do
   
   specify "should format SQL properly" do
     @dataset.count.should == 1
-    @c.sql.should == 'SELECT COUNT(*) FROM test'
+    @c.sql.should == 'SELECT COUNT(*) FROM test LIMIT 1'
   end
   
   specify "should be aliased by #size" do
@@ -1053,13 +1053,13 @@ context "Dataset#count" do
   
   specify "should include the where clause if it's there" do
     @dataset.filter {:abc < 30}.count.should == 1
-    @c.sql.should == 'SELECT COUNT(*) FROM test WHERE (abc < 30)'
+    @c.sql.should == 'SELECT COUNT(*) FROM test WHERE (abc < 30) LIMIT 1'
   end
   
   specify "should count properly for datasets with fixed sql" do
     @dataset.opts[:sql] = "select abc from xyz"
     @dataset.count.should == 1
-    @c.sql.should == "SELECT COUNT(*) FROM (select abc from xyz) t1"
+    @c.sql.should == "SELECT COUNT(*) FROM (select abc from xyz) t1 LIMIT 1"
   end
 end
 
@@ -1115,7 +1115,7 @@ context "Dataset#empty?" do
     @dataset = Sequel::Dataset.new(@db).from(:test)
     
     @dataset.should_not be_empty
-    @db.sqls.last.should == 'SELECT 1 WHERE EXISTS (SELECT * FROM test)'
+    @db.sqls.last.should == 'SELECT 1 WHERE EXISTS (SELECT * FROM test) LIMIT 1'
     
     @db.meta_def(:dataset) do
       ds = $cccc.new(self)
@@ -1352,23 +1352,23 @@ context "Dataset aggregate methods" do
   end
   
   specify "should include min" do
-    @d.min(:a).should == 'SELECT min(a) AS v FROM test'
+    @d.min(:a).should == 'SELECT min(a) AS v FROM test LIMIT 1'
   end
   
   specify "should include max" do
-    @d.max(:b).should == 'SELECT max(b) AS v FROM test'
+    @d.max(:b).should == 'SELECT max(b) AS v FROM test LIMIT 1'
   end
   
   specify "should include sum" do
-    @d.sum(:c).should == 'SELECT sum(c) AS v FROM test'
+    @d.sum(:c).should == 'SELECT sum(c) AS v FROM test LIMIT 1'
   end
   
   specify "should include avg" do
-    @d.avg(:d).should == 'SELECT avg(d) AS v FROM test'
+    @d.avg(:d).should == 'SELECT avg(d) AS v FROM test LIMIT 1'
   end
   
   specify "should accept qualified columns" do
-    @d.avg(:test__bc).should == 'SELECT avg(test.bc) AS v FROM test'
+    @d.avg(:test__bc).should == 'SELECT avg(test.bc) AS v FROM test LIMIT 1'
   end
 end
 
@@ -1595,14 +1595,14 @@ context "Dataset#single_value" do
   end
   
   specify "should call each and return the first value of the first record" do
-    @d.single_value.should == 'SELECT * FROM test'
+    @d.single_value.should == 'SELECT * FROM test LIMIT 1'
   end
   
   specify "should pass opts to each" do
-    @d.single_value(:limit => 3).should == 'SELECT * FROM test LIMIT 3'
+    @d.single_value(:from => [:blah]).should == 'SELECT * FROM blah LIMIT 1'
   end
   
-  specify "should return nil" do
+  specify "should return nil if no records" do
     @e.single_value.should be_nil
   end
 end
@@ -1622,16 +1622,16 @@ context "Dataset#get" do
   end
   
   specify "should select the specified column and fetch its value" do
-    @d.get(:name).should == "SELECT name FROM test"
-    @d.get(:abc).should == "SELECT abc FROM test" # the first available value is returned always
+    @d.get(:name).should == "SELECT name FROM test LIMIT 1"
+    @d.get(:abc).should == "SELECT abc FROM test LIMIT 1" # the first available value is returned always
   end
   
   specify "should work with filters" do
-    @d.filter(:id => 1).get(:name).should == "SELECT name FROM test WHERE (id = 1)"
+    @d.filter(:id => 1).get(:name).should == "SELECT name FROM test WHERE (id = 1) LIMIT 1"
   end
   
   specify "should work with aliased fields" do
-    @d.get(:x__b.as(:name)).should == "SELECT x.b AS name FROM test"
+    @d.get(:x__b.as(:name)).should == "SELECT x.b AS name FROM test LIMIT 1"
   end
 end
 
@@ -2270,7 +2270,7 @@ context "Dataset#query" do
   end
   
   specify "should raise on non-chainable method calls" do
-    proc {@d.query {count}}.should raise_error(Sequel::Error)
+    proc {@d.query {first_source}}.should raise_error(Sequel::Error)
   end
   
   specify "should raise on each, insert, update, delete" do

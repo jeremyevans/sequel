@@ -18,13 +18,12 @@ module Sequel
         nil
       end
 
-      # Returns the first value of the first reecord in the dataset.
+      # Returns the first value of the first record in the dataset.
       # Returns nil if dataset is empty.
       def single_value(opts = nil)
-        opts = opts ? NAKED_HASH.merge(opts) : NAKED_HASH
-        # don't cache the columns
-        each(opts) {|r| @columns = nil; return r.values.first}
-        nil
+        if r = naked.single_record(opts)
+          r.values.first
+        end
       end
       
       # Returns the first record in the dataset. If a numeric argument is
