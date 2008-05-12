@@ -172,8 +172,15 @@ module Sequel
     # Sets the dataset associated with the Model class.
     # Also has the alias dataset=.
     def self.set_dataset(ds)
-      @db = ds.db
-      @dataset = ds
+      @dataset = case ds
+      when Symbol
+        db[ds]
+      when Dataset
+        @db = ds.db
+        ds
+      else
+        raise(Error, "Model.set_dataset takes a Symbol or a Sequel::Dataset")
+      end
       @dataset.set_model(self)
       def_dataset_method(:destroy) do
         raise(Error, "No model associated with this dataset") unless @opts[:models]

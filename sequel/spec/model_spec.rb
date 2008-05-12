@@ -48,6 +48,16 @@ describe Sequel::Model, "dataset & schema" do
     @model.table_name.should == :foo
   end
 
+  it "set_dataset should take a symbol" do
+    @model.db = MODEL_DB
+    @model.set_dataset(:foo)
+    @model.table_name.should == :foo
+  end
+
+  it "set_dataset should raise an error unless given a Symbol or Dataset" do
+    proc{@model.set_dataset(Object.new)}.should raise_error(Sequel::Error)
+  end
+
   it "set_dataset should add the destroy method to the dataset" do
     ds = MODEL_DB[:foo]
     ds.should_not respond_to(:destroy)
@@ -434,7 +444,7 @@ describe Sequel::Model, "attribute accessors" do
     @c = Class.new(Sequel::Model) do
       def self.columns; orig_columns; end
     end
-    @dataset = Object.new
+    @dataset = Sequel::Dataset.new(MODEL_DB)
     def @dataset.db; end
     def @dataset.set_model(blah); end
     def @dataset.naked; self; end
