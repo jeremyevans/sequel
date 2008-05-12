@@ -1352,23 +1352,23 @@ context "Dataset aggregate methods" do
   end
   
   specify "should include min" do
-    @d.min(:a).should == 'SELECT min(a) AS v FROM test LIMIT 1'
+    @d.min(:a).should == 'SELECT min(a) FROM test LIMIT 1'
   end
   
   specify "should include max" do
-    @d.max(:b).should == 'SELECT max(b) AS v FROM test LIMIT 1'
+    @d.max(:b).should == 'SELECT max(b) FROM test LIMIT 1'
   end
   
   specify "should include sum" do
-    @d.sum(:c).should == 'SELECT sum(c) AS v FROM test LIMIT 1'
+    @d.sum(:c).should == 'SELECT sum(c) FROM test LIMIT 1'
   end
   
   specify "should include avg" do
-    @d.avg(:d).should == 'SELECT avg(d) AS v FROM test LIMIT 1'
+    @d.avg(:d).should == 'SELECT avg(d) FROM test LIMIT 1'
   end
   
   specify "should accept qualified columns" do
-    @d.avg(:test__bc).should == 'SELECT avg(test.bc) AS v FROM test LIMIT 1'
+    @d.avg(:test__bc).should == 'SELECT avg(test.bc) FROM test LIMIT 1'
   end
 end
 
@@ -1397,11 +1397,10 @@ context "Dataset#range" do
   
   specify "should return a range object" do
     @d.range(:tryme).should == (1..10)
-    @d.last_sql.should == "SELECT min(tryme) AS v1, max(tryme) AS v2 FROM test LIMIT 1"
   end
 end
 
-context "Dataset#range" do
+context "Dataset#interval" do
   setup do
     c = Class.new(Sequel::Dataset) do
       @@sql = nil
@@ -1418,15 +1417,14 @@ context "Dataset#range" do
   
   specify "should generate a correct SQL statement" do
     @d.interval(:stamp)
-    @d.last_sql.should == "SELECT (max(stamp) - min(stamp)) AS v FROM test LIMIT 1"
+    @d.last_sql.should == "SELECT (max(stamp) - min(stamp)) FROM test LIMIT 1"
 
     @d.filter {:price > 100}.interval(:stamp)
-    @d.last_sql.should == "SELECT (max(stamp) - min(stamp)) AS v FROM test WHERE (price > 100) LIMIT 1"
+    @d.last_sql.should == "SELECT (max(stamp) - min(stamp)) FROM test WHERE (price > 100) LIMIT 1"
   end
   
-  specify "should return a range object" do
+  specify "should return an integer" do
     @d.interval(:tryme).should == 1234
-    @d.last_sql.should == "SELECT (max(tryme) - min(tryme)) AS v FROM test LIMIT 1"
   end
 end
 

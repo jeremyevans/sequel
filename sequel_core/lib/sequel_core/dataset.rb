@@ -1,4 +1,4 @@
-%w'sql sequelizer convenience callback pagination'.each do |f|
+%w'callback convenience pagination query schema sequelizer sql'.each do |f|
  require "sequel_core/dataset/#{f}"
 end
 

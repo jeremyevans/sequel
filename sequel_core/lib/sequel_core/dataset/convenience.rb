@@ -1,29 +1,25 @@
 module Sequel
   class Dataset
     module Convenience
-      NAKED_HASH = {:naked => true}.freeze
+      COMMA_SEPARATOR = ', '.freeze
+      COUNT_OF_ALL_AS_COUNT = :count['*'.lit].as(:count)
+      # Returns the first record matching the condition.
+      def [](*conditions)
+        first(*conditions)
+      end
 
+      def []=(conditions, values)
+        filter(conditions).update(values)
+      end
+
+      # Returns the average value for the given column.
+      def avg(column)
+        get(:avg[column])
+      end
+      
       # Returns true if no records exists in the dataset
       def empty?
         db.dataset.where(exists).get(1) == nil
-      end
-      
-      def get(column)
-        select(column).single_value
-      end
-
-      # Returns the first record in the dataset.
-      def single_record(opts = nil)
-        each((opts||{}).merge(:limit=>1)){|r| return r}
-        nil
-      end
-
-      # Returns the first value of the first record in the dataset.
-      # Returns nil if dataset is empty.
-      def single_value(opts = nil)
-        if r = naked.single_record(opts)
-          r.values.first
-        end
       end
       
       # Returns the first record in the dataset. If a numeric argument is
@@ -62,13 +58,19 @@ module Sequel
         end
       end
 
-      # Returns the first record matching the condition.
-      def [](*conditions)
-        first(*conditions)
+      def get(column)
+        select(column).single_value
       end
 
-      def []=(conditions, values)
-        filter(conditions).update(values)
+      # Returns a dataset grouped by the given column with count by group.
+      def group_and_count(*columns)
+        group(*columns).select(columns + [COUNT_OF_ALL_AS_COUNT]).order(:count)
+      end
+      
+      # Returns the interval between minimum and maximum values for the given 
+      # column.
+      def interval(column)
+        get("(max(#{literal(column)}) - min(#{literal(column)}))".lit)
       end
 
       # Reverses the order and then runs first.  Note that this
@@ -90,77 +92,16 @@ module Sequel
         end
       end
 
-      # Returns a hash with one column used as key and another used as value.
-      def to_hash(key_column, value_column)
-        inject({}) do |m, r|
-          m[r[key_column]] = r[value_column]
-          m
-        end
+      # Returns the maximum value for the given column.
+      def max(column)
+        get(:max[column])
       end
 
       # Returns the minimum value for the given column.
       def min(column)
-        single_value(:select => [:min[column].as(:v)])
+        get(:min[column])
       end
 
-      # Returns the maximum value for the given column.
-      def max(column)
-        single_value(:select => [:max[column].as(:v)])
-      end
-
-      # Returns the sum for the given column.
-      def sum(column)
-        single_value(:select => [:sum[column].as(:v)])
-      end
-
-      # Returns the average value for the given column.
-      def avg(column)
-        single_value(:select => [:avg[column].as(:v)])
-      end
-      
-      COUNT_OF_ALL_AS_COUNT = :count['*'.lit].as(:count)
-      
-      # Returns a dataset grouped by the given column with count by group.
-      def group_and_count(*columns)
-        group(*columns).select(columns + [COUNT_OF_ALL_AS_COUNT]).order(:count)
-      end
-      
-      # Returns a Range object made from the minimum and maximum values for the
-      # given column.
-      def range(column)
-        if r = select(:min[column].as(:v1), :max[column].as(:v2)).first
-          (r[:v1]..r[:v2])
-        end
-      end
-      
-      # Returns the interval between minimum and maximum values for the given 
-      # column.
-      def interval(column)
-        if r = select("(max(#{literal(column)}) - min(#{literal(column)})) AS v".lit).first
-          r[:v]
-        end
-      end
-
-      # Pretty prints the records in the dataset as plain-text table.
-      def print(*cols)
-        Sequel::PrettyTable.print(naked.all, cols.empty? ? columns : cols)
-      end
-      
-      COMMA_SEPARATOR = ', '.freeze
-      
-      # Returns a string in CSV format containing the dataset records. By 
-      # default the CSV representation includes the column titles in the
-      # first line. You can turn that off by passing false as the 
-      # include_column_titles argument.
-      def to_csv(include_column_titles = true)
-        n = naked
-        cols = n.columns
-        csv = ''
-        csv << "#{cols.join(COMMA_SEPARATOR)}\r\n" if include_column_titles
-        n.each{|r| csv << "#{cols.collect{|c| r[c]}.join(COMMA_SEPARATOR)}\r\n"}
-        csv
-      end
-      
       # Inserts multiple records into the associated table. This method can be
       # to efficiently insert a large amounts of records into a table. Inserts
       # are automatically wrapped in a transaction.
@@ -214,42 +155,38 @@ module Sequel
       end
       alias_method :import, :multi_insert
       
-      module QueryBlockCopy #:nodoc:
-        def each(*args); raise Error, "#each cannot be invoked inside a query block."; end
-        def insert(*args); raise Error, "#insert cannot be invoked inside a query block."; end
-        def update(*args); raise Error, "#update cannot be invoked inside a query block."; end
-        def delete(*args); raise Error, "#delete cannot be invoked inside a query block."; end
-
-        def clone(opts = nil)
-          @opts.merge!(opts)
-          self
+      # Pretty prints the records in the dataset as plain-text table.
+      def print(*cols)
+        Sequel::PrettyTable.print(naked.all, cols.empty? ? columns : cols)
+      end
+      
+      # Returns a Range object made from the minimum and maximum values for the
+      # given column.
+      def range(column)
+        if r = select(:min[column].as(:v1), :max[column].as(:v2)).first
+          (r[:v1]..r[:v2])
         end
       end
       
-      # Translates a query block into a dataset. Query blocks can be useful
-      # when expressing complex SELECT statements, e.g.:
-      #
-      #   dataset = DB[:items].query do
-      #     select :x, :y, :z
-      #     where {:x > 1 && :y > 2}
-      #     order_by :z.DESC
-      #   end
-      #
-      def query(&block)
-        copy = clone({})
-        copy.extend(QueryBlockCopy)
-        copy.instance_eval(&block)
-        clone(copy.opts)
+      # Returns the first record in the dataset.
+      def single_record(opts = nil)
+        each((opts||{}).merge(:limit=>1)){|r| return r}
+        nil
+      end
+
+      # Returns the first value of the first record in the dataset.
+      # Returns nil if dataset is empty.
+      def single_value(opts = nil)
+        if r = naked.single_record(opts)
+          r.values.first
+        end
       end
       
-      def create_view(name)
-        @db.create_view(name, self)
+      # Returns the sum for the given column.
+      def sum(column)
+        get(:sum[column])
       end
-      
-      def create_or_replace_view(name)
-        @db.create_or_replace_view(name, self)
-      end
-      
+
       def table_exists?
         if @opts[:sql]
           raise Sequel::Error, "this dataset has fixed SQL"
@@ -265,6 +202,27 @@ module Sequel
         end
         
         @db.table_exists?(t.to_sym)
+      end
+
+      # Returns a string in CSV format containing the dataset records. By 
+      # default the CSV representation includes the column titles in the
+      # first line. You can turn that off by passing false as the 
+      # include_column_titles argument.
+      def to_csv(include_column_titles = true)
+        n = naked
+        cols = n.columns
+        csv = ''
+        csv << "#{cols.join(COMMA_SEPARATOR)}\r\n" if include_column_titles
+        n.each{|r| csv << "#{cols.collect{|c| r[c]}.join(COMMA_SEPARATOR)}\r\n"}
+        csv
+      end
+      
+      # Returns a hash with one column used as key and another used as value.
+      def to_hash(key_column, value_column)
+        inject({}) do |m, r|
+          m[r[key_column]] = r[value_column]
+          m
+        end
       end
     end
   end
