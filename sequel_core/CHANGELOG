@@ -1,5 +1,21 @@
 === HEAD
 
+* Add add_foreign_key and add_primary_key methods to the AlterTableGenerator (jeremyevans)
+
+* Allow migration files to have more than 3 digits (jeremyevans)
+
+* Add methods directly to Dataset instead of including modules (jeremyevans)
+
+* Make some Dataset instance methods private: invert_order, join_expr, insert_default_values_sql (jeremyevans)
+
+* Don't add methods that depend on ParseTree unless you can load ParseTree (jeremyevans)
+
+* Don't wipeout the cached columns every time a dataset is cloned, but only on changes to :select, :sql, :from, or :join (jeremyevans)
+
+* Fix Oracle Adapter (yasushi.abe)
+
+* Fixed sqlite uri to handle sqlite:#{absolute_path} and sqlite://#{relative_path} (dlee)
+
 * Raise a Sequel::Error if an invalid limit or offset is used (jeremyevans)
 
 * Refactor and beef up Dataset#first and Dataset#last, with some change in functionality (jeremyevans)

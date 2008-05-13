@@ -1,7 +1,7 @@
 require File.join(File.dirname(__FILE__), 'spec_helper')
 
 describe Sequel::Schema::Generator do
-  before :all do
+  before do
     @generator = Sequel::Schema::Generator.new(SchemaDummyDatabase.new) do
       string :title
       column :body, :text
@@ -11,6 +11,7 @@ describe Sequel::Schema::Generator do
       constraint(:xxx) {:yyy == :zzz}
       index :title
       index [:title, :body]
+      foreign_key :node_id, :nodes
     end
     @columns, @indexes = @generator.create_info
   end
@@ -22,7 +23,7 @@ describe Sequel::Schema::Generator do
   end
   
   it "counts primary key, column and constraint definitions as columns" do
-    @columns.size.should == 6
+    @columns.size.should == 7
   end
   
   it "places primary key first" do
@@ -45,6 +46,13 @@ describe Sequel::Schema::Generator do
   it "creates foreign key column" do
     @columns[3][:name].should == :parent_id
     @columns[3][:type].should == :integer
+    @columns[6][:name].should == :node_id
+    @columns[6][:type].should == :integer
+  end
+  
+  it "uses table for foreign key columns, if specified" do
+    @columns[6][:table].should == :nodes
+    @columns[3][:table].should == nil
   end
   
   it "finds columns" do
@@ -72,7 +80,7 @@ describe Sequel::Schema::Generator do
 end
 
 describe Sequel::Schema::AlterTableGenerator do
-  before :all do
+  before do
     @generator = Sequel::Schema::AlterTableGenerator.new(SchemaDummyDatabase.new) do
       add_column :aaa, :text
       drop_column :bbb
@@ -87,6 +95,8 @@ describe Sequel::Schema::AlterTableGenerator do
       add_index :blah, :where => {:something => true}
       add_constraint :con1, ':fred > 100'
       drop_constraint :con2
+      add_primary_key :id
+      add_foreign_key :node_id, :nodes
     end
   end
   
@@ -104,7 +114,9 @@ describe Sequel::Schema::AlterTableGenerator do
       {:op => :add_index, :columns => [:blah], :type => :hash},
       {:op => :add_index, :columns => [:blah], :where => {:something => true}},
       {:op => :add_constraint, :type => :check, :name => :con1, :check => [':fred > 100']},
-      {:op => :drop_constraint, :name => :con2}
+      {:op => :drop_constraint, :name => :con2},
+      {:op => :add_column, :name => :id, :type => :integer, :primary_key=>true, :auto_increment=>true},
+      {:op => :add_column, :name => :node_id, :type => :integer, :table=>:nodes}
     ]
   end
 end

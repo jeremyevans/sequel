@@ -27,7 +27,17 @@ module Sequel
         [@columns, @indexes]
       end
 
-      def foreign_key(name, opts = {})
+      def foreign_key(name, table=nil, opts = {})
+        opts = case table
+        when Hash
+          table.merge(opts)
+        when Symbol
+          opts.merge(:table=>table)
+        when NilClass
+          opts
+        else
+          raise(Sequel::Error, "The seconds argument to foreign key should be a Hash, Symbol, or nil")
+        end
         @columns << {:name => name, :type => :integer}.merge(opts)
         index(name) if opts[:index]
       end
@@ -92,12 +102,21 @@ module Sequel
           :check => block || args}
       end
 
+      def add_foreign_key(name, table, opts = {})
+        add_column(name, :integer, {:table=>table}.merge(opts))
+      end
+      
       def add_full_text_index(columns, opts = {})
         add_index(columns, {:type=>:full_text}.merge(opts))
       end
       
       def add_index(columns, opts = {})
         @operations << {:op => :add_index, :columns => Array(columns)}.merge(opts)
+      end
+      
+      def add_primary_key(name, opts = {})
+        opts = @db.serial_primary_key_options.merge(opts)
+        add_column(name, opts.delete(:type), opts)
       end
       
       def add_spatial_index(columns, opts = {})
