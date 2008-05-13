@@ -1,5 +1,7 @@
 === HEAD
 
+* Add Dataset#unfiltered, for removing filters from dataset (jeremyevans)
+
 * Add add_foreign_key and add_primary_key methods to the AlterTableGenerator (jeremyevans)
 
 * Allow migration files to have more than 3 digits (jeremyevans)

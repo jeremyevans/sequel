@@ -794,6 +794,17 @@ context "Dataset#order" do
   end
 end
 
+context "Dataset#unfiltered" do
+  setup do
+    @dataset = Sequel::Dataset.new(nil).from(:test)
+  end
+  
+  specify "should remove filtering from the dataset" do
+    @dataset.filter(:score=>1).unfiltered.sql.should ==
+      'SELECT * FROM test'
+  end
+end
+
 context "Dataset#unordered" do
   setup do
     @dataset = Sequel::Dataset.new(nil).from(:test)

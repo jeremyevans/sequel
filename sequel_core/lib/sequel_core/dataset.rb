@@ -67,7 +67,7 @@ module Sequel
     group group_and_count group_by having inner_join intersect invert_order join
     left_outer_join limit naked or order order_by order_more paginate query reject
     reverse reverse_order right_outer_join select select_all select_more
-    set_graph_aliases set_model sort sort_by union unordered where'.collect{|x| x.to_sym}
+    set_graph_aliases set_model sort sort_by unfiltered union unordered where'.collect{|x| x.to_sym}
     NOTIMPL_MSG = "This method must be overriden in Sequel adapters".freeze
     STOCK_TRANSFORMS = {
       :marshal => [

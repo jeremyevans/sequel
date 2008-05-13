@@ -554,6 +554,11 @@ module Sequel
       end
     end
 
+    # Returns a copy of the dataset with no filters (HAVING or WHERE clause) applied.
+    def unfiltered
+      clone(:where => nil, :having => nil)
+    end
+
     # Adds a UNION clause using a second dataset object. If all is true the
     # clause used is UNION ALL, which may return duplicate rows.
     def union(dataset, all = false)
@@ -624,7 +629,7 @@ module Sequel
         WILDCARD
       else
         m = columns.map do |i|
-          i.is_a?(Hash) ? i.map {|kv| "#{literal(kv[0])} AS #{kv[1]}"} : literal(i)
+          i.is_a?(Hash) ? i.map {|kv| "#{literal(kv[0])} AS #{quote_column_ref(kv[1])}"} : literal(i)
         end
         m.join(COMMA_SEPARATOR)
       end
