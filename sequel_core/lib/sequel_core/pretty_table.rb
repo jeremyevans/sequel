@@ -9,7 +9,7 @@ module Sequel
     #   |2 |test   |
     #   +--+-------+
     def self.print(records, columns = nil) # records is an array of hashes
-      columns ||= records_columns(records)
+      columns ||= records.first.keys.sort_by{|x|x.to_s}
       sizes = column_sizes(records, columns)
       
       puts separator_line(columns, sizes)
@@ -18,22 +18,10 @@ module Sequel
       records.each {|r| puts data_line(columns, sizes, r)}
       puts separator_line(columns, sizes)
     end
-  end
-  class << PrettyTable
-    private
-    def records_columns(records)
-      columns = []
-      records.each do |r|
-        if Array === r && (k = r.keys)
-          return k
-        elsif Hash === r
-          r.keys.each {|k| columns << k unless columns.include?(k)}
-        end
-      end
-      columns
-    end
-    
-    def column_sizes(records, columns)
+
+    ### Private Module Methods ###
+
+    def self.column_sizes(records, columns) # :nodoc:
       sizes = Hash.new {0}
       columns.each do |c|
         s = c.to_s.size
@@ -48,12 +36,11 @@ module Sequel
       sizes
     end
     
-    def separator_line(columns, sizes)
-      l = ''
-      '+' + columns.map {|c| '-' * sizes[c]}.join('+') + '+'
+    def self.data_line(columns, sizes, record) # :nodoc:
+      '|' << columns.map {|c| format_cell(sizes[c], record[c])}.join('|') << '|'
     end
     
-    def format_cell(size, v)
+    def self.format_cell(size, v) # :nodoc:
       case v
       when Bignum, Fixnum
         "%#{size}d" % v
@@ -64,13 +51,14 @@ module Sequel
       end
     end
     
-    def data_line(columns, sizes, record)
-      '|' + columns.map {|c| format_cell(sizes[c], record[c])}.join('|') + '|'
+    def self.header_line(columns, sizes) # :nodoc:
+      '|' << columns.map {|c| "%-#{sizes[c]}s" % c.to_s}.join('|') << '|'
     end
-    
-    def header_line(columns, sizes)
-      '|' + columns.map {|c| "%-#{sizes[c]}s" % c.to_s}.join('|') + '|'
+
+    def self.separator_line(columns, sizes) # :nodoc:
+      '+' << columns.map {|c| '-' * sizes[c]}.join('+') << '+'
     end
+    metaprivate :column_sizes, :data_line, :format_cell, :header_line, :separator_line
   end
 end
 
