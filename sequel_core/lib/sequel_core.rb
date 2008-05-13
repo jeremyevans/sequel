@@ -18,8 +18,8 @@ module Sequel #:nodoc:
   # The specified scheme determines the database class used, and the rest
   # of the string specifies the connection options. For example:
   #   DB = Sequel.open 'sqlite:///blog.db'
-  def self.connect(*args)
-    Database.connect(*args)
+  def self.connect(*args, &block)
+    Database.connect(*args, &block)
   end
   metaalias :open, :connect
   
@@ -29,22 +29,24 @@ module Sequel #:nodoc:
   
   ### Private Class Methods ###
 
+  def self.adapter_method(adapter, *args, &block)
+    raise(::Sequel::Error, "Wrong number of arguments, 0-2 arguments valid") if args.length > 2
+    opts = {:adapter=>adapter.to_sym}
+    opts[:database] = args.shift if args.length >= 1 && !(args[0].is_a?(Hash))
+    if Hash === (arg = args[0])
+      opts.merge!(arg)
+    elsif !arg.nil?
+      raise ::Sequel::Error, "Wrong format of arguments, either use (), (String), (Hash), or (String, Hash)"
+    end
+    connect(opts, &block)
+  end
+
   def self.def_adapter_method(*adapters)
     adapters.each do |adapter|
-      meta_def(adapter) do |*args|
-        raise(::Sequel::Error, "Wrong number of arguments, 0-2 arguments valid") if args.length > 2
-        opts = {:adapter=>adapter.to_sym}
-        opts[:database] = args.shift if args.length >= 1 && !(args[0].is_a?(Hash))
-        if Hash === (arg = args[0])
-          opts.merge!(arg)
-        elsif !arg.nil?
-          raise ::Sequel::Error, "Wrong format of arguments, either use (), (String), (Hash), or (String, Hash)"
-        end
-        ::Sequel::Database.connect(opts)
-      end
+      instance_eval("def #{adapter}(*args, &block); adapter_method('#{adapter}', *args, &block) end")
     end
   end
-  metaprivate :def_adapter_method
+  metaprivate :adapter_method, :def_adapter_method
   
   def_adapter_method(*Database::ADAPTERS)
 end

@@ -477,7 +477,15 @@ end
 context "A Database adapter with a scheme" do
   setup do
     class CCC < Sequel::Database
+      if defined?(DISCONNECTS)
+        DISCONNECTS.clear
+      else
+        DISCONNECTS = []
+      end
       set_adapter_scheme :ccc
+      def disconnect
+        DISCONNECTS << self
+      end
     end
   end
 
@@ -497,6 +505,30 @@ context "A Database adapter with a scheme" do
     c.should be_a_kind_of(CCC)
     c.opts[:host].should == 'localhost'
     c.opts[:database].should == 'db'
+  end
+
+  specify "should be accessible through Sequel.connect via a block" do
+    x = nil
+    y = nil
+    z = nil
+
+    p = proc do |c|
+      c.should be_a_kind_of(CCC)
+      c.opts[:host].should == 'localhost'
+      c.opts[:database].should == 'db'
+      z = y
+      y = x
+      x = c
+    end
+    Sequel::Database.connect('ccc://localhost/db', &p).should == nil
+    CCC::DISCONNECTS.should == [x]
+
+    Sequel.connect('ccc://localhost/db', &p).should == nil
+    CCC::DISCONNECTS.should == [y, x]
+
+    Sequel.send(:def_adapter_method, :ccc)
+    Sequel.ccc('db', :host=>'localhost', &p).should == nil
+    CCC::DISCONNECTS.should == [z, y, x]
   end
 
   specify "should be accessible through Sequel.open" do

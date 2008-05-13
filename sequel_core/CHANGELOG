@@ -1,5 +1,7 @@
 === HEAD
 
+* Allow Sequel::Database.connect and related methods to take a block that disconnects the database when the block finishes (jeremyevans)
+
 * Add Dataset#unfiltered, for removing filters from dataset (jeremyevans)
 
 * Add add_foreign_key and add_primary_key methods to the AlterTableGenerator (jeremyevans)

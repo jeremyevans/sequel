@@ -81,7 +81,7 @@ module Sequel
     # The second form of this method takes an options:
     #
     #   DB = Sequel.open :adapter => :sqlite, :database => 'blog.db'
-    def self.connect(conn_string, opts = nil)
+    def self.connect(conn_string, opts = nil, &block)
       if conn_string.is_a?(String)
         uri = URI.parse(conn_string)
         scheme = uri.scheme
@@ -98,7 +98,16 @@ module Sequel
         m[k.to_sym] = v
         m
       end
-      c.new(opts)
+      if block
+        begin
+          yield(db = c.new(opts))
+        ensure
+          db.disconnect if db
+        end
+        nil
+      else
+        c.new(opts)
+      end
     end
 
     # Sets the default single_threaded mode for new databases.
