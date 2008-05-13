@@ -1,5 +1,3 @@
-require 'thread'
-
 # A ConnectionPool manages access to database connections by keeping
 # multiple connections and giving threads exclusive access to each
 # connection.
