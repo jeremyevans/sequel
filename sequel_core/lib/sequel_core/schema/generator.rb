@@ -9,12 +9,43 @@ module Sequel
         instance_eval(&block) if block
       end
       
-      def method_missing(type, name = nil, opts = {})
-        name ? column(name, type, opts) : super
+      def check(*args, &block)
+        @columns << {:name => nil, :type => :check, :check => block || args}
+      end
+
+      def column(name, type, opts = {})
+        @columns << {:name => name, :type => type}.merge(opts)
+        index(name) if opts[:index]
       end
       
-      def primary_key_name
-        @primary_key ? @primary_key[:name] : nil
+      def constraint(name, *args, &block)
+        @columns << {:name => name, :type => :check, :check => block || args}
+      end
+      
+      def create_info
+        @columns.unshift(@primary_key) if @primary_key && !has_column?(primary_key_name)
+        [@columns, @indexes]
+      end
+
+      def foreign_key(name, opts = {})
+        @columns << {:name => name, :type => :integer}.merge(opts)
+        index(name) if opts[:index]
+      end
+      
+      def full_text_index(columns, opts = {})
+        index(columns, opts.merge(:type => :full_text))
+      end
+      
+      def has_column?(name)
+        @columns.any?{|c| c[:name] == name}
+      end
+      
+      def index(columns, opts = {})
+        @indexes << {:columns => Array(columns)}.merge(opts)
+      end
+      
+      def method_missing(type, name = nil, opts = {})
+        name ? column(name, type, opts) : super
       end
       
       def primary_key(name, *args)
@@ -30,36 +61,8 @@ module Sequel
         @primary_key
       end
       
-      def column(name, type, opts = {})
-        @columns << {:name => name, :type => type}.merge(opts)
-        index(name) if opts[:index]
-      end
-      
-      def foreign_key(name, opts = {})
-        @columns << {:name => name, :type => :integer}.merge(opts)
-        index(name) if opts[:index]
-      end
-      
-      def check(*args, &block)
-        @columns << {:name => nil, :type => :check, :check => block || args}
-      end
-
-      def constraint(name, *args, &block)
-        @columns << {:name => name, :type => :check, :check => block || args}
-      end
-      
-      def has_column?(name)
-        @columns.each {|c| return true if c[:name] == name}
-        false
-      end
-      
-      def index(columns, opts = {})
-        columns = [columns] unless columns.is_a?(Array)
-        @indexes << {:columns => columns}.merge(opts)
-      end
-      
-      def full_text_index(columns, opts = {})
-        index(columns, opts.merge(:type => :full_text))
+      def primary_key_name
+        @primary_key[:name] if @primary_key
       end
       
       def spatial_index(columns, opts = {})
@@ -68,13 +71,6 @@ module Sequel
 
       def unique(columns, opts = {})
         index(columns, opts.merge(:unique => true))
-      end
-      
-      def create_info
-        if @primary_key && !has_column?(@primary_key[:name])
-          @columns.unshift(@primary_key)
-        end
-        [@columns, @indexes]
       end
     end
   
@@ -88,92 +84,48 @@ module Sequel
       end
       
       def add_column(name, type, opts = {})
-        @operations << { \
-          :op => :add_column, \
-          :name => name, \
-          :type => type \
-        }.merge(opts)
+        @operations << {:op => :add_column, :name => name, :type => type}.merge(opts)
       end
       
-      def drop_column(name)
-        @operations << { \
-          :op => :drop_column, \
-          :name => name \
-        }
+      def add_constraint(name, *args, &block)
+        @operations << {:op => :add_constraint, :name => name, :type => :check, \
+          :check => block || args}
       end
-      
-      def rename_column(name, new_name, opts = {})
-        @operations << { \
-          :op => :rename_column, \
-          :name => name, \
-          :new_name => new_name \
-        }.merge(opts)
-      end
-      
-      def set_column_type(name, type)
-        @operations << { \
-          :op => :set_column_type, \
-          :name => name, \
-          :type => type \
-        }
-      end
-      
-      def set_column_default(name, default)
-        @operations << { \
-          :op => :set_column_default, \
-          :name => name, \
-          :default => default \
-        }
+
+      def add_full_text_index(columns, opts = {})
+        add_index(columns, {:type=>:full_text}.merge(opts))
       end
       
       def add_index(columns, opts = {})
-        columns = [columns] unless columns.is_a?(Array)
-        @operations << { \
-          :op => :add_index, \
-          :columns => columns \
-        }.merge(opts)
-      end
-      
-      def add_full_text_index(columns, opts = {})
-        columns = [columns] unless columns.is_a?(Array)
-        @operations << { \
-          :op => :add_index, \
-          :columns => columns, \
-          :type => :full_text \
-        }.merge(opts)
+        @operations << {:op => :add_index, :columns => Array(columns)}.merge(opts)
       end
       
       def add_spatial_index(columns, opts = {})
-        columns = [columns] unless columns.is_a?(Array)
-        @operations << { \
-          :op => :add_index, \
-          :columns => columns, \
-          :type => :spatial \
-        }.merge(opts)
+        add_index(columns, {:type=>:spatial}.merge(opts))
+      end
+      
+      def drop_column(name)
+        @operations << {:op => :drop_column, :name => name}
+      end
+      
+      def drop_constraint(name)
+        @operations << {:op => :drop_constraint, :name => name}
       end
       
       def drop_index(columns)
-        columns = [columns] unless columns.is_a?(Array)
-        @operations << { \
-          :op => :drop_index, \
-          :columns => columns \
-        }
+        @operations << {:op => :drop_index, :columns => Array(columns)}
       end
 
-      def add_constraint(name, *args, &block)
-        @operations << { \
-          :op => :add_constraint, \
-          :name => name, \
-          :type => :check, \
-          :check => block || args \
-        }
+      def rename_column(name, new_name, opts = {})
+        @operations << {:op => :rename_column, :name => name, :new_name => new_name}.merge(opts)
+      end
+      
+      def set_column_default(name, default)
+        @operations << {:op => :set_column_default, :name => name, :default => default}
       end
 
-      def drop_constraint(name)
-        @operations << { \
-          :op => :drop_constraint, \
-          :name => name \
-        }
+      def set_column_type(name, type)
+        @operations << {:op => :set_column_type, :name => name, :type => type}
       end
     end
   end
