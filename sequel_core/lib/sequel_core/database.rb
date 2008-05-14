@@ -332,15 +332,16 @@ module Sequel
         conn.execute(SQL_BEGIN)
         begin
           @transactions << Thread.current
-          result = yield(conn)
-          @logger.info(SQL_COMMIT) if @logger
-          conn.execute(SQL_COMMIT)
-          result
+          yield(conn)
         rescue Exception => e
           @logger.info(SQL_ROLLBACK) if @logger
           conn.execute(SQL_ROLLBACK)
           raise e unless Error::Rollback === e
         ensure
+          unless e
+            @logger.info(SQL_COMMIT) if @logger
+            conn.execute(SQL_COMMIT)
+          end
           @transactions.delete(Thread.current)
         end
       end

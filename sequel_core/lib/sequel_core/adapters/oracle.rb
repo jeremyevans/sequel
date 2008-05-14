@@ -59,13 +59,12 @@ module Sequel
           conn.autocommit = false
           begin
             @transactions << Thread.current
-            result = yield(conn)
-            conn.commit
-            result
+            yield(conn)
           rescue => e
             conn.rollback
             raise e unless Error::Rollback === e
           ensure
+            conn.commit unless e
             conn.autocommit = true
             @transactions.delete(Thread.current)
           end

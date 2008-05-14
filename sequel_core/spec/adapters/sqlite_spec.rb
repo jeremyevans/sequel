@@ -127,6 +127,29 @@ context "An SQLite database" do
     @db.tables.should == [:t]
   end
   
+  specify "should handle returning inside of transaction by committing" do
+    @db.create_table(:items){text :name}
+    def @db.ret_commit
+      transaction do
+        self[:items] << {:name => 'abc'}
+        return
+        self[:items] << {:name => 'd'}
+      end
+    end
+    @db[:items].count.should == 0
+    @db.ret_commit
+    @db[:items].count.should == 1
+    @db.ret_commit
+    @db[:items].count.should == 2
+    proc do
+      @db.transaction do
+        raise Interrupt, 'asdf'
+      end
+    end.should raise_error(Interrupt)
+
+    @db[:items].count.should == 2
+  end
+
   specify "should provide disconnect functionality" do
     @db.tables
     @db.pool.size.should == 1

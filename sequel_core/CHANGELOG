@@ -1,5 +1,7 @@
 === HEAD
 
+* Make returning inside of a database transaction commit the transaction (ahoward, jeremyevans)
+
 * Dataset#to_table_reference is now protected, and it has a different API (jeremyevans)
 
 * Dataset#join_table and related functions now take an explicit optional table_alias argument, you can no longer include the table alias in the table argument (jeremyevans)

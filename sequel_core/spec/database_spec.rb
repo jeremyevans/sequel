@@ -435,6 +435,18 @@ context "Database#transaction" do
     @db.sql.should == ['BEGIN', 'DROP TABLE test;', 'COMMIT']
   end
   
+  specify "should handle returning inside of the block by committing" do
+    def @db.ret_commit
+      transaction do
+        execute 'DROP TABLE test;'
+        return
+        execute 'DROP TABLE test2;';
+      end
+    end
+    @db.ret_commit
+    @db.sql.should == ['BEGIN', 'DROP TABLE test;', 'COMMIT']
+  end
+  
   specify "should issue ROLLBACK if an exception is raised, and re-raise" do
     @db.transaction {@db.execute 'DROP TABLE test'; raise RuntimeError} rescue nil
     @db.sql.should == ['BEGIN', 'DROP TABLE test', 'ROLLBACK']

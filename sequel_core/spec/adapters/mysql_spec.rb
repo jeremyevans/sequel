@@ -207,6 +207,18 @@ context "A MySQL dataset" do
 
     MYSQL_DB.sqls.should == ['BEGIN', "INSERT INTO items (name) VALUES ('abc')", 'ROLLBACK']
   end
+
+  specify "should handle returning inside of the block by committing" do
+    def MYSQL_DB.ret_commit
+      transaction do
+        self[:items] << {:name => 'abc'}
+        return
+        self[:items] << {:name => 'd'}
+      end
+    end
+    MYSQL_DB.ret_commit
+    MYSQL_DB.sqls.should == ['BEGIN', "INSERT INTO items (name) VALUES ('abc')", 'COMMIT']
+  end
   
   specify "should support regexps" do
     @d << {:name => 'abc', :value => 1}

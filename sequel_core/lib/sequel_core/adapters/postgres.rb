@@ -302,20 +302,21 @@ module Sequel
             conn.async_exec(SQL_BEGIN)
             begin
               conn.transaction_in_progress = true
-              result = yield
-              begin
-                @logger.info(SQL_COMMIT) if @logger
-                conn.async_exec(SQL_COMMIT)
-              rescue => e
-                @logger.error(e.message) if @logger
-                raise convert_pgerror(e)
-              end
-              result
+              yield
             rescue ::Exception => e
               @logger.info(SQL_ROLLBACK) if @logger
               conn.async_exec(SQL_ROLLBACK) rescue nil
               raise convert_pgerror(e) unless Error::Rollback === e
             ensure
+              unless e
+                begin
+                  @logger.info(SQL_COMMIT) if @logger
+                  conn.async_exec(SQL_COMMIT)
+                rescue => e
+                  @logger.error(e.message) if @logger
+                  raise convert_pgerror(e)
+                end
+              end
               conn.transaction_in_progress = nil
             end
           end

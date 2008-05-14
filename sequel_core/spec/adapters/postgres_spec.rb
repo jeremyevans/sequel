@@ -176,6 +176,28 @@ context "A PostgreSQL dataset" do
     @d.count.should == 0
   end
   
+  specify "should handle returning inside of the block by committing" do
+    def POSTGRES_DB.ret_commit
+      transaction do
+        self[:test] << {:name => 'abc'}
+        return
+        self[:test] << {:name => 'd'}
+      end
+    end
+    @d.count.should == 0
+    POSTGRES_DB.ret_commit
+    @d.count.should == 1
+    POSTGRES_DB.ret_commit
+    @d.count.should == 2
+    proc do
+      POSTGRES_DB.transaction do
+        raise Interrupt, 'asdf'
+      end
+    end.should raise_error(Interrupt)
+
+    @d.count.should == 2
+  end
+
   specify "should support regexps" do
     @d << {:name => 'abc', :value => 1}
     @d << {:name => 'bcd', :value => 2}
