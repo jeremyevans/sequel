@@ -3,13 +3,12 @@
 
 module Sequel
   class Dataset
-    ALIASED_REGEXP = /\A(.*)\s(.*)\z/.freeze
     AND_SEPARATOR = " AND ".freeze
     BOOL_FALSE = "'f'".freeze
     BOOL_TRUE = "'t'".freeze
-    COLUMN_REF_RE1 = /^(\w+)__(\w+)___(\w+)/.freeze
-    COLUMN_REF_RE2 = /\A(\w+)___(\w+)\z/.freeze
-    COLUMN_REF_RE3 = /\A(\w+)__(\w+)\z/.freeze
+    COLUMN_REF_RE1 = /\A([\w ]+)__([\w ]+)___([\w ]+)\z/.freeze
+    COLUMN_REF_RE2 = /\A([\w ]+)___([\w ]+)\z/.freeze
+    COLUMN_REF_RE3 = /\A([\w ]+)__([\w ]+)\z/.freeze
     DATE_FORMAT = "DATE '%Y-%m-%d'".freeze
     JOIN_TYPES = {
       :left_outer => 'LEFT OUTER JOIN'.freeze,
@@ -18,7 +17,6 @@ module Sequel
       :inner => 'INNER JOIN'.freeze
     }
     NULL = "NULL".freeze
-    QUALIFIED_REGEXP = /\A(.*)\.(.*)\z/.freeze
     QUESTION_MARK = '?'.freeze
     STOCK_COUNT_OPTS = {:select => ["COUNT(*)".lit], :order => nil}.freeze
     TIMESTAMP_FORMAT = "TIMESTAMP '%Y-%m-%d %H:%M:%S'".freeze
@@ -36,7 +34,7 @@ module Sequel
     end
 
     def column_all_sql(ca)
-      "#{ca.table}.*"
+      "#{quote_identifier(ca.table)}.*"
     end
 
     def column_expr_sql(ce)
@@ -276,21 +274,32 @@ module Sequel
     end
 
     # Returns a joined dataset with the specified join type and condition.
-    def join_table(type, table, expr)
-      expr = [[expr, :id]] unless (Hash === expr) || (Array === expr)
-      options = {}
+    def join_table(type, table, expr=nil, table_alias=nil)
+      raise(Error::InvalidJoinType, "Invalid join type: #{type}") unless join_type = JOIN_TYPES[type || :inner]
 
-      if Dataset === table
-        table = "(#{table.sql})"
-        table_alias_num = @opts[:num_dataset_joins] || 1
-        options[:table_alias] = "t#{table_alias_num}"
-      elsif table.respond_to?(:table_name)
-        table = table.table_name
+      table = if Dataset === table
+        table_alias = unless table_alias
+          table_alias_num = (@opts[:num_dataset_sources] || 0) + 1
+          "t#{table_alias_num}"
+        end
+        table.to_table_reference
+      else
+        table = table.table_name if table.respond_to?(:table_name)
+        table_alias ||= table
+        quote_identifier(table)
       end
-      
-      clause = join_expr(type, table, expr, options)
-      opts = {:join => @opts[:join] ? @opts[:join] + clause : clause, :last_joined_table => options[:table_alias] || table}
-      opts[:num_dataset_joins] = table_alias_num + 1 if table_alias_num
+
+      expr = [[expr, :id]] unless expr.is_one_of?(Hash, Array)
+      join_conditions = expr.collect do |k, v|
+        k = qualified_column_name(k, table_alias) if k.is_a?(Symbol)
+        v = qualified_column_name(v, @opts[:last_joined_table] || first_source) if v.is_a?(Symbol)
+        [k,v]
+      end
+
+      quoted_table_alias = quote_identifier(table_alias) 
+      clause = "#{@opts[:join]} #{join_type} #{table}#{" #{quoted_table_alias}" if quoted_table_alias != table} ON #{expression_list(join_conditions)}"
+      opts = {:join => clause, :last_joined_table => table_alias}
+      opts[:num_dataset_sources] = table_alias_num if table_alias_num
       clone(opts)
     end
 
@@ -345,7 +354,7 @@ module Sequel
       when FalseClass
         BOOL_FALSE
       when Symbol
-        v.to_column_ref(self)
+        symbol_to_column_ref(v)
       when Sequel::SQL::Expression
         v.to_s(self)
       when Array
@@ -367,7 +376,7 @@ module Sequel
     #
     # This method may be overriden by descendants.
     def multi_insert_sql(columns, values)
-      table = @opts[:from].first
+      table = quote_identifier(@opts[:from].first)
       columns = literal(columns)
       values.map do |r|
         "INSERT INTO #{table} (#{columns}) VALUES (#{literal(r)})"
@@ -415,14 +424,21 @@ module Sequel
     end
     
     def qualified_column_ref_sql(qcr)
-      "#{qcr.table}.#{literal(qcr.column)}"
+      "#{quote_identifier(qcr.table)}.#{quote_identifier(qcr.column)}"
     end
 
-    # Adds quoting to column references. This method is just a stub and can
-    # be overriden in adapters in order to provide correct column quoting
-    # behavior.
-    def quote_column_ref(name);
-      name.to_s;
+    # Adds quoting to identifiers (columns and tables). If identifiers are not
+    # being quoted, returns name as a string.  If identifiers are being quoted
+    # quote the name with the SQL standard double quote. This method
+    # should be overriden by subclasses to provide quoting not matching the
+    # SQL standard, such as backtick (used by MySQL and SQLite). 
+    def quote_identifier(name)
+      quote_identifiers? ? quoted_identifier(name) : name.to_s
+    end
+    alias_method :quote_column_ref, :quote_identifier
+
+    def quoted_identifier(name)
+      "\"#{name}\""
     end
 
     # Returns a copy of the dataset with the order reversed. If no order is
@@ -530,27 +546,21 @@ module Sequel
     #   :items__abc.to_column_ref(ds) #=> "items.abc"
     #   :items__abc___a.to_column_ref(ds) #=> "items.abc AS a"
     #
-    def symbol_to_column_ref(sym)
+    def symbol_to_column_ref(sym, table=(qualify=false; nil))
       s = sym.to_s
       if m = COLUMN_REF_RE1.match(s)
-        "#{m[1]}.#{quote_column_ref(m[2])} AS #{quote_column_ref(m[3])}"
+        table, column, aliaz = m[1], m[2], m[3]
       elsif m = COLUMN_REF_RE2.match(s)
-        "#{quote_column_ref(m[1])} AS #{quote_column_ref(m[2])}"
+        column, aliaz = m[1], m[2]
       elsif m = COLUMN_REF_RE3.match(s)
-        "#{m[1]}.#{quote_column_ref(m[2])}"
+        table, column = m[1], m[2]
       else
-        quote_column_ref(s)
+        column = s
       end
-    end
-
-    # Returns a table reference for use in the FROM clause. If the dataset has
-    # only a :from option refering to a single table, only the table name is 
-    # returned. Otherwise a subquery is returned.
-    def to_table_reference(idx = nil)
-      if opts.keys == [:from] && opts[:from].size == 1
-        opts[:from].first.to_s
+      if qualify == false
+        "#{"#{quote_identifier(table)}." if table}#{quote_identifier(column)}#{" AS #{quote_identifier(aliaz)}" if aliaz}"
       else
-        idx ? "(#{sql}) t#{idx}" : "(#{sql})"
+        ::Sequel::SQL::QualifiedColumnRef.new(table, column)
       end
     end
 
@@ -616,10 +626,19 @@ module Sequel
       sql
     end
 
-    [:inner, :full_outer, :right_outer, :left_outer].each do |x|
-      define_method("#{x}_join"){|t,e| join_table(x, t, e)}
+    [:inner, :full_outer, :right_outer, :left_outer].each do |jtype|
+      define_method("#{jtype}_join"){|*args| join_table(jtype, *args)}
     end
     alias_method :join, :inner_join
+
+    protected
+
+    # Returns a table reference for use in the FROM clause. If the dataset has
+    # only a :from option refering to a single table, only the table name is 
+    # returned. Otherwise a subquery is returned.
+    def to_table_reference(table_alias=nil)
+      table_alias ? "(#{sql}) #{quote_identifier(table_alias)}" : "(#{sql})"
+    end
 
     private
     # Converts an array of column names into a comma seperated string of 
@@ -629,7 +648,7 @@ module Sequel
         WILDCARD
       else
         m = columns.map do |i|
-          i.is_a?(Hash) ? i.map {|kv| "#{literal(kv[0])} AS #{quote_column_ref(kv[1])}"} : literal(i)
+          i.is_a?(Hash) ? i.map {|kv| "#{literal(kv[0])} AS #{quote_identifier(kv[1])}"} : literal(i)
         end
         m.join(COMMA_SEPARATOR)
       end
@@ -688,35 +707,10 @@ module Sequel
       end
     end
     
-    # Returns a join clause based on the specified join type and condition.
-    def join_expr(type, table, expr, options)
-      raise(Error::InvalidJoinType, "Invalid join type: #{type}") unless join_type = JOIN_TYPES[type || :inner]
-      
-      table_alias = options[:table_alias]
-
-      join_conditions = []
-      expr.each do |k, v|
-        k = qualified_column_name(k, table_alias || table) if k.is_a?(Symbol)
-        v = qualified_column_name(v, @opts[:last_joined_table] || first_source) if v.is_a?(Symbol)
-        join_conditions << [k,v]
-      end
-      " #{join_type} #{table} #{"#{table_alias} " if table_alias}ON #{expression_list(join_conditions)}"
-    end
-
     # Returns a qualified column name (including a table name) if the column
     # name isn't already qualified.
     def qualified_column_name(column, table)
-      s = literal(column)
-      if s =~ QUALIFIED_REGEXP
-        return column
-      else
-        if table.is_a?(Dataset)
-          table = :t1
-        elsif (table =~ ALIASED_REGEXP)
-          table = $2
-        end
-        Sequel::SQL::QualifiedColumnRef.new(table, column)
-      end
+      Symbol === column ? symbol_to_column_ref(column, table) : column
     end
 
     # Converts an array of sources names into into a comma separated list.
@@ -724,12 +718,12 @@ module Sequel
       if source.nil? || source.empty?
         raise Error, 'No source specified for query'
       end
-      auto_alias_count = 0
+      auto_alias_count = @opts[:num_dataset_sources] || 0
       m = source.map do |s|
         case s
         when Dataset
           auto_alias_count += 1
-          s.to_table_reference(auto_alias_count)
+          s.to_table_reference("t#{auto_alias_count}")
         else
           table_ref(s)
         end
@@ -744,7 +738,7 @@ module Sequel
       when Hash
         t.map {|k, v| "#{table_ref(k)} #{table_ref(v)}"}.join(COMMA_SEPARATOR)
       when Symbol, String
-        t
+        quote_identifier(t)
       else
         literal(t)
       end

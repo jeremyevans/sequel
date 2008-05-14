@@ -16,9 +16,11 @@ module Sequel
 
     @@adapters = Hash.new
     @@single_threaded = false
+    @@quote_identifiers = false
 
-    attr_reader :opts, :pool
     attr_accessor :logger
+    attr_reader :opts, :pool
+    attr_writer :quote_identifiers
 
     # Constructs a new instance of a database connection with the specified
     # options hash.
@@ -27,7 +29,7 @@ module Sequel
     def initialize(opts = {}, &block)
       @opts = opts
       
-      # Determine if the DB is single threaded or multi threaded
+      @quote_identifiers = opts[:quote_identifiers] || @@quote_identifiers
       @single_threaded = opts[:single_threaded] || @@single_threaded
       @pool = (@single_threaded ? SingleThreadedPool : ConnectionPool).new(connection_pool_default_options.merge(opts), &block)
       @pool.connection_proc = proc {connect} unless block
@@ -108,6 +110,11 @@ module Sequel
       else
         c.new(opts)
       end
+    end
+
+    # Sets the default quote_identifiers mode for new databases.
+    def self.quote_identifiers=(value)
+      @@quote_identifiers = value
     end
 
     # Sets the default single_threaded mode for new databases.
@@ -264,6 +271,11 @@ module Sequel
     # Dataset#query.
     def query(&block)
       dataset.query(&block)
+    end
+    
+    # Returns true if the database quotes identifiers
+    def quote_identifiers?
+      @quote_identifiers
     end
     
     # Returns a new dataset with the select method invoked.

@@ -658,9 +658,9 @@ context "Dataset#from" do
       "SELECT * FROM (SELECT * FROM a GROUP BY b) c"
   end
 
-  specify "should use the relevant table name if given a simple dataset" do
+  specify "should always use a subquery if given a dataset" do
     @dataset.from(@dataset.from(:a)).select_sql.should ==
-      "SELECT * FROM a"
+      "SELECT * FROM (SELECT * FROM a) t1"
   end
   
   specify "should raise if no source is given" do
@@ -967,14 +967,18 @@ context "Dataset#qualified_column_name" do
     @dataset = Sequel::Dataset.new(nil).from(:test)
   end
   
-  specify "should return the same if already qualified" do
-    @dataset.send(:qualified_column_name, 'test.a'.lit, :items).should == 'test.a'
-    @dataset.send(:qualified_column_name, :ccc__b, :items).should == :ccc__b
+  specify "should return the literal value if not given a symbol" do
+    @dataset.literal(@dataset.send(:qualified_column_name, 'ccc__b', :items)).should == "'ccc__b'"
+    @dataset.literal(@dataset.send(:qualified_column_name, 3, :items)).should == '3'
+    @dataset.literal(@dataset.send(:qualified_column_name, 'a'.lit, :items)).should == 'a'
   end
   
-  specify "should qualify the column with the supplied table name" do
-    @dataset.send(:qualified_column_name, 'a'.lit, :items).to_s(@dataset).should == 'items.a'
-    @dataset.send(:qualified_column_name, :b1, :items).to_s(@dataset).should == 'items.b1'
+  specify "should qualify the column with the supplied table name if given an unqualified symbol" do
+    @dataset.literal(@dataset.send(:qualified_column_name, :b1, :items)).should == 'items.b1'
+  end
+
+  specify "should not changed the qualifed column's table if given a qualified symbol" do
+    @dataset.literal(@dataset.send(:qualified_column_name, :ccc__b, :items)).should == 'ccc.b'
   end
 end
 
@@ -1141,31 +1145,32 @@ end
 context "Dataset#join_table" do
   setup do
     @d = Sequel::Dataset.new(nil).from(:items)
+    @d.quote_identifiers = true
   end
   
   specify "should format the JOIN clause properly" do
     @d.join_table(:left_outer, :categories, :category_id => :id).sql.should ==
-      'SELECT * FROM items LEFT OUTER JOIN categories ON (categories.category_id = items.id)'
+      'SELECT * FROM "items" LEFT OUTER JOIN "categories" ON ("categories"."category_id" = "items"."id")'
   end
   
   specify "should handle multiple conditions on the same join table column" do
     @d.join_table(:left_outer, :categories, [[:category_id, :id], [:category_id, 0..100]]).sql.should ==
-      'SELECT * FROM items LEFT OUTER JOIN categories ON (categories.category_id = items.id) AND (categories.category_id >= 0 AND categories.category_id <= 100)'
+      'SELECT * FROM "items" LEFT OUTER JOIN "categories" ON ("categories"."category_id" = "items"."id") AND ("categories"."category_id" >= 0 AND "categories"."category_id" <= 100)'
   end
   
   specify "should include WHERE clause if applicable" do
     @d.filter {:price < 100}.join_table(:right_outer, :categories, :category_id => :id).sql.should ==
-      'SELECT * FROM items RIGHT OUTER JOIN categories ON (categories.category_id = items.id) WHERE (price < 100)'
+      'SELECT * FROM "items" RIGHT OUTER JOIN "categories" ON ("categories"."category_id" = "items"."id") WHERE ("price" < 100)'
   end
   
   specify "should include ORDER BY clause if applicable" do
     @d.order(:stamp).join_table(:full_outer, :categories, :category_id => :id).sql.should ==
-      'SELECT * FROM items FULL OUTER JOIN categories ON (categories.category_id = items.id) ORDER BY stamp'
+      'SELECT * FROM "items" FULL OUTER JOIN "categories" ON ("categories"."category_id" = "items"."id") ORDER BY "stamp"'
   end
   
   specify "should support multiple joins" do
     @d.join_table(:inner, :b, :items_id).join_table(:left_outer, :c, :b_id => :b__id).sql.should ==
-      'SELECT * FROM items INNER JOIN b ON (b.items_id = items.id) LEFT OUTER JOIN c ON (c.b_id = b.id)'
+      'SELECT * FROM "items" INNER JOIN "b" ON ("b"."items_id" = "items"."id") LEFT OUTER JOIN "c" ON ("c"."b_id" = "b"."id")'
   end
   
   specify "should use id as implicit relation primary key if omitted" do
@@ -1174,47 +1179,47 @@ context "Dataset#join_table" do
 
     # when doing multiple joins, id should be qualified using the last joined table
     @d.join_table(:right_outer, :b, :items_id).join_table(:full_outer, :c, :b_id).sql.should ==
-      'SELECT * FROM items RIGHT OUTER JOIN b ON (b.items_id = items.id) FULL OUTER JOIN c ON (c.b_id = b.id)'
+      'SELECT * FROM "items" RIGHT OUTER JOIN "b" ON ("b"."items_id" = "items"."id") FULL OUTER JOIN "c" ON ("c"."b_id" = "b"."id")'
   end
   
   specify "should support left outer joins" do
     @d.join_table(:left_outer, :categories, :category_id).sql.should ==
-      'SELECT * FROM items LEFT OUTER JOIN categories ON (categories.category_id = items.id)'
+      'SELECT * FROM "items" LEFT OUTER JOIN "categories" ON ("categories"."category_id" = "items"."id")'
 
     @d.left_outer_join(:categories, :category_id).sql.should ==
-      'SELECT * FROM items LEFT OUTER JOIN categories ON (categories.category_id = items.id)'
+      'SELECT * FROM "items" LEFT OUTER JOIN "categories" ON ("categories"."category_id" = "items"."id")'
   end
 
   specify "should support right outer joins" do
     @d.join_table(:right_outer, :categories, :category_id).sql.should ==
-      'SELECT * FROM items RIGHT OUTER JOIN categories ON (categories.category_id = items.id)'
+      'SELECT * FROM "items" RIGHT OUTER JOIN "categories" ON ("categories"."category_id" = "items"."id")'
 
     @d.right_outer_join(:categories, :category_id).sql.should ==
-      'SELECT * FROM items RIGHT OUTER JOIN categories ON (categories.category_id = items.id)'
+      'SELECT * FROM "items" RIGHT OUTER JOIN "categories" ON ("categories"."category_id" = "items"."id")'
   end
 
   specify "should support full outer joins" do
     @d.join_table(:full_outer, :categories, :category_id).sql.should ==
-      'SELECT * FROM items FULL OUTER JOIN categories ON (categories.category_id = items.id)'
+      'SELECT * FROM "items" FULL OUTER JOIN "categories" ON ("categories"."category_id" = "items"."id")'
 
     @d.full_outer_join(:categories, :category_id).sql.should ==
-      'SELECT * FROM items FULL OUTER JOIN categories ON (categories.category_id = items.id)'
+      'SELECT * FROM "items" FULL OUTER JOIN "categories" ON ("categories"."category_id" = "items"."id")'
   end
 
   specify "should support inner joins" do
     @d.join_table(:inner, :categories, :category_id).sql.should ==
-      'SELECT * FROM items INNER JOIN categories ON (categories.category_id = items.id)'
+      'SELECT * FROM "items" INNER JOIN "categories" ON ("categories"."category_id" = "items"."id")'
 
     @d.inner_join(:categories, :category_id).sql.should ==
-      'SELECT * FROM items INNER JOIN categories ON (categories.category_id = items.id)'
+      'SELECT * FROM "items" INNER JOIN "categories" ON ("categories"."category_id" = "items"."id")'
   end
   
   specify "should default to an inner join" do
     @d.join_table(nil, :categories, :category_id).sql.should ==
-      'SELECT * FROM items INNER JOIN categories ON (categories.category_id = items.id)'
+      'SELECT * FROM "items" INNER JOIN "categories" ON ("categories"."category_id" = "items"."id")'
 
     @d.join(:categories, :category_id).sql.should ==
-      'SELECT * FROM items INNER JOIN categories ON (categories.category_id = items.id)'
+      'SELECT * FROM "items" INNER JOIN "categories" ON ("categories"."category_id" = "items"."id")'
   end
   
   specify "should raise if an invalid join type is specified" do
@@ -1222,27 +1227,28 @@ context "Dataset#join_table" do
   end
   
   specify "should support aliased tables" do
-    @d.from('stats s').join('players p', :id => :player_id).sql.should ==
-      'SELECT * FROM stats s INNER JOIN players p ON (p.id = s.player_id)'
+    @d.from('stats').join('players', {:id => :player_id}, 'p').sql.should ==
+      'SELECT * FROM "stats" INNER JOIN "players" "p" ON ("p"."id" = "stats"."player_id")'
 
-    ds = Sequel::Dataset.new(nil).from(:foo => :f). \
-      join_table(:inner, :bar, :id => :bar_id).sql.should ==
-      'SELECT * FROM foo f INNER JOIN bar ON (bar.id = f.bar_id)'
+    ds = Sequel::Dataset.new(nil).from(:foo => :f)
+    ds.quote_identifiers = true
+    ds.join_table(:inner, :bar, :id => :bar_id).sql.should ==
+      'SELECT * FROM "foo" "f" INNER JOIN "bar" ON ("bar"."id" = "f"."bar_id")'
   end
   
   specify "should allow for arbitrary conditions in the JOIN clause" do
     @d.join_table(:left_outer, :categories, :status => 0).sql.should ==
-      'SELECT * FROM items LEFT OUTER JOIN categories ON (categories.status = 0)'
+      'SELECT * FROM "items" LEFT OUTER JOIN "categories" ON ("categories"."status" = 0)'
     @d.join_table(:left_outer, :categories, :categorizable_type => "Post").sql.should ==
-      "SELECT * FROM items LEFT OUTER JOIN categories ON (categories.categorizable_type = 'Post')"
+      'SELECT * FROM "items" LEFT OUTER JOIN "categories" ON ("categories"."categorizable_type" = \'Post\')'
     @d.join_table(:left_outer, :categories, :timestamp => "CURRENT_TIMESTAMP".lit).sql.should ==
-      "SELECT * FROM items LEFT OUTER JOIN categories ON (categories.timestamp = CURRENT_TIMESTAMP)"
+      'SELECT * FROM "items" LEFT OUTER JOIN "categories" ON ("categories"."timestamp" = CURRENT_TIMESTAMP)'
     @d.join_table(:left_outer, :categories, :status => [1, 2, 3]).sql.should ==
-      "SELECT * FROM items LEFT OUTER JOIN categories ON (categories.status IN (1, 2, 3))"
+      'SELECT * FROM "items" LEFT OUTER JOIN "categories" ON ("categories"."status" IN (1, 2, 3))'
   end
   
   specify "should raise error for a table without a source" do
-    proc {Sequel::Dataset.new(nil).join('players p', :id => :player_id)}. \
+    proc {Sequel::Dataset.new(nil).join('players', :id => :player_id)}. \
       should raise_error(Sequel::Error)
   end
 
@@ -1250,12 +1256,12 @@ context "Dataset#join_table" do
     ds = Sequel::Dataset.new(nil).from(:categories)
     
     @d.join_table(:left_outer, ds, :item_id => :id).sql.should ==
-      'SELECT * FROM items LEFT OUTER JOIN (SELECT * FROM categories) t1 ON (t1.item_id = items.id)'
+      'SELECT * FROM "items" LEFT OUTER JOIN (SELECT * FROM categories) "t1" ON ("t1"."item_id" = "items"."id")'
       
     ds.filter!(:active => true)
 
     @d.join_table(:left_outer, ds, :item_id => :id).sql.should ==
-      'SELECT * FROM items LEFT OUTER JOIN (SELECT * FROM categories WHERE (active = \'t\')) t1 ON (t1.item_id = items.id)'
+      'SELECT * FROM "items" LEFT OUTER JOIN (SELECT * FROM categories WHERE (active = \'t\')) "t1" ON ("t1"."item_id" = "items"."id")'
   end
 
   specify "should support joining multiple datasets" do
@@ -1264,9 +1270,9 @@ context "Dataset#join_table" do
     ds3 = Sequel::Dataset.new(nil).from(:attributes).filter("name = 'blah'")
 
     @d.join_table(:left_outer, ds, :item_id => :id).join_table(:inner, ds2, :node_id=>:id).join_table(:right_outer, ds3, :attribute_id=>:id).sql.should ==
-      'SELECT * FROM items LEFT OUTER JOIN (SELECT * FROM categories) t1 ON (t1.item_id = items.id) ' \
-      'INNER JOIN (SELECT name FROM nodes) t2 ON (t2.node_id = t1.id) ' \
-      "RIGHT OUTER JOIN (SELECT * FROM attributes WHERE name = 'blah') t3 ON (t3.attribute_id = t2.id)"
+      'SELECT * FROM "items" LEFT OUTER JOIN (SELECT * FROM categories) "t1" ON ("t1"."item_id" = "items"."id") ' \
+      'INNER JOIN (SELECT name FROM nodes) "t2" ON ("t2"."node_id" = "t1"."id") ' \
+      'RIGHT OUTER JOIN (SELECT * FROM attributes WHERE name = \'blah\') "t3" ON ("t3"."attribute_id" = "t2"."id")'
   end
 
   specify "should support joining objects that respond to :table_name" do
@@ -1274,7 +1280,7 @@ context "Dataset#join_table" do
     def ds.table_name; :categories end
     
     @d.join(ds, :item_id => :id).sql.should ==
-      'SELECT * FROM items INNER JOIN categories ON (categories.item_id = items.id)'
+      'SELECT * FROM "items" INNER JOIN "categories" ON ("categories"."item_id" = "items"."id")'
   end
 end
 

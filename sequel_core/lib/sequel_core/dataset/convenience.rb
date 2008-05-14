@@ -127,7 +127,7 @@ module Sequel
       elsif args[0].is_a?(Array) && args[1].is_a?(Dataset)
         table = @opts[:from].first
         columns, dataset = *args
-        sql = "INSERT INTO #{table} (#{literal(columns)}) VALUES (#{dataset.sql})"
+        sql = "INSERT INTO #{quote_identifier(table)} (#{literal(columns)}) VALUES (#{dataset.sql})"
         return @db.transaction {@db.execute sql}
       else
         # we assume that an array of hashes is given

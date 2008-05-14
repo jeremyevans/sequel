@@ -138,20 +138,21 @@ end
 context "Column references" do
   setup do
     @c = Class.new(Sequel::Dataset) do
-      def quote_column_ref(c); "`#{c}`"; end
+      def quoted_identifier(c); "`#{c}`"; end
     end
     @ds = @c.new(nil)
+    @ds.quote_identifiers = true
   end
   
   specify "should be quoted properly" do
     @ds.literal(:xyz).should == "`xyz`"
-    @ds.literal(:xyz__abc).should == "xyz.`abc`"
+    @ds.literal(:xyz__abc).should == "`xyz`.`abc`"
 
     @ds.literal(:xyz.as(:x)).should == "`xyz` AS `x`"
-    @ds.literal(:xyz__abc.as(:x)).should == "xyz.`abc` AS `x`"
+    @ds.literal(:xyz__abc.as(:x)).should == "`xyz`.`abc` AS `x`"
 
     @ds.literal(:xyz___x).should == "`xyz` AS `x`"
-    @ds.literal(:xyz__abc___x).should == "xyz.`abc` AS `x`"
+    @ds.literal(:xyz__abc___x).should == "`xyz`.`abc` AS `x`"
   end
   
   specify "should be quoted properly in SQL functions" do
@@ -167,7 +168,7 @@ context "Column references" do
   
   specify "should be quoted properly in a cast function" do
     @ds.literal(:x.cast_as(:integer)).should == "cast(`x` AS integer)"
-    @ds.literal(:x__y.cast_as(:varchar[20])).should == "cast(x.`y` AS varchar(20))"
+    @ds.literal(:x__y.cast_as(:varchar[20])).should == "cast(`x`.`y` AS varchar(20))"
   end
 end
 
@@ -207,6 +208,14 @@ context "Symbol#to_column_ref" do
   specify "should support upper case and lower case" do
     :ABC.to_column_ref(@ds).should == 'ABC'
     :Zvashtoy__aBcD.to_column_ref(@ds).should == 'Zvashtoy.aBcD'
+  end
+
+  specify "should support spaces inside column names" do
+    @ds.quote_identifiers = true
+    :"AB C".to_column_ref(@ds).should == '"AB C"'
+    :"Zvas htoy__aB cD".to_column_ref(@ds).should == '"Zvas htoy"."aB cD"'
+    :"aB cD___XX XX".to_column_ref(@ds).should == '"aB cD" AS "XX XX"'
+    :"Zva shtoy__aB cD___XX XX".to_column_ref(@ds).should == '"Zva shtoy"."aB cD" AS "XX XX"'
   end
 end
 

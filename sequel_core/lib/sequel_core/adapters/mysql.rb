@@ -248,7 +248,9 @@ module Sequel
     end
 
     class Dataset < Sequel::Dataset
-      def quote_column_ref(c); "`#{c}`"; end
+      def quoted_identifier(c)
+        "`#{c}`"
+      end
 
       TRUE = '1'
       FALSE = '0'
@@ -305,21 +307,21 @@ module Sequel
       #
       # === Example
       #   @ds = MYSQL_DB[:nodes]
-      #   @ds.join_expr(:natural_left_outer, :nodes)
-      #   # 'NATURAL LEFT OUTER JOIN nodes'
-      #
-      def join_expr(type, table, expr = nil, options = {})
-        raise Error::InvalidJoinType, "Invalid join type: #{type}" unless join_type = JOIN_TYPES[type || :inner]
-        
-        server_version = @opts[:server_version] ||= @db.server_version
-        type = :inner if type == :cross && !expr.nil?
+      #   @ds.join_table(:natural_left_outer, :nodes)
+      #   # join SQL is 'NATURAL LEFT OUTER JOIN nodes'
+      def join_table(type, table, expr=nil, table_alias=nil)
+        raise(Error::InvalidJoinType, "Invalid join type: #{type}") unless join_type = JOIN_TYPES[type || :inner]
 
-        if (server_version >= 50014) && /\Anatural|cross|straight\z/.match(type.to_s)
-          table = "( #{literal(table)} )" if table.is_a?(Array)
-          "#{join_type} #{table}"
+        server_version = (@opts[:server_version] ||= @db.server_version)
+        type = :inner if (type == :cross) && !expr.nil?
+        return super(type, table, expr, table_alias) unless (server_version >= 50014) && /natural|cross|straight/.match(type.to_s)
+  
+        table = if Array === table
+          "( #{table.collect{|t| quote_identifier(t)}.join(', ')} )"
         else
-          super
+          quote_identifier(table)
         end
+        clone(:join => "#{@opts[:join]} #{join_type} #{table}")
       end
 
       def insert_default_values_sql

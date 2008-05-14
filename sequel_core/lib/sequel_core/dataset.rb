@@ -84,6 +84,7 @@ module Sequel
     @@dataset_classes = []
 
     attr_accessor :db, :opts, :row_proc
+    attr_writer :quote_identifiers
     
     # Constructs a new instance of a dataset with a database instance, initial
     # options and an optional record class. Datasets are usually constructed by
@@ -96,6 +97,7 @@ module Sequel
     # database adaptor should provide a descendant class of Sequel::Dataset.
     def initialize(db, opts = nil)
       @db = db
+      @quote_identifiers = db.quote_identifiers? if db.respond_to?(:quote_identifiers?)
       @opts = opts || {}
       @row_proc = nil
       @transform = nil
@@ -218,6 +220,11 @@ module Sequel
       @opts[:polymorphic_key]
     end
     
+    # Whether to quote identifiers for this dataset
+    def quote_identifiers?
+      @quote_identifiers
+    end
+
     # Updates the dataset with the given values.
     def set(*args, &block)
       update(*args, &block)

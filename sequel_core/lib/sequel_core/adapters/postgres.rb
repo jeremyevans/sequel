@@ -366,8 +366,6 @@ module Sequel
       
       PG_TIMESTAMP_FORMAT = "TIMESTAMP '%Y-%m-%d %H:%M:%S".freeze
 
-      def quote_column_ref(c); "\"#{c}\""; end
-      
       def literal(v)
         case v
         when LiteralString

@@ -97,62 +97,64 @@ context "A PostgreSQL dataset" do
     proc {@d.literal(false)}.should_not raise_error
   end
   
-  specify "should quote columns using double quotes" do
+  specify "should quote columns and tables using double quotes if quoting identifiers" do
+    @d.quote_identifiers = true
     @d.select(:name).sql.should == \
-      'SELECT "name" FROM test'
+      'SELECT "name" FROM "test"'
       
     @d.select('COUNT(*)'.lit).sql.should == \
-      'SELECT COUNT(*) FROM test'
+      'SELECT COUNT(*) FROM "test"'
 
     @d.select(:max[:value]).sql.should == \
-      'SELECT max("value") FROM test'
+      'SELECT max("value") FROM "test"'
       
     @d.select(:NOW[]).sql.should == \
-    'SELECT NOW() FROM test'
+    'SELECT NOW() FROM "test"'
 
     @d.select(:max[:items__value]).sql.should == \
-      'SELECT max(items."value") FROM test'
+      'SELECT max("items"."value") FROM "test"'
 
     @d.order(:name.desc).sql.should == \
-      'SELECT * FROM test ORDER BY "name" DESC'
+      'SELECT * FROM "test" ORDER BY "name" DESC'
 
     @d.select('test.name AS item_name'.lit).sql.should == \
-      'SELECT test.name AS item_name FROM test'
+      'SELECT test.name AS item_name FROM "test"'
       
     @d.select('"name"'.lit).sql.should == \
-      'SELECT "name" FROM test'
+      'SELECT "name" FROM "test"'
 
     @d.select('max(test."name") AS "max_name"'.lit).sql.should == \
-      'SELECT max(test."name") AS "max_name" FROM test'
+      'SELECT max(test."name") AS "max_name" FROM "test"'
       
     @d.select(:test[:abc, 'hello']).sql.should == \
-      "SELECT test(\"abc\", 'hello') FROM test"
+      "SELECT test(\"abc\", 'hello') FROM \"test\""
 
     @d.select(:test[:abc__def, 'hello']).sql.should == \
-      "SELECT test(abc.\"def\", 'hello') FROM test"
+      "SELECT test(\"abc\".\"def\", 'hello') FROM \"test\""
 
     @d.select(:test[:abc__def, 'hello'].as(:x2)).sql.should == \
-      "SELECT test(abc.\"def\", 'hello') AS \"x2\" FROM test"
+      "SELECT test(\"abc\".\"def\", 'hello') AS \"x2\" FROM \"test\""
 
     @d.insert_sql(:value => 333).should == \
-      'INSERT INTO test ("value") VALUES (333)'
+      'INSERT INTO "test" ("value") VALUES (333)'
 
     @d.insert_sql(:x => :y).should == \
-      'INSERT INTO test ("x") VALUES ("y")'
+      'INSERT INTO "test" ("x") VALUES ("y")'
   end
   
-  specify "should quote fields correctly when reversing the order" do
+  specify "should quote fields correctly when reversing the order if quoting identifiers" do
+    @d.quote_identifiers = true
     @d.reverse_order(:name).sql.should == \
-      'SELECT * FROM test ORDER BY "name" DESC'
+      'SELECT * FROM "test" ORDER BY "name" DESC'
 
     @d.reverse_order(:name.desc).sql.should == \
-      'SELECT * FROM test ORDER BY "name"'
+      'SELECT * FROM "test" ORDER BY "name"'
 
     @d.reverse_order(:name, :test.desc).sql.should == \
-      'SELECT * FROM test ORDER BY "name" DESC, "test"'
+      'SELECT * FROM "test" ORDER BY "name" DESC, "test"'
 
     @d.reverse_order(:name.desc, :test).sql.should == \
-      'SELECT * FROM test ORDER BY "name", "test" DESC'
+      'SELECT * FROM "test" ORDER BY "name", "test" DESC'
   end
   
   specify "should support transactions" do
@@ -253,8 +255,8 @@ context "A PostgreSQL database" do
       full_text_index [:title, :body]
     end
     POSTGRES_DB.create_table_sql_list(:posts, *g.create_info).should == [
-      "CREATE TABLE posts (\"title\" text, \"body\" text)",
-      "CREATE INDEX posts_title_body_index ON posts USING gin (to_tsvector(\"title\" || \"body\"))"
+      "CREATE TABLE posts (title text, body text)",
+      "CREATE INDEX posts_title_body_index ON posts USING gin (to_tsvector(title || body))"
     ]
   end
   
@@ -265,20 +267,20 @@ context "A PostgreSQL database" do
       full_text_index [:title, :body], :language => 'french'
     end
     POSTGRES_DB.create_table_sql_list(:posts, *g.create_info).should == [
-      "CREATE TABLE posts (\"title\" text, \"body\" text)",
-      "CREATE INDEX posts_title_body_index ON posts USING gin (to_tsvector('french', \"title\" || \"body\"))"
+      "CREATE TABLE posts (title text, body text)",
+      "CREATE INDEX posts_title_body_index ON posts USING gin (to_tsvector('french', title || body))"
     ]
   end
   
   specify "should support full_text_search" do
     POSTGRES_DB[:posts].full_text_search(:title, 'ruby').sql.should ==
-      "SELECT * FROM posts WHERE (to_tsvector(\"title\") @@ to_tsquery('ruby'))"
+      "SELECT * FROM posts WHERE (to_tsvector(title) @@ to_tsquery('ruby'))"
     
     POSTGRES_DB[:posts].full_text_search([:title, :body], ['ruby', 'sequel']).sql.should ==
-      "SELECT * FROM posts WHERE (to_tsvector(\"title\" || \"body\") @@ to_tsquery('ruby | sequel'))"
+      "SELECT * FROM posts WHERE (to_tsvector(title || body) @@ to_tsquery('ruby | sequel'))"
       
     POSTGRES_DB[:posts].full_text_search(:title, 'ruby', :language => 'french').sql.should ==
-      "SELECT * FROM posts WHERE (to_tsvector('french', \"title\") @@ to_tsquery('french', 'ruby'))"
+      "SELECT * FROM posts WHERE (to_tsvector('french', title) @@ to_tsquery('french', 'ruby'))"
   end
 
   specify "should support spatial indexes" do
@@ -287,8 +289,8 @@ context "A PostgreSQL database" do
       spatial_index [:geom]
     end
     POSTGRES_DB.create_table_sql_list(:posts, *g.create_info).should == [
-      "CREATE TABLE posts (\"geom\" geometry)",
-      "CREATE INDEX posts_geom_index ON posts USING gist (\"geom\")"
+      "CREATE TABLE posts (geom geometry)",
+      "CREATE INDEX posts_geom_index ON posts USING gist (geom)"
     ]
   end
   
@@ -298,8 +300,8 @@ context "A PostgreSQL database" do
       index :title, :type => 'hash'
     end
     POSTGRES_DB.create_table_sql_list(:posts, *g.create_info).should == [
-      "CREATE TABLE posts (\"title\" varchar(5))",
-      "CREATE INDEX posts_title_index ON posts USING hash (\"title\")"
+      "CREATE TABLE posts (title varchar(5))",
+      "CREATE INDEX posts_title_index ON posts USING hash (title)"
     ]
   end
   
@@ -309,8 +311,8 @@ context "A PostgreSQL database" do
       index :title, :type => 'hash', :unique => true
     end
     POSTGRES_DB.create_table_sql_list(:posts, *g.create_info).should == [
-      "CREATE TABLE posts (\"title\" varchar(5))",
-      "CREATE UNIQUE INDEX posts_title_index ON posts USING hash (\"title\")"
+      "CREATE TABLE posts (title varchar(5))",
+      "CREATE UNIQUE INDEX posts_title_index ON posts USING hash (title)"
     ]
   end
   
@@ -320,8 +322,8 @@ context "A PostgreSQL database" do
       index :title, :where => {:something => 5}
     end
     POSTGRES_DB.create_table_sql_list(:posts, *g.create_info).should == [
-      "CREATE TABLE posts (\"title\" varchar(5))",
-      "CREATE INDEX posts_title_index ON posts (\"title\") WHERE (\"something\" = 5)"
+      "CREATE TABLE posts (title varchar(5))",
+      "CREATE INDEX posts_title_index ON posts (title) WHERE (something = 5)"
     ]
   end
 end
@@ -335,8 +337,8 @@ context "Postgres::Dataset#multi_insert_sql / #import" do
     @ds.db.meta_def(:server_version) {80199}
     
     @ds.multi_insert_sql([:x, :y], [[1, 2], [3, 4]]).should == [
-      'INSERT INTO test ("x", "y") VALUES (1, 2)',
-      'INSERT INTO test ("x", "y") VALUES (3, 4)'
+      'INSERT INTO test (x, y) VALUES (1, 2)',
+      'INSERT INTO test (x, y) VALUES (3, 4)'
     ]
   end
   
@@ -344,13 +346,13 @@ context "Postgres::Dataset#multi_insert_sql / #import" do
     @ds.db.meta_def(:server_version) {80200}
     
     @ds.multi_insert_sql([:x, :y], [[1, 2], [3, 4]]).should == [
-      'INSERT INTO test ("x", "y") VALUES (1, 2), (3, 4)'
+      'INSERT INTO test (x, y) VALUES (1, 2), (3, 4)'
     ]
 
     @ds.db.meta_def(:server_version) {80201}
     
     @ds.multi_insert_sql([:x, :y], [[1, 2], [3, 4]]).should == [
-      'INSERT INTO test ("x", "y") VALUES (1, 2), (3, 4)'
+      'INSERT INTO test (x, y) VALUES (1, 2), (3, 4)'
     ]
   end
 end

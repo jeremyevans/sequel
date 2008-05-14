@@ -23,6 +23,10 @@ module Sequel #:nodoc:
   end
   metaalias :open, :connect
   
+  def self.quote_identifiers=(value)
+    Database.quote_identifiers = value
+  end
+  
   def self.single_threaded=(value)
     Database.single_threaded = value
   end

@@ -147,7 +147,9 @@ module Sequel
     end
     
     class Dataset < Sequel::Dataset
-      def quote_column_ref(c); "`#{c}`"; end
+      def quoted_identifier(c)
+        "`#{c}`"
+      end
 
       def literal(v)
         case v

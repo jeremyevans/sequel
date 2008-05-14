@@ -1,5 +1,17 @@
 === HEAD
 
+* Dataset#to_table_reference is now protected, and it has a different API (jeremyevans)
+
+* Dataset#join_table and related functions now take an explicit optional table_alias argument, you can no longer include the table alias in the table argument (jeremyevans)
+
+* Aliased and/or qualified columns with embedded spaces can now be specified as symbols (jeremyevans)
+
+* When identifier quoting is enabled, the SQL standard double quote is used by default (jeremyevans)
+
+* When identifier quoting is enabled, quote tables as well as columns (jeremyevans)
+
+* Make identifier quoting optional, disabled by default (jeremyevans)
+
 * Allow Sequel::Database.connect and related methods to take a block that disconnects the database when the block finishes (jeremyevans)
 
 * Add Dataset#unfiltered, for removing filters from dataset (jeremyevans)
