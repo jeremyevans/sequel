@@ -1,5 +1,7 @@
 === HEAD
 
+* Major update of the postgresql adapter (jdavis, jeremyevans) (#225)
+
 * Make returning inside of a database transaction commit the transaction (ahoward, jeremyevans)
 
 * Dataset#to_table_reference is now protected, and it has a different API (jeremyevans)
