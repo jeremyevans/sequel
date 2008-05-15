@@ -19,9 +19,7 @@ module Sequel
     def compare_expr(l, r)
       case r
       when Range
-        r.exclude_end? ? \
-          "(#{literal(l)} >= #{literal(r.begin)} AND #{literal(l)} < #{literal(r.end)})" : \
-          "(#{literal(l)} >= #{literal(r.begin)} AND #{literal(l)} <= #{literal(r.end)})"
+        "(#{literal(l)} >= #{literal(r.begin)} AND #{literal(l)} <#{'=' unless r.exclude_end?} #{literal(r.end)})"
       when Array
         "(#{literal(l)} IN (#{literal(r)}))"
       when Sequel::Dataset
