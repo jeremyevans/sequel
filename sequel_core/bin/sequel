@@ -8,16 +8,18 @@ require 'sequel_model' rescue nil
 require 'logger'
 
 $uri = nil
+$env = nil
 $logfile = nil
 $echo = nil
 
 opts = OptionParser.new do |opts|
   opts.banner = "Sequel: The Database Toolkit for Ruby"
-  opts.define_head "Usage: sequel <uri> [options]"
+  opts.define_head "Usage: sequel <uri|path> [options]"
   opts.separator ""
   opts.separator "Examples:"
   opts.separator "  sequel sqlite:///blog.db"
   opts.separator "  sequel postgres://localhost/my_blog"
+  opts.separator "  sequel config/database.yml"
   
   opts.separator ""
   opts.separator "For more information see http://code.google.com/p/ruby-sequel"
@@ -31,6 +33,10 @@ opts = OptionParser.new do |opts|
   # opts.on("-e", "--echo", "echo SQL statements") do |v|
   #   $echo = v
   # end
+  
+  opts.on("-e", "--env ENV", "use environment config for database") do |env|
+    $env = env
+  end
   
   opts.on_tail("-?", "--help", "Show this message") do
     puts opts
@@ -68,9 +74,21 @@ if $echo
   db_opts[:echo] = true
 end
 
+if File.exist?(db)
+  require 'yaml'
+  db_config = YAML.load_file(db)[$env || "development"]
+  db_config.each {|(k,v)| db_config[k.to_sym] = db_config.delete(k)}
+  db_config.merge!(db_opts)
+end
+
 begin
   puts "db_opts = #{db_opts.inspect}"
-  DB = Sequel.connect db, db_opts
+  if db_config
+    opts = [db_config]
+  else
+    opts = [db, db_opts]
+  end
+  DB = Sequel.connect *opts
 rescue => e
   puts e.message
   exit
