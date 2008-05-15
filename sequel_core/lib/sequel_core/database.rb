@@ -96,7 +96,7 @@ module Sequel
       end
       # process opts a bit
       opts = opts.inject({}) do |m, kv| k, v = *kv
-        k = :user if k == 'username'
+        k = :user if k.to_s == 'username'
         m[k.to_sym] = v
         m
       end
