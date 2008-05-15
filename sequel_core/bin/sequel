@@ -2,15 +2,18 @@
 
 require 'rubygems'
 require 'optparse'
-require 'sequel' rescue nil
 require 'sequel_core'
-require 'sequel_model' rescue nil
-require 'logger'
 
-$uri = nil
-$env = nil
-$logfile = nil
-$echo = nil
+begin
+  require 'sequel'
+  sequel_loaded = true
+rescue LoadError
+end
+
+db_opts = {}
+echo = nil
+env = nil
+logfile = nil
 
 opts = OptionParser.new do |opts|
   opts.banner = "Sequel: The Database Toolkit for Ruby"
@@ -20,22 +23,21 @@ opts = OptionParser.new do |opts|
   opts.separator "  sequel sqlite:///blog.db"
   opts.separator "  sequel postgres://localhost/my_blog"
   opts.separator "  sequel config/database.yml"
-  
   opts.separator ""
-  opts.separator "For more information see http://code.google.com/p/ruby-sequel"
+  opts.separator "For more information see http://sequel.rubyforge.org"
   opts.separator ""
   opts.separator "Options:"
 
   opts.on("-l", "--log logfile", "log SQL statements to log file") do |v|
-    $logfile = v
+    logfile = v
   end
   
-  # opts.on("-e", "--echo", "echo SQL statements") do |v|
-  #   $echo = v
-  # end
+  opts.on("-E", "--echo", "echo SQL statements") do |v|
+    echo = v
+  end
   
   opts.on("-e", "--env ENV", "use environment config for database") do |env|
-    $env = env
+    env = env
   end
   
   opts.on_tail("-?", "--help", "Show this message") do
@@ -45,14 +47,15 @@ opts = OptionParser.new do |opts|
 
   opts.on_tail("-v", "--version", "Show version") do
     class << Gem; attr_accessor :loaded_specs; end
-    specs = Gem.loaded_specs['sequel']
-    puts "sequel #{specs.version} (#{specs.date.strftime '%Y-%m-%d'})"
+    begin
     specs = Gem.loaded_specs['sequel_core']
     puts "sequel_core #{specs.version} (#{specs.date.strftime '%Y-%m-%d'})"
-    begin
-      specs = Gem.loaded_specs['sequel_model']
-      puts "sequel_model #{specs.version} (#{specs.date.strftime '%Y-%m-%d'})"
+    if sequel_loaded
+      specs = Gem.loaded_specs['sequel']
+      puts "sequel #{specs.version} (#{specs.date.strftime '%Y-%m-%d'})"
+    end
     rescue
+      puts "No gem version found"
     end
     exit
   end
@@ -66,35 +69,27 @@ if db.blank?
   exit
 end
 
-db_opts = {}
-if $logfile
-  db_opts[:logger] = Logger.new($logfile)
-end
-if $echo
-  db_opts[:echo] = true
+if logfile || echo
+  require 'logger'
+  db_opts[:loggers] = []
+  db_opts[:loggers] << Logger.new(logfile) if logfile
+  db_opts[:loggers] << Logger.new($stdout) if echo
 end
 
 if File.exist?(db)
   require 'yaml'
-  db_config = YAML.load_file(db)[$env || "development"]
+  db_config = YAML.load_file(db)[env || "development"]
   db_config.each {|(k,v)| db_config[k.to_sym] = db_config.delete(k)}
   db_config.merge!(db_opts)
 end
 
 begin
-  puts "db_opts = #{db_opts.inspect}"
   if db_config
     opts = [db_config]
   else
     opts = [db, db_opts]
   end
-  DB = Sequel.connect *opts
-rescue => e
-  puts e.message
-  exit
-end
-
-begin
+  DB = Sequel.connect(*opts)
   DB.test_connection
 rescue => e
   puts e.message
