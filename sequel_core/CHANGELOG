@@ -20,7 +20,7 @@
 
 * When identifier quoting is enabled, quote tables as well as columns (jeremyevans)
 
-* Make identifier quoting optional, disabled by default (jeremyevans)
+* Make identifier quoting optional, enabled by default (jeremyevans)
 
 * Allow Sequel::Database.connect and related methods to take a block that disconnects the database when the block finishes (jeremyevans)
 

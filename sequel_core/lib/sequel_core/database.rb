@@ -16,7 +16,7 @@ module Sequel
 
     @@adapters = Hash.new
     @@single_threaded = false
-    @@quote_identifiers = false
+    @@quote_identifiers = true
 
     attr_accessor :loggers
     attr_reader :opts, :pool

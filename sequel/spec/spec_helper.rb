@@ -28,6 +28,7 @@ class MockDataset < Sequel::Dataset
 end
 
 class MockDatabase < Sequel::Database
+  @@quote_identifiers = false
   attr_reader :sqls
   
   def execute(sql)
