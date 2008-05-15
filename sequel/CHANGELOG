@@ -1,5 +1,7 @@
 === HEAD
 
+* Add Model.lazy_load_schema=, when set to true, it loads the schema (columns) on first instantiation (jeremyevans)
+
 * Add before_validation and after_validation hooks, called whenever the model is validated (jeremyevans)
 
 * Add Model.default_foreign_key, a private class method that allows changing the default foreign key that Sequel will use in associations (jeremyevans)

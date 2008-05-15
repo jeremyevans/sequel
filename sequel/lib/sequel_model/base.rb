@@ -1,5 +1,7 @@
 module Sequel
   class Model
+    @@lazy_load_schema = false
+
     @primary_key = :id
 
     # Returns key for primary key.
@@ -133,6 +135,11 @@ module Sequel
     def self.implicit_table_name
       name.demodulize.underscore.pluralize.to_sym
     end
+
+    # Set whether to lazily load the schema
+    def self.lazy_load_schema=(value)
+      @@lazy_load_schema = value
+    end
   
     # Initializes a model instance as an existing record. This constructor is
     # used by Sequel to initialize model instances when fetching records.
@@ -190,11 +197,12 @@ module Sequel
       end
       @dataset.extend(Associations::EagerLoading)
       @dataset.transform(@transform) if @transform
+      @columns = nil
       begin
-        @columns = nil
-        columns
+        columns unless @@lazy_load_schema
       rescue StandardError
       end
+      self
     end
     metaalias :dataset=, :set_dataset
   

@@ -437,8 +437,11 @@ describe Sequel::Model, "A model class without a primary key" do
 end
 
 describe Sequel::Model, "attribute accessors" do
+  after do
+    Sequel::Model.lazy_load_schema = false
+  end
 
-  before(:each) do
+  before do
     MODEL_DB.reset
 
     @c = Class.new(Sequel::Model) do
@@ -452,7 +455,7 @@ describe Sequel::Model, "attribute accessors" do
     def @dataset.def_mutation_method(*names);  end
   end
 
-  it "should be created on set_dataset" do
+  it "should be created on set_dataset unless lazy loading schema" do
     %w'x y x= y='.each do |x|
       @c.instance_methods.include?(x).should == false
     end
@@ -461,6 +464,28 @@ describe Sequel::Model, "attribute accessors" do
       @c.instance_methods.include?(x).should == true
     end
     o = @c.new
+    %w'x y x= y='.each do |x|
+      o.methods.include?(x).should == true
+    end
+
+    o.x.should be_nil
+    o.x = 34
+    o.x.should == 34
+  end
+
+  it "should be created on first initialization if lazy loading schema" do
+    Sequel::Model.lazy_load_schema = true
+    %w'x y x= y='.each do |x|
+      @c.instance_methods.include?(x).should == false
+    end
+    @c.set_dataset(@dataset)
+    %w'x y x= y='.each do |x|
+      @c.instance_methods.include?(x).should == false 
+    end
+    o = @c.new
+    %w'x y x= y='.each do |x|
+      @c.instance_methods.include?(x).should == true
+    end
     %w'x y x= y='.each do |x|
       o.methods.include?(x).should == true
     end
