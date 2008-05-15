@@ -9,7 +9,7 @@ unless defined?(MYSQL_SOCKET_FILE)
 end
 
 MYSQL_URI = URI.parse(MYSQL_DB.uri)
-MYSQL_DB_NAME = MYSQL_URI.path =~ /\/(.*)/ && $1
+MYSQL_DB_NAME = (m = /\/(.*)/.match(MYSQL_URI.path)) && m[1]
 
 MYSQL_DB.drop_table(:items) if MYSQL_DB.table_exists?(:items)
 MYSQL_DB.drop_table(:test2) if MYSQL_DB.table_exists?(:test2)

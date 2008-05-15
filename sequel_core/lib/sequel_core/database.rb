@@ -141,7 +141,7 @@ module Sequel
           :password => uri.password,
           :host => uri.host,
           :port => uri.port,
-          :database => (uri.path =~ /\/(.*)/) && ($1)
+          :database => (m = /\/(.*)/.match(uri.path)) && (m[1])
         }
       end
     end

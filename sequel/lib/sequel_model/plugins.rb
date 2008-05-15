@@ -37,7 +37,7 @@ module Sequel
     # Returns the module for the specified plugin. If the module is not 
     # defined, the corresponding plugin gem is automatically loaded.
     def self.plugin_module(plugin)
-      module_name = plugin.to_s.gsub(/(^|_)(.)/) {$2.upcase}
+      module_name = plugin.to_s.gsub(/(^|_)(.)/){|x| x[-1..-1].upcase}
       if not Sequel::Plugins.const_defined?(module_name)
         require plugin_gem(plugin)
       end

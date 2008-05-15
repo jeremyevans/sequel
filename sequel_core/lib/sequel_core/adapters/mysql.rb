@@ -80,8 +80,8 @@ module Sequel
           if conn.respond_to?(:server_version)
             pool.hold {|c| c.server_version}
           else
-            get(:version[]) =~ /(\d+)\.(\d+)\.(\d+)/
-            ($1.to_i * 10000) + ($2.to_i * 100) + $3.to_i
+            m = /(\d+)\.(\d+)\.(\d+)/.match(get(:version[]))
+            (m[1].to_i * 10000) + (m[2].to_i * 100) + m[3].to_i
           end
         end
       end
