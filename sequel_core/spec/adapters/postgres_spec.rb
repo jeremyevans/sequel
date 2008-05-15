@@ -206,8 +206,8 @@ context "A PostgreSQL dataset" do
   end
 
   specify "should consider strings containing backslashes to be escaped string literals" do
-    PGconn.quote("\\dingo").should == "E'\\\\dingo'"   # literally, E'\\dingo'
-    PGconn.quote("dingo").should == "'dingo'"
+    @d.literal("\\dingo").should == "'\\\\dingo'"   # literally, E'\\dingo'
+    @d.literal("dingo").should == "'dingo'"
   end
 end
 
@@ -230,22 +230,21 @@ context "A PostgreSQL database" do
     @db = POSTGRES_DB
   end
 
-  specify "should support add_column operations" do
+  specify "should support column operations" do
+    @db.create_table!(:test2){text :name; integer :value}
+    @db[:test2] << {}
+    @db[:test2].columns.should == [:name, :value]
+
     @db.add_column :test2, :xyz, :text, :default => '000'
-    
     @db[:test2].columns.should == [:name, :value, :xyz]
     @db[:test2] << {:name => 'mmm', :value => 111}
     @db[:test2].first[:xyz].should == '000'
-  end
   
-  specify "should support drop_column operations" do
     @db[:test2].columns.should == [:name, :value, :xyz]
     @db.drop_column :test2, :xyz
     
     @db[:test2].columns.should == [:name, :value]
-  end
   
-  specify "should support rename_column operations" do
     @db[:test2].delete
     @db.add_column :test2, :xyz, :text, :default => '000'
     @db[:test2] << {:name => 'mmm', :value => 111, :xyz => 'qqqq'}
@@ -254,9 +253,7 @@ context "A PostgreSQL database" do
     @db.rename_column :test2, :xyz, :zyx
     @db[:test2].columns.should == [:name, :value, :zyx]
     @db[:test2].first[:zyx].should == 'qqqq'
-  end
   
-  specify "should support set_column_type operations" do
     @db.add_column :test2, :xyz, :float
     @db[:test2].delete
     @db[:test2] << {:name => 'mmm', :value => 111, :xyz => 56.78}

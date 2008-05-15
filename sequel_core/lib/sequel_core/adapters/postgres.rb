@@ -1,198 +1,190 @@
-require 'postgres'
-
-class PGconn
-  # the pure-ruby postgres adapter does not have a quote method.
-  TRUE = 'true'.freeze
-  FALSE = 'false'.freeze
-  NULL = 'NULL'.freeze
-  
-  unless methods.include?('quote')
-    def self.quote(obj)
-      case obj
-      when true
-        TRUE
-      when false
-        FALSE
-      when nil
-        NULL
-      when String
-        "'#{obj}'"
-      else
-        obj.to_s
-      end
+begin 
+  require 'pg' 
+rescue LoadError => e 
+  begin 
+    require 'postgres' 
+    class PGconn
+      metaalias :escape_string, :escape unless self.respond_to?(:escape_string)
+      alias_method :finish, :close unless method_defined?(:finish) 
     end
-  end
-  
-  class << self
-    # The postgres gem's string quoting doesn't render string literals properly, which this fixes.
-    # 
-    #   "a basic string" #=> 'a basic string'
-    #   "this\or that"   #=> E'this\\or that'
-    # 
-    # See <http://www.postgresql.org/docs/8.2/static/sql-syntax-lexical.html> for details.
-    def quote_with_proper_escaping(s)
-      value = quote_without_proper_escaping(s)
-      value = "E#{value}" if value =~ /\\/
-      return value
-    end
-    alias_method :quote_without_proper_escaping, :quote
-    alias_method :quote, :quote_with_proper_escaping
-  end
-
-  def connected?
-    status == PGconn::CONNECTION_OK
-  end
-  
-  unless instance_methods.include?('async_exec')
-    alias_method :async_exec, :exec
-  end
-  
-  unless instance_methods.include?('async_query')
-    alias_method :async_query, :query
-  end
-  
-  def execute(sql, &block)
-    q = nil
-    begin
-      q = async_exec(sql)
-    rescue PGError => e
-      unless connected?
-        reset
-        q = async_exec(sql)
-      else
-        raise e
-      end
-    end
-    begin
-      block ? block[q] : q.cmdtuples
-    ensure
-      q.clear
-    end
-  end
-  
-  attr_accessor :transaction_in_progress
-  
-  SELECT_CURRVAL = "SELECT currval('%s')".freeze
-      
-  def last_insert_id(table)
-    @table_sequences ||= {}
-    if !@table_sequences.include?(table)
-      pkey_and_seq = pkey_and_sequence(table)
-      if pkey_and_seq
-        @table_sequences[table] = pkey_and_seq[1]
-      end
-    end
-    if seq = @table_sequences[table]
-      r = async_query(SELECT_CURRVAL % seq)
-      return r[0][0].to_i unless r.nil? || (r.respond_to?(:empty?) && r.empty?)
-    end
-    nil # primary key sequence not found
-  end
-      
-  # Shamelessly appropriated from ActiveRecord's Postgresql adapter.
-  
-  SELECT_PK_AND_SERIAL_SEQUENCE = <<-end_sql
-    SELECT attr.attname, name.nspname, seq.relname
-    FROM pg_class seq, pg_attribute attr, pg_depend dep,
-      pg_namespace name, pg_constraint cons
-    WHERE seq.oid = dep.objid
-      AND seq.relnamespace  = name.oid
-      AND seq.relkind = 'S'
-      AND attr.attrelid = dep.refobjid
-      AND attr.attnum = dep.refobjsubid
-      AND attr.attrelid = cons.conrelid
-      AND attr.attnum = cons.conkey[1]
-      AND cons.contype = 'p'
-      AND dep.refobjid = '%s'::regclass
-  end_sql
-  
-  SELECT_PK_AND_CUSTOM_SEQUENCE = <<-end_sql
-    SELECT attr.attname, name.nspname, split_part(def.adsrc, '''', 2)
-    FROM pg_class t
-    JOIN pg_namespace  name ON (t.relnamespace = name.oid)
-    JOIN pg_attribute  attr ON (t.oid = attrelid)
-    JOIN pg_attrdef    def  ON (adrelid = attrelid AND adnum = attnum)
-    JOIN pg_constraint cons ON (conrelid = adrelid AND adnum = conkey[1])
-    WHERE t.oid = '%s'::regclass
-      AND cons.contype = 'p'
-      AND def.adsrc ~* 'nextval'
-  end_sql
-
-  SELECT_PK = <<-end_sql
-    SELECT pg_attribute.attname
-    FROM pg_class, pg_attribute, pg_index
-    WHERE pg_class.oid = pg_attribute.attrelid AND
-      pg_class.oid = pg_index.indrelid AND
-      pg_index.indkey[0] = pg_attribute.attnum AND
-      pg_index.indisprimary = 't' AND
-      pg_class.relname = '%s'
-  end_sql
-  
-  def pkey_and_sequence(table)
-    r = async_query(SELECT_PK_AND_SERIAL_SEQUENCE % table)
-    return [r[0].first, r[0].last] unless r.nil? || (r.respond_to?(:empty?) && r.empty?)
-
-    r = async_query(SELECT_PK_AND_CUSTOM_SEQUENCE % table)
-    return [r[0].first, r[0].last] unless r.nil? || (r.respond_to?(:empty?) && r.empty?)
-  rescue
-    nil
-  end
-  
-  def primary_key(table)
-    r = async_query(SELECT_PK % table)
-    pkey = r[0].first unless r.nil? || (r.respond_to?(:empty?) && r.empty?)
-    return pkey.to_sym if pkey
-  rescue
-    nil
-  end
-end
-
-class String
-  POSTGRES_BOOL_TRUE = 't'.freeze
-  POSTGRES_BOOL_FALSE = 'f'.freeze
-  
-  def postgres_to_bool
-    if self == POSTGRES_BOOL_TRUE
-      true
-    elsif self == POSTGRES_BOOL_FALSE
-      false
-    else
-      nil
-    end
-  end
+    class PGresult 
+      alias_method :nfields, :num_fields unless method_defined?(:nfields) 
+      alias_method :ntuples, :num_tuples unless method_defined?(:ntuples) 
+      alias_method :ftype, :type unless method_defined?(:ftype) 
+      alias_method :fname, :fieldname unless method_defined?(:fname) 
+      alias_method :cmd_tuples, :cmdtuples unless method_defined?(:cmd_tuples) 
+    end 
+  rescue LoadError 
+    raise e 
+  end 
 end
 
 module Sequel
   module Postgres
+    class Adapter < ::PGconn
+      # the pure-ruby postgres adapter does not have a quote method.
+      TRUE = 'true'.freeze
+      FALSE = 'false'.freeze
+      NULL = 'NULL'.freeze
+      
+      def self.quote(obj)
+        case obj
+        when TrueClass
+          TRUE
+        when FalseClass
+          FALSE
+        when NilClass
+          NULL
+        else
+          "'#{escape_string(obj.to_s)}'"
+        end
+      end
+      
+      def connected?
+        status == Adapter::CONNECTION_OK
+      end
+      
+      def execute(sql, &block)
+        q = nil
+        begin
+          q = exec(sql)
+        rescue PGError => e
+          unless connected?
+            reset
+            q = exec(sql)
+          else
+            raise e
+          end
+        end
+        begin
+          block ? block[q] : q.cmd_tuples
+        ensure
+          q.clear
+        end
+      end
+    
+      attr_accessor :transaction_in_progress
+      
+      SELECT_CURRVAL = "SELECT currval('%s')".freeze
+          
+      def last_insert_id(table)
+        @table_sequences ||= {}
+        if !@table_sequences.include?(table)
+          pkey_and_seq = pkey_and_sequence(table)
+          if pkey_and_seq
+            @table_sequences[table] = pkey_and_seq[1]
+          end
+        end
+        if seq = @table_sequences[table]
+          execute(SELECT_CURRVAL % seq) do |r|
+            return r.getvalue(0,0).to_i unless r.nil? || (r.ntuples == 0)
+          end
+        end
+        nil # primary key sequence not found
+      end
+          
+      # Shamelessly appropriated from ActiveRecord's Postgresql adapter.
+      222
+      SELECT_PK_AND_SERIAL_SEQUENCE = <<-end_sql
+        SELECT attr.attname, name.nspname, seq.relname
+        FROM pg_class seq, pg_attribute attr, pg_depend dep,
+          pg_namespace name, pg_constraint cons
+        WHERE seq.oid = dep.objid
+          AND seq.relnamespace  = name.oid
+          AND seq.relkind = 'S'
+          AND attr.attrelid = dep.refobjid
+          AND attr.attnum = dep.refobjsubid
+          AND attr.attrelid = cons.conrelid
+          AND attr.attnum = cons.conkey[1]
+          AND cons.contype = 'p'
+          AND dep.refobjid = '%s'::regclass
+      end_sql
+      
+      SELECT_PK_AND_CUSTOM_SEQUENCE = <<-end_sql
+        SELECT attr.attname,  
+          CASE  
+            WHEN split_part(def.adsrc, '''', 2) ~ '.' THEN  
+              substr(split_part(def.adsrc, '''', 2),  
+                     strpos(split_part(def.adsrc, '''', 2), '.')+1) 
+            ELSE split_part(def.adsrc, '''', 2)  
+          END
+        FROM pg_class t
+        JOIN pg_namespace  name ON (t.relnamespace = name.oid)
+        JOIN pg_attribute  attr ON (t.oid = attrelid)
+        JOIN pg_attrdef    def  ON (adrelid = attrelid AND adnum = attnum)
+        JOIN pg_constraint cons ON (conrelid = adrelid AND adnum = conkey[1])
+        WHERE t.oid = '%s'::regclass
+          AND cons.contype = 'p'
+          AND def.adsrc ~* 'nextval'
+      end_sql
+    
+      SELECT_PK = <<-end_sql
+        SELECT pg_attribute.attname
+        FROM pg_class, pg_attribute, pg_index
+        WHERE pg_class.oid = pg_attribute.attrelid AND
+          pg_class.oid = pg_index.indrelid AND
+          pg_index.indkey[0] = pg_attribute.attnum AND
+          pg_index.indisprimary = 't' AND
+          pg_class.relname = '%s'
+      end_sql
+      
+      def pkey_and_sequence(table)
+        execute(SELECT_PK_AND_SERIAL_SEQUENCE % table) do |r|
+          return [r.getvalue(0,2), r.getvalue(0,2)] unless r.nil? || (r.ntuples == 0)
+        end
+    
+        execute(SELECT_PK_AND_CUSTOM_SEQUENCE % table) do |r|
+          return [r.getvalue(0,0), r.getvalue(0,1)] unless r.nil? || (r.ntuples == 0)
+        end
+      end
+      
+      def primary_key(table)
+        execute(SELECT_PK % table) do |r|
+          if (r.nil? || (r.ntuples == 0)) then
+            return nil
+          else
+            r.getvalue(0,0)
+          end
+        end
+      end
+    
+      def self.string_to_bool(s)
+        if(s.downcase == 't' || s.downcase == 'true')
+          true
+        else
+          false
+        end
+      end
+    end
+
     PG_TYPES = {
-      16 => :postgres_to_bool,
-      20 => :to_i,
-      21 => :to_i,
-      22 => :to_i,
-      23 => :to_i,
-      26 => :to_i,
-      700 => :to_f,
-      701 => :to_f,
-      790 => :to_f,
-      1082 => :to_date,
-      1083 => :to_time,
-      1114 => :to_time,
-      1184 => :to_time,
-      1186 => :to_i
+      16 => lambda{ |s| Adapter.string_to_bool(s) },
+      17 => lambda{ |s| Adapter.unescape_bytea(s) },
+      20 => lambda{ |s| s.to_i },
+      21 => lambda{ |s| s.to_i },
+      22 => lambda{ |s| s.to_i },
+      23 => lambda{ |s| s.to_i },
+      26 => lambda{ |s| s.to_i },
+      700 => lambda{ |s| s.to_f },
+      701 => lambda{ |s| s.to_f },
+      790 => lambda{ |s| s.to_f },
+      1082 => lambda{ |s| s.to_date },
+      1083 => lambda{ |s| s.to_time },
+      1114 => lambda{ |s| s.to_time },
+      1184 => lambda{ |s| s.to_time },
+      1186 => lambda{ |s| s.to_i }
     }
 
-    if PGconn.respond_to?(:translate_results=)
-      PGconn.translate_results = true
-      AUTO_TRANSLATE = true
-    else
-      AUTO_TRANSLATE = false
+    if Adapter.respond_to?(:translate_results=)
+      Adapter.translate_results = false
     end
+    AUTO_TRANSLATE = false
 
     class Database < Sequel::Database
       set_adapter_scheme :postgres
     
       def connect
-        conn = PGconn.connect(
+        conn = Adapter.connect(
           @opts[:host] || 'localhost',
           @opts[:port] || 5432,
           '', '',
@@ -207,7 +199,7 @@ module Sequel
       end
       
       def disconnect
-        @pool.disconnect {|c| c.close}
+        @pool.disconnect {|c| c.finish}
       end
     
       def dataset(opts = nil)
@@ -266,14 +258,21 @@ module Sequel
       end
       
       def server_version
-        @server_version ||= pool.hold do |conn|
+        return @server_version if @server_version
+        @server_version = pool.hold do |conn|
           if conn.respond_to?(:server_version)
-            pool.hold {|c| c.server_version}
-          else
-            get(:version[]) =~ /PostgreSQL (\d+)\.(\d+)\.(\d+)/
-            ($1.to_i * 10000) + ($2.to_i * 100) + $3.to_i
+            begin
+              conn.server_version
+            rescue StandardError
+              nil
+            end
           end
         end
+        unless @server_version
+          m = /PostgreSQL (\d+)\.(\d+)\.(\d+)/.match(get(:version[]))
+          @server_version = (m[1].to_i * 10000) + (m[2].to_i * 100) + m[3].to_i
+        end
+        @server_version
       end
       
       def execute_insert(sql, table, values)
@@ -299,19 +298,19 @@ module Sequel
             yield conn
           else
             @logger.info(SQL_BEGIN) if @logger
-            conn.async_exec(SQL_BEGIN)
+            conn.execute(SQL_BEGIN)
             begin
               conn.transaction_in_progress = true
               yield
             rescue ::Exception => e
               @logger.info(SQL_ROLLBACK) if @logger
-              conn.async_exec(SQL_ROLLBACK) rescue nil
+              conn.execute(SQL_ROLLBACK) rescue nil
               raise convert_pgerror(e) unless Error::Rollback === e
             ensure
               unless e
                 begin
                   @logger.info(SQL_COMMIT) if @logger
-                  conn.async_exec(SQL_COMMIT)
+                  conn.execute(SQL_COMMIT)
                 rescue => e
                   @logger.error(e.message) if @logger
                   raise convert_pgerror(e)
@@ -351,16 +350,16 @@ module Sequel
       end
 
       private
-        # If the given exception is a PGError, return a Sequel::Error with the same message, otherwise
-        # just return the given exception
-        def convert_pgerror(e)
-          PGError === e ? Error.new(e.message) : e
-        end
+      # If the given exception is a PGError, return a Sequel::Error with the same message, otherwise
+      # just return the given exception
+      def convert_pgerror(e)
+        PGError === e ? Error.new(e.message) : e
+      end
 
-        # PostgreSQL currently can always reuse connections.  It doesn't need the pool to convert exceptions, either.
-        def connection_pool_default_options
-          super.merge(:pool_reuse_connections=>:always, :pool_convert_exceptions=>false)
-        end
+      # PostgreSQL currently can always reuse connections.  It doesn't need the pool to convert exceptions, either.
+      def connection_pool_default_options
+        super.merge(:pool_reuse_connections=>:always, :pool_convert_exceptions=>false)
+      end
     end
   
     class Dataset < Sequel::Dataset
@@ -371,8 +370,8 @@ module Sequel
         case v
         when LiteralString
           v
-        when String, Fixnum, Float, TrueClass, FalseClass
-          PGconn.quote(v)
+        when String, TrueClass, FalseClass
+          Adapter.quote(v)
         when Time
           "#{v.strftime(PG_TIMESTAMP_FORMAT)}.#{sprintf("%06d",v.usec)}'"
         else
@@ -468,7 +467,7 @@ module Sequel
       def multi_insert_sql(columns, values)
         return super if @db.server_version < 80200
         
-        # postgresql 8.2 introduces support for insert
+        # postgresql 8.2 introduces support for multi-row insert
         columns = literal(columns)
         values = values.map {|r| "(#{literal(r)})"}.join(COMMA_SEPARATOR)
         ["INSERT INTO #{source_list(@opts[:from])} (#{columns}) VALUES #{values}"]
@@ -486,47 +485,23 @@ module Sequel
       def delete(opts = nil)
         @db.execute(delete_sql(opts))
       end
-      
-      def fetch_rows(sql, &block)
-        @db.execute(sql) do |q|
-          conv = row_converter(q)
-          q.each {|r| yield conv[r]}
-        end
-      end
-      
-      @@converters_mutex = Mutex.new
-      @@converters = {}
 
-      def row_converter(result)
-        @columns = []; translators = []
-        result.fields.each_with_index do |f, idx|
-          @columns << f.to_sym
-          translators << PG_TYPES[result.type(idx)]
-        end
-        
-        # create result signature and memoize the converter
-        sig = [@columns, translators].hash
-        @@converters_mutex.synchronize do
-          @@converters[sig] ||= compile_converter(@columns, translators)
-        end
-      end
-    
-      def compile_converter(columns, translators)
-        used_columns = []
-        kvs = []
-        columns.each_with_index do |column, idx|
-          next if used_columns.include?(column)
-          used_columns << column
-        
-          if !AUTO_TRANSLATE and translator = translators[idx]
-            kvs << ":\"#{column}\" => ((t = r[#{idx}]) ? t.#{translator} : nil)"
-          else
-            kvs << ":\"#{column}\" => r[#{idx}]"
+      def fetch_rows(sql, &block)
+        @columns = []
+        @db.execute(sql) do |res|
+          (0...res.ntuples).each do |recnum|
+            converted_rec = {}
+            (0...res.nfields).each do |fieldnum|
+              fieldsym = res.fname(fieldnum).to_sym
+              @columns << fieldsym
+              converter = PG_TYPES[res.ftype(fieldnum)] || lambda{ |s| s.to_s }
+              converted_rec[fieldsym] = converter.call(res.getvalue(recnum,fieldnum))
+            end
+            yield converted_rec
           end
         end
-        eval("lambda {|r| {#{kvs.join(COMMA_SEPARATOR)}}}")
       end
-
     end
   end
 end
+
