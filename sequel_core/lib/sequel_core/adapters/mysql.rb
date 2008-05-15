@@ -136,7 +136,7 @@ module Sequel
 
       def execute(sql, &block)
         begin
-          @logger.info(sql) if @logger
+          log_info(sql)
           @pool.hold do |conn|
             conn.query(sql)
             block[conn] if block
@@ -216,18 +216,18 @@ module Sequel
           if @transactions.include? Thread.current
             return yield(conn)
           end
-          @logger.info(SQL_BEGIN) if @logger
+          log_info(SQL_BEGIN)
           conn.query(SQL_BEGIN)
           begin
             @transactions << Thread.current
             yield(conn)
           rescue ::Exception => e
-            @logger.info(SQL_ROLLBACK) if @logger
+            log_info(SQL_ROLLBACK)
             conn.query(SQL_ROLLBACK)
             raise (Mysql::Error === e ? Error.new(e.message) : e) unless Error::Rollback === e
           ensure
             unless e
-              @logger.info(SQL_COMMIT) if @logger
+              log_info(SQL_COMMIT)
               conn.query(SQL_COMMIT)
             end
             @transactions.delete(Thread.current)

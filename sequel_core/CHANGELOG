@@ -1,5 +1,9 @@
 === HEAD
 
+* Allow databases to have multiple loggers (jeremyevans)
+
+* The sequel command line tool now also accepts a path to a database config YAML file in addition to a URI (mtodd)
+
 * Major update of the postgresql adapter (jdavis, jeremyevans) (#225)
 
 * Make returning inside of a database transaction commit the transaction (ahoward, jeremyevans)

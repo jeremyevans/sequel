@@ -18,7 +18,7 @@ module Sequel
       end
       
       def execute(sql)
-        @logger.info(sql) if @logger
+        log_info(sql)
         @pool.hold {|conn| conn.exec(sql)}
       end
       

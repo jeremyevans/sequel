@@ -58,14 +58,14 @@ module Sequel
       end
     
       def execute(sql)
-        @logger.info(sql) if @logger
+        log_info(sql)
         @pool.hold do |conn|
           conn.execute(sql)
         end
       end
       
       def do(sql)
-        @logger.info(sql) if @logger
+        log_info(sql)
         @pool.hold do |conn|
           conn.do(sql)
         end

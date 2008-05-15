@@ -222,10 +222,10 @@ module Sequel
     
       def execute(sql, &block)
         begin
-          @logger.info(sql) if @logger
+          log_info(sql)
           @pool.hold {|conn| conn.execute(sql, &block)}
         rescue => e
-          @logger.error(e.message) if @logger
+          log_info(e.message)
           raise convert_pgerror(e)
         end
       end
@@ -277,13 +277,13 @@ module Sequel
       
       def execute_insert(sql, table, values)
         begin 
-          @logger.info(sql) if @logger
+          log_info(sql)
           @pool.hold do |conn|
             conn.execute(sql)
             insert_result(conn, table, values)
           end
         rescue => e
-          @logger.error(e.message) if @logger
+          log_info(e.message)
           raise convert_pgerror(e)
         end
       end
@@ -297,22 +297,22 @@ module Sequel
           if conn.transaction_in_progress
             yield conn
           else
-            @logger.info(SQL_BEGIN) if @logger
+            log_info(SQL_BEGIN)
             conn.execute(SQL_BEGIN)
             begin
               conn.transaction_in_progress = true
               yield
             rescue ::Exception => e
-              @logger.info(SQL_ROLLBACK) if @logger
+              log_info(SQL_ROLLBACK)
               conn.execute(SQL_ROLLBACK) rescue nil
               raise convert_pgerror(e) unless Error::Rollback === e
             ensure
               unless e
                 begin
-                  @logger.info(SQL_COMMIT) if @logger
+                  log_info(SQL_COMMIT)
                   conn.execute(SQL_COMMIT)
                 rescue => e
-                  @logger.error(e.message) if @logger
+                  log_info(e.message)
                   raise convert_pgerror(e)
                 end
               end

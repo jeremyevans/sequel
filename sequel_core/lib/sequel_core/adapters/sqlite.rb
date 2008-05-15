@@ -37,7 +37,7 @@ module Sequel
     
       def execute(sql)
         begin
-          @logger.info(sql) if @logger
+          log_info(sql)
           @pool.hold {|conn| conn.execute_batch(sql); conn.changes}
         rescue SQLite3::Exception => e
           raise Error::InvalidStatement, "#{sql}\r\n#{e.message}"
@@ -46,7 +46,7 @@ module Sequel
       
       def execute_insert(sql)
         begin
-          @logger.info(sql) if @logger
+          log_info(sql)
           @pool.hold {|conn| conn.execute(sql); conn.last_insert_row_id}
         rescue SQLite3::Exception => e
           raise Error::InvalidStatement, "#{sql}\r\n#{e.message}"
@@ -55,7 +55,7 @@ module Sequel
       
       def single_value(sql)
         begin
-          @logger.info(sql) if @logger
+          log_info(sql)
           @pool.hold {|conn| conn.get_first_value(sql)}
         rescue SQLite3::Exception => e
           raise Error::InvalidStatement, "#{sql}\r\n#{e.message}"
@@ -64,7 +64,7 @@ module Sequel
       
       def execute_select(sql, &block)
         begin
-          @logger.info(sql) if @logger
+          log_info(sql)
           @pool.hold {|conn| conn.query(sql, &block)}
         rescue SQLite3::Exception => e
           raise Error::InvalidStatement, "#{sql}\r\n#{e.message}"

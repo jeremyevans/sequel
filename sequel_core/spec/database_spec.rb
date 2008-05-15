@@ -9,8 +9,17 @@ context "A new Database" do
     @db.opts.should == {1 => 2, :logger => 3}  
   end
   
-  specify "should set the logger from opts[:logger]" do
+  specify "should set the logger from opts[:logger] and opts[:loggers]" do
     @db.logger.should == 3
+    @db.loggers.should == [3]
+    Sequel::Database.new(1 => 2, :loggers => 3).logger.should == 3
+    Sequel::Database.new(1 => 2, :loggers => 3).loggers.should == [3]
+    Sequel::Database.new(1 => 2, :loggers => [3]).logger.should == 3
+    Sequel::Database.new(1 => 2, :loggers => [3]).loggers.should == [3]
+    Sequel::Database.new(1 => 2, :logger => 4, :loggers => 3).logger.should == 4
+    Sequel::Database.new(1 => 2, :logger => 4, :loggers => 3).loggers.should == [4,3]
+    Sequel::Database.new(1 => 2, :logger => [4], :loggers => [3]).logger.should == 4
+    Sequel::Database.new(1 => 2, :logger => [4], :loggers => [3]).loggers.should == [4,3]
   end
   
   specify "should create a connection pool" do
@@ -724,9 +733,26 @@ context "A database" do
     db = Sequel::Database.new
     s = "I'm a logger"
     db.logger = s
-    db.logger.should be(s)
+    db.logger.should == s
+    db.loggers.should == [s]
     db.logger = nil
-    db.logger.should be_nil
+    db.logger.should == nil
+    db.loggers.should == []
+
+    db.loggers = [s]
+    db.logger.should == s
+    db.loggers.should == [s]
+    db.loggers = []
+    db.logger.should == nil
+    db.loggers.should == []
+
+    t = "I'm also a logger"
+    db.loggers = [s, t]
+    db.logger.should == s
+    db.loggers.should == [s,t]
+    db.loggers = []
+    db.logger.should == nil
+    db.loggers.should == []
   end
 end
 

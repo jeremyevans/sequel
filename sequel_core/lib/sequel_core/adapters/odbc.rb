@@ -46,14 +46,14 @@ module Sequel
       # fetch_rows method source code for an example of how to drop
       # the statements.
       def execute(sql)
-        @logger.info(sql) if @logger
+        log_info(sql)
         @pool.hold do |conn|
           conn.run(sql)
         end
       end
       
       def do(sql)
-        @logger.info(sql) if @logger
+        log_info(sql)
         @pool.hold do |conn|
           conn.do(sql)
         end

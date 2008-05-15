@@ -18,7 +18,7 @@ module Sequel
     @@single_threaded = false
     @@quote_identifiers = false
 
-    attr_accessor :logger
+    attr_accessor :loggers
     attr_reader :opts, :pool
     attr_writer :quote_identifiers
 
@@ -34,7 +34,7 @@ module Sequel
       @pool = (@single_threaded ? SingleThreadedPool : ConnectionPool).new(connection_pool_default_options.merge(opts), &block)
       @pool.connection_proc = proc {connect} unless block
 
-      @logger = opts[:logger]
+      @loggers = Array(opts[:logger]) + Array(opts[:loggers])
       ::Sequel::DATABASES.push(self)
     end
     
@@ -262,6 +262,22 @@ module Sequel
       "#<#{self.class}: #{(uri rescue opts).inspect}>" 
     end
 
+    # Log a message at level info to all loggers
+    def log_info(message)
+      @loggers.each{|logger| logger.info(message)}
+    end
+
+    # Return the first logger, if any.  Should only be used for backwards
+    # compatibility.
+    def logger
+      @loggers.first
+    end
+
+    # Replace the array of loggers with the given logger(s)
+    def logger=(logger)
+      @loggers = Array(logger)
+    end
+
     # Returns true if the database is using a multi-threaded connection pool.
     def multi_threaded?
       !@single_threaded
@@ -328,18 +344,18 @@ module Sequel
         if @transactions.include? Thread.current
           return yield(conn)
         end
-        @logger.info(SQL_BEGIN) if @logger
+        log_info(SQL_BEGIN)
         conn.execute(SQL_BEGIN)
         begin
           @transactions << Thread.current
           yield(conn)
         rescue Exception => e
-          @logger.info(SQL_ROLLBACK) if @logger
+          log_info(SQL_ROLLBACK)
           conn.execute(SQL_ROLLBACK)
           raise e unless Error::Rollback === e
         ensure
           unless e
-            @logger.info(SQL_COMMIT) if @logger
+            log_info(SQL_COMMIT)
             conn.execute(SQL_COMMIT)
           end
           @transactions.delete(Thread.current)

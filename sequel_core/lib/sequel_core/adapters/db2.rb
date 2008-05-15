@@ -54,7 +54,7 @@ module Sequel
       end
       
       def execute(sql, &block)
-        @logger.info(sql) if @logger
+        log_info(sql)
         @pool.hold do |conn|
           rc, sth = SQLAllocHandle(SQL_HANDLE_STMT, @handle) 
           check_error(rc, "Could not allocate statement")
