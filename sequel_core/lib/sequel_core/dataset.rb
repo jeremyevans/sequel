@@ -63,6 +63,7 @@ module Sequel
     include Enumerable
     
     COLUMN_CHANGE_OPTS = [:select, :sql, :from, :join].freeze
+    DATASET_CLASSES = []
     MUTATION_METHODS = %w'and distinct exclude exists filter from from_self full_outer_join graph
     group group_and_count group_by having inner_join intersect invert_order join
     left_outer_join limit naked or order order_by order_more paginate query reject
@@ -80,8 +81,6 @@ module Sequel
         proc {|v| v.to_yaml}
       ]
     }
-    
-    @@dataset_classes = []
 
     attr_accessor :db, :opts, :row_proc
     attr_writer :quote_identifiers
@@ -106,7 +105,7 @@ module Sequel
     ### Class Methods ###
 
     def self.dataset_classes #:nodoc:
-      @@dataset_classes
+      DATASET_CLASSES
     end
 
     # Setup mutation (e.g. filter!) methods
@@ -117,7 +116,7 @@ module Sequel
     end
 
     def self.inherited(c) #:nodoc:
-      @@dataset_classes << c
+      DATASET_CLASSES << c
     end
     
     ### Instance Methods ###
