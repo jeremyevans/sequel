@@ -138,7 +138,7 @@ module Sequel
         cond = transform_save(cond) if @transform
         filter = cond
       end
-      parenthesize = !(cond.is_a?(Hash) || cond.is_a?(Array))
+      parenthesize = !cond.is_one_of?(Hash, Array)
 
       if !@opts[clause].blank?
         l = expression_list(@opts[clause])
