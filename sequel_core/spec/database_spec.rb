@@ -789,7 +789,7 @@ context "Database#fetch" do
     sql.should == "select * from xyz where x = 15 and y = 'abc'"
     
     # and Aman Gupta's example
-    @db.fetch('select name from table where name = ? or id in (?)',
+    @db.fetch('select name from table where name = ? or id in ?',
     'aman', [3,4,7]) {|r| sql = r[:sql]}
     sql.should == "select name from table where name = 'aman' or id in (3, 4, 7)"
   end

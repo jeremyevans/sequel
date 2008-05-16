@@ -179,7 +179,7 @@ module Sequel
         sql = "#{literal(column[:name].to_sym)} #{TYPES[column[:type]]}"
         column[:size] ||= 255 if column[:type] == :varchar
         elements = column[:size] || column[:elements]
-        sql << "(#{literal(elements)})" if elements
+        sql << literal(Array(elements)) if elements
         sql << UNSIGNED if column[:unsigned]
         sql << UNIQUE if column[:unique]
         sql << NOT_NULL if column[:null] == false
@@ -189,7 +189,7 @@ module Sequel
         sql << " #{auto_increment_sql}" if column[:auto_increment]
         if column[:table]
           sql << ", FOREIGN KEY (#{literal(column[:name].to_sym)}) REFERENCES #{column[:table]}"
-          sql << "(#{literal(column[:key])})" if column[:key]
+          sql << literal(Array(column[:key])) if column[:key]
           sql << " ON DELETE #{on_delete_clause(column[:on_delete])}" if column[:on_delete]
         end
         sql
@@ -200,13 +200,13 @@ module Sequel
         unique = "UNIQUE " if index[:unique]
         case index[:type]
         when :full_text
-          "CREATE FULLTEXT INDEX #{index_name} ON #{table_name} (#{literal(index[:columns])})"
+          "CREATE FULLTEXT INDEX #{index_name} ON #{table_name} #{literal(index[:columns])}"
         when :spatial
-          "CREATE SPATIAL INDEX #{index_name} ON #{table_name} (#{literal(index[:columns])})"
+          "CREATE SPATIAL INDEX #{index_name} ON #{table_name} #{literal(index[:columns])}"
         when nil
-          "CREATE #{unique}INDEX #{index_name} ON #{table_name} (#{literal(index[:columns])})"
+          "CREATE #{unique}INDEX #{index_name} ON #{table_name} #{literal(index[:columns])}"
         else
-          "CREATE #{unique}INDEX #{index_name} ON #{table_name} (#{literal(index[:columns])}) USING #{index[:type]}"
+          "CREATE #{unique}INDEX #{index_name} ON #{table_name} #{literal(index[:columns])} USING #{index[:type]}"
         end
       end
     
@@ -329,6 +329,18 @@ module Sequel
         "INSERT INTO #{source_list(@opts[:from])} () VALUES ()"
       end
 
+      def complex_expression_sql(ce)
+        args = ce.args
+        case op = ce.op
+        when :~, :'!~'
+          "#{'NOT ' if op == :'!~'}(#{literal(args.at(0))} REGEXP BINARY #{literal(args.at(1))})"
+        when :'~*', :'!~*'
+          "#{'NOT ' if op == :'!~*'}((#{literal(args.at(0))} REGEXP #{literal(args.at(1))})"
+        else
+          super(ce)
+        end
+      end
+
       def match_expr(l, r)
         case r
         when Regexp
@@ -367,7 +379,7 @@ module Sequel
         end
 
         if where = opts[:where]
-          sql << " WHERE #{where}"
+          sql << " WHERE #{literal(where)}"
         end
 
         if group = opts[:group]
@@ -375,7 +387,7 @@ module Sequel
         end
 
         if having = opts[:having]
-          sql << " HAVING #{having}"
+          sql << " HAVING #{literal(having)}"
         end
 
         if order = opts[:order]
@@ -406,13 +418,22 @@ module Sequel
       
       def full_text_search(cols, terms, opts = {})
         mode = opts[:boolean] ? " IN BOOLEAN MODE" : ""
-        filter("MATCH (#{literal(cols)}) AGAINST (#{literal(terms)}#{mode})")
+        s = if Array === terms
+          if mode.blank?
+            "MATCH #{literal(Array(cols))} AGAINST #{literal(terms)}"
+          else
+            "MATCH #{literal(Array(cols))} AGAINST (#{literal(terms)[1...-1]}#{mode})"
+          end
+        else
+          "MATCH #{literal(Array(cols))} AGAINST (#{literal(terms)}#{mode})"
+        end
+        filter(s)
       end
 
       # MySQL allows HAVING clause on ungrouped datasets.
       def having(*cond, &block)
         @opts[:having] = {}
-        filter(*cond, &block)
+        x = filter(*cond, &block)
       end
 
       # MySQL supports ORDER and LIMIT clauses in UPDATE statements.
@@ -446,12 +467,8 @@ module Sequel
           when Array
             if values.empty?
               "REPLACE INTO #{from} DEFAULT VALUES"
-            elsif values.keys
-              fl = values.keys.map {|f| literal(f.is_a?(String) ? f.to_sym : f)}
-              vl = values.values.map {|v| literal(v)}
-              "REPLACE INTO #{from} (#{fl.join(COMMA_SEPARATOR)}) VALUES (#{vl.join(COMMA_SEPARATOR)})"
             else
-              "REPLACE INTO #{from} VALUES (#{literal(values)})"
+              "REPLACE INTO #{from} VALUES #{literal(values)}"
             end
           when Hash
             if values.empty?
@@ -513,8 +530,8 @@ module Sequel
       end
 
       def multi_insert_sql(columns, values)
-        columns = literal(columns)
-        values = values.map {|r| "(#{literal(r)})"}.join(COMMA_SEPARATOR)
+        columns = column_list(columns)
+        values = values.map {|r| literal(Array(r))}.join(COMMA_SEPARATOR)
         ["INSERT INTO #{source_list(@opts[:from])} (#{columns}) VALUES #{values}"]
       end
     end

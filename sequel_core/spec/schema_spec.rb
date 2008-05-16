@@ -283,7 +283,7 @@ context "DB#create_table" do
       integer :score
       check {:x > 0 && :y < 1}
     end
-    @db.sqls.should == ["CREATE TABLE cats (score integer, CHECK (((x > 0) AND (y < 1))))"]
+    @db.sqls.should == ["CREATE TABLE cats (score integer, CHECK ((x > 0) AND (y < 1)))"]
     @db.sqls.clear
 
     @db.create_table(:cats) do
@@ -303,7 +303,7 @@ context "DB#create_table" do
     @db.create_table(:cats) do
       constraint(:blah_blah) {:x > 0 && :y < 1}
     end
-    @db.sqls.should == ["CREATE TABLE cats (CONSTRAINT blah_blah CHECK (((x > 0) AND (y < 1))))"]
+    @db.sqls.should == ["CREATE TABLE cats (CONSTRAINT blah_blah CHECK ((x > 0) AND (y < 1)))"]
   end
 end
 
@@ -351,7 +351,7 @@ context "DB#alter_table" do
     @db.alter_table(:cats) do
       add_constraint(:blah_blah) {:x > 0 && :y < 1}
     end
-    @db.sqls.should == ["ALTER TABLE cats ADD CONSTRAINT blah_blah CHECK (((x > 0) AND (y < 1)))"]
+    @db.sqls.should == ["ALTER TABLE cats ADD CONSTRAINT blah_blah CHECK ((x > 0) AND (y < 1))"]
   end
 
   specify "should support add_foreign_key" do

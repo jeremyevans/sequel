@@ -333,7 +333,7 @@ context "Joined MySQL dataset" do
     proc {@ds.having('blah')}.should_not raise_error
 
     @ds.having('blah').sql.should == \
-      "SELECT * FROM nodes HAVING blah"
+      "SELECT * FROM nodes HAVING (blah)"
   end
   
   specify "should put a having clause before an order by clause" do

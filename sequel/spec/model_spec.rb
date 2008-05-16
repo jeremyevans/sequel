@@ -173,8 +173,8 @@ describe Sequel::Model, ".subset" do
     @c.dataset.pricey.sql.should == "SELECT * FROM items WHERE (price > 100)"
     
     # check if subsets are composable
-    @c.pricey.new_only.sql.should == "SELECT * FROM items WHERE (price > 100) AND (age = 'new')"
-    @c.new_only.pricey.sql.should == "SELECT * FROM items WHERE (age = 'new') AND (price > 100)"
+    @c.pricey.new_only.sql.should == "SELECT * FROM items WHERE ((price > 100) AND (age = 'new'))"
+    @c.new_only.pricey.sql.should == "SELECT * FROM items WHERE ((age = 'new') AND (price > 100))"
   end
 
 end
@@ -547,7 +547,7 @@ describe Sequel::Model, ".[]" do
     @c.set_primary_key [:node_id, :kind]
     @c[3921, 201].should be_a_kind_of(@c)
     $sqls.last.should =~ \
-    /^SELECT \* FROM items WHERE (\(node_id = 3921\) AND \(kind = 201\))|(\(kind = 201\) AND \(node_id = 3921\)) LIMIT 1$/
+    /^SELECT \* FROM items WHERE \((\(node_id = 3921\) AND \(kind = 201\))|(\(kind = 201\) AND \(node_id = 3921\))\) LIMIT 1$/
   end
 end
 

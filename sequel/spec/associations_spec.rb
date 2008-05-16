@@ -396,7 +396,7 @@ describe Sequel::Model, "one_to_many" do
     atts.first.should be_a_kind_of(@c1)
     atts.first.values.should == {}
     
-    MODEL_DB.sqls.should == ['SELECT attributes.* FROM attributes WHERE (node_id = 1234) AND (xxx IS NULL)']
+    MODEL_DB.sqls.should == ['SELECT attributes.* FROM attributes WHERE ((node_id = 1234) AND (xxx IS NULL))']
   end
   
   it "should support order option with block" do
@@ -411,7 +411,7 @@ describe Sequel::Model, "one_to_many" do
     atts.first.should be_a_kind_of(@c1)
     atts.first.values.should == {}
     
-    MODEL_DB.sqls.should == ['SELECT attributes.* FROM attributes WHERE (node_id = 1234) AND (xxx IS NULL) ORDER BY kind']
+    MODEL_DB.sqls.should == ['SELECT attributes.* FROM attributes WHERE ((node_id = 1234) AND (xxx IS NULL)) ORDER BY kind']
   end
   
   it "should set cached instance variable when accessed" do
@@ -572,7 +572,7 @@ describe Sequel::Model, "many_to_many" do
     n = @c2.new(:id => 1234)
     a = n.attributes_dataset
     a.should be_a_kind_of(Sequel::Dataset)
-    a.sql.should == 'SELECT attributes.* FROM attributes INNER JOIN attributes_nodes ON (attributes_nodes.attribute_id = attributes.id) AND (attributes_nodes.node_id = 1234)'
+    a.sql.should == 'SELECT attributes.* FROM attributes INNER JOIN attributes_nodes ON ((attributes_nodes.attribute_id = attributes.id) AND (attributes_nodes.node_id = 1234))'
   end
   
   it "should use implicit class if omitted" do
@@ -584,7 +584,7 @@ describe Sequel::Model, "many_to_many" do
     n = @c2.new(:id => 1234)
     a = n.tags_dataset
     a.should be_a_kind_of(Sequel::Dataset)
-    a.sql.should == 'SELECT tags.* FROM tags INNER JOIN nodes_tags ON (nodes_tags.tag_id = tags.id) AND (nodes_tags.node_id = 1234)'
+    a.sql.should == 'SELECT tags.* FROM tags INNER JOIN nodes_tags ON ((nodes_tags.tag_id = tags.id) AND (nodes_tags.node_id = 1234))'
   end
   
   it "should use class inside module if given as a string" do
@@ -598,7 +598,7 @@ describe Sequel::Model, "many_to_many" do
     n = @c2.new(:id => 1234)
     a = n.tags_dataset
     a.should be_a_kind_of(Sequel::Dataset)
-    a.sql.should == 'SELECT tags.* FROM tags INNER JOIN nodes_tags ON (nodes_tags.tag_id = tags.id) AND (nodes_tags.node_id = 1234)'
+    a.sql.should == 'SELECT tags.* FROM tags INNER JOIN nodes_tags ON ((nodes_tags.tag_id = tags.id) AND (nodes_tags.node_id = 1234))'
   end
   
   it "should use explicit key values and join table if given" do
@@ -607,7 +607,7 @@ describe Sequel::Model, "many_to_many" do
     n = @c2.new(:id => 1234)
     a = n.attributes_dataset
     a.should be_a_kind_of(Sequel::Dataset)
-    a.sql.should == 'SELECT attributes.* FROM attributes INNER JOIN attribute2node ON (attribute2node.attributeid = attributes.id) AND (attribute2node.nodeid = 1234)'
+    a.sql.should == 'SELECT attributes.* FROM attributes INNER JOIN attribute2node ON ((attribute2node.attributeid = attributes.id) AND (attribute2node.nodeid = 1234))'
   end
   
   it "should support an order option" do
@@ -616,7 +616,7 @@ describe Sequel::Model, "many_to_many" do
     n = @c2.new(:id => 1234)
     a = n.attributes_dataset
     a.should be_a_kind_of(Sequel::Dataset)
-    a.sql.should == 'SELECT attributes.* FROM attributes INNER JOIN attributes_nodes ON (attributes_nodes.attribute_id = attributes.id) AND (attributes_nodes.node_id = 1234) ORDER BY blah'
+    a.sql.should == 'SELECT attributes.* FROM attributes INNER JOIN attributes_nodes ON ((attributes_nodes.attribute_id = attributes.id) AND (attributes_nodes.node_id = 1234)) ORDER BY blah'
   end
   
   it "should support an array for the order option" do
@@ -625,7 +625,7 @@ describe Sequel::Model, "many_to_many" do
     n = @c2.new(:id => 1234)
     a = n.attributes_dataset
     a.should be_a_kind_of(Sequel::Dataset)
-    a.sql.should == 'SELECT attributes.* FROM attributes INNER JOIN attributes_nodes ON (attributes_nodes.attribute_id = attributes.id) AND (attributes_nodes.node_id = 1234) ORDER BY blah1, blah2'
+    a.sql.should == 'SELECT attributes.* FROM attributes INNER JOIN attributes_nodes ON ((attributes_nodes.attribute_id = attributes.id) AND (attributes_nodes.node_id = 1234)) ORDER BY blah1, blah2'
   end
   
   it "should support a select option" do
@@ -634,7 +634,7 @@ describe Sequel::Model, "many_to_many" do
     n = @c2.new(:id => 1234)
     a = n.attributes_dataset
     a.should be_a_kind_of(Sequel::Dataset)
-    a.sql.should == 'SELECT blah FROM attributes INNER JOIN attributes_nodes ON (attributes_nodes.attribute_id = attributes.id) AND (attributes_nodes.node_id = 1234)'
+    a.sql.should == 'SELECT blah FROM attributes INNER JOIN attributes_nodes ON ((attributes_nodes.attribute_id = attributes.id) AND (attributes_nodes.node_id = 1234))'
   end
   
   it "should support an array for the select option" do
@@ -643,7 +643,7 @@ describe Sequel::Model, "many_to_many" do
     n = @c2.new(:id => 1234)
     a = n.attributes_dataset
     a.should be_a_kind_of(Sequel::Dataset)
-    a.sql.should == 'SELECT attributes.*, attribute_nodes.blah2 FROM attributes INNER JOIN attributes_nodes ON (attributes_nodes.attribute_id = attributes.id) AND (attributes_nodes.node_id = 1234)'
+    a.sql.should == 'SELECT attributes.*, attribute_nodes.blah2 FROM attributes INNER JOIN attributes_nodes ON ((attributes_nodes.attribute_id = attributes.id) AND (attributes_nodes.node_id = 1234))'
   end
   
   it "should accept a block" do
@@ -657,7 +657,7 @@ describe Sequel::Model, "many_to_many" do
     a.should be_a_kind_of(Array)
     a.size.should == 1
     a.first.should be_a_kind_of(@c1)
-    MODEL_DB.sqls.first.should == 'SELECT attributes.* FROM attributes INNER JOIN attributes_nodes ON (attributes_nodes.attribute_id = attributes.id) AND (attributes_nodes.node_id = 1234) WHERE (xxx = 555)'
+    MODEL_DB.sqls.first.should == 'SELECT attributes.* FROM attributes INNER JOIN attributes_nodes ON ((attributes_nodes.attribute_id = attributes.id) AND (attributes_nodes.node_id = 1234)) WHERE (xxx = 555)'
   end
 
   it "should allow the order option while accepting a block" do
@@ -671,7 +671,7 @@ describe Sequel::Model, "many_to_many" do
     a.should be_a_kind_of(Array)
     a.size.should == 1
     a.first.should be_a_kind_of(@c1)
-    MODEL_DB.sqls.first.should == 'SELECT attributes.* FROM attributes INNER JOIN attributes_nodes ON (attributes_nodes.attribute_id = attributes.id) AND (attributes_nodes.node_id = 1234) WHERE (xxx = 555) ORDER BY blah1, blah2'
+    MODEL_DB.sqls.first.should == 'SELECT attributes.* FROM attributes INNER JOIN attributes_nodes ON ((attributes_nodes.attribute_id = attributes.id) AND (attributes_nodes.node_id = 1234)) WHERE (xxx = 555) ORDER BY blah1, blah2'
   end
 
   it "should define an add_ method" do
@@ -691,7 +691,7 @@ describe Sequel::Model, "many_to_many" do
     n = @c2.new(:id => 1234)
     a = @c1.new(:id => 2345)
     a.should == n.remove_attribute(a)
-    MODEL_DB.sqls.first.should == 'DELETE FROM attributes_nodes WHERE (node_id = 1234) AND (attribute_id = 2345)'
+    MODEL_DB.sqls.first.should == 'DELETE FROM attributes_nodes WHERE ((node_id = 1234) AND (attribute_id = 2345))'
   end
 
   it "should provide an array with all members of the association" do
@@ -703,7 +703,7 @@ describe Sequel::Model, "many_to_many" do
     atts.size.should == 1
     atts.first.should be_a_kind_of(@c1)
 
-    MODEL_DB.sqls.first.should == 'SELECT attributes.* FROM attributes INNER JOIN attributes_nodes ON (attributes_nodes.attribute_id = attributes.id) AND (attributes_nodes.node_id = 1234)'
+    MODEL_DB.sqls.first.should == 'SELECT attributes.* FROM attributes INNER JOIN attributes_nodes ON ((attributes_nodes.attribute_id = attributes.id) AND (attributes_nodes.node_id = 1234))'
   end
 
   it "should set cached instance variable when accessed" do
@@ -789,7 +789,7 @@ describe Sequel::Model, "many_to_many" do
     n = @c2.new(:id => 1234)
     a = n.attributes_dataset
     a.should be_a_kind_of(Sequel::Dataset)
-    a.sql.should == 'SELECT attributes.* FROM attributes INNER JOIN attributes_nodes ON (attributes_nodes.attribute_id = attributes.id) AND (attributes_nodes.node_id = 1234)'
+    a.sql.should == 'SELECT attributes.* FROM attributes INNER JOIN attributes_nodes ON ((attributes_nodes.attribute_id = attributes.id) AND (attributes_nodes.node_id = 1234))'
   end
   
 end

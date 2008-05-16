@@ -62,21 +62,15 @@ describe Sequel::Dataset, " graphing" do
   end
 
   it "#graph should pass all join_conditions to join_table" do
-    ds = @ds1.graph(@ds2, :x=>:id, :y=>:id)
-    ['SELECT points.id, points.x, points.y, lines.id AS lines_id, lines.x AS lines_x, lines.y AS lines_y, lines.graph_id FROM points LEFT OUTER JOIN lines ON (lines.x = points.id) AND (lines.y = points.id)',
-    'SELECT points.id, points.x, points.y, lines.id AS lines_id, lines.x AS lines_x, lines.y AS lines_y, lines.graph_id FROM points LEFT OUTER JOIN lines ON (lines.y = points.id) AND (lines.x = points.id)'
-    ].should(include(ds.sql))
+    ds = @ds1.graph(@ds2, [[:x, :id], [:y, :id]])
+    ds.sql.should == 'SELECT points.id, points.x, points.y, lines.id AS lines_id, lines.x AS lines_x, lines.y AS lines_y, lines.graph_id FROM points LEFT OUTER JOIN lines ON ((lines.x = points.id) AND (lines.y = points.id))'
   end
 
   it "#graph should not add columns if graph is called after set_graph_aliases" do
-    ds = @ds1.set_graph_aliases(:x=>[:points, :x], :y=>[:lines, :y])
-    ['SELECT points.x, lines.y FROM points',
-    'SELECT lines.y, points.x FROM points'
-    ].should(include(ds.sql))
+    ds = @ds1.set_graph_aliases([[:x,[:points, :x]], [:y,[:lines, :y]]])
+    ds.sql.should == 'SELECT points.x, lines.y FROM points'
     ds = ds.graph(:lines, :x=>:id)
-    ['SELECT points.x, lines.y FROM points LEFT OUTER JOIN lines ON (lines.x = points.id)',
-    'SELECT lines.y, points.x FROM points LEFT OUTER JOIN lines ON (lines.x = points.id)'
-    ].should(include(ds.sql))
+    ds.sql.should == 'SELECT points.x, lines.y FROM points LEFT OUTER JOIN lines ON (lines.x = points.id)'
   end
 
   it "#graph should allow graphing of multiple datasets" do

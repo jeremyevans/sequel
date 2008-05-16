@@ -328,11 +328,11 @@ module Sequel
 
       def index_definition_sql(table_name, index)
         index_name = index[:name] || default_index_name(table_name, index[:columns])
-        expr = "(#{literal(index[:columns])})"
+        expr = literal(Array(index[:columns]))
         unique = "UNIQUE " if index[:unique]
         index_type = index[:type]
         filter = index[:where] || index[:filter]
-        filter = " WHERE #{expression_list(filter)}" if filter
+        filter = " WHERE #{filter_expr(filter)}" if filter
         case index_type
         when :full_text
           lang = index[:language] ? "#{literal(index[:language])}, " : ""
@@ -468,8 +468,8 @@ module Sequel
         return super if @db.server_version < 80200
         
         # postgresql 8.2 introduces support for multi-row insert
-        columns = literal(columns)
-        values = values.map {|r| "(#{literal(r)})"}.join(COMMA_SEPARATOR)
+        columns = column_list(columns)
+        values = values.map {|r| literal(Array(r))}.join(COMMA_SEPARATOR)
         ["INSERT INTO #{source_list(@opts[:from])} (#{columns}) VALUES #{values}"]
       end
 

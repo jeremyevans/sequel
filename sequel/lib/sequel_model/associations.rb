@@ -206,7 +206,7 @@ module Sequel::Model::Associations
     
     # define a method returning the association dataset (with optional order)
     if order = opts[:order]
-      class_def(dataset_method) {instance_eval(&block).order(order)}
+      class_def(dataset_method) {instance_eval(&block).order(*order)}
     else
       class_def(dataset_method, &block)
     end
@@ -269,7 +269,7 @@ module Sequel::Model::Associations
     database = db
     
     def_association_dataset_methods(name, opts) do
-      opts.associated_class.select(opts.select).inner_join(join_table, [[right, opts.associated_primary_key], [left, pk]])
+      opts.associated_class.select(*opts.select).inner_join(join_table, [[right, opts.associated_primary_key], [left, pk]])
     end
 
     class_def(association_add_method_name(name)) do |o|
@@ -302,7 +302,7 @@ module Sequel::Model::Associations
     key = (opts[:key] ||= default_foreign_key(opts))
     opts[:class_name] ||= name.to_s.camelize
     
-    def_association_getter(name) {(fk = send(key)) ? opts.associated_class.select(opts.select).filter(opts.associated_primary_key=>fk).first : nil}
+    def_association_getter(name) {(fk = send(key)) ? opts.associated_class.select(*opts.select).filter(opts.associated_primary_key=>fk).first : nil}
     class_def(:"#{name}=") do |o|
       old_val = instance_variable_get(ivar) if reciprocal = opts.reciprocal
       instance_variable_set(ivar, o)
@@ -325,7 +325,7 @@ module Sequel::Model::Associations
     key = (opts[:key] ||= default_remote_key)
     opts[:class_name] ||= name.to_s.singularize.camelize
     
-    def_association_dataset_methods(name, opts) {opts.associated_class.select(opts.select).filter(key => pk)}
+    def_association_dataset_methods(name, opts) {opts.associated_class.select(*opts.select).filter(key => pk)}
     
     class_def(association_add_method_name(name)) do |o|
       o.send(:"#{key}=", pk)

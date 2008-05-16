@@ -16,6 +16,8 @@ module Sequel
       :full_outer => 'FULL OUTER JOIN'.freeze,
       :inner => 'INNER JOIN'.freeze
     }
+    N_ARITY_OPERATORS = ::Sequel::SQL::ComplexExpression::N_ARITY_OPERATORS
+    TWO_ARITY_OPERATORS = ::Sequel::SQL::ComplexExpression::TWO_ARITY_OPERATORS
     NULL = "NULL".freeze
     QUESTION_MARK = '?'.freeze
     STOCK_COUNT_OPTS = {:select => ["COUNT(*)".lit], :order => nil}.freeze
@@ -40,6 +42,21 @@ module Sequel
     def column_expr_sql(ce)
       r = ce.r
       "#{literal(ce.l)} #{ce.op}#{" #{literal(r)}" if r}"
+    end
+
+    def complex_expression_sql(ce)
+      op = ce.op
+      args = ce.args
+      case op
+      when *TWO_ARITY_OPERATORS
+        "(#{literal(args.at(0))} #{op} #{literal(args.at(1))})"
+      when *N_ARITY_OPERATORS
+        "(#{args.collect{|a| literal(a)}.join(" #{op} ")})"
+      when :NOT
+        "NOT #{literal(args.at(0))}"
+      else
+        raise(Sequel::Error, "invalid operator #{op}")
+      end
     end
 
     # Returns the number of records in the dataset.
@@ -68,7 +85,7 @@ module Sequel
       sql = "DELETE FROM #{source_list(opts[:from])}"
 
       if where = opts[:where]
-        sql << " WHERE #{where}"
+        sql << " WHERE #{literal(where)}"
       end
 
       sql
@@ -87,13 +104,13 @@ module Sequel
     def exclude(*cond, &block)
       clause = (@opts[:having] ? :having : :where)
       cond = cond.first if cond.size == 1
-      parenthesize = !(cond.is_a?(Hash) || cond.is_a?(Array))
-      if @opts[clause]
-        l = expression_list(@opts[clause])
-        r = expression_list(block || cond, parenthesize)
-        cond = "#{l} AND (NOT #{r})"
+      if (Hash === cond) || ((Array === cond) && (cond.all_two_pairs?))
+        cond = cond.sql_or
+      end
+      cond = if @opts[clause]
+        @opts[clause] & ~filter_expr(block || cond)
       else
-        cond = "(NOT #{expression_list(block || cond, true)})"
+        ~filter_expr(block || cond)
       end
       clone(clause => cond)
     end
@@ -138,14 +155,11 @@ module Sequel
         cond = transform_save(cond) if @transform
         filter = cond
       end
-      parenthesize = !cond.is_one_of?(Hash, Array)
 
-      if !@opts[clause].blank?
-        l = expression_list(@opts[clause])
-        r = expression_list(block || cond, parenthesize)
-        clone(clause => "#{l} AND #{r}")
+      if @opts[clause].blank?
+        clone(:filter => cond, clause => filter_expr(block || cond))
       else
-        clone(:filter => cond, clause => expression_list(block || cond))
+        clone(clause => @opts[clause] & filter_expr(block || cond))
       end
     end
     alias_method :where, :filter
@@ -182,14 +196,11 @@ module Sequel
 
     def function_sql(f)
       args = f.args
-      "#{f.f}(#{literal(args) unless args.empty?})"
+      "#{f.f}#{args.empty? ? '()' : literal(args)}"
     end
 
     def grep(cols, terms)
-      conds = [];
-      terms = Array(terms)
-      Array(cols).each {|c| terms.each {|t| conds << match_expr(c, t)}}
-      filter(conds.join(' OR '))
+      filter(::Sequel::SQL::ComplexExpression.new(:OR, *Array(cols).collect{|c| ::Sequel::SQL::ComplexExpression.like(c, *terms)}))
     end
 
     # Returns a copy of the dataset with the results grouped by the value of 
@@ -245,7 +256,7 @@ module Sequel
           if values.empty?
             insert_default_values_sql
           else
-            "INSERT INTO #{from} VALUES (#{literal(values)})"
+            "INSERT INTO #{from} VALUES #{literal(values)}"
           end
         when Hash
           if values.empty?
@@ -297,7 +308,7 @@ module Sequel
       end
 
       quoted_table_alias = quote_identifier(table_alias) 
-      clause = "#{@opts[:join]} #{join_type} #{table}#{" #{quoted_table_alias}" if quoted_table_alias != table} ON #{expression_list(join_conditions)}"
+      clause = "#{@opts[:join]} #{join_type} #{table}#{" #{quoted_table_alias}" if quoted_table_alias != table} ON #{literal(filter_expr(join_conditions))}"
       opts = {:join => clause, :last_joined_table => table_alias}
       opts[:num_dataset_sources] = table_alias_num if table_alias_num
       clone(opts)
@@ -355,10 +366,12 @@ module Sequel
         BOOL_FALSE
       when Symbol
         symbol_to_column_ref(v)
-      when Sequel::SQL::Expression
+      when ::Sequel::SQL::Expression
         v.to_s(self)
       when Array
-        v.empty? ? NULL : v.map {|i| literal(i)}.join(COMMA_SEPARATOR)
+        v.all_two_pairs? ? literal(v.to_complex_expr) : "(#{v.collect{|i| literal(i)}.join(COMMA_SEPARATOR)})"
+      when Hash
+        literal(v.to_complex_expr)
       when Time
         v.strftime(TIMESTAMP_FORMAT)
       when Date
@@ -379,7 +392,7 @@ module Sequel
       table = quote_identifier(@opts[:from].first)
       columns = literal(columns)
       values.map do |r|
-        "INSERT INTO #{table} (#{columns}) VALUES (#{literal(r)})"
+        "INSERT INTO #{table} #{columns} VALUES #{literal(r)}"
       end
     end
     
@@ -388,11 +401,8 @@ module Sequel
     def or(*cond, &block)
       clause = (@opts[:having] ? :having : :where)
       cond = cond.first if cond.size == 1
-      parenthesize = !(cond.is_a?(Hash) || cond.is_a?(Array))
       if @opts[clause]
-        l = expression_list(@opts[clause])
-        r = expression_list(block || cond, parenthesize)
-        clone(clause => "#{l} OR #{r}")
+        clone(clause => @opts[clause] | filter_expr(block || cond))
       else
         raise Error::NoExistingFilter, "No existing filter found."
       end
@@ -495,7 +505,7 @@ module Sequel
       end
 
       if where = opts[:where]
-        sql << " WHERE #{where}"
+        sql << " WHERE #{literal(where)}"
       end
 
       if group = opts[:group]
@@ -507,7 +517,7 @@ module Sequel
       end
 
       if having = opts[:having]
-        sql << " HAVING #{having}"
+        sql << " HAVING #{literal(having)}"
       end
 
       if limit = opts[:limit]
@@ -620,7 +630,7 @@ module Sequel
         sql << set
       end
       if where = opts[:where]
-        sql << " WHERE #{where}"
+        sql << " WHERE #{literal(where)}"
       end
 
       sql
@@ -648,38 +658,31 @@ module Sequel
         WILDCARD
       else
         m = columns.map do |i|
-          i.is_a?(Hash) ? i.map {|kv| "#{literal(kv[0])} AS #{quote_identifier(kv[1])}"} : literal(i)
+          i.is_a?(Hash) ? i.map{|kv| "#{literal(kv[0])} AS #{quote_identifier(kv[1])}"} : literal(i)
         end
         m.join(COMMA_SEPARATOR)
       end
     end
     
-    # Formats a where clause. If parenthesize is true, then the whole 
-    # generated clause will be enclosed in a set of parentheses.
-    def expression_list(expr, parenthesize = false)
-      fmt = case expr
+    def filter_expr(expr)
+      case expr
       when Hash
-        parenthesize = false if expr.size == 1
-        expression_list_map(expr)
+        ::Sequel::SQL::ComplexExpression.from_value_pairs(expr)
       when Array
         if String === expr[0]
-          expr.shift.gsub(QUESTION_MARK) {literal(expr.shift)}
+          filter_expr(expr.shift.gsub(QUESTION_MARK){literal(expr.shift)}.lit)
         else
-          expression_list_map(expr)
+          ::Sequel::SQL::ComplexExpression.from_value_pairs(expr)
         end
       when Proc
-        expr.to_sql(self)
-      else
-        # if the expression is compound, it should be parenthesized in order for 
-        # things to be predictable (when using #or and #and.)
-        parenthesize |= expr =~ /\).+\(/
+        expr.to_sql(self).lit
+      when Symbol, ::Sequel::SQL::Expression
         expr
+      when String, ::Sequel::LiteralString
+        "(#{expr})".lit
+      else
+        raise(Sequel::Error, 'Invalid filter argument')
       end
-      parenthesize ? "(#{fmt})" : fmt
-    end
-
-    def expression_list_map(expr)
-      expr.map {|i| compare_expr(i[0], i[1])}.join(AND_SEPARATOR)
     end
 
     # Returns the SQL for formatting an insert statement with default values

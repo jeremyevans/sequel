@@ -57,7 +57,7 @@ module Sequel
         sql = "#{literal(column[:name].to_sym)} #{type_literal(TYPES[column[:type]])}"
         column[:size] ||= 255 if column[:type] == :varchar
         elements = column[:size] || column[:elements]
-        sql << "(#{literal(elements)})" if elements
+        sql << literal(Array(elements)) if elements
         sql << UNSIGNED if column[:unsigned]
         sql << UNIQUE if column[:unique]
         sql << NOT_NULL if column[:null] == false
@@ -80,7 +80,7 @@ module Sequel
       def constraint_definition_sql(column)
         sql = column[:name] ? "CONSTRAINT #{literal(column[:name].to_sym)} " : ""
         
-        sql << "CHECK #{expression_list(column[:check], true)}"
+        sql << "CHECK #{filter_expr(column[:check])}"
         sql
       end
 
@@ -100,8 +100,8 @@ module Sequel
         "DROP TABLE #{name}"
       end
       
-      def expression_list(*args, &block)
-        schema_utility_dataset.send(:expression_list, *args, &block)
+      def filter_expr(*args, &block)
+        schema_utility_dataset.literal(schema_utility_dataset.send(:filter_expr, *args, &block))
       end
 
       def index_definition_sql(table_name, index)
@@ -111,9 +111,9 @@ module Sequel
         elsif index[:where]
           raise Error, "Partial indexes are not supported for this database"
         elsif index[:unique]
-          "CREATE UNIQUE INDEX #{index_name} ON #{table_name} (#{literal(index[:columns])})"
+          "CREATE UNIQUE INDEX #{index_name} ON #{table_name} #{literal(index[:columns])}"
         else
-          "CREATE INDEX #{index_name} ON #{table_name} (#{literal(index[:columns])})"
+          "CREATE INDEX #{index_name} ON #{table_name} #{literal(index[:columns])}"
         end
       end
     

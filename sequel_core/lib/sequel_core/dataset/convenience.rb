@@ -63,7 +63,7 @@ module Sequel
 
     # Returns a dataset grouped by the given column with count by group.
     def group_and_count(*columns)
-      group(*columns).select(columns + [COUNT_OF_ALL_AS_COUNT]).order(:count)
+      group(*columns).select(*(columns + [COUNT_OF_ALL_AS_COUNT])).order(:count)
     end
     
     # Returns the interval between minimum and maximum values for the given 
@@ -127,7 +127,7 @@ module Sequel
       elsif args[0].is_a?(Array) && args[1].is_a?(Dataset)
         table = @opts[:from].first
         columns, dataset = *args
-        sql = "INSERT INTO #{quote_identifier(table)} (#{literal(columns)}) VALUES (#{dataset.sql})"
+        sql = "INSERT INTO #{quote_identifier(table)} #{literal(columns)} VALUES #{literal(dataset)}"
         return @db.transaction {@db.execute sql}
       else
         # we assume that an array of hashes is given

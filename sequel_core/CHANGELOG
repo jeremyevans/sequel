@@ -1,5 +1,13 @@
 === HEAD
 
+* Add blockless filter syntax support (jeremyevans)
+
+* Passing an array to Dataset#order and Dataset#select no longer works, you need to pass multiple arguments (jeremyevans)
+
+* You no longer need to surround array placeholding ? with parantheses when using interpolated strings (jeremyevans)
+
+* Dataset.literal now surrounds the literalization of the members with parentheses (jeremyevans)
+
 * Add echo option (back?) to sequel command line tool, via -E or --echo (jeremyevans)
 
 * Allow databases to have multiple loggers (jeremyevans)
