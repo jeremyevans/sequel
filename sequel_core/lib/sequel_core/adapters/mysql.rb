@@ -55,7 +55,6 @@ class Mysql::Result
           row[i] = v.send(t)
         end
       end
-      row.keys = c
       yield row
     end
   end
