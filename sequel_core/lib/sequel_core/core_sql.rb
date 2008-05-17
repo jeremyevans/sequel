@@ -1,4 +1,12 @@
 class Array
+  def ~
+    ~to_complex_expr_if_all_two_pairs
+  end
+
+  def all_two_pairs?
+    !empty? && all?{|i| (Array === i) && (i.length == 2)}
+  end
+
   # Concatenates an array of strings into an SQL string. ANSI SQL and C-style
   # comments are removed, as well as excessive white-space.
   def to_sql
@@ -6,23 +14,20 @@ class Array
       gsub(/\/\*.*\*\//, '').gsub(/\s+/, ' ').strip
   end
 
-  def all_two_pairs?
-    !empty? && all?{|i| (Array === i) && (i.length == 2)}
-  end
-
-  def ~
-    ~to_complex_expr_if_all_two_pairs
-  end
   def sql_negate
     to_complex_expr_if_all_two_pairs(:AND, true)
   end
+
   def sql_or
     to_complex_expr_if_all_two_pairs(:OR)
   end
+
   def to_complex_expr
-    all_two_pairs? ? ::Sequel::SQL::ComplexExpression.from_value_pairs(self) : self
+    to_complex_expr_if_all_two_pairs
   end
+
   private
+
   def to_complex_expr_if_all_two_pairs(*args)
     raise(Sequel::Error, 'Not all elements of the array are arrays of size 2, so it cannot be converted to an SQL expression') unless all_two_pairs?
     ::Sequel::SQL::ComplexExpression.from_value_pairs(self, *args)
@@ -218,7 +223,16 @@ module Sequel
       attr_reader :op, :args
 
       def initialize(op, *args)
-        args.collect!{|a| a.is_one_of?(Hash, Array) ? a.to_complex_expr : a}
+        args.collect! do |a|
+          case a
+          when Hash
+            a.to_complex_expr
+          when Array
+            a.all_two_pairs? ? a.to_complex_expr : a
+          else
+            a
+          end
+        end
         case op
         when *N_ARITY_OPERATORS
           raise(Sequel::Error, 'mathematical and boolean operators require at least 1 argument') unless args.length >= 1
@@ -366,18 +380,23 @@ class Hash
   def &(ce)
     ::Sequel::SQL::ComplexExpression.new(:AND, self, ce)
   end
+
   def |(ce)
     ::Sequel::SQL::ComplexExpression.new(:OR, self, ce)
   end
+
   def ~
     ~::Sequel::SQL::ComplexExpression.from_value_pairs(self)
   end
+
   def sql_negate
     ::Sequel::SQL::ComplexExpression.from_value_pairs(self, :AND, true)
   end
+
   def sql_or
     ::Sequel::SQL::ComplexExpression.from_value_pairs(self, :OR)
   end
+
   def to_complex_expr
     ::Sequel::SQL::ComplexExpression.from_value_pairs(self)
   end

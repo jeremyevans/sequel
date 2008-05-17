@@ -1,5 +1,28 @@
 require File.join(File.dirname(__FILE__), 'spec_helper')
 
+context "Array#all_two_pairs?" do
+  specify "should return false if empty" do
+    [].all_two_pairs?.should == false
+  end
+
+  specify "should return false if any of the elements is not an array" do
+    [1].all_two_pairs?.should == false
+    [[1,2],1].all_two_pairs?.should == false
+  end
+
+  specify "should return false if any of the elements has a length other than two" do
+    [[1,2],[]].all_two_pairs?.should == false
+    [[1,2],[1]].all_two_pairs?.should == false
+    [[1,2],[1,2,3]].all_two_pairs?.should == false
+  end
+
+  specify "should return true if all of the elements are arrays with a length of two" do
+    [[1,2]].all_two_pairs?.should == true
+    [[1,2],[1,2]].all_two_pairs?.should == true
+    [[1,2],[1,2],[1,2]].all_two_pairs?.should == true
+  end
+end
+  
 context "Array#to_sql" do
   specify "should concatenate multiple lines into a single string" do
     "SELECT * \r\nFROM items\r\n WHERE a = 1".split.to_sql. \
@@ -177,9 +200,14 @@ context "Symbol#*" do
     @ds = Sequel::Dataset.new(nil)
   end
   
-  specify "should format a qualified wildcard" do
+  specify "should format a qualified wildcard if no argument" do
     :xyz.*.to_s(@ds).should == 'xyz.*'
     :abc.*.to_s(@ds).should == 'abc.*'
+  end
+
+  specify "should format a filter expression if an argument" do
+    :xyz.*(3).to_s(@ds).should == '(xyz * 3)'
+    :abc.*(5).to_s(@ds).should == '(abc * 5)'
   end
 end
 
