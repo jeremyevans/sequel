@@ -478,6 +478,24 @@ context "Dataset#exclude" do
   end
 end
 
+context "Dataset#invert" do
+  setup do
+    @d = Sequel::Dataset.new(nil).from(:test)
+  end
+
+  specify "should raise error if the dataset is not filtered" do
+    proc{@d.invert}.should raise_error(Sequel::Error)
+  end
+
+  specify "should invert current filter if dataset is filtered" do
+    @d.filter(:x).invert.sql.should == 'SELECT * FROM test WHERE NOT x'
+  end
+
+  specify "should invert both having and where if both are preset" do
+    @d.filter(:x).group(:x).having(:x).invert.sql.should == 'SELECT * FROM test WHERE NOT x GROUP BY x HAVING NOT x'
+  end
+end
+
 context "Dataset#having" do
   setup do
     @dataset = Sequel::Dataset.new(nil).from(:test)

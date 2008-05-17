@@ -17,11 +17,11 @@ module Sequel
       :inner => 'INNER JOIN'.freeze
     }
     N_ARITY_OPERATORS = ::Sequel::SQL::ComplexExpression::N_ARITY_OPERATORS
-    TWO_ARITY_OPERATORS = ::Sequel::SQL::ComplexExpression::TWO_ARITY_OPERATORS
     NULL = "NULL".freeze
     QUESTION_MARK = '?'.freeze
     STOCK_COUNT_OPTS = {:select => ["COUNT(*)".lit], :order => nil}.freeze
     TIMESTAMP_FORMAT = "TIMESTAMP '%Y-%m-%d %H:%M:%S'".freeze
+    TWO_ARITY_OPERATORS = ::Sequel::SQL::ComplexExpression::TWO_ARITY_OPERATORS
     WILDCARD = '*'.freeze
 
     # Adds an further filter to an existing filter using AND. If no filter 
@@ -282,6 +282,19 @@ module Sequel
     # the clause used is INTERSECT ALL, which may return duplicate rows.
     def intersect(dataset, all = false)
       clone(:intersect => dataset, :intersect_all => all)
+    end
+
+    # Inverts the current filter
+    #
+    #   dataset.filter(:category => 'software').invert.sql #=>
+    #     "SELECT * FROM items WHERE (category != 'software')"
+    def invert
+      having, where = @opts[:having], @opts[:where]
+      raise(Error, "No current filter") unless having || where
+      o = {}
+      o[:having] = ~having if having
+      o[:where] = ~where if where
+      clone(o)
     end
 
     # Returns a joined dataset with the specified join type and condition.

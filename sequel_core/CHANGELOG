@@ -1,5 +1,7 @@
 === HEAD
 
+* Add Dataset#invert, which returns a dataset with inverted HAVING and WHERE clauses (jeremyevans)
+
 * Add blockless filter syntax support (jeremyevans)
 
 * Passing an array to Dataset#order and Dataset#select no longer works, you need to pass multiple arguments (jeremyevans)
