@@ -111,9 +111,43 @@ context "Blockless Ruby Filters" do
     @d.l(~((((:x - :y)/(:x + :y))*:z) <= 100)).should == '((((x - y) / (x + y)) * z) > 100)'
   end
   
-  it "should only allow negation of boolean expressions" do
-    @d.l(~(:x + 1 > 100)).should == '((x + 1) <= 100)'
-    proc{@d.l(~(:x + 1))}.should raise_error(Sequel::Error)
+  it "should not allow negation of non-boolean expressions" do
+    proc{~(:x + 1 > 100)}.should_not raise_error 
+    proc{~(:x + 1)}.should raise_error(Sequel::Error)
+  end
+
+  it "should not allow mathematical or inequality operations on true, false, or nil" do
+    proc{:x + 1}.should_not raise_error
+    proc{:x - true}.should raise_error(Sequel::Error)
+    proc{:x / false}.should raise_error(Sequel::Error)
+    proc{:x * nil}.should raise_error(Sequel::Error)
+    proc{:x > 1}.should_not raise_error
+    proc{:x < true}.should raise_error(Sequel::Error)
+    proc{:x >= false}.should raise_error(Sequel::Error)
+    proc{:x <= nil}.should raise_error(Sequel::Error)
+  end
+
+  it "should not allow mathematical or inequality operations on boolean complex expressions" do
+    proc{:x + (:y + 1)}.should_not raise_error
+    proc{:x - (~:y)}.should raise_error(Sequel::Error)
+    proc{:x / (:y & :z)}.should raise_error(Sequel::Error)
+    proc{:x * (:y | :z)}.should raise_error(Sequel::Error)
+    proc{:x > (:y > 5)}.should raise_error(Sequel::Error)
+    proc{:x < (:y < 5)}.should raise_error(Sequel::Error)
+    proc{:x >= (:y >= 5)}.should raise_error(Sequel::Error)
+    proc{:x <= (:y <= 5)}.should raise_error(Sequel::Error)
+    proc{:x > {:y => nil}}.should raise_error(Sequel::Error)
+    proc{:x < ~{:y => nil}}.should raise_error(Sequel::Error)
+    proc{:x >= {:y => 5}}.should raise_error(Sequel::Error)
+    proc{:x <= ~{:y => 5}}.should raise_error(Sequel::Error)
+    proc{:x >= {:y => [1,2,3]}}.should raise_error(Sequel::Error)
+    proc{:x <= ~{:y => [1,2,3]}}.should raise_error(Sequel::Error)
+    proc{:x + :y.like('a')}.should raise_error(Sequel::Error)
+    proc{:x - :y.like(/a/)}.should raise_error(Sequel::Error)
+    proc{:x * :y.like(/a/i)}.should raise_error(Sequel::Error)
+    proc{:x + ~:y.like('a')}.should raise_error(Sequel::Error)
+    proc{:x - ~:y.like(/a/)}.should raise_error(Sequel::Error)
+    proc{:x * ~:y.like(/a/i)}.should raise_error(Sequel::Error)
   end
 
   it "should support AND conditions via &" do

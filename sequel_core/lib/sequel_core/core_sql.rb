@@ -216,6 +216,7 @@ module Sequel
       EQUALITY_OPERATORS = [:'=', :'!=', :IS, :'IS NOT', *INEQUALITY_OPERATORS]
       NO_BOOLEAN_INPUT_OPERATORS = MATHEMATICAL_OPERATORS + INEQUALITY_OPERATORS
       BOOLEAN_RESULT_OPERATORS = BOOLEAN_OPERATORS + EQUALITY_OPERATORS + SEARCH_OPERATORS + INCLUSION_OPERATORS + [:NOT]
+      BOOLEAN_LITERALS = [true, false, nil]
 
       TWO_ARITY_OPERATORS = EQUALITY_OPERATORS + SEARCH_OPERATORS + INCLUSION_OPERATORS
       N_ARITY_OPERATORS = MATHEMATICAL_OPERATORS + BOOLEAN_OPERATORS
@@ -231,6 +232,13 @@ module Sequel
             a.all_two_pairs? ? a.to_complex_expr : a
           else
             a
+          end
+        end
+        if NO_BOOLEAN_INPUT_OPERATORS.include?(op)
+          args.any? do |a|
+            if BOOLEAN_LITERALS.include?(a) || ((ComplexExpression === a) && BOOLEAN_RESULT_OPERATORS.include?(a.op))
+              raise(Sequel::Error, "cannot apply #{op} to a boolean expression")
+            end
           end
         end
         case op
