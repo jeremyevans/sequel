@@ -1,5 +1,7 @@
 === HEAD
 
+* Add Dataset#as, so using a dataset as a column with an alias is not deprecated (jeremyevans)
+
 * Add Dataset#invert, which returns a dataset with inverted HAVING and WHERE clauses (jeremyevans)
 
 * Add blockless filter syntax support (jeremyevans)

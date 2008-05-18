@@ -126,6 +126,12 @@ module Sequel
       insert(*args)
     end
   
+    # Return the dataset as a column with the given alias, so it can be used in the
+    # SELECT clause.
+    def as(a)
+      ::Sequel::SQL::ColumnExpr.new(self, AS, a)
+    end
+
     # Returns an array with all records in the dataset. If a block is given,
     # the array is iterated over.
     def all(opts = nil, &block)

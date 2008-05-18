@@ -569,6 +569,14 @@ context "Dataset#group_by" do
   end
 end
 
+context "Dataset#as" do
+  specify "should set up an alias" do
+    dataset = Sequel::Dataset.new(nil).from(:test)
+    dataset.select(dataset.limit(1).select(:name).as(:n)).sql.should == \
+      'SELECT (SELECT name FROM test LIMIT 1) AS n FROM test'
+  end
+end
+
 context "Dataset#literal" do
   setup do
     @dataset = Sequel::Dataset.new(nil).from(:test)
