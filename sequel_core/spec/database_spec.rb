@@ -97,7 +97,7 @@ context "Database#dataset" do
     e.sql.should == 'SELECT * FROM miu'
   end
   
-  specify "should provide a filtered #from dataset if a block is given" do
+  pt_specify "should provide a filtered #from dataset if a block is given" do
     d = @db.from(:mau) {:x > 100}
     d.should be_a_kind_of(Sequel::Dataset)
     d.sql.should == 'SELECT * FROM mau WHERE (x > 100)'
@@ -808,7 +808,7 @@ context "Database#fetch" do
     ds.select_sql.should == 'select * from xyz'
     ds.sql.should == 'select * from xyz'
     
-    ds.filter! {:price < 100}
+    ds.filter!(:price < 100)
     ds.select_sql.should == 'select * from xyz'
     ds.sql.should == 'select * from xyz'
   end

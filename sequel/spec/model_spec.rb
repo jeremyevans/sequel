@@ -159,7 +159,7 @@ describe Sequel::Model, ".subset" do
     @c = Class.new(Sequel::Model(:items))
   end
 
-  it "should create a filter on the underlying dataset" do
+  pt_specify "should create a filter on the underlying dataset" do
     proc {@c.new_only}.should raise_error(NoMethodError)
     
     @c.subset(:new_only) {:age == 'new'}
@@ -201,11 +201,11 @@ describe Sequel::Model, ".find" do
     @c.find(:name => 'sharon').should be_a_kind_of(@c)
     $sqls.last.should == "SELECT * FROM items WHERE (name = 'sharon') LIMIT 1"
 
-    @c.find {"name LIKE 'abc%'".lit}.should be_a_kind_of(@c)
-    $sqls.last.should == "SELECT * FROM items WHERE name LIKE 'abc%' LIMIT 1"
+    @c.find(:name.like('abc%')).should be_a_kind_of(@c)
+    $sqls.last.should == "SELECT * FROM items WHERE (name LIKE 'abc%') LIMIT 1"
   end
   
-  it "should accept filter blocks" do
+  pt_specify "should accept filter blocks" do
     @c.find {:id == 1}.should be_a_kind_of(@c)
     $sqls.last.should == "SELECT * FROM items WHERE (id = 1) LIMIT 1"
 

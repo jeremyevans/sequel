@@ -49,3 +49,8 @@ class SchemaDummyDatabase < Sequel::Database
   end
 end
 
+class Spec::Example::ExampleGroup
+  def self.pt_specify(*args, &block)
+    specify(*args, &block) if defined?(::ParseTree)
+  end
+end
