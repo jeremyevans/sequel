@@ -275,5 +275,3 @@ module Inflector
     end
   end
 end
-
-require File.dirname(__FILE__) + '/inflections'

@@ -235,7 +235,7 @@ module Sequel
     end
     
     # Add model methods that call dataset methods
-    def_dataset_method *DATASET_METHODS
+    def_dataset_method(*DATASET_METHODS)
 
     ### Private Class Methods ###
     

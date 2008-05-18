@@ -60,7 +60,7 @@ class Module
     #     attr_reader *meths
     #   end
     def metaattr_reader(*meths)
-      metaclass.instance_eval{attr_reader *meths}
+      metaclass.instance_eval{attr_reader(*meths)}
     end
 
     # Make a singleton/class method(s) private.
@@ -70,7 +70,7 @@ class Module
     #     private *meths
     #   end
     def metaprivate(*meths)
-      metaclass.instance_eval{private *meths}
+      metaclass.instance_eval{private(*meths)}
     end
 end
 

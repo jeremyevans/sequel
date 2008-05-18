@@ -22,7 +22,7 @@ module Sequel
       if m.const_defined?("DatasetMethods")
         dataset.meta_def(:"#{plugin}_opts") {args.first}
         dataset.metaclass.send(:include, m::DatasetMethods)
-        def_dataset_method *m::DatasetMethods.instance_methods
+        def_dataset_method(*m::DatasetMethods.instance_methods)
       end
     end
     metaalias :is_a, :is
