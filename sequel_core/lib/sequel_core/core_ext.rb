@@ -29,6 +29,11 @@ end
 
 # Add some metaprogramming methods to avoid class << self
 class Module
+  # Defines an instance method within a class/module
+  def class_def(name, &block)
+    class_eval{define_method(name, &block)}
+  end 
+
   private
     # Define an instance method(s) that class the class method of the
     # same name. Replaces the construct:
@@ -69,16 +74,34 @@ class Module
     end
 end
 
+# Helpers from Metaid and a bit more
 class Object
+  # Objects are blank if they respond true to empty?
+  def blank?
+    respond_to?(:empty?) && empty?
+  end
+
   # Returns true if the object is a object of one of the classes
   def is_one_of?(*classes)
     !!classes.find{|c| is_a?(c)}
   end
 
-  # Objects are blank if they respond true to empty?
-  def blank?
-    respond_to?(:empty?) && empty?
-  end
+  # Add methods to the object's metaclass
+  def meta_def(name, &block)
+    meta_eval{define_method(name, &block)}
+  end 
+
+  # Evaluate the block in the context of the object's metaclass
+  def meta_eval(&block)
+    metaclass.instance_eval(&block)
+  end 
+
+  # The hidden singleton lurks behind everyone
+  def metaclass
+    class << self
+      self
+    end 
+  end 
 end
 
 class NilClass

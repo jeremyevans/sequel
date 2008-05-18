@@ -1,7 +1,7 @@
-%w'bigdecimal bigdecimal/util date enumerator metaid thread time uri yaml'.each do |f|
+%w'bigdecimal bigdecimal/util date enumerator thread time uri yaml'.each do |f|
   require f
 end
-%w"deprecated core_ext core_sql connection_pool exceptions pretty_table
+%w"core_ext deprecated core_sql connection_pool exceptions pretty_table
   dataset migration schema database worker object_graph".each do |f|
   require "sequel_core/#{f}"
 end

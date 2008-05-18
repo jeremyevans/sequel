@@ -1,5 +1,7 @@
 === HEAD
 
+* Merge metaid gem into core_ext.rb and clean it up, so sequel now has no external dependencies (jeremyevans)
+
 * Add Dataset#as, so using a dataset as a column with an alias is not deprecated (jeremyevans)
 
 * Add Dataset#invert, which returns a dataset with inverted HAVING and WHERE clauses (jeremyevans)
