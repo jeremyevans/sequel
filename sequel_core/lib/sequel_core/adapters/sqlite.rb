@@ -136,6 +136,27 @@ module Sequel
         end
       end
       
+      SCHEMA_TYPE_RE = /\A(\w+)\((\d+)\)\z/
+      def schema_for_table(table_name, schema=nil)
+        rows = self["PRAGMA table_info('#{::SQLite3::Database.quote(table_name.to_s)}')"].collect do |row|
+          row.delete(:cid)
+          row[:column] = row.delete(:name)
+          row[:allow_null] = row.delete(:notnull) ? 'NO' : 'YES'
+          row[:default] = row.delete(:dflt_value)
+          row[:primary_key] = row.delete(:pk).to_i == 1 ? true : false 
+          row[:db_type] = row.delete(:type)
+          if m = SCHEMA_TYPE_RE.match(row[:db_type])
+            row[:db_type] = m[1]
+            row[:max_chars] = m[2].to_i
+          else
+             row[:max_chars] = nil
+          end
+          row[:numeric_precision] = nil
+          row
+        end
+        schema_for_table_parse_rows(rows)
+      end
+
       private
         def connection_pool_default_options
           o = super.merge(:pool_reuse_connections=>:always, :pool_convert_exceptions=>false)

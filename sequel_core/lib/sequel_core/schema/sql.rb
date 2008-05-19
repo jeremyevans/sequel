@@ -144,12 +144,71 @@ module Sequel
         "ALTER TABLE #{name} RENAME TO #{new_name}"
       end
       
+      def schema_for_table(table_name, schema = nil)
+        ds = schema_utility_dataset.clone
+        schema_for_table_from(ds)
+        schema_for_table_select(ds)
+        schema_for_table_join(ds)
+        schema_for_table_filter(ds, table_name, schema)
+        schema_for_table_parse_rows(ds)
+      end
+
       def schema_utility_dataset
         @schema_utility_dataset ||= dataset
       end
       
       def type_literal(t)
         t.is_a?(Symbol) ? t.to_s : literal(t)
+      end
+
+      private
+      def schema_column_type(db_type)
+        case db_type
+        when /\A(int(eger)?|bigint|smallint)\z/
+          :integer
+        when /\A(character( varying)?|varchar|text)\z/
+          :string
+        when /\A(date)\z/
+          :date
+        when /\A(datetime|time|timestamp( with(out)? time zone)?)\z/
+          :datetime
+        when /\A(boolean|tinyint)\z/
+          :boolean
+        when /\A(real|float|double( precision)?)\z/
+          :float
+        else
+          :unknown
+        end
+      end
+
+      def schema_for_table_filter(ds, table_name, schema=nil)
+        ds.filter!(:c__table_name=>table_name.to_s)
+        ds.filter!(:c__table_schema=>schema) if schema
+      end
+
+      def schema_for_table_from(ds)
+        ds.from!(:information_schema__tables___t)
+      end
+
+      def schema_for_table_join(ds)
+        ds.join!(:information_schema__columns, {:table_catalog=>:table_catalog,
+          :table_schema => :table_schema, :table_name => :table_name} , :c)
+      end
+
+      def schema_for_table_parse_rows(rows)
+        schema = []
+        rows.each do |row| 
+          row[:allow_null] = row[:allow_null] == 'YES' ? true : false
+          row[:default] = nil if row[:default].blank?
+          row[:type] = schema_column_type(row[:db_type])
+          schema << [row.delete(:column).to_sym, row]
+        end
+        schema
+      end
+
+      def schema_for_table_select(ds)
+        ds.select!(:column_name___column, :data_type___db_type, :character_maximum_length___max_chars, \
+          :numeric_precision, :column_default___default, :is_nullable___allow_null)
       end
     end
   end

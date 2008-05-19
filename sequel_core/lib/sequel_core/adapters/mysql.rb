@@ -245,6 +245,14 @@ module Sequel
         def connection_pool_default_options
           super.merge(:pool_reuse_connections=>:last_resort, :pool_convert_exceptions=>false)
         end
+
+        def schema_for_table_filter(ds, table_name, schema=nil)
+          ds.filter!(:c__table_name=>table_name.to_s)
+        end
+
+        def schema_for_table_join(ds)
+          ds.join!(:information_schema__columns, {:table_schema => :table_schema, :table_name => :table_name}, :c)
+        end
     end
 
     class Dataset < Sequel::Dataset
