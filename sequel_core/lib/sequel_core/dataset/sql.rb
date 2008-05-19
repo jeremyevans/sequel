@@ -310,7 +310,7 @@ module Sequel
       else
         table = table.table_name if table.respond_to?(:table_name)
         table_alias ||= table
-        quote_identifier(table)
+        table_ref(table)
       end
 
       expr = [[expr, :id]] unless expr.is_one_of?(Hash, Array)
@@ -569,22 +569,9 @@ module Sequel
     #   :items__abc.to_column_ref(ds) #=> "items.abc"
     #   :items__abc___a.to_column_ref(ds) #=> "items.abc AS a"
     #
-    def symbol_to_column_ref(sym, table=(qualify=false; nil))
-      s = sym.to_s
-      if m = COLUMN_REF_RE1.match(s)
-        table, column, aliaz = m[1], m[2], m[3]
-      elsif m = COLUMN_REF_RE2.match(s)
-        column, aliaz = m[1], m[2]
-      elsif m = COLUMN_REF_RE3.match(s)
-        table, column = m[1], m[2]
-      else
-        column = s
-      end
-      if qualify == false
-        "#{"#{quote_identifier(table)}." if table}#{quote_identifier(column)}#{" AS #{quote_identifier(aliaz)}" if aliaz}"
-      else
-        ::Sequel::SQL::QualifiedColumnRef.new(table, column)
-      end
+    def symbol_to_column_ref(sym)
+      c_table, column, c_alias = split_symbol(sym)
+      "#{"#{quote_identifier(c_table)}." if c_table}#{quote_identifier(column)}#{" AS #{quote_identifier(c_alias)}" if c_alias}"
     end
 
     # Returns a copy of the dataset with no filters (HAVING or WHERE clause) applied.
@@ -726,7 +713,14 @@ module Sequel
     # Returns a qualified column name (including a table name) if the column
     # name isn't already qualified.
     def qualified_column_name(column, table)
-      Symbol === column ? symbol_to_column_ref(column, table) : column
+      if Symbol === column 
+        c_table, column, c_alias = split_symbol(column)
+        schema, table, t_alias = split_symbol(table) if Symbol === table
+        c_table ||= t_alias || table
+        ::Sequel::SQL::QualifiedColumnRef.new(c_table, column)
+      else
+        column
+      end
     end
 
     # Converts an array of sources names into into a comma separated list.
@@ -747,13 +741,33 @@ module Sequel
       m.join(COMMA_SEPARATOR)
     end
     
+    # Splits the symbol into three parts.  Each part will
+    # either be a string or nil.
+    #
+    # For columns, these parts are the table, column, and alias.
+    # For tables, these parts are the schema, table, and alias.
+    def split_symbol(sym)
+      s = sym.to_s
+      if m = COLUMN_REF_RE1.match(s)
+         m[1..3]
+      elsif m = COLUMN_REF_RE2.match(s)
+        [nil, m[1], m[2]]
+      elsif m = COLUMN_REF_RE3.match(s)
+        [m[1], m[2], nil]
+      else
+        [nil, s, nil]
+      end
+    end
+
     def table_ref(t)
       case t
       when Dataset
         t.to_table_reference
       when Hash
         t.map {|k, v| "#{table_ref(k)} #{table_ref(v)}"}.join(COMMA_SEPARATOR)
-      when Symbol, String
+      when Symbol
+        symbol_to_column_ref(t)
+      when String
         quote_identifier(t)
       else
         literal(t)
