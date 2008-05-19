@@ -2031,7 +2031,20 @@ context "A paginated dataset" do
     @d.paginate(4, 50).current_page_record_count.should == 3
     @d.paginate(5, 50).current_page_record_count.should == 0
   end
-  
+
+  specify "should know if current page is last page" do
+    @paginated.last_page?.should be_false
+    @d.paginate(2, 20).last_page?.should be_false
+    @d.paginate(5, 30).last_page?.should be_false
+    @d.paginate(6, 30).last_page?.should be_true
+  end
+
+  specify "should know if current page is first page" do
+    @paginated.first_page?.should be_true
+    @d.paginate(1, 20).first_page?.should be_true
+    @d.paginate(2, 20).first_page?.should be_false
+  end
+
   specify "should work with fixed sql" do
     ds = @d.clone(:sql => 'select * from blah')
     ds.meta_def(:count) {150}

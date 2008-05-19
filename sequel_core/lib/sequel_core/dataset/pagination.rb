@@ -7,7 +7,7 @@ module Sequel
     def paginate(page_no, page_size)
       raise(Error, "You cannot paginate a dataset that already has a limit") if @opts[:limit]
       record_count = count
-      total_pages = (record_count / page_size.to_f).ceil
+      total_pages = record_count.zero? ? 1 : (record_count / page_size.to_f).ceil
       paginated = limit(page_size, (page_no - 1) * page_size)
       paginated.extend(Pagination)
       paginated.set_pagination_info(page_no, page_size, record_count)
@@ -73,6 +73,16 @@ module Sequel
         b = a + @page_size - 1
         b = @pagination_record_count if b > @pagination_record_count
         b - a + 1
+      end
+
+      # Returns true if the current page is the last page
+      def last_page?
+        @current_page == @page_count
+      end
+
+      # Returns true if the current page is the first page
+      def first_page?
+        @current_page == 1
       end
     end
   end

@@ -1,5 +1,7 @@
 === HEAD
 
+* Add Pagination#last_page? and Pagination#first_page? (apeiros)
+
 * Add limited column reflection support, tested on PostgreSQL, MySQL, and SQLite (jeremyevans)
 
 * Allow the use of :schema__table___table_alias syntax for tables, similar to the column support (jeremyevans)
