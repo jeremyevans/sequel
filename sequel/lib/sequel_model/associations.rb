@@ -19,6 +19,7 @@
 #   milestones, allowing for further filtering/limiting/etc.
 # * add_milestone(obj) - Associates the passed milestone with this object
 # * remove_milestone(obj) - Removes the association with the passed milestone
+# * remove_all_milestones - Removes associations with all associated milestones
 #
 # By default the classes for the associations are inferred from the association
 # name, so for example the Project#portfolio will return an instance of 
@@ -187,6 +188,11 @@ module Sequel::Model::Associations
   end
   
   # Name symbol for remove_method_name
+  def association_remove_all_method_name(name)
+    :"remove_all_#{name}"
+  end
+  
+  # Name symbol for remove_method_name
   def association_remove_method_name(name)
     :"remove_#{name.to_s.singularize}"
   end
@@ -293,6 +299,20 @@ module Sequel::Model::Associations
       end
       o
     end
+    class_def(association_remove_all_method_name(name)) do
+      database[join_table].filter(left=>pk).delete
+      if arr = instance_variable_get(ivar)
+        reciprocal = opts.reciprocal
+        ret = arr.dup
+        arr.each do |o|
+          if reciprocal && (list = o.instance_variable_get(reciprocal))
+            list.delete(self)
+          end
+        end
+      end
+      instance_variable_set(ivar, [])
+      ret
+    end
   end
   
   # Adds many_to_one association instance methods
@@ -348,6 +368,17 @@ module Sequel::Model::Associations
         o.instance_variable_set(reciprocal, :null)
       end
       o
+    end
+    class_def(association_remove_all_method_name(name)) do
+      opts.associated_class.filter(key=>pk).update(key=>nil)
+      if arr = instance_variable_get(ivar)
+        ret = arr.dup
+        if reciprocal = opts.reciprocal
+          arr.each{|o| o.instance_variable_set(reciprocal, :null)} 
+        end
+      end
+      instance_variable_set(ivar, [])
+      ret
     end
   end
   

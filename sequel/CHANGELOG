@@ -1,5 +1,7 @@
 === HEAD
 
+* Add remove_all_* association method for *_to_many associations, which removes the association with all currently associated objects (jeremyevans)
+
 * Add Model.lazy_load_schema=, when set to true, it loads the schema (columns) on first instantiation (jeremyevans)
 
 * Add before_validation and after_validation hooks, called whenever the model is validated (jeremyevans)

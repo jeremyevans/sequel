@@ -534,6 +534,55 @@ describe Sequel::Model, "one_to_many" do
     
     MODEL_DB.sqls.length.should == 1
   end
+  
+  it "should have an remove_all_ method that removes all associations" do
+    @c2.one_to_many :attributes, :class => @c1
+    @c2.new(:id => 1234).remove_all_attributes
+    MODEL_DB.sqls.first.should == 'UPDATE attributes SET node_id = NULL WHERE (node_id = 1234)'
+  end
+
+  it "remove_all should set the cached instance variable to []" do
+    @c2.one_to_many :attributes, :class => @c1
+    node = @c2.new(:id => 1234)
+    node.remove_all_attributes
+    node.instance_variable_get(:@attributes).should == []
+  end
+
+  it "remove_all should return the array of previously associated items if the cached instance variable exists" do
+    @c2.one_to_many :attributes, :class => @c1
+    attrib = @c1.new(:id=>3)
+    node = @c2.new(:id => 1234)
+    d = @c1.dataset
+    def d.fetch_rows(s); end
+    node.attributes.should == []
+    def attrib.save!; end
+    node.add_attribute(attrib)
+    node.instance_variable_get(:@attributes).should == [attrib]
+    node.remove_all_attributes.should == [attrib]
+  end
+
+  it "remove_all should return nil if the cached instance variable does not exist" do
+    @c2.one_to_many :attributes, :class => @c1
+    @c2.new(:id => 1234).remove_all_attributes.should == nil
+  end
+
+  it "remove_all should remove the current item from all reciprocal instance varaibles if it cached instance variable exists" do
+    @c2.one_to_many :attributes, :class => @c1
+    @c1.many_to_one :node, :class => @c2
+    d = @c1.dataset
+    def d.fetch_rows(s); end
+    d = @c2.dataset
+    def d.fetch_rows(s); end
+    attrib = @c1.new(:id=>3)
+    node = @c2.new(:id => 1234)
+    node.attributes.should == []
+    attrib.node.should == nil
+    def attrib.save!; end
+    node.add_attribute(attrib)
+    attrib.instance_variable_get(:@node).should == node 
+    node.remove_all_attributes
+    attrib.instance_variable_get(:@node).should == :null
+  end
 end
 
 describe Sequel::Model, "many_to_many" do
@@ -792,6 +841,52 @@ describe Sequel::Model, "many_to_many" do
     a.sql.should == 'SELECT attributes.* FROM attributes INNER JOIN attributes_nodes ON ((attributes_nodes.attribute_id = attributes.id) AND (attributes_nodes.node_id = 1234))'
   end
   
+  it "should have an remove_all_ method that removes all associations" do
+    @c2.many_to_many :attributes, :class => @c1
+    @c2.new(:id => 1234).remove_all_attributes
+    MODEL_DB.sqls.first.should == 'DELETE FROM attributes_nodes WHERE (node_id = 1234)'
+  end
+
+  it "remove_all should set the cached instance variable to []" do
+    @c2.many_to_many :attributes, :class => @c1
+    node = @c2.new(:id => 1234)
+    node.remove_all_attributes
+    node.instance_variable_get(:@attributes).should == []
+  end
+
+  it "remove_all should return the array of previously associated items if the cached instance variable exists" do
+    @c2.many_to_many :attributes, :class => @c1
+    attrib = @c1.new(:id=>3)
+    node = @c2.new(:id => 1234)
+    d = @c1.dataset
+    def d.fetch_rows(s); end
+    node.attributes.should == []
+    node.add_attribute(attrib)
+    node.instance_variable_get(:@attributes).should == [attrib]
+    node.remove_all_attributes.should == [attrib]
+  end
+
+  it "remove_all should return nil if the cached instance variable does not exist" do
+    @c2.many_to_many :attributes, :class => @c1
+    @c2.new(:id => 1234).remove_all_attributes.should == nil
+  end
+
+  it "remove_all should remove the current item from all reciprocal instance varaibles if it cached instance variable exists" do
+    @c2.many_to_many :attributes, :class => @c1
+    @c1.many_to_many :nodes, :class => @c2
+    d = @c1.dataset
+    def d.fetch_rows(s); end
+    d = @c2.dataset
+    def d.fetch_rows(s); end
+    attrib = @c1.new(:id=>3)
+    node = @c2.new(:id => 1234)
+    node.attributes.should == []
+    attrib.nodes.should == []
+    node.add_attribute(attrib)
+    attrib.instance_variable_get(:@nodes).should == [node]
+    node.remove_all_attributes
+    attrib.instance_variable_get(:@nodes).should == []
+  end
 end
 
 describe Sequel::Model, "all_association_reflections" do
