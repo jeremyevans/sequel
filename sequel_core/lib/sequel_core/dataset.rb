@@ -275,7 +275,6 @@ module Sequel
     # and specify nil as the class:
     # 
     #   dataset.set_model(nil)
-    #
     def set_model(key, *args)
       # This code is more verbose then necessary for performance reasons
       case key
@@ -297,7 +296,7 @@ module Sequel
         # polymorphic model
         hash = args.shift || raise(ArgumentError, "No class hash supplied for polymorphic model")
         @opts.merge!(:naked => true, :models => hash, :polymorphic_key => key)
-        if hash.values.first.respond_to?(:load)
+        if (hash.empty? ? (hash[nil] rescue nil) : hash.values.first).respond_to?(:load)
           # the class has a values setter method, so we use it
           self.row_proc = proc do |h|
             c = hash[h[key]] || hash[nil] || \
