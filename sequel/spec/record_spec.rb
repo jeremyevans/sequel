@@ -254,8 +254,8 @@ describe Sequel::Model, "with this" do
 
     parts = [
       'SELECT * FROM examples WHERE %s LIMIT 1',
-      '(x = 4) AND (y = 5)', 
-      '(y = 5) AND (x = 4)'
+      '((x = 4) AND (y = 5))', 
+      '((y = 5) AND (x = 4))'
     ].map { |expr| Regexp.escape expr }
     regexp = Regexp.new parts.first % "(?:#{parts[1]}|#{parts[2]})"
 

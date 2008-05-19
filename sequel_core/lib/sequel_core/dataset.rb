@@ -1,12 +1,6 @@
-require 'time'
-require 'date'
-require 'yaml'
-
-require File.join(File.dirname(__FILE__), 'dataset/sql')
-require File.join(File.dirname(__FILE__), 'dataset/sequelizer')
-require File.join(File.dirname(__FILE__), 'dataset/convenience')
-require File.join(File.dirname(__FILE__), 'dataset/callback')
-require File.join(File.dirname(__FILE__), 'dataset/pagination')
+%w'callback convenience pagination query schema sequelizer sql'.each do |f|
+ require "sequel_core/dataset/#{f}"
+end
 
 module Sequel
   # A Dataset represents a view of a the data in a database, constrained by
@@ -67,25 +61,30 @@ module Sequel
   #   end
   class Dataset
     include Enumerable
-    include Sequelizer
-    include SQL
-    include Convenience
-    include Callback
     
+    COLUMN_CHANGE_OPTS = [:select, :sql, :from, :join].freeze
+    DATASET_CLASSES = []
+    MUTATION_METHODS = %w'and distinct exclude exists filter from from_self full_outer_join graph
+    group group_and_count group_by having inner_join intersect invert join
+    left_outer_join limit naked or order order_by order_more paginate query reject
+    reverse reverse_order right_outer_join select select_all select_more
+    set_graph_aliases set_model sort sort_by unfiltered union unordered where'.collect{|x| x.to_sym}
+    NOTIMPL_MSG = "This method must be overriden in Sequel adapters".freeze
+    STOCK_TRANSFORMS = {
+      :marshal => [
+        # for backwards-compatibility we support also non-base64-encoded values.
+        proc {|v| Marshal.load(v.unpack('m')[0]) rescue Marshal.load(v)}, 
+        proc {|v| [Marshal.dump(v)].pack('m')}
+      ],
+      :yaml => [
+        proc {|v| YAML.load v if v}, 
+        proc {|v| v.to_yaml}
+      ]
+    }
+
     attr_accessor :db, :opts, :row_proc
+    attr_writer :quote_identifiers
     
-    alias_method :size, :count
-    
-    # Returns an array with all records in the dataset. If a block is given,
-    # the array is iterated over.
-    def all(opts = nil, &block)
-      a = []
-      each(opts) {|r| a << r}
-      post_load(a)
-      a.each(&block) if block
-      a
-    end
-  
     # Constructs a new instance of a dataset with a database instance, initial
     # options and an optional record class. Datasets are usually constructed by
     # invoking Database methods:
@@ -97,54 +96,58 @@ module Sequel
     # database adaptor should provide a descendant class of Sequel::Dataset.
     def initialize(db, opts = nil)
       @db = db
+      @quote_identifiers = db.quote_identifiers? if db.respond_to?(:quote_identifiers?)
       @opts = opts || {}
       @row_proc = nil
       @transform = nil
     end
     
+    ### Class Methods ###
+
+    def self.dataset_classes #:nodoc:
+      DATASET_CLASSES
+    end
+
+    # Setup mutation (e.g. filter!) methods
+    def self.def_mutation_method(*meths)
+      meths.each do |meth|
+        class_eval("def #{meth}!(*args, &block); mutation_method(:#{meth}, *args, &block) end")
+      end
+    end
+
+    def self.inherited(c) #:nodoc:
+      DATASET_CLASSES << c
+    end
+    
+    ### Instance Methods ###
+
+    # Inserts the supplied values into the associated table.
+    def <<(*args)
+      insert(*args)
+    end
+  
+    # Return the dataset as a column with the given alias, so it can be used in the
+    # SELECT clause.
+    def as(a)
+      ::Sequel::SQL::ColumnExpr.new(self, AS, a)
+    end
+
+    # Returns an array with all records in the dataset. If a block is given,
+    # the array is iterated over.
+    def all(opts = nil, &block)
+      a = []
+      each(opts) {|r| a << r}
+      post_load(a)
+      a.each(&block) if block
+      a
+    end
+  
     # Returns a new clone of the dataset with with the given options merged.
     def clone(opts = {})
       c = super()
       c.opts = @opts.merge(opts)
-      c.instance_variable_set(:@columns, nil)
+      c.instance_variable_set(:@columns, nil) unless (opts.keys & COLUMN_CHANGE_OPTS).empty?
       c
-    end
-    
-    NOTIMPL_MSG = "This method must be overriden in Sequel adapters".freeze
-    
-    # Executes a select query and fetches records, passing each record to the
-    # supplied block. Adapters should override this method.
-    def fetch_rows(sql, &block)
-      # @db.synchronize do
-      #   r = @db.execute(sql)
-      #   r.each(&block)
-      # end
-      raise NotImplementedError, NOTIMPL_MSG
-    end
-  
-    # Inserts values into the associated table. Adapters should override this
-    # method.
-    def insert(*values)
-      # @db.synchronize do
-      #   @db.execute(insert_sql(*values)).last_insert_id
-      # end
-      raise NotImplementedError, NOTIMPL_MSG
-    end
-  
-    # Updates values for the dataset. Adapters should override this method.
-    def update(values, opts = nil)
-      # @db.synchronize do
-      #   @db.execute(update_sql(values, opts)).affected_rows
-      # end
-      raise NotImplementedError, NOTIMPL_MSG
-    end
-  
-    # Deletes the records in the dataset. Adapters should override this method.
-    def delete(opts = nil)
-      # @db.synchronize do
-      #   @db.execute(delete_sql(opts)).affected_rows
-      # end
-      raise NotImplementedError, NOTIMPL_MSG
     end
     
     # Returns the columns in the result set in their true order. The stock 
@@ -152,23 +155,24 @@ module Sequel
     # a query is performed. Adapters are expected to fill @columns with the
     # column information when a query is performed.
     def columns
-      first unless @columns
+      single_record unless @columns
       @columns || []
     end
     
     def columns!
-      first
-      @columns || []
+      @columns = nil
+      columns
     end
     
-    # Inserts the supplied values into the associated table.
-    def <<(*args)
-      insert(*args)
+    def def_mutation_method(*meths)
+      meths.each do |meth|
+        instance_eval("def #{meth}!(*args, &block); mutation_method(:#{meth}, *args, &block) end")
+      end
     end
-  
-    # Updates the dataset with the given values.
-    def set(*args, &block)
-      update(*args, &block)
+
+    # Deletes the records in the dataset. Adapters should override this method.
+    def delete(opts = nil)
+      raise NotImplementedError, NOTIMPL_MSG
     end
     
     # Iterates over the records in the dataset
@@ -187,9 +191,33 @@ module Sequel
       self
     end
 
+    # Executes a select query and fetches records, passing each record to the
+    # supplied block. Adapters should override this method.
+    def fetch_rows(sql, &block)
+      raise NotImplementedError, NOTIMPL_MSG
+    end
+  
+    # Inserts values into the associated table. Adapters should override this
+    # method.
+    def insert(*values)
+      raise NotImplementedError, NOTIMPL_MSG
+    end
+  
+    # Returns a string representation of the dataset including the class name 
+    # and the corresponding SQL select statement.
+    def inspect
+      "#<#{self.class}: #{sql.inspect}>"
+    end
+
     # Returns the the model classes associated with the dataset as a hash.
     def model_classes
       @opts[:models]
+    end
+    
+    # Returns a naked dataset clone - i.e. a dataset that returns records as
+    # hashes rather than model objects.
+    def naked
+      clone.set_model(nil)
     end
     
     # Returns the column name for the polymorphic key.
@@ -197,12 +225,14 @@ module Sequel
       @opts[:polymorphic_key]
     end
     
-    # Returns a naked dataset clone - i.e. a dataset that returns records as
-    # hashes rather than model objects.
-    def naked
-      d = clone(:naked => true, :models => nil, :polymorphic_key => nil)
-      d.set_model(nil)
-      d
+    # Whether to quote identifiers for this dataset
+    def quote_identifiers?
+      @quote_identifiers
+    end
+
+    # Updates the dataset with the given values.
+    def set(*args, &block)
+      update(*args, &block)
     end
     
     # Associates or disassociates the dataset with a model. If no argument or
@@ -247,7 +277,7 @@ module Sequel
     #   dataset.set_model(nil)
     #
     def set_model(key, *args)
-      # pattern matching
+      # This code is more verbose then necessary for performance reasons
       case key
       when nil # set_model(nil) => no
         # no argument provided, so the dataset is denuded
@@ -287,18 +317,6 @@ module Sequel
       end
       self
     end
-    
-    STOCK_TRANSFORMS = {
-      :marshal => [
-        # for backwards-compatibility we support also non-base64-encoded values.
-        proc {|v| Marshal.load(v.unpack('m')[0]) rescue Marshal.load(v)}, 
-        proc {|v| [Marshal.dump(v)].pack('m')}
-      ],
-      :yaml => [
-        proc {|v| YAML.load v if v}, 
-        proc {|v| v.to_yaml}
-      ]
-    }
     
     # Sets a value transform which is used to convert values loaded and saved
     # to/from the database. The transform should be supplied as a hash. Each
@@ -357,40 +375,11 @@ module Sequel
       end
     end
     
-    @@dataset_classes = []
-
-    def self.dataset_classes #:nodoc:
-      @@dataset_classes
+    # Updates values for the dataset. Adapters should override this method.
+    def update(values, opts = nil)
+      raise NotImplementedError, NOTIMPL_MSG
     end
-
-    def self.inherited(c) #:nodoc:
-      @@dataset_classes << c
-    end
-    
-    # Returns a string representation of the dataset including the class name 
-    # and the corresponding SQL select statement.
-    def inspect
-      '#<%s: %s>' % [self.class.to_s, sql.inspect]
-    end
-
-    # Setup mutation (e.g. filter!) methods
-    def self.def_mutation_method(*meths)
-      meths.each do |meth|
-        class_eval("def #{meth}!(*args, &block); mutation_method(:#{meth}, *args, &block) end")
-      end
-    end
-    def def_mutation_method(*meths)
-      meths.each do |meth|
-        instance_eval("def #{meth}!(*args, &block); mutation_method(:#{meth}, *args, &block) end")
-      end
-    end
-
-    MUTATION_METHODS = %w'and distinct exclude exists filter from from_self full_outer_join graph
-    group group_and_count group_by having inner_join intersect invert_order join
-    left_outer_join limit naked or order order_by order_more paginate query reject
-    reverse reverse_order right_outer_join select select_all select_more
-    set_graph_aliases set_model sort sort_by union unordered where'.collect{|x| x.to_sym}
-
+  
     def_mutation_method(*MUTATION_METHODS)
 
     private

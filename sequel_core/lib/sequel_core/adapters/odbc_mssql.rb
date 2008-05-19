@@ -58,7 +58,7 @@ module Sequel
           end
 
           if where = opts[:where]
-            sql << " WHERE #{where}"
+            sql << " WHERE #{literal(where)}"
           end
 
           if group = opts[:group]
@@ -70,7 +70,7 @@ module Sequel
           end
 
           if having = opts[:having]
-            sql << " HAVING #{having}"
+            sql << " HAVING #{literal(having)}"
           end
 
           if union = opts[:union]

@@ -1,6 +1,4 @@
-require File.join(File.dirname(__FILE__), '../../lib/sequel_core')
 require File.join(File.dirname(__FILE__), '../spec_helper.rb')
-require 'logger'
 
 unless defined?(MYSQL_DB)
   MYSQL_URL = (ENV['SEQUEL_MY_SPEC_DB']||'mysql://root@localhost/sandbox') unless defined? MYSQL_URL
@@ -11,7 +9,7 @@ unless defined?(MYSQL_SOCKET_FILE)
 end
 
 MYSQL_URI = URI.parse(MYSQL_DB.uri)
-MYSQL_DB_NAME = MYSQL_URI.path =~ /\/(.*)/ && $1
+MYSQL_DB_NAME = (m = /\/(.*)/.match(MYSQL_URI.path)) && m[1]
 
 MYSQL_DB.drop_table(:items) if MYSQL_DB.table_exists?(:items)
 MYSQL_DB.drop_table(:test2) if MYSQL_DB.table_exists?(:test2)
@@ -23,6 +21,15 @@ MYSQL_DB.create_table :test2 do
   text :name
   integer :value
 end
+class Sequel::MySQL::Database
+  attr_accessor :sqls
+end
+logger = Object.new
+def logger.method_missing(m, msg)
+  MYSQL_DB.sqls << msg
+end
+MYSQL_DB.logger = logger
+MYSQL_DB.sqls = []
 
 context "A MySQL database" do
   setup do
@@ -51,12 +58,17 @@ context "A MySQL database" do
       {:id => 3, :name => 'ghi'}
     ]
   end
+
+  specify "Should convert Mysql::Errors to Sequel::Errors" do
+   proc{@db << "SELECT 1 + blah;"}.should raise_error(Sequel::Error)
+  end
 end
 
 context "A MySQL dataset" do
   setup do
     @d = MYSQL_DB[:items]
     @d.delete # remove all records
+    MYSQL_DB.sqls.clear
   end
   
   specify "should return the correct record count" do
@@ -107,72 +119,74 @@ context "A MySQL dataset" do
     proc {@d.literal(false)}.should_not raise_error
   end
   
-  specify "should quote columns using back-ticks" do
+  specify "should quote columns and tables using back-ticks if quoting identifiers" do
+    @d.quote_identifiers = true
     @d.select(:name).sql.should == \
-      'SELECT `name` FROM items'
+      'SELECT `name` FROM `items`'
       
     @d.select('COUNT(*)'.lit).sql.should == \
-      'SELECT COUNT(*) FROM items'
+      'SELECT COUNT(*) FROM `items`'
 
     @d.select(:max[:value]).sql.should == \
-      'SELECT max(`value`) FROM items'
+      'SELECT max(`value`) FROM `items`'
       
     @d.select(:NOW[]).sql.should == \
-    'SELECT NOW() FROM items'
+    'SELECT NOW() FROM `items`'
 
     @d.select(:max[:items__value]).sql.should == \
-      'SELECT max(items.`value`) FROM items'
+      'SELECT max(`items`.`value`) FROM `items`'
 
     @d.order(:name.desc).sql.should == \
-      'SELECT * FROM items ORDER BY `name` DESC'
+      'SELECT * FROM `items` ORDER BY `name` DESC'
 
     @d.select('items.name AS item_name'.lit).sql.should == \
-      'SELECT items.name AS item_name FROM items'
+      'SELECT items.name AS item_name FROM `items`'
       
     @d.select('`name`'.lit).sql.should == \
-      'SELECT `name` FROM items'
+      'SELECT `name` FROM `items`'
 
     @d.select('max(items.`name`) AS `max_name`'.lit).sql.should == \
-      'SELECT max(items.`name`) AS `max_name` FROM items'
+      'SELECT max(items.`name`) AS `max_name` FROM `items`'
       
     @d.select(:test[:abc, 'hello']).sql.should == \
-      "SELECT test(`abc`, 'hello') FROM items"
+      "SELECT test(`abc`, 'hello') FROM `items`"
 
     @d.select(:test[:abc__def, 'hello']).sql.should == \
-      "SELECT test(abc.`def`, 'hello') FROM items"
+      "SELECT test(`abc`.`def`, 'hello') FROM `items`"
 
     @d.select(:test[:abc__def, 'hello'].as(:x2)).sql.should == \
-      "SELECT test(abc.`def`, 'hello') AS `x2` FROM items"
+      "SELECT test(`abc`.`def`, 'hello') AS `x2` FROM `items`"
 
     @d.insert_sql(:value => 333).should == \
-      'INSERT INTO items (`value`) VALUES (333)'
+      'INSERT INTO `items` (`value`) VALUES (333)'
 
     @d.insert_sql(:x => :y).should == \
-      'INSERT INTO items (`x`) VALUES (`y`)'
+      'INSERT INTO `items` (`x`) VALUES (`y`)'
   end
   
   specify "should quote fields correctly when reversing the order" do
+    @d.quote_identifiers = true
     @d.reverse_order(:name).sql.should == \
-      'SELECT * FROM items ORDER BY `name` DESC'
+      'SELECT * FROM `items` ORDER BY `name` DESC'
 
     @d.reverse_order(:name.desc).sql.should == \
-      'SELECT * FROM items ORDER BY `name`'
+      'SELECT * FROM `items` ORDER BY `name`'
 
     @d.reverse_order(:name, :test.desc).sql.should == \
-      'SELECT * FROM items ORDER BY `name` DESC, `test`'
+      'SELECT * FROM `items` ORDER BY `name` DESC, `test`'
 
     @d.reverse_order(:name.desc, :test).sql.should == \
-      'SELECT * FROM items ORDER BY `name`, `test` DESC'
+      'SELECT * FROM `items` ORDER BY `name`, `test` DESC'
   end
   
   specify "should support ORDER clause in UPDATE statements" do
     @d.order(:name).update_sql(:value => 1).should == \
-      'UPDATE items SET `value` = 1 ORDER BY `name`'
+      'UPDATE items SET value = 1 ORDER BY name'
   end
   
   specify "should support LIMIT clause in UPDATE statements" do
     @d.limit(10).update_sql(:value => 1).should == \
-      'UPDATE items SET `value` = 1 LIMIT 10'
+      'UPDATE items SET value = 1 LIMIT 10'
   end
   
   specify "should support transactions" do
@@ -181,6 +195,29 @@ context "A MySQL dataset" do
     end
 
     @d.count.should == 1
+  end
+  
+  specify "should correctly rollback transactions" do
+    proc do
+      MYSQL_DB.transaction do
+        @d << {:name => 'abc'}
+        raise Interrupt, 'asdf'
+      end
+    end.should raise_error(Interrupt)
+
+    MYSQL_DB.sqls.should == ['BEGIN', "INSERT INTO items (name) VALUES ('abc')", 'ROLLBACK']
+  end
+
+  specify "should handle returning inside of the block by committing" do
+    def MYSQL_DB.ret_commit
+      transaction do
+        self[:items] << {:name => 'abc'}
+        return
+        self[:items] << {:name => 'd'}
+      end
+    end
+    MYSQL_DB.ret_commit
+    MYSQL_DB.sqls.should == ['BEGIN', "INSERT INTO items (name) VALUES ('abc')", 'COMMIT']
   end
   
   specify "should support regexps" do
@@ -204,6 +241,7 @@ context "MySQL datasets" do
   end
   
   specify "should correctly quote column references" do
+    @d.quote_identifiers = true
     market = 'ICE'
     ack_stamp = Time.now - 15 * 60 # 15 minutes ago
     @d.query do
@@ -214,7 +252,7 @@ context "MySQL datasets" do
       end
       group_by :minute[:from_unixtime[:ack]]
     end.sql.should == \
-      "SELECT `market`, minute(from_unixtime(`ack`)) AS `minute` FROM orders WHERE ((`ack` > #{@d.literal(ack_stamp)}) AND (`market` = 'ICE')) GROUP BY minute(from_unixtime(`ack`))"
+      "SELECT `market`, minute(from_unixtime(`ack`)) AS `minute` FROM `orders` WHERE ((`ack` > #{@d.literal(ack_stamp)}) AND (`market` = 'ICE')) GROUP BY minute(from_unixtime(`ack`))"
   end
 end
 
@@ -240,67 +278,67 @@ context "MySQL join expressions" do
   end
 
   specify "should raise error for :full_outer join requests." do
-    lambda{@ds.join_expr(:full_outer, :nodes)}.should raise_error(Sequel::Error::InvalidJoinType)
+    lambda{@ds.join_table(:full_outer, :nodes)}.should raise_error(Sequel::Error::InvalidJoinType)
   end
   specify "should support natural left joins" do
-    @ds.join_expr(:natural_left, :nodes).should == \
-      'NATURAL LEFT JOIN nodes'
+    @ds.join_table(:natural_left, :nodes).sql.should == \
+      'SELECT * FROM nodes NATURAL LEFT JOIN nodes'
   end
   specify "should support natural right joins" do
-    @ds.join_expr(:natural_right, :nodes).should == \
-      'NATURAL RIGHT JOIN nodes'
+    @ds.join_table(:natural_right, :nodes).sql.should == \
+      'SELECT * FROM nodes NATURAL RIGHT JOIN nodes'
   end
   specify "should support natural left outer joins" do
-    @ds.join_expr(:natural_left_outer, :nodes).should == \
-      'NATURAL LEFT OUTER JOIN nodes'
+    @ds.join_table(:natural_left_outer, :nodes).sql.should == \
+      'SELECT * FROM nodes NATURAL LEFT OUTER JOIN nodes'
   end
   specify "should support natural right outer joins" do
-    @ds.join_expr(:natural_right_outer, :nodes).should == \
-      'NATURAL RIGHT OUTER JOIN nodes'
+    @ds.join_table(:natural_right_outer, :nodes).sql.should == \
+      'SELECT * FROM nodes NATURAL RIGHT OUTER JOIN nodes'
   end
   specify "should support natural inner joins" do
-    @ds.join_expr(:natural_inner, :nodes).should == \
-      'NATURAL LEFT JOIN nodes'
+    @ds.join_table(:natural_inner, :nodes).sql.should == \
+      'SELECT * FROM nodes NATURAL LEFT JOIN nodes'
   end
   specify "should support cross joins (equivalent to inner join in MySQL, not in std SQL)" do
-    @ds.join_expr(:cross, :nodes).should == \
-      'INNER JOIN nodes'
+    @ds.join_table(:cross, :nodes).sql.should == \
+      'SELECT * FROM nodes INNER JOIN nodes'
   end
   specify "should support straight joins (force left table to be read before right)" do
-    @ds.join_expr(:straight, :nodes).should == \
-      'STRAIGHT_JOIN nodes'
+    @ds.join_table(:straight, :nodes).sql.should == \
+      'SELECT * FROM nodes STRAIGHT_JOIN nodes'
   end
   specify "should support natural joins on multiple tables." do
-    @ds.join_expr(:natural_left_outer, [:nodes, :branches]).should == \
-      'NATURAL LEFT OUTER JOIN ( `nodes`, `branches` )'
+    @ds.join_table(:natural_left_outer, [:nodes, :branches]).sql.should == \
+      'SELECT * FROM nodes NATURAL LEFT OUTER JOIN ( nodes, branches )'
   end
   specify "should support straight joins on multiple tables." do
-    @ds.join_expr(:straight, [:nodes,:branches]).should == \
-      'STRAIGHT_JOIN ( `nodes`, `branches` )'
+    @ds.join_table(:straight, [:nodes,:branches]).sql.should == \
+      'SELECT * FROM nodes STRAIGHT_JOIN ( nodes, branches )'
   end
 end
 
 context "Joined MySQL dataset" do
   setup do
-    @ds = MYSQL_DB[:nodes].join(:attributes, :node_id => :id)
-    @ds2 = MYSQL_DB[:nodes]
+    @ds = MYSQL_DB[:nodes]
   end
   
   specify "should quote fields correctly" do
-    @ds.sql.should == \
-      "SELECT * FROM nodes INNER JOIN attributes ON (attributes.`node_id` = nodes.`id`)"
+    @ds.quote_identifiers = true
+    @ds.join(:attributes, :node_id => :id).sql.should == \
+      "SELECT * FROM `nodes` INNER JOIN `attributes` ON (`attributes`.`node_id` = `nodes`.`id`)"
   end
   
   specify "should allow a having clause on ungrouped datasets" do
-    proc {@ds2.having('blah')}.should_not raise_error
+    proc {@ds.having('blah')}.should_not raise_error
 
-    @ds2.having('blah').sql.should == \
-      "SELECT * FROM nodes HAVING blah"
+    @ds.having('blah').sql.should == \
+      "SELECT * FROM nodes HAVING (blah)"
   end
   
   specify "should put a having clause before an order by clause" do
-    @ds2.order(:aaa).having(:bbb => :ccc).sql.should == \
-      "SELECT * FROM nodes HAVING (`bbb` = `ccc`) ORDER BY `aaa`"
+    @ds.order(:aaa).having(:bbb => :ccc).sql.should == \
+      "SELECT * FROM nodes HAVING (bbb = ccc) ORDER BY aaa"
   end
 end
 
@@ -376,7 +414,7 @@ context "A MySQL database" do
     end
     statements = @db.create_table_sql_list(:items, *g.create_info)
     statements.should == [
-      "CREATE TABLE items (`active1` boolean DEFAULT 1, `active2` boolean DEFAULT 0)"
+      "CREATE TABLE items (active1 boolean DEFAULT 1, active2 boolean DEFAULT 0)"
     ]
   end
   
@@ -386,7 +424,7 @@ context "A MySQL database" do
         :null => false, :on_delete => :cascade
     end
     @db.create_table_sql_list(:items, *g.create_info).should == [
-      "CREATE TABLE items (`p_id` integer NOT NULL, FOREIGN KEY (`p_id`) REFERENCES users(`id`) ON DELETE CASCADE)"
+      "CREATE TABLE items (p_id integer NOT NULL, FOREIGN KEY (p_id) REFERENCES users(id) ON DELETE CASCADE)"
     ]
   end
   
@@ -402,20 +440,23 @@ context "A MySQL database" do
   end
 end  
 
-context "A MySQL database" do
-  specify "should accept a socket option" do
-    db = Sequel.mysql(MYSQL_DB_NAME, :host => 'localhost', :user => 'root', :socket => MYSQL_SOCKET_FILE)
-    proc {db.test_connection}.should_not raise_error
-  end
-  
-  specify "should accept a socket option without host option" do
-    db = Sequel.mysql(MYSQL_DB_NAME, :user => 'root', :socket => MYSQL_SOCKET_FILE)
-    proc {db.test_connection}.should_not raise_error
-  end
-  
-  specify "should fail to connect with invalid socket" do
-    db = Sequel.mysql(MYSQL_DB_NAME, :host => 'localhost', :user => 'root', :socket => 'blah')
-    proc {db.test_connection}.should raise_error
+# Socket tests should only be run if the MySQL server is on localhost
+if %w'localhost 127.0.0.1 ::1'.include? MYSQL_URI.host
+  context "A MySQL database" do
+    specify "should accept a socket option" do
+      db = Sequel.mysql(MYSQL_DB_NAME, :host => 'localhost', :user => 'root', :socket => MYSQL_SOCKET_FILE)
+      proc {db.test_connection}.should_not raise_error
+    end
+    
+    specify "should accept a socket option without host option" do
+      db = Sequel.mysql(MYSQL_DB_NAME, :user => 'root', :socket => MYSQL_SOCKET_FILE)
+      proc {db.test_connection}.should_not raise_error
+    end
+    
+    specify "should fail to connect with invalid socket" do
+      db = Sequel.mysql(MYSQL_DB_NAME, :host => 'localhost', :user => 'root', :socket => 'blah')
+      proc {db.test_connection}.should raise_error
+    end
   end
 end
 
@@ -452,20 +493,20 @@ context "A MySQL database" do
       full_text_index [:title, :body]
     end
     MYSQL_DB.create_table_sql_list(:posts, *g.create_info).should == [
-      "CREATE TABLE posts (`title` text, `body` text)",
-      "CREATE FULLTEXT INDEX posts_title_body_index ON posts (`title`, `body`)"
+      "CREATE TABLE posts (title text, body text)",
+      "CREATE FULLTEXT INDEX posts_title_body_index ON posts (title, body)"
     ]
   end
   
   specify "should support full_text_search" do
     MYSQL_DB[:posts].full_text_search(:title, 'ruby').sql.should ==
-      "SELECT * FROM posts WHERE (MATCH (`title`) AGAINST ('ruby'))"
+      "SELECT * FROM posts WHERE (MATCH (title) AGAINST ('ruby'))"
     
     MYSQL_DB[:posts].full_text_search([:title, :body], ['ruby', 'sequel']).sql.should ==
-      "SELECT * FROM posts WHERE (MATCH (`title`, `body`) AGAINST ('ruby', 'sequel'))"
+      "SELECT * FROM posts WHERE (MATCH (title, body) AGAINST ('ruby', 'sequel'))"
       
     MYSQL_DB[:posts].full_text_search(:title, '+ruby -rails', :boolean => true).sql.should ==
-      "SELECT * FROM posts WHERE (MATCH (`title`) AGAINST ('+ruby -rails' IN BOOLEAN MODE))"
+      "SELECT * FROM posts WHERE (MATCH (title) AGAINST ('+ruby -rails' IN BOOLEAN MODE))"
   end
 
   specify "should support spatial indexes" do
@@ -474,8 +515,8 @@ context "A MySQL database" do
       spatial_index [:geom]
     end
     MYSQL_DB.create_table_sql_list(:posts, *g.create_info).should == [
-      "CREATE TABLE posts (`geom` point)",
-      "CREATE SPATIAL INDEX posts_geom_index ON posts (`geom`)"
+      "CREATE TABLE posts (geom point)",
+      "CREATE SPATIAL INDEX posts_geom_index ON posts (geom)"
     ]
   end
 
@@ -485,8 +526,8 @@ context "A MySQL database" do
       index :title, :type => :hash
     end
     MYSQL_DB.create_table_sql_list(:posts, *g.create_info).should == [
-      "CREATE TABLE posts (`title` text)",
-      "CREATE INDEX posts_title_index ON posts (`title`) USING hash"
+      "CREATE TABLE posts (title text)",
+      "CREATE INDEX posts_title_index ON posts (title) USING hash"
     ]
   end
 
@@ -496,42 +537,9 @@ context "A MySQL database" do
       index :title, :type => :hash, :unique => true
     end
     MYSQL_DB.create_table_sql_list(:posts, *g.create_info).should == [
-      "CREATE TABLE posts (`title` text)",
-      "CREATE UNIQUE INDEX posts_title_index ON posts (`title`) USING hash"
+      "CREATE TABLE posts (title text)",
+      "CREATE UNIQUE INDEX posts_title_index ON posts (title) USING hash"
     ]
-  end
-end
-
-class Sequel::MySQL::Database
-  alias_method :orig_execute, :execute
-  attr_accessor :sqls
-  def execute(sql, &block)
-    @sqls ||= []; @sqls << sql
-    orig_execute(sql, &block)
-  end
-
-  def transaction
-    @pool.hold do |conn|
-      @transactions ||= []
-      if @transactions.include? Thread.current
-        return yield(conn)
-      end
-      @sqls ||= []; @sqls << SQL_BEGIN
-      conn.query(SQL_BEGIN)
-      begin
-        @transactions << Thread.current
-        result = yield(conn)
-        @sqls ||= []; @sqls << SQL_COMMIT
-        conn.query(SQL_COMMIT)
-        result
-      rescue => e
-        @sqls ||= []; @sqls << SQL_ROLLBACK
-        conn.query(SQL_ROLLBACK)
-        raise e unless Sequel::Error::Rollback === e
-      ensure
-        @transactions.delete(Thread.current)
-      end
-    end
   end
 end
 
@@ -555,7 +563,7 @@ context "MySQL::Dataset#insert" do
   end
 
   specify "should insert record with default values when empty hash given" do
-    @d.insert {}
+    @d.insert({})
     
     MYSQL_DB.sqls.should == [
       "INSERT INTO items () VALUES ()"
@@ -591,7 +599,7 @@ context "MySQL::Dataset#multi_insert" do
     
     MYSQL_DB.sqls.should == [
       'BEGIN',
-      "INSERT INTO items (`name`) VALUES ('abc'), ('def')",
+      "INSERT INTO items (name) VALUES ('abc'), ('def')",
       'COMMIT'
     ]
 
@@ -606,10 +614,10 @@ context "MySQL::Dataset#multi_insert" do
 
     MYSQL_DB.sqls.should == [
       'BEGIN',
-      "INSERT INTO items (`value`) VALUES (1), (2)",
+      "INSERT INTO items (value) VALUES (1), (2)",
       'COMMIT',
       'BEGIN',
-      "INSERT INTO items (`value`) VALUES (3), (4)",
+      "INSERT INTO items (value) VALUES (3), (4)",
       'COMMIT'
     ]
     
@@ -627,10 +635,10 @@ context "MySQL::Dataset#multi_insert" do
 
     MYSQL_DB.sqls.should == [
       'BEGIN',
-      "INSERT INTO items (`value`) VALUES (1), (2)",
+      "INSERT INTO items (value) VALUES (1), (2)",
       'COMMIT',
       'BEGIN',
-      "INSERT INTO items (`value`) VALUES (3), (4)",
+      "INSERT INTO items (value) VALUES (3), (4)",
       'COMMIT'
     ]
     
@@ -647,7 +655,7 @@ context "MySQL::Dataset#multi_insert" do
 
     MYSQL_DB.sqls.should == [
       'BEGIN',
-      "INSERT INTO items (`name`, `value`) VALUES ('abc', 1), ('def', 2)",
+      "INSERT INTO items (name, value) VALUES ('abc', 1), ('def', 2)",
       'COMMIT'
     ]
     

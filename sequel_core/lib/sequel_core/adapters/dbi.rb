@@ -25,9 +25,9 @@ module Sequel
       # Converts a uri to an options hash. These options are then passed
       # to a newly created database object.
       def self.uri_to_options(uri)
-        database = (uri.path =~ /\/(.*)/) && ($1)
-        if uri.scheme =~ /dbi-(.+)/
-          adapter = DBI_ADAPTERS[$1.to_sym] || $1
+        database = (m = /\/(.*)/.match(uri.path)) && (m[1])
+        if m = /dbi-(.+)/.match(uri.scheme)
+          adapter = DBI_ADAPTERS[m[1].to_sym] || m[1]
           database = "#{adapter}:dbname=#{database}"
         end
         {
@@ -58,14 +58,14 @@ module Sequel
       end
     
       def execute(sql)
-        @logger.info(sql) if @logger
+        log_info(sql)
         @pool.hold do |conn|
           conn.execute(sql)
         end
       end
       
       def do(sql)
-        @logger.info(sql) if @logger
+        log_info(sql)
         @pool.hold do |conn|
           conn.do(sql)
         end

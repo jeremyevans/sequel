@@ -1,5 +1,3 @@
-require 'thread'
-
 # A ConnectionPool manages access to database connections by keeping
 # multiple connections and giving threads exclusive access to each
 # connection.
@@ -17,21 +15,43 @@ class ConnectionPool
   # Constructs a new pool with a maximum size. If a block is supplied, it
   # is used to create new connections as they are needed.
   #
-  #   pool = ConnectionPool.new(10) {MyConnection.new(opts)}
+  #   pool = ConnectionPool.new(:max_connections=>10) {MyConnection.new(opts)}
   #
   # The connection creation proc can be changed at any time by assigning a 
   # Proc to pool#connection_proc.
   #
-  #   pool = ConnectionPool.new(10)
+  #   pool = ConnectionPool.new(:max_connections=>10)
   #   pool.connection_proc = proc {MyConnection.new(opts)}
-  def initialize(max_size = 4, &block)
-    @max_size = max_size
+  #
+  # The connection pool takes the following options:
+  #
+  # * :max_connections - The maximum number of connections the connection pool
+  #   will open (default 4)
+  # * :pool_convert_exceptions - Whether to convert non-StandardError based exceptions
+  #   to RuntimeError exceptions (default true)
+  # * :pool_reuse_connections - Which strategy to follow in regards to reusing connections:
+  #   * :always - Always reuse a connection that belongs to the same thread
+  #   * :allow - Only reuse a connection that belongs to the same thread if
+  #     another cannot be acquired immediately (default)
+  #   * :last_resort - Only reuse a connection that belongs to the same thread if
+  #     the pool timeout has expired
+  #   * :never - Never reuse a connection that belongs to the same thread
+  # * :pool_sleep_time - The amount of time to sleep before attempting to acquire
+  #   a connection again (default 0.001)
+  # * :pool_timeout - The amount of seconds waiting to acquirea connection
+  #   before raising a PoolTimeoutError (default 5)
+  def initialize(opts = {}, &block)
+    @max_size = opts[:max_connections] || 4
     @mutex = Mutex.new
     @connection_proc = block
 
     @available_connections = []
-    @allocated = {}
+    @allocated = []
     @created_count = 0
+    @timeout = opts[:pool_timeout] || 5
+    @sleep_time = opts[:pool_sleep_time] || 0.001
+    @reuse_connections = opts[:pool_reuse_connections] || :allow
+    @convert_exceptions = opts.include?(:pool_convert_exceptions) ? opts[:pool_convert_exceptions] : true
   end
   
   # Returns the number of created connections.
@@ -50,21 +70,36 @@ class ConnectionPool
   # If no connection is available, Pool#hold will block until a connection
   # is available.
   def hold
-    t = Thread.current
-    if (conn = owned_connection(t))
-      return yield(conn)
-    end
-    while !(conn = acquire(t))
-      sleep 0.001
-    end
     begin
-      yield conn
-    ensure
-      release(t)
+      t = Thread.current
+      time = Time.new
+      timeout = time + @timeout
+      sleep_time = @sleep_time
+      reuse = @reuse_connections
+      if (reuse == :always) && (conn = owned_connection(t))
+        return yield(conn)
+      end
+      reuse = reuse == :allow ? true : false
+      until conn = acquire(t)
+        if reuse && (conn = owned_connection(t))
+          return yield(conn)
+        end
+        if Time.new > timeout
+          if (@reuse_connections == :last_resort) && (conn = owned_connection(t))
+            return yield(conn)
+          end
+          raise(::Sequel::Error::PoolTimeoutError)
+        end
+        sleep sleep_time
+      end
+      begin
+        yield conn
+      ensure
+        release(t, conn)
+      end
+    rescue Exception => e
+      raise(@convert_exceptions && !e.is_a?(StandardError) ? RuntimeError.new(e.message) : e)
     end
-  rescue Exception => e
-    # if the error is not a StandardError it is converted into RuntimeError.
-    raise e.is_a?(StandardError) ? e : e.message
   end
   
   # Removes all connection currently available, optionally yielding each 
@@ -82,14 +117,18 @@ class ConnectionPool
   private
     # Returns the connection owned by the supplied thread, if any.
     def owned_connection(thread)
-      @mutex.synchronize {@allocated[thread]}
+      @mutex.synchronize do 
+        x = @allocated.assoc(thread)
+        x[1] if x
+      end
     end
     
     # Assigns a connection to the supplied thread, if one is available.
     def acquire(thread)
       @mutex.synchronize do
         if conn = available
-          @allocated[thread] = conn
+          @allocated << [thread, conn]
+          conn
         end
       end
     end
@@ -111,10 +150,10 @@ class ConnectionPool
     end
     
     # Releases the connection assigned to the supplied thread.
-    def release(thread)
+    def release(thread, conn)
       @mutex.synchronize do
-        @available_connections << @allocated[thread]
-        @allocated.delete(thread)
+        @allocated.delete([thread, conn])
+        @available_connections << conn
       end
     end
 end
@@ -127,18 +166,21 @@ class SingleThreadedPool
   attr_writer :connection_proc
   
   # Initializes the instance with the supplied block as the connection_proc.
-  def initialize(&block)
+  def initialize(opts={}, &block)
     @connection_proc = block
+    @convert_exceptions = opts.include?(:pool_convert_exceptions) ? opts[:pool_convert_exceptions] : true
   end
   
   # Yields the connection to the supplied block. This method simulates the
   # ConnectionPool#hold API.
   def hold
-    @conn ||= @connection_proc.call
-    yield @conn
-  rescue Exception => e
-    # if the error is not a StandardError it is converted into RuntimeError.
-    raise e.is_a?(StandardError) ? e : e.message
+    begin
+      @conn ||= @connection_proc.call
+      yield @conn
+    rescue Exception => e
+      # if the error is not a StandardError it is converted into RuntimeError.
+      raise(@convert_exceptions && !e.is_a?(StandardError) ? RuntimeError.new(e.message) : e)
+    end
   end
   
   # Disconnects from the database. Once a connection is requested using

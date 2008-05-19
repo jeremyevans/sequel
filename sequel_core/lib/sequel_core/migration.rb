@@ -32,19 +32,6 @@ module Sequel
       @db = db
     end
     
-    # Adds the new migration class to the list of Migration descendants.
-    def self.inherited(base)
-      descendants << base
-    end
-    
-    # Returns the list of Migration descendants.
-    def self.descendants
-      @descendants ||= []
-    end
-    
-    def up; end #:nodoc:
-    def down; end #:nodoc:
-    
     # Applies the migration to the supplied database in the specified
     # direction.
     def self.apply(db, direction)
@@ -59,9 +46,27 @@ module Sequel
       end
     end
 
+    # Returns the list of Migration descendants.
+    def self.descendants
+      @descendants ||= []
+    end
+    
+    # Adds the new migration class to the list of Migration descendants.
+    def self.inherited(base)
+      descendants << base
+    end
+    
+    # The default down action does nothing
+    def down
+    end
+    
     # Intercepts method calls intended for the database and sends them along.
     def method_missing(method_sym, *args, &block)
-      @db.send method_sym, *args, &block
+      @db.send(method_sym, *args, &block)
+    end
+
+    # The default up action does nothing
+    def up
     end
   end
 
@@ -98,6 +103,8 @@ module Sequel
   #   Sequel::Migrator.apply(DB, '.', 5, 1)
   #
   module Migrator
+    MIGRATION_FILE_PATTERN = /\A\d+_.+\.rb\z/.freeze
+
     # Migrates the supplied database in the specified directory from the
     # current version to the target version. If no current version is
     # supplied, it is extracted from a schema_info table. The schema_info
@@ -121,6 +128,19 @@ module Sequel
       target
     end
 
+    # Gets the current migration version stored in the database. If no version
+    # number is stored, 0 is returned.
+    def self.get_current_migration_version(db)
+      r = schema_info_dataset(db).first
+      r ? r[:version] : 0
+    end
+
+    # Returns the latest version available in the specified directory.
+    def self.latest_migration_version(directory)
+      l = migration_files(directory).last
+      l ? File.basename(l).to_i : nil
+    end
+
     # Returns a list of migration classes filtered for the migration range and
     # ordered according to the migration direction.
     def self.migration_classes(directory, target, current, direction)
@@ -142,50 +162,27 @@ module Sequel
       classes
     end
     
-    MIGRATION_FILE_PATTERN = '[0-9][0-9][0-9]_*.rb'.freeze
-
     # Returns any found migration files in the supplied directory.
     def self.migration_files(directory, range = nil)
-      pattern = File.join(directory, MIGRATION_FILE_PATTERN)
-      files = Dir[pattern].inject([]) do |m, path|
-        m[File.basename(path).to_i] = path
-        m
+      files = []
+      Dir.new(directory).each do |file|
+        files[file.to_i] = File.join(directory, file) if MIGRATION_FILE_PATTERN.match(file)
       end
       filtered = range ? files[range] : files
       filtered ? filtered.compact : []
     end
     
-    # Returns the latest version available in the specified directory.
-    def self.latest_migration_version(directory)
-      l = migration_files(directory).last
-      l ? File.basename(l).to_i : nil
-    end
-
-    # Gets the current migration version stored in the database. If no version
-    # number is stored, 0 is returned.
-    def self.get_current_migration_version(db)
-      r = schema_info_dataset(db).first
-      r ? r[:version] : 0
+    # Returns the dataset for the schema_info table. If no such table
+    # exists, it is automatically created.
+    def self.schema_info_dataset(db)
+      db.create_table(:schema_info) {integer :version} unless db.table_exists?(:schema_info)
+      db[:schema_info]
     end
     
     # Sets the current migration  version stored in the database.
     def self.set_current_migration_version(db, version)
       dataset = schema_info_dataset(db)
-      if dataset.first
-        dataset.update(:version => version)
-      else
-        dataset << {:version => version}
-      end
-    end
-    
-    # Returns the dataset for the schema_info table. If no such table
-    # exists, it is automatically created.
-    def self.schema_info_dataset(db)
-      unless db.table_exists?(:schema_info)
-        db.create_table(:schema_info) {integer :version}
-      end
-
-      db[:schema_info]
+      dataset.send(dataset.first ? :update : :<<, :version => version)
     end
   end
 end

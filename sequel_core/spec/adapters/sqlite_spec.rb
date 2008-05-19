@@ -1,4 +1,3 @@
-require File.join(File.dirname(__FILE__), '../../lib/sequel_core')
 require File.join(File.dirname(__FILE__), '../spec_helper.rb')
 
 unless defined?(SQLITE_DB)
@@ -17,8 +16,11 @@ end
 SQLITE_DB.create_table(:time) {timestamp :t}
 
 context "An SQLite database" do
-  setup do
+  before do
     @db = Sequel.connect('sqlite:/')
+  end
+  after do
+    @db.disconnect
   end
   
   specify "should provide a list of existing tables" do
@@ -125,6 +127,29 @@ context "An SQLite database" do
     @db.tables.should == [:t]
   end
   
+  specify "should handle returning inside of transaction by committing" do
+    @db.create_table(:items){text :name}
+    def @db.ret_commit
+      transaction do
+        self[:items] << {:name => 'abc'}
+        return
+        self[:items] << {:name => 'd'}
+      end
+    end
+    @db[:items].count.should == 0
+    @db.ret_commit
+    @db[:items].count.should == 1
+    @db.ret_commit
+    @db[:items].count.should == 2
+    proc do
+      @db.transaction do
+        raise Interrupt, 'asdf'
+      end
+    end.should raise_error(Interrupt)
+
+    @db[:items].count.should == 2
+  end
+
   specify "should provide disconnect functionality" do
     @db.tables
     @db.pool.size.should == 1
@@ -163,6 +188,10 @@ context "An SQLite database" do
 
     proc {@db.single_value 'blah blah'}.should raise_error(
       Sequel::Error::InvalidStatement, "blah blah\r\nnear \"blah\": syntax error")
+  end
+  
+  specify "should not swallow non-SQLite based exceptions" do
+    proc {@db.pool.hold{raise Interrupt, "test"}}.should raise_error(Interrupt)
   end
 end
 

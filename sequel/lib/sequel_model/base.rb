@@ -1,5 +1,7 @@
 module Sequel
   class Model
+    @@lazy_load_schema = false
+
     @primary_key = :id
 
     # Returns key for primary key.
@@ -133,6 +135,11 @@ module Sequel
     def self.implicit_table_name
       name.demodulize.underscore.pluralize.to_sym
     end
+
+    # Set whether to lazily load the schema
+    def self.lazy_load_schema=(value)
+      @@lazy_load_schema = value
+    end
   
     # Initializes a model instance as an existing record. This constructor is
     # used by Sequel to initialize model instances when fetching records.
@@ -172,8 +179,15 @@ module Sequel
     # Sets the dataset associated with the Model class.
     # Also has the alias dataset=.
     def self.set_dataset(ds)
-      @db = ds.db
-      @dataset = ds
+      @dataset = case ds
+      when Symbol
+        db[ds]
+      when Dataset
+        @db = ds.db
+        ds
+      else
+        raise(Error, "Model.set_dataset takes a Symbol or a Sequel::Dataset")
+      end
       @dataset.set_model(self)
       def_dataset_method(:destroy) do
         raise(Error, "No model associated with this dataset") unless @opts[:models]
@@ -183,11 +197,12 @@ module Sequel
       end
       @dataset.extend(Associations::EagerLoading)
       @dataset.transform(@transform) if @transform
+      @columns = nil
       begin
-        @columns = nil
-        columns
+        columns unless @@lazy_load_schema
       rescue StandardError
       end
+      self
     end
     metaalias :dataset=, :set_dataset
   
@@ -220,23 +235,21 @@ module Sequel
     end
     
     # Add model methods that call dataset methods
-    def_dataset_method *DATASET_METHODS
+    def_dataset_method(*DATASET_METHODS)
 
     ### Private Class Methods ###
     
     # Create the column accessors
     def self.def_column_accessor(*columns) # :nodoc:
-      Thread.exclusive do
-        columns.each do |column|
-          im = instance_methods
-          meth = "#{column}="
-          define_method(column){self[column]} unless im.include?(column.to_s)
-          unless im.include?(meth)
-            define_method(meth) do |*v|
-              len = v.length
-              raise(ArgumentError, "wrong number of arguments (#{len} for 1)") unless len == 1
-              self[column] = v.first 
-            end
+      columns.each do |column|
+        im = instance_methods
+        meth = "#{column}="
+         define_method(column){self[column]} unless im.include?(column.to_s)
+        unless im.include?(meth)
+          define_method(meth) do |*v|
+            len = v.length
+            raise(ArgumentError, "wrong number of arguments (#{len} for 1)") unless len == 1
+            self[column] = v.first 
           end
         end
       end

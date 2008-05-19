@@ -1,29 +1,44 @@
-# Enumerable extensions.
+class Array
+  # Removes and returns the last member of the array if it is a hash. Otherwise,
+  # an empty hash is returned This method is useful when writing methods that
+  # take an options hash as the last parameter. For example:
+  #
+  #   def validate_each(*args, &block)
+  #     opts = args.extract_options!
+  #     ...
+  #   end
+  def extract_options!
+    last.is_a?(Hash) ? pop : {}
+  end
+end
+
 module Enumerable
   # Invokes the specified method for each item, along with the supplied
   # arguments.
   def send_each(sym, *args)
-    each {|i| i.send(sym, *args)}
+    each{|i| i.send(sym, *args)}
   end
 end
 
-# Range extensions
-class Range
-  # Returns the interval between the beginning and end of the range.
-  def interval
-    last - first
+class FalseClass
+  # false is always blank
+  def blank?
+    true
   end
 end
 
-class Class
+# Add some metaprogramming methods to avoid class << self
+class Module
+  # Defines an instance method within a class/module
+  def class_def(name, &block)
+    class_eval{define_method(name, &block)}
+  end 
+
   private
     # Define an instance method(s) that class the class method of the
-    # same name.
-    # Replaces the construct:
+    # same name. Replaces the construct:
     #
-    #   class << self
-    #     attr_reader *meths
-    #   end
+    #   define_method(meth){self.class.send(meth)}
     def class_attr_reader(*meths)
       meths.each{|meth| define_method(meth){self.class.send(meth)}}
     end
@@ -45,7 +60,7 @@ class Class
     #     attr_reader *meths
     #   end
     def metaattr_reader(*meths)
-      metaclass.instance_eval{attr_reader *meths}
+      metaclass.instance_eval{attr_reader(*meths)}
     end
 
     # Make a singleton/class method(s) private.
@@ -55,21 +70,44 @@ class Class
     #     private *meths
     #   end
     def metaprivate(*meths)
-      metaclass.instance_eval{private *meths}
+      metaclass.instance_eval{private(*meths)}
     end
 end
 
-# Object extensions
+# Helpers from Metaid and a bit more
 class Object
-  # Returns true if the object is a object of one of the classes
-  def is_one_of?(*classes)
-    classes.each {|c| return c if is_a?(c)}
-    nil
-  end
-
   # Objects are blank if they respond true to empty?
   def blank?
-    nil? || (respond_to?(:empty?) && empty?)
+    respond_to?(:empty?) && empty?
+  end
+
+  # Returns true if the object is a object of one of the classes
+  def is_one_of?(*classes)
+    !!classes.find{|c| is_a?(c)}
+  end
+
+  # Add methods to the object's metaclass
+  def meta_def(name, &block)
+    meta_eval{define_method(name, &block)}
+  end 
+
+  # Evaluate the block in the context of the object's metaclass
+  def meta_eval(&block)
+    metaclass.instance_eval(&block)
+  end 
+
+  # The hidden singleton lurks behind everyone
+  def metaclass
+    class << self
+      self
+    end 
+  end 
+end
+
+class NilClass
+  # nil is always blank
+  def blank?
+    true
   end
 end
 
@@ -80,10 +118,17 @@ class Numeric
   end
 end
 
-class NilClass
-  # nil is always blank
+class Range
+  # Returns the interval between the beginning and end of the range.
+  def interval
+    last - first - (exclude_end? ? 1 : 0)
+  end
+end
+
+class String
+  # Strings are blank if they are empty or include only whitespace
   def blank?
-    true
+    strip.empty?
   end
 end
 
@@ -91,20 +136,5 @@ class TrueClass
   # true is never blank
   def blank?
     false
-  end
-end
-
-class FalseClass
-  # false is always blank
-  def blank?
-    true
-  end
-end
-
-class String
-  BLANK_STRING_REGEXP = /\A\s*\z/
-  # Strings are blank if they are empty or include only whitespace
-  def blank?
-    empty? || BLANK_STRING_REGEXP.match(self)
   end
 end

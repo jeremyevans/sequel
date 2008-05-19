@@ -1,5 +1,28 @@
 require File.join(File.dirname(__FILE__), 'spec_helper')
 
+context "Array#all_two_pairs?" do
+  specify "should return false if empty" do
+    [].all_two_pairs?.should == false
+  end
+
+  specify "should return false if any of the elements is not an array" do
+    [1].all_two_pairs?.should == false
+    [[1,2],1].all_two_pairs?.should == false
+  end
+
+  specify "should return false if any of the elements has a length other than two" do
+    [[1,2],[]].all_two_pairs?.should == false
+    [[1,2],[1]].all_two_pairs?.should == false
+    [[1,2],[1,2,3]].all_two_pairs?.should == false
+  end
+
+  specify "should return true if all of the elements are arrays with a length of two" do
+    [[1,2]].all_two_pairs?.should == true
+    [[1,2],[1,2]].all_two_pairs?.should == true
+    [[1,2],[1,2],[1,2]].all_two_pairs?.should == true
+  end
+end
+  
 context "Array#to_sql" do
   specify "should concatenate multiple lines into a single string" do
     "SELECT * \r\nFROM items\r\n WHERE a = 1".split.to_sql. \
@@ -51,25 +74,14 @@ context "String#lit" do
   end
   
   specify "should inhibit string literalization" do
-    db = Sequel::Database.new
-    ds = db[:t]
-    
-    ds.update_sql(:stamp => "NOW()".lit).should == \
+    Sequel::Database.new[:t].update_sql(:stamp => "NOW()".expr).should == \
       "UPDATE t SET stamp = NOW()"
   end
-end
 
-context "String#expr" do
-  specify "should return an LiteralString object" do
+  specify "should be aliased as expr" do
     'xyz'.expr.should be_a_kind_of(Sequel::LiteralString)
     'xyz'.expr.to_s.should == 'xyz'
-  end
-
-  specify "should inhibit string literalization" do
-    db = Sequel::Database.new
-    ds = db[:t]
-    
-    ds.update_sql(:stamp => "NOW()".expr).should == \
+    Sequel::Database.new[:t].update_sql(:stamp => "NOW()".expr).should == \
       "UPDATE t SET stamp = NOW()"
   end
 end
@@ -149,20 +161,21 @@ end
 context "Column references" do
   setup do
     @c = Class.new(Sequel::Dataset) do
-      def quote_column_ref(c); "`#{c}`"; end
+      def quoted_identifier(c); "`#{c}`"; end
     end
     @ds = @c.new(nil)
+    @ds.quote_identifiers = true
   end
   
   specify "should be quoted properly" do
     @ds.literal(:xyz).should == "`xyz`"
-    @ds.literal(:xyz__abc).should == "xyz.`abc`"
+    @ds.literal(:xyz__abc).should == "`xyz`.`abc`"
 
     @ds.literal(:xyz.as(:x)).should == "`xyz` AS `x`"
-    @ds.literal(:xyz__abc.as(:x)).should == "xyz.`abc` AS `x`"
+    @ds.literal(:xyz__abc.as(:x)).should == "`xyz`.`abc` AS `x`"
 
     @ds.literal(:xyz___x).should == "`xyz` AS `x`"
-    @ds.literal(:xyz__abc___x).should == "xyz.`abc` AS `x`"
+    @ds.literal(:xyz__abc___x).should == "`xyz`.`abc` AS `x`"
   end
   
   specify "should be quoted properly in SQL functions" do
@@ -178,7 +191,7 @@ context "Column references" do
   
   specify "should be quoted properly in a cast function" do
     @ds.literal(:x.cast_as(:integer)).should == "cast(`x` AS integer)"
-    @ds.literal(:x__y.cast_as(:varchar[20])).should == "cast(x.`y` AS varchar(20))"
+    @ds.literal(:x__y.cast_as(:varchar[20])).should == "cast(`x`.`y` AS varchar(20))"
   end
 end
 
@@ -187,9 +200,14 @@ context "Symbol#*" do
     @ds = Sequel::Dataset.new(nil)
   end
   
-  specify "should format a qualified wildcard" do
+  specify "should format a qualified wildcard if no argument" do
     :xyz.*.to_s(@ds).should == 'xyz.*'
     :abc.*.to_s(@ds).should == 'abc.*'
+  end
+
+  specify "should format a filter expression if an argument" do
+    :xyz.*(3).to_s(@ds).should == '(xyz * 3)'
+    :abc.*(5).to_s(@ds).should == '(abc * 5)'
   end
 end
 
@@ -218,6 +236,14 @@ context "Symbol#to_column_ref" do
   specify "should support upper case and lower case" do
     :ABC.to_column_ref(@ds).should == 'ABC'
     :Zvashtoy__aBcD.to_column_ref(@ds).should == 'Zvashtoy.aBcD'
+  end
+
+  specify "should support spaces inside column names" do
+    @ds.quote_identifiers = true
+    :"AB C".to_column_ref(@ds).should == '"AB C"'
+    :"Zvas htoy__aB cD".to_column_ref(@ds).should == '"Zvas htoy"."aB cD"'
+    :"aB cD___XX XX".to_column_ref(@ds).should == '"aB cD" AS "XX XX"'
+    :"Zva shtoy__aB cD___XX XX".to_column_ref(@ds).should == '"Zva shtoy"."aB cD" AS "XX XX"'
   end
 end
 
@@ -295,6 +321,16 @@ context "String#to_date" do
   
   specify "should raise Error::InvalidValue for an invalid date" do
     proc {'0000-00-00'.to_date}.should raise_error(Sequel::Error::InvalidValue)
+  end
+end
+
+context "String#to_datetime" do
+  specify "should convert the string into a DateTime object" do
+    "2007-07-11 10:11:12a".to_datetime.should == DateTime.parse("2007-07-11 10:11:12a")
+  end
+  
+  specify "should raise Error::InvalidValue for an invalid date" do
+    proc {'0000-00-00'.to_datetime}.should raise_error(Sequel::Error::InvalidValue)
   end
 end
 

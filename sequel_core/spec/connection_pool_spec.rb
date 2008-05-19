@@ -1,8 +1,10 @@
 require File.join(File.dirname(__FILE__), 'spec_helper')
+CONNECTION_POOL_DEFAULTS = {:pool_timeout=>5, :pool_sleep_time=>0.001,
+  :pool_reuse_connections=>:allow, :pool_convert_exceptions=>true, :max_connections=>4}
 
 context "An empty ConnectionPool" do
   setup do
-    @cpool = ConnectionPool.new
+    @cpool = ConnectionPool.new(CONNECTION_POOL_DEFAULTS)
   end
 
   specify "should have no available connections" do
@@ -10,7 +12,7 @@ context "An empty ConnectionPool" do
   end
 
   specify "should have no allocated connections" do
-    @cpool.allocated.should == {}
+    @cpool.allocated.should == []
   end
 
   specify "should have a created_count of zero" do
@@ -21,21 +23,22 @@ end
 context "A connection pool handling connections" do
   setup do
     @max_size = 2
-    @cpool = ConnectionPool.new(@max_size) {:got_connection}
+    @cpool = ConnectionPool.new(CONNECTION_POOL_DEFAULTS.merge(:max_connections=>@max_size)) {:got_connection}
   end
 
   specify "#hold should increment #created_count" do
     @cpool.hold do
       @cpool.created_count.should == 1
-      @cpool.hold {@cpool.created_count.should == 1}
+      @cpool.hold {@cpool.created_count.should == 2}
+      @cpool.hold {@cpool.hold {@cpool.created_count.should == 2}}
     end
   end
 
-  specify "#hold should add the connection to the #allocated hash" do
+  specify "#hold should add the connection to the #allocated array" do
     @cpool.hold do
       @cpool.allocated.size.should == 1
   
-      @cpool.allocated.values.should == [:got_connection]
+      @cpool.allocated.should == [[Thread.current, :got_connection]]
     end
   end
 
@@ -73,7 +76,7 @@ end
 
 context "ConnectionPool#hold" do
   setup do
-    @pool = ConnectionPool.new {DummyConnection.new}
+    @pool = ConnectionPool.new(CONNECTION_POOL_DEFAULTS) {DummyConnection.new}
   end
   
   specify "should pass the result of the connection maker proc to the supplied block" do
@@ -109,7 +112,7 @@ end
 
 context "ConnectionPool#connection_proc" do
   setup do
-    @pool = ConnectionPool.new
+    @pool = ConnectionPool.new(CONNECTION_POOL_DEFAULTS)
   end
   
   specify "should be nil if no block is supplied to the pool" do
@@ -128,7 +131,7 @@ end
 context "A connection pool with a max size of 1" do
   setup do
     @invoked_count = 0
-    @pool = ConnectionPool.new(1) {@invoked_count += 1; 'herro'}
+    @pool = ConnectionPool.new(CONNECTION_POOL_DEFAULTS.merge(:max_connections=>1)) {@invoked_count += 1; 'herro'}
   end
   
   specify "should let only one thread access the connection at any time" do
@@ -151,7 +154,7 @@ context "A connection pool with a max size of 1" do
     c2.should be_nil
     
     @pool.available_connections.should be_empty
-    @pool.allocated.should == {t1 => cc}
+    @pool.allocated.should == [[t1, cc]]
     
     cc.gsub!('rr', 'll')
     sleep 0.5
@@ -163,7 +166,7 @@ context "A connection pool with a max size of 1" do
     c2.should == 'hello'
 
     @pool.available_connections.should be_empty
-    @pool.allocated.should == {t2 => cc}
+    @pool.allocated.should == [[t2, cc]]
     
     cc.gsub!('ll', 'rr')
     sleep 0.5
@@ -204,7 +207,7 @@ end
 context "A connection pool with a max size of 5" do
   setup do
     @invoked_count = 0
-    @pool = ConnectionPool.new(5) {@invoked_count += 1}
+    @pool = ConnectionPool.new(CONNECTION_POOL_DEFAULTS.merge(:max_connections=>5)) {@invoked_count += 1}
   end
   
   specify "should let five threads simultaneously access separate connections" do
@@ -219,8 +222,8 @@ context "A connection pool with a max size of 5" do
     @invoked_count.should == 5
     @pool.size.should == 5
     @pool.available_connections.should be_empty
-    @pool.allocated.should == {threads[0] => 1, threads[1] => 2, threads[2] => 3,
-      threads[3] => 4, threads[4] => 5}
+    i = 0
+    @pool.allocated.should == threads.collect{|t| [t,i+=1]}
     
     threads[0].raise "your'e dead"
     sleep 0.1
@@ -229,7 +232,7 @@ context "A connection pool with a max size of 5" do
     sleep 0.1
     
     @pool.available_connections.should == [1, 4]
-    @pool.allocated.should == {threads[1] => 2, threads[2] => 3, threads[4] => 5}
+    @pool.allocated.should == [[threads[1], 2], [threads[2], 3], [threads[4], 5]]
     
     stop = true
     sleep 0.2
@@ -274,7 +277,7 @@ end
 context "ConnectionPool#disconnect" do
   setup do
     @count = 0
-    @pool = ConnectionPool.new(5) {{:id => @count += 1}}
+    @pool = ConnectionPool.new(CONNECTION_POOL_DEFAULTS.merge(:max_connections=>5)) {{:id => @count += 1}}
   end
   
   specify "should invoke the given block for each available connection" do
@@ -338,7 +341,7 @@ end
 
 context "SingleThreadedPool" do
   setup do
-    @pool = SingleThreadedPool.new {1234}
+    @pool = SingleThreadedPool.new(CONNECTION_POOL_DEFAULTS){1234}
   end
   
   specify "should provide a #hold method" do

@@ -45,18 +45,8 @@ spec = Gem::Specification.new do |s|
   s.email = "code@jeremyevans.net"
   s.homepage = "http://sequel.rubyforge.org"
   s.required_ruby_version = ">= 1.8.4"
-
-  case RUBY_PLATFORM
-  when /java/
-    s.platform = "jruby"
-  else
-    s.platform = Gem::Platform::RUBY
-  end
-
   s.add_dependency("sequel_core", "= #{SEQUEL_CORE_VERS}")
-  
   s.files = %w(COPYING README Rakefile) + Dir.glob("{doc,spec,lib}/**/*")
-
   s.require_path = "lib"
 end
 

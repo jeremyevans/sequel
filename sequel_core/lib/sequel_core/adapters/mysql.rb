@@ -55,7 +55,6 @@ class Mysql::Result
           row[i] = v.send(t)
         end
       end
-      row.keys = c
       yield row
     end
   end
@@ -80,8 +79,8 @@ module Sequel
           if conn.respond_to?(:server_version)
             pool.hold {|c| c.server_version}
           else
-            get(:version[]) =~ /(\d+)\.(\d+)\.(\d+)/
-            ($1.to_i * 10000) + ($2.to_i * 100) + $3.to_i
+            m = /(\d+)\.(\d+)\.(\d+)/.match(get(:version[]))
+            (m[1].to_i * 10000) + (m[2].to_i * 100) + m[3].to_i
           end
         end
       end
@@ -135,10 +134,14 @@ module Sequel
       end
 
       def execute(sql, &block)
-        @logger.info(sql) if @logger
-        @pool.hold do |conn|
-          conn.query(sql)
-          block[conn] if block
+        begin
+          log_info(sql)
+          @pool.hold do |conn|
+            conn.query(sql)
+            block[conn] if block
+          end
+        rescue Mysql::Error => e
+          raise Error.new(e.message)
         end
       end
 
@@ -175,7 +178,7 @@ module Sequel
         sql = "#{literal(column[:name].to_sym)} #{TYPES[column[:type]]}"
         column[:size] ||= 255 if column[:type] == :varchar
         elements = column[:size] || column[:elements]
-        sql << "(#{literal(elements)})" if elements
+        sql << literal(Array(elements)) if elements
         sql << UNSIGNED if column[:unsigned]
         sql << UNIQUE if column[:unique]
         sql << NOT_NULL if column[:null] == false
@@ -185,7 +188,7 @@ module Sequel
         sql << " #{auto_increment_sql}" if column[:auto_increment]
         if column[:table]
           sql << ", FOREIGN KEY (#{literal(column[:name].to_sym)}) REFERENCES #{column[:table]}"
-          sql << "(#{literal(column[:key])})" if column[:key]
+          sql << literal(Array(column[:key])) if column[:key]
           sql << " ON DELETE #{on_delete_clause(column[:on_delete])}" if column[:on_delete]
         end
         sql
@@ -196,13 +199,13 @@ module Sequel
         unique = "UNIQUE " if index[:unique]
         case index[:type]
         when :full_text
-          "CREATE FULLTEXT INDEX #{index_name} ON #{table_name} (#{literal(index[:columns])})"
+          "CREATE FULLTEXT INDEX #{index_name} ON #{table_name} #{literal(index[:columns])}"
         when :spatial
-          "CREATE SPATIAL INDEX #{index_name} ON #{table_name} (#{literal(index[:columns])})"
+          "CREATE SPATIAL INDEX #{index_name} ON #{table_name} #{literal(index[:columns])}"
         when nil
-          "CREATE #{unique}INDEX #{index_name} ON #{table_name} (#{literal(index[:columns])})"
+          "CREATE #{unique}INDEX #{index_name} ON #{table_name} #{literal(index[:columns])}"
         else
-          "CREATE #{unique}INDEX #{index_name} ON #{table_name} (#{literal(index[:columns])}) USING #{index[:type]}"
+          "CREATE #{unique}INDEX #{index_name} ON #{table_name} #{literal(index[:columns])} USING #{index[:type]}"
         end
       end
     
@@ -212,16 +215,20 @@ module Sequel
           if @transactions.include? Thread.current
             return yield(conn)
           end
+          log_info(SQL_BEGIN)
           conn.query(SQL_BEGIN)
           begin
             @transactions << Thread.current
-            result = yield(conn)
-            conn.query(SQL_COMMIT)
-            result
-          rescue => e
+            yield(conn)
+          rescue ::Exception => e
+            log_info(SQL_ROLLBACK)
             conn.query(SQL_ROLLBACK)
-            raise e unless Error::Rollback === e
+            raise (Mysql::Error === e ? Error.new(e.message) : e) unless Error::Rollback === e
           ensure
+            unless e
+              log_info(SQL_COMMIT)
+              conn.query(SQL_COMMIT)
+            end
             @transactions.delete(Thread.current)
           end
         end
@@ -233,10 +240,17 @@ module Sequel
         @opts[:database] = db_name if self << "USE #{db_name}"
         self
       end
+
+      private
+        def connection_pool_default_options
+          super.merge(:pool_reuse_connections=>:last_resort, :pool_convert_exceptions=>false)
+        end
     end
 
     class Dataset < Sequel::Dataset
-      def quote_column_ref(c); "`#{c}`"; end
+      def quoted_identifier(c)
+        "`#{c}`"
+      end
 
       TRUE = '1'
       FALSE = '0'
@@ -268,7 +282,7 @@ module Sequel
         when LiteralString
           v
         when String
-          "'#{v.gsub(/'|\\/, '\&\&')}'"
+          "'#{::Mysql.quote(v)}'"
         when true
           TRUE
         when false
@@ -293,25 +307,37 @@ module Sequel
       #
       # === Example
       #   @ds = MYSQL_DB[:nodes]
-      #   @ds.join_expr(:natural_left_outer, :nodes)
-      #   # 'NATURAL LEFT OUTER JOIN nodes'
-      #
-      def join_expr(type, table, expr = nil, options = {})
-        raise Error::InvalidJoinType, "Invalid join type: #{type}" unless join_type = JOIN_TYPES[type || :inner]
-        
-        server_version = @opts[:server_version] ||= @db.server_version
-        type = :inner if type == :cross && !expr.nil?
+      #   @ds.join_table(:natural_left_outer, :nodes)
+      #   # join SQL is 'NATURAL LEFT OUTER JOIN nodes'
+      def join_table(type, table, expr=nil, table_alias=nil)
+        raise(Error::InvalidJoinType, "Invalid join type: #{type}") unless join_type = JOIN_TYPES[type || :inner]
 
-        if (server_version >= 50014) && /\Anatural|cross|straight\z/.match(type.to_s)
-          table = "( #{literal(table)} )" if table.is_a?(Array)
-          "#{join_type} #{table}"
+        server_version = (@opts[:server_version] ||= @db.server_version)
+        type = :inner if (type == :cross) && !expr.nil?
+        return super(type, table, expr, table_alias) unless (server_version >= 50014) && /natural|cross|straight/.match(type.to_s)
+  
+        table = if Array === table
+          "( #{table.collect{|t| quote_identifier(t)}.join(', ')} )"
         else
-          super
+          quote_identifier(table)
         end
+        clone(:join => "#{@opts[:join]} #{join_type} #{table}")
       end
 
       def insert_default_values_sql
         "INSERT INTO #{source_list(@opts[:from])} () VALUES ()"
+      end
+
+      def complex_expression_sql(ce)
+        args = ce.args
+        case op = ce.op
+        when :~, :'!~'
+          "#{'NOT ' if op == :'!~'}(#{literal(args.at(0))} REGEXP BINARY #{literal(args.at(1))})"
+        when :'~*', :'!~*'
+          "#{'NOT ' if op == :'!~*'}((#{literal(args.at(0))} REGEXP #{literal(args.at(1))})"
+        else
+          super(ce)
+        end
       end
 
       def match_expr(l, r)
@@ -352,7 +378,7 @@ module Sequel
         end
 
         if where = opts[:where]
-          sql << " WHERE #{where}"
+          sql << " WHERE #{literal(where)}"
         end
 
         if group = opts[:group]
@@ -360,7 +386,7 @@ module Sequel
         end
 
         if having = opts[:having]
-          sql << " HAVING #{having}"
+          sql << " HAVING #{literal(having)}"
         end
 
         if order = opts[:order]
@@ -391,13 +417,22 @@ module Sequel
       
       def full_text_search(cols, terms, opts = {})
         mode = opts[:boolean] ? " IN BOOLEAN MODE" : ""
-        filter("MATCH (#{literal(cols)}) AGAINST (#{literal(terms)}#{mode})")
+        s = if Array === terms
+          if mode.blank?
+            "MATCH #{literal(Array(cols))} AGAINST #{literal(terms)}"
+          else
+            "MATCH #{literal(Array(cols))} AGAINST (#{literal(terms)[1...-1]}#{mode})"
+          end
+        else
+          "MATCH #{literal(Array(cols))} AGAINST (#{literal(terms)}#{mode})"
+        end
+        filter(s)
       end
 
       # MySQL allows HAVING clause on ungrouped datasets.
       def having(*cond, &block)
         @opts[:having] = {}
-        filter(*cond, &block)
+        x = filter(*cond, &block)
       end
 
       # MySQL supports ORDER and LIMIT clauses in UPDATE statements.
@@ -431,12 +466,8 @@ module Sequel
           when Array
             if values.empty?
               "REPLACE INTO #{from} DEFAULT VALUES"
-            elsif values.keys
-              fl = values.keys.map {|f| literal(f.is_a?(String) ? f.to_sym : f)}
-              vl = values.values.map {|v| literal(v)}
-              "REPLACE INTO #{from} (#{fl.join(COMMA_SEPARATOR)}) VALUES (#{vl.join(COMMA_SEPARATOR)})"
             else
-              "REPLACE INTO #{from} VALUES (#{literal(values)})"
+              "REPLACE INTO #{from} VALUES #{literal(values)}"
             end
           when Hash
             if values.empty?
@@ -498,8 +529,8 @@ module Sequel
       end
 
       def multi_insert_sql(columns, values)
-        columns = literal(columns)
-        values = values.map {|r| "(#{literal(r)})"}.join(COMMA_SEPARATOR)
+        columns = column_list(columns)
+        values = values.map {|r| literal(Array(r))}.join(COMMA_SEPARATOR)
         ["INSERT INTO #{source_list(@opts[:from])} (#{columns}) VALUES #{values}"]
       end
     end

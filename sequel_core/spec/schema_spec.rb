@@ -110,11 +110,25 @@ context "DB#create_table" do
     @db.sqls.should == ["CREATE TABLE cats (name varchar(102))"]
   end
 
-  specify "should accept foreign keys" do
+  specify "should accept foreign keys without options" do
+    @db.create_table(:cats) do
+      foreign_key :project_id
+    end
+    @db.sqls.should == ["CREATE TABLE cats (project_id integer)"]
+  end
+
+  specify "should accept foreign keys with options" do
     @db.create_table(:cats) do
       foreign_key :project_id, :table => :projects
     end
     @db.sqls.should == ["CREATE TABLE cats (project_id integer REFERENCES projects)"]
+  end
+
+  specify "should accept foreign keys with separate table argument" do
+    @db.create_table(:cats) do
+      foreign_key :project_id, :projects, :default=>3
+    end
+    @db.sqls.should == ["CREATE TABLE cats (project_id integer DEFAULT 3 REFERENCES projects)"]
   end
   
   specify "should accept foreign keys with arbitrary keys" do
@@ -264,14 +278,15 @@ context "DB#create_table" do
     @db.sqls.should == ["CREATE TABLE cats (id integer)", "CREATE UNIQUE INDEX cats_id_name_index ON cats (id, name)"]
   end
   
-  specify "should accept unnamed constraint definitions" do
+  pt_specify "should accept unnamed constraint definitions with blocks" do
     @db.create_table(:cats) do
       integer :score
       check {:x > 0 && :y < 1}
     end
-    @db.sqls.should == ["CREATE TABLE cats (score integer, CHECK (((x > 0) AND (y < 1))))"]
-    @db.sqls.clear
+    @db.sqls.should == ["CREATE TABLE cats (score integer, CHECK ((x > 0) AND (y < 1)))"]
+  end
 
+  specify "should accept unnamed constraint definitions" do
     @db.create_table(:cats) do
       check 'price < ?', 100
     end
@@ -284,12 +299,13 @@ context "DB#create_table" do
       constraint :valid_score, 'score <= 100'
     end
     @db.sqls.should == ["CREATE TABLE cats (score integer, CONSTRAINT valid_score CHECK (score <= 100))"]
-    @db.sqls.clear
+  end
 
+  pt_specify "should accept named constraint definitions with block" do
     @db.create_table(:cats) do
       constraint(:blah_blah) {:x > 0 && :y < 1}
     end
-    @db.sqls.should == ["CREATE TABLE cats (CONSTRAINT blah_blah CHECK (((x > 0) AND (y < 1))))"]
+    @db.sqls.should == ["CREATE TABLE cats (CONSTRAINT blah_blah CHECK ((x > 0) AND (y < 1)))"]
   end
 end
 
@@ -320,24 +336,87 @@ context "DB#alter_table" do
     @db = SchemaDummyDatabase.new
   end
 
-  specify "should accept add constraint definitions" do
+  specify "should support add_column" do
+    @db.alter_table(:cats) do
+      add_column :score, :integer
+    end
+    @db.sqls.should == ["ALTER TABLE cats ADD COLUMN score integer"]
+  end
+
+  specify "should support add_constraint" do
     @db.alter_table(:cats) do
       add_constraint :valid_score, 'score <= 100'
     end
     @db.sqls.should == ["ALTER TABLE cats ADD CONSTRAINT valid_score CHECK (score <= 100)"]
-    @db.sqls.clear
+  end
 
+  pt_specify "should support add_constraint with block" do
     @db.alter_table(:cats) do
       add_constraint(:blah_blah) {:x > 0 && :y < 1}
     end
-    @db.sqls.should == ["ALTER TABLE cats ADD CONSTRAINT blah_blah CHECK (((x > 0) AND (y < 1)))"]
+    @db.sqls.should == ["ALTER TABLE cats ADD CONSTRAINT blah_blah CHECK ((x > 0) AND (y < 1))"]
   end
 
-  specify "should accept drop constraint definitions" do
+  specify "should support add_foreign_key" do
+    @db.alter_table(:cats) do
+      add_foreign_key :node_id, :nodes
+    end
+    @db.sqls.should == ["ALTER TABLE cats ADD COLUMN node_id integer REFERENCES nodes"]
+  end
+
+  specify "should support add_index" do
+    @db.alter_table(:cats) do
+      add_index :name
+    end
+    @db.sqls.should == ["CREATE INDEX cats_name_index ON cats (name)"]
+  end
+
+  specify "should support add_primary_key" do
+    @db.alter_table(:cats) do
+      add_primary_key :id
+    end
+    @db.sqls.should == ["ALTER TABLE cats ADD COLUMN id integer PRIMARY KEY AUTOINCREMENT"]
+  end
+
+  specify "should support drop_column" do
+    @db.alter_table(:cats) do
+      drop_column :score
+    end
+    @db.sqls.should == ["ALTER TABLE cats DROP COLUMN score"]
+  end
+
+  specify "should support drop_constraint" do
     @db.alter_table(:cats) do
       drop_constraint :valid_score
     end
     @db.sqls.should == ["ALTER TABLE cats DROP CONSTRAINT valid_score"]
   end
 
+  specify "should support drop_index" do
+    @db.alter_table(:cats) do
+      drop_index :name
+    end
+    @db.sqls.should == ["DROP INDEX cats_name_index"]
+  end
+
+  specify "should support rename_column" do
+    @db.alter_table(:cats) do
+      rename_column :name, :old_name
+    end
+    @db.sqls.should == ["ALTER TABLE cats RENAME COLUMN name TO old_name"]
+  end
+
+  specify "should support set_column_default" do
+    @db.alter_table(:cats) do
+      set_column_default :score, 3
+    end
+    @db.sqls.should == ["ALTER TABLE cats ALTER COLUMN score SET DEFAULT 3"]
+  end
+
+  specify "should support set_column_type" do
+    @db.alter_table(:cats) do
+      set_column_type :score, :real
+    end
+    @db.sqls.should == ["ALTER TABLE cats ALTER COLUMN score TYPE real"]
+  end
 end

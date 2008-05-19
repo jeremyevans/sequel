@@ -362,7 +362,7 @@ module Sequel::Model::Associations::EagerLoading
         # Proc for setting cascaded eager loading
         assoc_block = Proc.new do |d|
           if order = reflection[:order]
-            d = d.order(order)
+            d = d.order(*order)
           end
           if c = eager_assoc[assoc_name]
             d = d.eager(c)
@@ -382,8 +382,14 @@ module Sequel::Model::Associations::EagerLoading
             keys = h.keys
             # No records have the foreign key set for this association, so skip it
             next unless keys.length > 0
-            assoc_block.call(assoc_class.select(reflection.select).filter(assoc_class.primary_key=>keys)).all do |assoc_object|
-              h[assoc_object.pk].each do |object|
+            # Set the instance variable to null by default, so records that
+            # don't have a associated records will cache the negative lookup.
+            a.each do |object|
+              object.instance_variable_set(assoc_iv, :null)
+            end
+            assoc_block.call(assoc_class.select(*reflection.select).filter(assoc_class.primary_key=>keys)).all do |assoc_object|
+              next unless objects = h[assoc_object.pk]
+              objects.each do |object|
                 object.instance_variable_set(assoc_iv, assoc_object)
               end
             end
@@ -392,10 +398,10 @@ module Sequel::Model::Associations::EagerLoading
             ds = if rtype == :one_to_many
               fkey = reflection[:key]
               reciprocal = reflection.reciprocal
-              assoc_class.select(reflection.select).filter(fkey=>h.keys)
+              assoc_class.select(*reflection.select).filter(fkey=>h.keys)
             else
               fkey = reflection[:left_key_alias]
-              assoc_class.select(reflection.select, reflection[:left_key_select]).inner_join(reflection[:join_table], [[reflection[:right_key], reflection.associated_primary_key], [reflection[:left_key], h.keys]])
+              assoc_class.select(*(Array(reflection.select)+Array(reflection[:left_key_select]))).inner_join(reflection[:join_table], [[reflection[:right_key], reflection.associated_primary_key], [reflection[:left_key], h.keys]])
             end
             h.values.each do |object_array|
               object_array.each do |object|
@@ -408,7 +414,8 @@ module Sequel::Model::Associations::EagerLoading
               else
                 assoc_object[fkey]
               end
-              h[fk].each do |object|
+              next unless objects = h[fk]
+              objects.each do |object|
                 object.instance_variable_get(assoc_iv) << assoc_object
                 assoc_object.instance_variable_set(reciprocal, object) if reciprocal
               end

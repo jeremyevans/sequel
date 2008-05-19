@@ -48,6 +48,16 @@ describe Sequel::Model, "dataset & schema" do
     @model.table_name.should == :foo
   end
 
+  it "set_dataset should take a symbol" do
+    @model.db = MODEL_DB
+    @model.set_dataset(:foo)
+    @model.table_name.should == :foo
+  end
+
+  it "set_dataset should raise an error unless given a Symbol or Dataset" do
+    proc{@model.set_dataset(Object.new)}.should raise_error(Sequel::Error)
+  end
+
   it "set_dataset should add the destroy method to the dataset" do
     ds = MODEL_DB[:foo]
     ds.should_not respond_to(:destroy)
@@ -149,7 +159,7 @@ describe Sequel::Model, ".subset" do
     @c = Class.new(Sequel::Model(:items))
   end
 
-  it "should create a filter on the underlying dataset" do
+  pt_specify "should create a filter on the underlying dataset" do
     proc {@c.new_only}.should raise_error(NoMethodError)
     
     @c.subset(:new_only) {:age == 'new'}
@@ -163,8 +173,8 @@ describe Sequel::Model, ".subset" do
     @c.dataset.pricey.sql.should == "SELECT * FROM items WHERE (price > 100)"
     
     # check if subsets are composable
-    @c.pricey.new_only.sql.should == "SELECT * FROM items WHERE (price > 100) AND (age = 'new')"
-    @c.new_only.pricey.sql.should == "SELECT * FROM items WHERE (age = 'new') AND (price > 100)"
+    @c.pricey.new_only.sql.should == "SELECT * FROM items WHERE ((price > 100) AND (age = 'new'))"
+    @c.new_only.pricey.sql.should == "SELECT * FROM items WHERE ((age = 'new') AND (price > 100))"
   end
 
 end
@@ -191,11 +201,11 @@ describe Sequel::Model, ".find" do
     @c.find(:name => 'sharon').should be_a_kind_of(@c)
     $sqls.last.should == "SELECT * FROM items WHERE (name = 'sharon') LIMIT 1"
 
-    @c.find {"name LIKE 'abc%'".lit}.should be_a_kind_of(@c)
-    $sqls.last.should == "SELECT * FROM items WHERE name LIKE 'abc%' LIMIT 1"
+    @c.find(:name.like('abc%')).should be_a_kind_of(@c)
+    $sqls.last.should == "SELECT * FROM items WHERE (name LIKE 'abc%') LIMIT 1"
   end
   
-  it "should accept filter blocks" do
+  pt_specify "should accept filter blocks" do
     @c.find {:id == 1}.should be_a_kind_of(@c)
     $sqls.last.should == "SELECT * FROM items WHERE (id = 1) LIMIT 1"
 
@@ -427,14 +437,17 @@ describe Sequel::Model, "A model class without a primary key" do
 end
 
 describe Sequel::Model, "attribute accessors" do
+  after do
+    Sequel::Model.lazy_load_schema = false
+  end
 
-  before(:each) do
+  before do
     MODEL_DB.reset
 
     @c = Class.new(Sequel::Model) do
       def self.columns; orig_columns; end
     end
-    @dataset = Object.new
+    @dataset = Sequel::Dataset.new(MODEL_DB)
     def @dataset.db; end
     def @dataset.set_model(blah); end
     def @dataset.naked; self; end
@@ -442,7 +455,7 @@ describe Sequel::Model, "attribute accessors" do
     def @dataset.def_mutation_method(*names);  end
   end
 
-  it "should be created on set_dataset" do
+  it "should be created on set_dataset unless lazy loading schema" do
     %w'x y x= y='.each do |x|
       @c.instance_methods.include?(x).should == false
     end
@@ -451,6 +464,28 @@ describe Sequel::Model, "attribute accessors" do
       @c.instance_methods.include?(x).should == true
     end
     o = @c.new
+    %w'x y x= y='.each do |x|
+      o.methods.include?(x).should == true
+    end
+
+    o.x.should be_nil
+    o.x = 34
+    o.x.should == 34
+  end
+
+  it "should be created on first initialization if lazy loading schema" do
+    Sequel::Model.lazy_load_schema = true
+    %w'x y x= y='.each do |x|
+      @c.instance_methods.include?(x).should == false
+    end
+    @c.set_dataset(@dataset)
+    %w'x y x= y='.each do |x|
+      @c.instance_methods.include?(x).should == false 
+    end
+    o = @c.new
+    %w'x y x= y='.each do |x|
+      @c.instance_methods.include?(x).should == true
+    end
     %w'x y x= y='.each do |x|
       o.methods.include?(x).should == true
     end
@@ -512,7 +547,7 @@ describe Sequel::Model, ".[]" do
     @c.set_primary_key [:node_id, :kind]
     @c[3921, 201].should be_a_kind_of(@c)
     $sqls.last.should =~ \
-    /^SELECT \* FROM items WHERE (\(node_id = 3921\) AND \(kind = 201\))|(\(kind = 201\) AND \(node_id = 3921\)) LIMIT 1$/
+    /^SELECT \* FROM items WHERE \((\(node_id = 3921\) AND \(kind = 201\))|(\(kind = 201\) AND \(node_id = 3921\))\) LIMIT 1$/
   end
 end
 

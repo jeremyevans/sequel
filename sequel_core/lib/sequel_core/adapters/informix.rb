@@ -25,13 +25,13 @@ module Sequel
       
       # Returns number of rows affected
       def execute(sql)
-        @logger.info(sql) if @logger
+        log_info(sql)
         @pool.hold {|c| c.immediate(sql)}
       end
       alias_method :do, :execute
       
       def query(sql, &block)
-        @logger.info(sql) if @logger
+        log_info(sql)
         @pool.hold {|c| block[c.cursor(sql)]}
       end
     end

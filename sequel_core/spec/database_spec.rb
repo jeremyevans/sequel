@@ -9,8 +9,17 @@ context "A new Database" do
     @db.opts.should == {1 => 2, :logger => 3}  
   end
   
-  specify "should set the logger from opts[:logger]" do
+  specify "should set the logger from opts[:logger] and opts[:loggers]" do
     @db.logger.should == 3
+    @db.loggers.should == [3]
+    Sequel::Database.new(1 => 2, :loggers => 3).logger.should == 3
+    Sequel::Database.new(1 => 2, :loggers => 3).loggers.should == [3]
+    Sequel::Database.new(1 => 2, :loggers => [3]).logger.should == 3
+    Sequel::Database.new(1 => 2, :loggers => [3]).loggers.should == [3]
+    Sequel::Database.new(1 => 2, :logger => 4, :loggers => 3).logger.should == 4
+    Sequel::Database.new(1 => 2, :logger => 4, :loggers => 3).loggers.should == [4,3]
+    Sequel::Database.new(1 => 2, :logger => [4], :loggers => [3]).logger.should == 4
+    Sequel::Database.new(1 => 2, :logger => [4], :loggers => [3]).loggers.should == [4,3]
   end
   
   specify "should create a connection pool" do
@@ -88,7 +97,7 @@ context "Database#dataset" do
     e.sql.should == 'SELECT * FROM miu'
   end
   
-  specify "should provide a filtered #from dataset if a block is given" do
+  pt_specify "should provide a filtered #from dataset if a block is given" do
     d = @db.from(:mau) {:x > 100}
     d.should be_a_kind_of(Sequel::Dataset)
     d.sql.should == 'SELECT * FROM mau WHERE (x > 100)'
@@ -435,6 +444,18 @@ context "Database#transaction" do
     @db.sql.should == ['BEGIN', 'DROP TABLE test;', 'COMMIT']
   end
   
+  specify "should handle returning inside of the block by committing" do
+    def @db.ret_commit
+      transaction do
+        execute 'DROP TABLE test;'
+        return
+        execute 'DROP TABLE test2;';
+      end
+    end
+    @db.ret_commit
+    @db.sql.should == ['BEGIN', 'DROP TABLE test;', 'COMMIT']
+  end
+  
   specify "should issue ROLLBACK if an exception is raised, and re-raise" do
     @db.transaction {@db.execute 'DROP TABLE test'; raise RuntimeError} rescue nil
     @db.sql.should == ['BEGIN', 'DROP TABLE test', 'ROLLBACK']
@@ -477,7 +498,15 @@ end
 context "A Database adapter with a scheme" do
   setup do
     class CCC < Sequel::Database
+      if defined?(DISCONNECTS)
+        DISCONNECTS.clear
+      else
+        DISCONNECTS = []
+      end
       set_adapter_scheme :ccc
+      def disconnect
+        DISCONNECTS << self
+      end
     end
   end
 
@@ -499,6 +528,30 @@ context "A Database adapter with a scheme" do
     c.opts[:database].should == 'db'
   end
 
+  specify "should be accessible through Sequel.connect via a block" do
+    x = nil
+    y = nil
+    z = nil
+
+    p = proc do |c|
+      c.should be_a_kind_of(CCC)
+      c.opts[:host].should == 'localhost'
+      c.opts[:database].should == 'db'
+      z = y
+      y = x
+      x = c
+    end
+    Sequel::Database.connect('ccc://localhost/db', &p).should == nil
+    CCC::DISCONNECTS.should == [x]
+
+    Sequel.connect('ccc://localhost/db', &p).should == nil
+    CCC::DISCONNECTS.should == [y, x]
+
+    Sequel.send(:def_adapter_method, :ccc)
+    Sequel.ccc('db', :host=>'localhost', &p).should == nil
+    CCC::DISCONNECTS.should == [z, y, x]
+  end
+
   specify "should be accessible through Sequel.open" do
     c = Sequel.open 'ccc://localhost/db'
     c.should be_a_kind_of(CCC)
@@ -515,9 +568,8 @@ context "A Database adapter with a scheme" do
   end
 
   specify "should be accessible through Sequel.<adapter>" do
-    class << Sequel
-      def_adapter_method(:ccc)
-    end
+    Sequel.send(:def_adapter_method, :ccc)
+
     # invalid parameters
     proc {Sequel.ccc('abc', 'def')}.should raise_error(Sequel::Error)
     
@@ -681,9 +733,26 @@ context "A database" do
     db = Sequel::Database.new
     s = "I'm a logger"
     db.logger = s
-    db.logger.should be(s)
+    db.logger.should == s
+    db.loggers.should == [s]
     db.logger = nil
-    db.logger.should be_nil
+    db.logger.should == nil
+    db.loggers.should == []
+
+    db.loggers = [s]
+    db.logger.should == s
+    db.loggers.should == [s]
+    db.loggers = []
+    db.logger.should == nil
+    db.loggers.should == []
+
+    t = "I'm also a logger"
+    db.loggers = [s, t]
+    db.logger.should == s
+    db.loggers.should == [s,t]
+    db.loggers = []
+    db.logger.should == nil
+    db.loggers.should == []
   end
 end
 
@@ -720,7 +789,7 @@ context "Database#fetch" do
     sql.should == "select * from xyz where x = 15 and y = 'abc'"
     
     # and Aman Gupta's example
-    @db.fetch('select name from table where name = ? or id in (?)',
+    @db.fetch('select name from table where name = ? or id in ?',
     'aman', [3,4,7]) {|r| sql = r[:sql]}
     sql.should == "select name from table where name = 'aman' or id in (3, 4, 7)"
   end
@@ -739,7 +808,7 @@ context "Database#fetch" do
     ds.select_sql.should == 'select * from xyz'
     ds.sql.should == 'select * from xyz'
     
-    ds.filter! {:price < 100}
+    ds.filter!(:price < 100)
     ds.select_sql.should == 'select * from xyz'
     ds.sql.should == 'select * from xyz'
   end

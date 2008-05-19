@@ -1,10 +1,36 @@
-# Array extensions
 class Array
+  def ~
+    ~to_complex_expr_if_all_two_pairs
+  end
+
+  def all_two_pairs?
+    !empty? && all?{|i| (Array === i) && (i.length == 2)}
+  end
+
   # Concatenates an array of strings into an SQL string. ANSI SQL and C-style
   # comments are removed, as well as excessive white-space.
   def to_sql
-    map {|l| (l =~ /^(.*)--/ ? $1 : l).chomp}.join(' '). \
+    map {|l| ((m = /^(.*)--/.match(l)) ? m[1] : l).chomp}.join(' '). \
       gsub(/\/\*.*\*\//, '').gsub(/\s+/, ' ').strip
+  end
+
+  def sql_negate
+    to_complex_expr_if_all_two_pairs(:AND, true)
+  end
+
+  def sql_or
+    to_complex_expr_if_all_two_pairs(:OR)
+  end
+
+  def to_complex_expr
+    to_complex_expr_if_all_two_pairs
+  end
+
+  private
+
+  def to_complex_expr_if_all_two_pairs(*args)
+    raise(Sequel::Error, 'Not all elements of the array are arrays of size 2, so it cannot be converted to an SQL expression') unless all_two_pairs?
+    ::Sequel::SQL::ComplexExpression.from_value_pairs(self, *args)
   end
 end
 
@@ -16,20 +42,7 @@ module Sequel
   end
 end
 
-# String extensions
 class String
-  # Converts a string into an SQL string by removing comments.
-  # See also Array#to_sql.
-  def to_sql
-    split("\n").to_sql
-  end
-  
-  # Splits a string into separate SQL statements, removing comments
-  # and excessive white-space.
-  def split_sql
-    to_sql.split(';').map {|s| s.strip}
-  end
-
   # Converts a string into an LiteralString, in order to override string
   # literalization, e.g.:
   #
@@ -42,24 +55,44 @@ class String
   def lit
     Sequel::LiteralString.new(self)
   end
-  
   alias_method :expr, :lit
   
-  # Converts a string into a Time object.
-  def to_time
-    begin
-      Time.parse(self)
-    rescue Exception => e
-      raise Sequel::Error::InvalidValue, "Invalid time value '#{self}' (#{e.message})"
-    end
+  # Splits a string into separate SQL statements, removing comments
+  # and excessive white-space.
+  def split_sql
+    to_sql.split(';').map {|s| s.strip}
   end
 
+  # Converts a string into an SQL string by removing comments.
+  # See also Array#to_sql.
+  def to_sql
+    split("\n").to_sql
+  end
+  
   # Converts a string into a Date object.
   def to_date
     begin
       Date.parse(self)
-    rescue Exception => e
+    rescue => e
       raise Sequel::Error::InvalidValue, "Invalid date value '#{self}' (#{e.message})"
+    end
+  end
+
+  # Converts a string into a DateTime object.
+  def to_datetime
+    begin
+      DateTime.parse(self)
+    rescue => e
+      raise Sequel::Error::InvalidValue, "Invalid date value '#{self}' (#{e.message})"
+    end
+  end
+
+  # Converts a string into a Time object.
+  def to_time
+    begin
+      Time.parse(self)
+    rescue => e
+      raise Sequel::Error::InvalidValue, "Invalid time value '#{self}' (#{e.message})"
     end
   end
 end
@@ -79,40 +112,47 @@ module Sequel
       def asc; ColumnExpr.new(self, ASC); end
 
       def cast_as(t)
-        if t.is_a?(Symbol)
-          t = t.to_s.lit
-        end
+        t = t.to_s.lit if t.is_a?(Symbol)
         Sequel::SQL::Function.new(:cast, self.as(t))
       end
     end
 
     class Expression
       include ColumnMethods
+
       def lit; self; end
     end
     
     class ColumnExpr < Expression
       attr_reader :l, :op, :r
-      def initialize(l, op, r = nil); @l, @op, @r = l, op, r; end
+
+      def initialize(l, op, r = nil)
+        @l, @op, @r = l, op, r
+      end
       
       def to_s(ds)
-        @r ? \
-          "#{ds.literal(@l)} #{@op} #{ds.literal(@r)}" : \
-          "#{ds.literal(@l)} #{@op}"
+        ds.column_expr_sql(self)
       end
     end
     
     class QualifiedColumnRef < Expression
-      def initialize(t, c); @t, @c = t, c; end
+      attr_reader :table, :column
+
+      def initialize(table, column)
+        @table, @column = table, column
+      end
       
       def to_s(ds)
-        "#{@t}.#{ds.literal(@c)}"
+        ds.qualified_column_ref_sql(self)
       end 
     end
     
     class Function < Expression
       attr_reader :f, :args
-      def initialize(f, *args); @f, @args = f, args; end
+
+      def initialize(f, *args)
+        @f, @args = f, args
+      end
 
       # Functions are considered equivalent if they
       # have the same class, function, and arguments.
@@ -121,37 +161,187 @@ module Sequel
       end
 
       def to_s(ds)
-        args = @args.empty? ? '' : ds.literal(@args)
-        "#{@f}(#{args})"
+        ds.function_sql(self)
       end
     end
     
     class Subscript < Expression
-      def initialize(f, sub); @f, @sub = f, sub; end
+      attr_reader :f, :sub
+
+      def initialize(f, sub)
+        @f, @sub = f, sub
+      end
+
       def |(sub)
-        unless Array === sub
-          sub = [sub]
-        end
-        Subscript.new(@f, @sub << sub)
+        Subscript.new(@f, @sub << Array(sub))
       end
       
-      COMMA_SEPARATOR = ", ".freeze
-      
       def to_s(ds)
-        "#{@f}[#{@sub.join(COMMA_SEPARATOR)}]"
+        ds.subscript_sql(self)
       end
     end
     
     class ColumnAll < Expression
-      def initialize(t); @t = t; end
-      def to_s(ds); "#{@t}.*"; end
+      attr_reader :table
+
+      def initialize(table)
+        @table = table
+      end
 
       # ColumnAll expressions are considered equivalent if they
       # have the same class and string representation
       def ==(x)
-        x.class == self.class && to_s(nil) == x.to_s(nil)
+        x.class == self.class && @table == x.table
       end
 
+      def to_s(ds)
+        ds.column_all_sql(self)
+      end
+    end
+
+    class ComplexExpression < Expression
+      OPERTATOR_INVERSIONS = {:AND => :OR, :OR => :AND, :< => :>=, :> => :<=,
+        :<= => :>, :>= => :<, :'=' => :'!=' , :'!=' => :'=', :LIKE => :'NOT LIKE',
+        :'NOT LIKE' => :LIKE, :~ => :'!~', :'!~' => :~, :IN => :'NOT IN',
+        :'NOT IN' => :IN, :IS => :'IS NOT', :'IS NOT' => :IS, :'~*' => :'!~*',
+        :'!~*' => :'~*'}
+
+      MATHEMATICAL_OPERATORS = [:+, :-, :/, :*]
+      INEQUALITY_OPERATORS = [:<, :>, :<=, :>=]
+      SEARCH_OPERATORS = [:LIKE, :'NOT LIKE', :~, :'!~', :'~*', :'!~*']
+      INCLUSION_OPERATORS = [:IN, :'NOT IN']
+      BOOLEAN_OPERATORS = [:AND, :OR]
+      BOOLEAN_OPERATOR_METHODS = {:& => :AND, :| =>:OR}
+
+      EQUALITY_OPERATORS = [:'=', :'!=', :IS, :'IS NOT', *INEQUALITY_OPERATORS]
+      NO_BOOLEAN_INPUT_OPERATORS = MATHEMATICAL_OPERATORS + INEQUALITY_OPERATORS
+      BOOLEAN_RESULT_OPERATORS = BOOLEAN_OPERATORS + EQUALITY_OPERATORS + SEARCH_OPERATORS + INCLUSION_OPERATORS + [:NOT]
+      BOOLEAN_LITERALS = [true, false, nil]
+
+      TWO_ARITY_OPERATORS = EQUALITY_OPERATORS + SEARCH_OPERATORS + INCLUSION_OPERATORS
+      N_ARITY_OPERATORS = MATHEMATICAL_OPERATORS + BOOLEAN_OPERATORS
+
+      attr_reader :op, :args
+
+      def initialize(op, *args)
+        args.collect! do |a|
+          case a
+          when Hash
+            a.to_complex_expr
+          when Array
+            a.all_two_pairs? ? a.to_complex_expr : a
+          else
+            a
+          end
+        end
+        if NO_BOOLEAN_INPUT_OPERATORS.include?(op)
+          args.any? do |a|
+            if BOOLEAN_LITERALS.include?(a) || ((ComplexExpression === a) && BOOLEAN_RESULT_OPERATORS.include?(a.op))
+              raise(Sequel::Error, "cannot apply #{op} to a boolean expression")
+            end
+          end
+        end
+        case op
+        when *N_ARITY_OPERATORS
+          raise(Sequel::Error, 'mathematical and boolean operators require at least 1 argument') unless args.length >= 1
+        when *TWO_ARITY_OPERATORS
+          raise(Sequel::Error, '(in)equality operators require precisely 2 arguments') unless args.length == 2
+        when :NOT
+          raise(Sequel::Error, 'the NOT operator requires a single argument') unless args.length == 1
+        else
+          raise(Sequel::Error, "invalid operator #{op}")
+        end
+        @op = op
+        @args = args
+      end
+
+      def self.from_value_pairs(pairs, op=:AND, negate=false)
+        pairs = pairs.collect do |l,r|
+          ce = case r
+          when Range
+            new(:AND, new(:>=, l, r.begin), new(r.exclude_end? ? :< : :<=, l, r.end))
+          when Array, ::Sequel::Dataset
+            new(:IN, l, r)
+          when NilClass
+            new(:IS, l, r)
+          when Regexp
+            like(l, r)
+          else
+            new(:'=', l, r)
+          end
+          negate ? ~ce : ce
+        end
+        pairs.length == 1 ? pairs.at(0) : new(op, *pairs)
+      end
+
+      def self.like(l, *ces)
+        ces.collect! do |ce| 
+          op, expr = Regexp === ce ? [ce.casefold? ? :'~*' : :~, ce.source] : [:LIKE, ce.to_s]
+          new(op, l, expr)
+        end
+        ces.length == 1 ? ces.at(0) : new(:OR, *ces)
+      end
+
+      def ~
+        case op
+        when *MATHEMATICAL_OPERATORS
+          raise(Sequel::Error, 'mathematical operators cannot be inverted')
+        when *BOOLEAN_OPERATORS
+          self.class.new(OPERTATOR_INVERSIONS[@op], *@args.collect{|a| ~a})
+        when *TWO_ARITY_OPERATORS
+          self.class.new(OPERTATOR_INVERSIONS[@op], *@args.dup)
+        when :NOT
+          @args.first
+        else
+          raise(Sequel::Error, "invalid operator #{op}")
+        end
+      end
+
+      BOOLEAN_OPERATOR_METHODS.each do |m, o|
+        define_method(m) do |ce|
+          raise(Sequel::Error, "cannot apply #{o} to a non-boolean expression") unless BOOLEAN_RESULT_OPERATORS.include?(op)
+          super
+        end
+      end
+
+      NO_BOOLEAN_INPUT_OPERATORS.each do |o|
+        define_method(o) do |ce|
+          raise(Sequel::Error, "cannot apply #{o} to a boolean expression") unless NO_BOOLEAN_INPUT_OPERATORS.include?(op)
+          super
+        end
+      end
+
+      def to_s(ds)
+        ds.complex_expression_sql(self)
+      end
+    end
+
+    module ComplexExpressionMethods
+      NO_BOOLEAN_INPUT_OPERATORS = ::Sequel::SQL::ComplexExpression::NO_BOOLEAN_INPUT_OPERATORS
+      BOOLEAN_RESULT_OPERATORS = ::Sequel::SQL::ComplexExpression::BOOLEAN_RESULT_OPERATORS
+      BOOLEAN_OPERATOR_METHODS = ::Sequel::SQL::ComplexExpression::BOOLEAN_OPERATOR_METHODS
+
+      BOOLEAN_OPERATOR_METHODS.each do |m, o|
+        define_method(m) do |ce|
+          raise(Sequel::Error, "cannot apply #{o} to a non-boolean expression") if (ComplexExpression === ce) && !BOOLEAN_RESULT_OPERATORS.include?(ce.op)
+          ::Sequel::SQL::ComplexExpression.new(o, self, ce)   
+        end
+      end
+
+      NO_BOOLEAN_INPUT_OPERATORS.each do |o|
+        define_method(o) do |ce|
+          raise(Sequel::Error, "cannot apply #{o} to a boolean expression") if (ComplexExpression === ce) && !NO_BOOLEAN_INPUT_OPERATORS.include?(ce.op)
+          ::Sequel::SQL::ComplexExpression.new(o, self, ce)   
+        end
+      end
+
+      def ~
+        ::Sequel::SQL::ComplexExpression.new(:NOT, self)
+      end
+
+      def like(*ces)
+        ::Sequel::SQL::ComplexExpression.like(self, *ces)
+      end
     end
   end
 end
@@ -160,44 +350,62 @@ class String
   include Sequel::SQL::ColumnMethods
 end
 
+module Sequel
+  class LiteralString
+    include SQL::ComplexExpressionMethods
+  end
+  module SQL
+    class Expression
+      include ComplexExpressionMethods
+    end
+  end
+end
+
 class Symbol
   include Sequel::SQL::ColumnMethods
-  def *
+  include Sequel::SQL::ComplexExpressionMethods
+
+  def *(ce=(arg=false;nil))
+    return super(ce) unless arg == false
     Sequel::SQL::ColumnAll.new(self);
   end
 
-  def [](*args); Sequel::SQL::Function.new(self, *args); end
+  def [](*args)
+    Sequel::SQL::Function.new(self, *args)
+  end
+
   def |(sub)
-    unless Array === sub
-      sub = [sub]
-    end
-    Sequel::SQL::Subscript.new(self, sub)
+    return super unless (Integer === sub) || ((Array === sub) && sub.any?{|x| Integer === x})
+    Sequel::SQL::Subscript.new(self, Array(sub))
   end
   
-  COLUMN_REF_RE1 = /^(\w+)__(\w+)___(\w+)/.freeze
-  COLUMN_REF_RE2 = /^(\w+)___(\w+)$/.freeze
-  COLUMN_REF_RE3 = /^(\w+)__(\w+)$/.freeze
-
-  # Converts a symbol into a column name. This method supports underscore
-  # notation in order to express qualified (two underscores) and aliased 
-  # (three underscores) columns:
-  #
-  #   ds = DB[:items]
-  #   :abc.to_column_ref(ds) #=> "abc"
-  #   :abc___a.to_column_ref(ds) #=> "abc AS a"
-  #   :items__abc.to_column_ref(ds) #=> "items.abc"
-  #   :items__abc___a.to_column_ref(ds) #=> "items.abc AS a"
-  #
   def to_column_ref(ds)
-    case s = to_s
-    when COLUMN_REF_RE1
-      "#{$1}.#{ds.quote_column_ref($2)} AS #{ds.quote_column_ref($3)}"
-    when COLUMN_REF_RE2
-      "#{ds.quote_column_ref($1)} AS #{ds.quote_column_ref($2)}"
-    when COLUMN_REF_RE3
-      "#{$1}.#{ds.quote_column_ref($2)}"
-    else
-      ds.quote_column_ref(s)
-    end
+    ds.symbol_to_column_ref(self)
+  end
+end
+
+class Hash
+  def &(ce)
+    ::Sequel::SQL::ComplexExpression.new(:AND, self, ce)
+  end
+
+  def |(ce)
+    ::Sequel::SQL::ComplexExpression.new(:OR, self, ce)
+  end
+
+  def ~
+    ~::Sequel::SQL::ComplexExpression.from_value_pairs(self)
+  end
+
+  def sql_negate
+    ::Sequel::SQL::ComplexExpression.from_value_pairs(self, :AND, true)
+  end
+
+  def sql_or
+    ::Sequel::SQL::ComplexExpression.from_value_pairs(self, :OR)
+  end
+
+  def to_complex_expr
+    ::Sequel::SQL::ComplexExpression.from_value_pairs(self)
   end
 end

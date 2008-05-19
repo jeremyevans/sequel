@@ -38,7 +38,7 @@ module Sequel
       end
       
       def execute_and_forget(sql)
-        @logger.info(sql) if @logger
+        log_info(sql)
         @pool.hold do |conn|
           stmt = conn.createStatement
           begin
@@ -50,7 +50,7 @@ module Sequel
       end
       
       def execute(sql)
-        @logger.info(sql) if @logger
+        log_info(sql)
         @pool.hold do |conn|
           stmt = conn.createStatement
           begin

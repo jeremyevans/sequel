@@ -139,7 +139,7 @@ module Inflector
   #   "active_record/errors".camelize(:lower) #=> "activeRecord::Errors"
   def camelize(lower_case_and_underscored_word, first_letter_in_uppercase = true)
     if first_letter_in_uppercase
-      lower_case_and_underscored_word.to_s.gsub(/\/(.?)/) { "::" + $1.upcase }.gsub(/(^|_)(.)/) { $2.upcase }
+      lower_case_and_underscored_word.to_s.gsub(/\/(.?)/){|x| "::#{x[-1..-1].upcase unless x == '/'}"}.gsub(/(^|_)(.)/){|x| x[-1..-1].upcase}
     else
       lower_case_and_underscored_word.first + camelize(lower_case_and_underscored_word)[1..-1]
     end
@@ -155,7 +155,7 @@ module Inflector
   #   "man from the boondocks".titleize #=> "Man From The Boondocks"
   #   "x-men: the last stand".titleize #=> "X Men: The Last Stand"
   def titleize(word)
-    humanize(underscore(word)).gsub(/\b([a-z])/) { $1.capitalize }
+    humanize(underscore(word)).gsub(/\b([a-z])/){|x| x[-1..-1].upcase}
   end
 
   # The reverse of +camelize+. Makes an underscored form from the expression in the string.
@@ -243,11 +243,11 @@ module Inflector
   #   "Module".constantize #=> Module
   #   "Class".constantize #=> Class
   def constantize(camel_cased_word)
-    unless /\A(?:::)?([A-Z]\w*(?:::[A-Z]\w*)*)\z/ =~ camel_cased_word
+    unless m = /\A(?:::)?([A-Z]\w*(?:::[A-Z]\w*)*)\z/.match(camel_cased_word)
       raise NameError, "#{camel_cased_word.inspect} is not a valid constant name!"
     end
 
-    Object.module_eval("::#{$1}", __FILE__, __LINE__)
+    Object.module_eval("::#{m[1]}", __FILE__, __LINE__)
   end
 
   # Ordinalize turns a number into an ordinal string used to denote the
@@ -275,5 +275,3 @@ module Inflector
     end
   end
 end
-
-require File.dirname(__FILE__) + '/inflections'

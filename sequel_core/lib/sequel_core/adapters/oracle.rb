@@ -33,7 +33,7 @@ module Sequel
       end
     
       def execute(sql)
-        @logger.info(sql) if @logger
+        log_info(sql)
         @pool.hold {|conn| conn.exec(sql)}
       end
       
@@ -59,13 +59,12 @@ module Sequel
           conn.autocommit = false
           begin
             @transactions << Thread.current
-            result = yield(conn)
-            conn.commit
-            result
+            yield(conn)
           rescue => e
             conn.rollback
-            raise e unless SequelRollbackError === e
+            raise e unless Error::Rollback === e
           ensure
+            conn.commit unless e
             conn.autocommit = true
             @transactions.delete(Thread.current)
           end
@@ -76,8 +75,8 @@ module Sequel
     class Dataset < Sequel::Dataset
       def literal(v)
         case v
-        when Time
-          literal(v.iso8601)
+        when OraDate
+          literal(Time.local(*v.to_a))
         else
           super
         end
@@ -112,6 +111,9 @@ module Sequel
         @db.do delete_sql(opts)
       end
 
+      def empty?
+        db[:dual].where(exists).get(1) == nil
+      end
 
       # Formats a SELECT statement using the given options and the dataset
       # options.
@@ -137,7 +139,7 @@ module Sequel
         end
 
         if where = opts[:where]
-          sql << " WHERE #{where}"
+          sql << " WHERE #{literal(where)}"
         end
 
         if group = opts[:group]
@@ -145,7 +147,7 @@ module Sequel
         end
 
         if having = opts[:having]
-          sql << " HAVING #{having}"
+          sql << " HAVING #{literal(having)}"
         end
 
         if union = opts[:union]

@@ -396,7 +396,7 @@ describe Sequel::Model, "one_to_many" do
     atts.first.should be_a_kind_of(@c1)
     atts.first.values.should == {}
     
-    MODEL_DB.sqls.should == ['SELECT attributes.* FROM attributes WHERE (node_id = 1234) AND (xxx IS NULL)']
+    MODEL_DB.sqls.should == ['SELECT attributes.* FROM attributes WHERE ((node_id = 1234) AND (xxx IS NULL))']
   end
   
   it "should support order option with block" do
@@ -411,7 +411,7 @@ describe Sequel::Model, "one_to_many" do
     atts.first.should be_a_kind_of(@c1)
     atts.first.values.should == {}
     
-    MODEL_DB.sqls.should == ['SELECT attributes.* FROM attributes WHERE (node_id = 1234) AND (xxx IS NULL) ORDER BY kind']
+    MODEL_DB.sqls.should == ['SELECT attributes.* FROM attributes WHERE ((node_id = 1234) AND (xxx IS NULL)) ORDER BY kind']
   end
   
   it "should set cached instance variable when accessed" do
@@ -534,6 +534,55 @@ describe Sequel::Model, "one_to_many" do
     
     MODEL_DB.sqls.length.should == 1
   end
+  
+  it "should have an remove_all_ method that removes all associations" do
+    @c2.one_to_many :attributes, :class => @c1
+    @c2.new(:id => 1234).remove_all_attributes
+    MODEL_DB.sqls.first.should == 'UPDATE attributes SET node_id = NULL WHERE (node_id = 1234)'
+  end
+
+  it "remove_all should set the cached instance variable to []" do
+    @c2.one_to_many :attributes, :class => @c1
+    node = @c2.new(:id => 1234)
+    node.remove_all_attributes
+    node.instance_variable_get(:@attributes).should == []
+  end
+
+  it "remove_all should return the array of previously associated items if the cached instance variable exists" do
+    @c2.one_to_many :attributes, :class => @c1
+    attrib = @c1.new(:id=>3)
+    node = @c2.new(:id => 1234)
+    d = @c1.dataset
+    def d.fetch_rows(s); end
+    node.attributes.should == []
+    def attrib.save!; end
+    node.add_attribute(attrib)
+    node.instance_variable_get(:@attributes).should == [attrib]
+    node.remove_all_attributes.should == [attrib]
+  end
+
+  it "remove_all should return nil if the cached instance variable does not exist" do
+    @c2.one_to_many :attributes, :class => @c1
+    @c2.new(:id => 1234).remove_all_attributes.should == nil
+  end
+
+  it "remove_all should remove the current item from all reciprocal instance varaibles if it cached instance variable exists" do
+    @c2.one_to_many :attributes, :class => @c1
+    @c1.many_to_one :node, :class => @c2
+    d = @c1.dataset
+    def d.fetch_rows(s); end
+    d = @c2.dataset
+    def d.fetch_rows(s); end
+    attrib = @c1.new(:id=>3)
+    node = @c2.new(:id => 1234)
+    node.attributes.should == []
+    attrib.node.should == nil
+    def attrib.save!; end
+    node.add_attribute(attrib)
+    attrib.instance_variable_get(:@node).should == node 
+    node.remove_all_attributes
+    attrib.instance_variable_get(:@node).should == :null
+  end
 end
 
 describe Sequel::Model, "many_to_many" do
@@ -572,7 +621,7 @@ describe Sequel::Model, "many_to_many" do
     n = @c2.new(:id => 1234)
     a = n.attributes_dataset
     a.should be_a_kind_of(Sequel::Dataset)
-    a.sql.should == 'SELECT attributes.* FROM attributes INNER JOIN attributes_nodes ON (attributes_nodes.attribute_id = attributes.id) AND (attributes_nodes.node_id = 1234)'
+    a.sql.should == 'SELECT attributes.* FROM attributes INNER JOIN attributes_nodes ON ((attributes_nodes.attribute_id = attributes.id) AND (attributes_nodes.node_id = 1234))'
   end
   
   it "should use implicit class if omitted" do
@@ -584,7 +633,7 @@ describe Sequel::Model, "many_to_many" do
     n = @c2.new(:id => 1234)
     a = n.tags_dataset
     a.should be_a_kind_of(Sequel::Dataset)
-    a.sql.should == 'SELECT tags.* FROM tags INNER JOIN nodes_tags ON (nodes_tags.tag_id = tags.id) AND (nodes_tags.node_id = 1234)'
+    a.sql.should == 'SELECT tags.* FROM tags INNER JOIN nodes_tags ON ((nodes_tags.tag_id = tags.id) AND (nodes_tags.node_id = 1234))'
   end
   
   it "should use class inside module if given as a string" do
@@ -598,7 +647,7 @@ describe Sequel::Model, "many_to_many" do
     n = @c2.new(:id => 1234)
     a = n.tags_dataset
     a.should be_a_kind_of(Sequel::Dataset)
-    a.sql.should == 'SELECT tags.* FROM tags INNER JOIN nodes_tags ON (nodes_tags.tag_id = tags.id) AND (nodes_tags.node_id = 1234)'
+    a.sql.should == 'SELECT tags.* FROM tags INNER JOIN nodes_tags ON ((nodes_tags.tag_id = tags.id) AND (nodes_tags.node_id = 1234))'
   end
   
   it "should use explicit key values and join table if given" do
@@ -607,7 +656,7 @@ describe Sequel::Model, "many_to_many" do
     n = @c2.new(:id => 1234)
     a = n.attributes_dataset
     a.should be_a_kind_of(Sequel::Dataset)
-    a.sql.should == 'SELECT attributes.* FROM attributes INNER JOIN attribute2node ON (attribute2node.attributeid = attributes.id) AND (attribute2node.nodeid = 1234)'
+    a.sql.should == 'SELECT attributes.* FROM attributes INNER JOIN attribute2node ON ((attribute2node.attributeid = attributes.id) AND (attribute2node.nodeid = 1234))'
   end
   
   it "should support an order option" do
@@ -616,7 +665,7 @@ describe Sequel::Model, "many_to_many" do
     n = @c2.new(:id => 1234)
     a = n.attributes_dataset
     a.should be_a_kind_of(Sequel::Dataset)
-    a.sql.should == 'SELECT attributes.* FROM attributes INNER JOIN attributes_nodes ON (attributes_nodes.attribute_id = attributes.id) AND (attributes_nodes.node_id = 1234) ORDER BY blah'
+    a.sql.should == 'SELECT attributes.* FROM attributes INNER JOIN attributes_nodes ON ((attributes_nodes.attribute_id = attributes.id) AND (attributes_nodes.node_id = 1234)) ORDER BY blah'
   end
   
   it "should support an array for the order option" do
@@ -625,7 +674,7 @@ describe Sequel::Model, "many_to_many" do
     n = @c2.new(:id => 1234)
     a = n.attributes_dataset
     a.should be_a_kind_of(Sequel::Dataset)
-    a.sql.should == 'SELECT attributes.* FROM attributes INNER JOIN attributes_nodes ON (attributes_nodes.attribute_id = attributes.id) AND (attributes_nodes.node_id = 1234) ORDER BY blah1, blah2'
+    a.sql.should == 'SELECT attributes.* FROM attributes INNER JOIN attributes_nodes ON ((attributes_nodes.attribute_id = attributes.id) AND (attributes_nodes.node_id = 1234)) ORDER BY blah1, blah2'
   end
   
   it "should support a select option" do
@@ -634,7 +683,7 @@ describe Sequel::Model, "many_to_many" do
     n = @c2.new(:id => 1234)
     a = n.attributes_dataset
     a.should be_a_kind_of(Sequel::Dataset)
-    a.sql.should == 'SELECT blah FROM attributes INNER JOIN attributes_nodes ON (attributes_nodes.attribute_id = attributes.id) AND (attributes_nodes.node_id = 1234)'
+    a.sql.should == 'SELECT blah FROM attributes INNER JOIN attributes_nodes ON ((attributes_nodes.attribute_id = attributes.id) AND (attributes_nodes.node_id = 1234))'
   end
   
   it "should support an array for the select option" do
@@ -643,7 +692,7 @@ describe Sequel::Model, "many_to_many" do
     n = @c2.new(:id => 1234)
     a = n.attributes_dataset
     a.should be_a_kind_of(Sequel::Dataset)
-    a.sql.should == 'SELECT attributes.*, attribute_nodes.blah2 FROM attributes INNER JOIN attributes_nodes ON (attributes_nodes.attribute_id = attributes.id) AND (attributes_nodes.node_id = 1234)'
+    a.sql.should == 'SELECT attributes.*, attribute_nodes.blah2 FROM attributes INNER JOIN attributes_nodes ON ((attributes_nodes.attribute_id = attributes.id) AND (attributes_nodes.node_id = 1234))'
   end
   
   it "should accept a block" do
@@ -657,7 +706,7 @@ describe Sequel::Model, "many_to_many" do
     a.should be_a_kind_of(Array)
     a.size.should == 1
     a.first.should be_a_kind_of(@c1)
-    MODEL_DB.sqls.first.should == 'SELECT attributes.* FROM attributes INNER JOIN attributes_nodes ON (attributes_nodes.attribute_id = attributes.id) AND (attributes_nodes.node_id = 1234) WHERE (xxx = 555)'
+    MODEL_DB.sqls.first.should == 'SELECT attributes.* FROM attributes INNER JOIN attributes_nodes ON ((attributes_nodes.attribute_id = attributes.id) AND (attributes_nodes.node_id = 1234)) WHERE (xxx = 555)'
   end
 
   it "should allow the order option while accepting a block" do
@@ -671,7 +720,7 @@ describe Sequel::Model, "many_to_many" do
     a.should be_a_kind_of(Array)
     a.size.should == 1
     a.first.should be_a_kind_of(@c1)
-    MODEL_DB.sqls.first.should == 'SELECT attributes.* FROM attributes INNER JOIN attributes_nodes ON (attributes_nodes.attribute_id = attributes.id) AND (attributes_nodes.node_id = 1234) WHERE (xxx = 555) ORDER BY blah1, blah2'
+    MODEL_DB.sqls.first.should == 'SELECT attributes.* FROM attributes INNER JOIN attributes_nodes ON ((attributes_nodes.attribute_id = attributes.id) AND (attributes_nodes.node_id = 1234)) WHERE (xxx = 555) ORDER BY blah1, blah2'
   end
 
   it "should define an add_ method" do
@@ -691,7 +740,7 @@ describe Sequel::Model, "many_to_many" do
     n = @c2.new(:id => 1234)
     a = @c1.new(:id => 2345)
     a.should == n.remove_attribute(a)
-    MODEL_DB.sqls.first.should == 'DELETE FROM attributes_nodes WHERE (node_id = 1234) AND (attribute_id = 2345)'
+    MODEL_DB.sqls.first.should == 'DELETE FROM attributes_nodes WHERE ((node_id = 1234) AND (attribute_id = 2345))'
   end
 
   it "should provide an array with all members of the association" do
@@ -703,7 +752,7 @@ describe Sequel::Model, "many_to_many" do
     atts.size.should == 1
     atts.first.should be_a_kind_of(@c1)
 
-    MODEL_DB.sqls.first.should == 'SELECT attributes.* FROM attributes INNER JOIN attributes_nodes ON (attributes_nodes.attribute_id = attributes.id) AND (attributes_nodes.node_id = 1234)'
+    MODEL_DB.sqls.first.should == 'SELECT attributes.* FROM attributes INNER JOIN attributes_nodes ON ((attributes_nodes.attribute_id = attributes.id) AND (attributes_nodes.node_id = 1234))'
   end
 
   it "should set cached instance variable when accessed" do
@@ -789,9 +838,55 @@ describe Sequel::Model, "many_to_many" do
     n = @c2.new(:id => 1234)
     a = n.attributes_dataset
     a.should be_a_kind_of(Sequel::Dataset)
-    a.sql.should == 'SELECT attributes.* FROM attributes INNER JOIN attributes_nodes ON (attributes_nodes.attribute_id = attributes.id) AND (attributes_nodes.node_id = 1234)'
+    a.sql.should == 'SELECT attributes.* FROM attributes INNER JOIN attributes_nodes ON ((attributes_nodes.attribute_id = attributes.id) AND (attributes_nodes.node_id = 1234))'
   end
   
+  it "should have an remove_all_ method that removes all associations" do
+    @c2.many_to_many :attributes, :class => @c1
+    @c2.new(:id => 1234).remove_all_attributes
+    MODEL_DB.sqls.first.should == 'DELETE FROM attributes_nodes WHERE (node_id = 1234)'
+  end
+
+  it "remove_all should set the cached instance variable to []" do
+    @c2.many_to_many :attributes, :class => @c1
+    node = @c2.new(:id => 1234)
+    node.remove_all_attributes
+    node.instance_variable_get(:@attributes).should == []
+  end
+
+  it "remove_all should return the array of previously associated items if the cached instance variable exists" do
+    @c2.many_to_many :attributes, :class => @c1
+    attrib = @c1.new(:id=>3)
+    node = @c2.new(:id => 1234)
+    d = @c1.dataset
+    def d.fetch_rows(s); end
+    node.attributes.should == []
+    node.add_attribute(attrib)
+    node.instance_variable_get(:@attributes).should == [attrib]
+    node.remove_all_attributes.should == [attrib]
+  end
+
+  it "remove_all should return nil if the cached instance variable does not exist" do
+    @c2.many_to_many :attributes, :class => @c1
+    @c2.new(:id => 1234).remove_all_attributes.should == nil
+  end
+
+  it "remove_all should remove the current item from all reciprocal instance varaibles if it cached instance variable exists" do
+    @c2.many_to_many :attributes, :class => @c1
+    @c1.many_to_many :nodes, :class => @c2
+    d = @c1.dataset
+    def d.fetch_rows(s); end
+    d = @c2.dataset
+    def d.fetch_rows(s); end
+    attrib = @c1.new(:id=>3)
+    node = @c2.new(:id => 1234)
+    node.attributes.should == []
+    attrib.nodes.should == []
+    node.add_attribute(attrib)
+    attrib.instance_variable_get(:@nodes).should == [node]
+    node.remove_all_attributes
+    attrib.instance_variable_get(:@nodes).should == []
+  end
 end
 
 describe Sequel::Model, "all_association_reflections" do

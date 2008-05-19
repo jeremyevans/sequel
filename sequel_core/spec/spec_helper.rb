@@ -23,6 +23,7 @@ class MockDataset < Sequel::Dataset
 end
 
 class MockDatabase < Sequel::Database
+  @@quote_identifiers = false
   attr_reader :sqls
   
   def execute(sql)
@@ -48,3 +49,8 @@ class SchemaDummyDatabase < Sequel::Database
   end
 end
 
+class Spec::Example::ExampleGroup
+  def self.pt_specify(*args, &block)
+    specify(*args, &block) if defined?(::ParseTree)
+  end
+end
