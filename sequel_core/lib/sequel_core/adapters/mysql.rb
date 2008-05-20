@@ -336,15 +336,14 @@ module Sequel
         "INSERT INTO #{source_list(@opts[:from])} () VALUES ()"
       end
 
-      def complex_expression_sql(ce)
-        args = ce.args
-        case op = ce.op
+      def complex_expression_sql(op, args)
+        case op
         when :~, :'!~'
           "#{'NOT ' if op == :'!~'}(#{literal(args.at(0))} REGEXP BINARY #{literal(args.at(1))})"
         when :'~*', :'!~*'
           "#{'NOT ' if op == :'!~*'}((#{literal(args.at(0))} REGEXP #{literal(args.at(1))})"
         else
-          super(ce)
+          super(op, args)
         end
       end
 

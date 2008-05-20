@@ -1,6 +1,6 @@
 class Array
   def ~
-    ~to_complex_expr_if_all_two_pairs
+    to_complex_expr_if_all_two_pairs(:OR, true)
   end
 
   def all_two_pairs?
@@ -287,7 +287,7 @@ module Sequel
         when *MATHEMATICAL_OPERATORS
           raise(Sequel::Error, 'mathematical operators cannot be inverted')
         when *BOOLEAN_OPERATORS
-          self.class.new(OPERTATOR_INVERSIONS[@op], *@args.collect{|a| ~a})
+          self.class.new(OPERTATOR_INVERSIONS[@op], *@args.collect{|a| ComplexExpression === a ? ~a : ComplexExpression.new(:NOT, a)})
         when *TWO_ARITY_OPERATORS
           self.class.new(OPERTATOR_INVERSIONS[@op], *@args.dup)
         when :NOT
@@ -312,7 +312,7 @@ module Sequel
       end
 
       def to_s(ds)
-        ds.complex_expression_sql(self)
+        ds.complex_expression_sql(@op, @args)
       end
     end
 
@@ -394,7 +394,7 @@ class Hash
   end
 
   def ~
-    ~::Sequel::SQL::ComplexExpression.from_value_pairs(self)
+    ::Sequel::SQL::ComplexExpression.from_value_pairs(self, :OR, true)
   end
 
   def sql_negate

@@ -44,9 +44,7 @@ module Sequel
       "#{literal(ce.l)} #{ce.op}#{" #{literal(r)}" if r}"
     end
 
-    def complex_expression_sql(ce)
-      op = ce.op
-      args = ce.args
+    def complex_expression_sql(op, args)
       case op
       when *TWO_ARITY_OPERATORS
         "(#{literal(args.at(0))} #{op} #{literal(args.at(1))})"
@@ -104,14 +102,10 @@ module Sequel
     def exclude(*cond, &block)
       clause = (@opts[:having] ? :having : :where)
       cond = cond.first if cond.size == 1
-      if (Hash === cond) || ((Array === cond) && (cond.all_two_pairs?))
-        cond = cond.sql_or
-      end
-      cond = if @opts[clause]
-        @opts[clause] & ~filter_expr(block || cond)
-      else
-        ~filter_expr(block || cond)
-      end
+      cond = cond.sql_or if (Hash === cond) || ((Array === cond) && (cond.all_two_pairs?))
+      cond = filter_expr(block || cond)
+      cond = SQL::ComplexExpression === cond ? ~cond : SQL::ComplexExpression.new(:NOT, cond)
+      cond = SQL::ComplexExpression.new(:AND, @opts[clause], cond) if @opts[clause]
       clone(clause => cond)
     end
 
@@ -147,20 +141,11 @@ module Sequel
     def filter(*cond, &block)
       clause = (@opts[:having] ? :having : :where)
       cond = cond.first if cond.size == 1
-      if cond === true || cond === false
-        raise Error::InvalidFilter, "Invalid filter specified. Did you mean to supply a block?"
-      end
-      
-      if cond.is_a?(Hash)
-        cond = transform_save(cond) if @transform
-        filter = cond
-      end
-
-      if @opts[clause].blank?
-        clone(:filter => cond, clause => filter_expr(block || cond))
-      else
-        clone(clause => @opts[clause] & filter_expr(block || cond))
-      end
+      raise(Error::InvalidFilter, "Invalid filter specified. Did you mean to supply a block?") if cond === true || cond === false
+      cond = transform_save(cond) if @transform if cond.is_a?(Hash)
+      cond = filter_expr(block || cond)
+      cond = SQL::ComplexExpression.new(:AND, @opts[clause], cond) if @opts[clause] && !@opts[clause].blank?
+      clone(clause => cond)
     end
     alias_method :where, :filter
 
@@ -213,12 +198,8 @@ module Sequel
     # Returns a copy of the dataset with the having conditions changed. Raises 
     # if the dataset has not been grouped. See also #filter
     def having(*cond, &block)
-      unless @opts[:group]
-        raise Error::InvalidOperation, "Can only specify a HAVING clause on a grouped dataset"
-      else
-        @opts[:having] = {}
-        filter(*cond, &block)
-      end
+      raise(Error::InvalidOperation, "Can only specify a HAVING clause on a grouped dataset") unless @opts[:group]
+      clone(:having=>{}).filter(*cond, &block)
     end
     
     # Inserts multiple values. If a block is given it is invoked for each
@@ -292,8 +273,12 @@ module Sequel
       having, where = @opts[:having], @opts[:where]
       raise(Error, "No current filter") unless having || where
       o = {}
-      o[:having] = ~having if having
-      o[:where] = ~where if where
+      if having
+        o[:having] = SQL::ComplexExpression === having ? ~having : SQL::ComplexExpression.new(:NOT, having)
+      end
+      if where
+        o[:where] = SQL::ComplexExpression === where ? ~where : SQL::ComplexExpression.new(:NOT, where)
+      end
       clone(o)
     end
 
@@ -415,7 +400,7 @@ module Sequel
       clause = (@opts[:having] ? :having : :where)
       cond = cond.first if cond.size == 1
       if @opts[clause]
-        clone(clause => @opts[clause] | filter_expr(block || cond))
+        clone(clause => SQL::ComplexExpression.new(:OR, @opts[clause], filter_expr(block || cond)))
       else
         raise Error::NoExistingFilter, "No existing filter found."
       end
