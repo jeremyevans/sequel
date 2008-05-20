@@ -116,7 +116,7 @@ context "Blockless Ruby Filters" do
     proc{~(:x + 1)}.should raise_error(Sequel::Error)
   end
 
-  it "should not allow mathematical or inequality operations on true, false, or nil" do
+  it "should not allow mathematical, inequality, or string operations on true, false, or nil" do
     proc{:x + 1}.should_not raise_error
     proc{:x - true}.should raise_error(Sequel::Error)
     proc{:x / false}.should raise_error(Sequel::Error)
@@ -125,9 +125,10 @@ context "Blockless Ruby Filters" do
     proc{:x < true}.should raise_error(Sequel::Error)
     proc{:x >= false}.should raise_error(Sequel::Error)
     proc{:x <= nil}.should raise_error(Sequel::Error)
+    proc{[:x, nil].sql_string_join}.should raise_error(Sequel::Error)
   end
 
-  it "should not allow mathematical or inequality operations on boolean complex expressions" do
+  it "should not allow mathematical, inequality, or string operations on boolean complex expressions" do
     proc{:x + (:y + 1)}.should_not raise_error
     proc{:x - (~:y)}.should raise_error(Sequel::Error)
     proc{:x / (:y & :z)}.should raise_error(Sequel::Error)
@@ -148,6 +149,7 @@ context "Blockless Ruby Filters" do
     proc{:x + ~:y.like('a')}.should raise_error(Sequel::Error)
     proc{:x - ~:y.like(/a/)}.should raise_error(Sequel::Error)
     proc{:x * ~:y.like(/a/i)}.should raise_error(Sequel::Error)
+    proc{[:x, ~:y.like(/a/i)].sql_string_join}.should raise_error(Sequel::Error)
   end
 
   it "should support AND conditions via &" do
@@ -248,5 +250,20 @@ context "Blockless Ruby Filters" do
     @d.l([[:x, 100],[:y, 'a']].sql_or).should == '((x = 100) OR (y = \'a\'))'
     @d.l([[:x, true], [:y, false]].sql_or).should == '((x = \'t\') OR (y = \'f\'))'
     @d.l([[:x, nil], [:y, [1,2,3]]].sql_or).should == '((x IS NULL) OR (y IN (1, 2, 3)))'
+  end
+  
+  it "should support Array#sql_string_join for concatenation of SQL strings" do
+    @d.l([:x].sql_string_join).should == '(x)'
+    @d.l([:x].sql_string_join(', ')).should == '(x)'
+    @d.l([:x, :y].sql_string_join).should == '(x || y)'
+    @d.l([:x, :y].sql_string_join(', ')).should == "(x || ', ' || y)"
+    @d.l([:x[1], :y|1].sql_string_join).should == '(x(1) || y[1])'
+    @d.l([:x[1], 'y.z'.lit].sql_string_join(', ')).should == "(x(1) || ', ' || y.z)"
+    @d.l([:x, 1, :y].sql_string_join).should == "(x || '1' || y)"
+    @d.l([:x, 1, :y].sql_string_join(', ')).should == "(x || ', ' || '1' || ', ' || y)"
+    @d.l([:x, 1, :y].sql_string_join(:y__z)).should == "(x || y.z || '1' || y.z || y)"
+    @d.l([:x, 1, :y].sql_string_join(1)).should == "(x || '1' || '1' || '1' || y)"
+    @d.l([:x, :y].sql_string_join('y.x || x.y'.lit)).should == "(x || y.x || x.y || y)"
+    @d.l([[:x, :y].sql_string_join, [:a, :b].sql_string_join].sql_string_join).should == "((x || y) || (a || b))"
   end
 end

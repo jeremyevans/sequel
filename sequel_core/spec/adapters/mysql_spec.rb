@@ -689,3 +689,30 @@ context "MySQL::Dataset#replace" do
     @d.all.should == [{:id => 111, :value => 333}]
   end
 end
+
+context "MySQL::Dataset#complex_expression_sql" do
+  setup do
+    @d = MYSQL_DB.dataset
+  end
+
+  specify "should handle case insensitive regular expressions with REGEXP" do
+    @d.literal(:x.like(/a/i)).should == "(x REGEXP 'a')"
+    @d.literal(~:x.like(/a/i)).should == "NOT (x REGEXP 'a')"
+  end
+
+  specify "should handle case sensitive regular expressions with REGEXP BINARY" do
+    @d.literal(:x.like(/a/)).should == "(x REGEXP BINARY 'a')"
+    @d.literal(~:x.like(/a/)).should == "NOT (x REGEXP BINARY 'a')"
+  end
+
+  specify "should handle string concatenation with CONCAT if more than one record" do
+    @d.literal([:x, :y].sql_string_join).should == "CONCAT(x, y)"
+    @d.literal([:x, :y].sql_string_join(' ')).should == "CONCAT(x, ' ', y)"
+    @d.literal([:x[:y], 1, 'z'.lit].sql_string_join(:y|1)).should == "CONCAT(x(y), y[1], '1', y[1], z)"
+  end
+
+  specify "should handle string concatenation as simple string if just one record" do
+    @d.literal([:x].sql_string_join).should == "x"
+    @d.literal([:x].sql_string_join(' ')).should == "x"
+  end
+end

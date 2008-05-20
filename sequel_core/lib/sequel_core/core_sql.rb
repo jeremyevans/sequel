@@ -22,6 +22,20 @@ class Array
     to_complex_expr_if_all_two_pairs(:OR)
   end
 
+  def sql_string_join(joiner=nil)
+    if joiner
+      args = self.inject([]) do |m, a|
+        m << a
+        m << joiner
+      end
+      args.pop
+    else
+      args = self
+    end
+    args = args.collect{|a| a.is_one_of?(Symbol, ::Sequel::SQL::Expression, ::Sequel::LiteralString, TrueClass, FalseClass, NilClass) ? a : a.to_s}
+    ::Sequel::SQL::ComplexExpression.new(:'||', *args)
+  end
+
   def to_complex_expr
     to_complex_expr_if_all_two_pairs
   end
@@ -208,18 +222,19 @@ module Sequel
 
       MATHEMATICAL_OPERATORS = [:+, :-, :/, :*]
       INEQUALITY_OPERATORS = [:<, :>, :<=, :>=]
+      STRING_OPERATORS = [:'||']
       SEARCH_OPERATORS = [:LIKE, :'NOT LIKE', :~, :'!~', :'~*', :'!~*']
       INCLUSION_OPERATORS = [:IN, :'NOT IN']
       BOOLEAN_OPERATORS = [:AND, :OR]
       BOOLEAN_OPERATOR_METHODS = {:& => :AND, :| =>:OR}
 
       EQUALITY_OPERATORS = [:'=', :'!=', :IS, :'IS NOT', *INEQUALITY_OPERATORS]
-      NO_BOOLEAN_INPUT_OPERATORS = MATHEMATICAL_OPERATORS + INEQUALITY_OPERATORS
+      NO_BOOLEAN_INPUT_OPERATORS = MATHEMATICAL_OPERATORS + INEQUALITY_OPERATORS + STRING_OPERATORS
       BOOLEAN_RESULT_OPERATORS = BOOLEAN_OPERATORS + EQUALITY_OPERATORS + SEARCH_OPERATORS + INCLUSION_OPERATORS + [:NOT]
       BOOLEAN_LITERALS = [true, false, nil]
 
       TWO_ARITY_OPERATORS = EQUALITY_OPERATORS + SEARCH_OPERATORS + INCLUSION_OPERATORS
-      N_ARITY_OPERATORS = MATHEMATICAL_OPERATORS + BOOLEAN_OPERATORS
+      N_ARITY_OPERATORS = MATHEMATICAL_OPERATORS + BOOLEAN_OPERATORS + STRING_OPERATORS
 
       attr_reader :op, :args
 
@@ -283,9 +298,7 @@ module Sequel
       end
 
       def ~
-        case op
-        when *MATHEMATICAL_OPERATORS
-          raise(Sequel::Error, 'mathematical operators cannot be inverted')
+        case @op
         when *BOOLEAN_OPERATORS
           self.class.new(OPERTATOR_INVERSIONS[@op], *@args.collect{|a| ComplexExpression === a ? ~a : ComplexExpression.new(:NOT, a)})
         when *TWO_ARITY_OPERATORS
@@ -293,7 +306,7 @@ module Sequel
         when :NOT
           @args.first
         else
-          raise(Sequel::Error, "invalid operator #{op}")
+          raise(Sequel::Error, "operator #{@op} cannot be inverted")
         end
       end
 

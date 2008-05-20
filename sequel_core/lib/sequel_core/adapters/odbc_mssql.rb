@@ -91,6 +91,15 @@ module Sequel
         def full_text_search(cols, terms, opts = {})
           filter("CONTAINS (#{literal(cols)}, #{literal(terms)})")
         end
+
+        def complex_expression_sql(op, args)
+          case op
+          when :'||'
+            super(:+, args)
+          else
+            super(op, args)
+          end
+        end
       end
     end
   end

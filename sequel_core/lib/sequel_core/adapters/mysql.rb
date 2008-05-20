@@ -341,7 +341,13 @@ module Sequel
         when :~, :'!~'
           "#{'NOT ' if op == :'!~'}(#{literal(args.at(0))} REGEXP BINARY #{literal(args.at(1))})"
         when :'~*', :'!~*'
-          "#{'NOT ' if op == :'!~*'}((#{literal(args.at(0))} REGEXP #{literal(args.at(1))})"
+          "#{'NOT ' if op == :'!~*'}(#{literal(args.at(0))} REGEXP #{literal(args.at(1))})"
+        when :'||'
+          if args.length > 1
+            "CONCAT(#{args.collect{|a| literal(a)}.join(', ')})"
+          else
+            literal(args.at(0))
+          end
         else
           super(op, args)
         end

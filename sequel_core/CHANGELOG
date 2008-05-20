@@ -1,5 +1,7 @@
 === HEAD
 
+* Add SQL string concatenation support to blockless filters, via Array#sql_string_join (jeremyevans)
+
 * Add Pagination#last_page? and Pagination#first_page? (apeiros)
 
 * Add limited column reflection support, tested on PostgreSQL, MySQL, and SQLite (jeremyevans)
