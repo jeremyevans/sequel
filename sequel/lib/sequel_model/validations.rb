@@ -235,10 +235,14 @@ module Validation
       
       validates_each(*atts) do |o, a, v|
         next if (v.nil? && opts[:allow_nil]) || (v.blank? && opts[:allow_blank])
-        if opts[:only_integer]
-          o.errors[a] << opts[:message] unless v.to_s =~ /\A[+-]?\d+\Z/
-        else
-          Kernel.Float(v.to_s) rescue o.errors[a] << opts[:message]
+        begin
+          if opts[:only_integer]
+            Kernel.Integer(v.to_s)
+          else
+            Kernel.Float(v.to_s)
+          end
+        rescue
+          o.errors[a] << opts[:message]
         end
       end
     end
