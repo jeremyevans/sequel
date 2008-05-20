@@ -273,6 +273,22 @@ describe "Validations" do
     @m.should be_valid
     @m.value = '123.1231'
     @m.should be_valid
+    @m.value = '+1'
+    @m.should be_valid
+    @m.value = '-1'
+    @m.should be_valid
+    @m.value = '+1.123'
+    @m.should be_valid
+    @m.value = '-0.123'
+    @m.should be_valid
+    @m.value = '-0.123E10'
+    @m.should be_valid
+    @m.value = '32.123e10'
+    @m.should be_valid
+    @m.value = '+32.123E10'
+    @m.should be_valid
+    @m.should be_valid
+    @m.value = '.0123'
   end
 
   specify "should validate numericality_of with only_integer" do

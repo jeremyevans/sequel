@@ -227,20 +227,19 @@ module Validation
       end
     end
 
-    NUMBER_RE = /^\d*\.{0,1}\d+$/
-    INTEGER_RE = /\A[+-]?\d+\Z/
-
     # Validates whether an attribute is a number.
     def validates_numericality_of(*atts)
       opts = {
         :message => 'is not a number',
       }.merge!(atts.extract_options!)
       
-      re = opts[:only_integer] ? INTEGER_RE : NUMBER_RE
-      
       validates_each(*atts) do |o, a, v|
         next if (v.nil? && opts[:allow_nil]) || (v.blank? && opts[:allow_blank])
-        o.errors[a] << opts[:message] unless v.to_s =~ re
+        if opts[:only_integer]
+          o.errors[a] << opts[:message] unless v.to_s =~ /\A[+-]?\d+\Z/
+        else
+          Kernel.Float(v.to_s) rescue o.errors[a] << opts[:message]
+        end
       end
     end
 
