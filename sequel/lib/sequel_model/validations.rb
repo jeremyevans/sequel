@@ -27,14 +27,15 @@ module Validation
   # Validates the object.
   def validate
     errors.clear
-    before_validation
+    return false if before_validation == false
     self.class.validate(self)
     after_validation
+    nil
   end
 
   # Validates the object and returns true if no errors are reported.
   def valid?
-    validate
+    return false if validate == false
     errors.empty?
   end
 

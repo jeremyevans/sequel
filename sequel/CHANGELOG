@@ -1,5 +1,7 @@
 === HEAD
 
+* Returning false in one of the before_ hooks now causes the appropriate method(s) to immediately return false (jeremyevans)
+
 * Add remove_all_* association method for *_to_many associations, which removes the association with all currently associated objects (jeremyevans)
 
 * Add Model.lazy_load_schema=, when set to true, it loads the schema (columns) on first instantiation (jeremyevans)

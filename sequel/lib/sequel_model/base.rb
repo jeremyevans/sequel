@@ -45,7 +45,7 @@ module Sequel
     # (running any callbacks), and returns the instance.
     def self.create(values = {}, &block)
       obj = new(values, &block)
-      obj.save
+      return false if obj.save == false
       obj
     end
 

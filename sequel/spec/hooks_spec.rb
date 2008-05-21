@@ -182,18 +182,24 @@ describe "Model#before_create && Model#after_create" do
       columns :x
       no_primary_key
       
-      before_create {MODEL_DB << "BLAH before"}
       after_create {MODEL_DB << "BLAH after"}
     end
   end
   
   specify "should be called around new record creation" do
+    @c.before_create {MODEL_DB << "BLAH before"}
     @c.create(:x => 2)
     MODEL_DB.sqls.should == [
       'BLAH before',
       'INSERT INTO items (x) VALUES (2)',
       'BLAH after'
     ]
+  end
+
+  specify "should cancel the save if before_create returns false" do
+    @c.before_create{false}
+    @c.create(:x => 2).should == false
+    MODEL_DB.sqls.should == []
   end
 end
 
@@ -202,12 +208,12 @@ describe "Model#before_update && Model#after_update" do
     MODEL_DB.reset
 
     @c = Class.new(Sequel::Model(:items)) do
-      before_update {MODEL_DB << "BLAH before"}
       after_update {MODEL_DB << "BLAH after"}
     end
   end
   
   specify "should be called around record update" do
+    @c.before_update {MODEL_DB << "BLAH before"}
     m = @c.load(:id => 2233)
     m.save
     MODEL_DB.sqls.should == [
@@ -215,6 +221,12 @@ describe "Model#before_update && Model#after_update" do
       'UPDATE items SET id = 2233 WHERE (id = 2233)',
       'BLAH after'
     ]
+  end
+
+  specify "should cancel the save if before_update returns false" do
+    @c.before_update{false}
+    @c.load(:id => 2233).save.should == false
+    MODEL_DB.sqls.should == []
   end
 end
 
@@ -248,6 +260,12 @@ describe "Model#before_save && Model#after_save" do
       'BLAH after'
     ]
   end
+
+  specify "should cancel the save if before_save returns false" do
+    @c.before_save{false}
+    @c.load(:id => 2233).save.should == false
+    MODEL_DB.sqls.should == ["BLAH before"]
+  end
 end
 
 describe "Model#before_destroy && Model#after_destroy" do
@@ -255,7 +273,6 @@ describe "Model#before_destroy && Model#after_destroy" do
     MODEL_DB.reset
 
     @c = Class.new(Sequel::Model(:items)) do
-      before_destroy {MODEL_DB << "BLAH before"}
       after_destroy {MODEL_DB << "BLAH after"}
       
       def delete
@@ -264,7 +281,8 @@ describe "Model#before_destroy && Model#after_destroy" do
     end
   end
   
-  specify "should be called around record update" do
+  specify "should be called around record destruction" do
+    @c.before_destroy {MODEL_DB << "BLAH before"}
     m = @c.new(:id => 2233)
     m.destroy
     MODEL_DB.sqls.should == [
@@ -272,6 +290,12 @@ describe "Model#before_destroy && Model#after_destroy" do
       'DELETE BLAH',
       'BLAH after'
     ]
+  end
+
+  specify "should cancel the destroy if before_destroy returns false" do
+    @c.before_destroy{false}
+    @c.load(:id => 2233).destroy.should == false
+    MODEL_DB.sqls.should == []
   end
 end
 
@@ -314,6 +338,12 @@ describe "Model#before_validation && Model#after_validation" do
     m = @c.new(:id => 22)
     m.save.should == false
     MODEL_DB.sqls.should == ['BLAH before', 'BLAH after']
+  end
+
+  specify "should cancel the save if before_validation returns false" do
+    @c.before_validation{false}
+    @c.load(:id => 2233).save.should == false
+    MODEL_DB.sqls.should == ["BLAH before"]
   end
 end
 

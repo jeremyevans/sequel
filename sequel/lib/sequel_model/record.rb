@@ -68,7 +68,7 @@ module Sequel
     # Like delete but runs hooks before and after delete.
     def destroy
       db.transaction do
-        before_destroy
+        return false if before_destroy == false
         delete
         after_destroy
       end
@@ -154,9 +154,9 @@ module Sequel
     # it first. You can provide an optional list of columns to update,
     # in which case it only updates those columns
     def save!(*columns)
-      before_save
+      return false if before_save == false
       if @new
-        before_create
+        return false if before_create == false
         iid = model.dataset.insert(@values)
         # if we have a regular primary key and it's not set in @values,
         # we assume it's the last inserted id
@@ -170,7 +170,7 @@ module Sequel
         @new = false
         after_create
       else
-        before_update
+        return false if before_update == false
         if columns.empty?
           this.update(@values)
           @changed_columns = []
