@@ -1,14 +1,12 @@
 %w'bigdecimal bigdecimal/util date enumerator thread time uri yaml'.each do |f|
   require f
 end
-%w"core_ext deprecated core_sql connection_pool exceptions pretty_table
+%w"core_ext core_sql connection_pool exceptions pretty_table
   dataset migration schema database worker object_graph".each do |f|
   require "sequel_core/#{f}"
 end
 
 module Sequel #:nodoc:
-  Deprecation.deprecation_message_stream = STDERR
-
   # call-seq:
   #   Sequel::Database.connect(conn_string)
   #   Sequel.connect(conn_string)

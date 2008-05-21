@@ -247,34 +247,9 @@ context "Symbol#to_column_ref" do
   end
 end
 
-### DEPRECATED
 context "Symbol" do
   setup do
     @ds = Sequel::Dataset.new(nil)
-  end
-  
-  specify "should support MIN for specifying min function" do
-    :abc__def.MIN.to_s(@ds).should == 'min(abc.def)'
-  end
-
-  specify "should support MAX for specifying max function" do
-    :abc__def.MAX.to_s(@ds).should == 'max(abc.def)'
-  end
-
-  specify "should support SUM for specifying sum function" do
-    :abc__def.SUM.to_s(@ds).should == 'sum(abc.def)'
-  end
-
-  specify "should support AVG for specifying avg function" do
-    :abc__def.AVG.to_s(@ds).should == 'avg(abc.def)'
-  end
-  
-  specify "should support COUNT for specifying count function" do
-    :abc__def.COUNT.to_s(@ds).should == 'count(abc.def)'
-  end
-  
-  specify "should support any other function using upper case letters" do
-    :abc__def.DADA.to_s(@ds).should == 'dada(abc.def)'
   end
   
   specify "should support upper case outer functions" do
@@ -289,10 +264,6 @@ context "Symbol" do
   
   specify "should support cast function" do
     :abc.cast_as(:integer).to_s(@ds).should == "cast(abc AS integer)"
-  end
-  
-  specify "should raise NoMethodError for non-uppercase invalid methods" do
-    proc {:abc.dfaxs}.should raise_error(NoMethodError)
   end
   
   specify "should support subscript access using | operator" do

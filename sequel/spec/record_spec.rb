@@ -185,16 +185,6 @@ describe "Model#new?" do
     n.save
     n.should_not be_new
   end
-  
-  ### DEPRECATED
-  it "should alias new_record? to new?" do
-    n = @c.new(:x => 1)
-    n.should respond_to(:new_record?)
-    n.should be_new_record
-    n.save
-    n.should_not be_new_record
-  end
-  
 end
 
 describe Sequel::Model, "w/ primary key" do
@@ -398,56 +388,9 @@ describe Sequel::Model, "update_with_params" do
     MODEL_DB.sqls.first.should == "UPDATE items SET y = 1 WHERE (id = 5)"
   end
   
-  ### DEPRECATE
-  it "should be aliased by update_with" do
-    @o1.update_with(:x => 1, :z => 2)
-    MODEL_DB.sqls.first.should == "INSERT INTO items (x) VALUES (1)"
-
-    MODEL_DB.reset
-    @o2.update_with(:y => 1, :abc => 2)
-    MODEL_DB.sqls.first.should == "UPDATE items SET y = 1 WHERE (id = 5)"
-  end
-  
   it "should support virtual attributes" do
     @c.class_def(:blah=) {|v| self.x = v}
     @o1.update_with_params(:blah => 333)
-    MODEL_DB.sqls.first.should == "INSERT INTO items (x) VALUES (333)"
-  end
-end
-
-### DEPRECATE
-describe Sequel::Model, "create_with_params" do
-
-  before(:each) do
-    MODEL_DB.reset
-    
-    @c = Class.new(Sequel::Model(:items)) do
-      columns :x, :y
-    end
-    @c.instance_variable_set(:@columns, true)
-  end
-  
-  it "should filter the given params using the model columns" do
-    @c.create_with_params(:x => 1, :z => 2)
-    MODEL_DB.sqls.first.should == "INSERT INTO items (x) VALUES (1)"
-
-    MODEL_DB.reset
-    @c.create_with_params(:y => 1, :abc => 2)
-    MODEL_DB.sqls.first.should == "INSERT INTO items (y) VALUES (1)"
-  end
-  
-  it "should be aliased by create_with" do
-    @c.create_with(:x => 1, :z => 2)
-    MODEL_DB.sqls.first.should == "INSERT INTO items (x) VALUES (1)"
-
-    MODEL_DB.reset
-    @c.create_with(:y => 1, :abc => 2)
-    MODEL_DB.sqls.first.should == "INSERT INTO items (y) VALUES (1)"
-  end
-  
-  it "should support virtual attributes" do
-    @c.class_def(:blah=) {|v| self.x = v}
-    o = @c.create_with(:blah => 333)
     MODEL_DB.sqls.first.should == "INSERT INTO items (x) VALUES (333)"
   end
 end
