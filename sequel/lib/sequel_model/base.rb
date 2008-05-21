@@ -3,9 +3,11 @@ module Sequel
     @@lazy_load_schema = false
 
     @primary_key = :id
+    @typecast_on_assignment = true
 
     # Returns key for primary key.
     metaattr_reader :primary_key
+    metaattr_accessor :typecast_on_assignment
 
     # Add dataset methods via metaprogramming
     DATASET_METHODS = %w'all avg count delete distinct eager eager_graph each each_page 
@@ -33,12 +35,7 @@ module Sequel
     #
     # See Dataset#columns for more information.
     def self.columns
-      return @columns if @columns
-      @columns = dataset.naked.columns or
-      raise Error, "Could not fetch columns for #{self}"
-      def_column_accessor(*@columns)
-      @str_columns = nil
-      @columns
+      @columns || set_columns(dataset.naked.columns || raise(Error, "Could not fetch columns for #{self}"))
     end
   
     # Creates new instance with values set to passed-in Hash, saves it
@@ -70,6 +67,11 @@ module Sequel
       end
     end
     
+    # Get the schema for the underlying table, and set the columns
+    def self.db_schema
+      @db_schema ||= get_db_schema
+    end
+
     # If a block is given, define a method on the dataset with the given argument name using
     # the given block as well as a method on the model that calls the
     # dataset method.
@@ -118,6 +120,7 @@ module Sequel
     def self.inherited(subclass)
       sup_class = subclass.superclass
       ivs = subclass.instance_variables
+      subclass.instance_variable_set(:@typecast_on_assignment, sup_class.typecast_on_assignment) unless ivs.include?("@typecast_on_assignment")
       subclass.instance_variable_set(:@primary_key, sup_class.primary_key) unless ivs.include?("@primary_key")
       unless ivs.include?("@dataset")
         begin
@@ -197,10 +200,10 @@ module Sequel
       end
       @dataset.extend(Associations::EagerLoading)
       @dataset.transform(@transform) if @transform
-      @columns = nil
+      set_columns(nil)
       begin
-        columns unless @@lazy_load_schema
-      rescue StandardError
+        (@db_schema = get_db_schema) unless @@lazy_load_schema
+      rescue
       end
       self
     end
@@ -254,6 +257,46 @@ module Sequel
         end
       end
     end
-    metaprivate :def_column_accessor
+
+    def self.get_db_schema
+      return nil unless @dataset
+      schema_hash = {}
+      ds_opts = dataset.opts
+      # If the dataset uses a multiple tables or custom sql, just
+      # get the columns
+      single_table = ds_opts[:from] && (ds_opts[:from].length == 1) \
+        && !ds_opts.include?(:join) && !ds_opts.include?(:sql)
+      get_columns = proc{columns rescue []}
+      if single_table && (schema_array = (db.schema_for_table(table_name) rescue nil))
+        schema_array.each{|k,v| schema_hash[k] = v}
+        if ds_opts.include?(:select)
+          # Dataset only selects certain columns, delete the other
+          # columns from the schema
+          cols = get_columns.call
+          schema_hash.delete_if{|k,v| !cols.include?(k)}
+          cols.each{|c| schema_hash[c] ||= {}}
+        else
+          set_columns(schema_array.collect{|k,v| k})
+        end
+      else
+        get_columns.call.each{|c| schema_hash[c] = {}}
+      end
+      schema_hash
+    end
+
+    def self.set_columns(new_columns)
+      if @columns
+        # Remove previous column methods
+        #(instance_methods & @columns.collect{|c| [c.to_s, "#{c}="]}.flatten).each do |m|
+        #  remove_method(m)
+        #end
+      end
+      @columns = new_columns
+      def_column_accessor(*new_columns) if new_columns
+      @str_columns = nil
+      @columns
+    end
+
+    metaprivate :def_column_accessor, :get_db_schema, :set_columns
   end
 end

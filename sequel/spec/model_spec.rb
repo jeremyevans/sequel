@@ -4,7 +4,7 @@ describe Sequel::Model do
   it "should have class method aliased as model" do
     Sequel::Model.instance_methods.should include("model")
 
-    model_a = Class.new Sequel::Model
+    model_a = Class.new(Sequel::Model(:items))
     model_a.new.model.should be(model_a)
   end
 
@@ -558,5 +558,62 @@ context "Model#inspect" do
   
   specify "should include the class name and the values" do
     @o.inspect.should == '#<Sequel::Model @values={:x=>333}>'
+  end
+end
+
+context "Model.db_schema" do
+  setup do
+    @c = Class.new(Sequel::Model(:items)) do
+      def self.columns; orig_columns; end
+    end
+    @dataset = Sequel::Dataset.new(nil).from(:items)
+    @dataset.meta_def(:db){@db ||= Sequel::Database.new}
+    def @dataset.set_model(blah); end
+    def @dataset.naked; self; end
+    def @dataset.columns; []; end
+    def @dataset.def_mutation_method(*names);  end
+  end
+  
+  specify "should use the database's schema_for_table and set the columns" do
+    d = @dataset.db
+    def d.schema_for_table(table)
+      [[:x, {:type=>:integer}], [:y, {:type=>:string}]]
+    end
+    @c.dataset = @dataset
+    @c.db_schema.should == {:x=>{:type=>:integer}, :y=>{:type=>:string}}
+    @c.columns.should == [:x, :y]
+  end
+
+  specify "should restrict the schema and columns for datasets with a :select option" do
+    ds = @dataset.select(:x, :y___z)
+    d = ds.db
+    def d.schema_for_table(table)
+      [[:x, {:type=>:integer}], [:y, {:type=>:string}]]
+    end
+    def @c.columns; [:x, :z]; end
+    @c.dataset = ds
+    @c.db_schema.should == {:x=>{:type=>:integer}, :z=>{}}
+  end
+
+  specify "should not use schema_for_table if the dataset uses multiple tables or custom sql" do
+    ds = @dataset.join(:x, :id)
+    d = ds.db
+    e = false
+    d.meta_def(:schema_for_table){|table| e = true}
+    def @c.columns; [:x]; end
+    @c.dataset = ds
+    @c.db_schema.should == {:x=>{}}
+    e.should == false
+  end
+
+  specify "should fallback to fetching records if schema_for_table raises an error" do
+    ds = @dataset.join(:x, :id)
+    d = ds.db
+    def d.schema_for_table(table)
+      raise StandardError
+    end
+    def @c.columns; [:x]; end
+    @c.dataset = ds
+    @c.db_schema.should == {:x=>{}}
   end
 end

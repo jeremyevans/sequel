@@ -240,10 +240,10 @@ end
 
 describe "Model.db=" do
   setup do
-    $db1 = Sequel::Database.new
-    $db2 = Sequel::Database.new
+    $db1 = MockDatabase.new
+    $db2 = MockDatabase.new
     
-    class BlueBlue < Sequel::Model
+    class BlueBlue < Sequel::Model(:items)
       set_dataset $db1[:blue]
     end
   end

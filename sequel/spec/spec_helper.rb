@@ -22,6 +22,7 @@ class MockDataset < Sequel::Dataset
   end
   
   def fetch_rows(sql)
+    return if sql =~ /information_schema/
     @db.execute(sql)
     yield({:id => 1, :x => 1})
   end
@@ -53,6 +54,9 @@ class << Sequel::Model
     @dataset.instance_variable_set(:@columns, cols) if @dataset
     define_method(:str_columns){cols.map{|x|x.to_s.freeze}}
     def_column_accessor(*cols)
+    @columns = cols
+    @db_schema = {}
+    cols.each{|c| @db_schema[c] = {}}
   end
 end
 

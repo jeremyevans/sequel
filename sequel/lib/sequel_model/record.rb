@@ -3,17 +3,19 @@ module Sequel
     alias_method :model, :class
 
     attr_reader :changed_columns, :values
+    attr_writer :typecast_on_assignment
 
-    class_attr_reader :db, :dataset, :columns, :str_columns, :primary_key
+    class_attr_reader :columns, :dataset, :db, :primary_key, :str_columns
     
     # Creates new instance with values set to passed-in Hash.
     #
     # This method guesses whether the record exists when
     # <tt>new_record</tt> is set to false.
     def initialize(values = nil, from_db = false, &block)
-      columns
       values ||=  {}
       @changed_columns = []
+      @typecast_on_assignment = model.typecast_on_assignment
+      @db_schema = model.db_schema
       if from_db
         @new = false
         @values = values
@@ -41,7 +43,7 @@ module Sequel
       # NULL in the database, so assume it has changed.
       if new? || !@values.include?(column) || value != @values[column]
         @changed_columns << column unless @changed_columns.include?(column)
-        @values[column] = value
+        @values[column] = typecast_value(column, value)
       end
     end
 
@@ -261,6 +263,52 @@ module Sequel
       # assignment (those that end with =)
       def setter_methods
         methods.grep(/=\z/)
+      end
+
+      # Typecast the value to the column's type
+      def typecast_value(column, value)
+        return value unless @typecast_on_assignment && @db_schema && (col_schema = @db_schema[column])
+        case col_schema[:type]
+        when :integer
+          Integer(value)
+        when :string
+          value.to_s
+        when :float
+          Float(value)
+        when :boolean
+          case value
+          when false, 0, "0", /\Af(alse)?\z/i
+            false
+          else
+            value.blank? ? nil : true
+          end
+        when :date
+          case value
+          when Date
+            value
+          when DateTime, Time
+            Date.new(value.year, value.month, value.day)
+          when String
+            value.to_date
+          else
+            raise ArgumentError, "invalid value for Date: #{value.inspect}"
+          end
+        when :datetime
+          case value
+          when DateTime
+            value
+          when Date
+            DateTime.new(value.year, value.month, value.day)
+          when Time
+            DateTime.new(value.year, value.month, value.day, value.hour, value.min, value.sec)
+          when String
+            value.to_datetime
+          else
+            raise ArgumentError, "invalid value for DateTime: #{value.inspect}"
+          end
+        else
+          value
+        end
       end
   end
 end

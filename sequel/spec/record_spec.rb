@@ -749,3 +749,141 @@ describe Sequel::Model, "#refresh" do
     @m.instance_variable_get(:@tags).should == nil
   end
 end
+
+describe Sequel::Model, "typecasting" do
+  setup do
+    MODEL_DB.reset
+    @c = Class.new(Sequel::Model(:items)) do
+      columns :x
+    end
+  end
+
+  specify "should not convert if typecasting is turned of" do
+    @c.typecast_on_assignment = false
+    @c.instance_variable_set(:@db_schema, {:x=>{:type=>:integer}})
+    m = @c.new
+    m.x = '1'
+    m.x.should == '1'
+  end
+
+  specify "should convert to integer for an integer field" do
+    @c.instance_variable_set(:@db_schema, {:x=>{:type=>:integer}})
+    m = @c.new
+    m.x = '1'
+    m.x.should == 1
+    m.x = 1
+    m.x.should == 1
+    m.x = 1.3
+    m.x.should == 1
+  end
+
+  specify "should raise an error if invalid data is used in an integer field" do
+    @c.instance_variable_set(:@db_schema, {:x=>{:type=>:integer}})
+    proc{@c.new.x = 'a'}.should raise_error
+  end
+
+  specify "should convert to float for a float field" do
+    @c.instance_variable_set(:@db_schema, {:x=>{:type=>:float}})
+    m = @c.new
+    m.x = '1.3'
+    m.x.should == 1.3
+    m.x = 1
+    m.x.should == 1.0
+    m.x = 1.3
+    m.x.should == 1.3
+  end
+
+  specify "should raise an error if invalid data is used in an float field" do
+    @c.instance_variable_set(:@db_schema, {:x=>{:type=>:float}})
+    proc{@c.new.x = 'a'}.should raise_error
+  end
+
+  specify "should convert to string for a string field" do
+    @c.instance_variable_set(:@db_schema, {:x=>{:type=>:string}})
+    m = @c.new
+    m.x = '1.3'
+    m.x.should == '1.3'
+    m.x = 1
+    m.x.should == '1'
+    m.x = 1.3
+    m.x.should == '1.3'
+  end
+
+  specify "should convert to boolean for a boolean field" do
+    @c.instance_variable_set(:@db_schema, {:x=>{:type=>:boolean}})
+    m = @c.new
+    m.x = '1.3'
+    m.x.should == true
+    m.x = 1
+    m.x.should == true
+    m.x = 1.3
+    m.x.should == true
+    m.x = 't'
+    m.x.should == true
+    m.x = 'T'
+    m.x.should == true
+    m.x = true
+    m.x.should == true
+    m.x = nil
+    m.x.should == nil
+    m.x = ''
+    m.x.should == nil
+    m.x = []
+    m.x.should == nil
+    m.x = 'f'
+    m.x.should == false
+    m.x = 'F'
+    m.x.should == false
+    m.x = 'false'
+    m.x.should == false
+    m.x = 'FALSE'
+    m.x.should == false
+    m.x = '0'
+    m.x.should == false
+    m.x = 0
+    m.x.should == false
+    m.x = false
+    m.x.should == false
+  end
+
+  specify "should convert to date for a date field" do
+    @c.instance_variable_set(:@db_schema, {:x=>{:type=>:date}})
+    m = @c.new
+    y = Date.new(2007,10,21)
+    m.x = '2007-10-21'
+    m.x.should == y
+    m.x = '2007-10-21'.to_date
+    m.x.should == y
+    m.x = '2007-10-21'.to_time
+    m.x.should == y
+    m.x = '2007-10-21'.to_datetime
+    m.x.should == y
+  end
+
+  specify "should raise an error if invalid data is used in a date field" do
+    @c.instance_variable_set(:@db_schema, {:x=>{:type=>:date}})
+    proc{@c.new.x = 'a'}.should raise_error
+  end
+
+  specify "should convert to date for a datetime field" do
+    @c.instance_variable_set(:@db_schema, {:x=>{:type=>:datetime}})
+    m = @c.new
+    m.x = '2007-10-21 10:20:30'
+    m.x.should == '2007-10-21 10:20:30'.to_datetime
+    y = DateTime.new(2007,10,21,10,20,30)
+    m.x = '2007-10-21 10:20:30'
+    m.x.should == y
+    m.x = '2007-10-21 10:20:30'.to_datetime
+    m.x.should == y
+    m.x = '2007-10-21 10:20:30'.to_time
+    m.x.should == y
+    m.x = '2007-10-21'.to_date
+    m.x.should == DateTime.new(2007,10,21)
+  end
+
+  specify "should raise an error if invalid data is used in a datetime field" do
+    @c.instance_variable_set(:@db_schema, {:x=>{:type=>:datetime}})
+    proc{@c.new.x = 'a'}.should raise_error
+  end
+
+end

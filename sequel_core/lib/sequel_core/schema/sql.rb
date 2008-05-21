@@ -176,8 +176,6 @@ module Sequel
           :boolean
         when /\A(real|float|double( precision)?)\z/
           :float
-        else
-          :unknown
         end
       end
 
