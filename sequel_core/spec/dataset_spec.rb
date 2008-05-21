@@ -615,7 +615,7 @@ context "Dataset#literal" do
   end
   
   specify "should literalize an array properly" do
-    @dataset.literal([]).should == "()"
+    @dataset.literal([]).should == "(NULL)"
     @dataset.literal([1, 'abc', 3]).should == "(1, 'abc', 3)"
     @dataset.literal([1, "a'b''c", 3]).should == "(1, 'a''b''''c', 3)"
   end

@@ -367,7 +367,7 @@ module Sequel
       when ::Sequel::SQL::Expression
         v.to_s(self)
       when Array
-        v.all_two_pairs? ? literal(v.to_complex_expr) : "(#{v.collect{|i| literal(i)}.join(COMMA_SEPARATOR)})"
+        v.all_two_pairs? ? literal(v.to_complex_expr) : (v.empty? ? '(NULL)' : "(#{v.collect{|i| literal(i)}.join(COMMA_SEPARATOR)})")
       when Hash
         literal(v.to_complex_expr)
       when Time
