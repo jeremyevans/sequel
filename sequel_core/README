@@ -237,7 +237,7 @@ After filtering you can retrieve the matching records by using any of the retrie
 
   my_posts.each{|row| p row}
   
-See the doc/dataset_filtering.txt file for more details.
+See the doc/dataset_filtering.rdoc file for more details.
 
 === Summarizing Records
 

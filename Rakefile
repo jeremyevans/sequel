@@ -79,7 +79,8 @@ Rake::RDocTask.new do |rdoc|
   rdoc.options += RDOC_OPTS
   rdoc.main = "sequel_core/README"
   rdoc.title = "Sequel: The Database Toolkit for Ruby"
-  rdoc.rdoc_files.add ["sequel*/README", "sequel*/COPYING", "sequel*/lib/**/*.rb"]
+  rdoc.rdoc_files.add ["sequel*/README", "sequel*/COPYING", "sequel*/lib/**/*.rb", \
+    "sequel*/doc/*.rdoc"]
 end
 
 desc "Update docs and upload to rubyforge.org"
