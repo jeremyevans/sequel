@@ -1,5 +1,7 @@
 === HEAD
 
+* Remove methods deprecated in 1.5.0 (jeremyevans)
+
 * Add typecasting on attribute assignment to Sequel::Model objects, optional but enabled by default (jeremyevans)
 
 * Returning false in one of the before_ hooks now causes the appropriate method(s) to immediately return false (jeremyevans)

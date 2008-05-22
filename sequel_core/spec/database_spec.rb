@@ -559,14 +559,6 @@ context "A Database adapter with a scheme" do
     c.opts[:database].should == 'db'
   end
 
-  ### DEPRECATED
-  specify "should be accessible through Sequel()" do
-    c = Sequel('ccc://localhost/db')
-    c.should be_a_kind_of(CCC)
-    c.opts[:host].should == 'localhost'
-    c.opts[:database].should == 'db'
-  end
-
   specify "should be accessible through Sequel.<adapter>" do
     Sequel.send(:def_adapter_method, :ccc)
 

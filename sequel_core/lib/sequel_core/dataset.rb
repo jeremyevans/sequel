@@ -129,7 +129,7 @@ module Sequel
     # Return the dataset as a column with the given alias, so it can be used in the
     # SELECT clause.
     def as(a)
-      ::Sequel::SQL::ColumnExpr.new(self, AS, a)
+      ::Sequel::SQL::ColumnExpr.new(self, 'AS', a)
     end
 
     # Returns an array with all records in the dataset. If a block is given,
