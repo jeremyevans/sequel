@@ -68,7 +68,7 @@ end
 RDOC_OPTS = ["--quiet", "--line-numbers", "--inline-source"]
 
 Rake::RDocTask.new do |rdoc|
-  rdoc.rdoc_dir = "doc/rdoc"
+  rdoc.rdoc_dir = "rdoc"
   rdoc.options += RDOC_OPTS
   rdoc.main = "sequel_core/README"
   rdoc.title = "Sequel: The Database Toolkit for Ruby"
@@ -78,8 +78,8 @@ end
 desc "Update docs and upload to rubyforge.org"
 task :doc_rforge => [:rdoc]
 task :doc_rforge do
-  sh %{chmod -R g+w doc/rdoc/*}
-  sh %{scp -rp doc/rdoc/* rubyforge.org:/var/www/gforge-projects/sequel}
+  sh %{chmod -R g+w rdoc/*}
+  sh %{scp -rp rdoc/* rubyforge.org:/var/www/gforge-projects/sequel}
 end
 
 ##############################################################################

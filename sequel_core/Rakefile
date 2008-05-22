@@ -10,17 +10,17 @@ include FileUtils
 ##############################################################################
 NAME = "sequel_core"
 VERS = "1.5.1"
-CLEAN.include ["**/.*.sw?", "pkg/*", ".config", "doc/*", "coverage/*"]
-RDOC_OPTS = ["--quiet", "--line-numbers", "--inline-source"]
+CLEAN.include ["**/.*.sw?", "pkg/*", ".config", "rdoc/*", "coverage/*"]
+RDOC_OPTS = ["--quiet", "--line-numbers", "--inline-source", '--title', \
+  'Sequel: The Database Toolkit for Ruby: Core Library and Adapters', \
+  '--main', 'README']
 
 ##############################################################################
 # RDoc
 ##############################################################################
 Rake::RDocTask.new do |rdoc|
-  rdoc.rdoc_dir = "doc/rdoc"
+  rdoc.rdoc_dir = "rdoc"
   rdoc.options += RDOC_OPTS
-  rdoc.main = "README"
-  rdoc.title = "Sequel: The Database Toolkit for Ruby: Core Library and Adapters"
   rdoc.rdoc_files.add ["README", "COPYING", "lib/**/*.rb"]
 end
 
