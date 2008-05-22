@@ -6,7 +6,6 @@ Sequel makes it easy to deal with multiple records without having to break your 
 
 == Resources
 
-* {Project page}[http://code.google.com/p/ruby-sequel/]
 * {Source code}[http://github.com/jeremyevans/sequel]
 * {Bug tracking}[http://code.google.com/p/ruby-sequel/issues/list]
 * {Google group}[http://groups.google.com/group/sequel-talk]
@@ -39,6 +38,34 @@ Sequel currently supports:
 * SQLite 3
 
 There are also experimental adapters for DB2, OpenBase and JDBC (on JRuby).
+
+== A Short Example
+
+  require 'rubygems'
+  require 'sequel'
+  
+  DB = Sequel.sqlite # memory database
+  
+  DB.create_table :items do # Create a new table
+    column :name, :text
+    column :price, :float
+  end
+  
+  items = DB[:items] # Create a dataset
+  
+  # Populate the table
+  items << {:name => 'abc', :price => rand * 100}
+  items << {:name => 'def', :price => rand * 100}
+  items << {:name => 'ghi', :price => rand * 100}
+  
+  # Print out the number of records
+  puts "Item count: #{items.count}"
+  
+  # Print out the records in descending order by price
+  items.reverse_order(:price).print
+  
+  # Print out the average price
+  puts "The average price is: #{items.avg(:price)}"
 
 == The Sequel Console
 
