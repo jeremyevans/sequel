@@ -111,16 +111,20 @@ Much of Sequel is still undocumented (especially the part relating to model clas
 To connect to a database you simply provide Sequel with a URL:
 
   require 'sequel'
-  DB = Sequel.open 'sqlite:///blog.db'
+  DB = Sequel.connect('sqlite:///blog.db')
   
 The connection URL can also include such stuff as the user name and password:
 
-  DB = Sequel.open 'postgres://cico:12345@localhost:5432/mydb'
+  DB = Sequel.connect('postgres://cico:12345@localhost:5432/mydb')
 
 You can also specify optional parameters, such as the connection pool size, or a logger for logging SQL queries:
 
-  DB = Sequel.open("postgres://postgres:postgres@localhost/my_db",
+  DB = Sequel.connect("postgres://postgres:postgres@localhost/my_db",
     :max_connections => 10, :logger => Logger.new('log/db.log'))
+
+You can specify a block to connect, which will disconnect from the database after it completes:
+
+  Sequel.connect('postgres://cico:12345@localhost:5432/mydb'){|db| db[:posts].delete}
 
 === Arbitrary SQL queries
 
@@ -131,6 +135,18 @@ Or more succinctly:
 
   DB << "create table t (a text, b text)"
   DB << "insert into t values ('a', 'b')"
+
+You can also create datasets based on raw SQL:
+
+  dataset = DB['select * from items']
+  dataset.count # will return the number of records in the result set
+  dataset.map(:id) # will return an array containing all values of the id column in the result set
+
+You can also fetch records with raw SQL through the dataset:
+
+  DB['select * from items'].each do |row|
+    p row
+  end
 
 === Getting Dataset Instances
 
@@ -158,12 +174,12 @@ The all method returns an array of hashes, where each hash corresponds to a reco
 
 You can also iterate through records one at a time:
 
-  posts.each {|row| p row}
+  posts.each{|row| p row}
 
 Or perform more advanced stuff:
 
   posts.map(:id)
-  posts.inject({}) {|h, r| h[r[:id]] = r[:name]}
+  posts.inject({}){|h, r| h[r[:id]] = r[:name]}
   
 You can also retrieve the first record in a dataset:
 
@@ -191,13 +207,9 @@ Or lists of values:
 
   my_posts = posts.filter(:category => ['ruby', 'postgres', 'linux'])
   
-If ParseTree is installed, Sequel also accepts expressions as closures, AKA block filters:
-
-  my_posts = posts.filter {:category == ['ruby', 'postgres', 'linux']}
+Sequel also accepts expressions:
   
-Which also lets you do stuff like:
-
-  my_posts = posts.filter {:stamp > Date.today << 1}
+  my_posts = posts.filter(:stamp > Date.today << 1)
   
 Some adapters (like postgresql) will also let you specify Regexps:
 
@@ -206,18 +218,26 @@ Some adapters (like postgresql) will also let you specify Regexps:
 You can also use an inverse filter:
 
   my_posts = posts.exclude(:category => /ruby/i)
+  my_posts = posts.filter(:category => /ruby/i).invert # same as above
 
-You can then retrieve the records by using any of the retrieval methods:
+You can also specify a custom WHERE clause using a string:
 
-  my_posts.each {|row| p row}
-  
-You can also specify a custom WHERE clause:
+  posts.filter('stamp IS NOT NULL')
+
+You can use parameters in your string, as well (ActiveRecord style):
 
   posts.filter('(stamp < ?) AND (author <> ?)', Date.today - 3, author_name)
+  posts.filter((:stamp < Date.today - 3) & ~(:author => author_name)) # same as above
 
 Datasets can also be used as subqueries:
 
   DB[:items].filter('price > ?', DB[:items].select('AVG(price) + 100'))
+
+After filtering you can retrieve the matching records by using any of the retrieval methods:
+
+  my_posts.each{|row| p row}
+  
+See the doc/dataset_filtering.txt file for more details.
 
 === Summarizing Records
 
@@ -232,25 +252,31 @@ Or calculate a sum:
   
 === Ordering Records
 
-  posts.order(:stamp)
+Ordering datasets is simple:
+
+  posts.order(:stamp) # ORDER BY stamp
+  posts.order(:stamp, :name) # ORDER BY stamp, name
   
 You can also specify descending order
 
-  posts.order(:stamp.desc)
+  posts.order(:stamp.desc) # ORDER BY stamp DESC
 
 === Deleting Records
+
+Deleting records from the table is done with delete:
 
   posts.filter('stamp < ?', Date.today - 3).delete
   
 === Inserting Records
 
-  posts.insert(:category => 'ruby', :author => 'david')
-  
-Or alternatively:
+Inserting records into the table is done with insert:
 
-  posts << {:category => 'ruby', :author => 'david'}
+  posts.insert(:category => 'ruby', :author => 'david')
+  posts << {:category => 'ruby', :author => 'david'} # same as above
   
 === Updating Records
+
+Updating records in the table is done with update:
 
   posts.filter('stamp < ?', Date.today - 7).update(:state => 'archived')
 
