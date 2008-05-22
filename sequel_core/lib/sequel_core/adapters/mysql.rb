@@ -113,6 +113,8 @@ module Sequel
         if encoding = @opts[:encoding] || @opts[:charset]
           conn.query("set character_set_connection = '#{encoding}'")
           conn.query("set character_set_client = '#{encoding}'")
+          conn.query("set character_set_database = '#{encoding}'")
+          conn.query("set character_set_server = '#{encoding}'")
           conn.query("set character_set_results = '#{encoding}'")
         end
         conn.reconnect = true

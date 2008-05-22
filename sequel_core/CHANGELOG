@@ -1,5 +1,7 @@
 === HEAD
 
+* Set additional MySQL charset options required for creating tables and databases (tmm1)
+
 * Remove methods deprecated in 1.5.0 (jeremyevans)
 
 * Add Module#metaattr_accessor for creating attr_accessors for the metaclass (jeremyevans)
