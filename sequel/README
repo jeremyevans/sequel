@@ -27,7 +27,6 @@ You can, however, explicitly set the table name or even the dataset used:
 
 === Resources
 
-* {Project page}[http://code.google.com/p/ruby-sequel/]
 * {Source code}[http://github.com/jeremyevans/sequel]
 * {Bug tracking}[http://code.google.com/p/ruby-sequel/issues/list]
 * {Google group}[http://groups.google.com/group/sequel-talk]
