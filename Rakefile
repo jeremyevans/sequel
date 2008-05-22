@@ -7,6 +7,7 @@ require "fileutils"
 include FileUtils
 
 PROJECTS = %w{sequel_core sequel}
+CLEAN.include ["rdoc", "coverage"]
 
 def with_each_project
   PROJECTS.each do |p|
@@ -49,6 +50,12 @@ end
 desc "Upload sequel and sequel_core gems to rubyforge"
 task :release do
   sh_with_each_project "rake release"
+end
+
+task :clean => [:clean_subdirs]
+desc "Clean files from both subdirectories"
+task :clean_subdirs do
+  sh_with_each_project "rake clean"
 end
 
 ##############################################################################
@@ -119,7 +126,7 @@ STATS_DIRECTORIES = [
 
 desc "Report code statistics (KLOCs, etc) from the application"
 task :stats do
-  require "sequel_core/extra/stats"
+  require "extra/stats"
   verbose = true
   CodeStatistics.new(*STATS_DIRECTORIES).to_s
 end

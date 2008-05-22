@@ -10,7 +10,7 @@ include FileUtils
 ##############################################################################
 NAME = "sequel_core"
 VERS = "1.5.1"
-CLEAN.include ["**/.*.sw?", "pkg/*", ".config", "rdoc/*", "coverage/*"]
+CLEAN.include ["**/.*.sw?", "pkg", ".config", "rdoc", "coverage"]
 RDOC_OPTS = ["--quiet", "--line-numbers", "--inline-source", '--title', \
   'Sequel: The Database Toolkit for Ruby: Core Library and Adapters', \
   '--main', 'README']
@@ -151,7 +151,7 @@ STATS_DIRECTORIES = [
 
 desc "Report code statistics (KLOCs, etc) from the application"
 task :stats do
-  require "extra/stats"
+  require "../extra/stats"
   verbose = true
   CodeStatistics.new(*STATS_DIRECTORIES).to_s
 end
