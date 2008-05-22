@@ -11,15 +11,16 @@ end
 MYSQL_URI = URI.parse(MYSQL_DB.uri)
 MYSQL_DB_NAME = (m = /\/(.*)/.match(MYSQL_URI.path)) && m[1]
 
-MYSQL_DB.drop_table(:items) if MYSQL_DB.table_exists?(:items)
-MYSQL_DB.drop_table(:test2) if MYSQL_DB.table_exists?(:test2)
-MYSQL_DB.create_table :items do
+MYSQL_DB.create_table! :items do
   text :name
   integer :value, :index => true
 end
-MYSQL_DB.create_table :test2 do
+MYSQL_DB.create_table! :test2 do
   text :name
   integer :value
+end
+MYSQL_DB.create_table! :booltest do
+  tinyint :value
 end
 class Sequel::MySQL::Database
   attr_accessor :sqls
@@ -253,6 +254,15 @@ context "MySQL datasets" do
       group_by :minute[:from_unixtime[:ack]]
     end.sql.should == \
       "SELECT `market`, minute(from_unixtime(`ack`)) AS `minute` FROM `orders` WHERE ((`ack` > #{@d.literal(ack_stamp)}) AND (`market` = 'ICE')) GROUP BY minute(from_unixtime(`ack`))"
+  end
+
+  specify "should accept and return tinyints as bools" do
+    MYSQL_DB[:booltest].delete
+    MYSQL_DB[:booltest] << {:value=>true}
+    MYSQL_DB[:booltest].all.should == [{:value=>true}]
+    MYSQL_DB[:booltest].delete
+    MYSQL_DB[:booltest] << {:value=>false}
+    MYSQL_DB[:booltest].all.should == [{:value=>false}]
   end
 end
 

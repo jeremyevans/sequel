@@ -1,5 +1,7 @@
 === HEAD
 
+* MySQL tinyints are now returned as boolean values instead of integers (jeremyevans)
+
 * Set additional MySQL charset options required for creating tables and databases (tmm1)
 
 * Remove methods deprecated in 1.5.0 (jeremyevans)

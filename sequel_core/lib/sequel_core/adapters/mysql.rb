@@ -4,7 +4,7 @@ require 'mysql'
 class Mysql::Result
   MYSQL_TYPES = {
     0   => :to_d,     # MYSQL_TYPE_DECIMAL
-    1   => :to_i,     # MYSQL_TYPE_TINY
+    #1   => :to_i,     # MYSQL_TYPE_TINY
     2   => :to_i,     # MYSQL_TYPE_SHORT
     3   => :to_i,     # MYSQL_TYPE_LONG
     4   => :to_f,     # MYSQL_TYPE_FLOAT
@@ -33,7 +33,17 @@ class Mysql::Result
   }
 
   def convert_type(v, type)
-    v ? ((t = MYSQL_TYPES[type]) ? v.send(t) : v) : nil
+    if v
+      if type == 1
+        # We special case tinyint here to avoid adding
+        # a method to an ancestor of Fixnum
+        v.to_i == 0 ? false : true
+      else
+        (t = MYSQL_TYPES[type]) ? v.send(t) : v
+      end
+    else
+      nil
+    end
   end
 
   def columns(with_table = nil)
