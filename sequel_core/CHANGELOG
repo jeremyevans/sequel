@@ -1,5 +1,7 @@
 === HEAD
 
+* Set additional MySQL charset options required for creating tables and databases (tmm1)
+
 * Add Module#metaattr_accessor for creating attr_accessors for the metaclass (jeremyevans)
 
 * Add SQL string concatenation support to blockless filters, via Array#sql_string_join (jeremyevans)
