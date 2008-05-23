@@ -268,6 +268,7 @@ module Sequel
       # Typecast the value to the column's type
       def typecast_value(column, value)
         return value unless @typecast_on_assignment && @db_schema && (col_schema = @db_schema[column])
+        return nil if value.nil? and col_schema[:allow_null]
         case col_schema[:type]
         when :integer
           Integer(value)

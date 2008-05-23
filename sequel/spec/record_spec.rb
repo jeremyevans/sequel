@@ -701,7 +701,7 @@ describe Sequel::Model, "typecasting" do
     end
   end
 
-  specify "should not convert if typecasting is turned of" do
+  specify "should not convert if typecasting is turned off" do
     @c.typecast_on_assignment = false
     @c.instance_variable_set(:@db_schema, {:x=>{:type=>:integer}})
     m = @c.new
@@ -718,6 +718,13 @@ describe Sequel::Model, "typecasting" do
     m.x.should == 1
     m.x = 1.3
     m.x.should == 1
+  end
+
+  specify "should not typecast nil if field allows null values" do
+    @c.instance_variable_set(:@db_schema, {:x=>{:type=>:integer,:allow_null=>true}})
+    m = @c.new
+    m.x = nil
+    m.x.should == nil
   end
 
   specify "should raise an error if invalid data is used in an integer field" do
