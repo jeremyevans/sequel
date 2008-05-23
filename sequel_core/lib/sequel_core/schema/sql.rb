@@ -143,22 +143,42 @@ module Sequel
       def rename_table_sql(name, new_name)
         "ALTER TABLE #{name} RENAME TO #{new_name}"
       end
+
+      def schemas
+        unless @schemas
+          @schemas ||= {}
+
+          ds = schema_utility_dataset.clone
+          schema_for_table_from(ds)
+          schema_for_table_select(ds, true)
+          schema_for_table_join(ds)
+
+          ds.inject({}) do |tables, row|
+            (tables[row.delete(:table_name).to_sym] ||= []) << row
+            tables
+          end.each do |table_name, rows|
+            @schemas[table_name] = schema_for_table_parse_rows(rows)
+          end
+        end
+
+        @schemas
+      end
       
       def schema_for_table(table_name, schema = nil)
-        unless (@schemas||={})[table_name]
+        unless schemas[table_name]
           ds = schema_utility_dataset.clone
           schema_for_table_from(ds)
           schema_for_table_select(ds)
           schema_for_table_join(ds)
           schema_for_table_filter(ds, table_name, schema)
-          @schemas[table_name] = schema_for_table_parse_rows(ds)
+          schemas[table_name] = schema_for_table_parse_rows(ds)
         end
-        @schemas[table_name]
+        schemas[table_name]
       end
 
       def schema_for_table!(table_name, *args)
-        @schemas.delete table_name if @schemas
-        schema_for_table table_name, *args
+        schemas.delete table_name
+        schema_for_table(table_name, *args)
       end
 
       def schema_utility_dataset
@@ -212,9 +232,10 @@ module Sequel
         schema
       end
 
-      def schema_for_table_select(ds)
-        ds.select!(:column_name___column, :data_type___db_type, :character_maximum_length___max_chars, \
+      def schema_for_table_select(ds, table_name = false)
+        ds.select!(:column_name___column.distinct, :data_type___db_type, :character_maximum_length___max_chars, \
           :numeric_precision, :column_default___default, :is_nullable___allow_null)
+        ds.select_more!(:c__table_name) if table_name
       end
     end
   end
