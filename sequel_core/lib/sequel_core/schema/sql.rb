@@ -145,12 +145,20 @@ module Sequel
       end
       
       def schema_for_table(table_name, schema = nil)
-        ds = schema_utility_dataset.clone
-        schema_for_table_from(ds)
-        schema_for_table_select(ds)
-        schema_for_table_join(ds)
-        schema_for_table_filter(ds, table_name, schema)
-        schema_for_table_parse_rows(ds)
+        unless (@schemas||={})[table_name]
+          ds = schema_utility_dataset.clone
+          schema_for_table_from(ds)
+          schema_for_table_select(ds)
+          schema_for_table_join(ds)
+          schema_for_table_filter(ds, table_name, schema)
+          @schemas[table_name] = schema_for_table_parse_rows(ds)
+        end
+        @schemas[table_name]
+      end
+
+      def schema_for_table!(table_name, *args)
+        @schemas.delete table_name if @schemas
+        schema_for_table table_name, *args
       end
 
       def schema_utility_dataset
