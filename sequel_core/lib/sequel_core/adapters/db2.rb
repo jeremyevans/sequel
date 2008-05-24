@@ -82,6 +82,8 @@ module Sequel
         case v
         when Time
           literal(v.iso8601)
+        when Date, DateTime
+          literal(v.to_s)
         else
           super
         end

@@ -1,5 +1,9 @@
 === HEAD
 
+* Handle Date and DateTime value literalization correctly in adapters (jeremyevans)
+
+* Literalize DateTime values the same as Time values (jeremyevans)
+
 * MySQL tinyints are now returned as boolean values instead of integers (jeremyevans)
 
 * Set additional MySQL charset options required for creating tables and databases (tmm1)
