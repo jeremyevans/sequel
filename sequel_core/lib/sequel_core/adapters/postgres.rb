@@ -374,6 +374,8 @@ module Sequel
           Adapter.quote(v)
         when Time
           "#{v.strftime(PG_TIMESTAMP_FORMAT)}.#{sprintf("%06d",v.usec)}'"
+        when DateTime
+          "#{v.strftime(PG_TIMESTAMP_FORMAT)}.#{sprintf("%06d", (v.sec_fraction * 86400000000).to_i)}'"
         else
           super
         end

@@ -74,12 +74,10 @@ module Sequel
           BOOL_TRUE
         when false
           BOOL_FALSE
-        when Time
+        when Time, DateTime
           formatted = v.strftime(ODBC_TIMESTAMP_FORMAT)
-          if v.usec >= 1000
-            msec = ( v.usec.to_f / 1000 ).round
-            formatted.insert ODBC_TIMESTAMP_AFTER_SECONDS, ".#{msec}"
-          end
+          usec = (Time === v ? v.usec : (v.sec_fraction * 86400000000))
+          formatted.insert(ODBC_TIMESTAMP_AFTER_SECONDS, ".#{(usec.to_f/1000).round}") if usec >= 1000
           formatted
         when Date
           v.strftime(ODBC_DATE_FORMAT)

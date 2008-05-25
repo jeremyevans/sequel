@@ -370,7 +370,7 @@ module Sequel
         v.all_two_pairs? ? literal(v.to_complex_expr) : (v.empty? ? '(NULL)' : "(#{v.collect{|i| literal(i)}.join(COMMA_SEPARATOR)})")
       when Hash
         literal(v.to_complex_expr)
-      when Time
+      when Time, DateTime
         v.strftime(TIMESTAMP_FORMAT)
       when Date
         v.strftime(DATE_FORMAT)

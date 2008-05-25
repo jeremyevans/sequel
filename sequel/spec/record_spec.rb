@@ -720,8 +720,21 @@ describe Sequel::Model, "typecasting" do
     m.x.should == 1
   end
 
-  specify "should not typecast nil if field allows null values" do
+  specify "should not typecast nil if NULLs are allowed" do
     @c.instance_variable_set(:@db_schema, {:x=>{:type=>:integer,:allow_null=>true}})
+    m = @c.new
+    m.x = nil
+    m.x.should == nil
+  end
+
+  specify "should raise an error if attempting to typecast nil and NULLs are not allowed" do
+    @c.instance_variable_set(:@db_schema, {:x=>{:type=>:integer,:allow_null=>false}})
+    proc{@c.new.x = nil}.should raise_error(Sequel::Error)
+  end
+
+  specify "should not raise an error if NULLs are not allowed and typecasting is turned off" do
+    @c.typecast_on_assignment = false
+    @c.instance_variable_set(:@db_schema, {:x=>{:type=>:integer,:allow_null=>false}})
     m = @c.new
     m.x = nil
     m.x.should == nil
