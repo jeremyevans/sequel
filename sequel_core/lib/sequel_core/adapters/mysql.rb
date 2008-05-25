@@ -250,16 +250,17 @@ module Sequel
       def use(db_name)
         disconnect
         @opts[:database] = db_name if self << "USE #{db_name}"
+        @schemas = nil
         self
+      end
+
+      def schema(table_name = nil, database = schema_utility_dataset.db.opts[:database])
+        super
       end
 
       private
         def connection_pool_default_options
           super.merge(:pool_reuse_connections=>:last_resort, :pool_convert_exceptions=>false)
-        end
-
-        def schema_for_table_filter(ds, table_name, schema=nil)
-          ds.filter!(:c__table_name=>table_name.to_s)
         end
 
         def schema_for_table_join(ds)
