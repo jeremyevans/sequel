@@ -138,18 +138,6 @@ context "#asc" do
   end
 end
 
-context "#distinct" do
-  setup do
-    @ds = Sequel::Dataset.new(nil)
-  end
-
-  specify "should format a DISTINCT clause for a column ref" do
-    :test.distinct.to_s(@ds).should == ' DISTINCT test'
-    :items__price.distinct.to_s(@ds).should == ' DISTINCT items.price'
-    :items__price___p.distinct.to_s(@ds).should == ' DISTINCT items.price AS p'
-  end
-end
-
 context "#as" do
   setup do
     @ds = Sequel::Dataset.new(nil)

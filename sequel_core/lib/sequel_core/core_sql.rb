@@ -118,16 +118,12 @@ module Sequel
       AS = 'AS'.freeze
       DESC = 'DESC'.freeze
       ASC = 'ASC'.freeze
-      DISTINCT = 'DISTINCT'.lit.freeze
-      EMPTY = ''.lit.freeze
       
       def as(a); ColumnExpr.new(self, AS, a); end
       
       def desc; ColumnExpr.new(self, DESC); end
       
       def asc; ColumnExpr.new(self, ASC); end
-
-      def distinct; ColumnExpr.new(EMPTY, DISTINCT, self); end
 
       def cast_as(t)
         t = t.to_s.lit if t.is_a?(Symbol)
