@@ -144,42 +144,29 @@ module Sequel
         "ALTER TABLE #{name} RENAME TO #{new_name}"
       end
 
-      def schema(table_name = nil, database = nil)
-        if @schemas.nil? or table_name
-          ds = schema_utility_dataset.clone
-          schema_for_table_from(ds)
-          schema_for_table_select(ds, table_name)
-          schema_for_table_join(ds)
-          schema_for_table_filter(ds, table_name, database)
-        end
-
-        unless @schemas
-          @schemas ||= {}
-
-          ds.inject({}) do |tables, row|
-            (tables[row.delete(:table_name).to_sym] ||= []) << row
-            tables
-          end.each do |name, rows|
-            @schemas[name] = schema_for_table_parse_rows(rows)
+      def schema(table_name = nil, opts={})
+        if opts[:reload] && @schemas
+          if table_name
+            @schemas.delete(table_name)
+          else
+            @schemas = nil
           end
         end
 
         if table_name
-          @schemas[table_name] ||= schema_for_table_parse_rows(ds)
+          return @schemas[table_name] if @schemas && @schemas[table_name]
         else
-          @schemas
+          return @schemas if @schemas
+        end
+
+        if table_name
+          @schemas ||= {}
+          @schemas[table_name] ||= schema_parse_table(table_name, opts)
+        else
+          @schemas = schema_parse_tables(opts)
         end
       end
       
-      def schema_for_table(table_name)
-        schema(table_name)
-      end
-
-      def schema_for_table!(table_name)
-        @schemas.delete table_name
-        schema(table_name)
-      end
-
       def schema_utility_dataset
         @schema_utility_dataset ||= dataset
       end
@@ -206,21 +193,53 @@ module Sequel
         end
       end
 
-      def schema_for_table_filter(ds, table_name = nil, schema=nil)
-        ds.filter!(:c__table_name=>table_name.to_s) if table_name
-        ds.filter!(:c__table_schema=>schema) if schema
+      def schema_ds(table_name, opts)
+        schema_utility_dataset.from(*schema_ds_from(table_name, opts)) \
+          .select(*schema_ds_select(table_name, opts)) \
+          .join(*schema_ds_join(table_name, opts)) \
+          .filter(*schema_ds_filter(table_name, opts))
       end
 
-      def schema_for_table_from(ds)
-        ds.from!(:information_schema__tables___t)
+      def schema_ds_filter(table_name, opts)
+        if table_name
+          [{:c__table_name=>table_name.to_s}]
+        else
+          [{:t__table_type=>'BASE TABLE'}]
+        end
       end
 
-      def schema_for_table_join(ds)
-        ds.join!(:information_schema__columns, {:table_catalog=>:table_catalog,
-          :table_schema => :table_schema, :table_name => :table_name} , :c)
+      def schema_ds_from(table_name, opts)
+        [:information_schema__tables___t]
       end
 
-      def schema_for_table_parse_rows(rows)
+      def schema_ds_join(table_name, opts)
+        [:information_schema__columns, {:table_catalog=>:table_catalog,
+          :table_schema => :table_schema, :table_name => :table_name} , :c]
+      end
+
+      def schema_ds_select(table_name, opts)
+        cols = [:column_name___column, :data_type___db_type, :character_maximum_length___max_chars, \
+          :numeric_precision, :column_default___default, :is_nullable___allow_null]
+        cols << :c__table_name unless table_name
+        cols
+      end
+
+      def schema_parse_table(table_name, opts)
+        schema_parse_rows(schema_ds(table_name, opts))
+      end
+
+      def schema_parse_tables(opts)
+        schemas = {}
+        schema_ds(nil, opts).each do |row|
+          (schemas[row.delete(:table_name).to_sym] ||= []) << row
+        end
+        schemas.each do |table, rows|
+          schemas[table] = schema_parse_rows(rows)
+        end
+        schemas
+      end
+
+      def schema_parse_rows(rows)
         schema = []
         rows.each do |row| 
           row[:allow_null] = row[:allow_null] == 'YES' ? true : false
@@ -229,12 +248,6 @@ module Sequel
           schema << [row.delete(:column).to_sym, row]
         end
         schema
-      end
-
-      def schema_for_table_select(ds, table_name = nil)
-        ds.select!(:column_name___column, :data_type___db_type, :character_maximum_length___max_chars, \
-          :numeric_precision, :column_default___default, :is_nullable___allow_null)
-        ds.select_more!(:c__table_name) unless table_name
       end
     end
   end

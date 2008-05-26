@@ -31,6 +31,7 @@ module Sequel
       
       @quote_identifiers = opts[:quote_identifiers] || @@quote_identifiers
       @single_threaded = opts[:single_threaded] || @@single_threaded
+      @schemas = nil
       @pool = (@single_threaded ? SingleThreadedPool : ConnectionPool).new(connection_pool_default_options.merge(opts), &block)
       @pool.connection_proc = proc {connect} unless block
 

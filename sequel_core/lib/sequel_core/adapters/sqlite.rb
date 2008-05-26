@@ -136,8 +136,17 @@ module Sequel
         end
       end
       
+      private
+      def connection_pool_default_options
+        o = super.merge(:pool_reuse_connections=>:always, :pool_convert_exceptions=>false)
+        # Default to only a single connection if a memory database is used,
+        # because otherwise each connection will get a separate database
+        o[:max_connections] = 1 if @opts[:database] == ':memory:' || @opts[:database].blank?
+        o
+      end
+
       SCHEMA_TYPE_RE = /\A(\w+)\((\d+)\)\z/
-      def schema_for_table(table_name, schema=nil)
+      def schema_parse_table(table_name, opts)
         rows = self["PRAGMA table_info('#{::SQLite3::Database.quote(table_name.to_s)}')"].collect do |row|
           row.delete(:cid)
           row[:column] = row.delete(:name)
@@ -154,17 +163,14 @@ module Sequel
           row[:numeric_precision] = nil
           row
         end
-        schema_for_table_parse_rows(rows)
+        schema_parse_rows(rows)
       end
 
-      private
-        def connection_pool_default_options
-          o = super.merge(:pool_reuse_connections=>:always, :pool_convert_exceptions=>false)
-          # Default to only a single connection if a memory database is used,
-          # because otherwise each connection will get a separate database
-          o[:max_connections] = 1 if @opts[:database] == ':memory:' || @opts[:database].blank?
-          o
-        end
+      def schema_parse_tables(opts)
+        schemas = {}
+        tables.each{|table| schemas[table] = schema_parse_table(table, opts)}
+        schemas
+      end
     end
     
     class Dataset < Sequel::Dataset

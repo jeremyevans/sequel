@@ -267,7 +267,7 @@ module Sequel
       single_table = ds_opts[:from] && (ds_opts[:from].length == 1) \
         && !ds_opts.include?(:join) && !ds_opts.include?(:sql)
       get_columns = proc{columns rescue []}
-      if single_table && (schema_array = (db.schema_for_table(table_name) rescue nil))
+      if single_table && (schema_array = (db.schema(table_name) rescue nil))
         schema_array.each{|k,v| schema_hash[k] = v}
         if ds_opts.include?(:select)
           # Dataset only selects certain columns, delete the other

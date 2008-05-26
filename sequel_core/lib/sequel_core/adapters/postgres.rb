@@ -360,6 +360,13 @@ module Sequel
       def connection_pool_default_options
         super.merge(:pool_reuse_connections=>:always, :pool_convert_exceptions=>false)
       end
+
+      def schema_ds_filter(table_name, opts)
+        filt = super
+        # Restrict it to the given or public schema, unless specifically requesting :schema = nil
+        filt = SQL::ComplexExpression.new(:AND, filt, {:c__table_schema=>opts[:schema] || 'public'}) if opts[:schema] || !opts.include?(:schema)
+        filt
+      end
     end
   
     class Dataset < Sequel::Dataset

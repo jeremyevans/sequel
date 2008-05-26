@@ -254,18 +254,21 @@ module Sequel
         self
       end
 
-      def schema(table_name = nil, database = schema_utility_dataset.db.opts[:database])
-        super
+      private
+      def connection_pool_default_options
+        super.merge(:pool_reuse_connections=>:last_resort, :pool_convert_exceptions=>false)
       end
 
-      private
-        def connection_pool_default_options
-          super.merge(:pool_reuse_connections=>:last_resort, :pool_convert_exceptions=>false)
-        end
+      def schema_ds_filter(table_name, opts)
+        filt = super
+        # Restrict it to the given or current database, unless specifically requesting :database = nil
+        filt = SQL::ComplexExpression.new(:AND, filt, {:c__table_schema=>opts[:database] || self.opts[:database]}) if opts[:database] || !opts.include?(:database)
+        filt
+      end
 
-        def schema_for_table_join(ds)
-          ds.join!(:information_schema__columns, {:table_schema => :table_schema, :table_name => :table_name}, :c)
-        end
+      def schema_ds_join(table_name, opts)
+        [:information_schema__columns, {:table_schema => :table_schema, :table_name => :table_name}, :c]
+      end
     end
 
     class Dataset < Sequel::Dataset

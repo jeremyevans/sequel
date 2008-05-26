@@ -1,7 +1,5 @@
 === HEAD
 
-* Fix typecasting of null values for fields that allow null (tmm1)
-
 * Remove methods deprecated in 1.5.0 (jeremyevans)
 
 * Add typecasting on attribute assignment to Sequel::Model objects, optional but enabled by default (jeremyevans)
