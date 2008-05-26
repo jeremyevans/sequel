@@ -509,7 +509,7 @@ context "Model.db_schema" do
   
   specify "should use the database's schema_for_table and set the columns" do
     d = @dataset.db
-    def d.schema_for_table(table)
+    def d.schema(table)
       [[:x, {:type=>:integer}], [:y, {:type=>:string}]]
     end
     @c.dataset = @dataset
@@ -520,7 +520,7 @@ context "Model.db_schema" do
   specify "should restrict the schema and columns for datasets with a :select option" do
     ds = @dataset.select(:x, :y___z)
     d = ds.db
-    def d.schema_for_table(table)
+    def d.schema(table)
       [[:x, {:type=>:integer}], [:y, {:type=>:string}]]
     end
     def @c.columns; [:x, :z]; end
@@ -532,7 +532,7 @@ context "Model.db_schema" do
     ds = @dataset.join(:x, :id)
     d = ds.db
     e = false
-    d.meta_def(:schema_for_table){|table| e = true}
+    d.meta_def(:schema){|table| e = true}
     def @c.columns; [:x]; end
     @c.dataset = ds
     @c.db_schema.should == {:x=>{}}
@@ -542,7 +542,7 @@ context "Model.db_schema" do
   specify "should fallback to fetching records if schema_for_table raises an error" do
     ds = @dataset.join(:x, :id)
     d = ds.db
-    def d.schema_for_table(table)
+    def d.schema(table)
       raise StandardError
     end
     def @c.columns; [:x]; end
