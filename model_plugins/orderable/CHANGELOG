@@ -1,7 +1,0 @@
-== 0.0.3 (2007-12-30)
-
-* Updated gem dependency on sequel_model.
-
-* 2007.12.05 Modified for better readability and new plugin conventions.
-
-* 2007.12.02 Initial working revision.
