@@ -150,7 +150,7 @@ module Sequel
         rows = self["PRAGMA table_info('#{::SQLite3::Database.quote(table_name.to_s)}')"].collect do |row|
           row.delete(:cid)
           row[:column] = row.delete(:name)
-          row[:allow_null] = row.delete(:notnull) ? 'NO' : 'YES'
+          row[:allow_null] = row.delete(:notnull).to_i == 0 ? 'YES' : 'NO'
           row[:default] = row.delete(:dflt_value)
           row[:primary_key] = row.delete(:pk).to_i == 1 ? true : false 
           row[:db_type] = row.delete(:type)
