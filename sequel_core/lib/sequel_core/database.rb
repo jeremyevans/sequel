@@ -364,6 +364,52 @@ module Sequel
       end
     end
     
+    # Typecast the value to the given column_type
+    def typecast_value(column_type, value)
+      return nil if value.nil?
+      case column_type
+      when :integer
+        Integer(value)
+      when :string
+        value.to_s
+      when :float
+        Float(value)
+      when :boolean
+        case value
+        when false, 0, "0", /\Af(alse)?\z/i
+          false
+        else
+          value.blank? ? nil : true
+        end
+      when :date
+        case value
+        when Date
+          value
+        when DateTime, Time
+          Date.new(value.year, value.month, value.day)
+        when String
+          value.to_date
+        else
+          raise ArgumentError, "invalid value for Date: #{value.inspect}"
+        end
+      when :datetime
+        case value
+        when DateTime
+          value
+        when Date
+          DateTime.new(value.year, value.month, value.day)
+        when Time
+          DateTime.new(value.year, value.month, value.day, value.hour, value.min, value.sec)
+        when String
+          value.to_datetime
+        else
+          raise ArgumentError, "invalid value for DateTime: #{value.inspect}"
+        end
+      else
+        value
+      end
+    end 
+
     # Returns the URI identifying the database.
     def uri
       uri = URI::Generic.new(
@@ -384,9 +430,10 @@ module Sequel
     alias url uri # Because I don't care much for the semantic difference.
     
     private
-      def connection_pool_default_options
-        {}
-      end
+
+    def connection_pool_default_options
+      {}
+    end
   end
 end
 

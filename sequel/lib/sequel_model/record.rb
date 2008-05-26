@@ -259,60 +259,20 @@ module Sequel
     end
 
     private
-      # Returns all methods that can be used for attribute
-      # assignment (those that end with =)
-      def setter_methods
-        methods.grep(/=\z/)
-      end
 
-      # Typecast the value to the column's type
-      def typecast_value(column, value)
-        return value unless @typecast_on_assignment && @db_schema && (col_schema = @db_schema[column])
-        if value.nil?
-          raise(Sequel::Error, "nil/NULL is not allowed for the #{column} column") if col_schema[:allow_null] == false
-          return nil
-        end
-        case col_schema[:type]
-        when :integer
-          Integer(value)
-        when :string
-          value.to_s
-        when :float
-          Float(value)
-        when :boolean
-          case value
-          when false, 0, "0", /\Af(alse)?\z/i
-            false
-          else
-            value.blank? ? nil : true
-          end
-        when :date
-          case value
-          when Date
-            value
-          when DateTime, Time
-            Date.new(value.year, value.month, value.day)
-          when String
-            value.to_date
-          else
-            raise ArgumentError, "invalid value for Date: #{value.inspect}"
-          end
-        when :datetime
-          case value
-          when DateTime
-            value
-          when Date
-            DateTime.new(value.year, value.month, value.day)
-          when Time
-            DateTime.new(value.year, value.month, value.day, value.hour, value.min, value.sec)
-          when String
-            value.to_datetime
-          else
-            raise ArgumentError, "invalid value for DateTime: #{value.inspect}"
-          end
-        else
-          value
-        end
-      end
+    # Returns all methods that can be used for attribute
+    # assignment (those that end with =)
+    def setter_methods
+      methods.grep(/=\z/)
+    end
+
+    # Typecast the value to the column's type if typecasting.  Calls the database's
+    # typecast_value method, so database adapters can override/augment the handling
+    # for database specific column types.
+    def typecast_value(column, value)
+      return value unless @typecast_on_assignment && @db_schema && (col_schema = @db_schema[column])
+      raise(Error, "nil/NULL is not allowed for the #{column} column") if value.nil? && (col_schema[:allow_null] == false)
+      model.db.typecast_value(col_schema[:type], value)
+    end
   end
 end
