@@ -193,6 +193,16 @@ context "An SQLite database" do
   specify "should not swallow non-SQLite based exceptions" do
     proc {@db.pool.hold{raise Interrupt, "test"}}.should raise_error(Interrupt)
   end
+
+  specify "should correctly parse the schema" do
+    @db.create_table(:time) {timestamp :t}
+    @db.schema(:time, :reload=>true).should == [[:t, {:type=>:datetime, :allow_null=>true, :max_chars=>nil, :default=>nil, :db_type=>"timestamp", :numeric_precision=>nil, :primary_key=>false}]]
+  end
+
+  specify "should get the schema all database tables if no table name is used" do
+    @db.create_table(:time) {timestamp :t}
+    @db.schema(:time, :reload=>true).should == @db.schema(nil, :reload=>true)[:time]
+  end
 end
 
 context "An SQLite dataset" do

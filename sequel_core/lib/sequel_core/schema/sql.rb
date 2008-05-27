@@ -20,23 +20,23 @@ module Sequel
       def alter_table_sql(table, op)
         case op[:op]
         when :add_column
-          "ALTER TABLE #{table} ADD COLUMN #{column_definition_sql(op)}"
+          "ALTER TABLE #{quote_identifier(table)} ADD COLUMN #{column_definition_sql(op)}"
         when :drop_column
-          "ALTER TABLE #{table} DROP COLUMN #{literal(op[:name])}"
+          "ALTER TABLE #{table} DROP COLUMN #{quote_identifier(op[:name])}"
         when :rename_column
-          "ALTER TABLE #{table} RENAME COLUMN #{literal(op[:name])} TO #{literal(op[:new_name])}"
+          "ALTER TABLE #{quote_identifier(table)} RENAME COLUMN #{quote_identifier(op[:name])} TO #{quote_identifier(op[:new_name])}"
         when :set_column_type
-          "ALTER TABLE #{table} ALTER COLUMN #{literal(op[:name])} TYPE #{op[:type]}"
+          "ALTER TABLE #{quote_identifier(table)} ALTER COLUMN #{quote_identifier(op[:name])} TYPE #{op[:type]}"
         when :set_column_default
-          "ALTER TABLE #{table} ALTER COLUMN #{literal(op[:name])} SET DEFAULT #{literal(op[:default])}"
+          "ALTER TABLE #{quote_identifier(table)} ALTER COLUMN #{quote_identifier(op[:name])} SET DEFAULT #{literal(op[:default])}"
         when :add_index
           index_definition_sql(table, op)
         when :drop_index
           "DROP INDEX #{default_index_name(table, op[:columns])}"
         when :add_constraint
-          "ALTER TABLE #{table} ADD #{constraint_definition_sql(op)}"
+          "ALTER TABLE #{quote_identifier(table)} ADD #{constraint_definition_sql(op)}"
         when :drop_constraint
-          "ALTER TABLE #{table} DROP CONSTRAINT #{literal(op[:name])}"
+          "ALTER TABLE #{quote_identifier(table)} DROP CONSTRAINT #{quote_identifier(op[:name])}"
         else
           raise Error, "Unsupported ALTER TABLE operation"
         end
@@ -51,10 +51,8 @@ module Sequel
       end
       
       def column_definition_sql(column)
-        if column[:type] == :check
-          return constraint_definition_sql(column)
-        end
-        sql = "#{literal(column[:name].to_sym)} #{type_literal(TYPES[column[:type]])}"
+        return constraint_definition_sql(column) if column[:type] == :check
+        sql = "#{quote_identifier(column[:name])} #{type_literal(TYPES[column[:type]])}"
         column[:size] ||= 255 if column[:type] == :varchar
         elements = column[:size] || column[:elements]
         sql << literal(Array(elements)) if elements
@@ -66,8 +64,8 @@ module Sequel
         sql << PRIMARY_KEY if column[:primary_key]
         sql << " #{auto_increment_sql}" if column[:auto_increment]
         if column[:table]
-          sql << " REFERENCES #{column[:table]}"
-          sql << "(#{column[:key]})" if column[:key]
+          sql << " REFERENCES #{quote_identifier(column[:table])}"
+          sql << "(#{quote_identifier(column[:key])})" if column[:key]
           sql << " ON DELETE #{on_delete_clause(column[:on_delete])}" if column[:on_delete]
         end
         sql
@@ -78,17 +76,14 @@ module Sequel
       end
     
       def constraint_definition_sql(column)
-        sql = column[:name] ? "CONSTRAINT #{literal(column[:name].to_sym)} " : ""
-        
+        sql = column[:name] ? "CONSTRAINT #{quote_identifier(column[:name])} " : ""
         sql << "CHECK #{filter_expr(column[:check])}"
         sql
       end
 
       def create_table_sql_list(name, columns, indexes = nil)
-        sql = ["CREATE TABLE #{name} (#{column_list_sql(columns)})"]
-        if indexes && !indexes.empty?
-          sql.concat(index_list_sql_list(name, indexes))
-        end
+        sql = ["CREATE TABLE #{quote_identifier(name)} (#{column_list_sql(columns)})"]
+        sql.concat(index_list_sql_list(name, indexes)) if indexes && !indexes.empty?
         sql
       end
       
@@ -97,7 +92,7 @@ module Sequel
       end
     
       def drop_table_sql(name)
-        "DROP TABLE #{name}"
+        "DROP TABLE #{quote_identifier(name)}"
       end
       
       def filter_expr(*args, &block)
@@ -110,10 +105,8 @@ module Sequel
           raise Error, "Index types are not supported for this database"
         elsif index[:where]
           raise Error, "Partial indexes are not supported for this database"
-        elsif index[:unique]
-          "CREATE UNIQUE INDEX #{index_name} ON #{table_name} #{literal(index[:columns])}"
         else
-          "CREATE INDEX #{index_name} ON #{table_name} #{literal(index[:columns])}"
+          "CREATE #{'UNIQUE ' if index[:unique]}INDEX #{index_name} ON #{quote_identifier(table_name)} #{literal(index[:columns])}"
         end
       end
     
@@ -140,8 +133,12 @@ module Sequel
         end
       end
       
+      def quote_identifier(v)
+        schema_utility_dataset.quote_identifier(v)
+      end
+      
       def rename_table_sql(name, new_name)
-        "ALTER TABLE #{name} RENAME TO #{new_name}"
+        "ALTER TABLE #{quote_identifier(name)} RENAME TO #{quote_identifier(new_name)}"
       end
 
       def schema(table_name = nil, opts={})
@@ -194,10 +191,14 @@ module Sequel
       end
 
       def schema_ds(table_name, opts)
-        schema_utility_dataset.from(*schema_ds_from(table_name, opts)) \
+        schema_ds_dataset.from(*schema_ds_from(table_name, opts)) \
           .select(*schema_ds_select(table_name, opts)) \
           .join(*schema_ds_join(table_name, opts)) \
           .filter(*schema_ds_filter(table_name, opts))
+      end
+
+      def schema_ds_dataset
+        schema_utility_dataset
       end
 
       def schema_ds_filter(table_name, opts)

@@ -5,19 +5,15 @@ unless defined?(POSTGRES_DB)
   POSTGRES_DB = Sequel.connect(ENV['SEQUEL_PG_SPEC_DB']||POSTGRES_URL)
 end
 
-POSTGRES_DB.drop_table(:test) if POSTGRES_DB.table_exists?(:test)
-POSTGRES_DB.drop_table(:test2) if POSTGRES_DB.table_exists?(:test2)
-POSTGRES_DB.drop_table(:test3) if POSTGRES_DB.table_exists?(:test3)
-  
-POSTGRES_DB.create_table :test do
+POSTGRES_DB.create_table! :test do
   text :name
   integer :value, :index => true
 end
-POSTGRES_DB.create_table :test2 do
+POSTGRES_DB.create_table! :test2 do
   text :name
   integer :value
 end
-POSTGRES_DB.create_table :test3 do
+POSTGRES_DB.create_table! :test3 do
   integer :value
   timestamp :time
 end
@@ -40,6 +36,14 @@ context "A PostgreSQL database" do
 
   specify "should raise Sequel::Error on error" do
     proc{@db << "SELECT 1 + 'a'"}.should raise_error(Sequel::Error)
+  end
+
+  specify "should correctly parse the schema" do
+    @db.schema(:test3, :reload=>true).should == [[:value, {:type=>:integer, :allow_null=>true, :max_chars=>0, :default=>nil, :db_type=>"integer", :numeric_precision=>32}], [:time, {:type=>:datetime, :allow_null=>true, :max_chars=>0, :default=>nil, :db_type=>"timestamp without time zone", :numeric_precision=>0}]]
+  end
+
+  specify "should get the schema all database tables if no table name is used" do
+    @db.schema(:test3, :reload=>true).should == @db.schema(nil, :reload=>true)[:test3]
   end
 end
 

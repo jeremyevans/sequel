@@ -60,8 +60,16 @@ context "A MySQL database" do
     ]
   end
 
-  specify "Should convert Mysql::Errors to Sequel::Errors" do
+  specify "should convert Mysql::Errors to Sequel::Errors" do
    proc{@db << "SELECT 1 + blah;"}.should raise_error(Sequel::Error)
+  end
+
+  specify "should correctly parse the schema" do
+    @db.schema(:booltest, :reload=>true).should == [[:value, {:type=>:boolean, :allow_null=>true, :max_chars=>nil, :default=>nil, :db_type=>"tinyint", :numeric_precision=>3}]]
+  end
+
+  specify "should get the schema all database tables if no table name is used" do
+    @db.schema(:booltest, :reload=>true).should == @db.schema(nil, :reload=>true)[:booltest]
   end
 end
 

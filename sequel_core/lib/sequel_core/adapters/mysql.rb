@@ -259,6 +259,12 @@ module Sequel
         super.merge(:pool_reuse_connections=>:last_resort, :pool_convert_exceptions=>false)
       end
 
+      def schema_ds_dataset
+        ds = schema_utility_dataset.clone
+        ds.quote_identifiers = true
+        ds
+      end
+
       def schema_ds_filter(table_name, opts)
         filt = super
         # Restrict it to the given or current database, unless specifically requesting :database = nil
