@@ -2,15 +2,28 @@
 # multiple connections and giving threads exclusive access to each
 # connection.
 class ConnectionPool
-  attr_reader :mutex
+  # An array of connections currently being used
+  attr_reader :allocated
   
+  # An array of connections opened but not currently used
+  attr_reader :available_connections
+  
+  # The proc used to create a new database connection.
+  attr_accessor :connection_proc
+  
+  # The total number of connections opened, should
+  # be equal to available_connections.length +
+  # allocated.length
+  attr_reader :created_count
+  alias_method :size, :created_count
+
   # The maximum number of connections.
   attr_reader :max_size
   
-  # The proc used to create a new connection.
-  attr_accessor :connection_proc
+  # The mutex that protects access to the other internal vairables.  You must use
+  # this if you want to manipulate the variables safely.
+  attr_reader :mutex
   
-  attr_reader :available_connections, :allocated, :created_count
 
   # Constructs a new pool with a maximum size. If a block is supplied, it
   # is used to create new connections as they are needed.
@@ -54,21 +67,20 @@ class ConnectionPool
     @convert_exceptions = opts.include?(:pool_convert_exceptions) ? opts[:pool_convert_exceptions] : true
   end
   
-  # Returns the number of created connections.
-  def size
-    @created_count
-  end
-  
-  # Assigns a connection to the current thread, yielding the connection
-  # to the supplied block.
+  # Chooses the first available connection, or if none are available,
+  # creates a new connection.  Passes the connection to the supplied block:
   # 
   #   pool.hold {|conn| conn.execute('DROP TABLE posts')}
   # 
   # Pool#hold is re-entrant, meaning it can be called recursively in
-  # the same thread without blocking.
+  # the same thread without blocking.  Depending on the pool settings
+  # you may get the connection currently used by the thread or a new connection.
   #
-  # If no connection is available, Pool#hold will block until a connection
-  # is available.
+  # If no connection is immediately available and the pool is already using the maximum
+  # number of connections, Pool#hold will block until a connection
+  # is available or the timeout expires.  If the timeout expires before a
+  # connection can be acquired, a Sequel::Error::PoolTimeoutError is 
+  # raised.
   def hold
     begin
       t = Thread.current
@@ -115,57 +127,69 @@ class ConnectionPool
   end
   
   private
-    # Returns the connection owned by the supplied thread, if any.
-    def owned_connection(thread)
-      @mutex.synchronize do 
-        x = @allocated.assoc(thread)
-        x[1] if x
+
+  # Returns the connection owned by the supplied thread, if any.
+  def owned_connection(thread)
+    @mutex.synchronize do 
+      x = @allocated.assoc(thread)
+      x[1] if x
+    end
+  end
+  
+  # Assigns a connection to the supplied thread, if one is available.
+  def acquire(thread)
+    @mutex.synchronize do
+      if conn = available
+        @allocated << [thread, conn]
+        conn
       end
     end
-    
-    # Assigns a connection to the supplied thread, if one is available.
-    def acquire(thread)
-      @mutex.synchronize do
-        if conn = available
-          @allocated << [thread, conn]
-          conn
-        end
-      end
+  end
+  
+  # Returns an available connection. If no connection is available,
+  # tries to create a new connection.
+  def available
+    @available_connections.pop || make_new
+  end
+  
+  # Creates a new connection if the size of the pool is less than the
+  # maximum size.
+  def make_new
+    if @created_count < @max_size
+      @created_count += 1
+      @connection_proc ? @connection_proc.call : \
+        (raise Error, "No connection proc specified")
     end
-    
-    # Returns an available connection. If no connection is available,
-    # tries to create a new connection.
-    def available
-      @available_connections.pop || make_new
+  end
+  
+  # Releases the connection assigned to the supplied thread.
+  def release(thread, conn)
+    @mutex.synchronize do
+      @allocated.delete([thread, conn])
+      @available_connections << conn
     end
-    
-    # Creates a new connection if the size of the pool is less than the
-    # maximum size.
-    def make_new
-      if @created_count < @max_size
-        @created_count += 1
-        @connection_proc ? @connection_proc.call : \
-          (raise Error, "No connection proc specified")
-      end
-    end
-    
-    # Releases the connection assigned to the supplied thread.
-    def release(thread, conn)
-      @mutex.synchronize do
-        @allocated.delete([thread, conn])
-        @available_connections << conn
-      end
-    end
+  end
 end
 
 # A SingleThreadedPool acts as a replacement for a ConnectionPool for use
 # in single-threaded applications. ConnectionPool imposes a substantial
 # performance penalty, so SingleThreadedPool is used to gain some speed.
+#
+# Note that using a single threaded pool with some adapters can cause
+# errors in certain cases, see Sequel.single_threaded=.
 class SingleThreadedPool
+  # The single database connection for the pool
   attr_reader :conn
+
+  # The proc used to create a new database connection
   attr_writer :connection_proc
   
   # Initializes the instance with the supplied block as the connection_proc.
+  #
+  # The single threaded pool takes the following options:
+  #
+  # * :pool_convert_exceptions - Whether to convert non-StandardError based exceptions
+  #   to RuntimeError exceptions (default true)
   def initialize(opts={}, &block)
     @connection_proc = block
     @convert_exceptions = opts.include?(:pool_convert_exceptions) ? opts[:pool_convert_exceptions] : true
