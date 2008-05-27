@@ -1,4 +1,18 @@
+# This file includes augmentations to the core ruby classes the Sequel uses,
+# which are unrelated to the creation of SQL.  It includes common
+# idioms to reduce the amount of code duplication.
+
 class Array
+  # True if the array is not empty and all of its elements are
+  # arrays of size 2.  This is used to determine if the array
+  # could be a specifier of conditions, used similarly to a hash
+  # but allowing for duplicate keys.
+  #
+  #    hash.to_a.all_two_pairs? # => true unless hash is empty
+  def all_two_pairs?
+    !empty? && all?{|i| (Array === i) && (i.length == 2)}
+  end
+
   # Removes and returns the last member of the array if it is a hash. Otherwise,
   # an empty hash is returned This method is useful when writing methods that
   # take an options hash as the last parameter. For example:
@@ -149,6 +163,33 @@ class String
   # Strings are blank if they are empty or include only whitespace
   def blank?
     strip.empty?
+  end
+
+  # Converts a string into a Date object.
+  def to_date
+    begin
+      Date.parse(self)
+    rescue => e
+      raise Sequel::Error::InvalidValue, "Invalid date value '#{self}' (#{e.message})"
+    end
+  end
+
+  # Converts a string into a DateTime object.
+  def to_datetime
+    begin
+      DateTime.parse(self)
+    rescue => e
+      raise Sequel::Error::InvalidValue, "Invalid date value '#{self}' (#{e.message})"
+    end
+  end
+
+  # Converts a string into a Time object.
+  def to_time
+    begin
+      Time.parse(self)
+    rescue => e
+      raise Sequel::Error::InvalidValue, "Invalid time value '#{self}' (#{e.message})"
+    end
   end
 end
 
