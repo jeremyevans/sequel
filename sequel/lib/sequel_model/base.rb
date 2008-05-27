@@ -10,7 +10,7 @@ module Sequel
     metaattr_accessor :typecast_on_assignment
 
     # Add dataset methods via metaprogramming
-    DATASET_METHODS = %w'all avg count delete distinct eager eager_graph each each_page 
+    DATASET_METHODS = %w'<< all avg count delete distinct eager eager_graph each each_page 
        empty? except exclude filter first from_self full_outer_join graph 
        group group_and_count group_by having import inner_join insert 
        insert_multiple intersect interval invert_order join join_table last 
