@@ -84,7 +84,6 @@ module Sequel
       end
           
       # Shamelessly appropriated from ActiveRecord's Postgresql adapter.
-      222
       SELECT_PK_AND_SERIAL_SEQUENCE = <<-end_sql
         SELECT attr.attname, name.nspname, seq.relname
         FROM pg_class seq, pg_attribute attr, pg_depend dep,
