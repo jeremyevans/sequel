@@ -106,6 +106,7 @@ module Sequel
           yield(db = c.new(opts))
         ensure
           db.disconnect if db
+          ::Sequel::DATABASES.delete(db)
         end
         nil
       else
