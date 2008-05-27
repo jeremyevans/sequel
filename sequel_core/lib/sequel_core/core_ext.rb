@@ -35,54 +35,55 @@ class Module
   end 
 
   private
-    # Define an instance method(s) that class the class method of the
-    # same name. Replaces the construct:
-    #
-    #   define_method(meth){self.class.send(meth)}
-    def class_attr_reader(*meths)
-      meths.each{|meth| define_method(meth){self.class.send(meth)}}
-    end
 
-    # Create an alias for a singleton/class method.
-    # Replaces the construct:
-    #
-    #   class << self
-    #     alias_method to, from
-    #   end
-    def metaalias(to, from)
-      metaclass.instance_eval{alias_method to, from}
-    end
-    
-    # Make a singleton/class attribute accessor method(s).
-    # Replaces the construct:
-    #
-    #   class << self
-    #     attr_accessor *meths
-    #   end
-    def metaattr_accessor(*meths)
-      metaclass.instance_eval{attr_accessor(*meths)}
-    end
+  # Define instance method(s) that calls class method(s) of the
+  # same name. Replaces the construct:
+  #
+  #   define_method(meth){self.class.send(meth)}
+  def class_attr_reader(*meths)
+    meths.each{|meth| define_method(meth){self.class.send(meth)}}
+  end
 
-    # Make a singleton/class method(s) private.
-    # Make a singleton/class attribute reader method(s).
-    # Replaces the construct:
-    #
-    #   class << self
-    #     attr_reader *meths
-    #   end
-    def metaattr_reader(*meths)
-      metaclass.instance_eval{attr_reader(*meths)}
-    end
+  # Create an alias for a singleton/class method.
+  # Replaces the construct:
+  #
+  #   class << self
+  #     alias_method to, from
+  #   end
+  def metaalias(to, from)
+    metaclass.instance_eval{alias_method to, from}
+  end
+  
+  # Make a singleton/class attribute accessor method(s).
+  # Replaces the construct:
+  #
+  #   class << self
+  #     attr_accessor *meths
+  #   end
+  def metaattr_accessor(*meths)
+    metaclass.instance_eval{attr_accessor(*meths)}
+  end
 
-    # Make a singleton/class method(s) private.
-    # Replaces the construct:
-    #
-    #   class << self
-    #     private *meths
-    #   end
-    def metaprivate(*meths)
-      metaclass.instance_eval{private(*meths)}
-    end
+  # Make a singleton/class method(s) private.
+  # Make a singleton/class attribute reader method(s).
+  # Replaces the construct:
+  #
+  #   class << self
+  #     attr_reader *meths
+  #   end
+  def metaattr_reader(*meths)
+    metaclass.instance_eval{attr_reader(*meths)}
+  end
+
+  # Make a singleton/class method(s) private.
+  # Replaces the construct:
+  #
+  #   class << self
+  #     private *meths
+  #   end
+  def metaprivate(*meths)
+    metaclass.instance_eval{private(*meths)}
+  end
 end
 
 # Helpers from Metaid and a bit more
@@ -92,7 +93,7 @@ class Object
     respond_to?(:empty?) && empty?
   end
 
-  # Returns true if the object is a object of one of the classes
+  # Returns true if the object is an instance of one of the classes
   def is_one_of?(*classes)
     !!classes.find{|c| is_a?(c)}
   end
@@ -131,6 +132,14 @@ end
 
 class Range
   # Returns the interval between the beginning and end of the range.
+  #
+  # For exclusive ranges, is one less than the inclusive range:
+  #
+  #   (0..10).interval # => 10
+  #   (0...10).interval # => 9
+  #
+  # Only works for numeric ranges, for other ranges the result is undefined,
+  # and the method may raise an error.
   def interval
     last - first - (exclude_end? ? 1 : 0)
   end
