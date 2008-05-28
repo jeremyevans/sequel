@@ -5,6 +5,8 @@ module Sequel
     #
     #   DB.add_column :items, :name, :text, :unique => true, :null => false
     #   DB.add_column :items, :category, :text, :default => 'ruby'
+    #
+    # See Database#alter_table.
     def add_column(table, *args)
       alter_table(table) {add_column(*args)}
     end
@@ -13,6 +15,8 @@ module Sequel
     # 
     #   DB.add_index :posts, :title
     #   DB.add_index :posts, [:author, :title], :unique => true
+    #
+    # See Database#alter_table.
     def add_index(table, *args)
       alter_table(table) {add_index(*args)}
     end
@@ -33,19 +37,23 @@ module Sequel
     # Note that #add_column accepts all the options available for column
     # definitions using create_table, and #add_index accepts all the options
     # available for index definition.
+    #
+    # See Schema::AlterTableGenerator.
     def alter_table(name, &block)
       g = Schema::AlterTableGenerator.new(self, &block)
       alter_table_sql_list(name, g.operations).each {|sql| execute(sql)}
     end
     
-    # Creates a table. The easiest way to use this method is to provide a
-    # block:
+    # Creates a table with the columns given in the provided block:
+    #
     #   DB.create_table :posts do
     #     primary_key :id, :serial
     #     column :title, :text
     #     column :content, :text
     #     index :title
     #   end
+    #
+    # See Schema::Generator.
     def create_table(name, &block)
       g = Schema::Generator.new(self, &block)
       create_table_sql_list(name, *g.create_info).each {|sql| execute(sql)}
@@ -78,6 +86,8 @@ module Sequel
     # Removes a column from the specified table:
     #
     #   DB.drop_column :items, :category
+    #
+    # See Database#alter_table.
     def drop_column(table, *args)
       alter_table(table) {drop_column(*args)}
     end
@@ -86,11 +96,15 @@ module Sequel
     #
     #   DB.drop_index :posts, :title
     #   DB.drop_index :posts, [:author, :title]
+    #
+    # See Database#alter_table.
     def drop_index(table, columns)
       alter_table(table) {drop_index(columns)}
     end
     
-    # Drops one or more tables corresponding to the given table names.
+    # Drops one or more tables corresponding to the given table names:
+    #
+    #   DB.drop_table(:posts, :comments)
     def drop_table(*names)
       names.each {|n| execute(drop_table_sql(n))}
     end
@@ -115,6 +129,8 @@ module Sequel
     # column name and the new column name:
     #
     #   DB.rename_column :items, :cntr, :counter
+    #
+    # See Database#alter_table.
     def rename_column(table, *args)
       alter_table(table) {rename_column(*args)}
     end
@@ -122,6 +138,8 @@ module Sequel
     # Sets the default value for the given column in the given table:
     #
     #   DB.set_column_default :items, :category, 'perl!'
+    #
+    # See Database#alter_table.
     def set_column_default(table, *args)
       alter_table(table) {set_column_default(*args)}
     end
@@ -129,6 +147,8 @@ module Sequel
     # Set the data type for the given column in the given table:
     #
     #   DB.set_column_type :items, :price, :float
+    #
+    # See Database#alter_table.
     def set_column_type(table, *args)
       alter_table(table) {set_column_type(*args)}
     end
