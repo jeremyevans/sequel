@@ -1,6 +1,3 @@
-# The migration code is based on work by Florian Aßmann:
-#   http://code.google.com/p/ruby-sequel/issues/detail?id=23
-
 module Sequel
   # The Migration class describes a database migration that can be reversed.
   # The migration looks very similar to ActiveRecord (Rails) migrations, e.g.:
@@ -25,7 +22,6 @@ module Sequel
   #
   #   DB = Sequel.open ('sqlite:///mydb')
   #   CreateSessions.apply(DB, :up)
-  #
   class Migration
     # Creates a new instance of the migration and sets the @db attribute.
     def initialize(db)
@@ -101,7 +97,6 @@ module Sequel
   # To migrate the database from version 1 to version 5:
   #
   #   Sequel::Migrator.apply(DB, '.', 5, 1)
-  #
   module Migrator
     MIGRATION_FILE_PATTERN = /\A\d+_.+\.rb\z/.freeze
 

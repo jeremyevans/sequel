@@ -162,50 +162,51 @@ module Sequel
     end
 
     private
-      # Fetch the rows, split them into component table parts,
-      # tranform and run the row_proc on each part (if applicable),
-      # and yield a hash of the parts.
-      def graph_each(opts, &block)
-        # Reject tables with nil datasets, as they are excluded from
-        # the result set
-        datasets = @opts[:graph][:table_aliases].to_a.reject{|ta,ds| ds.nil?}
-        # Get just the list of table aliases into a local variable, for speed
-        table_aliases = datasets.collect{|ta,ds| ta}
-        # Get an array of arrays, one for each dataset, with
-        # the necessary information about each dataset, for speed
-        datasets = datasets.collect do |ta, ds|
-          [ta, ds, ds.instance_variable_get(:@transform), ds.row_proc]
-        end
-        # Use the manually set graph aliases, if any, otherwise
-        # use the ones automatically created by .graph
-        column_aliases = @opts[:graph_aliases] || @opts[:graph][:column_aliases]
-        fetch_rows(select_sql(opts)) do |r|
-          graph = {}
-          # Create the sub hashes, one per table
-          table_aliases.each{|ta| graph[ta]={}}
-          # Split the result set based on the column aliases
-          # If there are columns in the result set that are
-          # not in column_aliases, they are ignored
-          column_aliases.each do |col_alias, tc|
-            ta, column = tc
-            graph[ta][column] = r[col_alias]
-          end
-          # For each dataset, transform and run the row
-          # row_proc if applicable
-          datasets.each do |ta,ds,tr,rp|
-            g = graph[ta]
-            graph[ta] = if g.values.any?
-              g = ds.transform_load(g) if tr
-              g = rp[g] if rp
-              g
-            else
-              nil
-            end
-          end
 
-          yield graph
-        end
-        self
+    # Fetch the rows, split them into component table parts,
+    # tranform and run the row_proc on each part (if applicable),
+    # and yield a hash of the parts.
+    def graph_each(opts, &block)
+      # Reject tables with nil datasets, as they are excluded from
+      # the result set
+      datasets = @opts[:graph][:table_aliases].to_a.reject{|ta,ds| ds.nil?}
+      # Get just the list of table aliases into a local variable, for speed
+      table_aliases = datasets.collect{|ta,ds| ta}
+      # Get an array of arrays, one for each dataset, with
+      # the necessary information about each dataset, for speed
+      datasets = datasets.collect do |ta, ds|
+        [ta, ds, ds.instance_variable_get(:@transform), ds.row_proc]
       end
+      # Use the manually set graph aliases, if any, otherwise
+      # use the ones automatically created by .graph
+      column_aliases = @opts[:graph_aliases] || @opts[:graph][:column_aliases]
+      fetch_rows(select_sql(opts)) do |r|
+        graph = {}
+        # Create the sub hashes, one per table
+        table_aliases.each{|ta| graph[ta]={}}
+        # Split the result set based on the column aliases
+        # If there are columns in the result set that are
+        # not in column_aliases, they are ignored
+        column_aliases.each do |col_alias, tc|
+          ta, column = tc
+          graph[ta][column] = r[col_alias]
+        end
+        # For each dataset, transform and run the row
+        # row_proc if applicable
+        datasets.each do |ta,ds,tr,rp|
+          g = graph[ta]
+          graph[ta] = if g.values.any?
+            g = ds.transform_load(g) if tr
+            g = rp[g] if rp
+            g
+          else
+            nil
+          end
+        end
+
+        yield graph
+      end
+      self
+    end
   end
 end
