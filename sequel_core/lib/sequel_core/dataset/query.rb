@@ -5,10 +5,18 @@ module Sequel
     #
     #   dataset = DB[:items].query do
     #     select :x, :y, :z
-    #     where {:x > 1 && :y > 2}
-    #     order_by :z.DESC
+    #     filter((:x > 1) & (:y > 2))
+    #     order :z.desc
     #   end
     #
+    # Which is the same as:
+    #
+    #  dataset = DB[:items].select(:x, :y, :z).filter((:x > 1) & (:y > 2)) \
+    #            .order(:z.desc)
+    #
+    # Note that inside a call to query, you cannot call each, insert, update,
+    # or delete (or any method that calls those), or Sequel will raise an
+    # error.
     def query(&block)
       copy = clone({})
       copy.extend(QueryBlockCopy)
@@ -16,12 +24,15 @@ module Sequel
       clone(copy.opts)
     end
 
-    module QueryBlockCopy #:nodoc:
-      def each(*args); raise Error, "#each cannot be invoked inside a query block."; end
-      def insert(*args); raise Error, "#insert cannot be invoked inside a query block."; end
-      def update(*args); raise Error, "#update cannot be invoked inside a query block."; end
-      def delete(*args); raise Error, "#delete cannot be invoked inside a query block."; end
+    # Module used by Dataset#query that has the effect of making all
+    # dataset methods into !-style methods that modify the receiver.
+    module QueryBlockCopy
+      %w'each insert update delete'.each do |meth|
+        define_method(meth){|*args| raise Error, "##{meth} cannot be invoked inside a query block."}
+      end
 
+      # Merge the given options into the receiver's options and return the receiver
+      # instead of cloning the receiver.
       def clone(opts = nil)
         @opts.merge!(opts)
         self
