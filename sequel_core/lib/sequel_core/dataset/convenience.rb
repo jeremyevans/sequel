@@ -2,11 +2,14 @@ module Sequel
   class Dataset
     COMMA_SEPARATOR = ', '.freeze
     COUNT_OF_ALL_AS_COUNT = :count['*'.lit].as(:count)
-    # Returns the first record matching the condition.
+
+    # Returns the first record matching the conditions.
     def [](*conditions)
       first(*conditions)
     end
 
+    # Update all records matching the conditions
+    # with the values specified.
     def []=(conditions, values)
       filter(conditions).update(values)
     end
@@ -25,7 +28,7 @@ module Sequel
     # given, it is interpreted as a limit, and then returns all 
     # matching records up to that limit.  If no argument is passed,
     # it returns the first matching record.  If any other type of
-    # argument(s) is passed, they are given to filter and the
+    # argument(s) is passed, it is given to filter and the
     # first matching record is returned. If a block is given, it is used
     # to filter the dataset before returning anything.
     #
@@ -57,6 +60,7 @@ module Sequel
       end
     end
 
+    # Return the column value for the first matching record in the dataset.
     def get(column)
       select(column).single_value
     end
@@ -105,13 +109,17 @@ module Sequel
     # to efficiently insert a large amounts of records into a table. Inserts
     # are automatically wrapped in a transaction.
     # 
-    # This method can be called either with an array of hashes:
+    # This method should be called with a columns array and an array of value arrays:
+    #
+    #   dataset.multi_insert([:x, :y], [[1, 2], [3, 4]])
+    #
+    # This method can also be called with an array of hashes:
     # 
     #   dataset.multi_insert({:x => 1}, {:x => 2})
     #
-    # Or with a columns array and an array of value arrays:
-    #
-    #   dataset.multi_insert([:x, :y], [[1, 2], [3, 4]])
+    # Be aware that all hashes should have the same keys if you use this calling method,
+    # otherwise some columns could be missed or set to null instead of to default
+    # values.
     #
     # The method also accepts a :slice or :commit_every option that specifies
     # the number of records to insert per transaction. This is useful especially
@@ -186,6 +194,9 @@ module Sequel
       get(:sum[column])
     end
 
+    # Returns true if the table exists.  Will raise an error
+    # if the dataset has fixed SQL or selects from another dataset
+    # or more than one table.
     def table_exists?
       if @opts[:sql]
         raise Sequel::Error, "this dataset has fixed SQL"
@@ -207,6 +218,10 @@ module Sequel
     # default the CSV representation includes the column titles in the
     # first line. You can turn that off by passing false as the 
     # include_column_titles argument.
+    #
+    # This does not use a CSV library or handle quoting of values in
+    # any way.  If any values in any of the rows could include commas or line
+    # endings, you probably shouldn't use this.
     def to_csv(include_column_titles = true)
       n = naked
       cols = n.columns
@@ -217,6 +232,8 @@ module Sequel
     end
     
     # Returns a hash with one column used as key and another used as value.
+    # If rows have duplicate values for the key column, the latter row(s)
+    # will overwrite the value of the previous row(s).
     def to_hash(key_column, value_column)
       inject({}) do |m, r|
         m[r[key_column]] = r[value_column]

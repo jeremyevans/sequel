@@ -1,60 +1,43 @@
 module Sequel
   class Dataset
-    # Returns a paginated dataset. The resulting dataset also provides the
-    # total number of pages (Dataset#page_count) and the current page number
-    # (Dataset#current_page), as well as Dataset#prev_page and Dataset#next_page
-    # for implementing pagination controls.
-    def paginate(page_no, page_size)
+    # Returns a paginated dataset. The returned dataset is limited to
+    # the page size at the correct offset, and extended with the Pagination
+    # module.  If a record count is not provided, does a count of total
+    # number of records for this dataset.
+    def paginate(page_no, page_size, record_count=nil)
       raise(Error, "You cannot paginate a dataset that already has a limit") if @opts[:limit]
-      record_count = count
-      total_pages = record_count.zero? ? 1 : (record_count / page_size.to_f).ceil
       paginated = limit(page_size, (page_no - 1) * page_size)
       paginated.extend(Pagination)
-      paginated.set_pagination_info(page_no, page_size, record_count)
-      paginated
+      paginated.set_pagination_info(page_no, page_size, record_count || count)
     end
       
-    def each_page(page_size)
+    # Yields a paginated dataset for each page and returns the receiver. Does
+    # a count to find the total number of records for this dataset.
+    def each_page(page_size, &block)
       raise(Error, "You cannot paginate a dataset that already has a limit") if @opts[:limit]
       record_count = count
       total_pages = (record_count / page_size.to_f).ceil
-      
-      (1..total_pages).each do |page_no|
-        paginated = limit(page_size, (page_no - 1) * page_size)
-        paginated.extend(Pagination)
-        paginated.set_pagination_info(page_no, page_size, record_count)
-        yield paginated
-      end
-      
+      (1..total_pages).each{|page_no| yield paginate(page_no, page_size, record_count)}
       self
     end
 
+    # Holds methods that only relate to paginated datasets. Paginated dataset
+    # have pages starting at 1 (page 1 is offset 0, page 1 is offset page_size).
     module Pagination
-      attr_accessor :page_size, :page_count, :current_page, :pagination_record_count
+      # The number of records per page (the final page may have fewer than
+      # this number of records).
+      attr_accessor :page_size
 
-      # Sets the pagination info
-      def set_pagination_info(page_no, page_size, record_count)
-        @current_page = page_no
-        @page_size = page_size
-        @pagination_record_count = record_count
-        @page_count = (record_count / page_size.to_f).ceil
-      end
-      
-      # Returns the previous page number or nil if the current page is the first
-      def prev_page
-        current_page > 1 ? (current_page - 1) : nil
-      end
+      # The number of pages in the dataset before pagination, of which
+      # this paginated dataset is one.
+      attr_accessor :page_count
 
-      # Returns the next page number or nil if the current page is the last page
-      def next_page
-        current_page < page_count ? (current_page + 1) : nil
-      end
-      
-      # Returns the page range
-      def page_range
-        1..page_count
-      end
-      
+      # The current page of the dataset, starting at 1 and not 0.
+      attr_accessor :current_page
+
+      # The total number of records in the dataset before pagination.
+      attr_accessor :pagination_record_count
+
       # Returns the record range for the current page
       def current_page_record_range
         return (0..0) if @current_page > @page_count
@@ -75,14 +58,38 @@ module Sequel
         b - a + 1
       end
 
+      # Returns true if the current page is the first page
+      def first_page?
+        @current_page == 1
+      end
+
       # Returns true if the current page is the last page
       def last_page?
         @current_page == @page_count
       end
 
-      # Returns true if the current page is the first page
-      def first_page?
-        @current_page == 1
+      # Returns the next page number or nil if the current page is the last page
+      def next_page
+        current_page < page_count ? (current_page + 1) : nil
+      end
+      
+      # Returns the page range
+      def page_range
+        1..page_count
+      end
+      
+      # Returns the previous page number or nil if the current page is the first
+      def prev_page
+        current_page > 1 ? (current_page - 1) : nil
+      end
+
+      # Sets the pagination info for this paginated dataset, and returns self.
+      def set_pagination_info(page_no, page_size, record_count)
+        @current_page = page_no
+        @page_size = page_size
+        @pagination_record_count = record_count
+        @page_count = (record_count / page_size.to_f).ceil
+        self
       end
     end
   end
