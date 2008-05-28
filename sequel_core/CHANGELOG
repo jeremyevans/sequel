@@ -1,5 +1,7 @@
 === HEAD
 
+* Comprehensive update of all documentation, except for the block filters and adapters (jeremyevans)
+
 * Handle Date and DateTime value literalization correctly in adapters (jeremyevans)
 
 * Literalize DateTime values the same as Time values (jeremyevans)
