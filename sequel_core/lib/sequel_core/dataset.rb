@@ -1,5 +1,5 @@
 %w'callback convenience pagination query schema sequelizer sql'.each do |f|
- require "sequel_core/dataset/#{f}"
+  require "sequel_core/dataset/#{f}"
 end
 
 module Sequel
@@ -9,6 +9,7 @@ module Sequel
   # 
   # Query results are always retrieved on demand, so a dataset can be kept
   # around and reused indefinitely:
+  #
   #   my_posts = DB[:posts].filter(:author => 'david') # no records are retrieved
   #   p my_posts.all # records are now retrieved
   #   ...
@@ -17,6 +18,7 @@ module Sequel
   # In order to provide this functionality, dataset methods such as where, 
   # select, order, etc. return modified copies of the dataset, so you can
   # use different datasets to access data:
+  #
   #   posts = DB[:posts]
   #   davids_posts = posts.filter(:author => 'david')
   #   old_posts = posts.filter('stamp < ?', Date.today - 7)
@@ -62,13 +64,21 @@ module Sequel
   class Dataset
     include Enumerable
     
+    # The dataset options that require the removal of cached columns
+    # if changed.
     COLUMN_CHANGE_OPTS = [:select, :sql, :from, :join].freeze
+
+    # Array of all subclasses of Dataset
     DATASET_CLASSES = []
+
+    # All methods that should have a ! method added that modifies
+    # the receiver.
     MUTATION_METHODS = %w'and distinct exclude exists filter from from_self full_outer_join graph
     group group_and_count group_by having inner_join intersect invert join
     left_outer_join limit naked or order order_by order_more paginate query reject
     reverse reverse_order right_outer_join select select_all select_more
     set_graph_aliases set_model sort sort_by unfiltered union unordered where'.collect{|x| x.to_sym}
+
     NOTIMPL_MSG = "This method must be overriden in Sequel adapters".freeze
     STOCK_TRANSFORMS = {
       :marshal => [
@@ -83,13 +93,17 @@ module Sequel
     }
 
     attr_accessor :db, :opts, :row_proc
+
+    # Whether to quote identifiers for this dataset
     attr_writer :quote_identifiers
     
-    # Constructs a new instance of a dataset with a database instance, initial
-    # options and an optional record class. Datasets are usually constructed by
-    # invoking Database methods:
+    # Constructs a new instance of a dataset with an associated database and 
+    # options. Datasets are usually constructed by invoking Database methods:
+    #
     #   DB[:posts]
+    #
     # Or:
+    #
     #   DB.dataset # the returned dataset is blank
     #
     # Sequel::Dataset is an abstract class that is not useful by itself. Each
@@ -104,36 +118,41 @@ module Sequel
     
     ### Class Methods ###
 
-    def self.dataset_classes #:nodoc:
+    # The array of dataset subclasses.
+    def self.dataset_classes
       DATASET_CLASSES
     end
 
-    # Setup mutation (e.g. filter!) methods
+    # Setup mutation (e.g. filter!) methods.  These operate the same as the
+    # non-! methods, but replace the options of the current dataset with the
+    # options of the resulting dataset.
     def self.def_mutation_method(*meths)
       meths.each do |meth|
         class_eval("def #{meth}!(*args, &block); mutation_method(:#{meth}, *args, &block) end")
       end
     end
 
-    def self.inherited(c) #:nodoc:
+    # Add the subclass to the array of subclasses.
+    def self.inherited(c)
       DATASET_CLASSES << c
     end
     
     ### Instance Methods ###
 
-    # Inserts the supplied values into the associated table.
+    # Alias for insert, but not aliased directly so subclasses
+    # don't have to override both methods.
     def <<(*args)
       insert(*args)
     end
-  
+
     # Return the dataset as a column with the given alias, so it can be used in the
-    # SELECT clause.
+    # SELECT clause. This dataset should result in a single row and a single column.
     def as(a)
       ::Sequel::SQL::ColumnExpr.new(self, 'AS', a)
     end
 
     # Returns an array with all records in the dataset. If a block is given,
-    # the array is iterated over.
+    # the array is iterated over after all items have been loaded.
     def all(opts = nil, &block)
       a = []
       each(opts) {|r| a << r}
@@ -143,6 +162,8 @@ module Sequel
     end
   
     # Returns a new clone of the dataset with with the given options merged.
+    # If the options changed include options in COLUMN_CHANGE_OPTS, the cached
+    # @columns instance variable is reset.
     def clone(opts = {})
       c = super()
       c.opts = @opts.merge(opts)
@@ -152,18 +173,23 @@ module Sequel
     
     # Returns the columns in the result set in their true order. The stock 
     # implementation returns the content of @columns. If @columns is nil,
-    # a query is performed. Adapters are expected to fill @columns with the
-    # column information when a query is performed.
+    # a SELECT query is performed to get a single row. Adapters are expected
+    # to fill @columns with the column information when a query is performed.
+    # If the dataset does not have any rows, this will be an empty array.
+    # If you are looking for all columns for a single table, see Schema::SQL::schema.
     def columns
       single_record unless @columns
       @columns || []
     end
     
+    # Remove the cached list of columns and do a SELECT query to find
+    # the columns.
     def columns!
       @columns = nil
       columns
     end
     
+    # Add a mutation method to this dataset instance.
     def def_mutation_method(*meths)
       meths.each do |meth|
         instance_eval("def #{meth}!(*args, &block); mutation_method(:#{meth}, *args, &block) end")
@@ -175,7 +201,7 @@ module Sequel
       raise NotImplementedError, NOTIMPL_MSG
     end
     
-    # Iterates over the records in the dataset
+    # Iterates over the records in the dataset.
     def each(opts = nil, &block)
       if graph = @opts[:graph]
         graph_each(opts, &block)
@@ -210,6 +236,10 @@ module Sequel
     end
 
     # Returns the the model classes associated with the dataset as a hash.
+    # If the dataset is associated with a single model class, a key of nil
+    # is used.  For datasets with polymorphic models, the keys are
+    # values of the polymorphic column and the values are the corresponding
+    # model classes to which they map.
     def model_classes
       @opts[:models]
     end
@@ -225,17 +255,18 @@ module Sequel
       @opts[:polymorphic_key]
     end
     
-    # Whether to quote identifiers for this dataset
+    # Whether this dataset quotes identifiers.
     def quote_identifiers?
       @quote_identifiers
     end
 
-    # Updates the dataset with the given values.
+    # Alias for set, but not aliased directly so subclasses
+    # don't have to override both methods.
     def set(*args, &block)
       update(*args, &block)
     end
-    
-    # Associates or disassociates the dataset with a model. If no argument or
+
+    # Associates or disassociates the dataset with a model(s). If
     # nil is specified, the dataset is turned into a naked dataset and returns
     # records as hashes. If a model class specified, the dataset is modified
     # to return records as instances of the model class, e.g:
@@ -270,16 +301,16 @@ module Sequel
     # class corresponding to nil:
     #
     #   dataset.set_model(:kind, {nil => DefaultClass, 1 => Person, 2 => Business})
-    # 
-    # To disassociate a model from the dataset, you can call the #set_model 
-    # and specify nil as the class:
-    # 
-    #   dataset.set_model(nil)
+    #
+    # To make sure that there is always a default model class, the hash provided
+    # should have a default value.  To make the dataset map string values to
+    # model classes, and keep a good default, try:
+    #
+    #   dataset.set_model(:kind, Hash.new{|h,k| h[k] = (k.constantize rescue DefaultClass)})
     def set_model(key, *args)
       # This code is more verbose then necessary for performance reasons
       case key
-      when nil # set_model(nil) => no
-        # no argument provided, so the dataset is denuded
+      when nil # set_model(nil) => no argument provided, so the dataset is denuded
         @opts.merge!(:naked => true, :models => nil, :polymorphic_key => nil)
         self.row_proc = nil
       when Class
@@ -379,14 +410,18 @@ module Sequel
       raise NotImplementedError, NOTIMPL_MSG
     end
   
+    # Add the mutation methods via metaprogramming
     def_mutation_method(*MUTATION_METHODS)
 
     private
-      def mutation_method(meth, *args, &block)
-        copy = send(meth, *args, &block)
-        @opts.merge!(copy.opts)
-        self
-      end
+
+    # Modify the receiver with the results of sending the meth, args, and block
+    # to the receiver and merging the options of the resulting dataset into
+    # the receiver's options.
+    def mutation_method(meth, *args, &block)
+      copy = send(meth, *args, &block)
+      @opts.merge!(copy.opts)
+      self
+    end
   end
 end
-
