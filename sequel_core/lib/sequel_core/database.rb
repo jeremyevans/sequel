@@ -1,6 +1,10 @@
 require 'sequel_core/database/schema'
 
 module Sequel
+  # Array of all databases that to which Sequel has connected.  If you are
+  # developing an application that can connect to an arbitrary number of 
+  # databases, delete the database objects from this or they will not get
+  # garbage collected.
   DATABASES = []
 
   # A Database object represents a virtual connection to a database.
@@ -9,17 +13,32 @@ module Sequel
   class Database
     include Schema::SQL
 
+    # Array of supported database adapters
     ADAPTERS = %w'ado db2 dbi informix jdbc mysql odbc odbc_mssql openbase oracle postgres sqlite'.collect{|x| x.to_sym}
+
     SQL_BEGIN = 'BEGIN'.freeze
     SQL_COMMIT = 'COMMIT'.freeze
     SQL_ROLLBACK = 'ROLLBACK'.freeze
 
+    # Hash of adapters that have been used
     @@adapters = Hash.new
+
+    # Whether to use the single threaded connection pool by default
     @@single_threaded = false
+
+    # Whether to quote identifiers (columns and tables) by default
     @@quote_identifiers = true
 
+    # Array of SQL loggers to use for this database
     attr_accessor :loggers
-    attr_reader :opts, :pool
+
+    # The options for this database
+    attr_reader :opts
+    
+    # The connection pool for this database
+    attr_reader :pool
+
+    # Whether to quote identifiers (columns and tables) for this database
     attr_writer :quote_identifiers
 
     # Constructs a new instance of a database connection with the specified
@@ -41,13 +60,16 @@ module Sequel
     
     ### Class Methods ###
 
+    # The Database subclass for the given adapter scheme.
+    # Raises Sequel::Error::AdapterNotFound if the adapter
+    # could not be loaded.
     def self.adapter_class(scheme)
       scheme = scheme.to_sym
       
       if (klass = @@adapters[scheme]).nil?
         # attempt to load the adapter file
         begin
-          require File.join(File.dirname(__FILE__), "adapters/#{scheme}")
+          require "sequel_core/adapters/#{scheme}"
         rescue LoadError => e
           raise Error::AdapterNotFound, "Could not load #{scheme} adapter:\n  #{e.message}"
         end
@@ -65,25 +87,7 @@ module Sequel
       @scheme
     end
     
-    # call-seq:
-    #   Sequel::Database.connect(conn_string)
-    #   Sequel::Database.connect(opts)
-    #   Sequel.connect(conn_string)
-    #   Sequel.connect(opts)
-    #   Sequel.open(conn_string)
-    #   Sequel.open(opts)
-    #
-    # Creates a new database object based on the supplied connection string
-    # and or options. If a URI is used, the URI scheme determines the database
-    # class used, and the rest of the string specifies the connection options. 
-    # For example:
-    #
-    #   DB = Sequel.open 'sqlite://blog.db'
-    #   # opens database at ./blog.db
-    #
-    # The second form of this method takes an options:
-    #
-    #   DB = Sequel.open :adapter => :sqlite, :database => 'blog.db'
+    # Connects to a database.  See Sequel.connect.
     def self.connect(conn_string, opts = nil, &block)
       if conn_string.is_a?(String)
         uri = URI.parse(conn_string)
@@ -115,11 +119,13 @@ module Sequel
     end
 
     # Sets the default quote_identifiers mode for new databases.
+    # See Sequel.quote_identifiers=.
     def self.quote_identifiers=(value)
       @@quote_identifiers = value
     end
 
     # Sets the default single_threaded mode for new databases.
+    # See Sequel.single_threaded=.
     def self.single_threaded=(value)
       @@single_threaded = value
     end
@@ -153,13 +159,16 @@ module Sequel
     # Sets the adapter scheme for the Database class. Call this method in
     # descendnants of Database to allow connection using a URL. For example the
     # following:
-    #   class DB2::Database < Sequel::Database
-    #     set_adapter_scheme :db2
+    #
+    #   class Sequel::MyDB::Database < Sequel::Database
+    #     set_adapter_scheme :mydb
     #     ...
     #   end
+    #
     # would allow connection using:
-    #   Sequel.open('db2://user:password@dbserver/mydb')
-    def self.set_adapter_scheme(scheme)
+    #
+    #   Sequel.connect('mydb://user:password@dbserver/mydb')
+    def self.set_adapter_scheme(scheme) # :nodoc:
       @scheme = scheme
       @@adapters[scheme.to_sym] = self
     end
@@ -180,13 +189,12 @@ module Sequel
     #
     #   DB['SELECT * FROM items WHERE name = ?', my_name].print
     #
-    # Otherwise, the dataset returned has its from option set to the given
-    # arguments:
+    # Otherwise, acts as an alias for Database#from, setting the primary
+    # table for the dataset:
     #
     #   DB[:items].sql #=> "SELECT * FROM items"
-    #
-    def [](*args)
-      (String === args.first) ? fetch(*args) : from(*args)
+    def [](*args, &block)
+      (String === args.first) ? fetch(*args, &block) : from(*args, &block)
     end
     
     # Connects to the database. This method should be overriden by descendants.
@@ -205,7 +213,7 @@ module Sequel
       raise NotImplementedError, "#disconnect should be overriden by adapters"
     end
 
-    # Raises a Sequel::Error::NotImplemented. This method is overriden in descendants.
+    # Executes the given SQL. This method is overriden in descendants.
     def execute(sql)
       raise NotImplementedError, "#execute should be overriden by adapters"
     end
@@ -223,20 +231,11 @@ module Sequel
     # injection:
     #
     #   DB.fetch('SELECT * FROM items WHERE name = ?', my_name).print
-    #
-    # A short-hand form for Database#fetch is Database#[]:
-    #
-    #   DB['SELECT * FROM items'].each {|r| p r}
-    #
     def fetch(sql, *args, &block)
       ds = dataset
       sql = sql.gsub('?') {|m|  ds.literal(args.shift)}
-      if block
-        ds.fetch_rows(sql, &block)
-      else
-        ds.opts[:sql] = sql
-        ds
-      end
+      block ? ds.fetch_rows(sql, &block) : (ds.opts[:sql] = sql)
+      ds
     end
     alias_method :>>, :fetch
     
@@ -259,39 +258,40 @@ module Sequel
     end
     
     # Returns a string representation of the database object including the
-    # class name and the connection URI.
+    # class name and the connection URI (or the opts if the uri
+    # cannot be constructed).
     def inspect
       "#<#{self.class}: #{(uri rescue opts).inspect}>" 
     end
 
-    # Log a message at level info to all loggers
+    # Log a message at level info to all loggers.  All SQL logging
+    # goes through this method.
     def log_info(message)
       @loggers.each{|logger| logger.info(message)}
     end
 
-    # Return the first logger, if any.  Should only be used for backwards
-    # compatibility.
+    # Return the first logger or nil if no loggers are being used.
+    # Should only be used for backwards compatibility.
     def logger
       @loggers.first
     end
 
-    # Replace the array of loggers with the given logger(s)
+    # Replace the array of loggers with the given logger(s).
     def logger=(logger)
       @loggers = Array(logger)
     end
 
-    # Returns true if the database is using a multi-threaded connection pool.
+    # Returns true unless the database is using a single-threaded connection pool.
     def multi_threaded?
       !@single_threaded
     end
     
-    # Converts a query block into a dataset. For more information see 
-    # Dataset#query.
+    # Returns a dataset modified by the given query block.  See Dataset#query.
     def query(&block)
       dataset.query(&block)
     end
     
-    # Returns true if the database quotes identifiers
+    # Returns true if the database quotes identifiers.
     def quote_identifiers?
       @quote_identifiers
     end
@@ -301,7 +301,7 @@ module Sequel
       dataset.select(*args)
     end
     
-    # default serial primary key definition. this should be overriden for each adapter.
+    # Default serial primary key options.
     def serial_primary_key_options
       {:primary_key => true, :type => :integer, :auto_increment => true}
     end
@@ -316,7 +316,7 @@ module Sequel
       @pool.hold(&block)
     end
 
-    # Returns true if the given table exists.
+    # Returns true if a table with the given name exists.
     def table_exists?(name)
       begin 
         if respond_to?(:tables)
@@ -330,15 +330,16 @@ module Sequel
       end
     end
     
-    # Returns true if there is a database connection
+    # Attempts to acquire a database connection.  Returns true if successful.
+    # Will probably raise an error if unsuccessful.
     def test_connection
-      @pool.hold {|conn|}
+      synchronize{|conn|}
       true
     end
     
     # A simple implementation of SQL transactions. Nested transactions are not 
     # supported - calling #transaction within a transaction will reuse the 
-    # current transaction. May be overridden for databases that support nested 
+    # current transaction. Should be overridden for databases that support nested 
     # transactions.
     def transaction
       @pool.hold do |conn|
@@ -365,7 +366,8 @@ module Sequel
       end
     end
     
-    # Typecast the value to the given column_type
+    # Typecast the value to the given column_type. Can be overridden in
+    # adapters to support database specific column types.
     def typecast_value(column_type, value)
       return nil if value.nil?
       case column_type
@@ -412,6 +414,8 @@ module Sequel
     end 
 
     # Returns the URI identifying the database.
+    # This method can raise an error if the database used options
+    # instead of a connection string.
     def uri
       uri = URI::Generic.new(
         self.class.adapter_scheme.to_s,
@@ -428,10 +432,11 @@ module Sequel
       uri.password = @opts[:password] if uri.user
       uri.to_s
     end
-    alias url uri # Because I don't care much for the semantic difference.
+    alias_method :url, :uri
     
     private
 
+    # The default options for the connection pool.
     def connection_pool_default_options
       {}
     end
