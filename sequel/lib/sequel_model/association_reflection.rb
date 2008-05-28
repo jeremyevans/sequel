@@ -48,10 +48,11 @@ module Sequel
         end
   
         private
-          # Name symbol of association instance variable
-          def association_ivar(name)
-            :"@#{name}"
-          end
+
+        # Name symbol of association instance variable
+        def association_ivar(name)
+          :"@#{name}"
+        end
       end
     end
   end

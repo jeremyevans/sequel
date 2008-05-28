@@ -28,9 +28,9 @@
 #
 # Association definitions are also reflected by the class, e.g.:
 #
-#   >> Project.associations
+#   Project.associations
 #   => [:portfolio, :milestones]
-#   >> Project.association_reflection(:portfolio)
+#   Project.association_reflection(:portfolio)
 #   => {:type => :many_to_one, :name => :portfolio, :class_name => "Portfolio"}
 #
 # Associations can be defined by either using the associate method, or by
@@ -43,7 +43,7 @@
 #   one_to_many :attributes
 #   has_many :attributes
 module Sequel::Model::Associations
-  # Array of all association reflections
+  # Array of all association reflections for this model class
   def all_association_reflections
     association_reflections.values
   end
@@ -81,7 +81,7 @@ module Sequel::Model::Associations
   #     can be loaded at once.
   #   - :eager_block - If given, use the block instead of the default block when
   #     eagerly loading.  To not use a block when eager loading (when one is used normally),
-  #     use nil.
+  #     set to nil.
   #   - :graph_conditions - The conditions to use on the SQL join when eagerly loading
   #     the association via eager_graph
   #   - :graph_join_type - The type of SQL join to use when eagerly loading the association via
@@ -94,7 +94,7 @@ module Sequel::Model::Associations
   #     the current association's key(s).  Set to nil to not use a reciprocal.
   #   - :select - the attributes to select.  Defaults to the associated class's
   #     table_name.*, which means it doesn't include the attributes from the
-  #     join table.  If you want to include the join table attributes in a many_to_many association, you can
+  #     join table in a many_to_many association.  If you want to include the join table attributes, you can
   #     use this option, but beware that the join table attributes can clash with
   #     attributes from the model table, so you should alias any attributes that have
   #     the same name in both the join table and the associated table.
@@ -126,12 +126,6 @@ module Sequel::Model::Associations
     opts[:eager_block] = block unless opts.include?(:eager_block)
     opts[:graph_join_type] ||= :left_outer
     opts[:graph_conditions] = opts[:graph_conditions] ? opts[:graph_conditions].to_a : []
-
-    # deprecation
-    if opts[:from]
-      Sequel::Deprecation.deprecate("The :from option to Sequel::Model.associate is deprecated and will be removed in Sequel 2.0.  Use the :class option.")
-      opts[:class] = opts[:from]
-    end
 
     # find class
     case opts[:class]
@@ -177,6 +171,7 @@ module Sequel::Model::Associations
   alias_method :has_and_belongs_to_many, :many_to_many
   
   private
+
   # Name symbol for add association method
   def association_add_method_name(name)
     :"add_#{name.to_s.singularize}"
@@ -187,12 +182,12 @@ module Sequel::Model::Associations
     :"@#{name}"
   end
   
-  # Name symbol for remove_method_name
+  # Name symbol for remove_all association method
   def association_remove_all_method_name(name)
     :"remove_all_#{name}"
   end
   
-  # Name symbol for remove_method_name
+  # Name symbol for remove association method
   def association_remove_method_name(name)
     :"remove_#{name.to_s.singularize}"
   end
@@ -203,7 +198,7 @@ module Sequel::Model::Associations
     @association_reflections ||= {}
   end
   
-  # Defines an association
+  # Adds association methods to the model for *_to_many associations.
   def def_association_dataset_methods(name, opts, &block)
     dataset_method = :"#{name}_dataset"
     helper_method = :"#{name}_helper"
@@ -242,22 +237,6 @@ module Sequel::Model::Associations
           objs.each{|o| o.instance_variable_set(reciprocal, self)}
         end
         instance_variable_set(ivar, objs)
-      end
-    end
-  end
-  
-  # Defines an association getter method, caching the block result in an 
-  # instance variable. The defined method takes an optional reload parameter
-  # that can be set to true in order to bypass the cache.
-  def def_association_getter(name, &block)
-    ivar = association_ivar(name)
-    class_def(name) do |*reload|
-      if !reload[0] && obj = instance_variable_get(ivar)
-        obj == :null ? nil : obj
-      else
-        obj = instance_eval(&block)
-        instance_variable_set(ivar, obj || :null)
-        obj
       end
     end
   end
@@ -322,7 +301,18 @@ module Sequel::Model::Associations
     key = (opts[:key] ||= default_foreign_key(opts))
     opts[:class_name] ||= name.to_s.camelize
     
-    def_association_getter(name) {(fk = send(key)) ? opts.associated_class.select(*opts.select).filter(opts.associated_primary_key=>fk).first : nil}
+    class_def(name) do |*reload|
+      if !reload[0] && obj = instance_variable_get(ivar)
+        obj == :null ? nil : obj
+      else
+        obj = if fk = send(key)
+          opts.associated_class.select(*opts.select).filter(opts.associated_primary_key=>fk).first
+        end
+        instance_variable_set(ivar, obj || :null)
+        obj
+      end
+    end
+
     class_def(:"#{name}=") do |o|
       old_val = instance_variable_get(ivar) if reciprocal = opts.reciprocal
       instance_variable_set(ivar, o)
