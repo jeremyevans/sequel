@@ -50,6 +50,8 @@ module Sequel
   #   systems that reload code.
   # * All of the methods in HOOKS also create instance methods, but you
   #   should not override these instance methods.
+  # * The following instance_methods all call the class method of the same
+  #   name: columns, dataset, db, primary_key, str_columns.
   class Model
     extend Enumerable
     extend Associations

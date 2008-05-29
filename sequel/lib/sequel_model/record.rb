@@ -1,16 +1,30 @@
+# This file holds general instance methods for Sequel::Model
+
 module Sequel
   class Model
-    alias_method :model, :class
+    # The columns that have been updated.  This isn't completely accurate,
+    # see #[]=.
+    attr_reader :changed_columns
+    
+    # The hash of attribute values.  Keys are symbols with the names of the
+    # underlying database columns.
+    attr_reader :values
 
-    attr_reader :changed_columns, :values
+    # Whether this model instance should typecast on attribute assignment
     attr_writer :typecast_on_assignment
 
     class_attr_reader :columns, :dataset, :db, :primary_key, :str_columns
     
     # Creates new instance with values set to passed-in Hash.
+    # If a block is given, yield the instance to the block.
+    # This method runs the after_initialize hook after
+    # it has optionally yielded itself to the block.
     #
-    # This method guesses whether the record exists when
-    # <tt>new_record</tt> is set to false.
+    # Arguments:
+    # * values - should be a hash with symbol keys, though
+    #   string keys will work if from_db is false.
+    # * from_db - should only be set by Model.load, forget it
+    #   exists.
     def initialize(values = nil, from_db = false, &block)
       values ||=  {}
       @changed_columns = []
@@ -30,12 +44,13 @@ module Sequel
       after_initialize
     end
     
-    # Returns value of attribute.
+    # Returns value of the column's attribute.
     def [](column)
       @values[column]
     end
 
-    # Sets value of attribute and marks the column as changed.
+    # Sets value of the column's attribute and marks the column as changed.
+    # If the column already has the same value, this is a no-op.
     def []=(column, value)
       # If it is new, it doesn't have a value yet, so we should
       # definitely set the new value.
@@ -59,7 +74,13 @@ module Sequel
       pk.nil? ? false : (obj.class == model) && (obj.pk == pk)
     end
 
-    # Deletes and returns self.  Does not run callbacks.
+    # class is defined in Object, but it is also a keyword,
+    # and since a lot of instance methods call class methods,
+    # the model makes it so you can use model instead of
+    # self.class.
+    alias_method :model, :class
+
+    # Deletes and returns self.  Does not run destroy hooks.
     # Look into using destroy instead.
     def delete
       before_delete
@@ -68,6 +89,9 @@ module Sequel
     end
     
     # Like delete but runs hooks before and after delete.
+    # If before_destroy returns false, returns false without
+    # deleting the object the the database. Otherwise, deletes
+    # the item from the database and returns self.
     def destroy
       db.transaction do
         return false if before_destroy == false
@@ -79,7 +103,7 @@ module Sequel
     
     # Enumerates through all attributes.
     #
-    # === Example:
+    # Example:
     #   Ticket.find(7).each { |k, v| puts "#{k} => #{v}" }
     def each(&block)
       @values.each(&block)
@@ -96,7 +120,8 @@ module Sequel
       [model, pk.nil? ? @values.sort_by{|k,v| k.to_s} : pk].hash
     end
 
-    # Returns value for <tt>:id</tt> attribute.
+    # Returns value for the :id attribute, even if the primary key is
+    # not id. To get the primary key value, use #pk.
     def id
       @values[:id]
     end
@@ -104,10 +129,10 @@ module Sequel
     # Returns a string representation of the model instance including
     # the class name and values.
     def inspect
-      "#<%s @values=%s>" % [model.name, @values.inspect]
+      "#<#{model.name} @values=#{@values.inspect}>"
     end
 
-    # Returns attribute names.
+    # Returns attribute names as an array of symbols.
     def keys
       @values.keys
     end
@@ -117,9 +142,9 @@ module Sequel
       @new
     end
     
-    # Returns the primary key value identifying the model instance. If the
-    # model's primary key is changed (using #set_primary_key or #no_primary_key)
-    # this method is redefined accordingly.
+    # Returns the primary key value identifying the model instance.
+    # Raises an error if this model does not have a primary key.
+    # If the model has a composite primary key, returns an array of values.
     def pk
       raise(Error, "No primary key is associated with this model") unless key = primary_key
       case key
@@ -130,12 +155,16 @@ module Sequel
       end
     end
     
-    # Returns a hash identifying the model instance. Stock implementation.
+    # Returns a hash identifying the model instance.  It should be true that:
+    # 
+    #  Model[model_instance.pk_hash] == model_instance
     def pk_hash
       model.primary_key_hash(pk)
     end
     
-    # Reloads values from database and returns self.
+    # Reloads attributes from database and returns self. Also clears all
+    # cached column information.  Raises an Error if the record no longer
+    # exists in the database.
     def refresh
       @values = this.first || raise(Error, "Record not found")
       model.all_association_reflections.each do |r|
@@ -147,6 +176,9 @@ module Sequel
 
     # Creates or updates the record, after making sure the record
     # is valid.  If the record is not valid, returns false.
+    # If before_save, before_create (if new?), or before_update
+    # (if !new?) return false, returns false.  Otherwise,
+    # returns self.
     def save(*columns)
       return false unless valid?
       save!(*columns)
@@ -154,7 +186,10 @@ module Sequel
 
     # Creates or updates the record, without attempting to validate
     # it first. You can provide an optional list of columns to update,
-    # in which case it only updates those columns
+    # in which case it only updates those columns.
+    # If before_save, before_create (if new?), or before_update
+    # (if !new?) return false, returns false.  Otherwise,
+    # returns self.
     def save!(*columns)
       return false if before_save == false
       if @new
@@ -207,10 +242,10 @@ module Sequel
         when String
           # Prevent denial of service via memory exhaustion by only 
           # calling to_sym if the symbol already exists.
-          raise(::Sequel::Error, "all string keys must be a valid columns") unless s.include?(k)
+          raise(Error, "all string keys must be a valid columns") unless s.include?(k)
           k.to_sym
         else
-          raise(::Sequel::Error, "Only symbols and strings allows as keys")
+          raise(Error, "Only symbols and strings allows as keys")
         end
         m[k] = v
         m
@@ -226,7 +261,7 @@ module Sequel
     # If no columns have been set for this model (very unlikely), assume symbol
     # keys are valid column names, and assign the column value based on that.
     def set_with_params(hash)
-      columns_not_set = !model.instance_variable_get(:@columns)
+      columns_not_set = model.instance_variable_get(:@columns).blank?
       meths = setter_methods
       hash.each do |k,v|
         m = "#{k}="
@@ -238,7 +273,7 @@ module Sequel
       end
     end
 
-    # Returns (naked) dataset bound to current instance.
+    # Returns (naked) dataset that should return only this instance.
     def this
       @this ||= dataset.filter(pk_hash).limit(1).naked
     end
@@ -252,7 +287,7 @@ module Sequel
       this.update(set_values(values))
     end
     
-    # Runs set_with_params and saves the changes (which runs any callback methods).
+    # Runs set_with_params and runs save_changes (which runs any callback methods).
     def update_with_params(values)
       set_with_params(values)
       save_changes

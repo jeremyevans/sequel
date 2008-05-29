@@ -1,3 +1,5 @@
+# This file holds general class methods for Sequel::Model
+
 module Sequel
   class Model
     # Whether to lazily load the schema for future subclasses.  Unless turned
