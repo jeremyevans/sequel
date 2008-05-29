@@ -46,9 +46,9 @@ module Validation
       @errors = Hash.new {|h, k| h[k] = []}
     end
     
-    # Returns true if no errors are stored.
-    def empty?
-      @errors.empty?
+    # Adds an error for the given attribute.
+    def add(att, msg)
+      @errors[att] << msg
     end
     
     # Clears all errors.
@@ -56,25 +56,14 @@ module Validation
       @errors.clear
     end
     
-    # Returns size of errors array
-    def size
-      @errors.size
-    end
-    
     # Iterates over errors
     def each(&block)
       @errors.each(&block)
     end
     
-    # Returns the errors for the given attribute.
-    def on(att)
-      @errors[att]
-    end
-    alias_method :[], :on
-    
-    # Adds an error for the given attribute.
-    def add(att, msg)
-      @errors[att] << msg
+    # Returns true if no errors are stored.
+    def empty?
+      @errors.empty?
     end
     
     # Returns an array of fully-formatted error messages.
@@ -83,6 +72,17 @@ module Validation
         errors.each {|e| m << "#{att} #{e}"}
         m
       end
+    end
+    
+    # Returns the errors for the given attribute.
+    def on(att)
+      @errors[att]
+    end
+    alias_method :[], :on
+    
+    # Returns size of errors array
+    def size
+      @errors.size
     end
   end
   
@@ -103,6 +103,16 @@ module Validation
   
   # Validation class methods.
   module ClassMethods
+    # Returns true if validations are defined.
+    def has_validations?
+      !validations.empty?
+    end
+
+    # Instructs the model to skip validations defined in superclasses
+    def skip_superclass_validations
+      @skip_superclass_validations = true
+    end
+    
     # Defines validations by converting a longhand block into a series of 
     # shorthand definitions. For example:
     #
@@ -124,16 +134,6 @@ module Validation
       Generator.new(self, &block)
     end
 
-    # Returns the validations hash for the class.
-    def validations
-      @validations ||= Hash.new {|h, k| h[k] = []}
-    end
-
-    # Returns true if validations are defined.
-    def has_validations?
-      !validations.empty?
-    end
-
     # Validates the given instance.
     def validate(o)
       if superclass.respond_to?(:validate) && !@skip_superclass_validations
@@ -145,21 +145,6 @@ module Validation
       end
     end
     
-    def skip_superclass_validations
-      @skip_superclass_validations = true
-    end
-    
-    # Adds a validation for each of the given attributes using the supplied
-    # block. The block must accept three arguments: instance, attribute and 
-    # value, e.g.:
-    #
-    #   validates_each :name, :password do |object, attribute, value|
-    #     object.errors[attribute] << 'is not nice' unless value.nice?
-    #   end
-    def validates_each(*atts, &block)
-      atts.each {|a| validations[a] << block}
-    end
-
     # Validates acceptance of an attribute.
     def validates_acceptance_of(*atts)
       opts = {
@@ -185,6 +170,17 @@ module Validation
         c = o.send(:"#{a}_confirmation")
         o.errors[a] << opts[:message] unless v == c
       end
+    end
+
+    # Adds a validation for each of the given attributes using the supplied
+    # block. The block must accept three arguments: instance, attribute and 
+    # value, e.g.:
+    #
+    #   validates_each :name, :password do |object, attribute, value|
+    #     object.errors[attribute] << 'is not nice' unless value.nice?
+    #   end
+    def validates_each(*atts, &block)
+      atts.each {|a| validations[a] << block}
     end
 
     # Validates the format of an attribute.
@@ -288,6 +284,11 @@ module Validation
         end
         o.errors[a] << opts[:message] unless allow
       end
+    end
+
+    # Returns the validations hash for the class.
+    def validations
+      @validations ||= Hash.new {|h, k| h[k] = []}
     end
   end
 end
