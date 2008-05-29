@@ -36,7 +36,7 @@ module Sequel
 
     # Returns all hook methods for the given type of hook for this
     # model class and its ancestors.
-    def self.all_hooks(hook)
+    def self.all_hooks(hook) # :nodoc:
       ((self == Model ? [] : superclass.send(:all_hooks, hook)) + hooks[hook].collect{|x| x[1]})
     end
       
@@ -45,14 +45,16 @@ module Sequel
       @hooks ||= Hash.new {|h, k| h[k] = []}
     end
 
-    # Runs all hooks of type hook on the given object
+    # Runs all hooks of type hook on the given object.
+    # Returns false if any hook returns false.
     def self.run_hooks(hook, object) #:nodoc:
       all_hooks(hook).each{|b| return false if object.instance_eval(&b) == false}
     end
+
     metaprivate :add_hook, :all_hooks, :hooks, :run_hooks
 
     (HOOKS + PRIVATE_HOOKS).each do |hook|
-      instance_eval("def self.#{hook}(method = nil, &block); add_hook(:#{hook}, method, &block) end")
+      instance_eval("def #{hook}(method = nil, &block); add_hook(:#{hook}, method, &block) end")
       define_method(hook){model.send(:run_hooks, hook, self)}
     end
   end

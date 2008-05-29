@@ -29,10 +29,27 @@ module Sequel
     @models[source] = klass
   end
 
-  # Model has some methods that are added via metaprogramming.  All of the
-  # methods in DATASET_METHODS have model methods created that call
-  # the Model's dataset with the method of the same name with the given
-  # arguments.
+  # Model has some methods that are added via metaprogramming:
+  #
+  # * All of the methods in DATASET_METHODS have class methods created that call
+  #   the Model's dataset with the method of the same name with the given
+  #   arguments.
+  # * All of the methods in HOOKS have class methods created that accept
+  #   either a method name symbol or an optional tag and a block.  These
+  #   methods run the code as a callback at the specified time.  For example:
+  #
+  #     Model.before_save :do_something
+  #     Model.before_save(:do_something_else){ self.something_else = 42}
+  #     object = Model.new
+  #     object.save
+  #
+  #   Would run the object's :do_something method following by the code
+  #   block related to :do_something_else.  Note that if you specify a
+  #   block, a tag is optional.  If the tag is not nil, it will overwrite
+  #   a previous block with the same tag.  This allows hooks to work with
+  #   systems that reload code.
+  # * All of the methods in HOOKS also create instance methods, but you
+  #   should not override these instance methods.
   class Model
     extend Enumerable
     extend Associations
