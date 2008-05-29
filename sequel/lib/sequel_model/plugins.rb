@@ -1,10 +1,23 @@
 module Sequel
+  # Empty namespace that plugins should use to store themselves,
+  # so they can be loaded via Model.is.
+  #
+  # Plugins should be modules with one of the following conditions:
+  # * A singleton method named apply, which takes a model and 
+  #   additional arguments.
+  # * A module inside the plugin module named InstanceMethods,
+  #   which will be included in the model class.
+  # * A module inside the plugin module named ClassMethods,
+  #   which will extend the model class.
+  # * A module inside the plugin module named DatasetMethods,
+  #   which will extend the model's dataset.
   module Plugins
   end
   
   class Model
     # Loads a plugin for use with the model class, passing optional arguments
-    # to the plugin.
+    # to the plugin. If the plugin has a DatasetMethods module and the model
+    # doesn't have a dataset, raise an Error.
     def self.is(plugin, *args)
       m = plugin_module(plugin)
       raise(Error, "Plugin cannot be applied because the model class has no dataset") if m.const_defined?("DatasetMethods") && !@dataset
@@ -30,19 +43,20 @@ module Sequel
     ### Private Class Methods ###
 
     # Returns the gem name for the given plugin.
-    def self.plugin_gem(plugin)
+    def self.plugin_gem(plugin) # :nodoc:
       "sequel_#{plugin}"
     end
 
     # Returns the module for the specified plugin. If the module is not 
     # defined, the corresponding plugin gem is automatically loaded.
-    def self.plugin_module(plugin)
+    def self.plugin_module(plugin) # :nodoc:
       module_name = plugin.to_s.gsub(/(^|_)(.)/){|x| x[-1..-1].upcase}
       if not Sequel::Plugins.const_defined?(module_name)
         require plugin_gem(plugin)
       end
       Sequel::Plugins.const_get(module_name)
     end
+
     metaprivate :plugin_gem, :plugin_module
   end
 end
