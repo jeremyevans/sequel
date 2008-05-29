@@ -1,15 +1,24 @@
 module Sequel
   class Model
+    # Whether to lazily load the schema for future subclasses.  Unless turned
+    # off, checks the database for the table schema whenever a subclass is
+    # created
     @@lazy_load_schema = false
 
+    # The default primary key for tables, inherited by future subclasses
     @primary_key = :id
+
+    # Whether to typecast attribute values on assignment, inherited by
+    # future subclasses.
     @typecast_on_assignment = true
 
-    # Returns key for primary key.
-    metaattr_reader :primary_key
+    # The default primary key for classes (default: :id)
+    metaattr_accessor :primary_key
+
+    # Whether to typecast attribute values on assignment (default: true)
     metaattr_accessor :typecast_on_assignment
 
-    # Add dataset methods via metaprogramming
+    # Dataset methods to proxy via metaprogramming
     DATASET_METHODS = %w'<< all avg count delete distinct eager eager_graph each each_page 
        empty? except exclude filter first from_self full_outer_join graph 
        group group_and_count group_by having import inner_join insert 
@@ -19,7 +28,11 @@ module Sequel
        select_all select_more set set_graph_aliases single_value size to_csv 
        transform union uniq unordered update where'
   
-    # TODO: doc
+    # Returns the first record from the database matching the conditions.
+    # If a hash is given, it is used as the conditions.  If another
+    # object is given, it finds the first record whose primary key(s) match
+    # the given argument(s).  If caching is used, the cache is checked
+    # first before a dataset lookup is attempted unless a hash is supplied.
     def self.[](*args)
       args = args.first if (args.size == 1)
       raise(Error::InvalidFilter, "Did you mean to supply a hash?") if args === true || args === false
@@ -32,14 +45,18 @@ module Sequel
     end
     
     # Returns the columns in the result set in their original order.
-    #
-    # See Dataset#columns for more information.
+    # Generally, this will used the columns determined via the database
+    # schema, but in certain cases (e.g. models that are based on a joined
+    # dataset) it will use Dataset#columns to find the columns, which
+    # may be empty if the Dataset has no records.
     def self.columns
       @columns || set_columns(dataset.naked.columns || raise(Error, "Could not fetch columns for #{self}"))
     end
   
     # Creates new instance with values set to passed-in Hash, saves it
-    # (running any callbacks), and returns the instance.
+    # (running any callbacks), and returns the instance if the object
+    # was saved correctly.  If there was an error saving the object,
+    # returns false.
     def self.create(values = {}, &block)
       obj = new(values, &block)
       return false if obj.save == false
@@ -67,7 +84,8 @@ module Sequel
       end
     end
     
-    # Get the schema for the underlying table, and set the columns
+    # Returns the cached schema information if available or gets it
+    # from the database.
     def self.db_schema
       @db_schema ||= get_db_schema
     end
@@ -97,7 +115,7 @@ module Sequel
       dataset.destroy
     end
   
-    # TODO: doc
+    # Returns a dataset with custom SQL that yields model objects.
     def self.fetch(*args)
       db.fetch(*args).set_model(self)
     end
@@ -116,7 +134,8 @@ module Sequel
     end
   
     # If possible, set the dataset for the model subclass as soon as it
-    # is created.
+    # is created.  Also, inherit the typecast_on_assignment and primary_key
+    # attributes from the parent class.
     def self.inherited(subclass)
       sup_class = subclass.superclass
       ivs = subclass.instance_variables
@@ -129,7 +148,7 @@ module Sequel
           elsif ds = sup_class.instance_variable_get(:@dataset)
             subclass.set_dataset(ds.clone)
           end
-        rescue StandardError
+        rescue
         end
       end
     end
@@ -139,22 +158,33 @@ module Sequel
       name.demodulize.underscore.pluralize.to_sym
     end
 
-    # Set whether to lazily load the schema
+    # Set whether to lazily load the schema for future model classes.
+    # When the schema is lazy loaded, the schema information is grabbed
+    # during the first instantiation of the class instead of
+    # when the class is created.
     def self.lazy_load_schema=(value)
       @@lazy_load_schema = value
     end
   
     # Initializes a model instance as an existing record. This constructor is
     # used by Sequel to initialize model instances when fetching records.
+    # #load requires that values be a hash where all keys are symbols. It
+    # probably should not be used by external code.
     def self.load(values)
       new(values, true)
     end
 
-    def self.no_primary_key #:nodoc:
+    # Mark the model as not having a primary key. Not having a primary key
+    # can cause issues, among which is that you won't be able to update records.
+    def self.no_primary_key
       @primary_key = nil
     end
 
-    # Returns primary key attribute hash.
+    # Returns primary key attribute hash.  If using a composite primary key
+    # value such be an array with values for each primary key in the correct
+    # order.  For a standard primary key, value should be an object with a
+    # compatible type for the key.  If the model does not have a primary key,
+    # raises an Error.
     def self.primary_key_hash(value)
       raise(Error, "#{self} does not have a primary key") unless key = @primary_key
       case key
@@ -167,11 +197,13 @@ module Sequel
       end
     end
 
-    # Serializes column with YAML or through marshalling.
+    # Serializes column with YAML or through marshalling.  Arguments should be
+    # column symbols, with an optional trailing hash with a :format key
+    # set to :yaml or :marshal (:yaml is the default).  Setting this adds
+    # a transform to the model and dataset so that columns values will be serialized
+    # when saved and deserialized when returned from the database.
     def self.serialize(*columns)
-      format = columns.pop[:format] if Hash === columns.last
-      format ||= :yaml
-      
+      format = columns.extract_options![:format] || :yaml
       @transform = columns.inject({}) do |m, c|
         m[c] = format
         m
@@ -179,8 +211,18 @@ module Sequel
       @dataset.transform(@transform) if @dataset
     end
   
-    # Sets the dataset associated with the Model class.
-    # Also has the alias dataset=.
+    # Sets the dataset associated with the Model class. ds can be a Symbol
+    # (specifying a table name in the current database), or a Dataset.
+    # If a dataset is used, the model's database is changed to the given
+    # dataset.  If a symbol is used, a dataset is created from the current
+    # database with the table name given. Other arguments raise an Error.
+    #
+    # This sets the model of the the given/created dataset to the current model
+    # and adds a destroy method to it.  It also extends the dataset with
+    # the Associations::EagerLoading methods, and assigns a transform to it
+    # if there is one associated with the model. Finally, it attempts to 
+    # determine the database schema based on the given/created dataset unless
+    # lazy_load_schema is set.
     def self.set_dataset(ds)
       @dataset = case ds
       when Symbol
@@ -222,17 +264,34 @@ module Sequel
     #     set_primary_key :person_id
     #   end
     #
-    # <i>You can even set it to nil!</i>
+    # You can set it to nil to not have a primary key, but that
+    # cause certain things not to work, see #no_primary_key.
     def self.set_primary_key(*key)
       @primary_key = (key.length == 1) ? key[0] : key.flatten
     end
 
-    # Returns the columns as a list of frozen strings.
+    # Returns the columns as a list of frozen strings instead
+    # of a list of symbols.  This makes it possible to check
+    # whether a column exists without creating a symbol, which
+    # would be a memory leak if called with user input.
     def self.str_columns
       @str_columns ||= columns.map{|c| c.to_s.freeze}
     end
   
-    # Defines a method that returns a filtered dataset.
+    # Defines a method that returns a filtered dataset.  Subsets
+    # create dataset methods, so they can be chained for scoping.
+    # For example:
+    #
+    #   Topic.subset(:popular, :num_posts > 100)
+    #   Topic.subset(:recent, :created_on > Date.today - 7)
+    #
+    # Allows you to do:
+    #
+    #   Topic.filter(:username.like('%joe%')).popular.recent
+    #
+    # to get topics with a username that includes joe that
+    # have more than 100 posts and were created less than
+    # 7 days ago.
     def self.subset(name, *args, &block)
       def_dataset_method(name){filter(*args, &block)}
     end
@@ -258,12 +317,13 @@ module Sequel
       end
     end
 
-    def self.get_db_schema
+    # Get the schema from the database, fall back on checking the columns
+    # via the database if that will return inaccurate results or if
+    # it raises an error.
+    def self.get_db_schema # :nodoc:
       return nil unless @dataset
       schema_hash = {}
       ds_opts = dataset.opts
-      # If the dataset uses a multiple tables or custom sql, just
-      # get the columns
       single_table = ds_opts[:from] && (ds_opts[:from].length == 1) \
         && !ds_opts.include?(:join) && !ds_opts.include?(:sql)
       get_columns = proc{columns rescue []}
@@ -276,21 +336,23 @@ module Sequel
           schema_hash.delete_if{|k,v| !cols.include?(k)}
           cols.each{|c| schema_hash[c] ||= {}}
         else
+          # Dataset is for a single table with all columns,
+          # so set the columns based on the order they were
+          # returned by the schema.
           set_columns(schema_array.collect{|k,v| k})
         end
       else
+        # If the dataset uses multiple tables or custom sql or getting
+        # the schema raised an error, just get the columns and
+        # create an empty schema hash for it.
         get_columns.call.each{|c| schema_hash[c] = {}}
       end
       schema_hash
     end
 
-    def self.set_columns(new_columns)
-      if @columns
-        # Remove previous column methods
-        #(instance_methods & @columns.collect{|c| [c.to_s, "#{c}="]}.flatten).each do |m|
-        #  remove_method(m)
-        #end
-      end
+    # Set the columns for this model, reset the str_columns,
+    # and create accessor methods for each column.
+    def self.set_columns(new_columns) # :nodoc:
       @columns = new_columns
       def_column_accessor(*new_columns) if new_columns
       @str_columns = nil

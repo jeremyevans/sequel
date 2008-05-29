@@ -29,6 +29,10 @@ module Sequel
     @models[source] = klass
   end
 
+  # Model has some methods that are added via metaprogramming.  All of the
+  # methods in DATASET_METHODS have model methods created that call
+  # the Model's dataset with the method of the same name with the given
+  # arguments.
   class Model
     extend Enumerable
     extend Associations
