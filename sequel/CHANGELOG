@@ -1,5 +1,7 @@
 === HEAD
 
+* Comprehensive update of all documentation (jeremyevans)
+
 * Remove methods deprecated in 1.5.0 (jeremyevans)
 
 * Add typecasting on attribute assignment to Sequel::Model objects, optional but enabled by default (jeremyevans)
@@ -8,7 +10,7 @@
 
 * Add remove_all_* association method for *_to_many associations, which removes the association with all currently associated objects (jeremyevans)
 
-* Add Model.lazy_load_schema=, when set to true, it loads the schema (columns) on first instantiation (jeremyevans)
+* Add Model.lazy_load_schema=, when set to true, it loads the schema on first instantiation (jeremyevans)
 
 * Add before_validation and after_validation hooks, called whenever the model is validated (jeremyevans)
 

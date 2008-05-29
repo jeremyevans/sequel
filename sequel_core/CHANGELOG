@@ -32,9 +32,9 @@
 
 * Passing an array to Dataset#order and Dataset#select no longer works, you need to pass multiple arguments (jeremyevans)
 
-* You no longer need to surround array placeholding ? with parantheses when using interpolated strings (jeremyevans)
+* You should use '?' instead of '(?)' when using interpolated strings with array arguments (jeremyevans)
 
-* Dataset.literal now surrounds the literalization of the members with parentheses (jeremyevans)
+* Dataset.literal now surrounds the literalization of arrays with parentheses (jeremyevans)
 
 * Add echo option (back?) to sequel command line tool, via -E or --echo (jeremyevans)
 
@@ -68,7 +68,7 @@
 
 * Add methods directly to Dataset instead of including modules (jeremyevans)
 
-* Make some Dataset instance methods private: invert_order, join_expr, insert_default_values_sql (jeremyevans)
+* Make some Dataset instance methods private: invert_order, insert_default_values_sql (jeremyevans)
 
 * Don't add methods that depend on ParseTree unless you can load ParseTree (jeremyevans)
 
