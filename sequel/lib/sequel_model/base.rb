@@ -244,7 +244,6 @@ module Sequel
       end
       @dataset.extend(Associations::EagerLoading)
       @dataset.transform(@transform) if @transform
-      set_columns(nil)
       begin
         (@db_schema = get_db_schema) unless @@lazy_load_schema
       rescue
@@ -298,6 +297,11 @@ module Sequel
       def_dataset_method(name){filter(*args, &block)}
     end
     
+    # Returns name of primary table for the dataset.
+    def self.table_name
+      dataset.opts[:from].first
+    end
+
     # Add model methods that call dataset methods
     def_dataset_method(*DATASET_METHODS)
 
@@ -323,6 +327,7 @@ module Sequel
     # via the database if that will return inaccurate results or if
     # it raises an error.
     def self.get_db_schema # :nodoc:
+      set_columns(nil)
       return nil unless @dataset
       schema_hash = {}
       ds_opts = dataset.opts
