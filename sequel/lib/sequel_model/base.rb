@@ -25,7 +25,7 @@ module Sequel
        empty? except exclude filter first from_self full_outer_join graph 
        group group_and_count group_by having import inner_join insert 
        insert_multiple intersect interval invert_order join join_table last 
-       left_outer_join limit multi_insert naked order order_by order_more 
+       left_outer_join limit map multi_insert naked order order_by order_more 
        paginate print query range reverse_order right_outer_join select 
        select_all select_more set set_graph_aliases single_value size to_csv 
        transform union uniq unordered update where'
