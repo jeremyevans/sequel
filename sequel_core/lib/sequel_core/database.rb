@@ -64,7 +64,7 @@ module Sequel
     # Raises Sequel::Error::AdapterNotFound if the adapter
     # could not be loaded.
     def self.adapter_class(scheme)
-      scheme = scheme.to_sym
+      scheme = scheme.to_s.gsub('-', '_').to_sym
       
       if (klass = @@adapters[scheme]).nil?
         # attempt to load the adapter file
