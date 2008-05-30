@@ -76,7 +76,7 @@
 
 * Fix Oracle Adapter (yasushi.abe)
 
-* Fixed sqlite uri to handle sqlite:#{absolute_path} and sqlite://#{relative_path} (dlee)
+* Fixed sqlite uri so that sqlite:// works just like file:// (2 slashes for a relative path, 3 for an absolute) (dlee)
 
 * Raise a Sequel::Error if an invalid limit or offset is used (jeremyevans)
 

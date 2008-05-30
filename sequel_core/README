@@ -71,7 +71,7 @@ There are also experimental adapters for DB2, OpenBase and JDBC (on JRuby).
 
 Sequel includes an IRB console for quick'n'dirty access to databases. You can use it like this:
 
-  sequel sqlite:///test.db
+  sequel sqlite://test.db # test.db in current directory
 
 You get an IRB session with the database object stored in DB.
 
@@ -102,8 +102,6 @@ Or getting results as a transposed hash, with one column as key and another as v
 
   middle_east.to_hash(:name, :area) #=> {'Israel' => 20000, 'Greece' => 120000, ...}
 
-Much of Sequel is still undocumented (especially the part relating to model classes). The following section provides examples of common usage. Feel free to explore...
-
 == Getting Started
 
 === Connecting to a database
@@ -111,16 +109,16 @@ Much of Sequel is still undocumented (especially the part relating to model clas
 To connect to a database you simply provide Sequel with a URL:
 
   require 'sequel'
-  DB = Sequel.connect('sqlite:///blog.db')
+  DB = Sequel.connect('sqlite://blog.db')
   
 The connection URL can also include such stuff as the user name and password:
 
   DB = Sequel.connect('postgres://cico:12345@localhost:5432/mydb')
 
-You can also specify optional parameters, such as the connection pool size, or a logger for logging SQL queries:
+You can also specify optional parameters, such as the connection pool size, or loggers for logging SQL queries:
 
   DB = Sequel.connect("postgres://postgres:postgres@localhost/my_db",
-    :max_connections => 10, :logger => Logger.new('log/db.log'))
+    :max_connections => 10, :loggers => [Logger.new('log/db.log']))
 
 You can specify a block to connect, which will disconnect from the database after it completes:
 
@@ -158,11 +156,11 @@ Or by using the from methods:
 
   posts = DB.from(:posts)
 
-You can also use the equivalent shorthand:
+The recommended way is the equivalent shorthand:
 
   posts = DB[:posts]
 
-Note: the dataset will only fetch records when you explicitly ask for them, as will be shown below. Datasets can be manipulated to filter through records, change record order and even join tables, as will also be shown below.
+Datasets will only fetch records when you explicitly ask for them. Datasets can be manipulated to filter through records, change record order, join tables, etc..
 
 === Retrieving Records
 
@@ -226,7 +224,7 @@ You can also specify a custom WHERE clause using a string:
 
 You can use parameters in your string, as well (ActiveRecord style):
 
-  posts.filter('(stamp < ?) AND (author <> ?)', Date.today - 3, author_name)
+  posts.filter('(stamp < ?) AND (author != ?)', Date.today - 3, author_name)
   posts.filter((:stamp < Date.today - 3) & ~(:author => author_name)) # same as above
 
 Datasets can also be used as subqueries:

@@ -16,13 +16,9 @@ You can, however, explicitly set the table name or even the dataset used:
 
   class Post < Sequel::Model(:my_posts)
   end
-
   # or:
-
   Post.set_dataset :my_posts
-
   # or:
-
   Post.set_dataset DB[:my_posts].where(:category => 'ruby')
 
 === Resources
@@ -69,7 +65,7 @@ You can also define a model class that does not have a primary key, but then you
 A model instance can also be fetched by specifying a condition:
 
   post = Post[:title => 'hello world']
-  post = Post.find{:num_comments < 10}
+  post = Post.find(:num_comments < 10)
 
 === Iterating over records
 
@@ -79,8 +75,8 @@ A model class lets you iterate over specific records by acting as a proxy to the
 
 You can also manipulate the records in the dataset:
 
-  Post.filter{:num_comments < 7}.delete
-  Post.filter{:title =~ /ruby/}.update(:category => 'ruby')
+  Post.filter(:num_comments < 7).delete
+  Post.filter(:title.like(/ruby/)).update(:category => 'ruby')
 
 === Accessing record values
 
@@ -125,7 +121,7 @@ You can also supply a block to Model.new and Model.create:
 
 === Hooks
 
-You can execute custom code when creating, updating, or deleting records by using hooks. The before_create and after_create hooks wrap record creation. The before_update and after_update wrap record updating. The before_save and after_save wrap record creation and updating. The before_destroy and after_destroy wrap destruction.
+You can execute custom code when creating, updating, or deleting records by using hooks. The before_create and after_create hooks wrap record creation. The before_update and after_update wrap record updating. The before_save and after_save wrap record creation and updating. The before_destroy and after_destroy wrap destruction. The before_validation and after_validation hooks wrap validation.
 
 Hooks are defined by supplying a block:
 
@@ -173,7 +169,7 @@ You can also use the ActiveRecord names for these associations:
     has_and_belongs_to_many :tags
   end
 
-many_to_one/belongs_to creates a getter and setter for each model object:
+many_to_one creates a getter and setter for each model object:
 
   class Post < Sequel::Model
     many_to_one :author
@@ -183,7 +179,7 @@ many_to_one/belongs_to creates a getter and setter for each model object:
   post.author = Author[:name => 'Sharon']
   post.author
 
-one_to_many/has_many and many_to_many/has_and_belongs_to_many create a getter method, a method for adding an object to the association, and a method for removing an object from the association:
+one_to_many and many_to_many create a getter method, a method for adding an object to the association, a method for removing an object from the association, and a method for removing all associated objected from the association:
 
   class Post < Sequel::Model
     one_to_many :comments
@@ -195,9 +191,11 @@ one_to_many/has_many and many_to_many/has_and_belongs_to_many create a getter me
   comment = Comment.create(:text=>'hi')
   post.add_comment(comment)
   post.remove_comment(comment)
+  post.remove_all_comments
   tag = Tag.create(:tag=>'interesting')
   post.add_tag(tag)
   post.remove_tag(tag)
+  post.remove_all_tags
 
 === Eager Loading
 
@@ -228,7 +226,7 @@ Associations can be eagerly loaded via .eager and the :eager association option.
   Post.eager(:person).all
 
   # eager is a dataset method, so it works with filters/orders/limits/etc.
-  Post.filter("topic > 'M'").order(:date).limit(5).eager(:person).all
+  Post.filter(:topic > 'M').order(:date).limit(5).eager(:person).all
   
   person = Person.first
   # Eager loading via :eager (will eagerly load the tags for this person's posts)
@@ -272,7 +270,7 @@ The obvious way to add table-wide logic is to define class methods to the model 
 
   class Post < Sequel::Model
     def self.posts_with_few_comments
-      filter{:num_comments < 30}
+      filter(:num_comments < 30)
     end
 
     def self.clean_posts_with_few_comments
@@ -284,7 +282,7 @@ You can also implement table-wide logic by defining methods on the dataset:
 
   class Post < Sequel::Model
     def_dataset_method(:posts_with_few_comments) do
-      filter{:num_comments < 30}
+      filter(:num_comments < 30)
     end
 
     def_dataset_method(:clean_posts_with_few_comments) do
@@ -299,7 +297,7 @@ This is the recommended way of implementing table-wide operations, and allows yo
 Sequel models also provide a short hand notation for filters:
 
   class Post < Sequel::Model
-    subset(:posts_with_few_comments){:num_comments < 30}
+    subset(:posts_with_few_comments, :num_comments < 30)
     subset :invisible, :visible => false
   end
 
