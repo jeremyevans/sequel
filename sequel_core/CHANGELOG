@@ -1,5 +1,7 @@
 === HEAD
 
+* Refactor String inflection support, you must use String.inflections instead of Inflector.inflections now (jeremyevans)
+
 * Allow connection to ODBC-MSSQL via a URL (petersumskas) (#230)
 
 * Comprehensive update of all documentation, except for the block filters and adapters (jeremyevans)
