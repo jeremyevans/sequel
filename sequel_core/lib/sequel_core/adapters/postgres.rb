@@ -148,7 +148,9 @@ module Sequel
       end
     
       def self.string_to_bool(s)
-        if(s.downcase == 't' || s.downcase == 'true')
+        if(s.nil?)
+          nil
+		elsif(s.downcase == 't' || s.downcase == 'true')
           true
         else
           false
