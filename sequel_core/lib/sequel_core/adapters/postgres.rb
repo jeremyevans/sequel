@@ -504,8 +504,11 @@ module Sequel
             (0...res.nfields).each do |fieldnum|
               fieldsym = res.fname(fieldnum).to_sym
               @columns << fieldsym
-              converter = PG_TYPES[res.ftype(fieldnum)] || lambda{ |s| s.to_s }
-              converted_rec[fieldsym] = converter.call(res.getvalue(recnum,fieldnum))
+              converted_rec[fieldsym] = if value = res.getvalue(recnum,fieldnum)
+                (PG_TYPES[res.ftype(fieldnum)] || lambda{|s| s.to_s}).call(value)
+              else
+                value
+              end
             end
             yield converted_rec
           end
