@@ -1,7 +1,7 @@
 require 'sequel_core/database/schema'
 
 module Sequel
-  # Array of all databases that to which Sequel has connected.  If you are
+  # Array of all databases to which Sequel has connected.  If you are
   # developing an application that can connect to an arbitrary number of 
   # databases, delete the database objects from this or they will not get
   # garbage collected.
@@ -177,7 +177,7 @@ module Sequel
     ### Instance Methods ###
 
     # Executes the supplied SQL statement. The SQL can be supplied as a string
-    # or as an array of strings. If an array is give, comments and excessive 
+    # or as an array of strings. If an array is given, comments and excessive 
     # white space are removed. See also Array#to_sql.
     def <<(sql)
       execute((Array === sql) ? sql.to_sql : sql)
@@ -197,9 +197,9 @@ module Sequel
       (String === args.first) ? fetch(*args, &block) : from(*args, &block)
     end
     
-    # Connects to the database. This method should be overriden by descendants.
+    # Connects to the database. This method should be overridden by descendants.
     def connect
-      raise NotImplementedError, "#connect should be overriden by adapters"
+      raise NotImplementedError, "#connect should be overridden by adapters"
     end
     
     # Returns a blank dataset
@@ -207,23 +207,23 @@ module Sequel
       ds = Sequel::Dataset.new(self)
     end
     
-    # Disconnects from the database. This method should be overriden by 
+    # Disconnects from the database. This method should be overridden by 
     # descendants.
     def disconnect
-      raise NotImplementedError, "#disconnect should be overriden by adapters"
+      raise NotImplementedError, "#disconnect should be overridden by adapters"
     end
 
-    # Executes the given SQL. This method is overriden in descendants.
+    # Executes the given SQL. This method should be overridden in descendants.
     def execute(sql)
-      raise NotImplementedError, "#execute should be overriden by adapters"
+      raise NotImplementedError, "#execute should be overridden by adapters"
     end
     
     # Fetches records for an arbitrary SQL statement. If a block is given,
     # it is used to iterate over the records:
     #
-    #   DB.fetch('SELECT * FROM items') {|r| p r}
+    #   DB.fetch('SELECT * FROM items'){|r| p r}
     #
-    # If a block is not given, the method returns a dataset instance:
+    # The method returns a dataset instance:
     #
     #   DB.fetch('SELECT * FROM items').print
     #
@@ -234,7 +234,8 @@ module Sequel
     def fetch(sql, *args, &block)
       ds = dataset
       sql = sql.gsub('?') {|m|  ds.literal(args.shift)}
-      block ? ds.fetch_rows(sql, &block) : (ds.opts[:sql] = sql)
+      ds.opts[:sql] = sql
+      ds.fetch_rows(sql, &block) if block
       ds
     end
     alias_method :>>, :fetch
@@ -258,7 +259,7 @@ module Sequel
     end
     
     # Returns a string representation of the database object including the
-    # class name and the connection URI (or the opts if the uri
+    # class name and the connection URI (or the opts if the URI
     # cannot be constructed).
     def inspect
       "#<#{self.class}: #{(uri rescue opts).inspect}>" 

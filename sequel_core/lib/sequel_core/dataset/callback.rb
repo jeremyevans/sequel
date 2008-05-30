@@ -1,5 +1,5 @@
 # This file holds empty methods that can be
-# override to provide callback behavior
+# overridden to provide callback behavior.
 
 module Sequel
   class Dataset

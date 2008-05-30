@@ -18,7 +18,9 @@ module Sequel
       db.execute db.drop_table_sql(table_name)
     end
 
-    # Returns table schema for direct descendant of Model.
+    # Returns table schema created with set_schema for direct descendant of Model.
+    # Does not retreive schema information from the database, see db_schema if you
+    # want that.
     def self.schema
       @schema || ((superclass != Model) && (superclass.schema))
     end

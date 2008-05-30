@@ -2,25 +2,31 @@
 # code.
 
 class Array
-  # Return a ComplexExpression created from this array, not matching any of the
+  # Return a Sequel::SQL::ComplexExpression created from this array, not matching any of the
   # conditions.
   def ~
-    to_complex_expr_if_all_two_pairs(:OR, true)
+    sql_expr_if_all_two_pairs(:OR, true)
   end
 
-  # Return a ComplexExpression created from this array, matching none
+  # Return a Sequel::SQL::ComplexExpression created from this array, matching all of the
+  # conditions.
+  def sql_expr
+    sql_expr_if_all_two_pairs
+  end
+
+  # Return a Sequel::SQL::ComplexExpression created from this array, matching none
   # of the conditions.
   def sql_negate
-    to_complex_expr_if_all_two_pairs(:AND, true)
+    sql_expr_if_all_two_pairs(:AND, true)
   end
 
-  # Return a ComplexExpression created from this array, matching any of the
+  # Return a Sequel::SQL::ComplexExpression created from this array, matching any of the
   # conditions.
   def sql_or
-    to_complex_expr_if_all_two_pairs(:OR)
+    sql_expr_if_all_two_pairs(:OR)
   end
 
-  # Return a ComplexExpression representing an SQL string made up of the
+  # Return a Sequel::SQL::ComplexExpression representing an SQL string made up of the
   # concatenation of this array's elements.  If an argument is passed
   # it is used in between each element of the array in the SQL
   # concatenation.
@@ -38,12 +44,6 @@ class Array
     ::Sequel::SQL::ComplexExpression.new(:'||', *args)
   end
 
-  # Return a ComplexExpression created from this array, matching all of the
-  # conditions.
-  def to_complex_expr
-    to_complex_expr_if_all_two_pairs
-  end
-
   # Concatenates an array of strings into an SQL string. ANSI SQL and C-style
   # comments are removed, as well as excessive white-space.
   def to_sql
@@ -53,50 +53,50 @@ class Array
 
   private
 
-  # Raise an error if this array is not made up of all two pairs, otherwise create a SQL::ComplexExpression from this array.
-  def to_complex_expr_if_all_two_pairs(*args)
+  # Raise an error if this array is not made up of all two pairs, otherwise create a Sequel::SQL::ComplexExpression from this array.
+  def sql_expr_if_all_two_pairs(*args)
     raise(Sequel::Error, 'Not all elements of the array are arrays of size 2, so it cannot be converted to an SQL expression') unless all_two_pairs?
     ::Sequel::SQL::ComplexExpression.from_value_pairs(self, *args)
   end
 end
 
 class Hash
-  # Return a ComplexExpression created from this hash, matching
+  # Return a Sequel::SQL::ComplexExpression created from this hash, matching
   # all of the conditions in this hash and the condition specified by
   # the given argument.
   def &(ce)
     ::Sequel::SQL::ComplexExpression.new(:AND, self, ce)
   end
 
-  # Return a ComplexExpression created from this hash, matching
+  # Return a Sequel::SQL::ComplexExpression created from this hash, matching
   # all of the conditions in this hash or the condition specified by
   # the given argument.
   def |(ce)
     ::Sequel::SQL::ComplexExpression.new(:OR, self, ce)
   end
 
-  # Return a ComplexExpression created from this hash, not matching any of the
+  # Return a Sequel::SQL::ComplexExpression created from this hash, not matching any of the
   # conditions.
   def ~
     ::Sequel::SQL::ComplexExpression.from_value_pairs(self, :OR, true)
   end
 
-  # Return a ComplexExpression created from this hash, matching none
+  # Return a Sequel::SQL::ComplexExpression created from this hash, matching all of the
+  # conditions.
+  def sql_expr
+    ::Sequel::SQL::ComplexExpression.from_value_pairs(self)
+  end
+
+  # Return a Sequel::SQL::ComplexExpression created from this hash, matching none
   # of the conditions.
   def sql_negate
     ::Sequel::SQL::ComplexExpression.from_value_pairs(self, :AND, true)
   end
 
-  # Return a ComplexExpression created from this hash, matching any of the
+  # Return a Sequel::SQL::ComplexExpression created from this hash, matching any of the
   # conditions.
   def sql_or
     ::Sequel::SQL::ComplexExpression.from_value_pairs(self, :OR)
-  end
-
-  # Return a ComplexExpression created from this hash, matching all of the
-  # conditions.
-  def to_complex_expr
-    ::Sequel::SQL::ComplexExpression.from_value_pairs(self)
   end
 end
 
@@ -134,24 +134,24 @@ class Symbol
   include Sequel::SQL::ColumnMethods
   include Sequel::SQL::ComplexExpressionMethods
 
-  # If no argument is given, returns a ColumnAll object specifying all
+  # If no argument is given, returns a Sequel::SQL::ColumnAll object specifying all
   # columns for this table.
-  # If an argument is given, returns a ComplexExpression using the
-  # * (multiplication) operator with this and the given argument.
+  # If an argument is given, returns a Sequel::SQL::ComplexExpression using the *
+  # (multiplication) operator with this and the given argument.
   def *(ce=(arg=false;nil))
     return super(ce) unless arg == false
     Sequel::SQL::ColumnAll.new(self);
   end
 
-  # Returns an SQL function with this as the function name,
+  # Returns a Sequel::SQL::Function  with this as the function name,
   # and the given arguments.
   def [](*args)
     Sequel::SQL::Function.new(self, *args)
   end
 
   # If the given argument is an Integer or an array containing an Integer, returns
-  # an SQL::Subscript with this column and the given arg.
-  # Otherwise returns a ComplexExpression where this column (which should be boolean)
+  # a Sequel::SQL::Subscript with this column and the given arg.
+  # Otherwise returns a Sequel::SQL::ComplexExpression where this column (which should be boolean)
   # or the given argument is true.
   def |(sub)
     return super unless (Integer === sub) || ((Array === sub) && sub.any?{|x| Integer === x})

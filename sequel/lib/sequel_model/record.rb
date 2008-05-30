@@ -3,7 +3,7 @@
 module Sequel
   class Model
     # The columns that have been updated.  This isn't completely accurate,
-    # see #[]=.
+    # see Model#[]=.
     attr_reader :changed_columns
     
     # The hash of attribute values.  Keys are symbols with the names of the
@@ -157,13 +157,13 @@ module Sequel
     
     # Returns a hash identifying the model instance.  It should be true that:
     # 
-    #  Model[model_instance.pk_hash] == model_instance
+    #  Model[model_instance.pk_hash] === model_instance
     def pk_hash
       model.primary_key_hash(pk)
     end
     
     # Reloads attributes from database and returns self. Also clears all
-    # cached column information.  Raises an Error if the record no longer
+    # cached association information.  Raises an Error if the record no longer
     # exists in the database.
     def refresh
       @values = this.first || raise(Error, "Record not found")

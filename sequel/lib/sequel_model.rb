@@ -10,17 +10,14 @@ module Sequel
   # Sequel::Model() superclass specified.
   @models = {}
 
-  # Lets you create a Model class with its table name already set or reopen
-  # an existing Model.
+  # Lets you create a Model subclass with its dataset already set.
+  # source can be an existing dataset or a symbol (in which case
+  # it will create a dataset using the default database with 
+  # source as the table name.
   #
-  # Makes given dataset inherited.
-  #
-  # === Example:
+  # Example:
   #   class Comment < Sequel::Model(:something)
   #     table_name # => :something
-  #
-  #     # ...
-  #
   #   end
   def self.Model(source)
     return @models[source] if @models[source]

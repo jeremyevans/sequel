@@ -51,7 +51,7 @@ class ConnectionPool
   #   * :never - Never reuse a connection that belongs to the same thread
   # * :pool_sleep_time - The amount of time to sleep before attempting to acquire
   #   a connection again (default 0.001)
-  # * :pool_timeout - The amount of seconds waiting to acquirea connection
+  # * :pool_timeout - The amount of seconds to wait to acquire a connection
   #   before raising a PoolTimeoutError (default 5)
   def initialize(opts = {}, &block)
     @max_size = opts[:max_connections] || 4
@@ -72,9 +72,10 @@ class ConnectionPool
   # 
   #   pool.hold {|conn| conn.execute('DROP TABLE posts')}
   # 
-  # Pool#hold is re-entrant, meaning it can be called recursively in
-  # the same thread without blocking.  Depending on the pool settings
-  # you may get the connection currently used by the thread or a new connection.
+  # Pool#hold can be re-entrant, meaning it can be called recursively in
+  # the same thread without blocking if the :pool_reuse_connections option
+  # was set to :always or :allow.  Depending on the :pool_reuse_connections
+  # option you may get the connection currently used by the thread or a new connection.
   #
   # If no connection is immediately available and the pool is already using the maximum
   # number of connections, Pool#hold will block until a connection

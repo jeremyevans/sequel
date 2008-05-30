@@ -46,7 +46,7 @@ Sequel also allows you to specify functions by using the Symbol#[] method:
 
 == Filtering using a hash
 
-If you just need to compare records against values, you can supply a hash instead:
+If you just need to compare records against values, you can supply a hash:
 
   items.filter(:category => 'ruby').sql
   #=> "SELECT * FROM items WHERE (category = 'ruby')"
@@ -110,15 +110,15 @@ To filter by equality, you use the standard hash, which can be combined with oth
 
 This works with other hash values, such as arrays and ranges:
 
-  items.filter({:category == ['ruby', 'other']} | (:price - 100 > 200)).sql
-  #=> "SELECT * FROM items WHERE ((category IN ('ruby', 'other')) OR ((price * 100) <= 200))"
+  items.filter({:category => ['ruby', 'other']} | (:price - 100 > 200)).sql
+  #=> "SELECT * FROM items WHERE ((category IN ('ruby', 'other')) OR ((price - 100) <= 200))"
 
   items.filter({:price == (100..200)} & :active).sql
   #=> "SELECT * FROM items WHERE ((price >= 100 AND price <= 200) AND active)"
 
 === Negating conditions
 
-You can use the negation operator (~) anywhere:
+You can use the negation operator (~) in most cases:
 
   items.filter(~{:category => 'ruby'}).sql
   #=> "SELECT * FROM items WHERE (category != 'ruby')"

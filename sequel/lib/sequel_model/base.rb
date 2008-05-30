@@ -254,7 +254,7 @@ module Sequel
   
     # Sets primary key, regular and composite are possible.
     #
-    # == Example:
+    # Example:
     #   class Tagging < Sequel::Model
     #     # composite key
     #     set_primary_key :taggable_id, :tag_id

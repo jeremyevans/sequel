@@ -29,7 +29,7 @@ module Sequel
   # === The Dataset Adapter Interface
   #
   # Each adapter should define its own dataset class as a descendant of
-  # Sequel::Dataset. The following methods should be overriden by the adapter
+  # Sequel::Dataset. The following methods should be overridden by the adapter
   # Dataset class (each method with the stock implementation):
   #
   #   # Iterate over the results of the SQL query and call the supplied
@@ -62,7 +62,7 @@ module Sequel
   #     end
   #   end
   #
-  # == Methods added via metaprogramming
+  # === Methods added via metaprogramming
   #
   # Some methods are added via metaprogramming:
   #
@@ -90,7 +90,7 @@ module Sequel
     reverse reverse_order right_outer_join select select_all select_more
     set_graph_aliases set_model sort sort_by unfiltered union unordered where'.collect{|x| x.to_sym}
 
-    NOTIMPL_MSG = "This method must be overriden in Sequel adapters".freeze
+    NOTIMPL_MSG = "This method must be overridden in Sequel adapters".freeze
     STOCK_TRANSFORMS = {
       :marshal => [
         # for backwards-compatibility we support also non-base64-encoded values.
@@ -174,7 +174,7 @@ module Sequel
   
     # Returns a new clone of the dataset with with the given options merged.
     # If the options changed include options in COLUMN_CHANGE_OPTS, the cached
-    # @columns instance variable is reset.
+    # columns are deleted.
     def clone(opts = {})
       c = super()
       c.opts = @opts.merge(opts)
@@ -182,12 +182,12 @@ module Sequel
       c
     end
     
-    # Returns the columns in the result set in their true order. The stock 
-    # implementation returns the content of @columns. If @columns is nil,
+    # Returns the columns in the result set in their true order.
+    # If the columns are currently cached, returns the cached value. Otherwise,
     # a SELECT query is performed to get a single row. Adapters are expected
-    # to fill @columns with the column information when a query is performed.
+    # to fill the columns cache with the column information when a query is performed.
     # If the dataset does not have any rows, this will be an empty array.
-    # If you are looking for all columns for a single table, see Schema::SQL::schema.
+    # If you are looking for all columns for a single table, see Schema::SQL#schema.
     def columns
       single_record unless @columns
       @columns || []

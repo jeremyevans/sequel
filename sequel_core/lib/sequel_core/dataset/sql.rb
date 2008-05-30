@@ -215,7 +215,7 @@ module Sequel
 
     # Pattern match any of the columns to any of the terms.  The terms can be
     # strings (which use LIKE) or regular expressions (which are only supported
-    # in some databases).  See SQL::ComplexExpression.like.  Note that the
+    # in some databases).  See Sequel::SQL::ComplexExpression.like.  Note that the
     # total number of pattern matches will be cols.length * terms.length,
     # which could cause performance issues.
     def grep(cols, terms)
@@ -230,7 +230,7 @@ module Sequel
     alias_method :group_by, :group
 
     # Returns a copy of the dataset with the having conditions changed. Raises 
-    # if the dataset has not been grouped. See also #filter.
+    # an error if the dataset has not been grouped. See also #filter.
     def having(*cond, &block)
       raise(Error::InvalidOperation, "Can only specify a HAVING clause on a grouped dataset") unless @opts[:group]
       clone(:having=>{}).filter(*cond, &block)
@@ -325,17 +325,17 @@ module Sequel
     #
     # * type - The type of join to do (:inner, :left_outer, :right_outer, :full)
     # * table - Depends on type:
-    #   * Dataset - a subselect is performance with an alias of tN for some value of N
-    #   * Model (or anything responding to :table_name) - table name
-    #   * String, Symbol: name
+    #   * Dataset - a subselect is performed with an alias of tN for some value of N
+    #   * Model (or anything responding to :table_name) - table.table_name
+    #   * String, Symbol: table
     # * expr - Depends on type:
     #   * Hash, Array - Assumes key (1st arg) is column of joined table (unless already
     #     qualified), and value (2nd arg) is column of the last joined or primary table.
-    #     To specify multiple conditions on a joined table column, you must use an array.
+    #     To specify multiple conditions on a single joined table column, you must use an array.
     #   * Symbol - Assumed to be a column in the joined table that points to the id
     #     column in the last joined or primary table.
     # * table_alias - the name of the table's alias when joining, necessary for joining
-    #   to the same table more than once.
+    #   to the same table more than once.  No alias is used by default.
     def join_table(type, table, expr=nil, table_alias=nil)
       raise(Error::InvalidJoinType, "Invalid join type: #{type}") unless join_type = JOIN_TYPES[type || :inner]
 
@@ -417,9 +417,9 @@ module Sequel
       when ::Sequel::SQL::Expression
         v.to_s(self)
       when Array
-        v.all_two_pairs? ? literal(v.to_complex_expr) : (v.empty? ? '(NULL)' : "(#{v.collect{|i| literal(i)}.join(COMMA_SEPARATOR)})")
+        v.all_two_pairs? ? literal(v.sql_expr) : (v.empty? ? '(NULL)' : "(#{v.collect{|i| literal(i)}.join(COMMA_SEPARATOR)})")
       when Hash
-        literal(v.to_complex_expr)
+        literal(v.sql_expr)
       when Time, DateTime
         v.strftime(TIMESTAMP_FORMAT)
       when Date
@@ -435,7 +435,7 @@ module Sequel
     # This method is used by #multi_insert to format insert statements and
     # expects a keys array and and an array of value arrays.
     #
-    # This method should be overriden by descendants if the support
+    # This method should be overridden by descendants if the support
     # inserting multiple records in a single SQL statement.
     def multi_insert_sql(columns, values)
       table = quote_identifier(@opts[:from].first)
@@ -495,7 +495,7 @@ module Sequel
     alias_method :quote_column_ref, :quote_identifier
 
     # This method quotes the given name with the SQL standard double quote. It
-    # should be overriden by subclasses to provide quoting not matching the
+    # should be overridden by subclasses to provide quoting not matching the
     # SQL standard, such as backtick (used by MySQL and SQLite). 
     def quoted_identifier(name)
       "\"#{name}\""

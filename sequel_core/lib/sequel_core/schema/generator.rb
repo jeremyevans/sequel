@@ -30,8 +30,6 @@ module Sequel
 
       # Add a column with the given name, type, and opts to the DDL. 
       #
-      # Will create an index on this table if the :index option is present.
-      #
       # You can also create columns via method missing, so the following are
       # equivalent:
       #
@@ -41,6 +39,7 @@ module Sequel
       # The following options are supported:
       #
       # * :default - The default value for the column.
+      # * :index - Create an index on this column.
       # * :key - For foreign key columns, the column in the associated table
       #   that this column references.  Unnecessary if this column
       #   references the primary key of the associated table.
@@ -48,7 +47,7 @@ module Sequel
       #   or not allowing NULL values (if false).  If unspecified, will default
       #   to whatever the database default is.
       # * :on_delete - Specify the behavior of this column when being deleted.
-      #   See Schema::SQL::on_delete_clause for options.
+      #   See Schema::SQL#on_delete_clause for options.
       # * :size - The size of the column, generally used with string
       #   columns to specify the maximum number of characters the column will hold.
       # * :unique - Mark the column is unique, generally has the same effect as
@@ -60,7 +59,7 @@ module Sequel
         index(name) if opts[:index]
       end
       
-      # Adds a named constraint (or unamed if name is nil) to the DDL,
+      # Adds a named constraint (or unnamed if name is nil) to the DDL,
       # with the given block or args.
       def constraint(name, *args, &block)
         @columns << {:name => name, :type => :check, :check => block || args}

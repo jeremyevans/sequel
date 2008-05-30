@@ -111,9 +111,9 @@ module Sequel::Model::Associations
   #     of current model and name of associated model, pluralized,
   #     underscored, sorted, and joined with '_'.
   #   - :left_key - foreign key in join table that points to current model's
-  #     primary key, as a symbol.
+  #     primary key, as a symbol. Defaults to :"#{self.name.underscore}_id".
   #   - :right_key - foreign key in join table that points to associated
-  #     model's primary key, as a symbol.
+  #     model's primary key, as a symbol.  Defaults to Defaults to :"#{name.to_s.singularize}_id".
   #   - :graph_join_conditions - The conditions to use on the SQL join for the join_table when eagerly loading
   #     the association via eager_graph
   def associate(type, name, opts = {}, &block)

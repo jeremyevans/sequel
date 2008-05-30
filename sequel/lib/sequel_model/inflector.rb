@@ -281,6 +281,3 @@ class String
       gsub(/([a-z\d])([A-Z])/,'\1_\2').tr("-", "_").downcase
   end
 end
-
-# For backward compatibility of Inflector.inflections
-Inflector = String unless defined?(Inflector)

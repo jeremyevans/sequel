@@ -19,9 +19,9 @@ Without a filename argument, the sqlite adapter will setup a new sqlite database
 == Logging SQL statements
 
   require 'logger'
-  DB = Sequel.sqlite '', :logger => Logger.new($stdout)
+  DB = Sequel.sqlite '', :loggers => [Logger.new($stdout)]
   # or
-  DB.logger = Logger.new(...)
+  DB.loggers << Logger.new(...)
 
 == Using raw SQL
 
@@ -31,7 +31,7 @@ Without a filename argument, the sqlite adapter will setup a new sqlite database
   end
   dataset = DB["SELECT age FROM users"]
   dataset.print
-  dataset.map{|r| r[:age] }
+  dataset.map(:age)
 
 == Create a dataset
 
@@ -44,8 +44,8 @@ Without a filename argument, the sqlite adapter will setup a new sqlite database
   # or
   dataset = DB.query do
     from :managers
-    where :salary => 5_000..10_000
-    order_by :name, :department
+    where :salary => 5000..10000
+    order :name, :department
   end
 
 == Insert rows
@@ -111,7 +111,7 @@ There's support for nested expressions with AND, OR and NOT:
 
 You can use arithmetic operators and specify SQL functions:
 
-  DB[:items].filter(:x + :y) > :z).sql 
+  DB[:items].filter((:x + :y) > :z).sql 
   #=> "SELECT * FROM items WHERE ((x + y) > z)" 
 
   DB[:items].filter(:price < :AVG[:price] + 100).sql 
@@ -121,7 +121,7 @@ You can use arithmetic operators and specify SQL functions:
 
   dataset.order(:kind)
   dataset.reverse_order(:kind)
-  dataset.order(:kind.DESC, :name)
+  dataset.order(:kind.desc, :name)
 
 == Row ranges
 
@@ -219,6 +219,7 @@ Miscellaneous:
   dataset.sql #=> "SELECT * FROM items"
   dataset.delete_sql #=> "DELETE FROM items"
   dataset.where(:name => 'sequel').exists #=> "EXISTS ( SELECT 1 FROM items WHERE name = 'sequel' )"
-  dataset.print #=> pretty table print
-  dataset.columns #=> array of columns in the result set
+  dataset.print #=> pretty table print to $stdout
+  dataset.columns #=> array of columns in the result set, does a SELECT
   DB.schema_for_table(:items) => [[:id, {:type=>:integer, ...}], [:name, {:type=>:string, ...}], ...]
+                                 # Works on PostgreSQL, MySQL, SQLite, and possibly elsewhere

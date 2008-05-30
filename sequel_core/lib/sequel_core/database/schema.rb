@@ -6,7 +6,7 @@ module Sequel
     #   DB.add_column :items, :name, :text, :unique => true, :null => false
     #   DB.add_column :items, :category, :text, :default => 'ruby'
     #
-    # See Database#alter_table.
+    # See alter_table.
     def add_column(table, *args)
       alter_table(table) {add_column(*args)}
     end
@@ -16,7 +16,7 @@ module Sequel
     #   DB.add_index :posts, :title
     #   DB.add_index :posts, [:author, :title], :unique => true
     #
-    # See Database#alter_table.
+    # See alter_table.
     def add_index(table, *args)
       alter_table(table) {add_index(*args)}
     end
@@ -87,7 +87,7 @@ module Sequel
     #
     #   DB.drop_column :items, :category
     #
-    # See Database#alter_table.
+    # See alter_table.
     def drop_column(table, *args)
       alter_table(table) {drop_column(*args)}
     end
@@ -97,7 +97,7 @@ module Sequel
     #   DB.drop_index :posts, :title
     #   DB.drop_index :posts, [:author, :title]
     #
-    # See Database#alter_table.
+    # See alter_table.
     def drop_index(table, columns)
       alter_table(table) {drop_index(columns)}
     end
@@ -130,7 +130,7 @@ module Sequel
     #
     #   DB.rename_column :items, :cntr, :counter
     #
-    # See Database#alter_table.
+    # See alter_table.
     def rename_column(table, *args)
       alter_table(table) {rename_column(*args)}
     end
@@ -139,7 +139,7 @@ module Sequel
     #
     #   DB.set_column_default :items, :category, 'perl!'
     #
-    # See Database#alter_table.
+    # See alter_table.
     def set_column_default(table, *args)
       alter_table(table) {set_column_default(*args)}
     end
@@ -148,7 +148,7 @@ module Sequel
     #
     #   DB.set_column_type :items, :price, :float
     #
-    # See Database#alter_table.
+    # See alter_table.
     def set_column_type(table, *args)
       alter_table(table) {set_column_type(*args)}
     end

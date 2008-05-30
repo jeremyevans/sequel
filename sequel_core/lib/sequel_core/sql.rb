@@ -68,7 +68,7 @@ module Sequel
     # Sequel.
     #
     # Most ruby operators methods are defined via metaprogramming: +, -, /, *, <, >, <=,
-    # >=, & (AND), | (OR). This allows for a simple SQL after some core
+    # >=, & (AND), | (OR). This allows for a simple DSL after some core
     # classes have been overloaded with ComplexExpressionMethods.
     class ComplexExpression < Expression
       # A hash of the opposite for each operator symbol, used for inverting 
@@ -78,8 +78,6 @@ module Sequel
         :'NOT LIKE' => :LIKE, :~ => :'!~', :'!~' => :~, :IN => :'NOT IN',
         :'NOT IN' => :IN, :IS => :'IS NOT', :'IS NOT' => :IS, :'~*' => :'!~*',
         :'!~*' => :'~*'}
-
-      # Arrays of all the operator symbols that Sequel understands, except :NOT
 
       MATHEMATICAL_OPERATORS = [:+, :-, :/, :*]
       INEQUALITY_OPERATORS = [:<, :>, :<=, :>=]
@@ -123,9 +121,9 @@ module Sequel
         args.collect! do |a|
           case a
           when Hash
-            a.to_complex_expr
+            a.sql_expr
           when Array
-            a.all_two_pairs? ? a.to_complex_expr : a
+            a.all_two_pairs? ? a.sql_expr : a
           else
             a
           end
@@ -318,8 +316,7 @@ module Sequel
     # for creation of ComplexExpressions.
     #
     # Most ruby operators methods are defined via metaprogramming: +, -, /, *, <, >, <=,
-    # >=, & (AND), | (OR). This allows for a simple SQL after some core
-    # classes have been overloaded with ComplexExpressionMethods.
+    # >=, & (AND), | (OR). 
     module ComplexExpressionMethods
       NO_BOOLEAN_INPUT_OPERATORS = ComplexExpression::NO_BOOLEAN_INPUT_OPERATORS
       BOOLEAN_RESULT_OPERATORS = ComplexExpression::BOOLEAN_RESULT_OPERATORS

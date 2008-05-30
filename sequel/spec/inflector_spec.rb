@@ -1,6 +1,6 @@
 require File.join(File.dirname(__FILE__), 'spec_helper')
 
-describe Inflector do
+describe String do
   it "should transform words from singular to plural" do
     "post".pluralize.should == "posts"
     "octopus".pluralize.should =="octopi"

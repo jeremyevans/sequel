@@ -308,7 +308,7 @@ When retrieving records from joined datasets, you get the results in a single ha
   DB[:items].join(:order_items, :item_id => :id).first
   => {:id=>(could be items.id or order_items.id), :item_id=>order_items.order_id}
 
-Using graph, you can split the resulting dataset into separate hashes:
+Using graph, you can split the result hashes into subhashes, one per join:
 
   DB[:items].graph(:order_items, :item_id => :id).first
-  => {:items->{:id=>items.id}, :order_items=>{:id=>order_items.id, :item_id=>order_items.item_id}}
+  => {:items=>{:id=>items.id}, :order_items=>{:id=>order_items.id, :item_id=>order_items.item_id}}

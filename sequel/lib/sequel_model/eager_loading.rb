@@ -36,7 +36,7 @@ module Sequel::Model::Associations::EagerLoading
   # query for each association.
   #
   # The basic idea for how it works is that the dataset is first loaded normally.
-  # Then it goes through all associations that have been specified via .eager.
+  # Then it goes through all associations that have been specified via eager.
   # It loads each of those associations separately, then associates them back
   # to the original dataset via primary/foreign keys.  Due to the necessity of
   # all objects being present, you need to use .all to use eager loading, as it
