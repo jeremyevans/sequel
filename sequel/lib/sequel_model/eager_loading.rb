@@ -94,7 +94,7 @@ module Sequel::Model::Associations::EagerLoading
   # only graphing many_to_one associations.
   # 
   # Does not use the block defined for the association, since it does a single query for
-  # all objects.  You can use the :graph_join_type, :graph_conditions, and :graph_join_conditions
+  # all objects.  You can use the :graph_join_type, :graph_conditions, and :graph_join_table_conditions
   # association options to modify the SQL query.
   def eager_graph(*associations)
     model = check_model
@@ -141,7 +141,7 @@ module Sequel::Model::Associations::EagerLoading
       ds.opts[:eager_graph][:reciprocals][assoc_table_alias] = r.reciprocal
       ds
     when :many_to_many
-      ds = ds.graph(r[:join_table], [[r[:left_key], :"#{ta}__#{model.primary_key}"]] + r[:graph_join_conditions], :select=>false, :table_alias=>ds.eager_unique_table_alias(ds, r[:join_table]), :join_type=>join_type)
+      ds = ds.graph(r[:join_table], [[r[:left_key], :"#{ta}__#{model.primary_key}"]] + r[:graph_join_table_conditions], :select=>false, :table_alias=>ds.eager_unique_table_alias(ds, r[:join_table]), :join_type=>join_type)
       ds.graph(klass, [[klass.primary_key, r[:right_key]]] + conditions, :table_alias=>assoc_table_alias, :join_type=>join_type)
     end
     eager_graph = ds.opts[:eager_graph]

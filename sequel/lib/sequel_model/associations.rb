@@ -114,7 +114,7 @@ module Sequel::Model::Associations
   #     primary key, as a symbol. Defaults to :"#{self.name.underscore}_id".
   #   - :right_key - foreign key in join table that points to associated
   #     model's primary key, as a symbol.  Defaults to Defaults to :"#{name.to_s.singularize}_id".
-  #   - :graph_join_conditions - The conditions to use on the SQL join for the join_table when eagerly loading
+  #   - :graph_join_table_conditions - The conditions to use on the SQL join for the join table when eagerly loading
   #     the association via eager_graph
   def associate(type, name, opts = {}, &block)
     # check arguments
@@ -250,7 +250,7 @@ module Sequel::Model::Associations
     join_table = (opts[:join_table] ||= default_join_table_name(opts))
     opts[:left_key_alias] ||= :"x_foreign_key_x"
     opts[:left_key_select] ||= :"#{join_table}__#{left}___#{opts[:left_key_alias]}"
-    opts[:graph_join_conditions] = opts[:graph_join_conditions] ? opts[:graph_join_conditions].to_a : []
+    opts[:graph_join_table_conditions] = opts[:graph_join_table_conditions] ? opts[:graph_join_table_conditions].to_a : []
     database = db
     
     def_association_dataset_methods(name, opts) do
