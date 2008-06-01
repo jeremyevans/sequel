@@ -9,7 +9,7 @@ include FileUtils
 # Configuration
 ##############################################################################
 NAME = "sequel_core"
-VERS = "1.5.1"
+VERS = "2.0.0"
 CLEAN.include ["**/.*.sw?", "pkg", ".config", "rdoc", "coverage"]
 RDOC_OPTS = ["--quiet", "--line-numbers", "--inline-source", '--title', \
   'Sequel: The Database Toolkit for Ruby: Core Library and Adapters', \

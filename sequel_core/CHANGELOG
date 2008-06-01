@@ -1,4 +1,4 @@
-=== HEAD
+=== 2.0.0 (2008-06-01)
 
 * Refactor String inflection support, you must use String.inflections instead of Inflector.inflections now (jeremyevans)
 
