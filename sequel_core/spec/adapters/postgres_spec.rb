@@ -39,7 +39,10 @@ context "A PostgreSQL database" do
   end
 
   specify "should correctly parse the schema" do
-    @db.schema(:test3, :reload=>true).should == [[:value, {:type=>:integer, :allow_null=>true, :max_chars=>0, :default=>nil, :db_type=>"integer", :numeric_precision=>32}], [:time, {:type=>:datetime, :allow_null=>true, :max_chars=>0, :default=>nil, :db_type=>"timestamp without time zone", :numeric_precision=>0}]]
+    @db.schema(:test3, :reload=>true).should == [
+      [:value, {:type=>:integer, :allow_null=>true, :max_chars=>nil, :default=>nil, :db_type=>"integer", :numeric_precision=>32}],
+      [:time, {:type=>:datetime, :allow_null=>true, :max_chars=>nil, :default=>nil, :db_type=>"timestamp without time zone", :numeric_precision=>nil}]
+    ]
   end
 
   specify "should get the schema all database tables if no table name is used" do
