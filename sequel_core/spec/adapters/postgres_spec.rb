@@ -202,6 +202,31 @@ context "A PostgreSQL dataset" do
     @d.count.should == 2
   end
 
+  specify "should support nested transactions through savepoints" do
+    POSTGRES_DB.transaction do
+      @d << {:name => '1'}
+      POSTGRES_DB.transaction do
+        @d << {:name => '2'}
+        POSTGRES_DB.transaction do
+          @d << {:name => '3'}
+          raise Sequel::Error::Rollback
+        end
+        @d << {:name => '4'}
+        POSTGRES_DB.transaction do
+          @d << {:name => '6'}
+          POSTGRES_DB.transaction do
+            @d << {:name => '7'}
+          end
+          raise Sequel::Error::Rollback
+        end
+        @d << {:name => '5'}
+      end
+    end
+
+    @d.count.should == 4
+    @d.order(:name).map(:name).should == %w{1 2 4 5}
+  end
+
   specify "should support regexps" do
     @d << {:name => 'abc', :value => 1}
     @d << {:name => 'bcd', :value => 2}
