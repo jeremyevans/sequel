@@ -412,6 +412,12 @@ describe "Validations" do
     @m.value = 'a'
     @m.should be_valid
   end
+  
+  specify "should validate with :if => block" do
+    @c.validates_presence_of :value, :if => proc {false}
+    
+    @m.should be_valid
+  end
 end
 
 context "Superclass validations" do

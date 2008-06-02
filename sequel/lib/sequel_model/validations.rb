@@ -154,7 +154,7 @@ module Validation
       }.merge!(atts.extract_options!)
       
       validates_each(*atts) do |o, a, v|
-        next if (opts[:if] && !o.send(opts[:if]))
+        next unless o.instance_eval(&if_proc(opts))
         next if (v.nil? && opts[:allow_nil]) || (v.blank? && opts[:allow_blank])
         o.errors[a] << opts[:message] unless v == opts[:accept]
       end
@@ -167,7 +167,7 @@ module Validation
       }.merge!(atts.extract_options!)
       
       validates_each(*atts) do |o, a, v|
-        next if (opts[:if] && !o.send(opts[:if]))
+        next unless o.instance_eval(&if_proc(opts))
         next if (v.nil? && opts[:allow_nil]) || (v.blank? && opts[:allow_blank])
         c = o.send(:"#{a}_confirmation")
         o.errors[a] << opts[:message] unless v == c
@@ -196,7 +196,7 @@ module Validation
       end
       
       validates_each(*atts) do |o, a, v|
-        next if (opts[:if] && !o.send(opts[:if]))
+        next unless o.instance_eval(&if_proc(opts))
         next if (v.nil? && opts[:allow_nil]) || (v.blank? && opts[:allow_blank])
         o.errors[a] << opts[:message] unless v.to_s =~ opts[:with]
       end
@@ -211,7 +211,7 @@ module Validation
       }.merge!(atts.extract_options!)
       
       validates_each(*atts) do |o, a, v|
-        next if (opts[:if] && !o.send(opts[:if]))
+        next unless o.instance_eval(&if_proc(opts))
         next if (v.nil? && opts[:allow_nil]) || (v.blank? && opts[:allow_blank])
         if m = opts[:maximum]
           o.errors[a] << (opts[:message] || opts[:too_long]) unless v && v.size <= m
@@ -235,7 +235,7 @@ module Validation
       }.merge!(atts.extract_options!)
       
       validates_each(*atts) do |o, a, v|
-        next if (opts[:if] && !o.send(opts[:if]))
+        next unless o.instance_eval(&if_proc(opts))
         next if (v.nil? && opts[:allow_nil]) || (v.blank? && opts[:allow_blank])
         begin
           if opts[:only_integer]
@@ -256,7 +256,7 @@ module Validation
       }.merge!(atts.extract_options!)
       
       validates_each(*atts) do |o, a, v|
-        next if (opts[:if] && !o.send(opts[:if]))
+        next unless o.instance_eval(&if_proc(opts))
         o.errors[a] << opts[:message] unless v && !v.blank?
       end
     end
@@ -270,7 +270,7 @@ module Validation
       }.merge!(atts.extract_options!)
 
       validates_each(*atts) do |o, a, v|
-        next if (opts[:if] && !o.send(opts[:if]))
+        next unless o.instance_eval(&if_proc(opts))
         next if v.blank? 
         num_dups = o.class.filter(a => v).count
         allow = if num_dups == 0
@@ -296,6 +296,15 @@ module Validation
     # Returns the validations hash for the class.
     def validations
       @validations ||= Hash.new {|h, k| h[k] = []}
+    end
+    
+    protected
+    def if_proc(opts)
+      case opts[:if]
+      when Symbol then proc {send opts[:if]}
+      when Proc then opts[:if]
+      else proc {true}
+      end
     end
   end
 end
