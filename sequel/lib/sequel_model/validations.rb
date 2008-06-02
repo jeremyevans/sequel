@@ -154,6 +154,7 @@ module Validation
       }.merge!(atts.extract_options!)
       
       validates_each(*atts) do |o, a, v|
+        next if (opts[:if] && !o.send(opts[:if]))
         next if (v.nil? && opts[:allow_nil]) || (v.blank? && opts[:allow_blank])
         o.errors[a] << opts[:message] unless v == opts[:accept]
       end
@@ -166,6 +167,7 @@ module Validation
       }.merge!(atts.extract_options!)
       
       validates_each(*atts) do |o, a, v|
+        next if (opts[:if] && !o.send(opts[:if]))
         next if (v.nil? && opts[:allow_nil]) || (v.blank? && opts[:allow_blank])
         c = o.send(:"#{a}_confirmation")
         o.errors[a] << opts[:message] unless v == c
@@ -194,6 +196,7 @@ module Validation
       end
       
       validates_each(*atts) do |o, a, v|
+        next if (opts[:if] && !o.send(opts[:if]))
         next if (v.nil? && opts[:allow_nil]) || (v.blank? && opts[:allow_blank])
         o.errors[a] << opts[:message] unless v.to_s =~ opts[:with]
       end
@@ -208,6 +211,7 @@ module Validation
       }.merge!(atts.extract_options!)
       
       validates_each(*atts) do |o, a, v|
+        next if (opts[:if] && !o.send(opts[:if]))
         next if (v.nil? && opts[:allow_nil]) || (v.blank? && opts[:allow_blank])
         if m = opts[:maximum]
           o.errors[a] << (opts[:message] || opts[:too_long]) unless v && v.size <= m
@@ -231,6 +235,7 @@ module Validation
       }.merge!(atts.extract_options!)
       
       validates_each(*atts) do |o, a, v|
+        next if (opts[:if] && !o.send(opts[:if]))
         next if (v.nil? && opts[:allow_nil]) || (v.blank? && opts[:allow_blank])
         begin
           if opts[:only_integer]
@@ -251,6 +256,7 @@ module Validation
       }.merge!(atts.extract_options!)
       
       validates_each(*atts) do |o, a, v|
+        next if (opts[:if] && !o.send(opts[:if]))
         o.errors[a] << opts[:message] unless v && !v.blank?
       end
     end
@@ -264,6 +270,7 @@ module Validation
       }.merge!(atts.extract_options!)
 
       validates_each(*atts) do |o, a, v|
+        next if (opts[:if] && !o.send(opts[:if]))
         next if v.blank? 
         num_dups = o.class.filter(a => v).count
         allow = if num_dups == 0
