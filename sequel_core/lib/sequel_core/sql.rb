@@ -104,7 +104,8 @@ module Sequel
         :<= => :>, :>= => :<, :'=' => :'!=' , :'!=' => :'=', :LIKE => :'NOT LIKE',
         :'NOT LIKE' => :LIKE, :~ => :'!~', :'!~' => :~, :IN => :'NOT IN',
         :'NOT IN' => :IN, :IS => :'IS NOT', :'IS NOT' => :IS, :'~*' => :'!~*',
-        :'!~*' => :'~*', :NOT => :NOOP, :NOOP => :NOT}
+        :'!~*' => :'~*', :NOT => :NOOP, :NOOP => :NOT, :ILIKE => :'NOT ILIKE',
+        :'NOT ILIKE'=>:ILIKE}
 
       # Mathematical Operators used in NumericMethods
       MATHEMATICAL_OPERATORS = [:+, :-, :/, :*]
@@ -117,7 +118,7 @@ module Sequel
 
       # Operator symbols that take exactly two arguments
       TWO_ARITY_OPERATORS = [:'=', :'!=', :IS, :'IS NOT', :LIKE, :'NOT LIKE', \
-        :~, :'!~', :'~*', :'!~*', :IN, :'NOT IN'] + INEQUALITY_OPERATORS
+        :~, :'!~', :'~*', :'!~*', :IN, :'NOT IN', :ILIKE, :'NOT ILIKE'] + INEQUALITY_OPERATORS
 
       # Operator symbols that take one or more arguments
       N_ARITY_OPERATORS = [:AND, :OR, :'||'] + MATHEMATICAL_OPERATORS
@@ -218,7 +219,14 @@ module Sequel
     #
     # This defines the like (LIKE) method, used for pattern matching.
     module StringMethods
-      # Create a BooleanExpression pattern match of self with the given patterns.
+      # Create a BooleanExpression case insensitive pattern match of self
+      # with the given patterns.  See StringExpression.like.
+      def ilike(*ces)
+        StringExpression.like(self, *(ces << {:case_insensitive=>true}))
+      end
+
+      # Create a BooleanExpression case sensitive pattern match of self with
+      # the given patterns.  See StringExpression.like.
       def like(*ces)
         StringExpression.like(self, *ces)
       end
@@ -383,9 +391,15 @@ module Sequel
       # and PostgreSQL, and SQL regular expression syntax is not fully compatible
       # with ruby regular expression syntax, so be careful if using regular
       # expressions.
+      # 
+      # The pattern match will be case insensitive if the last argument is a hash
+      # with a key of :case_insensitive that is not false or nil. Also,
+      # if a case insensitive regular expression is used (//i), that particular
+      # pattern which will always be case insensitive.
       def self.like(l, *ces)
+        case_insensitive = ces.extract_options![:case_insensitive]
         ces.collect! do |ce|
-          op, expr = Regexp === ce ? [ce.casefold? ? :'~*' : :~, ce.source] : [:LIKE, ce.to_s]
+          op, expr = Regexp === ce ? [ce.casefold? || case_insensitive ? :'~*' : :~, ce.source] : [case_insensitive ? :ILIKE : :LIKE, ce.to_s]
           BooleanExpression.new(op, l, expr)
         end
         ces.length == 1 ? ces.at(0) : BooleanExpression.new(:OR, *ces)

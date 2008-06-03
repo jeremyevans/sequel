@@ -256,6 +256,20 @@ context "An SQLite dataset" do
     @d.count.should == 1
     @d.first[:name].should == 'def'
   end
+
+  specify "should handle string pattern matches correctly" do
+    @d.literal(:x.like('a')).should == "(x LIKE 'a')"
+    @d.literal(~:x.like('a')).should == "NOT (x LIKE 'a')"
+    @d.literal(:x.ilike('a')).should == "(x LIKE 'a')"
+    @d.literal(~:x.ilike('a')).should == "NOT (x LIKE 'a')"
+  end
+
+  specify "should raise errors if given a regexp pattern match" do
+    proc{@d.literal(:x.like(/a/))}.should raise_error(Sequel::Error)
+    proc{@d.literal(~:x.like(/a/))}.should raise_error(Sequel::Error)
+    proc{@d.literal(:x.like(/a/i))}.should raise_error(Sequel::Error)
+    proc{@d.literal(~:x.like(/a/i))}.should raise_error(Sequel::Error)
+  end
 end
 
 context "An SQLite dataset" do
@@ -356,38 +370,32 @@ context "SQLite dataset" do
   end
 end
 
-__END__
-
 context "A SQLite database" do
   setup do
     @db = SQLITE_DB
+    @db.create_table! :test2 do
+      text :name
+      integer :value
+    end
   end
 
   specify "should support add_column operations" do
     @db.add_column :test2, :xyz, :text
     
     @db[:test2].columns.should == [:name, :value, :xyz]
-    @db[:test2] << {:name => 'mmm', :value => 111}
-    @db[:test2].first[:xyz].should == '000'
+    @db[:test2] << {:name => 'mmm', :value => 111, :xyz=>'000'}
+    @db[:test2].first.should == {:name => 'mmm', :value => 111, :xyz=>'000'}
   end
   
   specify "should not support drop_column operations" do
-    proc {@db.drop_column :test2, :xyz}.should raise_error(Sequel::Error)
+    proc {@db.drop_column :test2, :value}.should raise_error(Sequel::Error)
   end
   
   specify "should not support rename_column operations" do
-    @db[:test2].delete
-    @db.add_column :test2, :xyz, :text, :default => '000'
-    @db[:test2] << {:name => 'mmm', :value => 111, :xyz => 'qqqq'}
-
-    @db[:test2].columns.should == [:name, :value, :xyz]
-    proc {@db.rename_column :test2, :xyz, :zyx}.should raise_error(Sequel::Error)
+    proc {@db.rename_column :test2, :value, :zyx}.should raise_error(Sequel::Error)
   end
   
   specify "should not support set_column_type operations" do
-    @db.add_column :test2, :xyz, :float
-    @db[:test2].delete
-    @db[:test2] << {:name => 'mmm', :value => 111, :xyz => 56.78}
-    proc {@db.set_column_type :test2, :xyz, :integer}.should raise_error(Sequel::Error)
+    proc {@db.set_column_type :test2, :value, :integer}.should raise_error(Sequel::Error)
   end
 end  

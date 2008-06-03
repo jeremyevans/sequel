@@ -84,7 +84,7 @@ context "Blockless Ruby Filters" do
     @d.l(:x.like('a')).should == '(x LIKE \'a\')'
     @d.l(:x.like(/a/)).should == '(x ~ \'a\')'
     @d.l(:x.like('a', 'b')).should == '((x LIKE \'a\') OR (x LIKE \'b\'))'
-    @d.l(:x.like(/a/, /b/)).should == '((x ~ \'a\') OR (x ~ \'b\'))'
+    @d.l(:x.like(/a/, /b/i)).should == '((x ~ \'a\') OR (x ~* \'b\'))'
     @d.l(:x.like('a', /b/)).should == '((x LIKE \'a\') OR (x ~ \'b\'))'
   end
 
@@ -92,8 +92,24 @@ context "Blockless Ruby Filters" do
     @d.l(~:x.like('a')).should == '(x NOT LIKE \'a\')'
     @d.l(~:x.like(/a/)).should == '(x !~ \'a\')'
     @d.l(~:x.like('a', 'b')).should == '((x NOT LIKE \'a\') AND (x NOT LIKE \'b\'))'
-    @d.l(~:x.like(/a/, /b/)).should == '((x !~ \'a\') AND (x !~ \'b\'))'
+    @d.l(~:x.like(/a/, /b/i)).should == '((x !~ \'a\') AND (x !~* \'b\'))'
     @d.l(~:x.like('a', /b/)).should == '((x NOT LIKE \'a\') AND (x !~ \'b\'))'
+  end
+
+  it "should support ILIKE via Symbol#ilike" do
+    @d.l(:x.ilike('a')).should == '(x ILIKE \'a\')'
+    @d.l(:x.ilike(/a/)).should == '(x ~* \'a\')'
+    @d.l(:x.ilike('a', 'b')).should == '((x ILIKE \'a\') OR (x ILIKE \'b\'))'
+    @d.l(:x.ilike(/a/, /b/i)).should == '((x ~* \'a\') OR (x ~* \'b\'))'
+    @d.l(:x.ilike('a', /b/)).should == '((x ILIKE \'a\') OR (x ~* \'b\'))'
+  end
+
+  it "should support NOT ILIKE via Symbol#ilike and Symbol#~" do
+    @d.l(~:x.ilike('a')).should == '(x NOT ILIKE \'a\')'
+    @d.l(~:x.ilike(/a/)).should == '(x !~* \'a\')'
+    @d.l(~:x.ilike('a', 'b')).should == '((x NOT ILIKE \'a\') AND (x NOT ILIKE \'b\'))'
+    @d.l(~:x.ilike(/a/, /b/i)).should == '((x !~* \'a\') AND (x !~* \'b\'))'
+    @d.l(~:x.ilike('a', /b/)).should == '((x NOT ILIKE \'a\') AND (x !~* \'b\'))'
   end
 
   it "should support negating ranges via Hash#~ and Range" do

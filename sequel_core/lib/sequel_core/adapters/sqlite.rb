@@ -193,6 +193,18 @@ module Sequel
         end
       end
 
+      def complex_expression_sql(op, args)
+        case op
+        when :~, :'!~', :'~*', :'!~*'
+          raise Error, "SQLite does not support pattern matching via regular expressions"
+        when :LIKE, :'NOT LIKE', :ILIKE, :'NOT ILIKE'
+          # SQLite is case insensitive for ASCII, and non case sensitive for other character sets
+          "#{'NOT ' if [:'NOT LIKE', :'NOT ILIKE'].include?(op)}(#{literal(args.at(0))} LIKE #{literal(args.at(1))})"
+        else
+          super(op, args)
+        end
+      end
+
       def insert_sql(*values)
         if (values.size == 1) && values.first.is_a?(Sequel::Dataset)
           "INSERT INTO #{source_list(@opts[:from])} #{values.first.sql};"

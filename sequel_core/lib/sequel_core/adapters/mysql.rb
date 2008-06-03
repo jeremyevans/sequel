@@ -360,10 +360,8 @@ module Sequel
 
       def complex_expression_sql(op, args)
         case op
-        when :~, :'!~'
-          "#{'NOT ' if op == :'!~'}(#{literal(args.at(0))} REGEXP BINARY #{literal(args.at(1))})"
-        when :'~*', :'!~*'
-          "#{'NOT ' if op == :'!~*'}(#{literal(args.at(0))} REGEXP #{literal(args.at(1))})"
+        when :~, :'!~', :'~*', :'!~*', :LIKE, :'NOT LIKE', :ILIKE, :'NOT ILIKE'
+          "(#{literal(args.at(0))} #{'NOT ' if [:'NOT LIKE', :'NOT ILIKE', :'!~', :'!~*']].include?(op)}#{[:~, :'!~', :'~*', :'!~*'].include?(op) ? 'REGEXP' : 'LIKE'} #{'BINARY ' if [:~, :'!~', :LIKE, :'NOT LIKE'].include?(op)}#{literal(args.at(1))})"
         when :'||'
           if args.length > 1
             "CONCAT(#{args.collect{|a| literal(a)}.join(', ')})"

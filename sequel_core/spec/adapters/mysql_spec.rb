@@ -713,14 +713,15 @@ context "MySQL::Dataset#complex_expression_sql" do
     @d = MYSQL_DB.dataset
   end
 
-  specify "should handle case insensitive regular expressions with REGEXP" do
-    @d.literal(:x.like(/a/i)).should == "(x REGEXP 'a')"
-    @d.literal(~:x.like(/a/i)).should == "NOT (x REGEXP 'a')"
-  end
-
-  specify "should handle case sensitive regular expressions with REGEXP BINARY" do
+  specify "should handle pattern matches correctly" do
+    @d.literal(:x.like('a')).should == "(x LIKE BINARY 'a')"
+    @d.literal(~:x.like('a')).should == "(x NOT LIKE BINARY 'a')"
+    @d.literal(:x.ilike('a')).should == "(x LIKE 'a')"
+    @d.literal(~:x.ilike('a')).should == "(x NOT LIKE 'a')"
     @d.literal(:x.like(/a/)).should == "(x REGEXP BINARY 'a')"
-    @d.literal(~:x.like(/a/)).should == "NOT (x REGEXP BINARY 'a')"
+    @d.literal(~:x.like(/a/)).should == "(x NOT REGEXP BINARY 'a')"
+    @d.literal(:x.like(/a/i)).should == "(x REGEXP 'a')"
+    @d.literal(~:x.like(/a/i)).should == "(x NOT REGEXP 'a')"
   end
 
   specify "should handle string concatenation with CONCAT if more than one record" do
