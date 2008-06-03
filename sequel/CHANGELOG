@@ -1,3 +1,7 @@
+=== master
+
+* Reload database schema for table when calling Model.create_table (jeremyevans)
+
 === 2.0.0 (2008-06-01)
 
 * Comprehensive update of all documentation (jeremyevans)
