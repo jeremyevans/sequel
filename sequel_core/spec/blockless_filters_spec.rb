@@ -288,4 +288,10 @@ context "Blockless Ruby Filters" do
     @d.lit([:x, :y].sql_string_join('y.x || x.y'.lit)).should == "(x || y.x || x.y || y)"
     @d.lit([[:x, :y].sql_string_join, [:a, :b].sql_string_join].sql_string_join).should == "((x || y) || (a || b))"
   end
+
+  it "should support StringExpression#+ for concatenation of SQL strings" do
+    @d.lit(:x.sql_string + :y).should == '(x || y)'
+    @d.lit([:x].sql_string_join + :y).should == '((x) || y)'
+    @d.lit([:x, :z].sql_string_join(' ') + :y).should == "((x || ' ' || z) || y)"
+  end
 end

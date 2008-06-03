@@ -1,3 +1,9 @@
+=== master
+
+* Add StringExpression#+, for simple SQL string concatenation (:x.sql_string + :y) (jeremyevans)
+
+* Refactor ComplexExpression into three subclasses and a few modules, so operators that don't make sense are not defined for the class (jeremyevans)
+
 === 2.0.0 (2008-06-01)
 
 * Refactor String inflection support, you must use String.inflections instead of Inflector.inflections now (jeremyevans)

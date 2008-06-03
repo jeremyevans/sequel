@@ -232,6 +232,17 @@ module Sequel
       end
     end
 
+    # This module is included in StringExpression and can be included elsewhere
+    # to allow the use of the + operator to represent concatenation of SQL
+    # Strings:
+    #
+    #   :x.sql_string + :y => # SQL: x || y
+    module StringConcatenationMethods
+      def +(ce)
+        StringExpression.new(:'||', self, ce)
+      end
+    end
+
     # This module includes the methods that are defined on objects that can be 
     # used in a numeric or string context in SQL (Symbol, LiteralString, 
     # SQL::Function, and SQL::StringExpression).
@@ -379,6 +390,7 @@ module Sequel
     # in a text/string/varchar value in SQL.
     class StringExpression < ComplexExpression
       include StringMethods
+      include StringConcatenationMethods
       include InequalityMethods
       include NoBooleanInputMethods
       
