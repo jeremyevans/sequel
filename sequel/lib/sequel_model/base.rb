@@ -326,7 +326,7 @@ module Sequel
     # Get the schema from the database, fall back on checking the columns
     # via the database if that will return inaccurate results or if
     # it raises an error.
-    def self.get_db_schema # :nodoc:
+    def self.get_db_schema(reload = false) # :nodoc:
       set_columns(nil)
       return nil unless @dataset
       schema_hash = {}
@@ -334,7 +334,7 @@ module Sequel
       single_table = ds_opts[:from] && (ds_opts[:from].length == 1) \
         && !ds_opts.include?(:join) && !ds_opts.include?(:sql)
       get_columns = proc{columns rescue []}
-      if single_table && (schema_array = (db.schema(table_name) rescue nil))
+      if single_table && (schema_array = (db.schema(table_name, :reload=>reload) rescue nil))
         schema_array.each{|k,v| schema_hash[k] = v}
         if ds_opts.include?(:select)
           # Dataset only selects certain columns, delete the other

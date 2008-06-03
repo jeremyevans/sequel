@@ -3,7 +3,7 @@ module Sequel
     # Creates table.
     def self.create_table
       db.create_table_sql_list(table_name, *schema.create_info).each {|s| db << s} 
-      @db_schema = get_db_schema unless @@lazy_load_schema
+      @db_schema = get_db_schema(true) unless @@lazy_load_schema
       columns
     end
     
