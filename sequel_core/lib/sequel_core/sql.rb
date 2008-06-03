@@ -6,11 +6,38 @@ module Sequel
   # It also holds modules that are included in core ruby classes that
   # make Sequel a friendly DSL.
   module SQL
-    
-    ### Classes ###
+    # Holds methods that should be called on columns only.
+    module ColumnMethods
+      AS = 'AS'.freeze
+      DESC = 'DESC'.freeze
+      ASC = 'ASC'.freeze
+      
+      # Create an SQL column alias of the receiving column to the given alias.
+      def as(a)
+        ColumnExpr.new(self, AS, a)
+      end
+      
+      # Mark the receiving SQL column as sorting in a descending fashion.
+      def desc
+        ColumnExpr.new(self, DESC)
+      end
+      
+      # Mark the receiving SQL column as sorting in an ascending fashion (generally a no-op).
+      def asc
+        ColumnExpr.new(self, ASC)
+      end
 
+      # Cast the reciever to the given SQL type
+      def cast_as(t)
+        t = t.to_s.lit if t.is_a?(Symbol)
+        Sequel::SQL::Function.new(:cast, self.as(t))
+      end
+    end
+    
     # Base class for all SQL fragments
     class Expression
+      include ColumnMethods
+
       # Returns self, because SQL::Expression already acts like
       # LiteralString.
       def lit
@@ -67,52 +94,43 @@ module Sequel
     # a tree).  This class is the backbone of the blockless filter support in
     # Sequel.
     #
-    # Most ruby operators methods are defined via metaprogramming: +, -, /, *, <, >, <=,
-    # >=, & (AND), | (OR). This allows for a simple DSL after some core
-    # classes have been overloaded with ComplexExpressionMethods.
+    # This is an abstract class that is not that useful by itself.  The
+    # subclasses BooleanExpression, NumericExpression, and StringExpression
+    # define the behavior of the DSL via operators.
     class ComplexExpression < Expression
-      # A hash of the opposite for each operator symbol, used for inverting 
+      # A hash of the opposite for each operator symbol, used for inverting
       # objects.
       OPERTATOR_INVERSIONS = {:AND => :OR, :OR => :AND, :< => :>=, :> => :<=,
         :<= => :>, :>= => :<, :'=' => :'!=' , :'!=' => :'=', :LIKE => :'NOT LIKE',
         :'NOT LIKE' => :LIKE, :~ => :'!~', :'!~' => :~, :IN => :'NOT IN',
         :'NOT IN' => :IN, :IS => :'IS NOT', :'IS NOT' => :IS, :'~*' => :'!~*',
-        :'!~*' => :'~*'}
+        :'!~*' => :'~*', :NOT => :NOOP, :NOOP => :NOT}
 
+      # Mathematical Operators used in NumericMethods
       MATHEMATICAL_OPERATORS = [:+, :-, :/, :*]
+
+      # Inequality Operators used in InequalityMethods
       INEQUALITY_OPERATORS = [:<, :>, :<=, :>=]
-      STRING_OPERATORS = [:'||']
-      SEARCH_OPERATORS = [:LIKE, :'NOT LIKE', :~, :'!~', :'~*', :'!~*']
-      INCLUSION_OPERATORS = [:IN, :'NOT IN']
-      BOOLEAN_OPERATORS = [:AND, :OR]
 
-      # Collection of all equality/inequality operator symbols
-      EQUALITY_OPERATORS = [:'=', :'!=', :IS, :'IS NOT', *INEQUALITY_OPERATORS]
-
-      # Operator symbols that do not work on boolean SQL input
-      NO_BOOLEAN_INPUT_OPERATORS = MATHEMATICAL_OPERATORS + INEQUALITY_OPERATORS + STRING_OPERATORS
-
-      # Operator symbols that result in boolean SQL output
-      BOOLEAN_RESULT_OPERATORS = BOOLEAN_OPERATORS + EQUALITY_OPERATORS + SEARCH_OPERATORS + INCLUSION_OPERATORS + [:NOT]
-
-      # Literal SQL booleans that are not allowed
-      BOOLEAN_LITERALS = [true, false, nil]
-
-      # Hash of ruby operator symbols to SQL operators, used for method creation
+      # Hash of ruby operator symbols to SQL operators, used in BooleanMethods
       BOOLEAN_OPERATOR_METHODS = {:& => :AND, :| =>:OR}
 
       # Operator symbols that take exactly two arguments
-      TWO_ARITY_OPERATORS = EQUALITY_OPERATORS + SEARCH_OPERATORS + INCLUSION_OPERATORS
+      TWO_ARITY_OPERATORS = [:'=', :'!=', :IS, :'IS NOT', :LIKE, :'NOT LIKE', \
+        :~, :'!~', :'~*', :'!~*', :IN, :'NOT IN'] + INEQUALITY_OPERATORS
 
       # Operator symbols that take one or more arguments
-      N_ARITY_OPERATORS = MATHEMATICAL_OPERATORS + BOOLEAN_OPERATORS + STRING_OPERATORS
+      N_ARITY_OPERATORS = [:AND, :OR, :'||'] + MATHEMATICAL_OPERATORS
+
+      # Operator symbols that take one argument
+      ONE_ARITY_OPERATORS = [:NOT, :NOOP]
 
       # An array of args for this object
       attr_reader :args
 
       # The operator symbol for this object
       attr_reader :op
-
+      
       # Set the operator symbol and arguments for this object to the ones given.
       # Convert all args that are hashes or arrays with all two pairs to ComplexExpressions.
       # Raise an error if the operator doesn't allow boolean input and a boolean argument is given.
@@ -128,31 +146,166 @@ module Sequel
             a
           end
         end
-        if NO_BOOLEAN_INPUT_OPERATORS.include?(op)
-          args.each do |a|
-            if BOOLEAN_LITERALS.include?(a) || ((ComplexExpression === a) && BOOLEAN_RESULT_OPERATORS.include?(a.op))
-              raise(Sequel::Error, "cannot apply #{op} to a boolean expression")
-            end
-          end
-        end
         case op
         when *N_ARITY_OPERATORS
-          raise(Sequel::Error, 'mathematical and boolean operators require at least 1 argument') unless args.length >= 1
+          raise(Error, "The #{op} operator requires at least 1 argument") unless args.length >= 1
         when *TWO_ARITY_OPERATORS
-          raise(Sequel::Error, '(in)equality operators require precisely 2 arguments') unless args.length == 2
-        when :NOT
-          raise(Sequel::Error, 'the NOT operator requires a single argument') unless args.length == 1
+          raise(Error, "The #{op} operator requires precisely 2 arguments") unless args.length == 2
+        when *ONE_ARITY_OPERATORS
+          raise(Error, "The #{op} operator requires a single argument") unless args.length == 1
         else
-          raise(Sequel::Error, "invalid operator #{op}")
+          raise(Error, "Invalid operator #{op}")
         end
         @op = op
         @args = args
       end
+      
+      # Delegate the creation of the resulting SQL to the given dataset,
+      # since it may be database dependent.
+      def to_s(ds)
+        ds.complex_expression_sql(@op, @args)
+      end
+    end
 
+    # This module includes the methods that are defined on objects that can be 
+    # used in a boolean context in SQL (Symbol, LiteralString, SQL::Function,
+    # and SQL::BooleanExpression).
+    #
+    # This defines the ~ (NOT), & (AND), and | (OR) methods.
+    module BooleanMethods
+      # Create a new BooleanExpression with NOT, representing the inversion of whatever self represents.
+      def ~
+        BooleanExpression.invert(self)
+      end
+      
+      ComplexExpression::BOOLEAN_OPERATOR_METHODS.each do |m, o|
+        define_method(m) do |ce|
+          case ce
+          when BooleanExpression
+            BooleanExpression.new(o, self, ce)
+          when ComplexExpression
+            raise(Sequel::Error, "cannot apply #{o} to a non-boolean expression")
+          else  
+            BooleanExpression.new(o, self, ce)
+          end
+        end
+      end
+    end
+
+    # This module includes the methods that are defined on objects that can be 
+    # used in a numeric context in SQL (Symbol, LiteralString, SQL::Function,
+    # and SQL::NumericExpression).
+    #
+    # This defines the +, -, *, and / methods.
+    module NumericMethods
+      ComplexExpression::MATHEMATICAL_OPERATORS.each do |o|
+        define_method(o) do |ce|
+          case ce
+          when NumericExpression
+            NumericExpression.new(o, self, ce)
+          when ComplexExpression
+            raise(Sequel::Error, "cannot apply #{o} to a non-numeric expression")
+          else  
+            NumericExpression.new(o, self, ce)
+          end
+        end
+      end
+    end
+
+    # This module includes the methods that are defined on objects that can be 
+    # used in a numeric context in SQL (Symbol, LiteralString, SQL::Function,
+    # and SQL::StringExpression).
+    #
+    # This defines the like (LIKE) method, used for pattern matching.
+    module StringMethods
+      # Create a BooleanExpression pattern match of self with the given patterns.
+      def like(*ces)
+        StringExpression.like(self, *ces)
+      end
+    end
+
+    # This module includes the methods that are defined on objects that can be 
+    # used in a numeric or string context in SQL (Symbol, LiteralString, 
+    # SQL::Function, and SQL::StringExpression).
+    #
+    # This defines the >, <, >=, and <= methods.
+    module InequalityMethods
+      ComplexExpression::INEQUALITY_OPERATORS.each do |o|
+        define_method(o) do |ce|
+          case ce
+          when BooleanExpression, TrueClass, FalseClass, NilClass, Hash, Array
+            raise(Error, "cannot apply #{o} to a boolean expression")
+          else  
+            BooleanExpression.new(o, self, ce)
+          end
+        end
+      end
+    end
+
+    # This module augments the default initalize method for the 
+    # ComplexExpression subclass it is included in, so that
+    # attempting to use boolean input when initializing a NumericExpression
+    # or StringExpression results in an error.
+    module NoBooleanInputMethods
+      # Raise an Error if one of the args would be boolean in an SQL
+      # context, otherwise call super.
+      def initialize(op, *args)
+        args.each do |a|
+          case a
+          when BooleanExpression, TrueClass, FalseClass, NilClass, Hash, Array
+            raise(Error, "cannot apply #{op} to a boolean expression")
+          end
+        end
+        super
+      end
+    end
+
+    # This module includes other Sequel::SQL::*Methods modules and is
+    # included in other classes that are could be either booleans,
+    # strings, or numbers.  It also adds three methods so that
+    # can specify behavior in case one of the operator methods has
+    # been overridden (such as Symbol#/).
+    #
+    # For example, if Symbol#/ is overridden to produce a string (for
+    # example, to make file system path creation easier), the
+    # following code will not do what you want:
+    #
+    #   :price/10 > 100
+    #
+    # In that case, you need to do the following:
+    #
+    #   :price.sql_number/10 > 100
+    module ComplexExpressionMethods
+      include BooleanMethods
+      include NumericMethods
+      include StringMethods
+      include InequalityMethods
+
+      # Return a BooleanExpression representation of self.
+      def sql_boolean
+        BooleanExpression.new(:NOOP, self)
+      end
+
+      # Return a NumericExpression representation of self.
+      def sql_number
+        NumericExpression.new(:NOOP, self)
+      end
+
+      # Return a StringExpression representation of self.
+      def sql_string
+        StringExpression.new(:NOOP, self)
+      end
+    end
+
+    # Subclass of ComplexExpression where the expression results
+    # in a boolean value in SQL.
+    class BooleanExpression < ComplexExpression
+      include BooleanMethods
+      
       # Take pairs of values (e.g. a hash or array of arrays of two pairs)
       # and converts it to a ComplexExpression.  The operator and args
       # used depends on the case of the right (2nd) argument:
-      # 
+      #
       # * 0..10 - left >= 0 AND left <= 10
       # * [1,2] - left IN (1,2)
       # * nil - left IS NULL
@@ -177,15 +330,50 @@ module Sequel
           when NilClass
             new(:IS, l, r)
           when Regexp
-            like(l, r)
+            StringExpression.like(l, r)
           else
             new(:'=', l, r)
           end
-          negate ? ~ce : ce
+          negate ? invert(ce) : ce
         end
         pairs.length == 1 ? pairs.at(0) : new(op, *pairs)
       end
+      
+      # Invert the expression, if possible.  If the expression cannot
+      # be inverted, raise an error.  An inverted expression should match everything that the
+      # uninverted expression did not match, and vice-versa.
+      def self.invert(ce)
+        case ce
+        when BooleanExpression
+          case op = ce.op
+          when :AND, :OR
+            BooleanExpression.new(OPERTATOR_INVERSIONS[op], *ce.args.collect{|a| BooleanExpression.invert(a)})
+          else
+            BooleanExpression.new(OPERTATOR_INVERSIONS[op], *ce.args.dup)
+          end
+        when ComplexExpression
+          raise(Sequel::Error, "operator #{ce.op} cannot be inverted")
+        else
+          BooleanExpression.new(:NOT, ce)
+        end
+      end
+    end
 
+    # Subclass of ComplexExpression where the expression results
+    # in a numeric value in SQL.
+    class NumericExpression < ComplexExpression
+      include NumericMethods
+      include InequalityMethods
+      include NoBooleanInputMethods
+    end
+
+    # Subclass of ComplexExpression where the expression results
+    # in a text/string/varchar value in SQL.
+    class StringExpression < ComplexExpression
+      include StringMethods
+      include InequalityMethods
+      include NoBooleanInputMethods
+      
       # Creates a SQL pattern match exprssion. left (l) is the SQL string we
       # are matching against, and ces are the patterns we are matching.
       # The match succeeds if any of the patterns match (SQL OR).  Patterns
@@ -193,55 +381,20 @@ module Sequel
       # the SQL LIKE operator to be used, and should be supported by most
       # databases.  Regular expressions will probably only work on MySQL
       # and PostgreSQL, and SQL regular expression syntax is not fully compatible
-      # with ruby regular expression syntax, so be careful if using regular 
+      # with ruby regular expression syntax, so be careful if using regular
       # expressions.
       def self.like(l, *ces)
-        ces.collect! do |ce| 
+        ces.collect! do |ce|
           op, expr = Regexp === ce ? [ce.casefold? ? :'~*' : :~, ce.source] : [:LIKE, ce.to_s]
-          new(op, l, expr)
+          BooleanExpression.new(op, l, expr)
         end
-        ces.length == 1 ? ces.at(0) : new(:OR, *ces)
-      end
-
-      # Invert the regular expression, if possible.  If the expression cannot
-      # be inverted, raise an error.  An inverted expression should match everything that the
-      # uninverted expression did not match, and vice-versa.
-      def ~
-        case @op
-        when *BOOLEAN_OPERATORS
-          self.class.new(OPERTATOR_INVERSIONS[@op], *@args.collect{|a| ComplexExpression === a ? ~a : ComplexExpression.new(:NOT, a)})
-        when *TWO_ARITY_OPERATORS
-          self.class.new(OPERTATOR_INVERSIONS[@op], *@args.dup)
-        when :NOT
-          @args.first
-        else
-          raise(Sequel::Error, "operator #{@op} cannot be inverted")
-        end
-      end
-
-      # Delegate the creation of the resulting SQL to the given dataset,
-      # since it may be database dependent.
-      def to_s(ds)
-        ds.complex_expression_sql(@op, @args)
-      end
-
-      BOOLEAN_OPERATOR_METHODS.each do |m, o|
-        define_method(m) do |ce|
-          raise(Sequel::Error, "cannot apply #{o} to a non-boolean expression") unless BOOLEAN_RESULT_OPERATORS.include?(@op)
-          super
-        end
-      end
-
-      (MATHEMATICAL_OPERATORS + INEQUALITY_OPERATORS).each do |o|
-        define_method(o) do |ce|
-          raise(Sequel::Error, "cannot apply #{o} to a boolean expression") unless NO_BOOLEAN_INPUT_OPERATORS.include?(@op)
-          super
-        end
+        ces.length == 1 ? ces.at(0) : BooleanExpression.new(:OR, *ces)
       end
     end
 
     # Represents an SQL function call.
     class Function < Expression
+      include ComplexExpressionMethods
       # The array of arguments to pass to the function (may be blank)
       attr_reader :args
 
@@ -308,78 +461,6 @@ module Sequel
       def to_s(ds)
         ds.subscript_sql(self)
       end
-    end
-
-    ### Modules ###
-    
-    # Module included in core classes giving them a simple and easy DSL
-    # for creation of ComplexExpressions.
-    #
-    # Most ruby operators methods are defined via metaprogramming: +, -, /, *, <, >, <=,
-    # >=, & (AND), | (OR). 
-    module ComplexExpressionMethods
-      NO_BOOLEAN_INPUT_OPERATORS = ComplexExpression::NO_BOOLEAN_INPUT_OPERATORS
-      BOOLEAN_RESULT_OPERATORS = ComplexExpression::BOOLEAN_RESULT_OPERATORS
-      BOOLEAN_OPERATOR_METHODS = ComplexExpression::BOOLEAN_OPERATOR_METHODS
-
-      BOOLEAN_OPERATOR_METHODS.each do |m, o|
-        define_method(m) do |ce|
-          raise(Sequel::Error, "cannot apply #{o} to a non-boolean expression") if (ComplexExpression === ce) && !BOOLEAN_RESULT_OPERATORS.include?(ce.op)
-          ComplexExpression.new(o, self, ce)   
-        end
-      end
-
-      (ComplexExpression::MATHEMATICAL_OPERATORS + ComplexExpression::INEQUALITY_OPERATORS).each do |o|
-        define_method(o) do |ce|
-          raise(Sequel::Error, "cannot apply #{o} to a boolean expression") if (ComplexExpression === ce) && !NO_BOOLEAN_INPUT_OPERATORS.include?(ce.op)
-          ComplexExpression.new(o, self, ce)   
-        end
-      end
-
-      # Create a new ComplexExpression with NOT, representing the inversion of whatever self represents.
-      def ~
-        ComplexExpression.new(:NOT, self)
-      end
-
-      # Create a ComplexExpression pattern match of self with the given patterns.
-      def like(*ces)
-        ComplexExpression.like(self, *ces)
-      end
-    end
-
-    # Holds methods that should be called on columns only.
-    module ColumnMethods
-      AS = 'AS'.freeze
-      DESC = 'DESC'.freeze
-      ASC = 'ASC'.freeze
-      
-      # Create an SQL column alias of the receiving column to the given alias.
-      def as(a)
-        ColumnExpr.new(self, AS, a)
-      end
-      
-      # Mark the receiving SQL column as sorting in a descending fashion.
-      def desc
-        ColumnExpr.new(self, DESC)
-      end
-      
-      # Mark the receiving SQL column as sorting in an ascending fashion (generally a no-op).
-      def asc
-        ColumnExpr.new(self, ASC)
-      end
-
-      # Cast the reciever to the given SQL type
-      def cast_as(t)
-        t = t.to_s.lit if t.is_a?(Symbol)
-        Sequel::SQL::Function.new(:cast, self.as(t))
-      end
-    end
-
-    class Expression
-      # Include the modules in Expression, couldn't be done
-      # earlier due to cyclic dependencies.
-      include ColumnMethods
-      include ComplexExpressionMethods
     end
   end
 

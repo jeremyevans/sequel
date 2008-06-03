@@ -268,7 +268,7 @@ module Sequel
       def schema_ds_filter(table_name, opts)
         filt = super
         # Restrict it to the given or current database, unless specifically requesting :database = nil
-        filt = SQL::ComplexExpression.new(:AND, filt, {:c__table_schema=>opts[:database] || self.opts[:database]}) if opts[:database] || !opts.include?(:database)
+        filt = SQL::BooleanExpression.new(:AND, filt, {:c__table_schema=>opts[:database] || self.opts[:database]}) if opts[:database] || !opts.include?(:database)
         filt
       end
 

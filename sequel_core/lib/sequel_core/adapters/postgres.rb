@@ -365,7 +365,7 @@ module Sequel
       def schema_ds_filter(table_name, opts)
         filt = super
         # Restrict it to the given or public schema, unless specifically requesting :schema = nil
-        filt = SQL::ComplexExpression.new(:AND, filt, {:c__table_schema=>opts[:schema] || 'public'}) if opts[:schema] || !opts.include?(:schema)
+        filt = SQL::BooleanExpression.new(:AND, filt, {:c__table_schema=>opts[:schema] || 'public'}) if opts[:schema] || !opts.include?(:schema)
         filt
       end
     end

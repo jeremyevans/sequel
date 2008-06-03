@@ -52,6 +52,8 @@ module Sequel
         "(#{args.collect{|a| literal(a)}.join(" #{op} ")})"
       when :NOT
         "NOT #{literal(args.at(0))}"
+      when :NOOP
+        literal(args.at(0))
       else
         raise(Sequel::Error, "invalid operator #{op}")
       end
@@ -107,8 +109,8 @@ module Sequel
       cond = cond.first if cond.size == 1
       cond = cond.sql_or if (Hash === cond) || ((Array === cond) && (cond.all_two_pairs?))
       cond = filter_expr(block || cond)
-      cond = SQL::ComplexExpression === cond ? ~cond : SQL::ComplexExpression.new(:NOT, cond)
-      cond = SQL::ComplexExpression.new(:AND, @opts[clause], cond) if @opts[clause]
+      cond = SQL::BooleanExpression.invert(cond)
+      cond = SQL::BooleanExpression.new(:AND, @opts[clause], cond) if @opts[clause]
       clone(clause => cond)
     end
 
@@ -135,7 +137,7 @@ module Sequel
     #     specified.
     # * String - taken literally
     # * Symbol - taken as a boolean column argument (e.g. WHERE active)
-    # * Sequel::SQL::ComplexExpression - an existing condition expression,
+    # * Sequel::SQL::BooleanExpression - an existing condition expression,
     #   probably created using the Sequel blockless filter DSL.
     #
     # filter also takes a block, but use of this is discouraged as it requires
@@ -169,7 +171,7 @@ module Sequel
       raise(Error::InvalidFilter, "Invalid filter specified. Did you mean to supply a block?") if cond === true || cond === false
       cond = transform_save(cond) if @transform if cond.is_a?(Hash)
       cond = filter_expr(block || cond)
-      cond = SQL::ComplexExpression.new(:AND, @opts[clause], cond) if @opts[clause] && !@opts[clause].blank?
+      cond = SQL::BooleanExpression.new(:AND, @opts[clause], cond) if @opts[clause] && !@opts[clause].blank?
       clone(clause => cond)
     end
     alias_method :where, :filter
@@ -215,11 +217,11 @@ module Sequel
 
     # Pattern match any of the columns to any of the terms.  The terms can be
     # strings (which use LIKE) or regular expressions (which are only supported
-    # in some databases).  See Sequel::SQL::ComplexExpression.like.  Note that the
+    # in some databases).  See Sequel::SQL::StringExpression.like.  Note that the
     # total number of pattern matches will be cols.length * terms.length,
     # which could cause performance issues.
     def grep(cols, terms)
-      filter(SQL::ComplexExpression.new(:OR, *Array(cols).collect{|c| SQL::ComplexExpression.like(c, *terms)}))
+      filter(SQL::BooleanExpression.new(:OR, *Array(cols).collect{|c| SQL::StringExpression.like(c, *terms)}))
     end
 
     # Returns a copy of the dataset with the results grouped by the value of 
@@ -312,12 +314,8 @@ module Sequel
       having, where = @opts[:having], @opts[:where]
       raise(Error, "No current filter") unless having || where
       o = {}
-      if having
-        o[:having] = SQL::ComplexExpression === having ? ~having : SQL::ComplexExpression.new(:NOT, having)
-      end
-      if where
-        o[:where] = SQL::ComplexExpression === where ? ~where : SQL::ComplexExpression.new(:NOT, where)
-      end
+      o[:having] = SQL::BooleanExpression.invert(having) if having
+      o[:where] = SQL::BooleanExpression.invert(where) if where
       clone(o)
     end
 
@@ -451,7 +449,7 @@ module Sequel
       clause = (@opts[:having] ? :having : :where)
       cond = cond.first if cond.size == 1
       if @opts[clause]
-        clone(clause => SQL::ComplexExpression.new(:OR, @opts[clause], filter_expr(block || cond)))
+        clone(clause => SQL::BooleanExpression.new(:OR, @opts[clause], filter_expr(block || cond)))
       else
         raise Error::NoExistingFilter, "No existing filter found."
       end
@@ -710,21 +708,23 @@ module Sequel
     def filter_expr(expr)
       case expr
       when Hash
-        SQL::ComplexExpression.from_value_pairs(expr)
+        SQL::BooleanExpression.from_value_pairs(expr)
       when Array
         if String === expr[0]
           filter_expr(expr.shift.gsub(QUESTION_MARK){literal(expr.shift)}.lit)
         else
-          SQL::ComplexExpression.from_value_pairs(expr)
+          SQL::BooleanExpression.from_value_pairs(expr)
         end
       when Proc
         expr.to_sql(self).lit
+      when SQL::NumericExpression, SQL::StringExpression
+        raise(Error, "Invalid SQL Expression type: #{expr.inspect}") 
       when Symbol, SQL::Expression
         expr
       when String
         "(#{expr})".lit
       else
-        raise(Sequel::Error, 'Invalid filter argument')
+        raise(Error, 'Invalid filter argument')
       end
     end
 

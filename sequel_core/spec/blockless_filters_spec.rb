@@ -8,6 +8,9 @@ context "Blockless Ruby Filters" do
     def @d.l(*args)
       literal(filter_expr(*args))
     end
+    def @d.lit(*args)
+      literal(*args)
+    end
   end
   
   it "should support boolean columns directly" do
@@ -113,7 +116,10 @@ context "Blockless Ruby Filters" do
   
   it "should not allow negation of non-boolean expressions" do
     proc{~(:x + 1 > 100)}.should_not raise_error 
-    proc{~(:x + 1)}.should raise_error(Sequel::Error)
+    proc{~(:x + 1)}.should raise_error
+    proc{~:x.sql_string}.should raise_error
+    proc{~:x.sql_number}.should raise_error
+    proc{~([:x, :y].sql_string_join)}.should raise_error
   end
 
   it "should not allow mathematical, inequality, or string operations on true, false, or nil" do
@@ -189,7 +195,7 @@ context "Blockless Ruby Filters" do
   it "should support LiteralString" do
     @d.l('x'.lit).should == '(x)'
     @d.l(~'x'.lit).should == 'NOT x'
-    @d.l(~~'x'.lit).should == '(x)'
+    @d.l(~~'x'.lit).should == 'x'
     @d.l(~(('x'.lit | :y) & :z)).should == '((NOT x AND NOT y) OR NOT z)'
     @d.l(~(:x | 'y'.lit)).should == '(NOT x AND NOT y)'
     @d.l(~('x'.lit & 'y'.lit)).should == '(NOT x OR NOT y)'
@@ -253,17 +259,17 @@ context "Blockless Ruby Filters" do
   end
   
   it "should support Array#sql_string_join for concatenation of SQL strings" do
-    @d.l([:x].sql_string_join).should == '(x)'
-    @d.l([:x].sql_string_join(', ')).should == '(x)'
-    @d.l([:x, :y].sql_string_join).should == '(x || y)'
-    @d.l([:x, :y].sql_string_join(', ')).should == "(x || ', ' || y)"
-    @d.l([:x[1], :y|1].sql_string_join).should == '(x(1) || y[1])'
-    @d.l([:x[1], 'y.z'.lit].sql_string_join(', ')).should == "(x(1) || ', ' || y.z)"
-    @d.l([:x, 1, :y].sql_string_join).should == "(x || '1' || y)"
-    @d.l([:x, 1, :y].sql_string_join(', ')).should == "(x || ', ' || '1' || ', ' || y)"
-    @d.l([:x, 1, :y].sql_string_join(:y__z)).should == "(x || y.z || '1' || y.z || y)"
-    @d.l([:x, 1, :y].sql_string_join(1)).should == "(x || '1' || '1' || '1' || y)"
-    @d.l([:x, :y].sql_string_join('y.x || x.y'.lit)).should == "(x || y.x || x.y || y)"
-    @d.l([[:x, :y].sql_string_join, [:a, :b].sql_string_join].sql_string_join).should == "((x || y) || (a || b))"
+    @d.lit([:x].sql_string_join).should == '(x)'
+    @d.lit([:x].sql_string_join(', ')).should == '(x)'
+    @d.lit([:x, :y].sql_string_join).should == '(x || y)'
+    @d.lit([:x, :y].sql_string_join(', ')).should == "(x || ', ' || y)"
+    @d.lit([:x[1], :y|1].sql_string_join).should == '(x(1) || y[1])'
+    @d.lit([:x[1], 'y.z'.lit].sql_string_join(', ')).should == "(x(1) || ', ' || y.z)"
+    @d.lit([:x, 1, :y].sql_string_join).should == "(x || '1' || y)"
+    @d.lit([:x, 1, :y].sql_string_join(', ')).should == "(x || ', ' || '1' || ', ' || y)"
+    @d.lit([:x, 1, :y].sql_string_join(:y__z)).should == "(x || y.z || '1' || y.z || y)"
+    @d.lit([:x, 1, :y].sql_string_join(1)).should == "(x || '1' || '1' || '1' || y)"
+    @d.lit([:x, :y].sql_string_join('y.x || x.y'.lit)).should == "(x || y.x || x.y || y)"
+    @d.lit([[:x, :y].sql_string_join, [:a, :b].sql_string_join].sql_string_join).should == "((x || y) || (a || b))"
   end
 end
