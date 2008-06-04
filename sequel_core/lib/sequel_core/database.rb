@@ -396,6 +396,15 @@ module Sequel
         else
           raise ArgumentError, "invalid value for Date: #{value.inspect}"
         end
+      when :time
+        case value
+        when Time
+          value
+        when String
+          value.to_time
+        else
+          raise ArgumentError, "invalid value for Time: #{value.inspect}"
+        end
       when :datetime
         raise(ArgumentError, "invalid value for #{tc}: #{value.inspect}") unless value.is_one_of?(DateTime, Date, Time, String)
         if Sequel.time_class === value

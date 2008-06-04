@@ -231,10 +231,12 @@ module Sequel
           :integer
         when /\A(character( varying)?|varchar|text)\z/
           :string
-        when /\A(date)\z/
+        when /\Adate\z/
           :date
-        when /\A(datetime|time|timestamp( with(out)? time zone)?)\z/
+        when /\A(datetime|timestamp( with(out)? time zone)?)\z/
           :datetime
+        when /\Atime( with(out)? time zone)?\z/
+          :time
         when /\A(boolean|tinyint)\z/
           :boolean
         when /\A(real|float|double( precision)?)\z/

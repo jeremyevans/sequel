@@ -832,6 +832,25 @@ describe Sequel::Model, "typecasting" do
     proc{@c.new.x = 'a'}.should raise_error
   end
 
+  specify "should convert to time for a time field" do
+    @c.instance_variable_set(:@db_schema, {:x=>{:type=>:time}})
+    m = @c.new
+    x = '10:20:30'
+    y = x.to_time
+    m.x = x
+    m.x.should == y
+    m.x = y
+    m.x.should == y
+  end
+
+  specify "should raise an error if invalid data is used in a time field" do
+    @c.instance_variable_set(:@db_schema, {:x=>{:type=>:time}})
+    proc{@c.new.x = '0000'}.should raise_error
+    proc{@c.new.x = 'a'}.should_not raise_error # Valid Time
+    proc{@c.new.x = '2008-10-21'.to_date}.should raise_error
+    proc{@c.new.x = '2008-10-21'.to_datetime}.should raise_error
+  end
+
   specify "should convert to the Sequel.time_class for a datetime field" do
     @c.instance_variable_set(:@db_schema, {:x=>{:type=>:datetime}})
     m = @c.new

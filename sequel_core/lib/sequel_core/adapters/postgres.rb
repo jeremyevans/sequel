@@ -159,21 +159,22 @@ module Sequel
     end
 
     PG_TYPES = {
-      16 => lambda{ |s| Adapter.string_to_bool(s) },
-      17 => lambda{ |s| Adapter.unescape_bytea(s) },
-      20 => lambda{ |s| s.to_i },
-      21 => lambda{ |s| s.to_i },
-      22 => lambda{ |s| s.to_i },
-      23 => lambda{ |s| s.to_i },
-      26 => lambda{ |s| s.to_i },
-      700 => lambda{ |s| s.to_f },
-      701 => lambda{ |s| s.to_f },
-      790 => lambda{ |s| s.to_f },
-      1082 => lambda{ |s| s.to_date },
-      1083 => lambda{ |s| s.to_time },
-      1114 => lambda{ |s| s.to_time },
-      1184 => lambda{ |s| s.to_time },
-      1186 => lambda{ |s| s.to_i }
+      16 => lambda{ |s| Adapter.string_to_bool(s) }, # boolean
+      17 => lambda{ |s| Adapter.unescape_bytea(s) }, # bytea
+      20 => lambda{ |s| s.to_i }, # int8
+      21 => lambda{ |s| s.to_i }, # int2
+      22 => lambda{ |s| s.to_i }, # int2vector
+      23 => lambda{ |s| s.to_i }, # int4
+      26 => lambda{ |s| s.to_i }, # oid
+      700 => lambda{ |s| s.to_f }, # float4
+      701 => lambda{ |s| s.to_f }, # float8
+      790 => lambda{ |s| s.to_d }, # money
+      1082 => lambda{ |s| s.to_date }, # date
+      1083 => lambda{ |s| s.to_time }, # time without time zone
+      1114 => lambda{ |s| s.to_sequel_time }, # timestamp without time zone
+      1184 => lambda{ |s| s.to_sequel_time }, # timestamp with time zone
+      1186 => lambda{ |s| s.to_i }, # interval
+      1266 => lambda{ |s| s.to_time } # time with time zone
     }
 
     if Adapter.respond_to?(:translate_results=)

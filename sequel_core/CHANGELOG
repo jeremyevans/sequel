@@ -1,5 +1,9 @@
 === master
 
+* Have PostgreSQL money type use BigDecimal instead of Float (jeremyevans)
+
+* Have the PostgreSQL and MySQL adapters use the Sequel.time_class setting for datetime/timestamp types (jeremyevans)
+
 * Add Sequel.time_class and String#to_sequel_time, used for converting time values from the database to either Time (default) or DateTime (jeremyevans)
 
 * Make identifier quoting uppercase by default, to work better with the SQL standard, override in PostgreSQL (jeremyevans) (#232)
