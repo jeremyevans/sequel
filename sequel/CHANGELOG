@@ -1,4 +1,4 @@
-=== master
+=== 2.0.1 (2008-06-04)
 
 * Make the choice of Time or DateTime optional for typecasting :datetime types, default to Time (jeremyevans)
 
