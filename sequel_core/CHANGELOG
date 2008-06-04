@@ -1,5 +1,7 @@
 === master
 
+* Add Sequel.time_class and String#to_sequel_time, used for converting time values from the database to either Time (default) or DateTime (jeremyevans)
+
 * Make identifier quoting uppercase by default, to work better with the SQL standard, override in PostgreSQL (jeremyevans) (#232)
 
 * Add StringExpression#+, for simple SQL string concatenation (:x.sql_string + :y) (jeremyevans)

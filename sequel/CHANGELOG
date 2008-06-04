@@ -1,5 +1,7 @@
 === master
 
+* Make the choice of Time or DateTime optional for typecasting :datetime types, default to Time (jeremyevans)
+
 * Reload database schema for table when calling Model.create_table (jeremyevans)
 
 === 2.0.0 (2008-06-01)

@@ -21,7 +21,15 @@ end
 # object, which is closed when the block exits.  For example:
 #
 #   Sequel.sqlite('blog.db'){|db| puts db.users.count}  
+#
+# Sequel can use either Time or DateTime for times returned from the
+# database.  It defaults to Time.  To change it to DateTime, use:
+#
+#   Sequel.time_class = DateTime
 module Sequel
+  @time_class = Time
+  metaattr_accessor :time_class
+
   # Creates a new database object based on the supplied connection string
   # and optional arguments.  The specified scheme determines the database
   # class used, and the rest of the string specifies the connection options.

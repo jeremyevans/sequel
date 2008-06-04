@@ -701,6 +701,10 @@ describe Sequel::Model, "typecasting" do
     end
   end
 
+  teardown do
+    Sequel.time_class = Time
+  end
+
   specify "should not convert if typecasting is turned off" do
     @c.typecast_on_assignment = false
     @c.instance_variable_set(:@db_schema, {:x=>{:type=>:integer}})
@@ -828,25 +832,38 @@ describe Sequel::Model, "typecasting" do
     proc{@c.new.x = 'a'}.should raise_error
   end
 
-  specify "should convert to date for a datetime field" do
+  specify "should convert to the Sequel.time_class for a datetime field" do
     @c.instance_variable_set(:@db_schema, {:x=>{:type=>:datetime}})
     m = @c.new
-    m.x = '2007-10-21 10:20:30'
-    m.x.should == '2007-10-21 10:20:30'.to_datetime
-    y = DateTime.new(2007,10,21,10,20,30)
-    m.x = '2007-10-21 10:20:30'
+    x = '2007-10-21T10:20:30-07:00'
+    y = x.to_time
+    m.x = x
     m.x.should == y
-    m.x = '2007-10-21 10:20:30'.to_datetime
+    m.x = x.to_datetime
     m.x.should == y
-    m.x = '2007-10-21 10:20:30'.to_time
+    m.x = x.to_time
     m.x.should == y
     m.x = '2007-10-21'.to_date
-    m.x.should == DateTime.new(2007,10,21)
+    m.x.should == '2007-10-21'.to_time
+    Sequel.time_class = DateTime
+    y = x.to_datetime
+    m.x = x
+    m.x.should == y
+    m.x = x.to_datetime
+    m.x.should == y
+    m.x = x.to_time
+    m.x.should == y
+    m.x = '2007-10-21'.to_date
+    m.x.should == '2007-10-21'.to_datetime
   end
 
   specify "should raise an error if invalid data is used in a datetime field" do
     @c.instance_variable_set(:@db_schema, {:x=>{:type=>:datetime}})
-    proc{@c.new.x = 'a'}.should raise_error
+    proc{@c.new.x = '0000'}.should raise_error
+    proc{@c.new.x = ''}.should_not raise_error # Valid Time
+    Sequel.time_class = DateTime
+    proc{@c.new.x = '0000'}.should raise_error
+    proc{@c.new.x = ''}.should raise_error
   end
 
 end

@@ -397,17 +397,14 @@ module Sequel
           raise ArgumentError, "invalid value for Date: #{value.inspect}"
         end
       when :datetime
-        case value
-        when DateTime
+        raise(ArgumentError, "invalid value for #{tc}: #{value.inspect}") unless value.is_one_of?(DateTime, Date, Time, String)
+        if Sequel.time_class === value
+          # Already the correct class, no need to convert
           value
-        when Date
-          DateTime.new(value.year, value.month, value.day)
-        when Time
-          DateTime.new(value.year, value.month, value.day, value.hour, value.min, value.sec)
-        when String
-          value.to_datetime
         else
-          raise ArgumentError, "invalid value for DateTime: #{value.inspect}"
+          # First convert it to standard ISO 8601 time, then
+          # parse that string using the time class.
+          (Time === value ? value.iso8601 : value.to_s).to_sequel_time
         end
       else
         value
