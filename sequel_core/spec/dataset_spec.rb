@@ -1183,7 +1183,7 @@ end
 
 context "Dataset#join_table" do
   setup do
-    @d = Sequel::Dataset.new(nil).from(:items)
+    @d = MockDataset.new(nil).from(:items)
     @d.quote_identifiers = true
   end
   
@@ -1269,7 +1269,7 @@ context "Dataset#join_table" do
     @d.from('stats').join('players', {:id => :player_id}, 'p').sql.should ==
       'SELECT * FROM "stats" INNER JOIN "players" "p" ON ("p"."id" = "stats"."player_id")'
 
-    ds = Sequel::Dataset.new(nil).from(:foo => :f)
+    ds = MockDataset.new(nil).from(:foo => :f)
     ds.quote_identifiers = true
     ds.join_table(:inner, :bar, :id => :bar_id).sql.should ==
       'SELECT * FROM "foo" "f" INNER JOIN "bar" ON ("bar"."id" = "f"."bar_id")'

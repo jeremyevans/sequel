@@ -371,6 +371,9 @@ module Sequel
     end
   
     class Dataset < Sequel::Dataset
+      def quoted_identifier(c)
+        "\"#{c}\""
+      end
       
       PG_TIMESTAMP_FORMAT = "TIMESTAMP '%Y-%m-%d %H:%M:%S".freeze
 

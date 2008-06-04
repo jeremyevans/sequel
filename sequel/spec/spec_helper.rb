@@ -26,6 +26,10 @@ class MockDataset < Sequel::Dataset
     @db.execute(sql)
     yield({:id => 1, :x => 1})
   end
+
+  def quoted_identifier(c)
+    "\"#{c}\""
+  end
 end
 
 class MockDatabase < Sequel::Database

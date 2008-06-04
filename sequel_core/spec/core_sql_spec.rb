@@ -213,7 +213,7 @@ end
 
 context "Symbol#to_column_ref" do
   setup do
-    @ds = Sequel::Dataset.new(nil)
+    @ds = MockDataset.new(nil)
   end
   
   specify "should convert qualified symbol notation into dot notation" do

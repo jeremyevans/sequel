@@ -492,11 +492,17 @@ module Sequel
     end
     alias_method :quote_column_ref, :quote_identifier
 
-    # This method quotes the given name with the SQL standard double quote. It
+    # This method quotes the given name with the SQL standard double quote. 
+    # It uppercases the name given to conform with the SQL standard. This
     # should be overridden by subclasses to provide quoting not matching the
-    # SQL standard, such as backtick (used by MySQL and SQLite). 
+    # SQL standard, such as backtick (used by MySQL and SQLite), or where
+    # lowercase is the default for unquoted identifiers (PostgreSQL).
+    #
+    # If you are using a database such as Oracle that defaults to uppercase
+    # but you are using lower case identifiers, you should override this
+    # method to not upcase the name for those identifiers.
     def quoted_identifier(name)
-      "\"#{name}\""
+      "\"#{name.to_s.upcase}\""
     end
 
     # Returns a copy of the dataset with the order reversed. If no order is
