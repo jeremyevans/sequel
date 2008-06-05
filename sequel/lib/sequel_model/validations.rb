@@ -182,7 +182,7 @@ module Validation
     #     object.errors[attribute] << 'is not nice' unless value.nice?
     #   end
     def validates_each(*atts, &block)
-      atts.each {|a| validations[a] << block}
+      atts.each{|a| validations[a] << block}
     end
 
     # Validates the format of an attribute.
@@ -299,11 +299,13 @@ module Validation
     end
     
     protected
+
     def if_proc(opts)
       case opts[:if]
-      when Symbol then proc {send opts[:if]}
+      when Symbol then proc{send opts[:if]}
       when Proc then opts[:if]
-      else proc {true}
+      when nil then proc{true}
+      else raise(::Sequel::Error, "invalid value for :if validation option")
       end
     end
   end

@@ -217,6 +217,24 @@ describe "Validations" do
     @m.should be_valid
   end
 
+  specify "should validate acceptance_of with if proc that evaluates to true" do
+    @c.validates_acceptance_of :value, :if => proc{true}
+    @m.value = '0'
+    @m.should_not be_valid
+  end
+
+  specify "should validate acceptance_of with if proc that evaluates to false" do
+    @c.validates_acceptance_of :value, :if => proc{false}
+    @m.value = '0'
+    @m.should be_valid
+  end
+
+  specify "should raise an error if :if option is not a Symbol, Proc, or nil" do
+    @c.validates_acceptance_of :value, :if => 1
+    @m.value = '0'
+    proc{@m.valid?}.should raise_error(Sequel::Error)
+  end
+
   specify "should validate confirmation_of" do
     @c.send(:attr_accessor, :value_confirmation)
     @c.validates_confirmation_of :value
