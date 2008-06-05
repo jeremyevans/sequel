@@ -350,6 +350,15 @@ describe Sequel::Model, "one_to_many" do
     MODEL_DB.sqls.should == ['UPDATE attributes SET node_id = NULL WHERE (id = 2345)']
   end
   
+  it "should raise an error in add_ and remove_ if the passed object returns false to save (is not valid)" do
+    @c2.one_to_many :attributes, :class => @c1
+    n = @c2.new(:id => 1234)
+    a = @c1.new(:id => 2345)
+    def a.valid?; false; end
+    proc{n.add_attribute(a)}.should raise_error(Sequel::Error)
+    proc{n.remove_attribute(a)}.should raise_error(Sequel::Error)
+  end
+
   it "should support a select option" do
     @c2.one_to_many :attributes, :class => @c1, :select => [:id, :name]
 
@@ -555,7 +564,7 @@ describe Sequel::Model, "one_to_many" do
     d = @c1.dataset
     def d.fetch_rows(s); end
     node.attributes.should == []
-    def attrib.save!; end
+    def attrib.save!; self end
     node.add_attribute(attrib)
     node.instance_variable_get(:@attributes).should == [attrib]
     node.remove_all_attributes.should == [attrib]
@@ -577,11 +586,63 @@ describe Sequel::Model, "one_to_many" do
     node = @c2.new(:id => 1234)
     node.attributes.should == []
     attrib.node.should == nil
-    def attrib.save!; end
+    def attrib.save!; self end
     node.add_attribute(attrib)
     attrib.instance_variable_get(:@node).should == node 
     node.remove_all_attributes
     attrib.instance_variable_get(:@node).should == :null
+  end
+
+  it "should add a getter method if the :one_to_one option is true" do
+    @c2.one_to_many :attributes, :class => @c1, :one_to_one=>true
+    att = @c2.new(:id => 1234).attribute
+    MODEL_DB.sqls.should == ['SELECT attributes.* FROM attributes WHERE (node_id = 1234)']
+    att.should be_a_kind_of(@c1)
+    att.values.should == {}
+  end
+
+  it "should have the getter method raise an error if more than one record is found" do
+    @c2.one_to_many :attributes, :class => @c1, :one_to_one=>true
+    d = @c1.dataset
+    def d.fetch_rows(s); 2.times{yield Hash.new} end
+    proc{@c2.new(:id => 1234).attribute}.should raise_error(Sequel::Error)
+  end
+
+  it "should add a setter method if the :one_to_one option is true" do
+    @c2.one_to_many :attributes, :class => @c1, :one_to_one=>true
+    attrib = @c1.new(:id=>3)
+    d = @c1.dataset
+    def d.fetch_rows(s); yield({:id=>3}) end
+    @c2.new(:id => 1234).attribute = attrib
+    ['INSERT INTO attributes (node_id, id) VALUES (1234, 3)',
+      'INSERT INTO attributes (id, node_id) VALUES (3, 1234)'].should(include(MODEL_DB.sqls.first))
+    MODEL_DB.sqls.last.should == 'UPDATE attributes SET node_id = NULL WHERE ((node_id = 1234) AND (id != 3))'
+    MODEL_DB.sqls.length.should == 2
+    @c2.new(:id => 1234).attribute.should == attrib
+    MODEL_DB.sqls.clear
+    attrib = @c1.load(:id=>3)
+    @c2.new(:id => 1234).attribute = attrib
+    MODEL_DB.sqls.should == ['UPDATE attributes SET node_id = 1234, id = 3 WHERE (id = 3)',
+      'UPDATE attributes SET node_id = NULL WHERE ((node_id = 1234) AND (id != 3))']
+  end
+
+  it "should raise an error if the one_to_one getter would be the same as the association name" do
+    proc{@c2.one_to_many :song, :class => @c1, :one_to_one=>true}.should raise_error(Sequel::Error)
+  end
+
+  it "should not create remove_ and remove_all methods if :one_to_one option is used" do
+    @c2.one_to_many :attributes, :class => @c1, :one_to_one=>true
+    @c2.new.should_not(respond_to(:remove_attribute))
+    @c2.new.should_not(respond_to(:remove_all_attributes))
+  end
+
+  it "should make non getter and setter methods private if :one_to_one option is used" do 
+    @c2.one_to_many :attributes, :class => @c1, :one_to_one=>true do |ds| end
+    meths = @c2.private_instance_methods(false)
+    meths.should(include("attributes"))
+    meths.should(include("add_attribute"))
+    meths.should(include("attributes_dataset"))
+    meths.should(include("attributes_helper"))
   end
 end
 

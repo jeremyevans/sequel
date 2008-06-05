@@ -68,6 +68,12 @@ module Sequel::Model::Associations
   #   model object can be associated with many current model objects.
   #   Similar to ActiveRecord/DataMapper's has_and_belongs_to_many.
   #
+  # A one to one relationship can be set up with a many_to_one association
+  # on the table with the foreign key, and a one_to_many association with the
+  # :one_to_one option specified on the table without the foreign key.  The
+  # two associations will operate similarly, except that the many_to_one
+  # association setter doesn't update the database until you call save manually.
+  # 
   # The following options can be supplied:
   # * *ALL types*:
   #   - :allow_eager - If set to false, you cannot load the association eagerly
@@ -105,6 +111,14 @@ module Sequel::Model::Associations
   #   - :key - foreign key in associated model's table that references
   #     current model's primary key, as a symbol.  Defaults to
   #     :"#{self.name.underscore}_id".
+  #   - :one_to_one: Create a getter and setter similar to those of many_to_one
+  #     associations.  The getter returns a singular matching record, or raises an
+  #     error if multiple records match.  The setter updates the record given and removes
+  #     associations with all other records. When this option is used, the other
+  #     association methods usually added are either removed or made private,
+  #     so using this is similar to using many_to_one, in terms of the methods
+  #     it adds, the main difference is that the foreign key is in the associated
+  #     table instead of the current table.
   # * :many_to_many:
   #   - :join_table - name of table that includes the foreign keys to both
   #     the current model and the associated model, as a symbol.  Defaults to the name
@@ -334,12 +348,15 @@ module Sequel::Model::Associations
     ivar = association_ivar(name)
     key = (opts[:key] ||= default_remote_key)
     opts[:class_name] ||= name.to_s.singularize.camelize
+    add_meth = association_add_method_name(name)
+    remove_meth = association_remove_method_name(name)
+    remove_all_meth = association_remove_all_method_name(name)
     
     def_association_dataset_methods(name, opts) {opts.associated_class.select(*opts.select).filter(key => pk)}
     
-    class_def(association_add_method_name(name)) do |o|
+    class_def(add_meth) do |o|
       o.send(:"#{key}=", pk)
-      o.save!
+      o.save || raise(Sequel::Error, "invalid associated object, cannot save")
       if arr = instance_variable_get(ivar)
         arr.push(o)
       end
@@ -348,9 +365,9 @@ module Sequel::Model::Associations
       end
       o
     end
-    class_def(association_remove_method_name(name)) do |o|
+    class_def(remove_meth) do |o|
       o.send(:"#{key}=", nil)
-      o.save!
+      o.save || raise(Sequel::Error, "invalid associated object, cannot save")
       if arr = instance_variable_get(ivar)
         arr.delete(o)
       end
@@ -359,7 +376,7 @@ module Sequel::Model::Associations
       end
       o
     end
-    class_def(association_remove_all_method_name(name)) do
+    class_def(remove_all_meth) do
       opts.associated_class.filter(key=>pk).update(key=>nil)
       if arr = instance_variable_get(ivar)
         ret = arr.dup
@@ -369,6 +386,25 @@ module Sequel::Model::Associations
       end
       instance_variable_set(ivar, [])
       ret
+    end
+    if opts[:one_to_one]
+      remove_method remove_meth, remove_all_meth
+      private add_meth, name, :"#{name}_dataset"
+      private :"#{name}_helper" if instance_methods.include?("#{name}_helper")
+      n = name.to_s.singularize.to_sym
+      raise(Sequel::Error, "one_to_many association names should still be plural even when using the :one_to_one option") if n == name
+      class_def(n) do |*o|
+        objs = send(name, *o)
+        raise(Sequel::Error, "multiple values found for a one-to-one relationship") if objs.length > 1
+        objs.first
+      end
+      class_def(:"#{n}=") do |o|
+        klass = opts.associated_class
+        model.db.transaction do
+          send(add_meth, o)
+          klass.filter(Sequel::SQL::BooleanExpression.new(:AND, {key=>pk}, ~{klass.primary_key=>o.pk}.sql_expr)).update(key=>nil)
+        end
+      end
     end
   end
   
