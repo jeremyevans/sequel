@@ -1321,6 +1321,11 @@ context "Dataset#join_table" do
     @d.join(ds, :item_id => :id).sql.should ==
       'SELECT * FROM "items" INNER JOIN "categories" ON ("categories"."item_id" = "items"."id")'
   end
+  
+  specify "should support using a proc as the join condition" do
+    @d.join(:categories, proc { :c__item_id == :items__id }, :c).sql.should ==
+      'SELECT * FROM "items" INNER JOIN "categories" "c" ON ("c"."item_id" = "items"."id")'
+  end
 end
 
 context "Dataset#[]=" do

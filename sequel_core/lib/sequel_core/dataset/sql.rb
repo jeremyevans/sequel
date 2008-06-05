@@ -349,11 +349,15 @@ module Sequel
         table_ref(table)
       end
 
-      expr = [[expr, :id]] unless expr.is_one_of?(Hash, Array)
-      join_conditions = expr.collect do |k, v|
-        k = qualified_column_name(k, table_alias) if k.is_a?(Symbol)
-        v = qualified_column_name(v, @opts[:last_joined_table] || first_source) if v.is_a?(Symbol)
-        [k,v]
+      expr = [[expr, :id]] unless expr.is_one_of?(Hash, Array, Proc)
+      join_conditions = if expr.is_a? Proc
+          expr
+        else
+          expr.collect do |k, v|
+          k = qualified_column_name(k, table_alias) if k.is_a?(Symbol)
+          v = qualified_column_name(v, @opts[:last_joined_table] || first_source) if v.is_a?(Symbol)
+          [k,v]
+        end
       end
 
       quoted_table_alias = quote_identifier(table_alias) 
