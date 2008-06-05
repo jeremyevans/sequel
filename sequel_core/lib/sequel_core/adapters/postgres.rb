@@ -63,7 +63,7 @@ module Sequel
         end
       end
     
-      attr_accessor :transaction_in_progress
+      attr_accessor :transaction_depth
       
       SELECT_CURRVAL = "SELECT currval('%s')".freeze
           
@@ -291,35 +291,50 @@ module Sequel
       end
     
       SQL_BEGIN = 'BEGIN'.freeze
+      SQL_SAVEPOINT = 'SAVEPOINT autopoint_%d'.freeze
       SQL_COMMIT = 'COMMIT'.freeze
+      SQL_ROLLBACK_TO_SAVEPOINT = 'ROLLBACK TO SAVEPOINT autopoint_%d'.freeze
       SQL_ROLLBACK = 'ROLLBACK'.freeze
+      SQL_RELEASE_SAVEPOINT = 'RELEASE SAVEPOINT autopoint_%d'.freeze
   
       def transaction
         @pool.hold do |conn|
-          if conn.transaction_in_progress
-            yield conn
+          conn.transaction_depth = 0 if conn.transaction_depth.nil?
+          if conn.transaction_depth > 0
+            log_info(SQL_SAVEPOINT % conn.transaction_depth)
+            conn.execute(SQL_SAVEPOINT % conn.transaction_depth)
           else
             log_info(SQL_BEGIN)
             conn.execute(SQL_BEGIN)
-            begin
-              conn.transaction_in_progress = true
-              yield
-            rescue ::Exception => e
+          end
+          begin
+            conn.transaction_depth += 1
+            yield
+          rescue ::Exception => e
+            if conn.transaction_depth > 1
+              log_info(SQL_ROLLBACK_TO_SAVEPOINT % [conn.transaction_depth - 1])
+              conn.execute(SQL_ROLLBACK_TO_SAVEPOINT % [conn.transaction_depth - 1])
+            else
               log_info(SQL_ROLLBACK)
               conn.execute(SQL_ROLLBACK) rescue nil
-              raise convert_pgerror(e) unless Error::Rollback === e
-            ensure
-              unless e
-                begin
+            end
+            raise convert_pgerror(e) unless Error::Rollback === e
+          ensure
+            unless e
+              begin
+                if conn.transaction_depth < 2
                   log_info(SQL_COMMIT)
                   conn.execute(SQL_COMMIT)
-                rescue => e
-                  log_info(e.message)
-                  raise convert_pgerror(e)
+                else
+                  log_info(SQL_RELEASE_SAVEPOINT % [conn.transaction_depth - 1])
+                  conn.execute(SQL_RELEASE_SAVEPOINT % [conn.transaction_depth - 1])
                 end
+              rescue => e
+                log_info(e.message)
+                raise convert_pgerror(e)
               end
-              conn.transaction_in_progress = nil
             end
+            conn.transaction_depth -= 1
           end
         end
       end

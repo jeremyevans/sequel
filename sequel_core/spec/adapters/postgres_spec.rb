@@ -39,7 +39,10 @@ context "A PostgreSQL database" do
   end
 
   specify "should correctly parse the schema" do
-    @db.schema(:test3, :reload=>true).should == [[:value, {:type=>:integer, :allow_null=>true, :max_chars=>0, :default=>nil, :db_type=>"integer", :numeric_precision=>32}], [:time, {:type=>:datetime, :allow_null=>true, :max_chars=>0, :default=>nil, :db_type=>"timestamp without time zone", :numeric_precision=>0}]]
+    @db.schema(:test3, :reload=>true).should == [
+      [:value, {:type=>:integer, :allow_null=>true, :max_chars=>nil, :default=>nil, :db_type=>"integer", :numeric_precision=>32}],
+      [:time, {:type=>:datetime, :allow_null=>true, :max_chars=>nil, :default=>nil, :db_type=>"timestamp without time zone", :numeric_precision=>nil}]
+    ]
   end
 
   specify "should get the schema all database tables if no table name is used" do
@@ -200,6 +203,31 @@ context "A PostgreSQL dataset" do
     end.should raise_error(Interrupt)
 
     @d.count.should == 2
+  end
+
+  specify "should support nested transactions through savepoints" do
+    POSTGRES_DB.transaction do
+      @d << {:name => '1'}
+      POSTGRES_DB.transaction do
+        @d << {:name => '2'}
+        POSTGRES_DB.transaction do
+          @d << {:name => '3'}
+          raise Sequel::Error::Rollback
+        end
+        @d << {:name => '4'}
+        POSTGRES_DB.transaction do
+          @d << {:name => '6'}
+          POSTGRES_DB.transaction do
+            @d << {:name => '7'}
+          end
+          raise Sequel::Error::Rollback
+        end
+        @d << {:name => '5'}
+      end
+    end
+
+    @d.count.should == 4
+    @d.order(:name).map(:name).should == %w{1 2 4 5}
   end
 
   specify "should support regexps" do
