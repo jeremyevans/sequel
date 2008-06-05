@@ -1302,7 +1302,14 @@ context "Dataset#join_table" do
     @d.join_table(:left_outer, ds, :item_id => :id).sql.should ==
       'SELECT * FROM "items" LEFT OUTER JOIN (SELECT * FROM categories WHERE (active = \'t\')) "t1" ON ("t1"."item_id" = "items"."id")'
   end
-
+  
+  specify "should support joining datasets and aliasing the join" do
+    ds = Sequel::Dataset.new(nil).from(:categories)
+    
+    @d.join_table(:left_outer, ds, {:ds__item_id => :id}, :ds).sql.should ==
+      'SELECT * FROM "items" LEFT OUTER JOIN (SELECT * FROM categories) "ds" ON ("ds"."item_id" = "items"."id")'      
+  end
+  
   specify "should support joining multiple datasets" do
     ds = Sequel::Dataset.new(nil).from(:categories)
     ds2 = Sequel::Dataset.new(nil).from(:nodes).select(:name)

@@ -338,9 +338,9 @@ module Sequel
       raise(Error::InvalidJoinType, "Invalid join type: #{type}") unless join_type = JOIN_TYPES[type || :inner]
 
       table = if Dataset === table
-        table_alias = unless table_alias
+        if table_alias.nil?
           table_alias_num = (@opts[:num_dataset_sources] || 0) + 1
-          "t#{table_alias_num}"
+          table_alias = "t#{table_alias_num}"
         end
         table.to_table_reference
       else
