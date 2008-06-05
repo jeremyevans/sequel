@@ -33,6 +33,13 @@ describe Sequel::Model, "create_table" do
     MODEL_DB.sqls.should == ['CREATE TABLE items (name text, price float NOT NULL)']
   end
 
+  it "should reload the schema from the database" do
+    schem = {:name=>{:type=>:string}, :price=>{:type=>:float}}
+    @model.db.should_receive(:schema).with(:items, :reload=>true).and_return(schem.to_a.sort_by{|x| x[0].to_s})
+    @model.create_table
+    @model.db_schema.should == schem
+    @model.instance_variable_get(:@columns).should == [:name, :price]
+  end
 end
 
 describe Sequel::Model, "drop_table" do
