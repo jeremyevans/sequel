@@ -1,3 +1,9 @@
+=== HEAD
+
+* Add savepoint/nesting support to postgresql transactions (elven)
+
+* Use the specified table alias when joining a dataset, instead of the automatically generated alias (brushbox)
+
 === 2.0.1 (2008-06-04)
 
 * Have PostgreSQL money type use BigDecimal instead of Float (jeremyevans)
