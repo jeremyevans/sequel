@@ -22,6 +22,10 @@ module Sequel
   #
   #   DB = Sequel.open ('sqlite://mydb')
   #   CreateSessions.apply(DB, :up)
+  #
+  # See Sequel::Schema::Generator for the syntax to use for creating tables,
+  # and Sequel::Schema::AlterTableGenerator for the syntax to use when
+  # altering existing tables.
   class Migration
     # Creates a new instance of the migration and sets the @db attribute.
     def initialize(db)
