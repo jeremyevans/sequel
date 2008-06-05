@@ -18,6 +18,10 @@
 
 * Add StringExpression#+, for simple SQL string concatenation (:x.sql_string + :y) (jeremyevans)
 
+* Make StringMethods.like to a case sensensitive search on MySQL (use ilike for the old behavior) (jeremyevans)
+
+* Add StringMethods.ilike, for case insensitive pattern matching (jeremyevans)
+
 * Refactor ComplexExpression into three subclasses and a few modules, so operators that don't make sense are not defined for the class (jeremyevans)
 
 === 2.0.0 (2008-06-01)
