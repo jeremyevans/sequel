@@ -172,6 +172,15 @@ describe "Validations" do
       attr_accessor :value
       attr_reader :before_validation, :after_validation
       include Validation
+      
+      def self.filter(*args)
+        o = Object.new
+        def o.count; 2; end
+        o
+      end
+
+      def skip; false; end
+      def dont_skip; true; end
     end
     @m = @c.new
   end
@@ -196,6 +205,18 @@ describe "Validations" do
     @m.should_not be_valid
   end
 
+  specify "should validate acceptance_of with if => true" do
+    @c.validates_acceptance_of :value, :if => :dont_skip
+    @m.value = '0'
+    @m.should_not be_valid
+  end
+
+  specify "should validate acceptance_of with if => false" do
+    @c.validates_acceptance_of :value, :if => :skip
+    @m.value = '0'
+    @m.should be_valid
+  end
+
   specify "should validate confirmation_of" do
     @c.send(:attr_accessor, :value_confirmation)
     @c.validates_confirmation_of :value
@@ -204,6 +225,22 @@ describe "Validations" do
     @m.should_not be_valid
     
     @m.value_confirmation = 'blah'
+    @m.should be_valid
+  end
+  
+  specify "should validate confirmation_of with if => true" do
+    @c.send(:attr_accessor, :value_confirmation)
+    @c.validates_confirmation_of :value, :if => :dont_skip
+
+    @m.value = 'blah'
+    @m.should_not be_valid
+  end
+
+  specify "should validate confirmation_of with if => false" do
+    @c.send(:attr_accessor, :value_confirmation)
+    @c.validates_confirmation_of :value, :if => :skip
+
+    @m.value = 'blah'
     @m.should be_valid
   end
 
@@ -218,6 +255,20 @@ describe "Validations" do
   specify "should raise for validate_format_of without regexp" do
     proc {@c.validates_format_of :value}.should raise_error(ArgumentError)
     proc {@c.validates_format_of :value, :with => :blah}.should raise_error(ArgumentError)
+  end
+  
+  specify "should validate format_of with if => true" do
+    @c.validates_format_of :value, :with => /_/, :if => :dont_skip
+
+    @m.value = 'a'
+    @m.should_not be_valid
+  end
+
+  specify "should validate format_of with if => false" do
+    @c.validates_format_of :value, :with => /_/, :if => :skip
+
+    @m.value = 'a'
+    @m.should be_valid
   end
   
   specify "should validate length_of with maximum" do
@@ -265,6 +316,20 @@ describe "Validations" do
     @m.should be_valid
   end
 
+  specify "should validate length_of with if => true" do
+    @c.validates_length_of :value, :is => 3, :if => :dont_skip
+
+    @m.value = 'a'
+    @m.should_not be_valid
+  end
+
+  specify "should validate length_of with if => false" do
+    @c.validates_length_of :value, :is => 3, :if => :skip
+
+    @m.value = 'a'
+    @m.should be_valid
+  end
+
   specify "should validate numericality_of" do
     @c.validates_numericality_of :value
     @m.value = 'blah'
@@ -301,12 +366,56 @@ describe "Validations" do
     @m.should_not be_valid
   end
   
+  specify "should validate numericality_of with if => true" do
+    @c.validates_numericality_of :value, :if => :dont_skip
+
+    @m.value = 'a'
+    @m.should_not be_valid
+  end
+
+  specify "should validate numericality_of with if => false" do
+    @c.validates_numericality_of :value, :if => :skip
+
+    @m.value = 'a'
+    @m.should be_valid
+  end
+
   specify "should validate presence_of" do
     @c.validates_presence_of :value
     @m.should_not be_valid
     @m.value = ''
     @m.should_not be_valid
     @m.value = 1234
+    @m.should be_valid
+  end
+
+  specify "should validate presence_of with if => true" do
+    @c.validates_presence_of :value, :if => :dont_skip
+    @m.should_not be_valid
+  end
+
+  specify "should validate presence_of with if => false" do
+    @c.validates_presence_of :value, :if => :skip
+    @m.should be_valid
+  end
+
+  specify "should validate uniqueness_of with if => true" do
+    @c.validates_uniqueness_of :value, :if => :dont_skip
+
+    @m.value = 'a'
+    @m.should_not be_valid
+  end
+
+  specify "should validate uniqueness_of with if => false" do
+    @c.validates_uniqueness_of :value, :if => :skip
+
+    @m.value = 'a'
+    @m.should be_valid
+  end
+  
+  specify "should validate with :if => block" do
+    @c.validates_presence_of :value, :if => proc {false}
+    
     @m.should be_valid
   end
 end
