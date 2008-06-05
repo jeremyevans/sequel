@@ -1,5 +1,7 @@
 === HEAD
 
+* Rename the Sequel.time_class setting to Sequel.datetime_class (jeremyevans)
+
 * Add savepoint/nesting support to postgresql transactions (elven)
 
 * Use the specified table alias when joining a dataset, instead of the automatically generated alias (brushbox)

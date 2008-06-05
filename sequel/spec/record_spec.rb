@@ -702,7 +702,7 @@ describe Sequel::Model, "typecasting" do
   end
 
   teardown do
-    Sequel.time_class = Time
+    Sequel.datetime_class = Time
   end
 
   specify "should not convert if typecasting is turned off" do
@@ -851,7 +851,7 @@ describe Sequel::Model, "typecasting" do
     proc{@c.new.x = '2008-10-21'.to_datetime}.should raise_error
   end
 
-  specify "should convert to the Sequel.time_class for a datetime field" do
+  specify "should convert to the Sequel.datetime_class for a datetime field" do
     @c.instance_variable_set(:@db_schema, {:x=>{:type=>:datetime}})
     m = @c.new
     x = '2007-10-21T10:20:30-07:00'
@@ -864,7 +864,7 @@ describe Sequel::Model, "typecasting" do
     m.x.should == y
     m.x = '2007-10-21'.to_date
     m.x.should == '2007-10-21'.to_time
-    Sequel.time_class = DateTime
+    Sequel.datetime_class = DateTime
     y = x.to_datetime
     m.x = x
     m.x.should == y
@@ -880,7 +880,7 @@ describe Sequel::Model, "typecasting" do
     @c.instance_variable_set(:@db_schema, {:x=>{:type=>:datetime}})
     proc{@c.new.x = '0000'}.should raise_error
     proc{@c.new.x = ''}.should_not raise_error # Valid Time
-    Sequel.time_class = DateTime
+    Sequel.datetime_class = DateTime
     proc{@c.new.x = '0000'}.should raise_error
     proc{@c.new.x = ''}.should raise_error
   end

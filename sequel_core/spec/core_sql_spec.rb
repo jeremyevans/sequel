@@ -307,7 +307,7 @@ end
 
 context "String#to_sequel_time" do
   after do
-    Sequel.time_class = Time
+    Sequel.datetime_class = Time
   end
 
   specify "should convert the string into a Time object by default" do
@@ -316,14 +316,14 @@ context "String#to_sequel_time" do
   end
   
   specify "should convert the string into a DateTime object if that is set" do
-    Sequel.time_class = DateTime
+    Sequel.datetime_class = DateTime
     "2007-07-11 10:11:12a".to_sequel_time.class.should == DateTime
     "2007-07-11 10:11:12a".to_sequel_time.should == DateTime.parse("2007-07-11 10:11:12a")
   end
   
   specify "should raise Error::InvalidValue for an invalid time" do
     proc {'0000-00-00'.to_sequel_time}.should raise_error(Sequel::Error::InvalidValue)
-    Sequel.time_class = DateTime
+    Sequel.datetime_class = DateTime
     proc {'0000-00-00'.to_sequel_time}.should raise_error(Sequel::Error::InvalidValue)
   end
 end

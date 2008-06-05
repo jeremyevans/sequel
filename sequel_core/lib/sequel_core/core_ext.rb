@@ -184,10 +184,10 @@ class String
   end
 
   # Converts a string into a Time or DateTime object, depending on the
-  # value of Sequel.time_class
+  # value of Sequel.datetime_class
   def to_sequel_time
     begin
-      Sequel.time_class.parse(self)
+      Sequel.datetime_class.parse(self)
     rescue => e
       raise Sequel::Error::InvalidValue, "Invalid time value '#{self}' (#{e.message})"
     end

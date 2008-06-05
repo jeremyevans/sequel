@@ -407,7 +407,7 @@ module Sequel
         end
       when :datetime
         raise(ArgumentError, "invalid value for #{tc}: #{value.inspect}") unless value.is_one_of?(DateTime, Date, Time, String)
-        if Sequel.time_class === value
+        if Sequel.datetime_class === value
           # Already the correct class, no need to convert
           value
         else
