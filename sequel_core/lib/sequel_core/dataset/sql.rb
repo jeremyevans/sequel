@@ -332,6 +332,8 @@ module Sequel
     #     To specify multiple conditions on a single joined table column, you must use an array.
     #   * Symbol - Assumed to be a column in the joined table that points to the id
     #     column in the last joined or primary table.
+    #   * String - Assumed to be an SQL expression. It will be used without modification as the condition.
+    #     Warning: using a String like this may make your query specific to your database platform.
     # * table_alias - the name of the table's alias when joining, necessary for joining
     #   to the same table more than once.  No alias is used by default.
     def join_table(type, table, expr=nil, table_alias=nil)
@@ -349,8 +351,8 @@ module Sequel
         table_ref(table)
       end
 
-      expr = [[expr, :id]] unless expr.is_one_of?(Hash, Array, Proc)
-      join_conditions = if expr.is_a? Proc
+      expr = [[expr, :id]] unless expr.is_one_of?(Hash, Array, String)
+      join_conditions = if expr.is_a? String
           expr
         else
           expr.collect do |k, v|

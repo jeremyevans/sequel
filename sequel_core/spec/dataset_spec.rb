@@ -1329,9 +1329,9 @@ context "Dataset#join_table" do
       'SELECT * FROM "items" INNER JOIN "categories" ON ("categories"."item_id" = "items"."id")'
   end
   
-  specify "should support using a proc as the join condition" do
-    @d.join(:categories, proc { :c__item_id == :items__id }, :c).sql.should ==
-      'SELECT * FROM "items" INNER JOIN "categories" "c" ON ("c"."item_id" = "items"."id")'
+  specify "should support using a SQL String as the join condition" do
+    @d.join(:categories, %{c.item_id = items.id}, :c).sql.should ==
+      'SELECT * FROM "items" INNER JOIN "categories" "c" ON (c.item_id = items.id)'
   end
 end
 
