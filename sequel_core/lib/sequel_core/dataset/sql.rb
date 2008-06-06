@@ -326,14 +326,13 @@ module Sequel
     #   * Dataset - a subselect is performed with an alias of tN for some value of N
     #   * Model (or anything responding to :table_name) - table.table_name
     #   * String, Symbol: table
-    # * expr - Depends on type:
+    # * expr - specifies conditions, depends on type:
     #   * Hash, Array - Assumes key (1st arg) is column of joined table (unless already
     #     qualified), and value (2nd arg) is column of the last joined or primary table.
     #     To specify multiple conditions on a single joined table column, you must use an array.
-    #   * Symbol - Assumed to be a column in the joined table that points to the id
-    #     column in the last joined or primary table.
-    #   * String - Assumed to be an SQL expression. It will be used without modification as the condition.
-    #     Warning: using a String like this may make your query specific to your database platform.
+    #   * Everything else - pretty much the same as a using the argument in a call to filter,
+    #     so strings are considered literal, symbols specify boolean columns, and blockless
+    #     filter expressions can be used.
     # * table_alias - the name of the table's alias when joining, necessary for joining
     #   to the same table more than once.  No alias is used by default.
     def join_table(type, table, expr=nil, table_alias=nil)
@@ -351,11 +350,8 @@ module Sequel
         table_ref(table)
       end
 
-      expr = [[expr, :id]] unless expr.is_one_of?(Hash, Array, String)
-      join_conditions = if expr.is_a? String
-          expr
-        else
-          expr.collect do |k, v|
+      if Hash === expr or (Array === expr and expr.all_two_pairs?)
+        expr = expr.collect do |k, v|
           k = qualified_column_name(k, table_alias) if k.is_a?(Symbol)
           v = qualified_column_name(v, @opts[:last_joined_table] || first_source) if v.is_a?(Symbol)
           [k,v]
@@ -363,7 +359,7 @@ module Sequel
       end
 
       quoted_table_alias = quote_identifier(table_alias) 
-      clause = "#{@opts[:join]} #{join_type} #{table}#{" #{quoted_table_alias}" if quoted_table_alias != table} ON #{literal(filter_expr(join_conditions))}"
+      clause = "#{@opts[:join]} #{join_type} #{table}#{" #{quoted_table_alias}" if quoted_table_alias != table} ON #{literal(filter_expr(expr))}"
       opts = {:join => clause, :last_joined_table => table_alias}
       opts[:num_dataset_sources] = table_alias_num if table_alias_num
       clone(opts)
