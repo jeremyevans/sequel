@@ -241,6 +241,8 @@ module Sequel
           :boolean
         when /\A(real|float|double( precision)?)\z/
           :float
+        when /\A(numeric|decimal|money)\z/
+          :decimal
         end
       end
 

@@ -378,6 +378,17 @@ module Sequel
         value.to_s
       when :float
         Float(value)
+      when :decimal
+        case value
+        when BigDecimal
+          value
+        when String, Float
+          value.to_d
+        when Integer
+          value.to_s.to_d
+        else
+          raise ArgumentError, "invalid value for BigDecimal: #{value.inspect}"
+        end
       when :boolean
         case value
         when false, 0, "0", /\Af(alse)?\z/i

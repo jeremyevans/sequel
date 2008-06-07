@@ -1,5 +1,9 @@
 === HEAD
 
+* Convert numeric fields to BigDecimal in PostgreSQL adapter (jeremyevans)
+
+* Add :decimal fields to the schema parser (jeremyevans)
+
 * The expr argument in join table now allows the same argument as filter, so it can take a string or a blockless filter expression (brushbox, jeremyevans)
 
 * No longer assume the expr argument to join_table references the primary key column (jeremyevans)

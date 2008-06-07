@@ -765,6 +765,25 @@ describe Sequel::Model, "typecasting" do
     proc{@c.new.x = 'a'}.should raise_error
   end
 
+  specify "should convert to BigDecimal for a decimal field" do
+    @c.instance_variable_set(:@db_schema, {:x=>{:type=>:decimal}})
+    m = @c.new
+    bd = '1.0'.to_d
+    m.x = '1.0'
+    m.x.should == bd
+    m.x = 1.0
+    m.x.should == bd
+    m.x = 1
+    m.x.should == bd
+    m.x = bd
+    m.x.should == bd
+  end
+
+  specify "should raise an error if invalid data is used in an decimal field" do
+    @c.instance_variable_set(:@db_schema, {:x=>{:type=>:decimal}})
+    proc{@c.new.x = Date.today}.should raise_error
+  end
+
   specify "should convert to string for a string field" do
     @c.instance_variable_set(:@db_schema, {:x=>{:type=>:string}})
     m = @c.new

@@ -174,7 +174,8 @@ module Sequel
       1114 => lambda{ |s| s.to_sequel_time }, # timestamp without time zone
       1184 => lambda{ |s| s.to_sequel_time }, # timestamp with time zone
       1186 => lambda{ |s| s.to_i }, # interval
-      1266 => lambda{ |s| s.to_time } # time with time zone
+      1266 => lambda{ |s| s.to_time }, # time with time zone
+      1700 => lambda{ |s| s.to_d }, # numeric
     }
 
     if Adapter.respond_to?(:translate_results=)
