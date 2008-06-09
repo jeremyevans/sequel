@@ -1,6 +1,3 @@
-# This file holds the extensions to core ruby classes that relate to the creation of SQL
-# code.
-
 class Array
   # Return a Sequel::SQL::BooleanExpression created from this array, not matching any of the
   # conditions.

@@ -1,24 +1,3 @@
-# This file includes dataset methods for translating Ruby expressions
-# into SQL expressions, making it possible to specify dataset filters using
-# blocks, e.g.:
-#
-#   DB[:items].filter {:price < 100}
-#   DB[:items].filter {:category == 'ruby' && :date < Date.today - 7}
-#
-# Block filters can refer to literals, variables, constants, arguments, 
-# instance variables or anything else in order to create parameterized 
-# queries. Block filters can also refer to other dataset objects as 
-# sub-queries. Block filters are pretty much limitless!
-#
-# Block filters are based on ParseTree. If you do not have the ParseTree
-# gem installed, block filters will raise an error.
-#
-# To enable full block filter support make sure you have both ParseTree and
-# Ruby2Ruby installed:
-#
-#   sudo gem install parsetree
-#   sudo gem install ruby2ruby
-
 module Sequel
   class Dataset
    private

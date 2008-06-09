@@ -1,6 +1,3 @@
-# This file holds classes and modules under Sequel that are related to SQL
-# creation.
-
 module Sequel
   # The SQL module holds classes whose instances represent SQL fragments.
   # It also holds modules that are included in core ruby classes that

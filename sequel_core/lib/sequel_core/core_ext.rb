@@ -1,7 +1,3 @@
-# This file includes augmentations to the core ruby classes the Sequel uses,
-# which are unrelated to the creation of SQL.  It includes common
-# idioms to reduce the amount of code duplication.
-
 class Array
   # True if the array is not empty and all of its elements are
   # arrays of size 2.  This is used to determine if the array

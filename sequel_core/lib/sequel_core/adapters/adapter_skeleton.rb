@@ -1,5 +1,3 @@
-# require 'adapter_lib'
-
 module Sequel
   module Adapter
     class Database < Sequel::Database

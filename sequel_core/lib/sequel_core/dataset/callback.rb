@@ -1,6 +1,3 @@
-# This file holds empty methods that can be
-# overridden to provide callback behavior.
-
 module Sequel
   class Dataset
     private

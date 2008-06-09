@@ -1,6 +1,3 @@
-# This file includes all the dataset methods concerned with
-# generating SQL statements for retrieving and manipulating records.
-
 module Sequel
   class Dataset
     AND_SEPARATOR = " AND ".freeze
