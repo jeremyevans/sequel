@@ -1,115 +1,59 @@
-# The Validations module provides validation capabilities as a mixin. When
-# included into a class, it enhances the class with class and instance
-# methods for defining validations and validating class instances.
-# 
-# The Validation emulates the validation capabilities of ActiveRecord, and
-# provides methods for validating acceptance, confirmation, presence, format, 
-# length and numericality of attributes.
-#
-# To use validations, you need to include the Validation module in your
-# class:
-#
-#   class MyClass
-#     include Validation
-#     validates_length_of :password, :minimum => 6
-#   end
-module Validation
-  # Includes the Validation class methods into the including class.
-  def self.included(c)
-    c.extend ClassMethods
-  end
+module Sequel
+  class Model
+    # The Validation module houses a couple of subclasses used by Sequel's
+    # validation code.
+    module Validation
+      # Validation::Errors represents validation errors, a simple hash subclass
+      # with a few convenience methods.
+      class Errors < ::Hash
+        # Assign an array of messages for each attribute on access
+        def initialize
+          super{|h,k| h[k] = []}
+        end
+
+        # Adds an error for the given attribute.
+        def add(att, msg)
+          self[att] << msg
+        end
+        
+        # Returns an array of fully-formatted error messages.
+        def full_messages
+          inject([]) do |m, kv| 
+            att, errors = *kv
+            errors.each {|e| m << "#{att} #{e}"}
+            m
+          end
+        end
+        
+        # Returns the errors for the given attribute.
+        def on(att)
+          self[att]
+        end
+      end
   
-  # Returns the validation errors associated with the object.
-  def errors
-    @errors ||= Errors.new
-  end
-
-  # Validates the object.
-  def validate
-    errors.clear
-    return false if before_validation == false
-    self.class.validate(self)
-    after_validation
-    nil
-  end
-
-  # Validates the object and returns true if no errors are reported.
-  def valid?
-    return false if validate == false
-    errors.empty?
-  end
-
-  # Validation::Errors represents validation errors.
-  class Errors
-    # Initializes a new instance of validation errors.
-    def initialize
-      @errors = Hash.new {|h, k| h[k] = []}
-    end
+      # The Generator class is used to generate validation definitions using 
+      # the validates {} idiom.
+      class Generator
+        # Initializes a new generator.
+        def initialize(receiver ,&block)
+          @receiver = receiver
+          instance_eval(&block)
+        end
     
-    # Adds an error for the given attribute.
-    def add(att, msg)
-      @errors[att] << msg
-    end
-    
-    # Clears all errors.
-    def clear
-      @errors.clear
-    end
-    
-    # Iterates over errors
-    def each(&block)
-      @errors.each(&block)
-    end
-    
-    # Returns true if no errors are stored.
-    def empty?
-      @errors.empty?
-    end
-    
-    # Returns an array of fully-formatted error messages.
-    def full_messages
-      @errors.inject([]) do |m, kv| att, errors = *kv
-        errors.each {|e| m << "#{att} #{e}"}
-        m
+        # Delegates method calls to the receiver by calling receiver.validates_xxx.
+        def method_missing(m, *args, &block)
+          @receiver.send(:"validates_#{m}", *args, &block)
+        end
       end
     end
-    
-    # Returns the errors for the given attribute.
-    def on(att)
-      @errors[att]
-    end
-    alias_method :[], :on
-    
-    # Returns size of errors array
-    def size
-      @errors.size
-    end
-  end
-  
-  # The Generator class is used to generate validation definitions using 
-  # the validates {} idiom.
-  class Generator
-    # Initializes a new generator.
-    def initialize(receiver ,&block)
-      @receiver = receiver
-      instance_eval(&block)
-    end
 
-    # Delegates method calls to the receiver by calling receiver.validates_xxx.
-    def method_missing(m, *args, &block)
-      @receiver.send(:"validates_#{m}", *args, &block)
-    end
-  end
-  
-  # Validation class methods.
-  module ClassMethods
     # Returns true if validations are defined.
-    def has_validations?
+    def self.has_validations?
       !validations.empty?
     end
 
     # Instructs the model to skip validations defined in superclasses
-    def skip_superclass_validations
+    def self.skip_superclass_validations
       @skip_superclass_validations = true
     end
     
@@ -130,12 +74,12 @@ module Validation
     #     validates_length_of :name, :minimum => 6
     #     validates_length_of :password, :minimum => 8
     #   end
-    def validates(&block)
-      Generator.new(self, &block)
+    def self.validates(&block)
+      Validation::Generator.new(self, &block)
     end
 
     # Validates the given instance.
-    def validate(o)
+    def self.validate(o)
       if superclass.respond_to?(:validate) && !@skip_superclass_validations
         superclass.validate(o)
       end
@@ -146,7 +90,7 @@ module Validation
     end
     
     # Validates acceptance of an attribute.
-    def validates_acceptance_of(*atts)
+    def self.validates_acceptance_of(*atts)
       opts = {
         :message => 'is not accepted',
         :allow_nil => true,
@@ -161,7 +105,7 @@ module Validation
     end
 
     # Validates confirmation of an attribute.
-    def validates_confirmation_of(*atts)
+    def self.validates_confirmation_of(*atts)
       opts = {
         :message => 'is not confirmed',
       }.merge!(atts.extract_options!)
@@ -181,12 +125,12 @@ module Validation
     #   validates_each :name, :password do |object, attribute, value|
     #     object.errors[attribute] << 'is not nice' unless value.nice?
     #   end
-    def validates_each(*atts, &block)
+    def self.validates_each(*atts, &block)
       atts.each{|a| validations[a] << block}
     end
 
     # Validates the format of an attribute.
-    def validates_format_of(*atts)
+    def self.validates_format_of(*atts)
       opts = {
         :message => 'is invalid',
       }.merge!(atts.extract_options!)
@@ -203,7 +147,7 @@ module Validation
     end
 
     # Validates the length of an attribute.
-    def validates_length_of(*atts)
+    def self.validates_length_of(*atts)
       opts = {
         :too_long     => 'is too long',
         :too_short    => 'is too short',
@@ -229,7 +173,7 @@ module Validation
     end
 
     # Validates whether an attribute is a number.
-    def validates_numericality_of(*atts)
+    def self.validates_numericality_of(*atts)
       opts = {
         :message => 'is not a number',
       }.merge!(atts.extract_options!)
@@ -250,7 +194,7 @@ module Validation
     end
 
     # Validates the presence of an attribute.
-    def validates_presence_of(*atts)
+    def self.validates_presence_of(*atts)
       opts = {
         :message => 'is not present',
       }.merge!(atts.extract_options!)
@@ -264,7 +208,7 @@ module Validation
     # Validates only if the fields in the model (specified by atts) are
     # unique in the database.  You should also add a unique index in the
     # database, as this suffers from a fairly obvious race condition.
-    def validates_uniqueness_of(*atts)
+    def self.validates_uniqueness_of(*atts)
       opts = {
         :message => 'is already taken',
       }.merge!(atts.extract_options!)
@@ -294,19 +238,43 @@ module Validation
     end
 
     # Returns the validations hash for the class.
-    def validations
+    def self.validations
       @validations ||= Hash.new {|h, k| h[k] = []}
     end
     
-    protected
+    ### Private Class Methods ###
 
-    def if_proc(opts)
+    def self.if_proc(opts)
       case opts[:if]
       when Symbol then proc{send opts[:if]}
       when Proc then opts[:if]
       when nil then proc{true}
       else raise(::Sequel::Error, "invalid value for :if validation option")
       end
+    end
+
+    metaprivate :if_proc
+
+    ### Instance Methods ###
+  
+    # Returns the validation errors associated with the object.
+    def errors
+      @errors ||= Validation::Errors.new
+    end
+
+    # Validates the object.
+    def validate
+      errors.clear
+      return false if before_validation == false
+      self.class.validate(self)
+      after_validation
+      nil
+    end
+
+    # Validates the object and returns true if no errors are reported.
+    def valid?
+      return false if validate == false
+      errors.empty?
     end
   end
 end

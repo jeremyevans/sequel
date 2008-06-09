@@ -1,17 +1,15 @@
 require File.join(File.dirname(__FILE__), "spec_helper")
 
-describe "Validation::Errors" do
+describe Sequel::Model::Validation::Errors do
   setup do
-    @errors = Validation::Errors.new
-    class Validation::Errors
-      attr_accessor :errors
-    end
+    @errors = Sequel::Model::Validation::Errors.new
   end
   
   specify "should be clearable using #clear" do
-    @errors.errors = {1 => 2, 3 => 4}
+    @errors.add(:a, 'b')
+    @errors.should == {:a=>['b']}
     @errors.clear
-    @errors.errors.should == {}
+    @errors.should == {}
   end
   
   specify "should be empty if no errors are added" do
@@ -52,21 +50,12 @@ describe "Validation::Errors" do
   end
 end
 
-describe Validation do
+describe Sequel::Model do
   setup do
-    @c = Class.new do
-      include Validation
-      attr_reader :before_validation, :after_validation
-      
+    @c = Class.new(Sequel::Model) do
       def self.validates_coolness_of(attr)
         validates_each(attr) {|o, a, v| o.errors[a] << 'is not cool' if v != :cool}
       end
-    end
-    
-    @d = Class.new do
-      attr_accessor :errors
-      attr_reader :before_validation, :after_validation
-      def initialize; @errors = Validation::Errors.new; end
     end
   end
   
@@ -81,7 +70,7 @@ describe Validation do
     @c.validations[:xx].size.should == 1
     @c.validations[:yy].size.should == 1
     
-    o = @d.new
+    o = @c.new
     @c.validations[:xx].first.call(o, :aa, 40)
     @c.validations[:yy].first.call(o, :bb, 60)
     
@@ -100,7 +89,7 @@ describe Validation do
     end
     @c.validations[:blah].should_not be_empty
 
-    o = @d.new
+    o = @c.new
     @c.validations[:blah].first.call(o, :ttt, 40)
     o.errors.full_messages.should == ['ttt is not cool']
     o.errors.clear
@@ -109,14 +98,10 @@ describe Validation do
   end
 end
 
-describe "A Validation instance" do
+describe Sequel::Model do
   setup do
-    @c = Class.new do
-      attr_accessor :score
-      attr_reader :before_validation, :after_validation
-      
-      include Validation
-      
+    @c = Class.new(Sequel::Model) do
+      columns :score
       validates_each :score do |o, a, v|
         o.errors[a] << 'too low' if v < 87
       end
@@ -144,14 +129,11 @@ describe "A Validation instance" do
   end
 end
 
-describe Validation::Generator do
+describe Sequel::Model::Validation::Generator do
   setup do
     $testit = nil
     
-    @c = Class.new do
-      include Validation
-      attr_reader :before_validation, :after_validation
-      
+    @c = Class.new(Sequel::Model) do
       def self.validates_blah
         $testit = 1324
       end
@@ -159,19 +141,17 @@ describe Validation::Generator do
   end
   
   specify "should instance_eval the block, sending everything to its receiver" do
-    Validation::Generator.new(@c) do
+    Sequel::Model::Validation::Generator.new(@c) do
       blah
     end
     $testit.should == 1324
   end
 end
 
-describe "Validations" do
+describe Sequel::Model do
   setup do
-    @c = Class.new do
-      attr_accessor :value
-      attr_reader :before_validation, :after_validation
-      include Validation
+    @c = Class.new(Sequel::Model) do
+      columns :value
       
       def self.filter(*args)
         o = Object.new
@@ -440,14 +420,13 @@ end
 
 context "Superclass validations" do
   setup do
-    @c1 = Class.new do
-      include Validation
-      attr_reader :before_validation, :after_validation
-      attr_accessor :value
+    @c1 = Class.new(Sequel::Model) do
+      columns :value
       validates_length_of :value, :minimum => 5
     end
     
     @c2 = Class.new(@c1) do
+      columns :value
       validates_format_of :value, :with => /^[a-z]+$/
     end
   end
@@ -491,11 +470,8 @@ end
 
 context ".validates with block" do
   specify "should support calling .each" do
-    @c = Class.new do
-      attr_accessor :vvv
-      attr_reader :before_validation, :after_validation
-      
-      include Validation
+    @c = Class.new(Sequel::Model) do
+      columns :vvv
       validates do
         each :vvv do |o, a, v|
           o.errors[a] << "is less than zero" if v.to_i < 0
