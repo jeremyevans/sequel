@@ -1,7 +1,7 @@
 # A ConnectionPool manages access to database connections by keeping
 # multiple connections and giving threads exclusive access to each
 # connection.
-class ConnectionPool
+class Sequel::ConnectionPool
   # An array of connections currently being used
   attr_reader :allocated
   
@@ -178,7 +178,7 @@ end
 #
 # Note that using a single threaded pool with some adapters can cause
 # errors in certain cases, see Sequel.single_threaded=.
-class SingleThreadedPool
+class Sequel::SingleThreadedPool
   # The single database connection for the pool
   attr_reader :conn
 

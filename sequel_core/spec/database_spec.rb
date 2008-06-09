@@ -23,7 +23,7 @@ context "A new Database" do
   end
   
   specify "should create a connection pool" do
-    @db.pool.should be_a_kind_of(ConnectionPool)
+    @db.pool.should be_a_kind_of(Sequel::ConnectionPool)
     @db.pool.max_size.should == 4
     
     Sequel::Database.new(:max_connections => 10).pool.max_size.should == 10
@@ -645,24 +645,24 @@ context "A single threaded database" do
   
   specify "should use a SingleThreadedPool instead of a ConnectionPool" do
     db = Sequel::Database.new(:single_threaded => true)
-    db.pool.should be_a_kind_of(SingleThreadedPool)
+    db.pool.should be_a_kind_of(Sequel::SingleThreadedPool)
   end
   
   specify "should be constructable using :single_threaded => true option" do
     db = Sequel::Database.new(:single_threaded => true)
-    db.pool.should be_a_kind_of(SingleThreadedPool)
+    db.pool.should be_a_kind_of(Sequel::SingleThreadedPool)
   end
   
   specify "should be constructable using Database.single_threaded = true" do
     Sequel::Database.single_threaded = true
     db = Sequel::Database.new
-    db.pool.should be_a_kind_of(SingleThreadedPool)
+    db.pool.should be_a_kind_of(Sequel::SingleThreadedPool)
   end
 
   specify "should be constructable using Sequel.single_threaded = true" do
     Sequel.single_threaded = true
     db = Sequel::Database.new
-    db.pool.should be_a_kind_of(SingleThreadedPool)
+    db.pool.should be_a_kind_of(Sequel::SingleThreadedPool)
   end
 end
 
