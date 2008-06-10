@@ -316,6 +316,11 @@ module Sequel
       clone(o)
     end
 
+    # SQL fragment specifying an Irregular (cast/extract) SQL function call
+    def irregular_function_sql(f)
+      "#{f.f}(#{literal(f.arg1)} #{f.joiner} #{literal(f.arg2)})"
+    end
+
     # Returns a joined dataset.  Uses the following arguments:
     #
     # * type - The type of join to do (:inner, :left_outer, :right_outer, :full)

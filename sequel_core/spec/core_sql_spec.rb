@@ -191,7 +191,7 @@ context "Column references" do
   
   specify "should be quoted properly in a cast function" do
     @ds.literal(:x.cast_as(:integer)).should == "cast(`x` AS integer)"
-    @ds.literal(:x__y.cast_as(:varchar[20])).should == "cast(`x`.`y` AS varchar(20))"
+    @ds.literal(:x__y.cast_as('varchar(20)')).should == "cast(`x`.`y` AS varchar(20))"
   end
 end
 
@@ -271,6 +271,10 @@ context "Symbol" do
     (:abc|[1]).to_s(@ds).should == 'abc[1]'
     (:abc|[1, 2]).to_s(@ds).should == 'abc[1, 2]'
     (:abc|1|2).to_s(@ds).should == 'abc[1, 2]'
+  end
+
+  specify "should support SQL EXTRACT function via #extract " do
+    :abc.extract(:year).to_s(@ds).should == "extract(year FROM abc)"
   end
 end
 

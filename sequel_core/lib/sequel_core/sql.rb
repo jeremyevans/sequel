@@ -26,8 +26,7 @@ module Sequel
 
       # Cast the reciever to the given SQL type
       def cast_as(t)
-        t = t.to_s.lit if t.is_a?(Symbol)
-        Sequel::SQL::Function.new(:cast, self.as(t))
+        IrregularFunction.new(:cast, self, :AS, t.to_s.lit)
       end
     end
     
@@ -297,6 +296,16 @@ module Sequel
       include StringMethods
       include InequalityMethods
 
+      # Extract a datetime_part (e.g. year, month) from self:
+      #
+      #   :date.extract(:year) # SQL:  extract(year FROM date)
+      #
+      # Also has the benefit of returning the result as a
+      # NumericExpression instead of a generic ComplexExpression.
+      def extract(datetime_part)
+        IrregularFunction.new(:extract, datetime_part.to_s.lit, :FROM, self).sql_number
+      end
+
       # Return a BooleanExpression representation of self.
       def sql_boolean
         BooleanExpression.new(:NOOP, self)
@@ -442,6 +451,35 @@ module Sequel
       end
     end
     
+    # IrregularFunction is used for the SQL EXTRACT and CAST functions,
+    # which don't use regular function calling syntax. The IrregularFunction
+    # replaces the commas the regular function uses with a custom
+    # join string.
+    #
+    # This shouldn't be used directly, see ColumnExpr#cast_as and 
+    # ComplexExpressionMethods#extract.
+    class IrregularFunction < Function
+      # The arguments to pass to the function (may be blank)
+      attr_reader :arg1, :arg2
+
+      # The SQL function to call
+      attr_reader :f
+      
+      # The literal string to use in place of a comma to join arguments
+      attr_reader :joiner
+
+      # Set the attributes to the given arguments
+      def initialize(f, arg1, joiner, arg2)
+        @f, @arg1, @joiner, @arg2 = f, arg1, joiner, arg2
+      end
+
+      # Delegate the creation of the resulting SQL to the given dataset,
+      # since it may be database dependent.
+      def to_s(ds)
+        ds.irregular_function_sql(self)
+      end
+    end
+
     # Represents a qualified (column with table) reference.  Used when
     # joining tables to disambiguate columns.
     class QualifiedColumnRef < Expression

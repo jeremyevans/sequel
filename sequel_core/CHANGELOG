@@ -1,5 +1,7 @@
 === HEAD
 
+* Support the SQL EXTRACT function: :date.extract(:year) (jeremyevans)
+
 * Convert numeric fields to BigDecimal in PostgreSQL adapter (jeremyevans)
 
 * Add :decimal fields to the schema parser (jeremyevans)
