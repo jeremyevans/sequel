@@ -41,6 +41,29 @@ module Sequel
       end
     end
     
+    # Represents an SQL CASE expression, used for conditions.
+    class CaseExpression < Expression
+      # An array of all two pairs with the first element specifying the
+      # condition and the second element specifying the result.
+      attr_reader :conditions
+
+      # The default value if no conditions are true
+      attr_reader :default
+
+      # Create an object with the given conditions and
+      # default value.
+      def initialize(conditions, default)
+        raise(Sequel::Error, 'CaseExpression conditions must be an array with all_two_pairs') unless Array === conditions and conditions.all_two_pairs?
+        @conditions, @default = conditions, default
+      end
+
+      # Delegate the creation of the resulting SQL to the given dataset,
+      # since it may be database dependent.
+      def to_s(ds)
+        ds.case_expression_sql(self)
+      end
+    end
+
     # Represents all columns in a given table, table.* in SQL
     class ColumnAll < Expression
       # The table containing the columns being selected

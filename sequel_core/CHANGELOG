@@ -1,5 +1,7 @@
 === HEAD
 
+* Support the SQL CASE expression via Array#case and Hash#case (jeremyevans)
+
 * Support the SQL EXTRACT function: :date.extract(:year) (jeremyevans)
 
 * Convert numeric fields to BigDecimal in PostgreSQL adapter (jeremyevans)

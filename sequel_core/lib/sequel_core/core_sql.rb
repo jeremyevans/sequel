@@ -5,6 +5,12 @@ class Array
     sql_expr_if_all_two_pairs(:OR, true)
   end
 
+  # Return a Sequel::SQL::CaseExpression with this array as the conditions and the given
+  # default value.
+  def case(default)
+    ::Sequel::SQL::CaseExpression.new(self, default)
+  end
+
   # Return a Sequel::SQL::BooleanExpression created from this array, matching all of the
   # conditions.
   def sql_expr
@@ -76,6 +82,13 @@ class Hash
   # conditions.
   def ~
     ::Sequel::SQL::BooleanExpression.from_value_pairs(self, :OR, true)
+  end
+
+  # Return a Sequel::SQL::CaseExpression with this hash as the conditions and the given
+  # default value.  Note that the order of the conditions will be arbitrary, so all
+  # conditions should be orthogonal.
+  def case(default)
+    ::Sequel::SQL::CaseExpression.new(to_a, default)
   end
 
   # Return a Sequel::SQL::BooleanExpression created from this hash, matching all of the

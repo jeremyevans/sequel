@@ -23,6 +23,31 @@ context "Array#all_two_pairs?" do
   end
 end
   
+context "Array#case and Hash#case" do
+  setup do
+    @d = Sequel::Dataset.new(nil)
+  end
+
+  specify "should return SQL CASE expression" do
+    @d.literal({:x=>:y}.case(:z)).should == '(CASE WHEN x THEN y ELSE z END)'
+    ['(CASE WHEN x THEN y WHEN a THEN b ELSE z END)',
+     '(CASE WHEN a THEN b WHEN x THEN y ELSE z END)'].should(include(@d.literal({:x=>:y, :a=>:b}.case(:z))))
+    @d.literal([[:x, :y]].case(:z)).should == '(CASE WHEN x THEN y ELSE z END)'
+    @d.literal([[:x, :y], [:a, :b]].case(:z)).should == '(CASE WHEN x THEN y WHEN a THEN b ELSE z END)'
+  end
+
+  specify "should raise an error if an array that isn't all two pairs is used" do
+    proc{[:b].case(:a)}.should raise_error(Sequel::Error)
+    proc{[:b, :c].case(:a)}.should raise_error(Sequel::Error)
+    proc{[[:b, :c], :d].case(:a)}.should raise_error(Sequel::Error)
+  end
+
+  specify "should raise an error if an empty array/hash is used" do
+    proc{[].case(:a)}.should raise_error(Sequel::Error)
+    proc{{}.case(:a)}.should raise_error(Sequel::Error)
+  end
+end
+
 context "Array#to_sql" do
   specify "should concatenate multiple lines into a single string" do
     "SELECT * \r\nFROM items\r\n WHERE a = 1".split.to_sql. \
