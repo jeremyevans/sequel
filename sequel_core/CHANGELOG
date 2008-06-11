@@ -1,5 +1,7 @@
 === HEAD
 
+* Remove Module#metaprivate, since it duplicates the standard Module#private_class_method (jeremyevans)
+
 * Support the SQL CASE expression via Array#case and Hash#case (jeremyevans)
 
 * Support the SQL EXTRACT function: :date.extract(:year) (jeremyevans)

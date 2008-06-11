@@ -253,7 +253,7 @@ module Sequel
       end
     end
 
-    metaprivate :if_proc
+    private_class_method :if_proc
 
     ### Instance Methods ###
   

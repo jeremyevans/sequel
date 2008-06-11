@@ -54,7 +54,7 @@ module Sequel
       obj
     end
 
-    metaprivate :cache_delete, :cache_key, :cache_lookup
+    private_class_method :cache_delete, :cache_key, :cache_lookup
 
     ### Instance Methods ###
 

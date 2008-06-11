@@ -172,7 +172,8 @@ module Sequel
       @scheme = scheme
       @@adapters[scheme.to_sym] = self
     end
-    metaprivate :set_adapter_scheme
+    
+    private_class_method :set_adapter_scheme
     
     ### Instance Methods ###
 

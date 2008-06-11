@@ -51,7 +51,7 @@ module Sequel
       all_hooks(hook).each{|b| return false if object.instance_eval(&b) == false}
     end
 
-    metaprivate :add_hook, :all_hooks, :hooks, :run_hooks
+    private_class_method :add_hook, :all_hooks, :hooks, :run_hooks
 
     (HOOKS + PRIVATE_HOOKS).each do |hook|
       instance_eval("def #{hook}(method = nil, &block); add_hook(:#{hook}, method, &block) end")

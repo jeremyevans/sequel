@@ -65,7 +65,7 @@ module Sequel
       '+' << columns.map {|c| '-' * sizes[c]}.join('+') << '+'
     end
 
-    metaprivate :column_sizes, :data_line, :format_cell, :header_line, :separator_line
+    private_class_method :column_sizes, :data_line, :format_cell, :header_line, :separator_line
   end
 end
 

@@ -57,6 +57,6 @@ module Sequel
       Sequel::Plugins.const_get(module_name)
     end
 
-    metaprivate :plugin_gem, :plugin_module
+    private_class_method :plugin_gem, :plugin_module
   end
 end

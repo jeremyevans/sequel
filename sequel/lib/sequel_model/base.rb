@@ -366,6 +366,6 @@ module Sequel
       @columns
     end
 
-    metaprivate :def_column_accessor, :get_db_schema, :set_columns
+    private_class_method :def_column_accessor, :get_db_schema, :set_columns
   end
 end

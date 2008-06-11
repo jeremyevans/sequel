@@ -107,7 +107,8 @@ module Sequel
       instance_eval("def #{adapter}(*args, &block); adapter_method('#{adapter}', *args, &block) end")
     end
   end
-  metaprivate :adapter_method, :def_adapter_method
+
+  private_class_method :adapter_method, :def_adapter_method
   
   # Add the database adapter class methods to Sequel via metaprogramming
   def_adapter_method(*Database::ADAPTERS)

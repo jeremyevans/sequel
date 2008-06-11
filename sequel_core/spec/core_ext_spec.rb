@@ -76,19 +76,6 @@ context "Module#metaattr_reader" do
   end
 end
 
-context "Module#metaprivate" do
-  specify "it should create aliases of singleton/class methods" do
-    @c = Class.new do
-      def self.x; 1; end
-    end
-    @c.x.should == 1
-    @c.class_eval do
-      metaprivate :x
-    end
-    proc{@c.x}.should raise_error(NoMethodError)
-  end
-end
-
 context "Object#is_one_of?" do
   specify "it should be true if the object is one of the classes" do
     1.is_one_of?(Numeric, Array).should == true

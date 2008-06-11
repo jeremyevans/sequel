@@ -84,16 +84,6 @@ class Module
   def metaattr_reader(*meths)
     metaclass.instance_eval{attr_reader(*meths)}
   end
-
-  # Make a singleton/class method(s) private.
-  # Replaces the construct:
-  #
-  #   class << self
-  #     private *meths
-  #   end
-  def metaprivate(*meths)
-    metaclass.instance_eval{private(*meths)}
-  end
 end
 
 # Helpers from Metaid and a bit more
