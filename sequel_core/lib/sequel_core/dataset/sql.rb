@@ -29,6 +29,11 @@ module Sequel
       filter(*cond, &block)
     end
 
+    # SQL fragment for the aliased expression
+    def aliased_expression_sql(ae)
+      "#{literal(ae.expression)} AS #{quote_identifier(ae.aliaz)}"
+    end
+
     # SQL fragment for specifying given CaseExpression.
     def case_expression_sql(ce)
       "(CASE #{ce.conditions.collect{|c,r| "WHEN #{literal(c)} THEN #{literal(r)} "}.join}ELSE #{literal(ce.default)} END)"
@@ -37,12 +42,6 @@ module Sequel
     # SQL fragment for specifying all columns in a given table.
     def column_all_sql(ca)
       "#{quote_identifier(ca.table)}.*"
-    end
-
-    # SQL fragment for column expressions
-    def column_expr_sql(ce)
-      r = ce.r
-      "#{literal(ce.l)} #{ce.op}#{" #{literal(r)}" if r}"
     end
 
     # SQL fragment for complex expressions
@@ -487,9 +486,15 @@ module Sequel
       order(*((@opts[:order] || []) + order))
     end
     
-    # SQL fragment for the qualifed column reference, specifying
-    # a table and a column.
-    def qualified_column_ref_sql(qcr)
+    # SQL fragment for the ordered expression, used in the ORDER BY
+    # clause.
+    def ordered_expression_sql(oe)
+      "#{literal(oe.expression)} #{oe.descending ? 'DESC' : 'ASC'}"
+    end
+
+    # SQL fragment for the qualifed identifier, specifying
+    # a table and a column (or schema and table).
+    def qualified_identifier_sql(qcr)
       "#{quote_identifier(qcr.table)}.#{quote_identifier(qcr.column)}"
     end
 
@@ -758,12 +763,11 @@ module Sequel
       return nil unless order
       new_order = []
       order.map do |f|
-        if f.is_a?(SQL::ColumnExpr) && (f.op == SQL::ColumnMethods::DESC)
-          f.l
-        elsif f.is_a?(SQL::ColumnExpr) && (f.op == SQL::ColumnMethods::ASC)
-          f.l.desc
+        case f
+        when SQL::OrderedExpression
+          SQL::OrderedExpression.new(f.expression, !f.descending)
         else
-          f.desc
+          SQL::OrderedExpression.new(f)
         end
       end
     end
@@ -775,7 +779,7 @@ module Sequel
         c_table, column, c_alias = split_symbol(column)
         schema, table, t_alias = split_symbol(table) if Symbol === table
         c_table ||= t_alias || table
-        ::Sequel::SQL::QualifiedColumnRef.new(c_table, column)
+        ::Sequel::SQL::QualifiedIdentifier.new(c_table, column)
       else
         column
       end

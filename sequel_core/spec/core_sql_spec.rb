@@ -137,10 +137,6 @@ context "#desc" do
   specify "should format a DESC clause for a function" do
     :avg[:test].desc.to_s(@ds).should == 'avg(test) DESC'
   end
-  
-  specify "should format a DESC clause for a literal value" do
-    'abc'.desc.to_s(@ds).should == "'abc' DESC"
-  end
 end
 
 context "#asc" do
@@ -156,10 +152,6 @@ context "#asc" do
 
   specify "should format a ASC clause for a function" do
     :avg[:test].asc.to_s(@ds).should == 'avg(test) ASC'
-  end
-  
-  specify "should format a ASC clause for a literal value" do
-    'abc'.asc.to_s(@ds).should == "'abc' ASC"
   end
 end
 
@@ -236,6 +228,12 @@ context "Symbol#*" do
   end
 end
 
+context "Symbol#qualify" do
+  specify "should format a qualified column" do
+    :xyz.qualify(:abc).to_s(Sequel::Dataset.new(nil)).should == 'abc.xyz'
+  end
+end
+
 context "Symbol#to_column_ref" do
   setup do
     @ds = MockDataset.new(nil)
@@ -287,8 +285,27 @@ context "Symbol" do
     ds.select(:COUNT['1']).sql.should == "SELECT COUNT('1') FROM t"
   end
   
-  specify "should support cast function" do
+  specify "should support cast method and its cast_as alias" do
     :abc.cast_as(:integer).to_s(@ds).should == "cast(abc AS integer)"
+    :abc.cast(:integer).to_s(@ds).should == "cast(abc AS integer)"
+  end
+  
+  specify "should support cast_numeric and cast_string" do
+    x = :abc.cast_numeric
+    x.should be_a_kind_of(Sequel::SQL::NumericExpression)
+    x.to_s(@ds).should == "cast(abc AS integer)"
+
+    x = :abc.cast_numeric(:real)
+    x.should be_a_kind_of(Sequel::SQL::NumericExpression)
+    x.to_s(@ds).should == "cast(abc AS real)"
+
+    x = :abc.cast_string
+    x.should be_a_kind_of(Sequel::SQL::StringExpression)
+    x.to_s(@ds).should == "cast(abc AS text)"
+
+    x = :abc.cast_string(:varchar)
+    x.should be_a_kind_of(Sequel::SQL::StringExpression)
+    x.to_s(@ds).should == "cast(abc AS varchar)"
   end
   
   specify "should support subscript access using | operator" do

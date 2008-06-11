@@ -712,12 +712,6 @@ context "Dataset#from" do
     
     @dataset.from(:a[:i]).select_sql.should ==
       "SELECT * FROM a(i)"
-    
-    @dataset.from(:generate_series[1, 2].as(:a[:i])).select_sql.should ==
-      "SELECT * FROM generate_series(1, 2) AS a(i)"
-      
-    @dataset.from(:generate_series[1, 2] => :a[:i]).select_sql.should ==
-      "SELECT * FROM generate_series(1, 2) a(i)"
   end
 end
 
@@ -914,7 +908,7 @@ context "Dataset#reverse_order" do
   
   specify "should invert the order given" do
     @dataset.reverse_order(:name.desc).sql.should ==
-      'SELECT * FROM test ORDER BY name'
+      'SELECT * FROM test ORDER BY name ASC'
   end
   
   specify "should invert the order for ASC expressions" do
@@ -924,14 +918,14 @@ context "Dataset#reverse_order" do
   
   specify "should accept multiple arguments" do
     @dataset.reverse_order(:name, :price.desc).sql.should ==
-      'SELECT * FROM test ORDER BY name DESC, price'
+      'SELECT * FROM test ORDER BY name DESC, price ASC'
   end
 
   specify "should reverse a previous ordering if no arguments are given" do
     @dataset.order(:name).reverse_order.sql.should ==
       'SELECT * FROM test ORDER BY name DESC'
     @dataset.order(:clumsy.desc, :fool).reverse_order.sql.should ==
-      'SELECT * FROM test ORDER BY clumsy, fool DESC'
+      'SELECT * FROM test ORDER BY clumsy ASC, fool DESC'
   end
   
   specify "should return an unordered dataset for a dataset with no order" do
@@ -1556,9 +1550,9 @@ context "Dataset #first and #last" do
   
   specify "#last should invert the order" do
     @d.order(:a).last.pop.should == 'SELECT * FROM test ORDER BY a DESC LIMIT 1'
-    @d.order(:b.desc).last.pop.should == 'SELECT * FROM test ORDER BY b LIMIT 1'
+    @d.order(:b.desc).last.pop.should == 'SELECT * FROM test ORDER BY b ASC LIMIT 1'
     @d.order(:c, :d).last.pop.should == 'SELECT * FROM test ORDER BY c DESC, d DESC LIMIT 1'
-    @d.order(:e.desc, :f).last.pop.should == 'SELECT * FROM test ORDER BY e, f DESC LIMIT 1'
+    @d.order(:e.desc, :f).last.pop.should == 'SELECT * FROM test ORDER BY e ASC, f DESC LIMIT 1'
   end
 end
 

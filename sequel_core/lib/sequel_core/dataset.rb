@@ -158,8 +158,8 @@ module Sequel
 
     # Return the dataset as a column with the given alias, so it can be used in the
     # SELECT clause. This dataset should result in a single row and a single column.
-    def as(a)
-      ::Sequel::SQL::ColumnExpr.new(self, 'AS', a)
+    def as(aliaz)
+      ::Sequel::SQL::AliasedExpression.new(self, aliaz)
     end
 
     # Returns an array with all records in the dataset. If a block is given,

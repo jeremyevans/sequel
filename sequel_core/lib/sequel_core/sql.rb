@@ -3,111 +3,20 @@ module Sequel
   # It also holds modules that are included in core ruby classes that
   # make Sequel a friendly DSL.
   module SQL
-    # Holds methods that should be called on columns only.
-    module ColumnMethods
-      AS = 'AS'.freeze
-      DESC = 'DESC'.freeze
-      ASC = 'ASC'.freeze
-      
-      # Create an SQL column alias of the receiving column to the given alias.
-      def as(a)
-        ColumnExpr.new(self, AS, a)
-      end
-      
-      # Mark the receiving SQL column as sorting in a descending fashion.
-      def desc
-        ColumnExpr.new(self, DESC)
-      end
-      
-      # Mark the receiving SQL column as sorting in an ascending fashion (generally a no-op).
-      def asc
-        ColumnExpr.new(self, ASC)
-      end
+    ### Parent Classes ###
 
-      # Cast the reciever to the given SQL type
-      def cast_as(t)
-        IrregularFunction.new(:cast, self, :AS, t.to_s.lit)
-      end
-    end
-    
+    # Classes/Modules aren't an alphabetical order due to the fact that
+    # some reference constants defined in others at load time.
+
     # Base class for all SQL fragments
     class Expression
-      include ColumnMethods
-
       # Returns self, because SQL::Expression already acts like
       # LiteralString.
       def lit
         self
       end
     end
-    
-    # Represents an SQL CASE expression, used for conditions.
-    class CaseExpression < Expression
-      # An array of all two pairs with the first element specifying the
-      # condition and the second element specifying the result.
-      attr_reader :conditions
 
-      # The default value if no conditions are true
-      attr_reader :default
-
-      # Create an object with the given conditions and
-      # default value.
-      def initialize(conditions, default)
-        raise(Sequel::Error, 'CaseExpression conditions must be an array with all_two_pairs') unless Array === conditions and conditions.all_two_pairs?
-        @conditions, @default = conditions, default
-      end
-
-      # Delegate the creation of the resulting SQL to the given dataset,
-      # since it may be database dependent.
-      def to_s(ds)
-        ds.case_expression_sql(self)
-      end
-    end
-
-    # Represents all columns in a given table, table.* in SQL
-    class ColumnAll < Expression
-      # The table containing the columns being selected
-      attr_reader :table
-
-      # Create an object with the given table
-      def initialize(table)
-        @table = table
-      end
-
-      # ColumnAll expressions are considered equivalent if they
-      # have the same class and string representation
-      def ==(x)
-        x.class == self.class && @table == x.table
-      end
-
-      # Delegate the creation of the resulting SQL to the given dataset,
-      # since it may be database dependent.
-      def to_s(ds)
-        ds.column_all_sql(self)
-      end
-    end
-
-    # Represents a generic column expression, used for specifying order
-    # and aliasing of columns.
-    class ColumnExpr < Expression
-      # Created readers for the left, operator, and right expression.
-      attr_reader :l, :op, :r
-
-      # Sets the attributes for the object to those given.
-      # The right (r) is not required, it is used when aliasing.
-      # The left (l) usually specifies the column name, and the
-      # operator (op) is usually 'ASC', 'DESC', or 'AS'.
-      def initialize(l, op, r = nil)
-        @l, @op, @r = l, op, r
-      end
-      
-      # Delegate the creation of the resulting SQL to the given dataset,
-      # since it may be database dependent.
-      def to_s(ds)
-        ds.column_expr_sql(self)
-      end
-    end
-    
     # Represents a complex SQL expression, with a given operator and one
     # or more attributes (which may also be ComplexExpressions, forming
     # a tree).  This class is the backbone of the blockless filter support in
@@ -187,6 +96,26 @@ module Sequel
       end
     end
 
+    # The base class for expressions that can be used in multiple places in
+    # the SQL query.  
+    class GenericExpression < Expression
+    end
+    
+    # The base class for expressions that are specific and can only be used
+    # in a certain place in the SQL query (ordering, selecting).
+    class SpecificExpression < Expression
+    end
+
+    ### Modules ###
+
+    # Methods the create aliased identifiers
+    module AliasMethods
+      # Create an SQL column alias of the receiving column to the given alias.
+      def as(aliaz)
+        AliasedExpression.new(self, aliaz)
+      end
+    end
+
     # This module includes the methods that are defined on objects that can be 
     # used in a boolean context in SQL (Symbol, LiteralString, SQL::Function,
     # and SQL::BooleanExpression).
@@ -212,56 +141,28 @@ module Sequel
       end
     end
 
-    # This module includes the methods that are defined on objects that can be 
-    # used in a numeric context in SQL (Symbol, LiteralString, SQL::Function,
-    # and SQL::NumericExpression).
-    #
-    # This defines the +, -, *, and / methods.
-    module NumericMethods
-      ComplexExpression::MATHEMATICAL_OPERATORS.each do |o|
-        define_method(o) do |ce|
-          case ce
-          when NumericExpression
-            NumericExpression.new(o, self, ce)
-          when ComplexExpression
-            raise(Sequel::Error, "cannot apply #{o} to a non-numeric expression")
-          else  
-            NumericExpression.new(o, self, ce)
-          end
-        end
+    # Holds methods that are used to cast objects to differen SQL types.
+    module CastMethods 
+      # Cast the reciever to the given SQL type
+      def cast(sql_type)
+        IrregularFunction.new(:cast, self, :AS, sql_type.to_s.lit)
+      end
+      alias_method :cast_as, :cast
+
+      # Cast the reciever to the given SQL type (or integer if none given),
+      # and return the result as a NumericExpression. 
+      def cast_numeric(sql_type = nil)
+        cast(sql_type || :integer).sql_number
+      end
+
+      # Cast the reciever to the given SQL type (or text if none given),
+      # and return the result as a StringExpression, so you can use +
+      # directly on the result for SQL string concatenation.
+      def cast_string(sql_type = nil)
+        cast(sql_type || :text).sql_string
       end
     end
-
-    # This module includes the methods that are defined on objects that can be 
-    # used in a numeric context in SQL (Symbol, LiteralString, SQL::Function,
-    # and SQL::StringExpression).
-    #
-    # This defines the like (LIKE) method, used for pattern matching.
-    module StringMethods
-      # Create a BooleanExpression case insensitive pattern match of self
-      # with the given patterns.  See StringExpression.like.
-      def ilike(*ces)
-        StringExpression.like(self, *(ces << {:case_insensitive=>true}))
-      end
-
-      # Create a BooleanExpression case sensitive pattern match of self with
-      # the given patterns.  See StringExpression.like.
-      def like(*ces)
-        StringExpression.like(self, *ces)
-      end
-    end
-
-    # This module is included in StringExpression and can be included elsewhere
-    # to allow the use of the + operator to represent concatenation of SQL
-    # Strings:
-    #
-    #   :x.sql_string + :y => # SQL: x || y
-    module StringConcatenationMethods
-      def +(ce)
-        StringExpression.new(:'||', self, ce)
-      end
-    end
-
+    
     # This module includes the methods that are defined on objects that can be 
     # used in a numeric or string context in SQL (Symbol, LiteralString, 
     # SQL::Function, and SQL::StringExpression).
@@ -297,6 +198,81 @@ module Sequel
         super
       end
     end
+
+    # This module includes the methods that are defined on objects that can be 
+    # used in a numeric context in SQL (Symbol, LiteralString, SQL::Function,
+    # and SQL::NumericExpression).
+    #
+    # This defines the +, -, *, and / methods.
+    module NumericMethods
+      ComplexExpression::MATHEMATICAL_OPERATORS.each do |o|
+        define_method(o) do |ce|
+          case ce
+          when NumericExpression
+            NumericExpression.new(o, self, ce)
+          when ComplexExpression
+            raise(Sequel::Error, "cannot apply #{o} to a non-numeric expression")
+          else  
+            NumericExpression.new(o, self, ce)
+          end
+        end
+      end
+    end
+
+    # Methods that create OrderedExpressions, used for sorting by columns
+    # or more complex expressions.
+    module OrderMethods
+      # Mark the receiving SQL column as sorting in a descending fashion.
+      def desc
+        OrderedExpression.new(self)
+      end
+      
+      # Mark the receiving SQL column as sorting in an ascending fashion (generally a no-op).
+      def asc
+        OrderedExpression.new(self, false)
+      end
+    end
+
+    # Methods that created QualifiedIdentifiers, used for qualifying column
+    # names with a table or table names with a schema.
+    module QualifyingMethods
+      # Qualify the current object with the given table/schema.
+      def qualify(ts)
+        QualifiedIdentifier.new(ts, self)
+      end
+    end
+
+    # This module includes the methods that are defined on objects that can be 
+    # used in a numeric context in SQL (Symbol, LiteralString, SQL::Function,
+    # and SQL::StringExpression).
+    #
+    # This defines the like (LIKE) method, used for pattern matching.
+    module StringMethods
+      # Create a BooleanExpression case insensitive pattern match of self
+      # with the given patterns.  See StringExpression.like.
+      def ilike(*ces)
+        StringExpression.like(self, *(ces << {:case_insensitive=>true}))
+      end
+
+      # Create a BooleanExpression case sensitive pattern match of self with
+      # the given patterns.  See StringExpression.like.
+      def like(*ces)
+        StringExpression.like(self, *ces)
+      end
+    end
+
+    # This module is included in StringExpression and can be included elsewhere
+    # to allow the use of the + operator to represent concatenation of SQL
+    # Strings:
+    #
+    #   :x.sql_string + :y => # SQL: x || y
+    module StringConcatenationMethods
+      def +(ce)
+        StringExpression.new(:'||', self, ce)
+      end
+    end
+
+    ### Modules that include other modules ###
 
     # This module includes other Sequel::SQL::*Methods modules and is
     # included in other classes that are could be either booleans,
@@ -342,6 +318,94 @@ module Sequel
       # Return a StringExpression representation of self.
       def sql_string
         StringExpression.new(:NOOP, self)
+      end
+    end
+
+    module SpecificExpressionMethods
+      include AliasMethods
+      include CastMethods
+      include OrderMethods
+    end
+
+    module GenericExpressionMethods
+      include SpecificExpressionMethods
+      include ComplexExpressionMethods
+    end
+
+    class ComplexExpression
+      include SpecificExpressionMethods
+    end
+
+    class GenericExpression
+      include GenericExpressionMethods
+    end
+
+    ### Classes ###
+
+    # Represents an aliasing of an expression/column to a given name.
+    class AliasedExpression < SpecificExpression
+      # The expression to alias
+      attr_reader :expression
+
+      # The alias to use for the expression, not alias since that is
+      # a keyword in ruby.
+      attr_reader :aliaz
+
+      # default value.
+      def initialize(expression, aliaz)
+        @expression, @aliaz = expression, aliaz
+      end
+
+      # Delegate the creation of the resulting SQL to the given dataset,
+      # since it may be database dependent.
+      def to_s(ds)
+        ds.aliased_expression_sql(self)
+      end
+    end
+
+    # Represents an SQL CASE expression, used for conditions.
+    class CaseExpression < GenericExpression
+      # An array of all two pairs with the first element specifying the
+      # condition and the second element specifying the result.
+      attr_reader :conditions
+
+      # The default value if no conditions are true
+      attr_reader :default
+
+      # Create an object with the given conditions and
+      # default value.
+      def initialize(conditions, default)
+        raise(Sequel::Error, 'CaseExpression conditions must be an array with all_two_pairs') unless Array === conditions and conditions.all_two_pairs?
+        @conditions, @default = conditions, default
+      end
+
+      # Delegate the creation of the resulting SQL to the given dataset,
+      # since it may be database dependent.
+      def to_s(ds)
+        ds.case_expression_sql(self)
+      end
+    end
+
+    # Represents all columns in a given table, table.* in SQL
+    class ColumnAll < SpecificExpression
+      # The table containing the columns being selected
+      attr_reader :table
+
+      # Create an object with the given table
+      def initialize(table)
+        @table = table
+      end
+
+      # ColumnAll expressions are considered equivalent if they
+      # have the same class and string representation
+      def ==(x)
+        x.class == self.class && @table == x.table
+      end
+
+      # Delegate the creation of the resulting SQL to the given dataset,
+      # since it may be database dependent.
+      def to_s(ds)
+        ds.column_all_sql(self)
       end
     end
 
@@ -407,6 +471,61 @@ module Sequel
       end
     end
 
+    # Represents an SQL function call.
+    class Function < GenericExpression
+      # The array of arguments to pass to the function (may be blank)
+      attr_reader :args
+
+      # The SQL function to call
+      attr_reader :f
+      
+      # Set the attributes to the given arguments
+      def initialize(f, *args)
+        @f, @args = f, args
+      end
+
+      # Functions are considered equivalent if they
+      # have the same class, function, and arguments.
+      def ==(x)
+         x.class == self.class && @f == x.f && @args == x.args
+      end
+
+      # Delegate the creation of the resulting SQL to the given dataset,
+      # since it may be database dependent.
+      def to_s(ds)
+        ds.function_sql(self)
+      end
+    end
+    
+    # IrregularFunction is used for the SQL EXTRACT and CAST functions,
+    # which don't use regular function calling syntax. The IrregularFunction
+    # replaces the commas the regular function uses with a custom
+    # join string.
+    #
+    # This shouldn't be used directly, see CastMethods#cast and 
+    # ComplexExpressionMethods#extract.
+    class IrregularFunction < Function
+      # The arguments to pass to the function (may be blank)
+      attr_reader :arg1, :arg2
+
+      # The SQL function to call
+      attr_reader :f
+      
+      # The literal string to use in place of a comma to join arguments
+      attr_reader :joiner
+
+      # Set the attributes to the given arguments
+      def initialize(f, arg1, joiner, arg2)
+        @f, @arg1, @joiner, @arg2 = f, arg1, joiner, arg2
+      end
+
+      # Delegate the creation of the resulting SQL to the given dataset,
+      # since it may be database dependent.
+      def to_s(ds)
+        ds.irregular_function_sql(self)
+      end
+    end
+
     # Subclass of ComplexExpression where the expression results
     # in a numeric value in SQL.
     class NumericExpression < ComplexExpression
@@ -415,6 +534,44 @@ module Sequel
       include NoBooleanInputMethods
     end
 
+    # Represents a column/expression to order the result set by.
+    class OrderedExpression < SpecificExpression
+      # The expression to order the result set by.
+      attr_reader :expression
+
+      # Whether the expression should order the result set in a descening manner
+      attr_reader :descending
+
+      # default value.
+      def initialize(expression, descending = true)
+        @expression, @descending = expression, descending
+      end
+
+      # Delegate the creation of the resulting SQL to the given dataset,
+      # since it may be database dependent.
+      def to_s(ds)
+        ds.ordered_expression_sql(self)
+      end
+    end
+
+    # Represents a qualified (column with table) reference.  Used when
+    # joining tables to disambiguate columns.
+    class QualifiedIdentifier < GenericExpression
+      # The table and column to reference
+      attr_reader :table, :column
+
+      # Set the attributes to the given arguments
+      def initialize(table, column)
+        @table, @column = table, column
+      end
+      
+      # Delegate the creation of the resulting SQL to the given dataset,
+      # since it may be database dependent.
+      def to_s(ds)
+        ds.qualified_identifier_sql(self)
+      end 
+    end
+    
     # Subclass of ComplexExpression where the expression results
     # in a text/string/varchar value in SQL.
     class StringExpression < ComplexExpression
@@ -447,82 +604,8 @@ module Sequel
       end
     end
 
-    # Represents an SQL function call.
-    class Function < Expression
-      include ComplexExpressionMethods
-      # The array of arguments to pass to the function (may be blank)
-      attr_reader :args
-
-      # The SQL function to call
-      attr_reader :f
-      
-      # Set the attributes to the given arguments
-      def initialize(f, *args)
-        @f, @args = f, args
-      end
-
-      # Functions are considered equivalent if they
-      # have the same class, function, and arguments.
-      def ==(x)
-         x.class == self.class && @f == x.f && @args == x.args
-      end
-
-      # Delegate the creation of the resulting SQL to the given dataset,
-      # since it may be database dependent.
-      def to_s(ds)
-        ds.function_sql(self)
-      end
-    end
-    
-    # IrregularFunction is used for the SQL EXTRACT and CAST functions,
-    # which don't use regular function calling syntax. The IrregularFunction
-    # replaces the commas the regular function uses with a custom
-    # join string.
-    #
-    # This shouldn't be used directly, see ColumnExpr#cast_as and 
-    # ComplexExpressionMethods#extract.
-    class IrregularFunction < Function
-      # The arguments to pass to the function (may be blank)
-      attr_reader :arg1, :arg2
-
-      # The SQL function to call
-      attr_reader :f
-      
-      # The literal string to use in place of a comma to join arguments
-      attr_reader :joiner
-
-      # Set the attributes to the given arguments
-      def initialize(f, arg1, joiner, arg2)
-        @f, @arg1, @joiner, @arg2 = f, arg1, joiner, arg2
-      end
-
-      # Delegate the creation of the resulting SQL to the given dataset,
-      # since it may be database dependent.
-      def to_s(ds)
-        ds.irregular_function_sql(self)
-      end
-    end
-
-    # Represents a qualified (column with table) reference.  Used when
-    # joining tables to disambiguate columns.
-    class QualifiedColumnRef < Expression
-      # The table and column to reference
-      attr_reader :table, :column
-
-      # Set the attributes to the given arguments
-      def initialize(table, column)
-        @table, @column = table, column
-      end
-      
-      # Delegate the creation of the resulting SQL to the given dataset,
-      # since it may be database dependent.
-      def to_s(ds)
-        ds.qualified_column_ref_sql(self)
-      end 
-    end
-    
     # Represents an SQL array access, with multiple possible arguments.
-    class Subscript < Expression
+    class Subscript < GenericExpression
       # The SQL array column
       attr_reader :f
 
@@ -554,6 +637,7 @@ module Sequel
   # LiteralStrings can use all of the SQL::ColumnMethods and the 
   # SQL::ComplexExpressionMethods.
   class LiteralString < ::String
+    include SQL::OrderMethods
     include SQL::ComplexExpressionMethods
   end
 end

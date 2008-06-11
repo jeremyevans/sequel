@@ -111,7 +111,8 @@ class Hash
 end
 
 class String
-  include Sequel::SQL::ColumnMethods
+  include Sequel::SQL::AliasMethods
+  include Sequel::SQL::CastMethods
 
   # Converts a string into an LiteralString, in order to override string
   # literalization, e.g.:
@@ -141,8 +142,8 @@ class String
 end
 
 class Symbol
-  include Sequel::SQL::ColumnMethods
-  include Sequel::SQL::ComplexExpressionMethods
+  include Sequel::SQL::QualifyingMethods
+  include Sequel::SQL::GenericExpressionMethods
 
   # If no argument is given, returns a Sequel::SQL::ColumnAll object specifying all
   # columns for this table.
