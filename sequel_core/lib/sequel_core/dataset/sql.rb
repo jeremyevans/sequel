@@ -8,12 +8,6 @@ module Sequel
     COLUMN_REF_RE3 = /\A([\w ]+)__([\w ]+)\z/.freeze
     COUNT_FROM_SELF_OPTS = [:distinct, :group, :sql]
     DATE_FORMAT = "DATE '%Y-%m-%d'".freeze
-    JOIN_TYPES = {
-      :left_outer => 'LEFT OUTER JOIN'.freeze,
-      :right_outer => 'RIGHT OUTER JOIN'.freeze,
-      :full_outer => 'FULL OUTER JOIN'.freeze,
-      :inner => 'INNER JOIN'.freeze
-    }
     N_ARITY_OPERATORS = ::Sequel::SQL::ComplexExpression::N_ARITY_OPERATORS
     NULL = "NULL".freeze
     QUESTION_MARK = '?'.freeze
@@ -185,6 +179,9 @@ module Sequel
       case s = source.first
       when Hash
         s.values.first
+      when Symbol
+        sch, table, aliaz = split_symbol(s)
+        aliaz ? aliaz.to_sym : s
       else
         s
       end
@@ -322,6 +319,25 @@ module Sequel
       "#{f.f}(#{literal(f.arg1)} #{f.joiner} #{literal(f.arg2)})"
     end
 
+    # SQL fragment specifying a JOIN clause without ON or USING.
+    def join_clause_sql(jc)
+      table = jc.table
+      table_alias = jc.table_alias
+      table_alias = nil if table == table_alias
+      " #{join_type_sql(jc.join_type)} #{table_ref(table)}" \
+        "#{" AS #{quote_identifier(jc.table_alias)}" if table_alias}"
+    end
+
+    # SQL fragment specifying a JOIN clause with ON.
+    def join_on_clause_sql(jc)
+      "#{join_clause_sql(jc)} ON #{literal(filter_expr(jc.on))}"
+    end
+
+    # SQL fragment specifying a JOIN clause with USING.
+    def join_using_clause_sql(jc)
+      "#{join_clause_sql(jc)} USING (#{column_list(jc.using)})"
+    end
+
     # Returns a joined dataset.  Uses the following arguments:
     #
     # * type - The type of join to do (:inner, :left_outer, :right_outer, :full)
@@ -330,40 +346,58 @@ module Sequel
     #   * Model (or anything responding to :table_name) - table.table_name
     #   * String, Symbol: table
     # * expr - specifies conditions, depends on type:
-    #   * Hash, Array - Assumes key (1st arg) is column of joined table (unless already
+    #   * Hash, Array with all two pairs - Assumes key (1st arg) is column of joined table (unless already
     #     qualified), and value (2nd arg) is column of the last joined or primary table.
     #     To specify multiple conditions on a single joined table column, you must use an array.
+    #     Uses a JOIN with an ON clause.
+    #   * Array - If all members of the array are symbols, considers them as columns and 
+    #     uses a JOIN with a USING clause.  Most databases will remove duplicate columns from
+    #     the result set if this is used.
+    #   * nil - If a block is not given, doesn't use ON or USING, so the JOIN should be a NATURAL
+    #     or CROSS join. If a block is given, uses a ON clause based on the block, see below.
     #   * Everything else - pretty much the same as a using the argument in a call to filter,
     #     so strings are considered literal, symbols specify boolean columns, and blockless
-    #     filter expressions can be used.
+    #     filter expressions can be used. Uses a JOIN with an ON clause.
     # * table_alias - the name of the table's alias when joining, necessary for joining
     #   to the same table more than once.  No alias is used by default.
-    def join_table(type, table, expr=nil, table_alias=nil)
-      raise(Error::InvalidJoinType, "Invalid join type: #{type}") unless join_type = JOIN_TYPES[type || :inner]
-
-      table = if Dataset === table
+    # * block - The block argument should only be given if a JOIN with an ON clause is used,
+    #   in which case it yields the table alias/name for the table currently being joined,
+    #   the table alias/name for the last joined (or first table), and an array of previous
+    #   SQL::JoinClause.
+    def join_table(type, table, expr=nil, table_alias=nil, &block)
+      if Dataset === table
         if table_alias.nil?
           table_alias_num = (@opts[:num_dataset_sources] || 0) + 1
           table_alias = "t#{table_alias_num}"
         end
-        table.to_table_reference
+        table_name = table_alias
       else
         table = table.table_name if table.respond_to?(:table_name)
-        table_alias ||= table
-        table_ref(table)
+        table_name = table_alias || table
       end
 
-      if Hash === expr or (Array === expr and expr.all_two_pairs?)
-        expr = expr.collect do |k, v|
-          k = qualified_column_name(k, table_alias) if k.is_a?(Symbol)
-          v = qualified_column_name(v, @opts[:last_joined_table] || first_source) if v.is_a?(Symbol)
-          [k,v]
+      join = if expr.nil? and !block_given?
+        SQL::JoinClause.new(type, table, table_alias)
+      elsif Array === expr and !expr.empty? and expr.all?{|x| Symbol === x}
+        raise(Sequel::Error, "can't use a block if providing an array of symbols as expr") if block_given?
+        SQL::JoinUsingClause.new(expr, type, table, table_alias)
+      else
+        last_alias = @opts[:last_joined_table] || first_source
+        if Hash === expr or (Array === expr and expr.all_two_pairs?)
+          expr = expr.collect do |k, v|
+            k = qualified_column_name(k, table_name) if k.is_a?(Symbol)
+            v = qualified_column_name(v, last_alias) if v.is_a?(Symbol)
+            [k,v]
+          end
         end
+        if block_given?
+          expr2 = yield(table_name, last_alias, @opts[:join] || [])
+          expr = expr ? SQL::BooleanExpression.new(:AND, expr, expr2) : expr2
+        end
+        SQL::JoinOnClause.new(expr, type, table, table_alias)
       end
 
-      quoted_table_alias = quote_identifier(table_alias) 
-      clause = "#{@opts[:join]} #{join_type} #{table}#{" #{quoted_table_alias}" if quoted_table_alias != table} ON #{literal(filter_expr(expr))}"
-      opts = {:join => clause, :last_joined_table => table_alias}
+      opts = {:join => (@opts[:join] || []) + [join], :last_joined_table => table_name}
       opts[:num_dataset_sources] = table_alias_num if table_alias_num
       clone(opts)
     end
@@ -564,7 +598,7 @@ module Sequel
       end
       
       if join = opts[:join]
-        sql << join
+        join.each{|j| sql << literal(j)}
       end
 
       if where = opts[:where]
@@ -694,7 +728,7 @@ module Sequel
     end
 
     [:inner, :full_outer, :right_outer, :left_outer].each do |jtype|
-      define_method("#{jtype}_join"){|*args| join_table(jtype, *args)}
+      class_eval("def #{jtype}_join(*args, &block); join_table(:#{jtype}, *args, &block) end")
     end
     alias_method :join, :inner_join
 
@@ -769,6 +803,12 @@ module Sequel
       end
     end
     
+    # SQL fragment specifying a JOIN type, converts underscores to
+    # spaces and upcases.
+    def join_type_sql(join_type)
+      "#{join_type.to_s.gsub('_', ' ').upcase} JOIN"
+    end
+
     # Returns a qualified column name (including a table name) if the column
     # name isn't already qualified.
     def qualified_column_name(column, table)

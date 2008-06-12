@@ -318,9 +318,13 @@ context "MySQL join expressions" do
     @ds.join_table(:natural_inner, :nodes).sql.should == \
       'SELECT * FROM nodes NATURAL LEFT JOIN nodes'
   end
-  specify "should support cross joins (equivalent to inner join in MySQL, not in std SQL)" do
+  specify "should support cross joins" do
     @ds.join_table(:cross, :nodes).sql.should == \
-      'SELECT * FROM nodes INNER JOIN nodes'
+      'SELECT * FROM nodes CROSS JOIN nodes'
+  end
+  specify "should support cross joins as inner joins if conditions are used" do
+    @ds.join_table(:cross, :nodes, :id=>:id).sql.should == \
+      'SELECT * FROM nodes INNER JOIN nodes ON (nodes.id = nodes.id)'
   end
   specify "should support straight joins (force left table to be read before right)" do
     @ds.join_table(:straight, :nodes).sql.should == \
@@ -328,11 +332,11 @@ context "MySQL join expressions" do
   end
   specify "should support natural joins on multiple tables." do
     @ds.join_table(:natural_left_outer, [:nodes, :branches]).sql.should == \
-      'SELECT * FROM nodes NATURAL LEFT OUTER JOIN ( nodes, branches )'
+      'SELECT * FROM nodes NATURAL LEFT OUTER JOIN (nodes, branches)'
   end
   specify "should support straight joins on multiple tables." do
     @ds.join_table(:straight, [:nodes,:branches]).sql.should == \
-      'SELECT * FROM nodes STRAIGHT_JOIN ( nodes, branches )'
+      'SELECT * FROM nodes STRAIGHT_JOIN (nodes, branches)'
   end
 end
 

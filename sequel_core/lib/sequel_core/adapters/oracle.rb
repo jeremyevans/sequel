@@ -135,7 +135,7 @@ module Sequel
         end
         
         if join = opts[:join]
-          sql << join
+          join.each{|j| sql << literal(j)}
         end
 
         if where = opts[:where]

@@ -1,5 +1,9 @@
 === HEAD
 
+* Allow join_table to accept a block providing the aliases and previous joins, that allows you to specify arbitrary conditions properly qualified (jeremyevans)
+
+* Support NATURAL, CROSS, and USING joins in join_table (jeremyevans)
+
 * Make sure HAVING comes before ORDER BY, per the SQL standard and at least MySQL, PostgreSQL, and SQLite (juco)
 
 * Add cast_numeric and cast_string methods for use in the Sequel DSL, that have default types and wrap the object in the correct class (jeremyevans)

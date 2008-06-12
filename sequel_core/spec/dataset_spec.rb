@@ -1244,21 +1244,19 @@ context "Dataset#join_table" do
       'SELECT * FROM "items" INNER JOIN "categories" ON ("categories"."category_id" = "items"."id")'
   end
   
-  specify "should default to an inner join" do
+  specify "should default to a plain join if nil is used for the type" do
     @d.join_table(nil, :categories, :category_id=>:id).sql.should ==
-      'SELECT * FROM "items" INNER JOIN "categories" ON ("categories"."category_id" = "items"."id")'
+      'SELECT * FROM "items"  JOIN "categories" ON ("categories"."category_id" = "items"."id")'
+  end
 
+  specify "should use an inner join for Dataset#join" do
     @d.join(:categories, :category_id=>:id).sql.should ==
       'SELECT * FROM "items" INNER JOIN "categories" ON ("categories"."category_id" = "items"."id")'
   end
   
-  specify "should raise if an invalid join type is specified" do
-    proc {@d.join_table(:invalid, :a, :b=>:id)}.should raise_error(Sequel::Error)
-  end
-  
   specify "should support aliased tables" do
     @d.from('stats').join('players', {:id => :player_id}, 'p').sql.should ==
-      'SELECT * FROM "stats" INNER JOIN "players" "p" ON ("p"."id" = "stats"."player_id")'
+      'SELECT * FROM "stats" INNER JOIN "players" AS "p" ON ("p"."id" = "stats"."player_id")'
 
     ds = MockDataset.new(nil).from(:foo => :f)
     ds.quote_identifiers = true
@@ -1286,19 +1284,19 @@ context "Dataset#join_table" do
     ds = Sequel::Dataset.new(nil).from(:categories)
     
     @d.join_table(:left_outer, ds, :item_id => :id).sql.should ==
-      'SELECT * FROM "items" LEFT OUTER JOIN (SELECT * FROM categories) "t1" ON ("t1"."item_id" = "items"."id")'
+      'SELECT * FROM "items" LEFT OUTER JOIN (SELECT * FROM categories) AS "t1" ON ("t1"."item_id" = "items"."id")'
       
     ds.filter!(:active => true)
 
     @d.join_table(:left_outer, ds, :item_id => :id).sql.should ==
-      'SELECT * FROM "items" LEFT OUTER JOIN (SELECT * FROM categories WHERE (active = \'t\')) "t1" ON ("t1"."item_id" = "items"."id")'
+      'SELECT * FROM "items" LEFT OUTER JOIN (SELECT * FROM categories WHERE (active = \'t\')) AS "t1" ON ("t1"."item_id" = "items"."id")'
   end
   
   specify "should support joining datasets and aliasing the join" do
     ds = Sequel::Dataset.new(nil).from(:categories)
     
     @d.join_table(:left_outer, ds, {:ds__item_id => :id}, :ds).sql.should ==
-      'SELECT * FROM "items" LEFT OUTER JOIN (SELECT * FROM categories) "ds" ON ("ds"."item_id" = "items"."id")'      
+      'SELECT * FROM "items" LEFT OUTER JOIN (SELECT * FROM categories) AS "ds" ON ("ds"."item_id" = "items"."id")'      
   end
   
   specify "should support joining multiple datasets" do
@@ -1307,9 +1305,9 @@ context "Dataset#join_table" do
     ds3 = Sequel::Dataset.new(nil).from(:attributes).filter("name = 'blah'")
 
     @d.join_table(:left_outer, ds, :item_id => :id).join_table(:inner, ds2, :node_id=>:id).join_table(:right_outer, ds3, :attribute_id=>:id).sql.should ==
-      'SELECT * FROM "items" LEFT OUTER JOIN (SELECT * FROM categories) "t1" ON ("t1"."item_id" = "items"."id") ' \
-      'INNER JOIN (SELECT name FROM nodes) "t2" ON ("t2"."node_id" = "t1"."id") ' \
-      'RIGHT OUTER JOIN (SELECT * FROM attributes WHERE (name = \'blah\')) "t3" ON ("t3"."attribute_id" = "t2"."id")'
+      'SELECT * FROM "items" LEFT OUTER JOIN (SELECT * FROM categories) AS "t1" ON ("t1"."item_id" = "items"."id") ' \
+      'INNER JOIN (SELECT name FROM nodes) AS "t2" ON ("t2"."node_id" = "t1"."id") ' \
+      'RIGHT OUTER JOIN (SELECT * FROM attributes WHERE (name = \'blah\')) AS "t3" ON ("t3"."attribute_id" = "t2"."id")'
   end
 
   specify "should support joining objects that respond to :table_name" do
@@ -1322,7 +1320,7 @@ context "Dataset#join_table" do
   
   specify "should support using a SQL String as the join condition" do
     @d.join(:categories, %{c.item_id = items.id}, :c).sql.should ==
-      'SELECT * FROM "items" INNER JOIN "categories" "c" ON (c.item_id = items.id)'
+      'SELECT * FROM "items" INNER JOIN "categories" AS "c" ON (c.item_id = items.id)'
   end
   
   specify "should support using a boolean column as the join condition" do
@@ -1333,6 +1331,89 @@ context "Dataset#join_table" do
   specify "should support using an expression as the join condition" do
     @d.join(:categories, :number > 10).sql.should ==
       'SELECT * FROM "items" INNER JOIN "categories" ON ("number" > 10)'
+  end
+
+  specify "should support natural and cross joins using nil" do
+    @d.join_table(:natural, :categories).sql.should ==
+      'SELECT * FROM "items" NATURAL JOIN "categories"'
+    @d.join_table(:cross, :categories, nil).sql.should ==
+      'SELECT * FROM "items" CROSS JOIN "categories"'
+    @d.join_table(:natural, :categories, nil, :c).sql.should ==
+      'SELECT * FROM "items" NATURAL JOIN "categories" AS "c"'
+  end
+
+  specify "should support joins with a USING clause if an array of symbols is used" do
+    @d.join(:categories, [:id]).sql.should ==
+      'SELECT * FROM "items" INNER JOIN "categories" USING ("id")'
+    @d.join(:categories, [:id1, :id2]).sql.should ==
+      'SELECT * FROM "items" INNER JOIN "categories" USING ("id1", "id2")'
+  end
+
+  specify "should raise an error if using an array of symbols with a block" do
+    proc{@d.join(:categories, [:id]){|j,lj,js|}}.should raise_error(Sequel::Error)
+  end
+
+  specify "should support using a block that receieves the join table/alias, last join table/alias, and array of previous joins" do
+    @d.join(:categories) do |join_alias, last_join_alias, joins| 
+      join_alias.should == :categories
+      last_join_alias.should == :items
+      joins.should == []
+    end
+
+    @d.from(:items=>:i).join(:categories, nil, :c) do |join_alias, last_join_alias, joins| 
+      join_alias.should == :c
+      last_join_alias.should == :i
+      joins.should == []
+    end
+
+    @d.from(:items___i).join(:categories, nil, :c) do |join_alias, last_join_alias, joins| 
+      join_alias.should == :c
+      last_join_alias.should == :i
+      joins.should == []
+    end
+
+    @d.join(:blah).join(:categories, nil, :c) do |join_alias, last_join_alias, joins| 
+      join_alias.should == :c
+      last_join_alias.should == :blah
+      joins.should be_a_kind_of(Array)
+      joins.length.should == 1
+      joins.first.should be_a_kind_of(Sequel::SQL::JoinClause)
+      joins.first.join_type.should == :inner
+    end
+
+    @d.join_table(:natural, :blah, nil, :b).join(:categories, nil, :c) do |join_alias, last_join_alias, joins| 
+      join_alias.should == :c
+      last_join_alias.should == :b
+      joins.should be_a_kind_of(Array)
+      joins.length.should == 1
+      joins.first.should be_a_kind_of(Sequel::SQL::JoinClause)
+      joins.first.join_type.should == :natural
+    end
+
+    @d.join(:blah).join(:categories).join(:blah2) do |join_alias, last_join_alias, joins| 
+      join_alias.should == :blah2
+      last_join_alias.should == :categories
+      joins.should be_a_kind_of(Array)
+      joins.length.should == 2
+      joins.first.should be_a_kind_of(Sequel::SQL::JoinClause)
+      joins.first.table.should == :blah
+      joins.last.should be_a_kind_of(Sequel::SQL::JoinClause)
+      joins.last.table.should == :categories
+    end
+  end
+
+  specify "should use the block result as the only condition if no condition is given" do
+    @d.join(:categories){|j,lj,js| {:b.qualify(j)=>:c.qualify(lj)}}.sql.should ==
+      'SELECT * FROM "items" INNER JOIN "categories" ON ("categories"."b" = "items"."c")'
+    @d.join(:categories){|j,lj,js| :b.qualify(j) > :c.qualify(lj)}.sql.should ==
+      'SELECT * FROM "items" INNER JOIN "categories" ON ("categories"."b" > "items"."c")'
+  end
+
+  specify "should combine the block conditions and argument conditions if both given" do
+    @d.join(:categories, :a=>:d){|j,lj,js| {:b.qualify(j)=>:c.qualify(lj)}}.sql.should ==
+      'SELECT * FROM "items" INNER JOIN "categories" ON (("categories"."a" = "items"."d") AND ("categories"."b" = "items"."c"))'
+    @d.join(:categories, :a=>:d){|j,lj,js| :b.qualify(j) > :c.qualify(lj)}.sql.should ==
+      'SELECT * FROM "items" INNER JOIN "categories" ON (("categories"."a" = "items"."d") AND ("categories"."b" > "items"."c"))'
   end
 end
 

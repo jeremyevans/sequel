@@ -48,7 +48,7 @@ describe Sequel::Dataset, " graphing" do
 
   it "#graph should accept a :table_alias option" do
     ds = @ds1.graph(:lines, {:x=>:id}, :table_alias=>:planes)
-    ds.sql.should == 'SELECT points.id, points.x, points.y, planes.id AS planes_id, planes.x AS planes_x, planes.y AS planes_y, planes.graph_id FROM points LEFT OUTER JOIN lines planes ON (planes.x = points.id)'
+    ds.sql.should == 'SELECT points.id, points.x, points.y, planes.id AS planes_id, planes.x AS planes_x, planes.y AS planes_y, planes.graph_id FROM points LEFT OUTER JOIN lines AS planes ON (planes.x = points.id)'
   end
 
   it "#graph should accept a :join_type option" do
@@ -80,7 +80,7 @@ describe Sequel::Dataset, " graphing" do
 
   it "#graph should allow graphing of the same dataset multiple times" do
     ds = @ds1.graph(@ds2, :x=>:id).graph(@ds2, {:y=>:points__id}, :table_alias=>:graph)
-    ds.sql.should == 'SELECT points.id, points.x, points.y, lines.id AS lines_id, lines.x AS lines_x, lines.y AS lines_y, lines.graph_id, graph.id AS graph_id_0, graph.x AS graph_x, graph.y AS graph_y, graph.graph_id AS graph_graph_id FROM points LEFT OUTER JOIN lines ON (lines.x = points.id) LEFT OUTER JOIN lines graph ON (graph.y = points.id)'
+    ds.sql.should == 'SELECT points.id, points.x, points.y, lines.id AS lines_id, lines.x AS lines_x, lines.y AS lines_y, lines.graph_id, graph.id AS graph_id_0, graph.x AS graph_x, graph.y AS graph_y, graph.graph_id AS graph_graph_id FROM points LEFT OUTER JOIN lines ON (lines.x = points.id) LEFT OUTER JOIN lines AS graph ON (graph.y = points.id)'
   end
 
   it "#graph should raise an error if the table/table alias has already been used" do

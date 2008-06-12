@@ -285,28 +285,6 @@ module Sequel
       TRUE = '1'
       FALSE = '0'
 
-      # Join processing changed after MySQL v5.0.12. NATURAL
-      # joins are SQL:2003 consistent.
-      JOIN_TYPES  =  { :cross => 'INNER JOIN'.freeze,
-        :straight => 'STRAIGHT_JOIN'.freeze,
-        :natural_left => 'NATURAL LEFT JOIN'.freeze,
-        :natural_right => 'NATURAL RIGHT JOIN'.freeze,
-        :natural_left_outer => 'NATURAL LEFT OUTER JOIN'.freeze,
-        :natural_right_outer => 'NATURAL RIGHT OUTER JOIN'.freeze,
-        :left => 'LEFT JOIN'.freeze,
-        :right => 'RIGHT JOIN'.freeze,
-        :left_outer => 'LEFT OUTER JOIN'.freeze,
-        :right_outer => 'RIGHT OUTER JOIN'.freeze,
-        :natural_inner => 'NATURAL LEFT JOIN'.freeze,
-        # :full_outer => 'FULL OUTER JOIN'.freeze,
-        #
-        # A full outer join, nor a workaround implementation of
-        # :full_outer, is not yet possible in Sequel. See issue
-        # #195 which probably depends on issue #113 being
-        # resolved.
-        :inner => 'INNER JOIN'.freeze
-      }
-
       def literal(v)
         case v
         when LiteralString
@@ -340,18 +318,18 @@ module Sequel
       #   @ds.join_table(:natural_left_outer, :nodes)
       #   # join SQL is 'NATURAL LEFT OUTER JOIN nodes'
       def join_table(type, table, expr=nil, table_alias=nil)
-        raise(Error::InvalidJoinType, "Invalid join type: #{type}") unless join_type = JOIN_TYPES[type || :inner]
-
-        server_version = (@opts[:server_version] ||= @db.server_version)
         type = :inner if (type == :cross) && !expr.nil?
-        return super(type, table, expr, table_alias) unless (server_version >= 50014) && /natural|cross|straight/.match(type.to_s)
-  
-        table = if Array === table
-          "( #{table.collect{|t| quote_identifier(t)}.join(', ')} )"
-        else
-          quote_identifier(table)
+        raise(Sequel::Error::InvalidJoinType, "MySQL doesn't support FULL OUTER JOIN") if type == :full_outer
+        super(type, table, expr, table_alias)
+      end
+      
+
+      def join_type_sql(join_type)
+        case join_type
+        when :straight then 'STRAIGHT_JOIN'
+        when :natural_inner then 'NATURAL LEFT JOIN'
+        else super
         end
-        clone(:join => "#{@opts[:join]} #{join_type} #{table}")
       end
 
       def insert_default_values_sql

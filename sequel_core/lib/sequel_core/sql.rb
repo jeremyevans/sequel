@@ -363,52 +363,6 @@ module Sequel
       end
     end
 
-    # Represents an SQL CASE expression, used for conditions.
-    class CaseExpression < GenericExpression
-      # An array of all two pairs with the first element specifying the
-      # condition and the second element specifying the result.
-      attr_reader :conditions
-
-      # The default value if no conditions are true
-      attr_reader :default
-
-      # Create an object with the given conditions and
-      # default value.
-      def initialize(conditions, default)
-        raise(Sequel::Error, 'CaseExpression conditions must be an array with all_two_pairs') unless Array === conditions and conditions.all_two_pairs?
-        @conditions, @default = conditions, default
-      end
-
-      # Delegate the creation of the resulting SQL to the given dataset,
-      # since it may be database dependent.
-      def to_s(ds)
-        ds.case_expression_sql(self)
-      end
-    end
-
-    # Represents all columns in a given table, table.* in SQL
-    class ColumnAll < SpecificExpression
-      # The table containing the columns being selected
-      attr_reader :table
-
-      # Create an object with the given table
-      def initialize(table)
-        @table = table
-      end
-
-      # ColumnAll expressions are considered equivalent if they
-      # have the same class and string representation
-      def ==(x)
-        x.class == self.class && @table == x.table
-      end
-
-      # Delegate the creation of the resulting SQL to the given dataset,
-      # since it may be database dependent.
-      def to_s(ds)
-        ds.column_all_sql(self)
-      end
-    end
-
     # Subclass of ComplexExpression where the expression results
     # in a boolean value in SQL.
     class BooleanExpression < ComplexExpression
@@ -471,6 +425,52 @@ module Sequel
       end
     end
 
+    # Represents an SQL CASE expression, used for conditions.
+    class CaseExpression < GenericExpression
+      # An array of all two pairs with the first element specifying the
+      # condition and the second element specifying the result.
+      attr_reader :conditions
+
+      # The default value if no conditions are true
+      attr_reader :default
+
+      # Create an object with the given conditions and
+      # default value.
+      def initialize(conditions, default)
+        raise(Sequel::Error, 'CaseExpression conditions must be an array with all_two_pairs') unless Array === conditions and conditions.all_two_pairs?
+        @conditions, @default = conditions, default
+      end
+
+      # Delegate the creation of the resulting SQL to the given dataset,
+      # since it may be database dependent.
+      def to_s(ds)
+        ds.case_expression_sql(self)
+      end
+    end
+
+    # Represents all columns in a given table, table.* in SQL
+    class ColumnAll < SpecificExpression
+      # The table containing the columns being selected
+      attr_reader :table
+
+      # Create an object with the given table
+      def initialize(table)
+        @table = table
+      end
+
+      # ColumnAll expressions are considered equivalent if they
+      # have the same class and string representation
+      def ==(x)
+        x.class == self.class && @table == x.table
+      end
+
+      # Delegate the creation of the resulting SQL to the given dataset,
+      # since it may be database dependent.
+      def to_s(ds)
+        ds.column_all_sql(self)
+      end
+    end
+
     # Represents an SQL function call.
     class Function < GenericExpression
       # The array of arguments to pass to the function (may be blank)
@@ -523,6 +523,69 @@ module Sequel
       # since it may be database dependent.
       def to_s(ds)
         ds.irregular_function_sql(self)
+      end
+    end
+
+    # Represents an SQL JOIN clause, used for joining tables.
+    class JoinClause < SpecificExpression
+      # The type of join to do
+      attr_reader :join_type
+
+      # The actual table to join
+      attr_reader :table
+
+      # The table alias to use for the join, if any
+      attr_reader :table_alias
+
+      # Create an object with the given conditions and
+      # default value.
+      def initialize(join_type, table, table_alias = nil)
+        @join_type, @table, @table_alias = join_type, table, table_alias
+      end
+
+      # Delegate the creation of the resulting SQL to the given dataset,
+      # since it may be database dependent.
+      def to_s(ds)
+        ds.join_clause_sql(self)
+      end
+    end
+
+    # Represents an SQL JOIN table ON conditions clause.
+    class JoinOnClause < JoinClause
+      # The conditions for the join
+      attr_reader :on
+
+      # Create an object with the given conditions and
+      # default value.
+      def initialize(on, *args)
+        @on = on
+        super(*args)
+      end
+
+      # Delegate the creation of the resulting SQL to the given dataset,
+      # since it may be database dependent.
+      def to_s(ds)
+        ds.join_on_clause_sql(self)
+      end
+    end
+
+    # Represents an SQL JOIN table USING (columns) clause.
+    class JoinUsingClause < JoinClause
+      # The columns that appear both tables that should be equal 
+      # for the conditions to match.
+      attr_reader :using
+
+      # Create an object with the given conditions and
+      # default value.
+      def initialize(using, *args)
+        @using = using
+        super(*args)
+      end
+
+      # Delegate the creation of the resulting SQL to the given dataset,
+      # since it may be database dependent.
+      def to_s(ds)
+        ds.join_using_clause_sql(self)
       end
     end
 
