@@ -1,5 +1,7 @@
 === HEAD
 
+* Make sure HAVING comes before ORDER BY, per the SQL standard and at least MySQL, PostgreSQL, and SQLite (juco)
+
 * Add cast_numeric and cast_string methods for use in the Sequel DSL, that have default types and wrap the object in the correct class (jeremyevans)
 
 * Add Symbol#qualify, for adding a table/schema qualifier to a column/table name (jeremyevans)
