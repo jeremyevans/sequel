@@ -578,12 +578,12 @@ module Sequel
         sql << " GROUP BY #{column_list(group)}"
       end
 
-      if order = opts[:order]
-        sql << " ORDER BY #{column_list(order)}"
-      end
-
       if having = opts[:having]
         sql << " HAVING #{literal(having)}"
+      end
+
+      if order = opts[:order]
+        sql << " ORDER BY #{column_list(order)}"
       end
 
       if limit = opts[:limit]
