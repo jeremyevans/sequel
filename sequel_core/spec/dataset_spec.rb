@@ -1057,7 +1057,8 @@ end
 
 context "Dataset#uniq" do
   setup do
-    @dataset = Sequel::Dataset.new(nil).from(:test).select(:name)
+    @db = MockDatabase.new
+    @dataset = @db[:test].select(:name)
   end
   
   specify "should include DISTINCT clause in statement" do
@@ -1072,6 +1073,11 @@ context "Dataset#uniq" do
     @dataset.uniq(:a, :b).sql.should == 'SELECT DISTINCT ON (a, b) name FROM test'
 
     @dataset.uniq(:stamp.cast_as(:integer), :node_id).sql.should == 'SELECT DISTINCT ON (cast(stamp AS integer), node_id) name FROM test'
+  end
+
+  specify "should do a subselect for count" do
+    @dataset.uniq.count
+    @db.sqls.should == ['SELECT COUNT(*) FROM (SELECT DISTINCT name FROM test) t1 LIMIT 1']
   end
 end
 

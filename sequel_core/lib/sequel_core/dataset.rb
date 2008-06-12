@@ -178,7 +178,7 @@ module Sequel
     def clone(opts = {})
       c = super()
       c.opts = @opts.merge(opts)
-      c.instance_variable_set(:@columns, nil) unless (opts.keys & COLUMN_CHANGE_OPTS).empty?
+      c.instance_variable_set(:@columns, nil) if c.options_overlap(COLUMN_CHANGE_OPTS)
       c
     end
     
@@ -423,6 +423,13 @@ module Sequel
   
     # Add the mutation methods via metaprogramming
     def_mutation_method(*MUTATION_METHODS)
+
+    protected
+
+    # Return true if the dataset has a non-nil value for any key in opts.
+    def options_overlap(opts)
+      !(@opts.collect{|k,v| k unless v.nil?}.compact & opts).empty?
+    end
 
     private
 

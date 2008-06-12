@@ -6,6 +6,7 @@ module Sequel
     COLUMN_REF_RE1 = /\A([\w ]+)__([\w ]+)___([\w ]+)\z/.freeze
     COLUMN_REF_RE2 = /\A([\w ]+)___([\w ]+)\z/.freeze
     COLUMN_REF_RE3 = /\A([\w ]+)__([\w ]+)\z/.freeze
+    COUNT_FROM_SELF_OPTS = [:distinct, :group, :sql]
     DATE_FORMAT = "DATE '%Y-%m-%d'".freeze
     JOIN_TYPES = {
       :left_outer => 'LEFT OUTER JOIN'.freeze,
@@ -62,11 +63,7 @@ module Sequel
 
     # Returns the number of records in the dataset.
     def count
-      if @opts[:sql] || @opts[:group]
-        from_self.count
-      else
-        single_value(STOCK_COUNT_OPTS).to_i
-      end
+      options_overlap(COUNT_FROM_SELF_OPTS) ? from_self.count : single_value(STOCK_COUNT_OPTS).to_i
     end
     alias_method :size, :count
 
