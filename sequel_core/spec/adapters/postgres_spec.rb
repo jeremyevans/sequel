@@ -155,13 +155,13 @@ context "A PostgreSQL dataset" do
       'SELECT * FROM "test" ORDER BY "name" DESC'
 
     @d.reverse_order(:name.desc).sql.should == \
-      'SELECT * FROM "test" ORDER BY "name"'
+      'SELECT * FROM "test" ORDER BY "name" ASC'
 
     @d.reverse_order(:name, :test.desc).sql.should == \
-      'SELECT * FROM "test" ORDER BY "name" DESC, "test"'
+      'SELECT * FROM "test" ORDER BY "name" DESC, "test" ASC'
 
     @d.reverse_order(:name.desc, :test).sql.should == \
-      'SELECT * FROM "test" ORDER BY "name", "test" DESC'
+      'SELECT * FROM "test" ORDER BY "name" ASC, "test" DESC'
   end
   
   specify "should support transactions" do

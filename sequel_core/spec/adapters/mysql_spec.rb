@@ -179,13 +179,13 @@ context "A MySQL dataset" do
       'SELECT * FROM `items` ORDER BY `name` DESC'
 
     @d.reverse_order(:name.desc).sql.should == \
-      'SELECT * FROM `items` ORDER BY `name`'
+      'SELECT * FROM `items` ORDER BY `name` ASC'
 
     @d.reverse_order(:name, :test.desc).sql.should == \
-      'SELECT * FROM `items` ORDER BY `name` DESC, `test`'
+      'SELECT * FROM `items` ORDER BY `name` DESC, `test` ASC'
 
     @d.reverse_order(:name.desc, :test).sql.should == \
-      'SELECT * FROM `items` ORDER BY `name`, `test` DESC'
+      'SELECT * FROM `items` ORDER BY `name` ASC, `test` DESC'
   end
   
   specify "should support ORDER clause in UPDATE statements" do
