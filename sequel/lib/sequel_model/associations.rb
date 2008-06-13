@@ -104,6 +104,9 @@ module Sequel::Model::Associations
   #     use this option, but beware that the join table attributes can clash with
   #     attributes from the model table, so you should alias any attributes that have
   #     the same name in both the join table and the associated table.
+  # * :one_to_many, :many_to_many:
+  #   - :limit - Limit the number of records to the provided value.  Use
+  #     an array with two arguments for the value to specify a limit and offset.
   # * :many_to_one:
   #   - :key - foreign_key in current model's table that references
   #     associated model's primary key, as a symbol.  Defaults to :"#{name}_id".
@@ -220,6 +223,7 @@ module Sequel::Model::Associations
     ivar = association_ivar(name)
     order = opts[:order]
     eager = opts[:eager]
+    limit = opts[:limit]
 
     # If a block is given, define a helper method for it, because it takes
     # an argument.  This is unnecessary in Ruby 1.9, as that has instance_exec.
@@ -232,6 +236,7 @@ module Sequel::Model::Associations
     class_def(dataset_method) do
       ds = instance_eval(&block)
       ds = ds.order(*order) if order
+      ds = ds.limit(*limit) if limit
       ds = ds.eager(eager) if eager
       ds = send(helper_method, ds) if dataset_block
       ds
