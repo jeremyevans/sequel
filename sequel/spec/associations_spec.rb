@@ -423,6 +423,18 @@ describe Sequel::Model, "one_to_many" do
     MODEL_DB.sqls.should == ['SELECT attributes.* FROM attributes WHERE ((node_id = 1234) AND (xxx IS NULL)) ORDER BY kind']
   end
   
+  it "should have the block argument affect the _dataset method" do
+    @c2.one_to_many :attributes, :class => @c1 do |ds|
+      ds.filter(:xxx => 456)
+    end
+    @c2.new(:id => 1234).attributes_dataset.sql.should == 'SELECT attributes.* FROM attributes WHERE ((node_id = 1234) AND (xxx = 456))'
+  end
+  
+  it "should have the :eager option affect the _dataset method" do
+    @c2.one_to_many :attributes, :class => @c2 , :eager=>:attributes
+    @c2.new(:id => 1234).attributes_dataset.opts[:eager].should == {:attributes=>nil}
+  end
+  
   it "should set cached instance variable when accessed" do
     @c2.one_to_many :attributes, :class => @c1
 
@@ -784,6 +796,18 @@ describe Sequel::Model, "many_to_many" do
     MODEL_DB.sqls.first.should == 'SELECT attributes.* FROM attributes INNER JOIN attributes_nodes ON ((attributes_nodes.attribute_id = attributes.id) AND (attributes_nodes.node_id = 1234)) WHERE (xxx = 555) ORDER BY blah1, blah2'
   end
 
+  it "should have the block argument affect the _dataset method" do
+    @c2.many_to_many :attributes, :class => @c1 do |ds|
+      ds.filter(:xxx => 456)
+    end
+    @c2.new(:id => 1234).attributes_dataset.sql.should == 'SELECT attributes.* FROM attributes INNER JOIN attributes_nodes ON ((attributes_nodes.attribute_id = attributes.id) AND (attributes_nodes.node_id = 1234)) WHERE (xxx = 456)'
+  end
+  
+  it "should have the :eager option affect the _dataset method" do
+    @c2.many_to_many :attributes, :class => @c2 , :eager=>:attributes
+    @c2.new(:id => 1234).attributes_dataset.opts[:eager].should == {:attributes=>nil}
+  end
+  
   it "should define an add_ method" do
     @c2.many_to_many :attributes, :class => @c1
     

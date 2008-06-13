@@ -1,5 +1,7 @@
 === HEAD
 
+* Make association block argument and :eager option affect the _dataset method (jeremyevans)
+
 * Add a :one_to_one option to one_to_many associations, which creates a getter and setter similar to many_to_one (a.k.a. has_one) (jeremyevans)
 
 * add_ and remove_ one_to_many association methods now raise an error if the passed object cannot be saved, instead of saving without validation (jeremyevans)

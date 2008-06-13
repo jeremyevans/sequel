@@ -218,34 +218,30 @@ module Sequel::Model::Associations
     helper_method = :"#{name}_helper"
     dataset_block = opts[:block]
     ivar = association_ivar(name)
-    
-    # define a method returning the association dataset (with optional order)
-    if order = opts[:order]
-      class_def(dataset_method) {instance_eval(&block).order(*order)}
-    else
-      class_def(dataset_method, &block)
-    end
-    
+    order = opts[:order]
+    eager = opts[:eager]
+
     # If a block is given, define a helper method for it, because it takes
     # an argument.  This is unnecessary in Ruby 1.9, as that has instance_exec.
     if dataset_block
       class_def(helper_method, &dataset_block)
+      private helper_method
+    end
+    
+    # define a method returning the association dataset (with optional order)
+    class_def(dataset_method) do
+      ds = instance_eval(&block)
+      ds = ds.order(*order) if order
+      ds = ds.eager(eager) if eager
+      ds = send(helper_method, ds) if dataset_block
+      ds
     end
     
     class_def(name) do |*reload|
       if !reload[0] && obj = instance_variable_get(ivar)
         obj
       else
-        ds = send(dataset_method)
-        # if the a dataset block was specified, we need to call it and use
-        # the result as the dataset to fetch records from.
-        if dataset_block
-          ds = send(helper_method, ds)
-        end
-        if eager = opts[:eager]
-          ds = ds.eager(eager)
-        end
-        objs = ds.all
+        objs = send(dataset_method).all
         # Only one_to_many associations should set the reciprocal object
         if (opts[:type] == :one_to_many) && (reciprocal = opts.reciprocal)
           objs.each{|o| o.instance_variable_set(reciprocal, self)}
