@@ -38,11 +38,11 @@ module Sequel
     #     used more than once.
     #   * :join_type - The type of join to use (passed to join_table).  Defaults to
     #     :left_outer.
-    #   * :select - Whether to select the columns from the you are joining, and 
-    #     include them as a separate hash in the output.  With this set to false,
-    #     it is like simply joining the tables.  This is designed to be used for
-    #     many_to_many join tables, where the columns are just foreign keys to primary
-    #     keys in other tables.
+    #   * :select - An array of columns to select.  When not used, selects
+    #     all columns in the given dataset.  When set to false, selects no
+    #     columns and is like simply joining the tables, though graph keeps
+    #     some metadata about join that makes it important to use graph instead
+    #     of join.
     def graph(dataset, join_conditions, options = {})
       # Allow the use of a model, dataset, or symbol as the first argument
       # Find the table name/dataset based on the argument
@@ -112,12 +112,14 @@ module Sequel
         select = opts[:select]
         column_aliases = graph[:column_aliases]
         ca_num = graph[:column_alias_num]
+        # Which columns to add to the result set
+        cols = options[:select] || dataset.columns
         # If the column hasn't been used yet, don't alias it.
         # If it has been used, try table_column.
         # If that has been used, try table_column_N 
         # using the next value of N that we know hasn't been
         # used
-        dataset.columns.each do |column|
+        cols.each do |column|
           col_alias, c = if column_aliases[column]
             tc = :"#{table_alias}_#{column}"
             if column_aliases[tc]

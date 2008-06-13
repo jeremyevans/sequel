@@ -56,9 +56,14 @@ describe Sequel::Dataset, " graphing" do
     ds.sql.should == 'SELECT points.id, points.x, points.y, lines.id AS lines_id, lines.x AS lines_x, lines.y AS lines_y, lines.graph_id FROM points INNER JOIN lines ON (lines.x = points.id)'
   end
 
-  it "#graph should accept a :select_option" do
+  it "#graph should not select any columns from the graphed table if :select option is false" do
     ds = @ds1.graph(:lines, {:x=>:id}, :select=>false).graph(:graphs, :id=>:graph_id)
     ds.sql.should == 'SELECT points.id, points.x, points.y, graphs.id AS graphs_id, graphs.name, graphs.x AS graphs_x, graphs.y AS graphs_y, graphs.lines_x FROM points LEFT OUTER JOIN lines ON (lines.x = points.id) LEFT OUTER JOIN graphs ON (graphs.id = lines.graph_id)'
+  end
+
+  it "#graph should use the given columns if :select option is used" do
+    ds = @ds1.graph(:lines, {:x=>:id}, :select=>[:x, :graph_id]).graph(:graphs, :id=>:graph_id)
+    ds.sql.should == 'SELECT points.id, points.x, points.y, lines.x AS lines_x, lines.graph_id, graphs.id AS graphs_id, graphs.name, graphs.x AS graphs_x, graphs.y AS graphs_y, graphs.lines_x AS graphs_lines_x FROM points LEFT OUTER JOIN lines ON (lines.x = points.id) LEFT OUTER JOIN graphs ON (graphs.id = lines.graph_id)'
   end
 
   it "#graph should pass all join_conditions to join_table" do
@@ -170,7 +175,7 @@ describe Sequel::Dataset, " graphing" do
     results[3].should == {:points=>{:id=>3, :x=>5, :y=>6}, :lines=>{:id=>7, :x=>5, :y=>8, :graph_id=>9}, :graphs=>{:id=>9, :name=>10, :x=>10, :y=>11, :lines_x=>12}}
   end
 
-  it "#graph_each should not included tables graphed with the :select option in the result set" do
+  it "#graph_each should not included tables graphed with the :select => false option in the result set" do
     ds = @ds1.graph(:lines, {:x=>:id}, :select=>false).graph(:graphs, :id=>:graph_id)
     def ds.fetch_rows(sql, &block)
       yield({:id=>1,:x=>2,:y=>3,:graphs_id=>8, :name=>9, :graphs_x=>10, :graphs_y=>11, :lines_x=>12})

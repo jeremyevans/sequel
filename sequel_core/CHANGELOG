@@ -1,5 +1,7 @@
 === HEAD
 
+* Allow Dataset#graph :select option to take an array of columns to select (jeremyevans)
+
 * Allow Dataset#to_hash to be called with only one argument, allowing for easy creation of lookup tables for a single key (jeremyevans)
 
 * Allow join_table to accept a block providing the aliases and previous joins, that allows you to specify arbitrary conditions properly qualified (jeremyevans)
