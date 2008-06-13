@@ -271,6 +271,19 @@ module Sequel
       @primary_key = (key.length == 1) ? key[0] : key.flatten
     end
 
+    # Makes this model a polymorphic model with the given key being a string
+    # field in the database holding the name of the class to use.  If the
+    # key given has a NULL value or there are any problems looking up the
+    # class, uses the current class.
+    #
+    # This should be used to set up single table inheritance for the model,
+    # and it only makes sense to use this in the parent class.
+    def self.sti_key(key)
+      m = self
+      dataset.set_model(key, Hash.new{|h,k| h[k] = (k.constantize rescue m)})
+      before_create(:set_sti_key){send("#{key}=", model.name)}
+    end
+
     # Returns the columns as a list of frozen strings instead
     # of a list of symbols.  This makes it possible to check
     # whether a column exists without creating a symbol, which

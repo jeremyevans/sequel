@@ -1,5 +1,7 @@
 === HEAD
 
+* Add Model.sti_key, for easily setting up single table inheritance (jeremyevans)
+
 * Make all associations support a :read_only option, which doesn't add methods that modify the database (jeremyevans)
 
 * Make *_to_many associations support a :limit option, for specifying a limit to the resulting records (and possibly an offset) (jeremyevans)
