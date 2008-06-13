@@ -1,5 +1,7 @@
 === HEAD
 
+* Bring back Model#set and Model#update, now the same as Model#set_with_params and Model#update_with_params (jeremyevans)
+
 * Allow model datasets to call to_hash without any arguments, which allows easy creation of identity maps (jeremyevans)
 
 * Add Model.sti_key, for easily setting up single table inheritance (jeremyevans)

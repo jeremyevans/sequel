@@ -227,6 +227,26 @@ module Sequel
       save(*@changed_columns) unless @changed_columns.empty?
     end
 
+    # Updates the instance with the supplied values with support for virtual
+    # attributes, ignoring any values for which no setter method is available.
+    # Does not save the record.
+    #
+    # If no columns have been set for this model (very unlikely), assume symbol
+    # keys are valid column names, and assign the column value based on that.
+    def set(hash)
+      columns_not_set = model.instance_variable_get(:@columns).blank?
+      meths = setter_methods
+      hash.each do |k,v|
+        m = "#{k}="
+        if meths.include?(m)
+          send(m, v)
+        elsif columns_not_set && (Symbol === k)
+          self[k] = v
+        end
+      end
+    end
+    alias_method :set_with_params, :set
+
     # Sets the value attributes without saving the record.  Returns
     # the values changed.  Raises an error if the keys are not symbols
     # or strings or a string key was passed that was not a valid column.
@@ -254,30 +274,18 @@ module Sequel
       vals
     end
 
-    # Updates the instance with the supplied values with support for virtual
-    # attributes, ignoring any values for which no setter method is available.
-    # Does not save the record.
-    #
-    # If no columns have been set for this model (very unlikely), assume symbol
-    # keys are valid column names, and assign the column value based on that.
-    def set_with_params(hash)
-      columns_not_set = model.instance_variable_get(:@columns).blank?
-      meths = setter_methods
-      hash.each do |k,v|
-        m = "#{k}="
-        if meths.include?(m)
-          send(m, v)
-        elsif columns_not_set && (Symbol === k)
-          self[k] = v
-        end
-      end
-    end
-
     # Returns (naked) dataset that should return only this instance.
     def this
       @this ||= dataset.filter(pk_hash).limit(1).naked
     end
     
+    # Runs set_with_params and runs save_changes (which runs any callback methods).
+    def update(values)
+      set_with_params(values)
+      save_changes
+    end
+    alias_method :update_with_params, :update
+
     # Sets the values attributes with set_values and then updates
     # the record in the database using those values.  This is a
     # low level method that does not run the usual save callbacks.
@@ -287,12 +295,6 @@ module Sequel
       this.update(set_values(values))
     end
     
-    # Runs set_with_params and runs save_changes (which runs any callback methods).
-    def update_with_params(values)
-      set_with_params(values)
-      save_changes
-    end
-
     private
 
     # Returns all methods that can be used for attribute
