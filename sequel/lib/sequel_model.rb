@@ -1,5 +1,5 @@
 require 'sequel_core'
-%w"inflector base hooks record schema association_reflection 
+%w"inflector base hooks record schema association_reflection dataset_methods 
   associations caching plugins validations eager_loading".each do |f|
   require "sequel_model/#{f}"
 end
@@ -52,6 +52,5 @@ module Sequel
   class Model
     extend Enumerable
     extend Associations
-    include Validation
   end
 end

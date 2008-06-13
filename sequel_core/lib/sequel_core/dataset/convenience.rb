@@ -233,10 +233,11 @@ module Sequel
     
     # Returns a hash with one column used as key and another used as value.
     # If rows have duplicate values for the key column, the latter row(s)
-    # will overwrite the value of the previous row(s).
-    def to_hash(key_column, value_column)
+    # will overwrite the value of the previous row(s). If the value_column
+    # is not given or nil, uses the entire hash as the value.
+    def to_hash(key_column, value_column = nil)
       inject({}) do |m, r|
-        m[r[key_column]] = r[value_column]
+        m[r[key_column]] = value_column ? r[value_column] : r
         m
       end
     end

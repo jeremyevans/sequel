@@ -236,12 +236,7 @@ module Sequel
         raise(Error, "Model.set_dataset takes a Symbol or a Sequel::Dataset")
       end
       @dataset.set_model(self)
-      def_dataset_method(:destroy) do
-        raise(Error, "No model associated with this dataset") unless @opts[:models]
-        count = 0
-        @db.transaction {each {|r| count += 1; r.destroy}}
-        count
-      end
+      @dataset.extend(DatasetMethods)
       @dataset.extend(Associations::EagerLoading)
       @dataset.transform(@transform) if @transform
       begin

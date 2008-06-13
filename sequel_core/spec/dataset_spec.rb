@@ -1053,6 +1053,11 @@ context "Dataset#to_hash" do
     @d.to_hash(:a, :b).should == {1 => 2, 3 => 4, 5 => 6}
     @d.to_hash(:b, :a).should == {2 => 1, 4 => 3, 6 => 5}
   end
+  
+  specify "should provide a hash with the first column as key and the entire hash as value if the value column is blank or nil" do
+    @d.to_hash(:a).should == {1 => {:a => 1, :b => 2}, 3 => {:a => 3, :b => 4}, 5 => {:a => 5, :b => 6}}
+    @d.to_hash(:b).should == {2 => {:a => 1, :b => 2}, 4 => {:a => 3, :b => 4}, 6 => {:a => 5, :b => 6}}
+  end
 end
 
 context "Dataset#uniq" do

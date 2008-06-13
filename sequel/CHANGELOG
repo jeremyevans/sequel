@@ -1,5 +1,7 @@
 === HEAD
 
+* Allow model datasets to call to_hash without any arguments, which allows easy creation of identity maps (jeremyevans)
+
 * Add Model.sti_key, for easily setting up single table inheritance (jeremyevans)
 
 * Make all associations support a :read_only option, which doesn't add methods that modify the database (jeremyevans)
