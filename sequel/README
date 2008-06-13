@@ -127,11 +127,11 @@ Hooks are defined by supplying a block:
 
   class Post < Sequel::Model
     after_create do
-      self.created_at = Time.now
+      author.increase_post_count
     end
 
     after_destroy do
-      author.update_post_count
+      author.decrease_post_count
     end
   end
 
