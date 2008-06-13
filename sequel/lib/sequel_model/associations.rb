@@ -94,6 +94,8 @@ module Sequel::Model::Associations
   #     eager_graph
   #   - :order - the column(s) by which to order the association dataset.  Can be a
   #     singular column or an array.
+  #   - :read_only - Do not add a setter method (for many_to_one or one_to_many with :one_to_one),
+  #     or add_/remove_/remove_all_ methods (for one_to_many, many_to_many)
   #   - :reciprocal - the symbol name of the instance variable of the reciprocal association,
   #     if it exists.  By default, sequel will try to determine it by looking at the
   #     associated model's assocations for a association that matches
@@ -271,6 +273,7 @@ module Sequel::Model::Associations
     def_association_dataset_methods(name, opts) do
       opts.associated_class.select(*opts.select).inner_join(join_table, [[right, opts.associated_primary_key], [left, pk]])
     end
+    return if opts[:read_only]
 
     class_def(association_add_method_name(name)) do |o|
       database[join_table].insert(left=>pk, right=>o.pk)
@@ -327,6 +330,7 @@ module Sequel::Model::Associations
         obj
       end
     end
+    return if opts[:read_only]
 
     class_def(:"#{name}=") do |o|
       old_val = instance_variable_get(ivar) if reciprocal = opts.reciprocal
@@ -355,43 +359,45 @@ module Sequel::Model::Associations
     
     def_association_dataset_methods(name, opts) {opts.associated_class.select(*opts.select).filter(key => pk)}
     
-    class_def(add_meth) do |o|
-      o.send(:"#{key}=", pk)
-      o.save || raise(Sequel::Error, "invalid associated object, cannot save")
-      if arr = instance_variable_get(ivar)
-        arr.push(o)
-      end
-      if reciprocal = opts.reciprocal
-        o.instance_variable_set(reciprocal, self)
-      end
-      o
-    end
-    class_def(remove_meth) do |o|
-      o.send(:"#{key}=", nil)
-      o.save || raise(Sequel::Error, "invalid associated object, cannot save")
-      if arr = instance_variable_get(ivar)
-        arr.delete(o)
-      end
-      if reciprocal = opts.reciprocal
-        o.instance_variable_set(reciprocal, :null)
-      end
-      o
-    end
-    class_def(remove_all_meth) do
-      opts.associated_class.filter(key=>pk).update(key=>nil)
-      if arr = instance_variable_get(ivar)
-        ret = arr.dup
+    unless opts[:read_only]
+      class_def(add_meth) do |o|
+        o.send(:"#{key}=", pk)
+        o.save || raise(Sequel::Error, "invalid associated object, cannot save")
+        if arr = instance_variable_get(ivar)
+          arr.push(o)
+        end
         if reciprocal = opts.reciprocal
-          arr.each{|o| o.instance_variable_set(reciprocal, :null)} 
+          o.instance_variable_set(reciprocal, self)
+        end
+        o
+      end
+      unless opts[:one_to_one]
+        class_def(remove_meth) do |o|
+          o.send(:"#{key}=", nil)
+          o.save || raise(Sequel::Error, "invalid associated object, cannot save")
+          if arr = instance_variable_get(ivar)
+            arr.delete(o)
+          end
+          if reciprocal = opts.reciprocal
+            o.instance_variable_set(reciprocal, :null)
+          end
+          o
+        end
+        class_def(remove_all_meth) do
+          opts.associated_class.filter(key=>pk).update(key=>nil)
+          if arr = instance_variable_get(ivar)
+            ret = arr.dup
+            if reciprocal = opts.reciprocal
+              arr.each{|o| o.instance_variable_set(reciprocal, :null)} 
+            end
+          end
+          instance_variable_set(ivar, [])
+          ret
         end
       end
-      instance_variable_set(ivar, [])
-      ret
     end
     if opts[:one_to_one]
-      remove_method remove_meth, remove_all_meth
-      private add_meth, name, :"#{name}_dataset"
-      private :"#{name}_helper" if instance_methods.include?("#{name}_helper")
+      private name, :"#{name}_dataset"
       n = name.to_s.singularize.to_sym
       raise(Sequel::Error, "one_to_many association names should still be plural even when using the :one_to_one option") if n == name
       class_def(n) do |*o|
@@ -399,11 +405,14 @@ module Sequel::Model::Associations
         raise(Sequel::Error, "multiple values found for a one-to-one relationship") if objs.length > 1
         objs.first
       end
-      class_def(:"#{n}=") do |o|
-        klass = opts.associated_class
-        model.db.transaction do
-          send(add_meth, o)
-          klass.filter(Sequel::SQL::BooleanExpression.new(:AND, {key=>pk}, ~{klass.primary_key=>o.pk}.sql_expr)).update(key=>nil)
+      unless opts[:read_only]
+        private add_meth
+        class_def(:"#{n}=") do |o|
+          klass = opts.associated_class
+          model.db.transaction do
+            send(add_meth, o)
+            klass.filter(Sequel::SQL::BooleanExpression.new(:AND, {key=>pk}, ~{klass.primary_key=>o.pk}.sql_expr)).update(key=>nil)
+          end
         end
       end
     end

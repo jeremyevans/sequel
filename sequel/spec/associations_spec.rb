@@ -234,6 +234,12 @@ describe Sequel::Model, "many_to_one" do
     MODEL_DB.sqls.should == []
   end
 
+  it "should not create the setter method if :read_only option is used" do
+    @c2.many_to_one :parent, :class => @c2, :read_only=>true
+    @c2.instance_methods.should(include('parent'))
+    @c2.instance_methods.should_not(include('parent='))
+  end
+
   it "should have belongs_to alias" do
     @c2.belongs_to :parent, :class => @c2
 
@@ -519,6 +525,16 @@ describe Sequel::Model, "one_to_many" do
     att.node.should == nil
   end
 
+  it "should not create the add_, remove_, or remove_all_ methods if :read_only option is used" do
+    @c2.one_to_many :attributes, :class => @c1, :read_only=>true
+    im = @c2.instance_methods
+    im.should(include('attributes'))
+    im.should(include('attributes_dataset'))
+    im.should_not(include('add_attribute'))
+    im.should_not(include('remove_attribute'))
+    im.should_not(include('remove_all_attributes'))
+  end
+
   it "should have has_many alias" do
     @c2.has_many :attributes, :class => @c1
     
@@ -620,6 +636,13 @@ describe Sequel::Model, "one_to_many" do
     att.values.should == {}
   end
 
+  it "should not add a getter method if the :one_to_one option is true and :read_only option is true" do
+    @c2.one_to_many :attributes, :class => @c1, :one_to_one=>true, :read_only=>true
+    im = @c2.instance_methods
+    im.should(include('attribute'))
+    im.should_not(include('attribute='))
+  end
+
   it "should have the getter method raise an error if more than one record is found" do
     @c2.one_to_many :attributes, :class => @c1, :one_to_one=>true
     d = @c1.dataset
@@ -661,7 +684,6 @@ describe Sequel::Model, "one_to_many" do
     meths.should(include("attributes"))
     meths.should(include("add_attribute"))
     meths.should(include("attributes_dataset"))
-    meths.should(include("attributes_helper"))
   end
 end
 
@@ -929,6 +951,16 @@ describe Sequel::Model, "many_to_many" do
     att.instance_variable_set(:@nodes, [n])
     n.remove_attribute(att)
     att.nodes.should == []
+  end
+
+  it "should not create the add_, remove_, or remove_all_ methods if :read_only option is used" do
+    @c2.many_to_many :attributes, :class => @c1, :read_only=>true
+    im = @c2.instance_methods
+    im.should(include('attributes'))
+    im.should(include('attributes_dataset'))
+    im.should_not(include('add_attribute'))
+    im.should_not(include('remove_attribute'))
+    im.should_not(include('remove_all_attributes'))
   end
 
   it "should have has_and_belongs_to_many alias" do
