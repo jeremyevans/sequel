@@ -113,7 +113,7 @@ This works with other hash values, such as arrays and ranges:
   items.filter({:category => ['ruby', 'other']} | (:price - 100 > 200)).sql
   #=> "SELECT * FROM items WHERE ((category IN ('ruby', 'other')) OR ((price - 100) <= 200))"
 
-  items.filter({:price == (100..200)} & :active).sql
+  items.filter({:price => (100..200)} & :active).sql
   #=> "SELECT * FROM items WHERE ((price >= 100 AND price <= 200) AND active)"
 
 === Negating conditions
