@@ -92,6 +92,9 @@ module Sequel::Model::Associations
   #     the association via eager_graph
   #   - :graph_join_type - The type of SQL join to use when eagerly loading the association via
   #     eager_graph
+  #   - :graph_select - A column or array of columns to select from the associated table
+  #     when eagerly loading the association via eager_graph. Defaults to all
+  #     columns in the associated table.
   #   - :order - the column(s) by which to order the association dataset.  Can be a
   #     singular column or an array.
   #   - :read_only - Do not add a setter method (for many_to_one or one_to_many with :one_to_one),
@@ -145,6 +148,7 @@ module Sequel::Model::Associations
     opts[:eager_block] = block unless opts.include?(:eager_block)
     opts[:graph_join_type] ||= :left_outer
     opts[:graph_conditions] = opts[:graph_conditions] ? opts[:graph_conditions].to_a : []
+    opts[:graph_select] = Array(opts[:graph_select]) if opts[:graph_select]
 
     # find class
     case opts[:class]
