@@ -256,7 +256,7 @@ module Sequel
 
       private
       def connection_pool_default_options
-        super.merge(:pool_reuse_connections=>:last_resort, :pool_convert_exceptions=>false)
+        super.merge(:pool_convert_exceptions=>false)
       end
 
       def schema_ds_dataset

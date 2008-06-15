@@ -1,5 +1,7 @@
 === HEAD
 
+* Remove :pool_reuse_connections ConnectionPool/Database option, MySQL users need to be careful with nested queries (jeremyevans)
+
 * Allow Dataset#graph :select option to take an array of columns to select (jeremyevans)
 
 * Allow Dataset#to_hash to be called with only one argument, allowing for easy creation of lookup tables for a single key (jeremyevans)

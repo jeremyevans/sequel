@@ -138,7 +138,7 @@ module Sequel
       
       private
       def connection_pool_default_options
-        o = super.merge(:pool_reuse_connections=>:always, :pool_convert_exceptions=>false)
+        o = super.merge(:pool_convert_exceptions=>false)
         # Default to only a single connection if a memory database is used,
         # because otherwise each connection will get a separate database
         o[:max_connections] = 1 if @opts[:database] == ':memory:' || @opts[:database].blank?

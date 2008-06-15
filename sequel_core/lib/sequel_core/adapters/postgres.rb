@@ -376,7 +376,7 @@ module Sequel
 
       # PostgreSQL currently can always reuse connections.  It doesn't need the pool to convert exceptions, either.
       def connection_pool_default_options
-        super.merge(:pool_reuse_connections=>:always, :pool_convert_exceptions=>false)
+        super.merge(:pool_convert_exceptions=>false)
       end
 
       def schema_ds_filter(table_name, opts)

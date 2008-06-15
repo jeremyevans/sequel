@@ -42,13 +42,6 @@ class Sequel::ConnectionPool
   #   will open (default 4)
   # * :pool_convert_exceptions - Whether to convert non-StandardError based exceptions
   #   to RuntimeError exceptions (default true)
-  # * :pool_reuse_connections - Which strategy to follow in regards to reusing connections:
-  #   * :always - Always reuse a connection that belongs to the same thread
-  #   * :allow - Only reuse a connection that belongs to the same thread if
-  #     another cannot be acquired immediately (default)
-  #   * :last_resort - Only reuse a connection that belongs to the same thread if
-  #     the pool timeout has expired
-  #   * :never - Never reuse a connection that belongs to the same thread
   # * :pool_sleep_time - The amount of time to sleep before attempting to acquire
   #   a connection again (default 0.001)
   # * :pool_timeout - The amount of seconds to wait to acquire a connection
@@ -63,7 +56,6 @@ class Sequel::ConnectionPool
     @created_count = 0
     @timeout = opts[:pool_timeout] || 5
     @sleep_time = opts[:pool_sleep_time] || 0.001
-    @reuse_connections = opts[:pool_reuse_connections] || :allow
     @convert_exceptions = opts.include?(:pool_convert_exceptions) ? opts[:pool_convert_exceptions] : true
   end
   
@@ -72,10 +64,8 @@ class Sequel::ConnectionPool
   # 
   #   pool.hold {|conn| conn.execute('DROP TABLE posts')}
   # 
-  # Pool#hold can be re-entrant, meaning it can be called recursively in
-  # the same thread without blocking if the :pool_reuse_connections option
-  # was set to :always or :allow.  Depending on the :pool_reuse_connections
-  # option you may get the connection currently used by the thread or a new connection.
+  # Pool#hold is re-entrant, meaning it can be called recursively in
+  # the same thread without blocking.
   #
   # If no connection is immediately available and the pool is already using the maximum
   # number of connections, Pool#hold will block until a connection
@@ -88,21 +78,11 @@ class Sequel::ConnectionPool
       time = Time.new
       timeout = time + @timeout
       sleep_time = @sleep_time
-      reuse = @reuse_connections
-      if (reuse == :always) && (conn = owned_connection(t))
+      if conn = owned_connection(t)
         return yield(conn)
       end
-      reuse = reuse == :allow ? true : false
       until conn = acquire(t)
-        if reuse && (conn = owned_connection(t))
-          return yield(conn)
-        end
-        if Time.new > timeout
-          if (@reuse_connections == :last_resort) && (conn = owned_connection(t))
-            return yield(conn)
-          end
-          raise(::Sequel::Error::PoolTimeoutError)
-        end
+        raise(::Sequel::Error::PoolTimeoutError) if Time.new > timeout
         sleep sleep_time
       end
       begin
