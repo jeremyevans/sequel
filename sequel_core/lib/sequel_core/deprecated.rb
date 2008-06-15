@@ -22,11 +22,5 @@ module Sequel
         caller.each{|c| @dms.puts(c)} if @pt 
       end
     end
-
-    # Formats the message with a message that it will be removed in Sequel 2.0.
-    # This is the method that is added to the classes that include Sequel::Deprecation.
-    def deprecate(meth, message = nil)
-      ::Sequel::Deprecation.deprecate("#{meth} is deprecated, and will be removed in Sequel 2.0.#{"  #{message}." if message}")
-    end
   end
 end

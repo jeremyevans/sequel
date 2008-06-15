@@ -5,12 +5,20 @@ context "Blockless Ruby Filters" do
     db = Sequel::Database.new
     db.quote_identifiers = false
     @d = db[:items]
-    def @d.l(*args)
-      literal(filter_expr(*args))
+    def @d.l(*args, &block)
+      if block_given?
+        literal(filter_expr(Proc.new(&block)))
+      else
+        literal(filter_expr(*args))
+      end
     end
     def @d.lit(*args)
       literal(*args)
     end
+  end
+
+  after do
+    Sequel.use_parse_tree = true
   end
   
   it "should support boolean columns directly" do
@@ -293,5 +301,12 @@ context "Blockless Ruby Filters" do
     @d.lit(:x.sql_string + :y).should == '(x || y)'
     @d.lit([:x].sql_string_join + :y).should == '((x) || y)'
     @d.lit([:x, :z].sql_string_join(' ') + :y).should == "((x || ' ' || z) || y)"
+  end
+
+  it "should be supported inside blocks if Sequel.use_parse_tree = false" do
+    @d.l{[[:x, nil], [:y, [1,2,3]]].sql_or}.should == '((x IS NULL) OR (y IN (1, 2, 3)))'
+    @d.l{~[[:x, nil], [:y, [1,2,3]]]}.should == '((x IS NOT NULL) OR (y NOT IN (1, 2, 3)))'
+    @d.l{~(((('x'.lit - :y)/(:x + :y))*:z) <= 100)}.should == '((((x - y) / (x + y)) * z) > 100)'
+    @d.l{{:x => :a} & {:y => :z}}.should == '((x = a) AND (y = z))'
   end
 end

@@ -767,7 +767,7 @@ module Sequel
           SQL::BooleanExpression.from_value_pairs(expr)
         end
       when Proc
-        expr.to_sql(self).lit
+        Sequel.use_parse_tree ? expr.to_sql(self).lit : filter_expr(expr.call)
       when SQL::NumericExpression, SQL::StringExpression
         raise(Error, "Invalid SQL Expression type: #{expr.inspect}") 
       when Symbol, SQL::Expression

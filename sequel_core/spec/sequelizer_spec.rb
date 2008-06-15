@@ -2,30 +2,21 @@ require File.join(File.dirname(__FILE__), 'spec_helper')
 
 context "Sequelizer without ParseTree" do
   setup do
-    module Kernel
-      alias_method :orig_sq_require, :require
-      def require(*args); raise LoadError; end
-    end
-    old_verbose = $VERBOSE
-    $VERBOSE = nil
-    load(File.join(File.dirname(__FILE__), '../lib/sequel_core/dataset/sequelizer.rb'))
-    $VERBOSE = old_verbose
+    Sequel.use_parse_tree = false
     @db = Sequel::Database.new
     @ds = @db[:items]
   end
   
   teardown do
-    module Kernel
-      alias_method :require, :orig_sq_require
-    end
-    old_verbose = $VERBOSE
-    $VERBOSE = nil
-    load(File.join(File.dirname(__FILE__), '../lib/sequel_core/dataset/sequelizer.rb'))
-    $VERBOSE = old_verbose
+    Sequel.use_parse_tree = true
   end
   
-  specify "should raise error when converting proc to SQL" do
-    proc {proc {:x > 1}.to_sql(@ds)}.should raise_error(Sequel::Error)
+  specify "should raise error when converting ParseTree proc to SQL" do
+    proc {@ds.filter{:x == 1}}.should raise_error(Sequel::Error)
+  end
+
+  specify "should allow expression syntax inside block raise error when converting ParseTree proc to SQL" do
+    proc {@ds.filter{:x > 1}}.should_not raise_error(Sequel::Error)
   end
 end
 

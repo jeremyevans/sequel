@@ -175,7 +175,14 @@ Array#sql_string_join also takes a join argument:
 
 Most SQL expressions that you can can create with expressions you can also express inside blocks.  This was previously the only way to specify expressions using ruby code.  Filtering with blocks requires that you install ParseTree, ruby2ruby, and their dependencies.  It's slower than using the equivalent expression without a block, and the syntax inside the block is different in some cases. Because it requires ParseTree, it can only be used with MRI (Matz's Ruby Interpreter) 1.8.*, as ParseTree doesn't run on any other ruby implementation (blockless filters should work on other ruby implementations).
 
-In general, filtering with a block should only be used with legacy code.  While it is not officially deprecated, usage of blocks when filtering is discouraged.
+In general, filtering with a block should only be used with legacy code.  ParseTree filters are currently deprecated, and support for them will be removed in Sequel 2.2.  To use the expression filtering syntax inside blocks, set:
+
+  Sequel.use_parse_tree = false
+  # or
+  SEQUEL_NO_PARSE_TREE = true
+  require 'sequel'
+
+These will become no-ops in Sequel 2.2, as the expression syntax inside blocks will be the only supported behavior.
 
 To filter with a block, supply a block to filter with the appropriate ruby code:
 

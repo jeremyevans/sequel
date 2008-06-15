@@ -2,7 +2,7 @@
   require f
 end
 %w"core_ext sql core_sql connection_pool exceptions pretty_table
-  dataset migration schema database worker object_graph".each do |f|
+  dataset migration schema database worker object_graph deprecated".each do |f|
   require "sequel_core/#{f}"
 end
 
@@ -26,9 +26,21 @@ end
 # database.  It defaults to Time.  To change it to DateTime, use:
 #
 #   Sequel.datetime_class = DateTime
+#
+# Sequel can either use ParseTree for block filters (deprecated but works),
+# or it can use the block filter syntax inside block filters (which will
+# be the only behavior allowed in Sequel 2.2). To set it not to use
+# ParseTree filters:
+#
+#   Sequel.use_parse_tree = false
 module Sequel
   @datetime_class = Time
+  @use_parse_tree = true
+
   metaattr_accessor :datetime_class
+  metaattr_accessor :use_parse_tree
+
+  Deprecation.deprecation_message_stream = $stderr
 
   # Creates a new database object based on the supplied connection string
   # and optional arguments.  The specified scheme determines the database

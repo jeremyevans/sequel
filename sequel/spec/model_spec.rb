@@ -199,8 +199,7 @@ describe Sequel::Model, "new" do
 end
 
 describe Sequel::Model, ".subset" do
-
-  before(:each) do
+  before do
     MODEL_DB.reset
 
     @c = Class.new(Sequel::Model(:items))
@@ -219,7 +218,6 @@ describe Sequel::Model, ".subset" do
     @c.pricey.sql.should == "SELECT * FROM items WHERE (price > 100)"
     @c.dataset.pricey.sql.should == "SELECT * FROM items WHERE (price > 100)"
     
-    # check if subsets are composable
     @c.pricey.new_only.sql.should == "SELECT * FROM items WHERE ((price > 100) AND (age = 'new'))"
     @c.new_only.pricey.sql.should == "SELECT * FROM items WHERE ((age = 'new') AND (price > 100))"
   end

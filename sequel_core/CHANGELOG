@@ -1,5 +1,7 @@
 === HEAD
 
+* ParseTree support is now officially deprecated, use Sequel.use_parse_tree = false to use the expression (blockless) filters inside blocks (jeremyevans)
+
 * Remove :pool_reuse_connections ConnectionPool/Database option, MySQL users need to be careful with nested queries (jeremyevans)
 
 * Allow Dataset#graph :select option to take an array of columns to select (jeremyevans)

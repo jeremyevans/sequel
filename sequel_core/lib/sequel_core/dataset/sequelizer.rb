@@ -1,8 +1,10 @@
 begin
+  raise LoadError if defined?(SEQUEL_NO_PARSE_TREE)
   require 'parse_tree'
   require 'sequel_core/dataset/parse_tree_sequelizer'
   class Proc
     def to_sql(dataset, opts = {})
+      Sequel::Deprecation.deprecate("ParseTree filters are deprecated and will be removed in Sequel 2.2")
       dataset.send(:pt_expr, to_sexp[2], self.binding, opts)
     end
   end
@@ -43,9 +45,5 @@ begin
     end
   end
 rescue LoadError
-  class Proc
-    def to_sql(*args)
-      raise Sequel::Error, "You must have the ParseTree gem installed in order to use block filters."
-    end
-  end
+  Sequel.use_parse_tree = false
 end
