@@ -7,18 +7,19 @@ module Sequel
     # created
     @@lazy_load_schema = false
 
-    # The default primary key for tables, inherited by future subclasses
     @primary_key = :id
-
-    # Whether to typecast attribute values on assignment, inherited by
-    # future subclasses.
     @typecast_on_assignment = true
+    @dataset_methods = {}
 
     # The default primary key for classes (default: :id)
     metaattr_accessor :primary_key
 
     # Whether to typecast attribute values on assignment (default: true)
     metaattr_accessor :typecast_on_assignment
+
+    # Hash of dataset methods to add to this class and subclasses when
+    # set_dataset is called.
+    metaattr_accessor :dataset_methods
 
     # Dataset methods to proxy via metaprogramming
     DATASET_METHODS = %w'<< all avg count delete distinct eager eager_graph each each_page 
@@ -28,8 +29,8 @@ module Sequel
        left_outer_join limit map multi_insert naked order order_by order_more 
        paginate print query range reverse_order right_outer_join select 
        select_all select_more set set_graph_aliases single_value size to_csv 
-       transform union uniq unordered update where'
-  
+       transform union uniq unordered update where'.map{|x| x.to_sym}
+
     # Returns the first record from the database matching the conditions.
     # If a hash is given, it is used as the conditions.  If another
     # object is given, it finds the first record whose primary key(s) match
@@ -102,7 +103,9 @@ module Sequel
       raise(Error, "No arguments given") if args.empty?
       if block_given?
         raise(Error, "Defining a dataset method using a block requires only one argument") if args.length > 1
-        dataset.meta_def(args.first, &block)
+        meth = args.first
+        @dataset_methods[meth] = block
+        dataset.meta_def(meth, &block)
       end
       args.each{|arg| instance_eval("def #{arg}(*args, &block); dataset.#{arg}(*args, &block) end", __FILE__, __LINE__)}
     end
@@ -143,6 +146,7 @@ module Sequel
       ivs = subclass.instance_variables
       subclass.instance_variable_set(:@typecast_on_assignment, sup_class.typecast_on_assignment) unless ivs.include?("@typecast_on_assignment")
       subclass.instance_variable_set(:@primary_key, sup_class.primary_key) unless ivs.include?("@primary_key")
+      subclass.instance_variable_set(:@dataset_methods, sup_class.dataset_methods.dup) unless ivs.include?("@dataset_methods")
       unless ivs.include?("@dataset")
         begin
           if sup_class == Model
@@ -239,6 +243,7 @@ module Sequel
       @dataset.extend(DatasetMethods)
       @dataset.extend(Associations::EagerLoading)
       @dataset.transform(@transform) if @transform
+      @dataset_methods.each{|meth, block| @dataset.meta_def(meth, &block)} if @dataset_methods
       begin
         (@db_schema = get_db_schema) unless @@lazy_load_schema
       rescue

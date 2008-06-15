@@ -1,5 +1,7 @@
 === HEAD
 
+* Calls to Model.def_dataset_method with a block are cached and reapplied to the new dataset if set_dataset is called, even in a subclass (jeremyevans)
+
 * The :reciprocal option to associations should now be the symbol name of the reciprocal association, not an instance variable symbol (jeremyevans)
 
 * Add Model#associations, which is a hash holding a cache of associated objects, with each association being a separate key (jeremyevans)

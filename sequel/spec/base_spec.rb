@@ -210,6 +210,25 @@ describe Sequel::Model, "def_dataset_method" do
     @c.return_3.should == 3
     @c.return_4.should == 4
   end
+
+  it "should cache calls and readd methods if set_dataset is used" do
+    @c.instance_eval do
+      def_dataset_method(:return_3){3}
+    end
+    @c.set_dataset :items
+    @c.return_3.should == 3
+    @c.dataset.return_3.should == 3
+  end
+
+  it "should readd methods to subclasses, if set_dataset is used in a subclass" do
+    @c.instance_eval do
+      def_dataset_method(:return_3){3}
+    end
+    c = Class.new(@c)
+    c.set_dataset :items
+    c.return_3.should == 3
+    c.dataset.return_3.should == 3
+  end
 end
 
 describe "A model class with implicit table name" do
