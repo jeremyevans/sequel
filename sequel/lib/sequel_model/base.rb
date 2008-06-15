@@ -10,6 +10,8 @@ module Sequel
     @primary_key = :id
     @restrict_primary_key = true
     @restricted_columns = nil
+    @sti_dataset = nil
+    @sti_key = nil
     @typecast_on_assignment = true
 
     # Which columns should be the only columns allowed in a call to set
@@ -27,6 +29,13 @@ module Sequel
     # (default: no columns).
     metaattr_accessor :restricted_columns
 
+    # The base dataset for STI, to which filters are added to get
+    # only the models for the specific STI subclass.
+    metaattr_accessor :sti_dataset
+
+    # The column name holding the STI key for this model
+    metaattr_accessor :sti_key
+
     # Whether to typecast attribute values on assignment (default: true)
     metaattr_accessor :typecast_on_assignment
 
@@ -43,7 +52,7 @@ module Sequel
     # Instance variables that are inherited in subclasses
     INHERITED_INSTANCE_VARIABLES = {:@allowed_columns=>:dup, :@dataset_methods=>:dup,
       :@primary_key=>nil, :@restricted_columns=>:dup, :@restrict_primary_key=>nil,
-      :@typecast_on_assignment=>nil}
+      :@sti_dataset=>nil, :@sti_key=>nil, :@typecast_on_assignment=>nil}
 
     # Returns the first record from the database matching the conditions.
     # If a hash is given, it is used as the conditions.  If another
@@ -169,7 +178,7 @@ module Sequel
           if sup_class == Model
             subclass.set_dataset(Model.db[subclass.implicit_table_name]) unless subclass.name.empty?
           elsif ds = sup_class.instance_variable_get(:@dataset)
-            subclass.set_dataset(ds.clone)
+            subclass.set_dataset(sup_class.sti_key ? sup_class.sti_dataset.filter(sup_class.sti_key=>subclass.name) : ds.clone)
           end
         rescue
         end
@@ -330,8 +339,17 @@ module Sequel
     #
     # This should be used to set up single table inheritance for the model,
     # and it only makes sense to use this in the parent class.
-    def self.sti_key(key)
+    #
+    # You should call sti_key after any calls to set_dataset in the model,
+    # otherwise subclasses might not have the filters set up correctly.
+    #
+    # The filters that sti_key sets up in subclasses will not work if
+    # those subclasses have further subclasses.  For those middle subclasses,
+    # you will need to call set_dataset manually with the correct filter set.
+    def self.set_sti_key(key)
       m = self
+      @sti_key = key
+      @sti_dataset = dataset
       dataset.set_model(key, Hash.new{|h,k| h[k] = (k.constantize rescue m)})
       before_create(:set_sti_key){send("#{key}=", model.name)}
     end

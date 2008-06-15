@@ -86,7 +86,7 @@ describe Sequel::Model, "#sti_key" do
     class StiTest < Sequel::Model
       def kind=(x); self[:kind] = x; end
       def refresh; end
-      sti_key :kind
+      set_sti_key :kind
     end
     class StiTestSub1 < StiTest
     end
@@ -124,6 +124,12 @@ describe Sequel::Model, "#sti_key" do
     StiTestSub1.new.save
     StiTestSub2.new.save
     MODEL_DB.sqls.should == ["INSERT INTO sti_tests (kind) VALUES ('StiTest')", "INSERT INTO sti_tests (kind) VALUES ('StiTestSub1')", "INSERT INTO sti_tests (kind) VALUES ('StiTestSub2')"]
+  end
+  
+  it "should add a filter to model datasets inside subclasses hook to only retreive objects with the matching key" do
+    StiTest.dataset.sql.should == "SELECT * FROM sti_tests"
+    StiTestSub1.dataset.sql.should == "SELECT * FROM sti_tests WHERE (kind = 'StiTestSub1')"
+    StiTestSub2.dataset.sql.should == "SELECT * FROM sti_tests WHERE (kind = 'StiTestSub2')"
   end
 end
 
