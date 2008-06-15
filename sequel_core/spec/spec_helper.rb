@@ -3,9 +3,6 @@ unless Object.const_defined?('Sequel')
   $:.unshift(File.join(File.dirname(__FILE__), "../lib/"))
   require 'sequel_core'
 end
-if File.exists?(File.join(File.dirname(__FILE__), 'spec_config.rb'))
-  require File.join(File.dirname(__FILE__), 'spec_config.rb')
-end
 
 class MockDataset < Sequel::Dataset
   def insert(*args)
@@ -57,4 +54,8 @@ class Spec::Example::ExampleGroup
   def self.pt_specify(*args, &block)
     specify(*args, &block) if defined?(::ParseTree)
   end
+end
+
+if File.exists?(File.join(File.dirname(__FILE__), 'spec_config.rb'))
+  require File.join(File.dirname(__FILE__), 'spec_config.rb')
 end
