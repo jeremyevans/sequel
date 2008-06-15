@@ -2,7 +2,8 @@
 # multiple connections and giving threads exclusive access to each
 # connection.
 class Sequel::ConnectionPool
-  # An array of connections currently being used
+  # A hash of connections currently being used, key is the Thread,
+  # value is the connection.
   attr_reader :allocated
   
   # An array of connections opened but not currently used
@@ -52,7 +53,7 @@ class Sequel::ConnectionPool
     @connection_proc = block
 
     @available_connections = []
-    @allocated = []
+    @allocated = {}
     @created_count = 0
     @timeout = opts[:pool_timeout] || 5
     @sleep_time = opts[:pool_sleep_time] || 0.001
@@ -111,18 +112,14 @@ class Sequel::ConnectionPool
 
   # Returns the connection owned by the supplied thread, if any.
   def owned_connection(thread)
-    @mutex.synchronize do 
-      x = @allocated.assoc(thread)
-      x[1] if x
-    end
+    @mutex.synchronize{@allocated[thread]}
   end
   
   # Assigns a connection to the supplied thread, if one is available.
   def acquire(thread)
     @mutex.synchronize do
       if conn = available
-        @allocated << [thread, conn]
-        conn
+        @allocated[thread] = conn
       end
     end
   end
@@ -146,7 +143,7 @@ class Sequel::ConnectionPool
   # Releases the connection assigned to the supplied thread.
   def release(thread, conn)
     @mutex.synchronize do
-      @allocated.delete([thread, conn])
+      @allocated.delete(thread)
       @available_connections << conn
     end
   end
