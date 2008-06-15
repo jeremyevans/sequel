@@ -1,5 +1,9 @@
 === HEAD
 
+* The :reciprocal option to associations should now be the symbol name of the reciprocal association, not an instance variable symbol (jeremyevans)
+
+* Add Model#associations, which is a hash holding a cache of associated objects, with each association being a separate key (jeremyevans)
+
 * Make all associations support a :graph_select option, specifying a column or array of columns to select when using eager_graph (jeremyevans)
 
 * Bring back Model#set and Model#update, now the same as Model#set_with_params and Model#update_with_params (jeremyevans)

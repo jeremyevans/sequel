@@ -28,14 +28,14 @@ module Sequel
             associated_class.all_association_reflections.each do |assoc_reflect|
               if assoc_reflect[:type] == :many_to_many && assoc_reflect[:left_key] == right_key \
                  && assoc_reflect[:right_key] == left_key && assoc_reflect[:join_table] == join_table
-                return self[:reciprocal] = association_ivar(assoc_reflect[:name])
+                return self[:reciprocal] = assoc_reflect[:name]
               end
             end
           else
             key = self[:key]
             associated_class.all_association_reflections.each do |assoc_reflect|
               if assoc_reflect[:type] == reciprocal_type && assoc_reflect[:key] == key
-                return self[:reciprocal] = association_ivar(assoc_reflect[:name])
+                return self[:reciprocal] = assoc_reflect[:name]
               end
             end
           end
@@ -45,13 +45,6 @@ module Sequel
         # The columns to select when loading the association
         def select
          self[:select] ||= associated_class.table_name.*
-        end
-  
-        private
-
-        # Name symbol of association instance variable
-        def association_ivar(name)
-          :"@#{name}"
         end
       end
     end

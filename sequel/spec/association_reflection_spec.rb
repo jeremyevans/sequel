@@ -40,9 +40,9 @@ describe Sequel::Model::Associations::AssociationReflection, "#reciprocal" do
   it "should use the :reciprocal value if present" do
     @c = Class.new(Sequel::Model)
     @d = Class.new(Sequel::Model)
-    @c.many_to_one :c, :class=>@d, :reciprocal=>:@xx
+    @c.many_to_one :c, :class=>@d, :reciprocal=>:xx
     @c.association_reflection(:c).should include(:reciprocal)
-    @c.association_reflection(:c).reciprocal.should == :@xx
+    @c.association_reflection(:c).reciprocal.should == :xx
   end
 
   it "should figure out the reciprocal if the :reciprocal value is not present" do
@@ -55,13 +55,13 @@ describe Sequel::Model::Associations::AssociationReflection, "#reciprocal" do
     ParParentThree.many_to_many :par_parents
 
     ParParent.association_reflection(:par_parent_two).should_not include(:reciprocal)
-    ParParent.association_reflection(:par_parent_two).reciprocal.should == :@par_parents
+    ParParent.association_reflection(:par_parent_two).reciprocal.should == :par_parents
     ParParentTwo.association_reflection(:par_parents).should_not include(:reciprocal)
-    ParParentTwo.association_reflection(:par_parents).reciprocal.should == :@par_parent_two
+    ParParentTwo.association_reflection(:par_parents).reciprocal.should == :par_parent_two
     ParParent.association_reflection(:par_parent_threes).should_not include(:reciprocal)
-    ParParent.association_reflection(:par_parent_threes).reciprocal.should == :@par_parents
+    ParParent.association_reflection(:par_parent_threes).reciprocal.should == :par_parents
     ParParentThree.association_reflection(:par_parents).should_not include(:reciprocal)
-    ParParentThree.association_reflection(:par_parents).reciprocal.should == :@par_parent_threes
+    ParParentThree.association_reflection(:par_parents).reciprocal.should == :par_parent_threes
   end
 end
 

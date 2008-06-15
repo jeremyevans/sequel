@@ -99,7 +99,7 @@ module Sequel::Model::Associations
   #     singular column or an array.
   #   - :read_only - Do not add a setter method (for many_to_one or one_to_many with :one_to_one),
   #     or add_/remove_/remove_all_ methods (for one_to_many, many_to_many)
-  #   - :reciprocal - the symbol name of the instance variable of the reciprocal association,
+  #   - :reciprocal - the symbol name of the reciprocal association,
   #     if it exists.  By default, sequel will try to determine it by looking at the
   #     associated model's assocations for a association that matches
   #     the current association's key(s).  Set to nil to not use a reciprocal.
@@ -200,11 +200,6 @@ module Sequel::Model::Associations
     :"add_#{name.to_s.singularize}"
   end
 
-  # Name symbol of association instance variable
-  def association_ivar(name)
-    :"@#{name}"
-  end
-  
   # Name symbol for remove_all association method
   def association_remove_all_method_name(name)
     :"remove_all_#{name}"
@@ -226,7 +221,6 @@ module Sequel::Model::Associations
     dataset_method = :"#{name}_dataset"
     helper_method = :"#{name}_helper"
     dataset_block = opts[:block]
-    ivar = association_ivar(name)
     order = opts[:order]
     eager = opts[:eager]
     limit = opts[:limit]
@@ -240,7 +234,7 @@ module Sequel::Model::Associations
     
     # define a method returning the association dataset (with optional order)
     class_def(dataset_method) do
-      ds = instance_eval(&block)
+      ds = instance_eval(&block).select(*opts.select)
       ds = ds.order(*order) if order
       ds = ds.limit(*limit) if limit
       ds = ds.eager(eager) if eager
@@ -249,22 +243,21 @@ module Sequel::Model::Associations
     end
     
     class_def(name) do |*reload|
-      if !reload[0] && obj = instance_variable_get(ivar)
-        obj
+      if (assoc = @associations).include?(name) and !reload[0]
+        assoc[name]
       else
         objs = send(dataset_method).all
         # Only one_to_many associations should set the reciprocal object
         if (opts[:type] == :one_to_many) && (reciprocal = opts.reciprocal)
-          objs.each{|o| o.instance_variable_set(reciprocal, self)}
+          objs.each{|o| o.associations[reciprocal] = self}
         end
-        instance_variable_set(ivar, objs)
+        assoc[name] = objs
       end
     end
   end
 
   # Adds many_to_many association instance methods
   def def_many_to_many(name, opts)
-    ivar = association_ivar(name)
     left = (opts[:left_key] ||= default_remote_key)
     right = (opts[:right_key] ||= default_foreign_key(opts))
     opts[:class_name] ||= name.to_s.singularize.camelize
@@ -275,77 +268,77 @@ module Sequel::Model::Associations
     database = db
     
     def_association_dataset_methods(name, opts) do
-      opts.associated_class.select(*opts.select).inner_join(join_table, [[right, opts.associated_primary_key], [left, pk]])
+      opts.associated_class.inner_join(join_table, [[right, opts.associated_primary_key], [left, pk]])
     end
     return if opts[:read_only]
 
     class_def(association_add_method_name(name)) do |o|
       database[join_table].insert(left=>pk, right=>o.pk)
-      if arr = instance_variable_get(ivar)
-        arr.push(o)
+      if (assoc = @associations).include?(name)
+        assoc[name].push(o)
       end
-      if (reciprocal = opts.reciprocal) && (list = o.instance_variable_get(reciprocal)) \
-         && !(list.include?(self))
-        list.push(self)
+      if reciprocal = opts.reciprocal and array = o.associations[reciprocal] and !array.include?(self)
+        array.push(self)
       end
       o
     end
     class_def(association_remove_method_name(name)) do |o|
       database[join_table].filter([[left, pk], [right, o.pk]]).delete
-      if arr = instance_variable_get(ivar)
-        arr.delete(o)
+      if (assoc = @associations).include?(name)
+        assoc[name].delete(o)
       end
-      if (reciprocal = opts.reciprocal) && (list = o.instance_variable_get(reciprocal))
-        list.delete(self)
+      if reciprocal = opts.reciprocal and array = o.associations[reciprocal]
+        array.delete(self)
       end
       o
     end
     class_def(association_remove_all_method_name(name)) do
       database[join_table].filter(left=>pk).delete
-      if arr = instance_variable_get(ivar)
+      if (assoc = @associations).include?(name)
         reciprocal = opts.reciprocal
+        arr = assoc[name]
         ret = arr.dup
         arr.each do |o|
-          if reciprocal && (list = o.instance_variable_get(reciprocal))
-            list.delete(self)
+          if reciprocal and array = o.associations[reciprocal]
+            array.delete(self)
           end
         end
       end
-      instance_variable_set(ivar, [])
+      assoc[name] = []
       ret
     end
   end
   
   # Adds many_to_one association instance methods
   def def_many_to_one(name, opts)
-    ivar = association_ivar(name)
-    
     key = (opts[:key] ||= default_foreign_key(opts))
     opts[:class_name] ||= name.to_s.camelize
     
     class_def(name) do |*reload|
-      if !reload[0] && obj = instance_variable_get(ivar)
-        obj == :null ? nil : obj
+      if (assoc = @associations).include?(name) and !reload[0]
+        assoc[name]
       else
         obj = if fk = send(key)
           opts.associated_class.select(*opts.select).filter(opts.associated_primary_key=>fk).first
         end
-        instance_variable_set(ivar, obj || :null)
-        obj
+        assoc[name] = obj
       end
     end
     return if opts[:read_only]
 
     class_def(:"#{name}=") do |o|
-      old_val = instance_variable_get(ivar) if reciprocal = opts.reciprocal
-      instance_variable_set(ivar, o)
+      reciprocal = opts.reciprocal
+      if (assoc = @associations).include?(name) and reciprocal
+        old_val = assoc[name]
+      end
+      assoc[name] = o
       send(:"#{key}=", (o.pk if o))
-      if reciprocal && (old_val != o)
-        if old_val && (list = old_val.instance_variable_get(reciprocal))
-          list.delete(self)
+      if reciprocal and old_val != o
+        if old_val and array = old_val.associations[reciprocal]
+          array.delete(self)
         end
-        if o && (list = o.instance_variable_get(reciprocal)) && !(list.include?(self))
-          list.push(self) 
+        if o and array = o.associations[reciprocal] and !array.include?(self)
+          array.push(self) 
         end
       end
       o
@@ -354,24 +347,23 @@ module Sequel::Model::Associations
   
   # Adds one_to_many association instance methods
   def def_one_to_many(name, opts)
-    ivar = association_ivar(name)
     key = (opts[:key] ||= default_remote_key)
     opts[:class_name] ||= name.to_s.singularize.camelize
     add_meth = association_add_method_name(name)
     remove_meth = association_remove_method_name(name)
     remove_all_meth = association_remove_all_method_name(name)
     
-    def_association_dataset_methods(name, opts) {opts.associated_class.select(*opts.select).filter(key => pk)}
+    def_association_dataset_methods(name, opts) {opts.associated_class.filter(key => pk)}
     
     unless opts[:read_only]
       class_def(add_meth) do |o|
         o.send(:"#{key}=", pk)
         o.save || raise(Sequel::Error, "invalid associated object, cannot save")
-        if arr = instance_variable_get(ivar)
-          arr.push(o)
+        if (assoc = @associations).include?(name)
+          assoc[name].push(o)
         end
         if reciprocal = opts.reciprocal
-          o.instance_variable_set(reciprocal, self)
+          o.associations[reciprocal] = self
         end
         o
       end
@@ -379,23 +371,24 @@ module Sequel::Model::Associations
         class_def(remove_meth) do |o|
           o.send(:"#{key}=", nil)
           o.save || raise(Sequel::Error, "invalid associated object, cannot save")
-          if arr = instance_variable_get(ivar)
-            arr.delete(o)
+          if (assoc = @associations).include?(name)
+            assoc[name].delete(o)
           end
           if reciprocal = opts.reciprocal
-            o.instance_variable_set(reciprocal, :null)
+            o.associations[reciprocal] = nil
           end
           o
         end
         class_def(remove_all_meth) do
           opts.associated_class.filter(key=>pk).update(key=>nil)
-          if arr = instance_variable_get(ivar)
+          if (assoc = @associations).include?(name)
+            arr = assoc[name]
             ret = arr.dup
             if reciprocal = opts.reciprocal
-              arr.each{|o| o.instance_variable_set(reciprocal, :null)} 
+              arr.each{|o| o.associations[reciprocal] = nil}
             end
           end
-          instance_variable_set(ivar, [])
+          assoc[name] = []
           ret
         end
       end

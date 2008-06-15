@@ -279,7 +279,8 @@ module Sequel::Model::Associations::EagerLoading
     return if dependency_map.empty?
     # Don't clobber the instance variable array for *_to_many associations if it has already been setup
     dependency_map.keys.each do |ta|
-      current.instance_variable_set("@#{alias_map[ta]}", type_map[ta] == :many_to_one ? :null : []) unless current.instance_variable_get("@#{alias_map[ta]}")
+      assoc_name = alias_map[ta]
+      current.associations[assoc_name] = type_map[ta] == :many_to_one ? nil : [] unless current.associations.include?(assoc_name)
     end
     dependency_map.each do |ta, deps|
       next unless rec = record_graph[ta]
@@ -289,15 +290,14 @@ module Sequel::Model::Associations::EagerLoading
       else
         records_map[ta][rec.pk] = rec
       end
-      ivar = "@#{alias_map[ta]}"
+      assoc_name = alias_map[ta]
       case assoc_type = type_map[ta]
       when :many_to_one
-        current.instance_variable_set(ivar, rec)
+        current.associations[assoc_name] = rec
       else
-        list = current.instance_variable_get(ivar)
-        list.push(rec) 
-        if (assoc_type == :one_to_many) && (reciprocal = reciprocal_map[ta])
-          rec.instance_variable_set(reciprocal, current)
+        current.associations[assoc_name].push(rec) 
+        if assoc_type == :one_to_many and reciprocal = reciprocal_map[ta]
+          rec.associations[reciprocal] = current
         end
       end
       # Recurse into dependencies of the current object
@@ -363,7 +363,6 @@ module Sequel::Model::Associations::EagerLoading
     reflections.each do |reflection|
       assoc_class = reflection.associated_class
       assoc_name = reflection[:name]
-      assoc_iv = :"@#{assoc_name}"
       # Proc for setting cascaded eager loading
       assoc_block = Proc.new do |d|
         if order = reflection[:order]
@@ -390,13 +389,11 @@ module Sequel::Model::Associations::EagerLoading
           # Set the instance variable to null by default, so records that
           # don't have a associated records will cache the negative lookup.
           a.each do |object|
-            object.instance_variable_set(assoc_iv, :null)
+            object.associations[assoc_name] = nil
           end
           assoc_block.call(assoc_class.select(*reflection.select).filter(assoc_class.primary_key=>keys)).all do |assoc_object|
             next unless objects = h[assoc_object.pk]
-            objects.each do |object|
-              object.instance_variable_set(assoc_iv, assoc_object)
-            end
+            objects.each{|object| object.associations[assoc_name] = assoc_object}
           end
         when :one_to_many, :many_to_many
           h = key_hash[model.primary_key]
@@ -409,9 +406,7 @@ module Sequel::Model::Associations::EagerLoading
             assoc_class.select(*(Array(reflection.select)+Array(reflection[:left_key_select]))).inner_join(reflection[:join_table], [[reflection[:right_key], reflection.associated_primary_key], [reflection[:left_key], h.keys]])
           end
           h.values.each do |object_array|
-            object_array.each do |object|
-              object.instance_variable_set(assoc_iv, [])
-            end
+            object_array.each{|object| object.associations[assoc_name] = []}
           end
           assoc_block.call(ds).all do |assoc_object|
             fk = if rtype == :many_to_many
@@ -421,8 +416,8 @@ module Sequel::Model::Associations::EagerLoading
             end
             next unless objects = h[fk]
             objects.each do |object|
-              object.instance_variable_get(assoc_iv) << assoc_object
-              assoc_object.instance_variable_set(reciprocal, object) if reciprocal
+              object.associations[assoc_name].push(assoc_object)
+              assoc_object.associations[reciprocal] = object if reciprocal
             end
           end
       end

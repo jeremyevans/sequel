@@ -144,12 +144,12 @@ describe Sequel::Model, "many_to_one" do
     d = @c2.create_new(:id => 1)
     MODEL_DB.reset
     d.parent_id = 234
-    d.instance_variable_get("@parent").should == nil
+    d.associations[:parent].should == nil
     ds = @c2.dataset
     def ds.fetch_rows(sql, &block); MODEL_DB.sqls << sql; yield({:id=>234}) end
     e = d.parent 
     MODEL_DB.sqls.should == ["SELECT nodes.* FROM nodes WHERE (id = 234) LIMIT 1"]
-    d.instance_variable_get("@parent").should == e
+    d.associations[:parent].should == e
   end
 
   it "should set cached instance variable when assigned" do
@@ -157,10 +157,10 @@ describe Sequel::Model, "many_to_one" do
 
     d = @c2.create(:id => 1)
     MODEL_DB.reset
-    d.instance_variable_get("@parent").should == nil
+    d.associations[:parent].should == nil
     d.parent = @c2.new(:id => 234)
     e = d.parent 
-    d.instance_variable_get("@parent").should == e
+    d.associations[:parent].should == e
     MODEL_DB.sqls.should == []
   end
 
@@ -169,7 +169,7 @@ describe Sequel::Model, "many_to_one" do
 
     d = @c2.create(:id => 1, :parent_id => 234)
     MODEL_DB.reset
-    d.instance_variable_set(:@parent, 42)
+    d.associations[:parent] = 42
     d.parent.should == 42
     MODEL_DB.sqls.should == []
   end
@@ -180,7 +180,7 @@ describe Sequel::Model, "many_to_one" do
     d = @c2.create(:id => 1)
     MODEL_DB.reset
     d.parent_id = 234
-    d.instance_variable_set(:@parent, 42)
+    d.associations[:parent] = 42
     d.parent(true).should_not == 42 
     MODEL_DB.sqls.should == ["SELECT nodes.* FROM nodes WHERE (id = 234) LIMIT 1"]
   end
@@ -246,12 +246,12 @@ describe Sequel::Model, "many_to_one" do
     d = @c2.create_new(:id => 1)
     MODEL_DB.reset
     d.parent_id = 234
-    d.instance_variable_get("@parent").should == nil
+    d.associations[:parent].should == nil
     ds = @c2.dataset
     def ds.fetch_rows(sql, &block); MODEL_DB.sqls << sql; yield({:id=>234}) end
     e = d.parent 
     MODEL_DB.sqls.should == ["SELECT nodes.* FROM nodes WHERE (id = 234) LIMIT 1"]
-    d.instance_variable_get("@parent").should == e
+    d.associations[:parent].should == e
   end
 end
 
@@ -453,9 +453,9 @@ describe Sequel::Model, "one_to_many" do
 
     n = @c2.new(:id => 1234)
     MODEL_DB.reset
-    n.instance_variables.include?("@attributes").should == false
+    n.associations.include?(:attributes).should == false
     atts = n.attributes
-    atts.should == n.instance_variable_get("@attributes")
+    atts.should == n.associations[:attributes]
     MODEL_DB.sqls.should == ['SELECT attributes.* FROM attributes WHERE (node_id = 1234)']
   end
 
@@ -464,7 +464,7 @@ describe Sequel::Model, "one_to_many" do
 
     n = @c2.new(:id => 1234)
     MODEL_DB.reset
-    n.instance_variable_set(:@attributes, 42)
+    n.associations[:attributes] = 42
     n.attributes.should == 42
     MODEL_DB.sqls.should == []
   end
@@ -474,7 +474,7 @@ describe Sequel::Model, "one_to_many" do
 
     n = @c2.new(:id => 1234)
     MODEL_DB.reset
-    n.instance_variable_set(:@attributes, 42)
+    n.associations[:attributes] = 42
     n.attributes(true).should_not == 42
     MODEL_DB.sqls.should == ['SELECT attributes.* FROM attributes WHERE (node_id = 1234)']
   end
@@ -486,7 +486,7 @@ describe Sequel::Model, "one_to_many" do
     att = @c1.new(:id => 345)
     MODEL_DB.reset
     a = []
-    n.instance_variable_set(:@attributes, a)
+    n.associations[:attributes] = a
     n.add_attribute(att)
     a.should == [att]
   end
@@ -508,7 +508,7 @@ describe Sequel::Model, "one_to_many" do
     att = @c1.new(:id => 345)
     MODEL_DB.reset
     a = [att]
-    n.instance_variable_set(:@attributes, a)
+    n.associations[:attributes] = a
     n.remove_attribute(att)
     a.should == []
   end
@@ -519,7 +519,7 @@ describe Sequel::Model, "one_to_many" do
 
     n = @c2.new(:id => 1234)
     att = @c1.new(:id => 345)
-    att.instance_variable_set(:@node, n)
+    att.associations[:node] = n
     att.node.should == n
     n.remove_attribute(att)
     att.node.should == nil
@@ -565,7 +565,7 @@ describe Sequel::Model, "one_to_many" do
   end
   
   it "should use an explicit reciprocal instance variable if given" do
-    @c2.one_to_many :attributes, :class => @c1, :key => :node_id, :reciprocal=>'@wxyz'
+    @c2.one_to_many :attributes, :class => @c1, :key => :node_id, :reciprocal=>:wxyz
     
     n = @c2.new(:id => 1234)
     atts = n.attributes
@@ -574,7 +574,7 @@ describe Sequel::Model, "one_to_many" do
     atts.size.should == 1
     atts.first.should be_a_kind_of(@c1)
     atts.first.values.should == {}
-    atts.first.instance_variable_get('@wxyz').should == n
+    atts.first.associations[:wxyz].should == n
     
     MODEL_DB.sqls.length.should == 1
   end
@@ -589,7 +589,7 @@ describe Sequel::Model, "one_to_many" do
     @c2.one_to_many :attributes, :class => @c1
     node = @c2.new(:id => 1234)
     node.remove_all_attributes
-    node.instance_variable_get(:@attributes).should == []
+    node.associations[:attributes].should == []
   end
 
   it "remove_all should return the array of previously associated items if the cached instance variable exists" do
@@ -601,7 +601,7 @@ describe Sequel::Model, "one_to_many" do
     node.attributes.should == []
     def attrib.save!; self end
     node.add_attribute(attrib)
-    node.instance_variable_get(:@attributes).should == [attrib]
+    node.associations[:attributes].should == [attrib]
     node.remove_all_attributes.should == [attrib]
   end
 
@@ -623,9 +623,9 @@ describe Sequel::Model, "one_to_many" do
     attrib.node.should == nil
     def attrib.save!; self end
     node.add_attribute(attrib)
-    attrib.instance_variable_get(:@node).should == node 
+    attrib.associations[:node].should == node 
     node.remove_all_attributes
-    attrib.instance_variable_get(:@node).should == :null
+    attrib.associations.fetch(:node, 2).should == nil
   end
 
   it "should add a getter method if the :one_to_one option is true" do
@@ -881,9 +881,9 @@ describe Sequel::Model, "many_to_many" do
 
     n = @c2.new(:id => 1234)
     MODEL_DB.reset
-    n.instance_variables.include?("@attributes").should == false
+    n.associations.include?(:attributes).should == false
     atts = n.attributes
-    atts.should == n.instance_variable_get("@attributes")
+    atts.should == n.associations[:attributes]
     MODEL_DB.sqls.length.should == 1
   end
 
@@ -892,7 +892,7 @@ describe Sequel::Model, "many_to_many" do
 
     n = @c2.new(:id => 1234)
     MODEL_DB.reset
-    n.instance_variable_set(:@attributes, 42)
+    n.associations[:attributes] = 42
     n.attributes.should == 42
     MODEL_DB.sqls.should == []
   end
@@ -902,7 +902,7 @@ describe Sequel::Model, "many_to_many" do
 
     n = @c2.new(:id => 1234)
     MODEL_DB.reset
-    n.instance_variable_set(:@attributes, 42)
+    n.associations[:attributes] = 42
     n.attributes(true).should_not == 42
     MODEL_DB.sqls.length.should == 1
   end
@@ -914,7 +914,7 @@ describe Sequel::Model, "many_to_many" do
     att = @c1.new(:id => 345)
     MODEL_DB.reset
     a = []
-    n.instance_variable_set(:@attributes, a)
+    n.associations[:attributes] = a
     n.add_attribute(att)
     a.should == [att]
   end
@@ -925,7 +925,7 @@ describe Sequel::Model, "many_to_many" do
 
     n = @c2.new(:id => 1234)
     att = @c1.new(:id => 345)
-    att.instance_variable_set(:@nodes, [])
+    att.associations[:nodes] = []
     n.add_attribute(att)
     att.nodes.should == [n]
   end
@@ -937,7 +937,7 @@ describe Sequel::Model, "many_to_many" do
     att = @c1.new(:id => 345)
     MODEL_DB.reset
     a = [att]
-    n.instance_variable_set(:@attributes, a)
+    n.associations[:attributes] = a
     n.remove_attribute(att)
     a.should == []
   end
@@ -948,7 +948,7 @@ describe Sequel::Model, "many_to_many" do
 
     n = @c2.new(:id => 1234)
     att = @c1.new(:id => 345)
-    att.instance_variable_set(:@nodes, [n])
+    att.associations[:nodes] = [n]
     n.remove_attribute(att)
     att.nodes.should == []
   end
@@ -982,7 +982,7 @@ describe Sequel::Model, "many_to_many" do
     @c2.many_to_many :attributes, :class => @c1
     node = @c2.new(:id => 1234)
     node.remove_all_attributes
-    node.instance_variable_get(:@attributes).should == []
+    node.associations[:attributes].should == []
   end
 
   it "remove_all should return the array of previously associated items if the cached instance variable exists" do
@@ -993,7 +993,7 @@ describe Sequel::Model, "many_to_many" do
     def d.fetch_rows(s); end
     node.attributes.should == []
     node.add_attribute(attrib)
-    node.instance_variable_get(:@attributes).should == [attrib]
+    node.associations[:attributes].should == [attrib]
     node.remove_all_attributes.should == [attrib]
   end
 
@@ -1014,9 +1014,9 @@ describe Sequel::Model, "many_to_many" do
     node.attributes.should == []
     attrib.nodes.should == []
     node.add_attribute(attrib)
-    attrib.instance_variable_get(:@nodes).should == [node]
+    attrib.associations[:nodes].should == [node]
     node.remove_all_attributes
-    attrib.instance_variable_get(:@nodes).should == []
+    attrib.associations[:nodes].should == []
   end
 end
 

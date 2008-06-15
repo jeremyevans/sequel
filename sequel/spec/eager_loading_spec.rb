@@ -277,7 +277,7 @@ describe Sequel::Model, "#eager" do
     a.first.values.should == {:id => 101, :band_id => 101}
     MODEL_DB.sqls.should == ['SELECT * FROM albums WHERE (id = 101)', 'SELECT bands.* FROM bands WHERE (id IN (101))']
     a = a.first
-    a.instance_variable_get(:@band).should == :null
+    a.associations.fetch(:band, 2).should == nil
     a.band.should == nil
     MODEL_DB.sqls.length.should == 2
   end
@@ -290,10 +290,10 @@ describe Sequel::Model, "#eager" do
     a.first.values.should == {:id => 101}
     a.last.values.should == {:id => 102}
     MODEL_DB.sqls.should == ['SELECT * FROM bands WHERE (id > 100)', 'SELECT albums.* FROM albums WHERE (band_id IN (101, 102))', "SELECT tracks.* FROM tracks WHERE (album_id IN (101))"]
-    a.first.instance_variable_get(:@albums).should be_a_kind_of(Array)
+    a.first.associations[:albums].should be_a_kind_of(Array)
     a.first.albums.length.should == 1
     a.first.albums.first.should be_a_kind_of(EagerAlbum)
-    a.last.instance_variable_get(:@albums).should == []
+    a.last.associations[:albums].should == []
     a.last.albums.should == []
     MODEL_DB.sqls.length.should == 3
   end
@@ -624,7 +624,7 @@ describe Sequel::Model, "#eager_graph" do
     a.size.should == 1
     a.first.should be_a_kind_of(GraphAlbum)
     a.first.values.should == {:id => 1, :band_id => 2}
-    a.first.instance_variable_get(:@band).should == :null
+    a.first.associations.fetch(:band, 2).should == nil
   end
 
   it "should handle no associated records for a single one_to_many association" do
@@ -674,7 +674,7 @@ describe Sequel::Model, "#eager_graph" do
     a.tracks.size.should == 4
     a.tracks.first.should be_a_kind_of(GraphTrack)
     a.tracks.collect{|x|x[:id]}.should == [3,4,5,6]
-    a.instance_variable_get(:@band).should == :null
+    a.associations.fetch(:band, 2).should == nil
     a.genres.should == []
   end
 
@@ -693,10 +693,10 @@ describe Sequel::Model, "#eager_graph" do
     a.size.should == 4
     a.first.should be_a_kind_of(GraphTrack)
     a.collect{|x|x[:id]}.should == [2,3,4,5]
-    a[0].instance_variable_get(:@album).should == :null
+    a[0].associations.fetch(:album, 2).should == nil
     a[1].album.should be_a_kind_of(GraphAlbum)
     a[1].album.values.should == {:id => 3, :band_id => 3}
-    a[1].album.instance_variable_get(:@band).should == :null
+    a[1].album.associations.fetch(:band, 2).should == nil
     a[2].album.should be_a_kind_of(GraphAlbum)
     a[2].album.values.should == {:id => 4, :band_id => 2}
     a[2].album.band.should be_a_kind_of(GraphBand)

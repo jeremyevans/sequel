@@ -10,6 +10,11 @@ module Sequel
     # underlying database columns.
     attr_reader :values
 
+    # The current cached associations.  A hash with the keys being the
+    # association name symbols and the values being the associated object
+    # or nil (many_to_one), or the array of associated objects (*_to_many).
+    attr_reader :associations
+
     # Whether this model instance should typecast on attribute assignment
     attr_writer :typecast_on_assignment
 
@@ -28,6 +33,7 @@ module Sequel
     def initialize(values = nil, from_db = false, &block)
       values ||=  {}
       @changed_columns = []
+      @associations = {}
       @typecast_on_assignment = model.typecast_on_assignment
       @db_schema = model.db_schema
       if from_db
@@ -167,9 +173,7 @@ module Sequel
     # exists in the database.
     def refresh
       @values = this.first || raise(Error, "Record not found")
-      model.all_association_reflections.each do |r|
-        instance_variable_set("@#{r[:name]}", nil)
-      end
+      @associations.clear
       self
     end
     alias_method :reload, :refresh
