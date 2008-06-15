@@ -529,7 +529,7 @@ describe Sequel::Model, "#eager_graph" do
     def ds.fetch_rows(sql, &block)
       yield({:id=>1, :band_id=>2, :band_id_0=>2, :vocalist_id=>3})
     end
-    ds.first.should == {:albums=>GraphAlbum.new(:id => 1, :band_id => 2), :band=>GraphBand.new(:id => 2, :vocalist_id=>3)}
+    ds.first.should == {:albums=>GraphAlbum.load(:id => 1, :band_id => 2), :band=>GraphBand.load(:id => 2, :vocalist_id=>3)}
   end
 
   it "should not drop any associated objects if the graph could not be a cartesian product" do

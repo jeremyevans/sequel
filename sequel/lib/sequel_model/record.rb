@@ -1,7 +1,9 @@
-# This file holds general instance methods for Sequel::Model
-
 module Sequel
   class Model
+    # The setter methods (methods ending with =) that are never allowed
+    # to be called automatically via set.
+    RESTRICTED_SETTER_METHODS = %w"== === []= taguri= typecast_on_assignment="
+
     # The columns that have been updated.  This isn't completely accurate,
     # see Model#[]=.
     attr_reader :changed_columns
@@ -42,7 +44,7 @@ module Sequel
       else
         @values = {}
         @new = true
-        set_with_params(values)
+        set(values)
       end
       @changed_columns.clear 
       
@@ -238,24 +240,33 @@ module Sequel
     # If no columns have been set for this model (very unlikely), assume symbol
     # keys are valid column names, and assign the column value based on that.
     def set(hash)
-      columns_not_set = model.instance_variable_get(:@columns).blank?
-      meths = setter_methods
-      hash.each do |k,v|
-        m = "#{k}="
-        if meths.include?(m)
-          send(m, v)
-        elsif columns_not_set && (Symbol === k)
-          self[k] = v
-        end
-      end
+      set_restricted(hash, nil, nil)
     end
     alias_method :set_with_params, :set
+
+    # Set all values using the entries in the hash, ignoring any setting of
+    # allowed_columns or restricted columns in the model.
+    def set_all(hash)
+      set_restricted(hash, false, false)
+    end
+
+    # Set all values using the entries in the hash, except for the keys
+    # given in except.
+    def set_except(hash, *except)
+      set_restricted(hash, false, except.flatten)
+    end
+
+    # Set the values using the entries in the hash, only if the key
+    # is included in only.
+    def set_only(hash, *only)
+      set_restricted(hash, only.flatten, false)
+    end
 
     # Sets the value attributes without saving the record.  Returns
     # the values changed.  Raises an error if the keys are not symbols
     # or strings or a string key was passed that was not a valid column.
     # This is a low level method that does not respect virtual attributes.  It
-    # should probably be avoided.  Look into using set_with_params instead.
+    # should probably be avoided.  Look into using set instead.
     def set_values(values)
       s = str_columns
       vals = values.inject({}) do |m, kv| 
@@ -283,12 +294,29 @@ module Sequel
       @this ||= dataset.filter(pk_hash).limit(1).naked
     end
     
-    # Runs set_with_params and runs save_changes (which runs any callback methods).
-    def update(values)
-      set_with_params(values)
-      save_changes
+    # Runs set with the passed hash and runs save_changes (which runs any callback methods).
+    def update(hash)
+      update_restricted(hash, nil, nil)
     end
     alias_method :update_with_params, :update
+
+    # Update all values using the entries in the hash, ignoring any setting of
+    # allowed_columns or restricted columns in the model.
+    def update_all(hash)
+      update_restricted(hash, false, false)
+    end
+
+    # Update all values using the entries in the hash, except for the keys
+    # given in except.
+    def update_except(hash, *except)
+      update_restricted(hash, false, except.flatten)
+    end
+
+    # Update the values using the entries in the hash, only if the key
+    # is included in only.
+    def update_only(hash, *only)
+      update_restricted(hash, only.flatten, false)
+    end
 
     # Sets the values attributes with set_values and then updates
     # the record in the database using those values.  This is a
@@ -301,10 +329,47 @@ module Sequel
     
     private
 
+    # Set the columns, filtered by the only and except arrays.
+    def set_restricted(hash, only, except)
+      columns_not_set = model.instance_variable_get(:@columns).blank?
+      meths = setter_methods(only, except)
+      hash.each do |k,v|
+        m = "#{k}="
+        if meths.include?(m)
+          send(m, v)
+        elsif columns_not_set && (Symbol === k)
+          self[k] = v
+        end
+      end
+    end
+
     # Returns all methods that can be used for attribute
-    # assignment (those that end with =)
-    def setter_methods
-      methods.grep(/=\z/)
+    # assignment (those that end with =), modified by the only
+    # and except arguments:
+    #
+    # * only
+    #   * false - Don't modify the results
+    #   * nil - if the model has allowed_columns, use only these, otherwise, don't modify
+    #   * Array - allow only the given methods to be used
+    # * except
+    #   * false - Don't modify the results
+    #   * nil - if the model has restricted_columns, remove these, otherwise, don't modify
+    #   * Array - remove the given methods
+    #
+    # only takes precedence over except, and if only is not used, certain methods are always
+    # restricted (RESTRICTED_SETTER_METHODS).  The primary key is restricted by default as
+    # well, see Model.unrestrict_primary_key to change this.
+    def setter_methods(only, except)
+      only = only.nil? ? model.allowed_columns : only
+      except = except.nil? ? model.restricted_columns : except
+      if only
+        only.map{|x| "#{x}="}
+      else
+        meths = methods.grep(/=\z/) - RESTRICTED_SETTER_METHODS
+        meths -= Array(primary_key).map{|x| "#{x}="} if primary_key && model.restrict_primary_key?
+        meths -= except.map{|x| "#{x}="} if except
+        meths
+      end
     end
 
     # Typecast the value to the column's type if typecasting.  Calls the database's
@@ -314,6 +379,12 @@ module Sequel
       return value unless @typecast_on_assignment && @db_schema && (col_schema = @db_schema[column])
       raise(Error, "nil/NULL is not allowed for the #{column} column") if value.nil? && (col_schema[:allow_null] == false)
       model.db.typecast_value(col_schema[:type], value)
+    end
+
+    # Set the columns, filtered by the only and except arrays.
+    def update_restricted(hash, only, except)
+      set_restricted(hash, only, except)
+      save_changes
     end
   end
 end

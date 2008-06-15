@@ -648,13 +648,11 @@ describe Sequel::Model, "Validations" do
     @user.should_not be_valid
     @user.errors.full_messages.should == ['username is already taken']
 
-    @user = User.new(:id=>4, :username => "1record", :password => "anothertest")
-    @user.instance_variable_set(:@new, false)
+    @user = User.load(:id=>4, :username => "1record", :password => "anothertest")
     @user.should_not be_valid
     @user.errors.full_messages.should == ['username is already taken']
 
-    @user = User.new(:id=>3, :username => "1record", :password => "anothertest")
-    @user.instance_variable_set(:@new, false)
+    @user = User.load(:id=>3, :username => "1record", :password => "anothertest")
     @user.should be_valid
     @user.errors.full_messages.should == []
 

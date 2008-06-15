@@ -227,20 +227,20 @@ describe Sequel::Model, "with this" do
   before { @example = Class.new Sequel::Model(:examples); @example.columns :id, :a, :x, :y }
 
   it "should return a dataset identifying the record" do
-    instance = @example.new :id => 3
+    instance = @example.load :id => 3
     instance.this.sql.should be_eql("SELECT * FROM examples WHERE (id = 3) LIMIT 1")
   end
 
   it "should support arbitary primary keys" do
     @example.set_primary_key :a
 
-    instance = @example.new :a => 3
+    instance = @example.load :a => 3
     instance.this.sql.should be_eql("SELECT * FROM examples WHERE (a = 3) LIMIT 1")
   end
 
   it "should support composite primary keys" do
     @example.set_primary_key :x, :y
-    instance = @example.new :x => 4, :y => 5
+    instance = @example.load :x => 4, :y => 5
 
     parts = [
       'SELECT * FROM examples WHERE %s LIMIT 1',
@@ -261,19 +261,19 @@ describe "Model#pk" do
   end
   
   it "should be default return the value of the :id column" do
-    m = @m.new(:id => 111, :x => 2, :y => 3)
+    m = @m.load(:id => 111, :x => 2, :y => 3)
     m.pk.should == 111
   end
 
   it "should be return the primary key value for custom primary key" do
     @m.set_primary_key :x
-    m = @m.new(:id => 111, :x => 2, :y => 3)
+    m = @m.load(:id => 111, :x => 2, :y => 3)
     m.pk.should == 2
   end
 
   it "should be return the primary key value for composite primary key" do
     @m.set_primary_key [:y, :x]
-    m = @m.new(:id => 111, :x => 2, :y => 3)
+    m = @m.load(:id => 111, :x => 2, :y => 3)
     m.pk.should == [3, 2]
   end
 
@@ -295,19 +295,19 @@ describe "Model#pk_hash" do
   end
   
   it "should be default return the value of the :id column" do
-    m = @m.new(:id => 111, :x => 2, :y => 3)
+    m = @m.load(:id => 111, :x => 2, :y => 3)
     m.pk_hash.should == {:id => 111}
   end
 
   it "should be return the primary key value for custom primary key" do
     @m.set_primary_key :x
-    m = @m.new(:id => 111, :x => 2, :y => 3)
+    m = @m.load(:id => 111, :x => 2, :y => 3)
     m.pk_hash.should == {:x => 2}
   end
 
   it "should be return the primary key value for composite primary key" do
     @m.set_primary_key [:y, :x]
-    m = @m.new(:id => 111, :x => 2, :y => 3)
+    m = @m.load(:id => 111, :x => 2, :y => 3)
     m.pk_hash.should == {:y => 3, :x => 2}
   end
 
@@ -322,11 +322,12 @@ describe "Model#pk_hash" do
   end
 end
 
-describe Sequel::Model, "set" do
+describe Sequel::Model, "#set" do
   before do
     MODEL_DB.reset
     
     @c = Class.new(Sequel::Model(:items)) do
+      set_primary_key :id
       columns :x, :y, :id
     end
     @c.instance_variable_set(:@columns, true)
@@ -364,6 +365,15 @@ describe Sequel::Model, "set" do
     MODEL_DB.sqls.should == []
   end
   
+  it "should not modify the primary key" do
+    @o1.set(:x => 1, :id => 2)
+    @o1.values.should == {:x => 1}
+    MODEL_DB.sqls.should == []
+    @o2.set('y'=> 1, 'id'=> 2)
+    @o2.values.should == {:y => 1, :id=> 5}
+    MODEL_DB.sqls.should == []
+  end
+
   it "should be aliased as set_with_params" do
     @o1.set_with_params(:x => 1, :z => 2)
     @o1.values.should == {:x => 1}
@@ -371,11 +381,12 @@ describe Sequel::Model, "set" do
   end
 end
 
-describe Sequel::Model, "update" do
+describe Sequel::Model, "#update" do
   before do
     MODEL_DB.reset
     
     @c = Class.new(Sequel::Model(:items)) do
+      set_primary_key :id
       columns :x, :y, :id
     end
     @c.instance_variable_set(:@columns, true)
@@ -398,22 +409,90 @@ describe Sequel::Model, "update" do
     MODEL_DB.sqls.first.should == "INSERT INTO items (x) VALUES (333)"
   end
   
+  it "should not modify the primary key" do
+    @o1.update(:x => 1, :id => 2)
+    MODEL_DB.sqls.first.should == "INSERT INTO items (x) VALUES (1)"
+    MODEL_DB.reset
+    @o2.update('y'=> 1, 'id'=> 2)
+    @o2.values.should == {:y => 1, :id=> 5}
+    MODEL_DB.sqls.first.should == "UPDATE items SET y = 1 WHERE (id = 5)"
+  end
+
   it "should be aliased as update_with_params" do
     @o1.update_with_params(:x => 1, :z => 2)
     MODEL_DB.sqls.first.should == "INSERT INTO items (x) VALUES (1)"
   end
 end
 
-describe Sequel::Model, "#destroy" do
+describe Sequel::Model, "#(set|update)_(all|except|only)" do
+  before do
+    MODEL_DB.reset
+    
+    @c = Class.new(Sequel::Model(:items)) do
+      set_primary_key :id
+      columns :x, :y, :z, :id
+      set_allowed_columns :x
+      set_restricted_columns :y
+    end
+    @c.instance_variable_set(:@columns, true)
+    @o1 = @c.new
+  end
 
-  before(:each) do
+  it "#set_all should set all attributes" do
+    @o1.set_all(:x => 1, :y => 2, :z=>3, :id=>4)
+    @o1.values.should == {:x => 1, :y => 2, :z=>3}
+  end
+
+  it "#set_only should only set given attributes" do
+    @o1.set_only({:x => 1, :y => 2, :z=>3, :id=>4}, [:x, :y])
+    @o1.values.should == {:x => 1, :y => 2}
+    @o1.set_only({:x => 4, :y => 5, :z=>6, :id=>7}, :x, :y)
+    @o1.values.should == {:x => 4, :y => 5}
+  end
+
+  it "#set_except should not set given attributes" do
+    @o1.set_except({:x => 1, :y => 2, :z=>3, :id=>4}, [:y, :z])
+    @o1.values.should == {:x => 1}
+    @o1.set_except({:x => 4, :y => 2, :z=>3, :id=>4}, :y, :z)
+    @o1.values.should == {:x => 4}
+  end
+
+  it "#update_all should update all attributes" do
+    @c.new.update_all(:x => 1, :id=>4)
+    MODEL_DB.sqls.first.should == "INSERT INTO items (x) VALUES (1)"
+    MODEL_DB.reset
+    @c.new.update_all(:y => 1, :id=>4)
+    MODEL_DB.sqls.first.should == "INSERT INTO items (y) VALUES (1)"
+    MODEL_DB.reset
+    @c.new.update_all(:z => 1, :id=>4)
+    MODEL_DB.sqls.first.should == "INSERT INTO items (z) VALUES (1)"
+  end
+
+  it "#update_only should only update given attributes" do
+    @o1.update_only({:x => 1, :y => 2, :z=>3, :id=>4}, [:x])
+    MODEL_DB.sqls.first.should == "INSERT INTO items (x) VALUES (1)"
+    MODEL_DB.reset
+    @c.new.update_only({:x => 1, :y => 2, :z=>3, :id=>4}, :x)
+    MODEL_DB.sqls.first.should == "INSERT INTO items (x) VALUES (1)"
+  end
+
+  it "#update_except should not update given attributes" do
+    @o1.update_except({:x => 1, :y => 2, :z=>3, :id=>4}, [:y, :z])
+    MODEL_DB.sqls.first.should == "INSERT INTO items (x) VALUES (1)"
+    MODEL_DB.reset
+    @c.new.update_except({:x => 1, :y => 2, :z=>3, :id=>4}, :y, :z)
+    MODEL_DB.sqls.first.should == "INSERT INTO items (x) VALUES (1)"
+  end
+end
+
+describe Sequel::Model, "#destroy" do
+  before do
     MODEL_DB.reset
     @model = Class.new(Sequel::Model(:items))
     @model.columns :id
     @model.dataset.meta_def(:delete) {MODEL_DB.execute delete_sql}
     
-    @instance = @model.new(:id => 1234)
-    #@model.stub!(:delete).and_return(:true)
+    @instance = @model.load(:id => 1234)
   end
 
   it "should return self" do
@@ -461,7 +540,7 @@ describe Sequel::Model, "#each" do
   setup do
     @model = Class.new(Sequel::Model(:items))
     @model.columns :a, :b, :id
-    @m = @model.new(:a => 1, :b => 2, :id => 4444)
+    @m = @model.load(:a => 1, :b => 2, :id => 4444)
   end
   
   specify "should iterate over the values" do
@@ -475,7 +554,7 @@ describe Sequel::Model, "#keys" do
   setup do
     @model = Class.new(Sequel::Model(:items))
     @model.columns :a, :b, :id
-    @m = @model.new(:a => 1, :b => 2, :id => 4444)
+    @m = @model.load(:a => 1, :b => 2, :id => 4444)
   end
   
   specify "should return the value keys" do
@@ -519,10 +598,10 @@ describe Sequel::Model, "#===" do
     z.columns :id, :x
     y = Class.new(Sequel::Model)
     y.columns :id, :x
-    a = z.new(:id => 1, :x => 3)
-    b = z.new(:id => 1, :x => 4)
-    c = z.new(:id => 2, :x => 3)
-    d = y.new(:id => 1, :x => 3)
+    a = z.load(:id => 1, :x => 3)
+    b = z.load(:id => 1, :x => 4)
+    c = z.load(:id => 2, :x => 3)
+    d = y.load(:id => 1, :x => 3)
     
     a.should === b
     a.should_not === c
@@ -551,10 +630,10 @@ describe Sequel::Model, "#hash" do
     z.columns :id, :x
     y = Class.new(Sequel::Model)
     y.columns :id, :x
-    a = z.new(:id => 1, :x => 3)
-    b = z.new(:id => 1, :x => 4)
-    c = z.new(:id => 2, :x => 3)
-    d = y.new(:id => 1, :x => 3)
+    a = z.load(:id => 1, :x => 3)
+    b = z.load(:id => 1, :x => 4)
+    c = z.load(:id => 2, :x => 3)
+    d = y.load(:id => 1, :x => 3)
     
     a.hash.should == b.hash
     a.hash.should_not == c.hash
@@ -585,8 +664,13 @@ describe Sequel::Model, "#initialize" do
   end
   
   specify "should accept values" do
+    m = @c.new(:x => 2)
+    m.values.should == {:x => 2}
+  end
+  
+  specify "should not modify the primary key" do
     m = @c.new(:id => 1, :x => 2)
-    m.values.should == {:id => 1, :x => 2}
+    m.values.should == {:x => 2}
   end
   
   specify "should accept no values" do
@@ -608,14 +692,14 @@ describe Sequel::Model, "#initialize" do
     @c.class_def(:blah=) {|x| @blah = x}
     @c.class_def(:blah) {@blah}
     
-    m = @c.new(:id => 1, :x => 2, :blah => 3)
-    m.values.should == {:id => 1, :x => 2}
+    m = @c.new(:x => 2, :blah => 3)
+    m.values.should == {:x => 2}
     m.blah.should == 3
   end
   
   specify "should convert string keys into symbol keys" do
-    m = @c.new('id' => 1, 'x' => 2)
-    m.values.should == {:id => 1, :x => 2}
+    m = @c.new('x' => 2)
+    m.values.should == {:x => 2}
   end
 end
 

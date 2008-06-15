@@ -1,5 +1,3 @@
-# This file holds general class methods for Sequel::Model
-
 module Sequel
   class Model
     # Whether to lazily load the schema for future subclasses.  Unless turned
@@ -7,19 +5,30 @@ module Sequel
     # created
     @@lazy_load_schema = false
 
-    @primary_key = :id
-    @typecast_on_assignment = true
+    @allowed_columns = nil
     @dataset_methods = {}
+    @primary_key = :id
+    @restrict_primary_key = true
+    @restricted_columns = nil
+    @typecast_on_assignment = true
 
-    # The default primary key for classes (default: :id)
-    metaattr_accessor :primary_key
-
-    # Whether to typecast attribute values on assignment (default: true)
-    metaattr_accessor :typecast_on_assignment
+    # Which columns should be the only columns allowed in a call to set
+    # (default: all columns).
+    metaattr_accessor :allowed_columns
 
     # Hash of dataset methods to add to this class and subclasses when
     # set_dataset is called.
     metaattr_accessor :dataset_methods
+
+    # The default primary key for classes (default: :id)
+    metaattr_accessor :primary_key
+
+    # Which columns should not be update in a call to set
+    # (default: no columns).
+    metaattr_accessor :restricted_columns
+
+    # Whether to typecast attribute values on assignment (default: true)
+    metaattr_accessor :typecast_on_assignment
 
     # Dataset methods to proxy via metaprogramming
     DATASET_METHODS = %w'<< all avg count delete distinct eager eager_graph each each_page 
@@ -30,6 +39,11 @@ module Sequel
        paginate print query range reverse_order right_outer_join select 
        select_all select_more set set_graph_aliases single_value size to_csv 
        transform union uniq unordered update where'.map{|x| x.to_sym}
+
+    # Instance variables that are inherited in subclasses
+    INHERITED_INSTANCE_VARIABLES = {:@allowed_columns=>:dup, :@dataset_methods=>:dup,
+      :@primary_key=>nil, :@restricted_columns=>:dup, :@restrict_primary_key=>nil,
+      :@typecast_on_assignment=>nil}
 
     # Returns the first record from the database matching the conditions.
     # If a hash is given, it is used as the conditions.  If another
@@ -139,14 +153,17 @@ module Sequel
     end
   
     # If possible, set the dataset for the model subclass as soon as it
-    # is created.  Also, inherit the typecast_on_assignment and primary_key
-    # attributes from the parent class.
+    # is created.  Also, inherit the INHERITED_INSTANCE_VARIABLES
+    # from the parent class.
     def self.inherited(subclass)
       sup_class = subclass.superclass
       ivs = subclass.instance_variables
-      subclass.instance_variable_set(:@typecast_on_assignment, sup_class.typecast_on_assignment) unless ivs.include?("@typecast_on_assignment")
-      subclass.instance_variable_set(:@primary_key, sup_class.primary_key) unless ivs.include?("@primary_key")
-      subclass.instance_variable_set(:@dataset_methods, sup_class.dataset_methods.dup) unless ivs.include?("@dataset_methods")
+      INHERITED_INSTANCE_VARIABLES.each do |iv, dup|
+        next if ivs.include?(iv.to_s)
+        sup_class_value = sup_class.instance_variable_get(iv)
+        sup_class_value = sup_class_value.dup if dup == :dup && sup_class_value
+        subclass.instance_variable_set(iv, sup_class_value)
+      end
       unless ivs.include?("@dataset")
         begin
           if sup_class == Model
@@ -203,6 +220,19 @@ module Sequel
       end
     end
 
+    # Restrict the setting of the primary key(s) inside new/set/update.  Because
+    # this is the default, this only make sense to use in a subclass where the
+    # parent class has used unrestrict_primary_key.
+    def self.restrict_primary_key
+      @restrict_primary_key = true
+    end
+
+    # Whether or not setting the primary key inside new/set/update is
+    # restricted, true by default.
+    def self.restrict_primary_key?
+      @restrict_primary_key
+    end
+
     # Serializes column with YAML or through marshalling.  Arguments should be
     # column symbols, with an optional trailing hash with a :format key
     # set to :yaml or :marshal (:yaml is the default).  Setting this adds
@@ -217,6 +247,17 @@ module Sequel
       @dataset.transform(@transform) if @dataset
     end
   
+    # Set the columns to allow in new/set/update.  Using this means that
+    # any columns not listed here will not be modified.  If you have any virtual
+    # setter methods (methods that end in =) that you want to be used in
+    # new/set/update, they need to be listed here as well (without the =).
+    #
+    # It may be better to use (set|update)_only instead of this in places where
+    # only certain columns may be allowed.
+    def self.set_allowed_columns(*cols)
+      @allowed_columns = cols
+    end
+
     # Sets the dataset associated with the Model class. ds can be a Symbol
     # (specifying a table name in the current database), or a Dataset.
     # If a dataset is used, the model's database is changed to the given
@@ -271,6 +312,17 @@ module Sequel
       @primary_key = (key.length == 1) ? key[0] : key.flatten
     end
 
+    # Set the columns to restrict in new/set/update.  Using this means that
+    # any columns listed here will not be modified.  If you have any virtual
+    # setter methods (methods that end in =) that you want not to be used in
+    # new/set/update, they need to be listed here as well (without the =).
+    #
+    # It may be better to use (set|update)_except instead of this in places where
+    # only certain columns may be allowed.
+    def self.set_restricted_columns(*cols)
+      @restricted_columns = cols
+    end
+
     # Makes this model a polymorphic model with the given key being a string
     # field in the database holding the name of the class to use.  If the
     # key given has a NULL value or there are any problems looking up the
@@ -313,6 +365,11 @@ module Sequel
     # Returns name of primary table for the dataset.
     def self.table_name
       dataset.opts[:from].first
+    end
+
+    # Allow the setting of the primary key(s) inside new/set/update.
+    def self.unrestrict_primary_key
+      @restrict_primary_key = false
     end
 
     # Add model methods that call dataset methods

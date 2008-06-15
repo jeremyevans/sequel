@@ -1,5 +1,9 @@
 === HEAD
 
+* The model's primary key is a restricted column by default, Add model.unrestrict_primary_key to get the old behavior (jeremyevans)
+
+* Add Model.set_(allowed|restricted)_columns, which affect which columns create/new/set/update/etc. modify (jeremyevans)
+
 * Calls to Model.def_dataset_method with a block are cached and reapplied to the new dataset if set_dataset is called, even in a subclass (jeremyevans)
 
 * The :reciprocal option to associations should now be the symbol name of the reciprocal association, not an instance variable symbol (jeremyevans)

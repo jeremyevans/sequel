@@ -182,7 +182,7 @@ describe Sequel::Model, "dataset" do
   end
 end
 
-describe Sequel::Model, "def_dataset_method" do
+describe Sequel::Model, ".def_dataset_method" do
   setup do
     @c = Class.new(Sequel::Model(:items)) do
       @dataset = Object.new
@@ -275,3 +275,105 @@ describe "Model.db=" do
   end
 end
 
+describe Sequel::Model, ".(allowed|restricted)_columns " do
+  setup do
+    @c = Class.new(Sequel::Model(:blahblah)) do
+      columns :x, :y, :z
+      def refresh
+        self
+      end
+    end
+    @c.instance_variable_set(:@columns, [:x, :y, :z])
+  end
+  
+  it "should set the allowed columns correctly" do
+    @c.allowed_columns.should == nil
+    @c.set_allowed_columns :x
+    @c.allowed_columns.should == [:x]
+    @c.set_allowed_columns :x, :y
+    @c.allowed_columns.should == [:x, :y]
+  end
+
+  it "should set the restricted columns correctly" do
+    @c.restricted_columns.should == nil
+    @c.set_restricted_columns :x
+    @c.restricted_columns.should == [:x]
+    @c.set_restricted_columns :x, :y
+    @c.restricted_columns.should == [:x, :y]
+  end
+
+  it "should only set allowed columns by default" do
+    @c.set_allowed_columns :x, :y
+    i = @c.new(:x => 1, :y => 2, :z => 3)
+    i.values.should == {:x => 1, :y => 2}
+    i.set(:x => 4, :y => 5, :z => 6)
+    i.values.should == {:x => 4, :y => 5}
+    i.update(:x => 7, :y => 8, :z => 9)
+    i.values.delete(:id) # stupid specs
+    i.values.should == {:x => 7, :y => 8}
+  end
+
+  it "should not set restricted columns by default" do
+    @c.set_restricted_columns :z
+    i = @c.new(:x => 1, :y => 2, :z => 3)
+    i.values.should == {:x => 1, :y => 2}
+    i.set(:x => 4, :y => 5, :z => 6)
+    i.values.should == {:x => 4, :y => 5}
+    i.update(:x => 7, :y => 8, :z => 9)
+    i.values.delete(:id) # stupid specs
+    i.values.should == {:x => 7, :y => 8}
+  end
+
+  it "should have allowed take precedence over restricted" do
+    @c.set_allowed_columns :x, :y
+    @c.set_restricted_columns :y, :z
+    i = @c.new(:x => 1, :y => 2, :z => 3)
+    i.values.should == {:x => 1, :y => 2}
+    i.set(:x => 4, :y => 5, :z => 6)
+    i.values.should == {:x => 4, :y => 5}
+    i.update(:x => 7, :y => 8, :z => 9)
+    i.values.delete(:id) # stupid specs
+    i.values.should == {:x => 7, :y => 8}
+  end
+end
+
+describe Sequel::Model, ".(un)?restrict_primary_key\\??" do
+  setup do
+    @c = Class.new(Sequel::Model(:blahblah)) do
+      set_primary_key :id
+      columns :x, :y, :z, :id
+      def refresh
+        self
+      end
+    end
+    @c.instance_variable_set(:@columns, [:x, :y, :z])
+  end
+  
+  it "should restrict updates to primary key by default" do
+    i = @c.new(:x => 1, :y => 2, :id => 3)
+    i.values.should == {:x => 1, :y => 2}
+    i.set(:x => 4, :y => 5, :id => 6)
+    i.values.should == {:x => 4, :y => 5}
+  end
+
+  it "should allow updates to primary key if unrestrict_primary_key is used" do
+    @c.unrestrict_primary_key
+    i = @c.new(:x => 1, :y => 2, :id => 3)
+    i.values.should == {:x => 1, :y => 2, :id=>3}
+    i.set(:x => 4, :y => 5, :id => 6)
+    i.values.should == {:x => 4, :y => 5, :id=>6}
+  end
+
+  it "should have restrict_primary_key? return true or false depending" do
+    @c.restrict_primary_key?.should == true
+    @c.unrestrict_primary_key
+    @c.restrict_primary_key?.should == false
+    c1 = Class.new(@c)
+    c1.restrict_primary_key?.should == false
+    @c.restrict_primary_key
+    @c.restrict_primary_key?.should == true
+    c1.restrict_primary_key?.should == false
+    c2 = Class.new(@c)
+    c2.restrict_primary_key?.should == true
+  end
+end
