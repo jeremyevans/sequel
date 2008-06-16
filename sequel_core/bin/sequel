@@ -14,13 +14,15 @@ db_opts = {}
 echo = nil
 env = nil
 logfile = nil
+migrate_dir = nil
+migrate_ver = nil
 
 opts = OptionParser.new do |opts|
   opts.banner = "Sequel: The Database Toolkit for Ruby"
   opts.define_head "Usage: sequel <uri|path> [options]"
   opts.separator ""
   opts.separator "Examples:"
-  opts.separator "  sequel sqlite:///blog.db"
+  opts.separator "  sequel sqlite://blog.db"
   opts.separator "  sequel postgres://localhost/my_blog"
   opts.separator "  sequel config/database.yml"
   opts.separator ""
@@ -28,23 +30,31 @@ opts = OptionParser.new do |opts|
   opts.separator ""
   opts.separator "Options:"
 
-  opts.on("-l", "--log logfile", "log SQL statements to log file") do |v|
-    logfile = v
-  end
-  
-  opts.on("-E", "--echo", "echo SQL statements") do |v|
-    echo = v
-  end
-  
-  opts.on("-e", "--env ENV", "use environment config for database") do |env|
-    env = env
-  end
-  
   opts.on_tail("-?", "--help", "Show this message") do
     puts opts
     exit
   end
 
+  opts.on("-l", "--log logfile", "log SQL statements to log file") do |v|
+    logfile = v
+  end
+  
+  opts.on("-e", "--env ENV", "use environment config for database") do |v|
+    env = v
+  end
+  
+  opts.on("-E", "--echo", "echo SQL statements") do
+    echo = true
+  end
+  
+  opts.on("-m", "--migrate-directory DIR", "run the migrations in directory") do |v|
+    migrate_dir = v
+  end
+  
+  opts.on("-M", "--migrate-version VER", "migrate the database to version given") do |v|
+    migrate_ver = Integer(v)
+  end
+  
   opts.on_tail("-v", "--version", "Show version") do
     class << Gem; attr_accessor :loaded_specs; end
     begin
@@ -66,7 +76,7 @@ db = ARGV.shift
 
 if db.blank?
   puts opts
-  exit
+  exit 1
 end
 
 if logfile || echo
@@ -91,11 +101,16 @@ begin
   end
   DB = Sequel.connect(*opts)
   DB.test_connection
+  if migrate_dir
+    Sequel::Migrator.apply(DB, migrate_dir, migrate_ver)
+    exit
+  end
 rescue => e
   puts e.message
   puts e.backtrace.first
-  exit
+  exit 1
 end
+
 
 require 'irb'
 puts "Your database is stored in DB..."
