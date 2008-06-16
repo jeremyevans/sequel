@@ -1,5 +1,7 @@
 === HEAD
 
+* Support bitwise operators for NumericExpressions: &, |, ^, ~, <<, >> (jeremyevans)
+
 * No longer raise an error for Dataset#filter(true) or Dataset#filter(false) (jeremyevans)
 
 * Allow Dataset #filter, #or, #exclude and other methods that call them to use both the block and regular arguments (jeremyevans)

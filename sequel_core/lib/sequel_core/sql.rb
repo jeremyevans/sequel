@@ -38,6 +38,9 @@ module Sequel
       # Mathematical Operators used in NumericMethods
       MATHEMATICAL_OPERATORS = [:+, :-, :/, :*]
 
+      # Mathematical Operators used in NumericMethods
+      BITWISE_OPERATORS = [:&, :|, :^, :<<, :>>]
+
       # Inequality Operators used in InequalityMethods
       INEQUALITY_OPERATORS = [:<, :>, :<=, :>=]
 
@@ -46,13 +49,14 @@ module Sequel
 
       # Operator symbols that take exactly two arguments
       TWO_ARITY_OPERATORS = [:'=', :'!=', :IS, :'IS NOT', :LIKE, :'NOT LIKE', \
-        :~, :'!~', :'~*', :'!~*', :IN, :'NOT IN', :ILIKE, :'NOT ILIKE'] + INEQUALITY_OPERATORS
+        :~, :'!~', :'~*', :'!~*', :IN, :'NOT IN', :ILIKE, :'NOT ILIKE'] + \
+        INEQUALITY_OPERATORS + BITWISE_OPERATORS 
 
       # Operator symbols that take one or more arguments
       N_ARITY_OPERATORS = [:AND, :OR, :'||'] + MATHEMATICAL_OPERATORS
 
       # Operator symbols that take one argument
-      ONE_ARITY_OPERATORS = [:NOT, :NOOP]
+      ONE_ARITY_OPERATORS = [:NOT, :NOOP, :'B~']
 
       # An array of args for this object
       attr_reader :args
@@ -113,6 +117,36 @@ module Sequel
       # Create an SQL column alias of the receiving column to the given alias.
       def as(aliaz)
         AliasedExpression.new(self, aliaz)
+      end
+    end
+
+    # This defines the bitwise methods &, |, ^, ~, <<, and >>.  Because these
+    # methods overlap with the standard BooleanMethods methods, and they only
+    # make sense for numbers, they are only included in NumericExpression.
+    module BitwiseMethods
+      ComplexExpression::BITWISE_OPERATORS.each do |o|
+        define_method(o) do |ce|
+          case ce
+          when NumericExpression 
+            NumericExpression.new(o, self, ce)
+          when ComplexExpression
+            raise(Sequel::Error, "cannot apply #{o} to a non-numeric expression")
+          else  
+            NumericExpression.new(o, self, ce)
+          end
+        end
+      end
+
+      # Do the bitwise compliment of the self
+      def ~
+        case self
+        when NumericExpression 
+          NumericExpression.new(:'B~', self)
+        when ComplexExpression
+          raise(Sequel::Error, "cannot apply #{o} to a non-numeric expression")
+        else  
+          NumericExpression.new(:'B~', self)
+        end
       end
     end
 
@@ -592,6 +626,7 @@ module Sequel
     # Subclass of ComplexExpression where the expression results
     # in a numeric value in SQL.
     class NumericExpression < ComplexExpression
+      include BitwiseMethods 
       include NumericMethods
       include InequalityMethods
       include NoBooleanInputMethods

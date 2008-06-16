@@ -138,11 +138,8 @@ context "Blockless Ruby Filters" do
     @d.l(~((((:x - :y)/(:x + :y))*:z) <= 100)).should == '((((x - y) / (x + y)) * z) > 100)'
   end
   
-  it "should not allow negation of non-boolean expressions" do
-    proc{~(:x + 1 > 100)}.should_not raise_error 
-    proc{~(:x + 1)}.should raise_error
+  it "should not allow negation of string expressions" do
     proc{~:x.sql_string}.should raise_error
-    proc{~:x.sql_number}.should raise_error
     proc{~([:x, :y].sql_string_join)}.should raise_error
   end
 
@@ -308,5 +305,20 @@ context "Blockless Ruby Filters" do
     @d.l{~[[:x, nil], [:y, [1,2,3]]]}.should == '((x IS NOT NULL) OR (y NOT IN (1, 2, 3)))'
     @d.l{~(((('x'.lit - :y)/(:x + :y))*:z) <= 100)}.should == '((((x - y) / (x + y)) * z) > 100)'
     @d.l{{:x => :a} & {:y => :z}}.should == '((x = a) AND (y = z))'
+  end
+
+  it "should support &, |, ^, ~, <<, and >> for NumericExpressions" do
+    @d.l(:x.sql_number & 1 > 100).should == '((x & 1) > 100)'
+    @d.l(:x.sql_number | 1 > 100).should == '((x | 1) > 100)'
+    @d.l(:x.sql_number ^ 1 > 100).should == '((x ^ 1) > 100)'
+    @d.l(~:x.sql_number > 100).should == '(~x > 100)'
+    @d.l(:x.sql_number << 1 > 100).should == '((x << 1) > 100)'
+    @d.l(:x.sql_number >> 1 > 100).should == '((x >> 1) > 100)'
+    @d.l((:x + 1) & 1 > 100).should == '(((x + 1) & 1) > 100)'
+    @d.l((:x + 1) | 1 > 100).should == '(((x + 1) | 1) > 100)'
+    @d.l((:x + 1) ^ 1 > 100).should == '(((x + 1) ^ 1) > 100)'
+    @d.l(~(:x + 1) > 100).should == '(~(x + 1) > 100)'
+    @d.l((:x + 1) << 1 > 100).should == '(((x + 1) << 1) > 100)'
+    @d.l((:x + 1) >> 1 > 100).should == '(((x + 1) >> 1) > 100)'
   end
 end

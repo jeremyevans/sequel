@@ -50,6 +50,8 @@ module Sequel
         "NOT #{literal(args.at(0))}"
       when :NOOP
         literal(args.at(0))
+      when :'B~'
+        "~#{literal(args.at(0))}"
       else
         raise(Sequel::Error, "invalid operator #{op}")
       end
