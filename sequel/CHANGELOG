@@ -1,5 +1,7 @@
 === HEAD
 
+* Break association add_/remove_/remove_all_ methods into two parts, for easier overriding (jeremyevans)
+
 * Add Model.strict_param_setting, on by default, which raises errors if a missing/restricted method is called via new/set/update/etc. (jeremyevans)
 
 * Raise errors when using association methods on objects without valid primary keys (jeremyevans)

@@ -271,11 +271,30 @@ module Sequel::Model::Associations
     def_association_dataset_methods(name, opts) do
       opts.associated_class.inner_join(join_table, [[right, opts.associated_primary_key], [left, pk]])
     end
+
     return if opts[:read_only]
 
-    class_def(association_add_method_name(name)) do |o|
-      raise(Sequel::Error, 'model object does not have a primary key') unless pk && o.pk
+    add_meth = association_add_method_name(name)
+    internal_add_meth = :"_#{add_meth}"
+    remove_meth = association_remove_method_name(name)
+    internal_remove_meth = :"_#{remove_meth}"
+    remove_all_meth = association_remove_all_method_name(name)
+    internal_remove_all_meth = :"_#{remove_all_meth}"
+
+    class_def(internal_add_meth) do |o|
       database[join_table].insert(left=>pk, right=>o.pk)
+    end
+    class_def(internal_remove_meth) do |o|
+      database[join_table].filter([[left, pk], [right, o.pk]]).delete
+    end
+    class_def(internal_remove_all_meth) do
+      database[join_table].filter(left=>pk).delete
+    end
+    private internal_add_meth, internal_remove_meth, internal_remove_all_meth
+
+    class_def(add_meth) do |o|
+      raise(Sequel::Error, 'model object does not have a primary key') unless pk && o.pk
+      send(internal_add_meth, o)
       if (assoc = @associations).include?(name)
         assoc[name].push(o)
       end
@@ -284,9 +303,9 @@ module Sequel::Model::Associations
       end
       o
     end
-    class_def(association_remove_method_name(name)) do |o|
+    class_def(remove_meth) do |o|
       raise(Sequel::Error, 'model object does not have a primary key') unless pk && o.pk
-      database[join_table].filter([[left, pk], [right, o.pk]]).delete
+      send(internal_remove_meth, o)
       if (assoc = @associations).include?(name)
         assoc[name].delete_if{|x| o === x}
       end
@@ -295,9 +314,9 @@ module Sequel::Model::Associations
       end
       o
     end
-    class_def(association_remove_all_method_name(name)) do
+    class_def(remove_all_meth) do
       raise(Sequel::Error, 'model object does not have a primary key') unless pk
-      database[join_table].filter(left=>pk).delete
+      send(internal_remove_all_meth)
       if (assoc = @associations).include?(name)
         reciprocal = opts.reciprocal
         arr = assoc[name]
@@ -354,17 +373,21 @@ module Sequel::Model::Associations
   def def_one_to_many(name, opts)
     key = (opts[:key] ||= default_remote_key)
     opts[:class_name] ||= name.to_s.singularize.camelize
-    add_meth = association_add_method_name(name)
-    remove_meth = association_remove_method_name(name)
-    remove_all_meth = association_remove_all_method_name(name)
     
     def_association_dataset_methods(name, opts) {opts.associated_class.filter(key => pk)}
     
     unless opts[:read_only]
-      class_def(add_meth) do |o|
-        raise(Sequel::Error, 'model object does not have a primary key') unless pk
+      add_meth = association_add_method_name(name)
+      internal_add_meth = :"_#{add_meth}"
+      class_def(internal_add_meth) do |o|
         o.send(:"#{key}=", pk)
         o.save || raise(Sequel::Error, "invalid associated object, cannot save")
+      end
+      private internal_add_meth
+
+      class_def(add_meth) do |o|
+        raise(Sequel::Error, 'model object does not have a primary key') unless pk
+        send(internal_add_meth, o)
         if (assoc = @associations).include?(name)
           assoc[name].push(o)
         end
@@ -374,10 +397,23 @@ module Sequel::Model::Associations
         o
       end
       unless opts[:one_to_one]
-        class_def(remove_meth) do |o|
-          raise(Sequel::Error, 'model object does not have a primary key') unless pk
+        remove_meth = association_remove_method_name(name)
+        internal_remove_meth = :"_#{remove_meth}"
+        remove_all_meth = association_remove_all_method_name(name)
+        internal_remove_all_meth = :"_#{remove_all_meth}"
+
+        class_def(internal_remove_meth) do |o|
           o.send(:"#{key}=", nil)
           o.save || raise(Sequel::Error, "invalid associated object, cannot save")
+        end
+        class_def(internal_remove_all_meth) do
+          opts.associated_class.filter(key=>pk).update(key=>nil)
+        end
+        private internal_remove_meth, internal_remove_all_meth
+
+        class_def(remove_meth) do |o|
+          raise(Sequel::Error, 'model object does not have a primary key') unless pk
+          send(internal_remove_meth, o)
           if (assoc = @associations).include?(name)
             assoc[name].delete_if{|x| o === x}
           end
@@ -388,7 +424,7 @@ module Sequel::Model::Associations
         end
         class_def(remove_all_meth) do
           raise(Sequel::Error, 'model object does not have a primary key') unless pk
-          opts.associated_class.filter(key=>pk).update(key=>nil)
+          send(internal_remove_all_meth)
           if (assoc = @associations).include?(name)
             arr = assoc[name]
             ret = arr.dup
