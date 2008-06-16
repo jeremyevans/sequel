@@ -12,6 +12,7 @@ module Sequel
     @restricted_columns = nil
     @sti_dataset = nil
     @sti_key = nil
+    @strict_param_setting = true
     @typecast_on_assignment = true
 
     # Which columns should be the only columns allowed in a call to set
@@ -36,6 +37,11 @@ module Sequel
     # The column name holding the STI key for this model
     metaattr_accessor :sti_key
 
+    # Whether new/set/update and their variants should raise an error
+    # if an invalid key is used (either that doesn't exist or that
+    # access is restricted to it).
+    metaattr_accessor :strict_param_setting
+
     # Whether to typecast attribute values on assignment (default: true)
     metaattr_accessor :typecast_on_assignment
 
@@ -52,7 +58,8 @@ module Sequel
     # Instance variables that are inherited in subclasses
     INHERITED_INSTANCE_VARIABLES = {:@allowed_columns=>:dup, :@dataset_methods=>:dup,
       :@primary_key=>nil, :@restricted_columns=>:dup, :@restrict_primary_key=>nil,
-      :@sti_dataset=>nil, :@sti_key=>nil, :@typecast_on_assignment=>nil}
+      :@sti_dataset=>nil, :@sti_key=>nil, :@strict_param_setting=>nil,
+      :@typecast_on_assignment=>nil}
 
     # Returns the first record from the database matching the conditions.
     # If a hash is given, it is used as the conditions.  If another

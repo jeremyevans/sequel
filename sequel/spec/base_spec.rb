@@ -283,6 +283,7 @@ describe Sequel::Model, ".(allowed|restricted)_columns " do
         self
       end
     end
+    @c.strict_param_setting = false
     @c.instance_variable_set(:@columns, [:x, :y, :z])
   end
   
@@ -346,6 +347,7 @@ describe Sequel::Model, ".(un)?restrict_primary_key\\??" do
         self
       end
     end
+    @c.strict_param_setting = false
     @c.instance_variable_set(:@columns, [:x, :y, :z])
   end
   
@@ -375,5 +377,42 @@ describe Sequel::Model, ".(un)?restrict_primary_key\\??" do
     c1.restrict_primary_key?.should == false
     c2 = Class.new(@c)
     c2.restrict_primary_key?.should == true
+  end
+end
+
+describe Sequel::Model, ".strict_param_setting" do
+  setup do
+    @c = Class.new(Sequel::Model(:blahblah)) do
+      columns :x, :y, :z, :id
+      set_restricted_columns :z
+      def refresh
+        self
+      end
+    end
+    @c.instance_variable_set(:@columns, [:x, :y, :z])
+  end
+  
+  it "should be enabled by default" do
+    @c.strict_param_setting.should == true
+  end
+
+  it "should raise an error if a missing/restricted column/method is accessed" do
+    proc{@c.new(:z=>1)}.should raise_error(Sequel::Error)
+    proc{@c.create(:z=>1)}.should raise_error(Sequel::Error)
+    c = @c.new
+    proc{c.set(:z=>1)}.should raise_error(Sequel::Error)
+    proc{c.set_all(:id=>1)}.should raise_error(Sequel::Error)
+    proc{c.set_only({:x=>1}, :y)}.should raise_error(Sequel::Error)
+    proc{c.set_except({:x=>1}, :x)}.should raise_error(Sequel::Error)
+    proc{c.update(:z=>1)}.should raise_error(Sequel::Error)
+    proc{c.update_all(:id=>1)}.should raise_error(Sequel::Error)
+    proc{c.update_only({:x=>1}, :y)}.should raise_error(Sequel::Error)
+    proc{c.update_except({:x=>1}, :x)}.should raise_error(Sequel::Error)
+  end
+
+  it "should be disabled by strict_param_setting = false" do
+    @c.strict_param_setting = false
+    @c.strict_param_setting.should == false
+    proc{@c.new(:z=>1)}.should_not raise_error
   end
 end

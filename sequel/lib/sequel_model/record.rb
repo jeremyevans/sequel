@@ -4,21 +4,26 @@ module Sequel
     # to be called automatically via set.
     RESTRICTED_SETTER_METHODS = %w"== === []= taguri= typecast_on_assignment="
 
-    # The columns that have been updated.  This isn't completely accurate,
-    # see Model#[]=.
-    attr_reader :changed_columns
-    
-    # The hash of attribute values.  Keys are symbols with the names of the
-    # underlying database columns.
-    attr_reader :values
-
     # The current cached associations.  A hash with the keys being the
     # association name symbols and the values being the associated object
     # or nil (many_to_one), or the array of associated objects (*_to_many).
     attr_reader :associations
 
+    # The columns that have been updated.  This isn't completely accurate,
+    # see Model#[]=.
+    attr_reader :changed_columns
+    
+    # Whether this model instance should raise an error if attempting
+    # to call a method through set/update and their variants that either
+    # doesn't exist or access to it is denied.
+    attr_writer :strict_param_setting
+
     # Whether this model instance should typecast on attribute assignment
     attr_writer :typecast_on_assignment
+
+    # The hash of attribute values.  Keys are symbols with the names of the
+    # underlying database columns.
+    attr_reader :values
 
     class_attr_reader :columns, :dataset, :db, :primary_key, :str_columns
     
@@ -34,10 +39,11 @@ module Sequel
     #   exists.
     def initialize(values = nil, from_db = false, &block)
       values ||=  {}
-      @changed_columns = []
       @associations = {}
-      @typecast_on_assignment = model.typecast_on_assignment
       @db_schema = model.db_schema
+      @changed_columns = []
+      @strict_param_setting = model.strict_param_setting
+      @typecast_on_assignment = model.typecast_on_assignment
       if from_db
         @new = false
         @values = values
@@ -333,12 +339,15 @@ module Sequel
     def set_restricted(hash, only, except)
       columns_not_set = model.instance_variable_get(:@columns).blank?
       meths = setter_methods(only, except)
+      strict_param_setting = @strict_param_setting
       hash.each do |k,v|
         m = "#{k}="
         if meths.include?(m)
           send(m, v)
         elsif columns_not_set && (Symbol === k)
           self[k] = v
+        elsif strict_param_setting
+          raise Error, "method #{m} doesn't exist or access is restricted to it"
         end
       end
     end

@@ -330,6 +330,7 @@ describe Sequel::Model, "#set" do
       set_primary_key :id
       columns :x, :y, :id
     end
+    @c.strict_param_setting = false
     @c.instance_variable_set(:@columns, true)
     @o1 = @c.new
     @o2 = @c.load(:id => 5)
@@ -389,6 +390,7 @@ describe Sequel::Model, "#update" do
       set_primary_key :id
       columns :x, :y, :id
     end
+    @c.strict_param_setting = false
     @c.instance_variable_set(:@columns, true)
     @o1 = @c.new
     @o2 = @c.load(:id => 5)
@@ -434,6 +436,7 @@ describe Sequel::Model, "#(set|update)_(all|except|only)" do
       set_allowed_columns :x
       set_restricted_columns :y
     end
+    @c.strict_param_setting = false
     @c.instance_variable_set(:@columns, true)
     @o1 = @c.new
   end
@@ -570,9 +573,9 @@ describe Sequel::Model, "#==" do
   specify "should compare instances by values" do
     z = Class.new(Sequel::Model)
     z.columns :id, :x
-    a = z.new(:id => 1, :x => 3)
-    b = z.new(:id => 1, :x => 4)
-    c = z.new(:id => 1, :x => 3)
+    a = z.load(:id => 1, :x => 3)
+    b = z.load(:id => 1, :x => 4)
+    c = z.load(:id => 1, :x => 3)
     
     a.should_not == b
     a.should == c
@@ -582,9 +585,9 @@ describe Sequel::Model, "#==" do
   specify "should be aliased to #eql?" do
     z = Class.new(Sequel::Model)
     z.columns :id, :x
-    a = z.new(:id => 1, :x => 3)
-    b = z.new(:id => 1, :x => 4)
-    c = z.new(:id => 1, :x => 3)
+    a = z.load(:id => 1, :x => 3)
+    b = z.load(:id => 1, :x => 4)
+    c = z.load(:id => 1, :x => 3)
     
     a.eql?(b).should == false
     a.eql?(c).should == true
@@ -661,6 +664,7 @@ describe Sequel::Model, "#initialize" do
     @c = Class.new(Sequel::Model) do
       columns :id, :x
     end
+    @c.strict_param_setting = false
   end
   
   specify "should accept values" do

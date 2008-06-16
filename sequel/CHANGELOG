@@ -1,5 +1,7 @@
 === HEAD
 
+* Add Model.strict_param_setting, on by default, which raises errors if a missing/restricted method is called via new/set/update/etc. (jeremyevans)
+
 * Raise errors when using association methods on objects without valid primary keys (jeremyevans)
 
 * The model's primary key is a restricted column by default, Add model.unrestrict_primary_key to get the old behavior (jeremyevans)
