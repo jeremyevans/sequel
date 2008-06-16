@@ -21,6 +21,12 @@
 # * remove_milestone(obj) - Removes the association with the passed milestone
 # * remove_all_milestones - Removes associations with all associated milestones
 #
+# If you want to override the behavior of the add_/remove_/remove_all_ methods,
+# there are private instance methods created that a prepended with an
+# underscore (e.g. _add_milestone).  The private instance methods can be
+# easily overridden, but you shouldn't override the public instance methods,
+# as they deal with how associations are cached.
+#
 # By default the classes for the associations are inferred from the association
 # name, so for example the Project#portfolio will return an instance of 
 # Portfolio, and Project#milestones will return an array of Milestone 

@@ -49,6 +49,27 @@ module Sequel
   #   should not override these instance methods.
   # * The following instance_methods all call the class method of the same
   #   name: columns, dataset, db, primary_key, str_columns.
+  # * The following class level attr_readers are created: allowed_columns,
+  #   cache_store, cache_ttl, dataset_methods, primary_key, restricted_columns,
+  #   sti_dataset, and sti_key.  You should not usually need to
+  #   access these directly.
+  # * The following class level attr_accessors are created: strict_param_setting
+  #   and typecast_on_assignment:
+  #
+  #     # Don't raise errors in new/set/update/etc. if an attempt to
+  #     # access a missing/restricted method occurs (just silently
+  #     # skip it)
+  #     Model.strict_param_setting = false
+  #     Model.new(:id=>1) # No Error
+  #     # Don't typecast attribute values on assignment
+  #     Model.typecast_on_assignment = false
+  #     m = Model.new
+  #     m.number = '10'
+  #     m.number # => '10' instead of 10
+  #
+  # * The following class level method aliases are defined:
+  #   * Model.dataset= => set_dataset
+  #   * Model.is_a => is
   class Model
     extend Enumerable
     extend Associations

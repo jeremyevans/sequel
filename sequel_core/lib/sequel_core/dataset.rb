@@ -103,7 +103,16 @@ module Sequel
       ]
     }
 
-    attr_accessor :db, :opts, :row_proc
+    # The database that corresponds to this dataset
+    attr_accessor :db
+
+    # The hash of options for this dataset, keys are symbols.
+    attr_accessor :opts
+
+    # The row_proc for this database, should be a Proc that takes
+    # a single hash argument and returns the object you want to
+    # fetch_rows to return.
+    attr_accessor :row_proc
 
     # Whether to quote identifiers for this dataset
     attr_writer :quote_identifiers

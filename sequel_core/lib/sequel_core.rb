@@ -17,8 +17,8 @@ end
 #          :password=>'password', :host=>'host', :port=>5432, \
 #          :max_connections=>10)
 #
-# If a block is given to these meethods, it is passed the opened Database
-# object, which is closed when the block exits.  For example:
+# If a block is given to these methods, it is passed the opened Database
+# object, which is closed (disconnected) when the block exits.  For example:
 #
 #   Sequel.sqlite('blog.db'){|db| puts db.users.count}  
 #
@@ -57,6 +57,8 @@ module Sequel
   # closed when the block exits.  For example:
   #
   #   Sequel.connect('sqlite://blog.db'){|db| puts db.users.count}  
+  #
+  # This is also aliased as Sequel.open.
   def self.connect(*args, &block)
     Database.connect(*args, &block)
   end
