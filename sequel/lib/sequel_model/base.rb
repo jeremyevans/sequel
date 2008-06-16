@@ -17,25 +17,25 @@ module Sequel
 
     # Which columns should be the only columns allowed in a call to set
     # (default: all columns).
-    metaattr_accessor :allowed_columns
+    metaattr_reader :allowed_columns
 
     # Hash of dataset methods to add to this class and subclasses when
     # set_dataset is called.
-    metaattr_accessor :dataset_methods
+    metaattr_reader :dataset_methods
 
     # The default primary key for classes (default: :id)
-    metaattr_accessor :primary_key
+    metaattr_reader :primary_key
 
     # Which columns should not be update in a call to set
     # (default: no columns).
-    metaattr_accessor :restricted_columns
+    metaattr_reader :restricted_columns
 
     # The base dataset for STI, to which filters are added to get
     # only the models for the specific STI subclass.
-    metaattr_accessor :sti_dataset
+    metaattr_reader :sti_dataset
 
     # The column name holding the STI key for this model
-    metaattr_accessor :sti_key
+    metaattr_reader :sti_key
 
     # Whether new/set/update and their variants should raise an error
     # if an invalid key is used (either that doesn't exist or that
