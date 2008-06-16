@@ -234,6 +234,7 @@ module Sequel::Model::Associations
     
     # define a method returning the association dataset (with optional order)
     class_def(dataset_method) do
+      raise(Sequel::Error, 'model object does not have a primary key') unless pk
       ds = instance_eval(&block).select(*opts.select)
       ds = ds.order(*order) if order
       ds = ds.limit(*limit) if limit
@@ -273,6 +274,7 @@ module Sequel::Model::Associations
     return if opts[:read_only]
 
     class_def(association_add_method_name(name)) do |o|
+      raise(Sequel::Error, 'model object does not have a primary key') unless pk && o.pk
       database[join_table].insert(left=>pk, right=>o.pk)
       if (assoc = @associations).include?(name)
         assoc[name].push(o)
@@ -283,16 +285,18 @@ module Sequel::Model::Associations
       o
     end
     class_def(association_remove_method_name(name)) do |o|
+      raise(Sequel::Error, 'model object does not have a primary key') unless pk && o.pk
       database[join_table].filter([[left, pk], [right, o.pk]]).delete
       if (assoc = @associations).include?(name)
-        assoc[name].delete(o)
+        assoc[name].delete_if{|x| o === x}
       end
       if reciprocal = opts.reciprocal and array = o.associations[reciprocal]
-        array.delete(self)
+        array.delete_if{|x| self === x}
       end
       o
     end
     class_def(association_remove_all_method_name(name)) do
+      raise(Sequel::Error, 'model object does not have a primary key') unless pk
       database[join_table].filter(left=>pk).delete
       if (assoc = @associations).include?(name)
         reciprocal = opts.reciprocal
@@ -300,7 +304,7 @@ module Sequel::Model::Associations
         ret = arr.dup
         arr.each do |o|
           if reciprocal and array = o.associations[reciprocal]
-            array.delete(self)
+            array.delete_if{|x| self === x}
           end
         end
       end
@@ -326,7 +330,8 @@ module Sequel::Model::Associations
     end
     return if opts[:read_only]
 
-    class_def(:"#{name}=") do |o|
+    class_def(:"#{name}=") do |o|  
+      raise(Sequel::Error, 'model object does not have a primary key') if o && !o.pk
       reciprocal = opts.reciprocal
       if (assoc = @associations).include?(name) and reciprocal
         old_val = assoc[name]
@@ -335,7 +340,7 @@ module Sequel::Model::Associations
       send(:"#{key}=", (o.pk if o))
       if reciprocal and old_val != o
         if old_val and array = old_val.associations[reciprocal]
-          array.delete(self)
+          array.delete_if{|x| self === x}
         end
         if o and array = o.associations[reciprocal] and !array.include?(self)
           array.push(self) 
@@ -357,6 +362,7 @@ module Sequel::Model::Associations
     
     unless opts[:read_only]
       class_def(add_meth) do |o|
+        raise(Sequel::Error, 'model object does not have a primary key') unless pk
         o.send(:"#{key}=", pk)
         o.save || raise(Sequel::Error, "invalid associated object, cannot save")
         if (assoc = @associations).include?(name)
@@ -369,10 +375,11 @@ module Sequel::Model::Associations
       end
       unless opts[:one_to_one]
         class_def(remove_meth) do |o|
+          raise(Sequel::Error, 'model object does not have a primary key') unless pk
           o.send(:"#{key}=", nil)
           o.save || raise(Sequel::Error, "invalid associated object, cannot save")
           if (assoc = @associations).include?(name)
-            assoc[name].delete(o)
+            assoc[name].delete_if{|x| o === x}
           end
           if reciprocal = opts.reciprocal
             o.associations[reciprocal] = nil
@@ -380,6 +387,7 @@ module Sequel::Model::Associations
           o
         end
         class_def(remove_all_meth) do
+          raise(Sequel::Error, 'model object does not have a primary key') unless pk
           opts.associated_class.filter(key=>pk).update(key=>nil)
           if (assoc = @associations).include?(name)
             arr = assoc[name]

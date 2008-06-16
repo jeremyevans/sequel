@@ -240,6 +240,13 @@ describe Sequel::Model, "many_to_one" do
     @c2.instance_methods.should_not(include('parent='))
   end
 
+  it "should raise an error if trying to set a model object that doesn't have a valid primary key" do
+    @c2.many_to_one :parent, :class => @c2
+    p = @c2.new
+    c = @c2.load(:id=>123)
+    proc{c.parent = p}.should raise_error(Sequel::Error)
+  end
+
   it "should have belongs_to alias" do
     @c2.belongs_to :parent, :class => @c2
 
@@ -365,6 +372,17 @@ describe Sequel::Model, "one_to_many" do
     proc{n.remove_attribute(a)}.should raise_error(Sequel::Error)
   end
 
+  it "should raise an error if the model object doesn't have a valid primary key" do
+    @c2.one_to_many :attributes, :class => @c1 
+    a = @c2.new
+    n = @c1.load(:id=>123)
+    proc{a.attributes_dataset}.should raise_error(Sequel::Error)
+    proc{a.attributes}.should raise_error(Sequel::Error)
+    proc{a.add_attribute(n)}.should raise_error(Sequel::Error)
+    proc{a.remove_attribute(n)}.should raise_error(Sequel::Error)
+    proc{a.remove_all_attributes}.should raise_error(Sequel::Error)
+  end
+  
   it "should support a select option" do
     @c2.one_to_many :attributes, :class => @c1, :select => [:id, :name]
 
@@ -504,8 +522,8 @@ describe Sequel::Model, "one_to_many" do
   it "should remove item from cached instance variable if it exists when calling remove_" do
     @c2.one_to_many :attributes, :class => @c1
 
-    n = @c2.new(:id => 1234)
-    att = @c1.new(:id => 345)
+    n = @c2.load(:id => 1234)
+    att = @c1.load(:id => 345)
     MODEL_DB.reset
     a = [att]
     n.associations[:attributes] = a
@@ -862,6 +880,25 @@ describe Sequel::Model, "many_to_many" do
     a = @c1.new(:id => 2345)
     a.should == n.remove_attribute(a)
     MODEL_DB.sqls.first.should == 'DELETE FROM attributes_nodes WHERE ((node_id = 1234) AND (attribute_id = 2345))'
+  end
+
+  it "should raise an error if the model object doesn't have a valid primary key" do
+    @c2.many_to_many :attributes, :class => @c1 
+    a = @c2.new
+    n = @c1.load(:id=>123)
+    proc{a.attributes_dataset}.should raise_error(Sequel::Error)
+    proc{a.attributes}.should raise_error(Sequel::Error)
+    proc{a.add_attribute(n)}.should raise_error(Sequel::Error)
+    proc{a.remove_attribute(n)}.should raise_error(Sequel::Error)
+    proc{a.remove_all_attributes}.should raise_error(Sequel::Error)
+  end
+
+  it "should raise an error if trying to add/remove a model object that doesn't have a valid primary key" do
+    @c2.many_to_many :attributes, :class => @c1 
+    n = @c1.new
+    a = @c2.load(:id=>123)
+    proc{a.add_attribute(n)}.should raise_error(Sequel::Error)
+    proc{a.remove_attribute(n)}.should raise_error(Sequel::Error)
   end
 
   it "should provide an array with all members of the association" do
