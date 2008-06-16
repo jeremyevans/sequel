@@ -9,8 +9,7 @@ Sequel makes it easy to deal with multiple records without having to break your 
 * {Source code}[http://github.com/jeremyevans/sequel]
 * {Bug tracking}[http://code.google.com/p/ruby-sequel/issues/list]
 * {Google group}[http://groups.google.com/group/sequel-talk]
-* {RubyForge page}[http://rubyforge.org/projects/sequel/]
-* {API RDoc}[http://sequel.rubyforge.org]
+* {RDoc}[http://sequel.rubyforge.org]
 
 To check out the source code:
   
