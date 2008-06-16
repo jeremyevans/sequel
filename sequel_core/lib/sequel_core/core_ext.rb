@@ -61,7 +61,7 @@ class Module
   #     alias_method to, from
   #   end
   def metaalias(to, from)
-    metaclass.instance_eval{alias_method to, from}
+    meta_eval{alias_method to, from}
   end
   
   # Make a singleton/class attribute accessor method(s).
@@ -71,7 +71,7 @@ class Module
   #     attr_accessor *meths
   #   end
   def metaattr_accessor(*meths)
-    metaclass.instance_eval{attr_accessor(*meths)}
+    meta_eval{attr_accessor(*meths)}
   end
 
   # Make a singleton/class method(s) private.
@@ -82,7 +82,7 @@ class Module
   #     attr_reader *meths
   #   end
   def metaattr_reader(*meths)
-    metaclass.instance_eval{attr_reader(*meths)}
+    meta_eval{attr_reader(*meths)}
   end
 end
 
