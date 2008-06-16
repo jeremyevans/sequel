@@ -1,5 +1,9 @@
 === HEAD
 
+* No longer raise an error for Dataset#filter(true) or Dataset#filter(false) (jeremyevans)
+
+* Allow Dataset #filter, #or, #exclude and other methods that call them to use both the block and regular arguments (jeremyevans)
+
 * ParseTree support is now officially deprecated, use Sequel.use_parse_tree = false to use the expression (blockless) filters inside blocks (jeremyevans)
 
 * Remove :pool_reuse_connections ConnectionPool/Database option, MySQL users need to be careful with nested queries (jeremyevans)

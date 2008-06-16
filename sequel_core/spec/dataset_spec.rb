@@ -317,7 +317,6 @@ context "Dataset#where" do
   end
   
   specify "should accept a subquery" do
-    # select all countries that have GDP greater than the average for Asia
     @dataset.filter('gdp > ?', @d1.select(:avg[:gdp])).sql.should ==
       "SELECT * FROM test WHERE (gdp > (SELECT avg(gdp) FROM test WHERE (region = 'Asia')))"
 
@@ -364,17 +363,21 @@ context "Dataset#where" do
       "SELECT * FROM test WHERE ((c LIKE 'ABC%') OR (c LIKE '%XYZ'))"
   end
   
-  specify "should raise if receiving a single boolean value" do
-    # the result of erroneous use of comparison not in a block
-    # so instead of filter{:x == y} someone writes filter(:x == y)
-    
-    proc {@dataset.filter(:a == 1)}.should raise_error(Sequel::Error::InvalidFilter)
-    proc {@dataset.filter(:a != 1)}.should raise_error(Sequel::Error::InvalidFilter)
-  end
-
   specify "should work for grouped datasets" do
     @dataset.group(:a).filter(:b => 1).sql.should ==
       'SELECT * FROM test WHERE (b = 1) GROUP BY a'
+  end
+
+  specify "should accept true and false as arguments" do
+    @dataset.filter(true).sql.should ==
+      "SELECT * FROM test WHERE 't'"
+    @dataset.filter(false).sql.should ==
+      "SELECT * FROM test WHERE 'f'"
+  end
+
+  pt_specify "should allow the use of blocks and arguments simultaneously" do
+    @dataset.filter(:zz < 3){:yy > 3}.sql.should ==
+      'SELECT * FROM test WHERE ((zz < 3) AND (yy > 3))'
   end
 end
 
@@ -411,6 +414,11 @@ context "Dataset#or" do
 
     @d1.or(:y => 2).filter(:z => 3).sql.should == 
       'SELECT * FROM test WHERE (((x = 1) OR (y = 2)) AND (z = 3))'
+  end
+
+  pt_specify "should allow the use of blocks and arguments simultaneously" do
+    @d1.or(:zz < 3){:yy > 3}.sql.should ==
+      'SELECT * FROM test WHERE ((x = 1) OR ((zz < 3) AND (yy > 3)))'
   end
 end
 
@@ -486,8 +494,13 @@ context "Dataset#exclude" do
   end
   
   pt_specify "should support proc expressions" do
-    @dataset.exclude {:id == (6...12)}.sql.should == 
+    @dataset.exclude{:id == (6...12)}.sql.should == 
       'SELECT * FROM test WHERE NOT (id >= 6 AND id < 12)'
+  end
+  
+  pt_specify "should allow the use of blocks and arguments simultaneously" do
+    @dataset.exclude(:id => (7..11)){:id == (6...12)}.sql.should == 
+      'SELECT * FROM test WHERE (((id < 7) OR (id > 11)) OR NOT (id >= 6 AND id < 12))'
   end
 end
 

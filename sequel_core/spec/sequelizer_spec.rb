@@ -11,8 +11,8 @@ context "Sequelizer without ParseTree" do
     Sequel.use_parse_tree = true
   end
   
-  specify "should raise error when converting ParseTree proc to SQL" do
-    proc {@ds.filter{:x == 1}}.should raise_error(Sequel::Error)
+  specify "should raise error when using ParseTree specific syntax without ParseTree" do
+    proc {@ds.filter{:x << 1}}.should raise_error
   end
 
   specify "should allow expression syntax inside block raise error when converting ParseTree proc to SQL" do

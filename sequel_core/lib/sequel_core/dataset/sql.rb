@@ -100,7 +100,7 @@ module Sequel
       clause = (@opts[:having] ? :having : :where)
       cond = cond.first if cond.size == 1
       cond = cond.sql_or if (Hash === cond) || ((Array === cond) && (cond.all_two_pairs?))
-      cond = filter_expr(block || cond)
+      cond = filter_expr(cond, &block)
       cond = SQL::BooleanExpression.invert(cond)
       cond = SQL::BooleanExpression.new(:AND, @opts[clause], cond) if @opts[clause]
       clone(clause => cond)
@@ -160,9 +160,8 @@ module Sequel
     def filter(*cond, &block)
       clause = (@opts[:having] ? :having : :where)
       cond = cond.first if cond.size == 1
-      raise(Error::InvalidFilter, "Invalid filter specified. Did you mean to supply a block?") if cond === true || cond === false
       cond = transform_save(cond) if @transform if cond.is_a?(Hash)
-      cond = filter_expr(block || cond)
+      cond = filter_expr(cond, &block)
       cond = SQL::BooleanExpression.new(:AND, @opts[clause], cond) if @opts[clause] && !@opts[clause].blank?
       clone(clause => cond)
     end
@@ -488,7 +487,7 @@ module Sequel
       clause = (@opts[:having] ? :having : :where)
       cond = cond.first if cond.size == 1
       if @opts[clause]
-        clone(clause => SQL::BooleanExpression.new(:OR, @opts[clause], filter_expr(block || cond)))
+        clone(clause => SQL::BooleanExpression.new(:OR, @opts[clause], filter_expr(cond, &block)))
       else
         raise Error::NoExistingFilter, "No existing filter found."
       end
@@ -756,7 +755,13 @@ module Sequel
     end
     
     # SQL fragment based on the expr type.  See #filter.
-    def filter_expr(expr)
+    def filter_expr(expr = nil, &block)
+      expr = nil if expr == []
+      if expr && block
+        return SQL::BooleanExpression.new(:AND, filter_expr(expr), filter_expr(block))
+      elsif block
+        expr = block
+      end
       case expr
       when Hash
         SQL::BooleanExpression.from_value_pairs(expr)
@@ -772,6 +777,8 @@ module Sequel
         raise(Error, "Invalid SQL Expression type: #{expr.inspect}") 
       when Symbol, SQL::Expression
         expr
+      when TrueClass, FalseClass
+        SQL::BooleanExpression.new(:NOOP, expr)
       when String
         "(#{expr})".lit
       else
