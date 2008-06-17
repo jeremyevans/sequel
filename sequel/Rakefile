@@ -9,8 +9,8 @@ include FileUtils
 # Configuration
 ##############################################################################
 NAME = "sequel"
-VERS = "2.0.1"
-SEQUEL_CORE_VERS= "2.0.1"
+VERS = "2.1.0"
+SEQUEL_CORE_VERS= "2.1.0"
 CLEAN.include ["**/.*.sw?", "pkg", ".config", "rdoc", "coverage"]
 RDOC_OPTS = ["--quiet", "--line-numbers", "--inline-source", '--title', \
   'Sequel: The Database Toolkit for Ruby: Model Classes', '--main', 'README']
@@ -60,13 +60,13 @@ end
 desc "Install sequel gem"
 task :install do
   sh %{rake package}
-  sh %{sudo gem install pkg/#{NAME}-#{VERS}}
+  sh %{sudo gem install pkg/#{NAME}-#{VERS} --local}
 end
 
 desc "Install sequel gem without docs"
 task :install_no_docs do
   sh %{rake package}
-  sh %{sudo gem install pkg/#{NAME}-#{VERS} --no-rdoc --no-ri}
+  sh %{sudo gem install pkg/#{NAME}-#{VERS} --no-rdoc --no-ri --local}
 end
 
 desc "Uninstall sequel gem"
