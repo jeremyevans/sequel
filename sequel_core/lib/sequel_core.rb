@@ -35,7 +35,7 @@ end
 #   Sequel.use_parse_tree = false
 module Sequel
   @datetime_class = Time
-  @use_parse_tree = true
+  @use_parse_tree = !defined?(SEQUEL_NO_PARSE_TREE)
 
   metaattr_accessor :datetime_class
   metaattr_accessor :use_parse_tree
