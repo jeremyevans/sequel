@@ -1,5 +1,7 @@
 === HEAD
 
+* Add the Model.to_hash dataset method (jeremyevans)
+
 === 2.1.0 (2008-06-17)
 
 * Break association add_/remove_/remove_all_ methods into two parts, for easier overriding (jeremyevans)
