@@ -245,9 +245,7 @@ module Sequel
           result = conn.last_insert_id(table)
           return result if result
         rescue PGError => e
-          # An error could occur if the inserted values include a primary key
-          # value, while the primary key is serial.
-          raise Error.new(e.message =~ RE_CURRVAL_ERROR ? "Could not return primary key value for the inserted record. Are you specifying a primary key value for a serial primary key?" : e.message)
+          raise(Error, e.message) unless RE_CURRVAL_ERROR.match(e.message)
         end
         
         case values
