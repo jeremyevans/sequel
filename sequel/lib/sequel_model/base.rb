@@ -56,7 +56,8 @@ module Sequel
        transform union uniq unordered update where'.map{|x| x.to_sym}
 
     # Instance variables that are inherited in subclasses
-    INHERITED_INSTANCE_VARIABLES = {:@allowed_columns=>:dup, :@dataset_methods=>:dup,
+    INHERITED_INSTANCE_VARIABLES = {:@allowed_columns=>:dup, :@cache_store=>nil,
+      :@cache_ttl=>nil, :@dataset_methods=>:dup,
       :@primary_key=>nil, :@restricted_columns=>:dup, :@restrict_primary_key=>nil,
       :@sti_dataset=>nil, :@sti_key=>nil, :@strict_param_setting=>nil,
       :@typecast_on_assignment=>nil}

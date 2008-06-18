@@ -1,5 +1,7 @@
 === HEAD
 
+* Make caching work correctly with subclasses (jeremyevans)
+
 * Add the Model.to_hash dataset method (jeremyevans)
 
 === 2.1.0 (2008-06-17)
