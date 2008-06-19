@@ -23,10 +23,10 @@ class Mysql::Result
     246 => :to_d,     # MYSQL_TYPE_NEWDECIMAL
     247 => :to_i,     # MYSQL_TYPE_ENUM
     248 => :to_i      # MYSQL_TYPE_SET
-    # 249 => :to_s,     # MYSQL_TYPE_TINY_BLOB
-    # 250 => :to_s,     # MYSQL_TYPE_MEDIUM_BLOB
-    # 251 => :to_s,     # MYSQL_TYPE_LONG_BLOB
-    # 252 => :to_s,     # MYSQL_TYPE_BLOB
+    249 => :to_blob,     # MYSQL_TYPE_TINY_BLOB
+    250 => :to_blob,     # MYSQL_TYPE_MEDIUM_BLOB
+    251 => :to_blob,     # MYSQL_TYPE_LONG_BLOB
+    252 => :to_blob,     # MYSQL_TYPE_BLOB
     # 253 => :to_s,     # MYSQL_TYPE_VAR_STRING
     # 254 => :to_s,     # MYSQL_TYPE_STRING
     # 255 => :to_s      # MYSQL_TYPE_GEOMETRY

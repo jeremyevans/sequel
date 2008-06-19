@@ -139,6 +139,12 @@ class String
   def to_sql
     split("\n").to_sql
   end
+
+  # Returns a Blob that holds the same data as this string. Blobs provide proper
+  # escaping of binary data.
+  def to_blob
+    ::Sequel::SQL::Blob.new self
+  end
 end
 
 class Symbol

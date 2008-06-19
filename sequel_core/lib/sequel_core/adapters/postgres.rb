@@ -35,6 +35,8 @@ module Sequel
           FALSE
         when NilClass
           NULL
+        when Blob
+          "'#{escape_binary(obj)}'"
         else
           "'#{escape_string(obj.to_s)}'"
         end
@@ -160,7 +162,7 @@ module Sequel
 
     PG_TYPES = {
       16 => lambda{ |s| Adapter.string_to_bool(s) }, # boolean
-      17 => lambda{ |s| Adapter.unescape_bytea(s) }, # bytea
+      17 => lambda{ |s| Adapter.unescape_bytea(s).to_blob }, # bytea
       20 => lambda{ |s| s.to_i }, # int8
       21 => lambda{ |s| s.to_i }, # int2
       22 => lambda{ |s| s.to_i }, # int2vector
@@ -396,7 +398,7 @@ module Sequel
         case v
         when LiteralString
           v
-        when String, TrueClass, FalseClass
+        when Blob, String, TrueClass, FalseClass
           Adapter.quote(v)
         when Time
           "#{v.strftime(PG_TIMESTAMP_FORMAT)}.#{sprintf("%06d",v.usec)}'"

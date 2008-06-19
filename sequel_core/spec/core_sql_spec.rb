@@ -111,6 +111,17 @@ context "String#lit" do
   end
 end
 
+context "String#to_blob" do
+  specify "should return a Blob object" do
+    'xyz'.to_blob.should be_a_kind_of(::Sequel::SQL::Blob)
+    'xyz'.to_blob.should == 'xyz'
+  end
+
+  specify "should retain binary data" do
+    "\1\2\3\4".to_blob.should == "\1\2\3\4"
+  end
+end
+
 context "String#split_sql" do
   specify "should split a string containing multiple statements" do
     "DROP TABLE a; DROP TABLE c".split_sql.should == \
@@ -209,6 +220,13 @@ context "Column references" do
   specify "should be quoted properly in a cast function" do
     @ds.literal(:x.cast_as(:integer)).should == "cast(`x` AS integer)"
     @ds.literal(:x__y.cast_as('varchar(20)')).should == "cast(`x`.`y` AS varchar(20))"
+  end
+end
+
+context "Blob" do
+  specify "#to_blob should return self" do
+    blob = "x".to_blob
+    blob.to_blob.object_id.should == blob.object_id
   end
 end
 

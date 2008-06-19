@@ -397,6 +397,19 @@ module Sequel
       end
     end
 
+    # Blob is used to represent binary data in the Ruby environment that is
+    # stored as a blob type in the database. In PostgreSQL, the blob type is 
+    # called bytea. Sequel represents binary data as a Blob object because 
+    # certain database engines, such as PostgreSQL, require binary data to be 
+    # escaped.
+    class Blob < ::String
+
+      # return self.
+      def to_blob
+        self
+      end
+    end
+
     # Subclass of ComplexExpression where the expression results
     # in a boolean value in SQL.
     class BooleanExpression < ComplexExpression
@@ -729,7 +742,7 @@ module Sequel
     end
   end
 
-  # LiteralString is used to represent literal SQL expressions. An 
+  # LiteralString is used to represent literal SQL expressions. A 
   # LiteralString is copied verbatim into an SQL statement. Instances of
   # LiteralString can be created by calling String#lit.
   # LiteralStrings can use all of the SQL::ColumnMethods and the 
@@ -738,4 +751,5 @@ module Sequel
     include SQL::OrderMethods
     include SQL::ComplexExpressionMethods
   end
+
 end
