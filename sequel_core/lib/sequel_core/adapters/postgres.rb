@@ -35,8 +35,8 @@ module Sequel
           FALSE
         when NilClass
           NULL
-        when Blob
-          "'#{escape_binary(obj)}'"
+        when ::Sequel::SQL::Blob
+          "'#{escape_bytea(obj)}'"
         else
           "'#{escape_string(obj.to_s)}'"
         end
@@ -398,7 +398,7 @@ module Sequel
         case v
         when LiteralString
           v
-        when Blob, String, TrueClass, FalseClass
+        when ::Sequel::SQL::Blob, String, TrueClass, FalseClass
           Adapter.quote(v)
         when Time
           "#{v.strftime(PG_TIMESTAMP_FORMAT)}.#{sprintf("%06d",v.usec)}'"

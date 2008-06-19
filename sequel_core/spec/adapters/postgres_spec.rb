@@ -8,7 +8,6 @@ end
 POSTGRES_DB.create_table! :test do
   text :name
   integer :value, :index => true
-  bytea :binary_value, :index => true
 end
 POSTGRES_DB.create_table! :test2 do
   text :name
@@ -17,6 +16,10 @@ end
 POSTGRES_DB.create_table! :test3 do
   integer :value
   timestamp :time
+end
+POSTGRES_DB.create_table! :test4 do
+  varchar :name
+  bytea :value
 end
 
 context "A PostgreSQL database" do
@@ -244,13 +247,17 @@ context "A PostgreSQL dataset" do
   end
 
   specify "should properly escape binary data" do
-    @d.literal("\1\2\3".to_blob).should == "'\\001\\002\\003'"
+    @d.literal("\1\2\3".to_blob).should == "'\\\\001\\\\002\\\\003'"
     @d.literal("dingo".to_blob).should == "'dingo'"
   end
 
   specify "should retrieve binary data as Blob object" do
-    @d << {:value => 'myvalue', :binary_value => "\1\2\3"}
-    retrieved_binary_value = @d[:value => 'myvalue'].binary_value
+    d = POSTGRES_DB[:test4]
+    d << {:name => '123', :value => "\1\2\3".to_blob}
+    retrieved_binary_value = d[:name => '123'][:value]
+    retrieved_binary_value.should be_a_kind_of(::Sequel::SQL::Blob)
+    retrieved_binary_value.should == "\1\2\3"
+    retrieved_binary_value = d[:value => "\1\2\3".to_blob][:value]
     retrieved_binary_value.should be_a_kind_of(::Sequel::SQL::Blob)
     retrieved_binary_value.should == "\1\2\3"
   end
