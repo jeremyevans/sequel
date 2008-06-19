@@ -427,6 +427,8 @@ module Sequel
           # parse that string using the time class.
           (Time === value ? value.iso8601 : value.to_s).to_sequel_time
         end
+      when :blob
+        value.to_blob
       else
         value
       end

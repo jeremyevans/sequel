@@ -243,6 +243,8 @@ module Sequel
           :float
         when /\A(numeric|decimal|money)\z/
           :decimal
+        when /\A(bytea)\z/
+          :blob
         end
       end
 
