@@ -592,6 +592,18 @@ context "Dataset#group_by" do
   specify "should specify the grouping in generated select statement" do
     @dataset.select_sql.should ==
       "SELECT * FROM test GROUP BY type_id"
+    @dataset.group_by(:a, :b).select_sql.should ==
+      "SELECT * FROM test GROUP BY a, b"
+  end
+
+  specify "should specify the grouping in generated select statement" do
+    @dataset.group_by(:type_id=>nil).select_sql.should ==
+      "SELECT * FROM test GROUP BY (type_id IS NULL)"
+  end
+
+  specify "should be aliased as #group" do
+    @dataset.group(:type_id=>nil).select_sql.should ==
+      "SELECT * FROM test GROUP BY (type_id IS NULL)"
   end
 end
 
@@ -829,9 +841,14 @@ context "Dataset#order" do
       'SELECT * FROM test ORDER BY stamp'
   end
   
-  specify "should accept a string" do
+  specify "should accept a literal string" do
     @dataset.order('dada ASC'.lit).sql.should ==
       'SELECT * FROM test ORDER BY dada ASC'
+  end
+  
+  specify "should accept a hash as an expression" do
+    @dataset.order(:name=>nil).sql.should ==
+      'SELECT * FROM test ORDER BY (name IS NULL)'
   end
   
   specify "should accept a nil to remove ordering" do
@@ -1090,7 +1107,7 @@ context "Dataset#uniq" do
   specify "should accept an expression list" do
     @dataset.uniq(:a, :b).sql.should == 'SELECT DISTINCT ON (a, b) name FROM test'
 
-    @dataset.uniq(:stamp.cast_as(:integer), :node_id).sql.should == 'SELECT DISTINCT ON (cast(stamp AS integer), node_id) name FROM test'
+    @dataset.uniq(:stamp.cast_as(:integer), :node_id=>nil).sql.should == 'SELECT DISTINCT ON (cast(stamp AS integer), (node_id IS NULL)) name FROM test'
   end
 
   specify "should do a subselect for count" do

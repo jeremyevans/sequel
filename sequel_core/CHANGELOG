@@ -1,5 +1,7 @@
 === HEAD
 
+* Treat Hash as expression instead of column alias when used in DISTINCT, ORDER BY, and GROUP BY clauses (jeremyevans)
+
 * PostgreSQL bytea fields are now fully supported (dlee)
 
 * For PostgreSQL, don't raise an error when assigning a value to a SERIAL PRIMARY KEY field when inserting records (jeremyevans)

@@ -588,7 +588,7 @@ module Sequel
       select_columns = columns ? column_list(columns) : WILDCARD
 
       if distinct = opts[:distinct]
-        distinct_clause = distinct.empty? ? "DISTINCT" : "DISTINCT ON (#{column_list(distinct)})"
+        distinct_clause = distinct.empty? ? "DISTINCT" : "DISTINCT ON (#{expression_list(distinct)})"
         sql = "SELECT #{distinct_clause} #{select_columns}"
       else
         sql = "SELECT #{select_columns}"
@@ -607,7 +607,7 @@ module Sequel
       end
 
       if group = opts[:group]
-        sql << " GROUP BY #{column_list(group)}"
+        sql << " GROUP BY #{expression_list(group)}"
       end
 
       if having = opts[:having]
@@ -615,7 +615,7 @@ module Sequel
       end
 
       if order = opts[:order]
-        sql << " ORDER BY #{column_list(order)}"
+        sql << " ORDER BY #{expression_list(order)}"
       end
 
       if limit = opts[:limit]
@@ -750,10 +750,16 @@ module Sequel
         WILDCARD
       else
         m = columns.map do |i|
-          i.is_a?(Hash) ? i.map{|kv| "#{literal(kv[0])} AS #{quote_identifier(kv[1])}"} : literal(i)
+          i.is_a?(Hash) ? i.map{|k, v| "#{literal(k)} AS #{quote_identifier(v)}"} : literal(i)
         end
         m.join(COMMA_SEPARATOR)
       end
+    end
+    
+    # Converts an array of expressions into a comma separated string of
+    # expressions.
+    def expression_list(columns)
+      columns.map{|i| literal(i)}.join(COMMA_SEPARATOR)
     end
     
     # SQL fragment based on the expr type.  See #filter.

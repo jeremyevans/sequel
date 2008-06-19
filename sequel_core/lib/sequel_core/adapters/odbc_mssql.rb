@@ -38,7 +38,7 @@ module Sequel
           select_columns = columns ? column_list(columns) : WILDCARD
 
           if distinct = opts[:distinct]
-            distinct_clause = distinct.empty? ? "DISTINCT" : "DISTINCT ON (#{column_list(distinct)})"
+            distinct_clause = distinct.empty? ? "DISTINCT" : "DISTINCT ON (#{expression_list(distinct)})"
             sql = "SELECT #{top}#{distinct_clause} #{select_columns}"
           else
             sql = "SELECT #{top}#{select_columns}"
@@ -62,11 +62,11 @@ module Sequel
           end
 
           if group = opts[:group]
-            sql << " GROUP BY #{column_list(group)}"
+            sql << " GROUP BY #{expression_list(group)}"
           end
 
           if order = opts[:order]
-            sql << " ORDER BY #{column_list(order)}"
+            sql << " ORDER BY #{expression_list(order)}"
           end
 
           if having = opts[:having]

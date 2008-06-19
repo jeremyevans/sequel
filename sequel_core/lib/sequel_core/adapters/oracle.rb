@@ -143,7 +143,7 @@ module Sequel
         end
 
         if group = opts[:group]
-          sql << " GROUP BY #{column_list(group)}"
+          sql << " GROUP BY #{expression_list(group)}"
         end
 
         if having = opts[:having]
@@ -162,7 +162,7 @@ module Sequel
         end
 
         if order = opts[:order]
-          sql << " ORDER BY #{column_list(order)}"
+          sql << " ORDER BY #{expression_list(order)}"
         end
 
         if limit = opts[:limit]

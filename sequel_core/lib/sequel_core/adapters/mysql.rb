@@ -388,7 +388,7 @@ module Sequel
         opts = opts ? @opts.merge(opts) : @opts
 
         if order = opts[:order]
-          sql << " ORDER BY #{column_list(order)}"
+          sql << " ORDER BY #{expression_list(order)}"
         end
         if limit = opts[:limit]
           sql << " LIMIT #{limit}"
@@ -442,7 +442,7 @@ module Sequel
         opts = opts ? @opts.merge(opts) : @opts
 
         if order = opts[:order]
-          sql << " ORDER BY #{column_list(order)}"
+          sql << " ORDER BY #{expression_list(order)}"
         end
         if limit = opts[:limit]
           sql << " LIMIT #{limit}"
