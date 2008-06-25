@@ -69,7 +69,7 @@ class Mysql::Result
     end
   end
 
-  def each_hash(with_table = nil)
+  def sequel_each_hash(with_table = nil)
     c = columns
     while row = fetch_row
       h = {}
@@ -77,6 +77,7 @@ class Mysql::Result
       yield h
     end
   end
+  
 end
 
 module Sequel
@@ -470,7 +471,7 @@ module Sequel
       def fetch_rows(sql)
         @db.execute_select(sql) do |r|
           @columns = r.columns
-          r.each_hash {|row| yield row}
+          r.sequel_each_hash {|row| yield row}
         end
         self
       end
