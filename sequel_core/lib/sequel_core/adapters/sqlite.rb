@@ -116,6 +116,8 @@ module Sequel
         case op[:op]
         when :add_column
           "ALTER TABLE #{table} ADD #{column_definition_sql(op)}"
+        when :add_index
+          index_definition_sql(table, op)
         else
           raise Error, "Unsupported ALTER TABLE operation"
         end

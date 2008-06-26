@@ -398,4 +398,13 @@ context "A SQLite database" do
   specify "should not support set_column_type operations" do
     proc {@db.set_column_type :test2, :value, :integer}.should raise_error(Sequel::Error)
   end
+  
+  specify "should support add_index" do
+    @db.add_index :test2, :value, :unique => true
+    @db.add_index :test2, [:name, :value]
+  end
+  
+  specify "should not support drop_index" do
+    proc {@db.drop_index :test2, :value}.should raise_error(Sequel::Error)
+  end
 end  
