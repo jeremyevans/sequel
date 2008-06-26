@@ -6,7 +6,7 @@ module Sequel
     COLUMN_REF_RE1 = /\A([\w ]+)__([\w ]+)___([\w ]+)\z/.freeze
     COLUMN_REF_RE2 = /\A([\w ]+)___([\w ]+)\z/.freeze
     COLUMN_REF_RE3 = /\A([\w ]+)__([\w ]+)\z/.freeze
-    COUNT_FROM_SELF_OPTS = [:distinct, :group, :sql]
+    COUNT_FROM_SELF_OPTS = [:distinct, :group, :sql, :limit]
     DATE_FORMAT = "DATE '%Y-%m-%d'".freeze
     N_ARITY_OPERATORS = ::Sequel::SQL::ComplexExpression::N_ARITY_OPERATORS
     NULL = "NULL".freeze
@@ -59,13 +59,7 @@ module Sequel
 
     # Returns the number of records in the dataset.
     def count
-      count = options_overlap(COUNT_FROM_SELF_OPTS) ? from_self.count : single_value(STOCK_COUNT_OPTS).to_i
-
-      if limit = opts[:limit]
-        count = limit if count > limit
-      end
-
-      count
+      options_overlap(COUNT_FROM_SELF_OPTS) ? from_self.count : single_value(STOCK_COUNT_OPTS).to_i
     end
     alias_method :size, :count
 
