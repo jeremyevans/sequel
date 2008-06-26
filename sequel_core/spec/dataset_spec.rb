@@ -1150,6 +1150,11 @@ context "Dataset#count" do
     @dataset.count.should == 1
     @c.sql.should == "SELECT COUNT(*) FROM (select abc from xyz) t1 LIMIT 1"
   end
+
+  specify "should return limit if count is greater than it" do
+    @dataset.limit(5).count.should == 1
+    @c.sql.should == "SELECT COUNT(*) FROM (SELECT * FROM test LIMIT 5) t1 LIMIT 1"
+  end
 end
 
 
