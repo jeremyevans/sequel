@@ -59,7 +59,13 @@ module Sequel
 
     # Returns the number of records in the dataset.
     def count
-      options_overlap(COUNT_FROM_SELF_OPTS) ? from_self.count : single_value(STOCK_COUNT_OPTS).to_i
+      count = options_overlap(COUNT_FROM_SELF_OPTS) ? from_self.count : single_value(STOCK_COUNT_OPTS).to_i
+
+      if limit = opts[:limit]
+        count = limit if count > limit
+      end
+
+      count
     end
     alias_method :size, :count
 
