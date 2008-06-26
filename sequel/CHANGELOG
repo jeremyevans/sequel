@@ -1,5 +1,7 @@
 === HEAD
 
+* Set the model's dataset's columns in addition to the model's columns when loading the schema for a model (jeremyevans)
+
 * Make caching work correctly with subclasses (jeremyevans)
 
 * Add the Model.to_hash dataset method (jeremyevans)

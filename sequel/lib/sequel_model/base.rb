@@ -84,7 +84,7 @@ module Sequel
     # dataset) it will use Dataset#columns to find the columns, which
     # may be empty if the Dataset has no records.
     def self.columns
-      @columns || set_columns(dataset.naked.columns || raise(Error, "Could not fetch columns for #{self}"))
+      @columns || set_columns(dataset.naked.columns)
     end
   
     # Creates new instance with values set to passed-in Hash, saves it
@@ -442,7 +442,11 @@ module Sequel
           # Dataset is for a single table with all columns,
           # so set the columns based on the order they were
           # returned by the schema.
-          set_columns(schema_array.collect{|k,v| k})
+          cols = schema_array.collect{|k,v| k}
+          set_columns(cols)
+          # Also set the columns for the dataset, so the dataset
+          # doesn't have to do a query to get them.
+          dataset.instance_variable_set(:@columns, cols)
         end
       else
         # If the dataset uses multiple tables or custom sql or getting

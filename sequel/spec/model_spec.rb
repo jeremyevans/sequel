@@ -552,7 +552,7 @@ context "Model.db_schema" do
     def @dataset.def_mutation_method(*names);  end
   end
   
-  specify "should use the database's schema_for_table and set the columns" do
+  specify "should use the database's schema_for_table and set the columns and dataset columns" do
     d = @dataset.db
     def d.schema(table, opts = {})
       [[:x, {:type=>:integer}], [:y, {:type=>:string}]]
@@ -560,6 +560,7 @@ context "Model.db_schema" do
     @c.dataset = @dataset
     @c.db_schema.should == {:x=>{:type=>:integer}, :y=>{:type=>:string}}
     @c.columns.should == [:x, :y]
+    @c.dataset.instance_variable_get(:@columns).should == [:x, :y]
   end
 
   specify "should restrict the schema and columns for datasets with a :select option" do
