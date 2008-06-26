@@ -310,7 +310,7 @@ module Sequel
           end
           begin
             conn.transaction_depth += 1
-            yield
+            yield conn
           rescue ::Exception => e
             if conn.transaction_depth > 1
               log_info(SQL_ROLLBACK_TO_SAVEPOINT % [conn.transaction_depth - 1])

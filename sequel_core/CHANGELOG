@@ -1,5 +1,7 @@
 === HEAD
 
+* Database#transaction now yields a connection when using the Postgres adapter, just like it does for other adapters (jeremyevans)
+
 * Dataset#count now works for a limited dataset (divoxx)
 
 * Database#add_index is now supported in the SQLite adapter (abhay)

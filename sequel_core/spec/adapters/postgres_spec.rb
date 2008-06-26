@@ -180,6 +180,12 @@ context "A PostgreSQL dataset" do
     @d.count.should == 1
   end
   
+  specify "should have #transaction yield the connection" do
+    POSTGRES_DB.transaction do |conn|
+      conn.should be_a_kind_of(Sequel::Postgres::Adapter)
+    end
+  end
+  
   specify "should correctly rollback transactions" do
     proc do
       POSTGRES_DB.transaction do
