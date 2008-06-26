@@ -22,26 +22,6 @@ end
 module Sequel
   module Postgres
     class Adapter < ::PGconn
-      # the pure-ruby postgres adapter does not have a quote method.
-      TRUE = 'true'.freeze
-      FALSE = 'false'.freeze
-      NULL = 'NULL'.freeze
-      
-      def self.quote(obj)
-        case obj
-        when TrueClass
-          TRUE
-        when FalseClass
-          FALSE
-        when NilClass
-          NULL
-        when ::Sequel::SQL::Blob
-          "'#{escape_bytea(obj)}'"
-        else
-          "'#{escape_string(obj.to_s)}'"
-        end
-      end
-      
       def connected?
         status == Adapter::CONNECTION_OK
       end
@@ -393,17 +373,23 @@ module Sequel
       end
       
       PG_TIMESTAMP_FORMAT = "TIMESTAMP '%Y-%m-%d %H:%M:%S".freeze
+      BOOL_FALSE = 'false'.freeze
+      BOOL_TRUE = 'true'.freeze
 
       def literal(v)
         case v
         when LiteralString
           v
-        when ::Sequel::SQL::Blob, String, TrueClass, FalseClass
-          Adapter.quote(v)
+        when String
+          db.synchronize{|c| "'#{SQL::Blob === v ? c.escape_bytea(v) : c.escape_string(v)}'"}
         when Time
           "#{v.strftime(PG_TIMESTAMP_FORMAT)}.#{sprintf("%06d",v.usec)}'"
         when DateTime
           "#{v.strftime(PG_TIMESTAMP_FORMAT)}.#{sprintf("%06d", (v.sec_fraction * 86400000000).to_i)}'"
+        when TrueClass
+          BOOL_TRUE
+        when FalseClass
+          BOOL_FALSE
         else
           super
         end
