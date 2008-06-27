@@ -28,6 +28,7 @@ describe Sequel::Model, "#eager" do
         ds.filter(:name=>name)
       end
       one_to_many :albums_by_name, :class=>'EagerAlbum', :key=>:band_id, :order=>:name, :allow_eager=>false
+      one_to_many :top_10_albums, :class=>'EagerAlbum', :key=>:band_id, :limit=>10
     end
     
     class EagerTrack < Sequel::Model(:tracks)
@@ -249,6 +250,21 @@ describe Sequel::Model, "#eager" do
     a.bands.size.should == 1
     a.bands.first.should be_a_kind_of(EagerBand)
     a.bands.first.values.should == {:id => 2}
+    MODEL_DB.sqls.length.should == 2
+  end
+  
+  it "should respect :limit when eagerly loading" do
+    a = EagerBand.eager(:top_10_albums).all
+    a.should be_a_kind_of(Array)
+    a.size.should == 1
+    a.first.should be_a_kind_of(EagerBand)
+    a.first.values.should == {:id => 2}
+    MODEL_DB.sqls.should == ['SELECT * FROM bands', 'SELECT albums.* FROM albums WHERE (band_id IN (2)) LIMIT 10']
+    a = a.first
+    a.top_10_albums.should be_a_kind_of(Array)
+    a.top_10_albums.size.should == 1
+    a.top_10_albums.first.should be_a_kind_of(EagerAlbum)
+    a.top_10_albums.first.values.should == {:id => 1, :band_id=> 2}
     MODEL_DB.sqls.length.should == 2
   end
   

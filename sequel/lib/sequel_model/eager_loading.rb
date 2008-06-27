@@ -369,18 +369,11 @@ module Sequel::Model::Associations::EagerLoading
       assoc_name = reflection[:name]
       # Proc for setting cascaded eager loading
       assoc_block = Proc.new do |d|
-        if order = reflection[:order]
-          d = d.order(*order)
-        end
-        if c = eager_assoc[assoc_name]
-          d = d.eager(c)
-        end
-        if c = reflection[:eager]
-          d = d.eager(c)
-        end
-        if b = reflection[:eager_block]
-          d = b.call(d)
-        end
+        d = d.order(*reflection[:order]) if reflection[:order]
+        d = d.limit(*reflection[:limit]) if reflection[:limit]
+        d = d.eager(reflection[:eager]) if reflection[:eager]
+        d = d.eager(eager_assoc[assoc_name]) if eager_assoc[assoc_name]
+        d = reflection[:eager_block].call(d) if reflection[:eager_block]
         d
       end
       case rtype = reflection[:type]
