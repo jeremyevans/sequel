@@ -93,7 +93,7 @@ module Sequel
         # aliased, but are not included if set_graph_aliases
         # has been used.
         if add_columns
-          select = (opts[:select] ||= [])
+          select = opts[:select] = []
           columns.each do |column|
             column_aliases[column] = [master, column]
             select.push(column.qualify(master))
@@ -155,8 +155,13 @@ module Sequel
     #   The first element of the array should be the table alias,
     #   and the second should be the actual column name.
     def set_graph_aliases(graph_aliases)
-      ds = select(*graph_aliases.collect{|col_alias, tc| :"#{tc[0]}__#{tc[1]}#{"___#{col_alias}" unless tc[1] == col_alias}"})
-      ds.opts[:graph_aliases]=graph_aliases
+      cols = graph_aliases.collect do |col_alias, tc| 
+        identifier = tc[1].qualify(tc[0])
+        identifier = identifier.as(col_alias) unless tc[1] == col_alias
+        identifier
+      end
+      ds = select(*cols)
+      ds.opts[:graph_aliases] = graph_aliases
       ds
     end
 

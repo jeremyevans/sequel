@@ -1,5 +1,7 @@
 === HEAD
 
+* Ignore any previously selected columns when using Dataset#graph for the first time (jeremyevans)
+
 * Dataset#graph now accepts a block which is passed to join_table (jeremyevans)
 
 * Make Dataset#columns ignore any filtering, ordering, and distinct clauses (jeremyevans)
