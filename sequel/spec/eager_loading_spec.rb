@@ -20,6 +20,7 @@ describe Sequel::Model, "#eager" do
     class EagerBand < Sequel::Model(:bands)
       columns :id
       one_to_many :albums, :class=>'EagerAlbum', :key=>:band_id, :eager=>:tracks
+      one_to_many :graph_albums, :class=>'EagerAlbum', :key=>:band_id, :eager_graph=>:tracks
       many_to_many :members, :class=>'EagerBandMember', :left_key=>:band_id, :right_key=>:member_id, :join_table=>:bm
       one_to_many :good_albums, :class=>'EagerAlbum', :key=>:band_id, :eager_block=>proc{|ds| ds.filter(:name=>'good')} do |ds|
         ds.filter(:name=>'Good')
@@ -47,6 +48,10 @@ describe Sequel::Model, "#eager" do
     end
     
     EagerAlbum.dataset.extend(Module.new {
+      def columns
+        [:id, :band_id]
+      end
+
       def fetch_rows(sql)
         h = if sql =~ /101/
           {:id => 101, :band_id=> 101}
@@ -236,6 +241,62 @@ describe Sequel::Model, "#eager" do
     a.tracks.first.should be_a_kind_of(EagerTrack)
     a.tracks.first.values.should == {:id => 3, :album_id => 1}
     MODEL_DB.sqls.length.should == 3
+  end
+  
+  it "should cascade eagerly loading when the :eager_graph association option is used" do
+    EagerAlbum.dataset.extend(Module.new {
+      def fetch_rows(sql)
+        @db << sql
+        yield({:id=>1, :band_id=>2, :tracks_id=>3, :album_id=>1})
+      end
+    })
+    a = EagerBand.eager(:graph_albums).all
+    a.should be_a_kind_of(Array)
+    a.size.should == 1
+    a.first.should be_a_kind_of(EagerBand)
+    a.first.values.should == {:id => 2}
+    MODEL_DB.sqls.should == ['SELECT * FROM bands', 
+                             'SELECT albums.id, albums.band_id, tracks.id AS tracks_id, tracks.album_id FROM albums LEFT OUTER JOIN tracks ON (tracks.album_id = albums.id) WHERE (band_id IN (2))']
+    a = a.first
+    a.graph_albums.should be_a_kind_of(Array)
+    a.graph_albums.size.should == 1
+    a.graph_albums.first.should be_a_kind_of(EagerAlbum)
+    a.graph_albums.first.values.should == {:id => 1, :band_id => 2}
+    a = a.graph_albums.first
+    a.tracks.should be_a_kind_of(Array)
+    a.tracks.size.should == 1
+    a.tracks.first.should be_a_kind_of(EagerTrack)
+    a.tracks.first.values.should == {:id => 3, :album_id => 1}
+    MODEL_DB.sqls.length.should == 2
+  end
+  
+  it "should respect :eager_graph when lazily loading an association" do
+    a = EagerBand.all
+    a.should be_a_kind_of(Array)
+    a.size.should == 1
+    a.first.should be_a_kind_of(EagerBand)
+    a.first.values.should == {:id => 2}
+    MODEL_DB.sqls.should == ['SELECT * FROM bands']
+    a = a.first
+    EagerAlbum.dataset.extend(Module.new {
+      def fetch_rows(sql)
+        @db << sql
+        yield({:id=>1, :band_id=>2, :tracks_id=>3, :album_id=>1})
+      end
+    })
+    a.graph_albums
+    MODEL_DB.sqls.should == ['SELECT * FROM bands', 
+                             'SELECT albums.id, albums.band_id, tracks.id AS tracks_id, tracks.album_id FROM albums LEFT OUTER JOIN tracks ON (tracks.album_id = albums.id) WHERE (band_id = 2)']
+    a.graph_albums.should be_a_kind_of(Array)
+    a.graph_albums.size.should == 1
+    a.graph_albums.first.should be_a_kind_of(EagerAlbum)
+    a.graph_albums.first.values.should == {:id => 1, :band_id => 2}
+    a = a.graph_albums.first
+    a.tracks.should be_a_kind_of(Array)
+    a.tracks.size.should == 1
+    a.tracks.first.should be_a_kind_of(EagerTrack)
+    a.tracks.first.values.should == {:id => 3, :album_id => 1}
+    MODEL_DB.sqls.length.should == 2
   end
   
   it "should respect :order when eagerly loading" do

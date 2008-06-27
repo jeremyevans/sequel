@@ -1,5 +1,7 @@
 === HEAD
 
+* Add the :eager_graph association option, works just like :eager except it uses #eager_graph (jeremyevans)
+
 * Make eager loading via #eager respect the :limit association option (jeremyevans)
 
 * Add :graph_join_table_join_type association option (jeremyevans)

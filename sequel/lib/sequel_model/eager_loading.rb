@@ -371,6 +371,7 @@ module Sequel::Model::Associations::EagerLoading
       assoc_block = Proc.new do |d|
         d = d.order(*reflection[:order]) if reflection[:order]
         d = d.limit(*reflection[:limit]) if reflection[:limit]
+        d = d.eager_graph(reflection[:eager_graph]) if reflection[:eager_graph]
         d = d.eager(reflection[:eager]) if reflection[:eager]
         d = d.eager(eager_assoc[assoc_name]) if eager_assoc[assoc_name]
         d = reflection[:eager_block].call(d) if reflection[:eager_block]

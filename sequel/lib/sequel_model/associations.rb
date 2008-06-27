@@ -87,7 +87,11 @@ module Sequel::Model::Associations
   #   - :class - The associated class or its name. If not
   #     given, uses the association's name, which is camelized (and
   #     singularized unless the type is :many_to_one)
-  #   - :eager - The associations to eagerly load when loading the associated object.
+  #   - :eager - The associations to eagerly load via EagerLoading#eager when loading the associated object(s).
+  #     For many_to_one associations, this is ignored unless this association is
+  #     being eagerly loaded, as it doesn't save queries unless multiple objects
+  #     can be loaded at once.
+  #   - :eager_graph - The associations to eagerly load via EagerLoading#eager_graph when loading the associated object(s).
   #     For many_to_one associations, this is ignored unless this association is
   #     being eagerly loaded, as it doesn't save queries unless multiple objects
   #     can be loaded at once.
@@ -244,6 +248,7 @@ module Sequel::Model::Associations
     dataset_block = opts[:block]
     order = opts[:order]
     eager = opts[:eager]
+    eager_graph = opts[:eager_graph]
     limit = opts[:limit]
 
     # If a block is given, define a helper method for it, because it takes
@@ -260,6 +265,7 @@ module Sequel::Model::Associations
       ds = ds.order(*order) if order
       ds = ds.limit(*limit) if limit
       ds = ds.eager(eager) if eager
+      ds = ds.eager_graph(eager_graph) if eager_graph
       ds = send(helper_method, ds) if dataset_block
       ds
     end
