@@ -99,7 +99,7 @@ module Sequel::Model::Associations
   #   - :graph_conditions - The additional conditions to use on the SQL join when eagerly loading
   #     the association via eager_graph.  Should be a hash or an array of all two pairs.
   #   - :graph_join_type - The type of SQL join to use when eagerly loading the association via
-  #     eager_graph
+  #     eager_graph.  Defaults to :left_outer.
   #   - :graph_only_conditions - The conditions to use on the SQL join when eagerly loading
   #     the association via eager_graph, instead of the default conditions specified by the
   #     foreign/primary keys.  This option causes the :graph_conditions option to be ignored.
@@ -152,6 +152,9 @@ module Sequel::Model::Associations
   #   - :graph_join_table_conditions - The additional conditions to use on the SQL join for
   #     the join table when eagerly loading the association via eager_graph. Should be a hash
   #     or an array of all two pairs.
+  #   - :graph_join_type - The type of SQL join to use for the join table when eagerly
+  #     loading the association via eager_graph.  Defaults to the :graph_join_type option or
+  #     :left_outer.
   #   - :graph_join_table_only_conditions - The conditions to use on the SQL join for the join
   #     table when eagerly loading the association via eager_graph, instead of the default
   #     conditions specified by the foreign/primary keys.  This option causes the 
@@ -284,6 +287,7 @@ module Sequel::Model::Associations
     opts[:left_key_alias] ||= :"x_foreign_key_x"
     opts[:left_key_select] ||= :"#{join_table}__#{left}___#{opts[:left_key_alias]}"
     opts[:graph_join_table_conditions] = opts[:graph_join_table_conditions] ? opts[:graph_join_table_conditions].to_a : []
+    opts[:graph_join_table_join_type] ||= opts[:graph_join_type]
     database = db
     
     def_association_dataset_methods(name, opts) do

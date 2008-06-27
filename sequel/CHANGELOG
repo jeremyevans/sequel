@@ -1,5 +1,7 @@
 === HEAD
 
+* Add :graph_join_table_join_type association option (jeremyevans)
+
 * Add :graph_only_conditions and :graph_join_table_only_conditions association options (jeremyevans)
 
 * Add :graph_block and :graph_join_table_block association options (jeremyevans)
