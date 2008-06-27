@@ -97,9 +97,12 @@ module Sequel::Model::Associations
   #   - :graph_block - The block to pass to join_table when eagerly loading
   #     the association via eager_graph.
   #   - :graph_conditions - The additional conditions to use on the SQL join when eagerly loading
-  #     the association via eager_graph.
+  #     the association via eager_graph.  Should be a hash or an array of all two pairs.
   #   - :graph_join_type - The type of SQL join to use when eagerly loading the association via
   #     eager_graph
+  #   - :graph_only_conditions - The conditions to use on the SQL join when eagerly loading
+  #     the association via eager_graph, instead of the default conditions specified by the
+  #     foreign/primary keys.  This option causes the :graph_conditions option to be ignored.
   #   - :graph_select - A column or array of columns to select from the associated table
   #     when eagerly loading the association via eager_graph. Defaults to all
   #     columns in the associated table.
@@ -147,7 +150,12 @@ module Sequel::Model::Associations
   #   - :graph_join_table_block - The block to pass to join_table for
   #     the join table when eagerly loading the association via eager_graph.
   #   - :graph_join_table_conditions - The additional conditions to use on the SQL join for
-  #     the join table when eagerly loading the association via eager_graph.
+  #     the join table when eagerly loading the association via eager_graph. Should be a hash
+  #     or an array of all two pairs.
+  #   - :graph_join_table_only_conditions - The conditions to use on the SQL join for the join
+  #     table when eagerly loading the association via eager_graph, instead of the default
+  #     conditions specified by the foreign/primary keys.  This option causes the 
+  #     :graph_join_table_conditions option to be ignored.
   def associate(type, name, opts = {}, &block)
     # check arguments
     raise ArgumentError unless [:many_to_one, :one_to_many, :many_to_many].include?(type) && Symbol === name
