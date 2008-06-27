@@ -94,8 +94,10 @@ module Sequel::Model::Associations
   #   - :eager_block - If given, use the block instead of the default block when
   #     eagerly loading.  To not use a block when eager loading (when one is used normally),
   #     set to nil.
-  #   - :graph_conditions - The conditions to use on the SQL join when eagerly loading
-  #     the association via eager_graph
+  #   - :graph_block - The block to pass to join_table when eagerly loading
+  #     the association via eager_graph.
+  #   - :graph_conditions - The additional conditions to use on the SQL join when eagerly loading
+  #     the association via eager_graph.
   #   - :graph_join_type - The type of SQL join to use when eagerly loading the association via
   #     eager_graph
   #   - :graph_select - A column or array of columns to select from the associated table
@@ -142,8 +144,10 @@ module Sequel::Model::Associations
   #     primary key, as a symbol. Defaults to :"#{self.name.underscore}_id".
   #   - :right_key - foreign key in join table that points to associated
   #     model's primary key, as a symbol.  Defaults to Defaults to :"#{name.to_s.singularize}_id".
-  #   - :graph_join_table_conditions - The conditions to use on the SQL join for the join table when eagerly loading
-  #     the association via eager_graph
+  #   - :graph_join_table_block - The block to pass to join_table for
+  #     the join table when eagerly loading the association via eager_graph.
+  #   - :graph_join_table_conditions - The additional conditions to use on the SQL join for
+  #     the join table when eagerly loading the association via eager_graph.
   def associate(type, name, opts = {}, &block)
     # check arguments
     raise ArgumentError unless [:many_to_one, :one_to_many, :many_to_many].include?(type) && Symbol === name

@@ -1,5 +1,7 @@
 === HEAD
 
+* Add support for :graph_block and :graph_join_table_block association options (jeremyevans)
+
 * Set the model's dataset's columns in addition to the model's columns when loading the schema for a model (jeremyevans)
 
 * Make caching work correctly with subclasses (jeremyevans)
