@@ -136,14 +136,14 @@ module Sequel::Model::Associations::EagerLoading
     graph_block = r[:graph_block]
     ds = case assoc_type = r[:type]
     when :many_to_one
-      ds.graph(klass, [[klass.primary_key, :"#{ta}__#{r[:key]}"]] + conditions, :select=>select, :table_alias=>assoc_table_alias, :join_type=>join_type, &graph_block)
+      ds.graph(klass, [[klass.primary_key, r[:key].qualify(ta)]] + conditions, :select=>select, :table_alias=>assoc_table_alias, :join_type=>join_type, &graph_block)
     when :one_to_many
-      ds = ds.graph(klass, [[r[:key], :"#{ta}__#{model.primary_key}"]] + conditions, :select=>select, :table_alias=>assoc_table_alias, :join_type=>join_type, &graph_block)
+      ds = ds.graph(klass, [[r[:key], model.primary_key.qualify(ta)]] + conditions, :select=>select, :table_alias=>assoc_table_alias, :join_type=>join_type, &graph_block)
       # We only load reciprocals for one_to_many associations, as other reciprocals don't make sense
       ds.opts[:eager_graph][:reciprocals][assoc_table_alias] = r.reciprocal
       ds
     when :many_to_many
-      ds = ds.graph(r[:join_table], [[r[:left_key], :"#{ta}__#{model.primary_key}"]] + r[:graph_join_table_conditions], :select=>false, :table_alias=>ds.eager_unique_table_alias(ds, r[:join_table]), :join_type=>join_type, &r[:graph_join_table_block])
+      ds = ds.graph(r[:join_table], [[r[:left_key], model.primary_key.qualify(ta)]] + r[:graph_join_table_conditions], :select=>false, :table_alias=>ds.eager_unique_table_alias(ds, r[:join_table]), :join_type=>join_type, &r[:graph_join_table_block])
       ds.graph(klass, [[klass.primary_key, r[:right_key]]] + conditions, :select=>select, :table_alias=>assoc_table_alias, :join_type=>join_type, &graph_block)
     end
     eager_graph = ds.opts[:eager_graph]
