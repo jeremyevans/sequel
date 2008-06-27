@@ -88,7 +88,7 @@ module Sequel
         # Associates table alias (the master is never aliased)
         table_aliases = graph[:table_aliases] = {master=>self}
         # Keep track of the alias numbers used
-        ca_num = graph[:column_alias_num] = {}
+        ca_num = graph[:column_alias_num] = Hash.new(0)
         # All columns in the master table are never
         # aliased, but are not included if set_graph_aliases
         # has been used.
@@ -96,7 +96,7 @@ module Sequel
           select = (opts[:select] ||= [])
           columns.each do |column|
             column_aliases[column] = [master, column]
-            select.push(:"#{master}__#{column}")
+            select.push(column.qualify(master))
           end
         end
       end
@@ -121,23 +121,19 @@ module Sequel
         # using the next value of N that we know hasn't been
         # used
         cols.each do |column|
-          col_alias, c = if column_aliases[column]
-            tc = :"#{table_alias}_#{column}"
-            if column_aliases[tc]
-              if can = ca_num[tc]
-                ca_num[tc] += 1
-                tc = :"#{tc}_#{can}"
-              else
-                ca_num[tc] = 1
-                tc = :"#{tc}_0"
-             end
+          col_alias, identifier = if column_aliases[column]
+            column_alias = :"#{table_alias}_#{column}"
+            if column_aliases[column_alias]
+              column_alias_num = ca_num[column_alias]
+              column_alias = :"#{column_alias}_#{column_alias_num}" 
+              ca_num[column_alias] += 1
             end
-            [tc, :"#{table_alias}__#{column}___#{tc}"]
+            [column_alias, column.qualify(table_alias).as(column_alias)]
           else
-            [column, :"#{table_alias}__#{column}"]
+            [column, column.qualify(table_alias)]
           end
           column_aliases[col_alias] = [table_alias, column]
-          select.push(c)
+          select.push(identifier)
         end
       end
       ds
