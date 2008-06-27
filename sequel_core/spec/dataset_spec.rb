@@ -2227,6 +2227,12 @@ context "Dataset#columns" do
     @dataset.opts[:from] = [:nana]
     @dataset.columns.should == 'SELECT * FROM items LIMIT 1a'
   end
+  
+  specify "should ignore any filters, orders, or DISTINCT clauses" do
+    @dataset.filter!(:b=>100).order!(:b).distinct!(:b)
+    @dataset.columns = nil
+    @dataset.columns.should == 'SELECT * FROM items LIMIT 1a'
+  end
 end
 
 context "Dataset#columns!" do

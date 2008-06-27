@@ -198,7 +198,10 @@ module Sequel
     # If the dataset does not have any rows, this will be an empty array.
     # If you are looking for all columns for a single table, see Schema::SQL#schema.
     def columns
-      single_record unless @columns
+      return @columns if @columns
+      ds = unfiltered.unordered.clone(:distinct => nil)
+      ds.single_record
+      @columns = ds.instance_variable_get(:@columns)
       @columns || []
     end
     
