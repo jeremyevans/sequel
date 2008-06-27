@@ -1,5 +1,7 @@
 === HEAD
 
+* Dataset#graph now accepts a block which is passed to join_table (jeremyevans)
+
 * Make Dataset#columns ignore any filtering, ordering, and distinct clauses (jeremyevans)
 
 * Use the safer connection-specific string escaping methods for PostgreSQL (jeremyevans)

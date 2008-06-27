@@ -71,6 +71,11 @@ describe Sequel::Dataset, " graphing" do
     ds.sql.should == 'SELECT points.id, points.x, points.y, lines.id AS lines_id, lines.x AS lines_x, lines.y AS lines_y, lines.graph_id FROM points LEFT OUTER JOIN lines ON ((lines.x = points.id) AND (lines.y = points.id))'
   end
 
+  it "#graph should accept a block instead of conditions and pass it to join_table" do
+    ds = @ds1.graph(@ds2){|ja, lja, js| [[:x.qualify(ja), :id.qualify(lja)], [:y.qualify(ja), :id.qualify(lja)]]}
+    ds.sql.should == 'SELECT points.id, points.x, points.y, lines.id AS lines_id, lines.x AS lines_x, lines.y AS lines_y, lines.graph_id FROM points LEFT OUTER JOIN lines ON ((lines.x = points.id) AND (lines.y = points.id))'
+  end
+
   it "#graph should not add columns if graph is called after set_graph_aliases" do
     ds = @ds1.set_graph_aliases([[:x,[:points, :x]], [:y,[:lines, :y]]])
     ds.sql.should == 'SELECT points.x, lines.y FROM points'

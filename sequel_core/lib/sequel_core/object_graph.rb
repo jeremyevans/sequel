@@ -31,7 +31,7 @@ module Sequel
     # Arguments:
     # * dataset -  Can be a symbol (specifying a table), another dataset,
     #   or an object that responds to .dataset and yields a symbol or a dataset
-    # * join_conditions - A conditions hash that is passed to the join_table method
+    # * join_conditions - Any condition(s) allowed by join_table.
     # * options -  A hash of graph options.  The following options are currently used:
     #   * :table_alias - The alias to use for the table.  If not specified, doesn't
     #     alias the table.  You will get an error if the the alias (or table) name is
@@ -43,7 +43,8 @@ module Sequel
     #     columns and is like simply joining the tables, though graph keeps
     #     some metadata about join that makes it important to use graph instead
     #     of join.
-    def graph(dataset, join_conditions, options = {})
+    # * block - A block that is passed to join_table.
+    def graph(dataset, join_conditions = nil, options = {}, &block)
       # Allow the use of a model, dataset, or symbol as the first argument
       # Find the table name/dataset based on the argument
       dataset = dataset.dataset if dataset.respond_to?(:dataset)
@@ -68,7 +69,7 @@ module Sequel
       raise_alias_error.call if @opts[:graph] && @opts[:graph][:table_aliases] && @opts[:graph][:table_aliases].include?(table_alias)
 
       # Join the table early in order to avoid cloning the dataset twice
-      ds = join_table(options[:join_type] || :left_outer, table, join_conditions, table_alias)
+      ds = join_table(options[:join_type] || :left_outer, table, join_conditions, table_alias, &block)
       opts = ds.opts
 
       # Whether to include the table in the result set
