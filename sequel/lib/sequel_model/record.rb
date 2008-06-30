@@ -335,6 +335,32 @@ module Sequel
     
     private
 
+    # Add/Set the current object to/as the given object's reciprocal association.
+    def add_reciprocal_object(opts, o)
+      return unless reciprocal = opts.reciprocal
+      case opts[:type]
+      when :many_to_many, :many_to_one
+        if array = o.associations[reciprocal] and !array.include?(self)
+          array.push(self)
+        end
+      when :one_to_many
+        o.associations[reciprocal] = self
+      end
+    end
+
+    # Remove/unset the current object from/as the given object's reciprocal association.
+    def remove_reciprocal_object(opts, o)
+      return unless reciprocal = opts.reciprocal
+      case opts[:type]
+      when :many_to_many, :many_to_one
+        if array = o.associations[reciprocal]
+          array.delete_if{|x| self === x}
+        end
+      when :one_to_many
+        o.associations[reciprocal] = nil
+      end
+    end
+
     # Set the columns, filtered by the only and except arrays.
     def set_restricted(hash, only, except)
       columns_not_set = model.instance_variable_get(:@columns).blank?
