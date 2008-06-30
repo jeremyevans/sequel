@@ -432,7 +432,7 @@ describe Sequel::Model, "one_to_many" do
     MODEL_DB.sqls.should == ['SELECT attributes.* FROM attributes WHERE ((attributes.node_id = 1234) AND (xxx IS NULL))']
   end
   
-  it "should support order option with block" do
+  it "should support :order option with block" do
     @c2.one_to_many :attributes, :class => @c1, :order => :kind do |ds|
       ds.filter(:xxx => @xxx)
     end
@@ -452,6 +452,23 @@ describe Sequel::Model, "one_to_many" do
       ds.filter(:xxx => 456)
     end
     @c2.new(:id => 1234).attributes_dataset.sql.should == 'SELECT attributes.* FROM attributes WHERE ((attributes.node_id = 1234) AND (xxx = 456))'
+  end
+  
+  it "should support a :dataset option that is used instead of the default" do
+    c1 = @c1
+    @c2.one_to_many :all_other_attributes, :class => @c1, :dataset=>proc{c1.filter(:nodeid=>pk).invert}, :order=>:a, :limit=>10, :select=>[] do |ds|
+      ds.filter(:xxx => 5)
+    end
+    
+    @c2.new(:id => 1234).all_other_attributes_dataset.sql.should == 'SELECT * FROM attributes WHERE ((nodeid != 1234) AND (xxx = 5)) ORDER BY a LIMIT 10'
+    n = @c2.new(:id => 1234)
+    atts = n.all_other_attributes
+    atts.should be_a_kind_of(Array)
+    atts.size.should == 1
+    atts.first.should be_a_kind_of(@c1)
+    atts.first.values.should == {}
+    
+    MODEL_DB.sqls.should == ['SELECT * FROM attributes WHERE ((nodeid != 1234) AND (xxx = 5)) ORDER BY a LIMIT 10']
   end
   
   it "should support a :limit option" do
@@ -829,7 +846,7 @@ describe Sequel::Model, "many_to_many" do
     MODEL_DB.sqls.first.should == 'SELECT attributes.* FROM attributes INNER JOIN attributes_nodes ON ((attributes_nodes.attribute_id = attributes.id) AND (attributes_nodes.node_id = 1234)) WHERE (xxx = 555)'
   end
 
-  it "should allow the order option while accepting a block" do
+  it "should allow the :order option while accepting a block" do
     @c2.many_to_many :attributes, :class => @c1, :order=>[:blah1, :blah2] do |ds|
       ds.filter(:xxx => @xxx)
     end
@@ -850,6 +867,22 @@ describe Sequel::Model, "many_to_many" do
     @c2.new(:id => 1234).attributes_dataset.sql.should == 'SELECT attributes.* FROM attributes INNER JOIN attributes_nodes ON ((attributes_nodes.attribute_id = attributes.id) AND (attributes_nodes.node_id = 1234)) WHERE (xxx = 456)'
   end
   
+  it "should support a :dataset option that is used instead of the default" do
+    c1 = @c1
+    @c2.many_to_many :attributes, :class => @c1, :dataset=>proc{c1.join_table(:natural, :an).filter(:an__nodeid=>pk)}, :order=> :a, :limit=>10, :select=>[] do |ds|
+      ds.filter(:xxx => @xxx)
+    end
+
+    n = @c2.new(:id => 1234)
+    n.xxx = 555
+    n.attributes_dataset.sql.should == 'SELECT * FROM attributes NATURAL JOIN an WHERE ((an.nodeid = 1234) AND (xxx = 555)) ORDER BY a LIMIT 10'
+    a = n.attributes
+    a.should be_a_kind_of(Array)
+    a.size.should == 1
+    a.first.should be_a_kind_of(@c1)
+    MODEL_DB.sqls.first.should == 'SELECT * FROM attributes NATURAL JOIN an WHERE ((an.nodeid = 1234) AND (xxx = 555)) ORDER BY a LIMIT 10'
+  end
+
   it "should support a :limit option" do
     @c2.many_to_many :attributes, :class => @c1 , :limit=>10
     @c2.new(:id => 1234).attributes_dataset.sql.should == 'SELECT attributes.* FROM attributes INNER JOIN attributes_nodes ON ((attributes_nodes.attribute_id = attributes.id) AND (attributes_nodes.node_id = 1234)) LIMIT 10'
@@ -1057,8 +1090,8 @@ describe Sequel::Model, "many_to_many" do
   end
 end
 
-describe Sequel::Model, "all_association_reflections" do
-  before(:each) do
+describe Sequel::Model, " association reflection methods" do
+  before do
     MODEL_DB.reset
     @c1 = Class.new(Sequel::Model(:nodes)) do
       def self.name; 'Node'; end
@@ -1066,64 +1099,40 @@ describe Sequel::Model, "all_association_reflections" do
     end
   end
   
-  it "should include all association reflection hashes" do
+  it "#all_association_reflections should include all association reflection hashes" do
     @c1.all_association_reflections.should == []
+
     @c1.associate :many_to_one, :parent, :class => @c1
-    @c1.all_association_reflections.should == [{
-      :type => :many_to_one, :name => :parent, :class_name => 'Node', 
-      :class => @c1, :key => :parent_id, :block => nil, :cache => true,
-      :graph_join_type=>:left_outer, :graph_conditions=>[], :eager_block => nil, :model => @c1
-    }]
+    @c1.all_association_reflections.collect{|v| v[:name]}.should == [:parent]
+    @c1.all_association_reflections.collect{|v| v[:type]}.should == [:many_to_one]
+    @c1.all_association_reflections.collect{|v| v[:class]}.should == [@c1]
+
     @c1.associate :one_to_many, :children, :class => @c1
-    @c1.all_association_reflections.sort_by{|x|x[:name].to_s}.should == [{
-      :type => :one_to_many, :name => :children, :class_name => 'Node', 
-      :class => @c1, :key => :node_id, :block => nil, :cache => true,
-      :graph_join_type=>:left_outer, :graph_conditions=>[], :eager_block => nil, :model => @c1}, {
-      :type => :many_to_one, :name => :parent, :class_name => 'Node',
-      :class => @c1, :key => :parent_id, :block => nil, :cache => true,
-      :graph_join_type=>:left_outer, :graph_conditions=>[], :eager_block => nil, :model => @c1}]
-  end
-end
-
-describe Sequel::Model, "association_reflection" do
-  before(:each) do
-    MODEL_DB.reset
-    @c1 = Class.new(Sequel::Model(:nodes)) do
-      def self.name; 'Node'; end
-      def self.to_s; 'Node'; end
-    end
+    @c1.all_association_reflections.sort_by{|x|x[:name].to_s}
+    @c1.all_association_reflections.sort_by{|x|x[:name].to_s}.collect{|v| v[:name]}.should == [:children, :parent]
+    @c1.all_association_reflections.sort_by{|x|x[:name].to_s}.collect{|v| v[:type]}.should == [:one_to_many, :many_to_one]
+    @c1.all_association_reflections.sort_by{|x|x[:name].to_s}.collect{|v| v[:class]}.should == [@c1, @c1]
   end
 
-  it "should return nil for nonexistent association" do
+  it "#association_reflection should return nil for nonexistent association" do
     @c1.association_reflection(:blah).should == nil
   end
 
-  it "should return association reflection hash if association exists" do
+  it "#association_reflection should return association reflection hash if association exists" do
     @c1.associate :many_to_one, :parent, :class => @c1
-    @c1.association_reflection(:parent).should == {
-      :type => :many_to_one, :name => :parent, :class_name => 'Node', 
-      :class => @c1, :key => :parent_id, :block => nil, :cache => true,
-      :graph_join_type=>:left_outer, :graph_conditions=>[], :eager_block => nil, :model => @c1
-    }
+    @c1.association_reflection(:parent).should be_a_kind_of(Sequel::Model::Associations::AssociationReflection)
+    @c1.association_reflection(:parent)[:name].should == :parent
+    @c1.association_reflection(:parent)[:type].should == :many_to_one
+    @c1.association_reflection(:parent)[:class].should == @c1
+
     @c1.associate :one_to_many, :children, :class => @c1
-    @c1.association_reflection(:children).should == {
-      :type => :one_to_many, :name => :children, :class_name => 'Node', 
-      :class => @c1, :key => :node_id, :block => nil, :cache => true,
-      :graph_join_type=>:left_outer, :graph_conditions=>[], :eager_block => nil, :model => @c1
-    }
-  end
-end
-
-describe Sequel::Model, "associations" do
-  before(:each) do
-    MODEL_DB.reset
-    @c1 = Class.new(Sequel::Model(:nodes)) do
-      def self.name; 'Node'; end
-      def self.to_s; 'Node'; end
-    end
+    @c1.association_reflection(:children).should be_a_kind_of(Sequel::Model::Associations::AssociationReflection)
+    @c1.association_reflection(:children)[:name].should == :children
+    @c1.association_reflection(:children)[:type].should == :one_to_many
+    @c1.association_reflection(:children)[:class].should == @c1
   end
 
-  it "should include all association names" do
+  it "#associations should include all association names" do
     @c1.associations.should == []
     @c1.associate :many_to_one, :parent, :class => @c1
     @c1.associations.should == [:parent]

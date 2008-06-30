@@ -242,10 +242,11 @@ module Sequel::Model::Associations
   end
   
   # Adds association methods to the model for *_to_many associations.
-  def def_association_dataset_methods(name, opts, &block)
+  def def_association_dataset_methods(name, opts)
     dataset_method = :"#{name}_dataset"
     helper_method = :"#{name}_helper"
-    dataset_block = opts[:block]
+    dataset = opts[:dataset]
+    dataset_helper = opts[:block]
     order = opts[:order]
     eager = opts[:eager]
     eager_graph = opts[:eager_graph]
@@ -253,20 +254,20 @@ module Sequel::Model::Associations
 
     # If a block is given, define a helper method for it, because it takes
     # an argument.  This is unnecessary in Ruby 1.9, as that has instance_exec.
-    if dataset_block
-      class_def(helper_method, &dataset_block)
+    if dataset_helper
+      class_def(helper_method, &dataset_helper)
       private helper_method
     end
     
     # define a method returning the association dataset (with optional order)
     class_def(dataset_method) do
       raise(Sequel::Error, 'model object does not have a primary key') unless pk
-      ds = instance_eval(&block).select(*opts.select)
+      ds = instance_eval(&dataset).select(*opts.select)
       ds = ds.order(*order) if order
       ds = ds.limit(*limit) if limit
       ds = ds.eager(eager) if eager
       ds = ds.eager_graph(eager_graph) if eager_graph
-      ds = send(helper_method, ds) if dataset_block
+      ds = send(helper_method, ds) if dataset_helper
       ds
     end
     
@@ -294,11 +295,10 @@ module Sequel::Model::Associations
     opts[:left_key_select] ||= :"#{join_table}__#{left}___#{opts[:left_key_alias]}"
     opts[:graph_join_table_conditions] = opts[:graph_join_table_conditions] ? opts[:graph_join_table_conditions].to_a : []
     opts[:graph_join_table_join_type] ||= opts[:graph_join_type]
+    opts[:dataset] ||= proc{opts.associated_class.inner_join(join_table, [[right, opts.associated_primary_key], [left, pk]])}
     database = db
     
-    def_association_dataset_methods(name, opts) do
-      opts.associated_class.inner_join(join_table, [[right, opts.associated_primary_key], [left, pk]])
-    end
+    def_association_dataset_methods(name, opts)
 
     return if opts[:read_only]
 
@@ -402,11 +402,12 @@ module Sequel::Model::Associations
   def def_one_to_many(name, opts)
     key = (opts[:key] ||= default_remote_key)
     opts[:class_name] ||= name.to_s.singularize.camelize
-    
-    def_association_dataset_methods(name, opts) do
+    opts[:dataset] ||= proc do
       klass = opts.associated_class
       klass.filter(key.qualify(klass.table_name) => pk)
     end
+    
+    def_association_dataset_methods(name, opts)
     
     unless opts[:read_only]
       add_meth = association_add_method_name(name)
