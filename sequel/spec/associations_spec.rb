@@ -18,17 +18,11 @@ describe Sequel::Model, "associate" do
 end
 
 describe Sequel::Model, "many_to_one" do
-
-  before(:each) do
+  before do
     MODEL_DB.reset
 
     @c2 = Class.new(Sequel::Model(:nodes)) do
       columns :id, :parent_id, :par_parent_id, :blah
-      def self.create_new(values)
-        obj = self.new(values)
-        obj.instance_variable_set(:@new, false)
-        obj
-      end
     end
 
     @dataset = @c2.dataset
@@ -90,6 +84,15 @@ describe Sequel::Model, "many_to_one" do
     MODEL_DB.sqls.should == ["SELECT id, name FROM nodes WHERE (nodes.id = 567) LIMIT 1"]
   end
 
+  it "should support :order, :limit (only for offset), and :dataset options, as well as a block" do
+    c2 = @c2
+    @c2.many_to_one :child_20, :class => @c2, :key=>:id, :dataset=>proc{c2.filter(:parent_id=>pk)}, :limit=>[10,20], :order=>:name do |ds|
+      ds.filter(:x > 1)
+    end
+    @c2.load(:id => 100).child_20
+    MODEL_DB.sqls.should == ["SELECT nodes.* FROM nodes WHERE ((parent_id = 100) AND (x > 1)) ORDER BY name LIMIT 1 OFFSET 20"]
+  end
+
   it "should return nil if key value is nil" do
     @c2.many_to_one :parent, :class => @c2
 
@@ -130,7 +133,7 @@ describe Sequel::Model, "many_to_one" do
   it "should not persist changes until saved" do
     @c2.many_to_one :parent, :class => @c2
 
-    d = @c2.create_new(:id => 1)
+    d = @c2.load(:id => 1)
     MODEL_DB.reset
     d.parent = @c2.new(:id => 345)
     MODEL_DB.sqls.should == []
@@ -141,7 +144,7 @@ describe Sequel::Model, "many_to_one" do
   it "should set cached instance variable when accessed" do
     @c2.many_to_one :parent, :class => @c2
 
-    d = @c2.create_new(:id => 1)
+    d = @c2.load(:id => 1)
     MODEL_DB.reset
     d.parent_id = 234
     d.associations[:parent].should == nil
@@ -250,7 +253,7 @@ describe Sequel::Model, "many_to_one" do
   it "should have belongs_to alias" do
     @c2.belongs_to :parent, :class => @c2
 
-    d = @c2.create_new(:id => 1)
+    d = @c2.load(:id => 1)
     MODEL_DB.reset
     d.parent_id = 234
     d.associations[:parent].should == nil

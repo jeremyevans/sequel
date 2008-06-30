@@ -11,15 +11,17 @@
 #   end
 # 
 # The project class now has the following instance methods:
-# * portfolio - Returns the associated portfolio
+# * portfolio - Returns the associated portfolio.
 # * portfolio=(obj) - Sets the associated portfolio to the object,
 #   but the change is not persisted until you save the record.
+# * portfolio_dataset - Returns a dataset that would return the associated
+#   portfolio, only useful in fairly specific circumstances.
 # * milestones - Returns an array of associated milestones
+# * add_milestone(obj) - Associates the passed milestone with this object.
+# * remove_milestone(obj) - Removes the association with the passed milestone.
+# * remove_all_milestones - Removes associations with all associated milestones.
 # * milestones_dataset - Returns a dataset that would return the associated
 #   milestones, allowing for further filtering/limiting/etc.
-# * add_milestone(obj) - Associates the passed milestone with this object
-# * remove_milestone(obj) - Removes the association with the passed milestone
-# * remove_all_milestones - Removes associations with all associated milestones
 #
 # If you want to override the behavior of the add_/remove_/remove_all_ methods,
 # there are private instance methods created that a prepended with an
@@ -112,6 +114,8 @@ module Sequel::Model::Associations
   #   - :graph_select - A column or array of columns to select from the associated table
   #     when eagerly loading the association via eager_graph. Defaults to all
   #     columns in the associated table.
+  #   - :limit - Limit the number of records to the provided value.  Use
+  #     an array with two arguments for the value to specify a limit and offset.
   #   - :order - the column(s) by which to order the association dataset.  Can be a
   #     singular column or an array.
   #   - :read_only - Do not add a setter method (for many_to_one or one_to_many with :one_to_one),
@@ -126,9 +130,6 @@ module Sequel::Model::Associations
   #     use this option, but beware that the join table attributes can clash with
   #     attributes from the model table, so you should alias any attributes that have
   #     the same name in both the join table and the associated table.
-  # * :one_to_many, :many_to_many:
-  #   - :limit - Limit the number of records to the provided value.  Use
-  #     an array with two arguments for the value to specify a limit and offset.
   # * :many_to_one:
   #   - :key - foreign_key in current model's table that references
   #     associated model's primary key, as a symbol.  Defaults to :"#{name}_id".
@@ -186,7 +187,7 @@ module Sequel::Model::Associations
         opts[:class_name] ||= opts[:class].name
     end
 
-    send(:"def_#{type}", name, opts)
+    send(:"def_#{type}", opts)
 
     # don't add to association_reflections until we are sure there are no errors
     association_reflections[name] = opts
@@ -284,7 +285,8 @@ module Sequel::Model::Associations
   end
 
   # Adds association methods to the model for *_to_many associations.
-  def def_association_dataset_methods(name, opts)
+  def def_association_dataset_methods(opts)
+    name = opts[:name]
     dataset_method = association_dataset_method_name(name)
     helper_method = association_helper_method_name(name)
     dataset = opts[:dataset]
@@ -293,6 +295,8 @@ module Sequel::Model::Associations
     eager = opts[:eager]
     eager_graph = opts[:eager_graph]
     limit = opts[:limit]
+    key = opts[:key] if opts[:type] == :many_to_one
+    set_reciprocal = opts[:type] == :one_to_many
 
     # If a block is given, define a helper method for it, because it takes
     # an argument.  This is unnecessary in Ruby 1.9, as that has instance_exec.
@@ -303,32 +307,35 @@ module Sequel::Model::Associations
     
     # define a method returning the association dataset (with optional order)
     class_def(dataset_method) do
-      raise(Sequel::Error, 'model object does not have a primary key') unless pk
+      raise(Sequel::Error, 'model object does not have a primary key') unless pk || key
       ds = instance_eval(&dataset).select(*opts.select)
       ds = ds.order(*order) if order
       ds = ds.limit(*limit) if limit
       ds = ds.eager(eager) if eager
-      ds = ds.eager_graph(eager_graph) if eager_graph
+      ds = ds.eager_graph(eager_graph) if eager_graph && !key
       ds = send(helper_method, ds) if dataset_helper
       ds
     end
     
     class_def(name) do |*reload|
-      if (assoc = @associations).include?(name) and !reload[0]
-        assoc[name]
+      if @associations.include?(name) and !reload[0]
+        @associations[name]
       else
-        objs = send(dataset_method).all
-        # Only one_to_many associations should set the reciprocal object
-        if (opts[:type] == :one_to_many) && (reciprocal = opts.reciprocal)
-          objs.each{|o| o.associations[reciprocal] = self}
+        objs = if key
+          send(dataset_method).first if send(key)
+        else
+          send(dataset_method).all
         end
-        assoc[name] = objs
+        # Only one_to_many associations should set the reciprocal object
+        objs.each{|o| add_reciprocal_object(opts, o)} if set_reciprocal
+        @associations[name] = objs
       end
     end
   end
 
   # Adds many_to_many association instance methods
-  def def_many_to_many(name, opts)
+  def def_many_to_many(opts)
+    name = opts[:name]
     left = (opts[:left_key] ||= default_remote_key)
     right = (opts[:right_key] ||= default_foreign_key(opts))
     opts[:class_name] ||= name.to_s.singularize.camelize
@@ -340,7 +347,7 @@ module Sequel::Model::Associations
     opts[:dataset] ||= proc{opts.associated_class.inner_join(join_table, [[right, opts.associated_primary_key], [left, pk]])}
     database = db
     
-    def_association_dataset_methods(name, opts)
+    def_association_dataset_methods(opts)
 
     return if opts[:read_only]
 
@@ -365,21 +372,17 @@ module Sequel::Model::Associations
   end
   
   # Adds many_to_one association instance methods
-  def def_many_to_one(name, opts)
+  def def_many_to_one(opts)
+    name = opts[:name]
     key = (opts[:key] ||= default_foreign_key(opts))
     opts[:class_name] ||= name.to_s.camelize
-    
-    class_def(name) do |*reload|
-      if (assoc = @associations).include?(name) and !reload[0]
-        assoc[name]
-      else
-        obj = if fk = send(key)
-          klass = opts.associated_class
-          klass.select(*opts.select).filter(opts.associated_primary_key.qualify(klass.table_name)=>fk).first
-        end
-        assoc[name] = obj
-      end
+    opts[:dataset] ||= proc do
+      klass = opts.associated_class
+      klass.filter(opts.associated_primary_key.qualify(klass.table_name)=>send(key))
     end
+
+    def_association_dataset_methods(opts)
+    
     return if opts[:read_only]
 
     class_def(:"#{name}=") do |o|  
@@ -396,7 +399,8 @@ module Sequel::Model::Associations
   end
   
   # Adds one_to_many association instance methods
-  def def_one_to_many(name, opts)
+  def def_one_to_many(opts)
+    name = opts[:name]
     key = (opts[:key] ||= default_remote_key)
     opts[:class_name] ||= name.to_s.singularize.camelize
     opts[:dataset] ||= proc do
@@ -404,7 +408,7 @@ module Sequel::Model::Associations
       klass.filter(key.qualify(klass.table_name) => pk)
     end
     
-    def_association_dataset_methods(name, opts)
+    def_association_dataset_methods(opts)
     
     unless opts[:read_only]
       internal_add_meth = association__add_method_name(name)
