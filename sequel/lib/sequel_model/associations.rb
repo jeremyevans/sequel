@@ -370,7 +370,8 @@ module Sequel::Model::Associations
         assoc[name]
       else
         obj = if fk = send(key)
-          opts.associated_class.select(*opts.select).filter(opts.associated_primary_key=>fk).first
+          klass = opts.associated_class
+          klass.select(*opts.select).filter(opts.associated_primary_key.qualify(klass.table_name)=>fk).first
         end
         assoc[name] = obj
       end
@@ -402,7 +403,10 @@ module Sequel::Model::Associations
     key = (opts[:key] ||= default_remote_key)
     opts[:class_name] ||= name.to_s.singularize.camelize
     
-    def_association_dataset_methods(name, opts) {opts.associated_class.filter(key => pk)}
+    def_association_dataset_methods(name, opts) do
+      klass = opts.associated_class
+      klass.filter(key.qualify(klass.table_name) => pk)
+    end
     
     unless opts[:read_only]
       add_meth = association_add_method_name(name)

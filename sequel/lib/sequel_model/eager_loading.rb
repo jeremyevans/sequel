@@ -389,7 +389,7 @@ module Sequel::Model::Associations::EagerLoading
           a.each do |object|
             object.associations[assoc_name] = nil
           end
-          assoc_block.call(assoc_class.select(*reflection.select).filter(assoc_class.primary_key=>keys)).all do |assoc_object|
+          assoc_block.call(assoc_class.select(*reflection.select).filter(assoc_class.primary_key.qualify(assoc_class.table_name)=>keys)).all do |assoc_object|
             next unless objects = h[assoc_object.pk]
             objects.each{|object| object.associations[assoc_name] = assoc_object}
           end
@@ -398,7 +398,7 @@ module Sequel::Model::Associations::EagerLoading
           ds = if rtype == :one_to_many
             fkey = reflection[:key]
             reciprocal = reflection.reciprocal
-            assoc_class.select(*reflection.select).filter(fkey=>h.keys)
+            assoc_class.select(*reflection.select).filter(fkey.qualify(assoc_class.table_name)=>h.keys)
           else
             fkey = reflection[:left_key_alias]
             assoc_class.select(*(Array(reflection.select)+Array(reflection[:left_key_select]))).inner_join(reflection[:join_table], [[reflection[:right_key], reflection.associated_primary_key], [reflection[:left_key], h.keys]])
