@@ -362,64 +362,7 @@ module Sequel::Model::Associations::EagerLoading
       end
     end
     
-    # Iterate through eager associations and assign instance variables
-    # for the association for all model objects
-    reflections.each do |reflection|
-      assoc_class = reflection.associated_class
-      assoc_name = reflection[:name]
-      # Proc for setting cascaded eager loading
-      assoc_block = Proc.new do |d|
-        d = d.order(*reflection[:order]) if reflection[:order]
-        d = d.limit(*reflection[:limit]) if reflection[:limit]
-        d = d.eager_graph(reflection[:eager_graph]) if reflection[:eager_graph]
-        d = d.eager(reflection[:eager]) if reflection[:eager]
-        d = d.eager(eager_assoc[assoc_name]) if eager_assoc[assoc_name]
-        d = reflection[:eager_block].call(d) if reflection[:eager_block]
-        d
-      end
-      case rtype = reflection[:type]
-        when :many_to_one
-          key = reflection[:key]
-          h = key_hash[key]
-          keys = h.keys
-          # No records have the foreign key set for this association, so skip it
-          next unless keys.length > 0
-          # Set the instance variable to null by default, so records that
-          # don't have a associated records will cache the negative lookup.
-          a.each do |object|
-            object.associations[assoc_name] = nil
-          end
-          assoc_block.call(assoc_class.select(*reflection.select).filter(assoc_class.primary_key.qualify(assoc_class.table_name)=>keys)).all do |assoc_object|
-            next unless objects = h[assoc_object.pk]
-            objects.each{|object| object.associations[assoc_name] = assoc_object}
-          end
-        when :one_to_many, :many_to_many
-          h = key_hash[model.primary_key]
-          ds = if rtype == :one_to_many
-            fkey = reflection[:key]
-            reciprocal = reflection.reciprocal
-            assoc_class.select(*reflection.select).filter(fkey.qualify(assoc_class.table_name)=>h.keys)
-          else
-            fkey = reflection[:left_key_alias]
-            assoc_class.select(*(Array(reflection.select)+Array(reflection[:left_key_select]))).inner_join(reflection[:join_table], [[reflection[:right_key], reflection.associated_primary_key], [reflection[:left_key], h.keys]])
-          end
-          h.values.each do |object_array|
-            object_array.each{|object| object.associations[assoc_name] = []}
-          end
-          assoc_block.call(ds).all do |assoc_object|
-            fk = if rtype == :many_to_many
-              assoc_object.values.delete(fkey)
-            else
-              assoc_object[fkey]
-            end
-            next unless objects = h[fk]
-            objects.each do |object|
-              object.associations[assoc_name].push(assoc_object)
-              assoc_object.associations[reciprocal] = object if reciprocal
-            end
-          end
-      end
-    end
+    reflections.each{|r| r[:eager_loader].call(key_hash, a, eager_assoc[r[:name]])}
   end
 
   # Build associations from the graph if #eager_graph was used, 

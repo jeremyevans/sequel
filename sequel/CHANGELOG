@@ -1,5 +1,7 @@
 === HEAD
 
+* Add :eager_loader association option, to specify code to be run when eager loading (jeremyevans)
+
 * Make :many_to_one associations support :dataset, :order, :limit association options, as well as block arguments (jeremyevans)
 
 * Add :dataset association option, which overrides the default base dataset to use (jeremyevans)

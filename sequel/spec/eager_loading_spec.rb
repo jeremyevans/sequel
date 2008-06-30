@@ -403,6 +403,44 @@ describe Sequel::Model, "#eager" do
     EagerAlbum.eager(:genre_names).all
     MODEL_DB.sqls.should == ['SELECT * FROM albums', "SELECT id, ag.album_id AS x_foreign_key_x FROM genres INNER JOIN ag ON ((ag.genre_id = genres.id) AND (ag.album_id IN (1)))"]
   end
+
+  it "should use the :eager_loader association option when eager loading" do
+    EagerAlbum.many_to_one :special_band, :eager_loader=>(proc do |key_hash, records, assocs| 
+      item = EagerBand.filter(:album_id=>records.collect{|r| [r.pk, r.pk*2]}.flatten).order(:name).first
+      records.each{|r| r.associations[:special_band] = item}
+    end)
+    EagerAlbum.one_to_many :special_tracks, :eager_loader=>(proc do |key_hash, records, assocs| 
+      items = EagerTrack.filter(:album_id=>records.collect{|r| [r.pk, r.pk*2]}.flatten).all
+      records.each{|r| r.associations[:special_tracks] = items}
+    end)
+    EagerAlbum.many_to_many :special_genres, :eager_loader=>(proc do |key_hash, records, assocs| 
+      items = EagerGenre.inner_join(:ag, [:genre_id]).filter(:album_id=>records.collect{|r| r.pk}).all
+      records.each{|r| r.associations[:special_genres] = items}
+    end)
+    a = EagerAlbum.eager(:special_genres, :special_tracks, :special_band).all
+    a.should be_a_kind_of(Array)
+    a.size.should == 1
+    a.first.should be_a_kind_of(EagerAlbum)
+    a.first.values.should == {:id => 1, :band_id => 2}
+    MODEL_DB.sqls.length.should == 4
+    MODEL_DB.sqls[0].should == 'SELECT * FROM albums'
+    MODEL_DB.sqls[1..-1].should(include('SELECT * FROM bands WHERE (album_id IN (1, 2)) ORDER BY name LIMIT 1'))
+    MODEL_DB.sqls[1..-1].should(include('SELECT * FROM tracks WHERE (album_id IN (1, 2))'))
+    MODEL_DB.sqls[1..-1].should(include('SELECT * FROM genres INNER JOIN ag USING (genre_id) WHERE (album_id IN (1))'))
+    a = a.first
+    a.special_band.should be_a_kind_of(EagerBand)
+    a.special_band.values.should == {:id => 2}
+    a.special_tracks.should be_a_kind_of(Array)
+    a.special_tracks.size.should == 1
+    a.special_tracks.first.should be_a_kind_of(EagerTrack)
+    a.special_tracks.first.values.should == {:id => 3, :album_id=>1}
+    a.special_genres.should be_a_kind_of(Array)
+    a.special_genres.size.should == 1
+    a.special_genres.first.should be_a_kind_of(EagerGenre)
+    a.special_genres.first.values.should == {:id => 4}
+    MODEL_DB.sqls.length.should == 4
+  end
+  
 end
 
 describe Sequel::Model, "#eager_graph" do

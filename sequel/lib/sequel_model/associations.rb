@@ -95,13 +95,18 @@ module Sequel::Model::Associations
   #     For many_to_one associations, this is ignored unless this association is
   #     being eagerly loaded, as it doesn't save queries unless multiple objects
   #     can be loaded at once.
+  #   - :eager_block - If given, use the block instead of the default block when
+  #     eagerly loading.  To not use a block when eager loading (when one is used normally),
+  #     set to nil.
   #   - :eager_graph - The associations to eagerly load via EagerLoading#eager_graph when loading the associated object(s).
   #     For many_to_one associations, this is ignored unless this association is
   #     being eagerly loaded, as it doesn't save queries unless multiple objects
   #     can be loaded at once.
-  #   - :eager_block - If given, use the block instead of the default block when
-  #     eagerly loading.  To not use a block when eager loading (when one is used normally),
-  #     set to nil.
+  #   - :eager_loader - A proc to use to implement eager loading, overriding the default.  Takes three arguments,
+  #     a key hash (used solely to enhance performance), an array of records,
+  #     and a hash of dependent associations.  The associated records should
+  #     be queried from the database and the associations cache for each
+  #     record should be populated for this to work correctly.
   #   - :graph_block - The block to pass to join_table when eagerly loading
   #     the association via eager_graph.
   #   - :graph_conditions - The additional conditions to use on the SQL join when eagerly loading
@@ -248,6 +253,11 @@ module Sequel::Model::Associations
     :"#{name}_dataset"
   end
 
+  # Name symbol for _dataset association method
+  def association_eager_dataset_method_name(name)
+    :"#{name}_eager_dataset"
+  end
+
   # Name symbol for _helper internal association method
   def association_helper_method_name(name)
     :"#{name}_helper"
@@ -288,9 +298,11 @@ module Sequel::Model::Associations
   def def_association_dataset_methods(opts)
     name = opts[:name]
     dataset_method = association_dataset_method_name(name)
+    eager_dataset_method = association_eager_dataset_method_name(name)
     helper_method = association_helper_method_name(name)
     dataset = opts[:dataset]
     dataset_helper = opts[:block]
+    eager_block = opts[:eager_block]
     order = opts[:order]
     eager = opts[:eager]
     eager_graph = opts[:eager_graph]
@@ -317,6 +329,18 @@ module Sequel::Model::Associations
       ds
     end
     
+    # define a method returning the association dataset suitable for eager_loading
+    meta_def(eager_dataset_method) do |ds, select, associations|
+      ds = ds.select(*select)
+      ds = ds.order(*order) if order
+      ds = ds.limit(*limit) if limit
+      ds = ds.eager(eager) if eager
+      ds = ds.eager_graph(eager_graph) if eager_graph
+      ds = ds.eager(associations) unless associations.blank?
+      ds = eager_block.call(ds) if eager_block
+      ds
+    end
+    
     class_def(name) do |*reload|
       if @associations.include?(name) and !reload[0]
         @associations[name]
@@ -336,16 +360,26 @@ module Sequel::Model::Associations
   # Adds many_to_many association instance methods
   def def_many_to_many(opts)
     name = opts[:name]
+    model = self
     left = (opts[:left_key] ||= default_remote_key)
     right = (opts[:right_key] ||= default_foreign_key(opts))
     opts[:class_name] ||= name.to_s.singularize.camelize
     join_table = (opts[:join_table] ||= default_join_table_name(opts))
-    opts[:left_key_alias] ||= :x_foreign_key_x
-    opts[:left_key_select] ||= left.qualify(join_table).as(opts[:left_key_alias])
+    left_key_alias = opts[:left_key_alias] ||= :x_foreign_key_x
+    left_key_select = opts[:left_key_select] ||= left.qualify(join_table).as(opts[:left_key_alias])
     opts[:graph_join_table_conditions] = opts[:graph_join_table_conditions] ? opts[:graph_join_table_conditions].to_a : []
     opts[:graph_join_table_join_type] ||= opts[:graph_join_type]
     opts[:dataset] ||= proc{opts.associated_class.inner_join(join_table, [[right, opts.associated_primary_key], [left, pk]])}
     database = db
+    
+    opts[:eager_loader] ||= proc do |key_hash, records, associations|
+      h = key_hash[model.primary_key]
+      records.each{|object| object.associations[name] = []}
+      model.send(association_eager_dataset_method_name(name), opts.associated_class.inner_join(join_table, [[right, opts.associated_primary_key], [left, h.keys]]), Array(opts.select) + Array(left_key_select), associations).all do |assoc_record|
+        next unless objects = h[assoc_record.values.delete(left_key_alias)]
+        objects.each{|object| object.associations[name].push(assoc_record)}
+      end
+    end
     
     def_association_dataset_methods(opts)
 
@@ -374,11 +408,26 @@ module Sequel::Model::Associations
   # Adds many_to_one association instance methods
   def def_many_to_one(opts)
     name = opts[:name]
+    model = self
     key = (opts[:key] ||= default_foreign_key(opts))
     opts[:class_name] ||= name.to_s.camelize
     opts[:dataset] ||= proc do
       klass = opts.associated_class
       klass.filter(opts.associated_primary_key.qualify(klass.table_name)=>send(key))
+    end
+    opts[:eager_loader] ||= proc do |key_hash, records, associations|
+      h = key_hash[key]
+      keys = h.keys
+      # Skip eager loading if no objects have a foreign key for this association
+      unless keys.empty?
+        # Default the cached association to nil, so any object that doesn't have it
+        # populated will have cached the negative lookup.
+        records.each{|object| object.associations[name] = nil}
+        model.send(association_eager_dataset_method_name(name), opts.associated_class.filter(opts.associated_primary_key.qualify(opts.associated_class.table_name)=>keys),  opts.select, associations).all do |assoc_record|
+          next unless objects = h[assoc_record.pk]
+          objects.each{|object| object.associations[name] = assoc_record}
+        end
+      end
     end
 
     def_association_dataset_methods(opts)
@@ -401,11 +450,24 @@ module Sequel::Model::Associations
   # Adds one_to_many association instance methods
   def def_one_to_many(opts)
     name = opts[:name]
+    model = self
     key = (opts[:key] ||= default_remote_key)
     opts[:class_name] ||= name.to_s.singularize.camelize
     opts[:dataset] ||= proc do
       klass = opts.associated_class
       klass.filter(key.qualify(klass.table_name) => pk)
+    end
+    opts[:eager_loader] ||= proc do |key_hash, records, associations|
+      h = key_hash[model.primary_key]
+      records.each{|object| object.associations[name] = []}
+      reciprocal = opts.reciprocal
+      model.send(association_eager_dataset_method_name(name), opts.associated_class.filter(key.qualify(opts.associated_class.table_name)=>h.keys), opts.select, associations).all do |assoc_record|
+        next unless objects = h[assoc_record[key]]
+        objects.each do |object| 
+          object.associations[name].push(assoc_record)
+          assoc_record.associations[reciprocal] = object if reciprocal
+        end
+      end
     end
     
     def_association_dataset_methods(opts)
