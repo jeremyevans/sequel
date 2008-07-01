@@ -314,21 +314,6 @@ describe Sequel::Model, "#eager" do
     MODEL_DB.sqls.length.should == 2
   end
   
-  it "should respect :limit when eagerly loading" do
-    a = EagerBand.eager(:top_10_albums).all
-    a.should be_a_kind_of(Array)
-    a.size.should == 1
-    a.first.should be_a_kind_of(EagerBand)
-    a.first.values.should == {:id => 2}
-    MODEL_DB.sqls.should == ['SELECT * FROM bands', 'SELECT albums.* FROM albums WHERE (albums.band_id IN (2)) LIMIT 10']
-    a = a.first
-    a.top_10_albums.should be_a_kind_of(Array)
-    a.top_10_albums.size.should == 1
-    a.top_10_albums.first.should be_a_kind_of(EagerAlbum)
-    a.top_10_albums.first.values.should == {:id => 1, :band_id=> 2}
-    MODEL_DB.sqls.length.should == 2
-  end
-  
   it "should populate the reciprocal many_to_one association when eagerly loading the one_to_many association" do
     a = EagerAlbum.eager(:tracks).all
     a.should be_a_kind_of(Array)

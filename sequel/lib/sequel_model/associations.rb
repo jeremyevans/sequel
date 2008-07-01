@@ -333,7 +333,6 @@ module Sequel::Model::Associations
     meta_def(eager_dataset_method) do |ds, select, associations|
       ds = ds.select(*select)
       ds = ds.order(*order) if order
-      ds = ds.limit(*limit) if limit
       ds = ds.eager(eager) if eager
       ds = ds.eager_graph(eager_graph) if eager_graph
       ds = ds.eager(associations) unless associations.blank?

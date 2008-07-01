@@ -56,8 +56,8 @@ module Sequel::Model::Associations::EagerLoading
   # or join the tables you need to filter on manually. 
   #
   # Each association's order, if definied, is respected. Eager also works
-  # on a limited dataset.  If the association uses a block or has an :eager_block
-  # argument, it is used.
+  # on a limited dataset, but does not use any :limit options for associations.
+  # If the association uses a block or has an :eager_block argument, it is used.
   def eager(*associations)
     model = check_model
     opt = @opts[:eager]
@@ -90,7 +90,7 @@ module Sequel::Model::Associations::EagerLoading
   # This does not respect each association's order, as all associations are loaded in
   # a single query.  If you want to order the results, you must manually call .order.
   #
-  # #eager_graph probably won't work the way you suspect with limit, unless you are
+  # #eager_graph probably won't work correctly on a limited dataset, unless you are
   # only graphing many_to_one associations.
   # 
   # Does not use the block defined for the association, since it does a single query for
