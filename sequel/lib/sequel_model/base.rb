@@ -8,6 +8,7 @@ module Sequel
     @allowed_columns = nil
     @dataset_methods = {}
     @primary_key = :id
+    @raise_on_save_failure = true
     @restrict_primary_key = true
     @restricted_columns = nil
     @sti_dataset = nil
@@ -25,6 +26,10 @@ module Sequel
 
     # The default primary key for classes (default: :id)
     metaattr_reader :primary_key
+
+    # Whether to raise an error instead of returning nil on a failure
+    # to save/create/save_changes/etc.
+    metaattr_accessor :raise_on_save_failure
 
     # Which columns should not be update in a call to set
     # (default: no columns).
@@ -57,8 +62,8 @@ module Sequel
 
     # Instance variables that are inherited in subclasses
     INHERITED_INSTANCE_VARIABLES = {:@allowed_columns=>:dup, :@cache_store=>nil,
-      :@cache_ttl=>nil, :@dataset_methods=>:dup,
-      :@primary_key=>nil, :@restricted_columns=>:dup, :@restrict_primary_key=>nil,
+      :@cache_ttl=>nil, :@dataset_methods=>:dup, :@primary_key=>nil, 
+      :@raise_on_save_failure=>nil, :@restricted_columns=>:dup, :@restrict_primary_key=>nil,
       :@sti_dataset=>nil, :@sti_key=>nil, :@strict_param_setting=>nil,
       :@typecast_on_assignment=>nil}
 
@@ -93,7 +98,7 @@ module Sequel
     # returns false.
     def self.create(values = {}, &block)
       obj = new(values, &block)
-      return false if obj.save == false
+      return unless obj.save
       obj
     end
 

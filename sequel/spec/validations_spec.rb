@@ -753,6 +753,7 @@ describe "Model#save" do
   end
 
   specify "should save only if validations pass" do
+    @m.raise_on_save_failure = false
     @m.should_not be_valid
     @m.save
     MODEL_DB.sqls.should be_empty
@@ -763,7 +764,12 @@ describe "Model#save" do
     MODEL_DB.sqls.should == ['UPDATE people SET id = 5 WHERE (id = 5)']
   end
   
-  specify "should return false if validations fail" do
-    @m.save.should == false
+  specify "should raise error if validations fail and raise_on_save_faiure is true" do
+    proc{@m.save}.should raise_error(Sequel::Error)
+  end
+  
+  specify "should return nil if validations fail and raise_on_save_faiure is false" do
+    @m.raise_on_save_failure = false
+    @m.save.should == nil
   end
 end

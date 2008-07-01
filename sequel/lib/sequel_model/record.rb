@@ -2,7 +2,7 @@ module Sequel
   class Model
     # The setter methods (methods ending with =) that are never allowed
     # to be called automatically via set.
-    RESTRICTED_SETTER_METHODS = %w"== === []= taguri= typecast_on_assignment="
+    RESTRICTED_SETTER_METHODS = %w"== === []= taguri= typecast_on_assignment= strict_param_setting= raise_on_save_failure="
 
     # The current cached associations.  A hash with the keys being the
     # association name symbols and the values being the associated object
@@ -13,6 +13,10 @@ module Sequel
     # see Model#[]=.
     attr_reader :changed_columns
     
+    # Whether this model instance should raise an exception instead of
+    # returning nil on a failure to save/save_changes/etc.
+    attr_writer :raise_on_save_failure
+
     # Whether this model instance should raise an error if attempting
     # to call a method through set/update and their variants that either
     # doesn't exist or access to it is denied.
@@ -42,6 +46,7 @@ module Sequel
       @associations = {}
       @db_schema = model.db_schema
       @changed_columns = []
+      @raise_on_save_failure = model.raise_on_save_failure
       @strict_param_setting = model.strict_param_setting
       @typecast_on_assignment = model.typecast_on_assignment
       if from_db
@@ -108,7 +113,7 @@ module Sequel
     # the item from the database and returns self.
     def destroy
       db.transaction do
-        return false if before_destroy == false
+        return save_failure(:destroy) if before_destroy == false
         delete
         after_destroy
       end
@@ -187,12 +192,13 @@ module Sequel
     alias_method :reload, :refresh
 
     # Creates or updates the record, after making sure the record
-    # is valid.  If the record is not valid, returns false.
-    # If before_save, before_create (if new?), or before_update
-    # (if !new?) return false, returns false.  Otherwise,
-    # returns self.
+    # is valid.  If the record is not valid, or before_save,
+    # before_create (if new?), or before_update (if !new?) return
+    # false, returns nil unless raise_on_save_failure is true.
+    # Otherwise, returns self. You can provide an optional list of
+    # columns to update, in which case it only updates those columns.
     def save(*columns)
-      return false unless valid?
+      return save_failure(:save) unless valid?
       save!(*columns)
     end
 
@@ -200,12 +206,12 @@ module Sequel
     # it first. You can provide an optional list of columns to update,
     # in which case it only updates those columns.
     # If before_save, before_create (if new?), or before_update
-    # (if !new?) return false, returns false.  Otherwise,
-    # returns self.
+    # (if !new?) return false, returns nil unless raise_on_save_failure
+    # is true.  Otherwise, returns self.
     def save!(*columns)
-      return false if before_save == false
+      return save_failure(:save) if before_save == false
       if @new
-        return false if before_create == false
+        return save_failure(:create) if before_create == false
         iid = model.dataset.insert(@values)
         # if we have a regular primary key and it's not set in @values,
         # we assume it's the last inserted id
@@ -219,7 +225,7 @@ module Sequel
         @new = false
         after_create
       else
-        return false if before_update == false
+        return save_failure(:update) if before_update == false
         if columns.empty?
           this.update(@values)
           @changed_columns = []
@@ -234,9 +240,10 @@ module Sequel
     end
     
     # Saves only changed columns or does nothing if no columns are marked as 
-    # chanaged.
+    # chanaged.  If no columns have been changed, returns nil.  If unable to
+    # save, returns false unless raise_on_save_failure is true.
     def save_changes
-      save(*@changed_columns) unless @changed_columns.empty?
+      save(*@changed_columns) || false unless @changed_columns.empty?
     end
 
     # Updates the instance with the supplied values with support for virtual
@@ -359,6 +366,11 @@ module Sequel
       when :one_to_many
         o.associations[reciprocal] = nil
       end
+    end
+
+    # Raise an error if raise_on_save_failure is true
+    def save_failure(action)
+      raise Error, "unable to #{action} record" if @raise_on_save_failure
     end
 
     # Set the columns, filtered by the only and except arrays.
