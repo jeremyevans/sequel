@@ -1,5 +1,7 @@
 === HEAD
 
+* Allow the use of URL parameters in connection strings (jeremyevans)
+
 * Ignore any previously selected columns when using Dataset#graph for the first time (jeremyevans)
 
 * Dataset#graph now accepts a block which is passed to join_table (jeremyevans)

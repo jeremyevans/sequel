@@ -133,25 +133,21 @@ module Sequel
     # Converts a uri to an options hash. These options are then passed
     # to a newly created database object.
     def self.uri_to_options(uri)
-      if uri.is_a?(String)
-        uri = URI.parse(uri)
-      end
+      uri = URI.parse(uri) if uri.is_a?(String)
       # special case for sqlite
-      if uri.scheme == 'sqlite'
-        {
-          :user => uri.user,
+      opts = if uri.scheme == 'sqlite'
+        { :user => uri.user,
           :password => uri.password,
-          :database => (uri.host.nil? && uri.path == '/') ? nil : "#{uri.host}#{uri.path}"
-        }
+          :database => (uri.host.nil? && uri.path == '/') ? nil : "#{uri.host}#{uri.path}" }
       else
-        {
-          :user => uri.user,
+        { :user => uri.user,
           :password => uri.password,
           :host => uri.host,
           :port => uri.port,
-          :database => (m = /\/(.*)/.match(uri.path)) && (m[1])
-        }
+          :database => (m = /\/(.*)/.match(uri.path)) && (m[1]) }
       end
+      uri.query.split('&').collect{|s| s.split('=')}.each{|k,v| opts[k.to_sym] = v} unless uri.query.blank?
+      opts
     end
     
     ### Private Class Methods ###

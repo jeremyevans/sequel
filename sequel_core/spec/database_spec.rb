@@ -587,6 +587,15 @@ context "A Database adapter with a scheme" do
     c.should be_a_kind_of(CCC)
     c.opts.should == {:adapter => :ccc, :database => 'mydb'}
   end
+
+  specify "should be accessible through Sequel.connect with URL parameters" do
+    c = Sequel.connect 'ccc://localhost/db?host=/tmp&user=test'
+    c.should be_a_kind_of(CCC)
+    c.opts[:host].should == '/tmp'
+    c.opts[:database].should == 'db'
+    c.opts[:user].should == 'test'
+  end
+
 end
 
 context "An unknown database scheme" do
