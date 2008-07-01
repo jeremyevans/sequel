@@ -385,6 +385,12 @@ describe Sequel::Model do
     @m.should_not be_valid
     @m.value = 1234
     @m.should be_valid
+    @m.value = nil
+    @m.should_not be_valid
+    @m.value = true
+    @m.should be_valid
+    @m.value = false
+    @m.should be_valid
   end
 
   specify "should validate presence_of with if => true" do

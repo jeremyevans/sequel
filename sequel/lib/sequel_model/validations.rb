@@ -201,7 +201,7 @@ module Sequel
       
       validates_each(*atts) do |o, a, v|
         next unless o.instance_eval(&if_proc(opts))
-        o.errors[a] << opts[:message] unless v && !v.blank?
+        o.errors[a] << opts[:message] if v.blank? && v != false
       end
     end
 

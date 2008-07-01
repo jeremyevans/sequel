@@ -1,5 +1,7 @@
 === HEAD
 
+* Model.validates_presence_of now considers false as present instead of absent (jeremyevans)
+
 * Add Model.raise_on_save_failure, raising errors on save failure instead of return false (now nil), default to true (jeremyevans)
 
 * Add :eager_loader association option, to specify code to be run when eager loading (jeremyevans)
