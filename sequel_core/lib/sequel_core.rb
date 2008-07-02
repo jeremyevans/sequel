@@ -33,12 +33,19 @@ end
 # ParseTree filters:
 #
 #   Sequel.use_parse_tree = false
+#
+# Sequel converts the column type tinyint to a boolean by default,
+# you can override the conversion to use tinyint as an integer:
+#
+#   Sequel.convert_tinyint_to_bool = false
 module Sequel
   @datetime_class = Time
   @use_parse_tree = !defined?(SEQUEL_NO_PARSE_TREE)
-
+  @convert_tinyint_to_bool = true
+  
   metaattr_accessor :datetime_class
   metaattr_accessor :use_parse_tree
+  metaattr_accessor :convert_tinyint_to_bool
 
   Deprecation.deprecation_message_stream = $stderr
 
