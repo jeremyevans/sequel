@@ -227,7 +227,7 @@ module Sequel
       # integer, string, date, datetime, boolean, and float.
       def schema_column_type(db_type)
         case db_type
-        when /\A(int(eger)?|bigint|smallint)\z/
+        when Sequel.convert_tinyint_to_bool ? /\A(int(eger)?|bigint|smallint)\z/ : /\A(int(eger)?|bigint|smallint|tinyint)\z/
           :integer
         when /\A(character( varying)?|varchar|text)\z/
           :string
@@ -237,7 +237,7 @@ module Sequel
           :datetime
         when /\Atime( with(out)? time zone)?\z/
           :time
-        when /\A(boolean|tinyint)\z/
+        when Sequel.convert_tinyint_to_bool ? /\A(boolean|tinyint)\z/ : /\A(boolean)\z/
           :boolean
         when /\A(real|float|double( precision)?)\z/
           :float

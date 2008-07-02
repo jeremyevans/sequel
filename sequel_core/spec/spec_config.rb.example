@@ -1,6 +1,7 @@
 # database objects for running adapter specs
 # INFORMIX_DB = Sequel.connect('informix://localhost/mydb')
-# MYSQL_DB = Sequel.connect('mysql://root@localhost/sandbox')
+# MYSQL_USER = 'root'
+# MYSQL_DB = Sequel.connect("mysql://#{MYSQL_USER}@localhost/sandbox")
 # MYSQL_SOCKET_FILE = '/tmp/mysql.sock'
 # ORACLE_DB = Sequel.connect('oracle://hr:hr@localhost/XE')
 # POSTGRES_DB = Sequel.connect('postgres://postgres:postgres@localhost:5432/reality_spec')

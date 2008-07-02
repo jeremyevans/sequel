@@ -1,7 +1,10 @@
 require File.join(File.dirname(__FILE__), '../spec_helper.rb')
 
+unless defined?(MYSQL_USER)
+  MYSQL_USER = 'root'
+end
 unless defined?(MYSQL_DB)
-  MYSQL_URL = (ENV['SEQUEL_MY_SPEC_DB']||'mysql://root@localhost/sandbox') unless defined? MYSQL_URL
+  MYSQL_URL = (ENV['SEQUEL_MY_SPEC_DB']||"mysql://#{MYSQL_USER}@localhost/sandbox") unless defined? MYSQL_URL
   MYSQL_DB = Sequel.connect(MYSQL_URL)
 end
 unless defined?(MYSQL_SOCKET_FILE)
@@ -66,6 +69,10 @@ context "A MySQL database" do
 
   specify "should correctly parse the schema" do
     @db.schema(:booltest, :reload=>true).should == [[:value, {:type=>:boolean, :allow_null=>true, :max_chars=>nil, :default=>nil, :db_type=>"tinyint", :numeric_precision=>3}]]
+    
+    Sequel.convert_tinyint_to_bool = false
+    @db.schema(:booltest, :reload=>true).should == [[:value, {:type=>:integer, :allow_null=>true, :max_chars=>nil, :default=>nil, :db_type=>"tinyint", :numeric_precision=>3}]]
+    Sequel.convert_tinyint_to_bool = true
   end
 
   specify "should get the schema all database tables if no table name is used" do
@@ -264,13 +271,30 @@ context "MySQL datasets" do
       "SELECT `market`, minute(from_unixtime(`ack`)) AS `minute` FROM `orders` WHERE ((`ack` > #{@d.literal(ack_stamp)}) AND (`market` = 'ICE')) GROUP BY minute(from_unixtime(`ack`))"
   end
 
-  specify "should accept and return tinyints as bools" do
+  specify "should accept and return tinyints as bools or integers when configured to do so" do
     MYSQL_DB[:booltest].delete
     MYSQL_DB[:booltest] << {:value=>true}
     MYSQL_DB[:booltest].all.should == [{:value=>true}]
     MYSQL_DB[:booltest].delete
     MYSQL_DB[:booltest] << {:value=>false}
     MYSQL_DB[:booltest].all.should == [{:value=>false}]
+    
+    Sequel.convert_tinyint_to_bool = false
+    MYSQL_DB[:booltest].delete
+    MYSQL_DB[:booltest] << {:value=>true}
+    MYSQL_DB[:booltest].all.should == [{:value=>1}]
+    MYSQL_DB[:booltest].delete
+    MYSQL_DB[:booltest] << {:value=>false}
+    MYSQL_DB[:booltest].all.should == [{:value=>0}]
+    
+    MYSQL_DB[:booltest].delete
+    MYSQL_DB[:booltest] << {:value=>1}
+    MYSQL_DB[:booltest].all.should == [{:value=>1}]
+    MYSQL_DB[:booltest].delete
+    MYSQL_DB[:booltest] << {:value=>0}
+    MYSQL_DB[:booltest].all.should == [{:value=>0}]
+    
+    Sequel.convert_tinyint_to_bool = true
   end
 end
 
@@ -466,17 +490,17 @@ end
 if %w'localhost 127.0.0.1 ::1'.include? MYSQL_URI.host
   context "A MySQL database" do
     specify "should accept a socket option" do
-      db = Sequel.mysql(MYSQL_DB_NAME, :host => 'localhost', :user => 'root', :socket => MYSQL_SOCKET_FILE)
+      db = Sequel.mysql(MYSQL_DB_NAME, :host => 'localhost', :user => MYSQL_USER, :socket => MYSQL_SOCKET_FILE)
       proc {db.test_connection}.should_not raise_error
     end
     
     specify "should accept a socket option without host option" do
-      db = Sequel.mysql(MYSQL_DB_NAME, :user => 'root', :socket => MYSQL_SOCKET_FILE)
+      db = Sequel.mysql(MYSQL_DB_NAME, :user => MYSQL_USER, :socket => MYSQL_SOCKET_FILE)
       proc {db.test_connection}.should_not raise_error
     end
     
     specify "should fail to connect with invalid socket" do
-      db = Sequel.mysql(MYSQL_DB_NAME, :host => 'localhost', :user => 'root', :socket => 'blah')
+      db = Sequel.mysql(MYSQL_DB_NAME, :host => 'localhost', :user => MYSQL_USER, :socket => 'blah')
       proc {db.test_connection}.should raise_error
     end
   end
