@@ -251,14 +251,12 @@ context "A PostgreSQL dataset" do
     @d.filter(:name => /^bc/).count.should == 1
   end
 
-  specify "should consider strings containing backslashes to be escaped string literals" do
-    @d.literal("\\dingo").should == "'\\\\dingo'"   # literally, E'\\dingo'
-    @d.literal("dingo").should == "'dingo'"
+  specify "should correctly escape strings" do
+    POSTGRES_DB['SELECT ? AS a', "\\dingo"].get(:a) == "\\dingo"
   end
 
   specify "should properly escape binary data" do
-    @d.literal("\1\2\3".to_blob).should == "'\\\\001\\\\002\\\\003'"
-    @d.literal("dingo".to_blob).should == "'dingo'"
+    POSTGRES_DB['SELECT ? AS a', "\1\2\3".to_blob].get(:a) == "\1\2\3"
   end
 
   specify "should retrieve binary data as Blob object" do
