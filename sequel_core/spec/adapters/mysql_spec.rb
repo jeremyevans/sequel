@@ -39,6 +39,9 @@ context "A MySQL database" do
   setup do
     @db = MYSQL_DB
   end
+  teardown do
+    Sequel.convert_tinyint_to_bool = true
+  end
   
   specify "should provide disconnect functionality" do
     @db.tables
@@ -72,7 +75,6 @@ context "A MySQL database" do
     
     Sequel.convert_tinyint_to_bool = false
     @db.schema(:booltest, :reload=>true).should == [[:value, {:type=>:integer, :allow_null=>true, :max_chars=>nil, :default=>nil, :db_type=>"tinyint", :numeric_precision=>3}]]
-    Sequel.convert_tinyint_to_bool = true
   end
 
   specify "should get the schema all database tables if no table name is used" do
@@ -255,6 +257,9 @@ context "MySQL datasets" do
   setup do
     @d = MYSQL_DB[:orders]
   end
+  teardown do
+    Sequel.convert_tinyint_to_bool = true
+  end
   
   specify "should correctly quote column references" do
     @d.quote_identifiers = true
@@ -293,8 +298,6 @@ context "MySQL datasets" do
     MYSQL_DB[:booltest].delete
     MYSQL_DB[:booltest] << {:value=>0}
     MYSQL_DB[:booltest].all.should == [{:value=>0}]
-    
-    Sequel.convert_tinyint_to_bool = true
   end
 end
 
