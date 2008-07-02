@@ -1,5 +1,9 @@
 === HEAD
 
+* Add :before_add, :after_add, :before_remove, :after_remove association callback options (jeremyevans)
+
+* Break many_to_one association setter method in two parts, for easier overriding (jeremyevans)
+
 * Model.validates_presence_of now considers false as present instead of absent (jeremyevans)
 
 * Add Model.raise_on_save_failure, raising errors on save failure instead of return false (now nil), default to true (jeremyevans)

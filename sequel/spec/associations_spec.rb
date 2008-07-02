@@ -263,6 +263,89 @@ describe Sequel::Model, "many_to_one" do
     MODEL_DB.sqls.should == ["SELECT nodes.* FROM nodes WHERE (nodes.id = 234) LIMIT 1"]
     d.associations[:parent].should == e
   end
+
+  it "should make the change to the foreign_key value inside a _association= method" do
+    @c2.many_to_one :parent, :class => @c2
+    @c2.private_instance_methods.sort.should(include("_parent="))
+    p = @c2.new
+    c = @c2.load(:id=>123)
+    def p._parent=(x)
+      @x = x
+    end
+    p.should_not_receive(:parent_id=)
+    p.parent = c
+    p.instance_variable_get(:@x).should == c
+  end
+
+  it "should support association callbacks" do
+    h = []
+    @c2.many_to_one :parent, :class => @c2, :before_add=>[proc{|x,y| h << x.pk; h << -y.pk}, :blah], :after_add=>proc{h << 3}, :before_remove=>:blah, :after_remove=>[:blahr]
+    @c2.class_eval do
+      @@blah = h
+      def []=(a, v)
+        a == :parent_id ? (@@blah << (v ? 4 : 5)) : super
+      end
+      def blah(x)
+        @@blah << x.pk
+      end
+      def blahr(x)
+        @@blah << 6
+      end
+    end
+    p = @c2.load(:id=>10)
+    c = @c2.load(:id=>123)
+    h.should == []
+    p.parent = c
+    h.should == [10, -123, 123, 4, 3]
+    p.parent = nil
+    h.should == [10, -123, 123, 4, 3, 123, 5, 6]
+  end
+
+  it "should raise error and not call internal add or remove method if before callback returns false, even if raise_on_save_failure is false" do
+    # The reason for this is that assignment in ruby always returns the argument instead of the result
+    # of the method, so we can't return nil to signal that the association callback prevented the modification
+    p = @c2.new
+    c = @c2.load(:id=>123)
+    p.raise_on_save_failure = false
+    @c2.many_to_one :parent, :class => @c2, :before_add=>:ba, :before_remove=>:br
+    p.should_receive(:ba).once.with(c).and_return(false)
+    p.should_not_receive(:_parent=)
+    proc{p.parent = c}.should raise_error(Sequel::Error)
+    p.parent.should == nil
+    p.associations[:parent] = c
+    p.parent.should == c
+    p.should_receive(:br).once.with(c).and_return(false)
+    proc{p.parent = nil}.should raise_error(Sequel::Error)
+  end
+
+  it "should call the remove callbacks for the previous object and the add callbacks for the new object" do
+    c = @c2.load(:id=>123)
+    d = @c2.load(:id=>321)
+    p = @c2.new
+    p.associations[:parent] = d
+    h = []
+    @c2.many_to_one :parent, :class => @c2, :before_add=>:ba, :before_remove=>:br, :after_add=>:aa, :after_remove=>:ar
+    @c2.class_eval do
+      @@blah = h
+      def []=(a, v)
+        a == :parent_id ? (@@blah << 5) : super
+      end
+      def ba(x)
+        @@blah << x.pk
+      end
+      def br(x)
+        @@blah << x.pk * -1
+      end
+      def aa(x)
+        @@blah << x.pk * 2
+      end
+      def ar(x)
+        @@blah << x.pk * -2
+      end
+    end
+    p.parent = c
+    h.should == [-321, 123, 5, 246, -642]
+  end
 end
 
 describe Sequel::Model, "one_to_many" do
@@ -723,6 +806,92 @@ describe Sequel::Model, "one_to_many" do
     meths.should(include("add_attribute"))
     meths.should(include("attributes_dataset"))
   end
+
+  it "should call an _add_ method internally to add attributes" do
+    @c2.one_to_many :attributes, :class => @c1
+    @c2.private_instance_methods.sort.should(include("_add_attribute"))
+    p = @c2.load(:id=>10)
+    c = @c1.load(:id=>123)
+    def p._add_attribute(x)
+      @x = x
+    end
+    c.should_not_receive(:node_id=)
+    p.add_attribute(c)
+    p.instance_variable_get(:@x).should == c
+  end
+
+  it "should call a _remove_ method internally to remove attributes" do
+    @c2.one_to_many :attributes, :class => @c1
+    @c2.private_instance_methods.sort.should(include("_remove_attribute"))
+    p = @c2.load(:id=>10)
+    c = @c1.load(:id=>123)
+    def p._remove_attribute(x)
+      @x = x
+    end
+    c.should_not_receive(:node_id=)
+    p.remove_attribute(c)
+    p.instance_variable_get(:@x).should == c
+  end
+
+  it "should support association callbacks" do
+    h = []
+    @c2.one_to_many :attributes, :class => @c1, :before_add=>[proc{|x,y| h << x.pk; h << -y.pk}, :blah], :after_add=>proc{h << 3}, :before_remove=>:blah, :after_remove=>[:blahr]
+    @c2.class_eval do
+      @@blah = h
+      def _add_attribute(v)
+        @@blah << 4
+      end
+      def _remove_attribute(v)
+        @@blah << 5
+      end
+      def blah(x)
+        @@blah << x.pk
+      end
+      def blahr(x)
+        @@blah << 6
+      end
+    end
+    p = @c2.load(:id=>10)
+    c = @c1.load(:id=>123)
+    h.should == []
+    p.add_attribute(c)
+    h.should == [10, -123, 123, 4, 3]
+    p.remove_attribute(c)
+    h.should == [10, -123, 123, 4, 3, 123, 5, 6]
+  end
+
+  it "should raise error and not call internal add or remove method if before callback returns false if raise_on_save_failure is true" do
+    p = @c2.load(:id=>10)
+    c = @c1.load(:id=>123)
+    @c2.one_to_many :attributes, :class => @c1, :before_add=>:ba, :before_remove=>:br
+    p.should_receive(:ba).once.with(c).and_return(false)
+    p.should_not_receive(:_add_attribute)
+    p.should_not_receive(:_remove_attribute)
+    p.associations[:attributes] = []
+    proc{p.add_attribute(c)}.should raise_error(Sequel::Error)
+    p.attributes.should == []
+    p.associations[:attributes] = [c]
+    p.should_receive(:br).once.with(c).and_return(false)
+    proc{p.remove_attribute(c)}.should raise_error(Sequel::Error)
+    p.attributes.should == [c]
+  end
+
+  it "should return nil and not call internal add or remove method if before callback returns false if raise_on_save_failure is false" do
+    p = @c2.load(:id=>10)
+    c = @c1.load(:id=>123)
+    p.raise_on_save_failure = false
+    @c2.one_to_many :attributes, :class => @c1, :before_add=>:ba, :before_remove=>:br
+    p.should_receive(:ba).once.with(c).and_return(false)
+    p.should_not_receive(:_add_attribute)
+    p.should_not_receive(:_remove_attribute)
+    p.associations[:attributes] = []
+    p.add_attribute(c).should == nil
+    p.attributes.should == []
+    p.associations[:attributes] = [c]
+    p.should_receive(:br).once.with(c).and_return(false)
+    p.remove_attribute(c).should == nil
+    p.attributes.should == [c]
+  end
 end
 
 describe Sequel::Model, "many_to_many" do
@@ -1090,6 +1259,93 @@ describe Sequel::Model, "many_to_many" do
     attrib.associations[:nodes].should == [node]
     node.remove_all_attributes
     attrib.associations[:nodes].should == []
+  end
+
+  it "should call an _add_ method internally to add attributes" do
+    @c2.many_to_many :attributes, :class => @c1
+    @c2.private_instance_methods.sort.should(include("_add_attribute"))
+    p = @c2.load(:id=>10)
+    c = @c1.load(:id=>123)
+    def p._add_attribute(x)
+      @x = x
+    end
+    p.add_attribute(c)
+    p.instance_variable_get(:@x).should == c
+    MODEL_DB.sqls.should == []
+  end
+
+  it "should call a _remove_ method internally to remove attributes" do
+    @c2.many_to_many :attributes, :class => @c1
+    @c2.private_instance_methods.sort.should(include("_remove_attribute"))
+    p = @c2.load(:id=>10)
+    c = @c1.load(:id=>123)
+    def p._remove_attribute(x)
+      @x = x
+    end
+    p.remove_attribute(c)
+    p.instance_variable_get(:@x).should == c
+    MODEL_DB.sqls.should == []
+  end
+
+  it "should support association callbacks" do
+    h = []
+    @c2.many_to_many :attributes, :class => @c1, :before_add=>[proc{|x,y| h << x.pk; h << -y.pk}, :blah], :after_add=>proc{h << 3}, :before_remove=>:blah, :after_remove=>[:blahr]
+    @c2.class_eval do
+      @@blah = h
+      def _add_attribute(v)
+        @@blah << 4
+      end
+      def _remove_attribute(v)
+        @@blah << 5
+      end
+      def blah(x)
+        @@blah << x.pk
+      end
+      def blahr(x)
+        @@blah << 6
+      end
+    end
+    p = @c2.load(:id=>10)
+    c = @c1.load(:id=>123)
+    h.should == []
+    p.add_attribute(c)
+    h.should == [10, -123, 123, 4, 3]
+    p.remove_attribute(c)
+    h.should == [10, -123, 123, 4, 3, 123, 5, 6]
+  end
+
+  it "should raise error and not call internal add or remove method if before callback returns false if raise_on_save_failure is true" do
+    p = @c2.load(:id=>10)
+    c = @c1.load(:id=>123)
+    @c2.many_to_many :attributes, :class => @c1, :before_add=>:ba, :before_remove=>:br
+    p.should_receive(:ba).once.with(c).and_return(false)
+    p.should_not_receive(:_add_attribute)
+    p.should_not_receive(:_remove_attribute)
+    p.associations[:attributes] = []
+    p.raise_on_save_failure = true
+    proc{p.add_attribute(c)}.should raise_error(Sequel::Error)
+    p.attributes.should == []
+    p.associations[:attributes] = [c]
+    p.should_receive(:br).once.with(c).and_return(false)
+    proc{p.remove_attribute(c)}.should raise_error(Sequel::Error)
+    p.attributes.should == [c]
+  end
+
+  it "should return nil and not call internal add or remove method if before callback returns false if raise_on_save_failure is false" do
+    p = @c2.load(:id=>10)
+    c = @c1.load(:id=>123)
+    p.raise_on_save_failure = false
+    @c2.many_to_many :attributes, :class => @c1, :before_add=>:ba, :before_remove=>:br
+    p.should_receive(:ba).once.with(c).and_return(false)
+    p.should_not_receive(:_add_attribute)
+    p.should_not_receive(:_remove_attribute)
+    p.associations[:attributes] = []
+    p.add_attribute(c).should == nil
+    p.attributes.should == []
+    p.associations[:attributes] = [c]
+    p.should_receive(:br).once.with(c).and_return(false)
+    p.remove_attribute(c).should == nil
+    p.attributes.should == [c]
   end
 end
 

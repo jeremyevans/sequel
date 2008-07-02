@@ -182,6 +182,9 @@ module Sequel::Model::Associations
     opts[:graph_join_type] ||= :left_outer
     opts[:graph_conditions] = opts[:graph_conditions] ? opts[:graph_conditions].to_a : []
     opts[:graph_select] = Array(opts[:graph_select]) if opts[:graph_select]
+    [:before_add, :before_remove, :after_add, :after_remove].each do |cb_type|
+      opts[cb_type] = Array(opts[cb_type])
+    end
 
     # find class
     case opts[:class]
@@ -242,6 +245,11 @@ module Sequel::Model::Associations
   def association__remove_method_name(name)
     :"_remove_#{name.to_s.singularize}"
   end
+
+  # Name symbol for setter association method
+  def association__setter_method_name(name)
+    :"_#{association_setter_method_name(name)}"
+  end
   
   # Name symbol for add_ association method
   def association_add_method_name(name)
@@ -273,6 +281,11 @@ module Sequel::Model::Associations
     :"remove_#{name.to_s.singularize}"
   end
   
+  # Name symbol for setter association method
+  def association_setter_method_name(name)
+    :"#{name}="
+  end
+  
   # Hash storing the association reflections.  Keys are association name
   # symbols, values are association reflection hashes.
   def association_reflections
@@ -287,9 +300,11 @@ module Sequel::Model::Associations
     class_def(association_add_method_name(name)) do |o|
       raise(Sequel::Error, 'model object does not have a primary key') unless pk
       raise(Sequel::Error, 'associated object does not have a primary key') if need_assoc_pk && !o.pk
+      return if run_association_callbacks(opts, :before_add, o) == false
       send(internal_add_meth, o)
       @associations[name].push(o) if @associations.include?(name)
       add_reciprocal_object(opts, o)
+      run_association_callbacks(opts, :after_add, o)
       o
     end
   end
@@ -433,15 +448,26 @@ module Sequel::Model::Associations
     
     return if opts[:read_only]
 
-    class_def(:"#{name}=") do |o|  
-      raise(Sequel::Error, 'model object does not have a primary key') if o && !o.pk
-      old_val = @associations[name]
+    setter_name = association_setter_method_name(name)
+    internal_setter_name = association__setter_method_name(name)
+
+    class_def(internal_setter_name) do |o|  
       send(:"#{key}=", (o.pk if o))
+    end
+    private internal_setter_name
+
+    class_def(setter_name) do |o|  
+      raise(Sequel::Error, 'model object does not have a primary key') if o && !o.pk
+      old_val = send(name)
+      return o if old_val == o
+      return if old_val and run_association_callbacks(opts, :before_remove, old_val) == false
+      return if o and run_association_callbacks(opts, :before_add, o) == false
+      send(internal_setter_name, o)
       @associations[name] = o
-      if old_val != o
-        remove_reciprocal_object(opts, old_val) if old_val
-        add_reciprocal_object(opts, o) if o
-      end
+      remove_reciprocal_object(opts, old_val) if old_val
+      add_reciprocal_object(opts, o) if o
+      run_association_callbacks(opts, :after_add, o) if o
+      run_association_callbacks(opts, :after_remove, old_val) if old_val
       o
     end
   end
@@ -529,9 +555,11 @@ module Sequel::Model::Associations
     class_def(association_remove_method_name(name)) do |o|
       raise(Sequel::Error, 'model object does not have a primary key') unless pk
       raise(Sequel::Error, 'associated object does not have a primary key') if need_assoc_pk && !o.pk
+      return if run_association_callbacks(opts, :before_remove, o) == false
       send(internal_remove_meth, o)
       @associations[name].delete_if{|x| o === x} if @associations.include?(name)
       remove_reciprocal_object(opts, o)
+      run_association_callbacks(opts, :after_remove, o)
       o
     end
   end

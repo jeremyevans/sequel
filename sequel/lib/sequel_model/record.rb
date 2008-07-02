@@ -368,9 +368,31 @@ module Sequel
       end
     end
 
+    # Run the callback for the association with the object.
+    def run_association_callbacks(reflection, callback_type, object)
+      raise_error = @raise_on_save_failure
+      raise_error = true if reflection[:type] == :many_to_one
+      stop_on_false = true if [:before_add, :before_remove].include?(callback_type)
+      reflection[callback_type].each do |cb|
+        res = case cb
+        when Symbol
+          send(cb, object)
+        when Proc
+          cb.call(self, object)
+        else
+          raise Error, "callbacks should either be Procs or Symbols"
+        end
+        if res == false and stop_on_false
+          save_failure("modify association for", raise_error)
+          return false
+        end
+      end
+    end
+
     # Raise an error if raise_on_save_failure is true
-    def save_failure(action)
-      raise Error, "unable to #{action} record" if @raise_on_save_failure
+    def save_failure(action, raise_error = nil)
+      raise_error = @raise_on_save_failure if raise_error.nil?
+      raise(Error, "unable to #{action} record") if raise_error
     end
 
     # Set the columns, filtered by the only and except arrays.
