@@ -90,7 +90,7 @@ module Sequel::Model::Associations
   #     given, uses the association's name, which is camelized (and
   #     singularized unless the type is :many_to_one)
   #   - :dataset - A proc that is instance_evaled to get the base dataset
-  #     to use for the _dataset method (before the other options are supplied).
+  #     to use for the _dataset method (before the other options are applied).
   #   - :eager - The associations to eagerly load via EagerLoading#eager when loading the associated object(s).
   #     For many_to_one associations, this is ignored unless this association is
   #     being eagerly loaded, as it doesn't save queries unless multiple objects
