@@ -197,6 +197,15 @@ module Sequel
       end
     end
     
+    # Methods that created QualifiedIdentifiers, used for qualifying column
+    # names with a table or table names with a schema.
+    module IdentifierMethods
+      # Qualify the current object with the given table/schema.
+      def identifier
+        Identifier.new(self)
+      end
+    end
+
     # This module includes the methods that are defined on objects that can be 
     # used in a numeric or string context in SQL (Symbol, LiteralString, 
     # SQL::Function, and SQL::StringExpression).
@@ -542,6 +551,27 @@ module Sequel
       def to_s(ds)
         ds.function_sql(self)
       end
+    end
+    
+    # Represents an identifier (column or table). Can be used
+    # to specify a Symbol with multiple underscores should not be
+    # split, or for creating an identifier without using a symbol.
+    class Identifier < GenericExpression
+      include QualifyingMethods
+
+      # The table and column to reference
+      attr_reader :value
+
+      # Set the value to the given argument
+      def initialize(value)
+        @value = value
+      end
+      
+      # Delegate the creation of the resulting SQL to the given dataset,
+      # since it may be database dependent.
+      def to_s(ds)
+        ds.quote_identifier(@value)
+      end 
     end
     
     # IrregularFunction is used for the SQL EXTRACT and CAST functions,

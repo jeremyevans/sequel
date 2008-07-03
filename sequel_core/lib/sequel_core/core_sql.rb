@@ -149,6 +149,7 @@ end
 
 class Symbol
   include Sequel::SQL::QualifyingMethods
+  include Sequel::SQL::IdentifierMethods
   include Sequel::SQL::GenericExpressionMethods
 
   # If no argument is given, returns a Sequel::SQL::ColumnAll object specifying all

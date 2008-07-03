@@ -246,9 +246,26 @@ context "Symbol#*" do
   end
 end
 
-context "Symbol#qualify" do
-  specify "should format a qualified column" do
-    :xyz.qualify(:abc).to_s(Sequel::Dataset.new(nil)).should == 'abc.xyz'
+context "Symbol" do
+  before do
+    @ds = Sequel::Dataset.new(nil)
+    @ds.quote_identifiers = true
+  end
+
+  specify "#identifier should format an identifier" do
+    @ds.literal(:xyz__abc.identifier).should == '"XYZ__ABC"'
+  end
+
+  specify "#qualify should format a qualified column" do
+    @ds.literal(:xyz.qualify(:abc)).should == '"ABC"."XYZ"'
+  end
+
+  specify "should be able to qualify an identifier" do
+    @ds.literal(:xyz.identifier.qualify(:xyz__abc)).should == '"XYZ__ABC"."XYZ"'
+  end
+
+  specify "should be able to specify a schema.table.column" do
+    @ds.literal(:column.qualify(:table__name.qualify(:schema))).should == '"SCHEMA"."TABLE__NAME"."COLUMN"'
   end
 end
 
