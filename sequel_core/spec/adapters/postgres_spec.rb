@@ -269,6 +269,10 @@ context "A PostgreSQL dataset" do
     retrieved_binary_value.should be_a_kind_of(::Sequel::SQL::Blob)
     retrieved_binary_value.should == "\1\2\3"
   end
+
+  specify "should properly receive binary data" do
+    POSTGRES_DB['SELECT ?::bytea AS a', "a"].get(:a) == "a"
+  end
 end
 
 context "A PostgreSQL dataaset with a timestamp field" do

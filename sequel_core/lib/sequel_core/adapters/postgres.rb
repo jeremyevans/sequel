@@ -4,7 +4,41 @@ rescue LoadError => e
   begin 
     require 'postgres' 
     class PGconn
-      metaalias :escape_string, :escape unless self.respond_to?(:escape_string)
+      unless method_defined?(:escape_string)
+        if self.respond_to?(:escape)
+          def escape_string(str)
+            self.class.escape(str)
+          end
+        else
+          def escape_string(obj)
+            raise Sequel::Error, "string escaping not supported with this postgres driver.  Try using ruby-pg, ruby-postgres, or postgres-pr."
+          end
+        end
+      end
+      unless method_defined?(:escape_bytea)
+        if self.respond_to?(:escape_bytea)
+          def escape_bytea(obj)
+            self.class.escape_bytea(obj)
+          end
+        else
+          begin
+            require 'postgres-pr/typeconv/conv'
+            require 'postgres-pr/typeconv/bytea'
+            extend Postgres::Conversion
+            def escape_bytea(obj)
+              self.class.encode_bytea(obj)
+            end
+            metaalias :unescape_bytea, :decode_bytea
+          rescue
+            def escape_bytea(obj)
+              raise Sequel::Error, "bytea escaping not supported with this postgres driver.  Try using ruby-pg, ruby-postgres, or postgres-pr."
+            end
+            def self.unescape_bytea(obj)
+              raise Sequel::Error, "bytea unescaping not supported with this postgres driver.  Try using ruby-pg, ruby-postgres, or postgres-pr."
+            end
+          end
+        end
+      end
       alias_method :finish, :close unless method_defined?(:finish) 
     end
     class PGresult 
