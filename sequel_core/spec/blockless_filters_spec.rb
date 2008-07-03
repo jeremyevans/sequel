@@ -6,19 +6,11 @@ context "Blockless Ruby Filters" do
     db.quote_identifiers = false
     @d = db[:items]
     def @d.l(*args, &block)
-      if block_given?
-        literal(filter_expr(Proc.new(&block)))
-      else
-        literal(filter_expr(*args))
-      end
+      literal(filter_expr(*args, &block))
     end
     def @d.lit(*args)
       literal(*args)
     end
-  end
-
-  after do
-    Sequel.use_parse_tree = true
   end
   
   it "should support boolean columns directly" do
