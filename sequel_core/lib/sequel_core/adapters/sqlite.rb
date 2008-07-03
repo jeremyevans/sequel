@@ -118,6 +118,16 @@ module Sequel
           "ALTER TABLE #{table} ADD #{column_definition_sql(op)}"
         when :add_index
           index_definition_sql(table, op)
+        when :drop_column
+          columns_str = (schema_parse_table(table, {}).map {|c| c[0] } - (Array === op[:name] ? op[:name] : [op[:name]])).join(",")
+          sql  = "BEGIN TRANSACTION;\n"
+          sql += "CREATE TEMPORARY TABLE #{table}_backup(#{columns_str});\n"
+          sql += "INSERT INTO #{table}_backup SELECT #{columns_str} FROM #{table};\n"
+          sql += "DROP TABLE #{table};\n"
+          sql += "CREATE TABLE #{table}(#{columns_str});\n"
+          sql += "INSERT INTO #{table} SELECT #{columns_str} FROM #{table}_backup;\n"
+          sql += "DROP TABLE #{table}_backup;\n"
+          sql += "COMMIT;\n"
         else
           raise Error, "Unsupported ALTER TABLE operation"
         end

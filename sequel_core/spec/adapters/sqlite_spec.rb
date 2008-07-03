@@ -387,8 +387,11 @@ context "A SQLite database" do
     @db[:test2].first.should == {:name => 'mmm', :value => 111, :xyz=>'000'}
   end
   
-  specify "should not support drop_column operations" do
-    proc {@db.drop_column :test2, :value}.should raise_error(Sequel::Error)
+  specify "should support drop_column operations" do
+    @db.drop_column :test2, :value
+    @db[:test2].columns.should == [:name]
+    @db[:test2] << {:name => 'mmm'}
+    @db[:test2].first.should == {:name => 'mmm'}
   end
   
   specify "should not support rename_column operations" do
