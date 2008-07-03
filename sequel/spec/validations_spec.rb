@@ -66,15 +66,11 @@ describe Sequel::Model do
   
   specify "should acccept validation definitions using validates_each" do
     @c.validates_each(:xx, :yy) {|o, a, v| o.errors[a] << 'too low' if v < 50}
-    
-    @c.validations[:xx].size.should == 1
-    @c.validations[:yy].size.should == 1
-    
     o = @c.new
-    @c.validations[:xx].first.call(o, :aa, 40)
-    @c.validations[:yy].first.call(o, :bb, 60)
-    
-    o.errors.full_messages.should == ['aa too low']
+    o.should_receive(:xx).once.and_return(40)
+    o.should_receive(:yy).once.and_return(60)
+    o.valid?.should == false
+    o.errors.full_messages.should == ['xx too low']
   end
 
   specify "should return true/false for has_validations?" do
@@ -83,18 +79,33 @@ describe Sequel::Model do
     @c.has_validations?.should == true
   end
   
+  specify "should overwrite existing validation with the same tag and attribute" do
+    @c.validates_each(:xx, :xx, :tag=>:low) {|o, a, v| o.xxx; o.errors[a] << 'too low' if v < 50}
+    @c.validates_each(:yy, :yy) {|o, a, v| o.yyy; o.errors[a] << 'too low' if v < 50}
+    @c.validates_presence_of(:zz, :zz)
+    o = @c.new
+    def o.zz
+      @a ||= 0
+      @a += 1
+    end
+    o.should_receive(:xx).once.and_return(40)
+    o.should_receive(:yy).once.and_return(60)
+    o.should_receive(:xxx).once
+    o.should_receive(:yyy).twice
+    o.valid?.should == false
+    o.zz.should == 2
+    o.errors.full_messages.should == ['xx too low']
+  end
+
   specify "should provide a validates method that takes block with validation definitions" do
     @c.validates do
       coolness_of :blah
     end
     @c.validations[:blah].should_not be_empty
-
     o = @c.new
-    @c.validations[:blah].first.call(o, :ttt, 40)
-    o.errors.full_messages.should == ['ttt is not cool']
-    o.errors.clear
-    @c.validations[:blah].first.call(o, :ttt, :cool)
-    o.errors.should be_empty
+    o.should_receive(:blah).once.and_return(nil)
+    o.valid?.should == false
+    o.errors.full_messages.should == ['blah is not cool']
   end
 end
 

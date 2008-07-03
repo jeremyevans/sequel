@@ -1,5 +1,7 @@
 === HEAD
 
+* Make validation methods support a :tag option, to work correctly with source reloading (jeremyevans)
+
 * Add :before_add, :after_add, :before_remove, :after_remove association callback options (jeremyevans)
 
 * Break many_to_one association setter method in two parts, for easier overriding (jeremyevans)
