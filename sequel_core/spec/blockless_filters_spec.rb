@@ -292,7 +292,7 @@ context "Blockless Ruby Filters" do
     @d.lit([:x, :z].sql_string_join(' ') + :y).should == "((x || ' ' || z) || y)"
   end
 
-  it "should be supported inside blocks if Sequel.use_parse_tree = false" do
+  it "should be supported inside blocks" do
     @d.l{[[:x, nil], [:y, [1,2,3]]].sql_or}.should == '((x IS NULL) OR (y IN (1, 2, 3)))'
     @d.l{~[[:x, nil], [:y, [1,2,3]]]}.should == '((x IS NOT NULL) OR (y NOT IN (1, 2, 3)))'
     @d.l{~(((('x'.lit - :y)/(:x + :y))*:z) <= 100)}.should == '((((x - y) / (x + y)) * z) > 100)'
