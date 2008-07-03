@@ -205,21 +205,21 @@ describe Sequel::Model, ".subset" do
     @c = Class.new(Sequel::Model(:items))
   end
 
-  pt_specify "should create a filter on the underlying dataset" do
+  specify "should create a filter on the underlying dataset" do
     proc {@c.new_only}.should raise_error(NoMethodError)
     
-    @c.subset(:new_only) {:age == 'new'}
+    @c.subset(:new_only) {:age < 'new'}
     
-    @c.new_only.sql.should == "SELECT * FROM items WHERE (age = 'new')"
-    @c.dataset.new_only.sql.should == "SELECT * FROM items WHERE (age = 'new')"
+    @c.new_only.sql.should == "SELECT * FROM items WHERE (age < 'new')"
+    @c.dataset.new_only.sql.should == "SELECT * FROM items WHERE (age < 'new')"
     
     @c.subset(:pricey) {:price > 100}
     
     @c.pricey.sql.should == "SELECT * FROM items WHERE (price > 100)"
     @c.dataset.pricey.sql.should == "SELECT * FROM items WHERE (price > 100)"
     
-    @c.pricey.new_only.sql.should == "SELECT * FROM items WHERE ((price > 100) AND (age = 'new'))"
-    @c.new_only.pricey.sql.should == "SELECT * FROM items WHERE ((age = 'new') AND (price > 100))"
+    @c.pricey.new_only.sql.should == "SELECT * FROM items WHERE ((price > 100) AND (age < 'new'))"
+    @c.new_only.pricey.sql.should == "SELECT * FROM items WHERE ((age < 'new') AND (price > 100))"
   end
 
 end
@@ -250,11 +250,11 @@ describe Sequel::Model, ".find" do
     $sqls.last.should == "SELECT * FROM items WHERE (name LIKE 'abc%') LIMIT 1"
   end
   
-  pt_specify "should accept filter blocks" do
-    @c.find {:id == 1}.should be_a_kind_of(@c)
-    $sqls.last.should == "SELECT * FROM items WHERE (id = 1) LIMIT 1"
+  specify "should accept filter blocks" do
+    @c.find{:id > 1}.should be_a_kind_of(@c)
+    $sqls.last.should == "SELECT * FROM items WHERE (id > 1) LIMIT 1"
 
-    @c.find {:x > 1 && :y < 2}.should be_a_kind_of(@c)
+    @c.find {(:x > 1) & (:y < 2)}.should be_a_kind_of(@c)
     $sqls.last.should == "SELECT * FROM items WHERE ((x > 1) AND (y < 2)) LIMIT 1"
   end
 

@@ -65,10 +65,3 @@ class << Sequel::Model
 end
 
 Sequel::Model.db = MODEL_DB = MockDatabase.new
-
-class Spec::Example::ExampleGroup
-  def self.pt_specify(*args, &block)
-    specify(*args, &block) if defined?(ParseTree)
-  end 
-end
-

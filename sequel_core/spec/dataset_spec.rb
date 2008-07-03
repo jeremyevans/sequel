@@ -164,11 +164,6 @@ context "A simple dataset" do
       "UPDATE test SET name = 'abc'"
   end
 
-  pt_specify "should format an update statement with block" do
-    @dataset.update_sql {:x << :y}.should ==
-      "UPDATE test SET x = y"
-  end
-  
   specify "should be able to return rows for arbitrary SQL" do
     @dataset.select_sql(:sql => 'xxx yyy zzz').should ==
       "xxx yyy zzz"
@@ -271,7 +266,7 @@ context "Dataset#where" do
       "SELECT * FROM test WHERE ((a = 1) AND (d = 4))"
   end
       
-  pt_specify "should be composable using AND operator (for scoping) with block" do
+  specify "should be composable using AND operator (for scoping) with block" do
     @d3.where{:e < 5}.select_sql.should ==
       "SELECT * FROM test WHERE ((a = 1) AND (e < 5))"
   end
@@ -294,28 +289,11 @@ context "Dataset#where" do
       'SELECT * FROM test WHERE ((table.id >= 4) AND (table.id < 7))'
   end
 
-  pt_specify "should accept ranges with a block" do
-    @dataset.filter {:id == (4..7)}.sql.should ==
-      'SELECT * FROM test WHERE (id >= 4 AND id <= 7)'
-    @dataset.filter {:id.in?(4..7)}.sql.should ==
-      'SELECT * FROM test WHERE (id >= 4 AND id <= 7)'
-
-    @dataset.filter {:table__id == (4..7)}.sql.should ==
-      'SELECT * FROM test WHERE (table.id >= 4 AND table.id <= 7)'
-    @dataset.filter {:table__id.in?(4..7)}.sql.should ==
-      'SELECT * FROM test WHERE (table.id >= 4 AND table.id <= 7)'
-  end
-  
   specify "should accept nil" do
     @dataset.filter(:owner_id => nil).sql.should ==
       'SELECT * FROM test WHERE (owner_id IS NULL)'
   end
 
-  pt_specify "should accept nil with a block" do
-    @dataset.filter{:owner_id.nil?}.sql.should ==
-      'SELECT * FROM test WHERE (owner_id IS NULL)'
-  end
-  
   specify "should accept a subquery" do
     @dataset.filter('gdp > ?', @d1.select(:avg[:gdp])).sql.should ==
       "SELECT * FROM test WHERE (gdp > (SELECT avg(gdp) FROM test WHERE (region = 'Asia')))"
@@ -330,36 +308,24 @@ context "Dataset#where" do
       'SELECT * FROM test WHERE (EXISTS (SELECT * FROM test WHERE (price < 100)))'
   end
   
-  pt_specify "should accept proc expressions" do
+  specify "should accept proc expressions" do
     d = @d1.select(:avg[:gdp])
     @dataset.filter {:gdp > d}.sql.should ==
       "SELECT * FROM test WHERE (gdp > (SELECT avg(gdp) FROM test WHERE (region = 'Asia')))"
     
-    @dataset.filter {:id.in(4..7)}.sql.should ==
-      'SELECT * FROM test WHERE (id >= 4 AND id <= 7)'
-    
-    @dataset.filter {:c == 3}.sql.should ==
-      'SELECT * FROM test WHERE (c = 3)'
-      
-    @dataset.filter {:id == :items__id}.sql.should ==
-      'SELECT * FROM test WHERE (id = items.id)'
-      
     @dataset.filter {:a < 1}.sql.should ==
       'SELECT * FROM test WHERE (a < 1)'
 
-    @dataset.filter {:a != 1}.sql.should ==
-      'SELECT * FROM test WHERE (NOT (a = 1))'
-      
-    @dataset.filter {:a >= 1 && :b <= 2}.sql.should ==
+    @dataset.filter {(:a >= 1) & (:b <= 2)}.sql.should ==
       'SELECT * FROM test WHERE ((a >= 1) AND (b <= 2))'
       
     @dataset.filter {:c.like 'ABC%'}.sql.should ==
       "SELECT * FROM test WHERE (c LIKE 'ABC%')"
 
-    @dataset.filter {:c.like? 'ABC%'}.sql.should ==
+    @dataset.filter {:c.like 'ABC%'}.sql.should ==
       "SELECT * FROM test WHERE (c LIKE 'ABC%')"
 
-    @dataset.filter {:c.like? ['ABC%', '%XYZ']}.sql.should ==
+    @dataset.filter {:c.like 'ABC%', '%XYZ'}.sql.should ==
       "SELECT * FROM test WHERE ((c LIKE 'ABC%') OR (c LIKE '%XYZ'))"
   end
   
@@ -375,7 +341,7 @@ context "Dataset#where" do
       "SELECT * FROM test WHERE 'f'"
   end
 
-  pt_specify "should allow the use of blocks and arguments simultaneously" do
+  specify "should allow the use of blocks and arguments simultaneously" do
     @dataset.filter(:zz < 3){:yy > 3}.sql.should ==
       'SELECT * FROM test WHERE ((zz < 3) AND (yy > 3))'
   end
@@ -403,7 +369,7 @@ context "Dataset#or" do
       'SELECT * FROM test WHERE ((x = 1) OR (yy > 3))'
   end    
 
-  pt_specify "should accept blocks passed to filter" do
+  specify "should accept blocks passed to filter" do
     @d1.or{:yy > 3}.sql.should ==
       'SELECT * FROM test WHERE ((x = 1) OR (yy > 3))'
   end
@@ -416,7 +382,7 @@ context "Dataset#or" do
       'SELECT * FROM test WHERE (((x = 1) OR (y = 2)) AND (z = 3))'
   end
 
-  pt_specify "should allow the use of blocks and arguments simultaneously" do
+  specify "should allow the use of blocks and arguments simultaneously" do
     @d1.or(:zz < 3){:yy > 3}.sql.should ==
       'SELECT * FROM test WHERE ((x = 1) OR ((zz < 3) AND (yy > 3)))'
   end
@@ -448,7 +414,7 @@ context "Dataset#and" do
       'SELECT * FROM test WHERE ((x = 1) AND (yy > 3))'
   end
       
-  pt_specify "should accept blocks passed to filter" do
+  specify "should accept blocks passed to filter" do
     @d1.and {:yy > 3}.sql.should ==
       'SELECT * FROM test WHERE ((x = 1) AND (yy > 3))'
   end
@@ -493,14 +459,14 @@ context "Dataset#exclude" do
       "SELECT * FROM test WHERE ((region != 'Asia') AND (name != 'Japan'))"
   end
   
-  pt_specify "should support proc expressions" do
-    @dataset.exclude{:id == (6...12)}.sql.should == 
-      'SELECT * FROM test WHERE NOT (id >= 6 AND id < 12)'
+  specify "should support proc expressions" do
+    @dataset.exclude{:id < 6}.sql.should == 
+      'SELECT * FROM test WHERE (id >= 6)'
   end
   
-  pt_specify "should allow the use of blocks and arguments simultaneously" do
-    @dataset.exclude(:id => (7..11)){:id == (6...12)}.sql.should == 
-      'SELECT * FROM test WHERE (((id < 7) OR (id > 11)) OR NOT (id >= 6 AND id < 12))'
+  specify "should allow the use of blocks and arguments simultaneously" do
+    @dataset.exclude(:id => (7..11)){:id < 6}.sql.should == 
+      'SELECT * FROM test WHERE (((id < 7) OR (id > 11)) OR (id >= 6))'
   end
 end
 
@@ -540,7 +506,7 @@ context "Dataset#having" do
       "SELECT #{@columns} FROM test GROUP BY region HAVING (sum(population) > 10)"
   end
 
-  pt_specify "should support proc expressions" do
+  specify "should support proc expressions" do
     @grouped.having {:sum[:population] > 10}.sql.should == 
       "SELECT #{@columns} FROM test GROUP BY region HAVING (sum(population) > 10)"
   end
@@ -1497,14 +1463,6 @@ context "Dataset#set" do
     @d.set({:x => 3})
     @d.last_sql.should == 'UPDATE items SET x = 3'
   end
-
-  pt_specify "should accept a block" do
-    @d.set{:x << :x + 1}
-    @d.last_sql.should == 'UPDATE items SET x = (x + 1)'
-
-    @d.set{(:x|1) << (:x|2) + 1}
-    @d.last_sql.should == 'UPDATE items SET x[1] = (x[2] + 1)'
-  end
 end
 
 
@@ -1651,17 +1609,17 @@ context "Dataset #first and #last" do
     r = @d.order(:a).last(i).should == [[:a,1,:b,2, "SELECT * FROM test ORDER BY a DESC LIMIT #{i}"]] * i
   end
   
-  pt_specify "should return the first matching record if a block is given without an argument" do
+  specify "should return the first matching record if a block is given without an argument" do
     @d.first{:z > 26}.should == [:a,1,:b,2, 'SELECT * FROM test WHERE (z > 26) LIMIT 1']
     @d.order(:name).last{:z > 26}.should == [:a,1,:b,2, 'SELECT * FROM test WHERE (z > 26) ORDER BY name DESC LIMIT 1']
   end
   
-  pt_specify "should combine block and standard argument filters if argument is not an Integer" do
+  specify "should combine block and standard argument filters if argument is not an Integer" do
     @d.first(:y=>25){:z > 26}.should == [:a,1,:b,2, 'SELECT * FROM test WHERE ((z > 26) AND (y = 25)) LIMIT 1']
     @d.order(:name).last('y = ?', 16){:z > 26}.should == [:a,1,:b,2, 'SELECT * FROM test WHERE ((z > 26) AND (y = 16)) ORDER BY name DESC LIMIT 1']
   end
   
-  pt_specify "should filter and return an array of records if an Integer argument is provided and a block is given" do
+  specify "should filter and return an array of records if an Integer argument is provided and a block is given" do
     i = rand(10) + 10
     r = @d.order(:a).first(i){:z > 26}.should == [[:a,1,:b,2, "SELECT * FROM test WHERE (z > 26) ORDER BY a LIMIT #{i}"]] * i
     i = rand(10) + 10
@@ -2515,9 +2473,9 @@ context "Dataset" do
     @d.sql.should == "SELECT * FROM x WHERE (y = 1)"
   end
 
-  pt_specify "should support self-changing filter! with block" do
-    @d.filter!{:y == 2}
-    @d.sql.should == "SELECT * FROM x WHERE (y = 2)"
+  specify "should support self-changing filter! with block" do
+    @d.filter!{:y < 2}
+    @d.sql.should == "SELECT * FROM x WHERE (y < 2)"
   end
   
   specify "should raise for ! methods that don't return a dataset" do

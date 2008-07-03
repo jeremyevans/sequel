@@ -278,10 +278,10 @@ context "DB#create_table" do
     @db.sqls.should == ["CREATE TABLE cats (id integer)", "CREATE UNIQUE INDEX cats_id_name_index ON cats (id, name)"]
   end
   
-  pt_specify "should accept unnamed constraint definitions with blocks" do
+  specify "should accept unnamed constraint definitions with blocks" do
     @db.create_table(:cats) do
       integer :score
-      check {:x > 0 && :y < 1}
+      check {(:x > 0) & (:y < 1)}
     end
     @db.sqls.should == ["CREATE TABLE cats (score integer, CHECK ((x > 0) AND (y < 1)))"]
   end
@@ -301,9 +301,9 @@ context "DB#create_table" do
     @db.sqls.should == ["CREATE TABLE cats (score integer, CONSTRAINT valid_score CHECK (score <= 100))"]
   end
 
-  pt_specify "should accept named constraint definitions with block" do
+  specify "should accept named constraint definitions with block" do
     @db.create_table(:cats) do
-      constraint(:blah_blah) {:x > 0 && :y < 1}
+      constraint(:blah_blah) {(:x > 0) & (:y < 1)}
     end
     @db.sqls.should == ["CREATE TABLE cats (CONSTRAINT blah_blah CHECK ((x > 0) AND (y < 1)))"]
   end
@@ -350,9 +350,9 @@ context "DB#alter_table" do
     @db.sqls.should == ["ALTER TABLE cats ADD CONSTRAINT valid_score CHECK (score <= 100)"]
   end
 
-  pt_specify "should support add_constraint with block" do
+  specify "should support add_constraint with block" do
     @db.alter_table(:cats) do
-      add_constraint(:blah_blah) {:x > 0 && :y < 1}
+      add_constraint(:blah_blah) {(:x > 0) & (:y < 1)}
     end
     @db.sqls.should == ["ALTER TABLE cats ADD CONSTRAINT blah_blah CHECK ((x > 0) AND (y < 1))"]
   end

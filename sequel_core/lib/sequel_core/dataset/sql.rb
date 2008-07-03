@@ -134,8 +134,9 @@ module Sequel
     # * Sequel::SQL::BooleanExpression - an existing condition expression,
     #   probably created using the Sequel blockless filter DSL.
     #
-    # filter also takes a block, but use of this is discouraged as it requires
-    # ParseTree.  
+    # filter also takes a block, which should return one of the above argument
+    # types, and is treated the same way. If both a block and regular argument
+    # are provided, they get ANDed together.
     #
     # Examples:
     #
@@ -694,7 +695,7 @@ module Sequel
     #
     # Raises an error if the dataset is grouped or includes more
     # than one table.
-    def update_sql(values = {}, opts = nil, &block)
+    def update_sql(values = {}, opts = nil)
       opts = opts ? @opts.merge(opts) : @opts
 
       if opts[:group]
@@ -704,23 +705,19 @@ module Sequel
       end
       
       sql = "UPDATE #{source_list(@opts[:from])} SET "
-      if block
-        sql << block.to_sql(self, :comma_separated => true)
+      set = if values.is_a?(Hash)
+        # get values from hash
+        values = transform_save(values) if @transform
+        values.map do |k, v|
+          # convert string key into symbol
+          k = k.to_sym if String === k
+          "#{literal(k)} = #{literal(v)}"
+        end.join(COMMA_SEPARATOR)
       else
-        set = if values.is_a?(Hash)
-          # get values from hash
-          values = transform_save(values) if @transform
-          values.map do |k, v|
-            # convert string key into symbol
-            k = k.to_sym if String === k
-            "#{literal(k)} = #{literal(v)}"
-          end.join(COMMA_SEPARATOR)
-        else
-          # copy values verbatim
-          values
-        end
-        sql << set
+        # copy values verbatim
+        values
       end
+      sql << set
       if where = opts[:where]
         sql << " WHERE #{literal(where)}"
       end
@@ -780,7 +777,7 @@ module Sequel
           SQL::BooleanExpression.from_value_pairs(expr)
         end
       when Proc
-        Sequel.use_parse_tree ? expr.to_sql(self).lit : filter_expr(expr.call)
+        filter_expr(expr.call)
       when SQL::NumericExpression, SQL::StringExpression
         raise(Error, "Invalid SQL Expression type: #{expr.inspect}") 
       when Symbol, SQL::Expression

@@ -267,10 +267,7 @@ context "MySQL datasets" do
     ack_stamp = Time.now - 15 * 60 # 15 minutes ago
     @d.query do
       select :market, :minute[:from_unixtime[:ack]].as(:minute)
-      where do
-        :ack > ack_stamp
-        :market == market
-      end
+      where {(:ack > ack_stamp) & {:market => market}}
       group_by :minute[:from_unixtime[:ack]]
     end.sql.should == \
       "SELECT `market`, minute(from_unixtime(`ack`)) AS `minute` FROM `orders` WHERE ((`ack` > #{@d.literal(ack_stamp)}) AND (`market` = 'ICE')) GROUP BY minute(from_unixtime(`ack`))"

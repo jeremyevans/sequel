@@ -1,5 +1,9 @@
 === HEAD
 
+* Dataset#update no longer takes a block, please use a hash argument with the expression syntax instead (jeremyevans)
+
+* ParseTree support has been removed from Sequel (jeremyevans)
+
 * Database#drop_column is now supported in the SQLite adapter (abhay)
 
 * Allow the use of URL parameters in connection strings (jeremyevans)

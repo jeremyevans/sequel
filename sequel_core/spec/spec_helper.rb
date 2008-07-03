@@ -50,12 +50,6 @@ class SchemaDummyDatabase < Sequel::Database
   end
 end
 
-class Spec::Example::ExampleGroup
-  def self.pt_specify(*args, &block)
-    specify(*args, &block) if defined?(::ParseTree)
-  end
-end
-
 if File.exists?(File.join(File.dirname(__FILE__), 'spec_config.rb'))
   require File.join(File.dirname(__FILE__), 'spec_config.rb')
 end

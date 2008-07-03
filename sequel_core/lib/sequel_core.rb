@@ -2,7 +2,7 @@
   require f
 end
 %w"core_ext sql core_sql connection_pool exceptions pretty_table
-  dataset migration schema database worker object_graph deprecated".each do |f|
+  dataset migration schema database worker object_graph".each do |f|
   require "sequel_core/#{f}"
 end
 
@@ -27,27 +27,16 @@ end
 #
 #   Sequel.datetime_class = DateTime
 #
-# Sequel can either use ParseTree for block filters (deprecated but works),
-# or it can use the block filter syntax inside block filters (which will
-# be the only behavior allowed in Sequel 2.2). To set it not to use
-# ParseTree filters:
-#
-#   Sequel.use_parse_tree = false
-#
 # Sequel converts the column type tinyint to a boolean by default,
 # you can override the conversion to use tinyint as an integer:
 #
 #   Sequel.convert_tinyint_to_bool = false
 module Sequel
   @datetime_class = Time
-  @use_parse_tree = !defined?(SEQUEL_NO_PARSE_TREE)
   @convert_tinyint_to_bool = true
   
   metaattr_accessor :datetime_class
-  metaattr_accessor :use_parse_tree
   metaattr_accessor :convert_tinyint_to_bool
-
-  Deprecation.deprecation_message_stream = $stderr
 
   # Creates a new database object based on the supplied connection string
   # and optional arguments.  The specified scheme determines the database
@@ -103,6 +92,17 @@ module Sequel
   # problem issuing queries inside of Dataset#each.
   def self.single_threaded=(value)
     Database.single_threaded = value
+  end
+
+  # Always returns false, since ParseTree support has been removed.
+  def self.use_parse_tree
+    false
+  end
+
+  # Raises an error if attempting to turn ParseTree support on (since it no longer exists).
+  # Otherwise, is a no-op.
+  def self.use_parse_tree=(val)
+    raise(Error, 'ParseTree support has been removed from Sequel') if val
   end
   
   ### Private Class Methods ###
