@@ -382,15 +382,17 @@ without knowing the depth of the tree?
         end
       end
     end)
-    many_to_one :descendents, :eager_loader=>(proc do |key_hash, nodes, associations|
+    many_to_one :descendants, :eager_loader=>(proc do |key_hash, nodes, associations|
       h = {}
       nodes.each do |n|
         n.associations[:children] = []
         h[n.pk] = n
       end
       # Doesn't cause an infinite loop, because the :eager_loader is not called
-      # if no records are returned.
-      Node.filter(:parent_id=>h.keys).eager(:descendents).all do |node|
+      # if no records are returned.  Exclude id = parent_id to avoid infinite loop
+      # if the root note is one of the returned records and it has parent_id = id
+      # instead of parent_id = NULL.
+      Node.filter(:parent_id=>h.keys).exclude(:id=>:parent_id).eager(:descendants).all do |node|
         h[node.parent_id].associations[:children] << node
       end
     end)
