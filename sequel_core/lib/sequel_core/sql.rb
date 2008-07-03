@@ -770,6 +770,36 @@ module Sequel
         ds.subscript_sql(self)
       end
     end
+
+    # An instance of this class is yielded to the block supplied to filter.
+    # Useful if another library also defines the operator methods that
+    # Sequel defines for symbols.
+    #
+    # Examples:
+    #
+    #   ds = DB[:t]
+    #   ds.filter{|r| r.name < 2} # SELECT * FROM t WHERE (name < 2)
+    #   ds.filter{|r| r.table__column + 1 < 2} # SELECT * FROM t WHERE ((table.column + 1) < 2)
+    #   ds.filter{|r| r.is_active(1, 'arg2')} # SELECT * FROM t WHERE is_active(1, 'arg2')
+    class VirtualRow
+      (instance_methods - %w"__id__ __send__").each{|m| undef_method(m)}
+
+      # Can return Identifiers, QualifiedIdentifiers, or Functions:
+      #
+      # * Function - returned if any arguments are supplied, using the method name
+      #   as the function name, and the arguments as the function arguments.
+      # * QualifiedIdentifier - returned if the method name contains __, with the
+      #   table being the part before __, and the column being the part after.
+      # * Identifier - returned otherwise, using the method name.
+      def method_missing(m, *args)
+        if args.empty?
+          table, column = m.to_s.split('__', 2)
+          column ? QualifiedIdentifier.new(table, column) : Identifier.new(m)
+        else
+          Function.new(m, *args)
+        end
+      end
+    end
   end
 
   # LiteralString is used to represent literal SQL expressions. A 
@@ -781,5 +811,4 @@ module Sequel
     include SQL::OrderMethods
     include SQL::ComplexExpressionMethods
   end
-
 end

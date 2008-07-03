@@ -345,6 +345,14 @@ context "Dataset#where" do
     @dataset.filter(:zz < 3){:yy > 3}.sql.should ==
       'SELECT * FROM test WHERE ((zz < 3) AND (yy > 3))'
   end
+
+  specify "should yield a VirtualRow to the block" do
+    x = nil
+    @dataset.filter{|r| x = r; false}
+    x.should be_a_kind_of(Sequel::SQL::VirtualRow)
+    @dataset.filter{|r| ((r.name < 'b') & {r.table__id => 1}) | r.is_active(r.blah, r.xx, r.x__y_z)}.sql.should ==
+      "SELECT * FROM test WHERE (((name < 'b') AND (table.id = 1)) OR is_active(blah, xx, x.y_z))"
+  end
 end
 
 context "Dataset#or" do

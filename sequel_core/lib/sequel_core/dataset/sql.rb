@@ -777,7 +777,7 @@ module Sequel
           SQL::BooleanExpression.from_value_pairs(expr)
         end
       when Proc
-        filter_expr(expr.call)
+        filter_expr(expr.call(SQL::VirtualRow.new))
       when SQL::NumericExpression, SQL::StringExpression
         raise(Error, "Invalid SQL Expression type: #{expr.inspect}") 
       when Symbol, SQL::Expression

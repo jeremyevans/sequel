@@ -1,5 +1,7 @@
 === HEAD
 
+* Filter blocks now yield a SQL::VirtualRow argument, which is useful if another library defines operator methods on Symbol (jeremyevans)
+
 * Add Symbol#identifier method, to make x__a be treated as "x__a" instead of "x"."a" (jeremyevans)
 
 * Dataset#update no longer takes a block, please use a hash argument with the expression syntax instead (jeremyevans)
