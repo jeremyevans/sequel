@@ -10,6 +10,8 @@
 
 * Database#drop_column is now supported in the SQLite adapter (abhay)
 
+* Tinyint columns can now be considered integers instead of booleans by setting Sequel.convert_tinyint_to_bool = false (samsouder)
+
 * Allow the use of URL parameters in connection strings (jeremyevans)
 
 * Ignore any previously selected columns when using Dataset#graph for the first time (jeremyevans)
