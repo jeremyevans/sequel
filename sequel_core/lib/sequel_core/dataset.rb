@@ -187,7 +187,7 @@ module Sequel
     def clone(opts = {})
       c = super()
       c.opts = @opts.merge(opts)
-      c.instance_variable_set(:@columns, nil) if c.options_overlap(COLUMN_CHANGE_OPTS)
+      c.instance_variable_set(:@columns, nil) if opts.keys.any?{|o| COLUMN_CHANGE_OPTS.include?(o)}
       c
     end
     
