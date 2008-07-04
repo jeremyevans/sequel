@@ -76,10 +76,18 @@ describe Sequel::Model::Associations::AssociationReflection, "#select" do
     @c.association_reflection(:c).should include(:select)
     @c.association_reflection(:c).select.should == [:par_parents__id]
   end
-  it "should use the associated_table.* if :select is not present" do
+  it "should be the associated_table.* if :select is not present for a many_to_many associaiton" do
+    @c.many_to_many :cs, :class=>'ParParent'
+    @c.association_reflection(:cs).should_not include(:select)
+    @c.association_reflection(:cs).select.should == :par_parents.*
+  end
+  it "should be if :select is not present for a many_to_one and one_to_many associaiton" do
+    @c.one_to_many :cs, :class=>'ParParent'
+    @c.association_reflection(:cs).should_not include(:select)
+    @c.association_reflection(:cs).select.should == nil
     @c.many_to_one :c, :class=>'ParParent'
     @c.association_reflection(:c).should_not include(:select)
-    @c.association_reflection(:c).select.should == :par_parents.*
+    @c.association_reflection(:c).select.should == nil
   end
 end
 

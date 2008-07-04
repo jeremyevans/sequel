@@ -63,18 +63,18 @@ module Sequel::Model::Associations
   #   associated model's primary key.  Each associated model object can
   #   be associated with more than one current model objects.  Each current
   #   model object can be associated with only one associated model object.
-  #   Similar to ActiveRecord/DataMapper's belongs_to.
+  #   Similar to ActiveRecord's belongs_to.
   # * :one_to_many - Foreign key in associated model's table points to this
   #   model's primary key.   Each current model object can be associated with
   #   more than one associated model objects.  Each associated model object
   #   can be associated with only one current model object.
-  #   Similar to ActiveRecord/DataMapper's has_many.
+  #   Similar to ActiveRecord's has_many.
   # * :many_to_many - A join table is used that has a foreign key that points
   #   to this model's primary key and a foreign key that points to the
   #   associated model's primary key.  Each current model object can be
   #   associated with many associated model objects, and each associated
   #   model object can be associated with many current model objects.
-  #   Similar to ActiveRecord/DataMapper's has_and_belongs_to_many.
+  #   Similar to ActiveRecord's has_and_belongs_to_many.
   #
   # A one to one relationship can be set up with a many_to_one association
   # on the table with the foreign key, and a one_to_many association with the
@@ -84,8 +84,16 @@ module Sequel::Model::Associations
   # 
   # The following options can be supplied:
   # * *ALL types*:
+  #   - :after_add - Symbol, Proc, or array of both/either specifying a callback to call
+  #     after a new item is added to the association.
+  #   - :after_remove - Symbol, Proc, or array of both/either specifying a callback to call
+  #     after an item is removed from the association.
   #   - :allow_eager - If set to false, you cannot load the association eagerly
   #     via eager or eager_graph
+  #   - :before_add - Symbol, Proc, or array of both/either specifying a callback to call
+  #     before a new item is added to the association.
+  #   - :before_remove - Symbol, Proc, or array of both/either specifying a callback to call
+  #     before an item is removed from the association.
   #   - :class - The associated class or its name. If not
   #     given, uses the association's name, which is camelized (and
   #     singularized unless the type is :many_to_one)
@@ -335,7 +343,8 @@ module Sequel::Model::Associations
     # define a method returning the association dataset (with optional order)
     class_def(dataset_method) do
       raise(Sequel::Error, 'model object does not have a primary key') unless pk || key
-      ds = instance_eval(&dataset).select(*opts.select)
+      ds = instance_eval(&dataset)
+      ds = ds.select(*opts.select) if opts.select
       ds = ds.order(*order) if order
       ds = ds.limit(*limit) if limit
       ds = ds.eager(eager) if eager
@@ -346,7 +355,7 @@ module Sequel::Model::Associations
     
     # define a method returning the association dataset suitable for eager_loading
     meta_def(eager_dataset_method) do |ds, select, associations|
-      ds = ds.select(*select)
+      ds = ds.select(*select) if select
       ds = ds.order(*order) if order
       ds = ds.eager(eager) if eager
       ds = ds.eager_graph(eager_graph) if eager_graph

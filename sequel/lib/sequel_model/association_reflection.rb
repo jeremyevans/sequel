@@ -44,7 +44,8 @@ module Sequel
 
         # The columns to select when loading the association
         def select
-         self[:select] ||= associated_class.table_name.*
+         return self[:select] if include?(:select)
+         self[:select] = self[:type] == :many_to_many ? associated_class.table_name.* : nil
         end
       end
     end

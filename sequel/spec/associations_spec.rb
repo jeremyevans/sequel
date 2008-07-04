@@ -36,7 +36,7 @@ describe Sequel::Model, "many_to_one" do
     p.class.should == @c2
     p.values.should == {:x => 1, :id => 1}
 
-    MODEL_DB.sqls.should == ["SELECT nodes.* FROM nodes WHERE (nodes.id = 234) LIMIT 1"]
+    MODEL_DB.sqls.should == ["SELECT * FROM nodes WHERE (nodes.id = 234) LIMIT 1"]
   end
   
   it "should use implicit class if omitted" do
@@ -49,7 +49,7 @@ describe Sequel::Model, "many_to_one" do
     p = d.par_parent
     p.class.should == ParParent
     
-    MODEL_DB.sqls.should == ["SELECT par_parents.* FROM par_parents WHERE (par_parents.id = 234) LIMIT 1"]
+    MODEL_DB.sqls.should == ["SELECT * FROM par_parents WHERE (par_parents.id = 234) LIMIT 1"]
   end
 
   it "should use class inside module if given as a string" do
@@ -64,7 +64,7 @@ describe Sequel::Model, "many_to_one" do
     p = d.par_parent
     p.class.should == Par::Parent
     
-    MODEL_DB.sqls.should == ["SELECT parents.* FROM parents WHERE (parents.id = 234) LIMIT 1"]
+    MODEL_DB.sqls.should == ["SELECT * FROM parents WHERE (parents.id = 234) LIMIT 1"]
   end
 
   it "should use explicit key if given" do
@@ -75,7 +75,7 @@ describe Sequel::Model, "many_to_one" do
     p.class.should == @c2
     p.values.should == {:x => 1, :id => 1}
 
-    MODEL_DB.sqls.should == ["SELECT nodes.* FROM nodes WHERE (nodes.id = 567) LIMIT 1"]
+    MODEL_DB.sqls.should == ["SELECT * FROM nodes WHERE (nodes.id = 567) LIMIT 1"]
   end
 
   it "should use :select option if given" do
@@ -90,7 +90,7 @@ describe Sequel::Model, "many_to_one" do
       ds.filter(:x > 1)
     end
     @c2.load(:id => 100).child_20
-    MODEL_DB.sqls.should == ["SELECT nodes.* FROM nodes WHERE ((parent_id = 100) AND (x > 1)) ORDER BY name LIMIT 1 OFFSET 20"]
+    MODEL_DB.sqls.should == ["SELECT * FROM nodes WHERE ((parent_id = 100) AND (x > 1)) ORDER BY name LIMIT 1 OFFSET 20"]
   end
 
   it "should return nil if key value is nil" do
@@ -110,9 +110,9 @@ describe Sequel::Model, "many_to_one" do
     d = @c2.new(:id => 1, :parent_id=>555)
     MODEL_DB.sqls.should == []
     d.parent.should == nil
-    MODEL_DB.sqls.should == ['SELECT nodes.* FROM nodes WHERE (nodes.id = 555) LIMIT 1']
+    MODEL_DB.sqls.should == ['SELECT * FROM nodes WHERE (nodes.id = 555) LIMIT 1']
     d.parent.should == nil
-    MODEL_DB.sqls.should == ['SELECT nodes.* FROM nodes WHERE (nodes.id = 555) LIMIT 1']
+    MODEL_DB.sqls.should == ['SELECT * FROM nodes WHERE (nodes.id = 555) LIMIT 1']
   end
 
   it "should define a setter method" do
@@ -151,7 +151,7 @@ describe Sequel::Model, "many_to_one" do
     ds = @c2.dataset
     def ds.fetch_rows(sql, &block); MODEL_DB.sqls << sql; yield({:id=>234}) end
     e = d.parent 
-    MODEL_DB.sqls.should == ["SELECT nodes.* FROM nodes WHERE (nodes.id = 234) LIMIT 1"]
+    MODEL_DB.sqls.should == ["SELECT * FROM nodes WHERE (nodes.id = 234) LIMIT 1"]
     d.associations[:parent].should == e
   end
 
@@ -185,7 +185,7 @@ describe Sequel::Model, "many_to_one" do
     d.parent_id = 234
     d.associations[:parent] = 42
     d.parent(true).should_not == 42 
-    MODEL_DB.sqls.should == ["SELECT nodes.* FROM nodes WHERE (nodes.id = 234) LIMIT 1"]
+    MODEL_DB.sqls.should == ["SELECT * FROM nodes WHERE (nodes.id = 234) LIMIT 1"]
   end
   
   it "should have the setter add to the reciprocal one_to_many cached association list if it exists" do
@@ -201,16 +201,16 @@ describe Sequel::Model, "many_to_one" do
     MODEL_DB.sqls.should == []
     d.parent = e
     e.children.should_not(include(d))
-    MODEL_DB.sqls.should == ['SELECT nodes.* FROM nodes WHERE (nodes.parent_id = 2)']
+    MODEL_DB.sqls.should == ['SELECT * FROM nodes WHERE (nodes.parent_id = 2)']
 
     MODEL_DB.reset
     d = @c2.new(:id => 1)
     e = @c2.new(:id => 2)
     e.children.should_not(include(d))
-    MODEL_DB.sqls.should == ['SELECT nodes.* FROM nodes WHERE (nodes.parent_id = 2)']
+    MODEL_DB.sqls.should == ['SELECT * FROM nodes WHERE (nodes.parent_id = 2)']
     d.parent = e
     e.children.should(include(d))
-    MODEL_DB.sqls.should == ['SELECT nodes.* FROM nodes WHERE (nodes.parent_id = 2)']
+    MODEL_DB.sqls.should == ['SELECT * FROM nodes WHERE (nodes.parent_id = 2)']
   end
 
   it "should have the setter remove the object from the previous associated object's reciprocal one_to_many cached association list if it exists" do
@@ -260,7 +260,7 @@ describe Sequel::Model, "many_to_one" do
     ds = @c2.dataset
     def ds.fetch_rows(sql, &block); MODEL_DB.sqls << sql; yield({:id=>234}) end
     e = d.parent 
-    MODEL_DB.sqls.should == ["SELECT nodes.* FROM nodes WHERE (nodes.id = 234) LIMIT 1"]
+    MODEL_DB.sqls.should == ["SELECT * FROM nodes WHERE (nodes.id = 234) LIMIT 1"]
     d.associations[:parent].should == e
   end
 
@@ -387,7 +387,7 @@ describe Sequel::Model, "one_to_many" do
     n = @c2.new(:id => 1234)
     a = n.attributes_dataset
     a.should be_a_kind_of(Sequel::Dataset)
-    a.sql.should == 'SELECT attributes.* FROM attributes WHERE (attributes.node_id = 1234)'
+    a.sql.should == 'SELECT * FROM attributes WHERE (attributes.node_id = 1234)'
   end
   
   it "should use implicit class if omitted" do
@@ -399,7 +399,7 @@ describe Sequel::Model, "one_to_many" do
     n = @c2.new(:id => 1234)
     v = n.historical_values_dataset
     v.should be_a_kind_of(Sequel::Dataset)
-    v.sql.should == 'SELECT historical_values.* FROM historical_values WHERE (historical_values.node_id = 1234)'
+    v.sql.should == 'SELECT * FROM historical_values WHERE (historical_values.node_id = 1234)'
     v.model_classes.should == {nil => HistoricalValue}
   end
   
@@ -414,7 +414,7 @@ describe Sequel::Model, "one_to_many" do
     n = @c2.new(:id => 1234)
     v = n.historical_values_dataset
     v.should be_a_kind_of(Sequel::Dataset)
-    v.sql.should == 'SELECT values.* FROM values WHERE (values.node_id = 1234)'
+    v.sql.should == 'SELECT * FROM values WHERE (values.node_id = 1234)'
     v.model_classes.should == {nil => Historical::Value}
   end
 
@@ -424,7 +424,7 @@ describe Sequel::Model, "one_to_many" do
     n = @c2.new(:id => 1234)
     a = n.attributes_dataset
     a.should be_a_kind_of(Sequel::Dataset)
-    a.sql.should == 'SELECT attributes.* FROM attributes WHERE (attributes.nodeid = 1234)'
+    a.sql.should == 'SELECT * FROM attributes WHERE (attributes.nodeid = 1234)'
   end
 
   it "should define an add_ method" do
@@ -480,14 +480,14 @@ describe Sequel::Model, "one_to_many" do
     @c2.one_to_many :attributes, :class => @c1, :order => :kind
 
     n = @c2.new(:id => 1234)
-    n.attributes_dataset.sql.should == "SELECT attributes.* FROM attributes WHERE (attributes.node_id = 1234) ORDER BY kind"
+    n.attributes_dataset.sql.should == "SELECT * FROM attributes WHERE (attributes.node_id = 1234) ORDER BY kind"
   end
   
   it "should support an array for the order option" do
     @c2.one_to_many :attributes, :class => @c1, :order => [:kind1, :kind2]
 
     n = @c2.new(:id => 1234)
-    n.attributes_dataset.sql.should == "SELECT attributes.* FROM attributes WHERE (attributes.node_id = 1234) ORDER BY kind1, kind2"
+    n.attributes_dataset.sql.should == "SELECT * FROM attributes WHERE (attributes.node_id = 1234) ORDER BY kind1, kind2"
   end
   
   it "should return array with all members of the association" do
@@ -500,7 +500,7 @@ describe Sequel::Model, "one_to_many" do
     atts.first.should be_a_kind_of(@c1)
     atts.first.values.should == {}
     
-    MODEL_DB.sqls.should == ['SELECT attributes.* FROM attributes WHERE (attributes.node_id = 1234)']
+    MODEL_DB.sqls.should == ['SELECT * FROM attributes WHERE (attributes.node_id = 1234)']
   end
   
   it "should accept a block" do
@@ -515,7 +515,7 @@ describe Sequel::Model, "one_to_many" do
     atts.first.should be_a_kind_of(@c1)
     atts.first.values.should == {}
     
-    MODEL_DB.sqls.should == ['SELECT attributes.* FROM attributes WHERE ((attributes.node_id = 1234) AND (xxx IS NULL))']
+    MODEL_DB.sqls.should == ['SELECT * FROM attributes WHERE ((attributes.node_id = 1234) AND (xxx IS NULL))']
   end
   
   it "should support :order option with block" do
@@ -530,19 +530,19 @@ describe Sequel::Model, "one_to_many" do
     atts.first.should be_a_kind_of(@c1)
     atts.first.values.should == {}
     
-    MODEL_DB.sqls.should == ['SELECT attributes.* FROM attributes WHERE ((attributes.node_id = 1234) AND (xxx IS NULL)) ORDER BY kind']
+    MODEL_DB.sqls.should == ['SELECT * FROM attributes WHERE ((attributes.node_id = 1234) AND (xxx IS NULL)) ORDER BY kind']
   end
   
   it "should have the block argument affect the _dataset method" do
     @c2.one_to_many :attributes, :class => @c1 do |ds|
       ds.filter(:xxx => 456)
     end
-    @c2.new(:id => 1234).attributes_dataset.sql.should == 'SELECT attributes.* FROM attributes WHERE ((attributes.node_id = 1234) AND (xxx = 456))'
+    @c2.new(:id => 1234).attributes_dataset.sql.should == 'SELECT * FROM attributes WHERE ((attributes.node_id = 1234) AND (xxx = 456))'
   end
   
   it "should support a :dataset option that is used instead of the default" do
     c1 = @c1
-    @c2.one_to_many :all_other_attributes, :class => @c1, :dataset=>proc{c1.filter(:nodeid=>pk).invert}, :order=>:a, :limit=>10, :select=>[] do |ds|
+    @c2.one_to_many :all_other_attributes, :class => @c1, :dataset=>proc{c1.filter(:nodeid=>pk).invert}, :order=>:a, :limit=>10 do |ds|
       ds.filter(:xxx => 5)
     end
     
@@ -559,9 +559,9 @@ describe Sequel::Model, "one_to_many" do
   
   it "should support a :limit option" do
     @c2.one_to_many :attributes, :class => @c1 , :limit=>10
-    @c2.new(:id => 1234).attributes_dataset.sql.should == 'SELECT attributes.* FROM attributes WHERE (attributes.node_id = 1234) LIMIT 10'
+    @c2.new(:id => 1234).attributes_dataset.sql.should == 'SELECT * FROM attributes WHERE (attributes.node_id = 1234) LIMIT 10'
     @c2.one_to_many :attributes, :class => @c1 , :limit=>[10,10]
-    @c2.new(:id => 1234).attributes_dataset.sql.should == 'SELECT attributes.* FROM attributes WHERE (attributes.node_id = 1234) LIMIT 10 OFFSET 10'
+    @c2.new(:id => 1234).attributes_dataset.sql.should == 'SELECT * FROM attributes WHERE (attributes.node_id = 1234) LIMIT 10 OFFSET 10'
   end
 
   it "should have the :eager option affect the _dataset method" do
@@ -577,7 +577,7 @@ describe Sequel::Model, "one_to_many" do
     n.associations.include?(:attributes).should == false
     atts = n.attributes
     atts.should == n.associations[:attributes]
-    MODEL_DB.sqls.should == ['SELECT attributes.* FROM attributes WHERE (attributes.node_id = 1234)']
+    MODEL_DB.sqls.should == ['SELECT * FROM attributes WHERE (attributes.node_id = 1234)']
   end
 
   it "should use cached instance variable if available" do
@@ -597,7 +597,7 @@ describe Sequel::Model, "one_to_many" do
     MODEL_DB.reset
     n.associations[:attributes] = 42
     n.attributes(true).should_not == 42
-    MODEL_DB.sqls.should == ['SELECT attributes.* FROM attributes WHERE (attributes.node_id = 1234)']
+    MODEL_DB.sqls.should == ['SELECT * FROM attributes WHERE (attributes.node_id = 1234)']
   end
 
   it "should add item to cached instance variable if it exists when calling add_" do
@@ -666,7 +666,7 @@ describe Sequel::Model, "one_to_many" do
     atts.first.should be_a_kind_of(@c1)
     atts.first.values.should == {}
     
-    MODEL_DB.sqls.should == ['SELECT attributes.* FROM attributes WHERE (attributes.node_id = 1234)']
+    MODEL_DB.sqls.should == ['SELECT * FROM attributes WHERE (attributes.node_id = 1234)']
   end
   
   it "should populate the reciprocal many_to_one instance variable when loading the one_to_many association" do
@@ -675,7 +675,7 @@ describe Sequel::Model, "one_to_many" do
     
     n = @c2.new(:id => 1234)
     atts = n.attributes
-    MODEL_DB.sqls.should == ['SELECT attributes.* FROM attributes WHERE (attributes.node_id = 1234)']
+    MODEL_DB.sqls.should == ['SELECT * FROM attributes WHERE (attributes.node_id = 1234)']
     atts.should be_a_kind_of(Array)
     atts.size.should == 1
     atts.first.should be_a_kind_of(@c1)
@@ -690,7 +690,7 @@ describe Sequel::Model, "one_to_many" do
     
     n = @c2.new(:id => 1234)
     atts = n.attributes
-    MODEL_DB.sqls.should == ['SELECT attributes.* FROM attributes WHERE (attributes.node_id = 1234)']
+    MODEL_DB.sqls.should == ['SELECT * FROM attributes WHERE (attributes.node_id = 1234)']
     atts.should be_a_kind_of(Array)
     atts.size.should == 1
     atts.first.should be_a_kind_of(@c1)
@@ -752,7 +752,7 @@ describe Sequel::Model, "one_to_many" do
   it "should add a getter method if the :one_to_one option is true" do
     @c2.one_to_many :attributes, :class => @c1, :one_to_one=>true
     att = @c2.new(:id => 1234).attribute
-    MODEL_DB.sqls.should == ['SELECT attributes.* FROM attributes WHERE (attributes.node_id = 1234)']
+    MODEL_DB.sqls.should == ['SELECT * FROM attributes WHERE (attributes.node_id = 1234)']
     att.should be_a_kind_of(@c1)
     att.values.should == {}
   end
@@ -1041,7 +1041,7 @@ describe Sequel::Model, "many_to_many" do
   
   it "should support a :dataset option that is used instead of the default" do
     c1 = @c1
-    @c2.many_to_many :attributes, :class => @c1, :dataset=>proc{c1.join_table(:natural, :an).filter(:an__nodeid=>pk)}, :order=> :a, :limit=>10, :select=>[] do |ds|
+    @c2.many_to_many :attributes, :class => @c1, :dataset=>proc{c1.join_table(:natural, :an).filter(:an__nodeid=>pk)}, :order=> :a, :limit=>10, :select=>nil do |ds|
       ds.filter(:xxx => @xxx)
     end
 
