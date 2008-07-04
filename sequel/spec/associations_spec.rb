@@ -277,7 +277,7 @@ describe Sequel::Model, "many_to_one" do
     p.instance_variable_get(:@x).should == c
   end
 
-  it "should support association callbacks" do
+  it "should support (before|after)_(add|remove) callbacks" do
     h = []
     @c2.many_to_one :parent, :class => @c2, :before_add=>[proc{|x,y| h << x.pk; h << -y.pk}, :blah], :after_add=>proc{h << 3}, :before_remove=>:blah, :after_remove=>[:blahr]
     @c2.class_eval do
@@ -299,6 +299,24 @@ describe Sequel::Model, "many_to_one" do
     h.should == [10, -123, 123, 4, 3]
     p.parent = nil
     h.should == [10, -123, 123, 4, 3, 123, 5, 6]
+  end
+
+  it "should support after_load association callback" do
+    h = []
+    @c2.many_to_one :parent, :class => @c2, :after_load=>[proc{|x,y| h << [x.pk, y.pk]}, :al]
+    @c2.class_eval do
+      @@blah = h
+      def al(v)
+        @@blah << v.pk
+      end
+      def @dataset.fetch_rows(sql)
+        yield({:id=>20})
+      end
+    end
+    p = @c2.load(:id=>10, :parent_id=>20)
+    parent = p.parent
+    h.should == [[10, 20], 20]
+    parent.pk.should == 20
   end
 
   it "should raise error and not call internal add or remove method if before callback returns false, even if raise_on_save_failure is false" do
@@ -785,8 +803,9 @@ describe Sequel::Model, "one_to_many" do
     MODEL_DB.sqls.clear
     attrib = @c1.load(:id=>3)
     @c2.new(:id => 1234).attribute = attrib
-    MODEL_DB.sqls.should == ['UPDATE attributes SET node_id = 1234, id = 3 WHERE (id = 3)',
-      'UPDATE attributes SET node_id = NULL WHERE ((node_id = 1234) AND (id != 3))']
+    MODEL_DB.sqls.length.should == 2
+    MODEL_DB.sqls.first.should =~ /UPDATE attributes SET (node_id = 1234, id = 3|id = 3, node_id = 1234) WHERE \(id = 3\)/
+    MODEL_DB.sqls.last.should == 'UPDATE attributes SET node_id = NULL WHERE ((node_id = 1234) AND (id != 3))'
   end
 
   it "should raise an error if the one_to_one getter would be the same as the association name" do
@@ -833,7 +852,7 @@ describe Sequel::Model, "one_to_many" do
     p.instance_variable_get(:@x).should == c
   end
 
-  it "should support association callbacks" do
+  it "should support (before|after)_(add|remove) callbacks" do
     h = []
     @c2.one_to_many :attributes, :class => @c1, :before_add=>[proc{|x,y| h << x.pk; h << -y.pk}, :blah], :after_add=>proc{h << 3}, :before_remove=>:blah, :after_remove=>[:blahr]
     @c2.class_eval do
@@ -858,6 +877,27 @@ describe Sequel::Model, "one_to_many" do
     h.should == [10, -123, 123, 4, 3]
     p.remove_attribute(c)
     h.should == [10, -123, 123, 4, 3, 123, 5, 6]
+  end
+
+  it "should support after_load association callback" do
+    h = []
+    @c2.one_to_many :attributes, :class => @c1, :after_load=>[proc{|x,y| h << [x.pk, y.collect{|z|z.pk}]}, :al]
+    @c2.class_eval do
+      @@blah = h
+      def al(v)
+        v.each{|x| @@blah << x.pk}
+      end
+    end
+    @c1.class_eval do
+      def @dataset.fetch_rows(sql)
+        yield({:id=>20})
+        yield({:id=>30})
+      end
+    end
+    p = @c2.load(:id=>10, :parent_id=>20)
+    attributes = p.attributes
+    h.should == [[10, [20, 30]], 20, 30]
+    attributes.collect{|a| a.pk}.should == [20, 30]
   end
 
   it "should raise error and not call internal add or remove method if before callback returns false if raise_on_save_failure is true" do
@@ -1287,7 +1327,7 @@ describe Sequel::Model, "many_to_many" do
     MODEL_DB.sqls.should == []
   end
 
-  it "should support association callbacks" do
+  it "should support (before|after)_(add|remove) callbacks" do
     h = []
     @c2.many_to_many :attributes, :class => @c1, :before_add=>[proc{|x,y| h << x.pk; h << -y.pk}, :blah], :after_add=>proc{h << 3}, :before_remove=>:blah, :after_remove=>[:blahr]
     @c2.class_eval do
@@ -1312,6 +1352,27 @@ describe Sequel::Model, "many_to_many" do
     h.should == [10, -123, 123, 4, 3]
     p.remove_attribute(c)
     h.should == [10, -123, 123, 4, 3, 123, 5, 6]
+  end
+
+  it "should support after_load association callback" do
+    h = []
+    @c2.many_to_many :attributes, :class => @c1, :after_load=>[proc{|x,y| h << [x.pk, y.collect{|z|z.pk}]}, :al]
+    @c2.class_eval do
+      @@blah = h
+      def al(v)
+        v.each{|x| @@blah << x.pk}
+      end
+    end
+    @c1.class_eval do
+      def @dataset.fetch_rows(sql)
+        yield({:id=>20})
+        yield({:id=>30})
+      end
+    end
+    p = @c2.load(:id=>10, :parent_id=>20)
+    attributes = p.attributes
+    h.should == [[10, [20, 30]], 20, 30]
+    attributes.collect{|a| a.pk}.should == [20, 30]
   end
 
   it "should raise error and not call internal add or remove method if before callback returns false if raise_on_save_failure is true" do

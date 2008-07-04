@@ -86,6 +86,9 @@ module Sequel::Model::Associations
   # * *ALL types*:
   #   - :after_add - Symbol, Proc, or array of both/either specifying a callback to call
   #     after a new item is added to the association.
+  #   - :after_load - Symbol, Proc, or array of both/either specifying a callback to call
+  #     after the associated record(s) have been retrieved from the database.  Not called
+  #     when eager loading (see the :eager_loader option to accomplish it when eager loading).
   #   - :after_remove - Symbol, Proc, or array of both/either specifying a callback to call
   #     after an item is removed from the association.
   #   - :allow_eager - If set to false, you cannot load the association eagerly
@@ -190,7 +193,7 @@ module Sequel::Model::Associations
     opts[:graph_join_type] ||= :left_outer
     opts[:graph_conditions] = opts[:graph_conditions] ? opts[:graph_conditions].to_a : []
     opts[:graph_select] = Array(opts[:graph_select]) if opts[:graph_select]
-    [:before_add, :before_remove, :after_add, :after_remove].each do |cb_type|
+    [:before_add, :before_remove, :after_add, :after_remove, :after_load].each do |cb_type|
       opts[cb_type] = Array(opts[cb_type])
     end
 
@@ -330,6 +333,7 @@ module Sequel::Model::Associations
     eager = opts[:eager]
     eager_graph = opts[:eager_graph]
     limit = opts[:limit]
+    single = opts[:type] == :many_to_one
     key = opts[:key] if opts[:type] == :many_to_one
     set_reciprocal = opts[:type] == :one_to_many
 
@@ -342,7 +346,7 @@ module Sequel::Model::Associations
     
     # define a method returning the association dataset (with optional order)
     class_def(dataset_method) do
-      raise(Sequel::Error, 'model object does not have a primary key') unless pk || key
+      raise(Sequel::Error, 'model object does not have a primary key') unless pk || single
       ds = instance_eval(&dataset)
       ds = ds.select(*opts.select) if opts.select
       ds = ds.order(*order) if order
@@ -368,11 +372,16 @@ module Sequel::Model::Associations
       if @associations.include?(name) and !reload[0]
         @associations[name]
       else
-        objs = if key
-          send(dataset_method).first if send(key)
+        objs = if single
+          if !key
+            send(dataset_method).all.first
+          elsif send(key)
+            send(dataset_method).first
+          end
         else
-          send(dataset_method).all
+          objs = send(dataset_method).all
         end
+        run_association_callbacks(opts, :after_load, objs)
         # Only one_to_many associations should set the reciprocal object
         objs.each{|o| add_reciprocal_object(opts, o)} if set_reciprocal
         @associations[name] = objs
@@ -432,7 +441,8 @@ module Sequel::Model::Associations
   def def_many_to_one(opts)
     name = opts[:name]
     model = self
-    key = (opts[:key] ||= default_foreign_key(opts))
+    opts[:key] = default_foreign_key(opts) unless opts.include?(:key)
+    key = opts[:key]
     opts[:class_name] ||= name.to_s.camelize
     opts[:dataset] ||= proc do
       klass = opts.associated_class
