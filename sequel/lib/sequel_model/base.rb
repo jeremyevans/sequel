@@ -161,6 +161,17 @@ module Sequel
       db.fetch(*args).set_model(self)
     end
   
+    # Modify and return eager loading dataset based on association options
+    def self.eager_loading_dataset(opts, ds, select, associations)
+      ds = ds.select(*select) if select
+      ds = ds.order(*opts[:order]) if opts[:order]
+      ds = ds.eager(opts[:eager]) if opts[:eager]
+      ds = ds.eager_graph(opts[:eager_graph]) if opts[:eager_graph]
+      ds = ds.eager(associations) unless associations.blank?
+      ds = opts[:eager_block].call(ds) if opts[:eager_block]
+      ds
+    end
+
     # Finds a single record according to the supplied filter, e.g.:
     #
     #   Ticket.find :author => 'Sharon' # => record

@@ -342,6 +342,32 @@ module Sequel
     
     private
 
+    # Backbone behind association_dataset
+    def _dataset(opts)
+      raise(Sequel::Error, 'model object does not have a primary key') if opts.dataset_need_primary_key? && !pk
+      ds = send(opts._dataset_method)
+      opts[:extend].each{|m| ds.extend(m)}
+      ds = ds.select(*opts.select) if opts.select
+      ds = ds.order(*opts[:order]) if opts[:order]
+      ds = ds.limit(*opts[:limit]) if opts[:limit]
+      ds = ds.eager(*opts[:eager]) if opts[:eager]
+      ds = ds.eager_graph(opts[:eager_graph]) if opts[:eager_graph] && opts.eager_graph_lazy_dataset?
+      ds = send(opts.dataset_helper_method, ds) if opts[:block]
+      ds
+    end
+
+    # Add the given associated object to the given association
+    def add_associated_object(opts, o)
+      raise(Sequel::Error, 'model object does not have a primary key') unless pk
+      raise(Sequel::Error, 'associated object does not have a primary key') if opts.need_associated_primary_key? && !o.pk
+      return if run_association_callbacks(opts, :before_add, o) == false
+      send(opts._add_method, o)
+      @associations[opts[:name]].push(o) if @associations.include?(opts[:name])
+      add_reciprocal_object(opts, o)
+      run_association_callbacks(opts, :after_add, o)
+      o
+    end
+
     # Add/Set the current object to/as the given object's reciprocal association.
     def add_reciprocal_object(opts, o)
       return unless reciprocal = opts.reciprocal
@@ -353,6 +379,49 @@ module Sequel
       when :one_to_many
         o.associations[reciprocal] = self
       end
+    end
+
+    # Load the associated objects using the dataset
+    def load_associated_objects(opts, reload=false)
+      name = opts[:name]
+      if @associations.include?(name) and !reload
+        @associations[name]
+      else
+        objs = if opts.single_associated_object?
+          if !opts[:key]
+            send(opts.dataset_method).all.first
+          elsif send(opts[:key])
+            send(opts.dataset_method).first
+          end
+        else
+          objs = send(opts.dataset_method).all
+        end
+        run_association_callbacks(opts, :after_load, objs)
+        # Only one_to_many associations should set the reciprocal object
+        objs.each{|o| add_reciprocal_object(opts, o)} if opts.set_reciprocal_to_self?
+        @associations[name] = objs
+      end
+    end
+
+    # Remove all associated objects from the given association
+    def remove_all_associated_objects(opts)
+      raise(Sequel::Error, 'model object does not have a primary key') unless pk
+      send(opts._remove_all_method)
+      ret = @associations[opts[:name]].each{|o| remove_reciprocal_object(opts, o)} if @associations.include?(opts[:name])
+      @associations[opts[:name]] = []
+      ret
+    end
+
+    # Remove the given associated object from the given association
+    def remove_associated_object(opts, o)
+      raise(Sequel::Error, 'model object does not have a primary key') unless pk
+      raise(Sequel::Error, 'associated object does not have a primary key') if opts.need_associated_primary_key? && !o.pk
+      return if run_association_callbacks(opts, :before_remove, o) == false
+      send(opts._remove_method, o)
+      @associations[opts[:name]].delete_if{|x| o === x} if @associations.include?(opts[:name])
+      remove_reciprocal_object(opts, o)
+      run_association_callbacks(opts, :after_remove, o)
+      o
     end
 
     # Remove/unset the current object from/as the given object's reciprocal association.
