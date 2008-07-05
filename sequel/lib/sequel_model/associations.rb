@@ -118,6 +118,7 @@ module Sequel::Model::Associations
   #     and a hash of dependent associations.  The associated records should
   #     be queried from the database and the associations cache for each
   #     record should be populated for this to work correctly.
+  #   - :extend - A module or array of modules to extend the dataset with.
   #   - :graph_block - The block to pass to join_table when eagerly loading
   #     the association via eager_graph.
   #   - :graph_conditions - The additional conditions to use on the SQL join when eagerly loading
@@ -193,7 +194,7 @@ module Sequel::Model::Associations
     opts[:graph_join_type] ||= :left_outer
     opts[:graph_conditions] = opts[:graph_conditions] ? opts[:graph_conditions].to_a : []
     opts[:graph_select] = Array(opts[:graph_select]) if opts[:graph_select]
-    [:before_add, :before_remove, :after_add, :after_remove, :after_load].each do |cb_type|
+    [:before_add, :before_remove, :after_add, :after_remove, :after_load, :extend].each do |cb_type|
       opts[cb_type] = Array(opts[cb_type])
     end
 
@@ -333,6 +334,7 @@ module Sequel::Model::Associations
     eager = opts[:eager]
     eager_graph = opts[:eager_graph]
     limit = opts[:limit]
+    exten = opts[:extend]
     single = opts[:type] == :many_to_one
     key = opts[:key] if opts[:type] == :many_to_one
     set_reciprocal = opts[:type] == :one_to_many
@@ -348,6 +350,7 @@ module Sequel::Model::Associations
     class_def(dataset_method) do
       raise(Sequel::Error, 'model object does not have a primary key') unless pk || single
       ds = instance_eval(&dataset)
+      exten.each{|m| ds.extend(m)}
       ds = ds.select(*opts.select) if opts.select
       ds = ds.order(*order) if order
       ds = ds.limit(*limit) if limit

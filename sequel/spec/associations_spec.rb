@@ -15,6 +15,32 @@ describe Sequel::Model, "associate" do
     klass.association_reflection(:"par_parent1s").associated_class.should == ParParent
     klass.association_reflection(:"par_parent2s").associated_class.should == ParParent
   end
+  it "should allow extending the dataset with :extend option" do
+    MODEL_DB.reset
+    klass = Class.new(Sequel::Model(:nodes)) do
+      columns :id, :a_id
+    end
+    mod = Module.new do
+      def blah
+       1
+      end
+    end
+    mod2 = Module.new do
+      def blar
+       2
+      end
+    end
+    
+    klass.associate :many_to_one, :a, :class=>klass, :extend=>mod
+    klass.associate :one_to_many, :bs, :class=>klass, :extend=>[mod]
+    klass.associate :many_to_many, :cs, :class=>klass, :extend=>[mod, mod2]
+    
+    node = klass.load(:id=>1)
+    node.a_dataset.blah.should == 1
+    node.bs_dataset.blah.should == 1
+    node.cs_dataset.blah.should == 1
+    node.cs_dataset.blar.should == 2
+  end
 end
 
 describe Sequel::Model, "many_to_one" do

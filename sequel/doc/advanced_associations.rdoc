@@ -151,9 +151,22 @@ otherwise modified:
     one_to_many :authorships
   end
   Author.first.authorships_dataset.filter(:number < 10).first
-  
-If you want to add methods to the association instead of just using existing
-methods:
+ 
+You can extend a dataset with a module easily with :extend:
+
+  module FindOrCreate
+    def find_or_create(vals)
+      first(vals) || @opts[:models][nil].create(vals)
+    end
+  end
+  class Author < Sequel::Model
+    one_to_many :authorships, :extend=>FindOrCreate
+  end
+  Author.first.authorships_dataset.find_or_create(:name=>'Blah', :number=>10)
+
+However, note that the dataset doesn't have any knowledge of the model object
+that created it via the association, so if you want to use attributes of the
+model object, you'll have to use a closure:
 
   class Author < Sequel::Model
     one_to_many :authorships, :dataset=>(proc do
@@ -166,6 +179,18 @@ methods:
     end)
   end
   Author.first.authorships_dataset.find_or_create_by_name('Bob')
+
+You can cheat if you want to:
+
+  module FindOrCreate
+    def find_or_create(vals)
+      # Exploits the fact that Sequel filters are ruby objects that
+      # can be introspected.
+      author_id = @opts[:where].args[1]
+      first(vals) || \
+        @opts[:models][nil].create(vals.merge(:author_id=>author_id))
+    end 
+  end
 
 ===has_many :through associations
 

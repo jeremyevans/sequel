@@ -1,5 +1,9 @@
 === HEAD
 
+* Add :extend association option, extending the dataset with module(s) (jeremyevans)
+
+* Add :after_load association callback option, called after associated objects have been loaded from the database (jeremyevans)
+
 * Make validation methods support a :tag option, to work correctly with source reloading (jeremyevans)
 
 * Add :before_add, :after_add, :before_remove, :after_remove association callback options (jeremyevans)
