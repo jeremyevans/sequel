@@ -1,4 +1,4 @@
-=== HEAD
+=== 2.2.0 (2008-07-05)
 
 * Filter blocks now yield a SQL::VirtualRow argument, which is useful if another library defines operator methods on Symbol (jeremyevans)
 

@@ -1,4 +1,4 @@
-=== HEAD
+=== 2.2.0 (2008-07-05)
 
 * Add :extend association option, extending the dataset with module(s) (jeremyevans)
 
