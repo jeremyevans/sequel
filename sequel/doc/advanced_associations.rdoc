@@ -84,6 +84,32 @@ option.  Though it can often be verbose (compared to other things in Sequel),
 it allows you complete control over how to eagerly load associations for a
 group of objects.
 
+:eager_loader should be a proc that takes 3 arguments, a key_hash,
+an array of records, and a hash of dependent associations.  Since you
+are given all of the records, you can do things like filter on
+associations that are specified by multiple keys, or do multiple
+queries depending on the content of the records (which would be
+necessary for polymorphic associations).  Inside the :eager_loader
+proc, you should get the related objects and populate the
+associations for all objects in the array of records.  The hash
+of dependent associations is available for you to cascade the eager
+loading down multiple levels, but it is up to you to use it.  The
+key_hash is a performance enhancement that is used by the default
+code and is also available to you.  It is a hash with keys being
+foreign/primary key symbols in the current table, and the values
+being hashes where the key is foreign/primary key values and values
+being arrays of current model objects having the foreign/primary key
+value associated with the key.  This is hard to visualize, so I'll
+give an example:
+    
+  album1 = Album.load(:id=>1, :artist_id=>2)
+  album2 = Album.load(:id=>3, :artist_id=>2)
+  Album.many_to_one :artist
+  Album.one_to_many :tracks
+  Album.eager(:band, :tracks).all
+  # The key_hash provided to the :eager_loader proc would be:
+  {:id=>{1=>[album1], 3=>[album2]}, :artist_id=>{2=>[album1, album2]}}
+
 Using these options, you can build associations Sequel doesn't natively support,
 and still be able to use the same eager loading features that you are used to.
 
@@ -92,6 +118,29 @@ and still be able to use the same eager loading features that you are used to.
 Sequel supports all of associations that ActiveRecord supports, one way or
 another.  Sometimes this requires more code, as Sequel is a toolkit and not
 a swiss army chainsaw.
+
+===Association callbacks
+
+Sequel supports the same callbacks that ActiveRecord does: :before_add,
+:before_remove, :after_add, and :after_remove. It also supports a
+callback that ActiveRecord does not, :after_load, which is called
+after the association has been loaded (when lazy loading).
+
+Each of these options can be a Symbol specifying an instance method
+that takes one argument (the associated object), or a Proc that takes
+two arguments (the current object and the associated object), or an
+array of Symbols and Procs.  For :after_load with a *_to_many association,
+the associated object argument is an array of associated objects.
+
+If any of the before callbacks return false, the adding/removing
+does not happen and it either raises an error (the default), or
+returns nil (if raise_on_save_failure is false).
+
+All callbacks are also run on many_to_one associations.  If there
+was already an existing object for the association, it calls the
+remove callbacks on the existing object and the add callbacks on the
+new object.  The remove callback calls are placed around the add
+callback calls.
 
 ===Association extensions
 
@@ -108,12 +157,13 @@ methods:
 
   class Author < Sequel::Model
     one_to_many :authorships, :dataset=>(proc do
-      ds = Authorship.filter(:author_id=>pk)
+      key = pk
+      ds = Authorship.filter(:author_id=>key)
       ds.meta_def(:find_or_create_by_name) do |name|
-        first(:name=>name) || Authorship.create(:name=>name)
-      end
-      ds
-    end
+        first(:name=>name) || Authorship.create(:name=>name, :author_id=>key)
+      end 
+      ds  
+    end)
   end
   Author.first.authorships_dataset.find_or_create_by_name('Bob')
 
@@ -159,21 +209,21 @@ are a bit more involved:
 ActiveRecord:
 
   class Firm < ActiveRecord::Base
-    has_many   :clients
-    has_many   :invoices, :through => :clients
+    has_many :clients
+    has_many :invoices, :through => :clients
   end
 
   class Client < ActiveRecord::Base
     belongs_to :firm
-    has_many   :invoices
+    has_many :invoices
   end
 
   class Invoice < ActiveRecord::Base
     belongs_to :client
+    has_one :firm, :through => :client
   end
 
-  @firm = Firm.find :first
-  @firm.invoices
+  Firm.find(:first).invoices
   
 Sequel::Model:
 
@@ -181,14 +231,22 @@ Sequel::Model:
     one_to_many :clients
     one_to_many :invoices, :read_only=>true, \
       :dataset=>proc{Invoice.eager_graph(:client).filter(:client__firm_id=>pk)}, \
+      :after_load=>(proc do |firm, invs|
+        invs.each do |inv|
+          inv.client.associations[:firm] = inv.associations[:firm] = firm
+        end
+      end), \
       :eager_loader=>(proc do |key_hash, firms, associations|
-        h = key_hash[Firm.primary_key]
-        firms.each{|firm| firm.associations[:invoices] = []}
-        Invoice.eager_graph(:client).filter(:client__firm_id=>h.keys).all do |inv|
-          h[inv.client.firm_id].each{|firm| firm.associations[:invoices] << inv}
+        id_map = key_hash[Firm.primary_key]
+        firms.each{|firm| firm.associations[:invoices] = []} 
+        Invoice.eager_graph(:client).filter(:client__firm_id=>id_map.keys).all do |inv|
+          id_map[inv.client.firm_id].each do |firm|
+            inv.client.associations[:firm] = inv.associations[:firm] = firm
+            firm.associations[:invoices] << inv 
+          end
         end
       end)
-  end
+  end 
 
   class Client < Sequel::Model
     many_to_one :firm
@@ -197,10 +255,40 @@ Sequel::Model:
 
   class Invoice < Sequel::Model
     many_to_one :client
+    many_to_one :firm, :key=>nil, :read_only=>true, \
+      :dataset=>proc{Firm.eager_graph(:clients).filter(:clients__id=>client_id)}, \
+      :after_load=>(proc do |inv, firm|
+        # Delete the cached associations from firm, because it only has the
+        # client with this invoice, instead of all clients of the firm
+        inv.associations[:client] = firm.associations.delete(:clients).first
+      end), \
+      :eager_loader=>(proc do |key_hash, invoices, associations|
+        id_map = {}
+        invoices.each do |inv|
+          inv.associations[:firm] = nil
+          inv.associations[:client] = nil
+          (id_map[inv.client_id] ||= []) << inv
+        end
+        Firm.eager_graph(:clients).filter(:clients__id=>id_map.keys).all do |firm|
+          # Delete the cached associations from firm, because it only has the
+          # clients related the invoices being eagerly loaded, instead of all
+          # clients of the firm.
+          firm.associations.delete(:clients).each do |client|
+            id_map[client.pk].each do |inv|
+              inv.associations[:firm] = firm
+              inv.associations[:client] = client
+            end
+          end
+        end
+      end)
   end
+  Firm.find(:first).invoices
 
-  @firm = Firm.first
-  @firm.invoices
+It is significantly more code in Sequel Model, but quite a bit of it is setting
+the intermediate associate record (the client) and the reciprocal association
+in the associations cache for each object, which ActiveRecord won't do for you.
+The reason you would want to do this is that then firm.invoices.first.firm or
+firm.invoices.first.client doesn't do another query to get the firm/client.
 
 ===Polymorphic Associations
 
@@ -217,24 +305,29 @@ ActiveRecord:
     has_many :assets, :as => :attachable
   end
 
+  class Note < ActiveRecord::Base
+    has_many :assets, :as => :attachable
+  end
+
   @asset.attachable = @post
+  @asset.attachable = @note
 
 Sequel::Model:
 
   class Asset < Sequel::Model
-    belongs_to :attachable, \
+    many_to_one :attachable, :reciprocal=>:assets, \
       :dataset=>(proc do
         klass = attachable_type.constantize
         klass.filter(klass.primary_key=>attachable_id)
       end), \
       :eager_loader=>(proc do |key_hash, assets, associations|
-        h = {}
+        id_map = {}
         assets.each do |asset|
-          asset.associations[:attachable] = nil
-          ((h[asset.attachable_type] ||= {})[asset.attachable_id] ||= []) << asset}
+          asset.associations[:attachable] = nil 
+          ((id_map[asset.attachable_type] ||= {})[asset.attachable_id] ||= []) << asset
         end
-        h.each do |klass_name, id_map|
-          klass = klass.constantize
+        id_map.each do |klass_name, id_map|
+          klass = klass_name.constantize
           klass.filter(klass.primary_key=>id_map.keys).all do |attach|
             id_map[attach.pk].each do |asset|
               asset.associations[:attachable] = attach
@@ -242,20 +335,63 @@ Sequel::Model:
           end
         end
       end)
-      
+  
+    private
+
     def _attachable=(attachable)
-      self[:attachable_id] = attachable.pk
-      self[:attachable_type] = attachable.class.name
+      self[:attachable_id] = (attachable.pk if attachable)
+      self[:attachable_type] = (attachable.class.name if attachable)
+    end 
+  end 
+
+  class Post < Sequel::Model
+    one_to_many :assets, :key=>:attachable_id do |ds|
+      ds.filter(:attachable_type=>'Post')
+    end 
+  
+    private
+
+    def _add_asset(asset)
+      asset.attachable_id = pk
+      asset.attachable_type = 'Post'
+      asset.save
+    end 
+    def _remove_asset(asset)
+      asset.attachable_id = nil 
+      asset.attachable_type = nil 
+      asset.save
+    end 
+    def _remove_all_assets
+      Asset.filter(:attachable_id=>pk, :attachable_type=>'Post')\
+        .update(:attachable_id=>nil, :attachable_type=>nil)
     end
   end
 
-  class Post < Sequel::Model
-    has_many :assets do |ds|
-      ds.filter(:attachable_type=>'Post')
+  class Note < Sequel::Model
+    one_to_many :assets, :key=>:attachable_id do |ds|
+      ds.filter(:attachable_type=>'Note')
+    end
+
+    private
+
+    def _add_asset(asset)
+      asset.attachable_id = pk
+      asset.attachable_type = 'Note'
+      asset.save
+    end
+    def _remove_asset(asset)
+      asset.attachable_id = nil
+      asset.attachable_type = nil
+      asset.save
+    end
+    def _remove_all_assets
+      Asset.filter(:attachable_id=>pk, :attachable_type=>'Note')\
+        .update(:attachable_id=>nil, :attachable_type=>nil)
     end
   end
 
   @asset.attachable = @post
+  @asset.attachable = @note
 
 ==More advanced associations
 
@@ -271,34 +407,52 @@ key, the invoice is associated to the client by name (this is bad database
 design, but sometimes you have to play with the cards you are dealt).
 
   class Client < Sequel::Model
-    one_to_many :invoices, \
+    one_to_many :invoices, :reciprocal=>:client, \
       :dataset=>proc{Invoice.filter(:client_name=>name)}, \
       :eager_loader=>(proc do |key_hash, clients, associations|
-        h = {}
+        id_map = {}
         clients.each do |client|
-          h[client.name] = client
+          id_map[client.name] = client
           client.associations[:invoices] = []
         end
-        Invoice.filter(:client_name=>h.keys).all do |inv|
-          h[inv.client_name].associations[:invoices] << inv
+        Invoice.filter(:client_name=>id_map.keys.sort).all do |inv|
+          inv.associations[:client] = client = id_map[inv.client_name]
+          client.associations[:invoices] << inv 
         end
       end)
-  end
+
+    private
+
+    def _add_invoice(invoice)
+      invoice.client_name = name
+      invoice.save
+    end 
+    def _remove_invoice(invoice)
+      invoice.client_name = nil 
+      invoice.save
+    end 
+    def _remove_all_invoices
+      Invoice.filter(:client_name=>name).update(:client_name=>nil)
+    end 
+  end 
 
   class Invoice < Sequel::Model
     many_to_one :client, :key=>:client_name, \
       :dataset=>proc{Client.filter(:name=>client_name)}, \
       :eager_loader=>(proc do |key_hash, invoices, associations|
-        h = key_hash[:client_name]
+        id_map = key_hash[:client_name]
         invoices.each{|inv| inv.associations[:client] = nil}
-        Client.filter(:name=>h.keys).all do |client|
-          h[client.name].each{|inv| inv.associations[:client] = client}
+        Client.filter(:name=>id_map.keys).all do |client|
+          id_map[client.name].each{|inv| inv.associations[:client] = client}
         end
       end)
-  end
 
-  Client.first.invoices
-  Invoice.first.client
+    private
+
+    def _client=(client)
+      self.client_name = (client.name if client)
+    end
+  end
 
 ===Joining on multiple keys
 
@@ -364,39 +518,53 @@ What if you want to get all ancestors up to the root node, or all descendents,
 without knowing the depth of the tree?
 
   class Node < Sequel::Model
-    many_to_one :parent
-    one_to_many :children, :key=>:parent_id
-    
-    # Only useful when eager loading
     many_to_one :ancestors, :eager_loader=>(proc do |key_hash, nodes, associations|
       # Handle cases where the root node has the same parent_id as primary_key
       # and also when it is NULL
-      non_root_nodes = nodes.reject{|n| [nil, n.pk].include?(n.parent_id)}
+      non_root_nodes = nodes.reject do |n| 
+        if [nil, n.pk].include?(n.parent_id)
+          # Make sure root nodes have their parent association set to nil
+          n.associations[:parent] = nil 
+          true
+        else
+          false
+        end 
+      end 
       unless non_root_nodes.empty?
-        h = {}
-        non_root_nodes.each{|n| (h[n.parent_id] ||= []) << n}
+        id_map = {}
+        # Create an map of parent_ids to nodes that have that parent id
+        non_root_nodes.each{|n| (id_map[n.parent_id] ||= []) << n}
         # Doesn't cause an infinte loop, because when only the root node
         # is left, this is not called.
-        Node.filter(Node.primary_key=>h.keys).eager(:ancestors).all do |node|
-          h[node.pk].each{|n| n.associations[:parent] = node}
-        end
-      end
+        Node.filter(Node.primary_key=>id_map.keys).eager(:ancestors).all do |node|
+          # Populate the parent association for each node
+          id_map[node.pk].each{|n| n.associations[:parent] = node}
+        end 
+      end 
     end)
     many_to_one :descendants, :eager_loader=>(proc do |key_hash, nodes, associations|
-      h = {}
-      nodes.each do |n|
+      id_map = {}
+      nodes.each do |n| 
+        # Initialize an empty array of child associations for each parent node
         n.associations[:children] = []
-        h[n.pk] = n
-      end
+        # Populate identity map of nodes
+        id_map[n.pk] = n 
+      end 
       # Doesn't cause an infinite loop, because the :eager_loader is not called
       # if no records are returned.  Exclude id = parent_id to avoid infinite loop
       # if the root note is one of the returned records and it has parent_id = id
       # instead of parent_id = NULL.
-      Node.filter(:parent_id=>h.keys).exclude(:id=>:parent_id).eager(:descendants).all do |node|
-        h[node.parent_id].associations[:children] << node
-      end
+      Node.filter(:parent_id=>id_map.keys).exclude(:id=>:parent_id).eager(:descendants).all do |node|
+        # Get the parent from the identity map
+        parent = id_map[node.parent_id]
+        # Set the child's parent association to the parent 
+        node.associations[:parent] = parent
+        # Add the child association to the array of children in the parent
+        parent.associations[:children] << node
+      end 
     end)
   end
+
 
 ===Joining multiple keys to a single key, through a third table
 
