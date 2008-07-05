@@ -35,6 +35,15 @@ context "A new Database" do
     d.synchronize {|c| cc = c}
     cc.should == 1234
   end
+
+  specify "should respect the :quote_identifiers and :single_threaded options" do
+    db = Sequel::Database.new(:quote_identifiers=>false, :single_threaded=>true)
+    db.quote_identifiers?.should == false
+    db.pool.should be_a_kind_of(Sequel::SingleThreadedPool)
+    db = Sequel::Database.new(:quote_identifiers=>true, :single_threaded=>false)
+    db.quote_identifiers?.should == true
+    db.pool.should be_a_kind_of(Sequel::ConnectionPool)
+  end
 end
 
 context "Database#connect" do
