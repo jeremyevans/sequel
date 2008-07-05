@@ -13,8 +13,8 @@ end
 #
 #   DB = Sequel.sqlite # Memory database
 #   DB = Sequel.sqlite('blog.db')
-#   DB = Sequel.postgres('database_name', :user=>'user', \
-#          :password=>'password', :host=>'host', :port=>5432, \
+#   DB = Sequel.postgres('database_name', :user=>'user', 
+#          :password=>'password', :host=>'host', :port=>5432, 
 #          :max_connections=>10)
 #
 # If a block is given to these methods, it is passed the opened Database

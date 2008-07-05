@@ -197,10 +197,9 @@ module Sequel
       end
     end
     
-    # Methods that created QualifiedIdentifiers, used for qualifying column
-    # names with a table or table names with a schema.
+    # Includes a method that returns Identifiers.
     module IdentifierMethods
-      # Qualify the current object with the given table/schema.
+      # Return self wrapped as an identifier.
       def identifier
         Identifier.new(self)
       end
@@ -394,7 +393,7 @@ module Sequel
       # a keyword in ruby.
       attr_reader :aliaz
 
-      # default value.
+      # Create an object with the given expression and alias.
       def initialize(expression, aliaz)
         @expression, @aliaz = expression, aliaz
       end
@@ -412,7 +411,6 @@ module Sequel
     # certain database engines, such as PostgreSQL, require binary data to be 
     # escaped.
     class Blob < ::String
-
       # return self.
       def to_blob
         self
@@ -425,7 +423,7 @@ module Sequel
       include BooleanMethods
       
       # Take pairs of values (e.g. a hash or array of arrays of two pairs)
-      # and converts it to a ComplexExpression.  The operator and args
+      # and converts it to a BooleanExpression.  The operator and args
       # used depends on the case of the right (2nd) argument:
       #
       # * 0..10 - left >= 0 AND left <= 10
@@ -680,10 +678,10 @@ module Sequel
       # The expression to order the result set by.
       attr_reader :expression
 
-      # Whether the expression should order the result set in a descening manner
+      # Whether the expression should order the result set in a descending manner
       attr_reader :descending
 
-      # default value.
+      # Set the expression and descending attributes to the given values.
       def initialize(expression, descending = true)
         @expression, @descending = expression, descending
       end

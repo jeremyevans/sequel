@@ -145,30 +145,30 @@ Or against SQL functions:
 
 You can search SQL strings using the #like method:
 
-  items.filter(:name.like('Acme%').sql
+  items.filter(:name.like('Acme%')).sql
   #=> "SELECT * FROM items WHERE (name LIKE 'Acme%')"
 
 You can specify a Regexp as a like argument, but this will probably only work
 on PostgreSQL and MySQL:
 
-  items.filter(:name.like(/Acme.*/).sql
+  items.filter(:name.like(/Acme.*/)).sql
   #=> "SELECT * FROM items WHERE (name ~ 'Acme.*')"
 
 Like can also take more than one argument:
 
-  items.filter(:name.like('Acme%', /Beta.*/).sql
+  items.filter(:name.like('Acme%', /Beta.*/)).sql
   #=> "SELECT * FROM items WHERE ((name LIKE 'Acme%') OR (name ~ 'Beta.*'))"
 
 == String concatenation
 
 You can concatenate SQL strings using Array#sql_string_join: 
 
-  items.filter([:name, :comment].sql_string_join.like('%acme%').sql
+  items.filter([:name, :comment].sql_string_join.like('%acme%')).sql
   #=> "SELECT * FROM items WHERE ((name || comment) LIKE 'Acme%')"
 
 Array#sql_string_join also takes a join argument:
 
-  items.filter([:name, :comment].sql_string_join(' ').like('%acme%').sql
+  items.filter([:name, :comment].sql_string_join(' ').like('%acme%')).sql
   #=> "SELECT * FROM items WHERE ((name || ' ' || comment) LIKE 'Acme%')"
 
 == Filtering using sub-queries
