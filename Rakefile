@@ -120,6 +120,13 @@ Spec::Rake::SpecTask.new("spec_model") do |t|
   t.spec_opts  = spec_opts.call
 end
 
+desc "Run integration tests"
+Spec::Rake::SpecTask.new("integration") do |t|
+  fixRUBYLIB.call
+  t.spec_files = FileList["spec/integration/*_test.rb"]
+  t.spec_opts  = spec_opts.call
+end
+
 %w'postgres sqlite mysql informix oracle'.each do |adapter|
   desc "Run #{adapter} specs without coverage"
   Spec::Rake::SpecTask.new("spec_#{adapter}") do |t|
