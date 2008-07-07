@@ -339,6 +339,20 @@ describe Sequel::Model do
     @m.should be_valid
   end
 
+  specify "should allow multiple calls to validates_length_of with different options without overwriting" do
+    @c.validates_length_of :value, :maximum => 5
+    @c.validates_length_of :value, :minimum => 5
+    @m.should_not be_valid
+    @m.value = '12345'
+    @m.should be_valid
+    @m.value = '123456'
+    @m.should_not be_valid
+    @m.value = '12345'
+    @m.should be_valid
+    @m.value = '1234'
+    @m.should_not be_valid
+  end
+
   specify "should validate numericality_of" do
     @c.validates_numericality_of :value
     @m.value = 'blah'

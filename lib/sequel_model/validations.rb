@@ -223,7 +223,12 @@ module Sequel
         :wrong_length => 'is the wrong length'
       }.merge!(atts.extract_options!)
       
-      atts << {:if=>opts[:if], :tag=>opts[:tag]||:length}
+      tag = if opts[:tag]
+        opts[:tag]
+      else
+       ([:length] + [:maximum, :minimum, :is, :within].reject{|x| !opts.include?(x)}).join('-').to_sym
+      end
+      atts << {:if=>opts[:if], :tag=>tag}
       validates_each(*atts) do |o, a, v|
         next if (v.nil? && opts[:allow_nil]) || (v.blank? && opts[:allow_blank])
         if m = opts[:maximum]

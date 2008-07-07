@@ -1,5 +1,7 @@
 === HEAD
 
+* Make validates_length_of default tag depend on presence of options passed to it (jeremyevans)
+
 * Combined the directory structure for sequel_model and sequel_core, now there is going to be only one gem named sequel (jeremyevans)
 
 === 2.2.0 (2008-07-05)
