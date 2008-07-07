@@ -1,10 +1,10 @@
 require 'rubygems'
 unless Object.const_defined?('Sequel')
-  $:.unshift(File.join(File.dirname(__FILE__), "../../sequel_core/lib/"))
+  $:.unshift(File.join(File.dirname(__FILE__), "../../lib/"))
   require 'sequel_core'
 end
 unless Sequel.const_defined?('Model')
-  $:.unshift(File.join(File.dirname(__FILE__), "../lib/"))
+  $:.unshift(File.join(File.dirname(__FILE__), "../../lib/"))
   require 'sequel_model'
 end
 

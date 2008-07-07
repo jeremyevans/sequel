@@ -1,4 +1,4 @@
-require File.join(File.dirname(__FILE__), '../spec_helper.rb')
+require File.join(File.dirname(__FILE__), 'spec_helper.rb')
 
 unless defined?(SQLITE_DB)
   SQLITE_DB = Sequel.connect('sqlite:/')

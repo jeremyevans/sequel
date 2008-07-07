@@ -1,4 +1,4 @@
-require File.join(File.dirname(__FILE__), '../spec_helper.rb')
+require File.join(File.dirname(__FILE__), 'spec_helper.rb')
 
 unless defined?(POSTGRES_DB)
   POSTGRES_URL = 'postgres://postgres:postgres@localhost:5432/reality_spec' unless defined? POSTGRES_URL

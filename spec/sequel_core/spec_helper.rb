@@ -1,6 +1,6 @@
 require 'rubygems'
 unless Object.const_defined?('Sequel')
-  $:.unshift(File.join(File.dirname(__FILE__), "../lib/"))
+  $:.unshift(File.join(File.dirname(__FILE__), "../../lib/"))
   require 'sequel_core'
 end
 
@@ -48,8 +48,4 @@ class SchemaDummyDatabase < Sequel::Database
     @sqls ||= []
     @sqls << sql
   end
-end
-
-if File.exists?(File.join(File.dirname(__FILE__), 'spec_config.rb'))
-  require File.join(File.dirname(__FILE__), 'spec_config.rb')
 end
