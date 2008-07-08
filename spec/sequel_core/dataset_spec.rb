@@ -1165,33 +1165,20 @@ end
 
 context "Dataset#empty?" do
   specify "should return true if records exist in the dataset" do
-    @db = Sequel::Database.new
-    @db.meta_def(:execute) {|sql| @sqls ||=[]; @sqls << sql}
-    @db.meta_def(:sqls) {@sqls ||= []}
-    
-    $cccc = Class.new(Sequel::Dataset) do
+    @c = Class.new(Sequel::Dataset) do
+      def self.sql
+        @@sql
+      end
+      
       def fetch_rows(sql)
-        @db.execute(sql)
-        yield(:x => 'blah')
+        @@sql = sql
+        yield({1 => 1}) unless sql =~ /WHERE 'f'/
       end
     end
-    
-    @db.meta_def(:dataset) do
-      $cccc.new(self)
-    end
-    
-    @dataset = Sequel::Dataset.new(@db).from(:test)
-    
-    @dataset.should_not be_empty
-    @db.sqls.last.should == 'SELECT 1 WHERE (EXISTS (SELECT * FROM test)) LIMIT 1'
-    
-    @db.meta_def(:dataset) do
-      ds = $cccc.new(self)
-      ds.meta_def(:get) {|c| nil}
-      ds
-    end
-
-    @dataset.should be_empty
+    @c.new(nil).from(:test).should_not be_empty
+    @c.sql.should == 'SELECT 1 FROM test LIMIT 1'
+    @c.new(nil).from(:test).filter(false).should be_empty
+    @c.sql.should == "SELECT 1 FROM test WHERE 'f' LIMIT 1"
   end
 end
 

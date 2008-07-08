@@ -1,5 +1,7 @@
 === HEAD
 
+* Use a simpler select in Dataset#empty?, fixes use with MySQL (jeremyevans)
+
 * Add integration test suite, testing sequel against a real database, with nothing mocked (jeremyevans)
 
 * Make validates_length_of default tag depend on presence of options passed to it (jeremyevans)

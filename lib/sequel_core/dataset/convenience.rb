@@ -21,7 +21,7 @@ module Sequel
     
     # Returns true if no records exists in the dataset
     def empty?
-      db.dataset.where(exists).get(1) == nil
+      get(1).nil?
     end
     
     # Returns the first record in the dataset. If a numeric argument is
