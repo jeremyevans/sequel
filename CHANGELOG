@@ -1,5 +1,7 @@
 === HEAD
 
+* Typecast '' to nil by default for non-string non-blob columns, add typecast_empty_string_to_nil= model class and instance methods (jeremyevans)
+
 * Use a simpler select in Dataset#empty?, fixes use with MySQL (jeremyevans)
 
 * Add integration test suite, testing sequel against a real database, with nothing mocked (jeremyevans)

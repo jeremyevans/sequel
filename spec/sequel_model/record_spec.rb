@@ -815,6 +815,30 @@ describe Sequel::Model, "typecasting" do
     m.x.should == 1
   end
 
+  specify "should typecast '' to nil unless type is string or blob" do
+    [:integer, :float, :decimal, :boolean, :date, :time, :datetime].each do |x|
+      @c.instance_variable_set(:@db_schema, {:x=>{:type=>x}})
+      m = @c.new
+      m.x = ''
+      m.x.should == nil
+    end
+   [:string, :blob].each do |x|
+      @c.instance_variable_set(:@db_schema, {:x=>{:type=>x}})
+      m = @c.new
+      m.x = ''
+      m.x.should == ''
+    end
+  end
+
+  specify "should not typecast '' to nil if typecast_empty_string_to_nil is false" do
+    @c.instance_variable_set(:@db_schema, {:x=>{:type=>:integer}})
+    m = @c.new
+    m.typecast_empty_string_to_nil = false
+    proc{m.x = ''}.should raise_error
+    @c.typecast_empty_string_to_nil = false
+    proc{@c.new.x = ''}.should raise_error
+  end
+
   specify "should not typecast nil if NULLs are allowed" do
     @c.instance_variable_set(:@db_schema, {:x=>{:type=>:integer,:allow_null=>true}})
     m = @c.new
@@ -825,6 +849,7 @@ describe Sequel::Model, "typecasting" do
   specify "should raise an error if attempting to typecast nil and NULLs are not allowed" do
     @c.instance_variable_set(:@db_schema, {:x=>{:type=>:integer,:allow_null=>false}})
     proc{@c.new.x = nil}.should raise_error(Sequel::Error)
+    proc{@c.new.x = ''}.should raise_error(Sequel::Error)
   end
 
   specify "should not raise an error if NULLs are not allowed and typecasting is turned off" do
@@ -989,10 +1014,9 @@ describe Sequel::Model, "typecasting" do
   specify "should raise an error if invalid data is used in a datetime field" do
     @c.instance_variable_set(:@db_schema, {:x=>{:type=>:datetime}})
     proc{@c.new.x = '0000'}.should raise_error
-    proc{@c.new.x = ''}.should_not raise_error # Valid Time
+    proc{@c.new.x = 'a'}.should_not raise_error # Valid Time
     Sequel.datetime_class = DateTime
     proc{@c.new.x = '0000'}.should raise_error
-    proc{@c.new.x = ''}.should raise_error
+    proc{@c.new.x = 'a'}.should raise_error
   end
-
 end

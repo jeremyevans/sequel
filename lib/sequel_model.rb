@@ -54,7 +54,7 @@ module Sequel
   #   sti_dataset, and sti_key.  You should not usually need to
   #   access these directly.
   # * The following class level attr_accessors are created: raise_on_save_failure,
-  #   strict_param_setting, and typecast_on_assignment:
+  #   strict_param_setting, typecast_empty_string_to_nil, and typecast_on_assignment:
   #
   #     # Don't raise an error if a validation attempt fails in
   #     # save/create/save_changes/etc.
@@ -71,6 +71,10 @@ module Sequel
   #     m = Model.new
   #     m.number = '10'
   #     m.number # => '10' instead of 10
+  #     # Don't typecast empty string to nil for non-string, non-blob columns.
+  #     Model.typecast_empty_string_to_nil = false
+  #     m.number = ''
+  #     m.number # => '' instead of nil
   #
   # * The following class level method aliases are defined:
   #   * Model.dataset= => set_dataset

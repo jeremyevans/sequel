@@ -14,6 +14,7 @@ module Sequel
     @sti_dataset = nil
     @sti_key = nil
     @strict_param_setting = true
+    @typecast_empty_string_to_nil = true
     @typecast_on_assignment = true
 
     # Which columns should be the only columns allowed in a call to set
@@ -47,6 +48,10 @@ module Sequel
     # access is restricted to it).
     metaattr_accessor :strict_param_setting
 
+    # Whether to typecast the empty string ('') to nil for columns that
+    # are not string or blob.
+    metaattr_accessor :typecast_empty_string_to_nil
+
     # Whether to typecast attribute values on assignment (default: true)
     metaattr_accessor :typecast_on_assignment
 
@@ -65,7 +70,7 @@ module Sequel
       :@cache_ttl=>nil, :@dataset_methods=>:dup, :@primary_key=>nil, 
       :@raise_on_save_failure=>nil, :@restricted_columns=>:dup, :@restrict_primary_key=>nil,
       :@sti_dataset=>nil, :@sti_key=>nil, :@strict_param_setting=>nil,
-      :@typecast_on_assignment=>nil}
+      :@typecast_empty_string_to_nil=>nil, :@typecast_on_assignment=>nil}
 
     # Returns the first record from the database matching the conditions.
     # If a hash is given, it is used as the conditions.  If another

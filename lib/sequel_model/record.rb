@@ -2,7 +2,7 @@ module Sequel
   class Model
     # The setter methods (methods ending with =) that are never allowed
     # to be called automatically via set.
-    RESTRICTED_SETTER_METHODS = %w"== === []= taguri= typecast_on_assignment= strict_param_setting= raise_on_save_failure="
+    RESTRICTED_SETTER_METHODS = %w"== === []= taguri= typecast_empty_string_to_nil= typecast_on_assignment= strict_param_setting= raise_on_save_failure="
 
     # The current cached associations.  A hash with the keys being the
     # association name symbols and the values being the associated object
@@ -21,6 +21,10 @@ module Sequel
     # to call a method through set/update and their variants that either
     # doesn't exist or access to it is denied.
     attr_writer :strict_param_setting
+
+    # Whether this model instance should typecast the empty string ('') to
+    # nil for columns that are non string or blob.
+    attr_writer :typecast_empty_string_to_nil
 
     # Whether this model instance should typecast on attribute assignment
     attr_writer :typecast_on_assignment
@@ -49,6 +53,7 @@ module Sequel
       @raise_on_save_failure = model.raise_on_save_failure
       @strict_param_setting = model.strict_param_setting
       @typecast_on_assignment = model.typecast_on_assignment
+      @typecast_empty_string_to_nil = model.typecast_empty_string_to_nil
       if from_db
         @new = false
         @values = values
@@ -515,6 +520,7 @@ module Sequel
     # for database specific column types.
     def typecast_value(column, value)
       return value unless @typecast_on_assignment && @db_schema && (col_schema = @db_schema[column])
+      value = nil if value == '' and @typecast_empty_string_to_nil and col_schema[:type] and ![:string, :blob].include?(col_schema[:type])
       raise(Error, "nil/NULL is not allowed for the #{column} column") if value.nil? && (col_schema[:allow_null] == false)
       model.db.typecast_value(col_schema[:type], value)
     end
