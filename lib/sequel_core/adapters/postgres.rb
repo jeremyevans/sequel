@@ -429,17 +429,6 @@ module Sequel
         end
       end
     
-      def match_expr(l, r)
-        case r
-        when Regexp
-          r.casefold? ? \
-            "(#{literal(l)} ~* #{literal(r.source)})" :
-            "(#{literal(l)} ~ #{literal(r.source)})"
-        else
-          super
-        end
-      end
-      
       def full_text_search(cols, terms, opts = {})
         lang = opts[:language] ? "#{literal(opts[:language])}, " : ""
         cols = cols.is_a?(Array) ? cols.map {|c| literal(c)}.join(" || ") : literal(cols)

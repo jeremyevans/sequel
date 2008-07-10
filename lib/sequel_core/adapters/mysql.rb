@@ -352,17 +352,6 @@ module Sequel
         end
       end
 
-      def match_expr(l, r)
-        case r
-        when Regexp
-          r.casefold? ? \
-          "(#{literal(l)} REGEXP #{literal(r.source)})" :
-          "(#{literal(l)} REGEXP BINARY #{literal(r.source)})"
-        else
-          super
-        end
-      end
-
       def full_text_search(cols, terms, opts = {})
         mode = opts[:boolean] ? " IN BOOLEAN MODE" : ""
         s = if Array === terms
