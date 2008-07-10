@@ -4,6 +4,12 @@ module Sequel
   module SQLite
     class Database < Sequel::Database
       set_adapter_scheme :sqlite
+      
+      def self.uri_to_options(uri) # :nodoc:
+        { :database => (uri.host.nil? && uri.path == '/') ? nil : "#{uri.host}#{uri.path}" }
+      end
+
+      private_class_method :uri_to_options
     
       def serial_primary_key_options
         {:primary_key => true, :type => :integer, :auto_increment => true}
@@ -149,6 +155,7 @@ module Sequel
       end
       
       private
+      
       def connection_pool_default_options
         o = super.merge(:pool_convert_exceptions=>false)
         # Default to only a single connection if a memory database is used,

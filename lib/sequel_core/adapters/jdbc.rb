@@ -4,29 +4,26 @@ module Sequel
   module JDBC
     module JavaLang; include_package 'java.lang'; end
     module JavaSQL; include_package 'java.sql'; end
+    CLASS_NAMES = {'postgresql'=>'org.postgresql.Driver',
+      'mysql'=>'com.mysql.jdbc.Driver',
+      'sqlite'=>'org.sqlite.JDBC',
+      'oracle'=>'oracle.jdbc.driver.OracleDriver',
+      'sqlserver'=>'com.microsoft.sqlserver.jdbc.SQLServerDriver'}
     
     def self.load_driver(driver)
       JavaLang::Class.forName(driver)
-      # "com.mysql.jdbc.Driver"
     end
-    
+
     class Database < Sequel::Database
       set_adapter_scheme :jdbc
       
       def connect
-        unless conn_string = @opts[:uri] || @opts[:url] || @opts[:database]
-          raise Error, "No connection string specified"
+        raise(Error, "No connection string specified") unless conn_string = @opts[:uri] || @opts[:url] || @opts[:database]
+        conn_string = "jdbc:#{conn_string}" unless conn_string =~ /^\Ajdbc:/
+        if match = /\Ajdbc:([^:]+)/.match(conn_string) and jdbc_class_name = CLASS_NAMES[match[1]]
+          Sequel::JDBC.load_driver(jdbc_class_name)
         end
-        unless conn_string =~ /^jdbc:/
-          conn_string = "jdbc:#{conn_string}"
-        end
-        JavaSQL::DriverManager.getConnection(
-          conn_string, 
-          @opts[:user], 
-          @opts[:password]
-        )
-        # "jdbc:mysql://127.0.0.1:3306/ruby?user=root"
-        # "mysql://127.0.0.1:3306/ruby?user=root"
+        JavaSQL::DriverManager.getConnection(conn_string)
       end
       
       def disconnect
@@ -42,7 +39,7 @@ module Sequel
         @pool.hold do |conn|
           stmt = conn.createStatement
           begin
-            stmt.executeQuery(sql)
+            stmt.executeUpdate(sql)
           ensure
             stmt.close
           end

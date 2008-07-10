@@ -88,15 +88,22 @@ module Sequel
     end
     
     # Connects to a database.  See Sequel.connect.
-    def self.connect(conn_string, opts = nil, &block)
+    def self.connect(conn_string, opts = {}, &block)
       if conn_string.is_a?(String)
-        uri = URI.parse(conn_string)
-        scheme = uri.scheme
-        scheme = :dbi if scheme =~ /^dbi-(.+)/
-        c = adapter_class(scheme)
-        opts = c.uri_to_options(uri).merge(opts || {})
+        if conn_string =~ /\Ajdbc:/
+          c = adapter_class(:jdbc)
+          opts = {:uri=>conn_string}.merge(opts)
+        else
+          uri = URI.parse(conn_string)
+          scheme = uri.scheme
+          scheme = :dbi if scheme =~ /\Adbi-/
+          c = adapter_class(scheme)
+          uri_options = {}
+          uri.query.split('&').collect{|s| s.split('=')}.each{|k,v| uri_options[k.to_sym] = v} unless uri.query.blank?
+          opts = c.send(:uri_to_options, uri).merge(uri_options).merge(opts)
+        end
       else
-        opts = conn_string.merge(opts || {})
+        opts = conn_string.merge(opts)
         c = adapter_class(opts[:adapter] || opts['adapter'])
       end
       # process opts a bit
@@ -130,26 +137,6 @@ module Sequel
       @@single_threaded = value
     end
 
-    # Converts a uri to an options hash. These options are then passed
-    # to a newly created database object.
-    def self.uri_to_options(uri)
-      uri = URI.parse(uri) if uri.is_a?(String)
-      # special case for sqlite
-      opts = if uri.scheme == 'sqlite'
-        { :user => uri.user,
-          :password => uri.password,
-          :database => (uri.host.nil? && uri.path == '/') ? nil : "#{uri.host}#{uri.path}" }
-      else
-        { :user => uri.user,
-          :password => uri.password,
-          :host => uri.host,
-          :port => uri.port,
-          :database => (m = /\/(.*)/.match(uri.path)) && (m[1]) }
-      end
-      uri.query.split('&').collect{|s| s.split('=')}.each{|k,v| opts[k.to_sym] = v} unless uri.query.blank?
-      opts
-    end
-    
     ### Private Class Methods ###
 
     # Sets the adapter scheme for the Database class. Call this method in
@@ -169,7 +156,17 @@ module Sequel
       @@adapters[scheme.to_sym] = self
     end
     
-    private_class_method :set_adapter_scheme
+    # Converts a uri to an options hash. These options are then passed
+    # to a newly created database object. 
+    def self.uri_to_options(uri) # :nodoc:
+      { :user => uri.user,
+        :password => uri.password,
+        :host => uri.host,
+        :port => uri.port,
+        :database => (m = /\/(.*)/.match(uri.path)) && (m[1]) }
+    end
+    
+    private_class_method :set_adapter_scheme, :uri_to_options
     
     ### Instance Methods ###
 

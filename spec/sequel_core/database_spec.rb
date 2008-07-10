@@ -636,26 +636,6 @@ context "A broken adapter (lib is there but the class is not)" do
   end
 end
 
-context "Database#uri_to_options" do
-  specify "should convert a URI to an options hash" do
-    h = Sequel::Database.uri_to_options(URI.parse('ttt://uuu:ppp@192.168.60.1:1234/blah'))
-    h[:user].should == 'uuu'
-    h[:password].should == 'ppp'
-    h[:host].should == '192.168.60.1'
-    h[:port].should == 1234
-    h[:database].should == 'blah'
-  end
-
-  specify "should accept a string and convert it to an options hash" do
-    h = Sequel::Database.uri_to_options('ttt://uuu:ppp@192.168.60.1:1234/blah')
-    h[:user].should == 'uuu'
-    h[:password].should == 'ppp'
-    h[:host].should == '192.168.60.1'
-    h[:port].should == 1234
-    h[:database].should == 'blah'
-  end
-end
-
 context "A single threaded database" do
   teardown do
     Sequel::Database.single_threaded = false

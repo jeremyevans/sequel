@@ -24,7 +24,7 @@ module Sequel
 
       # Converts a uri to an options hash. These options are then passed
       # to a newly created database object.
-      def self.uri_to_options(uri)
+      def self.uri_to_options(uri) # :nodoc:
         database = (m = /\/(.*)/.match(uri.path)) && (m[1])
         if m = /dbi-(.+)/.match(uri.scheme)
           adapter = DBI_ADAPTERS[m[1].to_sym] || m[1]
@@ -39,6 +39,7 @@ module Sequel
         }
       end
 
+      private_class_method :uri_to_options
       
       def connect
         dbname = @opts[:database]
