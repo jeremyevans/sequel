@@ -14,7 +14,7 @@ module Sequel
       def connect
         if @opts[:database]
           dbname = @opts[:host] ? \
-            "//#{@opts[:host]}/#{@opts[:database]}" : @opts[:database]
+            "//#{@opts[:host]}#{":#{@opts[:port]}" if @opts[:port]}/#{@opts[:database]}" : @opts[:database]
         else
           dbname = @opts[:host]
         end
