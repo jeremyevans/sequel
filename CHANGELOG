@@ -1,5 +1,9 @@
 === HEAD
 
+* Make Database.uri_to_options a private class method (jeremyevans)
+
+* Make JDBC load drivers automatically for PostgreSQL, MySQL, SQLite, Oracle, and MSSQL (jeremyevans)
+
 * Make Oracle adapter work with a nonstandard Oracle database port (pavel.lukin)
 
 * Typecast '' to nil by default for non-string non-blob columns, add typecast_empty_string_to_nil= model class and instance methods (jeremyevans)
