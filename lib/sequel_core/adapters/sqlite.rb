@@ -121,7 +121,7 @@ module Sequel
       def alter_table_sql(table, op)
         case op[:op]
         when :add_column
-          "ALTER TABLE #{table} ADD #{column_definition_sql(op)}"
+          super
         when :add_index
           index_definition_sql(table, op)
         when :drop_column

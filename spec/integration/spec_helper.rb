@@ -27,7 +27,6 @@ else
   INTEGRATION_DB = Sequel.sqlite('', :loggers=>[sql_logger], :quote_identifiers=>false)
   class Spec::Example::ExampleGroup
     def sqls_should_be(*sqls)
-      $sqls.length.should == sqls.length
       sqls.zip($sqls).each do |should_be, is|
         case should_be
         when String
@@ -38,6 +37,7 @@ else
           raise ArgumentError, "need String or RegExp"
         end
       end
+      $sqls.length.should == sqls.length
       clear_sqls
     end 
   end

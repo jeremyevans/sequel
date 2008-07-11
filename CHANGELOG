@@ -1,5 +1,7 @@
 === HEAD
 
+* Make PostgreSQL adapter not raise an error when inserting records into a table without a primary key (jeremyevans)
+
 * Make Database.uri_to_options a private class method (jeremyevans)
 
 * Make JDBC load drivers automatically for PostgreSQL, MySQL, SQLite, Oracle, and MSSQL (jeremyevans)

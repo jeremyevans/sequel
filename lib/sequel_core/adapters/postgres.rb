@@ -254,14 +254,14 @@ module Sequel
         @primary_keys[table] ||= conn.primary_key(table)
       end
       
-      RE_CURRVAL_ERROR = /currval of sequence "(.*)" is not yet defined in this session/.freeze
+      ALLOWED_LAST_INSERT_ID_ERRORS = /(currval of sequence "(.*)" is not yet defined in this session|relation "(.*)" does not exist)/.freeze
       
       def insert_result(conn, table, values)
         begin
           result = conn.last_insert_id(table)
           return result if result
         rescue PGError => e
-          raise(Error, e.message) unless RE_CURRVAL_ERROR.match(e.message)
+          raise(Error, e.message) unless ALLOWED_LAST_INSERT_ID_ERRORS.match(e.message)
         end
         
         case values

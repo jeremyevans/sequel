@@ -70,6 +70,7 @@ describe "Eagerly loading a tree structure" do
     clear_sqls
   end
   after do
+    Node.drop_table
     Object.send(:remove_const, :Node)
   end
 
@@ -172,6 +173,8 @@ describe "Association Extensions" do
     clear_sqls
   end
   after do
+    Authorship.drop_table
+    Author.drop_table
     Object.send(:remove_const, :Author)
     Object.send(:remove_const, :Authorship)
   end
@@ -291,9 +294,9 @@ describe "has_many :through has_many and has_one :through belongs_to" do
     clear_sqls
   end
   after do
-    Invoice.delete
-    Client.delete
-    Firm.delete
+    Invoice.drop_table
+    Client.drop_table
+    Firm.drop_table
     Object.send(:remove_const, :Firm)
     Object.send(:remove_const, :Client)
     Object.send(:remove_const, :Invoice)
@@ -471,9 +474,9 @@ describe "Polymorphic Associations" do
     clear_sqls
   end
   after do
-    Asset.delete
-    Post.delete
-    Note.delete
+    Asset.drop_table
+    Post.drop_table
+    Note.drop_table
     Object.send(:remove_const, :Asset)
     Object.send(:remove_const, :Post)
     Object.send(:remove_const, :Note)
@@ -538,8 +541,8 @@ describe "Polymorphic Associations" do
   it "should remove all items correctly" do
     @post.remove_all_assets
     @note.remove_all_assets
-    sqls_should_be("UPDATE assets SET attachable_id = NULL, attachable_type = NULL WHERE ((attachable_id = 1) AND (attachable_type = 'Post'))",
-      "UPDATE assets SET attachable_id = NULL, attachable_type = NULL WHERE ((attachable_id = 2) AND (attachable_type = 'Note'))")
+    sqls_should_be(/UPDATE assets SET attachable_(id|type) = NULL, attachable_(type|id) = NULL WHERE \(\(attachable_(id|type) = (1|'Post')\) AND \(attachable_(type|id) = ('Post'|1)\)\)/,
+      /UPDATE assets SET attachable_(id|type) = NULL, attachable_(type|id) = NULL WHERE \(\(attachable_(id|type) = (2|'Note')\) AND \(attachable_(type|id) = ('Note'|2)\)\)/)
     @asset1.reload.attachable.should == nil
     @asset2.reload.attachable.should == nil
   end
@@ -612,8 +615,8 @@ describe "many_to_one/one_to_many not referencing primary key" do
     clear_sqls
   end
   after do
-    Invoice.delete
-    Client.delete
+    Invoice.drop_table
+    Client.drop_table
     Object.send(:remove_const, :Client)
     Object.send(:remove_const, :Invoice)
   end
