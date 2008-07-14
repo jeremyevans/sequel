@@ -21,6 +21,12 @@ describe "Simple Dataset operations" do
     @ds.order(:id).all.should == [{:id=>1, :number=>10}, {:id=>100, :number=>20}]
   end
 
+  specify "should have insert return primary key value" do
+    @ds.insert(:number=>20).should == 2
+    sqls_should_be('INSERT INTO items (number) VALUES (20)')
+    @ds.filter(:id=>2).first[:number].should == 20
+  end
+
   specify "should delete correctly" do
     @ds.filter(1=>1).delete
     sqls_should_be('DELETE FROM items WHERE (1 = 1)')
