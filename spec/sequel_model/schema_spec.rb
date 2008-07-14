@@ -66,7 +66,6 @@ describe Sequel::Model, "create_table!" do
   end
   
   it "should drop table if it exists and then create the table" do
-    @model.should_receive(:table_exists?).and_return(true)
     @model.should_receive(:drop_table).and_return(true)
     @model.should_receive(:create_table).and_return(true)
 

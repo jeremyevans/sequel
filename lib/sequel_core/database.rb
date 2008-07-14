@@ -212,6 +212,18 @@ module Sequel
       raise NotImplementedError, "#execute should be overridden by adapters"
     end
     
+    # Method that should be used when submitting any DDL (Data Definition
+    # Language) SQL.  By default, calls execute_dui.
+    def execute_ddl(sql)
+      execute_dui(sql)
+    end
+
+    # Method that should be used when issuing a DELETE, UPDATE, or INSERT
+    # statement.  By default, calls execute.
+    def execute_dui(sql)
+      execute(sql)
+    end
+
     # Fetches records for an arbitrary SQL statement. If a block is given,
     # it is used to iterate over the records:
     #

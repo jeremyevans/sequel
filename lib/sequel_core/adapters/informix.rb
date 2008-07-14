@@ -24,16 +24,17 @@ module Sequel
       end
       
       # Returns number of rows affected
-      def execute(sql)
+      def execute_dui(sql)
         log_info(sql)
         @pool.hold {|c| c.immediate(sql)}
       end
-      alias_method :do, :execute
+      alias_method :do, :execute_dui
       
-      def query(sql, &block)
+      def execute(sql, &block)
         log_info(sql)
         @pool.hold {|c| block[c.cursor(sql)]}
       end
+      alias_method :query, :execute
     end
     
     class Dataset < Sequel::Dataset
@@ -62,7 +63,7 @@ module Sequel
       
       def fetch_rows(sql, &block)
         @db.synchronize do
-          @db.query(sql) do |cursor|
+          @db.execute(sql) do |cursor|
             begin
               cursor.open.each_hash(&block)
             ensure
@@ -71,18 +72,6 @@ module Sequel
           end
         end
         self
-      end
-      
-      def insert(*values)
-        @db.do insert_sql(*values)
-      end
-    
-      def update(*args, &block)
-        @db.do update_sql(*args, &block)
-      end
-    
-      def delete(opts = nil)
-        @db.do delete_sql(opts)
       end
     end
   end

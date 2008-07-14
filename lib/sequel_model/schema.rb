@@ -2,20 +2,20 @@ module Sequel
   class Model
     # Creates table.
     def self.create_table
-      db.create_table_sql_list(table_name, *schema.create_info).each {|s| db << s} 
+      db.create_table(table_name, @schema)
       @db_schema = get_db_schema(true) unless @@lazy_load_schema
       columns
     end
     
     # Drops the table if it exists and then runs create_table.
     def self.create_table!
-      drop_table if table_exists?
+      drop_table rescue nil
       create_table
     end
     
     # Drops table.
     def self.drop_table
-      db.execute db.drop_table_sql(table_name)
+      db.drop_table(table_name)
     end
 
     # Returns table schema created with set_schema for direct descendant of Model.

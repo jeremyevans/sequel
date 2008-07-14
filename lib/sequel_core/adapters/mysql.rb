@@ -373,7 +373,7 @@ module Sequel
       end
 
       # MySQL supports ORDER and LIMIT clauses in UPDATE statements.
-      def update_sql(values, opts = nil, &block)
+      def update_sql(values, opts = nil)
         sql = super
         opts = opts ? @opts.merge(opts) : @opts
 
@@ -445,8 +445,8 @@ module Sequel
         @db.execute(insert_sql(*values)) {|c| c.insert_id}
       end
 
-      def update(*args, &block)
-        @db.execute(update_sql(*args, &block)) {|c| c.affected_rows}
+      def update(*args)
+        @db.execute(update_sql(*args)) {|c| c.affected_rows}
       end
       
       def replace(*args)

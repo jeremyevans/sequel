@@ -39,13 +39,6 @@ context "Dataset" do
   specify "should include Enumerable" do
     Sequel::Dataset.included_modules.should include(Enumerable)
   end
-  
-  specify "should raise ImplementedError for the dataset interface methods" do
-    proc {@dataset.fetch_rows('abc')}.should raise_error(NotImplementedError)
-    proc {@dataset.insert(1, 2, 3)}.should raise_error(NotImplementedError)
-    proc {@dataset.update(:name => 'abc')}.should raise_error(NotImplementedError)
-    proc {@dataset.delete}.should raise_error(NotImplementedError)
-  end
 end
 
 context "Dataset#clone" do

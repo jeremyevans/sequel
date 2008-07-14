@@ -182,7 +182,7 @@ context "A PostgreSQL dataset" do
   
   specify "should have #transaction yield the connection" do
     POSTGRES_DB.transaction do |conn|
-      conn.should be_a_kind_of(Sequel::Postgres::Adapter)
+      conn.should_not == nil
     end
   end
   

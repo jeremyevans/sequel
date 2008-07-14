@@ -1,5 +1,7 @@
 === HEAD
 
+* Enable almost full support of PostgreSQL-JDBC using the JDBC adapter (jeremyevans)
+
 * Remove Sequel::Worker (jeremyevans)
 
 * Make PostgreSQL adapter not raise an error when inserting records into a table without a primary key (jeremyevans)

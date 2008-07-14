@@ -39,9 +39,9 @@ module Sequel
     # available for index definition.
     #
     # See Schema::AlterTableGenerator.
-    def alter_table(name, &block)
-      g = Schema::AlterTableGenerator.new(self, &block)
-      alter_table_sql_list(name, g.operations).each {|sql| execute(sql)}
+    def alter_table(name, generator=nil, &block)
+      generator ||= Schema::AlterTableGenerator.new(self, &block)
+      alter_table_sql_list(name, generator.operations).each {|sql| execute_ddl(sql)}
     end
     
     # Creates a table with the columns given in the provided block:
@@ -54,15 +54,15 @@ module Sequel
     #   end
     #
     # See Schema::Generator.
-    def create_table(name, &block)
-      g = Schema::Generator.new(self, &block)
-      create_table_sql_list(name, *g.create_info).each {|sql| execute(sql)}
+    def create_table(name, generator=nil, &block)
+      generator ||= Schema::Generator.new(self, &block)
+      create_table_sql_list(name, *generator.create_info).each {|sql| execute_ddl(sql)}
     end
     
     # Forcibly creates a table. If the table already exists it is dropped.
-    def create_table!(name, &block)
+    def create_table!(name, generator=nil, &block)
       drop_table(name) rescue nil
-      create_table(name, &block)
+      create_table(name, generator, &block)
     end
     
     # Creates a view, replacing it if it already exists:
@@ -71,7 +71,7 @@ module Sequel
     #   DB.create_or_replace_view(:ruby_items, DB[:items].filter(:category => 'ruby'))
     def create_or_replace_view(name, source)
       source = source.sql if source.is_a?(Dataset)
-      execute("CREATE OR REPLACE VIEW #{name} AS #{source}")
+      execute_ddl("CREATE OR REPLACE VIEW #{name} AS #{source}")
     end
     
     # Creates a view based on a dataset or an SQL string:
@@ -80,7 +80,7 @@ module Sequel
     #   DB.create_view(:ruby_items, DB[:items].filter(:category => 'ruby'))
     def create_view(name, source)
       source = source.sql if source.is_a?(Dataset)
-      execute("CREATE VIEW #{name} AS #{source}")
+      execute_ddl("CREATE VIEW #{name} AS #{source}")
     end
     
     # Removes a column from the specified table:
@@ -106,14 +106,14 @@ module Sequel
     #
     #   DB.drop_table(:posts, :comments)
     def drop_table(*names)
-      names.each {|n| execute(drop_table_sql(n))}
+      names.each {|n| execute_ddl(drop_table_sql(n))}
     end
     
     # Drops a view:
     #
     #   DB.drop_view(:cheap_items)
     def drop_view(name)
-      execute("DROP VIEW #{name}")
+      execute_ddl("DROP VIEW #{name}")
     end
 
     # Renames a table:
@@ -122,7 +122,7 @@ module Sequel
     #   DB.rename_table :items, :old_items
     #   DB.tables #=> [:old_items]
     def rename_table(*args)
-      execute(rename_table_sql(*args))
+      execute_ddl(rename_table_sql(*args))
     end
     
     # Renames a column in the specified table. This method expects the current

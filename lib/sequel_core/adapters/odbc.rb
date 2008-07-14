@@ -58,6 +58,7 @@ module Sequel
           conn.do(sql)
         end
       end
+      alias_method :execute_dui, :do
     end
     
     class Dataset < Sequel::Dataset
@@ -148,19 +149,6 @@ module Sequel
         else
           v
         end
-      end
-      
-      def insert(*values)
-        @db.do insert_sql(*values)
-      end
-    
-      def update(*args, &block)
-        @db.do update_sql(*args, &block)
-        self
-      end
-    
-      def delete(opts = nil)
-        @db.do delete_sql(opts)
       end
     end
   end

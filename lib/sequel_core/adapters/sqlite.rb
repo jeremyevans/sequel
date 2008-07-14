@@ -248,10 +248,6 @@ module Sequel
         @db.execute_insert insert_sql(*values)
       end
     
-      def update(*args, &block)
-        @db.execute update_sql(*args, &block)
-      end
-    
       def delete(opts = nil)
         # check if no filter is specified
         unless (opts && opts[:where]) || @opts[:where]

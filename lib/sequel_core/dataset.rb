@@ -49,9 +49,9 @@ module Sequel
   #   end
   #
   #   # Update records.
-  #   def update(*args, &block)
+  #   def update(*args)
   #     @db.synchronize do
-  #       @db.execute(update_sql(*args, &block)).affected_rows
+  #       @db.execute(update_sql(*args)).affected_rows
   #     end
   #   end
   #
@@ -220,8 +220,8 @@ module Sequel
     end
 
     # Deletes the records in the dataset. Adapters should override this method.
-    def delete(opts = nil)
-      raise NotImplementedError, NOTIMPL_MSG
+    def delete(*args)
+      @db.execute_dui(delete_sql(*args))
     end
     
     # Iterates over the records in the dataset.
@@ -249,7 +249,7 @@ module Sequel
     # Inserts values into the associated table. Adapters should override this
     # method.
     def insert(*values)
-      raise NotImplementedError, NOTIMPL_MSG
+      @db.execute_dui(insert_sql(*values))
     end
   
     # Returns a string representation of the dataset including the class name 
@@ -285,8 +285,8 @@ module Sequel
 
     # Alias for set, but not aliased directly so subclasses
     # don't have to override both methods.
-    def set(*args, &block)
-      update(*args, &block)
+    def set(*args)
+      update(*args)
     end
 
     # Associates or disassociates the dataset with a model(s). If
@@ -429,8 +429,8 @@ module Sequel
     end
     
     # Updates values for the dataset. Adapters should override this method.
-    def update(values, opts = nil)
-      raise NotImplementedError, NOTIMPL_MSG
+    def update(*args)
+      @db.execute_dui(update_sql(*args))
     end
   
     # Add the mutation methods via metaprogramming

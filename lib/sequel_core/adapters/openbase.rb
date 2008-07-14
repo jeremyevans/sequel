@@ -59,18 +59,6 @@ module Sequel
         end
         self
       end
-      
-      def insert(*values)
-        @db.do insert_sql(*values)
-      end
-    
-      def update(*args, &block)
-        @db.do update_sql(*args, &block)
-      end
-    
-      def delete(opts = nil)
-        @db.do delete_sql(opts)
-      end
     end
   end
 end

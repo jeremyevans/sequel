@@ -19,8 +19,6 @@ module Sequel
         log_info(sql)
         @pool.hold {|conn| conn.exec(sql)}
       end
-      
-      alias_method :do, :execute
     end
     
     class Dataset < Sequel::Dataset
@@ -50,18 +48,6 @@ module Sequel
           end
         end
         self
-      end
-      
-      def insert(*values)
-        @db.do insert_sql(*values)
-      end
-    
-      def update(*args, &block)
-        @db.do update_sql(*args, &block)
-      end
-    
-      def delete(opts = nil)
-        @db.do delete_sql(opts)
       end
     end
   end
