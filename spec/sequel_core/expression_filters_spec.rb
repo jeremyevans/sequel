@@ -173,6 +173,7 @@ context "Blockless Ruby Filters" do
 
   it "should support AND conditions via &" do
     @d.l(:x & :y).should == '(x AND y)'
+    @d.l(:x.sql_boolean & :y).should == '(x AND y)'
     @d.l(:x & :y & :z).should == '((x AND y) AND z)'
     @d.l(:x & {:y => :z}).should == '(x AND (y = z))'
     @d.l({:y => :z} & :x).should == '((y = z) AND x)'
@@ -185,6 +186,7 @@ context "Blockless Ruby Filters" do
   
   it "should support OR conditions via |" do
     @d.l(:x | :y).should == '(x OR y)'
+    @d.l(:x.sql_boolean | :y).should == '(x OR y)'
     @d.l(:x | :y | :z).should == '((x OR y) OR z)'
     @d.l(:x | {:y => :z}).should == '(x OR (y = z))'
     @d.l({:y => :z} | :x).should == '((y = z) OR x)'
@@ -312,6 +314,28 @@ context "Blockless Ruby Filters" do
     @d.l(~(:x + 1) > 100).should == '(~(x + 1) > 100)'
     @d.l((:x + 1) << 1 > 100).should == '(((x + 1) << 1) > 100)'
     @d.l((:x + 1) >> 1 > 100).should == '(((x + 1) >> 1) > 100)'
+    @d.l((:x + 1) & (:x + 2) > 100).should == '(((x + 1) & (x + 2)) > 100)'
+  end
+
+  it "should raise an error if use a Bitwise method on a ComplexExpression that isn't a NumericExpression" do
+    proc{(:x + 1) & (:x & 2)}.should raise_error(Sequel::Error)
+  end
+
+  it "should raise an error if use a Boolean method on a ComplexExpression that isn't a BooleanExpression" do
+    proc{:x & (:x + 2)}.should raise_error(Sequel::Error)
+  end
+
+  it "should raise an error if attempting to invert a ComplexExpression that isn't a BooleanExpression" do
+    proc{Sequel::SQL::BooleanExpression.invert(:x + 2)}.should raise_error(Sequel::Error)
+  end
+
+  it "should return self on .lit" do
+    y = :x + 1
+    y.lit.should == y
+  end
+
+  it "should raise an error if trying to create an invalid complex expression" do
+    proc{Sequel::SQL::ComplexExpression.new(:BANG, 1, 2)}.should raise_error(Sequel::Error)
   end
 
   it "should raise an error if trying to literalize an invalid complex expression" do

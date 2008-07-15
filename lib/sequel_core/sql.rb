@@ -139,14 +139,7 @@ module Sequel
 
       # Do the bitwise compliment of the self
       def ~
-        case self
-        when NumericExpression 
-          NumericExpression.new(:'B~', self)
-        when ComplexExpression
-          raise(Sequel::Error, "cannot apply #{o} to a non-numeric expression")
-        else  
-          NumericExpression.new(:'B~', self)
-        end
+        NumericExpression.new(:'B~', self)
       end
     end
 
