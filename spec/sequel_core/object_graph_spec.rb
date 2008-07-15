@@ -46,6 +46,10 @@ describe Sequel::Dataset, " graphing" do
     ds.sql.should == 'SELECT points.id, points.x, points.y, lines.id AS lines_id, lines.x AS lines_x, lines.y AS lines_y, lines.graph_id FROM points LEFT OUTER JOIN lines ON (lines.x = points.id)'
   end
 
+  it "#graph should raise an error if a symbol, dataset, or model is not used" do
+    proc{@ds1.graph(Object.new, :x=>:id)}.should raise_error(Sequel::Error)
+  end
+
   it "#graph should accept a :table_alias option" do
     ds = @ds1.graph(:lines, {:x=>:id}, :table_alias=>:planes)
     ds.sql.should == 'SELECT points.id, points.x, points.y, planes.id AS planes_id, planes.x AS planes_x, planes.y AS planes_y, planes.graph_id FROM points LEFT OUTER JOIN lines AS planes ON (planes.x = points.id)'
