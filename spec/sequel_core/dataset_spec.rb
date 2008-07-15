@@ -2927,3 +2927,37 @@ context "Sequel.use_parse_tree=" do
     proc{Sequel.use_parse_tree = false}.should_not raise_error
   end
 end
+
+context "Dataset.dataset_classes" do
+  specify "should be an array of dataset subclasses" do
+    ds_class = Class.new(Sequel::Dataset)
+    Sequel::Dataset.dataset_classes.should be_a_kind_of(Array)
+    Sequel::Dataset.dataset_classes.should include(ds_class)
+  end
+end
+
+context "Dataset default #fetch_rows, #insert, #update, and #delete" do
+  setup do
+    @db = Sequel::Database.new
+    @ds = @db[:items]
+  end
+
+  specify "#fetch_rows should raise a NotImplementedError" do
+    proc{@ds.fetch_rows(''){}}.should raise_error(NotImplementedError)
+  end
+
+  specify "#delete should execute delete SQL" do
+    @db.should_receive(:execute).once.with('DELETE FROM items')
+    @ds.delete
+  end
+
+  specify "#insert should execute insert SQL" do
+    @db.should_receive(:execute).once.with('INSERT INTO items (number) VALUES (1)')
+    @ds.insert(:number=>1)
+  end
+
+  specify "#update should execute update SQL" do
+    @db.should_receive(:execute).once.with('UPDATE items SET number = 1')
+    @ds.update(:number=>1)
+  end
+end
