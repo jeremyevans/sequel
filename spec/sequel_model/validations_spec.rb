@@ -83,10 +83,15 @@ describe Sequel::Model do
     @c.validates_each(:xx, :xx, :tag=>:low) {|o, a, v| o.xxx; o.errors[a] << 'too low' if v < 50}
     @c.validates_each(:yy, :yy) {|o, a, v| o.yyy; o.errors[a] << 'too low' if v < 50}
     @c.validates_presence_of(:zz, :zz)
+    @c.validates_length_of(:aa, :aa, :tag=>:blah)
     o = @c.new
     def o.zz
       @a ||= 0
       @a += 1
+    end
+    def o.aa
+      @b ||= 0
+      @b += 1
     end
     o.should_receive(:xx).once.and_return(40)
     o.should_receive(:yy).once.and_return(60)
@@ -94,6 +99,7 @@ describe Sequel::Model do
     o.should_receive(:yyy).twice
     o.valid?.should == false
     o.zz.should == 2
+    o.aa.should == 2
     o.errors.full_messages.should == ['xx too low']
   end
 
