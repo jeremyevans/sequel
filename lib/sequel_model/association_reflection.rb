@@ -88,7 +88,7 @@ module Sequel
       
         # Whether to eagerly graph a lazy dataset
         def eager_graph_lazy_dataset?
-          self[:type] != :many_to_one or opts[:key]
+          self[:type] != :many_to_one or self[:key].nil?
         end
 
         # Whether the associated object needs a primary key to be added/removed

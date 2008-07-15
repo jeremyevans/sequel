@@ -263,6 +263,25 @@ describe Sequel::Model, "many_to_one" do
     MODEL_DB.sqls.should == []
   end
 
+  it "should get all matching records and only return the first if :key option is set to nil" do
+    c2 = @c2
+    @c2.one_to_many :children, :class => @c2, :key=>:parent_id
+    @c2.many_to_one :first_grand_parent, :class => @c2, :key=>nil, :eager_graph=>:children, :dataset=>proc{c2.filter(:children_id=>parent_id)}
+    ds = @c2.dataset
+    def ds.columns
+      [:id, :parent_id, :par_parent_id, :blah]
+    end
+    def ds.fetch_rows(sql, &block)
+      MODEL_DB.sqls << sql
+      yield({:id=>1, :parent_id=>0, :par_parent_id=>3, :blah=>4, :children_id=>2, :children_parent_id=>1, :children_par_parent_id=>5, :children_blah=>6})
+    end
+    p = @c2.new(:parent_id=>2)
+    fgp = p.first_grand_parent
+    MODEL_DB.sqls.should == ["SELECT nodes.id, nodes.parent_id, nodes.par_parent_id, nodes.blah, children.id AS children_id, children.parent_id AS children_parent_id, children.par_parent_id AS children_par_parent_id, children.blah AS children_blah FROM nodes LEFT OUTER JOIN nodes AS children ON (children.parent_id = nodes.id) WHERE (children_id = 2)"]
+    fgp.values.should == {:id=>1, :parent_id=>0, :par_parent_id=>3, :blah=>4}
+    fgp.children.first.values.should == {:id=>2, :parent_id=>1, :par_parent_id=>5, :blah=>6}
+  end
+
   it "should not create the setter method if :read_only option is used" do
     @c2.many_to_one :parent, :class => @c2, :read_only=>true
     @c2.instance_methods.should(include('parent'))
@@ -360,6 +379,11 @@ describe Sequel::Model, "many_to_one" do
     p.parent.should == c
     p.should_receive(:br).once.with(c).and_return(false)
     proc{p.parent = nil}.should raise_error(Sequel::Error)
+  end
+
+  it "should raise an error if a callback is not a proc or symbol" do
+    @c2.many_to_one :parent, :class => @c2, :before_add=>Object.new
+    proc{@c2.new.parent = @c2.load(:id=>1)}.should raise_error(Sequel::Error)
   end
 
   it "should call the remove callbacks for the previous object and the add callbacks for the new object" do

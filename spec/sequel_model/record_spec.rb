@@ -164,6 +164,10 @@ describe "Model#set_values" do
     o.set_values('x' => 1)
     o.x.should == 1
   end
+
+  it "should raise an error if used with a non-String, non-Symbol key" do
+    proc{@c.new.set_values(1=>2)}.should raise_error(Sequel::Error)
+  end
 end
 
 describe "Model#new?" do
