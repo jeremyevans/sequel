@@ -15,13 +15,12 @@ describe Sequel::Model, "table_exists?" do
 
 end
 
-describe Sequel::Model, "create_table" do
+describe Sequel::Model, "create_table and schema" do
 
   before(:each) do
     MODEL_DB.reset
     @model = Class.new(Sequel::Model) do
-      set_dataset MODEL_DB[:items]
-      set_schema do
+      set_schema(:items) do
         text :name
         float :price, :null => false
       end
@@ -39,6 +38,22 @@ describe Sequel::Model, "create_table" do
     @model.create_table
     @model.db_schema.should == schem
     @model.instance_variable_get(:@columns).should == [:name, :price]
+  end
+
+  it "should return the schema generator via schema" do
+    @model.schema.should be_a_kind_of(Sequel::Schema::Generator)
+  end
+
+  it "should use the superclasses schema if it exists" do
+    @submodel = Class.new(@model)
+    @submodel.schema.should be_a_kind_of(Sequel::Schema::Generator)
+  end
+
+  it "should return nil if no schema is present" do
+    @model = Class.new(Sequel::Model)
+    @model.schema.should == nil
+    @submodel = Class.new(@model)
+    @submodel.schema.should == nil
   end
 end
 

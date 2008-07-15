@@ -22,7 +22,7 @@ module Sequel
     # Does not retreive schema information from the database, see db_schema if you
     # want that.
     def self.schema
-      @schema || ((superclass != Model) && (superclass.schema))
+      @schema || (superclass.schema unless superclass == Model)
     end
 
     # Defines a table schema (see Schema::Generator for more information).
