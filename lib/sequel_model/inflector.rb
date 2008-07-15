@@ -148,11 +148,9 @@ class String
   #   "active_record/errors".camelize #=> "ActiveRecord::Errors"
   #   "active_record/errors".camelize(:lower) #=> "activeRecord::Errors"
   def camelize(first_letter_in_uppercase = :upper)
-    if first_letter_in_uppercase == :upper
-      gsub(/\/(.?)/){|x| "::#{x[-1..-1].upcase unless x == '/'}"}.gsub(/(^|_)(.)/){|x| x[-1..-1].upcase}
-    else
-      "#{first}#{camelize[1..-1]}"
-    end
+    s = gsub(/\/(.?)/){|x| "::#{x[-1..-1].upcase unless x == '/'}"}.gsub(/(^|_)(.)/){|x| x[-1..-1].upcase}
+    s[0...1] = s[0...1].downcase unless first_letter_in_uppercase == :upper
+    s
   end
   alias_method :camelcase, :camelize
 
