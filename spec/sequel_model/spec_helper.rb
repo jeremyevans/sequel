@@ -52,6 +52,7 @@ end
 
 class << Sequel::Model
   alias orig_columns columns
+  alias orig_str_columns str_columns
   def columns(*cols)
     return if cols.empty?
     define_method(:columns){cols}

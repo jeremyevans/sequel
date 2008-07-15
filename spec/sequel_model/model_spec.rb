@@ -79,6 +79,16 @@ describe Sequel::Model, "dataset & schema" do
     @model.primary_key.should == :id
     @model.table_name.should == :foo
   end
+
+  it "doesn't raise an error on set_dataset if there is an error raised getting the schema" do
+    @model.meta_def(:get_db_schema){raise Sequel::Error}
+    proc{@model.set_dataset(MODEL_DB[:foo])}.should_not raise_error
+  end
+
+  it "doesn't raise an error on inherited if there is an error setting the dataset" do
+    @model.meta_def(:set_dataset){raise Sequel::Error}
+    proc{Class.new(@model)}.should_not raise_error
+  end
 end
 
 describe Sequel::Model, "#sti_key" do
@@ -594,5 +604,14 @@ context "Model.db_schema" do
     def @c.columns; [:x]; end
     @c.dataset = ds
     @c.db_schema.should == {:x=>{}}
+  end
+end
+
+context "Model.str_columns" do
+  specify "should return the columns as frozen strings" do
+    c = Class.new(Sequel::Model)
+    c.meta_def(:columns){[:a, :b]}
+    c.orig_str_columns.should == %w'a b'
+    proc{c.orig_str_columns.first << 'a'}.should raise_error
   end
 end

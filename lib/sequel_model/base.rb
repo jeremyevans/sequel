@@ -210,6 +210,7 @@ module Sequel
             subclass.set_dataset(sup_class.sti_key ? sup_class.sti_dataset.filter(sup_class.sti_key=>subclass.name) : ds.clone)
           end
         rescue
+          nil
         end
       end
     end
@@ -323,9 +324,8 @@ module Sequel
       @dataset.extend(Associations::EagerLoading)
       @dataset.transform(@transform) if @transform
       @dataset_methods.each{|meth, block| @dataset.meta_def(meth, &block)} if @dataset_methods
-      begin
-        (@db_schema = get_db_schema) unless @@lazy_load_schema
-      rescue
+      unless @@lazy_load_schema
+        (@db_schema = get_db_schema) rescue nil
       end
       self
     end
