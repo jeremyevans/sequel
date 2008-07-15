@@ -58,6 +58,13 @@ context "A new Database" do
     Sequel::Database.quote_identifiers = false
     Sequel::Database.new({}).quote_identifiers?.should == false
   end
+
+  specify "should just use a :uri option for jdbc with the full connection string" do
+    Sequel::Database.should_receive(:adapter_class).once.with(:jdbc).and_return(Sequel::Database)
+    db = Sequel.connect('jdbc:test://host/db_name')
+    db.should be_a_kind_of(Sequel::Database)
+    db.opts[:uri].should == 'jdbc:test://host/db_name'
+  end
 end
 
 context "Database#connect" do

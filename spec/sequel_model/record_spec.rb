@@ -965,6 +965,7 @@ describe Sequel::Model, "typecasting" do
   specify "should raise an error if invalid data is used in a date field" do
     @c.instance_variable_set(:@db_schema, {:x=>{:type=>:date}})
     proc{@c.new.x = 'a'}.should raise_error
+    proc{@c.new.x = 100}.should raise_error
   end
 
   specify "should convert to time for a time field" do
