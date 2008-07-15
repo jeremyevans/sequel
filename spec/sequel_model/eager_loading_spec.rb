@@ -106,6 +106,10 @@ describe Sequel::Model, "#eager" do
     })
   end
   
+  it "should raise an error if called without a symbol or hash" do
+    proc{EagerAlbum.eager(Object.new)}.should raise_error(Sequel::Error)
+  end
+
   it "should eagerly load a single many_to_one association" do
     a = EagerAlbum.eager(:band).all
     a.should be_a_kind_of(Array)
@@ -149,8 +153,33 @@ describe Sequel::Model, "#eager" do
     MODEL_DB.sqls.length.should == 2
   end
   
-  it "should eagerly load multiple associations" do
+  it "should eagerly load multiple associations in a single call" do
     a = EagerAlbum.eager(:genres, :tracks, :band).all
+    a.should be_a_kind_of(Array)
+    a.size.should == 1
+    a.first.should be_a_kind_of(EagerAlbum)
+    a.first.values.should == {:id => 1, :band_id => 2}
+    MODEL_DB.sqls.length.should == 4
+    MODEL_DB.sqls[0].should == 'SELECT * FROM albums'
+    MODEL_DB.sqls[1..-1].should(include('SELECT * FROM bands WHERE (bands.id IN (2))'))
+    MODEL_DB.sqls[1..-1].should(include('SELECT * FROM tracks WHERE (tracks.album_id IN (1))'))
+    MODEL_DB.sqls[1..-1].should(include('SELECT genres.*, ag.album_id AS x_foreign_key_x FROM genres INNER JOIN ag ON ((ag.genre_id = genres.id) AND (ag.album_id IN (1)))'))
+    a = a.first
+    a.band.should be_a_kind_of(EagerBand)
+    a.band.values.should == {:id => 2}
+    a.tracks.should be_a_kind_of(Array)
+    a.tracks.size.should == 1
+    a.tracks.first.should be_a_kind_of(EagerTrack)
+    a.tracks.first.values.should == {:id => 3, :album_id=>1}
+    a.genres.should be_a_kind_of(Array)
+    a.genres.size.should == 1
+    a.genres.first.should be_a_kind_of(EagerGenre)
+    a.genres.first.values.should == {:id => 4}
+    MODEL_DB.sqls.length.should == 4
+  end
+  
+  it "should eagerly load multiple associations in separate calls" do
+    a = EagerAlbum.eager(:genres).eager(:tracks).eager(:band).all
     a.should be_a_kind_of(Array)
     a.size.should == 1
     a.first.should be_a_kind_of(EagerAlbum)
@@ -452,6 +481,7 @@ describe Sequel::Model, "#eager_graph" do
       many_to_one :band, :class=>'GraphBand', :key=>:band_id
       one_to_many :tracks, :class=>'GraphTrack', :key=>:album_id
       many_to_many :genres, :class=>'GraphGenre', :left_key=>:album_id, :right_key=>:genre_id, :join_table=>:ag
+      many_to_one :previous_album, :class=>'GraphAlbum'
     end
 
     class GraphBand < Sequel::Model(:bands)
@@ -482,6 +512,10 @@ describe Sequel::Model, "#eager_graph" do
     end
   end
     
+  it "should raise an error if called without a symbol or hash" do
+    proc{GraphAlbum.eager_graph(Object.new)}.should raise_error(Sequel::Error)
+  end
+
   it "should eagerly load a single many_to_one association" do
     ds = GraphAlbum.eager_graph(:band)
     ds.sql.should == 'SELECT albums.id, albums.band_id, band.id AS band_id_0, band.vocalist_id FROM albums LEFT OUTER JOIN bands AS band ON (band.id = albums.band_id)'
@@ -534,8 +568,32 @@ describe Sequel::Model, "#eager_graph" do
     a.genres.first.values.should == {:id => 4}
   end
 
-  it "should eagerly load multiple associations" do 
+  it "should eagerly load multiple associations in a single call" do 
     ds = GraphAlbum.eager_graph(:genres, :tracks, :band)
+    ds.sql.should == 'SELECT albums.id, albums.band_id, genres.id AS genres_id, tracks.id AS tracks_id, tracks.album_id, band.id AS band_id_0, band.vocalist_id FROM albums LEFT OUTER JOIN ag ON (ag.album_id = albums.id) LEFT OUTER JOIN genres ON (genres.id = ag.genre_id) LEFT OUTER JOIN tracks ON (tracks.album_id = albums.id) LEFT OUTER JOIN bands AS band ON (band.id = albums.band_id)'
+    def ds.fetch_rows(sql, &block)
+      yield({:id=>1, :band_id=>2, :genres_id=>4, :tracks_id=>3, :album_id=>1, :band_id_0=>2, :vocalist_id=>6})
+    end
+    a = ds.all
+    a.should be_a_kind_of(Array)
+    a.size.should == 1
+    a.first.should be_a_kind_of(GraphAlbum)
+    a.first.values.should == {:id => 1, :band_id => 2}
+    a = a.first
+    a.band.should be_a_kind_of(GraphBand)
+    a.band.values.should == {:id => 2, :vocalist_id=>6}
+    a.tracks.should be_a_kind_of(Array)
+    a.tracks.size.should == 1
+    a.tracks.first.should be_a_kind_of(GraphTrack)
+    a.tracks.first.values.should == {:id => 3, :album_id=>1}
+    a.genres.should be_a_kind_of(Array)
+    a.genres.size.should == 1
+    a.genres.first.should be_a_kind_of(GraphGenre)
+    a.genres.first.values.should == {:id => 4}
+  end
+
+  it "should eagerly load multiple associations in separate calls" do 
+    ds = GraphAlbum.eager_graph(:genres).eager_graph(:tracks).eager_graph(:band)
     ds.sql.should == 'SELECT albums.id, albums.band_id, genres.id AS genres_id, tracks.id AS tracks_id, tracks.album_id, band.id AS band_id_0, band.vocalist_id FROM albums LEFT OUTER JOIN ag ON (ag.album_id = albums.id) LEFT OUTER JOIN genres ON (genres.id = ag.genre_id) LEFT OUTER JOIN tracks ON (tracks.album_id = albums.id) LEFT OUTER JOIN bands AS band ON (band.id = albums.band_id)'
     def ds.fetch_rows(sql, &block)
       yield({:id=>1, :band_id=>2, :genres_id=>4, :tracks_id=>3, :album_id=>1, :band_id_0=>2, :vocalist_id=>6})
@@ -900,4 +958,7 @@ describe Sequel::Model, "#eager_graph" do
     GraphAlbum.eager_graph(:active_genres).sql.should == "SELECT albums.id, albums.band_id, active_genres.id AS active_genres_id FROM albums LEFT OUTER JOIN ag ON (active) LEFT OUTER JOIN genres AS active_genres ON ((price + 2) > 100)"
   end
 
+  it "should create unique table aliases for all associations" do
+    GraphAlbum.eager_graph(:previous_album=>{:previous_album=>:previous_album}).sql.should == "SELECT albums.id, albums.band_id, previous_album.id AS previous_album_id, previous_album.band_id AS previous_album_band_id, previous_album_0.id AS previous_album_0_id, previous_album_0.band_id AS previous_album_0_band_id, previous_album_1.id AS previous_album_1_id, previous_album_1.band_id AS previous_album_1_band_id FROM albums LEFT OUTER JOIN albums AS previous_album ON (previous_album.id = albums.previous_album_id) LEFT OUTER JOIN albums AS previous_album_0 ON (previous_album_0.id = previous_album.previous_album_id) LEFT OUTER JOIN albums AS previous_album_1 ON (previous_album_1.id = previous_album_0.previous_album_id)"
+  end
 end
