@@ -424,3 +424,74 @@ context "DB#alter_table" do
     @db.sqls.should == ["ALTER TABLE cats ALTER COLUMN score TYPE real"]
   end
 end
+
+context "Schema Parser" do
+  setup do
+    sqls = @sqls = []
+    @db = Sequel::Database.new
+    @db.meta_def(:dataset) do
+      ds = super
+      ds.instance_variable_set(:@sqls, sqls)
+      def ds.fetch_rows(sql)
+        @sqls << sql
+        table = /'(.*)'/.match(sql)[1]
+        h = {:column=>"a", :db_type=>table, :max_chars=>nil, :numeric_precision=>nil, :default=>'', :allow_null=>'YES'}
+        (h[:column] = h[:table_name] = :x) if sql =~ /BASE TABLE/
+        yield h
+      end
+      ds
+    end
+  end
+  after do
+    Sequel.convert_tinyint_to_bool = true
+  end
+
+  specify "should parse the schema correctly for a single table" do
+    @db.schema(:x).should == [[:a, {:type=>nil, :db_type=>"x", :max_chars=>nil, :numeric_precision=>nil, :default=>nil, :allow_null=>true}]]
+    @sqls.should == ["SELECT column_name AS column, data_type AS db_type, character_maximum_length AS max_chars, numeric_precision, column_default AS default, is_nullable AS allow_null FROM information_schema.tables AS t INNER JOIN information_schema.columns AS c USING (table_catalog, table_schema, table_name) WHERE (c.table_name = 'x')"]
+    @db.schema(:x).should == [[:a, {:type=>nil, :db_type=>"x", :max_chars=>nil, :numeric_precision=>nil, :default=>nil, :allow_null=>true}]]
+    @sqls.length.should == 1
+    @db.schema(:x, :reload=>true).should == [[:a, {:type=>nil, :db_type=>"x", :max_chars=>nil, :numeric_precision=>nil, :default=>nil, :allow_null=>true}]]
+    @sqls.length.should == 2
+  end
+
+  specify "should parse the schema correctly for all tables" do
+    @db.schema.should == {:x=>[[:x, {:type=>nil, :db_type=>"BASE TABLE", :max_chars=>nil, :numeric_precision=>nil, :default=>nil, :allow_null=>true}]]}
+    @sqls.should == ["SELECT column_name AS column, data_type AS db_type, character_maximum_length AS max_chars, numeric_precision, column_default AS default, is_nullable AS allow_null, c.table_name FROM information_schema.tables AS t INNER JOIN information_schema.columns AS c USING (table_catalog, table_schema, table_name) WHERE (t.table_type = 'BASE TABLE')"]
+    @db.schema.should == {:x=>[[:x, {:type=>nil, :db_type=>"BASE TABLE", :max_chars=>nil, :numeric_precision=>nil, :default=>nil, :allow_null=>true}]]}
+    @sqls.length.should == 1
+    @db.schema(nil, :reload=>true).should == {:x=>[[:x, {:type=>nil, :db_type=>"BASE TABLE", :max_chars=>nil, :numeric_precision=>nil, :default=>nil, :allow_null=>true}]]}
+    @sqls.length.should == 2
+  end
+
+  specify "should correctly parse all supported data types" do
+    @db.schema(:tinyint).first.last[:type].should == :boolean
+    Sequel.convert_tinyint_to_bool = false
+    @db.schema(:tinyint, :reload=>true).first.last[:type].should == :integer
+    @db.schema(:int).first.last[:type].should == :integer
+    @db.schema(:integer).first.last[:type].should == :integer
+    @db.schema(:bigint).first.last[:type].should == :integer
+    @db.schema(:smallint).first.last[:type].should == :integer
+    @db.schema(:character).first.last[:type].should == :string
+    @db.schema(:"character varying").first.last[:type].should == :string
+    @db.schema(:varchar).first.last[:type].should == :string
+    @db.schema(:text).first.last[:type].should == :string
+    @db.schema(:date).first.last[:type].should == :date
+    @db.schema(:datetime).first.last[:type].should == :datetime
+    @db.schema(:timestamp).first.last[:type].should == :datetime
+    @db.schema(:"timestamp with time zone").first.last[:type].should == :datetime
+    @db.schema(:"timestamp without time zone").first.last[:type].should == :datetime
+    @db.schema(:time).first.last[:type].should == :time
+    @db.schema(:"time with time zone").first.last[:type].should == :time
+    @db.schema(:"time without time zone").first.last[:type].should == :time
+    @db.schema(:boolean).first.last[:type].should == :boolean
+    @db.schema(:real).first.last[:type].should == :float
+    @db.schema(:float).first.last[:type].should == :float
+    @db.schema(:double).first.last[:type].should == :float
+    @db.schema(:"double precision").first.last[:type].should == :float
+    @db.schema(:numeric).first.last[:type].should == :decimal
+    @db.schema(:decimal).first.last[:type].should == :decimal
+    @db.schema(:money).first.last[:type].should == :decimal
+    @db.schema(:bytea).first.last[:type].should == :blob
+  end
+end

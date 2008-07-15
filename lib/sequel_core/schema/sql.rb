@@ -280,8 +280,7 @@ module Sequel
 
       # Argument array for the schema dataset's join method.
       def schema_ds_join(table_name, opts)
-        [:information_schema__columns, {:table_catalog=>:table_catalog,
-          :table_schema => :table_schema, :table_name => :table_name} , :c]
+        [:information_schema__columns, [:table_catalog, :table_schema, :table_name], :c]
       end
 
       # Argument array for the schema dataset's select method.
