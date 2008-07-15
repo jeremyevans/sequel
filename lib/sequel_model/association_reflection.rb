@@ -86,11 +86,6 @@ module Sequel
           :"#{self[:type] == :many_to_one ? self[:name] : self[:name].to_s.singularize}_id"
         end
       
-        # Name symbol for _dataset association method
-        def eager_dataset_method
-          :"#{self[:name]}_eager_dataset"
-        end
-      
         # Whether to eagerly graph a lazy dataset
         def eager_graph_lazy_dataset?
           self[:type] != :many_to_one or opts[:key]
