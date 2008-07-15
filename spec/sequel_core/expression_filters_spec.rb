@@ -313,4 +313,10 @@ context "Blockless Ruby Filters" do
     @d.l((:x + 1) << 1 > 100).should == '(((x + 1) << 1) > 100)'
     @d.l((:x + 1) >> 1 > 100).should == '(((x + 1) >> 1) > 100)'
   end
+
+  it "should raise an error if trying to literalize an invalid complex expression" do
+    ce = :x + 1
+    ce.instance_variable_set(:@op, :BANG)
+    proc{@d.lit(ce)}.should raise_error(Sequel::Error)
+  end
 end

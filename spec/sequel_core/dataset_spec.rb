@@ -346,6 +346,15 @@ context "Dataset#where" do
     @dataset.filter{|r| ((r.name < 'b') & {r.table__id => 1}) | r.is_active(r.blah, r.xx, r.x__y_z)}.sql.should ==
       "SELECT * FROM test WHERE (((name < 'b') AND (table.id = 1)) OR is_active(blah, xx, x.y_z))"
   end
+
+  specify "should raise an error if an invalid argument is used" do
+    proc{@dataset.filter(1)}.should raise_error(Sequel::Error)
+  end
+
+  specify "should raise an error if a NumericExpression or StringExpression is used" do
+    proc{@dataset.filter(:x + 1)}.should raise_error(Sequel::Error)
+    proc{@dataset.filter(:x.sql_string)}.should raise_error(Sequel::Error)
+  end
 end
 
 context "Dataset#or" do
@@ -647,6 +656,10 @@ context "Dataset#literal" do
 
   specify "should literalize BigDecimal instances correctly" do
     @dataset.literal(BigDecimal.new("80")).should == "80.0"
+  end
+
+  specify "should raise an Error if the object can't be literalized" do
+    proc{@dataset.literal(Object.new)}.should raise_error(Sequel::Error)
   end
 end
 
@@ -2952,8 +2965,8 @@ context "Dataset default #fetch_rows, #insert, #update, and #delete" do
   end
 
   specify "#insert should execute insert SQL" do
-    @db.should_receive(:execute).once.with('INSERT INTO items (number) VALUES (1)')
-    @ds.insert(:number=>1)
+    @db.should_receive(:execute).once.with('INSERT INTO items DEFAULT VALUES')
+    @ds.insert([])
   end
 
   specify "#update should execute update SQL" do
