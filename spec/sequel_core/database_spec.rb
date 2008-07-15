@@ -4,6 +4,9 @@ context "A new Database" do
   setup do
     @db = Sequel::Database.new(1 => 2, :logger => 3)
   end
+  teardown do
+    Sequel.quote_identifiers = false
+  end
   
   specify "should receive options" do
     @db.opts.should == {1 => 2, :logger => 3}  
@@ -43,6 +46,17 @@ context "A new Database" do
     db = Sequel::Database.new(:quote_identifiers=>true, :single_threaded=>false)
     db.quote_identifiers?.should == true
     db.pool.should be_a_kind_of(Sequel::ConnectionPool)
+  end
+
+  specify "should use the default Sequel.quote_identifiers value" do
+    Sequel.quote_identifiers = true
+    Sequel::Database.new({}).quote_identifiers?.should == true
+    Sequel.quote_identifiers = false
+    Sequel::Database.new({}).quote_identifiers?.should == false
+    Sequel::Database.quote_identifiers = true
+    Sequel::Database.new({}).quote_identifiers?.should == true
+    Sequel::Database.quote_identifiers = false
+    Sequel::Database.new({}).quote_identifiers?.should == false
   end
 end
 

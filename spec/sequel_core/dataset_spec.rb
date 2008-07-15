@@ -2911,3 +2911,19 @@ context "Dataset#grep" do
       "SELECT * FROM posts WHERE (((title ~ '^ruby') OR (title LIKE 'ruby')))"
   end
 end
+
+context "Sequel.use_parse_tree" do
+  specify "be false" do
+    Sequel.use_parse_tree.should == false
+  end
+end
+
+context "Sequel.use_parse_tree=" do
+  specify "raise an error if true" do
+    proc{Sequel.use_parse_tree = true}.should raise_error(Sequel::Error)
+  end
+
+  specify "do nothing if false" do
+    proc{Sequel.use_parse_tree = false}.should_not raise_error
+  end
+end
