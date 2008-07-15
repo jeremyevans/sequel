@@ -131,6 +131,10 @@ context "DB#create_table" do
     @db.sqls.should == ["CREATE TABLE cats (project_id integer DEFAULT 3 REFERENCES projects)"]
   end
   
+  specify "should raise an error if the table argument to foreign_key isn't a hash, symbol, or nil" do
+    proc{@db.create_table(:cats){foreign_key :project_id, Object.new, :default=>3}}.should raise_error(Sequel::Error)
+  end
+  
   specify "should accept foreign keys with arbitrary keys" do
     @db.create_table(:cats) do
       foreign_key :project_id, :table => :projects, :key => :id
