@@ -384,6 +384,12 @@ describe Sequel::Model, "#set" do
     @o1.values.should == {:x => 1}
     MODEL_DB.sqls.should == []
   end
+  
+  it "should return self" do
+    returned_value = @o1.set_with_params(:x => 1, :z => 2)
+    returned_value.should == @o1
+    MODEL_DB.sqls.should == []
+  end
 end
 
 describe Sequel::Model, "#update" do
