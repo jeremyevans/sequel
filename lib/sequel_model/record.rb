@@ -252,7 +252,8 @@ module Sequel
     end
 
     # Updates the instance with the supplied values with support for virtual
-    # attributes, ignoring any values for which no setter method is available.
+    # attributes, raising an exception if a value is used that doesn't have
+    # a setter method (or ignoring it if strict_param_setting = false).
     # Does not save the record.
     #
     # If no columns have been set for this model (very unlikely), assume symbol
