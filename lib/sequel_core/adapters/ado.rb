@@ -61,8 +61,10 @@ module Sequel
           
           @columns = s.Fields.extend(Enumerable).map {|x| x.Name.to_sym}
           
-          s.moveFirst
-          s.getRows.transpose.each {|r| yield hash_row(r)}
+          unless s.eof
+            s.moveFirst
+            s.getRows.transpose.each {|r| yield hash_row(r)}
+          end
         end
         self
       end

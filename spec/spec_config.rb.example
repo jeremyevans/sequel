@@ -7,3 +7,4 @@
 # ORACLE_DB = Sequel.connect('oracle://hr:hr@localhost/XE')
 # POSTGRES_URL = 'postgres://postgres:postgres@localhost:5432/reality_spec'
 # SQLITE_DB = Sequel.connect('sqlite:/')
+# ADO_DB = Sequel.connect(:adapter => 'ado', :driver => "{Microsoft Access Driver (*.mdb)}; DBQ=c:\\Nwind.mdb")
