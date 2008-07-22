@@ -485,6 +485,7 @@ module Sequel
           raise Error, "method #{m} doesn't exist or access is restricted to it"
         end
       end
+      self
     end
 
     # Returns all methods that can be used for attribute
