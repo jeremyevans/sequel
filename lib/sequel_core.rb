@@ -2,7 +2,7 @@
   require f
 end
 %w"core_ext sql core_sql connection_pool exceptions pretty_table
-  dataset migration schema database worker object_graph".each do |f|
+  dataset migration schema database object_graph".each do |f|
   require "sequel_core/#{f}"
 end
 
