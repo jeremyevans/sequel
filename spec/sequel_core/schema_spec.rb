@@ -430,7 +430,7 @@ context "Schema Parser" do
     sqls = @sqls = []
     @db = Sequel::Database.new
     @db.meta_def(:dataset) do
-      ds = super
+      ds = super()
       ds.instance_variable_set(:@sqls, sqls)
       def ds.fetch_rows(sql)
         @sqls << sql
