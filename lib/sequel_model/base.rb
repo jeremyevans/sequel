@@ -57,7 +57,7 @@ module Sequel
 
     # Dataset methods to proxy via metaprogramming
     DATASET_METHODS = %w'<< all avg count delete distinct eager eager_graph each each_page 
-       empty? except exclude filter first from_self full_outer_join get graph 
+       empty? except exclude filter first from from_self full_outer_join get graph 
        group group_and_count group_by having import inner_join insert 
        insert_multiple intersect interval invert_order join join_table last 
        left_outer_join limit map multi_insert naked order order_by order_more 
