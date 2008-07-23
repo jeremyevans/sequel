@@ -1,5 +1,7 @@
 === HEAD
 
+* Make Database#disconnect work for the ADO adapter (spicyj)
+
 * Don't raise an exception in the ADO adapter if the dataset contains no records (nusco)
 
 * Enable almost full support of PostgreSQL-JDBC using the JDBC adapter (jeremyevans)

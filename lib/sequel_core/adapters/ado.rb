@@ -28,7 +28,7 @@ module Sequel
       end
       
       def disconnect
-        # how do we disconnect? couldn't find anything in the docs
+        @pool.disconnect {|conn| conn.Close}
       end
     
       def dataset(opts = nil)
