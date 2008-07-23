@@ -43,6 +43,7 @@ module Sequel
         
         def setup_connection(conn)
           conn.extend(Sequel::JDBC::Postgres::AdapterMethods)
+          conn
         end
       end
       
@@ -53,6 +54,8 @@ module Sequel
           case v
           when SQL::Blob
             "'#{v.gsub(/[\000-\037\047\134\177-\377]/){|b| "\\#{ b[0].to_s(8).rjust(3, '0') }"}}'"
+          when Java::JavaSql::Timestamp
+            "TIMESTAMP #{literal(v.to_s)}"
           else
             super
           end

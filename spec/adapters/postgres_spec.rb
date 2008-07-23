@@ -284,7 +284,7 @@ context "A PostgreSQL dataaset with a timestamp field" do
   specify "should store milliseconds in time fields" do
     t = Time.now
     @d << {:value=>1, :time=>t}
-    @d[:value =>'1'][:time].should == t
+    @d.literal(@d[:value =>'1'][:time]).should == @d.literal(t)
     @d[:value=>'1'][:time].usec.should == t.usec
   end
 end

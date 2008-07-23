@@ -4,15 +4,21 @@ module Sequel
   module JDBC
     module JavaLang; include_package 'java.lang'; end
     module JavaSQL; include_package 'java.sql'; end
-    CLASS_NAMES = {:postgresql=>'org.postgresql.Driver',
-      :mysql=>'com.mysql.jdbc.Driver',
-      :sqlite=>'org.sqlite.JDBC',
-      :oracle=>'oracle.jdbc.driver.OracleDriver',
-      :sqlserver=>'com.microsoft.sqlserver.jdbc.SQLServerDriver'}
     DATABASE_SETUP = {:postgresql=>proc do |db|
         require 'sequel_core/adapters/jdbc/postgresql'
         db.extend(Sequel::JDBC::Postgres::DatabaseMethods)
-      end
+        begin
+          require 'jdbc/postgres'
+        rescue LoadError
+          # jdbc-postgres gem not used, hopefully the user has the
+          # PostgreSQL-JDBC .jar in their CLASSPATH
+        end
+        org.postgresql.Driver
+      end,
+      :mysql=>proc{com.mysql.jdbc.Driver},
+      :sqlite=>proc{org.sqlite.JDBC},
+      :oracle=>proc{oracle.jdbc.driver.OracleDriver},
+      :sqlserver=>proc{com.microsoft.sqlserver.jdbc.SQLServerDriver}
     }
     
     def self.load_driver(driver)
@@ -25,19 +31,16 @@ module Sequel
       # The type of database we are connecting to
       attr_reader :database_type
       
-      def connect
-        raise(Error, "No connection string specified") unless conn_string = @opts[:uri] || @opts[:url] || @opts[:database]
-        conn_string = "jdbc:#{conn_string}" unless conn_string =~ /^\Ajdbc:/
-        if match = /\Ajdbc:([^:]+)/.match(conn_string)
-          @database_type = match[1].to_sym
-          DATABASE_SETUP[@database_type].call(self)
-          if jdbc_class_name = CLASS_NAMES[@database_type]
-            Sequel::JDBC.load_driver(jdbc_class_name)
-          end
+      def initialize(opts)
+        super(opts)
+        raise(Error, "No connection string specified") unless uri
+        if match = /\Ajdbc:([^:]+)/.match(uri) and prok = DATABASE_SETUP[match[1].to_sym]
+          prok.call(self)
         end
-        conn = JavaSQL::DriverManager.getConnection(conn_string)
-        setup_connection(conn)
-        conn
+      end
+      
+      def connect
+        setup_connection(JavaSQL::DriverManager.getConnection(uri))
       end
       
       def dataset(opts = nil)
@@ -91,6 +94,12 @@ module Sequel
       end
       
       def setup_connection(conn)
+        conn
+      end
+      
+      def uri
+        ur = @opts[:uri] || @opts[:url] || @opts[:database]
+        ur =~ /^\Ajdbc:/ ? ur : "jdbc:#{ur}"
       end
       
       private
@@ -105,7 +114,7 @@ module Sequel
         case v
         when Time
           literal(v.iso8601)
-        when Date, DateTime
+        when Date, DateTime, Java::JavaSql::Timestamp
           literal(v.to_s)
         else
           super
