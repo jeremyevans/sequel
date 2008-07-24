@@ -142,7 +142,7 @@ module Sequel
         when ::ODBC::TimeStamp
           DateTime.new(v.year, v.month, v.day, v.hour, v.minute, v.second)
         when ::ODBC::Time
-          DateTime.now
+          now = DateTime.now
           Time.gm(now.year, now.month, now.day, v.hour, v.minute, v.second)
         when ::ODBC::Date
           Date.new(v.year, v.month, v.day)
