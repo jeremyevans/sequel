@@ -1,5 +1,7 @@
 === HEAD
 
+* Enable full support for SQLite-JDBC using the JDBC adapter (jeremyevans)
+
 * Minor changes to allow for full Ruby 1.9 compatibility (jeremyevans)
 
 * Make Database#disconnect work for the ADO adapter (spicyj)

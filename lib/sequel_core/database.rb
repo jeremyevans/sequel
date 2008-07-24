@@ -174,7 +174,7 @@ module Sequel
     # or as an array of strings. If an array is given, comments and excessive 
     # white space are removed. See also Array#to_sql.
     def <<(sql)
-      execute((Array === sql) ? sql.to_sql : sql)
+      execute_ddl((Array === sql) ? sql.to_sql : sql)
     end
     
     # Returns a dataset from the database. If the first argument is a string,

@@ -1,55 +1,45 @@
 require File.join(File.dirname(__FILE__), 'spec_helper.rb')
 
 unless defined?(SQLITE_DB)
-  SQLITE_DB = Sequel.connect('sqlite:/')
+  SQLITE_URL = 'sqlite:/' unless defined? SQLITE_URL
+  SQLITE_DB = Sequel.connect(ENV['SEQUEL_SQLITE_SPEC_DB']||SQLITE_URL)
 end
-
-SQLITE_DB.create_table :items do
-  integer :id, :primary_key => true, :auto_increment => true
-  text :name
-  float :value
-end
-SQLITE_DB.create_table :test2 do
-  text :name
-  integer :value
-end
-SQLITE_DB.create_table(:time) {timestamp :t}
 
 context "An SQLite database" do
   before do
-    @db = Sequel.connect('sqlite:/')
+    @db = SQLITE_DB
   end
-  after do
-    @db.disconnect
+
+  if SQLITE_DB.auto_vacuum == :none
+    specify "should support getting pragma values" do
+      @db.pragma_get(:auto_vacuum).to_s.should == '0'
+    end
+    
+    specify "should support setting pragma values" do
+      @db.pragma_set(:auto_vacuum, '1')
+      @db.pragma_get(:auto_vacuum).to_s.should == '1'
+      @db.pragma_set(:auto_vacuum, '2')
+      @db.pragma_get(:auto_vacuum).to_s.should == '2'
+    end
+    
+    specify "should support getting and setting the auto_vacuum pragma" do
+      @db.auto_vacuum = :full
+      @db.auto_vacuum.should == :full
+      @db.auto_vacuum = :incremental
+      @db.auto_vacuum.should == :incremental
+      
+      proc {@db.auto_vacuum = :invalid}.should raise_error(Sequel::Error)
+    end
   end
   
   specify "should provide a list of existing tables" do
-    @db.tables.should == []
-    
-    @db.create_table :testing do
+    @db.drop_table(:testing) rescue nil
+    @db.tables.should be_a_kind_of(Array)
+    @db.tables.should_not include(:testing)
+    @db.create_table! :testing do
       text :name
     end
     @db.tables.should include(:testing)
-  end
-  
-  specify "should support getting pragma values" do
-    @db.pragma_get(:auto_vacuum).should == '0'
-  end
-  
-  specify "should support setting pragma values" do
-    @db.pragma_set(:auto_vacuum, '1')
-    @db.pragma_get(:auto_vacuum).should == '1'
-    @db.pragma_set(:auto_vacuum, '2')
-    @db.pragma_get(:auto_vacuum).should == '2'
-  end
-  
-  specify "should support getting and setting the auto_vacuum pragma" do
-    @db.auto_vacuum = :full
-    @db.auto_vacuum.should == :full
-    @db.auto_vacuum = :incremental
-    @db.auto_vacuum.should == :incremental
-    
-    proc {@db.auto_vacuum = :invalid}.should raise_error(Sequel::Error)
   end
 
   specify "should support getting and setting the synchronous pragma" do
@@ -74,94 +64,76 @@ context "An SQLite database" do
     proc {@db.temp_store = :invalid}.should raise_error(Sequel::Error)
   end
   
-  specify "should be able to execute multiple statements at once" do
-    @db.create_table :t do
-      text :name
-    end
-    
-    @db << "insert into t (name) values ('abc');insert into t (name) values ('def')"
-
-    @db[:t].count.should == 2
-    
-    @db[:t].order(:name).map(:name).should == ['abc', 'def']
-  end
-  
   specify "should be able to execute transactions" do
     @db.transaction do
-      @db.create_table(:t) {text :name}
+      @db.create_table!(:t) {text :name}
     end
     
-    @db.tables.should == [:t]
+    @db.tables.should include(:t)
 
     proc {@db.transaction do
-      @db.create_table(:u) {text :name}
+      @db.create_table!(:u) {text :name}
       raise ArgumentError
     end}.should raise_error(ArgumentError)
     # no commit
-    @db.tables.should == [:t]
+    @db.tables.should_not include(:u)
 
     proc {@db.transaction do
-      @db.create_table(:v) {text :name}
+      @db.create_table!(:v) {text :name}
       raise Sequel::Error::Rollback
     end}.should_not raise_error
     # no commit
-    @db.tables.should == [:t]
+    @db.tables.should_not include(:r)
   end
 
   specify "should support nested transactions" do
     @db.transaction do
       @db.transaction do
-        @db.create_table(:t) {text :name}
+        @db.create_table!(:t) {text :name}
       end
     end
     
-    @db.tables.should == [:t]
+    @db.tables.should include(:t)
 
     proc {@db.transaction do
-      @db.create_table(:v) {text :name}
+      @db.create_table!(:v) {text :name}
       @db.transaction do
         raise Sequel::Error::Rollback # should roll back the top-level transaction
       end
     end}.should_not raise_error
     # no commit
-    @db.tables.should == [:t]
+    @db.tables.should_not include(:v)
   end
   
   specify "should handle returning inside of transaction by committing" do
-    @db.create_table(:items){text :name}
+    @db.create_table!(:items2){text :name}
     def @db.ret_commit
       transaction do
-        self[:items] << {:name => 'abc'}
+        self[:items2] << {:name => 'abc'}
         return
-        self[:items] << {:name => 'd'}
+        self[:items2] << {:name => 'd'}
       end
     end
-    @db[:items].count.should == 0
+    @db[:items2].count.should == 0
     @db.ret_commit
-    @db[:items].count.should == 1
+    @db[:items2].count.should == 1
     @db.ret_commit
-    @db[:items].count.should == 2
+    @db[:items2].count.should == 2
     proc do
       @db.transaction do
         raise Interrupt, 'asdf'
       end
     end.should raise_error(Interrupt)
 
-    @db[:items].count.should == 2
-  end
-
-  specify "should provide disconnect functionality" do
-    @db.tables
-    @db.pool.size.should == 1
-    @db.disconnect
-    @db.pool.size.should == 0
+    @db[:items2].count.should == 2
   end
 
   specify "should support timestamps" do
     t1 = Time.at(Time.now.to_i) #normalize time
-    
-    SQLITE_DB[:time] << {:t => t1}
-    SQLITE_DB[:time].first[:t].should == t1
+    @db.create_table!(:time) {timestamp :t}
+    @db[:time] << {:t => t1}
+    x = @db[:time].first[:t]
+    [t1.iso8601, t1.to_s].should include(x.respond_to?(:iso8601) ? x.iso8601 : x.to_s)
   end
   
   specify "should support sequential primary keys" do
@@ -176,18 +148,9 @@ context "An SQLite database" do
     ]
   end
   
-  specify "should catch invalid SQL errors and raise them as Error::InvalidStatement" do
-    proc {@db.execute 'blah blah'}.should raise_error(
-      Sequel::Error::InvalidStatement, "blah blah\r\nnear \"blah\": syntax error")
-
-    proc {@db.execute_insert 'blah blah'}.should raise_error(
-      Sequel::Error::InvalidStatement, "blah blah\r\nnear \"blah\": syntax error")
-
-    proc {@db.execute_select 'blah blah'}.should raise_error(
-      Sequel::Error::InvalidStatement, "blah blah\r\nnear \"blah\": syntax error")
-
-    proc {@db.single_value 'blah blah'}.should raise_error(
-      Sequel::Error::InvalidStatement, "blah blah\r\nnear \"blah\": syntax error")
+  specify "should catch invalid SQL errors and raise them as Error" do
+    proc {@db.execute 'blah blah'}.should raise_error(Sequel::Error)
+    proc {@db.execute_insert 'blah blah'}.should raise_error(Sequel::Error)
   end
   
   specify "should not swallow non-SQLite based exceptions" do
@@ -195,18 +158,23 @@ context "An SQLite database" do
   end
 
   specify "should correctly parse the schema" do
-    @db.create_table(:time) {timestamp :t}
-    @db.schema(:time, :reload=>true).should == [[:t, {:type=>:datetime, :allow_null=>true, :max_chars=>nil, :default=>nil, :db_type=>"timestamp", :numeric_precision=>nil, :primary_key=>false}]]
+    @db.create_table!(:time2) {timestamp :t}
+    @db.schema(:time2, :reload=>true).should == [[:t, {:type=>:datetime, :allow_null=>true, :max_chars=>nil, :default=>nil, :db_type=>"timestamp", :numeric_precision=>nil, :primary_key=>false}]]
   end
 
   specify "should get the schema all database tables if no table name is used" do
-    @db.create_table(:time) {timestamp :t}
-    @db.schema(:time, :reload=>true).should == @db.schema(nil, :reload=>true)[:time]
+    @db.create_table!(:time2) {timestamp :t}
+    @db.schema(:time2, :reload=>true).should == @db.schema(nil, :reload=>true)[:time]
   end
 end
 
 context "An SQLite dataset" do
   setup do
+    SQLITE_DB.create_table! :items do
+      integer :id, :primary_key => true, :auto_increment => true
+      text :name
+      float :value
+    end
     @d = SQLITE_DB[:items]
     @d.delete # remove all records
   end
@@ -274,6 +242,11 @@ end
 
 context "An SQLite dataset" do
   setup do
+    SQLITE_DB.create_table! :items do
+      integer :id, :primary_key => true, :auto_increment => true
+      text :name
+      float :value
+    end
     @d = SQLITE_DB[:items]
     @d.delete # remove all records
     @d << {:name => 'abc', :value => 1.23}
@@ -282,24 +255,29 @@ context "An SQLite dataset" do
   end
   
   specify "should correctly return avg" do
-    @d.avg(:value).should == ((1.23 + 4.56 + 7.89) / 3).to_s
+    @d.avg(:value).to_s.should == ((1.23 + 4.56 + 7.89) / 3).to_s
   end
   
   specify "should correctly return sum" do
-    @d.sum(:value).should == (1.23 + 4.56 + 7.89).to_s
+    @d.sum(:value).to_s.should == (1.23 + 4.56 + 7.89).to_s
   end
   
   specify "should correctly return max" do
-    @d.max(:value).should == 7.89.to_s
+    @d.max(:value).to_s.should == 7.89.to_s
   end
   
   specify "should correctly return min" do
-    @d.min(:value).should == 1.23.to_s
+    @d.min(:value).to_s.should == 1.23.to_s
   end
 end
 
 context "SQLite::Dataset#delete" do
   setup do
+    SQLITE_DB.create_table! :items do
+      integer :id, :primary_key => true, :auto_increment => true
+      text :name
+      float :value
+    end
     @d = SQLITE_DB[:items]
     @d.delete # remove all records
     @d << {:name => 'abc', :value => 1.23}
@@ -327,6 +305,11 @@ end
 
 context "SQLite::Dataset#update" do
   setup do
+    SQLITE_DB.create_table! :items do
+      integer :id, :primary_key => true, :auto_increment => true
+      text :name
+      float :value
+    end
     @d = SQLITE_DB[:items]
     @d.delete # remove all records
     @d << {:name => 'abc', :value => 1.23}
@@ -345,12 +328,16 @@ end
 
 context "SQLite dataset" do
   setup do
-    SQLITE_DB.create_table :test do
+    SQLITE_DB.create_table! :test do
       integer :id, :primary_key => true, :auto_increment => true
       text :name
       float :value
     end
-
+    SQLITE_DB.create_table! :items do
+      integer :id, :primary_key => true, :auto_increment => true
+      text :name
+      float :value
+    end
     @d = SQLITE_DB[:items]
     @d.delete # remove all records
     @d << {:name => 'abc', :value => 1.23}

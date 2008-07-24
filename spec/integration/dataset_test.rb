@@ -28,13 +28,13 @@ describe "Simple Dataset operations" do
   end
 
   specify "should delete correctly" do
-    @ds.filter(1=>1).delete
+    @ds.filter(1=>1).delete.should == 1
     sqls_should_be('DELETE FROM items WHERE (1 = 1)')
     @ds.count.should == 0
   end
 
   specify "should update correctly" do
-    @ds.update(:number=>:number+1)
+    @ds.update(:number=>:number+1).should == 1
     sqls_should_be('UPDATE items SET number = (number + 1)')
     @ds.all.should == [{:id=>1, :number=>11}]
   end

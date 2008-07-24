@@ -7,22 +7,29 @@ module Sequel
     DATABASE_SETUP = {:postgresql=>proc do |db|
         require 'sequel_core/adapters/jdbc/postgresql'
         db.extend(Sequel::JDBC::Postgres::DatabaseMethods)
-        begin
-          require 'jdbc/postgres'
-        rescue LoadError
-          # jdbc-postgres gem not used, hopefully the user has the
-          # PostgreSQL-JDBC .jar in their CLASSPATH
-        end
+        JDBC.load_gem('postgres')
         org.postgresql.Driver
       end,
-      :mysql=>proc{com.mysql.jdbc.Driver},
-      :sqlite=>proc{org.sqlite.JDBC},
+      :mysql=>proc do |db|
+        JDBC.load_gem('mysql')
+        com.mysql.jdbc.Driver
+      end,
+      :sqlite=>proc do |db|
+        require 'sequel_core/adapters/jdbc/sqlite'
+        db.extend(Sequel::JDBC::SQLite::DatabaseMethods)
+        JDBC.load_gem('sqlite3')
+        org.sqlite.JDBC
+      end,
       :oracle=>proc{oracle.jdbc.driver.OracleDriver},
       :sqlserver=>proc{com.microsoft.sqlserver.jdbc.SQLServerDriver}
     }
     
-    def self.load_driver(driver)
-      JavaLang::Class.forName(driver)
+    def self.load_gem(name)
+      begin
+        require "jdbc/#{name}"
+      rescue LoadError
+        # jdbc gem not used, hopefully the user has the .jar in their CLASSPATH
+      end
     end
 
     class Database < Sequel::Database
@@ -57,7 +64,7 @@ module Sequel
           stmt = conn.createStatement
           begin
             yield stmt.executeQuery(sql)
-          rescue NativeException => e
+          rescue NativeException, JavaSQL::SQLException => e
             raise Error, e.message
           ensure
             stmt.close
@@ -71,7 +78,7 @@ module Sequel
           stmt = conn.createStatement
           begin
             stmt.execute(sql)
-          rescue NativeException => e
+          rescue NativeException, JavaSQL::SQLException => e
             raise Error, e.message
           ensure
             stmt.close
@@ -85,7 +92,7 @@ module Sequel
           stmt = conn.createStatement
           begin
             stmt.executeUpdate(sql)
-          rescue NativeException => e
+          rescue NativeException, JavaSQL::SQLException => e
             raise Error, e.message
           ensure
             stmt.close
@@ -101,6 +108,7 @@ module Sequel
         ur = @opts[:uri] || @opts[:url] || @opts[:database]
         ur =~ /^\Ajdbc:/ ? ur : "jdbc:#{ur}"
       end
+      alias url uri
       
       private
       

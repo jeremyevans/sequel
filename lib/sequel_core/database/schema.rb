@@ -41,7 +41,7 @@ module Sequel
     # See Schema::AlterTableGenerator.
     def alter_table(name, generator=nil, &block)
       generator ||= Schema::AlterTableGenerator.new(self, &block)
-      alter_table_sql_list(name, generator.operations).each {|sql| execute_ddl(sql)}
+      alter_table_sql_list(name, generator.operations).flatten.each {|sql| execute_ddl(sql)}
     end
     
     # Creates a table with the columns given in the provided block:
@@ -56,7 +56,7 @@ module Sequel
     # See Schema::Generator.
     def create_table(name, generator=nil, &block)
       generator ||= Schema::Generator.new(self, &block)
-      create_table_sql_list(name, *generator.create_info).each {|sql| execute_ddl(sql)}
+      create_table_sql_list(name, *generator.create_info).flatten.each {|sql| execute_ddl(sql)}
     end
     
     # Forcibly creates a table. If the table already exists it is dropped.
