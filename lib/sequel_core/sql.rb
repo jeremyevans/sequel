@@ -762,6 +762,15 @@ module Sequel
       end
     end
 
+    if RUBY_VERSION >= '1.9.0'
+      class VirtualRow < BasicObject
+      end
+    else
+      class VirtualRow
+        (instance_methods - %w"__id__ __send__ instance_eval == equal?").each{|m| undef_method(m)}
+      end
+    end
+
     # An instance of this class is yielded to the block supplied to filter.
     # Useful if another library also defines the operator methods that
     # Sequel defines for symbols.
@@ -773,8 +782,6 @@ module Sequel
     #   ds.filter{|r| r.table__column + 1 < 2} # SELECT * FROM t WHERE ((table.column + 1) < 2)
     #   ds.filter{|r| r.is_active(1, 'arg2')} # SELECT * FROM t WHERE is_active(1, 'arg2')
     class VirtualRow
-      (instance_methods - %w"__id__ __send__").each{|m| undef_method(m)}
-
       # Can return Identifiers, QualifiedIdentifiers, or Functions:
       #
       # * Function - returned if any arguments are supplied, using the method name

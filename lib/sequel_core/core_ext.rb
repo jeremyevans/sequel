@@ -1,3 +1,9 @@
+if RUBY_VERSION < '1.9.0'
+  class Hash
+    alias key index
+  end
+end
+
 class Array
   # True if the array is not empty and all of its elements are
   # arrays of size 2.  This is used to determine if the array

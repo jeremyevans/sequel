@@ -510,7 +510,7 @@ module Sequel
       if only
         only.map{|x| "#{x}="}
       else
-        meths = methods.grep(/=\z/) - RESTRICTED_SETTER_METHODS
+        meths = methods.collect{|x| x.to_s}.grep(/=\z/) - RESTRICTED_SETTER_METHODS
         meths -= Array(primary_key).map{|x| "#{x}="} if primary_key && model.restrict_primary_key?
         meths -= except.map{|x| "#{x}="} if except
         meths

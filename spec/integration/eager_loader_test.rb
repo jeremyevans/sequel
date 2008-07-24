@@ -2,7 +2,7 @@ require File.join(File.dirname(__FILE__), 'spec_helper.rb')
 
 describe "Eagerly loading a tree structure" do
   before do
-    class Node < Sequel::Model
+    class ::Node < Sequel::Model
       set_schema do
         primary_key :id
         foreign_key :parent_id, :nodes
@@ -137,7 +137,7 @@ end
 
 describe "Association Extensions" do
   before do
-    module FindOrCreate
+    module ::FindOrCreate
       def find_or_create(vals)
         # Exploits the fact that Sequel filters are ruby objects that
         # can be introspected.
@@ -146,7 +146,7 @@ describe "Association Extensions" do
           @opts[:models][nil].create(vals.merge(:author_id=>author_id))
       end 
     end
-    class Author < Sequel::Model
+    class ::Author < Sequel::Model
       set_schema do
         primary_key :id
       end
@@ -160,7 +160,7 @@ describe "Association Extensions" do
         ds  
       end)
     end
-    class Authorship < Sequel::Model
+    class ::Authorship < Sequel::Model
       set_schema do
         primary_key :id
         foreign_key :author_id, :authors
@@ -212,7 +212,7 @@ end
 
 describe "has_many :through has_many and has_one :through belongs_to" do
   before do
-    class Firm < Sequel::Model
+    class ::Firm < Sequel::Model
       set_schema do
         primary_key :id
       end
@@ -237,7 +237,7 @@ describe "has_many :through has_many and has_one :through belongs_to" do
         end)
     end
 
-    class Client < Sequel::Model
+    class ::Client < Sequel::Model
       set_schema do
         primary_key :id
         foreign_key :firm_id, :firms
@@ -247,7 +247,7 @@ describe "has_many :through has_many and has_one :through belongs_to" do
       one_to_many :invoices
     end
 
-    class Invoice < Sequel::Model
+    class ::Invoice < Sequel::Model
       set_schema do
         primary_key :id
         foreign_key :client_id, :clients
@@ -375,7 +375,7 @@ end
 
 describe "Polymorphic Associations" do
   before do
-    class Asset < Sequel::Model
+    class ::Asset < Sequel::Model
       set_schema do
         primary_key :id
         integer :attachable_id
@@ -411,7 +411,7 @@ describe "Polymorphic Associations" do
       end 
     end 
   
-    class Post < Sequel::Model
+    class ::Post < Sequel::Model
       set_schema do
         primary_key :id
       end
@@ -438,7 +438,7 @@ describe "Polymorphic Associations" do
       end
     end 
   
-    class Note < Sequel::Model
+    class ::Note < Sequel::Model
       set_schema do
         primary_key :id
       end
@@ -550,7 +550,7 @@ end
 
 describe "many_to_one/one_to_many not referencing primary key" do
   before do
-    class Client < Sequel::Model
+    class ::Client < Sequel::Model
       set_schema do
         primary_key :id
         text :name
@@ -585,7 +585,7 @@ describe "many_to_one/one_to_many not referencing primary key" do
       end
     end 
   
-    class Invoice < Sequel::Model
+    class ::Invoice < Sequel::Model
       set_schema do
         primary_key :id
         text :client_name
@@ -671,7 +671,7 @@ describe "many_to_one/one_to_many not referencing primary key" do
     @client2.invoices.should == []
     sqls_should_be("SELECT * FROM invoices WHERE (client_name = 'Y')")
     @client2.add_invoice(@invoice1)
-    sqls_should_be("UPDATE invoices SET client_name = 'Y', id = 1 WHERE (id = 1)")
+    sqls_should_be(/UPDATE invoices SET (client_name = 'Y'|id = 1), (client_name = 'Y'|id = 1) WHERE \(id = 1\)/)
     @client2.invoices.should == [@invoice1]
     @invoice1.client_name.should == 'Y'
     @invoice1.client = nil
@@ -684,7 +684,7 @@ describe "many_to_one/one_to_many not referencing primary key" do
     sqls_should_be("SELECT * FROM invoices WHERE (client_name = 'X')")
     invs.should == [@invoice1, @invoice2]
     @client1.remove_invoice(@invoice1)
-    sqls_should_be("UPDATE invoices SET client_name = NULL, id = 1 WHERE (id = 1)")
+    sqls_should_be(/UPDATE invoices SET (client_name = NULL|id = 1), (client_name = NULL|id = 1) WHERE \(id = 1\)/)
     @client1.invoices.should == [@invoice2]
     @invoice1.client_name.should == nil
     @invoice1.client.should == nil

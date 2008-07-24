@@ -349,24 +349,24 @@ describe "Model#before_validation && Model#after_validation" do
   
   specify "should be called around validation" do
     @c.before_validation{MODEL_DB << "BLAH before"}
-    m = @c.new(:id => 2233)
+    m = @c.load(:id => 2233)
     m.should be_valid
     MODEL_DB.sqls.should == ['BLAH before', 'BLAH after']
 
     MODEL_DB.sqls.clear
-    m = @c.new(:id => 22)
+    m = @c.load(:id => 22)
     m.should_not be_valid
     MODEL_DB.sqls.should == ['BLAH before', 'BLAH after']
   end
 
   specify "should be called when calling save" do
     @c.before_validation{MODEL_DB << "BLAH before"}
-    m = @c.new(:id => 2233)
+    m = @c.load(:id => 2233)
     m.save.should == m
     MODEL_DB.sqls.should == ['BLAH before', 'BLAH after', 'CREATE BLAH']
 
     MODEL_DB.sqls.clear
-    m = @c.new(:id => 22)
+    m = @c.load(:id => 22)
     m.raise_on_save_failure = false
     m.save.should == nil
     MODEL_DB.sqls.should == ['BLAH before', 'BLAH after']

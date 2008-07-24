@@ -195,7 +195,7 @@ module Sequel
     # from the parent class.
     def self.inherited(subclass)
       sup_class = subclass.superclass
-      ivs = subclass.instance_variables
+      ivs = subclass.instance_variables.collect{|x| x.to_s}
       INHERITED_INSTANCE_VARIABLES.each do |iv, dup|
         next if ivs.include?(iv.to_s)
         sup_class_value = sup_class.instance_variable_get(iv)
@@ -205,9 +205,9 @@ module Sequel
       unless ivs.include?("@dataset")
         begin
           if sup_class == Model
-            subclass.set_dataset(Model.db[subclass.implicit_table_name]) unless subclass.name.empty?
+            subclass.set_dataset(Model.db[subclass.implicit_table_name]) unless subclass.name.blank?
           elsif ds = sup_class.instance_variable_get(:@dataset)
-            subclass.set_dataset(sup_class.sti_key ? sup_class.sti_dataset.filter(sup_class.sti_key=>subclass.name) : ds.clone)
+            subclass.set_dataset(sup_class.sti_key ? sup_class.sti_dataset.filter(sup_class.sti_key=>subclass.name.to_s) : ds.clone)
           end
         rescue
           nil
@@ -380,7 +380,7 @@ module Sequel
       @sti_key = key
       @sti_dataset = dataset
       dataset.set_model(key, Hash.new{|h,k| h[k] = (k.constantize rescue m)})
-      before_create(:set_sti_key){send("#{key}=", model.name)}
+      before_create(:set_sti_key){send("#{key}=", model.name.to_s)}
     end
 
     # Returns the columns as a list of frozen strings instead
@@ -427,7 +427,7 @@ module Sequel
     # Create the column accessors
     def self.def_column_accessor(*columns) # :nodoc:
       columns.each do |column|
-        im = instance_methods
+        im = instance_methods.collect{|x| x.to_s}
         meth = "#{column}="
          define_method(column){self[column]} unless im.include?(column.to_s)
         unless im.include?(meth)

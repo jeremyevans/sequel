@@ -146,10 +146,10 @@ context "Sequel::Migrator" do
     Object.send(:remove_const, "CreateUsers") if Object.const_defined?("CreateUsers")
     Object.send(:remove_const, "CreateAttributes") if Object.const_defined?("CreateAttributes")
 
-    FileUtils.rm('001_create_sessions.rb')
-    FileUtils.rm('002_create_nodes.rb')
-    FileUtils.rm('003_create_users.rb')
-    FileUtils.rm('005_create_attributes.rb')
+    File.delete('001_create_sessions.rb')
+    File.delete('002_create_nodes.rb')
+    File.delete('003_create_users.rb')
+    File.delete('005_create_attributes.rb')
   end
   
   specify "should return the list of files for a specified version range" do

@@ -33,7 +33,7 @@ describe "Model#save" do
   end
   
   it "should mark saved columns as not changed" do
-    o = @c.new(:id => 3, :x => 1, :y => nil)
+    o = @c.load(:id => 3, :x => 1, :y => nil)
     o[:y] = 4
     o.changed_columns.should == [:y]
     o.save(:x)
@@ -50,6 +50,7 @@ describe "Model#save_changes" do
     MODEL_DB.reset
 
     @c = Class.new(Sequel::Model(:items)) do
+      unrestrict_primary_key
       columns :id, :x, :y
     end
   end
@@ -110,6 +111,7 @@ describe "Model#update_values" do
     MODEL_DB.reset
 
     @c = Class.new(Sequel::Model(:items)) do
+      unrestrict_primary_key
       columns :id, :x, :y
     end
   end
@@ -141,6 +143,7 @@ describe "Model#set_values" do
     MODEL_DB.reset
 
     @c = Class.new(Sequel::Model(:items)) do
+      unrestrict_primary_key
       columns :id, :x, :y
     end
   end
@@ -176,6 +179,7 @@ describe "Model#new?" do
     MODEL_DB.reset
 
     @c = Class.new(Sequel::Model(:items)) do
+      unrestrict_primary_key
     end
   end
   
@@ -722,6 +726,7 @@ describe Sequel::Model, ".create" do
   before(:each) do
     MODEL_DB.reset
     @c = Class.new(Sequel::Model(:items)) do
+      unrestrict_primary_key
       columns :x
     end
   end
@@ -740,7 +745,7 @@ describe Sequel::Model, ".create" do
 
   it "should accept a block and run it" do
     o1, o2, o3 =  nil, nil, nil
-    o = @c.create {|o3| o1 = o3; o2 = :blah; o3.x = 333}
+    o = @c.create {|o4| o1 = o4; o3 = o4; o2 = :blah; o3.x = 333}
     o.class.should == @c
     o1.should === o
     o3.should === o
@@ -760,7 +765,8 @@ describe Sequel::Model, "#refresh" do
   setup do
     MODEL_DB.reset
     @c = Class.new(Sequel::Model(:items)) do
-      columns :x
+      unrestrict_primary_key
+      columns :id, :x
     end
   end
 

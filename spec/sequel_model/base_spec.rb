@@ -79,10 +79,11 @@ describe "Model#serialize" do
 
     @c.create(:abc => 1)
     @c.create(:abc => "hello")
+    x = [Marshal.dump("hello")].pack('m')
 
     MODEL_DB.sqls.should == [ \
       "INSERT INTO items (abc) VALUES ('BAhpBg==\n')", \
-      "INSERT INTO items (abc) VALUES ('BAgiCmhlbGxv\n')", \
+      "INSERT INTO items (abc) VALUES ('#{x}')", \
     ]
   end
 

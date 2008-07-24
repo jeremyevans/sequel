@@ -2,7 +2,7 @@ require File.join(File.dirname(__FILE__), "spec_helper")
 
 describe Sequel::Model do
   it "should have class method aliased as model" do
-    Sequel::Model.instance_methods.should include("model")
+    Sequel::Model.instance_methods.collect{|x| x.to_s}.should include("model")
 
     model_a = Class.new(Sequel::Model(:items))
     model_a.new.model.should be(model_a)
@@ -93,14 +93,14 @@ end
 
 describe Sequel::Model, "#sti_key" do
   before do
-    class StiTest < Sequel::Model
+    class ::StiTest < Sequel::Model
       def kind=(x); self[:kind] = x; end
       def refresh; end
       set_sti_key :kind
     end
-    class StiTestSub1 < StiTest
+    class ::StiTestSub1 < StiTest
     end
-    class StiTestSub2 < StiTest
+    class ::StiTestSub2 < StiTest
     end
     @ds = StiTest.dataset
     MODEL_DB.reset
@@ -445,15 +445,15 @@ describe Sequel::Model, "attribute accessors" do
 
   it "should be created on set_dataset unless lazy loading schema" do
     %w'x y x= y='.each do |x|
-      @c.instance_methods.include?(x).should == false
+      @c.instance_methods.collect{|y| y.to_s}.should_not include(x)
     end
     @c.set_dataset(@dataset)
     %w'x y x= y='.each do |x|
-      @c.instance_methods.include?(x).should == true
+      @c.instance_methods.collect{|y| y.to_s}.should include(x)
     end
     o = @c.new
     %w'x y x= y='.each do |x|
-      o.methods.include?(x).should == true
+      o.methods.collect{|y| y.to_s}.should include(x)
     end
 
     o.x.should be_nil
@@ -464,18 +464,18 @@ describe Sequel::Model, "attribute accessors" do
   it "should be created on first initialization if lazy loading schema" do
     Sequel::Model.lazy_load_schema = true
     %w'x y x= y='.each do |x|
-      @c.instance_methods.include?(x).should == false
+      @c.instance_methods.collect{|y| y.to_s}.should_not include(x)
     end
     @c.set_dataset(@dataset)
     %w'x y x= y='.each do |x|
-      @c.instance_methods.include?(x).should == false 
+      @c.instance_methods.collect{|y| y.to_s}.should_not include(x)
     end
     o = @c.new
     %w'x y x= y='.each do |x|
-      @c.instance_methods.include?(x).should == true
+      @c.instance_methods.collect{|y| y.to_s}.should include(x)
     end
     %w'x y x= y='.each do |x|
-      o.methods.include?(x).should == true
+      o.methods.collect{|y| y.to_s}.should include(x)
     end
 
     o.x.should be_nil

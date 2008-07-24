@@ -1,5 +1,7 @@
 === HEAD
 
+* Minor changes to allow for full Ruby 1.9 compatibility (jeremyevans)
+
 * Make Database#disconnect work for the ADO adapter (spicyj)
 
 * Don't raise an exception in the ADO adapter if the dataset contains no records (nusco)

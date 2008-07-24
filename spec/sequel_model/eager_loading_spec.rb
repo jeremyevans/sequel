@@ -4,7 +4,7 @@ describe Sequel::Model, "#eager" do
   before(:each) do
     MODEL_DB.reset
     
-    class EagerAlbum < Sequel::Model(:albums)
+    class ::EagerAlbum < Sequel::Model(:albums)
       columns :id, :band_id
       many_to_one :band, :class=>'EagerBand', :key=>:band_id
       one_to_many :tracks, :class=>'EagerTrack', :key=>:album_id
@@ -17,7 +17,7 @@ describe Sequel::Model, "#eager" do
       many_to_many :genre_names, :class=>'EagerGenre', :left_key=>:album_id, :right_key=>:genre_id, :join_table=>:ag, :select=>[:id]
     end
 
-    class EagerBand < Sequel::Model(:bands)
+    class ::EagerBand < Sequel::Model(:bands)
       columns :id
       one_to_many :albums, :class=>'EagerAlbum', :key=>:band_id, :eager=>:tracks
       one_to_many :graph_albums, :class=>'EagerAlbum', :key=>:band_id, :eager_graph=>:tracks
@@ -32,17 +32,17 @@ describe Sequel::Model, "#eager" do
       one_to_many :top_10_albums, :class=>'EagerAlbum', :key=>:band_id, :limit=>10
     end
     
-    class EagerTrack < Sequel::Model(:tracks)
+    class ::EagerTrack < Sequel::Model(:tracks)
       columns :id, :album_id
       many_to_one :album, :class=>'EagerAlbum', :key=>:album_id
     end
     
-    class EagerGenre < Sequel::Model(:genres)
+    class ::EagerGenre < Sequel::Model(:genres)
       columns :id
       many_to_many :albums, :class=>'EagerAlbum', :left_key=>:genre_id, :right_key=>:album_id, :join_table=>:ag
     end
     
-    class EagerBandMember < Sequel::Model(:members)
+    class ::EagerBandMember < Sequel::Model(:members)
       columns :id
       many_to_many :bands, :class=>'EagerBand', :left_key=>:member_id, :right_key=>:band_id, :join_table=>:bm, :order =>:id
     end
@@ -459,13 +459,13 @@ end
 
 describe Sequel::Model, "#eager_graph" do
   after(:all) do
-    class MockDataset
+    class ::MockDataset
       alias clone orig_clone
     end
   end
 
   before(:all) do
-    class MockDataset
+    class ::MockDataset
       alias orig_clone clone
       def clone(opts = {})
         c = super()
@@ -475,7 +475,7 @@ describe Sequel::Model, "#eager_graph" do
       end
     end
 
-    class GraphAlbum < Sequel::Model(:albums)
+    class ::GraphAlbum < Sequel::Model(:albums)
       dataset.opts[:from] = [:albums]
       columns :id, :band_id
       many_to_one :band, :class=>'GraphBand', :key=>:band_id
@@ -484,7 +484,7 @@ describe Sequel::Model, "#eager_graph" do
       many_to_one :previous_album, :class=>'GraphAlbum'
     end
 
-    class GraphBand < Sequel::Model(:bands)
+    class ::GraphBand < Sequel::Model(:bands)
       dataset.opts[:from] = [:bands]
       columns :id, :vocalist_id
       many_to_one :vocalist, :class=>'GraphBandMember', :key=>:vocalist_id
@@ -493,19 +493,19 @@ describe Sequel::Model, "#eager_graph" do
       many_to_many :genres, :class=>'GraphGenre', :left_key=>:band_id, :right_key=>:genre_id, :join_table=>:bg
     end
     
-    class GraphTrack < Sequel::Model(:tracks)
+    class ::GraphTrack < Sequel::Model(:tracks)
       dataset.opts[:from] = [:tracks]
       columns :id, :album_id
       many_to_one :album, :class=>'GraphAlbum', :key=>:album_id
     end
     
-    class GraphGenre < Sequel::Model(:genres)
+    class ::GraphGenre < Sequel::Model(:genres)
       dataset.opts[:from] = [:genres]
       columns :id
       many_to_many :albums, :class=>'GraphAlbum', :left_key=>:genre_id, :right_key=>:album_id, :join_table=>:ag
     end
     
-    class GraphBandMember < Sequel::Model(:members)
+    class ::GraphBandMember < Sequel::Model(:members)
       dataset.opts[:from] = [:members]
       columns :id
       many_to_many :bands, :class=>'GraphBand', :left_key=>:member_id, :right_key=>:band_id, :join_table=>:bm

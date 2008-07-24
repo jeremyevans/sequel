@@ -70,14 +70,14 @@ module Sequel
 
         # Name symbol for default join table
         def default_join_table
-          ([self[:class_name].demodulize, self[:model].name.demodulize]. \
+          ([self[:class_name].demodulize, self[:model].name.to_s.demodulize]. \
             map{|i| i.pluralize.underscore}.sort.join('_')).to_sym
         end
       
         # Default foreign key name symbol for key in associated table that points to
         # current table's primary key.
         def default_left_key
-          :"#{self[:model].name.demodulize.underscore}_id"
+          :"#{self[:model].name.to_s.demodulize.underscore}_id"
         end
 
         # Default foreign key name symbol for foreign key in current model's table that points to

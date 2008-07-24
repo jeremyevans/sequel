@@ -3,7 +3,7 @@ require File.join(File.dirname(__FILE__), "spec_helper")
 describe Sequel::Model::Associations::AssociationReflection, "#associated_class" do
   before do
     @c = Class.new(Sequel::Model)
-    class ParParent < Sequel::Model; end
+    class ::ParParent < Sequel::Model; end
   end
 
   it "should use the :class value if present" do
@@ -21,7 +21,7 @@ end
 describe Sequel::Model::Associations::AssociationReflection, "#associated_primary_key" do
   before do
     @c = Class.new(Sequel::Model)
-    class ParParent < Sequel::Model; end
+    class ::ParParent < Sequel::Model; end
   end
 
   it "should use the :right_primary_key value if present" do
@@ -46,9 +46,9 @@ describe Sequel::Model::Associations::AssociationReflection, "#reciprocal" do
   end
 
   it "should figure out the reciprocal if the :reciprocal value is not present" do
-    class ParParent < Sequel::Model; end
-    class ParParentTwo < Sequel::Model; end
-    class ParParentThree < Sequel::Model; end
+    class ::ParParent < Sequel::Model; end
+    class ::ParParentTwo < Sequel::Model; end
+    class ::ParParentThree < Sequel::Model; end
     ParParent.many_to_one :par_parent_two
     ParParentTwo.one_to_many :par_parents
     ParParent.many_to_many :par_parent_threes
@@ -68,7 +68,7 @@ end
 describe Sequel::Model::Associations::AssociationReflection, "#select" do
   before do
     @c = Class.new(Sequel::Model)
-    class ParParent < Sequel::Model; end
+    class ::ParParent < Sequel::Model; end
   end
 
   it "should use the :select value if present" do

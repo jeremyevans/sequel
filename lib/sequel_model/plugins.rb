@@ -34,7 +34,7 @@ module Sequel
       end
       if m.const_defined?("DatasetMethods")
         dataset.meta_def(:"#{plugin}_opts") {args.first}
-        dataset.metaclass.send(:include, m::DatasetMethods)
+        dataset.extend(m::DatasetMethods)
         def_dataset_method(*m::DatasetMethods.instance_methods)
       end
     end

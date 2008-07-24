@@ -130,7 +130,7 @@ end
 %w'postgres sqlite mysql informix oracle ado'.each do |adapter|
   desc "Run #{adapter} specs without coverage"
   Spec::Rake::SpecTask.new("spec_#{adapter}") do |t|
-    t.spec_files = "spec/adapters/#{adapter}_spec.rb"
+    t.spec_files = ["spec/adapters/#{adapter}_spec.rb"]
     t.spec_opts  = spec_opts.call
   end
 end

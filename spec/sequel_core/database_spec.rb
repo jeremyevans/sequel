@@ -645,11 +645,11 @@ end
 context "A broken adapter (lib is there but the class is not)" do
   setup do
     @fn = File.join(File.dirname(__FILE__), '../../lib/sequel_core/adapters/blah.rb')
-    FileUtils.touch(@fn)
+    File.open(@fn,'a'){}
   end
   
   teardown do
-    FileUtils.rm(@fn)
+    File.delete(@fn)
   end
   
   specify "should raise an error" do
@@ -916,7 +916,7 @@ context "Database.connect" do
   end
   
   teardown do
-    FileUtils.rm(@fn)
+    File.delete(@fn)
   end
   
   specify "should accept hashes loaded from YAML files" do

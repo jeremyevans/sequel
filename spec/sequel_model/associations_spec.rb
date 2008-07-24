@@ -4,7 +4,7 @@ describe Sequel::Model, "associate" do
   it "should use explicit class if given a class, symbol, or string" do
     MODEL_DB.reset
     klass = Class.new(Sequel::Model(:nodes))
-    class ParParent < Sequel::Model
+    class ::ParParent < Sequel::Model
     end
     
     klass.associate :many_to_one, :par_parent0, :class=>ParParent
@@ -48,6 +48,7 @@ describe Sequel::Model, "many_to_one" do
     MODEL_DB.reset
 
     @c2 = Class.new(Sequel::Model(:nodes)) do
+      unrestrict_primary_key
       columns :id, :parent_id, :par_parent_id, :blah
     end
 
@@ -66,7 +67,7 @@ describe Sequel::Model, "many_to_one" do
   end
   
   it "should use implicit class if omitted" do
-    class ParParent < Sequel::Model
+    class ::ParParent < Sequel::Model
     end
     
     @c2.many_to_one :par_parent
@@ -79,7 +80,7 @@ describe Sequel::Model, "many_to_one" do
   end
 
   it "should use class inside module if given as a string" do
-    module Par 
+    module ::Par 
       class Parent < Sequel::Model
       end
     end
@@ -284,8 +285,8 @@ describe Sequel::Model, "many_to_one" do
 
   it "should not create the setter method if :read_only option is used" do
     @c2.many_to_one :parent, :class => @c2, :read_only=>true
-    @c2.instance_methods.should(include('parent'))
-    @c2.instance_methods.should_not(include('parent='))
+    @c2.instance_methods.collect{|x| x.to_s}.should(include('parent'))
+    @c2.instance_methods.collect{|x| x.to_s}.should_not(include('parent='))
   end
 
   it "should raise an error if trying to set a model object that doesn't have a valid primary key" do
@@ -311,7 +312,7 @@ describe Sequel::Model, "many_to_one" do
 
   it "should make the change to the foreign_key value inside a _association= method" do
     @c2.many_to_one :parent, :class => @c2
-    @c2.private_instance_methods.sort.should(include("_parent="))
+    @c2.private_instance_methods.collect{|x| x.to_s}.sort.should(include("_parent="))
     p = @c2.new
     c = @c2.load(:id=>123)
     def p._parent=(x)
@@ -422,10 +423,12 @@ describe Sequel::Model, "one_to_many" do
     MODEL_DB.reset
 
     @c1 = Class.new(Sequel::Model(:attributes)) do
+      unrestrict_primary_key
       columns :id, :node_id
     end
 
     @c2 = Class.new(Sequel::Model(:nodes)) do
+      unrestrict_primary_key
       attr_accessor :xxx
       
       def self.name; 'Node'; end
@@ -459,7 +462,7 @@ describe Sequel::Model, "one_to_many" do
   end
   
   it "should use implicit class if omitted" do
-    class HistoricalValue < Sequel::Model
+    class ::HistoricalValue < Sequel::Model
     end
     
     @c2.one_to_many :historical_values
@@ -472,7 +475,7 @@ describe Sequel::Model, "one_to_many" do
   end
   
   it "should use class inside a module if given as a string" do
-    module Historical
+    module ::Historical
       class Value < Sequel::Model
       end
     end
@@ -716,7 +719,7 @@ describe Sequel::Model, "one_to_many" do
 
   it "should not create the add_, remove_, or remove_all_ methods if :read_only option is used" do
     @c2.one_to_many :attributes, :class => @c1, :read_only=>true
-    im = @c2.instance_methods
+    im = @c2.instance_methods.collect{|x| x.to_s}
     im.should(include('attributes'))
     im.should(include('attributes_dataset'))
     im.should_not(include('add_attribute'))
@@ -827,7 +830,7 @@ describe Sequel::Model, "one_to_many" do
 
   it "should not add a getter method if the :one_to_one option is true and :read_only option is true" do
     @c2.one_to_many :attributes, :class => @c1, :one_to_one=>true, :read_only=>true
-    im = @c2.instance_methods
+    im = @c2.instance_methods.collect{|x| x.to_s}
     im.should(include('attribute'))
     im.should_not(include('attribute='))
   end
@@ -870,7 +873,7 @@ describe Sequel::Model, "one_to_many" do
 
   it "should make non getter and setter methods private if :one_to_one option is used" do 
     @c2.one_to_many :attributes, :class => @c1, :one_to_one=>true do |ds| end
-    meths = @c2.private_instance_methods(false)
+    meths = @c2.private_instance_methods(false).collect{|x| x.to_s}
     meths.should(include("attributes"))
     meths.should(include("add_attribute"))
     meths.should(include("attributes_dataset"))
@@ -878,7 +881,7 @@ describe Sequel::Model, "one_to_many" do
 
   it "should call an _add_ method internally to add attributes" do
     @c2.one_to_many :attributes, :class => @c1
-    @c2.private_instance_methods.sort.should(include("_add_attribute"))
+    @c2.private_instance_methods.collect{|x| x.to_s}.sort.should(include("_add_attribute"))
     p = @c2.load(:id=>10)
     c = @c1.load(:id=>123)
     def p._add_attribute(x)
@@ -891,7 +894,7 @@ describe Sequel::Model, "one_to_many" do
 
   it "should call a _remove_ method internally to remove attributes" do
     @c2.one_to_many :attributes, :class => @c1
-    @c2.private_instance_methods.sort.should(include("_remove_attribute"))
+    @c2.private_instance_methods.collect{|x| x.to_s}.sort.should(include("_remove_attribute"))
     p = @c2.load(:id=>10)
     c = @c1.load(:id=>123)
     def p._remove_attribute(x)
@@ -990,12 +993,14 @@ describe Sequel::Model, "many_to_many" do
     MODEL_DB.reset
 
     @c1 = Class.new(Sequel::Model(:attributes)) do
+      unrestrict_primary_key
       def self.name; 'Attribute'; end
       def self.to_s; 'Attribute'; end
       columns :id
     end
 
     @c2 = Class.new(Sequel::Model(:nodes)) do
+      unrestrict_primary_key
       attr_accessor :xxx
       
       def self.name; 'Node'; end
@@ -1024,7 +1029,7 @@ describe Sequel::Model, "many_to_many" do
   end
   
   it "should use implicit class if omitted" do
-    class Tag < Sequel::Model
+    class ::Tag < Sequel::Model
     end
     
     @c2.many_to_many :tags
@@ -1036,7 +1041,7 @@ describe Sequel::Model, "many_to_many" do
   end
   
   it "should use class inside module if given as a string" do
-    module Historical
+    module ::Historical
       class Tag < Sequel::Model
       end
     end
@@ -1287,7 +1292,7 @@ describe Sequel::Model, "many_to_many" do
 
   it "should not create the add_, remove_, or remove_all_ methods if :read_only option is used" do
     @c2.many_to_many :attributes, :class => @c1, :read_only=>true
-    im = @c2.instance_methods
+    im = @c2.instance_methods.collect{|x| x.to_s}
     im.should(include('attributes'))
     im.should(include('attributes_dataset'))
     im.should_not(include('add_attribute'))
@@ -1353,7 +1358,7 @@ describe Sequel::Model, "many_to_many" do
 
   it "should call an _add_ method internally to add attributes" do
     @c2.many_to_many :attributes, :class => @c1
-    @c2.private_instance_methods.sort.should(include("_add_attribute"))
+    @c2.private_instance_methods.collect{|x| x.to_s}.sort.should(include("_add_attribute"))
     p = @c2.load(:id=>10)
     c = @c1.load(:id=>123)
     def p._add_attribute(x)
@@ -1366,7 +1371,7 @@ describe Sequel::Model, "many_to_many" do
 
   it "should call a _remove_ method internally to remove attributes" do
     @c2.many_to_many :attributes, :class => @c1
-    @c2.private_instance_methods.sort.should(include("_remove_attribute"))
+    @c2.private_instance_methods.collect{|x| x.to_s}.sort.should(include("_remove_attribute"))
     p = @c2.load(:id=>10)
     c = @c1.load(:id=>123)
     def p._remove_attribute(x)
