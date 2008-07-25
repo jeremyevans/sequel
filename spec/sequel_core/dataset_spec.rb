@@ -2248,6 +2248,7 @@ context "Dataset#multi_insert" do
         @sqls ||= []
         @sqls << sql
       end
+      alias execute_dui execute
       
       def transaction
         @sqls ||= []

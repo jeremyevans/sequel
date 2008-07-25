@@ -11,6 +11,8 @@ module Sequel
         org.postgresql.Driver
       end,
       :mysql=>proc do |db|
+        require 'sequel_core/adapters/jdbc/mysql'
+        db.extend(Sequel::JDBC::MySQL::DatabaseMethods)
         JDBC.load_gem('mysql')
         com.mysql.jdbc.Driver
       end,
@@ -102,6 +104,31 @@ module Sequel
       
       def setup_connection(conn)
         conn
+      end
+      
+      def transaction
+        @pool.hold do |conn|
+          @transactions ||= []
+          return yield(conn) if @transactions.include?(Thread.current)
+          stmt = conn.createStatement
+          begin
+            log_info(Sequel::Database::SQL_BEGIN)
+            stmt.execute(Sequel::Database::SQL_BEGIN)
+            @transactions << Thread.current
+            yield(conn)
+          rescue Exception => e
+            log_info(Sequel::Database::SQL_ROLLBACK)
+            stmt.execute(Sequel::Database::SQL_ROLLBACK)
+            raise e unless Error::Rollback === e
+          ensure
+            unless e
+              log_info(Sequel::Database::SQL_COMMIT)
+              stmt.execute(Sequel::Database::SQL_COMMIT)
+            end
+            stmt.close
+            @transactions.delete(Thread.current)
+          end
+        end
       end
       
       def uri

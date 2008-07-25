@@ -25,15 +25,14 @@ end
 MYSQL_DB.create_table! :booltest do
   tinyint :value
 end
-class Sequel::MySQL::Database
-  attr_accessor :sqls
+def MYSQL_DB.sqls
+  (@sqls ||= [])
 end
 logger = Object.new
 def logger.method_missing(m, msg)
   MYSQL_DB.sqls << msg
 end
 MYSQL_DB.logger = logger
-MYSQL_DB.sqls = []
 
 context "A MySQL database" do
   setup do

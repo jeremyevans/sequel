@@ -1,5 +1,7 @@
 === HEAD
 
+* Enable almost full support for MySQL using JDBC (jeremyevans)
+
 * Fix ODBC adapter's conversion of ::ODBC::Time values (Michael Xavier)
 
 * Enable full support for SQLite-JDBC using the JDBC adapter (jeremyevans)

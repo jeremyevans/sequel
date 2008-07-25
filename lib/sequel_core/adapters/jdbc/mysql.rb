@@ -1,13 +1,13 @@
-require 'sequel_core/adapters/shared/sqlite'
+require 'sequel_core/adapters/shared/mysql'
 
 module Sequel
   module JDBC
-    module SQLite
+    module MySQL
       module DatabaseMethods
-        include Sequel::SQLite::DatabaseMethods
+        include Sequel::MySQL::DatabaseMethods
         
         def dataset(opts=nil)
-          Sequel::JDBC::SQLite::Dataset.new(self, opts)
+          Sequel::JDBC::MySQL::Dataset.new(self, opts)
         end
         
         def execute_insert(sql)
@@ -17,7 +17,7 @@ module Sequel
               stmt = conn.createStatement
               begin
                 stmt.executeUpdate(sql)
-                rs = stmt.executeQuery('SELECT last_insert_rowid()')
+                rs = stmt.executeQuery('SELECT LAST_INSERT_ID()')
                 rs.next
                 rs.getInt(1)
               rescue NativeException, JavaSQL::SQLException => e
@@ -33,14 +33,22 @@ module Sequel
         
         private
         
-        def connection_pool_default_options
-          o = super
-          uri == 'jdbc:sqlite::memory:' ? o.merge(:max_connections=>1) : o
+        def database_name
+          u = URI.parse(uri.sub(/\Ajdbc:/, ''))
+          (m = /\/(.*)/.match(u.path)) && m[1]
         end
       end
     
       class Dataset < JDBC::Dataset
-        include Sequel::SQLite::DatasetMethods
+        include Sequel::MySQL::DatasetMethods
+        
+        def insert(*values)
+          @db.execute_insert(insert_sql(*values))
+        end
+        
+        def replace(*args)
+          @db.execute_insert(replace_sql(*args))
+        end
       end
     end
   end
