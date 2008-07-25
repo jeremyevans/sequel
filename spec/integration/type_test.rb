@@ -28,7 +28,9 @@ describe "Supported types" do
     ds = create_items_table_with_column(:dat, :date)
     d = Date.today
     ds.insert(:dat => d)
-    ds.first[:dat].to_s.should == d.to_s
+    x = ds.first[:dat]
+    x = x.iso8601.to_date if Time === x
+    x.to_s.should == d.to_s
   end
   
   specify "should support time type" do
