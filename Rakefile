@@ -8,7 +8,7 @@ require "spec/rake/spectask"
 include FileUtils
 
 NAME = 'sequel'
-VERS = '2.2.0'
+VERS = '2.3.0'
 CLEAN.include ["**/.*.sw?", "pkg", ".config", "rdoc", "coverage"]
 RDOC_OPTS = ["--quiet", "--line-numbers", "--inline-source", '--title', \
   'Sequel: The Database Toolkit for Ruby', '--main', 'README']
@@ -35,6 +35,7 @@ spec = Gem::Specification.new do |s|
   s.files = %w(COPYING CHANGELOG README Rakefile) + Dir.glob("{bin,doc,spec,lib}/**/*")
   s.require_path = "lib"
   s.bindir = 'bin'
+  s.executables << 'sequel'
 end
 Rake::GemPackageTask.new(spec) do |p|
   p.need_tar = true
