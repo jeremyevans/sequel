@@ -59,7 +59,7 @@ module Sequel
           s = @db.execute sql
           
           @columns = s.Fields.extend(Enumerable).map do |column|
-            name = column.Name.empty? ? 'no column name' : column.Name
+            name = column.Name.empty? ? '(no column name)' : column.Name
             name.to_sym
           end
           

@@ -1,7 +1,7 @@
 require File.join(File.dirname(__FILE__), 'spec_helper.rb')
 
 unless defined?(ADO_DB)
-  ADO_DB = Sequel.ado(:host => 'AZTEC', :database => 'Uno_test', :user => 'sa', :password => 'sadev')
+  ADO_DB = Sequel.ado(:host => 'MY_SQL_SERVER', :database => 'MyDB', :user => 'my_pwd', :password => 'my_usr')
 end
 
 context "An ADO dataset" do
@@ -23,7 +23,7 @@ context "An MSSQL dataset" do
 
   specify "should assign a default name to anonymous columns" do
     col = ADO_DB.fetch('SELECT COUNT(*) FROM items').columns[0]
-    col.name.should == '(no column name)'
+    col.to_s.should == '(no column name)'
   end
 
   specify "should support counting" do
