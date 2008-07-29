@@ -58,7 +58,10 @@ module Sequel
         @db.synchronize do
           s = @db.execute sql
           
-          @columns = s.Fields.extend(Enumerable).map {|x| x.Name.to_sym}
+          @columns = s.Fields.extend(Enumerable).map do |column|
+            name = column.Name.empty? ? '(no column name)' : column.Name
+            name.to_sym
+          end
           
           unless s.eof
             s.moveFirst

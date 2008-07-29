@@ -49,7 +49,10 @@ module Sequel
         end
 
         columns = opts[:select]
-        select_columns = columns ? column_list(columns) : WILDCARD
+        # We had to reference const WILDCARD with its full path, because
+        # the Ruby constant scope rules played against us (it was resolving it
+        # as Sequel::Dataset::DatasetMethods::WILDCARD).
+        select_columns = columns ? column_list(columns) : Sequel::Dataset::WILDCARD
 
         if distinct = opts[:distinct]
           distinct_clause = distinct.empty? ? "DISTINCT" : "DISTINCT ON (#{expression_list(distinct)})"
