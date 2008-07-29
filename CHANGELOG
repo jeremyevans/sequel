@@ -1,3 +1,11 @@
+=== HEAD
+
+* Fix anonymous column names in the ADO adapter (nusco)
+
+* Remove odbc_mssql adapter, use :db_type=>'mssql' option instead (jeremyevans)
+
+* Split MSSQL specific syntax into separate file, usable by ADO and ODBC adapters (nusco, jeremyevans)
+
 === 2.3.0 (2008-07-25)
 
 * Enable almost full support for MySQL using JDBC (jeremyevans)
