@@ -90,14 +90,11 @@ module Sequel
         if union = opts[:union]
           sql << (opts[:union_all] ? \
             " UNION ALL #{union.sql}" : " UNION #{union.sql}")
-        elsif intersect = opts[:intersect]
-          sql << (opts[:intersect_all] ? \
-            " INTERSECT ALL #{intersect.sql}" : " INTERSECT #{intersect.sql}")
-        elsif except = opts[:except]
-          sql << (opts[:except_all] ? \
-            " EXCEPT ALL #{except.sql}" : " EXCEPT #{except.sql}")
         end
-
+        
+        raise Error, "Intersect not supported" if opts[:intersect]
+        raise Error, "Except not supported" if opts[:except]
+        
         sql
       end
       alias_method :sql, :select_sql
