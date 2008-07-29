@@ -4,17 +4,16 @@ module Sequel
   module ODBC
     class Database < Sequel::Database
       set_adapter_scheme :odbc
-    
-      # def connect
-      #   conn = ::ODBC::connect(@opts[:database], @opts[:user], @opts[:password])
-      #   conn.autocommit = true
-      #   conn
-      # end
 
       GUARDED_DRV_NAME = /^\{.+\}$/.freeze
       DRV_NAME_GUARDS = '{%s}'.freeze
 
       def connect
+        case @opts[:db_type]
+        when 'mssql'
+          require 'sequel_core/adapters/shared/mssql'
+          extend Sequel::MSSQL::DatabaseMethods
+        end
         if @opts.include? :driver
           drv = ::ODBC::Driver.new
           drv.name = 'Sequel ODBC Driver130'
@@ -108,20 +107,6 @@ module Sequel
         end
         self
       end
-    
-      # def fetch_rows(sql, &block)
-      #   @db.synchronize do
-      #     s = @db.execute sql
-      #     begin
-      #       @columns = s.columns(true).map {|c| c.name.to_sym}
-      #       rows = s.fetch_all
-      #       rows.each {|row| yield hash_row(row)}
-      #     ensure
-      #       s.drop unless s.nil? rescue nil
-      #     end
-      #   end
-      #   self
-      # end
       
       def hash_row(row)
         hash = {}

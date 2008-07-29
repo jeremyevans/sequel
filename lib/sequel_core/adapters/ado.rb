@@ -13,15 +13,15 @@ module Sequel
   module ADO
     class Database < Sequel::Database
       set_adapter_scheme :ado
-      
-      AUTO_INCREMENT = 'IDENTITY(1,1)'.freeze
-      
-      def auto_increment_sql
-        AUTO_INCREMENT
-      end
-      
+
       def connect
-        s = "driver=#{@opts[:driver] || 'SQL Server'};server=#{@opts[:host]};database=#{@opts[:database]}#{";uid=#{@opts[:user]};pwd=#{@opts[:password]}" if @opts[:user]}"
+        @opts[:driver] ||= 'SQL Server'
+        case @opts[:driver]
+        when 'SQL Server'
+          require 'sequel_core/adapters/shared/mssql'
+          extend Sequel::MSSQL::DatabaseMethods
+        end
+        s = "driver=#{@opts[:driver]};server=#{@opts[:host]};database=#{@opts[:database]}#{";uid=#{@opts[:user]};pwd=#{@opts[:password]}" if @opts[:user]}"
         handle = WIN32OLE.new('ADODB.Connection')
         handle.Open(s)
         handle
@@ -39,7 +39,6 @@ module Sequel
         log_info(sql)
         @pool.hold {|conn| conn.Execute(sql)}
       end
-      
       alias_method :do, :execute
     end
     
