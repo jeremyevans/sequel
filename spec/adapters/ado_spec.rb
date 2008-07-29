@@ -21,6 +21,11 @@ context "An MSSQL dataset" do
     ADO_DB.create_table!(:items) { text :name }
   end
 
+  specify "should assign a default name to anonymous columns" do
+    col = ADO_DB.fetch('SELECT COUNT(*) FROM items').columns[0]
+    col.name.should == '(no column name)'
+  end
+
   specify "should support counting" do
     ADO_DB[:items] << {:name => 'my name' }
     ADO_DB[:items].count.should == 1
