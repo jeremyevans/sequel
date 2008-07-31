@@ -1,0 +1,104 @@
+= Prepared Statements and Bound Variables
+
+Starting with version 2.4.0, Sequel has support for prepared statements and
+bound variables.  No matter which database you are using, the Sequel prepared
+statement/bound variable API remains exactly the same.  There is native support
+for prepared statements/bound variables on the following databases:
+
+* PostgreSQL (using the pg driver, requires type specifiers)
+* MySQL (prepared statements only, as the ruby mysql driver doesn't support
+  bound variables)
+* SQLite (a new native prepared statement is used for each call, though)
+* JDBC (using the postgresql, mysql, or sqlite databases, and possibly others)
+
+Support on other databases is emulated via the usual string interpolation.
+
+== Placeholders
+
+Generally, when using prepared statements (and certainly when using bound
+variables), you need to put placeholders in your SQL to indicate where you
+want your bound arguments to appear.  Database support and syntax vary
+significantly for placeholders (e.g. :name, $1, ?).  Sequel abstracts all of
+that and allows you to specify placeholders by using the :$name format for
+placeholders, e.g.:
+
+  ds = DB[:items].filter(:name=>:$name)
+
+== Bound Variables
+
+Using bound variables for this query is simple:
+
+  ds.call(:select, :name=>'Jim')
+
+This will do the equivalent of selecting records that have the name 'Jim'. It
+returns all records, and can take a block that is passed to Dataset#all.
+
+Deleting or returning the first record works similarly:
+
+  ds.call(:first, :name=>'Jim') # First record with name 'Jim'
+  ds.call(:delete, :name=>'Jim') # Delete records with name 'Jim'
+
+For inserting/updating records, you should also specify a value hash, which
+may itself contain placeholders:
+
+  # Insert record with 'Jim', note that the previous filter is ignored
+  ds.call(:insert, {:name=>'Jim'}, :name=>:$name)
+  # Change name to 'Bob' for all records with name of 'Jim'
+  ds.call(:update, {:name=>'Jim', :new_name=>'Bob'}, :name=>$:new_name)
+
+== Prepared Statements
+
+Prepared statement support is similar to bound variable support, but you
+use Dataset#prepare with a name, and Dataset#call later with the values:
+
+  ds = DB[:items].filter(:name=>:$name)
+  ps = ds.prepare(:select, :select_by_name)
+  ps.call(:name=>'Jim')
+  DB.call(:select_by_name, :name=>'Jim') # same as above
+
+The Dataset#prepare method returns a prepared statement, and also stores a
+copy of the prepared statement in the database for later use.  For insert
+and update queries, the hash to insert/update is passed to prepare:
+
+  ps1 = DB[:items].prepare(:insert, :insert_with_name, :name=>:$name)
+  ps1.call(:name=>'Jim')
+  DB.call(:insert_with_name, :name=>'Jim') # same as above
+  ds = DB[:items].filter(:name=>:$name)
+  ps2 = ds.prepare(:update, :update_name, :name=>:$new_name)
+  ps2.call(:name=>'Jim', :new_name=>'Bob')
+  DB.call(:update_name, :name=>'Jim', :new_name=>'Bob') # same as above
+
+== Database support
+
+=== PostgreSQL
+
+If you are using the ruby-postgres or postgres-pr driver, PostgreSQL uses the
+default emulated support.  If you are using ruby-pg, there is native support,
+but it requires type specifiers most of the time.  This is easy if you have
+direct control over the SQL string, but since Sequel abstracts that, the types
+have to be specified another way.  This is done by adding a __* suffix to the
+placeholder symbol (e.g. :$name__text, which will be compiled to "$1::text"
+in the SQL).  Prepared statements are always server side.
+
+=== SQLite
+
+SQLite supports bound variables and prepared statements exactly the same, since
+a new native prepared statement is created and executed for each call.
+
+=== MySQL
+
+The MySQL ruby driver does not support bound variables, so the the bound
+variable methods fall back to string interpolation.  It uses server side
+prepared statements.
+
+=== JDBC
+
+JDBC supports both prepared statements and bound variables.  Whether these
+are server side or client side depends on the JDBC driver.  For PostgreSQL
+over JDBC, you can add the prepareThreshold=N parameter to the connection
+string, which will use a server side prepared statement after N calls to
+the prepared statement.
+
+=== All Others
+
+Support is emulated using interpolation.

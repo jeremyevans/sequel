@@ -136,7 +136,7 @@ module Sequel
         table = @opts[:from].first
         columns, dataset = *args
         sql = "INSERT INTO #{quote_identifier(table)} #{literal(columns)} VALUES #{literal(dataset)}"
-        return @db.transaction {@db.execute_dui sql}
+        return @db.transaction{execute_dui(sql)}
       else
         # we assume that an array of hashes is given
         hashes, opts = *args
@@ -153,11 +153,11 @@ module Sequel
       if slice_size
         values.each_slice(slice_size) do |slice|
           statements = multi_insert_sql(columns, slice)
-          @db.transaction {statements.each {|st| @db.execute_dui(st)}}
+          @db.transaction{statements.each{|st| execute_dui(st)}}
         end
       else
         statements = multi_insert_sql(columns, values)
-        @db.transaction {statements.each {|st| @db.execute_dui(st)}}
+        @db.transaction{statements.each{|st| execute_dui(st)}}
       end
     end
     alias_method :import, :multi_insert

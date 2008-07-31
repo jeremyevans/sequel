@@ -1,5 +1,7 @@
 module Sequel
   module MySQL
+    # Methods shared by Database instances that connect to MySQL,
+    # currently supported by the native and JDBC adapters.
     module DatabaseMethods
       AUTO_INCREMENT = 'AUTO_INCREMENT'.freeze
       NOT_NULL = Sequel::Schema::SQL::NOT_NULL
@@ -12,6 +14,8 @@ module Sequel
       UNIQUE = Sequel::Schema::SQL::UNIQUE
       UNSIGNED = Sequel::Schema::SQL::UNSIGNED
       
+      # Use MySQL specific syntax for rename column, set column type, and
+      # drop index cases.
       def alter_table_sql(table, op)
         type = type_literal(op[:type])
         type << '(255)' if type == 'varchar'
@@ -27,10 +31,12 @@ module Sequel
         end
       end
       
+      # Use MySQL specific AUTO_INCREMENT text.
       def auto_increment_sql
         AUTO_INCREMENT
       end
       
+      # Handle MySQL specific column syntax (not sure why).
       def column_definition_sql(column)
         if column[:type] == :check
           return constraint_definition_sql(column)
@@ -53,7 +59,8 @@ module Sequel
         end
         sql
       end
-
+      
+      # Handle MySQL specific index SQL syntax
       def index_definition_sql(table_name, index)
         index_name = index[:name] || default_index_name(table_name, index[:columns])
         unique = "UNIQUE " if index[:unique]
@@ -69,16 +76,14 @@ module Sequel
         end
       end
       
-      def serial_primary_key_options
-        {:primary_key => true, :type => :integer, :auto_increment => true}
-      end
-      
+      # Get version of MySQL server, used for determined capabilities.
       def server_version
         m = /(\d+)\.(\d+)\.(\d+)/.match(get(:version[]))
         @server_version ||= (m[1].to_i * 10000) + (m[2].to_i * 100) + m[3].to_i
       end
       
-      # Changes the database in use by issuing a USE statement.
+      # Changes the database in use by issuing a USE statement.  I would be
+      # very careful if I used this.
       def use(db_name)
         disconnect
         @opts[:database] = db_name if self << "USE #{db_name}"
@@ -88,12 +93,17 @@ module Sequel
       
       private
       
+      # Always quote identifiers for the schema parser dataset.
       def schema_ds_dataset
         ds = schema_utility_dataset.clone
         ds.quote_identifiers = true
         ds
       end
       
+      # Allow other database schema's to be queried using the :database
+      # option.  Allow all database's schema to be used by setting
+      # the :database option to nil.  If the database option is not specified,
+      # uses the currently connected database.
       def schema_ds_filter(table_name, opts)
         filt = super
         # Restrict it to the given or current database, unless specifically requesting :database = nil
@@ -101,16 +111,20 @@ module Sequel
         filt
       end
 
+      # MySQL doesn't support table catalogs, so just join on schema and table name.
       def schema_ds_join(table_name, opts)
         [:information_schema__columns, {:table_schema => :table_schema, :table_name => :table_name}, :c]
       end
     end
   
+    # Dataset methods shared by datasets that use MySQL databases.
     module DatasetMethods
       BOOL_TRUE = '1'.freeze
       BOOL_FALSE = '0'.freeze
       COMMA_SEPARATOR = ', '.freeze
       
+      # MySQL specific syntax for LIKE/REGEXP searches, as well as
+      # string concatenation.
       def complex_expression_sql(op, args)
         case op
         when :~, :'!~', :'~*', :'!~*', :LIKE, :'NOT LIKE', :ILIKE, :'NOT ILIKE'
@@ -141,6 +155,7 @@ module Sequel
         sql
       end
 
+      # MySQL specific full text search syntax.
       def full_text_search(cols, terms, opts = {})
         mode = opts[:boolean] ? " IN BOOLEAN MODE" : ""
         s = if Array === terms
@@ -160,34 +175,22 @@ module Sequel
         @opts[:having] = {}
         x = filter(*cond, &block)
       end
-
+      
+      # MySQL doesn't use the SQL standard DEFAULT VALUES.
       def insert_default_values_sql
         "INSERT INTO #{source_list(@opts[:from])} () VALUES ()"
       end
 
-      # Returns a join clause based on the specified join type
-      # and condition.  MySQL's NATURAL join is 'semantically
-      # equivalent to a JOIN with a USING clause that names all
-      # columns that exist in both tables.  The constraint
-      # expression may be nil, so join expression can accept two
-      # arguments.
-      #
-      # === Note
-      # Full outer joins (:full_outer) are not implemented in
-      # MySQL (as of v6.0), nor is there currently a work around
-      # implementation in Sequel.  Straight joins with 'ON
-      # <condition>' are not yet implemented.
-      #
-      # === Example
-      #   @ds = MYSQL_DB[:nodes]
-      #   @ds.join_table(:natural_left_outer, :nodes)
-      #   # join SQL is 'NATURAL LEFT OUTER JOIN nodes'
+      # Transforms an CROSS JOIN to an INNER JOIN if the expr is not nil.
+      # Raises an error on use of :full_outer type, since MySQL doesn't support it.
       def join_table(type, table, expr=nil, table_alias=nil)
         type = :inner if (type == :cross) && !expr.nil?
-        raise(Sequel::Error::InvalidJoinType, "MySQL doesn't support FULL OUTER JOIN") if type == :full_outer
+        raise(Sequel::Error, "MySQL doesn't support FULL OUTER JOIN") if type == :full_outer
         super(type, table, expr, table_alias)
       end
       
+      # Transforms :natural_inner to NATURAL LEFT JOIN and straight to
+      # STRAIGHT_JOIN.
       def join_type_sql(join_type)
         case join_type
         when :straight then 'STRAIGHT_JOIN'
@@ -195,7 +198,8 @@ module Sequel
         else super
         end
       end
-
+      
+      # Override the default boolean values.
       def literal(v)
         case v
         when true
@@ -207,16 +211,20 @@ module Sequel
         end
       end
       
+      # MySQL specific syntax for inserting multiple values at once.
       def multi_insert_sql(columns, values)
         columns = column_list(columns)
         values = values.map {|r| literal(Array(r))}.join(COMMA_SEPARATOR)
         ["INSERT INTO #{source_list(@opts[:from])} (#{columns}) VALUES #{values}"]
       end
       
+      # MySQL uses the nonstandard ` (backtick) for quoting identifiers.
       def quoted_identifier(c)
         "`#{c}`"
       end
       
+      # MySQL specific syntax for REPLACE (aka UPSERT, or update if exists,
+      # insert if it doesn't).
       def replace_sql(*values)
         from = source_list(@opts[:from])
         if values.empty?

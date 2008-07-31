@@ -1,7 +1,10 @@
 module Sequel
   module Postgres
+    # Array of exceptions that need to be converted.  JDBC
+    # uses NativeExceptions, the native adapter uses PGError.
     CONVERTED_EXCEPTIONS = []
-  
+    
+    # Methods shared by adapter/connection instances.
     module AdapterMethods
       SELECT_CURRVAL = "SELECT currval('%s')".freeze
       SELECT_PK = <<-end_sql
@@ -45,8 +48,11 @@ module Sequel
           AND dep.refobjid = '%s'::regclass
       end_sql
       
+      # Depth of the current transaction on this connection, used
+      # to implement multi-level transactions with savepoints.
       attr_accessor :transaction_depth
       
+      # Get the last inserted value for the given table.
       def last_insert_id(table)
         @table_sequences ||= {}
         if !@table_sequences.include?(table)
@@ -63,6 +69,7 @@ module Sequel
         end
       end
       
+      # Get the primary key and sequence for the given table.
       def pkey_and_sequence(table)
         execute(SELECT_PK_AND_SERIAL_SEQUENCE % table) do |r|
           vals = result_set_values(r, 2, 2)
@@ -74,14 +81,17 @@ module Sequel
         end
       end
       
+      # Get the primary key for the given table.
       def primary_key(table)
         execute(SELECT_PK % table) do |r|
           result_set_values(r, 0)
         end
       end
     end
-
+    
+    # Methods shared by Database instances that connect to PostgreSQL.
     module DatabaseMethods
+      PREPARED_ARG_PLACEHOLDER = '$'.lit.freeze
       RE_CURRVAL_ERROR = /currval of sequence "(.*)" is not yet defined in this session/.freeze
       RELATION_QUERY = {:from => [:pg_class], :select => [:relname]}.freeze
       RELATION_FILTER = "(relkind = 'r') AND (relname !~ '^pg|sql')".freeze
@@ -93,15 +103,18 @@ module Sequel
       SQL_RELEASE_SAVEPOINT = 'RELEASE SAVEPOINT autopoint_%d'.freeze
       SYSTEM_TABLE_REGEXP = /^pg|sql/.freeze
       
+      # Always CASCADE the table drop
       def drop_table_sql(name)
         "DROP TABLE #{name} CASCADE"
       end
       
-      def execute_insert(sql, table, values)
+      # Insert the values into the table and return the primary key (if
+      # automatically generated).
+      def execute_insert(sql, table, values, *bind_arguments)
         begin 
-          log_info(sql)
-          @pool.hold do |conn|
-            conn.execute(sql)
+          log_info(sql, *bind_arguments)
+          synchronize do |conn|
+            conn.execute(sql, *bind_arguments)
             insert_result(conn, table, values)
           end
         rescue => e
@@ -110,6 +123,7 @@ module Sequel
         end
       end
       
+      # PostgreSQL specific index SQL.
       def index_definition_sql(table_name, index)
         index_name = index[:name] || default_index_name(table_name, index[:columns])
         expr = literal(Array(index[:columns]))
@@ -129,6 +143,11 @@ module Sequel
         "CREATE #{unique}INDEX #{index_name} ON #{table_name} #{"USING #{index_type} " if index_type}#{expr}#{filter}"
       end
       
+      # The result of the insert for the given table and values.  Uses
+      # last insert id the primary key for the table if it exists,
+      # otherwise determines the primary key for the table and uses the
+      # value of the hash key.  If values is an array, assume the first
+      # value is the primary key value and return that.
       def insert_result(conn, table, values)
         begin
           result = conn.last_insert_id(table)
@@ -147,21 +166,28 @@ module Sequel
         end
       end
       
+      # Dataset containing all current database locks 
       def locks
-        dataset.from("pg_class, pg_locks").
-          select("pg_class.relname, pg_locks.*").
-          filter("pg_class.relfilenode=pg_locks.relation")
+        dataset.from(:pg_class, :pg_locks).
+          select(:pg_class__relname, :pg_locks.*).
+          filter(:pg_class__relfilenode=>:pg_locks__relation)
       end
-    
+      
+      # Returns primary key for the given table.  This information is
+      # cached, and if the primary key for a table is changed, the
+      # @primary_keys instance variable should be reset manually.
       def primary_key_for_table(conn, table)
         @primary_keys ||= {}
         @primary_keys[table] ||= conn.primary_key(table)
       end
       
+      # PostgreSQL uses SERIAL psuedo-type instead of AUTOINCREMENT for
+      # managing incrementing primary keys.
       def serial_primary_key_options
         {:primary_key => true, :type => :serial}
       end
       
+      # The version of the PostgreSQL server, used for determining capability.
       def server_version
         return @server_version if @server_version
         @server_version = pool.hold do |conn|
@@ -174,12 +200,14 @@ module Sequel
         @server_version
       end
       
+      # Array of symbols specifying table names in the current database.
       def tables
-        dataset(RELATION_QUERY).filter(RELATION_FILTER).map {|r| r[:relname].to_sym}
+        dataset(RELATION_QUERY).filter(RELATION_FILTER).map{|r| r[:relname].to_sym}
       end
       
+      # PostgreSQL supports multi-level transactions using save points.
       def transaction
-        @pool.hold do |conn|
+        synchronize do |conn|
           conn.transaction_depth = 0 if conn.transaction_depth.nil?
           if conn.transaction_depth > 0
             log_info(SQL_SAVEPOINT % conn.transaction_depth)
@@ -222,10 +250,20 @@ module Sequel
 
       private
       
+      # Convert the exception to a Sequel::Error if it is in CONVERTED_EXCEPTIONS.
       def convert_pgerror(e)
         e.is_one_of?(*CONVERTED_EXCEPTIONS) ? Error.new(e.message) : e
       end
-
+      
+      # Use a dollar sign instead of question mark for the argument
+      # placeholder.
+      def prepared_arg_placeholder
+        PREPARED_ARG_PLACEHOLDER
+      end
+      
+      # When the :schema option is used, use the the given schema.
+      # When the :schema option is nil, return results for all schemas.
+      # If the :schema option is not used, use the public schema.
       def schema_ds_filter(table_name, opts)
         filt = super
         # Restrict it to the given or public schema, unless specifically requesting :schema = nil
@@ -233,7 +271,8 @@ module Sequel
         filt
       end
     end
-  
+    
+    # Instance methods for datasets that connect to a PostgreSQL database.
     module DatasetMethods
       ACCESS_SHARE = 'ACCESS SHARE'.freeze
       ACCESS_EXCLUSIVE = 'ACCESS EXCLUSIVE'.freeze
@@ -253,7 +292,8 @@ module Sequel
       SHARE = 'SHARE'.freeze
       SHARE_ROW_EXCLUSIVE = 'SHARE ROW EXCLUSIVE'.freeze
       SHARE_UPDATE_EXCLUSIVE = 'SHARE UPDATE EXCLUSIVE'.freeze
-
+      
+      # Return the results of an ANALYZE query as a string
       def analyze(opts = nil)
         analysis = []
         fetch_rows(EXPLAIN_ANALYZE + select_sql(opts)) do |r|
@@ -262,6 +302,7 @@ module Sequel
         analysis.join("\r\n")
       end
       
+      # Return the results of an EXPLAIN query as a string
       def explain(opts = nil)
         analysis = []
         fetch_rows(EXPLAIN + select_sql(opts)) do |r|
@@ -270,14 +311,18 @@ module Sequel
         analysis.join("\r\n")
       end
       
+      # Return a cloned dataset with a :share lock type.
       def for_share
         clone(:lock => :share)
       end
-    
+      
+      # Return a cloned dataset with a :update lock type.
       def for_update
         clone(:lock => :update)
       end
-
+      
+      # PostgreSQL specific full text search syntax, using tsearch2 (included
+      # in 8.3 by default, and available for earlier versions as an add-on).
       def full_text_search(cols, terms, opts = {})
         lang = opts[:language] ? "#{literal(opts[:language])}, " : ""
         cols = cols.is_a?(Array) ? cols.map {|c| literal(c)}.join(" || ") : literal(cols)
@@ -285,11 +330,14 @@ module Sequel
         filter("to_tsvector(#{lang}#{cols}) @@ to_tsquery(#{lang}#{terms})")
       end
       
+      # Insert given values into the database.
       def insert(*values)
-        @db.execute_insert(insert_sql(*values), source_list(@opts[:from]),
+        execute_insert(insert_sql(*values), source_list(@opts[:from]),
           values.size == 1 ? values.first : values)
       end
-
+      
+      # Handle microseconds for Time and DateTime values, as well as PostgreSQL
+      # specific boolean values and string escaping.
       def literal(v)
         case v
         when LiteralString
@@ -310,11 +358,11 @@ module Sequel
       end
       
       # Locks the table with the specified mode.
-      def lock(mode, &block)
+      def lock(mode)
         sql = LOCK % [source_list(@opts[:from]), mode]
         @db.synchronize do
-          if block # perform locking inside a transaction and yield to block
-            @db.transaction {@db.execute(sql); yield}
+          if block_given? # perform locking inside a transaction and yield to block
+            @db.transaction{@db.execute(sql); yield}
           else
             @db.execute(sql) # lock without a transaction
             self
@@ -322,6 +370,7 @@ module Sequel
         end
       end
       
+      # For PostgreSQL version > 8.2, allow inserting multiple rows at once.
       def multi_insert_sql(columns, values)
         return super if @db.server_version < 80200
         
@@ -331,10 +380,13 @@ module Sequel
         ["INSERT INTO #{source_list(@opts[:from])} (#{columns}) VALUES #{values}"]
       end
       
+      # PostgreSQL assumes unquoted identifiers are lower case by default,
+      # so do not upcase the identifier when quoting it.
       def quoted_identifier(c)
         "\"#{c}\""
       end
-    
+      
+      # Support lock mode, allowing FOR SHARE and FOR UPDATE queries.
       def select_sql(opts = nil)
         row_lock_mode = opts ? opts[:lock] : @opts[:lock]
         sql = super
@@ -345,6 +397,13 @@ module Sequel
           sql << FOR_SHARE
         end
         sql
+      end
+      
+      private
+      
+      # Call execute_insert on the database object with the given values.
+      def execute_insert(sql, table, values)
+        @db.execute_insert(sql, table, values)
       end
     end
   end

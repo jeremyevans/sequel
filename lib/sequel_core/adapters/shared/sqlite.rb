@@ -7,6 +7,10 @@ module Sequel
       TABLES_FILTER = "type = 'table' AND NOT name = 'sqlite_sequence'"
       TEMP_STORE = {'0' => :default, '1' => :file, '2' => :memory}.freeze
       
+      # SQLite supports limited table modification.  You can add a column
+      # or an index.  Dropping columns is supported by copying the table into
+      # a temporary table, dropping the table, and creating a new table without
+      # the column inside of a transaction.
       def alter_table_sql(table, op)
         case op[:op]
         when :add_column
@@ -28,51 +32,59 @@ module Sequel
         end
       end
       
+      # A symbol signifying the value of the auto_vacuum PRAGMA.
       def auto_vacuum
         AUTO_VACUUM[pragma_get(:auto_vacuum).to_s]
       end
       
+      # Set the auto_vacuum PRAGMA using the given symbol (:none, :full, or
+      # :incremental).
       def auto_vacuum=(value)
         value = AUTO_VACUUM.key(value) || (raise Error, "Invalid value for auto_vacuum option. Please specify one of :none, :full, :incremental.")
         pragma_set(:auto_vacuum, value)
       end
       
+      # Get the value of the given PRAGMA.
       def pragma_get(name)
         self["PRAGMA #{name}"].single_value
       end
       
+      # Set the value of the given PRAGMA to value.
       def pragma_set(name, value)
         execute_ddl("PRAGMA #{name} = #{value}")
       end
       
-      def serial_primary_key_options
-        {:primary_key => true, :type => :integer, :auto_increment => true}
-      end
-      
+      # A symbol signifying the value of the synchronous PRAGMA.
       def synchronous
         SYNCHRONOUS[pragma_get(:synchronous).to_s]
       end
       
+      # Set the synchronous PRAGMA using the given symbol (:off, :normal, or :full).
       def synchronous=(value)
         value = SYNCHRONOUS.key(value) || (raise Error, "Invalid value for synchronous option. Please specify one of :off, :normal, :full.")
         pragma_set(:synchronous, value)
       end
-    
+      
+      # Array of symbols specifying the table names in the current database.
       def tables
         self[:sqlite_master].filter(TABLES_FILTER).map {|r| r[:name].to_sym}
       end
       
+      # A symbol signifying the value of the temp_store PRAGMA.
       def temp_store
         TEMP_STORE[pragma_get(:temp_store).to_s]
       end
       
+      # Set the temp_store PRAGMA using the given symbol (:default, :file, or :memory).
       def temp_store=(value)
         value = TEMP_STORE.key(value) || (raise Error, "Invalid value for temp_store option. Please specify one of :default, :file, :memory.")
         pragma_set(:temp_store, value)
       end
       
       private
-
+      
+      # SQLite supports schema parsing using the table_info PRAGMA, so
+      # parse the output of that into the format Sequel expects.
       def schema_parse_table(table_name, opts)
         rows = self["PRAGMA table_info(?)", table_name].collect do |row|
           row.delete(:cid)
@@ -92,15 +104,21 @@ module Sequel
         end
         schema_parse_rows(rows)
       end
-
+      
+      # SQLite doesn't support getting the schema of all tables at once,
+      # so loop through the output of #tables to get them.
       def schema_parse_tables(opts)
         schemas = {}
         tables.each{|table| schemas[table] = schema_parse_table(table, opts)}
         schemas
       end
     end
-  
-    module DatasetMethods      
+    
+    # Instance methods for datasets that connect to an SQLite database
+    module DatasetMethods
+      # SQLite does not support pattern matching via regular expressions.
+      # SQLite is case insensitive (depending on pragma), so use LIKE for
+      # ILIKE.
       def complex_expression_sql(op, args)
         case op
         when :~, :'!~', :'~*', :'!~*'
@@ -113,23 +131,28 @@ module Sequel
         end
       end
       
+      # SQLite performs a TRUNCATE style DELETE if no filter is specified.
+      # Since we want to always return the count of records, do a specific
+      # count in the case of no filter.
       def delete(opts = nil)
         # check if no filter is specified
         unless (opts && opts[:where]) || @opts[:where]
           @db.transaction do
             unfiltered_count = count
-            @db.execute_dui delete_sql(opts)
+            execute_dui delete_sql(opts)
             unfiltered_count
           end
         else
-          @db.execute_dui delete_sql(opts)
+          execute_dui delete_sql(opts)
         end
       end
       
+      # Insert the values into the database.
       def insert(*values)
-        @db.execute_insert insert_sql(*values)
+        execute_insert insert_sql(*values)
       end
-
+      
+      # Allow inserting of values directly from a dataset.
       def insert_sql(*values)
         if (values.size == 1) && values.first.is_a?(Sequel::Dataset)
           "INSERT INTO #{source_list(@opts[:from])} #{values.first.sql};"
@@ -138,8 +161,16 @@ module Sequel
         end
       end
       
+      # SQLite uses the nonstandard ` (backtick) for quoting identifiers.
       def quoted_identifier(c)
         "`#{c}`"
+      end
+      
+      private
+      
+      # Call execute_insert on the database with the given SQL.
+      def execute_insert(sql)
+        @db.execute_insert(sql)
       end
     end
   end

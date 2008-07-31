@@ -1,4 +1,4 @@
-%w'callback convenience pagination query schema sql'.each do |f|
+%w'callback convenience pagination prepared_statements query schema sql'.each do |f|
   require "sequel_core/dataset/#{f}"
 end
 
@@ -25,42 +25,6 @@ module Sequel
   #
   # Datasets are Enumerable objects, so they can be manipulated using any
   # of the Enumerable methods, such as map, inject, etc.
-  #
-  # === The Dataset Adapter Interface
-  #
-  # Each adapter should define its own dataset class as a descendant of
-  # Sequel::Dataset. The following methods should be overridden by the adapter
-  # Dataset class (each method with the stock implementation):
-  #
-  #   # Iterate over the results of the SQL query and call the supplied
-  #   # block with each record (as a hash).
-  #   def fetch_rows(sql, &block)
-  #     @db.synchronize do
-  #       r = @db.execute(sql)
-  #       r.each(&block)
-  #     end
-  #   end
-  #
-  #   # Insert records.
-  #   def insert(*values)
-  #     @db.synchronize do
-  #       @db.execute(insert_sql(*values)).last_insert_id
-  #     end
-  #   end
-  #
-  #   # Update records.
-  #   def update(*args)
-  #     @db.synchronize do
-  #       @db.execute(update_sql(*args)).affected_rows
-  #     end
-  #   end
-  #
-  #   # Delete records.
-  #   def delete(opts = nil)
-  #     @db.synchronize do
-  #       @db.execute(delete_sql(opts)).affected_rows
-  #     end
-  #   end
   #
   # === Methods added via metaprogramming
   #
@@ -221,7 +185,7 @@ module Sequel
 
     # Deletes the records in the dataset. Adapters should override this method.
     def delete(*args)
-      @db.execute_dui(delete_sql(*args))
+      execute_dui(delete_sql(*args))
     end
     
     # Iterates over the records in the dataset.
@@ -249,7 +213,7 @@ module Sequel
     # Inserts values into the associated table. Adapters should override this
     # method.
     def insert(*values)
-      @db.execute_dui(insert_sql(*values))
+      execute_dui(insert_sql(*values))
     end
   
     # Returns a string representation of the dataset including the class name 
@@ -430,7 +394,7 @@ module Sequel
     
     # Updates values for the dataset. Adapters should override this method.
     def update(*args)
-      @db.execute_dui(update_sql(*args))
+      execute_dui(update_sql(*args))
     end
   
     # Add the mutation methods via metaprogramming
@@ -444,6 +408,16 @@ module Sequel
     end
 
     private
+    
+    # Execute the given SQL on the database using execute.
+    def execute(sql, &block)
+      @db.execute(sql, &block)
+    end
+    
+    # Execute the given SQL on the database using execute_dui.
+    def execute_dui(sql, &block)
+      @db.execute_dui(sql, &block)
+    end
 
     # Modify the receiver with the results of sending the meth, args, and block
     # to the receiver and merging the options of the resulting dataset into

@@ -1,0 +1,218 @@
+module Sequel 
+  class Dataset
+    PREPARED_ARG_PLACEHOLDER = '?'.lit.freeze
+    
+    # Default implementation of the argument mapper to allow
+    # native database support for bind variables and prepared
+    # statements (as opposed to the emulated ones used by default).
+    module ArgumentMapper
+      SQL_QUERY_TYPE = Hash.new{|h,k| h[k] = k}
+      SQL_QUERY_TYPE[:first] = SQL_QUERY_TYPE[:all] = :select
+      
+      # The name of the prepared statement, if any.
+      attr_accessor :prepared_statement_name
+      
+      # The bind arguments to use for running this prepared statement
+      attr_accessor :bind_arguments
+      
+      # Set the bind arguments based on the hash and call super.
+      def call(hash, &block)
+        ds = clone
+        ds.prepared_sql
+        ds.bind_arguments = ds.map_to_prepared_args(hash)
+        ds.prepared_args = hash
+        ds.run(&block)
+      end
+        
+      # Override the given *_sql method based on the type, and
+      # cache the result of the sql.  This requires that the object
+      # that includes this module implement prepared_args_hash.
+      def prepared_sql
+        return @prepared_sql if @prepared_sql
+        @prepared_args = prepared_args_hash
+        @prepared_sql = super
+        meta_def("#{sql_query_type}_sql"){|*args| prepared_sql}
+        @prepared_sql
+      end
+      
+      private
+      
+      def sql_query_type
+        SQL_QUERY_TYPE[@prepared_type]
+      end
+    end
+
+    # Backbone of the prepared statement support.  Grafts bind variable
+    # support into datasets by hijacking #literal and using placeholders.
+    # By default, emulates prepared statements and bind variables by
+    # taking the hash of bind variables and directly substituting them
+    # into the query, which works on all databases, as it is no different
+    # from using the dataset without bind variables.
+    module PreparedStatementMethods
+      PLACEHOLDER_RE = /\A\$(.*)\z/
+      
+      # The type of prepared statement, should be one of :select,
+      # :insert, :update, or :delete
+      attr_accessor :prepared_type
+      
+      # The bind variable hash to use when substituting
+      attr_accessor :prepared_args
+      
+      # The argument to supply to insert and update, which may use
+      # placeholders specified by prepared_args
+      attr_accessor :prepared_modify_values
+      
+      # Sets the prepared_args to the given hash and runs the
+      # prepared statement.
+      def call(hash, &block)
+        ds = clone
+        ds.prepared_args = hash
+        ds.run(&block)
+      end
+      
+      # Returns the SQL for the prepared statement, depending on
+      # the type of the statement and the prepared_modify_values.
+      def prepared_sql
+        case @prepared_type
+        when :select, :all
+          select_sql
+        when :first
+          select_sql(:limit=>1)
+        when :insert
+          insert_sql(@prepared_modify_values)
+        when :update
+          update_sql(@prepared_modify_values)
+        when :delete
+          delete_sql
+        end
+      end
+      
+      # Changes the values of symbols if they start with $ and
+      # prepared_args is present.  If so, they are considered placeholders,
+      # and they are substituted using prepared_arg.
+      def literal(v)
+        case v
+        when Symbol
+          if match = PLACEHOLDER_RE.match(v.to_s) and @prepared_args
+            super(prepared_arg(match[1].to_sym))
+          else
+            super
+          end
+        else
+          super
+        end
+      end
+      
+      # Programmer friendly string showing this is a prepared statement,
+      # with the prepared SQL it represents (which in general won't have
+      # substituted variables).
+      def inspect
+        "<#{self.class.name}/PreparedStatement #{prepared_sql.inspect}>"
+      end
+      
+      protected
+      
+      # Run the method based on the type of prepared statement, with
+      # :select running #all to get all of the rows, and the other
+      # types running the method with the same name as the type.
+      def run(&block)
+        case @prepared_type
+        when :select, :all
+          all(&block)
+        when :first
+          first
+        when :insert
+          insert(@prepared_modify_values)
+        when :update
+          update(@prepared_modify_values)
+        when :delete
+          delete
+        end
+      end
+      
+      private
+      
+      # Returns the value of the prepared_args hash for the given key.
+      def prepared_arg(k)
+        @prepared_args[k]
+      end
+    end
+    
+    # Default implementation for an argument mapper that uses
+    # unnumbered SQL placeholder arguments.  Keeps track of which
+    # arguments have been used, and allows arguments to
+    # be used more than once.
+    module UnnumberedArgumentMapper
+      include ArgumentMapper
+      
+      protected
+      
+      # Returns a single output array mapping the values of the input hash.
+      # Keys in the input hash that are used more than once in the query
+      # have multiple entries in the output array.
+      def map_to_prepared_args(hash)
+        array = []
+        @prepared_args.each{|k,vs| vs.each{|v| array[v] = hash[k]}}
+        array
+      end
+      
+      private
+      
+      # Uses a separate array of each key, holding the positions
+      # in the output array (necessary to support arguments
+      # that are used more than once).
+      def prepared_args_hash
+        Hash.new{|h,k| h[k] = Array.new}
+      end
+      
+      # Associates the argument with name k with the next position in
+      # the output array.
+      def prepared_arg(k)
+        @max_prepared_arg ||= 0
+        @prepared_args[k] << @max_prepared_arg
+        @max_prepared_arg += 1
+        prepared_arg_placeholder
+      end
+    end
+    
+    # For the given type (:select, :insert, :update, or :delete),
+    # run the sql with the bind variables
+    # specified in the hash.  values is a hash of passed to
+    # insert or update (if one of those types is used),
+    # which may contain placeholders.
+    def call(type, bind_variables={}, values=nil)
+      to_prepared_statement(type, values).call(bind_variables)
+    end
+    
+    # Prepare an SQL statement for later execution. This returns
+    # a clone of the dataset extended with PreparedStatementMethods,
+    # on which you can call call with the hash of bind variables to
+    # do substitution.  The prepared statement is also stored in
+    # the associated database.  The following usage is identical:
+    #
+    #   ps = prepare(:select, :select_by_name)
+    #   ps.call(:name=>'Blah')
+    #   db.call(:select_by_name, :name=>'Blah')
+    def prepare(type, name, values=nil)
+      db.prepared_statements[name] = to_prepared_statement(type, values)
+    end
+    
+    private
+    
+    # The argument placeholder.  Most databases used unnumbered
+    # arguments with question marks, so that is the default.
+    def prepared_arg_placeholder
+      PREPARED_ARG_PLACEHOLDER
+    end
+    
+    # Return a cloned copy of the current dataset extended with
+    # PreparedStatementMethods, setting the type and modify values.
+    def to_prepared_statement(type, values=nil)
+      ps = clone
+      ps.extend(PreparedStatementMethods)
+      ps.prepared_type = type
+      ps.prepared_modify_values = values
+      ps
+    end
+  end
+end

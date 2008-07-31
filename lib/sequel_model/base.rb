@@ -79,7 +79,6 @@ module Sequel
     # first before a dataset lookup is attempted unless a hash is supplied.
     def self.[](*args)
       args = args.first if (args.size == 1)
-      raise(Error::InvalidFilter, "Did you mean to supply a hash?") if args === true || args === false
 
       if Hash === args
         dataset[args]

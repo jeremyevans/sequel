@@ -4,15 +4,6 @@ module Sequel
     
     # Raised when Sequel is unable to load a specified adapter.
     class AdapterNotFound < Error ; end
-    
-    # Raise when an invalid expression is encountered inside a block filter.
-    class InvalidExpression < Error; end
-                                       
-    # Represents an Invalid filter.    
-    class InvalidFilter < Error ; end
-    
-    # Represents an invalid join type.
-    class InvalidJoinType < Error ; end
 
     # Raised on an invalid operation.
     class InvalidOperation < Error; end
@@ -35,8 +26,5 @@ module Sequel
     # Rollback is a special error used to rollback a transactions.
     # A transaction block will catch this error and won't pass further up the stack.
     class Rollback < Error ; end
-    
-    # Should be raised inside a worker loop to tell it to stop working.
-    class WorkerStop < RuntimeError ; end
   end  
 end

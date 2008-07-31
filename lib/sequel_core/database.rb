@@ -40,6 +40,9 @@ module Sequel
 
     # Whether to quote identifiers (columns and tables) for this database
     attr_writer :quote_identifiers
+    
+    # The prepared statement objects for this database, keyed by name
+    attr_reader :prepared_statements
 
     # Constructs a new instance of a database connection with the specified
     # options hash.
@@ -51,8 +54,10 @@ module Sequel
       @quote_identifiers = opts.include?(:quote_identifiers) ? opts[:quote_identifiers] : @@quote_identifiers
       @single_threaded = opts.include?(:single_threaded) ? opts[:single_threaded] : @@single_threaded
       @schemas = nil
+      @prepared_statements = {}
+      @transactions = []
       @pool = (@single_threaded ? SingleThreadedPool : ConnectionPool).new(connection_pool_default_options.merge(opts), &block)
-      @pool.connection_proc = proc {connect} unless block
+      @pool.connection_proc = proc{connect} unless block
 
       @loggers = Array(opts[:logger]) + Array(opts[:loggers])
       ::Sequel::DATABASES.push(self)
@@ -191,6 +196,12 @@ module Sequel
       (String === args.first) ? fetch(*args, &block) : from(*args, &block)
     end
     
+    # Call the prepared statement with the given name with the given hash
+    # of arguments.
+    def call(ps_name, hash={})
+      prepared_statements[ps_name].call(hash)
+    end
+    
     # Connects to the database. This method should be overridden by descendants.
     def connect
       raise NotImplementedError, "#connect should be overridden by adapters"
@@ -273,7 +284,8 @@ module Sequel
 
     # Log a message at level info to all loggers.  All SQL logging
     # goes through this method.
-    def log_info(message)
+    def log_info(message, args=nil)
+      message = "#{message}; #{args.inspect}" if args
       @loggers.each{|logger| logger.info(message)}
     end
 
@@ -349,11 +361,8 @@ module Sequel
     # current transaction. Should be overridden for databases that support nested 
     # transactions.
     def transaction
-      @pool.hold do |conn|
-        @transactions ||= []
-        if @transactions.include? Thread.current
-          return yield(conn)
-        end
+      synchronize do |conn|
+        return yield(conn) if @transactions.include?(Thread.current)
         log_info(SQL_BEGIN)
         conn.execute(SQL_BEGIN)
         begin

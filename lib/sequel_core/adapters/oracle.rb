@@ -5,12 +5,6 @@ module Sequel
     class Database < Sequel::Database
       set_adapter_scheme :oracle
       
-      # AUTO_INCREMENT = 'IDENTITY(1,1)'.freeze
-      # 
-      # def auto_increment_sql
-      #   AUTO_INCREMENT
-      # end
-
       def connect
         if @opts[:database]
           dbname = @opts[:host] ? \
@@ -51,7 +45,6 @@ module Sequel
 
       def transaction
         @pool.hold do |conn|
-          @transactions ||= []
           if @transactions.include? Thread.current
             return yield(conn)
           end

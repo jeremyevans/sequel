@@ -2950,7 +2950,7 @@ context "Dataset.dataset_classes" do
   end
 end
 
-context "Dataset default #fetch_rows, #insert, #update, and #delete" do
+context "Dataset default #fetch_rows, #insert, #update, and #delete, #execute" do
   setup do
     @db = Sequel::Database.new
     @ds = @db[:items]
@@ -2973,5 +2973,93 @@ context "Dataset default #fetch_rows, #insert, #update, and #delete" do
   specify "#update should execute update SQL" do
     @db.should_receive(:execute).once.with('UPDATE items SET number = 1')
     @ds.update(:number=>1)
+  end
+  
+  specify "#execute should execute the SQL on the database" do
+    @db.should_receive(:execute).once.with('SELECT 1')
+    @ds.send(:execute, 'SELECT 1')
+  end
+end
+
+context "Dataset prepared statements and bound variables " do
+  setup do
+    @db = Sequel::Database.new
+    @db.meta_eval{attr_accessor :sqls}
+    @db.sqls = []
+    def @db.execute(sql)
+      @sqls << sql
+    end
+    @ds = @db[:items]
+    def @ds.fetch_rows(sql, &block)
+      execute(sql)
+    end
+  end
+  
+  specify "#call should take a type and bind hash and interpolate it" do
+    @ds.filter(:num=>:$n).call(:select, :n=>1)
+    @ds.filter(:num=>:$n).call(:first, :n=>1)
+    @ds.filter(:num=>:$n).call(:delete, :n=>1)
+    @ds.filter(:num=>:$n).call(:update, {:n=>1, :n2=>2}, :num=>:$n2)
+    @ds.call(:insert, {:n=>1}, :num=>:$n)
+    @db.sqls.should == ['SELECT * FROM items WHERE (num = 1)',
+      'SELECT * FROM items WHERE (num = 1) LIMIT 1',
+      'DELETE FROM items WHERE (num = 1)',
+      'UPDATE items SET num = 2 WHERE (num = 1)',
+      'INSERT INTO items (num) VALUES (1)']
+  end
+    
+  specify "#prepare should take a type and name and store it in the database for later use with call" do
+    pss = []
+    pss << @ds.filter(:num=>:$n).prepare(:select, :sn)
+    pss << @ds.filter(:num=>:$n).prepare(:first, :fn)
+    pss << @ds.filter(:num=>:$n).prepare(:delete, :dn)
+    pss << @ds.filter(:num=>:$n).prepare(:update, :un, :num=>:$n2)
+    pss << @ds.prepare(:insert, :in, :num=>:$n)
+    @db.prepared_statements.keys.sort_by{|k| k.to_s}.should == [:dn, :fn, :in, :sn, :un]
+    [:sn, :fn, :dn, :un, :in].each_with_index{|x, i| @db.prepared_statements[x].should == pss[i]}
+    @db.call(:sn, :n=>1)
+    @db.call(:fn, :n=>1)
+    @db.call(:dn, :n=>1)
+    @db.call(:un, :n=>1, :n2=>2)
+    @db.call(:in, :n=>1)
+    @db.sqls.should == ['SELECT * FROM items WHERE (num = 1)',
+      'SELECT * FROM items WHERE (num = 1) LIMIT 1',
+      'DELETE FROM items WHERE (num = 1)',
+      'UPDATE items SET num = 2 WHERE (num = 1)',
+      'INSERT INTO items (num) VALUES (1)']
+  end
+    
+  specify "#inspect should indicate it is a prepared statement with the prepared SQL" do
+    @ds.filter(:num=>:$n).prepare(:select, :sn).inspect.should == \
+      '<Sequel::Dataset/PreparedStatement "SELECT * FROM items WHERE (num = $n)">'
+  end
+end
+
+context Sequel::Dataset::UnnumberedArgumentMapper do
+  setup do
+    @db = Sequel::Database.new
+    @db.meta_eval{attr_accessor :sqls}
+    @db.sqls = []
+    def @db.execute(sql, *binds)
+      @sqls << [sql, *binds]
+    end
+    @ds = @db[:items].filter(:num=>:$n)
+    def @ds.fetch_rows(sql, &block)
+      execute(sql)
+    end
+    def @ds.execute(sql, &block)
+      @db.execute(sql, *bind_arguments)
+    end
+    @ps = @ds.prepare(:select, :sn)
+    @ps.extend(Sequel::Dataset::UnnumberedArgumentMapper)
+  end
+
+  specify "#inspect should show the actual SQL submitted to the database" do
+    @ps.inspect.should == '<Sequel::Dataset/PreparedStatement "SELECT * FROM items WHERE (num = ?)">'
+  end
+  
+  specify "should submitted the SQL to the database with placeholders and bind variables" do
+    @ps.call(:n=>1)
+    @db.sqls.should == [["SELECT * FROM items WHERE (num = ?)", 1]]
   end
 end

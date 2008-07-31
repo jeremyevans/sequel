@@ -962,3 +962,14 @@ context "Database#get" do
     @db.sqls.last.should == 'SELECT version()'
   end
 end
+
+context "Database#call" do
+  specify "should call the prepared statement with the given name" do
+    db = MockDatabase.new
+    db[:items].prepare(:select, :select_all)
+    db.call(:select_all).should == [{:id => 1, :x => 1}]
+    db[:items].filter(:n=>:$n).prepare(:select, :select_n)
+    db.call(:select_n, :n=>1).should == [{:id => 1, :x => 1}]
+    db.sqls.should == ['SELECT * FROM items', 'SELECT * FROM items WHERE (n = 1)']
+  end
+end

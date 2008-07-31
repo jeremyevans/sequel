@@ -41,13 +41,6 @@ context "A MySQL database" do
   teardown do
     Sequel.convert_tinyint_to_bool = true
   end
-  
-  specify "should provide disconnect functionality" do
-    @db.tables
-    @db.pool.size.should == 1
-    @db.disconnect
-    @db.pool.size.should == 0
-  end
 
   specify "should provide the server version" do
     @db.server_version.should >= 40000
@@ -63,6 +56,12 @@ context "A MySQL database" do
       {:id => 2, :name => 'def'},
       {:id => 3, :name => 'ghi'}
     ]
+  end
+  
+  specify "should provide disconnect functionality" do
+    @db.pool.size.should == 1
+    @db.disconnect
+    @db.pool.size.should == 0
   end
 
   specify "should convert Mysql::Errors to Sequel::Errors" do
@@ -319,7 +318,7 @@ context "MySQL join expressions" do
   end
 
   specify "should raise error for :full_outer join requests." do
-    lambda{@ds.join_table(:full_outer, :nodes)}.should raise_error(Sequel::Error::InvalidJoinType)
+    lambda{@ds.join_table(:full_outer, :nodes)}.should raise_error(Sequel::Error)
   end
   specify "should support natural left joins" do
     @ds.join_table(:natural_left, :nodes).sql.should == \

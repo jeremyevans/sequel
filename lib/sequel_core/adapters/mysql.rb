@@ -1,8 +1,10 @@
 require 'mysql'
 require 'sequel_core/adapters/shared/mysql'
 
-# Monkey patch Mysql::Result to yield hashes with symbol keys
+# Add methods to get columns, yield hashes with symbol keys, and do
+# type conversion.
 class Mysql::Result
+  # Mapping of type numbers to conversion methods.
   MYSQL_TYPES = {
     0   => :to_d,     # MYSQL_TYPE_DECIMAL
     1   => :to_i,     # MYSQL_TYPE_TINY
@@ -32,7 +34,32 @@ class Mysql::Result
     # 254 => :to_s,     # MYSQL_TYPE_STRING
     # 255 => :to_s      # MYSQL_TYPE_GEOMETRY
   }
+  
+  # Return an array of column name symbols for this result set.
+  def columns(with_table = nil)
+    unless @columns
+      @column_types = []
+      @columns = fetch_fields.map do |f|
+        @column_types << f.type
+        (with_table ? "#{f.table}.#{f.name}" : f.name).to_sym
+      end
+    end
+    @columns
+  end
 
+  # yield a hash with symbol keys and type converted values.
+  def sequel_each_hash(with_table = nil)
+    c = columns
+    while row = fetch_row
+      h = {}
+      c.each_with_index {|f, i| h[f] = convert_type(row[i], @column_types[i])}
+      yield h
+    end
+  end
+  
+  private
+  
+  # Convert the type of v using the method in MYSQL_TYPES[type].
   def convert_type(v, type)
     if v
       if type == 1 && Sequel.convert_tinyint_to_bool
@@ -46,48 +73,24 @@ class Mysql::Result
       nil
     end
   end
-
-  def columns(with_table = nil)
-    unless @columns
-      @column_types = []
-      @columns = fetch_fields.map do |f|
-        @column_types << f.type
-        (with_table ? "#{f.table}.#{f.name}" : f.name).to_sym
-      end
-    end
-    @columns
-  end
-
-  def each_array(with_table = nil)
-    c = columns
-    while row = fetch_row
-      c.each_with_index do |f, i|
-        if (t = MYSQL_TYPES[@column_types[i]]) && (v = row[i])
-          row[i] = v.send(t)
-        end
-      end
-      yield row
-    end
-  end
-
-  def sequel_each_hash(with_table = nil)
-    c = columns
-    while row = fetch_row
-      h = {}
-      c.each_with_index {|f, i| h[f] = convert_type(row[i], @column_types[i])}
-      yield h
-    end
-  end
   
 end
 
 module Sequel
-  module MySQL    
+  # Module for holding all MySQL-related classes and modules for Sequel.
+  module MySQL
+    # Database class for MySQL databases used with Sequel.
     class Database < Sequel::Database
       include Sequel::MySQL::DatabaseMethods
       
       set_adapter_scheme :mysql
-
+      
+      # Connect to the database.  In addition to the usual database options,
+      # the following options have effect:
+      #
+      # * :encoding, :charset - Set all the related character sets for this
+      #   connection (connection, client, database, server, and results).
+      # * :socket - Use a unix socket file instead of connecting via TCP/IP.
       def connect
         conn = Mysql.init
         conn.options(Mysql::OPT_LOCAL_INFILE, "client")
@@ -110,55 +113,104 @@ module Sequel
           conn.query("set character_set_server = '#{encoding}'")
           conn.query("set character_set_results = '#{encoding}'")
         end
+        conn.meta_eval{attr_accessor :prepared_statements}
+        conn.prepared_statements = {}
         conn.reconnect = true
         conn
       end
       
+      # Returns instance of Sequel::MySQL::Dataset with the given options.
       def dataset(opts = nil)
         MySQL::Dataset.new(self, opts)
       end
-
+      
+      # Closes all database connections.
       def disconnect
         @pool.disconnect {|c| c.close}
       end
-
-      def execute(sql, &block)
+      
+      # Executes the given SQL using an available connection, yielding the
+      # connection if the block is given.
+      def execute(sql)
         begin
           log_info(sql)
-          @pool.hold do |conn|
+          synchronize do |conn|
             conn.query(sql)
-            block[conn] if block
+            yield conn if block_given?
           end
         rescue Mysql::Error => e
           raise Error.new(e.message)
         end
       end
-
-      def execute_select(sql, &block)
+      
+      # Executes a prepared statement on an available connection.  If the
+      # prepared statement already exists for the connection and has the same
+      # SQL, reuse it, otherwise, prepare the new statement.  Because of the
+      # usual MySQL stupidity, we are forced to name arguments via separate
+      # SET queries.  Use @sequel_arg_N (for N starting at 1) for these
+      # arguments.
+      def execute_prepared_statement(ps_name, args, opts={})
+        ps = prepared_statements[ps_name]
+        sql = ps.prepared_sql
+        synchronize do |conn|
+          unless conn.prepared_statements[ps_name] == sql
+            conn.prepared_statements[ps_name] = sql
+            s = "PREPARE #{ps_name} FROM '#{::Mysql.quote(sql)}'"
+            log_info(s)
+            conn.query(s)
+          end
+          i = 0
+          args.each do |arg|
+            s = "SET @sequel_arg_#{i+=1} = #{literal(arg)}"
+            log_info(s)
+            conn.query(s)
+          end
+          s = "EXECUTE #{ps_name}#{" USING #{(1..i).map{|j| "@sequel_arg_#{j}"}.join(', ')}" unless i == 0}"
+          log_info(s)
+          conn.query(s)
+          if opts[:select]
+            r = conn.use_result
+            begin
+              yield r
+            ensure
+              r.free
+            end
+          else
+            yield conn if block_given?
+          end
+        end
+      end
+      
+      # Execute the given SQL, yielding the result set.  Until the block
+      # given returns, no queries can use this connection.  For that
+      # reason, if you need to use nested queries in MySQL, you must
+      # get all records at once for the outer queries (e.g.
+      # DB[:i].all{|i| DB[:j].each{|j|}}.
+      def execute_select(sql)
         execute(sql) do |c|
           r = c.use_result
           begin
-            block[r]
+            yield r
           ensure
             r.free
           end
         end
       end
       
+      # Return the version of the MySQL server two which we are connecting.
       def server_version
         @server_version ||= (synchronize{|conn| conn.server_version if conn.respond_to?(:server_version)} || super)
       end
       
+      # Return an array of symbols specifying table names in the current database.
       def tables
-        @pool.hold do |conn|
-          conn.list_tables.map {|t| t.to_sym}
-        end
+        synchronize{|conn| conn.list_tables.map {|t| t.to_sym}}
       end
       
+      # Support single level transactions on MySQL.
       def transaction
-        @pool.hold do |conn|
-          @transactions ||= []
-          return yield(conn) if @transactions.include? Thread.current
+        synchronize do |conn|
+          return yield(conn) if @transactions.include?(Thread.current)
           log_info(SQL_BEGIN)
           conn.query(SQL_BEGIN)
           begin
@@ -180,34 +232,60 @@ module Sequel
 
       private
       
+      # MySQL doesn't need the connection pool to convert exceptions.
       def connection_pool_default_options
         super.merge(:pool_convert_exceptions=>false)
       end
       
+      # The database name when using the native adapter is always stored in
+      # the :database option.
       def database_name
         @opts[:database]
       end
     end
-
+    
+    # Dataset class for MySQL datasets accessed via the native driver.
     class Dataset < Sequel::Dataset
       include Sequel::MySQL::DatasetMethods
-
-      def delete(opts = nil)
-        @db.execute(delete_sql(opts)) {|c| c.affected_rows}
+      
+      # Methods for MySQL prepared statements using the native driver.
+      module PreparedStatementMethods
+        include Sequel::Dataset::UnnumberedArgumentMapper
+        
+        # Execute the prepared statement with the bind arguments instead of
+        # the given SQL, yielding the connection to the block.
+        def execute(sql, &block)
+          @db.execute_prepared_statement(prepared_statement_name, bind_arguments, &block)
+        end
+        alias execute_dui execute
+        
+        # Execute the prepared statement with the bind arguments instead of
+        # the given SQL, yielding the rows to the block.
+        def execute_select(sql, &block)
+          @db.execute_prepared_statement(prepared_statement_name, bind_arguments, :select=>true, &block)
+        end
       end
-
+      
+      # Delete rows matching this dataset
+      def delete(opts = nil)
+        execute(delete_sql(opts)){|c| c.affected_rows}
+      end
+      
+      # Yield all rows matching this dataset
       def fetch_rows(sql)
-        @db.execute_select(sql) do |r|
+        execute_select(sql) do |r|
           @columns = r.columns
           r.sequel_each_hash {|row| yield row}
         end
         self
       end
-
+      
+      # Insert a new value into this dataset
       def insert(*values)
-        @db.execute(insert_sql(*values)) {|c| c.insert_id}
+        execute(insert_sql(*values)){|c| c.insert_id}
       end
       
+      # Handle correct quoting of strings using ::MySQL.quote.
       def literal(v)
         case v
         when LiteralString
@@ -219,12 +297,30 @@ module Sequel
         end
       end
       
-      def replace(*args)
-        @db.execute(replace_sql(*args)) {|c| c.insert_id}
+      # Store the given type of prepared statement in the associated database
+      # with the given name.
+      def prepare(type, name, values=nil)
+        ps = to_prepared_statement(type, values)
+        ps.extend(PreparedStatementMethods)
+        ps.prepared_statement_name = name
+        db.prepared_statements[name] = ps
       end
       
+      # Replace (update or insert) the matching row.
+      def replace(*args)
+        execute(replace_sql(*args)){|c| c.insert_id}
+      end
+      
+      # Update the matching rows.
       def update(*args)
-        @db.execute(update_sql(*args)) {|c| c.affected_rows}
+        execute(update_sql(*args)){|c| c.affected_rows}
+      end
+      
+      private
+      
+      # Run execute_select with the given SQL against the associated database.
+      def execute_select(sql, &block)
+        @db.execute_select(sql, &block)
       end
     end
   end

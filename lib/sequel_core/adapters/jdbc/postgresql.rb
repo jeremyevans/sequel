@@ -4,10 +4,16 @@ module Sequel
   Postgres::CONVERTED_EXCEPTIONS << NativeException
   
   module JDBC
+    # Adapter, Database, and Dataset support for accessing a PostgreSQL
+    # database via JDBC.
     module Postgres
+      # Methods to add to the JDBC adapter/connection to allow it to work
+      # with the shared PostgreSQL code.
       module AdapterMethods
         include Sequel::Postgres::AdapterMethods
         
+        # Give the JDBC adapter a direct execute method, which creates
+        # a statement with the given sql and executes it.
         def execute(sql, method=:execute)
           method = :executeQuery if block_given?
           stmt = createStatement
@@ -21,6 +27,9 @@ module Sequel
           end
         end
         
+        private
+        
+        # JDBC specific method of getting specific values from a result set.
         def result_set_values(r, *vals)
           return if r.nil?
           r.next
@@ -34,22 +43,54 @@ module Sequel
         end
       end
     
+      # Methods to add to Database instances that access PostgreSQL via
+      # JDBC.
       module DatabaseMethods
         include Sequel::Postgres::DatabaseMethods
         
+        # Return instance of Sequel::JDBC::Postgres::Dataset with the given opts.
         def dataset(opts=nil)
           Sequel::JDBC::Postgres::Dataset.new(self, opts)
         end
         
+        # Run the INSERT sql on the database and return the primary key
+        # for the record.
+        def execute_insert(sql, table, values)
+          _execute(sql, :type=>:insert, :table=>table, :values=>values)
+        end
+        
+        private
+        
+        # Extend the adapter with the JDBC PostgreSQL AdapterMethods
         def setup_connection(conn)
+          conn = super(conn)
           conn.extend(Sequel::JDBC::Postgres::AdapterMethods)
           conn
         end
+        
+        # Call insert_result with the table and values specified in the opts.
+        def last_insert_id(conn, opts)
+          insert_result(conn, opts[:table], opts[:values])
+        end
       end
       
+      # Dataset subclass used for datasets that connect to PostgreSQL via JDBC.
       class Dataset < JDBC::Dataset
         include Sequel::Postgres::DatasetMethods
         
+        # Methods to support JDBC PostgreSQL prepared statements
+        module PreparedStatementMethods
+          private
+          
+          # Add the table and values to the opts call so they can later
+          # be pulled by the DatabaseMethods#last_insert_id
+          def execute_insert(sql, table, values)
+            @db.execute_prepared_statement(self, bind_arguments, :type=>:insert, :table=>table, :values=>values)
+          end
+        end
+        
+        # Convert Java::JavaSql::Timestamps correctly, and handle SQL::Blobs
+        # correctly.
         def literal(v)
           case v
           when SQL::Blob
@@ -59,6 +100,13 @@ module Sequel
           else
             super
           end
+        end
+        
+        # Extend the prepared statement created with PreparedStatementMethods.
+        def prepare(type, name, values=nil)
+          ps = super
+          ps.extend(PreparedStatementMethods)
+          ps
         end
       end
     end
