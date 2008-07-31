@@ -1,5 +1,9 @@
 === HEAD
 
+* Remove InvalidExpression, InvalidFilter, InvalidJoinType, and WorkerStop exceptions (jeremyevans)
+
+* Add prepared statement/bound variable support (jeremyevans)
+
 * Fix anonymous column names in the ADO adapter (nusco)
 
 * Remove odbc_mssql adapter, use :db_type=>'mssql' option instead (jeremyevans)
