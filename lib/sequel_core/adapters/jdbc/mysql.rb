@@ -54,8 +54,8 @@ module Sequel
         private
         
         # Call execute_insert on the database.
-        def execute_insert(sql)
-          @db.execute_insert(sql)
+        def execute_insert(sql, opts={})
+          @db.execute_insert(sql, {:server=>@opts[:server] || :default}.merge(opts))
         end
       end
     end

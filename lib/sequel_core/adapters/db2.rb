@@ -6,29 +6,15 @@ module Sequel
       set_adapter_scheme :db2
       include DB2CLI
       
-      # AUTO_INCREMENT = 'IDENTITY(1,1)'.freeze
-      # 
-      # def auto_increment_sql
-      #   AUTO_INCREMENT
-      # end
-      
-      def check_error(rc, msg)
-        case rc
-        when SQL_SUCCESS, SQL_SUCCESS_WITH_INFO
-          nil
-        else
-          raise Error, msg
-        end
-      end
-      
       rc, @@env = SQLAllocHandle(SQL_HANDLE_ENV, SQL_NULL_HANDLE)
-      check_error(rc, "Could not allocate DB2 environment")
+      #check_error(rc, "Could not allocate DB2 environment")
 
-      def connect
+      def connect(server)
+        opts = server_opts(server)
         rc, dbc = SQLAllocHandle(SQL_HANDLE_DBC, @@env) 
         check_error(rc, "Could not allocate database connection")
         
-        rc = SQLConnect(dbc, @opts[:database], @opts[:user], @opts[:password]) 
+        rc = SQLConnect(dbc, opts[:database], opts[:user], opts[:password]) 
         check_error(rc, "Could not connect to database")
         
         dbc
@@ -44,8 +30,8 @@ module Sequel
         end
       end
     
-      def test_connection
-        @pool.hold {|conn|}
+      def test_connection(server=nil)
+        synchronize(server){|conn|}
         true
       end
 
@@ -53,9 +39,9 @@ module Sequel
         DB2::Dataset.new(self, opts)
       end
       
-      def execute(sql, &block)
+      def execute(sql, opts={})
         log_info(sql)
-        @pool.hold do |conn|
+        synchronize(opts[:server]) do |conn|
           rc, sth = SQLAllocHandle(SQL_HANDLE_STMT, @handle) 
           check_error(rc, "Could not allocate statement")
 
@@ -63,7 +49,7 @@ module Sequel
             rc = SQLExecDirect(sth, sql) 
             check_error(rc, "Could not execute statement")
             
-            block[sth] if block
+            yield(sth) if block_given?
 
             rc, rpc = SQLRowCount(sth)
             check_error(rc, "Could not get RPC") 
@@ -75,9 +61,22 @@ module Sequel
         end
       end
       alias_method :do, :execute
+      
+      private
+      
+      def check_error(rc, msg)
+        case rc
+        when SQL_SUCCESS, SQL_SUCCESS_WITH_INFO
+          nil
+        else
+          raise Error, msg
+        end
+      end
     end
     
     class Dataset < Sequel::Dataset
+      MAX_COL_SIZE = 256
+      
       def literal(v)
         case v
         when Time
@@ -89,21 +88,19 @@ module Sequel
         end
       end
 
-      def fetch_rows(sql, &block)
-        @db.synchronize do
-          @db.execute(sql) do |sth|
-            @column_info = get_column_info(sth)
-            @columns = @column_info.map {|c| c[:name]}
-            while (rc = SQLFetch(@handle)) != SQL_NO_DATA_FOUND
-              @db.check_error(rc, "Could not fetch row")
-              yield hash_row(sth)
-            end
+      def fetch_rows(sql)
+        execute(sql) do |sth|
+          @column_info = get_column_info(sth)
+          @columns = @column_info.map {|c| c[:name]}
+          while (rc = SQLFetch(@handle)) != SQL_NO_DATA_FOUND
+            @db.check_error(rc, "Could not fetch row")
+            yield hash_row(sth)
           end
         end
         self
       end
       
-      MAX_COL_SIZE = 256
+      private
 
       def get_column_info(sth)
         rc, column_count = SQLNumResultCols(sth)

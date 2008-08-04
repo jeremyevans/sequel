@@ -56,9 +56,9 @@ context "A connection pool handling connections" do
   end
 
   specify "#make_new should not make more than max_size connections" do
-    @cpool.send(:make_new).should == :got_connection
-    @cpool.send(:make_new).should == :got_connection
-    @cpool.send(:make_new).should == nil
+    @cpool.send(:make_new, :default).should == :got_connection
+    @cpool.send(:make_new, :default).should == :got_connection
+    @cpool.send(:make_new, :default).should == nil
     @cpool.created_count.should == 2
   end
 end
@@ -341,6 +341,65 @@ context "ConnectionPool#disconnect" do
   end
 end
 
+context "A connection pool with multiple servers" do
+  setup do
+    @invoked_counts = Hash.new(0)
+    @pool = Sequel::ConnectionPool.new(CONNECTION_POOL_DEFAULTS.merge(:servers=>{:read_only=>{}})){|server| "#{server}#{@invoked_counts[server] += 1}"}
+  end
+  
+  specify "should use the :default server by default" do
+    @pool.size.should == 0
+    @pool.hold do |c|
+      c.should == "default1"
+      @pool.allocated.should == {Thread.current, "default1"}
+    end
+    @pool.available_connections.should == ["default1"]
+    @pool.size.should == 1
+    @invoked_counts.should == {:default=>1}
+  end
+
+  specify "should use the requested server if server is given" do
+    @pool.size(:read_only).should == 0
+    @pool.hold(:read_only) do |c|
+      c.should == "read_only1"
+      @pool.allocated(:read_only).should == {Thread.current, "read_only1"}
+    end
+    @pool.available_connections(:read_only).should == ["read_only1"]
+    @pool.size(:read_only).should == 1
+    @invoked_counts.should == {:read_only=>1}
+  end
+  
+  specify "#hold should only yield connections for the server requested" do
+    @pool.hold(:read_only) do |c|
+      c.should == "read_only1"
+      @pool.allocated(:read_only).should == {Thread.current, "read_only1"}
+      @pool.hold do |d|
+        d.should == "default1"
+        @pool.hold do |e|
+          e.should == d
+          @pool.hold(:read_only){|b| b.should == c}
+        end
+        @pool.allocated.should == {Thread.current, "default1"}
+      end
+    end
+    @invoked_counts.should == {:read_only=>1, :default=>1}
+  end
+  
+  specify "#disconnect should disconnect from all servers" do
+    @pool.hold(:read_only){}
+    @pool.hold{}
+    conns = []
+    @pool.size.should == 1
+    @pool.size(:read_only).should == 1
+    @pool.disconnect{|c| conns << c}
+    conns.sort.should == %w'default1 read_only1'
+    @pool.size.should == 0
+    @pool.size(:read_only).should == 0
+    @pool.hold(:read_only){|c| c.should == 'read_only2'}
+    @pool.hold{|c| c.should == 'default2'}
+  end
+end
+
 context "SingleThreadedPool" do
   setup do
     @pool = Sequel::SingleThreadedPool.new(CONNECTION_POOL_DEFAULTS){1234}
@@ -359,5 +418,48 @@ context "SingleThreadedPool" do
     @pool.disconnect {|c| conn = c}
     conn.should == 1234
     @pool.conn.should be_nil
+  end
+end
+
+context "A single threaded pool with multiple servers" do
+  setup do
+    @pool = Sequel::SingleThreadedPool.new(CONNECTION_POOL_DEFAULTS.merge(:servers=>{:read_only=>{}})){|server| server}
+  end
+  
+  specify "should use the :default server by default" do
+    @pool.hold{|c| c.should == :default}
+    @pool.conn.should == :default
+  end
+
+  specify "should use the requested server if server is given" do
+    @pool.hold(:read_only){|c| c.should == :read_only}
+    @pool.conn(:read_only).should == :read_only
+  end
+  
+  specify "#hold should only yield connections for the server requested" do
+    @pool.hold(:read_only) do |c|
+      c.should == :read_only
+      @pool.hold do |d|
+        d.should == :default
+        @pool.hold do |e|
+          e.should == d
+          @pool.hold(:read_only){|b| b.should == c}
+        end
+      end
+    end
+    @pool.conn.should == :default
+    @pool.conn(:read_only).should == :read_only
+  end
+  
+  specify "#disconnect should disconnect from all servers" do
+    @pool.hold(:read_only){}
+    @pool.hold{}
+    conns = []
+    @pool.conn.should == :default
+    @pool.conn(:read_only).should == :read_only
+    @pool.disconnect{|c| conns << c}
+    conns.sort_by{|x| x.to_s}.should == [:default, :read_only]
+    @pool.conn.should == nil
+    @pool.conn(:read_only).should == nil
   end
 end

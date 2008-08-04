@@ -23,11 +23,12 @@ module Sequel
       # Connect to the database.  Since SQLite is a file based database,
       # the only options available are :database (to specify the database
       # name), and :timeout, to specify how long to wait for the database to
-      # be available if it is locked (default is 5 seconds).
-      def connect
-        @opts[:database] = ':memory:' if @opts[:database].blank?
-        db = ::SQLite3::Database.new(@opts[:database])
-        db.busy_timeout(@opts.fetch(:timeout, 5000))
+      # be available if it is locked, given in milliseconds (default is 5000).
+      def connect(server)
+        opts = server_opts(server)
+        opts[:database] = ':memory:' if opts[:database].blank?
+        db = ::SQLite3::Database.new(opts[:database])
+        db.busy_timeout(opts.fetch(:timeout, 5000))
         db.type_translation = true
         # fix for timestamp translation
         db.translator.add_translator("timestamp") do |t, v|
@@ -47,30 +48,30 @@ module Sequel
       end
       
       # Run the given SQL with the given arguments and return the number of changed rows.
-      def execute(sql, *bind_arguments)
-        _execute(sql, *bind_arguments){|conn| conn.execute_batch(sql, *bind_arguments); conn.changes}
+      def execute_dui(sql, opts={})
+        _execute(sql, opts){|conn| conn.execute_batch(sql, opts[:arguments]); conn.changes}
       end
       
       # Run the given SQL with the given arguments and return the last inserted row id.
-      def execute_insert(sql, *bind_arguments)
-        _execute(sql, *bind_arguments){|conn| conn.execute(sql, *bind_arguments); conn.last_insert_row_id}
+      def execute_insert(sql, opts={})
+        _execute(sql, opts){|conn| conn.execute(sql, opts[:arguments]); conn.last_insert_row_id}
       end
       
       # Run the given SQL with the given arguments and yield each row.
-      def execute_select(sql, *bind_arguments)
-        _execute(sql, *bind_arguments){|conn| conn.query(sql, *bind_arguments){|r| yield r}}
+      def execute(sql, opts={}, &block)
+        _execute(sql, opts){|conn| conn.query(sql, opts[:arguments], &block)}
       end
       
       # Run the given SQL with the given arguments and return the first value of the first row.
-      def single_value(sql, *bind_arguments)
-        _execute(sql, *bind_arguments){|conn| conn.get_first_value(sql, *bind_arguments)}
+      def single_value(sql, opts={})
+        _execute(sql, opts){|conn| conn.get_first_value(sql, opts[:arguments])}
       end
       
       # Use the native driver transaction method if there isn't already a transaction
       # in progress on the connection, always yielding a connection inside a transaction
       # transaction.
-      def transaction(&block)
-        synchronize do |conn|
+      def transaction(server=nil, &block)
+        synchronize(server) do |conn|
           return yield(conn) if conn.transaction_active?
           begin
             result = nil
@@ -86,10 +87,10 @@ module Sequel
       
       # Log the SQL and the arguments, and yield an available connection.  Rescue
       # any SQLite3::Exceptions and turn the into Error::InvalidStatements.
-      def _execute(sql, *bind_arguments)
+      def _execute(sql, opts)
         begin
-          log_info(sql, *bind_arguments)
-          synchronize{|conn| yield conn}
+          log_info(sql, opts[:arguments])
+          synchronize(opts[:server]){|conn| yield conn}
         rescue SQLite3::Exception => e
           raise Error::InvalidStatement, "#{sql}\r\n#{e.message}"
         end
@@ -154,22 +155,19 @@ module Sequel
         
         # Run execute_select on the database with the given SQL and the stored
         # bind arguments.
-        def execute_select(sql, &block)
-          @db.execute_select(sql, bind_arguments, &block)
+        def execute(sql, opts={}, &block)
+          super(sql, {:arguments=>bind_arguments}.merge(opts), &block)
         end
         
-        # Run execute_insert on the database with the given SQL and the
-        # stored bind arguments.
-        def execute_insert(sql)
-          @db.execute_insert(sql, bind_arguments)
+        # Same as execute, explicit due to intricacies of alias and super.
+        def execute_dui(sql, opts={}, &block)
+          super(sql, {:arguments=>bind_arguments}.merge(opts), &block)
         end
         
-        # Run execute on the database with the given SQL and the stored bind
-        # arguments.
-        def execute(sql)
-          @db.execute(sql, bind_arguments)
+        # Same as execute, explicit due to intricacies of alias and super.
+        def execute_insert(sql, opts={}, &block)
+          super(sql, {:arguments=>bind_arguments}.merge(opts), &block)
         end
-        alias execute_dui execute
       end
       
       # Prepare an unnamed statement of the given type and call it with the
@@ -188,7 +186,7 @@ module Sequel
       
       # Yield a hash for each row in the dataset.
       def fetch_rows(sql)
-        execute_select(sql) do |result|
+        execute(sql) do |result|
           @columns = result.columns.map {|c| c.to_sym}
           column_count = @columns.size
           result.each do |values|
@@ -227,11 +225,6 @@ module Sequel
       end
       
       private
-      
-      # Run execute_select on the database with the given SQL.
-      def execute_select(sql, &block)
-        @db.execute_select(sql, &block)
-      end
       
       # SQLite uses a : before the name of the argument as a placeholder.
       def prepared_arg_placeholder

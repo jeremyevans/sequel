@@ -246,6 +246,13 @@ module Sequel
     def quote_identifiers?
       @quote_identifiers
     end
+    
+    # Set the server for this dataset to use.  Used to pick a specific database
+    # shard to run a query against, or to override the default SELECT uses
+    # :read_only database and all other queries use the :default database.
+    def server(servr)
+      clone(:server=>servr)
+    end
 
     # Alias for set, but not aliased directly so subclasses
     # don't have to override both methods.
@@ -410,13 +417,13 @@ module Sequel
     private
     
     # Execute the given SQL on the database using execute.
-    def execute(sql, &block)
-      @db.execute(sql, &block)
+    def execute(sql, opts={}, &block)
+      @db.execute(sql, {:server=>@opts[:server] || :read_only}.merge(opts), &block)
     end
     
     # Execute the given SQL on the database using execute_dui.
-    def execute_dui(sql, &block)
-      @db.execute_dui(sql, &block)
+    def execute_dui(sql, opts={}, &block)
+      @db.execute_dui(sql, {:server=>@opts[:server] || :default}.merge(opts), &block)
     end
 
     # Modify the receiver with the results of sending the meth, args, and block

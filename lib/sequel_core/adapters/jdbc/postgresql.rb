@@ -14,8 +14,8 @@ module Sequel
         
         # Give the JDBC adapter a direct execute method, which creates
         # a statement with the given sql and executes it.
-        def execute(sql, method=:execute)
-          method = :executeQuery if block_given?
+        def execute(sql, args=nil)
+          method = block_given? ? :executeQuery : :execute
           stmt = createStatement
           begin
             rows = stmt.send(method, sql)
@@ -55,8 +55,8 @@ module Sequel
         
         # Run the INSERT sql on the database and return the primary key
         # for the record.
-        def execute_insert(sql, table, values)
-          _execute(sql, :type=>:insert, :table=>table, :values=>values)
+        def execute_insert(sql, opts={})
+          super(sql, {:type=>:insert}.merge(opts))
         end
         
         private
@@ -78,17 +78,6 @@ module Sequel
       class Dataset < JDBC::Dataset
         include Sequel::Postgres::DatasetMethods
         
-        # Methods to support JDBC PostgreSQL prepared statements
-        module PreparedStatementMethods
-          private
-          
-          # Add the table and values to the opts call so they can later
-          # be pulled by the DatabaseMethods#last_insert_id
-          def execute_insert(sql, table, values)
-            @db.execute_prepared_statement(self, bind_arguments, :type=>:insert, :table=>table, :values=>values)
-          end
-        end
-        
         # Convert Java::JavaSql::Timestamps correctly, and handle SQL::Blobs
         # correctly.
         def literal(v)
@@ -100,13 +89,6 @@ module Sequel
           else
             super
           end
-        end
-        
-        # Extend the prepared statement created with PreparedStatementMethods.
-        def prepare(type, name, values=nil)
-          ps = super
-          ps.extend(PreparedStatementMethods)
-          ps
         end
       end
     end

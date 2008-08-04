@@ -90,8 +90,8 @@ module Sequel
       end
       
       # Connect to the database using JavaSQL::DriverManager.getConnection.
-      def connect
-        setup_connection(JavaSQL::DriverManager.getConnection(uri))
+      def connect(server)
+        setup_connection(JavaSQL::DriverManager.getConnection(uri(server_opts(server))))
       end
       
       # Return instances of JDBC::Dataset with the given opts.
@@ -104,85 +104,53 @@ module Sequel
         @pool.disconnect {|c| c.close}
       end
       
-      # Execute the given SQL, which should be a SELECT statement
-      # or something else that returns rows.
-      def execute(sql, &block)
-        _execute(sql, :type=>:select, &block)
-      end
-      
-      # Execute the given DDL SQL, which should not return any
-      # values or rows.
-      def execute_ddl(sql)
-        _execute(sql, :type=>:ddl)
-      end
-      
-      # Execute the given DELETE, UPDATE, or INSERT SQL, returning
-      # the number of rows affected.
-      def execute_dui(sql)
-        _execute(sql, :type=>:dui)
-      end
-      
-      # Execute the given INSERT SQL, returning the last inserted
-      # row id.
-      def execute_insert(sql)
-        _execute(sql, :type=>:insert)
-      end
-      
-      # Execute the prepared statement.  If the provided name is a
-      # dataset, use that as the prepared statement, otherwise use
-      # it as a key to look it up in the prepared_statements hash.
-      # If the connection we are using has already prepared an identical
-      # statement, use that statement instead of creating another.
-      # Otherwise, prepare a new statement for the connection, bind the
-      # variables, and execute it.
-      def execute_prepared_statement(name, args=[], opts={})
-        if Dataset === name
-          ps = name
-          name = ps.prepared_statement_name
-        else
-          ps = prepared_statements[name]
-        end
-        sql = ps.prepared_sql
-        synchronize do |conn|
-          if name and cps = conn.prepared_statements[name] and cps[0] == sql
-            cps = cps[1]
-          else
-            if cps
-              log_info("Closing #{name}")
-              cps[1].close
-            end
-            log_info("Preparing#{" #{name}:" if name} #{sql}")
-            cps = conn.prepareStatement(sql)
-            conn.prepared_statements[name] = [sql, cps] if name
-          end
-          i = 0
-          args.each{|arg| set_ps_arg(cps, arg, i+=1)}
-          log_info("Executing#{" #{name}" if name}", args)
+      # Execute the given SQL.  If a block is given, if should be a SELECT
+      # statement or something else that returns rows.
+      def execute(sql, opts={}, &block)
+        return execute_prepared_statement(sql, opts, &block) if sql.is_one_of?(Symbol, Dataset)
+        log_info(sql)
+        synchronize(opts[:server]) do |conn|
+          stmt = conn.createStatement
           begin
-            case opts[:type]
-            when :select
-              yield cps.executeQuery
-            when :ddl
-              cps.execute
-            when :insert
-              cps.executeUpdate
-              last_insert_id(conn, opts)
+            if block_given?
+              yield stmt.executeQuery(sql)
             else
-              cps.executeUpdate
+              case opts[:type]
+              when :ddl
+                stmt.execute(sql)
+              when :insert
+                stmt.executeUpdate(sql)
+                last_insert_id(conn, opts)
+              else
+                stmt.executeUpdate(sql)
+              end
             end
           rescue NativeException, JavaSQL::SQLException => e
             raise Error, e.message
           ensure
-            cps.close unless name
+            stmt.close
           end
         end
+      end
+      alias execute_dui execute
+      
+      # Execute the given DDL SQL, which should not return any
+      # values or rows.
+      def execute_ddl(sql, opts={})
+        execute(sql, {:type=>:ddl}.merge(opts))
+      end
+      
+      # Execute the given INSERT SQL, returning the last inserted
+      # row id.
+      def execute_insert(sql, opts={})
+        execute(sql, {:type=>:insert}.merge(opts))
       end
       
       # Default transaction method that should work on most JDBC
       # databases.  Does not use the JDBC transaction methods, uses
       # SQL BEGIN/ROLLBACK/COMMIT statements instead.
-      def transaction
-        synchronize do |conn|
+      def transaction(server=nil)
+        synchronize(server) do |conn|
           return yield(conn) if @transactions.include?(Thread.current)
           stmt = conn.createStatement
           begin
@@ -209,36 +177,64 @@ module Sequel
       # using the :uri, :url, or :database options.  You don't
       # need to worry about this if you use Sequel.connect
       # with the JDBC connectrion strings.
-      def uri
-        ur = @opts[:uri] || @opts[:url] || @opts[:database]
+      def uri(opts={})
+        opts = @opts.merge(opts)
+        ur = opts[:uri] || opts[:url] || opts[:database]
         ur =~ /^\Ajdbc:/ ? ur : "jdbc:#{ur}"
       end
       alias url uri
       
       private
       
-      # Execute the SQL.  Use the :type option to see which JDBC method
-      # to use.
-      def _execute(sql, opts)
-        log_info(sql)
-        synchronize do |conn|
-          stmt = conn.createStatement
+      # Execute the prepared statement.  If the provided name is a
+      # dataset, use that as the prepared statement, otherwise use
+      # it as a key to look it up in the prepared_statements hash.
+      # If the connection we are using has already prepared an identical
+      # statement, use that statement instead of creating another.
+      # Otherwise, prepare a new statement for the connection, bind the
+      # variables, and execute it.
+      def execute_prepared_statement(name, opts={})
+        args = opts[:arguments]
+        if Dataset === name
+          ps = name
+          name = ps.prepared_statement_name
+        else
+          ps = prepared_statements[name]
+        end
+        sql = ps.prepared_sql
+        synchronize(opts[:server]) do |conn|
+          if name and cps = conn.prepared_statements[name] and cps[0] == sql
+            cps = cps[1]
+          else
+            if cps
+              log_info("Closing #{name}")
+              cps[1].close
+            end
+            log_info("Preparing#{" #{name}:" if name} #{sql}")
+            cps = conn.prepareStatement(sql)
+            conn.prepared_statements[name] = [sql, cps] if name
+          end
+          i = 0
+          args.each{|arg| set_ps_arg(cps, arg, i+=1)}
+          log_info("Executing#{" #{name}" if name}", args)
           begin
-            case opts[:type]
-            when :select
-              yield stmt.executeQuery(sql)
-            when :ddl
-              stmt.execute(sql)
-            when :insert
-              stmt.executeUpdate(sql)
-              last_insert_id(conn, opts)
+            if block_given?
+              yield cps.executeQuery
             else
-              stmt.executeUpdate(sql)
+              case opts[:type]
+              when :ddl
+                cps.execute
+              when :insert
+                cps.executeUpdate
+                last_insert_id(conn, opts)
+              else
+                cps.executeUpdate
+              end
             end
           rescue NativeException, JavaSQL::SQLException => e
             raise Error, e.message
           ensure
-            stmt.close
+            cps.close unless name
           end
         end
       end
@@ -298,11 +294,19 @@ module Sequel
         
         # Execute the prepared SQL using the stored type and
         # arguments derived from the hash passed to call.
-        def execute(sql, &block)
-          @db.execute_prepared_statement(self, bind_arguments, :type=>sql_query_type, &block)
+        def execute(sql, opts={}, &block)
+          super(self, {:arguments=>bind_arguments, :type=>sql_query_type}.merge(opts), &block)
         end
-        alias execute_dui execute
-        alias execute_insert execute
+        
+        # Same as execute, explicit due to intricacies of alias and super.
+        def execute_dui(sql, opts={}, &block)
+          super(self, {:arguments=>bind_arguments, :type=>sql_query_type}.merge(opts), &block)
+        end
+        
+        # Same as execute, explicit due to intricacies of alias and super.
+        def execute_insert(sql, opts={}, &block)
+          super(self, {:arguments=>bind_arguments, :type=>sql_query_type}.merge(opts), &block)
+        end
       end
       
       # Create an unnamed prepared statement and call it.  Allows the
@@ -313,20 +317,18 @@ module Sequel
       
       # Correctly return rows from the database and return them as hashes.
       def fetch_rows(sql, &block)
-        @db.synchronize do
-          execute(sql) do |result|
-            # get column names
-            meta = result.getMetaData
-            column_count = meta.getColumnCount
-            @columns = []
-            column_count.times {|i| @columns << meta.getColumnName(i+1).to_sym}
+        execute(sql) do |result|
+          # get column names
+          meta = result.getMetaData
+          column_count = meta.getColumnCount
+          @columns = []
+          column_count.times {|i| @columns << meta.getColumnName(i+1).to_sym}
 
-            # get rows
-            while result.next
-              row = {}
-              @columns.each_with_index {|v, i| row[v] = result.getObject(i+1)}
-              yield row
-            end
+          # get rows
+          while result.next
+            row = {}
+            @columns.each_with_index {|v, i| row[v] = result.getObject(i+1)}
+            yield row
           end
         end
         self

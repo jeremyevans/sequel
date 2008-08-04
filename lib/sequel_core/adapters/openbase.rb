@@ -5,7 +5,8 @@ module Sequel
     class Database < Sequel::Database
       set_adapter_scheme :openbase
       
-      def connect
+      def connect(server)
+        opts = server_opts(server)
         OpenBase.new(
           opts[:database],
           opts[:host] || 'localhost',
@@ -23,11 +24,14 @@ module Sequel
         OpenBase::Dataset.new(self, opts)
       end
     
-      def execute(sql)
+      def execute(sql, opts={})
         log_info(sql)
-        @pool.hold {|conn| conn.execute(sql)}
+        synchronize(opts[:server]) do |conn|
+          r = conn.execute(sql)
+          yield(r) if block_given?
+          r
+        end
       end
-      
       alias_method :do, :execute
     end
     
@@ -43,9 +47,8 @@ module Sequel
         end
       end
 
-      def fetch_rows(sql, &block)
-        @db.synchronize do
-          result = @db.execute sql
+      def fetch_rows(sql)
+        execute(sql) do |result|
           begin
             @columns = result.column_infos.map {|c| c.name.to_sym}
             result.each do |r|

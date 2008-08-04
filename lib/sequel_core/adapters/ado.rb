@@ -14,14 +14,15 @@ module Sequel
     class Database < Sequel::Database
       set_adapter_scheme :ado
 
-      def connect
-        @opts[:driver] ||= 'SQL Server'
-        case @opts[:driver]
+      def connect(server)
+        opts = server_opts(server)
+        opts[:driver] ||= 'SQL Server'
+        case opts[:driver]
         when 'SQL Server'
           require 'sequel_core/adapters/shared/mssql'
           extend Sequel::MSSQL::DatabaseMethods
         end
-        s = "driver=#{@opts[:driver]};server=#{@opts[:host]};database=#{@opts[:database]}#{";uid=#{@opts[:user]};pwd=#{@opts[:password]}" if @opts[:user]}"
+        s = "driver=#{opts[:driver]};server=#{opts[:host]};database=#{opts[:database]}#{";uid=#{opts[:user]};pwd=#{opts[:password]}" if opts[:user]}"
         handle = WIN32OLE.new('ADODB.Connection')
         handle.Open(s)
         handle
@@ -35,9 +36,13 @@ module Sequel
         ADO::Dataset.new(self, opts)
       end
     
-      def execute(sql)
+      def execute(sql, opts={})
         log_info(sql)
-        @pool.hold {|conn| conn.Execute(sql)}
+        synchronize(opts[:server]) do |conn|
+          r = conn.Execute(sql)
+          yield(r) if block_given?
+          r
+        end
       end
       alias_method :do, :execute
     end
@@ -54,10 +59,8 @@ module Sequel
         end
       end
 
-      def fetch_rows(sql, &block)
-        @db.synchronize do
-          s = @db.execute sql
-          
+      def fetch_rows(sql)
+        execute(sql) do |s|
           @columns = s.Fields.extend(Enumerable).map do |column|
             name = column.Name.empty? ? '(no column name)' : column.Name
             name.to_sym
@@ -70,6 +73,8 @@ module Sequel
         end
         self
       end
+      
+      private
       
       def hash_row(row)
         @columns.inject({}) do |m, c|

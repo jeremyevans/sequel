@@ -8,16 +8,17 @@ module Sequel
       GUARDED_DRV_NAME = /^\{.+\}$/.freeze
       DRV_NAME_GUARDS = '{%s}'.freeze
 
-      def connect
-        case @opts[:db_type]
+      def connect(server)
+        opts = server_opts(server)
+        case opts[:db_type]
         when 'mssql'
           require 'sequel_core/adapters/shared/mssql'
           extend Sequel::MSSQL::DatabaseMethods
         end
-        if @opts.include? :driver
+        if opts.include? :driver
           drv = ::ODBC::Driver.new
           drv.name = 'Sequel ODBC Driver130'
-          @opts.each do |param, value|
+          opts.each do |param, value|
             if :driver == param and not (value =~ GUARDED_DRV_NAME)
               value = DRV_NAME_GUARDS % value
             end
@@ -26,7 +27,7 @@ module Sequel
           db = ::ODBC::Database.new
           conn = db.drvconnect(drv)
         else
-          conn = ::ODBC::connect(@opts[:database], @opts[:user], @opts[:password])
+          conn = ::ODBC::connect(opts[:database], opts[:user], opts[:password])
         end
         conn.autocommit = true
         conn
@@ -44,20 +45,20 @@ module Sequel
       # you call execute manually, or you will get warnings.  See the
       # fetch_rows method source code for an example of how to drop
       # the statements.
-      def execute(sql)
+      def execute(sql, opts={})
         log_info(sql)
-        @pool.hold do |conn|
-          conn.run(sql)
+        synchronize(opts[:server]) do |conn|
+          r = conn.run(sql)
+          yield(r) if block_given?
+          r
         end
       end
       
-      def do(sql)
+      def execute_dui(sql, opts={})
         log_info(sql)
-        @pool.hold do |conn|
-          conn.do(sql)
-        end
+        synchronize(opts[:server]){|conn| conn.do(sql)}
       end
-      alias_method :execute_dui, :do
+      alias_method :do, :execute_dui
     end
     
     class Dataset < Sequel::Dataset
@@ -89,8 +90,7 @@ module Sequel
       UNTITLED_COLUMN = 'untitled_%d'.freeze
 
       def fetch_rows(sql, &block)
-        @db.synchronize do
-          s = @db.execute sql
+        execute(sql) do |s|
           begin
             untitled_count = 0
             @columns = s.columns(true).map do |c|
@@ -107,6 +107,8 @@ module Sequel
         end
         self
       end
+      
+      private
       
       def hash_row(row)
         hash = {}

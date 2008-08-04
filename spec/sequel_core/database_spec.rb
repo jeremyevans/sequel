@@ -150,7 +150,7 @@ end
 context "Database#<<" do
   setup do
     @c = Class.new(Sequel::Database) do
-      define_method(:execute) {|sql| sql}
+      define_method(:execute) {|sql, opts| sql}
     end
     @db = @c.new({})
   end
@@ -238,7 +238,7 @@ end
 class DummyDatabase < Sequel::Database
   attr_reader :sqls
   
-  def execute(sql)
+  def execute(sql, opts={})
     @sqls ||= []
     @sqls << sql
   end
@@ -455,7 +455,7 @@ end
 
 class Dummy3Database < Sequel::Database
   attr_reader :sql, :transactions
-  def execute(sql); @sql ||= []; @sql << sql; end
+  def execute(sql, opts={}); @sql ||= []; @sql << sql; end
 
   class DummyConnection
     def initialize(db); @db = db; end
@@ -971,5 +971,32 @@ context "Database#call" do
     db[:items].filter(:n=>:$n).prepare(:select, :select_n)
     db.call(:select_n, :n=>1).should == [{:id => 1, :x => 1}]
     db.sqls.should == ['SELECT * FROM items', 'SELECT * FROM items WHERE (n = 1)']
+  end
+end
+
+context "Database#server_opts" do
+  specify "should return the general opts if no :servers option is used" do
+    opts = {:host=>1, :database=>2}
+    MockDatabase.new(opts).send(:server_opts, :server1).should == {:host=>1, :database=>2}
+  end
+  
+  specify "should return the general opts if entry for the server is present in the :servers option" do
+    opts = {:host=>1, :database=>2, :servers=>{}}
+    MockDatabase.new(opts).send(:server_opts, :server1).should == {:host=>1, :database=>2}
+  end
+  
+  specify "should return the general opts merged with the specific opts if given as a hash" do
+    opts = {:host=>1, :database=>2, :servers=>{:server1=>{:host=>3}}}
+    MockDatabase.new(opts).send(:server_opts, :server1).should == {:host=>3, :database=>2}
+  end
+  
+  specify "should return the sgeneral opts merged with the specific opts if given as a proc" do
+    opts = {:host=>1, :database=>2, :servers=>{:server1=>proc{|db| {:host=>4}}}}
+    MockDatabase.new(opts).send(:server_opts, :server1).should == {:host=>4, :database=>2}
+  end
+  
+  specify "should raise an error if the specific opts is not a proc or hash" do
+    opts = {:host=>1, :database=>2, :servers=>{:server1=>2}}
+    proc{MockDatabase.new(opts).send(:server_opts, :server1)}.should raise_error(Sequel::Error)
   end
 end

@@ -108,21 +108,6 @@ module Sequel
         "DROP TABLE #{name} CASCADE"
       end
       
-      # Insert the values into the table and return the primary key (if
-      # automatically generated).
-      def execute_insert(sql, table, values, *bind_arguments)
-        begin 
-          log_info(sql, *bind_arguments)
-          synchronize do |conn|
-            conn.execute(sql, *bind_arguments)
-            insert_result(conn, table, values)
-          end
-        rescue => e
-          log_info(e.message)
-          raise convert_pgerror(e)
-        end
-      end
-      
       # PostgreSQL specific index SQL.
       def index_definition_sql(table_name, index)
         index_name = index[:name] || default_index_name(table_name, index[:columns])
@@ -188,9 +173,9 @@ module Sequel
       end
       
       # The version of the PostgreSQL server, used for determining capability.
-      def server_version
+      def server_version(server=nil)
         return @server_version if @server_version
-        @server_version = pool.hold do |conn|
+        @server_version = synchronize(server) do |conn|
           (conn.server_version rescue nil) if conn.respond_to?(:server_version)
         end
         unless @server_version
@@ -206,8 +191,8 @@ module Sequel
       end
       
       # PostgreSQL supports multi-level transactions using save points.
-      def transaction
-        synchronize do |conn|
+      def transaction(server=nil)
+        synchronize(server) do |conn|
           conn.transaction_depth = 0 if conn.transaction_depth.nil?
           if conn.transaction_depth > 0
             log_info(SQL_SAVEPOINT % conn.transaction_depth)
@@ -332,8 +317,8 @@ module Sequel
       
       # Insert given values into the database.
       def insert(*values)
-        execute_insert(insert_sql(*values), source_list(@opts[:from]),
-          values.size == 1 ? values.first : values)
+        execute_insert(insert_sql(*values), :table=>source_list(@opts[:from]),
+          :values=>values.size == 1 ? values.first : values)
       end
       
       # Handle microseconds for Time and DateTime values, as well as PostgreSQL
@@ -358,13 +343,13 @@ module Sequel
       end
       
       # Locks the table with the specified mode.
-      def lock(mode)
+      def lock(mode, server=nil)
         sql = LOCK % [source_list(@opts[:from]), mode]
-        @db.synchronize do
+        @db.synchronize(server) do
           if block_given? # perform locking inside a transaction and yield to block
-            @db.transaction{@db.execute(sql); yield}
+            @db.transaction(server){@db.execute(sql, :server=>server); yield}
           else
-            @db.execute(sql) # lock without a transaction
+            @db.execute(sql, :server=>server) # lock without a transaction
             self
           end
         end
@@ -402,8 +387,8 @@ module Sequel
       private
       
       # Call execute_insert on the database object with the given values.
-      def execute_insert(sql, table, values)
-        @db.execute_insert(sql, table, values)
+      def execute_insert(sql, opts={})
+        @db.execute_insert(sql, {:server=>@opts[:server] || :default}.merge(opts))
       end
     end
   end

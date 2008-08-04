@@ -36,7 +36,7 @@ class MockDatabase < Sequel::Database
   @@quote_identifiers = false
   attr_reader :sqls
   
-  def execute(sql)
+  def execute(sql, opts={})
     @sqls ||= []
     @sqls << sql
   end

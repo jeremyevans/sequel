@@ -1,0 +1,113 @@
+= Read-Only Slaves/Writable Master and Database Sharding
+
+Starting with version 2.4.0, Sequel has support for read only slave databases
+with a writable master database, as well as database sharding (where you can
+pick a database connection to use for a given dataset).  Support for both
+features is database independent, and should work for all database adapters
+included with Sequel.
+
+== The :servers Database option
+
+Both features use the new :servers Database option.  The :servers option should
+be a hash with symbol keys and values that are either hashes or procs that
+return hashes.  Note that all servers should have the same schema, unless you
+really know what you are doing.
+
+== Master and Slave Database Configurations
+
+=== Single Read-Only Slave, Single Master
+
+To use a single, read-only slave that handles SELECT queries, the following
+is the simplest configuration:
+
+  DB=Sequel.connect('postgres://master_server/database', \
+    :servers=>{:read_only=>{:host=>'slave_server'}})
+
+This will use the host slave_server for SELECT queries and master_server for
+other queries.
+
+=== Multiple Read-Only Slaves, Single Master
+
+Let's say you have 4 slave database servers with names slave_server0,
+slave_server1, slave_server2, and slave_server3.
+
+  DB=Sequel.connect('postgres://master_server/database', \
+    :servers=>{:read_only=>proc{|db| :host=>db.get_slave_host}})
+  def DB.get_slave_host
+    @current_host ||= -1
+    "slave_server#{(@current_host+=1)%4}"
+  end
+
+This will use one of the slave servers for SELECT queries and use the
+master_server for other queries.  It's also possible to pick a random host
+instead of using the round robin approach presented above, but that can result
+in less optimal resource usage.
+
+=== Multiple Read-Only Slaves, Multiple Masters
+
+This involves the same basic idea as the multiple slaves, single master, but
+it shows that the master database is named :default.  So for 4 masters and
+4 slaves:
+
+  DB=Sequel.connect('postgres://master_server/database', \
+    :servers=>{:read_only=>proc{|db| :host=>db.get_slave_host}, \
+      :default=>proc{|db| :host=>db.get_master_host}})
+  def DB.get_slave_host
+    @current_slave_host ||= -1
+    "slave_server#{(@current_slave_host+=1)%4}"
+  end
+  def DB.get_master_host
+    @current_master_host ||= -1
+    "master_server#{(@current_master_host+=1)%4}"
+  end
+  
+== Sharding
+
+There is specific support in Sequel for handling master/slave database
+combinations, with the only necessary setup being the database configuration.
+However, since sharding is always going to be implementation dependent, Sequel
+supplies the basic infrastructure, but you have to tell it which server to use
+for each dataset.  Let's assume the simple scenario, a distributed rainbow
+table for SHA-1 hashes, sharding based on the first hex character (for a total
+of 16 shards).  First, you need to configure the database:
+
+  servers = {}
+  (('0'..'9').to_a + ('a'..'f').to_a).each do |hex|
+    servers[hex.to_sym] = {:host=>"hash_host_#{hex}"}
+  end
+  DB=Sequel.connect('postgres://hash_host/hashes', :servers=>servers)
+  
+This configures 17 servers, the 16 shard servers (/hash_host_[0-9a-f]/), and 1
+default server which will be used if no shard is specified ("hash_host").  If
+you want the default server to be one of the shard servers (e.g. hash_host_a),
+it's easiest to do:
+
+  DB=Sequel.connect('postgres://hash_host_a/hashes', :servers=>servers)
+
+That will still set up a second pool of connections for the default server,
+since it considers the default server and shard servers independent.  Note that
+if you always set the shard on a dataset before using it in queries, it will
+not attempt to connect to the default server.  Sequel may use the default
+server in queries it generates itself, such as to get column names or table
+schemas, so it is always good to have a default server that works.
+
+To set the shard for a given query, you use the Dataset#server method:
+
+  DB[:hashes].server(:a).filter(:hash=>/31337/)
+  
+That will return all matching rows on the hash_host_a shard that have a hash
+column that contains 31337.
+
+Rainbow tables are generally used to find specific hashes, so to save some
+work, you might want to add a method to the dataset that automatically sets
+the shard to use.  This is fairly easy using a Sequel::Model:
+
+  class Rainbow < Sequel::Model(:hashes)
+    def_dataset_method(:plaintext_for_hash) do |hash|
+      raise(ArgumentError, 'Invalid SHA-1 Hash') unless /\A[0-9a-f]{40}\z/.match(hash)
+      row = self.server(hash[0...1].to_sym).first(:hash=>hash)
+      row[:plaintext] if row
+    end
+  end
+  
+  Rainbow.plaintext_for_hash("e580726d31f6e1ad216ffd87279e536d1f74e606")

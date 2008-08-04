@@ -2,21 +2,8 @@
 # multiple connections and giving threads exclusive access to each
 # connection.
 class Sequel::ConnectionPool
-  # A hash of connections currently being used, key is the Thread,
-  # value is the connection.
-  attr_reader :allocated
-  
-  # An array of connections opened but not currently used
-  attr_reader :available_connections
-  
   # The proc used to create a new database connection.
   attr_accessor :connection_proc
-  
-  # The total number of connections opened, should
-  # be equal to available_connections.length +
-  # allocated.length
-  attr_reader :created_count
-  alias_method :size, :created_count
 
   # The maximum number of connections.
   attr_reader :max_size
@@ -25,7 +12,6 @@ class Sequel::ConnectionPool
   # this if you want to manipulate the variables safely.
   attr_reader :mutex
   
-
   # Constructs a new pool with a maximum size. If a block is supplied, it
   # is used to create new connections as they are needed.
   #
@@ -47,21 +33,50 @@ class Sequel::ConnectionPool
   #   a connection again (default 0.001)
   # * :pool_timeout - The amount of seconds to wait to acquire a connection
   #   before raising a PoolTimeoutError (default 5)
+  # * :servers - A hash of servers to use.  Keys should be symbols.  If not
+  #   present, will use a single :default server.  The server name symbol will
+  #   be passed to the connection_proc.
   def initialize(opts = {}, &block)
     @max_size = opts[:max_connections] || 4
     @mutex = Mutex.new
     @connection_proc = block
-
-    @available_connections = []
-    @allocated = {}
-    @created_count = 0
+    @servers = [:default]
+    @servers += opts[:servers].keys - @servers if opts[:servers] 
+    @available_connections = Hash.new{|h,k| h[:default]}
+    @allocated = Hash.new{|h,k| h[:default]}
+    @created_count = Hash.new{|h,k| h[:default]}
+    @servers.each do |s|
+      @available_connections[s] = []
+      @allocated[s] = {}
+      @created_count[s] = 0
+    end
     @timeout = opts[:pool_timeout] || 5
     @sleep_time = opts[:pool_sleep_time] || 0.001
     @convert_exceptions = opts.include?(:pool_convert_exceptions) ? opts[:pool_convert_exceptions] : true
   end
   
-  # Chooses the first available connection, or if none are available,
-  # creates a new connection.  Passes the connection to the supplied block:
+  # A hash of connections currently being used for the given server, key is the
+  # Thread, value is the connection.
+  def allocated(server=:default)
+    @allocated[server]
+  end
+  
+  # An array of connections opened but not currently used, for the given
+  # server.
+  def available_connections(server=:default)
+    @available_connections[server]
+  end
+  
+  # The total number of connections opened for the given server, should
+  # be equal to available_connections.length + allocated.length
+  def created_count(server=:default)
+    @created_count[server]
+  end
+  alias size created_count
+  
+  # Chooses the first available connection to the given server, or if none are
+  # available, creates a new connection.  Passes the connection to the supplied
+  # block:
   # 
   #   pool.hold {|conn| conn.execute('DROP TABLE posts')}
   # 
@@ -73,78 +88,83 @@ class Sequel::ConnectionPool
   # is available or the timeout expires.  If the timeout expires before a
   # connection can be acquired, a Sequel::Error::PoolTimeoutError is 
   # raised.
-  def hold
+  def hold(server=:default)
     begin
       t = Thread.current
       time = Time.new
       timeout = time + @timeout
       sleep_time = @sleep_time
-      if conn = owned_connection(t)
+      if conn = owned_connection(t, server)
         return yield(conn)
       end
-      until conn = acquire(t)
+      until conn = acquire(t, server)
         raise(::Sequel::Error::PoolTimeoutError) if Time.new > timeout
         sleep sleep_time
       end
       begin
         yield conn
       ensure
-        release(t, conn)
+        release(t, conn, server)
       end
     rescue Exception => e
       raise(@convert_exceptions && !e.is_a?(StandardError) ? RuntimeError.new(e.message) : e)
     end
   end
   
-  # Removes all connection currently available, optionally yielding each 
-  # connection to the given block. This method has the effect of 
-  # disconnecting from the database. Once a connection is requested using
-  # #hold, the connection pool creates new connections to the database.
-  def disconnect(&block)
+  # Removes all connection currently available on all servers, optionally
+  # yielding each connection to the given block. This method has the effect of 
+  # disconnecting from the database, assuming that no connections are currently
+  # being used. Once a connection is requested using #hold, the connection pool
+  # creates new connections to the database.
+  def disconnect
     @mutex.synchronize do
-      @available_connections.each {|c| block[c]} if block
-      @available_connections = []
-      @created_count = @allocated.size
+      @available_connections.each do |server, conns|
+        conns.each{|c| yield(c)} if block_given?
+        conns.clear
+        @created_count[server] = allocated(server).length
+      end
     end
   end
   
   private
 
-  # Returns the connection owned by the supplied thread, if any.
-  def owned_connection(thread)
-    @mutex.synchronize{@allocated[thread]}
+  # Returns the connection owned by the supplied thread for the given server,
+  # if any.
+  def owned_connection(thread, server)
+    @mutex.synchronize{@allocated[server][thread]}
   end
   
-  # Assigns a connection to the supplied thread, if one is available.
-  def acquire(thread)
+  # Assigns a connection to the supplied thread for the given server, if one
+  # is available.
+  def acquire(thread, server)
     @mutex.synchronize do
-      if conn = available
-        @allocated[thread] = conn
+      if conn = available(server)
+        allocated(server)[thread] = conn
       end
     end
   end
   
-  # Returns an available connection. If no connection is available,
-  # tries to create a new connection.
-  def available
-    @available_connections.pop || make_new
+  # Returns an available connection to the given server. If no connection is
+  # available, tries to create a new connection.
+  def available(server)
+    available_connections(server).pop || make_new(server)
   end
   
-  # Creates a new connection if the size of the pool is less than the
-  # maximum size.
-  def make_new
-    if @created_count < @max_size
-      @created_count += 1
-      @connection_proc ? @connection_proc.call : \
+  # Creates a new connection to the given server if the size of the pool for
+  # the server is less than the maximum size of the pool.
+  def make_new(server)
+    if @created_count[server] < @max_size
+      @created_count[server] += 1
+      @connection_proc ? @connection_proc.call(server) : \
         (raise Error, "No connection proc specified")
     end
   end
   
-  # Releases the connection assigned to the supplied thread.
-  def release(thread, conn)
+  # Releases the connection assigned to the supplied thread and server.
+  def release(thread, conn, server)
     @mutex.synchronize do
-      @allocated.delete(thread)
-      @available_connections << conn
+      allocated(server).delete(thread)
+      available_connections(server) << conn
     end
   end
 end
@@ -156,9 +176,6 @@ end
 # Note that using a single threaded pool with some adapters can cause
 # errors in certain cases, see Sequel.single_threaded=.
 class Sequel::SingleThreadedPool
-  # The single database connection for the pool
-  attr_reader :conn
-
   # The proc used to create a new database connection
   attr_writer :connection_proc
   
@@ -170,15 +187,20 @@ class Sequel::SingleThreadedPool
   #   to RuntimeError exceptions (default true)
   def initialize(opts={}, &block)
     @connection_proc = block
+    @conns = {}
     @convert_exceptions = opts.include?(:pool_convert_exceptions) ? opts[:pool_convert_exceptions] : true
   end
   
-  # Yields the connection to the supplied block. This method simulates the
-  # ConnectionPool#hold API.
-  def hold
+  # The connection for the given server.
+  def conn(server=:default)
+    @conns[server]
+  end
+  
+  # Yields the connection to the supplied block for the given server.
+  # This method simulates the ConnectionPool#hold API.
+  def hold(server=:default)
     begin
-      @conn ||= @connection_proc.call
-      yield @conn
+      yield(@conns[server] ||= @connection_proc.call(server))
     rescue Exception => e
       # if the error is not a StandardError it is converted into RuntimeError.
       raise(@convert_exceptions && !e.is_a?(StandardError) ? RuntimeError.new(e.message) : e)
@@ -188,7 +210,7 @@ class Sequel::SingleThreadedPool
   # Disconnects from the database. Once a connection is requested using
   # #hold, the connection is reestablished.
   def disconnect(&block)
-    block[@conn] if block && @conn
-    @conn = nil
+    @conns.values.each{|conn| yield(conn) if block_given?}
+    @conns = {}
   end
 end

@@ -134,22 +134,23 @@ module Sequel
       # SQLite performs a TRUNCATE style DELETE if no filter is specified.
       # Since we want to always return the count of records, do a specific
       # count in the case of no filter.
-      def delete(opts = nil)
+      def delete(opts = {})
         # check if no filter is specified
-        unless (opts && opts[:where]) || @opts[:where]
-          @db.transaction do
+        opts = @opts.merge(opts)
+        unless opts[:where]
+          @db.transaction(opts[:server]) do
             unfiltered_count = count
-            execute_dui delete_sql(opts)
+            execute_dui(delete_sql(opts))
             unfiltered_count
           end
         else
-          execute_dui delete_sql(opts)
+          execute_dui(delete_sql(opts))
         end
       end
       
       # Insert the values into the database.
       def insert(*values)
-        execute_insert insert_sql(*values)
+        execute_insert(insert_sql(*values))
       end
       
       # Allow inserting of values directly from a dataset.
@@ -169,8 +170,8 @@ module Sequel
       private
       
       # Call execute_insert on the database with the given SQL.
-      def execute_insert(sql)
-        @db.execute_insert(sql)
+      def execute_insert(sql, opts={})
+        @db.execute_insert(sql, {:server=>@opts[:server] || :default}.merge(opts))
       end
     end
   end

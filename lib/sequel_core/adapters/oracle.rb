@@ -5,14 +5,15 @@ module Sequel
     class Database < Sequel::Database
       set_adapter_scheme :oracle
       
-      def connect
-        if @opts[:database]
-          dbname = @opts[:host] ? \
-            "//#{@opts[:host]}#{":#{@opts[:port]}" if @opts[:port]}/#{@opts[:database]}" : @opts[:database]
+      def connect(server)
+        opts = server_opts(server)
+        if opts[:database]
+          dbname = opts[:host] ? \
+            "//#{opts[:host]}#{":#{opts[:port]}" if opts[:port]}/#{opts[:database]}" : opts[:database]
         else
-          dbname = @opts[:host]
+          dbname = opts[:host]
         end
-        conn = OCI8.new(@opts[:user], @opts[:password], dbname, @opts[:privilege])
+        conn = OCI8.new(opts[:user], opts[:password], dbname, opts[:privilege])
         conn.autocommit = true
         conn.non_blocking = true
         conn
@@ -26,11 +27,14 @@ module Sequel
         Oracle::Dataset.new(self, opts)
       end
     
-      def execute(sql)
+      def execute(sql, opts={})
         log_info(sql)
-        @pool.hold {|conn| conn.exec(sql)}
+        synchronize(opts[:server]) do |conn|
+          r = conn.exec(sql)
+          yield(r) if block_given?
+          r
+        end
       end
-      
       alias_method :do, :execute
       
       def tables
@@ -43,11 +47,9 @@ module Sequel
         from(:tab).filter(:tname => name.to_s.upcase, :tabtype => 'TABLE').count > 0
       end
 
-      def transaction
-        @pool.hold do |conn|
-          if @transactions.include? Thread.current
-            return yield(conn)
-          end
+      def transaction(server=nil)
+        synchronize(server) do |conn|
+          return yield(conn) if @transactions.include?(Thread.current)
           
           conn.autocommit = false
           begin
@@ -76,8 +78,7 @@ module Sequel
       end
 
       def fetch_rows(sql, &block)
-        @db.synchronize do
-          cursor = @db.execute sql
+        execute(sql) do |cursor|
           begin
             @columns = cursor.get_col_names.map {|c| c.downcase.to_sym}
             while r = cursor.fetch

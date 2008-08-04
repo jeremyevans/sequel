@@ -116,14 +116,14 @@ module Sequel
       
       # Execute the given SQL with this connection.  If a block is given,
       # yield the results, otherwise, return the number of changed rows.
-      def execute(sql, *args)
+      def execute(sql, args=nil)
         q = nil
         begin
-          q = exec(sql, *args)
+          q = args ? exec(sql, args) : exec(sql)
         rescue PGError => e
           raise if status == Adapter::CONNECTION_OK
           reset
-          q = exec(sql, *args)
+          q = args ? exec(sql, args) : exec(sql)
         end
         begin
           block_given? ? yield(q) : q.cmd_tuples
@@ -165,16 +165,17 @@ module Sequel
       # Connects to the database.  In addition to the standard database
       # options, using the :encoding or :charset option changes the
       # client encoding for the connection.
-      def connect
+      def connect(server)
+        opts = server_opts(server)
         conn = Adapter.connect(
-          @opts[:host] || 'localhost',
-          @opts[:port] || 5432,
+          opts[:host] || 'localhost',
+          opts[:port] || 5432,
           '', '',
-          @opts[:database],
-          @opts[:user],
-          @opts[:password]
+          opts[:database],
+          opts[:user],
+          opts[:password]
         )
-        if encoding = @opts[:encoding] || @opts[:charset]
+        if encoding = opts[:encoding] || opts[:charset]
           conn.set_client_encoding(encoding)
         end
         conn
@@ -191,14 +192,38 @@ module Sequel
       end
       
       # Execute the given SQL with the given args on an available connection.
-      def execute(sql, *args, &block)
+      def execute(sql, opts={}, &block)
+        return execute_prepared_statement(sql, opts, &block) if Symbol === sql
         begin
-          log_info(sql, *args)
-          synchronize{|conn| conn.execute(sql, *args, &block)}
+          log_info(sql, opts[:arguments])
+          synchronize(opts[:server]){|conn| conn.execute(sql, opts[:arguments], &block)}
         rescue => e
           log_info(e.message)
           raise convert_pgerror(e)
         end
+      end
+      
+      # Insert the values into the table and return the primary key (if
+      # automatically generated).
+      def execute_insert(sql, opts={})
+        return execute(sql, opts) if Symbol === sql
+        begin 
+          log_info(sql, opts[:arguments])
+          synchronize(opts[:server]) do |conn|
+            conn.execute(sql, opts[:arguments])
+            insert_result(conn, opts[:table], opts[:values])
+          end
+        rescue => e
+          log_info(e.message)
+          raise convert_pgerror(e)
+        end
+      end
+      
+      private
+
+      # PostgreSQL doesn't need the connection pool to convert exceptions.
+      def connection_pool_default_options
+        super.merge(:pool_convert_exceptions=>false)
       end
       
       # Execute the prepared statement with the given name on an available
@@ -209,11 +234,12 @@ module Sequel
       # If a block is given, yield the result, otherwise, return the number
       # of rows changed.  If the :insert option is passed, return the value
       # of the primary key for the last inserted row.
-      def execute_prepared_statement(name, args, opts={})
+      def execute_prepared_statement(name, opts={})
         ps = prepared_statements[name]
         sql = ps.prepared_sql
         ps_name = name.to_s
-        synchronize do |conn|
+        args = opts[:arguments]
+        synchronize(opts[:server]) do |conn|
           unless conn.prepared_statements[ps_name] == sql
             if conn.prepared_statements.include?(ps_name)
               s = "DEALLOCATE #{ps_name}"
@@ -226,8 +252,8 @@ module Sequel
           end
           log_info("EXECUTE #{ps_name}", args)
           q = conn.exec_prepared(ps_name, args)
-          if opts[:insert]
-            insert_result(conn, *opts[:insert])
+          if opts[:table] && opts[:values]
+            insert_result(conn, opts[:table], opts[:values])
           else
             begin
               block_given? ? yield(q) : q.cmd_tuples
@@ -236,13 +262,6 @@ module Sequel
             end
           end
         end
-      end
-      
-      private
-
-      # PostgreSQL doesn't need the connection pool to convert exceptions.
-      def connection_pool_default_options
-        super.merge(:pool_convert_exceptions=>false)
       end
     end
     
@@ -323,37 +342,42 @@ module Sequel
           private
           
           # Execute the given SQL with the stored bind arguments.
-          def execute(sql, &block)
-            @db.execute(sql, bind_arguments, &block)
+          def execute(sql, opts={}, &block)
+            super(sql, {:arguments=>bind_arguments}.merge(opts), &block)
           end
-          alias execute_dui execute
           
-          # Execute the given SQL with the stored bind arguments, returning
-          # the primary key value for the inserted row.
-          def execute_insert(sql, table, values)
-            @db.execute_insert(sql, table, values, bind_arguments)
+          # Same as execute, explicit due to intricacies of alias and super.
+          def execute_dui(sql, opts={}, &block)
+            super(sql, {:arguments=>bind_arguments}.merge(opts), &block)
+          end
+          
+          # Same as execute, explicit due to intricacies of alias and super.
+          def execute_insert(sql, opts={}, &block)
+            super(sql, {:arguments=>bind_arguments}.merge(opts), &block)
           end
         end
         
         # Allow use of server side prepared statements for PostgreSQL using the
         # pg driver.
         module PreparedStatementMethods
-          include ArgumentMapper
+          include BindArgumentMethods
           
           private
           
           # Execute the stored prepared statement name and the stored bind
           # arguments instead of the SQL given.
-          def execute(sql, &block)
-            @db.execute_prepared_statement(prepared_statement_name, bind_arguments, &block)
+          def execute(sql, opts={}, &block)
+            super(prepared_statement_name, opts, &block)
           end
-          alias execute_dui execute
           
-          # Execute the stored prepared statement name and the stored bind
-          # arguments instead of the SQL given, returning the primary key value
-          # for the last inserted row.
-          def execute_insert(sql, table, values)
-            @db.execute_prepared_statement(prepared_statement_name, bind_arguments, :insert=>[table, values])
+          # Same as execute, explicit due to intricacies of alias and super.
+          def execute_dui(sql, opts={}, &block)
+            super(prepared_statement_name, opts, &block)
+          end
+          
+          # Same as execute, explicit due to intricacies of alias and super.
+          def execute_insert(sql, opts={}, &block)
+            super(prepared_statement_name, opts, &block)
           end
         end
         
@@ -384,4 +408,3 @@ module Sequel
     end
   end
 end
-

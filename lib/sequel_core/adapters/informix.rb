@@ -11,12 +11,13 @@ module Sequel
       #   AUTO_INCREMENT
       # end
       
-      def connect
-        ::Informix.connect(@opts[:database], @opts[:user], @opts[:password])
+      def connect(server)
+        opts = server_opts(server)
+        ::Informix.connect(opts[:database], opts[:user], opts[:password])
       end
       
       def disconnect
-        @pool.disconnect {|c| c.close}
+        @pool.disconnect{|c| c.close}
       end
     
       def dataset(opts = nil)
@@ -24,15 +25,15 @@ module Sequel
       end
       
       # Returns number of rows affected
-      def execute_dui(sql)
+      def execute_dui(sql, opts={})
         log_info(sql)
-        @pool.hold {|c| c.immediate(sql)}
+        synchronize(opts[:server]){|c| c.immediate(sql)}
       end
       alias_method :do, :execute_dui
       
-      def execute(sql, &block)
+      def execute(sql, opts={})
         log_info(sql)
-        @pool.hold {|c| block[c.cursor(sql)]}
+        synchronize(opts[:server]){|c| yield c.cursor(sql)}
       end
       alias_method :query, :execute
     end
@@ -62,13 +63,11 @@ module Sequel
       end
       
       def fetch_rows(sql, &block)
-        @db.synchronize do
-          @db.execute(sql) do |cursor|
-            begin
-              cursor.open.each_hash(&block)
-            ensure
-              cursor.drop
-            end
+        execute(sql) do |cursor|
+          begin
+            cursor.open.each_hash(&block)
+          ensure
+            cursor.drop
           end
         end
         self

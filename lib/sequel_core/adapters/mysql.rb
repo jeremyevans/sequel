@@ -91,22 +91,23 @@ module Sequel
       # * :encoding, :charset - Set all the related character sets for this
       #   connection (connection, client, database, server, and results).
       # * :socket - Use a unix socket file instead of connecting via TCP/IP.
-      def connect
+      def connect(server)
+        opts = server_opts(server)
         conn = Mysql.init
         conn.options(Mysql::OPT_LOCAL_INFILE, "client")
         conn.real_connect(
-          @opts[:host] || 'localhost',
-          @opts[:user],
-          @opts[:password],
-          @opts[:database],
-          @opts[:port],
-          @opts[:socket],
+          opts[:host] || 'localhost',
+          opts[:user],
+          opts[:password],
+          opts[:database],
+          opts[:port],
+          opts[:socket],
           Mysql::CLIENT_MULTI_RESULTS +
           Mysql::CLIENT_MULTI_STATEMENTS +
           Mysql::CLIENT_COMPRESS
         )
         conn.query_with_result = false
-        if encoding = @opts[:encoding] || @opts[:charset]
+        if encoding = opts[:encoding] || opts[:charset]
           conn.query("set character_set_connection = '#{encoding}'")
           conn.query("set character_set_client = '#{encoding}'")
           conn.query("set character_set_database = '#{encoding}'")
@@ -131,85 +132,28 @@ module Sequel
       
       # Executes the given SQL using an available connection, yielding the
       # connection if the block is given.
-      def execute(sql)
+      def execute(sql, opts={}, &block)
+        return execute_prepared_statement(sql, opts, &block) if Symbol === sql
         begin
-          log_info(sql)
-          synchronize do |conn|
-            conn.query(sql)
-            yield conn if block_given?
-          end
+          synchronize(opts[:server]){|conn| _execute(conn, sql, opts, &block)}
         rescue Mysql::Error => e
           raise Error.new(e.message)
         end
       end
       
-      # Executes a prepared statement on an available connection.  If the
-      # prepared statement already exists for the connection and has the same
-      # SQL, reuse it, otherwise, prepare the new statement.  Because of the
-      # usual MySQL stupidity, we are forced to name arguments via separate
-      # SET queries.  Use @sequel_arg_N (for N starting at 1) for these
-      # arguments.
-      def execute_prepared_statement(ps_name, args, opts={})
-        ps = prepared_statements[ps_name]
-        sql = ps.prepared_sql
-        synchronize do |conn|
-          unless conn.prepared_statements[ps_name] == sql
-            conn.prepared_statements[ps_name] = sql
-            s = "PREPARE #{ps_name} FROM '#{::Mysql.quote(sql)}'"
-            log_info(s)
-            conn.query(s)
-          end
-          i = 0
-          args.each do |arg|
-            s = "SET @sequel_arg_#{i+=1} = #{literal(arg)}"
-            log_info(s)
-            conn.query(s)
-          end
-          s = "EXECUTE #{ps_name}#{" USING #{(1..i).map{|j| "@sequel_arg_#{j}"}.join(', ')}" unless i == 0}"
-          log_info(s)
-          conn.query(s)
-          if opts[:select]
-            r = conn.use_result
-            begin
-              yield r
-            ensure
-              r.free
-            end
-          else
-            yield conn if block_given?
-          end
-        end
-      end
-      
-      # Execute the given SQL, yielding the result set.  Until the block
-      # given returns, no queries can use this connection.  For that
-      # reason, if you need to use nested queries in MySQL, you must
-      # get all records at once for the outer queries (e.g.
-      # DB[:i].all{|i| DB[:j].each{|j|}}.
-      def execute_select(sql)
-        execute(sql) do |c|
-          r = c.use_result
-          begin
-            yield r
-          ensure
-            r.free
-          end
-        end
-      end
-      
       # Return the version of the MySQL server two which we are connecting.
-      def server_version
-        @server_version ||= (synchronize{|conn| conn.server_version if conn.respond_to?(:server_version)} || super)
+      def server_version(server=nil)
+        @server_version ||= (synchronize(server){|conn| conn.server_version if conn.respond_to?(:server_version)} || super)
       end
       
       # Return an array of symbols specifying table names in the current database.
-      def tables
-        synchronize{|conn| conn.list_tables.map {|t| t.to_sym}}
+      def tables(server=nil)
+        synchronize(server){|conn| conn.list_tables.map {|t| t.to_sym}}
       end
       
       # Support single level transactions on MySQL.
-      def transaction
-        synchronize do |conn|
+      def transaction(server=nil)
+        synchronize(server) do |conn|
           return yield(conn) if @transactions.include?(Thread.current)
           log_info(SQL_BEGIN)
           conn.query(SQL_BEGIN)
@@ -232,6 +176,24 @@ module Sequel
 
       private
       
+      # Execute the given SQL on the given connection.  If the :type
+      # option is :select, yield the result of the query, otherwise
+      # yield the connection if a block is given.
+      def _execute(conn, sql, opts)
+        log_info(sql)
+        conn.query(sql)
+        if opts[:type] == :select
+          r = conn.use_result
+          begin
+            yield r
+          ensure
+            r.free
+          end
+        else
+          yield conn if block_given?
+        end
+      end
+      
       # MySQL doesn't need the connection pool to convert exceptions.
       def connection_pool_default_options
         super.merge(:pool_convert_exceptions=>false)
@@ -241,6 +203,33 @@ module Sequel
       # the :database option.
       def database_name
         @opts[:database]
+      end
+      
+      # Executes a prepared statement on an available connection.  If the
+      # prepared statement already exists for the connection and has the same
+      # SQL, reuse it, otherwise, prepare the new statement.  Because of the
+      # usual MySQL stupidity, we are forced to name arguments via separate
+      # SET queries.  Use @sequel_arg_N (for N starting at 1) for these
+      # arguments.
+      def execute_prepared_statement(ps_name, opts, &block)
+        args = opts[:arguments]
+        ps = prepared_statements[ps_name]
+        sql = ps.prepared_sql
+        synchronize(opts[:server]) do |conn|
+          unless conn.prepared_statements[ps_name] == sql
+            conn.prepared_statements[ps_name] = sql
+            s = "PREPARE #{ps_name} FROM '#{::Mysql.quote(sql)}'"
+            log_info(s)
+            conn.query(s)
+          end
+          i = 0
+          args.each do |arg|
+            s = "SET @sequel_arg_#{i+=1} = #{literal(arg)}"
+            log_info(s)
+            conn.query(s)
+          end
+          _execute(conn, "EXECUTE #{ps_name}#{" USING #{(1..i).map{|j| "@sequel_arg_#{j}"}.join(', ')}" unless i == 0}", opts, &block)
+        end
       end
     end
     
@@ -253,27 +242,25 @@ module Sequel
         include Sequel::Dataset::UnnumberedArgumentMapper
         
         # Execute the prepared statement with the bind arguments instead of
-        # the given SQL, yielding the connection to the block.
-        def execute(sql, &block)
-          @db.execute_prepared_statement(prepared_statement_name, bind_arguments, &block)
+        # the given SQL.
+        def execute(sql, opts={}, &block)
+          super(prepared_statement_name, {:arguments=>bind_arguments}.merge(opts), &block)
         end
-        alias execute_dui execute
         
-        # Execute the prepared statement with the bind arguments instead of
-        # the given SQL, yielding the rows to the block.
-        def execute_select(sql, &block)
-          @db.execute_prepared_statement(prepared_statement_name, bind_arguments, :select=>true, &block)
+        # Same as execute, explicit due to intricacies of alias and super.
+        def execute_dui(sql, opts={}, &block)
+          super(prepared_statement_name, {:arguments=>bind_arguments}.merge(opts), &block)
         end
       end
       
       # Delete rows matching this dataset
       def delete(opts = nil)
-        execute(delete_sql(opts)){|c| c.affected_rows}
+        execute_dui(delete_sql(opts)){|c| c.affected_rows}
       end
       
       # Yield all rows matching this dataset
       def fetch_rows(sql)
-        execute_select(sql) do |r|
+        execute(sql) do |r|
           @columns = r.columns
           r.sequel_each_hash {|row| yield row}
         end
@@ -282,7 +269,7 @@ module Sequel
       
       # Insert a new value into this dataset
       def insert(*values)
-        execute(insert_sql(*values)){|c| c.insert_id}
+        execute_dui(insert_sql(*values)){|c| c.insert_id}
       end
       
       # Handle correct quoting of strings using ::MySQL.quote.
@@ -308,19 +295,24 @@ module Sequel
       
       # Replace (update or insert) the matching row.
       def replace(*args)
-        execute(replace_sql(*args)){|c| c.insert_id}
+        execute_dui(replace_sql(*args)){|c| c.insert_id}
       end
       
       # Update the matching rows.
       def update(*args)
-        execute(update_sql(*args)){|c| c.affected_rows}
+        execute_dui(update_sql(*args)){|c| c.affected_rows}
       end
       
       private
       
-      # Run execute_select with the given SQL against the associated database.
-      def execute_select(sql, &block)
-        @db.execute_select(sql, &block)
+      # Set the :type option to :select if it hasn't been set.
+      def execute(sql, opts={}, &block)
+        super(sql, {:type=>:select}.merge(opts), &block)
+      end
+      
+      # Set the :type option to :dui if it hasn't been set.
+      def execute_dui(sql, opts={}, &block)
+        super(sql, {:type=>:dui}.merge(opts), &block)
       end
     end
   end

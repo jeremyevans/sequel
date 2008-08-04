@@ -57,7 +57,7 @@ module Sequel
       @prepared_statements = {}
       @transactions = []
       @pool = (@single_threaded ? SingleThreadedPool : ConnectionPool).new(connection_pool_default_options.merge(opts), &block)
-      @pool.connection_proc = proc{connect} unless block
+      @pool.connection_proc = proc{|server| connect(server)} unless block
 
       @loggers = Array(opts[:logger]) + Array(opts[:loggers])
       ::Sequel::DATABASES.push(self)
@@ -219,20 +219,20 @@ module Sequel
     end
 
     # Executes the given SQL. This method should be overridden in descendants.
-    def execute(sql)
+    def execute(sql, opts={})
       raise NotImplementedError, "#execute should be overridden by adapters"
     end
     
     # Method that should be used when submitting any DDL (Data Definition
     # Language) SQL.  By default, calls execute_dui.
-    def execute_ddl(sql)
-      execute_dui(sql)
+    def execute_ddl(sql, opts={}, &block)
+      execute_dui(sql, opts, &block)
     end
 
     # Method that should be used when issuing a DELETE, UPDATE, or INSERT
     # statement.  By default, calls execute.
-    def execute_dui(sql)
-      execute(sql)
+    def execute_dui(sql, opts={}, &block)
+      execute(sql, opts, &block)
     end
 
     # Fetches records for an arbitrary SQL statement. If a block is given,
@@ -331,8 +331,8 @@ module Sequel
     end
     
     # Acquires a database connection, yielding it to the passed block.
-    def synchronize(&block)
-      @pool.hold(&block)
+    def synchronize(server=nil, &block)
+      @pool.hold(server || :default, &block)
     end
 
     # Returns true if a table with the given name exists.
@@ -351,8 +351,8 @@ module Sequel
     
     # Attempts to acquire a database connection.  Returns true if successful.
     # Will probably raise an error if unsuccessful.
-    def test_connection
-      synchronize{|conn|}
+    def test_connection(server=nil)
+      synchronize(server){|conn|}
       true
     end
     
@@ -360,8 +360,8 @@ module Sequel
     # supported - calling #transaction within a transaction will reuse the 
     # current transaction. Should be overridden for databases that support nested 
     # transactions.
-    def transaction
-      synchronize do |conn|
+    def transaction(server=nil)
+      synchronize(server) do |conn|
         return yield(conn) if @transactions.include?(Thread.current)
         log_info(SQL_BEGIN)
         conn.execute(SQL_BEGIN)
@@ -470,6 +470,26 @@ module Sequel
     alias_method :url, :uri
     
     private
+    
+    # Return the options for the given server by merging the generic
+    # options for all server with the specific options for the given
+    # server specified in the :servers option.
+    def server_opts(server)
+      opts = if @opts[:servers] && server_options = @opts[:servers][server]
+        case server_options
+        when Hash
+          @opts.merge(server_options)
+        when Proc
+          @opts.merge(server_options.call(self))
+        else
+          raise Error, 'Server opts should be a hash or proc'
+        end
+      else
+        @opts.dup
+      end
+      opts.delete(:servers)
+      opts
+    end
 
     # The default options for the connection pool.
     def connection_pool_default_options

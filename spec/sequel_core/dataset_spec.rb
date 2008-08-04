@@ -2244,7 +2244,7 @@ context "Dataset#multi_insert" do
     @dbc = Class.new do
       attr_reader :sqls
       
-      def execute(sql)
+      def execute(sql, opts={})
         @sqls ||= []
         @sqls << sql
       end
@@ -2717,7 +2717,7 @@ context "Dataset#create_view" do
     @dbc = Class.new(Sequel::Database) do
       attr_reader :sqls
       
-      def execute(sql)
+      def execute(sql, opts={})
         @sqls ||= []
         @sqls << sql
       end
@@ -2738,7 +2738,7 @@ context "Dataset#create_or_replace_view" do
     @dbc = Class.new(Sequel::Database) do
       attr_reader :sqls
       
-      def execute(sql)
+      def execute(sql, opts={})
         @sqls ||= []
         @sqls << sql
       end
@@ -2961,22 +2961,22 @@ context "Dataset default #fetch_rows, #insert, #update, and #delete, #execute" d
   end
 
   specify "#delete should execute delete SQL" do
-    @db.should_receive(:execute).once.with('DELETE FROM items')
+    @db.should_receive(:execute).once.with('DELETE FROM items', :server=>:default)
     @ds.delete
   end
 
   specify "#insert should execute insert SQL" do
-    @db.should_receive(:execute).once.with('INSERT INTO items DEFAULT VALUES')
+    @db.should_receive(:execute).once.with('INSERT INTO items DEFAULT VALUES', :server=>:default)
     @ds.insert([])
   end
 
   specify "#update should execute update SQL" do
-    @db.should_receive(:execute).once.with('UPDATE items SET number = 1')
+    @db.should_receive(:execute).once.with('UPDATE items SET number = 1', :server=>:default)
     @ds.update(:number=>1)
   end
   
   specify "#execute should execute the SQL on the database" do
-    @db.should_receive(:execute).once.with('SELECT 1')
+    @db.should_receive(:execute).once.with('SELECT 1', :server=>:read_only)
     @ds.send(:execute, 'SELECT 1')
   end
 end
@@ -2986,7 +2986,7 @@ context "Dataset prepared statements and bound variables " do
     @db = Sequel::Database.new
     @db.meta_eval{attr_accessor :sqls}
     @db.sqls = []
-    def @db.execute(sql)
+    def @db.execute(sql, opts={})
       @sqls << sql
     end
     @ds = @db[:items]
@@ -3040,15 +3040,15 @@ context Sequel::Dataset::UnnumberedArgumentMapper do
     @db = Sequel::Database.new
     @db.meta_eval{attr_accessor :sqls}
     @db.sqls = []
-    def @db.execute(sql, *binds)
-      @sqls << [sql, *binds]
+    def @db.execute(sql, opts={})
+      @sqls << [sql, *opts[:arguments]]
     end
     @ds = @db[:items].filter(:num=>:$n)
     def @ds.fetch_rows(sql, &block)
       execute(sql)
     end
-    def @ds.execute(sql, &block)
-      @db.execute(sql, *bind_arguments)
+    def @ds.execute(sql, opts={}, &block)
+      @db.execute(sql, {:arguments=>bind_arguments}.merge(opts))
     end
     @ps = @ds.prepare(:select, :sn)
     @ps.extend(Sequel::Dataset::UnnumberedArgumentMapper)
@@ -3061,5 +3061,27 @@ context Sequel::Dataset::UnnumberedArgumentMapper do
   specify "should submitted the SQL to the database with placeholders and bind variables" do
     @ps.call(:n=>1)
     @db.sqls.should == [["SELECT * FROM items WHERE (num = ?)", 1]]
+  end
+end
+
+context "Sequel::Dataset#server" do
+  specify "should set the server to use for the dataset" do
+    @db = Sequel::Database.new
+    @ds = @db[:items].server(:s)
+    sqls = []
+    @db.meta_def(:execute) do |sql, opts|
+      sqls << [sql, opts[:server]]
+    end
+    def @ds.fetch_rows(sql, &block)
+      execute(sql)
+    end
+    @ds.all
+    @ds.server(:i).insert(:a=>1)
+    @ds.server(:d).delete
+    @ds.server(:u).update(:a=>:a+1)
+    sqls.should == [['SELECT * FROM items', :s],
+      ['INSERT INTO items (a) VALUES (1)', :i],
+      ['DELETE FROM items', :d],
+      ['UPDATE items SET a = (a + 1)', :u]]
   end
 end
