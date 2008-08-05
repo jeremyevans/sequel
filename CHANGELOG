@@ -1,5 +1,7 @@
 === HEAD
 
+* Handle Java::JavaSql::Date type in the JDBC adapter (jeremyevans)
+
 * Add support for read-only slave/writable master databases and database sharding (jeremyevans)
 
 * Remove InvalidExpression, InvalidFilter, InvalidJoinType, and WorkerStop exceptions (jeremyevans)

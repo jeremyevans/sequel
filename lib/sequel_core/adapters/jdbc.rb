@@ -256,7 +256,7 @@ module Sequel
           cps.setInt(i, arg)
         when String
           cps.setString(i, arg)
-        when Date
+        when Date, Java::JavaSql::Date
           cps.setDate(i, arg)
         when Time, DateTime, Java::JavaSql::Timestamp
           cps.setTimestamp(i, arg)
@@ -339,7 +339,7 @@ module Sequel
         case v
         when Time
           literal(v.iso8601)
-        when Date, DateTime, Java::JavaSql::Timestamp
+        when Date, DateTime, Java::JavaSql::Timestamp, Java::JavaSql::Date
           literal(v.to_s)
         else
           super
