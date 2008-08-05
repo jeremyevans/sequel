@@ -13,9 +13,8 @@ CLEAN.include ["**/.*.sw?", "pkg", ".config", "rdoc", "coverage"]
 RDOC_OPTS = ["--quiet", "--line-numbers", "--inline-source", '--title', \
   'Sequel: The Database Toolkit for Ruby', '--main', 'README']
 
-##############################################################################
-# gem packaging and release
-##############################################################################
+# Gem Packaging and Release
+
 desc "Packages sequel"
 task :package=>[:clean]
 spec = Gem::Specification.new do |s|
@@ -64,25 +63,26 @@ task :release=>[:package] do
   sh %{rubyforge add_file sequel #{NAME} #{VERS} pkg/#{NAME}-#{VERS}.gem} 
 end
 
-##############################################################################
-# rdoc
-##############################################################################
+### RDoc
+
 Rake::RDocTask.new do |rdoc|
   rdoc.rdoc_dir = "rdoc"
   rdoc.options += RDOC_OPTS
   rdoc.rdoc_files.add %w"README CHANGELOG COPYING lib/**/*.rb doc/*.rdoc"
 end
 
-desc "Update docs and upload to rubyforge.org"
-task :doc_rforge => [:rdoc]
-task :doc_rforge do
-  sh %{chmod -R g+w rdoc/*}
-  sh %{scp -rp rdoc/* rubyforge.org:/var/www/gforge-projects/sequel}
+### Website
+
+desc "Update sequel.rubyforge.org"
+task :website => [:rdoc]
+task :website do
+  sh %{www/make_www.rb}
+  sh %{scp -r www/public/* rubyforge.org:/var/www/gforge-projects/sequel/}
+  sh %{scp -r rdoc/* rubyforge.org:/var/www/gforge-projects/sequel/rdoc/}
 end
 
-##############################################################################
-# specs
-##############################################################################
+### Specs
+
 lib_dir = File.join(File.dirname(__FILE__), 'lib')
 fixRUBYLIB = Proc.new{ENV['RUBYLIB'] ? (ENV['RUBYLIB'] += ":#{lib_dir}") : (ENV['RUBYLIB'] = lib_dir)}
 sequel_core_specs = "spec/sequel_core/*_spec.rb"
@@ -141,9 +141,7 @@ task :dcov do
   sh %{find lib -name '*.rb' | xargs dcov}
 end
 
-##############################################################################
-# Statistics
-##############################################################################
+### Statistics
 
 STATS_DIRECTORIES = [
   %w(Code   lib/),

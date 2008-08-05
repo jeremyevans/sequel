@@ -1,0 +1,39 @@
+<h2>Sequel: The Database Toolkit for Ruby</h2>
+
+<ul>
+<li>Sequel provides thread safety, connection pooling and a concise DSL for constructing database queries and table schemas.</li>
+<li>Sequel also includes a lightweight but comprehensive ORM layer for mapping records to Ruby objects and handling associated records.</li>
+<li>Sequel makes it easy to deal with multiple records without having to break your teeth on SQL.</li>
+<li>Sequel currently has adapters for ADO, DB2, DBI, Informix, JDBC, MySQL, ODBC, OpenBase, Oracle, PostgreSQL and SQLite3.</li>
+</ul>
+
+<h3 id='a_short_example'>A short example:</h3>
+
+<pre><code class='ruby' lang='ruby'><span class='comment'># connect to an in-memory database</span>
+<span class='constant'>DB</span> <span class='punct'>=</span> <span class='constant'>Sequel</span><span class='punct'>.</span><span class='ident'>sqlite</span>
+
+<span class='comment'># create an items table</span>
+<span class='constant'>DB</span><span class='punct'>.</span><span class='ident'>create_table</span> <span class='symbol'>:items</span> <span class='keyword'>do</span>
+
+  <span class='ident'>column</span> <span class='symbol'>:name</span><span class='punct'>,</span> <span class='symbol'>:text</span>
+  <span class='ident'>column</span> <span class='symbol'>:price</span><span class='punct'>,</span> <span class='symbol'>:float</span>
+<span class='keyword'>end</span>
+
+<span class='comment'># create a dataset from the items table</span>
+<span class='ident'>items</span> <span class='punct'>=</span> <span class='constant'>DB</span><span class='punct'>[</span><span class='symbol'>:items</span><span class='punct'>]</span>
+
+<span class='comment'># populate the table</span>
+<span class='ident'>items</span> <span class='punct'>&lt;&lt;</span> <span class='punct'>{</span><span class='symbol'>:name</span> <span class='punct'>=&gt;</span> <span class='punct'>&#39;</span><span class='string'>abc</span><span class='punct'>&#39;,</span> <span class='symbol'>:price</span> <span class='punct'>=&gt;</span> <span class='ident'>rand</span> <span class='punct'>*</span> <span class='number'>100</span><span class='punct'>}</span>
+<span class='ident'>items</span> <span class='punct'>&lt;&lt;</span> <span class='punct'>{</span><span class='symbol'>:name</span> <span class='punct'>=&gt;</span> <span class='punct'>&#39;</span><span class='string'>def</span><span class='punct'>&#39;,</span> <span class='symbol'>:price</span> <span class='punct'>=&gt;</span> <span class='ident'>rand</span> <span class='punct'>*</span> <span class='number'>100</span><span class='punct'>}</span>
+<span class='ident'>items</span> <span class='punct'>&lt;&lt;</span> <span class='punct'>{</span><span class='symbol'>:name</span> <span class='punct'>=&gt;</span> <span class='punct'>&#39;</span><span class='string'>ghi</span><span class='punct'>&#39;,</span> <span class='symbol'>:price</span> <span class='punct'>=&gt;</span> <span class='ident'>rand</span> <span class='punct'>*</span> <span class='number'>100</span><span class='punct'>}</span>
+
+<span class='comment'># print out the number of records</span>
+<span class='ident'>puts</span> <span class='punct'>&quot;</span><span class='string'>Item count: <span class='expr'>#{ items.count }</span></span><span class='punct'>&quot;</span>
+
+<span class='comment'># print out the records in descending order by price</span>
+<span class='ident'>items</span><span class='punct'>.</span><span class='ident'>reverse_order</span><span class='punct'>(</span><span class='symbol'>:price</span><span class='punct'>).</span><span class='ident'>print</span>
+
+<span class='comment'># print out the average price</span>
+<span class='ident'>puts</span> <span class='punct'>&quot;</span><span class='string'>The average price is: <span class='expr'>#{ items.avg :price }</span></span><span class='punct'>&quot;</span></code></pre>
+
+<h2><a href='/documentation'>Learn more about Sequel&#8230;</a></h2>

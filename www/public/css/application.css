@@ -1,0 +1,231 @@
+a {
+	color: maroon;
+	text-decoration: none;
+}
+a:hover { text-decoration: underline; }
+a:visited { color: maroon; }
+
+body {
+	background-color: #333333;
+	background-repeat: repeat-y;
+	color: #333333;
+	font-size: 13px;
+	line-height: 16px;
+	font-family: Arial, sans-serif;
+	margin: 0 10%;
+	overflow: scroll;
+	padding: 0;
+}
+
+#header, #footer, #content {
+	border-right: 4px solid dimgray;
+	border-left: 4px solid dimgray;
+	padding: 0 2em;
+	background-color: White; background-repeat: repeat-y;
+}
+#header {
+	padding: 1em 2em;
+	background-color: ivory; background-repeat: repeat-x;
+}
+#footer {
+	border-bottom: 4px solid dimgray;
+	margin-bottom: 1em;
+	padding-bottom: 1em;
+}
+
+h1 {
+	font-size: 20px;
+	font-weight: normal;
+	margin: 25px 0 0 0;
+	text-transform: uppercase;
+	white-space: pre;
+}
+
+img { border: none; }
+
+textarea { width: 100%; }
+
+#logo {
+	float: left;
+	margin-right: 1em;
+}
+
+#navigation ul {
+	list-style-type: none;
+	margin-top: 3px;
+	margin-bottom: 0;
+	padding-left: 0;
+}
+#navigation ul li {
+	float: left;
+	font-size: 12px;
+	margin-right: 1em;
+}
+#navigation ul li a:visited {
+	color: maroon;
+}
+
+#injectedBox {
+	background-color: ivory;
+	border: 2px solid lightgray;
+	float: right;
+	font-size: 75%;
+	min-height: 480px;
+	margin: 3em 0 3em 3em;
+	padding: 1.5em;
+	width: 220px;
+}
+#injectedBox h2 {
+	margin-top: 0;
+}
+#injectedBox h3.name {
+	font-weight: normal;
+	margin: 1em 0 0 0;
+}
+#injectedBox p {
+	margin: 0;
+}
+
+hr {
+	background-color: dimgray;
+	border-width: 0;
+	color: dimgray;
+	margin: 0;
+	height: 2px;
+}
+
+#content {
+	height: 100%;
+}
+
+
+#footer {
+	clear: both;
+	text-align: center;
+	text-transform: uppercase;
+}
+
+#footer p {
+	font-size: 80%;
+	margin: 0;
+}
+
+form p.controls { text-align: center; }
+
+p.timestamp { font-size: 90%; }
+
+label {
+	display: block;
+	margin-top: 0.5em;
+}
+div.fieldWithErrors {
+	border-left: 1em solid mistyrose;
+	margin-left: -1em;
+}
+
+#comments {
+	font-size: 90%;
+	margin-top: 1em;
+}
+div.comment span {
+	font-weight: bold;
+}
+div.comment pre {
+	font-family: monospace;
+	font-style: italic;
+	margin-right: 0.5em;
+	margin-left: 0.5em;
+	overflow: auto;
+}
+
+div.article {
+	margin-top: 0.5em;
+}
+div.article h3 {
+	font-weight: normal;
+	margin-bottom: 0;
+}
+div.article h3 b {
+	white-space: pre;
+}
+
+div.article div p {
+	margin: 0.5em;
+}
+div.article div a {
+	font-style: italic;
+}
+
+ul.plugins h3 {
+	font-weight: normal;
+	margin-bottom: 6px;
+}
+ul.plugins p {
+	font-style: italic;
+	margin-top: 6px;
+}
+
+td {
+	font-size: 11px;
+	vertical-align: top;
+}
+table thead tr th.cmAction, table tbody tr td.cmAction {
+	text-align: center;
+	width: 20px;
+}
+table tbody tr td img { vertical-align: bottom; }
+
+table tbody tr.cmAction {
+	background-color: #FAFAFA;
+	border-top: 1px dotted brown;
+	border-bottom: 1px dotted brown;
+	color: black;
+}
+
+table thead tr th.cmTimestamp,
+table tbody tr td.cmTimestamp {
+	text-align: right;
+	width: 200px;
+}
+
+#cmPages {
+	border-collapse: collapse;
+	width: 100%;
+}
+#cmPages thead tr th { text-align: left; }
+#cmPages thead tr th.cmPageTitle,
+#cmPages tbody tr td.cmPageTitle { width: 40%; }
+#cmPages thead tr th.cmPagePath,
+#cmPages tbody tr td.cmPagePath {}
+#cmPages tbody tr td { padding: 2px; }
+
+#cmArticles {
+	border-collapse: collapse;
+	width: 100%;
+}
+#cmArticles thead tr th { text-align: left; }
+#cmArticles tbody tr td { padding: 2px; }
+
+#cmPlugins {
+	border-collapse: collapse;
+	width: 100%;
+}
+#cmPlugins thead tr th { text-align: left; }
+#cmPlugins thead tr th.cmPluginName,
+#cmPlugins tbody tr td.cmPluginName { min-width: 160px; }
+#cmPlugins thead tr th.cmPluginFeed,
+#cmPlugins tbody tr td.cmPluginFeed { width: 75%; }
+#cmPlugins tbody tr td { padding: 2px; }
+#cmPlugins tbody tr td.cmPluginFeed ul { list-style-type: none; }
+#cmPlugins tbody tr td.cmPluginFeed ul li pre { white-space: normal; }
+
+#cmUsers {
+	border-collapse: collapse;
+	width: 100%;
+}
+#cmUsers thead tr th { text-align: left; }
+#cmUsers thead tr th.cmUserName,
+#cmUsers tbody tr td.cmUserName { min-width: 160px; }
+#cmUsers thead tr th.cmUserEMail,
+#cmUsers tbody tr td.cmUserEMail { width: 75%; }
+#cmUsers tbody tr td { padding: 2px; }

@@ -1,0 +1,19 @@
+<h2>Development</h2>
+
+<p>Sequel is being actively developed! You can join in on the discussions, ask questions, suggest features, and discuss Sequel in general by joining our Google Group - <a href='http://groups.google.com/group/sequel-talk'>Sequel Talk</a> or our <a href='irc://irc.freenode.net/sequel'>IRC channel</a>.</p>
+
+<h3>Reporting Bugs</h3>
+
+<p>To report a bug in Sequel, use our <a href="http://code.google.com/p/ruby-sequel/issues/list">bug tracker</a>.  If you aren't sure if something is a bug, post a question on the <a href='http://groups.google.com/group/sequel-talk'>Google Group</a> or ask on <a href='irc://irc.freenode.net/sequel'>IRC</a>.</p>
+
+<h3>Source Code</h3>
+
+<p>The master source code repository is <a href="http://github.com/jeremyevans/sequel/">jeremyevans/sequel on github</a>.  The latest release version also has a git clone at RubyForge.</p>
+
+<h3>Submitting Patches</h3>
+
+<p>The easiest way to contribute is to use git, post the changes to a public repository, and send a pull request, either via github, the google group, or IRC.  Posting patches to the bug tracker or the Google Group works fine as well.</p>
+
+<h3>License</h3>
+
+<p>Sequel is distributed under the <a href="/rdoc/files/COPYING.html">MIT License</a>.  Patches are assumed to be submitted under the same license as Sequel.</p>

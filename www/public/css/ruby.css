@@ -1,0 +1,57 @@
+code { font-family: 'Verdana'; font-style: italic; }
+
+pre code {
+	background-color: ivory;
+	border: 1px solid lightgray;
+	color: #000000;
+	display: block;
+	font-family: 'Monaco', monospace;
+	font-size: 11px;
+	font-style: normal;
+	margin-left: 1em;
+	margin-right: 1em;
+	overflow: auto;
+	padding: 1em 1.5em 1em 1.5em;
+}
+
+h1
+.ruby .keyword {
+	background-color: ivory;
+	color: #1f60a0;
+}
+.ruby .punct {
+	background-color: ivory;
+	color: #000000;
+}
+.ruby .class {
+	background-color: ivory;
+	color: #a08000;
+	font-weight: bold;
+}
+.ruby .constant {
+	background-color: ivory;
+	color: #008080;
+}
+.ruby .ident {}
+.ruby .comment {
+	background-color: ivory;
+	color: #3f603f;
+	font-style: italic;
+}
+.ruby .symbol {
+	background-color: ivory;
+	color: #800000;
+}
+.ruby .string {
+	background-color: ivory;
+	color: #bf2f2f;
+}
+.ruby .regex {
+	background-color: ivory;
+	color: #bf8060;
+}
+
+.ruby .number {
+	background-color: ivory;
+	color: #0080a0;
+}

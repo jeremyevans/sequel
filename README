@@ -6,6 +6,8 @@ Sequel is a lightweight database access toolkit for Ruby.
   for constructing database queries and table schemas.
 * Sequel also includes a lightweight but comprehensive ORM layer for
   mapping records to Ruby objects and handling associated records.
+* Sequel supports advanced database features such as prepared statements,
+  bound variables, master/slave configurations, and database sharding.
 * Sequel makes it easy to deal with multiple records without having
   to break your teeth on SQL.
 * Sequel currently has adapters for ADO, DB2, DBI, Informix, JDBC,
@@ -13,10 +15,11 @@ Sequel is a lightweight database access toolkit for Ruby.
 
 == Resources
 
+* {Website}[http://sequel.rubyforge.org]
 * {Source code}[http://github.com/jeremyevans/sequel]
 * {Bug tracking}[http://code.google.com/p/ruby-sequel/issues/list]
 * {Google group}[http://groups.google.com/group/sequel-talk]
-* {RDoc}[http://sequel.rubyforge.org]
+* {RDoc}[http://sequel.rubyforge.org/rdoc]
 
 To check out the source code:
   

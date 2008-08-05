@@ -1,0 +1,18 @@
+<h2>Documentation</h2>
+
+<h3>General Info, Guides, Examples, and Tutorials</h3>
+
+<ul>
+<li><a href="/rdoc/files/README.html">README</a></li>
+<li><a href="/rdoc/files/doc/cheat_sheet_rdoc.html">Cheat Sheet</a></li>
+<li><a href="/rdoc/files/doc/dataset_filtering_rdoc.html">Dataset Filtering</a></li>
+<li><a href="/rdoc/files/doc/advanced_associations_rdoc.html">Advanced Associations</a></li>
+<li><a href="/rdoc/files/doc/prepared_statements_rdoc.html">Prepared Statements/Bound Variables</a></li>
+<li><a href="/rdoc/files/doc/sharding_rdoc.html">Master/Slave Databases and Sharding</a></li>
+</ul>
+
+<h3><a href="/rdoc/">API RDoc</a></h3>
+
+<h3><a href="/rdoc/files/CHANGELOG.html">Change Log</a></h3>
+
+<h3><a href="/rdoc/files/COPYING.html">License</a></h3>
