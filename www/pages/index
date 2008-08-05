@@ -3,6 +3,7 @@
 <ul>
 <li>Sequel provides thread safety, connection pooling and a concise DSL for constructing database queries and table schemas.</li>
 <li>Sequel also includes a lightweight but comprehensive ORM layer for mapping records to Ruby objects and handling associated records.</li>
+<li>Sequel supports advanced database features such as prepared statements, bound variables, master/slave configurations, and database sharding.</li>
 <li>Sequel makes it easy to deal with multiple records without having to break your teeth on SQL.</li>
 <li>Sequel currently has adapters for ADO, DB2, DBI, Informix, JDBC, MySQL, ODBC, OpenBase, Oracle, PostgreSQL and SQLite3.</li>
 </ul>
