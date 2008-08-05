@@ -351,7 +351,7 @@ context "A connection pool with multiple servers" do
     @pool.size.should == 0
     @pool.hold do |c|
       c.should == "default1"
-      @pool.allocated.should == {Thread.current, "default1"}
+      @pool.allocated.should == {Thread.current=>"default1"}
     end
     @pool.available_connections.should == ["default1"]
     @pool.size.should == 1
@@ -362,7 +362,7 @@ context "A connection pool with multiple servers" do
     @pool.size(:read_only).should == 0
     @pool.hold(:read_only) do |c|
       c.should == "read_only1"
-      @pool.allocated(:read_only).should == {Thread.current, "read_only1"}
+      @pool.allocated(:read_only).should == {Thread.current=>"read_only1"}
     end
     @pool.available_connections(:read_only).should == ["read_only1"]
     @pool.size(:read_only).should == 1
@@ -372,14 +372,14 @@ context "A connection pool with multiple servers" do
   specify "#hold should only yield connections for the server requested" do
     @pool.hold(:read_only) do |c|
       c.should == "read_only1"
-      @pool.allocated(:read_only).should == {Thread.current, "read_only1"}
+      @pool.allocated(:read_only).should == {Thread.current=>"read_only1"}
       @pool.hold do |d|
         d.should == "default1"
         @pool.hold do |e|
           e.should == d
           @pool.hold(:read_only){|b| b.should == c}
         end
-        @pool.allocated.should == {Thread.current, "default1"}
+        @pool.allocated.should == {Thread.current=>"default1"}
       end
     end
     @invoked_counts.should == {:read_only=>1, :default=>1}
