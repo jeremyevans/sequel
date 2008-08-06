@@ -62,7 +62,7 @@ module Sequel
        insert_multiple intersect interval invert_order join join_table last 
        left_outer_join limit map multi_insert naked order order_by order_more 
        paginate print query range reverse_order right_outer_join select 
-       select_all select_more set set_graph_aliases single_value size to_csv to_hash
+       select_all select_more server set set_graph_aliases single_value size to_csv to_hash
        transform union uniq unfiltered unordered update where'.map{|x| x.to_sym}
 
     # Instance variables that are inherited in subclasses
