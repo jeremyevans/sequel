@@ -190,7 +190,7 @@ module Sequel
     
     # Iterates over the records in the dataset.
     def each(opts = nil, &block)
-      if graph = @opts[:graph]
+      if @opts[:graph] and !(opts && opts[:graph] == false)
         graph_each(opts, &block)
       else
         row_proc = @row_proc unless opts && opts[:naked]

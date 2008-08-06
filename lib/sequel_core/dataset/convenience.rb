@@ -184,7 +184,7 @@ module Sequel
     # Returns the first value of the first record in the dataset.
     # Returns nil if dataset is empty.
     def single_value(opts = nil)
-      if r = naked.single_record(opts)
+      if r = naked.single_record((opts||{}).merge(:graph=>false))
         r.values.first
       end
     end

@@ -1135,6 +1135,12 @@ context "Dataset#count" do
     @dataset.limit(5).count.should == 1
     @c.sql.should == "SELECT COUNT(*) FROM (SELECT * FROM test LIMIT 5) t1 LIMIT 1"
   end
+  
+  it "should work on a graphed_dataset" do
+    @dataset.should_receive(:columns).twice.and_return([:a])
+    @dataset.graph(@dataset, [:a], :table_alias=>:test2).count.should == 1
+    @c.sql.should == 'SELECT COUNT(*) FROM test LEFT OUTER JOIN test AS test2 USING (a) LIMIT 1'
+  end
 end
 
 
@@ -1753,6 +1759,11 @@ context "Dataset#single_value" do
   
   specify "should return nil if no records" do
     @e.single_value.should be_nil
+  end
+  
+  it "should work on a graphed_dataset" do
+    @d.should_receive(:columns).twice.and_return([:a])
+    @d.graph(@d, [:a], :table_alias=>:test2).single_value.should == 'SELECT test.a, test2.a AS test2_a FROM test LEFT OUTER JOIN test AS test2 USING (a) LIMIT 1'
   end
 end
 
