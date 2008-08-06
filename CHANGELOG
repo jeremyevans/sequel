@@ -1,4 +1,4 @@
-=== HEAD
+=== 2.4.0 (2008-08-06)
 
 * Handle Java::JavaSql::Date type in the JDBC adapter (jeremyevans)
 
