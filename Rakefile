@@ -9,7 +9,7 @@ include FileUtils
 
 NAME = 'sequel'
 VERS = '2.3.0'
-CLEAN.include ["**/.*.sw?", "pkg", ".config", "rdoc", "coverage"]
+CLEAN.include ["**/.*.sw?", "pkg", ".config", "rdoc", "coverage", "www/public/*.html"]
 RDOC_OPTS = ["--quiet", "--line-numbers", "--inline-source", '--title', \
   'Sequel: The Database Toolkit for Ruby', '--main', 'README']
 
