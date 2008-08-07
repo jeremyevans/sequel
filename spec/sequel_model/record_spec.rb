@@ -104,6 +104,40 @@ describe "Model#save_changes" do
     o.save_changes
     MODEL_DB.sqls.should == ["UPDATE items SET y = 4 WHERE (id = 3)"]
   end
+
+  it "should update columns changed in a before_update hook" do
+    o = @c.load(:id => 3, :x => 1, :y => nil)
+    @c.before_update{|x| x.x = x.x + 1}
+    o.save_changes
+    MODEL_DB.sqls.should == []
+    o.x = 2
+    o.save_changes
+    MODEL_DB.sqls.should == ["UPDATE items SET x = 3 WHERE (id = 3)"]
+    MODEL_DB.reset
+    o.save_changes
+    MODEL_DB.sqls.should == []
+    o.x = 4
+    o.save_changes
+    MODEL_DB.sqls.should == ["UPDATE items SET x = 5 WHERE (id = 3)"]
+    MODEL_DB.reset
+  end
+
+  it "should update columns changed in a before_save hook" do
+    o = @c.load(:id => 3, :x => 1, :y => nil)
+    @c.before_save{|x| x.x = x.x + 1}
+    o.save_changes
+    MODEL_DB.sqls.should == []
+    o.x = 2
+    o.save_changes
+    MODEL_DB.sqls.should == ["UPDATE items SET x = 3 WHERE (id = 3)"]
+    MODEL_DB.reset
+    o.save_changes
+    MODEL_DB.sqls.should == []
+    o.x = 4
+    o.save_changes
+    MODEL_DB.sqls.should == ["UPDATE items SET x = 5 WHERE (id = 3)"]
+    MODEL_DB.reset
+  end
 end
 
 describe "Model#update_values" do

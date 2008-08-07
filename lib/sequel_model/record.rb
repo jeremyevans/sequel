@@ -214,6 +214,7 @@ module Sequel
     # (if !new?) return false, returns nil unless raise_on_save_failure
     # is true.  Otherwise, returns self.
     def save!(*columns)
+      opts = columns.extract_options!
       return save_failure(:save) if before_save == false
       if @new
         return save_failure(:create) if before_create == false
@@ -232,7 +233,8 @@ module Sequel
       else
         return save_failure(:update) if before_update == false
         if columns.empty?
-          this.update(@values)
+          vals = opts[:changed] ? @values.reject{|k,v| !@changed_columns.include?(k)} : @values
+          this.update(vals)
           @changed_columns = []
         else # update only the specified columns
           this.update(@values.reject {|k, v| !columns.include?(k)})
@@ -248,7 +250,7 @@ module Sequel
     # chanaged.  If no columns have been changed, returns nil.  If unable to
     # save, returns false unless raise_on_save_failure is true.
     def save_changes
-      save(*@changed_columns) || false unless @changed_columns.empty?
+      save(:changed=>true) || false unless @changed_columns.empty?
     end
 
     # Updates the instance with the supplied values with support for virtual
