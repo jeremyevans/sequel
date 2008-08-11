@@ -297,13 +297,13 @@ module Sequel::Model::Associations
     return if opts[:read_only]
 
     class_def(opts._add_method) do |o|
-      database[join_table].insert(left=>pk, right=>o.pk)
+      database.dataset.from(join_table).insert(left=>pk, right=>o.pk)
     end
     class_def(opts._remove_method) do |o|
-      database[join_table].filter([[left, pk], [right, o.pk]]).delete
+      database.dataset.from(join_table).filter([[left, pk], [right, o.pk]]).delete
     end
     class_def(opts._remove_all_method) do
-      database[join_table].filter(left=>pk).delete
+      database.dataset.from(join_table).filter(left=>pk).delete
     end
     private opts._add_method, opts._remove_method, opts._remove_all_method
 
