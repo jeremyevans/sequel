@@ -107,7 +107,7 @@ describe "Model#save_changes" do
 
   it "should update columns changed in a before_update hook" do
     o = @c.load(:id => 3, :x => 1, :y => nil)
-    @c.before_update{|x| x.x = x.x + 1}
+    @c.before_update{self.x += 1}
     o.save_changes
     MODEL_DB.sqls.should == []
     o.x = 2
@@ -124,7 +124,7 @@ describe "Model#save_changes" do
 
   it "should update columns changed in a before_save hook" do
     o = @c.load(:id => 3, :x => 1, :y => nil)
-    @c.before_save{|x| x.x = x.x + 1}
+    @c.before_save{self.x += 1}
     o.save_changes
     MODEL_DB.sqls.should == []
     o.x = 2
