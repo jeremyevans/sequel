@@ -1,5 +1,7 @@
 === HEAD
 
+* In PostgreSQL adapter, fix inserting a row with a primary key value inside a transaction (jeremyevans)
+
 * Allow before_save and before_update to affect the columns saved by save_changes (jeremyevans)
 
 * Make Dataset#single_value work when graphing, which fixes count and paginate on graphed datasets (jeremyevans)

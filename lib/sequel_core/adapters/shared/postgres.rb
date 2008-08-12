@@ -6,19 +6,11 @@ module Sequel
     
     # Methods shared by adapter/connection instances.
     module AdapterMethods
+      attr_writer :db
+      
       SELECT_CURRVAL = "SELECT currval('%s')".freeze
-      SELECT_PK = <<-end_sql
-        SELECT pg_attribute.attname
-        FROM pg_class, pg_attribute, pg_index
-        WHERE pg_class.oid = pg_attribute.attrelid AND
-          pg_class.oid = pg_index.indrelid AND
-          pg_index.indkey[0] = pg_attribute.attnum AND
-          pg_index.indisprimary = 't' AND
-          pg_class.relname = '%s'
-      end_sql
-      SELECT_PK_AND_CUSTOM_SEQUENCE = <<-end_sql
-        SELECT attr.attname,  
-          CASE  
+      SELECT_CUSTOM_SEQUENCE = <<-end_sql
+        SELECT CASE  
             WHEN split_part(def.adsrc, '''', 2) ~ '.' THEN  
               substr(split_part(def.adsrc, '''', 2),  
                      strpos(split_part(def.adsrc, '''', 2), '.')+1) 
@@ -33,8 +25,17 @@ module Sequel
           AND cons.contype = 'p'
           AND def.adsrc ~* 'nextval'
       end_sql
-      SELECT_PK_AND_SERIAL_SEQUENCE = <<-end_sql
-        SELECT attr.attname, name.nspname, seq.relname
+      SELECT_PK = <<-end_sql
+        SELECT pg_attribute.attname
+        FROM pg_class, pg_attribute, pg_index
+        WHERE pg_class.oid = pg_attribute.attrelid AND
+          pg_class.oid = pg_index.indrelid AND
+          pg_index.indkey[0] = pg_attribute.attnum AND
+          pg_index.indisprimary = 't' AND
+          pg_class.relname = '%s'
+      end_sql
+      SELECT_SERIAL_SEQUENCE = <<-end_sql
+        SELECT seq.relname
         FROM pg_class seq, pg_attribute attr, pg_depend dep,
           pg_namespace name, pg_constraint cons
         WHERE seq.oid = dep.objid
@@ -52,39 +53,38 @@ module Sequel
       # to implement multi-level transactions with savepoints.
       attr_accessor :transaction_depth
       
-      # Get the last inserted value for the given table.
-      def last_insert_id(table)
-        @table_sequences ||= {}
-        if !@table_sequences.include?(table)
-          pkey_and_seq = pkey_and_sequence(table)
-          if pkey_and_seq
-            @table_sequences[table] = pkey_and_seq[1]
-          end
-        end
-        if seq = @table_sequences[table]
-          execute(SELECT_CURRVAL % seq) do |r|
-            val = result_set_values(r, 0)
-            val.to_i if val
-          end
+      # Get the last inserted value for the given sequence.
+      def last_insert_id(sequence)
+        sql = SELECT_CURRVAL % sequence
+        @db.log_info(sql)
+        execute(sql) do |r|
+          val = single_value(r)
+          return val.to_i if val
         end
       end
       
       # Get the primary key and sequence for the given table.
-      def pkey_and_sequence(table)
-        execute(SELECT_PK_AND_SERIAL_SEQUENCE % table) do |r|
-          vals = result_set_values(r, 2, 2)
-          return vals if vals
+      def sequence(table)
+        sql = SELECT_SERIAL_SEQUENCE % table
+        @db.log_info(sql)
+        execute(sql) do |r|
+          seq = single_value(r)
+          return seq if seq
         end
-    
-        execute(SELECT_PK_AND_CUSTOM_SEQUENCE % table) do |r|
-          result_set_values(r, 0, 1)
+        
+        sql = SELECT_CUSTOM_SEQUENCE % table
+        @db.log_info(sql)
+        execute(sql) do |r|
+          return single_value(r)
         end
       end
       
       # Get the primary key for the given table.
       def primary_key(table)
-        execute(SELECT_PK % table) do |r|
-          result_set_values(r, 0)
+        sql = SELECT_PK % table
+        @db.log_info(sql)
+        execute(sql) do |r|
+          return single_value(r)
         end
       end
     end
@@ -92,7 +92,7 @@ module Sequel
     # Methods shared by Database instances that connect to PostgreSQL.
     module DatabaseMethods
       PREPARED_ARG_PLACEHOLDER = '$'.lit.freeze
-      RE_CURRVAL_ERROR = /currval of sequence "(.*)" is not yet defined in this session/.freeze
+      RE_CURRVAL_ERROR = /currval of sequence "(.*)" is not yet defined in this session|relation "(.*)" does not exist/.freeze
       RELATION_QUERY = {:from => [:pg_class], :select => [:relname]}.freeze
       RELATION_FILTER = "(relkind = 'r') AND (relname !~ '^pg|sql')".freeze
       SQL_BEGIN = 'BEGIN'.freeze
@@ -128,42 +128,11 @@ module Sequel
         "CREATE #{unique}INDEX #{index_name} ON #{table_name} #{"USING #{index_type} " if index_type}#{expr}#{filter}"
       end
       
-      # The result of the insert for the given table and values.  Uses
-      # last insert id the primary key for the table if it exists,
-      # otherwise determines the primary key for the table and uses the
-      # value of the hash key.  If values is an array, assume the first
-      # value is the primary key value and return that.
-      def insert_result(conn, table, values)
-        begin
-          result = conn.last_insert_id(table)
-          return result if result
-        rescue Exception => e
-          convert_pgerror(e) unless RE_CURRVAL_ERROR.match(e.message)
-        end
-        
-        case values
-        when Hash
-          values[primary_key_for_table(conn, table)]
-        when Array
-          values.first
-        else
-          nil
-        end
-      end
-      
       # Dataset containing all current database locks 
       def locks
         dataset.from(:pg_class, :pg_locks).
           select(:pg_class__relname, :pg_locks.*).
           filter(:pg_class__relfilenode=>:pg_locks__relation)
-      end
-      
-      # Returns primary key for the given table.  This information is
-      # cached, and if the primary key for a table is changed, the
-      # @primary_keys instance variable should be reset manually.
-      def primary_key_for_table(conn, table)
-        @primary_keys ||= {}
-        @primary_keys[table] ||= conn.primary_key(table)
       end
       
       # PostgreSQL uses SERIAL psuedo-type instead of AUTOINCREMENT for
@@ -240,10 +209,52 @@ module Sequel
         e.is_one_of?(*CONVERTED_EXCEPTIONS) ? Error.new(e.message) : e
       end
       
+      # The result of the insert for the given table and values.  If values
+      # is an array, assume the first column is the primary key and return
+      # that.  If values is a hash, lookup the primary key for the table.  If
+      # the primary key is present in the hash, return its value.  Otherwise,
+      # look up the sequence for the table's primary key.  If one exists,
+      # return the last value the of the sequence for the connection.
+      def insert_result(conn, table, values)
+        case values
+        when Hash
+          return nil unless pk = primary_key_for_table(conn, table)
+          if pk and pkv = values[pk.to_sym]
+            pkv
+          else
+            begin
+              if seq = primary_key_sequence_for_table(conn, table)
+                conn.last_insert_id(seq)
+              end
+            rescue Exception => e
+              raise convert_pgerror(e) unless RE_CURRVAL_ERROR.match(e.message)
+            end
+          end
+        when Array
+          values.first
+        else
+          nil
+        end
+      end
+      
       # Use a dollar sign instead of question mark for the argument
       # placeholder.
       def prepared_arg_placeholder
         PREPARED_ARG_PLACEHOLDER
+      end
+      
+      # Returns primary key for the given table.  This information is
+      # cached, and if the primary key for a table is changed, the
+      # @primary_keys instance variable should be reset manually.
+      def primary_key_for_table(conn, table)
+        @primary_keys.include?(table) ? @primary_keys[table] : (@primary_keys[table] = conn.primary_key(table))
+      end
+      
+      # Returns primary key for the given table.  This information is
+      # cached, and if the primary key for a table is changed, the
+      # @primary_keys instance variable should be reset manually.
+      def primary_key_sequence_for_table(conn, table)
+        @primary_key_sequences.include?(table) ? @primary_key_sequences[table] : (@primary_key_sequences[table] = conn.sequence(table))
       end
       
       # When the :schema option is used, use the the given schema.
@@ -317,7 +328,7 @@ module Sequel
       
       # Insert given values into the database.
       def insert(*values)
-        execute_insert(insert_sql(*values), :table=>source_list(@opts[:from]),
+        execute_insert(insert_sql(*values), :table=>opts[:from].first,
           :values=>values.size == 1 ? values.first : values)
       end
       

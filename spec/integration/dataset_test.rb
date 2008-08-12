@@ -49,3 +49,35 @@ describe "Simple Dataset operations" do
     sqls_should_be('SELECT * FROM items LIMIT 1')
   end
 end
+
+describe "Simple Dataset operations in transactions" do
+  before do
+    INTEGRATION_DB.create_table!(:items_insert_in_transaction) do
+      primary_key :id
+      integer :number
+    end
+    @ds = INTEGRATION_DB[:items_insert_in_transaction]
+    clear_sqls
+  end
+  after do
+    INTEGRATION_DB.drop_table(:items_insert_in_transaction)
+  end
+
+  specify "should insert correctly with a primary key specified inside a transaction" do
+    INTEGRATION_DB.transaction do
+      @ds.insert(:id=>100, :number=>20)
+      sqls_should_be(/INSERT INTO items_insert_in_transaction \((number, id|id, number)\) VALUES \((100, 20|20, 100)\)/)
+      @ds.count.should == 1
+      @ds.order(:id).all.should == [{:id=>100, :number=>20}]
+    end
+  end
+  
+  specify "should have insert return primary key value inside a transaction" do
+    INTEGRATION_DB.transaction do
+      @ds.insert(:number=>20).should == 1
+      sqls_should_be(/INSERT INTO items_insert_in_transaction \(number\) VALUES \(20\)/)
+      @ds.count.should == 1
+      @ds.order(:id).all.should == [{:id=>1, :number=>20}]
+    end
+  end
+end

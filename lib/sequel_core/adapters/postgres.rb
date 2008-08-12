@@ -144,14 +144,8 @@ module Sequel
       private
       
       # Return the requested values for the given row.
-      def result_set_values(r, *vals)
-        return if r.nil? || (r.ntuples == 0)
-        case vals.length
-        when 1
-          r.getvalue(0, vals.first)
-        else
-          vals.collect{|col| r.getvalue(0, col)}
-        end
+      def single_value(r)
+        r.getvalue(0, 0) unless r.nil? || (r.ntuples == 0)
       end
     end
     
@@ -161,6 +155,14 @@ module Sequel
       include Sequel::Postgres::DatabaseMethods
       
       set_adapter_scheme :postgres
+      
+      # Add the primary_keys and primary_key_sequences instance variables,
+      # so we can get the correct return values for inserted rows.
+      def initialize(*args)
+        super
+        @primary_keys = {}
+        @primary_key_sequences = {}
+      end
       
       # Connects to the database.  In addition to the standard database
       # options, using the :encoding or :charset option changes the
@@ -178,6 +180,7 @@ module Sequel
         if encoding = opts[:encoding] || opts[:charset]
           conn.set_client_encoding(encoding)
         end
+        conn.db = self
         conn
       end
       
