@@ -206,7 +206,7 @@ module Sequel
           if sup_class == Model
             subclass.set_dataset(Model.db[subclass.implicit_table_name]) unless subclass.name.blank?
           elsif ds = sup_class.instance_variable_get(:@dataset)
-            subclass.set_dataset(sup_class.sti_key ? sup_class.sti_dataset.filter(sup_class.sti_key=>subclass.name.to_s) : ds.clone)
+            subclass.set_dataset(sup_class.sti_key ? sup_class.sti_dataset.filter(sup_class.sti_key=>subclass.name.to_s) : ds.clone, :inherited=>true)
           end
         rescue
           nil
@@ -308,7 +308,8 @@ module Sequel
     # if there is one associated with the model. Finally, it attempts to 
     # determine the database schema based on the given/created dataset unless
     # lazy_load_schema is set.
-    def self.set_dataset(ds)
+    def self.set_dataset(ds, opts={})
+      inherited = opts[:inherited]
       @dataset = case ds
       when Symbol
         db[ds]
@@ -319,13 +320,15 @@ module Sequel
         raise(Error, "Model.set_dataset takes a Symbol or a Sequel::Dataset")
       end
       @dataset.set_model(self)
-      @dataset.extend(DatasetMethods)
-      @dataset.extend(Associations::EagerLoading)
       @dataset.transform(@transform) if @transform
-      @dataset_methods.each{|meth, block| @dataset.meta_def(meth, &block)} if @dataset_methods
-      unless @@lazy_load_schema
-        (@db_schema = get_db_schema) rescue nil
+      if inherited
+        ((@columns = @dataset.columns) rescue nil) unless @@lazy_load_schema
+      else
+        @dataset.extend(DatasetMethods)
+        @dataset.extend(Associations::EagerLoading)
+        @dataset_methods.each{|meth, block| @dataset.meta_def(meth, &block)} if @dataset_methods
       end
+      ((@db_schema = inherited ? superclass.db_schema : get_db_schema) rescue nil) unless @@lazy_load_schema
       self
     end
     metaalias :dataset=, :set_dataset
@@ -425,15 +428,18 @@ module Sequel
     
     # Create the column accessors
     def self.def_column_accessor(*columns) # :nodoc:
+      include(@column_accessors_module = Module.new) unless @column_accessors_module
       columns.each do |column|
         im = instance_methods.collect{|x| x.to_s}
         meth = "#{column}="
-         define_method(column){self[column]} unless im.include?(column.to_s)
-        unless im.include?(meth)
-          define_method(meth) do |*v|
-            len = v.length
-            raise(ArgumentError, "wrong number of arguments (#{len} for 1)") unless len == 1
-            self[column] = v.first 
+        @column_accessors_module.module_eval do
+          define_method(column){self[column]} unless im.include?(column.to_s)
+          unless im.include?(meth)
+            define_method(meth) do |*v|
+              len = v.length
+              raise(ArgumentError, "wrong number of arguments (#{len} for 1)") unless len == 1
+              self[column] = v.first 
+            end
           end
         end
       end

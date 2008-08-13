@@ -1,5 +1,7 @@
 === HEAD
 
+* Don't have column accessor methods override plugin instance methods (jeremyevans)
+
 * Allow validation of multiple attributes at once, with built in support for uniqueness checking of multiple columns (jeremyevans)
 
 * In PostgreSQL adapter, fix inserting a row with a primary key value inside a transaction (jeremyevans)

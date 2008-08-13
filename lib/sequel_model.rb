@@ -13,17 +13,14 @@ module Sequel
   # Lets you create a Model subclass with its dataset already set.
   # source can be an existing dataset or a symbol (in which case
   # it will create a dataset using the default database with 
-  # source as the table name.
+  # source as the table name).
   #
   # Example:
   #   class Comment < Sequel::Model(:something)
   #     table_name # => :something
   #   end
   def self.Model(source)
-    return @models[source] if @models[source]
-    klass = Class.new(Model)
-    klass.set_dataset(source.is_a?(Dataset) ? source : Model.db[source])
-    @models[source] = klass
+    @models[source] ||= Class.new(Model).set_dataset(source)
   end
 
   # Model has some methods that are added via metaprogramming:
