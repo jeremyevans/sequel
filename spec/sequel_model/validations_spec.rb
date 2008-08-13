@@ -79,6 +79,22 @@ describe Sequel::Model do
     @c.has_validations?.should == true
   end
   
+  specify "should validate multiple attributes at once" do
+    o = @c.new
+    def o.xx
+      1
+    end
+    def o.yy
+      2
+    end
+    vals = nil
+    atts = nil
+    @c.validates_each([:xx, :yy]){|obj,a,v| atts=a; vals=v}
+    o.valid?
+    vals.should == [1,2]
+    atts.should == [:xx, :yy]
+  end
+  
   specify "should overwrite existing validation with the same tag and attribute" do
     @c.validates_each(:xx, :xx, :tag=>:low) {|o, a, v| o.xxx; o.errors[a] << 'too low' if v < 50}
     @c.validates_each(:yy, :yy) {|o, a, v| o.yyy; o.errors[a] << 'too low' if v < 50}
@@ -667,6 +683,7 @@ describe Sequel::Model, "Validations" do
         
         case sql
         when /COUNT.*username = '0records'/
+          yield({:v => 0})
         when /COUNT.*username = '2records'/
           yield({:v => 2})
         when /COUNT.*username = '1record'/
@@ -688,6 +705,59 @@ describe Sequel::Model, "Validations" do
     @user = User.load(:id=>4, :username => "1record", :password => "anothertest")
     @user.should_not be_valid
     @user.errors.full_messages.should == ['username is already taken']
+
+    @user = User.load(:id=>3, :username => "1record", :password => "anothertest")
+    @user.should be_valid
+    @user.errors.full_messages.should == []
+
+    @user = User.new(:username => "0records", :password => "anothertest")
+    @user.should be_valid
+    @user.errors.full_messages.should == []
+  end
+  
+  it "should validate the uniqueness of multiple columns" do
+    class ::User < Sequel::Model
+      validations.clear
+      validates do
+        uniqueness_of [:username, :password]
+      end
+    end
+    User.dataset.extend(Module.new {
+      def fetch_rows(sql)
+        @db << sql
+        
+        case sql
+        when /COUNT.*username = '0records'/
+          yield({:v => 0})
+        when /COUNT.*username = '2records'/
+          yield({:v => 2})
+        when /COUNT.*username = '1record'/
+          yield({:v => 1})
+        when /username = '1record'/
+          if sql =~ /password = 'anothertest'/
+            yield({:id => 3, :username => "1record", :password => "anothertest"})
+          else
+            yield({:id => 4, :username => "1record", :password => "test"})
+          end
+        end
+      end
+    })
+    
+    @user = User.new(:username => "2records", :password => "anothertest")
+    @user.should_not be_valid
+    @user.errors.full_messages.should == ['username and password is already taken']
+
+    @user = User.new(:username => "1record", :password => "anothertest")
+    @user.should_not be_valid
+    @user.errors.full_messages.should == ['username and password is already taken']
+
+    @user = User.load(:id=>4, :username => "1record", :password => "anothertest")
+    @user.should_not be_valid
+    @user.errors.full_messages.should == ['username and password is already taken']
+
+    @user = User.load(:id=>3, :username => "1record", :password => "test")
+    @user.should_not be_valid
+    @user.errors.full_messages.should == ['username and password is already taken']
 
     @user = User.load(:id=>3, :username => "1record", :password => "anothertest")
     @user.should be_valid
