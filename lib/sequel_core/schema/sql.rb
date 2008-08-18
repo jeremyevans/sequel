@@ -22,28 +22,29 @@ module Sequel
       def alter_table_sql(table, op)
         quoted_table = quote_identifier(table)
         quoted_name = quote_identifier(op[:name]) if op[:name]
-        case op[:op]
+        alter_table_op = case op[:op]
         when :add_column
-          "ALTER TABLE #{quoted_table} ADD COLUMN #{column_definition_sql(op)}"
+          "ADD COLUMN #{column_definition_sql(op)}"
         when :drop_column
-          "ALTER TABLE #{quoted_table} DROP COLUMN #{quoted_name}"
+          "DROP COLUMN #{quoted_name}"
         when :rename_column
-          "ALTER TABLE #{quoted_table} RENAME COLUMN #{quoted_name} TO #{quote_identifier(op[:new_name])}"
+          "RENAME COLUMN #{quoted_name} TO #{quote_identifier(op[:new_name])}"
         when :set_column_type
-          "ALTER TABLE #{quoted_table} ALTER COLUMN #{quoted_name} TYPE #{op[:type]}"
+          "ALTER COLUMN #{quoted_name} TYPE #{op[:type]}"
         when :set_column_default
-          "ALTER TABLE #{quoted_table} ALTER COLUMN #{quoted_name} SET DEFAULT #{literal(op[:default])}"
+          "ALTER COLUMN #{quoted_name} SET DEFAULT #{literal(op[:default])}"
         when :add_index
-          index_definition_sql(table, op)
+          return index_definition_sql(table, op)
         when :drop_index
-          "DROP INDEX #{default_index_name(table, op[:columns])}"
+          return drop_index_sql(table, op)
         when :add_constraint
-          "ALTER TABLE #{quoted_table} ADD #{constraint_definition_sql(op)}"
+          "ADD #{constraint_definition_sql(op)}"
         when :drop_constraint
-          "ALTER TABLE #{quoted_table} DROP CONSTRAINT #{quoted_name}"
+          "DROP CONSTRAINT #{quoted_name}"
         else
           raise Error, "Unsupported ALTER TABLE operation"
         end
+        "ALTER TABLE #{quoted_table} #{alter_table_op}"
       end
 
       # Array of SQL DDL modification statements for the given table,
@@ -72,11 +73,7 @@ module Sequel
         sql << " DEFAULT #{literal(column[:default])}" if column.include?(:default)
         sql << PRIMARY_KEY if column[:primary_key]
         sql << " #{auto_increment_sql}" if column[:auto_increment]
-        if column[:table]
-          sql << " REFERENCES #{quote_identifier(column[:table])}"
-          sql << "(#{quote_identifier(column[:key])})" if column[:key]
-          sql << " ON DELETE #{on_delete_clause(column[:on_delete])}" if column[:on_delete]
-        end
+        sql << column_references_sql(column) if column[:table]
         sql
       end
       
@@ -84,6 +81,14 @@ module Sequel
       # SQL for all given columns, used instead a CREATE TABLE block.
       def column_list_sql(columns)
         columns.map{|c| column_definition_sql(c)}.join(COMMA_SEPARATOR)
+      end
+
+      # SQL DDL fragment for column foreign key references
+      def column_references_sql(column)
+        sql = " REFERENCES #{quote_identifier(column[:table])}"
+        sql << "(#{Array(column[:key]).map{|x| quote_identifier(x)}.join(COMMA_SEPARATOR)})" if column[:key]
+        sql << " ON DELETE #{on_delete_clause(column[:on_delete])}" if column[:on_delete]
+        sql
       end
     
       # SQL DDL fragment specifying a constraint on a table.
@@ -108,6 +113,11 @@ module Sequel
         "#{table_name}_#{columns.join(UNDERSCORE)}_index"
       end
     
+      # The SQL to drop an index for the table.
+      def drop_index_sql(table, op)
+        "DROP INDEX #{quote_identifier(op[:name] || default_index_name(table, op[:columns]))}"
+      end
+
       # SQL DDL statement to drop the table with the given name.
       def drop_table_sql(name)
         "DROP TABLE #{quote_identifier(name)}"
@@ -127,7 +137,7 @@ module Sequel
         elsif index[:where]
           raise Error, "Partial indexes are not supported for this database"
         else
-          "CREATE #{'UNIQUE ' if index[:unique]}INDEX #{index_name} ON #{quote_identifier(table_name)} #{literal(index[:columns])}"
+          "CREATE #{'UNIQUE ' if index[:unique]}INDEX #{quote_identifier(index_name)} ON #{quote_identifier(table_name)} #{literal(index[:columns])}"
         end
       end
     

@@ -1,5 +1,7 @@
 === HEAD
 
+* Quote index names when creating or dropping indexes (jeremyevans, SanityInAnarchy)
+
 * Don't have column accessor methods override plugin instance methods (jeremyevans)
 
 * Allow validation of multiple attributes at once, with built in support for uniqueness checking of multiple columns (jeremyevans)

@@ -17,15 +17,17 @@ module Sequel
       # Use MySQL specific syntax for rename column, set column type, and
       # drop index cases.
       def alter_table_sql(table, op)
+        quoted_table = quote_identifier(table)
+        quoted_name = quote_identifier(op[:name]) if op[:name]
         type = type_literal(op[:type])
         type << '(255)' if type == 'varchar'
         case op[:op]
         when :rename_column
-          "ALTER TABLE #{table} CHANGE COLUMN #{literal(op[:name])} #{literal(op[:new_name])} #{type}"
+          "ALTER TABLE #{quoted_table} CHANGE COLUMN #{quoted_name} #{quote_identifier(op[:new_name])} #{type}"
         when :set_column_type
-          "ALTER TABLE #{table} CHANGE COLUMN #{literal(op[:name])} #{literal(op[:name])} #{type}"
+          "ALTER TABLE #{quoted_table} CHANGE COLUMN #{quoted_name} #{quoted_name} #{type}"
         when :drop_index
-          "DROP INDEX #{default_index_name(table, op[:columns])} ON #{table}"
+          "#{drop_index_sql(table, op)} ON #{quoted_table}"
         else
           super(table, op)
         end
@@ -36,44 +38,24 @@ module Sequel
         AUTO_INCREMENT
       end
       
-      # Handle MySQL specific column syntax (not sure why).
-      def column_definition_sql(column)
-        if column[:type] == :check
-          return constraint_definition_sql(column)
-        end
-        sql = "#{literal(column[:name].to_sym)} #{TYPES[column[:type]]}"
-        column[:size] ||= 255 if column[:type] == :varchar
-        elements = column[:size] || column[:elements]
-        sql << literal(Array(elements)) if elements
-        sql << UNSIGNED if column[:unsigned]
-        sql << UNIQUE if column[:unique]
-        sql << NOT_NULL if column[:null] == false
-        sql << NULL if column[:null] == true
-        sql << " DEFAULT #{literal(column[:default])}" if column.include?(:default)
-        sql << PRIMARY_KEY if column[:primary_key]
-        sql << " #{auto_increment_sql}" if column[:auto_increment]
-        if column[:table]
-          sql << ", FOREIGN KEY (#{literal(column[:name].to_sym)}) REFERENCES #{column[:table]}"
-          sql << literal(Array(column[:key])) if column[:key]
-          sql << " ON DELETE #{on_delete_clause(column[:on_delete])}" if column[:on_delete]
-        end
-        sql
+      # Handle MySQL specific syntax for column references
+      def column_references_sql(column)
+        ", FOREIGN KEY (#{quote_identifier(column[:name])})#{super(column)}"
       end
       
       # Handle MySQL specific index SQL syntax
       def index_definition_sql(table_name, index)
-        index_name = index[:name] || default_index_name(table_name, index[:columns])
-        unique = "UNIQUE " if index[:unique]
-        case index[:type]
+        index_name = quote_identifier(index[:name] || default_index_name(table_name, index[:columns]))
+        index_type = case index[:type]
         when :full_text
-          "CREATE FULLTEXT INDEX #{index_name} ON #{table_name} #{literal(index[:columns])}"
+          "FULLTEXT "
         when :spatial
-          "CREATE SPATIAL INDEX #{index_name} ON #{table_name} #{literal(index[:columns])}"
-        when nil
-          "CREATE #{unique}INDEX #{index_name} ON #{table_name} #{literal(index[:columns])}"
+          "SPATIAL "
         else
-          "CREATE #{unique}INDEX #{index_name} ON #{table_name} #{literal(index[:columns])} USING #{index[:type]}"
+          using = " USING #{index[:type]}" unless index[:type] == nil
+          "UNIQUE " if index[:unique]
         end
+        "CREATE #{index_type}INDEX #{index_name} ON #{quote_identifier(table_name)} #{literal(index[:columns])}#{using}"
       end
       
       # Get version of MySQL server, used for determined capabilities.
