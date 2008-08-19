@@ -1,5 +1,7 @@
 === HEAD
 
+* Disallow abuse of SQL function syntax for types (use :type=>:varchar, :size=>255 instead of :type=>:varchar[255]) (jeremyevans)
+
 * Quote index names when creating or dropping indexes (jeremyevans, SanityInAnarchy)
 
 * Don't have column accessor methods override plugin instance methods (jeremyevans)

@@ -423,7 +423,7 @@ context "A MySQL database" do
     @db[:test2] << {:name => 'mmm', :value => 111, :tre => 'qqqq'}
 
     @db[:test2].columns.should == [:name, :value, :zyx, :tre]
-    @db.rename_column :test2, :tre, :ert, :type => :varchar[255]
+    @db.rename_column :test2, :tre, :ert, :type => :varchar, :size=>255
     @db[:test2].columns.should == [:name, :value, :zyx, :ert]
     @db[:test2].first[:ert].should == 'qqqq'
   end

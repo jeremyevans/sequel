@@ -62,11 +62,7 @@ module Sequel
       # SQL DDL fragment containing the column creation SQL for the given column.
       def column_definition_sql(column)
         return constraint_definition_sql(column) if column[:type] == :check
-        sql = "#{quote_identifier(column[:name])} #{type_literal(TYPES[column[:type]])}"
-        column[:size] ||= 255 if column[:type] == :varchar
-        elements = column[:size] || column[:elements]
-        sql << literal(Array(elements)) if elements
-        sql << UNSIGNED if column[:unsigned]
+        sql = "#{quote_identifier(column[:name])} #{type_literal(column)}"
         sql << UNIQUE if column[:unique]
         sql << NOT_NULL if column[:null] == false
         sql << NULL if column[:null] == true
@@ -225,10 +221,6 @@ module Sequel
         @schema_utility_dataset ||= dataset
       end
       
-      # SQL fragment specifying the type of a given column.
-      def type_literal(t)
-        t.is_a?(Symbol) ? t.to_s : literal(t)
-      end
 
       private
 
@@ -329,6 +321,19 @@ module Sequel
           schema << [row.delete(:column).to_sym, row]
         end
         schema
+      end
+
+      # SQL fragment specifying the type of a given column.
+      def type_literal(column)
+        column[:size] ||= 255 if column[:type] == :varchar
+        elements = column[:size] || column[:elements]
+        "#{type_literal_base(column)}#{literal(Array(elements)) if elements}#{UNSIGNED if column[:unsigned]}"
+      end
+
+      # SQL fragment specifying the base type of a given column,
+      # without the size or elements.
+      def type_literal_base(column)
+        TYPES[column[:type]]
       end
     end
   end

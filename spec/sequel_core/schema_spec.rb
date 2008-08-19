@@ -103,11 +103,11 @@ context "DB#create_table" do
     @db.sqls.should == ["CREATE TABLE cats (name varchar(51))"]
   end
   
-  specify "should accept varchar size as sql function" do
+  specify "should use double precision for double type" do
     @db.create_table(:cats) do
-      column :name, :varchar[102]
+      double :name
     end
-    @db.sqls.should == ["CREATE TABLE cats (name varchar(102))"]
+    @db.sqls.should == ["CREATE TABLE cats (name double precision)"]
   end
 
   specify "should accept foreign keys without options" do

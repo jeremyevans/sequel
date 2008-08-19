@@ -19,13 +19,11 @@ module Sequel
       def alter_table_sql(table, op)
         quoted_table = quote_identifier(table)
         quoted_name = quote_identifier(op[:name]) if op[:name]
-        type = type_literal(op[:type])
-        type << '(255)' if type == 'varchar'
         case op[:op]
         when :rename_column
-          "ALTER TABLE #{quoted_table} CHANGE COLUMN #{quoted_name} #{quote_identifier(op[:new_name])} #{type}"
+          "ALTER TABLE #{quoted_table} CHANGE COLUMN #{quoted_name} #{quote_identifier(op[:new_name])} #{type_literal(op)}"
         when :set_column_type
-          "ALTER TABLE #{quoted_table} CHANGE COLUMN #{quoted_name} #{quoted_name} #{type}"
+          "ALTER TABLE #{quoted_table} CHANGE COLUMN #{quoted_name} #{quoted_name} #{type_literal(op)}"
         when :drop_index
           "#{drop_index_sql(table, op)} ON #{quoted_table}"
         else
