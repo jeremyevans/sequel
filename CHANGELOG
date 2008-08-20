@@ -1,5 +1,7 @@
 === HEAD
 
+* Work with the 2008.08.17 version of the pg gem (erikh)
+
 * Disallow abuse of SQL function syntax for types (use :type=>:varchar, :size=>255 instead of :type=>:varchar[255]) (jeremyevans)
 
 * Quote index names when creating or dropping indexes (jeremyevans, SanityInAnarchy)

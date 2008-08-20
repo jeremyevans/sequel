@@ -172,7 +172,7 @@ module Sequel
         conn = Adapter.connect(
           opts[:host] || 'localhost',
           opts[:port] || 5432,
-          '', '',
+          nil, '',
           opts[:database],
           opts[:user],
           opts[:password]
