@@ -62,7 +62,8 @@ module Sequel
       # Adds a named constraint (or unnamed if name is nil) to the DDL,
       # with the given block or args.
       def constraint(name, *args, &block)
-        @columns << {:name => name, :type => :check, :check => block || args}
+        @columns << {:name => name, :type => :check, :check => block || args,
+                     :constraint_type => :check}
       end
       
       # Return the DDL created by the generator as a array of two elements,
@@ -118,6 +119,7 @@ module Sequel
       # can optionally provide a type argument and/or an options hash argument
       # to change the primary key options. See column for available options.
       def primary_key(name, *args)
+        return composite_primary_key(name) if name.is_a?(Array)
         @primary_key = @db.serial_primary_key_options.merge({:name => name})
         
         if opts = args.pop
@@ -128,6 +130,11 @@ module Sequel
           @primary_key.merge!(opts)
         end
         @primary_key
+      end
+
+      def composite_primary_key(columns)
+        @columns << {:type => :check, :constraint_type => :primary_key,
+                     :name => nil, :columns => columns}
       end
       
       # The name of the primary key for this table, if it has a primary key.

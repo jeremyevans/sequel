@@ -90,7 +90,12 @@ module Sequel
       # SQL DDL fragment specifying a constraint on a table.
       def constraint_definition_sql(constraint)
         sql = constraint[:name] ? "CONSTRAINT #{quote_identifier(constraint[:name])} " : ""
-        sql << "CHECK #{filter_expr(constraint[:check])}"
+        case constraint[:constraint_type]
+        when :check:
+          sql << "CHECK #{filter_expr(constraint[:check])}"
+        when :primary_key:
+          sql << "PRIMARY KEY #{literal(constraint[:columns])}"
+        end
         sql
       end
 
