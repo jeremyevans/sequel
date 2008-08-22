@@ -181,6 +181,40 @@ context "DB#create_table" do
     @db.sqls.should == ["CREATE TABLE cats (project_id integer REFERENCES projects ON DELETE SET DEFAULT)"]
     @db.sqls.clear
   end
+
+  specify "should accept foreign keys with ON UPDATE clause" do
+    @db.create_table(:cats) do
+      foreign_key :project_id, :table => :projects, :on_update => :restrict
+    end
+    @db.sqls.should == ["CREATE TABLE cats (project_id integer REFERENCES projects ON UPDATE RESTRICT)"]
+
+    @db.sqls.clear
+    @db.create_table(:cats) do
+      foreign_key :project_id, :table => :projects, :on_update => :cascade
+    end
+    @db.sqls.should == ["CREATE TABLE cats (project_id integer REFERENCES projects ON UPDATE CASCADE)"]
+
+    @db.sqls.clear
+    @db.create_table(:cats) do
+      foreign_key :project_id, :table => :projects, :on_update => :no_action
+    end
+    @db.sqls.should == ["CREATE TABLE cats (project_id integer REFERENCES projects ON UPDATE NO ACTION)"]
+    @db.sqls.clear
+
+    @db.sqls.clear
+    @db.create_table(:cats) do
+      foreign_key :project_id, :table => :projects, :on_update => :set_null
+    end
+    @db.sqls.should == ["CREATE TABLE cats (project_id integer REFERENCES projects ON UPDATE SET NULL)"]
+    @db.sqls.clear
+
+    @db.sqls.clear
+    @db.create_table(:cats) do
+      foreign_key :project_id, :table => :projects, :on_update => :set_default
+    end
+    @db.sqls.should == ["CREATE TABLE cats (project_id integer REFERENCES projects ON UPDATE SET DEFAULT)"]
+    @db.sqls.clear
+  end
   
   specify "should accept inline index definition" do
     @db.create_table(:cats) do
@@ -210,7 +244,7 @@ context "DB#create_table" do
       text :name
       unique :name
     end
-    @db.sqls.should == ["CREATE TABLE cats (name text)", "CREATE UNIQUE INDEX cats_name_index ON cats (name)"]
+    @db.sqls.should == ["CREATE TABLE cats (name text, UNIQUE (name))", "CREATE UNIQUE INDEX cats_name_index ON cats (name)"]
   end
 
   specify "should raise on full-text index definitions" do
@@ -311,6 +345,92 @@ context "DB#create_table" do
     end
     @db.sqls.should == ["CREATE TABLE cats (CONSTRAINT blah_blah CHECK ((x > 0) AND (y < 1)))"]
   end
+
+  specify "should accept composite primary keys" do
+    @db.create_table(:cats) do
+      integer :a
+      integer :b
+      primary_key [:a, :b]
+    end
+    @db.sqls.should == ["CREATE TABLE cats (a integer, b integer, PRIMARY KEY (a, b))"]
+  end
+
+  specify "should accept named composite primary keys" do
+    @db.create_table(:cats) do
+      integer :a
+      integer :b
+      primary_key [:a, :b], :name => :cpk
+    end
+    @db.sqls.should == ["CREATE TABLE cats (a integer, b integer, CONSTRAINT cpk PRIMARY KEY (a, b))"]
+  end
+
+  specify "should accept composite foreign keys" do
+    @db.create_table(:cats) do
+      integer :a
+      integer :b
+      foreign_key [:a, :b], :abc
+    end
+    @db.sqls.should == ["CREATE TABLE cats (a integer, b integer, FOREIGN KEY (a, b) REFERENCES abc)"]
+  end
+
+  specify "should accept named composite foreign keys" do
+    @db.create_table(:cats) do
+      integer :a
+      integer :b
+      foreign_key [:a, :b], :abc, :name => :cfk
+    end
+    @db.sqls.should == ["CREATE TABLE cats (a integer, b integer, CONSTRAINT cfk FOREIGN KEY (a, b) REFERENCES abc)"]
+  end
+
+  specify "should accept composite foreign keys with arbitrary keys" do
+    @db.create_table(:cats) do
+      integer :a
+      integer :b
+      foreign_key [:a, :b], :abc, :key => [:real_a, :real_b]
+    end
+    @db.sqls.should == ["CREATE TABLE cats (a integer, b integer, FOREIGN KEY (a, b) REFERENCES abc(real_a, real_b))"]
+    @db.sqls.clear
+
+    @db.create_table(:cats) do
+      integer :a
+      integer :b
+      foreign_key [:a, :b], :abc, :key => [:z, :x]
+    end
+    @db.sqls.should == ["CREATE TABLE cats (a integer, b integer, FOREIGN KEY (a, b) REFERENCES abc(z, x))"]
+  end
+
+  specify "should accept composite foreign keys with on delete and on update clauses" do
+    @db.create_table(:cats) do
+      integer :a
+      integer :b
+      foreign_key [:a, :b], :abc, :on_delete => :cascade
+    end
+    @db.sqls.should == ["CREATE TABLE cats (a integer, b integer, FOREIGN KEY (a, b) REFERENCES abc ON DELETE CASCADE)"]
+
+    @db.sqls.clear
+    @db.create_table(:cats) do
+      integer :a
+      integer :b
+      foreign_key [:a, :b], :abc, :on_update => :no_action
+    end
+    @db.sqls.should == ["CREATE TABLE cats (a integer, b integer, FOREIGN KEY (a, b) REFERENCES abc ON UPDATE NO ACTION)"]
+
+    @db.sqls.clear
+    @db.create_table(:cats) do
+      integer :a
+      integer :b
+      foreign_key [:a, :b], :abc, :on_delete => :restrict, :on_update => :set_default
+    end
+    @db.sqls.should == ["CREATE TABLE cats (a integer, b integer, FOREIGN KEY (a, b) REFERENCES abc ON DELETE RESTRICT ON UPDATE SET DEFAULT)"]
+
+    @db.sqls.clear
+    @db.create_table(:cats) do
+      integer :a
+      integer :b
+      foreign_key [:a, :b], :abc, :key => [:x, :y], :on_delete => :set_null, :on_update => :set_null
+    end
+    @db.sqls.should == ["CREATE TABLE cats (a integer, b integer, FOREIGN KEY (a, b) REFERENCES abc(x, y) ON DELETE SET NULL ON UPDATE SET NULL)"]
+  end
 end
 
 context "DB#create_table!" do
@@ -361,11 +481,49 @@ context "DB#alter_table" do
     @db.sqls.should == ["ALTER TABLE cats ADD CONSTRAINT blah_blah CHECK ((x > 0) AND (y < 1))"]
   end
 
+  specify "should support add_unique_constraint" do
+    @db.alter_table(:cats) do
+      add_unique_constraint [:a, :b]
+    end
+    @db.sqls.should == ["ALTER TABLE cats ADD UNIQUE (a, b)"]
+
+    @db.sqls.clear
+    @db.alter_table(:cats) do
+      add_unique_constraint [:a, :b], :name => :ab_uniq
+    end
+    @db.sqls.should == ["ALTER TABLE cats ADD CONSTRAINT ab_uniq UNIQUE (a, b)"]
+  end
+
   specify "should support add_foreign_key" do
     @db.alter_table(:cats) do
       add_foreign_key :node_id, :nodes
     end
     @db.sqls.should == ["ALTER TABLE cats ADD COLUMN node_id integer REFERENCES nodes"]
+  end
+
+  specify "should support add_foreign_key with composite foreign keys" do
+    @db.alter_table(:cats) do
+      add_foreign_key [:node_id, :prop_id], :nodes_props
+    end
+    @db.sqls.should == ["ALTER TABLE cats ADD FOREIGN KEY (node_id, prop_id) REFERENCES nodes_props"]
+
+    @db.sqls.clear
+    @db.alter_table(:cats) do
+      add_foreign_key [:node_id, :prop_id], :nodes_props, :name => :cfk
+    end
+    @db.sqls.should == ["ALTER TABLE cats ADD CONSTRAINT cfk FOREIGN KEY (node_id, prop_id) REFERENCES nodes_props"]
+
+    @db.sqls.clear
+    @db.alter_table(:cats) do
+      add_foreign_key [:node_id, :prop_id], :nodes_props, :key => [:nid, :pid]
+    end
+    @db.sqls.should == ["ALTER TABLE cats ADD FOREIGN KEY (node_id, prop_id) REFERENCES nodes_props(nid, pid)"]
+
+    @db.sqls.clear
+    @db.alter_table(:cats) do
+      add_foreign_key [:node_id, :prop_id], :nodes_props, :on_delete => :restrict, :on_update => :cascade
+    end
+    @db.sqls.should == ["ALTER TABLE cats ADD FOREIGN KEY (node_id, prop_id) REFERENCES nodes_props ON DELETE RESTRICT ON UPDATE CASCADE"]
   end
 
   specify "should support add_index" do
@@ -380,6 +538,19 @@ context "DB#alter_table" do
       add_primary_key :id
     end
     @db.sqls.should == ["ALTER TABLE cats ADD COLUMN id integer PRIMARY KEY AUTOINCREMENT"]
+  end
+
+  specify "should support add_primary_key with composite primary keys" do
+    @db.alter_table(:cats) do
+      add_primary_key [:id, :type]
+    end
+    @db.sqls.should == ["ALTER TABLE cats ADD PRIMARY KEY (id, type)"]
+
+    @db.sqls.clear
+    @db.alter_table(:cats) do
+      add_primary_key [:id, :type], :name => :cpk
+    end
+    @db.sqls.should == ["ALTER TABLE cats ADD CONSTRAINT cpk PRIMARY KEY (id, type)"]
   end
 
   specify "should support drop_column" do

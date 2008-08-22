@@ -12,6 +12,8 @@ describe Sequel::Schema::Generator do
       index :title
       index [:title, :body]
       foreign_key :node_id, :nodes
+      primary_key [:title, :parent_id], :name => :cpk
+      foreign_key [:node_id, :prop_id], :nodes_props, :name => :cfk
     end
     @columns, @indexes = @generator.create_info
   end
@@ -23,7 +25,7 @@ describe Sequel::Schema::Generator do
   end
   
   it "counts primary key, column and constraint definitions as columns" do
-    @columns.size.should == 7
+    @columns.size.should == 9
   end
   
   it "places primary key first" do
@@ -53,6 +55,7 @@ describe Sequel::Schema::Generator do
   it "uses table for foreign key columns, if specified" do
     @columns[6][:table].should == :nodes
     @columns[3][:table].should == nil
+    @columns[8][:table].should == :nodes_props
   end
   
   it "finds columns" do
@@ -70,6 +73,17 @@ describe Sequel::Schema::Generator do
     @columns[5][:name].should == :xxx
     @columns[5][:type].should == :check
     @columns[5][:check].should be_a_kind_of(Proc)
+
+    @columns[7][:name].should == :cpk
+    @columns[7][:type].should == :check
+    @columns[7][:constraint_type].should == :primary_key
+    @columns[7][:columns].should == [ :title, :parent_id ]
+
+    @columns[8][:name].should == :cfk
+    @columns[8][:type].should == :check
+    @columns[8][:constraint_type].should == :foreign_key
+    @columns[8][:columns].should == [ :node_id, :prop_id ]
+    @columns[8][:table].should == :nodes_props
   end
   
   it "creates indexes" do
@@ -95,8 +109,11 @@ describe Sequel::Schema::AlterTableGenerator do
       add_index :blah, :where => {:something => true}
       add_constraint :con1, ':fred > 100'
       drop_constraint :con2
+      add_unique_constraint [:aaa, :bbb, :ccc], :name => :con3
       add_primary_key :id
       add_foreign_key :node_id, :nodes
+      add_primary_key [:aaa, :bbb]
+      add_foreign_key [:node_id, :prop_id], :nodes_props
     end
   end
   
@@ -113,10 +130,13 @@ describe Sequel::Schema::AlterTableGenerator do
       {:op => :add_index, :columns => [:geom], :type => :spatial},
       {:op => :add_index, :columns => [:blah], :type => :hash},
       {:op => :add_index, :columns => [:blah], :where => {:something => true}},
-      {:op => :add_constraint, :type => :check, :name => :con1, :check => [':fred > 100']},
+      {:op => :add_constraint, :type => :check, :constraint_type => :check, :name => :con1, :check => [':fred > 100']},
       {:op => :drop_constraint, :name => :con2},
+      {:op => :add_constraint, :type => :check, :constraint_type => :unique, :name => :con3, :columns => [:aaa, :bbb, :ccc]},
       {:op => :add_column, :name => :id, :type => :integer, :primary_key=>true, :auto_increment=>true},
-      {:op => :add_column, :name => :node_id, :type => :integer, :table=>:nodes}
+      {:op => :add_column, :name => :node_id, :type => :integer, :table=>:nodes},
+      {:op => :add_constraint, :type => :check, :constraint_type => :primary_key, :columns => [:aaa, :bbb]},
+      {:op => :add_constraint, :type => :check, :constraint_type => :foreign_key, :columns => [:node_id, :prop_id], :table => :nodes_props}
     ]
   end
 end

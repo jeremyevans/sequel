@@ -84,6 +84,7 @@ module Sequel
         sql = " REFERENCES #{quote_identifier(column[:table])}"
         sql << "(#{Array(column[:key]).map{|x| quote_identifier(x)}.join(COMMA_SEPARATOR)})" if column[:key]
         sql << " ON DELETE #{on_delete_clause(column[:on_delete])}" if column[:on_delete]
+        sql << " ON UPDATE #{on_delete_clause(column[:on_update])}" if column[:on_update]
         sql
       end
     
@@ -91,10 +92,15 @@ module Sequel
       def constraint_definition_sql(constraint)
         sql = constraint[:name] ? "CONSTRAINT #{quote_identifier(constraint[:name])} " : ""
         case constraint[:constraint_type]
-        when :check:
-          sql << "CHECK #{filter_expr(constraint[:check])}"
         when :primary_key:
           sql << "PRIMARY KEY #{literal(constraint[:columns])}"
+        when :foreign_key:
+          sql << "FOREIGN KEY #{literal(constraint[:columns])}"
+          sql << column_references_sql(constraint)
+        when :unique:
+          sql << "UNIQUE #{literal(constraint[:columns])}"
+        else
+          sql << "CHECK #{filter_expr(constraint[:check])}"
         end
         sql
       end

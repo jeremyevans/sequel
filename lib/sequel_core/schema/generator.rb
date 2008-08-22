@@ -48,6 +48,8 @@ module Sequel
       #   to whatever the database default is.
       # * :on_delete - Specify the behavior of this column when being deleted.
       #   See Schema::SQL#on_delete_clause for options.
+      # * :on_update - Specify the behavior of this column when being updated.
+      #   See Schema::SQL#on_delete_clause for options.
       # * :size - The size of the column, generally used with string
       #   columns to specify the maximum number of characters the column will hold.
       # * :unique - Mark the column is unique, generally has the same effect as
@@ -86,6 +88,7 @@ module Sequel
         else
           raise(Error, "The seconds argument to foreign_key should be a Hash, Symbol, or nil")
         end
+        return composite_foreign_key(name, opts) if name.is_a?(Array)
         column(name, :integer, opts)
       end
       
@@ -119,7 +122,7 @@ module Sequel
       # can optionally provide a type argument and/or an options hash argument
       # to change the primary key options. See column for available options.
       def primary_key(name, *args)
-        return composite_primary_key(name) if name.is_a?(Array)
+        return composite_primary_key(name, *args) if name.is_a?(Array)
         @primary_key = @db.serial_primary_key_options.merge({:name => name})
         
         if opts = args.pop
@@ -132,11 +135,6 @@ module Sequel
         @primary_key
       end
 
-      def composite_primary_key(columns)
-        @columns << {:type => :check, :constraint_type => :primary_key,
-                     :name => nil, :columns => columns}
-      end
-      
       # The name of the primary key for this table, if it has a primary key.
       def primary_key_name
         @primary_key[:name] if @primary_key
@@ -150,6 +148,21 @@ module Sequel
       # Add a unique index on the given columns to the DDL.
       def unique(columns, opts = {})
         index(columns, opts.merge(:unique => true))
+        @columns << {:type => :check, :constraint_type => :unique,
+                     :name => nil, :columns => Array(columns)}.merge(opts)
+      end
+
+      private
+
+      def composite_primary_key(columns, *args)
+        opts = args.pop || {}
+        @columns << {:type => :check, :constraint_type => :primary_key,
+                     :name => nil, :columns => columns}.merge(opts)
+      end
+
+      def composite_foreign_key(columns, opts)
+        @columns << {:type => :check, :constraint_type => :foreign_key,
+                     :name => nil, :columns => columns }.merge(opts)
       end
     end
   
@@ -177,12 +190,18 @@ module Sequel
       # See Generator#constraint.
       def add_constraint(name, *args, &block)
         @operations << {:op => :add_constraint, :name => name, :type => :check, \
-          :check => block || args}
+          :constraint_type => :check, :check => block || args}
+      end
+
+      def add_unique_constraint(columns, opts = {})
+        @operations << {:op => :add_constraint, :type => :check,
+          :constraint_type => :unique, :columns => Array(columns)}.merge(opts)
       end
 
       # Add a foreign key with the given name and referencing the given table
       # to the DDL for the table.  See Generator#column for the available options.
       def add_foreign_key(name, table, opts = {})
+        return add_composite_foreign_key(name, table, opts) if name.is_a?(Array)
         add_column(name, :integer, {:table=>table}.merge(opts))
       end
       
@@ -201,6 +220,7 @@ module Sequel
       # Add a primary key to the DDL for the table.  See Generator#column
       # for the available options.
       def add_primary_key(name, opts = {})
+        return add_composite_primary_key(name, opts) if name.is_a?(Array)
         opts = @db.serial_primary_key_options.merge(opts)
         add_column(name, opts.delete(:type), opts)
       end
@@ -239,6 +259,19 @@ module Sequel
       # Modify a column's type in the DDL for the table.
       def set_column_type(name, type)
         @operations << {:op => :set_column_type, :name => name, :type => type}
+      end
+
+      private
+
+      def add_composite_primary_key(columns, opts)
+        @operations << {:op => :add_constraint, :type => :check,
+          :constraint_type => :primary_key, :columns => columns}.merge(opts)
+      end
+
+      def add_composite_foreign_key(columns, table, opts)
+        @operations << {:op => :add_constraint, :type => :check,
+          :constraint_type => :foreign_key, :columns => columns,
+          :table => table}.merge(opts)
       end
     end
   end
