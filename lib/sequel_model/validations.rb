@@ -320,6 +320,7 @@ module Sequel
 
       atts << {:if=>opts[:if], :tag=>opts[:tag]||:uniqueness}
       validates_each(*atts) do |o, a, v|
+        error_field = a
         a = Array(a)
         v = Array(v)
         next unless v.any? or opts[:allow_nil] == false
@@ -341,7 +342,7 @@ module Sequel
         else
           false
         end
-        o.errors[a] << opts[:message] unless allow
+        o.errors[error_field] << opts[:message] unless allow
       end
     end
 
