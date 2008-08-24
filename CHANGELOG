@@ -1,5 +1,7 @@
 === HEAD
 
+* Make the schema generators support composite primary and foreign keys and unique constraints (jarredholman)
+
 * Work with the 2008.08.17 version of the pg gem (erikh)
 
 * Disallow abuse of SQL function syntax for types (use :type=>:varchar, :size=>255 instead of :type=>:varchar[255]) (jeremyevans)
