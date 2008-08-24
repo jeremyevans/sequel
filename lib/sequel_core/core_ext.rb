@@ -162,7 +162,7 @@ class String
     begin
       Date.parse(self)
     rescue => e
-      raise Sequel::Error::InvalidValue, "Invalid date value '#{self}' (#{e.message})"
+      raise Sequel::Error::InvalidValue, "Invalid Date value '#{self}' (#{e.message})"
     end
   end
 
@@ -171,7 +171,7 @@ class String
     begin
       DateTime.parse(self)
     rescue => e
-      raise Sequel::Error::InvalidValue, "Invalid date value '#{self}' (#{e.message})"
+      raise Sequel::Error::InvalidValue, "Invalid DateTime value '#{self}' (#{e.message})"
     end
   end
 
@@ -181,7 +181,7 @@ class String
     begin
       Sequel.datetime_class.parse(self)
     rescue => e
-      raise Sequel::Error::InvalidValue, "Invalid time value '#{self}' (#{e.message})"
+      raise Sequel::Error::InvalidValue, "Invalid #{Sequel.datetime_class} value '#{self}' (#{e.message})"
     end
   end
 
@@ -190,7 +190,7 @@ class String
     begin
       Time.parse(self)
     rescue => e
-      raise Sequel::Error::InvalidValue, "Invalid time value '#{self}' (#{e.message})"
+      raise Sequel::Error::InvalidValue, "Invalid Time value '#{self}' (#{e.message})"
     end
   end
 end
