@@ -92,12 +92,12 @@ module Sequel
       def constraint_definition_sql(constraint)
         sql = constraint[:name] ? "CONSTRAINT #{quote_identifier(constraint[:name])} " : ""
         case constraint[:constraint_type]
-        when :primary_key:
+        when :primary_key
           sql << "PRIMARY KEY #{literal(constraint[:columns])}"
-        when :foreign_key:
+        when :foreign_key
           sql << "FOREIGN KEY #{literal(constraint[:columns])}"
           sql << column_references_sql(constraint)
-        when :unique:
+        when :unique
           sql << "UNIQUE #{literal(constraint[:columns])}"
         else
           sql << "CHECK #{filter_expr(constraint[:check])}"
