@@ -8,13 +8,17 @@ module Sequel
       GUARDED_DRV_NAME = /^\{.+\}$/.freeze
       DRV_NAME_GUARDS = '{%s}'.freeze
 
-      def connect(server)
-        opts = server_opts(server)
+      def initialize(opts)
+        super(opts)
         case opts[:db_type]
         when 'mssql'
           require 'sequel_core/adapters/shared/mssql'
           extend Sequel::MSSQL::DatabaseMethods
         end
+      end
+
+      def connect(server)
+        opts = server_opts(server)
         if opts.include? :driver
           drv = ::ODBC::Driver.new
           drv.name = 'Sequel ODBC Driver130'
