@@ -56,7 +56,12 @@ rescue LoadError => e
           end
         end
       end
-      alias_method :finish, :close unless method_defined?(:finish) 
+      alias_method :finish, :close unless method_defined?(:finish)
+      alias_method :async_exec, :exec unless method_defined?(:async_exec)
+      unless method_defined?(:block)
+        def block(timeout=nil)
+        end
+      end
     end
     class PGresult 
       alias_method :nfields, :num_fields unless method_defined?(:nfields) 
@@ -119,11 +124,13 @@ module Sequel
       def execute(sql, args=nil)
         q = nil
         begin
-          q = args ? exec(sql, args) : exec(sql)
+          q = args ? async_exec(sql, args) : async_exec(sql)
         rescue PGError => e
           raise if status == Adapter::CONNECTION_OK
           reset
-          q = args ? exec(sql, args) : exec(sql)
+          q = args ? async_exec(sql, args) : async_exec(sql)
+        ensure
+          block
         end
         begin
           block_given? ? yield(q) : q.cmd_tuples
