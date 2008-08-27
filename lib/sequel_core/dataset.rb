@@ -183,7 +183,8 @@ module Sequel
       end
     end
 
-    # Deletes the records in the dataset. Adapters should override this method.
+    # Deletes the records in the dataset.  The returned value is generally the
+    # number of records deleted, but that is adapter dependent.
     def delete(*args)
       execute_dui(delete_sql(*args))
     end
@@ -205,13 +206,14 @@ module Sequel
     end
 
     # Executes a select query and fetches records, passing each record to the
-    # supplied block. Adapters should override this method.
+    # supplied block.  The yielded records are generally hashes with symbol keys,
+    # but that is adapter dependent.
     def fetch_rows(sql, &block)
       raise NotImplementedError, NOTIMPL_MSG
     end
   
-    # Inserts values into the associated table. Adapters should override this
-    # method.
+    # Inserts values into the associated table.  The returned value is generally
+    # the value of the primary key for the inserted row, but that is adapter dependent.
     def insert(*values)
       execute_dui(insert_sql(*values))
     end
@@ -399,7 +401,8 @@ module Sequel
       end
     end
     
-    # Updates values for the dataset. Adapters should override this method.
+    # Updates values for the dataset.  The returned value is generally the
+    # number of rows updated, but that is adapter dependent.
     def update(*args)
       execute_dui(update_sql(*args))
     end
