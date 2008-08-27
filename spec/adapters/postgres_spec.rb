@@ -21,6 +21,10 @@ POSTGRES_DB.create_table! :test4 do
   varchar :name, :size => 20
   bytea :value
 end
+POSTGRES_DB.create_table! :test5 do
+  primary_key :xid
+  integer :value
+end
 
 context "A PostgreSQL database" do
   setup do
@@ -150,11 +154,11 @@ context "A PostgreSQL dataset" do
     @d.select(:test[:abc__def, 'hello'].as(:x2)).sql.should == \
       "SELECT test(\"abc\".\"def\", 'hello') AS \"x2\" FROM \"test\""
 
-    @d.insert_sql(:value => 333).should == \
-      'INSERT INTO "test" ("value") VALUES (333)'
+    @d.insert_sql(:value => 333).should =~ \
+      /\AINSERT INTO "test" \("value"\) VALUES \(333\)( RETURNING NULL)?\z/
 
-    @d.insert_sql(:x => :y).should == \
-      'INSERT INTO "test" ("x") VALUES ("y")'
+    @d.insert_sql(:x => :y).should =~ \
+      /\AINSERT INTO "test" \("x"\) VALUES \("y"\)( RETURNING NULL)?\z/
   end
   
   specify "should quote fields correctly when reversing the order if quoting identifiers" do
@@ -275,7 +279,7 @@ context "A PostgreSQL dataset" do
   end
 end
 
-context "A PostgreSQL dataaset with a timestamp field" do
+context "A PostgreSQL dataset with a timestamp field" do
   setup do
     @d = POSTGRES_DB[:test3]
     @d.delete
@@ -417,7 +421,7 @@ context "Postgres::Dataset#multi_insert_sql / #import" do
   end
   
   specify "should return separate insert statements if server_version < 80200" do
-    @ds.db.meta_def(:server_version) {80199}
+    @ds.meta_def(:server_version){80199}
     
     @ds.multi_insert_sql([:x, :y], [[1, 2], [3, 4]]).should == [
       'INSERT INTO test (x, y) VALUES (1, 2)',
@@ -426,16 +430,48 @@ context "Postgres::Dataset#multi_insert_sql / #import" do
   end
   
   specify "should a single insert statement if server_version >= 80200" do
-    @ds.db.meta_def(:server_version) {80200}
-    
+    @ds.meta_def(:server_version){80200}
+   
     @ds.multi_insert_sql([:x, :y], [[1, 2], [3, 4]]).should == [
       'INSERT INTO test (x, y) VALUES (1, 2), (3, 4)'
     ]
 
-    @ds.db.meta_def(:server_version) {80201}
+    @ds.meta_def(:server_version){80201}
     
     @ds.multi_insert_sql([:x, :y], [[1, 2], [3, 4]]).should == [
       'INSERT INTO test (x, y) VALUES (1, 2), (3, 4)'
     ]
+  end
+end
+
+context "Postgres::Dataset#insert" do
+  setup do
+    @ds = POSTGRES_DB[:test5]
+    @ds.delete
+  end
+  
+  specify "should not using RETURNING primary_key if server_version < 80200" do
+    @ds.meta_def(:server_version){80100}
+    @ds.insert_sql(:value=>10).should == 'INSERT INTO test5 (value) VALUES (10)'
+  end
+
+  specify "should using RETURNING primary_key if server_version >= 80200" do
+    @ds.meta_def(:server_version){80201}
+    @ds.insert_sql(:value=>10).should == 'INSERT INTO test5 (value) VALUES (10) RETURNING xid'
+  end
+
+  specify "should correctly return the inserted record's primary key value" do
+    value1 = 10
+    id1 = @ds.insert(:value=>value1)
+    @ds.first(:xid=>id1)[:value].should == value1
+    value2 = 20
+    id2 = @ds.insert(:value=>value2)
+    @ds.first(:xid=>id2)[:value].should == value2
+  end
+
+  specify "should return nil if the table has no primary key" do
+    ds = POSTGRES_DB[:test4]
+    ds.delete
+    ds.insert(:name=>'a').should == nil
   end
 end

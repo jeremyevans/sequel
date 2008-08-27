@@ -103,6 +103,16 @@ module Sequel
       SQL_RELEASE_SAVEPOINT = 'RELEASE SAVEPOINT autopoint_%d'.freeze
       SYSTEM_TABLE_REGEXP = /^pg|sql/.freeze
       
+      # Remove the cached entries for primary keys and sequences when dropping a table.
+      def drop_table(*names)
+        names.each do |name|
+          s = name.to_sym
+          @primary_keys.delete(s)
+          @primary_key_sequences.delete(s)
+        end
+        super
+      end
+
       # Always CASCADE the table drop
       def drop_table_sql(name)
         "DROP TABLE #{name} CASCADE"
@@ -135,6 +145,11 @@ module Sequel
           filter(:pg_class__relfilenode=>:pg_locks__relation)
       end
       
+      # Return primary key for the given table.
+      def primary_key(table, server=nil)
+        synchronize(server){|conn| primary_key_for_table(conn, table)}
+      end
+
       # PostgreSQL uses SERIAL psuedo-type instead of AUTOINCREMENT for
       # managing incrementing primary keys.
       def serial_primary_key_options
@@ -328,10 +343,24 @@ module Sequel
       
       # Insert given values into the database.
       def insert(*values)
-        execute_insert(insert_sql(*values), :table=>opts[:from].first,
-          :values=>values.size == 1 ? values.first : values)
+        if !@opts[:sql] and server_version >= 80200
+          single_value(:sql=>insert_sql(*values))
+        else
+          execute_insert(insert_sql(*values), :table=>opts[:from].first,
+            :values=>values.size == 1 ? values.first : values)
+        end
       end
-      
+
+      # Use the RETURNING clause if not using custom SQL and the server supports it.
+      def insert_sql(*values)
+        sql = super
+        if !@opts[:sql] and server_version >= 80200
+          pk = db.primary_key(opts[:from].first)
+          sql << " RETURNING #{pk ? quote_identifier(pk) : :NULL}"
+        end
+        sql
+      end
+
       # Handle microseconds for Time and DateTime values, as well as PostgreSQL
       # specific boolean values and string escaping.
       def literal(v)
@@ -368,7 +397,7 @@ module Sequel
       
       # For PostgreSQL version > 8.2, allow inserting multiple rows at once.
       def multi_insert_sql(columns, values)
-        return super if @db.server_version < 80200
+        return super if server_version < 80200
         
         # postgresql 8.2 introduces support for multi-row insert
         columns = column_list(columns)
@@ -400,6 +429,11 @@ module Sequel
       # Call execute_insert on the database object with the given values.
       def execute_insert(sql, opts={})
         @db.execute_insert(sql, {:server=>@opts[:server] || :default}.merge(opts))
+      end
+
+      # The version of the database server
+      def server_version
+        db.server_version(@opts[:server])
       end
     end
   end
