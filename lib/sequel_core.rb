@@ -22,21 +22,30 @@ end
 #
 #   Sequel.sqlite('blog.db'){|db| puts db.users.count}  
 #
-# Sequel can use either Time or DateTime for times returned from the
-# database.  It defaults to Time.  To change it to DateTime, use:
-#
-#   Sequel.datetime_class = DateTime
-#
 # Sequel converts the column type tinyint to a boolean by default,
 # you can override the conversion to use tinyint as an integer:
 #
 #   Sequel.convert_tinyint_to_bool = false
+#
+# Sequel converts two digit years in Dates and DateTimes by default,
+# so 01/02/03 is interpreted at January 2nd, 2003, and 12/13/99 is interpreted
+# as December 13, 1999.. You can override this # to treat those dates as
+# January 2nd, 0003 and December 13, 0099, respectively, by setting: 
+#
+#   Sequel.convert_two_digit_years = false
+#
+# Sequel can use either Time or DateTime for times returned from the
+# database.  It defaults to Time.  To change it to DateTime, use:
+#
+#   Sequel.datetime_class = DateTime
 module Sequel
-  @datetime_class = Time
   @convert_tinyint_to_bool = true
+  @convert_two_digit_years = true
+  @datetime_class = Time
   
-  metaattr_accessor :datetime_class
   metaattr_accessor :convert_tinyint_to_bool
+  metaattr_accessor :convert_two_digit_years
+  metaattr_accessor :datetime_class
 
   # Creates a new database object based on the supplied connection string
   # and optional arguments.  The specified scheme determines the database

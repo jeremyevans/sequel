@@ -160,7 +160,7 @@ class String
   # Converts a string into a Date object.
   def to_date
     begin
-      Date.parse(self)
+      Date.parse(self, Sequel.convert_two_digit_years)
     rescue => e
       raise Sequel::Error::InvalidValue, "Invalid Date value '#{self}' (#{e.message})"
     end
@@ -169,7 +169,7 @@ class String
   # Converts a string into a DateTime object.
   def to_datetime
     begin
-      DateTime.parse(self)
+      DateTime.parse(self, Sequel.convert_two_digit_years)
     rescue => e
       raise Sequel::Error::InvalidValue, "Invalid DateTime value '#{self}' (#{e.message})"
     end
@@ -179,7 +179,11 @@ class String
   # value of Sequel.datetime_class
   def to_sequel_time
     begin
-      Sequel.datetime_class.parse(self)
+      if Sequel.datetime_class == DateTime
+        DateTime.parse(self, Sequel.convert_two_digit_years)
+      else
+        Sequel.datetime_class.parse(self)
+      end
     rescue => e
       raise Sequel::Error::InvalidValue, "Invalid #{Sequel.datetime_class} value '#{self}' (#{e.message})"
     end

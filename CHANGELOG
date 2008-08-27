@@ -1,5 +1,7 @@
 === HEAD
 
+* Default to converting 2 digit years, use Sequel.convert_two_digit_years = false to get back the old behavior (jeremyevans)
+
 * Make the PostgreSQL adapter with the pg driver use async_exec, so it doesn't block the entire interpreter (jeremyevans)
 
 * Make the schema generators support composite primary and foreign keys and unique constraints (jarredholman)
