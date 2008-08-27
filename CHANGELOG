@@ -1,5 +1,7 @@
 === HEAD
 
+* Make insert_sql, delete_sql, and update_sql respect the :sql option (jeremyevans)
+
 * Default to converting 2 digit years, use Sequel.convert_two_digit_years = false to get back the old behavior (jeremyevans)
 
 * Make the PostgreSQL adapter with the pg driver use async_exec, so it doesn't block the entire interpreter (jeremyevans)

@@ -70,6 +70,10 @@ module Sequel
     def delete_sql(opts = nil)
       opts = opts ? @opts.merge(opts) : @opts
 
+      if sql = opts[:sql]
+        return sql
+      end
+
       if opts[:group]
         raise Error::InvalidOperation, "Grouped datasets cannot be deleted from"
       elsif opts[:from].is_a?(Array) && opts[:from].size > 1
@@ -256,6 +260,10 @@ module Sequel
     #   dataset.insert_sql(:a => 1, :b => 2) #=>
     #     'INSERT INTO items (a, b) VALUES (1, 2)'
     def insert_sql(*values)
+      if sql = @opts[:sql]
+        return sql
+      end
+
       if values.empty?
         insert_default_values_sql
       else
@@ -697,6 +705,10 @@ module Sequel
     # than one table.
     def update_sql(values = {}, opts = nil)
       opts = opts ? @opts.merge(opts) : @opts
+
+      if sql = opts[:sql]
+        return sql
+      end
 
       if opts[:group]
         raise Error::InvalidOperation, "A grouped dataset cannot be updated"

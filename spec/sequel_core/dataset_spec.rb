@@ -161,6 +161,16 @@ context "A simple dataset" do
     @dataset.select_sql(:sql => 'xxx yyy zzz').should ==
       "xxx yyy zzz"
   end
+
+  specify "should use the :sql option for all sql methods" do
+    sql = "X"
+    ds = Sequel::Dataset.new(nil, :sql=>sql)
+    ds.sql.should == sql
+    ds.select_sql.should == sql
+    ds.insert_sql.should == sql
+    ds.delete_sql.should == sql
+    ds.update_sql.should == sql
+  end
 end
 
 context "A dataset with multiple tables in its FROM clause" do
