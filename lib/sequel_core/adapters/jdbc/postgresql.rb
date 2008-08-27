@@ -21,7 +21,7 @@ module Sequel
             rows = stmt.send(method, sql)
             yield(rows) if block_given?
           rescue NativeException => e
-            raise Error, e.message
+            raise_error(e)
           ensure
             stmt.close
           end

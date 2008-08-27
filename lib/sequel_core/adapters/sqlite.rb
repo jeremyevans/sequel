@@ -78,7 +78,7 @@ module Sequel
             conn.transaction{result = yield(conn)}
             result
           rescue ::Exception => e
-            raise (SQLite3::Exception === e ? Error.new(e.message) : e) unless Error::Rollback === e
+            transaction_error(e, SQLite3::Exception)
           end
         end
       end
@@ -92,7 +92,7 @@ module Sequel
           log_info(sql, opts[:arguments])
           synchronize(opts[:server]){|conn| yield conn}
         rescue SQLite3::Exception => e
-          raise Error::InvalidStatement, "#{sql}\r\n#{e.message}"
+          raise_error(e)
         end
       end
       

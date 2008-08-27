@@ -27,4 +27,8 @@ module Sequel
     # A transaction block will catch this error and won't pass further up the stack.
     class Rollback < Error ; end
   end  
+
+  # Generic error raised by the database adapters, indicating a
+  # problem originating from the database server.
+  class DatabaseError < Error; end
 end

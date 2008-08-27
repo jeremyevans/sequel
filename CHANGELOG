@@ -1,5 +1,7 @@
 === HEAD
 
+* Raise Sequel::DatabaseError instead of generic Sequel::Error for database errors, don't swallow tracebacks (jeremyevans)
+
 * Use INSERT ... RETURNING ... with PostgreSQL 8.2 and higher (jeremyevans)
 
 * Make insert_sql, delete_sql, and update_sql respect the :sql option (jeremyevans)

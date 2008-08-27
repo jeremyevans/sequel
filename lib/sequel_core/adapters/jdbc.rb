@@ -126,7 +126,7 @@ module Sequel
               end
             end
           rescue NativeException, JavaSQL::SQLException => e
-            raise Error, e.message
+            raise_error(e)
           ensure
             stmt.close
           end
@@ -232,7 +232,7 @@ module Sequel
               end
             end
           rescue NativeException, JavaSQL::SQLException => e
-            raise Error, e.message
+            raise_error(e)
           ensure
             cps.close unless name
           end

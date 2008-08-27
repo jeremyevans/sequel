@@ -137,7 +137,7 @@ module Sequel
         begin
           synchronize(opts[:server]){|conn| _execute(conn, sql, opts, &block)}
         rescue Mysql::Error => e
-          raise Error.new(e.message)
+          raise_error(e)
         end
       end
       
@@ -163,7 +163,7 @@ module Sequel
           rescue ::Exception => e
             log_info(SQL_ROLLBACK)
             conn.query(SQL_ROLLBACK)
-            raise (Mysql::Error === e ? Error.new(e.message) : e) unless Error::Rollback === e
+            transaction_error(e, Mysql::Error)
           ensure
             unless e
               log_info(SQL_COMMIT)

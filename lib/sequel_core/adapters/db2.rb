@@ -69,7 +69,7 @@ module Sequel
         when SQL_SUCCESS, SQL_SUCCESS_WITH_INFO
           nil
         else
-          raise Error, msg
+          raise DatabaseError, msg
         end
       end
     end

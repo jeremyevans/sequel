@@ -196,7 +196,7 @@ module Sequel
               log_info(SQL_ROLLBACK)
               conn.execute(SQL_ROLLBACK) rescue nil
             end
-            raise convert_pgerror(e) unless Error::Rollback === e
+            transaction_error(e, *CONVERTED_EXCEPTIONS)
           ensure
             unless e
               begin
@@ -209,7 +209,7 @@ module Sequel
                 end
               rescue => e
                 log_info(e.message)
-                raise convert_pgerror(e)
+                raise_error(e, :classes=>CONVERTED_EXCEPTIONS)
               end
             end
             conn.transaction_depth -= 1
@@ -218,11 +218,6 @@ module Sequel
       end
 
       private
-      
-      # Convert the exception to a Sequel::Error if it is in CONVERTED_EXCEPTIONS.
-      def convert_pgerror(e)
-        e.is_one_of?(*CONVERTED_EXCEPTIONS) ? Error.new(e.message) : e
-      end
       
       # The result of the insert for the given table and values.  If values
       # is an array, assume the first column is the primary key and return
@@ -242,7 +237,7 @@ module Sequel
                 conn.last_insert_id(seq)
               end
             rescue Exception => e
-              raise convert_pgerror(e) unless RE_CURRVAL_ERROR.match(e.message)
+              raise_error(e, :classes=>CONVERTED_EXCEPTIONS) unless RE_CURRVAL_ERROR.match(e.message)
             end
           end
         when Array

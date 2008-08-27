@@ -209,7 +209,7 @@ module Sequel
           synchronize(opts[:server]){|conn| conn.execute(sql, opts[:arguments], &block)}
         rescue => e
           log_info(e.message)
-          raise convert_pgerror(e)
+          raise_error(e, :classes=>CONVERTED_EXCEPTIONS)
         end
       end
       
@@ -225,7 +225,7 @@ module Sequel
           end
         rescue => e
           log_info(e.message)
-          raise convert_pgerror(e)
+          raise_error(e, :classes=>CONVERTED_EXCEPTIONS)
         end
       end
       

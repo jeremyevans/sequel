@@ -371,7 +371,7 @@ module Sequel
         rescue Exception => e
           log_info(SQL_ROLLBACK)
           conn.execute(SQL_ROLLBACK)
-          raise e unless Error::Rollback === e
+          transaction_error(e)
         ensure
           unless e
             log_info(SQL_COMMIT)
@@ -494,6 +494,23 @@ module Sequel
     # The default options for the connection pool.
     def connection_pool_default_options
       {}
+    end
+
+    # Convert the given exception to a DatabaseError, keeping message
+    # and traceback.
+    def raise_error(exception, opts={})
+      if !opts[:classes] || exception.is_one_of?(*opts[:classes])
+        e = DatabaseError.new("#{exception.class} #{exception.message}")
+        e.set_backtrace(exception.backtrace)
+        raise e
+      else
+        raise
+      end
+    end
+
+    # Raise a database error unless the exception is an Error::Rollback.
+    def transaction_error(e, *classes)
+      raise_error(e, :classes=>classes) unless Error::Rollback === e
     end
   end
 end
