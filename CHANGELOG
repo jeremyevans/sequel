@@ -1,5 +1,7 @@
 === HEAD
 
+* Add Dataset #set_defaults and #set_overrides, used for scoping the values used in insert/update statements (jeremyevans)
+
 * Allow Models to use the RETURNING clause when inserting records on PostgreSQL (jeremyevans)
 
 * Raise Sequel::DatabaseError instead of generic Sequel::Error for database errors, don't swallow tracebacks (jeremyevans)

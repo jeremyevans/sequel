@@ -262,6 +262,12 @@ module Sequel
       update(*args)
     end
 
+    # Set the default values for insert and update statements.  The values passed
+    # to insert or update are merged into this hash.
+    def set_defaults(hash)
+      clone(:defaults=>(@opts[:defaults]||{}).merge(hash))
+    end
+
     # Associates or disassociates the dataset with a model(s). If
     # nil is specified, the dataset is turned into a naked dataset and returns
     # records as hashes. If a model class specified, the dataset is modified
@@ -344,6 +350,12 @@ module Sequel
       self
     end
     
+    # Set values that override hash arguments given to insert and update statements.
+    # This hash is merged into the hash provided to insert or update.
+    def set_overrides(hash)
+      clone(:overrides=>hash.merge(@opts[:overrides]||{}))
+    end
+
     # Sets a value transform which is used to convert values loaded and saved
     # to/from the database. The transform should be supplied as a hash. Each
     # value in the hash should be an array containing two proc objects - one

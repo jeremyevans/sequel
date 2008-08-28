@@ -264,41 +264,42 @@ module Sequel
         return sql
       end
 
-      if values.empty?
-        insert_default_values_sql
-      else
-        values = values[0] if values.size == 1
-        
-        # if hash or array with keys we need to transform the values
-        if @transform && (values.is_a?(Hash) || (values.is_a?(Array) && values.keys))
-          values = transform_save(values)
+      from = source_list(@opts[:from])
+      case values.size
+      when 0
+        values = {}
+      when 1
+        vals = values.at(0)
+        if vals.is_one_of?(Hash, Dataset, Array)
+          values = vals
+        elsif vals.respond_to?(:values)
+          values = vals.values
         end
-        from = source_list(@opts[:from])
+      end
 
-        case values
-        when Array
-          if values.empty?
-            insert_default_values_sql
-          else
-            "INSERT INTO #{from} VALUES #{literal(values)}"
-          end
-        when Hash
-          if values.empty?
-            insert_default_values_sql
-          else
-            fl, vl = [], []
-            values.each {|k, v| fl << literal(k.is_a?(String) ? k.to_sym : k); vl << literal(v)}
-            "INSERT INTO #{from} (#{fl.join(COMMA_SEPARATOR)}) VALUES (#{vl.join(COMMA_SEPARATOR)})"
-          end
-        when Dataset
-          "INSERT INTO #{from} #{literal(values)}"
+      case values
+      when Array
+        if values.empty?
+          insert_default_values_sql
         else
-          if values.respond_to?(:values)
-            insert_sql(values.values)
-          else
-            "INSERT INTO #{from} VALUES (#{literal(values)})"
-          end
+          "INSERT INTO #{from} VALUES #{literal(values)}"
         end
+      when Hash
+        values = @opts[:defaults].merge(values) if @opts[:defaults]
+        values = values.merge(@opts[:overrides]) if @opts[:overrides]
+        values = transform_save(values) if @transform
+        if values.empty?
+          insert_default_values_sql
+        else
+          fl, vl = [], []
+          values.each do |k, v|
+            fl << literal(String === k ? k.to_sym : k)
+            vl << literal(v)
+          end
+          "INSERT INTO #{from} (#{fl.join(COMMA_SEPARATOR)}) VALUES (#{vl.join(COMMA_SEPARATOR)})"
+        end
+      when Dataset
+        "INSERT INTO #{from} #{literal(values)}"
       end
     end
     
@@ -718,6 +719,8 @@ module Sequel
       
       sql = "UPDATE #{source_list(@opts[:from])} SET "
       set = if values.is_a?(Hash)
+        values = opts[:defaults].merge(values) if opts[:defaults]
+        values = values.merge(opts[:overrides]) if opts[:overrides]
         # get values from hash
         values = transform_save(values) if @transform
         values.map do |k, v|
