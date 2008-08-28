@@ -299,6 +299,20 @@ module Sequel
       SHARE_ROW_EXCLUSIVE = 'SHARE ROW EXCLUSIVE'.freeze
       SHARE_UPDATE_EXCLUSIVE = 'SHARE UPDATE EXCLUSIVE'.freeze
       
+      # Shared methods for prepared statements when used with PostgreSQL databases.
+      module PreparedStatementMethods
+        # Override insert action to use RETURNING if the server supports it.
+        def prepared_sql
+          return @prepared_sql if @prepared_sql
+          super
+          if @prepared_type == :insert and server_version >= 80200
+            @prepared_sql = insert_returning_pk_sql(@prepared_modify_values)
+            meta_def(:insert_returning_pk_sql){|*args| prepared_sql}
+          end
+          @prepared_sql
+        end
+      end
+
       # Return the results of an ANALYZE query as a string
       def analyze(opts = nil)
         analysis = []
@@ -339,21 +353,21 @@ module Sequel
       # Insert given values into the database.
       def insert(*values)
         if !@opts[:sql] and server_version >= 80200
-          single_value(:sql=>insert_sql(*values))
+          single_value(:sql=>insert_returning_pk_sql(*values))
         else
           execute_insert(insert_sql(*values), :table=>opts[:from].first,
             :values=>values.size == 1 ? values.first : values)
         end
       end
 
-      # Use the RETURNING clause if not using custom SQL and the server supports it.
-      def insert_sql(*values)
-        sql = super
-        if !@opts[:sql] and server_version >= 80200
-          pk = db.primary_key(opts[:from].first)
-          sql << " RETURNING #{pk ? quote_identifier(pk) : :NULL}"
-        end
-        sql
+      # Use the RETURNING clause to return the columns listed in returning.
+      def insert_returning_sql(returning, *values)
+        "#{insert_sql(*values)} RETURNING #{column_list(Array(returning))}"
+      end
+
+      # Insert a record returning the record inserted
+      def insert_select(*values)
+        single_record(:naked=>true, :sql=>insert_returning_sql(nil, *values)) if server_version >= 80200
       end
 
       # Handle microseconds for Time and DateTime values, as well as PostgreSQL
@@ -424,6 +438,12 @@ module Sequel
       # Call execute_insert on the database object with the given values.
       def execute_insert(sql, opts={})
         @db.execute_insert(sql, {:server=>@opts[:server] || :default}.merge(opts))
+      end
+
+      # Use the RETURNING clause to return the primary key of the inserted record, if it exists
+      def insert_returning_pk_sql(*values)
+        pk = db.primary_key(opts[:from].first)
+        insert_returning_sql(pk ? Sequel::SQL::Identifier.new(pk) : 'NULL'.lit, *values)
       end
 
       # The version of the database server

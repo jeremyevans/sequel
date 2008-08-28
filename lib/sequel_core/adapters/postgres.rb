@@ -371,6 +371,7 @@ module Sequel
         # pg driver.
         module PreparedStatementMethods
           include BindArgumentMethods
+          include ::Sequel::Postgres::DatasetMethods::PreparedStatementMethods
           
           private
           

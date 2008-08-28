@@ -82,6 +82,13 @@ module Sequel
       # Dataset subclass used for datasets that connect to PostgreSQL via JDBC.
       class Dataset < JDBC::Dataset
         include Sequel::Postgres::DatasetMethods
+
+        # Add the shared PostgreSQL prepared statement methods
+        def prepare(*args)
+          ps = super
+          ps.extend(::Sequel::Postgres::DatasetMethods::PreparedStatementMethods)
+          ps
+        end
         
         # Convert Java::JavaSql::Timestamps correctly, and handle SQL::Blobs
         # correctly.

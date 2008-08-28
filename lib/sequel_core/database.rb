@@ -504,7 +504,7 @@ module Sequel
         e.set_backtrace(exception.backtrace)
         raise e
       else
-        raise
+        raise exception
       end
     end
 

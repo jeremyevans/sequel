@@ -450,14 +450,33 @@ context "Postgres::Dataset#insert" do
     @ds.delete
   end
   
-  specify "should not using RETURNING primary_key if server_version < 80200" do
+  specify "should call insert_sql if server_version < 80200" do
     @ds.meta_def(:server_version){80100}
-    @ds.insert_sql(:value=>10).should == 'INSERT INTO test5 (value) VALUES (10)'
+    @ds.should_receive(:execute_insert).once.with('INSERT INTO test5 (value) VALUES (10)', :table=>:test5, :values=>{:value=>10})
+    @ds.insert(:value=>10)
   end
 
-  specify "should using RETURNING primary_key if server_version >= 80200" do
+  specify "should using call insert_returning_sql if server_version >= 80200" do
     @ds.meta_def(:server_version){80201}
-    @ds.insert_sql(:value=>10).should == 'INSERT INTO test5 (value) VALUES (10) RETURNING xid'
+    @ds.should_receive(:single_value).once.with(:sql=>'INSERT INTO test5 (value) VALUES (10) RETURNING xid')
+    @ds.insert(:value=>10)
+  end
+
+  specify "should have insert_returning_sql use the RETURNING keyword" do
+    @ds.insert_returning_sql(:xid, :value=>10).should == "INSERT INTO test5 (value) VALUES (10) RETURNING xid"
+    @ds.insert_returning_sql('*'.lit, :value=>10).should == "INSERT INTO test5 (value) VALUES (10) RETURNING *"
+  end
+
+  specify "should have insert_select return nil if server_version < 80200" do
+    @ds.meta_def(:server_version){80100}
+    @ds.insert_select(:value=>10).should == nil
+  end
+
+  specify "should have insert_select insert the record and return the inserted record if server_version < 80200" do
+    @ds.meta_def(:server_version){80201}
+    h = @ds.insert_select(:value=>10)
+    h[:value].should == 10
+    @ds.first(:xid=>h[:xid])[:value].should == 10
   end
 
   specify "should correctly return the inserted record's primary key value" do

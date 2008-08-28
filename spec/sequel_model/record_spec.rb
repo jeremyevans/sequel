@@ -17,6 +17,19 @@ describe "Model#save" do
     MODEL_DB.sqls.first.should == "INSERT INTO items (x) VALUES (1)"
   end
 
+  it "should use dataset's insert_select method if present" do
+    ds = @c.dataset = @c.dataset.clone
+    def ds.insert_select(hash)
+      execute("INSERT INTO items (y) VALUES (2)")
+      {:y=>2}
+    end
+    o = @c.new(:x => 1)
+    o.save
+    
+    o.values.should == {:y=>2}
+    MODEL_DB.sqls.first.should == "INSERT INTO items (y) VALUES (2)"
+  end
+
   it "should update a record for an existing model instance" do
     o = @c.load(:id => 3, :x => 1)
     o.save

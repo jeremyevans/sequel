@@ -218,15 +218,21 @@ module Sequel
       return save_failure(:save) if before_save == false
       if @new
         return save_failure(:create) if before_create == false
-        iid = model.dataset.insert(@values)
-        # if we have a regular primary key and it's not set in @values,
-        # we assume it's the last inserted id
-        if (pk = primary_key) && !(Array === pk) && !@values[pk]
-          @values[pk] = iid
-        end
-        if pk
-          @this = nil # remove memoized this dataset
-          refresh
+        ds = model.dataset
+        if ds.respond_to?(:insert_select) and h = ds.insert_select(@values)
+          @values = h
+          @this = nil
+        else
+          iid = ds.insert(@values)
+          # if we have a regular primary key and it's not set in @values,
+          # we assume it's the last inserted id
+          if (pk = primary_key) && !(Array === pk) && !@values[pk]
+            @values[pk] = iid
+          end
+          if pk
+            @this = nil # remove memoized this dataset
+            refresh
+          end
         end
         @new = false
         after_create

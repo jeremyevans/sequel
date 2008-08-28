@@ -1,5 +1,7 @@
 === HEAD
 
+* Allow Models to use the RETURNING clause when inserting records on PostgreSQL (jeremyevans)
+
 * Raise Sequel::DatabaseError instead of generic Sequel::Error for database errors, don't swallow tracebacks (jeremyevans)
 
 * Use INSERT ... RETURNING ... with PostgreSQL 8.2 and higher (jeremyevans)

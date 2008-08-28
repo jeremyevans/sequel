@@ -1000,3 +1000,18 @@ context "Database#server_opts" do
     proc{MockDatabase.new(opts).send(:server_opts, :server1)}.should raise_error(Sequel::Error)
   end
 end
+
+context "Database#raise_error" do
+  specify "should reraise if the exception class is not in opts[:classes]" do
+    e = Class.new(StandardError)
+    proc{MockDatabase.new.send(:raise_error, e.new(''), :classes=>[])}.should raise_error(e)
+  end
+
+  specify "should convert the exception to a DatabaseError if the exception class is not in opts[:classes]" do
+    proc{MockDatabase.new.send(:raise_error, Interrupt.new(''), :classes=>[Interrupt])}.should raise_error(Sequel::DatabaseError)
+  end
+
+  specify "should convert the exception to a DatabaseError if opts[:classes] if not present" do
+    proc{MockDatabase.new.send(:raise_error, Interrupt.new(''))}.should raise_error(Sequel::DatabaseError)
+  end
+end
