@@ -1,4 +1,4 @@
-=== HEAD
+=== 2.5.0 (2008-09-03)
 
 * Add Dataset #set_defaults and #set_overrides, used for scoping the values used in insert/update statements (jeremyevans)
 
