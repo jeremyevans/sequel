@@ -227,6 +227,7 @@ describe "Model#new?" do
 
     @c = Class.new(Sequel::Model(:items)) do
       unrestrict_primary_key
+      columns :x
     end
   end
   
@@ -440,6 +441,12 @@ describe Sequel::Model, "#set" do
     returned_value = @o1.set_with_params(:x => 1, :z => 2)
     returned_value.should == @o1
     MODEL_DB.sqls.should == []
+  end
+
+  it "should assume it is a column if no column information is present and the key is a symbol" do
+    @c.instance_variable_set(:@columns, nil)
+    o = @c.new.set(:x123=>1)
+    o[:x123].should == 1
   end
 end
 

@@ -47,13 +47,14 @@ context "A PostgreSQL database" do
   end
 
   specify "should correctly parse the schema" do
+    require 'logger'
     @db.schema(:test3, :reload=>true).should == [
-      [:value, {:type=>:integer, :allow_null=>true, :max_chars=>nil, :default=>nil, :db_type=>"integer", :numeric_precision=>32}],
-      [:time, {:type=>:datetime, :allow_null=>true, :max_chars=>nil, :default=>nil, :db_type=>"timestamp without time zone", :numeric_precision=>nil}]
+      [:value, {:type=>:integer, :allow_null=>true, :default=>nil, :db_type=>"integer", :primary_key=>false}],
+      [:time, {:type=>:datetime, :allow_null=>true, :default=>nil, :db_type=>"timestamp without time zone", :primary_key=>false}]
     ]
     @db.schema(:test4, :reload=>true).should == [
-      [:name, {:type=>:string, :allow_null=>true, :max_chars=>20, :default=>nil, :db_type=>"character varying", :numeric_precision=>nil}],
-      [:value, {:type=>:blob, :allow_null=>true, :max_chars=>nil, :default=>nil, :db_type=>"bytea", :numeric_precision=>nil}]
+      [:name, {:type=>:string, :allow_null=>true, :default=>nil, :db_type=>"character varying(20)", :primary_key=>false}],
+      [:value, {:type=>:blob, :allow_null=>true, :default=>nil, :db_type=>"bytea", :primary_key=>false}]
     ]
   end
 

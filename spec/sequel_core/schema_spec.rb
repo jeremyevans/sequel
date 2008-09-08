@@ -598,44 +598,54 @@ end
 
 context "Schema Parser" do
   setup do
-    sqls = @sqls = []
+    @sqls = []
     @db = Sequel::Database.new
-    @db.meta_def(:dataset) do
-      ds = super()
-      ds.instance_variable_set(:@sqls, sqls)
-      def ds.fetch_rows(sql)
-        @sqls << sql
-        table = /'(.*)'/.match(sql)[1]
-        h = {:column=>"a", :db_type=>table, :max_chars=>nil, :numeric_precision=>nil, :default=>'', :allow_null=>'YES'}
-        (h[:column] = h[:table_name] = :x) if sql =~ /BASE TABLE/
-        yield h
-      end
-      ds
-    end
   end
   after do
     Sequel.convert_tinyint_to_bool = true
   end
 
   specify "should parse the schema correctly for a single table" do
-    @db.schema(:x).should == [[:a, {:type=>nil, :db_type=>"x", :max_chars=>nil, :numeric_precision=>nil, :default=>nil, :allow_null=>true}]]
-    @sqls.should == ["SELECT column_name AS column, data_type AS db_type, character_maximum_length AS max_chars, numeric_precision, column_default AS default, is_nullable AS allow_null FROM information_schema.tables AS t INNER JOIN information_schema.columns AS c USING (table_catalog, table_schema, table_name) WHERE (c.table_name = 'x')"]
-    @db.schema(:x).should == [[:a, {:type=>nil, :db_type=>"x", :max_chars=>nil, :numeric_precision=>nil, :default=>nil, :allow_null=>true}]]
-    @sqls.length.should == 1
-    @db.schema(:x, :reload=>true).should == [[:a, {:type=>nil, :db_type=>"x", :max_chars=>nil, :numeric_precision=>nil, :default=>nil, :allow_null=>true}]]
-    @sqls.length.should == 2
+    sqls = @sqls
+    proc{@db.schema(:x)}.should raise_error(Sequel::Error)
+    @db.meta_def(:schema_parse_table) do |t, opts|
+      sqls << t
+      [[:a, {:db_type=>t.to_s}]]
+    end
+    @db.schema(:x).should == [[:a, {:db_type=>"x"}]]
+    @sqls.should == [:x]
+    @db.schema(:x).should == [[:a, {:db_type=>"x"}]]
+    @sqls.should == [:x]
+    @db.schema(:x, :reload=>true).should == [[:a, {:db_type=>"x"}]]
+    @sqls.should == [:x, :x]
   end
 
   specify "should parse the schema correctly for all tables" do
-    @db.schema.should == {:x=>[[:x, {:type=>nil, :db_type=>"BASE TABLE", :max_chars=>nil, :numeric_precision=>nil, :default=>nil, :allow_null=>true}]]}
-    @sqls.should == ["SELECT column_name AS column, data_type AS db_type, character_maximum_length AS max_chars, numeric_precision, column_default AS default, is_nullable AS allow_null, c.table_name FROM information_schema.tables AS t INNER JOIN information_schema.columns AS c USING (table_catalog, table_schema, table_name) WHERE (t.table_type = 'BASE TABLE')"]
-    @db.schema.should == {:x=>[[:x, {:type=>nil, :db_type=>"BASE TABLE", :max_chars=>nil, :numeric_precision=>nil, :default=>nil, :allow_null=>true}]]}
-    @sqls.length.should == 1
-    @db.schema(nil, :reload=>true).should == {:x=>[[:x, {:type=>nil, :db_type=>"BASE TABLE", :max_chars=>nil, :numeric_precision=>nil, :default=>nil, :allow_null=>true}]]}
-    @sqls.length.should == 2
+    sqls = @sqls
+    proc{@db.schema}.should raise_error(Sequel::Error)
+    @db.meta_def(:tables){[:x]}
+    @db.meta_def(:schema_parse_table) do |t, opts|
+      sqls << t
+      [[:x, {:db_type=>t.to_s}]]
+    end
+    @db.schema.should == {:x=>[[:x, {:db_type=>"x"}]]}
+    @sqls.should == [:x]
+    @db.schema.should == {:x=>[[:x, {:db_type=>"x"}]]}
+    @sqls.should == [:x]
+    @db.schema(nil, :reload=>true).should == {:x=>[[:x, {:db_type=>"x"}]]}
+    @sqls.should == [:x, :x]
+    @db.meta_def(:schema_parse_tables) do |opts|
+      sqls << 1
+      {:x=>[[:a, {:db_type=>"1"}]]}
+    end
+    @db.schema(nil, :reload=>true).should == {:x=>[[:a, {:db_type=>"1"}]]}
+    @sqls.should == [:x, :x, 1]
   end
 
   specify "should correctly parse all supported data types" do
+    @db.meta_def(:schema_parse_table) do |t, opts|
+      [[:x, {:type=>schema_column_type(t.to_s)}]]
+    end
     @db.schema(:tinyint).first.last[:type].should == :boolean
     Sequel.convert_tinyint_to_bool = false
     @db.schema(:tinyint, :reload=>true).first.last[:type].should == :integer
@@ -646,6 +656,7 @@ context "Schema Parser" do
     @db.schema(:character).first.last[:type].should == :string
     @db.schema(:"character varying").first.last[:type].should == :string
     @db.schema(:varchar).first.last[:type].should == :string
+    @db.schema(:"varchar(255)").first.last[:type].should == :string
     @db.schema(:text).first.last[:type].should == :string
     @db.schema(:date).first.last[:type].should == :date
     @db.schema(:datetime).first.last[:type].should == :datetime

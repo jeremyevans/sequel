@@ -2,7 +2,6 @@ module Sequel
   module SQLite
     module DatabaseMethods
       AUTO_VACUUM = {'0' => :none, '1' => :full, '2' => :incremental}.freeze
-      SCHEMA_TYPE_RE = /\A(\w+)\((\d+)\)\z/
       SYNCHRONOUS = {'0' => :off, '1' => :normal, '2' => :full}.freeze
       TABLES_FILTER = "type = 'table' AND NOT name = 'sqlite_sequence'"
       TEMP_STORE = {'0' => :default, '1' => :file, '2' => :memory}.freeze
@@ -86,31 +85,16 @@ module Sequel
       # SQLite supports schema parsing using the table_info PRAGMA, so
       # parse the output of that into the format Sequel expects.
       def schema_parse_table(table_name, opts)
-        rows = self["PRAGMA table_info(?)", table_name].collect do |row|
+        self["PRAGMA table_info(?)", table_name].map do |row|
           row.delete(:cid)
-          row[:column] = row.delete(:name)
-          row[:allow_null] = row.delete(:notnull).to_i == 0 ? 'YES' : 'NO'
+          row[:allow_null] = row.delete(:notnull).to_i == 0
           row[:default] = row.delete(:dflt_value)
-          row[:primary_key] = row.delete(:pk).to_i == 1 ? true : false 
+          row[:primary_key] = row.delete(:pk).to_i == 1
+          row[:default] = nil if row[:default].blank?
           row[:db_type] = row.delete(:type)
-          if m = SCHEMA_TYPE_RE.match(row[:db_type])
-            row[:db_type] = m[1]
-            row[:max_chars] = m[2].to_i
-          else
-             row[:max_chars] = nil
-          end
-          row[:numeric_precision] = nil
-          row
+          row[:type] = schema_column_type(row[:db_type])
+          [row.delete(:name).to_sym, row]
         end
-        schema_parse_rows(rows)
-      end
-      
-      # SQLite doesn't support getting the schema of all tables at once,
-      # so loop through the output of #tables to get them.
-      def schema_parse_tables(opts)
-        schemas = {}
-        tables.each{|table| schemas[table] = schema_parse_table(table, opts)}
-        schemas
       end
     end
     

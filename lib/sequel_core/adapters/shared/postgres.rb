@@ -150,6 +150,22 @@ module Sequel
         synchronize(server){|conn| primary_key_for_table(conn, table)}
       end
 
+      # Support :schema__table format for table
+      def schema(table_name=nil, opts={})
+        case table_name
+        when Symbol
+          t, c, a = dataset.send(:split_symbol, table_name)
+          opts[:schema] ||= t
+          table_name = c
+        when SQL::QualifiedIdentifier
+          opts[:schema] ||= table_name.table
+          table_name = table_name.column
+        when SQL::Identifier
+          table_name = table_name.value
+        end
+        super(table_name, opts)
+      end
+
       # PostgreSQL uses SERIAL psuedo-type instead of AUTOINCREMENT for
       # managing incrementing primary keys.
       def serial_primary_key_options
@@ -267,14 +283,55 @@ module Sequel
         @primary_key_sequences.include?(table) ? @primary_key_sequences[table] : (@primary_key_sequences[table] = conn.sequence(table))
       end
       
-      # When the :schema option is used, use the the given schema.
-      # When the :schema option is nil, return results for all schemas.
-      # If the :schema option is not used, use the public schema.
-      def schema_ds_filter(table_name, opts)
-        filt = super
-        # Restrict it to the given or public schema, unless specifically requesting :schema = nil
-        filt = SQL::BooleanExpression.new(:AND, filt, {:c__table_schema=>opts[:schema] || 'public'}) if opts[:schema] || !opts.include?(:schema)
-        filt
+      # Set the default of the row to NULL if it is blank, and set
+      # the ruby type for the column based on the database type.
+      def schema_parse_rows(rows)
+        rows.map do |row|
+          row[:default] = nil if row[:default].blank?
+          row[:type] = schema_column_type(row[:db_type])
+          [row.delete(:name).to_sym, row]
+        end
+      end
+
+      # Parse the schema for a single table.
+      def schema_parse_table(table_name, opts)
+        schema_parse_rows(schema_parser_dataset(table_name, opts))
+      end
+
+      # Parse the schema for multiple tables.
+      def schema_parse_tables(opts)
+        schemas = {}
+        schema_parser_dataset(nil, opts).each do |row|
+          (schemas[row.delete(:table).to_sym] ||= []) << row
+        end
+        schemas.each do |table, rows|
+          schemas[table] = schema_parse_rows(rows)
+        end
+        schemas
+      end
+
+      # The dataset used for parsing table schemas, using the pg_* system catalogs.
+      def schema_parser_dataset(table_name, opts)
+        ds = dataset.select(:pg_attribute__attname___name,
+            SQL::Function.new(:format_type, :pg_type__oid, :pg_attribute__atttypmod).as(:db_type),
+            SQL::Function.new(:pg_get_expr, :pg_attrdef__adbin, :pg_class__oid).as(:default),
+            SQL::BooleanExpression.new(:NOT, :pg_attribute__attnotnull).as(:allow_null),
+            SQL::Function.new(:COALESCE, {:pg_attribute__attnum => SQL::Function.new(:ANY, :pg_index__indkey)}.sql_expr, false).as(:primary_key)).
+          from(:pg_class).
+          join(:pg_attribute, :attrelid=>:oid).
+          join(:pg_type, :oid=>:atttypid).
+          left_outer_join(:pg_attrdef, :adrelid=>:pg_class__oid, :adnum=>:pg_attribute__attnum).
+          left_outer_join(:pg_index, :indrelid=>:pg_class__oid, :indisprimary=>true).
+          filter(:pg_attribute__attisdropped=>false).
+          filter(:pg_attribute__attnum > 0).
+          order(:pg_attribute__attnum)
+        if table_name
+          ds.filter!(:pg_class__relname=>table_name.to_s)
+        else
+          ds.select_more!(:pg_class__relname___table)
+        end
+        ds.join!(:pg_namespace, :oid=>:pg_class__relnamespace, :nspname=>opts[:schema] || 'public') if opts[:schema] || !opts.include?(:schema)
+        ds
       end
     end
     

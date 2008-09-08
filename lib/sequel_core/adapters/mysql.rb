@@ -146,11 +146,6 @@ module Sequel
         @server_version ||= (synchronize(server){|conn| conn.server_version if conn.respond_to?(:server_version)} || super)
       end
       
-      # Return an array of symbols specifying table names in the current database.
-      def tables(server=nil)
-        synchronize(server){|conn| conn.list_tables.map {|t| t.to_sym}}
-      end
-      
       # Support single level transactions on MySQL.
       def transaction(server=nil)
         synchronize(server) do |conn|

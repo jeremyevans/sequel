@@ -305,7 +305,7 @@ describe "Model#before_destroy && Model#after_destroy" do
   
   specify "should be called around record destruction" do
     @c.before_destroy {MODEL_DB << "BLAH before"}
-    m = @c.new(:id => 2233)
+    m = @c.load(:id => 2233)
     m.destroy
     MODEL_DB.sqls.should == [
       'BLAH before',

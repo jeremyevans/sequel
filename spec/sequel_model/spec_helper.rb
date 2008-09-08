@@ -45,6 +45,14 @@ class MockDatabase < Sequel::Database
     @sqls = []
   end
 
+  def schema(table_name, opts)
+    if table_name
+      [[:id, {:primary_key=>true}]]
+    else
+      {table_name=>[[:id, {:primary_key=>true}]]}
+    end
+  end
+
   def transaction; yield; end
   
   def dataset; MockDataset.new(self); end

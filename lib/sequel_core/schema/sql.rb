@@ -205,6 +205,7 @@ module Sequel
       #   table_name, otherwise you may only getting the schemas for tables
       #   that have been requested explicitly.
       def schema(table_name = nil, opts={})
+        table_name = table_name.to_sym if table_name
         if opts[:reload] && @schemas
           if table_name
             @schemas.delete(table_name)
@@ -213,17 +214,30 @@ module Sequel
           end
         end
 
-        if table_name
-          return @schemas[table_name] if @schemas && @schemas[table_name]
-        else
-          return @schemas if @schemas
+        if @schemas
+          if table_name
+            return @schemas[table_name] if @schemas[table_name]
+          else
+            return @schemas
+          end
         end
 
         if table_name
           @schemas ||= {}
-          @schemas[table_name] ||= schema_parse_table(table_name, opts)
+          if respond_to?(:schema_parse_table, true)
+            @schemas[table_name] ||= schema_parse_table(table_name, opts)
+          else
+            raise Error, 'schema parsing is not implemented on this database'
+          end
         else
-          @schemas = schema_parse_tables(opts)
+          if respond_to?(:schema_parse_tables, true)
+            @schemas = schema_parse_tables(opts)
+          elsif respond_to?(:schema_parse_table, true) and respond_to?(:tables, true)
+            tables.each{|t| schema(t, opts)}
+            @schemas
+          else
+            raise Error, 'schema parsing is not implemented on this database'
+          end
         end
       end
       
@@ -240,11 +254,11 @@ module Sequel
       # integer, string, date, datetime, boolean, and float.
       def schema_column_type(db_type)
         case db_type
-        when 'tinyint'
+        when /\Atinyint/
           Sequel.convert_tinyint_to_bool ? :boolean : :integer
-        when /\A(int(eger)?|bigint|smallint)\z/
+        when /\A(int(eger)?|bigint|smallint)/
           :integer
-        when /\A(character( varying)?|varchar|text)\z/
+        when /\A(character( varying)?|varchar|text)/
           :string
         when /\Adate\z/
           :date
@@ -261,77 +275,6 @@ module Sequel
         when "bytea"
           :blob
         end
-      end
-
-      # The final dataset used by the schema parser, after all
-      # options have been applied.
-      def schema_ds(table_name, opts)
-        schema_ds_dataset.from(*schema_ds_from(table_name, opts)) \
-          .select(*schema_ds_select(table_name, opts)) \
-          .join(*schema_ds_join(table_name, opts)) \
-          .filter(*schema_ds_filter(table_name, opts))
-      end
-
-      # The blank dataset used by the schema parser.
-      def schema_ds_dataset
-        schema_utility_dataset
-      end
-
-      # Argument array for the schema dataset's filter method.
-      def schema_ds_filter(table_name, opts)
-        if table_name
-          [{:c__table_name=>table_name.to_s}]
-        else
-          [{:t__table_type=>'BASE TABLE'}]
-        end
-      end
-
-      # Argument array for the schema dataset's from method.
-      def schema_ds_from(table_name, opts)
-        [:information_schema__tables___t]
-      end
-
-      # Argument array for the schema dataset's join method.
-      def schema_ds_join(table_name, opts)
-        [:information_schema__columns, [:table_catalog, :table_schema, :table_name], :c]
-      end
-
-      # Argument array for the schema dataset's select method.
-      def schema_ds_select(table_name, opts)
-        cols = [:column_name___column, :data_type___db_type, :character_maximum_length___max_chars, \
-          :numeric_precision, :column_default___default, :is_nullable___allow_null]
-        cols << :c__table_name unless table_name
-        cols
-      end
-
-      # Parse the schema for a given table.
-      def schema_parse_table(table_name, opts)
-        schema_parse_rows(schema_ds(table_name, opts))
-      end
-
-      # Parse the schema all tables in the database.
-      def schema_parse_tables(opts)
-        schemas = {}
-        schema_ds(nil, opts).each do |row|
-          (schemas[row.delete(:table_name).to_sym] ||= []) << row
-        end
-        schemas.each do |table, rows|
-          schemas[table] = schema_parse_rows(rows)
-        end
-        schemas
-      end
-
-      # Parse the output of the information schema columns into
-      # the hash used by Sequel.
-      def schema_parse_rows(rows)
-        schema = []
-        rows.each do |row| 
-          row[:allow_null] = row[:allow_null] == 'YES' ? true : false
-          row[:default] = nil if row[:default].blank?
-          row[:type] = schema_column_type(row[:db_type])
-          schema << [row.delete(:column).to_sym, row]
-        end
-        schema
       end
 
       # SQL fragment specifying the type of a given column.

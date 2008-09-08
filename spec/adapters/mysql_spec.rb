@@ -69,10 +69,10 @@ context "A MySQL database" do
   end
 
   specify "should correctly parse the schema" do
-    @db.schema(:booltest, :reload=>true).should == [[:value, {:type=>:boolean, :allow_null=>true, :max_chars=>nil, :default=>nil, :db_type=>"tinyint", :numeric_precision=>3}]]
+    @db.schema(:booltest, :reload=>true).should == [[:value, {:type=>:boolean, :allow_null=>true, :primary_key=>false, :default=>nil, :db_type=>"tinyint(4)"}]]
     
     Sequel.convert_tinyint_to_bool = false
-    @db.schema(:booltest, :reload=>true).should == [[:value, {:type=>:integer, :allow_null=>true, :max_chars=>nil, :default=>nil, :db_type=>"tinyint", :numeric_precision=>3}]]
+    @db.schema(:booltest, :reload=>true).should == [[:value, {:type=>:integer, :allow_null=>true, :primary_key=>false, :default=>nil, :db_type=>"tinyint(4)"}]]
   end
 
   specify "should get the schema all database tables if no table name is used" do

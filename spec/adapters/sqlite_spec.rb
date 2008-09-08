@@ -159,7 +159,7 @@ context "An SQLite database" do
 
   specify "should correctly parse the schema" do
     @db.create_table!(:time2) {timestamp :t}
-    @db.schema(:time2, :reload=>true).should == [[:t, {:type=>:datetime, :allow_null=>true, :max_chars=>nil, :default=>nil, :db_type=>"timestamp", :numeric_precision=>nil, :primary_key=>false}]]
+    @db.schema(:time2, :reload=>true).should == [[:t, {:type=>:datetime, :allow_null=>true, :default=>nil, :db_type=>"timestamp", :primary_key=>false}]]
   end
 
   specify "should get the schema all database tables if no table name is used" do

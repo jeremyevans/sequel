@@ -62,6 +62,11 @@ module Sequel
         @server_version ||= (m[1].to_i * 10000) + (m[2].to_i * 100) + m[3].to_i
       end
       
+      # Return an array of symbols specifying table names in the current database.
+      def tables(server=nil)
+        self['SHOW TABLES'].server(server).map{|r| r.values.first.to_sym}
+      end
+      
       # Changes the database in use by issuing a USE statement.  I would be
       # very careful if I used this.
       def use(db_name)
@@ -73,27 +78,18 @@ module Sequel
       
       private
       
-      # Always quote identifiers for the schema parser dataset.
-      def schema_ds_dataset
-        ds = schema_utility_dataset.clone
-        ds.quote_identifiers = true
-        ds
-      end
-      
-      # Allow other database schema's to be queried using the :database
-      # option.  Allow all database's schema to be used by setting
-      # the :database option to nil.  If the database option is not specified,
-      # uses the currently connected database.
-      def schema_ds_filter(table_name, opts)
-        filt = super
-        # Restrict it to the given or current database, unless specifically requesting :database = nil
-        filt = SQL::BooleanExpression.new(:AND, filt, {:c__table_schema=>opts[:database] || database_name}) if opts[:database] || !opts.include?(:database)
-        filt
-      end
-
-      # MySQL doesn't support table catalogs, so just join on schema and table name.
-      def schema_ds_join(table_name, opts)
-        [:information_schema__columns, {:table_schema => :table_schema, :table_name => :table_name}, :c]
+      # Use the MySQL specific DESCRIBE syntax to get a table description.
+      def schema_parse_table(table_name, opts)
+        self["DESCRIBE ?", table_name].map do |row|
+          row.delete(:Extra)
+          row[:allow_null] = row.delete(:Null) == 'YES'
+          row[:default] = row.delete(:Default)
+          row[:primary_key] = row.delete(:Key) == 'PRI'
+          row[:default] = nil if row[:default].blank?
+          row[:db_type] = row.delete(:Type)
+          row[:type] = schema_column_type(row[:db_type])
+          [row.delete(:Field).to_sym, row]
+        end
       end
     end
   

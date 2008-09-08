@@ -171,6 +171,7 @@ describe Sequel::Model, "new" do
   before(:each) do
     @m = Class.new(Sequel::Model) do
       set_dataset MODEL_DB[:items]
+      columns :x, :id
     end
   end
 

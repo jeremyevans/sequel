@@ -40,6 +40,7 @@ module Sequel
     #
     # See Schema::AlterTableGenerator.
     def alter_table(name, generator=nil, &block)
+      @schemas.delete(name.to_sym) if @schemas
       generator ||= Schema::AlterTableGenerator.new(self, &block)
       alter_table_sql_list(name, generator.operations).flatten.each {|sql| execute_ddl(sql)}
     end
@@ -70,8 +71,9 @@ module Sequel
     #   DB.create_or_replace_view(:cheap_items, "SELECT * FROM items WHERE price < 100")
     #   DB.create_or_replace_view(:ruby_items, DB[:items].filter(:category => 'ruby'))
     def create_or_replace_view(name, source)
+      @schemas.delete(name.to_sym) if @schemas
       source = source.sql if source.is_a?(Dataset)
-      execute_ddl("CREATE OR REPLACE VIEW #{name} AS #{source}")
+      execute_ddl("CREATE OR REPLACE VIEW #{quote_identifier(name)} AS #{source}")
     end
     
     # Creates a view based on a dataset or an SQL string:
@@ -80,7 +82,7 @@ module Sequel
     #   DB.create_view(:ruby_items, DB[:items].filter(:category => 'ruby'))
     def create_view(name, source)
       source = source.sql if source.is_a?(Dataset)
-      execute_ddl("CREATE VIEW #{name} AS #{source}")
+      execute_ddl("CREATE VIEW #{quote_identifier(name)} AS #{source}")
     end
     
     # Removes a column from the specified table:
@@ -106,14 +108,20 @@ module Sequel
     #
     #   DB.drop_table(:posts, :comments)
     def drop_table(*names)
-      names.each {|n| execute_ddl(drop_table_sql(n))}
+      names.each do |n|
+        @schemas.delete(n.to_sym) if @schemas
+        execute_ddl(drop_table_sql(n))
+      end
     end
     
     # Drops a view:
     #
     #   DB.drop_view(:cheap_items)
-    def drop_view(name)
-      execute_ddl("DROP VIEW #{name}")
+    def drop_view(*names)
+      names.each do |n|
+        @schemas.delete(n.to_sym) if @schemas
+        execute_ddl("DROP VIEW #{quote_identifier(n)}")
+      end
     end
 
     # Renames a table:

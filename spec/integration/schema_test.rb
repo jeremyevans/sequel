@@ -1,21 +1,19 @@
 require File.join(File.dirname(__FILE__), 'spec_helper.rb')
 
 describe "Database schema parser" do
-  before do
-    INTEGRATION_DB.create_table!(:items){integer :number}
-    clear_sqls
-  end
   after do
     INTEGRATION_DB.drop_table(:items) if INTEGRATION_DB.table_exists?(:items)
   end
 
   specify "should be a hash with table_names as symbols" do
+    INTEGRATION_DB.create_table!(:items){integer :number}
     schema = INTEGRATION_DB.schema(nil, :reload=>true)
     schema.should be_a_kind_of(Hash)
     schema.should include(:items)
   end
 
   specify "should not issue an sql query if the schema has been loaded unless :reload is true" do
+    INTEGRATION_DB.create_table!(:items){integer :number}
     INTEGRATION_DB.schema(nil, :reload=>true)
     clear_sqls
     INTEGRATION_DB.schema
@@ -23,6 +21,7 @@ describe "Database schema parser" do
   end
 
   specify "should give the same result for a single table regardless of whether schema was called for a single table" do
+    INTEGRATION_DB.create_table!(:items){integer :number}
     INTEGRATION_DB.schema(:items, :reload=>true).should == INTEGRATION_DB.schema(nil, :reload=>true)[:items]
   end
 
@@ -41,6 +40,31 @@ describe "Database schema parser" do
     clear_sqls
     INTEGRATION_DB.schema(:items)
     sqls_should_be
+  end
+
+  specify "should parse primary keys from the schema properly" do
+    INTEGRATION_DB.create_table!(:items){integer :number}
+    INTEGRATION_DB.schema(:items).collect{|k,v| k if v[:primary_key]}.compact.should == []
+    INTEGRATION_DB.create_table!(:items){primary_key :number}
+    INTEGRATION_DB.schema(:items).collect{|k,v| k if v[:primary_key]}.compact.should == [:number]
+    INTEGRATION_DB.create_table!(:items){integer :number1; integer :number2; primary_key [:number1, :number2]}
+    INTEGRATION_DB.schema(:items).collect{|k,v| k if v[:primary_key]}.compact.should == [:number1, :number2]
+  end
+
+  specify "should parse NULL/NOT NULL from the schema properly" do
+    INTEGRATION_DB.create_table!(:items){integer :number, :null=>true}
+    INTEGRATION_DB.schema(:items).first.last[:allow_null].should == true
+    INTEGRATION_DB.create_table!(:items){integer :number, :null=>false}
+    INTEGRATION_DB.schema(:items).first.last[:allow_null].should == false
+  end
+
+  specify "should parse defaults from the schema properly" do
+    INTEGRATION_DB.create_table!(:items){integer :number}
+    INTEGRATION_DB.schema(:items).first.last[:default].should == nil
+    INTEGRATION_DB.create_table!(:items){integer :number, :default=>0}
+    INTEGRATION_DB.schema(:items).first.last[:default].to_s.should == "0"
+    INTEGRATION_DB.create_table!(:items){varchar :a, :default=>"blah", :size=>4}
+    INTEGRATION_DB.schema(:items).first.last[:default].gsub(/::character varying\z/, '').gsub("'", '').should == "blah"
   end
 end
 

@@ -1,5 +1,21 @@
 === HEAD
 
+* Database#tables now works for MySQL databases using the JDBC adapter (jeremyevans)
+
+* Database#drop_view can now take multiple arguments to drop multiple views at once (jeremyevans)
+
+* Schema modification methods (e.g. drop_table, create_table!) now remove the cached schema entry (jeremyevans)
+
+* Models can now determine their primary keys by looking at the schema (jeremyevans)
+
+* No longer include :numeric_precision and :max_chars entries in the schema column hashes, use the :db_type entry instead (jeremyevans)
+
+* Make schema parsing on PostgreSQL handle implicit schemas (e.g. schema(:schema__table)), so it works with models for tables outside the public schema (jeremyevans)
+
+* Significantly speed up schema parsing on MySQL (jeremyevans)
+
+* Include primary key information when parsing the schema (jeremyevans)
+
 * Fix schema generation of composite foreign keys on MySQL (clivecrous, jeremyevans)
 
 === 2.5.0 (2008-09-03)

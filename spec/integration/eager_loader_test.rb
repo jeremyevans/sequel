@@ -2,13 +2,12 @@ require File.join(File.dirname(__FILE__), 'spec_helper.rb')
 
 describe "Eagerly loading a tree structure" do
   before do
+    INTEGRATION_DB.instance_variable_set(:@schemas, nil)
+    INTEGRATION_DB.create_table!(:nodes) do
+      primary_key :id
+      foreign_key :parent_id, :nodes
+    end
     class ::Node < Sequel::Model
-      set_schema do
-        primary_key :id
-        foreign_key :parent_id, :nodes
-      end
-      create_table!
-      
       many_to_one :parent
       one_to_many :children, :key=>:parent_id
     
@@ -146,11 +145,11 @@ describe "Association Extensions" do
           @opts[:models][nil].create(vals.merge(:author_id=>author_id))
       end 
     end
+    INTEGRATION_DB.instance_variable_set(:@schemas, nil)
+    INTEGRATION_DB.create_table!(:authors) do
+      primary_key :id
+    end
     class ::Author < Sequel::Model
-      set_schema do
-        primary_key :id
-      end
-      create_table!
       one_to_many :authorships, :extend=>FindOrCreate, :dataset=>(proc do
         key = pk
         ds = Authorship.filter(:author_id=>key)
@@ -160,13 +159,12 @@ describe "Association Extensions" do
         ds  
       end)
     end
+    INTEGRATION_DB.create_table!(:authorships) do
+      primary_key :id
+      foreign_key :author_id, :authors
+      text :name
+    end
     class ::Authorship < Sequel::Model
-      set_schema do
-        primary_key :id
-        foreign_key :author_id, :authors
-        text :name
-      end
-      create_table!
       many_to_one :author
     end
     @author = Author.create
@@ -212,11 +210,11 @@ end
 
 describe "has_many :through has_many and has_one :through belongs_to" do
   before do
+    INTEGRATION_DB.instance_variable_set(:@schemas, nil)
+    INTEGRATION_DB.create_table!(:firms) do
+      primary_key :id
+    end
     class ::Firm < Sequel::Model
-      set_schema do
-        primary_key :id
-      end
-      create_table!
       one_to_many :clients
       one_to_many :invoices, :read_only=>true, \
         :dataset=>proc{Invoice.eager_graph(:client).filter(:client__firm_id=>pk)}, \
@@ -237,22 +235,20 @@ describe "has_many :through has_many and has_one :through belongs_to" do
         end)
     end
 
+    INTEGRATION_DB.create_table!(:clients) do
+      primary_key :id
+      foreign_key :firm_id, :firms
+    end
     class ::Client < Sequel::Model
-      set_schema do
-        primary_key :id
-        foreign_key :firm_id, :firms
-      end
-      create_table!
       many_to_one :firm
       one_to_many :invoices
     end
 
+    INTEGRATION_DB.create_table!(:invoices) do
+      primary_key :id
+      foreign_key :client_id, :clients
+    end
     class ::Invoice < Sequel::Model
-      set_schema do
-        primary_key :id
-        foreign_key :client_id, :clients
-      end
-      create_table!
       many_to_one :client
       many_to_one :firm, :key=>nil, :read_only=>true, \
         :dataset=>proc{Firm.eager_graph(:clients).filter(:clients__id=>client_id)}, \
@@ -375,13 +371,13 @@ end
 
 describe "Polymorphic Associations" do
   before do
+    INTEGRATION_DB.instance_variable_set(:@schemas, nil)
+    INTEGRATION_DB.create_table!(:assets) do
+      primary_key :id
+      integer :attachable_id
+      text :attachable_type
+    end
     class ::Asset < Sequel::Model
-      set_schema do
-        primary_key :id
-        integer :attachable_id
-        text :attachable_type
-      end
-      create_table!
       many_to_one :attachable, :reciprocal=>:assets, \
         :dataset=>(proc do
           klass = attachable_type.constantize
@@ -411,11 +407,10 @@ describe "Polymorphic Associations" do
       end 
     end 
   
+    INTEGRATION_DB.create_table!(:posts) do
+      primary_key :id
+    end
     class ::Post < Sequel::Model
-      set_schema do
-        primary_key :id
-      end
-      create_table!
       one_to_many :assets, :key=>:attachable_id do |ds|
         ds.filter(:attachable_type=>'Post')
       end 
@@ -438,11 +433,10 @@ describe "Polymorphic Associations" do
       end
     end 
   
+    INTEGRATION_DB.create_table!(:notes) do
+      primary_key :id
+    end
     class ::Note < Sequel::Model
-      set_schema do
-        primary_key :id
-      end
-      create_table!
       one_to_many :assets, :key=>:attachable_id do |ds|
         ds.filter(:attachable_type=>'Note')
       end 
@@ -550,12 +544,12 @@ end
 
 describe "many_to_one/one_to_many not referencing primary key" do
   before do
+    INTEGRATION_DB.instance_variable_set(:@schemas, nil)
+    INTEGRATION_DB.create_table!(:clients) do
+      primary_key :id
+      text :name
+    end
     class ::Client < Sequel::Model
-      set_schema do
-        primary_key :id
-        text :name
-      end
-      create_table!
       one_to_many :invoices, :reciprocal=>:client, \
         :dataset=>proc{Invoice.filter(:client_name=>name)}, \
         :eager_loader=>(proc do |key_hash, clients, associations|
@@ -585,12 +579,11 @@ describe "many_to_one/one_to_many not referencing primary key" do
       end
     end 
   
+    INTEGRATION_DB.create_table!(:invoices) do
+      primary_key :id
+      text :client_name
+    end
     class ::Invoice < Sequel::Model
-      set_schema do
-        primary_key :id
-        text :client_name
-      end
-      create_table!
       many_to_one :client, :key=>:client_name, \
         :dataset=>proc{Client.filter(:name=>client_name)}, \
         :eager_loader=>(proc do |key_hash, invoices, associations|
