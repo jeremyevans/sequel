@@ -38,7 +38,7 @@ module Sequel
       
       # Handle MySQL specific syntax for column references
       def column_references_sql(column)
-        ", FOREIGN KEY (#{quote_identifier(column[:name])})#{super(column)}"
+        "#{", FOREIGN KEY (#{quote_identifier(column[:name])})" unless column[:type] == :check}#{super(column)}"
       end
       
       # Handle MySQL specific index SQL syntax
