@@ -5,10 +5,10 @@
   require 'rubygems'
   require 'sequel'
 
-  DB = Sequel.sqlite 'my_blog.db'
-  DB = Sequel('postgres://user:password@localhost/my_db')
-  DB = Sequel.mysql 'my_db', :user => 'user', :password => 'password', :host => 'localhost'
-  DB = Sequel.ado 'mydb'
+  DB = Sequel.sqlite('my_blog.db')
+  DB = Sequel.connect('postgres://user:password@localhost/my_db')
+  DB = Sequel.mysql('my_db', :user => 'user', :password => 'password', :host => 'localhost')
+  DB = Sequel.ado('mydb')
 
 == Open an SQLite memory database
 
