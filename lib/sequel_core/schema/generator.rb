@@ -262,8 +262,8 @@ module Sequel
       end
       
       # Modify a column's NOT NULL constraint.
-      def set_column_accept_null(name, accept_null)
-        @operations << {:op => :set_column_null, :name => name, :null => accept_null}
+      def set_column_allow_null(name, allow_null)
+        @operations << {:op => :set_column_null, :name => name, :null => allow_null}
       end
 
       private

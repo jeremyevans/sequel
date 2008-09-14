@@ -1,5 +1,7 @@
 === HEAD
 
+* AlterTableGenerator#set_column_allow_null was added to SET/DROP NOT NULL for columns (divoxx)
+
 * Database#tables now works for MySQL databases using the JDBC adapter (jeremyevans)
 
 * Database#drop_view can now take multiple arguments to drop multiple views at once (jeremyevans)

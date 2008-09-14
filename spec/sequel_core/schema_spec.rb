@@ -462,14 +462,14 @@ context "DB#alter_table" do
   
   specify "should allow adding not null constraint" do
     @db.alter_table(:cats) do
-      set_column_accept_null :score, false
+      set_column_allow_null :score, false
     end
     @db.sqls.should == ["ALTER TABLE cats ALTER COLUMN score SET NOT NULL"]
   end
   
   specify "should allow droping not null constraint" do
     @db.alter_table(:cats) do
-      set_column_accept_null :score, true
+      set_column_allow_null :score, true
     end
     @db.sqls.should == ["ALTER TABLE cats ALTER COLUMN score DROP NOT NULL"]
   end
