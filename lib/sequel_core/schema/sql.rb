@@ -33,6 +33,8 @@ module Sequel
           "ALTER COLUMN #{quoted_name} TYPE #{op[:type]}"
         when :set_column_default
           "ALTER COLUMN #{quoted_name} SET DEFAULT #{literal(op[:default])}"
+        when :set_column_null
+          "ALTER COLUMN #{quoted_name} #{op[:null] ? 'DROP' : 'SET'} NOT NULL"
         when :add_index
           return index_definition_sql(table, op)
         when :drop_index

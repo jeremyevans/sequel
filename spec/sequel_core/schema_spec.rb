@@ -459,6 +459,20 @@ context "DB#alter_table" do
   setup do
     @db = SchemaDummyDatabase.new
   end
+  
+  specify "should allow adding not null constraint" do
+    @db.alter_table(:cats) do
+      set_column_accept_null :score, false
+    end
+    @db.sqls.should == ["ALTER TABLE cats ALTER COLUMN score SET NOT NULL"]
+  end
+  
+  specify "should allow droping not null constraint" do
+    @db.alter_table(:cats) do
+      set_column_accept_null :score, true
+    end
+    @db.sqls.should == ["ALTER TABLE cats ALTER COLUMN score DROP NOT NULL"]
+  end
 
   specify "should support add_column" do
     @db.alter_table(:cats) do

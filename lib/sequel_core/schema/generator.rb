@@ -260,6 +260,11 @@ module Sequel
       def set_column_type(name, type)
         @operations << {:op => :set_column_type, :name => name, :type => type}
       end
+      
+      # Modify a column's NOT NULL constraint.
+      def set_column_accept_null(name, accept_null)
+        @operations << {:op => :set_column_null, :name => name, :null => accept_null}
+      end
 
       private
 
