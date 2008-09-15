@@ -300,7 +300,7 @@ describe "has_many :through has_many and has_one :through belongs_to" do
 
   it "should return has_many :through has_many records for a single object" do
     invs = @firm1.invoices.sort_by{|x| x.pk}
-    sqls_should_be('SELECT invoices.id, invoices.client_id, client.id AS client_id_0, client.firm_id FROM invoices LEFT OUTER JOIN clients AS client ON (client.id = invoices.client_id) WHERE (client.firm_id = 1)')
+    sqls_should_be("SELECT invoices.id, invoices.client_id, client.id AS 'client_id_0', client.firm_id FROM invoices LEFT OUTER JOIN clients AS 'client' ON (client.id = invoices.client_id) WHERE (client.firm_id = 1)")
     invs.should == [@invoice1, @invoice2, @invoice3]
     invs[0].client.should == @client1
     invs[1].client.should == @client1
@@ -312,7 +312,7 @@ describe "has_many :through has_many and has_one :through belongs_to" do
 
   it "should eagerly load has_many :through has_many records for multiple objects" do
     firms = Firm.order(:id).eager(:invoices).all
-    sqls_should_be("SELECT * FROM firms ORDER BY id", "SELECT invoices.id, invoices.client_id, client.id AS client_id_0, client.firm_id FROM invoices LEFT OUTER JOIN clients AS client ON (client.id = invoices.client_id) WHERE (client.firm_id IN (1, 2))")
+    sqls_should_be("SELECT * FROM firms ORDER BY id", "SELECT invoices.id, invoices.client_id, client.id AS 'client_id_0', client.firm_id FROM invoices LEFT OUTER JOIN clients AS 'client' ON (client.id = invoices.client_id) WHERE (client.firm_id IN (1, 2))")
     firms.should == [@firm1, @firm2]
     firm1, firm2 = firms
     invs1 = firm1.invoices.sort_by{|x| x.pk}
@@ -333,7 +333,7 @@ describe "has_many :through has_many and has_one :through belongs_to" do
 
   it "should return has_one :through belongs_to records for a single object" do
     firm = @invoice1.firm
-    sqls_should_be('SELECT firms.id, clients.id AS clients_id, clients.firm_id FROM firms LEFT OUTER JOIN clients ON (clients.firm_id = firms.id) WHERE (clients.id = 1)')
+    sqls_should_be("SELECT firms.id, clients.id AS 'clients_id', clients.firm_id FROM firms LEFT OUTER JOIN clients ON (clients.firm_id = firms.id) WHERE (clients.id = 1)")
     firm.should == @firm1
     @invoice1.client.should == @client1
     @invoice1.client.firm.should == @firm1
@@ -343,7 +343,7 @@ describe "has_many :through has_many and has_one :through belongs_to" do
 
   it "should eagerly load has_one :through belongs_to records for multiple objects" do
     invs = Invoice.order(:id).eager(:firm).all
-    sqls_should_be("SELECT * FROM invoices ORDER BY id", "SELECT firms.id, clients.id AS clients_id, clients.firm_id FROM firms LEFT OUTER JOIN clients ON (clients.firm_id = firms.id) WHERE (clients.id IN (1, 2, 3))")
+    sqls_should_be("SELECT * FROM invoices ORDER BY id", "SELECT firms.id, clients.id AS 'clients_id', clients.firm_id FROM firms LEFT OUTER JOIN clients ON (clients.firm_id = firms.id) WHERE (clients.id IN (1, 2, 3))")
     invs.should == [@invoice1, @invoice2, @invoice3, @invoice4, @invoice5]
     invs[0].firm.should == @firm1
     invs[0].client.should == @client1

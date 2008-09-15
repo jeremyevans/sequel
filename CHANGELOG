@@ -1,5 +1,7 @@
 === HEAD
 
+* Use string literals in AS clauses on SQLite (jeremyevans) (#241)
+
 * AlterTableGenerator#set_column_allow_null was added to SET/DROP NOT NULL for columns (divoxx)
 
 * Database#tables now works for MySQL databases using the JDBC adapter (jeremyevans)

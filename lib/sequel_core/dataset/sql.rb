@@ -26,7 +26,7 @@ module Sequel
 
     # SQL fragment for the aliased expression
     def aliased_expression_sql(ae)
-      "#{literal(ae.expression)} AS #{quote_identifier(ae.aliaz)}"
+      as_sql(literal(ae.expression), ae.aliaz)
     end
 
     # SQL fragment for specifying given CaseExpression.
@@ -335,8 +335,8 @@ module Sequel
       table = jc.table
       table_alias = jc.table_alias
       table_alias = nil if table == table_alias
-      " #{join_type_sql(jc.join_type)} #{table_ref(table)}" \
-        "#{" AS #{quote_identifier(jc.table_alias)}" if table_alias}"
+      tref = table_ref(table)
+      " #{join_type_sql(jc.join_type)} #{table_alias ? as_sql(tref, table_alias) : tref}"
     end
 
     # SQL fragment specifying a JOIN clause with ON.
@@ -667,7 +667,8 @@ module Sequel
     #
     def symbol_to_column_ref(sym)
       c_table, column, c_alias = split_symbol(sym)
-      "#{"#{quote_identifier(c_table)}." if c_table}#{quote_identifier(column)}#{" AS #{quote_identifier(c_alias)}" if c_alias}"
+      qc = "#{"#{quote_identifier(c_table)}." if c_table}#{quote_identifier(column)}"
+      c_alias ? as_sql(qc, c_alias) : qc
     end
 
     # Returns a copy of the dataset with no filters (HAVING or WHERE clause) applied.
@@ -755,6 +756,11 @@ module Sequel
 
     private
 
+    # SQL fragment for specifying an alias.  expression should already be literalized.
+    def as_sql(expression, aliaz)
+      "#{expression} AS #{quote_identifier(aliaz)}"
+    end
+
     # Converts an array of column names into a comma seperated string of 
     # column names. If the array is empty, a wildcard (*) is returned.
     def column_list(columns)
@@ -762,7 +768,7 @@ module Sequel
         WILDCARD
       else
         m = columns.map do |i|
-          i.is_a?(Hash) ? i.map{|k, v| "#{literal(k)} AS #{quote_identifier(v)}"} : literal(i)
+          i.is_a?(Hash) ? i.map{|k, v| as_sql(literal(k), v)} : literal(i)
         end
         m.join(COMMA_SEPARATOR)
       end
@@ -891,7 +897,7 @@ module Sequel
       when Dataset
         t.to_table_reference
       when Hash
-        t.map {|k, v| "#{table_ref(k)} #{table_ref(v)}"}.join(COMMA_SEPARATOR)
+        t.map{|k, v| as_sql(table_ref(k), v)}.join(COMMA_SEPARATOR)
       when Symbol
         symbol_to_column_ref(t)
       when String

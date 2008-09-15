@@ -700,16 +700,13 @@ context "Dataset#from" do
   
   specify "should accept a hash for aliasing" do
     @dataset.from(:a => :b).sql.should ==
-      "SELECT * FROM a b"
+      "SELECT * FROM a AS b"
       
     @dataset.from(:a => 'b').sql.should ==
-      "SELECT * FROM a b"
-
-    @dataset.from(:a => :c[:d]).sql.should ==
-      "SELECT * FROM a c(d)"
+      "SELECT * FROM a AS b"
 
     @dataset.from(@dataset.from(:a).group(:b) => :c).sql.should ==
-      "SELECT * FROM (SELECT * FROM a GROUP BY b) c"
+      "SELECT * FROM (SELECT * FROM a GROUP BY b) AS c"
   end
 
   specify "should always use a subquery if given a dataset" do
@@ -1284,7 +1281,7 @@ context "Dataset#join_table" do
     ds = MockDataset.new(nil).from(:foo => :f)
     ds.quote_identifiers = true
     ds.join_table(:inner, :bar, :id => :bar_id).sql.should ==
-      'SELECT * FROM "foo" "f" INNER JOIN "bar" ON ("bar"."id" = "f"."bar_id")'
+      'SELECT * FROM "foo" AS "f" INNER JOIN "bar" ON ("bar"."id" = "f"."bar_id")'
   end
   
   specify "should allow for arbitrary conditions in the JOIN clause" do

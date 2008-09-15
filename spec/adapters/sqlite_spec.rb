@@ -240,6 +240,32 @@ context "An SQLite dataset" do
   end
 end
 
+context "An SQLite dataset AS clause" do
+  specify "should use a string literal for :col___alias" do
+    SQLITE_DB.literal(:c___a).should == "c AS 'a'"
+  end
+
+  specify "should use a string literal for :table__col___alias" do
+    SQLITE_DB.literal(:t__c___a).should == "t.c AS 'a'"
+  end
+
+  specify "should use a string literal for :column.as(:alias)" do
+    SQLITE_DB.literal(:c.as(:a)).should == "c AS 'a'"
+  end
+
+  specify "should use a string literal in the SELECT clause" do
+    SQLITE_DB[:t].select(:c___a).sql.should == "SELECT c AS 'a' FROM t"
+  end
+
+  specify "should use a string literal in the FROM clause" do
+    SQLITE_DB[:t___a].sql.should == "SELECT * FROM t AS 'a'"
+  end
+
+  specify "should use a string literal in the JOIN clause" do
+    SQLITE_DB[:t].join_table(:natural, :j, nil, :a).sql.should == "SELECT * FROM t NATURAL JOIN j AS 'a'"
+  end
+end
+
 context "An SQLite dataset" do
   setup do
     SQLITE_DB.create_table! :items do
