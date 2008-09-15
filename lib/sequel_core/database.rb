@@ -355,7 +355,7 @@ module Sequel
       synchronize(server){|conn|}
       true
     end
-    
+
     # A simple implementation of SQL transactions. Nested transactions are not 
     # supported - calling #transaction within a transaction will reuse the 
     # current transaction. Should be overridden for databases that support nested 
@@ -363,19 +363,19 @@ module Sequel
     def transaction(server=nil)
       synchronize(server) do |conn|
         return yield(conn) if @transactions.include?(Thread.current)
-        log_info(SQL_BEGIN)
-        conn.execute(SQL_BEGIN)
+        log_info(begin_transaction_sql)
+        conn.execute(begin_transaction_sql)
         begin
           @transactions << Thread.current
           yield(conn)
         rescue Exception => e
-          log_info(SQL_ROLLBACK)
-          conn.execute(SQL_ROLLBACK)
+          log_info(rollback_transaction_sql)
+          conn.execute(rollback_transaction_sql)
           transaction_error(e)
         ensure
           unless e
-            log_info(SQL_COMMIT)
-            conn.execute(SQL_COMMIT)
+            log_info(commit_transaction_sql)
+            conn.execute(commit_transaction_sql)
           end
           @transactions.delete(Thread.current)
         end
@@ -471,6 +471,38 @@ module Sequel
     
     private
     
+    # SQL to BEGIN a transaction.
+    def begin_transaction_sql
+      SQL_BEGIN
+    end
+
+    # SQL to COMMIT a transaction.
+    def commit_transaction_sql
+      SQL_COMMIT
+    end
+
+    # The default options for the connection pool.
+    def connection_pool_default_options
+      {}
+    end
+
+    # SQL to ROLLBACK a transaction.
+    def rollback_transaction_sql
+      SQL_ROLLBACK
+    end
+    
+    # Convert the given exception to a DatabaseError, keeping message
+    # and traceback.
+    def raise_error(exception, opts={})
+      if !opts[:classes] || exception.is_one_of?(*opts[:classes])
+        e = DatabaseError.new("#{exception.class} #{exception.message}")
+        e.set_backtrace(exception.backtrace)
+        raise e
+      else
+        raise exception
+      end
+    end
+
     # Return the options for the given server by merging the generic
     # options for all server with the specific options for the given
     # server specified in the :servers option.
@@ -489,23 +521,6 @@ module Sequel
       end
       opts.delete(:servers)
       opts
-    end
-
-    # The default options for the connection pool.
-    def connection_pool_default_options
-      {}
-    end
-
-    # Convert the given exception to a DatabaseError, keeping message
-    # and traceback.
-    def raise_error(exception, opts={})
-      if !opts[:classes] || exception.is_one_of?(*opts[:classes])
-        e = DatabaseError.new("#{exception.class} #{exception.message}")
-        e.set_backtrace(exception.backtrace)
-        raise e
-      else
-        raise exception
-      end
     end
 
     # Raise a database error unless the exception is an Error::Rollback.

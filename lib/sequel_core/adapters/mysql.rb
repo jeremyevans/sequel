@@ -150,19 +150,19 @@ module Sequel
       def transaction(server=nil)
         synchronize(server) do |conn|
           return yield(conn) if @transactions.include?(Thread.current)
-          log_info(SQL_BEGIN)
-          conn.query(SQL_BEGIN)
+          log_info(begin_transaction_sql)
+          conn.query(begin_transaction_sql)
           begin
             @transactions << Thread.current
             yield(conn)
           rescue ::Exception => e
-            log_info(SQL_ROLLBACK)
-            conn.query(SQL_ROLLBACK)
+            log_info(rollback_transaction_sql)
+            conn.query(rollback_transaction_sql)
             transaction_error(e, Mysql::Error)
           ensure
             unless e
-              log_info(SQL_COMMIT)
-              conn.query(SQL_COMMIT)
+              log_info(commit_transaction_sql)
+              conn.query(commit_transaction_sql)
             end
             @transactions.delete(Thread.current)
           end

@@ -1,5 +1,7 @@
 === HEAD
 
+* Support transactions on MSSQL (jeremyevans)
+
 * Use string literals in AS clauses on SQLite (jeremyevans) (#241)
 
 * AlterTableGenerator#set_column_allow_null was added to SET/DROP NOT NULL for columns (divoxx)

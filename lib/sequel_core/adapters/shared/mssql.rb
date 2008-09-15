@@ -2,15 +2,35 @@ module Sequel
   module MSSQL
     module DatabaseMethods
       AUTO_INCREMENT = 'IDENTITY(1,1)'.freeze
+      SQL_BEGIN = "BEGIN TRANSACTION".freeze
+      SQL_COMMIT = "COMMIT TRANSACTION".freeze
+      SQL_ROLLBACK = "ROLLBACK TRANSACTION".freeze
       
       def auto_increment_sql
         AUTO_INCREMENT
       end
-      
+
       def dataset(opts = nil)
         ds = super
         ds.extend(DatasetMethods)
         ds
+      end
+
+      private
+
+      # SQL to BEGIN a transaction.
+      def begin_transaction_sql
+        SQL_BEGIN
+      end
+
+      # SQL to COMMIT a transaction.
+      def commit_transaction_sql
+        SQL_COMMIT
+      end
+      
+      # SQL to ROLLBACK a transaction.
+      def rollback_transaction_sql
+        SQL_ROLLBACK
       end
     end
   

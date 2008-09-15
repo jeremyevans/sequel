@@ -154,18 +154,18 @@ module Sequel
           return yield(conn) if @transactions.include?(Thread.current)
           stmt = conn.createStatement
           begin
-            log_info(Sequel::Database::SQL_BEGIN)
-            stmt.execute(Sequel::Database::SQL_BEGIN)
+            log_info(begin_transaction_sql)
+            stmt.execute(begin_transaction_sql)
             @transactions << Thread.current
             yield(conn)
           rescue Exception => e
-            log_info(Sequel::Database::SQL_ROLLBACK)
-            stmt.execute(Sequel::Database::SQL_ROLLBACK)
-            raise e unless Error::Rollback === e
+            log_info(rollback_transaction_sql)
+            stmt.execute(rollback_transaction_sql)
+            transaction_error(e)
           ensure
             unless e
-              log_info(Sequel::Database::SQL_COMMIT)
-              stmt.execute(Sequel::Database::SQL_COMMIT)
+              log_info(commit_transaction_sql)
+              stmt.execute(commit_transaction_sql)
             end
             stmt.close
             @transactions.delete(Thread.current)

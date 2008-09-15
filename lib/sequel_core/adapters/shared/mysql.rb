@@ -7,9 +7,6 @@ module Sequel
       NOT_NULL = Sequel::Schema::SQL::NOT_NULL
       NULL = Sequel::Schema::SQL::NULL
       PRIMARY_KEY = Sequel::Schema::SQL::PRIMARY_KEY
-      SQL_BEGIN = Sequel::Database::SQL_BEGIN
-      SQL_COMMIT = Sequel::Database::SQL_COMMIT
-      SQL_ROLLBACK = Sequel::Database::SQL_ROLLBACK
       TYPES = Sequel::Schema::SQL::TYPES
       UNIQUE = Sequel::Schema::SQL::UNIQUE
       UNSIGNED = Sequel::Schema::SQL::UNSIGNED
