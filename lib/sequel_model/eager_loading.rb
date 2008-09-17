@@ -323,9 +323,9 @@ module Sequel::Model::Associations::EagerLoading
         else
           list = record.send(alias_map[ta])
           list.uniq!
-          # Recurse into dependencies
-          list.each{|rec| eager_graph_make_associations_unique(rec, deps, alias_map, type_map)}
         end
+        # Recurse into dependencies
+        eager_graph_make_associations_unique(list, deps, alias_map, type_map) if list
       end
     end
   end

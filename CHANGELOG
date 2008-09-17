@@ -1,5 +1,7 @@
 === HEAD
 
+* Fix a few corner cases in eager_graph (jeremyevans)
+
 * Support transactions on MSSQL (jeremyevans)
 
 * Use string literals in AS clauses on SQLite (jeremyevans) (#241)
