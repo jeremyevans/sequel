@@ -1,5 +1,7 @@
 === HEAD
 
+* Fix join_table when doing the first join for a dataset where the first source is a dataset when using unqualified columns (jeremyevans)
+
 * Fix a few corner cases in eager_graph (jeremyevans)
 
 * Support transactions on MSSQL (jeremyevans)

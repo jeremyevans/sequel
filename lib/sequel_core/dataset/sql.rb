@@ -393,7 +393,7 @@ module Sequel
         raise(Sequel::Error, "can't use a block if providing an array of symbols as expr") if block_given?
         SQL::JoinUsingClause.new(expr, type, table, table_alias)
       else
-        last_alias = @opts[:last_joined_table] || first_source
+        last_alias = @opts[:last_joined_table] || (first_source.is_a?(Dataset) ? 't1' : first_source)
         if Hash === expr or (Array === expr and expr.all_two_pairs?)
           expr = expr.collect do |k, v|
             k = qualified_column_name(k, table_name) if k.is_a?(Symbol)
