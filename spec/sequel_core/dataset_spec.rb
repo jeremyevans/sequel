@@ -2319,6 +2319,17 @@ context "Dataset#multi_insert" do
     ]
   end
   
+  specify "should accept string keys as column names" do
+    @ds.multi_insert([{'x'=>1, 'y'=>2}, {'x'=>3, 'y'=>4}])
+    @ds.multi_insert(['x', 'y'], [[1, 2], [3, 4]])
+    @db.sqls.should == [
+      'BEGIN',
+      "INSERT INTO items (x, y) VALUES (1, 2)",
+      "INSERT INTO items (x, y) VALUES (3, 4)",
+      'COMMIT'
+    ] * 2
+  end
+
   specify "should accept a columns array and a values array" do
     @ds.multi_insert([:x, :y], [[1, 2], [3, 4]])
     @db.sqls.should == [

@@ -466,9 +466,8 @@ module Sequel
         return super if server_version < 80200
         
         # postgresql 8.2 introduces support for multi-row insert
-        columns = column_list(columns)
         values = values.map {|r| literal(Array(r))}.join(COMMA_SEPARATOR)
-        ["INSERT INTO #{source_list(@opts[:from])} (#{columns}) VALUES #{values}"]
+        ["INSERT INTO #{source_list(@opts[:from])} (#{identifier_list(columns)}) VALUES #{values}"]
       end
       
       # PostgreSQL assumes unquoted identifiers are lower case by default,

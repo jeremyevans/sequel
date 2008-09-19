@@ -186,9 +186,8 @@ module Sequel
       
       # MySQL specific syntax for inserting multiple values at once.
       def multi_insert_sql(columns, values)
-        columns = column_list(columns)
         values = values.map {|r| literal(Array(r))}.join(COMMA_SEPARATOR)
-        ["INSERT INTO #{source_list(@opts[:from])} (#{columns}) VALUES #{values}"]
+        ["INSERT INTO #{source_list(@opts[:from])} (#{identifier_list(columns)}) VALUES #{values}"]
       end
       
       # MySQL uses the nonstandard ` (backtick) for quoting identifiers.

@@ -465,7 +465,7 @@ module Sequel
       when ::Sequel::SQL::Expression
         v.to_s(self)
       when Array
-        v.all_two_pairs? ? literal(v.sql_expr) : (v.empty? ? '(NULL)' : "(#{v.collect{|i| literal(i)}.join(COMMA_SEPARATOR)})")
+        v.all_two_pairs? ? literal(v.sql_expr) : (v.empty? ? '(NULL)' : "(#{expression_list(v)})")
       when Hash
         literal(v.sql_expr)
       when Time, DateTime
@@ -487,9 +487,9 @@ module Sequel
     # inserting multiple records in a single SQL statement.
     def multi_insert_sql(columns, values)
       table = quote_identifier(@opts[:from].first)
-      columns = literal(columns)
+      columns = identifier_list(columns)
       values.map do |r|
-        "INSERT INTO #{table} #{columns} VALUES #{literal(r)}"
+        "INSERT INTO #{table} (#{columns}) VALUES #{literal(r)}"
       end
     end
     
@@ -725,9 +725,7 @@ module Sequel
         # get values from hash
         values = transform_save(values) if @transform
         values.map do |k, v|
-          # convert string key into symbol
-          k = k.to_sym if String === k
-          "#{literal(k)} = #{literal(v)}"
+          "#{k.is_one_of?(String, Symbol) ? quote_identifier(k) : literal(k)} = #{literal(v)}"
         end.join(COMMA_SEPARATOR)
       else
         # copy values verbatim
@@ -810,6 +808,11 @@ module Sequel
       else
         raise(Error, 'Invalid filter argument')
       end
+    end
+
+    # SQL fragment specifying a list of identifiers
+    def identifier_list(columns)
+      columns.map{|i| quote_identifier(i)}.join(COMMA_SEPARATOR)
     end
 
     # SQL statement for formatting an insert statement with default values
