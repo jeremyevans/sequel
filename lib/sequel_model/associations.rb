@@ -325,12 +325,12 @@ module Sequel::Model::Associations
     opts[:eager_loader] ||= proc do |key_hash, records, associations|
       h = key_hash[key]
       keys = h.keys
+      # Default the cached association to nil, so any object that doesn't have it
+      # populated will have cached the negative lookup.
+      records.each{|object| object.associations[name] = nil}
       # Skip eager loading if no objects have a foreign key for this association
       unless keys.empty?
-        # Default the cached association to nil, so any object that doesn't have it
-        # populated will have cached the negative lookup.
-        records.each{|object| object.associations[name] = nil}
-        model.eager_loading_dataset(opts, opts.associated_class.filter(opts.associated_primary_key.qualify(opts.associated_class.table_name)=>keys),  opts.select, associations).all do |assoc_record|
+        model.eager_loading_dataset(opts, opts.associated_class.filter(opts.associated_primary_key.qualify(opts.associated_class.table_name)=>keys), opts.select, associations).all do |assoc_record|
           next unless objects = h[assoc_record.pk]
           objects.each{|object| object.associations[name] = assoc_record}
         end

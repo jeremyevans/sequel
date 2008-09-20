@@ -1,5 +1,7 @@
 === HEAD
 
+* Cache negative lookup when eagerly loading many_to_one associations where no objects have an associated object (jeremyevans)
+
 * Allow string keys to be used when using Dataset#multi_insert (jeremyevans)
 
 * Fix join_table when doing the first join for a dataset where the first source is a dataset when using unqualified columns (jeremyevans)
