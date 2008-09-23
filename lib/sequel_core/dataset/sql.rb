@@ -749,7 +749,8 @@ module Sequel
     # Returns a table reference for use in the FROM clause.  Returns an SQL subquery
     # frgament with an optional table alias.
     def to_table_reference(table_alias=nil)
-      "(#{sql})#{" #{quote_identifier(table_alias)}" if table_alias}"
+      s = "(#{sql})"
+      table_alias ? as_sql(s, table_alias) : s
     end
 
     private

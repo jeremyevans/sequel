@@ -558,7 +558,7 @@ context "a grouped dataset" do
   specify "should format the right statement for counting (as a subquery)" do
     db = MockDatabase.new
     db[:test].select(:name).group(:name).count
-    db.sqls.should == ["SELECT COUNT(*) FROM (SELECT name FROM test GROUP BY name) t1 LIMIT 1"]
+    db.sqls.should == ["SELECT COUNT(*) FROM (SELECT name FROM test GROUP BY name) AS t1 LIMIT 1"]
   end
 end
 
@@ -684,18 +684,18 @@ context "Dataset#from" do
 
   specify "should format a Dataset as a subquery if it has had options set" do
     @dataset.from(@dataset.from(:a).where(:a=>1)).select_sql.should ==
-      "SELECT * FROM (SELECT * FROM a WHERE (a = 1)) t1"
+      "SELECT * FROM (SELECT * FROM a WHERE (a = 1)) AS t1"
   end
   
   specify "should automatically alias sub-queries" do
     @dataset.from(@dataset.from(:a).group(:b)).select_sql.should ==
-      "SELECT * FROM (SELECT * FROM a GROUP BY b) t1"
+      "SELECT * FROM (SELECT * FROM a GROUP BY b) AS t1"
       
     d1 = @dataset.from(:a).group(:b)
     d2 = @dataset.from(:c).group(:d)
     
     @dataset.from(d1, d2).sql.should == 
-      "SELECT * FROM (SELECT * FROM a GROUP BY b) t1, (SELECT * FROM c GROUP BY d) t2"
+      "SELECT * FROM (SELECT * FROM a GROUP BY b) AS t1, (SELECT * FROM c GROUP BY d) AS t2"
   end
   
   specify "should accept a hash for aliasing" do
@@ -711,7 +711,7 @@ context "Dataset#from" do
 
   specify "should always use a subquery if given a dataset" do
     @dataset.from(@dataset.from(:a)).select_sql.should ==
-      "SELECT * FROM (SELECT * FROM a) t1"
+      "SELECT * FROM (SELECT * FROM a) AS t1"
   end
   
   specify "should raise if no source is given" do
@@ -982,7 +982,7 @@ context "Dataset#limit" do
   specify "should work with fixed sql datasets" do
     @dataset.opts[:sql] = 'select * from cccc'
     @dataset.limit(6, 10).sql.should ==
-      'SELECT * FROM (select * from cccc) t1 LIMIT 6 OFFSET 10'
+      'SELECT * FROM (select * from cccc) AS t1 LIMIT 6 OFFSET 10'
   end
   
   specify "should raise an error if an invalid limit or offset is used" do
@@ -1099,7 +1099,7 @@ context "Dataset#uniq" do
 
   specify "should do a subselect for count" do
     @dataset.uniq.count
-    @db.sqls.should == ['SELECT COUNT(*) FROM (SELECT DISTINCT name FROM test) t1 LIMIT 1']
+    @db.sqls.should == ['SELECT COUNT(*) FROM (SELECT DISTINCT name FROM test) AS t1 LIMIT 1']
   end
 end
 
@@ -1135,12 +1135,12 @@ context "Dataset#count" do
   specify "should count properly for datasets with fixed sql" do
     @dataset.opts[:sql] = "select abc from xyz"
     @dataset.count.should == 1
-    @c.sql.should == "SELECT COUNT(*) FROM (select abc from xyz) t1 LIMIT 1"
+    @c.sql.should == "SELECT COUNT(*) FROM (select abc from xyz) AS t1 LIMIT 1"
   end
 
   specify "should return limit if count is greater than it" do
     @dataset.limit(5).count.should == 1
-    @c.sql.should == "SELECT COUNT(*) FROM (SELECT * FROM test LIMIT 5) t1 LIMIT 1"
+    @c.sql.should == "SELECT COUNT(*) FROM (SELECT * FROM test LIMIT 5) AS t1 LIMIT 1"
   end
   
   it "should work on a graphed_dataset" do
@@ -2159,7 +2159,7 @@ context "A paginated dataset" do
   specify "should work with fixed sql" do
     ds = @d.clone(:sql => 'select * from blah')
     ds.meta_def(:count) {150}
-    ds.paginate(2, 50).sql.should == 'SELECT * FROM (select * from blah) t1 LIMIT 50 OFFSET 50'
+    ds.paginate(2, 50).sql.should == 'SELECT * FROM (select * from blah) AS t1 LIMIT 50 OFFSET 50'
   end
 end
 
