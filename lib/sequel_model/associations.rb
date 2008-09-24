@@ -135,6 +135,8 @@ module Sequel::Model::Associations
   #     an array with two arguments for the value to specify a limit and offset.
   #   - :order - the column(s) by which to order the association dataset.  Can be a
   #     singular column or an array.
+  #   - :order_eager_graph - Whether to add the order to the dataset's order when graphing
+  #     via eager graph.  Defaults to true, so set to false to disable.
   #   - :read_only - Do not add a setter method (for many_to_one or one_to_many with :one_to_one),
   #     or add_/remove_/remove_all_ methods (for one_to_many, many_to_many)
   #   - :reciprocal - the symbol name of the reciprocal association,
@@ -192,6 +194,7 @@ module Sequel::Model::Associations
     opts = AssociationReflection.new.merge!(opts)
     opts[:eager_block] = block unless opts.include?(:eager_block)
     opts[:graph_join_type] ||= :left_outer
+    opts[:order_eager_graph] = true unless opts.include?(:order_eager_graph)
     opts[:graph_conditions] = opts[:graph_conditions] ? opts[:graph_conditions].to_a : []
     opts[:graph_select] = Array(opts[:graph_select]) if opts[:graph_select]
     [:before_add, :before_remove, :after_add, :after_remove, :after_load, :extend].each do |cb_type|

@@ -87,10 +87,8 @@ module Sequel::Model::Associations::EagerLoading
   # create large cartesian products.  If you must graph multiple *_to_many associations,
   # make sure your filters are specific if you have a large database.
   # 
-  # This does not respect each association's order, as all associations are loaded in
-  # a single query.  If you want to order the results, you must manually call .order.
-  #
-  # #eager_graph probably won't work correctly on a limited dataset, unless you are
+  # Each association's order, if definied, is respected. #eager_graph probably
+  # won't work correctly on a limited dataset, unless you are
   # only graphing many_to_one associations.
   # 
   # Does not use the block defined for the association, since it does a single query for
@@ -149,6 +147,7 @@ module Sequel::Model::Associations::EagerLoading
       ds = ds.graph(r[:join_table], use_jt_only_conditions ? r[:graph_join_table_only_conditions] : [[r[:left_key], model.primary_key.qualify(ta)]] + r[:graph_join_table_conditions], :select=>false, :table_alias=>ds.eager_unique_table_alias(ds, r[:join_table]), :join_type=>r[:graph_join_table_join_type], &r[:graph_join_table_block])
       ds.graph(klass, use_only_conditions ? only_conditions : [[klass.primary_key, r[:right_key]]] + conditions, :select=>select, :table_alias=>assoc_table_alias, :join_type=>join_type, &graph_block)
     end
+    ds = ds.order_more(*(Array(r[:order]).map{|c| Sequel::SQL::QualifiedIdentifier.new(assoc_table_alias, c)})) if r[:order] and r[:order_eager_graph]
     eager_graph = ds.opts[:eager_graph]
     eager_graph[:requirements][assoc_table_alias] = requirements.dup
     eager_graph[:alias_association_name_map][assoc_table_alias] = assoc_name
@@ -250,16 +249,18 @@ module Sequel::Model::Associations::EagerLoading
   # Will either be the table_alias itself or table_alias_N for some integer
   # N (starting at 0 and increasing until an unused one is found).
   def eager_unique_table_alias(ds, table_alias)
-    if (graph = ds.opts[:graph]) && (table_aliases = graph[:table_aliases]) && (table_aliases.include?(table_alias))
+    used_aliases = ds.opts[:from]
+    graph = ds.opts[:graph]
+    used_aliases += graph[:table_aliases].keys if graph
+    if used_aliases.include?(table_alias)
       i = 0
       loop do
         ta = :"#{table_alias}_#{i}"
-        return ta unless table_aliases[ta]
+        return ta unless used_aliases.include?(ta)
         i += 1
       end
-    else
-      table_alias
     end
+    table_alias
   end
 
   private

@@ -992,4 +992,33 @@ describe Sequel::Model, "#eager_graph" do
   it "should create unique table aliases for all associations" do
     GraphAlbum.eager_graph(:previous_album=>{:previous_album=>:previous_album}).sql.should == "SELECT albums.id, albums.band_id, previous_album.id AS previous_album_id, previous_album.band_id AS previous_album_band_id, previous_album_0.id AS previous_album_0_id, previous_album_0.band_id AS previous_album_0_band_id, previous_album_1.id AS previous_album_1_id, previous_album_1.band_id AS previous_album_1_band_id FROM albums LEFT OUTER JOIN albums AS previous_album ON (previous_album.id = albums.previous_album_id) LEFT OUTER JOIN albums AS previous_album_0 ON (previous_album_0.id = previous_album.previous_album_id) LEFT OUTER JOIN albums AS previous_album_1 ON (previous_album_1.id = previous_album_0.previous_album_id)"
   end
+
+  it "should respect the associations :order" do
+    GraphAlbum.one_to_many :right_tracks, :class=>'GraphTrack', :key=>:album_id, :order=>[:id, :album_id]
+    GraphAlbum.eager_graph(:right_tracks).sql.should == 'SELECT albums.id, albums.band_id, right_tracks.id AS right_tracks_id, right_tracks.album_id FROM albums LEFT OUTER JOIN tracks AS right_tracks ON (right_tracks.album_id = albums.id) ORDER BY right_tracks.id, right_tracks.album_id'
+  end
+
+  it "should not respect the associations :order if :order_eager_graph is false" do
+    GraphAlbum.one_to_many :right_tracks, :class=>'GraphTrack', :key=>:album_id, :order=>[:id, :album_id], :order_eager_graph=>false
+    GraphAlbum.eager_graph(:right_tracks).sql.should == 'SELECT albums.id, albums.band_id, right_tracks.id AS right_tracks_id, right_tracks.album_id FROM albums LEFT OUTER JOIN tracks AS right_tracks ON (right_tracks.album_id = albums.id)'
+  end
+
+  it "should add the associations :order to the existing order" do
+    GraphAlbum.one_to_many :right_tracks, :class=>'GraphTrack', :key=>:album_id, :order=>[:id, :album_id]
+    GraphAlbum.order(:band_id).eager_graph(:right_tracks).sql.should == 'SELECT albums.id, albums.band_id, right_tracks.id AS right_tracks_id, right_tracks.album_id FROM albums LEFT OUTER JOIN tracks AS right_tracks ON (right_tracks.album_id = albums.id) ORDER BY band_id, right_tracks.id, right_tracks.album_id'
+  end
+
+  it "should add the associations :order for cascading associations" do
+    GraphBand.one_to_many :a_albums, :class=>'GraphAlbum', :key=>:band_id, :order=>:name
+    GraphAlbum.one_to_many :b_tracks, :class=>'GraphTrack', :key=>:album_id, :order=>[:id, :album_id]
+    GraphBand.eager_graph(:a_albums=>:b_tracks).sql.should == 'SELECT bands.id, bands.vocalist_id, a_albums.id AS a_albums_id, a_albums.band_id, b_tracks.id AS b_tracks_id, b_tracks.album_id FROM bands LEFT OUTER JOIN albums AS a_albums ON (a_albums.band_id = bands.id) LEFT OUTER JOIN tracks AS b_tracks ON (b_tracks.album_id = a_albums.id) ORDER BY a_albums.name, b_tracks.id, b_tracks.album_id'
+    GraphAlbum.one_to_many :albums, :class=>'GraphAlbum', :key=>:band_id, :order=>[:band_id, :id]
+    GraphAlbum.eager_graph(:albums=>{:albums=>:albums}).sql.should == 'SELECT albums.id, albums.band_id, albums_0.id AS albums_0_id, albums_0.band_id AS albums_0_band_id, albums_1.id AS albums_1_id, albums_1.band_id AS albums_1_band_id, albums_2.id AS albums_2_id, albums_2.band_id AS albums_2_band_id FROM albums LEFT OUTER JOIN albums AS albums_0 ON (albums_0.band_id = albums.id) LEFT OUTER JOIN albums AS albums_1 ON (albums_1.band_id = albums_0.id) LEFT OUTER JOIN albums AS albums_2 ON (albums_2.band_id = albums_1.id) ORDER BY albums_0.band_id, albums_0.id, albums_1.band_id, albums_1.id, albums_2.band_id, albums_2.id'
+  end
+
+  it "should add the associations :order for multiple associations" do
+    GraphAlbum.many_to_many :a_genres, :class=>'GraphGenre', :left_key=>:album_id, :right_key=>:genre_id, :join_table=>:ag, :order=>:id
+    GraphAlbum.one_to_many :b_tracks, :class=>'GraphTrack', :key=>:album_id, :order=>[:id, :album_id]
+    GraphAlbum.eager_graph(:a_genres, :b_tracks).sql.should == 'SELECT albums.id, albums.band_id, a_genres.id AS a_genres_id, b_tracks.id AS b_tracks_id, b_tracks.album_id FROM albums LEFT OUTER JOIN ag ON (ag.album_id = albums.id) LEFT OUTER JOIN genres AS a_genres ON (a_genres.id = ag.genre_id) LEFT OUTER JOIN tracks AS b_tracks ON (b_tracks.album_id = albums.id) ORDER BY a_genres.id, b_tracks.id, b_tracks.album_id'
+  end
 end
