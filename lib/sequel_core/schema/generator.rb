@@ -200,6 +200,13 @@ module Sequel
 
       # Add a foreign key with the given name and referencing the given table
       # to the DDL for the table.  See Generator#column for the available options.
+      #
+      # You can also pass an array of column names for creating composite foreign
+      # keys. In this case, it will assume the columns exists and will only add
+      # the constraint.
+      #
+      # NOTE: If you need to add a foreign key constraint to an existing column
+      # use the composite key syntax even if it is only one column.
       def add_foreign_key(name, table, opts = {})
         return add_composite_foreign_key(name, table, opts) if name.is_a?(Array)
         add_column(name, :integer, {:table=>table}.merge(opts))
