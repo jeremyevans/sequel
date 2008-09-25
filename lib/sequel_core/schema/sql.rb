@@ -102,7 +102,8 @@ module Sequel
         when :unique
           sql << "UNIQUE #{literal(constraint[:columns])}"
         else
-          sql << "CHECK #{filter_expr(constraint[:check])}"
+          check = constraint[:check]
+          sql << "CHECK #{filter_expr((check.is_a?(Array) && check.length == 1) ? check.first : check)}"
         end
         sql
       end

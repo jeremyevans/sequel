@@ -331,6 +331,13 @@ context "DB#create_table" do
     @db.sqls.should == ["CREATE TABLE cats (CHECK (price < 100))"]
   end
 
+  specify "should accept hash constraints" do
+    @db.create_table(:cats) do
+      check :price=>100
+    end
+    @db.sqls.should == ["CREATE TABLE cats (CHECK (price = 100))"]
+  end
+
   specify "should accept named constraint definitions" do
     @db.create_table(:cats) do
       integer :score
