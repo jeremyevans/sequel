@@ -1,5 +1,7 @@
 === HEAD
 
+* Add schema.rdoc file, which provides an brief description of the various parts of Sequel related to schema modification (jeremyevans)
+
 * Fix constraint generation when not using a proc or interpolated string (jeremyevans)
 
 * Make eager_graph respect associations' :order options (use :order_eager_graph=>false to disable) (jeremyevans)

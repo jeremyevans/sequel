@@ -85,6 +85,13 @@ module Sequel
   # The migration files should contain one or more migration classes based
   # on Sequel::Migration.
   #
+  # Migrations are generally run via the sequel command line tool,
+  # using the -m and -M switches.  The -m switch specifies the migration
+  # directory, and the -M switch specifies the version to which to migrate.
+  # 
+  # You can apply migrations using the Migrator API, as well (this is necessary
+  # if you want to specify the version from which to migrate in addition to the version
+  # to which to migrate).
   # To apply a migration, the #apply method must be invoked with the database
   # instance, the directory of migration files and the target version. If
   # no current version is supplied, it is read from the database. The migrator
