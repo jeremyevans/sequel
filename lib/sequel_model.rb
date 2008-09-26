@@ -50,8 +50,9 @@ module Sequel
   #   cache_store, cache_ttl, dataset_methods, primary_key, restricted_columns,
   #   sti_dataset, and sti_key.  You should not usually need to
   #   access these directly.
-  # * The following class level attr_accessors are created: raise_on_save_failure,
-  #   strict_param_setting, typecast_empty_string_to_nil, and typecast_on_assignment:
+  # * The following class level attr_accessors are created: raise_on_typecast_failure,
+  #   raise_on_save_failure, strict_param_setting, typecast_empty_string_to_nil,
+  #   and typecast_on_assignment:
   #
   #     # Don't raise an error if a validation attempt fails in
   #     # save/create/save_changes/etc.
@@ -72,6 +73,10 @@ module Sequel
   #     Model.typecast_empty_string_to_nil = false
   #     m.number = ''
   #     m.number # => '' instead of nil
+  #     # Don't raise if typecasting to nil but column cannot be null
+  #     Model.typecast_empty_string_to_nil = true
+  #     Model.raise_on_typecast_failure = false
+  #     m.not_null_column = '' # => nil
   #
   # * The following class level method aliases are defined:
   #   * Model.dataset= => set_dataset

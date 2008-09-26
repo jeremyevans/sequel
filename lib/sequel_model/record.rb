@@ -17,6 +17,10 @@ module Sequel
     # returning nil on a failure to save/save_changes/etc.
     attr_writer :raise_on_save_failure
 
+    # Whether this model instance should raise and error when attempting to
+    # typecast nil to a column which has :null => false set.
+    attr_writer :raise_on_typecast_failure
+
     # Whether this model instance should raise an error if attempting
     # to call a method through set/update and their variants that either
     # doesn't exist or access to it is denied.
@@ -54,6 +58,7 @@ module Sequel
       @strict_param_setting = model.strict_param_setting
       @typecast_on_assignment = model.typecast_on_assignment
       @typecast_empty_string_to_nil = model.typecast_empty_string_to_nil
+      @raise_on_typecast_failure = model.raise_on_typecast_failure
       if from_db
         @new = false
         @values = values
@@ -531,7 +536,7 @@ module Sequel
     def typecast_value(column, value)
       return value unless @typecast_on_assignment && @db_schema && (col_schema = @db_schema[column])
       value = nil if value == '' and @typecast_empty_string_to_nil and col_schema[:type] and ![:string, :blob].include?(col_schema[:type])
-      raise(Error, "nil/NULL is not allowed for the #{column} column") if value.nil? && (col_schema[:allow_null] == false)
+      raise(Error, "nil/NULL is not allowed for the #{column} column") if @raise_on_typecast_failure && value.nil? && (col_schema[:allow_null] == false)
       model.db.typecast_value(col_schema[:type], value)
     end
 

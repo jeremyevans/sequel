@@ -930,6 +930,17 @@ describe Sequel::Model, "typecasting" do
     m.x.should == nil
   end
 
+  specify "should not raise when typecasting nil to NOT NULL column but raise_on_typecast_failure is off" do
+    @c.raise_on_typecast_failure = false
+    @c.typecast_on_assignment = true
+    @c.instance_variable_set(:@db_schema, {:x=>{:type=>:integer,:allow_null=>false}})
+    m = @c.new
+    m.x = ''
+    m.x.should == nil
+    m.x = nil
+    m.x.should == nil
+  end
+
   specify "should raise an error if invalid data is used in an integer field" do
     @c.instance_variable_set(:@db_schema, {:x=>{:type=>:integer}})
     proc{@c.new.x = 'a'}.should raise_error
