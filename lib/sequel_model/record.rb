@@ -537,7 +537,15 @@ module Sequel
       return value unless @typecast_on_assignment && @db_schema && (col_schema = @db_schema[column])
       value = nil if value == '' and @typecast_empty_string_to_nil and col_schema[:type] and ![:string, :blob].include?(col_schema[:type])
       raise(Error, "nil/NULL is not allowed for the #{column} column") if @raise_on_typecast_failure && value.nil? && (col_schema[:allow_null] == false)
-      model.db.typecast_value(col_schema[:type], value)
+      begin
+        model.db.typecast_value(col_schema[:type], value)
+      rescue Sequel::Error::InvalidValue
+        if @raise_on_typecast_failure
+          raise
+        else
+          value
+        end
+      end
     end
 
     # Set the columns, filtered by the only and except arrays.

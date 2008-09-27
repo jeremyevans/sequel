@@ -1015,3 +1015,27 @@ context "Database#raise_error" do
     proc{MockDatabase.new.send(:raise_error, Interrupt.new(''))}.should raise_error(Sequel::DatabaseError)
   end
 end
+
+context "Database#typecast_value" do
+  setup do
+    @db = Sequel::Database.new(1 => 2, :logger => 3)
+  end
+  specify "should raise InvalidValue when setting invalid integer" do
+    proc{@db.typecast_value(:integer, "13a")}.should raise_error(Sequel::Error::InvalidValue)
+  end
+  specify "should raise InvalidValue when setting invalid float" do
+    proc{@db.typecast_value(:float, "4.e2")}.should raise_error(Sequel::Error::InvalidValue)
+  end
+  specify "should raise InvalidValue when setting invalid decimal" do
+    proc{@db.typecast_value(:decimal, :invalid_value)}.should raise_error(Sequel::Error::InvalidValue)
+  end
+  specify "should raise InvalidValue when setting invalid date" do
+    proc{@db.typecast_value(:date, Object.new)}.should raise_error(Sequel::Error::InvalidValue)
+  end
+  specify "should raise InvalidValue when setting invalid time" do
+    proc{@db.typecast_value(:time, Date.new)}.should raise_error(Sequel::Error::InvalidValue)
+  end
+  specify "should raise InvalidValue when setting invalid datetime" do
+    proc{@db.typecast_value(:datetime, 4)}.should raise_error(Sequel::Error::InvalidValue)
+  end
+end

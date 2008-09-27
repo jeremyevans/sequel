@@ -384,15 +384,25 @@ module Sequel
     
     # Typecast the value to the given column_type. Can be overridden in
     # adapters to support database specific column types.
+    # This method should raise Sequel::Error::InvalidValue if assigned value
+    # is invalid.
     def typecast_value(column_type, value)
       return nil if value.nil?
       case column_type
       when :integer
-        Integer(value)
+        begin
+          Integer(value)
+        rescue ArgumentError => e
+          raise Sequel::Error::InvalidValue, e.message.inspect
+        end
       when :string
         value.to_s
       when :float
-        Float(value)
+        begin
+          Float(value)
+        rescue ArgumentError => e
+          raise Sequel::Error::InvalidValue, e.message.inspect
+        end
       when :decimal
         case value
         when BigDecimal
@@ -402,7 +412,7 @@ module Sequel
         when Integer
           value.to_s.to_d
         else
-          raise ArgumentError, "invalid value for BigDecimal: #{value.inspect}"
+          raise Sequel::Error::InvalidValue, "invalid value for BigDecimal: #{value.inspect}"
         end
       when :boolean
         case value
@@ -420,7 +430,7 @@ module Sequel
         when String
           value.to_date
         else
-          raise ArgumentError, "invalid value for Date: #{value.inspect}"
+          raise Sequel::Error::InvalidValue, "invalid value for Date: #{value.inspect}"
         end
       when :time
         case value
@@ -429,10 +439,10 @@ module Sequel
         when String
           value.to_time
         else
-          raise ArgumentError, "invalid value for Time: #{value.inspect}"
+          raise Sequel::Error::InvalidValue, "invalid value for Time: #{value.inspect}"
         end
       when :datetime
-        raise(ArgumentError, "invalid value for #{tc}: #{value.inspect}") unless value.is_one_of?(DateTime, Date, Time, String)
+        raise(Sequel::Error::InvalidValue, "invalid value for Datetime: #{value.inspect}") unless value.is_one_of?(DateTime, Date, Time, String)
         if Sequel.datetime_class === value
           # Already the correct class, no need to convert
           value
@@ -446,7 +456,7 @@ module Sequel
       else
         value
       end
-    end 
+    end
 
     # Returns the URI identifying the database.
     # This method can raise an error if the database used options

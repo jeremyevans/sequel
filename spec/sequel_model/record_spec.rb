@@ -946,6 +946,14 @@ describe Sequel::Model, "typecasting" do
     proc{@c.new.x = 'a'}.should raise_error
   end
 
+  specify "should assign value if raise_on_typecast_failure is off and assigning invalid integer" do
+    @c.raise_on_typecast_failure = false
+    @c.instance_variable_set(:@db_schema, {:x=>{:type=>:integer}})
+    model = @c.new
+    model.x = '1d'
+    model.x.should == '1d'
+  end
+
   specify "should convert to float for a float field" do
     @c.instance_variable_set(:@db_schema, {:x=>{:type=>:float}})
     m = @c.new
@@ -960,6 +968,14 @@ describe Sequel::Model, "typecasting" do
   specify "should raise an error if invalid data is used in an float field" do
     @c.instance_variable_set(:@db_schema, {:x=>{:type=>:float}})
     proc{@c.new.x = 'a'}.should raise_error
+  end
+
+  specify "should assign value if raise_on_typecast_failure is off and assigning invalid float" do
+    @c.raise_on_typecast_failure = false
+    @c.instance_variable_set(:@db_schema, {:x=>{:type=>:float}})
+    model = @c.new
+    model.x = '1d'
+    model.x.should == '1d'
   end
 
   specify "should convert to BigDecimal for a decimal field" do
@@ -979,6 +995,15 @@ describe Sequel::Model, "typecasting" do
   specify "should raise an error if invalid data is used in an decimal field" do
     @c.instance_variable_set(:@db_schema, {:x=>{:type=>:decimal}})
     proc{@c.new.x = Date.today}.should raise_error
+  end
+
+  specify "should assign value if raise_on_typecast_failure is off and assigning invalid decimal" do
+    @c.raise_on_typecast_failure = false
+    @c.instance_variable_set(:@db_schema, {:x=>{:type=>:decimal}})
+    model = @c.new
+    time = Time.now
+    model.x = time
+    model.x.should == time
   end
 
   specify "should convert to string for a string field" do
@@ -1049,6 +1074,14 @@ describe Sequel::Model, "typecasting" do
     proc{@c.new.x = 100}.should raise_error
   end
 
+  specify "should assign value if raise_on_typecast_failure is off and assigning invalid date" do
+    @c.raise_on_typecast_failure = false
+    @c.instance_variable_set(:@db_schema, {:x=>{:type=>:date}})
+    model = @c.new
+    model.x = 4
+    model.x.should == 4
+  end
+
   specify "should convert to time for a time field" do
     @c.instance_variable_set(:@db_schema, {:x=>{:type=>:time}})
     m = @c.new
@@ -1066,6 +1099,14 @@ describe Sequel::Model, "typecasting" do
     proc{@c.new.x = 'a'}.should_not raise_error # Valid Time
     proc{@c.new.x = '2008-10-21'.to_date}.should raise_error
     proc{@c.new.x = '2008-10-21'.to_datetime}.should raise_error
+  end
+
+  specify "should assign value if raise_on_typecast_failure is off and assigning invalid time" do
+    @c.raise_on_typecast_failure = false
+    @c.instance_variable_set(:@db_schema, {:x=>{:type=>:time}})
+    model = @c.new
+    model.x = '0000'
+    model.x.should == '0000'
   end
 
   specify "should convert to the Sequel.datetime_class for a datetime field" do
@@ -1095,10 +1136,24 @@ describe Sequel::Model, "typecasting" do
 
   specify "should raise an error if invalid data is used in a datetime field" do
     @c.instance_variable_set(:@db_schema, {:x=>{:type=>:datetime}})
-    proc{@c.new.x = '0000'}.should raise_error
+    proc{@c.new.x = '0000'}.should raise_error(Sequel::Error::InvalidValue)
     proc{@c.new.x = 'a'}.should_not raise_error # Valid Time
     Sequel.datetime_class = DateTime
     proc{@c.new.x = '0000'}.should raise_error
     proc{@c.new.x = 'a'}.should raise_error
+  end
+
+  specify "should assign value if raise_on_typecast_failure is off and assigning invalid datetime" do
+    @c.raise_on_typecast_failure = false
+    @c.instance_variable_set(:@db_schema, {:x=>{:type=>:datetime}})
+    model = @c.new
+    model.x = '0000'
+    model.x.should == '0000'
+    Sequel.datetime_class = DateTime
+    model = @c.new
+    model.x = '0000'
+    model.x.should == '0000'
+    model.x = 'a'
+    model.x.should == 'a'
   end
 end
