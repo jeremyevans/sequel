@@ -1,5 +1,7 @@
 === HEAD
 
+* Add Model.raise_on_typecast_failure=, which makes it possible to not raise errors on invalid typecasts (michalbugno)
+
 * Add schema.rdoc file, which provides an brief description of the various parts of Sequel related to schema modification (jeremyevans)
 
 * Fix constraint generation when not using a proc or interpolated string (jeremyevans)

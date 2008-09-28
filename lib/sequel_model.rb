@@ -73,10 +73,11 @@ module Sequel
   #     Model.typecast_empty_string_to_nil = false
   #     m.number = ''
   #     m.number # => '' instead of nil
-  #     # Don't raise if typecasting to nil but column cannot be null
+  #     # Don't raise if unable to typecast data for a column
   #     Model.typecast_empty_string_to_nil = true
   #     Model.raise_on_typecast_failure = false
   #     m.not_null_column = '' # => nil
+  #     m.number = 'A' # => 'A'
   #
   # * The following class level method aliases are defined:
   #   * Model.dataset= => set_dataset

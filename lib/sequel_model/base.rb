@@ -9,6 +9,7 @@ module Sequel
     @dataset_methods = {}
     @primary_key = :id
     @raise_on_save_failure = true
+    @raise_on_typecast_failure = true
     @restrict_primary_key = true
     @restricted_columns = nil
     @sti_dataset = nil
@@ -16,7 +17,6 @@ module Sequel
     @strict_param_setting = true
     @typecast_empty_string_to_nil = true
     @typecast_on_assignment = true
-    @raise_on_typecast_failure = true
 
     # Which columns should be the only columns allowed in a call to set
     # (default: all columns).
@@ -33,8 +33,8 @@ module Sequel
     # to save/create/save_changes/etc.
     metaattr_accessor :raise_on_save_failure
 
-    # Whether to raise an error if typecasting nil to a column with NULLs not
-    # allowed (default: true)
+    # Whether to raise an error when unable to typecast data for a column
+    # (default: true)
     metaattr_accessor :raise_on_typecast_failure
 
     # Which columns should not be update in a call to set

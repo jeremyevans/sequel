@@ -2,7 +2,7 @@ module Sequel
   class Model
     # The setter methods (methods ending with =) that are never allowed
     # to be called automatically via set.
-    RESTRICTED_SETTER_METHODS = %w"== === []= taguri= typecast_empty_string_to_nil= typecast_on_assignment= strict_param_setting= raise_on_save_failure="
+    RESTRICTED_SETTER_METHODS = %w"== === []= taguri= typecast_empty_string_to_nil= typecast_on_assignment= strict_param_setting= raise_on_save_failure= raise_on_typecast_failure="
 
     # The current cached associations.  A hash with the keys being the
     # association name symbols and the values being the associated object
@@ -17,8 +17,8 @@ module Sequel
     # returning nil on a failure to save/save_changes/etc.
     attr_writer :raise_on_save_failure
 
-    # Whether this model instance should raise and error when attempting to
-    # typecast nil to a column which has :null => false set.
+    # Whether this model instance should raise an error when it cannot typecast
+    # data for a column correctly.
     attr_writer :raise_on_typecast_failure
 
     # Whether this model instance should raise an error if attempting
@@ -536,10 +536,10 @@ module Sequel
     def typecast_value(column, value)
       return value unless @typecast_on_assignment && @db_schema && (col_schema = @db_schema[column])
       value = nil if value == '' and @typecast_empty_string_to_nil and col_schema[:type] and ![:string, :blob].include?(col_schema[:type])
-      raise(Error, "nil/NULL is not allowed for the #{column} column") if @raise_on_typecast_failure && value.nil? && (col_schema[:allow_null] == false)
+      raise(Error::InvalidValue, "nil/NULL is not allowed for the #{column} column") if @raise_on_typecast_failure && value.nil? && (col_schema[:allow_null] == false)
       begin
         model.db.typecast_value(col_schema[:type], value)
-      rescue Sequel::Error::InvalidValue
+      rescue Error::InvalidValue
         if @raise_on_typecast_failure
           raise
         else
