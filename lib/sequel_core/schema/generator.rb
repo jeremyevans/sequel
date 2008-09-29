@@ -147,7 +147,6 @@ module Sequel
 
       # Add a unique index on the given columns to the DDL.
       def unique(columns, opts = {})
-        index(columns, opts.merge(:unique => true))
         @columns << {:type => :check, :constraint_type => :unique,
                      :name => nil, :columns => Array(columns)}.merge(opts)
       end

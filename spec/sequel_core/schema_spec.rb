@@ -244,7 +244,7 @@ context "DB#create_table" do
       text :name
       unique :name
     end
-    @db.sqls.should == ["CREATE TABLE cats (name text, UNIQUE (name))", "CREATE UNIQUE INDEX cats_name_index ON cats (name)"]
+    @db.sqls.should == ["CREATE TABLE cats (name text, UNIQUE (name))"]
   end
 
   specify "should raise on full-text index definitions" do
