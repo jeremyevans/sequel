@@ -7,8 +7,8 @@ class Array
 
   # Return a Sequel::SQL::CaseExpression with this array as the conditions and the given
   # default value.
-  def case(default)
-    ::Sequel::SQL::CaseExpression.new(self, default)
+  def case(default, expression = nil)
+    ::Sequel::SQL::CaseExpression.new(self, default, expression)
   end
 
   # Return a Sequel::SQL::BooleanExpression created from this array, matching all of the
@@ -87,8 +87,8 @@ class Hash
   # Return a Sequel::SQL::CaseExpression with this hash as the conditions and the given
   # default value.  Note that the order of the conditions will be arbitrary, so all
   # conditions should be orthogonal.
-  def case(default)
-    ::Sequel::SQL::CaseExpression.new(to_a, default)
+  def case(default, expression = nil)
+    ::Sequel::SQL::CaseExpression.new(to_a, default, expression)
   end
 
   # Return a Sequel::SQL::BooleanExpression created from this hash, matching all of the

@@ -31,7 +31,12 @@ module Sequel
 
     # SQL fragment for specifying given CaseExpression.
     def case_expression_sql(ce)
-      "(CASE #{ce.conditions.collect{|c,r| "WHEN #{literal(c)} THEN #{literal(r)} "}.join}ELSE #{literal(ce.default)} END)"
+      sql = '(CASE '
+      sql << "#{literal(ce.expression)} " if ce.expression
+      ce.conditions.collect{ |c,r|
+        sql << "WHEN #{literal(c)} THEN #{literal(r)} "
+      }
+      sql << "ELSE #{literal(ce.default)} END)"
     end
 
     # SQL fragment for specifying all columns in a given table.

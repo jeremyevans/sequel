@@ -481,11 +481,14 @@ module Sequel
       # The default value if no conditions are true
       attr_reader :default
 
+      # The expression to test the conditions against
+      attr_reader :expression
+
       # Create an object with the given conditions and
       # default value.
-      def initialize(conditions, default)
+      def initialize(conditions, default, expression = nil)
         raise(Sequel::Error, 'CaseExpression conditions must be an array with all_two_pairs') unless Array === conditions and conditions.all_two_pairs?
-        @conditions, @default = conditions, default
+        @conditions, @default, @expression = conditions, default, expression
       end
 
       # Delegate the creation of the resulting SQL to the given dataset,

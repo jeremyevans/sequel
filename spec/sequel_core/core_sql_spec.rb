@@ -30,10 +30,13 @@ context "Array#case and Hash#case" do
 
   specify "should return SQL CASE expression" do
     @d.literal({:x=>:y}.case(:z)).should == '(CASE WHEN x THEN y ELSE z END)'
+    @d.literal({:x=>:y}.case(:z, :exp)).should == '(CASE exp WHEN x THEN y ELSE z END)'
     ['(CASE WHEN x THEN y WHEN a THEN b ELSE z END)',
      '(CASE WHEN a THEN b WHEN x THEN y ELSE z END)'].should(include(@d.literal({:x=>:y, :a=>:b}.case(:z))))
     @d.literal([[:x, :y]].case(:z)).should == '(CASE WHEN x THEN y ELSE z END)'
     @d.literal([[:x, :y], [:a, :b]].case(:z)).should == '(CASE WHEN x THEN y WHEN a THEN b ELSE z END)'
+    @d.literal([[:x, :y], [:a, :b]].case(:z, :exp)).should == '(CASE exp WHEN x THEN y WHEN a THEN b ELSE z END)'
+    @d.literal([[:x, :y], [:a, :b]].case(:z, :exp__w)).should == '(CASE exp.w WHEN x THEN y WHEN a THEN b ELSE z END)'
   end
 
   specify "should raise an error if an array that isn't all two pairs is used" do
