@@ -8,6 +8,7 @@ module Sequel
     # Database class for PostgreSQL databases used with Sequel and the
     # ruby-sqlite3 driver.
     class Database < Sequel::Database
+      UNIX_EPOCH_TIME_FORMAT = /\A\d+\z/.freeze
       include ::Sequel::SQLite::DatabaseMethods
       
       set_adapter_scheme :sqlite
@@ -30,10 +31,13 @@ module Sequel
         db = ::SQLite3::Database.new(opts[:database])
         db.busy_timeout(opts.fetch(:timeout, 5000))
         db.type_translation = true
-        # fix for timestamp translation
-        db.translator.add_translator("timestamp") do |t, v|
-          v =~ /^\d+$/ ? Time.at(v.to_i) : Time.parse(v) 
-        end 
+        # Handle datetime's with Sequel.datetime_class
+        prok = proc do |t,v|
+          v = Time.at(v.to_i).iso8601 if UNIX_EPOCH_TIME_FORMAT.match(v)
+          v.to_sequel_time
+        end
+        db.translator.add_translator("timestamp", &prok)
+        db.translator.add_translator("datetime", &prok)
         db
       end
       

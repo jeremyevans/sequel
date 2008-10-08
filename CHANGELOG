@@ -1,5 +1,7 @@
 === HEAD
 
+* Make the sqlite adapter respect the Sequel.datetime_class setting, for timestamp and datetime types (jeremyevans)
+
 * Enhance the CASE statement support to include an optional expression (jarredholman)
 
 * Default to using the simple language if no language is specified for a full text index on PostgreSQL (michalbugno)

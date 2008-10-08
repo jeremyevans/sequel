@@ -9,6 +9,9 @@ context "An SQLite database" do
   before do
     @db = SQLITE_DB
   end
+  after do
+    Sequel.datetime_class = Time
+  end
 
   if SQLITE_DB.auto_vacuum == :none
     specify "should support getting pragma values" do
@@ -128,12 +131,17 @@ context "An SQLite database" do
     @db[:items2].count.should == 2
   end
 
-  specify "should support timestamps" do
-    t1 = Time.at(Time.now.to_i) #normalize time
-    @db.create_table!(:time) {timestamp :t}
-    @db[:time] << {:t => t1}
-    x = @db[:time].first[:t]
-    [t1.iso8601, t1.to_s].should include(x.respond_to?(:iso8601) ? x.iso8601 : x.to_s)
+  specify "should support timestamps and datetimes and respect datetime_class" do
+    @db.create_table!(:time){timestamp :t; datetime :d}
+    t1 = Time.at(1)
+    @db[:time] << {:t => t1, :d => t1.to_i}
+    @db[:time] << {:t => t1.to_i, :d => t1}
+    @db[:time].map(:t).should == [t1, t1]
+    @db[:time].map(:d).should == [t1, t1]
+    t2 = t1.iso8601.to_datetime
+    Sequel.datetime_class = DateTime
+    @db[:time].map(:t).should == [t2, t2]
+    @db[:time].map(:d).should == [t2, t2]
   end
   
   specify "should support sequential primary keys" do
@@ -164,7 +172,7 @@ context "An SQLite database" do
 
   specify "should get the schema all database tables if no table name is used" do
     @db.create_table!(:time2) {timestamp :t}
-    @db.schema(:time2, :reload=>true).should == @db.schema(nil, :reload=>true)[:time]
+    @db.schema(:time2, :reload=>true).should == @db.schema(nil, :reload=>true)[:time2]
   end
 end
 
