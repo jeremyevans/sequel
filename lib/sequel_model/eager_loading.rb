@@ -147,7 +147,8 @@ module Sequel::Model::Associations::EagerLoading
       ds = ds.graph(r[:join_table], use_jt_only_conditions ? r[:graph_join_table_only_conditions] : [[r[:left_key], model.primary_key.qualify(ta)]] + r[:graph_join_table_conditions], :select=>false, :table_alias=>ds.eager_unique_table_alias(ds, r[:join_table]), :join_type=>r[:graph_join_table_join_type], &r[:graph_join_table_block])
       ds.graph(klass, use_only_conditions ? only_conditions : [[klass.primary_key, r[:right_key]]] + conditions, :select=>select, :table_alias=>assoc_table_alias, :join_type=>join_type, &graph_block)
     end
-    ds = ds.order_more(*(Array(r[:order]).map{|c| Sequel::SQL::QualifiedIdentifier.new(assoc_table_alias, c)})) if r[:order] and r[:order_eager_graph]
+
+    ds = ds.order_more(*Array(r[:order]).map{|c| eager_graph_qualify_order(assoc_table_alias, c)}) if r[:order] and r[:order_eager_graph]
     eager_graph = ds.opts[:eager_graph]
     eager_graph[:requirements][assoc_table_alias] = requirements.dup
     eager_graph[:alias_association_name_map][assoc_table_alias] = assoc_name
@@ -328,6 +329,23 @@ module Sequel::Model::Associations::EagerLoading
         # Recurse into dependencies
         eager_graph_make_associations_unique(list, deps, alias_map, type_map) if list
       end
+    end
+  end
+
+  # Qualify the given expression if necessary.  The only expressions which are qualified are
+  # unqualified symbols and identifiers, either of which may by sorted.
+  def eager_graph_qualify_order(table_alias, expression)
+    case expression
+    when Symbol
+      table, column, aliaz = split_symbol(expression)
+      raise(Sequel::Error, "Can't use an aliased expression in the :order option") if aliaz
+      table ? expression : Sequel::SQL::QualifiedIdentifier.new(table_alias, expression)
+    when Sequel::SQL::Identifier
+      Sequel::SQL::QualifiedIdentifier.new(table_alias, expression)
+    when Sequel::SQL::OrderedExpression
+      Sequel::SQL::OrderedExpression.new(eager_graph_qualify_order(table_alias, expression.expression), expression.descending)
+    else
+      expression
     end
   end
 
