@@ -204,7 +204,8 @@ module Sequel
     # Creates or updates the record, after making sure the record
     # is valid.  If the record is not valid, or before_save,
     # before_create (if new?), or before_update (if !new?) return
-    # false, returns nil unless raise_on_save_failure is true.
+    # false, returns nil unless raise_on_save_failure is true (if it
+    # is true, it raises an error).
     # Otherwise, returns self. You can provide an optional list of
     # columns to update, in which case it only updates those columns.
     def save(*columns)
@@ -217,7 +218,7 @@ module Sequel
     # in which case it only updates those columns.
     # If before_save, before_create (if new?), or before_update
     # (if !new?) return false, returns nil unless raise_on_save_failure
-    # is true.  Otherwise, returns self.
+    # is true (if it is true, it raises an error).  Otherwise, returns self.
     def save!(*columns)
       opts = columns.extract_options!
       return save_failure(:save) if before_save == false
