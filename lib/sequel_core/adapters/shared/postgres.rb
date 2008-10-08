@@ -128,7 +128,7 @@ module Sequel
         filter = " WHERE #{filter_expr(filter)}" if filter
         case index_type
         when :full_text
-          lang = index[:language] ? "#{literal(index[:language])}, " : ""
+          lang = "#{literal(index[:language] || 'simple')}, "
           cols = index[:columns].map {|c| literal(c)}.join(" || ")
           expr = "(to_tsvector(#{lang}#{cols}))"
           index_type = :gin

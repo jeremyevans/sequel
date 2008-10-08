@@ -344,7 +344,7 @@ context "A PostgreSQL database" do
     end
     POSTGRES_DB.create_table_sql_list(:posts, *g.create_info).should == [
       "CREATE TABLE posts (title text, body text)",
-      "CREATE INDEX posts_title_body_index ON posts USING gin (to_tsvector(title || body))"
+      "CREATE INDEX posts_title_body_index ON posts USING gin (to_tsvector('simple', title || body))"
     ]
   end
   
@@ -493,5 +493,25 @@ context "Postgres::Dataset#insert" do
     ds = POSTGRES_DB[:test4]
     ds.delete
     ds.insert(:name=>'a').should == nil
+  end
+end
+
+if POSTGRES_DB.server_version >= 80300
+
+  POSTGRES_DB.create_table! :test6 do
+    text :title
+    full_text_index [:title]
+  end
+
+  context "PostgreSQL tsearch2" do
+
+    specify "should search by indexed column" do
+      # tsearch is by default included from PostgreSQL 8.3
+      ds = POSTGRES_DB[:test6]
+      record = {:title => "oopsla conference"}
+      ds << record
+      actual = ds.full_text_search(:title, "oopsla")
+      actual.should include(record)
+    end
   end
 end
