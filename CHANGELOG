@@ -1,5 +1,7 @@
 === HEAD
 
+* Enhance the CASE statement support to include an optional expression (jarredholman)
+
 * Default to using the simple language if no language is specified for a full text index on PostgreSQL (michalbugno)
 
 * Add Model.raise_on_typecast_failure=, which makes it possible to not raise errors on invalid typecasts (michalbugno)
