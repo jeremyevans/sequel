@@ -145,7 +145,7 @@ module Sequel
         index(columns, opts.merge(:type => :spatial))
       end
 
-      # Add a unique index on the given columns to the DDL.
+      # Add a unique constraint on the given columns to the DDL.
       def unique(columns, opts = {})
         @columns << {:type => :check, :constraint_type => :unique,
                      :name => nil, :columns => Array(columns)}.merge(opts)
