@@ -51,7 +51,7 @@ module Sequel
         JDBC.load_gem('sqlite3')
         org.sqlite.JDBC
       end,
-      :oracle=>proc{oracle.jdbc.driver.OracleDriver},
+      :oracle=>proc{Java::oracle.jdbc.driver.OracleDriver},
       :sqlserver=>proc do |db|
         require 'sequel_core/adapters/shared/mssql'
         db.extend(Sequel::MSSQL::DatabaseMethods)

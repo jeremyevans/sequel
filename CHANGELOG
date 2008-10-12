@@ -1,3 +1,7 @@
+=== HEAD
+
+* Fix automatic loading of Oracle driver when using JDBC adapter (bburton333) (#242)
+
 === 2.6.0 (2008-10-11)
 
 * Make the sqlite adapter respect the Sequel.datetime_class setting, for timestamp and datetime types (jeremyevans)
