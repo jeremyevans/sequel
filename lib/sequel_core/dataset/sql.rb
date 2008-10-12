@@ -653,7 +653,11 @@ module Sequel
 
       sql
     end
-    alias_method :sql, :select_sql
+
+    # Same as select_sql, not aliased directly to make subclassing simpler.
+    def sql(*args)
+      select_sql(*args)
+    end
 
     # SQL fragment for specifying subscripts (SQL arrays)
     def subscript_sql(s)
