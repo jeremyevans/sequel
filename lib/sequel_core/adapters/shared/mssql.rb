@@ -120,7 +120,6 @@ module Sequel
         
         sql
       end
-      alias_method :sql, :select_sql
     end
   end
 end

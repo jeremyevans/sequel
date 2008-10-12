@@ -1,5 +1,9 @@
 === HEAD
 
+* Make Dataset#sql call Dataset#select_sql instead of being an alias, to allow for easier subclassing (jeremyevans)
+
+* Split Oracle adapter into shared and unshared parts, so Oracle is better supported when using JDBC (jeremyevans)
+
 * Fix automatic loading of Oracle driver when using JDBC adapter (bburton333) (#242)
 
 === 2.6.0 (2008-10-11)

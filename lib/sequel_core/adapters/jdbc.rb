@@ -3,7 +3,7 @@ require 'java'
 module Sequel
   # Houses Sequel's JDBC support when running on JRuby.
   # Support for individual database types is done using sub adapters.
-  # PostgreSQL, MySQL, SQLite, and MSSQL all have relatively good support,
+  # PostgreSQL, MySQL, SQLite, Oracle, and MSSQL all have relatively good support,
   # close the the level supported by the native adapter.
   # PostgreSQL, MySQL, SQLite can load necessary support using
   # the jdbc-* gem, if it is installed, though they will work if you
@@ -51,7 +51,11 @@ module Sequel
         JDBC.load_gem('sqlite3')
         org.sqlite.JDBC
       end,
-      :oracle=>proc{Java::oracle.jdbc.driver.OracleDriver},
+      :oracle=>proc do |db|
+        require 'sequel_core/adapters/jdbc/oracle'
+        db.extend(Sequel::JDBC::Oracle::DatabaseMethods)
+        Java::oracle.jdbc.driver.OracleDriver
+      end,
       :sqlserver=>proc do |db|
         require 'sequel_core/adapters/shared/mssql'
         db.extend(Sequel::MSSQL::DatabaseMethods)
