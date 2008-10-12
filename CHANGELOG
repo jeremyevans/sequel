@@ -1,4 +1,4 @@
-=== HEAD
+=== 2.6.0 (2008-10-11)
 
 * Make the sqlite adapter respect the Sequel.datetime_class setting, for timestamp and datetime types (jeremyevans)
 
