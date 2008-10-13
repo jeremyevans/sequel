@@ -1,5 +1,7 @@
 === HEAD
 
+* The PostgreSQL adapter will now generally default to using a unix socket in /tmp if no host is specified, instead of a tcp socket to localhost (jeremyevans)
+
 * Make Dataset#sql call Dataset#select_sql instead of being an alias, to allow for easier subclassing (jeremyevans)
 
 * Split Oracle adapter into shared and unshared parts, so Oracle is better supported when using JDBC (jeremyevans)
