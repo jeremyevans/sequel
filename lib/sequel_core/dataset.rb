@@ -190,18 +190,18 @@ module Sequel
       execute_dui(delete_sql(*args))
     end
     
-    # Iterates over the records in the dataset.
+    # Iterates over the records in the dataset and returns set.  If opts
+    # have been passed that modify the columns, reset the column information.
     def each(opts = nil, &block)
-      if @opts[:graph] and !(opts && opts[:graph] == false)
-        graph_each(opts, &block)
-      else
-        row_proc = @row_proc unless opts && opts[:naked]
-        transform = @transform
-        fetch_rows(select_sql(opts)) do |r|
-          r = transform_load(r) if transform
-          r = row_proc[r] if row_proc
-          yield r
+      if opts && opts.keys.any?{|o| COLUMN_CHANGE_OPTS.include?(o)}
+        prev_columns = @columns
+        begin
+          _each(opts, &block)
+        ensure
+          @columns = prev_columns
         end
+      else
+        _each(opts, &block)
       end
       self
     end
@@ -432,6 +432,23 @@ module Sequel
 
     private
     
+    # Runs #graph_each if graphing.  Otherwise, iterates through the records
+    # yielded by #fetch_rows, applying any row_proc or transform if necessary,
+    # and yielding the result.
+    def _each(opts, &block)
+      if @opts[:graph] and !(opts && opts[:graph] == false)
+        graph_each(opts, &block)
+      else
+        row_proc = @row_proc unless opts && opts[:naked]
+        transform = @transform
+        fetch_rows(select_sql(opts)) do |r|
+          r = transform_load(r) if transform
+          r = row_proc[r] if row_proc
+          yield r
+        end
+      end
+    end
+
     # Execute the given SQL on the database using execute.
     def execute(sql, opts={}, &block)
       @db.execute(sql, {:server=>@opts[:server] || :read_only}.merge(opts), &block)

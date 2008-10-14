@@ -1111,8 +1111,9 @@ context "Dataset#count" do
       end
       
       def fetch_rows(sql)
+        @columns = [sql =~ /SELECT COUNT/i ? :count : :a]
         @@sql = sql
-        yield({1 => 1})
+        yield({@columns.first=>1})
       end
     end
     @dataset = @c.new(nil).from(:test)
@@ -1147,6 +1148,14 @@ context "Dataset#count" do
     @dataset.should_receive(:columns).twice.and_return([:a])
     @dataset.graph(@dataset, [:a], :table_alias=>:test2).count.should == 1
     @c.sql.should == 'SELECT COUNT(*) FROM test LEFT OUTER JOIN test AS test2 USING (a) LIMIT 1'
+  end
+
+  specify "should not cache the columns value" do
+    ds = @dataset.from(:blah)
+    ds.columns.should == [:a]
+    ds.count.should == 1
+    @c.sql.should == 'SELECT COUNT(*) FROM blah LIMIT 1'
+    ds.columns.should == [:a]
   end
 end
 
@@ -3156,5 +3165,45 @@ context "Sequel::Dataset #set_overrides" do
     @ds.update_sql(:y=>2).should =~ /UPDATE items SET (x = 1|y = 2), (x = 1|y = 2)/
     @ds.set_overrides(:y=>2).update_sql.should =~ /UPDATE items SET (x = 1|y = 2), (x = 1|y = 2)/
     @ds.set_overrides(:x=>2).update_sql.should == "UPDATE items SET x = 1"
+  end
+end
+
+context "Sequel::Dataset#each" do
+  before do
+    @ds = Sequel::Dataset.new(nil).from(:items)
+    def @ds.fetch_rows(sql)
+      @columns = /count/i.match(sql) ? [:count] : [:a]
+      yield({@columns.first=>sql})
+    end
+  end
+
+  specify "should not set the columns if passing an option that modifies them" do
+    @ds.each(:select=>[:count]){}
+    @ds.columns.should == [:a]
+    @ds.each(:from=>[:count]){} 
+    @ds.columns.should == [:a]
+    @ds.each(:join=>[Sequel::SQL::JoinClause.new(:natural, :count)]){}
+    @ds.columns.should == [:a]
+    @ds.each(:sql=>'SELECT COUNT'){}
+    @ds.columns.should == [:a]
+  end
+
+  specify "should have the correct columns inside the block regardless" do
+    @ds.each(:select=>[:count]) do |x|
+      x[:count].should == 'SELECT count FROM items'
+      @ds.columns.should == [:count]
+    end
+    @ds.each(:from=>[:count]) do |x|
+      x[:count].should == 'SELECT * FROM count'
+      @ds.columns.should == [:count]
+    end
+    @ds.each(:join=>[Sequel::SQL::JoinClause.new(:natural, :count)]) do |x|
+      x[:count].should == 'SELECT * FROM items NATURAL JOIN count'
+      @ds.columns.should == [:count]
+    end
+    @ds.each(:sql=>'SELECT COUNT') do |x|
+      x[:count].should == 'SELECT COUNT'
+      @ds.columns.should == [:count]
+    end
   end
 end

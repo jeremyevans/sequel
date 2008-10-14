@@ -1,5 +1,7 @@
 === HEAD
 
+* Don't modify a dataset's cached column information if calling #each with an option that modifies the columns (jeremyevans)
+
 * The PostgreSQL adapter will now generally default to using a unix socket in /tmp if no host is specified, instead of a tcp socket to localhost (jeremyevans)
 
 * Make Dataset#sql call Dataset#select_sql instead of being an alias, to allow for easier subclassing (jeremyevans)
