@@ -118,9 +118,17 @@ module Sequel
         name ? column(name, type, opts) : super
       end
       
-      # Add a column with the given name and primary key options to the DDL. You
-      # can optionally provide a type argument and/or an options hash argument
-      # to change the primary key options. See column for available options.
+      # Add primary key information to the DDL. Takes between one and three
+      # arguments. The last one is an options hash as for Generator#column.
+      # The first one distinguishes two modes: an array of existing column
+      # names adds a composite primary key constraint. A single symbol adds a
+      # new column of that name and makes it the primary key. In that case the
+      # optional middle argument denotes the type.
+      # 
+      # Examples:
+      #   primary_key(:id) primary_key(:name, :text)
+      #   primary_key(:zip_code, :null => false)
+      #   primary_key([:street_number, :house_number])
       def primary_key(name, *args)
         return composite_primary_key(name, *args) if name.is_a?(Array)
         @primary_key = @db.serial_primary_key_options.merge({:name => name})
