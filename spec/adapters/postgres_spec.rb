@@ -344,7 +344,7 @@ context "A PostgreSQL database" do
     end
     POSTGRES_DB.create_table_sql_list(:posts, *g.create_info).should == [
       "CREATE TABLE posts (title text, body text)",
-      "CREATE INDEX posts_title_body_index ON posts USING gin (to_tsvector('simple', title || ' ' || body))"
+      "CREATE INDEX posts_title_body_index ON posts USING gin (to_tsvector('simple', (COALESCE(title, '') || ' ' || COALESCE(body, ''))))"
     ]
   end
   
@@ -356,19 +356,19 @@ context "A PostgreSQL database" do
     end
     POSTGRES_DB.create_table_sql_list(:posts, *g.create_info).should == [
       "CREATE TABLE posts (title text, body text)",
-      "CREATE INDEX posts_title_body_index ON posts USING gin (to_tsvector('french', title || ' ' || body))"
+      "CREATE INDEX posts_title_body_index ON posts USING gin (to_tsvector('french', (COALESCE(title, '') || ' ' || COALESCE(body, ''))))"
     ]
   end
   
   specify "should support full_text_search" do
     POSTGRES_DB[:posts].full_text_search(:title, 'ruby').sql.should ==
-      "SELECT * FROM posts WHERE (to_tsvector(title) @@ to_tsquery('ruby'))"
+      "SELECT * FROM posts WHERE (to_tsvector('simple', (COALESCE(title, ''))) @@ to_tsquery('simple', 'ruby'))"
     
     POSTGRES_DB[:posts].full_text_search([:title, :body], ['ruby', 'sequel']).sql.should ==
-      "SELECT * FROM posts WHERE (to_tsvector(title || ' ' || body) @@ to_tsquery('ruby | sequel'))"
+      "SELECT * FROM posts WHERE (to_tsvector('simple', (COALESCE(title, '') || ' ' || COALESCE(body, ''))) @@ to_tsquery('simple', 'ruby | sequel'))"
       
     POSTGRES_DB[:posts].full_text_search(:title, 'ruby', :language => 'french').sql.should ==
-      "SELECT * FROM posts WHERE (to_tsvector('french', title) @@ to_tsquery('french', 'ruby'))"
+      "SELECT * FROM posts WHERE (to_tsvector('french', (COALESCE(title, ''))) @@ to_tsquery('french', 'ruby'))"
   end
 
   specify "should support spatial indexes" do
@@ -505,22 +505,29 @@ if POSTGRES_DB.server_version >= 80300
   end
 
   context "PostgreSQL tsearch2" do
+    before do
+      @ds = POSTGRES_DB[:test6]
+    end
+    after do
+      POSTGRES_DB[:test6].delete
+    end
 
     specify "should search by indexed column" do
-      # tsearch is by default included from PostgreSQL 8.3
-      ds = POSTGRES_DB[:test6]
-      record = {:title => "oopsla conference", :body => "test"}
-      ds << record
-      actual = ds.full_text_search(:title, "oopsla").all
-      actual.should include(record)
+      record =  {:title => "oopsla conference", :body => "test"}
+      @ds << record
+      @ds.full_text_search(:title, "oopsla").all.should include(record)
     end
 
     specify "should join multiple coumns with spaces to search by last words in row" do
-      ds = POSTGRES_DB[:test6]
       record = {:title => "multiple words", :body => "are easy to search"}
-      ds << record
-      actual = ds.full_text_search([:title, :body], "words").all
-      actual.should include(record)
+      @ds << record
+      @ds.full_text_search([:title, :body], "words").all.should include(record)
+    end
+
+    specify "should return rows with a NULL in one column if a match in another column" do
+      record = {:title => "multiple words", :body =>nil}
+      @ds << record
+      @ds.full_text_search([:title, :body], "words").all.should include(record)
     end
   end
 end

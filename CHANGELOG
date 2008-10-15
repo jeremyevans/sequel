@@ -1,5 +1,9 @@
 === HEAD
 
+* Allow full text search on PostgreSQL to include rows where a search column is NULL (jeremyevans)
+
+* PostgreSQL full text search queries with multiple columns are joined with space to prevent joining border words to one (michalbugno)
+
 * Don't modify a dataset's cached column information if calling #each with an option that modifies the columns (jeremyevans)
 
 * The PostgreSQL adapter will now generally default to using a unix socket in /tmp if no host is specified, instead of a tcp socket to localhost (jeremyevans)

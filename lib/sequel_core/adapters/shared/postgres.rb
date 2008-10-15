@@ -128,9 +128,8 @@ module Sequel
         filter = " WHERE #{filter_expr(filter)}" if filter
         case index_type
         when :full_text
-          lang = "#{literal(index[:language] || 'simple')}, "
-          cols = index[:columns].map {|c| literal(c)}.join(" || ' ' || ")
-          expr = "(to_tsvector(#{lang}#{cols}))"
+          cols = Array(index[:columns]).map{|x| :COALESCE[x, '']}.sql_string_join(' ')
+          expr = "(to_tsvector(#{literal(index[:language] || 'simple')}, #{literal(cols)}))"
           index_type = :gin
         when :spatial
           index_type = :gist
@@ -401,10 +400,9 @@ module Sequel
       # PostgreSQL specific full text search syntax, using tsearch2 (included
       # in 8.3 by default, and available for earlier versions as an add-on).
       def full_text_search(cols, terms, opts = {})
-        lang = opts[:language] ? "#{literal(opts[:language])}, " : ""
-        cols = cols.is_a?(Array) ? cols.map {|c| literal(c)}.join(" || ' ' || ") : literal(cols)
-        terms = terms.is_a?(Array) ? literal(terms.join(" | ")) : literal(terms)
-        filter("to_tsvector(#{lang}#{cols}) @@ to_tsquery(#{lang}#{terms})")
+        lang = opts[:language] || 'simple'
+        cols =  Array(cols).map{|x| :COALESCE[x, '']}.sql_string_join(' ')
+        filter("to_tsvector(#{literal(lang)}, #{literal(cols)}) @@ to_tsquery(#{literal(lang)}, #{literal(Array(terms).join(' | '))})")
       end
       
       # Insert given values into the database.
