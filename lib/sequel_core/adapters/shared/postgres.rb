@@ -129,7 +129,7 @@ module Sequel
         case index_type
         when :full_text
           lang = "#{literal(index[:language] || 'simple')}, "
-          cols = index[:columns].map {|c| literal(c)}.join(" || ")
+          cols = index[:columns].map {|c| literal(c)}.join(" || ' ' || ")
           expr = "(to_tsvector(#{lang}#{cols}))"
           index_type = :gin
         when :spatial
@@ -402,7 +402,7 @@ module Sequel
       # in 8.3 by default, and available for earlier versions as an add-on).
       def full_text_search(cols, terms, opts = {})
         lang = opts[:language] ? "#{literal(opts[:language])}, " : ""
-        cols = cols.is_a?(Array) ? cols.map {|c| literal(c)}.join(" || ") : literal(cols)
+        cols = cols.is_a?(Array) ? cols.map {|c| literal(c)}.join(" || ' ' || ") : literal(cols)
         terms = terms.is_a?(Array) ? literal(terms.join(" | ")) : literal(terms)
         filter("to_tsvector(#{lang}#{cols}) @@ to_tsquery(#{lang}#{terms})")
       end

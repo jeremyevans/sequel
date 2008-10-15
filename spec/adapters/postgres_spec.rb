@@ -344,7 +344,7 @@ context "A PostgreSQL database" do
     end
     POSTGRES_DB.create_table_sql_list(:posts, *g.create_info).should == [
       "CREATE TABLE posts (title text, body text)",
-      "CREATE INDEX posts_title_body_index ON posts USING gin (to_tsvector('simple', title || body))"
+      "CREATE INDEX posts_title_body_index ON posts USING gin (to_tsvector('simple', title || ' ' || body))"
     ]
   end
   
@@ -356,7 +356,7 @@ context "A PostgreSQL database" do
     end
     POSTGRES_DB.create_table_sql_list(:posts, *g.create_info).should == [
       "CREATE TABLE posts (title text, body text)",
-      "CREATE INDEX posts_title_body_index ON posts USING gin (to_tsvector('french', title || body))"
+      "CREATE INDEX posts_title_body_index ON posts USING gin (to_tsvector('french', title || ' ' || body))"
     ]
   end
   
@@ -365,7 +365,7 @@ context "A PostgreSQL database" do
       "SELECT * FROM posts WHERE (to_tsvector(title) @@ to_tsquery('ruby'))"
     
     POSTGRES_DB[:posts].full_text_search([:title, :body], ['ruby', 'sequel']).sql.should ==
-      "SELECT * FROM posts WHERE (to_tsvector(title || body) @@ to_tsquery('ruby | sequel'))"
+      "SELECT * FROM posts WHERE (to_tsvector(title || ' ' || body) @@ to_tsquery('ruby | sequel'))"
       
     POSTGRES_DB[:posts].full_text_search(:title, 'ruby', :language => 'french').sql.should ==
       "SELECT * FROM posts WHERE (to_tsvector('french', title) @@ to_tsquery('french', 'ruby'))"
@@ -500,7 +500,8 @@ if POSTGRES_DB.server_version >= 80300
 
   POSTGRES_DB.create_table! :test6 do
     text :title
-    full_text_index [:title]
+    text :body
+    full_text_index [:title, :body]
   end
 
   context "PostgreSQL tsearch2" do
@@ -508,9 +509,17 @@ if POSTGRES_DB.server_version >= 80300
     specify "should search by indexed column" do
       # tsearch is by default included from PostgreSQL 8.3
       ds = POSTGRES_DB[:test6]
-      record = {:title => "oopsla conference"}
+      record = {:title => "oopsla conference", :body => "test"}
       ds << record
-      actual = ds.full_text_search(:title, "oopsla")
+      actual = ds.full_text_search(:title, "oopsla").all
+      actual.should include(record)
+    end
+
+    specify "should join multiple coumns with spaces to search by last words in row" do
+      ds = POSTGRES_DB[:test6]
+      record = {:title => "multiple words", :body => "are easy to search"}
+      ds << record
+      actual = ds.full_text_search([:title, :body], "words").all
       actual.should include(record)
     end
   end
