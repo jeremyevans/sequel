@@ -10,13 +10,22 @@ module Sequel
   #         timestamp :created_at
   #         text      :data
   #       end
+  #     end
+  # 
+  #     def down
+  #       # You can use raw SQL if you need to
+  #       self << 'DROP TABLE sessions'
+  #     end
+  #   end
+  #
+  #   class AlterItems < Sequel::Migration
+  #     def up
   #       alter_table :items do
   #         add_column :category, :text, :default => 'ruby'
   #       end
   #     end
   # 
   #     def down
-  #       execute 'DROP TABLE sessions'
   #       alter_table :items do
   #         drop_column :category
   #       end  
@@ -31,7 +40,10 @@ module Sequel
   #
   # See Sequel::Schema::Generator for the syntax to use for creating tables,
   # and Sequel::Schema::AlterTableGenerator for the syntax to use when
-  # altering existing tables.
+  # altering existing tables.  Migrations act as a proxy for the database
+  # given in #apply, so inside #down and #up, you can act as though self
+  # refers to the database.  So you can use any of the Sequel::Database
+  # instance methods directly.
   class Migration
     # Creates a new instance of the migration and sets the @db attribute.
     def initialize(db)

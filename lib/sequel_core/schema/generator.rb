@@ -2,15 +2,16 @@ module Sequel
   # The Schema module holds the schema generators and the SQL code relating
   # to SQL DDL (Data Definition Language).
   module Schema
-    # Schema::Generator is used to create tables.  It takes a Database
+    # Schema::Generator is an internal class that the user is not expected
+    # to instantiate directly.  Instances are created by Database#create_table.
+    # It is used to specify table creation parameters.  It takes a Database
     # object and a block of column/index/constraint specifications, and
-    # creates a table in the database based on the specifications.
+    # gives the Database a table description, which the database uses to
+    # create a table.
     #
     # Schema::Generator has some methods but also includes method_missing,
     # allowing users to specify column type as a method instead of using
     # the column method, which makes for a nicer DSL.
-    #
-    # See Database#create_table.
     class Generator
       # Set the database in which to create the table, and evaluate the block
       # in the context of this object.
@@ -173,9 +174,12 @@ module Sequel
       end
     end
   
-    # The Schema::AlterTableGenerator creates DDL operations on existing tables,
-    # such as adding/removing/modifying columns/indexes/constraints.
-    # If used within a Migration you can use the DB.alter_table methods.  See Sequel::Migration and Sequel::Database.alter_table for examples.
+    # Schema::AlterTableGenerator is an internal class that the user is not expected
+    # to instantiate directly.  Instances are created by Database#alter_table.
+    # It is used to specify table alteration parameters.  It takes a Database
+    # object and a block of operations to perform on the table, and
+    # gives the Database a table an array of operations, which the database uses to
+    # alter a table's description.
     class AlterTableGenerator
       # An array of DDL operations to perform
       attr_reader :operations
