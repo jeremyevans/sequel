@@ -175,6 +175,7 @@ module Sequel
   
     # The Schema::AlterTableGenerator creates DDL operations on existing tables,
     # such as adding/removing/modifying columns/indexes/constraints.
+    # If used within a Migration you can use the DB.alter_table methods.  See Sequel::Migration and Sequel::Database.alter_table for examples.
     class AlterTableGenerator
       # An array of DDL operations to perform
       attr_reader :operations
