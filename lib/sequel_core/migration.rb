@@ -10,10 +10,16 @@ module Sequel
   #         timestamp :created_at
   #         text      :data
   #       end
+  #       alter_table :items do
+  #         add_column :category, :text, :default => 'ruby'
+  #       end
   #     end
   # 
   #     def down
   #       execute 'DROP TABLE sessions'
+  #       alter_table :items do
+  #         drop_column :category
+  #       end  
   #     end
   #   end
   #
