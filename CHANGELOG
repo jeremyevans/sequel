@@ -1,5 +1,7 @@
 === HEAD
 
+* Add ComplexExpression#== and #eql?, for checking equality (rubymage) (#244)
+
 * Allow full text search on PostgreSQL to include rows where a search column is NULL (jeremyevans)
 
 * PostgreSQL full text search queries with multiple columns are joined with space to prevent joining border words to one (michalbugno)

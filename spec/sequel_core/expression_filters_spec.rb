@@ -343,4 +343,10 @@ context "Blockless Ruby Filters" do
     ce.instance_variable_set(:@op, :BANG)
     proc{@d.lit(ce)}.should raise_error(Sequel::Error)
   end
+
+  it "should support equality comparison of two expressions" do
+    e1 = ~:comment.like('%:hidden:%')
+    e2 = ~:comment.like('%:hidden:%')
+    e1.should == e2
+  end
 end

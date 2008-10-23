@@ -98,6 +98,15 @@ module Sequel
       def to_s(ds)
         ds.complex_expression_sql(@op, @args)
       end
+
+      # Returns true if the receiver is the same expression as the
+      # the +other+ expression.
+      def eql?( other )
+        return other.is_a?( self.class ) &&
+          @op.eql?( other.op ) &&
+          @args.eql?( other.args )
+      end
+      alias_method :==, :eql?
     end
 
     # The base class for expressions that can be used in multiple places in
