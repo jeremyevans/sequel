@@ -1,0 +1,12 @@
+<h2>Sequel::Model Plugins</h2>
+
+<p>Sequel::Model has a very flexible and standardized plugin architecture, see the <a href="/rdoc/classes/Sequel/Plugins.html">RDoc</a>. Here is a list of plugins that members of the Sequel community have developed:</p>
+
+<ul>
+<li><a href='http://github.com/boof/sequel_notnaughty'>sequel_notnaughty</a>: A port of the NotNaughty validation framework to Sequel.</li>
+<li><a href='http://github.com/bricooke/sequel_timestamped'>sequel_timestamped</a>: Adds support for autotimestamping created_at and updated_at columns if they exist.</li>
+</ul>
+
+<h3>Submitting Your Plugin</h3>
+
+<p>If you have created a Sequel plugin and would like to list it here, please submit a request to code AT jeremyevans DOT net.</p>
