@@ -725,6 +725,15 @@ context "Dataset#from" do
     @dataset.from(:a[:i]).select_sql.should ==
       "SELECT * FROM a(i)"
   end
+
+  specify "should accept :schema__table___alias symbol format" do
+    @dataset.from(:abc__def).select_sql.should ==
+      "SELECT * FROM abc.def"
+    @dataset.from(:abc__def___d).select_sql.should ==
+      "SELECT * FROM abc.def AS d"
+    @dataset.from(:abc___def).select_sql.should ==
+      "SELECT * FROM abc AS def"
+  end
 end
 
 context "Dataset#select" do
