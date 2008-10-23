@@ -4,4 +4,7 @@ unless Object.const_defined?('Sequel')
   require 'sequel_core'
   Sequel.quote_identifiers = false
 end
-require File.join(File.dirname(__FILE__), '../spec_config.rb')
+begin
+  require File.join(File.dirname(__FILE__), '../spec_config.rb')
+rescue LoadError
+end
