@@ -304,7 +304,11 @@ module Sequel
     end
 
     # Validates only if the fields in the model (specified by atts) are
-    # unique in the database.  Pass an array to speficy that the combination must be unique.  You should also add a unique index in the
+    # unique in the database.  Pass an array of fields instead of multiple
+    # fields to specify that the combination of fields must be unique,
+    # instead of that each field should have a unique value.
+    #
+    # You should also add a unique index in the
     # database, as this suffers from a fairly obvious race condition.
     #
     # Possible Options:
