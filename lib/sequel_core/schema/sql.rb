@@ -273,7 +273,7 @@ module Sequel
           :boolean
         when /\A(real|float|double( precision)?)\z/
           :float
-        when /\A(numeric|decimal|money)\z/
+        when /\A(numeric(\(\d+,\d+\))?|decimal|money)\z/
           :decimal
         when "bytea"
           :blob
