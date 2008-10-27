@@ -51,6 +51,17 @@ context "Array#case and Hash#case" do
   end
 end
 
+context "Array#sql_array" do
+  setup do
+    @d = Sequel::Dataset.new(nil)
+  end
+
+  specify "should treat the array as an SQL array instead of conditions" do
+    @d.literal([[:x, 1], [:y, 2]]).should == '((x = 1) AND (y = 2))'
+    @d.literal([[:x, 1], [:y, 2]].sql_array).should == '((x, 1), (y, 2))'
+  end
+end
+
 context "Array#to_sql" do
   specify "should concatenate multiple lines into a single string" do
     "SELECT * \r\nFROM items\r\n WHERE a = 1".split.to_sql. \

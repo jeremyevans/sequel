@@ -11,6 +11,13 @@ class Array
     ::Sequel::SQL::CaseExpression.new(self, default, expression)
   end
 
+  # Return a Sequel::SQL::Array created from this array.  Used if this array contains
+  # all two pairs and you want it treated as an SQL array instead of a ordered hash-like
+  # conditions.
+  def sql_array
+    ::Sequel::SQL::SQLArray.new(self)
+  end
+
   # Return a Sequel::SQL::BooleanExpression created from this array, matching all of the
   # conditions.
   def sql_expr

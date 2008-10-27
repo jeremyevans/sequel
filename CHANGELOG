@@ -1,5 +1,7 @@
 === HEAD
 
+* Add Array#sql_array to handle ruby arrays of all two pairs as SQL arrays (jeremyevans) (#245)
+
 * Add ComplexExpression#== and #eql?, for checking equality (rubymage) (#244)
 
 * Allow full text search on PostgreSQL to include rows where a search column is NULL (jeremyevans)

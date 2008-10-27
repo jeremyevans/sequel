@@ -407,6 +407,22 @@ module Sequel
       end
     end
 
+    # Represents an SQL array.  Added so it is possible to deal with a
+    # ruby array of all two pairs as an SQL array instead of an ordered
+    # hash-like conditions specifier.
+    class SQLArray < Expression
+      # Create an object with the given array.
+      def initialize(array)
+        @array = array
+      end
+
+      # Delegate the creation of the resulting SQL to the given dataset,
+      # since it may be database dependent.
+      def to_s(ds)
+        ds.array_sql(@array)
+      end
+    end
+
     # Blob is used to represent binary data in the Ruby environment that is
     # stored as a blob type in the database. In PostgreSQL, the blob type is 
     # called bytea. Sequel represents binary data as a Blob object because 

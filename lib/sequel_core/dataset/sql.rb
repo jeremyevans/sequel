@@ -29,6 +29,11 @@ module Sequel
       as_sql(literal(ae.expression), ae.aliaz)
     end
 
+    # SQL fragment for the SQL array.
+    def array_sql(a)
+      a.empty? ? '(NULL)' : "(#{expression_list(a)})"     
+    end
+
     # SQL fragment for specifying given CaseExpression.
     def case_expression_sql(ce)
       sql = '(CASE '
@@ -470,7 +475,7 @@ module Sequel
       when ::Sequel::SQL::Expression
         v.to_s(self)
       when Array
-        v.all_two_pairs? ? literal(v.sql_expr) : (v.empty? ? '(NULL)' : "(#{expression_list(v)})")
+        v.all_two_pairs? ? literal(v.sql_expr) : array_sql(v)
       when Hash
         literal(v.sql_expr)
       when Time, DateTime
