@@ -874,6 +874,14 @@ describe Sequel::Model, "typecasting" do
     m.x.should == '1'
   end
 
+  specify "should not convert if serializing the field" do
+    @c.serialize :x
+    @c.instance_variable_set(:@db_schema, {:x=>{:type=>:string}})
+    m = @c.new
+    m.x =[1, 2]
+    m.x.should == [1, 2]
+  end
+
   specify "should convert to integer for an integer field" do
     @c.instance_variable_set(:@db_schema, {:x=>{:type=>:integer}})
     m = @c.new

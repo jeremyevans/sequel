@@ -290,6 +290,11 @@ module Sequel
       end
       @dataset.transform(@transform) if @dataset
     end
+
+    # Whether or not the given column is serialized for this model.
+    def self.serialized?(column)
+      @transform ? @transform.include?(column) : false
+    end
   
     # Set the columns to allow in new/set/update.  Using this means that
     # any columns not listed here will not be modified.  If you have any virtual

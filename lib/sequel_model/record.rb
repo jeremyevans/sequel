@@ -535,7 +535,7 @@ module Sequel
     # typecast_value method, so database adapters can override/augment the handling
     # for database specific column types.
     def typecast_value(column, value)
-      return value unless @typecast_on_assignment && @db_schema && (col_schema = @db_schema[column])
+      return value unless @typecast_on_assignment && @db_schema && (col_schema = @db_schema[column]) && !model.serialized?(column)
       value = nil if value == '' and @typecast_empty_string_to_nil and col_schema[:type] and ![:string, :blob].include?(col_schema[:type])
       raise(Error::InvalidValue, "nil/NULL is not allowed for the #{column} column") if @raise_on_typecast_failure && value.nil? && (col_schema[:allow_null] == false)
       begin
