@@ -1,5 +1,11 @@
 === HEAD
 
+* The first argument to Model#initalize can no longer be nil, it must be a hash if it is given (jeremyevans)
+
+* Remove Sequel::Model.lazy_load_schema= setting (jeremyevans)
+
+* Lazily load model instance options such as raise_on_save_failure, for better performance (jeremyevans)
+
 * Make Model::Validiation::Errors more Rails-compatible (jeremyevans)
 
 * Refactor model hooks for performance (jeremyevans)
