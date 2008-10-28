@@ -8,12 +8,14 @@ module Sequel
     # Hooks that are only for internal use
     PRIVATE_HOOKS = [:before_update_values, :before_delete]
     
-    # Returns true if the model class or any of its ancestors have defined
-    # hooks for the given hook key. Notice that this method cannot detect 
-    # hooks defined using overridden methods.
-    def self.has_hooks?(key)
-      has = hooks[key] && !hooks[key].empty?
-      has || ((self != Model) && superclass.has_hooks?(key))
+    # Returns true if there are any hook blocks for the given hook.
+    def self.has_hooks?(hook)
+      !@hooks[hook].empty?
+    end
+
+    # Yield every block related to the given hook.
+    def self.hook_blocks(hook)
+      @hooks[hook].each{|k,v| yield v}
     end
 
     ### Private Class Methods ###
@@ -26,7 +28,7 @@ module Sequel
         (raise Error, 'No hook method specified') unless tag
         block = proc {send tag}
       end
-      h = hooks[hook]
+      h = @hooks[hook]
       if tag && (old = h.find{|x| x[0] == tag})
         old[1] = block
       else
@@ -34,28 +36,27 @@ module Sequel
       end
     end
 
-    # Returns all hook methods for the given type of hook for this
-    # model class and its ancestors.
-    def self.all_hooks(hook) # :nodoc:
-      ((self == Model ? [] : superclass.send(:all_hooks, hook)) + hooks[hook].collect{|x| x[1]})
-    end
-      
-    # Returns the hooks hash for this model class.
-    def self.hooks #:nodoc:
-      @hooks ||= Hash.new {|h, k| h[k] = []}
+    # Define a hook instance method that calls the run_hooks instance method.
+    def self.define_hook_instance_method(hook) #:nodoc:
+      class_eval("def #{hook}; run_hooks(:#{hook}); end")
     end
 
-    # Runs all hooks of type hook on the given object.
-    # Returns false if any hook returns false.
-    def self.run_hooks(hook, object) #:nodoc:
-      all_hooks(hook).each{|b| return false if object.instance_eval(&b) == false}
+    private_class_method :add_hook, :define_hook_instance_method
+
+    private 
+
+    # Runs all hook blocks of given hook type on this object.
+    # Stops running hook blocks and returns false if any hook block returns false.
+    def run_hooks(hook)
+      model.hook_blocks(hook){|block| return false if instance_eval(&block) == false}
     end
-
-    private_class_method :add_hook, :all_hooks, :hooks, :run_hooks
-
+    
+    # For performance reasons, we define empty hook instance methods, which are
+    # overwritten with real hook instance methods whenever the hook class method is called.
     (HOOKS + PRIVATE_HOOKS).each do |hook|
-      instance_eval("def #{hook}(method = nil, &block); add_hook(:#{hook}, method, &block) end")
-      define_method(hook){model.send(:run_hooks, hook, self)}
+      @hooks[hook] = []
+      instance_eval("def #{hook}(method = nil, &block); define_hook_instance_method(:#{hook}); add_hook(:#{hook}, method, &block) end")
+      class_eval("def #{hook}; end")
     end
   end
 end

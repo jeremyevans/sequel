@@ -17,7 +17,8 @@ describe "Model hooks" do
   
   specify "should be definable using a block" do
     $adds = []
-    c = Class.new(Sequel::Model) do
+    c = Class.new(Sequel::Model)
+    c.class_eval do
       before_save {$adds << 'hi'}
     end
     
@@ -27,7 +28,8 @@ describe "Model hooks" do
   
   specify "should be definable using a method name" do
     $adds = []
-    c = Class.new(Sequel::Model) do
+    c = Class.new(Sequel::Model)
+    c.class_eval do
       def bye; $adds << 'bye'; end
       before_save :bye
     end
@@ -38,7 +40,8 @@ describe "Model hooks" do
   
   specify "should be additive" do
     $adds = []
-    c = Class.new(Sequel::Model) do
+    c = Class.new(Sequel::Model)
+    c.class_eval do
       before_save {$adds << 'hyiyie'}
       before_save {$adds << 'byiyie'}
     end
@@ -49,7 +52,8 @@ describe "Model hooks" do
 
   specify "should not be additive if the method or tag already exists" do
     $adds = []
-    c = Class.new(Sequel::Model) do
+    c = Class.new(Sequel::Model)
+    c.class_eval do
       def bye; $adds << 'bye'; end
       before_save :bye
       before_save :bye
@@ -59,7 +63,8 @@ describe "Model hooks" do
     $adds.should == ['bye']
 
     $adds = []
-    d = Class.new(Sequel::Model) do
+    d = Class.new(Sequel::Model)
+    d.class_eval do
       before_save(:bye){$adds << 'hyiyie'}
       before_save(:bye){$adds << 'byiyie'}
     end
@@ -68,7 +73,8 @@ describe "Model hooks" do
     $adds.should == ['byiyie']
 
     $adds = []
-    e = Class.new(Sequel::Model) do
+    e = Class.new(Sequel::Model)
+    e.class_eval do
       def bye; $adds << 'bye'; end
       before_save :bye
       before_save(:bye){$adds << 'byiyie'}
@@ -78,7 +84,8 @@ describe "Model hooks" do
     $adds.should == ['byiyie']
 
     $adds = []
-    e = Class.new(Sequel::Model) do
+    e = Class.new(Sequel::Model)
+    e.class_eval do
       def bye; $adds << 'bye'; end
       before_save(:bye){$adds << 'byiyie'}
       before_save :bye
@@ -92,11 +99,13 @@ describe "Model hooks" do
     # pending
     
     $adds = []
-    a = Class.new(Sequel::Model) do
+    a = Class.new(Sequel::Model)
+    a.class_eval do
       before_save {$adds << '123'}
     end
     
-    b = Class.new(a) do
+    b = Class.new(a)
+    b.class_eval do
       before_save {$adds << '456'}
       before_save {$adds << '789'}
     end
@@ -107,11 +116,13 @@ describe "Model hooks" do
   
   specify "should be overridable in descendant classes" do
     $adds = []
-    a = Class.new(Sequel::Model) do
+    a = Class.new(Sequel::Model)
+    a.class_eval do
       before_save {$adds << '123'}
     end
     
-    b = Class.new(a) do
+    b = Class.new(a)
+    b.class_eval do
       def before_save; $adds << '456'; end
     end
     
@@ -126,7 +137,8 @@ describe "Model hooks" do
     $flag = true
     $adds = []
     
-    a = Class.new(Sequel::Model) do
+    a = Class.new(Sequel::Model)
+    a.class_eval do
       before_save {$adds << 'blah'; $flag}
       before_save {$adds << 'cruel'}
     end
@@ -145,7 +157,8 @@ describe "Model hooks" do
     a.new.before_save
     $adds.should == ['blah']
     
-    b = Class.new(a) do
+    b = Class.new(a)
+    b.class_eval do
       before_save {$adds << 'mau'}
     end
     
@@ -160,7 +173,8 @@ describe "Model#after_initialize" do
     $values1 = nil
     $reached_after_initialized = false
     
-    a = Class.new(Sequel::Model) do
+    a = Class.new(Sequel::Model)
+    a.class_eval do
       columns :x, :y
       after_initialize do
         $values1 = @values.clone
@@ -178,7 +192,8 @@ describe "Model#before_create && Model#after_create" do
   setup do
     MODEL_DB.reset
 
-    @c = Class.new(Sequel::Model(:items)) do
+    @c = Class.new(Sequel::Model(:items))
+    @c.class_eval do
       columns :x
       no_primary_key
       
@@ -214,7 +229,8 @@ describe "Model#before_update && Model#after_update" do
   setup do
     MODEL_DB.reset
 
-    @c = Class.new(Sequel::Model(:items)) do
+    @c = Class.new(Sequel::Model(:items))
+    @c.class_eval do
       after_update {MODEL_DB << "BLAH after"}
     end
   end
@@ -248,7 +264,8 @@ describe "Model#before_save && Model#after_save" do
   setup do
     MODEL_DB.reset
 
-    @c = Class.new(Sequel::Model(:items)) do
+    @c = Class.new(Sequel::Model(:items))
+    @c.class_eval do
       columns :x
       after_save {MODEL_DB << "BLAH after"}
     end
@@ -294,7 +311,8 @@ describe "Model#before_destroy && Model#after_destroy" do
   setup do
     MODEL_DB.reset
 
-    @c = Class.new(Sequel::Model(:items)) do
+    @c = Class.new(Sequel::Model(:items))
+    @c.class_eval do
       after_destroy {MODEL_DB << "BLAH after"}
       
       def delete
@@ -332,7 +350,8 @@ describe "Model#before_validation && Model#after_validation" do
   setup do
     MODEL_DB.reset
 
-    @c = Class.new(Sequel::Model(:items)) do
+    @c = Class.new(Sequel::Model(:items))
+    @c.class_eval do
       after_validation{MODEL_DB << "BLAH after"}
 
       def self.validate(o)
@@ -403,8 +422,5 @@ describe "Model.has_hooks?" do
   specify "should return true if hooks are inherited" do
     @d = Class.new(@c)
     @d.has_hooks?(:before_save).should be_false
-    
-    @c.before_save :blah
-    @d.has_hooks?(:before_save).should be_true
   end
 end

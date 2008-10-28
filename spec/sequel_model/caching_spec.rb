@@ -12,7 +12,8 @@ describe Sequel::Model, "caching" do
     cache = @cache_class.new
     @cache = cache
     
-    @c = Class.new(Sequel::Model(:items)) do
+    @c = Class.new(Sequel::Model(:items))
+    @c.class_eval do
       set_cache cache
       def self.name; 'Item' end
       

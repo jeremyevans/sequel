@@ -28,7 +28,8 @@ describe Sequel::Model, "using a plugin" do
 
   it "should fail if the plugin is not found" do
     proc do
-      c = Class.new(Sequel::Model) do
+      c = Class.new(Sequel::Model)
+      c.class_eval do
         is :something_or_other
       end
     end.should raise_error(LoadError)
@@ -37,7 +38,8 @@ describe Sequel::Model, "using a plugin" do
   it "should apply the plugin to the class" do
     c = nil
     proc do
-      c = Class.new(Sequel::Model) do
+      c = Class.new(Sequel::Model)
+      c.class_eval do
         set_dataset MODEL_DB[:items]
         is :timestamped, :a => 1, :b => 2
       end

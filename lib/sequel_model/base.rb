@@ -7,6 +7,7 @@ module Sequel
 
     @allowed_columns = nil
     @dataset_methods = {}
+    @hooks = {}
     @primary_key = :id
     @raise_on_save_failure = true
     @raise_on_typecast_failure = true
@@ -218,6 +219,8 @@ module Sequel
           nil
         end
       end
+      hooks = subclass.instance_variable_set(:@hooks, {})
+      sup_class.instance_variable_get(:@hooks).each{|k,v| hooks[k] = v.dup}
     end
   
     # Returns the implicit table name for the model class.
