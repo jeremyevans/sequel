@@ -53,6 +53,16 @@ class Module
   private
 
   # Define instance method(s) that calls class method(s) of the
+  # same name, caching the result in an instance variable.  Define
+  # standard attr_writer method for modifying that instance variable
+  def class_attr_overridable(*meths)
+    meths.each{|meth| class_eval("def #{meth}; @#{meth}.nil? ? (@#{meth} = self.class.#{meth}) : @#{meth} end")}
+    attr_writer(*meths) 
+    public(*meths) 
+    public(*meths.collect{|m|"#{m}="}) 
+  end
+
+  # Define instance method(s) that calls class method(s) of the
   # same name. Replaces the construct:
   #
   #   define_method(meth){self.class.send(meth)}

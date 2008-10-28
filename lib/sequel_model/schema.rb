@@ -3,7 +3,7 @@ module Sequel
     # Creates table, using the column information from set_schema.
     def self.create_table
       db.create_table(table_name, @schema)
-      @db_schema = get_db_schema(true) unless @@lazy_load_schema
+      @db_schema = get_db_schema(true)
       columns
     end
     

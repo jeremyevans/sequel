@@ -426,25 +426,23 @@ describe Sequel::Model, "A model class without a primary key" do
 end
 
 describe Sequel::Model, "attribute accessors" do
-  after do
-    Sequel::Model.lazy_load_schema = false
-  end
-
   before do
     MODEL_DB.reset
-
-    @c = Class.new(Sequel::Model) do
-      def self.columns; orig_columns; end
-    end
     @dataset = Sequel::Dataset.new(MODEL_DB)
-    def @dataset.db; end
-    def @dataset.set_model(blah); end
-    def @dataset.naked; self; end
     def @dataset.columns; [:x, :y]; end
-    def @dataset.def_mutation_method(*names);  end
+    @c = Class.new(Sequel::Model) do
+      def self.db_schema
+         set_columns(Array(@columns))
+        @db_schema = {:x=>{}, :y=>{}}
+      end
+      def self.set_dataset(ds, opts={}) 
+        @columns = ds.columns
+        db_schema
+      end
+    end
   end
 
-  it "should be created on set_dataset unless lazy loading schema" do
+  it "should be created on set_dataset" do
     %w'x y x= y='.each do |x|
       @c.instance_methods.collect{|y| y.to_s}.should_not include(x)
     end
@@ -453,28 +451,6 @@ describe Sequel::Model, "attribute accessors" do
       @c.instance_methods.collect{|y| y.to_s}.should include(x)
     end
     o = @c.new
-    %w'x y x= y='.each do |x|
-      o.methods.collect{|y| y.to_s}.should include(x)
-    end
-
-    o.x.should be_nil
-    o.x = 34
-    o.x.should == 34
-  end
-
-  it "should be created on first initialization if lazy loading schema" do
-    Sequel::Model.lazy_load_schema = true
-    %w'x y x= y='.each do |x|
-      @c.instance_methods.collect{|y| y.to_s}.should_not include(x)
-    end
-    @c.set_dataset(@dataset)
-    %w'x y x= y='.each do |x|
-      @c.instance_methods.collect{|y| y.to_s}.should_not include(x)
-    end
-    o = @c.new
-    %w'x y x= y='.each do |x|
-      @c.instance_methods.collect{|y| y.to_s}.should include(x)
-    end
     %w'x y x= y='.each do |x|
       o.methods.collect{|y| y.to_s}.should include(x)
     end

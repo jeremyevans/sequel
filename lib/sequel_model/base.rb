@@ -1,10 +1,5 @@
 module Sequel
   class Model
-    # Whether to lazily load the schema for future subclasses.  Unless turned
-    # off, checks the database for the table schema whenever a subclass is
-    # created
-    @@lazy_load_schema = false
-
     @allowed_columns = nil
     @dataset_methods = {}
     @hooks = {}
@@ -228,14 +223,6 @@ module Sequel
       name.demodulize.underscore.pluralize.to_sym
     end
 
-    # Set whether to lazily load the schema for future model classes.
-    # When the schema is lazy loaded, the schema information is grabbed
-    # during the first instantiation of the class instead of
-    # when the class is created.
-    def self.lazy_load_schema=(value)
-      @@lazy_load_schema = value
-    end
-  
     # Initializes a model instance as an existing record. This constructor is
     # used by Sequel to initialize model instances when fetching records.
     # #load requires that values be a hash where all keys are symbols. It
@@ -320,8 +307,7 @@ module Sequel
     # and adds a destroy method to it.  It also extends the dataset with
     # the Associations::EagerLoading methods, and assigns a transform to it
     # if there is one associated with the model. Finally, it attempts to 
-    # determine the database schema based on the given/created dataset unless
-    # lazy_load_schema is set.
+    # determine the database schema based on the given/created dataset.
     def self.set_dataset(ds, opts={})
       inherited = opts[:inherited]
       @dataset = case ds
@@ -336,13 +322,13 @@ module Sequel
       @dataset.set_model(self)
       @dataset.transform(@transform) if @transform
       if inherited
-        ((@columns = @dataset.columns) rescue nil) unless @@lazy_load_schema
+        @columns = @dataset.columns rescue nil
       else
         @dataset.extend(DatasetMethods)
         @dataset.extend(Associations::EagerLoading)
         @dataset_methods.each{|meth, block| @dataset.meta_def(meth, &block)} if @dataset_methods
       end
-      ((@db_schema = inherited ? superclass.db_schema : get_db_schema) rescue nil) unless @@lazy_load_schema
+      @db_schema = (inherited ? superclass.db_schema : get_db_schema) rescue nil
       self
     end
     metaalias :dataset=, :set_dataset

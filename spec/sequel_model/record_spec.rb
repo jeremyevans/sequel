@@ -750,11 +750,6 @@ describe Sequel::Model, "#initialize" do
     m.values.should == {}
   end
   
-  specify "should accept nil values" do
-    m = @c.new(nil)
-    m.values.should == {}
-  end
-  
   specify "should accept a block to execute" do
     m = @c.new {|o| o[:id] = 1234}
     m.id.should == 1234

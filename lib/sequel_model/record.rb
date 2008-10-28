@@ -12,35 +12,18 @@ module Sequel
     # The columns that have been updated.  This isn't completely accurate,
     # see Model#[]=.
     attr_reader :changed_columns
-    
-    # Whether this model instance should raise an exception instead of
-    # returning nil on a failure to save/save_changes/etc.
-    attr_writer :raise_on_save_failure
-
-    # Whether this model instance should raise an error when it cannot typecast
-    # data for a column correctly.
-    attr_writer :raise_on_typecast_failure
-
-    # Whether this model instance should raise an error if attempting
-    # to call a method through set/update and their variants that either
-    # doesn't exist or access to it is denied.
-    attr_writer :strict_param_setting
-
-    # Whether this model instance should typecast the empty string ('') to
-    # nil for columns that are non string or blob.
-    attr_writer :typecast_empty_string_to_nil
-
-    # Whether this model instance should typecast on attribute assignment
-    attr_writer :typecast_on_assignment
 
     # The hash of attribute values.  Keys are symbols with the names of the
     # underlying database columns.
     attr_reader :values
 
     class_attr_reader :columns, :dataset, :db, :primary_key, :str_columns
+    class_attr_overridable :db_schema, :raise_on_save_failure, :raise_on_typecast_failure, :strict_param_setting, :typecast_empty_string_to_nil, :typecast_on_assignment
+    remove_method :db_schema=
     
     # Creates new instance with values set to passed-in Hash.
-    # If a block is given, yield the instance to the block.
+    # If a block is given, yield the instance to the block unless
+    # from_db is true.
     # This method runs the after_initialize hook after
     # it has optionally yielded itself to the block.
     #
@@ -49,16 +32,9 @@ module Sequel
     #   string keys will work if from_db is false.
     # * from_db - should only be set by Model.load, forget it
     #   exists.
-    def initialize(values = nil, from_db = false, &block)
-      values ||=  {}
+    def initialize(values = {}, from_db = false, &block)
       @associations = {}
-      @db_schema = model.db_schema
       @changed_columns = []
-      @raise_on_save_failure = model.raise_on_save_failure
-      @strict_param_setting = model.strict_param_setting
-      @typecast_on_assignment = model.typecast_on_assignment
-      @typecast_empty_string_to_nil = model.typecast_empty_string_to_nil
-      @raise_on_typecast_failure = model.raise_on_typecast_failure
       if from_db
         @new = false
         @values = values
@@ -66,10 +42,9 @@ module Sequel
         @values = {}
         @new = true
         set(values)
+        @changed_columns.clear 
+        yield self if block
       end
-      @changed_columns.clear 
-      
-      yield self if block
       after_initialize
     end
     
@@ -459,7 +434,7 @@ module Sequel
 
     # Run the callback for the association with the object.
     def run_association_callbacks(reflection, callback_type, object)
-      raise_error = @raise_on_save_failure
+      raise_error = raise_on_save_failure
       raise_error = true if reflection[:type] == :many_to_one
       stop_on_false = true if [:before_add, :before_remove].include?(callback_type)
       reflection[callback_type].each do |cb|
@@ -480,7 +455,7 @@ module Sequel
 
     # Raise an error if raise_on_save_failure is true
     def save_failure(action, raise_error = nil)
-      raise_error = @raise_on_save_failure if raise_error.nil?
+      raise_error = raise_on_save_failure if raise_error.nil?
       raise(Error, "unable to #{action} record") if raise_error
     end
 
@@ -488,14 +463,14 @@ module Sequel
     def set_restricted(hash, only, except)
       columns_not_set = model.instance_variable_get(:@columns).blank?
       meths = setter_methods(only, except)
-      strict_param_setting = @strict_param_setting
+      strict = strict_param_setting
       hash.each do |k,v|
         m = "#{k}="
         if meths.include?(m)
           send(m, v)
         elsif columns_not_set && (Symbol === k)
           self[k] = v
-        elsif strict_param_setting
+        elsif strict
           raise Error, "method #{m} doesn't exist or access is restricted to it"
         end
       end
@@ -535,13 +510,13 @@ module Sequel
     # typecast_value method, so database adapters can override/augment the handling
     # for database specific column types.
     def typecast_value(column, value)
-      return value unless @typecast_on_assignment && @db_schema && (col_schema = @db_schema[column]) && !model.serialized?(column)
-      value = nil if value == '' and @typecast_empty_string_to_nil and col_schema[:type] and ![:string, :blob].include?(col_schema[:type])
-      raise(Error::InvalidValue, "nil/NULL is not allowed for the #{column} column") if @raise_on_typecast_failure && value.nil? && (col_schema[:allow_null] == false)
+      return value unless typecast_on_assignment && db_schema && (col_schema = db_schema[column]) && !model.serialized?(column)
+      value = nil if value == '' and typecast_empty_string_to_nil and col_schema[:type] and ![:string, :blob].include?(col_schema[:type])
+      raise(Error::InvalidValue, "nil/NULL is not allowed for the #{column} column") if raise_on_typecast_failure && value.nil? && (col_schema[:allow_null] == false)
       begin
         model.db.typecast_value(col_schema[:type], value)
       rescue Error::InvalidValue
-        if @raise_on_typecast_failure
+        if raise_on_typecast_failure
           raise
         else
           value
