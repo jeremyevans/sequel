@@ -1,5 +1,7 @@
 === HEAD
 
+* Major performance enhancement when fetching rows using PostgreSQL (jeremyevans)
+
 * Don't typecast serialized columns in models (jeremyevans)
 
 * Add Array#sql_array to handle ruby arrays of all two pairs as SQL arrays (jeremyevans) (#245)

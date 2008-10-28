@@ -83,7 +83,7 @@ module Sequel
     
     # Hash with integer keys and proc values for converting PostgreSQL types.
     PG_TYPES = {
-      16 => lambda{ |s| Postgres.string_to_bool(s) }, # boolean
+      16 => lambda{ |s| s == 't' }, # boolean
       17 => lambda{ |s| Adapter.unescape_bytea(s).to_blob }, # bytea
       20 => lambda{ |s| s.to_i }, # int8
       21 => lambda{ |s| s.to_i }, # int2
@@ -101,17 +101,6 @@ module Sequel
       1266 => lambda{ |s| s.to_time }, # time with time zone
       1700 => lambda{ |s| s.to_d }, # numeric
     }
-    
-    # Module method for converting a PostgreSQL string to a boolean value.
-    def self.string_to_bool(s)
-      if(s.blank?)
-        nil
-      elsif(s.downcase == 't' || s.downcase == 'true')
-        true
-      else
-        false
-      end
-    end
     
     # PGconn subclass for connection specific methods used with the
     # pg, postgres, or postgres-pr driver.
@@ -280,21 +269,20 @@ module Sequel
     class Dataset < Sequel::Dataset
       include Sequel::Postgres::DatasetMethods
       
-      # yield all rows returned by executing the given SQL and converting
+      # Yield all rows returned by executing the given SQL and converting
       # the types.
       def fetch_rows(sql)
-        @columns = []
+        cols = []
         execute(sql) do |res|
-          (0...res.ntuples).each do |recnum|
+          res.nfields.times do |fieldnum|
+            cols << [fieldnum, PG_TYPES[res.ftype(fieldnum)], res.fname(fieldnum).to_sym]
+          end
+          @columns = cols.map{|c| c.at(2)}
+          res.ntuples.times do |recnum|
             converted_rec = {}
-            (0...res.nfields).each do |fieldnum|
-              fieldsym = res.fname(fieldnum).to_sym
-              @columns << fieldsym
-              converted_rec[fieldsym] = if value = res.getvalue(recnum,fieldnum)
-                (PG_TYPES[res.ftype(fieldnum)] || lambda{|s| s.to_s}).call(value)
-              else
-                value
-              end
+            cols.each do |fieldnum, type_proc, fieldsym|
+              value = res.getvalue(recnum, fieldnum)
+              converted_rec[fieldsym] = (value && type_proc) ? type_proc.call(value) : value
             end
             yield converted_rec
           end
