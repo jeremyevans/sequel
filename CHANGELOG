@@ -1,5 +1,9 @@
 === HEAD
 
+* Make Model::Validiation::Errors more Rails-compatible (jeremyevans)
+
+* Refactor model hooks for performance (jeremyevans)
+
 * Major performance enhancement when fetching rows using PostgreSQL (jeremyevans)
 
 * Don't typecast serialized columns in models (jeremyevans)

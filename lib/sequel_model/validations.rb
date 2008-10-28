@@ -18,6 +18,11 @@ module Sequel
         def add(att, msg)
           self[att] << msg
         end
+
+        # Return the total number of error messages.
+        def count
+          full_messages.length
+        end
         
         # Returns an array of fully-formatted error messages.
         def full_messages
@@ -28,9 +33,10 @@ module Sequel
           end
         end
         
-        # Returns the errors for the given attribute.
+        # Returns the array of errors for the given attribute, or nil
+        # if there are no errors for the attribute.
         def on(att)
-          self[att]
+          self[att] if include?(att)
         end
       end
   

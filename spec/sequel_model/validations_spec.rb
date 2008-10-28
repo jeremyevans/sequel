@@ -48,6 +48,31 @@ describe Sequel::Model::Validation::Errors do
     msgs.size.should == 3
     msgs.should include('blow blieuh', 'blow blich', 'blay bliu')
   end
+
+  specify "should return the number of error messages using #count" do
+    @errors.count.should == 0
+    @errors.add(:a, 'b')
+    @errors.count.should == 1
+    @errors.add(:a, 'c')
+    @errors.count.should == 2
+    @errors.add(:b, 'c')
+    @errors.count.should == 3
+  end
+
+  specify "should return the array of error messages for a given attribute using #on" do
+    @errors.add(:a, 'b')
+    @errors.on(:a).should == ['b']
+    @errors.add(:a, 'c')
+    @errors.on(:a).should == ['b', 'c']
+    @errors.add(:b, 'c')
+    @errors.on(:a).should == ['b', 'c']
+  end
+
+  specify "should return nil if there are no error messages for a given attribute using #on" do
+    @errors.on(:a).should == nil
+    @errors.add(:b, 'b')
+    @errors.on(:a).should == nil
+  end
 end
 
 describe Sequel::Model do
