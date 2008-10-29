@@ -185,6 +185,7 @@ module Sequel::Model::Associations
   #     table when eagerly loading the association via eager_graph, instead of the default
   #     conditions specified by the foreign/primary keys.  This option causes the 
   #     :graph_join_table_conditions option to be ignored.
+  #   - :uniq - Adds a after_load callback that makes the array of objects unique.
   def associate(type, name, opts = {}, &block)
     raise(Error, 'invalid association type') unless AssociationReflection::ASSOCIATION_TYPES.include?(type)
     raise(Error, 'Model.associate name argument must be a symbol') unless Symbol === name
@@ -283,6 +284,7 @@ module Sequel::Model::Associations
     left_key_select = opts[:left_key_select] ||= left.qualify(join_table).as(opts[:left_key_alias])
     opts[:graph_join_table_conditions] = opts[:graph_join_table_conditions] ? opts[:graph_join_table_conditions].to_a : []
     opts[:graph_join_table_join_type] ||= opts[:graph_join_type]
+    opts[:after_load].unshift(proc{|obj, assoc_objs| assoc_objs.uniq!}) if opts[:uniq]
     opts[:dataset] ||= proc{opts.associated_class.inner_join(join_table, [[right, opts.associated_primary_key], [left, pk]])}
     database = db
     

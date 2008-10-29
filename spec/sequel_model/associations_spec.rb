@@ -1463,6 +1463,20 @@ describe Sequel::Model, "many_to_many" do
     p.remove_attribute(c).should == nil
     p.attributes.should == [c]
   end
+
+  it "should support a :uniq option that removes duplicates from the association" do
+    h = []
+    @c2.many_to_many :attributes, :class => @c1, :uniq=>true
+    @c1.class_eval do
+      def @dataset.fetch_rows(sql)
+        yield({:id=>20})
+        yield({:id=>30})
+        yield({:id=>20})
+        yield({:id=>30})
+      end
+    end
+    @c2.load(:id=>10, :parent_id=>20).attributes.should == [@c1.load(:id=>20), @c1.load(:id=>30)]
+  end
 end
 
 describe Sequel::Model, " association reflection methods" do

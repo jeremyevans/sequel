@@ -1,5 +1,7 @@
 === HEAD
 
+* Add a :uniq association option to many_to_many associations (jeremyevans)
+
 * Support using any expression as the argument to Symbol#like (jeremyevans)
 
 * Much better support for multiple schemas in PostgreSQL (jeremyevans) (#243)
