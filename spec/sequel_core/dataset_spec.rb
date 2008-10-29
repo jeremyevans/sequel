@@ -2971,6 +2971,11 @@ context "Dataset#grep" do
     @ds.grep(:title, [/^ruby/, 'ruby']).sql.should ==
       "SELECT * FROM posts WHERE (((title ~ '^ruby') OR (title LIKE 'ruby')))"
   end
+
+  specify "should support searching against other columns" do
+    @ds.grep(:title, :body).sql.should ==
+      "SELECT * FROM posts WHERE ((title LIKE body))"
+  end
 end
 
 context "Sequel.use_parse_tree" do

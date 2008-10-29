@@ -757,7 +757,7 @@ module Sequel
       def self.like(l, *ces)
         case_insensitive = ces.extract_options![:case_insensitive]
         ces.collect! do |ce|
-          op, expr = Regexp === ce ? [ce.casefold? || case_insensitive ? :'~*' : :~, ce.source] : [case_insensitive ? :ILIKE : :LIKE, ce.to_s]
+          op, expr = Regexp === ce ? [ce.casefold? || case_insensitive ? :'~*' : :~, ce.source] : [case_insensitive ? :ILIKE : :LIKE, ce]
           BooleanExpression.new(op, l, expr)
         end
         ces.length == 1 ? ces.at(0) : BooleanExpression.new(:OR, *ces)
