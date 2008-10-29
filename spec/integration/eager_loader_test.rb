@@ -228,7 +228,6 @@ describe "has_many :through has_many and has_one :through belongs_to" do
           firms.each{|firm| firm.associations[:invoices] = []}
           Invoice.eager_graph(:client).filter(:client__firm_id=>id_map.keys).all do |inv|
             id_map[inv.client.firm_id].each do |firm|
-              inv.client.associations[:firm] = inv.associations[:firm] = firm
               firm.associations[:invoices] << inv
             end
           end
@@ -255,20 +254,22 @@ describe "has_many :through has_many and has_one :through belongs_to" do
         :after_load=>(proc do |inv, firm|
           # Delete the cached associations from firm, because it only has the
           # client with this invoice, instead of all clients of the firm
-          inv.associations[:client] = firm.associations.delete(:clients).first
+          if c = firm.associations.delete(:clients)
+            firm.associations[:invoice_client] = c.first
+          end
+          inv.associations[:client] ||= firm.associations[:invoice_client]
         end), \
         :eager_loader=>(proc do |key_hash, invoices, associations|
           id_map = {}
           invoices.each do |inv|
             inv.associations[:firm] = nil
-            inv.associations[:client] = nil
             (id_map[inv.client_id] ||= []) << inv
           end
           Firm.eager_graph(:clients).filter(:clients__id=>id_map.keys).all do |firm|
             # Delete the cached associations from firm, because it only has the
             # clients related the invoices being eagerly loaded, instead of all
             # clients of the firm.
-            firm.associations.delete(:clients).each do |client|
+            firm.associations[:clients].each do |client|
               id_map[client.pk].each do |inv|
                 inv.associations[:firm] = firm
                 inv.associations[:client] = client

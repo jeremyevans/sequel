@@ -455,6 +455,16 @@ describe Sequel::Model, "#eager" do
     MODEL_DB.sqls.length.should == 4
   end
   
+  it "should respect :after_load callbacks on associations when eager loading" do
+    EagerAlbum.many_to_one :al_band, :class=>'EagerBand', :key=>:band_id, :after_load=>proc{|o, a| a.id *=2}
+    EagerAlbum.one_to_many :al_tracks, :class=>'EagerTrack', :key=>:album_id, :after_load=>proc{|o, os| os.each{|a| a.id *=2}}
+    EagerAlbum.many_to_many :al_genres, :class=>'EagerGenre', :left_key=>:album_id, :right_key=>:genre_id, :join_table=>:ag, :after_load=>proc{|o, os| os.each{|a| a.id *=2}}
+    a = EagerAlbum.eager(:al_band, :al_tracks, :al_genres).all.first
+    a.should == EagerAlbum.load(:id => 1, :band_id => 2)
+    a.al_band.should == EagerBand.load(:id=>4)
+    a.al_tracks.should == [EagerTrack.load(:id=>6, :album_id=>1)]
+    a.al_genres.should == [EagerGenre.load(:id=>8)]
+  end
 end
 
 describe Sequel::Model, "#eager_graph" do

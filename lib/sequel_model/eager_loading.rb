@@ -381,7 +381,10 @@ module Sequel::Model::Associations::EagerLoading
       end
     end
     
-    reflections.each{|r| r[:eager_loader].call(key_hash, a, eager_assoc[r[:name]])}
+    reflections.each do |r|
+      r[:eager_loader].call(key_hash, a, eager_assoc[r[:name]])
+      a.each{|object| object.send(:run_association_callbacks, r, :after_load, object.associations[r[:name]])}
+    end 
   end
 
   # Build associations from the graph if #eager_graph was used, 

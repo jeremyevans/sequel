@@ -88,7 +88,7 @@ module Sequel::Model::Associations
   #     after a new item is added to the association.
   #   - :after_load - Symbol, Proc, or array of both/either specifying a callback to call
   #     after the associated record(s) have been retrieved from the database.  Not called
-  #     when eager loading (see the :eager_loader option to accomplish it when eager loading).
+  #     when eager loading via eager_graph, but called when eager loading via eager.
   #   - :after_remove - Symbol, Proc, or array of both/either specifying a callback to call
   #     after an item is removed from the association.
   #   - :allow_eager - If set to false, you cannot load the association eagerly
