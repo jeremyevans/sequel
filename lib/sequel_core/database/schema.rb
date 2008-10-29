@@ -109,7 +109,7 @@ module Sequel
     #   DB.drop_table(:posts, :comments)
     def drop_table(*names)
       names.each do |n|
-        @schemas.delete(n.to_sym) if @schemas
+        @schemas.delete(n.is_a?(String) ? n.to_sym : n) if @schemas
         execute_ddl(drop_table_sql(n))
       end
     end

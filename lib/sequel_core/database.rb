@@ -495,6 +495,11 @@ module Sequel
     def connection_pool_default_options
       {}
     end
+    
+    # Sequel doesn't use database schema's by default.
+    def default_schema
+      nil
+    end
 
     # SQL to ROLLBACK a transaction.
     def rollback_transaction_sql
@@ -510,6 +515,23 @@ module Sequel
         raise e
       else
         raise exception
+      end
+    end
+    
+    # Split the schema information from the table
+    def schema_and_table(table_name)
+      case table_name
+      when Symbol
+        s, t, a = dataset.send(:split_symbol, table_name)
+        [s||default_schema, t]
+      when SQL::QualifiedIdentifier
+        [table_name.table, table_name.column]
+      when SQL::Identifier
+        [default_schema, table_name.value]
+      when String
+        [default_schema, table_name]
+      else
+        raise Error, 'table_name should be a Symbol, SQL::QualifiedIdentifier, SQL::Identifier, or String'
       end
     end
 

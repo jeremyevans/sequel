@@ -20,7 +20,6 @@ module Sequel
       # The SQL to execute to modify the DDL for the given table name.  op
       # should be one of the operations returned by the AlterTableGenerator.
       def alter_table_sql(table, op)
-        quoted_table = quote_identifier(table)
         quoted_name = quote_identifier(op[:name]) if op[:name]
         alter_table_op = case op[:op]
         when :add_column
@@ -46,7 +45,7 @@ module Sequel
         else
           raise Error, "Unsupported ALTER TABLE operation"
         end
-        "ALTER TABLE #{quoted_table} #{alter_table_op}"
+        "ALTER TABLE #{quote_schema_table(table)} #{alter_table_op}"
       end
 
       # Array of SQL DDL modification statements for the given table,
@@ -83,7 +82,7 @@ module Sequel
 
       # SQL DDL fragment for column foreign key references
       def column_references_sql(column)
-        sql = " REFERENCES #{quote_identifier(column[:table])}"
+        sql = " REFERENCES #{quote_schema_table(column[:table])}"
         sql << "(#{Array(column[:key]).map{|x| quote_identifier(x)}.join(COMMA_SEPARATOR)})" if column[:key]
         sql << " ON DELETE #{on_delete_clause(column[:on_delete])}" if column[:on_delete]
         sql << " ON UPDATE #{on_delete_clause(column[:on_update])}" if column[:on_update]
@@ -112,7 +111,7 @@ module Sequel
       # name and column specifications, and the others for specifying indexes on
       # the table.
       def create_table_sql_list(name, columns, indexes = nil)
-        sql = ["CREATE TABLE #{quote_identifier(name)} (#{column_list_sql(columns)})"]
+        sql = ["CREATE TABLE #{quote_schema_table(name)} (#{column_list_sql(columns)})"]
         sql.concat(index_list_sql_list(name, indexes)) if indexes && !indexes.empty?
         sql
       end
@@ -120,7 +119,8 @@ module Sequel
       # Default index name for the table and columns, may be too long
       # for certain databases.
       def default_index_name(table_name, columns)
-        "#{table_name}_#{columns.join(UNDERSCORE)}_index"
+        schema, table = schema_and_table(table_name)
+        "#{"#{schema}_" if schema and schema != default_schema}#{table}_#{columns.join(UNDERSCORE)}_index"
       end
     
       # The SQL to drop an index for the table.
@@ -130,7 +130,7 @@ module Sequel
 
       # SQL DDL statement to drop the table with the given name.
       def drop_table_sql(name)
-        "DROP TABLE #{quote_identifier(name)}"
+        "DROP TABLE #{quote_schema_table(name)}"
       end
       
       # Proxy the filter_expr call to the dataset, used for creating constraints.
@@ -187,6 +187,11 @@ module Sequel
         end
       end
       
+      def quote_schema_table(table)
+        schema, table = schema_and_table(table)
+        "#{"#{quote_identifier(schema)}." if schema}#{quote_identifier(table)}"
+      end
+      
       # Proxy the quote_identifier method to the dataset, used for quoting tables and columns.
       def quote_identifier(v)
         schema_utility_dataset.quote_identifier(v)
@@ -194,7 +199,7 @@ module Sequel
       
       # SQL DDL statement for renaming a table.
       def rename_table_sql(name, new_name)
-        "ALTER TABLE #{quote_identifier(name)} RENAME TO #{quote_identifier(new_name)}"
+        "ALTER TABLE #{quote_schema_table(name)} RENAME TO #{quote_schema_table(new_name)}"
       end
 
       # Parse the schema from the database using the SQL standard INFORMATION_SCHEMA.
@@ -249,7 +254,6 @@ module Sequel
         @schema_utility_dataset ||= dataset
       end
       
-
       private
 
       # Match the database's column type to a ruby type via a

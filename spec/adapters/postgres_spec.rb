@@ -343,7 +343,7 @@ context "A PostgreSQL database" do
       full_text_index [:title, :body]
     end
     POSTGRES_DB.create_table_sql_list(:posts, *g.create_info).should == [
-      "CREATE TABLE posts (title text, body text)",
+      "CREATE TABLE public.posts (title text, body text)",
       "CREATE INDEX posts_title_body_index ON posts USING gin (to_tsvector('simple', (COALESCE(title, '') || ' ' || COALESCE(body, ''))))"
     ]
   end
@@ -355,7 +355,7 @@ context "A PostgreSQL database" do
       full_text_index [:title, :body], :language => 'french'
     end
     POSTGRES_DB.create_table_sql_list(:posts, *g.create_info).should == [
-      "CREATE TABLE posts (title text, body text)",
+      "CREATE TABLE public.posts (title text, body text)",
       "CREATE INDEX posts_title_body_index ON posts USING gin (to_tsvector('french', (COALESCE(title, '') || ' ' || COALESCE(body, ''))))"
     ]
   end
@@ -377,7 +377,7 @@ context "A PostgreSQL database" do
       spatial_index [:geom]
     end
     POSTGRES_DB.create_table_sql_list(:posts, *g.create_info).should == [
-      "CREATE TABLE posts (geom geometry)",
+      "CREATE TABLE public.posts (geom geometry)",
       "CREATE INDEX posts_geom_index ON posts USING gist (geom)"
     ]
   end
@@ -388,7 +388,7 @@ context "A PostgreSQL database" do
       index :title, :type => 'hash'
     end
     POSTGRES_DB.create_table_sql_list(:posts, *g.create_info).should == [
-      "CREATE TABLE posts (title varchar(5))",
+      "CREATE TABLE public.posts (title varchar(5))",
       "CREATE INDEX posts_title_index ON posts USING hash (title)"
     ]
   end
@@ -399,7 +399,7 @@ context "A PostgreSQL database" do
       index :title, :type => 'hash', :unique => true
     end
     POSTGRES_DB.create_table_sql_list(:posts, *g.create_info).should == [
-      "CREATE TABLE posts (title varchar(5))",
+      "CREATE TABLE public.posts (title varchar(5))",
       "CREATE UNIQUE INDEX posts_title_index ON posts USING hash (title)"
     ]
   end
@@ -410,7 +410,7 @@ context "A PostgreSQL database" do
       index :title, :where => {:something => 5}
     end
     POSTGRES_DB.create_table_sql_list(:posts, *g.create_info).should == [
-      "CREATE TABLE posts (title varchar(5))",
+      "CREATE TABLE public.posts (title varchar(5))",
       "CREATE INDEX posts_title_index ON posts (title) WHERE (something = 5)"
     ]
   end
@@ -493,6 +493,76 @@ context "Postgres::Dataset#insert" do
     ds = POSTGRES_DB[:test4]
     ds.delete
     ds.insert(:name=>'a').should == nil
+  end
+end
+
+context "Postgres::Database schema qualified tables" do
+  setup do
+    POSTGRES_DB << "CREATE SCHEMA schema_test"
+    POSTGRES_DB.instance_variable_set(:@primary_keys, {})
+    POSTGRES_DB.instance_variable_set(:@primary_key_sequences, {})
+  end
+  teardown do
+    POSTGRES_DB << "DROP SCHEMA schema_test CASCADE"
+    POSTGRES_DB.default_schema = :public
+  end
+  
+  specify "should be able to create, drop, select and insert into tables in a given schema" do
+    POSTGRES_DB.create_table(:schema_test__schema_test){primary_key :i}
+    POSTGRES_DB[:schema_test__schema_test].first.should == nil
+    POSTGRES_DB[:schema_test__schema_test].insert(:i=>1).should == 1
+    POSTGRES_DB[:schema_test__schema_test].first.should == {:i=>1}
+    POSTGRES_DB.from('schema_test.schema_test'.lit).first.should == {:i=>1}
+    POSTGRES_DB.drop_table(:schema_test__schema_test)
+    POSTGRES_DB.create_table(:schema_test.qualify(:schema_test)){integer :i}
+    POSTGRES_DB[:schema_test__schema_test].first.should == nil
+    POSTGRES_DB.from('schema_test.schema_test'.lit).first.should == nil
+    POSTGRES_DB.drop_table(:schema_test.qualify(:schema_test))
+  end
+  
+  specify "#tables should include only tables in the public schema if no schema is given" do
+    POSTGRES_DB.create_table(:schema_test__schema_test){integer :i}
+    POSTGRES_DB.tables.should_not include(:schema_test)
+  end
+  
+  specify "#tables should return tables in the schema provided by the :schema argument" do
+    POSTGRES_DB.create_table(:schema_test__schema_test){integer :i}
+    POSTGRES_DB.tables(:schema=>:schema_test).should == [:schema_test]
+  end
+  
+  specify "#table_exists? should assume the public schema if no schema is provided" do
+    POSTGRES_DB.create_table(:schema_test__schema_test){integer :i}
+    POSTGRES_DB.table_exists?(:schema_test).should == false
+  end
+  
+  specify "#table_exists? should see if the table is in a given schema" do
+    POSTGRES_DB.create_table(:schema_test__schema_test){integer :i}
+    POSTGRES_DB.table_exists?(:schema_test__schema_test).should == true
+  end
+  
+  specify "should be able to get primary keys for tables in a given schema" do
+    POSTGRES_DB.create_table(:schema_test__schema_test){primary_key :i}
+    POSTGRES_DB.synchronize{|c| POSTGRES_DB.send(:primary_key_for_table, c, :schema_test__schema_test).should == 'i'}
+  end
+  
+  specify "should be able to get serial sequences for tables in a given schema" do
+    POSTGRES_DB.create_table(:schema_test__schema_test){primary_key :i}
+    POSTGRES_DB.synchronize{|c| POSTGRES_DB.send(:primary_key_sequence_for_table, c, :schema_test__schema_test).should == '"schema_test"."schema_test_i_seq"'}
+  end
+  
+  specify "should be able to get custom sequences for tables in a given schema" do
+    POSTGRES_DB << "CREATE SEQUENCE schema_test.kseq"
+    POSTGRES_DB.create_table(:schema_test__schema_test){integer :j; primary_key :k, :type=>:integer, :default=>"nextval('schema_test.kseq'::regclass)".lit}
+    POSTGRES_DB.synchronize{|c| POSTGRES_DB.send(:primary_key_sequence_for_table, c, :schema_test__schema_test).should == '"schema_test"."kseq"'}
+  end
+  
+  specify "#default_schema= should change the default schema used from public" do
+    POSTGRES_DB.create_table(:schema_test__schema_test){primary_key :i}
+    POSTGRES_DB.default_schema = :schema_test
+    POSTGRES_DB.table_exists?(:schema_test).should == true
+    POSTGRES_DB.tables.should == [:schema_test]
+    POSTGRES_DB.synchronize{|c| POSTGRES_DB.send(:primary_key_for_table, c, :schema_test).should == 'i'}
+    POSTGRES_DB.synchronize{|c| POSTGRES_DB.send(:primary_key_sequence_for_table, c, :schema_test).should == '"schema_test"."schema_test_i_seq"'}
   end
 end
 

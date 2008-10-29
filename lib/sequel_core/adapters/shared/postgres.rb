@@ -10,32 +10,35 @@ module Sequel
       
       SELECT_CURRVAL = "SELECT currval('%s')".freeze
       SELECT_CUSTOM_SEQUENCE = <<-end_sql
-        SELECT CASE  
+        SELECT '"' || name.nspname || '"."' || CASE  
             WHEN split_part(def.adsrc, '''', 2) ~ '.' THEN  
               substr(split_part(def.adsrc, '''', 2),  
                      strpos(split_part(def.adsrc, '''', 2), '.')+1) 
             ELSE split_part(def.adsrc, '''', 2)  
-          END
+          END || '"'
         FROM pg_class t
         JOIN pg_namespace  name ON (t.relnamespace = name.oid)
         JOIN pg_attribute  attr ON (t.oid = attrelid)
         JOIN pg_attrdef    def  ON (adrelid = attrelid AND adnum = attnum)
         JOIN pg_constraint cons ON (conrelid = adrelid AND adnum = conkey[1])
-        WHERE t.oid = '%s'::regclass
-          AND cons.contype = 'p'
+        WHERE cons.contype = 'p'
           AND def.adsrc ~* 'nextval'
+          AND name.nspname = '%s'
+          AND t.relname = '%s'
       end_sql
       SELECT_PK = <<-end_sql
         SELECT pg_attribute.attname
-        FROM pg_class, pg_attribute, pg_index
-        WHERE pg_class.oid = pg_attribute.attrelid AND
-          pg_class.oid = pg_index.indrelid AND
-          pg_index.indkey[0] = pg_attribute.attnum AND
-          pg_index.indisprimary = 't' AND
-          pg_class.relname = '%s'
+        FROM pg_class, pg_attribute, pg_index, pg_namespace
+        WHERE pg_class.oid = pg_attribute.attrelid
+          AND pg_class.relnamespace  = pg_namespace.oid
+          AND pg_class.oid = pg_index.indrelid
+          AND pg_index.indkey[0] = pg_attribute.attnum
+          AND pg_index.indisprimary = 't'
+          AND pg_namespace.nspname = '%s'
+          AND pg_class.relname = '%s'
       end_sql
       SELECT_SERIAL_SEQUENCE = <<-end_sql
-        SELECT seq.relname
+        SELECT  '"' || name.nspname || '"."' || seq.relname || '"'
         FROM pg_class seq, pg_attribute attr, pg_depend dep,
           pg_namespace name, pg_constraint cons
         WHERE seq.oid = dep.objid
@@ -46,7 +49,8 @@ module Sequel
           AND attr.attrelid = cons.conrelid
           AND attr.attnum = cons.conkey[1]
           AND cons.contype = 'p'
-          AND dep.refobjid = '%s'::regclass
+          AND name.nspname = '%s'
+          AND seq.relname = '%s'
       end_sql
       
       # Depth of the current transaction on this connection, used
@@ -64,15 +68,15 @@ module Sequel
       end
       
       # Get the primary key and sequence for the given table.
-      def sequence(table)
-        sql = SELECT_SERIAL_SEQUENCE % table
+      def sequence(schema, table)
+        sql = SELECT_SERIAL_SEQUENCE % [schema, table]
         @db.log_info(sql)
         execute(sql) do |r|
           seq = single_value(r)
           return seq if seq
         end
         
-        sql = SELECT_CUSTOM_SEQUENCE % table
+        sql = SELECT_CUSTOM_SEQUENCE % [schema, table]
         @db.log_info(sql)
         execute(sql) do |r|
           return single_value(r)
@@ -80,8 +84,8 @@ module Sequel
       end
       
       # Get the primary key for the given table.
-      def primary_key(table)
-        sql = SELECT_PK % table
+      def primary_key(schema, table)
+        sql = SELECT_PK % [schema, table]
         @db.log_info(sql)
         execute(sql) do |r|
           return single_value(r)
@@ -93,8 +97,6 @@ module Sequel
     module DatabaseMethods
       PREPARED_ARG_PLACEHOLDER = '$'.lit.freeze
       RE_CURRVAL_ERROR = /currval of sequence "(.*)" is not yet defined in this session|relation "(.*)" does not exist/.freeze
-      RELATION_QUERY = {:from => [:pg_class], :select => [:relname]}.freeze
-      RELATION_FILTER = "(relkind = 'r') AND (relname !~ '^pg|sql')".freeze
       SQL_BEGIN = 'BEGIN'.freeze
       SQL_SAVEPOINT = 'SAVEPOINT autopoint_%d'.freeze
       SQL_COMMIT = 'COMMIT'.freeze
@@ -103,19 +105,29 @@ module Sequel
       SQL_RELEASE_SAVEPOINT = 'RELEASE SAVEPOINT autopoint_%d'.freeze
       SYSTEM_TABLE_REGEXP = /^pg|sql/.freeze
       
+      # The default schema to use if none is specified (default: public)
+      def default_schema
+        @default_schema ||= :public
+      end
+      
+      # Set a new default schema to use.
+      def default_schema=(schema)
+        @default_schema = schema
+      end
+      
       # Remove the cached entries for primary keys and sequences when dropping a table.
       def drop_table(*names)
         names.each do |name|
-          s = name.to_sym
-          @primary_keys.delete(s)
-          @primary_key_sequences.delete(s)
+          name = quote_schema_table(name)
+          @primary_keys.delete(name)
+          @primary_key_sequences.delete(name)
         end
         super
       end
 
       # Always CASCADE the table drop
       def drop_table_sql(name)
-        "DROP TABLE #{name} CASCADE"
+        "DROP TABLE #{quote_schema_table(name)} CASCADE"
       end
       
       # PostgreSQL specific index SQL.
@@ -151,17 +163,8 @@ module Sequel
 
       # Support :schema__table format for table
       def schema(table_name=nil, opts={})
-        case table_name
-        when Symbol
-          t, c, a = dataset.send(:split_symbol, table_name)
-          opts[:schema] ||= t
-          table_name = c
-        when SQL::QualifiedIdentifier
-          opts[:schema] ||= table_name.table
-          table_name = table_name.column
-        when SQL::Identifier
-          table_name = table_name.value
-        end
+        schema, table_name = schema_and_table(table_name) if table_name
+        opts[:schema] = schema if schema
         super(table_name, opts)
       end
 
@@ -184,9 +187,27 @@ module Sequel
         @server_version
       end
       
+      # Whether the given table exists in the database
+      #
+      # Options:
+      # * :schema - The schema to search (default_schema by default)
+      # * :server - The server to use
+      def table_exists?(table, opts={})
+        schema, table = schema_and_table(table)
+        opts[:schema] ||= schema
+        tables(opts){|ds| !ds.first(:relname=>table.to_s).nil?}
+      end
+      
       # Array of symbols specifying table names in the current database.
-      def tables
-        dataset(RELATION_QUERY).filter(RELATION_FILTER).map{|r| r[:relname].to_sym}
+      # The dataset used is yielded to the block if one is provided,
+      # otherwise, an array of symbols of table names is returned.  
+      #
+      # Options:
+      # * :schema - The schema to search (default_schema by default)
+      # * :server - The server to use
+      def tables(opts={})
+        ds = self[:pg_class].join(:pg_namespace, :oid=>:relnamespace, 'r'=>:relkind, :nspname=>(opts[:schema]||default_schema).to_s).select(:relname).exclude(:relname.like(SYSTEM_TABLE_REGEXP)).server(opts[:server])
+        block_given? ? yield(ds) : ds.map{|r| r[:relname].to_sym}
       end
       
       # PostgreSQL supports multi-level transactions using save points.
@@ -272,14 +293,14 @@ module Sequel
       # cached, and if the primary key for a table is changed, the
       # @primary_keys instance variable should be reset manually.
       def primary_key_for_table(conn, table)
-        @primary_keys.include?(table) ? @primary_keys[table] : (@primary_keys[table] = conn.primary_key(table))
+        @primary_keys[quote_schema_table(table)] ||= conn.primary_key(*schema_and_table(table))
       end
       
       # Returns primary key for the given table.  This information is
       # cached, and if the primary key for a table is changed, the
       # @primary_keys instance variable should be reset manually.
       def primary_key_sequence_for_table(conn, table)
-        @primary_key_sequences.include?(table) ? @primary_key_sequences[table] : (@primary_key_sequences[table] = conn.sequence(table))
+        @primary_key_sequences[quote_schema_table(table)] ||= conn.sequence(*schema_and_table(table))
       end
       
       # Set the default of the row to NULL if it is blank, and set
@@ -329,7 +350,7 @@ module Sequel
         else
           ds.select_more!(:pg_class__relname___table)
         end
-        ds.join!(:pg_namespace, :oid=>:pg_class__relnamespace, :nspname=>opts[:schema] || 'public') if opts[:schema] || !opts.include?(:schema)
+        ds.join!(:pg_namespace, :oid=>:pg_class__relnamespace, :nspname=>(opts[:schema] || default_schema).to_s) if opts[:schema] || !opts.include?(:schema)
         ds
       end
     end

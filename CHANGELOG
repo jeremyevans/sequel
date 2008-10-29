@@ -1,5 +1,7 @@
 === HEAD
 
+* Much better support for multiple schemas in PostgreSQL (jeremyevans) (#243)
+
 * The first argument to Model#initalize can no longer be nil, it must be a hash if it is given (jeremyevans)
 
 * Remove Sequel::Model.lazy_load_schema= setting (jeremyevans)
