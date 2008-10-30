@@ -524,6 +524,12 @@ module Sequel
       end
     end
 
+    # Call uniq! on the given array. This is used by the :uniq option,
+    # and is an actual method for memory reasons.
+    def array_uniq!(a)
+      a.uniq!
+    end
+
     # Set the columns, filtered by the only and except arrays.
     def update_restricted(hash, only, except)
       set_restricted(hash, only, except)

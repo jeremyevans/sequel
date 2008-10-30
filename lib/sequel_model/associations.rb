@@ -284,7 +284,7 @@ module Sequel::Model::Associations
     left_key_select = opts[:left_key_select] ||= left.qualify(join_table).as(opts[:left_key_alias])
     opts[:graph_join_table_conditions] = opts[:graph_join_table_conditions] ? opts[:graph_join_table_conditions].to_a : []
     opts[:graph_join_table_join_type] ||= opts[:graph_join_type]
-    opts[:after_load].unshift(proc{|obj, assoc_objs| assoc_objs.uniq!}) if opts[:uniq]
+    opts[:after_load].unshift(:array_uniq!) if opts[:uniq]
     opts[:dataset] ||= proc{opts.associated_class.inner_join(join_table, [[right, opts.associated_primary_key], [left, pk]])}
     database = db
     
