@@ -18,21 +18,21 @@ describe Sequel::Model::Associations::AssociationReflection, "#associated_class"
   end
 end
 
-describe Sequel::Model::Associations::AssociationReflection, "#associated_primary_key" do
+describe Sequel::Model::Associations::AssociationReflection, "#primary_key" do
   before do
     @c = Class.new(Sequel::Model)
     class ::ParParent < Sequel::Model; end
   end
 
-  it "should use the :right_primary_key value if present" do
-    @c.many_to_one :c, :class=>ParParent, :associated_primary_key=>:blah__blah
-    @c.association_reflection(:c).should include(:associated_primary_key)
-    @c.association_reflection(:c).associated_primary_key.should == :blah__blah
+  it "should use the :primary_key value if present" do
+    @c.many_to_one :c, :class=>ParParent, :primary_key=>:blah__blah
+    @c.association_reflection(:c).should include(:primary_key)
+    @c.association_reflection(:c).primary_key.should == :blah__blah
   end
-  it "should use the associated table's primary key if :associated_primary_key is not present" do
+  it "should use the associated table's primary key if :primary_key is not present" do
     @c.many_to_one :c, :class=>'ParParent'
-    @c.association_reflection(:c).should_not include(:associated_primary_key)
-    @c.association_reflection(:c).associated_primary_key.should == :id
+    @c.association_reflection(:c).should_not include(:primary_key)
+    @c.association_reflection(:c).primary_key.should == :id
   end
 end
 

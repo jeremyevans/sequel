@@ -152,6 +152,8 @@ module Sequel::Model::Associations
   # * :many_to_one:
   #   - :key - foreign_key in current model's table that references
   #     associated model's primary key, as a symbol.  Defaults to :"#{name}_id".
+  #   - :primary_key - column in the associated table that :key option references, as a symbol.
+  #     Defaults to the primary key of the associated table.
   # * :one_to_many:
   #   - :key - foreign key in associated model's table that references
   #     current model's primary key, as a symbol.  Defaults to
@@ -164,6 +166,8 @@ module Sequel::Model::Associations
   #     so using this is similar to using many_to_one, in terms of the methods
   #     it adds, the main difference is that the foreign key is in the associated
   #     table instead of the current table.
+  #   - :primary_key - column in the current table that :key option references, as a symbol.
+  #     Defaults to primary key of the current table.
   # * :many_to_many:
   #   - :join_table - name of table that includes the foreign keys to both
   #     the current model and the associated model, as a symbol.  Defaults to the name
@@ -285,13 +289,13 @@ module Sequel::Model::Associations
     opts[:graph_join_table_conditions] = opts[:graph_join_table_conditions] ? opts[:graph_join_table_conditions].to_a : []
     opts[:graph_join_table_join_type] ||= opts[:graph_join_type]
     opts[:after_load].unshift(:array_uniq!) if opts[:uniq]
-    opts[:dataset] ||= proc{opts.associated_class.inner_join(join_table, [[right, opts.associated_primary_key], [left, pk]])}
+    opts[:dataset] ||= proc{opts.associated_class.inner_join(join_table, [[right, opts.primary_key], [left, pk]])}
     database = db
     
     opts[:eager_loader] ||= proc do |key_hash, records, associations|
       h = key_hash[model.primary_key]
       records.each{|object| object.associations[name] = []}
-      model.eager_loading_dataset(opts, opts.associated_class.inner_join(join_table, [[right, opts.associated_primary_key], [left, h.keys]]), Array(opts.select) + Array(left_key_select), associations).all do |assoc_record|
+      model.eager_loading_dataset(opts, opts.associated_class.inner_join(join_table, [[right, opts.primary_key], [left, h.keys]]), Array(opts.select) + Array(left_key_select), associations).all do |assoc_record|
         next unless objects = h[assoc_record.values.delete(left_key_alias)]
         objects.each{|object| object.associations[name].push(assoc_record)}
       end
@@ -325,7 +329,7 @@ module Sequel::Model::Associations
     opts[:class_name] ||= name.to_s.camelize
     opts[:dataset] ||= proc do
       klass = opts.associated_class
-      klass.filter(opts.associated_primary_key.qualify(klass.table_name)=>send(key))
+      klass.filter(opts.primary_key.qualify(klass.table_name)=>send(key))
     end
     opts[:eager_loader] ||= proc do |key_hash, records, associations|
       h = key_hash[key]
@@ -335,7 +339,8 @@ module Sequel::Model::Associations
       records.each{|object| object.associations[name] = nil}
       # Skip eager loading if no objects have a foreign key for this association
       unless keys.empty?
-        model.eager_loading_dataset(opts, opts.associated_class.filter(opts.associated_primary_key.qualify(opts.associated_class.table_name)=>keys), opts.select, associations).all do |assoc_record|
+        klass = opts.associated_class
+        model.eager_loading_dataset(opts, klass.filter(opts.primary_key.qualify(klass.table_name)=>keys), opts.select, associations).all do |assoc_record|
           next unless objects = h[assoc_record.pk]
           objects.each{|object| object.associations[name] = assoc_record}
         end
@@ -346,7 +351,7 @@ module Sequel::Model::Associations
     
     return if opts[:read_only]
 
-    class_def(opts._setter_method){|o| send(:"#{key}=", (o.pk if o))}
+    class_def(opts._setter_method){|o| send(:"#{key}=", (o.send(opts.primary_key) if o))}
     private opts._setter_method
 
     class_def(opts.setter_method) do |o|  
@@ -370,16 +375,18 @@ module Sequel::Model::Associations
     name = opts[:name]
     model = self
     key = (opts[:key] ||= opts.default_left_key)
+    primary_key = (opts[:primary_key] ||= self.primary_key)
     opts[:class_name] ||= name.to_s.singularize.camelize
     opts[:dataset] ||= proc do
       klass = opts.associated_class
-      klass.filter(key.qualify(klass.table_name) => pk)
+      klass.filter(key.qualify(klass.table_name) => send(primary_key))
     end
     opts[:eager_loader] ||= proc do |key_hash, records, associations|
-      h = key_hash[model.primary_key]
+      h = key_hash[primary_key]
       records.each{|object| object.associations[name] = []}
       reciprocal = opts.reciprocal
-      model.eager_loading_dataset(opts, opts.associated_class.filter(key.qualify(opts.associated_class.table_name)=>h.keys), opts.select, associations).all do |assoc_record|
+      klass = opts.associated_class
+      model.eager_loading_dataset(opts, klass.filter(key.qualify(klass.table_name)=>h.keys), opts.select, associations).all do |assoc_record|
         next unless objects = h[assoc_record[key]]
         objects.each do |object| 
           object.associations[name].push(assoc_record)
@@ -392,7 +399,7 @@ module Sequel::Model::Associations
     
     unless opts[:read_only]
       class_def(opts._add_method) do |o|
-        o.send(:"#{key}=", pk)
+        o.send(:"#{key}=", send(primary_key))
         o.save || raise(Sequel::Error, "invalid associated object, cannot save")
       end
       private opts._add_method
@@ -404,7 +411,7 @@ module Sequel::Model::Associations
           o.save || raise(Sequel::Error, "invalid associated object, cannot save")
         end
         class_def(opts._remove_all_method) do
-          opts.associated_class.filter(key=>pk).update(key=>nil)
+          opts.associated_class.filter(key=>send(primary_key)).update(key=>nil)
         end
         private opts._remove_method, opts._remove_all_method
         def_remove_methods(opts)
@@ -425,7 +432,7 @@ module Sequel::Model::Associations
           klass = opts.associated_class
           model.db.transaction do
             send(opts.add_method, o)
-            klass.filter(Sequel::SQL::BooleanExpression.new(:AND, {key=>pk}, ~{klass.primary_key=>o.pk}.sql_expr)).update(key=>nil)
+            klass.filter(Sequel::SQL::BooleanExpression.new(:AND, {key=>send(primary_key)}, ~{klass.primary_key=>o.pk}.sql_expr)).update(key=>nil)
           end
         end
       end

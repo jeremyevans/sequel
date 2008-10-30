@@ -48,11 +48,6 @@ module Sequel
           self[:class] ||= self[:class_name].constantize
         end
   
-        # The associated class's primary key (used for caching)
-        def associated_primary_key
-         self[:associated_primary_key] ||= associated_class.primary_key
-        end
-  
         # Name symbol for dataset association method
         def dataset_method
           :"#{self[:name]}_dataset"
@@ -91,11 +86,21 @@ module Sequel
           self[:type] != :many_to_one or self[:key].nil?
         end
 
+        # The key to use for the key hash when eager loading
+        def eager_loader_key
+          self[:type] == :many_to_one ? self[:key] : self.primary_key
+        end
+
         # Whether the associated object needs a primary key to be added/removed
         def need_associated_primary_key?
           self[:type] == :many_to_many
         end
 
+        # The primary key used in the association
+        def primary_key
+         self[:primary_key] ||= associated_class.primary_key
+        end
+  
         # Returns/sets the reciprocal association variable, if one exists
         def reciprocal
           return self[:reciprocal] if include?(:reciprocal)

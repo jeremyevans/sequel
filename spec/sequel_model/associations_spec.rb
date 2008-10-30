@@ -105,6 +105,12 @@ describe Sequel::Model, "many_to_one" do
     MODEL_DB.sqls.should == ["SELECT * FROM nodes WHERE (nodes.id = 567) LIMIT 1"]
   end
 
+  it "should use :primary_key option if given" do
+    @c2.many_to_one :parent, :class => @c2, :key => :blah, :primary_key => :pk
+    @c2.new(:id => 1, :blah => 567).parent
+    MODEL_DB.sqls.should == ["SELECT * FROM nodes WHERE (nodes.pk = 567) LIMIT 1"]
+  end
+
   it "should use :select option if given" do
     @c2.many_to_one :parent, :class => @c2, :key => :blah, :select=>[:id, :name]
     @c2.new(:id => 1, :blah => 567).parent
@@ -540,6 +546,12 @@ describe Sequel::Model, "one_to_many" do
     proc{a.remove_all_attributes}.should raise_error(Sequel::Error)
   end
   
+  it "should use :primary_key option if given" do
+    @c1.one_to_many :nodes, :class => @c2, :primary_key => :node_id, :key=>:id
+    n = @c1.load(:id => 1234, :node_id=>4321)
+    n.nodes_dataset.sql.should == "SELECT * FROM nodes WHERE (nodes.id = 4321)"
+  end
+
   it "should support a select option" do
     @c2.one_to_many :attributes, :class => @c1, :select => [:id, :name]
 

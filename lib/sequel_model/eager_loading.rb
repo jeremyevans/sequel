@@ -136,9 +136,9 @@ module Sequel::Model::Associations::EagerLoading
     graph_block = r[:graph_block]
     ds = case assoc_type = r[:type]
     when :many_to_one
-      ds.graph(klass, use_only_conditions ? only_conditions : [[klass.primary_key, r[:key].qualify(ta)]] + conditions, :select=>select, :table_alias=>assoc_table_alias, :join_type=>join_type, &graph_block)
+      ds.graph(klass, use_only_conditions ? only_conditions : [[r.primary_key, r[:key].qualify(ta)]] + conditions, :select=>select, :table_alias=>assoc_table_alias, :join_type=>join_type, &graph_block)
     when :one_to_many
-      ds = ds.graph(klass, use_only_conditions ? only_conditions : [[r[:key], model.primary_key.qualify(ta)]] + conditions, :select=>select, :table_alias=>assoc_table_alias, :join_type=>join_type, &graph_block)
+      ds = ds.graph(klass, use_only_conditions ? only_conditions : [[r[:key], r.primary_key.qualify(ta)]] + conditions, :select=>select, :table_alias=>assoc_table_alias, :join_type=>join_type, &graph_block)
       # We only load reciprocals for one_to_many associations, as other reciprocals don't make sense
       ds.opts[:eager_graph][:reciprocals][assoc_table_alias] = r.reciprocal
       ds
@@ -368,7 +368,7 @@ module Sequel::Model::Associations::EagerLoading
 
     # Populate keys to monitor
     reflections.each do |reflection|
-      key = reflection[:type] == :many_to_one ? reflection[:key] : model.primary_key
+      key = reflection.eager_loader_key
       next if key_hash[key]
       key_hash[key] = {}
       keys << key
