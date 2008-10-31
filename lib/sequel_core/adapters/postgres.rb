@@ -174,7 +174,11 @@ module Sequel
           opts[:password]
         )
         if encoding = opts[:encoding] || opts[:charset]
-          conn.set_client_encoding(encoding)
+          if conn.respond_to?(:set_client_encoding)
+            conn.set_client_encoding(encoding)
+          else
+            conn.async_exec("set client_encoding to '#{encoding}'")
+          end
         end
         conn.db = self
         conn
