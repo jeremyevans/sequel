@@ -1058,6 +1058,7 @@ describe Sequel::Model, "many_to_many" do
 
     @c1 = Class.new(Sequel::Model(:attributes)) do
       unrestrict_primary_key
+      attr_accessor :yyy
       def self.name; 'Attribute'; end
       def self.to_s; 'Attribute'; end
       columns :id
@@ -1143,6 +1144,11 @@ describe Sequel::Model, "many_to_many" do
     a = n.attributes_dataset
     a.should be_a_kind_of(Sequel::Dataset)
     a.sql.should == 'SELECT attributes.* FROM attributes INNER JOIN attributes_nodes ON ((attributes_nodes.attribute_id = attributes.id) AND (attributes_nodes.node_id = 1234)) ORDER BY blah1, blah2'
+  end
+  
+  it "should support :left_primary_key and :right_primary_key options" do
+    @c2.many_to_many :attributes, :class => @c1, :left_primary_key=>:xxx, :right_primary_key=>:yyy
+    @c2.new(:id => 1234, :xxx=>5).attributes_dataset.sql.should == 'SELECT attributes.* FROM attributes INNER JOIN attributes_nodes ON ((attributes_nodes.attribute_id = attributes.yyy) AND (attributes_nodes.node_id = 5))'
   end
   
   it "should support a select option" do
@@ -1244,6 +1250,26 @@ describe Sequel::Model, "many_to_many" do
     a = @c1.new(:id => 2345)
     a.should == n.remove_attribute(a)
     MODEL_DB.sqls.first.should == 'DELETE FROM attributes_nodes WHERE ((node_id = 1234) AND (attribute_id = 2345))'
+  end
+
+  it "should have the add_ method respect the :left_primary_key and :right_primary_key options" do
+    @c2.many_to_many :attributes, :class => @c1, :left_primary_key=>:xxx, :right_primary_key=>:yyy
+    
+    n = @c2.new(:id => 1234, :xxx=>5)
+    a = @c1.new(:id => 2345, :yyy=>8)
+    a.should == n.add_attribute(a)
+    ['INSERT INTO attributes_nodes (node_id, attribute_id) VALUES (5, 8)',
+     'INSERT INTO attributes_nodes (attribute_id, node_id) VALUES (8, 5)'
+    ].should(include(MODEL_DB.sqls.first))
+  end
+
+  it "should have the remove_ method respect the :left_primary_key and :right_primary_key options" do
+    @c2.many_to_many :attributes, :class => @c1, :left_primary_key=>:xxx, :right_primary_key=>:yyy
+    
+    n = @c2.new(:id => 1234, :xxx=>5)
+    a = @c1.new(:id => 2345, :yyy=>8)
+    a.should == n.remove_attribute(a)
+    MODEL_DB.sqls.first.should == 'DELETE FROM attributes_nodes WHERE ((node_id = 5) AND (attribute_id = 8))'
   end
 
   it "should raise an error if the model object doesn't have a valid primary key" do
@@ -1377,6 +1403,12 @@ describe Sequel::Model, "many_to_many" do
     @c2.many_to_many :attributes, :class => @c1
     @c2.new(:id => 1234).remove_all_attributes
     MODEL_DB.sqls.first.should == 'DELETE FROM attributes_nodes WHERE (node_id = 1234)'
+  end
+
+  it "should have the remove_all_ method respect the :left_primary_key option" do
+    @c2.many_to_many :attributes, :class => @c1, :left_primary_key=>:xxx
+    @c2.new(:id => 1234, :xxx=>5).remove_all_attributes
+    MODEL_DB.sqls.first.should == 'DELETE FROM attributes_nodes WHERE (node_id = 5)'
   end
 
   it "remove_all should set the cached instance variable to []" do

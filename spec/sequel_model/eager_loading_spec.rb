@@ -38,7 +38,7 @@ describe Sequel::Model, "#eager" do
     end
     
     class ::EagerGenre < Sequel::Model(:genres)
-      columns :id
+      columns :id, :xxx
       many_to_many :albums, :class=>'EagerAlbum', :left_key=>:genre_id, :right_key=>:album_id, :join_table=>:ag
     end
     
@@ -442,6 +442,21 @@ describe Sequel::Model, "#eager" do
     MODEL_DB.sqls.should == ['SELECT * FROM albums', "SELECT * FROM tracks WHERE (tracks.album_id IN (2))"]
     as.length.should == 1
     as.first.special_tracks.should == [EagerTrack.load(:album_id=>2, :id=>1)]
+  end
+
+  it "should respect many_to_many association's :left_primary_key and :right_primary_key options" do
+    EagerAlbum.many_to_many :special_genres, :class=>:EagerGenre, :left_primary_key=>:band_id, :left_key=>:album_id, :right_primary_key=>:xxx, :right_key=>:genre_id, :join_table=>:ag
+    EagerGenre.dataset.extend(Module.new {
+      def fetch_rows(sql)
+        MODEL_DB.sqls << sql
+        yield({:x_foreign_key_x=>2, :id=>5})
+        yield({:x_foreign_key_x=>2, :id=>6})
+      end
+    })
+    as = EagerAlbum.eager(:special_genres).all
+    MODEL_DB.sqls.should == ['SELECT * FROM albums', "SELECT genres.*, ag.album_id AS x_foreign_key_x FROM genres INNER JOIN ag ON ((ag.genre_id = genres.xxx) AND (ag.album_id IN (2)))"]
+    as.length.should == 1
+    as.first.special_genres.should == [EagerGenre.load(:id=>5), EagerGenre.load(:id=>6)]
   end
 
   it "should use the :eager_loader association option when eager loading" do
@@ -959,6 +974,19 @@ describe Sequel::Model, "#eager_graph" do
     as = ds.all
     as.should == [GraphAlbum.load(:id=>3, :band_id=>2)]
     as.first.right_tracks.should == [GraphTrack.load(:id=>5, :album_id=>2), GraphTrack.load(:id=>6, :album_id=>2)]
+  end
+
+  it "should respect many_to_many association's :left_primary_key and :right_primary_key options" do 
+    GraphAlbum.many_to_many :inner_genres, :class=>'GraphGenre', :left_key=>:album_id, :left_primary_key=>:band_id, :right_key=>:genre_id, :right_primary_key=>:xxx, :join_table=>:ag
+    ds = GraphAlbum.eager_graph(:inner_genres)
+    ds.sql.should == 'SELECT albums.id, albums.band_id, inner_genres.id AS inner_genres_id FROM albums LEFT OUTER JOIN ag ON (ag.album_id = albums.band_id) LEFT OUTER JOIN genres AS inner_genres ON (inner_genres.xxx = ag.genre_id)'
+    def ds.fetch_rows(sql, &block)
+      yield({:id=>3, :band_id=>2, :inner_genres_id=>5, :xxx=>12})
+      yield({:id=>3, :band_id=>2, :inner_genres_id=>6, :xxx=>22})
+    end
+    as = ds.all
+    as.should == [GraphAlbum.load(:id=>3, :band_id=>2)]
+    as.first.inner_genres.should == [GraphGenre.load(:id=>5), GraphGenre.load(:id=>6)]
   end
 
   it "should respect the association's :graph_select option" do 

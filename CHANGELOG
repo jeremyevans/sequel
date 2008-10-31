@@ -1,5 +1,7 @@
 === HEAD
 
+* Add :left_primary_key and :right_primary_key options to many_to_many associations (jeremyevans)
+
 * Add :primary_key option to one_to_many and many_to_one associations (jeremyevans)
 
 * Make after_load association callbacks take effect when eager loading via eager (jeremyevans)

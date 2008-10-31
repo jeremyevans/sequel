@@ -88,7 +88,14 @@ module Sequel
 
         # The key to use for the key hash when eager loading
         def eager_loader_key
-          self[:type] == :many_to_one ? self[:key] : primary_key
+          case self[:type]
+          when :many_to_one
+            self[:key]
+          when :one_to_many
+            primary_key
+          when :many_to_many
+            self[:left_primary_key]
+          end
         end
 
         # Whether the associated object needs a primary key to be added/removed
@@ -98,7 +105,14 @@ module Sequel
 
         # The primary key used in the association
         def primary_key
-         self[:primary_key] ||= associated_class.primary_key
+         self[:primary_key] ||= case self[:type]
+         when :many_to_one
+           associated_class.primary_key
+         when :one_to_many
+           self[:model].primary_key
+         else
+           raise Sequel::Error, 'association does not have a single primary key'
+         end
         end
   
         # Returns/sets the reciprocal association variable, if one exists
@@ -136,6 +150,11 @@ module Sequel
           :"remove_#{self[:name].to_s.singularize}"
         end
       
+        # The primary key column to use in the associated table
+        def right_primary_key
+          self[:right_primary_key] ||= associated_class.primary_key
+        end
+
         # The columns to select when loading the association
         def select
          return self[:select] if include?(:select)

@@ -169,14 +169,6 @@ module Sequel::Model::Associations
   #   - :primary_key - column in the current table that :key option references, as a symbol.
   #     Defaults to primary key of the current table.
   # * :many_to_many:
-  #   - :join_table - name of table that includes the foreign keys to both
-  #     the current model and the associated model, as a symbol.  Defaults to the name
-  #     of current model and name of associated model, pluralized,
-  #     underscored, sorted, and joined with '_'.
-  #   - :left_key - foreign key in join table that points to current model's
-  #     primary key, as a symbol. Defaults to :"#{self.name.underscore}_id".
-  #   - :right_key - foreign key in join table that points to associated
-  #     model's primary key, as a symbol.  Defaults to Defaults to :"#{name.to_s.singularize}_id".
   #   - :graph_join_table_block - The block to pass to join_table for
   #     the join table when eagerly loading the association via eager_graph.
   #   - :graph_join_table_conditions - The additional conditions to use on the SQL join for
@@ -189,6 +181,18 @@ module Sequel::Model::Associations
   #     table when eagerly loading the association via eager_graph, instead of the default
   #     conditions specified by the foreign/primary keys.  This option causes the 
   #     :graph_join_table_conditions option to be ignored.
+  #   - :join_table - name of table that includes the foreign keys to both
+  #     the current model and the associated model, as a symbol.  Defaults to the name
+  #     of current model and name of associated model, pluralized,
+  #     underscored, sorted, and joined with '_'.
+  #   - :left_key - foreign key in join table that points to current model's
+  #     primary key, as a symbol. Defaults to :"#{self.name.underscore}_id".
+  #   - :left_primary_key - column in current table that :left_key points to, as a symbol.
+  #     Defaults to primary key of current table.
+  #   - :right_key - foreign key in join table that points to associated
+  #     model's primary key, as a symbol.  Defaults to Defaults to :"#{name.to_s.singularize}_id".
+  #   - :right_primary_key - column in associated table that :right_key points to, as a symbol.
+  #     Defaults to primary key of the associated table.
   #   - :uniq - Adds a after_load callback that makes the array of objects unique.
   def associate(type, name, opts = {}, &block)
     raise(Error, 'invalid association type') unless AssociationReflection::ASSOCIATION_TYPES.include?(type)
@@ -282,6 +286,7 @@ module Sequel::Model::Associations
     model = self
     left = (opts[:left_key] ||= opts.default_left_key)
     right = (opts[:right_key] ||= opts.default_right_key)
+    left_pk = (opts[:left_primary_key] ||= self.primary_key)
     opts[:class_name] ||= name.to_s.singularize.camelize
     join_table = (opts[:join_table] ||= opts.default_join_table)
     left_key_alias = opts[:left_key_alias] ||= :x_foreign_key_x
@@ -289,13 +294,13 @@ module Sequel::Model::Associations
     opts[:graph_join_table_conditions] = opts[:graph_join_table_conditions] ? opts[:graph_join_table_conditions].to_a : []
     opts[:graph_join_table_join_type] ||= opts[:graph_join_type]
     opts[:after_load].unshift(:array_uniq!) if opts[:uniq]
-    opts[:dataset] ||= proc{opts.associated_class.inner_join(join_table, [[right, opts.primary_key], [left, pk]])}
+    opts[:dataset] ||= proc{opts.associated_class.inner_join(join_table, [[right, opts.right_primary_key], [left, send(left_pk)]])}
     database = db
     
     opts[:eager_loader] ||= proc do |key_hash, records, associations|
-      h = key_hash[model.primary_key]
+      h = key_hash[left_pk]
       records.each{|object| object.associations[name] = []}
-      model.eager_loading_dataset(opts, opts.associated_class.inner_join(join_table, [[right, opts.primary_key], [left, h.keys]]), Array(opts.select) + Array(left_key_select), associations).all do |assoc_record|
+      model.eager_loading_dataset(opts, opts.associated_class.inner_join(join_table, [[right, opts.right_primary_key], [left, h.keys]]), Array(opts.select) + Array(left_key_select), associations).all do |assoc_record|
         next unless objects = h[assoc_record.values.delete(left_key_alias)]
         objects.each{|object| object.associations[name].push(assoc_record)}
       end
@@ -306,13 +311,13 @@ module Sequel::Model::Associations
     return if opts[:read_only]
 
     class_def(opts._add_method) do |o|
-      database.dataset.from(join_table).insert(left=>pk, right=>o.pk)
+      database.dataset.from(join_table).insert(left=>send(left_pk), right=>o.send(opts.right_primary_key))
     end
     class_def(opts._remove_method) do |o|
-      database.dataset.from(join_table).filter([[left, pk], [right, o.pk]]).delete
+      database.dataset.from(join_table).filter([[left, send(left_pk)], [right, o.send(opts.right_primary_key)]]).delete
     end
     class_def(opts._remove_all_method) do
-      database.dataset.from(join_table).filter(left=>pk).delete
+      database.dataset.from(join_table).filter(left=>send(left_pk)).delete
     end
     private opts._add_method, opts._remove_method, opts._remove_all_method
 

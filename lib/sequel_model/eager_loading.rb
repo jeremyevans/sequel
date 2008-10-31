@@ -144,8 +144,8 @@ module Sequel::Model::Associations::EagerLoading
       ds
     when :many_to_many
       use_jt_only_conditions = r.include?(:graph_join_table_only_conditions)
-      ds = ds.graph(r[:join_table], use_jt_only_conditions ? r[:graph_join_table_only_conditions] : [[r[:left_key], model.primary_key.qualify(ta)]] + r[:graph_join_table_conditions], :select=>false, :table_alias=>ds.eager_unique_table_alias(ds, r[:join_table]), :join_type=>r[:graph_join_table_join_type], &r[:graph_join_table_block])
-      ds.graph(klass, use_only_conditions ? only_conditions : [[klass.primary_key, r[:right_key]]] + conditions, :select=>select, :table_alias=>assoc_table_alias, :join_type=>join_type, &graph_block)
+      ds = ds.graph(r[:join_table], use_jt_only_conditions ? r[:graph_join_table_only_conditions] : [[r[:left_key], r[:left_primary_key].qualify(ta)]] + r[:graph_join_table_conditions], :select=>false, :table_alias=>ds.eager_unique_table_alias(ds, r[:join_table]), :join_type=>r[:graph_join_table_join_type], &r[:graph_join_table_block])
+      ds.graph(klass, use_only_conditions ? only_conditions : [[r.right_primary_key, r[:right_key]]] + conditions, :select=>select, :table_alias=>assoc_table_alias, :join_type=>join_type, &graph_block)
     end
 
     ds = ds.order_more(*Array(r[:order]).map{|c| eager_graph_qualify_order(assoc_table_alias, c)}) if r[:order] and r[:order_eager_graph]
