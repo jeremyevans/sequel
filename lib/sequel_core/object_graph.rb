@@ -33,9 +33,7 @@ module Sequel
     #   or an object that responds to .dataset and yields a symbol or a dataset
     # * join_conditions - Any condition(s) allowed by join_table.
     # * options -  A hash of graph options.  The following options are currently used:
-    #   * :table_alias - The alias to use for the table.  If not specified, doesn't
-    #     alias the table.  You will get an error if the the alias (or table) name is
-    #     used more than once.
+    #   * :implicit_qualifier - The qualifier of implicit conditions, see #join_table.
     #   * :join_type - The type of join to use (passed to join_table).  Defaults to
     #     :left_outer.
     #   * :select - An array of columns to select.  When not used, selects
@@ -43,6 +41,9 @@ module Sequel
     #     columns and is like simply joining the tables, though graph keeps
     #     some metadata about join that makes it important to use graph instead
     #     of join.
+    #   * :table_alias - The alias to use for the table.  If not specified, doesn't
+    #     alias the table.  You will get an error if the the alias (or table) name is
+    #     used more than once.
     # * block - A block that is passed to join_table.
     def graph(dataset, join_conditions = nil, options = {}, &block)
       # Allow the use of a model, dataset, or symbol as the first argument
@@ -69,7 +70,7 @@ module Sequel
       raise_alias_error.call if @opts[:graph] && @opts[:graph][:table_aliases] && @opts[:graph][:table_aliases].include?(table_alias)
 
       # Join the table early in order to avoid cloning the dataset twice
-      ds = join_table(options[:join_type] || :left_outer, table, join_conditions, table_alias, &block)
+      ds = join_table(options[:join_type] || :left_outer, table, join_conditions, :table_alias=>table_alias, :implicit_qualifier=>options[:implicit_qualifier], &block)
       opts = ds.opts
 
       # Whether to include the table in the result set

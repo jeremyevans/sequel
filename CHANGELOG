@@ -1,5 +1,9 @@
 === HEAD
 
+* Fix a corner case where the wrong table name is used in eager_graph (jeremyevans)
+
+* Make Dataset#join_table take an option hash instead of a table_alias argument, add support for :implicit_qualifier option (jeremyevans)
+
 * Add :left_primary_key and :right_primary_key options to many_to_many associations (jeremyevans)
 
 * Add :primary_key option to one_to_many and many_to_one associations (jeremyevans)

@@ -156,7 +156,7 @@ module Sequel
 
       # Transforms an CROSS JOIN to an INNER JOIN if the expr is not nil.
       # Raises an error on use of :full_outer type, since MySQL doesn't support it.
-      def join_table(type, table, expr=nil, table_alias=nil)
+      def join_table(type, table, expr=nil, table_alias={})
         type = :inner if (type == :cross) && !expr.nil?
         raise(Sequel::Error, "MySQL doesn't support FULL OUTER JOIN") if type == :full_outer
         super(type, table, expr, table_alias)

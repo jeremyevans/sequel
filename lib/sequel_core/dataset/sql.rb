@@ -368,7 +368,8 @@ module Sequel
     #   * String, Symbol: table
     # * expr - specifies conditions, depends on type:
     #   * Hash, Array with all two pairs - Assumes key (1st arg) is column of joined table (unless already
-    #     qualified), and value (2nd arg) is column of the last joined or primary table.
+    #     qualified), and value (2nd arg) is column of the last joined or primary table (or the
+    #     :implicit_qualifier option).
     #     To specify multiple conditions on a single joined table column, you must use an array.
     #     Uses a JOIN with an ON clause.
     #   * Array - If all members of the array are symbols, considers them as columns and 
@@ -379,13 +380,23 @@ module Sequel
     #   * Everything else - pretty much the same as a using the argument in a call to filter,
     #     so strings are considered literal, symbols specify boolean columns, and blockless
     #     filter expressions can be used. Uses a JOIN with an ON clause.
-    # * table_alias - the name of the table's alias when joining, necessary for joining
-    #   to the same table more than once.  No alias is used by default.
+    # * options - a hash of options, with any of the following keys:
+    #   * :table_alias - the name of the table's alias when joining, necessary for joining
+    #     to the same table more than once.  No alias is used by default.
+    #   * :implicit_qualifer - The name to use for qualifying implicit conditions.  By default,
+    #     the last joined or primary table is used.
     # * block - The block argument should only be given if a JOIN with an ON clause is used,
     #   in which case it yields the table alias/name for the table currently being joined,
     #   the table alias/name for the last joined (or first table), and an array of previous
     #   SQL::JoinClause.
-    def join_table(type, table, expr=nil, table_alias=nil, &block)
+    def join_table(type, table, expr=nil, options={}, &block)
+      if options.is_one_of?(Symbol, String)
+        table_alias = options
+        last_alias = nil 
+      else
+        table_alias = options[:table_alias]
+        last_alias = options[:implicit_qualifier]
+      end
       if Dataset === table
         if table_alias.nil?
           table_alias_num = (@opts[:num_dataset_sources] || 0) + 1
@@ -403,7 +414,7 @@ module Sequel
         raise(Sequel::Error, "can't use a block if providing an array of symbols as expr") if block_given?
         SQL::JoinUsingClause.new(expr, type, table, table_alias)
       else
-        last_alias = @opts[:last_joined_table] || (first_source.is_a?(Dataset) ? 't1' : first_source)
+        last_alias ||= @opts[:last_joined_table] || (first_source.is_a?(Dataset) ? 't1' : first_source)
         if Hash === expr or (Array === expr and expr.all_two_pairs?)
           expr = expr.collect do |k, v|
             k = qualified_column_name(k, table_name) if k.is_a?(Symbol)

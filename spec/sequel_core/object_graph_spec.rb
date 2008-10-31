@@ -55,6 +55,11 @@ describe Sequel::Dataset, " graphing" do
     ds.sql.should == 'SELECT points.id, points.x, points.y, planes.id AS planes_id, planes.x AS planes_x, planes.y AS planes_y, planes.graph_id FROM points LEFT OUTER JOIN lines AS planes ON (planes.x = points.id)'
   end
 
+  it "#graph should accept a :implicit_qualifier option" do
+    ds = @ds1.graph(:lines, {:x=>:id}, :implicit_qualifier=>:planes)
+    ds.sql.should == 'SELECT points.id, points.x, points.y, lines.id AS lines_id, lines.x AS lines_x, lines.y AS lines_y, lines.graph_id FROM points LEFT OUTER JOIN lines ON (lines.x = planes.id)'
+  end
+
   it "#graph should accept a :join_type option" do
     ds = @ds1.graph(:lines, {:x=>:id}, :join_type=>:inner)
     ds.sql.should == 'SELECT points.id, points.x, points.y, lines.id AS lines_id, lines.x AS lines_x, lines.y AS lines_y, lines.graph_id FROM points INNER JOIN lines ON (lines.x = points.id)'

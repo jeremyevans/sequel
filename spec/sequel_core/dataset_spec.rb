@@ -1292,14 +1292,26 @@ context "Dataset#join_table" do
       'SELECT * FROM "items" INNER JOIN "categories" ON ("categories"."category_id" = "items"."id")'
   end
   
-  specify "should support aliased tables" do
+  specify "should support aliased tables using the deprecated argument" do
     @d.from('stats').join('players', {:id => :player_id}, 'p').sql.should ==
       'SELECT * FROM "stats" INNER JOIN "players" AS "p" ON ("p"."id" = "stats"."player_id")'
+  end
 
+  specify "should support aliased tables using the :table_alias option" do
+    @d.from('stats').join('players', {:id => :player_id}, :table_alias=>:p).sql.should ==
+      'SELECT * FROM "stats" INNER JOIN "players" AS "p" ON ("p"."id" = "stats"."player_id")'
+  end
+  
+  specify "should support using an alias for the FROM when doing the first join with unqualified condition columns" do
     ds = MockDataset.new(nil).from(:foo => :f)
     ds.quote_identifiers = true
     ds.join_table(:inner, :bar, :id => :bar_id).sql.should ==
       'SELECT * FROM "foo" AS "f" INNER JOIN "bar" ON ("bar"."id" = "f"."bar_id")'
+  end
+  
+  specify "should support the :implicit_qualifier option" do
+    @d.from('stats').join('players', {:id => :player_id}, :implicit_qualifier=>:p).sql.should ==
+      'SELECT * FROM "stats" INNER JOIN "players" ON ("players"."id" = "p"."player_id")'
   end
   
   specify "should allow for arbitrary conditions in the JOIN clause" do
