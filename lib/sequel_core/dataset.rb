@@ -48,7 +48,8 @@ module Sequel
 
     # All methods that should have a ! method added that modifies
     # the receiver.
-    MUTATION_METHODS = %w'and distinct exclude exists filter from from_self full_outer_join graph
+    MUTATION_METHODS = %w'add_graph_aliases and distinct exclude exists
+    filter from from_self full_outer_join graph
     group group_and_count group_by having inner_join intersect invert join
     left_outer_join limit naked or order order_by order_more paginate query reject
     reverse reverse_order right_outer_join select select_all select_more

@@ -109,13 +109,19 @@ describe Sequel::Dataset, " graphing" do
     proc{@ds1.graph(@ds2, :x=>:id).graph(@ds2, {:x=>:id}, :table_alias=>:blah)}.should_not raise_error
   end
 
-  it "#set_graph_aliases should not modify the current dataset's opts" do
+  it "#set_graph_aliases and #add_graph_aliases should not modify the current dataset's opts" do
     o1 = @ds1.opts
     o2 = o1.dup
     ds1 = @ds1.set_graph_aliases(:x=>[:graphs,:id])
     @ds1.opts.should == o1
     @ds1.opts.should == o2
     ds1.opts.should_not == o1
+    o3 = ds1.opts
+    o4 = o3.dup
+    ds2 = ds1.add_graph_aliases(:y=>[:blah,:id])
+    ds1.opts.should == o3
+    ds1.opts.should == o3
+    ds2.opts.should_not == o2
   end
 
   it "#set_graph_aliases should specify the graph mapping" do
@@ -124,6 +130,17 @@ describe Sequel::Dataset, " graphing" do
     ds = ds.set_graph_aliases(:x=>[:points, :x], :y=>[:lines, :y])
     ['SELECT points.x, lines.y FROM points LEFT OUTER JOIN lines ON (lines.x = points.id)',
     'SELECT lines.y, points.x FROM points LEFT OUTER JOIN lines ON (lines.x = points.id)'
+    ].should(include(ds.sql))
+  end
+
+  it "#add_graph_aliases should add columns to the graph mapping" do
+    @ds1.graph(:lines, :x=>:id).set_graph_aliases(:x=>[:points, :q]).add_graph_aliases(:y=>[:lines, :r]).sql.should == 'SELECT points.q AS x, lines.r AS y FROM points LEFT OUTER JOIN lines ON (lines.x = points.id)'
+  end
+
+  it "#set_graph_aliases should allow a third entry to specify an expression to use other than the default" do
+    ds = @ds1.graph(:lines, :x=>:id).set_graph_aliases(:x=>[:points, :x, 1], :y=>[:lines, :y, :random[]])
+    ['SELECT 1 AS x, random() AS y FROM points LEFT OUTER JOIN lines ON (lines.x = points.id)',
+    'SELECT random() AS y, 1 AS x FROM points LEFT OUTER JOIN lines ON (lines.x = points.id)'
     ].should(include(ds.sql))
   end
 
@@ -199,7 +216,7 @@ describe Sequel::Dataset, " graphing" do
     results.first.should == {:points=>{:id=>1, :x=>2, :y=>3}, :graphs=>{:id=>8, :name=>9, :x=>10, :y=>11, :lines_x=>12}}
   end
 
-  it "#graph_each should only include the columns selected with #set_graph_aliases, if called" do
+  it "#graph_each should only include the columns selected with #set_graph_aliases and #add_graph_aliases, if called" do
     ds = @ds1.graph(:lines, :x=>:id).set_graph_aliases(:x=>[:points, :x], :y=>[:lines, :y])
     def ds.fetch_rows(sql, &block)
       yield({:x=>2,:y=>3})
@@ -215,6 +232,22 @@ describe Sequel::Dataset, " graphing" do
     results = ds.all
     results.length.should == 1
     results.first.should == {:points=>{:x=>2}, :lines=>nil}
+
+    ds = ds.add_graph_aliases(:q=>[:points, :r, 18])
+    def ds.fetch_rows(sql, &block)
+      yield({:x=>2, :q=>18})
+    end
+    ds.all.should == [{:points=>{:x=>2, :r=>18}, :lines=>nil}]
+  end
+
+  it "#graph_each should correctly map values when #set_graph_aliases is used with a third argument for each entry" do
+    ds = @ds1.graph(:lines, :x=>:id).set_graph_aliases(:x=>[:points, :z1, 2], :y=>[:lines, :z2, :random[]])
+    def ds.fetch_rows(sql, &block)
+      yield({:x=>2,:y=>3})
+    end
+    results = ds.all
+    results.length.should == 1
+    results.first.should == {:points=>{:z1=>2}, :lines=>{:z2=>3}}
   end
 
   it "#graph_each should run the row_proc and transform for graphed datasets" do

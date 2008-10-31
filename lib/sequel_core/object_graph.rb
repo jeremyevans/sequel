@@ -156,17 +156,30 @@ module Sequel
     #   The first element of the array should be the table alias,
     #   and the second should be the actual column name.
     def set_graph_aliases(graph_aliases)
-      cols = graph_aliases.collect do |col_alias, tc| 
-        identifier = tc[1].qualify(tc[0])
-        identifier = identifier.as(col_alias) unless tc[1] == col_alias
-        identifier
-      end
-      ds = select(*cols)
+      ds = select(*graph_alias_columns(graph_aliases))
       ds.opts[:graph_aliases] = graph_aliases
       ds
     end
 
+    # Adds the give graph aliases to the list of graph aliases to use,
+    # unlike #set_graph_aliases, which replaces the list.  See
+    # #set_graph_aliases.
+    def add_graph_aliases(graph_aliases)
+      ds = select_more(*graph_alias_columns(graph_aliases))
+      ds.opts[:graph_aliases] = (ds.opts[:graph_aliases] || {}).merge(graph_aliases)
+      ds
+    end
+
     private
+
+    # Transform the hash of graph aliases to an array of columns
+    def graph_alias_columns(graph_aliases)
+      graph_aliases.collect do |col_alias, tc| 
+        identifier = tc[2] || tc[1].qualify(tc[0])
+        identifier = SQL::AliasedExpression.new(identifier, col_alias) if tc[2] or tc[1] != col_alias
+        identifier
+      end
+    end
 
     # Fetch the rows, split them into component table parts,
     # tranform and run the row_proc on each part (if applicable),

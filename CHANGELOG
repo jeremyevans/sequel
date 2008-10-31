@@ -1,5 +1,7 @@
 === HEAD
 
+* Add #add_graph_aliases (select_more for graphs), and allow use of arbitrary expressions when graphing (jeremyevans)
+
 * Fix a corner case where the wrong table name is used in eager_graph (jeremyevans)
 
 * Make Dataset#join_table take an option hash instead of a table_alias argument, add support for :implicit_qualifier option (jeremyevans)
