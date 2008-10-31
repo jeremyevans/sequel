@@ -341,7 +341,7 @@ module Sequel::Model::Associations
       unless keys.empty?
         klass = opts.associated_class
         model.eager_loading_dataset(opts, klass.filter(opts.primary_key.qualify(klass.table_name)=>keys), opts.select, associations).all do |assoc_record|
-          next unless objects = h[assoc_record.pk]
+          next unless objects = h[assoc_record.send(opts.primary_key)]
           objects.each{|object| object.associations[name] = assoc_record}
         end
       end

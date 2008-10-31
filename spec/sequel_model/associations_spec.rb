@@ -163,6 +163,21 @@ describe Sequel::Model, "many_to_one" do
     d.values.should == {:id => 1, :parent_id => 6677}
   end
   
+  it "should have the setter method respect the :primary_key option" do
+    @c2.many_to_one :parent, :class => @c2, :primary_key=>:blah
+
+    d = @c2.new(:id => 1)
+    d.parent = @c2.new(:id => 4321, :blah=>444)
+    d.values.should == {:id => 1, :parent_id => 444}
+
+    d.parent = nil
+    d.values.should == {:id => 1, :parent_id => nil}
+
+    e = @c2.new(:id => 6677, :blah=>8)
+    d.parent = e
+    d.values.should == {:id => 1, :parent_id => 8}
+  end
+  
   it "should not persist changes until saved" do
     @c2.many_to_one :parent, :class => @c2
 
@@ -526,6 +541,18 @@ describe Sequel::Model, "one_to_many" do
     MODEL_DB.sqls.should == ['UPDATE attributes SET node_id = NULL WHERE (id = 2345)']
   end
   
+  it "should have add_ method respect the :primary_key option" do
+    @c2.one_to_many :attributes, :class => @c1, :primary_key=>:xxx
+    
+    n = @c2.new(:id => 1234, :xxx=>5)
+    a = @c1.new(:id => 2345)
+    a.save!
+    MODEL_DB.reset
+    a.should == n.add_attribute(a)
+    MODEL_DB.sqls.should == ['UPDATE attributes SET node_id = 5 WHERE (id = 2345)']
+  end
+
+  
   it "should raise an error in add_ and remove_ if the passed object returns false to save (is not valid)" do
     @c2.one_to_many :attributes, :class => @c1
     n = @c2.new(:id => 1234)
@@ -789,6 +816,12 @@ describe Sequel::Model, "one_to_many" do
     MODEL_DB.sqls.first.should == 'UPDATE attributes SET node_id = NULL WHERE (node_id = 1234)'
   end
 
+  it "should have the remove_all_ method respect the :primary_key option" do
+    @c2.one_to_many :attributes, :class => @c1, :primary_key=>:xxx
+    @c2.new(:id => 1234, :xxx=>5).remove_all_attributes
+    MODEL_DB.sqls.first.should == 'UPDATE attributes SET node_id = NULL WHERE (node_id = 5)'
+  end
+
   it "remove_all should set the cached instance variable to []" do
     @c2.one_to_many :attributes, :class => @c1
     node = @c2.new(:id => 1234)
@@ -840,7 +873,7 @@ describe Sequel::Model, "one_to_many" do
     att.values.should == {}
   end
 
-  it "should not add a getter method if the :one_to_one option is true and :read_only option is true" do
+  it "should not add a setter method if the :one_to_one option is true and :read_only option is true" do
     @c2.one_to_many :attributes, :class => @c1, :one_to_one=>true, :read_only=>true
     im = @c2.instance_methods.collect{|x| x.to_s}
     im.should(include('attribute'))
@@ -871,6 +904,25 @@ describe Sequel::Model, "one_to_many" do
     MODEL_DB.sqls.length.should == 2
     MODEL_DB.sqls.first.should =~ /UPDATE attributes SET (node_id = 1234, id = 3|id = 3, node_id = 1234) WHERE \(id = 3\)/
     MODEL_DB.sqls.last.should == 'UPDATE attributes SET node_id = NULL WHERE ((node_id = 1234) AND (id != 3))'
+  end
+
+  it "should have the setter method for the :one_to_one option respect the :primary_key option" do
+    @c2.one_to_many :attributes, :class => @c1, :one_to_one=>true, :primary_key=>:xxx
+    attrib = @c1.new(:id=>3)
+    d = @c1.dataset
+    def d.fetch_rows(s); yield({:id=>3}) end
+    @c2.new(:id => 1234, :xxx=>5).attribute = attrib
+    ['INSERT INTO attributes (node_id, id) VALUES (5, 3)',
+      'INSERT INTO attributes (id, node_id) VALUES (3, 5)'].should(include(MODEL_DB.sqls.first))
+    MODEL_DB.sqls.last.should == 'UPDATE attributes SET node_id = NULL WHERE ((node_id = 5) AND (id != 3))'
+    MODEL_DB.sqls.length.should == 2
+    @c2.new(:id => 321, :xxx=>5).attribute.should == attrib
+    MODEL_DB.sqls.clear
+    attrib = @c1.load(:id=>3)
+    @c2.new(:id => 621, :xxx=>5).attribute = attrib
+    MODEL_DB.sqls.length.should == 2
+    MODEL_DB.sqls.first.should =~ /UPDATE attributes SET (node_id = 5, id = 3|id = 3, node_id = 5) WHERE \(id = 3\)/
+    MODEL_DB.sqls.last.should == 'UPDATE attributes SET node_id = NULL WHERE ((node_id = 5) AND (id != 3))'
   end
 
   it "should raise an error if the one_to_one getter would be the same as the association name" do

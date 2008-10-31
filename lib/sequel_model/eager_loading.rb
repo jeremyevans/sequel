@@ -361,29 +361,22 @@ module Sequel::Model::Associations::EagerLoading
     #  and values being an array of current model objects with that
     #  specific foreign/primary key
     key_hash = {}
-    # array of attribute_values keys to monitor
-    keys = []
     # Reflections for all associations to eager load
     reflections = eager_assoc.keys.collect{|assoc| model.association_reflection(assoc)}
 
     # Populate keys to monitor
-    reflections.each do |reflection|
-      key = reflection.eager_loader_key
-      next if key_hash[key]
-      key_hash[key] = {}
-      keys << key
-    end
+    reflections.each{|reflection| key_hash[reflection.eager_loader_key] ||= Hash.new{|h,k| h[k] = []}}
     
     # Associate each object with every key being monitored
-    a.each do |r|
-      keys.each do |key|
-        ((key_hash[key][r[key]] ||= []) << r) if r[key]
+    a.each do |rec|
+      key_hash.each do |key, id_map|
+        id_map[rec[key]] << rec if rec[key]
       end
     end
     
     reflections.each do |r|
       r[:eager_loader].call(key_hash, a, eager_assoc[r[:name]])
-      a.each{|object| object.send(:run_association_callbacks, r, :after_load, object.associations[r[:name]])}
+      a.each{|object| object.send(:run_association_callbacks, r, :after_load, object.associations[r[:name]])} unless r[:after_load].empty?
     end 
   end
 

@@ -88,7 +88,7 @@ module Sequel
 
         # The key to use for the key hash when eager loading
         def eager_loader_key
-          self[:type] == :many_to_one ? self[:key] : self.primary_key
+          self[:type] == :many_to_one ? self[:key] : primary_key
         end
 
         # Whether the associated object needs a primary key to be added/removed
