@@ -266,12 +266,6 @@ module Sequel::Model::Associations
     overridable_methods_module.send(:private, name)
   end
 
-  # Hash storing the association reflections.  Keys are association name
-  # symbols, values are association reflection hashes.
-  def association_reflections
-    @association_reflections ||= {}
-  end
-  
   # Add the add_ instance method 
   def def_add_method(opts)
     association_module_def(opts.add_method){|o| add_associated_object(opts, o)}

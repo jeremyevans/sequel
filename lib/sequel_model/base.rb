@@ -1,6 +1,7 @@
 module Sequel
   class Model
     @allowed_columns = nil
+    @association_reflections = {}
     @dataset_methods = {}
     @hooks = {}
     @primary_key = :id
@@ -17,6 +18,9 @@ module Sequel
     # Which columns should be the only columns allowed in a call to set
     # (default: all columns).
     metaattr_reader :allowed_columns
+
+    # All association reflections defined for this model (default: none).
+    metaattr_reader :association_reflections
 
     # Hash of dataset methods to add to this class and subclasses when
     # set_dataset is called.
@@ -72,7 +76,7 @@ module Sequel
       :@raise_on_save_failure=>nil, :@restricted_columns=>:dup, :@restrict_primary_key=>nil,
       :@sti_dataset=>nil, :@sti_key=>nil, :@strict_param_setting=>nil,
       :@typecast_empty_string_to_nil=>nil, :@typecast_on_assignment=>nil,
-      :@raise_on_typecast_failure=>nil}
+      :@raise_on_typecast_failure=>nil, :@association_reflections=>:dup}
 
     # Returns the first record from the database matching the conditions.
     # If a hash is given, it is used as the conditions.  If another

@@ -1664,4 +1664,15 @@ describe Sequel::Model, " association reflection methods" do
     @c1.associate :one_to_many, :children, :class => @c1
     @c1.associations.sort_by{|x|x.to_s}.should == [:children, :parent]
   end
+
+  it "association reflections should be copied upon subclasing" do
+    @c1.associate :many_to_one, :parent, :class => @c1
+    c = Class.new(@c1)
+    @c1.associations.should == [:parent]
+    c.associations.should == [:parent]
+    c.associate :many_to_one, :parent2, :class => @c1
+    @c1.associations.should == [:parent]
+    c.associations.sort_by{|x| x.to_s}.should == [:parent, :parent2]
+    c.instance_methods.map{|x| x.to_s}.should include('parent')
+  end
 end
