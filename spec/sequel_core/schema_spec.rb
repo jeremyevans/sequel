@@ -10,6 +10,19 @@ context "DB#create_table" do
     @db.sqls.should == ['CREATE TABLE cats ()']
   end
 
+  specify "should accept the table name in multiple formats" do
+    @db.create_table(:cats__cats) {}
+    @db.create_table("cats__cats1") {}
+    @db.create_table(:cats__cats2.identifier) {}
+    @db.create_table(:cats.qualify(:cats3)) {}
+    @db.sqls.should == ['CREATE TABLE cats.cats ()', 'CREATE TABLE cats__cats1 ()', 'CREATE TABLE cats__cats2 ()', 'CREATE TABLE cats3.cats ()']
+  end
+
+  specify "should raise an error if the table name argument is not valid" do
+    proc{@db.create_table(1) {}}.should raise_error(Sequel::Error)
+    proc{@db.create_table(:cats.as(:c)) {}}.should raise_error(Sequel::Error)
+  end
+
   specify "should accept multiple columns" do
     @db.create_table(:cats) do
       column :id, :integer
