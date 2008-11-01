@@ -1,5 +1,9 @@
 === HEAD
 
+* Allow easier creation of custom association types, though support for them may still be suboptimal (jeremyevans)
+
+* Add :eager_grapher option to associations, which the user can use to override the default eager_graph code (jeremyevans)
+
 * Associations are now inherited when a model class is subclassed (jeremyevans)
 
 * Instance methods added by associations are now added to an anonymous module the class includes, allowing you to override them and use super (jeremyevans)

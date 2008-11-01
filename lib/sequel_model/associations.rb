@@ -113,6 +113,10 @@ module Sequel::Model::Associations
   #     For many_to_one associations, this is ignored unless this association is
   #     being eagerly loaded, as it doesn't save queries unless multiple objects
   #     can be loaded at once.
+  #   - :eager_grapher - A proc to use to implement eager loading via eager graph, overriding the default.
+  #     Takes three arguments, a dataset, an alias to use for the table to graph for this association,
+  #     and the alias that was used for the current table (since you can cascade associations),
+  #     Should return a copy of the dataset with the association graphed into it.
   #   - :eager_loader - A proc to use to implement eager loading, overriding the default.  Takes three arguments,
   #     a key hash (used solely to enhance performance), an array of records,
   #     and a hash of dependent associations.  The associated records should
@@ -292,7 +296,7 @@ module Sequel::Model::Associations
     join_table = (opts[:join_table] ||= opts.default_join_table)
     left_key_alias = opts[:left_key_alias] ||= :x_foreign_key_x
     left_key_select = opts[:left_key_select] ||= left.qualify(join_table).as(opts[:left_key_alias])
-    opts[:graph_join_table_conditions] = opts[:graph_join_table_conditions] ? opts[:graph_join_table_conditions].to_a : []
+    graph_jt_conds = opts[:graph_join_table_conditions] = opts[:graph_join_table_conditions] ? opts[:graph_join_table_conditions].to_a : []
     opts[:graph_join_table_join_type] ||= opts[:graph_join_type]
     opts[:after_load].unshift(:array_uniq!) if opts[:uniq]
     opts[:dataset] ||= proc{opts.associated_class.inner_join(join_table, [[right, opts.right_primary_key], [left, send(left_pk)]])}
@@ -307,6 +311,21 @@ module Sequel::Model::Associations
       end
     end
     
+    join_type = opts[:graph_join_type]
+    select = opts[:graph_select]
+    use_only_conditions = opts.include?(:graph_only_conditions)
+    only_conditions = opts[:graph_only_conditions]
+    conditions = opts[:graph_conditions]
+    graph_block = opts[:graph_block]
+    use_jt_only_conditions = opts.include?(:graph_join_table_only_conditions)
+    jt_only_conditions = opts[:graph_join_table_only_conditions]
+    jt_join_type = opts[:graph_join_table_join_type]
+    jt_graph_block = opts[:graph_join_table_block]
+    opts[:eager_grapher] ||= proc do |ds, assoc_alias, table_alias|
+      ds = ds.graph(join_table, use_jt_only_conditions ? jt_only_conditions : [[left, left_pk]] + graph_jt_conds, :select=>false, :table_alias=>ds.send(:eager_unique_table_alias, ds, join_table), :join_type=>jt_join_type, :implicit_qualifier=>table_alias, &jt_graph_block)
+      ds.graph(opts.associated_class, use_only_conditions ? only_conditions : [[opts.right_primary_key, right]] + conditions, :select=>select, :table_alias=>assoc_alias, :join_type=>join_type, &graph_block)
+    end
+
     def_association_dataset_methods(opts)
 
     return if opts[:read_only]
@@ -350,6 +369,16 @@ module Sequel::Model::Associations
           objects.each{|object| object.associations[name] = assoc_record}
         end
       end
+    end
+
+    join_type = opts[:graph_join_type]
+    select = opts[:graph_select]
+    use_only_conditions = opts.include?(:graph_only_conditions)
+    only_conditions = opts[:graph_only_conditions]
+    conditions = opts[:graph_conditions]
+    graph_block = opts[:graph_block]
+    opts[:eager_grapher] ||= proc do |ds, assoc_alias, table_alias|
+      ds.graph(opts.associated_class, use_only_conditions ? only_conditions : [[opts.primary_key, key]] + conditions, :select=>select, :table_alias=>assoc_alias, :join_type=>join_type, :implicit_qualifier=>table_alias, &graph_block)
     end
 
     def_association_dataset_methods(opts)
@@ -399,6 +428,19 @@ module Sequel::Model::Associations
       end
     end
     
+    join_type = opts[:graph_join_type]
+    select = opts[:graph_select]
+    use_only_conditions = opts.include?(:graph_only_conditions)
+    only_conditions = opts[:graph_only_conditions]
+    conditions = opts[:graph_conditions]
+    graph_block = opts[:graph_block]
+    opts[:eager_grapher] ||= proc do |ds, assoc_alias, table_alias|
+      ds = ds.graph(opts.associated_class, use_only_conditions ? only_conditions : [[key, primary_key]] + conditions, :select=>select, :table_alias=>assoc_alias, :join_type=>join_type, :implicit_qualifier=>table_alias, &graph_block)
+      # We only load reciprocals for one_to_many associations, as other reciprocals don't make sense
+      ds.opts[:eager_graph][:reciprocals][assoc_alias] = opts.reciprocal
+      ds
+    end
+
     def_association_dataset_methods(opts)
     
     unless opts[:read_only]

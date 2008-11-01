@@ -140,6 +140,11 @@ module Sequel
           self[:reciprocal] = nil
         end
 
+        # Whether this association returns an array of objects instead of a single object.
+        def reciprocal_array?
+          self[:type] != :one_to_many
+        end
+
         # Name symbol for remove_all_ association method
         def remove_all_method
           :"remove_all_#{self[:name]}"
@@ -150,6 +155,11 @@ module Sequel
           :"remove_#{self[:name].to_s.singularize}"
         end
       
+        # Whether this association returns an array of objects instead of a single object.
+        def returns_array?
+          self[:type] != :many_to_one
+        end
+
         # The primary key column to use in the associated table
         def right_primary_key
           self[:right_primary_key] ||= associated_class.primary_key

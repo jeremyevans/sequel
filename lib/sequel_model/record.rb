@@ -366,12 +366,11 @@ module Sequel
     # Add/Set the current object to/as the given object's reciprocal association.
     def add_reciprocal_object(opts, o)
       return unless reciprocal = opts.reciprocal
-      case opts[:type]
-      when :many_to_many, :many_to_one
+      if opts.reciprocal_array?
         if array = o.associations[reciprocal] and !array.include?(self)
           array.push(self)
         end
-      when :one_to_many
+      else
         o.associations[reciprocal] = self
       end
     end
@@ -422,21 +421,19 @@ module Sequel
     # Remove/unset the current object from/as the given object's reciprocal association.
     def remove_reciprocal_object(opts, o)
       return unless reciprocal = opts.reciprocal
-      case opts[:type]
-      when :many_to_many, :many_to_one
+      if opts.reciprocal_array?
         if array = o.associations[reciprocal]
           array.delete_if{|x| self === x}
         end
-      when :one_to_many
+      else
         o.associations[reciprocal] = nil
       end
     end
 
     # Run the callback for the association with the object.
     def run_association_callbacks(reflection, callback_type, object)
-      raise_error = raise_on_save_failure
-      raise_error = true if reflection[:type] == :many_to_one
-      stop_on_false = true if [:before_add, :before_remove].include?(callback_type)
+      raise_error = raise_on_save_failure || !reflection.returns_array?
+      stop_on_false = [:before_add, :before_remove].include?(callback_type)
       reflection[callback_type].each do |cb|
         res = case cb
         when Symbol

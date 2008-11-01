@@ -128,32 +128,13 @@ module Sequel::Model::Associations::EagerLoading
     klass = r.associated_class
     assoc_name = r[:name]
     assoc_table_alias = ds.eager_unique_table_alias(ds, assoc_name)
-    join_type = r[:graph_join_type]
-    conditions = r[:graph_conditions]
-    use_only_conditions = r.include?(:graph_only_conditions)
-    only_conditions = r[:graph_only_conditions]
-    select = r[:graph_select]
-    graph_block = r[:graph_block]
-    ds = case assoc_type = r[:type]
-    when :many_to_one
-      ds.graph(klass, use_only_conditions ? only_conditions : [[r.primary_key, r[:key]]] + conditions, :select=>select, :table_alias=>assoc_table_alias, :join_type=>join_type, :implicit_qualifier=>ta, &graph_block)
-    when :one_to_many
-      ds = ds.graph(klass, use_only_conditions ? only_conditions : [[r[:key], r.primary_key]] + conditions, :select=>select, :table_alias=>assoc_table_alias, :join_type=>join_type, :implicit_qualifier=>ta, &graph_block)
-      # We only load reciprocals for one_to_many associations, as other reciprocals don't make sense
-      ds.opts[:eager_graph][:reciprocals][assoc_table_alias] = r.reciprocal
-      ds
-    when :many_to_many
-      use_jt_only_conditions = r.include?(:graph_join_table_only_conditions)
-      ds = ds.graph(r[:join_table], use_jt_only_conditions ? r[:graph_join_table_only_conditions] : [[r[:left_key], r[:left_primary_key]]] + r[:graph_join_table_conditions], :select=>false, :table_alias=>ds.eager_unique_table_alias(ds, r[:join_table]), :join_type=>r[:graph_join_table_join_type], :implicit_qualifier=>ta, &r[:graph_join_table_block])
-      ds.graph(klass, use_only_conditions ? only_conditions : [[r.right_primary_key, r[:right_key]]] + conditions, :select=>select, :table_alias=>assoc_table_alias, :join_type=>join_type, &graph_block)
-    end
-
+    ds = r[:eager_grapher].call(ds, assoc_table_alias, ta)
     ds = ds.order_more(*Array(r[:order]).map{|c| eager_graph_qualify_order(assoc_table_alias, c)}) if r[:order] and r[:order_eager_graph]
     eager_graph = ds.opts[:eager_graph]
     eager_graph[:requirements][assoc_table_alias] = requirements.dup
     eager_graph[:alias_association_name_map][assoc_table_alias] = assoc_name
-    eager_graph[:alias_association_type_map][assoc_table_alias] = assoc_type
-    ds = ds.eager_graph_associations(ds, klass, assoc_table_alias, requirements + [assoc_table_alias], *associations) unless associations.empty?
+    eager_graph[:alias_association_type_map][assoc_table_alias] = r.returns_array?
+    ds = ds.eager_graph_associations(ds, r.associated_class, assoc_table_alias, requirements + [assoc_table_alias], *associations) unless associations.empty?
     ds
   end
 
@@ -240,7 +221,7 @@ module Sequel::Model::Associations::EagerLoading
     end
 
     # Remove duplicate records from all associations if this graph could possibly be a cartesian product
-    eager_graph_make_associations_unique(records, dependency_map, alias_map, type_map) if type_map.reject{|k,v| v == :many_to_one}.length > 1
+    eager_graph_make_associations_unique(records, dependency_map, alias_map, type_map) if type_map.values.select{|v| v}.length > 1
     
     # Replace the array of object graphs with an array of model objects
     record_graphs.replace(records)
@@ -286,7 +267,7 @@ module Sequel::Model::Associations::EagerLoading
     # Don't clobber the instance variable array for *_to_many associations if it has already been setup
     dependency_map.keys.each do |ta|
       assoc_name = alias_map[ta]
-      current.associations[assoc_name] = type_map[ta] == :many_to_one ? nil : [] unless current.associations.include?(assoc_name)
+      current.associations[assoc_name] = type_map[ta] ? [] : nil unless current.associations.include?(assoc_name)
     end
     dependency_map.each do |ta, deps|
       next unless rec = record_graph[ta]
@@ -297,12 +278,12 @@ module Sequel::Model::Associations::EagerLoading
         records_map[ta][rec.pk] = rec
       end
       assoc_name = alias_map[ta]
-      case assoc_type = type_map[ta]
-      when :many_to_one
+      case type_map[ta]
+      when false
         current.associations[assoc_name] = rec
       else
         current.associations[assoc_name].push(rec) 
-        if assoc_type == :one_to_many and reciprocal = reciprocal_map[ta]
+        if reciprocal = reciprocal_map[ta]
           rec.associations[reciprocal] = current
         end
       end
@@ -319,7 +300,7 @@ module Sequel::Model::Associations::EagerLoading
   def eager_graph_make_associations_unique(records, dependency_map, alias_map, type_map)
     records.each do |record|
       dependency_map.each do |ta, deps|
-        list = if type_map[ta] == :many_to_one
+        list = if !type_map[ta]
           item = record.send(alias_map[ta])
           [item] if item
         else
