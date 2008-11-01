@@ -381,14 +381,14 @@ module Sequel
       if @associations.include?(name) and !reload
         @associations[name]
       else
-        objs = if opts.single_associated_object?
+        objs = if opts.returns_array?
+          send(opts.dataset_method).all
+        else
           if !opts[:key]
             send(opts.dataset_method).all.first
           elsif send(opts[:key])
             send(opts.dataset_method).first
           end
-        else
-          objs = send(opts.dataset_method).all
         end
         run_association_callbacks(opts, :after_load, objs)
         # Only one_to_many associations should set the reciprocal object

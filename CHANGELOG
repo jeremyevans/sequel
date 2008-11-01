@@ -1,5 +1,7 @@
 === HEAD
 
+* Transform AssociationReflection from a single class to a class hierarchy (jeremyevans)
+
 * Optimize Date object creation in PostgreSQL adapter (jeremyevans)
 
 * Allow easier creation of custom association types, though support for them may still be suboptimal (jeremyevans)

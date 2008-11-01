@@ -199,12 +199,12 @@ module Sequel::Model::Associations
   #     Defaults to primary key of the associated table.
   #   - :uniq - Adds a after_load callback that makes the array of objects unique.
   def associate(type, name, opts = {}, &block)
-    raise(Error, 'invalid association type') unless AssociationReflection::ASSOCIATION_TYPES.include?(type)
+    raise(Error, 'invalid association type') unless assoc_class = ASSOCIATION_TYPES[type]
     raise(Error, 'Model.associate name argument must be a symbol') unless Symbol === name
 
     # merge early so we don't modify opts
     opts = opts.merge(:type => type, :name => name, :block => block, :cache => true, :model => self)
-    opts = AssociationReflection.new.merge!(opts)
+    opts = assoc_class.new.merge!(opts)
     opts[:eager_block] = block unless opts.include?(:eager_block)
     opts[:graph_join_type] ||= :left_outer
     opts[:order_eager_graph] = true unless opts.include?(:order_eager_graph)
@@ -348,7 +348,7 @@ module Sequel::Model::Associations
   def def_many_to_one(opts)
     name = opts[:name]
     model = self
-    opts[:key] = opts.default_right_key unless opts.include?(:key)
+    opts[:key] = opts.default_key unless opts.include?(:key)
     key = opts[:key]
     opts[:class_name] ||= name.to_s.camelize
     opts[:dataset] ||= proc do
@@ -407,7 +407,7 @@ module Sequel::Model::Associations
   def def_one_to_many(opts)
     name = opts[:name]
     model = self
-    key = (opts[:key] ||= opts.default_left_key)
+    key = (opts[:key] ||= opts.default_key)
     primary_key = (opts[:primary_key] ||= self.primary_key)
     opts[:class_name] ||= name.to_s.singularize.camelize
     opts[:dataset] ||= proc do
