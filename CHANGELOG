@@ -1,5 +1,7 @@
 === HEAD
 
+* Optimize Date object creation in PostgreSQL adapter (jeremyevans)
+
 * Allow easier creation of custom association types, though support for them may still be suboptimal (jeremyevans)
 
 * Add :eager_grapher option to associations, which the user can use to override the default eager_graph code (jeremyevans)

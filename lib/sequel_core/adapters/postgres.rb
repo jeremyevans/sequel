@@ -93,7 +93,7 @@ module Sequel
       700 => lambda{ |s| s.to_f }, # float4
       701 => lambda{ |s| s.to_f }, # float8
       790 => lambda{ |s| s.to_d }, # money
-      1082 => lambda{ |s| s.to_date }, # date
+      1082 => lambda{ |s| @use_iso_date_format ? Date.new(*s.split("-").map{|x| x.to_i}) : s.to_date }, # date
       1083 => lambda{ |s| s.to_time }, # time without time zone
       1114 => lambda{ |s| s.to_sequel_time }, # timestamp without time zone
       1184 => lambda{ |s| s.to_sequel_time }, # timestamp with time zone
@@ -102,12 +102,26 @@ module Sequel
       1700 => lambda{ |s| s.to_d }, # numeric
     }
     
+    @use_iso_date_format = true
+
+    # As an optimization, Sequel sets the date style to ISO, so that PostgreSQL provides
+    # the date in a known format that Sequel can parse faster.  This can be turned off
+    # if you require a date style other than ISO.
+    metaattr_accessor :use_iso_date_format
+    
     # PGconn subclass for connection specific methods used with the
     # pg, postgres, or postgres-pr driver.
     class Adapter < ::PGconn
       include Sequel::Postgres::AdapterMethods
       self.translate_results = false if respond_to?(:translate_results=)
       
+      # Apply connection settings for this connection.  Current sets
+      # the date style to ISO in order make Date object creation in ruby faster,
+      # if Postgres.use_iso_date_format is true.
+      def apply_connection_settings
+        async_exec("SET DateStyle = 'ISO, YMD'") if Postgres.use_iso_date_format
+      end
+
       # Execute the given SQL with this connection.  If a block is given,
       # yield the results, otherwise, return the number of changed rows.
       def execute(sql, args=nil)
@@ -126,6 +140,12 @@ module Sequel
         ensure
           q.clear
         end
+      end
+
+      # Reapply the connection settings if the connection is reset.
+      def reset(*args, &block)
+        super(*args, &block)
+        apply_connection_settings
       end
       
       if SEQUEL_POSTGRES_USES_PG
@@ -159,7 +179,7 @@ module Sequel
         @primary_keys = {}
         @primary_key_sequences = {}
       end
-      
+
       # Connects to the database.  In addition to the standard database
       # options, using the :encoding or :charset option changes the
       # client encoding for the connection.
@@ -180,6 +200,7 @@ module Sequel
             conn.async_exec("set client_encoding to '#{encoding}'")
           end
         end
+        conn.apply_connection_settings
         conn.db = self
         conn
       end
