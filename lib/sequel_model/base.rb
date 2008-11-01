@@ -428,11 +428,10 @@ module Sequel
     
     # Create the column accessors
     def self.def_column_accessor(*columns) # :nodoc:
-      include(@column_accessors_module = Module.new) unless @column_accessors_module
       columns.each do |column|
         im = instance_methods.collect{|x| x.to_s}
         meth = "#{column}="
-        @column_accessors_module.module_eval do
+        overridable_methods_module.module_eval do
           define_method(column){self[column]} unless im.include?(column.to_s)
           unless im.include?(meth)
             define_method(meth) do |*v|
@@ -486,6 +485,13 @@ module Sequel
       schema_hash
     end
 
+    # Module that the class includes that holds methods the class adds for column accessors and
+    # associations so that the methods can be overridden with super
+    def self.overridable_methods_module
+      include(@overridable_methods_module = Module.new) unless @overridable_methods_module
+      @overridable_methods_module
+    end
+
     # Set the columns for this model, reset the str_columns,
     # and create accessor methods for each column.
     def self.set_columns(new_columns) # :nodoc:
@@ -495,6 +501,6 @@ module Sequel
       @columns
     end
 
-    private_class_method :def_column_accessor, :get_db_schema, :set_columns
+    private_class_method :def_column_accessor, :get_db_schema, :overridable_methods_module, :set_columns
   end
 end

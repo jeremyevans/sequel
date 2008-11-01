@@ -1,5 +1,7 @@
 === HEAD
 
+* Instance methods added by associations are now added to an anonymous module the class includes, allowing you to override them and use super (jeremyevans)
+
 * Add #add_graph_aliases (select_more for graphs), and allow use of arbitrary expressions when graphing (jeremyevans)
 
 * Fix a corner case where the wrong table name is used in eager_graph (jeremyevans)

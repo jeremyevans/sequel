@@ -46,7 +46,7 @@ end
 describe Sequel::Model, "many_to_one" do
   before do
     MODEL_DB.reset
-
+    
     @c2 = Class.new(Sequel::Model(:nodes)) do
       unrestrict_primary_key
       columns :id, :parent_id, :par_parent_id, :blah
@@ -308,6 +308,14 @@ describe Sequel::Model, "many_to_one" do
     @c2.many_to_one :parent, :class => @c2, :read_only=>true
     @c2.instance_methods.collect{|x| x.to_s}.should(include('parent'))
     @c2.instance_methods.collect{|x| x.to_s}.should_not(include('parent='))
+  end
+
+  it "should not add associations methods directly to class" do
+    @c2.many_to_one :parent, :class => @c2
+    @c2.instance_methods.collect{|x| x.to_s}.should(include('parent'))
+    @c2.instance_methods.collect{|x| x.to_s}.should(include('parent='))
+    @c2.instance_methods(false).collect{|x| x.to_s}.should_not(include('parent'))
+    @c2.instance_methods(false).collect{|x| x.to_s}.should_not(include('parent='))
   end
 
   it "should raise an error if trying to set a model object that doesn't have a valid primary key" do
@@ -766,6 +774,22 @@ describe Sequel::Model, "one_to_many" do
     im.should_not(include('remove_all_attributes'))
   end
 
+  it "should not add associations methods directly to class" do
+    @c2.one_to_many :attributes, :class => @c1
+    im = @c2.instance_methods.collect{|x| x.to_s}
+    im.should(include('attributes'))
+    im.should(include('attributes_dataset'))
+    im.should(include('add_attribute'))
+    im.should(include('remove_attribute'))
+    im.should(include('remove_all_attributes'))
+    im2 = @c2.instance_methods(false).collect{|x| x.to_s}
+    im2.should_not(include('attributes'))
+    im2.should_not(include('attributes_dataset'))
+    im2.should_not(include('add_attribute'))
+    im2.should_not(include('remove_attribute'))
+    im2.should_not(include('remove_all_attributes'))
+  end
+
   it "should have has_many alias" do
     @c2.has_many :attributes, :class => @c1
     
@@ -937,7 +961,7 @@ describe Sequel::Model, "one_to_many" do
 
   it "should make non getter and setter methods private if :one_to_one option is used" do 
     @c2.one_to_many :attributes, :class => @c1, :one_to_one=>true do |ds| end
-    meths = @c2.private_instance_methods(false).collect{|x| x.to_s}
+    meths = @c2.private_instance_methods.collect{|x| x.to_s}
     meths.should(include("attributes"))
     meths.should(include("add_attribute"))
     meths.should(include("attributes_dataset"))
@@ -1388,6 +1412,22 @@ describe Sequel::Model, "many_to_many" do
     im.should_not(include('add_attribute'))
     im.should_not(include('remove_attribute'))
     im.should_not(include('remove_all_attributes'))
+  end
+
+  it "should not add associations methods directly to class" do
+    @c2.many_to_many :attributes, :class => @c1
+    im = @c2.instance_methods.collect{|x| x.to_s}
+    im.should(include('attributes'))
+    im.should(include('attributes_dataset'))
+    im.should(include('add_attribute'))
+    im.should(include('remove_attribute'))
+    im.should(include('remove_all_attributes'))
+    im2 = @c2.instance_methods(false).collect{|x| x.to_s}
+    im2.should_not(include('attributes'))
+    im2.should_not(include('attributes_dataset'))
+    im2.should_not(include('add_attribute'))
+    im2.should_not(include('remove_attribute'))
+    im2.should_not(include('remove_all_attributes'))
   end
 
   it "should have has_and_belongs_to_many alias" do

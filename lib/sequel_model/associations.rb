@@ -255,6 +255,17 @@ module Sequel::Model::Associations
   
   private
 
+  # Add a method to the association module
+  def association_module_def(name, &block)
+    overridable_methods_module.class_def(name, &block)
+  end
+
+  # Add a method to the association module
+  def association_module_private_def(name, &block)
+    association_module_def(name, &block)
+    overridable_methods_module.send(:private, name)
+  end
+
   # Hash storing the association reflections.  Keys are association name
   # symbols, values are association reflection hashes.
   def association_reflections
@@ -263,21 +274,17 @@ module Sequel::Model::Associations
   
   # Add the add_ instance method 
   def def_add_method(opts)
-    class_def(opts.add_method){|o| add_associated_object(opts, o)}
+    association_module_def(opts.add_method){|o| add_associated_object(opts, o)}
   end
 
   # Adds association methods to the model for *_to_many associations.
   def def_association_dataset_methods(opts)
     # If a block is given, define a helper method for it, because it takes
     # an argument.  This is unnecessary in Ruby 1.9, as that has instance_exec.
-    if opts[:block]
-      class_def(opts.dataset_helper_method, &opts[:block])
-      private opts.dataset_helper_method
-    end
-    class_def(opts._dataset_method, &opts[:dataset])
-    private opts._dataset_method
-    class_def(opts.dataset_method){_dataset(opts)}
-    class_def(opts.association_method){|*reload| load_associated_objects(opts, reload[0])}
+    association_module_private_def(opts.dataset_helper_method, &opts[:block]) if opts[:block]
+    association_module_private_def(opts._dataset_method, &opts[:dataset])
+    association_module_def(opts.dataset_method){_dataset(opts)}
+    association_module_def(opts.association_method){|*reload| load_associated_objects(opts, reload[0])}
   end
 
   # Adds many_to_many association instance methods
@@ -310,16 +317,15 @@ module Sequel::Model::Associations
 
     return if opts[:read_only]
 
-    class_def(opts._add_method) do |o|
+    association_module_private_def(opts._add_method) do |o|
       database.dataset.from(join_table).insert(left=>send(left_pk), right=>o.send(opts.right_primary_key))
     end
-    class_def(opts._remove_method) do |o|
+    association_module_private_def(opts._remove_method) do |o|
       database.dataset.from(join_table).filter([[left, send(left_pk)], [right, o.send(opts.right_primary_key)]]).delete
     end
-    class_def(opts._remove_all_method) do
+    association_module_private_def(opts._remove_all_method) do
       database.dataset.from(join_table).filter(left=>send(left_pk)).delete
     end
-    private opts._add_method, opts._remove_method, opts._remove_all_method
 
     def_add_method(opts)
     def_remove_methods(opts)
@@ -356,10 +362,9 @@ module Sequel::Model::Associations
     
     return if opts[:read_only]
 
-    class_def(opts._setter_method){|o| send(:"#{key}=", (o.send(opts.primary_key) if o))}
-    private opts._setter_method
+    association_module_private_def(opts._setter_method){|o| send(:"#{key}=", (o.send(opts.primary_key) if o))}
 
-    class_def(opts.setter_method) do |o|  
+    association_module_def(opts.setter_method) do |o|  
       raise(Sequel::Error, 'model object does not have a primary key') if o && !o.pk
       old_val = send(opts.association_method)
       return o if old_val == o
@@ -403,37 +408,35 @@ module Sequel::Model::Associations
     def_association_dataset_methods(opts)
     
     unless opts[:read_only]
-      class_def(opts._add_method) do |o|
+      association_module_private_def(opts._add_method) do |o|
         o.send(:"#{key}=", send(primary_key))
         o.save || raise(Sequel::Error, "invalid associated object, cannot save")
       end
-      private opts._add_method
       def_add_method(opts)
 
       unless opts[:one_to_one]
-        class_def(opts._remove_method) do |o|
+        association_module_private_def(opts._remove_method) do |o|
           o.send(:"#{key}=", nil)
           o.save || raise(Sequel::Error, "invalid associated object, cannot save")
         end
-        class_def(opts._remove_all_method) do
+        association_module_private_def(opts._remove_all_method) do
           opts.associated_class.filter(key=>send(primary_key)).update(key=>nil)
         end
-        private opts._remove_method, opts._remove_all_method
         def_remove_methods(opts)
       end
     end
     if opts[:one_to_one]
-      private opts.association_method, opts.dataset_method
+      overridable_methods_module.send(:private, opts.association_method, opts.dataset_method)
       n = name.to_s.singularize.to_sym
       raise(Sequel::Error, "one_to_many association names should still be plural even when using the :one_to_one option") if n == name
-      class_def(n) do |*o|
+      association_module_def(n) do |*o|
         objs = send(name, *o)
         raise(Sequel::Error, "multiple values found for a one-to-one relationship") if objs.length > 1
         objs.first
       end
       unless opts[:read_only]
-        private opts.add_method
-        class_def(:"#{n}=") do |o|
+        overridable_methods_module.send(:private, opts.add_method)
+        association_module_def(:"#{n}=") do |o|
           klass = opts.associated_class
           model.db.transaction do
             send(opts.add_method, o)
@@ -446,7 +449,7 @@ module Sequel::Model::Associations
   
   # Add the remove_ and remove_all instance methods
   def def_remove_methods(opts)
-    class_def(opts.remove_method){|o| remove_associated_object(opts, o)}
-    class_def(opts.remove_all_method){remove_all_associated_objects(opts)}
+    association_module_def(opts.remove_method){|o| remove_associated_object(opts, o)}
+    association_module_def(opts.remove_all_method){remove_all_associated_objects(opts)}
   end
 end
