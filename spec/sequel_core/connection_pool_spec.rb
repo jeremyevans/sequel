@@ -265,7 +265,7 @@ context "A connection pool with a max size of 5" do
     cc[7].should be_nil
     
     stop = true
-    sleep 0.03
+    sleep 0.05
     
     threads.each {|t| t.should_not be_alive}
     
