@@ -463,7 +463,7 @@ module Sequel
           ce = case r
           when Range
             new(:AND, new(:>=, l, r.begin), new(r.exclude_end? ? :< : :<=, l, r.end))
-          when Array, ::Sequel::Dataset
+          when Array, ::Sequel::Dataset, SQLArray
             new(:IN, l, r)
           when NilClass
             new(:IS, l, r)

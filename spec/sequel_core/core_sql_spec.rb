@@ -59,6 +59,7 @@ context "Array#sql_array" do
   specify "should treat the array as an SQL array instead of conditions" do
     @d.literal([[:x, 1], [:y, 2]]).should == '((x = 1) AND (y = 2))'
     @d.literal([[:x, 1], [:y, 2]].sql_array).should == '((x, 1), (y, 2))'
+    @d.filter([:a, :b]=>[[:x, 1], [:y, 2]].sql_array).sql.should == 'SELECT * WHERE ((a, b) IN ((x, 1), (y, 2)))'
   end
 end
 
