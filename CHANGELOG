@@ -1,4 +1,4 @@
-=== HEAD
+=== 2.7.0 (2008-11-03)
 
 * Transform AssociationReflection from a single class to a class hierarchy (jeremyevans)
 
