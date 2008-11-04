@@ -119,7 +119,7 @@ module Sequel
       # the date style to ISO in order make Date object creation in ruby faster,
       # if Postgres.use_iso_date_format is true.
       def apply_connection_settings
-        async_exec("SET DateStyle = 'ISO, YMD'") if Postgres.use_iso_date_format
+        async_exec("SET DateStyle = 'ISO'") if Postgres.use_iso_date_format
       end
 
       # Execute the given SQL with this connection.  If a block is given,
