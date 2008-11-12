@@ -127,9 +127,10 @@ module Sequel
       # optional middle argument denotes the type.
       # 
       # Examples:
-      #   primary_key(:id) primary_key(:name, :text)
+      #   primary_key(:id)
       #   primary_key(:zip_code, :null => false)
       #   primary_key([:street_number, :house_number])
+      #   primary_key(:id, :string, :auto_increment => false)
       def primary_key(name, *args)
         return composite_primary_key(name, *args) if name.is_a?(Array)
         @primary_key = @db.serial_primary_key_options.merge({:name => name})
