@@ -14,7 +14,7 @@ module Sequel
     include Schema::SQL
 
     # Array of supported database adapters
-    ADAPTERS = %w'ado db2 dbi informix jdbc mysql odbc odbc_mssql openbase oracle postgres sqlite'.collect{|x| x.to_sym}
+    ADAPTERS = %w'ado db2 dbi informix jdbc mysql odbc openbase oracle postgres sqlite'.collect{|x| x.to_sym}
 
     SQL_BEGIN = 'BEGIN'.freeze
     SQL_COMMIT = 'COMMIT'.freeze
