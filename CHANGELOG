@@ -1,5 +1,7 @@
 === HEAD
 
+* More optimization of Model#initialize (jeremyevans)
+
 * Treat interval as a string type, not an integer type (jeremyevans)
 
 * Allow use of implicitly qualified symbol as argument to Symbol#qualify (:a.qualify(:b__c)=>b.c.a), fixes model associations in different schemas (jeremyevans) (#246)

@@ -394,7 +394,7 @@ module Sequel::Model::Associations
       return if old_val and run_association_callbacks(opts, :before_remove, old_val) == false
       return if o and run_association_callbacks(opts, :before_add, o) == false
       send(opts._setter_method, o)
-      @associations[name] = o
+      associations[name] = o
       remove_reciprocal_object(opts, old_val) if old_val
       add_reciprocal_object(opts, o) if o
       run_association_callbacks(opts, :after_add, o) if o
