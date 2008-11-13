@@ -558,7 +558,7 @@ module Sequel
     # SQL fragment for the qualifed identifier, specifying
     # a table and a column (or schema and table).
     def qualified_identifier_sql(qcr)
-      [qcr.table, qcr.column].map{|x| x.is_one_of?(SQL::QualifiedIdentifier, SQL::Identifier) ? literal(x) : quote_identifier(x)}.join('.')
+      [qcr.table, qcr.column].map{|x| x.is_one_of?(SQL::QualifiedIdentifier, SQL::Identifier, Symbol) ? literal(x) : quote_identifier(x)}.join('.')
     end
 
     # Adds quoting to identifiers (columns and tables). If identifiers are not

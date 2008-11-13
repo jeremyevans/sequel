@@ -276,11 +276,12 @@ context "Symbol" do
   end
 
   specify "should be able to qualify an identifier" do
-    @ds.literal(:xyz.identifier.qualify(:xyz__abc)).should == '"XYZ__ABC"."XYZ"'
+    @ds.literal(:xyz.identifier.qualify(:xyz__abc)).should == '"XYZ"."ABC"."XYZ"'
   end
 
   specify "should be able to specify a schema.table.column" do
-    @ds.literal(:column.qualify(:table__name.qualify(:schema))).should == '"SCHEMA"."TABLE__NAME"."COLUMN"'
+    @ds.literal(:column.qualify(:table.qualify(:schema))).should == '"SCHEMA"."TABLE"."COLUMN"'
+    @ds.literal(:column.qualify(:table__name.identifier.qualify(:schema))).should == '"SCHEMA"."TABLE__NAME"."COLUMN"'
   end
 end
 
