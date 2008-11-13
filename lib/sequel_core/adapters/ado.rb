@@ -52,17 +52,6 @@ module Sequel
     end
     
     class Dataset < Sequel::Dataset
-      def literal(v)
-        case v
-        when Time
-          literal(v.iso8601)
-        when Date, DateTime
-          literal(v.to_s)
-        else
-          super
-        end
-      end
-
       def fetch_rows(sql)
         execute(sql) do |s|
           @columns = s.Fields.extend(Enumerable).map do |column|

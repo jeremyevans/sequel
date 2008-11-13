@@ -48,9 +48,31 @@ module Sequel
         filter("CONTAINS (#{literal(cols)}, #{literal(terms)})")
       end
       
+      def literal(v)
+        case v
+        when String
+          "N#{super}"
+        when Time
+          literal(v.iso8601)
+        when Date, DateTime
+          literal(v.to_s)
+        else
+          super
+        end
+      end
+
+      def multi_insert_sql(columns, values)
+        values = values.map {|r| "SELECT #{expression_list(r)}" }.join(" UNION ALL ")
+        ["INSERT INTO #{source_list(@opts[:from])} (#{identifier_list(columns)}) #{values}"]
+      end
+
       # Allows you to do .nolock on a query
       def nolock
         clone(:with => "(NOLOCK)")
+      end
+
+      def quoted_identifier(name)
+        "[#{name}]"
       end
 
       # Formats a SELECT statement using the given options and the dataset
