@@ -263,10 +263,10 @@ module Sequel
         case db_type
         when /\Atinyint/
           Sequel.convert_tinyint_to_bool ? :boolean : :integer
+        when /\A(character( varying)?|varchar|text|interval)/
+          :string
         when /\A(int(eger)?|bigint|smallint)/
           :integer
-        when /\A(character( varying)?|varchar|text)/
-          :string
         when /\Adate\z/
           :date
         when /\A(datetime|timestamp( with(out)? time zone)?)\z/
