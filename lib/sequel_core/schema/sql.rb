@@ -261,25 +261,27 @@ module Sequel
       # integer, string, date, datetime, boolean, and float.
       def schema_column_type(db_type)
         case db_type
-        when /\Atinyint/
+        when /\Atinyint/io
           Sequel.convert_tinyint_to_bool ? :boolean : :integer
-        when /\A(character( varying)?|varchar|text|interval)/
+        when /\Ainterval\z/io
+          :interval
+        when /\A(character( varying)?|varchar|text)/io
           :string
-        when /\A(int(eger)?|bigint|smallint)/
+        when /\A(int(eger)?|bigint|smallint)/io
           :integer
-        when /\Adate\z/
+        when /\Adate\z/io
           :date
-        when /\A(datetime|timestamp( with(out)? time zone)?)\z/
+        when /\A(datetime|timestamp( with(out)? time zone)?)\z/io
           :datetime
-        when /\Atime( with(out)? time zone)?\z/
+        when /\Atime( with(out)? time zone)?\z/io
           :time
-        when "boolean"
+        when /\Aboolean\z/io
           :boolean
-        when /\A(real|float|double( precision)?)\z/
+        when /\A(real|float|double( precision)?)\z/io
           :float
-        when /\A(numeric(\(\d+,\d+\))?|decimal|money)\z/
+        when /\A(numeric(\(\d+,\d+\))?|decimal|money)\z/io
           :decimal
-        when "bytea"
+        when /\Abytea\z/io
           :blob
         end
       end
