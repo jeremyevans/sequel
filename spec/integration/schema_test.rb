@@ -9,7 +9,7 @@ describe "Database schema parser" do
     INTEGRATION_DB.create_table!(:items){integer :number}
     schema = INTEGRATION_DB.schema(nil, :reload=>true)
     schema.should be_a_kind_of(Hash)
-    schema.should include(:items)
+    schema[:items].should_not == nil
   end
 
   specify "should not issue an sql query if the schema has been loaded unless :reload is true" do

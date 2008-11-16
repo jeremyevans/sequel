@@ -161,13 +161,6 @@ module Sequel
         synchronize(server){|conn| primary_key_for_table(conn, table)}
       end
 
-      # Support :schema__table format for table
-      def schema(table_name=nil, opts={})
-        schema, table_name = schema_and_table(table_name) if table_name
-        opts[:schema] = schema if schema
-        super(table_name, opts)
-      end
-
       # PostgreSQL uses SERIAL psuedo-type instead of AUTOINCREMENT for
       # managing incrementing primary keys.
       def serial_primary_key_options
@@ -322,7 +315,7 @@ module Sequel
       def schema_parse_tables(opts)
         schemas = {}
         schema_parser_dataset(nil, opts).each do |row|
-          (schemas[row.delete(:table).to_sym] ||= []) << row
+          (schemas[quote_schema_table(SQL::QualifiedIdentifier.new(row.delete(:schema), row.delete(:table)))] ||= []) << row
         end
         schemas.each do |table, rows|
           schemas[table] = schema_parse_rows(rows)
@@ -348,9 +341,9 @@ module Sequel
         if table_name
           ds.filter!(:pg_class__relname=>table_name.to_s)
         else
-          ds.select_more!(:pg_class__relname___table)
+          ds.select_more!(:pg_class__relname___table, :pg_namespace__nspname___schema)
+          ds.join!(:pg_namespace, :oid=>:pg_class__relnamespace, :nspname=>(opts[:schema] || default_schema).to_s)
         end
-        ds.join!(:pg_namespace, :oid=>:pg_class__relnamespace, :nspname=>(opts[:schema] || default_schema).to_s) if opts[:schema] || !opts.include?(:schema)
         ds
       end
     end

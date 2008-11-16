@@ -437,14 +437,12 @@ end
 context "Database#table_exists?" do
   setup do
     @db = DummyDatabase.new
-    @db.stub!(:tables).and_return([:a, :b])
+    @db.instance_variable_set(:@schemas, {:a=>[]})
     @db2 = DummyDatabase.new
   end
   
-  specify "should use Database#tables if available" do
+  specify "should use schema information if available" do
     @db.table_exists?(:a).should be_true
-    @db.table_exists?(:b).should be_true
-    @db.table_exists?(:c).should be_false
   end
   
   specify "should otherwise try to select the first record from the table's dataset" do

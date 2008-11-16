@@ -335,17 +335,19 @@ module Sequel
       @pool.hold(server || :default, &block)
     end
 
-    # Returns true if a table with the given name exists.
+    # Returns true if a table with the given name exists.  This requires a query
+    # to the database unless this database object already has the schema for
+    # the given table name.
     def table_exists?(name)
-      begin 
-        if respond_to?(:tables)
-          tables.include?(name.to_sym)
-        else
+      if @schemas && @schemas[name]
+        true
+      else
+        begin 
           from(name).first
           true
+        rescue
+          false
         end
-      rescue
-        false
       end
     end
     

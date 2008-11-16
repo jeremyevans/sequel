@@ -202,7 +202,7 @@ module Sequel
         "ALTER TABLE #{quote_schema_table(name)} RENAME TO #{quote_schema_table(new_name)}"
       end
 
-      # Parse the schema from the database using the SQL standard INFORMATION_SCHEMA.
+      # Parse the schema from the database.
       # If the table_name is not given, returns the schema for all tables as a hash.
       # If the table_name is given, returns the schema for a single table as an
       # array with all members being arrays of length 2.  Available options are:
@@ -212,11 +212,17 @@ module Sequel
       #   unless you are sure that schema has not been called before with a
       #   table_name, otherwise you may only getting the schemas for tables
       #   that have been requested explicitly.
-      def schema(table_name = nil, opts={})
-        table_name = table_name.to_sym if table_name
+      # * :schema - An explicit schema to use.  It may also be implicitly provided
+      #   via the table name.
+      def schema(table = nil, opts={})
+        if table
+          sch, table_name = schema_and_table(table)
+          quoted_name = quote_schema_table(table)
+        end
+        opts = opts.merge(:schema=>sch) if sch && !opts.include?(:schema)
         if opts[:reload] && @schemas
           if table_name
-            @schemas.delete(table_name)
+            @schemas.delete(quoted_name)
           else
             @schemas = nil
           end
@@ -224,26 +230,31 @@ module Sequel
 
         if @schemas
           if table_name
-            return @schemas[table_name] if @schemas[table_name]
+            return @schemas[quoted_name] if @schemas[quoted_name]
           else
             return @schemas
           end
         end
+        
+        @schemas ||= Hash.new do |h,k|
+          quote_name = quote_schema_table(k)
+          h[quote_name] if h.include?(quote_name)
+        end
 
         if table_name
-          @schemas ||= {}
           if respond_to?(:schema_parse_table, true)
-            @schemas[table_name] ||= schema_parse_table(table_name, opts)
+            @schemas[quoted_name] = schema_parse_table(table_name, opts)
           else
             raise Error, 'schema parsing is not implemented on this database'
           end
         else
           if respond_to?(:schema_parse_tables, true)
-            @schemas = schema_parse_tables(opts)
+            @schemas.merge!(schema_parse_tables(opts))
           elsif respond_to?(:schema_parse_table, true) and respond_to?(:tables, true)
-            tables.each{|t| schema(t, opts)}
+            tables.each{|t| @schemas[quote_identifier(t)] = schema_parse_table(t.to_s, opts)}
             @schemas
           else
+            @schemas = nil
             raise Error, 'schema parsing is not implemented on this database'
           end
         end
@@ -255,6 +266,11 @@ module Sequel
       end
       
       private
+
+      # Remove the cached schema for the given schema name
+      def remove_cached_schema(table)
+        @schemas.delete(quote_schema_table(table)) if @schemas
+      end
 
       # Match the database's column type to a ruby type via a
       # regular expression.  The following ruby types are supported:

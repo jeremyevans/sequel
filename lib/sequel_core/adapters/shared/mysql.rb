@@ -14,13 +14,11 @@ module Sequel
       # Use MySQL specific syntax for rename column, set column type, and
       # drop index cases.
       def alter_table_sql(table, op)
-        quoted_table = quote_identifier(table)
-        quoted_name = quote_identifier(op[:name]) if op[:name]
         case op[:op]
         when :rename_column
-          "ALTER TABLE #{quoted_table} CHANGE COLUMN #{quoted_name} #{quote_identifier(op[:new_name])} #{type_literal(op)}"
+          "ALTER TABLE #{quote_schema_table(table)} CHANGE COLUMN #{quote_identifier(op[:name])} #{quote_identifier(op[:new_name])} #{type_literal(op)}"
         when :set_column_type
-          "ALTER TABLE #{quoted_table} CHANGE COLUMN #{quoted_name} #{quoted_name} #{type_literal(op)}"
+          "ALTER TABLE #{quote_schema_table(table)} CHANGE COLUMN #{quote_identifier(op[:name])} #{quote_identifier(op[:name])} #{type_literal(op)}"
         when :drop_index
           "#{drop_index_sql(table, op)} ON #{quoted_table}"
         else
@@ -50,7 +48,7 @@ module Sequel
           using = " USING #{index[:type]}" unless index[:type] == nil
           "UNIQUE " if index[:unique]
         end
-        "CREATE #{index_type}INDEX #{index_name} ON #{quote_identifier(table_name)} #{literal(index[:columns])}#{using}"
+        "CREATE #{index_type}INDEX #{index_name} ON #{quote_schema_table(table_name)} #{literal(index[:columns])}#{using}"
       end
       
       # Get version of MySQL server, used for determined capabilities.

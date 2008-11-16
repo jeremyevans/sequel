@@ -647,11 +647,11 @@ context "Schema Parser" do
       [[:a, {:db_type=>t.to_s}]]
     end
     @db.schema(:x).should == [[:a, {:db_type=>"x"}]]
-    @sqls.should == [:x]
+    @sqls.should == ['x']
     @db.schema(:x).should == [[:a, {:db_type=>"x"}]]
-    @sqls.should == [:x]
+    @sqls.should == ['x']
     @db.schema(:x, :reload=>true).should == [[:a, {:db_type=>"x"}]]
-    @sqls.should == [:x, :x]
+    @sqls.should == ['x', 'x']
   end
 
   specify "should parse the schema correctly for all tables" do
@@ -662,18 +662,34 @@ context "Schema Parser" do
       sqls << t
       [[:x, {:db_type=>t.to_s}]]
     end
-    @db.schema.should == {:x=>[[:x, {:db_type=>"x"}]]}
-    @sqls.should == [:x]
-    @db.schema.should == {:x=>[[:x, {:db_type=>"x"}]]}
-    @sqls.should == [:x]
-    @db.schema(nil, :reload=>true).should == {:x=>[[:x, {:db_type=>"x"}]]}
-    @sqls.should == [:x, :x]
+    @db.schema.should == {'x'=>[[:x, {:db_type=>"x"}]]}
+    @sqls.should == ['x']
+    @db.schema.should == {'x'=>[[:x, {:db_type=>"x"}]]}
+    @sqls.should == ['x']
+    @db.schema(nil, :reload=>true).should == {'x'=>[[:x, {:db_type=>"x"}]]}
+    @sqls.should == ['x', 'x']
     @db.meta_def(:schema_parse_tables) do |opts|
       sqls << 1
-      {:x=>[[:a, {:db_type=>"1"}]]}
+      {'x'=>[[:a, {:db_type=>"1"}]]}
     end
-    @db.schema(nil, :reload=>true).should == {:x=>[[:a, {:db_type=>"1"}]]}
-    @sqls.should == [:x, :x, 1]
+    @db.schema(nil, :reload=>true).should == {'x'=>[[:a, {:db_type=>"1"}]]}
+    @sqls.should == ['x', 'x', 1]
+  end
+
+  specify "should convert various types of table name arguments" do
+    @db.meta_def(:schema_parse_table) do |t, opts|
+      [[t, {:db_type=>t}]]
+    end
+    s1 = @db.schema(:x)
+    s1.should == [['x', {:db_type=>'x'}]]
+    @db.schema[:x].object_id.should == s1.object_id
+    @db.schema(:x.identifier).object_id.should == s1.object_id
+    @db.schema[:x.identifier].object_id.should == s1.object_id
+    s2 = @db.schema(:x__y)
+    s2.should == [['y', {:db_type=>'y'}]]
+    @db.schema[:x__y].object_id.should == s2.object_id
+    @db.schema(:y.qualify(:x)).object_id.should == s2.object_id
+    @db.schema[:y.qualify(:x)].object_id.should == s2.object_id
   end
 
   specify "should correctly parse all supported data types" do

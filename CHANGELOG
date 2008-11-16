@@ -1,5 +1,15 @@
 === HEAD
 
+* Make PostgreSQL use the default schema if parsing the schema for all tables at once, even if :schema=>nil option is used (jeremyevans)
+
+* Make MySQL adapter not raise an error when giving an SQL::Identifier object to the schema modification methods such as create_table (jeremyevans)
+
+* The keys of the hash returned by Database#schema without a table name are now quoted strings instead of symbols (jeremyevans)
+
+* Make Database#schema to handle implicit schemas on all databases and multiple identifier object types (jeremyevans)
+
+* Remove Sequel.odbc_mssql method (jeremyevans) (#249)
+
 * More optimization of Model#initialize (jeremyevans)
 
 * Treat interval as it's own type, not an integer type (jeremyevans)
