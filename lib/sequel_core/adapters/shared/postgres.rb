@@ -161,6 +161,12 @@ module Sequel
         synchronize(server){|conn| primary_key_for_table(conn, table)}
       end
 
+      # SQL DDL statement for renaming a table. PostgreSQL doesn't allow you to change a table's schema in
+      # a rename table operation, so speciying a new schema in new_name will not have an effect.
+      def rename_table_sql(name, new_name)
+        "ALTER TABLE #{quote_schema_table(name)} RENAME TO #{quote_identifier(schema_and_table(new_name).last)}"
+      end 
+
       # PostgreSQL uses SERIAL psuedo-type instead of AUTOINCREMENT for
       # managing incrementing primary keys.
       def serial_primary_key_options

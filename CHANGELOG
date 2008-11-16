@@ -1,5 +1,7 @@
 === HEAD
 
+* Fix Database#rename_table when using PostgreSQL (jeremyevans) (#248)
+
 * Whether to upcase or quote identifiers can now be set separately, via Sequel.upcase_identifiers= or the :upcase_identifiers database option (jeremyevans)
 
 * Support transactions in the ODBC adapter (dlee)
