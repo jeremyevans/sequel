@@ -75,13 +75,16 @@ module Sequel
     # The hash of options for this dataset, keys are symbols.
     attr_accessor :opts
 
+    # Whether to quote identifiers for this dataset
+    attr_writer :quote_identifiers
+    
     # The row_proc for this database, should be a Proc that takes
     # a single hash argument and returns the object you want to
     # fetch_rows to return.
     attr_accessor :row_proc
 
-    # Whether to quote identifiers for this dataset
-    attr_writer :quote_identifiers
+    # Whether to upcase identifiers for this dataset
+    attr_writer :upcase_identifiers
     
     # Constructs a new instance of a dataset with an associated database and 
     # options. Datasets are usually constructed by invoking Database methods:
@@ -97,6 +100,7 @@ module Sequel
     def initialize(db, opts = nil)
       @db = db
       @quote_identifiers = db.quote_identifiers? if db.respond_to?(:quote_identifiers?)
+      @upcase_identifiers = db.upcase_identifiers? if db.respond_to?(:upcase_identifiers?)
       @opts = opts || {}
       @row_proc = nil
       @transform = nil
@@ -413,6 +417,11 @@ module Sequel
         m[k] = (tt = @transform[k]) ? tt[1][v] : v
         m
       end
+    end
+    
+    # Whether this dataset upcases identifiers.
+    def upcase_identifiers?
+      @upcase_identifiers
     end
     
     # Updates values for the dataset.  The returned value is generally the

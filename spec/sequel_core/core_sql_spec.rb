@@ -265,6 +265,7 @@ context "Symbol" do
   before do
     @ds = Sequel::Dataset.new(nil)
     @ds.quote_identifiers = true
+    @ds.upcase_identifiers = true
   end
 
   specify "#identifier should format an identifier" do

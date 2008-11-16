@@ -1,5 +1,11 @@
 === HEAD
 
+* Whether to upcase or quote identifiers can now be set separately, via Sequel.upcase_identifiers= or the :upcase_identifiers database option (jeremyevans)
+
+* Support transactions in the ODBC adapter (dlee)
+
+* Support multi_insert_sql and unicode string literals in MSSQL shared adapter (dlee)
+
 * Make PostgreSQL use the default schema if parsing the schema for all tables at once, even if :schema=>nil option is used (jeremyevans)
 
 * Make MySQL adapter not raise an error when giving an SQL::Identifier object to the schema modification methods such as create_table (jeremyevans)

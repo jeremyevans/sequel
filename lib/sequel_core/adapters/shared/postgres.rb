@@ -248,6 +248,11 @@ module Sequel
 
       private
       
+      # PostgreSQL folds unquoted identifiers to lowercase, so it shouldn't need to upcase identifiers by default.
+      def upcase_identifiers_default
+        false
+      end
+
       # The result of the insert for the given table and values.  If values
       # is an array, assume the first column is the primary key and return
       # that.  If values is a hash, lookup the primary key for the table.  If
@@ -480,12 +485,6 @@ module Sequel
         # postgresql 8.2 introduces support for multi-row insert
         values = values.map {|r| literal(Array(r))}.join(COMMA_SEPARATOR)
         ["INSERT INTO #{source_list(@opts[:from])} (#{identifier_list(columns)}) VALUES #{values}"]
-      end
-      
-      # PostgreSQL assumes unquoted identifiers are lower case by default,
-      # so do not upcase the identifier when quoting it.
-      def quoted_identifier(c)
-        "\"#{c}\""
       end
       
       # Support lock mode, allowing FOR SHARE and FOR UPDATE queries.

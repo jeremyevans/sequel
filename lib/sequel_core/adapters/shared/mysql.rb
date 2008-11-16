@@ -73,6 +73,11 @@ module Sequel
       
       private
       
+      # MySQL folds unquoted identifiers to lowercase, so it shouldn't need to upcase identifiers by default.
+      def upcase_identifiers_default
+        false
+      end
+
       # Use the MySQL specific DESCRIBE syntax to get a table description.
       def schema_parse_table(table_name, opts)
         self["DESCRIBE ?", table_name].map do |row|

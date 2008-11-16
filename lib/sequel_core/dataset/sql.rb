@@ -565,21 +565,18 @@ module Sequel
     # being quoted, returns name as a string.  If identifiers are being quoted
     # quote the name with quoted_identifier.
     def quote_identifier(name)
-      quote_identifiers? ? quoted_identifier(name) : name.to_s
+      name = name.to_s
+      name = name.upcase if upcase_identifiers?
+      name = quoted_identifier(name) if quote_identifiers?
+      name
     end
     alias_method :quote_column_ref, :quote_identifier
 
     # This method quotes the given name with the SQL standard double quote. 
-    # It uppercases the name given to conform with the SQL standard. This
     # should be overridden by subclasses to provide quoting not matching the
-    # SQL standard, such as backtick (used by MySQL and SQLite), or where
-    # lowercase is the default for unquoted identifiers (PostgreSQL).
-    #
-    # If you are using a database such as Oracle that defaults to uppercase
-    # but you are using lower case identifiers, you should override this
-    # method to not upcase the name for those identifiers.
+    # SQL standard, such as backtick (used by MySQL and SQLite).
     def quoted_identifier(name)
-      "\"#{name.to_s.upcase}\""
+      "\"#{name}\""
     end
 
     # Returns a copy of the dataset with the order reversed. If no order is

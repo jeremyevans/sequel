@@ -29,6 +29,9 @@ module Sequel
     # Whether to quote identifiers (columns and tables) by default
     @@quote_identifiers = true
 
+    # Whether to upcase identifiers (columns and tables) by default
+    @@upcase_identifiers = nil
+
     # Array of SQL loggers to use for this database
     attr_accessor :loggers
 
@@ -38,12 +41,15 @@ module Sequel
     # The connection pool for this database
     attr_reader :pool
 
-    # Whether to quote identifiers (columns and tables) for this database
-    attr_writer :quote_identifiers
-    
     # The prepared statement objects for this database, keyed by name
     attr_reader :prepared_statements
 
+    # Whether to quote identifiers (columns and tables) for this database
+    attr_writer :quote_identifiers
+    
+    # Whether to upcase identifiers (columns and tables) for this database
+    attr_writer :upcase_identifiers
+    
     # Constructs a new instance of a database connection with the specified
     # options hash.
     #
@@ -52,6 +58,7 @@ module Sequel
       @opts = opts
       
       @quote_identifiers = opts.include?(:quote_identifiers) ? opts[:quote_identifiers] : @@quote_identifiers
+      @upcase_identifiers = opts.include?(:upcase_identifiers) ? opts[:upcase_identifiers] : (@@upcase_identifiers.nil? ? upcase_identifiers_default : @@upcase_identifiers)
       @single_threaded = opts.include?(:single_threaded) ? opts[:single_threaded] : @@single_threaded
       @schemas = nil
       @prepared_statements = {}
@@ -140,6 +147,12 @@ module Sequel
     # See Sequel.single_threaded=.
     def self.single_threaded=(value)
       @@single_threaded = value
+    end
+
+    # Sets the default quote_identifiers mode for new databases.
+    # See Sequel.quote_identifiers=.
+    def self.upcase_identifiers=(value)
+      @@upcase_identifiers = value
     end
 
     ### Private Class Methods ###
@@ -460,6 +473,11 @@ module Sequel
       end
     end
 
+    # Returns true if the database upcases identifiers.
+    def upcase_identifiers?
+      @upcase_identifiers
+    end
+    
     # Returns the URI identifying the database.
     # This method can raise an error if the database used options
     # instead of a connection string.
@@ -560,6 +578,14 @@ module Sequel
     # Raise a database error unless the exception is an Error::Rollback.
     def transaction_error(e, *classes)
       raise_error(e, :classes=>classes) unless Error::Rollback === e
+    end
+
+    # Sets whether to upcase identifiers by default.  Should be
+    # overridden in subclasses for databases that fold unquoted
+    # identifiers to lower case instead of uppercase, such as
+    # MySQL, PostgreSQL, and SQLite.
+    def upcase_identifiers_default
+      true
     end
   end
 end

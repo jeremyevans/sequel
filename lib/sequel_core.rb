@@ -83,26 +83,19 @@ module Sequel
   # and speed is a priority, you may want to set this to true:
   #
   #   Sequel.single_threaded = true
-  #
-  # Note that some database adapters (e.g. MySQL) have issues with single threaded mode if
-  # you try to perform more than one query simultaneously.  For example, the
-  # following code will not work well in single threaded mode on MySQL:
-  #
-  #   DB[:items].each{|i| DB[:nodes].filter(:item_id=>i[:id]).each{|n| puts "#{i} #{n}"}}
-  #
-  # Basically, you can't issue another query inside a call to Dataset#each in single
-  # threaded mode.  There is a fairly easy fix, just use Dataset#all inside
-  # Dataset#each for the outer query:
-  #
-  #   DB[:items].all{|i| DB[:nodes].filter(:item_id=>i[:id]).each{|n| puts "#{i} #{n}"}}
-  #
-  # Dataset#all gets all of the returned objects before calling the block, so the query
-  # isn't left open. Some of the adapters do this internally, and thus don't have a
-  # problem issuing queries inside of Dataset#each.
   def self.single_threaded=(value)
     Database.single_threaded = value
   end
 
+  # Set whether to upcase identifiers for all databases by default. By default,
+  # Sequel upcases identifiers unless the database folds unquoted identifiers to
+  # lower case (MySQL, PostgreSQL, and SQLite).
+  #
+  #   Sequel.upcase_identifiers = false
+  def self.upcase_identifiers=(value)
+    Database.upcase_identifiers = value
+  end
+  
   # Always returns false, since ParseTree support has been removed.
   def self.use_parse_tree
     false

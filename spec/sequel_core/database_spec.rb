@@ -6,6 +6,7 @@ context "A new Database" do
   end
   teardown do
     Sequel.quote_identifiers = false
+    Sequel.upcase_identifiers = false
   end
   
   specify "should receive options" do
@@ -39,13 +40,25 @@ context "A new Database" do
     cc.should == 1234
   end
 
-  specify "should respect the :quote_identifiers and :single_threaded options" do
-    db = Sequel::Database.new(:quote_identifiers=>false, :single_threaded=>true)
-    db.quote_identifiers?.should == false
+  specify "should respect the :single_threaded option" do
+    db = Sequel::Database.new(:single_threaded=>true)
     db.pool.should be_a_kind_of(Sequel::SingleThreadedPool)
-    db = Sequel::Database.new(:quote_identifiers=>true, :single_threaded=>false)
-    db.quote_identifiers?.should == true
+    db = Sequel::Database.new(:single_threaded=>false)
     db.pool.should be_a_kind_of(Sequel::ConnectionPool)
+  end
+
+  specify "should respect the :quote_identifiers option" do
+    db = Sequel::Database.new(:quote_identifiers=>false)
+    db.quote_identifiers?.should == false
+    db = Sequel::Database.new(:quote_identifiers=>true)
+    db.quote_identifiers?.should == true
+  end
+
+  specify "should respect the :upcase_identifiers option" do
+    db = Sequel::Database.new(:upcase_identifiers=>false)
+    db.upcase_identifiers?.should == false
+    db = Sequel::Database.new(:upcase_identifiers=>true)
+    db.upcase_identifiers?.should == true
   end
 
   specify "should use the default Sequel.quote_identifiers value" do
@@ -57,6 +70,26 @@ context "A new Database" do
     Sequel::Database.new({}).quote_identifiers?.should == true
     Sequel::Database.quote_identifiers = false
     Sequel::Database.new({}).quote_identifiers?.should == false
+  end
+
+  specify "should use the default Sequel.upcase_identifiers value" do
+    Sequel.upcase_identifiers = true
+    Sequel::Database.new({}).upcase_identifiers?.should == true
+    Sequel.upcase_identifiers = false
+    Sequel::Database.new({}).upcase_identifiers?.should == false
+    Sequel::Database.upcase_identifiers = true
+    Sequel::Database.new({}).upcase_identifiers?.should == true
+    Sequel::Database.upcase_identifiers = false
+    Sequel::Database.new({}).upcase_identifiers?.should == false
+  end
+
+  specify "should respect the upcase_indentifiers_default method if Sequel.upcase_identifiers = nil" do
+    Sequel.upcase_identifiers = nil
+    Sequel::Database.new({}).upcase_identifiers?.should == true
+    x = Class.new(Sequel::Database){def upcase_identifiers_default; false end}
+    x.new({}).upcase_identifiers?.should == false
+    y = Class.new(Sequel::Database){def upcase_identifiers_default; true end}
+    y.new({}).upcase_identifiers?.should == true
   end
 
   specify "should just use a :uri option for jdbc with the full connection string" do
