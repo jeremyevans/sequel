@@ -70,6 +70,7 @@ module Sequel
           conn = super(conn)
           conn.extend(Sequel::JDBC::Postgres::AdapterMethods)
           conn.db = self
+          conn.apply_connection_settings
           conn
         end
         

@@ -1,5 +1,7 @@
 === HEAD
 
+* Set standard_conforming_strings = ON by default when using PostgreSQL, turn off with Sequel::Postgres.force_standard_strings = false (jeremyevans) (#247)
+
 * Fix Database#rename_table when using PostgreSQL (jeremyevans) (#248)
 
 * Whether to upcase or quote identifiers can now be set separately, via Sequel.upcase_identifiers= or the :upcase_identifiers database option (jeremyevans)

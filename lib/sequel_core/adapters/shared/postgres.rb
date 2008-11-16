@@ -4,6 +4,15 @@ module Sequel
     # uses NativeExceptions, the native adapter uses PGError.
     CONVERTED_EXCEPTIONS = []
     
+    @force_standard_strings = true
+
+    # By default, Sequel forces the use of standard strings, so that
+    # '\\' is interpreted as '\\' and not '\\'.  While PostgreSQL defaults
+    # to interpreting plain strings as extended strings, this will change
+    # in a future version of PostgreSQL.  Sequel assumes that SQL standard
+    # strings will be used.
+    metaattr_accessor :force_standard_strings
+
     # Methods shared by adapter/connection instances.
     module AdapterMethods
       attr_writer :db
@@ -57,6 +66,20 @@ module Sequel
       # to implement multi-level transactions with savepoints.
       attr_accessor :transaction_depth
       
+      # Apply connection settings for this connection. Currently, turns
+      # standard_conforming_strings ON if Postgres.force_standard_strings
+      # is true.
+      def apply_connection_settings
+        if Postgres.force_standard_strings
+          sql = "SET standard_conforming_strings = ON"
+          @db.log_info(sql)
+          # This setting will only work on PostgreSQL 8.2 or greater
+          # and we don't know the server version at this point, so
+          # try it unconditionally and rescue any errors.
+          execute(sql) rescue nil
+        end
+      end
+
       # Get the last inserted value for the given sequence.
       def last_insert_id(sequence)
         sql = SELECT_CURRVAL % sequence
@@ -64,6 +87,15 @@ module Sequel
         execute(sql) do |r|
           val = single_value(r)
           return val.to_i if val
+        end
+      end
+      
+      # Get the primary key for the given table.
+      def primary_key(schema, table)
+        sql = SELECT_PK % [schema, table]
+        @db.log_info(sql)
+        execute(sql) do |r|
+          return single_value(r)
         end
       end
       
@@ -77,15 +109,6 @@ module Sequel
         end
         
         sql = SELECT_CUSTOM_SEQUENCE % [schema, table]
-        @db.log_info(sql)
-        execute(sql) do |r|
-          return single_value(r)
-        end
-      end
-      
-      # Get the primary key for the given table.
-      def primary_key(schema, table)
-        sql = SELECT_PK % [schema, table]
         @db.log_info(sql)
         execute(sql) do |r|
           return single_value(r)
@@ -456,8 +479,10 @@ module Sequel
         case v
         when LiteralString
           v
+        when SQL::Blob
+          db.synchronize{|c| "E'#{c.escape_bytea(v)}'"}
         when String
-          db.synchronize{|c| "'#{SQL::Blob === v ? c.escape_bytea(v) : c.escape_string(v)}'"}
+          db.synchronize{|c| "'#{c.escape_string(v)}'"}
         when Time
           "#{v.strftime(PG_TIMESTAMP_FORMAT)}.#{sprintf("%06d",v.usec)}'"
         when DateTime
