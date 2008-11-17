@@ -58,7 +58,6 @@ module Sequel
       @opts = opts
       
       @quote_identifiers = opts.include?(:quote_identifiers) ? opts[:quote_identifiers] : @@quote_identifiers
-      @upcase_identifiers = opts.include?(:upcase_identifiers) ? opts[:upcase_identifiers] : (@@upcase_identifiers.nil? ? upcase_identifiers_default : @@upcase_identifiers)
       @single_threaded = opts.include?(:single_threaded) ? opts[:single_threaded] : @@single_threaded
       @schemas = nil
       @prepared_statements = {}
@@ -475,7 +474,7 @@ module Sequel
 
     # Returns true if the database upcases identifiers.
     def upcase_identifiers?
-      @upcase_identifiers
+      @upcase_identifiers ||= @opts.include?(:upcase_identifiers) ? @opts[:upcase_identifiers] : (@@upcase_identifiers.nil? ? upcase_identifiers_default : @@upcase_identifiers)
     end
     
     # Returns the URI identifying the database.

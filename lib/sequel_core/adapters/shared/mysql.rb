@@ -20,7 +20,7 @@ module Sequel
         when :set_column_type
           "ALTER TABLE #{quote_schema_table(table)} CHANGE COLUMN #{quote_identifier(op[:name])} #{quote_identifier(op[:name])} #{type_literal(op)}"
         when :drop_index
-          "#{drop_index_sql(table, op)} ON #{quoted_table}"
+          "#{drop_index_sql(table, op)} ON #{quote_schema_table(table)}"
         else
           super(table, op)
         end
@@ -80,7 +80,7 @@ module Sequel
 
       # Use the MySQL specific DESCRIBE syntax to get a table description.
       def schema_parse_table(table_name, opts)
-        self["DESCRIBE ?", table_name].map do |row|
+        self["DESCRIBE ?", SQL::Identifier.new(table_name)].map do |row|
           row.delete(:Extra)
           row[:allow_null] = row.delete(:Null) == 'YES'
           row[:default] = row.delete(:Default)
