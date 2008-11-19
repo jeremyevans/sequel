@@ -35,6 +35,8 @@ module Sequel
     end
   
     module DatasetMethods
+      SELECT_CLAUSE_ORDER = %w'intersect except limit distinct columns from with join where group order having union'.freeze
+
       def complex_expression_sql(op, args)
         case op
         when :'||'
@@ -75,72 +77,31 @@ module Sequel
         "[#{name}]"
       end
 
-      # Formats a SELECT statement using the given options and the dataset
-      # options.
-      def select_sql(opts = nil)
-        opts = opts ? @opts.merge(opts) : @opts
+      private
 
-        if sql = opts[:sql]
-          return sql
-        end
+      def select_clause_order
+        SELECT_CLAUSE_ORDER
+      end
 
-        # ADD TOP to SELECT string for LIMITS
-        if limit = opts[:limit]
-          top = "TOP #{limit} "
-          raise Error, "Offset not supported" if opts[:offset]
-        end
+      # EXCEPT is not supported by MSSQL
+      def select_except_sql(sql, opts)
+        raise(Error, "EXCEPT not supported") if opts[:except]
+      end
 
-        columns = opts[:select]
-        # We had to reference const WILDCARD with its full path, because
-        # the Ruby constant scope rules played against us (it was resolving it
-        # as Sequel::Dataset::DatasetMethods::WILDCARD).
-        select_columns = columns ? column_list(columns) : Sequel::Dataset::WILDCARD
+      # INTERSET is not supported by MSSQL
+      def select_intersect_sql(sql, opts)
+        raise(Error, "INTERSECT not supported") if opts[:intersect]
+      end
 
-        if distinct = opts[:distinct]
-          distinct_clause = distinct.empty? ? "DISTINCT" : "DISTINCT ON (#{expression_list(distinct)})"
-          sql = "SELECT #{top}#{distinct_clause} #{select_columns}"
-        else
-          sql = "SELECT #{top}#{select_columns}"
-        end
+      # MSSQL uses TOP for limit, with no offset support
+      def select_limit_sql(sql, opts)
+        raise(Error, "OFFSET not supported") if opts[:offset]
+        sql << " TOP #{opts[:limit]}" if opts[:limit]
+      end
 
-        if opts[:from]
-          sql << " FROM #{source_list(opts[:from])}"
-        end
-
-        # ADD WITH to SELECT string for NOLOCK
-        if with = opts[:with]
-          sql << " WITH #{with}"
-        end
-
-        if join = opts[:join]
-          join.each{|j| sql << literal(j)}
-        end
-
-        if where = opts[:where]
-          sql << " WHERE #{literal(where)}"
-        end
-
-        if group = opts[:group]
-          sql << " GROUP BY #{expression_list(group)}"
-        end
-
-        if order = opts[:order]
-          sql << " ORDER BY #{expression_list(order)}"
-        end
-
-        if having = opts[:having]
-          sql << " HAVING #{literal(having)}"
-        end
-
-        if union = opts[:union]
-          sql << (opts[:union_all] ? \
-            " UNION ALL #{union.sql}" : " UNION #{union.sql}")
-        end
-        
-        raise Error, "Intersect not supported" if opts[:intersect]
-        raise Error, "Except not supported" if opts[:except]
-        
-        sql
+      # MSSQL uses the WITH statement to lock tables
+      def select_with_sql(sql, opts)
+        sql << " WITH #{opts[:with]}" if opts[:with]
       end
     end
   end

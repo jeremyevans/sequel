@@ -12,6 +12,7 @@ module Sequel
     NULL = "NULL".freeze
     QUESTION_MARK = '?'.freeze
     STOCK_COUNT_OPTS = {:select => ["COUNT(*)".lit], :order => nil}.freeze
+    SELECT_CLAUSE_ORDER = %w'distinct columns from join where group having order limit union intersect except'.freeze
     TIMESTAMP_FORMAT = "TIMESTAMP '%Y-%m-%d %H:%M:%S'".freeze
     TWO_ARITY_OPERATORS = ::Sequel::SQL::ComplexExpression::TWO_ARITY_OPERATORS
     WILDCARD = '*'.freeze
@@ -607,63 +608,9 @@ module Sequel
     # options.
     def select_sql(opts = nil)
       opts = opts ? @opts.merge(opts) : @opts
-      
-      if sql = opts[:sql]
-        return sql
-      end
-
-      columns = opts[:select]
-      select_columns = columns ? column_list(columns) : WILDCARD
-
-      if distinct = opts[:distinct]
-        distinct_clause = distinct.empty? ? "DISTINCT" : "DISTINCT ON (#{expression_list(distinct)})"
-        sql = "SELECT #{distinct_clause} #{select_columns}"
-      else
-        sql = "SELECT #{select_columns}"
-      end
-      
-      if opts[:from]
-        sql << " FROM #{source_list(opts[:from])}"
-      end
-      
-      if join = opts[:join]
-        join.each{|j| sql << literal(j)}
-      end
-
-      if where = opts[:where]
-        sql << " WHERE #{literal(where)}"
-      end
-
-      if group = opts[:group]
-        sql << " GROUP BY #{expression_list(group)}"
-      end
-
-      if having = opts[:having]
-        sql << " HAVING #{literal(having)}"
-      end
-
-      if order = opts[:order]
-        sql << " ORDER BY #{expression_list(order)}"
-      end
-
-      if limit = opts[:limit]
-        sql << " LIMIT #{limit}"
-        if offset = opts[:offset]
-          sql << " OFFSET #{offset}"
-        end
-      end
-
-      if union = opts[:union]
-        sql << (opts[:union_all] ? \
-          " UNION ALL #{union.sql}" : " UNION #{union.sql}")
-      elsif intersect = opts[:intersect]
-        sql << (opts[:intersect_all] ? \
-          " INTERSECT ALL #{intersect.sql}" : " INTERSECT #{intersect.sql}")
-      elsif except = opts[:except]
-        sql << (opts[:except_all] ? \
-          " EXCEPT ALL #{except.sql}" : " EXCEPT #{except.sql}")
-      end
-
+      return opts[:sql] if opts[:sql]
+      sql = 'SELECT'
+      select_clause_order.each{|x| send("select_#{x}_sql", sql, opts)}
       sql
     end
 
@@ -785,7 +732,7 @@ module Sequel
     # Converts an array of column names into a comma seperated string of 
     # column names. If the array is empty, a wildcard (*) is returned.
     def column_list(columns)
-      if columns.empty?
+      if columns.blank?
         WILDCARD
       else
         m = columns.map do |i|
@@ -879,6 +826,74 @@ module Sequel
       else
         column
       end
+    end
+
+    # The order of methods to call to build the SELECT SQL statement
+    def select_clause_order
+      SELECT_CLAUSE_ORDER
+    end
+
+    # Modify the sql to add the columns selected
+    def select_columns_sql(sql, opts)
+      sql << " #{column_list(opts[:select])}"
+    end
+
+    # Modify the sql to add the DISTINCT modifier
+    def select_distinct_sql(sql, opts)
+      if distinct = opts[:distinct]
+        sql << " DISTINCT#{" ON (#{expression_list(distinct)})" unless distinct.empty?}"
+      end
+    end
+
+    # Modify the sql to add a dataset to the EXCEPT clause
+    def select_except_sql(sql, opts)
+      sql << " EXCEPT#{' ALL' if opts[:except_all]} #{opts[:except].sql}" if opts[:except]
+    end
+
+    # Modify the sql to add the list of tables to select FROM
+    def select_from_sql(sql, opts)
+      sql << " FROM #{source_list(opts[:from])}" if opts[:from]
+    end
+
+    # Modify the sql to add the expressions to GROUP BY
+    def select_group_sql(sql, opts)
+      sql << " GROUP BY #{expression_list(opts[:group])}" if opts[:group]
+    end
+
+    # Modify the sql to add the filter criteria in the HAVING clause
+    def select_having_sql(sql, opts)
+      sql << " HAVING #{literal(opts[:having])}" if opts[:having]
+    end
+
+    # Modify the sql to add a dataset to the INTERSECT clause
+    def select_intersect_sql(sql, opts)
+      sql << " INTERSECT#{' ALL' if opts[:intersect_all]} #{opts[:intersect].sql}" if opts[:intersect]
+    end
+
+    # Modify the sql to add the list of tables to JOIN to
+    def select_join_sql(sql, opts)
+      opts[:join].each{|j| sql << literal(j)} if opts[:join]
+    end
+
+    # Modify the sql to limit the number of rows returned and offset
+    def select_limit_sql(sql, opts)
+      sql << " LIMIT #{opts[:limit]}" if opts[:limit]
+      sql << " OFFSET #{opts[:offset]}" if opts[:offset]
+    end
+
+    # Modify the sql to add the expressions to ORDER BY
+    def select_order_sql(sql, opts)
+      sql << " ORDER BY #{expression_list(opts[:order])}" if opts[:order]
+    end
+
+    # Modify the sql to add a dataset to the UNION clause
+    def select_union_sql(sql, opts)
+      sql << " UNION#{' ALL' if opts[:union_all]} #{opts[:union].sql}" if opts[:union]
+    end
+
+    # Modify the sql to add the filter criteria in the WHERE clause
+    def select_where_sql(sql, opts)
+      sql << " WHERE #{literal(opts[:where])}" if opts[:where]
     end
 
     # Converts an array of source names into into a comma separated list.

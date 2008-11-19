@@ -1,5 +1,7 @@
 === HEAD
 
+* Make MySQL and Oracle adapters raise an Error if asked to do a SELECT DISTINCT ON (jeremyevans)
+
 * Set standard_conforming_strings = ON by default when using PostgreSQL, turn off with Sequel::Postgres.force_standard_strings = false (jeremyevans) (#247)
 
 * Fix Database#rename_table when using PostgreSQL (jeremyevans) (#248)

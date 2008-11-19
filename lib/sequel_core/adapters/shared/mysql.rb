@@ -253,6 +253,16 @@ module Sequel
 
         sql
       end
+
+      private
+
+      # MySQL doesn't support DISTINCT ON
+      def select_distinct_sql(sql, opts)
+        if opts[:distinct]
+          raise(Error, "DISTINCT ON not supported by MySQL") unless opts[:distinct].empty?
+          sql << " DISTINCT"
+        end
+      end
     end
   end
 end

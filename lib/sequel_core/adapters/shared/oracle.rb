@@ -13,69 +13,35 @@ module Sequel
     end
     
     module DatasetMethods
+      SELECT_CLAUSE_ORDER = %w'distinct columns from join where group having union intersect except order limit'.freeze
+
       def empty?
         db[:dual].where(exists).get(1) == nil
       end
 
-      # Formats a SELECT statement using the given options and the dataset
-      # options.
-      def select_sql(opts = nil)
-        opts = opts ? @opts.merge(opts) : @opts
+      private
 
-        if sql = opts[:sql]
-          return sql
-        end
+      def select_clause_order
+        SELECT_CLAUSE_ORDER
+      end
 
-        columns = opts[:select]
-        select_columns = columns ? column_list(columns) : '*'
-        sql = opts[:distinct] ? \
-        "SELECT DISTINCT #{select_columns}" : \
-        "SELECT #{select_columns}"
-        
-        if opts[:from]
-          sql << " FROM #{source_list(opts[:from])}"
+      # Oracle doesn't support DISTINCT ON
+      def select_distinct_sql(sql, opts)
+        if opts[:distinct]
+          raise(Error, "DISTINCT ON not supported by Oracle") unless opts[:distinct].empty?
+          sql << " DISTINCT"
         end
-        
-        if join = opts[:join]
-          join.each{|j| sql << literal(j)}
-        end
+      end
 
-        if where = opts[:where]
-          sql << " WHERE #{literal(where)}"
-        end
-
-        if group = opts[:group]
-          sql << " GROUP BY #{expression_list(group)}"
-        end
-
-        if having = opts[:having]
-          sql << " HAVING #{literal(having)}"
-        end
-
-        if union = opts[:union]
-          sql << (opts[:union_all] ? \
-            " UNION ALL #{union.sql}" : " UNION #{union.sql}")
-        elsif intersect = opts[:intersect]
-          sql << (opts[:intersect_all] ? \
-            " INTERSECT ALL #{intersect.sql}" : " INTERSECT #{intersect.sql}")
-        elsif except = opts[:except]
-          sql << (opts[:except_all] ? \
-            " EXCEPT ALL #{except.sql}" : " EXCEPT #{except.sql}")
-        end
-
-        if order = opts[:order]
-          sql << " ORDER BY #{expression_list(order)}"
-        end
-
+      # Oracle requires a subselect to do limit and offset
+      def select_limit_sql(sql, opts)
         if limit = opts[:limit]
           if (offset = opts[:offset]) && (offset > 0)
-            sql = "SELECT * FROM (SELECT raw_sql_.*, ROWNUM raw_rnum_ FROM(#{sql}) raw_sql_ WHERE ROWNUM <= #{limit + offset}) WHERE raw_rnum_ > #{offset}"
+            sql.replace("SELECT * FROM (SELECT raw_sql_.*, ROWNUM raw_rnum_ FROM(#{sql}) raw_sql_ WHERE ROWNUM <= #{limit + offset}) WHERE raw_rnum_ > #{offset}")
           else
-            sql = "SELECT * FROM (#{sql}) WHERE ROWNUM <= #{limit}"
+            sql.replace("SELECT * FROM (#{sql}) WHERE ROWNUM <= #{limit}")
           end
         end
-
-        sql
       end
     end
   end

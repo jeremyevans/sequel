@@ -39,6 +39,8 @@ module Sequel
     end
     
     class Dataset < Sequel::Dataset
+      SELECT_CLAUSE_ORDER = %w'limit distinct columns from join where group having order union intersect except'.freeze
+
       def literal(v)
         case v
         when Time
@@ -50,18 +52,6 @@ module Sequel
         end
       end
 
-      def select_sql(opts = nil)
-        limit = opts.delete(:limit)
-        offset = opts.delete(:offset)
-        sql = super
-        if limit
-          limit = "FIRST #{limit}"
-          offset = offset ? "SKIP #{offset}" : ""
-          sql.sub!(/^select /i,"SELECT #{offset} #{limit} ")
-        end
-        sql
-      end
-      
       def fetch_rows(sql, &block)
         execute(sql) do |cursor|
           begin
@@ -71,6 +61,17 @@ module Sequel
           end
         end
         self
+      end
+
+      private
+
+      def select_clause_order
+        SELECT_CLAUSE_ORDER
+      end
+
+      def select_limit_sql(sql, opts)
+        sql << " SKIP #{opts[:offset]}" if opts[:offset]
+        sql << " FIRST #{opts[:limit]}" if opts[:limit]
       end
     end
   end

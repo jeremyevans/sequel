@@ -399,6 +399,7 @@ module Sequel
       QUERY_PLAN = 'QUERY PLAN'.to_sym
       ROW_EXCLUSIVE = 'ROW EXCLUSIVE'.freeze
       ROW_SHARE = 'ROW SHARE'.freeze
+      SELECT_CLAUSE_ORDER = %w'distinct columns from join where group having order limit union intersect except lock'.freeze
       SHARE = 'SHARE'.freeze
       SHARE_ROW_EXCLUSIVE = 'SHARE ROW EXCLUSIVE'.freeze
       SHARE_UPDATE_EXCLUSIVE = 'SHARE UPDATE EXCLUSIVE'.freeze
@@ -518,19 +519,6 @@ module Sequel
         ["INSERT INTO #{source_list(@opts[:from])} (#{identifier_list(columns)}) VALUES #{values}"]
       end
       
-      # Support lock mode, allowing FOR SHARE and FOR UPDATE queries.
-      def select_sql(opts = nil)
-        row_lock_mode = opts ? opts[:lock] : @opts[:lock]
-        sql = super
-        case row_lock_mode
-        when :update
-          sql << FOR_UPDATE
-        when :share
-          sql << FOR_SHARE
-        end
-        sql
-      end
-      
       private
       
       # Call execute_insert on the database object with the given values.
@@ -544,6 +532,21 @@ module Sequel
         insert_returning_sql(pk ? Sequel::SQL::Identifier.new(pk) : 'NULL'.lit, *values)
       end
 
+      # The order of clauses in the SELECT SQL statement
+      def select_clause_order
+        SELECT_CLAUSE_ORDER
+      end
+
+      # Support lock mode, allowing FOR SHARE and FOR UPDATE queries.
+      def select_lock_sql(sql, opts)
+        case opts[:lock]
+        when :update
+          sql << FOR_UPDATE
+        when :share
+          sql << FOR_SHARE
+        end
+      end
+      
       # The version of the database server
       def server_version
         db.server_version(@opts[:server])
