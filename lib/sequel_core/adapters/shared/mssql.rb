@@ -88,7 +88,7 @@ module Sequel
         raise(Error, "EXCEPT not supported") if opts[:except]
       end
 
-      # INTERSET is not supported by MSSQL
+      # INTERSECT is not supported by MSSQL
       def select_intersect_sql(sql, opts)
         raise(Error, "INTERSECT not supported") if opts[:intersect]
       end
