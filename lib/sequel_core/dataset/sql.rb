@@ -845,8 +845,11 @@ module Sequel
     def qualified_column_name(column, table)
       if Symbol === column 
         c_table, column, c_alias = split_symbol(column)
-        schema, table, t_alias = split_symbol(table) if Symbol === table
-        c_table ||= t_alias || table
+        unless c_table
+          schema, table, t_alias = split_symbol(table) if Symbol === table
+          t_alias = schema ? Sequel::SQL::QualifiedIdentifier.new(schema, table) : table unless t_alias
+          c_table = t_alias
+        end
         ::Sequel::SQL::QualifiedIdentifier.new(c_table, column)
       else
         column

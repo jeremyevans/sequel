@@ -1309,6 +1309,18 @@ context "Dataset#join_table" do
       'SELECT * FROM "foo" AS "f" INNER JOIN "bar" ON ("bar"."id" = "f"."bar_id")'
   end
   
+  specify "should support implicit schemas in from table symbols" do
+    @d.from(:s__t).join(:u__v, {:id => :player_id}).sql.should ==
+      'SELECT * FROM "s"."t" INNER JOIN "u"."v" ON ("u"."v"."id" = "s"."t"."player_id")'
+  end
+
+  specify "should support implicit aliases in from table symbols" do
+    @d.from(:t___z).join(:v___y, {:id => :player_id}).sql.should ==
+      'SELECT * FROM "t" AS "z" INNER JOIN "v" AS "y" ON ("y"."id" = "z"."player_id")'
+    @d.from(:s__t___z).join(:u__v___y, {:id => :player_id}).sql.should ==
+      'SELECT * FROM "s"."t" AS "z" INNER JOIN "u"."v" AS "y" ON ("y"."id" = "z"."player_id")'
+  end
+  
   specify "should support the :implicit_qualifier option" do
     @d.from('stats').join('players', {:id => :player_id}, :implicit_qualifier=>:p).sql.should ==
       'SELECT * FROM "stats" INNER JOIN "players" ON ("players"."id" = "p"."player_id")'
