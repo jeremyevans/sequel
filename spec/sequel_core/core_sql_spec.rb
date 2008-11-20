@@ -259,6 +259,11 @@ context "Symbol#*" do
     :xyz.*(3).to_s(@ds).should == '(xyz * 3)'
     :abc.*(5).to_s(@ds).should == '(abc * 5)'
   end
+
+  specify "should support qualified symbols if no argument" do
+    :xyz__abc.*.to_s(@ds).should == 'xyz.abc.*'
+  end
+
 end
 
 context "Symbol" do

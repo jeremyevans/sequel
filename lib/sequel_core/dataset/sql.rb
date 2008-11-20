@@ -47,7 +47,7 @@ module Sequel
 
     # SQL fragment for specifying all columns in a given table.
     def column_all_sql(ca)
-      "#{quote_identifier(ca.table)}.*"
+      "#{quote_schema_table(ca.table)}.*"
     end
 
     # SQL fragment for complex expressions
@@ -573,6 +573,13 @@ module Sequel
     end
     alias_method :quote_column_ref, :quote_identifier
 
+    # Separates the schema from the table and returns a string with them
+    # quoted (if quoting identifiers)
+    def quote_schema_table(table)
+      schema, table = schema_and_table(table)
+      "#{"#{quote_identifier(schema)}." if schema}#{quote_identifier(table)}"
+    end
+
     # This method quotes the given name with the SQL standard double quote. 
     # should be overridden by subclasses to provide quoting not matching the
     # SQL standard, such as backtick (used by MySQL and SQLite).
@@ -586,6 +593,24 @@ module Sequel
       order(*invert_order(order.empty? ? @opts[:order] : order))
     end
     alias_method :reverse, :reverse_order
+
+    # Split the schema information from the table
+    def schema_and_table(table_name)
+      sch = db.default_schema if db
+      case table_name
+      when Symbol
+        s, t, a = split_symbol(table_name)
+        [s||sch, t]
+      when SQL::QualifiedIdentifier
+        [table_name.table, table_name.column]
+      when SQL::Identifier
+        [sch, table_name.value]
+      when String
+        [sch, table_name]
+      else
+        raise Error, 'table_name should be a Symbol, SQL::QualifiedIdentifier, SQL::Identifier, or String'
+      end
+    end
 
     # Returns a copy of the dataset with the columns selected changed
     # to the given columns.

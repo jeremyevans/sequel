@@ -32,6 +32,9 @@ module Sequel
     # Whether to upcase identifiers (columns and tables) by default
     @@upcase_identifiers = nil
 
+    # The default schema to use
+    attr_accessor :default_schema
+
     # Array of SQL loggers to use for this database
     attr_accessor :loggers
 
@@ -54,12 +57,21 @@ module Sequel
     # options hash.
     #
     # Sequel::Database is an abstract class that is not useful by itself.
+    #
+    # Takes the following options:
+    # * :default_schema : The default schema to use, should generally be nil
+    # * :loggers : An array of loggers to use.
+    # * :quote_identifiers : Whether to quote identifiers
+    # * :single_threaded : Whether to use a single-threaded connection pool
+    #
+    # All options given are also passed to the ConnectionPool.
     def initialize(opts = {}, &block)
       @opts = opts
       
       @quote_identifiers = opts.include?(:quote_identifiers) ? opts[:quote_identifiers] : @@quote_identifiers
       @single_threaded = opts.include?(:single_threaded) ? opts[:single_threaded] : @@single_threaded
       @schemas = nil
+      @default_schema = opts[:default_schema]
       @prepared_statements = {}
       @transactions = []
       @pool = (@single_threaded ? SingleThreadedPool : ConnectionPool).new(connection_pool_default_options.merge(opts), &block)
@@ -515,11 +527,6 @@ module Sequel
       {}
     end
     
-    # Sequel doesn't use database schema's by default.
-    def default_schema
-      nil
-    end
-
     # SQL to ROLLBACK a transaction.
     def rollback_transaction_sql
       SQL_ROLLBACK
@@ -539,19 +546,7 @@ module Sequel
     
     # Split the schema information from the table
     def schema_and_table(table_name)
-      case table_name
-      when Symbol
-        s, t, a = dataset.send(:split_symbol, table_name)
-        [s||default_schema, t]
-      when SQL::QualifiedIdentifier
-        [table_name.table, table_name.column]
-      when SQL::Identifier
-        [default_schema, table_name.value]
-      when String
-        [default_schema, table_name]
-      else
-        raise Error, 'table_name should be a Symbol, SQL::QualifiedIdentifier, SQL::Identifier, or String'
-      end
+      schema_utility_dataset.schema_and_table(table_name)
     end
 
     # Return the options for the given server by merging the generic

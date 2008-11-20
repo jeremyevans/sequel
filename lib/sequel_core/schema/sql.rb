@@ -187,9 +187,9 @@ module Sequel
         end
       end
       
+      # Proxy the quote_schema_table method to the dataset
       def quote_schema_table(table)
-        schema, table = schema_and_table(table)
-        "#{"#{quote_identifier(schema)}." if schema}#{quote_identifier(table)}"
+        schema_utility_dataset.quote_schema_table(table)
       end
       
       # Proxy the quote_identifier method to the dataset, used for quoting tables and columns.

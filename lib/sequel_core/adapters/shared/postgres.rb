@@ -133,11 +133,6 @@ module Sequel
         @default_schema ||= :public
       end
       
-      # Set a new default schema to use.
-      def default_schema=(schema)
-        @default_schema = schema
-      end
-      
       # Remove the cached entries for primary keys and sequences when dropping a table.
       def drop_table(*names)
         names.each do |name|
