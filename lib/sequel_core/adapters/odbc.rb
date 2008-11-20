@@ -14,6 +14,9 @@ module Sequel
         when 'mssql'
           require 'sequel_core/adapters/shared/mssql'
           extend Sequel::MSSQL::DatabaseMethods
+        when 'progress'
+          require 'sequel_core/adapters/shared/progress'
+          extend Sequel::Progress::DatabaseMethods
         end
       end
 

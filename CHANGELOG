@@ -1,5 +1,7 @@
 === HEAD
 
+* Add a subadapter for the Progress RDBMS to the ODBC adapter (:db_type=>'progress') (groveriffic) (#251)
+
 * Make MySQL and Oracle adapters raise an Error if asked to do a SELECT DISTINCT ON (jeremyevans)
 
 * Set standard_conforming_strings = ON by default when using PostgreSQL, turn off with Sequel::Postgres.force_standard_strings = false (jeremyevans) (#247)
