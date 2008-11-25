@@ -220,3 +220,25 @@ context "Joined Oracle dataset" do
     ]      
   end  
 end
+
+context "Oracle aliasing" do
+  setup do
+    @d1 = ORACLE_DB[:books]
+    @d1.delete # remove all records
+    @d1 << {:id => 1, :title => 'aaa', :category_id => 100}
+    @d1 << {:id => 2, :title => 'bbb', :category_id => 100}
+    @d1 << {:id => 3, :title => 'bbb', :category_id => 100}
+  end
+
+  specify "should allow columns to be renamed" do
+    @d1.select(:title.as(:name)).order_by(:id).to_a.should == [
+      { :name => 'aaa' },
+      { :name => 'bbb' },
+      { :name => 'bbb' },
+    ]
+  end
+
+  specify "nested queries should work" do
+    @d1.select(:title).group_by(:title).count.should == 2
+  end
+end

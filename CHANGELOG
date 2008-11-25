@@ -1,5 +1,7 @@
 === HEAD
 
+* Support aliasing subselects in the Oracle adapter (jeremyevans)
+
 * Add a subadapter for the Progress RDBMS to the ODBC adapter (:db_type=>'progress') (groveriffic) (#251)
 
 * Make MySQL and Oracle adapters raise an Error if asked to do a SELECT DISTINCT ON (jeremyevans)

@@ -21,6 +21,12 @@ module Sequel
 
       private
 
+      # Oracle doesn't support the use of AS when aliasing a dataset.  It doesn't require
+      # the use of AS anywhere, so this disables it in all cases.
+      def as_sql(expression, aliaz)
+        "#{expression} #{quote_identifier(aliaz)}"
+      end
+
       def select_clause_order
         SELECT_CLAUSE_ORDER
       end
