@@ -71,7 +71,7 @@ context "An Oracle dataset" do
       {:name => 'def'}
     ]
            
-    @d.order(:value.DESC).limit(1).to_a.should == [
+    @d.order(:value.desc).limit(1).to_a.should == [
       {:name => 'def', :value => 789}                                        
     ]
 
@@ -80,7 +80,7 @@ context "An Oracle dataset" do
       {:name => 'abc', :value => 456} 
     ]
     
-    @d.order(:value.DESC).filter(:name => 'abc').to_a.should == [
+    @d.order(:value.desc).filter(:name => 'abc').to_a.should == [
       {:name => 'abc', :value => 456},
       {:name => 'abc', :value => 123} 
     ]
@@ -89,7 +89,7 @@ context "An Oracle dataset" do
       {:name => 'abc', :value => 123}                                        
     ]
         
-    @d.filter(:name => 'abc').order(:value.DESC).limit(1).to_a.should == [
+    @d.filter(:name => 'abc').order(:value.desc).limit(1).to_a.should == [
       {:name => 'abc', :value => 456}                                        
     ]
     
@@ -214,7 +214,7 @@ context "Joined Oracle dataset" do
       {:id => 4, :title => 'ddd', :cat_name => nil} 
     ]
     
-    @d1.left_outer_join(:categories, :id => :category_id).select(:books__id, :title, :cat_name).order(:books__id.DESC).limit(2, 0).to_a.should == [      
+    @d1.left_outer_join(:categories, :id => :category_id).select(:books__id, :title, :cat_name).order(:books__id.desc).limit(2, 0).to_a.should == [      
       {:id => 4, :title => 'ddd', :cat_name => nil}, 
       {:id => 3, :title => 'ccc', :cat_name => 'rails'}
     ]      
