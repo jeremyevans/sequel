@@ -846,9 +846,14 @@ module Sequel
       if Symbol === column 
         c_table, column, c_alias = split_symbol(column)
         unless c_table
-          schema, table, t_alias = split_symbol(table) if Symbol === table
-          t_alias = schema ? Sequel::SQL::QualifiedIdentifier.new(schema, table) : table unless t_alias
-          c_table = t_alias
+          case table
+          when Symbol
+            schema, table, t_alias = split_symbol(table)
+            t_alias ||= Sequel::SQL::QualifiedIdentifier.new(schema, table) if schema
+          when Sequel::SQL::AliasedExpression
+            t_alias = table.aliaz
+          end
+          c_table = t_alias || table
         end
         ::Sequel::SQL::QualifiedIdentifier.new(c_table, column)
       else

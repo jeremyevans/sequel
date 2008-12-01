@@ -1321,6 +1321,11 @@ context "Dataset#join_table" do
       'SELECT * FROM "s"."t" AS "z" INNER JOIN "u"."v" AS "y" ON ("y"."id" = "z"."player_id")'
   end
   
+  specify "should support AliasedExpressions" do
+    @d.from(:s.as(:t)).join(:u.as(:v), {:id => :player_id}).sql.should ==
+      'SELECT * FROM "s" AS "t" INNER JOIN "u" AS "v" ON ("v"."id" = "t"."player_id")'
+  end
+
   specify "should support the :implicit_qualifier option" do
     @d.from('stats').join('players', {:id => :player_id}, :implicit_qualifier=>:p).sql.should ==
       'SELECT * FROM "stats" INNER JOIN "players" ON ("players"."id" = "p"."player_id")'

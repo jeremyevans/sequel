@@ -1,5 +1,7 @@
 === HEAD
 
+* Support AliasedExpressions in tables when using implicitly qualified arguments in joins (jeremyevans)
+
 * Support Dataset#except on Oracle (jeremyevans)
 
 * Raise errors when EXCEPT/INTERSECT is used when not supported (jeremyevans)
