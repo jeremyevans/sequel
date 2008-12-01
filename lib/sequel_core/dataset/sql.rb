@@ -12,7 +12,7 @@ module Sequel
     NULL = "NULL".freeze
     QUESTION_MARK = '?'.freeze
     STOCK_COUNT_OPTS = {:select => ["COUNT(*)".lit], :order => nil}.freeze
-    SELECT_CLAUSE_ORDER = %w'distinct columns from join where group having order limit union intersect except'.freeze
+    SELECT_CLAUSE_ORDER = %w'distinct columns from join where group having intersect union except order limit'.freeze
     TIMESTAMP_FORMAT = "TIMESTAMP '%Y-%m-%d %H:%M:%S'".freeze
     TWO_ARITY_OPERATORS = ::Sequel::SQL::ComplexExpression::TWO_ARITY_OPERATORS
     WILDCARD = '*'.freeze

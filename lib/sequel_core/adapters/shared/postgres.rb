@@ -394,7 +394,7 @@ module Sequel
       QUERY_PLAN = 'QUERY PLAN'.to_sym
       ROW_EXCLUSIVE = 'ROW EXCLUSIVE'.freeze
       ROW_SHARE = 'ROW SHARE'.freeze
-      SELECT_CLAUSE_ORDER = %w'distinct columns from join where group having order limit union intersect except lock'.freeze
+      SELECT_CLAUSE_ORDER = %w'distinct columns from join where group having intersect union except order limit lock'.freeze
       SHARE = 'SHARE'.freeze
       SHARE_ROW_EXCLUSIVE = 'SHARE ROW EXCLUSIVE'.freeze
       SHARE_UPDATE_EXCLUSIVE = 'SHARE UPDATE EXCLUSIVE'.freeze

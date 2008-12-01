@@ -1,5 +1,7 @@
 === HEAD
 
+* Fix ordering of UNION, INTERSECT, and EXCEPT statements (jeremyevans) (#253)
+
 * Support aliasing subselects in the Oracle adapter (jeremyevans)
 
 * Add a subadapter for the Progress RDBMS to the ODBC adapter (:db_type=>'progress') (groveriffic) (#251)
