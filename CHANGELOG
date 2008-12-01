@@ -1,5 +1,7 @@
 === HEAD
 
+* Support options when altering a column's type (for changing enums, varchar size, etc.) (jeremyevans)
+
 * Support AliasedExpressions in tables when using implicitly qualified arguments in joins (jeremyevans)
 
 * Support Dataset#except on Oracle (jeremyevans)

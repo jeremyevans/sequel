@@ -628,6 +628,17 @@ context "DB#alter_table" do
     end
     @db.sqls.should == ["ALTER TABLE cats ALTER COLUMN score TYPE real"]
   end
+
+  specify "should support set_column_type with options" do
+    @db.alter_table(:cats) do
+      set_column_type :score, :integer, :unsigned=>true
+      set_column_type :score, :varchar, :size=>30
+      set_column_type :score, :enum, :elements=>['a', 'b']
+    end
+    @db.sqls.should == ["ALTER TABLE cats ALTER COLUMN score TYPE integer UNSIGNED",
+      "ALTER TABLE cats ALTER COLUMN score TYPE varchar(30)",
+      "ALTER TABLE cats ALTER COLUMN score TYPE enum('a', 'b')"]
+  end
 end
 
 context "Schema Parser" do

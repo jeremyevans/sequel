@@ -277,8 +277,8 @@ module Sequel
       end
 
       # Modify a column's type in the DDL for the table.
-      def set_column_type(name, type)
-        @operations << {:op => :set_column_type, :name => name, :type => type}
+      def set_column_type(name, type, opts={})
+        @operations << {:op => :set_column_type, :name => name, :type => type}.merge(opts)
       end
       
       # Modify a column's NOT NULL constraint.

@@ -29,7 +29,7 @@ module Sequel
         when :rename_column
           "RENAME COLUMN #{quoted_name} TO #{quote_identifier(op[:new_name])}"
         when :set_column_type
-          "ALTER COLUMN #{quoted_name} TYPE #{op[:type]}"
+          "ALTER COLUMN #{quoted_name} TYPE #{type_literal(op)}"
         when :set_column_default
           "ALTER COLUMN #{quoted_name} SET DEFAULT #{literal(op[:default])}"
         when :set_column_null
