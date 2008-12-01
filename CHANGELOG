@@ -1,5 +1,7 @@
 === HEAD
 
+* Raise errors when EXCEPT/INTERSECT is used when not supported (jeremyevans)
+
 * Fix ordering of UNION, INTERSECT, and EXCEPT statements (jeremyevans) (#253)
 
 * Support aliasing subselects in the Oracle adapter (jeremyevans)

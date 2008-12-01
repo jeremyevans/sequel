@@ -5,12 +5,6 @@ module Sequel
     class Database < Sequel::Database
       set_adapter_scheme :informix
       
-      # AUTO_INCREMENT = 'IDENTITY(1,1)'.freeze
-      # 
-      # def auto_increment_sql
-      #   AUTO_INCREMENT
-      # end
-      
       def connect(server)
         opts = server_opts(server)
         ::Informix.connect(opts[:database], opts[:user], opts[:password])
@@ -39,7 +33,9 @@ module Sequel
     end
     
     class Dataset < Sequel::Dataset
-      SELECT_CLAUSE_ORDER = %w'limit distinct columns from join where group having order union intersect except'.freeze
+      include UnsupportedIntersectExcept
+
+      SELECT_CLAUSE_ORDER = %w'limit distinct columns from join where having group union order'.freeze
 
       def literal(v)
         case v

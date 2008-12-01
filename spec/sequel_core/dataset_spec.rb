@@ -3243,3 +3243,32 @@ context "Sequel::Dataset#each" do
     end
   end
 end
+
+context Sequel::Dataset::UnsupportedIntersectExcept do
+  before do
+    @ds = Sequel::Dataset.new(nil).from(:items)
+    @ds2 = Sequel::Dataset.new(nil).from(:i)
+    @ds.extend(Sequel::Dataset::UnsupportedIntersectExcept)
+  end
+
+  specify "should raise an error if INTERSECT or EXCEPT is USED" do
+    @ds.union(@ds2).sql.should == 'SELECT * FROM items UNION SELECT * FROM i'
+    proc{@ds.intersect(@ds2)}.should raise_error(Sequel::Error)
+    proc{@ds.except(@ds2)}.should raise_error(Sequel::Error)
+  end
+end
+
+context Sequel::Dataset::UnsupportedIntersectExceptAll do
+  before do
+    @ds = Sequel::Dataset.new(nil).from(:items)
+    @ds2 = Sequel::Dataset.new(nil).from(:i)
+    @ds.extend(Sequel::Dataset::UnsupportedIntersectExceptAll)
+  end
+
+  specify "should raise an error if INTERSECT or EXCEPT is USED" do
+    @ds.intersect(@ds2).sql.should == 'SELECT * FROM items INTERSECT SELECT * FROM i'
+    @ds.except(@ds2).sql.should == 'SELECT * FROM items EXCEPT SELECT * FROM i'
+    proc{@ds.intersect(@ds2, true)}.should raise_error(Sequel::Error)
+    proc{@ds.except(@ds2, true)}.should raise_error(Sequel::Error)
+  end
+end

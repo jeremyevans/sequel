@@ -95,6 +95,8 @@ module Sequel
   
     # Dataset methods shared by datasets that use MySQL databases.
     module DatasetMethods
+      include UnsupportedIntersectExcept
+
       BOOL_TRUE = '1'.freeze
       BOOL_FALSE = '0'.freeze
       COMMA_SEPARATOR = ', '.freeze

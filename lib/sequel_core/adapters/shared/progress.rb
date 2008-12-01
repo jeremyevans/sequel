@@ -10,22 +10,14 @@ module Sequel
     end
   
     module DatasetMethods
-      SELECT_CLAUSE_ORDER = %w'intersect except limit distinct columns from join where group order having union'.freeze
+      include Dataset::UnsupportedIntersectExcept
+
+      SELECT_CLAUSE_ORDER = %w'limit distinct columns from join where group order having union'.freeze
 
       private
 
       def select_clause_order
         SELECT_CLAUSE_ORDER
-      end
-
-      # EXCEPT is not supported by Progress
-      def select_except_sql(sql, opts)
-        raise(Error, "EXCEPT not supported") if opts[:except]
-      end
-
-      # INTERSECT is not supported by Progress
-      def select_intersect_sql(sql, opts)
-        raise(Error, "INTERSECT not supported") if opts[:intersect]
       end
 
       # Progress uses TOP for limit, but it is only supported in Progress 10.

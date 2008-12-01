@@ -13,6 +13,8 @@ module Sequel
     end
     
     module DatasetMethods
+      include Dataset::UnsupportedIntersectExceptAll
+
       SELECT_CLAUSE_ORDER = %w'distinct columns from join where group having union intersect except order limit'.freeze
 
       def empty?

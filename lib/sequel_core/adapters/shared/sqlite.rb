@@ -105,6 +105,8 @@ module Sequel
     
     # Instance methods for datasets that connect to an SQLite database
     module DatasetMethods
+      include Dataset::UnsupportedIntersectExceptAll
+
       # SQLite does not support pattern matching via regular expressions.
       # SQLite is case insensitive (depending on pragma), so use LIKE for
       # ILIKE.

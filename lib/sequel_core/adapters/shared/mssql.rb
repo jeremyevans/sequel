@@ -35,7 +35,9 @@ module Sequel
     end
   
     module DatasetMethods
-      SELECT_CLAUSE_ORDER = %w'intersect except limit distinct columns from with join where group order having union'.freeze
+      include Dataset::UnsupportedIntersectExcept
+
+      SELECT_CLAUSE_ORDER = %w'limit distinct columns from with join where group order having union'.freeze
 
       def complex_expression_sql(op, args)
         case op
@@ -81,16 +83,6 @@ module Sequel
 
       def select_clause_order
         SELECT_CLAUSE_ORDER
-      end
-
-      # EXCEPT is not supported by MSSQL
-      def select_except_sql(sql, opts)
-        raise(Error, "EXCEPT not supported") if opts[:except]
-      end
-
-      # INTERSECT is not supported by MSSQL
-      def select_intersect_sql(sql, opts)
-        raise(Error, "INTERSECT not supported") if opts[:intersect]
       end
 
       # MSSQL uses TOP for limit, with no offset support
