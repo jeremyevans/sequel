@@ -41,6 +41,11 @@ module Sequel
         end
       end
 
+      # Oracle uses MINUS instead of EXCEPT, and doesn't support EXCEPT ALL
+      def select_except_sql(sql, opts)
+        sql << " MINUS #{opts[:except].sql}" if opts[:except]
+      end
+
       # Oracle requires a subselect to do limit and offset
       def select_limit_sql(sql, opts)
         if limit = opts[:limit]
