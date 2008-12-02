@@ -1,5 +1,7 @@
 === HEAD
 
+* Have the connection pool remove disconnected connections when the adapter supports it (jeremyevans)
+
 * Make Dataset#exists return a LiteralString (jeremyevans)
 
 * Support multiple SQL statements in one query in the MySQL adapter (jeremyevans)

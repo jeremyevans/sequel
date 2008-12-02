@@ -5,6 +5,9 @@ class Sequel::ConnectionPool
   # The proc used to create a new database connection.
   attr_accessor :connection_proc
 
+  # The proc used to disconnect a database connection.
+  attr_accessor :disconnection_proc
+
   # The maximum number of connections.
   attr_reader :max_size
   
@@ -40,6 +43,7 @@ class Sequel::ConnectionPool
     @max_size = opts[:max_connections] || 4
     @mutex = Mutex.new
     @connection_proc = block
+    @disconnection_proc = opts[:disconnection_proc]
     @servers = [:default]
     @servers += opts[:servers].keys - @servers if opts[:servers] 
     @available_connections = Hash.new{|h,k| h[:default]}
@@ -103,8 +107,11 @@ class Sequel::ConnectionPool
       end
       begin
         yield conn
+      rescue Sequel::DatabaseDisconnectError => dde
+        remove(t, conn, server)
+        raise
       ensure
-        release(t, conn, server)
+        release(t, conn, server) unless dde
       end
     rescue Exception => e
       raise(@convert_exceptions && !e.is_a?(StandardError) ? RuntimeError.new(e.message) : e)
@@ -116,24 +123,19 @@ class Sequel::ConnectionPool
   # disconnecting from the database, assuming that no connections are currently
   # being used. Once a connection is requested using #hold, the connection pool
   # creates new connections to the database.
-  def disconnect
+  def disconnect(&block)
+    block ||= @disconnection_proc
     @mutex.synchronize do
       @available_connections.each do |server, conns|
-        conns.each{|c| yield(c)} if block_given?
+        conns.each{|c| block.call(c)} if block
         conns.clear
-        @created_count[server] = allocated(server).length
+        set_created_count(server, allocated(server).length)
       end
     end
   end
   
   private
 
-  # Returns the connection owned by the supplied thread for the given server,
-  # if any.
-  def owned_connection(thread, server)
-    @mutex.synchronize{@allocated[server][thread]}
-  end
-  
   # Assigns a connection to the supplied thread for the given server, if one
   # is available.
   def acquire(thread, server)
@@ -154,10 +156,16 @@ class Sequel::ConnectionPool
   # the server is less than the maximum size of the pool.
   def make_new(server)
     if @created_count[server] < @max_size
-      @created_count[server] += 1
+      set_created_count(server, @created_count[server] + 1)
       @connection_proc ? @connection_proc.call(server) : \
         (raise Error, "No connection proc specified")
     end
+  end
+  
+  # Returns the connection owned by the supplied thread for the given server,
+  # if any.
+  def owned_connection(thread, server)
+    @mutex.synchronize{@allocated[server][thread]}
   end
   
   # Releases the connection assigned to the supplied thread and server.
@@ -166,6 +174,21 @@ class Sequel::ConnectionPool
       allocated(server).delete(thread)
       available_connections(server) << conn
     end
+  end
+
+  # Removes the currently allocated connection from the connection pool.
+  def remove(thread, conn, server)
+    @mutex.synchronize do
+      allocated(server).delete(thread)
+      set_created_count(server, @created_count[server] - 1)
+      @disconnection_proc.call(conn) if @disconnection_proc
+    end
+  end
+
+  # Set the created count for the given server type
+  def set_created_count(server, value)
+    server = :default unless @created_count.include?(server)
+    @created_count[server] = value
   end
 end
 
@@ -179,6 +202,9 @@ class Sequel::SingleThreadedPool
   # The proc used to create a new database connection
   attr_writer :connection_proc
   
+  # The proc used to disconnect a database connection.
+  attr_accessor :disconnection_proc
+
   # Initializes the instance with the supplied block as the connection_proc.
   #
   # The single threaded pool takes the following options:
@@ -200,7 +226,14 @@ class Sequel::SingleThreadedPool
   # This method simulates the ConnectionPool#hold API.
   def hold(server=:default)
     begin
-      yield(@conns[server] ||= @connection_proc.call(server))
+      yield(c = (@conns[server] ||= @connection_proc.call(server)))
+    rescue Sequel::DatabaseDisconnectError
+      begin
+        @conns.delete(server)
+        @disconnection_proc.call(c) if @disconnection_proc
+      rescue Exception => e
+        raise(@convert_exceptions && !e.is_a?(StandardError) ? RuntimeError.new(e.message) : e)
+      end
     rescue Exception => e
       # if the error is not a StandardError it is converted into RuntimeError.
       raise(@convert_exceptions && !e.is_a?(StandardError) ? RuntimeError.new(e.message) : e)
@@ -210,7 +243,8 @@ class Sequel::SingleThreadedPool
   # Disconnects from the database. Once a connection is requested using
   # #hold, the connection is reestablished.
   def disconnect(&block)
-    @conns.values.each{|conn| yield(conn) if block_given?}
+    block ||= @disconnection_proc
+    @conns.values.each{|conn| block.call(conn) if block}
     @conns = {}
   end
 end

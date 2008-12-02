@@ -21,10 +21,6 @@ module Sequel
         conn
       end
       
-      def disconnect
-        @pool.disconnect {|c| c.logoff}
-      end
-    
       def dataset(opts = nil)
         Oracle::Dataset.new(self, opts)
       end
@@ -56,6 +52,12 @@ module Sequel
             @transactions.delete(Thread.current)
           end
         end
+      end
+
+      private
+
+      def disconnect_connection(c)
+        c.logoff
       end
     end
     

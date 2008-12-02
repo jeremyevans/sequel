@@ -132,11 +132,6 @@ module Sequel
         MySQL::Dataset.new(self, opts)
       end
       
-      # Closes all database connections.
-      def disconnect
-        @pool.disconnect {|c| c.close}
-      end
-      
       # Executes the given SQL using an available connection, yielding the
       # connection if the block is given.
       def execute(sql, opts={}, &block)
@@ -214,6 +209,11 @@ module Sequel
       # the :database option.
       def database_name
         @opts[:database]
+      end
+      
+      # Closes given database connection.
+      def disconnect_connection(c)
+        c.close
       end
       
       # Executes a prepared statement on an available connection.  If the

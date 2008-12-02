@@ -60,11 +60,13 @@ module Sequel
     #
     # Takes the following options:
     # * :default_schema : The default schema to use, should generally be nil
+    # * :disconnection_proc: A proc used to disconnect the connection.
     # * :loggers : An array of loggers to use.
     # * :quote_identifiers : Whether to quote identifiers
     # * :single_threaded : Whether to use a single-threaded connection pool
     #
-    # All options given are also passed to the ConnectionPool.
+    # All options given are also passed to the ConnectionPool.  If a block
+    # is given, it is used as the connection_proc for the ConnectionPool.
     def initialize(opts = {}, &block)
       @opts = opts
       
@@ -76,6 +78,7 @@ module Sequel
       @transactions = []
       @pool = (@single_threaded ? SingleThreadedPool : ConnectionPool).new(connection_pool_default_options.merge(opts), &block)
       @pool.connection_proc = proc{|server| connect(server)} unless block
+      @pool.disconnection_proc = proc{|conn| disconnect_connection(conn)} unless opts[:disconnection_proc]
 
       @loggers = Array(opts[:logger]) + Array(opts[:loggers])
       ::Sequel::DATABASES.push(self)
@@ -236,10 +239,10 @@ module Sequel
       ds = Sequel::Dataset.new(self)
     end
     
-    # Disconnects from the database. This method should be overridden by 
-    # descendants.
+    # Disconnects all available connections from the connection pool.  If any
+    # connections are currently in use, they will not be disconnected.
     def disconnect
-      raise NotImplementedError, "#disconnect should be overridden by adapters"
+      pool.disconnect
     end
 
     # Executes the given SQL. This method should be overridden in descendants.

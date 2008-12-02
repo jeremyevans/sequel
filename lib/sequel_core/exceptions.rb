@@ -31,4 +31,10 @@ module Sequel
   # Generic error raised by the database adapters, indicating a
   # problem originating from the database server.
   class DatabaseError < Error; end
+
+  # Error that should be raised by adapters when they determine that the connection
+  # to the database has been lost.  Instructs the connection pool code to 
+  # remove that connection from the pool so that other connections can be acquired
+  # automatically.
+  class DatabaseDisconnectError < DatabaseError; end
 end

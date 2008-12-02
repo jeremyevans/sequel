@@ -46,11 +46,6 @@ module Sequel
         SQLite::Dataset.new(self, opts)
       end
       
-      # Disconnect all connections from the database.
-      def disconnect
-        @pool.disconnect {|c| c.close}
-      end
-      
       # Run the given SQL with the given arguments and return the number of changed rows.
       def execute_dui(sql, opts={})
         _execute(sql, opts){|conn| conn.execute_batch(sql, opts[:arguments]); conn.changes}
@@ -109,6 +104,11 @@ module Sequel
         # because otherwise each connection will get a separate database
         o[:max_connections] = 1 if @opts[:database] == ':memory:' || @opts[:database].blank?
         o
+      end
+
+      # Disconnect given connections from the database.
+      def disconnect_connection(c)
+        c.close
       end
     end
     

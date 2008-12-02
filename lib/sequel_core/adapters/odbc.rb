@@ -40,10 +40,6 @@ module Sequel
         conn
       end      
 
-      def disconnect
-        @pool.disconnect {|c| c.disconnect}
-      end
-    
       def dataset(opts = nil)
         ODBC::Dataset.new(self, opts)
       end
@@ -90,6 +86,11 @@ module Sequel
         end
       end
 
+      private
+
+      def disconnect_connection(c)
+        c.disconnect
+      end
     end
     
     class Dataset < Sequel::Dataset

@@ -20,16 +20,6 @@ module Sequel
         dbc
       end
       
-      def disconnect
-        @pool.disconnect do |conn|
-          rc = SQLDisconnect(conn)
-          check_error(rc, "Could not disconnect from database")
-
-          rc = SQLFreeHandle(SQL_HANDLE_DBC, conn)
-          check_error(rc, "Could not free Database handle")
-        end
-      end
-    
       def test_connection(server=nil)
         synchronize(server){|conn|}
         true
@@ -71,6 +61,14 @@ module Sequel
         else
           raise DatabaseError, msg
         end
+      end
+
+      def disconnect_connection(conn)
+        rc = SQLDisconnect(conn)
+        check_error(rc, "Could not disconnect from database")
+
+        rc = SQLFreeHandle(SQL_HANDLE_DBC, conn)
+        check_error(rc, "Could not free Database handle")
       end
     end
     

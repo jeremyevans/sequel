@@ -15,11 +15,6 @@ module Sequel
         )
       end
       
-      def disconnect
-        # would this work?
-        @pool.disconnect {|c| c.disconnect}
-      end
-    
       def dataset(opts = nil)
         OpenBase::Dataset.new(self, opts)
       end
@@ -33,6 +28,12 @@ module Sequel
         end
       end
       alias_method :do, :execute
+
+      private
+
+      def disconnect_connection(c)
+        c.disconnect
+      end
     end
     
     class Dataset < Sequel::Dataset

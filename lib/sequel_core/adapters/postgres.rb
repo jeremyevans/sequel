@@ -132,12 +132,15 @@ module Sequel
         q = nil
         begin
           q = args ? async_exec(sql, args) : async_exec(sql)
-        rescue PGError => e
-          raise if status == Adapter::CONNECTION_OK
-          reset
-          q = args ? async_exec(sql, args) : async_exec(sql)
+        rescue PGError
+          begin
+            s = status
+          rescue PGError
+            raise(Sequel::DatabaseDisconnectError)
+          end
+          (s == Adapter::CONNECTION_OK) ? raise : raise(Sequel::DatabaseDisconnectError)
         ensure
-          block
+          block if s == Adapter::CONNECTION_OK
         end
         begin
           block_given? ? yield(q) : q.cmd_tuples
@@ -214,11 +217,6 @@ module Sequel
         Postgres::Dataset.new(self, opts)
       end
       
-      # Disconnect all active connections.
-      def disconnect
-        @pool.disconnect {|c| c.finish}
-      end
-      
       # Execute the given SQL with the given args on an available connection.
       def execute(sql, opts={}, &block)
         return execute_prepared_statement(sql, opts, &block) if Symbol === sql
@@ -252,6 +250,14 @@ module Sequel
       # PostgreSQL doesn't need the connection pool to convert exceptions.
       def connection_pool_default_options
         super.merge(:pool_convert_exceptions=>false)
+      end
+      
+      # Disconnect given connection
+      def disconnect_connection(conn)
+        begin
+          conn.finish
+        rescue PGError
+        end
       end
       
       # Execute the prepared statement with the given name on an available

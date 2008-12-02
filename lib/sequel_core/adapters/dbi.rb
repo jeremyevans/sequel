@@ -51,10 +51,6 @@ module Sequel
         ::DBI.connect(dbname, opts[:user], opts[:password])
       end
       
-      def disconnect
-        @pool.disconnect {|c| c.disconnect}
-      end
-    
       def dataset(opts = nil)
         DBI::Dataset.new(self, opts)
       end
@@ -77,6 +73,12 @@ module Sequel
       # Converts all column names to lowercase
       def lowercase
         @lowercase ||= false
+      end
+
+      private
+
+      def disconnect_connection(c)
+        c.disconnect
       end
     end
     

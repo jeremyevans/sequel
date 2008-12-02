@@ -106,12 +106,6 @@ context "Database#connect" do
   end
 end
 
-context "Database#disconnect" do
-  specify "should raise Sequel::Error::NotImplemented" do
-    proc {Sequel::Database.new.disconnect}.should raise_error(NotImplementedError)
-  end
-end
-
 context "Database#uri" do
   setup do
     @c = Class.new(Sequel::Database) do

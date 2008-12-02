@@ -135,11 +135,6 @@ module Sequel
         JDBC::Dataset.new(self, opts)
       end
       
-      # Close all adapter connections
-      def disconnect
-        @pool.disconnect {|c| c.close}
-      end
-      
       # Execute the given SQL.  If a block is given, if should be a SELECT
       # statement or something else that returns rows.
       def execute(sql, opts={}, &block)
@@ -222,6 +217,11 @@ module Sequel
       alias url uri
       
       private
+      
+      # Close given adapter connections
+      def disconnect_connection(c)
+        c.close
+      end
       
       # Execute the prepared statement.  If the provided name is a
       # dataset, use that as the prepared statement, otherwise use

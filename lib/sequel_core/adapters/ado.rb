@@ -32,10 +32,6 @@ module Sequel
         handle
       end
       
-      def disconnect
-        @pool.disconnect {|conn| conn.Close}
-      end
-    
       def dataset(opts = nil)
         ADO::Dataset.new(self, opts)
       end
@@ -49,6 +45,12 @@ module Sequel
         end
       end
       alias_method :do, :execute
+
+      private
+
+      def disconnect_connection(conn)
+        conn.Close
+      end
     end
     
     class Dataset < Sequel::Dataset

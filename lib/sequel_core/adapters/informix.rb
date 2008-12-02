@@ -9,10 +9,6 @@ module Sequel
         opts = server_opts(server)
         ::Informix.connect(opts[:database], opts[:user], opts[:password])
       end
-      
-      def disconnect
-        @pool.disconnect{|c| c.close}
-      end
     
       def dataset(opts = nil)
         Sequel::Informix::Dataset.new(self, opts)
@@ -30,6 +26,12 @@ module Sequel
         synchronize(opts[:server]){|c| yield c.cursor(sql)}
       end
       alias_method :query, :execute
+      
+      private
+
+      def disconnect_connection(c)
+        c.close
+      end
     end
     
     class Dataset < Sequel::Dataset
