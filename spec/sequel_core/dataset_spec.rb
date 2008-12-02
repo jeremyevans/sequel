@@ -191,6 +191,26 @@ context "A dataset with multiple tables in its FROM clause" do
   end
 end
 
+context "Dataset#exists" do
+  setup do
+    @ds1 = Sequel::Dataset.new(nil).from(:test)
+    @ds2 = @ds1.filter(:price < 100)
+    @ds3 = @ds1.filter(:price > 50)
+  end
+  
+  specify "should work in filters" do
+    @ds1.filter(@ds2.exists).sql.should ==
+      'SELECT * FROM test WHERE (EXISTS (SELECT * FROM test WHERE (price < 100)))'
+    @ds1.filter(@ds2.exists & @ds3.exists).sql.should ==
+      'SELECT * FROM test WHERE (EXISTS (SELECT * FROM test WHERE (price < 100)) AND EXISTS (SELECT * FROM test WHERE (price > 50)))'
+  end
+
+  specify "should work in select" do
+    @ds1.select(@ds2.exists.as(:a), @ds3.exists.as(:b)).sql.should ==
+      'SELECT EXISTS (SELECT * FROM test WHERE (price < 100)) AS a, EXISTS (SELECT * FROM test WHERE (price > 50)) AS b FROM test'
+  end
+end
+
 context "Dataset#where" do
   setup do
     @dataset = Sequel::Dataset.new(nil).from(:test)

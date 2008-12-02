@@ -123,12 +123,12 @@ module Sequel
       clone(clause => cond)
     end
 
-    # Returns an EXISTS clause for the dataset.
+    # Returns an EXISTS clause for the dataset as a LiteralString.
     #
     #   DB.select(1).where(DB[:items].exists).sql
     #   #=> "SELECT 1 WHERE EXISTS (SELECT * FROM items)"
     def exists(opts = nil)
-      "EXISTS (#{select_sql(opts)})"
+      "EXISTS (#{select_sql(opts)})".lit
     end
 
     # Returns a copy of the dataset with the given conditions imposed upon it.  
