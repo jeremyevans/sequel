@@ -12,7 +12,6 @@ unless defined?(MYSQL_SOCKET_FILE)
 end
 
 MYSQL_URI = URI.parse(MYSQL_DB.uri)
-MYSQL_DB_NAME = (m = /\/(.*)/.match(MYSQL_URI.path)) && m[1]
 
 MYSQL_DB.create_table! :items do
   text :name
@@ -482,23 +481,32 @@ context "A MySQL database" do
     @db << 'DELETE FROM items'
     @db[:items].first.should == nil
   end
+  
+  specify "should handle multiple select statements at once" do
+    @db << 'DELETE FROM items; '
+    
+    @db[:items].delete
+    @db[:items].insert(:name => 'tutu', :value => 1234)
+    @db["SELECT * FROM items; SELECT * FROM items"].all.should == \
+      [{:name => 'tutu', :value => 1234}, {:name => 'tutu', :value => 1234}]
+  end
 end  
 
 # Socket tests should only be run if the MySQL server is on localhost
 if %w'localhost 127.0.0.1 ::1'.include? MYSQL_URI.host
   context "A MySQL database" do
     specify "should accept a socket option" do
-      db = Sequel.mysql(MYSQL_DB_NAME, :host => 'localhost', :user => MYSQL_USER, :socket => MYSQL_SOCKET_FILE)
+      db = Sequel.mysql(MYSQL_DB.opts[:database], :host => 'localhost', :user => MYSQL_DB.opts[:user], :password => MYSQL_DB.opts[:password], :socket => MYSQL_SOCKET_FILE)
       proc {db.test_connection}.should_not raise_error
     end
     
     specify "should accept a socket option without host option" do
-      db = Sequel.mysql(MYSQL_DB_NAME, :user => MYSQL_USER, :socket => MYSQL_SOCKET_FILE)
+      db = Sequel.mysql(MYSQL_DB.opts[:database], :user => MYSQL_DB.opts[:user], :password => MYSQL_DB.opts[:password], :socket => MYSQL_SOCKET_FILE)
       proc {db.test_connection}.should_not raise_error
     end
     
     specify "should fail to connect with invalid socket" do
-      db = Sequel.mysql(MYSQL_DB_NAME, :host => 'localhost', :user => MYSQL_USER, :socket => 'blah')
+      db = Sequel.mysql(MYSQL_DB.opts[:database], :user => MYSQL_DB.opts[:user], :password => MYSQL_DB.opts[:password], :socket =>'blah')
       proc {db.test_connection}.should raise_error
     end
   end
@@ -759,5 +767,30 @@ context "MySQL::Dataset#complex_expression_sql" do
   specify "should handle string concatenation as simple string if just one record" do
     @d.literal([:x].sql_string_join).should == "x"
     @d.literal([:x].sql_string_join(' ')).should == "x"
+  end
+end
+
+context "MySQL Stored Procedures" do
+  teardown do
+    MYSQL_DB.execute('DROP PROCEDURE test_sproc')
+  end
+  
+  specify "should be callable on the database object" do
+    MYSQL_DB.execute('CREATE PROCEDURE test_sproc() BEGIN DELETE FROM items; END')
+    MYSQL_DB[:items].delete
+    MYSQL_DB[:items].insert(:value=>1)
+    MYSQL_DB[:items].count.should == 1
+    MYSQL_DB.call_sproc(:test_sproc)
+    MYSQL_DB[:items].count.should == 0
+  end
+  
+  specify "should be callable on the dataset object" do
+    MYSQL_DB.execute('CREATE PROCEDURE test_sproc(a INTEGER) BEGIN SELECT *, a AS b FROM items; END')
+    @d = MYSQL_DB[:items]
+    @d.call_sproc(:select, :test_sproc, 3).should == []
+    @d.insert(:value=>1)
+    @d.call_sproc(:select, :test_sproc, 4).should == [{:id=>nil, :value=>1, :b=>4}]
+    @d.row_proc = proc{|r| r.keys.each{|k| r[k] *= 2 if r[k].is_a?(Integer)}; r}
+    @d.call_sproc(:select, :test_sproc, 3).should == [{:id=>nil, :value=>2, :b=>6}]
   end
 end

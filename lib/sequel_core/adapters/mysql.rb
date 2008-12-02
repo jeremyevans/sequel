@@ -1,5 +1,6 @@
 require 'mysql'
 require 'sequel_core/adapters/shared/mysql'
+require 'sequel_core/dataset/stored_procedures'
 
 # Add methods to get columns, yield hashes with symbol keys, and do
 # type conversion.
@@ -85,6 +86,12 @@ module Sequel
       
       set_adapter_scheme :mysql
       
+      # Support stored procedures on MySQL
+      def call_sproc(name, opts={}, &block)
+        args = opts[:args] || [] 
+        execute("CALL #{name}(#{literal(args) unless args.empty?})", opts.merge(:sproc=>false), &block)
+      end
+      
       # Connect to the database.  In addition to the usual database options,
       # the following options have effect:
       #
@@ -133,6 +140,7 @@ module Sequel
       # Executes the given SQL using an available connection, yielding the
       # connection if the block is given.
       def execute(sql, opts={}, &block)
+        return call_sproc(sql, opts, &block) if opts[:sproc]
         return execute_prepared_statement(sql, opts, &block) if Symbol === sql
         begin
           synchronize(opts[:server]){|conn| _execute(conn, sql, opts, &block)}
@@ -178,11 +186,19 @@ module Sequel
         log_info(sql)
         conn.query(sql)
         if opts[:type] == :select
-          r = conn.use_result
-          begin
-            yield r
-          ensure
-            r.free
+          loop do
+            begin
+              r = conn.use_result
+            rescue Mysql::Error
+              nil
+            else
+              begin
+                yield r
+              ensure
+                r.free
+              end
+            end
+            break unless conn.respond_to?(:next_result) && conn.next_result
           end
         else
           yield conn if block_given?
@@ -231,6 +247,7 @@ module Sequel
     # Dataset class for MySQL datasets accessed via the native driver.
     class Dataset < Sequel::Dataset
       include Sequel::MySQL::DatasetMethods
+      include StoredProcedures
       
       # Methods for MySQL prepared statements using the native driver.
       module PreparedStatementMethods
@@ -245,6 +262,23 @@ module Sequel
         # Same as execute, explicit due to intricacies of alias and super.
         def execute_dui(sql, opts={}, &block)
           super(prepared_statement_name, {:arguments=>bind_arguments}.merge(opts), &block)
+        end
+      end
+      
+      # Methods for MySQL stored procedures using the native driver.
+      module StoredProcedureMethods
+        include Sequel::Dataset::StoredProcedureMethods
+        
+        private
+        
+        # Execute the database stored procedure with the stored arguments.
+        def execute(sql, opts={}, &block)
+          super(@sproc_name, {:args=>@sproc_args, :sproc=>true}.merge(opts), &block)
+        end
+        
+        # Same as execute, explicit due to intricacies of alias and super.
+        def execute_dui(sql, opts={}, &block)
+          super(@sproc_name, {:args=>@sproc_args, :sproc=>true}.merge(opts), &block)
         end
       end
       
@@ -308,6 +342,11 @@ module Sequel
       # Set the :type option to :dui if it hasn't been set.
       def execute_dui(sql, opts={}, &block)
         super(sql, {:type=>:dui}.merge(opts), &block)
+      end
+      
+      # Extend the dataset with the MySQL stored procedure methods.
+      def prepare_extend_sproc(ds)
+        ds.extend(StoredProcedureMethods)
       end
     end
   end

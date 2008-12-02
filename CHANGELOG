@@ -1,5 +1,9 @@
 === HEAD
 
+* Support multiple SQL statements in one query in the MySQL adapter (jeremyevans)
+
+* Add stored procedure support for the MySQL and JDBC adapters (jeremyevans, krsgoss) (#252)
+
 * Support options when altering a column's type (for changing enums, varchar size, etc.) (jeremyevans)
 
 * Support AliasedExpressions in tables when using implicitly qualified arguments in joins (jeremyevans)

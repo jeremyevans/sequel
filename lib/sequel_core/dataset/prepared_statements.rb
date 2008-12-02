@@ -37,6 +37,7 @@ module Sequel
       
       private
       
+      # The type of query (:select, :insert, :delete, :update).
       def sql_query_type
         SQL_QUERY_TYPE[@prepared_type]
       end
@@ -51,7 +52,7 @@ module Sequel
     module PreparedStatementMethods
       PLACEHOLDER_RE = /\A\$(.*)\z/
       
-      # The type of prepared statement, should be one of :select,
+      # The type of prepared statement, should be one of :select, :first,
       # :insert, :update, or :delete
       attr_accessor :prepared_type
       
