@@ -62,6 +62,9 @@ rescue LoadError => e
         def block(timeout=nil)
         end
       end
+      unless defined?(CONNECTION_OK)
+        CONNECTION_OK = -1
+      end
     end
     class PGresult 
       alias_method :nfields, :num_fields unless method_defined?(:nfields) 
@@ -138,9 +141,10 @@ module Sequel
           rescue PGError
             raise(Sequel::DatabaseDisconnectError)
           end
-          (s == Adapter::CONNECTION_OK) ? raise : raise(Sequel::DatabaseDisconnectError)
+          status_ok = (s == Adapter::CONNECTION_OK)
+          status_ok ? raise : raise(Sequel::DatabaseDisconnectError)
         ensure
-          block if s == Adapter::CONNECTION_OK
+          block if status_ok
         end
         begin
           block_given? ? yield(q) : q.cmd_tuples
