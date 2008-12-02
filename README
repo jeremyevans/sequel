@@ -41,6 +41,7 @@ If you have any comments or suggestions please post to the Google group.
   DB = Sequel.sqlite # memory database
   
   DB.create_table :items do # Create a new table
+    primary_key :id
     column :name, :text
     column :price, :float
   end

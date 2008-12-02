@@ -15,7 +15,7 @@
 
 <span class='comment'># create an items table</span>
 <span class='constant'>DB</span><span class='punct'>.</span><span class='ident'>create_table</span> <span class='symbol'>:items</span> <span class='keyword'>do</span>
-
+  <span class='ident'>primary_key</span> <span class='symbol'>:id</span>
   <span class='ident'>column</span> <span class='symbol'>:name</span><span class='punct'>,</span> <span class='symbol'>:text</span>
   <span class='ident'>column</span> <span class='symbol'>:price</span><span class='punct'>,</span> <span class='symbol'>:float</span>
 <span class='keyword'>end</span>
