@@ -6,6 +6,12 @@ module Sequel
     class Database < Sequel::Database
       include DatabaseMethods
       set_adapter_scheme :oracle
+
+      # ORA-00028: your session has been killed
+      # ORA-01012: not logged on
+      # ORA-03113: end-of-file on communication channel
+      # ORA-03114: not connected to ORACLE
+      CONNECTION_ERROR_CODES = [ 28, 1012, 3113, 3114 ]      
       
       def connect(server)
         opts = server_opts(server)
@@ -28,9 +34,17 @@ module Sequel
       def execute(sql, opts={})
         log_info(sql)
         synchronize(opts[:server]) do |conn|
-          r = conn.exec(sql)
-          yield(r) if block_given?
-          r
+          begin
+            r = conn.exec(sql)
+            yield(r) if block_given?
+            r
+          rescue OCIException => e
+            if CONNECTION_ERROR_CODES.include?(e.code)  
+              raise(Sequel::DatabaseDisconnectError)              
+            else
+              raise
+            end
+          end
         end
       end
       alias_method :do, :execute
