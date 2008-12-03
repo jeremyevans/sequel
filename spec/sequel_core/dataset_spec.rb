@@ -3088,10 +3088,14 @@ context "Dataset prepared statements and bound variables " do
     def @db.execute(sql, opts={})
       @sqls << sql
     end
-    @ds = @db[:items]
-    def @ds.fetch_rows(sql, &block)
-      execute(sql)
+    def @db.dataset
+      ds = super()
+      def ds.fetch_rows(sql, &block)
+        execute(sql)
+      end
+      ds
     end
+    @ds = @db[:items]
   end
   
   specify "#call should take a type and bind hash and interpolate it" do
@@ -3138,6 +3142,11 @@ context "Dataset prepared statements and bound variables " do
     @db.sqls.should == ['SELECT * FROM items WHERE (num = 1)']
   end
     
+  specify "should handle datasets using static sql and placeholders" do
+    @db["SELECT * FROM items WHERE (num = ?)", :$n].call(:select, :n=>1)
+    @db.sqls.should == ['SELECT * FROM items WHERE (num = 1)']
+  end
+    
   specify "should handle subselects" do
     @ds.filter(:$b).filter(:num=>@ds.select(:num).filter(:num=>:$n)).filter(:$c).call(:select, :n=>1, :b=>0, :c=>2)
     @db.sqls.should == ['SELECT * FROM items WHERE ((0 AND (num IN (SELECT num FROM items WHERE (num = 1)))) AND 2)']
@@ -3150,6 +3159,11 @@ context "Dataset prepared statements and bound variables " do
     
   specify "should handle subselects with literal strings" do
     @ds.filter(:$b).filter(:num=>@ds.select(:num).filter("num = ?", :$n)).call(:select, :n=>1, :b=>0)
+    @db.sqls.should == ['SELECT * FROM items WHERE (0 AND (num IN (SELECT num FROM items WHERE (num = 1))))']
+  end
+    
+  specify "should handle subselects with static sql and placeholders" do
+    @ds.filter(:$b).filter(:num=>@db["SELECT num FROM items WHERE (num = ?)", :$n]).call(:select, :n=>1, :b=>0)
     @db.sqls.should == ['SELECT * FROM items WHERE (0 AND (num IN (SELECT num FROM items WHERE (num = 1))))']
   end
 end

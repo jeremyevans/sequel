@@ -81,9 +81,7 @@ module Sequel
     def delete_sql(opts = nil)
       opts = opts ? @opts.merge(opts) : @opts
 
-      if sql = opts[:sql]
-        return sql
-      end
+      return static_sql(opts[:sql]) if opts[:sql]
 
       if opts[:group]
         raise Error::InvalidOperation, "Grouped datasets cannot be deleted from"
@@ -271,9 +269,7 @@ module Sequel
     #   dataset.insert_sql(:a => 1, :b => 2) #=>
     #     'INSERT INTO items (a, b) VALUES (1, 2)'
     def insert_sql(*values)
-      if sql = @opts[:sql]
-        return sql
-      end
+      return static_sql(@opts[:sql]) if @opts[:sql]
 
       from = source_list(@opts[:from])
       case values.size
@@ -641,7 +637,7 @@ module Sequel
     # options.
     def select_sql(opts = nil)
       opts = opts ? @opts.merge(opts) : @opts
-      return opts[:sql] if opts[:sql]
+      return static_sql(opts[:sql]) if opts[:sql]
       sql = 'SELECT'
       select_clause_order.each{|x| send("select_#{x}_sql", sql, opts)}
       sql
@@ -710,9 +706,7 @@ module Sequel
     def update_sql(values = {}, opts = nil)
       opts = opts ? @opts.merge(opts) : @opts
 
-      if sql = opts[:sql]
-        return sql
-      end
+      return static_sql(opts[:sql]) if opts[:sql]
 
       if opts[:group]
         raise Error::InvalidOperation, "A grouped dataset cannot be updated"
@@ -971,6 +965,13 @@ module Sequel
       else
         [nil, s, nil]
       end
+    end
+
+    # SQL to use if this dataset uses static SQL.  Since static SQL
+    # can be a PlaceholderLiteralString in addition to a String,
+    # we literalize nonstrings.
+    def static_sql(sql)
+      sql.is_a?(String) ? sql : literal(sql)
     end
 
     # SQL fragment for a subselect using the given database's SQL.
