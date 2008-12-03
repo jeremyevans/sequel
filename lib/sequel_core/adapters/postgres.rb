@@ -343,11 +343,9 @@ module Sequel
           # Return an array of strings for each of the hash values, inserting
           # them to the correct position in the array.
           def map_to_prepared_args(hash)
-            array = []
-            @prepared_args.each{|k,v| array[v] = hash[k].to_s}
-            array
+            @prepared_args.map{|k| hash[k.to_sym].to_s}
           end
-          
+
           private
           
           # PostgreSQL most of the time requires type information for each of
@@ -357,21 +355,16 @@ module Sequel
           # elminate ambiguity (and PostgreSQL from raising an exception).
           def prepared_arg(k)
             y, type = k.to_s.split("__")
-            "#{prepared_arg_placeholder}#{@prepared_args[y.to_sym]}#{"::#{type}" if type}".lit
-          end
-          
-          # If the named argument has already been used, return the position in
-          # the output array that it is mapped to.  Otherwise, map it to the
-          # next position in the array.
-          def prepared_args_hash
-            max_prepared_arg = 0
-            Hash.new do |h,k|
-              h[k] = max_prepared_arg
-              max_prepared_arg += 1
+            if i = @prepared_args.index(y)
+              i += 1
+            else
+              @prepared_args << y
+              i = @prepared_args.length
             end
+            "#{prepared_arg_placeholder}#{i}#{"::#{type}" if type}".lit
           end
         end
-        
+
         # Allow use of bind arguments for PostgreSQL using the pg driver.
         module BindArgumentMethods
           include ArgumentMapper
@@ -428,11 +421,14 @@ module Sequel
         
         # Prepare the given type of statement with the given name, and store
         # it in the database to be called later.
-        def prepare(type, name, values=nil)
+        def prepare(type, name=nil, values=nil)
           ps = to_prepared_statement(type, values)
           ps.extend(PreparedStatementMethods)
-          ps.prepared_statement_name = name
-          db.prepared_statements[name] = ps
+          if name
+            ps.prepared_statement_name = name
+            db.prepared_statements[name] = ps
+          end
+          ps
         end
         
         private

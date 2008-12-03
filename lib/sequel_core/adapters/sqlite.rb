@@ -135,14 +135,6 @@ module Sequel
         
         private
         
-        # Work around for the default prepared statement and argument
-        # mapper code, which wants a hash that maps.  SQLite doesn't
-        # need to do this, but still requires a value for the argument
-        # in order for the substitution to work correctly.
-        def prepared_args_hash
-          true
-        end
-        
         # SQLite uses a : before the name of the argument for named
         # arguments.
         def prepared_arg(k)
@@ -221,7 +213,7 @@ module Sequel
       # Prepare the given type of query with the given name and store
       # it in the database.  Note that a new native prepared statement is
       # created on each call to this prepared statement.
-      def prepare(type, name, values=nil)
+      def prepare(type, name=nil, values=nil)
         ps = to_prepared_statement(type, values)
         ps.extend(PreparedStatementMethods)
         db.prepared_statements[name] = ps if name

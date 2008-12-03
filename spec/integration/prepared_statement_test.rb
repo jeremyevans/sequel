@@ -24,6 +24,22 @@ describe "Prepared Statements and Bound Arguments" do
     @ds.filter(:number=>@ds.ba(:$n)).call(:first, :n=>10).should == {:id=>1, :number=>10}
   end
 
+  specify "should support placeholder literal strings" do
+    @ds.filter("number = ?", @ds.ba(:$n)).call(:select, :n=>10).should == [{:id=>1, :number=>10}]
+  end
+
+  specify "should support subselects" do
+    @ds.filter(:id=>:$i).filter(:number=>@ds.select(:number).filter(:number=>@ds.ba(:$n))).filter(:id=>:$j).call(:select, :n=>10, :i=>1, :j=>1).should == [{:id=>1, :number=>10}]
+  end
+
+  specify "should support subselects with literal strings" do
+    @ds.filter(:id=>:$i, :number=>@ds.select(:number).filter("number = ?", @ds.ba(:$n))).call(:select, :n=>10, :i=>1).should == [{:id=>1, :number=>10}]
+  end
+
+  specify "should support subselects of subselects" do
+    @ds.filter(:id=>:$i).filter(:number=>@ds.select(:number).filter(:number=>@ds.select(:number).filter(:number=>@ds.ba(:$n)))).filter(:id=>:$j).call(:select, :n=>10, :i=>1, :j=>1).should == [{:id=>1, :number=>10}]
+  end
+
   specify "should support bound variables with insert" do
     @ds.call(:insert, {:n=>20, :i=>100}, :id=>@ds.ba(:$i), :number=>@ds.ba(:$n))
     @ds.count.should == 2

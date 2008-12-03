@@ -495,7 +495,7 @@ module Sequel
       when Date
         v.strftime(DATE_FORMAT)
       when Dataset
-        "(#{v.sql})"
+        "(#{subselect_sql(v)})"
       else
         raise Error, "can't express #{v.inspect} as a SQL literal"
       end
@@ -554,6 +554,14 @@ module Sequel
     # clause.
     def ordered_expression_sql(oe)
       "#{literal(oe.expression)} #{oe.descending ? 'DESC' : 'ASC'}"
+    end
+
+    # SQL fragment for a literal string with placeholders
+    def placeholder_literal_string_sql(pls)
+      args = pls.args.dup
+      s = pls.str.gsub(QUESTION_MARK){literal(args.shift)}
+      s = "(#{s})" if pls.parens
+      s
     end
 
     # SQL fragment for the qualifed identifier, specifying
@@ -786,7 +794,7 @@ module Sequel
         SQL::BooleanExpression.from_value_pairs(expr)
       when Array
         if String === expr[0]
-          filter_expr(expr.shift.gsub(QUESTION_MARK){literal(expr.shift)}.lit)
+          SQL::PlaceholderLiteralString.new(expr.shift, expr, true)
         else
           SQL::BooleanExpression.from_value_pairs(expr)
         end
@@ -965,7 +973,12 @@ module Sequel
       end
     end
 
-    # SQL fragement specifying a table name.
+    # SQL fragment for a subselect using the given database's SQL.
+    def subselect_sql(ds)
+      ds.sql
+    end
+
+    # SQL fragment specifying a table name.
     def table_ref(t)
       case t
       when Dataset

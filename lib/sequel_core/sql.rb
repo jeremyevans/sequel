@@ -685,6 +685,34 @@ module Sequel
       end
     end
 
+    # Represents a literal string with placeholders and arguments.
+    # This is necessary to ensure delayed literalization of the arguments
+    # required for the prepared statement support
+    class PlaceholderLiteralString < SpecificExpression
+      # The arguments that will be subsituted into the placeholders.
+      attr_reader :args
+
+      # The literal string containing placeholders
+      attr_reader :str
+
+      # Whether to surround the expression with parantheses
+      attr_reader :parens
+
+      # Create an object with the given conditions and
+      # default value.
+      def initialize(str, args, parens=false)
+        @str = str
+        @args = args
+        @parens = parens
+      end
+
+      # Delegate the creation of the resulting SQL to the given dataset,
+      # since it may be database dependent.
+      def to_s(ds)
+        ds.placeholder_literal_string_sql(self)
+      end
+    end
+
     # Subclass of ComplexExpression where the expression results
     # in a numeric value in SQL.
     class NumericExpression < ComplexExpression
@@ -831,7 +859,7 @@ module Sequel
   # LiteralString is used to represent literal SQL expressions. A 
   # LiteralString is copied verbatim into an SQL statement. Instances of
   # LiteralString can be created by calling String#lit.
-  # LiteralStrings can use all of the SQL::ColumnMethods and the 
+  # LiteralStrings can also use all of the SQL::OrderMethods and the 
   # SQL::ComplexExpressionMethods.
   class LiteralString < ::String
     include SQL::OrderMethods

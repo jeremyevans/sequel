@@ -25,11 +25,10 @@ module Sequel
       end
         
       # Override the given *_sql method based on the type, and
-      # cache the result of the sql.  This requires that the object
-      # that includes this module implement prepared_args_hash.
+      # cache the result of the sql.
       def prepared_sql
         return @prepared_sql if @prepared_sql
-        @prepared_args = prepared_args_hash
+        @prepared_args ||= []
         @prepared_sql = super
         meta_def("#{sql_query_type}_sql"){|*args| prepared_sql}
         @prepared_sql
@@ -137,6 +136,15 @@ module Sequel
       def prepared_arg(k)
         @prepared_args[k]
       end
+
+      # Use a clone of the dataset extended with prepared statement
+      # support and using the same argument hash so that you can use
+      # bind variables/prepared arguments in subselects.
+      def subselect_sql(ds)
+        ps = ds.prepare(:select)
+        ps.prepared_args = prepared_args
+        ps.prepared_sql
+      end
     end
     
     # Default implementation for an argument mapper that uses
@@ -152,26 +160,15 @@ module Sequel
       # Keys in the input hash that are used more than once in the query
       # have multiple entries in the output array.
       def map_to_prepared_args(hash)
-        array = []
-        @prepared_args.each{|k,vs| vs.each{|v| array[v] = hash[k]}}
-        array
+        @prepared_args.map{|v| hash[v]}
       end
       
       private
       
-      # Uses a separate array of each key, holding the positions
-      # in the output array (necessary to support arguments
-      # that are used more than once).
-      def prepared_args_hash
-        Hash.new{|h,k| h[k] = Array.new}
-      end
-      
       # Associates the argument with name k with the next position in
       # the output array.
       def prepared_arg(k)
-        @max_prepared_arg ||= 0
-        @prepared_args[k] << @max_prepared_arg
-        @max_prepared_arg += 1
+        @prepared_args << k
         prepared_arg_placeholder
       end
     end
@@ -182,7 +179,7 @@ module Sequel
     # insert or update (if one of those types is used),
     # which may contain placeholders.
     def call(type, bind_variables={}, values=nil)
-      to_prepared_statement(type, values).call(bind_variables)
+      prepare(type, nil, values).call(bind_variables)
     end
     
     # Prepare an SQL statement for later execution. This returns
@@ -194,17 +191,13 @@ module Sequel
     #   ps = prepare(:select, :select_by_name)
     #   ps.call(:name=>'Blah')
     #   db.call(:select_by_name, :name=>'Blah')
-    def prepare(type, name, values=nil)
-      db.prepared_statements[name] = to_prepared_statement(type, values)
+    def prepare(type, name=nil, values=nil)
+      ps = to_prepared_statement(type, values)
+      db.prepared_statements[name] = ps if name
+      ps
     end
     
-    private
-    
-    # The argument placeholder.  Most databases used unnumbered
-    # arguments with question marks, so that is the default.
-    def prepared_arg_placeholder
-      PREPARED_ARG_PLACEHOLDER
-    end
+    protected
     
     # Return a cloned copy of the current dataset extended with
     # PreparedStatementMethods, setting the type and modify values.
@@ -214,6 +207,14 @@ module Sequel
       ps.prepared_type = type
       ps.prepared_modify_values = values
       ps
+    end
+
+    private
+    
+    # The argument placeholder.  Most databases used unnumbered
+    # arguments with question marks, so that is the default.
+    def prepared_arg_placeholder
+      PREPARED_ARG_PLACEHOLDER
     end
   end
 end

@@ -371,12 +371,6 @@ module Sequel
         end
       end
       
-      # Create an unnamed prepared statement and call it.  Allows the
-      # use of bind variables.
-      def call(type, hash, values=nil, &block)
-        prepare(type, nil, values).call(hash, &block)
-      end
-      
       # Correctly return rows from the database and return them as hashes.
       def fetch_rows(sql, &block)
         execute(sql) do |result|
@@ -410,7 +404,7 @@ module Sequel
       
       # Create a named prepared statement that is stored in the
       # database (and connection) for reuse.
-      def prepare(type, name, values=nil)
+      def prepare(type, name=nil, values=nil)
         ps = to_prepared_statement(type, values)
         ps.extend(PreparedStatementMethods)
         if name

@@ -1,5 +1,7 @@
 === HEAD
 
+* Support literal strings with placeholders and subselects in prepared statements (jeremyevans)
+
 * Have the connection pool remove disconnected connections when the adapter supports it (jeremyevans)
 
 * Make Dataset#exists return a LiteralString (jeremyevans)

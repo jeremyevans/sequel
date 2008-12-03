@@ -277,9 +277,8 @@ module Sequel
     #   DB.fetch('SELECT * FROM items WHERE name = ?', my_name).print
     def fetch(sql, *args, &block)
       ds = dataset
-      sql = sql.gsub('?') {|m|  ds.literal(args.shift)}
-      ds.opts[:sql] = sql
-      ds.fetch_rows(sql, &block) if block
+      ds.opts[:sql] = ds.literal(Sequel::SQL::PlaceholderLiteralString.new(sql, args))
+      ds.each(&block) if block
       ds
     end
     alias_method :>>, :fetch

@@ -249,9 +249,24 @@ module Sequel
       include Sequel::MySQL::DatasetMethods
       include StoredProcedures
       
+      # Methods to add to MySQL prepared statement calls without using a
+      # real database prepared statement and bound variables.
+      module CallableStatementMethods
+        # Extend given dataset with this module so subselects inside subselects in
+        # prepared statements work.
+        def subselect_sql(ds)
+          ps = ds.to_prepared_statement(:select)
+          ps.extend(CallableStatementMethods)
+          ps.prepared_args = prepared_args
+          ps.prepared_sql
+        end
+      end
+      
       # Methods for MySQL prepared statements using the native driver.
       module PreparedStatementMethods
         include Sequel::Dataset::UnnumberedArgumentMapper
+        
+        private
         
         # Execute the prepared statement with the bind arguments instead of
         # the given SQL.
@@ -280,6 +295,17 @@ module Sequel
         def execute_dui(sql, opts={}, &block)
           super(@sproc_name, {:args=>@sproc_args, :sproc=>true}.merge(opts), &block)
         end
+      end
+      
+      # MySQL is different in that it supports prepared statements but not bound
+      # variables outside of prepared statements.  The default implementation
+      # breaks the use of subselects in prepared statements, so extend the
+      # temporary prepared statement that this creates with a module that
+      # fixes it.
+      def call(type, bind_arguments={}, values=nil)
+        ps = to_prepared_statement(type, values)
+        ps.extend(CallableStatementMethods)
+        ps.call(bind_arguments)
       end
       
       # Delete rows matching this dataset
@@ -315,11 +341,14 @@ module Sequel
       
       # Store the given type of prepared statement in the associated database
       # with the given name.
-      def prepare(type, name, values=nil)
+      def prepare(type, name=nil, values=nil)
         ps = to_prepared_statement(type, values)
         ps.extend(PreparedStatementMethods)
-        ps.prepared_statement_name = name
-        db.prepared_statements[name] = ps
+        if name
+          ps.prepared_statement_name = name
+          db.prepared_statements[name] = ps
+        end
+        ps
       end
       
       # Replace (update or insert) the matching row.
