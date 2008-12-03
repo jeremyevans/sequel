@@ -6,6 +6,12 @@ module Sequel
       TABLES_FILTER = "type = 'table' AND NOT name = 'sqlite_sequence'"
       TEMP_STORE = {'0' => :default, '1' => :file, '2' => :memory}.freeze
       
+      # Run all alter_table commands in a transaction.  This is technically only
+      # needed for drop column.
+      def alter_table(name, generator=nil, &block)
+        transaction{super}
+      end
+
       # SQLite supports limited table modification.  You can add a column
       # or an index.  Dropping columns is supported by copying the table into
       # a temporary table, dropping the table, and creating a new table without
@@ -18,14 +24,12 @@ module Sequel
           index_definition_sql(table, op)
         when :drop_column
           columns_str = (schema_parse_table(table, {}).map{|c| c[0]} - Array(op[:name])).join(",")
-          ["BEGIN TRANSACTION",
-           "CREATE TEMPORARY TABLE #{table}_backup(#{columns_str})",
+           ["CREATE TEMPORARY TABLE #{table}_backup(#{columns_str})",
            "INSERT INTO #{table}_backup SELECT #{columns_str} FROM #{table}",
            "DROP TABLE #{table}",
            "CREATE TABLE #{table}(#{columns_str})",
            "INSERT INTO #{table} SELECT #{columns_str} FROM #{table}_backup",
-           "DROP TABLE #{table}_backup",
-           "COMMIT"]
+           "DROP TABLE #{table}_backup"]
         else
           raise Error, "Unsupported ALTER TABLE operation"
         end
