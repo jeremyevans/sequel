@@ -55,10 +55,24 @@ context "A new Database" do
   end
 
   specify "should respect the :upcase_identifiers option" do
+    Sequel.upcase_identifiers = false
     db = Sequel::Database.new(:upcase_identifiers=>false)
     db.upcase_identifiers?.should == false
+    db.upcase_identifiers = true
+    db.upcase_identifiers?.should == true
     db = Sequel::Database.new(:upcase_identifiers=>true)
     db.upcase_identifiers?.should == true
+    db.upcase_identifiers = false
+    db.upcase_identifiers?.should == false
+    Sequel.upcase_identifiers = true
+    db = Sequel::Database.new(:upcase_identifiers=>false)
+    db.upcase_identifiers?.should == false
+    db.upcase_identifiers = true
+    db.upcase_identifiers?.should == true
+    db = Sequel::Database.new(:upcase_identifiers=>true)
+    db.upcase_identifiers?.should == true
+    db.upcase_identifiers = false
+    db.upcase_identifiers?.should == false
   end
 
   specify "should use the default Sequel.quote_identifiers value" do

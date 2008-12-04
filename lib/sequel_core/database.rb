@@ -488,7 +488,8 @@ module Sequel
 
     # Returns true if the database upcases identifiers.
     def upcase_identifiers?
-      @upcase_identifiers ||= @opts.include?(:upcase_identifiers) ? @opts[:upcase_identifiers] : (@@upcase_identifiers.nil? ? upcase_identifiers_default : @@upcase_identifiers)
+      return @upcase_identifiers unless @upcase_identifiers.nil?
+      @upcase_identifiers = @opts.include?(:upcase_identifiers) ? @opts[:upcase_identifiers] : (@@upcase_identifiers.nil? ? upcase_identifiers_default : @@upcase_identifiers)
     end
     
     # Returns the URI identifying the database.
