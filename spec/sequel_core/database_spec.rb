@@ -114,6 +114,17 @@ context "A new Database" do
   end
 end
 
+context "Database#disconnect" do
+  specify "should call pool.disconnect" do
+    d = Sequel::Database.new
+    p = d.pool
+    a = 1
+    p.meta_def(:disconnect){a += 1}
+    d.disconnect.should == 2
+    a.should == 2
+  end
+end
+
 context "Database#connect" do
   specify "should raise Sequel::Error::NotImplemented" do
     proc {Sequel::Database.new.connect}.should raise_error(NotImplementedError)

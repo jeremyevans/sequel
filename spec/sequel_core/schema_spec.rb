@@ -710,6 +710,7 @@ context "Schema Parser" do
     @db.schema(:tinyint).first.last[:type].should == :boolean
     Sequel.convert_tinyint_to_bool = false
     @db.schema(:tinyint, :reload=>true).first.last[:type].should == :integer
+    @db.schema(:interval).first.last[:type].should == :interval
     @db.schema(:int).first.last[:type].should == :integer
     @db.schema(:integer).first.last[:type].should == :integer
     @db.schema(:bigint).first.last[:type].should == :integer
