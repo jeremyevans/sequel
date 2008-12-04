@@ -213,6 +213,7 @@ class Sequel::SingleThreadedPool
   #   to RuntimeError exceptions (default true)
   def initialize(opts={}, &block)
     @connection_proc = block
+    @disconnection_proc = opts[:disconnection_proc]
     @conns = {}
     @convert_exceptions = opts.include?(:pool_convert_exceptions) ? opts[:pool_convert_exceptions] : true
   end
@@ -226,13 +227,12 @@ class Sequel::SingleThreadedPool
   # This method simulates the ConnectionPool#hold API.
   def hold(server=:default)
     begin
-      yield(c = (@conns[server] ||= @connection_proc.call(server)))
-    rescue Sequel::DatabaseDisconnectError
       begin
+        yield(c = (@conns[server] ||= @connection_proc.call(server)))
+      rescue Sequel::DatabaseDisconnectError => dde
         @conns.delete(server)
         @disconnection_proc.call(c) if @disconnection_proc
-      rescue Exception => e
-        raise(@convert_exceptions && !e.is_a?(StandardError) ? RuntimeError.new(e.message) : e)
+        raise
       end
     rescue Exception => e
       # if the error is not a StandardError it is converted into RuntimeError.

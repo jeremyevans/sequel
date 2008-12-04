@@ -448,7 +448,8 @@ end
 
 context "A single threaded pool with multiple servers" do
   setup do
-    @pool = Sequel::SingleThreadedPool.new(CONNECTION_POOL_DEFAULTS.merge(:servers=>{:read_only=>{}})){|server| server}
+    @max_size=2
+    @pool = Sequel::SingleThreadedPool.new(CONNECTION_POOL_DEFAULTS.merge(:disconnection_proc=>proc{|c| @max_size=3}, :servers=>{:read_only=>{}})){|server| server}
   end
   
   specify "should use the :default server by default" do
@@ -486,5 +487,26 @@ context "A single threaded pool with multiple servers" do
     conns.sort_by{|x| x.to_s}.should == [:default, :read_only]
     @pool.conn.should == nil
     @pool.conn(:read_only).should == nil
+  end
+
+  specify ":disconnection_proc option should set the disconnection proc to use" do
+    @max_size.should == 2
+    proc{@pool.hold{raise Sequel::DatabaseDisconnectError}}.should raise_error(Sequel::DatabaseDisconnectError)
+    @max_size.should == 3
+  end
+
+  specify "#disconnection_proc= should set the disconnection proc to use" do
+    a = 1
+    @pool.disconnection_proc = proc{|c| a += 1}
+    proc{@pool.hold{raise Sequel::DatabaseDisconnectError}}.should raise_error(Sequel::DatabaseDisconnectError)
+    a.should == 2
+  end
+
+  specify "#hold should remove the connection if a DatabaseDisconnectError is raised" do
+    @pool.instance_variable_get(:@conns).length.should == 0
+    @pool.hold{}
+    @pool.instance_variable_get(:@conns).length.should == 1
+    proc{@pool.hold{raise Sequel::DatabaseDisconnectError}}.should raise_error(Sequel::DatabaseDisconnectError)
+    @pool.instance_variable_get(:@conns).length.should == 0
   end
 end
