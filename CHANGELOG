@@ -1,4 +1,4 @@
-=== HEAD
+=== 2.8.0 (2008-12-05)
 
 * Support drop column operations inside a transaction on sqlite (jeremyevans)
 

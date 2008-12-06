@@ -12,7 +12,7 @@ require "fileutils"
 include FileUtils
 
 NAME = 'sequel'
-VERS = '2.7.1'
+VERS = '2.8.0'
 CLEAN.include ["**/.*.sw?", "pkg", ".config", "rdoc", "coverage", "www/public/*.html"]
 RDOC_OPTS = ["--quiet", "--line-numbers", "--inline-source", '--title', \
   'Sequel: The Database Toolkit for Ruby', '--main', 'README']
