@@ -438,8 +438,8 @@ context "A SQLite database" do
     
     @db.drop_column :test3, :value
 
-    @db['PRAGMA table_info(?)', :test3][:id][:pk].should eql("1")
-    @db[:test3].select(:id).all.should eql([{:id => 1},{:id => 3}])
+    @db['PRAGMA table_info(?)', :test3][:id][:pk].should == "1"
+    @db[:test3].select(:id).all.should == [{:id => 1}, {:id => 3}]
   end
 
   specify "should not support rename_column operations" do
@@ -455,7 +455,7 @@ context "A SQLite database" do
     @db.add_index :test2, [:name, :value]
   end
   
-  specify "should not support drop_index" do
+  specify "should support drop_index" do
     @db.add_index :test2, :value, :unique => true
     @db.drop_index :test2, :value
   end

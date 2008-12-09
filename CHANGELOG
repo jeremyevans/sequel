@@ -1,3 +1,9 @@
+=== HEAD
+
+* Make SQLite keep table's primary key information when dropping columns (jmhodges)
+
+* Support dropping indicies on SQLite (jmhodges)
+
 === 2.8.0 (2008-12-05)
 
 * Support drop column operations inside a transaction on sqlite (jeremyevans)
