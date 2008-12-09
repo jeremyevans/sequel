@@ -1168,6 +1168,15 @@ context "Dataset#count" do
     @c.sql.should == "SELECT COUNT(*) FROM (select abc from xyz) AS t1 LIMIT 1"
   end
 
+  specify "should count properly when using UNION, INTERSECT, or EXCEPT" do
+    @dataset.union(@dataset).count.should == 1
+    @c.sql.should == "SELECT COUNT(*) FROM (SELECT * FROM test UNION SELECT * FROM test) AS t1 LIMIT 1"
+    @dataset.intersect(@dataset).count.should == 1
+    @c.sql.should == "SELECT COUNT(*) FROM (SELECT * FROM test INTERSECT SELECT * FROM test) AS t1 LIMIT 1"
+    @dataset.except(@dataset).count.should == 1
+    @c.sql.should == "SELECT COUNT(*) FROM (SELECT * FROM test EXCEPT SELECT * FROM test) AS t1 LIMIT 1"
+  end
+
   specify "should return limit if count is greater than it" do
     @dataset.limit(5).count.should == 1
     @c.sql.should == "SELECT COUNT(*) FROM (SELECT * FROM test LIMIT 5) AS t1 LIMIT 1"

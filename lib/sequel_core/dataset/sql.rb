@@ -6,7 +6,7 @@ module Sequel
     COLUMN_REF_RE1 = /\A([\w ]+)__([\w ]+)___([\w ]+)\z/.freeze
     COLUMN_REF_RE2 = /\A([\w ]+)___([\w ]+)\z/.freeze
     COLUMN_REF_RE3 = /\A([\w ]+)__([\w ]+)\z/.freeze
-    COUNT_FROM_SELF_OPTS = [:distinct, :group, :sql, :limit]
+    COUNT_FROM_SELF_OPTS = [:distinct, :group, :sql, :limit, :union, :except, :intersect]
     DATE_FORMAT = "DATE '%Y-%m-%d'".freeze
     N_ARITY_OPERATORS = ::Sequel::SQL::ComplexExpression::N_ARITY_OPERATORS
     NULL = "NULL".freeze
