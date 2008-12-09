@@ -24,10 +24,12 @@ module Sequel
           index_definition_sql(table, op)
         when :drop_column
           columns_str = (schema_parse_table(table, {}).map{|c| c[0]} - Array(op[:name])).join(",")
-           ["CREATE TEMPORARY TABLE #{table}_backup(#{columns_str})",
+          defined_columns_str = column_list_sql parse_pragma(table, {}).reject{ |c| c[:name] == op[:name].to_s}
+
+          ["CREATE TEMPORARY TABLE #{table}_backup(#{defined_columns_str})",
            "INSERT INTO #{table}_backup SELECT #{columns_str} FROM #{table}",
            "DROP TABLE #{table}",
-           "CREATE TABLE #{table}(#{columns_str})",
+           "CREATE TABLE #{table}(#{defined_columns_str})",
            "INSERT INTO #{table} SELECT #{columns_str} FROM #{table}_backup",
            "DROP TABLE #{table}_backup"]
         else
@@ -94,6 +96,12 @@ module Sequel
       # SQLite supports schema parsing using the table_info PRAGMA, so
       # parse the output of that into the format Sequel expects.
       def schema_parse_table(table_name, opts)
+        parse_pragma(table_name, opts).map do |row|
+          [row.delete(:name).to_sym, row]
+        end
+      end
+
+      def parse_pragma(table_name, opts)
         self["PRAGMA table_info(?)", table_name].map do |row|
           row.delete(:cid)
           row[:allow_null] = row.delete(:notnull).to_i == 0
@@ -102,7 +110,7 @@ module Sequel
           row[:default] = nil if row[:default].blank?
           row[:db_type] = row.delete(:type)
           row[:type] = schema_column_type(row[:db_type])
-          [row.delete(:name).to_sym, row]
+          row
         end
       end
     end

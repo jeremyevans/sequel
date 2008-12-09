@@ -421,7 +421,27 @@ context "A SQLite database" do
     @db[:test2] << {:name => 'mmm'}
     @db[:test2].first.should == {:name => 'mmm'}
   end
-  
+
+  specify "should keep column attributes when dropping a column" do
+    @db.create_table! :test3 do
+      primary_key :id
+      text :name
+      integer :value
+    end
+
+    # This lame set of additions and deletions are to test that the primary keys
+    # don't get messed up when we recreate the database.
+    @db[:test3] << { :name => "foo", :value => 1}
+    @db[:test3] << { :name => "foo", :value => 2}
+    @db[:test3] << { :name => "foo", :value => 3}
+    @db[:test3].filter(:id => 2).delete
+    
+    @db.drop_column :test3, :value
+
+    @db['PRAGMA table_info(?)', :test3][:id][:pk].should eql("1")
+    @db[:test3].select(:id).all.should eql([{:id => 1},{:id => 3}])
+  end
+
   specify "should not support rename_column operations" do
     proc {@db.rename_column :test2, :value, :zyx}.should raise_error(Sequel::Error)
   end
