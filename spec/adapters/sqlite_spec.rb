@@ -438,7 +438,7 @@ context "A SQLite database" do
     
     @db.drop_column :test3, :value
 
-    @db['PRAGMA table_info(?)', :test3][:id][:pk].should == "1"
+    @db['PRAGMA table_info(?)', :test3][:id][:pk].to_i.should == 1
     @db[:test3].select(:id).all.should == [{:id => 1}, {:id => 3}]
   end
 
