@@ -22,6 +22,8 @@ module Sequel
           super
         when :add_index
           index_definition_sql(table, op)
+        when :drop_index
+          drop_index_sql(table, op)
         when :drop_column
           columns_str = (schema_parse_table(table, {}).map{|c| c[0]} - Array(op[:name])).join(",")
           defined_columns_str = column_list_sql parse_pragma(table, {}).reject{ |c| c[:name] == op[:name].to_s}

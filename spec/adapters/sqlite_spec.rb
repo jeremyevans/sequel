@@ -456,6 +456,7 @@ context "A SQLite database" do
   end
   
   specify "should not support drop_index" do
-    proc {@db.drop_index :test2, :value}.should raise_error(Sequel::Error)
+    @db.add_index :test2, :value, :unique => true
+    @db.drop_index :test2, :value
   end
 end  
