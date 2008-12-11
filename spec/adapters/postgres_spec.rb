@@ -601,3 +601,72 @@ if POSTGRES_DB.server_version >= 80300
     end
   end
 end
+
+context "Postgres::Database functions, languages, and triggers" do
+  setup do
+    @d = POSTGRES_DB
+  end
+  teardown do
+    @d.drop_function('tf', :if_exists=>true, :cascade=>true)
+    @d.drop_function('tf', :if_exists=>true, :cascade=>true, :args=>%w'integer integer')
+    @d.drop_language(:plpgsql, :if_exists=>true, :cascade=>true)
+    @d.drop_trigger(:test5, :identity, :if_exists=>true, :cascade=>true)
+  end
+  
+  specify "#create_function and #drop_function should create and drop functions" do
+    proc{@d['SELECT tf()'].all}.should raise_error(Sequel::DatabaseError)
+    args = ['tf', 'SELECT 1', {:returns=>:integer}]
+    @d.create_function_sql(*args).should =~ /\A\s*CREATE FUNCTION tf\(\)\s+RETURNS integer\s+LANGUAGE SQL\s+AS 'SELECT 1'\s*\z/
+    @d.create_function(*args)
+    rows = @d['SELECT tf()'].all.should == [{:tf=>1}]
+    @d.drop_function_sql('tf').should == 'DROP FUNCTION tf()'
+    @d.drop_function('tf')
+    proc{@d['SELECT tf()'].all}.should raise_error(Sequel::DatabaseError)
+  end
+  
+  specify "#create_function and #drop_function should support options" do
+    args = ['tf', 'SELECT $1 + $2', {:args=>[[:integer, :a], :integer], :replace=>true, :returns=>:integer, :language=>'SQL', :behavior=>:immutable, :strict=>true, :security_definer=>true, :cost=>2, :set=>{:search_path => 'public'}}]
+    @d.create_function_sql(*args).should =~ /\A\s*CREATE OR REPLACE FUNCTION tf\(a integer, integer\)\s+RETURNS integer\s+LANGUAGE SQL\s+IMMUTABLE\s+STRICT\s+SECURITY DEFINER\s+COST 2\s+SET search_path = public\s+AS 'SELECT \$1 \+ \$2'\s*\z/
+    @d.create_function(*args)
+    # Make sure replace works
+    @d.create_function(*args)
+    rows = @d['SELECT tf(1, 2)'].all.should == [{:tf=>3}]
+    args = ['tf', {:if_exists=>true, :cascade=>true, :args=>[[:integer, :a], :integer]}]
+    @d.drop_function_sql(*args).should == 'DROP FUNCTION IF EXISTS tf(a integer, integer) CASCADE'
+    @d.drop_function(*args)
+    # Make sure if exists works
+    @d.drop_function(*args)
+  end
+  
+  specify "#create_language and #drop_language should create and drop languages" do
+    @d.create_language_sql(:plpgsql).should == 'CREATE LANGUAGE plpgsql'
+    @d.create_language(:plpgsql)
+    proc{@d.create_language(:plpgsql)}.should raise_error(Sequel::DatabaseError)
+    @d.drop_language_sql(:plpgsql).should == 'DROP LANGUAGE plpgsql'
+    @d.drop_language(:plpgsql)
+    proc{@d.drop_language(:plpgsql)}.should raise_error(Sequel::DatabaseError)
+    @d.create_language_sql(:plpgsql, :trusted=>true, :handler=>:a, :validator=>:b).should == 'CREATE TRUSTED LANGUAGE plpgsql HANDLER a VALIDATOR b'
+    @d.drop_language_sql(:plpgsql, :if_exists=>true, :cascade=>true).should == 'DROP LANGUAGE IF EXISTS plpgsql CASCADE'
+    # Make sure if exists works
+    @d.drop_language(:plpgsql, :if_exists=>true, :cascade=>true)
+  end
+  
+  specify "#create_trigger and #drop_trigger should create and drop triggers" do
+    @d.create_language(:plpgsql)
+    @d.create_function(:tf, 'BEGIN IF NEW.value IS NULL THEN RAISE EXCEPTION \'Blah\'; END IF; RETURN NEW; END;', :language=>:plpgsql, :returns=>:trigger)
+    @d.create_trigger_sql(:test, :identity, :tf, :each_row=>true).should == 'CREATE TRIGGER identity BEFORE INSERT OR UPDATE OR DELETE ON public.test FOR EACH ROW EXECUTE PROCEDURE tf()'
+    @d.create_trigger(:test, :identity, :tf, :each_row=>true)
+    @d[:test].insert(:name=>'a', :value=>1)
+    @d[:test].filter(:name=>'a').all.should == [{:name=>'a', :value=>1}]
+    proc{@d[:test].filter(:name=>'a').update(:value=>nil)}.should raise_error(Sequel::DatabaseError)
+    @d[:test].filter(:name=>'a').all.should == [{:name=>'a', :value=>1}]
+    @d[:test].filter(:name=>'a').update(:value=>3)
+    @d[:test].filter(:name=>'a').all.should == [{:name=>'a', :value=>3}]
+    @d.drop_trigger_sql(:test, :identity).should == 'DROP TRIGGER identity ON public.test'
+    @d.drop_trigger(:test, :identity)
+    @d.create_trigger_sql(:test, :identity, :tf, :after=>true, :events=>:insert, :args=>[1, 'a']).should == 'CREATE TRIGGER identity AFTER INSERT ON public.test EXECUTE PROCEDURE tf(1, \'a\')'
+    @d.drop_trigger_sql(:test, :identity, :if_exists=>true, :cascade=>true).should == 'DROP TRIGGER IF EXISTS identity ON public.test CASCADE'
+    # Make sure if exists works
+    @d.drop_trigger(:test, :identity, :if_exists=>true, :cascade=>true)
+  end
+end

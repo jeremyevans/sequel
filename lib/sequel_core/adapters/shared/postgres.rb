@@ -7,7 +7,7 @@ module Sequel
     @force_standard_strings = true
 
     # By default, Sequel forces the use of standard strings, so that
-    # '\\' is interpreted as '\\' and not '\\'.  While PostgreSQL defaults
+    # '\\' is interpreted as \\ and not \.  While PostgreSQL defaults
     # to interpreting plain strings as extended strings, this will change
     # in a future version of PostgreSQL.  Sequel assumes that SQL standard
     # strings will be used.
@@ -127,12 +127,122 @@ module Sequel
       SQL_ROLLBACK = 'ROLLBACK'.freeze
       SQL_RELEASE_SAVEPOINT = 'RELEASE SAVEPOINT autopoint_%d'.freeze
       SYSTEM_TABLE_REGEXP = /^pg|sql/.freeze
+
+      # Creates the function in the database.  See create_function_sql for arguments.
+      def create_function(*args)
+        self << create_function_sql(*args)
+      end
+      
+      # SQL statement to create database function. Arguments:
+      # * name : name of the function to create
+      # * definition : string definition of the function, or object file for a dynamically loaded C function.
+      # * opts : options hash:
+      #   * :args : function arguments, can be either a symbol or string specifying a type or an array of 1-3 elements:
+      #     * element 1 : argument data type
+      #     * element 2 : argument name
+      #     * element 3 : argument mode (e.g. in, out, inout)
+      #   * :behavior : Should be IMMUTABLE, STABLE, or VOLATILE.  PostgreSQL assumes VOLATILE by default.
+      #   * :cost : The estimated cost of the function, used by the query planner.
+      #   * :language : The language the function uses.  SQL is the default.
+      #   * :link_symbol : For a dynamically loaded see function, the function's link symbol if different from the definition argument.
+      #   * :returns : The data type returned by the function.  If you are using OUT or INOUT argument modes, this is ignored.
+      #     Otherwise, if this is not specified, void is used by default to specify the function is not supposed to return a value.
+      #   * :rows : The estimated number of rows the function will return.  Only use if the function returns SETOF something.
+      #   * :security_definer : Makes the privileges of the function the same as the privileges of the user who defined the function instead of
+      #     the privileges of the user who runs the function.  There are security implications when doing this, see the PostgreSQL documentation.
+      #   * :set : Configuration variables to set while the function is being run, can be a hash or an array of two pairs.  search_path is
+      #     often used here if :security_definer is used.
+      #   * :strict : Makes the function return NULL when any argument is NULL.
+      def create_function_sql(name, definition, opts={})
+        args = opts[:args]
+        if !opts[:args].is_a?(Array) || !opts[:args].any?{|a| Array(a).length == 3 and %w'OUT INOUT'.include?(a[2].to_s)}
+          returns = opts[:returns] || 'void'
+        end
+        language = opts[:language] || 'SQL'
+        <<-END
+        CREATE#{' OR REPLACE' if opts[:replace]} FUNCTION #{name}#{sql_function_args(args)}
+        #{"RETURNS #{returns}" if returns}
+        LANGUAGE #{language}
+        #{opts[:behavior].to_s.upcase if opts[:behavior]}
+        #{'STRICT' if opts[:strict]}
+        #{'SECURITY DEFINER' if opts[:security_definer]}
+        #{"COST #{opts[:cost]}" if opts[:cost]}
+        #{"ROWS #{opts[:rows]}" if opts[:rows]}
+        #{opts[:set].map{|k,v| " SET #{k} = #{v}"}.join("\n") if opts[:set]}
+        AS #{literal(definition.to_s)}#{", #{literal(opts[:link_symbol].to_s)}" if opts[:link_symbol]}
+        END
+      end
+      
+      # Create the procedural language in the database.  See create_language_sql for arguments.
+      def create_language(*args)
+        self << create_language_sql(*args)
+      end
+      
+      # SQL for creating a procedural language. Arguments:
+      # * name : Name of the procedural language (e.g. plpgsql)
+      # * opts : options hash:
+      #   * :handler : The name of a previously registered function used as a call handler for this language.
+      #   * :trusted : Marks the language being created as trusted, allowing unprivileged users to create functions using this language.
+      #   * :validator : The name of previously registered function used as a validator of functions defined in this language.
+      def create_language_sql(name, opts={})
+        "CREATE#{' TRUSTED' if opts[:trusted]} LANGUAGE #{name}#{" HANDLER #{opts[:handler]}" if opts[:handler]}#{" VALIDATOR #{opts[:validator]}" if opts[:validator]}"
+      end
+      
+      # Create a trigger in the database.  See create_trigger_sql for arguments.
+      def create_trigger(*args)
+        self << create_trigger_sql(*args)
+      end
+      
+      # SQL for creating a database trigger. Arguments:
+      # * table : the table on which this trigger operates
+      # * name : the name of this trigger
+      # * function : the function to call for this trigger, which should return type trigger.
+      # * opts : options hash:
+      #   * :after : Calls the trigger after execution instead of before.
+      #   * :args : An argument or array of arguments to pass to the function.
+      #   * :each_row : Calls the trigger for each row instead of for each statement.
+      #   * :events : Can be :insert, :update, :delete, or an array of any of those. Calls the trigger whenever that type of statement is used.  By default,
+      #     the trigger is called for insert, update, or delete.
+      def create_trigger_sql(table, name, function, opts={})
+        events = opts[:events] ? Array(opts[:events]) : [:insert, :update, :delete]
+        whence = opts[:after] ? 'AFTER' : 'BEFORE'
+        "CREATE TRIGGER #{name} #{whence} #{events.map{|e| e.to_s.upcase}.join(' OR ')} ON #{quote_schema_table(table)}#{' FOR EACH ROW' if opts[:each_row]} EXECUTE PROCEDURE #{function}(#{Array(opts[:args]).map{|a| literal(a)}.join(', ')})"
+      end
       
       # The default schema to use if none is specified (default: public)
       def default_schema
         @default_schema ||= :public
       end
       
+      # Drops the function from the database.  See drop_function_sql for arguments.
+      def drop_function(*args)
+        self << drop_function_sql(*args)
+      end
+      
+      # SQL for dropping a function from the database.  Arguments:
+      # * name : name of the function to drop
+      # * opts : options hash:
+      #   * :args : The arguments for the function.  See create_function_sql.
+      #   * :cascade : Drop other objects depending on this function.
+      #   * :if_exists : Don't raise an error if the function doesn't exist.
+      def drop_function_sql(name, opts={})
+        "DROP FUNCTION#{' IF EXISTS' if opts[:if_exists]} #{name}#{sql_function_args(opts[:args])}#{' CASCADE' if opts[:cascade]}"
+      end
+      
+      # Drops a procedural language from the database.  See drop_language_sql for arguments.
+      def drop_language(*args)
+        self << drop_language_sql(*args)
+      end
+      
+      # SQL for dropping a procedural language from the database.  Arguments:
+      # * name : name of the procedural language to drop
+      # * opts : options hash:
+      #   * :cascade : Drop other objects depending on this function.
+      #   * :if_exists : Don't raise an error if the function doesn't exist.
+      def drop_language_sql(name, opts={})
+        "DROP LANGUAGE#{' IF EXISTS' if opts[:if_exists]} #{name}#{' CASCADE' if opts[:cascade]}"
+      end
+
       # Remove the cached entries for primary keys and sequences when dropping a table.
       def drop_table(*names)
         names.each do |name|
@@ -148,6 +258,21 @@ module Sequel
         "DROP TABLE #{quote_schema_table(name)} CASCADE"
       end
       
+      # Drops a trigger from the database.  See drop_trigger_sql for arguments.
+      def drop_trigger(*args)
+        self << drop_trigger_sql(*args)
+      end
+      
+      # SQL for dropping a trigger from the database.  Arguments:
+      # * table : table from which to drop the trigger
+      # * name : name of the trigger to drop
+      # * opts : options hash:
+      #   * :cascade : Drop other objects depending on this function.
+      #   * :if_exists : Don't raise an error if the function doesn't exist.
+      def drop_trigger_sql(table, name, opts={})
+        "DROP TRIGGER#{' IF EXISTS' if opts[:if_exists]} #{name} ON #{quote_schema_table(table)}#{' CASCADE' if opts[:cascade]}"
+      end
+
       # PostgreSQL specific index SQL.
       def index_definition_sql(table_name, index)
         index_name = index[:name] || default_index_name(table_name, index[:columns])
@@ -374,6 +499,11 @@ module Sequel
           ds.join!(:pg_namespace, :oid=>:pg_class__relnamespace, :nspname=>(opts[:schema] || default_schema).to_s)
         end
         ds
+      end
+
+      # Turns an array of argument specifiers into an SQL fragment used for function arguments.  See create_function_sql.
+      def sql_function_args(args)
+        "(#{Array(args).map{|a| Array(a).reverse.join(' ')}.join(', ')})"
       end
     end
     

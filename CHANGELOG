@@ -1,5 +1,7 @@
 === HEAD
 
+* Add methods to create and drop functions, triggers, and procedural languages on PostgreSQL (jeremyevans)
+
 * Fix Dataset#count when using UNION, EXCEPT, or INTERSECT (jeremyevans)
 
 * Make SQLite keep table's primary key information when dropping columns (jmhodges)
