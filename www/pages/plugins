@@ -7,6 +7,12 @@
 <li><a href='http://github.com/bricooke/sequel_timestamped'>sequel_timestamped</a>: Adds support for autotimestamping created_at and updated_at columns if they exist.</li>
 </ul>
 
-<h3>Submitting Your Plugin</h3>
+<h2>Other Sequel Extensions</h2>
 
-<p>If you have created a Sequel plugin and would like to list it here, please submit a request to code AT jeremyevans DOT net.</p>
+<ul>
+<li><a href='http://github.com/jeremyevans/sequel_postgresql_triggers'>sequel_postgresql_triggers</a>: Database enforced timestamps, immutable columns, and counter/sum caches.</li>
+</ul>
+
+<h3>Submitting Your Plugin/Extension</h3>
+
+<p>If you have created a Sequel plugin/extension and would like to list it here, please submit a request to code AT jeremyevans DOT net.</p>
