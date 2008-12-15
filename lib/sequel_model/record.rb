@@ -135,7 +135,7 @@ module Sequel
     # Returns a string representation of the model instance including
     # the class name and values.
     def inspect
-      "#<#{model.name} @values=#{@values.inspect}>"
+      "#<#{model.name} @values=#{inspect_values}>"
     end
 
     # Returns attribute names as an array of symbols.
@@ -376,6 +376,11 @@ module Sequel
       else
         o.associations[reciprocal] = self
       end
+    end
+
+    # Default inspection output for a record, overwrite to change the way #inspect prints the @values hash
+    def inspect_values
+      @values.inspect
     end
 
     # Load the associated objects using the dataset

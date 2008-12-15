@@ -1,5 +1,7 @@
 === HEAD
 
+* Make Model#inspect call Model#inspect_values private method for easier overloading (bougyman)
+
 * Add methods to create and drop functions, triggers, and procedural languages on PostgreSQL (jeremyevans)
 
 * Fix Dataset#count when using UNION, EXCEPT, or INTERSECT (jeremyevans)
