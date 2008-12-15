@@ -650,6 +650,13 @@ context "Schema Parser" do
     Sequel.convert_tinyint_to_bool = true
   end
 
+  specify "should raise an error if there are no columns" do
+    @db.meta_def(:schema_parse_table) do |t, opts|
+      []
+    end
+    proc{@db.schema(:x)}.should raise_error(Sequel::Error)
+  end
+
   specify "should parse the schema correctly for a single table" do
     sqls = @sqls
     proc{@db.schema(:x)}.should raise_error(Sequel::Error)

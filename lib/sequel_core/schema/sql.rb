@@ -243,7 +243,9 @@ module Sequel
 
         if table_name
           if respond_to?(:schema_parse_table, true)
-            @schemas[quoted_name] = schema_parse_table(table_name, opts)
+            cols = schema_parse_table(table_name, opts)
+            raise(Error, 'schema parsing returned no columns, table probably doesn\'t exist') if cols.blank?
+            @schemas[quoted_name] = cols
           else
             raise Error, 'schema parsing is not implemented on this database'
           end

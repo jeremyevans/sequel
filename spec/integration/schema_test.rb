@@ -25,6 +25,10 @@ describe "Database schema parser" do
     INTEGRATION_DB.schema(:items, :reload=>true).should == INTEGRATION_DB.schema(nil, :reload=>true)[:items]
   end
 
+  specify "should raise an error when the table doesn't exist" do
+    proc{INTEGRATION_DB.schema(:no_table)}.should raise_error(Sequel::Error)
+  end
+
   specify "should return the schema correctly" do
     INTEGRATION_DB.create_table!(:items){integer :number}
     schema = INTEGRATION_DB.schema(:items, :reload=>true)

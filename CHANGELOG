@@ -1,5 +1,7 @@
 === HEAD
 
+* Make Database#schema raise an error if given a table that doesn't exist (jeremyevans) (#255)
+
 * Make Model#inspect call Model#inspect_values private method for easier overloading (bougyman)
 
 * Add methods to create and drop functions, triggers, and procedural languages on PostgreSQL (jeremyevans)
