@@ -606,7 +606,7 @@ module Sequel
         when LiteralString
           v
         when SQL::Blob
-          db.synchronize{|c| "E'#{c.escape_bytea(v)}'"}
+          db.synchronize{|c| "'#{c.escape_bytea(v)}'"}
         when String
           db.synchronize{|c| "'#{c.escape_string(v)}'"}
         when Time
