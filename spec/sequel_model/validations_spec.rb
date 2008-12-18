@@ -897,7 +897,7 @@ describe "Model#save" do
   end
   
   specify "should raise error if validations fail and raise_on_save_faiure is true" do
-    proc{@m.save}.should raise_error(Sequel::Error)
+    proc{@m.save}.should raise_error(Sequel::ValidationFailed)
   end
   
   specify "should return nil if validations fail and raise_on_save_faiure is false" do

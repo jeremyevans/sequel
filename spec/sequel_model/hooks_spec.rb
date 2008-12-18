@@ -213,6 +213,7 @@ describe "Model#before_create && Model#after_create" do
 
   specify ".create should cancel the save and raise an error if before_create returns false and raise_on_save_failure is true" do
     @c.before_create{false}
+    proc{@c.load(:id => 2233).save}.should_not raise_error(Sequel::ValidationFailed)
     proc{@c.create(:x => 2)}.should raise_error(Sequel::Error)
     MODEL_DB.sqls.should == []
   end
@@ -248,6 +249,7 @@ describe "Model#before_update && Model#after_update" do
 
   specify "#save should cancel the save and raise an error if before_update returns false and raise_on_save_failure is true" do
     @c.before_update{false}
+    proc{@c.load(:id => 2233).save}.should_not raise_error(Sequel::ValidationFailed)
     proc{@c.load(:id => 2233).save}.should raise_error(Sequel::Error)
     MODEL_DB.sqls.should == []
   end
@@ -295,6 +297,7 @@ describe "Model#before_save && Model#after_save" do
 
   specify "#save should cancel the save and raise an error if before_save returns false and raise_on_save_failure is true" do
     @c.before_save{false}
+    proc{@c.load(:id => 2233).save}.should_not raise_error(Sequel::ValidationFailed)
     proc{@c.load(:id => 2233).save}.should raise_error(Sequel::Error)
     MODEL_DB.sqls.should == []
   end
@@ -393,6 +396,7 @@ describe "Model#before_validation && Model#after_validation" do
 
   specify "#save should cancel the save and raise an error if before_validation returns false and raise_on_save_failure is true" do
     @c.before_validation{false}
+    proc{@c.load(:id => 2233).save}.should_not raise_error(Sequel::ValidationFailed)
     proc{@c.load(:id => 2233).save}.should raise_error(Sequel::Error)
     MODEL_DB.sqls.should == []
   end
