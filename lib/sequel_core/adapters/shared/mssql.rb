@@ -54,6 +54,8 @@ module Sequel
       
       def literal(v)
         case v
+        when LiteralString
+          v
         when String
           "N#{super}"
         when Time
