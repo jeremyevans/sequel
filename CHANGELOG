@@ -1,5 +1,7 @@
 === HEAD
 
+* Add Sequel::ValidationFailed exception to be raised when a record fails because a validation fails (bougyman)
+
 * Make Database#schema raise an error if given a table that doesn't exist (jeremyevans) (#255)
 
 * Make Model#inspect call Model#inspect_values private method for easier overloading (bougyman)
