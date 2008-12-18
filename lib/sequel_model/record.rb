@@ -461,7 +461,10 @@ module Sequel
     # Raise an error if raise_on_save_failure is true
     def save_failure(action, raise_error = nil)
       raise_error = raise_on_save_failure if raise_error.nil?
-      raise(errors.empty? ? Error : ValidationFailed, "unable to #{action} record") if raise_error
+      if raise_error
+        raise BeforeHookFailed if errors.delete(:before_hook_failed)
+        raise(errors.empty? ? Error : ValidationFailed, "unable to #{action} record") if raise_error
+      end
     end
 
     # Set the columns, filtered by the only and except arrays.
