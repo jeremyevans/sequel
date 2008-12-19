@@ -208,6 +208,7 @@ module Sequel
         subclass.instance_variable_set(iv, sup_class_value)
       end
       unless ivs.include?("@dataset")
+        db
         begin
           if sup_class == Model
             subclass.set_dataset(Model.db[subclass.implicit_table_name]) unless subclass.name.blank?

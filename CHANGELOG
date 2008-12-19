@@ -1,5 +1,7 @@
 === HEAD
 
+* Make Sequel raise an Error if you attempt to subclass Sequel::Model before setting up a database connection (jeremyevans)
+
 * Add Sequel::ValidationFailed exception to be raised when a record fails because a validation fails (bougyman)
 
 * Make Database#schema raise an error if given a table that doesn't exist (jeremyevans) (#255)
