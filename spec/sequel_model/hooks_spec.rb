@@ -397,7 +397,7 @@ describe "Model#before_validation && Model#after_validation" do
   specify "#save should cancel the save and raise an error if before_validation returns false and raise_on_save_failure is true" do
     @c.before_validation{false}
     proc{@c.load(:id => 2233).save}.should_not raise_error(Sequel::ValidationFailed)
-    proc{@c.load(:id => 2233).save}.should raise_error(Sequel::BeforeHookFailed)
+    proc{@c.load(:id => 2233).save}.should raise_error(Sequel::Error)
     MODEL_DB.sqls.should == []
   end
 

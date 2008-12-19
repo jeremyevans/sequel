@@ -384,10 +384,7 @@ module Sequel
     # Validates the object.
     def validate
       errors.clear
-      if before_validation == false
-        errors.add(:before_hook_failed, "before hook failed")
-        return false
-      end
+      return false if before_validation == false
       self.class.validate(self)
       after_validation
       nil
