@@ -9,18 +9,12 @@ FIREBIRD_DB.create_table! :TEST do
   varchar :NAME,  :size => 50
   integer :VAL,   :index => true
 end
-#FIREBIRD_DB.create_table! :TEST2 do
-#  text :NAME
-#  integer :VAL
-#end
+
 FIREBIRD_DB.create_table! :TEST3 do
   integer :VAL
   timestamp :TIME_STAMP
 end
-#FIREBIRD_DB.create_table! :TEST4 do
-#  varchar :NAME, :size => 20
-#  bytea :VAL
-#end
+
 FIREBIRD_DB.create_table! :TEST5 do
   primary_key :XID
   integer :VAL
@@ -229,11 +223,8 @@ context "A Firebird database" do
     @db[:test2] << {}
     @db[:test2].columns.should == [:NAME, :VAL]
 
-#    @db.create_domain!(:xyz_varchar){varchar :default => '000', :size => 50}
     @db.add_column :test2, :XYZ, :varchar, :size => 50
     @db[:test2].columns.should == [:NAME, :VAL, :XYZ]
-#    @db[:test2] << {:NAME => 'mmm', :VAL => 111}
-#    @db[:test2].first[:XYZ].should == '000'
 
     @db[:test2].columns.should == [:NAME, :VAL, :XYZ]
     @db.drop_column :test2, :XYZ
