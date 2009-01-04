@@ -27,7 +27,7 @@ module Sequel
     @@single_threaded = false
 
     # Whether to quote identifiers (columns and tables) by default
-    @@quote_identifiers = true
+    @@quote_identifiers = nil
 
     # Whether to upcase identifiers (columns and tables) by default
     @@upcase_identifiers = nil
@@ -70,7 +70,6 @@ module Sequel
     def initialize(opts = {}, &block)
       @opts = opts
       
-      @quote_identifiers = opts.include?(:quote_identifiers) ? opts[:quote_identifiers] : @@quote_identifiers
       @single_threaded = opts.include?(:single_threaded) ? opts[:single_threaded] : @@single_threaded
       @schemas = nil
       @default_schema = opts[:default_schema]
@@ -338,7 +337,8 @@ module Sequel
     
     # Returns true if the database quotes identifiers.
     def quote_identifiers?
-      @quote_identifiers
+      return @quote_identifiers unless @quote_identifiers.nil?
+      @quote_identifiers = @opts.include?(:quote_identifiers) ? @opts[:quote_identifiers] : (@@quote_identifiers.nil? ? quote_identifiers_default : @@quote_identifiers)
     end
     
     # Returns a new dataset with the select method invoked.
@@ -530,6 +530,10 @@ module Sequel
       {}
     end
     
+    def quote_identifiers_default
+      true
+    end
+
     # SQL to ROLLBACK a transaction.
     def rollback_transaction_sql
       SQL_ROLLBACK
