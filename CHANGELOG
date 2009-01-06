@@ -1,5 +1,7 @@
 === HEAD
 
+* Default to logging only WARNING level messages when connecting to PostgreSQL (jeremyevans)
+
 * Fix add_foreign_key for MySQL (jeremyevans)
 
 * Correctly literalize BigDecimal NaN and (+-)Infinity values (Fixes #256) (jeremyevans)
