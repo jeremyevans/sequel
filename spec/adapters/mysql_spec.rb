@@ -443,6 +443,13 @@ context "A MySQL database" do
   specify "should support drop_index" do
     @db.drop_index :test2, :value
   end
+  
+  specify "should support add_foreign_key" do
+    @db.alter_table :test2 do
+      add_foreign_key :value2, :test2, :key=>:value
+    end
+    @db[:test2].columns.should == [:name, :value, :zyx, :ert, :xyz, :value2]
+  end
 end  
 
 context "A MySQL database" do

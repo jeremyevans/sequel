@@ -15,6 +15,12 @@ module Sequel
       # drop index cases.
       def alter_table_sql(table, op)
         case op[:op]
+        when :add_column
+          if related = op.delete(:table)
+            [super(table, op), "ALTER TABLE #{quote_schema_table(table)} ADD FOREIGN KEY (#{quote_identifier(op[:name])}) REFERENCES #{quote_schema_table(related)}#{" (#{Array(op[:key]).map{|x| quote_identifier(x)}.join(', ')})" if op[:key]}"]
+          else
+            super(table, op)
+          end
         when :rename_column
           "ALTER TABLE #{quote_schema_table(table)} CHANGE COLUMN #{quote_identifier(op[:name])} #{quote_identifier(op[:new_name])} #{type_literal(op)}"
         when :set_column_type

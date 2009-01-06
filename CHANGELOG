@@ -1,5 +1,7 @@
 === HEAD
 
+* Fix add_foreign_key for MySQL (jeremyevans)
+
 * Correctly literalize BigDecimal NaN and (+-)Infinity values (Fixes #256) (jeremyevans)
 
 * Make Sequel raise an Error if you attempt to subclass Sequel::Model before setting up a database connection (jeremyevans)
