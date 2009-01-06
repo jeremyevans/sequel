@@ -1,5 +1,7 @@
 === HEAD
 
+* Correctly literalize BigDecimal NaN and (+-)Infinity values (Fixes #256) (jeremyevans)
+
 * Make Sequel raise an Error if you attempt to subclass Sequel::Model before setting up a database connection (jeremyevans)
 
 * Add Sequel::ValidationFailed exception to be raised when a record fails because a validation fails (bougyman)

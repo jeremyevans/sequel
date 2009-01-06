@@ -471,7 +471,9 @@ module Sequel
       when Integer, Float
         v.to_s
       when BigDecimal
-        v.to_s("F")
+        d = v.to_s("F")
+        d = "'#{d}'" if v.nan? || v.infinite?
+        d
       when NilClass
         NULL
       when TrueClass

@@ -686,6 +686,9 @@ context "Dataset#literal" do
 
   specify "should literalize BigDecimal instances correctly" do
     @dataset.literal(BigDecimal.new("80")).should == "80.0"
+    @dataset.literal(BigDecimal.new("NaN")).should == "'NaN'"
+    @dataset.literal(BigDecimal.new("Infinity")).should == "'Infinity'"
+    @dataset.literal(BigDecimal.new("-Infinity")).should == "'-Infinity'"
   end
 
   specify "should raise an Error if the object can't be literalized" do

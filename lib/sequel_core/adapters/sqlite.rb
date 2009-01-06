@@ -31,6 +31,7 @@ module Sequel
         db = ::SQLite3::Database.new(opts[:database])
         db.busy_timeout(opts.fetch(:timeout, 5000))
         db.type_translation = true
+        
         # Handle datetime's with Sequel.datetime_class
         prok = proc do |t,v|
           v = Time.at(v.to_i).iso8601 if UNIX_EPOCH_TIME_FORMAT.match(v)
@@ -38,6 +39,13 @@ module Sequel
         end
         db.translator.add_translator("timestamp", &prok)
         db.translator.add_translator("datetime", &prok)
+        
+        # Handle numeric values with BigDecimal
+        prok = proc{|t,v| BigDecimal.new(v) rescue v}
+        db.translator.add_translator("numeric", &prok)
+        db.translator.add_translator("decimal", &prok)
+        db.translator.add_translator("money", &prok)
+        
         db
       end
       

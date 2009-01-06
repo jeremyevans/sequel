@@ -248,6 +248,20 @@ context "An SQLite dataset" do
   end
 end
 
+context "An SQLite numeric column" do
+  specify "should handle and return BigDecimal values" do
+    SQLITE_DB.create_table!(:d){numeric :d}
+    d = SQLITE_DB[:d]
+    d.insert(:d=>BigDecimal.new('80.0'))
+    d.insert(:d=>BigDecimal.new('NaN'))
+    d.insert(:d=>BigDecimal.new('Infinity'))
+    d.insert(:d=>BigDecimal.new('-Infinity'))
+    ds = d.all
+    ds.shift.should == {:d=>BigDecimal.new('80.0')}
+    ds.map{|x| x[:d].to_s}.should == %w'NaN Infinity -Infinity'
+  end
+end
+
 context "An SQLite dataset AS clause" do
   specify "should use a string literal for :col___alias" do
     SQLITE_DB.literal(:c___a).should == "c AS 'a'"
