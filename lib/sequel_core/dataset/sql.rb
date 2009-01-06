@@ -6,13 +6,13 @@ module Sequel
     COLUMN_REF_RE1 = /\A([\w ]+)__([\w ]+)___([\w ]+)\z/.freeze
     COLUMN_REF_RE2 = /\A([\w ]+)___([\w ]+)\z/.freeze
     COLUMN_REF_RE3 = /\A([\w ]+)__([\w ]+)\z/.freeze
-    COUNT_FROM_SELF_OPTS = [:distinct, :group, :sql, :limit, :union, :except, :intersect]
+    COUNT_FROM_SELF_OPTS = [:distinct, :group, :sql, :limit, :compounds]
     DATE_FORMAT = "DATE '%Y-%m-%d'".freeze
     N_ARITY_OPERATORS = ::Sequel::SQL::ComplexExpression::N_ARITY_OPERATORS
     NULL = "NULL".freeze
     QUESTION_MARK = '?'.freeze
     STOCK_COUNT_OPTS = {:select => ["COUNT(*)".lit], :order => nil}.freeze
-    SELECT_CLAUSE_ORDER = %w'distinct columns from join where group having intersect union except order limit'.freeze
+    SELECT_CLAUSE_ORDER = %w'distinct columns from join where group having compounds order limit'.freeze
     TIMESTAMP_FORMAT = "TIMESTAMP '%Y-%m-%d %H:%M:%S'".freeze
     TWO_ARITY_OPERATORS = ::Sequel::SQL::ComplexExpression::TWO_ARITY_OPERATORS
     WILDCARD = '*'.freeze
@@ -104,7 +104,7 @@ module Sequel
     #   DB[:items].except(DB[:other_items]).sql
     #   #=> "SELECT * FROM items EXCEPT SELECT * FROM other_items"
     def except(dataset, all = false)
-      clone(:except => dataset, :except_all => all)
+      compound_clone(:except, dataset, all)
     end
 
     # Performs the inverse of Dataset#filter.
@@ -316,7 +316,7 @@ module Sequel
     #   DB[:items].intersect(DB[:other_items]).sql
     #   #=> "SELECT * FROM items INTERSECT SELECT * FROM other_items"
     def intersect(dataset, all = false)
-      clone(:intersect => dataset, :intersect_all => all)
+      compound_clone(:intersect, dataset, all)
     end
 
     # Inverts the current filter
@@ -682,7 +682,7 @@ module Sequel
     #   DB[:items].union(DB[:other_items]).sql
     #   #=> "SELECT * FROM items UNION SELECT * FROM other_items"
     def union(dataset, all = false)
-      clone(:union => dataset, :union_all => all)
+      compound_clone(:union, dataset, all)
     end
 
     # Returns a copy of the dataset with the distinct option.
@@ -769,6 +769,11 @@ module Sequel
         end
         m.join(COMMA_SEPARATOR)
       end
+    end
+    
+    # Add the dataset to the list of compounds
+    def compound_clone(type, dataset, all)
+      clone(:compounds=>Array(@opts[:compounds]).map{|x| x.dup} + [[type, dataset, all]])
     end
     
     # Converts an array of expressions into a comma separated string of
@@ -882,9 +887,16 @@ module Sequel
       end
     end
 
-    # Modify the sql to add a dataset to the EXCEPT clause
-    def select_except_sql(sql, opts)
-      sql << " EXCEPT#{' ALL' if opts[:except_all]} #{opts[:except].sql}" if opts[:except]
+    # Modify the sql to add a dataset to the via an EXCEPT, INTERSECT, or UNION clause.
+    # This uses a subselect for the compound datasets used, because using parantheses doesn't
+    # work on all databases.  I consider this an ugly hack, but can't I think of a better default.
+    def select_compounds_sql(sql, opts)
+      return unless opts[:compounds]
+      opts[:compounds].each do |type, dataset, all|
+        compound_sql = subselect_sql(dataset)
+        compound_sql = "SELECT * FROM (#{compound_sql})" if dataset.opts[:compounds]
+        sql.replace("#{sql} #{type.to_s.upcase}#{' ALL' if all} #{compound_sql}")
+      end
     end
 
     # Modify the sql to add the list of tables to select FROM
@@ -902,11 +914,6 @@ module Sequel
       sql << " HAVING #{literal(opts[:having])}" if opts[:having]
     end
 
-    # Modify the sql to add a dataset to the INTERSECT clause
-    def select_intersect_sql(sql, opts)
-      sql << " INTERSECT#{' ALL' if opts[:intersect_all]} #{opts[:intersect].sql}" if opts[:intersect]
-    end
-
     # Modify the sql to add the list of tables to JOIN to
     def select_join_sql(sql, opts)
       opts[:join].each{|j| sql << literal(j)} if opts[:join]
@@ -921,11 +928,6 @@ module Sequel
     # Modify the sql to add the expressions to ORDER BY
     def select_order_sql(sql, opts)
       sql << " ORDER BY #{expression_list(opts[:order])}" if opts[:order]
-    end
-
-    # Modify the sql to add a dataset to the UNION clause
-    def select_union_sql(sql, opts)
-      sql << " UNION#{' ALL' if opts[:union_all]} #{opts[:union].sql}" if opts[:union]
     end
 
     # Modify the sql to add the filter criteria in the WHERE clause

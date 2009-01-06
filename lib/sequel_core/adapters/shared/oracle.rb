@@ -15,7 +15,13 @@ module Sequel
     module DatasetMethods
       include Dataset::UnsupportedIntersectExceptAll
 
-      SELECT_CLAUSE_ORDER = %w'distinct columns from join where group having union intersect except order limit'.freeze
+      SELECT_CLAUSE_ORDER = %w'distinct columns from join where group having compounds order limit'.freeze
+
+      # Oracle uses MINUS instead of EXCEPT, and doesn't support EXCEPT ALL
+      def except(dataset, all = false)
+        raise(Sequel::Error, "EXCEPT ALL not supported") if all
+        compound_clone(:minus, dataset, all)
+      end
 
       def empty?
         db[:dual].where(exists).get(1) == nil
@@ -39,11 +45,6 @@ module Sequel
           raise(Error, "DISTINCT ON not supported by Oracle") unless opts[:distinct].empty?
           sql << " DISTINCT"
         end
-      end
-
-      # Oracle uses MINUS instead of EXCEPT, and doesn't support EXCEPT ALL
-      def select_except_sql(sql, opts)
-        sql << " MINUS #{opts[:except].sql}" if opts[:except]
       end
 
       # Oracle requires a subselect to do limit and offset

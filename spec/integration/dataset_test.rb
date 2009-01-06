@@ -81,3 +81,54 @@ describe "Simple Dataset operations in transactions" do
     end
   end
 end
+
+describe "Dataset UNION, EXCEPT, and INTERSECT" do
+  before do
+    INTEGRATION_DB.create_table!(:i1){integer :number}
+    INTEGRATION_DB.create_table!(:i2){integer :number}
+    INTEGRATION_DB.create_table!(:i3){integer :number}
+    @ds1 = INTEGRATION_DB[:i1]
+    @ds1.insert(:number=>10)
+    @ds1.insert(:number=>20)
+    @ds2 = INTEGRATION_DB[:i2]
+    @ds2.insert(:number=>10)
+    @ds2.insert(:number=>30)
+    @ds3 = INTEGRATION_DB[:i3]
+    @ds3.insert(:number=>10)
+    @ds3.insert(:number=>40)
+    clear_sqls
+  end
+  
+  specify "should give the correct results for simple UNION, EXCEPT, and INTERSECT" do
+    @ds1.union(@ds2).order(:number).map{|x| x[:number].to_s}.should == %w'10 20 30'
+    unless @ds1.class.ancestors.include?(Sequel::Dataset::UnsupportedIntersectExcept)
+      @ds1.except(@ds2).order(:number).map{|x| x[:number].to_s}.should == %w'20'
+      @ds1.intersect(@ds2).order(:number).map{|x| x[:number].to_s}.should == %w'10'
+    end
+  end
+  
+  specify "should give the correct results for compound UNION, EXCEPT, and INTERSECT" do
+    @ds1.union(@ds2).union(@ds3).order(:number).map{|x| x[:number].to_s}.should == %w'10 20 30 40'
+    @ds1.union(@ds2.union(@ds3)).order(:number).map{|x| x[:number].to_s}.should == %w'10 20 30 40'
+    unless @ds1.class.ancestors.include?(Sequel::Dataset::UnsupportedIntersectExcept)
+      @ds1.union(@ds2).except(@ds3).order(:number).map{|x| x[:number].to_s}.should == %w'20 30'
+      @ds1.union(@ds2.except(@ds3)).order(:number).map{|x| x[:number].to_s}.should == %w'10 20 30'
+      @ds1.union(@ds2).intersect(@ds3).order(:number).map{|x| x[:number].to_s}.should == %w'10 '
+      @ds1.union(@ds2.intersect(@ds3)).order(:number).map{|x| x[:number].to_s}.should == %w'10 20'
+      
+      @ds1.except(@ds2).union(@ds3).order(:number).map{|x| x[:number].to_s}.should == %w'10 20 40'
+      @ds1.except(@ds2.union(@ds3)).order(:number).map{|x| x[:number].to_s}.should == %w'20'
+      @ds1.except(@ds2).except(@ds3).order(:number).map{|x| x[:number].to_s}.should == %w'20'
+      @ds1.except(@ds2.except(@ds3)).order(:number).map{|x| x[:number].to_s}.should == %w'10 20'
+      @ds1.except(@ds2).intersect(@ds3).order(:number).map{|x| x[:number].to_s}.should == %w''
+      @ds1.except(@ds2.intersect(@ds3)).order(:number).map{|x| x[:number].to_s}.should == %w'20'
+      
+      @ds1.intersect(@ds2).union(@ds3).order(:number).map{|x| x[:number].to_s}.should == %w'10 40'
+      @ds1.intersect(@ds2.union(@ds3)).order(:number).map{|x| x[:number].to_s}.should == %w'10'
+      @ds1.intersect(@ds2).except(@ds3).order(:number).map{|x| x[:number].to_s}.should == %w''
+      @ds1.intersect(@ds2.except(@ds3)).order(:number).map{|x| x[:number].to_s}.should == %w''
+      @ds1.intersect(@ds2).intersect(@ds3).order(:number).map{|x| x[:number].to_s}.should == %w'10'
+      @ds1.intersect(@ds2.intersect(@ds3)).order(:number).map{|x| x[:number].to_s}.should == %w'10'
+    end
+  end
+end

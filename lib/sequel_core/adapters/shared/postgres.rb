@@ -552,7 +552,7 @@ module Sequel
       QUERY_PLAN = 'QUERY PLAN'.to_sym
       ROW_EXCLUSIVE = 'ROW EXCLUSIVE'.freeze
       ROW_SHARE = 'ROW SHARE'.freeze
-      SELECT_CLAUSE_ORDER = %w'distinct columns from join where group having intersect union except order limit lock'.freeze
+      SELECT_CLAUSE_ORDER = %w'distinct columns from join where group having compounds order limit lock'.freeze
       SHARE = 'SHARE'.freeze
       SHARE_ROW_EXCLUSIVE = 'SHARE ROW EXCLUSIVE'.freeze
       SHARE_UPDATE_EXCLUSIVE = 'SHARE UPDATE EXCLUSIVE'.freeze
@@ -683,6 +683,15 @@ module Sequel
       def insert_returning_pk_sql(*values)
         pk = db.primary_key(opts[:from].first)
         insert_returning_sql(pk ? Sequel::SQL::Identifier.new(pk) : 'NULL'.lit, *values)
+      end
+      
+      # PostgreSQL is smart and can use parantheses around all datasets to get
+      # the correct answers.
+      def select_compounds_sql(sql, opts)
+        return unless opts[:compounds]
+        opts[:compounds].each do |type, dataset, all|
+          sql.replace("(#{sql} #{type.to_s.upcase}#{' ALL' if all} #{subselect_sql(dataset)})")
+        end
       end
 
       # The order of clauses in the SELECT SQL statement

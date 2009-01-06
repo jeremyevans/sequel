@@ -11,6 +11,18 @@ class Sequel::Dataset
     def intersect(ds, all=false)
       raise(Sequel::Error, "INTERSECT not supported")
     end
+    
+    private
+    
+    # Since EXCEPT and INTERSECT are not supported, and order shouldn't matter
+    # when UNION is used, don't worry about parantheses.  This may potentially
+    # give incorrect results if UNION ALL is used.
+    def select_compounds_sql(sql, opts)
+      return unless opts[:compounds]
+      opts[:compounds].each do |type, dataset, all|
+        sql << " #{type.to_s.upcase}#{' ALL' if all} #{subselect_sql(dataset)}"
+      end
+    end
   end
 
   # This module should be included in the dataset class for all databases that

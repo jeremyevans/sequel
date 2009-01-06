@@ -12,7 +12,7 @@ module Sequel
     module DatasetMethods
       include Dataset::UnsupportedIntersectExcept
 
-      SELECT_CLAUSE_ORDER = %w'limit distinct columns from join where group order having union'.freeze
+      SELECT_CLAUSE_ORDER = %w'limit distinct columns from join where group order having compounds'.freeze
 
       private
 
