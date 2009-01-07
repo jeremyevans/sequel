@@ -478,6 +478,16 @@ context "A MySQL database" do
     ]
   end
   
+specify "should correctly format ALTER TABLE statements with foreign keys" do
+  g = Sequel::Schema::AlterTableGenerator.new(@db) do
+    add_foreign_key :p_id, :users, :key => :id, :null => false, :on_delete => :cascade
+  end
+  @db.alter_table_sql_list(:items, g.operations).should == [[
+    "ALTER TABLE items ADD COLUMN p_id integer NOT NULL",
+    "ALTER TABLE items ADD FOREIGN KEY (p_id) REFERENCES users(id) ON DELETE CASCADE"
+  ]]
+end
+  
   specify "should accept repeated raw sql statements using Database#<<" do
     @db << 'DELETE FROM items'
     @db[:items].count.should == 0

@@ -4,7 +4,7 @@
 
 * Default to logging only WARNING level messages when connecting to PostgreSQL (jeremyevans)
 
-* Fix add_foreign_key for MySQL (jeremyevans)
+* Fix add_foreign_key for MySQL (jeremyevans, aphyr)
 
 * Correctly literalize BigDecimal NaN and (+-)Infinity values (#256) (jeremyevans)
 

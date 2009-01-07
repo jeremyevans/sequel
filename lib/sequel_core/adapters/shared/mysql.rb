@@ -1,4 +1,10 @@
 module Sequel
+  module Schema
+    module SQL
+      # Keep default column_references_sql for add_foreign_key support
+      alias default_column_references_sql column_references_sql
+    end
+  end
   module MySQL
     # Methods shared by Database instances that connect to MySQL,
     # currently supported by the native and JDBC adapters.
@@ -17,7 +23,9 @@ module Sequel
         case op[:op]
         when :add_column
           if related = op.delete(:table)
-            [super(table, op), "ALTER TABLE #{quote_schema_table(table)} ADD FOREIGN KEY (#{quote_identifier(op[:name])}) REFERENCES #{quote_schema_table(related)}#{" (#{Array(op[:key]).map{|x| quote_identifier(x)}.join(', ')})" if op[:key]}"]
+            sql = super(table, op)
+            op[:table] = related
+            [sql, "ALTER TABLE #{quote_schema_table(table)} ADD FOREIGN KEY (#{quote_identifier(op[:name])})#{default_column_references_sql(op)}"]
           else
             super(table, op)
           end
