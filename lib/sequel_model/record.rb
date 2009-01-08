@@ -187,8 +187,7 @@ module Sequel
     # Otherwise, returns self. You can provide an optional list of
     # columns to update, in which case it only updates those columns.
     def save(*columns)
-      return save_failure(:save) unless valid?
-      save!(*columns)
+      valid? ? save!(*columns) : save_failure(:invalid)
     end
 
     # Creates or updates the record, without attempting to validate
@@ -452,16 +451,21 @@ module Sequel
           raise Error, "callbacks should either be Procs or Symbols"
         end
         if res == false and stop_on_false
-          save_failure("modify association for", raise_error)
+          raise(BeforeHookFailed, "Unable to modify association for record: one of the #{callback_type} hooks returned false") if raise_error
           return false
         end
       end
     end
 
     # Raise an error if raise_on_save_failure is true
-    def save_failure(action, raise_error = nil)
-      raise_error = raise_on_save_failure if raise_error.nil?
-      raise(errors.empty? ? BeforeHookFailed : ValidationFailed, "unable to #{action} record") if raise_error
+    def save_failure(type)
+      if raise_on_save_failure
+        if type == :invalid
+          raise ValidationFailed, errors.full_messages.join(', ')
+        else
+          raise BeforeHookFailed, "one of the before_#{type} hooks returned false"
+        end
+      end
     end
 
     # Set the columns, filtered by the only and except arrays.

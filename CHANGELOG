@@ -1,5 +1,7 @@
 === HEAD
 
+* Improve the error messages in parts of Sequel::Model (jeremyevans, pusewicz)
+
 * Much better support for Dataset#{union,except,intersect}, allowing chaining and respecting order (jeremyevans)
 
 * Default to logging only WARNING level messages when connecting to PostgreSQL (jeremyevans)
