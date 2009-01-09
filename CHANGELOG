@@ -1,5 +1,7 @@
 === HEAD
 
+* Fix Dataset#destroy for model datasets that can't handle nested queries (jeremyevans)
+
 * Improve the error messages in parts of Sequel::Model (jeremyevans, pusewicz)
 
 * Much better support for Dataset#{union,except,intersect}, allowing chaining and respecting order (jeremyevans)
