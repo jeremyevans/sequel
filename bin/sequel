@@ -1,7 +1,6 @@
 #!/usr/bin/env ruby
 
 require 'rubygems'
-require 'pathname'
 require 'optparse'
 require 'sequel'
 
@@ -11,7 +10,7 @@ env = nil
 logfile = nil
 migrate_dir = nil
 migrate_ver = nil
-models_dir = nil
+load_dir = nil
 
 opts = OptionParser.new do |opts|
   opts.banner = "Sequel: The Database Toolkit for Ruby"
@@ -31,16 +30,20 @@ opts = OptionParser.new do |opts|
     exit
   end
 
-  opts.on("-l", "--log logfile", "log SQL statements to log file") do |v|
-    logfile = v
-  end
-  
   opts.on("-e", "--env ENV", "use environment config for database") do |v|
     env = v
   end
   
   opts.on("-E", "--echo", "echo SQL statements") do
     echo = true
+  end
+  
+  opts.on("-l", "--log logfile", "log SQL statements to log file") do |v|
+    logfile = v
+  end
+  
+  opts.on("-L", "--load-dir DIR", "loads all *.rb from specifed directory") do |v|
+    load_dir = v
   end
   
   opts.on("-m", "--migrate-directory DIR", "run the migrations in directory") do |v|
@@ -51,10 +54,6 @@ opts = OptionParser.new do |opts|
     migrate_ver = Integer(v)
   end
 
-  opts.on("-L", "--load-models DIR", "loads all models from specifed directory") do |v|
-    models_dir = v
-  end
-  
   opts.on_tail("-v", "--version", "Show version") do
     class << Gem; attr_accessor :loaded_specs; end
     begin
@@ -107,9 +106,7 @@ rescue => e
   exit 1
 end
 
-if models_dir
-  Pathname.glob("#{models_dir}/**/*.rb") { |model| load(model) }
-end
+Dir["#{load_dir}/**/*.rb"].each{|f| load(f)} if load_dir
 
 require 'irb'
 puts "Your database is stored in DB..."

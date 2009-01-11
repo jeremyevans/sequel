@@ -1,5 +1,7 @@
 === HEAD
 
+* Add -L option to sequel command line tool to load all .rb files in the given directory (pkondzior, jeremyevans)
+
 * Fix Dataset#destroy for model datasets that can't handle nested queries (jeremyevans)
 
 * Improve the error messages in parts of Sequel::Model (jeremyevans, pusewicz)
