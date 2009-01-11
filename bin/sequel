@@ -89,10 +89,6 @@ if File.exist?(db)
   db_config.merge!(db_opts)
 end
 
-if models_dir
-  Pathname.glob("#{models_dir}/**/*.rb") { |model| load(model) }
-end
-
 begin
   if db_config
     opts = [db_config]
@@ -109,6 +105,10 @@ rescue => e
   puts e.message
   puts e.backtrace.first
   exit 1
+end
+
+if models_dir
+  Pathname.glob("#{models_dir}/**/*.rb") { |model| load(model) }
 end
 
 require 'irb'
