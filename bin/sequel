@@ -1,6 +1,7 @@
 #!/usr/bin/env ruby
 
 require 'rubygems'
+require 'pathname'
 require 'optparse'
 require 'sequel'
 
@@ -10,6 +11,7 @@ env = nil
 logfile = nil
 migrate_dir = nil
 migrate_ver = nil
+models_dir = nil
 
 opts = OptionParser.new do |opts|
   opts.banner = "Sequel: The Database Toolkit for Ruby"
@@ -48,6 +50,10 @@ opts = OptionParser.new do |opts|
   opts.on("-M", "--migrate-version VER", "migrate the database to version given") do |v|
     migrate_ver = Integer(v)
   end
+
+  opts.on("-L", "--load-models DIR", "loads all models from specifed directory") do |v|
+    models_dir = v
+  end
   
   opts.on_tail("-v", "--version", "Show version") do
     class << Gem; attr_accessor :loaded_specs; end
@@ -81,6 +87,10 @@ if File.exist?(db)
   db_config = YAML.load_file(db)[env || "development"]
   db_config.each {|(k,v)| db_config[k.to_sym] = db_config.delete(k)}
   db_config.merge!(db_opts)
+end
+
+if models_dir
+  Pathname.glob("#{models_dir}/**/*.rb") { |model| load(model) }
 end
 
 begin
