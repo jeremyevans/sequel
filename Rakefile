@@ -8,11 +8,12 @@ rescue LoadError
   require "rake/rdoctask"
 end
 require "fileutils"
+require "lib/sequel_core/version"
 
 include FileUtils
 
 NAME = 'sequel'
-VERS = '2.9.0'
+VERS = Sequel.version
 CLEAN.include ["**/.*.sw?", "pkg", ".config", "rdoc", "coverage", "www/public/*.html"]
 RDOC_OPTS = ["--quiet", "--line-numbers", "--inline-source", '--title', \
   'Sequel: The Database Toolkit for Ruby', '--main', 'README']
@@ -165,3 +166,7 @@ task :stats do
   CodeStatistics.new(*STATS_DIRECTORIES).to_s
 end
 
+desc "Print Sequel version"
+task :version do
+  puts VERS
+end
