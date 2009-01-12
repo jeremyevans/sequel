@@ -1,4 +1,4 @@
-=== HEAD
+=== 2.9.0 (2009-01-12)
 
 * Add -L option to sequel command line tool to load all .rb files in the given directory (pkondzior, jeremyevans)
 
