@@ -36,6 +36,34 @@ module Sequel
       end
     end
 
+    # Method allows to define own hook method for model. It will define 2
+    # methods, ClassMethods#your_hook and InstanceMethods#your_hook. With
+    # ClassMethods#your_hook you are able to pass block that should be called
+    # when InstanceMethods#your_hook will be invoked.
+    # 
+    # If InstanceMethods#your_hook returns false method that's invoking your
+    # hook should be stoped. It's of course only internal standard, and if you
+    # really don't like this behaviour you are not forced to use this. But still
+    # it's highly recommended.
+    # 
+    # Example of usage:
+    #
+    #  class MyModel
+    #   define_hook :before_move_to
+    #   before_move_to { true # code that should be executed before move_to method }
+    #   def move_to
+    #     return if before_move_to
+    #     do_something # main move_to method code
+    #   end
+    #  end
+    def self.define_hook(*hooks)
+      hooks.each do |hook|
+        @hooks[hook] = []
+        instance_eval("def #{hook}(method = nil, &block); define_hook_instance_method(:#{hook}); add_hook(:#{hook}, method, &block) end")
+        class_eval("def #{hook}; end")
+      end
+    end
+
     # Define a hook instance method that calls the run_hooks instance method.
     def self.define_hook_instance_method(hook) #:nodoc:
       class_eval("def #{hook}; run_hooks(:#{hook}); end")
@@ -43,7 +71,7 @@ module Sequel
 
     private_class_method :add_hook, :define_hook_instance_method
 
-    private 
+    private
 
     # Runs all hook blocks of given hook type on this object.
     # Stops running hook blocks and returns false if any hook block returns false.
@@ -53,10 +81,6 @@ module Sequel
     
     # For performance reasons, we define empty hook instance methods, which are
     # overwritten with real hook instance methods whenever the hook class method is called.
-    (HOOKS + PRIVATE_HOOKS).each do |hook|
-      @hooks[hook] = []
-      instance_eval("def #{hook}(method = nil, &block); define_hook_instance_method(:#{hook}); add_hook(:#{hook}, method, &block) end")
-      class_eval("def #{hook}; end")
-    end
+    define_hook(*(HOOKS + PRIVATE_HOOKS))
   end
 end
