@@ -429,14 +429,15 @@ describe "Model.has_hooks?" do
   end
 end
 
-describe "Model#define_hook" do
+describe "Model#add_hook_type" do
   setup do
     class Foo < Sequel::Model(:items)
-      define_hook :before_bar, :after_bar
+      add_hook_type :before_bar, :after_bar
 
       def bar
-        return if before_bar == false
-        return if after_bar == false
+        return :b if before_bar == false
+        return :a if after_bar == false
+        true
       end
     end
     @f = Class.new(Foo)
@@ -453,14 +454,20 @@ describe "Model#define_hook" do
   end
 
   specify "it should return true for bar when before_bar and after_bar hooks are returing true" do
-    @f.before_bar { true }
-    @f.after_bar { true }
+    a = 1
+    @f.before_bar { a += 1}
     @f.new.bar.should be_true
+    a.should == 2
+    @f.after_bar { a *= 2}
+    @f.new.bar.should be_true
+    a.should == 6
   end
 
   specify "it should return nil for bar when before_bar and after_bar hooks are returing false" do
-    @f.before_bar { false }
+    @f.new.bar.should be_true
     @f.after_bar { false }
-    @f.new.bar.should be_nil
+    @f.new.bar.should == :a
+    @f.before_bar { false }
+    @f.new.bar.should == :b
   end
 end

@@ -1,5 +1,7 @@
 === HEAD
 
+* Add Model.add_hook_type class method, for adding your own hook types, mostly for use by plugin authors (pkondzior, jeremyevans)
+
 * Add Sequel.version for getting the internal version of Sequel (pusewicz, jeremyevans)
 
 === 2.9.0 (2009-01-12)
