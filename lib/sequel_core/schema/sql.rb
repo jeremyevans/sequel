@@ -110,7 +110,7 @@ module Sequel
       # Array of SQL DDL statements, the first for creating a table with the given
       # name and column specifications, and the others for specifying indexes on
       # the table.
-      def create_table_sql_list(name, columns, indexes = nil)
+      def create_table_sql_list(name, columns, indexes = nil, options = {})
         sql = ["CREATE TABLE #{quote_schema_table(name)} (#{column_list_sql(columns)})"]
         sql.concat(index_list_sql_list(name, indexes)) if indexes && !indexes.empty?
         sql

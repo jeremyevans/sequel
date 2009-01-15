@@ -6,6 +6,9 @@ module Sequel
     end
   end
   module MySQL
+    # Set the default options used for CREATE TABLE
+    metaattr_accessor :default_charset, :default_collate, :default_engine
+
     # Methods shared by Database instances that connect to MySQL,
     # currently supported by the native and JDBC adapters.
     module DatabaseMethods
@@ -50,6 +53,16 @@ module Sequel
         "#{", FOREIGN KEY (#{quote_identifier(column[:name])})" unless column[:type] == :check}#{super(column)}"
       end
       
+      # Use MySQL specific syntax for engine type and character encoding
+      def create_table_sql_list(name, columns, indexes = nil, options = {})
+        options[:engine] = Sequel::MySQL.default_engine unless options.include?(:engine)
+        options[:charset] = Sequel::MySQL.default_charset unless options.include?(:charset)
+        options[:collate] = Sequel::MySQL.default_collate unless options.include?(:collate)
+        sql = ["CREATE TABLE #{quote_schema_table(name)} (#{column_list_sql(columns)})#{" ENGINE=#{options[:engine]}" if options[:engine]}#{" DEFAULT CHARSET=#{options[:charset]}" if options[:charset]}#{" DEFAULT COLLATE=#{options[:collate]}" if options[:collate]}"]
+        sql.concat(index_list_sql_list(name, indexes)) if indexes && !indexes.empty?
+        sql
+      end
+
       # Handle MySQL specific index SQL syntax
       def index_definition_sql(table_name, index)
         index_name = quote_identifier(index[:name] || default_index_name(table_name, index[:columns]))

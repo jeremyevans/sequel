@@ -2,7 +2,7 @@ module Sequel
   class Model
     # Creates table, using the column information from set_schema.
     def self.create_table
-      db.create_table(table_name, @schema)
+      db.create_table(table_name, :generator=>@schema)
       @db_schema = get_db_schema(true)
       columns
     end

@@ -33,6 +33,19 @@ def logger.method_missing(m, msg)
 end
 MYSQL_DB.logger = logger
 
+context "MySQL", '#create_table' do
+  setup do
+    @db = MYSQL_DB
+  end
+  after(:each) do
+    @db.drop_table :dolls
+  end
+  specify "should allow to specify options for MySQL" do
+    @db.create_table(:dolls, :engine => 'MyISAM', :charset => 'latin2') { text :name }
+    @db.sqls.should == ["CREATE TABLE dolls (name text) ENGINE=MyISAM DEFAULT CHARSET=latin2"]
+  end
+end
+
 context "A MySQL database" do
   setup do
     @db = MYSQL_DB
@@ -451,6 +464,52 @@ context "A MySQL database" do
     @db[:test2].columns.should == [:name, :value, :zyx, :ert, :xyz, :value2]
   end
 end  
+
+context "A MySQL database", "with table options" do
+  before(:all) do
+    @options = {}
+    @options[:engine] = 'MyISAM'
+    @options[:charset] = 'latin2'
+    @options[:collate] = 'swedish'
+    
+    Sequel::MySQL.default_engine = 'InnoDB'
+    Sequel::MySQL.default_charset = 'utf8'
+    Sequel::MySQL.default_collate = 'utf8'    
+    
+    @db = MYSQL_DB
+    @g = Sequel::Schema::Generator.new(@db) do
+      integer :size
+      text :name
+    end
+  end
+  
+  after(:all) do
+    Sequel::MySQL.default_engine = nil
+    Sequel::MySQL.default_charset = nil
+    Sequel::MySQL.default_collate = nil
+  end
+  
+  specify "should allow to pass custom options (engine, charset, collate) for table creation" do
+    statements = @db.create_table_sql_list(:items, *(@g.create_info << @options))
+    statements.should == [
+      "CREATE TABLE items (size integer, name text) ENGINE=MyISAM DEFAULT CHARSET=latin2 DEFAULT COLLATE=swedish"
+    ]
+  end
+  
+  specify "should use default options if specified (engine, charset, collate) for table creation" do
+    statements = @db.create_table_sql_list(:items, *(@g.create_info))
+    statements.should == [
+      "CREATE TABLE items (size integer, name text) ENGINE=InnoDB DEFAULT CHARSET=utf8 DEFAULT COLLATE=utf8"
+    ]
+  end
+  
+  specify "should not use default if option has a nil value" do
+    statements = @db.create_table_sql_list(:items, *(@g.create_info << {:engine=>nil, :charset=>nil, :collate=>nil}))
+    statements.should == [
+      "CREATE TABLE items (size integer, name text)"
+    ]
+  end
+end
 
 context "A MySQL database" do
   setup do
