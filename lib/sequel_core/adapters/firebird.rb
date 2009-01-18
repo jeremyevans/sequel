@@ -1,4 +1,5 @@
 require 'fb'
+require 'pp'
 
 module Sequel
   module Firebird
@@ -25,6 +26,7 @@ module Sequel
           :username => opts[:user],
           :password => opts[:password])
         conn = db.connect
+        conn.downcase_names = true
         conn
       end
 
@@ -58,12 +60,20 @@ module Sequel
         end
       end
 
-      def tables(opts={})
-        ds = self["RDB$RELATIONS".intern]
-        ds = ds.filter({"RDB$VIEW_BLR".intern => nil} & {:COALESCE["RDB$SYSTEM_FLAG".intern, 0] => 0})
-        ds = ds.select("RDB$RELATION_NAME".intern)
+      def sequences(opts={})
+        ds = self["rdb$generators".intern]
+        ds = ds.filter({"rdb$system_flag".intern => 0})
+        ds = ds.select("rdb$generator_name".intern)
 
-        block_given? ? yield(ds) : ds.map{|r| r["RDB$RELATION_NAME".intern].intern}
+        block_given? ? yield(ds) : ds.map{|r| r["rdb$generator_name".intern].intern}
+      end
+
+      def tables(opts={})
+        ds = self["rdb$relations".intern]
+        ds = ds.filter({"rdb$view_blr".intern => nil} & {:COALESCE["rdb$system_flag".intern, 0] => 0})
+        ds = ds.select("rdb$relation_name".intern)
+
+        block_given? ? yield(ds) : ds.map{|r| r["rdb$relation_name".intern].intern}
       end
 
       def transaction(server=nil)
@@ -110,50 +120,114 @@ module Sequel
         end
       end
 
-      def create_sequence_sql(name)
+      def create_sequence_sql(name, opts={})
         "CREATE SEQUENCE #{quote_identifier(name)}"
       end
 
-      def create_sequence_trigger_sql(table, col, seq)
-        table = quote_identifier(table)
-        col = quote_identifier(col)
-        seq = quote_identifier(seq)
+      def create_trigger(*args)
+        self << create_trigger_sql(*args)
+      end
+
+      def create_trigger_sql(table, name, definition, opts={})
+        events = opts[:events] ? Array(opts[:events]) : [:insert, :update, :delete]
+        whence = opts[:after] ? 'AFTER' : 'BEFORE'
+        inactive = opts[:inactive] ? 'INACTIVE' : 'ACTIVE'
+        position = opts[:position] ? opts[:position] : 0
         sql = <<-end_sql
-          CREATE TRIGGER BI_#{table}_#{col} for #{table}
-          active before insert position 0
-          as
-          begin
-            if ((new.#{col} is null) or (new.#{col} = 0)) then
-            begin
-              new.#{col} = next value for #{seq};
-            end
-          end
+          CREATE TRIGGER #{quote_identifier(name)} for #{quote_identifier(table)}
+          #{inactive} #{whence} #{events.map{|e| e.to_s.upcase}.join(' OR ')} position #{position}
+          as #{definition}
         end_sql
         sql
+      end
+
+      def drop_sequence(name)
+        self << drop_sequence_sql(name)
       end
 
       def drop_sequence_sql(name)
         "DROP SEQUENCE #{quote_identifier(name)}"
       end
 
-      def create_table_sql_list(name, columns, indexes = nil)
-        pre_statements = []
+    # Creates a table with the columns given in the provided block:
+    #
+    #   DB.create_table :posts do
+    #     primary_key :id, :serial
+    #     column :title, :text
+    #     column :content, :text
+    #     index :title
+    #   end
+    #
+    # See Schema::Generator.
+    # Firebird gets an override because of the mess of creating a
+    # generator for auto-incrementing primary keys.
+    def create_table(name, generator=nil, &block)
+      generator ||= Schema::Generator.new(self, &block)
+      statements = create_table_sql_list(name, *generator.create_info)
+      begin
+        execute_ddl(statements[1])
+      rescue
+        nil
+      end if statements[1]
+      statements[0].flatten.each {|sql| execute_ddl(sql)}
+    end
+
+    # Forcibly creates a table. If the table already exists it is dropped.
+    def create_table!(name, generator=nil, &block)
+      drop_table(name) rescue nil
+      create_table(name, generator, &block)
+    end
+
+    def create_table_sql_list(name, columns, indexes = nil)
         statements = super
+        drop_seq_statement = nil
         columns.each do |c|
           if c[:auto_increment]
-            pre_statements << drop_sequence_sql("seq_#{name}_#{c[:name]}")
-            statements << create_sequence_sql("seq_#{name}_#{c[:name]}")
-            statements << create_sequence_trigger_sql(name, c[:name], "seq_#{name}_#{c[:name]}")
-            break
+            c[:sequence_name] ||= "seq_#{name}_#{c[:name]}"
+            unless c[:create_sequence] == false
+              drop_seq_statement = drop_sequence_sql(c[:sequence_name])
+              statements << create_sequence_sql(c[:sequence_name])
+              statements << restart_sequence_sql(c[:sequence_name], {:restart_position => c[:sequence_start_position]}) if c[:sequence_start_position]
+            end
+            unless c[:create_trigger] == false
+              c[:trigger_name] ||= "BI_#{name}_#{c[:name]}"
+              c[:quoted_name] = quote_identifier(c[:name])
+              trigger_definition = <<-END
+              begin
+                if ((new.#{c[:quoted_name]} is null) or (new.#{c[:quoted_name]} = 0)) then
+                begin
+                  new.#{c[:quoted_name]} = next value for #{c[:sequence_name]};
+                end
+              end
+              END
+              statements << create_trigger_sql(name, c[:trigger_name], trigger_definition, {:events => [:insert]})
+            end
           end
         end
-        pre_statements.concat(statements)
+        [statements, drop_seq_statement]
+      end
+
+      def restart_sequence(*args)
+        self << restart_sequence_sql(*args)
+      end
+
+      def restart_sequence_sql(name, opts={})
+        seq_name = quote_identifier(name)
+        "ALTER SEQUENCE #{seq_name} RESTART WITH #{opts[:restart_position]}"
       end
 
       private
 
       def disconnect_connection(c)
         c.close
+      end
+
+      def quote_identifiers_default
+        false
+      end
+
+      def upcase_identifiers_default
+        true
       end
     end
 
@@ -213,7 +287,6 @@ module Sequel
         "#{insert_sql(*values)} RETURNING #{column_list(Array(returning))}"
       end
 
-
       # Insert a record returning the record inserted
       def insert_select(*values)
         single_record(:naked=>true, :sql=>insert_returning_sql(nil, *values))
@@ -223,6 +296,11 @@ module Sequel
       def insert_returning_pk_sql(*values)
         pk = db.primary_key(opts[:from].first)
         insert_returning_sql(pk ? Sequel::SQL::Identifier.new(pk) : 'NULL'.lit, *values)
+      end
+
+      def quote_identifier(name)
+        name = super
+        Fb::Global::reserved_keyword?(name) ? quoted_identifier(name.upcase) : name
       end
 
       # The order of clauses in the SELECT SQL statement
