@@ -229,7 +229,7 @@ Sequel::Model:
   @author.books
 
 If you use an association other than belongs_to in the associated model, things
-are a bit more involved:
+are a bit more involved (has_many :through a has_many association):
 
 ActiveRecord:
 
@@ -317,8 +317,18 @@ firm.invoices.first.client doesn't do another query to get the firm/client.
 
 ===Polymorphic Associations
 
-Polymorphic associations are really a design flaw, but if you are stuck with
-them, Sequel can handle it.
+Polymorphic associations are really a design flaw.  The only advantage
+polymorphic associations offer is that they require fewer join tables.
+
+Proof by Reductio ad absurdum: If fewer join tables are preferable, then surely
+fewer tables and columns are preferrable, so you might as well store all of
+your data in a single column in a single table if you think polymorphic
+associations are a good idea.
+
+Compelling Argument: Polymorphic associations are more complex than normal
+associations, and they break referential integrity, so the only reason you
+should use them is if you are already stuck with an existing design that
+uses them.  You should never use them in new code.
 
 ActiveRecord:
 
@@ -425,6 +435,10 @@ ActiveRecord's.  Now we will show how Sequel::Model's associations are more
 powerful.
 
 ===many_to_one/one_to_many not referencing primary key
+
+This can now be handled easily in Sequel using the :primary_key association
+option.  However, this example shows how the association was possible before
+the introduction of that option.
 
 Let's say you have two tables, invoices and clients, where each client is
 associated with many invoices.  However, instead of using the client's primary

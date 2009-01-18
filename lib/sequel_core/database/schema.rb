@@ -55,15 +55,15 @@ module Sequel
     #   end
     #
     # See Schema::Generator.
-    def create_table(name, generator=nil, &block)
-      generator ||= Schema::Generator.new(self, &block)
-      create_table_sql_list(name, *generator.create_info).flatten.each {|sql| execute_ddl(sql)}
+    def create_table(name, options={}, &block)
+      options = {:generator=>options} if options.is_a?(Schema::Generator)
+      create_table_sql_list(name, *((options[:generator] || Schema::Generator.new(self, &block)).create_info << options)).flatten.each {|sql| execute_ddl(sql)}
     end
     
     # Forcibly creates a table. If the table already exists it is dropped.
-    def create_table!(name, generator=nil, &block)
+    def create_table!(name, options={}, &block)
       drop_table(name) rescue nil
-      create_table(name, generator, &block)
+      create_table(name, options, &block)
     end
     
     # Creates a view, replacing it if it already exists:

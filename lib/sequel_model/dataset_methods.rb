@@ -8,7 +8,7 @@ module Sequel::Model::DatasetMethods
   def destroy
     raise(Error, "No model associated with this dataset") unless @opts[:models]
     count = 0
-    @db.transaction {each {|r| count += 1; r.destroy}}
+    @db.transaction{all{|r| count += 1; r.destroy}}
     count
   end
 

@@ -8,14 +8,15 @@ rescue LoadError
   require "rake/rdoctask"
 end
 require "fileutils"
+require "lib/sequel_core/version"
 
 include FileUtils
 
 NAME = 'sequel'
-VERS = '2.8.0'
+VERS = Sequel.version
 CLEAN.include ["**/.*.sw?", "pkg", ".config", "rdoc", "coverage", "www/public/*.html"]
 RDOC_OPTS = ["--quiet", "--line-numbers", "--inline-source", '--title', \
-  'Sequel: The Database Toolkit for Ruby', '--main', 'README']
+  'Sequel: The Database Toolkit for Ruby', '--main', 'README.rdoc']
 
 # Gem Packaging and Release
 
@@ -27,7 +28,7 @@ spec = Gem::Specification.new do |s|
   s.version = VERS
   s.platform = Gem::Platform::RUBY
   s.has_rdoc = true
-  s.extra_rdoc_files = ["README", "CHANGELOG", "COPYING"] + Dir["doc/*.rdoc"]
+  s.extra_rdoc_files = ["README.rdoc", "CHANGELOG", "COPYING"] + Dir["doc/*.rdoc"]
   s.rdoc_options += RDOC_OPTS
   s.summary = "The Database Toolkit for Ruby"
   s.description = s.summary
@@ -35,7 +36,7 @@ spec = Gem::Specification.new do |s|
   s.email = "code@jeremyevans.net"
   s.homepage = "http://sequel.rubyforge.org"
   s.required_ruby_version = ">= 1.8.4"
-  s.files = %w(COPYING CHANGELOG README Rakefile) + Dir.glob("{bin,doc,spec,lib}/**/*")
+  s.files = %w(COPYING CHANGELOG README.rdoc Rakefile) + Dir.glob("{bin,doc,spec,lib}/**/*")
   s.require_path = "lib"
   s.bindir = 'bin'
   s.executables << 'sequel'
@@ -72,7 +73,7 @@ end
 Rake::RDocTask.new do |rdoc|
   rdoc.rdoc_dir = "rdoc"
   rdoc.options += RDOC_OPTS
-  rdoc.rdoc_files.add %w"README CHANGELOG COPYING lib/**/*.rb doc/*.rdoc"
+  rdoc.rdoc_files.add %w"README.rdoc CHANGELOG COPYING lib/**/*.rb doc/*.rdoc"
 end
 
 ### Website
@@ -165,3 +166,7 @@ task :stats do
   CodeStatistics.new(*STATS_DIRECTORIES).to_s
 end
 
+desc "Print Sequel version"
+task :version do
+  puts VERS
+end

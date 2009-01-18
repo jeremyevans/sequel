@@ -27,7 +27,7 @@ context "Range#interval" do
     (1..10).interval.should == 9
     
     r = rand(100000) + 10
-    t1 = Time.now; t2 = t1 + r
+    t1 = Time.now.to_i; t2 = t1 + r
     (t1..t2).interval.should == r
   end
 
@@ -35,7 +35,7 @@ context "Range#interval" do
     (1...10).interval.should == 8
     
     r = rand(100000) + 10
-    t1 = Time.now; t2 = t1 + r
+    t1 = Time.now.to_i; t2 = t1 + r
     (t1...t2).interval.should == r - 1
   end
 end

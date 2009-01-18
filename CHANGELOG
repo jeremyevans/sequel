@@ -1,6 +1,30 @@
 === HEAD
 
+* Add ability for Database#create_table to take options, support specifying MySQL engine, charset, and collate per table (pusewicz, jeremyevans)
+
+* Add Model.add_hook_type class method, for adding your own hook types, mostly for use by plugin authors (pkondzior, jeremyevans)
+
+* Add Sequel.version for getting the internal version of Sequel (pusewicz, jeremyevans)
+
+=== 2.9.0 (2009-01-12)
+
+* Add -L option to sequel command line tool to load all .rb files in the given directory (pkondzior, jeremyevans)
+
+* Fix Dataset#destroy for model datasets that can't handle nested queries (jeremyevans)
+
+* Improve the error messages in parts of Sequel::Model (jeremyevans, pusewicz)
+
+* Much better support for Dataset#{union,except,intersect}, allowing chaining and respecting order (jeremyevans)
+
+* Default to logging only WARNING level messages when connecting to PostgreSQL (jeremyevans)
+
+* Fix add_foreign_key for MySQL (jeremyevans, aphyr)
+
+* Correctly literalize BigDecimal NaN and (+-)Infinity values (#256) (jeremyevans)
+
 * Make Sequel raise an Error if you attempt to subclass Sequel::Model before setting up a database connection (jeremyevans)
+
+* Add Sequel::BeforeHookFailed exception to be raised when a record fails because a before hook fails (bougyman)
 
 * Add Sequel::ValidationFailed exception to be raised when a record fails because a validation fails (bougyman)
 

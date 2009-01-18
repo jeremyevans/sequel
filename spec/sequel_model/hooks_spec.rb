@@ -214,7 +214,7 @@ describe "Model#before_create && Model#after_create" do
   specify ".create should cancel the save and raise an error if before_create returns false and raise_on_save_failure is true" do
     @c.before_create{false}
     proc{@c.load(:id => 2233).save}.should_not raise_error(Sequel::ValidationFailed)
-    proc{@c.create(:x => 2)}.should raise_error(Sequel::Error)
+    proc{@c.create(:x => 2)}.should raise_error(Sequel::BeforeHookFailed)
     MODEL_DB.sqls.should == []
   end
 
@@ -250,7 +250,7 @@ describe "Model#before_update && Model#after_update" do
   specify "#save should cancel the save and raise an error if before_update returns false and raise_on_save_failure is true" do
     @c.before_update{false}
     proc{@c.load(:id => 2233).save}.should_not raise_error(Sequel::ValidationFailed)
-    proc{@c.load(:id => 2233).save}.should raise_error(Sequel::Error)
+    proc{@c.load(:id => 2233).save}.should raise_error(Sequel::BeforeHookFailed)
     MODEL_DB.sqls.should == []
   end
 
@@ -298,7 +298,7 @@ describe "Model#before_save && Model#after_save" do
   specify "#save should cancel the save and raise an error if before_save returns false and raise_on_save_failure is true" do
     @c.before_save{false}
     proc{@c.load(:id => 2233).save}.should_not raise_error(Sequel::ValidationFailed)
-    proc{@c.load(:id => 2233).save}.should raise_error(Sequel::Error)
+    proc{@c.load(:id => 2233).save}.should raise_error(Sequel::BeforeHookFailed)
     MODEL_DB.sqls.should == []
   end
 
@@ -337,7 +337,7 @@ describe "Model#before_destroy && Model#after_destroy" do
 
   specify "#destroy should cancel the destroy and raise an error if before_destroy returns false and raise_on_save_failure is true" do
     @c.before_destroy{false}
-    proc{@c.load(:id => 2233).destroy}.should raise_error(Sequel::Error)
+    proc{@c.load(:id => 2233).destroy}.should raise_error(Sequel::BeforeHookFailed)
     MODEL_DB.sqls.should == []
   end
 
@@ -397,7 +397,7 @@ describe "Model#before_validation && Model#after_validation" do
   specify "#save should cancel the save and raise an error if before_validation returns false and raise_on_save_failure is true" do
     @c.before_validation{false}
     proc{@c.load(:id => 2233).save}.should_not raise_error(Sequel::ValidationFailed)
-    proc{@c.load(:id => 2233).save}.should raise_error(Sequel::Error)
+    proc{@c.load(:id => 2233).save}.should raise_error(Sequel::BeforeHookFailed)
     MODEL_DB.sqls.should == []
   end
 
@@ -426,5 +426,48 @@ describe "Model.has_hooks?" do
   specify "should return true if hooks are inherited" do
     @d = Class.new(@c)
     @d.has_hooks?(:before_save).should be_false
+  end
+end
+
+describe "Model#add_hook_type" do
+  setup do
+    class Foo < Sequel::Model(:items)
+      add_hook_type :before_bar, :after_bar
+
+      def bar
+        return :b if before_bar == false
+        return :a if after_bar == false
+        true
+      end
+    end
+    @f = Class.new(Foo)
+  end
+
+  specify "should have before_bar and after_bar class methods" do
+    @f.should respond_to(:before_bar)
+    @f.should respond_to(:before_bar)
+  end
+
+  specify "should have before_bar and after_bar instance methods" do
+    @f.new.should respond_to(:before_bar)
+    @f.new.should respond_to(:before_bar)
+  end
+
+  specify "it should return true for bar when before_bar and after_bar hooks are returing true" do
+    a = 1
+    @f.before_bar { a += 1}
+    @f.new.bar.should be_true
+    a.should == 2
+    @f.after_bar { a *= 2}
+    @f.new.bar.should be_true
+    a.should == 6
+  end
+
+  specify "it should return nil for bar when before_bar and after_bar hooks are returing false" do
+    @f.new.bar.should be_true
+    @f.after_bar { false }
+    @f.new.bar.should == :a
+    @f.before_bar { false }
+    @f.new.bar.should == :b
   end
 end

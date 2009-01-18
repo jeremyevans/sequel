@@ -1,5 +1,14 @@
 module Sequel
+  module Schema
+    module SQL
+      # Keep default column_references_sql for add_foreign_key support
+      alias default_column_references_sql column_references_sql
+    end
+  end
   module MySQL
+    # Set the default options used for CREATE TABLE
+    metaattr_accessor :default_charset, :default_collate, :default_engine
+
     # Methods shared by Database instances that connect to MySQL,
     # currently supported by the native and JDBC adapters.
     module DatabaseMethods
@@ -15,6 +24,14 @@ module Sequel
       # drop index cases.
       def alter_table_sql(table, op)
         case op[:op]
+        when :add_column
+          if related = op.delete(:table)
+            sql = super(table, op)
+            op[:table] = related
+            [sql, "ALTER TABLE #{quote_schema_table(table)} ADD FOREIGN KEY (#{quote_identifier(op[:name])})#{default_column_references_sql(op)}"]
+          else
+            super(table, op)
+          end
         when :rename_column
           "ALTER TABLE #{quote_schema_table(table)} CHANGE COLUMN #{quote_identifier(op[:name])} #{quote_identifier(op[:new_name])} #{type_literal(op)}"
         when :set_column_type
@@ -36,6 +53,16 @@ module Sequel
         "#{", FOREIGN KEY (#{quote_identifier(column[:name])})" unless column[:type] == :check}#{super(column)}"
       end
       
+      # Use MySQL specific syntax for engine type and character encoding
+      def create_table_sql_list(name, columns, indexes = nil, options = {})
+        options[:engine] = Sequel::MySQL.default_engine unless options.include?(:engine)
+        options[:charset] = Sequel::MySQL.default_charset unless options.include?(:charset)
+        options[:collate] = Sequel::MySQL.default_collate unless options.include?(:collate)
+        sql = ["CREATE TABLE #{quote_schema_table(name)} (#{column_list_sql(columns)})#{" ENGINE=#{options[:engine]}" if options[:engine]}#{" DEFAULT CHARSET=#{options[:charset]}" if options[:charset]}#{" DEFAULT COLLATE=#{options[:collate]}" if options[:collate]}"]
+        sql.concat(index_list_sql_list(name, indexes)) if indexes && !indexes.empty?
+        sql
+      end
+
       # Handle MySQL specific index SQL syntax
       def index_definition_sql(table_name, index)
         index_name = quote_identifier(index[:name] || default_index_name(table_name, index[:columns]))

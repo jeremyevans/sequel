@@ -37,7 +37,7 @@ module Sequel
     module DatasetMethods
       include Dataset::UnsupportedIntersectExcept
 
-      SELECT_CLAUSE_ORDER = %w'limit distinct columns from with join where group order having union'.freeze
+      SELECT_CLAUSE_ORDER = %w'limit distinct columns from with join where group order having compounds'.freeze
 
       def complex_expression_sql(op, args)
         case op

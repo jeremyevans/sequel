@@ -1,4 +1,32 @@
 module Sequel
+  # Top level module for holding all PostgreSQL-related modules and classes
+  # for Sequel.  There are a few module level accessors that are added via
+  # metaprogramming.  These are:
+  # * client_min_messages (only available when using the native adapter) -
+  #   Change the minimum level of messages that PostgreSQL will send to the
+  #   the client.  The PostgreSQL default is NOTICE, the Sequel default is
+  #   WARNING.  Set to nil to not change the server default.
+  # * force_standard_strings - Set to false to not force the use of
+  #   standard strings
+  # * use_iso_date_format (only available when using the native adapter) -
+  #   Set to false to not change the date format to
+  #   ISO.  This disables one of Sequel's optimizations.
+  #
+  # Changes in these settings only affect future connections.  To make
+  # sure that they are applied, they should generally be called right
+  # after the Database object is instantiated and before a connection
+  # is actually made. For example, to use whatever the server defaults are:
+  #
+  #   DB = Sequel.postgres(...)
+  #   Sequel::Postgres.client_min_messages = nil
+  #   Sequel::Postgres.force_standard_strings = false
+  #   Sequel::Postgres.use_iso_date_format = false
+  #   # A connection to the server is not made until here
+  #   DB[:t].all
+  #
+  # The reason they can't be done earlier is that the Sequel::Postgres
+  # module is not loaded until a Database object which uses PostgreSQL
+  # is created.
   module Postgres
     # Array of exceptions that need to be converted.  JDBC
     # uses NativeExceptions, the native adapter uses PGError.
@@ -524,7 +552,7 @@ module Sequel
       QUERY_PLAN = 'QUERY PLAN'.to_sym
       ROW_EXCLUSIVE = 'ROW EXCLUSIVE'.freeze
       ROW_SHARE = 'ROW SHARE'.freeze
-      SELECT_CLAUSE_ORDER = %w'distinct columns from join where group having intersect union except order limit lock'.freeze
+      SELECT_CLAUSE_ORDER = %w'distinct columns from join where group having compounds order limit lock'.freeze
       SHARE = 'SHARE'.freeze
       SHARE_ROW_EXCLUSIVE = 'SHARE ROW EXCLUSIVE'.freeze
       SHARE_UPDATE_EXCLUSIVE = 'SHARE UPDATE EXCLUSIVE'.freeze
@@ -655,6 +683,15 @@ module Sequel
       def insert_returning_pk_sql(*values)
         pk = db.primary_key(opts[:from].first)
         insert_returning_sql(pk ? Sequel::SQL::Identifier.new(pk) : 'NULL'.lit, *values)
+      end
+      
+      # PostgreSQL is smart and can use parantheses around all datasets to get
+      # the correct answers.
+      def select_compounds_sql(sql, opts)
+        return unless opts[:compounds]
+        opts[:compounds].each do |type, dataset, all|
+          sql.replace("(#{sql} #{type.to_s.upcase}#{' ALL' if all} #{subselect_sql(dataset)})")
+        end
       end
 
       # The order of clauses in the SELECT SQL statement

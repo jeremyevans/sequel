@@ -388,7 +388,7 @@ module Sequel::Model::Associations
     association_module_private_def(opts._setter_method){|o| send(:"#{key}=", (o.send(opts.primary_key) if o))}
 
     association_module_def(opts.setter_method) do |o|  
-      raise(Sequel::Error, 'model object does not have a primary key') if o && !o.pk
+      raise(Sequel::Error, "model object #{model} does not have a primary key") if o && !o.pk
       old_val = send(opts.association_method)
       return o if old_val == o
       return if old_val and run_association_callbacks(opts, :before_remove, old_val) == false

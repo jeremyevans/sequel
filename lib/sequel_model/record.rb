@@ -187,8 +187,7 @@ module Sequel
     # Otherwise, returns self. You can provide an optional list of
     # columns to update, in which case it only updates those columns.
     def save(*columns)
-      return save_failure(:save) unless valid?
-      save!(*columns)
+      valid? ? save!(*columns) : save_failure(:invalid)
     end
 
     # Creates or updates the record, without attempting to validate
@@ -342,7 +341,7 @@ module Sequel
 
     # Backbone behind association_dataset
     def _dataset(opts)
-      raise(Sequel::Error, 'model object does not have a primary key') if opts.dataset_need_primary_key? && !pk
+      raise(Sequel::Error, "model object #{model} does not have a primary key") if opts.dataset_need_primary_key? && !pk
       ds = send(opts._dataset_method)
       opts[:extend].each{|m| ds.extend(m)}
       ds = ds.select(*opts.select) if opts.select
@@ -356,8 +355,8 @@ module Sequel
 
     # Add the given associated object to the given association
     def add_associated_object(opts, o)
-      raise(Sequel::Error, 'model object does not have a primary key') unless pk
-      raise(Sequel::Error, 'associated object does not have a primary key') if opts.need_associated_primary_key? && !o.pk
+      raise(Sequel::Error, "model object #{model} does not have a primary key") unless pk
+      raise(Sequel::Error, "associated object #{o.model} does not have a primary key") if opts.need_associated_primary_key? && !o.pk
       return if run_association_callbacks(opts, :before_add, o) == false
       send(opts._add_method, o)
       associations[opts[:name]].push(o) if associations.include?(opts[:name])
@@ -407,7 +406,7 @@ module Sequel
 
     # Remove all associated objects from the given association
     def remove_all_associated_objects(opts)
-      raise(Sequel::Error, 'model object does not have a primary key') unless pk
+      raise(Sequel::Error, "model object #{model} does not have a primary key") unless pk
       send(opts._remove_all_method)
       ret = associations[opts[:name]].each{|o| remove_reciprocal_object(opts, o)} if associations.include?(opts[:name])
       associations[opts[:name]] = []
@@ -416,8 +415,8 @@ module Sequel
 
     # Remove the given associated object from the given association
     def remove_associated_object(opts, o)
-      raise(Sequel::Error, 'model object does not have a primary key') unless pk
-      raise(Sequel::Error, 'associated object does not have a primary key') if opts.need_associated_primary_key? && !o.pk
+      raise(Sequel::Error, "model object #{model} does not have a primary key") unless pk
+      raise(Sequel::Error, "associated object #{o.model} does not have a primary key") if opts.need_associated_primary_key? && !o.pk
       return if run_association_callbacks(opts, :before_remove, o) == false
       send(opts._remove_method, o)
       associations[opts[:name]].delete_if{|x| o === x} if associations.include?(opts[:name])
@@ -452,16 +451,21 @@ module Sequel
           raise Error, "callbacks should either be Procs or Symbols"
         end
         if res == false and stop_on_false
-          save_failure("modify association for", raise_error)
+          raise(BeforeHookFailed, "Unable to modify association for record: one of the #{callback_type} hooks returned false") if raise_error
           return false
         end
       end
     end
 
     # Raise an error if raise_on_save_failure is true
-    def save_failure(action, raise_error = nil)
-      raise_error = raise_on_save_failure if raise_error.nil?
-      raise(errors.empty? ? Error : ValidationFailed, "unable to #{action} record") if raise_error
+    def save_failure(type)
+      if raise_on_save_failure
+        if type == :invalid
+          raise ValidationFailed, errors.full_messages.join(', ')
+        else
+          raise BeforeHookFailed, "one of the before_#{type} hooks returned false"
+        end
+      end
     end
 
     # Set the columns, filtered by the only and except arrays.

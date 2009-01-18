@@ -384,10 +384,14 @@ module Sequel
     # Validates the object.
     def validate
       errors.clear
-      return false if before_validation == false
-      self.class.validate(self)
-      after_validation
-      nil
+      if before_validation == false
+        save_failure(:validation)
+        false
+      else
+        self.class.validate(self)
+        after_validation
+        nil
+      end
     end
 
     # Validates the object and returns true if no errors are reported.
