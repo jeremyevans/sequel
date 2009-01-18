@@ -5,19 +5,24 @@ unless defined?(FIREBIRD_DB)
   FIREBIRD_DB = Sequel.connect(ENV['SEQUEL_FB_SPEC_DB']||FIREBIRD_URL)
 end
 
-FIREBIRD_DB.create_table! :TEST do
-  varchar :NAME,  :size => 50
-  integer :VAL,   :index => true
+FIREBIRD_DB.create_table! :test do
+  varchar :name,  :size => 50
+  integer :val,   :index => true
 end
 
-FIREBIRD_DB.create_table! :TEST3 do
-  integer :VAL
-  timestamp :TIME_STAMP
+FIREBIRD_DB.create_table! :test2 do
+  integer :val
+  timestamp :time_stamp
 end
 
-FIREBIRD_DB.create_table! :TEST5 do
-  primary_key :XID
-  integer :VAL
+FIREBIRD_DB.create_table! :test3 do
+  integer :val
+  timestamp :time_stamp
+end
+
+FIREBIRD_DB.create_table! :test5 do
+  primary_key :xid
+  integer :val
 end
 
 context "A Firebird database" do
@@ -39,51 +44,51 @@ end
 
 context "A Firebird dataset" do
   setup do
-    @d = FIREBIRD_DB[:TEST]
+    @d = FIREBIRD_DB[:test]
     @d.delete # remove all records
   end
 
   specify "should return the correct record count" do
     @d.count.should == 0
-    @d << {:NAME => 'abc', :VAL => 123}
-    @d << {:NAME => 'abc', :VAL  => 456}
-    @d << {:NAME => 'def', :VAL => 789}
+    @d << {:name => 'abc', :val => 123}
+    @d << {:name => 'abc', :val  => 456}
+    @d << {:name => 'def', :val => 789}
     @d.count.should == 3
   end
 
   specify "should return the correct records" do
     @d.to_a.should == []
-    @d << {:NAME => 'abc', :VAL => 123}
-    @d << {:NAME => 'abc', :VAL => 456}
-    @d << {:NAME => 'def', :VAL => 789}
+    @d << {:name => 'abc', :val => 123}
+    @d << {:name => 'abc', :val => 456}
+    @d << {:name => 'def', :val => 789}
 
-    @d.order(:VAL).to_a.should == [
-      {:NAME => 'abc', :VAL => 123},
-      {:NAME => 'abc', :VAL => 456},
-      {:NAME => 'def', :VAL => 789}
+    @d.order(:val).to_a.should == [
+      {:name => 'abc', :val => 123},
+      {:name => 'abc', :val => 456},
+      {:name => 'def', :val => 789}
     ]
   end
 
   specify "should update records correctly" do
-    @d << {:NAME => 'abc', :VAL => 123}
-    @d << {:NAME => 'abc', :VAL => 456}
-    @d << {:NAME => 'def', :VAL => 789}
-    @d.filter(:NAME => 'abc').update(:VAL => 530)
+    @d << {:name => 'abc', :val => 123}
+    @d << {:name => 'abc', :val => 456}
+    @d << {:name => 'def', :val => 789}
+    @d.filter(:name => 'abc').update(:val => 530)
 
     # the third record should stay the same
     # floating-point precision bullshit
-    @d[:NAME => 'def'][:VAL].should == 789
-    @d.filter(:VAL => 530).count.should == 2
+    @d[:name => 'def'][:val].should == 789
+    @d.filter(:val => 530).count.should == 2
   end
 
   specify "should delete records correctly" do
-    @d << {:NAME => 'abc', :VAL => 123}
-    @d << {:NAME => 'abc', :VAL => 456}
-    @d << {:NAME => 'def', :VAL => 789}
-    @d.filter(:NAME => 'abc').delete
+    @d << {:name => 'abc', :val => 123}
+    @d << {:name => 'abc', :val => 456}
+    @d << {:name => 'def', :val => 789}
+    @d.filter(:name => 'abc').delete
 
     @d.count.should == 1
-    @d.first[:NAME].should == 'def'
+    @d.first[:name].should == 'def'
   end
 
   specify "should be able to literalize booleans" do
@@ -93,43 +98,43 @@ context "A Firebird dataset" do
 
   specify "should quote columns and tables using double quotes if quoting identifiers" do
     @d.quote_identifiers = true
-    @d.select(:NAME).sql.should == \
+    @d.select(:name).sql.should == \
       'SELECT "NAME" FROM "TEST"'
 
     @d.select('COUNT(*)'.lit).sql.should == \
       'SELECT COUNT(*) FROM "TEST"'
 
-    @d.select(:max[:VAL]).sql.should == \
+    @d.select(:max[:val]).sql.should == \
       'SELECT max("VAL") FROM "TEST"'
 
-    @d.select(:NOW[]).sql.should == \
-    'SELECT NOW() FROM "TEST"'
+    @d.select(:now[]).sql.should == \
+    'SELECT now() FROM "TEST"'
 
-    @d.select(:max[:ITEMS__VAL]).sql.should == \
+    @d.select(:max[:items__val]).sql.should == \
       'SELECT max("ITEMS"."VAL") FROM "TEST"'
 
-    @d.order(:NAME.desc).sql.should == \
+    @d.order(:name.desc).sql.should == \
       'SELECT * FROM "TEST" ORDER BY "NAME" DESC'
 
-    @d.select('TEST.NAME AS item_:NAME'.lit).sql.should == \
-      'SELECT TEST.NAME AS item_:NAME FROM "TEST"'
+    @d.select('TEST.NAME AS item_:name'.lit).sql.should == \
+      'SELECT TEST.NAME AS item_:name FROM "TEST"'
 
     @d.select('"NAME"'.lit).sql.should == \
       'SELECT "NAME" FROM "TEST"'
 
-    @d.select('max(TEST."NAME") AS "max_:NAME"'.lit).sql.should == \
-      'SELECT max(TEST."NAME") AS "max_:NAME" FROM "TEST"'
+    @d.select('max(TEST."NAME") AS "max_:name"'.lit).sql.should == \
+      'SELECT max(TEST."NAME") AS "max_:name" FROM "TEST"'
 
-    @d.select(:TEST[:ABC, 'hello']).sql.should == \
-      "SELECT TEST(\"ABC\", 'hello') FROM \"TEST\""
+    @d.select(:test[:ABC, 'hello']).sql.should == \
+      "SELECT test(\"ABC\", 'hello') FROM \"TEST\""
 
-    @d.select(:TEST[:ABC__DEF, 'hello']).sql.should == \
-      "SELECT TEST(\"ABC\".\"DEF\", 'hello') FROM \"TEST\""
+    @d.select(:test[:ABC__DEF, 'hello']).sql.should == \
+      "SELECT test(\"ABC\".\"DEF\", 'hello') FROM \"TEST\""
 
-    @d.select(:TEST[:ABC__DEF, 'hello'].as(:X2)).sql.should == \
-      "SELECT TEST(\"ABC\".\"DEF\", 'hello') AS \"X2\" FROM \"TEST\""
+    @d.select(:test[:ABC__DEF, 'hello'].as(:X2)).sql.should == \
+      "SELECT test(\"ABC\".\"DEF\", 'hello') AS \"X2\" FROM \"TEST\""
 
-    @d.insert_sql(:VAL => 333).should =~ \
+    @d.insert_sql(:val => 333).should =~ \
       /\AINSERT INTO "TEST" \("VAL"\) VALUES \(333\)( RETURNING NULL)?\z/
 
     @d.insert_sql(:X => :Y).should =~ \
@@ -138,22 +143,22 @@ context "A Firebird dataset" do
 
   specify "should quote fields correctly when reversing the order if quoting identifiers" do
     @d.quote_identifiers = true
-    @d.reverse_order(:NAME).sql.should == \
+    @d.reverse_order(:name).sql.should == \
       'SELECT * FROM "TEST" ORDER BY "NAME" DESC'
 
-    @d.reverse_order(:NAME.desc).sql.should == \
+    @d.reverse_order(:name.desc).sql.should == \
       'SELECT * FROM "TEST" ORDER BY "NAME" ASC'
 
-    @d.reverse_order(:NAME, :TEST.desc).sql.should == \
+    @d.reverse_order(:name, :test.desc).sql.should == \
       'SELECT * FROM "TEST" ORDER BY "NAME" DESC, "TEST" ASC'
 
-    @d.reverse_order(:NAME.desc, :TEST).sql.should == \
+    @d.reverse_order(:name.desc, :test).sql.should == \
       'SELECT * FROM "TEST" ORDER BY "NAME" ASC, "TEST" DESC'
   end
 
   specify "should support transactions" do
     FIREBIRD_DB.transaction do
-      @d << {:NAME => 'abc', :VAL => 1}
+      @d << {:name => 'abc', :val => 1}
     end
 
     @d.count.should == 1
@@ -168,7 +173,7 @@ context "A Firebird dataset" do
   specify "should correctly rollback transactions" do
     proc do
       FIREBIRD_DB.transaction do
-        @d << {:NAME => 'abc', :VAL => 1}
+        @d << {:name => 'abc', :val => 1}
         raise RuntimeError, 'asdf'
       end
     end.should raise_error(RuntimeError)
@@ -179,9 +184,9 @@ context "A Firebird dataset" do
   specify "should handle returning inside of the block by committing" do
     def FIREBIRD_DB.ret_commit
       transaction do
-        self[:test] << {:NAME => 'abc'}
+        self[:test] << {:name => 'abc'}
         return
-        self[:test] << {:NAME => 'd'}
+        self[:test] << {:name => 'd'}
       end
     end
     @d.count.should == 0
@@ -197,6 +202,13 @@ context "A Firebird dataset" do
 
     @d.count.should == 2
   end
+
+  specify "should quote and upcase reserved keywords" do
+    @d = FIREBIRD_DB[:testing]
+    @d.upcase_identifiers= false
+    @d.select(:select).sql.should == \
+      'SELECT "SELECT" FROM testing'
+  end
 end
 
 context "A Firebird dataset with a timestamp field" do
@@ -207,9 +219,9 @@ context "A Firebird dataset with a timestamp field" do
 
   specify "should store milliseconds in time fields" do
     t = Time.now
-    @d << {:VAL=>1, :TIME_STAMP=>t}
-    @d.literal(@d[:VAL =>'1'][:TIME_STAMP]).should == @d.literal(t)
-    @d[:VAL=>'1'][:TIME_STAMP].usec.should == t.usec - t.usec % 100
+    @d << {:val=>1, :time_stamp=>t}
+    @d.literal(@d[:val =>'1'][:time_stamp]).should == @d.literal(t)
+    @d[:val=>'1'][:time_stamp].usec.should == t.usec - t.usec % 100
   end
 end
 
@@ -218,34 +230,109 @@ context "A Firebird database" do
     @db = FIREBIRD_DB
   end
 
+  specify "should allow us to name the sequences" do
+    g = Sequel::Schema::Generator.new(FIREBIRD_DB) do
+      primary_key :id, :sequence_name => "seq_test"
+    end
+    FIREBIRD_DB.create_table_sql_list(:posts, *g.create_info).should == [[
+      "CREATE TABLE POSTS (ID integer PRIMARY KEY )",
+      "CREATE SEQUENCE SEQ_TEST",
+      "          CREATE TRIGGER BI_POSTS_ID for POSTS\n          ACTIVE BEFORE INSERT position 0\n          as               begin\n                if ((new.ID is null) or (new.ID = 0)) then\n                begin\n                  new.ID = next value for seq_test;\n                end\n              end\n\n"
+    ], "DROP SEQUENCE SEQ_TEST" ]
+  end
+
+  specify "should allow us to set the starting position for the sequences" do
+    g = Sequel::Schema::Generator.new(FIREBIRD_DB) do
+      primary_key :id, :sequence_start_position => 999
+    end
+    FIREBIRD_DB.create_table_sql_list(:posts, *g.create_info).should == [[
+      "CREATE TABLE POSTS (ID integer PRIMARY KEY )",
+      "CREATE SEQUENCE SEQ_POSTS_ID",
+      "ALTER SEQUENCE SEQ_POSTS_ID RESTART WITH 999",
+      "          CREATE TRIGGER BI_POSTS_ID for POSTS\n          ACTIVE BEFORE INSERT position 0\n          as               begin\n                if ((new.ID is null) or (new.ID = 0)) then\n                begin\n                  new.ID = next value for seq_posts_id;\n                end\n              end\n\n"
+    ], "DROP SEQUENCE SEQ_POSTS_ID" ]
+  end
+
+  specify "should allow us to name and set the starting position for the sequences" do
+    g = Sequel::Schema::Generator.new(FIREBIRD_DB) do
+      primary_key :id, :sequence_name => "seq_test", :sequence_start_position => 999
+    end
+    FIREBIRD_DB.create_table_sql_list(:posts, *g.create_info).should == [[
+      "CREATE TABLE POSTS (ID integer PRIMARY KEY )",
+      "CREATE SEQUENCE SEQ_TEST",
+      "ALTER SEQUENCE SEQ_TEST RESTART WITH 999",
+      "          CREATE TRIGGER BI_POSTS_ID for POSTS\n          ACTIVE BEFORE INSERT position 0\n          as               begin\n                if ((new.ID is null) or (new.ID = 0)) then\n                begin\n                  new.ID = next value for seq_test;\n                end\n              end\n\n"
+    ], "DROP SEQUENCE SEQ_TEST" ]
+  end
+
+  specify "should allow us to name the triggers" do
+    g = Sequel::Schema::Generator.new(FIREBIRD_DB) do
+      primary_key :id, :trigger_name => "trig_test"
+    end
+    FIREBIRD_DB.create_table_sql_list(:posts, *g.create_info).should == [[
+      "CREATE TABLE POSTS (ID integer PRIMARY KEY )",
+      "CREATE SEQUENCE SEQ_POSTS_ID",
+      "          CREATE TRIGGER TRIG_TEST for POSTS\n          ACTIVE BEFORE INSERT position 0\n          as               begin\n                if ((new.ID is null) or (new.ID = 0)) then\n                begin\n                  new.ID = next value for seq_posts_id;\n                end\n              end\n\n"
+    ], "DROP SEQUENCE SEQ_POSTS_ID" ]
+  end
+
+  specify "should allow us to not create the sequence" do
+    g = Sequel::Schema::Generator.new(FIREBIRD_DB) do
+      primary_key :id, :create_sequence => false
+    end
+    FIREBIRD_DB.create_table_sql_list(:posts, *g.create_info).should == [[
+      "CREATE TABLE POSTS (ID integer PRIMARY KEY )",
+      "          CREATE TRIGGER BI_POSTS_ID for POSTS\n          ACTIVE BEFORE INSERT position 0\n          as               begin\n                if ((new.ID is null) or (new.ID = 0)) then\n                begin\n                  new.ID = next value for seq_posts_id;\n                end\n              end\n\n"
+    ], nil]
+  end
+
+  specify "should allow us to not create the trigger" do
+    g = Sequel::Schema::Generator.new(FIREBIRD_DB) do
+      primary_key :id, :create_trigger => false
+    end
+    FIREBIRD_DB.create_table_sql_list(:posts, *g.create_info).should == [[
+      "CREATE TABLE POSTS (ID integer PRIMARY KEY )",
+      "CREATE SEQUENCE SEQ_POSTS_ID",
+    ], "DROP SEQUENCE SEQ_POSTS_ID"]
+  end
+
+  specify "should allow us to not create either the sequence nor the trigger" do
+    g = Sequel::Schema::Generator.new(FIREBIRD_DB) do
+      primary_key :id, :create_sequence => false, :create_trigger => false
+    end
+    FIREBIRD_DB.create_table_sql_list(:posts, *g.create_info).should == [[
+      "CREATE TABLE POSTS (ID integer PRIMARY KEY )"
+    ], nil]
+  end
+
   specify "should support column operations" do
-    @db.create_table!(:test2){varchar :NAME, :size => 50; integer :VAL}
+    @db.create_table!(:test2){varchar :name, :size => 50; integer :val}
     @db[:test2] << {}
-    @db[:test2].columns.should == [:NAME, :VAL]
+    @db[:test2].columns.should == [:name, :val]
 
-    @db.add_column :test2, :XYZ, :varchar, :size => 50
-    @db[:test2].columns.should == [:NAME, :VAL, :XYZ]
+    @db.add_column :test2, :xyz, :varchar, :size => 50
+    @db[:test2].columns.should == [:name, :val, :xyz]
 
-    @db[:test2].columns.should == [:NAME, :VAL, :XYZ]
-    @db.drop_column :test2, :XYZ
+    @db[:test2].columns.should == [:name, :val, :xyz]
+    @db.drop_column :test2, :xyz
 
-    @db[:test2].columns.should == [:NAME, :VAL]
+    @db[:test2].columns.should == [:name, :val]
 
     @db[:test2].delete
-    @db.add_column :test2, :XYZ, :varchar, :default => '000', :size => 50#, :create_domain => 'xyz_varchar'
-    @db[:test2] << {:NAME => 'mmm', :VAL => 111, :XYZ => 'qqqq'}
+    @db.add_column :test2, :xyz, :varchar, :default => '000', :size => 50#, :create_domain => 'xyz_varchar'
+    @db[:test2] << {:name => 'mmm', :val => 111, :xyz => 'qqqq'}
 
-    @db[:test2].columns.should == [:NAME, :VAL, :XYZ]
-    @db.rename_column :test2, :XYZ, :ZYX
-    @db[:test2].columns.should == [:NAME, :VAL, :ZYX]
-    @db[:test2].first[:ZYX].should == 'qqqq'
+    @db[:test2].columns.should == [:name, :val, :xyz]
+    @db.rename_column :test2, :xyz, :zyx
+    @db[:test2].columns.should == [:name, :val, :zyx]
+    @db[:test2].first[:zyx].should == 'qqqq'
 
-    @db.add_column :test2, :XYZ, :decimal, :elements => [12, 2]
+    @db.add_column :test2, :xyz, :decimal, :elements => [12, 2]
     @db[:test2].delete
-    @db[:test2] << {:NAME => 'mmm', :VAL => 111, :XYZ => 56.4}
-    @db.set_column_type :test2, :XYZ, :varchar, :size => 50
+    @db[:test2] << {:name => 'mmm', :val => 111, :xyz => 56.4}
+    @db.set_column_type :test2, :xyz, :varchar, :size => 50
 
-    @db[:test2].first[:XYZ].should == "56.40"
+    @db[:test2].first[:xyz].should == "56.40"
   end
 end
 
@@ -257,28 +344,28 @@ context "Postgres::Dataset#insert" do
 
   specify "should using call insert_returning_sql" do
     @ds.should_receive(:single_value).once.with(:sql=>'INSERT INTO TEST5 (VAL) VALUES (10) RETURNING XID')
-    @ds.insert(:VAL=>10)
+    @ds.insert(:val=>10)
   end
 
   specify "should have insert_returning_sql use the RETURNING keyword" do
-    @ds.insert_returning_sql(:XID, :VAL=>10).should == "INSERT INTO TEST5 (VAL) VALUES (10) RETURNING XID"
-    @ds.insert_returning_sql('*'.lit, :VAL=>10).should == "INSERT INTO TEST5 (VAL) VALUES (10) RETURNING *"
-    @ds.insert_returning_sql('NULL'.lit, :VAL=>10).should == "INSERT INTO TEST5 (VAL) VALUES (10) RETURNING NULL"
+    @ds.insert_returning_sql(:XID, :val=>10).should == "INSERT INTO TEST5 (VAL) VALUES (10) RETURNING XID"
+    @ds.insert_returning_sql('*'.lit, :val=>10).should == "INSERT INTO TEST5 (VAL) VALUES (10) RETURNING *"
+    @ds.insert_returning_sql('NULL'.lit, :val=>10).should == "INSERT INTO TEST5 (VAL) VALUES (10) RETURNING NULL"
   end
 
   specify "should correctly return the inserted record's primary key value" do
     value1 = 10
-    id1 = @ds.insert(:VAL=>value1)
-    @ds.first(:XID=>id1)[:VAL].should == value1
+    id1 = @ds.insert(:val=>value1)
+    @ds.first(:XID=>id1)[:val].should == value1
     value2 = 20
-    id2 = @ds.insert(:VAL=>value2)
-    @ds.first(:XID=>id2)[:VAL].should == value2
+    id2 = @ds.insert(:val=>value2)
+    @ds.first(:XID=>id2)[:val].should == value2
   end
 
   specify "should return nil if the table has no primary key" do
     ds = FIREBIRD_DB[:test]
     ds.delete
-    ds.insert(:NAME=>'a').should == nil
+    ds.insert(:name=>'a').should == nil
   end
 end
 
