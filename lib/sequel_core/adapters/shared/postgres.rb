@@ -32,7 +32,14 @@ module Sequel
     # uses NativeExceptions, the native adapter uses PGError.
     CONVERTED_EXCEPTIONS = []
     
+    @client_min_messages = :warning
     @force_standard_strings = true
+    
+    # By default, Sequel sets the minimum level of log messages sent to the client
+    # to WARNING, where PostgreSQL uses a default of NOTICE.  This is to avoid a lot
+    # of mostly useless messages when running migrations, such as a couple of lines
+    # for every serial primary key field.
+    metaattr_accessor :client_min_messages
 
     # By default, Sequel forces the use of standard strings, so that
     # '\\' is interpreted as \\ and not \.  While PostgreSQL defaults
@@ -105,6 +112,11 @@ module Sequel
           # and we don't know the server version at this point, so
           # try it unconditionally and rescue any errors.
           execute(sql) rescue nil
+        end
+        if cmm = Postgres.client_min_messages
+          sql = "SET client_min_messages = '#{cmm.to_s.upcase}'"
+          @db.log_info(sql)
+          execute(sql)
         end
       end
 
