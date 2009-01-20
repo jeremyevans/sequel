@@ -99,11 +99,9 @@ describe "Database schema modifiers" do
       INTEGRATION_DB.alter_table(:items){add_primary_key :id}
       INTEGRATION_DB.schema(:items, :reload=>true).map{|x| x.first}.should == [:number, :name, :id]
       @ds.columns!.should == [:number, :name, :id]
-      unless INTEGRATION_DB.url =~ /mysql/
-        INTEGRATION_DB.alter_table(:items){add_foreign_key :item_id, :items}
-        INTEGRATION_DB.schema(:items, :reload=>true).map{|x| x.first}.should == [:number, :name, :id, :item_id]
-        @ds.columns!.should == [:number, :name, :id, :item_id]
-      end
+      INTEGRATION_DB.alter_table(:items){add_foreign_key :item_id, :items}
+      INTEGRATION_DB.schema(:items, :reload=>true).map{|x| x.first}.should == [:number, :name, :id, :item_id]
+      @ds.columns!.should == [:number, :name, :id, :item_id]
     end
   end
 

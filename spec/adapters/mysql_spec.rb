@@ -33,6 +33,16 @@ def logger.method_missing(m, msg)
 end
 MYSQL_DB.logger = logger
 
+if MYSQL_DB.class.adapter_scheme == :do
+  SQL_BEGIN = 'Transaction.begin'
+  SQL_ROLLBACK = 'Transaction.rollback'
+  SQL_COMMIT = 'Transaction.commit'
+else
+  SQL_BEGIN = 'BEGIN'
+  SQL_ROLLBACK = 'ROLLBACK'
+  SQL_COMMIT = 'COMMIT'
+end
+
 context "MySQL", '#create_table' do
   setup do
     @db = MYSQL_DB
@@ -233,7 +243,7 @@ context "A MySQL dataset" do
       end
     end.should raise_error(Interrupt)
 
-    MYSQL_DB.sqls.should == ['BEGIN', "INSERT INTO items (name) VALUES ('abc')", 'ROLLBACK']
+    MYSQL_DB.sqls.should == [SQL_BEGIN, "INSERT INTO items (name) VALUES ('abc')", SQL_ROLLBACK]
   end
 
   specify "should handle returning inside of the block by committing" do
@@ -245,7 +255,7 @@ context "A MySQL dataset" do
       end
     end
     MYSQL_DB.ret_commit
-    MYSQL_DB.sqls.should == ['BEGIN', "INSERT INTO items (name) VALUES ('abc')", 'COMMIT']
+    MYSQL_DB.sqls.should == [SQL_BEGIN, "INSERT INTO items (name) VALUES ('abc')", SQL_COMMIT]
   end
   
   specify "should support regexps" do
@@ -308,21 +318,6 @@ context "MySQL datasets" do
   end
 end
 
-# # Commented out because it was causing subsequent examples to fail for some reason
-# context "Simple stored procedure test" do
-#   setup do
-#     # Create a simple stored procedure but drop it first if there
-#     MYSQL_DB.execute("DROP PROCEDURE IF EXISTS sp_get_server_id;")
-#     MYSQL_DB.execute("CREATE PROCEDURE sp_get_server_id() SQL SECURITY DEFINER SELECT @@SERVER_ID as server_id;")
-#   end
-# 
-#   specify "should return the server-id via a stored procedure call" do
-#     @server_id = MYSQL_DB["SELECT @@SERVER_ID as server_id;"].first[:server_id] # grab the server_id via a simple query
-#     @server_id_by_sp = MYSQL_DB["CALL sp_get_server_id();"].first[:server_id]
-#     @server_id_by_sp.should == @server_id  # compare it to output from stored procedure
-#   end
-# end
-# 
 context "MySQL join expressions" do
   setup do
     @ds = MYSQL_DB[:nodes]
@@ -726,9 +721,9 @@ context "MySQL::Dataset#multi_insert" do
     @d.multi_insert([{:name => 'abc'}, {:name => 'def'}])
     
     MYSQL_DB.sqls.should == [
-      'BEGIN',
+      SQL_BEGIN,
       "INSERT INTO items (name) VALUES ('abc'), ('def')",
-      'COMMIT'
+      SQL_COMMIT
     ]
 
     @d.all.should == [
@@ -741,12 +736,12 @@ context "MySQL::Dataset#multi_insert" do
       :commit_every => 2)
 
     MYSQL_DB.sqls.should == [
-      'BEGIN',
+      SQL_BEGIN,
       "INSERT INTO items (value) VALUES (1), (2)",
-      'COMMIT',
-      'BEGIN',
+      SQL_COMMIT,
+      SQL_BEGIN,
       "INSERT INTO items (value) VALUES (3), (4)",
-      'COMMIT'
+      SQL_COMMIT
     ]
     
     @d.all.should == [
@@ -762,12 +757,12 @@ context "MySQL::Dataset#multi_insert" do
       :slice => 2)
 
     MYSQL_DB.sqls.should == [
-      'BEGIN',
+      SQL_BEGIN,
       "INSERT INTO items (value) VALUES (1), (2)",
-      'COMMIT',
-      'BEGIN',
+      SQL_COMMIT,
+      SQL_BEGIN,
       "INSERT INTO items (value) VALUES (3), (4)",
-      'COMMIT'
+      SQL_COMMIT
     ]
     
     @d.all.should == [
@@ -782,9 +777,9 @@ context "MySQL::Dataset#multi_insert" do
     @d.multi_insert([:name, :value], [['abc', 1], ['def', 2]])
 
     MYSQL_DB.sqls.should == [
-      'BEGIN',
+      SQL_BEGIN,
       "INSERT INTO items (name, value) VALUES ('abc', 1), ('def', 2)",
-      'COMMIT'
+      SQL_COMMIT
     ]
     
     @d.all.should == [
@@ -846,27 +841,29 @@ context "MySQL::Dataset#complex_expression_sql" do
   end
 end
 
-context "MySQL Stored Procedures" do
-  teardown do
-    MYSQL_DB.execute('DROP PROCEDURE test_sproc')
-  end
-  
-  specify "should be callable on the database object" do
-    MYSQL_DB.execute('CREATE PROCEDURE test_sproc() BEGIN DELETE FROM items; END')
-    MYSQL_DB[:items].delete
-    MYSQL_DB[:items].insert(:value=>1)
-    MYSQL_DB[:items].count.should == 1
-    MYSQL_DB.call_sproc(:test_sproc)
-    MYSQL_DB[:items].count.should == 0
-  end
-  
-  specify "should be callable on the dataset object" do
-    MYSQL_DB.execute('CREATE PROCEDURE test_sproc(a INTEGER) BEGIN SELECT *, a AS b FROM items; END')
-    @d = MYSQL_DB[:items]
-    @d.call_sproc(:select, :test_sproc, 3).should == []
-    @d.insert(:value=>1)
-    @d.call_sproc(:select, :test_sproc, 4).should == [{:id=>nil, :value=>1, :b=>4}]
-    @d.row_proc = proc{|r| r.keys.each{|k| r[k] *= 2 if r[k].is_a?(Integer)}; r}
-    @d.call_sproc(:select, :test_sproc, 3).should == [{:id=>nil, :value=>2, :b=>6}]
+unless MYSQL_DB.class.adapter_scheme == :do
+  context "MySQL Stored Procedures" do
+    teardown do
+      MYSQL_DB.execute('DROP PROCEDURE test_sproc')
+    end
+    
+    specify "should be callable on the database object" do
+      MYSQL_DB.execute('CREATE PROCEDURE test_sproc() BEGIN DELETE FROM items; END')
+      MYSQL_DB[:items].delete
+      MYSQL_DB[:items].insert(:value=>1)
+      MYSQL_DB[:items].count.should == 1
+      MYSQL_DB.call_sproc(:test_sproc)
+      MYSQL_DB[:items].count.should == 0
+    end
+    
+    specify "should be callable on the dataset object" do
+      MYSQL_DB.execute('CREATE PROCEDURE test_sproc(a INTEGER) BEGIN SELECT *, a AS b FROM items; END')
+      @d = MYSQL_DB[:items]
+      @d.call_sproc(:select, :test_sproc, 3).should == []
+      @d.insert(:value=>1)
+      @d.call_sproc(:select, :test_sproc, 4).should == [{:id=>nil, :value=>1, :b=>4}]
+      @d.row_proc = proc{|r| r.keys.each{|k| r[k] *= 2 if r[k].is_a?(Integer)}; r}
+      @d.call_sproc(:select, :test_sproc, 3).should == [{:id=>nil, :value=>2, :b=>6}]
+    end
   end
 end

@@ -221,7 +221,7 @@ module Sequel
     # Inserts values into the associated table.  The returned value is generally
     # the value of the primary key for the inserted row, but that is adapter dependent.
     def insert(*values)
-      execute_dui(insert_sql(*values))
+      execute_insert(insert_sql(*values))
     end
   
     # Returns a string representation of the dataset including the class name 
@@ -467,6 +467,11 @@ module Sequel
     # Execute the given SQL on the database using execute_dui.
     def execute_dui(sql, opts={}, &block)
       @db.execute_dui(sql, {:server=>@opts[:server] || :default}.merge(opts), &block)
+    end
+    
+    # Execute the given SQL on the database using execute_insert.
+    def execute_insert(sql, opts={}, &block)
+      @db.execute_insert(sql, {:server=>@opts[:server] || :default}.merge(opts), &block)
     end
 
     # Modify the receiver with the results of sending the meth, args, and block

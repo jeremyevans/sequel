@@ -68,7 +68,7 @@ module Sequel
     # All options given are also passed to the ConnectionPool.  If a block
     # is given, it is used as the connection_proc for the ConnectionPool.
     def initialize(opts = {}, &block)
-      @opts = opts
+      @opts ||= opts
       
       @quote_identifiers = opts.include?(:quote_identifiers) ? opts[:quote_identifiers] : @@quote_identifiers
       @single_threaded = opts.include?(:single_threaded) ? opts[:single_threaded] : @@single_threaded
@@ -118,6 +118,9 @@ module Sequel
       if conn_string.is_a?(String)
         if conn_string =~ /\Ajdbc:/
           c = adapter_class(:jdbc)
+          opts = {:uri=>conn_string}.merge(opts)
+        elsif conn_string =~ /\Ado:/
+          c = adapter_class(:do)
           opts = {:uri=>conn_string}.merge(opts)
         else
           uri = URI.parse(conn_string)
@@ -260,6 +263,12 @@ module Sequel
     # statement.  By default, calls execute.
     def execute_dui(sql, opts={}, &block)
       execute(sql, opts, &block)
+    end
+
+    # Method that should be used when issuing a INSERT
+    # statement.  By default, calls execute_dui.
+    def execute_insert(sql, opts={}, &block)
+      execute_dui(sql, opts, &block)
     end
 
     # Fetches records for an arbitrary SQL statement. If a block is given,
@@ -511,7 +520,11 @@ module Sequel
       uri.password = @opts[:password] if uri.user
       uri.to_s
     end
-    alias_method :url, :uri
+    
+    # Explicit alias of uri for easier subclassing.
+    def url
+      uri
+    end
     
     private
     

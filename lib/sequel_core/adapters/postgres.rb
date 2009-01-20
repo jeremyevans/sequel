@@ -103,18 +103,11 @@ module Sequel
     }
     
     @use_iso_date_format = true
-    @client_min_messages = :warning
 
     # As an optimization, Sequel sets the date style to ISO, so that PostgreSQL provides
     # the date in a known format that Sequel can parse faster.  This can be turned off
     # if you require a date style other than ISO.
     metaattr_accessor :use_iso_date_format
-    
-    # By default, Sequel sets the minimum level of log messages sent to the client
-    # to WARNING, where PostgreSQL uses a default of NOTICE.  This is to avoid a lot
-    # of mostly useless messages when running migrations, such as a couple of lines
-    # for every serial primary key field.
-    metaattr_accessor :client_min_messages
     
     # PGconn subclass for connection specific methods used with the
     # pg, postgres, or postgres-pr driver.
@@ -129,11 +122,6 @@ module Sequel
         super
         if Postgres.use_iso_date_format
           sql = "SET DateStyle = 'ISO'"
-          @db.log_info(sql)
-          execute(sql)
-        end
-        if cmm = Postgres.client_min_messages
-          sql = "SET client_min_messages = '#{cmm.to_s.upcase}'"
           @db.log_info(sql)
           execute(sql)
         end
