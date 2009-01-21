@@ -71,7 +71,11 @@ module Sequel
       if tag && (old = h.find{|x| x[0] == tag})
         old[1] = block
       else
-        h << [tag, block]
+        if hook.to_s =~ /^before/
+          h.unshift([tag,block])
+        else
+          h << [tag, block]
+        end
       end
     end
 
