@@ -165,13 +165,13 @@ context "A MySQL dataset" do
     @d.select('COUNT(*)'.lit).sql.should == \
       'SELECT COUNT(*) FROM `items`'
 
-    @d.select(:max[:value]).sql.should == \
+    @d.select(:max.sql_function(:value)).sql.should == \
       'SELECT max(`value`) FROM `items`'
       
-    @d.select(:NOW[]).sql.should == \
+    @d.select(:NOW.sql_function).sql.should == \
     'SELECT NOW() FROM `items`'
 
-    @d.select(:max[:items__value]).sql.should == \
+    @d.select(:max.sql_function(:items__value)).sql.should == \
       'SELECT max(`items`.`value`) FROM `items`'
 
     @d.order(:name.desc).sql.should == \
@@ -186,13 +186,13 @@ context "A MySQL dataset" do
     @d.select('max(items.`name`) AS `max_name`'.lit).sql.should == \
       'SELECT max(items.`name`) AS `max_name` FROM `items`'
       
-    @d.select(:test[:abc, 'hello']).sql.should == \
+    @d.select(:test.sql_function(:abc, 'hello')).sql.should == \
       "SELECT test(`abc`, 'hello') FROM `items`"
 
-    @d.select(:test[:abc__def, 'hello']).sql.should == \
+    @d.select(:test.sql_function(:abc__def, 'hello')).sql.should == \
       "SELECT test(`abc`.`def`, 'hello') FROM `items`"
 
-    @d.select(:test[:abc__def, 'hello'].as(:x2)).sql.should == \
+    @d.select(:test.sql_function(:abc__def, 'hello').as(:x2)).sql.should == \
       "SELECT test(`abc`.`def`, 'hello') AS `x2` FROM `items`"
 
     @d.insert_sql(:value => 333).should == \
@@ -286,9 +286,9 @@ context "MySQL datasets" do
     market = 'ICE'
     ack_stamp = Time.now - 15 * 60 # 15 minutes ago
     @d.query do
-      select :market, :minute[:from_unixtime[:ack]].as(:minute)
-      where {(:ack > ack_stamp) & {:market => market}}
-      group_by :minute[:from_unixtime[:ack]]
+      select :market, :minute.sql_function(:from_unixtime.sql_function(:ack)).as(:minute)
+      where {(:ack.sql_number > ack_stamp) & {:market => market}}
+      group_by :minute.sql_function(:from_unixtime.sql_function(:ack))
     end.sql.should == \
       "SELECT `market`, minute(from_unixtime(`ack`)) AS `minute` FROM `orders` WHERE ((`ack` > #{@d.literal(ack_stamp)}) AND (`market` = 'ICE')) GROUP BY minute(from_unixtime(`ack`))"
   end
@@ -832,7 +832,7 @@ context "MySQL::Dataset#complex_expression_sql" do
   specify "should handle string concatenation with CONCAT if more than one record" do
     @d.literal([:x, :y].sql_string_join).should == "CONCAT(x, y)"
     @d.literal([:x, :y].sql_string_join(' ')).should == "CONCAT(x, ' ', y)"
-    @d.literal([:x[:y], 1, 'z'.lit].sql_string_join(:y|1)).should == "CONCAT(x(y), y[1], '1', y[1], z)"
+    @d.literal([:x.sql_function(:y), 1, 'z'.lit].sql_string_join(:y|1)).should == "CONCAT(x(y), y[1], '1', y[1], z)"
   end
 
   specify "should handle string concatenation as simple string if just one record" do

@@ -42,7 +42,7 @@ Another way to alias columns is to use the #AS method:
 
 Sequel also allows you to specify functions by using the Symbol#[] method:
 
-  items.literal(:avg[:price]) #=> "avg(price)"
+  items.literal(:avg.sql_function(:price)) #=> "avg(price)"
 
 == Filtering using a hash
 
@@ -78,7 +78,7 @@ Ranges (both inclusive and exclusive) can also be used:
 
 New in Sequel 2.0 is the ability to use ruby expressions directly in the call to filter, without using a block:
 
-  items.filter(:price < 100).sql
+  items.filter(:price.sql_number < 100).sql
   #=> "SELECT * FROM items WHERE (price < 100) 
 
 This works for the standard inequality and arithmetic operators:
@@ -133,13 +133,13 @@ You can use the negation operator (~) in most cases:
 
 You can also compare against other columns:
 
-  items.filter(:credit > :debit).sql
+  items.filter(:credit.sql_number > :debit).sql
   #=> "SELECT * FROM items WHERE (credit > debit)
 
 Or against SQL functions:
 
-  items.filter(:price < :max[:price] + 100).sql
-  #=> "SELECT * FROM items WHERE (price < (max(price) + 100))"
+  items.filter(:price - 100 < :max.sql_function(:price)).sql
+  #=> "SELECT * FROM items WHERE ((price - 100) < max(price))"
 
 == String search functions
 

@@ -323,7 +323,7 @@ module Sequel
         filter = " WHERE #{filter_expr(filter)}" if filter
         case index_type
         when :full_text
-          cols = Array(index[:columns]).map{|x| :COALESCE[x, '']}.sql_string_join(' ')
+          cols = Array(index[:columns]).map{|x| SQL::Function.new(:COALESCE, x, '')}.sql_string_join(' ')
           expr = "(to_tsvector(#{literal(index[:language] || 'simple')}, #{literal(cols)}))"
           index_type = :gin
         when :spatial
@@ -363,7 +363,7 @@ module Sequel
           (conn.server_version rescue nil) if conn.respond_to?(:server_version)
         end
         unless @server_version
-          m = /PostgreSQL (\d+)\.(\d+)\.(\d+)/.match(get(:version[]))
+          m = /PostgreSQL (\d+)\.(\d+)\.(\d+)/.match(get(SQL::Function.new(:version)))
           @server_version = (m[1].to_i * 10000) + (m[2].to_i * 100) + m[3].to_i
         end
         @server_version
@@ -530,7 +530,7 @@ module Sequel
           left_outer_join(:pg_attrdef, :adrelid=>:pg_class__oid, :adnum=>:pg_attribute__attnum).
           left_outer_join(:pg_index, :indrelid=>:pg_class__oid, :indisprimary=>true).
           filter(:pg_attribute__attisdropped=>false).
-          filter(:pg_attribute__attnum > 0).
+          filter(:pg_attribute__attnum.sql_number > 0).
           order(:pg_attribute__attnum)
         if table_name
           ds.filter!(:pg_class__relname=>table_name.to_s)
@@ -615,7 +615,7 @@ module Sequel
       # in 8.3 by default, and available for earlier versions as an add-on).
       def full_text_search(cols, terms, opts = {})
         lang = opts[:language] || 'simple'
-        cols =  Array(cols).map{|x| :COALESCE[x, '']}.sql_string_join(' ')
+        cols =  Array(cols).map{|x| SQL::Function.new(:COALESCE, x, '')}.sql_string_join(' ')
         filter("to_tsvector(#{literal(lang)}, #{literal(cols)}) @@ to_tsquery(#{literal(lang)}, #{literal(Array(terms).join(' | '))})")
       end
       

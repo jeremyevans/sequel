@@ -161,7 +161,7 @@ context "#desc" do
   end
 
   specify "should format a DESC clause for a function" do
-    :avg[:test].desc.to_s(@ds).should == 'avg(test) DESC'
+    :avg.sql_function(:test).desc.to_s(@ds).should == 'avg(test) DESC'
   end
 end
 
@@ -177,7 +177,7 @@ context "#asc" do
   end
 
   specify "should format a ASC clause for a function" do
-    :avg[:test].asc.to_s(@ds).should == 'avg(test) ASC'
+    :avg.sql_function(:test).asc.to_s(@ds).should == 'avg(test) ASC'
   end
 end
 
@@ -193,7 +193,7 @@ context "#as" do
   end
 
   specify "should format a AS clause for a function" do
-    :avg[:test].as(:avg).to_s(@ds).should == 'avg(test) AS avg'
+    :avg.sql_function(:test).as(:avg).to_s(@ds).should == 'avg(test) AS avg'
   end
   
   specify "should format a AS clause for a literal value" do
@@ -222,14 +222,14 @@ context "Column references" do
   end
   
   specify "should be quoted properly in SQL functions" do
-    @ds.literal(:avg[:xyz]).should == "avg(`xyz`)"
-    @ds.literal(:avg[:xyz, 1]).should == "avg(`xyz`, 1)"
-    @ds.literal(:avg[:xyz].as(:a)).should == "avg(`xyz`) AS `a`"
+    @ds.literal(:avg.sql_function(:xyz)).should == "avg(`xyz`)"
+    @ds.literal(:avg.sql_function(:xyz, 1)).should == "avg(`xyz`, 1)"
+    @ds.literal(:avg.sql_function(:xyz).as(:a)).should == "avg(`xyz`) AS `a`"
   end
 
   specify "should be quoted properly in ASC/DESC clauses" do
     @ds.literal(:xyz.asc).should == "`xyz` ASC"
-    @ds.literal(:avg[:xyz, 1].desc).should == "avg(`xyz`, 1) DESC"
+    @ds.literal(:avg.sql_function(:xyz, 1).desc).should == "avg(`xyz`, 1) DESC"
   end
   
   specify "should be quoted properly in a cast function" do
@@ -242,6 +242,17 @@ context "Blob" do
   specify "#to_blob should return self" do
     blob = "x".to_blob
     blob.to_blob.object_id.should == blob.object_id
+  end
+end
+
+if RUBY_VERSION < '1.9.0'
+  context "Symbol#[]" do
+    specify "should format an SQL Function" do
+      ds = Sequel::Dataset.new(nil)
+      ds.literal(:xyz[]).should == 'xyz()'
+      ds.literal(:xyz[1]).should == 'xyz(1)'
+      ds.literal(:xyz[1, 2, :abc[3]]).should == 'xyz(1, 2, abc(3))'
+    end
   end
 end
 
@@ -263,7 +274,6 @@ context "Symbol#*" do
   specify "should support qualified symbols if no argument" do
     :xyz__abc.*.to_s(@ds).should == 'xyz.abc.*'
   end
-
 end
 
 context "Symbol" do
@@ -333,13 +343,13 @@ context "Symbol" do
   end
   
   specify "should support upper case outer functions" do
-    :COUNT['1'].to_s(@ds).should == "COUNT('1')"
+    :COUNT.sql_function('1').to_s(@ds).should == "COUNT('1')"
   end
   
   specify "should inhibit string literalization" do
     db = Sequel::Database.new
     ds = db[:t]
-    ds.select(:COUNT['1']).sql.should == "SELECT COUNT('1') FROM t"
+    ds.select(:COUNT.sql_function('1')).sql.should == "SELECT COUNT('1') FROM t"
   end
   
   specify "should support cast method and its cast_as alias" do
@@ -471,14 +481,14 @@ end
 
 context "Sequel::SQL::Function#==" do
   specify "should be true for functions with the same name and arguments, false otherwise" do
-    a = :date[:t]
-    b = :date[:t]
+    a = :date.sql_function(:t)
+    b = :date.sql_function(:t)
     a.should == b
     (a == b).should == true
-    c = :date[:c]
+    c = :date.sql_function(:c)
     a.should_not == c
     (a == c).should == false
-    d = :time[:c]
+    d = :time.sql_function(:c)
     a.should_not == d
     c.should_not == d
     (a == d).should == false

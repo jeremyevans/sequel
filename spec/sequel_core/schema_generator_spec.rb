@@ -107,7 +107,7 @@ describe Sequel::Schema::AlterTableGenerator do
       add_spatial_index :geom
       add_index :blah, :type => :hash
       add_index :blah, :where => {:something => true}
-      add_constraint :con1, ':fred > 100'
+      add_constraint :con1, 'fred > 100'
       drop_constraint :con2
       add_unique_constraint [:aaa, :bbb, :ccc], :name => :con3
       add_primary_key :id
@@ -130,7 +130,7 @@ describe Sequel::Schema::AlterTableGenerator do
       {:op => :add_index, :columns => [:geom], :type => :spatial},
       {:op => :add_index, :columns => [:blah], :type => :hash},
       {:op => :add_index, :columns => [:blah], :where => {:something => true}},
-      {:op => :add_constraint, :type => :check, :constraint_type => :check, :name => :con1, :check => [':fred > 100']},
+      {:op => :add_constraint, :type => :check, :constraint_type => :check, :name => :con1, :check => ['fred > 100']},
       {:op => :drop_constraint, :name => :con2},
       {:op => :add_constraint, :type => :check, :constraint_type => :unique, :name => :con3, :columns => [:aaa, :bbb, :ccc]},
       {:op => :add_column, :name => :id, :type => :integer, :primary_key=>true, :auto_increment=>true},

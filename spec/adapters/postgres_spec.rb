@@ -125,13 +125,13 @@ context "A PostgreSQL dataset" do
     @d.select('COUNT(*)'.lit).sql.should == \
       'SELECT COUNT(*) FROM "test"'
 
-    @d.select(:max[:value]).sql.should == \
+    @d.select(:max.sql_function(:value)).sql.should == \
       'SELECT max("value") FROM "test"'
       
-    @d.select(:NOW[]).sql.should == \
+    @d.select(:NOW.sql_function).sql.should == \
     'SELECT NOW() FROM "test"'
 
-    @d.select(:max[:items__value]).sql.should == \
+    @d.select(:max.sql_function(:items__value)).sql.should == \
       'SELECT max("items"."value") FROM "test"'
 
     @d.order(:name.desc).sql.should == \
@@ -146,13 +146,13 @@ context "A PostgreSQL dataset" do
     @d.select('max(test."name") AS "max_name"'.lit).sql.should == \
       'SELECT max(test."name") AS "max_name" FROM "test"'
       
-    @d.select(:test[:abc, 'hello']).sql.should == \
+    @d.select(:test.sql_function(:abc, 'hello')).sql.should == \
       "SELECT test(\"abc\", 'hello') FROM \"test\""
 
-    @d.select(:test[:abc__def, 'hello']).sql.should == \
+    @d.select(:test.sql_function(:abc__def, 'hello')).sql.should == \
       "SELECT test(\"abc\".\"def\", 'hello') FROM \"test\""
 
-    @d.select(:test[:abc__def, 'hello'].as(:x2)).sql.should == \
+    @d.select(:test.sql_function(:abc__def, 'hello').as(:x2)).sql.should == \
       "SELECT test(\"abc\".\"def\", 'hello') AS \"x2\" FROM \"test\""
 
     @d.insert_sql(:value => 333).should =~ \

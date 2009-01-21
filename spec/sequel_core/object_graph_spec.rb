@@ -138,7 +138,7 @@ describe Sequel::Dataset, " graphing" do
   end
 
   it "#set_graph_aliases should allow a third entry to specify an expression to use other than the default" do
-    ds = @ds1.graph(:lines, :x=>:id).set_graph_aliases(:x=>[:points, :x, 1], :y=>[:lines, :y, :random[]])
+    ds = @ds1.graph(:lines, :x=>:id).set_graph_aliases(:x=>[:points, :x, 1], :y=>[:lines, :y, :random.sql_function])
     ['SELECT 1 AS x, random() AS y FROM points LEFT OUTER JOIN lines ON (lines.x = points.id)',
     'SELECT random() AS y, 1 AS x FROM points LEFT OUTER JOIN lines ON (lines.x = points.id)'
     ].should(include(ds.sql))
@@ -241,7 +241,7 @@ describe Sequel::Dataset, " graphing" do
   end
 
   it "#graph_each should correctly map values when #set_graph_aliases is used with a third argument for each entry" do
-    ds = @ds1.graph(:lines, :x=>:id).set_graph_aliases(:x=>[:points, :z1, 2], :y=>[:lines, :z2, :random[]])
+    ds = @ds1.graph(:lines, :x=>:id).set_graph_aliases(:x=>[:points, :z1, 2], :y=>[:lines, :z2, :random.sql_function])
     def ds.fetch_rows(sql, &block)
       yield({:x=>2,:y=>3})
     end

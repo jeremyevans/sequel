@@ -76,7 +76,7 @@ module Sequel
 
     # Formats a DELETE statement using the given options and dataset options.
     # 
-    #   dataset.filter(:price >= 100).delete_sql #=>
+    #   dataset.filter(:price.sql_number >= 100).delete_sql #=>
     #     "DELETE FROM items WHERE (price >= 100)"
     def delete_sql(opts = nil)
       opts = opts ? @opts.merge(opts) : @opts
@@ -163,7 +163,7 @@ module Sequel
     #     "SELECT * FROM items WHERE price < 100"
     #   dataset.filter(:active).sql #=>
     #     "SELECT * FROM items WHERE :active
-    #   dataset.filter(:price < 100).sql #=>
+    #   dataset.filter(:price.sql_number < 100).sql #=>
     #     "SELECT * FROM items WHERE (price < 100)"
     # 
     # Multiple filter calls can be chained for scoping:

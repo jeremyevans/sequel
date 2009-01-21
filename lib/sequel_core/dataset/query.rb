@@ -5,13 +5,13 @@ module Sequel
     #
     #   dataset = DB[:items].query do
     #     select :x, :y, :z
-    #     filter((:x > 1) & (:y > 2))
+    #     filter((:x.sql_number > 1) & (:y.sql_number > 2))
     #     order :z.desc
     #   end
     #
     # Which is the same as:
     #
-    #  dataset = DB[:items].select(:x, :y, :z).filter((:x > 1) & (:y > 2)).order(:z.desc)
+    #  dataset = DB[:items].select(:x, :y, :z).filter((:x.sql_number > 1) & (:y.sql_number > 2)).order(:z.desc)
     #
     # Note that inside a call to query, you cannot call each, insert, update,
     # or delete (or any method that calls those), or Sequel will raise an

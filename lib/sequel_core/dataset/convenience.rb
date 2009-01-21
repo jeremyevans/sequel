@@ -1,7 +1,7 @@
 module Sequel
   class Dataset
     COMMA_SEPARATOR = ', '.freeze
-    COUNT_OF_ALL_AS_COUNT = :count['*'.lit].as(:count)
+    COUNT_OF_ALL_AS_COUNT = SQL::Function.new(:count, '*'.lit).as(:count)
 
     # Returns the first record matching the conditions.
     def [](*conditions)
@@ -16,7 +16,7 @@ module Sequel
 
     # Returns the average value for the given column.
     def avg(column)
-      get(:avg[column])
+      get(SQL::Function.new(:avg, column))
     end
     
     # Returns true if no records exists in the dataset
@@ -40,11 +40,11 @@ module Sequel
     #   ds.first(:id=>2) => {:id=>2}
     #   ds.first("id = 3") => {:id=>3}
     #   ds.first("id = ?", 4) => {:id=>4}
-    #   ds.first{:id > 2} => {:id=>5}
-    #   ds.order(:id).first{:id > 2} => {:id=>3}
-    #   ds.first{:id > 2} => {:id=>5}
-    #   ds.first("id > ?", 4){:id < 6) => {:id=>5}
-    #   ds.order(:id).first(2){:id < 2} => [{:id=>1}]
+    #   ds.first{:id.sql_number > 2} => {:id=>5}
+    #   ds.order(:id).first{:id.sql_number > 2} => {:id=>3}
+    #   ds.first{:id.sql_number > 2} => {:id=>5}
+    #   ds.first("id > ?", 4){:id.sql_number < 6) => {:id=>5}
+    #   ds.order(:id).first(2){:id.sql_number < 2} => [{:id=>1}]
     def first(*args, &block)
       ds = block ? filter(&block) : self
 
@@ -97,12 +97,12 @@ module Sequel
 
     # Returns the maximum value for the given column.
     def max(column)
-      get(:max[column])
+      get(SQL::Function.new(:max, column))
     end
 
     # Returns the minimum value for the given column.
     def min(column)
-      get(:min[column])
+      get(SQL::Function.new(:min, column))
     end
 
     # Inserts multiple records into the associated table. This method can be
@@ -170,7 +170,7 @@ module Sequel
     # Returns a Range object made from the minimum and maximum values for the
     # given column.
     def range(column)
-      if r = select(:min[column].as(:v1), :max[column].as(:v2)).first
+      if r = select(SQL::Function.new(:min, column).as(:v1), SQL::Function.new(:max, column).as(:v2)).first
         (r[:v1]..r[:v2])
       end
     end
@@ -191,7 +191,7 @@ module Sequel
     
     # Returns the sum for the given column.
     def sum(column)
-      get(:sum[column])
+      get(SQL::Function.new(:sum, column))
     end
 
     # Returns true if the table exists.  Will raise an error

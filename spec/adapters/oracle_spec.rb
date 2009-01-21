@@ -113,25 +113,25 @@ context "An Oracle dataset" do
     
     @d.max(:value).to_i.should == 789
     
-    @d.select(:name, :AVG[:value]).filter(:name => 'abc').group(:name).to_a.should == [
+    @d.select(:name, :AVG.sql_function(:value)).filter(:name => 'abc').group(:name).to_a.should == [
       {:name => 'abc', :"avg(value)" => (456+123)/2.0}
     ]
 
-    @d.select(:AVG[:value]).group(:name).order(:name).limit(1).to_a.should == [
+    @d.select(:AVG.sql_function(:value)).group(:name).order(:name).limit(1).to_a.should == [
       {:"avg(value)" => (456+123)/2.0}
     ]
         
-    @d.select(:name, :AVG[:value]).group(:name).order(:name).to_a.should == [
+    @d.select(:name, :AVG.sql_function(:value)).group(:name).order(:name).to_a.should == [
       {:name => 'abc', :"avg(value)" => (456+123)/2.0},
       {:name => 'def', :"avg(value)" => 789*1.0}
     ]
     
-    @d.select(:name, :AVG[:value]).group(:name).order(:name).to_a.should == [
+    @d.select(:name, :AVG.sql_function(:value)).group(:name).order(:name).to_a.should == [
       {:name => 'abc', :"avg(value)" => (456+123)/2.0},
       {:name => 'def', :"avg(value)" => 789*1.0}
     ]
 
-    @d.select(:name, :AVG[:value]).group(:name).having(:name => ['abc', 'def']).order(:name).to_a.should == [
+    @d.select(:name, :AVG.sql_function(:value)).group(:name).having(:name => ['abc', 'def']).order(:name).to_a.should == [
       {:name => 'abc', :"avg(value)" => (456+123)/2.0},
       {:name => 'def', :"avg(value)" => 789*1.0}
     ]

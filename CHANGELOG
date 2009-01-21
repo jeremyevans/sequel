@@ -1,5 +1,7 @@
 === HEAD
 
+* Don't clobber the following Symbol instance methods when using ruby 1.9: [], <, <=, >, >= (jeremyevans)
+
 * Quote the table name and the index for PostgreSQL index creation (jeremyevans)
 
 * Add DataObjects adapter, supporting PostgreSQL, MySQL, and SQLite (jeremyevans)

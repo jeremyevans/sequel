@@ -305,7 +305,7 @@ module Sequel
     #   DB.get(1) #=> 1 
     #
     #   # SELECT version()
-    #   DB.get(:version[]) #=> ...
+    #   DB.get(:version.sql_function) #=> ...
     def get(expr)
       dataset.get(expr)
     end

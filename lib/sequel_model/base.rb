@@ -402,8 +402,8 @@ module Sequel
     # create dataset methods, so they can be chained for scoping.
     # For example:
     #
-    #   Topic.subset(:popular, :num_posts > 100)
-    #   Topic.subset(:recent, :created_on > Date.today - 7)
+    #   Topic.subset(:popular, :num_posts.sql_number > 100)
+    #   Topic.subset(:recent, :created_on + 7 > Date.today)
     #
     # Allows you to do:
     #

@@ -334,11 +334,6 @@ module Sequel
     #
     #   :price.sql_number/10 > 100
     module ComplexExpressionMethods
-      include BooleanMethods
-      include NumericMethods
-      include StringMethods
-      include InequalityMethods
-
       # Extract a datetime_part (e.g. year, month) from self:
       #
       #   :date.extract(:year) # SQL:  extract(year FROM date)
@@ -365,23 +360,21 @@ module Sequel
       end
     end
 
-    module SpecificExpressionMethods
+    class ComplexExpression
       include AliasMethods
       include CastMethods
       include OrderMethods
     end
 
-    module GenericExpressionMethods
-      include SpecificExpressionMethods
-      include ComplexExpressionMethods
-    end
-
-    class ComplexExpression
-      include SpecificExpressionMethods
-    end
-
     class GenericExpression
-      include GenericExpressionMethods
+      include AliasMethods
+      include CastMethods
+      include OrderMethods
+      include ComplexExpressionMethods
+      include BooleanMethods
+      include NumericMethods
+      include StringMethods
+      include InequalityMethods
     end
 
     ### Classes ###
@@ -864,5 +857,9 @@ module Sequel
   class LiteralString < ::String
     include SQL::OrderMethods
     include SQL::ComplexExpressionMethods
+    include SQL::BooleanMethods
+    include SQL::NumericMethods
+    include SQL::StringMethods
+    include SQL::InequalityMethods
   end
 end

@@ -335,10 +335,10 @@ context "SQLite::Dataset#delete" do
   
   specify "should return the number of records affected when filtered" do
     @d.count.should == 3
-    @d.filter {:value < 3}.delete.should == 1
+    @d.filter {:value.sql_number < 3}.delete.should == 1
     @d.count.should == 2
 
-    @d.filter {:value < 3}.delete.should == 0
+    @d.filter {:value.sql_number < 3}.delete.should == 0
     @d.count.should == 2
   end
   

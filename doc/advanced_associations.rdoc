@@ -16,7 +16,7 @@ a different block when eager loading via Dataset#eager. Association blocks are
 useful for things like:
 
   Artist.one_to_many :gold_albums, :class=>:Album do |ds|
-    ds.filter(:copies_sold > 500000)
+    ds.filter(:copies_sold.sql_number > 500000)
   end
 
 There are a whole bunch of options for changing how the association is eagerly
@@ -150,7 +150,7 @@ otherwise modified:
   class Author < Sequel::Model
     one_to_many :authorships
   end
-  Author.first.authorships_dataset.filter(:number < 10).first
+  Author.first.authorships_dataset.filter(:number.sql_number < 10).first
  
 You can extend a dataset with a module easily with :extend:
 
@@ -551,7 +551,7 @@ node.children.  You can even eager load the relationship up to a certain depth:
   # Eager load three generations of generations of children for a given node 
   Node.filter(:id=>1).eager(:children=>{:children=>:children}).all.first
   # Load parents and grandparents for a group of nodes
-  Node.filter(:id < 10).eager(:parent=>:parent).all
+  Node.filter(:id.sql_number < 10).eager(:parent=>:parent).all
 
 What if you want to get all ancestors up to the root node, or all descendents,
 without knowing the depth of the tree?
