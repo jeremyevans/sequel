@@ -329,7 +329,7 @@ module Sequel
         when :spatial
           index_type = :gist
         end
-        "CREATE #{unique}INDEX #{index_name} ON #{table_name} #{"USING #{index_type} " if index_type}#{expr}#{filter}"
+        "CREATE #{unique}INDEX #{quote_identifier(index_name)} ON #{quote_schema_table(table_name)} #{"USING #{index_type} " if index_type}#{expr}#{filter}"
       end
       
       # Dataset containing all current database locks 

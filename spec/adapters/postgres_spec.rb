@@ -344,7 +344,7 @@ context "A PostgreSQL database" do
     end
     POSTGRES_DB.create_table_sql_list(:posts, *g.create_info).should == [
       "CREATE TABLE public.posts (title text, body text)",
-      "CREATE INDEX posts_title_body_index ON posts USING gin (to_tsvector('simple', (COALESCE(title, '') || ' ' || COALESCE(body, ''))))"
+      "CREATE INDEX posts_title_body_index ON public.posts USING gin (to_tsvector('simple', (COALESCE(title, '') || ' ' || COALESCE(body, ''))))"
     ]
   end
   
@@ -356,7 +356,7 @@ context "A PostgreSQL database" do
     end
     POSTGRES_DB.create_table_sql_list(:posts, *g.create_info).should == [
       "CREATE TABLE public.posts (title text, body text)",
-      "CREATE INDEX posts_title_body_index ON posts USING gin (to_tsvector('french', (COALESCE(title, '') || ' ' || COALESCE(body, ''))))"
+      "CREATE INDEX posts_title_body_index ON public.posts USING gin (to_tsvector('french', (COALESCE(title, '') || ' ' || COALESCE(body, ''))))"
     ]
   end
   
@@ -378,7 +378,7 @@ context "A PostgreSQL database" do
     end
     POSTGRES_DB.create_table_sql_list(:posts, *g.create_info).should == [
       "CREATE TABLE public.posts (geom geometry)",
-      "CREATE INDEX posts_geom_index ON posts USING gist (geom)"
+      "CREATE INDEX posts_geom_index ON public.posts USING gist (geom)"
     ]
   end
   
@@ -389,7 +389,7 @@ context "A PostgreSQL database" do
     end
     POSTGRES_DB.create_table_sql_list(:posts, *g.create_info).should == [
       "CREATE TABLE public.posts (title varchar(5))",
-      "CREATE INDEX posts_title_index ON posts USING hash (title)"
+      "CREATE INDEX posts_title_index ON public.posts USING hash (title)"
     ]
   end
   
@@ -400,7 +400,7 @@ context "A PostgreSQL database" do
     end
     POSTGRES_DB.create_table_sql_list(:posts, *g.create_info).should == [
       "CREATE TABLE public.posts (title varchar(5))",
-      "CREATE UNIQUE INDEX posts_title_index ON posts USING hash (title)"
+      "CREATE UNIQUE INDEX posts_title_index ON public.posts USING hash (title)"
     ]
   end
   
@@ -411,7 +411,18 @@ context "A PostgreSQL database" do
     end
     POSTGRES_DB.create_table_sql_list(:posts, *g.create_info).should == [
       "CREATE TABLE public.posts (title varchar(5))",
-      "CREATE INDEX posts_title_index ON posts (title) WHERE (something = 5)"
+      "CREATE INDEX posts_title_index ON public.posts (title) WHERE (something = 5)"
+    ]
+  end
+  
+  specify "should support identifiers for table names in indicies" do
+    g = Sequel::Schema::Generator.new(POSTGRES_DB) do
+      varchar :title, :size => 5
+      index :title, :where => {:something => 5}
+    end
+    POSTGRES_DB.create_table_sql_list(Sequel::SQL::Identifier.new(:posts__test), *g.create_info).should == [
+      "CREATE TABLE public.posts__test (title varchar(5))",
+      "CREATE INDEX posts__test_title_index ON public.posts__test (title) WHERE (something = 5)"
     ]
   end
 end

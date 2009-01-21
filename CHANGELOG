@@ -1,5 +1,9 @@
 === HEAD
 
+* Quote the table name and the index for PostgreSQL index creation (jeremyevans)
+
+* Add DataObjects adapter, supporting PostgreSQL, MySQL, and SQLite (jeremyevans)
+
 * Add ability for Database#create_table to take options, support specifying MySQL engine, charset, and collate per table (pusewicz, jeremyevans)
 
 * Add Model.add_hook_type class method, for adding your own hook types, mostly for use by plugin authors (pkondzior, jeremyevans)
