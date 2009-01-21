@@ -61,19 +61,19 @@ module Sequel
       end
 
       def sequences(opts={})
-        ds = self["rdb$generators".intern]
-        ds = ds.filter({"rdb$system_flag".intern => 0})
-        ds = ds.select("rdb$generator_name".intern)
+        ds = self["rdb$generators".to_sym]
+        ds = ds.filter({"rdb$system_flag".to_sym => 0})
+        ds = ds.select("rdb$generator_name".to_sym)
 
-        block_given? ? yield(ds) : ds.map{|r| r["rdb$generator_name".intern].intern}
+        block_given? ? yield(ds) : ds.map{|r| r["rdb$generator_name".to_sym].to_sym}
       end
 
       def tables(opts={})
-        ds = self["rdb$relations".intern]
-        ds = ds.filter({"rdb$view_blr".intern => nil} & {:COALESCE["rdb$system_flag".intern, 0] => 0})
-        ds = ds.select("rdb$relation_name".intern)
+        ds = self["rdb$relations".to_sym]
+        ds = ds.filter({"rdb$view_blr".to_sym => nil} & {:COALESCE["rdb$system_flag".to_sym, 0] => 0})
+        ds = ds.select("rdb$relation_name".to_sym)
 
-        block_given? ? yield(ds) : ds.map{|r| r["rdb$relation_name".intern].intern}
+        block_given? ? yield(ds) : ds.map{|r| r["rdb$relation_name".to_sym].to_sym}
       end
 
       def transaction(server=nil)
@@ -238,7 +238,7 @@ module Sequel
       BOOL_TRUE = '1'.freeze
       BOOL_FALSE = '0'.freeze
       COMMA_SEPARATOR = ', '.freeze
-      SELECT_CLAUSE_ORDER = %w'distinct limit columns from join where group having union order'.freeze
+      SELECT_CLAUSE_ORDER = %w'distinct limit columns from join where group having compounds order'.freeze
 
       FIREBIRD_TIMESTAMP_FORMAT = "TIMESTAMP '%Y-%m-%d %H:%M:%S".freeze
 
@@ -262,7 +262,7 @@ module Sequel
         execute(sql) do |s|
           begin
             @columns = s.fields.map do |c|
-              c.name.intern
+              c.name.to_sym
             end
             s.fetchall(:symbols_hash).each{ |r| yield r}
           ensure
