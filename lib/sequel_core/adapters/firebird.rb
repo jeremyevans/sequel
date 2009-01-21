@@ -1,7 +1,8 @@
 require 'fb'
-require 'pp'
 
 module Sequel
+  # The Sequel Firebird adapter requires the ruby fb driver located at
+  # http://github.com/wishdev/fb.
   module Firebird
     CONVERTED_EXCEPTIONS = [Fb::Error]
 
