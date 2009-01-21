@@ -12,8 +12,8 @@ Sequel is a lightweight database access toolkit for Ruby.
 * Sequel makes it easy to deal with multiple records without having
   to break your teeth on SQL.
 * Sequel currently has adapters for ADO, DataObjects, DB2, DBI,
-  Informix, JDBC, MySQL, ODBC, OpenBase, Oracle, PostgreSQL and
-  SQLite3.
+  Firebird, Informix, JDBC, MySQL, ODBC, OpenBase, Oracle, PostgreSQL
+  and SQLite3.
 
 == Resources
 
