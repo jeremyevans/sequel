@@ -66,7 +66,7 @@ describe "Simple Dataset operations in transactions" do
   specify "should insert correctly with a primary key specified inside a transaction" do
     INTEGRATION_DB.transaction do
       @ds.insert(:id=>100, :number=>20)
-      sqls_should_be(/INSERT INTO items_insert_in_transaction \((number, id|id, number)\) VALUES \((100, 20|20, 100)\)/)
+      sqls_should_be('Transaction.begin', /INSERT INTO items_insert_in_transaction \((number, id|id, number)\) VALUES \((100, 20|20, 100)\)/)
       @ds.count.should == 1
       @ds.order(:id).all.should == [{:id=>100, :number=>20}]
     end
@@ -75,7 +75,7 @@ describe "Simple Dataset operations in transactions" do
   specify "should have insert return primary key value inside a transaction" do
     INTEGRATION_DB.transaction do
       @ds.insert(:number=>20).should == 1
-      sqls_should_be(/INSERT INTO items_insert_in_transaction \(number\) VALUES \(20\)/)
+      sqls_should_be('Transaction.begin', /INSERT INTO items_insert_in_transaction \(number\) VALUES \(20\)/)
       @ds.count.should == 1
       @ds.order(:id).all.should == [{:id=>1, :number=>20}]
     end
