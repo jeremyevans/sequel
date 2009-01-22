@@ -325,6 +325,20 @@ module Sequel
           end
         end
       end
+
+      # Literalize strings and blobs using code from the native adapter.
+      def literal(v)
+        case v
+        when LiteralString
+          v
+        when SQL::Blob
+          db.synchronize{|c| "'#{c.escape_bytea(v)}'"}
+        when String
+          db.synchronize{|c| "'#{c.escape_string(v)}'"}
+        else
+          super
+        end
+      end
       
       if SEQUEL_POSTGRES_USES_PG
         

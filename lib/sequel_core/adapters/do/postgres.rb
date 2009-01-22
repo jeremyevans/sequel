@@ -86,20 +86,6 @@ module Sequel
       # Dataset subclass used for datasets that connect to PostgreSQL via DataObjects.
       class Dataset < DataObjects::Dataset
         include Sequel::Postgres::DatasetMethods
-
-        # Handle SQL::Blobs and Strings correctly.
-        def literal(v)
-          case v
-          when LiteralString
-            v
-          when SQL::Blob
-            "'#{v.gsub(/[\000-\037\047\134\177-\377]/){|b| "\\#{ b[0].to_s(8).rjust(3, '0') }"}}'"
-          when String
-            "'#{v.gsub("'", "''")}'"
-          else
-            super
-          end
-        end
       end
     end
   end

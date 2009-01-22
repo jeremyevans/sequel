@@ -646,9 +646,9 @@ module Sequel
         when LiteralString
           v
         when SQL::Blob
-          db.synchronize{|c| "'#{c.escape_bytea(v)}'"}
+          "'#{v.gsub(/[\000-\037\047\134\177-\377]/){|b| "\\#{("%o" % b[0..1].unpack("C")[0]).rjust(3, '0')}"}}'"
         when String
-          db.synchronize{|c| "'#{c.escape_string(v)}'"}
+          "'#{v.gsub("'", "''")}'"
         when Time
           "#{v.strftime(PG_TIMESTAMP_FORMAT)}.#{sprintf("%06d",v.usec)}'"
         when DateTime
