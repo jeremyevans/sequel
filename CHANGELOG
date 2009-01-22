@@ -1,5 +1,7 @@
 === HEAD
 
+* Before hooks now run in reverse order of being added, so later ones are run first (tamas)
+
 * Add Firebird adapter, requires Firebird ruby driver located at http://github.com/wishdev/fb (wishdev)
 
 * Don't clobber the following Symbol instance methods when using ruby 1.9: [], <, <=, >, >= (jeremyevans)
