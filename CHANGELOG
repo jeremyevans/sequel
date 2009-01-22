@@ -1,5 +1,7 @@
 === HEAD
 
+* When using standard strings in the postgres adapter with the postgres-pr driver, use custom string escaping to prevent errors (jeremyevans)
+
 * Before hooks now run in reverse order of being added, so later ones are run first (tamas)
 
 * Add Firebird adapter, requires Firebird ruby driver located at http://github.com/wishdev/fb (wishdev)

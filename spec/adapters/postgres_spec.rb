@@ -260,6 +260,10 @@ context "A PostgreSQL dataset" do
     POSTGRES_DB['SELECT ? AS a', "\\dingo"].get(:a) == "\\dingo"
   end
 
+  specify "should correctly escape strings with quotes" do
+    POSTGRES_DB['SELECT ? AS a', "\\'dingo"].get(:a) == "\\'dingo"
+  end
+
   specify "should properly escape binary data" do
     POSTGRES_DB['SELECT ? AS a', "\1\2\3".to_blob].get(:a) == "\1\2\3"
   end

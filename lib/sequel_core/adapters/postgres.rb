@@ -15,7 +15,7 @@ rescue LoadError => e
           # If there is no escape_string instead method, but there is an
           # escape class method, use that instead.
           def escape_string(str)
-            self.class.escape(str)
+            Sequel::Postgres.force_standard_strings ? str.gsub("'", "''") : self.class.escape(str)
           end
         else
           # Raise an error if no valid string escaping method can be found.
