@@ -4,10 +4,9 @@ module Sequel
   # The Sequel Firebird adapter requires the ruby fb driver located at
   # http://github.com/wishdev/fb.
   module Firebird
-
     class Database < Sequel::Database
-
       set_adapter_scheme :firebird
+
       AUTO_INCREMENT = ''.freeze
 
       # Add the primary_keys and primary_key_sequences instance variables,
@@ -66,9 +65,9 @@ module Sequel
       # See Schema::Generator.
       # Firebird gets an override because of the mess of creating a
       # generator for auto-incrementing primary keys.
-      def create_table(name, options={}, &block)
-        options = {:generator=>options} if options.is_a?(Schema::Generator)
-        statements = create_table_sql_list(name, *((options[:generator] ||= Schema::Generator.new(self, &block)).create_info << options))
+      def create_table(name, generator=nil, &block)
+        generator ||= Schema::Generator.new(self, &block)
+        statements = create_table_sql_list(name, *generator.create_info)
         begin
           execute_ddl(statements[1])
         rescue
@@ -77,7 +76,7 @@ module Sequel
         statements[0].flatten.each {|sql| execute_ddl(sql)}
       end
 
-      def create_table_sql_list(name, columns, indexes = nil, options={})
+      def create_table_sql_list(name, columns, indexes = nil)
         statements = super
         drop_seq_statement = nil
         columns.each do |c|
