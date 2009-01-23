@@ -15,7 +15,7 @@ rescue LoadError => e
           # If there is no escape_string instead method, but there is an
           # escape class method, use that instead.
           def escape_string(str)
-            self.class.escape(str)
+            Sequel::Postgres.force_standard_strings ? str.gsub("'", "''") : self.class.escape(str)
           end
         else
           # Raise an error if no valid string escaping method can be found.
@@ -103,18 +103,11 @@ module Sequel
     }
     
     @use_iso_date_format = true
-    @client_min_messages = :warning
 
     # As an optimization, Sequel sets the date style to ISO, so that PostgreSQL provides
     # the date in a known format that Sequel can parse faster.  This can be turned off
     # if you require a date style other than ISO.
     metaattr_accessor :use_iso_date_format
-    
-    # By default, Sequel sets the minimum level of log messages sent to the client
-    # to WARNING, where PostgreSQL uses a default of NOTICE.  This is to avoid a lot
-    # of mostly useless messages when running migrations, such as a couple of lines
-    # for every serial primary key field.
-    metaattr_accessor :client_min_messages
     
     # PGconn subclass for connection specific methods used with the
     # pg, postgres, or postgres-pr driver.
@@ -129,11 +122,6 @@ module Sequel
         super
         if Postgres.use_iso_date_format
           sql = "SET DateStyle = 'ISO'"
-          @db.log_info(sql)
-          execute(sql)
-        end
-        if cmm = Postgres.client_min_messages
-          sql = "SET client_min_messages = '#{cmm.to_s.upcase}'"
           @db.log_info(sql)
           execute(sql)
         end
@@ -335,6 +323,20 @@ module Sequel
             end
             yield converted_rec
           end
+        end
+      end
+
+      # Literalize strings and blobs using code from the native adapter.
+      def literal(v)
+        case v
+        when LiteralString
+          v
+        when SQL::Blob
+          db.synchronize{|c| "'#{c.escape_bytea(v)}'"}
+        when String
+          db.synchronize{|c| "'#{c.escape_string(v)}'"}
+        else
+          super
         end
       end
       

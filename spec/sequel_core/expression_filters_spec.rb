@@ -27,32 +27,17 @@ context "Blockless Ruby Filters" do
   end
 
   it "should support NOT with SQL functions" do
-    @d.l(~:is_blah[]).should == 'NOT is_blah()'
-    @d.l(~:is_blah[:x]).should == 'NOT is_blah(x)'
-    @d.l(~:is_blah[:x__y]).should == 'NOT is_blah(x.y)'
-    @d.l(~:is_blah[:x, :x__y]).should == 'NOT is_blah(x, x.y)'
+    @d.l(~:is_blah.sql_function).should == 'NOT is_blah()'
+    @d.l(~:is_blah.sql_function(:x)).should == 'NOT is_blah(x)'
+    @d.l(~:is_blah.sql_function(:x__y)).should == 'NOT is_blah(x.y)'
+    @d.l(~:is_blah.sql_function(:x, :x__y)).should == 'NOT is_blah(x, x.y)'
   end
 
   it "should handle multiple ~" do
     @d.l(~~:x).should == 'x'
     @d.l(~~~:x).should == 'NOT x'
-    @d.l(~~(:x > 100)).should == '(x > 100)'
     @d.l(~~(:x & :y)).should == '(x AND y)'
     @d.l(~~(:x | :y)).should == '(x OR y)'
-  end
-
-  it "should support >, <, >=, and <= via Symbol#>,<,>=,<=" do
-    @d.l(:x > 100).should == '(x > 100)'
-    @d.l(:x < 100.01).should == '(x < 100.01)'
-    @d.l(:x >= 100000000000000000000000000000000000).should == '(x >= 100000000000000000000000000000000000)'
-    @d.l(:x <= 100).should == '(x <= 100)'
-  end
-  
-  it "should support negation of >, <, >=, and <= via Symbol#~" do
-    @d.l(~(:x > 100)).should == '(x <= 100)'
-    @d.l(~(:x < 100.01)).should == '(x >= 100.01)'
-    @d.l(~(:x >= 100000000000000000000000000000000000)).should == '(x < 100000000000000000000000000000000000)'
-    @d.l(~(:x <= 100)).should == '(x > 100)'
   end
 
   it "should support = via Hash" do
@@ -135,33 +120,19 @@ context "Blockless Ruby Filters" do
     proc{~([:x, :y].sql_string_join)}.should raise_error
   end
 
-  it "should not allow mathematical, inequality, or string operations on true, false, or nil" do
+  it "should not allow mathematical or string operations on true, false, or nil" do
     proc{:x + 1}.should_not raise_error
     proc{:x - true}.should raise_error(Sequel::Error)
     proc{:x / false}.should raise_error(Sequel::Error)
     proc{:x * nil}.should raise_error(Sequel::Error)
-    proc{:x > 1}.should_not raise_error
-    proc{:x < true}.should raise_error(Sequel::Error)
-    proc{:x >= false}.should raise_error(Sequel::Error)
-    proc{:x <= nil}.should raise_error(Sequel::Error)
     proc{[:x, nil].sql_string_join}.should raise_error(Sequel::Error)
   end
 
-  it "should not allow mathematical, inequality, or string operations on boolean complex expressions" do
+  it "should not allow mathematical or string operations on boolean complex expressions" do
     proc{:x + (:y + 1)}.should_not raise_error
     proc{:x - (~:y)}.should raise_error(Sequel::Error)
     proc{:x / (:y & :z)}.should raise_error(Sequel::Error)
     proc{:x * (:y | :z)}.should raise_error(Sequel::Error)
-    proc{:x > (:y > 5)}.should raise_error(Sequel::Error)
-    proc{:x < (:y < 5)}.should raise_error(Sequel::Error)
-    proc{:x >= (:y >= 5)}.should raise_error(Sequel::Error)
-    proc{:x <= (:y <= 5)}.should raise_error(Sequel::Error)
-    proc{:x > {:y => nil}}.should raise_error(Sequel::Error)
-    proc{:x < ~{:y => nil}}.should raise_error(Sequel::Error)
-    proc{:x >= {:y => 5}}.should raise_error(Sequel::Error)
-    proc{:x <= ~{:y => 5}}.should raise_error(Sequel::Error)
-    proc{:x >= {:y => [1,2,3]}}.should raise_error(Sequel::Error)
-    proc{:x <= ~{:y => [1,2,3]}}.should raise_error(Sequel::Error)
     proc{:x + :y.like('a')}.should raise_error(Sequel::Error)
     proc{:x - :y.like(/a/)}.should raise_error(Sequel::Error)
     proc{:x * :y.like(/a/i)}.should raise_error(Sequel::Error)
@@ -178,7 +149,7 @@ context "Blockless Ruby Filters" do
     @d.l(:x & {:y => :z}).should == '(x AND (y = z))'
     @d.l({:y => :z} & :x).should == '((y = z) AND x)'
     @d.l({:x => :a} & {:y => :z}).should == '((x = a) AND (y = z))'
-    @d.l((:x > 200) & (:y < 200)).should == '((x > 200) AND (y < 200))'
+    @d.l((:x + 200 < 0) & (:y - 200 < 0)).should == '(((x + 200) < 0) AND ((y - 200) < 0))'
     @d.l(:x & ~:y).should == '(x AND NOT y)'
     @d.l(~:x & :y).should == '(NOT x AND y)'
     @d.l(~:x & ~:y).should == '(NOT x AND NOT y)'
@@ -191,7 +162,7 @@ context "Blockless Ruby Filters" do
     @d.l(:x | {:y => :z}).should == '(x OR (y = z))'
     @d.l({:y => :z} | :x).should == '((y = z) OR x)'
     @d.l({:x => :a} | {:y => :z}).should == '((x = a) OR (y = z))'
-    @d.l((:x > 200) | (:y < 200)).should == '((x > 200) OR (y < 200))'
+    @d.l((:x.sql_number > 200) | (:y.sql_number < 200)).should == '((x > 200) OR (y < 200))'
   end
   
   it "should support & | combinations" do
@@ -204,7 +175,7 @@ context "Blockless Ruby Filters" do
     @d.l(~((:x | :y) & :z)).should == '((NOT x AND NOT y) OR NOT z)'
     @d.l(~(:x | (:y & :z))).should == '(NOT x AND (NOT y OR NOT z))'
     @d.l(~((:x & :w) | (:y & :z))).should == '((NOT x OR NOT w) AND (NOT y OR NOT z))'
-    @d.l(~((:x > 200) | (:y & :z))).should == '((x <= 200) AND (NOT y OR NOT z))'
+    @d.l(~((:x.sql_number > 200) | (:y & :z))).should == '((x <= 200) AND (NOT y OR NOT z))'
   end
   
   it "should support LiteralString" do
@@ -278,8 +249,8 @@ context "Blockless Ruby Filters" do
     @d.lit([:x].sql_string_join(', ')).should == '(x)'
     @d.lit([:x, :y].sql_string_join).should == '(x || y)'
     @d.lit([:x, :y].sql_string_join(', ')).should == "(x || ', ' || y)"
-    @d.lit([:x[1], :y|1].sql_string_join).should == '(x(1) || y[1])'
-    @d.lit([:x[1], 'y.z'.lit].sql_string_join(', ')).should == "(x(1) || ', ' || y.z)"
+    @d.lit([:x.sql_function(1), :y|1].sql_string_join).should == '(x(1) || y[1])'
+    @d.lit([:x.sql_function(1), 'y.z'.lit].sql_string_join(', ')).should == "(x(1) || ', ' || y.z)"
     @d.lit([:x, 1, :y].sql_string_join).should == "(x || '1' || y)"
     @d.lit([:x, 1, :y].sql_string_join(', ')).should == "(x || ', ' || '1' || ', ' || y)"
     @d.lit([:x, 1, :y].sql_string_join(:y__z)).should == "(x || y.z || '1' || y.z || y)"
@@ -348,5 +319,45 @@ context "Blockless Ruby Filters" do
     e1 = ~:comment.like('%:hidden:%')
     e2 = ~:comment.like('%:hidden:%')
     e1.should == e2
+  end
+  
+  if RUBY_VERSION < '1.9.0'
+    it "should not allow inequality operations on true, false, or nil" do
+      proc{:x > 1}.should_not raise_error
+      proc{:x < true}.should raise_error(Sequel::Error)
+      proc{:x >= false}.should raise_error(Sequel::Error)
+      proc{:x <= nil}.should raise_error(Sequel::Error)
+    end
+
+    it "should not allow inequality operations on boolean complex expressions" do
+      proc{:x > (:y > 5)}.should raise_error(Sequel::Error)
+      proc{:x < (:y < 5)}.should raise_error(Sequel::Error)
+      proc{:x >= (:y >= 5)}.should raise_error(Sequel::Error)
+      proc{:x <= (:y <= 5)}.should raise_error(Sequel::Error)
+      proc{:x > {:y => nil}}.should raise_error(Sequel::Error)
+      proc{:x < ~{:y => nil}}.should raise_error(Sequel::Error)
+      proc{:x >= {:y => 5}}.should raise_error(Sequel::Error)
+      proc{:x <= ~{:y => 5}}.should raise_error(Sequel::Error)
+      proc{:x >= {:y => [1,2,3]}}.should raise_error(Sequel::Error)
+      proc{:x <= ~{:y => [1,2,3]}}.should raise_error(Sequel::Error)
+    end
+    
+    it "should support >, <, >=, and <= via Symbol#>,<,>=,<=" do
+      @d.l(:x > 100).should == '(x > 100)'
+      @d.l(:x < 100.01).should == '(x < 100.01)'
+      @d.l(:x >= 100000000000000000000000000000000000).should == '(x >= 100000000000000000000000000000000000)'
+      @d.l(:x <= 100).should == '(x <= 100)'
+    end
+    
+    it "should support negation of >, <, >=, and <= via Symbol#~" do
+      @d.l(~(:x > 100)).should == '(x <= 100)'
+      @d.l(~(:x < 100.01)).should == '(x >= 100.01)'
+      @d.l(~(:x >= 100000000000000000000000000000000000)).should == '(x < 100000000000000000000000000000000000)'
+      @d.l(~(:x <= 100)).should == '(x > 100)'
+    end
+    
+    it "should support double negation via ~" do
+      @d.l(~~(:x > 100)).should == '(x > 100)'
+    end
   end
 end

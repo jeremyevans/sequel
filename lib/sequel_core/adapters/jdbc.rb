@@ -87,11 +87,12 @@ module Sequel
       # raise an error immediately if the connection doesn't have a
       # uri, since JDBC requires one.
       def initialize(opts)
-        super(opts)
+        @opts = opts
         raise(Error, "No connection string specified") unless uri
         if match = /\Ajdbc:([^:]+)/.match(uri) and prok = DATABASE_SETUP[match[1].to_sym]
           prok.call(self)
         end
+        super(opts)
       end
       
       # Execute the given stored procedure with the give name. If a block is
@@ -214,7 +215,6 @@ module Sequel
         ur = opts[:uri] || opts[:url] || opts[:database]
         ur =~ /^\Ajdbc:/ ? ur : "jdbc:#{ur}"
       end
-      alias url uri
       
       private
       

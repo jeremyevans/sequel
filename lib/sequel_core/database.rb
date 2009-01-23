@@ -14,7 +14,7 @@ module Sequel
     include Schema::SQL
 
     # Array of supported database adapters
-    ADAPTERS = %w'ado db2 dbi firebird informix jdbc mysql odbc openbase oracle postgres sqlite'.collect{|x| x.to_sym}
+    ADAPTERS = %w'ado db2 dbi do firebird informix jdbc mysql odbc openbase oracle postgres sqlite'.collect{|x| x.to_sym}
 
     SQL_BEGIN = 'BEGIN'.freeze
     SQL_COMMIT = 'COMMIT'.freeze
@@ -68,7 +68,7 @@ module Sequel
     # All options given are also passed to the ConnectionPool.  If a block
     # is given, it is used as the connection_proc for the ConnectionPool.
     def initialize(opts = {}, &block)
-      @opts = opts
+      @opts ||= opts
       
       @single_threaded = opts.include?(:single_threaded) ? opts[:single_threaded] : @@single_threaded
       @schemas = nil
@@ -117,6 +117,9 @@ module Sequel
       if conn_string.is_a?(String)
         if conn_string =~ /\Ajdbc:/
           c = adapter_class(:jdbc)
+          opts = {:uri=>conn_string}.merge(opts)
+        elsif conn_string =~ /\Ado:/
+          c = adapter_class(:do)
           opts = {:uri=>conn_string}.merge(opts)
         else
           uri = URI.parse(conn_string)
@@ -261,6 +264,12 @@ module Sequel
       execute(sql, opts, &block)
     end
 
+    # Method that should be used when issuing a INSERT
+    # statement.  By default, calls execute_dui.
+    def execute_insert(sql, opts={}, &block)
+      execute_dui(sql, opts, &block)
+    end
+
     # Fetches records for an arbitrary SQL statement. If a block is given,
     # it is used to iterate over the records:
     #
@@ -295,7 +304,7 @@ module Sequel
     #   DB.get(1) #=> 1 
     #
     #   # SELECT version()
-    #   DB.get(:version[]) #=> ...
+    #   DB.get(:version.sql_function) #=> ...
     def get(expr)
       dataset.get(expr)
     end
@@ -511,7 +520,11 @@ module Sequel
       uri.password = @opts[:password] if uri.user
       uri.to_s
     end
-    alias_method :url, :uri
+    
+    # Explicit alias of uri for easier subclassing.
+    def url
+      uri
+    end
     
     private
     

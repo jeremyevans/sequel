@@ -32,7 +32,14 @@ module Sequel
     # uses NativeExceptions, the native adapter uses PGError.
     CONVERTED_EXCEPTIONS = []
     
+    @client_min_messages = :warning
     @force_standard_strings = true
+    
+    # By default, Sequel sets the minimum level of log messages sent to the client
+    # to WARNING, where PostgreSQL uses a default of NOTICE.  This is to avoid a lot
+    # of mostly useless messages when running migrations, such as a couple of lines
+    # for every serial primary key field.
+    metaattr_accessor :client_min_messages
 
     # By default, Sequel forces the use of standard strings, so that
     # '\\' is interpreted as \\ and not \.  While PostgreSQL defaults
@@ -105,6 +112,11 @@ module Sequel
           # and we don't know the server version at this point, so
           # try it unconditionally and rescue any errors.
           execute(sql) rescue nil
+        end
+        if cmm = Postgres.client_min_messages
+          sql = "SET client_min_messages = '#{cmm.to_s.upcase}'"
+          @db.log_info(sql)
+          execute(sql)
         end
       end
 
@@ -311,13 +323,13 @@ module Sequel
         filter = " WHERE #{filter_expr(filter)}" if filter
         case index_type
         when :full_text
-          cols = Array(index[:columns]).map{|x| :COALESCE[x, '']}.sql_string_join(' ')
+          cols = Array(index[:columns]).map{|x| SQL::Function.new(:COALESCE, x, '')}.sql_string_join(' ')
           expr = "(to_tsvector(#{literal(index[:language] || 'simple')}, #{literal(cols)}))"
           index_type = :gin
         when :spatial
           index_type = :gist
         end
-        "CREATE #{unique}INDEX #{index_name} ON #{table_name} #{"USING #{index_type} " if index_type}#{expr}#{filter}"
+        "CREATE #{unique}INDEX #{quote_identifier(index_name)} ON #{quote_schema_table(table_name)} #{"USING #{index_type} " if index_type}#{expr}#{filter}"
       end
       
       # Dataset containing all current database locks 
@@ -351,7 +363,7 @@ module Sequel
           (conn.server_version rescue nil) if conn.respond_to?(:server_version)
         end
         unless @server_version
-          m = /PostgreSQL (\d+)\.(\d+)\.(\d+)/.match(get(:version[]))
+          m = /PostgreSQL (\d+)\.(\d+)\.(\d+)/.match(get(SQL::Function.new(:version)))
           @server_version = (m[1].to_i * 10000) + (m[2].to_i * 100) + m[3].to_i
         end
         @server_version
@@ -518,7 +530,7 @@ module Sequel
           left_outer_join(:pg_attrdef, :adrelid=>:pg_class__oid, :adnum=>:pg_attribute__attnum).
           left_outer_join(:pg_index, :indrelid=>:pg_class__oid, :indisprimary=>true).
           filter(:pg_attribute__attisdropped=>false).
-          filter(:pg_attribute__attnum > 0).
+          filter(:pg_attribute__attnum.sql_number > 0).
           order(:pg_attribute__attnum)
         if table_name
           ds.filter!(:pg_class__relname=>table_name.to_s)
@@ -603,7 +615,7 @@ module Sequel
       # in 8.3 by default, and available for earlier versions as an add-on).
       def full_text_search(cols, terms, opts = {})
         lang = opts[:language] || 'simple'
-        cols =  Array(cols).map{|x| :COALESCE[x, '']}.sql_string_join(' ')
+        cols =  Array(cols).map{|x| SQL::Function.new(:COALESCE, x, '')}.sql_string_join(' ')
         filter("to_tsvector(#{literal(lang)}, #{literal(cols)}) @@ to_tsquery(#{literal(lang)}, #{literal(Array(terms).join(' | '))})")
       end
       
@@ -634,9 +646,9 @@ module Sequel
         when LiteralString
           v
         when SQL::Blob
-          db.synchronize{|c| "'#{c.escape_bytea(v)}'"}
+          "'#{v.gsub(/[\000-\037\047\134\177-\377]/){|b| "\\#{("%o" % b[0..1].unpack("C")[0]).rjust(3, '0')}"}}'"
         when String
-          db.synchronize{|c| "'#{c.escape_string(v)}'"}
+          "'#{v.gsub("'", "''")}'"
         when Time
           "#{v.strftime(PG_TIMESTAMP_FORMAT)}.#{sprintf("%06d",v.usec)}'"
         when DateTime

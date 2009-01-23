@@ -125,13 +125,13 @@ context "A PostgreSQL dataset" do
     @d.select('COUNT(*)'.lit).sql.should == \
       'SELECT COUNT(*) FROM "test"'
 
-    @d.select(:max[:value]).sql.should == \
+    @d.select(:max.sql_function(:value)).sql.should == \
       'SELECT max("value") FROM "test"'
       
-    @d.select(:NOW[]).sql.should == \
+    @d.select(:NOW.sql_function).sql.should == \
     'SELECT NOW() FROM "test"'
 
-    @d.select(:max[:items__value]).sql.should == \
+    @d.select(:max.sql_function(:items__value)).sql.should == \
       'SELECT max("items"."value") FROM "test"'
 
     @d.order(:name.desc).sql.should == \
@@ -146,13 +146,13 @@ context "A PostgreSQL dataset" do
     @d.select('max(test."name") AS "max_name"'.lit).sql.should == \
       'SELECT max(test."name") AS "max_name" FROM "test"'
       
-    @d.select(:test[:abc, 'hello']).sql.should == \
+    @d.select(:test.sql_function(:abc, 'hello')).sql.should == \
       "SELECT test(\"abc\", 'hello') FROM \"test\""
 
-    @d.select(:test[:abc__def, 'hello']).sql.should == \
+    @d.select(:test.sql_function(:abc__def, 'hello')).sql.should == \
       "SELECT test(\"abc\".\"def\", 'hello') FROM \"test\""
 
-    @d.select(:test[:abc__def, 'hello'].as(:x2)).sql.should == \
+    @d.select(:test.sql_function(:abc__def, 'hello').as(:x2)).sql.should == \
       "SELECT test(\"abc\".\"def\", 'hello') AS \"x2\" FROM \"test\""
 
     @d.insert_sql(:value => 333).should =~ \
@@ -260,6 +260,10 @@ context "A PostgreSQL dataset" do
     POSTGRES_DB['SELECT ? AS a', "\\dingo"].get(:a) == "\\dingo"
   end
 
+  specify "should correctly escape strings with quotes" do
+    POSTGRES_DB['SELECT ? AS a', "\\'dingo"].get(:a) == "\\'dingo"
+  end
+
   specify "should properly escape binary data" do
     POSTGRES_DB['SELECT ? AS a', "\1\2\3".to_blob].get(:a) == "\1\2\3"
   end
@@ -344,7 +348,7 @@ context "A PostgreSQL database" do
     end
     POSTGRES_DB.create_table_sql_list(:posts, *g.create_info).should == [
       "CREATE TABLE public.posts (title text, body text)",
-      "CREATE INDEX posts_title_body_index ON posts USING gin (to_tsvector('simple', (COALESCE(title, '') || ' ' || COALESCE(body, ''))))"
+      "CREATE INDEX posts_title_body_index ON public.posts USING gin (to_tsvector('simple', (COALESCE(title, '') || ' ' || COALESCE(body, ''))))"
     ]
   end
   
@@ -356,7 +360,7 @@ context "A PostgreSQL database" do
     end
     POSTGRES_DB.create_table_sql_list(:posts, *g.create_info).should == [
       "CREATE TABLE public.posts (title text, body text)",
-      "CREATE INDEX posts_title_body_index ON posts USING gin (to_tsvector('french', (COALESCE(title, '') || ' ' || COALESCE(body, ''))))"
+      "CREATE INDEX posts_title_body_index ON public.posts USING gin (to_tsvector('french', (COALESCE(title, '') || ' ' || COALESCE(body, ''))))"
     ]
   end
   
@@ -378,7 +382,7 @@ context "A PostgreSQL database" do
     end
     POSTGRES_DB.create_table_sql_list(:posts, *g.create_info).should == [
       "CREATE TABLE public.posts (geom geometry)",
-      "CREATE INDEX posts_geom_index ON posts USING gist (geom)"
+      "CREATE INDEX posts_geom_index ON public.posts USING gist (geom)"
     ]
   end
   
@@ -389,7 +393,7 @@ context "A PostgreSQL database" do
     end
     POSTGRES_DB.create_table_sql_list(:posts, *g.create_info).should == [
       "CREATE TABLE public.posts (title varchar(5))",
-      "CREATE INDEX posts_title_index ON posts USING hash (title)"
+      "CREATE INDEX posts_title_index ON public.posts USING hash (title)"
     ]
   end
   
@@ -400,7 +404,7 @@ context "A PostgreSQL database" do
     end
     POSTGRES_DB.create_table_sql_list(:posts, *g.create_info).should == [
       "CREATE TABLE public.posts (title varchar(5))",
-      "CREATE UNIQUE INDEX posts_title_index ON posts USING hash (title)"
+      "CREATE UNIQUE INDEX posts_title_index ON public.posts USING hash (title)"
     ]
   end
   
@@ -411,7 +415,18 @@ context "A PostgreSQL database" do
     end
     POSTGRES_DB.create_table_sql_list(:posts, *g.create_info).should == [
       "CREATE TABLE public.posts (title varchar(5))",
-      "CREATE INDEX posts_title_index ON posts (title) WHERE (something = 5)"
+      "CREATE INDEX posts_title_index ON public.posts (title) WHERE (something = 5)"
+    ]
+  end
+  
+  specify "should support identifiers for table names in indicies" do
+    g = Sequel::Schema::Generator.new(POSTGRES_DB) do
+      varchar :title, :size => 5
+      index :title, :where => {:something => 5}
+    end
+    POSTGRES_DB.create_table_sql_list(Sequel::SQL::Identifier.new(:posts__test), *g.create_info).should == [
+      "CREATE TABLE public.posts__test (title varchar(5))",
+      "CREATE INDEX posts__test_title_index ON public.posts__test (title) WHERE (something = 5)"
     ]
   end
 end

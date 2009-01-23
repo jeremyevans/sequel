@@ -180,7 +180,7 @@ context "Database#dataset" do
   end
   
   specify "should provide a filtered #from dataset if a block is given" do
-    d = @db.from(:mau) {:x > 100}
+    d = @db.from(:mau) {:x.sql_number > 100}
     d.should be_a_kind_of(Sequel::Dataset)
     d.sql.should == 'SELECT * FROM mau WHERE (x > 100)'
   end
@@ -869,7 +869,7 @@ context "Database#fetch" do
     ds.select_sql.should == 'select * from xyz'
     ds.sql.should == 'select * from xyz'
     
-    ds.filter!(:price < 100)
+    ds.filter!(:price.sql_number < 100)
     ds.select_sql.should == 'select * from xyz'
     ds.sql.should == 'select * from xyz'
   end
@@ -1008,7 +1008,7 @@ context "Database#get" do
     @db.get(1).should == 1
     @db.sqls.last.should == 'SELECT 1'
     
-    @db.get(:version[])
+    @db.get(:version.sql_function)
     @db.sqls.last.should == 'SELECT version()'
   end
 end

@@ -37,8 +37,20 @@ describe "Model hooks" do
     c.new.before_save
     $adds.should == ['bye']
   end
-  
+
   specify "should be additive" do
+    $adds = []
+    c = Class.new(Sequel::Model)
+    c.class_eval do
+      after_save {$adds << 'hyiyie'}
+      after_save {$adds << 'byiyie'}
+    end
+
+    c.new.after_save
+    $adds.should == ['hyiyie', 'byiyie']
+  end
+  
+  specify "before hooks should run in reverse order" do
     $adds = []
     c = Class.new(Sequel::Model)
     c.class_eval do
@@ -47,7 +59,7 @@ describe "Model hooks" do
     end
     
     c.new.before_save
-    $adds.should == ['hyiyie', 'byiyie']
+    $adds.should == ['byiyie', 'hyiyie']
   end
 
   specify "should not be additive if the method or tag already exists" do
@@ -101,16 +113,16 @@ describe "Model hooks" do
     $adds = []
     a = Class.new(Sequel::Model)
     a.class_eval do
-      before_save {$adds << '123'}
+      after_save {$adds << '123'}
     end
     
     b = Class.new(a)
     b.class_eval do
-      before_save {$adds << '456'}
-      before_save {$adds << '789'}
+      after_save {$adds << '456'}
+      after_save {$adds << '789'}
     end
     
-    b.new.before_save
+    b.new.after_save
     $adds.should == ['123', '456', '789']
   end
   
@@ -139,31 +151,31 @@ describe "Model hooks" do
     
     a = Class.new(Sequel::Model)
     a.class_eval do
-      before_save {$adds << 'blah'; $flag}
-      before_save {$adds << 'cruel'}
+      after_save {$adds << 'blah'; $flag}
+      after_save {$adds << 'cruel'}
     end
     
-    a.new.before_save
+    a.new.after_save
     $adds.should == ['blah', 'cruel']
 
     # chain should not break on nil
     $adds = []
     $flag = nil
-    a.new.before_save
+    a.new.after_save
     $adds.should == ['blah', 'cruel']
     
     $adds = []
     $flag = false
-    a.new.before_save
+    a.new.after_save
     $adds.should == ['blah']
     
     b = Class.new(a)
     b.class_eval do
-      before_save {$adds << 'mau'}
+      after_save {$adds << 'mau'}
     end
     
     $adds = []
-    b.new.before_save
+    b.new.after_save
     $adds.should == ['blah']
   end
 end

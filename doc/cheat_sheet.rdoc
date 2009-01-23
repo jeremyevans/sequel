@@ -76,11 +76,11 @@ Without a filename argument, the sqlite adapter will setup a new sqlite database
 
   dataset.filter(:name => 'abc')
   dataset.filter('name = ?', 'abc')
-  dataset.filter(:value > 100)
-  dataset.exclude(:value <= 100)
+  dataset.filter(:value.sql_number > 100)
+  dataset.exclude(:value.sql_number <= 100)
 
   dataset.filter(:value => 50..100)
-  dataset.where((:value >= 50) & (:value <= 100))
+  dataset.where((:value.sql_number >= 50) & (:value.sql_number <= 100))
 
   dataset.where('value IN ?', [50,75,100])
 
@@ -95,7 +95,7 @@ Without a filename argument, the sqlite adapter will setup a new sqlite database
 
 Available as of Sequel 2.0:
 
-  DB[:items].filter(:price < 100).sql 
+  DB[:items].filter(:price.sql_number < 100).sql 
   #=> "SELECT * FROM items WHERE (price < 100)" 
 
   DB[:items].filter(:name.like('AL%')).sql 
@@ -103,7 +103,7 @@ Available as of Sequel 2.0:
 
 There's support for nested expressions with AND, OR and NOT:
 
-  DB[:items].filter((:x > 5) & (:y > 10)).sql 
+  DB[:items].filter((:x.sql_number > 5) & (:y.sql_number > 10)).sql 
   #=> "SELECT * FROM items WHERE ((x > 5) AND (y > 10))" 
 
   DB[:items].filter({:x => 1, :y => 2}.sql_or & ~{:z => 3}).sql 
@@ -114,8 +114,8 @@ You can use arithmetic operators and specify SQL functions:
   DB[:items].filter((:x + :y) > :z).sql 
   #=> "SELECT * FROM items WHERE ((x + y) > z)" 
 
-  DB[:items].filter(:price < :AVG[:price] + 100).sql 
-  #=> "SELECT * FROM items WHERE (price < (AVG(price) + 100))" 
+  DB[:items].filter(:price - 100 < :AVG.sql_function(:price)).sql 
+  #=> "SELECT * FROM items WHERE ((price - 100) < AVG(price))" 
 
 == Ordering
 
@@ -151,15 +151,15 @@ You can use arithmetic operators and specify SQL functions:
   dataset.avg(:price)
   dataset.sum(:stock)
 
-  dataset.group(:category).select(:category, :AVG[:price])
+  dataset.group(:category).select(:category, :AVG.sql_function(:price))
 
 == SQL Functions / Literals
 
-  dataset.update(:updated_at => :NOW[])
+  dataset.update(:updated_at => :NOW.sql_function)
   dataset.update(:updated_at => 'NOW()'.lit)
 
   dataset.update(:updated_at => "DateValue('1/1/2001')".lit)
-  dataset.update(:updated_at => :DateValue['1/1/2001'])
+  dataset.update(:updated_at => :DateValue.sql_function('1/1/2001'))
 
 == Schema Manipulation
 

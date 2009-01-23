@@ -120,7 +120,7 @@ describe Sequel::Model, "many_to_one" do
   it "should support :order, :limit (only for offset), and :dataset options, as well as a block" do
     c2 = @c2
     @c2.many_to_one :child_20, :class => @c2, :key=>:id, :dataset=>proc{c2.filter(:parent_id=>pk)}, :limit=>[10,20], :order=>:name do |ds|
-      ds.filter(:x > 1)
+      ds.filter(:x.sql_number > 1)
     end
     @c2.load(:id => 100).child_20
     MODEL_DB.sqls.should == ["SELECT * FROM nodes WHERE ((parent_id = 100) AND (x > 1)) ORDER BY name LIMIT 1 OFFSET 20"]

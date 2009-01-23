@@ -157,7 +157,14 @@ end
 class Symbol
   include Sequel::SQL::QualifyingMethods
   include Sequel::SQL::IdentifierMethods
-  include Sequel::SQL::GenericExpressionMethods
+  include Sequel::SQL::AliasMethods
+  include Sequel::SQL::CastMethods
+  include Sequel::SQL::OrderMethods
+  include Sequel::SQL::BooleanMethods
+  include Sequel::SQL::NumericMethods
+  include Sequel::SQL::StringMethods
+  include Sequel::SQL::ComplexExpressionMethods
+  include Sequel::SQL::InequalityMethods if RUBY_VERSION < '1.9.0'
 
   # If no argument is given, returns a Sequel::SQL::ColumnAll object specifying all
   # columns for this table.
@@ -169,10 +176,13 @@ class Symbol
   end
 
   # Returns a Sequel::SQL::Function  with this as the function name,
-  # and the given arguments.
-  def [](*args)
+  # and the given arguments. This is aliased as Symbol#[] if ruby 1.9
+  # is not being used.  ruby 1.9 includes Symbol#[], and Sequel
+  # doesn't override methods defined by ruby itself.
+  def sql_function(*args)
     Sequel::SQL::Function.new(self, *args)
   end
+  alias_method(:[], :sql_function) if RUBY_VERSION < '1.9.0'
 
   # If the given argument is an Integer or an array containing an Integer, returns
   # a Sequel::SQL::Subscript with this column and the given arg.

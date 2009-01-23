@@ -1,5 +1,19 @@
 === HEAD
 
+* Fix literalization of SQL::Blobs in DataObjects and JDBC adapter's postgresql subadapters when ruby 1.9 is used (jeremyevans)
+
+* When using standard strings in the postgres adapter with the postgres-pr driver, use custom string escaping to prevent errors (jeremyevans)
+
+* Before hooks now run in reverse order of being added, so later ones are run first (tamas)
+
+* Add Firebird adapter, requires Firebird ruby driver located at http://github.com/wishdev/fb (wishdev)
+
+* Don't clobber the following Symbol instance methods when using ruby 1.9: [], <, <=, >, >= (jeremyevans)
+
+* Quote the table name and the index for PostgreSQL index creation (jeremyevans)
+
+* Add DataObjects adapter, supporting PostgreSQL, MySQL, and SQLite (jeremyevans)
+
 * Add ability for Database#create_table to take options, support specifying MySQL engine, charset, and collate per table (pusewicz, jeremyevans)
 
 * Add Model.add_hook_type class method, for adding your own hook types, mostly for use by plugin authors (pkondzior, jeremyevans)

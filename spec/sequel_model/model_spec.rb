@@ -219,12 +219,12 @@ describe Sequel::Model, ".subset" do
   specify "should create a filter on the underlying dataset" do
     proc {@c.new_only}.should raise_error(NoMethodError)
     
-    @c.subset(:new_only) {:age < 'new'}
+    @c.subset(:new_only) {:age.sql_number < 'new'}
     
     @c.new_only.sql.should == "SELECT * FROM items WHERE (age < 'new')"
     @c.dataset.new_only.sql.should == "SELECT * FROM items WHERE (age < 'new')"
     
-    @c.subset(:pricey) {:price > 100}
+    @c.subset(:pricey) {:price.sql_number > 100}
     
     @c.pricey.sql.should == "SELECT * FROM items WHERE (price > 100)"
     @c.dataset.pricey.sql.should == "SELECT * FROM items WHERE (price > 100)"
@@ -262,10 +262,10 @@ describe Sequel::Model, ".find" do
   end
   
   specify "should accept filter blocks" do
-    @c.find{:id > 1}.should be_a_kind_of(@c)
+    @c.find{:id.sql_number > 1}.should be_a_kind_of(@c)
     $sqls.last.should == "SELECT * FROM items WHERE (id > 1) LIMIT 1"
 
-    @c.find {(:x > 1) & (:y < 2)}.should be_a_kind_of(@c)
+    @c.find {(:x.sql_number > 1) & (:y.sql_number < 2)}.should be_a_kind_of(@c)
     $sqls.last.should == "SELECT * FROM items WHERE ((x > 1) AND (y < 2)) LIMIT 1"
   end
 

@@ -6,12 +6,14 @@ Sequel is a lightweight database access toolkit for Ruby.
   for constructing database queries and table schemas.
 * Sequel also includes a lightweight but comprehensive ORM layer for
   mapping records to Ruby objects and handling associated records.
-* Sequel supports advanced database features such as prepared statements,
-  bound variables, master/slave configurations, and database sharding.
+* Sequel supports advanced database features such as prepared
+  statements, bound variables, stored procedures, master/slave
+  configurations, and database sharding.
 * Sequel makes it easy to deal with multiple records without having
   to break your teeth on SQL.
-* Sequel currently has adapters for ADO, DB2, DBI, Informix, JDBC,
-  MySQL, ODBC, OpenBase, Oracle, PostgreSQL and SQLite3.
+* Sequel currently has adapters for ADO, DataObjects, DB2, DBI,
+  Firebird, Informix, JDBC, MySQL, ODBC, OpenBase, Oracle, PostgreSQL
+  and SQLite3.
 
 == Resources
 
@@ -202,7 +204,7 @@ Or lists of values:
   
 Sequel also accepts expressions:
   
-  my_posts = posts.filter(:stamp > Date.today << 1)
+  my_posts = posts.filter(:stamp.sql_number > Date.today << 1)
   
 Some adapters (like postgresql) will also let you specify Regexps:
 
@@ -220,7 +222,7 @@ You can also specify a custom WHERE clause using a string:
 You can use parameters in your string, as well (ActiveRecord style):
 
   posts.filter('(stamp < ?) AND (author != ?)', Date.today - 3, author_name)
-  posts.filter((:stamp < Date.today - 3) & ~(:author => author_name)) # same as above
+  posts.filter((:stamp + 3 < Date.today) & ~(:author => author_name)) # same as above
 
 Datasets can also be used as subqueries:
 
@@ -355,7 +357,7 @@ You can also define a model class that does not have a primary key, but then you
 A model instance can also be fetched by specifying a condition:
 
   post = Post[:title => 'hello world']
-  post = Post.find(:num_comments < 10)
+  post = Post.find(:num_comments.sql_number < 10)
 
 === Iterating over records
 
@@ -365,7 +367,7 @@ A model class lets you iterate over specific records by acting as a proxy to the
 
 You can also manipulate the records in the dataset:
 
-  Post.filter(:num_comments < 7).delete
+  Post.filter(:num_comments.sql_number < 7).delete
   Post.filter(:title.like(/ruby/)).update(:category => 'ruby')
 
 === Accessing record values
@@ -516,7 +518,7 @@ Associations can be eagerly loaded via .eager and the :eager association option.
   Post.eager(:person).all
 
   # eager is a dataset method, so it works with filters/orders/limits/etc.
-  Post.filter(:topic > 'M').order(:date).limit(5).eager(:person).all
+  Post.filter(:topic.sql_string > 'M').order(:date).limit(5).eager(:person).all
   
   person = Person.first
   # Eager loading via :eager (will eagerly load the tags for this person's posts)
@@ -560,7 +562,7 @@ The obvious way to add table-wide logic is to define class methods to the model 
 
   class Post < Sequel::Model
     def self.posts_with_few_comments
-      filter(:num_comments < 30)
+      filter(:num_comments.sql_number < 30)
     end
 
     def self.clean_posts_with_few_comments
@@ -572,7 +574,7 @@ You can also implement table-wide logic by defining methods on the dataset:
 
   class Post < Sequel::Model
     def_dataset_method(:posts_with_few_comments) do
-      filter(:num_comments < 30)
+      filter(:num_comments.sql_number < 30)
     end
 
     def_dataset_method(:clean_posts_with_few_comments) do
@@ -587,7 +589,7 @@ This is the recommended way of implementing table-wide operations, and allows yo
 Sequel models also provide a short hand notation for filters:
 
   class Post < Sequel::Model
-    subset(:posts_with_few_comments, :num_comments < 30)
+    subset(:posts_with_few_comments, :num_comments.sql_number < 30)
     subset :invisible, :visible => false
   end
 
