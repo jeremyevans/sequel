@@ -120,6 +120,39 @@ describe Sequel::Model do
     atts.should == [:xx, :yy]
   end
   
+  specify "should respect allow_missing option when using multiple attributes" do
+    o = @c.new
+    def o.xx
+      self[:xx]
+    end
+    def o.yy
+      self[:yy]
+    end
+    vals = nil
+    atts = nil
+    @c.validates_each([:xx, :yy], :allow_missing=>true){|obj,a,v| atts=a; vals=v}
+
+    o.values[:xx] = 1
+    o.valid?
+    vals.should == [1,nil]
+    atts.should == [:xx, :yy]
+
+    vals = nil
+    atts = nil
+    o.values.clear
+    o.values[:yy] = 2
+    o.valid?
+    vals.should == [nil, 2]
+    atts.should == [:xx, :yy]
+
+    vals = nil
+    atts = nil
+    o.values.clear
+    o.valid?.should == true
+    vals.should == nil
+    atts.should == nil
+  end
+  
   specify "should overwrite existing validation with the same tag and attribute" do
     @c.validates_each(:xx, :xx, :tag=>:low) {|o, a, v| o.xxx; o.errors[a] << 'too low' if v < 50}
     @c.validates_each(:yy, :yy) {|o, a, v| o.yyy; o.errors[a] << 'too low' if v < 50}
@@ -243,6 +276,18 @@ describe Sequel::Model do
     @m.should_not be_valid
   end
 
+  specify "should validate acceptance_of with allow_missing => true" do
+    @c.validates_acceptance_of :value, :allow_missing => true
+    @m.should be_valid
+  end
+
+  specify "should validate acceptance_of with allow_missing => true and allow_nil => false" do
+    @c.validates_acceptance_of :value, :allow_missing => true, :allow_nil => false
+    @m.should be_valid
+    @m.value = nil
+    @m.should_not be_valid
+  end
+
   specify "should validate acceptance_of with if => true" do
     @c.validates_acceptance_of :value, :if => :dont_skip
     @m.value = '0'
@@ -300,6 +345,16 @@ describe Sequel::Model do
     @m.should be_valid
   end
 
+  specify "should validate confirmation_of with allow_missing => true" do
+    @c.send(:attr_accessor, :value_confirmation)
+    @c.validates_acceptance_of :value, :allow_missing => true
+    @m.should be_valid
+    @m.value_confirmation = 'blah'
+    @m.should be_valid
+    @m.value = nil
+    @m.should_not be_valid
+  end
+
   specify "should validate format_of" do
     @c.validates_format_of :value, :with => /.+_.+/
     @m.value = 'abc_'
@@ -327,6 +382,13 @@ describe Sequel::Model do
     @m.should be_valid
   end
   
+  specify "should validate format_of with allow_missing => true" do
+    @c.validates_format_of :value, :allow_missing => true, :with=>/./
+    @m.should be_valid
+    @m.value = nil
+    @m.should_not be_valid
+  end
+
   specify "should validate length_of with maximum" do
     @c.validates_length_of :value, :maximum => 5
     @m.should_not be_valid
@@ -384,6 +446,13 @@ describe Sequel::Model do
 
     @m.value = 'a'
     @m.should be_valid
+  end
+
+  specify "should validate length_of with allow_missing => true" do
+    @c.validates_length_of :value, :allow_missing => true, :minimum => 5
+    @m.should be_valid
+    @m.value = nil
+    @m.should_not be_valid
   end
 
   specify "should allow multiple calls to validates_length_of with different options without overwriting" do
@@ -450,6 +519,13 @@ describe Sequel::Model do
     @m.should be_valid
   end
 
+  specify "should validate numericality_of with allow_missing => true" do
+    @c.validates_numericality_of :value, :allow_missing => true
+    @m.should be_valid
+    @m.value = nil
+    @m.should_not be_valid
+  end
+
   specify "should validate presence_of" do
     @c.validates_presence_of :value
     @m.should_not be_valid
@@ -475,6 +551,13 @@ describe Sequel::Model do
     @m.should be_valid
   end
 
+  specify "should validate presence_of with allow_missing => true" do
+    @c.validates_presence_of :value, :allow_missing => true
+    @m.should be_valid
+    @m.value = nil
+    @m.should_not be_valid
+  end
+
   specify "should validate uniqueness_of with if => true" do
     @c.validates_uniqueness_of :value, :if => :dont_skip
 
@@ -489,10 +572,11 @@ describe Sequel::Model do
     @m.should be_valid
   end
   
-  specify "should validate with :if => block" do
-    @c.validates_presence_of :value, :if => proc {false}
-    
+  specify "should validate uniqueness_of with allow_missing => true" do
+    @c.validates_uniqueness_of :value, :allow_missing => true
     @m.should be_valid
+    @m.value = nil
+    @m.should_not be_valid
   end
 end
 

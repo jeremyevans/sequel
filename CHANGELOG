@@ -1,5 +1,7 @@
 === HEAD
 
+* Add :allow_missing validation option, useful if the database provides a good default (jeremyevans)
+
 * Fix literalization of SQL::Blobs in DataObjects and JDBC adapter's postgresql subadapters when ruby 1.9 is used (jeremyevans)
 
 * When using standard strings in the postgres adapter with the postgres-pr driver, use custom string escaping to prevent errors (jeremyevans)

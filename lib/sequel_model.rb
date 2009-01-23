@@ -50,6 +50,8 @@ module Sequel
   #   cache_store, cache_ttl, dataset_methods, primary_key, restricted_columns,
   #   sti_dataset, and sti_key.  You should not usually need to
   #   access these directly.
+  # * All validation methods also accept the options specified in #validates_each,
+  #   in addition to the options specified in the RDoc for that method.
   # * The following class level attr_accessors are created: raise_on_typecast_failure,
   #   raise_on_save_failure, strict_param_setting, typecast_empty_string_to_nil,
   #   and typecast_on_assignment:
