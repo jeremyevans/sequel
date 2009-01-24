@@ -1,5 +1,21 @@
 === HEAD
 
+* Database#quote_identifiers= now affects future schema modification statements, even if it is not used before one of the schema modification statements (jeremyevans)
+
+* Fix literalization of blobs when using the PostreSQL JDBC subadapter (jeremyevans)
+
+* Fix literalization of date and time types when using the MySQL JDBC subadapter (jeremyevans)
+
+* Convert some Java specific types to ruby types on output in the JDBC adapter (jeremyevans)
+
+* Add Database#tables method to JDBC adapter (jeremyevans)
+
+* Add H2 JDBC subadapter (logan_barnett, david_koontz, james_britt, jeremyevans)
+
+* Add identifer_output_method, used for converting identifiers coming out of the database, replacing the lowercase support on some databases (jeremyevans)
+
+* Add identifier_input_method, used for converting identifiers going into the database, replacing upcase_identifiers (jeremyevans)
+
 * Add :allow_missing validation option, useful if the database provides a good default (jeremyevans)
 
 * Fix literalization of SQL::Blobs in DataObjects and JDBC adapter's postgresql subadapters when ruby 1.9 is used (jeremyevans)
