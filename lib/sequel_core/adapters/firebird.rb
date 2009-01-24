@@ -233,7 +233,7 @@ module Sequel
       def fetch_rows(sql, &block)
         execute(sql) do |s|
           begin
-            @columns = s.fields.map{|c| output_identifier(c)}
+            @columns = s.fields.map{|c| output_identifier(c.name)}
             s.fetchall(:symbols_hash).each do |r|
               h = {}
               r.each{|k,v| h[output_identifier(k)] = v}
@@ -286,7 +286,8 @@ module Sequel
       end
 
       def quote_identifier(name)
-        Fb::Global::reserved_keyword?(name) ? quoted_identifier(name.upcase) : super
+        name = super
+        Fb::Global::reserved_keyword?(name) ? quoted_identifier(name.upcase) : name
       end
 
       # The order of clauses in the SELECT SQL statement
