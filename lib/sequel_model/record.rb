@@ -199,7 +199,7 @@ module Sequel
     def save!(*columns)
       opts = columns.extract_options!
       return save_failure(:save) if before_save == false
-      if @new
+      if new?
         return save_failure(:create) if before_create == false
         ds = model.dataset
         if ds.respond_to?(:insert_select) and h = ds.insert_select(@values)
@@ -214,24 +214,28 @@ module Sequel
           end
           if pk
             @this = nil # remove memoized this dataset
-            refresh
+            do_refresh = true
           end
         end
-        @new = false
         after_create
       else
         return save_failure(:update) if before_update == false
         if columns.empty?
           vals = opts[:changed] ? @values.reject{|k,v| !changed_columns.include?(k)} : @values
           this.update(vals)
-          changed_columns.clear
         else # update only the specified columns
           this.update(@values.reject{|k, v| !columns.include?(k)})
-          changed_columns.reject!{|c| columns.include?(c)}
         end
         after_update
       end
       after_save
+      if columns.empty? || new?
+        changed_columns.clear
+      else
+        changed_columns.reject!{|c| columns.include?(c)}
+      end
+      @new = false
+      refresh if defined?(do_refresh) && do_refresh
       self
     end
     

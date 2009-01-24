@@ -54,6 +54,28 @@ describe "Model#save" do
     o.save(:y)
     o.changed_columns.should == []
   end
+
+  it "should preserve changed_columns' and @new's value until all hook finish running" do
+    res = nil
+    @c.after_save { res = [changed_columns, @new].flatten}
+    o = @c.new(:x => 1, :y => nil)
+    o[:x] = 2
+    o.save
+    res.should == [:x,true]
+
+    res = nil
+    o = @c.load(:id => 23,:x => 1, :y => nil)
+    o[:x] = 2
+    o.save
+    res.should == [:x,false]
+
+    res = nil
+    o = @c.load(:id => 23,:x => 1, :y => nil)
+    o[:x] = 2
+    o[:y] = 22
+    o.save(:x)
+    res.should == [:x,:y,false]
+  end
   
 end
 
