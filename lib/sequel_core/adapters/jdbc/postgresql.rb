@@ -97,6 +97,8 @@ module Sequel
           case v
           when LiteralString
             v
+          when SQL::Blob
+            super
           when String
             db.synchronize{|c| "'#{c.escape_string(v)}'"}
           when Java::JavaSql::Timestamp

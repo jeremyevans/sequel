@@ -61,6 +61,12 @@ module Sequel
         require 'sequel_core/adapters/shared/mssql'
         db.extend(Sequel::MSSQL::DatabaseMethods)
         com.microsoft.sqlserver.jdbc.SQLServerDriver
+      end,
+      :h2=>proc do |db|
+        require 'sequel_core/adapters/jdbc/h2'
+        db.extend(Sequel::JDBC::H2::DatabaseMethods)
+        JDBC.load_gem('h2')
+        org.h2.Driver
       end
     }
     
@@ -177,6 +183,13 @@ module Sequel
       # row id.
       def execute_insert(sql, opts={})
         execute(sql, {:type=>:insert}.merge(opts))
+      end
+      
+      # All tables in this database
+      def tables(server=nil)
+        ts = []
+        synchronize(server){|c| dataset.send(:process_result_set, c.getMetaData.getTables(nil, nil, nil, ['TABLE'].to_java(:string))){|h| ts << dataset.send(:output_identifier, h[:table_name])}}
+        ts
       end
       
       # Default transaction method that should work on most JDBC
@@ -373,20 +386,7 @@ module Sequel
       
       # Correctly return rows from the database and return them as hashes.
       def fetch_rows(sql, &block)
-        execute(sql) do |result|
-          # get column names
-          meta = result.getMetaData
-          column_count = meta.getColumnCount
-          @columns = []
-          column_count.times {|i| @columns << meta.getColumnName(i+1).to_sym}
-
-          # get rows
-          while result.next
-            row = {}
-            @columns.each_with_index {|v, i| row[v] = result.getObject(i+1)}
-            yield row
-          end
-        end
+        execute(sql){|result| process_result_set(result, &block)}
         self
       end
       
@@ -416,9 +416,40 @@ module Sequel
       
       private
       
+      # Convert the type.  Used for converting Java types to ruby types.
+      def convert_type(v)
+        case v
+        when Java::JavaSQL::Timestamp, Java::JavaSQL::Time
+          v.to_string.to_sequel_time
+        when Java::JavaIo::BufferedReader
+          lines = []
+          while(line = v.read_line) do lines << line end
+          lines.join("\n")
+        else
+          v
+        end
+      end
+      
       # Extend the dataset with the JDBC stored procedure methods.
       def prepare_extend_sproc(ds)
         ds.extend(StoredProcedureMethods)
+      end
+      
+      # Split out from fetch rows to allow processing of JDBC result sets
+      # that don't come from issuing an SQL string.
+      def process_result_set(result)
+        # get column names
+        meta = result.getMetaData
+        column_count = meta.getColumnCount
+        @columns = []
+        column_count.times {|i| @columns << output_identifier(meta.getColumnName(i+1))}
+
+        # get rows
+        while result.next
+          row = {}
+          @columns.each_with_index {|v, i| row[v] = convert_type(result.getObject(i+1))}
+          yield row
+        end
       end
     end
   end

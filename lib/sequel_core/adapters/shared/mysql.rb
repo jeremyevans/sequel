@@ -100,9 +100,14 @@ module Sequel
       
       private
       
-      # MySQL folds unquoted identifiers to lowercase, so it shouldn't need to upcase identifiers by default.
-      def upcase_identifiers_default
-        false
+      # MySQL folds unquoted identifiers to lowercase, so it shouldn't need to upcase identifiers on input.
+      def identifier_input_method_default
+        nil
+      end
+      
+      # MySQL folds unquoted identifiers to lowercase, so it shouldn't need to upcase identifiers on output.
+      def identifier_output_method_default
+        nil
       end
 
       # Use the MySQL specific DESCRIBE syntax to get a table description.

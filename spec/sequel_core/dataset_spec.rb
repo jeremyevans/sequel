@@ -39,6 +39,66 @@ context "Dataset" do
   specify "should include Enumerable" do
     Sequel::Dataset.included_modules.should include(Enumerable)
   end
+  
+  specify "should get quote_identifiers default from database" do
+    db = Sequel::Database.new(:quote_identifiers=>true)
+    db[:a].quote_identifiers?.should == true
+    db = Sequel::Database.new(:quote_identifiers=>false)
+    db[:a].quote_identifiers?.should == false
+  end
+
+  specify "should get identifier_input_method default from database" do
+    db = Sequel::Database.new(:identifier_input_method=>:upcase)
+    db[:a].identifier_input_method.should == :upcase
+    db = Sequel::Database.new(:identifier_input_method=>:downcase)
+    db[:a].identifier_input_method.should == :downcase
+  end
+
+  specify "should get identifier_output_method default from database" do
+    db = Sequel::Database.new(:identifier_output_method=>:upcase)
+    db[:a].identifier_output_method.should == :upcase
+    db = Sequel::Database.new(:identifier_output_method=>:downcase)
+    db[:a].identifier_output_method.should == :downcase
+  end
+end
+
+context "Dataset" do
+  setup do
+    @dataset = Sequel::Dataset.new("db")
+  end
+  
+  specify "should have quote_identifiers= method which changes literalization of identifiers" do
+    @dataset.quote_identifiers = true
+    @dataset.literal(:a).should == '"a"'
+    @dataset.quote_identifiers = false
+    @dataset.literal(:a).should == 'a'
+  end
+  
+  specify "should have upcase_identifiers= method which changes literalization of identifiers" do
+    @dataset.upcase_identifiers = true
+    @dataset.literal(:a).should == 'A'
+    @dataset.upcase_identifiers = false
+    @dataset.literal(:a).should == 'a'
+  end
+
+  specify "should have identifier_input_method= method which changes literalization of identifiers" do
+    @dataset.identifier_input_method = :upcase
+    @dataset.literal(:a).should == 'A'
+    @dataset.identifier_input_method = :downcase
+    @dataset.literal(:A).should == 'a'
+    @dataset.identifier_input_method = :reverse
+    @dataset.literal(:at_b).should == 'b_ta'
+  end
+  
+  specify "should have identifier_output_method= method which changes identifiers returned from the database" do
+    @dataset.send(:output_identifier, "at_b_C").should == :at_b_C
+    @dataset.identifier_output_method = :upcase
+    @dataset.send(:output_identifier, "at_b_C").should == :AT_B_C
+    @dataset.identifier_output_method = :downcase
+    @dataset.send(:output_identifier, "at_b_C").should == :at_b_c
+    @dataset.identifier_output_method = :reverse
+    @dataset.send(:output_identifier, "at_b_C").should == :C_b_ta
+  end
 end
 
 context "Dataset#clone" do

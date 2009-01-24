@@ -191,7 +191,7 @@ module Sequel
       # with symbol keys.
       def fetch_rows(sql)
         execute(sql) do |reader|
-          cols = @columns = reader.fields.map{|f| f.to_sym}
+          cols = @columns = reader.fields.map{|f| output_identifier(f)}
           while(reader.next!) do
             h = {}
             cols.zip(reader.values).each{|k, v| h[k] = v}

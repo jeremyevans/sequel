@@ -34,7 +34,8 @@ end
 
 class MockDatabase < Sequel::Database
   @@quote_identifiers = false
-  @@upcase_identifiers = false
+  self.identifier_input_method = nil
+  self.identifier_output_method = nil
   attr_reader :sqls
   
   def execute(sql, opts={})

@@ -2,84 +2,40 @@ require 'mysql'
 require 'sequel_core/adapters/shared/mysql'
 require 'sequel_core/dataset/stored_procedures'
 
-# Add methods to get columns, yield hashes with symbol keys, and do
-# type conversion.
-class Mysql::Result
-  # Mapping of type numbers to conversion methods.
-  MYSQL_TYPES = {
-    0   => :to_d,     # MYSQL_TYPE_DECIMAL
-    1   => :to_i,     # MYSQL_TYPE_TINY
-    2   => :to_i,     # MYSQL_TYPE_SHORT
-    3   => :to_i,     # MYSQL_TYPE_LONG
-    4   => :to_f,     # MYSQL_TYPE_FLOAT
-    5   => :to_f,     # MYSQL_TYPE_DOUBLE
-    # 6   => ??,        # MYSQL_TYPE_NULL
-    7   => :to_sequel_time,  # MYSQL_TYPE_TIMESTAMP
-    8   => :to_i,     # MYSQL_TYPE_LONGLONG
-    9   => :to_i,     # MYSQL_TYPE_INT24
-    10  => :to_date,  # MYSQL_TYPE_DATE
-    11  => :to_time,  # MYSQL_TYPE_TIME
-    12  => :to_sequel_time,  # MYSQL_TYPE_DATETIME
-    13  => :to_i,     # MYSQL_TYPE_YEAR
-    14  => :to_date,  # MYSQL_TYPE_NEWDATE
-    # 15  => :to_s      # MYSQL_TYPE_VARCHAR
-    # 16  => :to_s,     # MYSQL_TYPE_BIT
-    246 => :to_d,     # MYSQL_TYPE_NEWDECIMAL
-    247 => :to_i,     # MYSQL_TYPE_ENUM
-    248 => :to_i,      # MYSQL_TYPE_SET
-    249 => :to_blob,     # MYSQL_TYPE_TINY_BLOB
-    250 => :to_blob,     # MYSQL_TYPE_MEDIUM_BLOB
-    251 => :to_blob,     # MYSQL_TYPE_LONG_BLOB
-    252 => :to_blob,     # MYSQL_TYPE_BLOB
-    # 253 => :to_s,     # MYSQL_TYPE_VAR_STRING
-    # 254 => :to_s,     # MYSQL_TYPE_STRING
-    # 255 => :to_s      # MYSQL_TYPE_GEOMETRY
-  }
-  
-  # Return an array of column name symbols for this result set.
-  def columns(with_table = nil)
-    unless @columns
-      @column_types = []
-      @columns = fetch_fields.map do |f|
-        @column_types << f.type
-        (with_table ? "#{f.table}.#{f.name}" : f.name).to_sym
-      end
-    end
-    @columns
-  end
-
-  # yield a hash with symbol keys and type converted values.
-  def sequel_each_hash(with_table = nil)
-    c = columns
-    while row = fetch_row
-      h = {}
-      c.each_with_index {|f, i| h[f] = convert_type(row[i], @column_types[i])}
-      yield h
-    end
-  end
-  
-  private
-  
-  # Convert the type of v using the method in MYSQL_TYPES[type].
-  def convert_type(v, type)
-    if v
-      if type == 1 && Sequel.convert_tinyint_to_bool
-        # We special case tinyint here to avoid adding
-        # a method to an ancestor of Fixnum
-        v.to_i == 0 ? false : true
-      else
-        (t = MYSQL_TYPES[type]) ? v.send(t) : v
-      end
-    else
-      nil
-    end
-  end
-  
-end
-
 module Sequel
   # Module for holding all MySQL-related classes and modules for Sequel.
   module MySQL
+    # Mapping of type numbers to conversion methods.
+    MYSQL_TYPES = {
+      0   => :to_d,     # MYSQL_TYPE_DECIMAL
+      1   => :to_i,     # MYSQL_TYPE_TINY
+      2   => :to_i,     # MYSQL_TYPE_SHORT
+      3   => :to_i,     # MYSQL_TYPE_LONG
+      4   => :to_f,     # MYSQL_TYPE_FLOAT
+      5   => :to_f,     # MYSQL_TYPE_DOUBLE
+      # 6   => ??,        # MYSQL_TYPE_NULL
+      7   => :to_sequel_time,  # MYSQL_TYPE_TIMESTAMP
+      8   => :to_i,     # MYSQL_TYPE_LONGLONG
+      9   => :to_i,     # MYSQL_TYPE_INT24
+      10  => :to_date,  # MYSQL_TYPE_DATE
+      11  => :to_time,  # MYSQL_TYPE_TIME
+      12  => :to_sequel_time,  # MYSQL_TYPE_DATETIME
+      13  => :to_i,     # MYSQL_TYPE_YEAR
+      14  => :to_date,  # MYSQL_TYPE_NEWDATE
+      # 15  => :to_s      # MYSQL_TYPE_VARCHAR
+      # 16  => :to_s,     # MYSQL_TYPE_BIT
+      246 => :to_d,     # MYSQL_TYPE_NEWDECIMAL
+      247 => :to_i,     # MYSQL_TYPE_ENUM
+      248 => :to_i,      # MYSQL_TYPE_SET
+      249 => :to_blob,     # MYSQL_TYPE_TINY_BLOB
+      250 => :to_blob,     # MYSQL_TYPE_MEDIUM_BLOB
+      251 => :to_blob,     # MYSQL_TYPE_LONG_BLOB
+      252 => :to_blob,     # MYSQL_TYPE_BLOB
+      # 253 => :to_s,     # MYSQL_TYPE_VAR_STRING
+      # 254 => :to_s,     # MYSQL_TYPE_STRING
+      # 255 => :to_s      # MYSQL_TYPE_GEOMETRY
+    }
+  
     # Database class for MySQL databases used with Sequel.
     class Database < Sequel::Database
       include Sequel::MySQL::DatabaseMethods
@@ -316,8 +272,13 @@ module Sequel
       # Yield all rows matching this dataset
       def fetch_rows(sql)
         execute(sql) do |r|
-          @columns = r.columns
-          r.sequel_each_hash {|row| yield row}
+          column_types = []
+          @columns = r.fetch_fields.map{|f| column_types << f.type; output_identifier(f.name)}
+          while row = r.fetch_row
+            h = {}
+            @columns.each_with_index {|f, i| h[f] = convert_type(row[i], column_types[i])}
+            yield h
+          end
         end
         self
       end
@@ -362,6 +323,21 @@ module Sequel
       end
       
       private
+      
+      # Convert the type of v using the method in MYSQL_TYPES[type].
+      def convert_type(v, type)
+        if v
+          if type == 1 && Sequel.convert_tinyint_to_bool
+            # We special case tinyint here to avoid adding
+            # a method to an ancestor of Fixnum
+            v.to_i == 0 ? false : true
+          else
+            (t = MYSQL_TYPES[type]) ? v.send(t) : v
+          end
+        else
+          nil
+        end
+      end
       
       # Set the :type option to :select if it hasn't been set.
       def execute(sql, opts={}, &block)

@@ -22,6 +22,12 @@ module Sequel
 
     # Hash of adapters that have been used
     @@adapters = Hash.new
+    
+    # The identifier input method to use by default
+    @@identifier_input_method = nil
+
+    # The identifier output method to use by default
+    @@identifier_output_method = nil
 
     # Whether to use the single threaded connection pool by default
     @@single_threaded = false
@@ -29,15 +35,12 @@ module Sequel
     # Whether to quote identifiers (columns and tables) by default
     @@quote_identifiers = nil
 
-    # Whether to upcase identifiers (columns and tables) by default
-    @@upcase_identifiers = nil
-
     # The default schema to use
     attr_accessor :default_schema
 
     # Array of SQL loggers to use for this database
     attr_accessor :loggers
-
+    
     # The options for this database
     attr_reader :opts
     
@@ -46,12 +49,6 @@ module Sequel
 
     # The prepared statement objects for this database, keyed by name
     attr_reader :prepared_statements
-
-    # Whether to quote identifiers (columns and tables) for this database
-    attr_writer :quote_identifiers
-    
-    # Whether to upcase identifiers (columns and tables) for this database
-    attr_writer :upcase_identifiers
     
     # Constructs a new instance of a database connection with the specified
     # options hash.
@@ -61,9 +58,12 @@ module Sequel
     # Takes the following options:
     # * :default_schema : The default schema to use, should generally be nil
     # * :disconnection_proc: A proc used to disconnect the connection.
+    # * :identifier_input_method: A string method symbol to call on identifiers going into the database
+    # * :identifier_output_method: A string method symbol to call on identifiers coming from the database
     # * :loggers : An array of loggers to use.
     # * :quote_identifiers : Whether to quote identifiers
     # * :single_threaded : Whether to use a single-threaded connection pool
+    # * :upcase_identifiers : Whether to upcase identifiers going into the database
     #
     # All options given are also passed to the ConnectionPool.  If a block
     # is given, it is used as the connection_proc for the ConnectionPool.
@@ -75,6 +75,9 @@ module Sequel
       @default_schema = opts[:default_schema]
       @prepared_statements = {}
       @transactions = []
+      if opts.include?(:upcase_identifiers)
+        @identifier_input_method = opts[:upcase_identifiers] ? :upcase : ""
+      end
       @pool = (@single_threaded ? SingleThreadedPool : ConnectionPool).new(connection_pool_default_options.merge(opts), &block)
       @pool.connection_proc = proc{|server| connect(server)} unless block
       @pool.disconnection_proc = proc{|conn| disconnect_connection(conn)} unless opts[:disconnection_proc]
@@ -152,6 +155,26 @@ module Sequel
         c.new(opts)
       end
     end
+    
+    # The method to call on identifiers going into the database
+    def self.identifier_input_method
+      @@identifier_input_method
+    end
+    
+    # Set the method to call on identifiers going into the database
+    def self.identifier_input_method=(v)
+      @@identifier_input_method = v || ""
+    end
+    
+    # The method to call on identifiers coming from the database
+    def self.identifier_output_method
+      @@identifier_output_method
+    end
+    
+    # Set the method to call on identifiers coming from the database
+    def self.identifier_output_method=(v)
+      @@identifier_output_method = v || ""
+    end
 
     # Sets the default quote_identifiers mode for new databases.
     # See Sequel.quote_identifiers=.
@@ -168,7 +191,7 @@ module Sequel
     # Sets the default quote_identifiers mode for new databases.
     # See Sequel.quote_identifiers=.
     def self.upcase_identifiers=(value)
-      @@upcase_identifiers = value
+      self.identifier_input_method = value ? :upcase : nil
     end
 
     ### Private Class Methods ###
@@ -309,6 +332,44 @@ module Sequel
       dataset.get(expr)
     end
     
+    # The method to call on identifiers going into the database
+    def identifier_input_method
+      case @identifier_input_method
+      when nil
+        @identifier_input_method = @opts.include?(:identifier_input_method) ? @opts[:identifier_input_method] : (@@identifier_input_method.nil? ? identifier_input_method_default : @@identifier_input_method)
+        @identifier_input_method == "" ? nil : @identifier_input_method
+      when ""
+        nil
+      else
+        @identifier_input_method
+      end
+    end
+    
+    # Set the method to call on identifiers going into the database
+    def identifier_input_method=(v)
+      reset_schema_utility_dataset
+      @identifier_input_method = v || ""
+    end
+    
+    # The method to call on identifiers coming from the database
+    def identifier_output_method
+      case @identifier_output_method
+      when nil
+        @identifier_output_method = @opts.include?(:identifier_output_method) ? @opts[:identifier_output_method] : (@@identifier_output_method.nil? ? identifier_output_method_default : @@identifier_output_method)
+        @identifier_output_method == "" ? nil : @identifier_output_method
+      when ""
+        nil
+      else
+        @identifier_output_method
+      end
+    end
+    
+    # Set the method to call on identifiers coming from the database
+    def identifier_output_method=(v)
+      reset_schema_utility_dataset
+      @identifier_output_method = v || ""
+    end
+    
     # Returns a string representation of the database object including the
     # class name and the connection URI (or the opts if the URI
     # cannot be constructed).
@@ -342,6 +403,12 @@ module Sequel
     # Returns a dataset modified by the given query block.  See Dataset#query.
     def query(&block)
       dataset.query(&block)
+    end
+    
+    # Whether to quote identifiers (columns and tables) for this database
+    def quote_identifiers=(v)
+      reset_schema_utility_dataset
+      @quote_identifiers = v
     end
     
     # Returns true if the database quotes identifiers.
@@ -494,11 +561,15 @@ module Sequel
         value
       end
     end
+    
+    # Set whether to upcase identifiers going into the database.
+    def upcase_identifiers=(v)
+      self.identifier_input_method = v ? :upcase : nil
+    end
 
     # Returns true if the database upcases identifiers.
     def upcase_identifiers?
-      return @upcase_identifiers unless @upcase_identifiers.nil?
-      @upcase_identifiers = @opts.include?(:upcase_identifiers) ? @opts[:upcase_identifiers] : (@@upcase_identifiers.nil? ? upcase_identifiers_default : @@upcase_identifiers)
+      identifier_input_method == :upcase
     end
     
     # Returns the URI identifying the database.
@@ -541,6 +612,22 @@ module Sequel
     # The default options for the connection pool.
     def connection_pool_default_options
       {}
+    end
+    
+    # The method to apply to identifiers going into the database by default.
+    # Should be overridden in subclasses for databases that fold unquoted
+    # identifiers to lower case instead of uppercase, such as
+    # MySQL, PostgreSQL, and SQLite.
+    def identifier_input_method_default
+      :upcase
+    end
+    
+    # The method to apply to identifiers coming the database by default.
+    # Should be overridden in subclasses for databases that fold unquoted
+    # identifiers to lower case instead of uppercase, such as
+    # MySQL, PostgreSQL, and SQLite.
+    def identifier_output_method_default
+      :downcase
     end
     
     def quote_identifiers_default
@@ -592,14 +679,6 @@ module Sequel
     # Raise a database error unless the exception is an Error::Rollback.
     def transaction_error(e, *classes)
       raise_error(e, :classes=>classes) unless Error::Rollback === e
-    end
-
-    # Sets whether to upcase identifiers by default.  Should be
-    # overridden in subclasses for databases that fold unquoted
-    # identifiers to lower case instead of uppercase, such as
-    # MySQL, PostgreSQL, and SQLite.
-    def upcase_identifiers_default
-      true
     end
   end
 end

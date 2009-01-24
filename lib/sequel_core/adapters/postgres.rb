@@ -312,7 +312,7 @@ module Sequel
         cols = []
         execute(sql) do |res|
           res.nfields.times do |fieldnum|
-            cols << [fieldnum, PG_TYPES[res.ftype(fieldnum)], res.fname(fieldnum).to_sym]
+            cols << [fieldnum, PG_TYPES[res.ftype(fieldnum)], output_identifier(res.fname(fieldnum))]
           end
           @columns = cols.map{|c| c.at(2)}
           res.ntuples.times do |recnum|

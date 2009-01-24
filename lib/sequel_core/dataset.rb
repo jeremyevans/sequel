@@ -71,6 +71,12 @@ module Sequel
 
     # The database that corresponds to this dataset
     attr_accessor :db
+    
+    # Set the method to call on identifiers going into the database for this dataset
+    attr_accessor :identifier_input_method
+    
+    # Set the method to call on identifiers coming the database for this dataset
+    attr_accessor :identifier_output_method
 
     # The hash of options for this dataset, keys are symbols.
     attr_accessor :opts
@@ -83,9 +89,6 @@ module Sequel
     # fetch_rows to return.
     attr_accessor :row_proc
 
-    # Whether to upcase identifiers for this dataset
-    attr_writer :upcase_identifiers
-    
     # Constructs a new instance of a dataset with an associated database and 
     # options. Datasets are usually constructed by invoking Database methods:
     #
@@ -100,7 +103,8 @@ module Sequel
     def initialize(db, opts = nil)
       @db = db
       @quote_identifiers = db.quote_identifiers? if db.respond_to?(:quote_identifiers?)
-      @upcase_identifiers = db.upcase_identifiers? if db.respond_to?(:upcase_identifiers?)
+      @identifier_input_method = db.identifier_input_method if db.respond_to?(:identifier_input_method)
+      @identifier_output_method = db.identifier_output_method if db.respond_to?(:identifier_output_method)
       @opts = opts || {}
       @row_proc = nil
       @transform = nil
@@ -419,9 +423,13 @@ module Sequel
       end
     end
     
+    def upcase_identifiers=(v)
+      @identifier_input_method = v ? :upcase : nil
+    end
+    
     # Whether this dataset upcases identifiers.
     def upcase_identifiers?
-      @upcase_identifiers
+      @identifier_input_method == :upcase
     end
     
     # Updates values for the dataset.  The returned value is generally the
@@ -481,6 +489,12 @@ module Sequel
       copy = send(meth, *args, &block)
       @opts.merge!(copy.opts)
       self
+    end
+    
+    # Modify the identifier returned from the database based on the
+    # identifier_output_method.
+    def output_identifier(v)
+      (i = identifier_output_method) ? v.to_s.send(i).to_sym : v.to_sym
     end
   end
 end

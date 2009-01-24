@@ -85,9 +85,14 @@ module Sequel
       
       private
       
-      # SQLite folds unquoted identifiers to lowercase, so it shouldn't need to upcase identifiers by default.
-      def upcase_identifiers_default
-        false
+      # SQLite folds unquoted identifiers to lowercase, so it shouldn't need to upcase identifiers on input.
+      def identifier_input_method_default
+        nil
+      end
+      
+      # SQLite folds unquoted identifiers to lowercase, so it shouldn't need to upcase identifiers on output.
+      def identifier_output_method_default
+        nil
       end
 
       # SQLite supports schema parsing using the table_info PRAGMA, so

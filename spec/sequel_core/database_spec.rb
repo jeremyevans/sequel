@@ -6,7 +6,8 @@ context "A new Database" do
   end
   teardown do
     Sequel.quote_identifiers = false
-    Sequel.upcase_identifiers = false
+    Sequel.identifier_input_method = nil
+    Sequel.identifier_output_method = nil
   end
   
   specify "should receive options" do
@@ -74,6 +75,48 @@ context "A new Database" do
     db.upcase_identifiers = false
     db.upcase_identifiers?.should == false
   end
+  
+  specify "should respect the :identifier_input_method option" do
+    Sequel.identifier_input_method = nil
+    db = Sequel::Database.new(:identifier_input_method=>nil)
+    db.identifier_input_method.should == nil
+    db.identifier_input_method = :downcase
+    db.identifier_input_method.should == :downcase
+    db = Sequel::Database.new(:identifier_input_method=>:upcase)
+    db.identifier_input_method.should == :upcase
+    db.identifier_input_method = nil
+    db.identifier_input_method.should == nil
+    Sequel.identifier_input_method = :downcase
+    db = Sequel::Database.new(:identifier_input_method=>nil)
+    db.identifier_input_method.should == nil
+    db.identifier_input_method = :upcase
+    db.identifier_input_method.should == :upcase
+    db = Sequel::Database.new(:identifier_input_method=>:upcase)
+    db.identifier_input_method.should == :upcase
+    db.identifier_input_method = nil
+    db.identifier_input_method.should == nil
+  end
+  
+  specify "should respect the :identifier_output_method option" do
+    Sequel.identifier_output_method = nil
+    db = Sequel::Database.new(:identifier_output_method=>nil)
+    db.identifier_output_method.should == nil
+    db.identifier_output_method = :downcase
+    db.identifier_output_method.should == :downcase
+    db = Sequel::Database.new(:identifier_output_method=>:upcase)
+    db.identifier_output_method.should == :upcase
+    db.identifier_output_method = nil
+    db.identifier_output_method.should == nil
+    Sequel.identifier_output_method = :downcase
+    db = Sequel::Database.new(:identifier_output_method=>nil)
+    db.identifier_output_method.should == nil
+    db.identifier_output_method = :upcase
+    db.identifier_output_method.should == :upcase
+    db = Sequel::Database.new(:identifier_output_method=>:upcase)
+    db.identifier_output_method.should == :upcase
+    db.identifier_output_method = nil
+    db.identifier_output_method.should == nil
+  end
 
   specify "should use the default Sequel.quote_identifiers value" do
     Sequel.quote_identifiers = true
@@ -96,14 +139,56 @@ context "A new Database" do
     Sequel::Database.upcase_identifiers = false
     Sequel::Database.new({}).upcase_identifiers?.should == false
   end
+  
+  specify "should use the default Sequel.identifier_input_method value" do
+    Sequel.identifier_input_method = :downcase
+    Sequel::Database.new({}).identifier_input_method.should == :downcase
+    Sequel.identifier_input_method = :upcase
+    Sequel::Database.new({}).identifier_input_method.should == :upcase
+    Sequel::Database.identifier_input_method = :downcase
+    Sequel::Database.new({}).identifier_input_method.should == :downcase
+    Sequel::Database.identifier_input_method = :upcase
+    Sequel::Database.new({}).identifier_input_method.should == :upcase
+  end
+  
+  specify "should use the default Sequel.identifier_output_method value" do
+    Sequel.identifier_output_method = :downcase
+    Sequel::Database.new({}).identifier_output_method.should == :downcase
+    Sequel.identifier_output_method = :upcase
+    Sequel::Database.new({}).identifier_output_method.should == :upcase
+    Sequel::Database.identifier_output_method = :downcase
+    Sequel::Database.new({}).identifier_output_method.should == :downcase
+    Sequel::Database.identifier_output_method = :upcase
+    Sequel::Database.new({}).identifier_output_method.should == :upcase
+  end
 
-  specify "should respect the upcase_indentifiers_default method if Sequel.upcase_identifiers = nil" do
-    Sequel.upcase_identifiers = nil
-    Sequel::Database.new({}).upcase_identifiers?.should == true
-    x = Class.new(Sequel::Database){def upcase_identifiers_default; false end}
-    x.new({}).upcase_identifiers?.should == false
-    y = Class.new(Sequel::Database){def upcase_identifiers_default; true end}
-    y.new({}).upcase_identifiers?.should == true
+  specify "should respect the quote_indentifiers_default method if Sequel.quote_identifiers = nil" do
+    Sequel.quote_identifiers = nil
+    Sequel::Database.new({}).quote_identifiers?.should == true
+    x = Class.new(Sequel::Database){def quote_identifiers_default; false end}
+    x.new({}).quote_identifiers?.should == false
+    y = Class.new(Sequel::Database){def quote_identifiers_default; true end}
+    y.new({}).quote_identifiers?.should == true
+  end
+  
+  specify "should respect the identifier_input_method_default method" do
+    class Sequel::Database
+      @@identifier_input_method = nil
+    end
+    x = Class.new(Sequel::Database){def identifier_input_method_default; :downcase end}
+    x.new({}).identifier_input_method.should == :downcase
+    y = Class.new(Sequel::Database){def identifier_input_method_default; :camelize end}
+    y.new({}).identifier_input_method.should == :camelize
+  end
+  
+  specify "should respect the identifier_output_method_default method if Sequel.upcase_identifiers = nil" do
+    class Sequel::Database
+      @@identifier_output_method = nil
+    end
+    x = Class.new(Sequel::Database){def identifier_output_method_default; :upcase end}
+    x.new({}).identifier_output_method.should == :upcase
+    y = Class.new(Sequel::Database){def identifier_output_method_default; :underscore end}
+    y.new({}).identifier_output_method.should == :underscore
   end
 
   specify "should just use a :uri option for jdbc with the full connection string" do

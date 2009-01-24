@@ -90,10 +90,10 @@ module Sequel
       def fetch_rows(sql, &block)
         execute(sql) do |cursor|
           begin
-            @columns = cursor.get_col_names.map {|c| c.downcase.to_sym}
+            @columns = cursor.get_col_names.map{|c| output_identifier(c)}
             while r = cursor.fetch
               row = {}
-              r.each_with_index {|v, i| row[columns[i]] = v unless columns[i] == :raw_rnum_}
+              r.each_with_index {|v, i| row[@columns[i]] = v unless @columns[i] == :raw_rnum_}
               yield row
             end
           ensure

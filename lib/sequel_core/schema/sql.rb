@@ -273,6 +273,12 @@ module Sequel
       def remove_cached_schema(table)
         @schemas.delete(quote_schema_table(table)) if @schemas
       end
+      
+      # Remove the cached schema_utility_dataset, because the identifier
+      # quoting has changed.
+      def reset_schema_utility_dataset
+        @schema_utility_dataset = nil
+      end
 
       # Match the database's column type to a ruby type via a
       # regular expression.  The following ruby types are supported:

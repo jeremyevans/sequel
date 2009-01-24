@@ -573,7 +573,7 @@ module Sequel
     # quote the name with quoted_identifier.
     def quote_identifier(name)
       name = name.to_s
-      name = name.upcase if upcase_identifiers?
+      name = name.send(@identifier_input_method) if @identifier_input_method
       name = quoted_identifier(name) if quote_identifiers?
       name
     end
@@ -590,7 +590,7 @@ module Sequel
     # should be overridden by subclasses to provide quoting not matching the
     # SQL standard, such as backtick (used by MySQL and SQLite).
     def quoted_identifier(name)
-      "\"#{name}\""
+      "\"#{name.to_s.gsub('"', '""')}\""
     end
 
     # Returns a copy of the dataset with the order reversed. If no order is

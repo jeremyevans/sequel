@@ -3,8 +3,6 @@ require 'dbi'
 module Sequel
   module DBI
     class Database < Sequel::Database
-      attr_writer :lowercase
-      
       set_adapter_scheme :dbi
       
       DBI_ADAPTERS = {
@@ -69,11 +67,6 @@ module Sequel
         synchronize(opts[:server]){|conn| conn.do(sql)}
       end
       alias_method :execute_dui, :do
-      
-      # Converts all column names to lowercase
-      def lowercase
-        @lowercase ||= false
-      end
 
       private
 
@@ -97,10 +90,8 @@ module Sequel
       def fetch_rows(sql, &block)
         execute(sql) do |s|
           begin
-            @columns = s.column_names.map do |c|
-              @db.lowercase ? c.downcase.to_sym : c.to_sym
-            end
-            s.fetch {|r| yield hash_row(s, r)}
+            @columns = s.column_names.map{|c| output_identifier(c)}
+            s.fetch{|r| yield hash_row(s, r)}
           ensure
             s.finish rescue nil
           end

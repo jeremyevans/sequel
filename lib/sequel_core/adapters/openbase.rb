@@ -51,7 +51,7 @@ module Sequel
       def fetch_rows(sql)
         execute(sql) do |result|
           begin
-            @columns = result.column_infos.map {|c| c.name.to_sym}
+            @columns = result.column_infos.map{|c| output_identifier(c.name)}
             result.each do |r|
               row = {}
               r.each_with_index {|v, i| row[@columns[i]] = v}

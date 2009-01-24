@@ -216,10 +216,6 @@ module Sequel
       def quote_identifiers_default
         false
       end
-
-      def upcase_identifiers_default
-        true
-      end
     end
 
     # Dataset class for Firebird datasets
@@ -237,10 +233,12 @@ module Sequel
       def fetch_rows(sql, &block)
         execute(sql) do |s|
           begin
-            @columns = s.fields.map do |c|
-              c.name.to_sym
+            @columns = s.fields.map{|c| output_identifier(c)}
+            s.fetchall(:symbols_hash).each do |r|
+              h = {}
+              r.each{|k,v| h[output_identifier(k)] = v}
+              yield h
             end
-            s.fetchall(:symbols_hash).each{ |r| yield r}
           ensure
             s.close
           end
@@ -288,8 +286,7 @@ module Sequel
       end
 
       def quote_identifier(name)
-        name = super
-        Fb::Global::reserved_keyword?(name) ? quoted_identifier(name.upcase) : name
+        Fb::Global::reserved_keyword?(name) ? quoted_identifier(name.upcase) : super
       end
 
       # The order of clauses in the SELECT SQL statement

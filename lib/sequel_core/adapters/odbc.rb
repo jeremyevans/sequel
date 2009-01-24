@@ -129,7 +129,7 @@ module Sequel
               if (n = c.name).empty?
                 n = UNTITLED_COLUMN % (untitled_count += 1)
               end
-              n.to_sym
+              output_identifier(n)
             end
             rows = s.fetch_all
             rows.each {|row| yield hash_row(row)} if rows

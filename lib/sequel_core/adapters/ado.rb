@@ -58,7 +58,7 @@ module Sequel
         execute(sql) do |s|
           @columns = s.Fields.extend(Enumerable).map do |column|
             name = column.Name.empty? ? '(no column name)' : column.Name
-            name.to_sym
+            output_identifier(name)
           end
           
           unless s.eof

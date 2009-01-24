@@ -89,7 +89,7 @@ module Sequel
       def fetch_rows(sql)
         execute(sql) do |sth|
           @column_info = get_column_info(sth)
-          @columns = @column_info.map {|c| c[:name]}
+          @columns = @column_info.map {|c| output_identifier(c[:name])}
           while (rc = SQLFetch(@handle)) != SQL_NO_DATA_FOUND
             @db.check_error(rc, "Could not fetch row")
             yield hash_row(sth)
@@ -118,7 +118,7 @@ module Sequel
           rc, v = SQLGetData(sth, i+1, c[:db2_type], c[:precision]) 
           @db.check_error(rc, "Could not get data")
           
-          @row[c[:name]] = convert_type(v)
+          row[output_identifier(c[:name])] = convert_type(v)
         end
         row
       end
