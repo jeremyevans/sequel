@@ -212,10 +212,6 @@ module Sequel
       def disconnect_connection(c)
         c.close
       end
-
-      def quote_identifiers_default
-        false
-      end
     end
 
     # Dataset class for Firebird datasets
@@ -233,7 +229,7 @@ module Sequel
       def fetch_rows(sql, &block)
         execute(sql) do |s|
           begin
-            @columns = s.fields.map{|c| output_identifier(c)}
+            @columns = s.fields.map{|c| output_identifier(c.name)}
             s.fetchall(:symbols_hash).each do |r|
               h = {}
               r.each{|k,v| h[output_identifier(k)] = v}
@@ -283,10 +279,6 @@ module Sequel
         else
           super
         end
-      end
-
-      def quote_identifier(name)
-        Fb::Global::reserved_keyword?(name) ? quoted_identifier(name.upcase) : super
       end
 
       # The order of clauses in the SELECT SQL statement

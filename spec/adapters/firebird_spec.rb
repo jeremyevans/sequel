@@ -205,9 +205,9 @@ context "A Firebird dataset" do
 
   specify "should quote and upcase reserved keywords" do
     @d = FIREBIRD_DB[:testing]
-    @d.upcase_identifiers= false
+    @d.quote_identifiers = true
     @d.select(:select).sql.should == \
-      'SELECT "SELECT" FROM testing'
+      'SELECT "SELECT" FROM "TESTING"'
   end
 end
 
