@@ -212,12 +212,12 @@ module Sequel
           if (pk = primary_key) && !(Array === pk) && !@values[pk]
             @values[pk] = iid
           end
-          if pk
-            @this = nil # remove memoized this dataset
-            do_refresh = true
-          end
+          @this = nil if pk
         end
         after_create
+        after_save
+        @new = false
+        refresh if pk
       else
         return save_failure(:update) if before_update == false
         if columns.empty?
@@ -227,15 +227,13 @@ module Sequel
           this.update(@values.reject{|k, v| !columns.include?(k)})
         end
         after_update
+        after_save
+        if columns.empty?
+          changed_columns.clear
+        else
+          changed_columns.reject!{|c| columns.include?(c)}
+        end
       end
-      after_save
-      if columns.empty? || new?
-        changed_columns.clear
-      else
-        changed_columns.reject!{|c| columns.include?(c)}
-      end
-      @new = false
-      refresh if defined?(do_refresh) && do_refresh
       self
     end
     

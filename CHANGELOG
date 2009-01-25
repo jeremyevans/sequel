@@ -1,5 +1,7 @@
 === HEAD
 
+* Don't modify Model#new? and Model#changed_columns when saving a record until after the after hooks have been run (tamas, jeremyevans)
+
 * Database#quote_identifiers= now affects future schema modification statements, even if it is not used before one of the schema modification statements (jeremyevans)
 
 * Fix literalization of blobs when using the PostreSQL JDBC subadapter (jeremyevans)
