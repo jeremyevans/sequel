@@ -212,10 +212,6 @@ module Sequel
       def disconnect_connection(c)
         c.close
       end
-
-      def quote_identifiers_default
-        false
-      end
     end
 
     # Dataset class for Firebird datasets
@@ -283,11 +279,6 @@ module Sequel
         else
           super
         end
-      end
-
-      def quote_identifier(name)
-        name = super
-        Fb::Global::reserved_keyword?(name) ? quoted_identifier(name.upcase) : name
       end
 
       # The order of clauses in the SELECT SQL statement
