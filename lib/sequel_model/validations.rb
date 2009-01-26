@@ -250,6 +250,34 @@ module Sequel
       end
     end
 
+    # Validates whether an attribute is not a string.  This is generally useful
+    # in conjunction with raise_on_typecast_failure = false, where you are
+    # passing in string values for non-string attributes (such as numbers and dates).
+    # If typecasting fails (invalid number or date), the value of the attribute will
+    # be a string in an invalid format, and if typecasting succeeds, the value will
+    # not be a string.
+    #
+    # Possible Options:
+    # * :message - The message to use (default: 'is a string' or 'is not a valid (integer|datetime|etc.)' if the type is known)
+    def self.validates_not_string(*atts)
+      opts = {
+        :tag => :not_string,
+      }.merge!(atts.extract_options!)
+      atts << opts
+      validates_each(*atts) do |o, a, v|
+        if v.is_a?(String)
+          unless message = opts[:message]
+            message = if sch = o.db_schema[a] and typ = sch[:type]
+              "is not a valid #{typ}"
+            else
+              "is a string"
+            end
+          end
+          o.errors[a] << message
+        end
+      end
+    end
+
     # Validates whether an attribute is a number.
     #
     # Possible Options:

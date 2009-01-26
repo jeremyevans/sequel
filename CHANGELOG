@@ -1,5 +1,7 @@
 === HEAD
 
+* Add validates_not_string validation, useful in conjunction with raise_on_typecast_failure = false (jeremyevans)
+
 * Don't modify Model#new? and Model#changed_columns when saving a record until after the after hooks have been run (tamas, jeremyevans)
 
 * Database#quote_identifiers= now affects future schema modification statements, even if it is not used before one of the schema modification statements (jeremyevans)

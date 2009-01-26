@@ -715,10 +715,6 @@ describe Sequel::Model, "Validations" do
     @person.valid?.should be_true
   end
   
-  # it "should allow for :with_exactly => /[a-zA-Z]/, which wraps the supplied regex with ^<regex>$" do
-  #   pending("TODO: Add this option to Validatable#validates_format_of")
-  # end
-
   it "should validate length of column" do
     class ::Person < Sequel::Model
       validations.clear
@@ -748,6 +744,26 @@ describe Sequel::Model, "Validations" do
     @person.last_name   = "1234567890123456789012345678901"
     @person.initials    = "LC"
     @person.middle_name = "Will"
+    @person.should be_valid
+  end
+  
+  it "should validate that a column doesn't have a string value" do
+    p = Class.new(Sequel::Model)
+    p.class_eval do
+      columns :age
+      self.raise_on_typecast_failure = false
+      validates_not_string :age
+      @db_schema = {:age=>{:type=>:integer}}
+    end
+    
+    @person = p.new :age => "a"
+    @person.should_not be_valid
+    @person.errors.full_messages.should == ['age is not a valid integer']
+    @person.db_schema[:age][:type] = :datetime
+    @person.should_not be_valid
+    @person.errors.full_messages.should == ['age is not a valid datetime']
+    
+    @person.age = 20
     @person.should be_valid
   end
   
