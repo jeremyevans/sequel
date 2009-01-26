@@ -88,6 +88,20 @@ context "A connection pool handling connections" do
   end
 end
 
+context "A connection pool handling connection errors" do 
+  specify "#hold should raise a Sequel::DatabaseConnectionError if an exception is raised by the connection_proc" do
+    cpool = Sequel::ConnectionPool.new(CONNECTION_POOL_DEFAULTS){raise Interrupt}
+    proc{cpool.hold{:block_return}}.should raise_error(Sequel::DatabaseConnectionError)
+    cpool.created_count.should == 0
+  end
+
+  specify "#hold should raise a Sequel::DatabaseConnectionError if nil is returned by the connection_proc" do
+    cpool = Sequel::ConnectionPool.new(CONNECTION_POOL_DEFAULTS){nil}
+    proc{cpool.hold{:block_return}}.should raise_error(Sequel::DatabaseConnectionError)
+    cpool.created_count.should == 0
+  end
+end
+
 class DummyConnection
   @@value = 0
   def initialize

@@ -156,9 +156,17 @@ class Sequel::ConnectionPool
   # the server is less than the maximum size of the pool.
   def make_new(server)
     if @created_count[server] < @max_size
+      raise(Sequel::Error, "No connection proc specified") unless @connection_proc
+      begin
+        conn = @connection_proc.call(server)
+      rescue Exception=>exception
+        e = Sequel::DatabaseConnectionError.new("#{exception.class} #{exception.message}")
+        e.set_backtrace(exception.backtrace)
+        raise e
+      end
+      raise(Sequel::DatabaseConnectionError, "Connection parameters not valid") unless conn
       set_created_count(server, @created_count[server] + 1)
-      @connection_proc ? @connection_proc.call(server) : \
-        (raise Error, "No connection proc specified")
+      conn
     end
   end
   

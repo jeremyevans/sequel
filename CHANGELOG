@@ -1,5 +1,7 @@
 === HEAD
 
+* Add Sequel::DatabaseConnectionError, for indicating that Sequel wasn't able to connect to the database (jeremyevans)
+
 * Add validates_not_string validation, useful in conjunction with raise_on_typecast_failure = false (jeremyevans)
 
 * Don't modify Model#new? and Model#changed_columns when saving a record until after the after hooks have been run (tamas, jeremyevans)
