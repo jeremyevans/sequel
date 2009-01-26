@@ -101,7 +101,7 @@ begin
     exit
   end
 rescue => e
-  puts e.message
+  puts "#{e.class}: #{e.message}"
   puts e.backtrace.first
   exit 1
 end
