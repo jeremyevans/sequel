@@ -46,6 +46,12 @@ module Sequel
         db.translator.add_translator("decimal", &prok)
         db.translator.add_translator("money", &prok)
         
+        # Handle floating point values with Float
+        prok = proc{|t,v| Float(v) rescue v}
+        db.translator.add_translator("float", &prok)
+        db.translator.add_translator("real", &prok)
+        db.translator.add_translator("double precision", &prok)
+        
         db
       end
       

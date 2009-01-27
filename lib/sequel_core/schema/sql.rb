@@ -12,7 +12,11 @@ module Sequel
       SET_DEFAULT = 'SET DEFAULT'.freeze
       SET_NULL = 'SET NULL'.freeze
       TYPES = Hash.new {|h, k| k}
-      TYPES[:double] = 'double precision'
+      TYPES.merge!(:double=>'double precision', String=>'varchar',
+        Integer=>'integer', Fixnum=>'integer', Bignum=>'bigint',
+        Float=>'double precision', BigDecimal=>'numeric', Numeric=>'numeric',
+        Date=>'date', DateTime=>'timestamp', Time=>'timestamp', File=>'blob',
+        TrueClass=>'boolean', FalseClass=>'boolean')
       UNDERSCORE = '_'.freeze
       UNIQUE = ' UNIQUE'.freeze
       UNSIGNED = ' UNSIGNED'.freeze
@@ -312,9 +316,10 @@ module Sequel
 
       # SQL fragment specifying the type of a given column.
       def type_literal(column)
-        column[:size] ||= 255 if column[:type] == :varchar
+        type = type_literal_base(column)
+        column[:size] ||= 255 if type.to_s == 'varchar'
         elements = column[:size] || column[:elements]
-        "#{type_literal_base(column)}#{literal(Array(elements)) if elements}#{UNSIGNED if column[:unsigned]}"
+        "#{type}#{literal(Array(elements)) if elements}#{UNSIGNED if column[:unsigned]}"
       end
 
       # SQL fragment specifying the base type of a given column,

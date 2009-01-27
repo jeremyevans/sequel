@@ -421,10 +421,14 @@ module Sequel
         case v
         when Java::JavaSQL::Timestamp, Java::JavaSQL::Time
           v.to_string.to_sequel_time
+        when Java::JavaSQL::Date
+          v.to_string.to_date
         when Java::JavaIo::BufferedReader
           lines = []
           while(line = v.read_line) do lines << line end
           lines.join("\n")
+        when Java::JavaMath::BigDecimal
+          BigDecimal.new(v.to_string)
         else
           v
         end

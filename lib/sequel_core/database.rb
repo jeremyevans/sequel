@@ -424,7 +424,7 @@ module Sequel
     
     # Default serial primary key options.
     def serial_primary_key_options
-      {:primary_key => true, :type => :integer, :auto_increment => true}
+      {:primary_key => true, :type => Integer, :auto_increment => true}
     end
     
     # Returns true if the database is using a single-threaded connection pool.

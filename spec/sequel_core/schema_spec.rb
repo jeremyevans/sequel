@@ -38,6 +38,28 @@ context "DB#create_table" do
     end
     @db.sqls.should == ['CREATE TABLE cats (id integer, name text)']
   end
+  
+  specify "should transform types given as ruby classes to database-specific types" do
+    @db.create_table(:cats) do
+      String :a
+      Integer :b
+      Fixnum :c
+      Bignum :d
+      Float :e
+      BigDecimal :f
+      Date :g
+      DateTime :h
+      Time :i
+      Numeric :j
+      File :k
+      TrueClass :l
+      FalseClass :m
+      column :n, Fixnum
+      primary_key :o, :type=>String
+      foreign_key :p, :f, :type=>Date
+    end
+    @db.sqls.should == ['CREATE TABLE cats (o varchar(255) PRIMARY KEY AUTOINCREMENT, a varchar(255), b integer, c integer, d bigint, e double precision, f numeric, g date, h timestamp, i timestamp, j numeric, k blob, l boolean, m boolean, n integer, p date REFERENCES f)']
+  end
 
   specify "should accept primary key definition" do
     @db.create_table(:cats) do

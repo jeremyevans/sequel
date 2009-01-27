@@ -16,7 +16,8 @@ module Sequel
       NOT_NULL = Sequel::Schema::SQL::NOT_NULL
       NULL = Sequel::Schema::SQL::NULL
       PRIMARY_KEY = Sequel::Schema::SQL::PRIMARY_KEY
-      TYPES = Sequel::Schema::SQL::TYPES
+      TYPES = Sequel::Schema::SQL::TYPES.merge(DateTime=>'datetime', \
+        TrueClass=>'tinyint', FalseClass=>'tinyint')
       UNIQUE = Sequel::Schema::SQL::UNIQUE
       UNSIGNED = Sequel::Schema::SQL::UNSIGNED
       
@@ -123,6 +124,11 @@ module Sequel
           [row.delete(:Field).to_sym, row]
         end
       end
+
+      # Override the standard type conversions with MySQL specific ones
+      def type_literal_base(column)
+        TYPES[column[:type]]
+      end
     end
   
     # Dataset methods shared by datasets that use MySQL databases.
@@ -216,6 +222,8 @@ module Sequel
           BOOL_TRUE
         when false
           BOOL_FALSE
+        when DateTime, Time
+          v.strftime("'%Y-%m-%d %H:%M:%S'")
         else
           super
         end

@@ -1,5 +1,7 @@
 === HEAD
 
+* Add per-database type translation support for schema changes, translating ruby classes to database specific types (jeremyevans)
+
 * Add Sequel::DatabaseConnectionError, for indicating that Sequel wasn't able to connect to the database (jeremyevans)
 
 * Add validates_not_string validation, useful in conjunction with raise_on_typecast_failure = false (jeremyevans)

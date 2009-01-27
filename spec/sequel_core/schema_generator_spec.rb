@@ -47,9 +47,9 @@ describe Sequel::Schema::Generator do
   
   it "creates foreign key column" do
     @columns[3][:name].should == :parent_id
-    @columns[3][:type].should == :integer
+    @columns[3][:type].should == Integer
     @columns[6][:name].should == :node_id
-    @columns[6][:type].should == :integer
+    @columns[6][:type].should == Integer
   end
   
   it "uses table for foreign key columns, if specified" do
@@ -133,10 +133,35 @@ describe Sequel::Schema::AlterTableGenerator do
       {:op => :add_constraint, :type => :check, :constraint_type => :check, :name => :con1, :check => ['fred > 100']},
       {:op => :drop_constraint, :name => :con2},
       {:op => :add_constraint, :type => :check, :constraint_type => :unique, :name => :con3, :columns => [:aaa, :bbb, :ccc]},
-      {:op => :add_column, :name => :id, :type => :integer, :primary_key=>true, :auto_increment=>true},
-      {:op => :add_column, :name => :node_id, :type => :integer, :table=>:nodes},
+      {:op => :add_column, :name => :id, :type => Integer, :primary_key=>true, :auto_increment=>true},
+      {:op => :add_column, :name => :node_id, :type => Integer, :table=>:nodes},
       {:op => :add_constraint, :type => :check, :constraint_type => :primary_key, :columns => [:aaa, :bbb]},
       {:op => :add_constraint, :type => :check, :constraint_type => :foreign_key, :columns => [:node_id, :prop_id], :table => :nodes_props}
     ]
+  end
+end
+
+describe "Sequel::Schema::Generator generic type methods" do
+  before do
+    @generator = Sequel::Schema::Generator.new(SchemaDummyDatabase.new) do
+      String :a
+      Integer :b
+      Fixnum :c
+      Bignum :d
+      Float :e
+      BigDecimal :f
+      Date :g
+      DateTime :h
+      Time :i
+      Numeric :j
+      File :k
+      TrueClass :l
+      FalseClass :m
+    end
+    @columns, @indexes = @generator.create_info
+  end
+  
+  it "should store the type class in :type for each column" do
+    @columns.map{|c| c[:type]}.should == [String, Integer, Fixnum, Bignum, Float, BigDecimal, Date, DateTime, Time, Numeric, File, TrueClass, FalseClass]
   end
 end

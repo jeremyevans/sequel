@@ -5,6 +5,7 @@ module Sequel
       SYNCHRONOUS = {'0' => :off, '1' => :normal, '2' => :full}.freeze
       TABLES_FILTER = "type = 'table' AND NOT name = 'sqlite_sequence'"
       TEMP_STORE = {'0' => :default, '1' => :file, '2' => :memory}.freeze
+      TYPES = Sequel::Schema::SQL::TYPES.merge(Bignum=>'integer')
       
       # Run all alter_table commands in a transaction.  This is technically only
       # needed for drop column.
@@ -95,14 +96,6 @@ module Sequel
         nil
       end
 
-      # SQLite supports schema parsing using the table_info PRAGMA, so
-      # parse the output of that into the format Sequel expects.
-      def schema_parse_table(table_name, opts)
-        parse_pragma(table_name, opts).map do |row|
-          [row.delete(:name).to_sym, row]
-        end
-      end
-
       def parse_pragma(table_name, opts)
         self["PRAGMA table_info(?)", table_name].map do |row|
           row.delete(:cid)
@@ -114,6 +107,19 @@ module Sequel
           row[:type] = schema_column_type(row[:db_type])
           row
         end
+      end
+      
+      # SQLite supports schema parsing using the table_info PRAGMA, so
+      # parse the output of that into the format Sequel expects.
+      def schema_parse_table(table_name, opts)
+        parse_pragma(table_name, opts).map do |row|
+          [row.delete(:name).to_sym, row]
+        end
+      end
+      
+      # Override the standard type conversions with SQLite specific ones
+      def type_literal_base(column)
+        TYPES[column[:type]]
       end
     end
     

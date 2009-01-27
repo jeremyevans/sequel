@@ -167,6 +167,7 @@ module Sequel
       SQL_ROLLBACK = 'ROLLBACK'.freeze
       SQL_RELEASE_SAVEPOINT = 'RELEASE SAVEPOINT autopoint_%d'.freeze
       SYSTEM_TABLE_REGEXP = /^pg|sql/.freeze
+      TYPES = Sequel::Schema::SQL::TYPES.merge(File=>'bytea')
 
       # Creates the function in the database.  See create_function_sql for arguments.
       def create_function(*args)
@@ -549,6 +550,11 @@ module Sequel
       # Turns an array of argument specifiers into an SQL fragment used for function arguments.  See create_function_sql.
       def sql_function_args(args)
         "(#{Array(args).map{|a| Array(a).reverse.join(' ')}.join(', ')})"
+      end
+      
+      # Override the standard type conversions with PostgreSQL specific ones
+      def type_literal_base(column)
+        TYPES[column[:type]]
       end
     end
     
