@@ -167,7 +167,7 @@ module Sequel
       SQL_ROLLBACK = 'ROLLBACK'.freeze
       SQL_RELEASE_SAVEPOINT = 'RELEASE SAVEPOINT autopoint_%d'.freeze
       SYSTEM_TABLE_REGEXP = /^pg|sql/.freeze
-      TYPES = Sequel::Schema::SQL::TYPES.merge(File=>'bytea')
+      TYPES = Sequel::Schema::SQL::TYPES.merge(File=>'bytea', String=>'text')
 
       # Creates the function in the database.  See create_function_sql for arguments.
       def create_function(*args)
