@@ -186,9 +186,9 @@ module Sequel
       end
       
       # All tables in this database
-      def tables(server=nil)
+      def tables
         ts = []
-        synchronize(server){|c| dataset.send(:process_result_set, c.getMetaData.getTables(nil, nil, nil, ['TABLE'].to_java(:string))){|h| ts << dataset.send(:output_identifier, h[:table_name])}}
+        metadata(:getTables, nil, nil, nil, ['TABLE'].to_java(:string)){|h| ts << dataset.send(:output_identifier, h[:table_name])}
         ts
       end
       
@@ -230,6 +230,11 @@ module Sequel
       end
       
       private
+      
+      # The JDBC adapter should not need the pool to convert exceptions.
+      def connection_pool_default_options
+        super.merge(:pool_convert_exceptions=>false)
+      end
       
       # Close given adapter connections
       def disconnect_connection(c)
@@ -296,6 +301,11 @@ module Sequel
         nil
       end
       
+      # Yield the metadata for this database
+      def metadata(*args, &block)
+        synchronize{|c| dataset.send(:process_result_set, c.getMetaData.send(*args), &block)}
+      end
+      
       # Java being java, you need to specify the type of each argument
       # for the prepared statement, and bind it individually.  This
       # guesses which JDBC method to use, and hopefully JRuby will convert
@@ -326,9 +336,19 @@ module Sequel
         conn
       end
       
-      # The JDBC adapter should not need the pool to convert exceptions.
-      def connection_pool_default_options
-        super.merge(:pool_convert_exceptions=>false)
+      # All tables in this database
+      def schema_parse_table(table, opts={})
+        schema, table = schema_and_table(table)
+        schema = dataset.send(:input_identifier, schema) if schema
+        table = dataset.send(:input_identifier, table)
+        pks, ts = [], []
+        metadata(:getPrimaryKeys, nil, schema, table) do |h|
+          pks << h[:column_name]
+        end
+        metadata(:getColumns, nil, schema, table, nil) do |h|
+          ts << [dataset.send(:output_identifier, h[:column_name]), {:type=>schema_column_type(h[:type_name]), :db_type=>h[:type_name], :default=>(h[:column_def] == '' ? nil : h[:column_def]), :allow_null=>(h[:nullable] != 0), :primary_key=>pks.include?(h[:column_name])}]
+        end
+        ts
       end
     end
     

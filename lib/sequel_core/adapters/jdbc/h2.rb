@@ -4,6 +4,21 @@ module Sequel
     module H2
       # Instance methods for H2 Database objects accessed via JDBC.
       module DatabaseMethods
+        # H2 needs to add a primary key column as a constraint
+        def alter_table_sql(table, op)
+          case op[:op]
+          when :add_column
+            if op.delete(:primary_key)
+              sql = super(table, op)
+              [sql, "ALTER TABLE #{quote_schema_table(table)} ADD PRIMARY KEY (#{quote_identifier(op[:name])})"]
+            else
+              super(table, op)
+            end
+          else
+            super(table, op)
+          end
+        end
+      
         # Return Sequel::JDBC::H2::Dataset object with the given opts.
         def dataset(opts=nil)
           Sequel::JDBC::H2::Dataset.new(self, opts)

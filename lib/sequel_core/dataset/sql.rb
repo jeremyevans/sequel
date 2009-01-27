@@ -572,8 +572,7 @@ module Sequel
     # being quoted, returns name as a string.  If identifiers are being quoted
     # quote the name with quoted_identifier.
     def quote_identifier(name)
-      name = name.to_s
-      name = name.send(@identifier_input_method) if @identifier_input_method
+      name = input_identifier(name)
       name = quoted_identifier(name) if quote_identifiers?
       name
     end

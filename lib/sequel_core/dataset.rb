@@ -481,6 +481,12 @@ module Sequel
     def execute_insert(sql, opts={}, &block)
       @db.execute_insert(sql, {:server=>@opts[:server] || :default}.merge(opts), &block)
     end
+    
+    # Modify the identifier returned from the database based on the
+    # identifier_output_method.
+    def input_identifier(v)
+      (i = identifier_input_method) ? v.to_s.send(i) : v.to_s
+    end
 
     # Modify the receiver with the results of sending the meth, args, and block
     # to the receiver and merging the options of the resulting dataset into
