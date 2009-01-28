@@ -284,7 +284,7 @@ Joining is very useful in a variety of scenarios, for example many-to-many relat
   
 This is equivalent to the SQL:
 
-  SELECT * FROM items LEFT OUTER JOIN order_items
+  SELECT * FROM items INNER JOIN order_items
   ON order_items.item_id = items.id 
   WHERE order_items.order_id = 1234
 
@@ -294,7 +294,7 @@ You can then do anything you like with the dataset:
   
 Which is equivalent to the SQL:
 
-  SELECT sum(price) FROM items LEFT OUTER JOIN order_items
+  SELECT sum(price) FROM items INNER JOIN order_items
   ON order_items.item_id = items.id
   WHERE order_items.order_id = 1234
   
