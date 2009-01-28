@@ -20,6 +20,7 @@
 <li><a href='http://github.com/pusewicz/rails_sequel/'>rails-sequel</a>: Rails plugin that allows you to use Sequel instead of ActiveRecord.</li>
 <li><a href='http://github.com/gyordanov/sequel_extjs'>sequel_extjs</a>: Generates JSON from datasets that is consumable by the ExtJS JsonStore.</li>
 <li><a href='http://github.com/jeremyevans/sequel_postgresql_triggers'>sequel_postgresql_triggers</a>: Database enforced timestamps, immutable columns, and counter/sum caches.</li>
+<li><a href='http://github.com/jsvd/sequel_vectorized'>sequel_vectorized</a>: Allows Sequel::Dataset to be exported as an Hash of Arrays and NArrays.</li>
 </ul>
 
 <h3>Submitting Your Plugin/Extension</h3>
