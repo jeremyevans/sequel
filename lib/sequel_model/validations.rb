@@ -328,7 +328,7 @@ module Sequel
     # validates the grouping of column1 and column2 while
     #   validates_uniqueness_of(:column1, :column2)
     # validates them separately.
-    
+    #
     # You should also add a unique index in the
     # database, as this suffers from a fairly obvious race condition.
     #
