@@ -323,6 +323,12 @@ module Sequel
     # fields to specify that the combination of fields must be unique,
     # instead of that each field should have a unique value.
     #
+    # This means that the code:
+    #   validates_uniqueness_of([:column1, :column2])
+    # validates the grouping of column1 and column2 while
+    #   validates_uniqueness_of(:column1, :column2)
+    # validates them separately.
+    
     # You should also add a unique index in the
     # database, as this suffers from a fairly obvious race condition.
     #
