@@ -1,5 +1,7 @@
 === HEAD
 
+* Support symbol keys and unnested hashes in the sequel command line tool's yaml config support (jeremyevans)
+
 * Add schema parsing support to the JDBC adapter (jeremyevans)
 
 * Add per-database type translation support for schema changes, translating ruby classes to database specific types (jeremyevans)

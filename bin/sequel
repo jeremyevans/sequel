@@ -83,18 +83,15 @@ end
 
 if File.exist?(db)
   require 'yaml'
-  db_config = YAML.load_file(db)[env || "development"]
-  db_config.each {|(k,v)| db_config[k.to_sym] = db_config.delete(k)}
+  env ||= "development"
+  db_config = YAML.load_file(db)
+  db_config = db_config[env] || db_config[env.to_sym] || db_config
+  db_config.each{|(k,v)| db_config[k.to_sym] = db_config.delete(k)}
   db_config.merge!(db_opts)
 end
 
 begin
-  if db_config
-    opts = [db_config]
-  else
-    opts = [db, db_opts]
-  end
-  DB = Sequel.connect(*opts)
+  DB = Sequel.connect(*(db_config ? [db_config] : [db, db_opts]))
   DB.test_connection
   if migrate_dir
     Sequel::Migrator.apply(DB, migrate_dir, migrate_ver)
