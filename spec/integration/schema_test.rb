@@ -126,3 +126,32 @@ describe "Database schema modifiers" do
     @ds.columns!.should == [:id]
   end
 end
+
+if INTEGRATION_DB.respond_to?(:tables)
+describe "Database#tables" do
+  before do
+    class String
+      @@xxxxx = 0
+      def xxxxx
+        "xxxxx#{@@xxxxx += 1}"
+      end
+    end
+    @iom = INTEGRATION_DB.identifier_output_method
+    clear_sqls
+  end
+  after do
+    INTEGRATION_DB.identifier_output_method = @iom
+  end
+
+  specify "should return an array of symbols" do
+    ts = INTEGRATION_DB.tables
+    ts.should be_a_kind_of(Array)
+    ts.each{|t| t.should be_a_kind_of(Symbol)}
+  end
+
+  specify "should respect the database's identifier_output_method" do
+    INTEGRATION_DB.identifier_output_method = :xxxxx
+    INTEGRATION_DB.tables.each{|t| t.to_s.should =~ /\Ax{5}\d+\z/}
+  end
+end
+end

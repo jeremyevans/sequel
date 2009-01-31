@@ -188,7 +188,8 @@ module Sequel
       # All tables in this database
       def tables
         ts = []
-        metadata(:getTables, nil, nil, nil, ['TABLE'].to_java(:string)){|h| ts << dataset.send(:output_identifier, h[:table_name])}
+        ds = dataset
+        metadata(:getTables, nil, nil, nil, ['TABLE'].to_java(:string)){|h| ts << ds.send(:output_identifier, h[:table_name])}
         ts
       end
       

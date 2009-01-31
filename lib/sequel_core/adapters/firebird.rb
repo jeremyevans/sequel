@@ -170,19 +170,13 @@ module Sequel
       end
 
       def sequences(opts={})
-        ds = self["rdb$generators".to_sym]
-        ds = ds.filter({"rdb$system_flag".to_sym => 0})
-        ds = ds.select("rdb$generator_name".to_sym)
-
-        block_given? ? yield(ds) : ds.map{|r| r["rdb$generator_name".to_sym].to_sym}
+        ds = self[:"rdb$generators"].server(opts[:server]).filter(:"rdb$system_flag" => 0).select(:"rdb$generator_name")
+        block_given? ? yield(ds) : ds.map{|r| ds.send(:output_identifier, r[:"rdb$generator_name"])}
       end
 
       def tables(opts={})
-        ds = self["rdb$relations".to_sym]
-        ds = ds.filter({"rdb$view_blr".to_sym => nil} & {:COALESCE["rdb$system_flag".to_sym, 0] => 0})
-        ds = ds.select("rdb$relation_name".to_sym)
-
-        block_given? ? yield(ds) : ds.map{|r| r["rdb$relation_name".to_sym].to_sym}
+        ds = self[:"rdb$relations"].server(opts[:server]).filter(:"rdb$view_blr" => nil, Sequel::SQL::Function.new(:COALESCE, :"rdb$system_flag", 0) => 0).select(:"rdb$relation_name")
+        block_given? ? yield(ds) : ds.map{|r| ds.send(:output_identifier, r[:"rdb$relation_name"])}
       end
 
       def transaction(server=nil)

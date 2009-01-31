@@ -378,7 +378,7 @@ module Sequel
       def table_exists?(table, opts={})
         schema, table = schema_and_table(table)
         opts[:schema] ||= schema
-        tables(opts){|ds| !ds.first(:relname=>table.to_s).nil?}
+        tables(opts){|ds| !ds.first(:relname=>ds.send(:input_identifier, table)).nil?}
       end
       
       # Array of symbols specifying table names in the current database.
@@ -390,7 +390,7 @@ module Sequel
       # * :server - The server to use
       def tables(opts={})
         ds = self[:pg_class].join(:pg_namespace, :oid=>:relnamespace, 'r'=>:relkind, :nspname=>(opts[:schema]||default_schema).to_s).select(:relname).exclude(:relname.like(SYSTEM_TABLE_REGEXP)).server(opts[:server])
-        block_given? ? yield(ds) : ds.map{|r| r[:relname].to_sym}
+        block_given? ? yield(ds) : ds.map{|r| ds.send(:output_identifier, r[:relname])}
       end
       
       # PostgreSQL supports multi-level transactions using save points.
@@ -536,7 +536,7 @@ module Sequel
           left_outer_join(:pg_attrdef, :adrelid=>:pg_class__oid, :adnum=>:pg_attribute__attnum).
           left_outer_join(:pg_index, :indrelid=>:pg_class__oid, :indisprimary=>true).
           filter(:pg_attribute__attisdropped=>false).
-          filter(:pg_attribute__attnum.sql_number > 0).
+          filter{|o| o.pg_attribute__attnum > 0}.
           order(:pg_attribute__attnum)
         if table_name
           ds.filter!(:pg_class__relname=>table_name.to_s)

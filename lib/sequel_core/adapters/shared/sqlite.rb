@@ -69,8 +69,12 @@ module Sequel
       end
       
       # Array of symbols specifying the table names in the current database.
-      def tables
-        self[:sqlite_master].filter(TABLES_FILTER).map {|r| r[:name].to_sym}
+      #
+      # Options:
+      # * :server - Set the server to use.
+      def tables(opts={})
+        ds = self[:sqlite_master].server(opts[:server]).filter(TABLES_FILTER)
+        ds.map{|r| ds.send(:output_identifier, r[:name])}
       end
       
       # A symbol signifying the value of the temp_store PRAGMA.
