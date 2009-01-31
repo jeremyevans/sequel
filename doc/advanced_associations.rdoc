@@ -16,7 +16,7 @@ a different block when eager loading via Dataset#eager. Association blocks are
 useful for things like:
 
   Artist.one_to_many :gold_albums, :class=>:Album do |ds|
-    ds.filter(:copies_sold.sql_number > 500000)
+    ds.filter{|o| o.copies_sold > 500000}
   end
 
 There are a whole bunch of options for changing how the association is eagerly
@@ -124,7 +124,7 @@ a swiss army chainsaw.
 Sequel supports the same callbacks that ActiveRecord does: :before_add,
 :before_remove, :after_add, and :after_remove. It also supports a
 callback that ActiveRecord does not, :after_load, which is called
-after the association has been loaded (when lazy loading).
+after the association has been loaded.
 
 Each of these options can be a Symbol specifying an instance method
 that takes one argument (the associated object), or a Proc that takes
@@ -150,7 +150,7 @@ otherwise modified:
   class Author < Sequel::Model
     one_to_many :authorships
   end
-  Author.first.authorships_dataset.filter(:number.sql_number < 10).first
+  Author.first.authorships_dataset.filter{|o| o.number < 10}.first
  
 You can extend a dataset with a module easily with :extend:
 
@@ -179,18 +179,6 @@ model object, you'll have to use a closure:
     end)
   end
   Author.first.authorships_dataset.find_or_create_by_name('Bob')
-
-You can cheat if you want to:
-
-  module FindOrCreate
-    def find_or_create(vals)
-      # Exploits the fact that Sequel filters are ruby objects that
-      # can be introspected.
-      author_id = @opts[:where].args[1]
-      first(vals) || \
-        @opts[:models][nil].create(vals.merge(:author_id=>author_id))
-    end 
-  end
 
 ===has_many :through associations
 
@@ -310,7 +298,7 @@ Sequel::Model:
   Firm.find(:first).invoices
 
 It is significantly more code in Sequel Model, but quite a bit of it is setting
-the intermediate associate record (the client) and the reciprocal association
+the intermediate associated record (the client) and the reciprocal association
 in the associations cache for each object, which ActiveRecord won't do for you.
 The reason you would want to do this is that then firm.invoices.first.firm or
 firm.invoices.first.client doesn't do another query to get the firm/client.
@@ -551,7 +539,7 @@ node.children.  You can even eager load the relationship up to a certain depth:
   # Eager load three generations of generations of children for a given node 
   Node.filter(:id=>1).eager(:children=>{:children=>:children}).all.first
   # Load parents and grandparents for a group of nodes
-  Node.filter(:id.sql_number < 10).eager(:parent=>:parent).all
+  Node.filter{|o| o.id < 10}.eager(:parent=>:parent).all
 
 What if you want to get all ancestors up to the root node, or all descendents,
 without knowing the depth of the tree?

@@ -76,7 +76,7 @@ You get an IRB session with the database object stored in DB.
 
 Sequel is designed to take the hassle away from connecting to databases and manipulating them. Sequel deals with all the boring stuff like maintaining connections, formatting SQL correctly and fetching records so you can concentrate on your application.
 
-Sequel uses the concept of datasets to retrieve data. A Dataset object encapsulates an SQL query and supports chainability, letting you fetch data using a convenient Ruby DSL that is both concise and infinitely flexible.
+Sequel uses the concept of datasets to retrieve data. A Dataset object encapsulates an SQL query and supports chainability, letting you fetch data using a convenient Ruby DSL that is both concise and flexible.
 
 For example, the following one-liner returns the average GDP for the five biggest countries in the middle east region:
 
@@ -89,7 +89,7 @@ Which is equivalent to:
 Since datasets retrieve records only when needed, they can be stored and later reused. Records are fetched as hashes (they can also be fetched as custom model objects), and are accessed using an Enumerable interface:
 
   middle_east = DB[:countries].filter(:region => 'Middle East')
-  middle_east.order(:name).each {|r| puts r[:name]}
+  middle_east.order(:name).each{|r| puts r[:name]}
   
 Sequel also offers convenience methods for extracting data from Datasets, such as an extended map method:
 
@@ -123,8 +123,8 @@ You can specify a block to connect, which will disconnect from the database afte
 
 === Arbitrary SQL queries
 
-  DB.execute("create table t (a text, b text)")
-  DB.execute("insert into t values ('a', 'b')")
+  DB.execute_ddl("create table t (a text, b text)")
+  DB.execute_insert("insert into t values ('a', 'b')")
 
 Or more succinctly:
 
@@ -140,6 +140,12 @@ You can also create datasets based on raw SQL:
 You can also fetch records with raw SQL through the dataset:
 
   DB['select * from items'].each do |row|
+    p row
+  end
+
+You can use placeholders in your SQL string as well:
+
+  DB['select * from items where name = ?', name].each do |row|
     p row
   end
 
@@ -198,13 +204,13 @@ You can also specify ranges:
 
   my_posts = posts.filter(:stamp => (Date.today - 14)..(Date.today - 7))
   
-Or lists of values:
+Or arrays of values:
 
   my_posts = posts.filter(:category => ['ruby', 'postgres', 'linux'])
   
 Sequel also accepts expressions:
   
-  my_posts = posts.filter(:stamp.sql_number > Date.today << 1)
+  my_posts = posts.filter{|o| o.stamp > Date.today << 1}
   
 Some adapters (like postgresql) will also let you specify Regexps:
 
@@ -222,7 +228,7 @@ You can also specify a custom WHERE clause using a string:
 You can use parameters in your string, as well (ActiveRecord style):
 
   posts.filter('(stamp < ?) AND (author != ?)', Date.today - 3, author_name)
-  posts.filter((:stamp + 3 < Date.today) & ~(:author => author_name)) # same as above
+  posts.filter{|o| (o.stamp < Date.today + 3) & ~{:author => author_name}} # same as above
 
 Datasets can also be used as subqueries:
 
@@ -251,11 +257,34 @@ Ordering datasets is simple:
 
   posts.order(:stamp) # ORDER BY stamp
   posts.order(:stamp, :name) # ORDER BY stamp, name
+
+Chaining order doesn't work the same as filter:
+
+  posts.order(:stamp).order(:name) # ORDER BY name
+
+The order_more method chains this way, though:
+
+  posts.order(:stamp).order_more(:name) # ORDER BY stamp, name
   
 You can also specify descending order
 
   posts.order(:stamp.desc) # ORDER BY stamp DESC
 
+=== Selecting Columns
+
+Selecting specific columns to be returned is also simple:
+
+  posts.select(:stamp) # SELECT stamp FROM posts
+  posts.select(:stamp, :name) # SELECT stamp, name FROM posts
+
+Chaining select works like order, not filter:
+
+  posts.select(:stamp).select(:name) # SELECT name FROM posts
+
+As you might expect, there is an order_more equivalent for select:
+
+  posts.select(:stamp).select_more(:name) # SELECT stamp, name FROM posts
+  
 === Deleting Records
 
 Deleting records from the table is done with delete:
@@ -300,7 +329,7 @@ Which is equivalent to the SQL:
   
 === Graphing Datasets
 
-When retrieving records from joined datasets, you get the results in a single hash, which is subject to clobbering:
+When retrieving records from joined datasets, you get the results in a single hash, which is subject to clobbering if you have columns with the same name in multiple tables:
 
   DB[:items].join(:order_items, :item_id => :id).first
   => {:id=>(could be items.id or order_items.id), :item_id=>order_items.order_id}
@@ -309,6 +338,30 @@ Using graph, you can split the result hashes into subhashes, one per join:
 
   DB[:items].graph(:order_items, :item_id => :id).first
   => {:items=>{:id=>items.id}, :order_items=>{:id=>order_items.id, :item_id=>order_items.item_id}}
+
+== An aside: column references in Sequel
+
+Sequel expects column names to be specified using symbols. In addition, returned hashes always use symbols as their keys. This allows you to freely mix literal values and column references. For example, the two following lines produce equivalent SQL:
+
+  items.filter(:x => 1) #=> "SELECT * FROM items WHERE (x = 1)" 
+  items.filter(1 => :x) #=> "SELECT * FROM items WHERE (1 = x)" 
+
+=== Qualifying column names
+
+Column references can be qualified by using the double underscore special notation :table__column:
+
+  items.literal(:items__price) #=> "items.price"
+
+=== Column aliases
+
+You can also alias columns by using the triple undersecore special notation :column___alias or :table__column___alias:
+
+  items.literal(:price___p) #=> "price AS p"
+  items.literal(:items__price___p) #=> "items.price AS p"
+
+Another way to alias columns is to use the #AS method:
+
+  items.literal(:price.as(:p)) #=> "price AS p"
 
 == Sequel Models
 
@@ -357,17 +410,17 @@ You can also define a model class that does not have a primary key, but then you
 A model instance can also be fetched by specifying a condition:
 
   post = Post[:title => 'hello world']
-  post = Post.find(:num_comments.sql_number < 10)
+  post = Post.find{|o| o.num_comments < 10}
 
 === Iterating over records
 
-A model class lets you iterate over specific records by acting as a proxy to the underlying dataset. This means that you can use the entire Dataset API to create customized queries that return model instances, e.g.:
+A model class lets you iterate over subsets of records by proxying many methods to the underlying dataset. This means that you can use most of the Dataset API to create customized queries that return model instances, e.g.:
 
   Post.filter(:category => 'ruby').each{|post| p post}
 
 You can also manipulate the records in the dataset:
 
-  Post.filter(:num_comments.sql_number < 7).delete
+  Post.filter{|o| o.num_comments < 7}.delete
   Post.filter(:title.like(/ruby/)).update(:category => 'ruby')
 
 === Accessing record values
@@ -386,9 +439,9 @@ You can also change record values:
   post.title = 'hey there'
   post.save
 
-Another way to change values by using the #update_with_params method:
+Another way to change values by using the #update method:
 
-  post.update_with_params(:title => 'hey there')
+  post.update(:title => 'hey there')
 
 === Creating new records
 
@@ -404,7 +457,7 @@ Another way is to construct a new instance and save it:
 
 You can also supply a block to Model.new and Model.create:
 
-  post = Post.create {|p| p.title = 'hello world'}
+  post = Post.create{|p| p.title = 'hello world'}
 
   post = Post.new do |p|
     p.title = 'hello world'
@@ -451,14 +504,6 @@ Associations are used in order to specify relationships between model classes th
     many_to_one :author
     one_to_many :comments
     many_to_many :tags
-  end
-
-You can also use the ActiveRecord names for these associations:
-
-  class Post < Sequel::Model
-    belongs_to :author
-    has_many :comments
-    has_and_belongs_to_many :tags
   end
 
 many_to_one creates a getter and setter for each model object:
@@ -518,7 +563,7 @@ Associations can be eagerly loaded via .eager and the :eager association option.
   Post.eager(:person).all
 
   # eager is a dataset method, so it works with filters/orders/limits/etc.
-  Post.filter(:topic.sql_string > 'M').order(:date).limit(5).eager(:person).all
+  Post.filter{|o| o.topic > 'M'}.order(:date).limit(5).eager(:person).all
   
   person = Person.first
   # Eager loading via :eager (will eagerly load the tags for this person's posts)
@@ -562,7 +607,7 @@ The obvious way to add table-wide logic is to define class methods to the model 
 
   class Post < Sequel::Model
     def self.posts_with_few_comments
-      filter(:num_comments.sql_number < 30)
+      filter{|o| o.num_comments < 30}
     end
 
     def self.clean_posts_with_few_comments
@@ -574,7 +619,7 @@ You can also implement table-wide logic by defining methods on the dataset:
 
   class Post < Sequel::Model
     def_dataset_method(:posts_with_few_comments) do
-      filter(:num_comments.sql_number < 30)
+      filter{|o| o.num_comments < 30}
     end
 
     def_dataset_method(:clean_posts_with_few_comments) do
@@ -584,34 +629,14 @@ You can also implement table-wide logic by defining methods on the dataset:
 
 This is the recommended way of implementing table-wide operations, and allows you to have access to your model API from filtered datasets as well:
 
-  Post.filter(:category => 'ruby').clean_old_posts
+  Post.filter(:category => 'ruby').clean_posts_with_few_comments
 
 Sequel models also provide a short hand notation for filters:
 
   class Post < Sequel::Model
-    subset(:posts_with_few_comments, :num_comments.sql_number < 30)
-    subset :invisible, :visible => false
+    subset(:posts_with_few_comments){|o| o.num_comments < 30}
+    subset :invisible, ~:visible
   end
-
-=== Defining the underlying schema
-
-Model classes can also be used as a place to define your table schema and control it. The schema DSL is exactly the same provided by Sequel::Schema::Generator:
-
-  class Post < Sequel::Model
-    set_schema do
-      primary_key :id
-      text :title
-      text :category
-      foreign_key :author_id, :table => :authors
-    end
-  end
-
-You can then create the underlying table, drop it, or recreate it:
-
-  Post.table_exists?
-  Post.create_table
-  Post.drop_table
-  Post.create_table! # drops the table if it exists and then recreates it
 
 === Basic Model Validations
 
@@ -619,13 +644,14 @@ To assign default validations to a sequel model:
 
   class MyModel < Sequel::Model
     validates do
-      format_of...
-      presence_of...
       acceptance_of...
       confirmation_of...
-      length_of...
-      numericality_of...
       format_of...
+      format_of...
+      presence_of...
+      length_of...
+      not_string ...
+      numericality_of...
       each...
     end
   end

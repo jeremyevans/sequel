@@ -14,33 +14,9 @@ In order to prevent SQL injection, you can replace literal values with question 
   items.filter('category = ?', 'ruby').sql
   #=> "SELECT * FROM items WHERE category = 'ruby'"
 
-== An aside: column references in Sequel
-
-Sequel expects column names to be specified using symbols. In addition, tuples always use symbols as their keys. This allows you to freely mix literal values and column references. For example, the two following lines produce equivalent SQL:
-
-  items.filter(:x => 1) #=> "SELECT * FROM items WHERE (x = 1)"
-  items.filter(1 => :x) #=> "SELECT * FROM items WHERE (1 = x)"
-
-=== Qualifying column names
-
-Column references can be qualified by using the double underscore special notation :table__column:
-
-  items.literal(:items__price) #=> "items.price"
-
-=== Column aliases
-
-You can also alias columns by using the triple undersecore special notation :column___alias or :table__column___alias:
-
-  items.literal(:price___p) #=> "price AS p"
-  items.literal(:items__price___p) #=> "items.price AS p"
-
-Another way to alias columns is to use the #AS method:
-
-  items.literal(:price.as(:p)) #=> "price AS p"
-
 === Specifying SQL functions
 
-Sequel also allows you to specify functions by using the Symbol#[] method:
+Sequel also allows you to specify functions by using the Symbol#sql_function method (and the Symbol#[] method on ruby 1.8):
 
   items.literal(:avg.sql_function(:price)) #=> "avg(price)"
 
@@ -76,10 +52,10 @@ Ranges (both inclusive and exclusive) can also be used:
 
 == Filtering using expressions
 
-New in Sequel 2.0 is the ability to use ruby expressions directly in the call to filter, without using a block:
+Sequel allows you to use ruby expressions directly in the call to filter, without using a block:
 
-  items.filter(:price.sql_number < 100).sql
-  #=> "SELECT * FROM items WHERE (price < 100) 
+  items.filter(:price * 2 < 50).sql
+  #=> "SELECT * FROM items WHERE ((price * 2) < 50) 
 
 This works for the standard inequality and arithmetic operators:
 
@@ -133,12 +109,12 @@ You can use the negation operator (~) in most cases:
 
 You can also compare against other columns:
 
-  items.filter(:credit.sql_number > :debit).sql
+  items.filter{|o| o.credit > :debit}.sql
   #=> "SELECT * FROM items WHERE (credit > debit)
 
 Or against SQL functions:
 
-  items.filter(:price - 100 < :max.sql_function(:price)).sql
+  items.filter{|o| :price - 100 < o.max(:price)}.sql
   #=> "SELECT * FROM items WHERE ((price - 100) < max(price))"
 
 == String search functions

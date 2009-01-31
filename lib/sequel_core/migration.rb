@@ -6,9 +6,9 @@ module Sequel
   #     def up
   #       create_table :sessions do
   #         primary_key :id
-  #         varchar   :session_id, :size => 32, :unique => true
-  #         timestamp :created_at
-  #         text      :data
+  #         String :session_id, :size => 32, :unique => true
+  #         DateTime :created_at
+  #         text :data
   #       end
   #     end
   # 
@@ -21,7 +21,7 @@ module Sequel
   #   class AlterItems < Sequel::Migration
   #     def up
   #       alter_table :items do
-  #         add_column :category, :text, :default => 'ruby'
+  #         add_column :category, String, :default => 'ruby'
   #       end
   #     end
   # 

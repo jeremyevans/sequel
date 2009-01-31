@@ -40,11 +40,11 @@ module Sequel
     #   ds.first(:id=>2) => {:id=>2}
     #   ds.first("id = 3") => {:id=>3}
     #   ds.first("id = ?", 4) => {:id=>4}
-    #   ds.first{:id.sql_number > 2} => {:id=>5}
-    #   ds.order(:id).first{:id.sql_number > 2} => {:id=>3}
-    #   ds.first{:id.sql_number > 2} => {:id=>5}
-    #   ds.first("id > ?", 4){:id.sql_number < 6) => {:id=>5}
-    #   ds.order(:id).first(2){:id.sql_number < 2} => [{:id=>1}]
+    #   ds.first{|o| o.id > 2} => {:id=>5}
+    #   ds.order(:id).first{|o| o.id > 2} => {:id=>3}
+    #   ds.first{|o| o.id > 2} => {:id=>5}
+    #   ds.first("id > ?", 4){|o| o.id < 6} => {:id=>5}
+    #   ds.order(:id).first(2){|o| o.id < 2} => [{:id=>1}]
     def first(*args, &block)
       ds = block ? filter(&block) : self
 

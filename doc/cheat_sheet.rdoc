@@ -29,7 +29,7 @@ Without a filename argument, the sqlite adapter will setup a new sqlite database
   DB.fetch("SELECT name FROM users") do |row|
     p r[:name]
   end
-  dataset = DB["SELECT age FROM users"]
+  dataset = DB["SELECT age FROM users WHERE name = ?", name]
   dataset.print
   dataset.map(:age)
 
@@ -70,17 +70,17 @@ Without a filename argument, the sqlite adapter will setup a new sqlite database
   dataset.map {|r| r[:name]}
   dataset.map(:name) # same effect as above
 
-  dataset.inject {|sum, r| sum + r[:value]}
+  dataset.inject(0){|sum, r| sum + r[:value]}
 
 == Filtering (see also doc/dataset_filtering.rdoc)
 
   dataset.filter(:name => 'abc')
   dataset.filter('name = ?', 'abc')
-  dataset.filter(:value.sql_number > 100)
-  dataset.exclude(:value.sql_number <= 100)
+  dataset.filter{|o| o.value > 100}
+  dataset.exclude{|o| o.value <= 100}
 
   dataset.filter(:value => 50..100)
-  dataset.where((:value.sql_number >= 50) & (:value.sql_number <= 100))
+  dataset.where{|o| (o.value >= 50) & (o.value <= 100)}
 
   dataset.where('value IN ?', [50,75,100])
 
@@ -91,11 +91,9 @@ Without a filename argument, the sqlite adapter will setup a new sqlite database
   # Filter using a subquery
   dataset.filter('price > ?', dataset.select('AVG(price) + 100'))
 
-=== Advanced filtering using ruby expressions without blocks
+=== Advanced filtering using ruby expressions
 
-Available as of Sequel 2.0:
-
-  DB[:items].filter(:price.sql_number < 100).sql 
+  DB[:items].filter{|o| o.price < 100}.sql 
   #=> "SELECT * FROM items WHERE (price < 100)" 
 
   DB[:items].filter(:name.like('AL%')).sql 
@@ -103,7 +101,7 @@ Available as of Sequel 2.0:
 
 There's support for nested expressions with AND, OR and NOT:
 
-  DB[:items].filter((:x.sql_number > 5) & (:y.sql_number > 10)).sql 
+  DB[:items].filter{|o| (o.x > 5) & (o.y > 10)}.sql 
   #=> "SELECT * FROM items WHERE ((x > 5) AND (y > 10))" 
 
   DB[:items].filter({:x => 1, :y => 2}.sql_or & ~{:z => 3}).sql 
@@ -114,7 +112,7 @@ You can use arithmetic operators and specify SQL functions:
   DB[:items].filter((:x + :y) > :z).sql 
   #=> "SELECT * FROM items WHERE ((x + y) > z)" 
 
-  DB[:items].filter(:price - 100 < :AVG.sql_function(:price)).sql 
+  DB[:items].filter{|o| :price - 100 < o.AVG(:price)}.sql 
   #=> "SELECT * FROM items WHERE ((price - 100) < AVG(price))" 
 
 == Ordering
@@ -165,9 +163,10 @@ You can use arithmetic operators and specify SQL functions:
 
   DB.create_table :items do
     primary_key :id
-    text :name, :unique => true, :null => false
+    String :name, :unique => true, :null => false
     boolean :active, :default => true
     foreign_key :category_id, :categories
+    Time :created_at
     
     index :grade
   end
@@ -175,14 +174,13 @@ You can use arithmetic operators and specify SQL functions:
   DB.drop_table :items
 
   DB.create_table :test do
-    varchar :zipcode, :size => 10
+    String :zipcode, :size => 10
     enum :system, :elements => ['mac', 'linux', 'windows']
   end
 
 == Aliasing
 
   DB[:items].select(:name.as(:item_name))
-  DB[:items].select(:name => :item_name)
   DB[:items].select(:name___item_name)
   DB[:items___items_table].select(:items_table__name___item_name)
   # => "SELECT items_table.name AS item_name FROM items AS items_table"
@@ -221,5 +219,5 @@ Miscellaneous:
   dataset.where(:name => 'sequel').exists #=> "EXISTS ( SELECT 1 FROM items WHERE name = 'sequel' )"
   dataset.print #=> pretty table print to $stdout
   dataset.columns #=> array of columns in the result set, does a SELECT
-  DB.schema_for_table(:items) => [[:id, {:type=>:integer, ...}], [:name, {:type=>:string, ...}], ...]
-                                 # Works on PostgreSQL, MySQL, SQLite, and possibly elsewhere
+  DB.schema(:items) => [[:id, {:type=>:integer, ...}], [:name, {:type=>:string, ...}], ...]
+                       # Works on PostgreSQL, MySQL, SQLite, and JDBC
