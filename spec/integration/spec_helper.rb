@@ -16,7 +16,7 @@ end
 class Spec::Example::ExampleGroup
   def start_logging
     require 'logger'
-     INTEGRATION_DB.loggers << Logger.new(STDOUT)
+    INTEGRATION_DB.loggers << Logger.new(STDOUT)
   end
   def stop_logging
      INTEGRATION_DB.loggers.clear
