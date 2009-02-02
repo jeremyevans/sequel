@@ -150,7 +150,7 @@ end
 if INTEGRATION_DB.respond_to?(:tables)
 describe "Database#tables" do
   before do
-    class String
+    class ::String
       @@xxxxx = 0
       def xxxxx
         "xxxxx#{@@xxxxx += 1}"
