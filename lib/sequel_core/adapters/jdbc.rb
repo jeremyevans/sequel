@@ -305,7 +305,7 @@ module Sequel
       # Yield the metadata for this database
       def metadata(*args, &block)
         ds = dataset
-        ds.output_identifier_method = nil
+        ds.identifier_output_method = :downcase
         synchronize{|c| ds.send(:process_result_set, c.getMetaData.send(*args), &block)}
       end
       
@@ -470,12 +470,12 @@ module Sequel
         meta = result.getMetaData
         column_count = meta.getColumnCount
         @columns = []
-        column_count.times {|i| @columns << output_identifier(meta.getColumnName(i+1))}
+        column_count.times{|i| @columns << output_identifier(meta.getColumnName(i+1))}
 
         # get rows
         while result.next
           row = {}
-          @columns.each_with_index {|v, i| row[v] = convert_type(result.getObject(i+1))}
+          @columns.each_with_index{|v, i| row[v] = convert_type(result.getObject(i+1))}
           yield row
         end
       end
