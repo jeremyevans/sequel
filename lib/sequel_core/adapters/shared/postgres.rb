@@ -53,7 +53,7 @@ module Sequel
       attr_writer :db
       
       SELECT_CURRVAL = "SELECT currval('%s')".freeze
-      SELECT_CUSTOM_SEQUENCE = <<-end_sql
+      SELECT_CUSTOM_SEQUENCE = proc do |schema, table| <<-end_sql
         SELECT '"' || name.nspname || '"."' || CASE  
             WHEN split_part(def.adsrc, '''', 2) ~ '.' THEN  
               substr(split_part(def.adsrc, '''', 2),  
@@ -67,10 +67,11 @@ module Sequel
         JOIN pg_constraint cons ON (conrelid = adrelid AND adnum = conkey[1])
         WHERE cons.contype = 'p'
           AND def.adsrc ~* 'nextval'
-          AND name.nspname = '%s'
-          AND t.relname = '%s'
+          #{"AND name.nspname = '#{schema}'" if schema}
+          AND t.relname = '#{table}'
       end_sql
-      SELECT_PK = <<-end_sql
+      end
+      SELECT_PK = proc do |schema, table| <<-end_sql
         SELECT pg_attribute.attname
         FROM pg_class, pg_attribute, pg_index, pg_namespace
         WHERE pg_class.oid = pg_attribute.attrelid
@@ -78,10 +79,11 @@ module Sequel
           AND pg_class.oid = pg_index.indrelid
           AND pg_index.indkey[0] = pg_attribute.attnum
           AND pg_index.indisprimary = 't'
-          AND pg_namespace.nspname = '%s'
-          AND pg_class.relname = '%s'
+          #{"AND pg_namespace.nspname = '#{schema}'" if schema}
+          AND pg_class.relname = '#{table}'
       end_sql
-      SELECT_SERIAL_SEQUENCE = <<-end_sql
+      end
+      SELECT_SERIAL_SEQUENCE = proc do |schema, table| <<-end_sql
         SELECT  '"' || name.nspname || '"."' || seq.relname || '"'
         FROM pg_class seq, pg_attribute attr, pg_depend dep,
           pg_namespace name, pg_constraint cons
@@ -93,9 +95,10 @@ module Sequel
           AND attr.attrelid = cons.conrelid
           AND attr.attnum = cons.conkey[1]
           AND cons.contype = 'p'
-          AND name.nspname = '%s'
-          AND seq.relname = '%s'
+          #{"AND name.nspname = '#{schema}'" if schema}
+          AND seq.relname = '#{table}'
       end_sql
+      end
       
       # Depth of the current transaction on this connection, used
       # to implement multi-level transactions with savepoints.
@@ -132,7 +135,7 @@ module Sequel
       
       # Get the primary key for the given table.
       def primary_key(schema, table)
-        sql = SELECT_PK % [schema, table]
+        sql = SELECT_PK[schema, table]
         @db.log_info(sql)
         execute(sql) do |r|
           return single_value(r)
@@ -141,14 +144,14 @@ module Sequel
       
       # Get the primary key and sequence for the given table.
       def sequence(schema, table)
-        sql = SELECT_SERIAL_SEQUENCE % [schema, table]
+        sql = SELECT_SERIAL_SEQUENCE[schema, table]
         @db.log_info(sql)
         execute(sql) do |r|
           seq = single_value(r)
           return seq if seq
         end
         
-        sql = SELECT_CUSTOM_SEQUENCE % [schema, table]
+        sql = SELECT_CUSTOM_SEQUENCE[schema, table]
         @db.log_info(sql)
         execute(sql) do |r|
           return single_value(r)
@@ -336,8 +339,25 @@ module Sequel
       end
       
       # Return primary key for the given table.
-      def primary_key(table, server=nil)
-        synchronize(server){|conn| primary_key_for_table(conn, table)}
+      def primary_key(table, opts={})
+        quoted_table = quote_schema_table(table)
+        return @primary_keys[quoted_table] if @primary_keys.include?(quoted_table)
+        @primary_keys[quoted_table] = if conn = opts[:conn]
+          conn.primary_key(*schema_and_table(table))
+        else
+          synchronize(opts[:server]){|con| con.primary_key(*schema_and_table(table))}
+        end
+      end
+      
+      # Return the sequence providing the default for the primary key for the given table.
+      def primary_key_sequence(table, opts={})
+        quoted_table = quote_schema_table(table)
+        return @primary_key_sequences[quoted_table] if @primary_key_sequences.include?(quoted_table)
+        @primary_key_sequences[quoted_table] = if conn = opts[:conn]
+          conn.sequence(*schema_and_table(table))
+        else
+          synchronize(opts[:server]){|con| con.sequence(*schema_and_table(table))}
+        end
       end
 
       # SQL DDL statement for renaming a table. PostgreSQL doesn't allow you to change a table's schema in
@@ -436,12 +456,7 @@ module Sequel
       end
 
       private
-      
-      # The default schema to use if none is specified (default: public)
-      def default_schema_default
-        :public
-      end
-      
+
       # PostgreSQL folds unquoted identifiers to lowercase, so it shouldn't need to upcase identifiers on input.
       def identifier_input_method_default
         nil
@@ -461,12 +476,12 @@ module Sequel
       def insert_result(conn, table, values)
         case values
         when Hash
-          return nil unless pk = primary_key_for_table(conn, table)
+          return nil unless pk = primary_key(table, :conn=>conn)
           if pk and pkv = values[pk.to_sym]
             pkv
           else
             begin
-              if seq = primary_key_sequence_for_table(conn, table)
+              if seq = primary_key_sequence(table, :conn=>conn)
                 conn.last_insert_id(seq)
               end
             rescue Exception => e
@@ -484,20 +499,6 @@ module Sequel
       # placeholder.
       def prepared_arg_placeholder
         PREPARED_ARG_PLACEHOLDER
-      end
-      
-      # Returns primary key for the given table.  This information is
-      # cached, and if the primary key for a table is changed, the
-      # @primary_keys instance variable should be reset manually.
-      def primary_key_for_table(conn, table)
-        @primary_keys[quote_schema_table(table)] ||= conn.primary_key(*schema_and_table(table))
-      end
-      
-      # Returns primary key for the given table.  This information is
-      # cached, and if the primary key for a table is changed, the
-      # @primary_keys instance variable should be reset manually.
-      def primary_key_sequence_for_table(conn, table)
-        @primary_key_sequences[quote_schema_table(table)] ||= conn.sequence(*schema_and_table(table))
       end
       
       # The dataset used for parsing table schemas, using the pg_* system catalogs.

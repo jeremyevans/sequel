@@ -27,6 +27,7 @@ if defined?(INTEGRATION_DB) || defined?(INTEGRATION_URL) || ENV['SEQUEL_INTEGRAT
   unless defined?(INTEGRATION_DB)
     url = defined?(INTEGRATION_URL) ? INTEGRATION_URL : ENV['SEQUEL_INTEGRATION_URL']
     INTEGRATION_DB = Sequel.connect(url)
+    #INTEGRATION_DB.instance_variable_set(:@server_version, 80100)
   end
   class Spec::Example::ExampleGroup
     def sqls_should_be(*args)

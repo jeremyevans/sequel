@@ -4,7 +4,7 @@ unless defined?(POSTGRES_DB)
   POSTGRES_URL = 'postgres://postgres:postgres@localhost:5432/reality_spec' unless defined? POSTGRES_URL
   POSTGRES_DB = Sequel.connect(ENV['SEQUEL_PG_SPEC_DB']||POSTGRES_URL)
 end
-
+#POSTGRES_DB.instance_variable_set(:@server_version, 80100)
 POSTGRES_DB.create_table! :test do
   text :name
   integer :value, :index => true
@@ -347,8 +347,8 @@ context "A PostgreSQL database" do
       full_text_index [:title, :body]
     end
     POSTGRES_DB.create_table_sql_list(:posts, *g.create_info).should == [
-      "CREATE TABLE public.posts (title text, body text)",
-      "CREATE INDEX posts_title_body_index ON public.posts USING gin (to_tsvector('simple', (COALESCE(title, '') || ' ' || COALESCE(body, ''))))"
+      "CREATE TABLE posts (title text, body text)",
+      "CREATE INDEX posts_title_body_index ON posts USING gin (to_tsvector('simple', (COALESCE(title, '') || ' ' || COALESCE(body, ''))))"
     ]
   end
   
@@ -359,8 +359,8 @@ context "A PostgreSQL database" do
       full_text_index [:title, :body], :language => 'french'
     end
     POSTGRES_DB.create_table_sql_list(:posts, *g.create_info).should == [
-      "CREATE TABLE public.posts (title text, body text)",
-      "CREATE INDEX posts_title_body_index ON public.posts USING gin (to_tsvector('french', (COALESCE(title, '') || ' ' || COALESCE(body, ''))))"
+      "CREATE TABLE posts (title text, body text)",
+      "CREATE INDEX posts_title_body_index ON posts USING gin (to_tsvector('french', (COALESCE(title, '') || ' ' || COALESCE(body, ''))))"
     ]
   end
   
@@ -381,8 +381,8 @@ context "A PostgreSQL database" do
       spatial_index [:geom]
     end
     POSTGRES_DB.create_table_sql_list(:posts, *g.create_info).should == [
-      "CREATE TABLE public.posts (geom geometry)",
-      "CREATE INDEX posts_geom_index ON public.posts USING gist (geom)"
+      "CREATE TABLE posts (geom geometry)",
+      "CREATE INDEX posts_geom_index ON posts USING gist (geom)"
     ]
   end
   
@@ -392,8 +392,8 @@ context "A PostgreSQL database" do
       index :title, :type => 'hash'
     end
     POSTGRES_DB.create_table_sql_list(:posts, *g.create_info).should == [
-      "CREATE TABLE public.posts (title varchar(5))",
-      "CREATE INDEX posts_title_index ON public.posts USING hash (title)"
+      "CREATE TABLE posts (title varchar(5))",
+      "CREATE INDEX posts_title_index ON posts USING hash (title)"
     ]
   end
   
@@ -403,8 +403,8 @@ context "A PostgreSQL database" do
       index :title, :type => 'hash', :unique => true
     end
     POSTGRES_DB.create_table_sql_list(:posts, *g.create_info).should == [
-      "CREATE TABLE public.posts (title varchar(5))",
-      "CREATE UNIQUE INDEX posts_title_index ON public.posts USING hash (title)"
+      "CREATE TABLE posts (title varchar(5))",
+      "CREATE UNIQUE INDEX posts_title_index ON posts USING hash (title)"
     ]
   end
   
@@ -414,8 +414,8 @@ context "A PostgreSQL database" do
       index :title, :where => {:something => 5}
     end
     POSTGRES_DB.create_table_sql_list(:posts, *g.create_info).should == [
-      "CREATE TABLE public.posts (title varchar(5))",
-      "CREATE INDEX posts_title_index ON public.posts (title) WHERE (something = 5)"
+      "CREATE TABLE posts (title varchar(5))",
+      "CREATE INDEX posts_title_index ON posts (title) WHERE (something = 5)"
     ]
   end
   
@@ -425,8 +425,8 @@ context "A PostgreSQL database" do
       index :title, :where => {:something => 5}
     end
     POSTGRES_DB.create_table_sql_list(Sequel::SQL::Identifier.new(:posts__test), *g.create_info).should == [
-      "CREATE TABLE public.posts__test (title varchar(5))",
-      "CREATE INDEX posts__test_title_index ON public.posts__test (title) WHERE (something = 5)"
+      "CREATE TABLE posts__test (title varchar(5))",
+      "CREATE INDEX posts__test_title_index ON posts__test (title) WHERE (something = 5)"
     ]
   end
 end
@@ -557,18 +557,18 @@ context "Postgres::Database schema qualified tables" do
   
   specify "should be able to get primary keys for tables in a given schema" do
     POSTGRES_DB.create_table(:schema_test__schema_test){primary_key :i}
-    POSTGRES_DB.synchronize{|c| POSTGRES_DB.send(:primary_key_for_table, c, :schema_test__schema_test).should == 'i'}
+    POSTGRES_DB.primary_key(:schema_test__schema_test).should == 'i'
   end
   
   specify "should be able to get serial sequences for tables in a given schema" do
     POSTGRES_DB.create_table(:schema_test__schema_test){primary_key :i}
-    POSTGRES_DB.synchronize{|c| POSTGRES_DB.send(:primary_key_sequence_for_table, c, :schema_test__schema_test).should == '"schema_test"."schema_test_i_seq"'}
+    POSTGRES_DB.primary_key_sequence(:schema_test__schema_test).should == '"schema_test"."schema_test_i_seq"'
   end
   
   specify "should be able to get custom sequences for tables in a given schema" do
     POSTGRES_DB << "CREATE SEQUENCE schema_test.kseq"
     POSTGRES_DB.create_table(:schema_test__schema_test){integer :j; primary_key :k, :type=>:integer, :default=>"nextval('schema_test.kseq'::regclass)".lit}
-    POSTGRES_DB.synchronize{|c| POSTGRES_DB.send(:primary_key_sequence_for_table, c, :schema_test__schema_test).should == '"schema_test"."kseq"'}
+    POSTGRES_DB.primary_key_sequence(:schema_test__schema_test).should == '"schema_test"."kseq"'
   end
   
   specify "#default_schema= should change the default schema used from public" do
@@ -576,8 +576,8 @@ context "Postgres::Database schema qualified tables" do
     POSTGRES_DB.default_schema = :schema_test
     POSTGRES_DB.table_exists?(:schema_test).should == true
     POSTGRES_DB.tables.should == [:schema_test]
-    POSTGRES_DB.synchronize{|c| POSTGRES_DB.send(:primary_key_for_table, c, :schema_test).should == 'i'}
-    POSTGRES_DB.synchronize{|c| POSTGRES_DB.send(:primary_key_sequence_for_table, c, :schema_test).should == '"schema_test"."schema_test_i_seq"'}
+    POSTGRES_DB.primary_key(:schema_test__schema_test).should == 'i'
+    POSTGRES_DB.primary_key_sequence(:schema_test__schema_test).should == '"schema_test"."schema_test_i_seq"'
   end
 end
 
