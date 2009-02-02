@@ -219,6 +219,8 @@ module Sequel
       # * :schema - An explicit schema to use.  It may also be implicitly provided
       #   via the table name.
       def schema(table = nil, opts={})
+        raise(Error, 'schema parsing is not implemented on this database') unless respond_to?(:schema_parse_table, true)
+
         if table
           sch, table_name = schema_and_table(table)
           quoted_name = quote_schema_table(table)
@@ -240,29 +242,20 @@ module Sequel
           end
         end
         
+        raise(Error, '#tables does not exist, you must provide a specific table to #schema') if table.nil? && !respond_to?(:tables, true)
+
         @schemas ||= Hash.new do |h,k|
           quote_name = quote_schema_table(k)
           h[quote_name] if h.include?(quote_name)
         end
 
         if table_name
-          if respond_to?(:schema_parse_table, true)
-            cols = schema_parse_table(table_name, opts)
-            raise(Error, 'schema parsing returned no columns, table probably doesn\'t exist') if cols.blank?
-            @schemas[quoted_name] = cols
-          else
-            raise Error, 'schema parsing is not implemented on this database'
-          end
+          cols = schema_parse_table(table_name, opts)
+          raise(Error, 'schema parsing returned no columns, table probably doesn\'t exist') if cols.blank?
+          @schemas[quoted_name] = cols
         else
-          if respond_to?(:schema_parse_tables, true)
-            @schemas.merge!(schema_parse_tables(opts))
-          elsif respond_to?(:schema_parse_table, true) and respond_to?(:tables, true)
-            tables.each{|t| @schemas[quote_identifier(t)] = schema_parse_table(t.to_s, opts)}
-            @schemas
-          else
-            @schemas = nil
-            raise Error, 'schema parsing is not implemented on this database'
-          end
+          tables.each{|t| @schemas[quote_schema_table(t)] = schema_parse_table(t.to_s, opts)}
+          @schemas
         end
       end
       

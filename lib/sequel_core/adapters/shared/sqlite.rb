@@ -74,7 +74,10 @@ module Sequel
       # * :server - Set the server to use.
       def tables(opts={})
         ds = self[:sqlite_master].server(opts[:server]).filter(TABLES_FILTER)
-        ds.map{|r| ds.send(:output_identifier, r[:name])}
+        ds.identifier_output_method = nil
+        ds.identifier_input_method = nil
+        ds2 = dataset
+        ds.map{|r| ds2.send(:output_identifier, r[:name])}
       end
       
       # A symbol signifying the value of the temp_store PRAGMA.
@@ -100,8 +103,12 @@ module Sequel
         nil
       end
 
+      # Parse the output of the table_info pragma
       def parse_pragma(table_name, opts)
-        self["PRAGMA table_info(?)", table_name].map do |row|
+        ds2 = dataset
+        ds = self["PRAGMA table_info(?)", ds2.send(:input_identifier, table_name)]
+        ds.identifier_output_method = nil
+        ds.map do |row|
           row.delete(:cid)
           row[:allow_null] = row.delete(:notnull).to_i == 0
           row[:default] = row.delete(:dflt_value)
@@ -116,8 +123,9 @@ module Sequel
       # SQLite supports schema parsing using the table_info PRAGMA, so
       # parse the output of that into the format Sequel expects.
       def schema_parse_table(table_name, opts)
+        ds = dataset
         parse_pragma(table_name, opts).map do |row|
-          [row.delete(:name).to_sym, row]
+          [ds.send(:output_identifier, row.delete(:name)), row]
         end
       end
       

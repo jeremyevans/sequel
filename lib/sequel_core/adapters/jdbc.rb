@@ -304,7 +304,9 @@ module Sequel
       
       # Yield the metadata for this database
       def metadata(*args, &block)
-        synchronize{|c| dataset.send(:process_result_set, c.getMetaData.send(*args), &block)}
+        ds = dataset
+        ds.output_identifier_method = nil
+        synchronize{|c| ds.send(:process_result_set, c.getMetaData.send(*args), &block)}
       end
       
       # Java being java, you need to specify the type of each argument
@@ -339,15 +341,16 @@ module Sequel
       
       # All tables in this database
       def schema_parse_table(table, opts={})
+        ds = dataset
         schema, table = schema_and_table(table)
-        schema = dataset.send(:input_identifier, schema) if schema
-        table = dataset.send(:input_identifier, table)
+        schema = ds.send(:input_identifier, schema) if schema
+        table = ds.send(:input_identifier, table)
         pks, ts = [], []
         metadata(:getPrimaryKeys, nil, schema, table) do |h|
           pks << h[:column_name]
         end
         metadata(:getColumns, nil, schema, table, nil) do |h|
-          ts << [dataset.send(:output_identifier, h[:column_name]), {:type=>schema_column_type(h[:type_name]), :db_type=>h[:type_name], :default=>(h[:column_def] == '' ? nil : h[:column_def]), :allow_null=>(h[:nullable] != 0), :primary_key=>pks.include?(h[:column_name])}]
+          ts << [ds.send(:output_identifier, h[:column_name]), {:type=>schema_column_type(h[:type_name]), :db_type=>h[:type_name], :default=>(h[:column_def] == '' ? nil : h[:column_def]), :allow_null=>(h[:nullable] != 0), :primary_key=>pks.include?(h[:column_name])}]
         end
         ts
       end

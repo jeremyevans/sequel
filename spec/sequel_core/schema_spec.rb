@@ -708,12 +708,6 @@ context "Schema Parser" do
     @sqls.should == ['x']
     @db.schema(nil, :reload=>true).should == {'x'=>[[:x, {:db_type=>"x"}]]}
     @sqls.should == ['x', 'x']
-    @db.meta_def(:schema_parse_tables) do |opts|
-      sqls << 1
-      {'x'=>[[:a, {:db_type=>"1"}]]}
-    end
-    @db.schema(nil, :reload=>true).should == {'x'=>[[:a, {:db_type=>"1"}]]}
-    @sqls.should == ['x', 'x', 1]
   end
 
   specify "should convert various types of table name arguments" do

@@ -250,11 +250,6 @@ module Sequel
         "CREATE TRIGGER #{name} #{whence} #{events.map{|e| e.to_s.upcase}.join(' OR ')} ON #{quote_schema_table(table)}#{' FOR EACH ROW' if opts[:each_row]} EXECUTE PROCEDURE #{function}(#{Array(opts[:args]).map{|a| literal(a)}.join(', ')})"
       end
       
-      # The default schema to use if none is specified (default: public)
-      def default_schema
-        @default_schema ||= :public
-      end
-      
       # Drops the function from the database.  See drop_function_sql for arguments.
       def drop_function(*args)
         self << drop_function_sql(*args)
@@ -389,8 +384,12 @@ module Sequel
       # * :schema - The schema to search (default_schema by default)
       # * :server - The server to use
       def tables(opts={})
-        ds = self[:pg_class].join(:pg_namespace, :oid=>:relnamespace, 'r'=>:relkind, :nspname=>(opts[:schema]||default_schema).to_s).select(:relname).exclude(:relname.like(SYSTEM_TABLE_REGEXP)).server(opts[:server])
-        block_given? ? yield(ds) : ds.map{|r| ds.send(:output_identifier, r[:relname])}
+        ds = self[:pg_class].filter(:relkind=>'r').select(:relname).exclude(:relname.like(SYSTEM_TABLE_REGEXP)).server(opts[:server])
+        ds.join!(:pg_namespace, :oid=>:relnamespace, :nspname=>(opts[:schema]||default_schema).to_s) if opts[:schema] || default_schema
+        ds.identifier_input_method = nil
+        ds.identifier_output_method = nil
+        ds2 = dataset
+        block_given? ? yield(ds) : ds.map{|r| ds2.send(:output_identifier, r[:relname])}
       end
       
       # PostgreSQL supports multi-level transactions using save points.
@@ -437,6 +436,11 @@ module Sequel
       end
 
       private
+      
+      # The default schema to use if none is specified (default: public)
+      def default_schema_default
+        :public
+      end
       
       # PostgreSQL folds unquoted identifiers to lowercase, so it shouldn't need to upcase identifiers on input.
       def identifier_input_method_default
@@ -496,35 +500,9 @@ module Sequel
         @primary_key_sequences[quote_schema_table(table)] ||= conn.sequence(*schema_and_table(table))
       end
       
-      # Set the default of the row to NULL if it is blank, and set
-      # the ruby type for the column based on the database type.
-      def schema_parse_rows(rows)
-        rows.map do |row|
-          row[:default] = nil if row[:default].blank?
-          row[:type] = schema_column_type(row[:db_type])
-          [row.delete(:name).to_sym, row]
-        end
-      end
-
-      # Parse the schema for a single table.
-      def schema_parse_table(table_name, opts)
-        schema_parse_rows(schema_parser_dataset(table_name, opts))
-      end
-
-      # Parse the schema for multiple tables.
-      def schema_parse_tables(opts)
-        schemas = {}
-        schema_parser_dataset(nil, opts).each do |row|
-          (schemas[quote_schema_table(SQL::QualifiedIdentifier.new(row.delete(:schema), row.delete(:table)))] ||= []) << row
-        end
-        schemas.each do |table, rows|
-          schemas[table] = schema_parse_rows(rows)
-        end
-        schemas
-      end
-
       # The dataset used for parsing table schemas, using the pg_* system catalogs.
-      def schema_parser_dataset(table_name, opts)
+      def schema_parse_table(table_name, opts)
+        ds2 = dataset
         ds = dataset.select(:pg_attribute__attname___name,
             SQL::Function.new(:format_type, :pg_type__oid, :pg_attribute__atttypmod).as(:db_type),
             SQL::Function.new(:pg_get_expr, :pg_attrdef__adbin, :pg_class__oid).as(:default),
@@ -537,14 +515,16 @@ module Sequel
           left_outer_join(:pg_index, :indrelid=>:pg_class__oid, :indisprimary=>true).
           filter(:pg_attribute__attisdropped=>false).
           filter{|o| o.pg_attribute__attnum > 0}.
+          filter(:pg_class__relname=>ds2.send(:input_identifier, table_name)).
           order(:pg_attribute__attnum)
-        if table_name
-          ds.filter!(:pg_class__relname=>table_name.to_s)
-        else
-          ds.select_more!(:pg_class__relname___table, :pg_namespace__nspname___schema)
-          ds.join!(:pg_namespace, :oid=>:pg_class__relnamespace, :nspname=>(opts[:schema] || default_schema).to_s)
+        ds.join!(:pg_namespace, :oid=>:pg_class__relnamespace, :nspname=>(opts[:schema] || default_schema).to_s) if opts[:schema] || default_schema
+        ds.identifier_input_method = nil
+        ds.identifier_output_method = nil
+        ds.map do |row|
+          row[:default] = nil if row[:default].blank?
+          row[:type] = schema_column_type(row[:db_type])
+          [ds2.send(:output_identifier, row.delete(:name)), row]
         end
-        ds
       end
 
       # Turns an array of argument specifiers into an SQL fragment used for function arguments.  See create_function_sql.

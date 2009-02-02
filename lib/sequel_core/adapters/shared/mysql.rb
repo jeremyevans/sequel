@@ -86,8 +86,14 @@ module Sequel
       end
       
       # Return an array of symbols specifying table names in the current database.
-      def tables(server=nil)
-        self['SHOW TABLES'].server(server).map{|r| r.values.first.to_sym}
+      #
+      # Options:
+      # * :server - Set the server to use
+      def tables(opts={})
+        ds = self['SHOW TABLES'].server(opts[:server])
+        ds.identifier_output_method = nil
+        ds2 = dataset
+        ds.map{|r| ds2.send(:output_identifier, r.values.first)}
       end
       
       # Changes the database in use by issuing a USE statement.  I would be
@@ -113,7 +119,10 @@ module Sequel
 
       # Use the MySQL specific DESCRIBE syntax to get a table description.
       def schema_parse_table(table_name, opts)
-        self["DESCRIBE ?", SQL::Identifier.new(table_name)].map do |row|
+        ds = self["DESCRIBE ?", SQL::Identifier.new(table_name)]
+        ds.identifier_output_method = nil
+        ds2 = dataset
+        ds.map do |row|
           row.delete(:Extra)
           row[:allow_null] = row.delete(:Null) == 'YES'
           row[:default] = row.delete(:Default)
@@ -121,7 +130,7 @@ module Sequel
           row[:default] = nil if row[:default].blank?
           row[:db_type] = row.delete(:Type)
           row[:type] = schema_column_type(row[:db_type])
-          [row.delete(:Field).to_sym, row]
+          [ds2.send(:output_identifier, row.delete(:Field)), row]
         end
       end
 

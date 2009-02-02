@@ -13,6 +13,16 @@ def clear_sqls
   $sqls.clear
 end 
 
+class Spec::Example::ExampleGroup
+  def start_logging
+    require 'logger'
+     INTEGRATION_DB.loggers << Logger.new(STDOUT)
+  end
+  def stop_logging
+     INTEGRATION_DB.loggers.clear
+  end
+end
+
 if defined?(INTEGRATION_DB) || defined?(INTEGRATION_URL) || ENV['SEQUEL_INTEGRATION_URL']
   unless defined?(INTEGRATION_DB)
     url = defined?(INTEGRATION_URL) ? INTEGRATION_URL : ENV['SEQUEL_INTEGRATION_URL']

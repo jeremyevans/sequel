@@ -72,7 +72,7 @@ module Sequel
       
       @single_threaded = opts.include?(:single_threaded) ? opts[:single_threaded] : @@single_threaded
       @schemas = nil
-      @default_schema = opts[:default_schema]
+      @default_schema = opts.include?(:default_schema) ? opts[:default_schema] : default_schema_default
       @prepared_statements = {}
       @transactions = []
       if opts.include?(:upcase_identifiers)
@@ -614,6 +614,11 @@ module Sequel
       {}
     end
     
+    # The default value for default_schema.
+    def default_schema_default
+      nil
+    end
+
     # The method to apply to identifiers going into the database by default.
     # Should be overridden in subclasses for databases that fold unquoted
     # identifiers to lower case instead of uppercase, such as

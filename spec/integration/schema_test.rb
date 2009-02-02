@@ -1,8 +1,27 @@
 require File.join(File.dirname(__FILE__), 'spec_helper.rb')
 
+if INTEGRATION_DB.respond_to?(:schema_parse_table, true)
 describe "Database schema parser" do
+  before do
+    @iom = INTEGRATION_DB.identifier_output_method
+    @iim = INTEGRATION_DB.identifier_input_method
+    @defsch = INTEGRATION_DB.default_schema
+    clear_sqls
+  end
   after do
     INTEGRATION_DB.drop_table(:items) if INTEGRATION_DB.table_exists?(:items)
+    INTEGRATION_DB.identifier_output_method = @iom
+    INTEGRATION_DB.identifier_input_method = @iim
+    INTEGRATION_DB.default_schema = @defsch
+  end
+
+  specify "should handle a database with a identifier_output_method" do
+    INTEGRATION_DB.identifier_output_method = :reverse
+    INTEGRATION_DB.identifier_input_method = :reverse
+    INTEGRATION_DB.default_schema = nil if INTEGRATION_DB.default_schema
+    INTEGRATION_DB.create_table!(:items){integer :number}
+    INTEGRATION_DB.schema(nil, :reload=>true)[:items].should be_a_kind_of(Array)
+    INTEGRATION_DB.schema(:items, :reload=>true).first.first.should == :number
   end
 
   specify "should be a hash with table_names as symbols" do
@@ -71,6 +90,7 @@ describe "Database schema parser" do
     INTEGRATION_DB.schema(:items).first.last[:default].gsub(/::character varying\z/, '').gsub("'", '').should == "blah"
   end
 end
+end
 
 describe "Database schema modifiers" do
   before do
@@ -137,10 +157,12 @@ describe "Database#tables" do
       end
     end
     @iom = INTEGRATION_DB.identifier_output_method
+    @iim = INTEGRATION_DB.identifier_input_method
     clear_sqls
   end
   after do
     INTEGRATION_DB.identifier_output_method = @iom
+    INTEGRATION_DB.identifier_input_method = @iim
   end
 
   specify "should return an array of symbols" do
@@ -151,6 +173,7 @@ describe "Database#tables" do
 
   specify "should respect the database's identifier_output_method" do
     INTEGRATION_DB.identifier_output_method = :xxxxx
+    INTEGRATION_DB.identifier_input_method = :xxxxx
     INTEGRATION_DB.tables.each{|t| t.to_s.should =~ /\Ax{5}\d+\z/}
   end
 end
