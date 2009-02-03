@@ -55,13 +55,7 @@ opts = OptionParser.new do |opts|
   end
 
   opts.on_tail("-v", "--version", "Show version") do
-    class << Gem; attr_accessor :loaded_specs; end
-    begin
-      specs = Gem.loaded_specs['sequel']
-      puts "sequel #{specs.version} (#{specs.date.strftime '%Y-%m-%d'})"
-    rescue
-      puts "No gem version found"
-    end
+    puts "sequel #{Sequel.version}"
     exit
   end
 end
