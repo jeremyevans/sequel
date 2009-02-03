@@ -1,4 +1,8 @@
-=== HEAD
+=== 2.10.0 (2009-02-03)
+
+* Don't use a default schema any longer in the shared PostgreSQL adapter (jeremyevans)
+
+* Make Dataset#quote_identifier return LiteralStrings as-is (jeremyevans)
 
 * Support symbol keys and unnested hashes in the sequel command line tool's yaml config support (jeremyevans)
 
