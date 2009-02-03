@@ -1,3 +1,7 @@
+=== HEAD
+
+* Add validates_inclusion_of validation (jdunphy)
+
 === 2.10.0 (2009-02-03)
 
 * Don't use a default schema any longer in the shared PostgreSQL adapter (jeremyevans)

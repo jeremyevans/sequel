@@ -69,8 +69,7 @@ module Sequel
     # Defines validations by converting a longhand block into a series of 
     # shorthand definitions. For example:
     #
-    #   class MyClass
-    #     include Validation
+    #   class MyClass < Sequel::Model
     #     validates do
     #       length_of :name, :minimum => 6
     #       length_of :password, :minimum => 8
@@ -78,8 +77,7 @@ module Sequel
     #   end
     #
     # is equivalent to:
-    #   class MyClass
-    #     include Validation
+    #   class MyClass < Sequel::Model
     #     validates_length_of :name, :minimum => 6
     #     validates_length_of :password, :minimum => 8
     #   end
@@ -322,13 +320,13 @@ module Sequel
     #
     # Possible Options:
     # * :in - An array or range of values to check for validity (required)
-    # * :message - The message to use (default: 'is not in range <specified range>')
+    # * :message - The message to use (default: 'is not in range or set: <specified range>')
     def self.validates_inclusion_of(*atts)
       opts = atts.extract_options!
       unless opts[:in] && opts[:in].respond_to?(:include?) 
-        raise ArgumentError, "The :in parameter is required, and should be a range or array"
+        raise ArgumentError, "The :in parameter is required, and respond to include?"
       end
-      opts[:message] = "is not in range #{opts[:in].inspect}"
+      opts[:message] ||= "is not in range or set: #{opts[:in].inspect}"
       atts << opts
       validates_each(*atts) do |o, a, v|
         o.errors[a] << opts[:message] unless opts[:in].include?(v)
