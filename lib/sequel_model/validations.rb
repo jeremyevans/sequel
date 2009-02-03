@@ -317,6 +317,23 @@ module Sequel
         o.errors[a] << opts[:message] if v.blank? && v != false
       end
     end
+    
+    # Validates that an attribute is within a specified range or set of values.
+    #
+    # Possible Options:
+    # * :in - An array or range of values to check for validity (required)
+    # * :message - The message to use (default: 'is not in range <specified range>')
+    def self.validates_inclusion_of(*atts)
+      opts = atts.extract_options!
+      unless opts[:in] && opts[:in].respond_to?(:include?) 
+        raise ArgumentError, "The :in parameter is required, and should be a range or array"
+      end
+      opts[:message] = "is not in range #{opts[:in].inspect}"
+      atts << opts
+      validates_each(*atts) do |o, a, v|
+        o.errors[a] << opts[:message] unless opts[:in].include?(v)
+      end
+    end
 
     # Validates only if the fields in the model (specified by atts) are
     # unique in the database.  Pass an array of fields instead of multiple
