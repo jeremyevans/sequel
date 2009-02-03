@@ -540,6 +540,50 @@ describe Sequel::Model do
     @m.value = false
     @m.should be_valid
   end
+  
+  specify "should validate inclusion_of with an array" do
+    @c.validates_inclusion_of :value, :in => [1,2]
+    @m.should_not be_valid
+    @m.value = 1
+    @m.should be_valid
+    @m.value = 1.5
+    @m.should_not be_valid
+    @m.value = 2
+    @m.should be_valid    
+    @m.value = 3
+    @m.should_not be_valid 
+  end
+  
+  specify "should validate inclusion_of with a range" do
+    @c.validates_inclusion_of :value, :in => 1..4
+    @m.should_not be_valid
+    @m.value = 1
+    @m.should be_valid
+    @m.value = 1.5
+    @m.should be_valid
+    @m.value = 0
+    @m.should_not be_valid
+    @m.value = 5
+    @m.should_not be_valid    
+  end
+  
+  specify "should raise an error if inclusion_of doesn't receive a valid :in option" do
+    lambda {
+      @c.validates_inclusion_of :value
+    }.should raise_error(ArgumentError)
+    
+    lambda {
+      @c.validates_inclusion_of :value, :in => 1
+    }.should raise_error(ArgumentError)
+  end
+  
+  specify "should raise an error if inclusion_of handles :allow_nil too" do
+    @c.validates_inclusion_of :value, :in => 1..4, :allow_nil => true
+    @m.value = nil
+    @m.should be_valid
+    @m.value = 0
+    @m.should_not be_valid
+  end
 
   specify "should validate presence_of with if => true" do
     @c.validates_presence_of :value, :if => :dont_skip
