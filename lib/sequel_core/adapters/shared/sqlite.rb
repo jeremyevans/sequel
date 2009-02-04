@@ -43,7 +43,6 @@ module Sequel
 
           def_new_columns_arr = defined_columns_for(table).map do |c|
             c[:name] = op[:new_name].to_s if c[:name] == op[:name].to_s
-            puts "WTF #{c[:name].inspect} #{op[:name].inspect}"
             c
           end
           
