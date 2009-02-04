@@ -54,7 +54,6 @@ module Sequel
            "DROP TABLE #{table}",
            "CREATE TABLE #{table}(#{def_new_columns})",
            "INSERT INTO #{table}(#{new_columns}) SELECT #{old_columns} FROM #{table}_backup",
-           "INSERT INTO #{table}(#{op[:new_name]}) SELECT #{op[:name]} FROM #{table}_backup",
            "DROP TABLE #{table}_backup"
           ]
 

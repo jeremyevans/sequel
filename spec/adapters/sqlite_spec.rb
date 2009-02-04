@@ -465,6 +465,7 @@ context "A SQLite database" do
     @db.rename_column :test2, :xyz, :zyx, :type => :text
     @db[:test2].columns.should == [:name, :value, :zyx]
     @db[:test2].first[:zyx].should == 'qqqq'
+    @db[:test2].count.should eql(1)
   end
   
   specify "should not support set_column_type operations" do
