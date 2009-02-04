@@ -35,7 +35,7 @@ module Sequel
           new_columns_arr = columns_for(table)
 
           # Replace the old column in place. This is extremely important.
-          new_columns_arr[new_columns_arr.find_index(op[:name])] = op[:new_name]
+          new_columns_arr[new_columns_arr.index(op[:name])] = op[:new_name]
           
           new_columns = new_columns_arr.join(",")
           
