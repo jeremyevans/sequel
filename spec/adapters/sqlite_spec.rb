@@ -464,7 +464,6 @@ context "A SQLite database" do
     @db[:test2].columns.should == [:name, :value, :xyz]
     @db.rename_column :test2, :xyz, :zyx, :type => :text
     @db[:test2].columns.should == [:name, :value, :zyx]
-    puts "WTF #{@db[:test2].first.inspect}"
     @db[:test2].first[:zyx].should == 'qqqq'
   end
   
