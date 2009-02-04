@@ -22,14 +22,43 @@ module Sequel
         when :add_column, :add_index, :drop_index
           super
         when :drop_column
-          columns_str = (schema_parse_table(table, {}).map{|c| c[0]} - Array(op[:name])).join(",")
-          defined_columns_str = column_list_sql parse_pragma(table, {}).reject{ |c| c[:name] == op[:name].to_s}
+          columns_str = columns_for(table, :except => op[:name]).join(",")
+          defined_columns_str = column_list_sql(defined_columns_for(table, :except => op[:name]))
           ["CREATE TEMPORARY TABLE #{table}_backup(#{defined_columns_str})",
            "INSERT INTO #{table}_backup SELECT #{columns_str} FROM #{table}",
            "DROP TABLE #{table}",
            "CREATE TABLE #{table}(#{defined_columns_str})",
            "INSERT INTO #{table} SELECT #{columns_str} FROM #{table}_backup",
            "DROP TABLE #{table}_backup"]
+        when :rename_column
+          old_columns = columns_for(table).join(",")
+          new_columns_arr = columns_for(table)
+
+          # Replace the old column in place. This is extremely important.
+          new_columns_arr[new_columns_arr.find_index(op[:name])] = op[:new_name]
+          
+          new_columns = new_columns_arr.join(",")
+          
+          def_old_columns = column_list_sql(defined_columns_for(table))
+
+          def_new_columns_arr = defined_columns_for(table).map do |c|
+            c[:name] = op[:new_name].to_s if c[:name] == op[:name].to_s
+            puts "WTF #{c[:name].inspect} #{op[:name].inspect}"
+            c
+          end
+          
+          def_new_columns = column_list_sql(def_new_columns_arr)
+
+          [
+           "CREATE TEMPORARY TABLE #{table}_backup(#{def_old_columns})",
+           "INSERT INTO #{table}_backup(#{old_columns}) SELECT #{old_columns} FROM #{table}",
+           "DROP TABLE #{table}",
+           "CREATE TABLE #{table}(#{def_new_columns})",
+           "INSERT INTO #{table}(#{new_columns}) SELECT #{old_columns} FROM #{table}_backup",
+           "INSERT INTO #{table}(#{op[:new_name]}) SELECT #{op[:name]} FROM #{table}_backup",
+           "DROP TABLE #{table}_backup"
+          ]
+
         else
           raise Error, "Unsupported ALTER TABLE operation"
         end
@@ -92,6 +121,21 @@ module Sequel
       end
       
       private
+
+      def columns_for(table, opts={})
+        cols = schema_parse_table(table, {}).map{|c| c[0]}
+        cols = cols - Array(opts[:except])
+        cols
+      end
+
+      def defined_columns_for(table, opts={})
+        cols = parse_pragma(table, {})
+        if opts[:except]
+          nono= Array(opts[:except]).compact.map{|n| n.to_s}
+          cols.reject!{|c| nono.include? c[:name] }
+        end
+        cols
+      end
       
       # SQLite folds unquoted identifiers to lowercase, so it shouldn't need to upcase identifiers on input.
       def identifier_input_method_default

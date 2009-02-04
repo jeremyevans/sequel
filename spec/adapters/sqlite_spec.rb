@@ -456,8 +456,16 @@ context "A SQLite database" do
     @db[:test3].select(:id).all.should == [{:id => 1}, {:id => 3}]
   end
 
-  specify "should not support rename_column operations" do
-    proc {@db.rename_column :test2, :value, :zyx}.should raise_error(Sequel::Error)
+  specify "should support rename_column operations" do
+    @db[:test2].delete
+    @db.add_column :test2, :xyz, :text
+    @db[:test2] << {:name => 'mmm', :value => 111, :xyz => 'qqqq'}
+
+    @db[:test2].columns.should == [:name, :value, :xyz]
+    @db.rename_column :test2, :xyz, :zyx, :type => :text
+    @db[:test2].columns.should == [:name, :value, :zyx]
+    puts "WTF #{@db[:test2].first.inspect}"
+    @db[:test2].first[:zyx].should == 'qqqq'
   end
   
   specify "should not support set_column_type operations" do
