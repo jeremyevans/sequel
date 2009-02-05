@@ -468,6 +468,77 @@ context "A SQLite database" do
     @db[:test2].count.should eql(1)
   end
   
+  specify "should preserve defaults when dropping or renaming columns" do
+    @db.create_table! :test3 do
+      String :s, :default=>'a'
+      Integer :i
+    end
+
+    @db[:test3].insert
+    @db[:test3].first[:s].should == 'a'
+    @db[:test3].delete
+    @db.drop_column :test3, :i
+    @db[:test3].insert
+    @db[:test3].first[:s].should == 'a'
+    @db[:test3].delete
+    @db.rename_column :test3, :s, :t
+    @db[:test3].insert
+    @db[:test3].first[:t].should == 'a'
+    @db[:test3].delete
+  end
+  
+  specify "should handle quoted tables when dropping or renaming columns" do
+    @db.quote_identifiers = true
+    table_name = "T T"
+    @db.drop_table(table_name) rescue nil
+    @db.create_table! table_name do
+      Integer :"s s"
+      Integer :"i i"
+    end
+
+    @db.from(table_name).insert(:"s s"=>1, :"i i"=>2)
+    @db.from(table_name).all.should == [{:"s s"=>1, :"i i"=>2}]
+    @db.drop_column table_name, :"i i"
+    @db.from(table_name).all.should == [{:"s s"=>1}]
+    @db.rename_column table_name, :"s s", :"t t"
+    @db.from(table_name).all.should == [{:"t t"=>1}]
+  end
+  
+  specify "should choose a temporary table name that isn't already used when dropping or renaming columns" do
+    @db.create_table! :test3 do
+      Integer :h
+      Integer :i
+    end
+    @db.create_table! :test3_backup0 do
+      Integer :j
+    end
+    @db.create_table! :test3_backup1 do
+      Integer :k
+    end
+
+    @db[:test3].columns.should == [:h, :i]
+    @db[:test3_backup0].columns.should == [:j]
+    @db[:test3_backup1].columns.should == [:k]
+    sqls = @db.drop_column(:test3, :i)
+    sqls.any?{|x| x =~ /test3_backup2/}.should == true
+    sqls.any?{|x| x =~ /test3_backup[01]/}.should == false
+    @db[:test3].columns.should == [:h]
+    @db[:test3_backup0].columns.should == [:j]
+    @db[:test3_backup1].columns.should == [:k]
+
+    @db.create_table! :test3_backup2 do
+      Integer :l
+    end
+
+    sqls = @db.rename_column(:test3, :h, :i)
+    sqls.any?{|x| x =~ /test3_backup3/}.should == true
+    sqls.any?{|x| x =~ /test3_backup[012]/}.should == false
+    @db[:test3].columns.should == [:i]
+    @db[:test3_backup0].columns.should == [:j]
+    @db[:test3_backup1].columns.should == [:k]
+    @db[:test3_backup2].columns.should == [:l]
+  end
+  
   specify "should not support set_column_type operations" do
     proc {@db.set_column_type :test2, :value, :integer}.should raise_error(Sequel::Error)
   end

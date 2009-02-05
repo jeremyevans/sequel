@@ -22,22 +22,26 @@ module Sequel
         when :add_column, :add_index, :drop_index
           super
         when :drop_column
-          columns_str = columns_for(table, :except => op[:name]).join(",")
+          qt = quote_schema_table(table)
+          bt = quote_identifier(backup_table_name(qt.gsub('`', '')))
+          columns_str = dataset.send(:identifier_list, columns_for(table, :except => op[:name]))
           defined_columns_str = column_list_sql(defined_columns_for(table, :except => op[:name]))
-          ["CREATE TEMPORARY TABLE #{table}_backup(#{defined_columns_str})",
-           "INSERT INTO #{table}_backup SELECT #{columns_str} FROM #{table}",
-           "DROP TABLE #{table}",
-           "CREATE TABLE #{table}(#{defined_columns_str})",
-           "INSERT INTO #{table} SELECT #{columns_str} FROM #{table}_backup",
-           "DROP TABLE #{table}_backup"]
+          ["CREATE TEMPORARY TABLE #{bt}(#{defined_columns_str})",
+           "INSERT INTO #{bt} SELECT #{columns_str} FROM #{qt}",
+           "DROP TABLE #{qt}",
+           "CREATE TABLE #{qt}(#{defined_columns_str})",
+           "INSERT INTO #{qt} SELECT #{columns_str} FROM #{bt}",
+           "DROP TABLE #{bt}"]
         when :rename_column
-          old_columns = columns_for(table).join(",")
+          qt = quote_schema_table(table)
+          bt = quote_identifier(backup_table_name(qt.gsub('`', '')))
+          old_columns = dataset.send(:identifier_list, columns_for(table))
           new_columns_arr = columns_for(table)
 
           # Replace the old column in place. This is extremely important.
           new_columns_arr[new_columns_arr.index(op[:name])] = op[:new_name]
           
-          new_columns = new_columns_arr.join(",")
+          new_columns = dataset.send(:identifier_list, new_columns_arr)
           
           def_old_columns = column_list_sql(defined_columns_for(table))
 
@@ -49,12 +53,12 @@ module Sequel
           def_new_columns = column_list_sql(def_new_columns_arr)
 
           [
-           "CREATE TEMPORARY TABLE #{table}_backup(#{def_old_columns})",
-           "INSERT INTO #{table}_backup(#{old_columns}) SELECT #{old_columns} FROM #{table}",
-           "DROP TABLE #{table}",
-           "CREATE TABLE #{table}(#{def_new_columns})",
-           "INSERT INTO #{table}(#{new_columns}) SELECT #{old_columns} FROM #{table}_backup",
-           "DROP TABLE #{table}_backup"
+           "CREATE TEMPORARY TABLE #{bt}(#{def_old_columns})",
+           "INSERT INTO #{bt}(#{old_columns}) SELECT #{old_columns} FROM #{qt}",
+           "DROP TABLE #{qt}",
+           "CREATE TABLE #{qt}(#{def_new_columns})",
+           "INSERT INTO #{qt}(#{new_columns}) SELECT #{old_columns} FROM #{bt}",
+           "DROP TABLE #{bt}"
           ]
 
         else
@@ -120,14 +124,25 @@ module Sequel
       
       private
 
+      # The array of column symbols in the table, except for ones given in opts[:except]
+      def backup_table_name(table, opts={})
+        (opts[:times]||1000).times do |i|
+          table_name = "#{table}_backup#{i}"
+          return table_name unless table_exists?(table_name)
+        end
+      end
+
+      # The array of column symbols in the table, except for ones given in opts[:except]
       def columns_for(table, opts={})
         cols = schema_parse_table(table, {}).map{|c| c[0]}
         cols = cols - Array(opts[:except])
         cols
       end
 
+      # The array of column schema hashes, except for the ones given in opts[:except]
       def defined_columns_for(table, opts={})
         cols = parse_pragma(table, {})
+        cols.each{|c| c[:default] = c[:default].lit if c[:default]}
         if opts[:except]
           nono= Array(opts[:except]).compact.map{|n| n.to_s}
           cols.reject!{|c| nono.include? c[:name] }

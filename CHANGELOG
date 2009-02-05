@@ -1,5 +1,9 @@
 === HEAD
 
+* Fix issues with default column values, table names, and quoting in the rename_column and drop_column support in shared SQLite adapter (jeremyevans)
+
+* Add rename_column support to SQLite shared adapter (jmhodges)
+
 * Add validates_inclusion_of validation (jdunphy)
 
 === 2.10.0 (2009-02-03)
