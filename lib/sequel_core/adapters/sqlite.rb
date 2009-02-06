@@ -52,6 +52,9 @@ module Sequel
         db.translator.add_translator("real", &prok)
         db.translator.add_translator("double precision", &prok)
         
+        # Handle blob values with Sequel::SQL::Blob
+        db.translator.add_translator("blob"){|t,v| ::Sequel::SQL::Blob.new(v)}
+        
         db
       end
       
@@ -215,14 +218,10 @@ module Sequel
       # using the ::SQLite3::Database.quote method.
       def literal(v)
         case v
-        when LiteralString
-          v
+        when LiteralString, ::Sequel::SQL::Blob
+          super
         when String
           "'#{::SQLite3::Database.quote(v)}'"
-        when Time
-          literal(v.iso8601)
-        when Date, DateTime
-          literal(v.to_s)
         else
           super
         end

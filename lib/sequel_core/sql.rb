@@ -423,9 +423,10 @@ module Sequel
     # escaped.
     class Blob < ::String
       # return self.
-      def to_blob
+      def to_sequel_blob
         self
       end
+      alias to_blob to_sequel_blob
     end
 
     # Subclass of ComplexExpression where the expression results

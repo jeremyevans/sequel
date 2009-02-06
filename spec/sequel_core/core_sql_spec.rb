@@ -126,10 +126,12 @@ context "String#lit" do
   end
 end
 
-context "String#to_blob" do
+context "String#to_blob and #to_sequel_blob" do
   specify "should return a Blob object" do
     'xyz'.to_blob.should be_a_kind_of(::Sequel::SQL::Blob)
     'xyz'.to_blob.should == 'xyz'
+    'xyz'.to_sequel_blob.should be_a_kind_of(::Sequel::SQL::Blob)
+    'xyz'.to_sequel_blob.should == 'xyz'
   end
 
   specify "should retain binary data" do
@@ -239,9 +241,11 @@ context "Column references" do
 end
 
 context "Blob" do
-  specify "#to_blob should return self" do
+  specify "#to_blob and #to_sequel_blob should return self" do
     blob = "x".to_blob
     blob.to_blob.object_id.should == blob.object_id
+    blob = "x".to_sequel_blob
+    blob.to_sequel_blob.object_id.should == blob.object_id
   end
 end
 

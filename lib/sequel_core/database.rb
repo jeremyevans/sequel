@@ -559,7 +559,7 @@ module Sequel
           (Time === value ? value.iso8601 : value.to_s).to_sequel_time
         end
       when :blob
-        value.to_blob
+        ::Sequel::SQL::Blob.new(value)
       else
         value
       end

@@ -85,7 +85,7 @@ module Sequel
     # Hash with integer keys and proc values for converting PostgreSQL types.
     PG_TYPES = {
       16 => lambda{ |s| s == 't' }, # boolean
-      17 => lambda{ |s| Adapter.unescape_bytea(s).to_blob }, # bytea
+      17 => lambda{ |s| ::Sequel::SQL::Blob.new(Adapter.unescape_bytea(s)) }, # bytea
       20 => lambda{ |s| s.to_i }, # int8
       21 => lambda{ |s| s.to_i }, # int2
       22 => lambda{ |s| s.to_i }, # int2vector

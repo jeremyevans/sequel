@@ -71,8 +71,9 @@ describe "Supported types" do
   
   specify "should support generic file type" do
     ds = create_items_table_with_column(:name, File)
-    ds.insert(:name => ("a\0"*300).to_blob)
-    ds.all.should == [{:name=>("a\0"*300).to_blob}]
+    ds.insert(:name => ("a\0"*300).to_sequel_blob)
+    ds.all.should == [{:name=>("a\0"*300).to_sequel_blob}]
+    ds.first[:name].should be_a_kind_of(::Sequel::SQL::Blob)
   end
   
   specify "should support generic boolean type" do

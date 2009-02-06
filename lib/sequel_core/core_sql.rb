@@ -149,9 +149,10 @@ class String
 
   # Returns a Blob that holds the same data as this string. Blobs provide proper
   # escaping of binary data.
-  def to_blob
+  def to_sequel_blob
     ::Sequel::SQL::Blob.new self
   end
+  alias to_blob to_sequel_blob
 end
 
 class Symbol

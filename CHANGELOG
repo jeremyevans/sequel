@@ -1,5 +1,9 @@
 === HEAD
 
+* Fully support blobs on SQLite (jeremyevans)
+
+* Add String#to_sequel_blob, alias String#to_blob to that (jeremyevans)
+
 * Fix default index names when a non-String or Symbol column is used (jeremyevans)
 
 * Fix some ruby -w warnings (jeremyevans) (#259)

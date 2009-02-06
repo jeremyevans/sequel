@@ -234,6 +234,21 @@ module Sequel
         end
       end
       
+      def literal(v)
+        case v
+        when ::Sequel::SQL::Blob
+          blob = ''
+          v.each_byte{|x| blob << sprintf('%02x', x)}
+          "X'#{blob}'"
+        when Time
+          literal(v.iso8601)
+        when Date, DateTime
+          literal(v.to_s)
+        else
+          super
+        end
+      end
+      
       # SQLite uses the nonstandard ` (backtick) for quoting identifiers.
       def quoted_identifier(c)
         "`#{c}`"
