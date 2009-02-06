@@ -1,5 +1,7 @@
 === HEAD
 
+* Fix some ruby -w warnings (jeremyevans) (#259)
+
 * Fix issues with default column values, table names, and quoting in the rename_column and drop_column support in shared SQLite adapter (jeremyevans)
 
 * Add rename_column support to SQLite shared adapter (jmhodges)
@@ -76,7 +78,7 @@
 
 * Fix add_foreign_key for MySQL (jeremyevans, aphyr)
 
-* Correctly literalize BigDecimal NaN and (+-)Infinity values (#256) (jeremyevans)
+* Correctly literalize BigDecimal NaN and (+-)Infinity values (jeremyevans) (#256)
 
 * Make Sequel raise an Error if you attempt to subclass Sequel::Model before setting up a database connection (jeremyevans)
 

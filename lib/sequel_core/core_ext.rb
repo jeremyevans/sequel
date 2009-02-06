@@ -56,7 +56,7 @@ class Module
   # same name, caching the result in an instance variable.  Define
   # standard attr_writer method for modifying that instance variable
   def class_attr_overridable(*meths)
-    meths.each{|meth| class_eval("def #{meth}; @#{meth}.nil? ? (@#{meth} = self.class.#{meth}) : @#{meth} end")}
+    meths.each{|meth| class_eval("def #{meth}; !defined?(@#{meth}) ? (@#{meth} = self.class.#{meth}) : @#{meth} end")}
     attr_writer(*meths) 
     public(*meths) 
     public(*meths.collect{|m|"#{m}="}) 

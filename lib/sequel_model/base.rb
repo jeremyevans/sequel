@@ -2,16 +2,23 @@ module Sequel
   class Model
     @allowed_columns = nil
     @association_reflections = {}
+    @cache_store = nil
+    @cache_ttl = nil
+    @db = nil
+    @db_schema = nil
     @dataset_methods = {}
     @hooks = {}
+    @overridable_methods_module = nil
     @primary_key = :id
     @raise_on_save_failure = true
     @raise_on_typecast_failure = true
     @restrict_primary_key = true
     @restricted_columns = nil
+    @skip_superclass_validations = nil
     @sti_dataset = nil
     @sti_key = nil
     @strict_param_setting = true
+    @transform = nil
     @typecast_empty_string_to_nil = true
     @typecast_on_assignment = true
 
@@ -77,6 +84,9 @@ module Sequel
       :@sti_dataset=>nil, :@sti_key=>nil, :@strict_param_setting=>nil,
       :@typecast_empty_string_to_nil=>nil, :@typecast_on_assignment=>nil,
       :@raise_on_typecast_failure=>nil, :@association_reflections=>:dup}
+    
+    # Empty instance variables, for -w compliance
+    EMPTY_INSTANCE_VARIABLES = [:@overridable_methods_module, :@transform, :@db, :@skip_superclass_validations]
 
     # Returns the first record from the database matching the conditions.
     # If a hash is given, it is used as the conditions.  If another
@@ -201,6 +211,7 @@ module Sequel
     def self.inherited(subclass)
       sup_class = subclass.superclass
       ivs = subclass.instance_variables.collect{|x| x.to_s}
+      EMPTY_INSTANCE_VARIABLES.each{|iv| subclass.instance_variable_set(iv, nil) unless ivs.include?(iv.to_s)}
       INHERITED_INSTANCE_VARIABLES.each do |iv, dup|
         next if ivs.include?(iv.to_s)
         sup_class_value = sup_class.instance_variable_get(iv)

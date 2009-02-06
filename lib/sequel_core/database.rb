@@ -75,6 +75,9 @@ module Sequel
       @default_schema = opts.include?(:default_schema) ? opts[:default_schema] : default_schema_default
       @prepared_statements = {}
       @transactions = []
+      @identifier_input_method = nil
+      @identifier_output_method = nil
+      @quote_identifiers = nil
       if opts.include?(:upcase_identifiers)
         @identifier_input_method = opts[:upcase_identifiers] ? :upcase : ""
       end
