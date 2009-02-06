@@ -124,7 +124,7 @@ module Sequel
       # for certain databases.
       def default_index_name(table_name, columns)
         schema, table = schema_and_table(table_name)
-        "#{"#{schema}_" if schema and schema != default_schema}#{table}_#{columns.join(UNDERSCORE)}_index"
+        "#{"#{schema}_" if schema and schema != default_schema}#{table}_#{columns.map{|c| c.is_one_of?(String, Symbol) ? c : literal(c).gsub(/\W/, '_')}.join(UNDERSCORE)}_index"
       end
     
       # The SQL to drop an index for the table.

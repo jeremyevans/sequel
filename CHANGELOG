@@ -1,5 +1,7 @@
 === HEAD
 
+* Fix default index names when a non-String or Symbol column is used (jeremyevans)
+
 * Fix some ruby -w warnings (jeremyevans) (#259)
 
 * Fix issues with default column values, table names, and quoting in the rename_column and drop_column support in shared SQLite adapter (jeremyevans)

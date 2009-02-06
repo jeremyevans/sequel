@@ -327,6 +327,22 @@ context "DB#create_table" do
     @db.sqls.should == ["CREATE TABLE cats (id integer)", "CREATE INDEX cats_id_index ON cats (id)", "CREATE INDEX cats_name_index ON cats (name)"]
   end
   
+  specify "should accept functional indexes" do
+    @db.create_table(:cats) do
+      integer :id
+      index :lower.sql_function(:name)
+    end
+    @db.sqls.should == ["CREATE TABLE cats (id integer)", "CREATE INDEX cats_lower_name__index ON cats (lower(name))"]
+  end
+  
+  specify "should accept indexes with identifiers" do
+    @db.create_table(:cats) do
+      integer :id
+      index :lower__name.identifier
+    end
+    @db.sqls.should == ["CREATE TABLE cats (id integer)", "CREATE INDEX cats_lower__name_index ON cats (lower__name)"]
+  end
+  
   specify "should accept custom index names" do
     @db.create_table(:cats) do
       integer :id
