@@ -73,6 +73,10 @@ module Sequel
           Mysql::CLIENT_MULTI_STATEMENTS +
           Mysql::CLIENT_COMPRESS
         )
+
+        # increase timeout so mysql server doesn't disconnect us
+        conn.query("set @@wait_timeout = #{opts[:timeout] || 2592000}")
+
         conn.query_with_result = false
         conn.meta_eval{attr_accessor :prepared_statements}
         conn.prepared_statements = {}

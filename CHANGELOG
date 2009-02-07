@@ -1,5 +1,7 @@
 === HEAD
 
+* Add timeout option to MySQL adapter (tmm1)
+
 * Set MySQL encoding using Mysql#options so it works across reconnects (tmm1)
 
 * Fully support blobs on SQLite (jeremyevans)
