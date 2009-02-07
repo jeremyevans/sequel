@@ -71,7 +71,7 @@ module Sequel
           opts[:socket],
           Mysql::CLIENT_MULTI_RESULTS +
           Mysql::CLIENT_MULTI_STATEMENTS +
-          Mysql::CLIENT_COMPRESS
+          opts[:compress] == false ? 0 : Mysql::CLIENT_COMPRESS
         )
 
         # increase timeout so mysql server doesn't disconnect us

@@ -1,5 +1,7 @@
 === HEAD
 
+* Add compress=>false option to MySQL adapter (tmm1)
+
 * Set SQL_AUTO_IS_NULL=0 on MySQL connections (tmm1)
 
 * Add timeout option to MySQL adapter (tmm1)
