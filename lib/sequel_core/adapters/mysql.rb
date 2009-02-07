@@ -58,6 +58,10 @@ module Sequel
         opts = server_opts(server)
         conn = Mysql.init
         conn.options(Mysql::OPT_LOCAL_INFILE, "client")
+        if encoding = opts[:encoding] || opts[:charset]
+          # set charset _before_ the connect. using an option instead of "SET (NAMES|CHARACTER_SET_*)" works across reconnects
+          conn.options(Mysql::SET_CHARSET_NAME, encoding)
+        end
         conn.real_connect(
           opts[:host] || 'localhost',
           opts[:user],
@@ -70,13 +74,6 @@ module Sequel
           Mysql::CLIENT_COMPRESS
         )
         conn.query_with_result = false
-        if encoding = opts[:encoding] || opts[:charset]
-          conn.query("set character_set_connection = '#{encoding}'")
-          conn.query("set character_set_client = '#{encoding}'")
-          conn.query("set character_set_database = '#{encoding}'")
-          conn.query("set character_set_server = '#{encoding}'")
-          conn.query("set character_set_results = '#{encoding}'")
-        end
         conn.meta_eval{attr_accessor :prepared_statements}
         conn.prepared_statements = {}
         conn.reconnect = true

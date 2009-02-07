@@ -1,5 +1,7 @@
 === HEAD
 
+* Set MySQL encoding using Mysql#options so it works across reconnects (tmm1)
+
 * Fully support blobs on SQLite (jeremyevans)
 
 * Add String#to_sequel_blob, alias String#to_blob to that (jeremyevans)
