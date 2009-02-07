@@ -77,6 +77,10 @@ module Sequel
         # increase timeout so mysql server doesn't disconnect us
         conn.query("set @@wait_timeout = #{opts[:timeout] || 2592000}")
 
+        # By default, MySQL 'where id is null' selects the last inserted id
+        # See: http://dev.rubyonrails.org/ticket/6778
+        conn.query("set SQL_AUTO_IS_NULL=0")
+
         conn.query_with_result = false
         conn.meta_eval{attr_accessor :prepared_statements}
         conn.prepared_statements = {}
