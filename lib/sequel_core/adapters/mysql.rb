@@ -51,9 +51,16 @@ module Sequel
       # Connect to the database.  In addition to the usual database options,
       # the following options have effect:
       #
-      # * :encoding, :charset - Set all the related character sets for this
+      # * :auto_is_null - Set to true to use MySQL default behavior of having
+      #   a filter for an autoincrement column equals NULL to return the last
+      #   inserted row.
+      # * :charset - Same as :encoding (:encoding takes precendence)
+      # * :compress - Set to false to not compress results from the server
+      # * :encoding - Set all the related character sets for this
       #   connection (connection, client, database, server, and results).
       # * :socket - Use a unix socket file instead of connecting via TCP/IP.
+      # * :timeout - Set the timeout in seconds before the server will
+      #   disconnect this connection.
       def connect(server)
         opts = server_opts(server)
         conn = Mysql.init
@@ -71,15 +78,14 @@ module Sequel
           opts[:socket],
           Mysql::CLIENT_MULTI_RESULTS +
           Mysql::CLIENT_MULTI_STATEMENTS +
-          opts[:compress] == false ? 0 : Mysql::CLIENT_COMPRESS
+          (opts[:compress] == false ? 0 : Mysql::CLIENT_COMPRESS)
         )
 
         # increase timeout so mysql server doesn't disconnect us
         conn.query("set @@wait_timeout = #{opts[:timeout] || 2592000}")
 
         # By default, MySQL 'where id is null' selects the last inserted id
-        # See: http://dev.rubyonrails.org/ticket/6778
-        conn.query("set SQL_AUTO_IS_NULL=0")
+        conn.query("set SQL_AUTO_IS_NULL=0") unless opts[:auto_is_null]
 
         conn.query_with_result = false
         conn.meta_eval{attr_accessor :prepared_statements}
