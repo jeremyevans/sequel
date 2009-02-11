@@ -1,5 +1,7 @@
 === HEAD
 
+* Handle typecasting invalid date strings (and possible other types) correctly (jeremyevans)
+
 * Add :compress=>false option to MySQL adapter to turn off compression of client-server connection (tmm1)
 
 * Set SQL_AUTO_IS_NULL=0 on MySQL connections, disable with :auto_is_null=>false (tmm1)

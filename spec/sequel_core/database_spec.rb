@@ -1153,24 +1153,15 @@ end
 
 context "Database#typecast_value" do
   setup do
-    @db = Sequel::Database.new(1 => 2, :logger => 3)
+    @db = Sequel::Database.new
   end
-  specify "should raise InvalidValue when setting invalid integer" do
+  specify "should raise an Error::InvalidValue when given an invalid value" do
     proc{@db.typecast_value(:integer, "13a")}.should raise_error(Sequel::Error::InvalidValue)
-  end
-  specify "should raise InvalidValue when setting invalid float" do
     proc{@db.typecast_value(:float, "4.e2")}.should raise_error(Sequel::Error::InvalidValue)
-  end
-  specify "should raise InvalidValue when setting invalid decimal" do
     proc{@db.typecast_value(:decimal, :invalid_value)}.should raise_error(Sequel::Error::InvalidValue)
-  end
-  specify "should raise InvalidValue when setting invalid date" do
     proc{@db.typecast_value(:date, Object.new)}.should raise_error(Sequel::Error::InvalidValue)
-  end
-  specify "should raise InvalidValue when setting invalid time" do
+    proc{@db.typecast_value(:date, 'a')}.should raise_error(Sequel::Error::InvalidValue)
     proc{@db.typecast_value(:time, Date.new)}.should raise_error(Sequel::Error::InvalidValue)
-  end
-  specify "should raise InvalidValue when setting invalid datetime" do
     proc{@db.typecast_value(:datetime, 4)}.should raise_error(Sequel::Error::InvalidValue)
   end
 end

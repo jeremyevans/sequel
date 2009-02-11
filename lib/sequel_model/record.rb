@@ -527,11 +527,7 @@ module Sequel
       begin
         model.db.typecast_value(col_schema[:type], value)
       rescue Error::InvalidValue
-        if raise_on_typecast_failure
-          raise
-        else
-          value
-        end
+        raise_on_typecast_failure ? raise : value
       end
     end
 

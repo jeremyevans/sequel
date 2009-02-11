@@ -495,73 +495,71 @@ module Sequel
     # is invalid.
     def typecast_value(column_type, value)
       return nil if value.nil?
-      case column_type
-      when :integer
-        begin
+      begin
+        case column_type
+        when :integer
           Integer(value)
-        rescue ArgumentError => e
-          raise Sequel::Error::InvalidValue, e.message.inspect
-        end
-      when :string
-        value.to_s
-      when :float
-        begin
+        when :string
+          value.to_s
+        when :float
           Float(value)
-        rescue ArgumentError => e
-          raise Sequel::Error::InvalidValue, e.message.inspect
-        end
-      when :decimal
-        case value
-        when BigDecimal
+        when :decimal
+          case value
+          when BigDecimal
+            value
+          when String, Float
+            value.to_d
+          when Integer
+            value.to_s.to_d
+          else
+            raise Sequel::Error::InvalidValue, "invalid value for BigDecimal: #{value.inspect}"
+          end
+        when :boolean
+          case value
+          when false, 0, "0", /\Af(alse)?\z/i
+            false
+          else
+            value.blank? ? nil : true
+          end
+        when :date
+          case value
+          when Date
+            value
+          when DateTime, Time
+            Date.new(value.year, value.month, value.day)
+          when String
+            value.to_date
+          else
+            raise Sequel::Error::InvalidValue, "invalid value for Date: #{value.inspect}"
+          end
+        when :time
+          case value
+          when Time
+            value
+          when String
+            value.to_time
+          else
+            raise Sequel::Error::InvalidValue, "invalid value for Time: #{value.inspect}"
+          end
+        when :datetime
+          raise(Sequel::Error::InvalidValue, "invalid value for Datetime: #{value.inspect}") unless value.is_one_of?(DateTime, Date, Time, String)
+          if Sequel.datetime_class === value
+            # Already the correct class, no need to convert
+            value
+          else
+            # First convert it to standard ISO 8601 time, then
+            # parse that string using the time class.
+            (Time === value ? value.iso8601 : value.to_s).to_sequel_time
+          end
+        when :blob
+          ::Sequel::SQL::Blob.new(value)
+        else
           value
-        when String, Float
-          value.to_d
-        when Integer
-          value.to_s.to_d
-        else
-          raise Sequel::Error::InvalidValue, "invalid value for BigDecimal: #{value.inspect}"
         end
-      when :boolean
-        case value
-        when false, 0, "0", /\Af(alse)?\z/i
-          false
-        else
-          value.blank? ? nil : true
-        end
-      when :date
-        case value
-        when Date
-          value
-        when DateTime, Time
-          Date.new(value.year, value.month, value.day)
-        when String
-          value.to_date
-        else
-          raise Sequel::Error::InvalidValue, "invalid value for Date: #{value.inspect}"
-        end
-      when :time
-        case value
-        when Time
-          value
-        when String
-          value.to_time
-        else
-          raise Sequel::Error::InvalidValue, "invalid value for Time: #{value.inspect}"
-        end
-      when :datetime
-        raise(Sequel::Error::InvalidValue, "invalid value for Datetime: #{value.inspect}") unless value.is_one_of?(DateTime, Date, Time, String)
-        if Sequel.datetime_class === value
-          # Already the correct class, no need to convert
-          value
-        else
-          # First convert it to standard ISO 8601 time, then
-          # parse that string using the time class.
-          (Time === value ? value.iso8601 : value.to_s).to_sequel_time
-        end
-      when :blob
-        ::Sequel::SQL::Blob.new(value)
-      else
-        value
+      rescue ArgumentError => exp
+        e = Sequel::Error::InvalidValue.new("#{exp.class} #{exp.message}")
+        e.set_backtrace(exp.backtrace)
+        raise e
       end
     end
     
