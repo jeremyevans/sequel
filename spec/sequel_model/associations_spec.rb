@@ -146,6 +146,17 @@ describe Sequel::Model, "many_to_one" do
     MODEL_DB.sqls.should == ["SELECT id, name FROM nodes WHERE (nodes.id = 567) LIMIT 1"]
   end
 
+  it "should use :conditions option if given" do
+    @c2.many_to_one :parent, :class => @c2, :key => :blah, :conditions=>{:a=>32}
+    @c2.new(:id => 1, :blah => 567).parent
+    MODEL_DB.sqls.should == ["SELECT * FROM nodes WHERE ((nodes.id = 567) AND (a = 32)) LIMIT 1"]
+
+    @c2.many_to_one :parent, :class => @c2, :key => :blah, :conditions=>:a
+    MODEL_DB.sqls.clear
+    @c2.new(:id => 1, :blah => 567).parent
+    MODEL_DB.sqls.should == ["SELECT * FROM nodes WHERE ((nodes.id = 567) AND a) LIMIT 1"]
+  end
+
   it "should support :order, :limit (only for offset), and :dataset options, as well as a block" do
     c2 = @c2
     @c2.many_to_one :child_20, :class => @c2, :key=>:id, :dataset=>proc{c2.filter(:parent_id=>pk)}, :limit=>[10,20], :order=>:name do |ds|
@@ -621,6 +632,15 @@ describe Sequel::Model, "one_to_many" do
 
     n = @c2.new(:id => 1234)
     n.attributes_dataset.sql.should == "SELECT id, name FROM attributes WHERE (attributes.node_id = 1234)"
+  end
+  
+  it "should support a conditions option" do
+    @c2.one_to_many :attributes, :class => @c1, :conditions => {:a=>32}
+    n = @c2.new(:id => 1234)
+    n.attributes_dataset.sql.should == "SELECT * FROM attributes WHERE ((attributes.node_id = 1234) AND (a = 32))"
+    @c2.one_to_many :attributes, :class => @c1, :conditions => ~:a
+    n = @c2.new(:id => 1234)
+    n.attributes_dataset.sql.should == "SELECT * FROM attributes WHERE ((attributes.node_id = 1234) AND NOT a)"
   end
   
   it "should support an order option" do
@@ -1179,6 +1199,19 @@ describe Sequel::Model, "many_to_many" do
     a = n.attributes_dataset
     a.should be_a_kind_of(Sequel::Dataset)
     a.sql.should == 'SELECT attributes.* FROM attributes INNER JOIN attribute2node ON ((attribute2node.attributeid = attributes.id) AND (attribute2node.nodeid = 1234))'
+  end
+  
+  it "should support a conditions option" do
+    @c2.many_to_many :attributes, :class => @c1, :conditions => {:a=>32}
+    n = @c2.new(:id => 1234)
+    a = n.attributes_dataset
+    a.should be_a_kind_of(Sequel::Dataset)
+    a.sql.should == 'SELECT attributes.* FROM attributes INNER JOIN attributes_nodes ON ((attributes_nodes.attribute_id = attributes.id) AND (attributes_nodes.node_id = 1234)) WHERE (a = 32)'
+    @c2.many_to_many :attributes, :class => @c1, :conditions => ['a = ?', 32]
+    n = @c2.new(:id => 1234)
+    a = n.attributes_dataset
+    a.should be_a_kind_of(Sequel::Dataset)
+    a.sql.should == 'SELECT attributes.* FROM attributes INNER JOIN attributes_nodes ON ((attributes_nodes.attribute_id = attributes.id) AND (attributes_nodes.node_id = 1234)) WHERE (a = 32)'
   end
   
   it "should support an order option" do

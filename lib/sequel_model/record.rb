@@ -347,6 +347,7 @@ module Sequel
       ds = send(opts._dataset_method)
       opts[:extend].each{|m| ds.extend(m)}
       ds = ds.select(*opts.select) if opts.select
+      ds = ds.filter(opts[:conditions]) if opts[:conditions]
       ds = ds.order(*opts[:order]) if opts[:order]
       ds = ds.limit(*opts[:limit]) if opts[:limit]
       ds = ds.eager(*opts[:eager]) if opts[:eager]

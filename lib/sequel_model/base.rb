@@ -184,6 +184,7 @@ module Sequel
     # Modify and return eager loading dataset based on association options
     def self.eager_loading_dataset(opts, ds, select, associations)
       ds = ds.select(*select) if select
+      ds = ds.filter(opts[:conditions]) if opts[:conditions]
       ds = ds.order(*opts[:order]) if opts[:order]
       ds = ds.eager(opts[:eager]) if opts[:eager]
       ds = ds.eager_graph(opts[:eager_graph]) if opts[:eager_graph]

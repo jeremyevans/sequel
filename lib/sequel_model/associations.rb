@@ -103,6 +103,7 @@ module Sequel::Model::Associations
   #   - :clone - Merge the current options and block into the options and block used in defining
   #     the given association.  Can be used to DRY up a bunch of similar associations that
   #     all share the same options such as :class and :key, while changing the order and block used.
+  #   - :conditions - The conditions to use to filter the association, can be any argument passed to filter.
   #   - :dataset - A proc that is instance_evaled to get the base dataset
   #     to use for the _dataset method (before the other options are applied).
   #   - :eager - The associations to eagerly load via EagerLoading#eager when loading the associated object(s).
@@ -129,7 +130,8 @@ module Sequel::Model::Associations
   #   - :graph_block - The block to pass to join_table when eagerly loading
   #     the association via eager_graph.
   #   - :graph_conditions - The additional conditions to use on the SQL join when eagerly loading
-  #     the association via eager_graph.  Should be a hash or an array of all two pairs.
+  #     the association via eager_graph.  Should be a hash or an array of all two pairs. If not
+  #     specified, the :conditions option is used if it is a hash or array of all two pairs.
   #   - :graph_join_type - The type of SQL join to use when eagerly loading the association via
   #     eager_graph.  Defaults to :left_outer.
   #   - :graph_only_conditions - The conditions to use on the SQL join when eagerly loading
@@ -214,6 +216,8 @@ module Sequel::Model::Associations
     opts[:eager_block] = block unless opts.include?(:eager_block)
     opts[:graph_join_type] ||= :left_outer
     opts[:order_eager_graph] = true unless opts.include?(:order_eager_graph)
+    conds = opts[:conditions]
+    opts[:graph_conditions] = conds if !opts.include?(:graph_conditions) and (conds.is_a?(Hash) or (conds.is_a?(Array) and conds.all_two_pairs?))
     opts[:graph_conditions] = opts[:graph_conditions] ? opts[:graph_conditions].to_a : []
     opts[:graph_select] = Array(opts[:graph_select]) if opts[:graph_select]
     [:before_add, :before_remove, :after_add, :after_remove, :after_load, :extend].each do |cb_type|

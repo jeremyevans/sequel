@@ -328,6 +328,27 @@ describe Sequel::Model, "#eager" do
     MODEL_DB.sqls.length.should == 2
   end
   
+  it "should respect :conditions when eagerly loading" do
+    EagerBandMember.many_to_many :good_bands, :clone=>:bands, :conditions=>{:a=>32}
+    a = EagerBandMember.eager(:good_bands).all
+    a.should be_a_kind_of(Array)
+    a.size.should == 1
+    a.first.should be_a_kind_of(EagerBandMember)
+    a.first.values.should == {:id => 5}
+    MODEL_DB.sqls.should == ['SELECT * FROM members', 'SELECT bands.*, bm.member_id AS x_foreign_key_x FROM bands INNER JOIN bm ON ((bm.band_id = bands.id) AND (bm.member_id IN (5))) WHERE (a = 32) ORDER BY id']
+    a = a.first
+    a.good_bands.should be_a_kind_of(Array)
+    a.good_bands.size.should == 1
+    a.good_bands.first.should be_a_kind_of(EagerBand)
+    a.good_bands.first.values.should == {:id => 2}
+    MODEL_DB.sqls.length.should == 2
+
+    MODEL_DB.sqls.clear
+    EagerBandMember.many_to_many :good_bands, :clone=>:bands, :conditions=>"x = 1"
+    a = EagerBandMember.eager(:good_bands).all
+    MODEL_DB.sqls.should == ['SELECT * FROM members', 'SELECT bands.*, bm.member_id AS x_foreign_key_x FROM bands INNER JOIN bm ON ((bm.band_id = bands.id) AND (bm.member_id IN (5))) WHERE (x = 1) ORDER BY id']
+  end
+  
   it "should respect :order when eagerly loading" do
     a = EagerBandMember.eager(:bands).all
     a.should be_a_kind_of(Array)
@@ -1017,6 +1038,17 @@ describe Sequel::Model, "#eager_graph" do
 
     GraphAlbum.many_to_many :inner_genres, :class=>'GraphGenre', :left_key=>:album_id, :right_key=>:genre_id, :join_table=>:ag, :graph_join_table_join_type=>:inner, :graph_join_type=>:right_outer
     GraphAlbum.eager_graph(:inner_genres).sql.should == 'SELECT albums.id, albums.band_id, inner_genres.id AS inner_genres_id FROM albums INNER JOIN ag ON (ag.album_id = albums.id) RIGHT OUTER JOIN genres AS inner_genres ON (inner_genres.id = ag.genre_id)'
+  end
+
+  it "should respect the association's :conditions option" do 
+    GraphAlbum.many_to_one :active_band, :class=>'GraphBand', :key=>:band_id, :conditions=>{:active=>true}
+    GraphAlbum.eager_graph(:active_band).sql.should == "SELECT albums.id, albums.band_id, active_band.id AS active_band_id, active_band.vocalist_id FROM albums LEFT OUTER JOIN bands AS active_band ON ((active_band.id = albums.band_id) AND (active_band.active = 't'))"
+
+    GraphAlbum.one_to_many :right_tracks, :class=>'GraphTrack', :key=>:album_id, :conditions=>{:id=>(0..100)}
+    GraphAlbum.eager_graph(:right_tracks).sql.should == 'SELECT albums.id, albums.band_id, right_tracks.id AS right_tracks_id, right_tracks.album_id FROM albums LEFT OUTER JOIN tracks AS right_tracks ON ((right_tracks.album_id = albums.id) AND ((right_tracks.id >= 0) AND (right_tracks.id <= 100)))'
+
+    GraphAlbum.many_to_many :active_genres, :class=>'GraphGenre', :left_key=>:album_id, :right_key=>:genre_id, :join_table=>:ag, :conditions=>{true=>:active}
+    GraphAlbum.eager_graph(:active_genres).sql.should == "SELECT albums.id, albums.band_id, active_genres.id AS active_genres_id FROM albums LEFT OUTER JOIN ag ON (ag.album_id = albums.id) LEFT OUTER JOIN genres AS active_genres ON ((active_genres.id = ag.genre_id) AND ('t' = ag.active))"
   end
 
   it "should respect the association's :graph_conditions option" do 
