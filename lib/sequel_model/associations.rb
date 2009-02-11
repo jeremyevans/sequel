@@ -100,6 +100,9 @@ module Sequel::Model::Associations
   #   - :class - The associated class or its name. If not
   #     given, uses the association's name, which is camelized (and
   #     singularized unless the type is :many_to_one)
+  #   - :clone - Merge the current options and block into the options and block used in defining
+  #     the given association.  Can be used to DRY up a bunch of similar associations that
+  #     all share the same options such as :class and :key, while changing the order and block used.
   #   - :dataset - A proc that is instance_evaled to get the base dataset
   #     to use for the _dataset method (before the other options are applied).
   #   - :eager - The associations to eagerly load via EagerLoading#eager when loading the associated object(s).
@@ -203,7 +206,10 @@ module Sequel::Model::Associations
     raise(Error, 'Model.associate name argument must be a symbol') unless Symbol === name
 
     # merge early so we don't modify opts
-    opts = opts.merge(:type => type, :name => name, :block => block, :cache => true, :model => self)
+    orig_opts = opts.dup
+    orig_opts = association_reflection(opts[:clone])[:orig_opts].merge(orig_opts) if opts[:clone]
+    opts = orig_opts.merge(:type => type, :name => name, :cache => true, :model => self)
+    opts[:block] = block if block
     opts = assoc_class.new.merge!(opts)
     opts[:eager_block] = block unless opts.include?(:eager_block)
     opts[:graph_join_type] ||= :left_outer
@@ -225,6 +231,9 @@ module Sequel::Model::Associations
 
     send(:"def_#{type}", opts)
 
+    orig_opts.delete(:clone)
+    orig_opts.merge!(:class_name=>opts[:class_name], :class=>opts[:class], :block=>block)
+    opts[:orig_opts] = orig_opts
     # don't add to association_reflections until we are sure there are no errors
     association_reflections[name] = opts
   end

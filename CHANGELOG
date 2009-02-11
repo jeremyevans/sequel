@@ -1,5 +1,7 @@
 === HEAD
 
+* Add :clone association option, for making clones of existing associations (jeremyevans)
+
 * Handle typecasting invalid date strings (and possible other types) correctly (jeremyevans)
 
 * Add :compress=>false option to MySQL adapter to turn off compression of client-server connection (tmm1)

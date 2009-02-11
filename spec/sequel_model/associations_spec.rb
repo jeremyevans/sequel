@@ -15,6 +15,7 @@ describe Sequel::Model, "associate" do
     klass.association_reflection(:"par_parent1s").associated_class.should == ParParent
     klass.association_reflection(:"par_parent2s").associated_class.should == ParParent
   end
+
   it "should allow extending the dataset with :extend option" do
     MODEL_DB.reset
     klass = Class.new(Sequel::Model(:nodes)) do
@@ -41,6 +42,34 @@ describe Sequel::Model, "associate" do
     node.cs_dataset.blah.should == 1
     node.cs_dataset.blar.should == 2
   end
+
+  it "should clone an existing association with the :clone option" do
+    MODEL_DB.reset
+    klass = Class.new(Sequel::Model(:nodes))
+    
+    klass.many_to_one(:par_parent, :order=>:a){1}
+    klass.one_to_many(:par_parent1s, :class=>'ParParent', :limit=>12){4}
+    klass.many_to_many(:par_parent2s, :class=>:ParParent, :uniq=>true){2}
+
+    klass.many_to_one :par, :clone=>:par_parent, :select=>:b
+    klass.one_to_many :par1s, :clone=>:par_parent1s, :order=>:b, :limit=>10, :block=>nil
+    klass.many_to_many(:par2s, :clone=>:par_parent2s, :order=>:c){3}
+    
+    klass.association_reflection(:par).associated_class.should == ParParent
+    klass.association_reflection(:par1s).associated_class.should == ParParent
+    klass.association_reflection(:par2s).associated_class.should == ParParent
+    
+    klass.association_reflection(:par)[:order].should == :a
+    klass.association_reflection(:par).select.should == :b
+    klass.association_reflection(:par)[:block].call.should == 1
+    klass.association_reflection(:par1s)[:limit].should == 10
+    klass.association_reflection(:par1s)[:order].should == :b
+    klass.association_reflection(:par1s)[:block].should == nil
+    klass.association_reflection(:par2s)[:after_load].length.should == 1
+    klass.association_reflection(:par2s)[:order].should == :c
+    klass.association_reflection(:par2s)[:block].call.should == 3
+  end
+
 end
 
 describe Sequel::Model, "many_to_one" do
