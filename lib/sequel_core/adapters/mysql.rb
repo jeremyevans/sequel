@@ -45,7 +45,7 @@ module Sequel
       # Support stored procedures on MySQL
       def call_sproc(name, opts={}, &block)
         args = opts[:args] || [] 
-        execute("CALL #{name}(#{literal(args) unless args.empty?})", opts.merge(:sproc=>false), &block)
+        execute("CALL #{name}#{args.empty? ? '()' :literal(args)}", opts.merge(:sproc=>false), &block)
       end
       
       # Connect to the database.  In addition to the usual database options,

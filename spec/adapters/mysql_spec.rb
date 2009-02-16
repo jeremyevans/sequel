@@ -858,12 +858,24 @@ unless MYSQL_DB.class.adapter_scheme == :do
     
     specify "should be callable on the dataset object" do
       MYSQL_DB.execute('CREATE PROCEDURE test_sproc(a INTEGER) BEGIN SELECT *, a AS b FROM items; END')
+      MYSQL_DB[:items].delete
       @d = MYSQL_DB[:items]
       @d.call_sproc(:select, :test_sproc, 3).should == []
       @d.insert(:value=>1)
       @d.call_sproc(:select, :test_sproc, 4).should == [{:id=>nil, :value=>1, :b=>4}]
       @d.row_proc = proc{|r| r.keys.each{|k| r[k] *= 2 if r[k].is_a?(Integer)}; r}
       @d.call_sproc(:select, :test_sproc, 3).should == [{:id=>nil, :value=>2, :b=>6}]
+    end
+    
+    specify "should be callable on the dataset object with multiple arguments" do
+      MYSQL_DB.execute('CREATE PROCEDURE test_sproc(a INTEGER, c INTEGER) BEGIN SELECT *, a AS b, c AS d FROM items; END')
+      MYSQL_DB[:items].delete
+      @d = MYSQL_DB[:items]
+      @d.call_sproc(:select, :test_sproc, 3, 4).should == []
+      @d.insert(:value=>1)
+      @d.call_sproc(:select, :test_sproc, 4, 5).should == [{:id=>nil, :value=>1, :b=>4, :d=>5}]
+      @d.row_proc = proc{|r| r.keys.each{|k| r[k] *= 2 if r[k].is_a?(Integer)}; r}
+      @d.call_sproc(:select, :test_sproc, 3, 4).should == [{:id=>nil, :value=>2, :b=>6, :d => 8}]
     end
   end
 end
