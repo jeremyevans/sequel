@@ -1,5 +1,7 @@
 === HEAD
 
+* Fix stored procedures in MySQL adapter when multiple arguments are used (clivecrous)
+
 * Add :conditions association option, for easier filtering of associated objects (jeremyevans)
 
 * Add :clone association option, for making clones of existing associations (jeremyevans)
