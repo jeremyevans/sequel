@@ -17,7 +17,7 @@ module Sequel
     def self.set_cache(store, opts = {})
       @cache_store = store
       @cache_ttl = opts[:ttl] || 3600
-      before_save :cache_delete_unless_new
+      before_update :cache_delete
       before_update_values :cache_delete
       before_delete :cache_delete
     end
@@ -77,11 +77,6 @@ module Sequel
     # Delete this object from the cache
     def cache_delete
       model.send(:cache_delete, cache_key)
-    end
-
-    # Delete this object from the cache unless it is a new record
-    def cache_delete_unless_new
-      cache_delete unless new?
     end
   end
 end
