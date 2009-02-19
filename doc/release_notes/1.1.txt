@@ -1,0 +1,143 @@
+=== DRY Sequel models
+
+With the new Sequel release you no longer need to explicitly specify
+the table
+name for each model class, assuming your model name is the singular of
+the
+table name (just like in ActiveRecord or DataMapper):
+
+  class UglyBug < Sequel::Model
+  end
+
+  UglyBug.table_name #=> :ugly_bugs
+
+=== New model validations and support for virtual attributes
+
+Sequel model now include validation functionality which largly follows
+the
+validations offered in ActiveRecord. Validations can be checked
+anytime by
+calling Model#valid?, with validation errors accessible through
+Model#errors:
+
+  class Item < Sequel::Model
+    validates_presence_of :name
+  end
+
+  my_item = Item.new
+  my_item.valid? #=> false
+  my_item.errors.full_messages #=> ["name is not present"]
+
+The Model#save method has been changed to check for validity before
+saving. If
+the model instance is not valid, the #save method returns false
+without saving
+the instance. You can also bypass the validity test by calling
+Model#save!
+instead.
+
+Model classes also now support virtual attributes, letting you assign
+values to
+any attribute (virtual or persistent) at initialization time:
+
+  class User < Sequel::Model
+    attr_accessor :password
+  end
+
+  u = User.new(:password => 'blah', ...)
+  u.password #=> 'blah'
+
+Also, virtual attributes can be validated just like persistent
+attributes.
+
+=== Other changes (long list!)
+
+* Added Model#reload as alias to Model#refresh.
+
+* Changed Model.create to accept a block (#126).
+
+* Fixed Model#initialize to accept nil values (#115).
+
+* Added Model#update_with_params method with support for virtual
+attributes and auto-filtering of unrelated parameters, and changed
+Model.create_with_params to support virtual attributes (#128).
+
+* Fixed Model.dataset to correctly set the dataset if using implicit
+naming or inheriting the superclass dataset (thanks celldee).
+
+* Finalized support for virtual attributes.
+
+* Fixed Model#set to work with string keys (#143).
+
+* Fixed Model.create to correctly initialize instances marked as new
+(#135).
+
+* Fixed Model#initialize to convert string keys into symbol keys. This
+also fixes problem with validating objects initialized with string
+keys (#136).
+
+* Added Dataset#table_exists? convenience method.
+
+* Changed Dataset#group_and_count to accept multiple columns (#134).
+
+* Added Dataset#select_all method.
+
+* Added Dataset#select_more, Dataset#order_more methods (#129).
+
+* Fixed Dataset#count to work correctly for grouped datasets (#144).
+
+* Fixed joining datasets using aliased tables (#140).
+
+* Added support for UNSIGNED constraint, used in MySQL? (#127).
+
+* Implemented constraint definitions inside Database#create_table.
+
+* Enhanced Database.connect to accept options with string keys, so it
+can now accept options loaded from YAML files. Database.connect also
+automatically converts :username option into :user for compatibility
+with existing YAML configuration files for AR and DataMapper.
+
+* Changed ODBC::Database to support connection using driver and
+database name, also added support for untitled columns in
+ODBC::Dataset (thanks Leonid Borisenko).
+
+* Changed MySQL adapter to support specifying socket option.
+
+* Fixed MySQL adapter to correctly format foreign key definitions
+(#123).
+
+* Changed MySQL::Dataset to allow HAVING clause on ungrouped datasets,
+and put HAVING clause before ORDER BY clause (#133).
+
+* Changed mysql adapter to default to localhost if :host option is not
+specified (#114).
+
+* Added String#to_date. Updated mysql adapter to use String#to_date
+for mysql date types (thanks drfreeze).
+
+* Fixed postgres adapter to define PGconn#async_exec as alias to #exec
+if not defined (for pure-ruby postgres driver).
+
+* Changed postgres adapter to quote column references using double
+quotes.
+
+* Applied patch for oracle adapter: fix behavior of limit and offset,
+transactions, #table_exists?, #tables and additional specs (thanks
+Liming Lian #122).
+
+* Added support additional field types in postgresql adapter (#146).
+
+* Added support for date field types in postgresql adapter (#145).
+
+* Added support for limiting and paginating datasets with fixed SQL,
+e.g. using Database#fetch.
+
+* Added new Dataset#from_self method that returns a dataset selecting
+from the original dataset.
+
+* Allow for additional filters on a grouped dataset (#119 and #120)
+
+* Refactored Sequelizer to use Proc#to_sexp (method provided by r2r).
+
+* Fixed bin/sequel to require sequel_model if available.
+

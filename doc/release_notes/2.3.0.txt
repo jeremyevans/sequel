@@ -1,0 +1,88 @@
+JRuby and Ruby 1.9 Officially Supported
+---------------------------------------
+
+Sequel now officially supports JRuby 1.1.3 and Ruby 1.9 (svn revision
+18194 at least).  Using JRuby with the JDBC adapter, PostgreSQL,
+MySQL, and SQLite now enjoy almost full support, though not
+everything works the same as using the native adapter.  Depending on
+what you are doing, it may make sense to use postgres-pr on JRuby
+instead of PostgreSQL-JDBC.
+
+To use the new JDBC support, the database connection string you give
+Sequel is now passed directly to JDBC, here are a few examples:
+
+  Sequel.connect('jdbc:postgresql://host/database?user=*&password=*')
+  Sequel.connect('jdbc:mysql://host/database?user=*&password=*')
+  Sequel.connect('jdbc:sqlite::memory:')
+  Sequel.connect('jdbc:sqlite:relative/path.db')
+  Sequel.connect('jdbc:sqlite:/absolute/path.db')
+
+Single Gem
+----------
+
+Sequel is now distributed as a single gem named sequel, by combining
+the previous sequel_core and sequel gems.  You can still just
+"require 'sequel_core'" if you don't want the model functionality.
+
+Database Adapter Improvements
+-----------------------------
+
+* Dataset#empty? now works using the MySQL adapter.
+
+* The Oracle adapter now works with a nonstandard database port.
+
+* The JDBC adapter should load JDBC drivers automatically for
+  PostgreSQL, MySQL, SQLite, Oracle, and MSSQL.  For PostgreSQL,
+  MySQL, and SQLite, the jdbc-* gem can be used, for the others, you
+  must have the correct .jar in your CLASSPATH.
+
+* The PostgreSQL adapter no longer raises an error when inserting
+  records into a table without a primary key.
+
+* Database#disconnect now works for the ADO adapter.
+
+* The ADO adapter no longer raises an error if the dataset contains
+  no records.
+
+* The ODBC adapter no longer errors when converting ::ODBC::Time
+  values.
+
+Backwards Incompatible Changes
+------------------------------
+
+* Sequel::Worker has been removed.  There are no known users, and the
+  specs caused problems on JRuby.
+
+* Assigning an empty string to a non-string, non-blob model attribute
+  converts it to nil by default.  You can use
+  "Model.typecast_empty_string_to_nil = false" to get the old
+  behavior.  This should make web development with Sequel
+  significantly easier, hopefully at no expense to other uses.
+
+* Database.uri_to_options is now a private class method.
+
+* Model.create_table! now acts the same as Database.create_table!,
+  dropping the table unconditionally and then creating it.  This was
+  done for consistency.  If you are using Model.create_table! in
+  production code, you should change it to
+  "Model.create_table unless Model.table_exists?", otherwise you risk
+  wiping out your production data.  I recommended you use the
+  migration feature instead of Model.set_schema, as that handles
+  altering existing tables.
+
+Other Notable Changes
+---------------------
+
+* Using validates_length_of more than once on the same attribute with
+  different options without a tag no longer causes the first use to
+  be ignored.  This was a side effect of the validation tags added
+  in 2.2.0.
+
+* Other than the adapters, Sequel now has 100% code coverage (line
+  coverage).
+
+* Model#set* methods now return self.
+
+* An integration test suite was added, testing Sequel against a live
+  database with nothing mocked, which helped greatly when testing the
+  new support for JDBC adapters.

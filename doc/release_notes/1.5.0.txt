@@ -1,0 +1,155 @@
+You can now graph a dataset and have the result split into component
+tables:
+
+  DB[:artists].graph(:albums, :artist_id=>:id).first
+  # => {:artists=>{:id=>artists.id, :name=>artists.name}, \
+  # :albums=>{:id=>albums.id, :name=>albums.name,
+:artist_id=>albums.artist_id}}
+
+This aliases columns if necessary so they don't stomp on each other,
+which
+is what usually happens if you just join the tables:
+
+  DB[:artists].left_outer_join(:albums, :artist_id=>:id).first
+  # => {:id=>(albums.id||artists.id),
+:name=>(albums.name||artist.names), \
+        :artist_id=>albums.artist_id}
+
+Models can use graph as well, in which case the values will be model
+objects:
+
+  Artist.graph(Album, :artist_id=>:id)
+  # => {:artists=>#<Artist...>, :albums=>#<Album...>}
+
+Models can now eager load via .eager_graph, which will load all the
+results
+and all associations in a single query.  This is necessary if you want
+to
+filter on columns in associated tables.  It works exactly the same way
+as
+.eager, and supports cascading of associations as well:
+
+  # Artist.one_to_many :albums
+  # Album.one_to_many :tracks
+  # Track.many_to_one :genre
+  Artist.eager_graph(:albums=>{:tracks=>:genre}).filter( \
+    :tracks_name=>"Firewire").all
+
+This will give you all artists have have an album with a track named
+"Firewire", and calling .albums on one of those artists will only return
+albums that have a track named "Firewire", and calling .tracks on one of
+those albums will return only the track(s) named "Firewire".
+
+You can use set_graph_aliases to select specific columns:
+
+  DB[:artists].graph(:albums, :artist_id=>:id).set_graph_aliases( \
+    :artist_name=>[:artists, :name], :album_name=>[:albums,
+:name]).first
+  # => {:artists=>{:name=>artists.name}, :albums=>{:name=>albums.name}}
+
+You can use eager_graph with set_graph_aliases to have eager loading
+with
+control over the SELECT clause.
+
+All associations now update their reciprocal associations whenever the
+association methods are used, so you don't need to refresh the
+association or model to have the reciprocal association updated:
+
+  Album.many_to_one :band
+  Band.one_to_many :albums
+
+  # Note that all of these associations are cached,
+  # so after the first access there are no additional
+  # database queries to fetch associated records.
+
+  # many_to_one setter adds to reciprocal association
+  band1.albums # => []
+  album1.band = band1
+  band1.albums # => [album1]
+  band2.albums # => []
+  album1.band = band2
+  band1.albums # => []
+  band2.albums # => [album1]
+  album1.band = band2
+  band2.albums # => [album1]
+  album1.band = nil
+  band2.albums # => []
+
+  # one_to_many add_* method sets reciprocal association
+  # one_to_many remove_* method removes reciprocal association
+  album1.band # => nil
+  band1.add_album(album1)
+  album1.band # => band1
+  band2.add_album(album1)
+  album1.band # => band2
+  band2.remove_album(album1)
+  album1.band # => nil
+
+  Post.many_to_many :tags
+  Tag.many_to_many :posts
+
+  # many_to_many add_* method adds to reciprocal association
+  # many_to_many remove_* method removes from reciprocal association
+  post1.tags # => []
+  tag1.posts # => []
+  tag1.add_post(post1)
+  post1.tags # => [tag1]
+  tag1.posts # => [post1]
+  tag1.remove_post(post1)
+  post1.tags # => []
+  tag1.posts # => []
+  post1.add_tag(tag1)
+  post1.tags # => [tag1]
+  tag1.posts # => [post1]
+  post1.remove_tag(tag1)
+  post1.tags # => []
+  tag1.posts # => []
+
+The MySQL and PostgreSQL adapters now support index types:
+
+  index :some_column, :type => :hash # or :spatial, :full_text, :rtree,
+etc.
+
+Starting in Sequel 1.5.0, some methods are deprecated.  These methods
+will be
+removed in Sequel 2.0.0.  The deprecation framework is fairly flexible.
+You
+can choose where the messages get sent:
+
+  Sequel::Deprecation.deprecation_message_stream = STDERR # the default
+  Sequel::Deprecation.deprecation_message_stream = \
+    File.new('deprecation.txt', 'wb') # A file
+  Sequel::Deprecation.deprecation_message_stream = nil # ignore the
+messages
+
+You can even have all deprecation messages accompanied by a traceback,
+so you
+can see exactly where in your code you are using a deprecated method:
+
+  Sequel::Deprecation.print_tracebacks = true
+
+All deprecation methods come with an message telling you what
+alternative code
+will work.
+
+In addition to deprecating some methods, we removed the ability to have
+arrays returned instead of hashes.  The array code still had debugging
+messages
+left it in, and we are not aware of anyone using it.  Hashes have been
+returned
+by default since Sequel 0.3.
+
+We have also removed the Numeric date/time extensions (e.g. 3.days.ago).
+The
+existing extensions were incomplete, better ones are provided elsewhere,
+and the extensions were not really related to Sequel's purpose.
+
+Sequel no longer depends on ParseTree, RubyInline, or ruby2ruby.  They
+are
+still required to use the block filters.  Sequel's only gem dependency
+is on
+the tiny metaid.
+
+Sequel 1.5.0 has fixes for 12 tracker issues, including fixes to the
+Informix,
+MySQL, ODBC, ADO, JDBC, Postgres, and SQLite adapters.

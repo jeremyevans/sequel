@@ -1,0 +1,328 @@
+New Supported Adapters and Databases
+------------------------------------
+
+* A DataObjects adapter was added that supports PostgreSQL,
+  MySQL, and SQLite.  DataObjects is the underlying database
+  library used by DataMapper, and has potential performance
+  advantages by doing all typecasting in C.
+
+* A Firebird Adapter was added, it requires the modified Ruby
+  Fb adapter found at http://github.com/wishdev/fb.
+
+* An H2 JDBC subadapter was added, based on the code used in JotBot.
+  H2 is an embeddable Java database, and may be preferable to using
+  SQLite on JDBC because SQLite requires native code.
+
+New Core Features
+-----------------
+
+* Sequel now has database independent migrations.  Before, column
+  types in migrations were not translated per database, so it was
+  difficult to set up a migration that worked on multiple databases.
+  Sequel now accepts ruby classes as database types, in addition to
+  symbols and strings.  If a ruby class is used, it is translated
+  to the most appropriate database type.  Here is an example using
+  all supported classes (with Sequel's default database type):
+
+    DB.create_table(:cats) do
+      primary_key :id, :type=>Integer # integer
+      String :a                       # varchar(255)
+      column :b, File                 # blob
+      Fixnum :c                       # integer
+      foreign_key :d, :other_table, :type=>Bignum # bigint
+      Float :e                        # double precision
+      BigDecimal :f                   # numeric
+      Date :g                         # date
+      DateTime :h                     # timestamp
+      Time :i                         # timestamp
+      Numeric :j                      # numeric
+      TrueClass :k                    # boolean
+      FalseClass :l                   # boolean
+    end
+
+  Type translations were tested on the PostgreSQL, MySQL, SQLite,
+  and H2 databases.  The default translations should work OK for
+  most databases, but there will probably be a type or two that
+  doesn't work.  Please send in a patch if Sequel uses a column type
+  that doesn't work on your database.
+
+  Note that existing migrations still work fine, in most cases.  If
+  you were using strings or symbols for types before, they should
+  still work.  See the Backwards Compatibility section below for
+  details.
+
+  Also note that this doesn't relate solely to migrations, as any
+  database schema modification method that accepts types will
+  accept one of the above classes.
+
+* A ton of internal work was done to better support databases that
+  fold unqouted identifiers to uppercase (which is the SQL standard).
+  Sequel now allows you to set a method to call on identifiers going
+  both into and out of the database.  The default is to downcase
+  identifiers coming out, and upcase identifiers going in, though
+  this is overridden by the PostgreSQL, MySQL, and SQLite adapters
+  to not do anything (since they fold to lowercase by default).
+
+  The settings are called identifier_input_method and
+  identifier_output_method, and like most Sequel settings, they can
+  be set globally, per database, or per dataset:
+
+    # Global (use uppercase in ruby and lowercase in the database)
+    Sequel.identifier_input_method = :downcase
+    Sequel.identifier_output_method = :upcase
+    # Per Database (use camelized names in the database, and
+    #               underscored names in ruby)
+    DB.identifier_input_method = :camelize
+    DB.identifier_output_method = :underscore
+    # Per Dataset (obfuscate your database columns!)
+    class String; def rot_13; tr('A-Za-z', 'N-ZA-Mn-za-m') end end
+    ds = DB[:table]
+    ds.identifier_input_method = :rot_13
+    ds.identifier_output_method = :rot_13
+
+* Schema parsing support was added to the JDBC adapter, using the
+  JDBC metadata methods.  This means that models that use the
+  JDBC adapter will typecast data in their column setters and
+  automatically select the correct primary key column(s).  This is
+  currently the only adapter that supports schema parsing when using
+  an MSSQL or Oracle database.
+
+* Database#create_table now takes options, which you can use to
+  specify a MySQL engine, charset, and/or collation.  You can also
+  set a default engine, charset, and collation for MySQL to use:
+
+    Sequel::MySQL.default_engine = 'InnoDB'
+    Sequel::MySQL.default_charset = 'utf8'
+    Sequel::MySQL.default_collate = 'utf8'
+
+  The defaults will be used if the options are not provided.  If a
+  default engine is set, you can specify :engine=>nil to not use it
+  (same goes for charset and collate).
+
+* The Sequel::DatabaseConnectionError exception class was added.  It
+  is raised by the connection pool if there is an error attempting
+  to instantiate a database connection.  Also, if the adapter returns
+  nil instead of raising an error for faulty connection parameters,
+  DatabaseConnectionError will be raised immediately, instead of the
+  connection pool busy waiting until if gives up with a
+  PoolTimeoutError.
+
+* Database#tables is now supported on the JDBC adapter, returning
+  an Array of table name symbols.
+
+* Sequel now converts the following Java types returned by the JDBC
+  adapter into ruby types: Java::JavaSQL::Timestamp,
+  Java::JavaSQL::Time, Java::JavaSQL::Date,
+  Java::JavaMath::BigDecimal, and Java::JavaIo::BufferedReader.
+
+* When using the PostgreSQL adapter with the postgres-pr driver,
+  Sequel will use a custom string escaping routine unless
+  force_standard_strings = false.  This means that using Sequel's
+  defaults, postgres-pr will correctly escape strings now.
+
+* The SQLite adapter now returns float, real, and double precision
+  columns as Floats.
+
+* The SQLite adapter logs beginning, committing, and rolling back
+  transactions.
+
+* Sequel now has an internal version (before, the only way to tell
+  the version was to look at the gem being used).  It is accessible
+  at Sequel.version.
+
+New Model Features
+------------------
+
+* A new validates_not_string validation was added for Sequel Models.
+  It is intended to be used with the raise_on_typecast_failure =
+  false setting.  In this case, for a non-string database column,
+  if there is a string value when the record is going to be
+  saved, it is due to the fact that Sequel was not able to typecast
+  the given data correctly (so it is almost certainly not valid).
+  This should make Sequel easier to use with web applications.
+
+* An :allow_missing validation option was added to all standard
+  validations.  This option skips the validation if the attribute
+  is not in the object's values.  It is different from :allow_nil,
+  which will skip the value if it is present but nil in the values.
+  The intended use case for this option is when the database provides
+  a good default.  If the attribute is not present in values, the
+  database will use its default.  If the attribute is present in
+  the values but equals nil, Sequel will attempt to insert it into
+  the database as a NULL value, instead of using the database's
+  default.  If you don't want Sequel to insert a NULL value in the
+  database, but you want the database to provide the default, this
+  is the option to use.
+
+* validates_each now accepts :allow_nil and :allow_blank options,
+  so it is easier to create custom validations with the same options
+  as the standard validations.
+
+* Before_* hooks now run in the reverse order that they were added.
+  The purpose of hooks is to wrap existing functionality, and making
+  later before_* hooks run before previous before_* hooks is the
+  correct behavior.
+
+* You can now add you own hook types, via Model.add_hook_type.  This
+  is intended for plugin use.  All of the standard hooks are now
+  implemented using this method.
+
+* The value of new? in a after_save hook now reflects the
+  previous state of the model (so true for a create and false for an
+  update), instead of always being false.  This makes it easier
+  to have a complex after_save hook that still needs to
+  differentiate between a newly created record and an updated record,
+  without having to add separate after_create and after_update
+  hooks.
+
+* The value of changed_columns in an after_update hook now reflects
+  the value before the update occurred, instead of usually being
+  empty.  Previously, to have this functionality, you generally had
+  to save the value to an instance variable in a before_update hook
+  so you could reference it in the after_update hook.
+
+Other Improvements
+------------------
+
+* Sequel now longer overwrites the following Symbol instance methods
+  when running on ruby 1.9: [], <, <=, >, and >=.  One of Sequel's
+  principals is that it does not override methods defined by ruby,
+  and now that ruby 1.9 defines the above methods on Symbol, Sequel
+  shouldn't be overwriting them.
+
+  Sequel already provides a way to work around this issue when
+  another library adds the same methods to Symbol that Sequel does.
+  For example, you need to change the following:
+
+    dataset.filter(:number > 1)
+    dataset.filter(:number >= 2)
+    dataset.filter(:name < 'M')
+    dataset.filter(:name <= 'I')
+    dataset.filter(:is_bool[:x])
+
+  To:
+
+    dataset.filter{|o| o.number > 1}
+    dataset.filter{|o| o.number >= 2}
+    dataset.filter{|o| o.name < 'M'}
+    dataset.filter{|o| o.name <= 'I'}
+    dataset.filter{|o| o.is_bool(:x)}
+
+  The argument provided to the block is a Sequel::SQL::VirtualRow.
+  This class uses method_missing so that any methods called on it
+  return Sequel::SQL::Identifiers (if no arguments are provided)
+  or Sequel::SQL::Function (if arguments are provided).
+
+  If you were using one of the above symbol methods outside of a
+  filter, you can to call sql_string, sql_number, or sql_function
+  on the symbol.  So the following would also work:
+
+    dataset.filter(:number.sql_number > 1)
+    dataset.filter(:number.sql_number >= 2)
+    dataset.filter(:name.sql_string < 'M')
+    dataset.filter(:name.sql_number <= 'I')
+    dataset.filter(:is_bool.sql_function(:x))
+
+  Using the block argument makes for a nicer API, though, so I
+  recommend using it when possible.
+
+  Note that if you are running ruby 1.8 or jruby without the --1.9
+  flag, you don't need to worry.  If you are running ruby 1.9 or
+  jruby --1.9, or you plan to at some point in the future, you
+  should inspect your code for existing uses of these methods.
+  Here are a couple command lines that should find most uses:
+
+    # Find :symbol[]
+    egrep -nr ':['\''"]?[a-zA-Z_0-9]*['\''"]?\[' *
+    # Find :symbol (<|>|<=|>=)
+    egrep -nr '[^:]:['\''"]?[a-zA-Z_0-9]*['\''"]? *[<>]=?' *
+
+* Database#quote_identifiers now affects future schema modifications
+  when using the database.  Previous, it only affected future
+  schema modifications if a schema modification method had not yet
+  been called.
+
+* Literalization of Times and DateTimes is now correct when using the
+  MySQL JDBC subadapter.
+
+* Literalization of Blobs is now correct when using the PostgreSQL
+  JDBC subadapter.
+
+* Index and table names are quoted when creating indices in the
+  PostgreSQL adapter.
+
+* Dataset#delete was changed in the SQLite adapter to add a
+  where clause that is always true, instead of doing an explicit
+  count first and the deleting.  This is simpler, though it
+  could potentially have performance implications.
+
+* The sequel command line tool now supports symbol keys and unnested
+  hashes in YAML files, so it should work with Merb's database.yml.
+  It also includes the error class in the case of an error.
+
+* The integration type tests were greatly expanded.  Generally,
+  running the integration tests is a good way to determine how well
+  your database is supported.
+
+* Dataset#quote_identifier now returns LiteralStrings as-is, instead
+  of treating them as regular strings.
+
+* Sequel no longer modifies the MySQL::Result class when using the
+  MySQL adapter.
+
+Backwards Compatibilty
+----------------------
+
+* If you were previously using a database that returned uppercase
+  identifiers, it will probably return lowercase identifiers by
+  default now.  To get back the old behavior:
+
+    DB.identifier_output_method = nil
+
+* The module hierarchy under Sequel::SQL has changed.  Now,
+  modules do not include other modules, and the following modules
+  were removed since they would have been empty after removing
+  the modules they included: Sequel::SQL::SpecificExpressionMethods
+  and Sequel::SQL::GenericExpressionMethods.
+
+* Sequel no longer assumes the public schema by default when
+  connecting to PostgreSQL.  You can still set the default
+  schema to use (even to public).
+
+* The ability to load schema information for all tables at once
+  was removed from the PostgreSQL adapter.  While it worked, it had
+  some issues, and it was difficult to keep it working when some
+  new features were used.  This ability wasn't exposed to the user,
+  and was purely an optimization.  If you have any code like:
+
+    DB.schema
+
+  by itself after the Database object was instantiated, you should
+  remove it.
+
+* The Database#primary_key API changed in the PostgreSQL shared
+  adapter, it now accepts an options hash with :server and :conn keys
+  instead of a server symbol.  Also, quite a few private Database
+  instance methods changed, as well as some constants in the
+  AdapterMethods.
+
+* It is possible that some migrations will break, though it is
+  unlikely.  If you were using any of the classes mentioned above
+  as a method inside a migration, it might be broken.  However,
+  since String, Float, and Integer wouldn't have worked as methods
+  before, it is unlikely that anyone used this.
+
+* The meaning of #String, #Integer, and #Float inside
+  Sequel::SQL::Generator (i.e. inside a Database#create_table
+  block) has changed.  Before, these used to call private Kernel
+  methods, now, they set up columns with the appropriate database
+  type.
+
+* The Database#lowercase method in the DBI adapter was removed,
+  as its use case is now met by the identifier_output_method support.
+
+* Database#uri is now aliased explicitly via a real method, to
+  allow for easier subclassing.
+
+* You can no longer pass nil as the second argument to
+  Database#create_table.

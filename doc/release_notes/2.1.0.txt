@@ -1,0 +1,271 @@
+Model Improvements
+------------------
+
+* one_to_many/many_to_many associations now support a :limit option,
+  adding a limit/offset to the records returned.  This was possible
+  before using a block, so it is just added for convenience.
+
+* Associations now support a :read_only option, which doesn't create
+  methods that modify the database.
+
+* Associations now support a :graph_select option, which allows
+  specifying the columns of associated models to include when using
+  eager_graph.
+
+* one_to_many associations now have a :one_to_one option.  When used
+  it creates a getter and setter method similar to many_to_one.  This
+  fills the same role as ActiveRecord's has_one, but it is
+  implemented as a couple of convenience methods over one_to_many, so
+  it still requires that you specify the association name as a
+  plural.
+
+* Model datasets now have to_hash augmented so that it can be called
+  without any arguments, in which case it yields an identity map (a
+  hash with keys being primary key values and values being model
+  instances).
+
+* The Model.set_sti_key method was added, for easily setting up
+  single table inheritance.  It should be called only in the parent
+  class.
+
+* Calls to def_dataset_method with a block are now cached and
+  reapplied to the new dataset if set_dataset is called afterward,
+  or in a subclass.
+
+* All validation methods can now be made conditional via an :if
+  option, which takes either a symbol (which specifies an instance
+  method) or a proc (which is instance_evaled).
+
+* Model#set and Model#update have been added back, they are now
+  aliases of #set_with_params and #update_with_params.
+
+* Models now have set_only/set_except/update_only/update_except
+  instance methods that take a hash (like you would provide to
+  set or update) and additional arguments specifying which columns
+  to allow or disallow.
+
+* Models now have a set_allowed_columns and set_restricted_columns
+  methods, which operate similarly to ActiveRecord's attr_accessible
+  and attr_protected.  It is recommend that you use the set_only or
+  update_only instead of these methods, though.  You can ignore the
+  allowed or restricted columns by using #set_all or #update_all.
+
+* The primary key column(s) is restricted by default. To allow it to
+  be set via new/set/update, use:
+
+    Sequel::Model.unrestrict_primary_key # Global
+    Artist.unrestrict_primary_key # Per Class
+
+* It is now easy to override the one_to_many/many_to_many association
+  methods that modify the database (add_/remove_/remove_all_), as
+  they have been broken into two methods, one that handles the
+  caching features and a private one (prepended with an _) that
+  handles the database changes (and which you can easily override
+  without worrying about the caching).
+
+Table Joining
+-------------
+
+Dataset#join_table got a nice overhaul.  You can now use any join
+type your database allows:
+
+  DB[:artist].join_table(:natural, :albums)
+  DB[:numbers].join_table(:cross, :numbers)
+
+You can now specify the conditions as
+
+* String: "a.b = c.d" # ON a.b = c.d
+* Expression :x < :y # ON x < y
+* Array of Symbols: [:x, :y, :z] # USING (x, y, z)
+* nil # no conditions, used for NATURAL or CROSS joins
+
+Dataset#join_table also takes a block that yields three arguments:
+
+* join_table_alias - The alias/name of the table currently being
+  joined
+* last_join_table_alias - The alias name of the last table joined
+  (if there was one) or the first FROM table (if not).
+* joins - An array of JoinClause objects for all previous joins in
+  the query.
+
+Using the block you can specify conditions for complex joins without
+needing to know in advance what table aliases will be used.
+
+Expanded SQL Syntax Support
+---------------------------
+
+SQL Case statements are now supported directly using hashes or
+arrays:
+
+  {:x > 1 => 1}.case(0)
+  # CASE WHEN x > 1 THEN 1 ELSE 0 END
+  [[{:x=>1}, 0], [:x < 1, 1], [:x > 1, 2]].case(-1)
+  # CASE WHEN x = 1 THEN 0 WHEN x < 1 THEN 1 WHEN x > 1 THEN 2
+    ELSE -1 END
+
+You should use an array instead of a hash for multiple conditions
+unless all conditions are orthogonal.
+
+The SQL extract function has special syntax:
+
+  EXTRACT(day FROM date)
+
+This syntax is now supported via the following ruby code:
+
+  :date.extract(:day)
+
+Other Notable Changes
+---------------------
+
+* The sequel command line tool can now run migrations.  The -m
+  option specifies the directory holding the migration files,
+  and the -M options specifies the version to which to migrate.
+
+* The PostgreSQL adapter supports nested transactions/savepoints.
+
+* The schema parser now understands decimal fields, and will
+  typecast to BigDecimal.
+
+* PostgreSQL's numeric type is now recognized and returned as
+  BigDecimal.
+
+* HAVING now comes before ORDER BY, which most databases seem to
+  prefer.  If your database wants HAVING after ORDER BY, please
+  let us know.
+
+* Symbol#qualify now exists, to specify the table name for a given
+  symbol, similar to the use of #as to specify an alias.  This is
+  mainly helpful in conjuction with the #join_table block, as that
+  provides the table aliases to use to qualify the columns inside
+  the block.
+
+* BitwiseMethods (&, |, ^, ~, <<, >>) have been added to the
+  NumericExpression class, so you can do the following:
+
+  (x + 1) ^ 10  # SQL: (x + 1) ^ 10
+  ~(x + 1) # SQL: ~(x + 1)
+
+  Usually, &, |, and ~ operate in a logical manner, but for
+  NumericExpressions, they take on their usual bitwise meaning,
+  since logical operations only make sense for booleans.
+
+* #cast_numeric and #cast_string exist for Symbols, Strings, and
+  other Sequel Expressions, which return the results casted and
+  wrapped in either NumericExpression or StringExpression, so you
+  can use the BitwiseMethods (&, |, ^, ~, <<, >>) or
+  StringConcatenationMethods (+) directly.
+
+# Dataset#to_hash can take only one argument, in which case it uses
+  that argument to specify the key, and uses the entire hash for the
+  value.
+
+# Dataset#graph can now take an array of columns to select from the
+  joined table via the :select option.
+
+# Dataset#filter and similar methods now combine the block and
+  regular argument conditions if both are given, instead of ignoring
+  the regular argument conditions.
+
+# Dataset#filter(false) can now be used to make sure that no records
+  are returned.  Dataset#filter(true) also works, but it's a no-op.
+  Before, these raised errors.
+
+# Dataset#count does a subquery for a dataset using DISTINCT, since
+  the otherwise it would yield a count for the query without
+  DISTINCT.
+
+ParseTree Support Officially Deprecated
+---------------------------------------
+
+The support for ParseTree-based block filters has officially been
+deprecated and will be removed in Sequel 2.2.  To use the
+expression filters (which don't require ParseTree) inside blocks,
+use:
+
+  SEQUEL_NO_PARSE_TREE = true
+  require 'sequel'
+  # OR
+  require 'sequel'
+  Sequel.use_parse_tree = false
+
+This is the default if ParseTree cannot be loaded.  If ParseTree
+can be loaded, it remains the default, in order not to immediately
+break existing code.
+
+With this set, you can use the expression filters inside of blocks:
+
+  dataset.filter{((:x + 1) & 10 < :y) & :z}
+
+That doesn't gain you all that much, but there are some methods
+that feed block arguments into filter, such as the following:
+
+  dataset.first(5){((:x + 1) & 10 < :y) & :z}
+
+Which will get you the first 5 records matching the condition.
+
+Backwards Incompatible Changes
+------------------------------
+
+* To change the datetime classe used from Time to DateTime, you
+  now use:
+
+    Sequel.datetime_class = DateTime # instead of Sequel.time_class
+
+* Models now raise errors if you try to access a missing or
+  restricted method via new/set/update, instead of just silently
+  skipping that parameter.  To get the old behavior:
+
+    Sequel::Model.strict_param_setting = false
+
+* The association_dataset method now takes into account the :eager
+  option and the block argument, where it didn't before. It also
+  takes into account the new :limit option.
+
+* Association methods now raise errors in most cases if the model
+  doesn't have a valid primary key.
+
+* Dataset#join_table used to allow a symbol as a conditions argument
+  as a shortcut for a hash:
+
+    DB[:artist].join(:albums, :artist_id)
+    # ON albums.artist_id = artists.id
+
+  With the changes to #join_table, this no longer works.  It would
+  now be interpreted as a boolean column:
+
+    DB[:artist].join(:albums, :artist_id)
+    # ON artists.id
+
+  Use the following slightly longer version for the old behavior:
+
+    DB[:artist].join(:albums, :artist_id=>:id)
+    # ON albums.artist_id = artists.id
+
+* MySQL users need to be careful when upgrading, the following code
+  will once again cause an error:
+
+    DB[:artists].each{|artist| DB[:albums].each{|album| ...}}
+
+  To fix it, change the code to:
+
+    DB[:artists].all{|artist| DB[:albums].each{|album| ...}}
+
+  The issue is the MySQL adapter doesn't release the database
+  connection while running each, and the second call to each gets the
+  same database connection (while the other query is still running),
+  because it is in the same thread.  Using #all for the outside query
+  ensures that the database connection is released before the block is
+  called.
+
+  The reason for this change was that the workaround provided for
+  MySQL could potentially cause issues with transactions for all
+  adapters.
+
+* String#asc and String#desc are no longer defined, as ordering on a
+  plain string column should be a no-op.  They are still defined
+  on LiteralStrings.
+
+* You can no longer abuse the SQL::Function syntax to use a table
+  alias with specified columns (e.g. :table[:col1, :col2, :col3])
+  or to cast to types (e.g. :x.cast_as(:varchar[20])).  Use a
+  LiteralString in both cases.

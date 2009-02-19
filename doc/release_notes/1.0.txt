@@ -1,0 +1,38 @@
+=== New code organization
+
+Sequel is now divided into two parts: sequel_core and sequel_model.
+These two parts are distributed as two separate gems. The sequel gem
+bundles sequel_core and sequel_model together. If you don't use
+Sequel::Model in your code, you can just install and use sequel_core.
+
+=== New model hooks implementation
+
+The hooks implementation have been rewritten from scratch, is much
+more robust and offers a few new features:
+
+* More ways to define hooks: hooks can now be defined by supplying a
+block or a method name, or by overriding the hook instance method.
+
+* Inheritable hooks: Hooks can now be inherited, which means that you
+can define general hooks in a model superclass, and use them in
+subclasses. You can also define global hooks on Sequel::Model that
+will be invoked for all model classes.
+
+* Hook chains can be broken by returning false from within the hook.
+
+* New after_initialize hook, invoked after instance initialization.
+
+* The hook invocation order can no longer be changed. Hooks are
+invoked in order of definition, from the top of the class hierarchy
+(that is, from Sequel::Model) down to the specific class.
+
+=== Miscellanea
+
+* Removed deprecated adapter stubs, and all other deprecations in both
+sequel_core and sequel_model.
+
+* Fixed String#to_time to raise error correctly for invalid time
+stamps.
+
+* Fixed error behavior when parse_tree or ruby2ruby are not available.
+

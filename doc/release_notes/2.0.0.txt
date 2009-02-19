@@ -1,0 +1,298 @@
+Blockless Filter Expressions
+----------------------------
+
+Before 2.0.0, in order to specify complex SQL expressions, you
+either had to resort to writing the SQL yourself in a string or
+using an expression inside a block that was parsed by ParseTree.
+Because ParseTree was required, only ruby 1.8.* was supported, and
+supporting other ruby versions (ruby 1.9, JRuby, Rubinius) would
+never be possible.
+
+With 2.0.0, you no longer need to use a block to write complex SQL
+expressions. The basics of the blockless filters are the usual
+arithmetic, inequality, and binary operators:
+
+  + = addition
+  - = subtraction
+  * = multiplication
+  / = division
+  > = greater than
+  < = less than
+  >= = greater than or equal to
+  <= = less than or equal to
+  ~ = negation
+  & = AND
+  | = OR
+
+You can use these operators on Symbols, LiteralStrings, and other
+Sequel::SQL::Expressions.  Note that there is no equal operator or
+not equal operator, to specify those, you use a Hash.
+
+Here are some examples:
+
+  # Ruby code => SQL WHERE clause
+  :active => active
+  ~:active => NOT active
+  ~~:active => active
+  ~~~:active => NOT active
+  :is_true[] => is_true()
+  ~:is_true[] => NOT is_true()
+  :x > 100 => (x > 100)
+  :x < 100.01 => (x < 100.01)
+  :x <= 0 => (x <= 0)
+  :x >= 1 => (x >= 1)
+  ~(:x > 100) => (x <= 100)
+  {:x => 100} => (x = 100)
+  {:x => 'a'} => (x = 'a')
+  {:x => nil} => (x IS NULL)
+  ~{:x => 100} => (x != 100)
+  ~{:x => 'a'} => (x != 'a')
+  ~{:x => nil} => (x IS NOT NULL)
+  {:x => /a/} => (x ~ 'blah') # Default, MySQL different
+  ~{:x => /a/} => (x !~ 'blah') # Default, MySQL different
+  :x.like('a') =>  (x LIKE 'a')
+  ~:x.like('a') =>  (x NOT LIKE 'a')
+  :x.like(/a/) => (x ~ 'a') # Default, MySQL different
+  ~:x.like('a', /b/) => ((x NOT LIKE 'a') AND (x !~ 'b')) # Default
+  ~{:x => 1..5} => ((x < 1) OR (x > 5))
+  ~{:x => DB[:items].select(:i)} => (x NOT IN (SELECT i FROM items))
+  ~{:x => [1,2,3]} => (x NOT IN (1, 2, 3))
+  :x + 1 > 100 => ((x + 1) > 100)
+  (:x * :y) < 100.01 => ((x * y) < 100.01)
+  (:x - :y/2) >= 100 => ((x - (y / 2)) >= 100)
+  (((:x - :y)/(:x + :y))*:z) <= 100 => ((((x - y) / (x + y)) * z) <=
+100)
+  ~((((:x - :y)/(:x + :y))*:z) <= 100) => ((((x - y) / (x + y)) * z) >
+100)
+  :x & :y => (x AND y)
+  :x & :y & :z => ((x AND y) AND z)
+  :x & {:y => :z} => (x AND (y = z))
+  {:y => :z} & :x => ((y = z) AND x)
+  {:x => :a} & {:y => :z} => ((x = a) AND (y = z))
+  (:x > 200) & (:y < 200) => ((x > 200) AND (y < 200))
+  :x | :y => (x OR y)
+  :x | :y | :z => ((x OR y) OR z)
+  :x | {:y => :z} => (x OR (y = z))
+  {:y => :z} | :x => ((y = z) OR x)
+  {:x => :a} | {:y => :z} => ((x = a) OR (y = z))
+  (:x > 200) | (:y < 200) => ((x > 200) OR (y < 200))
+  (:x | :y) & :z => ((x OR y) AND z)
+  :x | (:y & :z) => (x OR (y AND z))
+  (:x & :w) | (:y & :z) => ((x AND w) OR (y AND z))
+  ~((:x | :y) & :z) => ((NOT x AND NOT y) OR NOT z)
+  ~((:x & :w) | (:y & :z)) => ((NOT x OR NOT w) AND (NOT y OR NOT z))
+  ~((:x > 200) | (:y & :z)) => ((x <= 200) AND (NOT y OR NOT z))
+  ~('x'.lit + 1 > 100) => ((x + 1) <= 100)
+  'x'.lit.like(/a/) => (x ~ 'a') # (x ~ \'a\')
+
+None of these require blocks, you can use any directly in a call to
+filter:
+
+  DB[:items].filter((:price * :tax) - :discount > 100)
+  # => SELECT * FROM items WHERE (((price * tax) - discount) > 100)
+  DB[:items].filter(:active & ~:archived)
+  # => SELECT * FROM items WHERE (active AND NOT archived)
+
+SQL String Concatenation
+------------------------
+
+Sequel now has support for expressing SQL string concatenation in an
+easy way:
+
+  [:name, :title].sql_string_join(" - ")
+  # SQL:  name || ' - ' || title
+
+You can use this in selecting columns, creating filters, ordering
+datasets, and possibly elsewhere.
+
+Schema Reflection Support/Typecasting on Assignment
+---------------------------------------------------
+
+When used with PostgreSQL, MySQL, or SQLite, Sequel now has the
+ability to get information from the database's schema in regards
+to column types:
+
+  DB.schema(:artist)
+  => [[:id, {:type=>:integer, :db_type=>"integer", :max_chars=>0
+     :numeric_precision=>32, :allow_null=>false,
+     :default=>"nextval('artist_id_seq'::regclass)"}], [:name,
+     {:type=>:string, :default=>nil, :db_type=>"text",
+     :numeric_precision=>0, :allow_null=>true, :max_chars=>0}]]
+
+Models now use this information to typecast values on attribute
+assignment. For example, if you have an integer column named number
+and a text (e.g. varchar) column named title:
+
+  1.5.1:
+    model.number = '1'
+    model.number # => '1'
+    model.title = 1
+    model.title # => 1
+  2.0.0:
+    model.number = '1'
+    model.number # => 1
+    model.title = 1
+    model.title # => '1'
+
+Typecasting can be turned off on a global, per class, and per object
+basis:
+
+  Sequel::Model.typecast_on_assignment = false # Global
+  Album.typecast_on_assignment = false # Per Class
+  Album.new.typecast_on_assignment = false # Per Object
+
+Typecasting is somewhat strict, it does not allow obviously bogus
+data to be used:
+
+  model.number = 'a' # Raises error
+
+This is in contrast to how some other ORMs handle the situation:
+
+  model.number = 'a'
+  model.number # => 0
+
+If Sequel is being used with a web framework and you want to display
+friendly error messages to the user, you should probably turn
+typecasting off and set up the necessary validations in your models.
+
+Model Association Improvements
+------------------------------
+
+Associations can now be eagerly loaded even if they have a block,
+though the block should not rely on being evaluated in the context
+of an instance. This allows you filter on associations when eagerly
+loading:
+
+  Artist.one_to_many :albums_with_10_tracks, :class=>:Album do |ds|
+    ds.filter(:num_tracks => 10)
+  end
+  Artist.filter(:name.like('A%)).eager(:albums_with_10_tracks).all
+  # SELECT * FROM artists WHERE (name LIKE 'A%')
+  # SELECT albums.* FROM albums WHERE ((artist_id IN (...)) AND
+  #   (num_tracks = 10))
+
+Associations now have a remove_all_ method for removing all
+associated objects in a single query:
+
+  Artist.many_to_many :albums
+  Artist[1].remove_all_albums
+  # DELETE FROM albums_artists WHERE artist_id = 1
+
+  Artist.one_to_many :albums
+  Artist[1].remove_all_albums
+  # UPDATE albums SET artist_id = NULL WHERE artist_id = 1
+
+All associations can specify a :select option to change which columns
+are selected.  Previously only many to many associations suppported
+this.
+
+The SQL used when eagerly loading through eager_graph can be
+modified via the :graph_join_type, :graph_conditions, and
+:graph_join_conditions options.
+
+:graph_join_type changes the join type from the default of
+:left_outer.  This can be useful if you do not want any
+albums that don't have an artist in the result set:
+
+  Album.many_to_one :artist, :graph_join_type=>:inner
+  Album.eager_graph(:artist).sql
+  # SELECT ... FROM albums INNER JOIN artists ...
+
+:graph_conditions adds conditions on the join to the table you are
+joining, the eager_graph equivalent of an association block argument
+in eager. It takes either a hash or an array where all elements
+are arrays of length two, similar to join_table, where key symbols
+specify columns in the joined table and value symbols specify
+columns in the last joined or primary table:
+
+  Album.many_to_one :artist, :graph_conditions=>{:active=>true}
+  Album.eager_graph(:artist).sql
+  # SELECT ... FROM albums LEFT OUTER JOIN artists ON ((artists.id =
+  #   albums.artist_id) AND (artists.active = 't'))
+
+:graph_join_table_conditions exists for many to many associations only,
+and operates the same as :graph_conditions, except it specifies a
+condition on the many to many join table instead of the associated
+model's table. This is necessary if the join table is also model
+table with other columns on which you may want to filter:
+
+  Album.many_to_many :genres, :join_table=>:ag, \
+    :graph_join_table_conditions=>{:active=>true}
+  Album.eager_graph(:genres).sql
+  # SELECT ... FROM albums LEFT OUTER JOIN ag ON ((ag.album_id =
+      albums.id) AND (ag.active = 't')) LEFT OUTER JOIN genres ON
+      (genres.id = ag.genre_id)
+
+Other Small Improvements
+------------------------
+
+* Dataset#invert returns a dataset that matches all records not
+  matching the current filter.
+* Dataset#unfiltered returns a dataset that has any filters removed.
+* Dataset#last_page? and Dataset#first_page? for paginated datasets.
+* The sequel command line tool now support an -E or --echo argument
+  that logs all SQL to the standard output.  It also can take a path
+  to a yaml file with database connection options, in addition to a
+  database URL.
+* Databases can now have multiple SQL loggers, so you can log to the
+  standard output as well as a file.
+* SQL identifiers (columns and tables) are now quoted by default (you
+  can turn this off via Sequel.quote_identifiers = false if need be).
+* Sequel.connect now takes an optional block that will disconnect the
+  database when the block finishes.
+* AlterTableGenerator now has add_primary_key and add_foreign_key
+  methods.
+* Running the specs without ParseTree installed skips the specs that
+  require ParseTree.
+* You can use an array of arrays instead of a hash when specifying
+  conditions, which may be necessary in certain situations where
+  you would be using the same hash key more than once.
+* Almost all documentation for Sequel was updated for 2.0.0, so if you
+  found Sequel documentation lacking before, check out the new RDoc
+  pages.
+* There have been many minor refactoring improvements, the code
+  should now be easier to read and follow.
+* Sequel now has no external dependencies.
+* Sequel::Models now have before_validation and after_validation
+  hooks.
+* Sequel::Model hooks that return false cause the methods that call
+  them (such as save) to return false.
+* Sequel::Models can now load their schema on first instantiation,
+  instead of when they are created, via
+  Sequel::Model.lazy_load_schema=.  This is helpful for certain
+  web frameworks that reload all models on every request.
+* Hook methods that use blocks can now include an optional tag,
+  which allows them to work well with web frameworks that load source
+  files every time they are modified.
+
+The PostgreSQL adapter has been rewritten and now supports ruby-pg.
+There have also been improvements in the following adapters: DBI,
+MySQL, SQLite, Oracle, and MSSQL.
+
+All of the methods that have been deprecated in 1.5.0 have now been
+removed.  If you are want to upgrade to Sequel 2.0.0 from version 1.4.0
+or previous, upgrade to 1.5.1 first, fix all of the deprecation
+warnings that show up, and then upgrade to 2.0.0.
+
+There were some backwards incompatible changes made in 2.0.0 beyond the
+removal of deprecated methods.  These are:
+
+* Inflector is no longer used, the inflection methods were moved
+  directly into String (where they belong because inflections only
+  make sense for strings).  So to override singularization
+  or pluralization rules, use String.inflections instead of
+  Inflector.inflections.
+* MySQL tinyints are now returned as boolean values instead of
+  integers.  MySQL doesn't have a boolean type, and usually it
+  is recommended to use tinyint for a boolean column.
+* You can no longer pass an array to Dataset#order or Dataset#select,
+  you need to pass each argument separately (the * operator is your
+  friend).
+* You must use '?' instead of '(?)' when interpolating an array
+  argument into a string (e.g. filter('x IN ?', [1,2,3]))
+* You must pass an explicit table alias argument to join_table and
+  related methods, you can no longer include the table alias
+  inside the table argument.
+* sqlite:// URLs now operate the same as file:// URLs (2 slashes
+  for a relative path, 3 for an absolute path).
+

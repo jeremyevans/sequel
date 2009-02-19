@@ -1,0 +1,166 @@
+Performance Optimizations
+-------------------------
+
+* Fetching a large number of records with the PostgreSQL adapter is
+  significantly faster (up to 3-4 times faster than before).
+
+* Instantiating model objects has been made much faster, as many
+  options (such as raise_on_save_failure) are now lazily loaded, and
+  hook methods are now much faster if no hooks have been defined for
+  that type of hook.
+
+New Association Options
+-----------------------
+
+* The :eager_grapher option has been added allowing you to supply
+  your own block to implement eager loading via eager_graph.
+
+* many_to_one and one_to_many associations now have a :primary_key
+  option, specifying the name of the column that the :key option
+  references.
+
+* many_to_many associations now have :left_primary_key and
+  :right_primary_key options, specifying the columns that :left_key
+  and :right_key reference, respectively.
+
+* many_to_many associations now have a :uniq option, that adds an
+  :after_load callback that makes the returned array of objects
+  unique.
+
+Other New Features
+------------------
+
+* Dataset#set_graph_aliases now allows you to supply a third argument
+  for each column you want graph into the dataset, allowing you to use
+  arbitrary SQL expressions that are graphed into the correct table:
+
+    ds.set_graph_aliases!(:a=>[:b, :c], :d=>[:e, :f, 42])
+    # SELECT b.c AS a, 42 AS d FROM ...
+    ds.first # => {:b=>{:c=>?}, :e=>{:f=>42}}
+
+* Dataset#add_graph_aliases was added, that adds additional graph
+  aliases instead of replacing the existing ones (as
+  #set_graph_aliases does).  It's basically the equivalent of
+  select_more for graphs.
+
+* Dataset#join_table changed it's final argument from a symbol
+  specifying a table name to an option hash (with backwards
+  compatibility kept), and adds support for a :implicit_qualifier
+  option, which it uses instead of the last joined table to
+  qualify columns.
+
+* Association's :after_load callbacks are now called when eager
+  loading via eager (but not when eager loading via eager_graph).
+
+* Any expression can now be used as the argument to Symbol#like,
+  which means that you can pattern match columns to other columns.
+  Before, it always transformed the argument to a string.
+
+    :a.like(:b)
+    # 2.6.0: a LIKE 'b'
+    # 2.7.0: a LIKE b
+
+* Array#sql_array was added, allowing you to specify that an array
+  in ruby be treated like an array in SQL.  This is true anyway,
+  except for arrays of all two pairs, which are treated like hashes,
+  for specifying multiple conditions with the same key:
+
+   DB[:foo].filter([:a,:b] => [[1,2],[3,4]].sql_array)
+   # => SELECT * FROM foo WHERE ((a, b) IN ((1, 2), (3, 4)))
+
+* ComplexExpression#== and #sql? were added, allowing for easier
+  testing.
+
+* Full text searching on PostgreSQL now joins multiple columns with
+  a space, to prevent joining border words, and it works when there
+  is a match in one column but the other column is NULL.
+
+Other Improvements
+------------------
+
+* Instance methods added by creating associations are added to an
+  anonymous module included by the class, so they can be overridden
+  in the class while still allowing the use of super to get the
+  default behavior (this is similar to column accessor methods).
+
+* Many improvements were added to support using multiple schemas in
+  PostgreSQL.
+
+* Model::Validation::Errors objects are now more compatible with
+  Rails, by adding a #count method and making #on return nil if there
+  are no error messages for that attribute.
+
+* Serialized columns in models are no longer typecast.
+
+* Associations are now inherited when a model class is subclassed.
+
+* Many improvements were made that should make adding custom
+  association types easier.
+
+* A corner case in eager_graph where the wrong table name would be
+  used to qualify a column name has been fixed.
+
+* Dataset's cached column information is no longer modified if #each
+  is called with an option that modifies the columns.
+
+* You should now be able to connect to Oracle via the JDBC adapter,
+  and with the same support it has when using the oracle adapter.
+
+* Model.association_reflections is now a public methods, so you can
+  grab a hash of all association reflections at once (keyed by
+  association name symbol).
+
+* The :encoding/:charset option now works in the PostgreSQL adapter
+  if the postgres-pr driver is used.
+
+* The numeric(x,y) type is now interpreted as decimal.
+
+Backwards Compatibilty
+----------------------
+
+* The first argument to Model#initialize must be a hash, you can no
+  longer use nil.  For example, the following code will break if
+  :album is not in params:
+
+    Album.new(params[:album])
+
+  Additionally, Model#initialize does not call the block if the
+  second argument is true.
+
+* The Sequel::Model.lazy_load_schema setting was removed.  It should
+  no longer be necessary now that schema loading is relatively speedy,
+  and schemas can be loaded at startup and cached.
+
+* The PostgreSQL adapter will default to using a unix socket in /tmp
+  if no host is specified.  Before, a TCP/IP socket to localhost was
+  used if no host was specified.  This change makes Sequel operate
+  similarly to the PostgreSQL command line tools.
+
+* The ASSOCIATION_TYPES constant has changed from an array to a hash
+  and it has been moved.  The RECIPROCAL_ASSOCIATIONS constant has
+  been removed.  This is unlikely to matter unless you were using
+  custom association types.
+
+* The PostgreSQL adapter now sets the PostgreSQL DateStyle, in order
+  to implement an optimization.  To turn this off, set
+  Sequel::Postgres.use_iso_date_format = false.
+
+* When using the PostgreSQL adapter, in many places the schema is
+  specified explicitly.  If you do not specify a schema, a default
+  one is used (public by default).  If you use a schema other than
+  public for your work, use Database#default_schema= to set it.  For
+  any table outside of the default schema, you should specify the
+  schema explicitly, even if it is in the PostgreSQL search_path.
+
+* Model::Validation::Errors#on now returns nil instead of [] if there
+  are no errors for an attribute.
+
+* Hooks added to a superclass after a subclass has been created no
+  longer have an effect on the subclass.
+
+* The Postgres.string_to_bool method has been removed.
+
+* PostgreSQL full text searching now always defaults to using the
+  simple dictionary.  If you want to use another dictionary, it must
+  be specified explicitly, both when searching and when creating a
+  full text index.

@@ -1,0 +1,157 @@
+New Features
+------------
+
+* Schema parsing was refactored, resulting in a huge speedup when
+  using MySQL.  MySQL now uses the DESCRIBE statement instead of the
+  INFORMATION_SCHEMA.  PostgreSQL now uses the pg_* system catalogs
+  instead of the INFORMATION schema.
+
+* The schema information now includes the :primary_key field.  Models
+  now use this field to automatically determine the primary key for
+  a table, so it no longer needs to be specified explicitly.  Models
+  even handle the composite primary key case.
+
+* The raise_on_typecast_failure switch was added, with it being true
+  by default (so no change in behavior).  This allows the user to
+  silently ignore errors when typecasting fails, at the global, class,
+  and instance levels.
+
+    Sequel::Model.raise_on_typecast_failure = false # Global
+    Artist.raise_on_typecast_failure = true # Class
+    artist = Artist.new
+    artist.raise_on_typecast_failure = false # Instance
+
+    Album.raise_on_typecast_failure = true
+    Album.new(:numtracks=>'a') # => raises Sequel::Error::InvalidValue
+    Album.raise_on_typecast_failure = false
+    Album.new(:numtracks=>'a') # => #<Album @values={:numtracks=>"a"}>
+
+* Associations' orders are now respected when eager loading via
+  eager_graph.  Sequel will qualify the columns in the order with
+  the alias being used, so you can have overlapping columns when
+  eager loading multiple associations.
+
+    Artist.one_to_many :albums, :order=>:name
+    Album.one_to_many :tracks, :order=>:number
+    Artist.order(:artists__name).eager_graph(:albums=>:tracks).sql
+    # => ... ORDER BY artists.name, albums.name, tracks.number
+
+* The support for CASE expressions has been enhanced by allowing the
+  use of an optional expression:
+
+    {1=>2}.case(0, :x)
+    # => CASE x WHEN 1 THEN 2 ELSE 0 END
+    [[:a, 1], [:b, 2], [:c, 3]].case(4, :y)
+    # => CASE y WHEN a THEN 1 WHEN b THEN 2 WHEN c THEN 3 ELSE 4 END
+
+  Previously, to get something equivalent to this, you had to do:
+
+    {{:x=>1}=>2}.case(0)
+    # => CASE WHEN (x = 1) THEN 2 ELSE 0 END
+    [[{:y=>:a}, 1], [{:y=>:b}, 2], [{:y=>:c}, 3]].case(4)
+    # => CASE WHEN (y = a) THEN 1 WHEN (y = b) THEN 2 WHEN (y = c)
+         THEN 3 ELSE 4 END
+
+* You can now change the NULL/NOT NULL value of an existing column
+  using the set_column_allow_null method.
+
+    # Set NOT NULL
+    DB.alter_table(:artists){set_column_allow_null :name, false}
+    # Set NULL
+    DB.alter_table(:artists){set_column_allow_null :name, true}
+
+* You can now get the schema information for a table in a non-public
+  schema in PostgreSQL using the implicit :schema__table syntax.
+  Before, the :schema option had to be given explicitly to
+  Database#schema.  This allows models to get schema information for
+  tables outside the public schema.
+
+* Transactions are now supported on MSSQL.
+
+* Dataset#tables now returns all tables in the database for MySQL
+  databases accessed via JDBC.
+
+* Database#drop_view can now drop multiple views at once.
+
+Other Improvements
+------------------
+
+* The SQLite adapter now respects the Sequel.datetime_class option
+  for timestamp and datetime columns.
+
+* Adding a unique constraint no longer explicity creates a unique
+  index.  If you want a unique index, use index :unique=>true.
+
+* If no language is specified when creating a full text index on
+  PostgreSQL, the simple language is assumed.
+
+* Errors when typecasting fails are now Sequel::Error::InvalidValue
+  instead of the more generic Sequel::Error.
+
+* Specifying constraints now works correctly for all types of
+  arguments.  Previously, it did not work unless a block or
+  interpolated string were used.
+
+* Loading an association with the same name as a table in the FROM
+  clause no longer causes an error.
+
+* When eagerly loading many_to_one associations where no objects have
+  an associated object, the negative lookup is now cached.
+
+* String keys can now be used with Dataset#multi_insert, just like
+  they can be used for Dataset#insert.
+
+* Dataset#join_table now generates the correct SQL when doing the
+  first join to a dataset where the first source is a dataset, when
+  an unqualified column is used in the conditions.
+
+* Cascading associations after *_to_many associations can now be
+  eagerly loaded via eager_graph.
+
+* Eagerly loading *_to_many associations that are cascaded behind a
+  many_to_one association now have their duplicates removed if a
+  cartesian product join is done.
+
+* The SQLite adapter now uses string literals in all of the AS
+  clauses.  While the SQL standard specifies that identifiers should
+  be used, SQLite documentation explicitly states that string
+  literals are expected (though it generally works with identifiers
+  by converting them implicitly).
+
+* Database methods that modify the schema now remove the cached
+  schema entry.
+
+* The hash keys that Database#schema returns when no table is
+  requested are now always supposed to be symbols.
+
+* The generation of SQL for composite foreign keys on MySQL has been
+  fixed.
+
+* A schema.rdoc file was added to the documentation explaining the
+  various parts of Sequel related to schema generation and
+  modification and how they interact
+  (http://sequel.rubyforge.org/rdoc/files/doc/schema_rdoc.html).
+
+* The RDoc template for the website was changed from the default
+  template to the hanna template.
+
+Backwards Compatibility
+-----------------------
+
+* The :numeric_precision and :max_chars schema entries have been
+  removed.  Use the :db_type entry to determine this information,
+  if available.
+
+* The SQLite adapter used to always return Time instances for
+  timestamp types, even if Sequel.datetime_class was DateTime.  For
+  datetime types it always returned a DateTime instance.  It
+  now returns an instance of Sequel.datetime_class in both cases.
+
+* It's possible that the including of associations' orders when eager
+  loading via eager_graph could cause problems.  You can use the
+  :order_eager_graph=>false option to not use the :order option when
+  eager loading via :eager_graph.
+
+* There were small changes in SQL creation where the AS keyword is
+  now used explicitly.  These should have no effect, but could break
+  tests for explicit SQL.

@@ -1,0 +1,253 @@
+The Most Powerful and Flexible Associations of Any Ruby ORM
+-----------------------------------------------------------
+
+Sequel can now support any association type supported by
+ActiveRecord, and many association types ActiveRecord doesn't
+support.
+
+Association callbacks (:before_add, :after_add, :before_remove,
+:after_remove) have been added, and work for all association
+types.  Each of the callback options can be a Symbol specifying an
+instance method that takes one argument (the associated object), or a
+Proc that takes two arguments (the current object and the associated
+object), or an array of Symbols and Procs.  Additionally, an
+:after_load callback is available, which is running after loading the
+associated record(s) from the database.
+
+Association extensions are now supported:
+
+  class FindOrCreate
+    def find_or_create(vals)
+      first(vals) || create(vals)
+    end
+  end
+  class Author < Sequel::Model
+    one_to_many :authorships, :extend=>FindOrCreate
+  end
+  Author.first.authorships_dataset.find_or_create(:name=>'Bob')
+
+Sequel has been able to support most has_many :through style
+associations since 1.3, via many_to_many (since it doesn't break on
+join tables that are also model tables, unlike ActiveRecord's
+has_and_belongs_to_many).  Now it can also support has_many :through
+style associations where it goes through a has_many association.
+
+Sequel can now support polymorphic associations.  Polymorphic
+associations are really a design flaw, so Sequel doesn't support them
+directly, but the tools that Sequel gives you make them pretty easy
+to implement.
+
+Sequel can also support associations that ActiveRecord does not.  For
+example, a belongs_to association where the column referenced in the
+associated table is not the primary key, an association that depends
+on multiple columns in each table, or even situations where the
+association has a column in the primary table that can be referenced
+by any of multiple columns in a second table that has a has_one style
+association with the table you want to associate with.
+
+Some of those associations can be supported for a single object using
+custom SQL in ActiveRecord, but none are supported when eager
+loading or allow further filtering.
+
+Not only can all of these cases be supported with Sequel::Model, all
+can be supported with eager loading, and can allow for further
+filtering. See
+http://sequel.rubyforge.org/files/sequel/doc/advanced_associations_rdoc.html
+for details and example code for all association types covered above.
+
+There have also been many additional options added for controlling
+eager loading via eager_graph.  Every part of the SQL JOINs can now
+be controlled via one of the options, so you can use JOIN USING,
+NATURAL JOIN, or arbitrary JOIN ON conditions.
+
+Finally, just to show off the power that Sequel gives you when eager
+loading, here is example code that will eagerly load all descendants
+and ancestors in a tree structure, without knowing the depth of the
+tree:
+
+  class Node < Sequel::Model
+    set_schema do
+      primary_key :id
+      foreign_key :parent_id, :nodes
+    end
+    create_table
+
+    many_to_one :parent
+    one_to_many :children, :key=>:parent_id
+
+    # Only useful when eager loading
+    many_to_one :ancestors, :eager_loader=>(proc do |key_hash, nodes,
+associations|
+      # Handle cases where the root node has the same parent_id as
+primary_key
+      # and also when it is NULL
+      non_root_nodes = nodes.reject do |n|
+        if [nil, n.pk].include?(n.parent_id)
+          # Make sure root nodes have their parent association set to
+nil
+          n.associations[:parent] = nil
+          true
+        else
+          false
+        end
+      end
+      unless non_root_nodes.empty?
+        id_map = {}
+        # Create an map of parent_ids to nodes that have that parent id
+        non_root_nodes.each{|n| (id_map[n.parent_id] ||= []) << n}
+        # Doesn't cause an infinte loop, because when only the root node
+        # is left, this is not called.
+        Node.filter(Node.primary_key=>id_map.keys).eager(:ancestors).all
+do |node|
+          # Populate the parent association for each node
+          id_map[node.pk].each{|n| n.associations[:parent] = node}
+        end
+      end
+    end)
+    many_to_one :descendants, :eager_loader=>(proc do |key_hash, nodes,
+associations|
+      id_map = {}
+      nodes.each do |n|
+        # Initialize an empty array of child associations for each
+parent node
+        n.associations[:children] = []
+        # Populate identity map of nodes
+        id_map[n.pk] = n
+      end
+      # Doesn't cause an infinite loop, because the :eager_loader is not
+called
+      # if no records are returned.  Exclude id = parent_id to avoid
+infinite loop
+      # if the root note is one of the returned records and it has
+parent_id = id
+      # instead of parent_id = NULL.
+      Node.filter(:parent_id=>id_map.keys).exclude(:id=>:parent_id).eager(:descendants).all
+do |node|
+        # Get the parent from the identity map
+        parent = id_map[node.parent_id]
+        # Set the child's parent association to the parent
+        node.associations[:parent] = parent
+        # Add the child association to the array of children in the
+parent
+        parent.associations[:children] << node
+      end
+    end)
+  end
+
+  nodes = Node.filter(:id < 10).eager(:ancestors, :descendants).all
+
+New Adapter Features
+--------------------
+
+* PostgreSQL bytea fields are now fully supported.
+
+* The PostgreSQL adapter now uses the safer connection-specific
+  string escaping if you are using ruby-pg.
+
+* The SQLite adapter supports drop_column and add_index.
+
+* You can now use URL parameters in the connection string, enabling
+  you to connect to PostgreSQL via a socket using
+  postgres://user:password@blah/database?host=/tmp
+
+Other New Features
+------------------
+
+* Dataset#graph now takes a block which it passes to join_table.
+
+* Symbol#identifier has been added, which can be used if another
+  library defines the same operator(s) on Symbol that Sequel defines.
+
+* Filter blocks now yield a VirtualRow instance, which can yield
+  Identifiers, QualifiedIdentifiers, or Functions.  Like
+  Symbol#identifier, this is useful if another library defines the
+  same operator(s) on Symbol that Sequel defines.
+
+* You can now call Model.to_hash to get an identity map for all
+  rows (before this required Model.dataset.to_hash).
+
+* A model that can get it's column information from the schema will
+  set it in the dataset, potentially saving many queries.
+
+* Model.validates_presence_of now works correctly for boolean
+  columns.
+
+Notable Bug Fixes
+-----------------
+
+* Caching now works with Model subclasses.
+
+* Model validation methods now work with source reloading.
+
+* The PostgreSQL adapter no longer raises an Error if you try to
+  insert a record with the primary key already specified.
+
+* Sequel no longer messes with the native MySQL adapter, so you can
+  use Sequel and ActiveRecord with MySQL in the same process.
+
+* Dataset#count now works correctly for limited dataset.
+
+* PostgreSQL Database#transaction method yields a connection, similar
+  to the other adapters.
+
+* Using a hash argument in #distinct, #order, or #group is treated
+  as an expression instead of a column alias.
+
+* Cloned datasets no longer ignore the existing columns unless it is
+  necessary.
+
+* The :quote_identifiers and :single_threaded Database options now
+  work correctly.
+
+Backwards Incompatible Changes
+------------------------------
+
+* ParseTree support, deprecated in 2.1.0, has been removed in 2.2.0.
+  You should use the expression filter syntax instead, perferably
+  without the block (though it can be used inside a block as well).
+  This usually involves the following types of changes:
+
+    filter{:x == :y} => filter(:x => :y)
+    filter{:x << :y} => filter(:x => :y)
+    filter{:x && :y} => filter(:x & :y) # Don't forget about change
+    filter{:x || :y} => filter(:x | :y) #  in operator precedence
+    filter{:x.like?('%blah%')} => filter(:x.like('%blah%'))
+    filter do => filter((:x > 1) & (:y < 2))
+      :x > 1
+      :y < 2
+    end
+
+* Attempts to save an invalid Model instance will raise an error by
+  default.  To revert to returning a nil value, use:
+
+    Sequel::Model.raise_on_save_failure = false # Global
+    Album.raise_on_save_failure = false # Class
+    album = Album.new
+    album.raise_on_save_failure = false # Instance
+
+  Note that before, save would return false where now it returns nil
+  if you disable raising on save failure.
+
+* Dataset#update no longer takes a block, as it's use of the block
+  depended on ParseTree.  With the introduction of the expression
+  syntax in 2.0.0, it's no longer necessary.  You should use a hash
+  with an expression as the value instead:
+
+    DB[:table].update(:column=>:column + 1)
+
+* validates_presence of now considers false as present instead of
+  absent.  This is so it works with boolean columns.
+
+* Dataset#graph ignores any previously selected columns when it is
+  called for the first time.
+
+* Dataset#columns ignores any filtering, ordering, or distinct
+  clauses.  This shouldn't cause issues unless you were using
+  SQL functions with side effects and expecting them to be called
+  when columns was called (unlikely at best).
+
+One significant point of note is that the 2.2.0 release will be the
+last release with both a sequel_core and sequel gem.  Starting
+with 2.3.0 they will be combined into one sequel gem.  You will still
+be able to get just the sequel_core part by requiring 'sequel_core',
+but they will be packaged together.

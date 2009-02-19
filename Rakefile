@@ -28,7 +28,7 @@ spec = Gem::Specification.new do |s|
   s.version = VERS
   s.platform = Gem::Platform::RUBY
   s.has_rdoc = true
-  s.extra_rdoc_files = ["README.rdoc", "CHANGELOG", "COPYING"] + Dir["doc/*.rdoc"]
+  s.extra_rdoc_files = ["README.rdoc", "CHANGELOG", "COPYING"] + Dir["doc/*.rdoc"] + Dir['doc/release_notes/*.txt']
   s.rdoc_options += RDOC_OPTS
   s.summary = "The Database Toolkit for Ruby"
   s.description = s.summary
@@ -73,7 +73,7 @@ end
 Rake::RDocTask.new do |rdoc|
   rdoc.rdoc_dir = "rdoc"
   rdoc.options += RDOC_OPTS
-  rdoc.rdoc_files.add %w"README.rdoc CHANGELOG COPYING lib/**/*.rb doc/*.rdoc"
+  rdoc.rdoc_files.add %w"README.rdoc CHANGELOG COPYING lib/**/*.rb doc/*.rdoc doc/release_notes/*.txt"
 end
 
 ### Website

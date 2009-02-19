@@ -1,0 +1,171 @@
+New Features
+------------
+
+* Sequel now supports database stored procedures similar to its
+  support for prepared statements.  The API is as follows:
+
+    DB[:table].call_sproc(:select, :mysp, 'param1', 'param2')
+    # or
+    sp = DB[:table].prepare_sproc(:select, :mysp)
+    sp.call('param1', 'param2')
+    sp.call('param3', 'param4')
+
+  This works with Model datasets as well, allowing them to return
+  model objects:
+
+    Album.call_sproc(:select, :new_albums)
+    #=> [#<Album ...>, #<Album ...>]
+
+  You can call a stored procedure directly on the Database object
+  if you want to, but the results and API are adapter dependent,
+  and you definitely shouldn't do it if the stored procedure returns
+  rows:
+
+    DB.call_sproc(:mysp, :args=>['param1', 'param2'])
+
+  Currently, the MySQL and JDBC adapters support stored procedures.
+  Other adapters may support them in a future version.
+
+* The connection pool code can now remove connections if the
+  adapter raises a Sequel::DatabaseDisconnectError indicating that
+  the connection has been lost.  When a query is attempted and
+  the adapter raises this error, the connection pool removes the
+  connection from the pool, and reraises the error.  The Oracle and
+  PostgreSQL adapters currently support this, and other adapters may
+  support it in a future version.
+
+* Whether to upcase or quote identifiers can now be set separately.
+  Previously, upcasing was done when quoting except when using SQLite,
+  PostgreSQL, or MySQL.  Now, you can turn upcasing off while still
+  quoting.  This may be necessary if you are using a MSSQL database
+  that has lower case table names that conflict with reserved words.
+  It also allows you to uppercase identifiers when using SQLite,
+  PostgreSQL, or MySQL, which may be beneficial in certain cases.
+
+  To turn upcasing on or off:
+
+    # Global
+    Sequel.upcase_identifiers = true
+    # Database
+    DB = Sequel.connect("postgres://...", :upcase_identifiers=>true)
+    DB.upcase_identifiers = false
+    # Dataset
+    ds = DB[:items]
+    ds.upcase_identifiers = true
+
+* Options are now supported when altering a columns type:
+
+    DB.alter_table(:items) do
+      set_column_type :score, :integer, :unsigned=>true
+      set_column_type :score, :varchar, :size=>30
+      set_column_type :score, :enum, :elements=>['a', 'b']
+    end
+
+* Standard conforming strings are now turned on by default in the
+  PostgreSQL adapter.  This makes PostgreSQL not interpret backslash
+  escapes.  This is the PostgreSQL recommended setting, which will be
+  the default setting in a future version of PostgreSQL.  If you
+  don't want for force the use of standard strings, use:
+
+    Sequel::Postgres.force_standard_strings = false
+
+  You need to do that after you call Sequel.connect but before you
+  use the database for anything, since that setting is set on
+  initial connection.
+
+* Sequel now raises an error if you attempt to use EXCEPT [ALL] or
+  INTERSECT [ALL] on a database that doesn't support it.
+
+* Sequel now raises an error if you attempt to use DISTINCT ON with
+  MySQL or Oracle, which don't support it.
+
+* A subadapter for the Progress RDBMS was added to the ODBC adapter.
+  To connect to a Progress database, use the :db_type=>'progress'
+  option.  This adapter targets Progress 9.
+
+* The ODBC adapter now supports transactions.
+
+* The MSSQL shared adapter now supports multi_insert (for inserting
+  multiple rows at once), and unicode string literals.
+
+Other Improvements
+------------------
+
+* There were many improvements related to using schemas in databases.
+  Using schema-qualified tables should work in most if not all cases
+  now.  Model associations, getting the schema, joins, and many other
+  parts of Sequel were modified to allow the use of schema-qualifed
+  tables.
+
+* You can now use literal strings with placeholders as well as
+  subselects when using prepared statements.  For example, the
+  following all work now:
+
+    DB[:items].filter("id = ?", :$i).call(:select, :i=>1)
+    DB[:items].filter(:id=>DB[:items].select(:id)\
+      .filter(:id=>:$i)).call(:select, :i=>1)
+    DB["SELECT * FROM items WHERE id = ?", :$i].call(:select, :i=>1)
+
+* Model#initialize received a few more micro-optimizations.
+
+* Model#refresh now clears the changed columns as well as the
+  associations.
+
+* You can now drop columns inside a transaction when using SQLite.
+
+* You can now submit multiple SQL queries at once in the MySQL
+  adapter:
+
+    DB['SELECT 1; SELECT 2'].all
+    #=> [{:"1"=>1, :"2"=>2}]
+
+  This may fix issues if you've seen a MySQL "commands out of sync"
+  message.  Note that this doesn't work if you are connecting to
+  MySQL via JDBC.
+
+* You can now use AliasedExpressions directly in table names given
+  to join_table:
+
+    DB.from(:i.as(:j)).join(:k.as(:l), :a=>:b)
+    #=> ... FROM i AS j INNER JOIN k AS l ON (l.a = j.b)
+
+* Database#rename_table once again works on PostgreSQL.  It was
+  broken in 2.7.0.
+
+* The interval type is now treated as it's own type. It was
+  previously treated as an integer type.
+
+* Subselects are now aliased correctly when using Oracle.
+
+* UNION, INTERSECT, and EXCEPT statements now appear before ORDER
+  and LIMIT on most databases.  If you use these constructs, please
+  test and make sure that they work correctly with your database.
+
+* SQL EXCEPT clause now works on Oracle, which uses MINUS instead.
+
+* Dataset#exists now returns a LiteralString, to make it easier to
+  use.
+
+* The Sequel.odbc_mssql method was removed, as the odbc_mssql adapter
+  was removed in a previous version.  Instead, use:
+
+    Sequel.odbc(..., :db_type=>'mssql')
+
+Backwards Compatibilty
+----------------------
+
+* The hash returned by Database#schema when no table name is provided
+  uses quoted strings instead of symbols as keys.  The hash has a
+  default proc, so using the symbol will return the same value as
+  before, but if you use each to iterate through the hash, the keys
+  will be different.  This was necessary to handle schema-qualified
+  tables.
+
+* Database#table_exists? no longer checks the output of
+  Database#tables.  If the table exists in the schema, it returns
+  true, otherwise, it does a query.  This was necessary because
+  table_exists? accepts multiple formats for table names and
+  Database#tables is an array of symbols.
+
+* When getting the schema on PostgreSQL, the default schema is now
+  used even if the :schema=>nil option is used.

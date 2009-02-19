@@ -1,0 +1,137 @@
+New Features
+------------
+
+* The values that are used to insert/update records can now be
+  scoped similar to how filter expressions can be scoped.
+  set_defaults is used to set defaults which can be overridden,
+  and set_overrides is used to set defaults which cannot be
+  overridden:
+
+      DB[:t].set_defaults(:x=>1).insert_sql
+      # => INSERT INTO t (x) VALUES (1)
+      DB[:t].set_defaults(:x=>1).insert_sql(:x=>2)
+      # => INSERT INTO t (x) VALUES (2)
+      DB[:t].set_defaults(:x=>1).insert_sql(:y=>2)
+      # => INSERT INTO t (x, y) VALUES (1, 2)
+      DB[:t].set_overrides(:x=>1).insert_sql(:x=>2)
+      # => INSERT INTO t (x) VALUES (1)
+
+  The difference between set_defaults and set_overrides is that
+  with set_defaults, the last value takes precedence, while with
+  set_overrides, the first value takes precedence.
+
+* The schema generators now support creating and altering tables
+  with composite primary and/or foreign keys:
+
+    DB.create_table(:items) do
+      integer :id
+      text :name
+      primary_key [:id, :name]
+      foreign_key [:id, :name], :other_table, \
+        :key=>[:item_id, :item_name]
+    end
+
+    DB.alter_table(:items) do
+      add_primary_key [:id, :name]
+      add_foreign_key [:id, :name], :other_table, \
+        :key=>[:item_id, :item_name]
+    end
+
+* The AlterTableGenerator now supports unique constraints:
+
+    DB.alter_table(:items) do
+      add_unique_constraint [:aaa, :bbb, :ccc], :name => :con3
+    end
+
+* The schema generators now support ON UPDATE (previously, they only
+  supported ON DELETE):
+
+    DB.create_table(:items) do
+      foreign_key :project_id, :projects, :on_update => :cascade
+    end
+
+* When connecting to a PostgreSQL server version 8.2 and higher,
+  Sequel now uses the INSERT ... RETURNING ... syntax, which should
+  speed up row inserts on PostgreSQL.  In addition, Sequel Models
+  use RETURNING * to speed up model object creation.
+
+* You can now validate multiple attributes at once.  This is useful
+  if the combination of two or more attribute values is important,
+  such as checking the uniqueness of multiple columns.
+  validates_uniqueness_of now supports this directly:
+
+    validates_uniqueness_of [:column1, :column2]
+
+  This protects against the database having multiple rows with the
+  same values for both :column1 and :column2.  This is different
+  from:
+
+    validates_uniqueness_of :column1, :column2
+
+  Which checks that the value of column1 is unique in the table, and
+  that the value of column2 is unique in the table (which is much
+  more restrictive).
+
+Other Improvements
+------------------
+
+* Dataset methods insert_sql, delete_sql, and update_sql respect the
+  :sql option, allowing you to do things such as:
+
+    ds = DB['INSERT INTO t (time) VALUES (CURRENT_TIMESTAMP)']
+    ds.insert
+    ds.insert
+
+* The database adapters (at least MySQL, PostgreSQL, SQLite, and
+  JDBC) generally raise Sequel::DatabaseError for database problems,
+  making it easier to tell what is a true database error versus an
+  error raised by Sequel itself.
+
+* Sequel uses the async features of ruby-pg so that the entire
+  interpreter is not blocked while waiting for the results of
+  queries.
+
+* Sequel now supports the 2008.08.17 version of ruby-pg.
+
+* MSSQL support has been improved when using the ODBC and ADO
+  adapters.
+
+* Index names are quoted and creating or dropping indexes.
+
+* Automatically generated column accessor methods no longer override
+  instance methods specified by plugins.
+
+* Inserting a row with an already specified primary key inside a
+  transaction now works correctly when using PostgreSQL.
+
+* before_save and before_update hooks now work as expected when using
+  save_changes.
+
+* count and paginate now work correctly on graphed datasets.
+
+Backwards Compatibility
+-----------------------
+
+* The SQLite adapter now raises Sequel::DatabaseError instead of
+  Sequel::Error::InvalidStatement whenever an SQLite3::Exception is
+  raised by the SQLite3 driver.
+
+* Date and DateTime conversions now convert 2 digit years.  To revert
+  to the previous behavior:
+
+    Sequel.convert_two_digit_years = false
+
+  Note that Ruby 1.8 and 1.9 handle Date parsing differently, so
+  there is no backwards compatibility change for Ruby 1.9.  However,
+  this also means that the MM/DD/YY date syntax commonly used in the
+  United States is not always parsed correctly on Ruby 1.9, greatly
+  limiting the use of 2 digit year conversion.
+
+* You can no longer abuse the SQL function syntax for specifying
+  database types.  For example, you must change:
+
+    :type=>:varchar[255]
+
+  to:
+
+    :type=>:varchar, :size=>255

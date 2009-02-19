@@ -1,0 +1,101 @@
+=== Better model associations
+
+The latest release of sequel_model includes a new associations
+functionality written by Jeremy Evans which replaces the old relations
+code in previous versions. Please note that this version is not
+completely backward-compatible and you should therefore upgrade with
+caution.
+
+The new implementation supports three kinds of relations: one_to_many,
+many_to_one and many_to_many, which correspond to has_many, belongs_to
+and has_and_belongs_to_many relations in ActiveRecord. In fact, the
+new implementation includes aliases for ActiveRecord assocation macros
+and is basically compatible with ActiveRecord conventions. It also
+supports DRY implicit class name references. Here's a simple example:
+
+  class Author < Sequel::Model
+    has_many :books # equivalent to one_to_many
+  end
+
+  class Book < Sequel::Model
+    belongs_to :author # equivalent to many_to_one
+    has_and_belongs_to_many :categories # equivalent to many_to_many
+  end
+
+  class Category < Sequel::Model
+    has_and_belongs_to_many :books
+  end
+
+These macros will create the following methods:
+
+* Author#books, Author#add_book, Author#remove_book
+* Book#author, Book#categories, Book#add_category,
+Book#remove_category
+* Category#books, Category#add_book, Category#remove_book
+
+Unlike ActiveRecord, one_to_many and many_to_many association methods
+return a dataset:
+
+  a = Author[1234]
+  a.books.sql #=> 'SELECT * FROM books WHERE (author_id = 1234)'
+
+You can also tell Sequel to cache the association result set and
+return it as an array:
+
+  class Author < Sequel::Model
+    has_many :books, :cache => true
+  end
+
+  Author[1234].books.class #=> Array
+
+You can of course bypass the defaults and specify class names and key
+names:
+
+  class Node < Sequel::Model
+    belongs_to :parent, :class => Node
+    belongs_to :session, :key => :producer_id
+  end
+
+Another useful option is :order, which sets the order for the
+association dataset:
+
+  class Author < Sequel::Model
+    has_many :books, :order => :title
+  end
+
+  Author[1234].books.sql #=> 'SELECT * FROM books WHERE (author_id =
+1234) ORDER BY title'
+
+More information about associations can be found in the Sequel
+documentation.
+
+=== Other changes
+
+* Added configuration file for running specs (#186).
+
+* Changed Database#drop_index to accept fixed arity (#173).
+
+* Changed column definition sql to put UNSIGNED constraint before
+unique in order to satisfy MySQL (#171).
+
+* Enhanced MySQL adapter to support load data local infile_, added
+compress option for mysql connection by default (#172).
+
+* Fixed bug when inserting hashes in array tuples mode.
+
+* Changed SQLite adapter to catch RuntimeError raised when executing a
+statement and raise Error::InvalidStatement with the offending SQL and
+error message (#188).
+
+* Fixed Dataset#reverse to not raise for unordered dataset (#189).
+
+* Added Dataset#unordered method and changed #order to remove order if
+nil is specified (#190).
+
+* Fixed reversing order of ASC expression (#164).
+
+* Added support for :null => true option when defining table columns
+(#192).
+
+* Fixed Symbol#method_missing to accept variable arity (#185).
+

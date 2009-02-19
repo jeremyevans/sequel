@@ -1,0 +1,97 @@
+New Features
+------------
+
+* Compound SQL statement (i.e. UNION, EXCEPT, and INTERSECT) support
+  is much improved.  Chaining compound statement calls now longer
+  wipes out previous compound statements calls of the same type.
+  Also, the ordering of the compound statements is no longer fixed
+  per adapter, it now reflects the order they were called on the
+  object.  For example, the following now work as expected:
+
+    ds1.union(ds2).union(ds3)
+    ds1.except(ds2).except(ds3)
+    ds1.intersect(ds2).intersect(ds3)
+    ds1.union(ds2).except(ds3)
+    ds1.except(ds2).intersect(ds3)
+    ds1.intersect(ds2).union(ds3)
+
+* Exception classes ValidationFailure and BeforeHookFailure were
+  added so it is eaiser to catch a failed validation.  These are
+  both subclasses of Sequel::Error, so there shouldn't be any
+  backwards compatibility issues.  Error messages are also improved,
+  as the ValidationFailure message is a string containing all
+  validation failures and the BeforeHookFailure message contains
+  which hook type caused the failure (i.e. before_save,
+  before_create, or before_validate).
+
+* The sequel command line tool now has a -L option to load
+  all files in the given directory.  This is mainly useful for
+  loading a directory of model files. The files are loaded
+  after the database connection is set up.
+
+* Methods to create and drop database functions, triggers, and
+  procedural languages were added to the PostgreSQL adapter.
+
+Other Improvements
+------------------
+
+* Database#schema now raises an error if you pass a table that
+  doesn't exist.  Before, some adapters would return an empty schema.
+  The bigger problem with this is that it made table_exists? return
+  the wrong value, since it looks at the Database's schema.
+  Generally, this bug would show up in the following code:
+
+    class Blah < Sequel::Model
+    end
+    Blah.table_exists? # True even if blahs is not a table
+
+* AlterTableGenerator#add_foreign_key now works for MySQL.
+
+* Error messages in model association methods that add/remove an
+  associated object are now more descriptive.
+
+* Dataset#destroy for model datasets now works with databases that
+  can't handle nested queries.  However, it now loads all model
+  objects being destroyed before attempting to destroy any of them.
+
+* Dataset#count now works correctly for compound SQL statements
+  (i.e. UNION, EXCEPT, and INTERSECT).
+
+* BigDecimal NaN and (+/-)Infinity values are now literalized
+  correctly.  Database support for this is hit or miss.  Sqlite will
+  work correctly, PostgreSQL raises an error if you try to store an
+  infinite value in a numeric column (though it works for float
+  columns), and MySQL converts all three to 0.
+
+* The SQLite adapter no longer loses primary key information when
+  dropping columns.
+
+* The SQLite adapter now supports dropping indicies.
+
+* A bug in the MSSQL adapter's literalization of LiteralStrings has
+  been fixed.
+
+* The literalization of blobs on PostgreSQL (bytea columns) has been
+  fixed.
+
+* Sequel now raises an error if you attempt to subclass Sequel::Model
+  before setting up a database connection.
+
+* The native postgresql adapter has been changed to only log client
+  messages of level WARNING by default.  You can modify this via:
+
+    Sequel::Postgres.client_min_messages = nil # Use Server Default
+    Sequel::Postgres.client_min_messages = :notice # Use NOTICE level
+
+* Model#inspect now calls Model#inspect_values for easier
+  overloading.
+
+Backwards Compatibilty
+----------------------
+
+* The API to Model#save_failure (a private method) was changed to
+  remove the second argument.
+
+* SQLite columns with type numeric, decimal, or money are now
+  returned as BigDecimal values.  Before, they were probably returned
+  as strings.

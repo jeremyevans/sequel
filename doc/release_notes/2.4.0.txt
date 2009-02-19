@@ -1,0 +1,106 @@
+Prepared Statements/Bound Variables
+===================================
+
+Sequel now supports prepared statements and bound variables.  No
+matter which database you are using, Sequel uses exactly the same API.
+To specify placeholders, you use the :$placeholder syntax:
+
+  ds = DB[:items].filter(:name=>:$n)
+
+To use a bound variable:
+
+  ds.call(:select, :n=>'Jim')
+
+This will do the equivalent of selecting records that have the name
+'Jim'.  In addition to :select, you can use :first or :delete. There
+is also support for bound variables when inserting or updating
+records:
+
+  ds.call(:update, {:n=>'Jim', :new_n=>'Bob'}, :name=>:$new_n)
+
+Which will update all records that have the name 'Jim' to have the
+name 'Bob'.
+
+Prepared statement support is very similar to bound variable support,
+except that the statement is first prepared with a name:
+
+  ps = ds.prepare(:select, :select_by_name)
+
+It is then called later with the bound arguments to use:
+
+  ps.call(:n=>'Jim')
+  DB.call(:select_by_name, :n=>'Jim') # same as above
+
+For inserting or updating, the hash to use when inserting or updating
+is given to prepare:
+
+  ps2 = ds.prepare(:update, :update_name, :name=>:$new_n)
+  ps2.call(:n=>'Jim', :new_n=>'Bob')
+
+There is some level of native support for these features in the
+PostgreSQL, MySQL, SQLite, and JDBC adapters.  For other adapters,
+support is emulated, but it shouldn't be too difficult to add native
+support for them.
+
+For more details see:
+http://sequel.rubyforge.org/rdoc/files/doc/prepared_statements_rdoc.html
+
+Read-Only Slave/Writable Master and Database Sharding
+=====================================================
+
+Sequel now has built in support for master/slave database
+configurations, just by setting an option in Sequel.connect:
+
+  DB=Sequel.connect('postgres://master_server/database', \
+    :servers=>{:read_only=>{:host=>'slave_server'}})
+
+That will use slave_server for SELECT queries and master_server for
+other queries.  It's fairly easy to use multiple slaves or even
+multiple masters, examples are included in the link below.
+
+Sharding support requires some code other than the database
+configuration, but is still fairly simple.  For example, to set up
+a 16 shard configuration based on a hex character:
+
+  servers = {}
+  (('0'..'9').to_a + ('a'..'f').to_a).each do |hex|
+    servers[hex.to_sym] = {:host=>"hash_host_#{hex}"}
+  end
+  DB=Sequel.connect('postgres://hash_host/hashes', :servers=>servers)
+
+To set which shard to use for a query, use the Dataset#server method:
+
+  DB[:hashes].server(:a).filter(:hash=>/31337/)
+
+For more details see:
+http://sequel.rubyforge.org/rdoc/files/doc/sharding_rdoc.html
+
+Other Changes
+=============
+
+* The sequel.rubyforge.org website has a new design thanks to boof.
+  The online RDoc is now located at http://sequel.rubyforge.org/rdoc.
+
+* Support was added for anonymous column names in the ADO adapter.
+
+* Better MSSQL support in the ADO, ODBC, and JDBC adapters.  The
+  odbc_mssql adapter has been removed. If you use MSSQL with ODBC,
+  please use the odbc adapter with a :db_type=>'mssql' option.
+
+* The following Sequel::Error exception subclasses were removed:
+  InvalidExpression, InvalidFilter, InvalidJoinType, and WorkerStop.
+
+* Documentation was added for the PostgreSQL, MySQL, SQLite, and
+  JDBC adapters.
+
+* Various internal interfaces were refactored.  For example, if you
+  use an adapter not included with Sequel, it probably won't work
+  until you update it to the new internal API.
+
+* Many low level methods (such as Database#transaction), now take
+  an optional server argument to indicate which server to use.
+
+* Model plugins that have a DatasetMethods module with non-public
+  methods no longer have Model methods created that call those
+  methods.
+
