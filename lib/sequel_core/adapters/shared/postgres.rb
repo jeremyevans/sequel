@@ -612,7 +612,7 @@ module Sequel
       # Insert given values into the database.
       def insert(*values)
         if !@opts[:sql] and server_version >= 80200
-          single_value(:sql=>insert_returning_pk_sql(*values))
+          single_value(default_server_opts(:sql=>insert_returning_pk_sql(*values)))
         else
           execute_insert(insert_sql(*values), :table=>opts[:from].first,
             :values=>values.size == 1 ? values.first : values)
@@ -626,7 +626,7 @@ module Sequel
 
       # Insert a record returning the record inserted
       def insert_select(*values)
-        single_record(:naked=>true, :sql=>insert_returning_sql(nil, *values)) if server_version >= 80200
+        single_record(default_server_opts(:naked=>true, :sql=>insert_returning_sql(nil, *values))) if server_version >= 80200
       end
 
       # Handle microseconds for Time and DateTime values, as well as PostgreSQL
@@ -676,11 +676,6 @@ module Sequel
       
       private
       
-      # Call execute_insert on the database object with the given values.
-      def execute_insert(sql, opts={})
-        @db.execute_insert(sql, {:server=>@opts[:server] || :default}.merge(opts))
-      end
-
       # Use the RETURNING clause to return the primary key of the inserted record, if it exists
       def insert_returning_pk_sql(*values)
         pk = db.primary_key(opts[:from].first)

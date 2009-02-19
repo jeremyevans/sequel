@@ -467,6 +467,11 @@ module Sequel
       end
     end
 
+    # Set the server to use to :default unless it is already set in the passed opts
+    def default_server_opts(opts)
+      {:server=>@opts[:server] || :default}.merge(opts)
+    end
+
     # Execute the given SQL on the database using execute.
     def execute(sql, opts={}, &block)
       @db.execute(sql, {:server=>@opts[:server] || :read_only}.merge(opts), &block)
@@ -474,12 +479,12 @@ module Sequel
     
     # Execute the given SQL on the database using execute_dui.
     def execute_dui(sql, opts={}, &block)
-      @db.execute_dui(sql, {:server=>@opts[:server] || :default}.merge(opts), &block)
+      @db.execute_dui(sql, default_server_opts(opts), &block)
     end
     
     # Execute the given SQL on the database using execute_insert.
     def execute_insert(sql, opts={}, &block)
-      @db.execute_insert(sql, {:server=>@opts[:server] || :default}.merge(opts), &block)
+      @db.execute_insert(sql, default_server_opts(opts), &block)
     end
     
     # Modify the identifier returned from the database based on the

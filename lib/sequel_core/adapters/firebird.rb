@@ -239,7 +239,7 @@ module Sequel
       # Insert given values into the database.
       def insert(*values)
         if !@opts[:sql]
-          single_value(:sql=>insert_returning_pk_sql(*values))
+          single_value(default_server_opts(:sql=>insert_returning_pk_sql(*values)))
         else
           execute_insert(insert_sql(*values), :table=>opts[:from].first,
             :values=>values.size == 1 ? values.first : values)
@@ -259,7 +259,7 @@ module Sequel
 
       # Insert a record returning the record inserted
       def insert_select(*values)
-        single_record(:naked=>true, :sql=>insert_returning_sql(nil, *values))
+        single_record(default_server_opts(:naked=>true, :sql=>insert_returning_sql(nil, *values)))
       end
 
       def literal(v)

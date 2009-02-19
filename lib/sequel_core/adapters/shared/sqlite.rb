@@ -260,11 +260,6 @@ module Sequel
       def as_sql(expression, aliaz)
         "#{expression} AS #{literal(aliaz.to_s)}"
       end
-
-      # Call execute_insert on the database with the given SQL.
-      def execute_insert(sql, opts={})
-        @db.execute_insert(sql, {:server=>@opts[:server] || :default}.merge(opts))
-      end
     end
   end
 end
