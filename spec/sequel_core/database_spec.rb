@@ -55,6 +55,12 @@ context "A new Database" do
     db.quote_identifiers?.should == true
   end
 
+  specify "should upcase on input and downcase on output by default" do
+    db = Sequel::Database.new
+    db.send(:identifier_input_method_default).should == :upcase
+    db.send(:identifier_output_method_default).should == :downcase
+  end
+
   specify "should respect the :upcase_identifiers option" do
     Sequel.upcase_identifiers = false
     db = Sequel::Database.new(:upcase_identifiers=>false)
@@ -78,6 +84,7 @@ context "A new Database" do
   
   specify "should respect the :identifier_input_method option" do
     Sequel.identifier_input_method = nil
+    Sequel::Database.identifier_input_method.should == ""
     db = Sequel::Database.new(:identifier_input_method=>nil)
     db.identifier_input_method.should == nil
     db.identifier_input_method = :downcase
@@ -87,6 +94,7 @@ context "A new Database" do
     db.identifier_input_method = nil
     db.identifier_input_method.should == nil
     Sequel.identifier_input_method = :downcase
+    Sequel::Database.identifier_input_method.should == :downcase
     db = Sequel::Database.new(:identifier_input_method=>nil)
     db.identifier_input_method.should == nil
     db.identifier_input_method = :upcase
@@ -99,6 +107,7 @@ context "A new Database" do
   
   specify "should respect the :identifier_output_method option" do
     Sequel.identifier_output_method = nil
+    Sequel::Database.identifier_output_method.should == ""
     db = Sequel::Database.new(:identifier_output_method=>nil)
     db.identifier_output_method.should == nil
     db.identifier_output_method = :downcase
@@ -108,6 +117,7 @@ context "A new Database" do
     db.identifier_output_method = nil
     db.identifier_output_method.should == nil
     Sequel.identifier_output_method = :downcase
+    Sequel::Database.identifier_output_method.should == :downcase
     db = Sequel::Database.new(:identifier_output_method=>nil)
     db.identifier_output_method.should == nil
     db.identifier_output_method = :upcase
@@ -197,6 +207,13 @@ context "A new Database" do
     db.should be_a_kind_of(Sequel::Database)
     db.opts[:uri].should == 'jdbc:test://host/db_name'
   end
+
+  specify "should just use a :uri option for do with the full connection string" do
+    Sequel::Database.should_receive(:adapter_class).once.with(:do).and_return(Sequel::Database)
+    db = Sequel.connect('do:test://host/db_name')
+    db.should be_a_kind_of(Sequel::Database)
+    db.opts[:uri].should == 'do:test://host/db_name'
+  end
 end
 
 context "Database#disconnect" do
@@ -227,6 +244,10 @@ context "Database#uri" do
   
   specify "should return the connection URI for the database" do
     @db.uri.should == 'mau://user:pass@localhost:9876/maumau'
+  end
+  
+  specify "should be aliased as #url" do
+    @db.url.should == 'mau://user:pass@localhost:9876/maumau'
   end
 end
 

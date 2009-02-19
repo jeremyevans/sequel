@@ -81,6 +81,13 @@ context "Dataset" do
     @dataset.literal(:a).should == 'a'
   end
 
+  specify "should have upcase_identifiers? method which returns whether identifiers are currently upcased" do
+    @dataset.upcase_identifiers = true
+    @dataset.upcase_identifiers?.should == true
+    @dataset.upcase_identifiers = false
+    @dataset.upcase_identifiers?.should == false
+  end
+
   specify "should have identifier_input_method= method which changes literalization of identifiers" do
     @dataset.identifier_input_method = :upcase
     @dataset.literal(:a).should == 'A'

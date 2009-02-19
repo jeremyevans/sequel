@@ -794,20 +794,36 @@ describe Sequel::Model, "Validations" do
   it "should validate that a column doesn't have a string value" do
     p = Class.new(Sequel::Model)
     p.class_eval do
-      columns :age
+      columns :age, :price, :confirmed
       self.raise_on_typecast_failure = false
       validates_not_string :age
+      validates_not_string :confirmed
+      validates_not_string :price, :message=>'is not valid'
       @db_schema = {:age=>{:type=>:integer}}
     end
     
-    @person = p.new :age => "a"
+    @person = p.new
+    @person.should be_valid
+
+    @person.confirmed = 't'
+    @person.should_not be_valid
+    @person.errors.full_messages.should == ['confirmed is a string']
+    @person.confirmed = true
+    @person.should be_valid
+
+    @person.age = 'a'
     @person.should_not be_valid
     @person.errors.full_messages.should == ['age is not a valid integer']
     @person.db_schema[:age][:type] = :datetime
     @person.should_not be_valid
     @person.errors.full_messages.should == ['age is not a valid datetime']
-    
     @person.age = 20
+    @person.should be_valid
+
+    @person.price = 'a'
+    @person.should_not be_valid
+    @person.errors.full_messages.should == ['price is not valid']
+    @person.price = 20
     @person.should be_valid
   end
   
