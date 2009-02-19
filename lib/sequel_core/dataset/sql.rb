@@ -621,6 +621,7 @@ module Sequel
     # Returns a copy of the dataset with the columns selected changed
     # to the given columns.
     def select(*columns)
+      columns += Array((yield SQL::VirtualRow.new)) if block_given?
       clone(:select => columns)
     end
     
@@ -632,6 +633,7 @@ module Sequel
     # Returns a copy of the dataset with the given columns added
     # to the existing selected columns.
     def select_more(*columns)
+      columns += Array((yield SQL::VirtualRow.new)) if block_given?
       select(*((@opts[:select] || []) + columns))
     end
     

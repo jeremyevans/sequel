@@ -867,6 +867,20 @@ context "Dataset#select" do
 
     @d.select(nil, 1, :x => :y).sql.should == "SELECT NULL, 1, x AS y FROM test"
   end
+
+  specify "should accept a block that yields a virtual row" do
+    @d.select{|o| o.a}.sql.should == 'SELECT a FROM test'
+    @d.select{|o| o.a(1)}.sql.should == 'SELECT a(1) FROM test'
+    @d.select{|o| o.a(1, 2)}.sql.should == 'SELECT a(1, 2) FROM test'
+    @d.select{|o| [o.a, o.a(1, 2)]}.sql.should == 'SELECT a, a(1, 2) FROM test'
+  end
+
+  specify "should merge regular arguments with argument returned from block" do
+    @d.select(:b){|o| o.a}.sql.should == 'SELECT b, a FROM test'
+    @d.select(:b, :c){|o| o.a(1)}.sql.should == 'SELECT b, c, a(1) FROM test'
+    @d.select(:b){|o| [o.a, o.a(1, 2)]}.sql.should == 'SELECT b, a, a(1, 2) FROM test'
+    @d.select(:b, :c){|o| [o.a, o.a(1, 2)]}.sql.should == 'SELECT b, c, a, a(1, 2) FROM test'
+  end
 end
 
 context "Dataset#select_all" do
@@ -897,6 +911,11 @@ context "Dataset#select_more" do
   specify "should add to the currently selected columns" do
     @d.select(:a).select_more(:b).sql.should == 'SELECT a, b FROM test'
     @d.select(:a.*).select_more(:b.*).sql.should == 'SELECT a.*, b.* FROM test'
+  end
+
+  specify "should accept a block that yields a virtual row" do
+    @d.select(:a).select_more{|o| o.b}.sql.should == 'SELECT a, b FROM test'
+    @d.select(:a.*).select_more(:b.*){|o| o.b(1)}.sql.should == 'SELECT a.*, b.*, b(1) FROM test'
   end
 end
 
@@ -1960,6 +1979,15 @@ context "Dataset#get" do
   
   specify "should work with aliased fields" do
     @d.get(:x__b.as(:name)).should == "SELECT x.b AS name FROM test LIMIT 1"
+  end
+  
+  specify "should accept a block that yields a virtual row" do
+    @d.get{|o| o.x__b.as(:name)}.should == "SELECT x.b AS name FROM test LIMIT 1"
+    @d.get{|o| o.x(1).as(:name)}.should == "SELECT x(1) AS name FROM test LIMIT 1"
+  end
+  
+  specify "should raise an error if both a regular argument and block argument are used" do
+    proc{@d.get(:name){|o| o.x__b.as(:name)}}.should raise_error(Sequel::Error)
   end
 end
 

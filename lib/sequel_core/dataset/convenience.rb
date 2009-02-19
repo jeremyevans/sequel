@@ -16,7 +16,7 @@ module Sequel
 
     # Returns the average value for the given column.
     def avg(column)
-      get(SQL::Function.new(:avg, column))
+      get{|o| o.avg(column)}
     end
     
     # Returns true if no records exists in the dataset
@@ -61,8 +61,9 @@ module Sequel
     end
 
     # Return the column value for the first matching record in the dataset.
-    def get(column)
-      select(column).single_value
+    def get(column=nil, &block)
+      raise(Error, 'must provide argument or block to Dataset#get, not both') if column && block
+      (column ? select(column) : select(&block)).single_value
     end
 
     # Returns a dataset grouped by the given column with count by group.
@@ -73,7 +74,7 @@ module Sequel
     # Returns the interval between minimum and maximum values for the given 
     # column.
     def interval(column)
-      get("(max(#{literal(column)}) - min(#{literal(column)}))".lit)
+      get{|o| o.max(column) - o.min(column)}
     end
 
     # Reverses the order and then runs first.  Note that this
@@ -97,12 +98,12 @@ module Sequel
 
     # Returns the maximum value for the given column.
     def max(column)
-      get(SQL::Function.new(:max, column))
+      get{|o| o.max(column)}
     end
 
     # Returns the minimum value for the given column.
     def min(column)
-      get(SQL::Function.new(:min, column))
+      get{|o| o.min(column)}
     end
 
     # Inserts multiple records into the associated table. This method can be
@@ -170,7 +171,7 @@ module Sequel
     # Returns a Range object made from the minimum and maximum values for the
     # given column.
     def range(column)
-      if r = select(SQL::Function.new(:min, column).as(:v1), SQL::Function.new(:max, column).as(:v2)).first
+      if r = select{|o| [o.min(column).as(:v1), o.max(column).as(:v2)]}.first
         (r[:v1]..r[:v2])
       end
     end
@@ -191,7 +192,7 @@ module Sequel
     
     # Returns the sum for the given column.
     def sum(column)
-      get(SQL::Function.new(:sum, column))
+      get{|o| o.sum(column)}
     end
 
     # Returns true if the table exists.  Will raise an error
