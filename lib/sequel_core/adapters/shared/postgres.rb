@@ -333,9 +333,7 @@ module Sequel
       
       # Dataset containing all current database locks 
       def locks
-        dataset.from(:pg_class, :pg_locks).
-          select(:pg_class__relname, :pg_locks.*).
-          filter(:pg_class__relfilenode=>:pg_locks__relation)
+        dataset.from(:pg_class).join(:pg_locks, :relation=>:relfilenode).select(:pg_class__relname, Sequel::SQL::ColumnAll.new(:pg_locks))
       end
       
       # Return primary key for the given table.
