@@ -369,7 +369,7 @@ Models in Sequel are based on the Active Record pattern described by Martin Fowl
 
 Model classes are defined as regular Ruby classes:
 
-  DB = Sequel.connect('sqlite:/blog.db')
+  DB = Sequel.connect('sqlite://blog.db')
   class Post < Sequel::Model
   end
 
