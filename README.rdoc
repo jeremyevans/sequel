@@ -228,7 +228,7 @@ You can also specify a custom WHERE clause using a string:
 You can use parameters in your string, as well (ActiveRecord style):
 
   posts.filter('(stamp < ?) AND (author != ?)', Date.today - 3, author_name)
-  posts.filter{|o| (o.stamp < Date.today + 3) & ~{:author => author_name}} # same as above
+  posts.filter{|o| (o.stamp < Date.today - 3) & ~{:author => author_name}} # same as above
 
 Datasets can also be used as subqueries:
 
