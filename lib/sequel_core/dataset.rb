@@ -1,4 +1,4 @@
-%w'callback convenience pagination prepared_statements query schema sql unsupported'.each do |f|
+%w'callback convenience pagination prepared_statements query schema sql'.each do |f|
   require "sequel_core/dataset/#{f}"
 end
 

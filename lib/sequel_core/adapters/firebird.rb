@@ -1,4 +1,5 @@
 require 'fb'
+require 'sequel_core/adapters/utils/unsupported'
 
 module Sequel
   # The Sequel Firebird adapter requires the ruby fb driver located at
@@ -262,19 +263,6 @@ module Sequel
         single_record(default_server_opts(:naked=>true, :sql=>insert_returning_sql(nil, *values)))
       end
 
-      def literal(v)
-        case v
-        when Time, DateTime
-          "#{v.strftime(FIREBIRD_TIMESTAMP_FORMAT)}.#{sprintf("%04d",v.usec / 100)}'"
-        when TrueClass
-          BOOL_TRUE
-        when FalseClass
-          BOOL_FALSE
-        else
-          super
-        end
-      end
-
       # The order of clauses in the SELECT SQL statement
       def select_clause_order
         SELECT_CLAUSE_ORDER
@@ -292,6 +280,22 @@ module Sequel
           m[c] = row.shift
           m
         end
+      end
+
+      def literal_datetime(v)
+        "#{v.strftime(FIREBIRD_TIMESTAMP_FORMAT)}.#{sprintf("%04d",(v.sec_fraction * 864000000))}'"
+      end
+
+      def literal_false
+        BOOL_FALSE
+      end
+
+      def literal_time(v)
+        "#{v.strftime(FIREBIRD_TIMESTAMP_FORMAT)}.#{sprintf("%04d",v.usec / 100)}'"
+      end
+
+      def literal_true
+        BOOL_TRUE
       end
     end
   end

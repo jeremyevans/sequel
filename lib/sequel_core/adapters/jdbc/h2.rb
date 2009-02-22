@@ -1,3 +1,5 @@
+require 'sequel_core/adapters/utils/date_format'
+
 module Sequel
   module JDBC
     # Database and Dataset support for H2 databases accessed via JDBC.
@@ -52,17 +54,7 @@ module Sequel
       
       # Dataset class for H2 datasets accessed via JDBC.
       class Dataset < JDBC::Dataset
-        # Use H2 syntax for Date, DateTime, and Time types.
-        def literal(v)
-          case v
-          when Date
-            v.strftime("DATE '%Y-%m-%d'") 
-          when DateTime, Time
-            v.strftime("TIMESTAMP '%Y-%m-%d %H:%M:%S'")
-          else
-            super
-          end
-        end
+        include Dataset::SQLStandardDateFormat
       end
     end
   end

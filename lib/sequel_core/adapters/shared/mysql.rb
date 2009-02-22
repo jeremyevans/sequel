@@ -1,3 +1,5 @@
+require 'sequel_core/adapters/utils/unsupported'
+
 module Sequel
   module Schema
     module SQL
@@ -146,6 +148,7 @@ module Sequel
 
       BOOL_TRUE = '1'.freeze
       BOOL_FALSE = '0'.freeze
+      TIMESTAMP_FORMAT = "'%Y-%m-%d %H:%M:%S'".freeze
       COMMA_SEPARATOR = ', '.freeze
       
       # MySQL specific syntax for LIKE/REGEXP searches, as well as
@@ -224,20 +227,6 @@ module Sequel
         end
       end
       
-      # Override the default boolean values.
-      def literal(v)
-        case v
-        when true
-          BOOL_TRUE
-        when false
-          BOOL_FALSE
-        when DateTime, Time
-          v.strftime("'%Y-%m-%d %H:%M:%S'")
-        else
-          super
-        end
-      end
-      
       # MySQL specific syntax for inserting multiple values at once.
       def multi_insert_sql(columns, values)
         values = values.map {|r| literal(Array(r))}.join(COMMA_SEPARATOR)
@@ -307,6 +296,26 @@ module Sequel
 
       private
 
+      # Use MySQL Timestamp format
+      def literal_datetime(v)
+        v.strftime(TIMESTAMP_FORMAT)
+      end
+
+      # Use 0 for false on MySQL
+      def literal_false
+        BOOL_FALSE
+      end
+
+      # Use MySQL Timestamp format
+      def literal_time(v)
+        v.strftime(TIMESTAMP_FORMAT)
+      end
+
+      # Use 1 for true on MySQL
+      def literal_true
+        BOOL_TRUE
+      end
+      
       # MySQL doesn't support DISTINCT ON
       def select_distinct_sql(sql, opts)
         if opts[:distinct]

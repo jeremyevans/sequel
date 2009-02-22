@@ -46,16 +46,6 @@ module Sequel
           execute_insert(insert_sql(*values))
         end
         
-        # Handle time types correctly
-        def literal(v)
-          case v
-          when Time, DateTime
-            v.strftime("'%Y-%m-%d %H:%M:%S'")
-          else
-            super
-          end
-        end
-        
         # Use execute_insert to execute the replace_sql.
         def replace(*args)
           execute_insert(replace_sql(*args))

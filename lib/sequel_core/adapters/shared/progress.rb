@@ -1,3 +1,6 @@
+require 'sequel_core/adapters/utils/date_format'
+require 'sequel_core/adapters/utils/unsupported'
+
 module Sequel
   module Progress
     module DatabaseMethods
@@ -11,6 +14,7 @@ module Sequel
   
     module DatasetMethods
       include Dataset::UnsupportedIntersectExcept
+      include Dataset::SQLStandardDateFormat
 
       SELECT_CLAUSE_ORDER = %w'limit distinct columns from join where group order having compounds'.freeze
 

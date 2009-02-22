@@ -91,21 +91,9 @@ module Sequel
           ps
         end
         
-        # Convert Java::JavaSql::Timestamps correctly, and handle Strings
-        # similar to the native postgres adapter.
-        def literal(v)
-          case v
-          when LiteralString
-            v
-          when SQL::Blob
-            super
-          when String
-            db.synchronize{|c| "'#{c.escape_string(v)}'"}
-          when Java::JavaSql::Timestamp
-            "TIMESTAMP #{literal(v.to_s)}"
-          else
-            super
-          end
+        # Literalize strings similar to the native postgres adapter
+        def literal_string(v)
+          db.synchronize{|c| "'#{c.escape_string(v)}'"}
         end
       end
     end

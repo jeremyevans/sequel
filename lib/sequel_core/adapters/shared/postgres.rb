@@ -629,29 +629,6 @@ module Sequel
         single_record(default_server_opts(:naked=>true, :sql=>insert_returning_sql(nil, *values))) if server_version >= 80200
       end
 
-      # Handle microseconds for Time and DateTime values, as well as PostgreSQL
-      # specific boolean values and string escaping.
-      def literal(v)
-        case v
-        when LiteralString
-          v
-        when SQL::Blob
-          "'#{v.gsub(/[\000-\037\047\134\177-\377]/){|b| "\\#{("%o" % b[0..1].unpack("C")[0]).rjust(3, '0')}"}}'"
-        when String
-          "'#{v.gsub("'", "''")}'"
-        when Time
-          "#{v.strftime(PG_TIMESTAMP_FORMAT)}.#{sprintf("%06d",v.usec)}'"
-        when DateTime
-          "#{v.strftime(PG_TIMESTAMP_FORMAT)}.#{sprintf("%06d", (v.sec_fraction * 86400000000).to_i)}'"
-        when TrueClass
-          BOOL_TRUE
-        when FalseClass
-          BOOL_FALSE
-        else
-          super
-        end
-      end
-      
       # Locks the table with the specified mode.
       def lock(mode, server=nil)
         sql = LOCK % [source_list(@opts[:from]), mode]
@@ -682,6 +659,30 @@ module Sequel
         insert_returning_sql(pk ? Sequel::SQL::Identifier.new(pk) : 'NULL'.lit, *values)
       end
       
+      def literal_blob(v)
+        "'#{v.gsub(/[\000-\037\047\134\177-\377]/){|b| "\\#{("%o" % b[0..1].unpack("C")[0]).rjust(3, '0')}"}}'"
+      end
+
+      def literal_datetime(v)
+        "#{v.strftime(PG_TIMESTAMP_FORMAT)}.#{sprintf("%06d", (v.sec_fraction * 86400000000).to_i)}'"
+      end
+
+      def literal_false
+        BOOL_FALSE
+      end
+
+      def literal_string(v)
+        "'#{v.gsub("'", "''")}'"
+      end
+
+      def literal_true
+        BOOL_TRUE
+      end
+
+      def literal_time(v)
+        "#{v.strftime(PG_TIMESTAMP_FORMAT)}.#{sprintf("%06d",v.usec)}'"
+      end
+
       # PostgreSQL is smart and can use parantheses around all datasets to get
       # the correct answers.
       def select_compounds_sql(sql, opts)

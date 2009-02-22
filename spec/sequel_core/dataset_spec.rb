@@ -734,13 +734,13 @@ context "Dataset#literal" do
   
   specify "should literalize Time properly" do
     t = Time.now
-    s = t.strftime("TIMESTAMP '%Y-%m-%d %H:%M:%S'")
+    s = t.strftime("'%Y-%m-%dT%H:%M:%S%z'").gsub(/(\d\d')\z/, ':\1')
     @dataset.literal(t).should == s
   end
   
   specify "should literalize Date properly" do
     d = Date.today
-    s = d.strftime("DATE '%Y-%m-%d'")
+    s = d.strftime("'%Y-%m-%d'")
     @dataset.literal(d).should == s
   end
   
@@ -3429,34 +3429,5 @@ context "Sequel::Dataset#each" do
       x[:count].should == 'SELECT COUNT'
       @ds.columns.should == [:count]
     end
-  end
-end
-
-context Sequel::Dataset::UnsupportedIntersectExcept do
-  before do
-    @ds = Sequel::Dataset.new(nil).from(:items)
-    @ds2 = Sequel::Dataset.new(nil).from(:i)
-    @ds.extend(Sequel::Dataset::UnsupportedIntersectExcept)
-  end
-
-  specify "should raise an error if INTERSECT or EXCEPT is USED" do
-    @ds.union(@ds2).sql.should == 'SELECT * FROM items UNION SELECT * FROM i'
-    proc{@ds.intersect(@ds2)}.should raise_error(Sequel::Error)
-    proc{@ds.except(@ds2)}.should raise_error(Sequel::Error)
-  end
-end
-
-context Sequel::Dataset::UnsupportedIntersectExceptAll do
-  before do
-    @ds = Sequel::Dataset.new(nil).from(:items)
-    @ds2 = Sequel::Dataset.new(nil).from(:i)
-    @ds.extend(Sequel::Dataset::UnsupportedIntersectExceptAll)
-  end
-
-  specify "should raise an error if INTERSECT or EXCEPT is USED" do
-    @ds.intersect(@ds2).sql.should == 'SELECT * FROM items INTERSECT SELECT * FROM i'
-    @ds.except(@ds2).sql.should == 'SELECT * FROM items EXCEPT SELECT * FROM i'
-    proc{@ds.intersect(@ds2, true)}.should raise_error(Sequel::Error)
-    proc{@ds.except(@ds2, true)}.should raise_error(Sequel::Error)
   end
 end

@@ -75,17 +75,6 @@ module Sequel
     class Dataset < Sequel::Dataset
       MAX_COL_SIZE = 256
       
-      def literal(v)
-        case v
-        when Time
-          literal(v.iso8601)
-        when Date, DateTime
-          literal(v.to_s)
-        else
-          super
-        end
-      end
-
       def fetch_rows(sql)
         execute(sql) do |sth|
           @column_info = get_column_info(sth)

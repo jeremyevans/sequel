@@ -100,25 +100,6 @@ module Sequel
       ODBC_TIMESTAMP_AFTER_SECONDS =
         ODBC_TIMESTAMP_FORMAT.index( '%S' ).succ - ODBC_TIMESTAMP_FORMAT.length
       ODBC_DATE_FORMAT = "{d '%Y-%m-%d'}".freeze
-      
-      def literal(v)
-        case v
-        when true
-          BOOL_TRUE
-        when false
-          BOOL_FALSE
-        when Time, DateTime
-          formatted = v.strftime(ODBC_TIMESTAMP_FORMAT)
-          usec = (Time === v ? v.usec : (v.sec_fraction * 86400000000))
-          formatted.insert(ODBC_TIMESTAMP_AFTER_SECONDS, ".#{(usec.to_f/1000).round}") if usec >= 1000
-          formatted
-        when Date
-          v.strftime(ODBC_DATE_FORMAT)
-        else
-          super
-        end
-      end
-
       UNTITLED_COLUMN = 'untitled_%d'.freeze
 
       def fetch_rows(sql, &block)
@@ -141,15 +122,7 @@ module Sequel
       end
       
       private
-      
-      def hash_row(row)
-        hash = {}
-        row.each_with_index do |v, idx|
-          hash[@columns[idx]] = convert_odbc_value(v)
-        end
-        hash
-      end
-      
+
       def convert_odbc_value(v)
         # When fetching a result set, the Ruby ODBC driver converts all ODBC 
         # SQL types to an equivalent Ruby type; with the exception of
@@ -168,6 +141,39 @@ module Sequel
         else
           v
         end
+      end
+      
+      def hash_row(row)
+        hash = {}
+        row.each_with_index do |v, idx|
+          hash[@columns[idx]] = convert_odbc_value(v)
+        end
+        hash
+      end
+      
+      def literal_date(v)
+        v.strftime(ODBC_DATE_FORMAT)
+      end
+      
+      def literal_datetime(v)
+        formatted = v.strftime(ODBC_TIMESTAMP_FORMAT)
+        usec = v.sec_fraction * 86400000000
+        formatted.insert(ODBC_TIMESTAMP_AFTER_SECONDS, ".#{(usec.to_f/1000).round}") if usec >= 1000
+        formatted
+      end
+      
+      def literal_false
+        BOOL_FALSE
+      end
+      
+      def literal_true
+        BOOL_TRUE
+      end
+
+      def literal_time(v)
+        formatted = v.strftime(ODBC_TIMESTAMP_FORMAT)
+        formatted.insert(ODBC_TIMESTAMP_AFTER_SECONDS, ".#{(v.usec.to_f/1000).round}") if usec >= 1000
+        formatted
       end
     end
   end

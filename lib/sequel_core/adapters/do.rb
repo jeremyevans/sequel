@@ -175,18 +175,6 @@ module Sequel
     
     # Dataset class for Sequel::DataObjects::Database objects.
     class Dataset < Sequel::Dataset
-      # Handle the usual time class overrides.
-      def literal(v)
-        case v
-        when Time
-          literal(v.iso8601)
-        when Date, DateTime
-          literal(v.to_s)
-        else
-          super
-        end
-      end
-      
       # Execute the SQL on the database and yield the rows as hashes
       # with symbol keys.
       def fetch_rows(sql)
