@@ -73,6 +73,9 @@ class << Sequel::Model
     @db_schema = {}
     cols.each{|c| @db_schema[c] = {}}
   end
+  def simple_table
+    nil
+  end
 end
 
 Sequel::Model.db = MODEL_DB = MockDatabase.new

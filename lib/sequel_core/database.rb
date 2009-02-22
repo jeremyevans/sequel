@@ -317,6 +317,14 @@ module Sequel
     end
     alias_method :>>, :fetch
     
+    # Optimized method to select the first row with the value for the column
+    # in the given table. The table and column arguments are used as-is, do not call this method
+    # with untrusted input in those arguments, or you will be vulnerable to SQL injection.
+    def find_by_table_column_value(table, column, value)
+      self["SELECT * FROM #{table} WHERE #{column} = #{literal(value)} LIMIT 1"].each{|r| return r}
+      nil
+    end
+
     # Returns a new dataset with the from method invoked. If a block is given,
     # it is used as a filter on the dataset.
     def from(*args, &block)

@@ -417,3 +417,69 @@ describe Sequel::Model, ".strict_param_setting" do
     proc{@c.new(:z=>1)}.should_not raise_error
   end
 end
+
+describe Sequel::Model, ".[] optimization" do
+  setup do
+    @c = Class.new(Sequel::Model(:a))
+    @c.instance_eval do
+      def simple_table
+        @simple_table
+      end
+    end
+  end
+
+  it "should set simple_pk to the literalized primary key column name if a single primary key" do
+    @c.simple_pk.should == 'id'
+    @c.set_primary_key :b
+    @c.simple_pk.should == 'b'
+    @c.set_primary_key :b__a.identifier
+    @c.simple_pk.should == 'b__a'
+  end
+
+  it "should have simple_pk be blank if compound or no primary key" do
+    @c.no_primary_key
+    @c.simple_pk.should == nil
+    @c.set_primary_key :b, :a
+    @c.simple_pk.should == nil
+  end
+
+  it "should have simple table set if passed a Symbol to set_dataset" do
+    @c.set_dataset :a
+    @c.simple_table.should == 'a'
+    @c.set_dataset :b
+    @c.simple_table.should == 'b'
+    @c.set_dataset :b__a
+    @c.simple_table.should == 'b.a'
+  end
+
+  it "should have simple_table = nil if passed a dataset to set_dataset" do
+    @c.set_dataset @c.db[:a]
+    @c.simple_table.should == nil
+  end
+
+  it "should have simple_table superclasses setting if inheriting" do
+    @c.set_dataset :a
+    Class.new(@c).simple_table.should == 'a'
+    @c.instance_variable_set(:@simple_table, nil)
+    Class.new(@c).simple_table.should == nil
+    @c.instance_variable_set(:@simple_table, "'b'")
+    Class.new(@c).simple_table.should == "'b'"
+  end
+
+  it "should have simple_table = nil if inheriting and sti_key is set" do
+    @c.set_sti_key :x
+    Class.new(@c).simple_table.should == nil
+  end
+
+  it "should use Database#find_by_table_column_value if simple_table and simple_pk are true" do
+    @c.set_dataset :a
+    @c.db.should_receive(:find_by_table_column_value)
+    @c[1]
+  end
+
+  it "should not use Database#find_by_table_column_value if either simple_table or simple_pk is nil" do
+    @c.set_dataset @c.dataset
+    @c.db.should_not_receive(:find_by_table_column_value)
+    @c[1]
+  end
+end

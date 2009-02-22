@@ -1186,3 +1186,28 @@ context "Database#typecast_value" do
     proc{@db.typecast_value(:datetime, 4)}.should raise_error(Sequel::Error::InvalidValue)
   end
 end
+
+context "Database#find_by_table_column_value" do
+  setup do
+    @db = MockDatabase.new
+  end
+
+  specify "should return a record with a matching value" do
+    @db.find_by_table_column_value(:a, :id, 1).should == {:x=>1, :id=>1}
+  end
+
+  specify "should return nil if no value matches" do
+    def @db.dataset
+      super.extend(Module.new{
+        def fetch_rows(*args)
+        end
+      })
+    end
+    @db.find_by_table_column_value(:a, :id, 1).should == nil
+  end
+
+  specify "should literalize only the value argument" do
+    @db.find_by_table_column_value("'a'", "''id''", '1')
+    @db.sqls.should == ["SELECT * FROM 'a' WHERE ''id'' = '1' LIMIT 1"]
+  end
+end

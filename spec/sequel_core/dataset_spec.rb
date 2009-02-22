@@ -703,6 +703,10 @@ context "Dataset#literal" do
     @dataset.literal("a\\'bc").should == "'a\\\\''bc'"
   end
   
+  specify "should escape blobs as strings by default" do
+    @dataset.literal('abc'.to_sequel_blob).should == "'abc'"
+  end
+
   specify "should literalize numbers properly" do
     @dataset.literal(1).should == "1"
     @dataset.literal(1.5).should == "1.5"
@@ -734,6 +738,12 @@ context "Dataset#literal" do
   
   specify "should literalize Time properly" do
     t = Time.now
+    s = t.strftime("'%Y-%m-%dT%H:%M:%S%z'").gsub(/(\d\d')\z/, ':\1')
+    @dataset.literal(t).should == s
+  end
+  
+  specify "should literalize DateTime properly" do
+    t = DateTime.now
     s = t.strftime("'%Y-%m-%dT%H:%M:%S%z'").gsub(/(\d\d')\z/, ':\1')
     @dataset.literal(t).should == s
   end
