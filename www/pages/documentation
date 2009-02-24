@@ -12,9 +12,20 @@
 <li><a href="/rdoc/files/doc/schema_rdoc.html">Schema Modification</a></li>
 </ul>
 
-<h3><a href="/rdoc/">API RDoc</a></h3>
+<h3><a href="/rdoc/">Full API RDoc</a>, Main Classes/Modules:</h3>
+
+<ul>
+<li><a href="/rdoc/classes/Sequel.html">Sequel</a></li>
+<li><a href="/rdoc/classes/Sequel/Database.html">Sequel::Database</a></li>
+<li><a href="/rdoc/classes/Sequel/Dataset.html">Sequel::Dataset</a></li>
+<li><a href="/rdoc/classes/Sequel/Model.html">Sequel::Model</a></li>
+<li><a href="/rdoc/classes/Sequel/Model/Associations.html">Sequel::Model::Associations</a></li>
+<li><a href="/rdoc/classes/Sequel/Model/Associations/EagerLoading.html">Sequel::Model::Associations::EagerLoading</a></li>
+</ul>
 
 <h3><a href="/rdoc/files/CHANGELOG.html">Change Log</a></h3>
+
+<h3><a href="/rdoc/files/doc/release_notes/">Release Notes</a></h3>
 
 <h3><a href="/rdoc/files/COPYING.html">License</a></h3>
 
