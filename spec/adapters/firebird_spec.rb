@@ -334,6 +334,11 @@ context "A Firebird database" do
 
     @db[:test2].first[:xyz].should == "56.40"
   end
+
+  specify "should allow us to retrieve the primary key for a table" do
+    @db.create_table!(:test2){primary_key :id}
+    @db.primary_key(:test2).should == ["id"]
+  end
 end
 
 context "Postgres::Dataset#insert" do
