@@ -221,7 +221,7 @@ module Sequel
     # * :minimum - The minimum size allowed for the value (no default)
     # * :too_long - The message to use use if it the value is too long (default: 'is too long')
     # * :too_short - The message to use use if it the value is too short (default: 'is too short')
-    # * :with - The array/range that must include the size of the value for it to be valid (no default)
+    # * :within - The array/range that must include the size of the value for it to be valid (no default)
     # * :wrong_length - The message to use use if it the value is not valid (default: 'is the wrong length')
     def self.validates_length_of(*atts)
       opts = {
