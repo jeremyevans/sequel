@@ -348,7 +348,7 @@ context "Postgres::Dataset#insert" do
   end
 
   specify "should using call insert_returning_sql" do
-    @ds.should_receive(:single_value).once.with(:sql=>'INSERT INTO TEST5 (VAL) VALUES (10) RETURNING XID')
+    @ds.should_receive(:single_value).once.with(:sql=>'INSERT INTO TEST5 (VAL) VALUES (10) RETURNING XID', :server=> :default)
     @ds.insert(:val=>10)
   end
 
