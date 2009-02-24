@@ -152,33 +152,21 @@ otherwise modified:
   end
   Author.first.authorships_dataset.filter{|o| o.number < 10}.first
  
-You can extend a dataset with a module easily with :extend:
+You can extend a dataset with a module easily with :extend.  You can reference
+the model object that created the association dataset via the dataset's
+model_object method, and the related association reflection via the dataset's
+association_reflection method:
 
   module FindOrCreate
     def find_or_create(vals)
-      first(vals) || @opts[:models][nil].create(vals)
+      first(vals) || association_reflection.associated_class. \
+        create(vals.merge(association_reflection[:key]=>model_object.id))
     end
   end
   class Author < Sequel::Model
     one_to_many :authorships, :extend=>FindOrCreate
   end
   Author.first.authorships_dataset.find_or_create(:name=>'Blah', :number=>10)
-
-However, note that the dataset doesn't have any knowledge of the model object
-that created it via the association, so if you want to use attributes of the
-model object, you'll have to use a closure:
-
-  class Author < Sequel::Model
-    one_to_many :authorships, :dataset=>(proc do
-      key = pk
-      ds = Authorship.filter(:author_id=>key)
-      ds.meta_def(:find_or_create_by_name) do |name|
-        first(:name=>name) || Authorship.create(:name=>name, :author_id=>key)
-      end 
-      ds  
-    end)
-  end
-  Author.first.authorships_dataset.find_or_create_by_name('Bob')
 
 ===has_many :through associations
 

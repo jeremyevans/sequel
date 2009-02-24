@@ -345,6 +345,9 @@ module Sequel
     def _dataset(opts)
       raise(Sequel::Error, "model object #{model} does not have a primary key") if opts.dataset_need_primary_key? && !pk
       ds = send(opts._dataset_method)
+      ds.extend(Associations::DatasetMethods)
+      ds.model_object = self
+      ds.association_reflection = opts
       opts[:extend].each{|m| ds.extend(m)}
       ds = ds.select(*opts.select) if opts.select
       ds = ds.filter(opts[:conditions]) if opts[:conditions]

@@ -51,6 +51,15 @@
 #   one_to_many :attributes
 #   has_many :attributes
 module Sequel::Model::Associations
+  # This module contains methods added to all association datasets
+  module DatasetMethods
+    # The model object that created the association dataset
+    attr_accessor :model_object
+
+    # The association reflection related to the association dataset
+    attr_accessor :association_reflection
+  end
+
   # Array of all association reflections for this model class
   def all_association_reflections
     association_reflections.values

@@ -1,5 +1,7 @@
 === HEAD
 
+* Give association datasets knowledge of the model object that created them and the related association reflection (jeremyevans)
+
 * Make Dataset#select, #select_more, and #get take a block that yields a SQL::VirtualRow, similar to #filter (jeremyevans)
 
 * Fix stored procedures in MySQL adapter when multiple arguments are used (clivecrous)

@@ -16,6 +16,33 @@ describe Sequel::Model, "associate" do
     klass.association_reflection(:"par_parent2s").associated_class.should == ParParent
   end
 
+  it "should add a model_object and association_reflection accessors to the dataset, and return it with the current model object" do
+    MODEL_DB.reset
+    klass = Class.new(Sequel::Model(:nodes)) do
+      columns :id, :a_id
+    end
+    mod = Module.new do
+      def blah
+       filter{|o| o.__send__(association_reflection[:key]) > model_object.id*2}
+      end
+    end
+
+    klass.associate :many_to_one, :a, :class=>klass
+    klass.associate :one_to_many, :bs, :key=>:b_id, :class=>klass, :extend=>mod
+    klass.associate :many_to_many, :cs, :class=>klass
+    
+    node = klass.load(:id=>1)
+    node.a_dataset.model_object.should == node
+    node.bs_dataset.model_object.should == node
+    node.cs_dataset.model_object.should == node
+
+    node.a_dataset.association_reflection.should == klass.association_reflection(:a)
+    node.bs_dataset.association_reflection.should == klass.association_reflection(:bs)
+    node.cs_dataset.association_reflection.should == klass.association_reflection(:cs)
+
+    node.bs_dataset.blah.sql.should == 'SELECT * FROM nodes WHERE ((nodes.b_id = 1) AND (b_id > 2))'
+  end
+
   it "should allow extending the dataset with :extend option" do
     MODEL_DB.reset
     klass = Class.new(Sequel::Model(:nodes)) do
