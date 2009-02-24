@@ -146,8 +146,14 @@ module Sequel
 
       BOOL_TRUE = '1'.freeze
       BOOL_FALSE = '0'.freeze
+      CAST_TYPES = {String=>:CHAR, Integer=>:SIGNED, Time=>:DATETIME, DateTime=>:DATETIME, Numeric=>:DECIMAL, BigDecimal=>:DECIMAL, File=>:BINARY}
       COMMA_SEPARATOR = ', '.freeze
       
+      # MySQL can't use the varchar type in a cast.
+      def cast_sql(expr, type)
+        "CAST(#{literal(expr)} AS #{CAST_TYPES[type] || db.send(:type_literal_base, :type=>type)})"
+      end
+
       # MySQL specific syntax for LIKE/REGEXP searches, as well as
       # string concatenation.
       def complex_expression_sql(op, args)

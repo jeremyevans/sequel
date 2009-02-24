@@ -12,7 +12,7 @@ module Sequel
       SET_DEFAULT = 'SET DEFAULT'.freeze
       SET_NULL = 'SET NULL'.freeze
       TYPES = Hash.new {|h, k| k}
-      TYPES.merge!(:double=>'double precision', String=>'varchar',
+      TYPES.merge!(:double=>'double precision', String=>'varchar(255)',
         Integer=>'integer', Fixnum=>'integer', Bignum=>'bigint',
         Float=>'double precision', BigDecimal=>'numeric', Numeric=>'numeric',
         Date=>'date', DateTime=>'timestamp', Time=>'timestamp', File=>'blob',

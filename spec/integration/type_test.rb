@@ -6,6 +6,15 @@ describe "Supported types" do
     INTEGRATION_DB[:items]
   end
 
+  specify "should support casting correctly" do
+    ds = create_items_table_with_column(:number, Integer)
+    ds.insert(:number => 1)
+    ds.select(:number.cast_string.as(:n)).map(:n).should == %w'1'
+    ds = create_items_table_with_column(:name, String)
+    ds.insert(:name=> '1')
+    ds.select(:name.cast_numeric.as(:n)).map(:n).should == [1]
+  end
+
   specify "should support NULL correctly" do
     ds = create_items_table_with_column(:number, Integer)
     ds.insert(:number => nil)

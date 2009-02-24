@@ -181,21 +181,21 @@ module Sequel
     module CastMethods 
       # Cast the reciever to the given SQL type
       def cast(sql_type)
-        IrregularFunction.new(:cast, self, :AS, sql_type.to_s.lit)
+        Cast.new(self, sql_type)
       end
       alias_method :cast_as, :cast
 
       # Cast the reciever to the given SQL type (or integer if none given),
       # and return the result as a NumericExpression. 
       def cast_numeric(sql_type = nil)
-        cast(sql_type || :integer).sql_number
+        cast(sql_type || Integer).sql_number
       end
 
       # Cast the reciever to the given SQL type (or text if none given),
       # and return the result as a StringExpression, so you can use +
       # directly on the result for SQL string concatenation.
       def cast_string(sql_type = nil)
-        cast(sql_type || :text).sql_string
+        cast(sql_type || String).sql_string
       end
     end
     
@@ -400,22 +400,6 @@ module Sequel
       end
     end
 
-    # Represents an SQL array.  Added so it is possible to deal with a
-    # ruby array of all two pairs as an SQL array instead of an ordered
-    # hash-like conditions specifier.
-    class SQLArray < Expression
-      # Create an object with the given array.
-      def initialize(array)
-        @array = array
-      end
-
-      # Delegate the creation of the resulting SQL to the given dataset,
-      # since it may be database dependent.
-      def to_s(ds)
-        ds.array_sql(@array)
-      end
-    end
-
     # Blob is used to represent binary data in the Ruby environment that is
     # stored as a blob type in the database. In PostgreSQL, the blob type is 
     # called bytea. Sequel represents binary data as a Blob object because 
@@ -517,6 +501,27 @@ module Sequel
       end
     end
 
+    # Represents a cast of an SQL expression to a specific type.
+    class Cast < GenericExpression
+      # The expression to cast
+      attr_reader :expr
+
+      # The type to which to cast the expression
+      attr_reader :type
+      
+      # Set the attributes to the given arguments
+      def initialize(expr, type)
+        @expr = expr
+        @type = type
+      end
+
+      # Delegate the creation of the resulting SQL to the given dataset,
+      # since it may be database dependent.
+      def to_s(ds)
+        ds.cast_sql(expr, type)
+      end
+    end
+
     # Represents all columns in a given table, table.* in SQL
     class ColumnAll < SpecificExpression
       # The table containing the columns being selected
@@ -587,12 +592,12 @@ module Sequel
       end 
     end
     
-    # IrregularFunction is used for the SQL EXTRACT and CAST functions,
+    # IrregularFunction is used for the SQL EXTRACT function,
     # which don't use regular function calling syntax. The IrregularFunction
     # replaces the commas the regular function uses with a custom
     # join string.
     #
-    # This shouldn't be used directly, see CastMethods#cast and 
+    # This shouldn't be used directly, see
     # ComplexExpressionMethods#extract.
     class IrregularFunction < Function
       # The arguments to pass to the function (may be blank)
@@ -783,6 +788,22 @@ module Sequel
           BooleanExpression.new(op, l, expr)
         end
         ces.length == 1 ? ces.at(0) : BooleanExpression.new(:OR, *ces)
+      end
+    end
+
+    # Represents an SQL array.  Added so it is possible to deal with a
+    # ruby array of all two pairs as an SQL array instead of an ordered
+    # hash-like conditions specifier.
+    class SQLArray < Expression
+      # Create an object with the given array.
+      def initialize(array)
+        @array = array
+      end
+
+      # Delegate the creation of the resulting SQL to the given dataset,
+      # since it may be database dependent.
+      def to_s(ds)
+        ds.array_sql(@array)
       end
     end
 

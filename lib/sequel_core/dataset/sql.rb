@@ -45,6 +45,11 @@ module Sequel
       sql << "ELSE #{literal(ce.default)} END)"
     end
 
+    # SQL fragment for the SQL CAST expression.
+    def cast_sql(expr, type)
+      "CAST(#{literal(expr)} AS #{db.send(:type_literal_base, :type=>type)})"
+    end
+
     # SQL fragment for specifying all columns in a given table.
     def column_all_sql(ca)
       "#{quote_schema_table(ca.table)}.*"

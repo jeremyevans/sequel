@@ -1212,7 +1212,7 @@ context "Dataset#uniq" do
   specify "should accept an expression list" do
     @dataset.uniq(:a, :b).sql.should == 'SELECT DISTINCT ON (a, b) name FROM test'
 
-    @dataset.uniq(:stamp.cast_as(:integer), :node_id=>nil).sql.should == 'SELECT DISTINCT ON (cast(stamp AS integer), (node_id IS NULL)) name FROM test'
+    @dataset.uniq(:stamp.cast_as(:integer), :node_id=>nil).sql.should == 'SELECT DISTINCT ON (CAST(stamp AS integer), (node_id IS NULL)) name FROM test'
   end
 
   specify "should do a subselect for count" do

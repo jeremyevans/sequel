@@ -1,5 +1,7 @@
 === HEAD
 
+* Allow use of database independent types when casting (jeremyevans)
+
 * Give association datasets knowledge of the model object that created them and the related association reflection (jeremyevans)
 
 * Make Dataset#select, #select_more, and #get take a block that yields a SQL::VirtualRow, similar to #filter (jeremyevans)

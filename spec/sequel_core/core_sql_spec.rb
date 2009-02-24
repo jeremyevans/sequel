@@ -208,7 +208,7 @@ context "Column references" do
     @c = Class.new(Sequel::Dataset) do
       def quoted_identifier(c); "`#{c}`"; end
     end
-    @ds = @c.new(nil)
+    @ds = @c.new(MockDatabase.new)
     @ds.quote_identifiers = true
   end
   
@@ -235,8 +235,8 @@ context "Column references" do
   end
   
   specify "should be quoted properly in a cast function" do
-    @ds.literal(:x.cast_as(:integer)).should == "cast(`x` AS integer)"
-    @ds.literal(:x__y.cast_as('varchar(20)')).should == "cast(`x`.`y` AS varchar(20))"
+    @ds.literal(:x.cast_as(:integer)).should == "CAST(`x` AS integer)"
+    @ds.literal(:x__y.cast_as('varchar(20)')).should == "CAST(`x`.`y` AS varchar(20))"
   end
 end
 
@@ -343,7 +343,7 @@ end
 
 context "Symbol" do
   setup do
-    @ds = Sequel::Dataset.new(nil)
+    @ds = Sequel::Dataset.new(MockDatabase.new)
   end
   
   specify "should support upper case outer functions" do
@@ -357,28 +357,49 @@ context "Symbol" do
   end
   
   specify "should support cast method and its cast_as alias" do
-    :abc.cast_as(:integer).to_s(@ds).should == "cast(abc AS integer)"
-    :abc.cast(:integer).to_s(@ds).should == "cast(abc AS integer)"
+    :abc.cast_as(:integer).to_s(@ds).should == "CAST(abc AS integer)"
+    :abc.cast(:integer).to_s(@ds).should == "CAST(abc AS integer)"
   end
   
   specify "should support cast_numeric and cast_string" do
     x = :abc.cast_numeric
     x.should be_a_kind_of(Sequel::SQL::NumericExpression)
-    x.to_s(@ds).should == "cast(abc AS integer)"
+    x.to_s(@ds).should == "CAST(abc AS integer)"
 
     x = :abc.cast_numeric(:real)
     x.should be_a_kind_of(Sequel::SQL::NumericExpression)
-    x.to_s(@ds).should == "cast(abc AS real)"
+    x.to_s(@ds).should == "CAST(abc AS real)"
 
     x = :abc.cast_string
     x.should be_a_kind_of(Sequel::SQL::StringExpression)
-    x.to_s(@ds).should == "cast(abc AS text)"
+    x.to_s(@ds).should == "CAST(abc AS varchar(255))"
 
     x = :abc.cast_string(:varchar)
     x.should be_a_kind_of(Sequel::SQL::StringExpression)
-    x.to_s(@ds).should == "cast(abc AS varchar)"
+    x.to_s(@ds).should == "CAST(abc AS varchar)"
   end
   
+  specify "should allow database independent types when casting" do
+    m = MockDatabase.new
+    m.instance_eval do
+       def type_literal_base(column)
+         return :foo if column[:type] == Integer
+         return :bar if column[:type] == String
+         column
+       end
+    end
+    @ds2 = Sequel::Dataset.new(m)
+    :abc.cast_as(Integer).to_s(@ds).should == "CAST(abc AS integer)"
+    :abc.cast_as(Integer).to_s(@ds2).should == "CAST(abc AS foo)"
+    :abc.cast(String).to_s(@ds).should == "CAST(abc AS varchar(255))"
+    :abc.cast(String).to_s(@ds2).should == "CAST(abc AS bar)"
+    :abc.cast(String).to_s(@ds2).should == "CAST(abc AS bar)"
+    :abc.cast_string.to_s(@ds2).should == "CAST(abc AS bar)"
+    :abc.cast_string(Integer).to_s(@ds2).should == "CAST(abc AS foo)"
+    :abc.cast_numeric.to_s(@ds2).should == "CAST(abc AS foo)"
+    :abc.cast_numeric(String).to_s(@ds2).should == "CAST(abc AS bar)"
+  end
+
   specify "should support subscript access using | operator" do
     (:abc|1).to_s(@ds).should == 'abc[1]'
     (:abc|[1]).to_s(@ds).should == 'abc[1]'
