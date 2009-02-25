@@ -994,6 +994,21 @@ context "Dataset#unordered" do
   end
 end
 
+context "Dataset#with_sql" do
+  setup do
+    @dataset = Sequel::Dataset.new(nil).from(:test)
+  end
+  
+  specify "should remove use static sql" do
+    @dataset.with_sql('SELECT 1 FROM test').sql.should == 'SELECT 1 FROM test'
+  end
+  
+  specify "should keep row_proc and transform" do
+    @dataset.with_sql('SELECT 1 FROM test').row_proc.should == @dataset.row_proc
+    @dataset.with_sql('SELECT 1 FROM test').instance_variable_get(:@transform).should == @dataset.instance_variable_get(:@transform)
+  end
+end
+
 context "Dataset#order_by" do
   setup do
     @dataset = Sequel::Dataset.new(nil).from(:test)

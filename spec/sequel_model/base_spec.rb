@@ -471,15 +471,15 @@ describe Sequel::Model, ".[] optimization" do
     Class.new(@c).simple_table.should == nil
   end
 
-  it "should use Database#find_by_table_column_value if simple_table and simple_pk are true" do
+  it "should use Dataset#with_sql if simple_table and simple_pk are true" do
     @c.set_dataset :a
-    @c.db.should_receive(:find_by_table_column_value)
+    @c.dataset.should_receive(:with_sql).and_return(@c.dataset)
     @c[1]
   end
 
-  it "should not use Database#find_by_table_column_value if either simple_table or simple_pk is nil" do
+  it "should not use Dataset#with_sql if either simple_table or simple_pk is nil" do
     @c.set_dataset @c.dataset
-    @c.db.should_not_receive(:find_by_table_column_value)
+    @c.dataset.should_not_receive(:with_sql)
     @c[1]
   end
 end

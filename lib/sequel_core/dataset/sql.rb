@@ -736,6 +736,12 @@ module Sequel
       sql
     end
 
+    # Returns a copy of the dataset with the static SQL used.  This is useful if you want
+    # to keep the same row_proc/transform/graph, but change the SQL used to custom SQL.
+    def with_sql(sql)
+      clone(:sql=>sql)
+    end
+
     [:inner, :full_outer, :right_outer, :left_outer].each do |jtype|
       class_eval("def #{jtype}_join(*args, &block); join_table(:#{jtype}, *args, &block) end")
     end

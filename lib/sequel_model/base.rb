@@ -85,7 +85,7 @@ module Sequel
        left_outer_join limit map multi_insert naked order order_by order_more 
        paginate print query range reverse_order right_outer_join select 
        select_all select_more server set set_graph_aliases single_value size to_csv to_hash
-       transform union uniq unfiltered unordered update where'.map{|x| x.to_sym}
+       transform union uniq unfiltered unordered update where with_sql'.map{|x| x.to_sym}
 
     # Instance variables that are inherited in subclasses
     INHERITED_INSTANCE_VARIABLES = {:@allowed_columns=>:dup, :@cache_store=>nil,
@@ -108,7 +108,11 @@ module Sequel
       args = args.first if (args.size == 1)
       return dataset[args] if args.is_a?(Hash)
       return cache_lookup(args) if @cache_store
-      (t = simple_table and p = simple_pk) ? new(db.find_by_table_column_value(t, p, args), true) : dataset[primary_key_hash(args)]
+      if t = simple_table and p = simple_pk
+        with_sql("SELECT * FROM #{t} WHERE #{p} = #{dataset.literal(args)} LIMIT 1").first
+      else
+        dataset[primary_key_hash(args)]
+      end
     end
     
     # Returns the columns in the result set in their original order.
@@ -340,6 +344,7 @@ module Sequel
         @simple_table = db.literal(ds)
         db[ds]
       when Dataset
+        @simple_table = nil
         @db = ds.db
         ds
       else
