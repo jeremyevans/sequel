@@ -541,15 +541,17 @@ module Sequel
     #   ds.order(:name.asc).sql #=> 'SELECT * FROM items ORDER BY name ASC'
     #   ds.order(:arr|1).sql #=> 'SELECT * FROM items ORDER BY arr[1]'
     #   ds.order(nil).sql #=> 'SELECT * FROM items'
-    def order(*order)
-      clone(:order => (order.compact.empty?) ? nil : order)
+    def order(*columns)
+      columns += Array((yield SQL::VirtualRow.new)) if block_given?
+      clone(:order => (columns.compact.empty?) ? nil : columns)
     end
     alias_method :order_by, :order
     
     # Returns a copy of the dataset with the order columns added
     # to the existing order.
-    def order_more(*order)
-      order(*((@opts[:order] || []) + order))
+    def order_more(*columns)
+      columns += Array((yield SQL::VirtualRow.new)) if block_given?
+      order(*((@opts[:order] || []) + columns))
     end
     
     # SQL fragment for the ordered expression, used in the ORDER BY

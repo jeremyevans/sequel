@@ -960,6 +960,20 @@ context "Dataset#order" do
     @dataset.order(:bah).order(nil).sql.should == 
       'SELECT * FROM test'
   end
+
+  specify "should accept a block that yields a virtual row" do
+    @dataset.order{|o| o.a}.sql.should == 'SELECT * FROM test ORDER BY a'
+    @dataset.order{|o| o.a(1)}.sql.should == 'SELECT * FROM test ORDER BY a(1)'
+    @dataset.order{|o| o.a(1, 2)}.sql.should == 'SELECT * FROM test ORDER BY a(1, 2)'
+    @dataset.order{|o| [o.a, o.a(1, 2)]}.sql.should == 'SELECT * FROM test ORDER BY a, a(1, 2)'
+  end
+
+  specify "should merge regular arguments with argument returned from block" do
+    @dataset.order(:b){|o| o.a}.sql.should == 'SELECT * FROM test ORDER BY b, a'
+    @dataset.order(:b, :c){|o| o.a(1)}.sql.should == 'SELECT * FROM test ORDER BY b, c, a(1)'
+    @dataset.order(:b){|o| [o.a, o.a(1, 2)]}.sql.should == 'SELECT * FROM test ORDER BY b, a, a(1, 2)'
+    @dataset.order(:b, :c){|o| [o.a, o.a(1, 2)]}.sql.should == 'SELECT * FROM test ORDER BY b, c, a, a(1, 2)'
+  end
 end
 
 context "Dataset#unfiltered" do
@@ -1028,6 +1042,11 @@ context "Dataset#order_more" do
   specify "should add to a previous ordering" do
     @dataset.order(:name).order_more(:stamp.desc).sql.should ==
       'SELECT * FROM test ORDER BY name, stamp DESC'
+  end
+
+  specify "should accept a block that yields a virtual row" do
+    @dataset.order(:a).order_more{|o| o.b}.sql.should == 'SELECT * FROM test ORDER BY a, b'
+    @dataset.order(:a, :b).order_more(:c, :d){|o| [o.e, o.f(1, 2)]}.sql.should == 'SELECT * FROM test ORDER BY a, b, c, d, e, f(1, 2)'
   end
 end
 
