@@ -189,8 +189,7 @@ module Sequel
     alias_method :where, :filter
 
     # The first source (primary table) for this dataset.  If the dataset doesn't
-    # have a table, raises an error.  If the table is aliased, returns the actual
-    # table name, not the alias.
+    # have a table, raises an error.  If the table is aliased, returns the aliased name.
     def first_source
       source = @opts[:from]
       if source.nil? || source.empty?
