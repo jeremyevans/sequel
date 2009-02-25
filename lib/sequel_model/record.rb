@@ -474,6 +474,24 @@ module Sequel
       end
     end
 
+    # Set the given object as the associated object for the given association
+    def set_associated_object(opts, o)
+      raise(Sequel::Error, "model object #{model} does not have a primary key") if o && !o.pk
+      old_val = send(opts.association_method)
+      return o if old_val == o
+      return if old_val and run_association_callbacks(opts, :before_remove, old_val) == false
+      return if o and run_association_callbacks(opts, :before_add, o) == false
+      send(opts._setter_method, o)
+      associations[opts[:name]] = o
+      remove_reciprocal_object(opts, old_val) if old_val
+      if o
+        add_reciprocal_object(opts, o) 
+        run_association_callbacks(opts, :after_add, o)
+      end
+      run_association_callbacks(opts, :after_remove, old_val) if old_val
+      o
+    end
+
     # Set the columns, filtered by the only and except arrays.
     def set_restricted(hash, only, except)
       columns_not_set = model.instance_variable_get(:@columns).blank?
