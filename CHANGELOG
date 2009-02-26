@@ -1,5 +1,11 @@
 === HEAD
 
+* Optimize Model.[] by using static sql when possible, for a 30-40% speed increase (jeremyevans)
+
+* Add Dataset#with_sql, which returns a clone of the datatset with static SQL (jeremyevans)
+
+* Refactor Dataset#literal so it doesn't need to be overridden in subadapters, for a 20-25% performance increase (jeremyevans)
+
 * Remove SQL::IrregularFunction, no longer used internally (jeremyevans)
 
 * Allow String#lit to take arguments and return a SQL::PlaceholderLiteralString (jeremyevans)
