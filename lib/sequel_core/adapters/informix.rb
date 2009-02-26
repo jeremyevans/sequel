@@ -1,3 +1,4 @@
+require 'sequel_core/adapters/utils/unsupported'
 require 'informix'
 
 module Sequel
@@ -38,17 +39,6 @@ module Sequel
       include UnsupportedIntersectExcept
 
       SELECT_CLAUSE_ORDER = %w'limit distinct columns from join where having group compounds order'.freeze
-
-      def literal(v)
-        case v
-        when Time
-          literal(v.iso8601)
-        when Date, DateTime
-          literal(v.to_s)
-        else
-          super
-        end
-      end
 
       def fetch_rows(sql, &block)
         execute(sql) do |cursor|

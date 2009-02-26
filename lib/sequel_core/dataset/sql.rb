@@ -7,13 +7,11 @@ module Sequel
     COLUMN_REF_RE2 = /\A([\w ]+)___([\w ]+)\z/.freeze
     COLUMN_REF_RE3 = /\A([\w ]+)__([\w ]+)\z/.freeze
     COUNT_FROM_SELF_OPTS = [:distinct, :group, :sql, :limit, :compounds]
-    DATE_FORMAT = "DATE '%Y-%m-%d'".freeze
     N_ARITY_OPERATORS = ::Sequel::SQL::ComplexExpression::N_ARITY_OPERATORS
     NULL = "NULL".freeze
     QUESTION_MARK = '?'.freeze
     STOCK_COUNT_OPTS = {:select => [LiteralString.new("COUNT(*)").freeze], :order => nil}.freeze
     SELECT_CLAUSE_ORDER = %w'distinct columns from join where group having compounds order limit'.freeze
-    TIMESTAMP_FORMAT = "TIMESTAMP '%Y-%m-%d %H:%M:%S'".freeze
     TWO_ARITY_OPERATORS = ::Sequel::SQL::ComplexExpression::TWO_ARITY_OPERATORS
     WILDCARD = '*'.freeze
 
@@ -468,38 +466,39 @@ module Sequel
     # If an unsupported object is given, an exception is raised.
     def literal(v)
       case v
-      when LiteralString
-        v
       when String
-        "'#{v.gsub(/\\/, "\\\\\\\\").gsub(/'/, "''")}'"
-      when Integer, Float
-        v.to_s
+        return v if v.is_a?(LiteralString)
+        v.is_a?(SQL::Blob) ? literal_blob(v) : literal_string(v)
+      when Symbol
+        literal_symbol(v)
+      when Integer
+        literal_integer(v)
+      when Hash
+        literal_hash(v)
+      when SQL::Expression
+        literal_expression(v)
+      when Float
+        literal_float(v)
       when BigDecimal
-        d = v.to_s("F")
-        d = "'#{d}'" if v.nan? || v.infinite?
-        d
+        literal_big_decimal(v)
       when NilClass
         NULL
       when TrueClass
-        BOOL_TRUE
+        literal_true
       when FalseClass
-        BOOL_FALSE
-      when Symbol
-        symbol_to_column_ref(v)
-      when ::Sequel::SQL::Expression
-        v.to_s(self)
+        literal_false
       when Array
-        v.all_two_pairs? ? literal(v.sql_expr) : array_sql(v)
-      when Hash
-        literal(v.sql_expr)
-      when Time, DateTime
-        v.strftime(TIMESTAMP_FORMAT)
+        literal_array(v)
+      when Time
+        literal_time(v)
+      when DateTime
+        literal_datetime(v)
       when Date
-        v.strftime(DATE_FORMAT)
+        literal_date(v)
       when Dataset
-        "(#{subselect_sql(v)})"
+        literal_dataset(v)
       else
-        raise Error, "can't express #{v.inspect} as a SQL literal"
+        literal_other(v)
       end
     end
 
@@ -674,9 +673,7 @@ module Sequel
     #   :items__abc___a.to_column_ref(ds) #=> "items.abc AS a"
     #
     def symbol_to_column_ref(sym)
-      c_table, column, c_alias = split_symbol(sym)
-      qc = "#{"#{quote_identifier(c_table)}." if c_table}#{quote_identifier(column)}"
-      c_alias ? as_sql(qc, c_alias) : qc
+      literal_symbol(sym)
     end
 
     # Returns a copy of the dataset with no filters (HAVING or WHERE clause) applied.
@@ -743,6 +740,12 @@ module Sequel
       end
 
       sql
+    end
+
+    # Returns a copy of the dataset with the static SQL used.  This is useful if you want
+    # to keep the same row_proc/transform/graph, but change the SQL used to custom SQL.
+    def with_sql(sql)
+      clone(:sql=>sql)
     end
 
     [:inner, :full_outer, :right_outer, :left_outer].each do |jtype|
@@ -855,6 +858,89 @@ module Sequel
     # spaces and upcases.
     def join_type_sql(join_type)
       "#{join_type.to_s.gsub('_', ' ').upcase} JOIN"
+    end
+
+    # SQL fragment for Array.  Treats as an expression if an array of all two pairs, or as a SQL array otherwise.
+    def literal_array(v)
+      v.all_two_pairs? ? literal_expression(v.sql_expr) : array_sql(v)
+    end
+
+    # SQL fragment for BigDecimal
+    def literal_big_decimal(v)
+      d = v.to_s("F")
+      v.nan? || v.infinite? ?  "'#{d}'" : d
+    end
+
+    # SQL fragment for SQL::Blob
+    def literal_blob(v)
+      literal_string(v)
+    end
+
+    # SQL fragment for Dataset.  Does a subselect inside parantheses.
+    def literal_dataset(v)
+      "(#{subselect_sql(v)})"
+    end
+
+    # SQL fragment for Date, using the ISO8601 format.
+    def literal_date(v)
+      "'#{v}'"
+    end
+
+    # SQL fragment for DateTime, using the ISO8601 format.
+    def literal_datetime(v)
+      "'#{v}'"
+    end
+
+    # SQL fragment for SQL::Expression, result depends on the specific type of expression.
+    def literal_expression(v)
+      v.to_s(self)
+    end
+
+    # SQL fragment for false
+    def literal_false
+      BOOL_FALSE
+    end
+
+    # SQL fragment for Float
+    def literal_float(v)
+      v.to_s
+    end
+
+    # SQL fragment for Hash, treated as an expression
+    def literal_hash(v)
+      literal_expression(v.sql_expr)
+    end
+
+    # SQL fragment for Integer
+    def literal_integer(v)
+      v.to_s
+    end
+
+    # SQL fragmento for a type of object not handled by Dataset#literal.  Raises an error.  If a database specific type is allowed, this should be overriden in a subclass.
+    def literal_other(v)
+      raise Error, "can't express #{v.inspect} as a SQL literal"
+    end
+
+    # SQL fragment for String.  Doubles \ and ' by default.
+    def literal_string(v)
+      "'#{v.gsub(/\\/, "\\\\\\\\").gsub(/'/, "''")}'"
+    end
+
+    # SQL fragment for Symbol, treated as an identifier, possibly aliased and/or qualified.
+    def literal_symbol(v)
+      c_table, column, c_alias = split_symbol(v)
+      qc = "#{"#{quote_identifier(c_table)}." if c_table}#{quote_identifier(column)}"
+      c_alias ? as_sql(qc, c_alias) : qc
+    end
+
+    # SQL fragment for Time, uses the ISO8601 format.
+    def literal_time(v)
+      "'#{v.iso8601}'"
+    end
+
+    # SQL fragment for true.
+    def literal_true
+      BOOL_TRUE
     end
 
     # Returns a qualified column name (including a table name) if the column

@@ -1,5 +1,5 @@
 require 'java'
-require 'sequel_core/dataset/stored_procedures'
+require 'sequel_core/adapters/utils/stored_procedures'
 
 module Sequel
   # Houses Sequel's JDBC support when running on JRuby.
@@ -412,18 +412,6 @@ module Sequel
       def fetch_rows(sql, &block)
         execute(sql){|result| process_result_set(result, &block)}
         self
-      end
-      
-      # Use the ISO values for dates and times.
-      def literal(v)
-        case v
-        when Time
-          literal(v.iso8601)
-        when Date, DateTime, Java::JavaSql::Timestamp, Java::JavaSql::Date
-          literal(v.to_s)
-        else
-          super
-        end
       end
       
       # Create a named prepared statement that is stored in the

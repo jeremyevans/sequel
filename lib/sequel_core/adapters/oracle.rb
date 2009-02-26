@@ -78,15 +78,6 @@ module Sequel
     class Dataset < Sequel::Dataset
       include DatasetMethods
 
-      def literal(v)
-        case v
-        when OraDate
-          literal(Time.local(*v.to_a))
-        else
-          super
-        end
-      end
-
       def fetch_rows(sql, &block)
         execute(sql) do |cursor|
           begin
@@ -101,6 +92,17 @@ module Sequel
           end
         end
         self
+      end
+
+      private
+
+      def literal_other(v)
+        case v
+        when OraDate
+          literal_time(Time.local(*v.to_a))
+        else
+          super
+        end
       end
     end
   end

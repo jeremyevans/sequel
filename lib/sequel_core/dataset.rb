@@ -1,4 +1,4 @@
-%w'callback convenience pagination prepared_statements query schema sql unsupported'.each do |f|
+%w'callback convenience pagination prepared_statements query schema sql'.each do |f|
   require "sequel_core/dataset/#{f}"
 end
 
@@ -54,7 +54,7 @@ module Sequel
     left_outer_join limit naked or order order_by order_more paginate query reject
     reverse reverse_order right_outer_join select select_all select_more
     set_defaults set_graph_aliases set_model set_overrides sort sort_by
-    unfiltered union unordered where'.collect{|x| x.to_sym}
+    unfiltered union unordered where with_sql'.collect{|x| x.to_sym}
 
     NOTIMPL_MSG = "This method must be overridden in Sequel adapters".freeze
     STOCK_TRANSFORMS = {

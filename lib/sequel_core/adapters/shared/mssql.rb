@@ -1,3 +1,5 @@
+require 'sequel_core/adapters/utils/unsupported'
+
 module Sequel
   module MSSQL
     module DatabaseMethods
@@ -52,21 +54,6 @@ module Sequel
         filter("CONTAINS (#{literal(cols)}, #{literal(terms)})")
       end
       
-      def literal(v)
-        case v
-        when LiteralString
-          v
-        when String
-          "N#{super}"
-        when Time
-          literal(v.iso8601)
-        when Date, DateTime
-          literal(v.to_s)
-        else
-          super
-        end
-      end
-
       def multi_insert_sql(columns, values)
         values = values.map {|r| "SELECT #{expression_list(r)}" }.join(" UNION ALL ")
         ["INSERT INTO #{source_list(@opts[:from])} (#{identifier_list(columns)}) #{values}"]
@@ -82,6 +69,10 @@ module Sequel
       end
 
       private
+
+      def literal_string(v)
+        "N#{super}"
+      end
 
       def select_clause_order
         SELECT_CLAUSE_ORDER

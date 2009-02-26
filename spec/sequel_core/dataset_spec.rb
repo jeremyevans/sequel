@@ -703,6 +703,10 @@ context "Dataset#literal" do
     @dataset.literal("a\\'bc").should == "'a\\\\''bc'"
   end
   
+  specify "should escape blobs as strings by default" do
+    @dataset.literal('abc'.to_sequel_blob).should == "'abc'"
+  end
+
   specify "should literalize numbers properly" do
     @dataset.literal(1).should == "1"
     @dataset.literal(1.5).should == "1.5"
@@ -734,13 +738,19 @@ context "Dataset#literal" do
   
   specify "should literalize Time properly" do
     t = Time.now
-    s = t.strftime("TIMESTAMP '%Y-%m-%d %H:%M:%S'")
+    s = t.strftime("'%Y-%m-%dT%H:%M:%S%z'").gsub(/(\d\d')\z/, ':\1')
+    @dataset.literal(t).should == s
+  end
+  
+  specify "should literalize DateTime properly" do
+    t = DateTime.now
+    s = t.strftime("'%Y-%m-%dT%H:%M:%S%z'").gsub(/(\d\d')\z/, ':\1')
     @dataset.literal(t).should == s
   end
   
   specify "should literalize Date properly" do
     d = Date.today
-    s = d.strftime("DATE '%Y-%m-%d'")
+    s = d.strftime("'%Y-%m-%d'")
     @dataset.literal(d).should == s
   end
   
@@ -995,6 +1005,21 @@ context "Dataset#unordered" do
   specify "should remove ordering from the dataset" do
     @dataset.order(:name).unordered.sql.should ==
       'SELECT * FROM test'
+  end
+end
+
+context "Dataset#with_sql" do
+  setup do
+    @dataset = Sequel::Dataset.new(nil).from(:test)
+  end
+  
+  specify "should remove use static sql" do
+    @dataset.with_sql('SELECT 1 FROM test').sql.should == 'SELECT 1 FROM test'
+  end
+  
+  specify "should keep row_proc and transform" do
+    @dataset.with_sql('SELECT 1 FROM test').row_proc.should == @dataset.row_proc
+    @dataset.with_sql('SELECT 1 FROM test').instance_variable_get(:@transform).should == @dataset.instance_variable_get(:@transform)
   end
 end
 
@@ -3448,34 +3473,5 @@ context "Sequel::Dataset#each" do
       x[:count].should == 'SELECT COUNT'
       @ds.columns.should == [:count]
     end
-  end
-end
-
-context Sequel::Dataset::UnsupportedIntersectExcept do
-  before do
-    @ds = Sequel::Dataset.new(nil).from(:items)
-    @ds2 = Sequel::Dataset.new(nil).from(:i)
-    @ds.extend(Sequel::Dataset::UnsupportedIntersectExcept)
-  end
-
-  specify "should raise an error if INTERSECT or EXCEPT is USED" do
-    @ds.union(@ds2).sql.should == 'SELECT * FROM items UNION SELECT * FROM i'
-    proc{@ds.intersect(@ds2)}.should raise_error(Sequel::Error)
-    proc{@ds.except(@ds2)}.should raise_error(Sequel::Error)
-  end
-end
-
-context Sequel::Dataset::UnsupportedIntersectExceptAll do
-  before do
-    @ds = Sequel::Dataset.new(nil).from(:items)
-    @ds2 = Sequel::Dataset.new(nil).from(:i)
-    @ds.extend(Sequel::Dataset::UnsupportedIntersectExceptAll)
-  end
-
-  specify "should raise an error if INTERSECT or EXCEPT is USED" do
-    @ds.intersect(@ds2).sql.should == 'SELECT * FROM items INTERSECT SELECT * FROM i'
-    @ds.except(@ds2).sql.should == 'SELECT * FROM items EXCEPT SELECT * FROM i'
-    proc{@ds.intersect(@ds2, true)}.should raise_error(Sequel::Error)
-    proc{@ds.except(@ds2, true)}.should raise_error(Sequel::Error)
   end
 end

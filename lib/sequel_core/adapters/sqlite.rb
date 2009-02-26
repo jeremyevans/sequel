@@ -214,19 +214,6 @@ module Sequel
         end
       end
       
-      # Use the ISO format for dates and timestamps, and quote strings
-      # using the ::SQLite3::Database.quote method.
-      def literal(v)
-        case v
-        when LiteralString, ::Sequel::SQL::Blob
-          super
-        when String
-          "'#{::SQLite3::Database.quote(v)}'"
-        else
-          super
-        end
-      end
-      
       # Prepare the given type of query with the given name and store
       # it in the database.  Note that a new native prepared statement is
       # created on each call to this prepared statement.
@@ -239,6 +226,10 @@ module Sequel
       
       private
       
+      def literal_string(v)
+        "'#{::SQLite3::Database.quote(v)}'"
+      end
+
       # SQLite uses a : before the name of the argument as a placeholder.
       def prepared_arg_placeholder
         PREPARED_ARG_PLACEHOLDER

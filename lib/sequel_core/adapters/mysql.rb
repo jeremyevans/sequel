@@ -1,6 +1,6 @@
 require 'mysql'
 require 'sequel_core/adapters/shared/mysql'
-require 'sequel_core/dataset/stored_procedures'
+require 'sequel_core/adapters/utils/stored_procedures'
 
 module Sequel
   # Module for holding all MySQL-related classes and modules for Sequel.
@@ -299,18 +299,6 @@ module Sequel
         execute_dui(insert_sql(*values)){|c| c.insert_id}
       end
       
-      # Handle correct quoting of strings using ::MySQL.quote.
-      def literal(v)
-        case v
-        when LiteralString
-          v
-        when String
-          "'#{::Mysql.quote(v)}'"
-        else
-          super
-        end
-      end
-      
       # Store the given type of prepared statement in the associated database
       # with the given name.
       def prepare(type, name=nil, values=nil)
@@ -358,6 +346,11 @@ module Sequel
       # Set the :type option to :dui if it hasn't been set.
       def execute_dui(sql, opts={}, &block)
         super(sql, {:type=>:dui}.merge(opts), &block)
+      end
+      
+      # Handle correct quoting of strings using ::MySQL.quote.
+      def literal_string(v)
+        "'#{::Mysql.quote(v)}'"
       end
       
       # Extend the dataset with the MySQL stored procedure methods.
