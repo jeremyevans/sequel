@@ -11,7 +11,7 @@ module Sequel
     N_ARITY_OPERATORS = ::Sequel::SQL::ComplexExpression::N_ARITY_OPERATORS
     NULL = "NULL".freeze
     QUESTION_MARK = '?'.freeze
-    STOCK_COUNT_OPTS = {:select => ["COUNT(*)".lit], :order => nil}.freeze
+    STOCK_COUNT_OPTS = {:select => [LiteralString.new("COUNT(*)").freeze], :order => nil}.freeze
     SELECT_CLAUSE_ORDER = %w'distinct columns from join where group having compounds order limit'.freeze
     TIMESTAMP_FORMAT = "TIMESTAMP '%Y-%m-%d %H:%M:%S'".freeze
     TWO_ARITY_OPERATORS = ::Sequel::SQL::ComplexExpression::TWO_ARITY_OPERATORS
@@ -131,7 +131,7 @@ module Sequel
     #   DB.select(1).where(DB[:items].exists).sql
     #   #=> "SELECT 1 WHERE EXISTS (SELECT * FROM items)"
     def exists(opts = nil)
-      "EXISTS (#{select_sql(opts)})".lit
+      LiteralString.new("EXISTS (#{select_sql(opts)})")
     end
 
     # Returns a copy of the dataset with the given conditions imposed upon it.  
@@ -816,7 +816,7 @@ module Sequel
       when TrueClass, FalseClass
         SQL::BooleanExpression.new(:NOOP, expr)
       when String
-        "(#{expr})".lit
+        LiteralString.new("(#{expr})")
       else
         raise(Error, 'Invalid filter argument')
       end

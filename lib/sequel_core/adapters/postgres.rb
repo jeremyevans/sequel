@@ -342,7 +342,7 @@ module Sequel
       
       if SEQUEL_POSTGRES_USES_PG
         
-        PREPARED_ARG_PLACEHOLDER = '$'.lit.freeze
+        PREPARED_ARG_PLACEHOLDER = LiteralString.new('$').freeze
         
         # PostgreSQL specific argument mapper used for mapping the named
         # argument hash to a array with numbered arguments.  Only used with
@@ -373,7 +373,7 @@ module Sequel
               @prepared_args << y
               i = @prepared_args.length
             end
-            "#{prepared_arg_placeholder}#{i}#{"::#{type}" if type}".lit
+            LiteralString.new("#{prepared_arg_placeholder}#{i}#{"::#{type}" if type}")
           end
         end
 

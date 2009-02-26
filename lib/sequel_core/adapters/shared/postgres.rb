@@ -161,7 +161,7 @@ module Sequel
     
     # Methods shared by Database instances that connect to PostgreSQL.
     module DatabaseMethods
-      PREPARED_ARG_PLACEHOLDER = '$'.lit.freeze
+      PREPARED_ARG_PLACEHOLDER = LiteralString.new('$').freeze
       RE_CURRVAL_ERROR = /currval of sequence "(.*)" is not yet defined in this session|relation "(.*)" does not exist/.freeze
       SQL_BEGIN = 'BEGIN'.freeze
       SQL_SAVEPOINT = 'SAVEPOINT autopoint_%d'.freeze
@@ -550,6 +550,7 @@ module Sequel
       FOR_SHARE = ' FOR SHARE'.freeze
       FOR_UPDATE = ' FOR UPDATE'.freeze
       LOCK = 'LOCK TABLE %s IN %s MODE'.freeze
+      NULL = LiteralString.new('NULL').freeze
       PG_TIMESTAMP_FORMAT = "TIMESTAMP '%Y-%m-%d %H:%M:%S".freeze
       QUERY_PLAN = 'QUERY PLAN'.to_sym
       ROW_EXCLUSIVE = 'ROW EXCLUSIVE'.freeze
@@ -679,7 +680,7 @@ module Sequel
       # Use the RETURNING clause to return the primary key of the inserted record, if it exists
       def insert_returning_pk_sql(*values)
         pk = db.primary_key(opts[:from].first)
-        insert_returning_sql(pk ? Sequel::SQL::Identifier.new(pk) : 'NULL'.lit, *values)
+        insert_returning_sql(pk ? Sequel::SQL::Identifier.new(pk) : NULL, *values)
       end
       
       # PostgreSQL is smart and can use parantheses around all datasets to get

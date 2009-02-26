@@ -159,7 +159,7 @@ module Sequel
         # SQLite uses a : before the name of the argument for named
         # arguments.
         def prepared_arg(k)
-          "#{prepared_arg_placeholder}#{k}".lit
+          LiteralString.new("#{prepared_arg_placeholder}#{k}")
         end
       end
       

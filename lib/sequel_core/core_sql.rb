@@ -121,7 +121,7 @@ class String
   include Sequel::SQL::AliasMethods
   include Sequel::SQL::CastMethods
 
-  # Converts a string into an LiteralString, in order to override string
+  # Converts a string into a Sequel::LiteralString, in order to override string
   # literalization, e.g.:
   #
   #   DB[:items].filter(:abc => 'def').sql #=>
@@ -130,8 +130,12 @@ class String
   #   DB[:items].filter(:abc => 'def'.lit).sql #=>
   #     "SELECT * FROM items WHERE (abc = def)"
   #
-  def lit
-    Sequel::LiteralString.new(self)
+  # You can also provide arguments, to create a Sequel::SQL::PlaceholderLiteralString:
+  #
+  #    DB[:items].select{|o| o.count('DISTINCT ?'.lit(:a))}.sql #=>
+  #      "SELECT count(DISTINCT a) FROM items"
+  def lit(*args)
+    args.empty? ? Sequel::LiteralString.new(self) : Sequel::SQL::PlaceholderLiteralString.new(self, args)
   end
   alias_method :expr, :lit
   

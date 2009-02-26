@@ -124,6 +124,15 @@ context "String#lit" do
     Sequel::Database.new[:t].update_sql(:stamp => "NOW()".expr).should == \
       "UPDATE t SET stamp = NOW()"
   end
+
+  specify "should return a PlaceholderLiteralString object if args are given" do
+    a = 'DISTINCT ?'.lit(:a)
+    a.should be_a_kind_of(Sequel::SQL::PlaceholderLiteralString)
+    ds = MockDatabase.new.dataset
+    ds.literal(a).should == 'DISTINCT a'
+    ds.quote_identifiers = true
+    ds.literal(a).should == 'DISTINCT "a"'
+  end
 end
 
 context "String#to_blob and #to_sequel_blob" do

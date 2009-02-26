@@ -214,6 +214,7 @@ module Sequel
 
       BOOL_TRUE = '1'.freeze
       BOOL_FALSE = '0'.freeze
+      NULL = LiteralString.new('NULL').freeze
       COMMA_SEPARATOR = ', '.freeze
       FIREBIRD_TIMESTAMP_FORMAT = "TIMESTAMP '%Y-%m-%d %H:%M:%S".freeze
       SELECT_CLAUSE_ORDER = %w'distinct limit columns from join where group having compounds order'.freeze
@@ -249,7 +250,7 @@ module Sequel
       # Use the RETURNING clause to return the primary key of the inserted record, if it exists
       def insert_returning_pk_sql(*values)
         pk = db.primary_key(opts[:from].first)
-        insert_returning_sql(pk ? Sequel::SQL::Identifier.new(pk) : 'NULL'.lit, *values)
+        insert_returning_sql(pk ? Sequel::SQL::Identifier.new(pk) : NULL, *values)
       end
 
       # Use the RETURNING clause to return the columns listed in returning.

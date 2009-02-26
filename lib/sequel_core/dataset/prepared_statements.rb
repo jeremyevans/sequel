@@ -1,6 +1,6 @@
 module Sequel 
   class Dataset
-    PREPARED_ARG_PLACEHOLDER = '?'.lit.freeze
+    PREPARED_ARG_PLACEHOLDER = LiteralString.new('?').freeze
     
     # Default implementation of the argument mapper to allow
     # native database support for bind variables and prepared

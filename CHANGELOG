@@ -1,5 +1,7 @@
 === HEAD
 
+* Allow String.lit to take arguments and return a SQL::PlaceholderLiteralString (jeremyevans)
+
 * Add Model#set_associated_object, used by the many_to_one setter method, for easier overriding (jeremyevans)
 
 * Allow use of database independent types when casting (jeremyevans)

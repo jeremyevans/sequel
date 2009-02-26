@@ -1,7 +1,7 @@
 module Sequel
   class Dataset
     COMMA_SEPARATOR = ', '.freeze
-    COUNT_OF_ALL_AS_COUNT = SQL::Function.new(:count, '*'.lit).as(:count)
+    COUNT_OF_ALL_AS_COUNT = SQL::Function.new(:count, LiteralString.new('*'.freeze)).as(:count)
 
     # Returns the first record matching the conditions.
     def [](*conditions)
