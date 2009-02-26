@@ -142,7 +142,7 @@ module Sequel
       # The array of column schema hashes, except for the ones given in opts[:except]
       def defined_columns_for(table, opts={})
         cols = parse_pragma(table, {})
-        cols.each{|c| c[:default] = c[:default].lit if c[:default]}
+        cols.each{|c| c[:default] = LiteralString.new(c[:default]) if c[:default]}
         if opts[:except]
           nono= Array(opts[:except]).compact.map{|n| n.to_s}
           cols.reject!{|c| nono.include? c[:name] }
