@@ -1,0 +1,215 @@
+Optimizations
+-------------
+
+* Model.[] was optimized to use static SQL in cases where doing so
+  should result in the same output.  This should result in a 30-40%
+  performance increase.  Since this can be the most significant or
+  only method call in a web application action, this has potential
+  to significantly enhance the performance of web application code.
+  
+  In order for this optimization to have an effect, you need to
+  make sure that you are calling set_dataset with a Symbol and
+  not a Dataset object:
+  
+    # Optimized:
+    class Foo < Sequel::Model; end
+    class Foo < Sequel::Model(:foos); end
+    class Foo < Sequel::Model
+      set_dataset :foos
+    end
+    
+    # Not Optimized, but otherwise equivalent:
+    class Foo < Sequel::Model(Model.db[:foos]); end
+    class Foo < Sequel::Model
+      set_dataset db[:foos]
+    end
+  
+* Dataset#literal was refactored for performance reasons to make
+  overriding it in subclasses unnecessary.  The changes made result
+  in a 20-25% performance increase.  Sequel can spend about 10% of
+  it's time in Dataset#literal, so this may be only a 2% overall
+  performance improvement.
+
+New Features
+------------
+
+* Association datasets now know about the model objects that created
+  them, as well as the related association reflection.  This makes
+  association extensions much more powerful.  For example, you can
+  now create generic association extensions such as:
+  
+    module FindOrCreate
+      def find_or_create(vals)
+        first(vals) || association_reflection.associated_class. \
+         create(vals.merge(association_reflection[:key]=> \
+           model_object.id))
+      end
+    end
+    
+  The above will work for any standard one_to_many association:
+  
+    Artist.one_to_many :albums, :extend=>FindOrCreate
+    # Create an album named Foo related to this artist,
+    # unless such an album already exists
+    Artist.first.albums_dataset.find_or_create(:name=>'Foo')
+    
+  Before, the only way to do the above was to use a closure inside
+  the :dataset option proc, which couldn't be done generically
+  for multiple associations.
+  
+* A :conditions association option was added, which allows simple
+  filters to be set up without defining :graph_conditions and
+  an association block:
+  
+    # 2.10.0
+    one_to_many(:japanese_verses, :class=>:Verse, \
+     :graph_conditions=>{:languageid=>3})do |ds|
+       ds.filter(:languageid=>3)
+    end
+    # 2.11.0
+    one_to_many(:japanese_verses, :class=>:Verse, \
+       :conditions=>{:languageid=>3})
+
+* A :clone association option was added, which allows you to clone
+  an existing association.  This is most useful when you are dealing
+  with a legacy schema and had to define the same options redundantly
+  for each type of association. You can now do:
+  
+    many_to_many :deputies, :class=>:Employee, \
+     :join_table=>:employeecurrentaudits, :left_key=>:currentauditid, \
+     :right_key=>:employeeid, :order=>[:firstname, :lastname] do |ds|
+      ds.filter(:active).filter(:capacity=>1)
+    end
+    many_to_many :project_managers, :clone=>:deputies do |ds|
+      ds.filter(:active).filter(:capacity=>2)
+    end
+    many_to_many :team_leaders, :clone=>:deputies do |ds|
+      ds.filter(:active).filter(:capacity=>3)
+    end
+    
+  All of the above would use the same :class, :join_table, :left_key,
+  :right_key, and :order options.  If you don't provide an
+  association block, but you are cloning an association that has one,
+  the cloned association's block is used.  You can use the
+  :block=>nil option to not use a block even if the cloned
+  association has a block.
+
+* Dataset#select, #select_more, #order, #order_more, and #get all
+  take a block that yields a Sequel::SQL::VirtualRow instance,
+  similar to the behavior of filter. This allows for the easier
+  use of SQL functions on Ruby 1.9:
+  
+    # 2.10.0
+    dataset.select(:prettify.sql_function(:name))
+    # 2.11.0
+    dataset.select{|o| o.prettify(:name)}
+
+* String#lit can now accept arguments and return an SQL literal
+  string.  This allows you to do things that were previously hard
+  or at least unnecessarily verbose.  For example, you can now
+  easily use the SQL standard SUBSTRING function:
+  
+    column = :user
+    pattern = params[:pattern]
+    dataset.select{|o| o.substring('? from ?'.lit(column, pattern))}
+    
+* A validates_inclusion_of validation method was added to Model. You
+  can provide a Range or an Array in the :in option to specify the
+  allowed values:
+  
+    validates_inclusion_of :value, :in=>1..5
+    validates_inclusion_of :weekday, :in=>%w'Monday Tuesday ...'
+
+* Dataset#with_sql was added, which returns a copy of the dataset
+  with static SQL.  This is useful if you want to keep the same
+  row_proc/graph/transform/etc., but want to use your own custom
+  SQL.
+
+Other Improvements
+------------------
+
+* You can now use Sequel's database independent types when casting:
+
+    dataset.select(:number.cast(String))
+  
+  Among other things, the default cast types for cast_string and
+  cast_numeric now work in the MySQL adapter.
+
+* Model#set_associated_object was added.  The many_to_one association
+  setter method calls it.  This allows you to easily override the
+  association setters for all many_to_one associations of a class
+  by modifying a single method. 
+  
+* Typecasting invalid date strings now raises a
+  Sequel::Error::InvalidValue instead of an argument error, which
+  means that you can use raise_on_typecast_failure = false and not
+  have an error raised when an invalid date format is used.
+  
+* String#to_sequel_blob was added and should now be used instead
+  of String#to_blob.  sqlite3-ruby defines String#to_blob
+  differently, which could cause problems.
+  
+* Blob columns are now fully supported in the SQLite adapter, with
+  the hex escape syntax being used for input, and returning columns
+  of type Sequel::SQL::Blob on output.
+  
+* The SQLite adapter drop_column support is now significantly more
+  robust.
+  
+* The SQLite adapter now supports rename_column.
+  
+* The MySQL adapter now supports stored procedures with multiple
+  arguments.
+  
+* The MySQL adapter can now not use a compressed connection to the
+  server via the :compress=>false option.
+  
+* The MySQL adapter now sets a default timeout of 30 days to the
+  database connection, you can change it via the :timeout option,
+  which accepts a number of seconds.
+  
+* The MySQL adapter now sets SQL_AUTO_IS_NULL to false by default,
+  you can use the :auto_is_null=>true option to not do this.
+  
+* The MySQL adapter now sets the encoding option on the database
+  connection itself, so it works across reconnects.
+
+* Sequel itself no longer uses String#lit or Symbol#* internally, so
+  it shouldn't break if another library defines them.
+
+* The default index name is now generated correctly if a non-String
+  or Symbol column is used.
+  
+* Some ruby -w warnings have been fixed.
+
+* INSERTs are now sent to the master database instead of the slave
+  database(s) if using a master/slave database configuration and
+  PostgreSQL 8.2+ or Firebird.
+  
+* DateTime literalization has been fixed in the Firebird adapter.
+  
+* Date literalization has been fixed in the H2 JDBC subadapter.
+  
+* Release notes for versions from 1.0 to the present are now included
+  in the Sequel repository and the RDoc documentation, see
+  http://sequel.rubyforge.org/rdoc/files/doc/release_notes/
+
+Backwards Compatibilty
+----------------------
+
+* The optimization of Model.[] may break if you modify the model's
+  dataset behind its back.  Always use Model.set_dataset if you
+  want to change a Model's dataset.
+  
+* Sequel::Dataset::UnsupportedExceptIntersect and
+  Sequel::Dataset::UnsupportedExceptIntersectAll will now only be
+  defined if you are using an adapter that requires them.
+  
+* The private Model#cache_delete_unless_new method has been removed.
+
+* Sequel::SQL::IrregularFunction was removed, as it was a bad hack
+  that is not used by Sequel anymore.  Unless you were instantiating
+  it directly or using a plugin/extension that did, this shouldn't
+  affect you.  Using a Sequel::SQL::Function with a 
+  Sequel::SQL::PlaceholderLiteralString is recommended instead, see
+  the substring example above.
