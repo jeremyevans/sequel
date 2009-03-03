@@ -8,6 +8,8 @@ begin
 rescue LoadError
 end
 
+Sequel.virtual_row_instance_eval = true
+
 $sqls = []
 def clear_sqls
   $sqls.clear

@@ -1,8 +1,8 @@
 %w'bigdecimal bigdecimal/util date enumerator thread time uri yaml'.each do |f|
   require f
 end
-%w"core_ext sql core_sql connection_pool exceptions pretty_table
-  dataset migration schema database object_graph version".each do |f|
+%w"core_ext sql core_sql connection_pool exceptions pretty_table 
+  dataset migration schema database object_graph version deprecated".each do |f|
   require "sequel_core/#{f}"
 end
 
@@ -38,14 +38,35 @@ end
 # database.  It defaults to Time.  To change it to DateTime, use:
 #
 #   Sequel.datetime_class = DateTime
+#
+# Sequel currently does not use instance_eval for virtual row blocks by default
+# (e.g. the block passed to Dataset#filter, #select, #order and other similar
+# methods).  If you want to use instance_eval for these blocks, don't have any
+# block arguments, and set:
+#
+#   Sequel.virtual_row_instance_eval = true
+#
+# When this is set, you can do:
+#
+#   dataset.filter{|o| o.column > 0} # no instance_eval
+#   dataset.filter{column > 0}       # instance eval
+#
+# When the virtual_row_instance_eval is false, using a virtual row block without a block
+# argument will generate a deprecation message.
+#
+# The option to not use instance_eval for a block with no arguments will be removed in a future version.
+# If you have any virtual row blocks that you don't want to use instance_eval for,
+# make sure the blocks have block arguments.
 module Sequel
   @convert_tinyint_to_bool = true
   @convert_two_digit_years = true
   @datetime_class = Time
+  @virtual_row_instance_eval = false
   
   metaattr_accessor :convert_tinyint_to_bool
   metaattr_accessor :convert_two_digit_years
   metaattr_accessor :datetime_class
+  metaattr_accessor :virtual_row_instance_eval
 
   # Creates a new database object based on the supplied connection string
   # and optional arguments.  The specified scheme determines the database
@@ -61,7 +82,7 @@ module Sequel
   # If a block is given, it is passed the opened Database object, which is
   # closed when the block exits.  For example:
   #
-  #   Sequel.connect('sqlite://blog.db'){|db| puts db.users.count}  
+  #   Sequel.connect('sqlite://blog.db'){|db| puts db[:users].count}  
   #
   # This is also aliased as Sequel.open.
   def self.connect(*args, &block)

@@ -540,16 +540,16 @@ module Sequel
     #   ds.order(:name.asc).sql #=> 'SELECT * FROM items ORDER BY name ASC'
     #   ds.order(:arr|1).sql #=> 'SELECT * FROM items ORDER BY arr[1]'
     #   ds.order(nil).sql #=> 'SELECT * FROM items'
-    def order(*columns)
-      columns += Array((yield SQL::VirtualRow.new)) if block_given?
+    def order(*columns, &block)
+      columns += Array(virtual_row_block_call(block)) if block
       clone(:order => (columns.compact.empty?) ? nil : columns)
     end
     alias_method :order_by, :order
     
     # Returns a copy of the dataset with the order columns added
     # to the existing order.
-    def order_more(*columns)
-      columns += Array((yield SQL::VirtualRow.new)) if block_given?
+    def order_more(*columns, &block)
+      columns += Array(virtual_row_block_call(block)) if block
       order(*((@opts[:order] || []) + columns))
     end
     
@@ -625,8 +625,8 @@ module Sequel
 
     # Returns a copy of the dataset with the columns selected changed
     # to the given columns.
-    def select(*columns)
-      columns += Array((yield SQL::VirtualRow.new)) if block_given?
+    def select(*columns, &block)
+      columns += Array(virtual_row_block_call(block)) if block
       clone(:select => columns)
     end
     
@@ -637,8 +637,8 @@ module Sequel
 
     # Returns a copy of the dataset with the given columns added
     # to the existing selected columns.
-    def select_more(*columns)
-      columns += Array((yield SQL::VirtualRow.new)) if block_given?
+    def select_more(*columns, &block)
+      columns += Array(virtual_row_block_call(block)) if block
       select(*((@opts[:select] || []) + columns))
     end
     
@@ -811,7 +811,7 @@ module Sequel
           SQL::BooleanExpression.from_value_pairs(expr)
         end
       when Proc
-        filter_expr(expr.call(SQL::VirtualRow.new))
+        filter_expr(virtual_row_block_call(expr))
       when SQL::NumericExpression, SQL::StringExpression
         raise(Error, "Invalid SQL Expression type: #{expr.inspect}") 
       when Symbol, SQL::Expression

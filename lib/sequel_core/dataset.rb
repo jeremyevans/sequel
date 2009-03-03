@@ -507,5 +507,23 @@ module Sequel
     def output_identifier(v)
       (i = identifier_output_method) ? v.to_s.send(i).to_sym : v.to_sym
     end
+
+    # If a block argument is passed to a method that uses a VirtualRow,
+    # yield a new VirtualRow instance to the block if it accepts a single
+    # argument.  Otherwise, evaluate the block in the context of a new
+    # VirtualRow instance.
+    def virtual_row_block_call(block)
+      return unless block
+      unless Sequel.virtual_row_instance_eval
+        Deprecation.deprecate('Using a VirtualRow block without an argument is deprecated, and its meaning will change in a future version.  Add a block argument to keep the old semantics, or set Sequel.virtual_row_instance_eval = true to use instance_eval for VirtualRow blocks without arguments.') unless block.arity == 1
+        return block.call(SQL::VirtualRow.new)
+      end
+      case block.arity
+      when -1, 0
+        SQL::VirtualRow.new.instance_eval(&block)
+      else
+        block.call(SQL::VirtualRow.new)
+      end
+    end
   end
 end

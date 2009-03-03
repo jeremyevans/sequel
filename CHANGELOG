@@ -1,3 +1,7 @@
+=== HEAD
+
+* Allow virtual row blocks to be instance_evaled, add Sequel.virtual_row_instance_eval= (jeremyevans)
+
 === 2.11.0 (2009-03-02)
 
 * Optimize Model.[] by using static sql when possible, for a 30-40% speed increase (jeremyevans)

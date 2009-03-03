@@ -8,6 +8,8 @@ unless Sequel.const_defined?('Model')
   require 'sequel_model'
 end
 
+Sequel.virtual_row_instance_eval = true
+
 class MockDataset < Sequel::Dataset
   def insert(*args)
     @db.execute insert_sql(*args)

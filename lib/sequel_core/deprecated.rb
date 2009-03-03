@@ -1,25 +1,34 @@
 module Sequel
-  # This module makes it easy to add deprecation functionality to other classes.
-  module Deprecation # :nodoc:
-    # This sets the output stream for the deprecation messages.  Set it to an IO
-    # (or any object that responds to puts) and it will call puts on that
-    # object with the deprecation message.  Set to nil to ignore deprecation messages.
-    def self.deprecation_message_stream=(file)
-      @dms = file
-    end
+  # This module makes it easy to print deprecation warnings with optional backtraces to a given stream.
+  # There are a couple of methods you can use to change where the deprecation methods are printed
+  # and whether they should include backtraces:
+  #
+  #   Sequel.Deprecation.output = $stderr # print deprecation messages to standard error (default)
+  #   Sequel.Deprecation.output = File.open('deprecated_calls.txt', 'wb') # use a file instead
+  #   Sequel.Deprecation.backtraces = false # don't include backtraces
+  #   Sequel.Deprecation.backtraces = true # include full backtraces
+  #   Sequel.Deprecation.backtraces = 10 # include 10 backtrace lines (default)
+  #   Sequel.Deprecation.backtraces = 1 # include 1 backtrace line
+  module Deprecation
+    @output = $stderr
+    @backtraces = 10
 
-    # Set this to true to print tracebacks with every deprecation message,
-    # so you can see exactly where in your code the deprecated methods are
-    # being called.
-    def self.print_tracebacks=(pt)
-      @pt = pt
-    end
+    metaattr_accessor :output, :backtraces
 
-    # Puts the messages unaltered to the deprecation message stream
+    # Print the message to the output stream
     def self.deprecate(message)
-      if @dms
-        @dms.puts(message)
-        caller.each{|c| @dms.puts(c)} if @pt 
+      return unless output
+      output.puts(message)
+      case backtraces
+      when Integer
+        b = backtraces
+        caller.each do |c|
+          b -= 1
+          output.puts(c)
+          break if b == 0
+        end
+      when true
+        caller.each{|c| output.puts(c)}
       end
     end
   end

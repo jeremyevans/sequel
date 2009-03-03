@@ -444,6 +444,14 @@ context "Dataset#where" do
       "SELECT * FROM test WHERE (((name < 'b') AND (table.id = 1)) OR is_active(blah, xx, x.y_z))"
   end
 
+  specify "should instance_eval the block in the context of a VirtualRow if the block doesn't request an argument" do
+    x = nil
+    @dataset.filter{x = self; false}
+    x.should be_a_kind_of(Sequel::SQL::VirtualRow)
+    @dataset.filter{((name < 'b') & {table__id => 1}) | is_active(blah, xx, x__y_z)}.sql.should ==
+      "SELECT * FROM test WHERE (((name < 'b') AND (table.id = 1)) OR is_active(blah, xx, x.y_z))"
+  end
+
   specify "should raise an error if an invalid argument is used" do
     proc{@dataset.filter(1)}.should raise_error(Sequel::Error)
   end
@@ -887,15 +895,15 @@ context "Dataset#select" do
 
   specify "should accept a block that yields a virtual row" do
     @d.select{|o| o.a}.sql.should == 'SELECT a FROM test'
-    @d.select{|o| o.a(1)}.sql.should == 'SELECT a(1) FROM test'
+    @d.select{a(1)}.sql.should == 'SELECT a(1) FROM test'
     @d.select{|o| o.a(1, 2)}.sql.should == 'SELECT a(1, 2) FROM test'
-    @d.select{|o| [o.a, o.a(1, 2)]}.sql.should == 'SELECT a, a(1, 2) FROM test'
+    @d.select{[a, a(1, 2)]}.sql.should == 'SELECT a, a(1, 2) FROM test'
   end
 
   specify "should merge regular arguments with argument returned from block" do
-    @d.select(:b){|o| o.a}.sql.should == 'SELECT b, a FROM test'
+    @d.select(:b){a}.sql.should == 'SELECT b, a FROM test'
     @d.select(:b, :c){|o| o.a(1)}.sql.should == 'SELECT b, c, a(1) FROM test'
-    @d.select(:b){|o| [o.a, o.a(1, 2)]}.sql.should == 'SELECT b, a, a(1, 2) FROM test'
+    @d.select(:b){[a, a(1, 2)]}.sql.should == 'SELECT b, a, a(1, 2) FROM test'
     @d.select(:b, :c){|o| [o.a, o.a(1, 2)]}.sql.should == 'SELECT b, c, a, a(1, 2) FROM test'
   end
 end
@@ -932,7 +940,7 @@ context "Dataset#select_more" do
 
   specify "should accept a block that yields a virtual row" do
     @d.select(:a).select_more{|o| o.b}.sql.should == 'SELECT a, b FROM test'
-    @d.select(:a.*).select_more(:b.*){|o| o.b(1)}.sql.should == 'SELECT a.*, b.*, b(1) FROM test'
+    @d.select(:a.*).select_more(:b.*){b(1)}.sql.should == 'SELECT a.*, b.*, b(1) FROM test'
   end
 end
 
@@ -973,15 +981,15 @@ context "Dataset#order" do
 
   specify "should accept a block that yields a virtual row" do
     @dataset.order{|o| o.a}.sql.should == 'SELECT * FROM test ORDER BY a'
-    @dataset.order{|o| o.a(1)}.sql.should == 'SELECT * FROM test ORDER BY a(1)'
+    @dataset.order{a(1)}.sql.should == 'SELECT * FROM test ORDER BY a(1)'
     @dataset.order{|o| o.a(1, 2)}.sql.should == 'SELECT * FROM test ORDER BY a(1, 2)'
-    @dataset.order{|o| [o.a, o.a(1, 2)]}.sql.should == 'SELECT * FROM test ORDER BY a, a(1, 2)'
+    @dataset.order{[a, a(1, 2)]}.sql.should == 'SELECT * FROM test ORDER BY a, a(1, 2)'
   end
 
   specify "should merge regular arguments with argument returned from block" do
-    @dataset.order(:b){|o| o.a}.sql.should == 'SELECT * FROM test ORDER BY b, a'
+    @dataset.order(:b){a}.sql.should == 'SELECT * FROM test ORDER BY b, a'
     @dataset.order(:b, :c){|o| o.a(1)}.sql.should == 'SELECT * FROM test ORDER BY b, c, a(1)'
-    @dataset.order(:b){|o| [o.a, o.a(1, 2)]}.sql.should == 'SELECT * FROM test ORDER BY b, a, a(1, 2)'
+    @dataset.order(:b){[a, a(1, 2)]}.sql.should == 'SELECT * FROM test ORDER BY b, a, a(1, 2)'
     @dataset.order(:b, :c){|o| [o.a, o.a(1, 2)]}.sql.should == 'SELECT * FROM test ORDER BY b, c, a, a(1, 2)'
   end
 end
@@ -1071,7 +1079,7 @@ context "Dataset#order_more" do
 
   specify "should accept a block that yields a virtual row" do
     @dataset.order(:a).order_more{|o| o.b}.sql.should == 'SELECT * FROM test ORDER BY a, b'
-    @dataset.order(:a, :b).order_more(:c, :d){|o| [o.e, o.f(1, 2)]}.sql.should == 'SELECT * FROM test ORDER BY a, b, c, d, e, f(1, 2)'
+    @dataset.order(:a, :b).order_more(:c, :d){[e, f(1, 2)]}.sql.should == 'SELECT * FROM test ORDER BY a, b, c, d, e, f(1, 2)'
   end
 end
 
@@ -2034,7 +2042,7 @@ context "Dataset#get" do
   
   specify "should accept a block that yields a virtual row" do
     @d.get{|o| o.x__b.as(:name)}.should == "SELECT x.b AS name FROM test LIMIT 1"
-    @d.get{|o| o.x(1).as(:name)}.should == "SELECT x(1) AS name FROM test LIMIT 1"
+    @d.get{x(1).as(:name)}.should == "SELECT x(1) AS name FROM test LIMIT 1"
   end
   
   specify "should raise an error if both a regular argument and block argument are used" do
