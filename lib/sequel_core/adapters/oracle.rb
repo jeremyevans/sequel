@@ -30,7 +30,35 @@ module Sequel
       def dataset(opts = nil)
         Oracle::Dataset.new(self, opts)
       end
-    
+
+      def schema_parse_table(table, opts={})
+        ds = dataset
+        ds.identifier_output_method = :downcase
+        schema, table = schema_and_table(table)
+        table_schema = []
+        metadata = transaction {|conn| conn.describe_table(table.to_s)}
+        metadata.columns.each do |column|
+          table_schema << [
+            column.name.downcase.to_sym,
+            {
+              :type => column.data_type,
+              :db_type => column.type_string.split(' ')[0],
+              :type_string => column.type_string,
+              :charset_form => column.charset_form,
+              :char_used? => column.char_used?,
+              :char_size => column.char_size,
+              :data_size => column.data_size,
+              :precision => column.precision,
+              :scale => column.scale,
+              :fsprecision => column.fsprecision,
+              :lfprecision => column.lfprecision,
+              :allow_null => column.nullable?
+            }
+          ]
+        end
+        table_schema
+      end
+
       def execute(sql, opts={})
         log_info(sql)
         synchronize(opts[:server]) do |conn|
