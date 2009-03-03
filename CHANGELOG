@@ -1,5 +1,7 @@
 === HEAD
 
+* Support schema parsing in the Oracle adapter (jacaetevha)
+
 * Allow virtual row blocks to be instance_evaled, add Sequel.virtual_row_instance_eval= (jeremyevans)
 
 === 2.11.0 (2009-03-02)
