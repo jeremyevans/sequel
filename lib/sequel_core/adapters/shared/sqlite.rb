@@ -3,10 +3,10 @@ require 'sequel_core/adapters/utils/unsupported'
 module Sequel
   module SQLite
     module DatabaseMethods
-      AUTO_VACUUM = {'0' => :none, '1' => :full, '2' => :incremental}.freeze
-      SYNCHRONOUS = {'0' => :off, '1' => :normal, '2' => :full}.freeze
+      AUTO_VACUUM = [:none, :full, :incremental].freeze
+      SYNCHRONOUS = [:off, :normal, :full].freeze
       TABLES_FILTER = "type = 'table' AND NOT name = 'sqlite_sequence'"
-      TEMP_STORE = {'0' => :default, '1' => :file, '2' => :memory}.freeze
+      TEMP_STORE = [:default, :file, :memory].freeze
       TYPES = Sequel::Schema::SQL::TYPES.merge(Bignum=>'integer')
       
       # Run all alter_table commands in a transaction.  This is technically only
@@ -70,13 +70,13 @@ module Sequel
       
       # A symbol signifying the value of the auto_vacuum PRAGMA.
       def auto_vacuum
-        AUTO_VACUUM[pragma_get(:auto_vacuum).to_s]
+        AUTO_VACUUM[pragma_get(:auto_vacuum).to_i]
       end
       
       # Set the auto_vacuum PRAGMA using the given symbol (:none, :full, or
       # :incremental).
       def auto_vacuum=(value)
-        value = AUTO_VACUUM.key(value) || (raise Error, "Invalid value for auto_vacuum option. Please specify one of :none, :full, :incremental.")
+        value = AUTO_VACUUM.index(value) || (raise Error, "Invalid value for auto_vacuum option. Please specify one of :none, :full, :incremental.")
         pragma_set(:auto_vacuum, value)
       end
       
@@ -92,12 +92,12 @@ module Sequel
       
       # A symbol signifying the value of the synchronous PRAGMA.
       def synchronous
-        SYNCHRONOUS[pragma_get(:synchronous).to_s]
+        SYNCHRONOUS[pragma_get(:synchronous).to_i]
       end
       
       # Set the synchronous PRAGMA using the given symbol (:off, :normal, or :full).
       def synchronous=(value)
-        value = SYNCHRONOUS.key(value) || (raise Error, "Invalid value for synchronous option. Please specify one of :off, :normal, :full.")
+        value = SYNCHRONOUS.index(value) || (raise Error, "Invalid value for synchronous option. Please specify one of :off, :normal, :full.")
         pragma_set(:synchronous, value)
       end
       
@@ -115,12 +115,12 @@ module Sequel
       
       # A symbol signifying the value of the temp_store PRAGMA.
       def temp_store
-        TEMP_STORE[pragma_get(:temp_store).to_s]
+        TEMP_STORE[pragma_get(:temp_store).to_i]
       end
       
       # Set the temp_store PRAGMA using the given symbol (:default, :file, or :memory).
       def temp_store=(value)
-        value = TEMP_STORE.key(value) || (raise Error, "Invalid value for temp_store option. Please specify one of :default, :file, :memory.")
+        value = TEMP_STORE.index(value) || (raise Error, "Invalid value for temp_store option. Please specify one of :default, :file, :memory.")
         pragma_set(:temp_store, value)
       end
       

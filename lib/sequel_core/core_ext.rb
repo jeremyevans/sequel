@@ -1,9 +1,3 @@
-if RUBY_VERSION < '1.9.0'
-  class Hash
-    alias key index
-  end
-end
-
 class Array
   # True if the array is not empty and all of its elements are
   # arrays of size 2.  This is used to determine if the array
@@ -25,14 +19,6 @@ class Array
   #   end
   def extract_options!
     last.is_a?(Hash) ? pop : {}
-  end
-end
-
-module Enumerable
-  # Invokes the specified method for each item, along with the supplied
-  # arguments.
-  def send_each(sym, *args)
-    each{|i| i.send(sym, *args)}
   end
 end
 

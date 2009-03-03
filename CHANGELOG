@@ -1,5 +1,9 @@
 === HEAD
 
+* Deprecate Enumerable#send_each (jeremyevans)
+
+* Deprecate Hash#key on ruby 1.8, change some SQLite adapter constants (jeremyevans)
+
 * Deprecate Sequel.open, Sequel.use_parse_tree=?, and the upcase_identifier methods (jeremyevans)
 
 * Deprecate virtual row blocks without block arguments, unless Sequel.virtual_row_instance_eval is enabled (jeremyevans)

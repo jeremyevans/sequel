@@ -35,7 +35,7 @@ module Sequel
   end
 
   def self.open(*args, &block)
-    Deprecation.deprecate('Sequel.open', 'Use Sequel.connect instead')
+    Deprecation.deprecate('Sequel.open', 'Use Sequel.connect')
     Database.connect(*args, &block)
   end
 
@@ -83,3 +83,24 @@ module Sequel
     end
   end
 end
+
+if RUBY_VERSION < '1.9.0'
+  class Hash
+    unless method_defined?(:key)
+      def key(*args, &block)
+        Sequel::Deprecation.deprecate('Hash#key', 'Use Hash#index')
+        index(*args, &block)
+      end
+    end
+  end
+end
+
+module Enumerable
+  # Invokes the specified method for each item, along with the supplied
+  # arguments.
+  def send_each(sym, *args)
+    Sequel::Deprecation.deprecate('Enumerable#send_each', 'Use Enumerable#each{|x| x.send(...)}')
+    each{|i| i.send(sym, *args)}
+  end
+end
+
