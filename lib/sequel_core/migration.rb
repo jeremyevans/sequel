@@ -35,7 +35,7 @@ module Sequel
   # To apply a migration to a database, you can invoke the #apply with
   # the target database instance and the direction :up or :down, e.g.:
   #
-  #   DB = Sequel.open ('sqlite://mydb')
+  #   DB = Sequel.connect('sqlite://mydb')
   #   CreateSessions.apply(DB, :up)
   #
   # See Sequel::Schema::Generator for the syntax to use for creating tables,

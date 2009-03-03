@@ -5,7 +5,7 @@ module Sequel
   # The ADO adapter provides connectivity to ADO databases in Windows. ADO
   # databases can be opened using a URL with the ado schema:
   #
-  #   DB = Sequel.open('ado://mydb')
+  #   DB = Sequel.connect('ado://mydb')
   # 
   # or using the Sequel.ado method:
   #

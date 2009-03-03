@@ -3,7 +3,22 @@ unless Object.const_defined?('Sequel')
   $:.unshift(File.join(File.dirname(__FILE__), "../../lib/"))
   require 'sequel_core'
 end
+
 Sequel.virtual_row_instance_eval = true
+
+module Spec::Example::ExampleGroupMethods
+  def deprec_specify(*args, &block)
+    specify(*args) do
+      output = Sequel::Deprecation.output
+      Sequel::Deprecation.output = nil
+      begin
+        instance_eval(&block)
+      ensure
+        Sequel::Deprecation.output = output
+      end
+    end
+  end
+end
 
 class MockDataset < Sequel::Dataset
   def insert(*args)

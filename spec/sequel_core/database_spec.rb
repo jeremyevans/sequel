@@ -61,7 +61,7 @@ context "A new Database" do
     db.send(:identifier_output_method_default).should == :downcase
   end
 
-  specify "should respect the :upcase_identifiers option" do
+  deprec_specify "should respect the :upcase_identifiers option" do
     Sequel.upcase_identifiers = false
     db = Sequel::Database.new(:upcase_identifiers=>false)
     db.upcase_identifiers?.should == false
@@ -139,7 +139,7 @@ context "A new Database" do
     Sequel::Database.new({}).quote_identifiers?.should == false
   end
 
-  specify "should use the default Sequel.upcase_identifiers value" do
+  deprec_specify "should use the default Sequel.upcase_identifiers value" do
     Sequel.upcase_identifiers = true
     Sequel::Database.new({}).upcase_identifiers?.should == true
     Sequel.upcase_identifiers = false
@@ -191,7 +191,7 @@ context "A new Database" do
     y.new({}).identifier_input_method.should == :camelize
   end
   
-  specify "should respect the identifier_output_method_default method if Sequel.upcase_identifiers = nil" do
+  specify "should respect the identifier_output_method_default method if Sequel.identifier_output_method is not called" do
     class Sequel::Database
       @@identifier_output_method = nil
     end
@@ -738,7 +738,7 @@ context "A Database adapter with a scheme" do
     CCC::DISCONNECTS.should == [z, y, x]
   end
 
-  specify "should be accessible through Sequel.open" do
+  deprec_specify "should be accessible through Sequel.open" do
     c = Sequel.open 'ccc://localhost/db'
     c.should be_a_kind_of(CCC)
     c.opts[:host].should == 'localhost'
@@ -791,10 +791,6 @@ context "An unknown database scheme" do
 
   specify "should raise an error in Sequel.connect" do
     proc {Sequel.connect('ddd://localhost/db')}.should raise_error(Sequel::Error::AdapterNotFound)
-  end
-
-  specify "should raise an error in Sequel.open" do
-    proc {Sequel.open('ddd://localhost/db')}.should raise_error(Sequel::Error::AdapterNotFound)
   end
 end
 

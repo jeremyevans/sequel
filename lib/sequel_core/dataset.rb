@@ -423,15 +423,6 @@ module Sequel
       end
     end
     
-    def upcase_identifiers=(v)
-      @identifier_input_method = v ? :upcase : nil
-    end
-    
-    # Whether this dataset upcases identifiers.
-    def upcase_identifiers?
-      @identifier_input_method == :upcase
-    end
-    
     # Updates values for the dataset.  The returned value is generally the
     # number of rows updated, but that is adapter dependent.
     def update(*args)

@@ -63,7 +63,6 @@ module Sequel
     # * :loggers : An array of loggers to use.
     # * :quote_identifiers : Whether to quote identifiers
     # * :single_threaded : Whether to use a single-threaded connection pool
-    # * :upcase_identifiers : Whether to upcase identifiers going into the database
     #
     # All options given are also passed to the ConnectionPool.  If a block
     # is given, it is used as the connection_proc for the ConnectionPool.
@@ -79,6 +78,7 @@ module Sequel
       @identifier_output_method = nil
       @quote_identifiers = nil
       if opts.include?(:upcase_identifiers)
+        Deprecation.deprecate('The :upcase_identifiers Database option', 'Use the :identifier_input_method => :upcase option instead')
         @identifier_input_method = opts[:upcase_identifiers] ? :upcase : ""
       end
       @pool = (@single_threaded ? SingleThreadedPool : ConnectionPool).new(connection_pool_default_options.merge(opts), &block)
@@ -189,12 +189,6 @@ module Sequel
     # See Sequel.single_threaded=.
     def self.single_threaded=(value)
       @@single_threaded = value
-    end
-
-    # Sets the default quote_identifiers mode for new databases.
-    # See Sequel.quote_identifiers=.
-    def self.upcase_identifiers=(value)
-      self.identifier_input_method = value ? :upcase : nil
     end
 
     ### Private Class Methods ###
@@ -561,16 +555,6 @@ module Sequel
         e.set_backtrace(exp.backtrace)
         raise e
       end
-    end
-    
-    # Set whether to upcase identifiers going into the database.
-    def upcase_identifiers=(v)
-      self.identifier_input_method = v ? :upcase : nil
-    end
-
-    # Returns true if the database upcases identifiers.
-    def upcase_identifiers?
-      identifier_input_method == :upcase
     end
     
     # Returns the URI identifying the database.

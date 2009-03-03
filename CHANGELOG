@@ -1,5 +1,9 @@
 === HEAD
 
+* Deprecate Sequel.open, Sequel.use_parse_tree=?, and the upcase_identifier methods (jeremyevans)
+
+* Deprecate virtual row blocks without block arguments, unless Sequel.virtual_row_instance_eval is enabled (jeremyevans)
+
 * Support schema parsing in the Oracle adapter (jacaetevha)
 
 * Allow virtual row blocks to be instance_evaled, add Sequel.virtual_row_instance_eval= (jeremyevans)

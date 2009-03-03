@@ -74,14 +74,14 @@ context "Dataset" do
     @dataset.literal(:a).should == 'a'
   end
   
-  specify "should have upcase_identifiers= method which changes literalization of identifiers" do
+  deprec_specify "should have upcase_identifiers= method which changes literalization of identifiers" do
     @dataset.upcase_identifiers = true
     @dataset.literal(:a).should == 'A'
     @dataset.upcase_identifiers = false
     @dataset.literal(:a).should == 'a'
   end
 
-  specify "should have upcase_identifiers? method which returns whether identifiers are currently upcased" do
+  deprec_specify "should have upcase_identifiers? method which returns whether identifiers are currently upcased" do
     @dataset.upcase_identifiers = true
     @dataset.upcase_identifiers?.should == true
     @dataset.upcase_identifiers = false
@@ -3207,17 +3207,17 @@ context "Dataset#grep" do
 end
 
 context "Sequel.use_parse_tree" do
-  specify "be false" do
+  deprec_specify "be false" do
     Sequel.use_parse_tree.should == false
   end
 end
 
 context "Sequel.use_parse_tree=" do
-  specify "raise an error if true" do
+  deprec_specify "raise an error if true" do
     proc{Sequel.use_parse_tree = true}.should raise_error(Sequel::Error)
   end
 
-  specify "do nothing if false" do
+  deprec_specify "do nothing if false" do
     proc{Sequel.use_parse_tree = false}.should_not raise_error
   end
 end

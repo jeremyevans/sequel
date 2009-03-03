@@ -83,12 +83,9 @@ module Sequel
   # closed when the block exits.  For example:
   #
   #   Sequel.connect('sqlite://blog.db'){|db| puts db[:users].count}  
-  #
-  # This is also aliased as Sequel.open.
   def self.connect(*args, &block)
     Database.connect(*args, &block)
   end
-  metaalias :open, :connect
   
   # Set the method to call on identifiers going into the database.  This affects
   # the literalization of identifiers by calling this method on them before they are input.
@@ -139,29 +136,6 @@ module Sequel
     Database.single_threaded = value
   end
 
-  # Set whether to upcase identifiers for all databases by default. By default,
-  # Sequel upcases identifiers unless the database folds unquoted identifiers to
-  # lower case (MySQL, PostgreSQL, and SQLite).
-  #
-  #   Sequel.upcase_identifiers = false
-  #
-  # This will set the indentifier_input_method to :upcase if value is true
-  # or nil if value is false.
-  def self.upcase_identifiers=(value)
-    Database.upcase_identifiers = value
-  end
-  
-  # Always returns false, since ParseTree support has been removed.
-  def self.use_parse_tree
-    false
-  end
-
-  # Raises an error if attempting to turn ParseTree support on (since it no longer exists).
-  # Otherwise, is a no-op.
-  def self.use_parse_tree=(val)
-    raise(Error, 'ParseTree support has been removed from Sequel') if val
-  end
-  
   ### Private Class Methods ###
 
   # Helper method that the database adapter class methods that are added to Sequel via

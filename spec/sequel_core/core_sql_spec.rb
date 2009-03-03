@@ -293,7 +293,7 @@ context "Symbol" do
   before do
     @ds = Sequel::Dataset.new(nil)
     @ds.quote_identifiers = true
-    @ds.upcase_identifiers = true
+    @ds.identifier_input_method = :upcase
   end
 
   specify "#identifier should format an identifier" do
