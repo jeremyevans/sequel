@@ -38,6 +38,20 @@ context "An Oracle database" do
     ORACLE_DB.disconnect
     ORACLE_DB.pool.size.should == 0
   end
+  
+  specify "should provide schema information" do
+    [:books, :categories, :items].each do |table|
+      schema = ORACLE_DB.schema(table)
+      schema.should_not be_nil
+      schema.each do |name, column_schema|
+        name.should_not be_nil
+        column_schema.should_not be_nil
+        [:type, :db_type, :type_string].each do |info|
+          column_schema[info].should_not be_nil
+        end
+      end
+    end
+  end
 end
 
 context "An Oracle dataset" do
