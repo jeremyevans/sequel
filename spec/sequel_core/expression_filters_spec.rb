@@ -249,7 +249,7 @@ context "Blockless Ruby Filters" do
     @d.lit([:x].sql_string_join(', ')).should == '(x)'
     @d.lit([:x, :y].sql_string_join).should == '(x || y)'
     @d.lit([:x, :y].sql_string_join(', ')).should == "(x || ', ' || y)"
-    @d.lit([:x.sql_function(1), :y|1].sql_string_join).should == '(x(1) || y[1])'
+    @d.lit([:x.sql_function(1), :y.sql_subscript(1)].sql_string_join).should == '(x(1) || y[1])'
     @d.lit([:x.sql_function(1), 'y.z'.lit].sql_string_join(', ')).should == "(x(1) || ', ' || y.z)"
     @d.lit([:x, 1, :y].sql_string_join).should == "(x || '1' || y)"
     @d.lit([:x, 1, :y].sql_string_join(', ')).should == "(x || ', ' || '1' || ', ' || y)"

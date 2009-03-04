@@ -169,12 +169,8 @@ class Symbol
   end
   alias_method(:[], :sql_function) if RUBY_VERSION < '1.9.0'
 
-  # If the given argument is an Integer or an array containing an Integer, returns
-  # a Sequel::SQL::Subscript with this column and the given arg.
-  # Otherwise returns a Sequel::SQL::BooleanExpression where this column (which should be boolean)
-  # or the given argument is true.
-  def |(sub)
-    return super unless (Integer === sub) || ((Array === sub) && sub.any?{|x| Integer === x})
-    Sequel::SQL::Subscript.new(self, Array(sub))
+  # Return an SQL array subscript with the given arguments.
+  def sql_subscript(*sub)
+    Sequel::SQL::Subscript.new(self, sub.flatten)
   end
 end

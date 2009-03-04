@@ -137,6 +137,12 @@ class String
 end
 
 class Symbol
+  def |(sub)
+    return super unless (Integer === sub) || ((Array === sub) && sub.any?{|x| Integer === x})
+    Sequel::Deprecation.deprecate('The use of Symbol#| for SQL array subscripts', 'Use Symbol#sql_subscript')
+    Sequel::SQL::Subscript.new(self, Array(sub))
+  end
+
   def to_column_ref(ds)
     Sequel::Deprecation.deprecate('Symbol#to_column_ref', 'Use Dataset#literal')
     ds.literal(self)

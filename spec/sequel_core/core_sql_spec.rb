@@ -409,7 +409,7 @@ context "Symbol" do
     :abc.cast_numeric(String).to_s(@ds2).should == "CAST(abc AS bar)"
   end
 
-  specify "should support subscript access using | operator" do
+  deprec_specify "should support subscript access using | operator" do
     (:abc|1).to_s(@ds).should == 'abc[1]'
     (:abc|[1]).to_s(@ds).should == 'abc[1]'
     (:abc|[1, 2]).to_s(@ds).should == 'abc[1, 2]'

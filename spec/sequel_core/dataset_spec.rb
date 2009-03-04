@@ -3045,7 +3045,7 @@ context "Dataset#update_sql" do
   end
 
   specify "should accept array subscript references" do
-    @ds.update_sql((:day|1) => 'd').should == "UPDATE items SET day[1] = 'd'"
+    @ds.update_sql((:day.sql_subscript(1)) => 'd').should == "UPDATE items SET day[1] = 'd'"
   end
 end
 
@@ -3063,7 +3063,7 @@ context "Dataset#insert_sql" do
   end
 
   specify "should accept array subscript references" do
-    @ds.insert_sql((:day|1) => 'd').should == "INSERT INTO items (day[1]) VALUES ('d')"
+    @ds.insert_sql((:day.sql_subscript(1)) => 'd').should == "INSERT INTO items (day[1]) VALUES ('d')"
   end
 end
 
