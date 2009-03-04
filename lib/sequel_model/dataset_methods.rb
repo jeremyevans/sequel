@@ -1,12 +1,13 @@
 # Dataset methods are methods that the model class extends its dataset with in
 # the call to set_dataset.
 module Sequel::Model::DatasetMethods
+  attr_accessor :model
+
   # Destroy each row in the dataset by instantiating it and then calling
   # destroy on the resulting model object.  This isn't as fast as deleting
   # the object, which does a single SQL call, but this runs any destroy
   # hooks.
   def destroy
-    raise(Error, "No model associated with this dataset") unless @opts[:models]
     count = 0
     @db.transaction{all{|r| count += 1; r.destroy}}
     count
@@ -19,7 +20,7 @@ module Sequel::Model::DatasetMethods
     if key_column
       super
     else
-      raise(Sequel::Error, "No primary key for model") unless pk = @opts[:models][nil].primary_key
+      raise(Sequel::Error, "No primary key for model") unless model and pk = model.primary_key
       super(pk, value_column) 
     end
   end

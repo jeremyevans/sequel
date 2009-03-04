@@ -188,9 +188,9 @@ module Sequel
       dataset.destroy
     end
   
-    # Returns a dataset with custom SQL that yields model objects.
+    # Returns a copy of the model's dataset with custom SQL
     def self.fetch(*args)
-      db.fetch(*args).set_model(self)
+      with_sql(*args)
     end
   
     # Modify and return eager loading dataset based on association options
@@ -350,7 +350,7 @@ module Sequel
       else
         raise(Error, "Model.set_dataset takes a Symbol or a Sequel::Dataset")
       end
-      @dataset.set_model(self)
+      @dataset.row_proc = Proc.new{|r| load(r)}
       @dataset.transform(@transform) if @transform
       if inherited
         @simple_table = sti_key ? nil : superclass.simple_table
@@ -360,6 +360,7 @@ module Sequel
         @dataset.extend(Associations::EagerLoading)
         @dataset_methods.each{|meth, block| @dataset.meta_def(meth, &block)} if @dataset_methods
       end
+      @dataset.model = self
       @db_schema = (inherited ? superclass.db_schema : get_db_schema) rescue nil
       self
     end
@@ -414,7 +415,7 @@ module Sequel
       m = self
       @sti_key = key
       @sti_dataset = dataset
-      dataset.set_model(key, Hash.new{|h,k| h[k] = (k.constantize rescue m)})
+      dataset.row_proc = Proc.new{|r| (r[key].constantize rescue m).load(r)}
       before_create(:set_sti_key){send("#{key}=", model.name.to_s)}
     end
 

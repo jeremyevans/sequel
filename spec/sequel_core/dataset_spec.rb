@@ -114,13 +114,13 @@ context "Dataset#clone" do
   end
   
   specify "should create an exact copy of the dataset" do
-    @c = Class.new
-    @dataset.set_model(@c)
+    @dataset.row_proc = Proc.new{|r| r}
     @clone = @dataset.clone
 
     @clone.should_not === @dataset
     @clone.class.should == @dataset.class
-    @clone.model_classes.should == @dataset.model_classes
+    @clone.opts.should == @dataset.opts
+    @clone.row_proc.should == @dataset.row_proc
   end
   
   specify "should deep-copy the dataset opts" do
@@ -1168,17 +1168,13 @@ end
 context "Dataset#naked" do
   setup do
     @d1 = Sequel::Dataset.new(nil, {1 => 2, 3 => 4})
-    @d2 = Sequel::Dataset.new(nil, {1 => 2, 3 => 4}).set_model(Object)
+    @d2 = @d1.clone
+    @d2.row_proc = Proc.new{|r| r}
   end
   
-  specify "should return a clone with :naked option set" do
-    naked = @d1.naked
-    naked.opts[:naked].should be_true
-  end
-  
-  specify "should remove any existing reference to a model class" do
+  specify "should remove any existing row_proc" do
     naked = @d2.naked
-    naked.opts[:models].should be_nil
+    naked.row_proc.should be_nil
   end
 end
 
@@ -2093,38 +2089,38 @@ context "Dataset#set_model" do
     end
   end
   
-  specify "should clear the models hash and restore the stock #each if nil is specified" do
+  deprec_specify "should clear the models hash and restore the stock #each if nil is specified" do
     @dataset.set_model(@m)
     @dataset.set_model(nil)
     @dataset.first.should == {:kind => 1}
     @dataset.model_classes.should be_nil
   end
   
-  specify "should clear the models hash and restore the stock #each if nothing is specified" do
+  deprec_specify "should clear the models hash and restore the stock #each if nothing is specified" do
     @dataset.set_model(@m)
     @dataset.set_model(nil)
     @dataset.first.should == {:kind => 1}
     @dataset.model_classes.should be_nil
   end
   
-  specify "should alter #each to provide model instances" do
+  deprec_specify "should alter #each to provide model instances" do
     @dataset.first.should == {:kind => 1}
     @dataset.set_model(@m)
     @dataset.first.should == @m.new({:kind => 1})
   end
   
-  specify "should set opts[:naked] to nil" do
+  deprec_specify "should set opts[:naked] to nil" do
     @dataset.opts[:naked] = true
     @dataset.set_model(@m)
     @dataset.opts[:naked].should be_nil
   end
   
-  specify "should send additional arguments to the models' initialize method" do
+  deprec_specify "should send additional arguments to the models' initialize method" do
     @dataset.set_model(@m, 7, 6, 5)
     @dataset.first.should == @m.new({:kind => 1}, 7, 6, 5)
   end
   
-  specify "should provide support for polymorphic model instantiation" do
+  deprec_specify "should provide support for polymorphic model instantiation" do
     @m1 = Class.new(@m)
     @m2 = Class.new(@m)
     @dataset.set_model(:kind, 0 => @m1, 1 => @m2)
@@ -2141,7 +2137,7 @@ context "Dataset#set_model" do
     @dataset.first.should == {:kind => 1}
   end
   
-  specify "should send additional arguments for polymorphic models as well" do
+  deprec_specify "should send additional arguments for polymorphic models as well" do
     @m1 = Class.new(@m)
     @m2 = Class.new(@m)
     @dataset.set_model(:kind, {0 => @m1, 1 => @m2}, :hey => :wow)
@@ -2152,7 +2148,7 @@ context "Dataset#set_model" do
     all[3].class.should == @m1; all[3].args.should == [{:hey => :wow}]
   end
   
-  specify "should raise for invalid parameters" do
+  deprec_specify "should raise for invalid parameters" do
     proc {@dataset.set_model('kind')}.should raise_error(ArgumentError)
     proc {@dataset.set_model(0)}.should raise_error(ArgumentError)
     proc {@dataset.set_model(:kind)}.should raise_error(ArgumentError) # no hash given
@@ -2175,16 +2171,16 @@ context "Dataset#model_classes" do
     end
   end
   
-  specify "should return nil for a naked dataset" do
+  deprec_specify "should return nil for a naked dataset" do
     @dataset.model_classes.should == nil
   end
   
-  specify "should return a {nil => model_class} hash for a model dataset" do
+  deprec_specify "should return a {nil => model_class} hash for a model dataset" do
     @dataset.set_model(@m)
     @dataset.model_classes.should == {nil => @m}
   end
   
-  specify "should return the polymorphic hash for a polymorphic model dataset" do
+  deprec_specify "should return the polymorphic hash for a polymorphic model dataset" do
     @m1 = Class.new(@m)
     @m2 = Class.new(@m)
     @dataset.set_model(:key, 0 => @m1, 1 => @m2)
@@ -2208,11 +2204,11 @@ context "Dataset#polymorphic_key" do
     end
   end
   
-  specify "should return nil for a naked dataset" do
+  deprec_specify "should return nil for a naked dataset" do
     @dataset.polymorphic_key.should be_nil
   end
   
-  specify "should return the polymorphic key" do
+  deprec_specify "should return the polymorphic key" do
     @dataset.set_model(:id, nil => @m)
     @dataset.polymorphic_key.should == :id
   end
@@ -2231,7 +2227,7 @@ context "A model dataset" do
       def initialize(c); @c = c; end
       def ==(o); @c == o.c; end
     end
-    @dataset.set_model(@m)
+    @dataset.row_proc = Proc.new{|r| @m.new(r)}
   end
   
   specify "should supply naked records if the naked option is specified" do
@@ -2255,7 +2251,7 @@ context "A polymorphic model dataset" do
     end
   end
   
-  specify "should use a nil key in the polymorphic hash to specify the default model class" do
+  deprec_specify "should use a nil key in the polymorphic hash to specify the default model class" do
     @m2 = Class.new(@m)
     @dataset.set_model(:bit, nil => @m, 1 => @m2)
     all = @dataset.all
@@ -2266,13 +2262,13 @@ context "A polymorphic model dataset" do
     #...
   end
   
-  specify "should raise Sequel::Error if no suitable class is found in the polymorphic hash" do
+  deprec_specify "should raise Sequel::Error if no suitable class is found in the polymorphic hash" do
     @m2 = Class.new(@m)
     @dataset.set_model(:bit, 1 => @m2)
     proc {@dataset.all}.should raise_error(Sequel::Error)
   end
 
-  specify "should supply naked records if the naked option is specified" do
+  deprec_specify "should supply naked records if the naked option is specified" do
     @dataset.set_model(:bit, nil => @m)
     @dataset.each(:naked => true) {|r| r.class.should == Hash}
   end
@@ -2298,14 +2294,14 @@ context "A dataset with associated model class(es)" do
     @m3 = Class.new(@m2)
   end
 
-  specify "should instantiate an instance by passing the record hash as argument" do
+  deprec_specify "should instantiate an instance by passing the record hash as argument" do
     @dataset.set_model(@m1)
     o = @dataset.first
     o.class.should == @m1
     o.v.should == {:x => 1, :y => 2}
   end
   
-  specify "should use the .load constructor if available" do
+  deprec_specify "should use the .load constructor if available" do
     @dataset.set_model(@m2)
     o = @dataset.first
     o.class.should == @m2
@@ -2313,7 +2309,7 @@ context "A dataset with associated model class(es)" do
     o.vv.should == {:x => 1, :y => 2}
   end
   
-  specify "should use the .load constructor also for polymorphic datasets" do
+  deprec_specify "should use the .load constructor also for polymorphic datasets" do
     @dataset.set_model(:y, 1 => @m2, 2 => @m3)
     o = @dataset.first
     o.class.should == @m3
@@ -3223,7 +3219,7 @@ context "Sequel.use_parse_tree=" do
 end
 
 context "Dataset.dataset_classes" do
-  specify "should be an array of dataset subclasses" do
+  deprec_specify "should be an array of dataset subclasses" do
     ds_class = Class.new(Sequel::Dataset)
     Sequel::Dataset.dataset_classes.should be_a_kind_of(Array)
     Sequel::Dataset.dataset_classes.should include(ds_class)

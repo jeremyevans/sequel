@@ -43,9 +43,6 @@ module Sequel
     # if changed.
     COLUMN_CHANGE_OPTS = [:select, :sql, :from, :join].freeze
 
-    # Array of all subclasses of Dataset
-    DATASET_CLASSES = []
-
     # All methods that should have a ! method added that modifies
     # the receiver.
     MUTATION_METHODS = %w'add_graph_aliases and distinct exclude exists
@@ -53,7 +50,7 @@ module Sequel
     group group_and_count group_by having inner_join intersect invert join
     left_outer_join limit naked or order order_by order_more paginate query reject
     reverse reverse_order right_outer_join select select_all select_more
-    set_defaults set_graph_aliases set_model set_overrides sort sort_by
+    set_defaults set_graph_aliases set_overrides sort sort_by
     unfiltered union unordered where with_sql'.collect{|x| x.to_sym}
 
     NOTIMPL_MSG = "This method must be overridden in Sequel adapters".freeze
@@ -112,11 +109,6 @@ module Sequel
     
     ### Class Methods ###
 
-    # The array of dataset subclasses.
-    def self.dataset_classes
-      DATASET_CLASSES
-    end
-
     # Setup mutation (e.g. filter!) methods.  These operate the same as the
     # non-! methods, but replace the options of the current dataset with the
     # options of the resulting dataset.
@@ -126,11 +118,6 @@ module Sequel
       end
     end
 
-    # Add the subclass to the array of subclasses.
-    def self.inherited(c)
-      DATASET_CLASSES << c
-    end
-    
     ### Instance Methods ###
 
     # Alias for insert, but not aliased directly so subclasses
@@ -234,24 +221,12 @@ module Sequel
       "#<#{self.class}: #{sql.inspect}>"
     end
 
-    # Returns the the model classes associated with the dataset as a hash.
-    # If the dataset is associated with a single model class, a key of nil
-    # is used.  For datasets with polymorphic models, the keys are
-    # values of the polymorphic column and the values are the corresponding
-    # model classes to which they map.
-    def model_classes
-      @opts[:models]
-    end
-    
     # Returns a naked dataset clone - i.e. a dataset that returns records as
-    # hashes rather than model objects.
+    # hashes instead of calling the row proc.
     def naked
-      clone.set_model(nil)
-    end
-    
-    # Returns the column name for the polymorphic key.
-    def polymorphic_key
-      @opts[:polymorphic_key]
+      ds = clone
+      ds.row_proc = nil
+      ds
     end
     
     # Whether this dataset quotes identifiers.
@@ -278,88 +253,6 @@ module Sequel
       clone(:defaults=>(@opts[:defaults]||{}).merge(hash))
     end
 
-    # Associates or disassociates the dataset with a model(s). If
-    # nil is specified, the dataset is turned into a naked dataset and returns
-    # records as hashes. If a model class specified, the dataset is modified
-    # to return records as instances of the model class, e.g:
-    #
-    #   class MyModel
-    #     def initialize(values)
-    #       @values = values
-    #       ...
-    #     end
-    #   end
-    # 
-    #   dataset.set_model(MyModel)
-    #
-    # You can also provide additional arguments to be passed to the model's
-    # initialize method:
-    #
-    #   class MyModel
-    #     def initialize(values, options)
-    #       @values = values
-    #       ...
-    #     end
-    #   end
-    # 
-    #   dataset.set_model(MyModel, :allow_delete => false)
-    #  
-    # The dataset can be made polymorphic by specifying a column name as the
-    # polymorphic key and a hash mapping column values to model classes.
-    #
-    #   dataset.set_model(:kind, {1 => Person, 2 => Business})
-    #
-    # You can also set a default model class to fall back on by specifying a
-    # class corresponding to nil:
-    #
-    #   dataset.set_model(:kind, {nil => DefaultClass, 1 => Person, 2 => Business})
-    #
-    # To make sure that there is always a default model class, the hash provided
-    # should have a default value.  To make the dataset map string values to
-    # model classes, and keep a good default, try:
-    #
-    #   dataset.set_model(:kind, Hash.new{|h,k| h[k] = (k.constantize rescue DefaultClass)})
-    def set_model(key, *args)
-      # This code is more verbose then necessary for performance reasons
-      case key
-      when nil # set_model(nil) => no argument provided, so the dataset is denuded
-        @opts.merge!(:naked => true, :models => nil, :polymorphic_key => nil)
-        self.row_proc = nil
-      when Class
-        # isomorphic model
-        @opts.merge!(:naked => nil, :models => {nil => key}, :polymorphic_key => nil)
-        if key.respond_to?(:load)
-          # the class has a values setter method, so we use it
-          self.row_proc = proc{|h| key.load(h, *args)}
-        else
-          # otherwise we just pass the hash to the constructor
-          self.row_proc = proc{|h| key.new(h, *args)}
-        end
-      when Symbol
-        # polymorphic model
-        hash = args.shift || raise(ArgumentError, "No class hash supplied for polymorphic model")
-        @opts.merge!(:naked => true, :models => hash, :polymorphic_key => key)
-        if (hash.empty? ? (hash[nil] rescue nil) : hash.values.first).respond_to?(:load)
-          # the class has a values setter method, so we use it
-          self.row_proc = proc do |h|
-            c = hash[h[key]] || hash[nil] || \
-              raise(Error, "No matching model class for record (#{polymorphic_key} => #{h[polymorphic_key].inspect})")
-            c.load(h, *args)
-          end
-        else
-          # otherwise we just pass the hash to the constructor
-          self.row_proc = proc do |h|
-            c = hash[h[key]] || hash[nil] || \
-              raise(Error, "No matching model class for record (#{polymorphic_key} => #{h[polymorphic_key].inspect})")
-            c.new(h, *args)
-          end
-        end
-      else
-        raise ArgumentError, "Invalid model specified"
-      end
-      self
-    end
-    
     # Set values that override hash arguments given to insert and update statements.
     # This hash is merged into the hash provided to insert or update.
     def set_overrides(hash)

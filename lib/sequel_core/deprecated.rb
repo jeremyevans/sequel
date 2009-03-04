@@ -77,6 +77,17 @@ module Sequel
   end
 
   class Dataset
+    DATASET_CLASSES = []
+
+    def self.dataset_classes
+      Deprecation.deprecate('Sequel::Dataset#dataset_classes', 'No replacement is planned')
+      DATASET_CLASSES
+    end
+
+    def self.inherited(c)
+      DATASET_CLASSES << c
+    end
+
     def upcase_identifiers=(v)
       Deprecation.deprecate('Sequel::Dataset#upcase_identifiers=', 'Use Sequel::Dataset#identifier_input_method = :upcase or nil')
       @identifier_input_method = v ? :upcase : nil
@@ -85,6 +96,58 @@ module Sequel
     def upcase_identifiers?
       Deprecation.deprecate('Sequel::Dataset#upcase_identifiers?', 'Use Sequel::Dataset#identifier_input_method == :upcase')
       @identifier_input_method == :upcase
+    end
+
+    def model_classes
+      Deprecation.deprecate('Sequel::Dataset#model_classes', 'Sequel::Model datasets no longer set this information')
+      @opts[:models]
+    end
+
+    def polymorphic_key
+      Deprecation.deprecate('Sequel::Dataset#polymorphic_key', 'Sequel::Model datasets no longer set this information')
+      @opts[:polymorphic_key]
+    end
+
+    def set_model(key, *args)
+      Deprecation.deprecate('Sequel::Dataset#set_model', 'Use Sequel::Dataset#set_row_proc with an appropriate row proc')
+      # This code is more verbose then necessary for performance reasons
+      case key
+      when nil # set_model(nil) => no argument provided, so the dataset is denuded
+        @opts.merge!(:naked => true, :models => nil, :polymorphic_key => nil)
+        self.row_proc = nil
+      when Class
+        # isomorphic model
+        @opts.merge!(:naked => nil, :models => {nil => key}, :polymorphic_key => nil)
+        if key.respond_to?(:load)
+          # the class has a values setter method, so we use it
+          self.row_proc = proc{|h| key.load(h, *args)}
+        else
+          # otherwise we just pass the hash to the constructor
+          self.row_proc = proc{|h| key.new(h, *args)}
+        end
+      when Symbol
+        # polymorphic model
+        hash = args.shift || raise(ArgumentError, "No class hash supplied for polymorphic model")
+        @opts.merge!(:naked => true, :models => hash, :polymorphic_key => key)
+        if (hash.empty? ? (hash[nil] rescue nil) : hash.values.first).respond_to?(:load)
+          # the class has a values setter method, so we use it
+          self.row_proc = proc do |h|
+            c = hash[h[key]] || hash[nil] || \
+              raise(Error, "No matching model class for record (#{polymorphic_key} => #{h[polymorphic_key].inspect})")
+            c.load(h, *args)
+          end
+        else
+          # otherwise we just pass the hash to the constructor
+          self.row_proc = proc do |h|
+            c = hash[h[key]] || hash[nil] || \
+              raise(Error, "No matching model class for record (#{polymorphic_key} => #{h[polymorphic_key].inspect})")
+            c.new(h, *args)
+          end
+        end
+      else
+        raise ArgumentError, "Invalid model specified"
+      end
+      self
     end
   end
 

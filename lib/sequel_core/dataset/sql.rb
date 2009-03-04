@@ -744,7 +744,8 @@ module Sequel
 
     # Returns a copy of the dataset with the static SQL used.  This is useful if you want
     # to keep the same row_proc/transform/graph, but change the SQL used to custom SQL.
-    def with_sql(sql)
+    def with_sql(sql, *args)
+      sql = SQL::PlaceholderLiteralString.new(sql, args) unless args.empty?
       clone(:sql=>sql)
     end
 

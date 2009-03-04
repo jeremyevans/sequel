@@ -239,7 +239,7 @@ describe "A model class with implicit table name" do
   end
   
   specify "should have a dataset associated with the model class" do
-    Donkey.dataset.model_classes.should == {nil => Donkey}
+    Donkey.dataset.model.should == Donkey
   end
 end
 
@@ -253,8 +253,8 @@ describe "A model inheriting from a model" do
   end
   
   specify "should have a dataset associated with itself" do
-    Feline.dataset.model_classes.should == {nil => Feline}
-    Leopard.dataset.model_classes.should == {nil => Leopard}
+    Feline.dataset.model.should == Feline
+    Leopard.dataset.model.should == Leopard
   end
 end
 

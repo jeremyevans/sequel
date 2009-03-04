@@ -138,26 +138,18 @@ describe "Association Extensions" do
   before do
     module ::FindOrCreate
       def find_or_create(vals)
-        # Exploits the fact that Sequel filters are ruby objects that
-        # can be introspected.
-        author_id = @opts[:where].args[1]
-        first(vals) || \
-          @opts[:models][nil].create(vals.merge(:author_id=>author_id))
+        first(vals) || model.create(vals.merge(:author_id=>model_object.pk))
       end 
+      def find_or_create_by_name(name)
+        first(:name=>name) || model.create(:name=>name, :author_id=>model_object.pk)
+      end
     end
     INTEGRATION_DB.instance_variable_set(:@schemas, nil)
     INTEGRATION_DB.create_table!(:authors) do
       primary_key :id
     end
     class ::Author < Sequel::Model
-      one_to_many :authorships, :extend=>FindOrCreate, :dataset=>(proc do
-        key = pk
-        ds = Authorship.filter(:author_id=>key)
-        ds.meta_def(:find_or_create_by_name) do |name|
-          first(:name=>name) || Authorship.create(:name=>name, :author_id=>key)
-        end 
-        ds  
-      end)
+      one_to_many :authorships, :extend=>FindOrCreate
     end
     INTEGRATION_DB.create_table!(:authorships) do
       primary_key :id
@@ -181,7 +173,7 @@ describe "Association Extensions" do
     Authorship.count.should == 0
     sqls_should_be('SELECT COUNT(*) FROM authorships LIMIT 1')
     authorship = @author.authorships_dataset.find_or_create_by_name('Bob')
-    sqls_should_be("SELECT * FROM authorships WHERE ((author_id = 1) AND (name = 'Bob')) LIMIT 1",
+    sqls_should_be("SELECT * FROM authorships WHERE ((authorships.author_id = 1) AND (name = 'Bob')) LIMIT 1",
       /INSERT INTO authorships \((author_id, name|name, author_id)\) VALUES \((1, 'Bob'|'Bob', 1)\)/,
       "SELECT * FROM authorships WHERE (id = 1) LIMIT 1")
     Authorship.count.should == 1
@@ -190,11 +182,11 @@ describe "Association Extensions" do
     authorship.name.should == 'Bob'
     authorship.author_id.should == @author.id
     @author.authorships_dataset.find_or_create_by_name('Bob').should == authorship
-    sqls_should_be("SELECT * FROM authorships WHERE ((author_id = 1) AND (name = 'Bob')) LIMIT 1")
+    sqls_should_be("SELECT * FROM authorships WHERE ((authorships.author_id = 1) AND (name = 'Bob')) LIMIT 1")
     Authorship.count.should == 1
     sqls_should_be('SELECT COUNT(*) FROM authorships LIMIT 1')
     authorship2 = @author.authorships_dataset.find_or_create(:name=>'Jim')
-    sqls_should_be("SELECT * FROM authorships WHERE ((author_id = 1) AND (name = 'Jim')) LIMIT 1",
+    sqls_should_be("SELECT * FROM authorships WHERE ((authorships.author_id = 1) AND (name = 'Jim')) LIMIT 1",
       /INSERT INTO authorships \((author_id, name|name, author_id)\) VALUES \((1, 'Jim'|'Jim', 1)\)/,
       "SELECT * FROM authorships WHERE (id = 2) LIMIT 1")
     Authorship.count.should == 2
@@ -204,7 +196,7 @@ describe "Association Extensions" do
     authorship2.name.should == 'Jim'
     authorship2.author_id.should == @author.id
     @author.authorships_dataset.find_or_create(:name=>'Jim').should == authorship2
-    sqls_should_be("SELECT * FROM authorships WHERE ((author_id = 1) AND (name = 'Jim')) LIMIT 1")
+    sqls_should_be("SELECT * FROM authorships WHERE ((authorships.author_id = 1) AND (name = 'Jim')) LIMIT 1")
   end
 end
 

@@ -527,7 +527,6 @@ context "Model.db_schema" do
     end
     @dataset = Sequel::Dataset.new(nil).from(:items)
     @dataset.meta_def(:db){@db ||= Sequel::Database.new}
-    def @dataset.set_model(blah); end
     def @dataset.naked; self; end
     def @dataset.columns; []; end
     def @dataset.def_mutation_method(*names);  end

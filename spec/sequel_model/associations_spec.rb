@@ -567,7 +567,7 @@ describe Sequel::Model, "one_to_many" do
     v = n.historical_values_dataset
     v.should be_a_kind_of(Sequel::Dataset)
     v.sql.should == 'SELECT * FROM historical_values WHERE (historical_values.node_id = 1234)'
-    v.model_classes.should == {nil => HistoricalValue}
+    v.model.should == HistoricalValue
   end
   
   it "should use class inside a module if given as a string" do
@@ -582,7 +582,7 @@ describe Sequel::Model, "one_to_many" do
     v = n.historical_values_dataset
     v.should be_a_kind_of(Sequel::Dataset)
     v.sql.should == 'SELECT * FROM values WHERE (values.node_id = 1234)'
-    v.model_classes.should == {nil => Historical::Value}
+    v.model.should == Historical::Value
   end
 
   it "should use explicit key if given" do

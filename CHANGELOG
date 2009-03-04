@@ -1,5 +1,11 @@
 === HEAD
 
+* Model datasets now have a model accessor that returns the related model (jeremyevans)
+
+* Model datasets no longer have :models and :polymorphic_key options (jeremyevans)
+
+* Deprecate Dataset.dataset_classes, Dataset#model_classes, Dataset#polymorphic_key, and Dataset#set_model (jeremyevans)
+
 * Allow Database#get and Database#select to take a block (jeremyevans)
 
 * Deprecate Database#>> (jeremyevans)

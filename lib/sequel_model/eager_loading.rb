@@ -59,7 +59,6 @@ module Sequel::Model::Associations::EagerLoading
   # on a limited dataset, but does not use any :limit options for associations.
   # If the association uses a block or has an :eager_block argument, it is used.
   def eager(*associations)
-    model = check_model
     opt = @opts[:eager]
     opt = opt ? opt.dup : {}
     associations.flatten.each do |association|
@@ -95,7 +94,6 @@ module Sequel::Model::Associations::EagerLoading
   # all objects.  You can use the :graph_join_type, :graph_conditions, and :graph_join_table_conditions
   # association options to modify the SQL query.
   def eager_graph(*associations)
-    model = check_model
     table_name = model.table_name
     ds = if @opts[:eager_graph]
       self
@@ -247,12 +245,6 @@ module Sequel::Model::Associations::EagerLoading
 
   private
 
-  # Make sure this dataset is associated with a model, and return the default model for it.
-  def check_model
-    raise(Sequel::Error, 'No model for this dataset') unless @opts[:models] && model = @opts[:models][nil]
-    model
-  end
-
   # Make sure the association is valid for this model, and return the related AssociationReflection.
   def check_association(model, association)
     raise(Sequel::Error, 'Invalid association') unless reflection = model.association_reflection(association)
@@ -333,8 +325,6 @@ module Sequel::Model::Associations::EagerLoading
   # Eagerly load all specified associations 
   def eager_load(a)
     return if a.empty?
-    # Current model class
-    model = @opts[:models][nil]
     # All associations to eager load
     eager_assoc = @opts[:eager]
     # Key is foreign/primary key name symbol
