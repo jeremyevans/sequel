@@ -135,3 +135,10 @@ class String
     lit(*args)
   end
 end
+
+class Symbol
+  def to_column_ref(ds)
+    Sequel::Deprecation.deprecate('Symbol#to_column_ref', 'Use Dataset#literal')
+    ds.literal(self)
+  end
+end

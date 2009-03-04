@@ -130,7 +130,6 @@ class String
   def lit(*args)
     args.empty? ? Sequel::LiteralString.new(self) : Sequel::SQL::PlaceholderLiteralString.new(self, args)
   end
-  alias_method :expr, :lit
   
   # Returns a Blob that holds the same data as this string. Blobs provide proper
   # escaping of binary data.
@@ -177,11 +176,5 @@ class Symbol
   def |(sub)
     return super unless (Integer === sub) || ((Array === sub) && sub.any?{|x| Integer === x})
     Sequel::SQL::Subscript.new(self, Array(sub))
-  end
-  
-  # Delegate the creation of the resulting SQL to the given dataset,
-  # since it may be database dependent.
-  def to_column_ref(ds)
-    ds.symbol_to_column_ref(self)
   end
 end

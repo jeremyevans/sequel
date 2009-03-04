@@ -1,5 +1,7 @@
 === HEAD
 
+* Deprecate Symbol#to_column_ref (jeremyevans)
+
 * Deprecate String#expr (jeremyevans)
 
 * Deprecate Array#to_sql, String#to_sql, and String#split_sql (jeremyevans)

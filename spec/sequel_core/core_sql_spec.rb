@@ -314,39 +314,39 @@ context "Symbol" do
   end
 end
 
-context "Symbol#to_column_ref" do
+context "Dataset#literal" do
   setup do
     @ds = MockDataset.new(nil)
   end
   
   specify "should convert qualified symbol notation into dot notation" do
-    :abc__def.to_column_ref(@ds).should == 'abc.def'
+    @ds.literal(:abc__def).should == 'abc.def'
   end
   
   specify "should convert AS symbol notation into SQL AS notation" do
-    :xyz___x.to_column_ref(@ds).should == 'xyz AS x'
-    :abc__def___x.to_column_ref(@ds).should == 'abc.def AS x'
+    @ds.literal(:xyz___x).should == 'xyz AS x'
+    @ds.literal(:abc__def___x).should == 'abc.def AS x'
   end
   
   specify "should support names with digits" do
-    :abc2.to_column_ref(@ds).should == 'abc2'
-    :xx__yy3.to_column_ref(@ds).should == 'xx.yy3'
-    :ab34__temp3_4ax.to_column_ref(@ds).should == 'ab34.temp3_4ax'
-    :x1___y2.to_column_ref(@ds).should == 'x1 AS y2'
-    :abc2__def3___ggg4.to_column_ref(@ds).should == 'abc2.def3 AS ggg4'
+    @ds.literal(:abc2).should == 'abc2'
+    @ds.literal(:xx__yy3).should == 'xx.yy3'
+    @ds.literal(:ab34__temp3_4ax).should == 'ab34.temp3_4ax'
+    @ds.literal(:x1___y2).should == 'x1 AS y2'
+    @ds.literal(:abc2__def3___ggg4).should == 'abc2.def3 AS ggg4'
   end
   
   specify "should support upper case and lower case" do
-    :ABC.to_column_ref(@ds).should == 'ABC'
-    :Zvashtoy__aBcD.to_column_ref(@ds).should == 'Zvashtoy.aBcD'
+    @ds.literal(:ABC).should == 'ABC'
+    @ds.literal(:Zvashtoy__aBcD).should == 'Zvashtoy.aBcD'
   end
 
   specify "should support spaces inside column names" do
     @ds.quote_identifiers = true
-    :"AB C".to_column_ref(@ds).should == '"AB C"'
-    :"Zvas htoy__aB cD".to_column_ref(@ds).should == '"Zvas htoy"."aB cD"'
-    :"aB cD___XX XX".to_column_ref(@ds).should == '"aB cD" AS "XX XX"'
-    :"Zva shtoy__aB cD___XX XX".to_column_ref(@ds).should == '"Zva shtoy"."aB cD" AS "XX XX"'
+    @ds.literal(:"AB C").should == '"AB C"'
+    @ds.literal(:"Zvas htoy__aB cD").should == '"Zvas htoy"."aB cD"'
+    @ds.literal(:"aB cD___XX XX").should == '"aB cD" AS "XX XX"'
+    @ds.literal(:"Zva shtoy__aB cD___XX XX").should == '"Zva shtoy"."aB cD" AS "XX XX"'
   end
 end
 
