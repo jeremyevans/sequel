@@ -406,11 +406,10 @@ module Sequel
     # certain database engines, such as PostgreSQL, require binary data to be 
     # escaped.
     class Blob < ::String
-      # return self.
+      # Returns self
       def to_sequel_blob
         self
       end
-      alias to_blob to_sequel_blob
     end
 
     # Subclass of ComplexExpression where the expression results

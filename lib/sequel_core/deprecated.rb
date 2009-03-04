@@ -82,6 +82,15 @@ module Sequel
       @identifier_input_method == :upcase
     end
   end
+
+  module SQL
+    class Blob
+      def to_blob(*args)
+        Sequel::Deprecation.deprecate('Sequel::SQL::Blob#to_blob', 'Use Sequel::SQL::Blob#to_sequel_blob')
+        to_sequel_blob(*args)
+      end
+    end
+  end
 end
 
 if RUBY_VERSION < '1.9.0'
@@ -133,6 +142,11 @@ class String
   def expr(*args)
     Sequel::Deprecation.deprecate('String#expr', 'Use String#lit')
     lit(*args)
+  end
+
+  def to_blob(*args)
+    Sequel::Deprecation.deprecate('String#to_blob', 'Use String#to_sequel_blob')
+    to_sequel_blob(*args)
   end
 end
 

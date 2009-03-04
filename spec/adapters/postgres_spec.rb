@@ -265,16 +265,16 @@ context "A PostgreSQL dataset" do
   end
 
   specify "should properly escape binary data" do
-    POSTGRES_DB['SELECT ? AS a', "\1\2\3".to_blob].get(:a) == "\1\2\3"
+    POSTGRES_DB['SELECT ? AS a', "\1\2\3".to_sequel_blob].get(:a) == "\1\2\3"
   end
 
   specify "should retrieve binary data as Blob object" do
     d = POSTGRES_DB[:test4]
-    d << {:name => '123', :value => "\1\2\3".to_blob}
+    d << {:name => '123', :value => "\1\2\3".to_sequel_blob}
     retrieved_binary_value = d[:name => '123'][:value]
     retrieved_binary_value.should be_a_kind_of(::Sequel::SQL::Blob)
     retrieved_binary_value.should == "\1\2\3"
-    retrieved_binary_value = d[:value => "\1\2\3".to_blob][:value]
+    retrieved_binary_value = d[:value => "\1\2\3".to_sequel_blob][:value]
     retrieved_binary_value.should be_a_kind_of(::Sequel::SQL::Blob)
     retrieved_binary_value.should == "\1\2\3"
   end
