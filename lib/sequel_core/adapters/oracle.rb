@@ -45,7 +45,7 @@ module Sequel
               :db_type => column.type_string.split(' ')[0],
               :type_string => column.type_string,
               :charset_form => column.charset_form,
-              :char_used? => column.char_used?,
+              :char_used => column.char_used?,
               :char_size => column.char_size,
               :data_size => column.data_size,
               :precision => column.precision,

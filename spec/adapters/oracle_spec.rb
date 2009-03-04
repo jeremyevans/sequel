@@ -10,7 +10,7 @@ end
 ORACLE_DB.create_table :items do
   varchar2 :name, :size => 50
   number :value, :size => 38
-  
+  date :date_created
   index :value
 end
 
@@ -40,16 +40,22 @@ context "An Oracle database" do
   end
   
   specify "should provide schema information" do
-    [:books, :categories, :items].each do |table|
+    books_schema = [
+      [:id, {:char_size=>0, :type=>:number, :allow_null=>true, :type_string=>"NUMBER(38)", :data_size=>22, :precision=>38, :char_used=>false, :scale=>0, :charset_form=>nil, :fsprecision=>38, :lfprecision=>0, :db_type=>"NUMBER(38)"}], 
+      [:title, {:char_size=>50, :type=>:varchar2, :allow_null=>true, :type_string=>"VARCHAR2(50)", :data_size=>50, :precision=>0, :char_used=>false, :scale=>0, :charset_form=>:implicit, :fsprecision=>0, :lfprecision=>0, :db_type=>"VARCHAR2(50)"}], 
+      [:category_id, {:char_size=>0, :type=>:number, :allow_null=>true, :type_string=>"NUMBER(38)", :data_size=>22, :precision=>38, :char_used=>false, :scale=>0, :charset_form=>nil, :fsprecision=>38, :lfprecision=>0, :db_type=>"NUMBER(38)"}]]
+    categories_schema = [
+      [:id, {:char_size=>0, :type=>:number, :allow_null=>true, :type_string=>"NUMBER(38)", :data_size=>22, :precision=>38, :char_used=>false, :scale=>0, :charset_form=>nil, :fsprecision=>38, :lfprecision=>0, :db_type=>"NUMBER(38)"}], 
+      [:cat_name, {:char_size=>50, :type=>:varchar2, :allow_null=>true, :type_string=>"VARCHAR2(50)", :data_size=>50, :precision=>0, :char_used=>false, :scale=>0, :charset_form=>:implicit, :fsprecision=>0, :lfprecision=>0, :db_type=>"VARCHAR2(50)"}]]
+    items_schema = [
+      [:name, {:char_size=>50, :type=>:varchar2, :allow_null=>true, :type_string=>"VARCHAR2(50)", :data_size=>50, :precision=>0, :char_used=>false, :scale=>0, :charset_form=>:implicit, :fsprecision=>0, :lfprecision=>0, :db_type=>"VARCHAR2(50)"}], 
+      [:value, {:char_size=>0, :type=>:number, :allow_null=>true, :type_string=>"NUMBER(38)", :data_size=>22, :precision=>38, :char_used=>false, :scale=>0, :charset_form=>nil, :fsprecision=>38, :lfprecision=>0, :db_type=>"NUMBER(38)"}],
+      [:date_created, {:charset_form=>nil, :type=>:date, :type_string=>"DATE", :fsprecision=>0, :data_size=>7, :lfprecision=>0, :precision=>0, :db_type=>"DATE", :char_used=>false, :char_size=>0, :scale=>0, :allow_null=>true}]]
+     
+    {:books => books_schema, :categories => categories_schema, :items => items_schema}.each_pair do |table, expected_schema|
       schema = ORACLE_DB.schema(table)
       schema.should_not be_nil
-      schema.each do |name, column_schema|
-        name.should_not be_nil
-        column_schema.should_not be_nil
-        [:type, :db_type, :type_string].each do |info|
-          column_schema[info].should_not be_nil
-        end
-      end
+      expected_schema.should == schema
     end
   end
 end
@@ -75,9 +81,9 @@ context "An Oracle dataset" do
     @d << {:name => 'def', :value => 789}
 
     @d.order(:value).to_a.should == [
-      {:name => 'abc', :value => 123},
-      {:name => 'abc', :value => 456},
-      {:name => 'def', :value => 789}
+      {:date_created=>nil, :name => 'abc', :value => 123},
+      {:date_created=>nil, :name => 'abc', :value => 456},
+      {:date_created=>nil, :name => 'def', :value => 789}
     ]
 
     @d.select(:name).uniq.order_by(:name).to_a.should == [
@@ -86,41 +92,41 @@ context "An Oracle dataset" do
     ]
            
     @d.order(:value.desc).limit(1).to_a.should == [
-      {:name => 'def', :value => 789}                                        
+      {:date_created=>nil, :name => 'def', :value => 789}                                        
     ]
 
     @d.filter(:name => 'abc').to_a.should == [
-      {:name => 'abc', :value => 123},
-      {:name => 'abc', :value => 456} 
+      {:date_created=>nil, :name => 'abc', :value => 123},
+      {:date_created=>nil, :name => 'abc', :value => 456} 
     ]
     
     @d.order(:value.desc).filter(:name => 'abc').to_a.should == [
-      {:name => 'abc', :value => 456},
-      {:name => 'abc', :value => 123} 
+      {:date_created=>nil, :name => 'abc', :value => 456},
+      {:date_created=>nil, :name => 'abc', :value => 123} 
     ]
 
     @d.filter(:name => 'abc').limit(1).to_a.should == [
-      {:name => 'abc', :value => 123}                                        
+      {:date_created=>nil, :name => 'abc', :value => 123}                                        
     ]
         
     @d.filter(:name => 'abc').order(:value.desc).limit(1).to_a.should == [
-      {:name => 'abc', :value => 456}                                        
+      {:date_created=>nil, :name => 'abc', :value => 456}                                        
     ]
     
     @d.filter(:name => 'abc').order(:value).limit(1).to_a.should == [
-      {:name => 'abc', :value => 123}                                        
+      {:date_created=>nil, :name => 'abc', :value => 123}                                        
     ]
         
     @d.order(:value).limit(1).to_a.should == [
-      {:name => 'abc', :value => 123}                                        
+      {:date_created=>nil, :name => 'abc', :value => 123}                                        
     ]
 
     @d.order(:value).limit(1, 1).to_a.should == [
-      {:name => 'abc', :value => 456}
+      {:date_created=>nil, :name => 'abc', :value => 456}
     ]
 
     @d.order(:value).limit(1, 2).to_a.should == [
-      {:name => 'def', :value => 789}
+      {:date_created=>nil, :name => 'def', :value => 789}
     ]    
     
     @d.avg(:value).to_i.should == (789+123+456)/3
@@ -168,6 +174,14 @@ context "An Oracle dataset" do
     # floating-point precision bullshit
     @d[:name => 'def'][:value].should == 789
     @d.filter(:value => 530).count.should == 2
+  end
+
+  specify "should translate values correctly" do
+    @d << {:name => 'abc', :value => 456}
+    @d << {:name => 'def', :value => 789}
+    @d.filter(:value > 500).update(:date_created => "to_timestamp('2009-09-09', 'YYYY-MM-DD')".lit)
+    
+    @d[:name => 'def'][:date_created].should == Time.parse('2009-09-09')
   end
   
   specify "should delete records correctly" do
