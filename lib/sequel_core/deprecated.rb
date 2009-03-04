@@ -111,4 +111,22 @@ class Range
   end
 end
 
+class Array
+  def to_sql
+    Sequel::Deprecation.deprecate('Array#to_sql', 'It may be a good idea to refactor your implementation so this type of method is not required')
+    map {|l| ((m = /^(.*)--/.match(l)) ? m[1] : l).chomp}.join(' '). \
+      gsub(/\/\*.*\*\//, '').gsub(/\s+/, ' ').strip
+  end
+end
 
+class String
+  def split_sql
+    Sequel::Deprecation.deprecate('String#split_sql', 'It may be a good idea to refactor your implementation so this type of method is not required')
+    to_sql.split(';').map {|s| s.strip}
+  end
+
+  def to_sql
+    Sequel::Deprecation.deprecate('String#to_sql', 'It may be a good idea to refactor your implementation so this type of method is not required')
+    split("\n").to_sql
+  end
+end

@@ -317,7 +317,7 @@ context "Database#<<" do
     (@db << "DELETE FROM items").should == "DELETE FROM items"
   end
   
-  specify "should accept an array and convert it to SQL" do
+  deprec_specify "should accept an array and convert it to SQL" do
     a = %[
       --
       CREATE TABLE items (a integer, /*b integer*/
@@ -328,7 +328,7 @@ context "Database#<<" do
       "CREATE TABLE items (a integer, b text, c integer); DROP TABLE old_items;"
   end
   
-  specify "should remove comments and whitespace from arrays" do
+  deprec_specify "should remove comments and whitespace from arrays" do
     s = %[
       --
       CREATE TABLE items (a integer, /*b integer*/

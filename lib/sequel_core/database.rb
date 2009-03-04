@@ -224,10 +224,9 @@ module Sequel
     
     ### Instance Methods ###
 
-    # Executes the supplied SQL statement. The SQL can be supplied as a string
-    # or as an array of strings. If an array is given, comments and excessive 
-    # white space are removed. See also Array#to_sql.
+    # Executes the supplied SQL statement string.
     def <<(sql)
+      Deprecation.deprecate('Passing an array argument to Database#<<', 'Use array.each{|x| database << x}') if Array === sql
       execute_ddl((Array === sql) ? sql.to_sql : sql)
     end
     

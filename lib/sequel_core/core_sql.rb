@@ -54,13 +54,6 @@ class Array
     ::Sequel::SQL::StringExpression.new(:'||', *args)
   end
 
-  # Concatenates an array of strings into an SQL string. ANSI SQL and C-style
-  # comments are removed, as well as excessive white-space.
-  def to_sql
-    map {|l| ((m = /^(.*)--/.match(l)) ? m[1] : l).chomp}.join(' '). \
-      gsub(/\/\*.*\*\//, '').gsub(/\s+/, ' ').strip
-  end
-
   private
 
   # Raise an error if this array is not made up of all two pairs, otherwise create a Sequel::SQL::BooleanExpression from this array.
@@ -139,18 +132,6 @@ class String
   end
   alias_method :expr, :lit
   
-  # Splits a string into separate SQL statements, removing comments
-  # and excessive white-space.
-  def split_sql
-    to_sql.split(';').map {|s| s.strip}
-  end
-
-  # Converts a string into an SQL string by removing comments.
-  # See also Array#to_sql.
-  def to_sql
-    split("\n").to_sql
-  end
-
   # Returns a Blob that holds the same data as this string. Blobs provide proper
   # escaping of binary data.
   def to_sequel_blob

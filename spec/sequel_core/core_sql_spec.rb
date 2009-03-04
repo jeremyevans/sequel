@@ -64,44 +64,44 @@ context "Array#sql_array" do
 end
 
 context "Array#to_sql" do
-  specify "should concatenate multiple lines into a single string" do
+  deprec_specify "should concatenate multiple lines into a single string" do
     "SELECT * \r\nFROM items\r\n WHERE a = 1".split.to_sql. \
       should == 'SELECT * FROM items WHERE a = 1'
   end
   
-  specify "should remove superfluous white space and line breaks" do
+  deprec_specify "should remove superfluous white space and line breaks" do
     "\tSELECT * \n FROM items    ".split.to_sql. \
       should == 'SELECT * FROM items'
   end
   
-  specify "should remove ANSI SQL comments" do
+  deprec_specify "should remove ANSI SQL comments" do
     "SELECT *   --comment\r\n  FROM items\r\n  --comment".split.to_sql. \
       should == 'SELECT * FROM items'
   end
   
-  specify "should remove C-style comments" do
+  deprec_specify "should remove C-style comments" do
     "SELECT * \r\n /* comment comment\r\n comment\r\n FROM items */\r\n FROM items\r\n--comment".split.to_sql. \
       should == 'SELECT * FROM items'
   end
 end
 
 context "String#to_sql" do
-  specify "should concatenate multiple lines into a single string" do
+  deprec_specify "should concatenate multiple lines into a single string" do
     "SELECT * \r\nFROM items\r\nWHERE a = 1".to_sql. \
       should == 'SELECT * FROM items WHERE a = 1'
   end
   
-  specify "should remove superfluous white space and line breaks" do
+  deprec_specify "should remove superfluous white space and line breaks" do
     "\tSELECT * \r\n FROM items    ".to_sql. \
       should == 'SELECT * FROM items'
   end
   
-  specify "should remove ANSI SQL comments" do
+  deprec_specify "should remove ANSI SQL comments" do
     "SELECT *   --comment \r\n FROM items\r\n  --comment".to_sql. \
       should == 'SELECT * FROM items'
   end
   
-  specify "should remove C-style comments" do
+  deprec_specify "should remove C-style comments" do
     "SELECT * \r\n/* comment comment\r\ncomment\r\nFROM items */\r\nFROM items\r\n--comment".to_sql. \
       should == 'SELECT * FROM items'
   end
@@ -149,12 +149,12 @@ context "String#to_blob and #to_sequel_blob" do
 end
 
 context "String#split_sql" do
-  specify "should split a string containing multiple statements" do
+  deprec_specify "should split a string containing multiple statements" do
     "DROP TABLE a; DROP TABLE c".split_sql.should == \
       ['DROP TABLE a', 'DROP TABLE c']
   end
   
-  specify "should remove comments from the string" do
+  deprec_specify "should remove comments from the string" do
     "DROP TABLE a;/* DROP TABLE b; DROP TABLE c;*/DROP TABLE d".split_sql.should == \
       ['DROP TABLE a', 'DROP TABLE d']
   end

@@ -1,5 +1,9 @@
 === HEAD
 
+* Deprecate Array#to_sql, String#to_sql, and String#split_sql (jeremyevans)
+
+* Deprecate passing an array to Database#<< (jeremyevans)
+
 * Deprecate Range#interval (jeremyevans)
 
 * Deprecate Enumerable#send_each (jeremyevans)
