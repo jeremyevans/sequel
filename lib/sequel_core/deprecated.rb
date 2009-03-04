@@ -129,4 +129,9 @@ class String
     Sequel::Deprecation.deprecate('String#to_sql', 'It may be a good idea to refactor your implementation so this type of method is not required')
     split("\n").to_sql
   end
+
+  def expr(*args)
+    Sequel::Deprecation.deprecate('String#expr', 'Use String#lit')
+    lit(*args)
+  end
 end

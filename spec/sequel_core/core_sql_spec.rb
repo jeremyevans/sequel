@@ -114,11 +114,11 @@ context "String#lit" do
   end
   
   specify "should inhibit string literalization" do
-    Sequel::Database.new[:t].update_sql(:stamp => "NOW()".expr).should == \
+    Sequel::Database.new[:t].update_sql(:stamp => "NOW()".lit).should == \
       "UPDATE t SET stamp = NOW()"
   end
 
-  specify "should be aliased as expr" do
+  deprec_specify "should be aliased as expr" do
     'xyz'.expr.should be_a_kind_of(Sequel::LiteralString)
     'xyz'.expr.to_s.should == 'xyz'
     Sequel::Database.new[:t].update_sql(:stamp => "NOW()".expr).should == \

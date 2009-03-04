@@ -762,10 +762,10 @@ context "Dataset#literal" do
     @dataset.literal(d).should == s
   end
   
-  specify "should not literalize expression strings" do
-    @dataset.literal('col1 + 2'.expr).should == 'col1 + 2'
+  specify "should not modify literal strings" do
+    @dataset.literal('col1 + 2'.lit).should == 'col1 + 2'
     
-    @dataset.update_sql(:a => 'a + 2'.expr).should == 
+    @dataset.update_sql(:a => 'a + 2'.lit).should == 
       'UPDATE test SET a = a + 2'
   end
 
