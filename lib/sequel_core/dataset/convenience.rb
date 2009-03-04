@@ -5,6 +5,7 @@ module Sequel
 
     # Returns the first record matching the conditions.
     def [](*conditions)
+      Deprecation.deprecate('Using an Integer argument to Dataset#[] is deprecated and will raise an error in a future version. Use Dataset#first.') if conditions.length == 1 and conditions.is_a?(Integer)
       first(*conditions)
     end
 
@@ -90,7 +91,7 @@ module Sequel
     # given), or performs the stock mapping functionality of Enumerable.
     def map(column_name = nil, &block)
       if column_name
-        super() {|r| r[column_name]}
+        super(){|r| r[column_name]}
       else
         super(&block)
       end
@@ -161,7 +162,6 @@ module Sequel
         @db.transaction{statements.each{|st| execute_dui(st)}}
       end
     end
-    alias_method :import, :multi_insert
     
     # Pretty prints the records in the dataset as plain-text table.
     def print(*cols)

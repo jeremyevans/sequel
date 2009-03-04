@@ -159,6 +159,11 @@ module Sequel
       Sequel::Deprecation.deprecate('Sequel::Dataset#create_or_replace_view', 'Use Sequel::Database#create_or_replace_view')
       @db.create_or_replace_view(name, self)
     end
+
+    def import(*args, &block)
+      Sequel::Deprecation.deprecate('Sequel::Dataset#import', 'Use Sequel::Dataset#multi_insert')
+      multi_insert(*args, &block)
+    end
   end
 
   module SQL

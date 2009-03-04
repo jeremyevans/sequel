@@ -431,7 +431,7 @@ context "A PostgreSQL database" do
   end
 end
 
-context "Postgres::Dataset#multi_insert_sql / #import" do
+context "Postgres::Dataset#multi_insert_sql" do
   setup do
     @ds = POSTGRES_DB[:test]
   end

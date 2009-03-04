@@ -1,5 +1,9 @@
 === HEAD
 
+* Deprecate Dataset#[Integer] and Dataset#import (jeremyevans)
+
+* Deprecate Dataset#create_view and Dataset#create_or_replace_view (jeremyevans)
+
 * Model datasets now have a model accessor that returns the related model (jeremyevans)
 
 * Model datasets no longer have :models and :polymorphic_key options (jeremyevans)

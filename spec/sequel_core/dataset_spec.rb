@@ -2608,7 +2608,7 @@ context "Dataset#multi_insert" do
     ]
   end
   
-  specify "should be aliased by #import" do
+  deprec_specify "should be aliased by #import" do
     @ds.import([:x, :y], [[1, 2], [3, 4], [5, 6]], :slice => 2)
     @db.sqls.should == [
       'BEGIN',
