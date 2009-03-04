@@ -1,5 +1,7 @@
 === HEAD
 
+* Deprecate Range#interval (jeremyevans)
+
 * Deprecate Enumerable#send_each (jeremyevans)
 
 * Deprecate Hash#key on ruby 1.8, change some SQLite adapter constants (jeremyevans)

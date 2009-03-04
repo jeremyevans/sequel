@@ -104,3 +104,11 @@ module Enumerable
   end
 end
 
+class Range
+  def interval
+    Sequel::Deprecation.deprecate('Range#interval', 'Use range.first - range.last - (range.exclude_end? ? 1 : 0)')
+    last - first - (exclude_end? ? 1 : 0)
+  end
+end
+
+

@@ -132,21 +132,6 @@ class Numeric
   end
 end
 
-class Range
-  # Returns the interval between the beginning and end of the range.
-  #
-  # For exclusive ranges, is one less than the inclusive range:
-  #
-  #   (0..10).interval # => 10
-  #   (0...10).interval # => 9
-  #
-  # Only works for numeric ranges, for other ranges the result is undefined,
-  # and the method may raise an error.
-  def interval
-    last - first - (exclude_end? ? 1 : 0)
-  end
-end
-
 class String
   # Strings are blank if they are empty or include only whitespace
   def blank?

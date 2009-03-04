@@ -23,7 +23,7 @@ context "Enumerable#send_each" do
 end
 
 context "Range#interval" do
-  specify "should return the interval between the beginning and end for an inclusive range" do
+  deprec_specify "should return the interval between the beginning and end for an inclusive range" do
     (1..10).interval.should == 9
     
     r = rand(100000) + 10
@@ -31,7 +31,7 @@ context "Range#interval" do
     (t1..t2).interval.should == r
   end
 
-  specify "should return the interval between the beginning and end for an exclusive range" do
+  deprec_specify "should return the interval between the beginning and end for an exclusive range" do
     (1...10).interval.should == 8
     
     r = rand(100000) + 10

@@ -441,7 +441,7 @@ module Sequel
 
       if Range === l
         o = l.first
-        l = l.interval + 1
+        l = l.last - l.first + (l.exclude_end? ? 0 : 1)
       end
       l = l.to_i
       raise(Error, 'Limits must be greater than or equal to 1') unless l >= 1
