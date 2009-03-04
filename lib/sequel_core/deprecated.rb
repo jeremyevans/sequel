@@ -69,6 +69,11 @@ module Sequel
       Deprecation.deprecate('Sequel::Database#upcase_identifiers?', 'Use Sequel::Database#identifier_input_method == :upcase')
       identifier_input_method == :upcase
     end
+
+    def >>(*args, &block)
+      Deprecation.deprecate('Sequel::Database#>>', 'Use Sequel::Database#fetch')
+      fetch(*args, &block)
+    end
   end
 
   class Dataset

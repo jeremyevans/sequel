@@ -308,7 +308,6 @@ module Sequel
       ds.each(&block) if block
       ds
     end
-    alias_method :>>, :fetch
     
     # Returns a new dataset with the from method invoked. If a block is given,
     # it is used as a filter on the dataset.

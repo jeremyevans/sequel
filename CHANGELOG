@@ -1,5 +1,7 @@
 === HEAD
 
+* Deprecate Database#>> (jeremyevans)
+
 * Deprecate String#to_blob and Sequel::SQL::Blob#to_blob (jeremyevans)
 
 * Deprecate use of Symbol#| for SQL array subscripts, add Symbol#sql_subscript (jeremyevans)
