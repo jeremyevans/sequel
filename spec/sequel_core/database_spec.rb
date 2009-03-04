@@ -296,6 +296,12 @@ context "Database#dataset" do
     d.should be_a_kind_of(Sequel::Dataset)
     d.sql.should == 'SELECT a, b, c FROM mau'
   end
+  
+  specify "should allow #select to take a block" do
+    d = @db.select(:a, :b){c}.from(:mau)
+    d.should be_a_kind_of(Sequel::Dataset)
+    d.sql.should == 'SELECT a, b, c FROM mau'
+  end
 end
 
 context "Database#execute" do
@@ -1098,7 +1104,10 @@ context "Database#get" do
     @c = Class.new(DummyDatabase) do
       def dataset
         ds = super
-        ds.meta_def(:get) {|c| @db.execute select(c).sql; c}
+        def ds.get(*args, &block)
+          @db.execute select(*args, &block).sql
+          args
+        end
         ds
       end
     end
@@ -1107,11 +1116,19 @@ context "Database#get" do
   end
   
   specify "should use Dataset#get to get a single value" do
-    @db.get(1).should == 1
+    @db.get(1).should == [1]
     @db.sqls.last.should == 'SELECT 1'
     
     @db.get(:version.sql_function)
     @db.sqls.last.should == 'SELECT version()'
+  end
+
+  specify "should accept a block" do
+    @db.get{1}
+    @db.sqls.last.should == 'SELECT 1'
+    
+    @db.get{version(1)}
+    @db.sqls.last.should == 'SELECT version(1)'
   end
 end
 

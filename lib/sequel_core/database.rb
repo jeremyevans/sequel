@@ -323,8 +323,8 @@ module Sequel
     #
     #   # SELECT version()
     #   DB.get(:version.sql_function) #=> ...
-    def get(expr)
-      dataset.get(expr)
+    def get(*args, &block)
+      dataset.get(*args, &block)
     end
     
     # The method to call on identifiers going into the database
@@ -413,8 +413,8 @@ module Sequel
     end
     
     # Returns a new dataset with the select method invoked.
-    def select(*args)
-      dataset.select(*args)
+    def select(*args, &block)
+      dataset.select(*args, &block)
     end
     
     # Default serial primary key options.

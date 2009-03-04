@@ -1,5 +1,7 @@
 === HEAD
 
+* Allow Database#get and Database#select to take a block (jeremyevans)
+
 * Deprecate Database#>> (jeremyevans)
 
 * Deprecate String#to_blob and Sequel::SQL::Blob#to_blob (jeremyevans)
