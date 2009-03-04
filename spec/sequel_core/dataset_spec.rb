@@ -3000,7 +3000,7 @@ context "Dataset#create_view" do
     @ds = @db[:items].order(:abc).filter(:category => 'ruby')
   end
   
-  specify "should create a view with the dataset's sql" do
+  deprec_specify "should create a view with the dataset's sql" do
     @ds.create_view(:xyz)
     @db.sqls.should == ["CREATE VIEW xyz AS #{@ds.sql}"]
   end
@@ -3021,7 +3021,7 @@ context "Dataset#create_or_replace_view" do
     @ds = @db[:items].order(:abc).filter(:category => 'ruby')
   end
   
-  specify "should create a view with the dataset's sql" do
+  deprec_specify "should create a view with the dataset's sql" do
     @ds.create_or_replace_view(:xyz)
     @db.sqls.should == ["CREATE OR REPLACE VIEW xyz AS #{@ds.sql}"]
   end

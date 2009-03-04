@@ -1,4 +1,4 @@
-%w'callback convenience pagination prepared_statements query schema sql'.each do |f|
+%w'convenience pagination prepared_statements query sql'.each do |f|
   require "sequel_core/dataset/#{f}"
 end
 
@@ -390,6 +390,13 @@ module Sequel
     # identifier_output_method.
     def output_identifier(v)
       (i = identifier_output_method) ? v.to_s.send(i).to_sym : v.to_sym
+    end
+
+    # This is run inside .all, after all of the records have been loaded
+    # via .each, but before any block passed to all is called.  It is called with
+    # a single argument, an array of all returned records.  Does nothing by
+    # default, added to make the model eager loading code simpler.
+    def post_load(all_records)
     end
 
     # If a block argument is passed to a method that uses a VirtualRow,

@@ -149,6 +149,16 @@ module Sequel
       end
       self
     end
+
+    def create_view(name)
+      Sequel::Deprecation.deprecate('Sequel::Dataset#create_view', 'Use Sequel::Database#create_view')
+      @db.create_view(name, self)
+    end
+
+    def create_or_replace_view(name)
+      Sequel::Deprecation.deprecate('Sequel::Dataset#create_or_replace_view', 'Use Sequel::Database#create_or_replace_view')
+      @db.create_or_replace_view(name, self)
+    end
   end
 
   module SQL
