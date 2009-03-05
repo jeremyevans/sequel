@@ -1290,7 +1290,7 @@ context "Dataset#count" do
     @c.sql.should == 'SELECT COUNT(*) FROM test LIMIT 1'
   end
   
-  specify "should be aliased by #size" do
+  deprec_specify "should be aliased by #size" do
     @dataset.size.should == 1
   end
   

@@ -164,6 +164,11 @@ module Sequel
       Sequel::Deprecation.deprecate('Sequel::Dataset#import', 'Use Sequel::Dataset#multi_insert')
       multi_insert(*args, &block)
     end
+
+    def size
+      Sequel::Deprecation.deprecate('Sequel::Dataset#size', 'Use Sequel::Dataset#count')
+      count
+    end
   end
 
   module SQL

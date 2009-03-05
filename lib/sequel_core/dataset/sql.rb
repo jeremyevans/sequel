@@ -75,7 +75,6 @@ module Sequel
     def count
       options_overlap(COUNT_FROM_SELF_OPTS) ? from_self.count : clone(STOCK_COUNT_OPTS).single_value.to_i
     end
-    alias_method :size, :count
 
     # Formats a DELETE statement using the given options and dataset options.
     # 
