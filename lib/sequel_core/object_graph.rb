@@ -184,7 +184,7 @@ module Sequel
     # Fetch the rows, split them into component table parts,
     # tranform and run the row_proc on each part (if applicable),
     # and yield a hash of the parts.
-    def graph_each(opts, &block)
+    def graph_each(opts=(defarg=true;nil), &block)
       # Reject tables with nil datasets, as they are excluded from
       # the result set
       datasets = @opts[:graph][:table_aliases].to_a.reject{|ta,ds| ds.nil?}
@@ -198,7 +198,7 @@ module Sequel
       # Use the manually set graph aliases, if any, otherwise
       # use the ones automatically created by .graph
       column_aliases = @opts[:graph_aliases] || @opts[:graph][:column_aliases]
-      fetch_rows(select_sql(opts)) do |r|
+      fetch_rows(defarg ? select_sql : select_sql(opts)) do |r|
         graph = {}
         # Create the sub hashes, one per table
         table_aliases.each{|ta| graph[ta]={}}

@@ -134,9 +134,10 @@ module Sequel
 
     # Returns an array with all records in the dataset. If a block is given,
     # the array is iterated over after all items have been loaded.
-    def all(opts = nil, &block)
+    def all(opts = (defarg=true;nil), &block)
+      Deprecation.deprecate("Calling Dataset#all with an argument is deprecated and will raise an error in a future version.  Use dataset.clone(opts).all.") unless defarg
       a = []
-      each(opts) {|r| a << r}
+      defarg ? each{|r| a << r} : each(opts){|r| a << r}
       post_load(a)
       a.each(&block) if block
       a
@@ -160,8 +161,8 @@ module Sequel
     # If you are looking for all columns for a single table, see Schema::SQL#schema.
     def columns
       return @columns if @columns
-      ds = unfiltered.unordered.clone(:distinct => nil)
-      ds.single_record
+      ds = unfiltered.unordered.clone(:distinct => nil, :limit => 1)
+      ds.each{break}
       @columns = ds.instance_variable_get(:@columns)
       @columns || []
     end
@@ -182,22 +183,24 @@ module Sequel
 
     # Deletes the records in the dataset.  The returned value is generally the
     # number of records deleted, but that is adapter dependent.
-    def delete(*args)
-      execute_dui(delete_sql(*args))
+    def delete(opts=(defarg=true;nil))
+      Deprecation.deprecate("Calling Dataset#delete with an argument is deprecated and will raise an error in a future version.  Use dataset.clone(opts).delete.") unless defarg
+      execute_dui(defarg ? delete_sql : delete_sql(opts))
     end
     
     # Iterates over the records in the dataset and returns set.  If opts
     # have been passed that modify the columns, reset the column information.
-    def each(opts = nil, &block)
+    def each(opts = (defarg=true;nil), &block)
+      Deprecation.deprecate("Calling Dataset#each with an argument is deprecated and will raise an error in a future version.  Use dataset.clone(opts).each.") unless defarg
       if opts && opts.keys.any?{|o| COLUMN_CHANGE_OPTS.include?(o)}
         prev_columns = @columns
         begin
-          _each(opts, &block)
+          defarg ? _each(&block) : _each(opts, &block)
         ensure
           @columns = prev_columns
         end
       else
-        _each(opts, &block)
+        defarg ? _each(&block) : _each(opts, &block)
       end
       self
     end
@@ -318,8 +321,9 @@ module Sequel
     
     # Updates values for the dataset.  The returned value is generally the
     # number of rows updated, but that is adapter dependent.
-    def update(*args)
-      execute_dui(update_sql(*args))
+    def update(values={}, opts=(defarg=true;nil))
+      Deprecation.deprecate("Calling Dataset#update with an argument is deprecated and will raise an error in a future version.  Use dataset.clone(opts).update.") unless defarg
+      execute_dui(defarg ? update_sql(values) : update_sql(value, opts))
     end
   
     # Add the mutation methods via metaprogramming
@@ -337,13 +341,13 @@ module Sequel
     # Runs #graph_each if graphing.  Otherwise, iterates through the records
     # yielded by #fetch_rows, applying any row_proc or transform if necessary,
     # and yielding the result.
-    def _each(opts, &block)
+    def _each(opts=(defarg=true;nil), &block)
       if @opts[:graph] and !(opts && opts[:graph] == false)
-        graph_each(opts, &block)
+        defarg ? graph_each(&block) : graph_each(opts, &block)
       else
         row_proc = @row_proc unless opts && opts[:naked]
         transform = @transform
-        fetch_rows(select_sql(opts)) do |r|
+        fetch_rows(defarg ? select_sql : select_sql(opts)) do |r|
           r = transform_load(r) if transform
           r = row_proc[r] if row_proc
           yield r

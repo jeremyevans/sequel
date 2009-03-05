@@ -276,8 +276,8 @@ module Sequel
       end
       
       # Delete rows matching this dataset
-      def delete(opts = nil)
-        execute_dui(delete_sql(opts)){|c| c.affected_rows}
+      def delete(opts = (defarg=true;nil))
+        execute_dui(defarg ? delete_sql : delete_sql(opts)){|c| c.affected_rows}
       end
       
       # Yield all rows matching this dataset
@@ -317,8 +317,8 @@ module Sequel
       end
       
       # Update the matching rows.
-      def update(*args)
-        execute_dui(update_sql(*args)){|c| c.affected_rows}
+      def update(values={}, opts=(defarg=true;nil))
+        execute_dui(defarg ? update_sql(values) : update_sql(values, opts)){|c| c.affected_rows}
       end
       
       private

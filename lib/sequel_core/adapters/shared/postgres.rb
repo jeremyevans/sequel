@@ -613,7 +613,7 @@ module Sequel
       # Insert given values into the database.
       def insert(*values)
         if !@opts[:sql] and server_version >= 80200
-          single_value(default_server_opts(:sql=>insert_returning_pk_sql(*values)))
+          clone(default_server_opts(:sql=>insert_returning_pk_sql(*values))).single_value
         else
           execute_insert(insert_sql(*values), :table=>opts[:from].first,
             :values=>values.size == 1 ? values.first : values)
@@ -627,7 +627,7 @@ module Sequel
 
       # Insert a record returning the record inserted
       def insert_select(*values)
-        single_record(default_server_opts(:naked=>true, :sql=>insert_returning_sql(nil, *values))) if server_version >= 80200
+        naked.clone(default_server_opts(:sql=>insert_returning_sql(nil, *values))).single_record if server_version >= 80200
       end
 
       # Locks the table with the specified mode.

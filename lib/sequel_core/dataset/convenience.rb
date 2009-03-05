@@ -177,15 +177,20 @@ module Sequel
     end
     
     # Returns the first record in the dataset.
-    def single_record(opts = nil)
-      each((opts||{}).merge(:limit=>1)){|r| return r}
+    def single_record(opts = (defarg=true;nil))
+      Deprecation.deprecate("Calling Dataset#single_record with an argument is deprecated and will raise an error in a future version.  Use dataset.clone(opts).single_record.") unless defarg
+      ds = clone(:limit=>1)
+      opts = opts.merge(:limit=>1) if opts and opts[:limit]
+      defarg ? ds.each{|r| return r} : ds.each(opts){|r| return r}
       nil
     end
 
     # Returns the first value of the first record in the dataset.
     # Returns nil if dataset is empty.
-    def single_value(opts = nil)
-      if r = single_record((opts||{}).merge(:graph=>false, :naked=>true))
+    def single_value(opts = (defarg=true;nil))
+      Deprecation.deprecate("Calling Dataset#single_value with an argument is deprecated and will raise an error in a future version.  Use dataset.clone(opts).single_value.") unless defarg
+      ds = naked.clone(:graph=>false)
+      if r = (defarg ? ds.single_record : ds.single_record(opts))
         r.values.first
       end
     end

@@ -225,7 +225,7 @@ context "A simple dataset" do
   end
 
   specify "should be able to return rows for arbitrary SQL" do
-    @dataset.select_sql(:sql => 'xxx yyy zzz').should ==
+    @dataset.clone(:sql => 'xxx yyy zzz').select_sql.should ==
       "xxx yyy zzz"
   end
 
@@ -1808,8 +1808,8 @@ end
 context "Dataset #first and #last" do
   setup do
     @c = Class.new(Sequel::Dataset) do
-      def each(opts = nil, &block)
-        s = select_sql(opts)
+      def each(&block)
+        s = select_sql
         x = [:a,1,:b,2,s]
         i = /LIMIT (\d+)/.match(s)[1].to_i.times{yield x}
       end
@@ -1927,7 +1927,7 @@ context "Dataset#[]" do
         @@last_dataset
       end
 
-      def single_record(opts = nil)
+      def single_record
         @@last_dataset = opts ? clone(opts) : self
         {1 => 2, 3 => 4}
       end
@@ -1963,11 +1963,11 @@ context "Dataset#single_record" do
     @d.single_record.should == 'SELECT * FROM test LIMIT 1'
   end
   
-  specify "should pass opts to each" do
+  deprec_specify "should pass opts to each" do
     @d.single_record(:order => [:name]).should == 'SELECT * FROM test ORDER BY name LIMIT 1'
   end
   
-  specify "should override the limit if passed as an option" do
+  deprec_specify "should override the limit if passed as an option" do
     @d.single_record(:limit => 3).should == 'SELECT * FROM test LIMIT 1'
   end
 
@@ -1995,7 +1995,7 @@ context "Dataset#single_value" do
     @d.single_value.should == 'SELECT * FROM test LIMIT 1'
   end
   
-  specify "should pass opts to each" do
+  deprec_specify "should pass opts to each" do
     @d.single_value(:from => [:blah]).should == 'SELECT * FROM blah LIMIT 1'
   end
   
@@ -2230,9 +2230,9 @@ context "A model dataset" do
     @dataset.row_proc = Proc.new{|r| @m.new(r)}
   end
   
-  specify "should supply naked records if the naked option is specified" do
+  deprec_specify "should supply naked records if the naked option is specified" do
     @dataset.each {|r| r.class.should == @m}
-    @dataset.each(:naked => true) {|r| r.class.should == Fixnum}
+    @dataset.naked.each(:naked => true) {|r| r.class.should == Fixnum}
   end
 end
 
@@ -2434,7 +2434,7 @@ context "Dataset#columns" do
     @dataset = DummyDataset.new(nil).from(:items)
     @dataset.meta_def(:columns=) {|c| @columns = c}
     i = 'a' 
-    @dataset.meta_def(:each) {|o| @columns = select_sql(o||@opts) + i; i = i.next}
+    @dataset.meta_def(:each){@columns = select_sql + i; i = i.next}
   end
   
   specify "should return the value of @columns if @columns is not nil" do
@@ -2460,7 +2460,7 @@ context "Dataset#columns!" do
   setup do
     @dataset = DummyDataset.new(nil).from(:items)
     i = 'a' 
-    @dataset.meta_def(:each) {|o| @columns = select_sql(o||@opts) + i; i = i.next}
+    @dataset.meta_def(:each){@columns = select_sql + i; i = i.next}
   end
   
   specify "should always attempt to get a record and return @columns" do
@@ -2831,7 +2831,7 @@ context "Dataset#transform" do
 
     f = nil
     @ds.raw = {:x => Marshal.dump("wow"), :y => 'hello'}
-    @ds.each(:naked => true) {|r| f = r}
+    @ds.naked.each{|r| f = r}
     f.should == {:x => "wow", :y => 'hello'}
   end
   
@@ -2896,7 +2896,7 @@ context "Dataset#transform" do
     @ds.first.should == {:x => "wow", :y => 'hello', :z => "wowwow"}
     f = nil
     @ds.raw = {:x => "wow".to_yaml, :y => 'hello'}
-    @ds.each(:naked => true) {|r| f = r}
+    @ds.naked.each{|r| f = r}
     f.should == {:x => "wow", :y => 'hello'}
   end
   
@@ -2924,7 +2924,7 @@ context "Dataset#transform" do
     @ds.first.should == {:x => "wow", :y => 'hello', :z => "wowwow"}
     f = nil
     @ds.raw = {:x => [Marshal.dump("wow")].pack('m'), :y => 'hello'}
-    @ds.each(:naked => true) {|r| f = r}
+    @ds.naked.each{|r| f = r}
     f.should == {:x => "wow", :y => 'hello'}
   end
   
@@ -3144,7 +3144,7 @@ context "Dataset#all" do
     ]
   end
   
-  specify "should accept options and pass them to #each" do
+  deprec_specify "should accept options and pass them to #each" do
     @dataset.all(:limit => 33).should == [
       {:x => 1, :y => 2},
       {:x => 3, :y => 4},
@@ -3449,7 +3449,7 @@ context "Sequel::Dataset#each" do
     end
   end
 
-  specify "should not set the columns if passing an option that modifies them" do
+  deprec_specify "should not set the columns if passing an option that modifies them" do
     @ds.each(:select=>[:count]){}
     @ds.columns.should == [:a]
     @ds.each(:from=>[:count]){} 
@@ -3460,7 +3460,7 @@ context "Sequel::Dataset#each" do
     @ds.columns.should == [:a]
   end
 
-  specify "should have the correct columns inside the block regardless" do
+  deprec_specify "should have the correct columns inside the block regardless" do
     @ds.each(:select=>[:count]) do |x|
       x[:count].should == 'SELECT count FROM items'
       @ds.columns.should == [:count]

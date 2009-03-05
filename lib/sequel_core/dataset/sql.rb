@@ -73,7 +73,7 @@ module Sequel
 
     # Returns the number of records in the dataset.
     def count
-      options_overlap(COUNT_FROM_SELF_OPTS) ? from_self.count : single_value(STOCK_COUNT_OPTS).to_i
+      options_overlap(COUNT_FROM_SELF_OPTS) ? from_self.count : clone(STOCK_COUNT_OPTS).single_value.to_i
     end
     alias_method :size, :count
 
@@ -81,7 +81,8 @@ module Sequel
     # 
     #   dataset.filter{|o| o.price >= 100}.delete_sql #=>
     #     "DELETE FROM items WHERE (price >= 100)"
-    def delete_sql(opts = nil)
+    def delete_sql(opts = (defarg=true;nil))
+      Deprecation.deprecate("Calling Dataset#delete_sql with an argument is deprecated and will raise an error in a future version.  Use dataset.clone(opts).delete_sql.") unless defarg
       opts = opts ? @opts.merge(opts) : @opts
 
       return static_sql(opts[:sql]) if opts[:sql]
@@ -128,8 +129,9 @@ module Sequel
     #
     #   DB.select(1).where(DB[:items].exists).sql
     #   #=> "SELECT 1 WHERE EXISTS (SELECT * FROM items)"
-    def exists(opts = nil)
-      LiteralString.new("EXISTS (#{select_sql(opts)})")
+    def exists(opts = (defarg=true;nil))
+      Deprecation.deprecate("Calling Dataset#exists with an argument is deprecated and will raise an error in a future version.  Use dataset.clone(opts).exists.") unless defarg
+      LiteralString.new("EXISTS (#{defarg ? select_sql : select_sql(opts)})")
     end
 
     # Returns a copy of the dataset with the given conditions imposed upon it.  
@@ -644,7 +646,8 @@ module Sequel
     
     # Formats a SELECT statement using the given options and the dataset
     # options.
-    def select_sql(opts = nil)
+    def select_sql(opts = (defarg=true;nil))
+      Deprecation.deprecate("Calling Dataset#select_sql with an argument is deprecated and will raise an error in a future version.  Use dataset.clone(opts).select_sql.") unless defarg
       opts = opts ? @opts.merge(opts) : @opts
       return static_sql(opts[:sql]) if opts[:sql]
       sql = 'SELECT'
@@ -653,8 +656,9 @@ module Sequel
     end
 
     # Same as select_sql, not aliased directly to make subclassing simpler.
-    def sql(*args)
-      select_sql(*args)
+    def sql(opts = (defarg=true;nil))
+      Deprecation.deprecate("Calling Dataset#select_sql with an argument is deprecated and will raise an error in a future version.  Use dataset.clone(opts).select_sql.") unless defarg
+      defarg ? select_sql : select_sql(opts)
     end
 
     # SQL fragment for specifying subscripts (SQL arrays)
@@ -710,7 +714,8 @@ module Sequel
     #
     # Raises an error if the dataset is grouped or includes more
     # than one table.
-    def update_sql(values = {}, opts = nil)
+    def update_sql(values = {}, opts = (defarg=true;nil))
+      Deprecation.deprecate("Calling Dataset#update_sql with an argument is deprecated and will raise an error in a future version.  Use dataset.clone(opts).update_sql.") unless defarg
       opts = opts ? @opts.merge(opts) : @opts
 
       return static_sql(opts[:sql]) if opts[:sql]

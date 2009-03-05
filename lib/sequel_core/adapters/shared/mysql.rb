@@ -175,9 +175,14 @@ module Sequel
       end
       
       # MySQL supports ORDER and LIMIT clauses in DELETE statements.
-      def delete_sql(opts = nil)
-        sql = super
-        opts = opts ? @opts.merge(opts) : @opts
+      def delete_sql(opts = (defarg=true;nil))
+        if defarg
+          sql = super()
+          opts = @opts
+        else
+          sql = super
+          opts = opts ? @opts.merge(opts) : @opts
+        end
 
         if order = opts[:order]
           sql << " ORDER BY #{expression_list(order)}"
@@ -286,9 +291,14 @@ module Sequel
       end
       
       # MySQL supports ORDER and LIMIT clauses in UPDATE statements.
-      def update_sql(values, opts = nil)
-        sql = super
-        opts = opts ? @opts.merge(opts) : @opts
+      def update_sql(values, opts = (defarg=true;nil))
+        if defarg
+          sql = super(values)
+          opts = @opts
+        else
+          sql = super
+          opts = opts ? @opts.merge(opts) : @opts
+        end
 
         if order = opts[:order]
           sql << " ORDER BY #{expression_list(order)}"

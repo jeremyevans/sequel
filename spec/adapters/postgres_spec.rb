@@ -474,7 +474,8 @@ context "Postgres::Dataset#insert" do
 
   specify "should use INSERT RETURNING if server_version >= 80200" do
     @ds.meta_def(:server_version){80201}
-    @ds.should_receive(:single_value).once.with(:server=>:default, :sql=>'INSERT INTO test5 (value) VALUES (10) RETURNING xid')
+    @ds.should_receive(:clone).once.with(:server=>:default, :sql=>'INSERT INTO test5 (value) VALUES (10) RETURNING xid').and_return(@ds)
+    @ds.should_receive(:single_value).once
     @ds.insert(:value=>10)
   end
 

@@ -77,7 +77,7 @@ module Sequel
         when :select, :all
           select_sql
         when :first
-          select_sql(:limit=>1)
+          clone(:limit=>1).select_sql
         when :insert
           insert_sql(@prepared_modify_values)
         when :update
