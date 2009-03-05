@@ -579,7 +579,6 @@ module Sequel
       name = quoted_identifier(name) if quote_identifiers?
       name
     end
-    alias_method :quote_column_ref, :quote_identifier
 
     # Separates the schema from the table and returns a string with them
     # quoted (if quoting identifiers)

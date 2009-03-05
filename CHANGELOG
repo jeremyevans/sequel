@@ -1,5 +1,7 @@
 === HEAD
 
+* Deprecate Dataset#quote_column_ref (jeremyevans)
+
 * Deprecate Dataset#size (jeremyevans)
 
 * Deprecate passing options to Dataset#each, #all, #single_record, #single_value, #sql, #select_sql, #update, #update_sql, #delete, #delete_sql, and #exists (jeremyevans)

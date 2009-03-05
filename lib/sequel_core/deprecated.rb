@@ -169,6 +169,11 @@ module Sequel
       Sequel::Deprecation.deprecate('Sequel::Dataset#size', 'Use Sequel::Dataset#count')
       count
     end
+
+    def quote_column_ref(name)
+      Sequel::Deprecation.deprecate('Sequel::Dataset#quote_column_ref', 'Use Sequel::Dataset#quote_identifier')
+      quote_identifier(name)
+    end
   end
 
   module SQL
