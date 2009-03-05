@@ -547,8 +547,7 @@ module Sequel
     # Returns a copy of the dataset with the order columns added
     # to the existing order.
     def order_more(*columns, &block)
-      columns += Array(virtual_row_block_call(block)) if block
-      order(*((@opts[:order] || []) + columns))
+      order(*Array(@opts[:order]).concat(columns), &block)
     end
     
     # SQL fragment for the ordered expression, used in the ORDER BY
@@ -636,8 +635,7 @@ module Sequel
     # Returns a copy of the dataset with the given columns added
     # to the existing selected columns.
     def select_more(*columns, &block)
-      columns += Array(virtual_row_block_call(block)) if block
-      select(*((@opts[:select] || []) + columns))
+      select(*Array(@opts[:select]).concat(columns), &block)
     end
     
     # Formats a SELECT statement using the given options and the dataset
