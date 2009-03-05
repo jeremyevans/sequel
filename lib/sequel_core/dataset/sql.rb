@@ -510,11 +510,8 @@ module Sequel
     # This method should be overridden by descendants if the support
     # inserting multiple records in a single SQL statement.
     def multi_insert_sql(columns, values)
-      table = quote_identifier(@opts[:from].first)
-      columns = identifier_list(columns)
-      values.map do |r|
-        "INSERT INTO #{table} (#{columns}) VALUES #{literal(r)}"
-      end
+      s = "INSERT INTO #{source_list(@opts[:from])} (#{identifier_list(columns)}) VALUES "
+      values.map{|r| s + literal(r)}
     end
     
     # Adds an alternate filter to an existing filter using OR. If no filter 

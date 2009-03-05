@@ -2537,6 +2537,39 @@ context "Dataset#multi_insert" do
     ]
   end
   
+  specify "should handle different formats for tables" do
+    @ds = @ds.from(:sch__tab)
+    @ds.multi_insert(@list)
+    @db.sqls.should == [
+      'BEGIN',
+      "INSERT INTO sch.tab (name) VALUES ('abc')",
+      "INSERT INTO sch.tab (name) VALUES ('def')",
+      "INSERT INTO sch.tab (name) VALUES ('ghi')",
+      'COMMIT'
+    ]
+    @db.sqls.clear
+
+    @ds = @ds.from(:tab.qualify(:sch))
+    @ds.multi_insert(@list)
+    @db.sqls.should == [
+      'BEGIN',
+      "INSERT INTO sch.tab (name) VALUES ('abc')",
+      "INSERT INTO sch.tab (name) VALUES ('def')",
+      "INSERT INTO sch.tab (name) VALUES ('ghi')",
+      'COMMIT'
+    ]
+    @db.sqls.clear
+    @ds = @ds.from(:sch__tab.identifier)
+    @ds.multi_insert(@list)
+    @db.sqls.should == [
+      'BEGIN',
+      "INSERT INTO sch__tab (name) VALUES ('abc')",
+      "INSERT INTO sch__tab (name) VALUES ('def')",
+      "INSERT INTO sch__tab (name) VALUES ('ghi')",
+      'COMMIT'
+    ]
+  end
+  
   specify "should accept the :commit_every option for committing every x records" do
     @ds.multi_insert(@list, :commit_every => 2)
     @db.sqls.should == [
