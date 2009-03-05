@@ -174,6 +174,11 @@ module Sequel
       Sequel::Deprecation.deprecate('Sequel::Dataset#quote_column_ref', 'Use Sequel::Dataset#quote_identifier')
       quote_identifier(name)
     end
+
+    def symbol_to_column_ref(sym)
+      Sequel::Deprecation.deprecate('Sequel::Dataset#symbol_to_column_ref', 'Use Sequel::Dataset#literal')
+      literal_symbol(sym)
+    end
   end
 
   module SQL

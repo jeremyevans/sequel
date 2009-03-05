@@ -659,20 +659,6 @@ module Sequel
       "#{s.f}[#{s.sub.join(COMMA_SEPARATOR)}]"
     end
 
-    # Converts a symbol into a column name. This method supports underscore
-    # notation in order to express qualified (two underscores) and aliased
-    # (three underscores) columns:
-    #
-    #   ds = DB[:items]
-    #   :abc.to_column_ref(ds) #=> "abc"
-    #   :abc___a.to_column_ref(ds) #=> "abc AS a"
-    #   :items__abc.to_column_ref(ds) #=> "items.abc"
-    #   :items__abc___a.to_column_ref(ds) #=> "items.abc AS a"
-    #
-    def symbol_to_column_ref(sym)
-      literal_symbol(sym)
-    end
-
     # Returns a copy of the dataset with no filters (HAVING or WHERE clause) applied.
     def unfiltered
       clone(:where => nil, :having => nil)
@@ -925,7 +911,15 @@ module Sequel
       "'#{v.gsub(/\\/, "\\\\\\\\").gsub(/'/, "''")}'"
     end
 
-    # SQL fragment for Symbol, treated as an identifier, possibly aliased and/or qualified.
+    # Converts a symbol into a column name. This method supports underscore
+    # notation in order to express qualified (two underscores) and aliased
+    # (three underscores) columns:
+    #
+    #   ds = DB[:items]
+    #   :abc.to_column_ref(ds) #=> "abc"
+    #   :abc___a.to_column_ref(ds) #=> "abc AS a"
+    #   :items__abc.to_column_ref(ds) #=> "items.abc"
+    #   :items__abc___a.to_column_ref(ds) #=> "items.abc AS a"
     def literal_symbol(v)
       c_table, column, c_alias = split_symbol(v)
       qc = "#{"#{quote_identifier(c_table)}." if c_table}#{quote_identifier(column)}"
@@ -1079,12 +1073,12 @@ module Sequel
     # SQL fragment specifying a table name.
     def table_ref(t)
       case t
+      when Symbol
+        literal_symbol(t)
       when Dataset
         t.to_table_reference
       when Hash
         t.map{|k, v| as_sql(table_ref(k), v)}.join(COMMA_SEPARATOR)
-      when Symbol
-        symbol_to_column_ref(t)
       when String
         quote_identifier(t)
       else

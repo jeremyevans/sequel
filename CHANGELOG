@@ -1,6 +1,6 @@
 === HEAD
 
-* Deprecate Dataset#quote_column_ref (jeremyevans)
+* Deprecate Dataset#quote_column_ref and #symbol_to_column_ref (jeremyevans)
 
 * Deprecate Dataset#size (jeremyevans)
 
