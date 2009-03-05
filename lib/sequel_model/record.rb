@@ -8,9 +8,8 @@ module Sequel
     # underlying database columns.
     attr_reader :values
 
-    class_attr_reader :columns, :dataset, :db, :primary_key, :str_columns
-    class_attr_overridable :db_schema, :raise_on_save_failure, :raise_on_typecast_failure, :strict_param_setting, :typecast_empty_string_to_nil, :typecast_on_assignment
-    remove_method :db_schema=
+    class_attr_reader :columns, :dataset, :db, :primary_key, :str_columns, :db_schema
+    class_attr_overridable :raise_on_save_failure, :raise_on_typecast_failure, :strict_param_setting, :typecast_empty_string_to_nil, :typecast_on_assignment
     
     # Creates new instance with values set to passed-in Hash.
     # If a block is given, yield the instance to the block unless
