@@ -170,6 +170,11 @@ module Sequel
       count
     end
 
+    def uniq(*args)
+      Sequel::Deprecation.deprecate('Sequel::Dataset#uniq', 'Use Sequel::Dataset#distinct')
+      distinct(*args)
+    end
+
     def quote_column_ref(name)
       Sequel::Deprecation.deprecate('Sequel::Dataset#quote_column_ref', 'Use Sequel::Dataset#quote_identifier')
       quote_identifier(name)

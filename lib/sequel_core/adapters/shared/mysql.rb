@@ -194,6 +194,12 @@ module Sequel
         sql
       end
 
+      # MySQL doesn't support DISTINCT ON
+      def distinct(*columns)
+        raise(Error, "DISTINCT ON not supported by MySQL") unless columns.empty?
+        super
+      end
+
       # MySQL specific full text search syntax.
       def full_text_search(cols, terms, opts = {})
         mode = opts[:boolean] ? " IN BOOLEAN MODE" : ""
@@ -330,14 +336,6 @@ module Sequel
       # Use 1 for true on MySQL
       def literal_true
         BOOL_TRUE
-      end
-      
-      # MySQL doesn't support DISTINCT ON
-      def select_distinct_sql(sql, opts)
-        if opts[:distinct]
-          raise(Error, "DISTINCT ON not supported by MySQL") unless opts[:distinct].empty?
-          sql << " DISTINCT"
-        end
       end
     end
   end

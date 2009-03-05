@@ -101,6 +101,15 @@ module Sequel
       sql
     end
 
+    # Returns a copy of the dataset with the SQL DISTINCT clause.
+    # The DISTINCT clause is used to remove duplicate rows from the
+    # output.  If arguments are provided, uses a DISTINCT ON clause,
+    # in which case it will only be distinct on those columns, instead
+    # of all returned columns.
+    def distinct(*args)
+      clone(:distinct => args)
+    end
+
     # Adds an EXCEPT clause using a second dataset object. If all is true the
     # clause used is EXCEPT ALL, which may return duplicate rows.
     #
@@ -672,12 +681,6 @@ module Sequel
     def union(dataset, all = false)
       compound_clone(:union, dataset, all)
     end
-
-    # Returns a copy of the dataset with the distinct option.
-    def uniq(*args)
-      clone(:distinct => args)
-    end
-    alias_method :distinct, :uniq
 
     # Returns a copy of the dataset with no order.
     def unordered

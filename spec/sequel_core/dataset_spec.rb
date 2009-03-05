@@ -1243,28 +1243,27 @@ context "Dataset#to_hash" do
   end
 end
 
-context "Dataset#uniq" do
+context "Dataset#distinct" do
   setup do
     @db = MockDatabase.new
     @dataset = @db[:test].select(:name)
   end
   
   specify "should include DISTINCT clause in statement" do
-    @dataset.uniq.sql.should == 'SELECT DISTINCT name FROM test'
-  end
-  
-  specify "should be aliased by Dataset#distinct" do
     @dataset.distinct.sql.should == 'SELECT DISTINCT name FROM test'
   end
   
+  deprec_specify "should be aliased by Dataset#uniq" do
+    @dataset.uniq.sql.should == 'SELECT DISTINCT name FROM test'
+  end
+  
   specify "should accept an expression list" do
-    @dataset.uniq(:a, :b).sql.should == 'SELECT DISTINCT ON (a, b) name FROM test'
-
-    @dataset.uniq(:stamp.cast_as(:integer), :node_id=>nil).sql.should == 'SELECT DISTINCT ON (CAST(stamp AS integer), (node_id IS NULL)) name FROM test'
+    @dataset.distinct(:a, :b).sql.should == 'SELECT DISTINCT ON (a, b) name FROM test'
+    @dataset.distinct(:stamp.cast_as(:integer), :node_id=>nil).sql.should == 'SELECT DISTINCT ON (CAST(stamp AS integer), (node_id IS NULL)) name FROM test'
   end
 
   specify "should do a subselect for count" do
-    @dataset.uniq.count
+    @dataset.distinct.count
     @db.sqls.should == ['SELECT COUNT(*) FROM (SELECT DISTINCT name FROM test) AS t1 LIMIT 1']
   end
 end

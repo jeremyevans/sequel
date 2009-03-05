@@ -20,6 +20,12 @@ module Sequel
 
       SELECT_CLAUSE_ORDER = %w'distinct columns from join where group having compounds order limit'.freeze
 
+      # Oracle doesn't support DISTINCT ON
+      def distinct(*columns)
+        raise(Error, "DISTINCT ON not supported by Oracle") unless columns.empty?
+        super
+      end
+
       # Oracle uses MINUS instead of EXCEPT, and doesn't support EXCEPT ALL
       def except(dataset, all = false)
         raise(Sequel::Error, "EXCEPT ALL not supported") if all
@@ -40,14 +46,6 @@ module Sequel
 
       def select_clause_order
         SELECT_CLAUSE_ORDER
-      end
-
-      # Oracle doesn't support DISTINCT ON
-      def select_distinct_sql(sql, opts)
-        if opts[:distinct]
-          raise(Error, "DISTINCT ON not supported by Oracle") unless opts[:distinct].empty?
-          sql << " DISTINCT"
-        end
       end
 
       # Oracle requires a subselect to do limit and offset
