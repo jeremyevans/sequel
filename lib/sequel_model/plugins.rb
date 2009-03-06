@@ -18,7 +18,7 @@ module Sequel
     # Loads a plugin for use with the model class, passing optional arguments
     # to the plugin. If the plugin has a DatasetMethods module and the model
     # doesn't have a dataset, raise an Error.
-    def self.is(plugin, *args)
+    def self.plugin(plugin, *args)
       m = plugin_module(plugin)
       raise(Error, "Plugin cannot be applied because the model class has no dataset") if m.const_defined?("DatasetMethods") && !@dataset
       if m.respond_to?(:apply)
@@ -38,7 +38,6 @@ module Sequel
         def_dataset_method(*m::DatasetMethods.public_instance_methods)
       end
     end
-    metaalias :is_a, :is
   
     ### Private Class Methods ###
 

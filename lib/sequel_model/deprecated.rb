@@ -4,6 +4,16 @@ module Sequel
       instance_eval "def #{o}(*args, &block); Deprecation.deprecate('Sequel::Model.#{o}', 'Use Sequel::Model.dataset.#{n}'); dataset.#{n}(*args, &block); end"
     end
 
+    def self.is(*args, &block)
+      Deprecation.deprecate('Sequel::Model.is', 'Use Sequel::Model.plugin')
+      plugin(*args, &block)
+    end
+
+    def self.is_a(*args, &block)
+      Deprecation.deprecate('Sequel::Model.is_a', 'Use Sequel::Model.plugin')
+      plugin(*args, &block)
+    end
+
     def self.delete_all
       Deprecation.deprecate('Sequel::Model.delete_all', 'Use Sequel::Model.delete')
       dataset.delete
