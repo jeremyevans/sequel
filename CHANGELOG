@@ -1,6 +1,6 @@
 === HEAD
 
-* Remove cached version of @db_schema in model instances to reduce memory overhead (tmm1)
+* Remove cached version of @db_schema in model instances to reduce memory and marshalling overhead (tmm1)
 
 * Deprecate Dataset#quote_column_ref and Dataset#symbol_to_column_ref (jeremyevans)
 

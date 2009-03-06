@@ -213,7 +213,7 @@ module Sequel
         # row_proc if applicable
         datasets.each do |ta,ds,tr,rp|
           g = graph[ta]
-          graph[ta] = if g.values.any?
+          graph[ta] = if g.values.any?{|x| !x.nil?}
             g = ds.transform_load(g) if tr
             g = rp[g] if rp
             g

@@ -206,6 +206,14 @@ describe Sequel::Dataset, " graphing" do
     results[3].should == {:points=>{:id=>3, :x=>5, :y=>6}, :lines=>{:id=>7, :x=>5, :y=>8, :graph_id=>9}, :graphs=>{:id=>9, :name=>10, :x=>10, :y=>11, :lines_x=>12}}
   end
 
+  it "#graph_each should not give a nil value instead of a hash when any value for a table is false" do
+    ds = @ds1.graph(@ds2, :x=>:id)
+    def ds.fetch_rows(sql, &block)
+      block.call(:id=>1,:x=>2,:y=>3,:lines_id=>nil,:lines_x=>false,:lines_y=>nil,:graph_id=>nil)
+    end
+    ds.all.should == [{:points=>{:id=>1, :x=>2, :y=>3}, :lines=>{:id=>nil, :x=>false, :y=>nil, :graph_id=>nil}}]
+  end
+
   it "#graph_each should not included tables graphed with the :select => false option in the result set" do
     ds = @ds1.graph(:lines, {:x=>:id}, :select=>false).graph(:graphs, :id=>:graph_id)
     def ds.fetch_rows(sql, &block)
