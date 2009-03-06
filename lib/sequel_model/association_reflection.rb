@@ -257,7 +257,7 @@ module Sequel::Model::Associations
     # The columns to select when loading the association, associated_class.table_name.* by default.
     def select
      return self[:select] if include?(:select)
-     self[:select] ||= associated_class.table_name.*
+     self[:select] ||= Sequel::SQL::ColumnAll.new(associated_class.table_name)
     end
   end
 end
