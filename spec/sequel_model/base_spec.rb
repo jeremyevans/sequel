@@ -264,7 +264,7 @@ describe "Model.db=" do
     $db2 = MockDatabase.new
     
     class BlueBlue < Sequel::Model(:items)
-      set_dataset $db1[:blue]
+      set_dataset $db1[:blue].filter(:x=>1)
     end
   end
   
@@ -273,6 +273,16 @@ describe "Model.db=" do
     
     BlueBlue.dataset.db.should === $db2
     BlueBlue.dataset.db.should_not === $db1
+  end
+
+  specify "should keep the same dataset options" do
+    BlueBlue.db = $db2
+    BlueBlue.dataset.sql.should == 'SELECT * FROM blue WHERE (x = 1)'
+  end
+
+  specify "should use the database for subclasses" do
+    BlueBlue.db = $db2
+    Class.new(BlueBlue).db.should === $db2
   end
 end
 

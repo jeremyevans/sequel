@@ -1,5 +1,7 @@
 === HEAD
 
+* Copy all current dataset options when calling Model.db= (jeremyevans)
+
 * Deprecate Model.belongs_to, Model.has_many, and Model.has_and_belongs_to_many (jeremyevans)
 
 * Remove SQL::SpecificExpression, have subclasses inherit from SQL::Expression instead (jeremyevans)

@@ -73,7 +73,7 @@ class MockDatabase < Sequel::Database
 
   def transaction; yield; end
   
-  def dataset; MockDataset.new(self); end
+  def dataset(opts=nil); MockDataset.new(self, opts); end
 end
 
 class << Sequel::Model

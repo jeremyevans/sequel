@@ -150,9 +150,7 @@ module Sequel
     # Sets the database associated with the Model class.
     def self.db=(db)
       @db = db
-      if @dataset
-        set_dataset(db[table_name])
-      end
+      set_dataset(db.dataset(@dataset.opts)) if @dataset
     end
     
     # Returns the cached schema information if available or gets it
