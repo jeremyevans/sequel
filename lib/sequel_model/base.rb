@@ -391,9 +391,10 @@ module Sequel
     # You should call sti_key after any calls to set_dataset in the model,
     # otherwise subclasses might not have the filters set up correctly.
     #
-    # The filters that sti_key sets up in subclasses will not work if
+    # The filters and row_proc that sti_key sets up in subclasses will not work if
     # those subclasses have further subclasses.  For those middle subclasses,
-    # you will need to call set_dataset manually with the correct filter set.
+    # you will need to call set_dataset manually with the correct filter and
+    # row_proc.
     def self.set_sti_key(key)
       m = self
       @sti_key = key
