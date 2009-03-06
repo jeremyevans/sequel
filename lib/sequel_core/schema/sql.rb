@@ -303,7 +303,7 @@ module Sequel
           :float
         when /\A(numeric(\(\d+,\d+\))?|decimal|money)\z/io
           :decimal
-        when /\Abytea\z/io
+        when /bytea|blob/io
           :blob
         end
       end
