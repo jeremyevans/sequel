@@ -1,5 +1,7 @@
 === HEAD
 
+* Remove SQL::SpecificExpression, have subclasses inherit from SQL::Expression instead (jeremyevans)
+
 * Deprecate SQL::CastMethods#cast_as (jeremyevans)
 
 * Deprecate calling Database#schema without a table argument (jeremyevans)

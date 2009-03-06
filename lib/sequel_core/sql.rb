@@ -114,11 +114,6 @@ module Sequel
     class GenericExpression < Expression
     end
     
-    # The base class for expressions that are specific and can only be used
-    # in a certain place in the SQL query (ordering, selecting).
-    class SpecificExpression < Expression
-    end
-
     ### Modules ###
 
     # Methods the create aliased identifiers
@@ -379,7 +374,7 @@ module Sequel
     ### Classes ###
 
     # Represents an aliasing of an expression/column to a given name.
-    class AliasedExpression < SpecificExpression
+    class AliasedExpression < Expression
       # The expression to alias
       attr_reader :expression
 
@@ -521,7 +516,7 @@ module Sequel
     end
 
     # Represents all columns in a given table, table.* in SQL
-    class ColumnAll < SpecificExpression
+    class ColumnAll < Expression
       # The table containing the columns being selected
       attr_reader :table
 
@@ -591,7 +586,7 @@ module Sequel
     end
     
     # Represents an SQL JOIN clause, used for joining tables.
-    class JoinClause < SpecificExpression
+    class JoinClause < Expression
       # The type of join to do
       attr_reader :join_type
 
@@ -656,7 +651,7 @@ module Sequel
     # Represents a literal string with placeholders and arguments.
     # This is necessary to ensure delayed literalization of the arguments
     # required for the prepared statement support
-    class PlaceholderLiteralString < SpecificExpression
+    class PlaceholderLiteralString < Expression
       # The arguments that will be subsituted into the placeholders.
       attr_reader :args
 
@@ -691,7 +686,7 @@ module Sequel
     end
 
     # Represents a column/expression to order the result set by.
-    class OrderedExpression < SpecificExpression
+    class OrderedExpression < Expression
       # The expression to order the result set by.
       attr_reader :expression
 
