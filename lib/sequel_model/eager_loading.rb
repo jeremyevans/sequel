@@ -285,9 +285,9 @@ module Sequel::Model::Associations::EagerLoading
   end
 
   # If the result set is the result of a cartesian product, then it is possible that
-  # there a multiple records for each association when there should only be one.
+  # there are multiple records for each association when there should only be one.
   # In that case, for each object in all associations loaded via #eager_graph, run
-  # uniq! on the association instance variables to make sure no duplicate records show up.
+  # uniq! on the association to make sure no duplicate records show up.
   # Note that this can cause legitimate duplicate records to be removed.
   def eager_graph_make_associations_unique(records, dependency_map, alias_map, type_map)
     records.each do |record|
