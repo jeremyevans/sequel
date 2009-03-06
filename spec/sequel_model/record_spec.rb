@@ -465,7 +465,7 @@ describe Sequel::Model, "#set" do
     MODEL_DB.sqls.should == []
   end
 
-  it "should assume it is a column if no column information is present and the key is a symbol" do
+  deprec_specify "should assume it is a column if no column information is present and the key is a symbol" do
     @c.instance_variable_set(:@columns, nil)
     o = @c.new.set(:x123=>1)
     o[:x123].should == 1

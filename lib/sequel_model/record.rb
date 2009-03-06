@@ -356,7 +356,6 @@ module Sequel
           end
         end
         run_association_callbacks(opts, :after_load, objs)
-        # Only one_to_many associations should set the reciprocal object
         objs.each{|o| add_reciprocal_object(opts, o)} if opts.set_reciprocal_to_self?
         associations[name] = objs
       end
@@ -454,6 +453,7 @@ module Sequel
         if meths.include?(m)
           send(m, v)
         elsif columns_not_set && (Symbol === k)
+          Deprecation.deprecate('Calling Model#set_restricted for a column without a setter method when the model class does not have any columns', 'Use Model#[] for these columns')
           self[k] = v
         elsif strict
           raise Error, "method #{m} doesn't exist or access is restricted to it"
