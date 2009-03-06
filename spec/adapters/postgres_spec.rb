@@ -57,10 +57,6 @@ context "A PostgreSQL database" do
       [:value, {:type=>:blob, :allow_null=>true, :default=>nil, :db_type=>"bytea", :primary_key=>false}]
     ]
   end
-
-  specify "should get the schema all database tables if no table name is used" do
-    @db.schema(:test3, :reload=>true).should == @db.schema(nil, :reload=>true)[:test3]
-  end
 end
 
 context "A PostgreSQL dataset" do

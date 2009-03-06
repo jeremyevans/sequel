@@ -219,6 +219,7 @@ module Sequel
       # * :schema - An explicit schema to use.  It may also be implicitly provided
       #   via the table name.
       def schema(table = nil, opts={})
+        Deprecation.deprecate('Calling Database#schema without a table argument', 'Use database.tables.inject({}){|h, m| h[m] = database.schema(m); h}') unless table
         raise(Error, 'schema parsing is not implemented on this database') unless respond_to?(:schema_parse_table, true)
 
         if table

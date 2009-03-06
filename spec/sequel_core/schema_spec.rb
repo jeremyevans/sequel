@@ -710,7 +710,7 @@ context "Schema Parser" do
     @sqls.should == ['x', 'x']
   end
 
-  specify "should parse the schema correctly for all tables" do
+  deprec_specify "should parse the schema correctly for all tables" do
     sqls = @sqls
     proc{@db.schema}.should raise_error(Sequel::Error)
     @db.meta_def(:tables){[:x]}
@@ -732,14 +732,12 @@ context "Schema Parser" do
     end
     s1 = @db.schema(:x)
     s1.should == [['x', {:db_type=>'x'}]]
-    @db.schema[:x].object_id.should == s1.object_id
+    @db.schema(:x).object_id.should == s1.object_id
     @db.schema(:x.identifier).object_id.should == s1.object_id
-    @db.schema[:x.identifier].object_id.should == s1.object_id
     s2 = @db.schema(:x__y)
     s2.should == [['y', {:db_type=>'y'}]]
-    @db.schema[:x__y].object_id.should == s2.object_id
+    @db.schema(:x__y).object_id.should == s2.object_id
     @db.schema(:y.qualify(:x)).object_id.should == s2.object_id
-    @db.schema[:y.qualify(:x)].object_id.should == s2.object_id
   end
 
   specify "should correctly parse all supported data types" do

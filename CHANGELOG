@@ -1,5 +1,7 @@
 === HEAD
 
+* Deprecate calling Database#schema without a table argument (jeremyevans)
+
 * Remove cached version of @db_schema in model instances to reduce memory and marshalling overhead (tmm1)
 
 * Deprecate Dataset#quote_column_ref and Dataset#symbol_to_column_ref (jeremyevans)

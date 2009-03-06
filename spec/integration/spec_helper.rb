@@ -10,6 +10,20 @@ end
 
 Sequel.virtual_row_instance_eval = true
 
+module Spec::Example::ExampleGroupMethods
+  def deprec_specify(*args, &block)
+    specify(*args) do
+      output = Sequel::Deprecation.output
+      Sequel::Deprecation.output = nil 
+      begin
+        instance_eval(&block)
+      ensure
+        Sequel::Deprecation.output = output
+      end 
+    end 
+  end 
+end
+
 $sqls = []
 def clear_sqls
   $sqls.clear

@@ -96,10 +96,6 @@ context "A MySQL database" do
     Sequel.convert_tinyint_to_bool = false
     @db.schema(:booltest, :reload=>true).should == [[:value, {:type=>:integer, :allow_null=>true, :primary_key=>false, :default=>nil, :db_type=>"tinyint(4)"}]]
   end
-
-  specify "should get the schema all database tables if no table name is used" do
-    @db.schema(:booltest, :reload=>true).should == @db.schema(nil, :reload=>true)[:booltest]
-  end
 end
 
 context "A MySQL dataset" do
