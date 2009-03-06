@@ -185,20 +185,20 @@ describe "Model#update_values" do
     end
   end
   
-  it "should generate an update statement" do
+  deprec_specify "should generate an update statement" do
     o = @c.new(:id => 1)
     o.update_values(:x => 1)
     MODEL_DB.sqls.first.should == "UPDATE items SET x = 1 WHERE (id = 1)"
   end
   
-  it "should update attribute values" do
+  deprec_specify "should update attribute values" do
     o = @c.new(:id => 1)
     o.x.should be_nil
     o.update_values(:x => 1)
     o.x.should == 1
   end
   
-  it "should support string keys" do
+  deprec_specify "should support string keys" do
     o = @c.new(:id => 1)
     o.x.should be_nil
     o.update_values('x' => 1)
@@ -217,27 +217,27 @@ describe "Model#set_values" do
     end
   end
   
-  it "should not touch the database" do
+  deprec_specify "should not touch the database" do
     o = @c.new(:id => 1)
     o.set_values(:x => 1)
     MODEL_DB.sqls.should == []
   end
   
-  it "should update attribute values" do
+  deprec_specify "should update attribute values" do
     o = @c.new(:id => 1)
     o.x.should be_nil
     o.set_values(:x => 1)
     o.x.should == 1
   end
   
-  it "should support string keys" do
+  deprec_specify "should support string keys" do
     o = @c.new(:id => 1)
     o.x.should be_nil
     o.set_values('x' => 1)
     o.x.should == 1
   end
 
-  it "should raise an error if used with a non-String, non-Symbol key" do
+  deprec_specify "should raise an error if used with a non-String, non-Symbol key" do
     proc{@c.new.set_values(1=>2)}.should raise_error(Sequel::Error)
   end
 end

@@ -45,7 +45,7 @@ module Sequel
   # * All of the methods in HOOKS also create instance methods, but you
   #   should not override these instance methods.
   # * The following instance_methods all call the class method of the same
-  #   name: columns, dataset, db, primary_key, str_columns.
+  #   name: columns, dataset, db, primary_key, db_schema.
   # * The following class level attr_readers are created: allowed_columns,
   #   cache_store, cache_ttl, dataset_methods, primary_key, restricted_columns,
   #   sti_dataset, and sti_key.  You should not usually need to

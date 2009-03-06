@@ -403,20 +403,12 @@ module Sequel
       before_create(:set_sti_key){send("#{key}=", model.name.to_s)}
     end
 
-    # Returns the columns as a list of frozen strings instead
-    # of a list of symbols.  This makes it possible to check
-    # whether a column exists without creating a symbol, which
-    # would be a memory leak if called with user input.
-    def self.str_columns
-      @str_columns ||= columns.map{|c| c.to_s.freeze}
-    end
-  
     # Defines a method that returns a filtered dataset.  Subsets
     # create dataset methods, so they can be chained for scoping.
     # For example:
     #
-    #   Topic.subset(:popular, :num_posts.sql_number > 100)
-    #   Topic.subset(:recent, :created_on + 7 > Date.today)
+    #   Topic.subset(:popular){|o| o.num_posts > 100}
+    #   Topic.subset(:recent){|o| o.created_on > Date.today - 7}
     #
     # Allows you to do:
     #

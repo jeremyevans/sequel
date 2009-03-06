@@ -578,7 +578,7 @@ context "Model.db_schema" do
 end
 
 context "Model.str_columns" do
-  specify "should return the columns as frozen strings" do
+  deprec_specify "should return the columns as frozen strings" do
     c = Class.new(Sequel::Model)
     c.meta_def(:columns){[:a, :b]}
     c.orig_str_columns.should == %w'a b'

@@ -145,13 +145,6 @@ describe Sequel::Model, "caching" do
   it "should delete the cache when writing to the database" do
     m = @c[1]
     @cache[m.cache_key].should == m
-    
-    m.update_values(:name => 'tutu')
-    @cache.has_key?(m.cache_key).should be_false
-    $sqls.last.should == "UPDATE items SET name = 'tutu' WHERE (id = 1)"
-    
-    m = @c[1]
-    @cache[m.cache_key].should == m
     m.name = 'hey'
     m.save
     @cache.has_key?(m.cache_key).should be_false
@@ -159,17 +152,24 @@ describe Sequel::Model, "caching" do
 
     m = @c2[1]
     @cache[m.cache_key].should == m
-    
+    m.name = 'hey'
+    m.save
+    @cache.has_key?(m.cache_key).should be_false
+    $sqls.last.should == "UPDATE items SET name = 'hey', id = 1 WHERE (id = 1)"
+  end
+
+  deprec_specify "should delete the cache when using update_values" do
+    m = @c[1]
+    @cache[m.cache_key].should == m
     m.update_values(:name => 'tutu')
     @cache.has_key?(m.cache_key).should be_false
     $sqls.last.should == "UPDATE items SET name = 'tutu' WHERE (id = 1)"
     
     m = @c2[1]
     @cache[m.cache_key].should == m
-    m.name = 'hey'
-    m.save
+    m.update_values(:name => 'tutu')
     @cache.has_key?(m.cache_key).should be_false
-    $sqls.last.should == "UPDATE items SET name = 'hey', id = 1 WHERE (id = 1)"
+    $sqls.last.should == "UPDATE items SET name = 'tutu' WHERE (id = 1)"
   end
   
   it "should delete the cache when deleting the record" do

@@ -1,5 +1,7 @@
 === HEAD
 
+* Deprecate Model.str_columns, Model#str_columns, #set_values, #update_values (jeremyevans)
+
 * Deprecate Model.delete_all, .destroy_all, .size, .uniq, and .import (jeremyevans)
 
 * Copy all current dataset options when calling Model.db= (jeremyevans)

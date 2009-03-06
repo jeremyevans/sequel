@@ -8,7 +8,7 @@ module Sequel
     # underlying database columns.
     attr_reader :values
 
-    class_attr_reader :columns, :dataset, :db, :primary_key, :str_columns, :db_schema
+    class_attr_reader :columns, :dataset, :db, :primary_key, :db_schema
     class_attr_overridable :raise_on_save_failure, :raise_on_typecast_failure, :strict_param_setting, :typecast_empty_string_to_nil, :typecast_on_assignment
     
     # Creates new instance with values set to passed-in Hash.
@@ -273,33 +273,6 @@ module Sequel
       set_restricted(hash, only.flatten, false)
     end
 
-    # Sets the value attributes without saving the record.  Returns
-    # the values changed.  Raises an error if the keys are not symbols
-    # or strings or a string key was passed that was not a valid column.
-    # This is a low level method that does not respect virtual attributes.  It
-    # should probably be avoided.  Look into using set instead.
-    def set_values(values)
-      s = str_columns
-      vals = values.inject({}) do |m, kv| 
-        k, v = kv
-        k = case k
-        when Symbol
-          k
-        when String
-          # Prevent denial of service via memory exhaustion by only 
-          # calling to_sym if the symbol already exists.
-          raise(Error, "all string keys must be a valid columns") unless s.include?(k)
-          k.to_sym
-        else
-          raise(Error, "Only symbols and strings allows as keys")
-        end
-        m[k] = v
-        m
-      end
-      vals.each {|k, v| @values[k] = v}
-      vals
-    end
-
     # Returns (naked) dataset that should return only this instance.
     def this
       @this ||= dataset.filter(pk_hash).limit(1).naked
@@ -329,15 +302,6 @@ module Sequel
       update_restricted(hash, only.flatten, false)
     end
 
-    # Sets the values attributes with set_values and then updates
-    # the record in the database using those values.  This is a
-    # low level method that does not run the usual save callbacks.
-    # It should probably be avoided.  Look into using update_with_params instead.
-    def update_values(values)
-      before_update_values
-      this.update(set_values(values))
-    end
-    
     private
 
     # Backbone behind association_dataset
