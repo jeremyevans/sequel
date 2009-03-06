@@ -244,7 +244,6 @@ module Sequel
     def set(hash)
       set_restricted(hash, nil, nil)
     end
-    alias_method :set_with_params, :set
 
     # Set all values using the entries in the hash, ignoring any setting of
     # allowed_columns or restricted columns in the model.
@@ -273,7 +272,6 @@ module Sequel
     def update(hash)
       update_restricted(hash, nil, nil)
     end
-    alias_method :update_with_params, :update
 
     # Update all values using the entries in the hash, ignoring any setting of
     # allowed_columns or restricted columns in the model.

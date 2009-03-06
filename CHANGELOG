@@ -1,5 +1,7 @@
 === HEAD
 
+* Deprecate Model#set_with_params and #update_with_params (jeremyevans)
+
 * Deprecate Model#save!, use Model.save(:validate=>false) (jeremyevans)
 
 * Deprecate Model#dataset (jeremyevans)

@@ -46,6 +46,16 @@ module Sequel
       model.str_columns
     end
 
+    def set_with_params(hash)
+      Deprecation.deprecate('Sequel::Model#set_with_params', 'Use Sequel::Model#set')
+      set_restricted(hash, nil, nil)
+    end
+
+    def update_with_params(hash)
+      Deprecation.deprecate('Sequel::Model#update_with_params', 'Use Sequel::Model#update')
+      update_restricted(hash, nil, nil)
+    end
+
     def set_values(values)
       Deprecation.deprecate('Sequel::Model#set_values', 'Use Sequel::Model#set')
       s = str_columns

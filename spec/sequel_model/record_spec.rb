@@ -453,14 +453,14 @@ describe Sequel::Model, "#set" do
     MODEL_DB.sqls.should == []
   end
 
-  it "should be aliased as set_with_params" do
+  deprec_specify "should be aliased as set_with_params" do
     @o1.set_with_params(:x => 1, :z => 2)
     @o1.values.should == {:x => 1}
     MODEL_DB.sqls.should == []
   end
   
   it "should return self" do
-    returned_value = @o1.set_with_params(:x => 1, :z => 2)
+    returned_value = @o1.set(:x => 1, :z => 2)
     returned_value.should == @o1
     MODEL_DB.sqls.should == []
   end
@@ -510,7 +510,7 @@ describe Sequel::Model, "#update" do
     MODEL_DB.sqls.first.should == "UPDATE items SET y = 1 WHERE (id = 5)"
   end
 
-  it "should be aliased as update_with_params" do
+  deprec_specify "should be aliased as update_with_params" do
     @o1.update_with_params(:x => 1, :z => 2)
     MODEL_DB.sqls.first.should == "INSERT INTO items (x) VALUES (1)"
   end
