@@ -183,7 +183,6 @@ module Sequel
       def cast(sql_type)
         Cast.new(self, sql_type)
       end
-      alias_method :cast_as, :cast
 
       # Cast the reciever to the given SQL type (or integer if none given),
       # and return the result as a NumericExpression. 

@@ -187,6 +187,13 @@ module Sequel
   end
 
   module SQL
+    module CastMethods
+      def cast_as(sql_type)
+        Sequel::Deprecation.deprecate('Sequel::SQL::CastMethods#cast_as', 'Use Sequel::SQL::CastMethods#cast')
+        cast(sql_type)
+      end
+    end
+
     class Blob
       def to_blob(*args)
         Sequel::Deprecation.deprecate('Sequel::SQL::Blob#to_blob', 'Use Sequel::SQL::Blob#to_sequel_blob')

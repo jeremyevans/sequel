@@ -242,8 +242,8 @@ context "Column references" do
   end
   
   specify "should be quoted properly in a cast function" do
-    @ds.literal(:x.cast_as(:integer)).should == "CAST(`x` AS integer)"
-    @ds.literal(:x__y.cast_as('varchar(20)')).should == "CAST(`x`.`y` AS varchar(20))"
+    @ds.literal(:x.cast(:integer)).should == "CAST(`x` AS integer)"
+    @ds.literal(:x__y.cast('varchar(20)')).should == "CAST(`x`.`y` AS varchar(20))"
   end
 end
 
@@ -361,9 +361,12 @@ context "Symbol" do
     ds.select(:COUNT.sql_function('1')).sql.should == "SELECT COUNT('1') FROM t"
   end
   
-  specify "should support cast method and its cast_as alias" do
-    :abc.cast_as(:integer).to_s(@ds).should == "CAST(abc AS integer)"
+  specify "should support cast method" do
     :abc.cast(:integer).to_s(@ds).should == "CAST(abc AS integer)"
+  end
+
+  deprec_specify "should support cast_as method" do
+    :abc.cast_as(:integer).to_s(@ds).should == "CAST(abc AS integer)"
   end
   
   specify "should support cast_numeric and cast_string" do
@@ -394,8 +397,6 @@ context "Symbol" do
        end
     end
     @ds2 = Sequel::Dataset.new(m)
-    :abc.cast_as(Integer).to_s(@ds).should == "CAST(abc AS integer)"
-    :abc.cast_as(Integer).to_s(@ds2).should == "CAST(abc AS foo)"
     :abc.cast(String).to_s(@ds).should == "CAST(abc AS varchar(255))"
     :abc.cast(String).to_s(@ds2).should == "CAST(abc AS bar)"
     :abc.cast(String).to_s(@ds2).should == "CAST(abc AS bar)"
