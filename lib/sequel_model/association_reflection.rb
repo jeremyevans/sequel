@@ -177,15 +177,11 @@ module Sequel::Model::Associations
       :"#{self[:model].name.to_s.demodulize.underscore}_id"
     end
 
-    # The key to use for the key hash when eager loading
-    def eager_loader_key
-      primary_key
-    end
-
     # The column in the current table that the key in the associated table references.
     def primary_key
      self[:primary_key] ||= self[:model].primary_key
     end
+    alias eager_loader_key primary_key
   
     # One to many associations set the reciprocal to self.
     def set_reciprocal_to_self?
