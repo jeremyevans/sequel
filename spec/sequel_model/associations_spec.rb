@@ -599,7 +599,7 @@ describe Sequel::Model, "one_to_many" do
     
     n = @c2.new(:id => 1234)
     a = @c1.new(:id => 2345)
-    a.save!
+    a.save
     MODEL_DB.reset
     a.should == n.add_attribute(a)
     MODEL_DB.sqls.should == ['UPDATE attributes SET node_id = 1234 WHERE (id = 2345)']
@@ -610,7 +610,7 @@ describe Sequel::Model, "one_to_many" do
     
     n = @c2.new(:id => 1234)
     a = @c1.new(:id => 2345)
-    a.save!
+    a.save
     MODEL_DB.reset
     a.should == n.remove_attribute(a)
     MODEL_DB.sqls.should == ['UPDATE attributes SET node_id = NULL WHERE (id = 2345)']
@@ -621,7 +621,7 @@ describe Sequel::Model, "one_to_many" do
     
     n = @c2.new(:id => 1234, :xxx=>5)
     a = @c1.new(:id => 2345)
-    a.save!
+    a.save
     MODEL_DB.reset
     a.should == n.add_attribute(a)
     MODEL_DB.sqls.should == ['UPDATE attributes SET node_id = 5 WHERE (id = 2345)']
@@ -936,7 +936,7 @@ describe Sequel::Model, "one_to_many" do
     d = @c1.dataset
     def d.fetch_rows(s); end
     node.attributes.should == []
-    def attrib.save!; self end
+    def attrib.save; self end
     node.add_attribute(attrib)
     node.associations[:attributes].should == [attrib]
     node.remove_all_attributes.should == [attrib]
@@ -958,7 +958,7 @@ describe Sequel::Model, "one_to_many" do
     node = @c2.new(:id => 1234)
     node.attributes.should == []
     attrib.node.should == nil
-    def attrib.save!; self end
+    def attrib.save; self end
     node.add_attribute(attrib)
     attrib.associations[:node].should == node 
     node.remove_all_attributes

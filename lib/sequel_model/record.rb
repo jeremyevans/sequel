@@ -186,17 +186,8 @@ module Sequel
     # Otherwise, returns self. You can provide an optional list of
     # columns to update, in which case it only updates those columns.
     def save(*columns)
-      valid? ? save!(*columns) : save_failure(:invalid)
-    end
-
-    # Creates or updates the record, without attempting to validate
-    # it first. You can provide an optional list of columns to update,
-    # in which case it only updates those columns.
-    # If before_save, before_create (if new?), or before_update
-    # (if !new?) return false, returns nil unless raise_on_save_failure
-    # is true (if it is true, it raises an error).  Otherwise, returns self.
-    def save!(*columns)
       opts = columns.extract_options!
+      return save_failure(:invalid) unless opts[:validate] == false or valid?
       return save_failure(:save) if before_save == false
       if new?
         return save_failure(:create) if before_create == false

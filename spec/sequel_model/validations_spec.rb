@@ -1024,7 +1024,7 @@ describe "Model#save!" do
     MODEL_DB.reset
   end
   
-  specify "should save regardless of validations" do
+  deprec_specify "should save regardless of validations" do
     @m.should_not be_valid
     @m.save!
     MODEL_DB.sqls.should == ['UPDATE people SET id = 4 WHERE (id = 4)']
@@ -1056,6 +1056,13 @@ describe "Model#save" do
     MODEL_DB.sqls.should == ['UPDATE people SET id = 5 WHERE (id = 5)']
   end
   
+  specify "should skip validations if the :validate=>false option is used" do
+    @m.raise_on_save_failure = false
+    @m.should_not be_valid
+    @m.save(:validate=>false)
+    MODEL_DB.sqls.should == ['UPDATE people SET id = 4 WHERE (id = 4)']
+  end
+    
   specify "should raise error if validations fail and raise_on_save_faiure is true" do
     proc{@m.save}.should raise_error(Sequel::ValidationFailed)
   end

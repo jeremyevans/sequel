@@ -372,11 +372,6 @@ describe "Model#before_validation && Model#after_validation" do
       def self.validate(o)
         o.errors[:id] << 'not valid' unless o[:id] == 2233
       end
-      
-      def save!(*columns)
-        MODEL_DB << "CREATE BLAH"
-        self
-      end
       columns :id
     end
   end
@@ -397,7 +392,7 @@ describe "Model#before_validation && Model#after_validation" do
     @c.before_validation{MODEL_DB << "BLAH before"}
     m = @c.load(:id => 2233)
     m.save.should == m
-    MODEL_DB.sqls.should == ['BLAH before', 'BLAH after', 'CREATE BLAH']
+    MODEL_DB.sqls.should == ['BLAH before', 'BLAH after', 'UPDATE items SET id = 2233 WHERE (id = 2233)']
 
     MODEL_DB.sqls.clear
     m = @c.load(:id => 22)

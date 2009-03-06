@@ -34,6 +34,13 @@ module Sequel
       model.dataset
     end
 
+    def save!(*args)
+      Deprecation.deprecate('Sequel::Model#save!', 'Use model_object.save(..., :validate=>false)')
+      opts = args.extract_options!
+      args.push(opts.merge(:validate=>false))
+      save(*args)
+    end
+
     def str_columns
       Deprecation.deprecate('Sequel::Model#str_columns', 'Use model_object.columns.map{|x| x.to_s}')
       model.str_columns
