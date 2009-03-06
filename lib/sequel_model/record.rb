@@ -8,7 +8,7 @@ module Sequel
     # underlying database columns.
     attr_reader :values
 
-    class_attr_reader :columns, :dataset, :db, :primary_key, :db_schema
+    class_attr_reader :columns, :db, :primary_key, :db_schema
     class_attr_overridable :raise_on_save_failure, :raise_on_typecast_failure, :strict_param_setting, :typecast_empty_string_to_nil, :typecast_on_assignment
     
     # Creates new instance with values set to passed-in Hash.
@@ -275,7 +275,7 @@ module Sequel
 
     # Returns (naked) dataset that should return only this instance.
     def this
-      @this ||= dataset.filter(pk_hash).limit(1).naked
+      @this ||= model.dataset.filter(pk_hash).limit(1).naked
     end
     
     # Runs set with the passed hash and runs save_changes (which runs any callback methods).

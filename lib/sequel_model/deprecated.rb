@@ -29,6 +29,11 @@ module Sequel
       @str_columns ||= columns.map{|c| c.to_s.freeze}
     end
 
+    def dataset
+      Deprecation.deprecate('Sequel::Model#dataset', 'Use model_object.model.dataset')
+      model.dataset
+    end
+
     def str_columns
       Deprecation.deprecate('Sequel::Model#str_columns', 'Use model_object.columns.map{|x| x.to_s}')
       model.str_columns

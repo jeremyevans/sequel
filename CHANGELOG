@@ -1,5 +1,7 @@
 === HEAD
 
+* Deprecate Model#dataset (jeremyevans)
+
 * Deprecate Model.is and Model.is_a, use Model.plugin for plugins (jeremyevans)
 
 * Deprecate Model.str_columns, Model#str_columns, #set_values, #update_values (jeremyevans)
