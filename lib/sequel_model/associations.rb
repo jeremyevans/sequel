@@ -265,19 +265,16 @@ module Sequel::Model::Associations
   def one_to_many(*args, &block)
     associate(:one_to_many, *args, &block)
   end
-  alias_method :has_many, :one_to_many
   
   # Shortcut for adding a many_to_one association, see associate
   def many_to_one(*args, &block)
     associate(:many_to_one, *args, &block)
   end
-  alias_method :belongs_to, :many_to_one
   
   # Shortcut for adding a many_to_many association, see associate
   def many_to_many(*args, &block)
     associate(:many_to_many, *args, &block)
   end
-  alias_method :has_and_belongs_to_many, :many_to_many
   
   private
 

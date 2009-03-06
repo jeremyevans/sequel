@@ -392,7 +392,7 @@ describe Sequel::Model, "many_to_one" do
     proc{c.parent = p}.should raise_error(Sequel::Error)
   end
 
-  it "should have belongs_to alias" do
+  deprec_specify "should have belongs_to alias" do
     @c2.belongs_to :parent, :class => @c2
 
     d = @c2.load(:id => 1)
@@ -866,7 +866,7 @@ describe Sequel::Model, "one_to_many" do
     im2.should_not(include('remove_all_attributes'))
   end
 
-  it "should have has_many alias" do
+  deprec_specify "should have has_many alias" do
     @c2.has_many :attributes, :class => @c1
     
     n = @c2.new(:id => 1234)
@@ -1519,7 +1519,7 @@ describe Sequel::Model, "many_to_many" do
     im2.should_not(include('remove_all_attributes'))
   end
 
-  it "should have has_and_belongs_to_many alias" do
+  deprec_specify "should have has_and_belongs_to_many alias" do
     @c2.has_and_belongs_to_many :attributes, :class => @c1 
 
     n = @c2.new(:id => 1234)
