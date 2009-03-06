@@ -332,7 +332,7 @@ describe Sequel::Model, ".delete_all" do
     @c.dataset.meta_def(:delete) {MODEL_DB << delete_sql}
   end
 
-  it "should delete all records in the dataset" do
+  deprec_specify "should delete all records in the dataset" do
     @c.delete_all
     MODEL_DB.sqls.should == ["DELETE FROM items"]
   end
@@ -350,13 +350,13 @@ describe Sequel::Model, ".destroy_all" do
     @c.dataset.meta_def(:delete) {MODEL_DB << delete_sql}
   end
 
-  it "should delete all records in the dataset" do
+  deprec_specify "should delete all records in the dataset" do
     @c.dataset.meta_def(:destroy) {MODEL_DB << "DESTROY this stuff"}
     @c.destroy_all
     MODEL_DB.sqls.should == ["DESTROY this stuff"]
   end
   
-  it "should call dataset.destroy" do
+  deprec_specify "should call dataset.destroy" do
     @c.dataset.should_receive(:destroy).and_return(true)
     @c.destroy_all
   end

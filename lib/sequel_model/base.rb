@@ -80,12 +80,12 @@ module Sequel
     # Dataset methods to proxy via metaprogramming
     DATASET_METHODS = %w'<< all avg count delete distinct eager eager_graph each each_page 
        empty? except exclude filter first from from_self full_outer_join get graph 
-       group group_and_count group_by having import inner_join insert 
+       group group_and_count group_by having inner_join insert 
        insert_multiple intersect interval invert_order join join_table last 
        left_outer_join limit map multi_insert naked order order_by order_more 
        paginate print query range reverse_order right_outer_join select 
-       select_all select_more server set set_graph_aliases single_value size to_csv to_hash
-       transform union uniq unfiltered unordered update where with_sql'.map{|x| x.to_sym}
+       select_all select_more server set set_graph_aliases single_value to_csv to_hash
+       transform union unfiltered unordered update where with_sql'.map{|x| x.to_sym}
 
     # Instance variables that are inherited in subclasses
     INHERITED_INSTANCE_VARIABLES = {:@allowed_columns=>:dup, :@cache_store=>nil,
@@ -176,21 +176,6 @@ module Sequel
       args.each{|arg| instance_eval("def #{arg}(*args, &block); dataset.#{arg}(*args, &block) end", __FILE__, __LINE__)}
     end
     
-    # Deletes all records in the model's table.
-    def self.delete_all
-      dataset.delete
-    end
-  
-    # Like delete_all, but invokes before_destroy and after_destroy hooks if used.
-    def self.destroy_all
-      dataset.destroy
-    end
-  
-    # Returns a copy of the model's dataset with custom SQL
-    def self.fetch(*args)
-      with_sql(*args)
-    end
-  
     # Modify and return eager loading dataset based on association options
     def self.eager_loading_dataset(opts, ds, select, associations)
       ds = ds.select(*select) if select
@@ -207,7 +192,7 @@ module Sequel
     #
     #   Ticket.find :author => 'Sharon' # => record
     def self.find(*args, &block)
-      dataset.filter(*args, &block).first
+      filter(*args, &block).first
     end
     
     # Like find but invokes create with given conditions when record does not
@@ -456,6 +441,9 @@ module Sequel
     # Add model methods that call dataset methods
     def_dataset_method(*DATASET_METHODS)
 
+    # Returns a copy of the model's dataset with custom SQL
+    metaalias :fetch, :with_sql
+  
     ### Private Class Methods ###
     
     # Create the column accessors

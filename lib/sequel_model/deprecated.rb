@@ -1,5 +1,19 @@
 module Sequel
   class Model
+    {:import=>:multi_insert, :size=>:count, :uniq=>:distinct}.each do |o, n|
+      instance_eval "def #{o}(*args, &block); Deprecation.deprecate('Sequel::Model.#{o}', 'Use Sequel::Model.dataset.#{n}'); dataset.#{n}(*args, &block); end"
+    end
+
+    def self.delete_all
+      Deprecation.deprecate('Sequel::Model.delete_all', 'Use Sequel::Model.delete')
+      dataset.delete
+    end
+
+    def self.destroy_all
+      Deprecation.deprecate('Sequel::Model.destroy_all', 'Use Sequel::Model.destroy')
+      dataset.destroy
+    end
+
     module Associations
       def belongs_to(*args, &block)
         Deprecation.deprecate('Sequel::Model.belongs_to', 'Use Sequel::Model.many_to_one')

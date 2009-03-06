@@ -1,5 +1,7 @@
 === HEAD
 
+* Deprecate Model.delete_all, .destroy_all, .size, .uniq, and .import (jeremyevans)
+
 * Copy all current dataset options when calling Model.db= (jeremyevans)
 
 * Deprecate Model.belongs_to, Model.has_many, and Model.has_and_belongs_to_many (jeremyevans)
