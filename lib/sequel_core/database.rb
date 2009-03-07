@@ -11,6 +11,8 @@ module Sequel
   # The Database class is meant to be subclassed by database adapters in order
   # to provide the functionality needed for executing queries.
   class Database
+    extend Metaprogramming
+    include Metaprogramming
     include Schema::SQL
 
     # Array of supported database adapters
@@ -533,7 +535,7 @@ module Sequel
             raise Sequel::Error::InvalidValue, "invalid value for Time: #{value.inspect}"
           end
         when :datetime
-          raise(Sequel::Error::InvalidValue, "invalid value for Datetime: #{value.inspect}") unless value.is_one_of?(DateTime, Date, Time, String)
+          raise(Sequel::Error::InvalidValue, "invalid value for Datetime: #{value.inspect}") unless [DateTime, Date, Time, String].any?{|c| value.is_a?(c)}
           if Sequel.datetime_class === value
             # Already the correct class, no need to convert
             value
@@ -629,7 +631,7 @@ module Sequel
     # Convert the given exception to a DatabaseError, keeping message
     # and traceback.
     def raise_error(exception, opts={})
-      if !opts[:classes] || exception.is_one_of?(*opts[:classes])
+      if !opts[:classes] || Array(opts[:classes]).any?{|c| exception.is_a?(c)}
         e = DatabaseError.new("#{exception.class} #{exception.message}")
         e.set_backtrace(exception.backtrace)
         raise e

@@ -10,6 +10,8 @@ module Sequel
   #   Sequel.Deprecation.backtraces = 10 # include 10 backtrace lines (default)
   #   Sequel.Deprecation.backtraces = 1 # include 1 backtrace line
   module Deprecation
+    extend Metaprogramming
+
     @output = $stderr
     @backtraces = 10
 
@@ -231,6 +233,11 @@ class Range
 end
 
 class Array
+  def extract_options!
+    Sequel::Deprecation.deprecate('Array#extract_options!', 'Use array.last.is_a?(Hash) ? array.pop : {}')
+    last.is_a?(Hash) ? pop : {}
+  end 
+
   def to_sql
     Sequel::Deprecation.deprecate('Array#to_sql', 'It may be a good idea to refactor your implementation so this type of method is not required')
     map {|l| ((m = /^(.*)--/.match(l)) ? m[1] : l).chomp}.join(' '). \
@@ -270,5 +277,72 @@ class Symbol
   def to_column_ref(ds)
     Sequel::Deprecation.deprecate('Symbol#to_column_ref', 'Use Dataset#literal')
     ds.literal(self)
+  end
+end
+
+class Module
+  unless method_defined?(:class_def)
+   def class_def(name, &block)
+      Sequel::Deprecation.deprecate('Object#class_def', "Install the metaid gem")
+      class_eval{define_method(name, &block)}
+    end
+  end
+
+  private
+
+  def class_attr_overridable(*meths)
+    Sequel::Deprecation.deprecate('Module#class_attr_overridable', "Copy the method from #{__FILE__} (line #{__LINE__}) if you need it")
+    meths.each{|meth| class_eval("def #{meth}; !defined?(@#{meth}) ? (@#{meth} = self.class.#{meth}) : @#{meth} end")}
+    attr_writer(*meths)
+  end
+
+  def class_attr_reader(*meths)
+    Sequel::Deprecation.deprecate('Module#class_attr_reader', "Copy the method from #{__FILE__} (line #{__LINE__}) if you need it")
+    meths.each{|meth| define_method(meth){self.class.send(meth)}}
+  end
+
+  def metaalias(to, from)
+    Sequel::Deprecation.deprecate('Module#metaalias', "Copy the method from #{__FILE__} (line #{__LINE__}) if you need it")
+    meta_eval{alias_method to, from}
+  end
+
+  def metaattr_accessor(*meths)
+    Sequel::Deprecation.deprecate('Module#metaattr_accessor', "Copy the method from #{__FILE__} (line #{__LINE__}) if you need it")
+    meta_eval{attr_accessor(*meths)}
+  end
+
+  def metaattr_reader(*meths)
+    Sequel::Deprecation.deprecate('Module#metaattr_reader', "Copy the method from #{__FILE__} (line #{__LINE__}) if you need it")
+    meta_eval{attr_reader(*meths)}
+  end
+end
+
+class Object
+  def is_one_of?(*classes)
+    Sequel::Deprecation.deprecate('Object#is_one_of?', "Use classes.any?{|c| object.is_a?(c)}")
+    classes.any?{|c| is_a?(c)}
+  end
+
+  unless method_defined?(:meta_def)
+    def meta_def(name, &block)
+      Sequel::Deprecation.deprecate('Object#meta_def', "Install the metaid gem")
+      meta_eval{define_method(name, &block)}
+    end
+  end
+  
+  unless method_defined?(:meta_eval)
+    def meta_eval(&block)
+      Sequel::Deprecation.deprecate('Object#meta_eval', "Install the metaid gem")
+      metaclass.instance_eval(&block)
+    end
+  end
+  
+  unless method_defined?(:metaclass)
+    def metaclass
+      Sequel::Deprecation.deprecate('Object#metaclass', "Install the metaid gem")
+      class << self
+        self
+      end
+    end
   end
 end

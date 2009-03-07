@@ -1,13 +1,13 @@
 require File.join(File.dirname(__FILE__), 'spec_helper')
 
 context "Array#extract_options!" do
-  specify "should pop the last item if it is a hash" do
+  deprec_specify "should pop the last item if it is a hash" do
     a = [1,2,{1=>2}]
     a.extract_options!.should == {1=>2}
     a.should == [1,2]
   end
 
-  specify "should return an empty hash if the last item is not a hash" do
+  deprec_specify "should return an empty hash if the last item is not a hash" do
     a = [1,2]
     a.extract_options!.should == {}
     a.should == [1,2]
@@ -41,7 +41,7 @@ context "Range#interval" do
 end
 
 context "Module#class_attr_reader" do
-  specify "it should create instance methods that call class methods of the same name" do
+  deprec_specify "it should create instance methods that call class methods of the same name" do
     @c = Class.new do
       def self.x; 1; end
       class_attr_reader :x
@@ -53,7 +53,7 @@ context "Module#class_attr_reader" do
 end
 
 context "Module#metaalias" do
-  specify "it should create aliases of singleton/class methods" do
+  deprec_specify "it should create aliases of singleton/class methods" do
     @c = Class.new do
       def self.x; 1; end
       metaalias :y, :x
@@ -65,7 +65,7 @@ context "Module#metaalias" do
 end
 
 context "Module#metaattr_reader" do
-  specify "it should create attr_readers of singleton/class methods" do
+  deprec_specify "it should create attr_readers of singleton/class methods" do
     @c = Class.new do
       @y = 1
       @x = 2
@@ -77,13 +77,13 @@ context "Module#metaattr_reader" do
 end
 
 context "Object#is_one_of?" do
-  specify "it should be true if the object is one of the classes" do
+  deprec_specify "it should be true if the object is one of the classes" do
     1.is_one_of?(Numeric, Array).should == true
     [].is_one_of?(Numeric, Array).should == true
     {}.is_one_of?(Numeric, Enumerable).should == true
   end
 
-  specify "it should be false if the object is not one of the classes" do
+  deprec_specify "it should be false if the object is not one of the classes" do
     'a'.is_one_of?(Numeric, Array).should == false
     Object.new.is_one_of?(Numeric, Array).should == false
   end

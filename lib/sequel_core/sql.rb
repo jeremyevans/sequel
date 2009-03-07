@@ -746,7 +746,7 @@ module Sequel
       # if a case insensitive regular expression is used (//i), that particular
       # pattern which will always be case insensitive.
       def self.like(l, *ces)
-        case_insensitive = ces.extract_options![:case_insensitive]
+        case_insensitive = (ces.last.is_a?(Hash) ? ces.pop : {})[:case_insensitive]
         ces.collect! do |ce|
           op, expr = Regexp === ce ? [ce.casefold? || case_insensitive ? :'~*' : :~, ce.source] : [case_insensitive ? :ILIKE : :LIKE, ce]
           BooleanExpression.new(op, l, expr)

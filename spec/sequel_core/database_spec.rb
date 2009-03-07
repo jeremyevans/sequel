@@ -220,10 +220,8 @@ context "Database#disconnect" do
   specify "should call pool.disconnect" do
     d = Sequel::Database.new
     p = d.pool
-    a = 1
-    p.meta_def(:disconnect){a += 1}
+    p.should_receive(:disconnect).once.and_return(2)
     d.disconnect.should == 2
-    a.should == 2
   end
 end
 

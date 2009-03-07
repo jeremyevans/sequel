@@ -435,7 +435,7 @@ describe Sequel::Model, "#set" do
   end
   
   it "should support virtual attributes" do
-    @c.class_def(:blah=) {|v| self.x = v}
+    @c.send(:define_method, :blah=){|v| self.x = v}
     @o1.set(:blah => 333)
     @o1.values.should == {:x => 333}
     MODEL_DB.sqls.should == []
@@ -496,7 +496,7 @@ describe Sequel::Model, "#update" do
   end
   
   it "should support virtual attributes" do
-    @c.class_def(:blah=) {|v| self.x = v}
+    @c.send(:define_method, :blah=){|v| self.x = v}
     @o1.update(:blah => 333)
     MODEL_DB.sqls.first.should == "INSERT INTO items (x) VALUES (333)"
   end
@@ -778,8 +778,8 @@ describe Sequel::Model, "#initialize" do
   end
   
   specify "should accept virtual attributes" do
-    @c.class_def(:blah=) {|x| @blah = x}
-    @c.class_def(:blah) {@blah}
+    @c.send(:define_method, :blah=){|x| @blah = x}
+    @c.send(:define_method, :blah){@blah}
     
     m = @c.new(:x => 2, :blah => 3)
     m.values.should == {:x => 2}

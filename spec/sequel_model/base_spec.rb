@@ -186,7 +186,6 @@ end
 describe Sequel::Model, ".def_dataset_method" do
   setup do
     @c = Class.new(Sequel::Model(:items)) do
-      @dataset = Object.new
     end
   end
   

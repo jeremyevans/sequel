@@ -186,7 +186,7 @@ module Sequel
     # Otherwise, returns self. You can provide an optional list of
     # columns to update, in which case it only updates those columns.
     def save(*columns)
-      opts = columns.extract_options!
+      opts = columns.last.is_a?(Hash) ? columns.pop : {}
       return save_failure(:invalid) unless opts[:validate] == false or valid?
       return save_failure(:save) if before_save == false
       if new?

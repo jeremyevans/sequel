@@ -19,21 +19,23 @@ module Sequel
     # to the plugin. If the plugin has a DatasetMethods module and the model
     # doesn't have a dataset, raise an Error.
     def self.plugin(plugin, *args)
+      arg = args.first
+      block = lambda{arg}
       m = plugin_module(plugin)
       raise(Error, "Plugin cannot be applied because the model class has no dataset") if m.const_defined?("DatasetMethods") && !@dataset
       if m.respond_to?(:apply)
         m.apply(self, *args)
       end
       if m.const_defined?("InstanceMethods")
-        class_def(:"#{plugin}_opts") {args.first}
+        define_method(:"#{plugin}_opts", &block)
         include(m::InstanceMethods)
       end
       if m.const_defined?("ClassMethods")
-        meta_def(:"#{plugin}_opts") {args.first}
+        meta_def(:"#{plugin}_opts", &block)
         extend(m::ClassMethods)
       end
       if m.const_defined?("DatasetMethods")
-        dataset.meta_def(:"#{plugin}_opts") {args.first}
+        dataset.meta_def(:"#{plugin}_opts", &block)
         dataset.extend(m::DatasetMethods)
         def_dataset_method(*m::DatasetMethods.public_instance_methods)
       end

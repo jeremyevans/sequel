@@ -3292,7 +3292,7 @@ end
 context "Dataset prepared statements and bound variables " do
   setup do
     @db = Sequel::Database.new
-    @db.meta_eval{attr_accessor :sqls}
+    @db.send :metaattr_accessor, :sqls
     @db.sqls = []
     def @db.execute(sql, opts={})
       @sqls << sql
@@ -3380,7 +3380,7 @@ end
 context Sequel::Dataset::UnnumberedArgumentMapper do
   setup do
     @db = Sequel::Database.new
-    @db.meta_eval{attr_accessor :sqls}
+    @db.send :metaattr_accessor, :sqls
     @db.sqls = []
     def @db.execute(sql, opts={})
       @sqls << [sql, *opts[:arguments]]

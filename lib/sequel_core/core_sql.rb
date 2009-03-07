@@ -5,6 +5,16 @@ class Array
     sql_expr_if_all_two_pairs(:OR, true)
   end
 
+  # True if the array is not empty and all of its elements are
+  # arrays of size 2.  This is used to determine if the array
+  # could be a specifier of conditions, used similarly to a hash
+  # but allowing for duplicate keys.
+  #
+  #    hash.to_a.all_two_pairs? # => true unless hash is empty
+  def all_two_pairs?
+    !empty? && all?{|i| (Array === i) && (i.length == 2)}
+  end
+
   # Return a Sequel::SQL::CaseExpression with this array as the conditions and the given
   # default value.
   def case(default, expression = nil)
@@ -50,7 +60,7 @@ class Array
     else
       args = self
     end
-    args = args.collect{|a| a.is_one_of?(Symbol, ::Sequel::SQL::Expression, ::Sequel::LiteralString, TrueClass, FalseClass, NilClass) ? a : a.to_s}
+    args = args.collect{|a| [Symbol, ::Sequel::SQL::Expression, ::Sequel::LiteralString, TrueClass, FalseClass, NilClass].any?{|c| a.is_a?(c)} ? a : a.to_s}
     ::Sequel::SQL::StringExpression.new(:'||', *args)
   end
 

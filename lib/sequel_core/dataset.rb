@@ -37,6 +37,8 @@ module Sequel
   #   This methods are shortcuts to join_table with the join type
   #   already specified.
   class Dataset
+    extend Metaprogramming
+    include Metaprogramming
     include Enumerable
     
     # The dataset options that require the removal of cached columns

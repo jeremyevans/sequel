@@ -280,7 +280,7 @@ module Sequel::Model::Associations
 
   # Add a method to the association module
   def association_module_def(name, &block)
-    overridable_methods_module.class_def(name, &block)
+    overridable_methods_module.module_eval{define_method(name, &block)}
   end
 
   # Add a method to the association module

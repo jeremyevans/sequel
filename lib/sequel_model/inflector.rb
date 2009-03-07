@@ -21,7 +21,9 @@ class String
   module Inflections
     @plurals, @singulars, @uncountables = [], [], []
 
-    metaattr_reader :plurals, :singulars, :uncountables
+    class << self
+      attr_reader :plurals, :singulars, :uncountables
+    end
 
     # Clears the loaded inflections within a given scope (default is :all). Give the scope as a symbol of the inflection type,
     # the options are: :plurals, :singulars, :uncountables

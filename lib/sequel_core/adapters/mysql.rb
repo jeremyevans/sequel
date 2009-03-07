@@ -88,7 +88,9 @@ module Sequel
         conn.query("set SQL_AUTO_IS_NULL=0") unless opts[:auto_is_null]
 
         conn.query_with_result = false
-        conn.meta_eval{attr_accessor :prepared_statements}
+        class << conn
+          attr_accessor :prepared_statements
+        end
         conn.prepared_statements = {}
         conn.reconnect = true
         conn

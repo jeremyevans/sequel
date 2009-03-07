@@ -1,5 +1,11 @@
 === HEAD
 
+* Deprecate Array#extract_options! and Object#is_one_of? (jeremyevans)
+
+* Deprecate Object#meta_def, #meta_eval, and #metaclass (jeremyevans)
+
+* Deprecate Module#class_def, #class_attr_overridable, #class_attr_reader, #metaalias, #metaattr_reader, and #metaatt_accessor (jeremyevans)
+
 * Speed up the calling of most column accessor methods, and reduce memory overhead of creating them (jeremyevans)
 
 * Deprecate Model#set_restricted using Model#[] if no setter method exists, a symbol is used, and the columns are not set (jeremyevans)

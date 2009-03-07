@@ -4,12 +4,12 @@ module Sequel::Plugins
 
   module Timestamped
     def self.apply(m, opts)
-      m.class_def(:get_stamp) {@values[:stamp]}
       m.meta_def(:stamp_opts) {opts}
       m.before_save {@values[:stamp] = Time.now}
     end
     
     module InstanceMethods
+      def get_stamp(*args); @values[:stamp] end
       def abc; timestamped_opts; end
     end
     

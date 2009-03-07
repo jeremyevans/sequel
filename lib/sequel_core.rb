@@ -1,7 +1,7 @@
 %w'bigdecimal bigdecimal/util date enumerator thread time uri yaml'.each do |f|
   require f
 end
-%w"core_ext sql core_sql connection_pool exceptions pretty_table 
+%w"metaprogramming core_ext sql core_sql connection_pool exceptions pretty_table 
   dataset migration schema database object_graph version deprecated".each do |f|
   require "sequel_core/#{f}"
 end
@@ -63,10 +63,9 @@ module Sequel
   @datetime_class = Time
   @virtual_row_instance_eval = false
   
-  metaattr_accessor :convert_tinyint_to_bool
-  metaattr_accessor :convert_two_digit_years
-  metaattr_accessor :datetime_class
-  metaattr_accessor :virtual_row_instance_eval
+  class << self
+    attr_accessor :convert_tinyint_to_bool, :convert_two_digit_years, :datetime_class, :virtual_row_instance_eval
+  end
 
   # Creates a new database object based on the supplied connection string
   # and optional arguments.  The specified scheme determines the database

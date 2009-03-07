@@ -114,7 +114,7 @@ module Sequel
         :allow_nil => true,
         :accept => '1',
         :tag => :acceptance,
-      }.merge!(atts.extract_options!)
+      }.merge!(extract_options!(atts))
       atts << opts
       validates_each(*atts) do |o, a, v|
         o.errors[a] << opts[:message] unless v == opts[:accept]
@@ -135,7 +135,7 @@ module Sequel
       opts = {
         :message => 'is not confirmed',
         :tag => :confirmation,
-      }.merge!(atts.extract_options!)
+      }.merge!(extract_options!(atts))
       atts << opts
       validates_each(*atts) do |o, a, v|
         o.errors[a] << opts[:message] unless v == o.send(:"#{a}_confirmation")
@@ -166,7 +166,7 @@ module Sequel
     #   skipping this validation if it returns nil or false.
     # * :tag - The tag to use for this validation.
     def self.validates_each(*atts, &block)
-      opts = atts.extract_options!
+      opts = extract_options!(atts)
       blk = if (i = opts[:if]) || (am = opts[:allow_missing]) || (an = opts[:allow_nil]) || (ab = opts[:allow_blank])
         proc do |o,a,v|
           next if i && !o.instance_eval(&if_proc(opts))
@@ -199,7 +199,7 @@ module Sequel
       opts = {
         :message => 'is invalid',
         :tag => :format,
-      }.merge!(atts.extract_options!)
+      }.merge!(extract_options!(atts))
       
       unless opts[:with].is_a?(Regexp)
         raise ArgumentError, "A regular expression must be supplied as the :with option of the options hash"
@@ -228,7 +228,7 @@ module Sequel
         :too_long     => 'is too long',
         :too_short    => 'is too short',
         :wrong_length => 'is the wrong length'
-      }.merge!(atts.extract_options!)
+      }.merge!(extract_options!(atts))
       
       opts[:tag] ||= ([:length] + [:maximum, :minimum, :is, :within].reject{|x| !opts.include?(x)}).join('-').to_sym
       atts << opts
@@ -260,7 +260,7 @@ module Sequel
     def self.validates_not_string(*atts)
       opts = {
         :tag => :not_string,
-      }.merge!(atts.extract_options!)
+      }.merge!(extract_options!(atts))
       atts << opts
       validates_each(*atts) do |o, a, v|
         if v.is_a?(String)
@@ -285,7 +285,7 @@ module Sequel
       opts = {
         :message => 'is not a number',
         :tag => :numericality,
-      }.merge!(atts.extract_options!)
+      }.merge!(extract_options!(atts))
       atts << opts
       validates_each(*atts) do |o, a, v|
         begin
@@ -309,7 +309,7 @@ module Sequel
       opts = {
         :message => 'is not present',
         :tag => :presence,
-      }.merge!(atts.extract_options!)
+      }.merge!(extract_options!(atts))
       atts << opts
       validates_each(*atts) do |o, a, v|
         o.errors[a] << opts[:message] if v.blank? && v != false
@@ -322,7 +322,7 @@ module Sequel
     # * :in - An array or range of values to check for validity (required)
     # * :message - The message to use (default: 'is not in range or set: <specified range>')
     def self.validates_inclusion_of(*atts)
-      opts = atts.extract_options!
+      opts = extract_options!(atts)
       unless opts[:in] && opts[:in].respond_to?(:include?) 
         raise ArgumentError, "The :in parameter is required, and respond to include?"
       end
@@ -353,7 +353,7 @@ module Sequel
       opts = {
         :message => 'is already taken',
         :tag => :uniqueness,
-      }.merge!(atts.extract_options!)
+      }.merge!(extract_options!(atts))
 
       atts << opts
       validates_each(*atts) do |o, a, v|

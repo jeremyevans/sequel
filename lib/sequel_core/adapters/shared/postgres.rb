@@ -35,18 +35,20 @@ module Sequel
     @client_min_messages = :warning
     @force_standard_strings = true
     
-    # By default, Sequel sets the minimum level of log messages sent to the client
-    # to WARNING, where PostgreSQL uses a default of NOTICE.  This is to avoid a lot
-    # of mostly useless messages when running migrations, such as a couple of lines
-    # for every serial primary key field.
-    metaattr_accessor :client_min_messages
+    class << self
+      # By default, Sequel sets the minimum level of log messages sent to the client
+      # to WARNING, where PostgreSQL uses a default of NOTICE.  This is to avoid a lot
+      # of mostly useless messages when running migrations, such as a couple of lines
+      # for every serial primary key field.
+      attr_accessor :client_min_messages
 
-    # By default, Sequel forces the use of standard strings, so that
-    # '\\' is interpreted as \\ and not \.  While PostgreSQL defaults
-    # to interpreting plain strings as extended strings, this will change
-    # in a future version of PostgreSQL.  Sequel assumes that SQL standard
-    # strings will be used.
-    metaattr_accessor :force_standard_strings
+      # By default, Sequel forces the use of standard strings, so that
+      # '\\' is interpreted as \\ and not \.  While PostgreSQL defaults
+      # to interpreting plain strings as extended strings, this will change
+      # in a future version of PostgreSQL.  Sequel assumes that SQL standard
+      # strings will be used.
+      attr_accessor :force_standard_strings
+    end
 
     # Methods shared by adapter/connection instances.
     module AdapterMethods

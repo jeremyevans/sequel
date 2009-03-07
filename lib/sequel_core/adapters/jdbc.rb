@@ -146,7 +146,7 @@ module Sequel
       # statement or something else that returns rows.
       def execute(sql, opts={}, &block)
         return call_sproc(sql, opts, &block) if opts[:sproc]
-        return execute_prepared_statement(sql, opts, &block) if sql.is_one_of?(Symbol, Dataset)
+        return execute_prepared_statement(sql, opts, &block) if [Symbol, Dataset].any?{|c| sql.is_a?(c)}
         log_info(sql)
         synchronize(opts[:server]) do |conn|
           stmt = conn.createStatement
@@ -334,7 +334,9 @@ module Sequel
       # and set it to an empty hash.  This is used to store
       # adapter specific prepared statements.
       def setup_connection(conn)
-        conn.meta_eval{attr_accessor :prepared_statements}
+        class << conn
+          attr_accessor :prepared_statements
+        end
         conn.prepared_statements = {}
         conn
       end

@@ -289,7 +289,7 @@ module Sequel
         values = {}
       when 1
         vals = values.at(0)
-        if vals.is_one_of?(Hash, Dataset, Array)
+        if [Hash, Dataset, Array].any?{|c| vals.is_a?(c)}
           values = vals
         elsif vals.respond_to?(:values)
           values = vals.values
@@ -399,7 +399,7 @@ module Sequel
     #   the table alias/name for the last joined (or first table), and an array of previous
     #   SQL::JoinClause.
     def join_table(type, table, expr=nil, options={}, &block)
-      if options.is_one_of?(Symbol, String)
+      if [Symbol, String].any?{|c| options.is_a?(c)}
         table_alias = options
         last_alias = nil 
       else
@@ -576,7 +576,7 @@ module Sequel
     # SQL fragment for the qualifed identifier, specifying
     # a table and a column (or schema and table).
     def qualified_identifier_sql(qcr)
-      [qcr.table, qcr.column].map{|x| x.is_one_of?(SQL::QualifiedIdentifier, SQL::Identifier, Symbol) ? literal(x) : quote_identifier(x)}.join('.')
+      [qcr.table, qcr.column].map{|x| [SQL::QualifiedIdentifier, SQL::Identifier, Symbol].any?{|c| x.is_a?(c)} ? literal(x) : quote_identifier(x)}.join('.')
     end
 
     # Adds quoting to identifiers (columns and tables). If identifiers are not
@@ -715,7 +715,7 @@ module Sequel
         # get values from hash
         values = transform_save(values) if @transform
         values.map do |k, v|
-          "#{k.is_one_of?(String, Symbol) ? quote_identifier(k) : literal(k)} = #{literal(v)}"
+          "#{[String, Symbol].any?{|c| k.is_a?(c)} ? quote_identifier(k) : literal(k)} = #{literal(v)}"
         end.join(COMMA_SEPARATOR)
       else
         # copy values verbatim

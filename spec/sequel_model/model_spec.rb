@@ -284,10 +284,9 @@ describe Sequel::Model, ".fetch" do
 
   it "should return true for .empty? and not raise an error on empty selection" do
     rows = @c.fetch("SELECT * FROM items WHERE FALSE")
-    @c.class_def(:fetch_rows) {|sql| yield({:count => 0})}
+    @c.send(:define_method, :fetch_rows){|sql| yield({:count => 0})}
     proc {rows.empty?}.should_not raise_error
   end
-  
 end
 
 describe Sequel::Model, ".find_or_create" do

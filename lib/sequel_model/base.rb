@@ -1,5 +1,8 @@
 module Sequel
   class Model
+    extend Metaprogramming
+    include Metaprogramming
+
     @allowed_columns = nil
     @association_reflections = {}
     @cache_store = nil
@@ -285,7 +288,7 @@ module Sequel
     # a transform to the model and dataset so that columns values will be serialized
     # when saved and deserialized when returned from the database.
     def self.serialize(*columns)
-      format = columns.extract_options![:format] || :yaml
+      format = extract_options!(columns)[:format] || :yaml
       @transform = columns.inject({}) do |m, c|
         m[c] = format
         m
@@ -347,7 +350,7 @@ module Sequel
       @db_schema = (inherited ? superclass.db_schema : get_db_schema) rescue nil
       self
     end
-    metaalias :dataset=, :set_dataset
+    instance_eval{alias dataset= set_dataset}
   
     # Sets primary key, regular and composite are possible.
     #
@@ -435,10 +438,26 @@ module Sequel
     def_dataset_method(*DATASET_METHODS)
 
     # Returns a copy of the model's dataset with custom SQL
-    metaalias :fetch, :with_sql
+    instance_eval{alias fetch with_sql}
   
     ### Private Class Methods ###
     
+    # Define instance method(s) that calls class method(s) of the
+    # same name, caching the result in an instance variable.  Define
+    # standard attr_writer method for modifying that instance variable
+    def self.class_attr_overridable(*meths)
+      meths.each{|meth| class_eval("def #{meth}; !defined?(@#{meth}) ? (@#{meth} = self.class.#{meth}) : @#{meth} end")}
+      attr_writer(*meths) 
+    end 
+  
+    # Define instance method(s) that calls class method(s) of the
+    # same name. Replaces the construct:
+    #   
+    #   define_method(meth){self.class.send(meth)}
+    def self.class_attr_reader(*meths)
+      meths.each{|meth| define_method(meth){self.class.send(meth)}}
+    end
+
     # Create the column accessors.  For columns that can be used as method names directly in ruby code,
     # use a string to define the method for speed.  For other columns names, use a block.
     def self.def_column_accessor(*columns) # :nodoc:
@@ -458,6 +477,13 @@ module Sequel
         define_method(column){self[column]}
         define_method("#{column}="){|v| self[column] = v}
       end
+    end
+
+    # Removes and returns the last member of the array if it is a hash. Otherwise,
+    # an empty hash is returned This method is useful when writing methods that
+    # take an options hash as the last parameter.
+    def self.extract_options!(array)
+      array.last.is_a?(Hash) ? array.pop : {}
     end
 
     # Get the schema from the database, fall back on checking the columns
@@ -517,6 +543,6 @@ module Sequel
       @columns
     end
 
-    private_class_method :def_column_accessor, :def_bad_column_accessor, :get_db_schema, :overridable_methods_module, :set_columns
+    private_class_method :class_attr_overridable, :class_attr_reader, :def_column_accessor, :def_bad_column_accessor, :get_db_schema, :overridable_methods_module, :set_columns
   end
 end

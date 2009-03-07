@@ -41,7 +41,7 @@ rescue LoadError => e
             def escape_bytea(obj)
               self.class.encode_bytea(obj)
             end
-            metaalias :unescape_bytea, :decode_bytea
+            instance_eval{alias unescape_bytea decode_bytea}
           rescue
             # If no valid bytea escaping method can be found, create one that
             # raises an error
@@ -104,10 +104,12 @@ module Sequel
     
     @use_iso_date_format = true
 
-    # As an optimization, Sequel sets the date style to ISO, so that PostgreSQL provides
-    # the date in a known format that Sequel can parse faster.  This can be turned off
-    # if you require a date style other than ISO.
-    metaattr_accessor :use_iso_date_format
+    class << self
+      # As an optimization, Sequel sets the date style to ISO, so that PostgreSQL provides
+      # the date in a known format that Sequel can parse faster.  This can be turned off
+      # if you require a date style other than ISO.
+      attr_accessor :use_iso_date_format
+    end
     
     # PGconn subclass for connection specific methods used with the
     # pg, postgres, or postgres-pr driver.

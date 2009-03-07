@@ -8,8 +8,10 @@ module Sequel
     end
   end
   module MySQL
-    # Set the default options used for CREATE TABLE
-    metaattr_accessor :default_charset, :default_collate, :default_engine
+    class << self
+      # Set the default options used for CREATE TABLE
+      attr_accessor :default_charset, :default_collate, :default_engine
+    end
 
     # Methods shared by Database instances that connect to MySQL,
     # currently supported by the native and JDBC adapters.
