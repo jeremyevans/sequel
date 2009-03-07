@@ -434,9 +434,9 @@ module Sequel
       def convert_type(v)
         case v
         when Java::JavaSQL::Timestamp, Java::JavaSQL::Time
-          v.to_string.to_sequel_time
+          Sequel.string_to_datetime(v.to_string)
         when Java::JavaSQL::Date
-          v.to_string.to_date
+          Sequel.string_to_date(v.to_string)
         when Java::JavaIo::BufferedReader
           lines = []
           while(line = v.read_line) do lines << line end

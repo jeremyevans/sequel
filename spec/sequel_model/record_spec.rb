@@ -1085,11 +1085,11 @@ describe Sequel::Model, "typecasting" do
     y = Date.new(2007,10,21)
     m.x = '2007-10-21'
     m.x.should == y
-    m.x = '2007-10-21'.to_date
+    m.x = Date.parse('2007-10-21')
     m.x.should == y
-    m.x = '2007-10-21'.to_time
+    m.x = Time.parse('2007-10-21')
     m.x.should == y
-    m.x = '2007-10-21'.to_datetime
+    m.x = DateTime.parse('2007-10-21')
     m.x.should == y
   end
 
@@ -1111,7 +1111,7 @@ describe Sequel::Model, "typecasting" do
     @c.instance_variable_set(:@db_schema, {:x=>{:type=>:time}})
     m = @c.new
     x = '10:20:30'
-    y = x.to_time
+    y = Time.parse(x)
     m.x = x
     m.x.should == y
     m.x = y
@@ -1122,8 +1122,8 @@ describe Sequel::Model, "typecasting" do
     @c.instance_variable_set(:@db_schema, {:x=>{:type=>:time}})
     proc{@c.new.x = '0000'}.should raise_error
     proc{@c.new.x = 'a'}.should_not raise_error # Valid Time
-    proc{@c.new.x = '2008-10-21'.to_date}.should raise_error(Sequel::Error::InvalidValue)
-    proc{@c.new.x = '2008-10-21'.to_datetime}.should raise_error(Sequel::Error::InvalidValue)
+    proc{@c.new.x = Date.parse('2008-10-21')}.should raise_error(Sequel::Error::InvalidValue)
+    proc{@c.new.x = DateTime.parse('2008-10-21')}.should raise_error(Sequel::Error::InvalidValue)
   end
 
   specify "should assign value if raise_on_typecast_failure is off and assigning invalid time" do
@@ -1138,25 +1138,25 @@ describe Sequel::Model, "typecasting" do
     @c.instance_variable_set(:@db_schema, {:x=>{:type=>:datetime}})
     m = @c.new
     x = '2007-10-21T10:20:30-07:00'
-    y = x.to_time
+    y = Time.parse(x)
     m.x = x
     m.x.should == y
-    m.x = x.to_datetime
+    m.x = DateTime.parse(x)
     m.x.should == y
-    m.x = x.to_time
+    m.x = Time.parse(x)
     m.x.should == y
-    m.x = '2007-10-21'.to_date
-    m.x.should == '2007-10-21'.to_time
+    m.x = Date.parse('2007-10-21')
+    m.x.should == Time.parse('2007-10-21')
     Sequel.datetime_class = DateTime
-    y = x.to_datetime
+    y = DateTime.parse(x)
     m.x = x
     m.x.should == y
-    m.x = x.to_datetime
+    m.x = DateTime.parse(x)
     m.x.should == y
-    m.x = x.to_time
+    m.x = Time.parse(x)
     m.x.should == y
-    m.x = '2007-10-21'.to_date
-    m.x.should == '2007-10-21'.to_datetime
+    m.x = Date.parse('2007-10-21')
+    m.x.should == DateTime.parse('2007-10-21')
   end
 
   specify "should raise an error if invalid data is used in a datetime field" do

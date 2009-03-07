@@ -1,5 +1,7 @@
 === HEAD
 
+* Deprecate String#to_date, #to_datetime, #to_time, and #to_sequel_time, use require 'sequel/extensions/string_date_time' if you want them (jeremyevans)
+
 * Deprecate Array#extract_options! and Object#is_one_of? (jeremyevans)
 
 * Deprecate Object#meta_def, #meta_eval, and #metaclass (jeremyevans)

@@ -521,7 +521,7 @@ module Sequel
           when DateTime, Time
             Date.new(value.year, value.month, value.day)
           when String
-            value.to_date
+            Sequel.string_to_date(value)
           else
             raise Sequel::Error::InvalidValue, "invalid value for Date: #{value.inspect}"
           end
@@ -530,7 +530,7 @@ module Sequel
           when Time
             value
           when String
-            value.to_time
+            Sequel.string_to_time(value)
           else
             raise Sequel::Error::InvalidValue, "invalid value for Time: #{value.inspect}"
           end
@@ -542,7 +542,7 @@ module Sequel
           else
             # First convert it to standard ISO 8601 time, then
             # parse that string using the time class.
-            (Time === value ? value.iso8601 : value.to_s).to_sequel_time
+            Sequel.string_to_datetime(Time === value ? value.iso8601 : value.to_s)
           end
         when :blob
           ::Sequel::SQL::Blob.new(value)

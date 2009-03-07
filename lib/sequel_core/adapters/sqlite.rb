@@ -35,7 +35,7 @@ module Sequel
         # Handle datetime's with Sequel.datetime_class
         prok = proc do |t,v|
           v = Time.at(v.to_i).iso8601 if UNIX_EPOCH_TIME_FORMAT.match(v)
-          v.to_sequel_time
+          Sequel.string_to_datetime(v)
         end
         db.translator.add_translator("timestamp", &prok)
         db.translator.add_translator("datetime", &prok)

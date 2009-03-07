@@ -83,24 +83,22 @@ module Sequel
     CONVERTED_EXCEPTIONS << PGError
     
     # Hash with integer keys and proc values for converting PostgreSQL types.
-    PG_TYPES = {
-      16 => lambda{ |s| s == 't' }, # boolean
-      17 => lambda{ |s| ::Sequel::SQL::Blob.new(Adapter.unescape_bytea(s)) }, # bytea
-      20 => lambda{ |s| s.to_i }, # int8
-      21 => lambda{ |s| s.to_i }, # int2
-      22 => lambda{ |s| s.to_i }, # int2vector
-      23 => lambda{ |s| s.to_i }, # int4
-      26 => lambda{ |s| s.to_i }, # oid
-      700 => lambda{ |s| s.to_f }, # float4
-      701 => lambda{ |s| s.to_f }, # float8
-      790 => lambda{ |s| s.to_d }, # money
-      1082 => lambda{ |s| @use_iso_date_format ? Date.new(*s.split("-").map{|x| x.to_i}) : s.to_date }, # date
-      1083 => lambda{ |s| s.to_time }, # time without time zone
-      1114 => lambda{ |s| s.to_sequel_time }, # timestamp without time zone
-      1184 => lambda{ |s| s.to_sequel_time }, # timestamp with time zone
-      1266 => lambda{ |s| s.to_time }, # time with time zone
-      1700 => lambda{ |s| s.to_d }, # numeric
+    PG_TYPES = {}
+
+    # Use a single proc for each type to conserve memory
+    PG_TYPE_PROCS  = {
+      [16] =>  lambda{|s| s == 't'}, # boolean
+      [17] => lambda{|s| ::Sequel::SQL::Blob.new(Adapter.unescape_bytea(s))}, # bytea
+      [20, 21, 22, 23, 26] => lambda{|s| s.to_i}, # integer
+      [700, 701] => lambda{|s| s.to_f}, # float
+      [790, 1700] => lambda{|s| BigDecimal.new(s)}, # numeric
+      [1082] => lambda{|s| @use_iso_date_format ? Date.new(*s.split("-").map{|x| x.to_i}) : Sequel.string_to_date(s)}, # date
+      [1083, 1266] => lambda{|s| Sequel.string_to_time(s)}, # time
+      [1114, 1184] => lambda{|s| Sequel.string_to_datetime(s)}, # timestamp
     }
+    PG_TYPE_PROCS.each do |k,v|
+      k.each{|n| PG_TYPES[n] = v}
+    end
     
     @use_iso_date_format = true
 

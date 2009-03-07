@@ -5,36 +5,22 @@ require 'sequel_core/adapters/utils/stored_procedures'
 module Sequel
   # Module for holding all MySQL-related classes and modules for Sequel.
   module MySQL
-    # Mapping of type numbers to conversion methods.
-    MYSQL_TYPES = {
-      0   => :to_d,     # MYSQL_TYPE_DECIMAL
-      1   => :to_i,     # MYSQL_TYPE_TINY
-      2   => :to_i,     # MYSQL_TYPE_SHORT
-      3   => :to_i,     # MYSQL_TYPE_LONG
-      4   => :to_f,     # MYSQL_TYPE_FLOAT
-      5   => :to_f,     # MYSQL_TYPE_DOUBLE
-      # 6   => ??,        # MYSQL_TYPE_NULL
-      7   => :to_sequel_time,  # MYSQL_TYPE_TIMESTAMP
-      8   => :to_i,     # MYSQL_TYPE_LONGLONG
-      9   => :to_i,     # MYSQL_TYPE_INT24
-      10  => :to_date,  # MYSQL_TYPE_DATE
-      11  => :to_time,  # MYSQL_TYPE_TIME
-      12  => :to_sequel_time,  # MYSQL_TYPE_DATETIME
-      13  => :to_i,     # MYSQL_TYPE_YEAR
-      14  => :to_date,  # MYSQL_TYPE_NEWDATE
-      # 15  => :to_s      # MYSQL_TYPE_VARCHAR
-      # 16  => :to_s,     # MYSQL_TYPE_BIT
-      246 => :to_d,     # MYSQL_TYPE_NEWDECIMAL
-      247 => :to_i,     # MYSQL_TYPE_ENUM
-      248 => :to_i,      # MYSQL_TYPE_SET
-      249 => :to_sequel_blob,     # MYSQL_TYPE_TINY_BLOB
-      250 => :to_sequel_blob,     # MYSQL_TYPE_MEDIUM_BLOB
-      251 => :to_sequel_blob,     # MYSQL_TYPE_LONG_BLOB
-      252 => :to_sequel_blob,     # MYSQL_TYPE_BLOB
-      # 253 => :to_s,     # MYSQL_TYPE_VAR_STRING
-      # 254 => :to_s,     # MYSQL_TYPE_STRING
-      # 255 => :to_s      # MYSQL_TYPE_GEOMETRY
+    # Mapping of type numbers to conversion procs
+    MYSQL_TYPES = {}
+
+    # Use only a single proc for each type to save on memory
+    MYSQL_TYPE_PROCS = {
+      [0, 246]  => lambda{|v| BigDecimal.new(v)},                   # decimal
+      [1, 2, 3, 8, 9, 13, 247, 248]  => lambda{|v| v.to_i},         # integer
+      [4, 5]  => lambda{|v| v.to_f},                                # float
+      [10]  => lambda{|v| Sequel.string_to_date(v)},                # date
+      [7, 14] => lambda{|v| Sequel.string_to_datetime(v)},          # datetime
+      [11]  => lambda{|v| Sequel.string_to_time(v)},                # time
+      [249, 250, 251, 252]  => lambda{|v| Sequel::SQL::Blob.new(v)} # blob
     }
+    MYSQL_TYPE_PROCS.each do |k,v|
+      k.each{|n| MYSQL_TYPES[n] = v}
+    end
   
     # Database class for MySQL databases used with Sequel.
     class Database < Sequel::Database
@@ -333,7 +319,7 @@ module Sequel
             # a method to an ancestor of Fixnum
             v.to_i == 0 ? false : true
           else
-            (t = MYSQL_TYPES[type]) ? v.send(t) : v
+            (b = MYSQL_TYPES[type]) ? b.call(v) : v
           end
         else
           nil

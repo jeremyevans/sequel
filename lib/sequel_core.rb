@@ -135,6 +135,38 @@ module Sequel
     Database.single_threaded = value
   end
 
+  # Converts a string into a Date object.
+  def self.string_to_date(s)
+    begin
+      Date.parse(s, Sequel.convert_two_digit_years)
+    rescue => e
+      raise Error::InvalidValue, "Invalid Date value '#{self}' (#{e.message})"
+    end
+  end
+
+  # Converts a string into a Time or DateTime object, depending on the
+  # value of Sequel.datetime_class.
+  def self.string_to_datetime(s)
+    begin
+      if datetime_class == DateTime
+        DateTime.parse(s, convert_two_digit_years)
+      else
+        datetime_class.parse(s)
+      end
+    rescue => e
+      raise Error::InvalidValue, "Invalid #{datetime_class} value '#{self}' (#{e.message})"
+    end
+  end
+
+  # Converts a string into a Time object.
+  def self.string_to_time(s)
+    begin
+      Time.parse(s)
+    rescue => e
+      raise Error::InvalidValue, "Invalid Time value '#{self}' (#{e.message})"
+    end
+  end
+
   ### Private Class Methods ###
 
   # Helper method that the database adapter class methods that are added to Sequel via

@@ -265,6 +265,46 @@ class String
     Sequel::Deprecation.deprecate('String#to_blob', 'Use String#to_sequel_blob')
     to_sequel_blob(*args)
   end
+
+  def to_date
+    Sequel::Deprecation.deprecate('String#to_date', 'You should require "sequel/extensions/string_date_time"')
+    begin
+      Date.parse(self, Sequel.convert_two_digit_years)
+    rescue => e
+      raise Sequel::Error::InvalidValue, "Invalid Date value '#{self}' (#{e.message})"
+    end 
+  end 
+
+  def to_datetime
+    Sequel::Deprecation.deprecate('String#to_datetime', 'You should require "sequel/extensions/string_date_time"')
+    begin
+      DateTime.parse(self, Sequel.convert_two_digit_years)
+    rescue => e
+      raise Sequel::Error::InvalidValue, "Invalid DateTime value '#{self}' (#{e.message})"
+    end 
+  end 
+
+  def to_sequel_time
+    Sequel::Deprecation.deprecate('String#to_sequel_time', 'You should require "sequel/extensions/string_date_time"')
+    begin
+      if Sequel.datetime_class == DateTime
+        DateTime.parse(self, Sequel.convert_two_digit_years)
+      else
+        Sequel.datetime_class.parse(self)
+      end 
+    rescue => e
+      raise Sequel::Error::InvalidValue, "Invalid #{Sequel.datetime_class} value '#{self}' (#{e.message})"
+    end 
+  end 
+
+  def to_time
+    Sequel::Deprecation.deprecate('String#to_time', 'You should require "sequel/extensions/string_date_time"')
+    begin
+      Time.parse(self)
+    rescue => e
+      raise Sequel::Error::InvalidValue, "Invalid Time value '#{self}' (#{e.message})"
+    end 
+  end
 end
 
 class Symbol
