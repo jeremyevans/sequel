@@ -1,5 +1,7 @@
 === HEAD
 
+* Speed up the calling of most column accessor methods, and reduce memory overhead of creating them (jeremyevans)
+
 * Deprecate Model#set_restricted using Model#[] if no setter method exists, a symbol is used, and the columns are not set (jeremyevans)
 
 * Deprecate Model#set_with_params and #update_with_params (jeremyevans)

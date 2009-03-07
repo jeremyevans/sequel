@@ -439,21 +439,24 @@ module Sequel
   
     ### Private Class Methods ###
     
-    # Create the column accessors
+    # Create the column accessors.  For columns that can be used as method names directly in ruby code,
+    # use a string to define the method for speed.  For other columns names, use a block.
     def self.def_column_accessor(*columns) # :nodoc:
+      columns, bad_columns = columns.partition{|x| %r{\A[_A-Za-z][0-9A-Za-z_]*\z}io.match(x.to_s)}
+      bad_columns.each{|x| def_bad_column_accessor(x)}
+      im = instance_methods.collect{|x| x.to_s}
       columns.each do |column|
-        im = instance_methods.collect{|x| x.to_s}
         meth = "#{column}="
-        overridable_methods_module.module_eval do
-          define_method(column){self[column]} unless im.include?(column.to_s)
-          unless im.include?(meth)
-            define_method(meth) do |*v|
-              len = v.length
-              raise(ArgumentError, "wrong number of arguments (#{len} for 1)") unless len == 1
-              self[column] = v.first 
-            end
-          end
-        end
+        overridable_methods_module.module_eval("def #{column}; self[:#{column}] end") unless im.include?(column.to_s)
+        overridable_methods_module.module_eval("def #{meth}(v); self[:#{column}] = v end") unless im.include?(meth)
+      end
+    end
+
+    # Create a column accessor for a column with a method name that is hard to use in ruby code.
+    def self.def_bad_column_accessor(column)
+      overridable_methods_module.module_eval do
+        define_method(column){self[column]}
+        define_method("#{column}="){|v| self[column] = v}
       end
     end
 
@@ -514,6 +517,6 @@ module Sequel
       @columns
     end
 
-    private_class_method :def_column_accessor, :get_db_schema, :overridable_methods_module, :set_columns
+    private_class_method :def_column_accessor, :def_bad_column_accessor, :get_db_schema, :overridable_methods_module, :set_columns
   end
 end
