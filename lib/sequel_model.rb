@@ -84,7 +84,7 @@ module Sequel
   end
 end
 
-%w"inflector association_reflection associations base hooks record schema dataset_methods 
+%w"inflector record association_reflection associations base hooks schema dataset_methods 
   caching plugins validations eager_loading exceptions deprecated".each do |f|
   require "sequel_model/#{f}"
 end

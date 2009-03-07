@@ -436,22 +436,6 @@ module Sequel
   
       private
       
-      # Define instance method(s) that calls class method(s) of the
-      # same name, caching the result in an instance variable.  Define
-      # standard attr_writer method for modifying that instance variable
-      def class_attr_overridable(*meths)
-        meths.each{|meth| class_eval("def #{meth}; !defined?(@#{meth}) ? (@#{meth} = self.class.#{meth}) : @#{meth} end")}
-        attr_writer(*meths) 
-      end 
-    
-      # Define instance method(s) that calls class method(s) of the
-      # same name. Replaces the construct:
-      #   
-      #   define_method(meth){self.class.send(meth)}
-      def class_attr_reader(*meths)
-        meths.each{|meth| define_method(meth){self.class.send(meth)}}
-      end
-  
       # Create the column accessors.  For columns that can be used as method names directly in ruby code,
       # use a string to define the method for speed.  For other columns names, use a block.
       def def_column_accessor(*columns)
