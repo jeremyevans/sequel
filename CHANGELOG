@@ -1,5 +1,7 @@
 === HEAD
 
+* Move most model class methods into Model::ClassMethods, for easier overriding of class methods for all models (jeremyevans)
+
 * Deprecate String#to_date, #to_datetime, #to_time, and #to_sequel_time, use require 'sequel/extensions/string_date_time' if you want them (jeremyevans)
 
 * Deprecate Array#extract_options! and Object#is_one_of? (jeremyevans)

@@ -1,8 +1,4 @@
 require 'sequel_core'
-%w"inflector base hooks record schema association_reflection dataset_methods 
-  associations caching plugins validations eager_loading exceptions deprecated".each do |f|
-  require "sequel_model/#{f}"
-end
 
 module Sequel
   # Holds the nameless subclasses that are created with
@@ -85,7 +81,11 @@ module Sequel
   #   * Model.dataset= => set_dataset
   #   * Model.is_a => is
   class Model
-    extend Enumerable
-    extend Associations
   end
 end
+
+%w"inflector association_reflection associations base hooks record schema dataset_methods 
+  caching plugins validations eager_loading exceptions deprecated".each do |f|
+  require "sequel_model/#{f}"
+end
+
