@@ -1,5 +1,11 @@
 === HEAD
 
+* Deprecate Model hook class methods, use instance methods instead or Model.plugin :hook_class_methods (jeremyevans)
+
+* Deprecate Model.set_sti_key, use Model.plugin :single_table_inheritance (jeremyevans)
+
+* Deprecate Model.set_cache, use Model.plugin :caching (jeremyevans)
+
 * Move most model instance methods into Model::InstanceMethods, for easier overriding of instance methods for all models (jeremyevans)
 
 * Move most model class methods into Model::ClassMethods, for easier overriding of class methods for all models (jeremyevans)

@@ -133,7 +133,7 @@ module Sequel
 end
 
 %w"inflector plugins record association_reflection associations base hooks schema dataset_methods 
-  caching validations eager_loading exceptions deprecated".each do |f|
+  validations eager_loading exceptions deprecated".each do |f|
   require "sequel_model/#{f}"
 end
 
