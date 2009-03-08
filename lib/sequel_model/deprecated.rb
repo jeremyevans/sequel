@@ -97,7 +97,7 @@ module Sequel
       def set_schema(name = nil, &block)
         Deprecation.deprecate('Sequel::Model.set_schema', 'Use Model.plugin(:schema) first')
         set_dataset(db[name]) if name
-        @schema = Schema::Generator.new(db, &block)
+        @schema = Sequel::Schema::Generator.new(db, &block)
         set_primary_key(@schema.primary_key_name) if @schema.primary_key_name
       end
   
