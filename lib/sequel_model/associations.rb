@@ -494,3 +494,7 @@ module Sequel::Model::Associations
     association_module_def(opts.remove_all_method){remove_all_associated_objects(opts)}
   end
 end
+
+class Sequel::Model
+  extend Associations
+end

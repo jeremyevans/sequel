@@ -1,5 +1,7 @@
 === HEAD
 
+* Deprecate Model validation class methods, override Model#validate instead or Model.plugin validation_class_methods (jeremyevans)
+
 * Deprecate Model schema methods, use Model.plugin :schema (jeremyevans)
 
 * Deprecate Model hook class methods, use instance methods instead or Model.plugin :hook_class_methods (jeremyevans)

@@ -1,3 +1,6 @@
+require 'sequel_model/hooks'
+require 'sequel_model/deprecated_validations'
+
 module Sequel
   class Model
     module ClassMethods

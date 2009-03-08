@@ -77,21 +77,19 @@ end
 
 describe Sequel::Model do
   setup do
-    deprec do
-      @c = Class.new(Sequel::Model) do
-        def self.validates_coolness_of(attr)
-          validates_each(attr) {|o, a, v| o.errors[a] << 'is not cool' if v != :cool}
-        end
+    @c = Class.new(Sequel::Model) do
+      def self.validates_coolness_of(attr)
+        validates_each(attr) {|o, a, v| o.errors[a] << 'is not cool' if v != :cool}
       end
     end
   end
   
-  deprec_specify "should respond to validates, validations, has_validations?" do
+  specify "should respond to validates, validations, has_validations?" do
     @c.should respond_to(:validations)
     @c.should respond_to(:has_validations?)
   end
   
-  deprec_specify "should acccept validation definitions using validates_each" do
+  specify "should acccept validation definitions using validates_each" do
     @c.validates_each(:xx, :yy) {|o, a, v| o.errors[a] << 'too low' if v < 50}
     o = @c.new
     o.should_receive(:xx).once.and_return(40)
@@ -100,13 +98,13 @@ describe Sequel::Model do
     o.errors.full_messages.should == ['xx too low']
   end
 
-  deprec_specify "should return true/false for has_validations?" do
+  specify "should return true/false for has_validations?" do
     @c.has_validations?.should == false
     @c.validates_each(:xx) {1}
     @c.has_validations?.should == true
   end
   
-  deprec_specify "should validate multiple attributes at once" do
+  specify "should validate multiple attributes at once" do
     o = @c.new
     def o.xx
       1
@@ -122,7 +120,7 @@ describe Sequel::Model do
     atts.should == [:xx, :yy]
   end
   
-  deprec_specify "should respect allow_missing option when using multiple attributes" do
+  specify "should respect allow_missing option when using multiple attributes" do
     o = @c.new
     def o.xx
       self[:xx]
@@ -155,7 +153,7 @@ describe Sequel::Model do
     atts.should == nil
   end
   
-  deprec_specify "should overwrite existing validation with the same tag and attribute" do
+  specify "should overwrite existing validation with the same tag and attribute" do
     @c.validates_each(:xx, :xx, :tag=>:low) {|o, a, v| o.xxx; o.errors[a] << 'too low' if v < 50}
     @c.validates_each(:yy, :yy) {|o, a, v| o.yyy; o.errors[a] << 'too low' if v < 50}
     @c.validates_presence_of(:zz, :zz)
@@ -179,7 +177,7 @@ describe Sequel::Model do
     o.errors.full_messages.should == ['xx too low']
   end
 
-  deprec_specify "should provide a validates method that takes block with validation definitions" do
+  specify "should provide a validates method that takes block with validation definitions" do
     @c.validates do
       coolness_of :blah
     end
@@ -195,8 +193,8 @@ describe Sequel::Model do
   setup do
     @c = Class.new(Sequel::Model) do
       columns :score
-      def validate
-        errors[:score] << 'too low' if score < 87
+      validates_each :score do |o, a, v|
+        o.errors[a] << 'too low' if v < 87
       end
     end
     
@@ -222,7 +220,7 @@ describe Sequel::Model do
   end
 end
 
-describe 'Sequel::Model::Validation::Generator' do
+describe Sequel::Plugins::ValidationClassMethods::ClassMethods::Generator do
   setup do
     $testit = nil
     
@@ -233,11 +231,9 @@ describe 'Sequel::Model::Validation::Generator' do
     end
   end
   
-  deprec_specify "should instance_eval the block, sending everything to its receiver" do
-    @c.class_eval do
-      validates do
-        blah
-      end
+  specify "should instance_eval the block, sending everything to its receiver" do
+    @c.validates do
+      blah
     end
     $testit.should == 1324
   end
@@ -260,14 +256,14 @@ describe Sequel::Model do
     @m = @c.new
   end
 
-  deprec_specify "should validate acceptance_of" do
+  specify "should validate acceptance_of" do
     @c.validates_acceptance_of :value
     @m.should be_valid
     @m.value = '1'
     @m.should be_valid
   end
   
-  deprec_specify "should validate acceptance_of with accept" do
+  specify "should validate acceptance_of with accept" do
     @c.validates_acceptance_of :value, :accept => 'true'
     @m.value = '1'
     @m.should_not be_valid
@@ -275,54 +271,54 @@ describe Sequel::Model do
     @m.should be_valid
   end
   
-  deprec_specify "should validate acceptance_of with allow_nil => false" do
+  specify "should validate acceptance_of with allow_nil => false" do
     @c.validates_acceptance_of :value, :allow_nil => false
     @m.should_not be_valid
   end
 
-  deprec_specify "should validate acceptance_of with allow_missing => true" do
+  specify "should validate acceptance_of with allow_missing => true" do
     @c.validates_acceptance_of :value, :allow_missing => true
     @m.should be_valid
   end
 
-  deprec_specify "should validate acceptance_of with allow_missing => true and allow_nil => false" do
+  specify "should validate acceptance_of with allow_missing => true and allow_nil => false" do
     @c.validates_acceptance_of :value, :allow_missing => true, :allow_nil => false
     @m.should be_valid
     @m.value = nil
     @m.should_not be_valid
   end
 
-  deprec_specify "should validate acceptance_of with if => true" do
+  specify "should validate acceptance_of with if => true" do
     @c.validates_acceptance_of :value, :if => :dont_skip
     @m.value = '0'
     @m.should_not be_valid
   end
 
-  deprec_specify "should validate acceptance_of with if => false" do
+  specify "should validate acceptance_of with if => false" do
     @c.validates_acceptance_of :value, :if => :skip
     @m.value = '0'
     @m.should be_valid
   end
 
-  deprec_specify "should validate acceptance_of with if proc that evaluates to true" do
+  specify "should validate acceptance_of with if proc that evaluates to true" do
     @c.validates_acceptance_of :value, :if => proc{true}
     @m.value = '0'
     @m.should_not be_valid
   end
 
-  deprec_specify "should validate acceptance_of with if proc that evaluates to false" do
+  specify "should validate acceptance_of with if proc that evaluates to false" do
     @c.validates_acceptance_of :value, :if => proc{false}
     @m.value = '0'
     @m.should be_valid
   end
 
-  deprec_specify "should raise an error if :if option is not a Symbol, Proc, or nil" do
+  specify "should raise an error if :if option is not a Symbol, Proc, or nil" do
     @c.validates_acceptance_of :value, :if => 1
     @m.value = '0'
     proc{@m.valid?}.should raise_error(Sequel::Error)
   end
 
-  deprec_specify "should validate confirmation_of" do
+  specify "should validate confirmation_of" do
     @c.send(:attr_accessor, :value_confirmation)
     @c.validates_confirmation_of :value
     
@@ -333,7 +329,7 @@ describe Sequel::Model do
     @m.should be_valid
   end
   
-  deprec_specify "should validate confirmation_of with if => true" do
+  specify "should validate confirmation_of with if => true" do
     @c.send(:attr_accessor, :value_confirmation)
     @c.validates_confirmation_of :value, :if => :dont_skip
 
@@ -341,7 +337,7 @@ describe Sequel::Model do
     @m.should_not be_valid
   end
 
-  deprec_specify "should validate confirmation_of with if => false" do
+  specify "should validate confirmation_of with if => false" do
     @c.send(:attr_accessor, :value_confirmation)
     @c.validates_confirmation_of :value, :if => :skip
 
@@ -349,7 +345,7 @@ describe Sequel::Model do
     @m.should be_valid
   end
 
-  deprec_specify "should validate confirmation_of with allow_missing => true" do
+  specify "should validate confirmation_of with allow_missing => true" do
     @c.send(:attr_accessor, :value_confirmation)
     @c.validates_acceptance_of :value, :allow_missing => true
     @m.should be_valid
@@ -359,7 +355,7 @@ describe Sequel::Model do
     @m.should_not be_valid
   end
 
-  deprec_specify "should validate format_of" do
+  specify "should validate format_of" do
     @c.validates_format_of :value, :with => /.+_.+/
     @m.value = 'abc_'
     @m.should_not be_valid
@@ -367,33 +363,33 @@ describe Sequel::Model do
     @m.should be_valid
   end
   
-  deprec_specify "should raise for validate_format_of without regexp" do
+  specify "should raise for validate_format_of without regexp" do
     proc {@c.validates_format_of :value}.should raise_error(ArgumentError)
     proc {@c.validates_format_of :value, :with => :blah}.should raise_error(ArgumentError)
   end
   
-  deprec_specify "should validate format_of with if => true" do
+  specify "should validate format_of with if => true" do
     @c.validates_format_of :value, :with => /_/, :if => :dont_skip
 
     @m.value = 'a'
     @m.should_not be_valid
   end
 
-  deprec_specify "should validate format_of with if => false" do
+  specify "should validate format_of with if => false" do
     @c.validates_format_of :value, :with => /_/, :if => :skip
 
     @m.value = 'a'
     @m.should be_valid
   end
   
-  deprec_specify "should validate format_of with allow_missing => true" do
+  specify "should validate format_of with allow_missing => true" do
     @c.validates_format_of :value, :allow_missing => true, :with=>/./
     @m.should be_valid
     @m.value = nil
     @m.should_not be_valid
   end
 
-  deprec_specify "should validate length_of with maximum" do
+  specify "should validate length_of with maximum" do
     @c.validates_length_of :value, :maximum => 5
     @m.should_not be_valid
     @m.value = '12345'
@@ -402,7 +398,7 @@ describe Sequel::Model do
     @m.should_not be_valid
   end
 
-  deprec_specify "should validate length_of with minimum" do
+  specify "should validate length_of with minimum" do
     @c.validates_length_of :value, :minimum => 5
     @m.should_not be_valid
     @m.value = '12345'
@@ -411,7 +407,7 @@ describe Sequel::Model do
     @m.should_not be_valid
   end
 
-  deprec_specify "should validate length_of with within" do
+  specify "should validate length_of with within" do
     @c.validates_length_of :value, :within => 2..5
     @m.should_not be_valid
     @m.value = '12345'
@@ -422,7 +418,7 @@ describe Sequel::Model do
     @m.should_not be_valid
   end
 
-  deprec_specify "should validate length_of with is" do
+  specify "should validate length_of with is" do
     @c.validates_length_of :value, :is => 3
     @m.should_not be_valid
     @m.value = '123'
@@ -433,33 +429,33 @@ describe Sequel::Model do
     @m.should_not be_valid
   end
   
-  deprec_specify "should validate length_of with allow_nil" do
+  specify "should validate length_of with allow_nil" do
     @c.validates_length_of :value, :is => 3, :allow_nil => true
     @m.should be_valid
   end
 
-  deprec_specify "should validate length_of with if => true" do
+  specify "should validate length_of with if => true" do
     @c.validates_length_of :value, :is => 3, :if => :dont_skip
 
     @m.value = 'a'
     @m.should_not be_valid
   end
 
-  deprec_specify "should validate length_of with if => false" do
+  specify "should validate length_of with if => false" do
     @c.validates_length_of :value, :is => 3, :if => :skip
 
     @m.value = 'a'
     @m.should be_valid
   end
 
-  deprec_specify "should validate length_of with allow_missing => true" do
+  specify "should validate length_of with allow_missing => true" do
     @c.validates_length_of :value, :allow_missing => true, :minimum => 5
     @m.should be_valid
     @m.value = nil
     @m.should_not be_valid
   end
 
-  deprec_specify "should allow multiple calls to validates_length_of with different options without overwriting" do
+  specify "should allow multiple calls to validates_length_of with different options without overwriting" do
     @c.validates_length_of :value, :maximum => 5
     @c.validates_length_of :value, :minimum => 5
     @m.should_not be_valid
@@ -473,7 +469,7 @@ describe Sequel::Model do
     @m.should_not be_valid
   end
 
-  deprec_specify "should validate numericality_of" do
+  specify "should validate numericality_of" do
     @c.validates_numericality_of :value
     @m.value = 'blah'
     @m.should_not be_valid
@@ -499,7 +495,7 @@ describe Sequel::Model do
     @m.value = '.0123'
   end
 
-  deprec_specify "should validate numericality_of with only_integer" do
+  specify "should validate numericality_of with only_integer" do
     @c.validates_numericality_of :value, :only_integer => true
     @m.value = 'blah'
     @m.should_not be_valid
@@ -509,28 +505,28 @@ describe Sequel::Model do
     @m.should_not be_valid
   end
   
-  deprec_specify "should validate numericality_of with if => true" do
+  specify "should validate numericality_of with if => true" do
     @c.validates_numericality_of :value, :if => :dont_skip
 
     @m.value = 'a'
     @m.should_not be_valid
   end
 
-  deprec_specify "should validate numericality_of with if => false" do
+  specify "should validate numericality_of with if => false" do
     @c.validates_numericality_of :value, :if => :skip
 
     @m.value = 'a'
     @m.should be_valid
   end
 
-  deprec_specify "should validate numericality_of with allow_missing => true" do
+  specify "should validate numericality_of with allow_missing => true" do
     @c.validates_numericality_of :value, :allow_missing => true
     @m.should be_valid
     @m.value = nil
     @m.should_not be_valid
   end
 
-  deprec_specify "should validate presence_of" do
+  specify "should validate presence_of" do
     @c.validates_presence_of :value
     @m.should_not be_valid
     @m.value = ''
@@ -545,7 +541,7 @@ describe Sequel::Model do
     @m.should be_valid
   end
   
-  deprec_specify "should validate inclusion_of with an array" do
+  specify "should validate inclusion_of with an array" do
     @c.validates_inclusion_of :value, :in => [1,2]
     @m.should_not be_valid
     @m.value = 1
@@ -558,7 +554,7 @@ describe Sequel::Model do
     @m.should_not be_valid 
   end
   
-  deprec_specify "should validate inclusion_of with a range" do
+  specify "should validate inclusion_of with a range" do
     @c.validates_inclusion_of :value, :in => 1..4
     @m.should_not be_valid
     @m.value = 1
@@ -571,7 +567,7 @@ describe Sequel::Model do
     @m.should_not be_valid    
   end
   
-  deprec_specify "should raise an error if inclusion_of doesn't receive a valid :in option" do
+  specify "should raise an error if inclusion_of doesn't receive a valid :in option" do
     lambda {
       @c.validates_inclusion_of :value
     }.should raise_error(ArgumentError)
@@ -581,7 +577,7 @@ describe Sequel::Model do
     }.should raise_error(ArgumentError)
   end
   
-  deprec_specify "should raise an error if inclusion_of handles :allow_nil too" do
+  specify "should raise an error if inclusion_of handles :allow_nil too" do
     @c.validates_inclusion_of :value, :in => 1..4, :allow_nil => true
     @m.value = nil
     @m.should be_valid
@@ -589,38 +585,38 @@ describe Sequel::Model do
     @m.should_not be_valid
   end
 
-  deprec_specify "should validate presence_of with if => true" do
+  specify "should validate presence_of with if => true" do
     @c.validates_presence_of :value, :if => :dont_skip
     @m.should_not be_valid
   end
 
-  deprec_specify "should validate presence_of with if => false" do
+  specify "should validate presence_of with if => false" do
     @c.validates_presence_of :value, :if => :skip
     @m.should be_valid
   end
 
-  deprec_specify "should validate presence_of with allow_missing => true" do
+  specify "should validate presence_of with allow_missing => true" do
     @c.validates_presence_of :value, :allow_missing => true
     @m.should be_valid
     @m.value = nil
     @m.should_not be_valid
   end
 
-  deprec_specify "should validate uniqueness_of with if => true" do
+  specify "should validate uniqueness_of with if => true" do
     @c.validates_uniqueness_of :value, :if => :dont_skip
 
     @m.value = 'a'
     @m.should_not be_valid
   end
 
-  deprec_specify "should validate uniqueness_of with if => false" do
+  specify "should validate uniqueness_of with if => false" do
     @c.validates_uniqueness_of :value, :if => :skip
 
     @m.value = 'a'
     @m.should be_valid
   end
   
-  deprec_specify "should validate uniqueness_of with allow_missing => true" do
+  specify "should validate uniqueness_of with allow_missing => true" do
     @c.validates_uniqueness_of :value, :allow_missing => true
     @m.should be_valid
     @m.value = nil
@@ -630,20 +626,18 @@ end
 
 context "Superclass validations" do
   setup do
-    deprec do
-      @c1 = Class.new(Sequel::Model) do
-        columns :value
-        validates_length_of :value, :minimum => 5
-      end
+    @c1 = Class.new(Sequel::Model) do
+      columns :value
+      validates_length_of :value, :minimum => 5
+    end
     
-      @c2 = Class.new(@c1) do
-        columns :value
-        validates_format_of :value, :with => /^[a-z]+$/
-      end
+    @c2 = Class.new(@c1) do
+      columns :value
+      validates_format_of :value, :with => /^[a-z]+$/
     end
   end
   
-  deprec_specify "should be checked when validating" do
+  specify "should be checked when validating" do
     o = @c2.new
     o.value = 'ab'
     o.valid?.should == false
@@ -662,7 +656,7 @@ context "Superclass validations" do
     o.valid?.should be_true
   end
   
-  deprec_specify "should be skipped if skip_superclass_validations is called" do
+  specify "should be skipped if skip_superclass_validations is called" do
     @c2.skip_superclass_validations
 
     o = @c2.new
@@ -681,7 +675,7 @@ context "Superclass validations" do
 end
 
 context ".validates with block" do
-  deprec_specify "should support calling .each" do
+  specify "should support calling .each" do
     @c = Class.new(Sequel::Model) do
       columns :vvv
       validates do
@@ -722,7 +716,7 @@ describe Sequel::Model, "Validations" do
     end
   end
   
-  deprec_specify "should validate the acceptance of a column" do
+  it "should validate the acceptance of a column" do
     class ::Cow < Sequel::Model
       validations.clear
       validates_acceptance_of :got_milk, :accept => 'blah', :allow_nil => false
@@ -736,7 +730,7 @@ describe Sequel::Model, "Validations" do
     @cow.should be_valid
   end
   
-  deprec_specify "should validate the confirmation of a column" do
+  it "should validate the confirmation of a column" do
     class ::User < Sequel::Model
       def password_confirmation
         "test"
@@ -754,7 +748,7 @@ describe Sequel::Model, "Validations" do
     @user.should be_valid
   end
   
-  deprec_specify "should validate format of column" do
+  it "should validate format of column" do
     class ::Person < Sequel::Model
       validates_format_of :first_name, :with => /^[a-zA-Z]+$/
     end
@@ -765,7 +759,7 @@ describe Sequel::Model, "Validations" do
     @person.valid?.should be_true
   end
   
-  deprec_specify "should validate length of column" do
+  it "should validate length of column" do
     class ::Person < Sequel::Model
       validations.clear
       validates_length_of :first_name, :maximum => 30
@@ -797,7 +791,7 @@ describe Sequel::Model, "Validations" do
     @person.should be_valid
   end
   
-  deprec_specify "should validate that a column doesn't have a string value" do
+  it "should validate that a column doesn't have a string value" do
     p = Class.new(Sequel::Model)
     p.class_eval do
       columns :age, :price, :confirmed
@@ -833,7 +827,7 @@ describe Sequel::Model, "Validations" do
     @person.should be_valid
   end
   
-  deprec_specify "should validate numericality of column" do
+  it "should validate numericality of column" do
     class ::Person < Sequel::Model
       validations.clear
       validates_numericality_of :age
@@ -847,7 +841,7 @@ describe Sequel::Model, "Validations" do
     @person.should be_valid
   end
   
-  deprec_specify "should validate the presence of a column" do
+  it "should validate the presence of a column" do
     class ::Cow < Sequel::Model
       validations.clear
       validates_presence_of :name
@@ -861,7 +855,7 @@ describe Sequel::Model, "Validations" do
     @cow.should be_valid
   end
  
-  deprec_specify "should validate the uniqueness of a column" do
+  it "should validate the uniqueness of a column" do
     class ::User < Sequel::Model
       validations.clear
       validates do
@@ -906,7 +900,7 @@ describe Sequel::Model, "Validations" do
     @user.errors.full_messages.should == []
   end
   
-  deprec_specify "should validate the uniqueness of multiple columns" do
+  it "should validate the uniqueness of multiple columns" do
     class ::User < Sequel::Model
       validations.clear
       validates do
@@ -959,7 +953,7 @@ describe Sequel::Model, "Validations" do
     @user.errors.full_messages.should == []
   end
   
-  deprec_specify "should have a validates block that contains multiple validations" do
+  it "should have a validates block that contains multiple validations" do
     class ::Person < Sequel::Model
       validations.clear
       validates do
@@ -977,7 +971,7 @@ describe Sequel::Model, "Validations" do
     @person2.valid?.should be_true
   end
 
-  deprec_specify "should allow 'longhand' validations direcly within the model." do
+  it "should allow 'longhand' validations direcly within the model." do
     lambda {
       class ::Person < Sequel::Model
         validations.clear
@@ -987,7 +981,7 @@ describe Sequel::Model, "Validations" do
     Person.validations.length.should eql(1)
   end
 
-  deprec_specify "should define a has_validations? method which returns true if the model has validations, false otherwise" do
+  it "should define a has_validations? method which returns true if the model has validations, false otherwise" do
     class ::Person < Sequel::Model
       validations.clear
       validates do
@@ -1004,7 +998,7 @@ describe Sequel::Model, "Validations" do
     Smurf.should_not have_validations
   end
 
-  deprec_specify "should validate correctly instances initialized with string keys" do
+  it "should validate correctly instances initialized with string keys" do
     class ::Can < Sequel::Model
       columns :id, :name
       
@@ -1017,33 +1011,13 @@ describe Sequel::Model, "Validations" do
   
 end
 
-describe "Model#save!" do
-  setup do
-    @c = Class.new(Sequel::Model(:people)) do
-      def columns; [:id]; end
-      
-      validates_each :id do |o, a, v|
-        o.errors[a] << 'blah' unless v == 5
-      end
-    end
-    @m = @c.load(:id => 4)
-    MODEL_DB.reset
-  end
-  
-  deprec_specify "should save regardless of validations" do
-    @m.should_not be_valid
-    @m.save!
-    MODEL_DB.sqls.should == ['UPDATE people SET id = 4 WHERE (id = 4)']
-  end
-end
-
 describe "Model#save" do
   setup do
     @c = Class.new(Sequel::Model(:people)) do
       columns :id
 
-      def validate
-        errors[:id] << 'blah' unless id == 5
+      validates_each :id do |o, a, v|
+        o.errors[a] << 'blah' unless v == 5
       end
     end
     @m = @c.load(:id => 4)

@@ -130,6 +130,11 @@ module Sequel
         @values.each(&block)
       end
   
+      # Returns the validation errors associated with the object.
+      def errors
+        @errors ||= Validation::Errors.new
+      end 
+
       # Returns true when current instance exists, false otherwise.
       def exists?
         this.count > 0
@@ -203,7 +208,7 @@ module Sequel
       # columns to update, in which case it only updates those columns.
       def save(*columns)
         opts = columns.last.is_a?(Hash) ? columns.pop : {}
-        return save_failure(:invalid) unless opts[:validate] == false or valid?
+        return save_failure(:invalid) if opts[:validate] != false and !valid?
         return save_failure(:save) if before_save == false
         if new?
           return save_failure(:create) if before_create == false
@@ -306,7 +311,25 @@ module Sequel
       def update_only(hash, *only)
         update_restricted(hash, only.flatten, false)
       end
-  
+      
+      # Validates the object.  If the object is invalid, errors should be added
+      # to the errors attribute.  By default, does nothing, as all models
+      # are valid by default.
+      def validate
+      end
+
+      # Validates the object and returns true if no errors are reported.
+      def valid?
+        errors.clear
+        if before_validation == false
+          save_failure(:validation)
+          return false
+        end
+        validate
+        after_validation
+        errors.empty?
+      end
+
       private
   
       # Backbone behind association_dataset

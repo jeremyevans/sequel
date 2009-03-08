@@ -450,7 +450,6 @@ module Sequel
 
     extend Enumerable
     extend Metaprogramming
-    extend Associations
     extend ClassMethods
     include Metaprogramming
   end
