@@ -64,7 +64,7 @@ describe Sequel::Model, "dataset & schema" do
     ds.should respond_to(:destroy)
   end
 
-  it "sets schema with implicit table name" do
+  deprec_specify "sets schema with implicit table name" do
     @model.set_schema do
       primary_key :ssn, :string
     end
@@ -72,7 +72,7 @@ describe Sequel::Model, "dataset & schema" do
     @model.table_name.should == :items
   end
 
-  it "sets schema with explicit table name" do
+  deprec_specify "sets schema with explicit table name" do
     @model.set_schema :foo do
       primary_key :id
     end

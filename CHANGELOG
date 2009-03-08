@@ -1,5 +1,7 @@
 === HEAD
 
+* Deprecate Model schema methods, use Model.plugin :schema (jeremyevans)
+
 * Deprecate Model hook class methods, use instance methods instead or Model.plugin :hook_class_methods (jeremyevans)
 
 * Deprecate Model.set_sti_key, use Model.plugin :single_table_inheritance (jeremyevans)
