@@ -57,7 +57,7 @@ describe "Model#save" do
 
   it "should preserve changed_columns' and @new's value until all hook finish running" do
     res = nil
-    @c.after_save { res = [changed_columns, @new].flatten}
+    @c.send(:define_method, :after_save){ res = [changed_columns, @new].flatten}
     o = @c.new(:x => 1, :y => nil)
     o[:x] = 2
     o.save
@@ -142,7 +142,7 @@ describe "Model#save_changes" do
 
   it "should update columns changed in a before_update hook" do
     o = @c.load(:id => 3, :x => 1, :y => nil)
-    @c.before_update{self.x += 1}
+    @c.send(:define_method, :before_update){self.x += 1}
     o.save_changes
     MODEL_DB.sqls.should == []
     o.x = 2
@@ -159,7 +159,7 @@ describe "Model#save_changes" do
 
   it "should update columns changed in a before_save hook" do
     o = @c.load(:id => 3, :x => 1, :y => nil)
-    @c.before_save{self.x += 1}
+    @c.send(:define_method, :before_update){self.x += 1}
     o.save_changes
     MODEL_DB.sqls.should == []
     o.x = 2
@@ -590,7 +590,7 @@ describe Sequel::Model, "#destroy" do
 
   it "should return self" do
     @model.db.should_receive(:transaction)
-    @model.after_destroy{3}
+    @model.send(:define_method, :after_destroy){3}
     @instance.destroy.should == @instance
   end
 
@@ -600,8 +600,8 @@ describe Sequel::Model, "#destroy" do
   end
 
   it "should run before_destroy and after_destroy hooks" do
-    @model.before_destroy {MODEL_DB.execute('before blah')}
-    @model.after_destroy {MODEL_DB.execute('after blah')}
+    @model.send(:define_method, :before_destroy){MODEL_DB.execute('before blah')}
+    @model.send(:define_method, :after_destroy){MODEL_DB.execute('after blah')}
     @instance.destroy
     
     MODEL_DB.sqls.should == [

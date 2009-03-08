@@ -29,6 +29,31 @@ module Sequel
       @str_columns ||= columns.map{|c| c.to_s.freeze}
     end
 
+    def self.set_sti_key(key)
+      Deprecation.deprecate('Sequel::Model.set_sti_key', 'Use Model.plugin(:single_table_inheritance, key)')
+      plugin :single_table_inheritance, key
+    end
+
+    def self.sti_key
+      Deprecation.deprecate('Sequel::Model.sti_key', 'Use Model.plugin(:single_table_inheritance, key) first')
+      @sti_key
+    end
+
+    def self.sti_dataset
+      Deprecation.deprecate('Sequel::Model.sti_dataset', 'Use Model.plugin(:single_table_inheritance, key) first')
+      @sti_dataset
+    end
+
+    def self.set_cache(store, opts = {})
+      Deprecation.deprecate('Sequel::Model.set_cache', 'Use Model.plugin(:caching, store, opts)')
+      plugin :caching, store, opts
+    end
+
+    def self.set_cache_ttl(ttl)
+      Deprecation.deprecate('Sequel::Model.set_cache_ttl', 'Use Model.plugin(:caching, store, opts) first')
+      @cache_ttl = ttl
+    end
+
     def dataset
       Deprecation.deprecate('Sequel::Model#dataset', 'Use model_object.model.dataset')
       model.dataset
@@ -79,7 +104,6 @@ module Sequel
 
     def update_values(values)
       Deprecation.deprecate('Sequel::Model#update_values', 'Use Sequel::Model#update or model_object.this.update')
-      before_update_values
       this.update(set_values(values))
     end
 

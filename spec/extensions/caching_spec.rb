@@ -13,13 +13,11 @@ describe Sequel::Model, "caching" do
     @cache = cache
     
     @c = Class.new(Sequel::Model(:items))
-    deprec do
-      @c.class_eval do
-        set_cache cache
-        def self.name; 'Item' end
+    @c.class_eval do
+      plugin :caching, cache
+      def self.name; 'Item' end
       
-        columns :name, :id
-      end
+      columns :name, :id
     end
     
     $cache_dataset_row = {:name => 'sharon', :id => 1}
@@ -56,7 +54,7 @@ describe Sequel::Model, "caching" do
   end
   
   it "should take a ttl option" do
-    @c.set_cache @cache, :ttl => 1234
+    @c.plugin :caching, @cache, :ttl => 1234
     @c.cache_ttl.should == 1234
     Class.new(@c).cache_ttl.should == 1234
   end
@@ -160,20 +158,6 @@ describe Sequel::Model, "caching" do
     $sqls.last.should == "UPDATE items SET name = 'hey', id = 1 WHERE (id = 1)"
   end
 
-  deprec_specify "should delete the cache when using update_values" do
-    m = @c[1]
-    @cache[m.cache_key].should == m
-    m.update_values(:name => 'tutu')
-    @cache.has_key?(m.cache_key).should be_false
-    $sqls.last.should == "UPDATE items SET name = 'tutu' WHERE (id = 1)"
-    
-    m = @c2[1]
-    @cache[m.cache_key].should == m
-    m.update_values(:name => 'tutu')
-    @cache.has_key?(m.cache_key).should be_false
-    $sqls.last.should == "UPDATE items SET name = 'tutu' WHERE (id = 1)"
-  end
-  
   it "should delete the cache when deleting the record" do
     m = @c[1]
     @cache[m.cache_key].should == m

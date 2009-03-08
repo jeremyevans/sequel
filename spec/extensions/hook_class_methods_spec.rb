@@ -5,7 +5,7 @@ describe "Model hooks" do
     MODEL_DB.reset
   end
   
-  deprec_specify "should be definable using a block" do
+  specify "should be definable using a block" do
     $adds = []
     c = Class.new(Sequel::Model)
     c.class_eval do
@@ -16,7 +16,7 @@ describe "Model hooks" do
     $adds.should == ['hi']
   end
   
-  deprec_specify "should be definable using a method name" do
+  specify "should be definable using a method name" do
     $adds = []
     c = Class.new(Sequel::Model)
     c.class_eval do
@@ -28,7 +28,7 @@ describe "Model hooks" do
     $adds.should == ['bye']
   end
 
-  deprec_specify "should be additive" do
+  specify "should be additive" do
     $adds = []
     c = Class.new(Sequel::Model)
     c.class_eval do
@@ -40,7 +40,7 @@ describe "Model hooks" do
     $adds.should == ['hyiyie', 'byiyie']
   end
   
-  deprec_specify "before hooks should run in reverse order" do
+  specify "before hooks should run in reverse order" do
     $adds = []
     c = Class.new(Sequel::Model)
     c.class_eval do
@@ -52,7 +52,7 @@ describe "Model hooks" do
     $adds.should == ['byiyie', 'hyiyie']
   end
 
-  deprec_specify "should not be additive if the method or tag already exists" do
+  specify "should not be additive if the method or tag already exists" do
     $adds = []
     c = Class.new(Sequel::Model)
     c.class_eval do
@@ -97,7 +97,9 @@ describe "Model hooks" do
     $adds.should == ['bye']
   end
   
-  deprec_specify "should be inheritable" do
+  specify "should be inheritable" do
+    # pending
+    
     $adds = []
     a = Class.new(Sequel::Model)
     a.class_eval do
@@ -114,7 +116,7 @@ describe "Model hooks" do
     $adds.should == ['123', '456', '789']
   end
   
-  deprec_specify "should be overridable in descendant classes" do
+  specify "should be overridable in descendant classes" do
     $adds = []
     a = Class.new(Sequel::Model)
     a.class_eval do
@@ -133,7 +135,7 @@ describe "Model hooks" do
     $adds.should == ['456']
   end
   
-  deprec_specify "should stop processing if a hook returns false" do
+  specify "should stop processing if a hook returns false" do
     $flag = true
     $adds = []
     
@@ -176,7 +178,7 @@ describe "Model#after_initialize" do
     a = Class.new(Sequel::Model)
     a.class_eval do
       columns :x, :y
-      def after_initialize
+      after_initialize do
         $values1 = @values.clone
         $reached_after_initialized = true
       end
@@ -197,14 +199,12 @@ describe "Model#before_create && Model#after_create" do
       columns :x
       no_primary_key
       
-      def after_create
-        MODEL_DB << "BLAH after"
-      end
+      after_create {MODEL_DB << "BLAH after"}
     end
   end
   
   specify "should be called around new record creation" do
-    @c.send(:define_method, :before_create){MODEL_DB << "BLAH before"}
+    @c.before_create {MODEL_DB << "BLAH before"}
     @c.create(:x => 2)
     MODEL_DB.sqls.should == [
       'BLAH before',
@@ -214,14 +214,14 @@ describe "Model#before_create && Model#after_create" do
   end
 
   specify ".create should cancel the save and raise an error if before_create returns false and raise_on_save_failure is true" do
-    @c.send(:define_method, :before_create){false}
+    @c.before_create{false}
     proc{@c.load(:id => 2233).save}.should_not raise_error(Sequel::ValidationFailed)
     proc{@c.create(:x => 2)}.should raise_error(Sequel::BeforeHookFailed)
     MODEL_DB.sqls.should == []
   end
 
   specify ".create should cancel the save and return nil if before_create returns false and raise_on_save_failure is false" do
-    @c.send(:define_method, :before_create){false}
+    @c.before_create{false}
     @c.raise_on_save_failure = false
     @c.create(:x => 2).should == nil
     MODEL_DB.sqls.should == []
@@ -234,12 +234,12 @@ describe "Model#before_update && Model#after_update" do
 
     @c = Class.new(Sequel::Model(:items))
     @c.class_eval do
-      def after_update; MODEL_DB << "BLAH after" end
+      after_update {MODEL_DB << "BLAH after"}
     end
   end
   
   specify "should be called around record update" do
-    @c.send(:define_method, :before_update){MODEL_DB << "BLAH before"}
+    @c.before_update {MODEL_DB << "BLAH before"}
     m = @c.load(:id => 2233)
     m.save
     MODEL_DB.sqls.should == [
@@ -250,14 +250,14 @@ describe "Model#before_update && Model#after_update" do
   end
 
   specify "#save should cancel the save and raise an error if before_update returns false and raise_on_save_failure is true" do
-    @c.send(:define_method, :before_update){false}
+    @c.before_update{false}
     proc{@c.load(:id => 2233).save}.should_not raise_error(Sequel::ValidationFailed)
     proc{@c.load(:id => 2233).save}.should raise_error(Sequel::BeforeHookFailed)
     MODEL_DB.sqls.should == []
   end
 
   specify "#save should cancel the save and return nil if before_update returns false and raise_on_save_failure is false" do
-    @c.send(:define_method, :before_update){false}
+    @c.before_update{false}
     @c.raise_on_save_failure = false
     @c.load(:id => 2233).save.should == nil
     MODEL_DB.sqls.should == []
@@ -271,12 +271,12 @@ describe "Model#before_save && Model#after_save" do
     @c = Class.new(Sequel::Model(:items))
     @c.class_eval do
       columns :x
-      def after_save; MODEL_DB << "BLAH after" end
+      after_save {MODEL_DB << "BLAH after"}
     end
   end
   
   specify "should be called around record update" do
-    @c.send(:define_method, :before_save){MODEL_DB << "BLAH before"}
+    @c.before_save {MODEL_DB << "BLAH before"}
     m = @c.load(:id => 2233)
     m.save
     MODEL_DB.sqls.should == [
@@ -287,7 +287,7 @@ describe "Model#before_save && Model#after_save" do
   end
   
   specify "should be called around record creation" do
-    @c.send(:define_method, :before_save){MODEL_DB << "BLAH before"}
+    @c.before_save {MODEL_DB << "BLAH before"}
     @c.no_primary_key
     @c.create(:x => 2)
     MODEL_DB.sqls.should == [
@@ -298,14 +298,14 @@ describe "Model#before_save && Model#after_save" do
   end
 
   specify "#save should cancel the save and raise an error if before_save returns false and raise_on_save_failure is true" do
-    @c.send(:define_method, :before_save){false}
+    @c.before_save{false}
     proc{@c.load(:id => 2233).save}.should_not raise_error(Sequel::ValidationFailed)
     proc{@c.load(:id => 2233).save}.should raise_error(Sequel::BeforeHookFailed)
     MODEL_DB.sqls.should == []
   end
 
   specify "#save should cancel the save and return nil if before_save returns false and raise_on_save_failure is false" do
-    @c.send(:define_method, :before_save){false}
+    @c.before_save{false}
     @c.raise_on_save_failure = false
     @c.load(:id => 2233).save.should == nil
     MODEL_DB.sqls.should == []
@@ -318,7 +318,7 @@ describe "Model#before_destroy && Model#after_destroy" do
 
     @c = Class.new(Sequel::Model(:items))
     @c.class_eval do
-      def after_destroy; MODEL_DB << "BLAH after"; end
+      after_destroy {MODEL_DB << "BLAH after"}
       
       def delete
         MODEL_DB << "DELETE BLAH"
@@ -327,7 +327,7 @@ describe "Model#before_destroy && Model#after_destroy" do
   end
   
   specify "should be called around record destruction" do
-    @c.send(:define_method, :before_destroy){MODEL_DB << "BLAH before"}
+    @c.before_destroy {MODEL_DB << "BLAH before"}
     m = @c.load(:id => 2233)
     m.destroy
     MODEL_DB.sqls.should == [
@@ -338,13 +338,13 @@ describe "Model#before_destroy && Model#after_destroy" do
   end
 
   specify "#destroy should cancel the destroy and raise an error if before_destroy returns false and raise_on_save_failure is true" do
-    @c.send(:define_method, :before_destroy){false}
+    @c.before_destroy{false}
     proc{@c.load(:id => 2233).destroy}.should raise_error(Sequel::BeforeHookFailed)
     MODEL_DB.sqls.should == []
   end
 
   specify "#destroy should cancel the destroy and return nil if before_destroy returns false and raise_on_save_failure is false" do
-    @c.send(:define_method, :before_destroy){false}
+    @c.before_destroy{false}
     @c.raise_on_save_failure = false
     @c.load(:id => 2233).destroy.should == nil
     MODEL_DB.sqls.should == []
@@ -357,7 +357,7 @@ describe "Model#before_validation && Model#after_validation" do
 
     @c = Class.new(Sequel::Model(:items))
     @c.class_eval do
-      def after_validation; MODEL_DB << "BLAH after" end
+      after_validation{MODEL_DB << "BLAH after"}
 
       def self.validate(o)
         o.errors[:id] << 'not valid' unless o[:id] == 2233
@@ -367,7 +367,7 @@ describe "Model#before_validation && Model#after_validation" do
   end
   
   specify "should be called around validation" do
-    @c.send(:define_method, :before_validation){MODEL_DB << "BLAH before"}
+    @c.before_validation{MODEL_DB << "BLAH before"}
     m = @c.load(:id => 2233)
     m.should be_valid
     MODEL_DB.sqls.should == ['BLAH before', 'BLAH after']
@@ -379,7 +379,7 @@ describe "Model#before_validation && Model#after_validation" do
   end
 
   specify "should be called when calling save" do
-    @c.send(:define_method, :before_validation){MODEL_DB << "BLAH before"}
+    @c.before_validation{MODEL_DB << "BLAH before"}
     m = @c.load(:id => 2233)
     m.save.should == m
     MODEL_DB.sqls.should == ['BLAH before', 'BLAH after', 'UPDATE items SET id = 2233 WHERE (id = 2233)']
@@ -392,14 +392,14 @@ describe "Model#before_validation && Model#after_validation" do
   end
 
   specify "#save should cancel the save and raise an error if before_validation returns false and raise_on_save_failure is true" do
-    @c.send(:define_method, :before_validation){false}
+    @c.before_validation{false}
     proc{@c.load(:id => 2233).save}.should_not raise_error(Sequel::ValidationFailed)
     proc{@c.load(:id => 2233).save}.should raise_error(Sequel::BeforeHookFailed)
     MODEL_DB.sqls.should == []
   end
 
   specify "#save should cancel the save and return nil if before_validation returns false and raise_on_save_failure is false" do
-    @c.send(:define_method, :before_validation){false}
+    @c.before_validation{false}
     @c.raise_on_save_failure = false
     @c.load(:id => 2233).save.should == nil
     MODEL_DB.sqls.should == []
@@ -411,16 +411,16 @@ describe "Model.has_hooks?" do
     @c = Class.new(Sequel::Model(:items))
   end
   
-  deprec_specify "should return false if no hooks are defined" do
+  specify "should return false if no hooks are defined" do
     @c.has_hooks?(:before_save).should be_false
   end
   
-  deprec_specify "should return true if hooks are defined" do
+  specify "should return true if hooks are defined" do
     @c.before_save {'blah'}
     @c.has_hooks?(:before_save).should be_true
   end
   
-  deprec_specify "should return true if hooks are inherited" do
+  specify "should return true if hooks are inherited" do
     @d = Class.new(@c)
     @d.has_hooks?(:before_save).should be_false
   end
@@ -428,31 +428,29 @@ end
 
 describe "Model#add_hook_type" do
   setup do
-    deprec do
-      class Foo < Sequel::Model(:items)
-        add_hook_type :before_bar, :after_bar
+    class Foo < Sequel::Model(:items)
+      add_hook_type :before_bar, :after_bar
 
-        def bar
-          return :b if before_bar == false
-          return :a if after_bar == false
-          true
-        end
+      def bar
+        return :b if before_bar == false
+        return :a if after_bar == false
+        true
       end
     end
     @f = Class.new(Foo)
   end
 
-  deprec_specify "should have before_bar and after_bar class methods" do
+  specify "should have before_bar and after_bar class methods" do
     @f.should respond_to(:before_bar)
     @f.should respond_to(:before_bar)
   end
 
-  deprec_specify "should have before_bar and after_bar instance methods" do
+  specify "should have before_bar and after_bar instance methods" do
     @f.new.should respond_to(:before_bar)
     @f.new.should respond_to(:before_bar)
   end
 
-  deprec_specify "it should return true for bar when before_bar and after_bar hooks are returing true" do
+  specify "it should return true for bar when before_bar and after_bar hooks are returing true" do
     a = 1
     @f.before_bar { a += 1}
     @f.new.bar.should be_true
@@ -462,7 +460,7 @@ describe "Model#add_hook_type" do
     a.should == 6
   end
 
-  deprec_specify "it should return nil for bar when before_bar and after_bar hooks are returing false" do
+  specify "it should return nil for bar when before_bar and after_bar hooks are returing false" do
     @f.new.bar.should be_true
     @f.after_bar { false }
     @f.new.bar.should == :a

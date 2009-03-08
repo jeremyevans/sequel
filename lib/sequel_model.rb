@@ -43,9 +43,8 @@ module Sequel
   # * The following instance_methods all call the class method of the same
   #   name: columns, dataset, db, primary_key, db_schema.
   # * The following class level attr_readers are created: allowed_columns,
-  #   cache_store, cache_ttl, dataset_methods, primary_key, restricted_columns,
-  #   sti_dataset, and sti_key.  You should not usually need to
-  #   access these directly.
+  #   dataset_methods, primary_key, and restricted_columns.
+  #   You should not usually need to  access these directly.
   # * All validation methods also accept the options specified in #validates_each,
   #   in addition to the options specified in the RDoc for that method.
   # * The following class level attr_accessors are created: raise_on_typecast_failure,
@@ -81,11 +80,60 @@ module Sequel
   #   * Model.dataset= => set_dataset
   #   * Model.is_a => is
   class Model
+    # Dataset methods to proxy via metaprogramming
+    DATASET_METHODS = %w'<< all avg count delete distinct eager eager_graph each each_page 
+       empty? except exclude filter first from from_self full_outer_join get graph 
+       group group_and_count group_by having inner_join insert 
+       insert_multiple intersect interval join join_table last 
+       left_outer_join limit map multi_insert naked order order_by order_more 
+       paginate print query range reverse_order right_outer_join select 
+       select_all select_more server set set_graph_aliases single_value to_csv to_hash
+       transform union unfiltered unordered update where with_sql'.map{|x| x.to_sym}
+  
+    # Empty instance variables, for -w compliance
+    EMPTY_INSTANCE_VARIABLES = [:@overridable_methods_module, :@transform, :@db, :@skip_superclass_validations]
+
+    # Hooks that are safe for public use
+    HOOKS = [:after_initialize, :before_create, :after_create, :before_update,
+      :after_update, :before_save, :after_save, :before_destroy, :after_destroy,
+      :before_validation, :after_validation]
+
+    # Instance variables that are inherited in subclasses
+    INHERITED_INSTANCE_VARIABLES = {:@allowed_columns=>:dup, :@dataset_methods=>:dup, :@primary_key=>nil, 
+      :@raise_on_save_failure=>nil, :@restricted_columns=>:dup, :@restrict_primary_key=>nil,
+      :@simple_pk=>nil, :@simple_table=>nil, :@strict_param_setting=>nil,
+      :@typecast_empty_string_to_nil=>nil, :@typecast_on_assignment=>nil,
+      :@raise_on_typecast_failure=>nil, :@association_reflections=>:dup}
+
+    # The setter methods (methods ending with =) that are never allowed
+    # to be called automatically via set.
+    RESTRICTED_SETTER_METHODS = %w"== === []= taguri= typecast_empty_string_to_nil= typecast_on_assignment= strict_param_setting= raise_on_save_failure= raise_on_typecast_failure="
+
+    @allowed_columns = nil
+    @association_reflections = {}
+    @cache_store = nil
+    @cache_ttl = nil
+    @db = nil
+    @db_schema = nil
+    @dataset_methods = {}
+    @overridable_methods_module = nil
+    @primary_key = :id
+    @raise_on_save_failure = true
+    @raise_on_typecast_failure = true
+    @restrict_primary_key = true
+    @restricted_columns = nil
+    @simple_pk = nil
+    @simple_table = nil
+    @skip_superclass_validations = nil
+    @strict_param_setting = true
+    @transform = nil
+    @typecast_empty_string_to_nil = true
+    @typecast_on_assignment = true
   end
 end
 
-%w"inflector record association_reflection associations base hooks schema dataset_methods 
-  caching plugins validations eager_loading exceptions deprecated".each do |f|
+%w"inflector plugins record association_reflection associations base hooks schema dataset_methods 
+  caching validations eager_loading exceptions deprecated".each do |f|
   require "sequel_model/#{f}"
 end
 

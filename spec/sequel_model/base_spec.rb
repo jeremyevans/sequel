@@ -475,8 +475,8 @@ describe Sequel::Model, ".[] optimization" do
     Class.new(@c).simple_table.should == "'b'"
   end
 
-  it "should have simple_table = nil if inheriting and sti_key is set" do
-    @c.set_sti_key :x
+  specify "should have simple_table = nil if inheriting and sti_key is set" do
+    @c.plugin :single_table_inheritance, :x
     Class.new(@c).simple_table.should == nil
   end
 

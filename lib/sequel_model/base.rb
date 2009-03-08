@@ -1,52 +1,5 @@
 module Sequel
   class Model
-
-    # Dataset methods to proxy via metaprogramming
-    DATASET_METHODS = %w'<< all avg count delete distinct eager eager_graph each each_page 
-       empty? except exclude filter first from from_self full_outer_join get graph 
-       group group_and_count group_by having inner_join insert 
-       insert_multiple intersect interval join join_table last 
-       left_outer_join limit map multi_insert naked order order_by order_more 
-       paginate print query range reverse_order right_outer_join select 
-       select_all select_more server set set_graph_aliases single_value to_csv to_hash
-       transform union unfiltered unordered update where with_sql'.map{|x| x.to_sym}
-  
-    # Instance variables that are inherited in subclasses
-    INHERITED_INSTANCE_VARIABLES = {:@allowed_columns=>:dup, :@cache_store=>nil,
-      :@cache_ttl=>nil, :@dataset_methods=>:dup, :@primary_key=>nil, 
-      :@raise_on_save_failure=>nil, :@restricted_columns=>:dup, :@restrict_primary_key=>nil,
-      :@simple_pk=>nil, :@simple_table=>nil,
-      :@sti_dataset=>nil, :@sti_key=>nil, :@strict_param_setting=>nil,
-      :@typecast_empty_string_to_nil=>nil, :@typecast_on_assignment=>nil,
-      :@raise_on_typecast_failure=>nil, :@association_reflections=>:dup}
-      
-    # Empty instance variables, for -w compliance
-    EMPTY_INSTANCE_VARIABLES = [:@overridable_methods_module, :@transform, :@db, :@skip_superclass_validations]
-
-    @allowed_columns = nil
-    @association_reflections = {}
-    @cache_store = nil
-    @cache_ttl = nil
-    @db = nil
-    @db_schema = nil
-    @dataset_methods = {}
-    @hooks = {}
-    @overridable_methods_module = nil
-    @primary_key = :id
-    @raise_on_save_failure = true
-    @raise_on_typecast_failure = true
-    @restrict_primary_key = true
-    @restricted_columns = nil
-    @simple_pk = nil
-    @simple_table = nil
-    @skip_superclass_validations = nil
-    @sti_dataset = nil
-    @sti_key = nil
-    @strict_param_setting = true
-    @transform = nil
-    @typecast_empty_string_to_nil = true
-    @typecast_on_assignment = true
-
     module ClassMethods
       # Which columns should be the only columns allowed in a call to set
       # (default: all columns).
@@ -81,13 +34,6 @@ module Sequel
       # Should be the literal table name if this Model's dataset is a simple table (no select, order, join, etc.),
       # or nil otherwise.
       attr_reader :simple_table
-  
-      # The base dataset for STI, to which filters are added to get
-      # only the models for the specific STI subclass.
-      attr_reader :sti_dataset
-  
-      # The column name holding the STI key for this model
-      attr_reader :sti_key
   
       # Whether new/set/update and their variants should raise an error
       # if an invalid key is used (either that doesn't exist or that
@@ -208,29 +154,26 @@ module Sequel
       # is created.  Also, inherit the INHERITED_INSTANCE_VARIABLES
       # from the parent class.
       def inherited(subclass)
-        sup_class = subclass.superclass
         ivs = subclass.instance_variables.collect{|x| x.to_s}
         EMPTY_INSTANCE_VARIABLES.each{|iv| subclass.instance_variable_set(iv, nil) unless ivs.include?(iv.to_s)}
         INHERITED_INSTANCE_VARIABLES.each do |iv, dup|
           next if ivs.include?(iv.to_s)
-          sup_class_value = sup_class.instance_variable_get(iv)
+          sup_class_value = instance_variable_get(iv)
           sup_class_value = sup_class_value.dup if dup == :dup && sup_class_value
           subclass.instance_variable_set(iv, sup_class_value)
         end
         unless ivs.include?("@dataset")
           db
           begin
-            if sup_class == Model
+            if self == Model
               subclass.set_dataset(subclass.implicit_table_name) unless subclass.name.blank?
-            elsif ds = sup_class.instance_variable_get(:@dataset)
-              subclass.set_dataset(sup_class.sti_key ? sup_class.sti_dataset.filter(sup_class.sti_key=>subclass.name.to_s) : ds.clone, :inherited=>true)
+            elsif ds = instance_variable_get(:@dataset)
+              subclass.set_dataset(ds.clone, :inherited=>true)
             end
           rescue
             nil
           end
         end
-        hooks = subclass.instance_variable_set(:@hooks, {})
-        sup_class.instance_variable_get(:@hooks).each{|k,v| hooks[k] = v.dup}
       end
     
       # Returns the implicit table name for the model class.
@@ -339,7 +282,7 @@ module Sequel
         @dataset.row_proc = Proc.new{|r| load(r)}
         @dataset.transform(@transform) if @transform
         if inherited
-          @simple_table = sti_key ? nil : superclass.simple_table
+          @simple_table = superclass.simple_table
           @columns = @dataset.columns rescue nil
         else
           @dataset.extend(DatasetMethods)
@@ -381,29 +324,6 @@ module Sequel
       # only certain columns may be allowed.
       def set_restricted_columns(*cols)
         @restricted_columns = cols
-      end
-  
-      # Makes this model a polymorphic model with the given key being a string
-      # field in the database holding the name of the class to use.  If the
-      # key given has a NULL value or there are any problems looking up the
-      # class, uses the current class.
-      #
-      # This should be used to set up single table inheritance for the model,
-      # and it only makes sense to use this in the parent class.
-      #
-      # You should call sti_key after any calls to set_dataset in the model,
-      # otherwise subclasses might not have the filters set up correctly.
-      #
-      # The filters and row_proc that sti_key sets up in subclasses will not work if
-      # those subclasses have further subclasses.  For those middle subclasses,
-      # you will need to call set_dataset manually with the correct filter and
-      # row_proc.
-      def set_sti_key(key)
-        m = self
-        @sti_key = key
-        @sti_dataset = dataset
-        dataset.row_proc = Proc.new{|r| (r[key].constantize rescue m).load(r)}
-        before_create(:set_sti_key){send("#{key}=", model.name.to_s)}
       end
   
       # Defines a method that returns a filtered dataset.  Subsets

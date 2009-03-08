@@ -1,10 +1,8 @@
 module Sequel
   class Model
-    # The setter methods (methods ending with =) that are never allowed
-    # to be called automatically via set.
-    RESTRICTED_SETTER_METHODS = %w"== === []= taguri= typecast_empty_string_to_nil= typecast_on_assignment= strict_param_setting= raise_on_save_failure= raise_on_typecast_failure="
-
     module InstanceMethods
+      HOOKS.each{|h| class_eval("def #{h}; end", __FILE__, __LINE__)}
+
       # Define instance method(s) that calls class method(s) of the
       # same name, caching the result in an instance variable.  Define
       # standard attr_writer method for modifying that instance variable
@@ -107,7 +105,6 @@ module Sequel
       # Deletes and returns self.  Does not run destroy hooks.
       # Look into using destroy instead.
       def delete
-        before_delete
         this.delete
         self
       end

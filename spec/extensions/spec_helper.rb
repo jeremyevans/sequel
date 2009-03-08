@@ -10,30 +10,11 @@ end
 
 Sequel.virtual_row_instance_eval = true
 
-module Spec::Example::ExampleMethods
-  def deprec
-    output = Sequel::Deprecation.output = nil
-    begin
-      yield
-    ensure
-      Sequel::Deprecation.output = output
-    end
-  end
-end
+extensions = %w'string_date_time'
+plugins = {:hook_class_methods=>[]}
 
-module Spec::Example::ExampleGroupMethods
-  def deprec_specify(*args, &block)
-    specify(*args) do
-      output = Sequel::Deprecation.output
-      Sequel::Deprecation.output = nil
-      begin
-        instance_eval(&block)
-      ensure
-        Sequel::Deprecation.output = output
-      end
-    end
-  end
-end
+extensions.each{|e| require "sequel/extensions/#{e}"}
+plugins.each{|p, opts| Sequel::Model.plugin(p, *opts)}
 
 class MockDataset < Sequel::Dataset
   def insert(*args)

@@ -98,6 +98,7 @@ lib_dir = File.join(File.dirname(__FILE__), 'lib')
 fixRUBYLIB = Proc.new{ENV['RUBYLIB'] ? (ENV['RUBYLIB'] += ":#{lib_dir}") : (ENV['RUBYLIB'] = lib_dir)}
 sequel_core_specs = "spec/sequel_core/*_spec.rb"
 sequel_model_specs = "spec/sequel_model/*_spec.rb"
+sequel_plugin_specs = "spec/extensions/*_spec.rb"
 spec_opts = proc{File.read("spec/spec.opts").split("\n")}
 rcov_opts = proc{File.read("spec/rcov.opts").split("\n")}
 
@@ -129,6 +130,13 @@ desc "Run model specs"
 Spec::Rake::SpecTask.new("spec_model") do |t|
   fixRUBYLIB.call
   t.spec_files = FileList[sequel_model_specs]
+  t.spec_opts  = spec_opts.call
+end
+
+desc "Run extension/plugin specs"
+Spec::Rake::SpecTask.new("spec_plugin") do |t|
+  fixRUBYLIB.call
+  t.spec_files = FileList[sequel_plugin_specs]
   t.spec_opts  = spec_opts.call
 end
 

@@ -5,7 +5,7 @@ module Sequel::Plugins
   module Timestamped
     def self.apply(m, opts)
       m.meta_def(:stamp_opts) {opts}
-      m.before_save {@values[:stamp] = Time.now}
+      m.send(:define_method, :before_save){@values[:stamp] = Time.now}
     end
     
     module InstanceMethods
