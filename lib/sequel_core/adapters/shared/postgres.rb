@@ -413,8 +413,15 @@ module Sequel
       end
       
       # PostgreSQL supports multi-level transactions using save points.
-      def transaction(server=nil)
-        synchronize(server) do |conn|
+      # To use a savepoint instead of reusing the current transaction,
+      # use the :savepoint=>true option.
+      def transaction(opts={})
+        unless opts.is_a?(Hash)
+          Deprecation.deprecate('Passing an argument other than a Hash to Database#transaction', "Use DB.transaction(:server=>#{opts.inspect})") 
+          opts = {:server=>opts}
+        end
+        synchronize(opts[:server]) do |conn|
+          return yield(conn) if @transactions.include?(Thread.current) and !opts[:savepoint]
           conn.transaction_depth = 0 if conn.transaction_depth.nil?
           if conn.transaction_depth > 0
             log_info(SQL_SAVEPOINT % conn.transaction_depth)
@@ -425,6 +432,7 @@ module Sequel
           end
           begin
             conn.transaction_depth += 1
+            @transactions << Thread.current
             yield conn
           rescue ::Exception => e
             if conn.transaction_depth > 1
@@ -441,6 +449,7 @@ module Sequel
                 if conn.transaction_depth < 2
                   log_info(SQL_COMMIT)
                   conn.execute(SQL_COMMIT)
+                  @transactions.delete(Thread.current)
                 else
                   log_info(SQL_RELEASE_SAVEPOINT % [conn.transaction_depth - 1])
                   conn.execute(SQL_RELEASE_SAVEPOINT % [conn.transaction_depth - 1])

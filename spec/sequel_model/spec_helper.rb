@@ -82,7 +82,7 @@ class MockDatabase < Sequel::Database
     end
   end
 
-   def transaction(*args)
+   def transaction(opts={})
     return yield if @transactions.include?(Thread.current)
     execute('BEGIN')
     begin

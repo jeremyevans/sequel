@@ -2511,7 +2511,7 @@ context "Dataset#multi_insert" do
       end
       alias execute_dui execute
       
-      def transaction
+      def transaction(opts={})
         @sqls ||= []
         @sqls << 'BEGIN'
         yield

@@ -155,7 +155,7 @@ module Sequel
       if slice_size
         values.each_slice(slice_size) do |slice|
           statements = multi_insert_sql(columns, slice)
-          @db.transaction{statements.each{|st| execute_dui(st)}}
+          @db.transaction(opts){statements.each{|st| execute_dui(st)}}
         end
       else
         statements = multi_insert_sql(columns, values)

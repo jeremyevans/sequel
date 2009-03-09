@@ -36,7 +36,7 @@ module Sequel
         ds.identifier_output_method = :downcase
         schema, table = schema_and_table(table)
         table_schema = []
-        metadata = transaction {|conn| conn.describe_table(table.to_s)}
+        metadata = transaction(opts){|conn| conn.describe_table(table.to_s)}
         metadata.columns.each do |column|
           table_schema << [
             column.name.downcase.to_sym,
@@ -77,10 +77,13 @@ module Sequel
       end
       alias_method :do, :execute
       
-      def transaction(server=nil)
-        synchronize(server) do |conn|
+      def transaction(opts={})
+        unless opts.is_a?(Hash)
+          Deprecation.deprecate('Passing an argument other than a Hash to Database#transaction', "Use DB.transaction(:server=>#{opts.inspect})") 
+          opts = {:server=>opts}
+        end
+        synchronize(opts[:server]) do |conn|
           return yield(conn) if @transactions.include?(Thread.current)
-          
           conn.autocommit = false
           begin
             @transactions << Thread.current

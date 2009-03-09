@@ -54,7 +54,7 @@ class MockDatabase < Sequel::Database
     @sqls = []
   end
 
-  def transaction; yield; end
+  def transaction(opts={}); yield; end
   
   def dataset; MockDataset.new(self); end
 end

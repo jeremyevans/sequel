@@ -655,7 +655,7 @@ module Sequel
         else
           use_transactions
         end
-        use_transaction ? db.transaction{_save(columns, opts)} : _save(columns, opts)
+        use_transaction ? db.transaction(opts){_save(columns, opts)} : _save(columns, opts)
       end
 
       # Saves only changed columns or does nothing if no columns are marked as 

@@ -105,8 +105,12 @@ module Sequel
       end
       
       # Support single level transactions on MySQL.
-      def transaction(server=nil)
-        synchronize(server) do |conn|
+      def transaction(opts={})
+        unless opts.is_a?(Hash)
+          Deprecation.deprecate('Passing an argument other than a Hash to Database#transaction', "Use DB.transaction(:server=>#{opts.inspect})") 
+          opts = {:server=>opts}
+        end
+        synchronize(opts[:server]) do |conn|
           return yield(conn) if @transactions.include?(Thread.current)
           log_info(begin_transaction_sql)
           conn.query(begin_transaction_sql)

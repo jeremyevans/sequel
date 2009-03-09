@@ -1,5 +1,9 @@
 === HEAD
 
+* Don't use savepoints by default on PostgreSQL, use the :savepoint option to Database#transaction to use a savepoint (jeremyevans)
+
+* Deprecate Database#transaction accepting a server symbol argument, use an options hash with the :server option (jeremyevans)
+
 * Add Model.use_transactions for setting whether models should use transactions when destroying/saving records (jeremyevans, mjwillson)
 
 * Deprecate Model::Validation::Errors, use Model::Errors (jeremyevans)

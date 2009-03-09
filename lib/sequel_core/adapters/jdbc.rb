@@ -196,8 +196,12 @@ module Sequel
       # Default transaction method that should work on most JDBC
       # databases.  Does not use the JDBC transaction methods, uses
       # SQL BEGIN/ROLLBACK/COMMIT statements instead.
-      def transaction(server=nil)
-        synchronize(server) do |conn|
+      def transaction(opts={})
+        unless opts.is_a?(Hash)
+          Deprecation.deprecate('Passing an argument other than a Hash to Database#transaction', "Use DB.transaction(:server=>#{opts.inspect})") 
+          opts = {:server=>opts}
+        end
+        synchronize(opts[:server]) do |conn|
           return yield(conn) if @transactions.include?(Thread.current)
           stmt = conn.createStatement
           begin

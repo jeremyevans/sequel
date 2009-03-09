@@ -180,8 +180,12 @@ module Sequel
         block_given? ? yield(ds) : ds.map{|r| ds.send(:output_identifier, r[:"rdb$relation_name"])}
       end
 
-      def transaction(server=nil)
-        synchronize(server) do |conn|
+      def transaction(opts={})
+        unless opts.is_a?(Hash)
+          Deprecation.deprecate('Passing an argument other than a Hash to Database#transaction', "Use DB.transaction(:server=>#{opts.inspect})") 
+          opts = {:server=>opts}
+        end
+        synchronize(opts[:server]) do |conn|
           return yield(conn) if @transactions.include?(Thread.current)
           log_info("Transaction.begin")
           conn.transaction

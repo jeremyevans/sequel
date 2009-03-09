@@ -501,7 +501,7 @@ module Sequel
                   send(opts.add_method, o)
                   klass.filter(Sequel::SQL::BooleanExpression.new(:AND, {key=>send(primary_key)}, ~{klass.primary_key=>o.pk}.sql_expr)).update(key=>nil)
                 end
-                use_transactions ? db.transaction{update_database.call} : update_database.call
+                use_transactions ? db.transaction(opts){update_database.call} : update_database.call
               end
             end
           end

@@ -86,8 +86,12 @@ module Sequel
       # Use the native driver transaction method if there isn't already a transaction
       # in progress on the connection, always yielding a connection inside a transaction
       # transaction.
-      def transaction(server=nil, &block)
-        synchronize(server) do |conn|
+      def transaction(opts={})
+        unless opts.is_a?(Hash)
+          Deprecation.deprecate('Passing an argument other than a Hash to Database#transaction', "Use DB.transaction(:server=>#{opts.inspect})") 
+          opts = {:server=>opts}
+        end
+        synchronize(opts[:server]) do |conn|
           return yield(conn) if conn.transaction_active?
           begin
             result = nil

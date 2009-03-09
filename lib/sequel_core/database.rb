@@ -460,8 +460,12 @@ module Sequel
     # supported - calling #transaction within a transaction will reuse the 
     # current transaction. Should be overridden for databases that support nested 
     # transactions.
-    def transaction(server=nil)
-      synchronize(server) do |conn|
+    def transaction(opts={})
+      unless opts.is_a?(Hash)
+        Deprecation.deprecate('Passing an argument other than a Hash to Database#transaction', "Use DB.transaction(:server=>#{opts.inspect})") 
+        opts = {:server=>opts}
+      end
+      synchronize(opts[:server]) do |conn|
         return yield(conn) if @transactions.include?(Thread.current)
         log_info(begin_transaction_sql)
         conn.execute(begin_transaction_sql)

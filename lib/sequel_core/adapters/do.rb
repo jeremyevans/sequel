@@ -120,9 +120,13 @@ module Sequel
       # only supports single level transactions, and it always prepares
       # transactions and commits them immediately after.  It's wasteful,
       # but required by DataObject's API.
-      def transaction(server=nil)
+      def transaction(opts={})
+        unless opts.is_a?(Hash)
+          Deprecation.deprecate('Passing an argument other than a Hash to Database#transaction', "Use DB.transaction(:server=>#{opts.inspect})") 
+          opts = {:server=>opts}
+        end
         th = Thread.current
-        synchronize(server) do |conn|
+        synchronize(opts[:server]) do |conn|
           return yield(conn) if @transactions.include?(th)
           t = ::DataObjects::Transaction.create_for_uri(uri)
           t.instance_variable_get(:@connection).close
