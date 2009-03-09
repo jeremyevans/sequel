@@ -55,12 +55,10 @@ module Sequel
       # Returns the first record from the database matching the conditions.
       # If a hash is given, it is used as the conditions.  If another
       # object is given, it finds the first record whose primary key(s) match
-      # the given argument(s).  If caching is used, the cache is checked
-      # first before a dataset lookup is attempted unless a hash is supplied.
+      # the given argument(s).  
       def [](*args)
         args = args.first if (args.size == 1)
         return dataset[args] if args.is_a?(Hash)
-        return cache_lookup(args) if @cache_store
         if t = simple_table and p = simple_pk
           with_sql("SELECT * FROM #{t} WHERE #{p} = #{dataset.literal(args)} LIMIT 1").first
         else
