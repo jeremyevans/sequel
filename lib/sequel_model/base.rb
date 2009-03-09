@@ -178,7 +178,7 @@ module Sequel
     
       # Returns the implicit table name for the model class.
       def implicit_table_name
-        name.demodulize.underscore.pluralize.to_sym
+        pluralize(underscore(demodulize(name))).to_sym
       end
   
       # Initializes a model instance as an existing record. This constructor is
@@ -449,6 +449,7 @@ module Sequel
     end
 
     extend Enumerable
+    extend Inflections
     extend Metaprogramming
     extend ClassMethods
     include Metaprogramming

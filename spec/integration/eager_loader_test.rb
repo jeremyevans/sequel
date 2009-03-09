@@ -368,9 +368,10 @@ describe "Polymorphic Associations" do
       text :attachable_type
     end
     class ::Asset < Sequel::Model
+      m = method(:constantize)
       many_to_one :attachable, :reciprocal=>:assets, \
         :dataset=>(proc do
-          klass = attachable_type.constantize
+          klass = m.call(attachable_type)
           klass.filter(klass.primary_key=>attachable_id)
         end), \
         :eager_loader=>(proc do |key_hash, assets, associations|
@@ -380,7 +381,7 @@ describe "Polymorphic Associations" do
             ((id_map[asset.attachable_type] ||= {})[asset.attachable_id] ||= []) << asset
           end 
           id_map.each do |klass_name, id_map|
-            klass = klass_name.constantize
+            klass = m.call(klass_name)
             klass.filter(klass.primary_key=>id_map.keys).all do |attach|
               id_map[attach.pk].each do |asset|
                 asset.associations[:attachable] = attach

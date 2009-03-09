@@ -32,6 +32,8 @@ class String
     #   clear :all
     #   clear :plurals
     def self.clear(scope = :all)
+      Sequel::Deprecation.deprecate('String::Inflections.clear', 'require "sequel/extensions/inflector" first')
+      Sequel::Inflections.clear(scope)
       case scope
       when :all
         @plurals, @singulars, @uncountables = [], [], []
@@ -47,6 +49,8 @@ class String
     #   irregular 'octopus', 'octopi'
     #   irregular 'person', 'people'
     def self.irregular(singular, plural)
+      Sequel::Deprecation.deprecate('String::Inflections.irregular', 'require "sequel/extensions/inflector" first')
+      Sequel::Inflections.irregular(singular, plural)
       plural(Regexp.new("(#{singular[0,1]})#{singular[1..-1]}$", "i"), '\1' + plural[1..-1])
       singular(Regexp.new("(#{plural[0,1]})#{plural[1..-1]}$", "i"), '\1' + singular[1..-1])
     end
@@ -57,6 +61,8 @@ class String
     # Example:
     #   plural(/(x|ch|ss|sh)$/i, '\1es')
     def self.plural(rule, replacement)
+      Sequel::Deprecation.deprecate('String::Inflections.plural', 'require "sequel/extensions/inflector" first')
+      Sequel::Inflections.plural(rule, replacement)
       @plurals.insert(0, [rule, replacement])
     end
 
@@ -66,6 +72,8 @@ class String
     # Example:
     #   singular(/([^aeiouy]|qu)ies$/i, '\1y') 
     def self.singular(rule, replacement)
+      Sequel::Deprecation.deprecate('String::Inflections.singular', 'require "sequel/extensions/inflector" first')
+      Sequel::Inflections.singular(rule, replacement)
       @singulars.insert(0, [rule, replacement])
     end
 
@@ -76,9 +84,13 @@ class String
     #   uncountable "money", "information"
     #   uncountable %w( money information rice )
     def self.uncountable(*words)
+      Sequel::Deprecation.deprecate('String::Inflections.uncountable', 'require "sequel/extensions/inflector" first')
+      Sequel::Inflections.uncountable(*words)
       (@uncountables << words).flatten!
     end
 
+    output = Sequel::Deprecation.output
+    Sequel::Deprecation.output = nil
     # Setup the default inflections
     plural(/$/, 's')
     plural(/s$/i, 's')
@@ -130,11 +142,13 @@ class String
     irregular('move', 'moves')
 
     uncountable(%w(equipment information rice money species series fish sheep))
+    Sequel::Deprecation.output = output
   end
 
   # Yield the Inflections module if a block is given, and return
   # the Inflections module.
   def self.inflections
+    Sequel::Deprecation.deprecate('String.inflections', 'require "sequel/extensions/inflector" first')
     yield Inflections if block_given?
     Inflections
   end
@@ -150,6 +164,7 @@ class String
   #   "active_record/errors".camelize #=> "ActiveRecord::Errors"
   #   "active_record/errors".camelize(:lower) #=> "activeRecord::Errors"
   def camelize(first_letter_in_uppercase = :upper)
+    Sequel::Deprecation.deprecate('String#camelize', 'require "sequel/extensions/inflector" first')
     s = gsub(/\/(.?)/){|x| "::#{x[-1..-1].upcase unless x == '/'}"}.gsub(/(^|_)(.)/){|x| x[-1..-1].upcase}
     s[0...1] = s[0...1].downcase unless first_letter_in_uppercase == :upper
     s
@@ -164,6 +179,7 @@ class String
   #   "post".classify #=> "Post"
   #   "schema.post".classify #=> "Post"
   def classify
+    Sequel::Deprecation.deprecate('String#classify', 'require "sequel/extensions/inflector" first')
     sub(/.*\./, '').singularize.camelize
   end
 
@@ -175,6 +191,7 @@ class String
   #   "Module".constantize #=> Module
   #   "Class".constantize #=> Class
   def constantize
+    Sequel::Deprecation.deprecate('String#constantize', 'require "sequel/extensions/inflector" first')
     raise(NameError, "#{inspect} is not a valid constant name!") unless m = /\A(?:::)?([A-Z]\w*(?:::[A-Z]\w*)*)\z/.match(self)
     Object.module_eval("::#{m[1]}", __FILE__, __LINE__)
   end
@@ -184,6 +201,7 @@ class String
   # Example
   #   "puni_puni".dasherize #=> "puni-puni"
   def dasherize
+    Sequel::Deprecation.deprecate('String#dasherize', 'require "sequel/extensions/inflector" first')
     gsub(/_/, '-')
   end
 
@@ -193,6 +211,7 @@ class String
   #   "ActiveRecord::CoreExtensions::String::Inflections".demodulize #=> "Inflections"
   #   "Inflections".demodulize #=> "Inflections"
   def demodulize
+    Sequel::Deprecation.deprecate('String#demodulize', 'require "sequel/extensions/inflector" first')
     gsub(/^.*::/, '')
   end
 
@@ -204,6 +223,7 @@ class String
   #   "Message".foreign_key(false) #=> "messageid"
   #   "Admin::Post".foreign_key #=> "post_id"
   def foreign_key(use_underscore = true)
+    Sequel::Deprecation.deprecate('String#foreign_key', 'require "sequel/extensions/inflector" first')
     "#{demodulize.underscore}#{'_' if use_underscore}id"
   end
 
@@ -214,6 +234,7 @@ class String
   #   "employee_salary" #=> "Employee salary"
   #   "author_id" #=> "Author"
   def humanize
+    Sequel::Deprecation.deprecate('String#humanize', 'require "sequel/extensions/inflector" first')
     gsub(/_id$/, "").gsub(/_/, " ").capitalize
   end
 
@@ -227,6 +248,7 @@ class String
   #   "the blue mailman".pluralize #=> "the blue mailmen"
   #   "CamelOctopus".pluralize #=> "CamelOctopi"
   def pluralize
+    Sequel::Deprecation.deprecate('String#pluralize', 'require "sequel/extensions/inflector" first')
     result = dup
     Inflections.plurals.each{|(rule, replacement)| break if result.gsub!(rule, replacement)} unless Inflections.uncountables.include?(downcase)
     result
@@ -242,6 +264,7 @@ class String
   #   "the blue mailmen".singularize #=> "the blue mailman"
   #   "CamelOctopi".singularize #=> "CamelOctopus"
   def singularize
+    Sequel::Deprecation.deprecate('String#singularize', 'require "sequel/extensions/inflector" first')
     result = dup
     Inflections.singulars.each{|(rule, replacement)| break if result.gsub!(rule, replacement)} unless Inflections.uncountables.include?(downcase)
     result
@@ -254,6 +277,7 @@ class String
   #   "egg_and_ham".tableize #=> "egg_and_hams"
   #   "fancyCategory".tableize #=> "fancy_categories"
   def tableize
+    Sequel::Deprecation.deprecate('String#tableize', 'require "sequel/extensions/inflector" first')
     underscore.pluralize
   end
 
@@ -266,6 +290,7 @@ class String
   #   "man from the boondocks".titleize #=> "Man From The Boondocks"
   #   "x-men: the last stand".titleize #=> "X Men: The Last Stand"
   def titleize
+    Sequel::Deprecation.deprecate('String#titleize', 'require "sequel/extensions/inflector" first')
     underscore.humanize.gsub(/\b([a-z])/){|x| x[-1..-1].upcase}
   end
   alias_method :titlecase, :titleize
@@ -277,6 +302,7 @@ class String
   #   "ActiveRecord".underscore #=> "active_record"
   #   "ActiveRecord::Errors".underscore #=> active_record/errors
   def underscore
+    Sequel::Deprecation.deprecate('String#underscore', 'require "sequel/extensions/inflector" first')
     gsub(/::/, '/').gsub(/([A-Z]+)([A-Z][a-z])/,'\1_\2').
       gsub(/([a-z\d])([A-Z])/,'\1_\2').tr("-", "_").downcase
   end

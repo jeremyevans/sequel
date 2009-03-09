@@ -19,10 +19,11 @@ module Sequel
       # dataset's row_proc so that the dataset yields objects of varying classes,
       # where the class used has the same name as the key field.
       def self.apply(model, key)
+        m = model.method(:constantize)
         model.instance_eval do
           @sti_key = key 
           @sti_dataset = dataset
-          dataset.row_proc = Proc.new{|r| (r[key].constantize rescue model).load(r)}
+          dataset.row_proc = lambda{|r| (m.call(r[key]) rescue model).load(r)}
         end
       end
 

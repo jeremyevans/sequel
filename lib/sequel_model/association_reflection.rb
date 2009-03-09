@@ -6,9 +6,11 @@ module Sequel::Model::Associations
   # provides methods to reduce internal code duplication.  It should not
   # be instantiated by the user.
   class AssociationReflection < Hash
+    include Sequel::Inflections
+
     # Name symbol for _add_ internal association method
     def _add_method
-      :"_add_#{self[:name].to_s.singularize}"
+      :"_add_#{singularize(self[:name])}"
     end
   
     # Name symbol for _dataset association method
@@ -23,7 +25,7 @@ module Sequel::Model::Associations
   
     # Name symbol for _remove_ internal association method
     def _remove_method
-      :"_remove_#{self[:name].to_s.singularize}"
+      :"_remove_#{singularize(self[:name])}"
     end
   
     # Name symbol for setter association method
@@ -33,7 +35,7 @@ module Sequel::Model::Associations
   
     # Name symbol for add_ association method
     def add_method
-      :"add_#{self[:name].to_s.singularize}"
+      :"add_#{singularize(self[:name])}"
     end
   
     # Name symbol for association method, the same as the name of the association.
@@ -43,7 +45,7 @@ module Sequel::Model::Associations
   
     # The class associated to the current model class via this association
     def associated_class
-      self[:class] ||= self[:class_name].constantize
+      self[:class] ||= constantize(self[:class_name])
     end
   
     # Name symbol for dataset association method
@@ -98,7 +100,7 @@ module Sequel::Model::Associations
   
     # Name symbol for remove_ association method
     def remove_method
-      :"remove_#{self[:name].to_s.singularize}"
+      :"remove_#{singularize(self[:name])}"
     end
   
     # Whether this association returns an array of objects instead of a single object,
@@ -121,7 +123,6 @@ module Sequel::Model::Associations
     def setter_method
       :"#{self[:name]}="
     end
-
   end
 
   class ManyToOneAssociationReflection < AssociationReflection
@@ -174,7 +175,7 @@ module Sequel::Model::Associations
     # Default foreign key name symbol for key in associated table that points to
     # current table's primary key.
     def default_key
-      :"#{self[:model].name.to_s.demodulize.underscore}_id"
+      :"#{underscore(demodulize(self[:model].name))}_id"
     end
 
     # The column in the current table that the key in the associated table references.
@@ -207,20 +208,19 @@ module Sequel::Model::Associations
 
     # Default name symbol for the join table.
     def default_join_table
-      ([self[:class_name].demodulize, self[:model].name.to_s.demodulize]. \
-        map{|i| i.pluralize.underscore}.sort.join('_')).to_sym
+      [self[:class_name], self[:model].name].map{|i| underscore(pluralize(demodulize(i)))}.sort.join('_').to_sym
     end
   
     # Default foreign key name symbol for key in join table that points to
     # current table's primary key (or :left_primary_key column).
     def default_left_key
-      :"#{self[:model].name.to_s.demodulize.underscore}_id"
+      :"#{underscore(demodulize(self[:model].name))}_id"
     end
 
     # Default foreign key name symbol for foreign key in join table that points to
     # the association's table's primary key (or :right_primary_key column).
     def default_right_key
-      :"#{self[:name].to_s.singularize}_id"
+      :"#{singularize(self[:name])}_id"
     end
   
     # The key to use for the key hash when eager loading

@@ -311,7 +311,7 @@ module Sequel::Model::Associations
     left = (opts[:left_key] ||= opts.default_left_key)
     right = (opts[:right_key] ||= opts.default_right_key)
     left_pk = (opts[:left_primary_key] ||= self.primary_key)
-    opts[:class_name] ||= name.to_s.singularize.camelize
+    opts[:class_name] ||= camelize(singularize(name))
     join_table = (opts[:join_table] ||= opts.default_join_table)
     left_key_alias = opts[:left_key_alias] ||= :x_foreign_key_x
     left_key_select = opts[:left_key_select] ||= left.qualify(join_table).as(opts[:left_key_alias])
@@ -369,7 +369,7 @@ module Sequel::Model::Associations
     model = self
     opts[:key] = opts.default_key unless opts.include?(:key)
     key = opts[:key]
-    opts[:class_name] ||= name.to_s.camelize
+    opts[:class_name] ||= camelize(name)
     opts[:dataset] ||= proc do
       klass = opts.associated_class
       klass.filter(opts.primary_key.qualify(klass.table_name)=>send(key))
@@ -414,7 +414,7 @@ module Sequel::Model::Associations
     model = self
     key = (opts[:key] ||= opts.default_key)
     primary_key = (opts[:primary_key] ||= self.primary_key)
-    opts[:class_name] ||= name.to_s.singularize.camelize
+    opts[:class_name] ||= camelize(singularize(name))
     opts[:dataset] ||= proc do
       klass = opts.associated_class
       klass.filter(key.qualify(klass.table_name) => send(primary_key))
@@ -468,7 +468,7 @@ module Sequel::Model::Associations
     end
     if opts[:one_to_one]
       overridable_methods_module.send(:private, opts.association_method, opts.dataset_method)
-      n = name.to_s.singularize.to_sym
+      n = singularize(name).to_sym
       raise(Sequel::Error, "one_to_many association names should still be plural even when using the :one_to_one option") if n == name
       association_module_def(n) do |*o|
         objs = send(name, *o)

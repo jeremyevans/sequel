@@ -1,5 +1,6 @@
-require 'sequel_model/hooks'
+require 'sequel_model/deprecated_hooks'
 require 'sequel_model/deprecated_validations'
+require 'sequel_model/deprecated_inflector'
 
 module Sequel
   class Model
