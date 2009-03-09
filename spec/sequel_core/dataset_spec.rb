@@ -1359,7 +1359,7 @@ context "Dataset#group_and_count" do
       "SELECT a, b, count(*) AS count FROM test GROUP BY a, b ORDER BY count"
   end
   
-  specify "should work within query block" do
+  deprec_specify "should work within query block" do
     @ds.query{group_and_count(:a, :b)}.sql.should == 
       "SELECT a, b, count(*) AS count FROM test GROUP BY a, b ORDER BY count"
   end
@@ -2335,71 +2335,71 @@ context "A paginated dataset" do
     @d = Sequel::Dataset.new(nil)
     @d.meta_def(:count) {153}
     
-    @paginated = @d.paginate(1, 20)
+    deprec{@paginated = @d.paginate(1, 20)}
   end
   
-  specify "should raise an error if the dataset already has a limit" do
+ deprec_specify "should raise an error if the dataset already has a limit" do
     proc{@d.limit(10).paginate(1,10)}.should raise_error(Sequel::Error)
     proc{@paginated.paginate(2,20)}.should raise_error(Sequel::Error)
   end
   
-  specify "should set the limit and offset options correctly" do
+  deprec_specify "should set the limit and offset options correctly" do
     @paginated.opts[:limit].should == 20
     @paginated.opts[:offset].should == 0
   end
   
-  specify "should set the page count correctly" do
+  deprec_specify "should set the page count correctly" do
     @paginated.page_count.should == 8
     @d.paginate(1, 50).page_count.should == 4
   end
   
-  specify "should set the current page number correctly" do
+  deprec_specify "should set the current page number correctly" do
     @paginated.current_page.should == 1
     @d.paginate(3, 50).current_page.should == 3
   end
   
-  specify "should return the next page number or nil if we're on the last" do
+  deprec_specify "should return the next page number or nil if we're on the last" do
     @paginated.next_page.should == 2
     @d.paginate(4, 50).next_page.should be_nil
   end
   
-  specify "should return the previous page number or nil if we're on the last" do
+  deprec_specify "should return the previous page number or nil if we're on the last" do
     @paginated.prev_page.should be_nil
     @d.paginate(4, 50).prev_page.should == 3
   end
   
-  specify "should return the page range" do
+  deprec_specify "should return the page range" do
     @paginated.page_range.should == (1..8)
     @d.paginate(4, 50).page_range.should == (1..4)
   end
   
-  specify "should return the record range for the current page" do
+  deprec_specify "should return the record range for the current page" do
     @paginated.current_page_record_range.should == (1..20)
     @d.paginate(4, 50).current_page_record_range.should == (151..153)
     @d.paginate(5, 50).current_page_record_range.should == (0..0)
   end
 
-  specify "should return the record count for the current page" do
+  deprec_specify "should return the record count for the current page" do
     @paginated.current_page_record_count.should == 20
     @d.paginate(3, 50).current_page_record_count.should == 50
     @d.paginate(4, 50).current_page_record_count.should == 3
     @d.paginate(5, 50).current_page_record_count.should == 0
   end
 
-  specify "should know if current page is last page" do
+  deprec_specify "should know if current page is last page" do
     @paginated.last_page?.should be_false
     @d.paginate(2, 20).last_page?.should be_false
     @d.paginate(5, 30).last_page?.should be_false
     @d.paginate(6, 30).last_page?.should be_true
   end
 
-  specify "should know if current page is first page" do
+  deprec_specify "should know if current page is first page" do
     @paginated.first_page?.should be_true
     @d.paginate(1, 20).first_page?.should be_true
     @d.paginate(2, 20).first_page?.should be_false
   end
 
-  specify "should work with fixed sql" do
+  deprec_specify "should work with fixed sql" do
     ds = @d.clone(:sql => 'select * from blah')
     ds.meta_def(:count) {150}
     ds.paginate(2, 50).sql.should == 'SELECT * FROM (select * from blah) AS t1 LIMIT 50 OFFSET 50'
@@ -2412,11 +2412,11 @@ context "Dataset#each_page" do
     @d.meta_def(:count) {153}
   end
   
-  specify "should raise an error if the dataset already has a limit" do
+  deprec_specify "should raise an error if the dataset already has a limit" do
     proc{@d.limit(10).each_page(10){}}.should raise_error(Sequel::Error)
   end
   
-  specify "should iterate over each page in the resultset as a paginated dataset" do
+  deprec_specify "should iterate over each page in the resultset as a paginated dataset" do
     a = []
     @d.each_page(50) {|p| a << p}
     a.map {|p| p.sql}.should == [
@@ -2688,13 +2688,13 @@ context "Dataset#query" do
     @d = Sequel::Dataset.new(nil)
   end
   
-  specify "should support #from" do
+  deprec_specify "should support #from" do
     q = @d.query {from :xxx}
     q.class.should == @d.class
     q.sql.should == "SELECT * FROM xxx"
   end
   
-  specify "should support #select" do
+  deprec_specify "should support #select" do
     q = @d.query do
       select :a, :b___mongo
       from :yyy
@@ -2703,7 +2703,7 @@ context "Dataset#query" do
     q.sql.should == "SELECT a, b AS mongo FROM yyy"
   end
   
-  specify "should support #where" do
+  deprec_specify "should support #where" do
     q = @d.query do
       from :zzz
       where(:x + 2 > :y + 3)
@@ -2724,7 +2724,7 @@ context "Dataset#query" do
     q.sql.should == "SELECT * FROM zzz WHERE (x = 33)"
   end
   
-  specify "should support #group_by and #having" do
+  deprec_specify "should support #group_by and #having" do
     q = @d.query do
       from :abc
       group_by :id
@@ -2734,7 +2734,7 @@ context "Dataset#query" do
     q.sql.should == "SELECT * FROM abc GROUP BY id HAVING (x >= 2)"
   end
   
-  specify "should support #order, #order_by" do
+  deprec_specify "should support #order, #order_by" do
     q = @d.query do
       from :xyz
       order_by :stamp
@@ -2743,11 +2743,11 @@ context "Dataset#query" do
     q.sql.should == "SELECT * FROM xyz ORDER BY stamp"
   end
   
-  specify "should raise on non-chainable method calls" do
+  deprec_specify "should raise on non-chainable method calls" do
     proc {@d.query {first_source}}.should raise_error(Sequel::Error)
   end
   
-  specify "should raise on each, insert, update, delete" do
+  deprec_specify "should raise on each, insert, update, delete" do
     proc {@d.query {each}}.should raise_error(Sequel::Error)
     proc {@d.query {insert(:x => 1)}}.should raise_error(Sequel::Error)
     proc {@d.query {update(:x => 1)}}.should raise_error(Sequel::Error)

@@ -1,5 +1,9 @@
 === HEAD
 
+* Deprecate Database#query and Dataset#query, require 'sequel/extensions/query' if you want them
+
+* Deprecate Dataset#paginate and #each_page, require 'sequel/extensions/pagination' if you want them
+
 * Fix ~{:bool_col=>true} and related inversions of boolean values (jeremyevans)
 
 * Add disable_insert_returning method to PostgreSQL datasets, so they fallback to just using INSERT (jeremyevans)

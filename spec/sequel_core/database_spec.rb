@@ -928,7 +928,7 @@ context "Database#dataset" do
     @db = Sequel::Database.new
   end
   
-  specify "should delegate to Dataset#query if block is provided" do
+  deprec_specify "should delegate to Dataset#query if block is provided" do
     @d = @db.query {select :x; from :y}
     @d.should be_a_kind_of(Sequel::Dataset)
     @d.sql.should == "SELECT x FROM y"

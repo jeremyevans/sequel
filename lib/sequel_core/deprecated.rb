@@ -76,6 +76,11 @@ module Sequel
       Deprecation.deprecate('Sequel::Database#>>', 'Use Sequel::Database#fetch')
       fetch(*args, &block)
     end
+
+    def query(&block)
+      Deprecation.deprecate('Sequel::Database#query', 'require "sequel/extensions/query" first')
+      dataset.query(&block)
+    end
   end
 
   class Dataset
@@ -185,6 +190,33 @@ module Sequel
     def symbol_to_column_ref(sym)
       Sequel::Deprecation.deprecate('Sequel::Dataset#symbol_to_column_ref', 'Use Sequel::Dataset#literal')
       literal_symbol(sym)
+    end
+
+    def paginate(page_no, page_size, record_count=nil)
+      Sequel::Deprecation.deprecate('Sequel::Dataset#paginate', 'require "sequel/extensions/pagination" first')
+      require "sequel/extensions/pagination"
+      raise(Error, "You cannot paginate a dataset that already has a limit") if @opts[:limit]
+      paginated = limit(page_size, (page_no - 1) * page_size)
+      paginated.extend(Pagination)
+      paginated.set_pagination_info(page_no, page_size, record_count || count)
+    end
+
+    def each_page(page_size, &block)
+      Sequel::Deprecation.deprecate('Sequel::Dataset#each_page', 'require "sequel/extensions/pagination" first')
+      raise(Error, "You cannot paginate a dataset that already has a limit") if @opts[:limit]
+      record_count = count
+      total_pages = (record_count / page_size.to_f).ceil
+      (1..total_pages).each{|page_no| yield paginate(page_no, page_size, record_count)}
+      self
+    end
+
+    def query(&block)
+      Sequel::Deprecation.deprecate('Sequel::Dataset#each_page', 'require "sequel/extensions/query" first')
+      require "sequel/extensions/query"
+      copy = clone({})
+      copy.extend(QueryBlockCopy)
+      copy.instance_eval(&block)
+      clone(copy.opts)
     end
   end
 

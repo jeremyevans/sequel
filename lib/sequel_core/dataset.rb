@@ -1,4 +1,4 @@
-%w'convenience pagination prepared_statements query sql'.each do |f|
+%w'convenience prepared_statements sql'.each do |f|
   require "sequel_core/dataset/#{f}"
 end
 

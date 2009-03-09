@@ -1,4 +1,11 @@
 module Sequel
+  class Database
+    # Return a dataset modified by the query block
+    def query(&block)
+      dataset.query(&block)
+    end
+  end
+
   class Dataset
     # Translates a query block into a dataset. Query blocks can be useful
     # when expressing complex SELECT statements, e.g.:

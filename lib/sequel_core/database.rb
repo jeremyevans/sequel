@@ -396,11 +396,6 @@ module Sequel
       !@single_threaded
     end
     
-    # Returns a dataset modified by the given query block.  See Dataset#query.
-    def query(&block)
-      dataset.query(&block)
-    end
-    
     # Whether to quote identifiers (columns and tables) for this database
     def quote_identifiers=(v)
       reset_schema_utility_dataset
