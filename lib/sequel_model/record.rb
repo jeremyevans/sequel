@@ -187,41 +187,43 @@ module Sequel
     # columns to update, in which case it only updates those columns.
     def save(*columns)
       opts = columns.extract_options!
-      return save_failure(:invalid) unless opts[:validate] == false or valid?
-      return save_failure(:save) if before_save == false
-      if new?
-        return save_failure(:create) if before_create == false
-        ds = model.dataset
-        if ds.respond_to?(:insert_select) and h = ds.insert_select(@values)
-          @values = h
-          @this = nil
-        else
-          iid = ds.insert(@values)
-          # if we have a regular primary key and it's not set in @values,
-          # we assume it's the last inserted id
-          if (pk = primary_key) && !(Array === pk) && !@values[pk]
-            @values[pk] = iid
+      db.transaction do
+        return save_failure(:invalid) unless opts[:validate] == false or valid?
+        return save_failure(:save) if before_save == false
+        if new?
+          return save_failure(:create) if before_create == false
+          ds = model.dataset
+          if ds.respond_to?(:insert_select) and h = ds.insert_select(@values)
+            @values = h
+            @this = nil
+          else
+            iid = ds.insert(@values)
+            # if we have a regular primary key and it's not set in @values,
+            # we assume it's the last inserted id
+            if (pk = primary_key) && !(Array === pk) && !@values[pk]
+              @values[pk] = iid
+            end
+            @this = nil if pk
           end
-          @this = nil if pk
-        end
-        after_create
-        after_save
-        @new = false
-        refresh if pk
-      else
-        return save_failure(:update) if before_update == false
-        if columns.empty?
-          vals = opts[:changed] ? @values.reject{|k,v| !changed_columns.include?(k)} : @values
-          this.update(vals)
-        else # update only the specified columns
-          this.update(@values.reject{|k, v| !columns.include?(k)})
-        end
-        after_update
-        after_save
-        if columns.empty?
-          changed_columns.clear
+          after_create
+          after_save
+          @new = false
+          refresh if pk
         else
-          changed_columns.reject!{|c| columns.include?(c)}
+          return save_failure(:update) if before_update == false
+          if columns.empty?
+            vals = opts[:changed] ? @values.reject{|k,v| !changed_columns.include?(k)} : @values
+            this.update(vals)
+          else # update only the specified columns
+            this.update(@values.reject{|k, v| !columns.include?(k)})
+          end
+          after_update
+          after_save
+          if columns.empty?
+            changed_columns.clear
+          else
+            changed_columns.reject!{|c| columns.include?(c)}
+          end
         end
       end
       self

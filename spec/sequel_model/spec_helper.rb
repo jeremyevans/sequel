@@ -52,15 +52,16 @@ class MockDatabase < Sequel::Database
   @@quote_identifiers = false
   self.identifier_input_method = nil
   self.identifier_output_method = nil
-  attr_reader :sqls
-  
+  attr_reader :sqls, :sqls_with_transaction_commands
+
   def execute(sql, opts={})
-    @sqls ||= []
-    @sqls << sql
+    @sqls ||= []; @sqls_with_transaction_commands ||= []
+    @sqls_with_transaction_commands << sql
+    @sqls << sql unless ['BEGIN','COMMIT','ROLLBACK'].include?(sql)
   end
 
   def reset
-    @sqls = []
+    @sqls = []; @sqls_with_transaction_commands = []
   end
 
   def schema(table_name, opts)
@@ -71,8 +72,18 @@ class MockDatabase < Sequel::Database
     end
   end
 
-  def transaction; yield; end
-  
+  def transaction
+    begin
+      execute "BEGIN"
+      inside = true
+      yield
+      inside = false
+      execute "COMMIT"
+    ensure
+      execute(inside ? "ROLLBACK" : "COMMIT")
+    end
+  end
+
   def dataset(opts=nil); MockDataset.new(self, opts); end
 end
 

@@ -91,6 +91,22 @@ describe Sequel::Model, "dataset & schema" do
   end
 end
 
+describe Sequel::Model, "#save" do
+  before do
+    @m = Class.new(Sequel::Model) do
+      set_dataset MODEL_DB[:items]
+      columns :x, :id
+    end
+    MODEL_DB.reset
+  end
+
+  it "should wrap the save operation in a transaction" do
+    @m.new.save
+    MODEL_DB.sqls_with_transaction_commands.first.should == 'BEGIN'
+    MODEL_DB.sqls_with_transaction_commands.last.should == 'COMMIT'
+  end
+end
+
 describe Sequel::Model, "#sti_key" do
   before do
     class ::StiTest < Sequel::Model
