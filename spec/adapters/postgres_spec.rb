@@ -156,6 +156,9 @@ context "A PostgreSQL dataset" do
 
     @d.insert_sql(:x => :y).should =~ \
       /\AINSERT INTO "test" \("x"\) VALUES \("y"\)( RETURNING NULL)?\z/
+
+    @d.disable_insert_returning.insert_sql(:value => 333).should =~ \
+      /\AINSERT INTO "test" \("value"\) VALUES \(333\)\z/
   end
   
   specify "should quote fields correctly when reversing the order if quoting identifiers" do
@@ -463,6 +466,12 @@ context "Postgres::Dataset#insert" do
   
   specify "should call insert_sql if server_version < 80200" do
     @ds.meta_def(:server_version){80100}
+    @ds.should_receive(:execute_insert).once.with('INSERT INTO test5 (value) VALUES (10)', :table=>:test5, :values=>{:value=>10})
+    @ds.insert(:value=>10)
+  end
+
+  specify "should call insert_sql if disabling insert returning" do
+    @ds.disable_insert_returning!
     @ds.should_receive(:execute_insert).once.with('INSERT INTO test5 (value) VALUES (10)', :table=>:test5, :values=>{:value=>10})
     @ds.insert(:value=>10)
   end

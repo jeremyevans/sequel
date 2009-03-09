@@ -577,12 +577,22 @@ module Sequel
         def prepared_sql
           return @prepared_sql if @prepared_sql
           super
-          if @prepared_type == :insert and server_version >= 80200
+          if @prepared_type == :insert and !@opts[:disable_insert_returning] and server_version >= 80200
             @prepared_sql = insert_returning_pk_sql(@prepared_modify_values)
             meta_def(:insert_returning_pk_sql){|*args| prepared_sql}
           end
           @prepared_sql
         end
+      end
+
+      # Add the disable_insert_returning! mutation method
+      def self.extended(obj)
+        obj.def_mutation_method(:disable_insert_returning)
+      end
+
+      # Add the disable_insert_returning! mutation method
+      def self.included(mod)
+        mod.def_mutation_method(:disable_insert_returning)
       end
 
       # Return the results of an ANALYZE query as a string
@@ -594,6 +604,11 @@ module Sequel
         analysis.join("\r\n")
       end
       
+      # Disable the use of INSERT RETURNING, even if the server supports it
+      def disable_insert_returning
+        clone(:disable_insert_returning=>true)
+      end
+
       # Return the results of an EXPLAIN query as a string
       def explain(opts = nil)
         analysis = []
@@ -623,7 +638,7 @@ module Sequel
       
       # Insert given values into the database.
       def insert(*values)
-        if !@opts[:sql] and server_version >= 80200
+        if !@opts[:sql] and !@opts[:disable_insert_returning] and server_version >= 80200
           clone(default_server_opts(:sql=>insert_returning_pk_sql(*values))).single_value
         else
           execute_insert(insert_sql(*values), :table=>opts[:from].first,
