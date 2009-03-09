@@ -167,7 +167,7 @@ module Sequel
       end
     end
 
-    module Associations
+    module Associations::ClassMethods
       def belongs_to(*args, &block)
         Deprecation.deprecate('Sequel::Model.belongs_to', 'Use Sequel::Model.many_to_one')
         many_to_one(*args, &block)

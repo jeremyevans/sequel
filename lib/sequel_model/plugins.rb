@@ -15,33 +15,35 @@ module Sequel
   end
   
   class Model
-    module ClassMethods
-      # Loads a plugin for use with the model class, passing optional arguments
-      # to the plugin. If the plugin has a DatasetMethods module and the model
-      # doesn't have a dataset, raise an Error.
-      def plugin(plugin, *args)
-        arg = args.first
-        block = lambda{arg}
-        m = plugin_module(plugin)
-        raise(Error, "Plugin cannot be applied because the model class has no dataset") if m.const_defined?("DatasetMethods") && !@dataset
-        if m.respond_to?(:apply)
-          m.apply(self, *args)
-        end
-        if m.const_defined?("InstanceMethods")
-          define_method(:"#{plugin}_opts", &block)
-          include(m::InstanceMethods)
-        end
-        if m.const_defined?("ClassMethods")
-          meta_def(:"#{plugin}_opts", &block)
-          extend(m::ClassMethods)
-        end
-        if m.const_defined?("DatasetMethods")
+    # Loads a plugin for use with the model class, passing optional arguments
+    # to the plugin. If the plugin has a DatasetMethods module and the model
+    # doesn't have a dataset, raise an Error.
+    def self.plugin(plugin, *args)
+      arg = args.first
+      block = lambda{arg}
+      m = plugin.is_a?(Module) ? plugin : plugin_module(plugin)
+      if m.respond_to?(:apply)
+        m.apply(self, *args)
+      end
+      if m.const_defined?("InstanceMethods")
+        define_method(:"#{plugin}_opts", &block)
+        include(m::InstanceMethods)
+      end
+      if m.const_defined?("ClassMethods")
+        meta_def(:"#{plugin}_opts", &block)
+        extend(m::ClassMethods)
+      end
+      if m.const_defined?("DatasetMethods")
+        if @dataset
           dataset.meta_def(:"#{plugin}_opts", &block)
           dataset.extend(m::DatasetMethods)
-          def_dataset_method(*m::DatasetMethods.public_instance_methods)
         end
+        dataset_method_modules << m::DatasetMethods
+        def_dataset_method(*m::DatasetMethods.public_instance_methods.reject{|x| DATASET_METHOD_RE !~ x.to_s})
       end
+    end
     
+    module ClassMethods
       private
   
       # Returns the new style location for the plugin name.

@@ -90,6 +90,10 @@ module Sequel
        select_all select_more server set set_graph_aliases single_value to_csv to_hash
        transform union unfiltered unordered update where with_sql'.map{|x| x.to_sym}
   
+    # Regular expression that much match for a public instance method of a plugin
+    # dataset to have a model method created that calls it
+    DATASET_METHOD_RE = /\A[A-Za-z_][A-Za-z0-9_]*\z/
+
     # Empty instance variables, for -w compliance
     EMPTY_INSTANCE_VARIABLES = [:@overridable_methods_module, :@transform, :@db, :@skip_superclass_validations]
 
@@ -99,7 +103,8 @@ module Sequel
       :before_validation, :after_validation]
 
     # Instance variables that are inherited in subclasses
-    INHERITED_INSTANCE_VARIABLES = {:@allowed_columns=>:dup, :@dataset_methods=>:dup, :@primary_key=>nil, 
+    INHERITED_INSTANCE_VARIABLES = {:@allowed_columns=>:dup, :@dataset_methods=>:dup, 
+      :@dataset_method_modules=>:dup, :@primary_key=>nil, 
       :@raise_on_save_failure=>nil, :@restricted_columns=>:dup, :@restrict_primary_key=>nil,
       :@simple_pk=>nil, :@simple_table=>nil, :@strict_param_setting=>nil,
       :@typecast_empty_string_to_nil=>nil, :@typecast_on_assignment=>nil,
@@ -115,6 +120,7 @@ module Sequel
     @cache_ttl = nil
     @db = nil
     @db_schema = nil
+    @dataset_method_modules = []
     @dataset_methods = {}
     @overridable_methods_module = nil
     @primary_key = :id
@@ -132,7 +138,7 @@ module Sequel
   end
 end
 
-%w"inflections plugins base record association_reflection associations dataset_methods eager_loading exceptions validations deprecated".each do |f|
+%w"inflections plugins base association_reflection associations exceptions validations deprecated".each do |f|
   require "sequel_model/#{f}"
 end
 
