@@ -3,11 +3,10 @@ require File.join(File.dirname(__FILE__), "spec_helper")
 describe "Model#save" do
   
   before(:each) do
-    MODEL_DB.reset
-
     @c = Class.new(Sequel::Model(:items)) do
       columns :id, :x, :y
     end
+    MODEL_DB.reset
   end
   
   it "should insert a record for a new model instance" do
@@ -41,7 +40,6 @@ describe "Model#save" do
   it "should update only the given columns if given" do
     o = @c.load(:id => 3, :x => 1, :y => nil)
     o.save(:y)
-    
     MODEL_DB.sqls.first.should == "UPDATE items SET y = NULL WHERE (id = 3)"
   end
   
@@ -77,6 +75,55 @@ describe "Model#save" do
     res.should == [:x,:y,false]
   end
   
+  it "should use Model's save_in_transaction setting by default" do
+    @c.use_transactions = true
+    @c.load(:id => 3, :x => 1, :y => nil).save(:y)
+    MODEL_DB.sqls.should == ["BEGIN", "UPDATE items SET y = NULL WHERE (id = 3)", "COMMIT"]
+    MODEL_DB.reset
+    @c.use_transactions = false
+    @c.load(:id => 3, :x => 1, :y => nil).save(:y)
+    MODEL_DB.sqls.should == ["UPDATE items SET y = NULL WHERE (id = 3)"]
+    MODEL_DB.reset
+  end
+
+  it "should inherit Model's save_in_transaction setting" do
+    @c.use_transactions = true
+    Class.new(@c).load(:id => 3, :x => 1, :y => nil).save(:y)
+    MODEL_DB.sqls.should == ["BEGIN", "UPDATE items SET y = NULL WHERE (id = 3)", "COMMIT"]
+    MODEL_DB.reset
+    @c.use_transactions = false
+    Class.new(@c).load(:id => 3, :x => 1, :y => nil).save(:y)
+    MODEL_DB.sqls.should == ["UPDATE items SET y = NULL WHERE (id = 3)"]
+    MODEL_DB.reset
+  end
+
+  it "should use object's save_in_transaction setting" do
+    o = @c.load(:id => 3, :x => 1, :y => nil)
+    o.use_transactions = false
+    @c.use_transactions = true
+    o.save(:y)
+    MODEL_DB.sqls.should == ["UPDATE items SET y = NULL WHERE (id = 3)"]
+    MODEL_DB.reset
+    o = @c.load(:id => 3, :x => 1, :y => nil)
+    o.use_transactions = true
+    @c.use_transactions = false 
+    o.save(:y)
+    MODEL_DB.sqls.should == ["BEGIN", "UPDATE items SET y = NULL WHERE (id = 3)", "COMMIT"]
+    MODEL_DB.reset
+  end
+
+  it "should use :transaction option if given" do
+    o = @c.load(:id => 3, :x => 1, :y => nil)
+    o.use_transactions = true
+    o.save(:y, :transaction=>false)
+    MODEL_DB.sqls.should == ["UPDATE items SET y = NULL WHERE (id = 3)"]
+    MODEL_DB.reset
+    o = @c.load(:id => 3, :x => 1, :y => nil)
+    o.use_transactions = false
+    o.save(:y, :transaction=>true)
+    MODEL_DB.sqls.should == ["BEGIN", "UPDATE items SET y = NULL WHERE (id = 3)", "COMMIT"]
+    MODEL_DB.reset
+  end
 end
 
 describe "Model#save_changes" do
@@ -589,13 +636,19 @@ describe Sequel::Model, "#destroy" do
   end
 
   it "should return self" do
-    @model.db.should_receive(:transaction)
     @model.send(:define_method, :after_destroy){3}
     @instance.destroy.should == @instance
   end
 
-  it "should run within a transaction" do
+  it "should run within a transaction if use_transactions is true" do
+    @instance.use_transactions = true
     @model.db.should_receive(:transaction)
+    @instance.destroy
+  end
+
+  it "should not run within a transaction if use_transactions is false" do
+    @instance.use_transactions = false
+    @model.db.should_not_receive(:transaction)
     @instance.destroy
   end
 

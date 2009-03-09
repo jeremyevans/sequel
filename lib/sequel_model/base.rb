@@ -52,6 +52,9 @@ module Sequel
       # Whether to typecast attribute values on assignment (default: true)
       attr_accessor :typecast_on_assignment
   
+      # Whether to use a transaction by default when saving/deleting records
+      attr_accessor :use_transactions
+  
       # Returns the first record from the database matching the conditions.
       # If a hash is given, it is used as the conditions.  If another
       # object is given, it finds the first record whose primary key(s) match
@@ -459,7 +462,7 @@ module Sequel
       private_class_method :class_attr_overridable, :class_attr_reader
 
       class_attr_reader :columns, :db, :primary_key, :db_schema
-      class_attr_overridable :raise_on_save_failure, :raise_on_typecast_failure, :strict_param_setting, :typecast_empty_string_to_nil, :typecast_on_assignment
+      class_attr_overridable :raise_on_save_failure, :raise_on_typecast_failure, :strict_param_setting, :typecast_empty_string_to_nil, :typecast_on_assignment, :use_transactions
       
       # The hash of attribute values.  Keys are symbols with the names of the
       # underlying database columns.
@@ -551,14 +554,9 @@ module Sequel
       # deleting the object the the database. Otherwise, deletes
       # the item from the database and returns self.
       def destroy
-        db.transaction do
-          return save_failure(:destroy) if before_destroy == false
-          delete
-          after_destroy
-        end
-        self
+        use_transactions ? db.transaction{_destroy} : _destroy
       end
-      
+
       # Enumerates through all attributes.
       #
       # Example:
@@ -643,48 +641,23 @@ module Sequel
       # is true, it raises an error).
       # Otherwise, returns self. You can provide an optional list of
       # columns to update, in which case it only updates those columns.
+      #
+      # Takes the following options:
+      #
+      # * :changed - save all changed columns, instead of all columns or the columns
+      # * :transaction - set to false not to use a transaction
+      # * :validate - set to false not to validate the model before saving
       def save(*columns)
         opts = columns.last.is_a?(Hash) ? columns.pop : {}
         return save_failure(:invalid) if opts[:validate] != false and !valid?
-        return save_failure(:save) if before_save == false
-        if new?
-          return save_failure(:create) if before_create == false
-          ds = model.dataset
-          if ds.respond_to?(:insert_select) and h = ds.insert_select(@values)
-            @values = h
-            @this = nil
-          else
-            iid = ds.insert(@values)
-            # if we have a regular primary key and it's not set in @values,
-            # we assume it's the last inserted id
-            if (pk = primary_key) && !(Array === pk) && !@values[pk]
-              @values[pk] = iid
-            end
-            @this = nil if pk
-          end
-          after_create
-          after_save
-          @new = false
-          refresh if pk
+        use_transaction = if opts.include?(:transaction)
+          opts[:transaction]
         else
-          return save_failure(:update) if before_update == false
-          if columns.empty?
-            vals = opts[:changed] ? @values.reject{|k,v| !changed_columns.include?(k)} : @values
-            this.update(vals)
-          else # update only the specified columns
-            this.update(@values.reject{|k, v| !columns.include?(k)})
-          end
-          after_update
-          after_save
-          if columns.empty?
-            changed_columns.clear
-          else
-            changed_columns.reject!{|c| columns.include?(c)}
-          end
+          use_transactions
         end
-        self
+        use_transaction ? db.transaction{_save(columns, opts)} : _save(columns, opts)
       end
-      
+
       # Saves only changed columns or does nothing if no columns are marked as 
       # chanaged.  If no columns have been changed, returns nil.  If unable to
       # save, returns false unless raise_on_save_failure is true.
@@ -769,6 +742,57 @@ module Sequel
 
       private
   
+      # Internal destroy method, separted from destroy to
+      # allow running inside a transaction
+      def _destroy
+        return save_failure(:destroy) if before_destroy == false
+        delete
+        after_destroy
+        self
+      end
+      
+      # Internal version of save, split from save to allow running inside
+      # it's own transaction.
+      def _save(columns, opts)
+        return save_failure(:save) if before_save == false
+        if new?
+          return save_failure(:create) if before_create == false
+          ds = model.dataset
+          if ds.respond_to?(:insert_select) and h = ds.insert_select(@values)
+            @values = h
+            @this = nil
+          else
+            iid = ds.insert(@values)
+            # if we have a regular primary key and it's not set in @values,
+            # we assume it's the last inserted id
+            if (pk = primary_key) && !(Array === pk) && !@values[pk]
+              @values[pk] = iid
+            end
+            @this = nil if pk
+          end
+          after_create
+          after_save
+          @new = false
+          refresh if pk
+        else
+          return save_failure(:update) if before_update == false
+          if columns.empty?
+            vals = opts[:changed] ? @values.reject{|k,v| !changed_columns.include?(k)} : @values
+            this.update(vals)
+          else # update only the specified columns
+            this.update(@values.reject{|k, v| !columns.include?(k)})
+          end
+          after_update
+          after_save
+          if columns.empty?
+            changed_columns.clear
+          else
+            changed_columns.reject!{|c| columns.include?(c)}
+          end
+        end
+        self
+      end
+      
       # Default inspection output for a record, overwrite to change the way #inspect prints the @values hash
       def inspect_values
         @values.inspect

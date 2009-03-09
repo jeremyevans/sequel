@@ -497,10 +497,11 @@ module Sequel
               overridable_methods_module.send(:private, opts.add_method)
               association_module_def(:"#{n}=") do |o|
                 klass = opts.associated_class
-                model.db.transaction do
+                update_database = lambda do 
                   send(opts.add_method, o)
                   klass.filter(Sequel::SQL::BooleanExpression.new(:AND, {key=>send(primary_key)}, ~{klass.primary_key=>o.pk}.sql_expr)).update(key=>nil)
                 end
+                use_transactions ? db.transaction{update_database.call} : update_database.call
               end
             end
           end

@@ -1,5 +1,7 @@
 === HEAD
 
+* Add Model.use_transactions for setting whether models should use transactions when destroying/saving records (jeremyevans, mjwillson)
+
 * Deprecate Model::Validation::Errors, use Model::Errors (jeremyevans)
 
 * Deprecate string inflection methods, require 'sequel/extensions/inflector' if you use them (jeremyevans)

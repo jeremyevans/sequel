@@ -1006,6 +1006,19 @@ describe Sequel::Model, "one_to_many" do
     MODEL_DB.sqls.last.should == 'UPDATE attributes SET node_id = NULL WHERE ((node_id = 1234) AND (id != 3))'
   end
 
+  it "should use a transaction in the setter method if the :one_to_one option is true" do
+    @c2.one_to_many :attributes, :class => @c1, :one_to_one=>true
+    @c2.use_transactions = true
+    MODEL_DB.sqls.clear
+    attrib = @c1.load(:id=>3)
+    @c2.new(:id => 1234).attribute = attrib
+    MODEL_DB.sqls.length.should == 4
+    MODEL_DB.sqls.first.should == 'BEGIN'
+    MODEL_DB.sqls[1].should =~ /UPDATE attributes SET (node_id = 1234, id = 3|id = 3, node_id = 1234) WHERE \(id = 3\)/
+    MODEL_DB.sqls[2].should == 'UPDATE attributes SET node_id = NULL WHERE ((node_id = 1234) AND (id != 3))'
+    MODEL_DB.sqls.last.should == 'COMMIT'
+  end
+
   it "should have the setter method for the :one_to_one option respect the :primary_key option" do
     @c2.one_to_many :attributes, :class => @c1, :one_to_one=>true, :primary_key=>:xxx
     attrib = @c1.new(:id=>3)

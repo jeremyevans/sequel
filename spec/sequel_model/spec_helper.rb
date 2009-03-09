@@ -82,8 +82,23 @@ class MockDatabase < Sequel::Database
     end
   end
 
-  def transaction; yield; end
-  
+   def transaction(*args)
+    return yield if @transactions.include?(Thread.current)
+    execute('BEGIN')
+    begin
+      @transactions << Thread.current
+      yield
+    rescue Exception => e
+      execute('ROLLBACK')
+      transaction_error(e)
+    ensure
+      unless e
+        execute('COMMIT')
+      end
+      @transactions.delete(Thread.current)
+    end
+  end
+
   def dataset(opts=nil); MockDataset.new(self, opts); end
 end
 
@@ -105,4 +120,5 @@ class << Sequel::Model
   end
 end
 
+Sequel::Model.use_transactions = false
 Sequel::Model.db = MODEL_DB = MockDatabase.new
