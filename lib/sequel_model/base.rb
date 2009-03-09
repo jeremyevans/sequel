@@ -197,8 +197,8 @@ module Sequel
     
     # Like find but invokes create with given conditions when record does not
     # exists.
-    def self.find_or_create(cond)
-      find(cond) || create(cond)
+    def self.find_or_create(find_cond, create_cond = {})
+      find(find_cond) || create(find_cond.merge(create_cond))
     end
   
     # If possible, set the dataset for the model subclass as soon as it
