@@ -4,6 +4,9 @@ require 'sequel_model/deprecated_inflector'
 
 module Sequel
   class Model
+    module Validation
+      Errors = Model::Errors
+    end
     module ClassMethods
       {:import=>:multi_insert, :size=>:count, :uniq=>:distinct}.each do |o, n|
         class_eval "def #{o}(*args, &block); Deprecation.deprecate('Sequel::Model.#{o}', 'Use Sequel::Model.dataset.#{n}'); dataset.#{n}(*args, &block); end"

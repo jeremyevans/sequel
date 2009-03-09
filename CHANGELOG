@@ -1,5 +1,7 @@
 === HEAD
 
+* Deprecate Model::Validation::Errors, use Model::Errors (jeremyevans)
+
 * Deprecate string inflection methods, require 'sequel/extensions/inflector' if you use them (jeremyevans)
 
 * Deprecate Model validation class methods, override Model#validate instead or Model.plugin validation_class_methods (jeremyevans)

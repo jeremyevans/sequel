@@ -1,8 +1,8 @@
 require File.join(File.dirname(__FILE__), "spec_helper")
 
-describe Sequel::Model::Validation::Errors do
+describe Sequel::Model::Errors do
   setup do
-    @errors = Sequel::Model::Validation::Errors.new
+    @errors = Sequel::Model::Errors.new
   end
   
   specify "should be clearable using #clear" do

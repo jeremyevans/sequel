@@ -138,7 +138,7 @@ module Sequel
   end
 end
 
-%w"inflections plugins base association_reflection associations exceptions validations deprecated".each do |f|
+%w"inflections plugins base association_reflection associations exceptions errors deprecated".each do |f|
   require "sequel_model/#{f}"
 end
 

@@ -571,7 +571,7 @@ module Sequel
   
       # Returns the validation errors associated with the object.
       def errors
-        @errors ||= Validation::Errors.new
+        @errors ||= Errors.new
       end 
 
       # Returns true when current instance exists, false otherwise.
