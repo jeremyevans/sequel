@@ -1521,7 +1521,7 @@ context "Dataset#join_table" do
     ds.filter!(:active => true)
 
     @d.join_table(:left_outer, ds, :item_id => :id).sql.should ==
-      'SELECT * FROM "items" LEFT OUTER JOIN (SELECT * FROM categories WHERE (active = \'t\')) AS "t1" ON ("t1"."item_id" = "items"."id")'
+      'SELECT * FROM "items" LEFT OUTER JOIN (SELECT * FROM categories WHERE (active IS TRUE)) AS "t1" ON ("t1"."item_id" = "items"."id")'
   end
   
   specify "should support joining datasets and aliasing the join" do
@@ -2622,7 +2622,7 @@ context "Dataset#multi_insert" do
     @ds.multi_insert([:x, :y], @ds2)
     @db.sqls.should == [
       'BEGIN',
-      "INSERT INTO items (x, y) VALUES (SELECT a, b FROM cats WHERE (purr = 't'))",
+      "INSERT INTO items (x, y) VALUES (SELECT a, b FROM cats WHERE (purr IS TRUE))",
       'COMMIT'
     ]
   end

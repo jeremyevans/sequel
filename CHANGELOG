@@ -1,5 +1,7 @@
 === HEAD
 
+* Fix ~{:bool_col=>true} and related inversions of boolean values (jeremyevans)
+
 * Add disable_insert_returning method to PostgreSQL datasets, so they fallback to just using INSERT (jeremyevans)
 
 * Don't use savepoints by default on PostgreSQL, use the :savepoint option to Database#transaction to use a savepoint (jeremyevans)

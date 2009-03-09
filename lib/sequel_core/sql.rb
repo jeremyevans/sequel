@@ -47,10 +47,13 @@ module Sequel
       # Hash of ruby operator symbols to SQL operators, used in BooleanMethods
       BOOLEAN_OPERATOR_METHODS = {:& => :AND, :| =>:OR}
 
+      # Operators that use IS, used for special casing to override literal true/false values
+      IS_OPERATORS = [:IS, :'IS NOT']
+
       # Operator symbols that take exactly two arguments
-      TWO_ARITY_OPERATORS = [:'=', :'!=', :IS, :'IS NOT', :LIKE, :'NOT LIKE', \
+      TWO_ARITY_OPERATORS = [:'=', :'!=', :LIKE, :'NOT LIKE', \
         :~, :'!~', :'~*', :'!~*', :IN, :'NOT IN', :ILIKE, :'NOT ILIKE'] + \
-        INEQUALITY_OPERATORS + BITWISE_OPERATORS 
+        INEQUALITY_OPERATORS + BITWISE_OPERATORS + IS_OPERATORS 
 
       # Operator symbols that take one or more arguments
       N_ARITY_OPERATORS = [:AND, :OR, :'||'] + MATHEMATICAL_OPERATORS
@@ -436,7 +439,7 @@ module Sequel
             new(:AND, new(:>=, l, r.begin), new(r.exclude_end? ? :< : :<=, l, r.end))
           when Array, ::Sequel::Dataset, SQLArray
             new(:IN, l, r)
-          when NilClass
+          when NilClass, TrueClass, FalseClass
             new(:IS, l, r)
           when Regexp
             StringExpression.like(l, r)

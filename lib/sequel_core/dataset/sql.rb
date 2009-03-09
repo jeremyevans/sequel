@@ -7,6 +7,8 @@ module Sequel
     COLUMN_REF_RE2 = /\A([\w ]+)___([\w ]+)\z/.freeze
     COLUMN_REF_RE3 = /\A([\w ]+)__([\w ]+)\z/.freeze
     COUNT_FROM_SELF_OPTS = [:distinct, :group, :sql, :limit, :compounds]
+    IS_LITERALS = {nil=>'NULL'.freeze, true=>'TRUE'.freeze, false=>'FALSE'.freeze}.freeze
+    IS_OPERATORS = ::Sequel::SQL::ComplexExpression::IS_OPERATORS
     N_ARITY_OPERATORS = ::Sequel::SQL::ComplexExpression::N_ARITY_OPERATORS
     NULL = "NULL".freeze
     QUESTION_MARK = '?'.freeze
@@ -56,6 +58,9 @@ module Sequel
     # SQL fragment for complex expressions
     def complex_expression_sql(op, args)
       case op
+      when *IS_OPERATORS
+        v = IS_LITERALS[args.at(1)] || raise(Error, 'Invalid argument used for IS operator')
+        "(#{literal(args.at(0))} #{op} #{v})"
       when *TWO_ARITY_OPERATORS
         "(#{literal(args.at(0))} #{op} #{literal(args.at(1))})"
       when *N_ARITY_OPERATORS

@@ -43,8 +43,8 @@ context "Blockless Ruby Filters" do
   it "should support = via Hash" do
     @d.l(:x => 100).should == '(x = 100)'
     @d.l(:x => 'a').should == '(x = \'a\')'
-    @d.l(:x => true).should == '(x = \'t\')'
-    @d.l(:x => false).should == '(x = \'f\')'
+    @d.l(:x => true).should == '(x IS TRUE)'
+    @d.l(:x => false).should == '(x IS FALSE)'
     @d.l(:x => nil).should == '(x IS NULL)'
     @d.l(:x => [1,2,3]).should == '(x IN (1, 2, 3))'
   end
@@ -52,8 +52,8 @@ context "Blockless Ruby Filters" do
   it "should support != via Hash#~" do
     @d.l(~{:x => 100}).should == '(x != 100)'
     @d.l(~{:x => 'a'}).should == '(x != \'a\')'
-    @d.l(~{:x => true}).should == '(x != \'t\')'
-    @d.l(~{:x => false}).should == '(x != \'f\')'
+    @d.l(~{:x => true}).should == '(x IS NOT TRUE)'
+    @d.l(~{:x => false}).should == '(x IS NOT FALSE)'
     @d.l(~{:x => nil}).should == '(x IS NOT NULL)'
   end
   
@@ -198,49 +198,49 @@ context "Blockless Ruby Filters" do
 
   it "should support hashes by ANDing the conditions" do
     @d.l(:x => 100, :y => 'a')[1...-1].split(' AND ').sort.should == ['(x = 100)', '(y = \'a\')']
-    @d.l(:x => true, :y => false)[1...-1].split(' AND ').sort.should == ['(x = \'t\')', '(y = \'f\')']
+    @d.l(:x => true, :y => false)[1...-1].split(' AND ').sort.should == ['(x IS TRUE)', '(y IS FALSE)']
     @d.l(:x => nil, :y => [1,2,3])[1...-1].split(' AND ').sort.should == ['(x IS NULL)', '(y IN (1, 2, 3))']
   end
   
   it "should support sql_negate on hashes" do
     @d.l({:x => 100, :y => 'a'}.sql_negate)[1...-1].split(' AND ').sort.should == ['(x != 100)', '(y != \'a\')']
-    @d.l({:x => true, :y => false}.sql_negate)[1...-1].split(' AND ').sort.should == ['(x != \'t\')', '(y != \'f\')']
+    @d.l({:x => true, :y => false}.sql_negate)[1...-1].split(' AND ').sort.should == ['(x IS NOT TRUE)', '(y IS NOT FALSE)']
     @d.l({:x => nil, :y => [1,2,3]}.sql_negate)[1...-1].split(' AND ').sort.should == ['(x IS NOT NULL)', '(y NOT IN (1, 2, 3))']
   end
   
   it "should support ~ on hashes" do
     @d.l(~{:x => 100, :y => 'a'})[1...-1].split(' OR ').sort.should == ['(x != 100)', '(y != \'a\')']
-    @d.l(~{:x => true, :y => false})[1...-1].split(' OR ').sort.should == ['(x != \'t\')', '(y != \'f\')']
+    @d.l(~{:x => true, :y => false})[1...-1].split(' OR ').sort.should == ['(x IS NOT TRUE)', '(y IS NOT FALSE)']
     @d.l(~{:x => nil, :y => [1,2,3]})[1...-1].split(' OR ').sort.should == ['(x IS NOT NULL)', '(y NOT IN (1, 2, 3))']
   end
   
   it "should support sql_or on hashes" do
     @d.l({:x => 100, :y => 'a'}.sql_or)[1...-1].split(' OR ').sort.should == ['(x = 100)', '(y = \'a\')']
-    @d.l({:x => true, :y => false}.sql_or)[1...-1].split(' OR ').sort.should == ['(x = \'t\')', '(y = \'f\')']
+    @d.l({:x => true, :y => false}.sql_or)[1...-1].split(' OR ').sort.should == ['(x IS TRUE)', '(y IS FALSE)']
     @d.l({:x => nil, :y => [1,2,3]}.sql_or)[1...-1].split(' OR ').sort.should == ['(x IS NULL)', '(y IN (1, 2, 3))']
   end
   
   it "should support arrays with all two pairs the same as hashes" do
     @d.l([[:x, 100],[:y, 'a']]).should == '((x = 100) AND (y = \'a\'))'
-    @d.l([[:x, true], [:y, false]]).should == '((x = \'t\') AND (y = \'f\'))'
+    @d.l([[:x, true], [:y, false]]).should == '((x IS TRUE) AND (y IS FALSE))'
     @d.l([[:x, nil], [:y, [1,2,3]]]).should == '((x IS NULL) AND (y IN (1, 2, 3)))'
   end
   
   it "should support sql_negate on arrays with all two pairs" do
     @d.l([[:x, 100],[:y, 'a']].sql_negate).should == '((x != 100) AND (y != \'a\'))'
-    @d.l([[:x, true], [:y, false]].sql_negate).should == '((x != \'t\') AND (y != \'f\'))'
+    @d.l([[:x, true], [:y, false]].sql_negate).should == '((x IS NOT TRUE) AND (y IS NOT FALSE))'
     @d.l([[:x, nil], [:y, [1,2,3]]].sql_negate).should == '((x IS NOT NULL) AND (y NOT IN (1, 2, 3)))'
   end
   
   it "should support ~ on arrays with all two pairs" do
     @d.l(~[[:x, 100],[:y, 'a']]).should == '((x != 100) OR (y != \'a\'))'
-    @d.l(~[[:x, true], [:y, false]]).should == '((x != \'t\') OR (y != \'f\'))'
+    @d.l(~[[:x, true], [:y, false]]).should == '((x IS NOT TRUE) OR (y IS NOT FALSE))'
     @d.l(~[[:x, nil], [:y, [1,2,3]]]).should == '((x IS NOT NULL) OR (y NOT IN (1, 2, 3)))'
   end
   
   it "should support sql_or on arrays with all two pairs" do
     @d.l([[:x, 100],[:y, 'a']].sql_or).should == '((x = 100) OR (y = \'a\'))'
-    @d.l([[:x, true], [:y, false]].sql_or).should == '((x = \'t\') OR (y = \'f\'))'
+    @d.l([[:x, true], [:y, false]].sql_or).should == '((x IS TRUE) OR (y IS FALSE))'
     @d.l([[:x, nil], [:y, [1,2,3]]].sql_or).should == '((x IS NULL) OR (y IN (1, 2, 3)))'
   end
   
