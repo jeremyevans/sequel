@@ -197,19 +197,13 @@ module Sequel
     # Instance methods for datasets that connect to an SQLite database
     module DatasetMethods
       include Dataset::UnsupportedIntersectExceptAll
+      include Dataset::UnsupportedIsTrue
 
       # SQLite does not support pattern matching via regular expressions.
       # SQLite is case insensitive (depending on pragma), so use LIKE for
       # ILIKE.
       def complex_expression_sql(op, args)
         case op
-        when :IS, :'IS NOT'
-          isnot = op != :IS
-          return super if (v1 = args.at(1)).nil?
-          v0 = literal(args.at(0))
-          s = "(#{v0} #{'!' if isnot}= #{literal(v1)})"
-          s = "(#{s} OR (#{v0} IS NULL))" if isnot
-          s
         when :~, :'!~', :'~*', :'!~*'
           raise Error, "SQLite does not support pattern matching via regular expressions"
         when :LIKE, :'NOT LIKE', :ILIKE, :'NOT ILIKE'

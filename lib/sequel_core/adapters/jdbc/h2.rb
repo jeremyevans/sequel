@@ -1,4 +1,5 @@
 require 'sequel_core/adapters/utils/date_format'
+require 'sequel_core/adapters/utils/unsupported'
 
 module Sequel
   module JDBC
@@ -55,6 +56,7 @@ module Sequel
       # Dataset class for H2 datasets accessed via JDBC.
       class Dataset < JDBC::Dataset
         include Dataset::SQLStandardDateFormat
+        include Dataset::UnsupportedIsTrue
       end
     end
   end
