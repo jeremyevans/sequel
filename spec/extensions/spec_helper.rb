@@ -87,3 +87,4 @@ class << Sequel::Model
 end
 
 Sequel::Model.db = MODEL_DB = MockDatabase.new
+Sequel::Model.use_transactions = false

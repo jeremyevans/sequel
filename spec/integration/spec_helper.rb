@@ -9,6 +9,7 @@ rescue LoadError
 end
 
 Sequel.virtual_row_instance_eval = true
+Sequel::Model.use_transactions = false
 
 module Spec::Example::ExampleGroupMethods
   def deprec_specify(*args, &block)
