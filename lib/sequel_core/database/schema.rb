@@ -48,7 +48,7 @@ module Sequel
     # Creates a table with the columns given in the provided block:
     #
     #   DB.create_table :posts do
-    #     primary_key :id, :serial
+    #     primary_key :id
     #     column :title, :text
     #     column :content, :text
     #     index :title
