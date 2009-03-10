@@ -163,11 +163,6 @@ module Sequel
       end
     end
     
-    # Pretty prints the records in the dataset as plain-text table.
-    def print(*cols)
-      Sequel::PrettyTable.print(naked.all, cols.empty? ? columns : cols)
-    end
-    
     # Returns a Range object made from the minimum and maximum values for the
     # given column.
     def range(column)

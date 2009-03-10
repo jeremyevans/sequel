@@ -1,4 +1,11 @@
 module Sequel
+  class Dataset
+    # Pretty prints the records in the dataset as plain-text table.
+    def print(*cols)
+      Sequel::PrettyTable.print(naked.all, cols.empty? ? columns : cols)
+    end
+  end
+
   module PrettyTable
     # Prints nice-looking plain-text tables via puts
     # 

@@ -218,6 +218,11 @@ module Sequel
       copy.instance_eval(&block)
       clone(copy.opts)
     end
+
+    def print(*cols)
+      Sequel::Deprecation.deprecate('Sequel::Dataset#print', 'require "sequel/extensions/pretty_table" first')
+      Sequel::PrettyTable.print(naked.all, cols.empty? ? columns : cols)
+    end
   end
 
   module SQL
@@ -233,6 +238,14 @@ module Sequel
         Sequel::Deprecation.deprecate('Sequel::SQL::Blob#to_blob', 'Use Sequel::SQL::Blob#to_sequel_blob')
         to_sequel_blob(*args)
       end
+    end
+  end
+
+  module PrettyTable
+    def self.print(*args)
+      Sequel::Deprecation.deprecate('Sequel::PrettyTable#print', 'require "sequel/extensions/pretty_table" first')
+      require "sequel/extensions/pretty_table"
+      print(*args)
     end
   end
 end

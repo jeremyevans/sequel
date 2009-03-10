@@ -1,8 +1,10 @@
 === HEAD
 
-* Deprecate Database#query and Dataset#query, require 'sequel/extensions/query' if you want them
+* Deprecate Dataset#print and PrettyTable, require 'sequel/extensions/pretty_table' if you want them (jeremyevans)
 
-* Deprecate Dataset#paginate and #each_page, require 'sequel/extensions/pagination' if you want them
+* Deprecate Database#query and Dataset#query, require 'sequel/extensions/query' if you want them (jeremyevans)
+
+* Deprecate Dataset#paginate and #each_page, require 'sequel/extensions/pagination' if you want them (jeremyevans)
 
 * Fix ~{:bool_col=>true} and related inversions of boolean values (jeremyevans)
 

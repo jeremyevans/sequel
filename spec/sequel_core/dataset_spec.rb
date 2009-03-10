@@ -2484,14 +2484,14 @@ context "Dataset#print" do
     $stdout = @orig_stdout
   end
   
-  specify "should print out a table with the values" do
+  deprec_specify "should print out a table with the values" do
     @dataset.print(:a, :b)
     @output.rewind
     @output.read.should == \
       "+-+-+\n|a|b|\n+-+-+\n|1|2|\n|3|4|\n|5|6|\n+-+-+\n"
   end
 
-  specify "should default to the dataset's columns" do
+  deprec_specify "should default to the dataset's columns" do
     @dataset.meta_def(:columns) {[:a, :b]}
     @dataset.print
     @output.rewind
