@@ -53,26 +53,32 @@ describe "Model#save" do
     o.changed_columns.should == []
   end
 
-  it "should preserve changed_columns' and @new's value until all hook finish running" do
+  it "should store previous value of @new in @was_new and as well as the hash used for updating in @columns_updated until after hooks finish running" do
     res = nil
-    @c.send(:define_method, :after_save){ res = [changed_columns, @new].flatten}
+    @c.send(:define_method, :after_save){ res = [@columns_updated, @was_new]}
     o = @c.new(:x => 1, :y => nil)
     o[:x] = 2
     o.save
-    res.should == [:x,true]
+    res.should == [nil, true]
+    o.after_save
+    res.should == [nil, nil]
 
     res = nil
     o = @c.load(:id => 23,:x => 1, :y => nil)
     o[:x] = 2
     o.save
-    res.should == [:x,false]
+    res.should == [{:id => 23,:x => 2, :y => nil}, nil]
+    o.after_save
+    res.should == [nil, nil]
 
     res = nil
-    o = @c.load(:id => 23,:x => 1, :y => nil)
+    o = @c.load(:id => 23,:x => 2, :y => nil)
     o[:x] = 2
     o[:y] = 22
     o.save(:x)
-    res.should == [:x,:y,false]
+    res.should == [{:x=>2},nil]
+    o.after_save
+    res.should == [nil, nil]
   end
   
   it "should use Model's save_in_transaction setting by default" do

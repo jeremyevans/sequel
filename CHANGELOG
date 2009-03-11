@@ -1,5 +1,7 @@
 === HEAD
 
+* Fix saving a newly inserted record in an after_create or after_save hook (jeremyevans)
+
 * Deprecate Dataset#print and PrettyTable, require 'sequel/extensions/pretty_table' if you want them (jeremyevans)
 
 * Deprecate Database#query and Dataset#query, require 'sequel/extensions/query' if you want them (jeremyevans)

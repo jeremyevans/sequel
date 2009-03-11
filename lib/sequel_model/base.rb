@@ -770,25 +770,25 @@ module Sequel
             end
             @this = nil if pk
           end
+          @new = false
+          @was_new = true
           after_create
           after_save
-          @new = false
+          @was_new = nil
           refresh if pk
         else
           return save_failure(:update) if before_update == false
           if columns.empty?
-            vals = opts[:changed] ? @values.reject{|k,v| !changed_columns.include?(k)} : @values
-            this.update(vals)
-          else # update only the specified columns
-            this.update(@values.reject{|k, v| !columns.include?(k)})
-          end
-          after_update
-          after_save
-          if columns.empty?
+            @columns_updated = opts[:changed] ? @values.reject{|k,v| !changed_columns.include?(k)} : @values
             changed_columns.clear
-          else
+          else # update only the specified columns
+            @columns_updated = @values.reject{|k, v| !columns.include?(k)}
             changed_columns.reject!{|c| columns.include?(c)}
           end
+          this.update(@columns_updated)
+          after_update
+          after_save
+          @columns_updated = nil
         end
         self
       end
