@@ -1013,11 +1013,17 @@ context "Database#create_view" do
   specify "should construct proper SQL with raw SQL" do
     @db.create_view :test, "SELECT * FROM xyz"
     @db.sqls.should == ['CREATE VIEW test AS SELECT * FROM xyz']
+    @db.sqls.clear
+    @db.create_view :test.identifier, "SELECT * FROM xyz"
+    @db.sqls.should == ['CREATE VIEW test AS SELECT * FROM xyz']
   end
   
   specify "should construct proper SQL with dataset" do
     @db.create_view :test, @db[:items].select(:a, :b).order(:c)
     @db.sqls.should == ['CREATE VIEW test AS SELECT a, b FROM items ORDER BY c']
+    @db.sqls.clear
+    @db.create_view :test.qualify(:sch), @db[:items].select(:a, :b).order(:c)
+    @db.sqls.should == ['CREATE VIEW sch.test AS SELECT a, b FROM items ORDER BY c']
   end
 end
 
@@ -1029,10 +1035,16 @@ context "Database#create_or_replace_view" do
   specify "should construct proper SQL with raw SQL" do
     @db.create_or_replace_view :test, "SELECT * FROM xyz"
     @db.sqls.should == ['CREATE OR REPLACE VIEW test AS SELECT * FROM xyz']
+    @db.sqls.clear
+    @db.create_or_replace_view :sch__test, "SELECT * FROM xyz"
+    @db.sqls.should == ['CREATE OR REPLACE VIEW sch.test AS SELECT * FROM xyz']
   end
 
   specify "should construct proper SQL with dataset" do
     @db.create_or_replace_view :test, @db[:items].select(:a, :b).order(:c)
+    @db.sqls.should == ['CREATE OR REPLACE VIEW test AS SELECT a, b FROM items ORDER BY c']
+    @db.sqls.clear
+    @db.create_or_replace_view :test.identifier, @db[:items].select(:a, :b).order(:c)
     @db.sqls.should == ['CREATE OR REPLACE VIEW test AS SELECT a, b FROM items ORDER BY c']
   end
 end
@@ -1044,7 +1056,10 @@ context "Database#drop_view" do
   
   specify "should construct proper SQL" do
     @db.drop_view :test
-    @db.sqls.should == ['DROP VIEW test']
+    @db.drop_view :test.identifier
+    @db.drop_view :sch__test
+    @db.drop_view :test.qualify(:sch)
+    @db.sqls.should == ['DROP VIEW test', 'DROP VIEW test', 'DROP VIEW sch.test', 'DROP VIEW sch.test']
   end
 end
 

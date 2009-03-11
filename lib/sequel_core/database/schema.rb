@@ -73,7 +73,7 @@ module Sequel
     def create_or_replace_view(name, source)
       remove_cached_schema(name)
       source = source.sql if source.is_a?(Dataset)
-      execute_ddl("CREATE OR REPLACE VIEW #{quote_identifier(name)} AS #{source}")
+      execute_ddl("CREATE OR REPLACE VIEW #{quote_schema_table(name)} AS #{source}")
     end
     
     # Creates a view based on a dataset or an SQL string:
@@ -82,7 +82,7 @@ module Sequel
     #   DB.create_view(:ruby_items, DB[:items].filter(:category => 'ruby'))
     def create_view(name, source)
       source = source.sql if source.is_a?(Dataset)
-      execute_ddl("CREATE VIEW #{quote_identifier(name)} AS #{source}")
+      execute_ddl("CREATE VIEW #{quote_schema_table(name)} AS #{source}")
     end
     
     # Removes a column from the specified table:
@@ -120,7 +120,7 @@ module Sequel
     def drop_view(*names)
       names.each do |n|
         remove_cached_schema(n)
-        execute_ddl("DROP VIEW #{quote_identifier(n)}")
+        execute_ddl("DROP VIEW #{quote_schema_table(n)}")
       end
     end
 
