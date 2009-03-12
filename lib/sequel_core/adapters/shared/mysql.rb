@@ -17,13 +17,13 @@ module Sequel
     # currently supported by the native and JDBC adapters.
     module DatabaseMethods
       AUTO_INCREMENT = 'AUTO_INCREMENT'.freeze
-      NOT_NULL = Sequel::Schema::SQL::NOT_NULL
-      NULL = Sequel::Schema::SQL::NULL
-      PRIMARY_KEY = Sequel::Schema::SQL::PRIMARY_KEY
-      TYPES = Sequel::Schema::SQL::TYPES.merge(DateTime=>'datetime', \
+      NOT_NULL = Sequel::Database::NOT_NULL
+      NULL = Sequel::Database::NULL
+      PRIMARY_KEY = Sequel::Database::PRIMARY_KEY
+      TYPES = Sequel::Database::TYPES.merge(DateTime=>'datetime', \
         TrueClass=>'tinyint', FalseClass=>'tinyint')
-      UNIQUE = Sequel::Schema::SQL::UNIQUE
-      UNSIGNED = Sequel::Schema::SQL::UNSIGNED
+      UNIQUE = Sequel::Database::UNIQUE
+      UNSIGNED = Sequel::Database::UNSIGNED
       
       # Use MySQL specific syntax for rename column, set column type, and
       # drop index cases.

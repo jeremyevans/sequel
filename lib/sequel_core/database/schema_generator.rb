@@ -62,7 +62,7 @@ module Sequel
       #   or not allowing NULL values (if false).  If unspecified, will default
       #   to whatever the database default is.
       # * :on_delete - Specify the behavior of this column when being deleted.
-      #   See Schema::SQL#on_delete_clause for options.
+      #   See Dataset#on_delete_clause for options.
       # * :on_update - Specify the behavior of this column when being updated.
       #   See Schema::SQL#on_delete_clause for options.
       # * :size - The size of the column, generally used with string
@@ -177,12 +177,14 @@ module Sequel
 
       private
 
+      # Add a composite primary key constraint
       def composite_primary_key(columns, *args)
         opts = args.pop || {}
         @columns << {:type => :check, :constraint_type => :primary_key,
                      :name => nil, :columns => columns}.merge(opts)
       end
 
+      # Add a composite foreign key constraint
       def composite_foreign_key(columns, opts)
         @columns << {:type => :check, :constraint_type => :foreign_key,
                      :name => nil, :columns => columns }.merge(opts)
@@ -304,11 +306,13 @@ module Sequel
 
       private
 
+      # Add a composite primary key constraint
       def add_composite_primary_key(columns, opts)
         @operations << {:op => :add_constraint, :type => :check,
           :constraint_type => :primary_key, :columns => columns}.merge(opts)
       end
 
+      # Add a composite foreign key constraint
       def add_composite_foreign_key(columns, table, opts)
         @operations << {:op => :add_constraint, :type => :check,
           :constraint_type => :foreign_key, :columns => columns,

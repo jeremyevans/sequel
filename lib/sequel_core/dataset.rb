@@ -160,7 +160,7 @@ module Sequel
     # a SELECT query is performed to get a single row. Adapters are expected
     # to fill the columns cache with the column information when a query is performed.
     # If the dataset does not have any rows, this will be an empty array.
-    # If you are looking for all columns for a single table, see Schema::SQL#schema.
+    # If you are looking for all columns for a single table, see Database#schema.
     def columns
       return @columns if @columns
       ds = unfiltered.unordered.clone(:distinct => nil, :limit => 1)

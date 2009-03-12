@@ -7,7 +7,7 @@ module Sequel
       SYNCHRONOUS = [:off, :normal, :full].freeze
       TABLES_FILTER = "type = 'table' AND NOT name = 'sqlite_sequence'"
       TEMP_STORE = [:default, :file, :memory].freeze
-      TYPES = Sequel::Schema::SQL::TYPES.merge(Bignum=>'integer')
+      TYPES = Sequel::Database::TYPES.merge(Bignum=>'integer')
       
       # Run all alter_table commands in a transaction.  This is technically only
       # needed for drop column.

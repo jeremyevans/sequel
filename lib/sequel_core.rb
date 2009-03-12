@@ -2,7 +2,7 @@
   require f
 end
 %w"metaprogramming core_ext sql core_sql connection_pool exceptions
-  dataset migration schema database object_graph version deprecated".each do |f|
+  dataset migration database object_graph version deprecated".each do |f|
   require "sequel_core/#{f}"
 end
 

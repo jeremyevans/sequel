@@ -1,4 +1,4 @@
-require 'sequel_core/database/schema'
+%w'methods generator sql'.each{|f| require "sequel_core/database/schema_#{f}"}
 
 module Sequel
   # Array of all databases to which Sequel has connected.  If you are
@@ -13,7 +13,6 @@ module Sequel
   class Database
     extend Metaprogramming
     include Metaprogramming
-    include Schema::SQL
 
     # Array of supported database adapters
     ADAPTERS = %w'ado db2 dbi do firebird informix jdbc mysql odbc openbase oracle postgres sqlite'.collect{|x| x.to_sym}
