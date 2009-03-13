@@ -1,0 +1,622 @@
+0
+
+My name is Jeremy Evans, and I'm here to talk about Sequel, the database toolkit
+for ruby.
+
+1
+
+Sequel has only been around two years, and I don't know much about the first
+year.  I was only using Sequel a month before becoming maintainer last March.  I
+didn't read much of Sequel's source until after I became maintainer, and what I
+found distressed me.  The basic design was good, but the implementation was
+messy.  Many features were implemented by overriding methods, there was very
+little documentation, and all methods were public.  The advanced filtering at
+the time required ParseTree, and the code for that was the ugliest.  I
+deprecated some things I thought were obviously bad ideas, and worked on a
+replacement for the ParseTree filters.
+
+2
+
+I added expression filters in 2.0, which let you write advanced filters without
+requiring ParseTree or handwritten SQL.  I removed ParseTree support in 2.2,
+which allowed me to support Ruby 1.9 and JRuby in 2.3.  I added prepared
+statement and sharding support in 2.4, which was impressive as it came only two
+weeks after 2.3.  Since then, there have been a lot of features added and a lot
+of bugs fixed.
+
+3
+
+Sequel is split into two parts, core and model.  This is different than the DM
+core/more split, where more adds features to core.  sequel_core is a ruby
+interface to an SQL database.  It's great for generating reports or dealing with
+sets of rows instead of single rows.  sequel_model is an object relational
+mapper built on top of core.  model classes are built on top of core datasets,
+so you get the benefits of core when using model.  At an instance level, model
+is similar to AR or DM in basic usage.  model depends on core, but core does not
+depend on model, and you could probably use a core dataset to return AR objects
+if you wanted to.
+
+4
+
+Sequel currently supports 13 database adapters.  Some databases are supported by
+multiple adapters, and some adapters support multiple databases, though the best
+supported adapters are the native ones.  I test MySQL, PostgreSQL, and SQLite
+using the native, JDBC, and DataObjects adapters, all of which have good
+support.  I know Sequel users who are using the ADO, Firebird, ODBC, and Oracle
+adapters successfully, and I haven't received bug reports about the others.
+
+5
+
+One reason Sequel supports many adapters is that the adapters are easy to write.
+Only 5 methods are required.  Adapters range in size from 50 lines for OpenBase
+to 1200 for PostgreSQL.  The PostgreSQL adapter supports 3 different native
+drivers, native prepared statements, and even methods to add database triggers
+and functions, which is the reason it is so large.
+
+6
+
+Adding 5 methods is enough return results, but not enough for full support.
+Full support requires the delete and update methods return the number of rows
+modified and the insert method return the autoincrementing primary key value.
+Getting insert fully supported usually takes the most time.
+
+If you are adding support for a new database, you have to deal with the SQL
+syntax differences. Sequel makes this as easy as possible, as it is designed for
+flexibility over performance. You generally just have to override a few short
+methods.  Running the integration tests is the best way to test adapter support.
+
+7
+
+After requiring sequel, you should create a Database object via the connect
+method.  The convention for an application using a single database is to store
+the database object in a constant named DB.  The main use for this object is to
+create dataset objects for queries, but it handles transactions and some other
+things too.
+
+8
+
+For example, You can use it to change the default settings for datasets and add
+SQL loggers.  The transaction method is the only way to use an SQL transaction.
+It ensures that all access to the database inside the block uses the same
+connection inside a transaction.
+
+9
+
+Each database object has a separate thread safe connection pool.  Sequel was
+well designed to use the connection pool when I became maintainer.  I've added a
+few features, but most of it is the same.  It is designed for high concurrency,
+where Sequel uses the pool for the least amount of time necessary. Sequel
+doesn't checkout a connection until the final SQL string is ready to be sent to
+the database, and returns the connection as soon as it is finished iterating
+over the results.  Sequel ensures that connections are not leaked, so you don't
+need to cleanup connections manually or use a reaper thread.  There's also a
+single threaded pool that's faster if thread safety is not important.
+
+10
+
+The Sequel dataset is really its defining object, and by that I mean it is what
+separates Sequel from other ruby database libraries.  It uses a functional style
+API where you build queries by chaining methods, and it doesn't send the query
+to the database until you ask it to.  The thing to note here is the lack of any
+SQL strings.  You can code complex database applications in Sequel without ever
+writing any SQL code, if you don't stray from the SQL standard.  You can use
+Sequel and code all of your SQL by hand too, if you want.
+
+11
+
+To request records, you use each or all.  Each yields the rows as they arrive,
+and all loads all rows first.  Some adapters buffer all rows in memory first,
+but with others, each works on a million record dataset without loading
+everything in memory.  You can set an arbitrary proc called the row proc to call
+with the row before yielding, which is how model instances are returned by
+datasets.   Datasets do no caching of records, calling each twice sends two
+queries.
+
+12
+
+Inserting, updating, and deleting records should be intuitive. Be careful with
+delete and update, as they affect all rows in the receiver.  Remember this:
+filter first, delete second.  You should note the usage of symbols for database
+columns.  Sequel generally treats ruby strings as SQL strings and ruby symbols
+as SQL columns.
+
+13
+
+Sequel supports simple filters using strings or hashes.  Sequel uses hashes for
+equality and inclusion.  See here the difference between the use of a string and
+symbol for ln.
+
+14
+
+Sequel allows you to write your SQL queries as ruby expressions, without using
+ParseTree, by adding methods that ruby does not define.  These examples show
+that Sequel knows about boolean logic, leading to cleaner looking SQL.  The
+subselect example shown here shows how datasets can be used with other datasets.
+Even these filters are just the tip of the iceberg, queries can get much more
+complex than this, and Sequel handles them just fine.  Putting your objects
+directly in your queries feels natural to me, moreso than using strings with
+placeholders.  The expression syntax is terse, but hopefully intuitive.  Be
+aware that one issue with using the bitwise operators in place of the logical
+ones is that you often need to use extra parentheses.
+
+15
+
+If you do string manipulation in the database, Sequel can help.  It supports
+concatenating strings and doing LIKE searches.  It also supports full text
+searching on some databases.
+
+16
+
+I mentioned that Sequel uses symbols for columns, but it also uses them for
+tables and schemas.  Because columns often need to be qualified or aliased, you
+can specify the qualifier or alias in the symbol itself. A double underscore
+separates a table from a column, and a triple underscore separates a column from
+an alias.  You can use methods that do the same thing.  You can also use this
+for schema qualified tables, which Sequel supports well.
+
+17
+
+Sequel makes joining tables easy and flexible.  You need to provide the join
+type, table, and conditions.  The typical foreign key to primary key join uses a
+hash with the key being the column symbol in the table being joined, and the
+value being the column symbol in the current table.  You can use complex
+conditions with an expression filter.  You can also use a using join or natural
+join.
+
+18
+
+Sequel has helper methods for common join types.  If you are doing multiple
+joins in your query, often you will have a condition that refers to a previous
+table instead of the current table or the table being joined.  If that is the
+case, you need to qualify that column yourself, as otherwise Sequel will qualify
+it incorrectly.
+
+19
+
+Unfortunately, joining tables creates problems when multiple tables have columns
+with the same names, which happens a lot.  Since Sequel returns rows as hashes,
+later columns end up clobbering earlier columns.  This is one of the reasons
+that has_and_belongs_to_many associations don't work on model join tables in AR.
+
+20
+
+You can select only certain columns and/or alias columns manually, but that's a
+pain.  Wouldn't it be great for something else to do the work and give you
+something useable back?
+
+21
+
+That's what graphing does.  Graphing aliases for you, and returns rows as a hash
+of hashes.  The main hash has table symbol keys, and the subhashes have column
+symbol keys and column values.  This is a lot easier than aliasing everything
+yourself.  I think graphing is one of Sequel's unique features, and it makes
+dealing with table joins at a row based level much easier. While graphing is
+great, there are cases when joining and aliasing manually is better.
+
+22
+
+Onto Sequel models.  Remember model classes are backed by dataset instances, and
+model instances represent single rows in the dataset.  Sequel doesn't require
+that you use a plain table for a model, you can use a joined dataset if you
+want.  Generally a plain table is best if you want to create, update, or delete
+rows.  You can use an ordered dataset to return all rows in a certain order by
+default, or a filtered dataset to restrict the model to a subset of rows.
+
+23
+
+Sequel didn't have associations when I started using it, people generally just
+wrote their own instance methods.  It's easy to do that in Sequel, but if you
+want caching, callbacks, reflection, eager loading, and methods to add/remove
+associated objects, it's a lot more work.  Associations handle all that for you.
+They are created with method names that reflect the database relationship,
+rather than imply ownership.
+
+24
+
+Sequel does not use proxies for associations.  The many to one association
+method returns either the associated object or nil, and the to many association
+method always returns an array.  Most uses of a proxy can be handled using the
+association dataset method, which returns a dataset that you can filter,
+reorder, or otherwise modify.  The many to one association adds a setter method,
+and the to many associations add add association, remove association and remove
+all association methods.
+
+25
+
+I chose to not use proxies because they are more difficult to implement,
+understand, and reason about. With the association dataset method, there really
+isn't a need for proxies.  The add, remove, and remove all instance methods are
+simple and descriptive.  Note that the add and remove methods affect only the
+association, the remove method doesn't delete the passed object from the
+database.
+
+26
+
+Some people complain that association_dataset is an ugly method name. Maybe so.
+However, accessing the dataset should be less frequent than accessing the
+associated objects.  If you find yourself using the dataset a lot with different
+filters, you should add multiple associations with those filters built in. Doing
+so leads to more descriptive code.  I added the clone option to make this
+easier.
+
+27
+
+Clone is only one of around 30 current association options.  Most users will
+only use a small number of the options, but the numerous options exist to give
+users near complete control over all aspects of the association.   All
+association defining methods also take a block that yields a dataset that you
+can modify if there isn't an option available, which you can use to make an
+association a union of multiple datasets, for example.
+
+28
+
+Many options affect eager loading, which I'll discuss soon. Sequel provides the
+same association callbacks as AR, and also adds an after_load callback, which I
+use in an accounting app to figure out if each associated entry is a debit or a
+credit to the current account.  You can use the :extend option to extend the
+association dataset with a module.
+
+29
+
+Since Sequel is a toolkit, flexibility is important, so the added methods are
+easy to override.  You just override them and call super, no aliasing required.
+The modification methods are split into public and private methods.  The private
+method starts with an underscore and does the query.  The public method handles
+caching and callbacks. If you want the setter method to accept a hash in
+addition to a model object, you override the public method and call super.  If
+you want to set an additional column in the database, you override the private
+method.
+
+30
+
+Sequel's eager loading gives you choice whether to load associations in a
+separate query with eager or use a join with eager_graph.  Using eager is
+recommended.  If your association uses a different database, you must use eager,
+if your order or filters use columns in the associated table, you must use
+eager_graph.  Both have the same API and can be used simultaneously.  I chose to
+use two methods because they do very different things, and to leave the choice
+to the user.  Also, Sequel never attempts to parse SQL, so it wouldn't be able
+to guess which method was appropriate.
+
+31
+
+Sequel only supports three association types natively, but you can support any
+other association type using the :dataset option, which takes a proc that is
+instance evaled.  The has many through has many association just uses a filtered
+eager graphed dataset.  The has many through belongs to isn't shown here because
+it is handled by the built in many to many association.  You can also create
+much more complex associations, such as joining on any of multiple keys through
+a third table.  That is not a hypothetical example made purposely difficult, I
+use it in one of my apps.
+
+AR can actually handle that associations using custom SQL.  However,
+
+32
+
+it can't eager load it.  Sequel supports eager loading of custom associations
+using the eager loader option.  This option takes a proc that accepts a key
+hash, an array of current objects, and the dependent associations to eagerly
+load.  The key hash is an optimization.  It's a hash of hashes, with keys being
+columns.  The subhashes have column value keys with values being an array of
+related objects.  Let me break down how this works.  First, you get the subhash
+for the primary key and set the cached invoices for all given firms to the empty
+array.  You then get all invoices for all clients of all the firms being eagerly
+loaded, using the keys of the subhash.  For each invoice, you get the value in
+the subhash for the invoice's client's firm_id foreign key, and you add the
+invoice to the firm.
+
+This feature is powerful enough to load any association that can be eagerly
+loaded. An eager_grapher option is also available to allow you to set custom
+joins when eager graphing.
+
+33
+
+Sequel doesn't support polymorphic associations because I think they are a bad
+idea.  Their only purpose is to reduce the number of tables, which is a solution
+to a non-problem.  An association between two separate classes should have its
+own join table, for the same reason you use separate tables for classes even if
+they have the same schema.  Polymorphic associations are more complex and they
+break referential integrity.  If you must use them, there is a Sequel plugin
+that handles them.
+
+34
+
+That plugin just uses the options and techniques I've discussed, no monkey
+patching.  Sequel's eager loader is even powerful enough to load all ancestors
+and decendants in a tree structure.  It's my belief that Sequel has the most
+powerful and flexible associations of any ruby ORM.
+
+35
+
+Sequel currently supports validations similar to AR.  My philosophy is that they
+should only be used for nice error messages, not data integrity.  Use database
+constraints if you can.  It supports built in validations
+
+36
+
+as well as custom ones you write yourself.
+
+37
+
+Sequel supports most of the same hooks as AR, and the usage is currently
+similar.  I prefer database triggers to hooks for data integrity.  However, if
+you are targeting multiple databases, using hooks and validations is probably
+easier.
+
+38
+
+Sequel's built in pagination support is just a wrapper for limit that adds a few
+methods.  It's helpful if you are writing a search engine.  each page yields a
+paginated version of the current dataset a page at a time.  If you use an
+adapter that buffers all records before yielding, it can be useful to process a
+record set that won't fit in memory.
+
+39
+
+Sequel's built in caching supports caching model objects to any object with the
+ruby-memcache API.
+
+40
+
+You can use Sequel to create and alter tables.  create table takes a table name
+and a block.  You have to explicitly use primary key if you want one.  You can
+use the column method or method_missing to create columns.  You can use the
+index method to create indexes.  If you use a ruby class as a type, Sequel uses
+the most appropriate database type for that class.  If you use a symbol, Sequel
+uses it directly.  Sequel encourages the use of database constraints and allows
+you to create them with the constraint method.  Sequel encourages the use of
+real foreign key references, so foreign key takes a table argument.  You can
+also use composite keys if you want.
+
+41
+
+alter table is similar. You can add and drop columns, constraints, and indexes.
+Adding foreign and primary keys is easy, and you can use composite keys here
+too.  You can also change a column's name, type, or default.
+
+42
+
+Most table altering methods can be called directly on the database object.  You
+can also rename and drop tables and create and drop views using database
+methods.
+
+43
+
+Generally, the schema methods are called inside migrations.  A migration proxies
+most methods to the database that applies it.
+
+44
+
+There is a individual migration API, but it's recommended to use Sequel's
+migrator, which deals with a directory of individual migration files.  Sequel's
+command line tool uses the migrator with the -m switch, but you can also use the
+migrator API.
+
+
+45
+
+My migration philosophy is that you should usually only make schema changes in a
+migration, no data modification unless necessary.  More importantly, keep your
+migrations decoupled from your models and environment, otherwise it's likely
+that you'll make changes that break old migrations and you won't find out till
+later.  The migration files must use integer version numbers, I think
+timestamped migrations cause more problems than they solve.
+
+46
+
+Sequel currently supports a DM like way of specifying schemas in your models.  I
+think this is a bad idea as it makes migrations difficult.
+
+It also goes against my philosophy.  I think a model is a nice front end to the
+database, not that the database is just a place to store your model's data.  You
+can use Sequel just for persistence, but that's not a design goal.  Most
+databases I use were designed before I started using ruby.  In my experience,
+most databases are integration databases, not application databases.  If your
+data is important, design your app around your database, not vice-versa.
+
+47
+
+Let's move on to some advanced core features.  Sequel supports bound variables
+and prepared statements, and it does so in a database independent manner.
+Database support for placeholders varies greatly, but with Sequel the API for
+all databases is the same.  Sequel supports the same interface even if the
+database or adapter doesn't have native support.
+
+To use a bound variable, you specify the placeholder as a symbol starting with a
+dollar sign.  When you call the statement, you provide a hash of symbols for
+your placeholders, without the dollar signs.  You have to tell Sequel which type
+of statement you want to use, and for update and insert statements, you can also
+provide a hash of attribute values, which can also include placeholders.
+
+If there is native bound variable support, this may be faster, though you should
+profile and/or benchmark.  The performance difference probably won't be
+significant unless the bound variables are expensive to literalize.
+
+48
+
+Prepared statement support is similar.  Instead of call you use the prepare
+method on the dataset and give the statement a name.  You can then call the
+statement through the returned object or through the database via the name.
+
+Prepared statements are most beneficial when the database spends a lot of time
+planning the same query.  If you prepare it once, the database only plans it
+once.  It also has the same literalization benefits as bound variables.
+
+You can use both of these on model datasets and get back model objects.
+
+The code for this is probably the most complex code in Sequel, and I don't
+recommend using it without profiling and benchmarking.  If used incorrectly, it
+might make your app slower.
+
+49
+
+Sequel supports database stored procedures in the MySQL and JDBC adapters,
+similar to the prepared statement support. The API is a little strange, as you
+call the database stored procedure on a dataset object and specify a query type.
+It's done this way so that you can have a stored procedure that returns model
+objects, as well as one that one that doesn't return rows.
+
+50
+
+Sequel has built in support for master/slave database configurations.  Moving
+from a single database to a master/slave configuration can be done just by
+adding a servers option to the connect method with a read_only key.  The
+read_only value should be a hash or proc that returns a hash.  It is merged with
+the other options when a connection is requested.  Sequel will then use the
+slave databases for selects and the master database for all other queries.  You
+can also use multiple masters or single slaves.
+
+51
+
+The master/slave support is mostly a subset of the generic sharding support.
+Sequel makes it easy to deal with a partitioned database, you can choose which
+server to use for any query via the server method.  The connection pool handles
+sharding, so it is supported with all adapters.
+
+When using sharding, the tables you are using should have the same schema on
+each server, otherwise you should use separate Database objects.
+
+52
+
+Sequel doesn't override methods added by ruby, but it does add methods to the
+core classes. Most of these implement Sequel's DSL, though currently some exist
+just to ease implementation.  I'm going to review the ones related to the DSL.
+
+Hashes and arrays of two pairs are used are used to specify conditions.  By
+default, the condition entries are ANDed together.  However, you can use sql_or
+to OR the entries. You can use sql_negate to AND the negation of the entries.
+You can use the bitwise negation operator to invert the conditions.  The case
+method returns an SQL case statement, useful for conditional sums and many other
+things.
+
+53
+
+Since Sequel usually treats arrays of all two pairs as conditions, you have to
+call the sql_array method if you want it treated as an array. The hash and
+symbol bitwise and and or methods are treated like a logical AND or OR.  The as
+method is used to set up aliases.  There are a few methods relating to casting
+values.  The cast methods can take Ruby classes, similar to how database types
+are handled in the schema methods.  The cast numeric method also tells Sequel it
+is a number, so it knows to treat the bitwise operators as bitwise operators in
+SQL.  The cast string method also tells Sequel that it is a string, so addition
+will do concatenation.
+
+54
+
+Since ruby strings are usually treated as SQL strings, if you want the string to
+be used literally without quoting, you call the lit method.  You can use
+placeholders in the string and call lit with arguments too.  Symbol has the
+numeric operators defined and they operate as expected in SQL.  The sql_function
+method creates SQL functions.  If you are using ruby 1.8, you can use the array
+access operator for SQL functions, and you can also use the inequality operators
+directly on symbol.
+
+55
+
+You use the identifier method to handle a symbol as a single identifier, so it
+won't care about double or triple underscores.  You use the qualify method
+directly qualify a column with a table.  The like and ilike methods handle
+searching, and you can use regular expressions on PostgreSQL or MySQL.  The
+sql_number or sql_string methods work similar to cast_numeric and cast_string,
+but without the casting.
+
+Sequel knows a little about how database types work.  If it knows an object is a
+string in SQL, you won't be able to use the division operator, and the addition
+operator will do concatenation.
+
+Most methods added to symbol also work on the objects that Sequel creates, which
+is what allows you to write complex SQL queries directly in ruby.
+
+56
+
+Sequel ships with a command line tool called sequel.  You it with either a
+connection string or a path to a yaml file as an argument.  It gives you an irb
+shell with the database object already loaded in the DB constant.  You can also
+use it to run migrations.  It's great for quick access and playing with sequel.
+With the -L option, you can load all files in your models.  It starts quickly so
+you can too.
+
+57
+
+Sequel isn't designed around the needs to web applications, but it does work
+well with them.  Sequel's settings are fairly strict by default, most people
+will want to turn off raise on typecast failure, otherwise user input errors
+will raise exceptions before validations are called.  You can turn off
+typecasting completely, but that is not a good solution.  Using the validates
+not string validation, you can check that non-string columns don't have string
+values.  If there is a string value in a non-string column and you have
+typecasting enabled and raise on typecast failure is false, then it is obvious
+that typecasting failed, so it will add a validation error.
+
+Turning off raise on save failure is necessary if you don't want to use begin
+and rescue to catch save failures.  Turning off strict param setting will cause
+Sequel not to report errors if there is an attempt to access a restricted setter
+method in a mass assignment call.  It makes debugging more difficult, so I urge
+caution.  All of these methods can be set at a per model or per instance level.
+
+Sequel offers multiple mass assignment methods.  set_only is recommended, as it
+only allows access the attributes you specify.  This is a better approach than
+setting the allowed columns at a model level, as you can decide which attributes
+are allowed in each call.  Some forms may let you set some attributes and not
+others, and you should make sure that no form submission can update more
+attributes than you specifically allow.  For consistency, there is a
+set_restricted method, that works as you might expect, but I don't recommend its
+use.  You can use Sequel just like AR and set allowed or restricted columns at
+the model level, and just use set to update the attributes.  For very simple
+applications, that may be easiest.
+
+58
+
+Sequel is lightweight compared to AR or DM.  sequel core 63% smaller than
+dm-core, and all of sequel is still 33% smaller.  All of sequel is 3.5 times
+smaller than dm-more and 2.5 times smaller than AR.
+
+Sequel loads as fast as dm-core, and 2.5 times faster than AR or dm-more.
+Sequel is comparable to AR in performance from the benchmarks I've seen.
+Performance optimization has not been a focus during my maintenance, I've mainly
+worked on new features, bug fixes, and cleaning the internals.
+
+59
+
+Sequel is currently at version 2.11, and only a year ago it was at 1.3.  There
+was a release every 2 to 3 weeks for a while, now there is a monthly release
+cycle.
+
+I take bug reports seriously.  Bugs posted on the tracker generally get fixed in
+a day to a week.  I actually try to fix bugs that don't affect me personally.
+You don't have to provide specs if the bug is obvious.  Sequel's bug tracker is
+usually empty.
+
+I run the full release test suite before pushing to github, so the master branch
+is stable enough to use in production if you use one of the databases I test.  I
+run all of my personal apps directly off the master branch.  You should read the
+commit messages before pulling, they are descriptive.
+
+60
+
+It is very easy to contribute to Sequel.  Zero bureaucracy, no plus 1s, just
+show me the code and tell me why it is a good idea. I accept patches via IRC,
+the Google Group, the bug tracker, or github. I don't accept all patches, and
+modify many I do accept, but you will get a response quickly.
+
+I prefer specs with new features, but I'll write the specs myself if I think a
+feature is a good idea.  I'll even rewrite the implementation if I like the
+feature but not the patch.
+
+61
+
+The future is coming, and it is Sequel 3.  As much as possible it will be
+compatible with Sequel 2.  Like the move from 1.5 to 2.0, I will be deprecating
+stuff in 2.12 and removing it in 3.0.  Many built-in features will be moving
+into plugins or extensions that still ship with sequel but will need to be
+required separately.  The majority of this work is already completed and
+available in the master branch.
+
+Sequel 3 will be more lightweight, easier to use, and cleaner internally than
+Sequel 2.
+
+62
+
+That concludes my presentation.  I'll open it to the floor for questions now.
+
+Thank you all for your time.

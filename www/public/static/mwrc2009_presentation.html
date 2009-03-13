@@ -1,0 +1,1723 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" 
+	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+	<head>
+		<title>Sequel: The Database Toolkit for Ruby</title>
+		<meta name="generator" content="S5" />
+		<meta name="presdate" content="March 13, 2009" />
+		<meta name="author" content="Jeremy Evans" />
+		<meta name="company" content="" />
+		<meta name="defaultView" content="slideshow" />
+		<meta name="controlVis" content="hidden" />
+        <style type='text/css' media='screen' id='slideProj'>
+/* Do not edit or override these styles! The system will likely break if you do. */
+
+div#header, div#footer, div#controls, .slide {position: absolute;}
+html>body div#header, html>body div#footer, 
+  html>body div#controls, html>body .slide {position: fixed;}
+.handout {display: none;}
+.layout {display: block;}
+.slide, .hideme, .incremental {visibility: hidden;}
+#slide0 {visibility: visible;}
+
+/* The following styles size, place, and layer the slide components.
+   Edit these if you want to change the overall slide layout.
+   The commented lines can be uncommented (and modified, if necessary) 
+    to help you with the rearrangement process. */
+
+div#header, div#footer, .slide {width: 100%; top: 0; left: 0;}
+div#header {top: 0; height: 3em; z-index: 1;}
+div#footer {top: auto; bottom: 0; height: 2.5em; z-index: 5;}
+.slide {top: 0; padding: 1.5em 1em 0 1em; z-index: 2;  list-style: none;}
+div#controls {left: 50%; bottom: 0; width: 50%; z-index: 100;}
+div#controls form {position: absolute; bottom: 0; right: 0; width: 100%;
+  margin: 0;}
+#currentSlide {position: absolute; width: 10%; left: 45%; bottom: 1em; z-index: 10;}
+html>body #currentSlide {position: fixed;}
+/* Based on a combination of 'Blue Theme 2004' and the default. */
+
+/* Following are the presentation styles -- edit away!
+   Note that the 'body' font size may have to be changed if the resolution is
+    different than expected. */
+
+body {
+	background-color: #fffff0;
+	color: black;
+	font-size: 1.8em;
+}
+:link, :visited {text-decoration: none; color: black;}
+#controls :active {color: #88A !important;}
+#controls :focus {outline: 1px dotted #227;}
+h1, h2, h3, h4 {font-size: 100%; margin: 0; padding: 0; font-weight: inherit;}
+html, body {margin: 0; padding: 0;}
+
+blockquote, q {font-style: italic;}
+blockquote {padding: 0 2em 0.5em; margin: 0 1.5em 0.5em; text-align: center; font-size: 1em;}
+blockquote p {margin: 0;}
+blockquote i {font-style: normal;}
+blockquote b {display: block; margin-top: 0.5em; font-weight: normal; font-size: smaller; font-style: normal;}
+blockquote b i {font-style: italic;}
+
+kbd {font-weight: bold; font-size: 1em;}
+sup {font-size: smaller; line-height: 1px;}
+
+ul {margin-left: 5%; margin-right: 7%; list-style: disc;}
+li {margin-top: 0.75em; margin-right: 0;}
+ul ul {line-height: 1;}
+ul ul li {margin: .2em; font-size: 85%; list-style: square;}
+img.leader {display: block; margin: 0 auto;}
+
+div#header, div#footer {
+  background-color: #ffffd0;
+  color: black;
+  font-family: Verdana, Helvetica, sans-serif;
+}
+div#header {
+	line-height: 10px;
+	border-bottom: 2px solid red;
+}
+div#header img {float: left; }
+div#footer {
+	font-size: 0.5em;
+	font-weight: bold;
+	padding: 1em 0;
+	height: 36px;
+	border-top: 2px solid red;
+}
+#footer h1, #footer h2 {display: block; padding: 0 1em;}
+#footer h2 {font-style: italic;}
+
+div.long {font-size: 0.75em;}
+.slide {
+  font-family: georgia, Times, 'Times New Roman', serif;
+  width: 96%;
+}
+.slide h1 {
+ z-index: 1;
+ white-space: nowrap;
+ margin-top: 1.5em;
+ margin-bottom: .5em;
+ text-align: center;
+ padding: 0;
+ font: 150%/1em georgia, Times, 'Times New Roman', serif;
+ color: black;
+ }
+.slide h3 {font-size: 130%;}
+h1 abbr {font-variant: small-caps;}
+
+div#controls {position: absolute; left: 50%; bottom: 0;
+  width: 50%;
+  text-align: right; font: bold 0.9em Verdana, Helvetica, sans-serif;}
+html>body div#controls {position: fixed; padding: 0 0 1em 0;
+  top: auto;}
+div#controls form {position: absolute; bottom: 0; right: 0; width: 100%;
+  margin: 0; padding: 0;}
+#controls #navLinks a {padding: 0; margin: 0 0.5em; 
+  background: #005; border: none; color: #779; 
+  cursor: pointer;}
+#controls #navList {height: 1em;}
+#controls #navList #jumplist {position: absolute; bottom: 0; right: 0; background: #DDD; color: #227;}
+
+#currentSlide {text-align: center; font-size: 0.5em; color: #9183BF; font-family: Verdana, Helvetica, sans-serif;}
+
+#slide0 h1, #slide0 h2, #slide0 h3 { text-align: center; }
+#slide0 h1 {
+   margin-top: 2em;
+   margin-bottom: .2em;
+   padding: 0;
+   white-space: normal;
+   background: transparent;
+   font: 2.5em Georgia, Times, 'Times New Roman', serif;
+   color: black;
+}
+#slide0 h2 { font-size: 2em; }
+#slide0 h3 {
+	margin-top: 1em;
+	font-size: 1.5em;
+}
+
+ul.urls {list-style: none; display: inline; margin: 0;}
+.urls li {display: inline; margin: 0;}
+.note {display: none;}
+
+div.ruby pre {
+	background-color: #ffffd0;
+	border: 1px solid lightgray;
+	color: #000000;
+	display: block;
+	font-family: 'Monaco', monospace;
+	font-size: 1em;
+	font-style: normal;
+	font-weight: bold;
+	margin-left: 1em;
+	margin-right: 1em;
+	padding: 1em 1.5em 1em 1.5em;
+}
+
+.ruby .keyword {
+	color: #1f60a0;
+}
+.ruby .punct {
+	color: #000000;
+}
+.ruby .class {
+	color: #a08000;
+	font-weight: bold;
+}
+.ruby .constant {
+	color: #008080;
+}
+.ruby .ident {}
+.ruby .comment {
+	color: #3f603f;
+	font-style: italic;
+}
+.ruby .symbol {
+	color: #800000;
+}
+.ruby .string {
+	color: #bf2f2f;
+}
+.ruby .regex {
+	color: #bf8060;
+}
+
+.ruby .number {
+	color: #0080a0;
+}
+</style>
+        <style type='text/css' media='screen' id='outlineStyle'>
+/* don't change this unless you want the layout stuff to show up in the outline view! */
+
+.layout div, #footer *, #controlForm * {display: none;}
+#footer, #controls, #controlForm, #navLinks, #toggle {
+  display: block; visibility: visible; margin: 0; padding: 0;}
+#toggle {float: right; padding: 0.5em;}
+html>body #toggle {position: fixed; top: 0; right: 0;}
+
+/* making the outline look pretty-ish */
+
+#slide0 h1, #slide0 h2, #slide0 h3, #slide0 h4 {border: none; margin: 0;}
+#slide0 h1 {padding-top: 1.5em;}
+.slide h1 {margin: 1.5em 0 0; padding-top: 0.25em;
+  border-top: 1px solid #888; border-bottom: 1px solid #AAA;}
+#toggle {border: 1px solid; border-width: 0 0 1px 1px; background: #FFF;}
+
+</style>
+        <style type='text/css' media='print' id='slidePrint'>
+/* The following rule is necessary to have all slides appear in print! DO NOT REMOVE IT! */.slide, ul {page-break-inside: avoid; visibility: visible !important;}h1 {page-break-after: avoid;}body {font-size: 12pt; background: white;}* {color: black;}#slide0 h1 {font-size: 200%; border: none; margin: 0.5em 0 0.25em;}#slide0 h3 {margin: 0; padding: 0;}#slide0 h4 {margin: 0 0 0.5em; padding: 0;}#slide0 {margin-bottom: 3em;}h1 {border-top: 2pt solid gray; border-bottom: 1px dotted silver;}.extra {background: transparent !important;}div.extra, pre.extra, .example {font-size: 10pt; color: #333;}ul.extra a {font-weight: bold;}p.example {display: none;}#header {display: none;}#footer h1 {margin: 0; border-bottom: 1px solid; color: gray; font-style: italic;}#footer h2, #controls {display: none;}/* The following rule keeps the layout stuff out of print.  Remove at your own risk! */.layout, .layout * {display: none !important;}
+</style>
+        <style type='text/css' media='projection' id='operaFix'>
+/* DO NOT CHANGE THESE unless you really want to break Opera Show */
+.slide {
+	visibility: visible !important;
+	position: static !important;
+	page-break-before: always;
+}
+#slide0 {page-break-before: avoid;}
+
+</style>
+        <script type='text/javascript'>
+// S5 v1.1 slides.js -- released into the Public Domain
+//
+// Please see http://www.meyerweb.com/eric/tools/s5/credits.html for information 
+// about all the wonderful and talented contributors to this code!
+
+var undef;
+var slideCSS = '';
+var snum = 0;
+var smax = 1;
+var incpos = 0;
+var number = undef;
+var s5mode = true;
+var defaultView = 'slideshow';
+var controlVis = 'visible';
+
+var isIE = navigator.appName == 'Microsoft Internet Explorer' && navigator.userAgent.indexOf('Opera') < 1 ? 1 : 0;
+var isOp = navigator.userAgent.indexOf('Opera') > -1 ? 1 : 0;
+var isGe = navigator.userAgent.indexOf('Gecko') > -1 && navigator.userAgent.indexOf('Safari') < 1 ? 1 : 0;
+
+function hasClass(object, className) {
+	if (!object.className) return false;
+	return (object.className.search('(^|\\s)' + className + '(\\s|$)') != -1);
+}
+
+function hasValue(object, value) {
+	if (!object) return false;
+	return (object.search('(^|\\s)' + value + '(\\s|$)') != -1);
+}
+
+function removeClass(object,className) {
+	if (!object) return;
+	object.className = object.className.replace(new RegExp('(^|\\s)'+className+'(\\s|$)'), RegExp.$1+RegExp.$2);
+}
+
+function addClass(object,className) {
+	if (!object || hasClass(object, className)) return;
+	if (object.className) {
+		object.className += ' '+className;
+	} else {
+		object.className = className;
+	}
+}
+
+function GetElementsWithClassName(elementName,className) {
+	var allElements = document.getElementsByTagName(elementName);
+	var elemColl = new Array();
+	for (var i = 0; i< allElements.length; i++) {
+		if (hasClass(allElements[i], className)) {
+			elemColl[elemColl.length] = allElements[i];
+		}
+	}
+	return elemColl;
+}
+
+function isParentOrSelf(element, id) {
+	if (element == null || element.nodeName=='BODY') return false;
+	else if (element.id == id) return true;
+	else return isParentOrSelf(element.parentNode, id);
+}
+
+function nodeValue(node) {
+	var result = "";
+	if (node.nodeType == 1) {
+		var children = node.childNodes;
+		for (var i = 0; i < children.length; ++i) {
+			result += nodeValue(children[i]);
+		}		
+	}
+	else if (node.nodeType == 3) {
+		result = node.nodeValue;
+	}
+	return(result);
+}
+
+function slideLabel() {
+	var slideColl = GetElementsWithClassName('*','slide');
+	var list = document.getElementById('jumplist');
+	smax = slideColl.length;
+	for (var n = 0; n < smax; n++) {
+		var obj = slideColl[n];
+
+		var did = 'slide' + n.toString();
+		obj.setAttribute('id',did);
+		if (isOp) continue;
+
+		var otext = '';
+		var menu = obj.firstChild;
+		if (!menu) continue; // to cope with empty slides
+		while (menu && menu.nodeType == 3) {
+			menu = menu.nextSibling;
+		}
+	 	if (!menu) continue; // to cope with slides with only text nodes
+
+		var menunodes = menu.childNodes;
+		for (var o = 0; o < menunodes.length; o++) {
+			otext += nodeValue(menunodes[o]);
+		}
+		list.options[list.length] = new Option(n + ' : '  + otext, n);
+	}
+}
+
+function currentSlide() {
+	var cs;
+	if (document.getElementById) {
+		cs = document.getElementById('currentSlide');
+	} else {
+		cs = document.currentSlide;
+	}
+	cs.innerHTML = '<span id="csHere">' + snum + '<\/span> ' + 
+		'<span id="csSep">\/<\/span> ' + 
+		'<span id="csTotal">' + (smax-1) + '<\/span>';
+	if (snum == 0) {
+		cs.style.visibility = 'hidden';
+	} else {
+		cs.style.visibility = 'visible';
+	}
+}
+
+function go(step) {
+	if (document.getElementById('slideProj').disabled || step == 0) return;
+	var jl = document.getElementById('jumplist');
+	var cid = 'slide' + snum;
+	var ce = document.getElementById(cid);
+	if (incrementals[snum].length > 0) {
+		for (var i = 0; i < incrementals[snum].length; i++) {
+			removeClass(incrementals[snum][i], 'current');
+			removeClass(incrementals[snum][i], 'incremental');
+		}
+	}
+	if (step != 'j') {
+		snum += step;
+		lmax = smax - 1;
+		if (snum > lmax) snum = lmax;
+		if (snum < 0) snum = 0;
+	} else
+		snum = parseInt(jl.value);
+	var nid = 'slide' + snum;
+	var ne = document.getElementById(nid);
+	if (!ne) {
+		ne = document.getElementById('slide0');
+		snum = 0;
+	}
+	if (step < 0) {incpos = incrementals[snum].length} else {incpos = 0;}
+	if (incrementals[snum].length > 0 && incpos == 0) {
+		for (var i = 0; i < incrementals[snum].length; i++) {
+			if (hasClass(incrementals[snum][i], 'current'))
+				incpos = i + 1;
+			else
+				addClass(incrementals[snum][i], 'incremental');
+		}
+	}
+	if (incrementals[snum].length > 0 && incpos > 0)
+		addClass(incrementals[snum][incpos - 1], 'current');
+	ce.style.visibility = 'hidden';
+	ne.style.visibility = 'visible';
+	jl.selectedIndex = snum;
+	currentSlide();
+	number = 0;
+}
+
+function goTo(target) {
+	if (target >= smax || target == snum) return;
+	go(target - snum);
+}
+
+function subgo(step) {
+	if (step > 0) {
+		removeClass(incrementals[snum][incpos - 1],'current');
+		removeClass(incrementals[snum][incpos], 'incremental');
+		addClass(incrementals[snum][incpos],'current');
+		incpos++;
+	} else {
+		incpos--;
+		removeClass(incrementals[snum][incpos],'current');
+		addClass(incrementals[snum][incpos], 'incremental');
+		addClass(incrementals[snum][incpos - 1],'current');
+	}
+}
+
+function toggle() {
+	var slideColl = GetElementsWithClassName('*','slide');
+	var slides = document.getElementById('slideProj');
+	var outline = document.getElementById('outlineStyle');
+	if (!slides.disabled) {
+		slides.disabled = true;
+		outline.disabled = false;
+		s5mode = false;
+		fontSize('1em');
+		for (var n = 0; n < smax; n++) {
+			var slide = slideColl[n];
+			slide.style.visibility = 'visible';
+		}
+	} else {
+		slides.disabled = false;
+		outline.disabled = true;
+		s5mode = true;
+		fontScale();
+		for (var n = 0; n < smax; n++) {
+			var slide = slideColl[n];
+			slide.style.visibility = 'hidden';
+		}
+		slideColl[snum].style.visibility = 'visible';
+	}
+}
+
+function showHide(action) {
+	var obj = GetElementsWithClassName('*','hideme')[0];
+	switch (action) {
+	case 's': obj.style.visibility = 'visible'; break;
+	case 'h': obj.style.visibility = 'hidden'; break;
+	case 'k':
+		if (obj.style.visibility != 'visible') {
+			obj.style.visibility = 'visible';
+		} else {
+			obj.style.visibility = 'hidden';
+		}
+	break;
+	}
+}
+
+// 'keys' code adapted from MozPoint (http://mozpoint.mozdev.org/)
+function keys(key) {
+	if (!key) {
+		key = event;
+		key.which = key.keyCode;
+	}
+	if (key.which == 84) {
+		toggle();
+		return;
+	}
+	if (s5mode) {
+		switch (key.which) {
+			case 10: // return
+			case 13: // enter
+				if (window.event && isParentOrSelf(window.event.srcElement, 'controls')) return;
+				if (key.target && isParentOrSelf(key.target, 'controls')) return;
+				if(number != undef) {
+					goTo(number);
+					break;
+				}
+			case 32: // spacebar
+			case 34: // page down
+			case 39: // rightkey
+			case 40: // downkey
+				if(number != undef) {
+					go(number);
+				} else if (!incrementals[snum] || incpos >= incrementals[snum].length) {
+					go(1);
+				} else {
+					subgo(1);
+				}
+				break;
+			case 33: // page up
+			case 37: // leftkey
+			case 38: // upkey
+				if(number != undef) {
+					go(-1 * number);
+				} else if (!incrementals[snum] || incpos <= 0) {
+					go(-1);
+				} else {
+					subgo(-1);
+				}
+				break;
+			case 36: // home
+				goTo(0);
+				break;
+			case 35: // end
+				goTo(smax-1);
+				break;
+			case 67: // c
+				showHide('k');
+				break;
+		}
+		if (key.which < 48 || key.which > 57) {
+			number = undef;
+		} else {
+			if (window.event && isParentOrSelf(window.event.srcElement, 'controls')) return;
+			if (key.target && isParentOrSelf(key.target, 'controls')) return;
+			number = (((number != undef) ? number : 0) * 10) + (key.which - 48);
+		}
+	}
+	return false;
+}
+
+function clicker(e) {
+	number = undef;
+	var target;
+	if (window.event) {
+		target = window.event.srcElement;
+		e = window.event;
+	} else target = e.target;
+	if (target.getAttribute('href') != null || hasValue(target.rel, 'external') || isParentOrSelf(target, 'controls') || isParentOrSelf(target,'embed') || isParentOrSelf(target,'object')) return true;
+	if (!e.which || e.which == 1) {
+		if (!incrementals[snum] || incpos >= incrementals[snum].length) {
+			go(1);
+		} else {
+			subgo(1);
+		}
+	}
+}
+
+function findSlide(hash) {
+	var target = null;
+	var slides = GetElementsWithClassName('*','slide');
+	for (var i = 0; i < slides.length; i++) {
+		var targetSlide = slides[i];
+		if ( (targetSlide.name && targetSlide.name == hash)
+		 || (targetSlide.id && targetSlide.id == hash) ) {
+			target = targetSlide;
+			break;
+		}
+	}
+	while(target != null && target.nodeName != 'BODY') {
+		if (hasClass(target, 'slide')) {
+			return parseInt(target.id.slice(5));
+		}
+		target = target.parentNode;
+	}
+	return null;
+}
+
+function slideJump() {
+	if (window.location.hash == null) return;
+	var sregex = /^#slide(\d+)$/;
+	var matches = sregex.exec(window.location.hash);
+	var dest = null;
+	if (matches != null) {
+		dest = parseInt(matches[1]);
+	} else {
+		dest = findSlide(window.location.hash.slice(1));
+	}
+	if (dest != null)
+		go(dest - snum);
+}
+
+function fixLinks() {
+	var thisUri = window.location.href;
+	thisUri = thisUri.slice(0, thisUri.length - window.location.hash.length);
+	var aelements = document.getElementsByTagName('A');
+	for (var i = 0; i < aelements.length; i++) {
+		var a = aelements[i].href;
+		var slideID = a.match('\#slide[0-9]{1,2}');
+		if ((slideID) && (slideID[0].slice(0,1) == '#')) {
+			var dest = findSlide(slideID[0].slice(1));
+			if (dest != null) {
+				if (aelements[i].addEventListener) {
+					aelements[i].addEventListener("click", new Function("e",
+						"if (document.getElementById('slideProj').disabled) return;" +
+						"go("+dest+" - snum); " +
+						"if (e.preventDefault) e.preventDefault();"), true);
+				} else if (aelements[i].attachEvent) {
+					aelements[i].attachEvent("onclick", new Function("",
+						"if (document.getElementById('slideProj').disabled) return;" +
+						"go("+dest+" - snum); " +
+						"event.returnValue = false;"));
+				}
+			}
+		}
+	}
+}
+
+function externalLinks() {
+	if (!document.getElementsByTagName) return;
+	var anchors = document.getElementsByTagName('a');
+	for (var i=0; i<anchors.length; i++) {
+		var anchor = anchors[i];
+		if (anchor.getAttribute('href') && hasValue(anchor.rel, 'external')) {
+			anchor.target = '_blank';
+			addClass(anchor,'external');
+		}
+	}
+}
+
+function createControls() {
+	var controlsDiv = document.getElementById("controls");
+	if (!controlsDiv) return;
+	var hider = ' onmouseover="showHide(\'s\');" onmouseout="showHide(\'h\');"';
+	var hideDiv, hideList = '';
+	if (controlVis == 'hidden') {
+		hideDiv = hider;
+	} else {
+		hideList = hider;
+	}
+	controlsDiv.innerHTML = '<form action="#" id="controlForm"' + hideDiv + '>' +
+	'<div id="navLinks">' +
+	'<a accesskey="t" id="toggle" href="javascript:toggle();">&#216;<\/a>' +
+	'<a accesskey="z" id="prev" href="javascript:go(-1);">&laquo;<\/a>' +
+	'<a accesskey="x" id="next" href="javascript:go(1);">&raquo;<\/a>' +
+	'<div id="navList"' + hideList + '><select id="jumplist" onchange="go(\'j\');"><\/select><\/div>' +
+	'<\/div><\/form>';
+	if (controlVis == 'hidden') {
+		var hidden = document.getElementById('navLinks');
+	} else {
+		var hidden = document.getElementById('jumplist');
+	}
+	addClass(hidden,'hideme');
+}
+
+function fontScale() {  // causes layout problems in FireFox that get fixed if browser's Reload is used; same may be true of other Gecko-based browsers
+	if (!s5mode) return false;
+	var vScale = 28;  // both yield 32 (after rounding) at 1024x768
+	var hScale = 32;  // perhaps should auto-calculate based on theme's declared value?
+	if (window.innerHeight) {
+		var vSize = window.innerHeight;
+		var hSize = window.innerWidth;
+	} else if (document.documentElement.clientHeight) {
+		var vSize = document.documentElement.clientHeight;
+		var hSize = document.documentElement.clientWidth;
+	} else if (document.body.clientHeight) {
+		var vSize = document.body.clientHeight;
+		var hSize = document.body.clientWidth;
+	} else {
+		var vSize = 700;  // assuming 1024x768, minus chrome and such
+		var hSize = 1024; // these do not account for kiosk mode or Opera Show
+	}
+	var newSize = Math.min(Math.round(vSize/vScale),Math.round(hSize/hScale));
+	fontSize(newSize + 'px');
+	if (isGe) {  // hack to counter incremental reflow bugs
+		var obj = document.getElementsByTagName('body')[0];
+		obj.style.display = 'none';
+		obj.style.display = 'block';
+	}
+}
+
+function fontSize(value) {
+	if (!(s5ss = document.getElementById('s5ss'))) {
+		if (!isIE) {
+			document.getElementsByTagName('head')[0].appendChild(s5ss = document.createElement('style'));
+			s5ss.setAttribute('media','screen, projection');
+			s5ss.setAttribute('id','s5ss');
+		} else {
+			document.createStyleSheet();
+			document.s5ss = document.styleSheets[document.styleSheets.length - 1];
+		}
+	}
+	if (!isIE) {
+		while (s5ss.lastChild) s5ss.removeChild(s5ss.lastChild);
+		s5ss.appendChild(document.createTextNode('body {font-size: ' + value + ' !important;}'));
+	} else {
+		document.s5ss.addRule('body','font-size: ' + value + ' !important;');
+	}
+}
+
+function notOperaFix() {
+	slideCSS = document.getElementById('slideProj').href;
+	var slides = document.getElementById('slideProj');
+	var outline = document.getElementById('outlineStyle');
+	slides.setAttribute('media','screen');
+	outline.disabled = true;
+	if (isGe) {
+		slides.setAttribute('href','null');   // Gecko fix
+		slides.setAttribute('href',slideCSS); // Gecko fix
+	}
+	if (isIE && document.styleSheets && document.styleSheets[0]) {
+		document.styleSheets[0].addRule('img', 'behavior: url(ui/default/iepngfix.htc)');
+		document.styleSheets[0].addRule('div', 'behavior: url(ui/default/iepngfix.htc)');
+		document.styleSheets[0].addRule('.slide', 'behavior: url(ui/default/iepngfix.htc)');
+	}
+}
+
+function getIncrementals(obj) {
+	var incrementals = new Array();
+	if (!obj) 
+		return incrementals;
+	var children = obj.childNodes;
+	for (var i = 0; i < children.length; i++) {
+		var child = children[i];
+		if (hasClass(child, 'incremental')) {
+			if (child.nodeName == 'OL' || child.nodeName == 'UL') {
+				removeClass(child, 'incremental');
+				for (var j = 0; j < child.childNodes.length; j++) {
+					if (child.childNodes[j].nodeType == 1) {
+						addClass(child.childNodes[j], 'incremental');
+					}
+				}
+			} else {
+				incrementals[incrementals.length] = child;
+				removeClass(child,'incremental');
+			}
+		}
+		if (hasClass(child, 'show-first')) {
+			if (child.nodeName == 'OL' || child.nodeName == 'UL') {
+				removeClass(child, 'show-first');
+				if (child.childNodes[isGe].nodeType == 1) {
+					removeClass(child.childNodes[isGe], 'incremental');
+				}
+			} else {
+				incrementals[incrementals.length] = child;
+			}
+		}
+		incrementals = incrementals.concat(getIncrementals(child));
+	}
+	return incrementals;
+}
+
+function createIncrementals() {
+	var incrementals = new Array();
+	for (var i = 0; i < smax; i++) {
+		incrementals[i] = getIncrementals(document.getElementById('slide'+i));
+	}
+	return incrementals;
+}
+
+function defaultCheck() {
+	var allMetas = document.getElementsByTagName('meta');
+	for (var i = 0; i< allMetas.length; i++) {
+		if (allMetas[i].name == 'defaultView') {
+			defaultView = allMetas[i].content;
+		}
+		if (allMetas[i].name == 'controlVis') {
+			controlVis = allMetas[i].content;
+		}
+	}
+}
+
+// Key trap fix, new function body for trap()
+function trap(e) {
+	if (!e) {
+		e = event;
+		e.which = e.keyCode;
+	}
+	try {
+		modifierKey = e.ctrlKey || e.altKey || e.metaKey;
+	}
+	catch(e) {
+		modifierKey = false;
+	}
+	return modifierKey || e.which == 0;
+}
+
+function startup() {
+	defaultCheck();
+	if (!isOp) 
+		createControls();
+	slideLabel();
+	fixLinks();
+	externalLinks();
+	fontScale();
+	if (!isOp) {
+		notOperaFix();
+		incrementals = createIncrementals();
+		slideJump();
+		if (defaultView == 'outline') {
+			toggle();
+		}
+		document.onkeyup = keys;
+		document.onkeypress = trap;
+		document.onclick = clicker;
+	}
+}
+
+window.onload = startup;
+window.onresize = function(){setTimeout('fontScale()', 50);}
+</script>
+	</head>
+	<body>
+		<div class="layout">
+			<div id="controls"></div>
+			<div id="currentSlide"></div>
+			<div id="header"><img src='/images/ruby-sequel.png' /></div>
+			<div id="footer">
+				<h1>MountainWest RubyConf 2009</h1>
+				<h2>Sequel: The Database Toolkit for Ruby</h2>
+			</div>
+		</div>
+		<div class="presentation">
+			
+				<div class="slide">
+					<h1>Sequel:</h1>
+<h2>The Database Toolkit for Ruby</h2>
+<h3>Jeremy Evans</h3>
+				</div>
+			
+				<div class="slide">
+					<h1>History</h1>
+<ul>
+  <li>Originally developed by Sharon Rosner</li>
+  <li>March 2007: 0.0.1 - First release</li>
+  <li>January 2008: 1.0 - Split into sequel, sequel_core, and sequel_model gems</li>
+  <li>February 2008:  1.2 - I started using Sequel</li>
+  <li>March 2008: 1.3 - Model associations; I became developer, then maintainer of Sequel</li>
+  <li>April 2008: 1.4 - Eager loading; sequel and sequel_model gems merged</li>
+  <li>April 2008: 1.5 - Dataset graphing; much deprecation</li>
+</ul>
+				</div>
+			
+				<div class="slide">
+					<h1>History (2)</h1>
+<ul>
+  <li>May 2008: 2.0 - Expression filters; deprecated method removal; massive code cleanup and documentation updates</li>
+  <li>July 2008: 2.3 - Jruby/Ruby 1.9 support; sequel_core and sequel gems merged</li>
+  <li>August 2008: 2.4 - Bound variable/Prepared Statements; Master/Slave database and sharding</li>
+  <li>Since: Many features and bug fixes</li>
+</ul>
+				</div>
+			
+				<div class="slide">
+					<h1>sequel_core vs sequel_model</h1>
+<ul>
+  <li>NOT *-core vs. *-more</li>
+  <li>sequel_core:<ul>
+    <li>Dataset-centric, returns plain hashes</li>
+    <li>Basically a ruby DSL for SQL</li>
+    <li>Good for aggregate reporting, dealing with sets of objects</li>
+    <li>Also houses the adapters, core extensions, connection pool, migrations, and some utilities</li>
+  </ul></li>
+  <li>sequel_model:<ul>
+    <li>Object-centric, returns model objects</li>
+    <li>An ORM built on top of sequel-core</li>
+    <li>Good for dealing with individual objects</li>
+    <li>Also houses the string inflection methods</li>
+  </ul></li>
+  <li>Model classes proxy many methods to their underlying dataset, so you get the benefits of sequel-core when using sequel-model</li>
+</ul>
+
+				</div>
+			
+				<div class="slide">
+					<h1>Database Support</h1>
+<ul>
+  <li>13 supported adapters: ADO, DataObjects, DB2, DBI, Firebird, Informix, JDBC, MySQL, ODBC, OpenBase, Oracle, PostgreSQL and SQLite3</li>
+  <li>Some adapters support multiple databases: DataObjects, JDBC</li>
+  <li>Some databases are supported by multiple adapters: MySQL, PostgreSQL, SQLite</li>
+  <li>PostgreSQL adapter can use pg, postgres, or postgres-pr driver</li>
+</ul>
+				</div>
+			
+				<div class="slide">
+					<h1>Adding adapters</h1>
+<ul>
+  <li>Adding additional adapters is pretty easy</li>
+  <li>Need to define:<ul>
+    <li>Database#connect method that returns an adapter-specific connection object</li>
+    <li>Database#disconnect_connection method that disconnects adapter-specific connection object</li>
+    <li>Database#execute method that runs SQL against the database</li>
+    <li>Database#dataset method that returns a dataset subclass instance for the database</li>
+    <li>Dataset#fetch_rows method that yields hashes with symbol keys</li>
+  </ul></li>
+  <li>Potentially, that's it</li>
+  <li>About 1/3 of Sequel code is in the adapters</li>
+</ul>
+
+				</div>
+			
+				<div class="slide">
+					<h1>Adding adapters (2)</h1>
+<ul>
+  <li>However, Dataset#delete and Dataset#update should return number of rows deleted/updated</li>
+  <li>And Dataset#insert should return the primary key value of the row inserted (if any)</li>
+  <li>Generally this is done by Database#execute or a related method</li>
+  <li>If Sequel already supports the underlying database, just include the shared adapter code</li>
+  <li>Otherwise, you need to deal with SQL syntax issues</li>
+  <li>Running the integration tests is a good way to check support</li>
+</ul>
+				</div>
+			
+				<div class="slide">
+					<h1>Sequel::Database</h1>
+<div class='ruby'><pre><span class="ident">uri</span> <span class="punct">=</span> <span class="punct">'</span><span class="string">postgres://user:pass@host/database</span><span class="punct">'</span>
+<span class="constant">DB</span> <span class="punct">=</span> <span class="constant">Sequel</span><span class="punct">.</span><span class="ident">connect</span><span class="punct">(</span><span class="ident">uri</span><span class="punct">)</span>
+<span class="constant">DB</span> <span class="punct">=</span> <span class="constant">Sequel</span><span class="punct">.</span><span class="ident">postgres</span><span class="punct">(</span><span class="ident">database</span><span class="punct">,</span> <span class="symbol">:host</span> <span class="punct">=&gt;</span><span class="ident">host</span><span class="punct">)</span>
+<span class="constant">DB</span> <span class="punct">=</span> <span class="constant">Sequel</span><span class="punct">.</span><span class="ident">sqlite</span> <span class="comment"># Memory database</span></pre></div>
+<ul>
+  <li>Represents a virtual database connection</li>
+  <li>Uses a (not-shared) connection pool internally</li>
+  <li>Mainly used to:
+  <ul>
+    <li>Modify the database schema</li>
+    <li>Set defaults for datasets (e.g. quoting)</li>
+    <li>Create datasets</li>
+    <li>Setup SQL loggers</li>
+    <li>Handle transactions</li>
+    <li>Execute SQL directly</li>
+  </ul></li>
+</ul>
+				</div>
+			
+				<div class="slide">
+					<h1>Sequel::Database (2)</h1>
+<div class='ruby'><pre><span class="comment"># Set defaults for future datasets</span>
+<span class="constant">DB</span><span class="punct">.</span><span class="ident">quote_identifiers</span> <span class="punct">=</span> <span class="constant">true</span>
+<span class="comment"># Create Datasets</span>
+<span class="ident">dataset</span> <span class="punct">=</span> <span class="constant">DB</span><span class="punct">[</span><span class="symbol">:attendees</span><span class="punct">]</span>
+<span class="comment"># Setup SQL Loggers</span>
+<span class="constant">DB</span><span class="punct">.</span><span class="ident">loggers</span> <span class="punct">&lt;&lt;</span> <span class="constant">Logger</span><span class="punct">.</span><span class="ident">new</span><span class="punct">(</span><span class="global">$stdout</span><span class="punct">)</span>
+<span class="comment"># Handle transactions: block required, no way</span>
+<span class="comment"># to leave a transaction open indefinitely</span>
+<span class="constant">DB</span><span class="punct">.</span><span class="ident">transaction</span> <span class="punct">{</span>
+  <span class="comment"># Execute SQL directly</span>
+  <span class="ident">rows</span> <span class="punct">=</span> <span class="constant">DB</span><span class="punct">['</span><span class="string">SELECT * FROM ...</span><span class="punct">'].</span><span class="ident">all</span>
+  <span class="constant">DB</span><span class="punct">[&quot;</span><span class="string">INSERT ...</span><span class="punct">&quot;].</span><span class="ident">insert</span>
+  <span class="constant">DB</span><span class="punct">[&quot;</span><span class="string">DELETE ...</span><span class="punct">&quot;].</span><span class="ident">delete</span>
+  <span class="constant">DB</span> <span class="punct">&lt;&lt;</span> <span class="punct">&quot;</span><span class="string">SET ...</span><span class="punct">&quot;</span> <span class="punct">}</span>
+</pre></div>
+
+				</div>
+			
+				<div class="slide">
+					<h1>Connection Pooling</h1>
+<ul>
+  <li>Sequel has thread-safe connection pooling</li>
+  <li>No need for manual cleanup</li>
+  <li>Only way to get a connection is through a block</li>
+  <li>Block ensures the connection is returned to the pool before it exits</li>
+  <li>Makes it impossible to leak connections</li>
+  <li>Connection not checked out until final SQL string is ready</li>
+  <li>Connection returned as soon as iteration of results is finished</li>
+  <li>This allows for much better concurrency</li>
+</ul>
+
+				</div>
+			
+				<div class="slide">
+					<h1>Sequel::Dataset</h1>
+<ul>
+  <li>Represents an SQL query, or more generally, an abstract set of rows/objects</li>
+  <li>Most methods returned modified copies, functional style</li>
+  <li>Don't need to worry about the order of methods, usually</li>
+  <li>Build your SQL query by chaining methods</li>
+</ul>
+<div class='ruby'><pre><span class="constant">DB</span><span class="punct">[</span><span class="symbol">:table</span><span class="punct">].</span><span class="ident">limit</span><span class="punct">(</span><span class="number">5</span><span class="punct">,</span> <span class="number">2</span><span class="punct">).</span><span class="ident">order</span><span class="punct">(</span><span class="symbol">:column4</span><span class="punct">).</span>
+  <span class="ident">select</span><span class="punct">(</span><span class="symbol">:column1</span><span class="punct">,</span> <span class="symbol">:column2</span><span class="punct">).</span>
+  <span class="ident">filter</span><span class="punct">(</span><span class="symbol">:column3</span> <span class="punct">=&gt;</span><span class="number">0</span><span class="punct">..</span><span class="number">100</span><span class="punct">).</span><span class="ident">all</span></pre></div>
+				</div>
+			
+				<div class="slide">
+					<h1>Fetching Rows</h1>
+<ul>
+  <li>#each iterates over the returned rows</li>
+  <li>Enumerable is included</li>
+  <li>Rows are returned as hashes with symbol keys</li>
+  <li>Can set an arbitrary proc to call with the hash before yielding (how models are implemented)</li>
+  <li>#all returns all rows as an array of hashes</li>
+  <li>No caching is done</li>
+  <li>If you don't want two identical queries for the same data, store the results of #all in a variable, and use that variable later</li>
+</ul>
+				</div>
+			
+				<div class="slide">
+					<h1>Dataset inserting, updating, and deleting</h1>
+<ul>
+  <li>#insert inserts records</li>
+  <li>#update updates records</li>
+  <li>#delete deletes records</li>
+</ul>
+<div class='ruby'><pre><span class="constant">DB</span><span class="punct">[</span><span class="symbol">:attendees</span><span class="punct">].</span><span class="ident">insert</span><span class="punct">(</span><span class="symbol">:name</span> <span class="punct">=&gt;</span> <span class="punct">'</span><span class="string">Jeremy Evans</span><span class="punct">')</span>
+<span class="constant">DB</span><span class="punct">[</span><span class="symbol">:attendees</span><span class="punct">].</span><span class="ident">filter</span><span class="punct">(</span><span class="symbol">:confirmed</span> <span class="punct">=&gt;</span> <span class="constant">nil</span><span class="punct">).</span>
+  <span class="ident">update</span><span class="punct">(</span><span class="symbol">:confirmed</span> <span class="punct">=&gt;</span> <span class="constant">true</span><span class="punct">)</span>
+<span class="constant">DB</span><span class="punct">[</span><span class="symbol">:attendees</span><span class="punct">].</span><span class="ident">filter</span><span class="punct">(</span><span class="symbol">:paid</span> <span class="punct">=&gt;</span> <span class="constant">false</span><span class="punct">).</span><span class="ident">delete</span>
+</pre></div>
+				</div>
+			
+				<div class="slide">
+					<h1>Dataset Filtering</h1>
+<div class='ruby'><pre><span class="ident">ds</span> <span class="punct">=</span> <span class="constant">DB</span><span class="punct">[</span><span class="symbol">:attendees</span><span class="punct">]</span>
+<span class="comment"># Strings</span>
+<span class="ident">ds</span><span class="punct">.</span><span class="ident">filter</span><span class="punct">('</span><span class="string">n = 1</span><span class="punct">')</span>      <span class="comment"># n = 1</span>
+<span class="ident">ds</span><span class="punct">.</span><span class="ident">filter</span><span class="punct">('</span><span class="string">n &gt; ?</span><span class="punct">',</span> <span class="punct">'</span><span class="string">M</span><span class="punct">')</span> <span class="comment"># n &gt; 'M'</span>
+<span class="comment"># Hashes</span>
+<span class="ident">ds</span><span class="punct">.</span><span class="ident">filter</span><span class="punct">(</span><span class="symbol">:n</span> <span class="punct">=&gt;</span><span class="number">1</span><span class="punct">)</span>        <span class="comment"># n = 1</span>
+<span class="ident">ds</span><span class="punct">.</span><span class="ident">filter</span><span class="punct">(</span><span class="symbol">:n</span> <span class="punct">=&gt;</span><span class="constant">nil</span><span class="punct">)</span>      <span class="comment"># n IS NULL</span>
+<span class="ident">ds</span><span class="punct">.</span><span class="ident">filter</span><span class="punct">(</span><span class="symbol">:fn</span> <span class="punct">=&gt;'</span><span class="string">ln</span><span class="punct">')</span>    <span class="comment"># fn = 'ln'</span>
+<span class="ident">ds</span><span class="punct">.</span><span class="ident">filter</span><span class="punct">(</span><span class="symbol">:fn</span> <span class="punct">=&gt;</span><span class="symbol">:ln</span><span class="punct">)</span>     <span class="comment"># fn = ln</span>
+<span class="ident">ds</span><span class="punct">.</span><span class="ident">filter</span><span class="punct">(</span><span class="symbol">:n</span> <span class="punct">=&gt;[</span><span class="number">1</span><span class="punct">,</span> <span class="number">2</span><span class="punct">])</span>   <span class="comment"># n IN (1, 2)</span>
+<span class="ident">ds</span><span class="punct">.</span><span class="ident">filter</span><span class="punct">(</span><span class="symbol">:n</span> <span class="punct">=&gt;</span><span class="number">1</span><span class="punct">..</span><span class="number">2</span><span class="punct">)</span>     <span class="comment"># n &gt;= 1 AND n &lt;= 2</span></pre></div>
+				</div>
+			
+				<div class="slide">
+					<h1>More Advanced Filtering</h1>
+<div class='ruby'><pre><span class="ident">ds</span><span class="punct">.</span><span class="ident">filter</span><span class="punct">(</span><span class="symbol">:p</span> <span class="punct">*</span> <span class="symbol">:q</span> <span class="punct">+</span> <span class="number">1</span> <span class="punct">&lt;</span> <span class="symbol">:r</span><span class="punct">)</span>     <span class="comment"># p * q + 1 &lt; r</span>
+<span class="ident">ds</span><span class="punct">.</span><span class="ident">filter</span><span class="punct">(</span><span class="symbol">:p</span> <span class="punct">/</span> <span class="punct">(</span><span class="symbol">:q</span> <span class="punct">+</span> <span class="number">1</span><span class="punct">)</span> <span class="punct">&gt;=</span> <span class="symbol">:r</span><span class="punct">)</span>  <span class="comment"># p / (q + 1) &gt;= r</span>
+<span class="ident">ds</span><span class="punct">.</span><span class="ident">filter</span><span class="punct">({</span><span class="symbol">:p</span> <span class="punct">=&gt;</span> <span class="number">3</span><span class="punct">}</span> <span class="punct">|</span> <span class="symbol">:r</span><span class="punct">)</span>       <span class="comment"># p = 3 OR r</span>
+<span class="ident">ds</span><span class="punct">.</span><span class="ident">filter</span><span class="punct">(~{</span><span class="symbol">:p</span> <span class="punct">=&gt;</span> <span class="punct">'</span><span class="string">A</span><span class="punct">'}</span> <span class="punct">&amp;</span> <span class="symbol">:r</span><span class="punct">)</span>    <span class="comment"># p != 'A' AND r</span>
+<span class="ident">ds</span><span class="punct">.</span><span class="ident">filter</span><span class="punct">(~</span><span class="symbol">:p</span><span class="punct">)</span>                  <span class="comment"># NOT p</span>
+<span class="ident">ds</span><span class="punct">.</span><span class="ident">filter</span><span class="punct">(~(~{</span><span class="symbol">:p</span> <span class="punct">=&gt;</span><span class="symbol">:q</span><span class="punct">}</span> <span class="punct">&amp;</span> <span class="symbol">:r</span><span class="punct">))</span>   <span class="comment"># p = q OR NOT r</span>
+<span class="ident">ds</span><span class="punct">.</span><span class="ident">filter</span><span class="punct">(</span><span class="symbol">:p</span> <span class="punct">=&gt;</span><span class="ident">ds</span><span class="punct">.</span><span class="ident">select</span><span class="punct">(</span><span class="symbol">:q</span><span class="punct">).</span><span class="ident">filter</span><span class="punct">(</span><span class="symbol">:r</span><span class="punct">))</span>
+  <span class="comment"># p IN (SELECT q FROM attendees WHERE r)</span></pre></div>
+				</div>
+			
+				<div class="slide">
+					<h1>Sql String Manipulation</h1>
+<h2>Concatenation</h2>
+<div class='ruby'><pre><span class="ident">ds</span><span class="punct">.</span><span class="ident">select</span><span class="punct">(</span><span class="symbol">:p</span> <span class="punct">+</span> <span class="symbol">:q</span><span class="punct">)</span>                  <span class="comment"># p + q</span>
+<span class="ident">ds</span><span class="punct">.</span><span class="ident">select</span><span class="punct">(</span><span class="symbol">:p</span><span class="punct">.</span><span class="ident">sql_string</span> <span class="punct">+</span> <span class="symbol">:q</span><span class="punct">)</span>       <span class="comment"># p || q</span>
+<span class="ident">ds</span><span class="punct">.</span><span class="ident">select</span><span class="punct">([</span><span class="symbol">:p</span><span class="punct">,</span> <span class="symbol">:q</span><span class="punct">].</span><span class="ident">sql_string_join</span><span class="punct">)</span> <span class="comment"># p || q</span></pre></div>
+<h2>Searching</h2>
+<div class='ruby'><pre><span class="ident">ds</span><span class="punct">.</span><span class="ident">filter</span><span class="punct">(</span><span class="symbol">:p</span><span class="punct">.</span><span class="ident">like</span><span class="punct">(</span><span class="symbol">:q</span><span class="punct">))</span>       <span class="comment"># p LIKE q</span>
+<span class="ident">ds</span><span class="punct">.</span><span class="ident">filter</span><span class="punct">(</span><span class="symbol">:p</span><span class="punct">.</span><span class="ident">like</span><span class="punct">('</span><span class="string">q</span><span class="punct">',</span> <span class="punct">/</span><span class="regex">r</span><span class="punct">/))</span> <span class="comment"># p LIKE 'q' OR p ~ 'r'</span>
+<span class="ident">ds</span><span class="punct">.</span><span class="ident">filter</span><span class="punct">([</span><span class="symbol">:p</span><span class="punct">,</span> <span class="symbol">:q</span><span class="punct">].</span><span class="ident">sql_string_join</span><span class="punct">.</span><span class="ident">like</span><span class="punct">('</span><span class="string">Test</span><span class="punct">'))</span> 
+  <span class="comment"># (p || q) LIKE 'Test'</span></pre></div>
+				</div>
+			
+				<div class="slide">
+					<h1>Identifier Symbols</h1>
+<ul>
+  <li>As a shortcut, sequel allows you to use plain symbols to signify qualified and/or aliased columns:
+  <ul>
+  <li>:table__column => table.column</li>
+  <li>:column___alias => column AS alias</li>
+  <li>:table__column___alias => table.column AS alias</li>
+  </ul></li>
+  <li>You can use methods to do the same thing, if you want:
+  <ul>
+  <li>:column.qualify(:table)</li>
+  <li>:column.as(:alias)</li>
+  <li>:column.qualify(:table).as(:alias)</li>
+  </ul></li>
+  <li>Can also be used for schemas (:schema__table)</li>
+</ul>
+				</div>
+			
+				<div class="slide">
+					<h1>Dataset Joining</h1>
+<div class='ruby'><pre><span class="ident">ds</span> <span class="punct">=</span> <span class="constant">DB</span><span class="punct">[</span><span class="symbol">:attendees</span><span class="punct">].</span>
+  <span class="ident">join_table</span><span class="punct">(</span><span class="symbol">:inner</span><span class="punct">,</span> <span class="symbol">:events</span><span class="punct">,</span> <span class="symbol">:id</span> <span class="punct">=&gt;</span><span class="symbol">:event_id</span><span class="punct">)</span>
+<span class="comment"># FROM attendees INNER JOIN events</span>
+<span class="comment">#   ON (events.id = attendees.event_id)</span>
+</pre></div>
+<ul>
+  <li>Uses implicit qualification to reduce verbosity</li>
+  <li>Unqualified keys are qualified with the table you are joining</li>
+  <li>Unqualified values are qualified with the last table joined, or first table if no table previously joined</li>
+</ul>
+				</div>
+			
+				<div class="slide">
+					<h1>Dataset Joining (2)</h1>
+<div class='ruby'><pre><span class="ident">ds</span> <span class="punct">=</span> <span class="ident">ds</span><span class="punct">.</span><span class="ident">join</span><span class="punct">(</span><span class="symbol">:locations</span><span class="punct">,</span> <span class="symbol">:id</span> <span class="punct">=&gt;</span><span class="symbol">:location_id</span><span class="punct">)</span>
+<span class="comment"># ... INNER JOIN locations ON</span>
+<span class="comment">#   (locations.id = events.location_id)</span>
+
+<span class="ident">ds</span> <span class="punct">=</span> <span class="ident">ds</span><span class="punct">.</span><span class="ident">left_outer_join</span><span class="punct">(</span><span class="symbol">:caterers</span><span class="punct">,</span> \
+  <span class="symbol">:id</span> <span class="punct">=&gt;</span><span class="symbol">:events__caterer_id</span><span class="punct">)</span>
+<span class="comment"># ... LEFT OUTER JOIN caterers ON</span>
+<span class="comment">#   (caterers.id = events.caterer.id)</span></pre></div>
+<ul>
+  <li>Need to qualify table names if implicit qualification would be incorrect</li>
+  <li>Can use helper methods instead of join_table: join/inner_join or (left|right|full)_outer_join</li>
+</ul>
+				</div>
+			
+				<div class="slide">
+					<h1>Join Clobbering</h1>
+<div class='ruby'><pre><span class="comment"># attendees: id, name, event_id</span>
+<span class="comment"># events: id, name</span>
+<span class="ident">ds</span> <span class="punct">=</span> <span class="constant">DB</span><span class="punct">[</span><span class="symbol">:attendees</span><span class="punct">].</span><span class="ident">join</span><span class="punct">(</span><span class="symbol">:events</span><span class="punct">,</span> <span class="symbol">:id</span> <span class="punct">=&gt;</span><span class="symbol">:event_id</span><span class="punct">)</span>
+<span class="ident">ds</span><span class="punct">.</span><span class="ident">all</span>
+<span class="comment"># =&gt; [{:id=&gt;event.id, :name=&gt;event.name}, ...]</span></pre></div>
+<ul>
+  <li>Like SQL, returns all columns from both tables unless you choose which columns to select</li>
+  <li>SQL generally returns rows as arrays, so it's possible to differentiate columns that have the same name but are in separate tables</li>
+  <li>Sequel returns rows as hashes, so identical names will clobber each other (last one wins)</li>
+  <li>This makes a join problematic if the tables share column names</li>
+</ul>
+				</div>
+			
+				<div class="slide">
+					<h1>Join Clobbering (2)</h1>
+<div class='ruby'><pre><span class="ident">ds</span><span class="punct">.</span><span class="ident">select</span><span class="punct">(</span><span class="symbol">:attendees__name___attendee</span><span class="punct">,</span>
+  <span class="symbol">:events__name___event</span><span class="punct">)</span>
+<span class="ident">ds</span><span class="punct">.</span><span class="ident">all</span>
+<span class="comment"># =&gt; [{:attendee=&gt;attendees.name, \</span>
+<span class="comment">#      :event=&gt;events.name}, ...]</span></pre></div>
+<ul>
+  <li>You can use Dataset#select to restrict the columns returned, and/or to alias them to eliminate clobbbering</li>
+  <li>But that's ugly and cumbersome</li>
+  <li>There's got to be a better way!</li>
+</ul>
+				</div>
+			
+				<div class="slide">
+					<h1>Dataset Graphing</h1>
+<div class='ruby'><pre><span class="comment"># attendees: id, name, event_id</span>
+<span class="comment"># events: id, name</span>
+<span class="ident">ds</span> <span class="punct">=</span> <span class="constant">DB</span><span class="punct">[</span><span class="symbol">:attendees</span><span class="punct">].</span><span class="ident">graph</span><span class="punct">(</span><span class="symbol">:events</span><span class="punct">,</span> <span class="symbol">:id</span> <span class="punct">=&gt;</span><span class="symbol">:event_id</span><span class="punct">)</span>
+<span class="ident">ds</span><span class="punct">.</span><span class="ident">all</span>
+<span class="comment"># =&gt; [{:attendees=&gt;{...}, :events=&gt;{...}}, ...]</span></pre></div>
+<ul>
+  <li>Splits resulting hashes into subhashes per table</li>
+  <li>Eliminates clobbering by automatically aliasing columns as necessary</li>
+  <li>You can manually change the aliases via (add|set)_graph_aliases</li>
+</ul>
+				</div>
+			
+				<div class="slide">
+					<h1>Sequel::Model</h1>
+<ul>
+  <li>Allows easily adding methods to datasets and returned objects</li>
+  <li>Each model class is associated with a single dataset</li>
+  <li>The model class object proxies many methods to its dataset</li>
+  <li>Model instances represent individual rows in the dataset</li>
+  <li>The basics are similar to AR and DM</li>
+</ul>
+<div class='ruby'><pre><span class="keyword">class </span><span class="class">Attendee</span> <span class="punct">&lt;</span> <span class="constant">Sequel</span><span class="punct">::</span><span class="constant">Model</span><span class="punct">;</span> <span class="keyword">end</span>
+<span class="keyword">class </span><span class="class">Event</span> <span class="punct">&lt;</span> <span class="constant">Sequel</span><span class="punct">::</span><span class="constant">Model</span><span class="punct">(</span><span class="symbol">:events</span><span class="punct">);</span> <span class="keyword">end</span>
+<span class="keyword">class </span><span class="class">Foo</span> <span class="punct">&lt;</span> <span class="constant">Sequel</span><span class="punct">::</span><span class="constant">Model</span>
+  <span class="ident">set_dataset</span> <span class="ident">db</span><span class="punct">[</span><span class="symbol">:bar</span><span class="punct">].</span><span class="ident">join</span><span class="punct">(</span><span class="symbol">:baz</span><span class="punct">,</span> <span class="symbol">:id</span> <span class="punct">=&gt;</span><span class="symbol">:baz_id</span><span class="punct">)</span>
+<span class="keyword">end</span></pre></div>
+				</div>
+			
+				<div class="slide">
+					<h1>Model Associations</h1>
+<div class='ruby'><pre><span class="constant">Player</span><span class="punct">.</span><span class="ident">many_to_one</span> <span class="symbol">:team</span>
+<span class="constant">Team</span><span class="punct">.</span><span class="ident">one_to_many</span> <span class="symbol">:players</span>
+<span class="constant">Player</span><span class="punct">.</span><span class="ident">first</span><span class="punct">.</span><span class="ident">team</span>
+<span class="comment"># SELECT * FROM team WHERE id = #{player.team_id}</span>
+<span class="constant">Team</span><span class="punct">.</span><span class="ident">first</span><span class="punct">.</span><span class="ident">players</span>
+<span class="comment"># SELECT * FROM players WHERE team_id = #{team.id}</span>
+<span class="constant">Attendee</span><span class="punct">.</span><span class="ident">many_to_many</span> <span class="symbol">:events</span>
+<span class="constant">Attendee</span><span class="punct">.</span><span class="ident">first</span><span class="punct">.</span><span class="ident">events</span>
+<span class="comment"># SELECT events.* FROM events INNER JOIN</span>
+<span class="comment"># attendee_events ON attendee_events.event_id=events.id</span>
+<span class="comment"># AND attendee_events.attendee_id = #{attendee.id}</span>
+</pre></div>
+<ul>
+  <li>No one_to_one, but available as an option to one_to_many</li>
+</ul>
+				</div>
+			
+				<div class="slide">
+					<h1>No Proxies for Associations</h1>
+<div class='ruby'><pre><span class="constant">Player</span><span class="punct">.</span><span class="ident">many_to_one</span> <span class="symbol">:team</span>
+<span class="ident">player</span><span class="punct">.</span><span class="ident">team</span> <span class="comment"># Team or nil</span>
+<span class="ident">player</span><span class="punct">.</span><span class="ident">team</span> <span class="punct">=</span> <span class="ident">team</span>
+
+<span class="constant">Team</span><span class="punct">.</span><span class="ident">one_to_many</span> <span class="symbol">:players</span>
+<span class="ident">team</span><span class="punct">.</span><span class="ident">players</span> <span class="comment"># Array of Players</span>
+<span class="ident">team</span><span class="punct">.</span><span class="ident">players_dataset</span> <span class="comment"># Sequel::Dataset for this</span>
+                     <span class="comment"># team's players</span>
+<span class="ident">team</span><span class="punct">.</span><span class="ident">add_player</span><span class="punct">(</span><span class="ident">player</span><span class="punct">)</span>
+<span class="ident">team</span><span class="punct">.</span><span class="ident">remove_player</span><span class="punct">(</span><span class="ident">player</span><span class="punct">)</span>
+<span class="ident">team</span><span class="punct">.</span><span class="ident">remove_all_players</span></pre></div>
+
+				</div>
+			
+				<div class="slide">
+					<h1>No Proxies for Associations (2)</h1>
+<ul>
+  <li>Proxies make the design more complex</li>
+  <li>The dataset returned by the association_dataset method does most of what you would want from a proxy (further filtering, reordering, etc.)</li>
+  <li>Association add/remove methods are simple to understand</li>
+  <li>The add/remove methods only affect object's relationships</li>
+  <li>team.remove_player(player) removes the player from the team, it doesn't delete the player</li>
+  <li>Bottom line: easier to understand, less magical</li>
+</ul>
+				</div>
+			
+				<div class="slide">
+					<h1>No Proxies for Associations (3)</h1>
+<ul>
+  <li>Main complaint: association_dataset method looks ugly</li>
+  <li>Solution: Use multiple associations (see :clone option)</li>
+  <li>Using association_dataset in multiple places for the same reason is not DRY</li>
+  <li>Results returned by association_dataset are not cached, unlike regular association methods</li>
+  <li>DRY up your code by adding a real association</li>
+  <li>Using a real association means caching is done correctly, and the API is nicer</li>
+  <li>Having many associations for the same type of object is not a bad thing, it leads to more descriptive code</li>
+</ul>
+				</div>
+			
+				<div class="slide">
+					<h1>Association Options</h1>
+<ul>
+  <li>There are lots of options: 27 currently, not counting ones specific to certain associations</li>
+  <li>Most are only useful in fairly rare circumstances, but if you have that circumstance...</li>
+  <li>Common ones: :select, :order, :limit (also used for offsets), :conditions, :class (takes class or name), :read_only</li>
+  <li>Association methods take blocks:</li>
+</ul>
+<div class='ruby'><pre><span class="comment"># Only return players with 20 or more goals</span>
+<span class="constant">Team</span><span class="punct">.</span><span class="ident">one_to_many</span><span class="punct">(</span><span class="symbol">:high_scorers</span><span class="punct">,</span> <span class="symbol">:class</span> <span class="punct">=&gt;</span><span class="constant">Player</span><span class="punct">){|</span><span class="ident">ds</span><span class="punct">|</span>
+  <span class="ident">ds</span><span class="punct">.</span><span class="ident">filter</span><span class="punct">{|</span><span class="ident">o</span><span class="punct">|</span> <span class="ident">o</span><span class="punct">.</span><span class="ident">goals</span> <span class="punct">&gt;=</span> <span class="number">20</span><span class="punct">}}</span>
+</pre></div>
+				</div>
+			
+				<div class="slide">
+					<h1>Association Options (2)</h1>
+<ul>
+  <li>Many options affect eager loading, which is coming up</li>
+  <li>5 callback options: before/after add/remove, and after load</li>
+  <li>Can use :extend option to extend the association_dataset with a module:</li>
+</ul>
+<div class='ruby'><pre><span class="keyword">module </span><span class="module">SameName</span>
+  <span class="keyword">def </span><span class="method">self_titled</span>
+    <span class="ident">first</span><span class="punct">(</span><span class="symbol">:name=</span><span class="punct">&gt;</span><span class="ident">model_object</span><span class="punct">.</span><span class="ident">name</span><span class="punct">)</span>
+<span class="keyword">end</span> <span class="keyword">end</span>
+<span class="constant">Artist</span><span class="punct">.</span><span class="ident">one_to_many</span> <span class="symbol">:albums</span><span class="punct">,</span> <span class="symbol">:extend=</span><span class="punct">&gt;</span><span class="constant">SameName</span>
+<span class="constant">Artist</span><span class="punct">.</span><span class="ident">first</span><span class="punct">.</span><span class="ident">albums_dataset</span><span class="punct">.</span><span class="ident">self_titled</span></pre></div>
+				</div>
+			
+				<div class="slide">
+					<h1>Overriding Association Methods</h1>
+<ul>
+  <li>Association add/remove or getter/setter methods are designed to be easy to override</li>
+  <li>These methods come in pairs:<ul>
+    <li>add_association and remove_association: Handle caching, callbacks, and other stuff</li>
+    <li>_add_association and _remove_association: Do the actual database work</li>
+    <li>Same for many_to_one setter: association= and _association=</li>
+    <li>Leading underscore methods are private</li>
+  </ul></li>
+  <li>All of these methods can be overridden and super can be used (the same is true of the column accessor methods)</li>
+</ul>
+				</div>
+			
+				<div class="slide">
+					<h1>Eager Loading</h1>
+<ul>
+  <li>Two separate methods: eager and eager_graph</li>
+  <li>eager loads each table separately</li>
+  <li>eager_graph does joins</li>
+  <li>Argument structure similar to AR's :include</li>
+  <li>Can combine the two, to a certain extent:<ul>
+    <li>Works fine: eager(:blah).eager_graph(:bars, :foos)</li>
+    <li>Works fine: eager(:blah=>:bars).eager_graph(:foos=>:bazs)</li>
+    <li>Problematic: eager(:blah=>:bars).eager_graph(:blah=>:foos)</li>
+    <li>Possibly fixable, but no one has complained...</li>
+  </ul></li>
+  <li>Why two methods?:<ul>
+      <li>User choice (performance, explicitness)</li>
+      <li>Sequel does not parse SQL!</li>
+  </ul></li>
+</ul>
+				</div>
+			
+				<div class="slide">
+					<h1>Advanced Associations</h1>
+<h2>Sequel allows you full control over associations via the :dataset option</h2>
+<div class='ruby'><pre><span class="comment"># AR has_many :through=&gt;has_many</span>
+<span class="comment"># Firm one_to_many Clients one_to_many Invoices</span>
+<span class="constant">Firm</span><span class="punct">.</span><span class="ident">one_to_many</span> <span class="symbol">:invoices</span><span class="punct">,</span> <span class="symbol">:dataset</span> <span class="punct">=&gt;</span><span class="ident">proc</span><span class="punct">{</span>
+  <span class="constant">Invoice</span><span class="punct">.</span><span class="ident">eager_graph</span><span class="punct">(</span><span class="symbol">:client</span><span class="punct">).</span>
+  <span class="ident">filter</span><span class="punct">(</span><span class="symbol">:client__firm_id</span> <span class="punct">=&gt;</span><span class="ident">pk</span><span class="punct">)}</span>
+
+<span class="comment"># Joining on any of multiple keys to a single key</span>
+<span class="comment"># through a third table</span>
+<span class="constant">Artist</span><span class="punct">.</span><span class="ident">one_to_many</span> <span class="symbol">:songs</span><span class="punct">,</span> <span class="symbol">:dataset=</span><span class="punct">&gt;</span><span class="ident">proc</span><span class="punct">{</span>
+  <span class="constant">Song</span><span class="punct">.</span><span class="ident">select</span><span class="punct">(</span><span class="symbol">:songs</span><span class="punct">.*).</span><span class="ident">join</span><span class="punct">(</span><span class="constant">Lyric</span><span class="punct">,</span> <span class="symbol">:id</span> <span class="punct">=&gt;</span><span class="symbol">:lyric_id</span><span class="punct">,</span>
+  <span class="ident">id</span><span class="punct">=&gt;[</span><span class="symbol">:composer_id</span><span class="punct">,</span> <span class="symbol">:arranger_id</span><span class="punct">,</span> <span class="symbol">:vocalist_id</span><span class="punct">,</span>
+  <span class="symbol">:lyricist_id</span><span class="punct">])}</span></pre></div>
+
+				</div>
+			
+				<div class="slide">
+					<h1>Eager Loading of Advanced Associations</h1>
+<h2>Sequel allows you full control via the :eager_loader option</h2>
+<div class='ruby'><pre><span class="constant">Firm</span><span class="punct">.</span><span class="ident">one_to_many</span> <span class="symbol">:invoices</span><span class="punct">,</span> <span class="symbol">:eager_loader</span> <span class="punct">=&gt;(</span>
+ <span class="ident">proc</span><span class="punct">{|</span><span class="ident">key_hash</span><span class="punct">,</span> <span class="ident">firms</span><span class="punct">,</span> <span class="ident">associations</span><span class="punct">|</span>
+  <span class="comment"># key_hash: {:id=&gt;{1=&gt;[firm1], 2=&gt;[firm2]}, </span>
+  <span class="comment"># :type_id=&gt;{1=&gt;[firm1, firm2], 2=&gt;[firm3, firm4]}}</span>
+  <span class="ident">id_map</span> <span class="punct">=</span> <span class="ident">key_hash</span><span class="punct">[</span><span class="constant">Firm</span><span class="punct">.</span><span class="ident">primary_key</span><span class="punct">]</span>
+  <span class="ident">firms</span><span class="punct">.</span><span class="ident">each</span><span class="punct">{|</span><span class="ident">f</span><span class="punct">|</span> <span class="ident">f</span><span class="punct">.</span><span class="ident">associations</span><span class="punct">[</span><span class="symbol">:invoices</span><span class="punct">]</span> <span class="punct">=</span> <span class="punct">[]}</span>
+  <span class="constant">Invoice</span><span class="punct">.</span><span class="ident">eager_graph</span><span class="punct">(</span><span class="symbol">:client</span><span class="punct">).</span>
+   <span class="ident">filter</span><span class="punct">(</span><span class="symbol">:client__firm_id</span> <span class="punct">=&gt;</span><span class="ident">id_map</span><span class="punct">.</span><span class="ident">keys</span><span class="punct">).</span><span class="ident">all</span><span class="punct">{|</span><span class="ident">i</span><span class="punct">|</span>
+    <span class="ident">id_map</span><span class="punct">[</span><span class="ident">inv</span><span class="punct">.</span><span class="ident">client</span><span class="punct">.</span><span class="ident">firm_id</span><span class="punct">].</span><span class="ident">each</span> <span class="punct">{|</span><span class="ident">firm</span><span class="punct">|</span>
+     <span class="ident">firm</span><span class="punct">.</span><span class="ident">associations</span><span class="punct">[</span><span class="symbol">:invoices</span><span class="punct">]</span> <span class="punct">&lt;&lt;</span> <span class="ident">inv</span>
+ <span class="punct">}}})</span>
+</pre></div>
+				</div>
+			
+				<div class="slide">
+					<h1>Polymorphic Associations - DRY Too Far</h1>
+<ul>
+  <li>Only one advantage to polymorphic associations: fewer tables</li>
+  <li>When you break it down, that's it, as all polymorphic associations can be broken down into simpler relationships simply by using more tables</li>
+  <li>Using separate tables to express relationships between different tables is a good thing, for the same reason that using separate tables for different entities is a good thing (even if the schemas are the same)</li>
+  <li>They are more complex, for no real benefit, and they break referential integrity</li>
+  <li>There's a Sequel plugin available if you are stuck with a legacy schema that uses them</li>
+</ul>
+				</div>
+			
+				<div class="slide">
+					<h1>Advanced Associations: What Else Can you Do?</h1>
+<ul>
+  <li>Polymorphic associations (the plugin just uses the options and techniques already discussed, no funny stuff)</li>
+  <li>Join on multiple keys</li>
+  <li>Load all ancestors or descendants in a tree structure</li>
+  <li>All of these associations can be eagerly loaded</li>
+  <li>See the Advanced Associations RDoc for example code</li>
+</ul>
+				</div>
+			
+				<div class="slide">
+					<h1>Validations</h1>
+<ul>
+  <li>Philosophy: Only useful to display nice error messages to the user, actual data integrity should be handled by the database</li>
+  <li>9 Standard validations available: acceptance_of, confirmation_of, format_of, inclusion_of, length_of, not_string, numericality_of, presence_of, uniqueness_of</li>
+  <li>Easy shorthand via validates:</li>
+</ul>
+<div class='ruby'><pre><span class="ident">validates</span> <span class="keyword">do</span>
+  <span class="ident">format_of</span> <span class="symbol">:a</span><span class="punct">,</span> <span class="symbol">:with=</span><span class="punct">&gt;/</span><span class="regex"><span class="escape">\A</span>.*@.*<span class="escape">\.</span>.*<span class="escape">\z</span></span><span class="punct">/</span>
+  <span class="ident">uniqueness_of</span> <span class="symbol">:a_id</span><span class="punct">,</span> <span class="symbol">:b_id</span> <span class="comment"># both unique</span>
+  <span class="ident">uniqueness_of</span> <span class="punct">[</span><span class="symbol">:a_id</span><span class="punct">,</span> <span class="symbol">:b_id</span><span class="punct">]</span> <span class="comment"># combination</span>
+<span class="keyword">end</span></pre></div>
+				</div>
+			
+				<div class="slide">
+					<h1>Custom Validations</h1>
+<ul>
+  <li>validates_each: Backbone of defining the standard validations and any custom ones</li>
+  <li>Requires a block (called with the object, attribute(s), and attribute value(s)), accepts multiple attributes arguments and a hash of options</li>
+  <li>Built-in support for :if, :allow_missing, :allow_nil, and :allow_blank options</li>
+  <li>Can use arrays of attributes in addition to individual attributes</li>
+</ul>
+<div class='ruby'><pre><span class="ident">validates_each</span><span class="punct">(</span><span class="symbol">:amount</span><span class="punct">,</span> <span class="symbol">:if=</span><span class="punct">&gt;</span><span class="symbol">:confirmed?</span><span class="punct">){|</span><span class="ident">o</span><span class="punct">,</span><span class="ident">a</span><span class="punct">,</span><span class="ident">v</span><span class="punct">|</span>
+  <span class="ident">o</span><span class="punct">.</span><span class="ident">errors</span><span class="punct">[</span><span class="ident">a</span><span class="punct">]</span> <span class="punct">&lt;&lt;</span> <span class="punct">&quot;</span><span class="string">is less than 100</span><span class="punct">&quot;</span> <span class="keyword">if</span> <span class="ident">v</span> <span class="punct">&lt;</span> <span class="number">100</span>
+<span class="keyword">end</span></pre></div>
+				</div>
+			
+				<div class="slide">
+					<h1>Hooks</h1>
+<ul>
+  <li>Philosophy: Should not be used for data integrity, use a database trigger for that</li>
+  <li>Called before or after certain model actions: initialize (after only), save, create, update, destroy, and validation</li>
+  <li>Arbitrary hook types can be defined via add_hook_type, useful for plugins (all standard hooks are implemented using it)</li>
+  <li>Can use a symbol specifying an instance method, or a proc</li>
+  <li>Class methods add hooks, instance methods call them</li>
+  <li>Returning false from any hook cancels the rest of the hook chain</li>
+</ul>
+				</div>
+			
+				<div class="slide">
+					<h1>Dataset Pagination</h1>
+<ul>
+  <li>Built in support via Dataset#paginate and Dataset#each_page</li>
+  <li>Dataset#paginate applies a limit and offset and returns a dataset with helper methods such as next_page and prev_page</li>
+  <li>Useful for building a search engine or website showing a defined number of records per page</li>
+  <li>Dataset#each_page yields paginated datasets of a given length starting with page 1</li>
+  <li>Useful for processing all records, but only loading a given number at a time due to memory constraints</li>
+  <li>You should probably run #each_page inside of a transaction unless you know what you are doing</li>
+</ul>
+				</div>
+			
+				<div class="slide">
+					<h1>Model Caching</h1>
+<ul>
+  <li>Built in support via Model.set_cache</li>
+  <li>Caches to any object with the following API:</li>
+  <li>#set(key, object, seconds): Store object with key for amount of seconds</li>
+  <li>#get(key): Return object with matching key, or nil if there is no object</li>
+  <li>This API is used by Ruby-MemCache, so it works with that by default</li>
+  <li>The cache is only used when Model.[] is called with the primary key</li>
+</ul>
+				</div>
+			
+				<div class="slide">
+					<h1>Schema Definition</h1>
+<div class='ruby'><pre><span class="constant">DB</span><span class="punct">.</span><span class="ident">create_table</span><span class="punct">(</span><span class="symbol">:attendees</span><span class="punct">)</span> <span class="keyword">do</span>
+  <span class="ident">primary_key</span> <span class="symbol">:id</span> <span class="comment"># integer/serial/identity</span>
+  <span class="constant">String</span> <span class="symbol">:name</span> <span class="comment"># varchar(255)/text</span>
+  <span class="ident">column</span> <span class="symbol">:registered_at</span><span class="punct">,</span> <span class="constant">DateTime</span> <span class="comment"># timestamp</span>
+  <span class="ident">money</span> <span class="symbol">:price</span> <span class="comment"># money</span>
+  <span class="ident">foreign_key</span> <span class="symbol">:event_id</span><span class="punct">,</span> <span class="symbol">:events</span>
+  <span class="ident">index</span> <span class="symbol">:name</span><span class="punct">,</span> <span class="symbol">:unique</span> <span class="punct">=&gt;</span><span class="constant">true</span>
+  <span class="ident">index</span> <span class="punct">[</span><span class="symbol">:name</span><span class="punct">,</span> <span class="symbol">:event_id</span><span class="punct">]</span>
+  <span class="ident">constraint</span> <span class="symbol">:b</span><span class="punct">,</span> ~<span class="punct">{</span><span class="symbol">:price</span> <span class="punct">=&gt;</span><span class="number">0</span><span class="punct">}</span> <span class="comment"># price != 0</span>
+  <span class="ident">check</span><span class="punct">{|</span><span class="ident">o</span><span class="punct">|</span> <span class="ident">o</span><span class="punct">.</span><span class="ident">registered_at</span> <span class="punct">&gt;</span> <span class="punct">'</span><span class="string">2008-12-31</span><span class="punct">'}</span>
+  <span class="ident">primary_key</span> <span class="punct">[</span><span class="symbol">:name</span><span class="punct">,</span> <span class="symbol">:price</span><span class="punct">]</span> <span class="comment"># composite pk</span>
+  <span class="ident">foreign_key</span> <span class="punct">[</span><span class="symbol">:name</span><span class="punct">,</span> <span class="symbol">:price</span><span class="punct">],</span> <span class="symbol">:blah</span><span class="punct">,</span> \
+    <span class="symbol">:key</span> <span class="punct">=&gt;</span> <span class="punct">[</span><span class="symbol">:att_name</span><span class="punct">,</span> <span class="symbol">:att_price</span><span class="punct">]</span> <span class="comment"># composite fk</span>
+<span class="keyword">end</span></pre></div>
+				</div>
+			
+				<div class="slide">
+					<h1>Schema Modification</h1>
+<div class='ruby'><pre><span class="constant">DB</span><span class="punct">.</span><span class="ident">alter_table</span><span class="punct">(</span><span class="symbol">:attendees</span><span class="punct">)</span> <span class="keyword">do</span>
+  <span class="ident">add_column</span> <span class="symbol">:confirmed</span><span class="punct">,</span> <span class="symbol">:boolean</span><span class="punct">,</span> <span class="symbol">:null</span> <span class="punct">=&gt;</span><span class="constant">false</span>
+  <span class="ident">drop_constraint</span> <span class="symbol">:b</span>
+  <span class="ident">add_constraint</span> <span class="symbol">:c</span> <span class="keyword">do</span> <span class="punct">|</span><span class="ident">o</span><span class="punct">|</span> <span class="comment"># price != 0 if confirmed</span>
+    <span class="punct">{</span><span class="symbol">:confirmed</span> <span class="punct">=&gt;~{</span><span class="symbol">:price=</span><span class="punct">&gt;</span><span class="number">0</span><span class="punct">}}.</span><span class="ident">case</span><span class="punct">(</span><span class="constant">true</span><span class="punct">)</span>
+  <span class="keyword">end</span>
+  <span class="ident">add_foreign_key</span> <span class="symbol">:foo_id</span><span class="punct">,</span> <span class="symbol">:foos</span>
+  <span class="ident">add_primary_key</span> <span class="symbol">:id</span>
+  <span class="ident">rename_column</span> <span class="symbol">:id</span><span class="punct">,</span> <span class="symbol">:attendee_id</span>
+  <span class="ident">drop_column</span> <span class="symbol">:id</span>
+  <span class="ident">set_column_default</span> <span class="symbol">:name</span><span class="punct">,</span> <span class="punct">'</span><span class="string">Jeremy</span><span class="punct">'</span>
+  <span class="ident">set_column_type</span> <span class="symbol">:price</span><span class="punct">,</span> <span class="constant">Numeric</span>
+  <span class="ident">set_column_allow_null</span> <span class="symbol">:confirmed</span><span class="punct">,</span> <span class="constant">true</span>
+<span class="keyword">end</span></pre></div>
+				</div>
+			
+				<div class="slide">
+					<h1>Schema Modification (2)</h1>
+<div class='ruby'><pre><span class="constant">DB</span><span class="punct">.</span><span class="ident">add_column</span> <span class="symbol">:attendees</span><span class="punct">,</span> <span class="symbol">:confirmed</span><span class="punct">,</span> <span class="symbol">:boolean</span>
+<span class="constant">DB</span><span class="punct">.</span><span class="ident">add_index</span> <span class="symbol">:attendees</span><span class="punct">,</span> <span class="symbol">:confirmed</span>
+<span class="constant">DB</span><span class="punct">.</span><span class="ident">drop_index</span> <span class="symbol">:attendees</span><span class="punct">,</span> <span class="symbol">:confirmed</span>
+<span class="constant">DB</span><span class="punct">.</span><span class="ident">rename_column</span> <span class="symbol">:attendees</span><span class="punct">,</span> <span class="symbol">:id</span><span class="punct">,</span> <span class="symbol">:attendee_id</span>
+<span class="constant">DB</span><span class="punct">.</span><span class="ident">drop_column</span> <span class="symbol">:attendees</span><span class="punct">,</span> <span class="symbol">:attendee_id</span>
+<span class="constant">DB</span><span class="punct">.</span><span class="ident">set_column_default</span> <span class="symbol">:attendees</span><span class="punct">,</span> <span class="symbol">:name</span><span class="punct">,</span> <span class="punct">'</span><span class="string">Jeremy</span><span class="punct">'</span>
+<span class="constant">DB</span><span class="punct">.</span><span class="ident">set_column_type</span> <span class="symbol">:attendees</span><span class="punct">,</span> <span class="symbol">:price</span><span class="punct">,</span> <span class="constant">Numeric</span>
+<span class="constant">DB</span><span class="punct">.</span><span class="ident">rename_table</span> <span class="symbol">:attendees</span><span class="punct">,</span> <span class="symbol">:people</span>
+<span class="constant">DB</span><span class="punct">.</span><span class="ident">drop_table</span> <span class="symbol">:people</span>
+<span class="constant">DB</span><span class="punct">.</span><span class="ident">create_view</span> <span class="symbol">:ac</span><span class="punct">,</span> <span class="constant">DB</span><span class="punct">[</span><span class="symbol">:attendees</span><span class="punct">].</span><span class="ident">where</span><span class="punct">(</span><span class="symbol">:confirmed</span><span class="punct">)</span>
+<span class="constant">DB</span><span class="punct">.</span><span class="ident">drop_view</span> <span class="symbol">:ac</span></pre></div>
+				</div>
+			
+				<div class="slide">
+					<h1>Migrations</h1>
+<ul>
+  <li>Similar to ActiveRecord migrations</li>
+  <li>Migration class proxies most methods to Database</li>
+</ul>
+<div class='ruby'><pre><span class="keyword">class </span><span class="class">CreateAttendees</span> <span class="punct">&lt;</span> <span class="constant">Sequel</span><span class="punct">::</span><span class="constant">Migration</span>
+  <span class="keyword">def </span><span class="method">up</span>
+    <span class="ident">create_table</span><span class="punct">(</span><span class="symbol">:attendees</span><span class="punct">)</span> <span class="punct">{</span>
+      <span class="ident">primary_key</span> <span class="symbol">:id</span>
+      <span class="constant">String</span> <span class="symbol">:name</span> <span class="punct">}</span>
+  <span class="keyword">end</span>
+  <span class="keyword">def </span><span class="method">down</span>
+    <span class="ident">drop_table</span><span class="punct">(</span><span class="symbol">:attendees</span><span class="punct">)</span>
+  <span class="keyword">end</span>
+<span class="keyword">end</span> <span class="comment"># CreateAttendees.apply(DB, :up)</span></pre></div>
+				</div>
+			
+				<div class="slide">
+					<h1>Migrator</h1>
+<ul>
+  <li>Migrations are just classes that can be used individually via an API</li>
+  <li>Sequel::Migrator deals with a directory of files containing migrations, similar to AR</li>
+  <li>Filenames should start with integer representing state of migration, similar to AR before timestamped migrations</li>
+  <li>You can use the Migrator API, or the sequel command line tool -m switch</li>
+</ul>
+<div class='ruby'><pre><span class="constant">Sequel</span><span class="punct">::</span><span class="constant">Migrator</span><span class="punct">.</span><span class="ident">apply</span><span class="punct">(</span><span class="constant">DB</span><span class="punct">,</span> <span class="punct">'</span><span class="string">.</span><span class="punct">')</span> <span class="comment"># To current version</span>
+<span class="constant">Sequel</span><span class="punct">::</span><span class="constant">Migrator</span><span class="punct">.</span><span class="ident">apply</span><span class="punct">(</span><span class="constant">DB</span><span class="punct">,</span> <span class="punct">'</span><span class="string">.</span><span class="punct">',</span> <span class="number">5</span><span class="punct">,</span> <span class="number">1</span><span class="punct">)</span> <span class="comment"># To 5 from 1</span>
+<span class="comment"># $ sequel -m /path/to/migrations -M 5 postgres://...</span></pre></div>
+				</div>
+			
+				<div class="slide">
+					<h1>Migration Philosophy</h1>
+<ul>
+  <li>Migrations should preferably only do schema modification, no data modification unless necessary</li>
+  <li>Migrations should be self contained, and not reference any part of your app (such as your models)</li>
+  <li>Migrations are deliberately not timestamped:<ul>
+    <li>The whole point of timestamped migrations was to allow multiple teams working on the same app to add migrations to different branches without requiring manual intervention when merging</li>
+    <li>That is a poor idea, as there is no guarantee that the modifications will not conflict</li>
+    <li>Using integer versions instead of timestamps makes it so the maintainer has to take manual effort when merging branches with different migrations, which is a good thing</li>
+  </ul></li>
+</ul>
+				</div>
+			
+				<div class="slide">
+					<h1>Model Schemas</h1>
+<ul>
+  <li>Models can use set_schema/create_table for a DataMapper-like way of handling things</li>
+  <li>This isn't recommended, as it makes schema changes difficult</li>
+  <li>Use migrations instead for any production app</li>
+  <li>For test code/examples, it is OK</li>
+  <li>However, even then I prefer using the standard database schema methods before the model definition</li>
+  <li>Sequel's philosophy is that the model is simply a nice front end to working with the database, not that the database is just a place to store the model's data</li>
+</ul>
+				</div>
+			
+				<div class="slide">
+					<h1>Bound Variables</h1>
+<ul>
+  <li>Potentially faster depending on the query (no literalization of large objects)</li>
+  <li>Don't assume better performance, and don't use without profiling/benchmarking</li>
+  <li>Use :$blah placeholders on all databases</li>
+  <li>Native support on PostgreSQL, JDBC, and SQLite, others have emulated support</li>
+</ul>
+<div class='ruby'><pre><span class="ident">ds</span> <span class="punct">=</span> <span class="constant">DB</span><span class="punct">[</span><span class="symbol">:items</span><span class="punct">].</span><span class="ident">filter</span><span class="punct">(</span><span class="symbol">:name</span> <span class="punct">=&gt;</span><span class="symbol">:$n</span><span class="punct">)</span>
+<span class="ident">ds</span><span class="punct">.</span><span class="ident">call</span><span class="punct">(</span><span class="symbol">:select</span><span class="punct">,</span> <span class="symbol">:n</span> <span class="punct">=&gt;'</span><span class="string">Jim</span><span class="punct">')</span>
+<span class="ident">ds</span><span class="punct">.</span><span class="ident">call</span><span class="punct">(</span><span class="symbol">:update</span><span class="punct">,</span> <span class="punct">{</span><span class="symbol">:n</span> <span class="punct">=&gt;'</span><span class="string">Jim</span><span class="punct">',</span> <span class="symbol">:new_n</span> <span class="punct">=&gt;'</span><span class="string">Bob</span><span class="punct">'},</span> \
+  <span class="symbol">:name</span> <span class="punct">=&gt;</span><span class="symbol">:$new_n</span><span class="punct">)</span></pre></div>
+				</div>
+			
+				<div class="slide">
+					<h1>Prepared Statements</h1>
+<ul>
+  <li>Similar to bound variable support:<ul>
+    <li>Potentially faster due to reduced literalization and query plan caching</li>
+    <li>Only use after profiling/benchmarking</li>
+    <li>Uses same :$blah placeholders</li>
+    <li>Native support on PostgreSQL, JDBC, SQLite, and MySQL, emulated support on other databases</li>
+  </ul></li>
+</ul>
+<div class='ruby'><pre><span class="ident">ds</span> <span class="punct">=</span> <span class="constant">DB</span><span class="punct">[</span><span class="symbol">:items</span><span class="punct">].</span><span class="ident">filter</span><span class="punct">(</span><span class="symbol">:name</span> <span class="punct">=&gt;</span><span class="symbol">:$n</span><span class="punct">)</span>
+<span class="ident">ps</span> <span class="punct">=</span> <span class="ident">ds</span><span class="punct">.</span><span class="ident">prepare</span><span class="punct">(</span><span class="symbol">:select</span><span class="punct">,</span> <span class="symbol">:select_by_name</span><span class="punct">)</span>
+<span class="ident">ps</span><span class="punct">.</span><span class="ident">call</span><span class="punct">(</span><span class="symbol">:n</span> <span class="punct">=&gt;'</span><span class="string">Jim</span><span class="punct">')</span>
+<span class="constant">DB</span><span class="punct">.</span><span class="ident">call</span><span class="punct">(</span><span class="symbol">:select_by_name</span><span class="punct">,</span> <span class="symbol">:n</span> <span class="punct">=&gt;'</span><span class="string">Jim</span><span class="punct">')</span>
+<span class="ident">ps2</span> <span class="punct">=</span> <span class="ident">ds</span><span class="punct">.</span><span class="ident">prepare</span><span class="punct">(</span><span class="symbol">:update</span><span class="punct">,</span> <span class="symbol">:update_name</span><span class="punct">,</span> \
+  <span class="symbol">:name</span> <span class="punct">=&gt;</span><span class="symbol">:$new_n</span><span class="punct">)</span>
+<span class="ident">ps2</span><span class="punct">.</span><span class="ident">call</span><span class="punct">(</span><span class="symbol">:n</span> <span class="punct">=&gt;'</span><span class="string">Jim</span><span class="punct">',</span> <span class="symbol">:new_n</span> <span class="punct">=&gt;'</span><span class="string">Bob</span><span class="punct">')</span>
+</pre></div>
+				</div>
+			
+				<div class="slide">
+					<h1>Stored Procedures</h1>
+<ul>
+  <li>Only supported in the MySQL and JDBC adapters</li>
+  <li>Similar to prepared statement support</li>
+</ul>
+<div class='ruby'><pre><span class="constant">DB</span><span class="punct">[</span><span class="symbol">:table</span><span class="punct">].</span><span class="ident">call_sproc</span><span class="punct">(</span><span class="symbol">:select</span><span class="punct">,</span> <span class="symbol">:mysp</span><span class="punct">,</span> \
+  <span class="punct">'</span><span class="string">param1</span><span class="punct">',</span> <span class="punct">'</span><span class="string">param2</span><span class="punct">')</span>
+<span class="ident">sp</span> <span class="punct">=</span> <span class="constant">DB</span><span class="punct">[</span><span class="symbol">:table</span><span class="punct">].</span><span class="ident">prepare_sproc</span><span class="punct">(</span><span class="symbol">:select</span><span class="punct">,</span> <span class="symbol">:mysp</span><span class="punct">)</span>
+<span class="ident">sp</span><span class="punct">.</span><span class="ident">call</span><span class="punct">('</span><span class="string">param1</span><span class="punct">',</span> <span class="punct">'</span><span class="string">param2</span><span class="punct">')</span>
+<span class="ident">sp</span><span class="punct">.</span><span class="ident">call</span><span class="punct">('</span><span class="string">param3</span><span class="punct">',</span> <span class="punct">'</span><span class="string">param4</span><span class="punct">')</span></pre></div>
+				</div>
+			
+				<div class="slide">
+					<h1>Master/Slave Databases</h1>
+<ul>
+  <li>Sequel has built in support for master/slave database configurations</li>
+  <li>SELECT queries go to slave databases, all other requests go to master database</li>
+  <li>No code modifications are required, just need to modify the Sequel.connect call</li>
+</ul>
+<div class='ruby'><pre><span class="constant">DB</span><span class="punct">=</span><span class="constant">Sequel</span><span class="punct">.</span><span class="ident">connect</span><span class="punct">('</span><span class="string">postgres://m/db</span><span class="punct">',</span> <span class="symbol">:servers</span> <span class="punct">=&gt;</span> \
+  <span class="punct">{</span><span class="symbol">:read_only</span> <span class="punct">=&gt;</span><span class="ident">proc</span><span class="punct">{|</span><span class="ident">db</span><span class="punct">|</span> <span class="symbol">:host</span> <span class="punct">=&gt;</span><span class="ident">db</span><span class="punct">.</span><span class="ident">slave</span><span class="punct">}},</span> \
+  <span class="symbol">:max_connections</span> <span class="punct">=&gt;</span><span class="number">16</span><span class="punct">)</span> <span class="comment"># 4 connections per slave</span>
+<span class="comment"># Master host: m; slave hosts: s1, s2, s3, s4</span>
+<span class="keyword">def </span><span class="method">DB.slave</span><span class="punct">;</span> <span class="punct">&quot;</span><span class="string">s<span class="expr">#{((@current_host||=-1)+=1)%4}</span></span><span class="punct">&quot;</span> <span class="keyword">end</span></pre></div>
+				</div>
+			
+				<div class="slide">
+					<h1>Sharding/Partitioning</h1>
+<ul>
+  <li>Sequel makes it simple to deal with a sharded/partitioned database setup</li>
+  <li>Basically, you can set any standard query to use whichever server you specify, using the Dataset#server method</li>
+  <li>Implemented in the generic connection pool, so all adapters are supported</li>
+</ul>
+<div class='ruby'><pre><span class="ident">s</span> <span class="punct">=</span> <span class="punct">{}</span>
+<span class="punct">%w'</span><span class="string">a b c d</span><span class="punct">'.</span><span class="ident">each</span><span class="punct">{|</span><span class="ident">x</span><span class="punct">|</span> <span class="ident">s</span><span class="punct">[</span><span class="ident">x</span><span class="punct">.</span><span class="ident">to_sym</span><span class="punct">]</span> <span class="punct">=</span> <span class="punct">{</span><span class="symbol">:host=</span><span class="punct">&gt;&quot;</span><span class="string">s<span class="expr">#{x}</span></span><span class="punct">&quot;}}</span>
+<span class="constant">DB</span><span class="punct">=</span><span class="constant">Sequel</span><span class="punct">.</span><span class="ident">connect</span><span class="punct">('</span><span class="string">postgres://m/db</span><span class="punct">',</span> <span class="symbol">:servers=</span><span class="punct">&gt;</span><span class="ident">s</span><span class="punct">)</span>
+<span class="constant">DB</span><span class="punct">[</span><span class="symbol">:table</span><span class="punct">].</span><span class="ident">server</span><span class="punct">(</span><span class="symbol">:a</span><span class="punct">).</span><span class="ident">filter</span><span class="punct">(</span><span class="symbol">:num=</span><span class="punct">&gt;</span><span class="number">10</span><span class="punct">).</span><span class="ident">all</span>
+<span class="constant">DB</span><span class="punct">[</span><span class="symbol">:table</span><span class="punct">].</span><span class="ident">server</span><span class="punct">(</span><span class="symbol">:b</span><span class="punct">).</span><span class="ident">filter</span><span class="punct">(</span><span class="symbol">:num=</span><span class="punct">&gt;</span><span class="number">100</span><span class="punct">).</span><span class="ident">delete</span></pre></div>
+				</div>
+			
+				<div class="slide">
+					<h1>Core Class Methods</h1>
+<ul>
+  <li>Sequel adds methods to the core classes, probably more than it should</li>
+  <li>Some of these are designed to be used by the user in constructing queries, some are general and designed to make the implementation easier, I'll cover the former</li>
+</ul>
+<div class='ruby'><pre><span class="ident">h</span> <span class="punct">=</span> <span class="punct">{</span><span class="symbol">:a</span> <span class="punct">=&gt;</span><span class="number">1</span><span class="punct">,</span> <span class="symbol">:b</span> <span class="punct">=&gt;</span><span class="number">2</span><span class="punct">}</span> <span class="comment"># or [[:a,1],[:b,2]]</span>
+<span class="ident">h</span><span class="punct">.</span><span class="ident">sql_expr</span>    <span class="comment"># a = 1 AND b = 2</span>
+<span class="ident">h</span><span class="punct">.</span><span class="ident">sql_negate</span>  <span class="comment"># a != 1 AND b != 2</span>
+<span class="ident">h</span><span class="punct">.</span><span class="ident">sql_or</span>      <span class="comment"># a = 1 OR b = 2</span>
+~<span class="ident">h</span>            <span class="comment"># a != 1 OR b != 2</span>
+<span class="ident">h</span><span class="punct">.</span><span class="ident">case</span><span class="punct">(</span><span class="number">0</span><span class="punct">,</span> <span class="symbol">:c</span><span class="punct">)</span> <span class="comment"># CASE c WHEN a THEN 1</span>
+              <span class="comment"># WHEN b THEN 2 ELSE 0 END</span></pre></div>
+				</div>
+			
+				<div class="slide">
+					<h1>Core Class Methods (2)</h1>
+<div class='ruby'><pre><span class="comment"># (a,b) IN (1=2 AND 3=4)</span>
+<span class="ident">filter</span><span class="punct">([</span><span class="symbol">:a</span><span class="punct">,</span><span class="symbol">:b</span><span class="punct">]=&gt;[[</span><span class="number">1</span><span class="punct">,</span><span class="number">2</span><span class="punct">],[</span><span class="number">3</span><span class="punct">,</span><span class="number">4</span><span class="punct">]])</span>
+<span class="comment"># (a,b) IN ((1,2),(3,4))</span>
+<span class="ident">filter</span><span class="punct">([</span><span class="symbol">:a</span><span class="punct">,</span><span class="symbol">:b</span><span class="punct">]=&gt;[[</span><span class="number">1</span><span class="punct">,</span><span class="number">2</span><span class="punct">],[</span><span class="number">3</span><span class="punct">,</span><span class="number">4</span><span class="punct">]].</span><span class="ident">sql_array</span><span class="punct">)</span>
+<span class="punct">{</span><span class="symbol">:a=</span><span class="punct">&gt;</span><span class="number">1</span><span class="punct">}</span> <span class="punct">&amp;</span> <span class="symbol">:b</span> <span class="comment"># a = 1 AND b</span>
+<span class="punct">{</span><span class="symbol">:a=</span><span class="punct">&gt;</span><span class="number">1</span><span class="punct">}</span> <span class="punct">|</span> <span class="symbol">:b</span> <span class="comment"># a = 1 OR b</span>
+<span class="symbol">:a</span><span class="punct">.</span><span class="ident">as</span><span class="punct">(</span><span class="symbol">:b</span><span class="punct">)</span>  <span class="comment"># a AS b</span>
+<span class="punct">'</span><span class="string">a</span><span class="punct">'.</span><span class="ident">as</span><span class="punct">(</span><span class="symbol">:b</span><span class="punct">)</span> <span class="comment"># 'a' AS b</span>
+<span class="symbol">:a</span><span class="punct">.</span><span class="ident">cast</span><span class="punct">(</span><span class="symbol">:integer</span><span class="punct">)</span> <span class="comment"># CAST(a AS integer)</span>
+<span class="symbol">:a</span><span class="punct">.</span><span class="ident">cast_numeric</span> <span class="punct">&lt;&lt;</span> <span class="number">1</span> <span class="comment"># CAST(a AS integer) &lt;&lt; 1</span>
+<span class="punct">'</span><span class="string">1.0</span><span class="punct">'.</span><span class="ident">cast_numeric</span><span class="punct">(</span><span class="symbol">:real</span><span class="punct">)</span> <span class="comment"># CAST('1.0' AS real) </span>
+<span class="symbol">:a</span><span class="punct">.</span><span class="ident">cast_string</span> <span class="punct">+</span> <span class="symbol">:b</span> <span class="comment"># CAST(a AS varchar(255)) || b</span>
+</pre></div>
+				</div>
+			
+				<div class="slide">
+					<h1>Core Class Methods (3)</h1>
+<div class='ruby'><pre><span class="punct">'</span><span class="string">a</span><span class="punct">'</span>      <span class="comment"># 'a'</span>
+<span class="punct">'</span><span class="string">a</span><span class="punct">'.</span><span class="ident">lit</span>  <span class="comment"># a</span>
+<span class="punct">'</span><span class="string">a</span><span class="punct">'.</span><span class="ident">to_sequel_blob</span> <span class="comment"># Needed for dealing with blob</span>
+                   <span class="comment"># columns on most databases</span>
+<span class="symbol">:a</span> <span class="punct">+</span> <span class="symbol">:b</span> <span class="punct">-</span> <span class="symbol">:c</span> <span class="punct">*</span> <span class="symbol">:d</span> <span class="punct">/</span> <span class="symbol">:e</span>  <span class="comment"># (a + b) - ((c * d) / e)</span>
+<span class="symbol">:a</span> <span class="punct">&amp;</span> <span class="symbol">:b</span> <span class="punct">|</span> ~<span class="symbol">:c</span>           <span class="comment"># (a AND b) OR NOT c</span>
+<span class="symbol">:a</span><span class="punct">.</span><span class="ident">sql_function</span>         <span class="comment"># a()</span>
+<span class="symbol">:a</span><span class="punct">.</span><span class="ident">sql_function</span><span class="punct">(</span><span class="symbol">:b</span><span class="punct">,</span> <span class="symbol">:c</span><span class="punct">)</span> <span class="comment"># a(b, c)</span>
+<span class="symbol">:a</span><span class="punct">.</span><span class="ident">extract</span><span class="punct">(</span><span class="symbol">:year</span><span class="punct">)</span>       <span class="comment"># EXTRACT(year FROM a)</span>
+<span class="comment"># Except on Ruby 1.9:</span>
+<span class="symbol">:a</span> <span class="punct">&lt;</span> <span class="punct">'</span><span class="string">a</span><span class="punct">';</span> <span class="symbol">:b</span> <span class="punct">&gt;=</span> <span class="number">1</span> <span class="comment"># a &lt; 'a'; b &gt;= 1</span>
+<span class="symbol">:a</span><span class="punct">[]</span>              <span class="comment"># a()</span>
+<span class="symbol">:a</span><span class="punct">[</span><span class="symbol">:b</span><span class="punct">,</span> <span class="symbol">:c</span><span class="punct">]</span>        <span class="comment"># a(b, c)</span></pre></div>
+				</div>
+			
+				<div class="slide">
+					<h1>Core Class Methods (4)</h1>
+<div class='ruby'><pre><span class="symbol">:a__b</span>              <span class="comment"># a.b</span>
+<span class="symbol">:a__b</span><span class="punct">.</span><span class="ident">identifier</span>   <span class="comment"># a__b</span>
+<span class="symbol">:a</span><span class="punct">.</span><span class="ident">qualify</span><span class="punct">(</span><span class="symbol">:b</span><span class="punct">)</span>     <span class="comment"># b.a</span>
+<span class="symbol">:a</span><span class="punct">.</span><span class="ident">qualify</span><span class="punct">(</span><span class="symbol">:b__a</span><span class="punct">)</span>  <span class="comment"># b.a.a</span>
+<span class="symbol">:b__c</span><span class="punct">.</span><span class="ident">qualify</span><span class="punct">(</span><span class="symbol">:a</span><span class="punct">)</span>  <span class="comment"># a.b.c</span>
+<span class="symbol">:a</span><span class="punct">.</span><span class="ident">like</span><span class="punct">(</span><span class="symbol">:b</span><span class="punct">)</span>        <span class="comment"># PostgreSQL: a LIKE b</span>
+<span class="symbol">:a</span><span class="punct">.</span><span class="ident">like</span><span class="punct">('</span><span class="string">b</span><span class="punct">')</span>       <span class="comment"># MySQL:      a LIKE BINARY 'b'</span>
+<span class="symbol">:a</span><span class="punct">.</span><span class="ident">like</span><span class="punct">(/</span><span class="regex">b</span><span class="punct">/)</span>       <span class="comment"># PostgreSQL: a ~ 'b'</span>
+<span class="symbol">:a</span><span class="punct">.</span><span class="ident">like</span><span class="punct">(/</span><span class="regex">b</span><span class="punct">/)</span>       <span class="comment"># MySQL:      a REGEXP BINARY 'b'</span>
+<span class="symbol">:a</span><span class="punct">.</span><span class="ident">ilike</span><span class="punct">(</span><span class="symbol">:b</span><span class="punct">)</span>       <span class="comment"># MySQL:      a LIKE b</span>
+<span class="symbol">:a</span><span class="punct">.</span><span class="ident">ilike</span><span class="punct">('</span><span class="string">b</span><span class="punct">')</span>      <span class="comment"># PostgreSQL: a ILIKE 'b'</span>
+<span class="symbol">:a</span><span class="punct">.</span><span class="ident">ilike</span><span class="punct">(/</span><span class="regex">b</span><span class="punct">/)</span>      <span class="comment"># PostgreSQL: a ~* 'b'</span>
+<span class="symbol">:a</span><span class="punct">.</span><span class="ident">ilike</span><span class="punct">(/</span><span class="regex">b</span><span class="punct">/)</span>      <span class="comment"># MySQL:      a REGEXP 'b'</span>
+<span class="symbol">:a</span><span class="punct">.</span><span class="ident">sql_number</span> <span class="punct">&lt;&lt;</span> <span class="number">1</span> <span class="comment"># a &lt;&lt; 1</span></pre></div>
+
+				</div>
+			
+				<div class="slide">
+					<h1>sequel command line tool</h1>
+<ul>
+  <li>Provide database connection string or path to yaml file as argument</li>
+  <li>Gives you an irb shell with DB constant already defined</li>
+  <li>Options:<ul>
+    <li>-E option echos all SQL used to stdout</li>
+    <li>-e option specifies the environment to use in the yaml file</li>
+    <li>-m option runs the migrator with the path to the given directory</li>
+    <li>-M tells the migrator which version to migrate to</li>
+    <li>-l option logs all SQL to a file</li>
+    <li>-L option loads all files (usually model files) in a given directory</li>
+  </ul></li>
+  <li>Great for quick access and seeing how Sequel works</li>
+</ul>
+				</div>
+			
+				<div class="slide">
+					<h1>Using Sequel in Web Applications</h1>
+<ul>
+  <li>Sequel is not designed with web applications in mind, though it does work well with them</li>
+  <li>The default options are a bit strict, you may want to relax them<ul>
+    <li>Model.raise_on_typecast_failure: Set to false and use validates_not_string to check that non string columns don't have string values</li>
+    <li>Model.raise_on_save_failure: Set to false if you want save to return nil or false if validations fail, instead of raising an error.</li>
+    <li>Model.strict_param_setting: Set to false to not raise an error if a setter method called via mass assignment is restricted or not defined</li>
+  </ul></li>
+  <li>Sequel gives you lots of options for setting model values from user input:<ul>
+    <li>set_only: Given a user provided hash, restricts access to only the attributes you provide (recommended)</li>
+    <li>set_restricted: Restricts access to the attributes you provide, in addition to the defaults</li>
+    <li>set: Uses the defaults set by set_allowed_columns and set_restricted_columns class methods</li>
+  </ul></li>
+</ul>
+				</div>
+			
+				<div class="slide">
+					<h1>Lightweight?</h1>
+<ul>
+  <li>Requires: bigdecimal, bigdecimal/util, date, enumerator, thread, time, uri, yaml</li>
+  <li>Possible to trim some of those out with minor hacking</li>
+  <li>RAM Usage (VSZ change from requiring on i386):<ul>
+    <li>Sequel 2.11.0:<ul>
+      <li>sequel_core: 2064KB</li>
+      <li>sequel: 3700KB</li>
+    </ul></li>
+    <li>DataMapper 0.9.10:<ul>
+      <li>dm-core: 5560KB</li>
+      <li>dm-more: 14244KB</li>
+    </ul>ActiveRecord<ul>
+      <li> 2.2.2: 12792KB</li>
+      <li> 2.3.1rc2: 6588KB (nothing autoloaded)</li>
+      <li> 2.3.1rc2: 9724KB (everything loaded)</li>
+    </ul></li>
+  </ul></li>
+</ul>
+				</div>
+			
+				<div class="slide">
+					<h1>Current Status</h1>
+<ul>
+  <li>Current version: 2.11.0</li>
+  <li>Releases are generally done once a month, usually in the first week of the month</li>
+  <li>Generally there are no open bugs or features planned when a release is made</li>
+  <li>Every month there are small and not-so-small features that get added, mostly based on user's suggestions/code</li>
+  <li>Bugs on the tracker get priority, and generally are dealt with quickly (1 day-1 week)</li>
+  <li>Bugs 200-260: 48 Fixed, 5 WontFix, rest invalid/spam</li>
+  <li>The empty bug tracker is the SOP</li>
+</ul>
+				</div>
+			
+				<div class="slide">
+					<h1>Contributing</h1>
+<ul>
+  <li>Contributing is very easy, no +1s required</li>
+  <li>No bureaucracy, just notify me via IRC (#sequel), the Google Group, the bug tracker, or github</li>
+  <li>Feedback for all patches is prompt, no exceptions</li>
+  <li>Patches should include specs, but they aren't required, I'll accept patches without specs and add the specs myself (if an obvious bug or a feature I like)</li>
+  <li>Feature requests are denied more often for philosophical reasons than for poor implementation</li>
+  <li>If I think a feature is good and the implementation is not, I'll rewrite the implementation myself</li>
+</ul>
+				</div>
+			
+				<div class="slide">
+					<h1>The Future: Sequel 3.0</h1>
+<ul>
+  <li>No Grand Refactoring, break compatibility only when necessary</li>
+  <li>Move some current features into optional plugins<ul>
+    <li>Dataset pagination</li>
+    <li>Dataset#query</li>
+    <li>Sequel::PrettyTable</li>
+    <li>Model caching</li>
+    <li>Model set_schema/create_table</li>
+    <li>Dataset transforms/Model serialization</li>
+    <li>All core extensions not related to the SQL DSL</li>
+    <li>Model hooks and validations class methods</li>
+  </ul></li>
+  <li>Eliminate some cruft and aliases, modify some minor features/APIs</li>
+  <li>Deprecation warnings for all major changes in 2.12</li>
+</ul>
+
+				</div>
+			
+				<div class="slide">
+					<h1>Questions?</h1>
+
+				</div>
+			
+		</div>
+	</body>
+</html>
