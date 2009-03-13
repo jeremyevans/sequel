@@ -96,8 +96,8 @@ task :website=>[:website_base, :website_rdoc]
 
 lib_dir = File.join(File.dirname(__FILE__), 'lib')
 fixRUBYLIB = Proc.new{ENV['RUBYLIB'] ? (ENV['RUBYLIB'] += ":#{lib_dir}") : (ENV['RUBYLIB'] = lib_dir)}
-sequel_core_specs = "spec/sequel_core/*_spec.rb"
-sequel_model_specs = "spec/sequel_model/*_spec.rb"
+sequel_core_specs = "spec/core/*_spec.rb"
+sequel_model_specs = "spec/model/*_spec.rb"
 sequel_plugin_specs = "spec/extensions/*_spec.rb"
 spec_opts = proc{File.read("spec/spec.opts").split("\n")}
 rcov_opts = proc{File.read("spec/rcov.opts").split("\n")}

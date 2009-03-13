@@ -6,6 +6,17 @@ end
 
 Sequel.virtual_row_instance_eval = true
 
+module Spec::Example::ExampleMethods
+  def deprec
+    output = Sequel::Deprecation.output = nil 
+    begin
+      yield
+    ensure
+      Sequel::Deprecation.output = output
+    end 
+  end 
+end
+
 module Spec::Example::ExampleGroupMethods
   def deprec_specify(*args, &block)
     specify(*args) do
