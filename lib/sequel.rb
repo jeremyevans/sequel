@@ -1,1 +1,1 @@
-require 'sequel_model'
+require 'sequel/model'

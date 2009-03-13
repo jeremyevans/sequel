@@ -5,7 +5,7 @@ unless Object.const_defined?('Sequel')
 end
 unless Sequel.const_defined?('Model')
   $:.unshift(File.join(File.dirname(__FILE__), "../../lib/"))
-  require 'sequel_model'
+  require 'sequel/model'
 end
 
 Sequel.virtual_row_instance_eval = true
