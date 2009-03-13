@@ -1,4 +1,4 @@
-require 'sequel_core/adapters/shared/postgres'
+Sequel.require 'adapters/shared/postgres'
 
 module Sequel
   Postgres::CONVERTED_EXCEPTIONS << PostgresError

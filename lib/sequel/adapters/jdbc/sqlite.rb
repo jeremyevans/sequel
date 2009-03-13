@@ -1,4 +1,4 @@
-require 'sequel_core/adapters/shared/sqlite'
+Sequel.require 'adapters/shared/sqlite'
 
 module Sequel
   module JDBC

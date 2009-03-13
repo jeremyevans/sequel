@@ -12,10 +12,10 @@ module Sequel
         super(opts)
         case opts[:db_type]
         when 'mssql'
-          require 'sequel_core/adapters/shared/mssql'
+          Sequel.require 'adapters/shared/mssql'
           extend Sequel::MSSQL::DatabaseMethods
         when 'progress'
-          require 'sequel_core/adapters/shared/progress'
+          Sequel.require 'adapters/shared/progress'
           extend Sequel::Progress::DatabaseMethods
         end
       end

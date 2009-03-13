@@ -1,4 +1,4 @@
-require 'sequel_core'
+require 'sequel/core'
 
 module Sequel
   # Holds the nameless subclasses that are created with

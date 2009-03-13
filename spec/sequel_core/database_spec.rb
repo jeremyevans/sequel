@@ -800,7 +800,7 @@ end
 
 context "A broken adapter (lib is there but the class is not)" do
   setup do
-    @fn = File.join(File.dirname(__FILE__), '../../lib/sequel_core/adapters/blah.rb')
+    @fn = File.join(File.dirname(__FILE__), '../../lib/sequel/adapters/blah.rb')
     File.open(@fn,'a'){}
   end
   

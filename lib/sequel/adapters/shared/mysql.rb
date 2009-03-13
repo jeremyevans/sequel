@@ -1,11 +1,9 @@
-require 'sequel_core/adapters/utils/unsupported'
+Sequel.require 'adapters/utils/unsupported'
 
 module Sequel
-  module Schema
-    module SQL
-      # Keep default column_references_sql for add_foreign_key support
-      alias default_column_references_sql column_references_sql
-    end
+  class Database
+    # Keep default column_references_sql for add_foreign_key support
+    alias default_column_references_sql column_references_sql
   end
   module MySQL
     class << self

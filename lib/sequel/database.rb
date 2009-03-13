@@ -1,5 +1,3 @@
-%w'methods generator sql'.each{|f| require "sequel_core/database/schema_#{f}"}
-
 module Sequel
   # Array of all databases to which Sequel has connected.  If you are
   # developing an application that can connect to an arbitrary number of 
@@ -101,7 +99,7 @@ module Sequel
       if (klass = @@adapters[scheme]).nil?
         # attempt to load the adapter file
         begin
-          require "sequel_core/adapters/#{scheme}"
+          Sequel.require "adapters/#{scheme}"
         rescue LoadError => e
           raise Error::AdapterNotFound, "Could not load #{scheme} adapter:\n  #{e.message}"
         end

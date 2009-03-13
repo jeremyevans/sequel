@@ -1,6 +1,5 @@
 require 'mysql'
-require 'sequel_core/adapters/shared/mysql'
-require 'sequel_core/adapters/utils/stored_procedures'
+Sequel.require %w'shared/mysql utils/stored_procedures', 'adapters'
 
 module Sequel
   # Module for holding all MySQL-related classes and modules for Sequel.

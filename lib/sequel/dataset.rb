@@ -1,7 +1,3 @@
-%w'convenience prepared_statements sql'.each do |f|
-  require "sequel_core/dataset/#{f}"
-end
-
 module Sequel
   # A Dataset represents a view of a the data in a database, constrained by
   # specific parameters such as filtering conditions, order, etc. Datasets

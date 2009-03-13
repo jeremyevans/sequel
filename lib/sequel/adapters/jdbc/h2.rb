@@ -1,5 +1,4 @@
-require 'sequel_core/adapters/utils/date_format'
-require 'sequel_core/adapters/utils/unsupported'
+Sequel.require %w'date_format unsupported', 'adapters/utils'
 
 module Sequel
   module JDBC

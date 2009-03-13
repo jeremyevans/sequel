@@ -15,19 +15,19 @@ module Sequel
     # given database object so it supports the correct database type.
     DATABASE_SETUP = {:postgres=>proc do |db|
         require 'do_postgres'
-        require 'sequel_core/adapters/do/postgres'
+        Sequel.require 'adapters/do/postgres'
         db.converted_exceptions << PostgresError
         db.extend(Sequel::DataObjects::Postgres::DatabaseMethods)
       end,
       :mysql=>proc do |db|
         require 'do_mysql'
-        require 'sequel_core/adapters/do/mysql'
+        Sequel.require 'adapters/do/mysql'
         db.converted_exceptions << MysqlError
         db.extend(Sequel::DataObjects::MySQL::DatabaseMethods)
       end,
       :sqlite3=>proc do |db|
         require 'do_sqlite3'
-        require 'sequel_core/adapters/do/sqlite'
+        Sequel.require 'adapters/do/sqlite'
         db.converted_exceptions << Sqlite3Error
         db.extend(Sequel::DataObjects::SQLite::DatabaseMethods)
       end

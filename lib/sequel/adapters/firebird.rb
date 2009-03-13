@@ -1,5 +1,5 @@
 require 'fb'
-require 'sequel_core/adapters/utils/unsupported'
+Sequel.require 'adapters/utils/unsupported'
 
 module Sequel
   # The Sequel Firebird adapter requires the ruby fb driver located at

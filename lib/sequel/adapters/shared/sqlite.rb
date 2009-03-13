@@ -1,4 +1,4 @@
-require 'sequel_core/adapters/utils/unsupported'
+Sequel.require 'adapters/utils/unsupported'
 
 module Sequel
   module SQLite

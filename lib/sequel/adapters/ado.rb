@@ -1,4 +1,4 @@
-require 'sequel_core/adapters/utils/date_format'
+Sequel.require 'adapters/utils/date_format'
 require 'win32ole'
 
 module Sequel
@@ -20,7 +20,7 @@ module Sequel
         opts[:driver] ||= 'SQL Server'
         case opts[:driver]
         when 'SQL Server'
-          require 'sequel_core/adapters/shared/mssql'
+          Sequel.require 'adapters/shared/mssql'
           extend Sequel::MSSQL::DatabaseMethods
         end
       end

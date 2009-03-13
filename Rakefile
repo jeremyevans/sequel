@@ -8,7 +8,7 @@ rescue LoadError
   require "rake/rdoctask"
 end
 require "fileutils"
-require "lib/sequel_core/version"
+require "lib/sequel/version"
 
 include FileUtils
 
@@ -61,7 +61,7 @@ task :uninstall=>[:clean] do
   sh %{sudo gem uninstall #{NAME}}
 end
 
-desc "Upload sequel and sequel_core gems to rubyforge"
+desc "Upload sequel gem to rubyforge"
 task :release=>[:package] do
   sh %{rubyforge login}
   sh %{rubyforge add_release sequel #{NAME} #{VERS} pkg/#{NAME}-#{VERS}.tgz}

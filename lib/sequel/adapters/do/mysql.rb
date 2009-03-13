@@ -1,4 +1,4 @@
-require 'sequel_core/adapters/shared/mysql'
+Sequel.require 'adapters/shared/mysql'
 
 module Sequel
   module DataObjects

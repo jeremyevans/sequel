@@ -1,5 +1,5 @@
 require 'java'
-require 'sequel_core/adapters/utils/stored_procedures'
+Sequel.require 'adapters/utils/stored_procedures'
 
 module Sequel
   # Houses Sequel's JDBC support when running on JRuby.
@@ -35,35 +35,35 @@ module Sequel
     # Contains procs keyed on sub adapter type that extend the
     # given database object so it supports the correct database type.
     DATABASE_SETUP = {:postgresql=>proc do |db|
-        require 'sequel_core/adapters/jdbc/postgresql'
+        Sequel.require 'adapters/jdbc/postgresql'
         db.extend(Sequel::JDBC::Postgres::DatabaseMethods)
         JDBC.load_gem('postgres')
         org.postgresql.Driver
       end,
       :mysql=>proc do |db|
-        require 'sequel_core/adapters/jdbc/mysql'
+        Sequel.require 'adapters/jdbc/mysql'
         db.extend(Sequel::JDBC::MySQL::DatabaseMethods)
         JDBC.load_gem('mysql')
         com.mysql.jdbc.Driver
       end,
       :sqlite=>proc do |db|
-        require 'sequel_core/adapters/jdbc/sqlite'
+        Sequel.require 'adapters/jdbc/sqlite'
         db.extend(Sequel::JDBC::SQLite::DatabaseMethods)
         JDBC.load_gem('sqlite3')
         org.sqlite.JDBC
       end,
       :oracle=>proc do |db|
-        require 'sequel_core/adapters/jdbc/oracle'
+        Sequel.require 'adapters/jdbc/oracle'
         db.extend(Sequel::JDBC::Oracle::DatabaseMethods)
         Java::oracle.jdbc.driver.OracleDriver
       end,
       :sqlserver=>proc do |db|
-        require 'sequel_core/adapters/shared/mssql'
+        Sequel.require 'adapters/shared/mssql'
         db.extend(Sequel::MSSQL::DatabaseMethods)
         com.microsoft.sqlserver.jdbc.SQLServerDriver
       end,
       :h2=>proc do |db|
-        require 'sequel_core/adapters/jdbc/h2'
+        Sequel.require 'adapters/jdbc/h2'
         db.extend(Sequel::JDBC::H2::DatabaseMethods)
         JDBC.load_gem('h2')
         org.h2.Driver

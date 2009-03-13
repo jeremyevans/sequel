@@ -1,7 +1,7 @@
 require 'rubygems'
 unless Object.const_defined?('Sequel')
   $:.unshift(File.join(File.dirname(__FILE__), "../../lib/"))
-  require 'sequel_core'
+  require 'sequel/core'
 end
 
 Sequel.virtual_row_instance_eval = true
