@@ -431,3 +431,59 @@ class Object
     end
   end
 end
+
+class FalseClass
+  unless method_defined?(:blank?)
+    def blank?
+      Sequel::Deprecation.deprecate('FalseClass#blank?', "require 'sequel/extensions/blank' first")
+      true
+    end
+  end
+end
+
+class NilClass
+  unless method_defined?(:blank?)
+    def blank?
+      Sequel::Deprecation.deprecate('NilClass#blank?', "require 'sequel/extensions/blank' first")
+      true
+    end
+  end
+end
+
+class Numeric
+  unless method_defined?(:blank?)
+    def blank?
+      Sequel::Deprecation.deprecate('Numeric#blank?', "require 'sequel/extensions/blank' first")
+      false
+    end
+  end
+end
+
+class String
+  unless method_defined?(:blank?)
+    def blank?
+      Sequel::Deprecation.deprecate('String#blank?', "require 'sequel/extensions/blank' first")
+      strip.empty?
+    end
+  end
+end
+
+class TrueClass
+  unless method_defined?(:blank?)
+    def blank?
+      Sequel::Deprecation.deprecate('FalseClass#blank?', "require 'sequel/extensions/blank' first")
+      false
+    end
+  end
+end
+
+# Helpers from Metaid and a bit more
+class Object
+  unless method_defined?(:blank?)
+    def blank?
+      Sequel::Deprecation.deprecate('FalseClass#blank?', "require 'sequel/extensions/blank' first")
+      respond_to?(:empty?) && empty?
+    end
+  end
+end
+

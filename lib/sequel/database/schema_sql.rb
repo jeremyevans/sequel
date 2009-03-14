@@ -251,7 +251,7 @@ module Sequel
 
       if table_name
         cols = schema_parse_table(table_name, opts)
-        raise(Error, 'schema parsing returned no columns, table probably doesn\'t exist') if cols.blank?
+        raise(Error, 'schema parsing returned no columns, table probably doesn\'t exist') if cols.nil? || cols.empty?
         @schemas[quoted_name] = cols
       else
         tables.each{|t| @schemas[quote_schema_table(t)] = schema_parse_table(t.to_s, opts)}

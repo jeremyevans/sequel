@@ -274,7 +274,7 @@ module Sequel
           ds = ds.order(*opts[:order]) if opts[:order]
           ds = ds.eager(opts[:eager]) if opts[:eager]
           ds = ds.eager_graph(opts[:eager_graph]) if opts[:eager_graph]
-          ds = ds.eager(associations) unless associations.blank?
+          ds = ds.eager(associations) unless Array(associations).empty?
           ds = opts[:eager_block].call(ds) if opts[:eager_block]
           ds
         end

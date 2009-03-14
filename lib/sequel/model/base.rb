@@ -159,7 +159,7 @@ module Sequel
           db
           begin
             if self == Model
-              subclass.set_dataset(subclass.implicit_table_name) unless subclass.name.blank?
+              subclass.set_dataset(subclass.implicit_table_name) unless subclass.name.empty?
             elsif ds = instance_variable_get(:@dataset)
               subclass.set_dataset(ds.clone, :inherited=>true)
             end
@@ -811,7 +811,7 @@ module Sequel
   
       # Set the columns, filtered by the only and except arrays.
       def set_restricted(hash, only, except)
-        columns_not_set = model.instance_variable_get(:@columns).blank?
+        columns_not_set = [nil, false, "", [], {}].include?(model.instance_variable_get(:@columns))
         meths = setter_methods(only, except)
         strict = strict_param_setting
         hash.each do |k,v|

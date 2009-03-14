@@ -44,7 +44,7 @@ module Sequel
         dbname = opts[:database]
         if dbname !~ /^DBI:/ then
           dbname = "DBI:#{dbname}"
-          [:host, :port].each{|sym| dbname += ";#{sym}=#{opts[sym]}" unless opts[sym].blank?}
+          [:host, :port].each{|sym| dbname += ";#{sym}=#{opts[sym]}" unless blank_object?(opts[sym])}
         end
         ::DBI.connect(dbname, opts[:user], opts[:password])
       end

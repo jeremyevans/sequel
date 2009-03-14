@@ -195,7 +195,7 @@ module Sequel
       def connect(server)
         opts = server_opts(server)
         conn = Adapter.connect(
-          (opts[:host] unless opts[:host].blank?),
+          (opts[:host] unless blank_object?(opts[:host])),
           opts[:port] || 5432,
           nil, '',
           opts[:database],

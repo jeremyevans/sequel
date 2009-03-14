@@ -172,7 +172,7 @@ module Sequel
           row[:allow_null] = row.delete(:notnull).to_i == 0
           row[:default] = row.delete(:dflt_value)
           row[:primary_key] = row.delete(:pk).to_i == 1
-          row[:default] = nil if row[:default].blank?
+          row[:default] = nil if blank_object?(row[:default])
           row[:db_type] = row.delete(:type)
           row[:type] = schema_column_type(row[:db_type])
           row

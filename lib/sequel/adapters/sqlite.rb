@@ -27,7 +27,7 @@ module Sequel
       # be available if it is locked, given in milliseconds (default is 5000).
       def connect(server)
         opts = server_opts(server)
-        opts[:database] = ':memory:' if opts[:database].blank?
+        opts[:database] = ':memory:' if blank_object?(opts[:database])
         db = ::SQLite3::Database.new(opts[:database])
         db.busy_timeout(opts.fetch(:timeout, 5000))
         db.type_translation = true
@@ -127,7 +127,7 @@ module Sequel
         o = super.merge(:pool_convert_exceptions=>false)
         # Default to only a single connection if a memory database is used,
         # because otherwise each connection will get a separate database
-        o[:max_connections] = 1 if @opts[:database] == ':memory:' || @opts[:database].blank?
+        o[:max_connections] = 1 if @opts[:database] == ':memory:' || blank_object?(@opts[:database])
         o
       end
 

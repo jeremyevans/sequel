@@ -129,7 +129,7 @@ module Sequel
           row[:allow_null] = row.delete(:Null) == 'YES'
           row[:default] = row.delete(:Default)
           row[:primary_key] = row.delete(:Key) == 'PRI'
-          row[:default] = nil if row[:default].blank?
+          row[:default] = nil if blank_obj?(row[:default])
           row[:db_type] = row.delete(:Type)
           row[:type] = schema_column_type(row[:db_type])
           [ds2.send(:output_identifier, row.delete(:Field)), row]
@@ -204,7 +204,7 @@ module Sequel
       def full_text_search(cols, terms, opts = {})
         mode = opts[:boolean] ? " IN BOOLEAN MODE" : ""
         s = if Array === terms
-          if mode.blank?
+          if mode.empty?
             "MATCH #{literal(Array(cols))} AGAINST #{literal(terms)}"
           else
             "MATCH #{literal(Array(cols))} AGAINST (#{literal(terms)[1...-1]}#{mode})"

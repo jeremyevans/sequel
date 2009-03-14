@@ -1,4 +1,6 @@
 module Sequel
+  require 'extensions/blank'
+
   module Plugins
     module ValidationClassMethods
       module ClassMethods

@@ -196,10 +196,10 @@ module Sequel
       cond = cond.first if cond.size == 1
       cond = transform_save(cond) if @transform if cond.is_a?(Hash)
       cond = filter_expr(cond, &block)
-      cond = SQL::BooleanExpression.new(:AND, @opts[clause], cond) if @opts[clause] && !@opts[clause].blank?
+      cond = SQL::BooleanExpression.new(:AND, @opts[clause], cond) if @opts[clause] && @opts[clause] != {}
       clone(clause => cond)
     end
-    alias_method :where, :filter
+    alias where filter
 
     # The first source (primary table) for this dataset.  If the dataset doesn't
     # have a table, raises an error.  If the table is aliased, returns the aliased name.
@@ -765,7 +765,7 @@ module Sequel
     # Converts an array of column names into a comma seperated string of 
     # column names. If the array is empty, a wildcard (*) is returned.
     def column_list(columns)
-      if columns.blank?
+      if columns.nil? || columns.empty?
         WILDCARD
       else
         m = columns.map do |i|

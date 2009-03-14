@@ -531,7 +531,7 @@ module Sequel
         ds.identifier_input_method = nil
         ds.identifier_output_method = nil
         ds.map do |row|
-          row[:default] = nil if row[:default].blank?
+          row[:default] = nil if blank_object?(row[:default])
           row[:type] = schema_column_type(row[:db_type])
           [ds2.send(:output_identifier, row.delete(:name)), row]
         end

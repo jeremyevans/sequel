@@ -132,7 +132,7 @@ module Sequel
           scheme = :dbi if scheme =~ /\Adbi-/
           c = adapter_class(scheme)
           uri_options = {}
-          uri.query.split('&').collect{|s| s.split('=')}.each{|k,v| uri_options[k.to_sym] = v} unless uri.query.blank?
+          uri.query.split('&').collect{|s| s.split('=')}.each{|k,v| uri_options[k.to_sym] = v} unless uri.query.to_s.strip.empty?
           opts = c.send(:uri_to_options, uri).merge(uri_options).merge(opts)
         end
       else
@@ -508,7 +508,7 @@ module Sequel
           when false, 0, "0", /\Af(alse)?\z/i
             false
           else
-            value.blank? ? nil : true
+            blank_object?(value) ? nil : true
           end
         when :date
           case value
@@ -582,6 +582,23 @@ module Sequel
     # SQL to BEGIN a transaction.
     def begin_transaction_sql
       SQL_BEGIN
+    end
+
+    # Returns true when the object is considered blank.
+    # The only objects that are blank are nil, false,
+    # strings with all whitespace, and ones that respond
+    # true to empty?
+    def blank_object?(obj)
+      case obj
+      when NilClass, FalseClass
+        true
+      when Numeric, TrueClass
+        false
+      when String
+        obj.strip.empty?
+      else
+        !obj.respond_to?(:empty?) || obj.empty?
+      end
     end
 
     # SQL to COMMIT a transaction.
