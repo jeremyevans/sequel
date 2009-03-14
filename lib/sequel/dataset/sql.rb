@@ -148,12 +148,12 @@ module Sequel
     end
 
     # Returns a copy of the dataset with the given conditions imposed upon it.  
-    # If the query has been grouped, then the conditions are imposed in the 
-    # HAVING clause. If not, then they are imposed in the WHERE clause. Filter
+    # If the query already has a HAVING clause, then the conditions are imposed in the 
+    # HAVING clause. If not, then they are imposed in the WHERE clause.
     # 
     # filter accepts the following argument types:
     #
-    # * Hash - list of equality expressions
+    # * Hash - list of equality/inclusion expressions
     # * Array - depends:
     #   * If first member is a string, assumes the rest of the arguments
     #     are parameters and interpolates them into the string.
@@ -163,7 +163,7 @@ module Sequel
     # * String - taken literally
     # * Symbol - taken as a boolean column argument (e.g. WHERE active)
     # * Sequel::SQL::BooleanExpression - an existing condition expression,
-    #   probably created using the Sequel blockless filter DSL.
+    #   probably created using the Sequel expression filter DSL.
     #
     # filter also takes a block, which should return one of the above argument
     # types, and is treated the same way. If both a block and regular argument
@@ -192,14 +192,8 @@ module Sequel
     #
     # See doc/dataset_filters.rdoc for more examples and details.
     def filter(*cond, &block)
-      clause = (@opts[:having] ? :having : :where)
-      cond = cond.first if cond.size == 1
-      cond = transform_save(cond) if @transform if cond.is_a?(Hash)
-      cond = filter_expr(cond, &block)
-      cond = SQL::BooleanExpression.new(:AND, @opts[clause], cond) if @opts[clause] && @opts[clause] != {}
-      clone(clause => cond)
+      _filter(@opts[:having] ? :having : :where, *cond, &block)
     end
-    alias where filter
 
     # The first source (primary table) for this dataset.  If the dataset doesn't
     # have a table, raises an error.  If the table is aliased, returns the aliased name.
@@ -258,11 +252,11 @@ module Sequel
     end
     alias_method :group_by, :group
 
-    # Returns a copy of the dataset with the having conditions changed. Raises 
-    # an error if the dataset has not been grouped. See also #filter.
+    # Returns a copy of the dataset with the HAVING conditions changed. Raises 
+    # an error if the dataset has not been grouped. See #filter for argument types.
     def having(*cond, &block)
       raise(Error::InvalidOperation, "Can only specify a HAVING clause on a grouped dataset") unless @opts[:group]
-      clone(:having=>{}).filter(*cond, &block)
+      _filter(:having, *cond, &block)
     end
     
     # Inserts multiple values. If a block is given it is invoked for each
@@ -734,6 +728,11 @@ module Sequel
       sql
     end
 
+    # Add a condition to the WHERE clause.  See #filter for argument types.
+    def where(*cond, &block)
+      _filter(:where, *cond, &block)
+    end
+
     # Returns a copy of the dataset with the static SQL used.  This is useful if you want
     # to keep the same row_proc/transform/graph, but change the SQL used to custom SQL.
     def with_sql(sql, *args)
@@ -756,6 +755,15 @@ module Sequel
     end
 
     private
+
+    # Internal filter method so it works on either the having or where clauses.
+    def _filter(clause, *cond, &block)
+      cond = cond.first if cond.size == 1
+      cond = transform_save(cond) if @transform if cond.is_a?(Hash)
+      cond = filter_expr(cond, &block)
+      cond = SQL::BooleanExpression.new(:AND, @opts[clause], cond) if @opts[clause]
+      clone(clause => cond)
+    end
 
     # SQL fragment for specifying an alias.  expression should already be literalized.
     def as_sql(expression, aliaz)

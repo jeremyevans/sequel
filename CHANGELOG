@@ -1,5 +1,7 @@
 === HEAD
 
+* Make Dataset#where always affect the WHERE clause (jeremyevans)
+
 * Deprecate Object#blank? and related extensions, require 'sequel/extensions/blank' to get them back (jeremyevans)
 
 * Move lib/sequel_core into lib/sequel and lib/sequel_model into lib/sequel/model (jeremyevans)
