@@ -1,5 +1,11 @@
 === HEAD
 
+* Deprecate Object#blank? and related extensions, require 'sequel/extensions/blank' to get them back (jeremyevans)
+
+* Move lib/sequel_core into lib/sequel and lib/sequel_model into lib/sequel/model (jeremyevans)
+
+* Remove Sequel::Schema::SQL module, move methods into Sequel::Database (jeremyevans)
+
 * Support creating and dropping schema qualified views (jeremyevans)
 
 * Fix saving a newly inserted record in an after_create or after_save hook (jeremyevans)
