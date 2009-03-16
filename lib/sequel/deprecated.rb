@@ -253,35 +253,45 @@ end
 if RUBY_VERSION < '1.9.0'
   class Hash
     unless method_defined?(:key)
-      def key(*args, &block)
-        Sequel::Deprecation.deprecate('Hash#key', 'Use Hash#index')
-        index(*args, &block)
-      end
+      include(Module.new do
+        def key(*args, &block)
+          Sequel::Deprecation.deprecate('Hash#key', 'Use Hash#index')
+          index(*args, &block)
+        end
+      end)
     end
   end
 end
 
 module Enumerable
-  # Invokes the specified method for each item, along with the supplied
-  # arguments.
-  def send_each(sym, *args)
-    Sequel::Deprecation.deprecate('Enumerable#send_each', 'Use Enumerable#each{|x| x.send(...)}')
-    each{|i| i.send(sym, *args)}
+  unless method_defined?(:send_each)
+    def send_each(sym, *args)
+      Sequel::Deprecation.deprecate('Enumerable#send_each', 'Use Enumerable#each{|x| x.send(...)}')
+      each{|i| i.send(sym, *args)}
+    end
   end
 end
 
 class Range
-  def interval
-    Sequel::Deprecation.deprecate('Range#interval', 'Use range.first - range.last - (range.exclude_end? ? 1 : 0)')
-    last - first - (exclude_end? ? 1 : 0)
+  unless method_defined?(:interval)
+    include(Module.new do
+      def interval
+        Sequel::Deprecation.deprecate('Range#interval', 'Use range.first - range.last - (range.exclude_end? ? 1 : 0)')
+        last - first - (exclude_end? ? 1 : 0)
+      end
+    end)
   end
 end
 
 class Array
-  def extract_options!
-    Sequel::Deprecation.deprecate('Array#extract_options!', 'Use array.last.is_a?(Hash) ? array.pop : {}')
-    last.is_a?(Hash) ? pop : {}
-  end 
+  unless method_defined?(:extract_options!)
+    include(Module.new do
+      def extract_options!
+        Sequel::Deprecation.deprecate('Array#extract_options!', 'Use array.last.is_a?(Hash) ? array.pop : {}')
+        last.is_a?(Hash) ? pop : {}
+      end 
+    end)
+  end
 
   def to_sql
     Sequel::Deprecation.deprecate('Array#to_sql', 'It may be a good idea to refactor your implementation so this type of method is not required')
@@ -291,65 +301,84 @@ class Array
 end
 
 class String
-  def split_sql
-    Sequel::Deprecation.deprecate('String#split_sql', 'It may be a good idea to refactor your implementation so this type of method is not required')
-    to_sql.split(';').map {|s| s.strip}
-  end
-
-  def to_sql
-    Sequel::Deprecation.deprecate('String#to_sql', 'It may be a good idea to refactor your implementation so this type of method is not required')
-    split("\n").to_sql
-  end
-
-  def expr(*args)
-    Sequel::Deprecation.deprecate('String#expr', 'Use String#lit')
-    lit(*args)
-  end
-
-  def to_blob(*args)
-    Sequel::Deprecation.deprecate('String#to_blob', 'Use String#to_sequel_blob')
-    to_sequel_blob(*args)
-  end
-
-  def to_date
-    Sequel::Deprecation.deprecate('String#to_date', 'You should require "sequel/extensions/string_date_time"')
-    begin
-      Date.parse(self, Sequel.convert_two_digit_years)
-    rescue => e
-      raise Sequel::Error::InvalidValue, "Invalid Date value '#{self}' (#{e.message})"
-    end 
-  end 
-
-  def to_datetime
-    Sequel::Deprecation.deprecate('String#to_datetime', 'You should require "sequel/extensions/string_date_time"')
-    begin
-      DateTime.parse(self, Sequel.convert_two_digit_years)
-    rescue => e
-      raise Sequel::Error::InvalidValue, "Invalid DateTime value '#{self}' (#{e.message})"
-    end 
-  end 
-
-  def to_sequel_time
-    Sequel::Deprecation.deprecate('String#to_sequel_time', 'You should require "sequel/extensions/string_date_time"')
-    begin
-      if Sequel.datetime_class == DateTime
-        DateTime.parse(self, Sequel.convert_two_digit_years)
-      else
-        Sequel.datetime_class.parse(self)
+  include(Module.new do
+    def split_sql
+      Sequel::Deprecation.deprecate('String#split_sql', 'It may be a good idea to refactor your implementation so this type of method is not required')
+      to_sql.split(';').map {|s| s.strip}
+    end
+  
+    def to_sql
+      Sequel::Deprecation.deprecate('String#to_sql', 'It may be a good idea to refactor your implementation so this type of method is not required')
+      split("\n").to_sql
+    end
+  
+    def expr(*args)
+      Sequel::Deprecation.deprecate('String#expr', 'Use String#lit')
+      lit(*args)
+    end
+  
+    unless String.method_defined?(:to_blob)
+      def to_blob(*args)
+        Sequel::Deprecation.deprecate('String#to_blob', 'Use String#to_sequel_blob')
+        to_sequel_blob(*args)
+      end
+    end
+  
+    unless String.method_defined?(:blank?)
+      def blank?
+        Sequel::Deprecation.deprecate('String#blank?', "require 'sequel/extensions/blank' first")
+        strip.empty?
+      end
+    end
+  
+    unless String.method_defined?(:to_date)
+      def to_date
+        Sequel::Deprecation.deprecate('String#to_date', 'You should require "sequel/extensions/string_date_time"')
+        begin
+          Date.parse(self, Sequel.convert_two_digit_years)
+        rescue => e
+          raise Sequel::Error::InvalidValue, "Invalid Date value '#{self}' (#{e.message})"
+        end 
       end 
-    rescue => e
-      raise Sequel::Error::InvalidValue, "Invalid #{Sequel.datetime_class} value '#{self}' (#{e.message})"
-    end 
-  end 
-
-  def to_time
-    Sequel::Deprecation.deprecate('String#to_time', 'You should require "sequel/extensions/string_date_time"')
-    begin
-      Time.parse(self)
-    rescue => e
-      raise Sequel::Error::InvalidValue, "Invalid Time value '#{self}' (#{e.message})"
-    end 
-  end
+    end
+    
+    unless String.method_defined?(:to_datetime)
+      def to_datetime
+        Sequel::Deprecation.deprecate('String#to_datetime', 'You should require "sequel/extensions/string_date_time"')
+        begin
+          DateTime.parse(self, Sequel.convert_two_digit_years)
+        rescue => e
+          raise Sequel::Error::InvalidValue, "Invalid DateTime value '#{self}' (#{e.message})"
+        end 
+      end 
+    end
+    
+    unless String.method_defined?(:to_sequel_time)
+      def to_sequel_time
+        Sequel::Deprecation.deprecate('String#to_sequel_time', 'You should require "sequel/extensions/string_date_time"')
+        begin
+          if Sequel.datetime_class == DateTime
+            DateTime.parse(self, Sequel.convert_two_digit_years)
+          else
+            Sequel.datetime_class.parse(self)
+          end 
+        rescue => e
+          raise Sequel::Error::InvalidValue, "Invalid #{Sequel.datetime_class} value '#{self}' (#{e.message})"
+        end 
+      end 
+    end
+    
+    unless String.method_defined?(:to_time)
+      def to_time
+        Sequel::Deprecation.deprecate('String#to_time', 'You should require "sequel/extensions/string_date_time"')
+        begin
+          Time.parse(self)
+        rescue => e
+          raise Sequel::Error::InvalidValue, "Invalid Time value '#{self}' (#{e.message})"
+        end 
+      end
+    end
+  end)
 end
 
 class Symbol
@@ -366,124 +395,135 @@ class Symbol
 end
 
 class Module
-  unless method_defined?(:class_def)
-   def class_def(name, &block)
-      Sequel::Deprecation.deprecate('Object#class_def', "Install the metaid gem")
-      class_eval{define_method(name, &block)}
-    end
-  end
-
-  private
-
-  def class_attr_overridable(*meths)
-    Sequel::Deprecation.deprecate('Module#class_attr_overridable', "Copy the method from #{__FILE__} (line #{__LINE__}) if you need it")
-    meths.each{|meth| class_eval("def #{meth}; !defined?(@#{meth}) ? (@#{meth} = self.class.#{meth}) : @#{meth} end")}
-    attr_writer(*meths)
-  end
-
-  def class_attr_reader(*meths)
-    Sequel::Deprecation.deprecate('Module#class_attr_reader', "Copy the method from #{__FILE__} (line #{__LINE__}) if you need it")
-    meths.each{|meth| define_method(meth){self.class.send(meth)}}
-  end
-
-  def metaalias(to, from)
-    Sequel::Deprecation.deprecate('Module#metaalias', "Copy the method from #{__FILE__} (line #{__LINE__}) if you need it")
-    meta_eval{alias_method to, from}
-  end
-
-  def metaattr_accessor(*meths)
-    Sequel::Deprecation.deprecate('Module#metaattr_accessor', "Copy the method from #{__FILE__} (line #{__LINE__}) if you need it")
-    meta_eval{attr_accessor(*meths)}
-  end
-
-  def metaattr_reader(*meths)
-    Sequel::Deprecation.deprecate('Module#metaattr_reader', "Copy the method from #{__FILE__} (line #{__LINE__}) if you need it")
-    meta_eval{attr_reader(*meths)}
-  end
-end
-
-class Object
-  def is_one_of?(*classes)
-    Sequel::Deprecation.deprecate('Object#is_one_of?', "Use classes.any?{|c| object.is_a?(c)}")
-    classes.any?{|c| is_a?(c)}
-  end
-
-  unless method_defined?(:meta_def)
-    def meta_def(name, &block)
-      Sequel::Deprecation.deprecate('Object#meta_def', "Install the metaid gem")
-      meta_eval{define_method(name, &block)}
-    end
-  end
-  
-  unless method_defined?(:meta_eval)
-    def meta_eval(&block)
-      Sequel::Deprecation.deprecate('Object#meta_eval', "Install the metaid gem")
-      metaclass.instance_eval(&block)
-    end
-  end
-  
-  unless method_defined?(:metaclass)
-    def metaclass
-      Sequel::Deprecation.deprecate('Object#metaclass', "Install the metaid gem")
-      class << self
-        self
+  include(Module.new do
+    unless Module.method_defined?(:class_def)
+      def class_def(name, &block)
+        Sequel::Deprecation.deprecate('Object#class_def', "Install the metaid gem")
+        class_eval{define_method(name, &block)}
       end
     end
-  end
+  
+    private
+  
+    unless Module.method_defined?(:class_attr_overridable)
+      def class_attr_overridable(*meths)
+        Sequel::Deprecation.deprecate('Module#class_attr_overridable', "Copy the method from #{__FILE__} (line #{__LINE__}) if you need it")
+        meths.each{|meth| class_eval("def #{meth}; !defined?(@#{meth}) ? (@#{meth} = self.class.#{meth}) : @#{meth} end")}
+        attr_writer(*meths)
+      end
+    end
+    
+    unless Module.method_defined?(:class_attr_reader)
+      def class_attr_reader(*meths)
+        Sequel::Deprecation.deprecate('Module#class_attr_reader', "Copy the method from #{__FILE__} (line #{__LINE__}) if you need it")
+        meths.each{|meth| define_method(meth){self.class.send(meth)}}
+      end
+    end
+    
+    unless Module.method_defined?(:metaalias)
+      def metaalias(to, from)
+        Sequel::Deprecation.deprecate('Module#metaalias', "Copy the method from #{__FILE__} (line #{__LINE__}) if you need it")
+        meta_eval{alias_method to, from}
+      end
+    end
+    
+    unless Module.method_defined?(:metaattr_accessor)
+      def metaattr_accessor(*meths)
+        Sequel::Deprecation.deprecate('Module#metaattr_accessor', "Copy the method from #{__FILE__} (line #{__LINE__}) if you need it")
+        meta_eval{attr_accessor(*meths)}
+      end
+    end
+    
+    unless Module.method_defined?(:metaattr_reader)
+      def metaattr_reader(*meths)
+        Sequel::Deprecation.deprecate('Module#metaattr_reader', "Copy the method from #{__FILE__} (line #{__LINE__}) if you need it")
+        meta_eval{attr_reader(*meths)}
+      end
+    end
+  end)
 end
 
 class FalseClass
   unless method_defined?(:blank?)
-    def blank?
-      Sequel::Deprecation.deprecate('FalseClass#blank?', "require 'sequel/extensions/blank' first")
-      true
-    end
+    include(Module.new do
+      def blank?
+        Sequel::Deprecation.deprecate('FalseClass#blank?', "require 'sequel/extensions/blank' first")
+        true
+      end
+    end)
   end
 end
 
 class NilClass
   unless method_defined?(:blank?)
-    def blank?
-      Sequel::Deprecation.deprecate('NilClass#blank?', "require 'sequel/extensions/blank' first")
-      true
-    end
+    include(Module.new do
+      def blank?
+        Sequel::Deprecation.deprecate('NilClass#blank?', "require 'sequel/extensions/blank' first")
+        true
+      end
+    end)
   end
 end
 
 class Numeric
   unless method_defined?(:blank?)
-    def blank?
-      Sequel::Deprecation.deprecate('Numeric#blank?', "require 'sequel/extensions/blank' first")
-      false
-    end
-  end
-end
-
-class String
-  unless method_defined?(:blank?)
-    def blank?
-      Sequel::Deprecation.deprecate('String#blank?', "require 'sequel/extensions/blank' first")
-      strip.empty?
-    end
+    include(Module.new do
+      def blank?
+        Sequel::Deprecation.deprecate('Numeric#blank?', "require 'sequel/extensions/blank' first")
+        false
+      end
+    end)
   end
 end
 
 class TrueClass
   unless method_defined?(:blank?)
-    def blank?
-      Sequel::Deprecation.deprecate('FalseClass#blank?', "require 'sequel/extensions/blank' first")
-      false
-    end
+    include(Module.new do
+      def blank?
+        Sequel::Deprecation.deprecate('FalseClass#blank?', "require 'sequel/extensions/blank' first")
+        false
+      end
+    end)
   end
 end
 
-# Helpers from Metaid and a bit more
 class Object
-  unless method_defined?(:blank?)
-    def blank?
-      Sequel::Deprecation.deprecate('FalseClass#blank?', "require 'sequel/extensions/blank' first")
-      respond_to?(:empty?) && empty?
+  include(Module.new do
+    unless Object.method_defined?(:blank?)
+      def blank?
+        Sequel::Deprecation.deprecate('FalseClass#blank?', "require 'sequel/extensions/blank' first")
+        respond_to?(:empty?) && empty?
+      end
     end
-  end
-end
 
+    unless Object.method_defined?(:is_one_of?)
+      def is_one_of?(*classes)
+        Sequel::Deprecation.deprecate('Object#is_one_of?', "Use classes.any?{|c| object.is_a?(c)}")
+        classes.any?{|c| is_a?(c)}
+      end
+    end
+  
+    unless Object.method_defined?(:meta_def)
+      def meta_def(name, &block)
+        Sequel::Deprecation.deprecate('Object#meta_def', "Install the metaid gem")
+        meta_eval{define_method(name, &block)}
+      end
+    end
+    
+    unless Object.method_defined?(:meta_eval)
+      def meta_eval(&block)
+        Sequel::Deprecation.deprecate('Object#meta_eval', "Install the metaid gem")
+        metaclass.instance_eval(&block)
+      end
+    end
+    
+    unless Object.method_defined?(:metaclass)
+      def metaclass
+        Sequel::Deprecation.deprecate('Object#metaclass', "Install the metaid gem")
+        class << self
+          self
+        end
+      end
+    end
+  end)
+end

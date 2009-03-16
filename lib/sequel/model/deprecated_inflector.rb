@@ -153,157 +153,183 @@ class String
     Inflections
   end
 
-  # By default, camelize converts the string to UpperCamelCase. If the argument to camelize
-  # is set to :lower then camelize produces lowerCamelCase.
-  #
-  # camelize will also convert '/' to '::' which is useful for converting paths to namespaces
-  #
-  # Examples
-  #   "active_record".camelize #=> "ActiveRecord"
-  #   "active_record".camelize(:lower) #=> "activeRecord"
-  #   "active_record/errors".camelize #=> "ActiveRecord::Errors"
-  #   "active_record/errors".camelize(:lower) #=> "activeRecord::Errors"
-  def camelize(first_letter_in_uppercase = :upper)
-    Sequel::Deprecation.deprecate('String#camelize', 'require "sequel/extensions/inflector" first')
-    s = gsub(/\/(.?)/){|x| "::#{x[-1..-1].upcase unless x == '/'}"}.gsub(/(^|_)(.)/){|x| x[-1..-1].upcase}
-    s[0...1] = s[0...1].downcase unless first_letter_in_uppercase == :upper
-    s
-  end
-  alias_method :camelcase, :camelize
-
-  # Singularizes and camelizes the string.  Also strips out all characters preceding
-  # and including a period (".").
-  #
-  # Examples
-  #   "egg_and_hams".classify #=> "EggAndHam"
-  #   "post".classify #=> "Post"
-  #   "schema.post".classify #=> "Post"
-  def classify
-    Sequel::Deprecation.deprecate('String#classify', 'require "sequel/extensions/inflector" first')
-    sub(/.*\./, '').singularize.camelize
-  end
-
-  # Constantize tries to find a declared constant with the name specified
-  # in the string. It raises a NameError when the name is not in CamelCase
-  # or is not initialized.
-  #
-  # Examples
-  #   "Module".constantize #=> Module
-  #   "Class".constantize #=> Class
-  def constantize
-    Sequel::Deprecation.deprecate('String#constantize', 'require "sequel/extensions/inflector" first')
-    raise(NameError, "#{inspect} is not a valid constant name!") unless m = /\A(?:::)?([A-Z]\w*(?:::[A-Z]\w*)*)\z/.match(self)
-    Object.module_eval("::#{m[1]}", __FILE__, __LINE__)
-  end
-
-  # Replaces underscores with dashes in the string.
-  #
-  # Example
-  #   "puni_puni".dasherize #=> "puni-puni"
-  def dasherize
-    Sequel::Deprecation.deprecate('String#dasherize', 'require "sequel/extensions/inflector" first')
-    gsub(/_/, '-')
-  end
-
-  # Removes the module part from the expression in the string
-  #
-  # Examples
-  #   "ActiveRecord::CoreExtensions::String::Inflections".demodulize #=> "Inflections"
-  #   "Inflections".demodulize #=> "Inflections"
-  def demodulize
-    Sequel::Deprecation.deprecate('String#demodulize', 'require "sequel/extensions/inflector" first')
-    gsub(/^.*::/, '')
-  end
-
-  # Creates a foreign key name from a class name.
-  # +use_underscore+ sets whether the method should put '_' between the name and 'id'.
-  #
-  # Examples
-  #   "Message".foreign_key #=> "message_id"
-  #   "Message".foreign_key(false) #=> "messageid"
-  #   "Admin::Post".foreign_key #=> "post_id"
-  def foreign_key(use_underscore = true)
-    Sequel::Deprecation.deprecate('String#foreign_key', 'require "sequel/extensions/inflector" first')
-    "#{demodulize.underscore}#{'_' if use_underscore}id"
-  end
-
-  # Capitalizes the first word and turns underscores into spaces and strips _id.
-  # Like titleize, this is meant for creating pretty output.
-  #
-  # Examples
-  #   "employee_salary" #=> "Employee salary"
-  #   "author_id" #=> "Author"
-  def humanize
-    Sequel::Deprecation.deprecate('String#humanize', 'require "sequel/extensions/inflector" first')
-    gsub(/_id$/, "").gsub(/_/, " ").capitalize
-  end
-
-  # Returns the plural form of the word in the string.
-  #
-  # Examples
-  #   "post".pluralize #=> "posts"
-  #   "octopus".pluralize #=> "octopi"
-  #   "sheep".pluralize #=> "sheep"
-  #   "words".pluralize #=> "words"
-  #   "the blue mailman".pluralize #=> "the blue mailmen"
-  #   "CamelOctopus".pluralize #=> "CamelOctopi"
-  def pluralize
-    Sequel::Deprecation.deprecate('String#pluralize', 'require "sequel/extensions/inflector" first')
-    result = dup
-    Inflections.plurals.each{|(rule, replacement)| break if result.gsub!(rule, replacement)} unless Inflections.uncountables.include?(downcase)
-    result
-  end
-
-  # The reverse of pluralize, returns the singular form of a word in a string.
-  #
-  # Examples
-  #   "posts".singularize #=> "post"
-  #   "octopi".singularize #=> "octopus"
-  #   "sheep".singluarize #=> "sheep"
-  #   "word".singluarize #=> "word"
-  #   "the blue mailmen".singularize #=> "the blue mailman"
-  #   "CamelOctopi".singularize #=> "CamelOctopus"
-  def singularize
-    Sequel::Deprecation.deprecate('String#singularize', 'require "sequel/extensions/inflector" first')
-    result = dup
-    Inflections.singulars.each{|(rule, replacement)| break if result.gsub!(rule, replacement)} unless Inflections.uncountables.include?(downcase)
-    result
-  end
-
-  # Underscores and pluralizes the string.
-  #
-  # Examples
-  #   "RawScaledScorer".tableize #=> "raw_scaled_scorers"
-  #   "egg_and_ham".tableize #=> "egg_and_hams"
-  #   "fancyCategory".tableize #=> "fancy_categories"
-  def tableize
-    Sequel::Deprecation.deprecate('String#tableize', 'require "sequel/extensions/inflector" first')
-    underscore.pluralize
-  end
-
-  # Capitalizes all the words and replaces some characters in the string to create
-  # a nicer looking title. Titleize is meant for creating pretty output.
-  #
-  # titleize is also aliased as as titlecase
-  #
-  # Examples
-  #   "man from the boondocks".titleize #=> "Man From The Boondocks"
-  #   "x-men: the last stand".titleize #=> "X Men: The Last Stand"
-  def titleize
-    Sequel::Deprecation.deprecate('String#titleize', 'require "sequel/extensions/inflector" first')
-    underscore.humanize.gsub(/\b([a-z])/){|x| x[-1..-1].upcase}
-  end
-  alias_method :titlecase, :titleize
-
-  # The reverse of camelize. Makes an underscored form from the expression in the string.
-  # Also changes '::' to '/' to convert namespaces to paths.
-  #
-  # Examples
-  #   "ActiveRecord".underscore #=> "active_record"
-  #   "ActiveRecord::Errors".underscore #=> active_record/errors
-  def underscore
-    Sequel::Deprecation.deprecate('String#underscore', 'require "sequel/extensions/inflector" first')
-    gsub(/::/, '/').gsub(/([A-Z]+)([A-Z][a-z])/,'\1_\2').
-      gsub(/([a-z\d])([A-Z])/,'\1_\2').tr("-", "_").downcase
-  end
+  include(Module.new do
+    unless String.method_defined?(:camelize)
+      # By default, camelize converts the string to UpperCamelCase. If the argument to camelize
+      # is set to :lower then camelize produces lowerCamelCase.
+      #
+      # camelize will also convert '/' to '::' which is useful for converting paths to namespaces
+      #
+      # Examples
+      #   "active_record".camelize #=> "ActiveRecord"
+      #   "active_record".camelize(:lower) #=> "activeRecord"
+      #   "active_record/errors".camelize #=> "ActiveRecord::Errors"
+      #   "active_record/errors".camelize(:lower) #=> "activeRecord::Errors"
+      def camelize(first_letter_in_uppercase = :upper)
+        Sequel::Deprecation.deprecate('String#camelize', 'require "sequel/extensions/inflector" first')
+        s = gsub(/\/(.?)/){|x| "::#{x[-1..-1].upcase unless x == '/'}"}.gsub(/(^|_)(.)/){|x| x[-1..-1].upcase}
+        s[0...1] = s[0...1].downcase unless first_letter_in_uppercase == :upper
+        s
+      end
+      alias camelcase camelize
+    end
+    
+    unless String.method_defined?(:camelize)
+      # Singularizes and camelizes the string.  Also strips out all characters preceding
+      # and including a period (".").
+      #
+      # Examples
+      #   "egg_and_hams".classify #=> "EggAndHam"
+      #   "post".classify #=> "Post"
+      #   "schema.post".classify #=> "Post"
+      def classify
+        Sequel::Deprecation.deprecate('String#classify', 'require "sequel/extensions/inflector" first')
+        sub(/.*\./, '').singularize.camelize
+      end
+    end
+    
+    unless String.method_defined?(:camelize)
+      # Constantize tries to find a declared constant with the name specified
+      # in the string. It raises a NameError when the name is not in CamelCase
+      # or is not initialized.
+      #
+      # Examples
+      #   "Module".constantize #=> Module
+      #   "Class".constantize #=> Class
+      def constantize
+        Sequel::Deprecation.deprecate('String#constantize', 'require "sequel/extensions/inflector" first')
+        raise(NameError, "#{inspect} is not a valid constant name!") unless m = /\A(?:::)?([A-Z]\w*(?:::[A-Z]\w*)*)\z/.match(self)
+        Object.module_eval("::#{m[1]}", __FILE__, __LINE__)
+      end
+    end
+    
+    unless String.method_defined?(:camelize)
+      # Replaces underscores with dashes in the string.
+      #
+      # Example
+      #   "puni_puni".dasherize #=> "puni-puni"
+      def dasherize
+        Sequel::Deprecation.deprecate('String#dasherize', 'require "sequel/extensions/inflector" first')
+        gsub(/_/, '-')
+      end
+    end
+    
+    unless String.method_defined?(:camelize)
+      # Removes the module part from the expression in the string
+      #
+      # Examples
+      #   "ActiveRecord::CoreExtensions::String::Inflections".demodulize #=> "Inflections"
+      #   "Inflections".demodulize #=> "Inflections"
+      def demodulize
+        Sequel::Deprecation.deprecate('String#demodulize', 'require "sequel/extensions/inflector" first')
+        gsub(/^.*::/, '')
+      end
+    end
+    
+    unless String.method_defined?(:camelize)
+      # Creates a foreign key name from a class name.
+      # +use_underscore+ sets whether the method should put '_' between the name and 'id'.
+      #
+      # Examples
+      #   "Message".foreign_key #=> "message_id"
+      #   "Message".foreign_key(false) #=> "messageid"
+      #   "Admin::Post".foreign_key #=> "post_id"
+      def foreign_key(use_underscore = true)
+        Sequel::Deprecation.deprecate('String#foreign_key', 'require "sequel/extensions/inflector" first')
+        "#{demodulize.underscore}#{'_' if use_underscore}id"
+      end
+    end
+    
+    unless String.method_defined?(:camelize)
+      # Capitalizes the first word and turns underscores into spaces and strips _id.
+      # Like titleize, this is meant for creating pretty output.
+      #
+      # Examples
+      #   "employee_salary" #=> "Employee salary"
+      #   "author_id" #=> "Author"
+      def humanize
+        Sequel::Deprecation.deprecate('String#humanize', 'require "sequel/extensions/inflector" first')
+        gsub(/_id$/, "").gsub(/_/, " ").capitalize
+      end
+    end
+    
+    unless String.method_defined?(:camelize)
+      # Returns the plural form of the word in the string.
+      #
+      # Examples
+      #   "post".pluralize #=> "posts"
+      #   "octopus".pluralize #=> "octopi"
+      #   "sheep".pluralize #=> "sheep"
+      #   "words".pluralize #=> "words"
+      #   "the blue mailman".pluralize #=> "the blue mailmen"
+      #   "CamelOctopus".pluralize #=> "CamelOctopi"
+      def pluralize
+        Sequel::Deprecation.deprecate('String#pluralize', 'require "sequel/extensions/inflector" first')
+        result = dup
+        Inflections.plurals.each{|(rule, replacement)| break if result.gsub!(rule, replacement)} unless Inflections.uncountables.include?(downcase)
+        result
+      end
+    end
+    
+    unless String.method_defined?(:camelize)
+      # The reverse of pluralize, returns the singular form of a word in a string.
+      #
+      # Examples
+      #   "posts".singularize #=> "post"
+      #   "octopi".singularize #=> "octopus"
+      #   "sheep".singluarize #=> "sheep"
+      #   "word".singluarize #=> "word"
+      #   "the blue mailmen".singularize #=> "the blue mailman"
+      #   "CamelOctopi".singularize #=> "CamelOctopus"
+      def singularize
+        Sequel::Deprecation.deprecate('String#singularize', 'require "sequel/extensions/inflector" first')
+        result = dup
+        Inflections.singulars.each{|(rule, replacement)| break if result.gsub!(rule, replacement)} unless Inflections.uncountables.include?(downcase)
+        result
+      end
+    end
+    
+    unless String.method_defined?(:camelize)
+      # Underscores and pluralizes the string.
+      #
+      # Examples
+      #   "RawScaledScorer".tableize #=> "raw_scaled_scorers"
+      #   "egg_and_ham".tableize #=> "egg_and_hams"
+      #   "fancyCategory".tableize #=> "fancy_categories"
+      def tableize
+        Sequel::Deprecation.deprecate('String#tableize', 'require "sequel/extensions/inflector" first')
+        underscore.pluralize
+      end
+    end
+    
+    unless String.method_defined?(:camelize)
+      # Capitalizes all the words and replaces some characters in the string to create
+      # a nicer looking title. Titleize is meant for creating pretty output.
+      #
+      # titleize is also aliased as as titlecase
+      #
+      # Examples
+      #   "man from the boondocks".titleize #=> "Man From The Boondocks"
+      #   "x-men: the last stand".titleize #=> "X Men: The Last Stand"
+      def titleize
+        Sequel::Deprecation.deprecate('String#titleize', 'require "sequel/extensions/inflector" first')
+        underscore.humanize.gsub(/\b([a-z])/){|x| x[-1..-1].upcase}
+      end
+      alias titlecase titleize
+    end
+    
+    unless String.method_defined?(:camelize)
+      # The reverse of camelize. Makes an underscored form from the expression in the string.
+      # Also changes '::' to '/' to convert namespaces to paths.
+      #
+      # Examples
+      #   "ActiveRecord".underscore #=> "active_record"
+      #   "ActiveRecord::Errors".underscore #=> active_record/errors
+      def underscore
+        Sequel::Deprecation.deprecate('String#underscore', 'require "sequel/extensions/inflector" first')
+        gsub(/::/, '/').gsub(/([A-Z]+)([A-Z][a-z])/,'\1_\2').
+          gsub(/([a-z\d])([A-Z])/,'\1_\2').tr("-", "_").downcase
+      end
+    end
+  end)
 end
