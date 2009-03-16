@@ -129,7 +129,7 @@ module Sequel
           row[:allow_null] = row.delete(:Null) == 'YES'
           row[:default] = row.delete(:Default)
           row[:primary_key] = row.delete(:Key) == 'PRI'
-          row[:default] = nil if blank_obj?(row[:default])
+          row[:default] = nil if blank_object?(row[:default])
           row[:db_type] = row.delete(:Type)
           row[:type] = schema_column_type(row[:db_type])
           [ds2.send(:output_identifier, row.delete(:Field)), row]
@@ -217,8 +217,7 @@ module Sequel
 
       # MySQL allows HAVING clause on ungrouped datasets.
       def having(*cond, &block)
-        @opts[:having] = {}
-        x = filter(*cond, &block)
+        _filter(:having, *cond, &block)
       end
       
       # MySQL doesn't use the SQL standard DEFAULT VALUES.
