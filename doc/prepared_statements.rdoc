@@ -1,17 +1,17 @@
 = Prepared Statements and Bound Variables
 
-Starting with version 2.4.0, Sequel has support for prepared statements and
-bound variables.  No matter which database you are using, the Sequel prepared
-statement/bound variable API remains exactly the same.  There is native support
-for prepared statements/bound variables on the following databases:
+Sequel has support for prepared statements and bound variables.  No matter which
+database you are using, the Sequel prepared statement/bound variable API remains
+the same.  There is native support for prepared statements/bound variables on
+the following databases:
 
 * PostgreSQL (using the pg driver, requires type specifiers)
 * MySQL (prepared statements only, as the ruby mysql driver doesn't support
   bound variables)
 * SQLite (a new native prepared statement is used for each call, though)
-* JDBC (using the postgresql, mysql, or sqlite databases, and possibly others)
+* JDBC
 
-Support on other databases is emulated via the usual string interpolation.
+Support on other databases is emulated via string interpolation.
 
 == Placeholders
 
@@ -22,51 +22,51 @@ significantly for placeholders (e.g. :name, $1, ?).  Sequel abstracts all of
 that and allows you to specify placeholders by using the :$name format for
 placeholders, e.g.:
 
-  ds = DB[:items].filter(:name=>:$name)
+  ds = DB[:items].filter(:name=>:$n)
 
 == Bound Variables
 
 Using bound variables for this query is simple:
 
-  ds.call(:select, :name=>'Jim')
+  ds.call(:select, :n=>'Jim')
 
 This will do the equivalent of selecting records that have the name 'Jim'. It
 returns all records, and can take a block that is passed to Dataset#all.
 
 Deleting or returning the first record works similarly:
 
-  ds.call(:first, :name=>'Jim') # First record with name 'Jim'
-  ds.call(:delete, :name=>'Jim') # Delete records with name 'Jim'
+  ds.call(:first, :n=>'Jim') # First record with name 'Jim'
+  ds.call(:delete, :n=>'Jim') # Delete records with name 'Jim'
 
 For inserting/updating records, you should also specify a value hash, which
 may itself contain placeholders:
 
   # Insert record with 'Jim', note that the previous filter is ignored
-  ds.call(:insert, {:name=>'Jim'}, :name=>:$name)
+  ds.call(:insert, {:n=>'Jim'}, :name=>:$n)
   # Change name to 'Bob' for all records with name of 'Jim'
-  ds.call(:update, {:name=>'Jim', :new_name=>'Bob'}, :name=>$:new_name)
+  ds.call(:update, {:n=>'Jim', :new_n=>'Bob'}, :name=>$:new_n)
 
 == Prepared Statements
 
 Prepared statement support is similar to bound variable support, but you
 use Dataset#prepare with a name, and Dataset#call later with the values:
 
-  ds = DB[:items].filter(:name=>:$name)
+  ds = DB[:items].filter(:name=>:$n)
   ps = ds.prepare(:select, :select_by_name)
-  ps.call(:name=>'Jim')
-  DB.call(:select_by_name, :name=>'Jim') # same as above
+  ps.call(:n=>'Jim')
+  DB.call(:select_by_name, :n=>'Jim') # same as above
 
 The Dataset#prepare method returns a prepared statement, and also stores a
 copy of the prepared statement in the database for later use.  For insert
 and update queries, the hash to insert/update is passed to prepare:
 
-  ps1 = DB[:items].prepare(:insert, :insert_with_name, :name=>:$name)
-  ps1.call(:name=>'Jim')
-  DB.call(:insert_with_name, :name=>'Jim') # same as above
-  ds = DB[:items].filter(:name=>:$name)
-  ps2 = ds.prepare(:update, :update_name, :name=>:$new_name)
-  ps2.call(:name=>'Jim', :new_name=>'Bob')
-  DB.call(:update_name, :name=>'Jim', :new_name=>'Bob') # same as above
+  ps1 = DB[:items].prepare(:insert, :insert_with_name, :name=>:$n)
+  ps1.call(:n=>'Jim')
+  DB.call(:insert_with_name, :n=>'Jim') # same as above
+  ds = DB[:items].filter(:name=>:$n)
+  ps2 = ds.prepare(:update, :update_name, :name=>:$new_n)
+  ps2.call(:n=>'Jim', :new_n=>'Bob')
+  DB.call(:update_name, :n=>'Jim', :new_n=>'Bob') # same as above
 
 == Database support
 
