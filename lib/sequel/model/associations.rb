@@ -1,57 +1,48 @@
-# Associations are used in order to specify relationships between model classes
-# that reflect relations between tables in the database using foreign keys.
-#
-# Each kind of association adds a number of methods to the model class which
-# are specialized according to the association type and optional parameters
-# given in the definition. Example:
-# 
-#   class Project < Sequel::Model
-#     many_to_one :portfolio
-#     one_to_many :milestones
-#   end
-# 
-# The project class now has the following instance methods:
-# * portfolio - Returns the associated portfolio.
-# * portfolio=(obj) - Sets the associated portfolio to the object,
-#   but the change is not persisted until you save the record.
-# * portfolio_dataset - Returns a dataset that would return the associated
-#   portfolio, only useful in fairly specific circumstances.
-# * milestones - Returns an array of associated milestones
-# * add_milestone(obj) - Associates the passed milestone with this object.
-# * remove_milestone(obj) - Removes the association with the passed milestone.
-# * remove_all_milestones - Removes associations with all associated milestones.
-# * milestones_dataset - Returns a dataset that would return the associated
-#   milestones, allowing for further filtering/limiting/etc.
-#
-# If you want to override the behavior of the add_/remove_/remove_all_ methods,
-# there are private instance methods created that a prepended with an
-# underscore (e.g. _add_milestone).  The private instance methods can be
-# easily overridden, but you shouldn't override the public instance methods,
-# as they deal with how associations are cached.
-#
-# By default the classes for the associations are inferred from the association
-# name, so for example the Project#portfolio will return an instance of 
-# Portfolio, and Project#milestones will return an array of Milestone 
-# instances, in similar fashion to how ActiveRecord infers class names.
-#
-# Association definitions are also reflected by the class, e.g.:
-#
-#   Project.associations
-#   => [:portfolio, :milestones]
-#   Project.association_reflection(:portfolio)
-#   => {:type => :many_to_one, :name => :portfolio, :class_name => "Portfolio"}
-#
-# Associations can be defined by either using the associate method, or by
-# calling one of the three methods: many_to_one, one_to_many, many_to_many.
-# Sequel::Model also provides aliases for these methods that conform to
-# ActiveRecord conventions: belongs_to, has_many, has_and_belongs_to_many.
-# For example, the following three statements are equivalent:
-#
-#   associate :one_to_many, :attributes
-#   one_to_many :attributes
-#   has_many :attributes
 module Sequel
   class Model
+    # Associations are used in order to specify relationships between model classes
+    # that reflect relations between tables in the database using foreign keys.
+    #
+    # Each kind of association adds a number of methods to the model class which
+    # are specialized according to the association type and optional parameters
+    # given in the definition. Example:
+    # 
+    #   class Project < Sequel::Model
+    #     many_to_one :portfolio
+    #     one_to_many :milestones
+    #     # or: many_to_many :milestones 
+    #   end
+    # 
+    # The project class now has the following instance methods:
+    # * portfolio - Returns the associated portfolio.
+    # * portfolio=(obj) - Sets the associated portfolio to the object,
+    #   but the change is not persisted until you save the record.
+    # * portfolio_dataset - Returns a dataset that would return the associated
+    #   portfolio, only useful in fairly specific circumstances.
+    # * milestones - Returns an array of associated milestones
+    # * add_milestone(obj) - Associates the passed milestone with this object.
+    # * remove_milestone(obj) - Removes the association with the passed milestone.
+    # * remove_all_milestones - Removes associations with all associated milestones.
+    # * milestones_dataset - Returns a dataset that would return the associated
+    #   milestones, allowing for further filtering/limiting/etc.
+    #
+    # If you want to override the behavior of the add_/remove_/remove_all_ methods,
+    # there are private instance methods created that a prepended with an
+    # underscore (e.g. _add_milestone).  The private instance methods can be
+    # easily overridden, but you shouldn't override the public instance methods without
+    # calling super, as they deal with callbacks and caching.
+    #
+    # By default the classes for the associations are inferred from the association
+    # name, so for example the Project#portfolio will return an instance of 
+    # Portfolio, and Project#milestones will return an array of Milestone 
+    # instances, in similar fashion to how ActiveRecord infers class names.
+    #
+    # Association definitions are also reflected by the class, e.g.:
+    #
+    #   Project.associations
+    #   => [:portfolio, :milestones]
+    #   Project.association_reflection(:portfolio)
+    #   => {:type => :many_to_one, :name => :portfolio, :class_name => "Portfolio"}
     module Associations
       # This module contains methods added to all association datasets
       module AssociationDatasetMethods
