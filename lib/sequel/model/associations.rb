@@ -753,6 +753,9 @@ module Sequel
         # Does not use the block defined for the association, since it does a single query for
         # all objects.  You can use the :graph_join_type, :graph_conditions, and :graph_join_table_conditions
         # association options to modify the SQL query.
+        #
+        # Like eager, you need to call .all on the dataset for the eager loading to work.  If you just
+        # call each, you will get a normal graphed result back (a hash with model object values).
         def eager_graph(*associations)
           table_name = model.table_name
           ds = if @opts[:eager_graph]
