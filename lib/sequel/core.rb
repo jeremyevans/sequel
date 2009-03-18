@@ -195,9 +195,9 @@ module Sequel
 
   private_class_method :adapter_method, :def_adapter_method
   
-  require(%w"metaprogramming sql core_sql connection_pool exceptions dataset migration database object_graph version deprecated")
+  require(%w"metaprogramming sql core_sql connection_pool exceptions dataset migration database version deprecated")
   require(%w"schema_generator schema_methods schema_sql", 'database')
-  require(%w"convenience prepared_statements sql", 'dataset')
+  require(%w"convenience prepared_statements graph sql", 'dataset')
 
   # Add the database adapter class methods to Sequel via metaprogramming
   def_adapter_method(*Database::ADAPTERS)
