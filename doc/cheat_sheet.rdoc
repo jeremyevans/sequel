@@ -7,12 +7,12 @@
 
   DB = Sequel.sqlite('my_blog.db')
   DB = Sequel.connect('postgres://user:password@localhost/my_db')
-  DB = Sequel.mysql('my_db', :user => 'user', :password => 'password', :host => 'localhost')
+  DB = Sequel.postgres('my_db', :user => 'user', :password => 'password', :host => 'localhost')
   DB = Sequel.ado('mydb')
 
 == Open an SQLite memory database
 
-Without a filename argument, the sqlite adapter will setup a new sqlite database in RAM.
+Without a filename argument, the sqlite adapter will setup a new sqlite database in memory.
 
   DB = Sequel.sqlite
 
@@ -26,56 +26,49 @@ Without a filename argument, the sqlite adapter will setup a new sqlite database
 == Using raw SQL
 
   DB << "CREATE TABLE users (name VARCHAR(255) NOT NULL, age INT(3) NOT NULL)"
+  dataset = DB["SELECT age FROM users WHERE name = ?", name]
+  dataset.map(:age)
   DB.fetch("SELECT name FROM users") do |row|
     p r[:name]
   end
-  dataset = DB["SELECT age FROM users WHERE name = ?", name]
-  dataset.print
-  dataset.map(:age)
 
 == Create a dataset
 
   dataset = DB[:items]
-  dataset = DB.dataset.from(:items)
+  dataset = DB.from(:items)
 
 == Most dataset methods are chainable
 
   dataset = DB[:managers].where(:salary => 5000..10000).order(:name, :department)
-  # or
-  dataset = DB.query do
-    from :managers
-    where :salary => 5000..10000
-    order :name, :department
-  end
 
 == Insert rows
 
   dataset.insert(:name => 'Sharon', :grade => 50)
-  dataset << {:name => 'Sharon', :grade => 50} # same effect as above
 
 == Retrieve rows
 
-  dataset.each {|r| p r}
+  dataset.each{|r| p r}
   dataset.all #=> [{...}, {...}, ...]
   dataset.first
-  dataset.order(:name).last # works only for ordered datasets
 
 == Update/Delete rows
 
-  dataset.filter(:active => false).delete
+  dataset.filter(~:active).delete
   dataset.filter('price < ?', 100).update(:active => true)
 
 == Datasets are Enumerable
 
-  dataset.map {|r| r[:name]}
-  dataset.map(:name) # same effect as above
+  dataset.map{|r| r[:name]}
+  dataset.map(:name) # same as above
 
   dataset.inject(0){|sum, r| sum + r[:value]}
+  dataset.sum(:value) # same as above
 
 == Filtering (see also doc/dataset_filtering.rdoc)
 
   dataset.filter(:name => 'abc')
   dataset.filter('name = ?', 'abc')
+
   dataset.filter{|o| o.value > 100}
   dataset.exclude{|o| o.value <= 100}
 
@@ -83,13 +76,13 @@ Without a filename argument, the sqlite adapter will setup a new sqlite database
   dataset.where{|o| (o.value >= 50) & (o.value <= 100)}
 
   dataset.where('value IN ?', [50,75,100])
+  dataset.where(:value=>[50,75,100])
 
-  # Get the first record that matches a condition
-  dataset[:name => 'abc'] # Same as:
   dataset.filter(:name => 'abc').first
+  dataset[:name => 'abc'] # same as above
 
   # Filter using a subquery
-  dataset.filter('price > ?', dataset.select('AVG(price) + 100'))
+  dataset.filter{|o| o.price > dataset.select(o.avg(price) + 100)}
 
 === Advanced filtering using ruby expressions
 
@@ -112,8 +105,8 @@ You can use arithmetic operators and specify SQL functions:
   DB[:items].filter((:x + :y) > :z).sql 
   #=> "SELECT * FROM items WHERE ((x + y) > z)" 
 
-  DB[:items].filter{|o| :price - 100 < o.AVG(:price)}.sql 
-  #=> "SELECT * FROM items WHERE ((price - 100) < AVG(price))" 
+  DB[:items].filter{|o| :price - 100 < o.avg(:price)}.sql 
+  #=> "SELECT * FROM items WHERE ((price - 100) < avg(price))" 
 
 == Ordering
 
@@ -125,16 +118,6 @@ You can use arithmetic operators and specify SQL functions:
 
   dataset.limit(30) # LIMIT 30
   dataset.limit(30, 10) # LIMIT 30 OFFSET 10
-
-== Pagination
-
-  paginated = dataset.paginate(1, 10) # first page, 10 rows per page
-  paginated.page_count #=> number of pages in dataset
-  paginated.current_page #=> 1
-  paginated.next_page #=> next page number or nil
-  paginated.prev_page #=> previous page number or nil
-  paginated.first_page? #=> true if page number = 1
-  paginated.last_page? #=> true if page number = page_count
 
 == Joins
 
@@ -188,8 +171,8 @@ You can use arithmetic operators and specify SQL functions:
 == Transactions
 
   DB.transaction do
-    dataset << {:first_name => 'Inigo', :last_name => 'Montoya'}
-    dataset << {:first_name => 'Farm', :last_name => 'Boy'}
+    dataset.insert(:first_name => 'Inigo', :last_name => 'Montoya')
+    dataset.insert(:first_name => 'Farm', :last_name => 'Boy')
   end # Either both are inserted or neither are inserted
 
 Database#transaction is re-entrant:
@@ -217,7 +200,7 @@ Miscellaneous:
   dataset.sql #=> "SELECT * FROM items"
   dataset.delete_sql #=> "DELETE FROM items"
   dataset.where(:name => 'sequel').exists #=> "EXISTS ( SELECT 1 FROM items WHERE name = 'sequel' )"
-  dataset.print #=> pretty table print to $stdout
   dataset.columns #=> array of columns in the result set, does a SELECT
+
+  # Works on PostgreSQL, MySQL, SQLite, and JDBC
   DB.schema(:items) => [[:id, {:type=>:integer, ...}], [:name, {:type=>:string, ...}], ...]
-                       # Works on PostgreSQL, MySQL, SQLite, and JDBC
