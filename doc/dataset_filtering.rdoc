@@ -4,7 +4,7 @@ Sequel offers unparalleled flexibility when it comes to filtering records. You c
 
 == Filtering using a custom filter string
 
-If you do not wish to lose control over your SQL WHERE clauses, you can just supply it to the dataset's #filter method:
+If you wish to write your SQL by hand, you can just supply it to the dataset's #filter method:
 
   items.filter('x < 10').sql
   #=> "SELECT * FROM items WHERE x < 10"
@@ -52,12 +52,12 @@ Ranges (both inclusive and exclusive) can also be used:
 
 == Filtering using expressions
 
-Sequel allows you to use ruby expressions directly in the call to filter, without using a block:
+Sequel allows you to use ruby expressions directly in the call to filter:
 
   items.filter(:price * 2 < 50).sql
   #=> "SELECT * FROM items WHERE ((price * 2) < 50) 
 
-This works for the standard inequality and arithmetic operators:
+This works for the standard inequality and arithmetic operators (though you can't use the inequality operators directly on a symbol in ruby 1.9):
 
   items.filter(:price + 100 < 200).sql
   #=> "SELECT * FROM items WHERE ((price + 100) < 200) 
@@ -99,7 +99,7 @@ You can use the negation operator (~) in most cases:
   items.filter(~{:category => 'ruby'}).sql
   #=> "SELECT * FROM items WHERE (category != 'ruby')"
 
-  items.filter {~:active}.sql
+  items.filter{~:active}.sql
   #=> "SELECT * FROM items WHERE NOT active"
 
   items.filter(~(:price / 100 >= 200)).sql
@@ -151,8 +151,8 @@ Array#sql_string_join also takes a join argument:
 
 One of the best features of Sequel is the ability to use datasets as sub-queries. Sub-queries can be very useful for filtering records, and many times provide a simpler alternative to table joins. Sub-queries can be used in all forms of filters:
 
-  refs = consumer_refs.filter(:logged_in => true).select(:consumer_id)
+  refs = consumer_refs.filter(:logged_in).select(:consumer_id)
   consumers.filter(:id => refs).sql
-  #=> "SELECT * FROM consumers WHERE (id IN (SELECT consumer_id FROM consumer_refs WHERE (logged_in = 't')))"
+  #=> "SELECT * FROM consumers WHERE (id IN (SELECT consumer_id FROM consumer_refs WHERE logged_in))"
 
 Note that if you compare against a sub-query, you must select a single column in the sub-query.
