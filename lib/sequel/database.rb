@@ -496,10 +496,8 @@ module Sequel
           case value
           when BigDecimal
             value
-          when String, Float
-            value.to_d
-          when Integer
-            value.to_s.to_d
+          when String, Numeric
+            BigDecimal.new(value.to_s)
           else
             raise Sequel::Error::InvalidValue, "invalid value for BigDecimal: #{value.inspect}"
           end
@@ -541,11 +539,11 @@ module Sequel
             Sequel.string_to_datetime(Time === value ? value.iso8601 : value.to_s)
           end
         when :blob
-          ::Sequel::SQL::Blob.new(value)
+          value.is_a?(Sequel::SQL::Blob) ? value : Sequel::SQL::Blob.new(value)
         else
           value
         end
-      rescue ArgumentError => exp
+      rescue ArgumentError, TypeError => exp
         e = Sequel::Error::InvalidValue.new("#{exp.class} #{exp.message}")
         e.set_backtrace(exp.backtrace)
         raise e
