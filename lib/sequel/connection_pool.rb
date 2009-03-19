@@ -28,6 +28,7 @@ class Sequel::ConnectionPool
   #
   # The connection pool takes the following options:
   #
+  # * :disconnection_proc - The proc called when removing connections from the pool.
   # * :max_connections - The maximum number of connections the connection pool
   #   will open (default 4)
   # * :pool_convert_exceptions - Whether to convert non-StandardError based exceptions
@@ -203,9 +204,6 @@ end
 # A SingleThreadedPool acts as a replacement for a ConnectionPool for use
 # in single-threaded applications. ConnectionPool imposes a substantial
 # performance penalty, so SingleThreadedPool is used to gain some speed.
-#
-# Note that using a single threaded pool with some adapters can cause
-# errors in certain cases, see Sequel.single_threaded=.
 class Sequel::SingleThreadedPool
   # The proc used to create a new database connection
   attr_writer :connection_proc
@@ -217,8 +215,12 @@ class Sequel::SingleThreadedPool
   #
   # The single threaded pool takes the following options:
   #
+  # * :disconnection_proc - The proc called when removing connections from the pool.
   # * :pool_convert_exceptions - Whether to convert non-StandardError based exceptions
   #   to RuntimeError exceptions (default true)
+  # * :servers - A hash of servers to use.  Keys should be symbols.  If not
+  #   present, will use a single :default server.  The server name symbol will
+  #   be passed to the connection_proc.
   def initialize(opts={}, &block)
     @connection_proc = block
     @disconnection_proc = opts[:disconnection_proc]
