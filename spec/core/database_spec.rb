@@ -681,10 +681,6 @@ context "Database#transaction" do
   end
 end
 
-class Sequel::Database
-  def self.get_adapters; @@adapters; end
-end
-
 context "A Database adapter with a scheme" do
   setup do
     class CCC < Sequel::Database
@@ -700,8 +696,8 @@ context "A Database adapter with a scheme" do
     end
   end
 
-  specify "should be registered in adapters" do
-    Sequel::Database.get_adapters[:ccc].should == CCC
+  specify "should be registered in the ADAPTER_MAP" do
+    Sequel::ADAPTER_MAP[:ccc].should == CCC
   end
   
   specify "should be instantiated when its scheme is specified" do

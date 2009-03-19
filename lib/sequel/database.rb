@@ -1,4 +1,8 @@
 module Sequel
+  # Hash of adapters that have been used. The key is the adapter scheme
+  # symbol, and the value is the Database subclass.
+  ADAPTER_MAP = {}
+    
   # Array of all databases to which Sequel has connected.  If you are
   # developing an application that can connect to an arbitrary number of 
   # databases, delete the database objects from this or they will not get
@@ -19,9 +23,6 @@ module Sequel
     SQL_COMMIT = 'COMMIT'.freeze
     SQL_ROLLBACK = 'ROLLBACK'.freeze
 
-    # Hash of adapters that have been used
-    @@adapters = Hash.new
-    
     # The identifier input method to use by default
     @@identifier_input_method = nil
 
@@ -96,7 +97,7 @@ module Sequel
     def self.adapter_class(scheme)
       scheme = scheme.to_s.gsub('-', '_').to_sym
       
-      if (klass = @@adapters[scheme]).nil?
+      unless klass = ADAPTER_MAP[scheme]
         # attempt to load the adapter file
         begin
           Sequel.require "adapters/#{scheme}"
@@ -105,11 +106,11 @@ module Sequel
         end
         
         # make sure we actually loaded the adapter
-        if (klass = @@adapters[scheme]).nil?
+        unless klass = ADAPTER_MAP[scheme]
           raise Error::AdapterNotFound, "Could not load #{scheme} adapter"
         end
       end
-      return klass
+      klass
     end
         
     # Returns the scheme for the Database class.
@@ -206,7 +207,7 @@ module Sequel
     #   Sequel.connect('mydb://user:password@dbserver/mydb')
     def self.set_adapter_scheme(scheme) # :nodoc:
       @scheme = scheme
-      @@adapters[scheme.to_sym] = self
+      ADAPTER_MAP[scheme.to_sym] = self
     end
     
     # Converts a uri to an options hash. These options are then passed
