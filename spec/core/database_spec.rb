@@ -1074,14 +1074,13 @@ context "Database#drop_view" do
   end
 end
 
-# TODO: beaf this up with specs for all supported ops
 context "Database#alter_table_sql" do
   setup do
     @db = DummyDatabase.new
   end
   
   specify "should raise error for an invalid op" do
-    proc {@db.alter_table_sql(:mau, :op => :blah)}.should raise_error(Sequel::Error)
+    proc {@db.send(:alter_table_sql, :mau, :op => :blah)}.should raise_error(Sequel::Error)
   end
 end
 

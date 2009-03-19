@@ -374,6 +374,11 @@ module Sequel
       "#<#{self.class}: #{(uri rescue opts).inspect}>" 
     end
 
+    # Proxy the literal call to the dataset, used for default values.
+    def literal(v)
+      schema_utility_dataset.literal(v)
+    end
+
     # Log a message at level info to all loggers.  All SQL logging
     # goes through this method.
     def log_info(message, args=nil)
@@ -403,11 +408,60 @@ module Sequel
       dataset.select(*args, &block)
     end
     
-    # Default serial primary key options.
-    def serial_primary_key_options
-      {:primary_key => true, :type => Integer, :auto_increment => true}
+    # Parse the schema from the database.
+    # If the table_name is not given, returns the schema for all tables as a hash.
+    # If the table_name is given, returns the schema for a single table as an
+    # array with all members being arrays of length 2.  Available options are:
+    #
+    # * :reload - Get fresh information from the database, instead of using
+    #   cached information.  If table_name is blank, :reload should be used
+    #   unless you are sure that schema has not been called before with a
+    #   table_name, otherwise you may only getting the schemas for tables
+    #   that have been requested explicitly.
+    # * :schema - An explicit schema to use.  It may also be implicitly provided
+    #   via the table name.
+    def schema(table = nil, opts={})
+      Deprecation.deprecate('Calling Database#schema without a table argument', 'Use database.tables.inject({}){|h, m| h[m] = database.schema(m); h}') unless table
+      raise(Error, 'schema parsing is not implemented on this database') unless respond_to?(:schema_parse_table, true)
+
+      if table
+        sch, table_name = schema_and_table(table)
+        quoted_name = quote_schema_table(table)
+      end
+      opts = opts.merge(:schema=>sch) if sch && !opts.include?(:schema)
+      if opts[:reload] && @schemas
+        if table_name
+          @schemas.delete(quoted_name)
+        else
+          @schemas = nil
+        end
+      end
+
+      if @schemas
+        if table_name
+          return @schemas[quoted_name] if @schemas[quoted_name]
+        else
+          return @schemas
+        end
+      end
+
+      raise(Error, '#tables does not exist, you must provide a specific table to #schema') if table.nil? && !respond_to?(:tables, true)
+
+      @schemas ||= Hash.new do |h,k|
+        quote_name = quote_schema_table(k)
+        h[quote_name] if h.include?(quote_name)
+      end
+
+      if table_name
+        cols = schema_parse_table(table_name, opts)
+        raise(Error, 'schema parsing returned no columns, table probably doesn\'t exist') if cols.nil? || cols.empty?
+        @schemas[quoted_name] = cols
+      else
+        tables.each{|t| @schemas[quote_schema_table(t)] = schema_parse_table(t.to_s, opts)}
+        @schemas
+      end
     end
-    
+
     # Returns true if the database is using a single-threaded connection pool.
     def single_threaded?
       @single_threaded
@@ -646,9 +700,55 @@ module Sequel
       end
     end
     
+    # Remove the cached schema for the given schema name
+    def remove_cached_schema(table)
+      @schemas.delete(quote_schema_table(table)) if @schemas
+    end
+
+    # Remove the cached schema_utility_dataset, because the identifier
+    # quoting has changed.
+    def reset_schema_utility_dataset
+      @schema_utility_dataset = nil
+    end
+
     # Split the schema information from the table
     def schema_and_table(table_name)
       schema_utility_dataset.schema_and_table(table_name)
+    end
+
+    # Match the database's column type to a ruby type via a
+    # regular expression.  The following ruby types are supported:
+    # integer, string, date, datetime, boolean, and float.
+    def schema_column_type(db_type)
+      case db_type
+      when /\Atinyint/io
+        Sequel.convert_tinyint_to_bool ? :boolean : :integer
+      when /\Ainterval\z/io
+        :interval
+      when /\A(character( varying)?|varchar|text)/io
+        :string
+      when /\A(int(eger)?|bigint|smallint)/io
+        :integer
+      when /\Adate\z/io
+        :date
+      when /\A(datetime|timestamp( with(out)? time zone)?)\z/io
+        :datetime
+      when /\Atime( with(out)? time zone)?\z/io
+        :time
+      when /\Aboolean\z/io
+        :boolean
+      when /\A(real|float|double( precision)?)\z/io
+        :float
+      when /\A(numeric(\(\d+,\d+\))?|decimal|money)\z/io
+        :decimal
+      when /bytea|blob/io
+        :blob
+      end
+    end
+
+    # The dataset to use for proxying certain schema methods.
+    def schema_utility_dataset
+      @schema_utility_dataset ||= dataset
     end
 
     # Return the options for the given server by merging the generic

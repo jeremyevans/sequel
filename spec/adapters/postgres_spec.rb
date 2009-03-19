@@ -344,7 +344,7 @@ context "A PostgreSQL database" do
       text :body
       full_text_index [:title, :body]
     end
-    POSTGRES_DB.create_table_sql_list(:posts, *g.create_info).should == [
+    POSTGRES_DB.send(:create_table_sql_list, :posts, *g.create_info).should == [
       "CREATE TABLE posts (title text, body text)",
       "CREATE INDEX posts_title_body_index ON posts USING gin (to_tsvector('simple', (COALESCE(title, '') || ' ' || COALESCE(body, ''))))"
     ]
@@ -356,7 +356,7 @@ context "A PostgreSQL database" do
       text :body
       full_text_index [:title, :body], :language => 'french'
     end
-    POSTGRES_DB.create_table_sql_list(:posts, *g.create_info).should == [
+    POSTGRES_DB.send(:create_table_sql_list, :posts, *g.create_info).should == [
       "CREATE TABLE posts (title text, body text)",
       "CREATE INDEX posts_title_body_index ON posts USING gin (to_tsvector('french', (COALESCE(title, '') || ' ' || COALESCE(body, ''))))"
     ]
@@ -378,7 +378,7 @@ context "A PostgreSQL database" do
       geometry :geom
       spatial_index [:geom]
     end
-    POSTGRES_DB.create_table_sql_list(:posts, *g.create_info).should == [
+    POSTGRES_DB.send(:create_table_sql_list, :posts, *g.create_info).should == [
       "CREATE TABLE posts (geom geometry)",
       "CREATE INDEX posts_geom_index ON posts USING gist (geom)"
     ]
@@ -389,7 +389,7 @@ context "A PostgreSQL database" do
       varchar :title, :size => 5
       index :title, :type => 'hash'
     end
-    POSTGRES_DB.create_table_sql_list(:posts, *g.create_info).should == [
+    POSTGRES_DB.send(:create_table_sql_list, :posts, *g.create_info).should == [
       "CREATE TABLE posts (title varchar(5))",
       "CREATE INDEX posts_title_index ON posts USING hash (title)"
     ]
@@ -400,7 +400,7 @@ context "A PostgreSQL database" do
       varchar :title, :size => 5
       index :title, :type => 'hash', :unique => true
     end
-    POSTGRES_DB.create_table_sql_list(:posts, *g.create_info).should == [
+    POSTGRES_DB.send(:create_table_sql_list, :posts, *g.create_info).should == [
       "CREATE TABLE posts (title varchar(5))",
       "CREATE UNIQUE INDEX posts_title_index ON posts USING hash (title)"
     ]
@@ -411,7 +411,7 @@ context "A PostgreSQL database" do
       varchar :title, :size => 5
       index :title, :where => {:something => 5}
     end
-    POSTGRES_DB.create_table_sql_list(:posts, *g.create_info).should == [
+    POSTGRES_DB.send(:create_table_sql_list, :posts, *g.create_info).should == [
       "CREATE TABLE posts (title varchar(5))",
       "CREATE INDEX posts_title_index ON posts (title) WHERE (something = 5)"
     ]
@@ -422,7 +422,7 @@ context "A PostgreSQL database" do
       varchar :title, :size => 5
       index :title, :where => {:something => 5}
     end
-    POSTGRES_DB.create_table_sql_list(Sequel::SQL::Identifier.new(:posts__test), *g.create_info).should == [
+    POSTGRES_DB.send(:create_table_sql_list, Sequel::SQL::Identifier.new(:posts__test), *g.create_info).should == [
       "CREATE TABLE posts__test (title varchar(5))",
       "CREATE INDEX posts__test_title_index ON posts__test (title) WHERE (something = 5)"
     ]

@@ -67,7 +67,7 @@ module Sequel
       #   See Schema::SQL#on_delete_clause for options.
       # * :size - The size of the column, generally used with string
       #   columns to specify the maximum number of characters the column will hold.
-      # * :unique - Mark the column is unique, generally has the same effect as
+      # * :unique - Mark the column as unique, generally has the same effect as
       #   creating a unique index on the column.
       # * :unsigned - Make the column type unsigned, only useful for integer
       #   columns.

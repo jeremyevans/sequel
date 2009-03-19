@@ -1,5 +1,9 @@
 === HEAD
 
+* Make Database#rename_table remove the cached schema entry for the table (jeremyevans)
+
+* Make Database schema sql methods private (jeremyevans)
+
 * Deprecate Database #multi_threaded? and #logger (jeremyevans)
 
 * Make Dataset#where always affect the WHERE clause (jeremyevans)
