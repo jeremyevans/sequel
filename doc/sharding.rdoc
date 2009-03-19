@@ -1,17 +1,17 @@
 = Read-Only Slaves/Writable Master and Database Sharding
 
-Starting with version 2.4.0, Sequel has support for read only slave databases
+Sequel has support for read only slave databases
 with a writable master database, as well as database sharding (where you can
-pick a database connection to use for a given dataset).  Support for both
+pick a server to use for a given dataset).  Support for both
 features is database independent, and should work for all database adapters
 included with Sequel.
 
 == The :servers Database option
 
-Both features use the new :servers Database option.  The :servers option should
+Both features use the :servers Database option.  The :servers option should
 be a hash with symbol keys and values that are either hashes or procs that
-return hashes.  Note that all servers should have the same schema, unless you
-really know what you are doing.
+return hashes.  Note that all servers should have the same schema for all
+tables you are accessing, unless you really know what you are doing.
 
 == Master and Slave Database Configurations
 
@@ -23,7 +23,7 @@ is the simplest configuration:
   DB=Sequel.connect('postgres://master_server/database', \
     :servers=>{:read_only=>{:host=>'slave_server'}})
 
-This will use the host slave_server for SELECT queries and master_server for
+This will use the slave_server for SELECT queries and master_server for
 other queries.
 
 === Multiple Read-Only Slaves, Single Master
@@ -67,7 +67,7 @@ There is specific support in Sequel for handling master/slave database
 combinations, with the only necessary setup being the database configuration.
 However, since sharding is always going to be implementation dependent, Sequel
 supplies the basic infrastructure, but you have to tell it which server to use
-for each dataset.  Let's assume the simple scenario, a distributed rainbow
+for each dataset.  Let's assume a simple scenario, a distributed rainbow
 table for SHA-1 hashes, sharding based on the first hex character (for a total
 of 16 shards).  First, you need to configure the database:
 
@@ -89,7 +89,7 @@ since it considers the default server and shard servers independent.  Note that
 if you always set the shard on a dataset before using it in queries, it will
 not attempt to connect to the default server.  Sequel may use the default
 server in queries it generates itself, such as to get column names or table
-schemas, so it is always good to have a default server that works.
+schemas, so you should always have a default server that works.
 
 To set the shard for a given query, you use the Dataset#server method:
 

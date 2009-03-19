@@ -156,6 +156,9 @@ context "A PostgreSQL dataset" do
 
     @d.insert_sql(:x => :y).should =~ \
       /\AINSERT INTO "test" \("x"\) VALUES \("y"\)( RETURNING NULL)?\z/
+
+    @d.disable_insert_returning.insert_sql(:value => 333).should =~ \
+      /\AINSERT INTO "test" \("value"\) VALUES \(333\)\z/
   end
   
   specify "should quote fields correctly when reversing the order if quoting identifiers" do
@@ -220,29 +223,28 @@ context "A PostgreSQL dataset" do
     @d.count.should == 2
   end
 
-  specify "should support nested transactions through savepoints" do
+  specify "should support nested transactions through savepoints using the savepoint option" do
     POSTGRES_DB.transaction do
       @d << {:name => '1'}
-      POSTGRES_DB.transaction do
+      POSTGRES_DB.transaction(:savepoint=>true) do
         @d << {:name => '2'}
         POSTGRES_DB.transaction do
           @d << {:name => '3'}
           raise Sequel::Error::Rollback
         end
-        @d << {:name => '4'}
-        POSTGRES_DB.transaction do
-          @d << {:name => '6'}
-          POSTGRES_DB.transaction do
-            @d << {:name => '7'}
-          end
+      end
+      @d << {:name => '4'}
+      POSTGRES_DB.transaction do
+        @d << {:name => '6'}
+        POSTGRES_DB.transaction(:savepoint=>true) do
+          @d << {:name => '7'}
           raise Sequel::Error::Rollback
         end
-        @d << {:name => '5'}
       end
+      @d << {:name => '5'}
     end
 
-    @d.count.should == 4
-    @d.order(:name).map(:name).should == %w{1 2 4 5}
+    @d.order(:name).map(:name).should == %w{1 4 5 6}
   end
 
   specify "should support regexps" do
@@ -464,6 +466,12 @@ context "Postgres::Dataset#insert" do
   
   specify "should call insert_sql if server_version < 80200" do
     @ds.meta_def(:server_version){80100}
+    @ds.should_receive(:execute_insert).once.with('INSERT INTO test5 (value) VALUES (10)', :table=>:test5, :values=>{:value=>10})
+    @ds.insert(:value=>10)
+  end
+
+  specify "should call insert_sql if disabling insert returning" do
+    @ds.disable_insert_returning!
     @ds.should_receive(:execute_insert).once.with('INSERT INTO test5 (value) VALUES (10)', :table=>:test5, :values=>{:value=>10})
     @ds.insert(:value=>10)
   end

@@ -42,31 +42,28 @@ If you have any comments or suggestions please post to the Google group.
   
   DB = Sequel.sqlite # memory database
   
-  DB.create_table :items do # Create a new table
+  DB.create_table :items do
     primary_key :id
-    column :name, :text
-    column :price, :float
+    String name
+    Float price
   end
   
   items = DB[:items] # Create a dataset
   
   # Populate the table
-  items << {:name => 'abc', :price => rand * 100}
-  items << {:name => 'def', :price => rand * 100}
-  items << {:name => 'ghi', :price => rand * 100}
+  items.insert(:name => 'abc', :price => rand * 100)
+  items.insert(name => 'def', :price => rand * 100)
+  items.insert(:name => 'ghi', :price => rand * 100)
   
   # Print out the number of records
   puts "Item count: #{items.count}"
-  
-  # Print out the records in descending order by price
-  items.reverse_order(:price).print
   
   # Print out the average price
   puts "The average price is: #{items.avg(:price)}"
 
 == The Sequel Console
 
-Sequel includes an IRB console for quick'n'dirty access to databases. You can use it like this:
+Sequel includes an IRB console for quick access to databases. You can use it like this:
 
   sequel sqlite://test.db # test.db in current directory
 
@@ -86,7 +83,7 @@ Which is equivalent to:
 
   SELECT avg(GDP) FROM countries WHERE region = 'Middle East' ORDER BY area DESC LIMIT 5
 
-Since datasets retrieve records only when needed, they can be stored and later reused. Records are fetched as hashes (they can also be fetched as custom model objects), and are accessed using an Enumerable interface:
+Since datasets retrieve records only when needed, they can be stored and later reused. Records are fetched as hashes (or custom model objects), and are accessed using an Enumerable interface:
 
   middle_east = DB[:countries].filter(:region => 'Middle East')
   middle_east.order(:name).each{|r| puts r[:name]}
@@ -123,17 +120,12 @@ You can specify a block to connect, which will disconnect from the database afte
 
 === Arbitrary SQL queries
 
-  DB.execute_ddl("create table t (a text, b text)")
-  DB.execute_insert("insert into t values ('a', 'b')")
-
-Or more succinctly:
-
   DB << "create table t (a text, b text)"
   DB << "insert into t values ('a', 'b')"
 
 You can also create datasets based on raw SQL:
 
-  dataset = DB['select * from items']
+  dataset = DB['select id from items']
   dataset.count # will return the number of records in the result set
   dataset.map(:id) # will return an array containing all values of the id column in the result set
 
@@ -151,23 +143,16 @@ You can use placeholders in your SQL string as well:
 
 === Getting Dataset Instances
 
-Dataset is the primary means through which records are retrieved and manipulated. You can create an blank dataset by using the dataset method:
-
-  dataset = DB.dataset
-
-Or by using the from methods:
+Datasets are the primary way records are retrieved and manipulated.  They are generally created via the Database#from or Database#[] methods:
 
   posts = DB.from(:posts)
+  posts = DB[:posts] # same
 
-The recommended way is the equivalent shorthand:
-
-  posts = DB[:posts]
-
-Datasets will only fetch records when you explicitly ask for them. Datasets can be manipulated to filter through records, change record order, join tables, etc..
+Datasets will only fetch records when you tell them to. They can be manipulated to filter records, change ordering, join tables, etc..
 
 === Retrieving Records
 
-You can retrieve records by using the all method:
+You can retrieve all records by using the all method:
 
   posts.all
 
@@ -179,8 +164,8 @@ You can also iterate through records one at a time:
 
 Or perform more advanced stuff:
 
-  posts.map(:id)
-  posts.inject({}){|h, r| h[r[:id]] = r[:name]}
+  names_and_dates = posts.map{|r| [r[:name], r[:date]]}
+  old_posts, recent_posts = posts.partition{|r| r[:date] < Date.today - 7}
   
 You can also retrieve the first record in a dataset:
 
@@ -196,7 +181,7 @@ If the dataset is ordered, you can also ask for the last record:
   
 === Filtering Records
 
-The simplest way to filter records is to provide a hash of values to match:
+An easy way to filter records is to provide a hash of values to match:
 
   my_posts = posts.filter(:category => 'ruby', :author => 'david')
   
@@ -212,27 +197,26 @@ Sequel also accepts expressions:
   
   my_posts = posts.filter{|o| o.stamp > Date.today << 1}
   
-Some adapters (like postgresql) will also let you specify Regexps:
+Some adapters will also let you specify Regexps:
 
   my_posts = posts.filter(:category => /ruby/i)
   
 You can also use an inverse filter:
 
   my_posts = posts.exclude(:category => /ruby/i)
-  my_posts = posts.filter(:category => /ruby/i).invert # same as above
 
 You can also specify a custom WHERE clause using a string:
 
   posts.filter('stamp IS NOT NULL')
 
-You can use parameters in your string, as well (ActiveRecord style):
+You can use parameters in your string, as well:
 
   posts.filter('(stamp < ?) AND (author != ?)', Date.today - 3, author_name)
   posts.filter{|o| (o.stamp < Date.today - 3) & ~{:author => author_name}} # same as above
 
 Datasets can also be used as subqueries:
 
-  DB[:items].filter('price > ?', DB[:items].select('AVG(price) + 100'))
+  DB[:items].filter('price > ?', DB[:items].select{|o| o.avg(:price) + 100})
 
 After filtering you can retrieve the matching records by using any of the retrieval methods:
 
@@ -246,10 +230,12 @@ Counting records is easy:
   posts.filter(:category => /ruby/i).count
 
 And you can also query maximum/minimum values:
-  max_value = DB[:history].max(:value)
+  max = DB[:history].max(:value)
+  min = DB[:history].min(:value)
   
-Or calculate a sum:
-  total = DB[:items].sum(:price)
+Or calculate a sum or average:
+  sum = DB[:items].sum(:price)
+  avg = DB[:items].avg(:price)
   
 === Ordering Records
 
@@ -266,7 +252,7 @@ The order_more method chains this way, though:
 
   posts.order(:stamp).order_more(:name) # ORDER BY stamp, name
   
-You can also specify descending order
+You can also specify descending order:
 
   posts.order(:stamp.desc) # ORDER BY stamp DESC
 
@@ -291,12 +277,14 @@ Deleting records from the table is done with delete:
 
   posts.filter('stamp < ?', Date.today - 3).delete
   
+Be very careful when deleting, as delete affects all rows in the dataset.
+Filter first, delete second, unless you want to empty the table.
+
 === Inserting Records
 
 Inserting records into the table is done with insert:
 
   posts.insert(:category => 'ruby', :author => 'david')
-  posts << {:category => 'ruby', :author => 'david'} # same as above
   
 === Updating Records
 
@@ -304,9 +292,16 @@ Updating records in the table is done with update:
 
   posts.filter('stamp < ?', Date.today - 7).update(:state => 'archived')
 
+You can reference table columns when choosing what values to set:
+
+  posts.filter{|o| o.stamp < Date.today - 7}.update(:backup_number => :backup_number + 1)
+
+As with delete, this affects all rows in the dataset, so filter first,
+update second, unless you want to update all rows.
+
 === Joining Tables
 
-Joining is very useful in a variety of scenarios, for example many-to-many relationships. With Sequel it's really easy:
+Sequel makes it easy to join tables:
 
   order_items = DB[:items].join(:order_items, :item_id => :id).
     filter(:order_items__order_id => 1234)
@@ -332,7 +327,7 @@ Which is equivalent to the SQL:
 When retrieving records from joined datasets, you get the results in a single hash, which is subject to clobbering if you have columns with the same name in multiple tables:
 
   DB[:items].join(:order_items, :item_id => :id).first
-  => {:id=>(could be items.id or order_items.id), :item_id=>order_items.order_id}
+  => {:id=>order_items.id), :item_id=>order_items.item_id}
 
 Using graph, you can split the result hashes into subhashes, one per join:
 
@@ -345,6 +340,10 @@ Sequel expects column names to be specified using symbols. In addition, returned
 
   items.filter(:x => 1) #=> "SELECT * FROM items WHERE (x = 1)" 
   items.filter(1 => :x) #=> "SELECT * FROM items WHERE (1 = x)" 
+
+Ruby strings are generally treated as SQL strings:
+
+  items.filter(:x => 'x') #=> "SELECT * FROM items WHERE (x = 'x')" 
 
 === Qualifying column names
 
@@ -359,13 +358,13 @@ You can also alias columns by using the triple undersecore special notation :col
   items.literal(:price___p) #=> "price AS p"
   items.literal(:items__price___p) #=> "items.price AS p"
 
-Another way to alias columns is to use the #AS method:
+Another way to alias columns is to use the #as method:
 
   items.literal(:price.as(:p)) #=> "price AS p"
 
 == Sequel Models
 
-Models in Sequel are based on the Active Record pattern described by Martin Fowler (http://www.martinfowler.com/eaaCatalog/activeRecord.html). A model class corresponds to a table or a dataset, and an instance of that class wraps a single record in the model's underlying dataset.
+A model class wraps a dataset, and an instance of that class wraps a single record in the dataset.
 
 Model classes are defined as regular Ruby classes:
 
@@ -383,12 +382,15 @@ You can, however, explicitly set the table name or even the dataset used:
   end
   # or:
   Post.set_dataset :my_posts
-  # or:
-  Post.set_dataset DB[:my_posts].where(:category => 'ruby')
+
+If you use a symbol, it assumes you are referring to the table with the same name.  You can also give it a dataset:
+
+  Post.set_dataset DB[:my_posts].filter(:category => 'ruby')
+  Post.set_dataset DB[:my_posts].select(:id, :name).order(:date)
 
 === Model instances
 
-Model instance are identified by a primary key. By default, Sequel assumes the primary key column to be :id. The Model#[] method can be used to fetch records by their primary key:
+Model instance are identified by a primary key. By default, Sequel assumes the primary key column to be :id, unless it can get the primary key information from the database. The Model.[] method can be used to fetch records by their primary key:
 
   post = Post[123]
 
@@ -466,23 +468,23 @@ You can also supply a block to Model.new and Model.create:
 
 === Hooks
 
-You can execute custom code when creating, updating, or deleting records by using hooks. The before_create and after_create hooks wrap record creation. The before_update and after_update wrap record updating. The before_save and after_save wrap record creation and updating. The before_destroy and after_destroy wrap destruction. The before_validation and after_validation hooks wrap validation.
-
-Hooks are defined by supplying a block:
+You can execute custom code when creating, updating, or deleting records by defining hook methods. The before_create and after_create hook methods wrap record creation. The before_update and after_update hook methods wrap record updating. The before_save and after_save hook methods wrap record creation and updating. The before_destroy and after_destroy hook methods wrap destruction. The before_validation and after_validation hook methods wrap validation. Example:
 
   class Post < Sequel::Model
-    after_create do
+    def after_create
       author.increase_post_count
     end
 
-    after_destroy do
+    def after_destroy
       author.decrease_post_count
     end
   end
 
+For the example above, you should probably use a database trigger if you can.  Hooks can be used for data integrity, but they will only enforce that integrity when you are using the model.  If you plan on allowing any other access to the database, it's best to use database triggers for data integrity.
+
 === Deleting records
 
-You can delete individual records by calling #delete or #destroy. The only difference between the two methods is that #destroy invokes before_destroy and after_destroy hooks, while #delete does not:
+You can delete individual records by calling #delete or #destroy. The only difference between the two methods is that #destroy invokes before_destroy and after_destroy hook methods, while #delete does not:
 
   post.delete #=> bypasses hooks
   post.destroy #=> runs hooks
@@ -533,6 +535,14 @@ one_to_many and many_to_many create a getter method, a method for adding an obje
   post.add_tag(tag)
   post.remove_tag(tag)
   post.remove_all_tags
+
+All associations add a dataset method that can be used to further filter or reorder the returned objects, or modify all of them:
+
+  # Delete all of this post's comments from the database
+  Post.comments_dataset.destroy
+
+  # Return all tags related to this post with no subscribers, ordered by the tag's name
+  Post.tags_dataset.filter(:subscribers=>0).order(:name).all
 
 === Eager Loading
 
@@ -585,21 +595,7 @@ Associations can be eagerly loaded via .eager and the :eager association option.
   # replies that have that tag.  Uses a total of 8 queries.
   Person.eager(:posts=>{:replies=>[:person, {:tags=>{:posts, :replies}}]}).all
 
-In addition to using eager, you can also use eager_graph, which will use a single query to get the object and all associated objects.  This may be necessary if you want to filter the result set based on columns in associated tables.  It works with cascading as well, the syntax is exactly the same.  Note that using eager_graph to eagerly load multiple *_to_many associations will cause the result set to be a cartesian product, so you should be very careful with your filters when using it in that case.
-
-=== Caching model instances with memcached
-
-Sequel models can be cached using memcached based on their primary keys. The use of memcached can significantly reduce database load by keeping model instances in memory. The set_cache method is used to specify caching:
-
-  require 'memcache'
-  CACHE = MemCache.new 'localhost:11211', :namespace => 'blog'
-
-  class Author < Sequel::Model
-    set_cache CACHE, :ttl => 3600
-  end
-
-  Author[333] # database hit
-  Author[333] # cache hit
+In addition to using eager, you can also use eager_graph, which will use a single query to get the object and all associated objects.  This may be necessary if you want to filter or order the result set based on columns in associated tables.  It works with cascading as well, the syntax is exactly the same.  Note that using eager_graph to eagerly load multiple *_to_many associations will cause the result set to be a cartesian product, so you should be very careful with your filters when using it in that case.
 
 === Extending the underlying dataset
 
@@ -638,33 +634,19 @@ Sequel models also provide a short hand notation for filters:
     subset :invisible, ~:visible
   end
 
-=== Basic Model Validations
+=== Model Validations
 
-To assign default validations to a sequel model:
+You can define a validate method for your model, which save
+will check before attempting to save the model in the database.
+If an attribute of the model isn't valid, you should add a error
+message for that attribute to the model object's errors. If an
+object has any errors added by the validate method, save will
+raise an error or return false depending on how it is configured.
 
-  class MyModel < Sequel::Model
-    validates do
-      acceptance_of...
-      confirmation_of...
-      format_of...
-      format_of...
-      presence_of...
-      length_of...
-      not_string ...
-      numericality_of...
-      each...
+  class Post < Sequel::Model
+    def validate
+      errors[:name] << "can't be empty" if name.empty?
+      errors[:written_on] << "should be in the past" if written_on >= Time.now
     end
   end
 
-You may also perform the usual 'longhand' way to assign default model validates directly within the model class itself:
-
-  class MyModel < Sequel::Model
-    validates_format_of...
-    validates_presence_of...
-    validates_acceptance_of...
-    validates_confirmation_of...
-    validates_length_of...
-    validates_numericality_of...
-    validates_format_of...
-    validates_each...
-  end

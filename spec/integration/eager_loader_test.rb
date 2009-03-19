@@ -69,7 +69,7 @@ describe "Eagerly loading a tree structure" do
     clear_sqls
   end
   after do
-    Node.drop_table
+    INTEGRATION_DB.drop_table :nodes
     Object.send(:remove_const, :Node)
   end
 
@@ -163,8 +163,7 @@ describe "Association Extensions" do
     clear_sqls
   end
   after do
-    Authorship.drop_table
-    Author.drop_table
+    INTEGRATION_DB.drop_table :authorships, :authors
     Object.send(:remove_const, :Author)
     Object.send(:remove_const, :Authorship)
   end
@@ -283,9 +282,7 @@ describe "has_many :through has_many and has_one :through belongs_to" do
     clear_sqls
   end
   after do
-    Invoice.drop_table
-    Client.drop_table
-    Firm.drop_table
+    INTEGRATION_DB.drop_table :invoices, :clients, :firms
     Object.send(:remove_const, :Firm)
     Object.send(:remove_const, :Client)
     Object.send(:remove_const, :Invoice)
@@ -371,9 +368,10 @@ describe "Polymorphic Associations" do
       text :attachable_type
     end
     class ::Asset < Sequel::Model
+      m = method(:constantize)
       many_to_one :attachable, :reciprocal=>:assets, \
         :dataset=>(proc do
-          klass = attachable_type.constantize
+          klass = m.call(attachable_type)
           klass.filter(klass.primary_key=>attachable_id)
         end), \
         :eager_loader=>(proc do |key_hash, assets, associations|
@@ -383,7 +381,7 @@ describe "Polymorphic Associations" do
             ((id_map[asset.attachable_type] ||= {})[asset.attachable_id] ||= []) << asset
           end 
           id_map.each do |klass_name, id_map|
-            klass = klass_name.constantize
+            klass = m.call(klass_name)
             klass.filter(klass.primary_key=>id_map.keys).all do |attach|
               id_map[attach.pk].each do |asset|
                 asset.associations[:attachable] = attach
@@ -461,9 +459,7 @@ describe "Polymorphic Associations" do
     clear_sqls
   end
   after do
-    Asset.drop_table
-    Post.drop_table
-    Note.drop_table
+    INTEGRATION_DB.drop_table :assets, :posts, :notes
     Object.send(:remove_const, :Asset)
     Object.send(:remove_const, :Post)
     Object.send(:remove_const, :Note)
@@ -601,8 +597,7 @@ describe "many_to_one/one_to_many not referencing primary key" do
     clear_sqls
   end
   after do
-    Invoice.drop_table
-    Client.drop_table
+    INTEGRATION_DB.drop_table :invoices, :clients
     Object.send(:remove_const, :Client)
     Object.send(:remove_const, :Invoice)
   end

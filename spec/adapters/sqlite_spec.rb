@@ -138,8 +138,8 @@ context "An SQLite database" do
     @db[:time] << {:t => t1.to_i, :d => t1}
     @db[:time].map(:t).should == [t1, t1]
     @db[:time].map(:d).should == [t1, t1]
-    t2 = t1.iso8601.to_datetime
     Sequel.datetime_class = DateTime
+    t2 = Sequel.string_to_datetime(t1.iso8601)
     @db[:time].map(:t).should == [t2, t2]
     @db[:time].map(:d).should == [t2, t2]
   end

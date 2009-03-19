@@ -4,7 +4,7 @@ Sequel::Model has the most powerful and flexible associations of any ruby ORM.
 
   "Extraordinary claims require extraordinary proof" - Carl Sagan
 
-==Background: Sequel::Model association options
+== Background: Sequel::Model association options
 
 There are a bunch of advanced association options that are available to
 handle the other-than-bog-standard cases.  First we'll go over some of
@@ -35,11 +35,10 @@ JOINing to the join table in a many_to_many association).
   condition.  The block is passed the associated table alias, current model
   alias, and array of previous joins.
 - :graph_only_conditions - Use these conditions instead of the standard
-  association conditions. This is necessary when the standard keys it uses are
-  not correct for the association (such as an association that doesn't use
-  primary keys).  You can also use this to have a JOIN USING (array of
-  symbols), or a NATURAL or CROSS JOIN (nil, with the appropriate
-  :graph_join_type).
+  association conditions. This is necessary when you don't want to have an
+  equal condition between the foreign key and primary key of the tables.
+  You can also use this to have a JOIN USING (array of symbols), or a NATURAL
+  or CROSS JOIN (nil, with the appropriate :graph_join_type).
   
 These can be used like this:
 
@@ -55,21 +54,15 @@ These can be used like this:
   Artist.one_to_many :gold_albums, :class=>:Album, \
     :graph_block=>proc{|j,lj,js| :copies_sold.qualify(j) > 500000}
     
-  # Handles the case where the artist is associated to the album by an
-  # artist_name column in the albums table, when name is not the primary key
-  # of the artists table
+  # Handles the case where the to tables are associated by a case insensitive name string
   Artist.one_to_many :albums, :key=>:artist_name, \
-    :graph_only_conditions=>{:artist_name=>:name}
+    :graph_only_conditions=>nil, \
+    :graph_block=>proc{|j,lj,js| {:lower.sql_function(artist_name.qualify(j))=>:lower.sql_function(name.qualify(lj))}}
     
-  # Handles the above case, but where :artist_name is used in both tables,
-  # via a JOIN USING
+  # Handles the case where both key columns have the name artist_name, and you want to use
+  # a JOIN USING
   Artist.one_to_many :albums, :key=>:artist_name, :graph_only_conditions=>[:artist_name]
   
-  # Handles the case where all columns in both tables are uniquely named, except
-  # for the ones that handle associations
-  Artist.one_to_many :albums, :key=>:artist_name, :graph_only_conditions=>nil, \
-    :graph_join_type=>:natural
-
 Remember, using #eager_graph is generally only necessary when you need to
 filter/order based on columns in an associated table, it is recommended to
 use #eager for eager loading if possible.
@@ -91,7 +84,7 @@ associations that are specified by multiple keys, or do multiple
 queries depending on the content of the records (which would be
 necessary for polymorphic associations).  Inside the :eager_loader
 proc, you should get the related objects and populate the
-associations for all objects in the array of records.  The hash
+associations cache for all objects in the array of records.  The hash
 of dependent associations is available for you to cascade the eager
 loading down multiple levels, but it is up to you to use it.  The
 key_hash is a performance enhancement that is used by the default
@@ -113,13 +106,13 @@ give an example:
 Using these options, you can build associations Sequel doesn't natively support,
 and still be able to use the same eager loading features that you are used to.
 
-==ActiveRecord associations
+== ActiveRecord associations
 
 Sequel supports all of associations that ActiveRecord supports, one way or
 another.  Sometimes this requires more code, as Sequel is a toolkit and not
 a swiss army chainsaw.
 
-===Association callbacks
+=== Association callbacks
 
 Sequel supports the same callbacks that ActiveRecord does: :before_add,
 :before_remove, :after_add, and :after_remove. It also supports a
@@ -142,9 +135,9 @@ remove callbacks on the existing object and the add callbacks on the
 new object.  The remove callback calls are placed around the add
 callback calls.
 
-===Association extensions
+=== Association extensions
 
-All associations come with a _dataset method that can be further filtered or
+All associations come with an association_dataset method that can be further filtered or
 otherwise modified:
 
   class Author < Sequel::Model
@@ -159,8 +152,7 @@ association_reflection method:
 
   module FindOrCreate
     def find_or_create(vals)
-      first(vals) || association_reflection.associated_class. \
-        create(vals.merge(association_reflection[:key]=>model_object.id))
+      first(vals) || model.create(vals.merge(association_reflection[:key]=>model_object.id))
     end
   end
   class Author < Sequel::Model
@@ -168,7 +160,7 @@ association_reflection method:
   end
   Author.first.authorships_dataset.find_or_create(:name=>'Blah', :number=>10)
 
-===has_many :through associations
+=== has_many :through associations
 
 many_to_many handles the usual case of a has_many :through with a belongs_to in
 the associated model.  It doesn't break on the case where the join table is a
@@ -291,7 +283,7 @@ in the associations cache for each object, which ActiveRecord won't do for you.
 The reason you would want to do this is that then firm.invoices.first.firm or
 firm.invoices.first.client doesn't do another query to get the firm/client.
 
-===Polymorphic Associations
+=== Polymorphic Associations
 
 Polymorphic associations are really a design flaw.  The only advantage
 polymorphic associations offer is that they require fewer join tables.
@@ -404,13 +396,13 @@ Sequel::Model:
   @asset.attachable = @post
   @asset.attachable = @note
 
-==More advanced associations
+== More advanced associations
 
 So far, we've only shown that Sequel::Model has associations as powerful as
 ActiveRecord's.  Now we will show how Sequel::Model's associations are more
 powerful.
 
-===many_to_one/one_to_many not referencing primary key
+=== many_to_one/one_to_many not referencing primary key
 
 This can now be handled easily in Sequel using the :primary_key association
 option.  However, this example shows how the association was possible before
@@ -469,7 +461,7 @@ design, but sometimes you have to play with the cards you are dealt).
     end
   end
 
-===Joining on multiple keys
+=== Joining on multiple keys
 
 Let's say you have two tables that are associated with each other with multiple
 keys.  For example:
@@ -511,7 +503,7 @@ keys.  For example:
       end)
   end
 
-===Tree - All Ancestors and Descendents
+=== Tree - All Ancestors and Descendents
 
 Let's say you want to store a tree relationship in your database, it's pretty
 simple:
@@ -580,8 +572,7 @@ without knowing the depth of the tree?
     end)
   end
 
-
-===Joining multiple keys to a single key, through a third table
+=== Joining multiple keys to a single key, through a third table
 
 Let's say you have a database, of songs, lyrics, and artists.  Each song
 may or may not have a lyric (most songs are instrumental).  The lyric can be

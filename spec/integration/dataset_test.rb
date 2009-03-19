@@ -50,6 +50,32 @@ describe "Simple Dataset operations" do
   end
 end
 
+describe "Simple Dataset operations" do
+  before do
+    INTEGRATION_DB.create_table!(:items) do
+      Integer :number
+      TrueClass :flag
+    end
+    @ds = INTEGRATION_DB[:items]
+  end
+  after do
+    INTEGRATION_DB.drop_table(:items)
+  end
+
+  specify "should deal with boolean conditions correctly" do
+    @ds.insert(:number=>1, :flag=>true)
+    @ds.insert(:number=>2, :flag=>false)
+    @ds.insert(:number=>3, :flag=>nil)
+    @ds.order!(:number)
+    @ds.filter(:flag=>true).map(:number).should == [1]
+    @ds.filter(:flag=>false).map(:number).should == [2]
+    @ds.filter(:flag=>nil).map(:number).should == [3]
+    @ds.exclude(:flag=>true).map(:number).should == [2, 3]
+    @ds.exclude(:flag=>false).map(:number).should == [1, 3]
+    @ds.exclude(:flag=>nil).map(:number).should == [1, 2]
+  end
+end
+
 describe "Simple Dataset operations in transactions" do
   before do
     INTEGRATION_DB.create_table!(:items_insert_in_transaction) do

@@ -8,7 +8,7 @@ The format of the individual migration files themselves is explained in the Sequ
 
 Migrations are not required, you can just call the schema modification methods directly on the database object.  This is often done in test code and examples.  However, it is recommended that you use the migration framework unless the database schema will not be changing in the future, as it provides a way to easily handle modifications to existing database schema.
 
-Also, new in Sequel 2.10 is the ability to have database independent migrations using ruby classes as types.  When you use a ruby class as a type, Sequel translates it to the most comparable type in the database you are using.  Here's an example using all supported types:
+Sequel has the ability to have database independent migrations using ruby classes as types.  When you use a ruby class as a type, Sequel translates it to the most comparable type in the database you are using.  Here's an example using all supported types:
 
     DB.create_table(:cats) do
       primary_key :id, :type=>Integer # integer

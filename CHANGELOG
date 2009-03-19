@@ -1,5 +1,59 @@
 === HEAD
 
+* Make Dataset#where always affect the WHERE clause (jeremyevans)
+
+* Deprecate Object#blank? and related extensions, require 'sequel/extensions/blank' to get them back (jeremyevans)
+
+* Move lib/sequel_core into lib/sequel and lib/sequel_model into lib/sequel/model (jeremyevans)
+
+* Remove Sequel::Schema::SQL module, move methods into Sequel::Database (jeremyevans)
+
+* Support creating and dropping schema qualified views (jeremyevans)
+
+* Fix saving a newly inserted record in an after_create or after_save hook (jeremyevans)
+
+* Deprecate Dataset#print and PrettyTable, require 'sequel/extensions/pretty_table' if you want them (jeremyevans)
+
+* Deprecate Database#query and Dataset#query, require 'sequel/extensions/query' if you want them (jeremyevans)
+
+* Deprecate Dataset#paginate and #each_page, require 'sequel/extensions/pagination' if you want them (jeremyevans)
+
+* Fix ~{:bool_col=>true} and related inversions of boolean values (jeremyevans)
+
+* Add disable_insert_returning method to PostgreSQL datasets, so they fallback to just using INSERT (jeremyevans)
+
+* Don't use savepoints by default on PostgreSQL, use the :savepoint option to Database#transaction to use a savepoint (jeremyevans)
+
+* Deprecate Database#transaction accepting a server symbol argument, use an options hash with the :server option (jeremyevans)
+
+* Add Model.use_transactions for setting whether models should use transactions when destroying/saving records (jeremyevans, mjwillson)
+
+* Deprecate Model::Validation::Errors, use Model::Errors (jeremyevans)
+
+* Deprecate string inflection methods, require 'sequel/extensions/inflector' if you use them (jeremyevans)
+
+* Deprecate Model validation class methods, override Model#validate instead or Model.plugin validation_class_methods (jeremyevans)
+
+* Deprecate Model schema methods, use Model.plugin :schema (jeremyevans)
+
+* Deprecate Model hook class methods, use instance methods instead or Model.plugin :hook_class_methods (jeremyevans)
+
+* Deprecate Model.set_sti_key, use Model.plugin :single_table_inheritance (jeremyevans)
+
+* Deprecate Model.set_cache, use Model.plugin :caching (jeremyevans)
+
+* Move most model instance methods into Model::InstanceMethods, for easier overriding of instance methods for all models (jeremyevans)
+
+* Move most model class methods into Model::ClassMethods, for easier overriding of class methods for all models (jeremyevans)
+
+* Deprecate String#to_date, #to_datetime, #to_time, and #to_sequel_time, use require 'sequel/extensions/string_date_time' if you want them (jeremyevans)
+
+* Deprecate Array#extract_options! and Object#is_one_of? (jeremyevans)
+
+* Deprecate Object#meta_def, #meta_eval, and #metaclass (jeremyevans)
+
+* Deprecate Module#class_def, #class_attr_overridable, #class_attr_reader, #metaalias, #metaattr_reader, and #metaatt_accessor (jeremyevans)
+
 * Speed up the calling of most column accessor methods, and reduce memory overhead of creating them (jeremyevans)
 
 * Deprecate Model#set_restricted using Model#[] if no setter method exists, a symbol is used, and the columns are not set (jeremyevans)
