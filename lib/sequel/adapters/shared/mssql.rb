@@ -8,10 +8,6 @@ module Sequel
       SQL_COMMIT = "COMMIT TRANSACTION".freeze
       SQL_ROLLBACK = "ROLLBACK TRANSACTION".freeze
       
-      def auto_increment_sql
-        AUTO_INCREMENT
-      end
-
       def dataset(opts = nil)
         ds = super
         ds.extend(DatasetMethods)
@@ -19,6 +15,10 @@ module Sequel
       end
 
       private
+
+      def auto_increment_sql
+        AUTO_INCREMENT
+      end
 
       # SQL to BEGIN a transaction.
       def begin_transaction_sql

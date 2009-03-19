@@ -23,6 +23,34 @@ module Sequel
       UNIQUE = Sequel::Database::UNIQUE
       UNSIGNED = Sequel::Database::UNSIGNED
       
+      # Get version of MySQL server, used for determined capabilities.
+      def server_version
+        m = /(\d+)\.(\d+)\.(\d+)/.match(get(SQL::Function.new(:version)))
+        @server_version ||= (m[1].to_i * 10000) + (m[2].to_i * 100) + m[3].to_i
+      end
+      
+      # Return an array of symbols specifying table names in the current database.
+      #
+      # Options:
+      # * :server - Set the server to use
+      def tables(opts={})
+        ds = self['SHOW TABLES'].server(opts[:server])
+        ds.identifier_output_method = nil
+        ds2 = dataset
+        ds.map{|r| ds2.send(:output_identifier, r.values.first)}
+      end
+      
+      # Changes the database in use by issuing a USE statement.  I would be
+      # very careful if I used this.
+      def use(db_name)
+        disconnect
+        @opts[:database] = db_name if self << "USE #{db_name}"
+        @schemas = nil
+        self
+      end
+      
+      private
+      
       # Use MySQL specific syntax for rename column, set column type, and
       # drop index cases.
       def alter_table_sql(table, op)
@@ -66,6 +94,16 @@ module Sequel
         sql
       end
 
+      # MySQL folds unquoted identifiers to lowercase, so it shouldn't need to upcase identifiers on input.
+      def identifier_input_method_default
+        nil
+      end
+      
+      # MySQL folds unquoted identifiers to lowercase, so it shouldn't need to upcase identifiers on output.
+      def identifier_output_method_default
+        nil
+      end
+
       # Handle MySQL specific index SQL syntax
       def index_definition_sql(table_name, index)
         index_name = quote_identifier(index[:name] || default_index_name(table_name, index[:columns]))
@@ -81,44 +119,6 @@ module Sequel
         "CREATE #{index_type}INDEX #{index_name} ON #{quote_schema_table(table_name)} #{literal(index[:columns])}#{using}"
       end
       
-      # Get version of MySQL server, used for determined capabilities.
-      def server_version
-        m = /(\d+)\.(\d+)\.(\d+)/.match(get(SQL::Function.new(:version)))
-        @server_version ||= (m[1].to_i * 10000) + (m[2].to_i * 100) + m[3].to_i
-      end
-      
-      # Return an array of symbols specifying table names in the current database.
-      #
-      # Options:
-      # * :server - Set the server to use
-      def tables(opts={})
-        ds = self['SHOW TABLES'].server(opts[:server])
-        ds.identifier_output_method = nil
-        ds2 = dataset
-        ds.map{|r| ds2.send(:output_identifier, r.values.first)}
-      end
-      
-      # Changes the database in use by issuing a USE statement.  I would be
-      # very careful if I used this.
-      def use(db_name)
-        disconnect
-        @opts[:database] = db_name if self << "USE #{db_name}"
-        @schemas = nil
-        self
-      end
-      
-      private
-      
-      # MySQL folds unquoted identifiers to lowercase, so it shouldn't need to upcase identifiers on input.
-      def identifier_input_method_default
-        nil
-      end
-      
-      # MySQL folds unquoted identifiers to lowercase, so it shouldn't need to upcase identifiers on output.
-      def identifier_output_method_default
-        nil
-      end
-
       # Use the MySQL specific DESCRIBE syntax to get a table description.
       def schema_parse_table(table_name, opts)
         ds = self["DESCRIBE ?", SQL::Identifier.new(table_name)]

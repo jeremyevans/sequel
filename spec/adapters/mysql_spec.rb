@@ -479,21 +479,21 @@ context "A MySQL database", "with table options" do
   end
   
   specify "should allow to pass custom options (engine, charset, collate) for table creation" do
-    statements = @db.create_table_sql_list(:items, *(@g.create_info << @options))
+    statements = @db.send(:create_table_sql_list, :items, *(@g.create_info << @options))
     statements.should == [
       "CREATE TABLE items (size integer, name text) ENGINE=MyISAM DEFAULT CHARSET=latin2 DEFAULT COLLATE=swedish"
     ]
   end
   
   specify "should use default options if specified (engine, charset, collate) for table creation" do
-    statements = @db.create_table_sql_list(:items, *(@g.create_info))
+    statements = @db.send(:create_table_sql_list, :items, *(@g.create_info))
     statements.should == [
       "CREATE TABLE items (size integer, name text) ENGINE=InnoDB DEFAULT CHARSET=utf8 DEFAULT COLLATE=utf8"
     ]
   end
   
   specify "should not use default if option has a nil value" do
-    statements = @db.create_table_sql_list(:items, *(@g.create_info << {:engine=>nil, :charset=>nil, :collate=>nil}))
+    statements = @db.send(:create_table_sql_list, :items, *(@g.create_info << {:engine=>nil, :charset=>nil, :collate=>nil}))
     statements.should == [
       "CREATE TABLE items (size integer, name text)"
     ]
@@ -510,7 +510,7 @@ context "A MySQL database" do
       boolean :active1, :default => true
       boolean :active2, :default => false
     end
-    statements = @db.create_table_sql_list(:items, *g.create_info)
+    statements = @db.send(:create_table_sql_list, :items, *g.create_info)
     statements.should == [
       "CREATE TABLE items (active1 boolean DEFAULT 1, active2 boolean DEFAULT 0)"
     ]
@@ -521,7 +521,7 @@ context "A MySQL database" do
       foreign_key :p_id, :table => :users, :key => :id, 
         :null => false, :on_delete => :cascade
     end
-    @db.create_table_sql_list(:items, *g.create_info).should == [
+    @db.send(:create_table_sql_list, :items, *g.create_info).should == [
       "CREATE TABLE items (p_id integer NOT NULL, FOREIGN KEY (p_id) REFERENCES users(id) ON DELETE CASCADE)"
     ]
   end
@@ -530,7 +530,7 @@ specify "should correctly format ALTER TABLE statements with foreign keys" do
   g = Sequel::Schema::AlterTableGenerator.new(@db) do
     add_foreign_key :p_id, :users, :key => :id, :null => false, :on_delete => :cascade
   end
-  @db.alter_table_sql_list(:items, g.operations).should == [[
+  @db.send(:alter_table_sql_list, :items, g.operations).should == [[
     "ALTER TABLE items ADD COLUMN p_id integer NOT NULL",
     "ALTER TABLE items ADD FOREIGN KEY (p_id) REFERENCES users(id) ON DELETE CASCADE"
   ]]
@@ -609,7 +609,7 @@ context "A MySQL database" do
       text :body
       full_text_index [:title, :body]
     end
-    MYSQL_DB.create_table_sql_list(:posts, *g.create_info).should == [
+    MYSQL_DB.send(:create_table_sql_list, :posts, *g.create_info).should == [
       "CREATE TABLE posts (title text, body text)",
       "CREATE FULLTEXT INDEX posts_title_body_index ON posts (title, body)"
     ]
@@ -631,7 +631,7 @@ context "A MySQL database" do
       point :geom
       spatial_index [:geom]
     end
-    MYSQL_DB.create_table_sql_list(:posts, *g.create_info).should == [
+    MYSQL_DB.send(:create_table_sql_list, :posts, *g.create_info).should == [
       "CREATE TABLE posts (geom point)",
       "CREATE SPATIAL INDEX posts_geom_index ON posts (geom)"
     ]
@@ -642,7 +642,7 @@ context "A MySQL database" do
       text :title
       index :title, :type => :hash
     end
-    MYSQL_DB.create_table_sql_list(:posts, *g.create_info).should == [
+    MYSQL_DB.send(:create_table_sql_list, :posts, *g.create_info).should == [
       "CREATE TABLE posts (title text)",
       "CREATE INDEX posts_title_index ON posts (title) USING hash"
     ]
@@ -653,7 +653,7 @@ context "A MySQL database" do
       text :title
       index :title, :type => :hash, :unique => true
     end
-    MYSQL_DB.create_table_sql_list(:posts, *g.create_info).should == [
+    MYSQL_DB.send(:create_table_sql_list, :posts, *g.create_info).should == [
       "CREATE TABLE posts (title text)",
       "CREATE UNIQUE INDEX posts_title_index ON posts (title) USING hash"
     ]
