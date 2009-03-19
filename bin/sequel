@@ -63,7 +63,7 @@ opts.parse!
 
 db = ARGV.shift
 
-if db.blank?
+if db.nil? || db.empty?
   puts opts
   exit 1
 end
