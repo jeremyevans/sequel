@@ -35,7 +35,7 @@ module Sequel
     # Whether to quote identifiers (columns and tables) by default
     @@quote_identifiers = nil
 
-    # The default schema to use
+    # The default schema to use, generally should be nil.
     attr_accessor :default_schema
 
     # Array of SQL loggers to use for this database
@@ -121,11 +121,8 @@ module Sequel
     # Connects to a database.  See Sequel.connect.
     def self.connect(conn_string, opts = {}, &block)
       if conn_string.is_a?(String)
-        if conn_string =~ /\Ajdbc:/
-          c = adapter_class(:jdbc)
-          opts = {:uri=>conn_string}.merge(opts)
-        elsif conn_string =~ /\Ado:/
-          c = adapter_class(:do)
+        if match = /\A(jdbc|do):/o.match(conn_string)
+          c = adapter_class(match[1].to_sym)
           opts = {:uri=>conn_string}.merge(opts)
         else
           uri = URI.parse(conn_string)
