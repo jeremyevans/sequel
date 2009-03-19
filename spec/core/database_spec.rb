@@ -15,15 +15,10 @@ context "A new Database" do
   end
   
   specify "should set the logger from opts[:logger] and opts[:loggers]" do
-    @db.logger.should == 3
     @db.loggers.should == [3]
-    Sequel::Database.new(1 => 2, :loggers => 3).logger.should == 3
     Sequel::Database.new(1 => 2, :loggers => 3).loggers.should == [3]
-    Sequel::Database.new(1 => 2, :loggers => [3]).logger.should == 3
     Sequel::Database.new(1 => 2, :loggers => [3]).loggers.should == [3]
-    Sequel::Database.new(1 => 2, :logger => 4, :loggers => 3).logger.should == 4
     Sequel::Database.new(1 => 2, :logger => 4, :loggers => 3).loggers.should == [4,3]
-    Sequel::Database.new(1 => 2, :logger => [4], :loggers => [3]).logger.should == 4
     Sequel::Database.new(1 => 2, :logger => [4], :loggers => [3]).loggers.should == [4,3]
   end
   
@@ -868,54 +863,74 @@ context "A database" do
     Sequel::Database.single_threaded = false
   end
   
-  specify "should be either single_threaded? or multi_threaded?" do
+  deprec_specify "should have a multi_threaded? method" do
     db = Sequel::Database.new(:single_threaded => true)
-    db.should be_single_threaded
     db.should_not be_multi_threaded
     
     db = Sequel::Database.new(:max_options => 1)
-    db.should_not be_single_threaded
     db.should be_multi_threaded
+
+    db = Sequel::Database.new
+    db.should be_multi_threaded
+
+    Sequel::Database.single_threaded = true
+    
+    db = Sequel::Database.new
+    db.should_not be_multi_threaded
+    
+    db = Sequel::Database.new(:max_options => 4)
+    db.should_not be_multi_threaded
+  end
+
+  specify "should have single_threaded? respond to true if in single threaded mode" do
+    db = Sequel::Database.new(:single_threaded => true)
+    db.should be_single_threaded
+    
+    db = Sequel::Database.new(:max_options => 1)
+    db.should_not be_single_threaded
     
     db = Sequel::Database.new
     db.should_not be_single_threaded
-    db.should be_multi_threaded
     
     Sequel::Database.single_threaded = true
     
     db = Sequel::Database.new
     db.should be_single_threaded
-    db.should_not be_multi_threaded
     
     db = Sequel::Database.new(:max_options => 4)
     db.should be_single_threaded
-    db.should_not be_multi_threaded
   end
   
-  specify "should accept a logger object" do
+  deprec_specify "should have a logger method" do
     db = Sequel::Database.new
     s = "I'm a logger"
     db.logger = s
     db.logger.should == s
-    db.loggers.should == [s]
     db.logger = nil
     db.logger.should == nil
+    db.loggers = []
+    db.logger.should == nil
+    t = "I'm also a logger"
+    db.loggers = [s, t]
+    db.logger.should == s
+  end
+
+  specify "should be able to set loggers via the logger= and loggers= methods" do
+    db = Sequel::Database.new
+    s = "I'm a logger"
+    db.logger = s
+    db.loggers.should == [s]
+    db.logger = nil
     db.loggers.should == []
 
     db.loggers = [s]
-    db.logger.should == s
     db.loggers.should == [s]
     db.loggers = []
-    db.logger.should == nil
     db.loggers.should == []
 
     t = "I'm also a logger"
     db.loggers = [s, t]
-    db.logger.should == s
     db.loggers.should == [s,t]
-    db.loggers = []
-    db.logger.should == nil
-    db.loggers.should == []
   end
 end
 

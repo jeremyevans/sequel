@@ -162,6 +162,7 @@ module Sequel
     end
     
     # Set the method to call on identifiers going into the database
+    # See Sequel.identifier_input_method=.
     def self.identifier_input_method=(v)
       @@identifier_input_method = v || ""
     end
@@ -172,6 +173,7 @@ module Sequel
     end
     
     # Set the method to call on identifiers coming from the database
+    # See Sequel.identifier_output_method=.
     def self.identifier_output_method=(v)
       @@identifier_output_method = v || ""
     end
@@ -191,7 +193,7 @@ module Sequel
     ### Private Class Methods ###
 
     # Sets the adapter scheme for the Database class. Call this method in
-    # descendnants of Database to allow connection using a URL. For example the
+    # descendants of Database to allow connection using a URL. For example the
     # following:
     #
     #   class Sequel::MyDB::Database < Sequel::Database
@@ -231,14 +233,14 @@ module Sequel
     # the method acts as an alias for Database#fetch, returning a dataset for
     # arbitrary SQL:
     #
-    #   DB['SELECT * FROM items WHERE name = ?', my_name].print
+    #   DB['SELECT * FROM items WHERE name = ?', my_name].all
     #
     # Otherwise, acts as an alias for Database#from, setting the primary
     # table for the dataset:
     #
     #   DB[:items].sql #=> "SELECT * FROM items"
-    def [](*args, &block)
-      (String === args.first) ? fetch(*args, &block) : from(*args, &block)
+    def [](*args)
+      (String === args.first) ? fetch(*args) : from(*args)
     end
     
     # Call the prepared statement with the given name with the given hash
@@ -252,36 +254,40 @@ module Sequel
       raise NotImplementedError, "#connect should be overridden by adapters"
     end
     
-    # Returns a blank dataset
+    # Returns a blank dataset for this database
     def dataset
       ds = Sequel::Dataset.new(self)
     end
     
-    # Disconnects all available connections from the connection pool.  If any
-    # connections are currently in use, they will not be disconnected.
+    # Disconnects all available connections from the connection pool.  Any
+    # connections currently in use will not be disconnected.
     def disconnect
       pool.disconnect
     end
 
-    # Executes the given SQL. This method should be overridden in descendants.
+    # Executes the given SQL on the database. This method should be overridden in descendants.
+    # This method should not be called directly by user code.
     def execute(sql, opts={})
       raise NotImplementedError, "#execute should be overridden by adapters"
     end
     
     # Method that should be used when submitting any DDL (Data Definition
     # Language) SQL.  By default, calls execute_dui.
+    # This method should not be called directly by user code.
     def execute_ddl(sql, opts={}, &block)
       execute_dui(sql, opts, &block)
     end
 
     # Method that should be used when issuing a DELETE, UPDATE, or INSERT
     # statement.  By default, calls execute.
+    # This method should not be called directly by user code.
     def execute_dui(sql, opts={}, &block)
       execute(sql, opts, &block)
     end
 
     # Method that should be used when issuing a INSERT
     # statement.  By default, calls execute_dui.
+    # This method should not be called directly by user code.
     def execute_insert(sql, opts={}, &block)
       execute_dui(sql, opts, &block)
     end
@@ -293,12 +299,12 @@ module Sequel
     #
     # The method returns a dataset instance:
     #
-    #   DB.fetch('SELECT * FROM items').print
+    #   DB.fetch('SELECT * FROM items').all
     #
     # Fetch can also perform parameterized queries for protection against SQL
     # injection:
     #
-    #   DB.fetch('SELECT * FROM items WHERE name = ?', my_name).print
+    #   DB.fetch('SELECT * FROM items WHERE name = ?', my_name).all
     def fetch(sql, *args, &block)
       ds = dataset.with_sql(sql, *args)
       ds.each(&block) if block
@@ -375,22 +381,11 @@ module Sequel
       @loggers.each{|logger| logger.info(message)}
     end
 
-    # Return the first logger or nil if no loggers are being used.
-    # Should only be used for backwards compatibility.
-    def logger
-      @loggers.first
-    end
-
-    # Replace the array of loggers with the given logger(s).
+    # Remove any existing loggers and just use the given logger.
     def logger=(logger)
       @loggers = Array(logger)
     end
 
-    # Returns true unless the database is using a single-threaded connection pool.
-    def multi_threaded?
-      !@single_threaded
-    end
-    
     # Whether to quote identifiers (columns and tables) for this database
     def quote_identifiers=(v)
       reset_schema_utility_dataset
@@ -628,6 +623,8 @@ module Sequel
       :downcase
     end
     
+    # Whether to quote identifiers by default for this database, true
+    # by default.
     def quote_identifiers_default
       true
     end

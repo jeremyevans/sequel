@@ -1,5 +1,7 @@
 === HEAD
 
+* Deprecate Database #multi_threaded? and #logger (jeremyevans)
+
 * Make Dataset#where always affect the WHERE clause (jeremyevans)
 
 * Deprecate Object#blank? and related extensions, require 'sequel/extensions/blank' to get them back (jeremyevans)

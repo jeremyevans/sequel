@@ -81,6 +81,16 @@ module Sequel
       Deprecation.deprecate('Sequel::Database#query', 'require "sequel/extensions/query" first')
       dataset.query(&block)
     end
+
+    def logger
+      Deprecation.deprecate('Sequel::Database#logger', 'Use Sequel::Database#loggers')
+      @loggers.first
+    end
+
+    def multi_threaded?
+      Deprecation.deprecate('Sequel::Database#multi_threaded?', 'Use !database.single_threaded?')
+      !@single_threaded
+    end
   end
 
   class Dataset
