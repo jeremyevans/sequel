@@ -1,5 +1,7 @@
 === HEAD
 
+* Fix aliasing columns in the JDBC adapter (per.melin) (#263)
+
 * Make Database#rename_table remove the cached schema entry for the table (jeremyevans)
 
 * Make Database schema sql methods private (jeremyevans)
