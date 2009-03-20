@@ -3,14 +3,19 @@ module Sequel
     COMMA_SEPARATOR = ', '.freeze
     COUNT_OF_ALL_AS_COUNT = SQL::Function.new(:count, LiteralString.new('*'.freeze)).as(:count)
 
-    # Returns the first record matching the conditions.
+    # Returns the first record matching the conditions. Examples:
+    #
+    #   ds[:id=>1] => {:id=1}
     def [](*conditions)
       Deprecation.deprecate('Using an Integer argument to Dataset#[] is deprecated and will raise an error in a future version. Use Dataset#first.') if conditions.length == 1 and conditions.is_a?(Integer)
+      Deprecation.deprecate('Using Dataset#[] without an argument is deprecated and will raise an error in a future version. Use Dataset#first.') if conditions.length == 0
       first(*conditions)
     end
 
     # Update all records matching the conditions
-    # with the values specified.
+    # with the values specified. Examples:
+    #
+    #   ds[:id=>1] = {:id=>2} # SQL: UPDATE ... SET id = 2 WHERE id = 1
     def []=(conditions, values)
       filter(conditions).update(values)
     end
@@ -20,20 +25,18 @@ module Sequel
       get{|o| o.avg(column)}
     end
     
-    # Returns true if no records exists in the dataset
+    # Returns true if no records exist in the dataset, false otherwise
     def empty?
       get(1).nil?
     end
     
-    # Returns the first record in the dataset. If a numeric argument is
+    # If a integer argument is
     # given, it is interpreted as a limit, and then returns all 
     # matching records up to that limit.  If no argument is passed,
     # it returns the first matching record.  If any other type of
     # argument(s) is passed, it is given to filter and the
     # first matching record is returned. If a block is given, it is used
-    # to filter the dataset before returning anything.
-    #
-    # Examples:
+    # to filter the dataset before returning anything.  Examples:
     # 
     #   ds.first => {:id=>7}
     #   ds.first(2) => [{:id=>6}, {:id=>4}]
@@ -62,12 +65,20 @@ module Sequel
     end
 
     # Return the column value for the first matching record in the dataset.
+    # Raises an error if both an argument and block is given.
+    #
+    #   ds.get(:id)
+    #   ds.get{|o| o.sum(:id)}
     def get(column=nil, &block)
       raise(Error, 'must provide argument or block to Dataset#get, not both') if column && block
       (column ? select(column) : select(&block)).single_value
     end
 
-    # Returns a dataset grouped by the given column with count by group.
+    # Returns a dataset grouped by the given column with count by group,
+    # order by the count of records.  Examples:
+    #
+    #   ds.group_and_count(:name) => [{:name=>'a', :count=>1}, ...]
+    #   ds.group_and_count(:first_name, :last_name) => [{:first_name=>'a', :last_name=>'b', :count=>1}, ...]
     def group_and_count(*columns)
       group(*columns).select(*(columns + [COUNT_OF_ALL_AS_COUNT])).order(:count)
     end
@@ -88,10 +99,15 @@ module Sequel
     end
     
     # Maps column values for each record in the dataset (if a column name is
-    # given), or performs the stock mapping functionality of Enumerable.
-    def map(column_name = nil, &block)
-      if column_name
-        super(){|r| r[column_name]}
+    # given), or performs the stock mapping functionality of Enumerable. 
+    # Raises an error if both an argument and block are given. Examples:
+    #
+    #   ds.map(:id) => [1, 2, 3, ...]
+    #   ds.map{|r| r[:id] * 2} => [2, 4, 6, ...]
+    def map(column=nil, &block)
+      Deprecation.deprecate('Using Dataset#map with an argument and a block is deprecated and will raise an error in a future version. Use an argument or a block, not both.') if column && block
+      if column
+        super(){|r| r[column]}
       else
         super(&block)
       end
@@ -213,7 +229,7 @@ module Sequel
     #
     # This does not use a CSV library or handle quoting of values in
     # any way.  If any values in any of the rows could include commas or line
-    # endings, you probably shouldn't use this.
+    # endings, you shouldn't use this.
     def to_csv(include_column_titles = true)
       n = naked
       cols = n.columns

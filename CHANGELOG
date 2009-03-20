@@ -1,5 +1,7 @@
 === HEAD
 
+* Deprecate Dataset#[] when called without an argument, and Dataset#map when called with an argument and a block (jeremyevans)
+
 * Fix aliasing columns in the JDBC adapter (per.melin) (#263)
 
 * Make Database#rename_table remove the cached schema entry for the table (jeremyevans)
