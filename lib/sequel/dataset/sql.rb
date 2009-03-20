@@ -20,6 +20,8 @@ module Sequel
     # Adds an further filter to an existing filter using AND. If no filter 
     # exists an error is raised. This method is identical to #filter except
     # it expects an existing filter.
+    #
+    #   ds.filter(:a).and(:b) # SQL: WHERE a AND b
     def and(*cond, &block)
       raise(Error::NoExistingFilter, "No existing filter found.") unless @opts[:having] || @opts[:where]
       filter(*cond, &block)
@@ -111,6 +113,9 @@ module Sequel
     # output.  If arguments are provided, uses a DISTINCT ON clause,
     # in which case it will only be distinct on those columns, instead
     # of all returned columns.
+    #
+    #  dataset.distinct # SQL: SELECT DISTINCT * FROM items
+    #  dataset.order(:id).distinct(:id) # SQL: SELECT DISTINCT ON (id) * FROM items ORDER BY id
     def distinct(*args)
       clone(:distinct => args)
     end
@@ -166,7 +171,10 @@ module Sequel
     #   probably created using the Sequel expression filter DSL.
     #
     # filter also takes a block, which should return one of the above argument
-    # types, and is treated the same way. If both a block and regular argument
+    # types, and is treated the same way.  This block yields a virtual row object,
+    # which is easy to use to create identifiers and functions.
+    #
+    # If both a block and regular argument
     # are provided, they get ANDed together.
     #
     # Examples:
@@ -214,6 +222,9 @@ module Sequel
     end
 
     # Returns a copy of the dataset with the source changed.
+    #
+    #   dataset.from(:blah) # SQL: SELECT * FROM blah
+    #   dataset.from(:blah, :foo) # SQL: SELECT * FROM blah, foo
     def from(*source)
       clone(:from => source)
     end
@@ -241,19 +252,27 @@ module Sequel
     # in some databases).  See Sequel::SQL::StringExpression.like.  Note that the
     # total number of pattern matches will be cols.length * terms.length,
     # which could cause performance issues.
+    #
+    #   dataset.grep(:a, '%test%') # SQL: SELECT * FROM items WHERE a LIKE '%test%'
+    #   dataset.grep([:a, :b], %w'%test% foo') # SQL: SELECT * FROM items WHERE a LIKE '%test%' OR a LIKE 'foo' OR b LIKE '%test%' OR b LIKE 'foo' 
     def grep(cols, terms)
       filter(SQL::BooleanExpression.new(:OR, *Array(cols).collect{|c| SQL::StringExpression.like(c, *terms)}))
     end
 
     # Returns a copy of the dataset with the results grouped by the value of 
-    # the given columns
+    # the given columns.
+    #
+    #   dataset.group(:id) # SELECT * FROM items GROUP BY id
+    #   dataset.group(:id, :name) # SELECT * FROM items GROUP BY id, name
     def group(*columns)
       clone(:group => columns)
     end
-    alias_method :group_by, :group
+    alias group_by group
 
     # Returns a copy of the dataset with the HAVING conditions changed. Raises 
     # an error if the dataset has not been grouped. See #filter for argument types.
+    #
+    #   dataset.group(:sum).having(:sum=>10) # SQL: SELECT * FROM items GROUP BY sum HAVING sum = 10 
     def having(*cond, &block)
       raise(Error::InvalidOperation, "Can only specify a HAVING clause on a grouped dataset") unless @opts[:group]
       _filter(:having, *cond, &block)
@@ -275,7 +294,7 @@ module Sequel
     # the resulting statement includes column names. If no values are given, 
     # the resulting statement includes a DEFAULT VALUES clause.
     #
-    #   dataset.insert_sql() #=> 'INSERT INTO items DEFAULT VALUES'
+    #   dataset.insert_sql #=> 'INSERT INTO items DEFAULT VALUES'
     #   dataset.insert_sql(1,2,3) #=> 'INSERT INTO items VALUES (1, 2, 3)'
     #   dataset.insert_sql(:a => 1, :b => 2) #=>
     #     'INSERT INTO items (a, b) VALUES (1, 2)'
@@ -369,7 +388,7 @@ module Sequel
 
     # Returns a joined dataset.  Uses the following arguments:
     #
-    # * type - The type of join to do (:inner, :left_outer, :right_outer, :full)
+    # * type - The type of join to do (e.g. :inner)
     # * table - Depends on type:
     #   * Dataset - a subselect is performed with an alias of tN for some value of N
     #   * Model (or anything responding to :table_name) - table.table_name
@@ -445,6 +464,9 @@ module Sequel
     # If given an integer, the dataset will contain only the first l results.
     # If given a range, it will contain only those at offsets within that
     # range. If a second argument is given, it is used as an offset.
+    #
+    #   dataset.limit(10) # SQL: SELECT * FROM items LIMIT 10
+    #   dataset.limit(10, 20) # SQL: SELECT * FROM items LIMIT 10 OFFSET 20
     def limit(l, o = nil)
       return from_self.limit(l, o) if @opts[:sql]
 
@@ -524,6 +546,8 @@ module Sequel
     
     # Adds an alternate filter to an existing filter using OR. If no filter 
     # exists an error is raised.
+    #
+    #   dataset.filter(:a).or(:b) # SQL: SELECT * FROM items WHERE a OR b
     def or(*cond, &block)
       clause = (@opts[:having] ? :having : :where)
       cond = cond.first if cond.size == 1
@@ -536,7 +560,8 @@ module Sequel
 
     # Returns a copy of the dataset with the order changed. If a nil is given
     # the returned dataset has no order. This can accept multiple arguments
-    # of varying kinds, and even SQL functions.
+    # of varying kinds, and even SQL functions.  If a block is given, it is treated
+    # as a virtual row block, similar to filter.
     #
     #   ds.order(:name).sql #=> 'SELECT * FROM items ORDER BY name'
     #   ds.order(:a, :b).sql #=> 'SELECT * FROM items ORDER BY a, b'
@@ -544,7 +569,7 @@ module Sequel
     #   ds.order(:a + :b).sql #=> 'SELECT * FROM items ORDER BY (a + b)'
     #   ds.order(:name.desc).sql #=> 'SELECT * FROM items ORDER BY name DESC'
     #   ds.order(:name.asc).sql #=> 'SELECT * FROM items ORDER BY name ASC'
-    #   ds.order(:arr|1).sql #=> 'SELECT * FROM items ORDER BY arr[1]'
+    #   ds.order{|o| o.sum(:name)}.sql #=> 'SELECT * FROM items ORDER BY sum(name)'
     #   ds.order(nil).sql #=> 'SELECT * FROM items'
     def order(*columns, &block)
       columns += Array(virtual_row_block_call(block)) if block
@@ -554,6 +579,9 @@ module Sequel
     
     # Returns a copy of the dataset with the order columns added
     # to the existing order.
+    #
+    #   ds.order(:a).order(:b).sql #=> 'SELECT * FROM items ORDER BY b'
+    #   ds.order(:a).order_more(:b).sql #=> 'SELECT * FROM items ORDER BY a, b'
     def order_more(*columns, &block)
       order(*Array(@opts[:order]).concat(columns), &block)
     end
@@ -607,7 +635,7 @@ module Sequel
     def reverse_order(*order)
       order(*invert_order(order.empty? ? @opts[:order] : order))
     end
-    alias_method :reverse, :reverse_order
+    alias reverse reverse_order
 
     # Split the schema information from the table
     def schema_and_table(table_name)
@@ -628,25 +656,36 @@ module Sequel
     end
 
     # Returns a copy of the dataset with the columns selected changed
-    # to the given columns.
+    # to the given columns. This also takes a virtual row block,
+    # similar to filter.
+    #
+    #   dataset.select(:a) # SELECT a FROM items
+    #   dataset.select(:a, :b) # SELECT a, b FROM items
+    #   dataset.select{|o| o.a, o.sum(:b)} # SELECT a, sum(b) FROM items
     def select(*columns, &block)
       columns += Array(virtual_row_block_call(block)) if block
       clone(:select => columns)
     end
     
     # Returns a copy of the dataset selecting the wildcard.
+    #
+    #   dataset.select(:a).select_all # SELECT * FROM items
     def select_all
       clone(:select => nil)
     end
 
     # Returns a copy of the dataset with the given columns added
     # to the existing selected columns.
+    #
+    #   dataset.select(:a).select(:b) # SELECT b FROM items
+    #   dataset.select(:a).select_more(:b) # SELECT a, b FROM items
     def select_more(*columns, &block)
       select(*Array(@opts[:select]).concat(columns), &block)
     end
     
-    # Formats a SELECT statement using the given options and the dataset
-    # options.
+    # Formats a SELECT statement
+    #
+    #   dataset.select_sql # => "SELECT * FROM items"
     def select_sql(opts = (defarg=true;nil))
       Deprecation.deprecate("Calling Dataset#select_sql with an argument is deprecated and will raise an error in a future version.  Use dataset.clone(opts).select_sql.") unless defarg
       opts = opts ? @opts.merge(opts) : @opts
@@ -668,6 +707,8 @@ module Sequel
     end
 
     # Returns a copy of the dataset with no filters (HAVING or WHERE clause) applied.
+    # 
+    #   dataset.group(:a).having(:a=>1).where(:b).unfiltered # SELECT * FROM items
     def unfiltered
       clone(:where => nil, :having => nil)
     end
@@ -682,6 +723,8 @@ module Sequel
     end
 
     # Returns a copy of the dataset with no order.
+    # 
+    #   dataset.order(:a).unordered # SELECT * FROM items
     def unordered
       order(nil)
     end
@@ -690,8 +733,6 @@ module Sequel
     #
     #   dataset.update_sql(:price => 100, :category => 'software') #=>
     #     "UPDATE items SET price = 100, category = 'software'"
-    #
-    # Accepts a block, but such usage is discouraged.
     #
     # Raises an error if the dataset is grouped or includes more
     # than one table.
@@ -729,12 +770,17 @@ module Sequel
     end
 
     # Add a condition to the WHERE clause.  See #filter for argument types.
+    #
+    #   dataset.group(:a).having(:a).filter(:b) # SELECT * FROM items GROUP BY a HAVING a AND b
+    #   dataset.group(:a).having(:a).where(:b) # SELECT * FROM items WHERE b GROUP BY a HAVING a
     def where(*cond, &block)
       _filter(:where, *cond, &block)
     end
 
     # Returns a copy of the dataset with the static SQL used.  This is useful if you want
     # to keep the same row_proc/transform/graph, but change the SQL used to custom SQL.
+    #
+    #   dataset.with_sql('SELECT * FROM foo') # SELECT * FROM foo
     def with_sql(sql, *args)
       sql = SQL::PlaceholderLiteralString.new(sql, args) unless args.empty?
       clone(:sql=>sql)
@@ -743,7 +789,7 @@ module Sequel
     [:inner, :full_outer, :right_outer, :left_outer].each do |jtype|
       class_eval("def #{jtype}_join(*args, &block); join_table(:#{jtype}, *args, &block) end")
     end
-    alias_method :join, :inner_join
+    alias join inner_join
 
     protected
 
@@ -931,11 +977,10 @@ module Sequel
     # notation in order to express qualified (two underscores) and aliased
     # (three underscores) columns:
     #
-    #   ds = DB[:items]
-    #   :abc.to_column_ref(ds) #=> "abc"
-    #   :abc___a.to_column_ref(ds) #=> "abc AS a"
-    #   :items__abc.to_column_ref(ds) #=> "items.abc"
-    #   :items__abc___a.to_column_ref(ds) #=> "items.abc AS a"
+    #   dataset.literal(:abc) #=> "abc"
+    #   dataset.literal(:abc___a) #=> "abc AS a"
+    #   dataset.literal(:items__abc) #=> "items.abc"
+    #   dataset.literal(:items__abc___a) #=> "items.abc AS a"
     def literal_symbol(v)
       c_table, column, c_alias = split_symbol(v)
       qc = "#{"#{quote_identifier(c_table)}." if c_table}#{quote_identifier(column)}"
