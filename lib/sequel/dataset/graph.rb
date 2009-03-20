@@ -9,7 +9,7 @@ module Sequel
     #   # CREATE TABLE artists (id INTEGER, name TEXT);
     #   # CREATE TABLE albums (id INTEGER, name TEXT, artist_id INTEGER);
     #   DB[:artists].left_outer_join(:albums, :artist_id=>:id).first
-    #   => {:id=>(albums.id||artists.id), :name=>(albums.name||artist.names), :artist_id=>albums.artist_id}
+    #   => {:id=>albums.id, :name=>albums.name, :artist_id=>albums.artist_id}
     #   DB[:artists].graph(:albums, :artist_id=>:id).first
     #   => {:artists=>{:id=>artists.id, :name=>artists.name}, :albums=>{:id=>albums.id, :name=>albums.name, :artist_id=>albums.artist_id}}
     #
@@ -30,7 +30,7 @@ module Sequel
     #
     # Arguments:
     # * dataset -  Can be a symbol (specifying a table), another dataset,
-    #   or an object that responds to .dataset and yields a symbol or a dataset
+    #   or an object that responds to .dataset and return a symbol or a dataset
     # * join_conditions - Any condition(s) allowed by join_table.
     # * options -  A hash of graph options.  The following options are currently used:
     #   * :implicit_qualifier - The qualifier of implicit conditions, see #join_table.
@@ -147,14 +147,16 @@ module Sequel
     # graphed dataset, and must be used instead of .select whenever
     # graphing is used. Example:
     #
-    #   DB[:artists].graph(:albums, :artist_id=>:id).set_graph_aliases(:artist_name=>[:artists, :name], :album_name=>[:albums, :name]).first
-    #   => {:artists=>{:name=>artists.name}, :albums=>{:name=>albums.name}}
+    #   DB[:artists].graph(:albums, :artist_id=>:id).set_graph_aliases(:artist_name=>[:artists, :name], :album_name=>[:albums, :name], :forty_two=>[:albums, :fourtwo, 42]).first
+    #   => {:artists=>{:name=>artists.name}, :albums=>{:name=>albums.name, :fourtwo=>42}}
     #
     # Arguments:
     # * graph_aliases - Should be a hash with keys being symbols of
-    #   column aliases, and values being arrays with two symbol elements.
-    #   The first element of the array should be the table alias,
-    #   and the second should be the actual column name.
+    #   column aliases, and values being arrays with two or three elements.
+    #   The first element of the array should be the table alias symbol,
+    #   and the second should be the actual column name symbol. If the array
+    #   has a third element, it is used as the value returned, instead of
+    #   table_alias.column_name.
     def set_graph_aliases(graph_aliases)
       ds = select(*graph_alias_columns(graph_aliases))
       ds.opts[:graph_aliases] = graph_aliases
