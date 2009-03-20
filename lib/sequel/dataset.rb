@@ -1,23 +1,22 @@
 module Sequel
-  # A Dataset represents a view of a the data in a database, constrained by
-  # specific parameters such as filtering conditions, order, etc. Datasets
+  # A dataset represents an SQL query, or more generally, an abstract
+  # set of rows in the database.  Datasets
   # can be used to create, retrieve, update and delete records.
   # 
   # Query results are always retrieved on demand, so a dataset can be kept
-  # around and reused indefinitely:
+  # around and reused indefinitely (datasets never cache results):
   #
   #   my_posts = DB[:posts].filter(:author => 'david') # no records are retrieved
-  #   p my_posts.all # records are now retrieved
-  #   ...
-  #   p my_posts.all # records are retrieved again
+  #   my_posts.all # records are retrieved
+  #   my_posts.all # records are retrieved again
   #
-  # In order to provide this functionality, dataset methods such as where, 
-  # select, order, etc. return modified copies of the dataset, so you can
-  # use different datasets to access data:
+  # Most dataset methods return modified copies of the dataset (functional style), so you can
+  # reuse different datasets to access data:
   #
   #   posts = DB[:posts]
   #   davids_posts = posts.filter(:author => 'david')
   #   old_posts = posts.filter('stamp < ?', Date.today - 7)
+  #   davids_old_posts = davids_posts.filter('stamp < ?', Date.today - 7)
   #
   # Datasets are Enumerable objects, so they can be manipulated using any
   # of the Enumerable methods, such as map, inject, etc.
@@ -80,21 +79,18 @@ module Sequel
     attr_writer :quote_identifiers
     
     # The row_proc for this database, should be a Proc that takes
-    # a single hash argument and returns the object you want to
-    # fetch_rows to return.
+    # a single hash argument and returns the object you want
+    # each to return.
     attr_accessor :row_proc
 
-    # Constructs a new instance of a dataset with an associated database and 
-    # options. Datasets are usually constructed by invoking Database methods:
+    # Constructs a new Dataset instance with an associated database and 
+    # options. Datasets are usually constructed by invoking the Database#[] method:
     #
     #   DB[:posts]
     #
-    # Or:
-    #
-    #   DB.dataset # the returned dataset is blank
-    #
     # Sequel::Dataset is an abstract class that is not useful by itself. Each
-    # database adaptor should provide a descendant class of Sequel::Dataset.
+    # database adaptor should provide a subclass of Sequel::Dataset, and have
+    # the Database#dataset method return an instance of that class.
     def initialize(db, opts = nil)
       @db = db
       @quote_identifiers = db.quote_identifiers? if db.respond_to?(:quote_identifiers?)
@@ -124,8 +120,9 @@ module Sequel
       insert(*args)
     end
 
-    # Return the dataset as a column with the given alias, so it can be used in the
-    # SELECT clause. This dataset should result in a single row and a single column.
+    # Return the dataset as an aliased expression with the given alias. You can
+    # use this as a FROM or JOIN dataset, or as a column if this dataset
+    # returns a single row and column.
     def as(aliaz)
       ::Sequel::SQL::AliasedExpression.new(self, aliaz)
     end
@@ -151,12 +148,15 @@ module Sequel
       c
     end
     
-    # Returns the columns in the result set in their true order.
+    # Returns the columns in the result set in order.
     # If the columns are currently cached, returns the cached value. Otherwise,
     # a SELECT query is performed to get a single row. Adapters are expected
     # to fill the columns cache with the column information when a query is performed.
-    # If the dataset does not have any rows, this will be an empty array.
-    # If you are looking for all columns for a single table, see Database#schema.
+    # If the dataset does not have any rows, this may be an empty array depending on how
+    # the adapter is programmed.
+    #
+    # If you are looking for all columns for a single table and maybe some information about
+    # each column (e.g. type), see Database#schema.
     def columns
       return @columns if @columns
       ds = unfiltered.unordered.clone(:distinct => nil, :limit => 1)
@@ -186,8 +186,8 @@ module Sequel
       execute_dui(defarg ? delete_sql : delete_sql(opts))
     end
     
-    # Iterates over the records in the dataset and returns set.  If opts
-    # have been passed that modify the columns, reset the column information.
+    # Iterates over the records in the dataset as they are yielded from the
+    # database adapter, and returns self.
     def each(opts = (defarg=true;nil), &block)
       Deprecation.deprecate("Calling Dataset#each with an argument is deprecated and will raise an error in a future version.  Use dataset.clone(opts).each.") unless defarg
       if opts && opts.keys.any?{|o| COLUMN_CHANGE_OPTS.include?(o)}
@@ -204,8 +204,7 @@ module Sequel
     end
 
     # Executes a select query and fetches records, passing each record to the
-    # supplied block.  The yielded records are generally hashes with symbol keys,
-    # but that is adapter dependent.
+    # supplied block.  The yielded records should be hashes with symbol keys.
     def fetch_rows(sql, &block)
       raise NotImplementedError, NOTIMPL_MSG
     end
@@ -236,8 +235,8 @@ module Sequel
     end
     
     # Set the server for this dataset to use.  Used to pick a specific database
-    # shard to run a query against, or to override the default SELECT uses
-    # :read_only database and all other queries use the :default database.
+    # shard to run a query against, or to override the default (which is SELECT uses
+    # :read_only database and all other queries use the :default database).
     def server(servr)
       clone(:server=>servr)
     end
