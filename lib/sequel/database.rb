@@ -92,7 +92,7 @@ module Sequel
     ### Class Methods ###
 
     # The Database subclass for the given adapter scheme.
-    # Raises Sequel::Error::AdapterNotFound if the adapter
+    # Raises Sequel::AdapterNotFound if the adapter
     # could not be loaded.
     def self.adapter_class(scheme)
       scheme = scheme.to_s.gsub('-', '_').to_sym
@@ -102,12 +102,12 @@ module Sequel
         begin
           Sequel.require "adapters/#{scheme}"
         rescue LoadError => e
-          raise Error::AdapterNotFound, "Could not load #{scheme} adapter:\n  #{e.message}"
+          raise AdapterNotFound, "Could not load #{scheme} adapter:\n  #{e.message}"
         end
         
         # make sure we actually loaded the adapter
         unless klass = ADAPTER_MAP[scheme]
-          raise Error::AdapterNotFound, "Could not load #{scheme} adapter"
+          raise AdapterNotFound, "Could not load #{scheme} adapter"
         end
       end
       klass
@@ -527,7 +527,7 @@ module Sequel
     
     # Typecast the value to the given column_type. Can be overridden in
     # adapters to support database specific column types.
-    # This method should raise Sequel::Error::InvalidValue if assigned value
+    # This method should raise Sequel::InvalidValue if assigned value
     # is invalid.
     def typecast_value(column_type, value)
       return nil if value.nil?
@@ -546,7 +546,7 @@ module Sequel
           when String, Numeric
             BigDecimal.new(value.to_s)
           else
-            raise Sequel::Error::InvalidValue, "invalid value for BigDecimal: #{value.inspect}"
+            raise Sequel::InvalidValue, "invalid value for BigDecimal: #{value.inspect}"
           end
         when :boolean
           case value
@@ -564,7 +564,7 @@ module Sequel
           when String
             Sequel.string_to_date(value)
           else
-            raise Sequel::Error::InvalidValue, "invalid value for Date: #{value.inspect}"
+            raise Sequel::InvalidValue, "invalid value for Date: #{value.inspect}"
           end
         when :time
           case value
@@ -573,10 +573,10 @@ module Sequel
           when String
             Sequel.string_to_time(value)
           else
-            raise Sequel::Error::InvalidValue, "invalid value for Time: #{value.inspect}"
+            raise Sequel::InvalidValue, "invalid value for Time: #{value.inspect}"
           end
         when :datetime
-          raise(Sequel::Error::InvalidValue, "invalid value for Datetime: #{value.inspect}") unless [DateTime, Date, Time, String].any?{|c| value.is_a?(c)}
+          raise(Sequel::InvalidValue, "invalid value for Datetime: #{value.inspect}") unless [DateTime, Date, Time, String].any?{|c| value.is_a?(c)}
           if Sequel.datetime_class === value
             # Already the correct class, no need to convert
             value
@@ -591,7 +591,7 @@ module Sequel
           value
         end
       rescue ArgumentError, TypeError => exp
-        e = Sequel::Error::InvalidValue.new("#{exp.class} #{exp.message}")
+        e = Sequel::InvalidValue.new("#{exp.class} #{exp.message}")
         e.set_backtrace(exp.backtrace)
         raise e
       end
@@ -771,9 +771,9 @@ module Sequel
       opts
     end
 
-    # Raise a database error unless the exception is an Error::Rollback.
+    # Raise a database error unless the exception is an Rollback.
     def transaction_error(e, *classes)
-      raise_error(e, :classes=>classes) unless Error::Rollback === e
+      raise_error(e, :classes=>classes) unless Rollback === e
     end
   end
 end

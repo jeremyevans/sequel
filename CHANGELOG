@@ -1,6 +1,8 @@
 === HEAD
 
-* Remove Error::InvalidStatement, not used for some time (jeremyevans)
+* Denamespace Sequel::Error decendants (e.g. use Sequel::Rollback instead of Sequel::Error::Rollback) (jeremyevans)
+
+* Deprecate Error::InvalidTransform, Error::NoExistingFilter, and Error::InvalidStatement (jeremyevans)
 
 * Deprecate Dataset#[] when called without an argument, and Dataset#map when called with an argument and a block (jeremyevans)
 

@@ -143,7 +143,7 @@ module Sequel
     begin
       Date.parse(s, Sequel.convert_two_digit_years)
     rescue => e
-      raise Error::InvalidValue, "Invalid Date value '#{self}' (#{e.message})"
+      raise InvalidValue, "Invalid Date value '#{self}' (#{e.message})"
     end
   end
 
@@ -157,7 +157,7 @@ module Sequel
         datetime_class.parse(s)
       end
     rescue => e
-      raise Error::InvalidValue, "Invalid #{datetime_class} value '#{self}' (#{e.message})"
+      raise InvalidValue, "Invalid #{datetime_class} value '#{self}' (#{e.message})"
     end
   end
 
@@ -166,7 +166,7 @@ module Sequel
     begin
       Time.parse(s)
     rescue => e
-      raise Error::InvalidValue, "Invalid Time value '#{self}' (#{e.message})"
+      raise InvalidValue, "Invalid Time value '#{self}' (#{e.message})"
     end
   end
 

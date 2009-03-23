@@ -91,7 +91,7 @@ class Sequel::ConnectionPool
   # If no connection is immediately available and the pool is already using the maximum
   # number of connections, Pool#hold will block until a connection
   # is available or the timeout expires.  If the timeout expires before a
-  # connection can be acquired, a Sequel::Error::PoolTimeoutError is 
+  # connection can be acquired, a Sequel::PoolTimeout is 
   # raised.
   def hold(server=:default)
     begin
@@ -103,7 +103,7 @@ class Sequel::ConnectionPool
         return yield(conn)
       end
       until conn = acquire(t, server)
-        raise(::Sequel::Error::PoolTimeoutError) if Time.new > timeout
+        raise(::Sequel::PoolTimeout) if Time.new > timeout
         sleep sleep_time
       end
       begin

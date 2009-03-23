@@ -246,11 +246,11 @@ context "A dataset with multiple tables in its FROM clause" do
   end
 
   specify "should raise on #update_sql" do
-    proc {@dataset.update_sql(:a=>1)}.should raise_error(Sequel::Error::InvalidOperation)
+    proc {@dataset.update_sql(:a=>1)}.should raise_error(Sequel::InvalidOperation)
   end
 
   specify "should raise on #delete_sql" do
-    proc {@dataset.delete_sql}.should raise_error(Sequel::Error::InvalidOperation)
+    proc {@dataset.delete_sql}.should raise_error(Sequel::InvalidOperation)
   end
 
   specify "should generate a select query FROM all specified tables" do
@@ -613,7 +613,7 @@ context "Dataset#having" do
   end
 
   specify "should raise if the dataset is not grouped" do
-    proc {@dataset.having('avg(gdp) > 10')}.should raise_error(Sequel::Error::InvalidOperation)
+    proc {@dataset.having('avg(gdp) > 10')}.should raise_error(Sequel::InvalidOperation)
   end
 
   specify "should affect select statements" do

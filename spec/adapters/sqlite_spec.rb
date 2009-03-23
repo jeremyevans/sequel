@@ -83,7 +83,7 @@ context "An SQLite database" do
 
     proc {@db.transaction do
       @db.create_table!(:v) {text :name}
-      raise Sequel::Error::Rollback
+      raise Sequel::Rollback
     end}.should_not raise_error
     # no commit
     @db.tables.should_not include(:r)
@@ -101,7 +101,7 @@ context "An SQLite database" do
     proc {@db.transaction do
       @db.create_table!(:v) {text :name}
       @db.transaction do
-        raise Sequel::Error::Rollback # should roll back the top-level transaction
+        raise Sequel::Rollback # should roll back the top-level transaction
       end
     end}.should_not raise_error
     # no commit

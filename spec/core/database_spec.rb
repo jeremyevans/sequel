@@ -221,7 +221,7 @@ context "Database#disconnect" do
 end
 
 context "Database#connect" do
-  specify "should raise Sequel::Error::NotImplemented" do
+  specify "should raise NotImplementedError" do
     proc {Sequel::Database.new.connect}.should raise_error(NotImplementedError)
   end
 end
@@ -298,7 +298,7 @@ context "Database#dataset" do
 end
 
 context "Database#execute" do
-  specify "should raise Sequel::Error::NotImplemented" do
+  specify "should raise NotImplementedError" do
     proc {Sequel::Database.new.execute('blah blah')}.should raise_error(NotImplementedError)
     proc {Sequel::Database.new << 'blah blah'}.should raise_error(NotImplementedError)
   end
@@ -648,10 +648,10 @@ context "Database#transaction" do
     proc {@db.transaction {raise RuntimeError}}.should raise_error(RuntimeError)
   end
   
-  specify "should issue ROLLBACK if Sequel::Error::Rollback is called in the transaction" do
+  specify "should issue ROLLBACK if Sequel::Rollback is called in the transaction" do
     @db.transaction do
       @db.drop_table(:a)
-      raise Sequel::Error::Rollback
+      raise Sequel::Rollback
       @db.drop_table(:b)
     end
     
@@ -781,11 +781,11 @@ end
 
 context "An unknown database scheme" do
   specify "should raise an error in Sequel::Database.connect" do
-    proc {Sequel::Database.connect('ddd://localhost/db')}.should raise_error(Sequel::Error::AdapterNotFound)
+    proc {Sequel::Database.connect('ddd://localhost/db')}.should raise_error(Sequel::AdapterNotFound)
   end
 
   specify "should raise an error in Sequel.connect" do
-    proc {Sequel.connect('ddd://localhost/db')}.should raise_error(Sequel::Error::AdapterNotFound)
+    proc {Sequel.connect('ddd://localhost/db')}.should raise_error(Sequel::AdapterNotFound)
   end
 end
 
@@ -800,7 +800,7 @@ context "A broken adapter (lib is there but the class is not)" do
   end
   
   specify "should raise an error" do
-    proc {Sequel.connect('blah://blow')}.should raise_error(Sequel::Error::AdapterNotFound)
+    proc {Sequel.connect('blah://blow')}.should raise_error(Sequel::AdapterNotFound)
   end
 end
 
@@ -1212,13 +1212,13 @@ context "Database#typecast_value" do
   setup do
     @db = Sequel::Database.new
   end
-  specify "should raise an Error::InvalidValue when given an invalid value" do
-    proc{@db.typecast_value(:integer, "13a")}.should raise_error(Sequel::Error::InvalidValue)
-    proc{@db.typecast_value(:float, "4.e2")}.should raise_error(Sequel::Error::InvalidValue)
-    proc{@db.typecast_value(:decimal, :invalid_value)}.should raise_error(Sequel::Error::InvalidValue)
-    proc{@db.typecast_value(:date, Object.new)}.should raise_error(Sequel::Error::InvalidValue)
-    proc{@db.typecast_value(:date, 'a')}.should raise_error(Sequel::Error::InvalidValue)
-    proc{@db.typecast_value(:time, Date.new)}.should raise_error(Sequel::Error::InvalidValue)
-    proc{@db.typecast_value(:datetime, 4)}.should raise_error(Sequel::Error::InvalidValue)
+  specify "should raise an InvalidValue when given an invalid value" do
+    proc{@db.typecast_value(:integer, "13a")}.should raise_error(Sequel::InvalidValue)
+    proc{@db.typecast_value(:float, "4.e2")}.should raise_error(Sequel::InvalidValue)
+    proc{@db.typecast_value(:decimal, :invalid_value)}.should raise_error(Sequel::InvalidValue)
+    proc{@db.typecast_value(:date, Object.new)}.should raise_error(Sequel::InvalidValue)
+    proc{@db.typecast_value(:date, 'a')}.should raise_error(Sequel::InvalidValue)
+    proc{@db.typecast_value(:time, Date.new)}.should raise_error(Sequel::InvalidValue)
+    proc{@db.typecast_value(:datetime, 4)}.should raise_error(Sequel::InvalidValue)
   end
 end

@@ -75,7 +75,7 @@ module Sequel
           end
         end
       end
-      alias_method :do, :execute
+      alias do execute
       
       def transaction(opts={})
         unless opts.is_a?(Hash)
@@ -90,7 +90,7 @@ module Sequel
             yield(conn)
           rescue => e
             conn.rollback
-            raise e unless Error::Rollback === e
+            raise e unless Rollback === e
           ensure
             conn.commit unless e
             conn.autocommit = true

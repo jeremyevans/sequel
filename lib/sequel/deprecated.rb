@@ -258,6 +258,12 @@ module Sequel
       print(*args)
     end
   end
+
+  class Error
+    class InvalidStatement < Error; end
+    class InvalidTransform < Error; end
+    class NoExistingFilter < InvalidOperation; end
+  end
 end
 
 if RUBY_VERSION < '1.9.0'

@@ -230,7 +230,7 @@ context "A PostgreSQL dataset" do
         @d << {:name => '2'}
         POSTGRES_DB.transaction do
           @d << {:name => '3'}
-          raise Sequel::Error::Rollback
+          raise Sequel::Rollback
         end
       end
       @d << {:name => '4'}
@@ -238,7 +238,7 @@ context "A PostgreSQL dataset" do
         @d << {:name => '6'}
         POSTGRES_DB.transaction(:savepoint=>true) do
           @d << {:name => '7'}
-          raise Sequel::Error::Rollback
+          raise Sequel::Rollback
         end
       end
       @d << {:name => '5'}

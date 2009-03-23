@@ -23,7 +23,7 @@ module Sequel
     #
     #   ds.filter(:a).and(:b) # SQL: WHERE a AND b
     def and(*cond, &block)
-      raise(Error::NoExistingFilter, "No existing filter found.") unless @opts[:having] || @opts[:where]
+      raise(InvalidOperation, "No existing filter found.") unless @opts[:having] || @opts[:where]
       filter(*cond, &block)
     end
 
@@ -94,9 +94,9 @@ module Sequel
       return static_sql(opts[:sql]) if opts[:sql]
 
       if opts[:group]
-        raise Error::InvalidOperation, "Grouped datasets cannot be deleted from"
+        raise InvalidOperation, "Grouped datasets cannot be deleted from"
       elsif opts[:from].is_a?(Array) && opts[:from].size > 1
-        raise Error::InvalidOperation, "Joined datasets cannot be deleted from"
+        raise InvalidOperation, "Joined datasets cannot be deleted from"
       end
 
       sql = "DELETE FROM #{source_list(opts[:from])}"
@@ -274,7 +274,7 @@ module Sequel
     #
     #   dataset.group(:sum).having(:sum=>10) # SQL: SELECT * FROM items GROUP BY sum HAVING sum = 10 
     def having(*cond, &block)
-      raise(Error::InvalidOperation, "Can only specify a HAVING clause on a grouped dataset") unless @opts[:group]
+      raise(InvalidOperation, "Can only specify a HAVING clause on a grouped dataset") unless @opts[:group]
       _filter(:having, *cond, &block)
     end
     
@@ -550,12 +550,9 @@ module Sequel
     #   dataset.filter(:a).or(:b) # SQL: SELECT * FROM items WHERE a OR b
     def or(*cond, &block)
       clause = (@opts[:having] ? :having : :where)
+      raise(InvalidOperation, "No existing filter found.") unless @opts[clause]
       cond = cond.first if cond.size == 1
-      if @opts[clause]
-        clone(clause => SQL::BooleanExpression.new(:OR, @opts[clause], filter_expr(cond, &block)))
-      else
-        raise Error::NoExistingFilter, "No existing filter found."
-      end
+      clone(clause => SQL::BooleanExpression.new(:OR, @opts[clause], filter_expr(cond, &block)))
     end
 
     # Returns a copy of the dataset with the order changed. If a nil is given
@@ -743,9 +740,9 @@ module Sequel
       return static_sql(opts[:sql]) if opts[:sql]
 
       if opts[:group]
-        raise Error::InvalidOperation, "A grouped dataset cannot be updated"
+        raise InvalidOperation, "A grouped dataset cannot be updated"
       elsif (opts[:from].size > 1) or opts[:join]
-        raise Error::InvalidOperation, "A joined dataset cannot be updated"
+        raise InvalidOperation, "A joined dataset cannot be updated"
       end
       
       sql = "UPDATE #{source_list(@opts[:from])} SET "

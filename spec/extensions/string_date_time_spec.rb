@@ -6,8 +6,8 @@ context "String#to_time" do
     "06:30".to_time.should == Time.parse("06:30")
   end
   
-  specify "should raise Error::InvalidValue for an invalid time" do
-    proc {'0000-00-00'.to_time}.should raise_error(Sequel::Error::InvalidValue)
+  specify "should raise InvalidValue for an invalid time" do
+    proc {'0000-00-00'.to_time}.should raise_error(Sequel::InvalidValue)
   end
 end
 
@@ -29,8 +29,8 @@ context "String#to_date" do
     "July 11, 07".to_date.should == Date.parse("0007-07-11")
   end
 
-  specify "should raise Error::InvalidValue for an invalid date" do
-    proc {'0000-00-00'.to_date}.should raise_error(Sequel::Error::InvalidValue)
+  specify "should raise InvalidValue for an invalid date" do
+    proc {'0000-00-00'.to_date}.should raise_error(Sequel::InvalidValue)
   end
 end
 
@@ -52,8 +52,8 @@ context "String#to_datetime" do
     "July 11, 07 10:11:12a".to_datetime.should == DateTime.parse("0007-07-11 10:11:12a")
   end
 
-  specify "should raise Error::InvalidValue for an invalid date" do
-    proc {'0000-00-00'.to_datetime}.should raise_error(Sequel::Error::InvalidValue)
+  specify "should raise InvalidValue for an invalid date" do
+    proc {'0000-00-00'.to_datetime}.should raise_error(Sequel::InvalidValue)
   end
 end
 
@@ -85,9 +85,9 @@ context "String#to_sequel_time" do
     "July 11, 07 10:11:12a".to_sequel_time.should == DateTime.parse("0007-07-11 10:11:12a")
   end
 
-  specify "should raise Error::InvalidValue for an invalid time" do
-    proc {'0000-00-00'.to_sequel_time}.should raise_error(Sequel::Error::InvalidValue)
+  specify "should raise InvalidValue for an invalid time" do
+    proc {'0000-00-00'.to_sequel_time}.should raise_error(Sequel::InvalidValue)
     Sequel.datetime_class = DateTime
-    proc {'0000-00-00'.to_sequel_time}.should raise_error(Sequel::Error::InvalidValue)
+    proc {'0000-00-00'.to_sequel_time}.should raise_error(Sequel::InvalidValue)
   end
 end
