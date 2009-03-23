@@ -136,7 +136,7 @@ module Sequel
     def exclude(*cond, &block)
       clause = (@opts[:having] ? :having : :where)
       cond = cond.first if cond.size == 1
-      cond = cond.sql_or if (Hash === cond) || ((Array === cond) && (cond.all_two_pairs?))
+      cond = SQL::BooleanExpression.from_value_pairs(cond, :OR) if Sequel.condition_specifier?(cond)
       cond = filter_expr(cond, &block)
       cond = SQL::BooleanExpression.invert(cond)
       cond = SQL::BooleanExpression.new(:AND, @opts[clause], cond) if @opts[clause]
@@ -442,7 +442,7 @@ module Sequel
         SQL::JoinUsingClause.new(expr, type, table, table_alias)
       else
         last_alias ||= @opts[:last_joined_table] || (first_source.is_a?(Dataset) ? 't1' : first_source)
-        if Hash === expr or (Array === expr and expr.all_two_pairs?)
+        if Sequel.condition_specifier?(expr)
           expr = expr.collect do |k, v|
             k = qualified_column_name(k, table_name) if k.is_a?(Symbol)
             v = qualified_column_name(v, last_alias) if v.is_a?(Symbol)
@@ -906,7 +906,7 @@ module Sequel
 
     # SQL fragment for Array.  Treats as an expression if an array of all two pairs, or as a SQL array otherwise.
     def literal_array(v)
-      v.all_two_pairs? ? literal_expression(v.sql_expr) : array_sql(v)
+      Sequel.condition_specifier?(v) ? literal_expression(SQL::BooleanExpression.from_value_pairs(v)) : array_sql(v)
     end
 
     # SQL fragment for BigDecimal
@@ -952,7 +952,7 @@ module Sequel
 
     # SQL fragment for Hash, treated as an expression
     def literal_hash(v)
-      literal_expression(v.sql_expr)
+      literal_expression(SQL::BooleanExpression.from_value_pairs(v))
     end
 
     # SQL fragment for Integer

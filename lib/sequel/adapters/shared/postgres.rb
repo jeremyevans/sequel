@@ -453,16 +453,16 @@ module Sequel
 
       # PostgreSQL specific index SQL.
       def index_definition_sql(table_name, index)
-        index_name = index[:name] || default_index_name(table_name, index[:columns])
-        expr = literal(Array(index[:columns]))
+        cols = index[:columns]
+        index_name = index[:name] || default_index_name(table_name, cols)
+        expr = literal(Array(cols))
         unique = "UNIQUE " if index[:unique]
         index_type = index[:type]
         filter = index[:where] || index[:filter]
         filter = " WHERE #{filter_expr(filter)}" if filter
         case index_type
         when :full_text
-          cols = Array(index[:columns]).map{|x| SQL::Function.new(:COALESCE, x, '')}.sql_string_join(' ')
-          expr = "(to_tsvector(#{literal(index[:language] || 'simple')}, #{literal(cols)}))"
+          expr = "(to_tsvector(#{literal(index[:language] || 'simple')}, #{dataset.send(:full_text_string_join, cols)}))"
           index_type = :gin
         when :spatial
           index_type = :gist
@@ -517,7 +517,7 @@ module Sequel
             SQL::Function.new(:format_type, :pg_type__oid, :pg_attribute__atttypmod).as(:db_type),
             SQL::Function.new(:pg_get_expr, :pg_attrdef__adbin, :pg_class__oid).as(:default),
             SQL::BooleanExpression.new(:NOT, :pg_attribute__attnotnull).as(:allow_null),
-            SQL::Function.new(:COALESCE, {:pg_attribute__attnum => SQL::Function.new(:ANY, :pg_index__indkey)}.sql_expr, false).as(:primary_key)).
+            SQL::Function.new(:COALESCE, SQL::BooleanExpression.from_value_pairs(:pg_attribute__attnum => SQL::Function.new(:ANY, :pg_index__indkey)), false).as(:primary_key)).
           from(:pg_class).
           join(:pg_attribute, :attrelid=>:oid).
           join(:pg_type, :oid=>:atttypid).
@@ -632,8 +632,7 @@ module Sequel
       # in 8.3 by default, and available for earlier versions as an add-on).
       def full_text_search(cols, terms, opts = {})
         lang = opts[:language] || 'simple'
-        cols =  Array(cols).map{|x| SQL::Function.new(:COALESCE, x, '')}.sql_string_join(' ')
-        filter("to_tsvector(#{literal(lang)}, #{literal(cols)}) @@ to_tsquery(#{literal(lang)}, #{literal(Array(terms).join(' | '))})")
+        filter("to_tsvector(#{literal(lang)}, #{full_text_string_join(cols)}) @@ to_tsquery(#{literal(lang)}, #{literal(Array(terms).join(' | '))})")
       end
       
       # Insert given values into the database.
@@ -737,6 +736,14 @@ module Sequel
       # The version of the database server
       def server_version
         db.server_version(@opts[:server])
+      end
+
+      # Concatenate the expressions with a space in between
+      def full_text_string_join(cols)
+        cols = Array(cols).map{|x| SQL::Function.new(:COALESCE, x, '')}
+        cols = cols.zip([' '] * cols.length).flatten
+        cols.pop
+        literal(SQL::StringExpression.new(:'||', *cols))
       end
     end
   end

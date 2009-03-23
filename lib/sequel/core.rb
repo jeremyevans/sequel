@@ -64,6 +64,20 @@ module Sequel
     attr_accessor :convert_tinyint_to_bool, :convert_two_digit_years, :datetime_class, :virtual_row_instance_eval
   end
 
+  # Returns true if the passed object could be a specifier of conditions, false otherwise.
+  # Currently, Sequel considers hashes and arrays of all two pairs as
+  # condition specifiers.
+  def self.condition_specifier?(obj)
+    case obj
+    when Hash
+      true
+    when Array
+      !obj.empty? && obj.all?{|i| (Array === i) && (i.length == 2)}
+    else
+      false
+    end
+  end
+
   # Creates a new database object based on the supplied connection string
   # and optional arguments.  The specified scheme determines the database
   # class used, and the rest of the string specifies the connection options.

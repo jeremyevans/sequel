@@ -10,6 +10,14 @@ module Sequel
 
     # Base class for all SQL fragments
     class Expression
+      # Create a to_s instance method that takes a dataset, and calls
+      # the method provided on the dataset with args as the argument (self by default).
+      # Used to DRY up some code.
+      def self.to_s_method(meth, args=:self) # :nodoc:
+        class_eval("def to_s(ds); ds.#{meth}(#{args}) end", __FILE__, __LINE__)
+      end
+      private_class_method :to_s_method
+
       # Returns self, because SQL::Expression already acts like
       # LiteralString.
       def lit
@@ -68,20 +76,11 @@ module Sequel
       attr_reader :op
       
       # Set the operator symbol and arguments for this object to the ones given.
-      # Convert all args that are hashes or arrays with all two pairs to ComplexExpressions.
+      # Convert all args that are hashes or arrays with all two pairs to BooleanExpressions.
       # Raise an error if the operator doesn't allow boolean input and a boolean argument is given.
       # Raise an error if the wrong number of arguments for a given operator is used.
       def initialize(op, *args)
-        args.collect! do |a|
-          case a
-          when Hash
-            a.sql_expr
-          when Array
-            a.all_two_pairs? ? a.sql_expr : a
-          else
-            a
-          end
-        end
+        args.map!{|a| Sequel.condition_specifier?(a) ? SQL::BooleanExpression.from_value_pairs(a) : a}
         case op
         when *N_ARITY_OPERATORS
           raise(Error, "The #{op} operator requires at least 1 argument") unless args.length >= 1
@@ -95,21 +94,15 @@ module Sequel
         @op = op
         @args = args
       end
-      
-      # Delegate the creation of the resulting SQL to the given dataset,
-      # since it may be database dependent.
-      def to_s(ds)
-        ds.complex_expression_sql(@op, @args)
-      end
 
       # Returns true if the receiver is the same expression as the
       # the +other+ expression.
-      def eql?( other )
-        return other.is_a?( self.class ) &&
-          @op.eql?( other.op ) &&
-          @args.eql?( other.args )
+      def eql?(other)
+        other.is_a?(self.class) && @op.eql?(other.op) && @args.eql?(other.args)
       end
-      alias_method :==, :eql?
+      alias == eql?
+      
+      to_s_method :complex_expression_sql, '@op, @args'
     end
 
     # The base class for expressions that can be used in multiple places in
@@ -119,15 +112,15 @@ module Sequel
     
     ### Modules ###
 
-    # Methods the create aliased identifiers
+    # Methods that create aliased identifiers
     module AliasMethods
-      # Create an SQL column alias of the receiving column to the given alias.
+      # Create an SQL column alias of the receiving column or expression to the given alias.
       def as(aliaz)
         AliasedExpression.new(self, aliaz)
       end
     end
 
-    # This defines the bitwise methods &, |, ^, ~, <<, and >>.  Because these
+    # This defines the bitwise methods: &, |, ^, ~, <<, and >>.  Because these
     # methods overlap with the standard BooleanMethods methods, and they only
     # make sense for numbers, they are only included in NumericExpression.
     module BitwiseMethods
@@ -177,18 +170,19 @@ module Sequel
 
     # Holds methods that are used to cast objects to differen SQL types.
     module CastMethods 
-      # Cast the reciever to the given SQL type
+      # Cast the reciever to the given SQL type.  You can specify a ruby class as a type,
+      # and it is handled similarly to using a database independent type in the schema methods.
       def cast(sql_type)
         Cast.new(self, sql_type)
       end
 
-      # Cast the reciever to the given SQL type (or integer if none given),
+      # Cast the reciever to the given SQL type (or the database's default integer type if none given),
       # and return the result as a NumericExpression. 
       def cast_numeric(sql_type = nil)
         cast(sql_type || Integer).sql_number
       end
 
-      # Cast the reciever to the given SQL type (or text if none given),
+      # Cast the reciever to the given SQL type (or the database's default string type if none given),
       # and return the result as a StringExpression, so you can use +
       # directly on the result for SQL string concatenation.
       def cast_string(sql_type = nil)
@@ -196,6 +190,49 @@ module Sequel
       end
     end
     
+    # Adds methods that allow you to treat an object as an instance of a specific
+    # ComplexExpression subclass.  This is useful if another library
+    # overrides the methods defined by Sequel.
+    #
+    # For example, if Symbol#/ is overridden to produce a string (for
+    # example, to make file system path creation easier), the
+    # following code will not do what you want:
+    #
+    #   :price/10 > 100
+    #
+    # In that case, you need to do the following:
+    #
+    #   :price.sql_number/10 > 100
+    module ComplexExpressionMethods
+      # Extract a datetime_part (e.g. year, month) from self:
+      #
+      #   :date.extract(:year) # SQL:  extract(year FROM "date")
+      #
+      # Also has the benefit of returning the result as a
+      # NumericExpression instead of a generic ComplexExpression.
+      #
+      # The extract function is in the SQL standard, but it doesn't
+      # doesn't use the standard function calling convention.
+      def extract(datetime_part)
+        Function.new(:extract, PlaceholderLiteralString.new("#{datetime_part} FROM ?", [self])).sql_number
+      end
+
+      # Return a BooleanExpression representation of self.
+      def sql_boolean
+        BooleanExpression.new(:NOOP, self)
+      end
+
+      # Return a NumericExpression representation of self.
+      def sql_number
+        NumericExpression.new(:NOOP, self)
+      end
+
+      # Return a StringExpression representation of self.
+      def sql_string
+        StringExpression.new(:NOOP, self)
+      end
+    end
+
     # Includes a method that returns Identifiers.
     module IdentifierMethods
       # Return self wrapped as an identifier.
@@ -205,7 +242,7 @@ module Sequel
     end
 
     # This module includes the methods that are defined on objects that can be 
-    # used in a numeric or string context in SQL (Symbol, LiteralString, 
+    # used in a numeric or string context in SQL (Symbol (except on ruby 1.9), LiteralString, 
     # SQL::Function, and SQL::StringExpression).
     #
     # This defines the >, <, >=, and <= methods.
@@ -284,10 +321,11 @@ module Sequel
     end
 
     # This module includes the methods that are defined on objects that can be 
-    # used in a numeric context in SQL (Symbol, LiteralString, SQL::Function,
+    # used in a string context in SQL (Symbol, LiteralString, SQL::Function,
     # and SQL::StringExpression).
     #
-    # This defines the like (LIKE) method, used for pattern matching.
+    # This defines the like (LIKE) and ilike methods, used for pattern matching.
+    # like is case sensitive, ilike is case insensitive.
     module StringMethods
       # Create a BooleanExpression case insensitive pattern match of self
       # with the given patterns.  See StringExpression.like.
@@ -310,50 +348,6 @@ module Sequel
     module StringConcatenationMethods
       def +(ce)
         StringExpression.new(:'||', self, ce)
-      end
-    end
-
-    ### Modules that include other modules ###
-
-    # This module includes other Sequel::SQL::*Methods modules and is
-    # included in other classes that are could be either booleans,
-    # strings, or numbers.  It also adds three methods so that
-    # can specify behavior in case one of the operator methods has
-    # been overridden (such as Symbol#/).
-    #
-    # For example, if Symbol#/ is overridden to produce a string (for
-    # example, to make file system path creation easier), the
-    # following code will not do what you want:
-    #
-    #   :price/10 > 100
-    #
-    # In that case, you need to do the following:
-    #
-    #   :price.sql_number/10 > 100
-    module ComplexExpressionMethods
-      # Extract a datetime_part (e.g. year, month) from self:
-      #
-      #   :date.extract(:year) # SQL:  extract(year FROM "date")
-      #
-      # Also has the benefit of returning the result as a
-      # NumericExpression instead of a generic ComplexExpression.
-      def extract(datetime_part)
-        Function.new(:extract, PlaceholderLiteralString.new("#{datetime_part} FROM ?", [self])).sql_number
-      end
-
-      # Return a BooleanExpression representation of self.
-      def sql_boolean
-        BooleanExpression.new(:NOOP, self)
-      end
-
-      # Return a NumericExpression representation of self.
-      def sql_number
-        NumericExpression.new(:NOOP, self)
-      end
-
-      # Return a StringExpression representation of self.
-      def sql_string
-        StringExpression.new(:NOOP, self)
       end
     end
 
@@ -390,18 +384,12 @@ module Sequel
         @expression, @aliaz = expression, aliaz
       end
 
-      # Delegate the creation of the resulting SQL to the given dataset,
-      # since it may be database dependent.
-      def to_s(ds)
-        ds.aliased_expression_sql(self)
-      end
+      to_s_method :aliased_expression_sql
     end
 
     # Blob is used to represent binary data in the Ruby environment that is
-    # stored as a blob type in the database. In PostgreSQL, the blob type is 
-    # called bytea. Sequel represents binary data as a Blob object because 
-    # certain database engines, such as PostgreSQL, require binary data to be 
-    # escaped.
+    # stored as a blob type in the database. Sequel represents binary data as a Blob object because 
+    # certain database engines require binary data to be escaped.
     class Blob < ::String
       # Returns self
       def to_sequel_blob
@@ -453,7 +441,8 @@ module Sequel
       
       # Invert the expression, if possible.  If the expression cannot
       # be inverted, raise an error.  An inverted expression should match everything that the
-      # uninverted expression did not match, and vice-versa.
+      # uninverted expression did not match, and vice-versa, except for possible issues with
+      # SQL NULL (i.e. 1 == NULL is NULL and 1 != NULL is also NULL).
       def self.invert(ce)
         case ce
         when BooleanExpression
@@ -486,15 +475,11 @@ module Sequel
       # Create an object with the given conditions and
       # default value.
       def initialize(conditions, default, expression = nil)
-        raise(Sequel::Error, 'CaseExpression conditions must be an array with all_two_pairs') unless Array === conditions and conditions.all_two_pairs?
-        @conditions, @default, @expression = conditions, default, expression
+        raise(Sequel::Error, 'CaseExpression conditions must be a hash or array of all two pairs') unless Sequel.condition_specifier?(conditions)
+        @conditions, @default, @expression = conditions.to_a, default, expression
       end
 
-      # Delegate the creation of the resulting SQL to the given dataset,
-      # since it may be database dependent.
-      def to_s(ds)
-        ds.case_expression_sql(self)
-      end
+      to_s_method :case_expression_sql
     end
 
     # Represents a cast of an SQL expression to a specific type.
@@ -511,11 +496,7 @@ module Sequel
         @type = type
       end
 
-      # Delegate the creation of the resulting SQL to the given dataset,
-      # since it may be database dependent.
-      def to_s(ds)
-        ds.cast_sql(expr, type)
-      end
+      to_s_method :cast_sql, '@expr, @type'
     end
 
     # Represents all columns in a given table, table.* in SQL
@@ -531,14 +512,10 @@ module Sequel
       # ColumnAll expressions are considered equivalent if they
       # have the same class and string representation
       def ==(x)
-        x.class == self.class && @table == x.table
+        x.class == self.class and @table == x.table
       end
 
-      # Delegate the creation of the resulting SQL to the given dataset,
-      # since it may be database dependent.
-      def to_s(ds)
-        ds.column_all_sql(self)
-      end
+      to_s_method :column_all_sql
     end
 
     # Represents an SQL function call.
@@ -560,11 +537,7 @@ module Sequel
          x.class == self.class && @f == x.f && @args == x.args
       end
 
-      # Delegate the creation of the resulting SQL to the given dataset,
-      # since it may be database dependent.
-      def to_s(ds)
-        ds.function_sql(self)
-      end
+      to_s_method :function_sql
     end
     
     # Represents an identifier (column or table). Can be used
@@ -581,11 +554,7 @@ module Sequel
         @value = value
       end
       
-      # Delegate the creation of the resulting SQL to the given dataset,
-      # since it may be database dependent.
-      def to_s(ds)
-        ds.quote_identifier(@value)
-      end 
+      to_s_method :quote_identifier, '@value'
     end
     
     # Represents an SQL JOIN clause, used for joining tables.
@@ -599,17 +568,12 @@ module Sequel
       # The table alias to use for the join, if any
       attr_reader :table_alias
 
-      # Create an object with the given conditions and
-      # default value.
+      # Create an object with the given join_type, table, and table alias
       def initialize(join_type, table, table_alias = nil)
         @join_type, @table, @table_alias = join_type, table, table_alias
       end
 
-      # Delegate the creation of the resulting SQL to the given dataset,
-      # since it may be database dependent.
-      def to_s(ds)
-        ds.join_clause_sql(self)
-      end
+      to_s_method :join_clause_sql
     end
 
     # Represents an SQL JOIN table ON conditions clause.
@@ -617,38 +581,30 @@ module Sequel
       # The conditions for the join
       attr_reader :on
 
-      # Create an object with the given conditions and
-      # default value.
+      # Create an object with the ON conditions and call super with the
+      # remaining args.
       def initialize(on, *args)
         @on = on
         super(*args)
       end
 
-      # Delegate the creation of the resulting SQL to the given dataset,
-      # since it may be database dependent.
-      def to_s(ds)
-        ds.join_on_clause_sql(self)
-      end
+      to_s_method :join_on_clause_sql
     end
 
     # Represents an SQL JOIN table USING (columns) clause.
     class JoinUsingClause < JoinClause
-      # The columns that appear both tables that should be equal 
+      # The columns that appear in both tables that should be equal 
       # for the conditions to match.
       attr_reader :using
 
-      # Create an object with the given conditions and
-      # default value.
+      # Create an object with the given USING conditions and call super
+      # with the remaining args.
       def initialize(using, *args)
         @using = using
         super(*args)
       end
 
-      # Delegate the creation of the resulting SQL to the given dataset,
-      # since it may be database dependent.
-      def to_s(ds)
-        ds.join_using_clause_sql(self)
-      end
+      to_s_method :join_using_clause_sql
     end
 
     # Represents a literal string with placeholders and arguments.
@@ -664,19 +620,14 @@ module Sequel
       # Whether to surround the expression with parantheses
       attr_reader :parens
 
-      # Create an object with the given conditions and
-      # default value.
+      # Create an object with the given string, placeholder arguments, and parens flag.
       def initialize(str, args, parens=false)
         @str = str
         @args = args
         @parens = parens
       end
 
-      # Delegate the creation of the resulting SQL to the given dataset,
-      # since it may be database dependent.
-      def to_s(ds)
-        ds.placeholder_literal_string_sql(self)
-      end
+      to_s_method :placeholder_literal_string_sql
     end
 
     # Subclass of ComplexExpression where the expression results
@@ -701,29 +652,23 @@ module Sequel
         @expression, @descending = expression, descending
       end
 
-      # Delegate the creation of the resulting SQL to the given dataset,
-      # since it may be database dependent.
-      def to_s(ds)
-        ds.ordered_expression_sql(self)
-      end
+      to_s_method :ordered_expression_sql
     end
 
-    # Represents a qualified (column with table) reference.  Used when
-    # joining tables to disambiguate columns.
+    # Represents a qualified (column with table or table with schema) reference. 
     class QualifiedIdentifier < GenericExpression
-      # The table and column to reference
-      attr_reader :table, :column
+      # The column to reference
+      attr_reader :column
 
-      # Set the attributes to the given arguments
+      # The table to reference
+      attr_reader :table
+
+      # Set the table and column to the given arguments
       def initialize(table, column)
         @table, @column = table, column
       end
       
-      # Delegate the creation of the resulting SQL to the given dataset,
-      # since it may be database dependent.
-      def to_s(ds)
-        ds.qualified_identifier_sql(self)
-      end 
+      to_s_method :qualified_identifier_sql
     end
     
     # Subclass of ComplexExpression where the expression results
@@ -767,11 +712,7 @@ module Sequel
         @array = array
       end
 
-      # Delegate the creation of the resulting SQL to the given dataset,
-      # since it may be database dependent.
-      def to_s(ds)
-        ds.array_sql(@array)
-      end
+      to_s_method :array_sql, '@array'
     end
 
     # Represents an SQL array access, with multiple possible arguments.
@@ -782,7 +723,7 @@ module Sequel
       # The array of subscripts to use (should be an array of numbers)
       attr_reader :sub
 
-      # Set the attributes to the given arguments
+      # Set the array column and subscripts to the given arguments
       def initialize(f, sub)
         @f, @sub = f, sub
       end
@@ -793,11 +734,7 @@ module Sequel
         Subscript.new(@f, @sub + Array(sub))
       end
       
-      # Delegate the creation of the resulting SQL to the given dataset,
-      # since it may be database dependent.
-      def to_s(ds)
-        ds.subscript_sql(self)
-      end
+      to_s_method :subscript_sql
     end
 
     if RUBY_VERSION >= '1.9.0'
@@ -809,9 +746,13 @@ module Sequel
       end
     end
 
-    # An instance of this class is yielded to the block supplied to filter.
-    # Useful if another library also defines the operator methods that
-    # Sequel defines for symbols.
+    # The purpose of this class is to allow the easy creation of SQL identifiers and functions
+    # without relying on methods defined on Symbol.  This is useful if another library defines
+    # the methods defined by Sequel, or if you are running on ruby 1.9.
+    #
+    # An instance of this class is yielded to the block supplied to filter, order, and select.
+    # If Sequel.virtual_row_instance_eval is true and the block doesn't take an argument,
+    # the block is instance_evaled in the context of a new instance of this class.
     #
     # Examples:
     #
@@ -841,8 +782,6 @@ module Sequel
   # LiteralString is used to represent literal SQL expressions. A 
   # LiteralString is copied verbatim into an SQL statement. Instances of
   # LiteralString can be created by calling String#lit.
-  # LiteralStrings can also use all of the SQL::OrderMethods and the 
-  # SQL::ComplexExpressionMethods.
   class LiteralString < ::String
     include SQL::OrderMethods
     include SQL::ComplexExpressionMethods
