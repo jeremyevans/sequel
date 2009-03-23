@@ -196,7 +196,7 @@ module Sequel
 
   private_class_method :adapter_method, :def_adapter_method
   
-  require(%w"metaprogramming sql core_sql connection_pool exceptions dataset migration database version deprecated")
+  require(%w"metaprogramming sql core_sql connection_pool exceptions dataset database version deprecated")
   require(%w"schema_generator schema_methods schema_sql", 'database')
   require(%w"convenience graph prepared_statements sql", 'dataset')
 

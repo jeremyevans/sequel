@@ -36,6 +36,8 @@ module Sequel
     end
   end
 
+  require 'deprecated_migration'
+
   def self.open(*args, &block)
     Deprecation.deprecate('Sequel.open', 'Use Sequel.connect')
     Database.connect(*args, &block)

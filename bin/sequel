@@ -88,6 +88,7 @@ begin
   DB = Sequel.connect(*(db_config ? [db_config] : [db, db_opts]))
   DB.test_connection
   if migrate_dir
+    require 'sequel/extensions/migration'
     Sequel::Migrator.apply(DB, migrate_dir, migrate_ver)
     exit
   end

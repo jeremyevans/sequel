@@ -2,16 +2,16 @@ require File.join(File.dirname(__FILE__), 'spec_helper')
 
 context "Migration classes" do
   setup do
-    deprec{Sequel::Migration.descendants.clear}
+    Sequel::Migration.descendants.clear
   end
 
-  deprec_specify "should be registred in Migration.descendants" do
+  specify "should be registred in Migration.descendants" do
     @class = Class.new(Sequel::Migration)
     
     Sequel::Migration.descendants.should == [@class]
   end
   
-  deprec_specify "should be registered in the right order" do
+  specify "should be registered in the right order" do
     @c1 = Class.new(Sequel::Migration)
     @c2 = Class.new(Sequel::Migration)
     @c3 = Class.new(Sequel::Migration)
@@ -28,23 +28,21 @@ context "Migration#apply" do
     end
     @db = @c.new
     
-    deprec do
-      @migration = Class.new(Sequel::Migration) do
-        define_method(:up) {one(3333)}
-        define_method(:down) {two(4444)}
-      end
+    @migration = Class.new(Sequel::Migration) do
+      define_method(:up) {one(3333)}
+      define_method(:down) {two(4444)}
     end
   end
   
-  deprec_specify "should raise for an invalid direction" do
+  specify "should raise for an invalid direction" do
     proc {@migration.apply(@db, :hahaha)}.should raise_error(ArgumentError)
   end
   
-  deprec_specify "should apply the up direction correctly" do
+  specify "should apply the up direction correctly" do
     @migration.apply(@db, :up).should == [1111, 3333]
   end
 
-  deprec_specify "should apply the down direction correctly" do
+  specify "should apply the down direction correctly" do
     @migration.apply(@db, :down).should == [2222, 4444]
   end
 end
@@ -154,7 +152,7 @@ context "Sequel::Migrator" do
     File.delete('005_create_attributes.rb')
   end
   
-  deprec_specify "should return the list of files for a specified version range" do
+  specify "should return the list of files for a specified version range" do
     Sequel::Migrator.migration_files('.', 1..1).should == \
       ['./001_create_sessions.rb']
 
@@ -167,31 +165,31 @@ context "Sequel::Migrator" do
     Sequel::Migrator.migration_files('.', 7..8).should == []
   end
   
-  deprec_specify "should return the latest version available" do
+  specify "should return the latest version available" do
     Sequel::Migrator.latest_migration_version('.').should == 5
   end
   
-  deprec_specify "should load the migration classes for the specified range" do
+  specify "should load the migration classes for the specified range" do
     Sequel::Migrator.migration_classes('.', 3, 0, :up).should == \
       [CreateSessions, CreateNodes, CreateUsers]
   end
   
-  deprec_specify "should load the migration classes for the specified range" do
+  specify "should load the migration classes for the specified range" do
     Sequel::Migrator.migration_classes('.', 0, 5, :down).should == \
       [CreateAttributes, CreateUsers, CreateNodes, CreateSessions]
   end
   
-  deprec_specify "should start from current + 1 for the up direction" do
+  specify "should start from current + 1 for the up direction" do
     Sequel::Migrator.migration_classes('.', 3, 1, :up).should == \
       [CreateNodes, CreateUsers]
   end
   
-  deprec_specify "should end on current + 1 for the down direction" do
+  specify "should end on current + 1 for the down direction" do
     Sequel::Migrator.migration_classes('.', 2, 5, :down).should == \
       [CreateAttributes, CreateUsers]
   end
   
-  deprec_specify "should automatically create the schema_info table" do
+  specify "should automatically create the schema_info table" do
     @db.table_exists?(:schema_info).should be_false
     Sequel::Migrator.schema_info_dataset(@db)
     @db.table_exists?(:schema_info).should be_true
@@ -200,12 +198,12 @@ context "Sequel::Migrator" do
     proc {Sequel::Migrator.schema_info_dataset(@db)}.should_not raise_error
   end
   
-  deprec_specify "should return a dataset for the schema_info table" do
+  specify "should return a dataset for the schema_info table" do
     d = Sequel::Migrator.schema_info_dataset(@db)
     d.from.should == :schema_info
   end
   
-  deprec_specify "should get the migration version stored in the database" do
+  specify "should get the migration version stored in the database" do
     # default is 0
     Sequel::Migrator.get_current_migration_version(@db).should == 0
     
@@ -214,13 +212,13 @@ context "Sequel::Migrator" do
     Sequel::Migrator.get_current_migration_version(@db).should == 4321
   end
   
-  deprec_specify "should set the migration version stored in the database" do
+  specify "should set the migration version stored in the database" do
     Sequel::Migrator.get_current_migration_version(@db).should == 0
     Sequel::Migrator.set_current_migration_version(@db, 6666)
     Sequel::Migrator.get_current_migration_version(@db).should == 6666
   end
   
-  deprec_specify "should apply migrations correctly in the up direction" do
+  specify "should apply migrations correctly in the up direction" do
     Sequel::Migrator.apply(@db, '.', 3, 2)
     @db.creates.should == [3333]
     
@@ -232,28 +230,28 @@ context "Sequel::Migrator" do
     Sequel::Migrator.get_current_migration_version(@db).should == 5
   end
   
-  deprec_specify "should apply migrations correctly in the down direction" do
+  specify "should apply migrations correctly in the down direction" do
     Sequel::Migrator.apply(@db, '.', 1, 5)
     @db.drops.should == [5555, 3333, 2222]
 
     Sequel::Migrator.get_current_migration_version(@db).should == 1
   end
 
-  deprec_specify "should apply migrations up to the latest version if no target is given" do
+  specify "should apply migrations up to the latest version if no target is given" do
     Sequel::Migrator.apply(@db, '.')
     @db.creates.should == [1111, 2222, 3333, 5555]
 
     Sequel::Migrator.get_current_migration_version(@db).should == 5
   end
 
-  deprec_specify "should apply migrations down to 0 version correctly" do
+  specify "should apply migrations down to 0 version correctly" do
     Sequel::Migrator.apply(@db, '.', 0, 5)
     @db.drops.should == [5555, 3333, 2222, 1111]
 
     Sequel::Migrator.get_current_migration_version(@db).should == 0
   end
   
-  deprec_specify "should return the target version" do
+  specify "should return the target version" do
     Sequel::Migrator.apply(@db, '.', 3, 2).should == 3
 
     Sequel::Migrator.apply(@db, '.', 0).should == 0

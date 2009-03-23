@@ -1,5 +1,7 @@
 === HEAD
 
+* Deprecate Migration and Migrator, require 'sequel/extensions/migration' if you want them (jeremyevans)
+
 * Denamespace Sequel::Error decendants (e.g. use Sequel::Rollback instead of Sequel::Error::Rollback) (jeremyevans)
 
 * Deprecate Error::InvalidTransform, Error::NoExistingFilter, and Error::InvalidStatement (jeremyevans)
