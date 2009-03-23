@@ -110,7 +110,7 @@ module Sequel
       private
       
       # Log the SQL and the arguments, and yield an available connection.  Rescue
-      # any SQLite3::Exceptions and turn the into Error::InvalidStatements.
+      # any SQLite3::Exceptions and turn the into DatabaseErrors.
       def _execute(sql, opts)
         begin
           log_info(sql, opts[:arguments])

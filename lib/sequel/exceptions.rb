@@ -8,9 +8,6 @@ module Sequel
     # Raised on an invalid operation.
     class InvalidOperation < Error; end
                                        
-    # Error raised when an invalid statement is executed.
-    class InvalidStatement < Error; end
-
     # Represents an Invalid transform.
     class InvalidTransform < Error ; end
     

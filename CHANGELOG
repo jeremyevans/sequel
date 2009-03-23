@@ -1,5 +1,7 @@
 === HEAD
 
+* Remove Error::InvalidStatement, not used for some time (jeremyevans)
+
 * Deprecate Dataset#[] when called without an argument, and Dataset#map when called with an argument and a block (jeremyevans)
 
 * Fix aliasing columns in the JDBC adapter (per.melin) (#263)
