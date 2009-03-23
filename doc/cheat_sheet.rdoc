@@ -157,7 +157,7 @@ You can use arithmetic operators and specify SQL functions:
   DB.drop_table :items
 
   DB.create_table :test do
-    String :zipcode, :size => 10
+    String :zipcode
     enum :system, :elements => ['mac', 'linux', 'windows']
   end
 
