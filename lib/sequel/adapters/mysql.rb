@@ -3,22 +3,52 @@ Sequel.require %w'shared/mysql utils/stored_procedures', 'adapters'
 
 module Sequel
   # Module for holding all MySQL-related classes and modules for Sequel.
+  #
+  # A class level convert_invalid_date_time accessor exists if
+  # the native adapter is used.  If set to nil or :nil, the adapter treats dates
+  # like 0000-00-00 and times like 838:00:00 as nil values.  If set to :string,
+  # it returns the strings as is.  If is false by default, which means that
+  # invalid dates and times will raise errors.
   module MySQL
     # Mapping of type numbers to conversion procs
     MYSQL_TYPES = {}
 
     # Use only a single proc for each type to save on memory
     MYSQL_TYPE_PROCS = {
-      [0, 246]  => lambda{|v| BigDecimal.new(v)},                   # decimal
-      [1, 2, 3, 8, 9, 13, 247, 248]  => lambda{|v| v.to_i},         # integer
-      [4, 5]  => lambda{|v| v.to_f},                                # float
-      [10, 14]  => lambda{|v| Sequel.string_to_date(v)},                # date
-      [7, 12] => lambda{|v| Sequel.string_to_datetime(v)},          # datetime
-      [11]  => lambda{|v| Sequel.string_to_time(v)},                # time
-      [249, 250, 251, 252]  => lambda{|v| Sequel::SQL::Blob.new(v)} # blob
+      [0, 246]  => lambda{|v| BigDecimal.new(v)},                       # decimal
+      [1, 2, 3, 8, 9, 13, 247, 248]  => lambda{|v| v.to_i},             # integer
+      [4, 5]  => lambda{|v| v.to_f},                                    # float
+      [10, 14]  => lambda{|v| convert_date_time(:string_to_date, v)},   # date
+      [7, 12] => lambda{|v| convert_date_time(:string_to_datetime, v)}, # datetime
+      [11]  => lambda{|v| convert_date_time(:string_to_time, v)},       # time
+      [249, 250, 251, 252]  => lambda{|v| Sequel::SQL::Blob.new(v)}     # blob
     }
     MYSQL_TYPE_PROCS.each do |k,v|
       k.each{|n| MYSQL_TYPES[n] = v}
+    end
+    
+    @convert_invalid_date_time = false
+
+    class << self
+      attr_accessor :convert_invalid_date_time
+    end
+
+    # If convert_invalid_date_time is nil, :nil, or :string and
+    # the conversion raises an InvalidValue exception, return v
+    # if :string and nil otherwise.
+    def self.convert_date_time(meth, v)
+      begin
+        Sequel.send(meth, v)
+      rescue InvalidValue
+        case @convert_invalid_date_time
+        when nil, :nil
+          nil
+        when :string
+          v
+        else 
+          raise
+        end
+      end
     end
   
     # Database class for MySQL databases used with Sequel.

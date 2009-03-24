@@ -873,3 +873,36 @@ unless MYSQL_DB.class.adapter_scheme == :do
     end
   end
 end
+
+if MYSQL_DB.class.adapter_scheme == :mysql
+  context "MySQL bad date/time conversions" do
+    teardown do
+      Sequel::MySQL.convert_invalid_date_time = false
+    end
+  
+    specify "should raise an exception when a bad date/time is used and convert_invalid_date_time is false" do
+      Sequel::MySQL.convert_invalid_date_time = false
+      proc{MYSQL_DB["SELECT CAST('0000-00-00' AS date)"].single_value}.should raise_error(Sequel::InvalidValue)
+      proc{MYSQL_DB["SELECT CAST('0000-00-00 00:00:00' AS datetime)"].single_value}.should raise_error(Sequel::InvalidValue)
+      proc{MYSQL_DB["SELECT CAST('25:00:00' AS time)"].single_value}.should raise_error(Sequel::InvalidValue)
+    end
+  
+    specify "should not use a nil value bad date/time is used and convert_invalid_date_time is nil or :nil" do
+      Sequel::MySQL.convert_invalid_date_time = nil
+      MYSQL_DB["SELECT CAST('0000-00-00' AS date)"].single_value.should == nil
+      MYSQL_DB["SELECT CAST('0000-00-00 00:00:00' AS datetime)"].single_value.should == nil
+      MYSQL_DB["SELECT CAST('25:00:00' AS time)"].single_value.should == nil
+      Sequel::MySQL.convert_invalid_date_time = :nil
+      MYSQL_DB["SELECT CAST('0000-00-00' AS date)"].single_value.should == nil
+      MYSQL_DB["SELECT CAST('0000-00-00 00:00:00' AS datetime)"].single_value.should == nil
+      MYSQL_DB["SELECT CAST('25:00:00' AS time)"].single_value.should == nil
+    end
+  
+    specify "should not use a nil value bad date/time is used and convert_invalid_date_time is :string" do
+      Sequel::MySQL.convert_invalid_date_time = :string
+      MYSQL_DB["SELECT CAST('0000-00-00' AS date)"].single_value.should == '0000-00-00'
+      MYSQL_DB["SELECT CAST('0000-00-00 00:00:00' AS datetime)"].single_value.should == '0000-00-00 00:00:00'
+      MYSQL_DB["SELECT CAST('25:00:00' AS time)"].single_value.should == '25:00:00'
+    end
+  end
+end
