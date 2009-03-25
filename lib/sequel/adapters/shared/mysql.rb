@@ -243,10 +243,15 @@ module Sequel
         end
       end
       
+      def multi_insert_ignore(*args)
+        clone(:multi_insert_ignore=>true).multi_insert(*args)
+      end
+      
       # MySQL specific syntax for inserting multiple values at once.
       def multi_insert_sql(columns, values)
+        ignore = opts[:multi_insert_ignore] ? ' IGNORE' : ''
         values = values.map {|r| literal(Array(r))}.join(COMMA_SEPARATOR)
-        ["INSERT INTO #{source_list(@opts[:from])} (#{identifier_list(columns)}) VALUES #{values}"]
+        ["INSERT#{ignore} INTO #{source_list(@opts[:from])} (#{identifier_list(columns)}) VALUES #{values}"]
       end
       
       # MySQL uses the nonstandard ` (backtick) for quoting identifiers.
