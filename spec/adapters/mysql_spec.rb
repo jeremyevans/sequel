@@ -788,7 +788,7 @@ context "MySQL::Dataset#multi_insert_ignore" do
   end
   
   specify "should add the IGNORE keyword when inserting" do
-    @d.multi_insert_ignore([{:name => 'abc'}, {:name => 'def'}])
+    @d.multi_insert_ignore.multi_insert([{:name => 'abc'}, {:name => 'def'}])
     
     MYSQL_DB.sqls.should == [
       SQL_BEGIN,
@@ -800,6 +800,46 @@ context "MySQL::Dataset#multi_insert_ignore" do
       {:name => 'abc', :value => nil}, {:name => 'def', :value => nil}
     ]
   end
+end
+
+context "MySQL::Dataset#multi_insert_update" do
+  setup do
+    @d = MYSQL_DB[:items]
+    @d.delete
+    MYSQL_DB.sqls.clear
+  end
+  
+  specify "should add the ON DUPLICATE KEY UPDATE and ALL columns when no args given" do
+    @d.multi_insert_update.multi_insert([:name,:value], 
+      [['abc', 1], ['def',2]]
+    )
+    
+    MYSQL_DB.sqls.should == [
+      SQL_BEGIN,
+      "INSERT INTO items (name, value) VALUES ('abc', 1), ('def', 2) ON DUPLICATE KEY UPDATE name=VALUES(name), value=VALUES(value)",
+      SQL_COMMIT
+    ]
+
+    @d.all.should == [
+      {:name => 'abc', :value => 1}, {:name => 'def', :value => 2}
+    ]
+  end
+  specify "should add the ON DUPLICATE KEY UPDATE and columns specified when args are given" do
+    @d.multi_insert_update(:value).multi_insert([:name,:value], 
+      [['abc', 1], ['def',2]]
+    )
+    
+    MYSQL_DB.sqls.should == [
+      SQL_BEGIN,
+      "INSERT INTO items (name, value) VALUES ('abc', 1), ('def', 2) ON DUPLICATE KEY UPDATE value=VALUES(value)",
+      SQL_COMMIT
+    ]
+
+    @d.all.should == [
+      {:name => 'abc', :value => 1}, {:name => 'def', :value => 2}
+    ]
+  end
+  
 end
 
 context "MySQL::Dataset#replace" do
