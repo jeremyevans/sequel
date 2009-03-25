@@ -3,7 +3,7 @@ require File.join(File.dirname(__FILE__), 'spec_helper')
 require 'stringio'
 
 context "PrettyTable" do
-  setup do
+  before do
     @data1 = [
       {:x => 3, :y => 4}
     ]
@@ -24,7 +24,7 @@ context "PrettyTable" do
     $stdout = @output
   end
 
-  teardown do
+  after do
     $stdout = @orig_stdout
   end
   

@@ -44,7 +44,7 @@ else
 end
 
 context "MySQL", '#create_table' do
-  setup do
+  before do
     @db = MYSQL_DB
   end
   after(:each) do
@@ -57,10 +57,10 @@ context "MySQL", '#create_table' do
 end
 
 context "A MySQL database" do
-  setup do
+  before do
     @db = MYSQL_DB
   end
-  teardown do
+  after do
     Sequel.convert_tinyint_to_bool = true
   end
 
@@ -99,7 +99,7 @@ context "A MySQL database" do
 end
 
 context "A MySQL dataset" do
-  setup do
+  before do
     @d = MYSQL_DB[:items]
     @d.delete # remove all records
     MYSQL_DB.sqls.clear
@@ -270,10 +270,10 @@ context "A MySQL dataset" do
 end
 
 context "MySQL datasets" do
-  setup do
+  before do
     @d = MYSQL_DB[:orders]
   end
-  teardown do
+  after do
     Sequel.convert_tinyint_to_bool = true
   end
   
@@ -313,7 +313,7 @@ context "MySQL datasets" do
 end
 
 context "MySQL join expressions" do
-  setup do
+  before do
     @ds = MYSQL_DB[:nodes]
     @ds.db.meta_def(:server_version) {50014}
   end
@@ -364,7 +364,7 @@ context "MySQL join expressions" do
 end
 
 context "Joined MySQL dataset" do
-  setup do
+  before do
     @ds = MYSQL_DB[:nodes]
   end
   
@@ -388,7 +388,7 @@ context "Joined MySQL dataset" do
 end
 
 context "A MySQL database" do
-  setup do
+  before do
     @db = MYSQL_DB
   end
 
@@ -501,7 +501,7 @@ context "A MySQL database", "with table options" do
 end
 
 context "A MySQL database" do
-  setup do
+  before do
     @db = MYSQL_DB
   end
   
@@ -578,7 +578,7 @@ if %w'localhost 127.0.0.1 ::1'.include?(MYSQL_URI.host) and MYSQL_DB.class.adapt
 end
 
 context "A grouped MySQL dataset" do
-  setup do
+  before do
     MYSQL_DB[:test2].delete
     MYSQL_DB[:test2] << {:name => '11', :value => 10}
     MYSQL_DB[:test2] << {:name => '11', :value => 20}
@@ -658,7 +658,7 @@ context "A MySQL database" do
 end
 
 context "MySQL::Dataset#insert" do
-  setup do
+  before do
     @d = MYSQL_DB[:items]
     @d.delete
     MYSQL_DB.sqls.clear
@@ -702,7 +702,7 @@ context "MySQL::Dataset#insert" do
 end
 
 context "MySQL::Dataset#multi_insert" do
-  setup do
+  before do
     @d = MYSQL_DB[:items]
     @d.delete
     MYSQL_DB.sqls.clear
@@ -781,7 +781,7 @@ context "MySQL::Dataset#multi_insert" do
 end
 
 context "MySQL::Dataset#multi_insert_ignore" do
-  setup do
+  before do
     @d = MYSQL_DB[:items]
     @d.delete
     MYSQL_DB.sqls.clear
@@ -803,7 +803,7 @@ context "MySQL::Dataset#multi_insert_ignore" do
 end
 
 context "MySQL::Dataset#replace" do
-  setup do
+  before do
     MYSQL_DB.drop_table(:items) if MYSQL_DB.table_exists?(:items)
     MYSQL_DB.create_table :items do
       integer :id, :unique => true
@@ -827,7 +827,7 @@ context "MySQL::Dataset#replace" do
 end
 
 context "MySQL::Dataset#complex_expression_sql" do
-  setup do
+  before do
     @d = MYSQL_DB.dataset
   end
 
@@ -856,7 +856,7 @@ end
 
 unless MYSQL_DB.class.adapter_scheme == :do
   context "MySQL Stored Procedures" do
-    teardown do
+    after do
       MYSQL_DB.execute('DROP PROCEDURE test_sproc')
     end
     
@@ -895,7 +895,7 @@ end
 
 if MYSQL_DB.class.adapter_scheme == :mysql
   context "MySQL bad date/time conversions" do
-    teardown do
+    after do
       Sequel::MySQL.convert_invalid_date_time = false
     end
   

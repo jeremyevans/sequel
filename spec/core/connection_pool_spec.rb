@@ -3,7 +3,7 @@ CONNECTION_POOL_DEFAULTS = {:pool_timeout=>5, :pool_sleep_time=>0.001,
   :pool_reuse_connections=>:allow, :pool_convert_exceptions=>true, :max_connections=>4}
 
 context "An empty ConnectionPool" do
-  setup do
+  before do
     @cpool = Sequel::ConnectionPool.new(CONNECTION_POOL_DEFAULTS)
   end
 
@@ -21,7 +21,7 @@ context "An empty ConnectionPool" do
 end
 
 context "A connection pool handling connections" do
-  setup do
+  before do
     @max_size = 2
     @cpool = Sequel::ConnectionPool.new(CONNECTION_POOL_DEFAULTS.merge(:disconnection_proc=>proc{|c| @max_size=3},  :max_connections=>@max_size)) {:got_connection}
   end
@@ -114,7 +114,7 @@ class DummyConnection
 end
 
 context "ConnectionPool#hold" do
-  setup do
+  before do
     @pool = Sequel::ConnectionPool.new(CONNECTION_POOL_DEFAULTS) {DummyConnection.new}
   end
   
@@ -150,7 +150,7 @@ context "ConnectionPool#hold" do
 end
 
 context "ConnectionPool#connection_proc" do
-  setup do
+  before do
     @pool = Sequel::ConnectionPool.new(CONNECTION_POOL_DEFAULTS)
   end
   
@@ -168,7 +168,7 @@ context "ConnectionPool#connection_proc" do
 end
 
 context "A connection pool with a max size of 1" do
-  setup do
+  before do
     @invoked_count = 0
     @pool = Sequel::ConnectionPool.new(CONNECTION_POOL_DEFAULTS.merge(:max_connections=>1)) {@invoked_count += 1; 'herro'}
   end
@@ -244,7 +244,7 @@ context "A connection pool with a max size of 1" do
 end
 
 context "A connection pool with a max size of 5" do
-  setup do
+  before do
     @invoked_count = 0
     @pool = Sequel::ConnectionPool.new(CONNECTION_POOL_DEFAULTS.merge(:max_connections=>5)) {@invoked_count += 1}
   end
@@ -316,7 +316,7 @@ context "A connection pool with a max size of 5" do
 end
 
 context "ConnectionPool#disconnect" do
-  setup do
+  before do
     @count = 0
     @pool = Sequel::ConnectionPool.new(CONNECTION_POOL_DEFAULTS.merge(:max_connections=>5)) {{:id => @count += 1}}
   end
@@ -381,7 +381,7 @@ context "ConnectionPool#disconnect" do
 end
 
 context "A connection pool with multiple servers" do
-  setup do
+  before do
     @invoked_counts = Hash.new(0)
     @pool = Sequel::ConnectionPool.new(CONNECTION_POOL_DEFAULTS.merge(:servers=>{:read_only=>{}})){|server| "#{server}#{@invoked_counts[server] += 1}"}
   end
@@ -440,7 +440,7 @@ context "A connection pool with multiple servers" do
 end
 
 context "SingleThreadedPool" do
-  setup do
+  before do
     @pool = Sequel::SingleThreadedPool.new(CONNECTION_POOL_DEFAULTS){1234}
   end
   
@@ -461,7 +461,7 @@ context "SingleThreadedPool" do
 end
 
 context "A single threaded pool with multiple servers" do
-  setup do
+  before do
     @max_size=2
     @pool = Sequel::SingleThreadedPool.new(CONNECTION_POOL_DEFAULTS.merge(:disconnection_proc=>proc{|c| @max_size=3}, :servers=>{:read_only=>{}})){|server| server}
   end

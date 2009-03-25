@@ -1,10 +1,10 @@
 require File.join(File.dirname(__FILE__), 'spec_helper')
 
 context "A new Database" do
-  setup do
+  before do
     @db = Sequel::Database.new(1 => 2, :logger => 3)
   end
-  teardown do
+  after do
     Sequel.quote_identifiers = false
     Sequel.identifier_input_method = nil
     Sequel.identifier_output_method = nil
@@ -227,7 +227,7 @@ context "Database#connect" do
 end
 
 context "Database#uri" do
-  setup do
+  before do
     @c = Class.new(Sequel::Database) do
       set_adapter_scheme :mau
     end
@@ -257,7 +257,7 @@ context "Database.adapter_scheme" do
 end
 
 context "Database#dataset" do
-  setup do
+  before do
     @db = Sequel::Database.new
     @ds = @db.dataset
   end
@@ -305,7 +305,7 @@ context "Database#execute" do
 end
 
 context "Database#<<" do
-  setup do
+  before do
     @c = Class.new(Sequel::Database) do
       define_method(:execute) {|sql, opts| sql}
     end
@@ -345,7 +345,7 @@ context "Database#<<" do
 end
 
 context "Database#synchronize" do
-  setup do
+  before do
     @db = Sequel::Database.new(:max_connections => 1)
     @db.pool.connection_proc = proc {12345}
   end
@@ -369,7 +369,7 @@ context "Database#synchronize" do
 end
 
 context "Database#test_connection" do
-  setup do
+  before do
     @db = Sequel::Database.new
     @test = nil
     @db.pool.connection_proc = proc {@test = rand(100)}
@@ -408,7 +408,7 @@ class DummyDatabase < Sequel::Database
 end
 
 context "Database#create_table" do
-  setup do
+  before do
     @db = DummyDatabase.new
   end
   
@@ -426,7 +426,7 @@ context "Database#create_table" do
 end
 
 context "Database#alter_table" do
-  setup do
+  before do
     @db = DummyDatabase.new
   end
   
@@ -456,7 +456,7 @@ context "Database#alter_table" do
 end
 
 context "Database#add_column" do
-  setup do
+  before do
     @db = DummyDatabase.new
   end
   
@@ -469,7 +469,7 @@ context "Database#add_column" do
 end
 
 context "Database#drop_column" do
-  setup do
+  before do
     @db = DummyDatabase.new
   end
   
@@ -482,7 +482,7 @@ context "Database#drop_column" do
 end
 
 context "Database#rename_column" do
-  setup do
+  before do
     @db = DummyDatabase.new
   end
   
@@ -495,7 +495,7 @@ context "Database#rename_column" do
 end
 
 context "Database#set_column_type" do
-  setup do
+  before do
     @db = DummyDatabase.new
   end
   
@@ -508,7 +508,7 @@ context "Database#set_column_type" do
 end
 
 context "Database#set_column_default" do
-  setup do
+  before do
     @db = DummyDatabase.new
   end
   
@@ -521,7 +521,7 @@ context "Database#set_column_default" do
 end
 
 context "Database#add_index" do
-  setup do
+  before do
     @db = DummyDatabase.new
   end
   
@@ -541,7 +541,7 @@ context "Database#add_index" do
 end
 
 context "Database#drop_index" do
-  setup do
+  before do
     @db = DummyDatabase.new
   end
   
@@ -561,7 +561,7 @@ class Dummy2Database < Sequel::Database
 end
 
 context "Database#drop_table" do
-  setup do
+  before do
     @db = DummyDatabase.new
   end
   
@@ -581,7 +581,7 @@ context "Database#drop_table" do
 end
 
 context "Database#rename_table" do
-  setup do
+  before do
     @db = DummyDatabase.new
   end
   
@@ -592,7 +592,7 @@ context "Database#rename_table" do
 end
 
 context "Database#table_exists?" do
-  setup do
+  before do
     @db = DummyDatabase.new
     @db.instance_variable_set(:@schemas, {:a=>[]})
     @db2 = DummyDatabase.new
@@ -619,7 +619,7 @@ class Dummy3Database < Sequel::Database
 end
 
 context "Database#transaction" do
-  setup do
+  before do
     @db = Dummy3Database.new
     @db.pool.connection_proc = proc {Dummy3Database::DummyConnection.new(@db)}
   end
@@ -677,7 +677,7 @@ context "Database#transaction" do
 end
 
 context "A Database adapter with a scheme" do
-  setup do
+  before do
     class CCC < Sequel::Database
       if defined?(DISCONNECTS)
         DISCONNECTS.clear
@@ -790,12 +790,12 @@ context "An unknown database scheme" do
 end
 
 context "A broken adapter (lib is there but the class is not)" do
-  setup do
+  before do
     @fn = File.join(File.dirname(__FILE__), '../../lib/sequel/adapters/blah.rb')
     File.open(@fn,'a'){}
   end
   
-  teardown do
+  after do
     File.delete(@fn)
   end
   
@@ -805,7 +805,7 @@ context "A broken adapter (lib is there but the class is not)" do
 end
 
 context "A single threaded database" do
-  teardown do
+  after do
     Sequel::Database.single_threaded = false
   end
   
@@ -833,7 +833,7 @@ context "A single threaded database" do
 end
 
 context "A single threaded database" do
-  setup do
+  before do
     conn = 1234567
     @db = Sequel::Database.new(:single_threaded => true) do
       conn += 1
@@ -855,11 +855,11 @@ context "A single threaded database" do
 end
 
 context "A database" do
-  setup do
+  before do
     Sequel::Database.single_threaded = false
   end
   
-  teardown do
+  after do
     Sequel::Database.single_threaded = false
   end
   
@@ -935,7 +935,7 @@ context "A database" do
 end
 
 context "Database#dataset" do
-  setup do
+  before do
     @db = Sequel::Database.new
   end
   
@@ -947,7 +947,7 @@ context "Database#dataset" do
 end
 
 context "Database#fetch" do
-  setup do
+  before do
     @db = Sequel::Database.new
     c = Class.new(Sequel::Dataset) do
       def fetch_rows(sql); yield({:sql => sql}); end
@@ -994,7 +994,7 @@ end
 
 
 context "Database#[]" do
-  setup do
+  before do
     @db = Sequel::Database.new
   end
   
@@ -1017,7 +1017,7 @@ context "Database#[]" do
 end
 
 context "Database#create_view" do
-  setup do
+  before do
     @db = DummyDatabase.new
   end
   
@@ -1039,7 +1039,7 @@ context "Database#create_view" do
 end
 
 context "Database#create_or_replace_view" do
-  setup do
+  before do
     @db = DummyDatabase.new
   end
   
@@ -1061,7 +1061,7 @@ context "Database#create_or_replace_view" do
 end
 
 context "Database#drop_view" do
-  setup do
+  before do
     @db = DummyDatabase.new
   end
   
@@ -1075,7 +1075,7 @@ context "Database#drop_view" do
 end
 
 context "Database#alter_table_sql" do
-  setup do
+  before do
     @db = DummyDatabase.new
   end
   
@@ -1087,7 +1087,7 @@ end
 context "Database.connect" do
   EEE_YAML = "development:\r\n  adapter: eee\r\n  username: mau\r\n  password: tau\r\n  host: alfonso\r\n  database: mydb\r\n"
   
-  setup do
+  before do
     class EEE < Sequel::Database
       set_adapter_scheme :eee
     end
@@ -1096,7 +1096,7 @@ context "Database.connect" do
     File.open(@fn, 'wb') {|f| f << EEE_YAML}
   end
   
-  teardown do
+  after do
     File.delete(@fn)
   end
   
@@ -1111,7 +1111,7 @@ context "Database.connect" do
 end
 
 context "Database#inspect" do
-  setup do
+  before do
     @db = DummyDatabase.new
     
     @db.meta_def(:uri) {'blah://blahblah/blah'}
@@ -1123,7 +1123,7 @@ context "Database#inspect" do
 end
 
 context "Database#get" do
-  setup do
+  before do
     @c = Class.new(DummyDatabase) do
       def dataset
         ds = super
@@ -1209,7 +1209,7 @@ context "Database#raise_error" do
 end
 
 context "Database#typecast_value" do
-  setup do
+  before do
     @db = Sequel::Database.new
   end
   specify "should raise an InvalidValue when given an invalid value" do

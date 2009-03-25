@@ -24,7 +24,7 @@ context "Array#all_two_pairs?" do
 end
   
 context "Array#case and Hash#case" do
-  setup do
+  before do
     @d = Sequel::Dataset.new(nil)
   end
 
@@ -52,7 +52,7 @@ context "Array#case and Hash#case" do
 end
 
 context "Array#sql_array" do
-  setup do
+  before do
     @d = Sequel::Dataset.new(nil)
   end
 
@@ -159,7 +159,7 @@ context "String#split_sql" do
 end
 
 context "#desc" do
-  setup do
+  before do
     @ds = Sequel::Dataset.new(nil)
   end
   
@@ -175,7 +175,7 @@ context "#desc" do
 end
 
 context "#asc" do
-  setup do
+  before do
     @ds = Sequel::Dataset.new(nil)
   end
   
@@ -191,7 +191,7 @@ context "#asc" do
 end
 
 context "#as" do
-  setup do
+  before do
     @ds = Sequel::Dataset.new(nil)
   end
   
@@ -211,7 +211,7 @@ context "#as" do
 end
 
 context "Column references" do
-  setup do
+  before do
     @c = Class.new(Sequel::Dataset) do
       def quoted_identifier(c); "`#{c}`"; end
     end
@@ -266,7 +266,7 @@ if RUBY_VERSION < '1.9.0'
 end
 
 context "Symbol#*" do
-  setup do
+  before do
     @ds = Sequel::Dataset.new(nil)
   end
   
@@ -311,7 +311,7 @@ context "Symbol" do
 end
 
 context "Dataset#literal" do
-  setup do
+  before do
     @ds = MockDataset.new(nil)
   end
   
@@ -347,7 +347,7 @@ context "Dataset#literal" do
 end
 
 context "Symbol" do
-  setup do
+  before do
     @ds = Sequel::Dataset.new(MockDatabase.new)
   end
   

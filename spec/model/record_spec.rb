@@ -689,7 +689,7 @@ describe Sequel::Model, "#exists?" do
 end
 
 describe Sequel::Model, "#each" do
-  setup do
+  before do
     @model = Class.new(Sequel::Model(:items))
     @model.columns :a, :b, :id
     @m = @model.load(:a => 1, :b => 2, :id => 4444)
@@ -703,7 +703,7 @@ describe Sequel::Model, "#each" do
 end
 
 describe Sequel::Model, "#keys" do
-  setup do
+  before do
     @model = Class.new(Sequel::Model(:items))
     @model.columns :a, :b, :id
     @m = @model.load(:a => 1, :b => 2, :id => 4444)
@@ -809,7 +809,7 @@ describe Sequel::Model, "#hash" do
 end
 
 describe Sequel::Model, "#initialize" do
-  setup do
+  before do
     @c = Class.new(Sequel::Model) do
       columns :id, :x
     end
@@ -892,7 +892,7 @@ describe Sequel::Model, ".create" do
 end
 
 describe Sequel::Model, "#refresh" do
-  setup do
+  before do
     MODEL_DB.reset
     @c = Class.new(Sequel::Model(:items)) do
       unrestrict_primary_key
@@ -931,14 +931,14 @@ describe Sequel::Model, "#refresh" do
 end
 
 describe Sequel::Model, "typecasting" do
-  setup do
+  before do
     MODEL_DB.reset
     @c = Class.new(Sequel::Model(:items)) do
       columns :x
     end
   end
 
-  teardown do
+  after do
     Sequel.datetime_class = Time
   end
 

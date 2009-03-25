@@ -1,7 +1,7 @@
 require File.join(File.dirname(__FILE__), 'spec_helper')
 
 context "DB#create_table" do
-  setup do
+  before do
     @db = SchemaDummyDatabase.new
   end
   
@@ -492,7 +492,7 @@ context "DB#create_table" do
 end
 
 context "DB#create_table!" do
-  setup do
+  before do
     @db = SchemaDummyDatabase.new
   end
   
@@ -503,7 +503,7 @@ context "DB#create_table!" do
 end
 
 context "DB#drop_table" do
-  setup do
+  before do
     @db = SchemaDummyDatabase.new
   end
 
@@ -514,7 +514,7 @@ context "DB#drop_table" do
 end
 
 context "DB#alter_table" do
-  setup do
+  before do
     @db = SchemaDummyDatabase.new
   end
   
@@ -680,7 +680,7 @@ context "DB#alter_table" do
 end
 
 context "Schema Parser" do
-  setup do
+  before do
     @sqls = []
     @db = Sequel::Database.new
   end

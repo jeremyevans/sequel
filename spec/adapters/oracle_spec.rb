@@ -61,7 +61,7 @@ context "An Oracle database" do
 end
 
 context "An Oracle dataset" do
-  setup do
+  before do
     @d = ORACLE_DB[:items]
     @d.delete # remove all records
   end
@@ -209,7 +209,7 @@ context "An Oracle dataset" do
 end
 
 context "Joined Oracle dataset" do
-  setup do
+  before do
     @d1 = ORACLE_DB[:books]
     @d1.delete # remove all records
     @d1 << {:id => 1, :title => 'aaa', :category_id => 100}
@@ -250,7 +250,7 @@ context "Joined Oracle dataset" do
 end
 
 context "Oracle aliasing" do
-  setup do
+  before do
     @d1 = ORACLE_DB[:books]
     @d1.delete # remove all records
     @d1 << {:id => 1, :title => 'aaa', :category_id => 100}

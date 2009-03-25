@@ -1,7 +1,7 @@
 require File.join(File.dirname(__FILE__), "spec_helper")
 
 describe Sequel::Model::Errors do
-  setup do
+  before do
     @errors = Sequel::Model::Errors.new
   end
   
@@ -76,7 +76,7 @@ describe Sequel::Model::Errors do
 end
 
 describe Sequel::Model do
-  setup do
+  before do
     deprec do
       @c = Class.new(Sequel::Model) do
         def self.validates_coolness_of(attr)
@@ -192,7 +192,7 @@ describe Sequel::Model do
 end
 
 describe Sequel::Model do
-  setup do
+  before do
     @c = Class.new(Sequel::Model) do
       columns :score
       def validate
@@ -223,7 +223,7 @@ describe Sequel::Model do
 end
 
 describe 'Sequel::Model::Validation::Generator' do
-  setup do
+  before do
     $testit = nil
     
     @c = Class.new(Sequel::Model) do
@@ -244,7 +244,7 @@ describe 'Sequel::Model::Validation::Generator' do
 end
 
 describe Sequel::Model do
-  setup do
+  before do
     @c = Class.new(Sequel::Model) do
       columns :value
       
@@ -629,7 +629,7 @@ describe Sequel::Model do
 end
 
 context "Superclass validations" do
-  setup do
+  before do
     deprec do
       @c1 = Class.new(Sequel::Model) do
         columns :value
@@ -1018,7 +1018,7 @@ describe Sequel::Model, "Validations" do
 end
 
 describe "Model#save!" do
-  setup do
+  before do
     @c = Class.new(Sequel::Model(:people)) do
       def columns; [:id]; end
       
@@ -1038,7 +1038,7 @@ describe "Model#save!" do
 end
 
 describe "Model#save" do
-  setup do
+  before do
     @c = Class.new(Sequel::Model(:people)) do
       columns :id
 

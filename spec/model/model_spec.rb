@@ -512,7 +512,7 @@ describe Sequel::Model, ".[]" do
 end
 
 context "Model#inspect" do
-  setup do
+  before do
     @o = Sequel::Model.load(:x => 333)
   end
   
@@ -522,7 +522,7 @@ context "Model#inspect" do
 end
 
 context "Model.db_schema" do
-  setup do
+  before do
     @c = Class.new(Sequel::Model(:items)) do
       def self.columns; orig_columns; end
     end

@@ -27,7 +27,7 @@ POSTGRES_DB.create_table! :test5 do
 end
 
 context "A PostgreSQL database" do
-  setup do
+  before do
     @db = POSTGRES_DB
   end
   
@@ -60,7 +60,7 @@ context "A PostgreSQL database" do
 end
 
 context "A PostgreSQL dataset" do
-  setup do
+  before do
     @d = POSTGRES_DB[:test]
     @d.delete # remove all records
   end
@@ -283,7 +283,7 @@ context "A PostgreSQL dataset" do
 end
 
 context "A PostgreSQL dataset with a timestamp field" do
-  setup do
+  before do
     @d = POSTGRES_DB[:test3]
     @d.delete
   end
@@ -297,7 +297,7 @@ context "A PostgreSQL dataset with a timestamp field" do
 end
 
 context "A PostgreSQL database" do
-  setup do
+  before do
     @db = POSTGRES_DB
   end
 
@@ -335,7 +335,7 @@ context "A PostgreSQL database" do
 end  
 
 context "A PostgreSQL database" do
-  setup do
+  before do
   end
   
   specify "should support fulltext indexes" do
@@ -430,7 +430,7 @@ context "A PostgreSQL database" do
 end
 
 context "Postgres::Dataset#multi_insert_sql" do
-  setup do
+  before do
     @ds = POSTGRES_DB[:test]
   end
   
@@ -459,7 +459,7 @@ context "Postgres::Dataset#multi_insert_sql" do
 end
 
 context "Postgres::Dataset#insert" do
-  setup do
+  before do
     @ds = POSTGRES_DB[:test5]
     @ds.delete
   end
@@ -517,12 +517,12 @@ context "Postgres::Dataset#insert" do
 end
 
 context "Postgres::Database schema qualified tables" do
-  setup do
+  before do
     POSTGRES_DB << "CREATE SCHEMA schema_test"
     POSTGRES_DB.instance_variable_set(:@primary_keys, {})
     POSTGRES_DB.instance_variable_set(:@primary_key_sequences, {})
   end
-  teardown do
+  after do
     POSTGRES_DB << "DROP SCHEMA schema_test CASCADE"
     POSTGRES_DB.default_schema = :public
   end
@@ -623,10 +623,10 @@ if POSTGRES_DB.server_version >= 80300
 end
 
 context "Postgres::Database functions, languages, and triggers" do
-  setup do
+  before do
     @d = POSTGRES_DB
   end
-  teardown do
+  after do
     @d.drop_function('tf', :if_exists=>true, :cascade=>true)
     @d.drop_function('tf', :if_exists=>true, :cascade=>true, :args=>%w'integer integer')
     @d.drop_language(:plpgsql, :if_exists=>true, :cascade=>true)

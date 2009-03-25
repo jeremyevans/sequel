@@ -172,7 +172,7 @@ context "An SQLite database" do
 end
 
 context "An SQLite dataset" do
-  setup do
+  before do
     SQLITE_DB.create_table! :items do
       integer :id, :primary_key => true, :auto_increment => true
       text :name
@@ -284,7 +284,7 @@ context "An SQLite dataset AS clause" do
 end
 
 context "An SQLite dataset" do
-  setup do
+  before do
     SQLITE_DB.create_table! :items do
       integer :id, :primary_key => true, :auto_increment => true
       text :name
@@ -315,7 +315,7 @@ context "An SQLite dataset" do
 end
 
 context "SQLite::Dataset#delete" do
-  setup do
+  before do
     SQLITE_DB.create_table! :items do
       integer :id, :primary_key => true, :auto_increment => true
       text :name
@@ -347,7 +347,7 @@ context "SQLite::Dataset#delete" do
 end
 
 context "SQLite::Dataset#update" do
-  setup do
+  before do
     SQLITE_DB.create_table! :items do
       integer :id, :primary_key => true, :auto_increment => true
       text :name
@@ -370,7 +370,7 @@ context "SQLite::Dataset#update" do
 end
 
 context "SQLite dataset" do
-  setup do
+  before do
     SQLITE_DB.create_table! :test do
       integer :id, :primary_key => true, :auto_increment => true
       text :name
@@ -388,7 +388,7 @@ context "SQLite dataset" do
     @d << {:name => 'ghi', :value => 7.89}
   end
   
-  teardown do
+  after do
     SQLITE_DB.drop_table :test
   end
   
@@ -401,7 +401,7 @@ context "SQLite dataset" do
 end
 
 context "A SQLite database" do
-  setup do
+  before do
     @db = SQLITE_DB
     @db.create_table! :test2 do
       text :name

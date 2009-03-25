@@ -184,7 +184,7 @@ describe Sequel::Model, "dataset" do
 end
 
 describe Sequel::Model, ".def_dataset_method" do
-  setup do
+  before do
     @c = Class.new(Sequel::Model(:items)) do
     end
   end
@@ -232,7 +232,7 @@ describe Sequel::Model, ".def_dataset_method" do
 end
 
 describe "A model class with implicit table name" do
-  setup do
+  before do
     class Donkey < Sequel::Model
     end
   end
@@ -243,7 +243,7 @@ describe "A model class with implicit table name" do
 end
 
 describe "A model inheriting from a model" do
-  setup do
+  before do
     class Feline < Sequel::Model
     end
     
@@ -258,7 +258,7 @@ describe "A model inheriting from a model" do
 end
 
 describe "Model.db=" do
-  setup do
+  before do
     $db1 = MockDatabase.new
     $db2 = MockDatabase.new
     
@@ -286,7 +286,7 @@ describe "Model.db=" do
 end
 
 describe Sequel::Model, ".(allowed|restricted)_columns " do
-  setup do
+  before do
     @c = Class.new(Sequel::Model(:blahblah)) do
       columns :x, :y, :z
       def refresh
@@ -349,7 +349,7 @@ describe Sequel::Model, ".(allowed|restricted)_columns " do
 end
 
 describe Sequel::Model, ".(un)?restrict_primary_key\\??" do
-  setup do
+  before do
     @c = Class.new(Sequel::Model(:blahblah)) do
       set_primary_key :id
       columns :x, :y, :z, :id
@@ -391,7 +391,7 @@ describe Sequel::Model, ".(un)?restrict_primary_key\\??" do
 end
 
 describe Sequel::Model, ".strict_param_setting" do
-  setup do
+  before do
     @c = Class.new(Sequel::Model(:blahblah)) do
       columns :x, :y, :z, :id
       set_restricted_columns :z
@@ -428,7 +428,7 @@ describe Sequel::Model, ".strict_param_setting" do
 end
 
 describe Sequel::Model, ".[] optimization" do
-  setup do
+  before do
     @c = Class.new(Sequel::Model(:a))
     @c.instance_eval do
       def simple_table

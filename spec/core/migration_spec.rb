@@ -1,7 +1,7 @@
 require File.join(File.dirname(__FILE__), 'spec_helper')
 
 context "Migration classes" do
-  setup do
+  before do
     deprec{Sequel::Migration.descendants.clear}
   end
 
@@ -21,7 +21,7 @@ context "Migration classes" do
 end
 
 context "Migration#apply" do
-  setup do
+  before do
     @c = Class.new do
       define_method(:one) {|x| [1111, x]}
       define_method(:two) {|x| [2222, x]}
@@ -131,7 +131,7 @@ MIGRATION_005 = %[
 ]
 
 context "Sequel::Migrator" do
-  setup do
+  before do
     @db = DummyMigrationDB.new
     
     File.open('001_create_sessions.rb', 'w') {|f| f << MIGRATION_001}
@@ -142,7 +142,7 @@ context "Sequel::Migrator" do
     @db[:schema_info].version = nil
   end
   
-  teardown do
+  after do
     Object.send(:remove_const, "CreateSessions") if Object.const_defined?("CreateSessions")
     Object.send(:remove_const, "CreateNodes") if Object.const_defined?("CreateNodes")
     Object.send(:remove_const, "CreateUsers") if Object.const_defined?("CreateUsers")

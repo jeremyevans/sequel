@@ -24,7 +24,7 @@ context "A Informix database" do
 end
 
 context "A Informix dataset" do
-  setup do
+  before do
     @d = INFORMIX_DB[:test]
     @d.delete # remove all records
   end
