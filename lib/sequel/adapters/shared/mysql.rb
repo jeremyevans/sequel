@@ -243,17 +243,64 @@ module Sequel
         end
       end
       
-      # Similar to the multi_insert method, but skips errors.
+      # Sets up the the multi_insert method to skips errors.
       # Useful if you have a unique key and want to just skip
       # inserting rows that violate the unique key restriction.
-      def multi_insert_ignore(*args)
-        clone(:multi_insert_ignore=>true).multi_insert(*args)
+      #
+      # Example:
+      #
+      # dataset.multi_insert_ignore.multi_insert([:name,:value],
+      #   [['a',1],['b',2]])
+      #
+      # INSERT IGNORE INTO tablename (name, value) VALUES (a, 1), (b, 2)
+      #
+      def multi_insert_ignore
+        clone(:multi_insert_ignore=>true)
+      end
+      
+      # Sets up the multi_insert method do UPDATE on DUPLICATE KEY
+      # errors.  If you pass no arguments, ALL fields will be
+      # updated with the new values.  If you pass the fields you
+      # want then ONLY those field will be updated.
+      #
+      # Useful if you have a unique key and want to update
+      # inserting rows that violate the unique key restriction.
+      #
+      # Examples:
+      #
+      # dataset.multi_insert_update.multi_insert([:name,:value],
+      #   [['a',1],['b',2]])
+      #
+      # INSERT INTO tablename (name, value) VALUES (a, 1), (b, 2)
+      # ON DUPLICATE KEY UPDATE name=VALUES(name), value=VALUES(value)
+      #
+      # dataset.multi_insert_update(:value).multi_insert([:name,:value],
+      #   [['a',1],['b',2]])
+      #
+      # INSERT INTO tablename (name, value) VALUES (a, 1), (b, 2)
+      # ON DUPLICATE KEY UPDATE value=VALUES(value)
+      #
+      def multi_insert_update(*args)
+        clone(:multi_insert_update => true, 
+          :on_duplicate_key_update => args || []
+        )
       end
       
       # MySQL specific syntax for inserting multiple values at once.
       def multi_insert_sql(columns, values)
+        if opts[:multi_insert_update]
+          if opts[:on_duplicate_key_update].empty?
+            updates = columns.map do |c|
+              "#{quote_identifier(c)}=VALUES(#{quote_identifier(c)})"
+            end.join(COMMA_SEPARATOR)
+          else
+            updates = opts[:on_duplicate_key_update].map do |c|
+              "#{quote_identifier(c)}=VALUES(#{quote_identifier(c)})"
+            end.join(COMMA_SEPARATOR)
+          end
+        end
         values = values.map {|r| literal(Array(r))}.join(COMMA_SEPARATOR)
-        ["INSERT#{' IGNORE' if opts[:multi_insert_ignore]} INTO #{source_list(@opts[:from])} (#{identifier_list(columns)}) VALUES #{values}"]
+        ["INSERT#{' IGNORE' if opts[:multi_insert_ignore]} INTO #{source_list(@opts[:from])} (#{identifier_list(columns)}) VALUES #{values}#{" ON DUPLICATE KEY UPDATE " + updates if opts[:multi_insert_update] }"]
       end
       
       # MySQL uses the nonstandard ` (backtick) for quoting identifiers.
