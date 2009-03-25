@@ -600,9 +600,6 @@ context "A grouped MySQL dataset" do
 end
 
 context "A MySQL database" do
-  setup do
-  end
-  
   specify "should support fulltext indexes" do
     g = Sequel::Schema::Generator.new(MYSQL_DB) do
       text :title
@@ -663,7 +660,7 @@ end
 context "MySQL::Dataset#insert" do
   setup do
     @d = MYSQL_DB[:items]
-    @d.delete # remove all records
+    @d.delete
     MYSQL_DB.sqls.clear
   end
 
@@ -707,7 +704,7 @@ end
 context "MySQL::Dataset#multi_insert" do
   setup do
     @d = MYSQL_DB[:items]
-    @d.delete # remove all records
+    @d.delete
     MYSQL_DB.sqls.clear
   end
   
@@ -786,12 +783,12 @@ end
 context "MySQL::Dataset#multi_insert_ignore" do
   setup do
     @d = MYSQL_DB[:items]
-    @d.delete # remove all records
+    @d.delete
     MYSQL_DB.sqls.clear
   end
   
-  specify "should insert multiple records in a single statement" do
-    @d.multi_insert([{:name => 'abc'}, {:name => 'def'}])
+  specify "should add the IGNORE keyword when inserting" do
+    @d.multi_insert_ignore([{:name => 'abc'}, {:name => 'def'}])
     
     MYSQL_DB.sqls.should == [
       SQL_BEGIN,
@@ -801,63 +798,6 @@ context "MySQL::Dataset#multi_insert_ignore" do
 
     @d.all.should == [
       {:name => 'abc', :value => nil}, {:name => 'def', :value => nil}
-    ]
-  end
-
-  specify "should split the list of records into batches if :commit_every option is given" do
-    @d.multi_insert([{:value => 1}, {:value => 2}, {:value => 3}, {:value => 4}],
-      :commit_every => 2)
-
-    MYSQL_DB.sqls.should == [
-      SQL_BEGIN,
-      "INSERT IGNORE INTO items (value) VALUES (1), (2)",
-      SQL_COMMIT,
-      SQL_BEGIN,
-      "INSERT IGNORE INTO items (value) VALUES (3), (4)",
-      SQL_COMMIT
-    ]
-    
-    @d.all.should == [
-      {:name => nil, :value => 1}, 
-      {:name => nil, :value => 2},
-      {:name => nil, :value => 3}, 
-      {:name => nil, :value => 4}
-    ]
-  end
-
-  specify "should split the list of records into batches if :slice option is given" do
-    @d.multi_insert([{:value => 1}, {:value => 2}, {:value => 3}, {:value => 4}],
-      :slice => 2)
-
-    MYSQL_DB.sqls.should == [
-      SQL_BEGIN,
-      "INSERT IGNORE INTO items (value) VALUES (1), (2)",
-      SQL_COMMIT,
-      SQL_BEGIN,
-      "INSERT IGNORE INTO items (value) VALUES (3), (4)",
-      SQL_COMMIT
-    ]
-    
-    @d.all.should == [
-      {:name => nil, :value => 1}, 
-      {:name => nil, :value => 2},
-      {:name => nil, :value => 3}, 
-      {:name => nil, :value => 4}
-    ]
-  end
-  
-  specify "should support inserting using columns and values arrays" do
-    @d.multi_insert([:name, :value], [['abc', 1], ['def', 2]])
-
-    MYSQL_DB.sqls.should == [
-      SQL_BEGIN,
-      "INSERT IGNORE INTO items (name, value) VALUES ('abc', 1), ('def', 2)",
-      SQL_COMMIT
-    ]
-    
-    @d.all.should == [
-      {:name => 'abc', :value => 1}, 
-      {:name => 'def', :value => 2}
     ]
   end
 end

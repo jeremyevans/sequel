@@ -89,7 +89,7 @@ module Sequel
        order_more paginate print query range reverse_order right_outer_join
        select select_all select_more server set set_graph_aliases 
        single_value to_csv to_hash transform union unfiltered unordered 
-       update where with_sql multi_insert_ignore'.map{|x| x.to_sym}
+       update where with_sql'.map{|x| x.to_sym}
   
     # Regular expression that much match for a public instance method of a plugin
     # dataset to have a model method created that calls it

@@ -243,15 +243,17 @@ module Sequel
         end
       end
       
+      # Similar to the multi_insert method, but skips errors.
+      # Useful if you have a unique key and want to just skip
+      # inserting rows that violate the unique key restriction.
       def multi_insert_ignore(*args)
         clone(:multi_insert_ignore=>true).multi_insert(*args)
       end
       
       # MySQL specific syntax for inserting multiple values at once.
       def multi_insert_sql(columns, values)
-        ignore = opts[:multi_insert_ignore] ? ' IGNORE' : ''
         values = values.map {|r| literal(Array(r))}.join(COMMA_SEPARATOR)
-        ["INSERT#{ignore} INTO #{source_list(@opts[:from])} (#{identifier_list(columns)}) VALUES #{values}"]
+        ["INSERT#{' IGNORE' if opts[:multi_insert_ignore]} INTO #{source_list(@opts[:from])} (#{identifier_list(columns)}) VALUES #{values}"]
       end
       
       # MySQL uses the nonstandard ` (backtick) for quoting identifiers.

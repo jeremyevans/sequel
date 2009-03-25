@@ -1,5 +1,7 @@
 === HEAD
 
+* Add multi_insert_ignore to the MySQL adapter, used for skipping errors when inserting multiple records at once (dusty)
+
 * Add Sequel::MySQL.convert_invalid_date_time accessor for dealing with dates like "0000-00-00" and times like "25:00:00" (jeremyevans, epugh)
 
 * Eliminate internal dependence on core_sql extensions (jeremyevans)
