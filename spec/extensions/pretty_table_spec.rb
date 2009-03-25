@@ -3,7 +3,7 @@ require File.join(File.dirname(__FILE__), 'spec_helper')
 require 'stringio'
 
 context "Dataset#print" do
-  setup do
+  before do
     @output = StringIO.new
     @orig_stdout = $stdout
     $stdout = @output
@@ -15,7 +15,7 @@ context "Dataset#print" do
     end
   end
 
-  teardown do
+  after do
     $stdout = @orig_stdout
   end
 
@@ -36,7 +36,7 @@ context "Dataset#print" do
 end
 
 context "PrettyTable" do
-  setup do
+  before do
     @data1 = [
       {:x => 3, :y => 4}
     ]
@@ -57,7 +57,7 @@ context "PrettyTable" do
     $stdout = @output
   end
 
-  teardown do
+  after do
     $stdout = @orig_stdout
   end
   

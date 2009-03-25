@@ -1,7 +1,7 @@
 require File.join(File.dirname(__FILE__), "spec_helper")
 
 context "Database#dataset" do
-  setup do
+  before do
     @db = Sequel::Database.new
   end
 
@@ -13,7 +13,7 @@ context "Database#dataset" do
 end
 
 context "Dataset#query" do
-  setup do
+  before do
     @d = Sequel::Dataset.new(nil)
   end
   

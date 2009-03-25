@@ -1,4 +1,8 @@
 module Sequel
+  # Hash of adapters that have been used. The key is the adapter scheme
+  # symbol, and the value is the Database subclass.
+  ADAPTER_MAP = {}
+    
   # Array of all databases to which Sequel has connected.  If you are
   # developing an application that can connect to an arbitrary number of 
   # databases, delete the database objects from this or they will not get
@@ -19,9 +23,6 @@ module Sequel
     SQL_COMMIT = 'COMMIT'.freeze
     SQL_ROLLBACK = 'ROLLBACK'.freeze
 
-    # Hash of adapters that have been used
-    @@adapters = Hash.new
-    
     # The identifier input method to use by default
     @@identifier_input_method = nil
 
@@ -34,7 +35,7 @@ module Sequel
     # Whether to quote identifiers (columns and tables) by default
     @@quote_identifiers = nil
 
-    # The default schema to use
+    # The default schema to use, generally should be nil.
     attr_accessor :default_schema
 
     # Array of SQL loggers to use for this database
@@ -91,25 +92,25 @@ module Sequel
     ### Class Methods ###
 
     # The Database subclass for the given adapter scheme.
-    # Raises Sequel::Error::AdapterNotFound if the adapter
+    # Raises Sequel::AdapterNotFound if the adapter
     # could not be loaded.
     def self.adapter_class(scheme)
       scheme = scheme.to_s.gsub('-', '_').to_sym
       
-      if (klass = @@adapters[scheme]).nil?
+      unless klass = ADAPTER_MAP[scheme]
         # attempt to load the adapter file
         begin
           Sequel.require "adapters/#{scheme}"
         rescue LoadError => e
-          raise Error::AdapterNotFound, "Could not load #{scheme} adapter:\n  #{e.message}"
+          raise AdapterNotFound, "Could not load #{scheme} adapter:\n  #{e.message}"
         end
         
         # make sure we actually loaded the adapter
-        if (klass = @@adapters[scheme]).nil?
-          raise Error::AdapterNotFound, "Could not load #{scheme} adapter"
+        unless klass = ADAPTER_MAP[scheme]
+          raise AdapterNotFound, "Could not load #{scheme} adapter"
         end
       end
-      return klass
+      klass
     end
         
     # Returns the scheme for the Database class.
@@ -120,11 +121,8 @@ module Sequel
     # Connects to a database.  See Sequel.connect.
     def self.connect(conn_string, opts = {}, &block)
       if conn_string.is_a?(String)
-        if conn_string =~ /\Ajdbc:/
-          c = adapter_class(:jdbc)
-          opts = {:uri=>conn_string}.merge(opts)
-        elsif conn_string =~ /\Ado:/
-          c = adapter_class(:do)
+        if match = /\A(jdbc|do):/o.match(conn_string)
+          c = adapter_class(match[1].to_sym)
           opts = {:uri=>conn_string}.merge(opts)
         else
           uri = URI.parse(conn_string)
@@ -164,6 +162,7 @@ module Sequel
     end
     
     # Set the method to call on identifiers going into the database
+    # See Sequel.identifier_input_method=.
     def self.identifier_input_method=(v)
       @@identifier_input_method = v || ""
     end
@@ -174,6 +173,7 @@ module Sequel
     end
     
     # Set the method to call on identifiers coming from the database
+    # See Sequel.identifier_output_method=.
     def self.identifier_output_method=(v)
       @@identifier_output_method = v || ""
     end
@@ -193,7 +193,7 @@ module Sequel
     ### Private Class Methods ###
 
     # Sets the adapter scheme for the Database class. Call this method in
-    # descendnants of Database to allow connection using a URL. For example the
+    # descendants of Database to allow connection using a URL. For example the
     # following:
     #
     #   class Sequel::MyDB::Database < Sequel::Database
@@ -206,7 +206,7 @@ module Sequel
     #   Sequel.connect('mydb://user:password@dbserver/mydb')
     def self.set_adapter_scheme(scheme) # :nodoc:
       @scheme = scheme
-      @@adapters[scheme.to_sym] = self
+      ADAPTER_MAP[scheme.to_sym] = self
     end
     
     # Converts a uri to an options hash. These options are then passed
@@ -233,14 +233,14 @@ module Sequel
     # the method acts as an alias for Database#fetch, returning a dataset for
     # arbitrary SQL:
     #
-    #   DB['SELECT * FROM items WHERE name = ?', my_name].print
+    #   DB['SELECT * FROM items WHERE name = ?', my_name].all
     #
     # Otherwise, acts as an alias for Database#from, setting the primary
     # table for the dataset:
     #
     #   DB[:items].sql #=> "SELECT * FROM items"
-    def [](*args, &block)
-      (String === args.first) ? fetch(*args, &block) : from(*args, &block)
+    def [](*args)
+      (String === args.first) ? fetch(*args) : from(*args)
     end
     
     # Call the prepared statement with the given name with the given hash
@@ -254,36 +254,40 @@ module Sequel
       raise NotImplementedError, "#connect should be overridden by adapters"
     end
     
-    # Returns a blank dataset
+    # Returns a blank dataset for this database
     def dataset
       ds = Sequel::Dataset.new(self)
     end
     
-    # Disconnects all available connections from the connection pool.  If any
-    # connections are currently in use, they will not be disconnected.
+    # Disconnects all available connections from the connection pool.  Any
+    # connections currently in use will not be disconnected.
     def disconnect
       pool.disconnect
     end
 
-    # Executes the given SQL. This method should be overridden in descendants.
+    # Executes the given SQL on the database. This method should be overridden in descendants.
+    # This method should not be called directly by user code.
     def execute(sql, opts={})
       raise NotImplementedError, "#execute should be overridden by adapters"
     end
     
     # Method that should be used when submitting any DDL (Data Definition
     # Language) SQL.  By default, calls execute_dui.
+    # This method should not be called directly by user code.
     def execute_ddl(sql, opts={}, &block)
       execute_dui(sql, opts, &block)
     end
 
     # Method that should be used when issuing a DELETE, UPDATE, or INSERT
     # statement.  By default, calls execute.
+    # This method should not be called directly by user code.
     def execute_dui(sql, opts={}, &block)
       execute(sql, opts, &block)
     end
 
     # Method that should be used when issuing a INSERT
     # statement.  By default, calls execute_dui.
+    # This method should not be called directly by user code.
     def execute_insert(sql, opts={}, &block)
       execute_dui(sql, opts, &block)
     end
@@ -295,12 +299,12 @@ module Sequel
     #
     # The method returns a dataset instance:
     #
-    #   DB.fetch('SELECT * FROM items').print
+    #   DB.fetch('SELECT * FROM items').all
     #
     # Fetch can also perform parameterized queries for protection against SQL
     # injection:
     #
-    #   DB.fetch('SELECT * FROM items WHERE name = ?', my_name).print
+    #   DB.fetch('SELECT * FROM items WHERE name = ?', my_name).all
     def fetch(sql, *args, &block)
       ds = dataset.with_sql(sql, *args)
       ds.each(&block) if block
@@ -370,6 +374,11 @@ module Sequel
       "#<#{self.class}: #{(uri rescue opts).inspect}>" 
     end
 
+    # Proxy the literal call to the dataset, used for default values.
+    def literal(v)
+      schema_utility_dataset.literal(v)
+    end
+
     # Log a message at level info to all loggers.  All SQL logging
     # goes through this method.
     def log_info(message, args=nil)
@@ -377,22 +386,11 @@ module Sequel
       @loggers.each{|logger| logger.info(message)}
     end
 
-    # Return the first logger or nil if no loggers are being used.
-    # Should only be used for backwards compatibility.
-    def logger
-      @loggers.first
-    end
-
-    # Replace the array of loggers with the given logger(s).
+    # Remove any existing loggers and just use the given logger.
     def logger=(logger)
       @loggers = Array(logger)
     end
 
-    # Returns true unless the database is using a single-threaded connection pool.
-    def multi_threaded?
-      !@single_threaded
-    end
-    
     # Whether to quote identifiers (columns and tables) for this database
     def quote_identifiers=(v)
       reset_schema_utility_dataset
@@ -410,11 +408,60 @@ module Sequel
       dataset.select(*args, &block)
     end
     
-    # Default serial primary key options.
-    def serial_primary_key_options
-      {:primary_key => true, :type => Integer, :auto_increment => true}
+    # Parse the schema from the database.
+    # If the table_name is not given, returns the schema for all tables as a hash.
+    # If the table_name is given, returns the schema for a single table as an
+    # array with all members being arrays of length 2.  Available options are:
+    #
+    # * :reload - Get fresh information from the database, instead of using
+    #   cached information.  If table_name is blank, :reload should be used
+    #   unless you are sure that schema has not been called before with a
+    #   table_name, otherwise you may only getting the schemas for tables
+    #   that have been requested explicitly.
+    # * :schema - An explicit schema to use.  It may also be implicitly provided
+    #   via the table name.
+    def schema(table = nil, opts={})
+      Deprecation.deprecate('Calling Database#schema without a table argument', 'Use database.tables.inject({}){|h, m| h[m] = database.schema(m); h}') unless table
+      raise(Error, 'schema parsing is not implemented on this database') unless respond_to?(:schema_parse_table, true)
+
+      if table
+        sch, table_name = schema_and_table(table)
+        quoted_name = quote_schema_table(table)
+      end
+      opts = opts.merge(:schema=>sch) if sch && !opts.include?(:schema)
+      if opts[:reload] && @schemas
+        if table_name
+          @schemas.delete(quoted_name)
+        else
+          @schemas = nil
+        end
+      end
+
+      if @schemas
+        if table_name
+          return @schemas[quoted_name] if @schemas[quoted_name]
+        else
+          return @schemas
+        end
+      end
+
+      raise(Error, '#tables does not exist, you must provide a specific table to #schema') if table.nil? && !respond_to?(:tables, true)
+
+      @schemas ||= Hash.new do |h,k|
+        quote_name = quote_schema_table(k)
+        h[quote_name] if h.include?(quote_name)
+      end
+
+      if table_name
+        cols = schema_parse_table(table_name, opts)
+        raise(Error, 'schema parsing returned no columns, table probably doesn\'t exist') if cols.nil? || cols.empty?
+        @schemas[quoted_name] = cols
+      else
+        tables.each{|t| @schemas[quote_schema_table(t)] = schema_parse_table(t.to_s, opts)}
+        @schemas
+      end
     end
-    
+
     # Returns true if the database is using a single-threaded connection pool.
     def single_threaded?
       @single_threaded
@@ -480,7 +527,7 @@ module Sequel
     
     # Typecast the value to the given column_type. Can be overridden in
     # adapters to support database specific column types.
-    # This method should raise Sequel::Error::InvalidValue if assigned value
+    # This method should raise Sequel::InvalidValue if assigned value
     # is invalid.
     def typecast_value(column_type, value)
       return nil if value.nil?
@@ -499,7 +546,7 @@ module Sequel
           when String, Numeric
             BigDecimal.new(value.to_s)
           else
-            raise Sequel::Error::InvalidValue, "invalid value for BigDecimal: #{value.inspect}"
+            raise Sequel::InvalidValue, "invalid value for BigDecimal: #{value.inspect}"
           end
         when :boolean
           case value
@@ -517,7 +564,7 @@ module Sequel
           when String
             Sequel.string_to_date(value)
           else
-            raise Sequel::Error::InvalidValue, "invalid value for Date: #{value.inspect}"
+            raise Sequel::InvalidValue, "invalid value for Date: #{value.inspect}"
           end
         when :time
           case value
@@ -526,10 +573,10 @@ module Sequel
           when String
             Sequel.string_to_time(value)
           else
-            raise Sequel::Error::InvalidValue, "invalid value for Time: #{value.inspect}"
+            raise Sequel::InvalidValue, "invalid value for Time: #{value.inspect}"
           end
         when :datetime
-          raise(Sequel::Error::InvalidValue, "invalid value for Datetime: #{value.inspect}") unless [DateTime, Date, Time, String].any?{|c| value.is_a?(c)}
+          raise(Sequel::InvalidValue, "invalid value for Datetime: #{value.inspect}") unless [DateTime, Date, Time, String].any?{|c| value.is_a?(c)}
           if Sequel.datetime_class === value
             # Already the correct class, no need to convert
             value
@@ -544,7 +591,7 @@ module Sequel
           value
         end
       rescue ArgumentError, TypeError => exp
-        e = Sequel::Error::InvalidValue.new("#{exp.class} #{exp.message}")
+        e = Sequel::InvalidValue.new("#{exp.class} #{exp.message}")
         e.set_backtrace(exp.backtrace)
         raise e
       end
@@ -630,6 +677,8 @@ module Sequel
       :downcase
     end
     
+    # Whether to quote identifiers by default for this database, true
+    # by default.
     def quote_identifiers_default
       true
     end
@@ -651,9 +700,55 @@ module Sequel
       end
     end
     
+    # Remove the cached schema for the given schema name
+    def remove_cached_schema(table)
+      @schemas.delete(quote_schema_table(table)) if @schemas
+    end
+
+    # Remove the cached schema_utility_dataset, because the identifier
+    # quoting has changed.
+    def reset_schema_utility_dataset
+      @schema_utility_dataset = nil
+    end
+
     # Split the schema information from the table
     def schema_and_table(table_name)
       schema_utility_dataset.schema_and_table(table_name)
+    end
+
+    # Match the database's column type to a ruby type via a
+    # regular expression.  The following ruby types are supported:
+    # integer, string, date, datetime, boolean, and float.
+    def schema_column_type(db_type)
+      case db_type
+      when /\Atinyint/io
+        Sequel.convert_tinyint_to_bool ? :boolean : :integer
+      when /\Ainterval\z/io
+        :interval
+      when /\A(character( varying)?|varchar|text)/io
+        :string
+      when /\A(int(eger)?|bigint|smallint)/io
+        :integer
+      when /\Adate\z/io
+        :date
+      when /\A(datetime|timestamp( with(out)? time zone)?)\z/io
+        :datetime
+      when /\Atime( with(out)? time zone)?\z/io
+        :time
+      when /\Aboolean\z/io
+        :boolean
+      when /\A(real|float|double( precision)?)\z/io
+        :float
+      when /\A(numeric(\(\d+,\d+\))?|decimal|money)\z/io
+        :decimal
+      when /bytea|blob/io
+        :blob
+      end
+    end
+
+    # The dataset to use for proxying certain schema methods.
+    def schema_utility_dataset
+      @schema_utility_dataset ||= dataset
     end
 
     # Return the options for the given server by merging the generic
@@ -676,9 +771,9 @@ module Sequel
       opts
     end
 
-    # Raise a database error unless the exception is an Error::Rollback.
+    # Raise a database error unless the exception is an Rollback.
     def transaction_error(e, *classes)
-      raise_error(e, :classes=>classes) unless Error::Rollback === e
+      raise_error(e, :classes=>classes) unless Rollback === e
     end
   end
 end

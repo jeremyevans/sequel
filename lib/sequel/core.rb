@@ -14,9 +14,10 @@ end
 #          :max_connections=>10)
 #
 # If a block is given to these methods, it is passed the opened Database
-# object, which is closed (disconnected) when the block exits.  For example:
+# object, which is closed (disconnected) when the block exits, just
+# like a block passed to connect.  For example:
 #
-#   Sequel.sqlite('blog.db'){|db| puts db.users.count}  
+#   Sequel.sqlite('blog.db'){|db| puts db[:users].count}  
 #
 # Sequel converts the column type tinyint to a boolean by default,
 # you can override the conversion to use tinyint as an integer:
@@ -25,7 +26,7 @@ end
 #
 # Sequel converts two digit years in Dates and DateTimes by default,
 # so 01/02/03 is interpreted at January 2nd, 2003, and 12/13/99 is interpreted
-# as December 13, 1999.. You can override this # to treat those dates as
+# as December 13, 1999.. You can override this to treat those dates as
 # January 2nd, 0003 and December 13, 0099, respectively, by setting: 
 #
 #   Sequel.convert_two_digit_years = false
@@ -50,7 +51,7 @@ end
 # When the virtual_row_instance_eval is false, using a virtual row block without a block
 # argument will generate a deprecation message.
 #
-# The option to not use instance_eval for a block with no arguments will be removed in a future version.
+# The option to not use instance_eval for a block with no arguments will be removed in Sequel 3.0.
 # If you have any virtual row blocks that you don't want to use instance_eval for,
 # make sure the blocks have block arguments.
 module Sequel
@@ -61,6 +62,20 @@ module Sequel
   
   class << self
     attr_accessor :convert_tinyint_to_bool, :convert_two_digit_years, :datetime_class, :virtual_row_instance_eval
+  end
+
+  # Returns true if the passed object could be a specifier of conditions, false otherwise.
+  # Currently, Sequel considers hashes and arrays of all two pairs as
+  # condition specifiers.
+  def self.condition_specifier?(obj)
+    case obj
+    when Hash
+      true
+    when Array
+      !obj.empty? && obj.all?{|i| (Array === i) && (i.length == 2)}
+    else
+      false
+    end
   end
 
   # Creates a new database object based on the supplied connection string
@@ -92,7 +107,7 @@ module Sequel
   #
   #   Sequel.identifier_input_method = :downcase
   #
-  # Other string methods work as well.
+  # Other String instance methods work as well.
   def self.identifier_input_method=(value)
     Database.identifier_input_method = value
   end
@@ -108,7 +123,7 @@ module Sequel
   #
   #   Sequel.identifier_output_method = :upcase
   #
-  # Other string methods work as well.
+  # Other String instance methods work as well.
   def self.identifier_output_method=(value)
     Database.identifier_output_method = value
   end
@@ -122,7 +137,7 @@ module Sequel
   end
 
   # Require all given files which should be in the same or a subdirectory of
-  # this file
+  # this file.  If a subdir is given, assume all files are in that subdir.
   def self.require(files, subdir=nil)
     Array(files).each{|f| super("#{File.dirname(__FILE__)}/#{"#{subdir}/" if subdir}#{f}")}
   end
@@ -137,16 +152,16 @@ module Sequel
     Database.single_threaded = value
   end
 
-  # Converts a string into a Date object.
+  # Converts the given string into a Date object.
   def self.string_to_date(s)
     begin
       Date.parse(s, Sequel.convert_two_digit_years)
     rescue => e
-      raise Error::InvalidValue, "Invalid Date value '#{self}' (#{e.message})"
+      raise InvalidValue, "Invalid Date value '#{self}' (#{e.message})"
     end
   end
 
-  # Converts a string into a Time or DateTime object, depending on the
+  # Converts the given string into a Time or DateTime object, depending on the
   # value of Sequel.datetime_class.
   def self.string_to_datetime(s)
     begin
@@ -156,16 +171,16 @@ module Sequel
         datetime_class.parse(s)
       end
     rescue => e
-      raise Error::InvalidValue, "Invalid #{datetime_class} value '#{self}' (#{e.message})"
+      raise InvalidValue, "Invalid #{datetime_class} value '#{self}' (#{e.message})"
     end
   end
 
-  # Converts a string into a Time object.
+  # Converts the given string into a Time object.
   def self.string_to_time(s)
     begin
       Time.parse(s)
     rescue => e
-      raise Error::InvalidValue, "Invalid Time value '#{self}' (#{e.message})"
+      raise InvalidValue, "Invalid Time value '#{self}' (#{e.message})"
     end
   end
 
@@ -195,9 +210,9 @@ module Sequel
 
   private_class_method :adapter_method, :def_adapter_method
   
-  require(%w"metaprogramming sql core_sql connection_pool exceptions dataset migration database version deprecated")
+  require(%w"metaprogramming sql core_sql connection_pool exceptions dataset database version deprecated")
   require(%w"schema_generator schema_methods schema_sql", 'database')
-  require(%w"convenience prepared_statements graph sql", 'dataset')
+  require(%w"convenience graph prepared_statements sql", 'dataset')
 
   # Add the database adapter class methods to Sequel via metaprogramming
   def_adapter_method(*Database::ADAPTERS)

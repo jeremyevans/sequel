@@ -36,6 +36,8 @@ module Sequel
     end
   end
 
+  require 'deprecated_migration'
+
   def self.open(*args, &block)
     Deprecation.deprecate('Sequel.open', 'Use Sequel.connect')
     Database.connect(*args, &block)
@@ -80,6 +82,16 @@ module Sequel
     def query(&block)
       Deprecation.deprecate('Sequel::Database#query', 'require "sequel/extensions/query" first')
       dataset.query(&block)
+    end
+
+    def logger
+      Deprecation.deprecate('Sequel::Database#logger', 'Use Sequel::Database#loggers')
+      @loggers.first
+    end
+
+    def multi_threaded?
+      Deprecation.deprecate('Sequel::Database#multi_threaded?', 'Use !database.single_threaded?')
+      !@single_threaded
     end
   end
 
@@ -247,6 +259,12 @@ module Sequel
       require "sequel/extensions/pretty_table"
       print(*args)
     end
+  end
+
+  class Error
+    class InvalidStatement < Error; end
+    class InvalidTransform < Error; end
+    class NoExistingFilter < InvalidOperation; end
   end
 end
 

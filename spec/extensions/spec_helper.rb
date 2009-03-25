@@ -10,7 +10,7 @@ end
 
 Sequel.virtual_row_instance_eval = true
 
-extensions = %w'string_date_time inflector pagination query pretty_table blank'
+extensions = %w'string_date_time inflector pagination query pretty_table blank migration'
 plugins = {:hook_class_methods=>[], :schema=>[], :validation_class_methods=>[]}
 
 extensions.each{|e| require "sequel/extensions/#{e}"}

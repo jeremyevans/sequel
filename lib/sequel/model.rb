@@ -81,14 +81,15 @@ module Sequel
   #   * Model.is_a => is
   class Model
     # Dataset methods to proxy via metaprogramming
-    DATASET_METHODS = %w'<< all avg count delete distinct eager eager_graph each each_page 
-       empty? except exclude filter first from from_self full_outer_join get graph 
-       group group_and_count group_by having inner_join insert 
-       insert_multiple intersect interval join join_table last 
-       left_outer_join limit map multi_insert naked order order_by order_more 
-       paginate print query range reverse_order right_outer_join select 
-       select_all select_more server set set_graph_aliases single_value to_csv to_hash
-       transform union unfiltered unordered update where with_sql'.map{|x| x.to_sym}
+    DATASET_METHODS = %w'<< all avg count delete distinct eager eager_graph
+       each each_page empty? except exclude filter first from from_self
+       full_outer_join get graph group group_and_count group_by having
+       inner_join insert insert_multiple intersect interval join join_table
+       last left_outer_join limit map multi_insert naked order order_by
+       order_more paginate print query range reverse_order right_outer_join
+       select select_all select_more server set set_graph_aliases 
+       single_value to_csv to_hash transform union unfiltered unordered 
+       update where with_sql'.map{|x| x.to_sym}
   
     # Regular expression that much match for a public instance method of a plugin
     # dataset to have a model method created that calls it

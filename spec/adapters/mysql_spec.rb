@@ -44,7 +44,7 @@ else
 end
 
 context "MySQL", '#create_table' do
-  setup do
+  before do
     @db = MYSQL_DB
   end
   after(:each) do
@@ -57,10 +57,10 @@ context "MySQL", '#create_table' do
 end
 
 context "A MySQL database" do
-  setup do
+  before do
     @db = MYSQL_DB
   end
-  teardown do
+  after do
     Sequel.convert_tinyint_to_bool = true
   end
 
@@ -99,7 +99,7 @@ context "A MySQL database" do
 end
 
 context "A MySQL dataset" do
-  setup do
+  before do
     @d = MYSQL_DB[:items]
     @d.delete # remove all records
     MYSQL_DB.sqls.clear
@@ -270,10 +270,10 @@ context "A MySQL dataset" do
 end
 
 context "MySQL datasets" do
-  setup do
+  before do
     @d = MYSQL_DB[:orders]
   end
-  teardown do
+  after do
     Sequel.convert_tinyint_to_bool = true
   end
   
@@ -313,7 +313,7 @@ context "MySQL datasets" do
 end
 
 context "MySQL join expressions" do
-  setup do
+  before do
     @ds = MYSQL_DB[:nodes]
     @ds.db.meta_def(:server_version) {50014}
   end
@@ -364,7 +364,7 @@ context "MySQL join expressions" do
 end
 
 context "Joined MySQL dataset" do
-  setup do
+  before do
     @ds = MYSQL_DB[:nodes]
   end
   
@@ -388,7 +388,7 @@ context "Joined MySQL dataset" do
 end
 
 context "A MySQL database" do
-  setup do
+  before do
     @db = MYSQL_DB
   end
 
@@ -479,21 +479,21 @@ context "A MySQL database", "with table options" do
   end
   
   specify "should allow to pass custom options (engine, charset, collate) for table creation" do
-    statements = @db.create_table_sql_list(:items, *(@g.create_info << @options))
+    statements = @db.send(:create_table_sql_list, :items, *(@g.create_info << @options))
     statements.should == [
       "CREATE TABLE items (size integer, name text) ENGINE=MyISAM DEFAULT CHARSET=latin2 DEFAULT COLLATE=swedish"
     ]
   end
   
   specify "should use default options if specified (engine, charset, collate) for table creation" do
-    statements = @db.create_table_sql_list(:items, *(@g.create_info))
+    statements = @db.send(:create_table_sql_list, :items, *(@g.create_info))
     statements.should == [
       "CREATE TABLE items (size integer, name text) ENGINE=InnoDB DEFAULT CHARSET=utf8 DEFAULT COLLATE=utf8"
     ]
   end
   
   specify "should not use default if option has a nil value" do
-    statements = @db.create_table_sql_list(:items, *(@g.create_info << {:engine=>nil, :charset=>nil, :collate=>nil}))
+    statements = @db.send(:create_table_sql_list, :items, *(@g.create_info << {:engine=>nil, :charset=>nil, :collate=>nil}))
     statements.should == [
       "CREATE TABLE items (size integer, name text)"
     ]
@@ -501,7 +501,7 @@ context "A MySQL database", "with table options" do
 end
 
 context "A MySQL database" do
-  setup do
+  before do
     @db = MYSQL_DB
   end
   
@@ -510,7 +510,7 @@ context "A MySQL database" do
       boolean :active1, :default => true
       boolean :active2, :default => false
     end
-    statements = @db.create_table_sql_list(:items, *g.create_info)
+    statements = @db.send(:create_table_sql_list, :items, *g.create_info)
     statements.should == [
       "CREATE TABLE items (active1 boolean DEFAULT 1, active2 boolean DEFAULT 0)"
     ]
@@ -521,7 +521,7 @@ context "A MySQL database" do
       foreign_key :p_id, :table => :users, :key => :id, 
         :null => false, :on_delete => :cascade
     end
-    @db.create_table_sql_list(:items, *g.create_info).should == [
+    @db.send(:create_table_sql_list, :items, *g.create_info).should == [
       "CREATE TABLE items (p_id integer NOT NULL, FOREIGN KEY (p_id) REFERENCES users(id) ON DELETE CASCADE)"
     ]
   end
@@ -530,7 +530,7 @@ specify "should correctly format ALTER TABLE statements with foreign keys" do
   g = Sequel::Schema::AlterTableGenerator.new(@db) do
     add_foreign_key :p_id, :users, :key => :id, :null => false, :on_delete => :cascade
   end
-  @db.alter_table_sql_list(:items, g.operations).should == [[
+  @db.send(:alter_table_sql_list, :items, g.operations).should == [[
     "ALTER TABLE items ADD COLUMN p_id integer NOT NULL",
     "ALTER TABLE items ADD FOREIGN KEY (p_id) REFERENCES users(id) ON DELETE CASCADE"
   ]]
@@ -578,7 +578,7 @@ if %w'localhost 127.0.0.1 ::1'.include?(MYSQL_URI.host) and MYSQL_DB.class.adapt
 end
 
 context "A grouped MySQL dataset" do
-  setup do
+  before do
     MYSQL_DB[:test2].delete
     MYSQL_DB[:test2] << {:name => '11', :value => 10}
     MYSQL_DB[:test2] << {:name => '11', :value => 20}
@@ -600,16 +600,13 @@ context "A grouped MySQL dataset" do
 end
 
 context "A MySQL database" do
-  setup do
-  end
-  
   specify "should support fulltext indexes" do
     g = Sequel::Schema::Generator.new(MYSQL_DB) do
       text :title
       text :body
       full_text_index [:title, :body]
     end
-    MYSQL_DB.create_table_sql_list(:posts, *g.create_info).should == [
+    MYSQL_DB.send(:create_table_sql_list, :posts, *g.create_info).should == [
       "CREATE TABLE posts (title text, body text)",
       "CREATE FULLTEXT INDEX posts_title_body_index ON posts (title, body)"
     ]
@@ -631,7 +628,7 @@ context "A MySQL database" do
       point :geom
       spatial_index [:geom]
     end
-    MYSQL_DB.create_table_sql_list(:posts, *g.create_info).should == [
+    MYSQL_DB.send(:create_table_sql_list, :posts, *g.create_info).should == [
       "CREATE TABLE posts (geom point)",
       "CREATE SPATIAL INDEX posts_geom_index ON posts (geom)"
     ]
@@ -642,7 +639,7 @@ context "A MySQL database" do
       text :title
       index :title, :type => :hash
     end
-    MYSQL_DB.create_table_sql_list(:posts, *g.create_info).should == [
+    MYSQL_DB.send(:create_table_sql_list, :posts, *g.create_info).should == [
       "CREATE TABLE posts (title text)",
       "CREATE INDEX posts_title_index ON posts (title) USING hash"
     ]
@@ -653,7 +650,7 @@ context "A MySQL database" do
       text :title
       index :title, :type => :hash, :unique => true
     end
-    MYSQL_DB.create_table_sql_list(:posts, *g.create_info).should == [
+    MYSQL_DB.send(:create_table_sql_list, :posts, *g.create_info).should == [
       "CREATE TABLE posts (title text)",
       "CREATE UNIQUE INDEX posts_title_index ON posts (title) USING hash"
     ]
@@ -661,9 +658,9 @@ context "A MySQL database" do
 end
 
 context "MySQL::Dataset#insert" do
-  setup do
+  before do
     @d = MYSQL_DB[:items]
-    @d.delete # remove all records
+    @d.delete
     MYSQL_DB.sqls.clear
   end
 
@@ -705,9 +702,9 @@ context "MySQL::Dataset#insert" do
 end
 
 context "MySQL::Dataset#multi_insert" do
-  setup do
+  before do
     @d = MYSQL_DB[:items]
-    @d.delete # remove all records
+    @d.delete
     MYSQL_DB.sqls.clear
   end
   
@@ -783,8 +780,70 @@ context "MySQL::Dataset#multi_insert" do
   end
 end
 
+context "MySQL::Dataset#multi_insert_ignore" do
+  before do
+    @d = MYSQL_DB[:items]
+    @d.delete
+    MYSQL_DB.sqls.clear
+  end
+  
+  specify "should add the IGNORE keyword when inserting" do
+    @d.multi_insert_ignore.multi_insert([{:name => 'abc'}, {:name => 'def'}])
+    
+    MYSQL_DB.sqls.should == [
+      SQL_BEGIN,
+      "INSERT IGNORE INTO items (name) VALUES ('abc'), ('def')",
+      SQL_COMMIT
+    ]
+
+    @d.all.should == [
+      {:name => 'abc', :value => nil}, {:name => 'def', :value => nil}
+    ]
+  end
+end
+
+context "MySQL::Dataset#multi_insert_update" do
+  before do
+    @d = MYSQL_DB[:items]
+    @d.delete
+    MYSQL_DB.sqls.clear
+  end
+  
+  specify "should add the ON DUPLICATE KEY UPDATE and ALL columns when no args given" do
+    @d.multi_insert_update.multi_insert([:name,:value], 
+      [['abc', 1], ['def',2]]
+    )
+    
+    MYSQL_DB.sqls.should == [
+      SQL_BEGIN,
+      "INSERT INTO items (name, value) VALUES ('abc', 1), ('def', 2) ON DUPLICATE KEY UPDATE name=VALUES(name), value=VALUES(value)",
+      SQL_COMMIT
+    ]
+
+    @d.all.should == [
+      {:name => 'abc', :value => 1}, {:name => 'def', :value => 2}
+    ]
+  end
+  specify "should add the ON DUPLICATE KEY UPDATE and columns specified when args are given" do
+    @d.multi_insert_update(:value).multi_insert([:name,:value], 
+      [['abc', 1], ['def',2]]
+    )
+    
+    MYSQL_DB.sqls.should == [
+      SQL_BEGIN,
+      "INSERT INTO items (name, value) VALUES ('abc', 1), ('def', 2) ON DUPLICATE KEY UPDATE value=VALUES(value)",
+      SQL_COMMIT
+    ]
+
+    @d.all.should == [
+      {:name => 'abc', :value => 1}, {:name => 'def', :value => 2}
+    ]
+  end
+  
+end
+
 context "MySQL::Dataset#replace" do
-  setup do
+  before do
     MYSQL_DB.drop_table(:items) if MYSQL_DB.table_exists?(:items)
     MYSQL_DB.create_table :items do
       integer :id, :unique => true
@@ -808,7 +867,7 @@ context "MySQL::Dataset#replace" do
 end
 
 context "MySQL::Dataset#complex_expression_sql" do
-  setup do
+  before do
     @d = MYSQL_DB.dataset
   end
 
@@ -837,7 +896,7 @@ end
 
 unless MYSQL_DB.class.adapter_scheme == :do
   context "MySQL Stored Procedures" do
-    teardown do
+    after do
       MYSQL_DB.execute('DROP PROCEDURE test_sproc')
     end
     
@@ -870,6 +929,39 @@ unless MYSQL_DB.class.adapter_scheme == :do
       @d.call_sproc(:select, :test_sproc, 4, 5).should == [{:id=>nil, :value=>1, :b=>4, :d=>5}]
       @d.row_proc = proc{|r| r.keys.each{|k| r[k] *= 2 if r[k].is_a?(Integer)}; r}
       @d.call_sproc(:select, :test_sproc, 3, 4).should == [{:id=>nil, :value=>2, :b=>6, :d => 8}]
+    end
+  end
+end
+
+if MYSQL_DB.class.adapter_scheme == :mysql
+  context "MySQL bad date/time conversions" do
+    after do
+      Sequel::MySQL.convert_invalid_date_time = false
+    end
+  
+    specify "should raise an exception when a bad date/time is used and convert_invalid_date_time is false" do
+      Sequel::MySQL.convert_invalid_date_time = false
+      proc{MYSQL_DB["SELECT CAST('0000-00-00' AS date)"].single_value}.should raise_error(Sequel::InvalidValue)
+      proc{MYSQL_DB["SELECT CAST('0000-00-00 00:00:00' AS datetime)"].single_value}.should raise_error(Sequel::InvalidValue)
+      proc{MYSQL_DB["SELECT CAST('25:00:00' AS time)"].single_value}.should raise_error(Sequel::InvalidValue)
+    end
+  
+    specify "should not use a nil value bad date/time is used and convert_invalid_date_time is nil or :nil" do
+      Sequel::MySQL.convert_invalid_date_time = nil
+      MYSQL_DB["SELECT CAST('0000-00-00' AS date)"].single_value.should == nil
+      MYSQL_DB["SELECT CAST('0000-00-00 00:00:00' AS datetime)"].single_value.should == nil
+      MYSQL_DB["SELECT CAST('25:00:00' AS time)"].single_value.should == nil
+      Sequel::MySQL.convert_invalid_date_time = :nil
+      MYSQL_DB["SELECT CAST('0000-00-00' AS date)"].single_value.should == nil
+      MYSQL_DB["SELECT CAST('0000-00-00 00:00:00' AS datetime)"].single_value.should == nil
+      MYSQL_DB["SELECT CAST('25:00:00' AS time)"].single_value.should == nil
+    end
+  
+    specify "should not use a nil value bad date/time is used and convert_invalid_date_time is :string" do
+      Sequel::MySQL.convert_invalid_date_time = :string
+      MYSQL_DB["SELECT CAST('0000-00-00' AS date)"].single_value.should == '0000-00-00'
+      MYSQL_DB["SELECT CAST('0000-00-00 00:00:00' AS datetime)"].single_value.should == '0000-00-00 00:00:00'
+      MYSQL_DB["SELECT CAST('25:00:00' AS time)"].single_value.should == '25:00:00'
     end
   end
 end

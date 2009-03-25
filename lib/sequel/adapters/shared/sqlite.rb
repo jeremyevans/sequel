@@ -15,59 +15,6 @@ module Sequel
         transaction{super}
       end
 
-      # SQLite supports limited table modification.  You can add a column
-      # or an index.  Dropping columns is supported by copying the table into
-      # a temporary table, dropping the table, and creating a new table without
-      # the column inside of a transaction.
-      def alter_table_sql(table, op)
-        case op[:op]
-        when :add_column, :add_index, :drop_index
-          super
-        when :drop_column
-          qt = quote_schema_table(table)
-          bt = quote_identifier(backup_table_name(qt.gsub('`', '')))
-          columns_str = dataset.send(:identifier_list, columns_for(table, :except => op[:name]))
-          defined_columns_str = column_list_sql(defined_columns_for(table, :except => op[:name]))
-          ["CREATE TEMPORARY TABLE #{bt}(#{defined_columns_str})",
-           "INSERT INTO #{bt} SELECT #{columns_str} FROM #{qt}",
-           "DROP TABLE #{qt}",
-           "CREATE TABLE #{qt}(#{defined_columns_str})",
-           "INSERT INTO #{qt} SELECT #{columns_str} FROM #{bt}",
-           "DROP TABLE #{bt}"]
-        when :rename_column
-          qt = quote_schema_table(table)
-          bt = quote_identifier(backup_table_name(qt.gsub('`', '')))
-          old_columns = dataset.send(:identifier_list, columns_for(table))
-          new_columns_arr = columns_for(table)
-
-          # Replace the old column in place. This is extremely important.
-          new_columns_arr[new_columns_arr.index(op[:name])] = op[:new_name]
-          
-          new_columns = dataset.send(:identifier_list, new_columns_arr)
-          
-          def_old_columns = column_list_sql(defined_columns_for(table))
-
-          def_new_columns_arr = defined_columns_for(table).map do |c|
-            c[:name] = op[:new_name].to_s if c[:name] == op[:name].to_s
-            c
-          end
-          
-          def_new_columns = column_list_sql(def_new_columns_arr)
-
-          [
-           "CREATE TEMPORARY TABLE #{bt}(#{def_old_columns})",
-           "INSERT INTO #{bt}(#{old_columns}) SELECT #{old_columns} FROM #{qt}",
-           "DROP TABLE #{qt}",
-           "CREATE TABLE #{qt}(#{def_new_columns})",
-           "INSERT INTO #{qt}(#{new_columns}) SELECT #{old_columns} FROM #{bt}",
-           "DROP TABLE #{bt}"
-          ]
-
-        else
-          raise Error, "Unsupported ALTER TABLE operation"
-        end
-      end
-      
       # A symbol signifying the value of the auto_vacuum PRAGMA.
       def auto_vacuum
         AUTO_VACUUM[pragma_get(:auto_vacuum).to_i]
@@ -126,6 +73,59 @@ module Sequel
       
       private
 
+      # SQLite supports limited table modification.  You can add a column
+      # or an index.  Dropping columns is supported by copying the table into
+      # a temporary table, dropping the table, and creating a new table without
+      # the column inside of a transaction.
+      def alter_table_sql(table, op)
+        case op[:op]
+        when :add_column, :add_index, :drop_index
+          super
+        when :drop_column
+          qt = quote_schema_table(table)
+          bt = quote_identifier(backup_table_name(qt.gsub('`', '')))
+          columns_str = dataset.send(:identifier_list, columns_for(table, :except => op[:name]))
+          defined_columns_str = column_list_sql(defined_columns_for(table, :except => op[:name]))
+          ["CREATE TEMPORARY TABLE #{bt}(#{defined_columns_str})",
+           "INSERT INTO #{bt} SELECT #{columns_str} FROM #{qt}",
+           "DROP TABLE #{qt}",
+           "CREATE TABLE #{qt}(#{defined_columns_str})",
+           "INSERT INTO #{qt} SELECT #{columns_str} FROM #{bt}",
+           "DROP TABLE #{bt}"]
+        when :rename_column
+          qt = quote_schema_table(table)
+          bt = quote_identifier(backup_table_name(qt.gsub('`', '')))
+          old_columns = dataset.send(:identifier_list, columns_for(table))
+          new_columns_arr = columns_for(table)
+
+          # Replace the old column in place. This is extremely important.
+          new_columns_arr[new_columns_arr.index(op[:name])] = op[:new_name]
+          
+          new_columns = dataset.send(:identifier_list, new_columns_arr)
+          
+          def_old_columns = column_list_sql(defined_columns_for(table))
+
+          def_new_columns_arr = defined_columns_for(table).map do |c|
+            c[:name] = op[:new_name].to_s if c[:name] == op[:name].to_s
+            c
+          end
+          
+          def_new_columns = column_list_sql(def_new_columns_arr)
+
+          [
+           "CREATE TEMPORARY TABLE #{bt}(#{def_old_columns})",
+           "INSERT INTO #{bt}(#{old_columns}) SELECT #{old_columns} FROM #{qt}",
+           "DROP TABLE #{qt}",
+           "CREATE TABLE #{qt}(#{def_new_columns})",
+           "INSERT INTO #{qt}(#{new_columns}) SELECT #{old_columns} FROM #{bt}",
+           "DROP TABLE #{bt}"
+          ]
+
+        else
+          raise Error, "Unsupported ALTER TABLE operation"
+        end
+      end
+      
       # The array of column symbols in the table, except for ones given in opts[:except]
       def backup_table_name(table, opts={})
         (opts[:times]||1000).times do |i|

@@ -48,6 +48,11 @@ describe "Simple Dataset operations" do
     @ds.first.should == {:id=>1, :number=>10}
     sqls_should_be('SELECT * FROM items LIMIT 1')
   end
+
+  specify "should alias columns correctly" do
+    @ds.select(:id___x, :number___n).first.should == {:x=>1, :n=>10}
+    sqls_should_be("SELECT id AS 'x', number AS 'n' FROM items LIMIT 1")
+  end
 end
 
 describe "Simple Dataset operations" do

@@ -157,7 +157,7 @@ You can use arithmetic operators and specify SQL functions:
   DB.drop_table :items
 
   DB.create_table :test do
-    String :zipcode, :size => 10
+    String :zipcode
     enum :system, :elements => ['mac', 'linux', 'windows']
   end
 
@@ -189,10 +189,10 @@ Transactions are aborted if an error is raised:
     raise "some error occurred"
   end # ROLLBACK issued and the error is re-raised
 
-Transactions can also be aborted by raising Sequel::Error::Rollback:
+Transactions can also be aborted by raising Sequel::Rollback:
 
   DB.transaction do
-    raise(Sequel::Error::Rollback) if something_bad_happened
+    raise(Sequel::Rollback) if something_bad_happened
   end # ROLLBACK issued and no error raised
 
 Miscellaneous:

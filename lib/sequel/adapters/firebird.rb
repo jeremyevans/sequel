@@ -18,26 +18,6 @@ module Sequel
         @primary_key_sequences = {}
       end
 
-      # Use Firebird specific syntax for add column
-      def alter_table_sql(table, op)
-        case op[:op]
-        when :add_column
-          "ALTER TABLE #{quote_schema_table(table)} ADD #{column_definition_sql(op)}"
-        when :drop_column
-          "ALTER TABLE #{quote_schema_table(table)} DROP #{column_definition_sql(op)}"
-        when :rename_column
-          "ALTER TABLE #{quote_schema_table(table)} ALTER #{quote_identifier(op[:name])} TO #{quote_identifier(op[:new_name])}"
-        when :set_column_type
-          "ALTER TABLE #{quote_schema_table(table)} ALTER #{quote_identifier(op[:name])} TYPE #{type_literal(op)}"
-        else
-          super(table, op)
-        end
-      end
-
-      def auto_increment_sql()
-        AUTO_INCREMENT
-      end
-      
       def connect(server)
         opts = server_opts(server)
 
@@ -48,10 +28,6 @@ module Sequel
         conn = db.connect
         conn.downcase_names = true
         conn
-      end
-
-      def create_sequence_sql(name, opts={})
-        "CREATE SEQUENCE #{quote_identifier(name)}"
       end
 
       # Creates a table with the columns given in the provided block:
@@ -77,50 +53,8 @@ module Sequel
         statements[0].flatten.each {|sql| execute_ddl(sql)}
       end
 
-      def create_table_sql_list(name, columns, indexes = nil, options={})
-        statements = super
-        drop_seq_statement = nil
-        columns.each do |c|
-          if c[:auto_increment]
-            c[:sequence_name] ||= "seq_#{name}_#{c[:name]}"
-            unless c[:create_sequence] == false
-              drop_seq_statement = drop_sequence_sql(c[:sequence_name])
-              statements << create_sequence_sql(c[:sequence_name])
-              statements << restart_sequence_sql(c[:sequence_name], {:restart_position => c[:sequence_start_position]}) if c[:sequence_start_position]
-            end
-            unless c[:create_trigger] == false
-              c[:trigger_name] ||= "BI_#{name}_#{c[:name]}"
-              c[:quoted_name] = quote_identifier(c[:name])
-              trigger_definition = <<-END
-              begin
-                if ((new.#{c[:quoted_name]} is null) or (new.#{c[:quoted_name]} = 0)) then
-                begin
-                  new.#{c[:quoted_name]} = next value for #{c[:sequence_name]};
-                end
-              end
-              END
-              statements << create_trigger_sql(name, c[:trigger_name], trigger_definition, {:events => [:insert]})
-            end
-          end
-        end
-        [statements, drop_seq_statement]
-      end
-
       def create_trigger(*args)
         self << create_trigger_sql(*args)
-      end
-
-      def create_trigger_sql(table, name, definition, opts={})
-        events = opts[:events] ? Array(opts[:events]) : [:insert, :update, :delete]
-        whence = opts[:after] ? 'AFTER' : 'BEFORE'
-        inactive = opts[:inactive] ? 'INACTIVE' : 'ACTIVE'
-        position = opts[:position] ? opts[:position] : 0
-        sql = <<-end_sql
-          CREATE TRIGGER #{quote_identifier(name)} for #{quote_identifier(table)}
-          #{inactive} #{whence} #{events.map{|e| e.to_s.upcase}.join(' OR ')} position #{position}
-          as #{definition}
-        end_sql
-        sql
       end
 
       def dataset(opts = nil)
@@ -129,10 +63,6 @@ module Sequel
 
       def drop_sequence(name)
         self << drop_sequence_sql(name)
-      end
-
-      def drop_sequence_sql(name)
-        "DROP SEQUENCE #{quote_identifier(name)}"
       end
 
       def execute(sql, opts={})
@@ -163,11 +93,6 @@ module Sequel
 
       def restart_sequence(*args)
         self << restart_sequence_sql(*args)
-      end
-
-      def restart_sequence_sql(name, opts={})
-        seq_name = quote_identifier(name)
-        "ALTER SEQUENCE #{seq_name} RESTART WITH #{opts[:restart_position]}"
       end
 
       def sequences(opts={})
@@ -208,8 +133,83 @@ module Sequel
 
       private
 
+      # Use Firebird specific syntax for add column
+      def alter_table_sql(table, op)
+        case op[:op]
+        when :add_column
+          "ALTER TABLE #{quote_schema_table(table)} ADD #{column_definition_sql(op)}"
+        when :drop_column
+          "ALTER TABLE #{quote_schema_table(table)} DROP #{column_definition_sql(op)}"
+        when :rename_column
+          "ALTER TABLE #{quote_schema_table(table)} ALTER #{quote_identifier(op[:name])} TO #{quote_identifier(op[:new_name])}"
+        when :set_column_type
+          "ALTER TABLE #{quote_schema_table(table)} ALTER #{quote_identifier(op[:name])} TYPE #{type_literal(op)}"
+        else
+          super(table, op)
+        end
+      end
+
+      def auto_increment_sql()
+        AUTO_INCREMENT
+      end
+      
+      def create_sequence_sql(name, opts={})
+        "CREATE SEQUENCE #{quote_identifier(name)}"
+      end
+
+      def create_table_sql_list(name, columns, indexes = nil, options={})
+        statements = super
+        drop_seq_statement = nil
+        columns.each do |c|
+          if c[:auto_increment]
+            c[:sequence_name] ||= "seq_#{name}_#{c[:name]}"
+            unless c[:create_sequence] == false
+              drop_seq_statement = drop_sequence_sql(c[:sequence_name])
+              statements << create_sequence_sql(c[:sequence_name])
+              statements << restart_sequence_sql(c[:sequence_name], {:restart_position => c[:sequence_start_position]}) if c[:sequence_start_position]
+            end
+            unless c[:create_trigger] == false
+              c[:trigger_name] ||= "BI_#{name}_#{c[:name]}"
+              c[:quoted_name] = quote_identifier(c[:name])
+              trigger_definition = <<-END
+              begin
+                if ((new.#{c[:quoted_name]} is null) or (new.#{c[:quoted_name]} = 0)) then
+                begin
+                  new.#{c[:quoted_name]} = next value for #{c[:sequence_name]};
+                end
+              end
+              END
+              statements << create_trigger_sql(name, c[:trigger_name], trigger_definition, {:events => [:insert]})
+            end
+          end
+        end
+        [statements, drop_seq_statement]
+      end
+
+      def create_trigger_sql(table, name, definition, opts={})
+        events = opts[:events] ? Array(opts[:events]) : [:insert, :update, :delete]
+        whence = opts[:after] ? 'AFTER' : 'BEFORE'
+        inactive = opts[:inactive] ? 'INACTIVE' : 'ACTIVE'
+        position = opts[:position] ? opts[:position] : 0
+        sql = <<-end_sql
+          CREATE TRIGGER #{quote_identifier(name)} for #{quote_identifier(table)}
+          #{inactive} #{whence} #{events.map{|e| e.to_s.upcase}.join(' OR ')} position #{position}
+          as #{definition}
+        end_sql
+        sql
+      end
+
       def disconnect_connection(c)
         c.close
+      end
+
+      def drop_sequence_sql(name)
+        "DROP SEQUENCE #{quote_identifier(name)}"
+      end
+
+      def restart_sequence_sql(name, opts={})
+        seq_name = quote_identifier(name)
+        "ALTER SEQUENCE #{seq_name} RESTART WITH #{opts[:restart_position]}"
       end
     end
 

@@ -21,8 +21,7 @@ module Sequel
       alter_table(table) {add_index(*args)}
     end
     
-    # Alters the given table with the specified block. Here are the currently
-    # available operations:
+    # Alters the given table with the specified block. Example:
     #
     #   DB.alter_table :items do
     #     add_column :category, :text, :default => 'ruby'
@@ -50,7 +49,7 @@ module Sequel
     #   DB.create_table :posts do
     #     primary_key :id
     #     column :title, :text
-    #     column :content, :text
+    #     String :content
     #     index :title
     #   end
     #
@@ -60,7 +59,7 @@ module Sequel
       create_table_sql_list(name, *((options[:generator] || Schema::Generator.new(self, &block)).create_info << options)).flatten.each {|sql| execute_ddl(sql)}
     end
     
-    # Forcibly creates a table. If the table already exists it is dropped.
+    # Forcibly creates a table, attempting to drop it unconditionally (and catching any errors), then creating it.
     def create_table!(name, options={}, &block)
       drop_table(name) rescue nil
       create_table(name, options, &block)
@@ -104,7 +103,7 @@ module Sequel
       alter_table(table) {drop_index(columns)}
     end
     
-    # Drops one or more tables corresponding to the given table names:
+    # Drops one or more tables corresponding to the given names:
     #
     #   DB.drop_table(:posts, :comments)
     def drop_table(*names)
@@ -114,7 +113,7 @@ module Sequel
       end
     end
     
-    # Drops a view:
+    # Drops one or more views corresponding to the given names:
     #
     #   DB.drop_view(:cheap_items)
     def drop_view(*names)
@@ -129,8 +128,9 @@ module Sequel
     #   DB.tables #=> [:items]
     #   DB.rename_table :items, :old_items
     #   DB.tables #=> [:old_items]
-    def rename_table(*args)
-      execute_ddl(rename_table_sql(*args))
+    def rename_table(name, new_name)
+      remove_cached_schema(name)
+      execute_ddl(rename_table_sql(name, new_name))
     end
     
     # Renames a column in the specified table. This method expects the current

@@ -18,7 +18,6 @@ module Sequel
       meta_eval{attr_accessor(*meths)}
     end
   
-    # Make a singleton/class method(s) private.
     # Make a singleton/class attribute reader method(s).
     # Replaces the construct:
     #

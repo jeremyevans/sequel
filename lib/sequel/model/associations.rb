@@ -223,7 +223,7 @@ module Sequel
           opts[:graph_join_type] ||= :left_outer
           opts[:order_eager_graph] = true unless opts.include?(:order_eager_graph)
           conds = opts[:conditions]
-          opts[:graph_conditions] = conds if !opts.include?(:graph_conditions) and (conds.is_a?(Hash) or (conds.is_a?(Array) and conds.all_two_pairs?))
+          opts[:graph_conditions] = conds if !opts.include?(:graph_conditions) and Sequel.condition_specifier?(conds)
           opts[:graph_conditions] = opts[:graph_conditions] ? opts[:graph_conditions].to_a : []
           opts[:graph_select] = Array(opts[:graph_select]) if opts[:graph_select]
           [:before_add, :before_remove, :after_add, :after_remove, :after_load, :extend].each do |cb_type|
@@ -490,7 +490,7 @@ module Sequel
                 klass = opts.associated_class
                 update_database = lambda do 
                   send(opts.add_method, o)
-                  klass.filter(Sequel::SQL::BooleanExpression.new(:AND, {key=>send(primary_key)}, ~{klass.primary_key=>o.pk}.sql_expr)).update(key=>nil)
+                  klass.filter(Sequel::SQL::BooleanExpression.new(:AND, {key=>send(primary_key)}, SQL::BooleanExpression.new(:'!=', klass.primary_key, o.pk))).update(key=>nil)
                 end
                 use_transactions ? db.transaction(opts){update_database.call} : update_database.call
               end

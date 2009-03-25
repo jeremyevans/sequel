@@ -1,5 +1,29 @@
 === HEAD
 
+* Add multi_insert_update to the MySQL adapter, used for setting specific update behavior when an error occurs when using multi_insert (dusty)
+
+* Add multi_insert_ignore to the MySQL adapter, used for skipping errors on row inserts when using multi_insert (dusty)
+
+* Add Sequel::MySQL.convert_invalid_date_time accessor for dealing with dates like "0000-00-00" and times like "25:00:00" (jeremyevans, epugh)
+
+* Eliminate internal dependence on core_sql extensions (jeremyevans)
+
+* Deprecate Migration and Migrator, require 'sequel/extensions/migration' if you want them (jeremyevans)
+
+* Denamespace Sequel::Error decendants (e.g. use Sequel::Rollback instead of Sequel::Error::Rollback) (jeremyevans)
+
+* Deprecate Error::InvalidTransform, Error::NoExistingFilter, and Error::InvalidStatement (jeremyevans)
+
+* Deprecate Dataset#[] when called without an argument, and Dataset#map when called with an argument and a block (jeremyevans)
+
+* Fix aliasing columns in the JDBC adapter (per.melin) (#263)
+
+* Make Database#rename_table remove the cached schema entry for the table (jeremyevans)
+
+* Make Database schema sql methods private (jeremyevans)
+
+* Deprecate Database #multi_threaded? and #logger (jeremyevans)
+
 * Make Dataset#where always affect the WHERE clause (jeremyevans)
 
 * Deprecate Object#blank? and related extensions, require 'sequel/extensions/blank' to get them back (jeremyevans)

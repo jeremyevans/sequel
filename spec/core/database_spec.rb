@@ -1,10 +1,10 @@
 require File.join(File.dirname(__FILE__), 'spec_helper')
 
 context "A new Database" do
-  setup do
+  before do
     @db = Sequel::Database.new(1 => 2, :logger => 3)
   end
-  teardown do
+  after do
     Sequel.quote_identifiers = false
     Sequel.identifier_input_method = nil
     Sequel.identifier_output_method = nil
@@ -15,15 +15,10 @@ context "A new Database" do
   end
   
   specify "should set the logger from opts[:logger] and opts[:loggers]" do
-    @db.logger.should == 3
     @db.loggers.should == [3]
-    Sequel::Database.new(1 => 2, :loggers => 3).logger.should == 3
     Sequel::Database.new(1 => 2, :loggers => 3).loggers.should == [3]
-    Sequel::Database.new(1 => 2, :loggers => [3]).logger.should == 3
     Sequel::Database.new(1 => 2, :loggers => [3]).loggers.should == [3]
-    Sequel::Database.new(1 => 2, :logger => 4, :loggers => 3).logger.should == 4
     Sequel::Database.new(1 => 2, :logger => 4, :loggers => 3).loggers.should == [4,3]
-    Sequel::Database.new(1 => 2, :logger => [4], :loggers => [3]).logger.should == 4
     Sequel::Database.new(1 => 2, :logger => [4], :loggers => [3]).loggers.should == [4,3]
   end
   
@@ -226,13 +221,13 @@ context "Database#disconnect" do
 end
 
 context "Database#connect" do
-  specify "should raise Sequel::Error::NotImplemented" do
+  specify "should raise NotImplementedError" do
     proc {Sequel::Database.new.connect}.should raise_error(NotImplementedError)
   end
 end
 
 context "Database#uri" do
-  setup do
+  before do
     @c = Class.new(Sequel::Database) do
       set_adapter_scheme :mau
     end
@@ -262,7 +257,7 @@ context "Database.adapter_scheme" do
 end
 
 context "Database#dataset" do
-  setup do
+  before do
     @db = Sequel::Database.new
     @ds = @db.dataset
   end
@@ -303,14 +298,14 @@ context "Database#dataset" do
 end
 
 context "Database#execute" do
-  specify "should raise Sequel::Error::NotImplemented" do
+  specify "should raise NotImplementedError" do
     proc {Sequel::Database.new.execute('blah blah')}.should raise_error(NotImplementedError)
     proc {Sequel::Database.new << 'blah blah'}.should raise_error(NotImplementedError)
   end
 end
 
 context "Database#<<" do
-  setup do
+  before do
     @c = Class.new(Sequel::Database) do
       define_method(:execute) {|sql, opts| sql}
     end
@@ -350,7 +345,7 @@ context "Database#<<" do
 end
 
 context "Database#synchronize" do
-  setup do
+  before do
     @db = Sequel::Database.new(:max_connections => 1)
     @db.pool.connection_proc = proc {12345}
   end
@@ -374,7 +369,7 @@ context "Database#synchronize" do
 end
 
 context "Database#test_connection" do
-  setup do
+  before do
     @db = Sequel::Database.new
     @test = nil
     @db.pool.connection_proc = proc {@test = rand(100)}
@@ -413,7 +408,7 @@ class DummyDatabase < Sequel::Database
 end
 
 context "Database#create_table" do
-  setup do
+  before do
     @db = DummyDatabase.new
   end
   
@@ -431,7 +426,7 @@ context "Database#create_table" do
 end
 
 context "Database#alter_table" do
-  setup do
+  before do
     @db = DummyDatabase.new
   end
   
@@ -461,7 +456,7 @@ context "Database#alter_table" do
 end
 
 context "Database#add_column" do
-  setup do
+  before do
     @db = DummyDatabase.new
   end
   
@@ -474,7 +469,7 @@ context "Database#add_column" do
 end
 
 context "Database#drop_column" do
-  setup do
+  before do
     @db = DummyDatabase.new
   end
   
@@ -487,7 +482,7 @@ context "Database#drop_column" do
 end
 
 context "Database#rename_column" do
-  setup do
+  before do
     @db = DummyDatabase.new
   end
   
@@ -500,7 +495,7 @@ context "Database#rename_column" do
 end
 
 context "Database#set_column_type" do
-  setup do
+  before do
     @db = DummyDatabase.new
   end
   
@@ -513,7 +508,7 @@ context "Database#set_column_type" do
 end
 
 context "Database#set_column_default" do
-  setup do
+  before do
     @db = DummyDatabase.new
   end
   
@@ -526,7 +521,7 @@ context "Database#set_column_default" do
 end
 
 context "Database#add_index" do
-  setup do
+  before do
     @db = DummyDatabase.new
   end
   
@@ -546,7 +541,7 @@ context "Database#add_index" do
 end
 
 context "Database#drop_index" do
-  setup do
+  before do
     @db = DummyDatabase.new
   end
   
@@ -566,7 +561,7 @@ class Dummy2Database < Sequel::Database
 end
 
 context "Database#drop_table" do
-  setup do
+  before do
     @db = DummyDatabase.new
   end
   
@@ -586,7 +581,7 @@ context "Database#drop_table" do
 end
 
 context "Database#rename_table" do
-  setup do
+  before do
     @db = DummyDatabase.new
   end
   
@@ -597,7 +592,7 @@ context "Database#rename_table" do
 end
 
 context "Database#table_exists?" do
-  setup do
+  before do
     @db = DummyDatabase.new
     @db.instance_variable_set(:@schemas, {:a=>[]})
     @db2 = DummyDatabase.new
@@ -624,7 +619,7 @@ class Dummy3Database < Sequel::Database
 end
 
 context "Database#transaction" do
-  setup do
+  before do
     @db = Dummy3Database.new
     @db.pool.connection_proc = proc {Dummy3Database::DummyConnection.new(@db)}
   end
@@ -653,10 +648,10 @@ context "Database#transaction" do
     proc {@db.transaction {raise RuntimeError}}.should raise_error(RuntimeError)
   end
   
-  specify "should issue ROLLBACK if Sequel::Error::Rollback is called in the transaction" do
+  specify "should issue ROLLBACK if Sequel::Rollback is called in the transaction" do
     @db.transaction do
       @db.drop_table(:a)
-      raise Sequel::Error::Rollback
+      raise Sequel::Rollback
       @db.drop_table(:b)
     end
     
@@ -681,12 +676,8 @@ context "Database#transaction" do
   end
 end
 
-class Sequel::Database
-  def self.get_adapters; @@adapters; end
-end
-
 context "A Database adapter with a scheme" do
-  setup do
+  before do
     class CCC < Sequel::Database
       if defined?(DISCONNECTS)
         DISCONNECTS.clear
@@ -700,8 +691,8 @@ context "A Database adapter with a scheme" do
     end
   end
 
-  specify "should be registered in adapters" do
-    Sequel::Database.get_adapters[:ccc].should == CCC
+  specify "should be registered in the ADAPTER_MAP" do
+    Sequel::ADAPTER_MAP[:ccc].should == CCC
   end
   
   specify "should be instantiated when its scheme is specified" do
@@ -790,31 +781,31 @@ end
 
 context "An unknown database scheme" do
   specify "should raise an error in Sequel::Database.connect" do
-    proc {Sequel::Database.connect('ddd://localhost/db')}.should raise_error(Sequel::Error::AdapterNotFound)
+    proc {Sequel::Database.connect('ddd://localhost/db')}.should raise_error(Sequel::AdapterNotFound)
   end
 
   specify "should raise an error in Sequel.connect" do
-    proc {Sequel.connect('ddd://localhost/db')}.should raise_error(Sequel::Error::AdapterNotFound)
+    proc {Sequel.connect('ddd://localhost/db')}.should raise_error(Sequel::AdapterNotFound)
   end
 end
 
 context "A broken adapter (lib is there but the class is not)" do
-  setup do
+  before do
     @fn = File.join(File.dirname(__FILE__), '../../lib/sequel/adapters/blah.rb')
     File.open(@fn,'a'){}
   end
   
-  teardown do
+  after do
     File.delete(@fn)
   end
   
   specify "should raise an error" do
-    proc {Sequel.connect('blah://blow')}.should raise_error(Sequel::Error::AdapterNotFound)
+    proc {Sequel.connect('blah://blow')}.should raise_error(Sequel::AdapterNotFound)
   end
 end
 
 context "A single threaded database" do
-  teardown do
+  after do
     Sequel::Database.single_threaded = false
   end
   
@@ -842,7 +833,7 @@ context "A single threaded database" do
 end
 
 context "A single threaded database" do
-  setup do
+  before do
     conn = 1234567
     @db = Sequel::Database.new(:single_threaded => true) do
       conn += 1
@@ -864,67 +855,87 @@ context "A single threaded database" do
 end
 
 context "A database" do
-  setup do
+  before do
     Sequel::Database.single_threaded = false
   end
   
-  teardown do
+  after do
     Sequel::Database.single_threaded = false
   end
   
-  specify "should be either single_threaded? or multi_threaded?" do
+  deprec_specify "should have a multi_threaded? method" do
     db = Sequel::Database.new(:single_threaded => true)
-    db.should be_single_threaded
     db.should_not be_multi_threaded
     
     db = Sequel::Database.new(:max_options => 1)
-    db.should_not be_single_threaded
     db.should be_multi_threaded
+
+    db = Sequel::Database.new
+    db.should be_multi_threaded
+
+    Sequel::Database.single_threaded = true
+    
+    db = Sequel::Database.new
+    db.should_not be_multi_threaded
+    
+    db = Sequel::Database.new(:max_options => 4)
+    db.should_not be_multi_threaded
+  end
+
+  specify "should have single_threaded? respond to true if in single threaded mode" do
+    db = Sequel::Database.new(:single_threaded => true)
+    db.should be_single_threaded
+    
+    db = Sequel::Database.new(:max_options => 1)
+    db.should_not be_single_threaded
     
     db = Sequel::Database.new
     db.should_not be_single_threaded
-    db.should be_multi_threaded
     
     Sequel::Database.single_threaded = true
     
     db = Sequel::Database.new
     db.should be_single_threaded
-    db.should_not be_multi_threaded
     
     db = Sequel::Database.new(:max_options => 4)
     db.should be_single_threaded
-    db.should_not be_multi_threaded
   end
   
-  specify "should accept a logger object" do
+  deprec_specify "should have a logger method" do
     db = Sequel::Database.new
     s = "I'm a logger"
     db.logger = s
     db.logger.should == s
-    db.loggers.should == [s]
     db.logger = nil
     db.logger.should == nil
+    db.loggers = []
+    db.logger.should == nil
+    t = "I'm also a logger"
+    db.loggers = [s, t]
+    db.logger.should == s
+  end
+
+  specify "should be able to set loggers via the logger= and loggers= methods" do
+    db = Sequel::Database.new
+    s = "I'm a logger"
+    db.logger = s
+    db.loggers.should == [s]
+    db.logger = nil
     db.loggers.should == []
 
     db.loggers = [s]
-    db.logger.should == s
     db.loggers.should == [s]
     db.loggers = []
-    db.logger.should == nil
     db.loggers.should == []
 
     t = "I'm also a logger"
     db.loggers = [s, t]
-    db.logger.should == s
     db.loggers.should == [s,t]
-    db.loggers = []
-    db.logger.should == nil
-    db.loggers.should == []
   end
 end
 
 context "Database#dataset" do
-  setup do
+  before do
     @db = Sequel::Database.new
   end
   
@@ -936,7 +947,7 @@ context "Database#dataset" do
 end
 
 context "Database#fetch" do
-  setup do
+  before do
     @db = Sequel::Database.new
     c = Class.new(Sequel::Dataset) do
       def fetch_rows(sql); yield({:sql => sql}); end
@@ -983,7 +994,7 @@ end
 
 
 context "Database#[]" do
-  setup do
+  before do
     @db = Sequel::Database.new
   end
   
@@ -1006,7 +1017,7 @@ context "Database#[]" do
 end
 
 context "Database#create_view" do
-  setup do
+  before do
     @db = DummyDatabase.new
   end
   
@@ -1028,7 +1039,7 @@ context "Database#create_view" do
 end
 
 context "Database#create_or_replace_view" do
-  setup do
+  before do
     @db = DummyDatabase.new
   end
   
@@ -1050,7 +1061,7 @@ context "Database#create_or_replace_view" do
 end
 
 context "Database#drop_view" do
-  setup do
+  before do
     @db = DummyDatabase.new
   end
   
@@ -1063,21 +1074,20 @@ context "Database#drop_view" do
   end
 end
 
-# TODO: beaf this up with specs for all supported ops
 context "Database#alter_table_sql" do
-  setup do
+  before do
     @db = DummyDatabase.new
   end
   
   specify "should raise error for an invalid op" do
-    proc {@db.alter_table_sql(:mau, :op => :blah)}.should raise_error(Sequel::Error)
+    proc {@db.send(:alter_table_sql, :mau, :op => :blah)}.should raise_error(Sequel::Error)
   end
 end
 
 context "Database.connect" do
   EEE_YAML = "development:\r\n  adapter: eee\r\n  username: mau\r\n  password: tau\r\n  host: alfonso\r\n  database: mydb\r\n"
   
-  setup do
+  before do
     class EEE < Sequel::Database
       set_adapter_scheme :eee
     end
@@ -1086,7 +1096,7 @@ context "Database.connect" do
     File.open(@fn, 'wb') {|f| f << EEE_YAML}
   end
   
-  teardown do
+  after do
     File.delete(@fn)
   end
   
@@ -1101,7 +1111,7 @@ context "Database.connect" do
 end
 
 context "Database#inspect" do
-  setup do
+  before do
     @db = DummyDatabase.new
     
     @db.meta_def(:uri) {'blah://blahblah/blah'}
@@ -1113,7 +1123,7 @@ context "Database#inspect" do
 end
 
 context "Database#get" do
-  setup do
+  before do
     @c = Class.new(DummyDatabase) do
       def dataset
         ds = super
@@ -1199,16 +1209,16 @@ context "Database#raise_error" do
 end
 
 context "Database#typecast_value" do
-  setup do
+  before do
     @db = Sequel::Database.new
   end
-  specify "should raise an Error::InvalidValue when given an invalid value" do
-    proc{@db.typecast_value(:integer, "13a")}.should raise_error(Sequel::Error::InvalidValue)
-    proc{@db.typecast_value(:float, "4.e2")}.should raise_error(Sequel::Error::InvalidValue)
-    proc{@db.typecast_value(:decimal, :invalid_value)}.should raise_error(Sequel::Error::InvalidValue)
-    proc{@db.typecast_value(:date, Object.new)}.should raise_error(Sequel::Error::InvalidValue)
-    proc{@db.typecast_value(:date, 'a')}.should raise_error(Sequel::Error::InvalidValue)
-    proc{@db.typecast_value(:time, Date.new)}.should raise_error(Sequel::Error::InvalidValue)
-    proc{@db.typecast_value(:datetime, 4)}.should raise_error(Sequel::Error::InvalidValue)
+  specify "should raise an InvalidValue when given an invalid value" do
+    proc{@db.typecast_value(:integer, "13a")}.should raise_error(Sequel::InvalidValue)
+    proc{@db.typecast_value(:float, "4.e2")}.should raise_error(Sequel::InvalidValue)
+    proc{@db.typecast_value(:decimal, :invalid_value)}.should raise_error(Sequel::InvalidValue)
+    proc{@db.typecast_value(:date, Object.new)}.should raise_error(Sequel::InvalidValue)
+    proc{@db.typecast_value(:date, 'a')}.should raise_error(Sequel::InvalidValue)
+    proc{@db.typecast_value(:time, Date.new)}.should raise_error(Sequel::InvalidValue)
+    proc{@db.typecast_value(:datetime, 4)}.should raise_error(Sequel::InvalidValue)
   end
 end

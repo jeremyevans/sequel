@@ -24,7 +24,7 @@ context "Array#all_two_pairs?" do
 end
   
 context "Array#case and Hash#case" do
-  setup do
+  before do
     @d = Sequel::Dataset.new(nil)
   end
 
@@ -52,7 +52,7 @@ context "Array#case and Hash#case" do
 end
 
 context "Array#sql_array" do
-  setup do
+  before do
     @d = Sequel::Dataset.new(nil)
   end
 
@@ -159,7 +159,7 @@ context "String#split_sql" do
 end
 
 context "#desc" do
-  setup do
+  before do
     @ds = Sequel::Dataset.new(nil)
   end
   
@@ -175,7 +175,7 @@ context "#desc" do
 end
 
 context "#asc" do
-  setup do
+  before do
     @ds = Sequel::Dataset.new(nil)
   end
   
@@ -191,7 +191,7 @@ context "#asc" do
 end
 
 context "#as" do
-  setup do
+  before do
     @ds = Sequel::Dataset.new(nil)
   end
   
@@ -211,7 +211,7 @@ context "#as" do
 end
 
 context "Column references" do
-  setup do
+  before do
     @c = Class.new(Sequel::Dataset) do
       def quoted_identifier(c); "`#{c}`"; end
     end
@@ -266,7 +266,7 @@ if RUBY_VERSION < '1.9.0'
 end
 
 context "Symbol#*" do
-  setup do
+  before do
     @ds = Sequel::Dataset.new(nil)
   end
   
@@ -311,7 +311,7 @@ context "Symbol" do
 end
 
 context "Dataset#literal" do
-  setup do
+  before do
     @ds = MockDataset.new(nil)
   end
   
@@ -347,7 +347,7 @@ context "Dataset#literal" do
 end
 
 context "Symbol" do
-  setup do
+  before do
     @ds = Sequel::Dataset.new(MockDatabase.new)
   end
   
@@ -424,8 +424,8 @@ context "String#to_time" do
     "06:30".to_time.should == Time.parse("06:30")
   end
   
-  deprec_specify "should raise Error::InvalidValue for an invalid time" do
-    proc {'0000-00-00'.to_time}.should raise_error(Sequel::Error::InvalidValue)
+  deprec_specify "should raise InvalidValue for an invalid time" do
+    proc {'0000-00-00'.to_time}.should raise_error(Sequel::InvalidValue)
   end
 end
 
@@ -447,8 +447,8 @@ context "String#to_date" do
     "July 11, 07".to_date.should == Date.parse("0007-07-11")
   end
 
-  deprec_specify "should raise Error::InvalidValue for an invalid date" do
-    proc {'0000-00-00'.to_date}.should raise_error(Sequel::Error::InvalidValue)
+  deprec_specify "should raise InvalidValue for an invalid date" do
+    proc {'0000-00-00'.to_date}.should raise_error(Sequel::InvalidValue)
   end
 end
 
@@ -470,8 +470,8 @@ context "String#to_datetime" do
     "July 11, 07 10:11:12a".to_datetime.should == DateTime.parse("0007-07-11 10:11:12a")
   end
 
-  deprec_specify "should raise Error::InvalidValue for an invalid date" do
-    proc {'0000-00-00'.to_datetime}.should raise_error(Sequel::Error::InvalidValue)
+  deprec_specify "should raise InvalidValue for an invalid date" do
+    proc {'0000-00-00'.to_datetime}.should raise_error(Sequel::InvalidValue)
   end
 end
 
@@ -503,10 +503,10 @@ context "String#to_sequel_time" do
     "July 11, 07 10:11:12a".to_sequel_time.should == DateTime.parse("0007-07-11 10:11:12a")
   end
 
-  deprec_specify "should raise Error::InvalidValue for an invalid time" do
-    proc {'0000-00-00'.to_sequel_time}.should raise_error(Sequel::Error::InvalidValue)
+  deprec_specify "should raise InvalidValue for an invalid time" do
+    proc {'0000-00-00'.to_sequel_time}.should raise_error(Sequel::InvalidValue)
     Sequel.datetime_class = DateTime
-    proc {'0000-00-00'.to_sequel_time}.should raise_error(Sequel::Error::InvalidValue)
+    proc {'0000-00-00'.to_sequel_time}.should raise_error(Sequel::InvalidValue)
   end
 end
 

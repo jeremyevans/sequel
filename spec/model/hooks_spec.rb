@@ -189,7 +189,7 @@ describe "Model#after_initialize" do
 end
 
 describe "Model#before_create && Model#after_create" do
-  setup do
+  before do
     MODEL_DB.reset
 
     @c = Class.new(Sequel::Model(:items))
@@ -229,7 +229,7 @@ describe "Model#before_create && Model#after_create" do
 end
 
 describe "Model#before_update && Model#after_update" do
-  setup do
+  before do
     MODEL_DB.reset
 
     @c = Class.new(Sequel::Model(:items))
@@ -265,7 +265,7 @@ describe "Model#before_update && Model#after_update" do
 end
 
 describe "Model#before_save && Model#after_save" do
-  setup do
+  before do
     MODEL_DB.reset
 
     @c = Class.new(Sequel::Model(:items))
@@ -313,7 +313,7 @@ describe "Model#before_save && Model#after_save" do
 end
 
 describe "Model#before_destroy && Model#after_destroy" do
-  setup do
+  before do
     MODEL_DB.reset
 
     @c = Class.new(Sequel::Model(:items))
@@ -352,7 +352,7 @@ describe "Model#before_destroy && Model#after_destroy" do
 end
 
 describe "Model#before_validation && Model#after_validation" do
-  setup do
+  before do
     MODEL_DB.reset
 
     @c = Class.new(Sequel::Model(:items))
@@ -407,7 +407,7 @@ describe "Model#before_validation && Model#after_validation" do
 end
 
 describe "Model.has_hooks?" do
-  setup do
+  before do
     @c = Class.new(Sequel::Model(:items))
   end
   
@@ -427,7 +427,7 @@ describe "Model.has_hooks?" do
 end
 
 describe "Model#add_hook_type" do
-  setup do
+  before do
     deprec do
       class Foo < Sequel::Model(:items)
         add_hook_type :before_bar, :after_bar

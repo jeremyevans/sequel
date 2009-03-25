@@ -27,3 +27,5 @@ Sequel has the ability to have database independent migrations using ruby classe
     end
 
 Basically, if you use one of the ruby classes above, it will translate into a database specific type.  If you use a lowercase method, symbol, or string to specify the type, Sequel won't attempt to translate it.
+
+Note that if you use a ruby class, you shouldn't use a :size option.  Using a ruby class means that you want Sequel to pick the database type to use.  If you want to specify the size, you are no longer in database independent territory, and you need to specify the type as well, using a lowercase method, symbol, or string.

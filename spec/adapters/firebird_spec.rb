@@ -26,7 +26,7 @@ FIREBIRD_DB.create_table! :test5 do
 end
 
 context "A Firebird database" do
-  setup do
+  before do
     @db = FIREBIRD_DB
   end
 
@@ -43,7 +43,7 @@ context "A Firebird database" do
 end
 
 context "A Firebird dataset" do
-  setup do
+  before do
     @d = FIREBIRD_DB[:test]
     @d.delete # remove all records
   end
@@ -212,7 +212,7 @@ context "A Firebird dataset" do
 end
 
 context "A Firebird dataset with a timestamp field" do
-  setup do
+  before do
     @d = FIREBIRD_DB[:test3]
     @d.delete
   end
@@ -226,7 +226,7 @@ context "A Firebird dataset with a timestamp field" do
 end
 
 context "A Firebird database" do
-  setup do
+  before do
     @db = FIREBIRD_DB
   end
 
@@ -342,7 +342,7 @@ context "A Firebird database" do
 end
 
 context "Postgres::Dataset#insert" do
-  setup do
+  before do
     @ds = FIREBIRD_DB[:test5]
     @ds.delete
   end

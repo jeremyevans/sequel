@@ -174,12 +174,7 @@ module Sequel
       SYSTEM_TABLE_REGEXP = /^pg|sql/.freeze
       TYPES = Sequel::Database::TYPES.merge(File=>'bytea', String=>'text')
 
-      # Creates the function in the database.  See create_function_sql for arguments.
-      def create_function(*args)
-        self << create_function_sql(*args)
-      end
-      
-      # SQL statement to create database function. Arguments:
+      # Creates the function in the database.  Arguments:
       # * name : name of the function to create
       # * definition : string definition of the function, or object file for a dynamically loaded C function.
       # * opts : options hash:
@@ -199,47 +194,21 @@ module Sequel
       #   * :set : Configuration variables to set while the function is being run, can be a hash or an array of two pairs.  search_path is
       #     often used here if :security_definer is used.
       #   * :strict : Makes the function return NULL when any argument is NULL.
-      def create_function_sql(name, definition, opts={})
-        args = opts[:args]
-        if !opts[:args].is_a?(Array) || !opts[:args].any?{|a| Array(a).length == 3 and %w'OUT INOUT'.include?(a[2].to_s)}
-          returns = opts[:returns] || 'void'
-        end
-        language = opts[:language] || 'SQL'
-        <<-END
-        CREATE#{' OR REPLACE' if opts[:replace]} FUNCTION #{name}#{sql_function_args(args)}
-        #{"RETURNS #{returns}" if returns}
-        LANGUAGE #{language}
-        #{opts[:behavior].to_s.upcase if opts[:behavior]}
-        #{'STRICT' if opts[:strict]}
-        #{'SECURITY DEFINER' if opts[:security_definer]}
-        #{"COST #{opts[:cost]}" if opts[:cost]}
-        #{"ROWS #{opts[:rows]}" if opts[:rows]}
-        #{opts[:set].map{|k,v| " SET #{k} = #{v}"}.join("\n") if opts[:set]}
-        AS #{literal(definition.to_s)}#{", #{literal(opts[:link_symbol].to_s)}" if opts[:link_symbol]}
-        END
+      def create_function(name, definition, opts={})
+        self << create_function_sql(name, definition, opts)
       end
       
-      # Create the procedural language in the database.  See create_language_sql for arguments.
-      def create_language(*args)
-        self << create_language_sql(*args)
-      end
-      
-      # SQL for creating a procedural language. Arguments:
+      # Create the procedural language in the database. Arguments:
       # * name : Name of the procedural language (e.g. plpgsql)
       # * opts : options hash:
       #   * :handler : The name of a previously registered function used as a call handler for this language.
       #   * :trusted : Marks the language being created as trusted, allowing unprivileged users to create functions using this language.
       #   * :validator : The name of previously registered function used as a validator of functions defined in this language.
-      def create_language_sql(name, opts={})
-        "CREATE#{' TRUSTED' if opts[:trusted]} LANGUAGE #{name}#{" HANDLER #{opts[:handler]}" if opts[:handler]}#{" VALIDATOR #{opts[:validator]}" if opts[:validator]}"
+      def create_language(name, opts={})
+        self << create_language_sql(name, opts)
       end
       
-      # Create a trigger in the database.  See create_trigger_sql for arguments.
-      def create_trigger(*args)
-        self << create_trigger_sql(*args)
-      end
-      
-      # SQL for creating a database trigger. Arguments:
+      # Create a trigger in the database.  Arguments:
       # * table : the table on which this trigger operates
       # * name : the name of this trigger
       # * function : the function to call for this trigger, which should return type trigger.
@@ -249,41 +218,29 @@ module Sequel
       #   * :each_row : Calls the trigger for each row instead of for each statement.
       #   * :events : Can be :insert, :update, :delete, or an array of any of those. Calls the trigger whenever that type of statement is used.  By default,
       #     the trigger is called for insert, update, or delete.
-      def create_trigger_sql(table, name, function, opts={})
-        events = opts[:events] ? Array(opts[:events]) : [:insert, :update, :delete]
-        whence = opts[:after] ? 'AFTER' : 'BEFORE'
-        "CREATE TRIGGER #{name} #{whence} #{events.map{|e| e.to_s.upcase}.join(' OR ')} ON #{quote_schema_table(table)}#{' FOR EACH ROW' if opts[:each_row]} EXECUTE PROCEDURE #{function}(#{Array(opts[:args]).map{|a| literal(a)}.join(', ')})"
+      def create_trigger(table, name, function, opts={})
+        self << create_trigger_sql(table, name, function, opts)
       end
       
-      # Drops the function from the database.  See drop_function_sql for arguments.
-      def drop_function(*args)
-        self << drop_function_sql(*args)
-      end
-      
-      # SQL for dropping a function from the database.  Arguments:
+      # Drops the function from the database. Arguments:
       # * name : name of the function to drop
       # * opts : options hash:
       #   * :args : The arguments for the function.  See create_function_sql.
       #   * :cascade : Drop other objects depending on this function.
       #   * :if_exists : Don't raise an error if the function doesn't exist.
-      def drop_function_sql(name, opts={})
-        "DROP FUNCTION#{' IF EXISTS' if opts[:if_exists]} #{name}#{sql_function_args(opts[:args])}#{' CASCADE' if opts[:cascade]}"
+      def drop_function(name, opts={})
+        self << drop_function_sql(name, opts)
       end
       
-      # Drops a procedural language from the database.  See drop_language_sql for arguments.
-      def drop_language(*args)
-        self << drop_language_sql(*args)
-      end
-      
-      # SQL for dropping a procedural language from the database.  Arguments:
+      # Drops a procedural language from the database.  Arguments:
       # * name : name of the procedural language to drop
       # * opts : options hash:
       #   * :cascade : Drop other objects depending on this function.
       #   * :if_exists : Don't raise an error if the function doesn't exist.
-      def drop_language_sql(name, opts={})
-        "DROP LANGUAGE#{' IF EXISTS' if opts[:if_exists]} #{name}#{' CASCADE' if opts[:cascade]}"
+      def drop_language(name, opts={})
+        self << drop_language_sql(name, opts)
       end
-
+      
       # Remove the cached entries for primary keys and sequences when dropping a table.
       def drop_table(*names)
         names.each do |name|
@@ -294,43 +251,14 @@ module Sequel
         super
       end
 
-      # Always CASCADE the table drop
-      def drop_table_sql(name)
-        "DROP TABLE #{quote_schema_table(name)} CASCADE"
-      end
-      
-      # Drops a trigger from the database.  See drop_trigger_sql for arguments.
-      def drop_trigger(*args)
-        self << drop_trigger_sql(*args)
-      end
-      
-      # SQL for dropping a trigger from the database.  Arguments:
+      # Drops a trigger from the database.  Arguments:
       # * table : table from which to drop the trigger
       # * name : name of the trigger to drop
       # * opts : options hash:
       #   * :cascade : Drop other objects depending on this function.
       #   * :if_exists : Don't raise an error if the function doesn't exist.
-      def drop_trigger_sql(table, name, opts={})
-        "DROP TRIGGER#{' IF EXISTS' if opts[:if_exists]} #{name} ON #{quote_schema_table(table)}#{' CASCADE' if opts[:cascade]}"
-      end
-
-      # PostgreSQL specific index SQL.
-      def index_definition_sql(table_name, index)
-        index_name = index[:name] || default_index_name(table_name, index[:columns])
-        expr = literal(Array(index[:columns]))
-        unique = "UNIQUE " if index[:unique]
-        index_type = index[:type]
-        filter = index[:where] || index[:filter]
-        filter = " WHERE #{filter_expr(filter)}" if filter
-        case index_type
-        when :full_text
-          cols = Array(index[:columns]).map{|x| SQL::Function.new(:COALESCE, x, '')}.sql_string_join(' ')
-          expr = "(to_tsvector(#{literal(index[:language] || 'simple')}, #{literal(cols)}))"
-          index_type = :gin
-        when :spatial
-          index_type = :gist
-        end
-        "CREATE #{unique}INDEX #{quote_identifier(index_name)} ON #{quote_schema_table(table_name)} #{"USING #{index_type} " if index_type}#{expr}#{filter}"
+      def drop_trigger(table, name, opts={})
+        self << drop_trigger_sql(table, name, opts)
       end
       
       # Dataset containing all current database locks 
@@ -359,12 +287,6 @@ module Sequel
           synchronize(opts[:server]){|con| con.sequence(*schema_and_table(table))}
         end
       end
-
-      # SQL DDL statement for renaming a table. PostgreSQL doesn't allow you to change a table's schema in
-      # a rename table operation, so speciying a new schema in new_name will not have an effect.
-      def rename_table_sql(name, new_name)
-        "ALTER TABLE #{quote_schema_table(name)} RENAME TO #{quote_identifier(schema_and_table(new_name).last)}"
-      end 
 
       # PostgreSQL uses SERIAL psuedo-type instead of AUTOINCREMENT for
       # managing incrementing primary keys.
@@ -466,6 +388,59 @@ module Sequel
 
       private
 
+      # SQL statement to create database function.
+      def create_function_sql(name, definition, opts={})
+        args = opts[:args]
+        if !opts[:args].is_a?(Array) || !opts[:args].any?{|a| Array(a).length == 3 and %w'OUT INOUT'.include?(a[2].to_s)}
+          returns = opts[:returns] || 'void'
+        end
+        language = opts[:language] || 'SQL'
+        <<-END
+        CREATE#{' OR REPLACE' if opts[:replace]} FUNCTION #{name}#{sql_function_args(args)}
+        #{"RETURNS #{returns}" if returns}
+        LANGUAGE #{language}
+        #{opts[:behavior].to_s.upcase if opts[:behavior]}
+        #{'STRICT' if opts[:strict]}
+        #{'SECURITY DEFINER' if opts[:security_definer]}
+        #{"COST #{opts[:cost]}" if opts[:cost]}
+        #{"ROWS #{opts[:rows]}" if opts[:rows]}
+        #{opts[:set].map{|k,v| " SET #{k} = #{v}"}.join("\n") if opts[:set]}
+        AS #{literal(definition.to_s)}#{", #{literal(opts[:link_symbol].to_s)}" if opts[:link_symbol]}
+        END
+      end
+      
+      # SQL for creating a procedural language.
+      def create_language_sql(name, opts={})
+        "CREATE#{' TRUSTED' if opts[:trusted]} LANGUAGE #{name}#{" HANDLER #{opts[:handler]}" if opts[:handler]}#{" VALIDATOR #{opts[:validator]}" if opts[:validator]}"
+      end
+      
+      # SQL for creating a database trigger. 
+      def create_trigger_sql(table, name, function, opts={})
+        events = opts[:events] ? Array(opts[:events]) : [:insert, :update, :delete]
+        whence = opts[:after] ? 'AFTER' : 'BEFORE'
+        "CREATE TRIGGER #{name} #{whence} #{events.map{|e| e.to_s.upcase}.join(' OR ')} ON #{quote_schema_table(table)}#{' FOR EACH ROW' if opts[:each_row]} EXECUTE PROCEDURE #{function}(#{Array(opts[:args]).map{|a| literal(a)}.join(', ')})"
+      end
+      
+      # SQL for dropping a function from the database. 
+      def drop_function_sql(name, opts={})
+        "DROP FUNCTION#{' IF EXISTS' if opts[:if_exists]} #{name}#{sql_function_args(opts[:args])}#{' CASCADE' if opts[:cascade]}"
+      end
+      
+      # SQL for dropping a procedural language from the database.
+      def drop_language_sql(name, opts={})
+        "DROP LANGUAGE#{' IF EXISTS' if opts[:if_exists]} #{name}#{' CASCADE' if opts[:cascade]}"
+      end
+
+      # Always CASCADE the table drop
+      def drop_table_sql(name)
+        "DROP TABLE #{quote_schema_table(name)} CASCADE"
+      end
+      
+      # SQL for dropping a trigger from the database.
+      def drop_trigger_sql(table, name, opts={})
+        "DROP TRIGGER#{' IF EXISTS' if opts[:if_exists]} #{name} ON #{quote_schema_table(table)}#{' CASCADE' if opts[:cascade]}"
+      end
+
       # PostgreSQL folds unquoted identifiers to lowercase, so it shouldn't need to upcase identifiers on input.
       def identifier_input_method_default
         nil
@@ -476,6 +451,25 @@ module Sequel
         nil
       end
 
+      # PostgreSQL specific index SQL.
+      def index_definition_sql(table_name, index)
+        cols = index[:columns]
+        index_name = index[:name] || default_index_name(table_name, cols)
+        expr = literal(Array(cols))
+        unique = "UNIQUE " if index[:unique]
+        index_type = index[:type]
+        filter = index[:where] || index[:filter]
+        filter = " WHERE #{filter_expr(filter)}" if filter
+        case index_type
+        when :full_text
+          expr = "(to_tsvector(#{literal(index[:language] || 'simple')}, #{dataset.send(:full_text_string_join, cols)}))"
+          index_type = :gin
+        when :spatial
+          index_type = :gist
+        end
+        "CREATE #{unique}INDEX #{quote_identifier(index_name)} ON #{quote_schema_table(table_name)} #{"USING #{index_type} " if index_type}#{expr}#{filter}"
+      end
+      
       # The result of the insert for the given table and values.  If values
       # is an array, assume the first column is the primary key and return
       # that.  If values is a hash, lookup the primary key for the table.  If
@@ -510,6 +504,12 @@ module Sequel
         PREPARED_ARG_PLACEHOLDER
       end
       
+      # SQL DDL statement for renaming a table. PostgreSQL doesn't allow you to change a table's schema in
+      # a rename table operation, so speciying a new schema in new_name will not have an effect.
+      def rename_table_sql(name, new_name)
+        "ALTER TABLE #{quote_schema_table(name)} RENAME TO #{quote_identifier(schema_and_table(new_name).last)}"
+      end 
+
       # The dataset used for parsing table schemas, using the pg_* system catalogs.
       def schema_parse_table(table_name, opts)
         ds2 = dataset
@@ -517,7 +517,7 @@ module Sequel
             SQL::Function.new(:format_type, :pg_type__oid, :pg_attribute__atttypmod).as(:db_type),
             SQL::Function.new(:pg_get_expr, :pg_attrdef__adbin, :pg_class__oid).as(:default),
             SQL::BooleanExpression.new(:NOT, :pg_attribute__attnotnull).as(:allow_null),
-            SQL::Function.new(:COALESCE, {:pg_attribute__attnum => SQL::Function.new(:ANY, :pg_index__indkey)}.sql_expr, false).as(:primary_key)).
+            SQL::Function.new(:COALESCE, SQL::BooleanExpression.from_value_pairs(:pg_attribute__attnum => SQL::Function.new(:ANY, :pg_index__indkey)), false).as(:primary_key)).
           from(:pg_class).
           join(:pg_attribute, :attrelid=>:oid).
           join(:pg_type, :oid=>:atttypid).
@@ -632,8 +632,7 @@ module Sequel
       # in 8.3 by default, and available for earlier versions as an add-on).
       def full_text_search(cols, terms, opts = {})
         lang = opts[:language] || 'simple'
-        cols =  Array(cols).map{|x| SQL::Function.new(:COALESCE, x, '')}.sql_string_join(' ')
-        filter("to_tsvector(#{literal(lang)}, #{literal(cols)}) @@ to_tsquery(#{literal(lang)}, #{literal(Array(terms).join(' | '))})")
+        filter("to_tsvector(#{literal(lang)}, #{full_text_string_join(cols)}) @@ to_tsquery(#{literal(lang)}, #{literal(Array(terms).join(' | '))})")
       end
       
       # Insert given values into the database.
@@ -737,6 +736,14 @@ module Sequel
       # The version of the database server
       def server_version
         db.server_version(@opts[:server])
+      end
+
+      # Concatenate the expressions with a space in between
+      def full_text_string_join(cols)
+        cols = Array(cols).map{|x| SQL::Function.new(:COALESCE, x, '')}
+        cols = cols.zip([' '] * cols.length).flatten
+        cols.pop
+        literal(SQL::StringExpression.new(:'||', *cols))
       end
     end
   end

@@ -464,7 +464,7 @@ module Sequel
         meta = result.getMetaData
         column_count = meta.getColumnCount
         @columns = []
-        column_count.times{|i| @columns << output_identifier(meta.getColumnName(i+1))}
+        column_count.times{|i| @columns << output_identifier(meta.getColumnLabel(i+1))}
 
         # get rows
         while result.next

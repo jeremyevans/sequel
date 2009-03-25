@@ -1,7 +1,7 @@
 require File.join(File.dirname(__FILE__), "spec_helper")
 
 context "A paginated dataset" do
-  setup do
+  before do
     @d = Sequel::Dataset.new(nil)
     @d.meta_def(:count) {153}
     
@@ -77,7 +77,7 @@ context "A paginated dataset" do
 end
 
 context "Dataset#each_page" do
-  setup do
+  before do
     @d = Sequel::Dataset.new(nil).from(:items)
     @d.meta_def(:count) {153}
   end
