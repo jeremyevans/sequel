@@ -803,7 +803,7 @@ context "MySQL::Dataset#multi_insert_ignore" do
 end
 
 context "MySQL::Dataset#multi_insert_update" do
-  setup do
+  before do
     @d = MYSQL_DB[:items]
     @d.delete
     MYSQL_DB.sqls.clear

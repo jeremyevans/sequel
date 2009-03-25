@@ -281,26 +281,17 @@ module Sequel
       # ON DUPLICATE KEY UPDATE value=VALUES(value)
       #
       def multi_insert_update(*args)
-        clone(:multi_insert_update => true, 
-          :on_duplicate_key_update => args || []
-        )
+        clone(:multi_insert_update => args)
       end
       
       # MySQL specific syntax for inserting multiple values at once.
       def multi_insert_sql(columns, values)
-        if opts[:multi_insert_update]
-          if opts[:on_duplicate_key_update].empty?
-            updates = columns.map do |c|
-              "#{quote_identifier(c)}=VALUES(#{quote_identifier(c)})"
-            end.join(COMMA_SEPARATOR)
-          else
-            updates = opts[:on_duplicate_key_update].map do |c|
-              "#{quote_identifier(c)}=VALUES(#{quote_identifier(c)})"
-            end.join(COMMA_SEPARATOR)
-          end
+        if update_cols = opts[:multi_insert_update]
+          update_cols = columns if update_cols.empty?
+          update_string = update_cols.map{|c| "#{quote_identifier(c)}=VALUES(#{quote_identifier(c)})"}.join(COMMA_SEPARATOR)
         end
         values = values.map {|r| literal(Array(r))}.join(COMMA_SEPARATOR)
-        ["INSERT#{' IGNORE' if opts[:multi_insert_ignore]} INTO #{source_list(@opts[:from])} (#{identifier_list(columns)}) VALUES #{values}#{" ON DUPLICATE KEY UPDATE " + updates if opts[:multi_insert_update] }"]
+        ["INSERT#{' IGNORE' if opts[:multi_insert_ignore]} INTO #{source_list(@opts[:from])} (#{identifier_list(columns)}) VALUES #{values}#{" ON DUPLICATE KEY UPDATE #{update_string}" if update_string}"]
       end
       
       # MySQL uses the nonstandard ` (backtick) for quoting identifiers.
