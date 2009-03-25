@@ -258,10 +258,10 @@ module Sequel
         clone(:multi_insert_ignore=>true)
       end
       
-      # Sets up the multi_insert method do UPDATE on DUPLICATE KEY
-      # errors.  If you pass no arguments, ALL fields will be
-      # updated with the new values.  If you pass the fields you
-      # want then ONLY those field will be updated.
+      # Sets up the multi_insert method to support ON DUPLICATE KEY UPDATE
+      # If you pass no arguments, ALL fields will be updated with the new
+      # values.  If you pass the fields you want then ONLY those field 
+      # will be updated.
       #
       # Useful if you have a unique key and want to update
       # inserting rows that violate the unique key restriction.
