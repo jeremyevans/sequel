@@ -1,0 +1,65 @@
+= Virtual Row Blocks
+
+Dataset methods filter, order, and select all take blocks that yield
+instances of Sequel::SQL::VirtualRow.  These are referred to as
+virtual row blocks.  Many other dataset methods pass the blocks
+they are given into one of those three methods, so there are actually
+many Sequel methods that take virtual row blocks.
+
+VirtualRow is a class that returns SQL::Indentifiers,
+SQL::QualifiedIdentifiers, or SQL::Functions depending on how it is
+called.  This is best shown by example:
+
+  ds = DB[:items]
+  ds.filter{|o| o.column > 1}        # column > 1
+  ds.filter{|o| o.table__column > 1} # table.column > 1
+  ds.filter{|o| o.function(1) > 1}   # function(1) > 1
+  
+Basically, the rules are:
+
+* If there are arguments, an SQL::Function is returned with the
+  name of the method used and the arguments given.
+
+* If there are no arguments and the method contains a double
+  underscore, split on the double underscore and return an
+  SQL::QualifiedIdentifier with the table and column.
+  
+* Otherwise, create an SQL::Identifier with the name of the
+  method.
+  
+One of the consequences of these rules is that you cannot
+create an SQL::Function that takes no arguments using a VirtualRow
+instance.
+  
+In Sequel 2.12, the following is deprecated by default, as
+virtual row blocks are required to accept an argument:
+
+  ds.filter{:column > 1}                     # column > 1
+  ds.filter{:table__column > 1}              # table.column > 1
+  ds.filter{:function.sql_function(1) > 1}   # function(1) > 1
+  
+This is to keep backwards compatibility while notifying people
+to change their code.  In Sequel 3.0, you will be able to
+do:
+
+  ds.filter{column > 1}        # column > 1
+  ds.filter{table__column > 1} # table.column > 1
+  ds.filter{function(1) > 1}   # function(1) > 1
+
+Sequel 3.0 will change the virtual row block support to use
+instance_eval if the block doesn't take an argument.  This
+breaks backward compatibility because instance methods called
+inside the block will now have a virtual row instance as a
+receiver instead of the receiver where the block was defined.
+You can still use local variables in the enclosing scope
+inside the block, as they take on their usual meaning.
+
+If you find yourself needing to call instance methods for the
+current receiver inside a virtual row block, you should change
+the block to accept an argument, and use that argument whenever
+you need the virtual row support.
+
+You can get the Sequel 3.0 behavior in Sequel 2.12 using the
+following method:
+
+  Sequel.virtual_row_instance_eval = true

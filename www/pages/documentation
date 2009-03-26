@@ -10,17 +10,19 @@
 <li><a href="/rdoc/files/doc/prepared_statements_rdoc.html">Prepared Statements/Bound Variables</a></li>
 <li><a href="/rdoc/files/doc/sharding_rdoc.html">Master/Slave Databases and Sharding</a></li>
 <li><a href="/rdoc/files/doc/schema_rdoc.html">Schema Modification</a></li>
+<li><a href="/rdoc/files/doc/virtual_rows_rdoc.html">Virtual Row Blocks</a></li>
 </ul>
 
 <h3><a href="/rdoc/">Full API RDoc</a>, Main Classes/Modules:</h3>
 
 <ul>
 <li><a href="/rdoc/classes/Sequel.html">Sequel</a></li>
-<li><a href="/rdoc/classes/Sequel/Database.html">Sequel::Database</a></li>
-<li><a href="/rdoc/classes/Sequel/Dataset.html">Sequel::Dataset</a></li>
-<li><a href="/rdoc/classes/Sequel/Model.html">Sequel::Model</a></li>
-<li><a href="/rdoc/classes/Sequel/Model/Associations.html">Sequel::Model::Associations</a></li>
-<li><a href="/rdoc/classes/Sequel/Model/Associations/EagerLoading.html">Sequel::Model::Associations::EagerLoading</a></li>
+<li><a href="/rdoc/classes/Sequel/Database.html">Database</a></li>
+<li><a href="/rdoc/classes/Sequel/Dataset.html">Dataset</a></li>
+<li><a href="/rdoc/classes/Sequel/Model/ClassMethods.html">Model Class Methods</a></li>
+<li><a href="/rdoc/classes/Sequel/Model/InstanceMethods.html">Model Instance Methods</a></li>
+<li><a href="/rdoc/classes/Sequel/Model/Associations/ClassMethods.html">Model Association Class Methods</a></li>
+<li><a href="/rdoc/classes/Sequel/Model/Associations/DatasetMethods.html">Model Association Eager Loading Methods</a></li>
 </ul>
 
 <h3><a href="/rdoc/files/CHANGELOG.html">Change Log</a></h3>
