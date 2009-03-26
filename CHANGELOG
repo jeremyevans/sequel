@@ -1,5 +1,7 @@
 === HEAD
 
+* Split multi_insert into 2 methods with separate APIs, multi_insert for hashes, import for arrays of columns and values (jeremyevans)
+
 * Deprecate Dataset#transform and Model.serialize, and model serialization plugin (jeremyevans)
 
 * Add multi_insert_update to the MySQL adapter, used for setting specific update behavior when an error occurs when using multi_insert (dusty)
@@ -94,7 +96,7 @@
 
 * Deprecate Model.str_columns, Model#str_columns, #set_values, #update_values (jeremyevans)
 
-* Deprecate Model.delete_all, .destroy_all, .size, .uniq, and .import (jeremyevans)
+* Deprecate Model.delete_all, .destroy_all, .size, and .uniq (jeremyevans)
 
 * Copy all current dataset options when calling Model.db= (jeremyevans)
 
@@ -114,7 +116,7 @@
 
 * Deprecate passing options to Dataset#each, #all, #single_record, #single_value, #sql, #select_sql, #update, #update_sql, #delete, #delete_sql, and #exists (jeremyevans)
 
-* Deprecate Dataset#[Integer] and Dataset#import (jeremyevans)
+* Deprecate Dataset#[Integer] (jeremyevans)
 
 * Deprecate Dataset#create_view and Dataset#create_or_replace_view (jeremyevans)
 

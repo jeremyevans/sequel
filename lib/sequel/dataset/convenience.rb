@@ -83,6 +83,56 @@ module Sequel
       group(*columns).select(*(columns + [COUNT_OF_ALL_AS_COUNT])).order(:count)
     end
     
+    # Inserts multiple records into the associated table. This method can be
+    # to efficiently insert a large amounts of records into a table. Inserts
+    # are automatically wrapped in a transaction.
+    # 
+    # This method is called with a columns array and an array of value arrays:
+    #
+    #   dataset.import([:x, :y], [[1, 2], [3, 4]])
+    #
+    # This method also accepts a dataset instead of an array of value arrays:
+    #
+    #   dataset.import([:x, :y], other_dataset.select(:a___x, :b___y))
+    #
+    # The method also accepts a :slice or :commit_every option that specifies
+    # the number of records to insert per transaction. This is useful especially
+    # when inserting a large number of records, e.g.:
+    #
+    #   # this will commit every 50 records
+    #   dataset.import([:x, :y], [[1, 2], [3, 4], ...], :slice => 50)
+    def import(*args)
+      if args.empty?
+        Sequel::Deprecation.deprecate('Calling Sequel::Dataset#import with no arguments', 'Use dataset.multi_insert([])')
+        return
+      elsif args[0].is_a?(Array) && args[1].is_a?(Array)
+        columns, values, opts = *args
+      elsif args[0].is_a?(Array) && args[1].is_a?(Dataset)
+        table = @opts[:from].first
+        columns, dataset = *args
+        sql = "INSERT INTO #{quote_identifier(table)} (#{identifier_list(columns)}) VALUES #{literal(dataset)}"
+        return @db.transaction{execute_dui(sql)}
+      else
+        Sequel::Deprecation.deprecate('Calling Sequel::Dataset#import with hashes', 'Use Sequel::Dataset#multi_insert')
+        return multi_insert(*args)
+      end
+      # make sure there's work to do
+      Sequel::Deprecation.deprecate('Calling Sequel::Dataset#import an empty column array is deprecated and will raise an error in Sequel 3.0.') if columns.empty?
+      return if columns.empty? || values.empty?
+      
+      slice_size = opts && (opts[:commit_every] || opts[:slice])
+      
+      if slice_size
+        values.each_slice(slice_size) do |slice|
+          statements = multi_insert_sql(columns, slice)
+          @db.transaction(opts){statements.each{|st| execute_dui(st)}}
+        end
+      else
+        statements = multi_insert_sql(columns, values)
+        @db.transaction{statements.each{|st| execute_dui(st)}}
+      end
+    end
+    
     # Returns the interval between minimum and maximum values for the given 
     # column.
     def interval(column)
@@ -123,38 +173,23 @@ module Sequel
       get{|o| o.min(column)}
     end
 
-    # Inserts multiple records into the associated table. This method can be
-    # to efficiently insert a large amounts of records into a table. Inserts
-    # are automatically wrapped in a transaction.
+    # This is a front end for import that allows you to submit an array of
+    # hashes instead of arrays of columns and values:
     # 
-    # This method should be called with a columns array and an array of value arrays:
-    #
-    #   dataset.multi_insert([:x, :y], [[1, 2], [3, 4]])
-    #
-    # This method can also be called with an array of hashes:
-    # 
-    #   dataset.multi_insert({:x => 1}, {:x => 2})
+    #   dataset.multi_insert([{:x => 1}, {:x => 2}])
     #
     # Be aware that all hashes should have the same keys if you use this calling method,
     # otherwise some columns could be missed or set to null instead of to default
     # values.
     #
-    # The method also accepts a :slice or :commit_every option that specifies
-    # the number of records to insert per transaction. This is useful especially
-    # when inserting a large number of records, e.g.:
-    #
-    #   # this will commit every 50 records
-    #   dataset.multi_insert(lots_of_records, :slice => 50)
+    # You can also use the :slice or :commit_every option that import accepts.
     def multi_insert(*args)
       if args.empty?
+        Sequel::Deprecation.deprecate('Calling Sequel::Dataset#multi_insert with no arguments', 'Use dataset.multi_insert([])')
         return
-      elsif args[0].is_a?(Array) && args[1].is_a?(Array)
-        columns, values, opts = *args
-      elsif args[0].is_a?(Array) && args[1].is_a?(Dataset)
-        table = @opts[:from].first
-        columns, dataset = *args
-        sql = "INSERT INTO #{quote_identifier(table)} (#{identifier_list(columns)}) VALUES #{literal(dataset)}"
-        return @db.transaction{execute_dui(sql)}
+      elsif args[0].is_a?(Array) && (args[1].is_a?(Array) || args[1].is_a?(Dataset))
+        Sequel::Deprecation.deprecate('Calling Sequel::Dataset#multi_insert with an array of columns and an array of arrays of values', 'Use Sequel::Dataset#import')
+       return import(*args)
       else
         # we assume that an array of hashes is given
         hashes, opts = *args
@@ -163,22 +198,9 @@ module Sequel
         # convert the hashes into arrays
         values = hashes.map {|h| columns.map {|c| h[c]}}
       end
-      # make sure there's work to do
-      return if columns.empty? || values.empty?
-      
-      slice_size = opts && (opts[:commit_every] || opts[:slice])
-      
-      if slice_size
-        values.each_slice(slice_size) do |slice|
-          statements = multi_insert_sql(columns, slice)
-          @db.transaction(opts){statements.each{|st| execute_dui(st)}}
-        end
-      else
-        statements = multi_insert_sql(columns, values)
-        @db.transaction{statements.each{|st| execute_dui(st)}}
-      end
+      import(columns, values, opts)
     end
-    
+
     # Returns a Range object made from the minimum and maximum values for the
     # given column.
     def range(column)

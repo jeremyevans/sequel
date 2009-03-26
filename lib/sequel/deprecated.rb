@@ -194,11 +194,6 @@ module Sequel
       @db.create_or_replace_view(name, self)
     end
 
-    def import(*args, &block)
-      Sequel::Deprecation.deprecate('Sequel::Dataset#import', 'Use Sequel::Dataset#multi_insert')
-      multi_insert(*args, &block)
-    end
-
     def size
       Sequel::Deprecation.deprecate('Sequel::Dataset#size', 'Use Sequel::Dataset#count')
       count

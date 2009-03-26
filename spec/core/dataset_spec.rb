@@ -2499,6 +2499,163 @@ context "Dataset#print" do
   end
 end
 
+context "Dataset#import" do
+  before do
+    @dbc = Class.new do
+      attr_reader :sqls
+      
+      def execute(sql, opts={})
+        @sqls ||= []
+        @sqls << sql
+      end
+      alias execute_dui execute
+      
+      def transaction(opts={})
+        @sqls ||= []
+        @sqls << 'BEGIN'
+        yield
+        @sqls << 'COMMIT'
+      end
+    end
+    @db = @dbc.new
+    
+    @ds = Sequel::Dataset.new(@db).from(:items)
+    
+    @list = [{:name => 'abc'}, {:name => 'def'}, {:name => 'ghi'}]
+  end
+  
+  deprec_specify "should issue multiple inserts inside a transaction" do
+    @ds.import(@list)
+    @db.sqls.should == [
+      'BEGIN',
+      "INSERT INTO items (name) VALUES ('abc')",
+      "INSERT INTO items (name) VALUES ('def')",
+      "INSERT INTO items (name) VALUES ('ghi')",
+      'COMMIT'
+    ]
+  end
+  
+  deprec_specify "should handle different formats for tables" do
+    @ds = @ds.from(:sch__tab)
+    @ds.import(@list)
+    @db.sqls.should == [
+      'BEGIN',
+      "INSERT INTO sch.tab (name) VALUES ('abc')",
+      "INSERT INTO sch.tab (name) VALUES ('def')",
+      "INSERT INTO sch.tab (name) VALUES ('ghi')",
+      'COMMIT'
+    ]
+    @db.sqls.clear
+
+    @ds = @ds.from(:tab.qualify(:sch))
+    @ds.import(@list)
+    @db.sqls.should == [
+      'BEGIN',
+      "INSERT INTO sch.tab (name) VALUES ('abc')",
+      "INSERT INTO sch.tab (name) VALUES ('def')",
+      "INSERT INTO sch.tab (name) VALUES ('ghi')",
+      'COMMIT'
+    ]
+    @db.sqls.clear
+    @ds = @ds.from(:sch__tab.identifier)
+    @ds.import(@list)
+    @db.sqls.should == [
+      'BEGIN',
+      "INSERT INTO sch__tab (name) VALUES ('abc')",
+      "INSERT INTO sch__tab (name) VALUES ('def')",
+      "INSERT INTO sch__tab (name) VALUES ('ghi')",
+      'COMMIT'
+    ]
+  end
+  
+  deprec_specify "should accept the :commit_every option for committing every x records" do
+    @ds.import(@list, :commit_every => 2)
+    @db.sqls.should == [
+      'BEGIN',
+      "INSERT INTO items (name) VALUES ('abc')",
+      "INSERT INTO items (name) VALUES ('def')",
+      'COMMIT',
+      'BEGIN',
+      "INSERT INTO items (name) VALUES ('ghi')",
+      'COMMIT'
+    ]
+  end
+
+  deprec_specify "should accept the :slice option for committing every x records" do
+    @ds.import(@list, :slice => 2)
+    @db.sqls.should == [
+      'BEGIN',
+      "INSERT INTO items (name) VALUES ('abc')",
+      "INSERT INTO items (name) VALUES ('def')",
+      'COMMIT',
+      'BEGIN',
+      "INSERT INTO items (name) VALUES ('ghi')",
+      'COMMIT'
+    ]
+  end
+  
+  specify "should accept string keys as column names" do
+    @ds.import(['x', 'y'], [[1, 2], [3, 4]])
+    @db.sqls.should == [
+      'BEGIN',
+      "INSERT INTO items (x, y) VALUES (1, 2)",
+      "INSERT INTO items (x, y) VALUES (3, 4)",
+      'COMMIT'
+    ]
+  end
+
+  specify "should accept a columns array and a values array" do
+    @ds.import([:x, :y], [[1, 2], [3, 4]])
+    @db.sqls.should == [
+      'BEGIN',
+      "INSERT INTO items (x, y) VALUES (1, 2)",
+      "INSERT INTO items (x, y) VALUES (3, 4)",
+      'COMMIT'
+    ]
+  end
+
+  specify "should accept a columns array and a dataset" do
+    @ds2 = Sequel::Dataset.new(@db).from(:cats).filter(:purr => true).select(:a, :b)
+    
+    @ds.import([:x, :y], @ds2)
+    @db.sqls.should == [
+      'BEGIN',
+      "INSERT INTO items (x, y) VALUES (SELECT a, b FROM cats WHERE (purr IS TRUE))",
+      'COMMIT'
+    ]
+  end
+
+  specify "should accept a columns array and a values array with slice option" do
+    @ds.import([:x, :y], [[1, 2], [3, 4], [5, 6]], :slice => 2)
+    @db.sqls.should == [
+      'BEGIN',
+      "INSERT INTO items (x, y) VALUES (1, 2)",
+      "INSERT INTO items (x, y) VALUES (3, 4)",
+      'COMMIT',
+      'BEGIN',
+      "INSERT INTO items (x, y) VALUES (5, 6)",
+      'COMMIT'
+    ]
+  end
+  
+  deprec_specify "should not do anything if no columns or values are given" do
+    @ds.import
+    @db.sqls.should be_nil
+    
+    @ds.import([])
+    @db.sqls.should be_nil
+    
+    @ds.import([], [])
+    @db.sqls.should be_nil
+
+    @ds.import([{}, {}])
+    @db.sqls.should be_nil
+    
+    @ds.import([:a, :b], [])
+    @db.sqls.should be_nil
+  end
+end
+
 context "Dataset#multi_insert" do
   before do
     @dbc = Class.new do
@@ -2524,7 +2681,7 @@ context "Dataset#multi_insert" do
     @list = [{:name => 'abc'}, {:name => 'def'}, {:name => 'ghi'}]
   end
   
-  specify "should join all inserts into a single SQL string" do
+  specify "should issue multiple insert statements inside a transaction" do
     @ds.multi_insert(@list)
     @db.sqls.should == [
       'BEGIN',
@@ -2596,16 +2753,15 @@ context "Dataset#multi_insert" do
   
   specify "should accept string keys as column names" do
     @ds.multi_insert([{'x'=>1, 'y'=>2}, {'x'=>3, 'y'=>4}])
-    @ds.multi_insert(['x', 'y'], [[1, 2], [3, 4]])
     @db.sqls.should == [
       'BEGIN',
       "INSERT INTO items (x, y) VALUES (1, 2)",
       "INSERT INTO items (x, y) VALUES (3, 4)",
       'COMMIT'
-    ] * 2
+    ]
   end
 
-  specify "should accept a columns array and a values array" do
+  deprec_specify "should accept a columns array and a values array" do
     @ds.multi_insert([:x, :y], [[1, 2], [3, 4]])
     @db.sqls.should == [
       'BEGIN',
@@ -2615,7 +2771,7 @@ context "Dataset#multi_insert" do
     ]
   end
 
-  specify "should accept a columns array and a dataset" do
+  deprec_specify "should accept a columns array and a dataset" do
     @ds2 = Sequel::Dataset.new(@db).from(:cats).filter(:purr => true).select(:a, :b)
     
     @ds.multi_insert([:x, :y], @ds2)
@@ -2626,7 +2782,7 @@ context "Dataset#multi_insert" do
     ]
   end
 
-  specify "should accept a columns array and a values array with slice option" do
+  deprec_specify "should accept a columns array and a values array with slice option" do
     @ds.multi_insert([:x, :y], [[1, 2], [3, 4], [5, 6]], :slice => 2)
     @db.sqls.should == [
       'BEGIN',
@@ -2639,47 +2795,10 @@ context "Dataset#multi_insert" do
     ]
   end
   
-  deprec_specify "should be aliased by #import" do
-    @ds.import([:x, :y], [[1, 2], [3, 4], [5, 6]], :slice => 2)
-    @db.sqls.should == [
-      'BEGIN',
-      "INSERT INTO items (x, y) VALUES (1, 2)",
-      "INSERT INTO items (x, y) VALUES (3, 4)",
-      'COMMIT',
-      'BEGIN',
-      "INSERT INTO items (x, y) VALUES (5, 6)",
-      'COMMIT'
-    ]
-  end
-
-  specify "should not do anything if no columns or values are given" do
+  deprec_specify "should not do anything if no hashes are provided" do
     @ds.multi_insert
     @db.sqls.should be_nil
-    
-    @ds.multi_insert([])
-    @db.sqls.should be_nil
-    
-    @ds.multi_insert([], [])
-    @db.sqls.should be_nil
-
-    @ds.multi_insert([{}, {}])
-    @db.sqls.should be_nil
-    
-    @ds.multi_insert([:a, :b], [])
-    @db.sqls.should be_nil
-    
-    @ds.multi_insert([:x, :y], [[1, 2], [3, 4], [5, 6]], :slice => 2)
-    @db.sqls.should == [
-      'BEGIN',
-      "INSERT INTO items (x, y) VALUES (1, 2)",
-      "INSERT INTO items (x, y) VALUES (3, 4)",
-      'COMMIT',
-      'BEGIN',
-      "INSERT INTO items (x, y) VALUES (5, 6)",
-      'COMMIT'
-    ]
   end
-  
 end
 
 context "Dataset#query" do
