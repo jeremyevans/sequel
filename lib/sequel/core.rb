@@ -1,6 +1,4 @@
-%w'bigdecimal bigdecimal/util date enumerator thread time uri yaml'.each do |f|
-  require f
-end
+%w'bigdecimal date thread time uri'.each{|f| require f}
 
 # Top level module for Sequel
 #

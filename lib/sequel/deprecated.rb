@@ -1,3 +1,7 @@
+%w'bigdecimal/util enumerator yaml'.each do |f|
+  require f
+end
+
 module Sequel
   # This module makes it easy to print deprecation warnings with optional backtraces to a given stream.
   # There are a couple of methods you can use to change where the deprecation methods are printed
@@ -97,6 +101,17 @@ module Sequel
 
   class Dataset
     DATASET_CLASSES = []
+    STOCK_TRANSFORMS = {
+      :marshal => [
+        # for backwards-compatibility we support also non-base64-encoded values.
+        proc {|v| Marshal.load(v.unpack('m')[0]) rescue Marshal.load(v)},
+        proc {|v| [Marshal.dump(v)].pack('m')}
+      ],
+      :yaml => [
+        proc {|v| YAML.load v if v},
+        proc {|v| v.to_yaml}
+      ]
+    }
 
     def self.dataset_classes
       Deprecation.deprecate('Sequel::Dataset#dataset_classes', 'No replacement is planned')
@@ -234,6 +249,42 @@ module Sequel
     def print(*cols)
       Sequel::Deprecation.deprecate('Sequel::Dataset#print', 'require "sequel/extensions/pretty_table" first')
       Sequel::PrettyTable.print(naked.all, cols.empty? ? columns : cols)
+    end
+
+    def transform(t)
+      Sequel::Deprecation.deprecate('Sequel::Dataset#transform', 'There is no replacement.')
+      @transform = t
+      t.each do |k, v|
+        case v
+        when Array
+          if (v.size != 2) || !v.first.is_a?(Proc) && !v.last.is_a?(Proc)
+            raise Error::InvalidTransform, "Invalid transform specified"
+          end
+        else
+          unless v = STOCK_TRANSFORMS[v]
+            raise Error::InvalidTransform, "Invalid transform specified"
+          else
+            t[k] = v
+          end
+        end
+      end
+      self
+    end
+
+    def transform_load(r)
+      r.inject({}) do |m, kv|
+        k, v = *kv
+        m[k] = (tt = @transform[k]) ? tt[0][v] : v
+        m
+      end
+    end
+
+    def transform_save(r)
+      r.inject({}) do |m, kv|
+        k, v = *kv
+        m[k] = (tt = @transform[k]) ? tt[1][v] : v
+        m
+      end
     end
   end
 

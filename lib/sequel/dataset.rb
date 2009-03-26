@@ -51,17 +51,6 @@ module Sequel
     unfiltered union unordered where with_sql'.collect{|x| x.to_sym}
 
     NOTIMPL_MSG = "This method must be overridden in Sequel adapters".freeze
-    STOCK_TRANSFORMS = {
-      :marshal => [
-        # for backwards-compatibility we support also non-base64-encoded values.
-        proc {|v| Marshal.load(v.unpack('m')[0]) rescue Marshal.load(v)}, 
-        proc {|v| [Marshal.dump(v)].pack('m')}
-      ],
-      :yaml => [
-        proc {|v| YAML.load v if v}, 
-        proc {|v| v.to_yaml}
-      ]
-    }
 
     # The database that corresponds to this dataset
     attr_accessor :db
@@ -259,63 +248,6 @@ module Sequel
       clone(:overrides=>hash.merge(@opts[:overrides]||{}))
     end
 
-    # Sets a value transform which is used to convert values loaded and saved
-    # to/from the database. The transform should be supplied as a hash. Each
-    # value in the hash should be an array containing two proc objects - one
-    # for transforming loaded values, and one for transforming saved values.
-    # The following example demonstrates how to store Ruby objects in a dataset
-    # using Marshal serialization:
-    #
-    #   dataset.transform(:obj => [
-    #     proc {|v| Marshal.load(v)},
-    #     proc {|v| Marshal.dump(v)}
-    #   ])
-    #
-    #   dataset.insert_sql(:obj => 1234) #=>
-    #   "INSERT INTO items (obj) VALUES ('\004\bi\002\322\004')"
-    #
-    # Another form of using transform is by specifying stock transforms:
-    # 
-    #   dataset.transform(:obj => :marshal)
-    #
-    # The currently supported stock transforms are :marshal and :yaml.
-    def transform(t)
-      @transform = t
-      t.each do |k, v|
-        case v
-        when Array
-          if (v.size != 2) || !v.first.is_a?(Proc) && !v.last.is_a?(Proc)
-            raise Error::InvalidTransform, "Invalid transform specified"
-          end
-        else
-          unless v = STOCK_TRANSFORMS[v]
-            raise Error::InvalidTransform, "Invalid transform specified"
-          else
-            t[k] = v
-          end
-        end
-      end
-      self
-    end
-    
-    # Applies the value transform for data loaded from the database.
-    def transform_load(r)
-      r.inject({}) do |m, kv|
-        k, v = *kv
-        m[k] = (tt = @transform[k]) ? tt[0][v] : v
-        m
-      end
-    end
-    
-    # Applies the value transform for data saved to the database.
-    def transform_save(r)
-      r.inject({}) do |m, kv|
-        k, v = *kv
-        m[k] = (tt = @transform[k]) ? tt[1][v] : v
-        m
-      end
-    end
-    
     # Updates values for the dataset.  The returned value is generally the
     # number of rows updated, but that is adapter dependent.
     def update(values={}, opts=(defarg=true;nil))

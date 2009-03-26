@@ -37,7 +37,7 @@ describe "Model#serialize" do
     MODEL_DB.reset
   end
 
-  it "should translate values to YAML when creating records" do
+  deprec_specify "should translate values to YAML when creating records" do
     @c = Class.new(Sequel::Model(:items)) do
       no_primary_key
       serialize :abc
@@ -53,7 +53,7 @@ describe "Model#serialize" do
     ]
   end
 
-  it "should support calling after the class is defined" do
+  deprec_specify "should support calling after the class is defined" do
     @c = Class.new(Sequel::Model(:items)) do
       no_primary_key
       columns :def
@@ -70,7 +70,7 @@ describe "Model#serialize" do
     ]
   end
 
-  it "should support using the Marshal format" do
+  deprec_specify "should support using the Marshal format" do
     @c = Class.new(Sequel::Model(:items)) do
       no_primary_key
       serialize :abc, :format => :marshal
@@ -87,7 +87,7 @@ describe "Model#serialize" do
     ]
   end
 
-  it "should translate values to and from YAML using accessor methods" do
+  deprec_specify "should translate values to and from YAML using accessor methods" do
     @c = Class.new(Sequel::Model(:items)) do
       serialize :abc, :def
       columns :abc, :def

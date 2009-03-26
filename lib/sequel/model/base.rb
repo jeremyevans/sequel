@@ -218,25 +218,6 @@ module Sequel
         @restrict_primary_key
       end
   
-      # Serializes column with YAML or through marshalling.  Arguments should be
-      # column symbols, with an optional trailing hash with a :format key
-      # set to :yaml or :marshal (:yaml is the default).  Setting this adds
-      # a transform to the model and dataset so that columns values will be serialized
-      # when saved and deserialized when returned from the database.
-      def serialize(*columns)
-        format = extract_options!(columns)[:format] || :yaml
-        @transform = columns.inject({}) do |m, c|
-          m[c] = format
-          m
-        end
-        @dataset.transform(@transform) if @dataset
-      end
-  
-      # Whether or not the given column is serialized for this model.
-      def serialized?(column)
-        @transform ? @transform.include?(column) : false
-      end
-    
       # Set the columns to allow in new/set/update.  Using this means that
       # any columns not listed here will not be modified.  If you have any virtual
       # setter methods (methods that end in =) that you want to be used in
@@ -351,7 +332,7 @@ module Sequel
       # Create the column accessors.  For columns that can be used as method names directly in ruby code,
       # use a string to define the method for speed.  For other columns names, use a block.
       def def_column_accessor(*columns)
-        columns, bad_columns = columns.partition{|x| %r{\A[_A-Za-z][0-9A-Za-z_]*\z}io.match(x.to_s)}
+        columns, bad_columns = columns.partition{|x| DATASET_METHOD_RE.match(x.to_s)}
         bad_columns.each{|x| def_bad_column_accessor(x)}
         im = instance_methods.collect{|x| x.to_s}
         columns.each do |column|
@@ -632,7 +613,11 @@ module Sequel
         associations.clear
         self
       end
-      alias reload refresh
+      
+      # Alias of refresh, but not aliased directly to make overriding in a plugin easier.
+      def reload
+        refresh
+      end
   
       # Creates or updates the record, after making sure the record
       # is valid.  If the record is not valid, or before_save,
@@ -861,6 +846,7 @@ module Sequel
       # typecast_value method, so database adapters can override/augment the handling
       # for database specific column types.
       def typecast_value(column, value)
+        # Deprecation.deprecate : Remove model.serialized call
         return value unless typecast_on_assignment && db_schema && (col_schema = db_schema[column]) && !model.serialized?(column)
         value = nil if value == '' and typecast_empty_string_to_nil and col_schema[:type] and ![:string, :blob].include?(col_schema[:type])
         raise(InvalidValue, "nil/NULL is not allowed for the #{column} column") if raise_on_typecast_failure && value.nil? && (col_schema[:allow_null] == false)

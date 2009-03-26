@@ -1,5 +1,7 @@
 === HEAD
 
+* Deprecate Dataset#transform and Model.serialize, and model serialization plugin (jeremyevans)
+
 * Add multi_insert_update to the MySQL adapter, used for setting specific update behavior when an error occurs when using multi_insert (dusty)
 
 * Add multi_insert_ignore to the MySQL adapter, used for skipping errors on row inserts when using multi_insert (dusty)

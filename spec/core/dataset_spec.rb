@@ -1025,9 +1025,8 @@ context "Dataset#with_sql" do
     @dataset.with_sql('SELECT 1 FROM test').sql.should == 'SELECT 1 FROM test'
   end
   
-  specify "should keep row_proc and transform" do
+  specify "should keep row_proc" do
     @dataset.with_sql('SELECT 1 FROM test').row_proc.should == @dataset.row_proc
-    @dataset.with_sql('SELECT 1 FROM test').instance_variable_get(:@transform).should == @dataset.instance_variable_get(:@transform)
   end
 end
 
@@ -2822,20 +2821,22 @@ context "Dataset#transform" do
     end
 
     @ds = @c.new(nil).from(:items)
-    @ds.transform(:x => [
-      proc {|v| Marshal.load(v)},
-      proc {|v| Marshal.dump(v)}
-    ])
+    deprec do
+      @ds.transform(:x => [
+        proc {|v| Marshal.load(v)},
+        proc {|v| Marshal.dump(v)}
+      ])
+    end
   end
   
-  specify "should change the dataset to transform values loaded from the database" do
+  deprec_specify "should change the dataset to transform values loaded from the database" do
     @ds.raw = {:x => Marshal.dump([1, 2, 3]), :y => 'hello'}
     @ds.first.should == {:x => [1, 2, 3], :y => 'hello'}
     @ds.raw = {:x => Marshal.dump([1, 2, 3]), :y => 'hello'}
     @ds.all.should == [{:x => [1, 2, 3], :y => 'hello'}]
   end
   
-  specify "should change the dataset to transform values saved to the database" do
+  deprec_specify "should change the dataset to transform values saved to the database" do
     @ds.insert(:x => :toast)
     @ds.sql.should == "INSERT INTO items (x) VALUES ('#{Marshal.dump(:toast)}')"
 
@@ -2846,7 +2847,7 @@ context "Dataset#transform" do
     @ds.sql.should == "UPDATE items SET x = '#{Marshal.dump(['dream'])}'"
   end
   
-  specify "should be transferred to cloned datasets" do
+  deprec_specify "should be transferred to cloned datasets" do
     @ds2 = @ds.filter(:a => 1)
 
     @ds2.raw = {:x => Marshal.dump([1, 2, 3]), :y => 'hello'}
@@ -2856,7 +2857,7 @@ context "Dataset#transform" do
     @ds2.sql.should == "INSERT INTO items (x) VALUES ('#{Marshal.dump(:toast)}')"
   end
   
-  specify "should work correctly together with set_row_proc" do
+  deprec_specify "should work correctly together with set_row_proc" do
     @ds.row_proc = proc{|r| r[:z] = r[:x] * 2; r}
     @ds.raw = {:x => Marshal.dump("wow"), :y => 'hello'}
     @ds.first.should == {:x => "wow", :y => 'hello', :z => "wowwow"}
@@ -2867,7 +2868,7 @@ context "Dataset#transform" do
     f.should == {:x => "wow", :y => 'hello'}
   end
   
-  specify "should leave the supplied values intact" do
+  deprec_specify "should leave the supplied values intact" do
     h = {:x => :toast}
     @ds.insert(h)
     h.should == {:x => :toast}
@@ -2896,7 +2897,7 @@ context "Dataset#transform" do
     @ds = @c.new(nil).from(:items)
   end
   
-  specify "should raise Sequel::Error for invalid transformations" do
+  deprec_specify "should raise Sequel::Error for invalid transformations" do
     proc {@ds.transform(:x => 'mau')}.should raise_error(Sequel::Error::InvalidTransform)
     proc {@ds.transform(:x => :mau)}.should raise_error(Sequel::Error::InvalidTransform)
     proc {@ds.transform(:x => [])}.should raise_error(Sequel::Error::InvalidTransform)
@@ -2904,7 +2905,7 @@ context "Dataset#transform" do
     proc {@ds.transform(:x => [proc {|v|}, proc {|v|}])}.should_not raise_error(Sequel::Error::InvalidTransform)
   end
   
-  specify "should support stock YAML transformation" do
+  deprec_specify "should support stock YAML transformation" do
     @ds.transform(:x => :yaml)
 
     @ds.raw = {:x => [1, 2, 3].to_yaml, :y => 'hello'}
@@ -2932,7 +2933,7 @@ context "Dataset#transform" do
     f.should == {:x => "wow", :y => 'hello'}
   end
   
-  specify "should support stock Marshal transformation with Base64 encoding" do
+  deprec_specify "should support stock Marshal transformation with Base64 encoding" do
     @ds.transform(:x => :marshal)
 
     @ds.raw = {:x => [Marshal.dump([1, 2, 3])].pack('m'), :y => 'hello'}
@@ -2960,14 +2961,14 @@ context "Dataset#transform" do
     f.should == {:x => "wow", :y => 'hello'}
   end
   
-  specify "should support loading of Marshalled values without Base64 encoding" do
+  deprec_specify "should support loading of Marshalled values without Base64 encoding" do
     @ds.transform(:x => :marshal)
 
     @ds.raw = {:x => Marshal.dump([1,2,3]), :y => nil}
     @ds.first.should == {:x => [1,2,3], :y => nil}
   end
   
-  specify "should return self" do
+  deprec_specify "should return self" do
     @ds.transform(:x => :marshal).should be(@ds)
   end
 end
@@ -2975,10 +2976,10 @@ end
 context "A dataset with a transform" do
   before do
     @ds = Sequel::Dataset.new(nil).from(:items)
-    @ds.transform(:x => :marshal)
+    deprec{@ds.transform(:x => :marshal)}
   end
   
-  specify "should automatically transform hash filters" do
+  deprec_specify "should automatically transform hash filters" do
     @ds.filter(:y => 2).sql.should == 'SELECT * FROM items WHERE (y = 2)'
     
     @ds.filter(:x => 2).sql.should == "SELECT * FROM items WHERE (x = '#{[Marshal.dump(2)].pack('m')}')"

@@ -950,7 +950,7 @@ describe Sequel::Model, "typecasting" do
     m.x.should == '1'
   end
 
-  specify "should not convert if serializing the field" do
+  deprec_specify "should not convert if serializing the field" do
     @c.serialize :x
     @c.instance_variable_set(:@db_schema, {:x=>{:type=>:string}})
     m = @c.new

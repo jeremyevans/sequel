@@ -111,6 +111,20 @@ module Sequel
         Deprecation.deprecate('Sequel::Model.table_exists?', 'Use Model.plugin(:schema) first')
         db.table_exists?(table_name)
       end
+
+      def serialize(*columns)
+        Deprecation.deprecate('Sequel::Model.serialize', 'A implementation that doesn\'t use dataset transforms can be added via plugin(:serialization, (:marshal||:yaml), column1, column2)')
+        format = extract_options!(columns)[:format] || :yaml
+        @transform = columns.inject({}) do |m, c|
+          m[c] = format
+          m
+        end
+        @dataset.transform(@transform) if @dataset
+      end
+
+      def serialized?(column)
+        @transform ? @transform.include?(column) : false
+      end
     end
   
     module InstanceMethods
