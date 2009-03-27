@@ -525,71 +525,16 @@ module Sequel
       end
     end
     
-    # Typecast the value to the given column_type. Can be overridden in
-    # adapters to support database specific column types.
+    # Typecast the value to the given column_type. Calls
+    # typecast_value_#{column_type} if the method exists,
+    # otherwise returns the value.
     # This method should raise Sequel::InvalidValue if assigned value
     # is invalid.
     def typecast_value(column_type, value)
       return nil if value.nil?
+      meth = "typecast_value_#{column_type}"
       begin
-        case column_type
-        when :integer
-          Integer(value)
-        when :string
-          value.to_s
-        when :float
-          Float(value)
-        when :decimal
-          case value
-          when BigDecimal
-            value
-          when String, Numeric
-            BigDecimal.new(value.to_s)
-          else
-            raise Sequel::InvalidValue, "invalid value for BigDecimal: #{value.inspect}"
-          end
-        when :boolean
-          case value
-          when false, 0, "0", /\Af(alse)?\z/i
-            false
-          else
-            blank_object?(value) ? nil : true
-          end
-        when :date
-          case value
-          when Date
-            value
-          when DateTime, Time
-            Date.new(value.year, value.month, value.day)
-          when String
-            Sequel.string_to_date(value)
-          else
-            raise Sequel::InvalidValue, "invalid value for Date: #{value.inspect}"
-          end
-        when :time
-          case value
-          when Time
-            value
-          when String
-            Sequel.string_to_time(value)
-          else
-            raise Sequel::InvalidValue, "invalid value for Time: #{value.inspect}"
-          end
-        when :datetime
-          raise(Sequel::InvalidValue, "invalid value for Datetime: #{value.inspect}") unless [DateTime, Date, Time, String].any?{|c| value.is_a?(c)}
-          if Sequel.datetime_class === value
-            # Already the correct class, no need to convert
-            value
-          else
-            # First convert it to standard ISO 8601 time, then
-            # parse that string using the time class.
-            Sequel.string_to_datetime(Time === value ? value.iso8601 : value.to_s)
-          end
-        when :blob
-          value.is_a?(Sequel::SQL::Blob) ? value : Sequel::SQL::Blob.new(value)
-        else
-          value
-        end
+        respond_to?(meth, true) ? send(meth, value) : value
       rescue ArgumentError, TypeError => exp
         e = Sequel::InvalidValue.new("#{exp.class} #{exp.message}")
         e.set_backtrace(exp.backtrace)
@@ -774,6 +719,87 @@ module Sequel
     # Raise a database error unless the exception is an Rollback.
     def transaction_error(e, *classes)
       raise_error(e, :classes=>classes) unless Rollback === e
+    end
+
+    # Typecast the value to an SQL::Blob
+    def typecast_value_blob(value)
+      value.is_a?(Sequel::SQL::Blob) ? value : Sequel::SQL::Blob.new(value)
+    end
+
+    # Typecast the value to true, false, or nil
+    def typecast_value_boolean(value)
+      case value
+      when false, 0, "0", /\Af(alse)?\z/i
+        false
+      else
+        blank_object?(value) ? nil : true
+      end
+    end
+
+    # Typecast the value to a Date
+    def typecast_value_date(value)
+      case value
+      when Date
+        value
+      when DateTime, Time
+        Date.new(value.year, value.month, value.day)
+      when String
+        Sequel.string_to_date(value)
+      else
+        raise InvalidValue, "invalid value for Date: #{value.inspect}"
+      end
+    end
+
+    # Typecast the value to a DateTime or Time depending on Sequel.datetime_class
+    def typecast_value_datetime(value)
+      raise(Sequel::InvalidValue, "invalid value for Datetime: #{value.inspect}") unless [DateTime, Date, Time, String].any?{|c| value.is_a?(c)}
+      if Sequel.datetime_class === value
+        # Already the correct class, no need to convert
+       value
+      else
+        # First convert it to standard ISO 8601 time, then
+        # parse that string using the time class.
+        Sequel.string_to_datetime(Time === value ? value.iso8601 : value.to_s)
+      end
+    end
+
+    # Typecast the value to a BigDecimal
+    def typecast_value_decimal(value)
+      case value
+      when BigDecimal
+        value
+      when String, Numeric
+        BigDecimal.new(value.to_s)
+      else
+        raise InvalidValue, "invalid value for BigDecimal: #{value.inspect}"
+      end
+    end
+
+    # Typecast the value to a Float
+    def typecast_value_float(value)
+      Float(value)
+    end
+
+    # Typecast the value to an Integer
+    def typecast_value_integer(value)
+      Integer(value)
+    end
+
+    # Typecast the value to a String
+    def typecast_value_string(value)
+      value.to_s
+    end
+
+    # Typecast the value to a Time
+    def typecast_value_time(value)
+      case value
+      when Time
+        value
+      when String
+        Sequel.string_to_time(value)
+      else
+        raise Sequel::InvalidValue, "invalid value for Time: #{value.inspect}"
+      end
     end
   end
 end
