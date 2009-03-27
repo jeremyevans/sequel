@@ -119,7 +119,7 @@ module Sequel
     # Returns an array with all records in the dataset. If a block is given,
     # the array is iterated over after all items have been loaded.
     def all(opts = (defarg=true;nil), &block)
-      Deprecation.deprecate("Calling Dataset#all with an argument is deprecated and will raise an error in a future version.  Use dataset.clone(opts).all.") unless defarg
+      Deprecation.deprecate("Calling Dataset#all with an argument is deprecated and will raise an error in Sequel 3.0.  Use dataset.clone(opts).all.") unless defarg
       a = []
       defarg ? each{|r| a << r} : each(opts){|r| a << r}
       post_load(a)
@@ -171,14 +171,14 @@ module Sequel
     # Deletes the records in the dataset.  The returned value is generally the
     # number of records deleted, but that is adapter dependent.
     def delete(opts=(defarg=true;nil))
-      Deprecation.deprecate("Calling Dataset#delete with an argument is deprecated and will raise an error in a future version.  Use dataset.clone(opts).delete.") unless defarg
+      Deprecation.deprecate("Calling Dataset#delete with an argument is deprecated and will raise an error in Sequel 3.0.  Use dataset.clone(opts).delete.") unless defarg
       execute_dui(defarg ? delete_sql : delete_sql(opts))
     end
     
     # Iterates over the records in the dataset as they are yielded from the
     # database adapter, and returns self.
     def each(opts = (defarg=true;nil), &block)
-      Deprecation.deprecate("Calling Dataset#each with an argument is deprecated and will raise an error in a future version.  Use dataset.clone(opts).each.") unless defarg
+      Deprecation.deprecate("Calling Dataset#each with an argument is deprecated and will raise an error in Sequel 3.0.  Use dataset.clone(opts).each.") unless defarg
       if opts && opts.keys.any?{|o| COLUMN_CHANGE_OPTS.include?(o)}
         prev_columns = @columns
         begin
@@ -251,7 +251,7 @@ module Sequel
     # Updates values for the dataset.  The returned value is generally the
     # number of rows updated, but that is adapter dependent.
     def update(values={}, opts=(defarg=true;nil))
-      Deprecation.deprecate("Calling Dataset#update with an argument is deprecated and will raise an error in a future version.  Use dataset.clone(opts).update.") unless defarg
+      Deprecation.deprecate("Calling Dataset#update with an argument is deprecated and will raise an error in Sequel 3.0.  Use dataset.clone(opts).update.") unless defarg
       execute_dui(defarg ? update_sql(values) : update_sql(value, opts))
     end
   
@@ -339,7 +339,7 @@ module Sequel
     def virtual_row_block_call(block)
       return unless block
       unless Sequel.virtual_row_instance_eval
-        Deprecation.deprecate('Using a VirtualRow block without an argument is deprecated, and its meaning will change in a future version.  Add a block argument to keep the old semantics, or set Sequel.virtual_row_instance_eval = true to use instance_eval for VirtualRow blocks without arguments.') unless block.arity == 1
+        Deprecation.deprecate('Using a VirtualRow block without an argument is deprecated, and its meaning will change in Sequel 3.0.  Add a block argument to keep the old semantics, or set Sequel.virtual_row_instance_eval = true to use instance_eval for VirtualRow blocks without arguments.') unless block.arity == 1
         return block.call(SQL::VirtualRow.new)
       end
       case block.arity

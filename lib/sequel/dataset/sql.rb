@@ -88,7 +88,7 @@ module Sequel
     #   dataset.filter{|o| o.price >= 100}.delete_sql #=>
     #     "DELETE FROM items WHERE (price >= 100)"
     def delete_sql(opts = (defarg=true;nil))
-      Deprecation.deprecate("Calling Dataset#delete_sql with an argument is deprecated and will raise an error in a future version.  Use dataset.clone(opts).delete_sql.") unless defarg
+      Deprecation.deprecate("Calling Dataset#delete_sql with an argument is deprecated and will raise an error in Sequel 3.0.  Use dataset.clone(opts).delete_sql.") unless defarg
       opts = opts ? @opts.merge(opts) : @opts
 
       return static_sql(opts[:sql]) if opts[:sql]
@@ -148,7 +148,7 @@ module Sequel
     #   DB.select(1).where(DB[:items].exists).sql
     #   #=> "SELECT 1 WHERE EXISTS (SELECT * FROM items)"
     def exists(opts = (defarg=true;nil))
-      Deprecation.deprecate("Calling Dataset#exists with an argument is deprecated and will raise an error in a future version.  Use dataset.clone(opts).exists.") unless defarg
+      Deprecation.deprecate("Calling Dataset#exists with an argument is deprecated and will raise an error in Sequel 3.0.  Use dataset.clone(opts).exists.") unless defarg
       LiteralString.new("EXISTS (#{defarg ? select_sql : select_sql(opts)})")
     end
 
@@ -684,7 +684,7 @@ module Sequel
     #
     #   dataset.select_sql # => "SELECT * FROM items"
     def select_sql(opts = (defarg=true;nil))
-      Deprecation.deprecate("Calling Dataset#select_sql with an argument is deprecated and will raise an error in a future version.  Use dataset.clone(opts).select_sql.") unless defarg
+      Deprecation.deprecate("Calling Dataset#select_sql with an argument is deprecated and will raise an error in Sequel 3.0.  Use dataset.clone(opts).select_sql.") unless defarg
       opts = opts ? @opts.merge(opts) : @opts
       return static_sql(opts[:sql]) if opts[:sql]
       sql = 'SELECT'
@@ -694,7 +694,7 @@ module Sequel
 
     # Same as select_sql, not aliased directly to make subclassing simpler.
     def sql(opts = (defarg=true;nil))
-      Deprecation.deprecate("Calling Dataset#select_sql with an argument is deprecated and will raise an error in a future version.  Use dataset.clone(opts).select_sql.") unless defarg
+      Deprecation.deprecate("Calling Dataset#select_sql with an argument is deprecated and will raise an error in Sequel 3.0.  Use dataset.clone(opts).select_sql.") unless defarg
       defarg ? select_sql : select_sql(opts)
     end
 
@@ -734,7 +734,7 @@ module Sequel
     # Raises an error if the dataset is grouped or includes more
     # than one table.
     def update_sql(values = {}, opts = (defarg=true;nil))
-      Deprecation.deprecate("Calling Dataset#update_sql with an argument is deprecated and will raise an error in a future version.  Use dataset.clone(opts).update_sql.") unless defarg
+      Deprecation.deprecate("Calling Dataset#update_sql with an argument is deprecated and will raise an error in Sequel 3.0.  Use dataset.clone(opts).update_sql.") unless defarg
       opts = opts ? @opts.merge(opts) : @opts
 
       return static_sql(opts[:sql]) if opts[:sql]

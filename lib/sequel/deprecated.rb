@@ -23,7 +23,7 @@ module Sequel
 
     # Print the message to the output stream
     def self.deprecate(method, instead=nil)
-      message = instead ? "#{method} is deprecated and will be removed in a future version.  #{instead}." : method
+      message = instead ? "#{method} is deprecated and will be removed in Sequel 3.0.  #{instead}." : method
       return unless output
       output.puts(message)
       case backtraces

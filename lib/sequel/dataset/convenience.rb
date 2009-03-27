@@ -7,8 +7,8 @@ module Sequel
     #
     #   ds[:id=>1] => {:id=1}
     def [](*conditions)
-      Deprecation.deprecate('Using an Integer argument to Dataset#[] is deprecated and will raise an error in a future version. Use Dataset#first.') if conditions.length == 1 and conditions.is_a?(Integer)
-      Deprecation.deprecate('Using Dataset#[] without an argument is deprecated and will raise an error in a future version. Use Dataset#first.') if conditions.length == 0
+      Deprecation.deprecate('Using an Integer argument to Dataset#[] is deprecated and will raise an error in Sequel 3.0. Use Dataset#first.') if conditions.length == 1 and conditions.is_a?(Integer)
+      Deprecation.deprecate('Using Dataset#[] without an argument is deprecated and will raise an error in Sequel 3.0. Use Dataset#first.') if conditions.length == 0
       first(*conditions)
     end
 
@@ -155,7 +155,7 @@ module Sequel
     #   ds.map(:id) => [1, 2, 3, ...]
     #   ds.map{|r| r[:id] * 2} => [2, 4, 6, ...]
     def map(column=nil, &block)
-      Deprecation.deprecate('Using Dataset#map with an argument and a block is deprecated and will raise an error in a future version. Use an argument or a block, not both.') if column && block
+      Deprecation.deprecate('Using Dataset#map with an argument and a block is deprecated and will raise an error in Sequel 3.0. Use an argument or a block, not both.') if column && block
       if column
         super(){|r| r[column]}
       else
@@ -211,7 +211,7 @@ module Sequel
     
     # Returns the first record in the dataset.
     def single_record(opts = (defarg=true;nil))
-      Deprecation.deprecate("Calling Dataset#single_record with an argument is deprecated and will raise an error in a future version.  Use dataset.clone(opts).single_record.") unless defarg
+      Deprecation.deprecate("Calling Dataset#single_record with an argument is deprecated and will raise an error in Sequel 3.0.  Use dataset.clone(opts).single_record.") unless defarg
       ds = clone(:limit=>1)
       opts = opts.merge(:limit=>1) if opts and opts[:limit]
       defarg ? ds.each{|r| return r} : ds.each(opts){|r| return r}
@@ -221,7 +221,7 @@ module Sequel
     # Returns the first value of the first record in the dataset.
     # Returns nil if dataset is empty.
     def single_value(opts = (defarg=true;nil))
-      Deprecation.deprecate("Calling Dataset#single_value with an argument is deprecated and will raise an error in a future version.  Use dataset.clone(opts).single_value.") unless defarg
+      Deprecation.deprecate("Calling Dataset#single_value with an argument is deprecated and will raise an error in Sequel 3.0.  Use dataset.clone(opts).single_value.") unless defarg
       ds = naked.clone(:graph=>false)
       if r = (defarg ? ds.single_record : ds.single_record(opts))
         r.values.first
