@@ -1,5 +1,7 @@
 === HEAD
 
+* Add validation_helpers model plugin, which adds instance level validation support similar to previously standard validations, with a different API (jeremyevans)
+
 * Split multi_insert into 2 methods with separate APIs, multi_insert for hashes, import for arrays of columns and values (jeremyevans)
 
 * Deprecate Dataset#transform and Model.serialize, and model serialization plugin (jeremyevans)
