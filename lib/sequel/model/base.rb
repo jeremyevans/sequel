@@ -350,13 +350,6 @@ module Sequel
         end
       end
   
-      # Removes and returns the last member of the array if it is a hash. Otherwise,
-      # an empty hash is returned This method is useful when writing methods that
-      # take an options hash as the last parameter.
-      def extract_options!(array)
-        array.last.is_a?(Hash) ? array.pop : {}
-      end
-  
       # Get the schema from the database, fall back on checking the columns
       # via the database if that will return inaccurate results or if
       # it raises an error.

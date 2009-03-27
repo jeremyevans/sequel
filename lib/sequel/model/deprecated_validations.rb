@@ -361,6 +361,10 @@ module Sequel
         
         private
     
+        def extract_options!(array)
+          array.last.is_a?(Hash) ? array.pop : {}
+        end
+  
         def validation_if_proc(o, i)
           case i
           when Symbol then o.send(i)

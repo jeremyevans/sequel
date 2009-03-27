@@ -352,6 +352,14 @@ module Sequel
         
         private
     
+        # Removes and returns the last member of the array if it is a hash. Otherwise,
+        # an empty hash is returned This method is useful when writing methods that
+        # take an options hash as the last parameter.
+        def extract_options!(array)
+          array.last.is_a?(Hash) ? array.pop : {}
+        end
+
+        # Handle the :if option for validations
         def validation_if_proc(o, i)
           case i
           when Symbol then o.send(i)
