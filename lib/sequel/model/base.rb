@@ -329,6 +329,14 @@ module Sequel
   
       private
       
+      # Create a column accessor for a column with a method name that is hard to use in ruby code.
+      def def_bad_column_accessor(column)
+        overridable_methods_module.module_eval do
+          define_method(column){self[column]}
+          define_method("#{column}="){|v| self[column] = v}
+        end
+      end
+  
       # Create the column accessors.  For columns that can be used as method names directly in ruby code,
       # use a string to define the method for speed.  For other columns names, use a block.
       def def_column_accessor(*columns)
@@ -339,14 +347,6 @@ module Sequel
           meth = "#{column}="
           overridable_methods_module.module_eval("def #{column}; self[:#{column}] end") unless im.include?(column.to_s)
           overridable_methods_module.module_eval("def #{meth}(v); self[:#{column}] = v end") unless im.include?(meth)
-        end
-      end
-  
-      # Create a column accessor for a column with a method name that is hard to use in ruby code.
-      def def_bad_column_accessor(column)
-        overridable_methods_module.module_eval do
-          define_method(column){self[column]}
-          define_method("#{column}="){|v| self[column] = v}
         end
       end
   
@@ -860,6 +860,7 @@ module Sequel
     # Dataset methods are methods that the model class extends its dataset with in
     # the call to set_dataset.
     module DatasetMethods
+      # The model class associated with this dataset
       attr_accessor :model
 
       # Destroy each row in the dataset by instantiating it and then calling

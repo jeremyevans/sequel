@@ -29,6 +29,11 @@ module Sequel
           @skip_superclass_validations = true
         end
         
+        # Instructs the model to skip validations defined in superclasses
+        def skip_superclass_validations?
+          defined?(@skip_superclass_validations) && @skip_superclass_validations
+        end
+
         # Defines validations by converting a longhand block into a series of 
         # shorthand definitions. For example:
         #
@@ -50,9 +55,7 @@ module Sequel
     
         # Validates the given instance.
         def validate(o)
-          if superclass.respond_to?(:validate) && !@skip_superclass_validations
-            superclass.validate(o)
-          end
+          superclass.validate(o) if superclass.respond_to?(:validate) && !skip_superclass_validations?
           validations.each do |att, procs|
             v = case att
             when Array

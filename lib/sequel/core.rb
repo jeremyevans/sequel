@@ -211,7 +211,7 @@ module Sequel
   require(%w"metaprogramming sql connection_pool exceptions dataset database version deprecated")
   require(%w"schema_generator schema_methods schema_sql", 'database')
   require(%w"convenience graph prepared_statements sql", 'dataset')
-  require('core_sql') unless defined?(::SEQUEL_NO_CORE_EXTENSIONS) || ENV.has_key?('SEQUEL_NO_CORE_EXTENSIONS')
+  require('core_sql') if !defined?(::SEQUEL_NO_CORE_EXTENSIONS) && !ENV.has_key?('SEQUEL_NO_CORE_EXTENSIONS')
 
   # Add the database adapter class methods to Sequel via metaprogramming
   def_adapter_method(*Database::ADAPTERS)

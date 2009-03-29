@@ -1,5 +1,7 @@
 === HEAD
 
+* Don't use the model association plugin if SEQUEL_NO_ASSOCIATIONS constant or environment variable is defined (jeremyevans)
+
 * Don't require core_sql if SEQUEL_NO_CORE_EXTENSIONS constant or environment variable is defined (jeremyevans)
 
 * Add validation_helpers model plugin, which adds instance level validation support similar to previously standard validations, with a different API (jeremyevans)

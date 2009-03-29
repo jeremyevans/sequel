@@ -96,7 +96,7 @@ module Sequel
     DATASET_METHOD_RE = /\A[A-Za-z_][A-Za-z0-9_]*\z/
 
     # Empty instance variables, for -w compliance
-    EMPTY_INSTANCE_VARIABLES = [:@overridable_methods_module, :@transform, :@db, :@skip_superclass_validations]
+    EMPTY_INSTANCE_VARIABLES = [:@overridable_methods_module, :@db]
 
     # Hooks that are safe for public use
     HOOKS = [:after_initialize, :before_create, :after_create, :before_update,
@@ -109,16 +109,13 @@ module Sequel
       :@raise_on_save_failure=>nil, :@restricted_columns=>:dup, :@restrict_primary_key=>nil,
       :@simple_pk=>nil, :@simple_table=>nil, :@strict_param_setting=>nil,
       :@typecast_empty_string_to_nil=>nil, :@typecast_on_assignment=>nil,
-      :@raise_on_typecast_failure=>nil, :@association_reflections=>:dup}
+      :@raise_on_typecast_failure=>nil}
 
     # The setter methods (methods ending with =) that are never allowed
     # to be called automatically via set.
     RESTRICTED_SETTER_METHODS = %w"== === []= taguri= typecast_empty_string_to_nil= typecast_on_assignment= strict_param_setting= raise_on_save_failure= raise_on_typecast_failure="
 
     @allowed_columns = nil
-    @association_reflections = {}
-    @cache_store = nil
-    @cache_ttl = nil
     @db = nil
     @db_schema = nil
     @dataset_method_modules = []
@@ -131,13 +128,16 @@ module Sequel
     @restricted_columns = nil
     @simple_pk = nil
     @simple_table = nil
-    @skip_superclass_validations = nil
     @strict_param_setting = true
-    @transform = nil
     @typecast_empty_string_to_nil = true
     @typecast_on_assignment = true
     @use_transactions = true
   end
-end
 
-Sequel.require %w"inflections plugins base association_reflection associations exceptions errors deprecated", "model"
+  require %w"inflections plugins base exceptions errors", "model"
+  if !defined?(::SEQUEL_NO_ASSOCIATIONS) && !ENV.has_key?('SEQUEL_NO_ASSOCIATIONS')
+    require 'associations', 'model'
+    Model.plugin Model::Associations
+  end
+  require 'deprecated', 'model'
+end
