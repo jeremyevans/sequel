@@ -765,7 +765,7 @@ context "MySQL::Dataset#multi_insert" do
   end
   
   specify "should support inserting using columns and values arrays" do
-    @d.multi_insert([:name, :value], [['abc', 1], ['def', 2]])
+    @d.import([:name, :value], [['abc', 1], ['def', 2]])
 
     MYSQL_DB.sqls.should == [
       SQL_BEGIN,
@@ -810,7 +810,7 @@ context "MySQL::Dataset#multi_insert_update" do
   end
   
   specify "should add the ON DUPLICATE KEY UPDATE and ALL columns when no args given" do
-    @d.multi_insert_update.multi_insert([:name,:value], 
+    @d.multi_insert_update.import([:name,:value], 
       [['abc', 1], ['def',2]]
     )
     
@@ -825,7 +825,7 @@ context "MySQL::Dataset#multi_insert_update" do
     ]
   end
   specify "should add the ON DUPLICATE KEY UPDATE and columns specified when args are given" do
-    @d.multi_insert_update(:value).multi_insert([:name,:value], 
+    @d.multi_insert_update(:value).import([:name,:value], 
       [['abc', 1], ['def',2]]
     )
     
