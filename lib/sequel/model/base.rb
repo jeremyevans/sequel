@@ -88,7 +88,7 @@ module Sequel
         args = args.first if (args.size == 1)
         return dataset[args] if args.is_a?(Hash)
         if t = simple_table and p = simple_pk
-          with_sql("SELECT * FROM #{t} WHERE #{p} = #{dataset.literal(args)} LIMIT 1").first
+          with_sql("SELECT * FROM #{t} WHERE #{p} = #{dataset.literal(args)}").first
         else
           dataset[primary_key_hash(args)]
         end
