@@ -243,22 +243,21 @@ module Sequel
         end
       end
       
-      # Sets up the the multi_insert method to skips errors.
+      # Sets up the the multi_insert and import methods to skip errors.
       # Useful if you have a unique key and want to just skip
       # inserting rows that violate the unique key restriction.
       #
       # Example:
       #
-      # dataset.multi_insert_ignore.multi_insert([:name,:value],
+      # dataset.multi_insert_ignore.import([:name,:value],
       #   [['a',1],['b',2]])
       #
       # INSERT IGNORE INTO tablename (name, value) VALUES (a, 1), (b, 2)
-      #
       def multi_insert_ignore
         clone(:multi_insert_ignore=>true)
       end
       
-      # Sets up the multi_insert method to support ON DUPLICATE KEY UPDATE
+      # Sets up the multi_insert and import methods to support ON DUPLICATE KEY UPDATE.
       # If you pass no arguments, ALL fields will be updated with the new
       # values.  If you pass the fields you want then ONLY those field 
       # will be updated.
@@ -268,18 +267,17 @@ module Sequel
       #
       # Examples:
       #
-      # dataset.multi_insert_update.multi_insert([:name,:value],
+      # dataset.multi_insert_update.import([:name,:value],
       #   [['a',1],['b',2]])
       #
       # INSERT INTO tablename (name, value) VALUES (a, 1), (b, 2)
       # ON DUPLICATE KEY UPDATE name=VALUES(name), value=VALUES(value)
       #
-      # dataset.multi_insert_update(:value).multi_insert([:name,:value],
+      # dataset.multi_insert_update(:value).import([:name,:value],
       #   [['a',1],['b',2]])
       #
       # INSERT INTO tablename (name, value) VALUES (a, 1), (b, 2)
       # ON DUPLICATE KEY UPDATE value=VALUES(value)
-      #
       def multi_insert_update(*args)
         clone(:multi_insert_update => args)
       end
