@@ -16,8 +16,10 @@ module Sequel
   
   class Model
     # Loads a plugin for use with the model class, passing optional arguments
-    # to the plugin. If the plugin has a DatasetMethods module and the model
-    # doesn't have a dataset, raise an Error.
+    # to the plugin.  If the plugin is a module, load it directly.  Otherwise,
+    # require the plugin from either sequel/plugins/#{plugin} or
+    # sequel_#{plugin}, and then attempt to load the module using a
+    # the camelized plugin name under Sequel::Plugins.
     def self.plugin(plugin, *args)
       arg = args.first
       block = lambda{arg}
@@ -39,7 +41,7 @@ module Sequel
           dataset.extend(m::DatasetMethods)
         end
         dataset_method_modules << m::DatasetMethods
-        def_dataset_method(*m::DatasetMethods.public_instance_methods.reject{|x| DATASET_METHOD_RE !~ x.to_s})
+        def_dataset_method(*m::DatasetMethods.public_instance_methods.reject{|x| NORMAL_METHOD_NAME_REGEXP !~ x.to_s})
       end
     end
     
