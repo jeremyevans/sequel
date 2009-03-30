@@ -122,7 +122,7 @@ module Sequel
           message = (atts.pop[:message] if atts.last.is_a?(Hash)) || 'is already taken'
           atts.each do |a|
             ds = model.filter(Array(a).map{|x| [x, send(x)]})
-            errors[a] << message unless (new? ? ds : ds.exclude(pk_hash)).count == 0
+            errors.add(a, message) unless (new? ? ds : ds.exclude(pk_hash)).count == 0
           end
         end
         
@@ -139,7 +139,7 @@ module Sequel
             next if opts[:allow_nil] && value.nil?
             next if opts[:allow_blank] && value.respond_to?(:blank?) && value.blank?
             if message = yield(a, v, opts[:message])
-              errors[a] << message
+              errors.add(a, message)
             end
           end
         end
