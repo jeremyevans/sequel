@@ -780,7 +780,7 @@ context "MySQL::Dataset#multi_insert" do
   end
 end
 
-context "MySQL::Dataset#multi_insert_ignore" do
+context "MySQL::Dataset#insert_ignore" do
   before do
     @d = MYSQL_DB[:items]
     @d.delete
@@ -788,7 +788,7 @@ context "MySQL::Dataset#multi_insert_ignore" do
   end
   
   specify "should add the IGNORE keyword when inserting" do
-    @d.multi_insert_ignore.multi_insert([{:name => 'abc'}, {:name => 'def'}])
+    @d.insert_ignore.multi_insert([{:name => 'abc'}, {:name => 'def'}])
     
     MYSQL_DB.sqls.should == [
       SQL_BEGIN,
@@ -802,7 +802,7 @@ context "MySQL::Dataset#multi_insert_ignore" do
   end
 end
 
-context "MySQL::Dataset#multi_insert_update" do
+context "MySQL::Dataset#on_duplicate_key_update" do
   before do
     @d = MYSQL_DB[:items]
     @d.delete
@@ -810,7 +810,7 @@ context "MySQL::Dataset#multi_insert_update" do
   end
   
   specify "should add the ON DUPLICATE KEY UPDATE and ALL columns when no args given" do
-    @d.multi_insert_update.import([:name,:value], 
+    @d.on_duplicate_key_update.import([:name,:value], 
       [['abc', 1], ['def',2]]
     )
     
@@ -825,7 +825,7 @@ context "MySQL::Dataset#multi_insert_update" do
     ]
   end
   specify "should add the ON DUPLICATE KEY UPDATE and columns specified when args are given" do
-    @d.multi_insert_update(:value).import([:name,:value], 
+    @d.on_duplicate_key_update(:value).import([:name,:value], 
       [['abc', 1], ['def',2]]
     )
     
