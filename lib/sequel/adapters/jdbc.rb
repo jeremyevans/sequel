@@ -480,6 +480,7 @@ end
 class Java::JavaSQL::Timestamp
   # Add a usec method in order to emulate Time values.
   def usec
+    Deprecation.deprecate('Java::JavaSQL::Timestamp#usec', 'Use timestamp.getNanos/1000')
     getNanos/1000
   end
 end

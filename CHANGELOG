@@ -1,5 +1,7 @@
 === HEAD
 
+* Deprecate Java::JavaSQL::Timestamp#usec (jeremyevans)
+
 * Fix Model.[] optimization introduced in 2.11.0 for databases that don't use LIMIT (jacaetevha)
 
 * Don't use the model association plugin if SEQUEL_NO_ASSOCIATIONS constant or environment variable is defined (jeremyevans)
