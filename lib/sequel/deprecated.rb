@@ -7,12 +7,12 @@ module Sequel
   # There are a couple of methods you can use to change where the deprecation methods are printed
   # and whether they should include backtraces:
   #
-  #   Sequel.Deprecation.output = $stderr # print deprecation messages to standard error (default)
-  #   Sequel.Deprecation.output = File.open('deprecated_calls.txt', 'wb') # use a file instead
-  #   Sequel.Deprecation.backtraces = false # don't include backtraces
-  #   Sequel.Deprecation.backtraces = true # include full backtraces
-  #   Sequel.Deprecation.backtraces = 10 # include 10 backtrace lines (default)
-  #   Sequel.Deprecation.backtraces = 1 # include 1 backtrace line
+  #   Sequel::Deprecation.output = $stderr # print deprecation messages to standard error (default)
+  #   Sequel::Deprecation.output = File.open('deprecated_calls.txt', 'wb') # use a file instead
+  #   Sequel::Deprecation.backtraces = false # don't include backtraces
+  #   Sequel::Deprecation.backtraces = true # include full backtraces
+  #   Sequel::Deprecation.backtraces = 10 # include 10 backtrace lines (default)
+  #   Sequel::Deprecation.backtraces = 1 # include 1 backtrace line
   module Deprecation
     extend Metaprogramming
 
