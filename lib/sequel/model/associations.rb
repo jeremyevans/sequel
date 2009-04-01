@@ -606,7 +606,7 @@ module Sequel
           opts[:class_name] ||= camelize(singularize(name))
           join_table = (opts[:join_table] ||= opts.default_join_table)
           left_key_alias = opts[:left_key_alias] ||= :x_foreign_key_x
-          left_key_select = opts[:left_key_select] ||= left.qualify(join_table).as(opts[:left_key_alias])
+          left_key_select = opts[:left_key_select] ||= SQL::QualifiedIdentifier.new(join_table, left).as(opts[:left_key_alias])
           graph_jt_conds = opts[:graph_join_table_conditions] = opts[:graph_join_table_conditions] ? opts[:graph_join_table_conditions].to_a : []
           opts[:graph_join_table_join_type] ||= opts[:graph_join_type]
           opts[:after_load].unshift(:array_uniq!) if opts[:uniq]
@@ -664,7 +664,7 @@ module Sequel
           opts[:class_name] ||= camelize(name)
           opts[:dataset] ||= proc do
             klass = opts.associated_class
-            klass.filter(opts.primary_key.qualify(klass.table_name)=>send(key))
+            klass.filter(SQL::QualifiedIdentifier.new(klass.table_name, opts.primary_key)=>send(key))
           end
           opts[:eager_loader] ||= proc do |key_hash, records, associations|
             h = key_hash[key]
@@ -675,7 +675,7 @@ module Sequel
             # Skip eager loading if no objects have a foreign key for this association
             unless keys.empty?
               klass = opts.associated_class
-              model.eager_loading_dataset(opts, klass.filter(opts.primary_key.qualify(klass.table_name)=>keys), opts.select, associations).all do |assoc_record|
+              model.eager_loading_dataset(opts, klass.filter(SQL::QualifiedIdentifier.new(klass.table_name, opts.primary_key)=>keys), opts.select, associations).all do |assoc_record|
                 next unless objects = h[assoc_record.send(opts.primary_key)]
                 objects.each{|object| object.associations[name] = assoc_record}
               end
@@ -709,14 +709,14 @@ module Sequel
           opts[:class_name] ||= camelize(singularize(name))
           opts[:dataset] ||= proc do
             klass = opts.associated_class
-            klass.filter(key.qualify(klass.table_name) => send(primary_key))
+            klass.filter(SQL::QualifiedIdentifier.new(klass.table_name, key) => send(primary_key))
           end
           opts[:eager_loader] ||= proc do |key_hash, records, associations|
             h = key_hash[primary_key]
             records.each{|object| object.associations[name] = []}
             reciprocal = opts.reciprocal
             klass = opts.associated_class
-            model.eager_loading_dataset(opts, klass.filter(key.qualify(klass.table_name)=>h.keys), opts.select, associations).all do |assoc_record|
+            model.eager_loading_dataset(opts, klass.filter(SQL::QualifiedIdentifier.new(klass.table_name, key)=>h.keys), opts.select, associations).all do |assoc_record|
               next unless objects = h[assoc_record[key]]
               objects.each do |object| 
                 object.associations[name].push(assoc_record)

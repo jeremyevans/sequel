@@ -326,7 +326,7 @@ module Sequel
       # * :schema - The schema to search (default_schema by default)
       # * :server - The server to use
       def tables(opts={})
-        ds = self[:pg_class].filter(:relkind=>'r').select(:relname).exclude(:relname.like(SYSTEM_TABLE_REGEXP)).server(opts[:server])
+        ds = self[:pg_class].filter(:relkind=>'r').select(:relname).exclude(SQL::StringExpression.like(:relname, SYSTEM_TABLE_REGEXP)).server(opts[:server])
         ds.join!(:pg_namespace, :oid=>:relnamespace, :nspname=>(opts[:schema]||default_schema).to_s) if opts[:schema] || default_schema
         ds.identifier_input_method = nil
         ds.identifier_output_method = nil

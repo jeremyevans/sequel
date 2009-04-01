@@ -97,7 +97,7 @@ module Sequel
           select = opts[:select] = []
           columns.each do |column|
             column_aliases[column] = [master, column]
-            select.push(column.qualify(master))
+            select.push(SQL::QualifiedIdentifier.new(master, column))
           end
         end
       end
@@ -129,9 +129,9 @@ module Sequel
               column_alias = :"#{column_alias}_#{column_alias_num}" 
               ca_num[column_alias] += 1
             end
-            [column_alias, column.qualify(table_alias).as(column_alias)]
+            [column_alias, SQL::QualifiedIdentifier.new(table_alias, column).as(column_alias)]
           else
-            [column, column.qualify(table_alias)]
+            [column, SQL::QualifiedIdentifier.new(table_alias, column)]
           end
           column_aliases[col_alias] = [table_alias, column]
           select.push(identifier)
@@ -177,7 +177,7 @@ module Sequel
     # Transform the hash of graph aliases to an array of columns
     def graph_alias_columns(graph_aliases)
       graph_aliases.collect do |col_alias, tc| 
-        identifier = tc[2] || tc[1].qualify(tc[0])
+        identifier = tc[2] || SQL::QualifiedIdentifier.new(tc[0], tc[1])
         identifier = SQL::AliasedExpression.new(identifier, col_alias) if tc[2] or tc[1] != col_alias
         identifier
       end
