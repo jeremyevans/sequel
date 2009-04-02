@@ -235,6 +235,11 @@ describe Sequel::Model, ".subset" do
     @c.new_only.pricey.sql.should == "SELECT * FROM items WHERE ((age < 'new') AND (price > 100))"
   end
 
+  specify "should not override existing model methods" do
+    @c.meta_def(:active){true}
+    @c.subset(:active, :active)
+    @c.active.should == true
+  end
 end
 
 describe Sequel::Model, ".find" do
