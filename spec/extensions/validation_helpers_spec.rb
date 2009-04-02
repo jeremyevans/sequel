@@ -16,6 +16,8 @@ describe "Sequel::Plugins::ValidationHelpers" do
     @c.set_validations{validates_format(/.+_.+/, :value, :allow_blank=>true)}
     @m.value = 'abc_'
     @m.should_not be_valid
+    @m.value = '1_1'
+    @m.should be_valid
     o = Object.new
     @m.value = o
     @m.should_not be_valid
@@ -31,12 +33,16 @@ describe "Sequel::Plugins::ValidationHelpers" do
     @m.should be_valid
     @m.value = nil
     @m.should_not be_valid
+    @m.value = '1_1'
+    @m.should be_valid
   end
 
-  specify "should take an :allow_blank option" do
+  specify "should take an :allow_nil option" do
     @c.set_validations{validates_format(/.+_.+/, :value, :allow_nil=>true)}
     @m.value = 'abc_'
     @m.should_not be_valid
+    @m.value = '1_1'
+    @m.should be_valid
     @m.value = nil
     @m.should be_valid
   end
@@ -46,6 +52,8 @@ describe "Sequel::Plugins::ValidationHelpers" do
     @m.value = 'abc_'
     @m.should_not be_valid
     @m.errors.full_messages.should == ['value is so blah']
+    @m.value = '1_1'
+    @m.should be_valid
   end
 
   specify "should take multiple attributes in the same call" do

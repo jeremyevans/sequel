@@ -133,12 +133,13 @@ module Sequel
         # the block.  If the block returns anything except nil or false, add it as
         # an error message for that attributes.
         def validatable_attributes(atts, opts)
+          am, an, ab, m = opts.values_at(:allow_missing, :allow_nil, :allow_blank, :message)
           Array(atts).each do |a|
-            next if opts[:allow_missing] && !values.has_key?(a)
+            next if am && !values.has_key?(a)
             v = send(a)
-            next if opts[:allow_nil] && value.nil?
-            next if opts[:allow_blank] && value.respond_to?(:blank?) && value.blank?
-            if message = yield(a, v, opts[:message])
+            next if an && v.nil?
+            next if ab && v.respond_to?(:blank?) && v.blank?
+            if message = yield(a, v, m)
               errors.add(a, message)
             end
           end
