@@ -3,37 +3,42 @@
 <h3>General Info, Guides, Examples, and Tutorials</h3>
 
 <ul>
-<li><a href="/rdoc/files/README_rdoc.html">README</a></li>
-<li><a href="/rdoc/files/doc/cheat_sheet_rdoc.html">Cheat Sheet</a></li>
-<li><a href="/rdoc/files/doc/dataset_filtering_rdoc.html">Dataset Filtering</a></li>
-<li><a href="/rdoc/files/doc/advanced_associations_rdoc.html">Advanced Associations</a></li>
-<li><a href="/rdoc/files/doc/prepared_statements_rdoc.html">Prepared Statements/Bound Variables</a></li>
-<li><a href="/rdoc/files/doc/sharding_rdoc.html">Master/Slave Databases and Sharding</a></li>
-<li><a href="/rdoc/files/doc/schema_rdoc.html">Schema Modification</a></li>
-<li><a href="/rdoc/files/doc/virtual_rows_rdoc.html">Virtual Row Blocks</a></li>
+  <li><a href="rdoc/files/README_rdoc.html">README</a></li>
+  <li><a href="rdoc/files/doc/cheat_sheet_rdoc.html">Cheat Sheet</a></li>
+  <li><a href="rdoc/files/doc/dataset_filtering_rdoc.html">Dataset Filtering</a></li>
+  <li><a href="rdoc/files/doc/advanced_associations_rdoc.html">Advanced Associations</a></li>
+  <li><a href="rdoc/files/doc/prepared_statements_rdoc.html">Prepared Statements/Bound Variables</a></li>
+  <li><a href="rdoc/files/doc/sharding_rdoc.html">Master/Slave Databases and Sharding</a></li>
+  <li><a href="rdoc/files/doc/schema_rdoc.html">Schema Modification</a></li>
+  <li><a href="rdoc/files/doc/virtual_rows_rdoc.html">Virtual Row Blocks</a></li>
 </ul>
 
-<h3><a href="/rdoc/">Full API RDoc</a>, Main Classes/Modules:</h3>
+<h3>RDoc</h3>
 
 <ul>
-<li><a href="/rdoc/classes/Sequel.html">Sequel</a></li>
-<li><a href="/rdoc/classes/Sequel/Database.html">Database</a></li>
-<li><a href="/rdoc/classes/Sequel/Dataset.html">Dataset</a></li>
-<li><a href="/rdoc/classes/Sequel/Model/ClassMethods.html">Model Class Methods</a></li>
-<li><a href="/rdoc/classes/Sequel/Model/InstanceMethods.html">Model Instance Methods</a></li>
-<li><a href="/rdoc/classes/Sequel/Model/Associations/ClassMethods.html">Model Association Class Methods</a></li>
-<li><a href="/rdoc/classes/Sequel/Model/Associations/DatasetMethods.html">Model Association Eager Loading Methods</a></li>
+  <li><a href="rdoc/index.html">Core/Model</a>, main pages:<ul>
+    <li><a href="rdoc/classes/Sequel.html">Sequel</a> (main module)</li>
+    <li><a href="rdoc/classes/Sequel/Database.html">Database</a></li>
+    <li><a href="rdoc/classes/Sequel/Dataset.html">Dataset</a></li>
+    <li><a href="rdoc/classes/Sequel/Model.html">Model</a></li>
+    <li><a href="rdoc/classes/Sequel/Model/ClassMethods.html">Model Class Methods</a></li>
+    <li><a href="rdoc/classes/Sequel/Model/InstanceMethods.html">Model Instance Methods</a></li>
+    <li><a href="rdoc/classes/Sequel/Model/Associations/ClassMethods.html">Model Association Class Methods</a></li>
+    <li><a href="rdoc/classes/Sequel/Model/Associations/DatasetMethods.html">Model Eager Loading Methods</a></li>
+</ul></li>
+  <li><a href="rdoc-adapters/index.html">Adapters</a></li>
+  <li><a href="rdoc-plugins/index.html">Extensions/Plugins</a></li>
 </ul>
 
-<h3><a href="/rdoc/files/CHANGELOG.html">Change Log</a></h3>
+<h3><a href="rdoc/files/CHANGELOG.html">Change Log</a></h3>
 
-<h3><a href="/rdoc/files/doc/release_notes/">Release Notes</a></h3>
+<h3><a href="rdoc/files/doc/release_notes/">Release Notes</a></h3>
 
-<h3><a href="/rdoc/files/COPYING.html">License</a></h3>
+<h3><a href="rdoc/files/COPYING.html">License</a></h3>
 
 <h3>Presentations</h3>
 
 <ul>
-<li><a href="/static/mwrc2009_presentation.html">Jeremy Evans's &quot;Sequel: The Database Toolkit for Ruby&quot; Presentation at MountainWest RubyConf 2009</a> (<a href="http://mwrc2009.confreaks.com/13-mar-2009-12-30-sequel-jeremy-evans.html">Video</a>) (<a href="/static/mwrc2009_presentation.txt">Transcript</a>)</li>
+<li><a href="static/mwrc2009_presentation.html">Jeremy Evans's &quot;Sequel: The Database Toolkit for Ruby&quot; Presentation at MountainWest RubyConf 2009</a> (<a href="http://mwrc2009.confreaks.com/13-mar-2009-12-30-sequel-jeremy-evans.html">Video</a>) (<a href="static/mwrc2009_presentation.txt">Transcript</a>)</li>
 <li><a href="http://assets.loriholden.com/presentations/merbcamp2008/">Lori Holden's &quot;Merb And Sequel&quot; Presentation at Merbcamp 2008</a></li>
 </ul>

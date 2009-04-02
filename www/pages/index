@@ -34,4 +34,4 @@
 <span class='comment'># print out the average price</span>
 <span class='ident'>puts</span> <span class='punct'>&quot;</span><span class='string'>The average price is: <span class='expr'>#{items.avg(:price)}</span></span><span class='punct'>&quot;</span></code></pre>
 
-<h2><a href='/documentation.html'>Learn more about Sequel&#8230;</a></h2>
+<h2><a href='documentation.html'>Learn more about Sequel&#8230;</a></h2>
