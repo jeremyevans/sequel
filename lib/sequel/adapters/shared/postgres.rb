@@ -344,7 +344,7 @@ module Sequel
         end
         synchronize(opts[:server]) do |conn|
           return yield(conn) if @transactions.include?(Thread.current) and !opts[:savepoint]
-          conn.transaction_depth = 0 if conn.transaction_depth.nil?
+          conn.transaction_depth ||= 0
           if conn.transaction_depth > 0
             log_info(SQL_SAVEPOINT % conn.transaction_depth)
             conn.execute(SQL_SAVEPOINT % conn.transaction_depth)
@@ -363,18 +363,19 @@ module Sequel
             else
               log_info(SQL_ROLLBACK)
               conn.execute(SQL_ROLLBACK) rescue nil
+              @transactions.delete(Thread.current)
             end
             transaction_error(e, *CONVERTED_EXCEPTIONS)
           ensure
             unless e
               begin
-                if conn.transaction_depth < 2
+                if conn.transaction_depth > 1
+                  log_info(SQL_RELEASE_SAVEPOINT % [conn.transaction_depth - 1])
+                  conn.execute(SQL_RELEASE_SAVEPOINT % [conn.transaction_depth - 1])
+                else
                   log_info(SQL_COMMIT)
                   conn.execute(SQL_COMMIT)
                   @transactions.delete(Thread.current)
-                else
-                  log_info(SQL_RELEASE_SAVEPOINT % [conn.transaction_depth - 1])
-                  conn.execute(SQL_RELEASE_SAVEPOINT % [conn.transaction_depth - 1])
                 end
               rescue => e
                 log_info(e.message)

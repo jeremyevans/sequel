@@ -198,6 +198,13 @@ context "A PostgreSQL dataset" do
       end
     end.should raise_error(Interrupt)
 
+    proc do
+      POSTGRES_DB.transaction do
+        @d << {:name => 'abc', :value => 1}
+        raise Sequel::Rollback
+      end
+    end.should_not raise_error
+
     @d.count.should == 0
   end
   
