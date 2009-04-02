@@ -193,6 +193,8 @@ describe "Sequel::Plugins::ValidationHelpers" do
     @m.should be_valid
     @m.value = false
     @m.should be_valid
+    @m.value = Time.now
+    @m.should be_valid
   end
   
   it "should support validates_unique with a single attribute" do

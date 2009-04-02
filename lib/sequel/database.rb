@@ -587,7 +587,7 @@ module Sequel
       when String
         obj.strip.empty?
       else
-        !obj.respond_to?(:empty?) || obj.empty?
+        obj.respond_to?(:empty?) ? obj.empty? : false
       end
     end
 
