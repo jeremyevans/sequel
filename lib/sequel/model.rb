@@ -29,6 +29,9 @@ module Sequel
   # plugin is the plugin method itself.  Plugins can override any class, instance, or
   # dataset method defined by a previous plugin and call super to get the default
   # behavior.
+  #
+  # You can set the SEQUEL_NO_ASSOCIATIONS constant or environment variable to
+  # make Sequel not load the associations plugin by default.
   class Model
     # Map that stores model classes created with Sequel::Model(), to allow the reopening
     # of classes when dealing with code reloading.

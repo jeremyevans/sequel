@@ -24,7 +24,7 @@
 #
 # Sequel converts two digit years in Dates and DateTimes by default,
 # so 01/02/03 is interpreted at January 2nd, 2003, and 12/13/99 is interpreted
-# as December 13, 1999.. You can override this to treat those dates as
+# as December 13, 1999. You can override this to treat those dates as
 # January 2nd, 0003 and December 13, 0099, respectively, by setting: 
 #
 #   Sequel.convert_two_digit_years = false
@@ -52,6 +52,9 @@
 # The option to not use instance_eval for a block with no arguments will be removed in Sequel 3.0.
 # If you have any virtual row blocks that you don't want to use instance_eval for,
 # make sure the blocks have block arguments.
+#
+# You can set the SEQUEL_NO_CORE_EXTENSIONS constant or environment variable to have
+# Sequel not extend the core classes.
 module Sequel
   @convert_tinyint_to_bool = true
   @convert_two_digit_years = true
