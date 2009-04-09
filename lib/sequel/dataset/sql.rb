@@ -87,9 +87,8 @@ module Sequel
     # 
     #   dataset.filter{|o| o.price >= 100}.delete_sql #=>
     #     "DELETE FROM items WHERE (price >= 100)"
-    def delete_sql(opts = (defarg=true;nil))
-      Deprecation.deprecate("Calling Dataset#delete_sql with an argument is deprecated and will raise an error in Sequel 3.0.  Use dataset.clone(opts).delete_sql.") unless defarg
-      opts = opts ? @opts.merge(opts) : @opts
+    def delete_sql
+      opts = @opts
 
       return static_sql(opts[:sql]) if opts[:sql]
 
@@ -147,9 +146,8 @@ module Sequel
     #
     #   DB.select(1).where(DB[:items].exists).sql
     #   #=> "SELECT 1 WHERE EXISTS (SELECT * FROM items)"
-    def exists(opts = (defarg=true;nil))
-      Deprecation.deprecate("Calling Dataset#exists with an argument is deprecated and will raise an error in Sequel 3.0.  Use dataset.clone(opts).exists.") unless defarg
-      LiteralString.new("EXISTS (#{defarg ? select_sql : select_sql(opts)})")
+    def exists
+      LiteralString.new("EXISTS (#{select_sql})")
     end
 
     # Returns a copy of the dataset with the given conditions imposed upon it.  
@@ -324,7 +322,6 @@ module Sequel
       when Hash
         values = @opts[:defaults].merge(values) if @opts[:defaults]
         values = values.merge(@opts[:overrides]) if @opts[:overrides]
-        values = transform_save(values) if @transform
         if values.empty?
           insert_default_values_sql
         else
@@ -683,19 +680,17 @@ module Sequel
     # Formats a SELECT statement
     #
     #   dataset.select_sql # => "SELECT * FROM items"
-    def select_sql(opts = (defarg=true;nil))
-      Deprecation.deprecate("Calling Dataset#select_sql with an argument is deprecated and will raise an error in Sequel 3.0.  Use dataset.clone(opts).select_sql.") unless defarg
-      opts = opts ? @opts.merge(opts) : @opts
+    def select_sql
+      opts = @opts
       return static_sql(opts[:sql]) if opts[:sql]
       sql = 'SELECT'
-      select_clause_order.each{|x| send("select_#{x}_sql", sql, opts)}
+      select_clause_order.each{|x| send(:"select_#{x}_sql", sql, opts)}
       sql
     end
 
     # Same as select_sql, not aliased directly to make subclassing simpler.
-    def sql(opts = (defarg=true;nil))
-      Deprecation.deprecate("Calling Dataset#select_sql with an argument is deprecated and will raise an error in Sequel 3.0.  Use dataset.clone(opts).select_sql.") unless defarg
-      defarg ? select_sql : select_sql(opts)
+    def sql
+      select_sql
     end
 
     # SQL fragment for specifying subscripts (SQL arrays)
@@ -733,9 +728,8 @@ module Sequel
     #
     # Raises an error if the dataset is grouped or includes more
     # than one table.
-    def update_sql(values = {}, opts = (defarg=true;nil))
-      Deprecation.deprecate("Calling Dataset#update_sql with an argument is deprecated and will raise an error in Sequel 3.0.  Use dataset.clone(opts).update_sql.") unless defarg
-      opts = opts ? @opts.merge(opts) : @opts
+    def update_sql(values = {})
+      opts = @opts
 
       return static_sql(opts[:sql]) if opts[:sql]
 
@@ -750,7 +744,6 @@ module Sequel
         values = opts[:defaults].merge(values) if opts[:defaults]
         values = values.merge(opts[:overrides]) if opts[:overrides]
         # get values from hash
-        values = transform_save(values) if @transform
         values.map do |k, v|
           "#{[String, Symbol].any?{|c| k.is_a?(c)} ? quote_identifier(k) : literal(k)} = #{literal(v)}"
         end.join(COMMA_SEPARATOR)
@@ -775,7 +768,7 @@ module Sequel
     end
 
     # Returns a copy of the dataset with the static SQL used.  This is useful if you want
-    # to keep the same row_proc/transform/graph, but change the SQL used to custom SQL.
+    # to keep the same row_proc/graph, but change the SQL used to custom SQL.
     #
     #   dataset.with_sql('SELECT * FROM foo') # SELECT * FROM foo
     def with_sql(sql, *args)
@@ -802,7 +795,6 @@ module Sequel
     # Internal filter method so it works on either the having or where clauses.
     def _filter(clause, *cond, &block)
       cond = cond.first if cond.size == 1
-      cond = transform_save(cond) if @transform if cond.is_a?(Hash)
       cond = filter_expr(cond, &block)
       cond = SQL::BooleanExpression.new(:AND, @opts[clause], cond) if @opts[clause]
       clone(clause => cond)

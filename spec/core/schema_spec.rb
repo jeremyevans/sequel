@@ -710,22 +710,6 @@ context "Schema Parser" do
     @sqls.should == ['x', 'x']
   end
 
-  deprec_specify "should parse the schema correctly for all tables" do
-    sqls = @sqls
-    proc{@db.schema}.should raise_error(Sequel::Error)
-    @db.meta_def(:tables){[:x]}
-    @db.meta_def(:schema_parse_table) do |t, opts|
-      sqls << t
-      [[:x, {:db_type=>t.to_s}]]
-    end
-    @db.schema.should == {'x'=>[[:x, {:db_type=>"x"}]]}
-    @sqls.should == ['x']
-    @db.schema.should == {'x'=>[[:x, {:db_type=>"x"}]]}
-    @sqls.should == ['x']
-    @db.schema(nil, :reload=>true).should == {'x'=>[[:x, {:db_type=>"x"}]]}
-    @sqls.should == ['x', 'x']
-  end
-
   specify "should convert various types of table name arguments" do
     @db.meta_def(:schema_parse_table) do |t, opts|
       [[t, {:db_type=>t}]]

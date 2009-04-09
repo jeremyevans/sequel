@@ -228,73 +228,6 @@ describe "Model#save_changes" do
   end
 end
 
-describe "Model#update_values" do
-  before(:each) do
-    MODEL_DB.reset
-
-    @c = Class.new(Sequel::Model(:items)) do
-      unrestrict_primary_key
-      columns :id, :x, :y
-    end
-  end
-  
-  deprec_specify "should generate an update statement" do
-    o = @c.new(:id => 1)
-    o.update_values(:x => 1)
-    MODEL_DB.sqls.first.should == "UPDATE items SET x = 1 WHERE (id = 1)"
-  end
-  
-  deprec_specify "should update attribute values" do
-    o = @c.new(:id => 1)
-    o.x.should be_nil
-    o.update_values(:x => 1)
-    o.x.should == 1
-  end
-  
-  deprec_specify "should support string keys" do
-    o = @c.new(:id => 1)
-    o.x.should be_nil
-    o.update_values('x' => 1)
-    o.x.should == 1
-    MODEL_DB.sqls.first.should == "UPDATE items SET x = 1 WHERE (id = 1)"
-  end
-end
-
-describe "Model#set_values" do
-  before(:each) do
-    MODEL_DB.reset
-
-    @c = Class.new(Sequel::Model(:items)) do
-      unrestrict_primary_key
-      columns :id, :x, :y
-    end
-  end
-  
-  deprec_specify "should not touch the database" do
-    o = @c.new(:id => 1)
-    o.set_values(:x => 1)
-    MODEL_DB.sqls.should == []
-  end
-  
-  deprec_specify "should update attribute values" do
-    o = @c.new(:id => 1)
-    o.x.should be_nil
-    o.set_values(:x => 1)
-    o.x.should == 1
-  end
-  
-  deprec_specify "should support string keys" do
-    o = @c.new(:id => 1)
-    o.x.should be_nil
-    o.set_values('x' => 1)
-    o.x.should == 1
-  end
-
-  deprec_specify "should raise an error if used with a non-String, non-Symbol key" do
-    proc{@c.new.set_values(1=>2)}.should raise_error(Sequel::Error)
-  end
-end
-
 describe "Model#new?" do
   
   before(:each) do
@@ -506,22 +439,10 @@ describe Sequel::Model, "#set" do
     MODEL_DB.sqls.should == []
   end
 
-  deprec_specify "should be aliased as set_with_params" do
-    @o1.set_with_params(:x => 1, :z => 2)
-    @o1.values.should == {:x => 1}
-    MODEL_DB.sqls.should == []
-  end
-  
   it "should return self" do
     returned_value = @o1.set(:x => 1, :z => 2)
     returned_value.should == @o1
     MODEL_DB.sqls.should == []
-  end
-
-  deprec_specify "should assume it is a column if no column information is present and the key is a symbol" do
-    @c.instance_variable_set(:@columns, nil)
-    o = @c.new.set(:x123=>1)
-    o[:x123].should == 1
   end
 end
 
@@ -561,11 +482,6 @@ describe Sequel::Model, "#update" do
     @o2.update('y'=> 1, 'id'=> 2)
     @o2.values.should == {:y => 1, :id=> 5}
     MODEL_DB.sqls.first.should == "UPDATE items SET y = 1 WHERE (id = 5)"
-  end
-
-  deprec_specify "should be aliased as update_with_params" do
-    @o1.update_with_params(:x => 1, :z => 2)
-    MODEL_DB.sqls.first.should == "INSERT INTO items (x) VALUES (1)"
   end
 end
 
@@ -950,14 +866,6 @@ describe Sequel::Model, "typecasting" do
     m.x.should == '1'
   end
 
-  deprec_specify "should not convert if serializing the field" do
-    @c.serialize :x
-    @c.instance_variable_set(:@db_schema, {:x=>{:type=>:string}})
-    m = @c.new
-    m.x =[1, 2]
-    m.x.should == [1, 2]
-  end
-
   specify "should convert to integer for an integer field" do
     @c.instance_variable_set(:@db_schema, {:x=>{:type=>:integer}})
     m = @c.new
@@ -1065,7 +973,7 @@ describe Sequel::Model, "typecasting" do
   specify "should convert to BigDecimal for a decimal field" do
     @c.instance_variable_set(:@db_schema, {:x=>{:type=>:decimal}})
     m = @c.new
-    bd = '1.0'.to_d
+    bd = BigDecimal.new('1.0')
     m.x = '1.0'
     m.x.should == bd
     m.x = 1.0

@@ -24,13 +24,6 @@ describe "Database schema parser" do
     INTEGRATION_DB.schema(:items, :reload=>true).first.first.should == :number
   end
 
-  deprec_specify "should be a hash with table_names as symbols" do
-    INTEGRATION_DB.create_table!(:items){integer :number}
-    schema = INTEGRATION_DB.schema(nil, :reload=>true)
-    schema.should be_a_kind_of(Hash)
-    schema[:items].should_not == nil
-  end
-
   specify "should not issue an sql query if the schema has been loaded unless :reload is true" do
     INTEGRATION_DB.create_table!(:items){integer :number}
     INTEGRATION_DB.schema(:items, :reload=>true)
@@ -40,11 +33,6 @@ describe "Database schema parser" do
     clear_sqls
     INTEGRATION_DB.schema(:items, :reload=>true)
     sqls_should_be "PRAGMA table_info('items')"
-  end
-
-  deprec_specify "should give the same result for a single table regardless of whether schema was called for a single table" do
-    INTEGRATION_DB.create_table!(:items){integer :number}
-    INTEGRATION_DB.schema(:items, :reload=>true).should == INTEGRATION_DB.schema(nil, :reload=>true)[:items]
   end
 
   specify "should raise an error when the table doesn't exist" do

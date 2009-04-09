@@ -285,7 +285,6 @@ module Sequel
           raise(Error, "Model.set_dataset takes a Symbol or a Sequel::Dataset")
         end
         @dataset.row_proc = Proc.new{|r| load(r)}
-        @dataset.transform(@transform) if @transform
         if inherited
           @simple_table = superclass.simple_table
           @columns = @dataset.columns rescue nil
@@ -438,8 +437,6 @@ module Sequel
       def set_columns(new_columns)
         @columns = new_columns
         def_column_accessor(*new_columns) if new_columns
-        # Deprecation.deprecated
-        @str_columns = nil
         @columns
       end
 
@@ -837,16 +834,12 @@ module Sequel
   
       # Set the columns, filtered by the only and except arrays.
       def set_restricted(hash, only, except)
-        columns_not_set = [nil, false, "", [], {}].include?(model.instance_variable_get(:@columns))
         meths = setter_methods(only, except)
         strict = strict_param_setting
         hash.each do |k,v|
           m = "#{k}="
           if meths.include?(m)
             send(m, v)
-          elsif columns_not_set && (Symbol === k)
-            Deprecation.deprecate('Calling Model#set_restricted for a column without a setter method when the model class does not have any columns', 'Use Model#[] for these columns')
-            self[k] = v
           elsif strict
             raise Error, "method #{m} doesn't exist or access is restricted to it"
           end
@@ -887,8 +880,7 @@ module Sequel
       # typecast_value method, so database adapters can override/augment the handling
       # for database specific column types.
       def typecast_value(column, value)
-        # Deprecation.deprecate : Remove model.serialized call
-        return value unless typecast_on_assignment && db_schema && (col_schema = db_schema[column]) && !model.serialized?(column)
+        return value unless typecast_on_assignment && db_schema && (col_schema = db_schema[column])
         value = nil if value == '' and typecast_empty_string_to_nil and col_schema[:type] and ![:string, :blob].include?(col_schema[:type])
         raise(InvalidValue, "nil/NULL is not allowed for the #{column} column") if raise_on_typecast_failure && value.nil? && (col_schema[:allow_null] == false)
         begin

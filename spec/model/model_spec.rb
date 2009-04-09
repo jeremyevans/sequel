@@ -64,22 +64,6 @@ describe Sequel::Model, "dataset & schema" do
     ds.should respond_to(:destroy)
   end
 
-  deprec_specify "sets schema with implicit table name" do
-    @model.set_schema do
-      primary_key :ssn, :string
-    end
-    @model.primary_key.should == :ssn
-    @model.table_name.should == :items
-  end
-
-  deprec_specify "sets schema with explicit table name" do
-    @model.set_schema :foo do
-      primary_key :id
-    end
-    @model.primary_key.should == :id
-    @model.table_name.should == :foo
-  end
-
   it "doesn't raise an error on set_dataset if there is an error raised getting the schema" do
     @model.meta_def(:get_db_schema){raise Sequel::Error}
     proc{@model.set_dataset(MODEL_DB[:foo])}.should_not raise_error
@@ -88,60 +72,6 @@ describe Sequel::Model, "dataset & schema" do
   it "doesn't raise an error on inherited if there is an error setting the dataset" do
     @model.meta_def(:set_dataset){raise Sequel::Error}
     proc{Class.new(@model)}.should_not raise_error
-  end
-end
-
-describe Sequel::Model, "#sti_key" do
-  before do
-    deprec do
-      class ::StiTest < Sequel::Model
-        def kind=(x); self[:kind] = x; end
-        def refresh; end
-        set_sti_key :kind
-      end
-    end
-    class ::StiTestSub1 < StiTest
-    end
-    class ::StiTestSub2 < StiTest
-    end
-    @ds = StiTest.dataset
-    MODEL_DB.reset
-  end
-  
-  deprec_specify "should return rows with the correct class based on the polymorphic_key value" do
-    def @ds.fetch_rows(sql)
-      yield({:kind=>'StiTest'})
-      yield({:kind=>'StiTestSub1'})
-      yield({:kind=>'StiTestSub2'})
-    end
-    StiTest.all.collect{|x| x.class}.should == [StiTest, StiTestSub1, StiTestSub2]
-  end
-
-  deprec_specify "should fallback to the main class if polymophic_key value is NULL" do
-    def @ds.fetch_rows(sql)
-      yield({:kind=>nil})
-    end
-    StiTest.all.collect{|x| x.class}.should == [StiTest]
-  end
-  
-  deprec_specify "should fallback to the main class if the given class does not exist" do
-    def @ds.fetch_rows(sql)
-      yield({:kind=>'StiTestSub3'})
-    end
-    StiTest.all.collect{|x| x.class}.should == [StiTest]
-  end
-  
-  deprec_specify "should add a before_create hook that sets the model class name for the key" do
-    StiTest.new.save
-    StiTestSub1.new.save
-    StiTestSub2.new.save
-    MODEL_DB.sqls.should == ["INSERT INTO sti_tests (kind) VALUES ('StiTest')", "INSERT INTO sti_tests (kind) VALUES ('StiTestSub1')", "INSERT INTO sti_tests (kind) VALUES ('StiTestSub2')"]
-  end
-  
-  deprec_specify "should add a filter to model datasets inside subclasses hook to only retreive objects with the matching key" do
-    StiTest.dataset.sql.should == "SELECT * FROM sti_tests"
-    StiTestSub1.dataset.sql.should == "SELECT * FROM sti_tests WHERE (kind = 'StiTestSub1')"
-    StiTestSub2.dataset.sql.should == "SELECT * FROM sti_tests WHERE (kind = 'StiTestSub2')"
   end
 end
 
@@ -324,47 +254,6 @@ describe Sequel::Model, ".find_or_create" do
       "SELECT * FROM items WHERE (x = 1) LIMIT 1",
       "INSERT INTO items (x) VALUES (1)"
     ]
-  end
-end
-
-describe Sequel::Model, ".delete_all" do
-
-  before(:each) do
-    MODEL_DB.reset
-    @c = Class.new(Sequel::Model(:items)) do
-      no_primary_key
-    end
-    
-    @c.dataset.meta_def(:delete) {MODEL_DB << delete_sql}
-  end
-
-  deprec_specify "should delete all records in the dataset" do
-    @c.delete_all
-    MODEL_DB.sqls.should == ["DELETE FROM items"]
-  end
-
-end
-
-describe Sequel::Model, ".destroy_all" do
-
-  before(:each) do
-    MODEL_DB.reset
-    @c = Class.new(Sequel::Model(:items)) do
-      no_primary_key
-    end
-
-    @c.dataset.meta_def(:delete) {MODEL_DB << delete_sql}
-  end
-
-  deprec_specify "should delete all records in the dataset" do
-    @c.dataset.meta_def(:destroy) {MODEL_DB << "DESTROY this stuff"}
-    @c.destroy_all
-    MODEL_DB.sqls.should == ["DESTROY this stuff"]
-  end
-  
-  deprec_specify "should call dataset.destroy" do
-    @c.dataset.should_receive(:destroy).and_return(true)
-    @c.destroy_all
   end
 end
 
@@ -580,14 +469,5 @@ context "Model.db_schema" do
     def @c.columns; [:x]; end
     @c.dataset = ds
     @c.db_schema.should == {:x=>{}}
-  end
-end
-
-context "Model.str_columns" do
-  deprec_specify "should return the columns as frozen strings" do
-    c = Class.new(Sequel::Model)
-    c.meta_def(:columns){[:a, :b]}
-    c.orig_str_columns.should == %w'a b'
-    proc{c.orig_str_columns.first << 'a'}.should raise_error
   end
 end

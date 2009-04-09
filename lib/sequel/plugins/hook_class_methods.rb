@@ -107,7 +107,7 @@ module Sequel
       end
 
       module InstanceMethods
-        Model::HOOKS.each{|h| class_eval("def #{h}; run_hooks(:#{h}); end", __FILE__, __LINE__)}
+        Model::HOOKS.each{|h| class_eval("def #{h}; return false if super == false; run_hooks(:#{h}); end", __FILE__, __LINE__)}
 
         private
 

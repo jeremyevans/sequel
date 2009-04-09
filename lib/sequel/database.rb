@@ -77,10 +77,6 @@ module Sequel
       @identifier_input_method = nil
       @identifier_output_method = nil
       @quote_identifiers = nil
-      if opts.include?(:upcase_identifiers)
-        Deprecation.deprecate('The :upcase_identifiers Database option', 'Use the :identifier_input_method => :upcase option instead')
-        @identifier_input_method = opts[:upcase_identifiers] ? :upcase : ""
-      end
       @pool = (@single_threaded ? SingleThreadedPool : ConnectionPool).new(connection_pool_default_options.merge(opts), &block)
       @pool.connection_proc = proc{|server| connect(server)} unless block
       @pool.disconnection_proc = proc{|conn| disconnect_connection(conn)} unless opts[:disconnection_proc]
@@ -225,8 +221,7 @@ module Sequel
 
     # Executes the supplied SQL statement string.
     def <<(sql)
-      Deprecation.deprecate('Passing an array argument to Database#<<', 'Use array.each{|x| database << x}') if Array === sql
-      execute_ddl((Array === sql) ? sql.to_sql : sql)
+      execute_ddl(sql)
     end
     
     # Returns a dataset from the database. If the first argument is a string,
@@ -409,9 +404,9 @@ module Sequel
     end
     
     # Parse the schema from the database.
-    # If the table_name is not given, returns the schema for all tables as a hash.
-    # If the table_name is given, returns the schema for a single table as an
-    # array with all members being arrays of length 2.  Available options are:
+    # Returns the schema for the given table as an array with all members being arrays of length 2,
+    # the first member being the column name, and the second member being a hash of column information.
+    # Available options are:
     #
     # * :reload - Get fresh information from the database, instead of using
     #   cached information.  If table_name is blank, :reload should be used
@@ -420,46 +415,24 @@ module Sequel
     #   that have been requested explicitly.
     # * :schema - An explicit schema to use.  It may also be implicitly provided
     #   via the table name.
-    def schema(table = nil, opts={})
-      Deprecation.deprecate('Calling Database#schema without a table argument', 'Use database.tables.inject({}){|h, m| h[m] = database.schema(m); h}') unless table
+    def schema(table, opts={})
       raise(Error, 'schema parsing is not implemented on this database') unless respond_to?(:schema_parse_table, true)
 
-      if table
-        sch, table_name = schema_and_table(table)
-        quoted_name = quote_schema_table(table)
-      end
+      sch, table_name = schema_and_table(table)
+      quoted_name = quote_schema_table(table)
       opts = opts.merge(:schema=>sch) if sch && !opts.include?(:schema)
-      if opts[:reload] && @schemas
-        if table_name
-          @schemas.delete(quoted_name)
-        else
-          @schemas = nil
-        end
-      end
 
-      if @schemas
-        if table_name
-          return @schemas[quoted_name] if @schemas[quoted_name]
-        else
-          return @schemas
-        end
-      end
-
-      raise(Error, '#tables does not exist, you must provide a specific table to #schema') if table.nil? && !respond_to?(:tables, true)
+      @schemas.delete(quoted_name) if opts[:reload] && @schemas
+      return @schemas[quoted_name] if @schemas && @schemas[quoted_name]
 
       @schemas ||= Hash.new do |h,k|
         quote_name = quote_schema_table(k)
         h[quote_name] if h.include?(quote_name)
       end
 
-      if table_name
-        cols = schema_parse_table(table_name, opts)
-        raise(Error, 'schema parsing returned no columns, table probably doesn\'t exist') if cols.nil? || cols.empty?
-        @schemas[quoted_name] = cols
-      else
-        tables.each{|t| @schemas[quote_schema_table(t)] = schema_parse_table(t.to_s, opts)}
-        @schemas
-      end
+      cols = schema_parse_table(table_name, opts)
+      raise(Error, 'schema parsing returned no columns, table probably doesn\'t exist') if cols.nil? || cols.empty?
+      @schemas[quoted_name] = cols
     end
 
     # Returns true if the database is using a single-threaded connection pool.
@@ -500,10 +473,6 @@ module Sequel
     # current transaction. Should be overridden for databases that support nested 
     # transactions.
     def transaction(opts={})
-      unless opts.is_a?(Hash)
-        Deprecation.deprecate('Passing an argument other than a Hash to Database#transaction', "Use DB.transaction(:server=>#{opts.inspect})") 
-        opts = {:server=>opts}
-      end
       synchronize(opts[:server]) do |conn|
         return yield(conn) if @transactions.include?(Thread.current)
         log_info(begin_transaction_sql)
@@ -579,6 +548,7 @@ module Sequel
     # strings with all whitespace, and ones that respond
     # true to empty?
     def blank_object?(obj)
+      return obj.blank? if obj.respond_to?(:blank?)
       case obj
       when NilClass, FalseClass
         true

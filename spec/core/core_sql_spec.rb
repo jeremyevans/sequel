@@ -63,50 +63,6 @@ context "Array#sql_array" do
   end
 end
 
-context "Array#to_sql" do
-  deprec_specify "should concatenate multiple lines into a single string" do
-    "SELECT * \r\nFROM items\r\n WHERE a = 1".split.to_sql. \
-      should == 'SELECT * FROM items WHERE a = 1'
-  end
-  
-  deprec_specify "should remove superfluous white space and line breaks" do
-    "\tSELECT * \n FROM items    ".split.to_sql. \
-      should == 'SELECT * FROM items'
-  end
-  
-  deprec_specify "should remove ANSI SQL comments" do
-    "SELECT *   --comment\r\n  FROM items\r\n  --comment".split.to_sql. \
-      should == 'SELECT * FROM items'
-  end
-  
-  deprec_specify "should remove C-style comments" do
-    "SELECT * \r\n /* comment comment\r\n comment\r\n FROM items */\r\n FROM items\r\n--comment".split.to_sql. \
-      should == 'SELECT * FROM items'
-  end
-end
-
-context "String#to_sql" do
-  deprec_specify "should concatenate multiple lines into a single string" do
-    "SELECT * \r\nFROM items\r\nWHERE a = 1".to_sql. \
-      should == 'SELECT * FROM items WHERE a = 1'
-  end
-  
-  deprec_specify "should remove superfluous white space and line breaks" do
-    "\tSELECT * \r\n FROM items    ".to_sql. \
-      should == 'SELECT * FROM items'
-  end
-  
-  deprec_specify "should remove ANSI SQL comments" do
-    "SELECT *   --comment \r\n FROM items\r\n  --comment".to_sql. \
-      should == 'SELECT * FROM items'
-  end
-  
-  deprec_specify "should remove C-style comments" do
-    "SELECT * \r\n/* comment comment\r\ncomment\r\nFROM items */\r\nFROM items\r\n--comment".to_sql. \
-      should == 'SELECT * FROM items'
-  end
-end
-
 context "String#lit" do
   specify "should return an LiteralString object" do
     'xyz'.lit.should be_a_kind_of(Sequel::LiteralString)
@@ -115,13 +71,6 @@ context "String#lit" do
   
   specify "should inhibit string literalization" do
     Sequel::Database.new[:t].update_sql(:stamp => "NOW()".lit).should == \
-      "UPDATE t SET stamp = NOW()"
-  end
-
-  deprec_specify "should be aliased as expr" do
-    'xyz'.expr.should be_a_kind_of(Sequel::LiteralString)
-    'xyz'.expr.to_s.should == 'xyz'
-    Sequel::Database.new[:t].update_sql(:stamp => "NOW()".expr).should == \
       "UPDATE t SET stamp = NOW()"
   end
 
@@ -143,18 +92,6 @@ context "String#to_sequel_blob" do
 
   specify "should retain binary data" do
     "\1\2\3\4".to_sequel_blob.should == "\1\2\3\4"
-  end
-end
-
-context "String#split_sql" do
-  deprec_specify "should split a string containing multiple statements" do
-    "DROP TABLE a; DROP TABLE c".split_sql.should == \
-      ['DROP TABLE a', 'DROP TABLE c']
-  end
-  
-  deprec_specify "should remove comments from the string" do
-    "DROP TABLE a;/* DROP TABLE b; DROP TABLE c;*/DROP TABLE d".split_sql.should == \
-      ['DROP TABLE a', 'DROP TABLE d']
   end
 end
 
@@ -365,10 +302,6 @@ context "Symbol" do
     :abc.cast(:integer).to_s(@ds).should == "CAST(abc AS integer)"
   end
 
-  deprec_specify "should support cast_as method" do
-    :abc.cast_as(:integer).to_s(@ds).should == "CAST(abc AS integer)"
-  end
-  
   specify "should support cast_numeric and cast_string" do
     x = :abc.cast_numeric
     x.should be_a_kind_of(Sequel::SQL::NumericExpression)
@@ -406,107 +339,8 @@ context "Symbol" do
     :abc.cast_numeric(String).to_s(@ds2).should == "CAST(abc AS bar)"
   end
 
-  deprec_specify "should support subscript access using | operator" do
-    (:abc|1).to_s(@ds).should == 'abc[1]'
-    (:abc|[1]).to_s(@ds).should == 'abc[1]'
-    (:abc|[1, 2]).to_s(@ds).should == 'abc[1, 2]'
-    (:abc|1|2).to_s(@ds).should == 'abc[1, 2]'
-  end
-
   specify "should support SQL EXTRACT function via #extract " do
     :abc.extract(:year).to_s(@ds).should == "extract(year FROM abc)"
-  end
-end
-
-context "String#to_time" do
-  deprec_specify "should convert the string into a Time object" do
-    "2007-07-11".to_time.should == Time.parse("2007-07-11")
-    "06:30".to_time.should == Time.parse("06:30")
-  end
-  
-  deprec_specify "should raise InvalidValue for an invalid time" do
-    proc {'0000-00-00'.to_time}.should raise_error(Sequel::InvalidValue)
-  end
-end
-
-context "String#to_date" do
-  after do
-    Sequel.convert_two_digit_years = true
-  end
-
-  deprec_specify "should convert the string into a Date object" do
-    "2007-07-11".to_date.should == Date.parse("2007-07-11")
-  end
-  
-  deprec_specify "should convert 2 digit years by default" do
-    "July 11, 07".to_date.should == Date.parse("2007-07-11")
-  end
-
-  deprec_specify "should not convert 2 digit years if set not to" do
-    Sequel.convert_two_digit_years = false
-    "July 11, 07".to_date.should == Date.parse("0007-07-11")
-  end
-
-  deprec_specify "should raise InvalidValue for an invalid date" do
-    proc {'0000-00-00'.to_date}.should raise_error(Sequel::InvalidValue)
-  end
-end
-
-context "String#to_datetime" do
-  after do
-    Sequel.convert_two_digit_years = true
-  end
-
-  deprec_specify "should convert the string into a DateTime object" do
-    "2007-07-11 10:11:12a".to_datetime.should == DateTime.parse("2007-07-11 10:11:12a")
-  end
-  
-  deprec_specify "should convert 2 digit years by default" do
-    "July 11, 07 10:11:12a".to_datetime.should == DateTime.parse("2007-07-11 10:11:12a")
-  end
-
-  deprec_specify "should not convert 2 digit years if set not to" do
-    Sequel.convert_two_digit_years = false
-    "July 11, 07 10:11:12a".to_datetime.should == DateTime.parse("0007-07-11 10:11:12a")
-  end
-
-  deprec_specify "should raise InvalidValue for an invalid date" do
-    proc {'0000-00-00'.to_datetime}.should raise_error(Sequel::InvalidValue)
-  end
-end
-
-context "String#to_sequel_time" do
-  after do
-    Sequel.datetime_class = Time
-    Sequel.convert_two_digit_years = true
-  end
-
-  deprec_specify "should convert the string into a Time object by default" do
-    "2007-07-11 10:11:12a".to_sequel_time.class.should == Time
-    "2007-07-11 10:11:12a".to_sequel_time.should == Time.parse("2007-07-11 10:11:12a")
-  end
-  
-  deprec_specify "should convert the string into a DateTime object if that is set" do
-    Sequel.datetime_class = DateTime
-    "2007-07-11 10:11:12a".to_sequel_time.class.should == DateTime
-    "2007-07-11 10:11:12a".to_sequel_time.should == DateTime.parse("2007-07-11 10:11:12a")
-  end
-  
-  deprec_specify "should convert 2 digit years by default if using DateTime class" do
-    Sequel.datetime_class = DateTime
-    "July 11, 07 10:11:12a".to_sequel_time.should == DateTime.parse("2007-07-11 10:11:12a")
-  end
-
-  deprec_specify "should not convert 2 digit years if set not to when using DateTime class" do
-    Sequel.datetime_class = DateTime
-    Sequel.convert_two_digit_years = false
-    "July 11, 07 10:11:12a".to_sequel_time.should == DateTime.parse("0007-07-11 10:11:12a")
-  end
-
-  deprec_specify "should raise InvalidValue for an invalid time" do
-    proc {'0000-00-00'.to_sequel_time}.should raise_error(Sequel::InvalidValue)
-    Sequel.datetime_class = DateTime
-    proc {'0000-00-00'.to_sequel_time}.should raise_error(Sequel::InvalidValue)
   end
 end
 

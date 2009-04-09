@@ -114,8 +114,10 @@ class Sequel::ConnectionPool
       ensure
         release(t, conn, server) unless dde
       end
+    rescue StandardError => e
+      raise e
     rescue Exception => e
-      raise(@convert_exceptions && !e.is_a?(StandardError) ? RuntimeError.new(e.message) : e)
+      raise(@convert_exceptions ? RuntimeError.new(e.message) : e)
     end
   end
   

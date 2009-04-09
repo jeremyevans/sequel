@@ -121,10 +121,6 @@ module Sequel
       # transactions and commits them immediately after.  It's wasteful,
       # but required by DataObject's API.
       def transaction(opts={})
-        unless opts.is_a?(Hash)
-          Deprecation.deprecate('Passing an argument other than a Hash to Database#transaction', "Use DB.transaction(:server=>#{opts.inspect})") 
-          opts = {:server=>opts}
-        end
         th = Thread.current
         synchronize(opts[:server]) do |conn|
           return yield(conn) if @transactions.include?(th)

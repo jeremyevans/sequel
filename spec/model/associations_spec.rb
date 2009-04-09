@@ -392,20 +392,6 @@ describe Sequel::Model, "many_to_one" do
     proc{c.parent = p}.should raise_error(Sequel::Error)
   end
 
-  deprec_specify "should have belongs_to alias" do
-    @c2.belongs_to :parent, :class => @c2
-
-    d = @c2.load(:id => 1)
-    MODEL_DB.reset
-    d.parent_id = 234
-    d.associations[:parent].should == nil
-    ds = @c2.dataset
-    def ds.fetch_rows(sql, &block); MODEL_DB.sqls << sql; yield({:id=>234}) end
-    e = d.parent 
-    MODEL_DB.sqls.should == ["SELECT * FROM nodes WHERE (nodes.id = 234) LIMIT 1"]
-    d.associations[:parent].should == e
-  end
-
   it "should make the change to the foreign_key value inside a _association= method" do
     @c2.many_to_one :parent, :class => @c2
     @c2.private_instance_methods.collect{|x| x.to_s}.sort.should(include("_parent="))
@@ -866,19 +852,6 @@ describe Sequel::Model, "one_to_many" do
     im2.should_not(include('remove_all_attributes'))
   end
 
-  deprec_specify "should have has_many alias" do
-    @c2.has_many :attributes, :class => @c1
-    
-    n = @c2.new(:id => 1234)
-    atts = n.attributes
-    atts.should be_a_kind_of(Array)
-    atts.size.should == 1
-    atts.first.should be_a_kind_of(@c1)
-    atts.first.values.should == {}
-    
-    MODEL_DB.sqls.should == ['SELECT * FROM attributes WHERE (attributes.node_id = 1234)']
-  end
-  
   it "should populate the reciprocal many_to_one instance variable when loading the one_to_many association" do
     @c2.one_to_many :attributes, :class => @c1, :key => :node_id
     @c1.many_to_one :node, :class => @c2, :key => :node_id
@@ -1532,15 +1505,6 @@ describe Sequel::Model, "many_to_many" do
     im2.should_not(include('remove_all_attributes'))
   end
 
-  deprec_specify "should have has_and_belongs_to_many alias" do
-    @c2.has_and_belongs_to_many :attributes, :class => @c1 
-
-    n = @c2.new(:id => 1234)
-    a = n.attributes_dataset
-    a.should be_a_kind_of(Sequel::Dataset)
-    a.sql.should == 'SELECT attributes.* FROM attributes INNER JOIN attributes_nodes ON ((attributes_nodes.attribute_id = attributes.id) AND (attributes_nodes.node_id = 1234))'
-  end
-  
   it "should have an remove_all_ method that removes all associations" do
     @c2.many_to_many :attributes, :class => @c1
     @c2.new(:id => 1234).remove_all_attributes

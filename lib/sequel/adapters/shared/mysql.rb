@@ -175,22 +175,10 @@ module Sequel
       end
       
       # MySQL supports ORDER and LIMIT clauses in DELETE statements.
-      def delete_sql(opts = (defarg=true;nil))
-        if defarg
-          sql = super()
-          opts = @opts
-        else
-          sql = super
-          opts = opts ? @opts.merge(opts) : @opts
-        end
-
-        if order = opts[:order]
-          sql << " ORDER BY #{expression_list(order)}"
-        end
-        if limit = opts[:limit]
-          sql << " LIMIT #{limit}"
-        end
-
+      def delete_sql
+        sql = super
+        sql << " ORDER BY #{expression_list(opts[:order])}" if opts[:order]
+        sql << " LIMIT #{opts[:limit]}" if opts[:limit]
         sql
       end
 
@@ -311,11 +299,6 @@ module Sequel
         else
           values = values[0] if values.size == 1
           
-          # if hash or array with keys we need to transform the values
-          if @transform && (values.is_a?(Hash) || (values.is_a?(Array) && values.keys))
-            values = transform_save(values)
-          end
-
           case values
           when Array
             if values.empty?
@@ -344,22 +327,10 @@ module Sequel
       end
       
       # MySQL supports ORDER and LIMIT clauses in UPDATE statements.
-      def update_sql(values, opts = (defarg=true;nil))
-        if defarg
-          sql = super(values)
-          opts = @opts
-        else
-          sql = super
-          opts = opts ? @opts.merge(opts) : @opts
-        end
-
-        if order = opts[:order]
-          sql << " ORDER BY #{expression_list(order)}"
-        end
-        if limit = opts[:limit]
-          sql << " LIMIT #{limit}"
-        end
-
+      def update_sql(values)
+        sql = super
+        sql << " ORDER BY #{expression_list(opts[:order])}" if opts[:order]
+        sql << " LIMIT #{opts[:limit]}" if opts[:limit]
         sql
       end
 

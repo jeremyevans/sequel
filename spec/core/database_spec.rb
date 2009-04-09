@@ -56,27 +56,6 @@ context "A new Database" do
     db.send(:identifier_output_method_default).should == :downcase
   end
 
-  deprec_specify "should respect the :upcase_identifiers option" do
-    Sequel.upcase_identifiers = false
-    db = Sequel::Database.new(:upcase_identifiers=>false)
-    db.upcase_identifiers?.should == false
-    db.upcase_identifiers = true
-    db.upcase_identifiers?.should == true
-    db = Sequel::Database.new(:upcase_identifiers=>true)
-    db.upcase_identifiers?.should == true
-    db.upcase_identifiers = false
-    db.upcase_identifiers?.should == false
-    Sequel.upcase_identifiers = true
-    db = Sequel::Database.new(:upcase_identifiers=>false)
-    db.upcase_identifiers?.should == false
-    db.upcase_identifiers = true
-    db.upcase_identifiers?.should == true
-    db = Sequel::Database.new(:upcase_identifiers=>true)
-    db.upcase_identifiers?.should == true
-    db.upcase_identifiers = false
-    db.upcase_identifiers?.should == false
-  end
-  
   specify "should respect the :identifier_input_method option" do
     Sequel.identifier_input_method = nil
     Sequel::Database.identifier_input_method.should == ""
@@ -134,17 +113,6 @@ context "A new Database" do
     Sequel::Database.new({}).quote_identifiers?.should == false
   end
 
-  deprec_specify "should use the default Sequel.upcase_identifiers value" do
-    Sequel.upcase_identifiers = true
-    Sequel::Database.new({}).upcase_identifiers?.should == true
-    Sequel.upcase_identifiers = false
-    Sequel::Database.new({}).upcase_identifiers?.should == false
-    Sequel::Database.upcase_identifiers = true
-    Sequel::Database.new({}).upcase_identifiers?.should == true
-    Sequel::Database.upcase_identifiers = false
-    Sequel::Database.new({}).upcase_identifiers?.should == false
-  end
-  
   specify "should use the default Sequel.identifier_input_method value" do
     Sequel.identifier_input_method = :downcase
     Sequel::Database.new({}).identifier_input_method.should == :downcase
@@ -314,28 +282,6 @@ context "Database#<<" do
   
   specify "should pass the supplied sql to #execute" do
     (@db << "DELETE FROM items").should == "DELETE FROM items"
-  end
-  
-  deprec_specify "should accept an array and convert it to SQL" do
-    a = %[
-      --
-      CREATE TABLE items (a integer, /*b integer*/
-        b text, c integer);
-      DROP TABLE old_items;
-    ].split($/)
-    (@db << a).should == 
-      "CREATE TABLE items (a integer, b text, c integer); DROP TABLE old_items;"
-  end
-  
-  deprec_specify "should remove comments and whitespace from arrays" do
-    s = %[
-      --
-      CREATE TABLE items (a integer, /*b integer*/
-        b text, c integer); \r\n
-      DROP TABLE old_items;
-    ].split($/)
-    (@db << s).should == 
-      "CREATE TABLE items (a integer, b text, c integer); DROP TABLE old_items;"
   end
   
   specify "should not remove comments and whitespace from strings" do
@@ -733,13 +679,6 @@ context "A Database adapter with a scheme" do
     CCC::DISCONNECTS.should == [z, y, x]
   end
 
-  deprec_specify "should be accessible through Sequel.open" do
-    c = Sequel.open 'ccc://localhost/db'
-    c.should be_a_kind_of(CCC)
-    c.opts[:host].should == 'localhost'
-    c.opts[:database].should == 'db'
-  end
-
   specify "should be accessible through Sequel.<adapter>" do
     Sequel.send(:def_adapter_method, :ccc)
 
@@ -863,25 +802,6 @@ context "A database" do
     Sequel::Database.single_threaded = false
   end
   
-  deprec_specify "should have a multi_threaded? method" do
-    db = Sequel::Database.new(:single_threaded => true)
-    db.should_not be_multi_threaded
-    
-    db = Sequel::Database.new(:max_options => 1)
-    db.should be_multi_threaded
-
-    db = Sequel::Database.new
-    db.should be_multi_threaded
-
-    Sequel::Database.single_threaded = true
-    
-    db = Sequel::Database.new
-    db.should_not be_multi_threaded
-    
-    db = Sequel::Database.new(:max_options => 4)
-    db.should_not be_multi_threaded
-  end
-
   specify "should have single_threaded? respond to true if in single threaded mode" do
     db = Sequel::Database.new(:single_threaded => true)
     db.should be_single_threaded
@@ -901,20 +821,6 @@ context "A database" do
     db.should be_single_threaded
   end
   
-  deprec_specify "should have a logger method" do
-    db = Sequel::Database.new
-    s = "I'm a logger"
-    db.logger = s
-    db.logger.should == s
-    db.logger = nil
-    db.logger.should == nil
-    db.loggers = []
-    db.logger.should == nil
-    t = "I'm also a logger"
-    db.loggers = [s, t]
-    db.logger.should == s
-  end
-
   specify "should be able to set loggers via the logger= and loggers= methods" do
     db = Sequel::Database.new
     s = "I'm a logger"
@@ -931,18 +837,6 @@ context "A database" do
     t = "I'm also a logger"
     db.loggers = [s, t]
     db.loggers.should == [s,t]
-  end
-end
-
-context "Database#dataset" do
-  before do
-    @db = Sequel::Database.new
-  end
-  
-  deprec_specify "should delegate to Dataset#query if block is provided" do
-    @d = @db.query {select :x; from :y}
-    @d.should be_a_kind_of(Sequel::Dataset)
-    @d.sql.should == "SELECT x FROM y"
   end
 end
 
@@ -1081,32 +975,6 @@ context "Database#alter_table_sql" do
   
   specify "should raise error for an invalid op" do
     proc {@db.send(:alter_table_sql, :mau, :op => :blah)}.should raise_error(Sequel::Error)
-  end
-end
-
-context "Database.connect" do
-  EEE_YAML = "development:\r\n  adapter: eee\r\n  username: mau\r\n  password: tau\r\n  host: alfonso\r\n  database: mydb\r\n"
-  
-  before do
-    class EEE < Sequel::Database
-      set_adapter_scheme :eee
-    end
-    
-    @fn = File.join(File.dirname(__FILE__), 'eee.yaml')
-    File.open(@fn, 'wb') {|f| f << EEE_YAML}
-  end
-  
-  after do
-    File.delete(@fn)
-  end
-  
-  specify "should accept hashes loaded from YAML files" do
-    db = Sequel.connect(YAML.load_file(@fn)['development'])
-    db.class.should == EEE
-    db.opts[:database].should == 'mydb'
-    db.opts[:user].should == 'mau'
-    db.opts[:password].should == 'tau'
-    db.opts[:host].should == 'alfonso'
   end
 end
 

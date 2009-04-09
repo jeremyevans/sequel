@@ -1,5 +1,7 @@
 require File.join(File.dirname(__FILE__), "spec_helper")
 
+require 'yaml'
+
 describe "Serialization plugin" do
   before do
     @c = Class.new(Sequel::Model(:items)) do

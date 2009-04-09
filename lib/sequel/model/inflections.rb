@@ -97,8 +97,6 @@ module Sequel
     end
 
     # Setup the default inflections
-    # Commented out until the deprecated inflector is removed
-=begin
     plural(/$/, 's')
     plural(/s$/i, 's')
     plural(/(ax|test)is$/i, '\1es')
@@ -149,14 +147,13 @@ module Sequel
     irregular('move', 'moves')
 
     uncountable(%w(equipment information rice money species series fish sheep))
-=end
 
     private
 
     # Convert the given string to CamelCase.  Will also convert '/' to '::' which is useful for converting paths to namespaces.
     def camelize(s)
       s = s.to_s
-      # return s.camelize if s.respond_to?(:camelize)
+      return s.camelize if s.respond_to?(:camelize)
       s = s.gsub(CAMELIZE_MODULE_REGEXP){|x| "::#{x[-1..-1].upcase unless x == SLASH}"}.gsub(CAMELIZE_CONVERT_REGEXP){|x| x[-1..-1].upcase}
       s
     end
@@ -166,7 +163,7 @@ module Sequel
     # or is not initialized.
     def constantize(s)
       s = s.to_s
-      # return s.constantize if s.respond_to?(:constantize)
+      return s.constantize if s.respond_to?(:constantize)
       raise(NameError, "#{inspect} is not a valid constant name!") unless m = VALID_CONSTANT_NAME_REGEXP.match(s.to_s)
       Object.module_eval("::#{m[1]}", __FILE__, __LINE__)
     end
@@ -174,14 +171,14 @@ module Sequel
     # Removes the module part from the expression in the string
     def demodulize(s)
       s = s.to_s
-      # return s.demodulize if s.respond_to?(:demodulize)
+      return s.demodulize if s.respond_to?(:demodulize)
       s.gsub(DEMODULIZE_CONVERT_REGEXP, EMPTY_STRING)
     end
   
     # Returns the plural form of the word in the string.
     def pluralize(s)
       s = s.to_s
-      # return s.pluralize if s.respond_to?(:pluralize)
+      return s.pluralize if s.respond_to?(:pluralize)
       result = s.dup
       Inflections.plurals.each{|(rule, replacement)| break if result.gsub!(rule, replacement)} unless Inflections.uncountables.include?(s.downcase)
       result
@@ -190,7 +187,7 @@ module Sequel
     # The reverse of pluralize, returns the singular form of a word in a string.
     def singularize(s)
       s = s.to_s
-      # return s.singularize if s.respond_to?(:singularize)
+      return s.singularize if s.respond_to?(:singularize)
       result = s.dup
       Inflections.singulars.each{|(rule, replacement)| break if result.gsub!(rule, replacement)} unless Inflections.uncountables.include?(s.downcase)
       result
@@ -200,7 +197,7 @@ module Sequel
     # Also changes '::' to '/' to convert namespaces to paths.
     def underscore(s)
       s = s.to_s
-      # return s.underscore if s.respond_to?(:underscore)
+      return s.underscore if s.respond_to?(:underscore)
       s.gsub(UNDERSCORE_MODULE_REGEXP, SLASH).gsub(UNDERSCORE_CONVERT_REGEXP1, UNDERSCORE_CONVERT_REPLACE).
         gsub(UNDERSCORE_CONVERT_REGEXP2, UNDERSCORE_CONVERT_REPLACE).tr(DASH, UNDERSCORE).downcase
     end

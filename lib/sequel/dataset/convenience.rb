@@ -2,13 +2,16 @@ module Sequel
   class Dataset
     COMMA_SEPARATOR = ', '.freeze
     COUNT_OF_ALL_AS_COUNT = SQL::Function.new(:count, LiteralString.new('*'.freeze)).as(:count)
+    ARRAY_ACCESS_ERROR_MSG = 'You cannot call Dataset#[] with an integer or with no arguments.'.freeze
+    MAP_ERROR_MSG = 'Using Dataset#map with an argument and a block is not allowed'.freeze
+    GET_ERROR_MSG = 'must provide argument or block to Dataset#get, not both'.freeze
+    IMPORT_ERROR_MSG = 'Using Sequel::Dataset#import an empty column array is not allowed'.freeze
 
     # Returns the first record matching the conditions. Examples:
     #
     #   ds[:id=>1] => {:id=1}
     def [](*conditions)
-      Deprecation.deprecate('Using an Integer argument to Dataset#[] is deprecated and will raise an error in Sequel 3.0. Use Dataset#first.') if conditions.length == 1 and conditions.is_a?(Integer)
-      Deprecation.deprecate('Using Dataset#[] without an argument is deprecated and will raise an error in Sequel 3.0. Use Dataset#first.') if conditions.length == 0
+      raise(Error, ARRAY_ACCESS_ERROR_MSG) if (conditions.length == 1 and conditions.is_a?(Integer)) or conditions.length == 0
       first(*conditions)
     end
 
@@ -70,8 +73,12 @@ module Sequel
     #   ds.get(:id)
     #   ds.get{|o| o.sum(:id)}
     def get(column=nil, &block)
-      raise(Error, 'must provide argument or block to Dataset#get, not both') if column && block
-      (column ? select(column) : select(&block)).single_value
+      if column
+        raise(Error, GET_ERROR_MSG) if block
+        select(column).single_value
+      else
+        select(&block).single_value
+      end
     end
 
     # Returns a dataset grouped by the given column with count by group,
@@ -101,31 +108,18 @@ module Sequel
     #
     #   # this will commit every 50 records
     #   dataset.import([:x, :y], [[1, 2], [3, 4], ...], :slice => 50)
-    def import(*args)
-      if args.empty?
-        Sequel::Deprecation.deprecate('Calling Sequel::Dataset#import with no arguments', 'Use dataset.multi_insert([])')
-        return
-      elsif args[0].is_a?(Array) && args[1].is_a?(Array)
-        columns, values, opts = *args
-      elsif args[0].is_a?(Array) && args[1].is_a?(Dataset)
-        table = @opts[:from].first
-        columns, dataset = *args
-        sql = "INSERT INTO #{quote_identifier(table)} (#{identifier_list(columns)}) VALUES #{literal(dataset)}"
-        return @db.transaction{execute_dui(sql)}
-      else
-        Sequel::Deprecation.deprecate('Calling Sequel::Dataset#import with hashes', 'Use Sequel::Dataset#multi_insert')
-        return multi_insert(*args)
-      end
-      # make sure there's work to do
-      Sequel::Deprecation.deprecate('Calling Sequel::Dataset#import an empty column array is deprecated and will raise an error in Sequel 3.0.') if columns.empty?
-      return if columns.empty? || values.empty?
+    def import(columns, values, opts={})
+      return @db.transaction{execute_dui("INSERT INTO #{quote_schema_table(@opts[:from].first)} (#{identifier_list(columns)}) VALUES #{literal(values)}")} if values.is_a?(Dataset)
+
+      return if values.empty?
+      raise(Error, IMPORT_ERROR_MSG) if columns.empty?
       
-      slice_size = opts && (opts[:commit_every] || opts[:slice])
-      
-      if slice_size
-        values.each_slice(slice_size) do |slice|
-          statements = multi_insert_sql(columns, slice)
-          @db.transaction(opts){statements.each{|st| execute_dui(st)}}
+      if slice_size = opts[:commit_every] || opts[:slice]
+        offset = 0
+        loop do
+          @db.transaction(opts){multi_insert_sql(columns, values[offset, slice_size]).each{|st| execute_dui(st)}}
+          offset += slice_size
+          break if offset >= values.length
         end
       else
         statements = multi_insert_sql(columns, values)
@@ -155,8 +149,8 @@ module Sequel
     #   ds.map(:id) => [1, 2, 3, ...]
     #   ds.map{|r| r[:id] * 2} => [2, 4, 6, ...]
     def map(column=nil, &block)
-      Deprecation.deprecate('Using Dataset#map with an argument and a block is deprecated and will raise an error in Sequel 3.0. Use an argument or a block, not both.') if column && block
       if column
+        raise(Error, MAP_ERROR_MSG) if block
         super(){|r| r[column]}
       else
         super(&block)
@@ -183,22 +177,10 @@ module Sequel
     # values.
     #
     # You can also use the :slice or :commit_every option that import accepts.
-    def multi_insert(*args)
-      if args.empty?
-        Sequel::Deprecation.deprecate('Calling Sequel::Dataset#multi_insert with no arguments', 'Use dataset.multi_insert([])')
-        return
-      elsif args[0].is_a?(Array) && (args[1].is_a?(Array) || args[1].is_a?(Dataset))
-        Sequel::Deprecation.deprecate('Calling Sequel::Dataset#multi_insert with an array of columns and an array of arrays of values', 'Use Sequel::Dataset#import')
-       return import(*args)
-      else
-        # we assume that an array of hashes is given
-        hashes, opts = *args
-        return if hashes.empty?
-        columns = hashes.first.keys
-        # convert the hashes into arrays
-        values = hashes.map {|h| columns.map {|c| h[c]}}
-      end
-      import(columns, values, opts)
+    def multi_insert(hashes, opts={})
+      return if hashes.empty?
+      columns = hashes.first.keys
+      import(columns, hashes.map{|h| columns.map{|c| h[c]}}, opts)
     end
 
     # Returns a Range object made from the minimum and maximum values for the
@@ -210,20 +192,15 @@ module Sequel
     end
     
     # Returns the first record in the dataset.
-    def single_record(opts = (defarg=true;nil))
-      Deprecation.deprecate("Calling Dataset#single_record with an argument is deprecated and will raise an error in Sequel 3.0.  Use dataset.clone(opts).single_record.") unless defarg
-      ds = clone(:limit=>1)
-      opts = opts.merge(:limit=>1) if opts and opts[:limit]
-      defarg ? ds.each{|r| return r} : ds.each(opts){|r| return r}
+    def single_record
+      clone(:limit=>1).each{|r| return r}
       nil
     end
 
     # Returns the first value of the first record in the dataset.
     # Returns nil if dataset is empty.
-    def single_value(opts = (defarg=true;nil))
-      Deprecation.deprecate("Calling Dataset#single_value with an argument is deprecated and will raise an error in Sequel 3.0.  Use dataset.clone(opts).single_value.") unless defarg
-      ds = naked.clone(:graph=>false)
-      if r = (defarg ? ds.single_record : ds.single_record(opts))
+    def single_value
+      if r = naked.clone(:graph=>false).single_record
         r.values.first
       end
     end

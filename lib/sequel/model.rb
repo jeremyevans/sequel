@@ -45,7 +45,7 @@ module Sequel
        last left_outer_join limit map multi_insert naked order order_by
        order_more paginate print query range reverse_order right_outer_join
        select select_all select_more server set set_graph_aliases 
-       single_value to_csv to_hash transform union unfiltered unordered 
+       single_value to_csv to_hash union unfiltered unordered 
        update where with_sql'.map{|x| x.to_sym}
   
     # Class instance variables to set to nil when a subclass is created, for -w compliance
@@ -106,5 +106,4 @@ module Sequel
     require 'associations', 'model'
     Model.plugin Model::Associations
   end
-  require 'deprecated', 'model'
 end

@@ -87,7 +87,6 @@ module Sequel
       @identifier_output_method = db.identifier_output_method if db.respond_to?(:identifier_output_method)
       @opts = opts || {}
       @row_proc = nil
-      @transform = nil
     end
     
     ### Class Methods ###
@@ -118,10 +117,9 @@ module Sequel
 
     # Returns an array with all records in the dataset. If a block is given,
     # the array is iterated over after all items have been loaded.
-    def all(opts = (defarg=true;nil), &block)
-      Deprecation.deprecate("Calling Dataset#all with an argument is deprecated and will raise an error in Sequel 3.0.  Use dataset.clone(opts).all.") unless defarg
+    def all(&block)
       a = []
-      defarg ? each{|r| a << r} : each(opts){|r| a << r}
+      each{|r| a << r}
       post_load(a)
       a.each(&block) if block
       a
@@ -170,24 +168,21 @@ module Sequel
 
     # Deletes the records in the dataset.  The returned value is generally the
     # number of records deleted, but that is adapter dependent.
-    def delete(opts=(defarg=true;nil))
-      Deprecation.deprecate("Calling Dataset#delete with an argument is deprecated and will raise an error in Sequel 3.0.  Use dataset.clone(opts).delete.") unless defarg
-      execute_dui(defarg ? delete_sql : delete_sql(opts))
+    def delete
+      execute_dui(delete_sql)
     end
     
     # Iterates over the records in the dataset as they are yielded from the
     # database adapter, and returns self.
-    def each(opts = (defarg=true;nil), &block)
-      Deprecation.deprecate("Calling Dataset#each with an argument is deprecated and will raise an error in Sequel 3.0.  Use dataset.clone(opts).each.") unless defarg
-      if opts && opts.keys.any?{|o| COLUMN_CHANGE_OPTS.include?(o)}
-        prev_columns = @columns
-        begin
-          defarg ? _each(&block) : _each(opts, &block)
-        ensure
-          @columns = prev_columns
-        end
+    def each(&block)
+      if @opts[:graph]
+        graph_each(&block)
       else
-        defarg ? _each(&block) : _each(opts, &block)
+        if row_proc = @row_proc
+          fetch_rows(select_sql){|r| yield row_proc.call(r)}
+        else
+          fetch_rows(select_sql, &block)
+        end
       end
       self
     end
@@ -250,9 +245,8 @@ module Sequel
 
     # Updates values for the dataset.  The returned value is generally the
     # number of rows updated, but that is adapter dependent.
-    def update(values={}, opts=(defarg=true;nil))
-      Deprecation.deprecate("Calling Dataset#update with an argument is deprecated and will raise an error in Sequel 3.0.  Use dataset.clone(opts).update.") unless defarg
-      execute_dui(defarg ? update_sql(values) : update_sql(value, opts))
+    def update(values={})
+      execute_dui(update_sql(values))
     end
   
     # Add the mutation methods via metaprogramming
@@ -267,23 +261,6 @@ module Sequel
 
     private
     
-    # Runs #graph_each if graphing.  Otherwise, iterates through the records
-    # yielded by #fetch_rows, applying any row_proc or transform if necessary,
-    # and yielding the result.
-    def _each(opts=(defarg=true;nil), &block)
-      if @opts[:graph] and !(opts && opts[:graph] == false)
-        defarg ? graph_each(&block) : graph_each(opts, &block)
-      else
-        row_proc = @row_proc unless opts && opts[:naked]
-        transform = @transform
-        fetch_rows(defarg ? select_sql : select_sql(opts)) do |r|
-          r = transform_load(r) if transform
-          r = row_proc[r] if row_proc
-          yield r
-        end
-      end
-    end
-
     # Set the server to use to :default unless it is already set in the passed opts
     def default_server_opts(opts)
       {:server=>@opts[:server] || :default}.merge(opts)
@@ -338,10 +315,6 @@ module Sequel
     # VirtualRow instance.
     def virtual_row_block_call(block)
       return unless block
-      unless Sequel.virtual_row_instance_eval
-        Deprecation.deprecate('Using a VirtualRow block without an argument is deprecated, and its meaning will change in Sequel 3.0.  Add a block argument to keep the old semantics, or set Sequel.virtual_row_instance_eval = true to use instance_eval for VirtualRow blocks without arguments.') unless block.arity == 1
-        return block.call(SQL::VirtualRow.new)
-      end
       case block.arity
       when -1, 0
         SQL::VirtualRow.new.instance_eval(&block)
