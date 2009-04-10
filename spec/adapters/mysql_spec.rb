@@ -612,7 +612,7 @@ context "A MySQL database" do
     ]
   end
   
-  specify "should support full_text_search in WHERE clause" do
+  specify "should support full_text_search" do
     MYSQL_DB[:posts].full_text_search(:title, 'ruby').sql.should ==
       "SELECT * FROM posts WHERE (MATCH (title) AGAINST ('ruby'))"
     
@@ -621,21 +621,6 @@ context "A MySQL database" do
       
     MYSQL_DB[:posts].full_text_search(:title, '+ruby -rails', :boolean => true).sql.should ==
       "SELECT * FROM posts WHERE (MATCH (title) AGAINST ('+ruby -rails' IN BOOLEAN MODE))"
-  end
-  
-  specify "should support full_text_search in SELECT CLAUSE" do
-    # Should add full_text_search to * when select is not defined
-    MYSQL_DB[:posts].full_text_select(:title, 'ruby', :as => :score).sql.should ==
-      "SELECT *, MATCH (title) AGAINST ('ruby') AS score FROM posts"
-    
-    # Should add full_text_search to custom select
-    MYSQL_DB[:posts].select(:title).full_text_select(:title, 'ruby', :as => :score).sql.should ==
-      "SELECT title, MATCH (title) AGAINST ('ruby') AS score FROM posts"
-    
-    # Should raise Error when :as option is not provided
-    lambda { 
-      MYSQL_DB[:posts].full_text_select(:title, 'ruby').sql
-    }.should raise_error(Sequel::Error)
   end
 
   specify "should support spatial indexes" do

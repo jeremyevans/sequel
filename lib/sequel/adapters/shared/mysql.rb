@@ -188,30 +188,9 @@ module Sequel
         super
       end
 
-      # Adds full text search in WHERE clause
+      # Adds full text filter
       def full_text_search(cols, terms, opts = {})
         filter(full_text_sql(cols, terms, opts))
-      end
-      
-      # Adds full text search in SELECT clause
-      def full_text_select(cols, terms, opts = {})
-        # You must provide the :as argument to opts
-        as = opts[:as] || raise(Error, "Must provide :as option")
-        
-        # Sequel defines * to be default select options if none have
-        # been previously defined.  We will be defining a select
-        # for full_text, so we need to add back the * if it
-        # hasn't already been removed by a custom select
-        orig_select = (@opts[:select].nil? || @opts[:select].empty?) ?
-          Sequel::Dataset::WILDCARD.lit : nil
-          
-        # Select more will add the select given to the already created
-        # selects.  If none have been given it will be *, MATCH..AS.
-        # Otherwise, select what has previously been declared and add
-        # the full_text MATCH to it
-        select_more(
-          *[orig_select,full_text_sql(cols,terms,opts).lit.as(as)].compact
-        )
       end
       
       # MySQL specific full text search syntax.
