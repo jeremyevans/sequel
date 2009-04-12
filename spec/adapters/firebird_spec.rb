@@ -25,6 +25,14 @@ FIREBIRD_DB.create_table! :test5 do
   integer :val
 end
 
+FIREBIRD_DB.create_table! :test6 do
+  primary_key :xid
+  blob :val
+  String :val2
+  varchar :val3, :size=>200
+  text :val4
+end
+
 context "A Firebird database" do
   before do
     @db = FIREBIRD_DB
@@ -375,3 +383,21 @@ context "Postgres::Dataset#insert" do
   end
 end
 
+context "Postgres::Dataset#insert" do
+  before do
+    @ds = FIREBIRD_DB[:test6]
+    @ds.delete
+  end
+
+  specify "should insert and retrieve a blob successfully" do
+    value1 = "\1\2\2\2\2222\2\2\2"
+    value2 = "abcd"
+    value3 = "efgh"
+    value4 = "ijkl"
+    id1 = @ds.insert(:val=>value1, :val2=>value2, :val3=>value3, :val4=>value4)
+    @ds.first(:XID=>id1)[:val].should == value1
+    @ds.first(:XID=>id1)[:val2].should == value2
+    @ds.first(:XID=>id1)[:val3].should == value3
+    @ds.first(:XID=>id1)[:val4].should == value4
+  end
+end

@@ -9,6 +9,7 @@ module Sequel
       set_adapter_scheme :firebird
 
       AUTO_INCREMENT = ''.freeze
+      TYPES = Sequel::Database::TYPES.merge(:text=>'BLOB SUB_TYPE TEXT')
 
       # Add the primary_keys and primary_key_sequences instance variables,
       # so we can get the correct return values for inserted rows.
@@ -206,6 +207,10 @@ module Sequel
       def restart_sequence_sql(name, opts={})
         seq_name = quote_identifier(name)
         "ALTER SEQUENCE #{seq_name} RESTART WITH #{opts[:restart_position]}"
+      end
+
+      def type_literal_base(column)
+        TYPES[column[:type]]
       end
     end
 
