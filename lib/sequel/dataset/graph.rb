@@ -17,8 +17,7 @@ module Sequel
     # the tables are combined in the single return hash.  You can get around that by
     # using .select with correct aliases for all of the columns, but it is simpler to
     # use graph and have the result set split for you.  In addition, graph respects
-    # any row_proc or transform attributes of the current dataset and the datasets
-    # you use with graph.
+    # any row_proc of the current dataset and the datasets you use with graph.
     #
     # If you are graphing a table and all columns for that table are nil, this
     # indicates that no matching rows existed in the table, so graph will return nil
@@ -97,7 +96,7 @@ module Sequel
           select = opts[:select] = []
           columns.each do |column|
             column_aliases[column] = [master, column]
-            select.push(column.qualify(master))
+            select.push(SQL::QualifiedIdentifier.new(master, column))
           end
         end
       end
@@ -129,9 +128,9 @@ module Sequel
               column_alias = :"#{column_alias}_#{column_alias_num}" 
               ca_num[column_alias] += 1
             end
-            [column_alias, column.qualify(table_alias).as(column_alias)]
+            [column_alias, SQL::QualifiedIdentifier.new(table_alias, column).as(column_alias)]
           else
-            [column, column.qualify(table_alias)]
+            [column, SQL::QualifiedIdentifier.new(table_alias, column)]
           end
           column_aliases[col_alias] = [table_alias, column]
           select.push(identifier)
@@ -177,7 +176,7 @@ module Sequel
     # Transform the hash of graph aliases to an array of columns
     def graph_alias_columns(graph_aliases)
       graph_aliases.collect do |col_alias, tc| 
-        identifier = tc[2] || tc[1].qualify(tc[0])
+        identifier = tc[2] || SQL::QualifiedIdentifier.new(tc[0], tc[1])
         identifier = SQL::AliasedExpression.new(identifier, col_alias) if tc[2] or tc[1] != col_alias
         identifier
       end
@@ -186,7 +185,7 @@ module Sequel
     # Fetch the rows, split them into component table parts,
     # tranform and run the row_proc on each part (if applicable),
     # and yield a hash of the parts.
-    def graph_each(opts=(defarg=true;nil), &block)
+    def graph_each
       # Reject tables with nil datasets, as they are excluded from
       # the result set
       datasets = @opts[:graph][:table_aliases].to_a.reject{|ta,ds| ds.nil?}
@@ -194,13 +193,11 @@ module Sequel
       table_aliases = datasets.collect{|ta,ds| ta}
       # Get an array of arrays, one for each dataset, with
       # the necessary information about each dataset, for speed
-      datasets = datasets.collect do |ta, ds|
-        [ta, ds, ds.instance_variable_get(:@transform), ds.row_proc]
-      end
+      datasets = datasets.collect{|ta, ds| [ta, ds, ds.row_proc]}
       # Use the manually set graph aliases, if any, otherwise
       # use the ones automatically created by .graph
       column_aliases = @opts[:graph_aliases] || @opts[:graph][:column_aliases]
-      fetch_rows(defarg ? select_sql : select_sql(opts)) do |r|
+      fetch_rows(select_sql) do |r|
         graph = {}
         # Create the sub hashes, one per table
         table_aliases.each{|ta| graph[ta]={}}
@@ -211,14 +208,11 @@ module Sequel
           ta, column = tc
           graph[ta][column] = r[col_alias]
         end
-        # For each dataset, transform and run the row
-        # row_proc if applicable
-        datasets.each do |ta,ds,tr,rp|
+        # For each dataset run the row_proc if applicable
+        datasets.each do |ta,ds,rp|
           g = graph[ta]
           graph[ta] = if g.values.any?{|x| !x.nil?}
-            g = ds.transform_load(g) if tr
-            g = rp[g] if rp
-            g
+            rp ? rp.call(g) : g
           else
             nil
           end

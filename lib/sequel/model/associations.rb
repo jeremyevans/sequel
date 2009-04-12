@@ -2,48 +2,282 @@ module Sequel
   class Model
     # Associations are used in order to specify relationships between model classes
     # that reflect relations between tables in the database using foreign keys.
-    #
-    # Each kind of association adds a number of methods to the model class which
-    # are specialized according to the association type and optional parameters
-    # given in the definition. Example:
-    # 
-    #   class Project < Sequel::Model
-    #     many_to_one :portfolio
-    #     one_to_many :milestones
-    #     # or: many_to_many :milestones 
-    #   end
-    # 
-    # The project class now has the following instance methods:
-    # * portfolio - Returns the associated portfolio.
-    # * portfolio=(obj) - Sets the associated portfolio to the object,
-    #   but the change is not persisted until you save the record.
-    # * portfolio_dataset - Returns a dataset that would return the associated
-    #   portfolio, only useful in fairly specific circumstances.
-    # * milestones - Returns an array of associated milestones
-    # * add_milestone(obj) - Associates the passed milestone with this object.
-    # * remove_milestone(obj) - Removes the association with the passed milestone.
-    # * remove_all_milestones - Removes associations with all associated milestones.
-    # * milestones_dataset - Returns a dataset that would return the associated
-    #   milestones, allowing for further filtering/limiting/etc.
-    #
-    # If you want to override the behavior of the add_/remove_/remove_all_ methods,
-    # there are private instance methods created that a prepended with an
-    # underscore (e.g. _add_milestone).  The private instance methods can be
-    # easily overridden, but you shouldn't override the public instance methods without
-    # calling super, as they deal with callbacks and caching.
-    #
-    # By default the classes for the associations are inferred from the association
-    # name, so for example the Project#portfolio will return an instance of 
-    # Portfolio, and Project#milestones will return an array of Milestone 
-    # instances, in similar fashion to how ActiveRecord infers class names.
-    #
-    # Association definitions are also reflected by the class, e.g.:
-    #
-    #   Project.associations
-    #   => [:portfolio, :milestones]
-    #   Project.association_reflection(:portfolio)
-    #   => {:type => :many_to_one, :name => :portfolio, :class_name => "Portfolio"}
     module Associations
+      # Map of association type symbols to association reflection classes.
+      ASSOCIATION_TYPES = {}
+    
+      # Set an empty association reflection hash in the model
+      def self.apply(model)
+        model.instance_variable_set(:@association_reflections, {})
+      end
+
+      # AssociationReflection is a Hash subclass that keeps information on Sequel::Model associations. It
+      # provides methods to reduce internal code duplication.  It should not
+      # be instantiated by the user.
+      class AssociationReflection < Hash
+        include Sequel::Inflections
+    
+        # Name symbol for the _add internal association method
+        def _add_method
+          :"_add_#{singularize(self[:name])}"
+        end
+      
+        # Name symbol for the _dataset association method
+        def _dataset_method
+          :"_#{self[:name]}_dataset"
+        end
+      
+        # Name symbol for the _remove_all internal association method
+        def _remove_all_method
+          :"_remove_all_#{self[:name]}"
+        end
+      
+        # Name symbol for the _remove internal association method
+        def _remove_method
+          :"_remove_#{singularize(self[:name])}"
+        end
+      
+        # Name symbol for the _setter association method
+        def _setter_method
+          :"_#{self[:name]}="
+        end
+      
+        # Name symbol for the add association method
+        def add_method
+          :"add_#{singularize(self[:name])}"
+        end
+      
+        # Name symbol for association method, the same as the name of the association.
+        def association_method
+          self[:name]
+        end
+      
+        # The class associated to the current model class via this association
+        def associated_class
+          self[:class] ||= constantize(self[:class_name])
+        end
+      
+        # Name symbol for the dataset association method
+        def dataset_method
+          :"#{self[:name]}_dataset"
+        end
+      
+        # Name symbol for the _helper internal association method
+        def dataset_helper_method
+          :"_#{self[:name]}_dataset_helper"
+        end
+      
+        # Whether the dataset needs a primary key to function, true by default.
+        def dataset_need_primary_key?
+          true
+        end
+    
+        # Whether to eagerly graph a lazy dataset, true by default.  If this
+        # is false, the association won't respect the :eager_graph option
+        # when loading the association for a single record.
+        def eager_graph_lazy_dataset?
+          true
+        end
+    
+        # Whether the associated object needs a primary key to be added/removed,
+        # false by default.
+        def need_associated_primary_key?
+          false
+        end
+    
+        # Returns the reciprocal association variable, if one exists. The reciprocal
+        # association is the association in the associated class that is the opposite
+        # of the current association.  For example, Album.many_to_one :artist and
+        # Artist.one_to_many :albums are reciprocal associations.  This information is
+        # to populate reciprocal associations.  For example, when you do this_artist.add_album(album)
+        # it sets album.artist to this_artist.
+        def reciprocal
+          return self[:reciprocal] if include?(:reciprocal)
+          r_type = reciprocal_type
+          key = self[:key]
+          associated_class.all_association_reflections.each do |assoc_reflect|
+            if assoc_reflect[:type] == r_type && assoc_reflect[:key] == key
+              return self[:reciprocal] = assoc_reflect[:name]
+            end
+          end
+          self[:reciprocal] = nil
+        end
+    
+        # Whether the reciprocal of this association returns an array of objects instead of a single object,
+        # true by default.
+        def reciprocal_array?
+          true
+        end
+    
+        # Name symbol for the remove_all_ association method
+        def remove_all_method
+          :"remove_all_#{self[:name]}"
+        end
+      
+        # Name symbol for the remove_ association method
+        def remove_method
+          :"remove_#{singularize(self[:name])}"
+        end
+      
+        # Whether this association returns an array of objects instead of a single object,
+        # true by default.
+        def returns_array?
+          true
+        end
+    
+        # The columns to select when loading the association, nil by default.
+        def select
+          self[:select]
+        end
+    
+        # Whether to set the reciprocal association to self when loading associated
+        # records, false by default.
+        def set_reciprocal_to_self?
+          false
+        end
+    
+        # Name symbol for the setter association method
+        def setter_method
+          :"#{self[:name]}="
+        end
+      end
+    
+      class ManyToOneAssociationReflection < AssociationReflection
+        ASSOCIATION_TYPES[:many_to_one] = self
+    
+        # Whether the dataset needs a primary key to function, false for many_to_one associations.
+        def dataset_need_primary_key?
+          false
+        end
+    
+        # Default foreign key name symbol for foreign key in current model's table that points to
+        # the given association's table's primary key.
+        def default_key
+          :"#{self[:name]}_id"
+        end
+      
+        # Whether to eagerly graph a lazy dataset, true for many_to_one associations
+        # only if the key is nil.
+        def eager_graph_lazy_dataset?
+          self[:key].nil?
+        end
+    
+        # The key to use for the key hash when eager loading
+        def eager_loader_key
+          self[:key]
+        end
+    
+        # The column in the associated table that the key in the current table references.
+        def primary_key
+         self[:primary_key] ||= associated_class.primary_key
+        end
+      
+        # Whether this association returns an array of objects instead of a single object,
+        # false for a many_to_one association.
+        def returns_array?
+          false
+        end
+    
+        private
+    
+        # The reciprocal type of a many_to_one association is a one_to_many association.
+        def reciprocal_type
+          :one_to_many
+        end
+      end
+    
+      class OneToManyAssociationReflection < AssociationReflection
+        ASSOCIATION_TYPES[:one_to_many] = self
+    
+        # Default foreign key name symbol for key in associated table that points to
+        # current table's primary key.
+        def default_key
+          :"#{underscore(demodulize(self[:model].name))}_id"
+        end
+    
+        # The column in the current table that the key in the associated table references.
+        def primary_key
+         self[:primary_key] ||= self[:model].primary_key
+        end
+        alias eager_loader_key primary_key
+      
+        # One to many associations set the reciprocal to self when loading associated records.
+        def set_reciprocal_to_self?
+          true
+        end
+    
+        # Whether the reciprocal of this association returns an array of objects instead of a single object,
+        # false for a one_to_many association.
+        def reciprocal_array?
+          false
+        end
+    
+        private
+    
+        # The reciprocal type of a one_to_many association is a many_to_one association.
+        def reciprocal_type
+          :many_to_one
+        end
+      end
+    
+      class ManyToManyAssociationReflection < AssociationReflection
+        ASSOCIATION_TYPES[:many_to_many] = self
+    
+        # Default name symbol for the join table.
+        def default_join_table
+          [self[:class_name], self[:model].name].map{|i| underscore(pluralize(demodulize(i)))}.sort.join('_').to_sym
+        end
+      
+        # Default foreign key name symbol for key in join table that points to
+        # current table's primary key (or :left_primary_key column).
+        def default_left_key
+          :"#{underscore(demodulize(self[:model].name))}_id"
+        end
+    
+        # Default foreign key name symbol for foreign key in join table that points to
+        # the association's table's primary key (or :right_primary_key column).
+        def default_right_key
+          :"#{singularize(self[:name])}_id"
+        end
+      
+        # The key to use for the key hash when eager loading
+        def eager_loader_key
+          self[:left_primary_key]
+        end
+    
+        # Whether the associated object needs a primary key to be added/removed,
+        # true for many_to_many associations.
+        def need_associated_primary_key?
+          true
+        end
+    
+        # Returns the reciprocal association symbol, if one exists.
+        def reciprocal
+          return self[:reciprocal] if include?(:reciprocal)
+          left_key = self[:left_key]
+          right_key = self[:right_key]
+          join_table = self[:join_table]
+          associated_class.all_association_reflections.each do |assoc_reflect|
+            if assoc_reflect[:type] == :many_to_many && assoc_reflect[:left_key] == right_key \
+               && assoc_reflect[:right_key] == left_key && assoc_reflect[:join_table] == join_table
+              return self[:reciprocal] = assoc_reflect[:name]
+            end
+          end
+          self[:reciprocal] = nil
+        end
+    
+        # The primary key column to use in the associated table.
+        def right_primary_key
+          self[:right_primary_key] ||= associated_class.primary_key
+        end
+    
+        # The columns to select when loading the association, associated_class.table_name.* by default.
+        def select
+         return self[:select] if include?(:select)
+         self[:select] ||= Sequel::SQL::ColumnAll.new(associated_class.table_name)
+        end
+      end
+  
       # This module contains methods added to all association datasets
       module AssociationDatasetMethods
         # The model object that created the association dataset
@@ -53,6 +287,46 @@ module Sequel
         attr_accessor :association_reflection
       end
       
+      # Each kind of association adds a number of instance methods to the model class which
+      # are specialized according to the association type and optional parameters
+      # given in the definition. Example:
+      # 
+      #   class Project < Sequel::Model
+      #     many_to_one :portfolio
+      #     one_to_many :milestones
+      #     # or: many_to_many :milestones 
+      #   end
+      # 
+      # The project class now has the following instance methods:
+      # * portfolio - Returns the associated portfolio.
+      # * portfolio=(obj) - Sets the associated portfolio to the object,
+      #   but the change is not persisted until you save the record.
+      # * portfolio_dataset - Returns a dataset that would return the associated
+      #   portfolio, only useful in fairly specific circumstances.
+      # * milestones - Returns an array of associated milestones
+      # * add_milestone(obj) - Associates the passed milestone with this object.
+      # * remove_milestone(obj) - Removes the association with the passed milestone.
+      # * remove_all_milestones - Removes associations with all associated milestones.
+      # * milestones_dataset - Returns a dataset that would return the associated
+      #   milestones, allowing for further filtering/limiting/etc.
+      #
+      # If you want to override the behavior of the add_/remove_/remove_all_ methods,
+      # there are private instance methods created that a prepended with an
+      # underscore (e.g. _add_milestone).  The private instance methods can be
+      # easily overridden, but you shouldn't override the public instance methods without
+      # calling super, as they deal with callbacks and caching.
+      #
+      # By default the classes for the associations are inferred from the association
+      # name, so for example the Project#portfolio will return an instance of 
+      # Portfolio, and Project#milestones will return an array of Milestone 
+      # instances.
+      #
+      # Association definitions are also reflected by the class, e.g.:
+      #
+      #   Project.associations
+      #   => [:portfolio, :milestones]
+      #   Project.association_reflection(:portfolio)
+      #   => {:type => :many_to_one, :name => :portfolio, :class_name => "Portfolio"}
       module ClassMethods
         # All association reflections defined for this model (default: none).
         attr_reader :association_reflections
@@ -69,24 +343,23 @@ module Sequel
         #   associated model's primary key.  Each associated model object can
         #   be associated with more than one current model objects.  Each current
         #   model object can be associated with only one associated model object.
-        #   Similar to ActiveRecord's belongs_to.
         # * :one_to_many - Foreign key in associated model's table points to this
         #   model's primary key.   Each current model object can be associated with
         #   more than one associated model objects.  Each associated model object
         #   can be associated with only one current model object.
-        #   Similar to ActiveRecord's has_many.
         # * :many_to_many - A join table is used that has a foreign key that points
         #   to this model's primary key and a foreign key that points to the
         #   associated model's primary key.  Each current model object can be
         #   associated with many associated model objects, and each associated
         #   model object can be associated with many current model objects.
-        #   Similar to ActiveRecord's has_and_belongs_to_many.
         #
         # A one to one relationship can be set up with a many_to_one association
         # on the table with the foreign key, and a one_to_many association with the
         # :one_to_one option specified on the table without the foreign key.  The
         # two associations will operate similarly, except that the many_to_one
         # association setter doesn't update the database until you call save manually.
+        # Also, in most cases you need to specify the plural association name when using
+        # one_to_many with the :one_to_one option.
         # 
         # The following options can be supplied:
         # * *ALL types*:
@@ -112,14 +385,14 @@ module Sequel
         #   - :conditions - The conditions to use to filter the association, can be any argument passed to filter.
         #   - :dataset - A proc that is instance_evaled to get the base dataset
         #     to use for the _dataset method (before the other options are applied).
-        #   - :eager - The associations to eagerly load via EagerLoading#eager when loading the associated object(s).
+        #   - :eager - The associations to eagerly load via #eager when loading the associated object(s).
         #     For many_to_one associations, this is ignored unless this association is
         #     being eagerly loaded, as it doesn't save queries unless multiple objects
         #     can be loaded at once.
         #   - :eager_block - If given, use the block instead of the default block when
         #     eagerly loading.  To not use a block when eager loading (when one is used normally),
         #     set to nil.
-        #   - :eager_graph - The associations to eagerly load via EagerLoading#eager_graph when loading the associated object(s).
+        #   - :eager_graph - The associations to eagerly load via #eager_graph when loading the associated object(s).
         #     For many_to_one associations, this is ignored unless this association is
         #     being eagerly loaded, as it doesn't save queries unless multiple objects
         #     can be loaded at once.
@@ -147,7 +420,7 @@ module Sequel
         #     when eagerly loading the association via eager_graph. Defaults to all
         #     columns in the associated table.
         #   - :limit - Limit the number of records to the provided value.  Use
-        #     an array with two arguments for the value to specify a limit and offset.
+        #     an array with two arguments for the value to specify a limit and an offset.
         #   - :order - the column(s) by which to order the association dataset.  Can be a
         #     singular column or an array.
         #   - :order_eager_graph - Whether to add the order to the dataset's order when graphing
@@ -159,8 +432,8 @@ module Sequel
         #     associated model's assocations for a association that matches
         #     the current association's key(s).  Set to nil to not use a reciprocal.
         #   - :select - the attributes to select.  Defaults to the associated class's
-        #     table_name.*, which means it doesn't include the attributes from the
-        #     join table in a many_to_many association.  If you want to include the join table attributes, you can
+        #     table_name.* in a many_to_many association, which means it doesn't include the attributes from the
+        #     join table.  If you want to include the join table attributes, you can
         #     use this option, but beware that the join table attributes can clash with
         #     attributes from the model table, so you should alias any attributes that have
         #     the same name in both the join table and the associated table.
@@ -180,7 +453,8 @@ module Sequel
         #     association methods usually added are either removed or made private,
         #     so using this is similar to using many_to_one, in terms of the methods
         #     it adds, the main difference is that the foreign key is in the associated
-        #     table instead of the current table.
+        #     table instead of the current table.  Note that using this option still requires
+        #     you to use a plural name when creating and using the association (e.g. for reflections, eager loading, etc.).
         #   - :primary_key - column in the current table that :key option references, as a symbol.
         #     Defaults to primary key of the current table.
         # * :many_to_many:
@@ -189,7 +463,7 @@ module Sequel
         #   - :graph_join_table_conditions - The additional conditions to use on the SQL join for
         #     the join table when eagerly loading the association via eager_graph. Should be a hash
         #     or an array of all two pairs.
-        #   - :graph_join_type - The type of SQL join to use for the join table when eagerly
+        #   - :graph_join_table_join_type - The type of SQL join to use for the join table when eagerly
         #     loading the association via eager_graph.  Defaults to the :graph_join_type option or
         #     :left_outer.
         #   - :graph_join_table_only_conditions - The conditions to use on the SQL join for the join
@@ -269,10 +543,16 @@ module Sequel
           ds = opts[:eager_block].call(ds) if opts[:eager_block]
           ds
         end
+
+        # Copy the association reflections to the subclass
+        def inherited(subclass)
+          super
+          subclass.instance_variable_set(:@association_reflections, @association_reflections.dup)
+        end
       
-        # Shortcut for adding a one_to_many association, see associate
-        def one_to_many(*args, &block)
-          associate(:one_to_many, *args, &block)
+        # Shortcut for adding a many_to_many association, see associate
+        def many_to_many(*args, &block)
+          associate(:many_to_many, *args, &block)
         end
         
         # Shortcut for adding a many_to_one association, see associate
@@ -280,19 +560,21 @@ module Sequel
           associate(:many_to_one, *args, &block)
         end
         
-        # Shortcut for adding a many_to_many association, see associate
-        def many_to_many(*args, &block)
-          associate(:many_to_many, *args, &block)
+        # Shortcut for adding a one_to_many association, see associate
+        def one_to_many(*args, &block)
+          associate(:one_to_many, *args, &block)
         end
         
         private
       
-        # Add a method to the association module
+        # Add a method to the module included in the class, so the method
+        # can be easily overridden in the class itself while allowing for
+        # super to be called.
         def association_module_def(name, &block)
           overridable_methods_module.module_eval{define_method(name, &block)}
         end
       
-        # Add a method to the association module
+        # Add a private method to the module included in the class.
         def association_module_private_def(name, &block)
           association_module_def(name, &block)
           overridable_methods_module.send(:private, name)
@@ -303,7 +585,8 @@ module Sequel
           association_module_def(opts.add_method){|o| add_associated_object(opts, o)}
         end
       
-        # Adds association methods to the model for *_to_many associations.
+        # Adds methods to the module included in the class related to getting the
+        # dataset and associated object(s).
         def def_association_dataset_methods(opts)
           # If a block is given, define a helper method for it, because it takes
           # an argument.  This is unnecessary in Ruby 1.9, as that has instance_exec.
@@ -323,7 +606,7 @@ module Sequel
           opts[:class_name] ||= camelize(singularize(name))
           join_table = (opts[:join_table] ||= opts.default_join_table)
           left_key_alias = opts[:left_key_alias] ||= :x_foreign_key_x
-          left_key_select = opts[:left_key_select] ||= left.qualify(join_table).as(opts[:left_key_alias])
+          left_key_select = opts[:left_key_select] ||= SQL::QualifiedIdentifier.new(join_table, left).as(opts[:left_key_alias])
           graph_jt_conds = opts[:graph_join_table_conditions] = opts[:graph_join_table_conditions] ? opts[:graph_join_table_conditions].to_a : []
           opts[:graph_join_table_join_type] ||= opts[:graph_join_type]
           opts[:after_load].unshift(:array_uniq!) if opts[:uniq]
@@ -381,7 +664,7 @@ module Sequel
           opts[:class_name] ||= camelize(name)
           opts[:dataset] ||= proc do
             klass = opts.associated_class
-            klass.filter(opts.primary_key.qualify(klass.table_name)=>send(key))
+            klass.filter(SQL::QualifiedIdentifier.new(klass.table_name, opts.primary_key)=>send(key))
           end
           opts[:eager_loader] ||= proc do |key_hash, records, associations|
             h = key_hash[key]
@@ -392,7 +675,7 @@ module Sequel
             # Skip eager loading if no objects have a foreign key for this association
             unless keys.empty?
               klass = opts.associated_class
-              model.eager_loading_dataset(opts, klass.filter(opts.primary_key.qualify(klass.table_name)=>keys), opts.select, associations).all do |assoc_record|
+              model.eager_loading_dataset(opts, klass.filter(SQL::QualifiedIdentifier.new(klass.table_name, opts.primary_key)=>keys), opts.select, associations).all do |assoc_record|
                 next unless objects = h[assoc_record.send(opts.primary_key)]
                 objects.each{|object| object.associations[name] = assoc_record}
               end
@@ -426,14 +709,14 @@ module Sequel
           opts[:class_name] ||= camelize(singularize(name))
           opts[:dataset] ||= proc do
             klass = opts.associated_class
-            klass.filter(key.qualify(klass.table_name) => send(primary_key))
+            klass.filter(SQL::QualifiedIdentifier.new(klass.table_name, key) => send(primary_key))
           end
           opts[:eager_loader] ||= proc do |key_hash, records, associations|
             h = key_hash[primary_key]
             records.each{|object| object.associations[name] = []}
             reciprocal = opts.reciprocal
             klass = opts.associated_class
-            model.eager_loading_dataset(opts, klass.filter(key.qualify(klass.table_name)=>h.keys), opts.select, associations).all do |assoc_record|
+            model.eager_loading_dataset(opts, klass.filter(SQL::QualifiedIdentifier.new(klass.table_name, key)=>h.keys), opts.select, associations).all do |assoc_record|
               next unless objects = h[assoc_record[key]]
               objects.each do |object| 
                 object.associations[name].push(assoc_record)
@@ -505,10 +788,11 @@ module Sequel
         end
       end
 
+      # Private instance methods used to implement the associations support.
       module InstanceMethods
         private
 
-        # Backbone behind association_dataset
+        # Backbone behind association dataset methods
         def _dataset(opts)
           raise(Sequel::Error, "model object #{model} does not have a primary key") if opts.dataset_need_primary_key? && !pk
           ds = send(opts._dataset_method)
@@ -656,7 +940,7 @@ module Sequel
       # time, as it loads associated records using one query per association.  However,
       # it does not allow you the ability to filter based on columns in associated tables.  #eager_graph loads
       # all records in one query.  Using #eager_graph you can filter based on columns in associated
-      # tables.  However, #eager_graph can be much slower than #eager, especially if multiple
+      # tables.  However, #eager_graph can be slower than #eager, especially if multiple
       # *_to_many associations are joined.
       #
       # You can cascade the eager loading (loading associations' associations)
@@ -742,8 +1026,7 @@ module Sequel
         # only graphing many_to_one associations.
         # 
         # Does not use the block defined for the association, since it does a single query for
-        # all objects.  You can use the :graph_join_type, :graph_conditions, and :graph_join_table_conditions
-        # association options to modify the SQL query.
+        # all objects.  You can use the :graph_* association options to modify the SQL query.
         #
         # Like eager, you need to call .all on the dataset for the eager loading to work.  If you just
         # call each, you will get a normal graphed result back (a hash with model object values).
@@ -830,7 +1113,7 @@ module Sequel
           # to ensure that all parts of the object graph are loaded into the
           # appropriate subordinate association.
           dependency_map = {}
-          # Sort the associations be requirements length, so that
+          # Sort the associations by requirements length, so that
           # requirements are added to the dependency hash before their
           # dependencies.
           requirements.sort_by{|a| a[1].length}.each do |ta, deps|
@@ -907,7 +1190,7 @@ module Sequel
         end
       
         # Build associations for the current object.  This is called recursively
-        # to build object's dependencies.
+        # to build all dependencies.
         def eager_graph_build_associations_graph(dependency_map, alias_map, type_map, reciprocal_map, records_map, current, record_graph)
           return if dependency_map.empty?
           # Don't clobber the instance variable array for *_to_many associations if it has already been setup
@@ -1013,6 +1296,5 @@ module Sequel
         end
       end
     end
-    plugin Associations
   end
 end

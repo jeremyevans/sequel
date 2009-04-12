@@ -1,0 +1,534 @@
+Overview
+--------
+
+Sequel 2.12 is really just a stepping stone to Sequel 3.0, which will
+be released next month.  All major changes currently planned for 3.0
+have been made in 2.12, but 2.12 contains many features that have
+been deprecated and will be removed or moved into extensions or
+plugins in 3.0.
+
+Deprecation Logging
+-------------------
+
+If you use a deprecated method or feature, Sequel will by default
+print a deprecation message and 10 lines of backtrace to standard
+error to easily allow you to figure out which code needs to be
+updated.  You can change where the deprecation messages go and how
+many lines of backtrace are given using the following:
+
+  # Log deprecation information to a file
+  Sequel::Deprecation.output = File.open('deprecated.txt', 'wb')
+  
+  # Use 5 lines of backtrace when logging deprecation messages
+  Sequel::Deprecation.backtraces = 5
+  
+  # Use all backtrace lines when logging deprecation messages
+  Sequel::Deprecation.backtraces = true
+  
+  # Don't include backtraces in the deprecation logging
+  Sequel.Deprecation.backtraces = false
+  
+  # Turn off all deprecation logging
+  Sequel::Deprecation.output = nil
+
+Deprecated Features Moving to Extensions
+----------------------------------------
+
+* Migrations are being moved into sequel/extensions/migration.  There
+  isn't any reason that they should be loaded in normal use since
+  they are used so rarely.  The sequel command line tool uses this
+  extension to run the migrations.
+  
+* Adding the blank? method to all objects has been moved into
+  sequel/extensions/blank.
+  
+* Dataset#print and Sequel::PrettyTable have been moved into
+  sequel/extensions/pretty_table.
+  
+* Dataset#query and related methods have been moved into
+  sequel/extensions/query.
+  
+* Dataset#paginate and related methods have been moved into
+  sequel/extensions/pagination.
+  
+* String inflection methods (e.g. "people".singularize) have been
+  moved into sequel/extensions/inflector.
+  
+* String date/time conversion methods (e.g. '2000-01-01'.to_date)
+  have been moved into sequel/extensions/string_date_time.
+
+Deprecated Model Features Moving to Plugins
+-------------------------------------------
+
+* Model validation class methods have been moved to a plugin.  Sequel
+  users are encouraged to write their own validate instance method
+  instead. A new validation_helpers plugin has been added to make
+  this easier, it's explained in the New Features section.  If you
+  want to continue using the validation class methods:
+  
+    Sequel::Model.plugin :validation_class_methods
+  
+* Model hook class methods have been moved to a plugin.  Sequel users
+  are encouraged to write their own hook instance methods, and call
+  super to get hooks specified in superclasses or plugins.  If you
+  want to continue using the hook class methods:
+  
+    Sequel::Model.plugin :hook_class_methods
+  
+* Model schema methods (e.g. Model.set_schema, Model.create_table, 
+  Model.drop_table) have been moved to a plugin.  The use of these
+  methods has been discouraged for a long time.  If you want to use
+  them:
+  
+    Sequel::Model.plugin :schema
+
+* Model.set_sti_key has been moved to a plugin.  So you should
+  change:
+
+    MyModel.set_sti_key :key_column
+
+  to:
+  
+    MyModel.plugin :single_table_inheritance, :key_column
+    
+* Model.set_cache has been moved to a plugin.  So you should change:
+
+    MyModel.set_cache cache_store, opts
+    
+  to:
+  
+    MyModel.plugin :caching, cache_store, opts
+    
+* Model.serialize has been moved to a plugin.  So you should change:
+
+    MyModel.serialize :column, :format=>:yaml
+    
+  to:
+  
+    MyModel.plugin :serialization, :yaml, :column
+    
+  Because the previous serialization support depended on dataset
+  transforms, the new serialization support is implemented
+  differently, and behavior may not be identical in all cases.
+  However, this should be a drop in replacement for most users.
+
+Deprecated Features To Be Removed in Sequel 3.0
+-----------------------------------------------
+
+* Dataset#transform is deprecated without any replacement planned.
+  It was announced on the Sequel mailing list that transforms would
+  be removed unless someone said they needed them, and nobody said
+  that they did.
+
+* Dataset#multi_insert and Dataset#import are no longer aliases
+  of each other.  Dataset#multi_insert now takes an array of hashes,
+  and Dataset#import now takes an array of columns and an array
+  of arrays of values.  Using multi_insert with import's API or
+  vice-versa is deprecated.
+  
+* Calling Dataset#[] with no arguments or an integer argument is
+  deprecated.
+  
+* Calling Dataset#map with both an argument and a block is
+  deprecated.
+  
+* Database#multi_threaded? and Database#logger are both deprecated.
+
+* Calling Database#transaction with a symbol to specify which server
+  to use is deprecated.  You should now call it with an option hash
+  with a :server key.
+  
+* Array#extract_options! and Object#is_one_of? are both deprecated.
+
+* The metaprogramming methods taken from metaid are deprecated and
+  have been moved into Sequel::Metaprogramming.  If you want them
+  available to specific objects/classes, just include or extend with
+  Sequel::Metaprogramming.  If you want all objects to have access to
+  the metaprogramming methods, install metaid.  Note that the
+  class_def method from metaid doesn't exist in
+  Sequel::Metaprogramming, since it really isn't different from
+  define_method (except it is public instead of private).
+  
+* Module#class_attr_overridable, #class_attr_reader, and
+  #metaalias are deprecated.
+  
+* Using Model#set or #update when the columns for the model are not
+  set and you provide a hash with symbol keys is deprecated.
+  Basically, you must have setter methods now for any columns used in
+  #set or #update.
+  
+* Model#set_with_params and #update_with_params are deprecated, use
+  #set and #update instead.
+  
+* Model#save! is deprecated, use #save(:validate=>false).
+
+* Model.is and Model.is_a are deprecated, use Model.plugin.
+
+* Model.str_columns, Model#str_columns, #set_values, and
+  #update_values are deprecated.  You should use #set and
+  #update instead of #set_values and #update_values, though they
+  operate differently.
+  
+* Model.delete_all, Model.destroy_all, Model.size, and Model.uniq
+  are deprecated, use .delete, .destroy, .count, and .distinct.
+  
+* Model.belongs_to, Model.has_many, and Model.has_and_belongs_to_many
+  are deprecated, use .many_to_one, .one_to_many, and .many_to_many.
+  
+* Model#dataset is deprecated, use Model.dataset.
+
+* SQL::CastMethods#cast_as is deprecated, use #cast.
+
+* Calling Database#schema without a table argument is deprecated.
+
+* Dataset#uniq is deprecated, use Dataset#distinct.
+
+* Dataset#symbol_to_column_ref is deprecated, use #literal.
+
+* Dataset#quote_column_ref is deprecated, use #quote_identifier.
+
+* Dataset#size is deprecated, use #count.
+
+* Passing options to Dataset#each, #all, #single_record,
+  #single_value, #sql, #select_sql, #update, #update_sql, #delete,
+  #delete_sql, and #exists is deprecated.  Modify the options first
+  using clone or a related method, then call one of the above
+  methods.
+  
+* Dataset#create_view and #create_or_replace_view are deprecated,
+  use the database methods instead.
+
+* Dataset.dataset_classes, #model_classes, #polymorphic_key, and
+  #set_model are deprecated.
+  
+* Database#>> is deprecated.
+
+* String#to_blob and SQL::Blob#to_blob are deprecated, use
+  #to_sequel_blob.
+  
+* The use of Symbol#| to create array subscripts is deprecated,
+  use Symbol#sql_subscript.
+  
+* Symbol#to_column_ref is deprecated, use Dataset#literal.
+
+* String#expr is deprecated, use String#lit.
+
+* Array#to_sql, String#to_sql, and String#split_sql are deprecated.
+
+* Passing an array to Database#<< is deprecated.
+
+* Range#interval is deprecated.
+
+* Enumerable#send_each is deprecated.
+
+* When using ruby 1.8, Hash#key is deprecated.
+
+* Sequel.open is deprecated, use Sequel.connect.
+
+* Sequel.use_parse_tree and Sequel.use_parse_tree= are deprecated.
+
+* All upcase_identifier methods and the :upcase_identifiers database
+  option are deprecated, use identifier_input_method = :upcase
+  instead.
+  
+* Using a virtual row block without an argument is deprecated, see
+  Sequel.virtual_row_instance_eval= under New Features.
+  
+* When using the JDBC adapter, Java::JavaSQL::Timestamp#usec is
+  deprecated.  Sequel has returned Java::JavaSQL::Timestamp as
+  DateTime or Time for a few versions, so this shouldn't affect most
+  people.
+  
+* Sequel will no longer require bigdecimal/util, enumerator, or yaml
+  in 3.0.  If you need them in your code, make sure you require
+  them yourself.  Using features added by requiring these standard
+  libaries will not bring up a deprecation warning, for obvious
+  reasons.
+  
+* Sequel::Error::InvalidTransform, Sequel::Error::NoExistingFilter,
+  and Sequel::Error::InvalidStatement exceptions will be removed in
+  Sequel 3.0.  You will not get a deprecation message if you reference
+  them in 2.12.
+  
+* Sequel::Model::Validation::Errors is deprecated, use
+  Sequel::Model::Errors instead.  Referencing the old name will not
+  bring up a deprecation message.
+
+New Features
+------------
+
+* Sequel.virtual_row_instance_eval= was added, which lets you give
+  Sequel 2.12 the behavior that will be the standard in 3.0.
+  It changes blocks passed to Dataset#filter, #select, or #order that
+  don't accept arguments (or accept any number of arguments) to
+  instance eval the block in the context of a new VirtualRow
+  instance instead of passing a new VirtualRow instance to the block.
+  It allows you to change code that looks like this:
+
+    dataset.filter{|o| (o.number > 10) & (o.name > 'M')}
+
+  to:
+
+    dataset.filter{(number > 10) & (name > 'M')}
+
+  When instance_eval is used, only local variables are available
+  to the block.  Any calls to instance methods will be interpreted
+  as calling VirtualRow#method_missing, which generates identifiers
+  or functions.  When virtual_row_instance_eval is enabled, the
+  following type of code will break:
+
+    # amount is a instance method
+    dataset.filter{:number + amount > 0}
+      
+  Just like this example, the only type of code that should break is
+  when a virtual row block was used when it wasn't necessary (since
+  it doesn't use the VirtualRow argument).
+  
+  When Sequel.virtual_row_instance_eval = false, using a virtual row
+  block that doesn't accept an argument will cause a deprecation
+  message.
+  
+  Here's a regular expression that should catch most places where you
+  are using a virtual row block without an argument.
+
+    egrep -nr '[^A-Za-z0-9_](filter|select|select_more|order|order_more|get|where|having|from|first|and|or|exclude|find|subset|constraint|check)( *(\([^)]*\) *)?){*[^|]' *
+    
+  An RDoc page explaining virtual row blocks was added as well.
+
+* A validation_helpers model plugin was added that allows you to do
+  validations similar to the old class level validations inside
+  the Model#validate instance method.  The API has changed, but it's
+  capable of most of the same validations.  It doesn't handle
+  acceptance_of or confirmation_of validations, as those shouldn't be
+  handled in the model.
+  
+    # Old class level validations
+    validates_format_of :col, :with=>/.../
+    validates_length_of :col, :maximum=>5
+    validates_length_of :col, :minimum=>3
+    validates_length_of :col, :is=>4
+    validates_length_of :col, :within=>3..5
+    validates_not_string :col
+    validates_numericality_of :col
+    validates_numericality_of :col, :only_integer=>true
+    validates_presence_of :col
+    validates_inclusion_of :col, :in=>[3, 4, 5]
+    validates_uniqueness_of :col, :col2
+    validates_uniqueness_of([:col, :col2])
+
+    # New instance level validations
+    def validate
+      validates_format /.../, :col
+      validates_max_length 5, :col
+      validates_min_length 3, :col
+      validates_exact_length 4, :col
+      validates_length_range 3..5, :col
+      validates_not_string :col
+      validates_numeric :col
+      validates_integer :col
+      validates_presence :col
+      validates_includes([3,4,5], :col)
+      validates_unique :col, :col2
+      validates_unique([:col, :col2])
+    end
+    
+  Another change made is to specify the same type of validation on
+  multiple attributes, you must use an array:
+
+    # Old
+    validates_length_of :name, :password, :within=>3..5
+
+    # New
+    def validate
+      validates_length_range 3..5, [:name, :password]
+    end
+    
+  The :message, :allow_blank, :allow_missing, and :allow_nil options
+  are still respected.  The :tag option is not needed as instance level
+  validations work with code reloading without workarounds. The :if
+  option is also not needed for instance level validations:
+
+    # Old
+    validates_presence_of :name, :if=>:new?
+    validates_presence_of :pass, :if=>{flag > 3}
+
+    # New
+    def validate
+      validates_presence(:name) if new?
+      validates_presence(:pass) if flag > 3
+    end
+    
+  The validates_each also doesn't have an equivalent instance method,
+  since it is much easier to just write your own validation:
+  
+    # Old
+    validates_each(:date) do |o,a,v|
+      o.errors.add(a, '...') unless v > Date.today
+    end
+
+    # New
+    def validate
+      errors.add(:date, '...') unless date > Date.today
+    end
+    
+* MySQL adapter datasets now have on_duplicate_key_update and
+  insert_ignore methods which modify the SQL used to support
+  ON DUPLICATE KEY UPDATE and INSERT INGORE syntax in multi_insert
+  and import.
+  
+* If you use the MySQL native adapter, you can set:
+
+    Sequel::MySQL.convert_invalid_date_time = nil
+    
+  to return dates like "0000-00-00" and times like "25:00:00" as
+  nil values instead of raising an error.  You can also set it
+  to :string to return the values as strings.
+
+* You can now use Sequel without modifying any core classes, by
+  defining a SEQUEL_NO_CORE_EXTENSIONS constant or environment
+  variable.  In 2.12, this may still add some deprecated methods to
+  the core classes, but in 3.0 no methods will be added to the core
+  classes if you use this.
+
+* You can now use Sequel::Model without the associations
+  implementation by defining a SEQUEL_NO_ASSOCIATIONS constant or
+  environment variable.
+
+Other Improvements
+------------------
+
+* Model column accessors have been made faster and the overhead of
+  creating them has been reduced significantly.
+
+* ~{:bool_col=>true} now generates an bool_col IS NOT TRUE filter
+  instead of bool_col != TRUE.  This makes it return records with
+  NULL values.  If you only want to have false records, you should
+  use {:bool_col=>false}.  This works better with SQL's 3 valued
+  boolean logic.
+  
+  It is slightly inconsistent with ~{:col=>1}, since that won't
+  return values where col is NULL, but it gives the user the ability
+  to create an IS [NOT] (TRUE|FALSE) filter, which Sequel previously
+  did not support.
+  
+  If you really want the old behavior, you can change it to 
+  ~{true=>:bool_col}.
+  
+* Model.use_transactions was added for setting whether model objects
+  should use transactions when destroying or saving records.  Like
+  most Sequel options, it's settable on a global, per model, and
+  per object basis:
+  
+    Sequel::Model.use_transactions = false
+    MyModel.use_transactions = true
+    my_model.use_transactions = false
+    
+  You can also turn it on or off for specific save calls:
+  
+    my_model.save(:transaction=>true)
+    
+* The Oracle adapter now supports schema parsing.
+    
+* When using Model.db=, all current dataset options are copied to
+  a new dataset created with the new db.
+
+* Model::Errors#count was refactored to improve performance.
+
+* Most exception classes that were located under Sequel::Error are
+  now located directly under Sequel.  The old names are not
+  deprecated (unless mentioned above), but their use is now
+  discouraged.  The exceptions have the same name except that
+  Sequel::Error::PoolTimeoutError changed to Sequel::PoolTimeout.
+
+* Dataset#where now always affects the WHERE clause.  Before, it
+  was just an alias of filter, so it modified the HAVING clause
+  if the dataset already had a HAVING clause.
+
+* The optimization of Model.[] introduced in 2.11.0 broke on
+  databases that didn't support LIMIT.  The optimization now works
+  on those databases.
+
+* All of the the RDoc documentation was reviewed and many updates
+  were made, resulting in significantly improved documentation
+  quality.
+  
+* Model.def_dataset_method now works when the model doesn't have an
+  associated dataset, as it will add the method to a dataset
+  given to set_dataset in the future.
+  
+* Database#get and #select now take a block that is passed to
+  the dataset they create.
+  
+* You can disable the use of INSERT RETURNING in the shared
+  PostgreSQL adapter using disable_insert_returning.  This is mostly
+  useful if you are inserting a large number of records.
+  
+* A bug relating to aliasing columns in the JDBC adapter has been
+  fixed.
+
+* Sequel can now create and drop schema-qualified views.
+  
+* Performance of Dataset#destroy for model datasets was improved.
+
+* The specs now run on Rspec 1.2.
+
+* Internal dependence on the methods that Sequel adds to core
+  classes has been eliminated, any internal use of methods that
+  Sequel adds to the core classes is now considered a bug.
+  
+* A possible bug where Database#rename_table would not remove a
+  cached schema entry has been fixed.
+  
+* The Oracle and MySQL adapters now raise an error as soon as you
+  call distinct on a dataset, instead of waiting until the SQL is
+  generated.
+
+Backwards Compatibilty
+----------------------
+
+* Saving a newly inserted record in an after_create or after_save
+  hook is no longer broken.  It broke in 2.10 as a side effect of
+  allowing the hook to check whether or not the record was a new
+  record.  The code has been changed so that a @was_new instance
+  variable will be defined to true if the record was just created.
+  
+  Similarly, instead of not modifying changed_columns until after
+  the after hooks run, a @columns_updated instance variable will
+  be available in the after hooks that is a hash of exactly what
+  attribute keys and values were used in the update.
+  
+  These changes break compatibility with 2.11.0 and 2.10.0, but
+  restore compatibility with 2.9.0 and previous versions.
+  
+* PostgreSQL no longer uses savepoints for nested transactions by
+  default.  If you want to use a savepoint, you have to pass the
+  :savepoint option to the transaction method.  Using savepoints
+  by default broke expectations when a method raised Rollback to
+  rollback the transaction, and it only rolled back to the last
+  savepoint.
+
+* The anonymous model classes created by Sequel::Model() are now
+  stored in Model::ANONYMOUS_MODEL_CLASSES instead of the @models
+  class instance variable of the main module.
+  
+* The mappings of adapter schemes to classes are now stored in
+  Sequel::ADAPTER_MAP instead of the Database @@adapters class
+  variable.
+
+* Model instances no longer contain a reference to their class's
+  @db_schema.
+
+* Database schema sql methods (e.g. alter_table_sql) are now private.
+
+* Database#[] no longer accepts a block.  It's not possible to call
+  it with a block in general usage, anyway.
+  
+* The Sequel::Schema::SQL module no longer exists, the methods it
+  included were placed directly in the Sequel::Database class.
+
+* The Sequel::SQL::SpecificExpression class has been removed,
+  subclasses now inherit from Sequel::SQL::Expression.
+
+* Sequel now requires its own files with an absolute path.
+
+* The file hierarchy of the sequel library changed significantly.

@@ -217,14 +217,8 @@ module Sequel
       # SQLite performs a TRUNCATE style DELETE if no filter is specified.
       # Since we want to always return the count of records, add a condition
       # that is always true and then delete.
-      def delete(opts = (defarg=true;{}))
-        # check if no filter is specified
-        if defarg
-          @opts[:where] ? super() : filter(1=>1).delete
-        else
-          opts = @opts.merge(opts)
-          super(opts[:where] ? opts : opts.merge(:where=>{1=>1}))
-        end
+      def delete
+        @opts[:where] ? super : filter(1=>1).delete
       end
       
       # Insert the values into the database.

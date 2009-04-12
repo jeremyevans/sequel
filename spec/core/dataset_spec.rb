@@ -74,20 +74,6 @@ context "Dataset" do
     @dataset.literal(:a).should == 'a'
   end
   
-  deprec_specify "should have upcase_identifiers= method which changes literalization of identifiers" do
-    @dataset.upcase_identifiers = true
-    @dataset.literal(:a).should == 'A'
-    @dataset.upcase_identifiers = false
-    @dataset.literal(:a).should == 'a'
-  end
-
-  deprec_specify "should have upcase_identifiers? method which returns whether identifiers are currently upcased" do
-    @dataset.upcase_identifiers = true
-    @dataset.upcase_identifiers?.should == true
-    @dataset.upcase_identifiers = false
-    @dataset.upcase_identifiers?.should == false
-  end
-
   specify "should have identifier_input_method= method which changes literalization of identifiers" do
     @dataset.identifier_input_method = :upcase
     @dataset.literal(:a).should == 'A'
@@ -1025,9 +1011,8 @@ context "Dataset#with_sql" do
     @dataset.with_sql('SELECT 1 FROM test').sql.should == 'SELECT 1 FROM test'
   end
   
-  specify "should keep row_proc and transform" do
+  specify "should keep row_proc" do
     @dataset.with_sql('SELECT 1 FROM test').row_proc.should == @dataset.row_proc
-    @dataset.with_sql('SELECT 1 FROM test').instance_variable_get(:@transform).should == @dataset.instance_variable_get(:@transform)
   end
 end
 
@@ -1253,10 +1238,6 @@ context "Dataset#distinct" do
     @dataset.distinct.sql.should == 'SELECT DISTINCT name FROM test'
   end
   
-  deprec_specify "should be aliased by Dataset#uniq" do
-    @dataset.uniq.sql.should == 'SELECT DISTINCT name FROM test'
-  end
-  
   specify "should accept an expression list" do
     @dataset.distinct(:a, :b).sql.should == 'SELECT DISTINCT ON (a, b) name FROM test'
     @dataset.distinct(:stamp.cast(:integer), :node_id=>nil).sql.should == 'SELECT DISTINCT ON (CAST(stamp AS integer), (node_id IS NULL)) name FROM test'
@@ -1287,10 +1268,6 @@ context "Dataset#count" do
   specify "should format SQL properly" do
     @dataset.count.should == 1
     @c.sql.should == 'SELECT COUNT(*) FROM test LIMIT 1'
-  end
-  
-  deprec_specify "should be aliased by #size" do
-    @dataset.size.should == 1
   end
   
   specify "should include the where clause if it's there" do
@@ -1356,11 +1333,6 @@ context "Dataset#group_and_count" do
 
   specify "should accept multiple columns for grouping" do
     @ds.group_and_count(:a, :b).sql.should == 
-      "SELECT a, b, count(*) AS count FROM test GROUP BY a, b ORDER BY count"
-  end
-  
-  deprec_specify "should work within query block" do
-    @ds.query{group_and_count(:a, :b)}.sql.should == 
       "SELECT a, b, count(*) AS count FROM test GROUP BY a, b ORDER BY count"
   end
 end
@@ -1962,14 +1934,6 @@ context "Dataset#single_record" do
     @d.single_record.should == 'SELECT * FROM test LIMIT 1'
   end
   
-  deprec_specify "should pass opts to each" do
-    @d.single_record(:order => [:name]).should == 'SELECT * FROM test ORDER BY name LIMIT 1'
-  end
-  
-  deprec_specify "should override the limit if passed as an option" do
-    @d.single_record(:limit => 3).should == 'SELECT * FROM test LIMIT 1'
-  end
-
   specify "should return nil if no record is present" do
     @e.single_record.should be_nil
   end
@@ -1992,10 +1956,6 @@ context "Dataset#single_value" do
   
   specify "should call each and return the first value of the first record" do
     @d.single_value.should == 'SELECT * FROM test LIMIT 1'
-  end
-  
-  deprec_specify "should pass opts to each" do
-    @d.single_value(:from => [:blah]).should == 'SELECT * FROM blah LIMIT 1'
   end
   
   specify "should return nil if no records" do
@@ -2072,251 +2032,6 @@ context "Dataset#set_row_proc" do
   end
 end
 
-context "Dataset#set_model" do
-  before do
-    @c = Class.new(Sequel::Dataset) do
-      def fetch_rows(sql, &block)
-        # yield a hash with kind as the 1 bit of a number
-        (1..10).each {|i| block.call({:kind => i[0]})}
-      end
-    end
-    @dataset = @c.new(nil).from(:items)
-    @m = Class.new do
-      attr_accessor :c, :args
-      def initialize(c, *args); @c = c; @args = args; end
-      def ==(o); (@c == o.c) && (@args = o.args); end
-    end
-  end
-  
-  deprec_specify "should clear the models hash and restore the stock #each if nil is specified" do
-    @dataset.set_model(@m)
-    @dataset.set_model(nil)
-    @dataset.first.should == {:kind => 1}
-    @dataset.model_classes.should be_nil
-  end
-  
-  deprec_specify "should clear the models hash and restore the stock #each if nothing is specified" do
-    @dataset.set_model(@m)
-    @dataset.set_model(nil)
-    @dataset.first.should == {:kind => 1}
-    @dataset.model_classes.should be_nil
-  end
-  
-  deprec_specify "should alter #each to provide model instances" do
-    @dataset.first.should == {:kind => 1}
-    @dataset.set_model(@m)
-    @dataset.first.should == @m.new({:kind => 1})
-  end
-  
-  deprec_specify "should set opts[:naked] to nil" do
-    @dataset.opts[:naked] = true
-    @dataset.set_model(@m)
-    @dataset.opts[:naked].should be_nil
-  end
-  
-  deprec_specify "should send additional arguments to the models' initialize method" do
-    @dataset.set_model(@m, 7, 6, 5)
-    @dataset.first.should == @m.new({:kind => 1}, 7, 6, 5)
-  end
-  
-  deprec_specify "should provide support for polymorphic model instantiation" do
-    @m1 = Class.new(@m)
-    @m2 = Class.new(@m)
-    @dataset.set_model(:kind, 0 => @m1, 1 => @m2)
-    @dataset.opts[:polymorphic_key].should == :kind
-    all = @dataset.all
-    all[0].class.should == @m2
-    all[1].class.should == @m1
-    all[2].class.should == @m2
-    all[3].class.should == @m1
-    #...
-    
-    # denude model
-    @dataset.set_model(nil)
-    @dataset.first.should == {:kind => 1}
-  end
-  
-  deprec_specify "should send additional arguments for polymorphic models as well" do
-    @m1 = Class.new(@m)
-    @m2 = Class.new(@m)
-    @dataset.set_model(:kind, {0 => @m1, 1 => @m2}, :hey => :wow)
-    all = @dataset.all
-    all[0].class.should == @m2; all[0].args.should == [{:hey => :wow}]
-    all[1].class.should == @m1; all[1].args.should == [{:hey => :wow}]
-    all[2].class.should == @m2; all[2].args.should == [{:hey => :wow}]
-    all[3].class.should == @m1; all[3].args.should == [{:hey => :wow}]
-  end
-  
-  deprec_specify "should raise for invalid parameters" do
-    proc {@dataset.set_model('kind')}.should raise_error(ArgumentError)
-    proc {@dataset.set_model(0)}.should raise_error(ArgumentError)
-    proc {@dataset.set_model(:kind)}.should raise_error(ArgumentError) # no hash given
-  end
-end
-
-context "Dataset#model_classes" do
-  before do
-    @c = Class.new(Sequel::Dataset) do
-      # # We don't need that for now
-      # def fetch_rows(sql, &block)
-      #   (1..10).each(&block)
-      # end
-    end
-    @dataset = @c.new(nil).from(:items)
-    @m = Class.new do
-      attr_accessor :c
-      def initialize(c); @c = c; end
-      def ==(o); @c == o.c; end
-    end
-  end
-  
-  deprec_specify "should return nil for a naked dataset" do
-    @dataset.model_classes.should == nil
-  end
-  
-  deprec_specify "should return a {nil => model_class} hash for a model dataset" do
-    @dataset.set_model(@m)
-    @dataset.model_classes.should == {nil => @m}
-  end
-  
-  deprec_specify "should return the polymorphic hash for a polymorphic model dataset" do
-    @m1 = Class.new(@m)
-    @m2 = Class.new(@m)
-    @dataset.set_model(:key, 0 => @m1, 1 => @m2)
-    @dataset.model_classes.should == {0 => @m1, 1 => @m2}
-  end
-end
-
-context "Dataset#polymorphic_key" do
-  before do
-    @c = Class.new(Sequel::Dataset) do
-      # # We don't need this for now
-      # def fetch_rows(sql, &block)
-      #   (1..10).each(&block)
-      # end
-    end
-    @dataset = @c.new(nil).from(:items)
-    @m = Class.new do
-      attr_accessor :c
-      def initialize(c); @c = c; end
-      def ==(o); @c == o.c; end
-    end
-  end
-  
-  deprec_specify "should return nil for a naked dataset" do
-    @dataset.polymorphic_key.should be_nil
-  end
-  
-  deprec_specify "should return the polymorphic key" do
-    @dataset.set_model(:id, nil => @m)
-    @dataset.polymorphic_key.should == :id
-  end
-end
-
-context "A model dataset" do
-  before do
-    @c = Class.new(Sequel::Dataset) do
-      def fetch_rows(sql, &block)
-        (1..10).each(&block)
-      end
-    end
-    @dataset = @c.new(nil).from(:items)
-    @m = Class.new do
-      attr_accessor :c
-      def initialize(c); @c = c; end
-      def ==(o); @c == o.c; end
-    end
-    @dataset.row_proc = Proc.new{|r| @m.new(r)}
-  end
-  
-  deprec_specify "should supply naked records if the naked option is specified" do
-    @dataset.each {|r| r.class.should == @m}
-    @dataset.naked.each(:naked => true) {|r| r.class.should == Fixnum}
-  end
-end
-
-context "A polymorphic model dataset" do
-  before do
-    @c = Class.new(Sequel::Dataset) do
-      def fetch_rows(sql, &block)
-        (1..10).each {|i| block.call(:bit => i[0])}
-      end
-    end
-    @dataset = @c.new(nil).from(:items)
-    @m = Class.new do
-      attr_accessor :c
-      def initialize(c); @c = c; end
-      def ==(o); @c == o.c; end
-    end
-  end
-  
-  deprec_specify "should use a nil key in the polymorphic hash to specify the default model class" do
-    @m2 = Class.new(@m)
-    @dataset.set_model(:bit, nil => @m, 1 => @m2)
-    all = @dataset.all
-    all[0].class.should == @m2
-    all[1].class.should == @m
-    all[2].class.should == @m2
-    all[3].class.should == @m
-    #...
-  end
-  
-  deprec_specify "should raise Sequel::Error if no suitable class is found in the polymorphic hash" do
-    @m2 = Class.new(@m)
-    @dataset.set_model(:bit, 1 => @m2)
-    proc {@dataset.all}.should raise_error(Sequel::Error)
-  end
-
-  deprec_specify "should supply naked records if the naked option is specified" do
-    @dataset.set_model(:bit, nil => @m)
-    @dataset.each(:naked => true) {|r| r.class.should == Hash}
-  end
-end
-
-context "A dataset with associated model class(es)" do
-  before do
-    @c = Class.new(Sequel::Dataset) do
-      def fetch_rows(sql, &block)
-        block.call({:x => 1, :y => 2})
-      end
-    end
-    @dataset = @c.new(nil).from(:items)
-    @m1 = Class.new do
-      attr_accessor :v
-      def initialize(v); @v = v; end
-    end
-    @m2 = Class.new do
-      attr_accessor :v, :vv
-      def initialize(v = nil); @v = v; end
-      def self.load(v); o = new(nil); o.vv = v; o; end
-    end
-    @m3 = Class.new(@m2)
-  end
-
-  deprec_specify "should instantiate an instance by passing the record hash as argument" do
-    @dataset.set_model(@m1)
-    o = @dataset.first
-    o.class.should == @m1
-    o.v.should == {:x => 1, :y => 2}
-  end
-  
-  deprec_specify "should use the .load constructor if available" do
-    @dataset.set_model(@m2)
-    o = @dataset.first
-    o.class.should == @m2
-    o.v.should == nil
-    o.vv.should == {:x => 1, :y => 2}
-  end
-  
-  deprec_specify "should use the .load constructor also for polymorphic datasets" do
-    @dataset.set_model(:y, 1 => @m2, 2 => @m3)
-    o = @dataset.first
-    o.class.should == @m3
-    o.v.should == nil
-    o.vv.should == {:x => 1, :y => 2}
-  end
-end
-
 context "Dataset#<<" do
   before do
     @d = Sequel::Dataset.new(nil)
@@ -2327,104 +2042,6 @@ context "Dataset#<<" do
   
   specify "should call #insert" do
     (@d << {:name => 1}).should == 1234567890
-  end
-end
-
-context "A paginated dataset" do
-  before do
-    @d = Sequel::Dataset.new(nil)
-    @d.meta_def(:count) {153}
-    
-    deprec{@paginated = @d.paginate(1, 20)}
-  end
-  
- deprec_specify "should raise an error if the dataset already has a limit" do
-    proc{@d.limit(10).paginate(1,10)}.should raise_error(Sequel::Error)
-    proc{@paginated.paginate(2,20)}.should raise_error(Sequel::Error)
-  end
-  
-  deprec_specify "should set the limit and offset options correctly" do
-    @paginated.opts[:limit].should == 20
-    @paginated.opts[:offset].should == 0
-  end
-  
-  deprec_specify "should set the page count correctly" do
-    @paginated.page_count.should == 8
-    @d.paginate(1, 50).page_count.should == 4
-  end
-  
-  deprec_specify "should set the current page number correctly" do
-    @paginated.current_page.should == 1
-    @d.paginate(3, 50).current_page.should == 3
-  end
-  
-  deprec_specify "should return the next page number or nil if we're on the last" do
-    @paginated.next_page.should == 2
-    @d.paginate(4, 50).next_page.should be_nil
-  end
-  
-  deprec_specify "should return the previous page number or nil if we're on the last" do
-    @paginated.prev_page.should be_nil
-    @d.paginate(4, 50).prev_page.should == 3
-  end
-  
-  deprec_specify "should return the page range" do
-    @paginated.page_range.should == (1..8)
-    @d.paginate(4, 50).page_range.should == (1..4)
-  end
-  
-  deprec_specify "should return the record range for the current page" do
-    @paginated.current_page_record_range.should == (1..20)
-    @d.paginate(4, 50).current_page_record_range.should == (151..153)
-    @d.paginate(5, 50).current_page_record_range.should == (0..0)
-  end
-
-  deprec_specify "should return the record count for the current page" do
-    @paginated.current_page_record_count.should == 20
-    @d.paginate(3, 50).current_page_record_count.should == 50
-    @d.paginate(4, 50).current_page_record_count.should == 3
-    @d.paginate(5, 50).current_page_record_count.should == 0
-  end
-
-  deprec_specify "should know if current page is last page" do
-    @paginated.last_page?.should be_false
-    @d.paginate(2, 20).last_page?.should be_false
-    @d.paginate(5, 30).last_page?.should be_false
-    @d.paginate(6, 30).last_page?.should be_true
-  end
-
-  deprec_specify "should know if current page is first page" do
-    @paginated.first_page?.should be_true
-    @d.paginate(1, 20).first_page?.should be_true
-    @d.paginate(2, 20).first_page?.should be_false
-  end
-
-  deprec_specify "should work with fixed sql" do
-    ds = @d.clone(:sql => 'select * from blah')
-    ds.meta_def(:count) {150}
-    ds.paginate(2, 50).sql.should == 'SELECT * FROM (select * from blah) AS t1 LIMIT 50 OFFSET 50'
-  end
-end
-
-context "Dataset#each_page" do
-  before do
-    @d = Sequel::Dataset.new(nil).from(:items)
-    @d.meta_def(:count) {153}
-  end
-  
-  deprec_specify "should raise an error if the dataset already has a limit" do
-    proc{@d.limit(10).each_page(10){}}.should raise_error(Sequel::Error)
-  end
-  
-  deprec_specify "should iterate over each page in the resultset as a paginated dataset" do
-    a = []
-    @d.each_page(50) {|p| a << p}
-    a.map {|p| p.sql}.should == [
-      'SELECT * FROM items LIMIT 50 OFFSET 0',
-      'SELECT * FROM items LIMIT 50 OFFSET 50',
-      'SELECT * FROM items LIMIT 50 OFFSET 100',
-      'SELECT * FROM items LIMIT 50 OFFSET 150',
-    ]
   end
 end
 
@@ -2470,33 +2087,83 @@ context "Dataset#columns!" do
   end
 end
 
-require 'stringio'
-
-context "Dataset#print" do
+context "Dataset#import" do
   before do
-    @output = StringIO.new
-    @orig_stdout = $stdout
-    $stdout = @output
-    @dataset = DummyDataset.new(nil).from(:items)
+    @dbc = Class.new(Sequel::Database) do
+      attr_reader :sqls
+      
+      def execute(sql, opts={})
+        @sqls ||= []
+        @sqls << sql
+      end
+      alias execute_dui execute
+      
+      def transaction(opts={})
+        @sqls ||= []
+        @sqls << 'BEGIN'
+        yield
+        @sqls << 'COMMIT'
+      end
+    end
+    @db = @dbc.new
+    
+    @ds = Sequel::Dataset.new(@db).from(:items)
+    
+    @list = [{:name => 'abc'}, {:name => 'def'}, {:name => 'ghi'}]
   end
   
-  after do
-    $stdout = @orig_stdout
-  end
-  
-  deprec_specify "should print out a table with the values" do
-    @dataset.print(:a, :b)
-    @output.rewind
-    @output.read.should == \
-      "+-+-+\n|a|b|\n+-+-+\n|1|2|\n|3|4|\n|5|6|\n+-+-+\n"
+  specify "should accept string keys as column names" do
+    @ds.import(['x', 'y'], [[1, 2], [3, 4]])
+    @db.sqls.should == [
+      'BEGIN',
+      "INSERT INTO items (x, y) VALUES (1, 2)",
+      "INSERT INTO items (x, y) VALUES (3, 4)",
+      'COMMIT'
+    ]
   end
 
-  deprec_specify "should default to the dataset's columns" do
-    @dataset.meta_def(:columns) {[:a, :b]}
-    @dataset.print
-    @output.rewind
-    @output.read.should == \
-      "+-+-+\n|a|b|\n+-+-+\n|1|2|\n|3|4|\n|5|6|\n+-+-+\n"
+  specify "should accept a columns array and a values array" do
+    @ds.import([:x, :y], [[1, 2], [3, 4]])
+    @db.sqls.should == [
+      'BEGIN',
+      "INSERT INTO items (x, y) VALUES (1, 2)",
+      "INSERT INTO items (x, y) VALUES (3, 4)",
+      'COMMIT'
+    ]
+  end
+
+  specify "should accept a columns array and a dataset" do
+    @ds2 = Sequel::Dataset.new(@db).from(:cats).filter(:purr => true).select(:a, :b)
+    
+    @ds.import([:x, :y], @ds2)
+    @db.sqls.should == [
+      'BEGIN',
+      "INSERT INTO items (x, y) VALUES (SELECT a, b FROM cats WHERE (purr IS TRUE))",
+      'COMMIT'
+    ]
+  end
+
+  specify "should accept a columns array and a values array with :commit_every option" do
+    @ds.import([:x, :y], [[1, 2], [3, 4], [5, 6]], :commit_every => 3)
+    @db.sqls.should == [
+      'BEGIN',
+      "INSERT INTO items (x, y) VALUES (1, 2)",
+      "INSERT INTO items (x, y) VALUES (3, 4)",
+      "INSERT INTO items (x, y) VALUES (5, 6)",
+      'COMMIT',
+    ]
+  end
+  specify "should accept a columns array and a values array with slice option" do
+    @ds.import([:x, :y], [[1, 2], [3, 4], [5, 6]], :slice => 2)
+    @db.sqls.should == [
+      'BEGIN',
+      "INSERT INTO items (x, y) VALUES (1, 2)",
+      "INSERT INTO items (x, y) VALUES (3, 4)",
+      'COMMIT',
+      'BEGIN',
+      "INSERT INTO items (x, y) VALUES (5, 6)",
+      'COMMIT'
+    ]
   end
 end
 
@@ -2525,7 +2192,7 @@ context "Dataset#multi_insert" do
     @list = [{:name => 'abc'}, {:name => 'def'}, {:name => 'ghi'}]
   end
   
-  specify "should join all inserts into a single SQL string" do
+  specify "should issue multiple insert statements inside a transaction" do
     @ds.multi_insert(@list)
     @db.sqls.should == [
       'BEGIN',
@@ -2570,10 +2237,12 @@ context "Dataset#multi_insert" do
   end
   
   specify "should accept the :commit_every option for committing every x records" do
-    @ds.multi_insert(@list, :commit_every => 2)
+    @ds.multi_insert(@list, :commit_every => 1)
     @db.sqls.should == [
       'BEGIN',
       "INSERT INTO items (name) VALUES ('abc')",
+      'COMMIT',
+      'BEGIN',
       "INSERT INTO items (name) VALUES ('def')",
       'COMMIT',
       'BEGIN',
@@ -2597,17 +2266,6 @@ context "Dataset#multi_insert" do
   
   specify "should accept string keys as column names" do
     @ds.multi_insert([{'x'=>1, 'y'=>2}, {'x'=>3, 'y'=>4}])
-    @ds.multi_insert(['x', 'y'], [[1, 2], [3, 4]])
-    @db.sqls.should == [
-      'BEGIN',
-      "INSERT INTO items (x, y) VALUES (1, 2)",
-      "INSERT INTO items (x, y) VALUES (3, 4)",
-      'COMMIT'
-    ] * 2
-  end
-
-  specify "should accept a columns array and a values array" do
-    @ds.multi_insert([:x, :y], [[1, 2], [3, 4]])
     @db.sqls.should == [
       'BEGIN',
       "INSERT INTO items (x, y) VALUES (1, 2)",
@@ -2616,142 +2274,9 @@ context "Dataset#multi_insert" do
     ]
   end
 
-  specify "should accept a columns array and a dataset" do
-    @ds2 = Sequel::Dataset.new(@db).from(:cats).filter(:purr => true).select(:a, :b)
-    
-    @ds.multi_insert([:x, :y], @ds2)
-    @db.sqls.should == [
-      'BEGIN',
-      "INSERT INTO items (x, y) VALUES (SELECT a, b FROM cats WHERE (purr IS TRUE))",
-      'COMMIT'
-    ]
-  end
-
-  specify "should accept a columns array and a values array with slice option" do
-    @ds.multi_insert([:x, :y], [[1, 2], [3, 4], [5, 6]], :slice => 2)
-    @db.sqls.should == [
-      'BEGIN',
-      "INSERT INTO items (x, y) VALUES (1, 2)",
-      "INSERT INTO items (x, y) VALUES (3, 4)",
-      'COMMIT',
-      'BEGIN',
-      "INSERT INTO items (x, y) VALUES (5, 6)",
-      'COMMIT'
-    ]
-  end
-  
-  deprec_specify "should be aliased by #import" do
-    @ds.import([:x, :y], [[1, 2], [3, 4], [5, 6]], :slice => 2)
-    @db.sqls.should == [
-      'BEGIN',
-      "INSERT INTO items (x, y) VALUES (1, 2)",
-      "INSERT INTO items (x, y) VALUES (3, 4)",
-      'COMMIT',
-      'BEGIN',
-      "INSERT INTO items (x, y) VALUES (5, 6)",
-      'COMMIT'
-    ]
-  end
-
-  specify "should not do anything if no columns or values are given" do
-    @ds.multi_insert
-    @db.sqls.should be_nil
-    
+  specify "should not do anything if no hashes are provided" do
     @ds.multi_insert([])
     @db.sqls.should be_nil
-    
-    @ds.multi_insert([], [])
-    @db.sqls.should be_nil
-
-    @ds.multi_insert([{}, {}])
-    @db.sqls.should be_nil
-    
-    @ds.multi_insert([:a, :b], [])
-    @db.sqls.should be_nil
-    
-    @ds.multi_insert([:x, :y], [[1, 2], [3, 4], [5, 6]], :slice => 2)
-    @db.sqls.should == [
-      'BEGIN',
-      "INSERT INTO items (x, y) VALUES (1, 2)",
-      "INSERT INTO items (x, y) VALUES (3, 4)",
-      'COMMIT',
-      'BEGIN',
-      "INSERT INTO items (x, y) VALUES (5, 6)",
-      'COMMIT'
-    ]
-  end
-  
-end
-
-context "Dataset#query" do
-  before do
-    @d = Sequel::Dataset.new(nil)
-  end
-  
-  deprec_specify "should support #from" do
-    q = @d.query {from :xxx}
-    q.class.should == @d.class
-    q.sql.should == "SELECT * FROM xxx"
-  end
-  
-  deprec_specify "should support #select" do
-    q = @d.query do
-      select :a, :b___mongo
-      from :yyy
-    end
-    q.class.should == @d.class
-    q.sql.should == "SELECT a, b AS mongo FROM yyy"
-  end
-  
-  deprec_specify "should support #where" do
-    q = @d.query do
-      from :zzz
-      where(:x + 2 > :y + 3)
-    end
-    q.class.should == @d.class
-    q.sql.should == "SELECT * FROM zzz WHERE ((x + 2) > (y + 3))"
-
-    q = @d.from(:zzz).query do
-      where((:x.sql_number > 1) & (:y.sql_number > 2))
-    end
-    q.class.should == @d.class
-    q.sql.should == "SELECT * FROM zzz WHERE ((x > 1) AND (y > 2))"
-
-    q = @d.from(:zzz).query do
-      where :x => 33
-    end
-    q.class.should == @d.class
-    q.sql.should == "SELECT * FROM zzz WHERE (x = 33)"
-  end
-  
-  deprec_specify "should support #group_by and #having" do
-    q = @d.query do
-      from :abc
-      group_by :id
-      having(:x.sql_number >= 2)
-    end
-    q.class.should == @d.class
-    q.sql.should == "SELECT * FROM abc GROUP BY id HAVING (x >= 2)"
-  end
-  
-  deprec_specify "should support #order, #order_by" do
-    q = @d.query do
-      from :xyz
-      order_by :stamp
-    end
-    q.class.should == @d.class
-    q.sql.should == "SELECT * FROM xyz ORDER BY stamp"
-  end
-  
-  deprec_specify "should raise on non-chainable method calls" do
-    proc {@d.query {first_source}}.should raise_error(Sequel::Error)
-  end
-  
-  deprec_specify "should raise on each, insert, update, delete" do
-    proc {@d.query {each}}.should raise_error(Sequel::Error)
-    proc {@d.query {insert(:x => 1)}}.should raise_error(Sequel::Error)
-    proc {@d.query {update(:x => 1)}}.should raise_error(Sequel::Error)
-    proc {@d.query {delete}}.should raise_error(Sequel::Error)
   end
 end
 
@@ -2802,189 +2327,6 @@ context "Dataset" do
   end
 end
 
-context "Dataset#transform" do
-  before do
-    @c = Class.new(Sequel::Dataset) do
-      attr_accessor :raw
-      attr_accessor :sql
-      
-      def fetch_rows(sql, &block)
-        block[@raw]
-      end
-      
-      def insert(v)
-        @sql = insert_sql(v)
-      end
-      
-      def update(v)
-        @sql = update_sql(v)
-      end
-    end
-
-    @ds = @c.new(nil).from(:items)
-    @ds.transform(:x => [
-      proc {|v| Marshal.load(v)},
-      proc {|v| Marshal.dump(v)}
-    ])
-  end
-  
-  specify "should change the dataset to transform values loaded from the database" do
-    @ds.raw = {:x => Marshal.dump([1, 2, 3]), :y => 'hello'}
-    @ds.first.should == {:x => [1, 2, 3], :y => 'hello'}
-    @ds.raw = {:x => Marshal.dump([1, 2, 3]), :y => 'hello'}
-    @ds.all.should == [{:x => [1, 2, 3], :y => 'hello'}]
-  end
-  
-  specify "should change the dataset to transform values saved to the database" do
-    @ds.insert(:x => :toast)
-    @ds.sql.should == "INSERT INTO items (x) VALUES ('#{Marshal.dump(:toast)}')"
-
-    @ds.insert(:y => 'butter')
-    @ds.sql.should == "INSERT INTO items (y) VALUES ('butter')"
-    
-    @ds.update(:x => ['dream'])
-    @ds.sql.should == "UPDATE items SET x = '#{Marshal.dump(['dream'])}'"
-  end
-  
-  specify "should be transferred to cloned datasets" do
-    @ds2 = @ds.filter(:a => 1)
-
-    @ds2.raw = {:x => Marshal.dump([1, 2, 3]), :y => 'hello'}
-    @ds2.first.should == {:x => [1, 2, 3], :y => 'hello'}
-
-    @ds2.insert(:x => :toast)
-    @ds2.sql.should == "INSERT INTO items (x) VALUES ('#{Marshal.dump(:toast)}')"
-  end
-  
-  specify "should work correctly together with set_row_proc" do
-    @ds.row_proc = proc{|r| r[:z] = r[:x] * 2; r}
-    @ds.raw = {:x => Marshal.dump("wow"), :y => 'hello'}
-    @ds.first.should == {:x => "wow", :y => 'hello', :z => "wowwow"}
-
-    f = nil
-    @ds.raw = {:x => Marshal.dump("wow"), :y => 'hello'}
-    @ds.naked.each{|r| f = r}
-    f.should == {:x => "wow", :y => 'hello'}
-  end
-  
-  specify "should leave the supplied values intact" do
-    h = {:x => :toast}
-    @ds.insert(h)
-    h.should == {:x => :toast}
-  end
-end
-
-context "Dataset#transform" do
-  before do
-    @c = Class.new(Sequel::Dataset) do
-      attr_accessor :raw
-      attr_accessor :sql
-      
-      def fetch_rows(sql, &block)
-        block[@raw]
-      end
-      
-      def insert(v)
-        @sql = insert_sql(v)
-      end
-      
-      def update(v)
-        @sql = update_sql(v)
-      end
-    end
-
-    @ds = @c.new(nil).from(:items)
-  end
-  
-  specify "should raise Sequel::Error for invalid transformations" do
-    proc {@ds.transform(:x => 'mau')}.should raise_error(Sequel::Error::InvalidTransform)
-    proc {@ds.transform(:x => :mau)}.should raise_error(Sequel::Error::InvalidTransform)
-    proc {@ds.transform(:x => [])}.should raise_error(Sequel::Error::InvalidTransform)
-    proc {@ds.transform(:x => ['mau'])}.should raise_error(Sequel::Error::InvalidTransform)
-    proc {@ds.transform(:x => [proc {|v|}, proc {|v|}])}.should_not raise_error(Sequel::Error::InvalidTransform)
-  end
-  
-  specify "should support stock YAML transformation" do
-    @ds.transform(:x => :yaml)
-
-    @ds.raw = {:x => [1, 2, 3].to_yaml, :y => 'hello'}
-    @ds.first.should == {:x => [1, 2, 3], :y => 'hello'}
-
-    @ds.insert(:x => :toast)
-    @ds.sql.should == "INSERT INTO items (x) VALUES ('#{:toast.to_yaml}')"
-    @ds.insert(:y => 'butter')
-    @ds.sql.should == "INSERT INTO items (y) VALUES ('butter')"
-    @ds.update(:x => ['dream'])
-    @ds.sql.should == "UPDATE items SET x = '#{['dream'].to_yaml}'"
-
-    @ds2 = @ds.filter(:a => 1)
-    @ds2.raw = {:x => [1, 2, 3].to_yaml, :y => 'hello'}
-    @ds2.first.should == {:x => [1, 2, 3], :y => 'hello'}
-    @ds2.insert(:x => :toast)
-    @ds2.sql.should == "INSERT INTO items (x) VALUES ('#{:toast.to_yaml}')"
-
-    @ds.row_proc = proc{|r| r[:z] = r[:x] * 2; r}
-    @ds.raw = {:x => "wow".to_yaml, :y => 'hello'}
-    @ds.first.should == {:x => "wow", :y => 'hello', :z => "wowwow"}
-    f = nil
-    @ds.raw = {:x => "wow".to_yaml, :y => 'hello'}
-    @ds.naked.each{|r| f = r}
-    f.should == {:x => "wow", :y => 'hello'}
-  end
-  
-  specify "should support stock Marshal transformation with Base64 encoding" do
-    @ds.transform(:x => :marshal)
-
-    @ds.raw = {:x => [Marshal.dump([1, 2, 3])].pack('m'), :y => 'hello'}
-    @ds.first.should == {:x => [1, 2, 3], :y => 'hello'}
-
-    @ds.insert(:x => :toast)
-    @ds.sql.should == "INSERT INTO items (x) VALUES ('#{[Marshal.dump(:toast)].pack('m')}')"
-    @ds.insert(:y => 'butter')
-    @ds.sql.should == "INSERT INTO items (y) VALUES ('butter')"
-    @ds.update(:x => ['dream'])
-    @ds.sql.should == "UPDATE items SET x = '#{[Marshal.dump(['dream'])].pack('m')}'"
-
-    @ds2 = @ds.filter(:a => 1)
-    @ds2.raw = {:x => [Marshal.dump([1, 2, 3])].pack('m'), :y => 'hello'}
-    @ds2.first.should == {:x => [1, 2, 3], :y => 'hello'}
-    @ds2.insert(:x => :toast)
-    @ds2.sql.should == "INSERT INTO items (x) VALUES ('#{[Marshal.dump(:toast)].pack('m')}')"
-
-    @ds.row_proc = proc{|r| r[:z] = r[:x] * 2; r}
-    @ds.raw = {:x => [Marshal.dump("wow")].pack('m'), :y => 'hello'}
-    @ds.first.should == {:x => "wow", :y => 'hello', :z => "wowwow"}
-    f = nil
-    @ds.raw = {:x => [Marshal.dump("wow")].pack('m'), :y => 'hello'}
-    @ds.naked.each{|r| f = r}
-    f.should == {:x => "wow", :y => 'hello'}
-  end
-  
-  specify "should support loading of Marshalled values without Base64 encoding" do
-    @ds.transform(:x => :marshal)
-
-    @ds.raw = {:x => Marshal.dump([1,2,3]), :y => nil}
-    @ds.first.should == {:x => [1,2,3], :y => nil}
-  end
-  
-  specify "should return self" do
-    @ds.transform(:x => :marshal).should be(@ds)
-  end
-end
-
-context "A dataset with a transform" do
-  before do
-    @ds = Sequel::Dataset.new(nil).from(:items)
-    @ds.transform(:x => :marshal)
-  end
-  
-  specify "should automatically transform hash filters" do
-    @ds.filter(:y => 2).sql.should == 'SELECT * FROM items WHERE (y = 2)'
-    
-    @ds.filter(:x => 2).sql.should == "SELECT * FROM items WHERE (x = '#{[Marshal.dump(2)].pack('m')}')"
-  end
-end
-
 context "Dataset#to_csv" do
   before do
     @c = Class.new(Sequel::Dataset) do
@@ -3014,48 +2356,6 @@ context "Dataset#to_csv" do
   specify "should exclude column titles if so specified" do
     @ds.to_csv(false).should ==
       "1, 2, 3\r\n4, 5, 6\r\n7, 8, 9\r\n"
-  end
-end
-
-context "Dataset#create_view" do
-  before do
-    @dbc = Class.new(Sequel::Database) do
-      attr_reader :sqls
-      
-      def execute(sql, opts={})
-        @sqls ||= []
-        @sqls << sql
-      end
-    end
-    @db = @dbc.new
-    
-    @ds = @db[:items].order(:abc).filter(:category => 'ruby')
-  end
-  
-  deprec_specify "should create a view with the dataset's sql" do
-    @ds.create_view(:xyz)
-    @db.sqls.should == ["CREATE VIEW xyz AS #{@ds.sql}"]
-  end
-end
-
-context "Dataset#create_or_replace_view" do
-  before do
-    @dbc = Class.new(Sequel::Database) do
-      attr_reader :sqls
-      
-      def execute(sql, opts={})
-        @sqls ||= []
-        @sqls << sql
-      end
-    end
-    @db = @dbc.new
-    
-    @ds = @db[:items].order(:abc).filter(:category => 'ruby')
-  end
-  
-  deprec_specify "should create a view with the dataset's sql" do
-    @ds.create_or_replace_view(:xyz)
-    @db.sqls.should == ["CREATE OR REPLACE VIEW xyz AS #{@ds.sql}"]
   end
 end
 
@@ -3176,14 +2476,6 @@ context "Dataset#all" do
     ]
   end
   
-  deprec_specify "should accept options and pass them to #each" do
-    @dataset.all(:limit => 33).should == [
-      {:x => 1, :y => 2},
-      {:x => 3, :y => 4},
-      "SELECT * FROM items LIMIT 33"
-    ]
-  end
-
   specify "should iterate over the array if a block is given" do
     a = []
     
@@ -3231,30 +2523,6 @@ context "Dataset#grep" do
   specify "should support searching against other columns" do
     @ds.grep(:title, :body).sql.should ==
       "SELECT * FROM posts WHERE ((title LIKE body))"
-  end
-end
-
-context "Sequel.use_parse_tree" do
-  deprec_specify "be false" do
-    Sequel.use_parse_tree.should == false
-  end
-end
-
-context "Sequel.use_parse_tree=" do
-  deprec_specify "raise an error if true" do
-    proc{Sequel.use_parse_tree = true}.should raise_error(Sequel::Error)
-  end
-
-  deprec_specify "do nothing if false" do
-    proc{Sequel.use_parse_tree = false}.should_not raise_error
-  end
-end
-
-context "Dataset.dataset_classes" do
-  deprec_specify "should be an array of dataset subclasses" do
-    ds_class = Class.new(Sequel::Dataset)
-    Sequel::Dataset.dataset_classes.should be_a_kind_of(Array)
-    Sequel::Dataset.dataset_classes.should include(ds_class)
   end
 end
 
@@ -3469,45 +2737,5 @@ context "Sequel::Dataset #set_overrides" do
     @ds.update_sql(:y=>2).should =~ /UPDATE items SET (x = 1|y = 2), (x = 1|y = 2)/
     @ds.set_overrides(:y=>2).update_sql.should =~ /UPDATE items SET (x = 1|y = 2), (x = 1|y = 2)/
     @ds.set_overrides(:x=>2).update_sql.should == "UPDATE items SET x = 1"
-  end
-end
-
-context "Sequel::Dataset#each" do
-  before do
-    @ds = Sequel::Dataset.new(nil).from(:items)
-    def @ds.fetch_rows(sql)
-      @columns = /count/i.match(sql) ? [:count] : [:a]
-      yield({@columns.first=>sql})
-    end
-  end
-
-  deprec_specify "should not set the columns if passing an option that modifies them" do
-    @ds.each(:select=>[:count]){}
-    @ds.columns.should == [:a]
-    @ds.each(:from=>[:count]){} 
-    @ds.columns.should == [:a]
-    @ds.each(:join=>[Sequel::SQL::JoinClause.new(:natural, :count)]){}
-    @ds.columns.should == [:a]
-    @ds.each(:sql=>'SELECT COUNT'){}
-    @ds.columns.should == [:a]
-  end
-
-  deprec_specify "should have the correct columns inside the block regardless" do
-    @ds.each(:select=>[:count]) do |x|
-      x[:count].should == 'SELECT count FROM items'
-      @ds.columns.should == [:count]
-    end
-    @ds.each(:from=>[:count]) do |x|
-      x[:count].should == 'SELECT * FROM count'
-      @ds.columns.should == [:count]
-    end
-    @ds.each(:join=>[Sequel::SQL::JoinClause.new(:natural, :count)]) do |x|
-      x[:count].should == 'SELECT * FROM items NATURAL JOIN count'
-      @ds.columns.should == [:count]
-    end
-    @ds.each(:sql=>'SELECT COUNT') do |x|
-      x[:count].should == 'SELECT COUNT'
-      @ds.columns.should == [:count]
-    end
   end
 end

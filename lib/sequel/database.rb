@@ -77,10 +77,6 @@ module Sequel
       @identifier_input_method = nil
       @identifier_output_method = nil
       @quote_identifiers = nil
-      if opts.include?(:upcase_identifiers)
-        Deprecation.deprecate('The :upcase_identifiers Database option', 'Use the :identifier_input_method => :upcase option instead')
-        @identifier_input_method = opts[:upcase_identifiers] ? :upcase : ""
-      end
       @pool = (@single_threaded ? SingleThreadedPool : ConnectionPool).new(connection_pool_default_options.merge(opts), &block)
       @pool.connection_proc = proc{|server| connect(server)} unless block
       @pool.disconnection_proc = proc{|conn| disconnect_connection(conn)} unless opts[:disconnection_proc]
@@ -225,8 +221,7 @@ module Sequel
 
     # Executes the supplied SQL statement string.
     def <<(sql)
-      Deprecation.deprecate('Passing an array argument to Database#<<', 'Use array.each{|x| database << x}') if Array === sql
-      execute_ddl((Array === sql) ? sql.to_sql : sql)
+      execute_ddl(sql)
     end
     
     # Returns a dataset from the database. If the first argument is a string,
@@ -409,9 +404,9 @@ module Sequel
     end
     
     # Parse the schema from the database.
-    # If the table_name is not given, returns the schema for all tables as a hash.
-    # If the table_name is given, returns the schema for a single table as an
-    # array with all members being arrays of length 2.  Available options are:
+    # Returns the schema for the given table as an array with all members being arrays of length 2,
+    # the first member being the column name, and the second member being a hash of column information.
+    # Available options are:
     #
     # * :reload - Get fresh information from the database, instead of using
     #   cached information.  If table_name is blank, :reload should be used
@@ -420,46 +415,24 @@ module Sequel
     #   that have been requested explicitly.
     # * :schema - An explicit schema to use.  It may also be implicitly provided
     #   via the table name.
-    def schema(table = nil, opts={})
-      Deprecation.deprecate('Calling Database#schema without a table argument', 'Use database.tables.inject({}){|h, m| h[m] = database.schema(m); h}') unless table
+    def schema(table, opts={})
       raise(Error, 'schema parsing is not implemented on this database') unless respond_to?(:schema_parse_table, true)
 
-      if table
-        sch, table_name = schema_and_table(table)
-        quoted_name = quote_schema_table(table)
-      end
+      sch, table_name = schema_and_table(table)
+      quoted_name = quote_schema_table(table)
       opts = opts.merge(:schema=>sch) if sch && !opts.include?(:schema)
-      if opts[:reload] && @schemas
-        if table_name
-          @schemas.delete(quoted_name)
-        else
-          @schemas = nil
-        end
-      end
 
-      if @schemas
-        if table_name
-          return @schemas[quoted_name] if @schemas[quoted_name]
-        else
-          return @schemas
-        end
-      end
-
-      raise(Error, '#tables does not exist, you must provide a specific table to #schema') if table.nil? && !respond_to?(:tables, true)
+      @schemas.delete(quoted_name) if opts[:reload] && @schemas
+      return @schemas[quoted_name] if @schemas && @schemas[quoted_name]
 
       @schemas ||= Hash.new do |h,k|
         quote_name = quote_schema_table(k)
         h[quote_name] if h.include?(quote_name)
       end
 
-      if table_name
-        cols = schema_parse_table(table_name, opts)
-        raise(Error, 'schema parsing returned no columns, table probably doesn\'t exist') if cols.nil? || cols.empty?
-        @schemas[quoted_name] = cols
-      else
-        tables.each{|t| @schemas[quote_schema_table(t)] = schema_parse_table(t.to_s, opts)}
-        @schemas
-      end
+      cols = schema_parse_table(table_name, opts)
+      raise(Error, 'schema parsing returned no columns, table probably doesn\'t exist') if cols.nil? || cols.empty?
+      @schemas[quoted_name] = cols
     end
 
     # Returns true if the database is using a single-threaded connection pool.
@@ -500,10 +473,6 @@ module Sequel
     # current transaction. Should be overridden for databases that support nested 
     # transactions.
     def transaction(opts={})
-      unless opts.is_a?(Hash)
-        Deprecation.deprecate('Passing an argument other than a Hash to Database#transaction', "Use DB.transaction(:server=>#{opts.inspect})") 
-        opts = {:server=>opts}
-      end
       synchronize(opts[:server]) do |conn|
         return yield(conn) if @transactions.include?(Thread.current)
         log_info(begin_transaction_sql)
@@ -525,71 +494,16 @@ module Sequel
       end
     end
     
-    # Typecast the value to the given column_type. Can be overridden in
-    # adapters to support database specific column types.
+    # Typecast the value to the given column_type. Calls
+    # typecast_value_#{column_type} if the method exists,
+    # otherwise returns the value.
     # This method should raise Sequel::InvalidValue if assigned value
     # is invalid.
     def typecast_value(column_type, value)
       return nil if value.nil?
+      meth = "typecast_value_#{column_type}"
       begin
-        case column_type
-        when :integer
-          Integer(value)
-        when :string
-          value.to_s
-        when :float
-          Float(value)
-        when :decimal
-          case value
-          when BigDecimal
-            value
-          when String, Numeric
-            BigDecimal.new(value.to_s)
-          else
-            raise Sequel::InvalidValue, "invalid value for BigDecimal: #{value.inspect}"
-          end
-        when :boolean
-          case value
-          when false, 0, "0", /\Af(alse)?\z/i
-            false
-          else
-            blank_object?(value) ? nil : true
-          end
-        when :date
-          case value
-          when Date
-            value
-          when DateTime, Time
-            Date.new(value.year, value.month, value.day)
-          when String
-            Sequel.string_to_date(value)
-          else
-            raise Sequel::InvalidValue, "invalid value for Date: #{value.inspect}"
-          end
-        when :time
-          case value
-          when Time
-            value
-          when String
-            Sequel.string_to_time(value)
-          else
-            raise Sequel::InvalidValue, "invalid value for Time: #{value.inspect}"
-          end
-        when :datetime
-          raise(Sequel::InvalidValue, "invalid value for Datetime: #{value.inspect}") unless [DateTime, Date, Time, String].any?{|c| value.is_a?(c)}
-          if Sequel.datetime_class === value
-            # Already the correct class, no need to convert
-            value
-          else
-            # First convert it to standard ISO 8601 time, then
-            # parse that string using the time class.
-            Sequel.string_to_datetime(Time === value ? value.iso8601 : value.to_s)
-          end
-        when :blob
-          value.is_a?(Sequel::SQL::Blob) ? value : Sequel::SQL::Blob.new(value)
-        else
-          value
-        end
+        respond_to?(meth, true) ? send(meth, value) : value
       rescue ArgumentError, TypeError => exp
         e = Sequel::InvalidValue.new("#{exp.class} #{exp.message}")
         e.set_backtrace(exp.backtrace)
@@ -634,6 +548,7 @@ module Sequel
     # strings with all whitespace, and ones that respond
     # true to empty?
     def blank_object?(obj)
+      return obj.blank? if obj.respond_to?(:blank?)
       case obj
       when NilClass, FalseClass
         true
@@ -642,7 +557,7 @@ module Sequel
       when String
         obj.strip.empty?
       else
-        !obj.respond_to?(:empty?) || obj.empty?
+        obj.respond_to?(:empty?) ? obj.empty? : false
       end
     end
 
@@ -774,6 +689,87 @@ module Sequel
     # Raise a database error unless the exception is an Rollback.
     def transaction_error(e, *classes)
       raise_error(e, :classes=>classes) unless Rollback === e
+    end
+
+    # Typecast the value to an SQL::Blob
+    def typecast_value_blob(value)
+      value.is_a?(Sequel::SQL::Blob) ? value : Sequel::SQL::Blob.new(value)
+    end
+
+    # Typecast the value to true, false, or nil
+    def typecast_value_boolean(value)
+      case value
+      when false, 0, "0", /\Af(alse)?\z/i
+        false
+      else
+        blank_object?(value) ? nil : true
+      end
+    end
+
+    # Typecast the value to a Date
+    def typecast_value_date(value)
+      case value
+      when Date
+        value
+      when DateTime, Time
+        Date.new(value.year, value.month, value.day)
+      when String
+        Sequel.string_to_date(value)
+      else
+        raise InvalidValue, "invalid value for Date: #{value.inspect}"
+      end
+    end
+
+    # Typecast the value to a DateTime or Time depending on Sequel.datetime_class
+    def typecast_value_datetime(value)
+      raise(Sequel::InvalidValue, "invalid value for Datetime: #{value.inspect}") unless [DateTime, Date, Time, String].any?{|c| value.is_a?(c)}
+      if Sequel.datetime_class === value
+        # Already the correct class, no need to convert
+       value
+      else
+        # First convert it to standard ISO 8601 time, then
+        # parse that string using the time class.
+        Sequel.string_to_datetime(Time === value ? value.iso8601 : value.to_s)
+      end
+    end
+
+    # Typecast the value to a BigDecimal
+    def typecast_value_decimal(value)
+      case value
+      when BigDecimal
+        value
+      when String, Numeric
+        BigDecimal.new(value.to_s)
+      else
+        raise InvalidValue, "invalid value for BigDecimal: #{value.inspect}"
+      end
+    end
+
+    # Typecast the value to a Float
+    def typecast_value_float(value)
+      Float(value)
+    end
+
+    # Typecast the value to an Integer
+    def typecast_value_integer(value)
+      Integer(value)
+    end
+
+    # Typecast the value to a String
+    def typecast_value_string(value)
+      value.to_s
+    end
+
+    # Typecast the value to a Time
+    def typecast_value_time(value)
+      case value
+      when Time
+        value
+      when String
+        Sequel.string_to_time(value)
+      else
+        raise Sequel::InvalidValue, "invalid value for Time: #{value.inspect}"
+      end
     end
   end
 end

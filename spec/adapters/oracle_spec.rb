@@ -86,7 +86,7 @@ context "An Oracle dataset" do
       {:date_created=>nil, :name => 'def', :value => 789}
     ]
 
-    @d.select(:name).uniq.order_by(:name).to_a.should == [
+    @d.select(:name).distinct.order_by(:name).to_a.should == [
       {:name => 'abc'},
       {:name => 'def'}
     ]

@@ -135,10 +135,6 @@ module Sequel
       
       # Support single level transactions on MySQL.
       def transaction(opts={})
-        unless opts.is_a?(Hash)
-          Deprecation.deprecate('Passing an argument other than a Hash to Database#transaction', "Use DB.transaction(:server=>#{opts.inspect})") 
-          opts = {:server=>opts}
-        end
         synchronize(opts[:server]) do |conn|
           return yield(conn) if @transactions.include?(Thread.current)
           log_info(begin_transaction_sql)
@@ -297,8 +293,8 @@ module Sequel
       end
       
       # Delete rows matching this dataset
-      def delete(opts = (defarg=true;nil))
-        execute_dui(defarg ? delete_sql : delete_sql(opts)){|c| c.affected_rows}
+      def delete
+        execute_dui(delete_sql){|c| c.affected_rows}
       end
       
       # Yield all rows matching this dataset
@@ -338,8 +334,8 @@ module Sequel
       end
       
       # Update the matching rows.
-      def update(values={}, opts=(defarg=true;nil))
-        execute_dui(defarg ? update_sql(values) : update_sql(values, opts)){|c| c.affected_rows}
+      def update(values={})
+        execute_dui(update_sql(values)){|c| c.affected_rows}
       end
       
       private

@@ -29,6 +29,11 @@ module Sequel
           @skip_superclass_validations = true
         end
         
+        # Instructs the model to skip validations defined in superclasses
+        def skip_superclass_validations?
+          defined?(@skip_superclass_validations) && @skip_superclass_validations
+        end
+
         # Defines validations by converting a longhand block into a series of 
         # shorthand definitions. For example:
         #
@@ -50,9 +55,7 @@ module Sequel
     
         # Validates the given instance.
         def validate(o)
-          if superclass.respond_to?(:validate) && !@skip_superclass_validations
-            superclass.validate(o)
-          end
+          superclass.validate(o) if superclass.respond_to?(:validate) && !skip_superclass_validations?
           validations.each do |att, procs|
             v = case att
             when Array
@@ -80,7 +83,7 @@ module Sequel
           }.merge!(extract_options!(atts))
           atts << opts
           validates_each(*atts) do |o, a, v|
-            o.errors[a] << opts[:message] unless v == opts[:accept]
+            o.errors.add(a, opts[:message]) unless v == opts[:accept]
           end
         end
     
@@ -101,7 +104,7 @@ module Sequel
           }.merge!(extract_options!(atts))
           atts << opts
           validates_each(*atts) do |o, a, v|
-            o.errors[a] << opts[:message] unless v == o.send(:"#{a}_confirmation")
+            o.errors.add(a, opts[:message]) unless v == o.send(:"#{a}_confirmation")
           end
         end
     
@@ -110,7 +113,7 @@ module Sequel
         # value, e.g.:
         #
         #   validates_each :name, :password do |object, attribute, value|
-        #     object.errors[attribute] << 'is not nice' unless value.nice?
+        #     object.errors.add(attribute, 'is not nice') unless value.nice?
         #   end
         #
         # Possible Options:
@@ -170,7 +173,7 @@ module Sequel
           
           atts << opts
           validates_each(*atts) do |o, a, v|
-            o.errors[a] << opts[:message] unless v.to_s =~ opts[:with]
+            o.errors.add(a, opts[:message]) unless v.to_s =~ opts[:with]
           end
         end
     
@@ -197,16 +200,16 @@ module Sequel
           atts << opts
           validates_each(*atts) do |o, a, v|
             if m = opts[:maximum]
-              o.errors[a] << (opts[:message] || opts[:too_long]) unless v && v.size <= m
+              o.errors.add(a, opts[:message] || opts[:too_long]) unless v && v.size <= m
             end
             if m = opts[:minimum]
-              o.errors[a] << (opts[:message] || opts[:too_short]) unless v && v.size >= m
+              o.errors.add(a, opts[:message] || opts[:too_short]) unless v && v.size >= m
             end
             if i = opts[:is]
-              o.errors[a] << (opts[:message] || opts[:wrong_length]) unless v && v.size == i
+              o.errors.add(a, opts[:message] || opts[:wrong_length]) unless v && v.size == i
             end
             if w = opts[:within]
-              o.errors[a] << (opts[:message] || opts[:wrong_length]) unless v && w.include?(v.size)
+              o.errors.add(a, opts[:message] || opts[:wrong_length]) unless v && w.include?(v.size)
             end
           end
         end
@@ -234,7 +237,7 @@ module Sequel
                   "is a string"
                 end
               end
-              o.errors[a] << message
+              o.errors.add(a, message)
             end
           end
         end
@@ -258,7 +261,7 @@ module Sequel
                 Kernel.Float(v.to_s)
               end
             rescue
-              o.errors[a] << opts[:message]
+              o.errors.add(a, opts[:message])
             end
           end
         end
@@ -275,7 +278,7 @@ module Sequel
           }.merge!(extract_options!(atts))
           atts << opts
           validates_each(*atts) do |o, a, v|
-            o.errors[a] << opts[:message] if v.blank? && v != false
+            o.errors.add(a, opts[:message]) if v.blank? && v != false
           end
         end
         
@@ -292,7 +295,7 @@ module Sequel
           opts[:message] ||= "is not in range or set: #{opts[:in].inspect}"
           atts << opts
           validates_each(*atts) do |o, a, v|
-            o.errors[a] << opts[:message] unless opts[:in].include?(v)
+            o.errors.add(a, opts[:message]) unless opts[:in].include?(v)
           end
         end
     
@@ -341,7 +344,7 @@ module Sequel
             else
               false
             end
-            o.errors[error_field] << opts[:message] unless allow
+            o.errors.add(error_field, opts[:message]) unless allow
           end
         end
     
@@ -352,6 +355,14 @@ module Sequel
         
         private
     
+        # Removes and returns the last member of the array if it is a hash. Otherwise,
+        # an empty hash is returned This method is useful when writing methods that
+        # take an options hash as the last parameter.
+        def extract_options!(array)
+          array.last.is_a?(Hash) ? array.pop : {}
+        end
+
+        # Handle the :if option for validations
         def validation_if_proc(o, i)
           case i
           when Symbol then o.send(i)

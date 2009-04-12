@@ -2,13 +2,16 @@ module Sequel
   class Dataset
     COMMA_SEPARATOR = ', '.freeze
     COUNT_OF_ALL_AS_COUNT = SQL::Function.new(:count, LiteralString.new('*'.freeze)).as(:count)
+    ARRAY_ACCESS_ERROR_MSG = 'You cannot call Dataset#[] with an integer or with no arguments.'.freeze
+    MAP_ERROR_MSG = 'Using Dataset#map with an argument and a block is not allowed'.freeze
+    GET_ERROR_MSG = 'must provide argument or block to Dataset#get, not both'.freeze
+    IMPORT_ERROR_MSG = 'Using Sequel::Dataset#import an empty column array is not allowed'.freeze
 
     # Returns the first record matching the conditions. Examples:
     #
     #   ds[:id=>1] => {:id=1}
     def [](*conditions)
-      Deprecation.deprecate('Using an Integer argument to Dataset#[] is deprecated and will raise an error in a future version. Use Dataset#first.') if conditions.length == 1 and conditions.is_a?(Integer)
-      Deprecation.deprecate('Using Dataset#[] without an argument is deprecated and will raise an error in a future version. Use Dataset#first.') if conditions.length == 0
+      raise(Error, ARRAY_ACCESS_ERROR_MSG) if (conditions.length == 1 and conditions.is_a?(Integer)) or conditions.length == 0
       first(*conditions)
     end
 
@@ -70,8 +73,12 @@ module Sequel
     #   ds.get(:id)
     #   ds.get{|o| o.sum(:id)}
     def get(column=nil, &block)
-      raise(Error, 'must provide argument or block to Dataset#get, not both') if column && block
-      (column ? select(column) : select(&block)).single_value
+      if column
+        raise(Error, GET_ERROR_MSG) if block
+        select(column).single_value
+      else
+        select(&block).single_value
+      end
     end
 
     # Returns a dataset grouped by the given column with count by group,
@@ -81,6 +88,43 @@ module Sequel
     #   ds.group_and_count(:first_name, :last_name) => [{:first_name=>'a', :last_name=>'b', :count=>1}, ...]
     def group_and_count(*columns)
       group(*columns).select(*(columns + [COUNT_OF_ALL_AS_COUNT])).order(:count)
+    end
+    
+    # Inserts multiple records into the associated table. This method can be
+    # to efficiently insert a large amounts of records into a table. Inserts
+    # are automatically wrapped in a transaction.
+    # 
+    # This method is called with a columns array and an array of value arrays:
+    #
+    #   dataset.import([:x, :y], [[1, 2], [3, 4]])
+    #
+    # This method also accepts a dataset instead of an array of value arrays:
+    #
+    #   dataset.import([:x, :y], other_dataset.select(:a___x, :b___y))
+    #
+    # The method also accepts a :slice or :commit_every option that specifies
+    # the number of records to insert per transaction. This is useful especially
+    # when inserting a large number of records, e.g.:
+    #
+    #   # this will commit every 50 records
+    #   dataset.import([:x, :y], [[1, 2], [3, 4], ...], :slice => 50)
+    def import(columns, values, opts={})
+      return @db.transaction{execute_dui("INSERT INTO #{quote_schema_table(@opts[:from].first)} (#{identifier_list(columns)}) VALUES #{literal(values)}")} if values.is_a?(Dataset)
+
+      return if values.empty?
+      raise(Error, IMPORT_ERROR_MSG) if columns.empty?
+      
+      if slice_size = opts[:commit_every] || opts[:slice]
+        offset = 0
+        loop do
+          @db.transaction(opts){multi_insert_sql(columns, values[offset, slice_size]).each{|st| execute_dui(st)}}
+          offset += slice_size
+          break if offset >= values.length
+        end
+      else
+        statements = multi_insert_sql(columns, values)
+        @db.transaction{statements.each{|st| execute_dui(st)}}
+      end
     end
     
     # Returns the interval between minimum and maximum values for the given 
@@ -105,8 +149,8 @@ module Sequel
     #   ds.map(:id) => [1, 2, 3, ...]
     #   ds.map{|r| r[:id] * 2} => [2, 4, 6, ...]
     def map(column=nil, &block)
-      Deprecation.deprecate('Using Dataset#map with an argument and a block is deprecated and will raise an error in a future version. Use an argument or a block, not both.') if column && block
       if column
+        raise(Error, MAP_ERROR_MSG) if block
         super(){|r| r[column]}
       else
         super(&block)
@@ -123,62 +167,22 @@ module Sequel
       get{|o| o.min(column)}
     end
 
-    # Inserts multiple records into the associated table. This method can be
-    # to efficiently insert a large amounts of records into a table. Inserts
-    # are automatically wrapped in a transaction.
+    # This is a front end for import that allows you to submit an array of
+    # hashes instead of arrays of columns and values:
     # 
-    # This method should be called with a columns array and an array of value arrays:
-    #
-    #   dataset.multi_insert([:x, :y], [[1, 2], [3, 4]])
-    #
-    # This method can also be called with an array of hashes:
-    # 
-    #   dataset.multi_insert({:x => 1}, {:x => 2})
+    #   dataset.multi_insert([{:x => 1}, {:x => 2}])
     #
     # Be aware that all hashes should have the same keys if you use this calling method,
     # otherwise some columns could be missed or set to null instead of to default
     # values.
     #
-    # The method also accepts a :slice or :commit_every option that specifies
-    # the number of records to insert per transaction. This is useful especially
-    # when inserting a large number of records, e.g.:
-    #
-    #   # this will commit every 50 records
-    #   dataset.multi_insert(lots_of_records, :slice => 50)
-    def multi_insert(*args)
-      if args.empty?
-        return
-      elsif args[0].is_a?(Array) && args[1].is_a?(Array)
-        columns, values, opts = *args
-      elsif args[0].is_a?(Array) && args[1].is_a?(Dataset)
-        table = @opts[:from].first
-        columns, dataset = *args
-        sql = "INSERT INTO #{quote_identifier(table)} (#{identifier_list(columns)}) VALUES #{literal(dataset)}"
-        return @db.transaction{execute_dui(sql)}
-      else
-        # we assume that an array of hashes is given
-        hashes, opts = *args
-        return if hashes.empty?
-        columns = hashes.first.keys
-        # convert the hashes into arrays
-        values = hashes.map {|h| columns.map {|c| h[c]}}
-      end
-      # make sure there's work to do
-      return if columns.empty? || values.empty?
-      
-      slice_size = opts && (opts[:commit_every] || opts[:slice])
-      
-      if slice_size
-        values.each_slice(slice_size) do |slice|
-          statements = multi_insert_sql(columns, slice)
-          @db.transaction(opts){statements.each{|st| execute_dui(st)}}
-        end
-      else
-        statements = multi_insert_sql(columns, values)
-        @db.transaction{statements.each{|st| execute_dui(st)}}
-      end
+    # You can also use the :slice or :commit_every option that import accepts.
+    def multi_insert(hashes, opts={})
+      return if hashes.empty?
+      columns = hashes.first.keys
+      import(columns, hashes.map{|h| columns.map{|c| h[c]}}, opts)
     end
-    
+
     # Returns a Range object made from the minimum and maximum values for the
     # given column.
     def range(column)
@@ -188,20 +192,15 @@ module Sequel
     end
     
     # Returns the first record in the dataset.
-    def single_record(opts = (defarg=true;nil))
-      Deprecation.deprecate("Calling Dataset#single_record with an argument is deprecated and will raise an error in a future version.  Use dataset.clone(opts).single_record.") unless defarg
-      ds = clone(:limit=>1)
-      opts = opts.merge(:limit=>1) if opts and opts[:limit]
-      defarg ? ds.each{|r| return r} : ds.each(opts){|r| return r}
+    def single_record
+      clone(:limit=>1).each{|r| return r}
       nil
     end
 
     # Returns the first value of the first record in the dataset.
     # Returns nil if dataset is empty.
-    def single_value(opts = (defarg=true;nil))
-      Deprecation.deprecate("Calling Dataset#single_value with an argument is deprecated and will raise an error in a future version.  Use dataset.clone(opts).single_value.") unless defarg
-      ds = naked.clone(:graph=>false)
-      if r = (defarg ? ds.single_record : ds.single_record(opts))
+    def single_value
+      if r = naked.clone(:graph=>false).single_record
         r.values.first
       end
     end

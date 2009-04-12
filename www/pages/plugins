@@ -1,6 +1,6 @@
 <h2>Sequel::Model Plugins</h2>
 
-<p>Sequel::Model has a very flexible and standardized plugin architecture, see the <a href="/rdoc/classes/Sequel/Plugins.html">RDoc</a>. Here is a list of plugins that members of the Sequel community have developed:</p>
+<p>Sequel::Model has a very flexible and standardized plugin architecture, see the <a href="rdoc/classes/Sequel/Plugins.html">RDoc</a>. Here is a list of plugins that members of the Sequel community have developed:</p>
 
 <ul>
 <li><a href='http://github.com/sbfaulkner/sequel_cascading'>sequel_cascading</a>: Destroy associated records, nullify foreign keys or raise an exception when destroying a record.</li>
@@ -11,7 +11,6 @@
 <li><a href='http://github.com/jackdempsey/sequel_taggable'>sequel_taggable</a>: Allows easily adding tags to any model.</li>
 <li><a href='http://github.com/bricooke/sequel_timestamped'>sequel_timestamped</a>: Adds support for autotimestamped created_at and updated_at columns if they exist.</li>
 <li><a href='http://github.com/sbfaulkner/sequel_timestamped'>sequel_timestamped</a> (2): Another take on timestamping.</li>
-<li><a href='http://github.com/deimos1986/sequel_versioned'>sequel_versioned</a>: Stores previous versions of the model objects and associated objects.</li>
 </ul>
 
 <h2>Other Sequel Extensions</h2>

@@ -1,6 +1,4 @@
-%w'bigdecimal bigdecimal/util date enumerator thread time uri yaml'.each do |f|
-  require f
-end
+%w'bigdecimal date thread time uri'.each{|f| require f}
 
 # Top level module for Sequel
 #
@@ -26,7 +24,7 @@ end
 #
 # Sequel converts two digit years in Dates and DateTimes by default,
 # so 01/02/03 is interpreted at January 2nd, 2003, and 12/13/99 is interpreted
-# as December 13, 1999.. You can override this to treat those dates as
+# as December 13, 1999. You can override this to treat those dates as
 # January 2nd, 0003 and December 13, 0099, respectively, by setting: 
 #
 #   Sequel.convert_two_digit_years = false
@@ -36,29 +34,13 @@ end
 #
 #   Sequel.datetime_class = DateTime
 #
-# Sequel currently does not use instance_eval for virtual row blocks by default
-# (e.g. the block passed to Dataset#filter, #select, #order and other similar
-# methods).  If you want to use instance_eval for these blocks, don't have any
-# block arguments, and set:
-#
-#   Sequel.virtual_row_instance_eval = true
-#
-# When this is set, you can do:
-#
-#   dataset.filter{|o| o.column > 0} # no instance_eval
-#   dataset.filter{column > 0}       # instance eval
-#
-# When the virtual_row_instance_eval is false, using a virtual row block without a block
-# argument will generate a deprecation message.
-#
-# The option to not use instance_eval for a block with no arguments will be removed in Sequel 3.0.
-# If you have any virtual row blocks that you don't want to use instance_eval for,
-# make sure the blocks have block arguments.
+# You can set the SEQUEL_NO_CORE_EXTENSIONS constant or environment variable to have
+# Sequel not extend the core classes.
 module Sequel
   @convert_tinyint_to_bool = true
   @convert_two_digit_years = true
   @datetime_class = Time
-  @virtual_row_instance_eval = false
+  @virtual_row_instance_eval = true
   
   class << self
     attr_accessor :convert_tinyint_to_bool, :convert_two_digit_years, :datetime_class, :virtual_row_instance_eval
@@ -210,9 +192,10 @@ module Sequel
 
   private_class_method :adapter_method, :def_adapter_method
   
-  require(%w"metaprogramming sql core_sql connection_pool exceptions dataset database version deprecated")
+  require(%w"metaprogramming sql connection_pool exceptions dataset database version")
   require(%w"schema_generator schema_methods schema_sql", 'database')
   require(%w"convenience graph prepared_statements sql", 'dataset')
+  require('core_sql') if !defined?(::SEQUEL_NO_CORE_EXTENSIONS) && !ENV.has_key?('SEQUEL_NO_CORE_EXTENSIONS')
 
   # Add the database adapter class methods to Sequel via metaprogramming
   def_adapter_method(*Database::ADAPTERS)

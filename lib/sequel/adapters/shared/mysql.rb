@@ -175,22 +175,10 @@ module Sequel
       end
       
       # MySQL supports ORDER and LIMIT clauses in DELETE statements.
-      def delete_sql(opts = (defarg=true;nil))
-        if defarg
-          sql = super()
-          opts = @opts
-        else
-          sql = super
-          opts = opts ? @opts.merge(opts) : @opts
-        end
-
-        if order = opts[:order]
-          sql << " ORDER BY #{expression_list(order)}"
-        end
-        if limit = opts[:limit]
-          sql << " LIMIT #{limit}"
-        end
-
+      def delete_sql
+        sql = super
+        sql << " ORDER BY #{expression_list(opts[:order])}" if opts[:order]
+        sql << " LIMIT #{opts[:limit]}" if opts[:limit]
         sql
       end
 
@@ -243,23 +231,24 @@ module Sequel
         end
       end
       
-      # Sets up the the multi_insert method to skips errors.
+      # Sets up multi_insert or import to use INSERT IGNORE.
       # Useful if you have a unique key and want to just skip
       # inserting rows that violate the unique key restriction.
       #
       # Example:
       #
-      # dataset.multi_insert_ignore.multi_insert([:name,:value],
-      #   [['a',1],['b',2]])
+      # dataset.insert_ignore.multi_insert(
+      #  [{:name => 'a', :value => 1}, {:name => 'b', :value => 2}]
+      # )
       #
       # INSERT IGNORE INTO tablename (name, value) VALUES (a, 1), (b, 2)
       #
-      def multi_insert_ignore
-        clone(:multi_insert_ignore=>true)
+      def insert_ignore
+        clone(:insert_ignore=>true)
       end
       
-      # Sets up the multi_insert method do UPDATE on DUPLICATE KEY
-      # errors.  If you pass no arguments, ALL fields will be
+      # Sets up multi_insert or import to use ON DUPLICATE KEY UPDATE
+      # If you pass no arguments, ALL fields will be
       # updated with the new values.  If you pass the fields you
       # want then ONLY those field will be updated.
       #
@@ -268,30 +257,32 @@ module Sequel
       #
       # Examples:
       #
-      # dataset.multi_insert_update.multi_insert([:name,:value],
-      #   [['a',1],['b',2]])
+      # dataset.on_duplicate_key_update.multi_insert(
+      #  [{:name => 'a', :value => 1}, {:name => 'b', :value => 2}]
+      # )
       #
       # INSERT INTO tablename (name, value) VALUES (a, 1), (b, 2)
       # ON DUPLICATE KEY UPDATE name=VALUES(name), value=VALUES(value)
       #
-      # dataset.multi_insert_update(:value).multi_insert([:name,:value],
-      #   [['a',1],['b',2]])
+      # dataset.on_duplicate_key_update(:value).multi_insert(
+      #  [{:name => 'a', :value => 1}, {:name => 'b', :value => 2}]
+      # )
       #
       # INSERT INTO tablename (name, value) VALUES (a, 1), (b, 2)
       # ON DUPLICATE KEY UPDATE value=VALUES(value)
       #
-      def multi_insert_update(*args)
-        clone(:multi_insert_update => args)
+      def on_duplicate_key_update(*args)
+        clone(:on_duplicate_key_update => args)
       end
       
       # MySQL specific syntax for inserting multiple values at once.
       def multi_insert_sql(columns, values)
-        if update_cols = opts[:multi_insert_update]
+        if update_cols = opts[:on_duplicate_key_update]
           update_cols = columns if update_cols.empty?
           update_string = update_cols.map{|c| "#{quote_identifier(c)}=VALUES(#{quote_identifier(c)})"}.join(COMMA_SEPARATOR)
         end
         values = values.map {|r| literal(Array(r))}.join(COMMA_SEPARATOR)
-        ["INSERT#{' IGNORE' if opts[:multi_insert_ignore]} INTO #{source_list(@opts[:from])} (#{identifier_list(columns)}) VALUES #{values}#{" ON DUPLICATE KEY UPDATE #{update_string}" if update_string}"]
+        ["INSERT#{' IGNORE' if opts[:insert_ignore]} INTO #{source_list(@opts[:from])} (#{identifier_list(columns)}) VALUES #{values}#{" ON DUPLICATE KEY UPDATE #{update_string}" if update_string}"]
       end
       
       # MySQL uses the nonstandard ` (backtick) for quoting identifiers.
@@ -308,11 +299,6 @@ module Sequel
         else
           values = values[0] if values.size == 1
           
-          # if hash or array with keys we need to transform the values
-          if @transform && (values.is_a?(Hash) || (values.is_a?(Array) && values.keys))
-            values = transform_save(values)
-          end
-
           case values
           when Array
             if values.empty?
@@ -341,22 +327,10 @@ module Sequel
       end
       
       # MySQL supports ORDER and LIMIT clauses in UPDATE statements.
-      def update_sql(values, opts = (defarg=true;nil))
-        if defarg
-          sql = super(values)
-          opts = @opts
-        else
-          sql = super
-          opts = opts ? @opts.merge(opts) : @opts
-        end
-
-        if order = opts[:order]
-          sql << " ORDER BY #{expression_list(order)}"
-        end
-        if limit = opts[:limit]
-          sql << " LIMIT #{limit}"
-        end
-
+      def update_sql(values)
+        sql = super
+        sql << " ORDER BY #{expression_list(opts[:order])}" if opts[:order]
+        sql << " LIMIT #{opts[:limit]}" if opts[:limit]
         sql
       end
 

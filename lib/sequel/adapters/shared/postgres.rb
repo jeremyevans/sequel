@@ -326,7 +326,7 @@ module Sequel
       # * :schema - The schema to search (default_schema by default)
       # * :server - The server to use
       def tables(opts={})
-        ds = self[:pg_class].filter(:relkind=>'r').select(:relname).exclude(:relname.like(SYSTEM_TABLE_REGEXP)).server(opts[:server])
+        ds = self[:pg_class].filter(:relkind=>'r').select(:relname).exclude(SQL::StringExpression.like(:relname, SYSTEM_TABLE_REGEXP)).server(opts[:server])
         ds.join!(:pg_namespace, :oid=>:relnamespace, :nspname=>(opts[:schema]||default_schema).to_s) if opts[:schema] || default_schema
         ds.identifier_input_method = nil
         ds.identifier_output_method = nil
@@ -338,13 +338,9 @@ module Sequel
       # To use a savepoint instead of reusing the current transaction,
       # use the :savepoint=>true option.
       def transaction(opts={})
-        unless opts.is_a?(Hash)
-          Deprecation.deprecate('Passing an argument other than a Hash to Database#transaction', "Use DB.transaction(:server=>#{opts.inspect})") 
-          opts = {:server=>opts}
-        end
         synchronize(opts[:server]) do |conn|
           return yield(conn) if @transactions.include?(Thread.current) and !opts[:savepoint]
-          conn.transaction_depth = 0 if conn.transaction_depth.nil?
+          conn.transaction_depth ||= 0
           if conn.transaction_depth > 0
             log_info(SQL_SAVEPOINT % conn.transaction_depth)
             conn.execute(SQL_SAVEPOINT % conn.transaction_depth)
@@ -363,18 +359,19 @@ module Sequel
             else
               log_info(SQL_ROLLBACK)
               conn.execute(SQL_ROLLBACK) rescue nil
+              @transactions.delete(Thread.current)
             end
             transaction_error(e, *CONVERTED_EXCEPTIONS)
           ensure
             unless e
               begin
-                if conn.transaction_depth < 2
+                if conn.transaction_depth > 1
+                  log_info(SQL_RELEASE_SAVEPOINT % [conn.transaction_depth - 1])
+                  conn.execute(SQL_RELEASE_SAVEPOINT % [conn.transaction_depth - 1])
+                else
                   log_info(SQL_COMMIT)
                   conn.execute(SQL_COMMIT)
                   @transactions.delete(Thread.current)
-                else
-                  log_info(SQL_RELEASE_SAVEPOINT % [conn.transaction_depth - 1])
-                  conn.execute(SQL_RELEASE_SAVEPOINT % [conn.transaction_depth - 1])
                 end
               rescue => e
                 log_info(e.message)

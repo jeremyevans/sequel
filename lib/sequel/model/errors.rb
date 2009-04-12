@@ -3,6 +3,8 @@ module Sequel
     # Errors represents validation errors, a simple hash subclass
     # with a few convenience methods.
     class Errors < ::Hash
+      ATTRIBUTE_JOINER = ' and '
+
       # Assign an array of messages for each attribute on access
       def initialize
         super{|h,k| h[k] = []}
@@ -15,14 +17,14 @@ module Sequel
 
       # Return the total number of error messages.
       def count
-        full_messages.length
+        values.inject(0){|m, v| m + v.length}
       end
       
       # Returns an array of fully-formatted error messages.
       def full_messages
         inject([]) do |m, kv| 
           att, errors = *kv
-          errors.each {|e| m << "#{Array(att).join(' and ')} #{e}"}
+          errors.each {|e| m << "#{Array(att).join(ATTRIBUTE_JOINER)} #{e}"}
           m
         end
       end

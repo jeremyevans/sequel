@@ -32,7 +32,6 @@ class String
     #   clear :all
     #   clear :plurals
     def self.clear(scope = :all)
-      Sequel::Inflections.clear(scope)
       case scope
       when :all
         @plurals, @singulars, @uncountables = [], [], []
@@ -48,7 +47,6 @@ class String
     #   irregular 'octopus', 'octopi'
     #   irregular 'person', 'people'
     def self.irregular(singular, plural)
-      Sequel::Inflections.irregular(singular, plural)
       plural(Regexp.new("(#{singular[0,1]})#{singular[1..-1]}$", "i"), '\1' + plural[1..-1])
       singular(Regexp.new("(#{plural[0,1]})#{plural[1..-1]}$", "i"), '\1' + singular[1..-1])
     end
@@ -59,7 +57,6 @@ class String
     # Example:
     #   plural(/(x|ch|ss|sh)$/i, '\1es')
     def self.plural(rule, replacement)
-      Sequel::Inflections.plural(rule, replacement)
       @plurals.insert(0, [rule, replacement])
     end
 
@@ -69,7 +66,6 @@ class String
     # Example:
     #   singular(/([^aeiouy]|qu)ies$/i, '\1y') 
     def self.singular(rule, replacement)
-      Sequel::Inflections.singular(rule, replacement)
       @singulars.insert(0, [rule, replacement])
     end
 
@@ -80,7 +76,6 @@ class String
     #   uncountable "money", "information"
     #   uncountable %w( money information rice )
     def self.uncountable(*words)
-      Sequel::Inflections.uncountable(*words)
       (@uncountables << words).flatten!
     end
 

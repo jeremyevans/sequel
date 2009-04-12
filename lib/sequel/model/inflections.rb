@@ -6,10 +6,11 @@ module Sequel
     Inflections
   end
 
-  # This module acts as a singleton returned/yielded by String.inflections,
-  # which is used to override or specify additional inflection rules. Examples:
+  # This module acts as a singleton returned/yielded by Sequel.inflections,
+  # which is used to override or specify additional inflection rules
+  # for Sequel. Examples:
   #
-  #   String.inflections do |inflect|
+  #   Sequel.inflections do |inflect|
   #     inflect.plural /^(ox)$/i, '\1\2en'
   #     inflect.singular /^(ox)en/i, '\1'
   #
@@ -22,6 +23,19 @@ module Sequel
   # pluralization and singularization rules that is runs. This guarantees that your rules run before any of the rules that may
   # already have been loaded.
   module Inflections
+    CAMELIZE_CONVERT_REGEXP = /(^|_)(.)/.freeze
+    CAMELIZE_MODULE_REGEXP = /\/(.?)/.freeze
+    DASH = '-'.freeze
+    DEMODULIZE_CONVERT_REGEXP = /^.*::/.freeze
+    EMPTY_STRING= ''.freeze
+    SLASH = '/'.freeze
+    VALID_CONSTANT_NAME_REGEXP = /\A(?:::)?([A-Z]\w*(?:::[A-Z]\w*)*)\z/.freeze
+    UNDERSCORE = '_'.freeze
+    UNDERSCORE_CONVERT_REGEXP1 = /([A-Z]+)([A-Z][a-z])/.freeze
+    UNDERSCORE_CONVERT_REGEXP2 = /([a-z\d])([A-Z])/.freeze
+    UNDERSCORE_CONVERT_REPLACE = '\1_\2'.freeze
+    UNDERSCORE_MODULE_REGEXP = /::/.freeze
+
     @plurals, @singulars, @uncountables = [], [], []
 
     class << self
@@ -83,8 +97,6 @@ module Sequel
     end
 
     # Setup the default inflections
-    # Commented out until the deprecated inflector is removed
-=begin
     plural(/$/, 's')
     plural(/s$/i, 's')
     plural(/(ax|test)is$/i, '\1es')
@@ -135,80 +147,47 @@ module Sequel
     irregular('move', 'moves')
 
     uncountable(%w(equipment information rice money species series fish sheep))
-=end
+
     private
 
-    # By default, camelize converts the string to UpperCamelCase. If the argument to camelize
-    # is set to :lower then camelize produces lowerCamelCase.
-    #
-    # camelize will also convert '/' to '::' which is useful for converting paths to namespaces
-    #
-    # Examples
-    #   "active_record".camelize #=> "ActiveRecord"
-    #   "active_record".camelize(:lower) #=> "activeRecord"
-    #   "active_record/errors".camelize #=> "ActiveRecord::Errors"
-    #   "active_record/errors".camelize(:lower) #=> "activeRecord::Errors"
+    # Convert the given string to CamelCase.  Will also convert '/' to '::' which is useful for converting paths to namespaces.
     def camelize(s)
       s = s.to_s
-      # return s.camelize if s.respond_to?(:camelize)
-      s = s.gsub(/\/(.?)/){|x| "::#{x[-1..-1].upcase unless x == '/'}"}.gsub(/(^|_)(.)/){|x| x[-1..-1].upcase}
+      return s.camelize if s.respond_to?(:camelize)
+      s = s.gsub(CAMELIZE_MODULE_REGEXP){|x| "::#{x[-1..-1].upcase unless x == SLASH}"}.gsub(CAMELIZE_CONVERT_REGEXP){|x| x[-1..-1].upcase}
       s
     end
   
-    # Constantize tries to find a declared constant with the name specified
+    # Tries to find a declared constant with the name specified
     # in the string. It raises a NameError when the name is not in CamelCase
     # or is not initialized.
-    #
-    # Examples
-    #   "Module".constantize #=> Module
-    #   "Class".constantize #=> Class
     def constantize(s)
       s = s.to_s
-      # return s.constantize if s.respond_to?(:constantize)
-      raise(NameError, "#{inspect} is not a valid constant name!") unless m = /\A(?:::)?([A-Z]\w*(?:::[A-Z]\w*)*)\z/.match(s.to_s)
+      return s.constantize if s.respond_to?(:constantize)
+      raise(NameError, "#{inspect} is not a valid constant name!") unless m = VALID_CONSTANT_NAME_REGEXP.match(s.to_s)
       Object.module_eval("::#{m[1]}", __FILE__, __LINE__)
     end
   
     # Removes the module part from the expression in the string
-    #
-    # Examples
-    #   "ActiveRecord::CoreExtensions::String::Inflections".demodulize #=> "Inflections"
-    #   "Inflections".demodulize #=> "Inflections"
     def demodulize(s)
       s = s.to_s
-      # return s.demodulize if s.respond_to?(:demodulize)
-      s.gsub(/^.*::/, '')
+      return s.demodulize if s.respond_to?(:demodulize)
+      s.gsub(DEMODULIZE_CONVERT_REGEXP, EMPTY_STRING)
     end
   
     # Returns the plural form of the word in the string.
-    #
-    # Examples
-    #   "post".pluralize #=> "posts"
-    #   "octopus".pluralize #=> "octopi"
-    #   "sheep".pluralize #=> "sheep"
-    #   "words".pluralize #=> "words"
-    #   "the blue mailman".pluralize #=> "the blue mailmen"
-    #   "CamelOctopus".pluralize #=> "CamelOctopi"
     def pluralize(s)
       s = s.to_s
-      # return s.pluralize if s.respond_to?(:pluralize)
+      return s.pluralize if s.respond_to?(:pluralize)
       result = s.dup
       Inflections.plurals.each{|(rule, replacement)| break if result.gsub!(rule, replacement)} unless Inflections.uncountables.include?(s.downcase)
       result
     end
   
     # The reverse of pluralize, returns the singular form of a word in a string.
-    #
-    # Examples
-    #   "posts".singularize #=> "post"
-    #   "octopi".singularize #=> "octopus"
-    #   "sheep".singluarize #=> "sheep"
-    #   "word".singluarize #=> "word"
-    #   "the blue mailmen".singularize #=> "the blue mailman"
-    #   "CamelOctopi".singularize #=> "CamelOctopus"
     def singularize(s)
       s = s.to_s
-      # return s.singularize if s.respond_to?(:singularize)
+      return s.singularize if s.respond_to?(:singularize)
       result = s.dup
       Inflections.singulars.each{|(rule, replacement)| break if result.gsub!(rule, replacement)} unless Inflections.uncountables.include?(s.downcase)
       result
@@ -216,15 +195,11 @@ module Sequel
   
     # The reverse of camelize. Makes an underscored form from the expression in the string.
     # Also changes '::' to '/' to convert namespaces to paths.
-    #
-    # Examples
-    #   "ActiveRecord".underscore #=> "active_record"
-    #   "ActiveRecord::Errors".underscore #=> active_record/errors
     def underscore(s)
       s = s.to_s
-      # return s.underscore if s.respond_to?(:underscore)
-      s.gsub(/::/, '/').gsub(/([A-Z]+)([A-Z][a-z])/,'\1_\2').
-        gsub(/([a-z\d])([A-Z])/,'\1_\2').tr("-", "_").downcase
+      return s.underscore if s.respond_to?(:underscore)
+      s.gsub(UNDERSCORE_MODULE_REGEXP, SLASH).gsub(UNDERSCORE_CONVERT_REGEXP1, UNDERSCORE_CONVERT_REPLACE).
+        gsub(UNDERSCORE_CONVERT_REGEXP2, UNDERSCORE_CONVERT_REPLACE).tr(DASH, UNDERSCORE).downcase
     end
   end
 end

@@ -51,17 +51,6 @@ module Sequel
     unfiltered union unordered where with_sql'.collect{|x| x.to_sym}
 
     NOTIMPL_MSG = "This method must be overridden in Sequel adapters".freeze
-    STOCK_TRANSFORMS = {
-      :marshal => [
-        # for backwards-compatibility we support also non-base64-encoded values.
-        proc {|v| Marshal.load(v.unpack('m')[0]) rescue Marshal.load(v)}, 
-        proc {|v| [Marshal.dump(v)].pack('m')}
-      ],
-      :yaml => [
-        proc {|v| YAML.load v if v}, 
-        proc {|v| v.to_yaml}
-      ]
-    }
 
     # The database that corresponds to this dataset
     attr_accessor :db
@@ -98,7 +87,6 @@ module Sequel
       @identifier_output_method = db.identifier_output_method if db.respond_to?(:identifier_output_method)
       @opts = opts || {}
       @row_proc = nil
-      @transform = nil
     end
     
     ### Class Methods ###
@@ -129,10 +117,9 @@ module Sequel
 
     # Returns an array with all records in the dataset. If a block is given,
     # the array is iterated over after all items have been loaded.
-    def all(opts = (defarg=true;nil), &block)
-      Deprecation.deprecate("Calling Dataset#all with an argument is deprecated and will raise an error in a future version.  Use dataset.clone(opts).all.") unless defarg
+    def all(&block)
       a = []
-      defarg ? each{|r| a << r} : each(opts){|r| a << r}
+      each{|r| a << r}
       post_load(a)
       a.each(&block) if block
       a
@@ -181,24 +168,21 @@ module Sequel
 
     # Deletes the records in the dataset.  The returned value is generally the
     # number of records deleted, but that is adapter dependent.
-    def delete(opts=(defarg=true;nil))
-      Deprecation.deprecate("Calling Dataset#delete with an argument is deprecated and will raise an error in a future version.  Use dataset.clone(opts).delete.") unless defarg
-      execute_dui(defarg ? delete_sql : delete_sql(opts))
+    def delete
+      execute_dui(delete_sql)
     end
     
     # Iterates over the records in the dataset as they are yielded from the
     # database adapter, and returns self.
-    def each(opts = (defarg=true;nil), &block)
-      Deprecation.deprecate("Calling Dataset#each with an argument is deprecated and will raise an error in a future version.  Use dataset.clone(opts).each.") unless defarg
-      if opts && opts.keys.any?{|o| COLUMN_CHANGE_OPTS.include?(o)}
-        prev_columns = @columns
-        begin
-          defarg ? _each(&block) : _each(opts, &block)
-        ensure
-          @columns = prev_columns
-        end
+    def each(&block)
+      if @opts[:graph]
+        graph_each(&block)
       else
-        defarg ? _each(&block) : _each(opts, &block)
+        if row_proc = @row_proc
+          fetch_rows(select_sql){|r| yield row_proc.call(r)}
+        else
+          fetch_rows(select_sql, &block)
+        end
       end
       self
     end
@@ -259,68 +243,10 @@ module Sequel
       clone(:overrides=>hash.merge(@opts[:overrides]||{}))
     end
 
-    # Sets a value transform which is used to convert values loaded and saved
-    # to/from the database. The transform should be supplied as a hash. Each
-    # value in the hash should be an array containing two proc objects - one
-    # for transforming loaded values, and one for transforming saved values.
-    # The following example demonstrates how to store Ruby objects in a dataset
-    # using Marshal serialization:
-    #
-    #   dataset.transform(:obj => [
-    #     proc {|v| Marshal.load(v)},
-    #     proc {|v| Marshal.dump(v)}
-    #   ])
-    #
-    #   dataset.insert_sql(:obj => 1234) #=>
-    #   "INSERT INTO items (obj) VALUES ('\004\bi\002\322\004')"
-    #
-    # Another form of using transform is by specifying stock transforms:
-    # 
-    #   dataset.transform(:obj => :marshal)
-    #
-    # The currently supported stock transforms are :marshal and :yaml.
-    def transform(t)
-      @transform = t
-      t.each do |k, v|
-        case v
-        when Array
-          if (v.size != 2) || !v.first.is_a?(Proc) && !v.last.is_a?(Proc)
-            raise Error::InvalidTransform, "Invalid transform specified"
-          end
-        else
-          unless v = STOCK_TRANSFORMS[v]
-            raise Error::InvalidTransform, "Invalid transform specified"
-          else
-            t[k] = v
-          end
-        end
-      end
-      self
-    end
-    
-    # Applies the value transform for data loaded from the database.
-    def transform_load(r)
-      r.inject({}) do |m, kv|
-        k, v = *kv
-        m[k] = (tt = @transform[k]) ? tt[0][v] : v
-        m
-      end
-    end
-    
-    # Applies the value transform for data saved to the database.
-    def transform_save(r)
-      r.inject({}) do |m, kv|
-        k, v = *kv
-        m[k] = (tt = @transform[k]) ? tt[1][v] : v
-        m
-      end
-    end
-    
     # Updates values for the dataset.  The returned value is generally the
     # number of rows updated, but that is adapter dependent.
-    def update(values={}, opts=(defarg=true;nil))
-      Deprecation.deprecate("Calling Dataset#update with an argument is deprecated and will raise an error in a future version.  Use dataset.clone(opts).update.") unless defarg
-      execute_dui(defarg ? update_sql(values) : update_sql(value, opts))
+    def update(values={})
+      execute_dui(update_sql(values))
     end
   
     # Add the mutation methods via metaprogramming
@@ -335,23 +261,6 @@ module Sequel
 
     private
     
-    # Runs #graph_each if graphing.  Otherwise, iterates through the records
-    # yielded by #fetch_rows, applying any row_proc or transform if necessary,
-    # and yielding the result.
-    def _each(opts=(defarg=true;nil), &block)
-      if @opts[:graph] and !(opts && opts[:graph] == false)
-        defarg ? graph_each(&block) : graph_each(opts, &block)
-      else
-        row_proc = @row_proc unless opts && opts[:naked]
-        transform = @transform
-        fetch_rows(defarg ? select_sql : select_sql(opts)) do |r|
-          r = transform_load(r) if transform
-          r = row_proc[r] if row_proc
-          yield r
-        end
-      end
-    end
-
     # Set the server to use to :default unless it is already set in the passed opts
     def default_server_opts(opts)
       {:server=>@opts[:server] || :default}.merge(opts)
@@ -406,10 +315,6 @@ module Sequel
     # VirtualRow instance.
     def virtual_row_block_call(block)
       return unless block
-      unless Sequel.virtual_row_instance_eval
-        Deprecation.deprecate('Using a VirtualRow block without an argument is deprecated, and its meaning will change in a future version.  Add a block argument to keep the old semantics, or set Sequel.virtual_row_instance_eval = true to use instance_eval for VirtualRow blocks without arguments.') unless block.arity == 1
-        return block.call(SQL::VirtualRow.new)
-      end
       case block.arity
       when -1, 0
         SQL::VirtualRow.new.instance_eval(&block)

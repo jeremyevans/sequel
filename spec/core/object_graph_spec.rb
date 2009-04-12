@@ -258,23 +258,15 @@ describe Sequel::Dataset, " graphing" do
     results.first.should == {:points=>{:z1=>2}, :lines=>{:z2=>3}}
   end
 
-  it "#graph_each should run the row_proc and transform for graphed datasets" do
+  it "#graph_each should run the row_proc for graphed datasets" do
     @ds1.row_proc = proc{|h| h.keys.each{|k| h[k] *= 2}; h}
     @ds2.row_proc = proc{|h| h.keys.each{|k| h[k] *= 3}; h}
-    @ds1.transform(:x=>[
-      proc{|v| 123},
-      proc{|v| 123}
-    ])
-    @ds2.transform(:x=>[
-      proc{|v| 321},
-      proc{|v| 321}
-    ])
     ds = @ds1.graph(@ds2, :x=>:id)
     def ds.fetch_rows(sql, &block)
       yield({:id=>1,:x=>2,:y=>3,:lines_id=>4,:lines_x=>5,:lines_y=>6,:graph_id=>7})
     end
     results = ds.all
     results.length.should == 1
-    results.first.should == {:points=>{:id=>2, :x=>246, :y=>6}, :lines=>{:id=>12, :x=>963, :y=>18, :graph_id=>21}}
+    results.first.should == {:points=>{:id=>2, :x=>4, :y=>6}, :lines=>{:id=>12, :x=>15, :y=>18, :graph_id=>21}}
   end
 end

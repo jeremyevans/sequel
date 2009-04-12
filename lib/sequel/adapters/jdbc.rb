@@ -197,10 +197,6 @@ module Sequel
       # databases.  Does not use the JDBC transaction methods, uses
       # SQL BEGIN/ROLLBACK/COMMIT statements instead.
       def transaction(opts={})
-        unless opts.is_a?(Hash)
-          Deprecation.deprecate('Passing an argument other than a Hash to Database#transaction', "Use DB.transaction(:server=>#{opts.inspect})") 
-          opts = {:server=>opts}
-        end
         synchronize(opts[:server]) do |conn|
           return yield(conn) if @transactions.include?(Thread.current)
           stmt = conn.createStatement
@@ -474,12 +470,5 @@ module Sequel
         end
       end
     end
-  end
-end
-
-class Java::JavaSQL::Timestamp
-  # Add a usec method in order to emulate Time values.
-  def usec
-    getNanos/1000
   end
 end
