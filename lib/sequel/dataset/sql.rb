@@ -605,6 +605,7 @@ module Sequel
     # quote the name with quoted_identifier.
     def quote_identifier(name)
       return name if name.is_a?(LiteralString)
+      name = name.value if name.is_a?(SQL::Identifier)
       name = input_identifier(name)
       name = quoted_identifier(name) if quote_identifiers?
       name
