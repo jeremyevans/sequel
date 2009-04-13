@@ -4,7 +4,7 @@ describe "Simple Dataset operations" do
   before do
     INTEGRATION_DB.create_table!(:items) do
       primary_key :id
-      integer :number
+      Integer :number
     end
     @ds = INTEGRATION_DB[:items]
     @ds.insert(:number=>10)
@@ -13,6 +13,15 @@ describe "Simple Dataset operations" do
   after do
     INTEGRATION_DB.drop_table(:items)
   end
+
+  specify "should support sequential primary keys" do
+    @ds << {:number=>20}
+    @ds << {:number=>30}
+    @ds.order(:number).all.should == [
+      {:id => 1, :number=>10},
+      {:id => 2, :number=>20},
+      {:id => 3, :number=>30} ]   
+  end 
 
   specify "should insert with a primary key specified" do
     @ds.insert(:id=>100, :number=>20)
@@ -53,6 +62,108 @@ describe "Simple Dataset operations" do
     @ds.select(:id___x, :number___n).first.should == {:x=>1, :n=>10}
     sqls_should_be("SELECT id AS 'x', number AS 'n' FROM items LIMIT 1")
   end
+end
+
+describe Sequel::Dataset do
+  before do
+    INTEGRATION_DB.create_table!(:test) do
+      String :name
+      Integer :value
+    end
+    @d = INTEGRATION_DB[:test]
+    clear_sqls
+  end
+  after do
+    INTEGRATION_DB.drop_table(:test)
+  end
+
+  specify "should return the correct record count" do
+    @d.count.should == 0
+    @d << {:name => 'abc', :value => 123}
+    @d << {:name => 'abc', :value => 456}
+    @d << {:name => 'def', :value => 789}
+    @d.count.should == 3
+  end
+
+  specify "should return the correct records" do
+    @d.to_a.should == []
+    @d << {:name => 'abc', :value => 123}
+    @d << {:name => 'abc', :value => 456}
+    @d << {:name => 'def', :value => 789}
+
+    @d.order(:value).to_a.should == [
+      {:name => 'abc', :value => 123},
+      {:name => 'abc', :value => 456},
+      {:name => 'def', :value => 789}
+    ]
+  end
+
+  specify "should update records correctly" do
+    @d << {:name => 'abc', :value => 123}
+    @d << {:name => 'abc', :value => 456}
+    @d << {:name => 'def', :value => 789}
+    @d.filter(:name => 'abc').update(:value => 530)
+    @d[:name => 'def'][:value].should == 789
+    @d.filter(:value => 530).count.should == 2
+  end
+
+  specify "should delete records correctly" do
+    @d << {:name => 'abc', :value => 123}
+    @d << {:name => 'abc', :value => 456}
+    @d << {:name => 'def', :value => 789}
+    @d.filter(:name => 'abc').delete
+    @d.count.should == 1
+    @d.first[:name].should == 'def'
+  end
+
+  specify "should be able to literalize booleans" do
+    proc {@d.literal(true)}.should_not raise_error
+    proc {@d.literal(false)}.should_not raise_error
+  end
+
+  specify "should correctly escape strings" do
+    INTEGRATION_DB.get("\\dingo".as(:a)) == "\\dingo"
+  end
+
+  specify "should correctly escape strings with quotes" do
+    INTEGRATION_DB.get("\\'dingo".as(:a)) == "\\'dingo"
+  end
+
+  specify "should properly escape binary data" do
+    INTEGRATION_DB.get("\1\2\3".to_sequel_blob.as(:a)) == "\1\2\3"
+  end
+end
+
+context "An SQLite dataset" do
+  before do
+    INTEGRATION_DB.create_table! :items do
+      primary_key :id 
+      Integer :value
+    end 
+    @d = INTEGRATION_DB[:items]
+    @d << {:value => 123}
+    @d << {:value => 456}
+    @d << {:value => 789}
+  end 
+  after do
+    INTEGRATION_DB.drop_table(:items)
+  end 
+  
+  specify "should correctly return avg" do
+    @d.avg(:value).to_i.should == 456
+  end 
+  
+  specify "should correctly return sum" do
+    @d.sum(:value).to_i.should == 1368
+  end 
+  
+  specify "should correctly return max" do
+    @d.max(:value).to_i.should == 789 
+  end 
+  
+  specify "should correctly return min" do
+    @d.min(:value).to_i.should == 123 
+  end 
 end
 
 describe "Simple Dataset operations" do

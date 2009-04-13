@@ -67,70 +67,6 @@ context "An SQLite database" do
     proc {@db.temp_store = :invalid}.should raise_error(Sequel::Error)
   end
   
-  specify "should be able to execute transactions" do
-    @db.transaction do
-      @db.create_table!(:t) {text :name}
-    end
-    
-    @db.tables.should include(:t)
-
-    proc {@db.transaction do
-      @db.create_table!(:u) {text :name}
-      raise ArgumentError
-    end}.should raise_error(ArgumentError)
-    # no commit
-    @db.tables.should_not include(:u)
-
-    proc {@db.transaction do
-      @db.create_table!(:v) {text :name}
-      raise Sequel::Rollback
-    end}.should_not raise_error
-    # no commit
-    @db.tables.should_not include(:r)
-  end
-
-  specify "should support nested transactions" do
-    @db.transaction do
-      @db.transaction do
-        @db.create_table!(:t) {text :name}
-      end
-    end
-    
-    @db.tables.should include(:t)
-
-    proc {@db.transaction do
-      @db.create_table!(:v) {text :name}
-      @db.transaction do
-        raise Sequel::Rollback # should roll back the top-level transaction
-      end
-    end}.should_not raise_error
-    # no commit
-    @db.tables.should_not include(:v)
-  end
-  
-  specify "should handle returning inside of transaction by committing" do
-    @db.create_table!(:items2){text :name}
-    def @db.ret_commit
-      transaction do
-        self[:items2] << {:name => 'abc'}
-        return
-        self[:items2] << {:name => 'd'}
-      end
-    end
-    @db[:items2].count.should == 0
-    @db.ret_commit
-    @db[:items2].count.should == 1
-    @db.ret_commit
-    @db[:items2].count.should == 2
-    proc do
-      @db.transaction do
-        raise Interrupt, 'asdf'
-      end
-    end.should raise_error(Interrupt)
-
-    @db[:items2].count.should == 2
-  end
-
   specify "should support timestamps and datetimes and respect datetime_class" do
     @db.create_table!(:time){timestamp :t; datetime :d}
     t1 = Time.at(1)
@@ -156,15 +92,6 @@ context "An SQLite database" do
     ]
   end
   
-  specify "should catch invalid SQL errors and raise them as Error" do
-    proc {@db.execute 'blah blah'}.should raise_error(Sequel::Error)
-    proc {@db.execute_insert 'blah blah'}.should raise_error(Sequel::Error)
-  end
-  
-  specify "should not swallow non-SQLite based exceptions" do
-    proc {@db.pool.hold{raise Interrupt, "test"}}.should raise_error(Interrupt)
-  end
-
   specify "should correctly parse the schema" do
     @db.create_table!(:time2) {timestamp :t}
     @db.schema(:time2, :reload=>true).should == [[:t, {:type=>:datetime, :allow_null=>true, :default=>nil, :db_type=>"timestamp", :primary_key=>false}]]
@@ -173,61 +100,9 @@ end
 
 context "An SQLite dataset" do
   before do
-    SQLITE_DB.create_table! :items do
-      integer :id, :primary_key => true, :auto_increment => true
-      text :name
-      float :value
-    end
     @d = SQLITE_DB[:items]
-    @d.delete # remove all records
   end
   
-  specify "should return the correct records" do
-    @d.to_a.should == []
-    @d << {:name => 'abc', :value => 1.23}
-    @d << {:name => 'abc', :value => 4.56}
-    @d << {:name => 'def', :value => 7.89}
-    @d.select(:name, :value).to_a.sort_by {|h| h[:value]}.should == [
-      {:name => 'abc', :value => 1.23},
-      {:name => 'abc', :value => 4.56},
-      {:name => 'def', :value => 7.89}
-    ]
-  end
-  
-  specify "should return the correct record count" do
-    @d.count.should == 0
-    @d << {:name => 'abc', :value => 1.23}
-    @d << {:name => 'abc', :value => 4.56}
-    @d << {:name => 'def', :value => 7.89}
-    @d.count.should == 3
-  end
-
-  specify "should return the last inserted id when inserting records" do
-    id = @d << {:name => 'abc', :value => 1.23}
-    id.should == @d.first[:id]
-  end
-  
-  specify "should update records correctly" do
-    @d << {:name => 'abc', :value => 1.23}
-    @d << {:name => 'abc', :value => 4.56}
-    @d << {:name => 'def', :value => 7.89}
-    @d.filter(:name => 'abc').update(:value => 5.3)
-    
-    # the third record should stay the same
-    @d[:name => 'def'][:value].should == 7.89
-    @d.filter(:value => 5.3).count.should == 2
-  end
-  
-  specify "should delete records correctly" do
-    @d << {:name => 'abc', :value => 1.23}
-    @d << {:name => 'abc', :value => 4.56}
-    @d << {:name => 'def', :value => 7.89}
-    @d.filter(:name => 'abc').delete
-    
-    @d.count.should == 1
-    @d.first[:name].should == 'def'
-  end
-
   specify "should handle string pattern matches correctly" do
     @d.literal(:x.like('a')).should == "(x LIKE 'a')"
     @d.literal(~:x.like('a')).should == "NOT (x LIKE 'a')"
@@ -283,43 +158,12 @@ context "An SQLite dataset AS clause" do
   end
 end
 
-context "An SQLite dataset" do
-  before do
-    SQLITE_DB.create_table! :items do
-      integer :id, :primary_key => true, :auto_increment => true
-      text :name
-      float :value
-    end
-    @d = SQLITE_DB[:items]
-    @d.delete # remove all records
-    @d << {:name => 'abc', :value => 1.23}
-    @d << {:name => 'def', :value => 4.56}
-    @d << {:name => 'ghi', :value => 7.89}
-  end
-  
-  specify "should correctly return avg" do
-    @d.avg(:value).to_s.should == ((1.23 + 4.56 + 7.89) / 3).to_s
-  end
-  
-  specify "should correctly return sum" do
-    @d.sum(:value).to_s.should == (1.23 + 4.56 + 7.89).to_s
-  end
-  
-  specify "should correctly return max" do
-    @d.max(:value).to_s.should == 7.89.to_s
-  end
-  
-  specify "should correctly return min" do
-    @d.min(:value).to_s.should == 1.23.to_s
-  end
-end
-
 context "SQLite::Dataset#delete" do
   before do
     SQLITE_DB.create_table! :items do
-      integer :id, :primary_key => true, :auto_increment => true
-      text :name
-      float :value
+      primary_key :id
+      String :name
+      Float :value
     end
     @d = SQLITE_DB[:items]
     @d.delete # remove all records
@@ -349,9 +193,9 @@ end
 context "SQLite::Dataset#update" do
   before do
     SQLITE_DB.create_table! :items do
-      integer :id, :primary_key => true, :auto_increment => true
-      text :name
-      float :value
+      primary_key :id
+      String :name
+      Float :value
     end
     @d = SQLITE_DB[:items]
     @d.delete # remove all records
@@ -372,24 +216,22 @@ end
 context "SQLite dataset" do
   before do
     SQLITE_DB.create_table! :test do
-      integer :id, :primary_key => true, :auto_increment => true
-      text :name
-      float :value
+      primary_key :id
+      String :name
+      Float :value
     end
     SQLITE_DB.create_table! :items do
-      integer :id, :primary_key => true, :auto_increment => true
-      text :name
-      float :value
+      primary_key :id
+      String :name
+      Float :value
     end
     @d = SQLITE_DB[:items]
-    @d.delete # remove all records
     @d << {:name => 'abc', :value => 1.23}
     @d << {:name => 'def', :value => 4.56}
     @d << {:name => 'ghi', :value => 7.89}
   end
-  
   after do
-    SQLITE_DB.drop_table :test
+    SQLITE_DB.drop_table(:test, :items)
   end
   
   specify "should be able to insert from a subquery" do

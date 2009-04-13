@@ -31,23 +31,11 @@ context "A PostgreSQL database" do
     @db = POSTGRES_DB
   end
   
-  specify "should provide disconnect functionality" do
-    @db.tables
-    @db.pool.size.should == 1
-    @db.disconnect
-    @db.pool.size.should == 0
-  end
-  
   specify "should provide the server version" do
     @db.server_version.should > 70000
   end
 
-  specify "should raise Sequel::Error on error" do
-    proc{@db << "SELECT 1 + 'a'"}.should raise_error(Sequel::Error)
-  end
-
   specify "should correctly parse the schema" do
-    require 'logger'
     @db.schema(:test3, :reload=>true).should == [
       [:value, {:type=>:integer, :allow_null=>true, :default=>nil, :db_type=>"integer", :primary_key=>false}],
       [:time, {:type=>:datetime, :allow_null=>true, :default=>nil, :db_type=>"timestamp without time zone", :primary_key=>false}]
@@ -63,54 +51,6 @@ context "A PostgreSQL dataset" do
   before do
     @d = POSTGRES_DB[:test]
     @d.delete # remove all records
-  end
-  
-  specify "should return the correct record count" do
-    @d.count.should == 0
-    @d << {:name => 'abc', :value => 123}
-    @d << {:name => 'abc', :value => 456}
-    @d << {:name => 'def', :value => 789}
-    @d.count.should == 3
-  end
-  
-  specify "should return the correct records" do
-    @d.to_a.should == []
-    @d << {:name => 'abc', :value => 123}
-    @d << {:name => 'abc', :value => 456}
-    @d << {:name => 'def', :value => 789}
-
-    @d.order(:value).to_a.should == [
-      {:name => 'abc', :value => 123},
-      {:name => 'abc', :value => 456},
-      {:name => 'def', :value => 789}
-    ]
-  end
-  
-  specify "should update records correctly" do
-    @d << {:name => 'abc', :value => 123}
-    @d << {:name => 'abc', :value => 456}
-    @d << {:name => 'def', :value => 789}
-    @d.filter(:name => 'abc').update(:value => 530)
-    
-    # the third record should stay the same
-    # floating-point precision bullshit
-    @d[:name => 'def'][:value].should == 789
-    @d.filter(:value => 530).count.should == 2
-  end
-  
-  specify "should delete records correctly" do
-    @d << {:name => 'abc', :value => 123}
-    @d << {:name => 'abc', :value => 456}
-    @d << {:name => 'def', :value => 789}
-    @d.filter(:name => 'abc').delete
-    
-    @d.count.should == 1
-    @d.first[:name].should == 'def'
-  end
-  
-  specify "should be able to literalize booleans" do
-    proc {@d.literal(true)}.should_not raise_error
-    proc {@d.literal(false)}.should_not raise_error
   end
   
   specify "should quote columns and tables using double quotes if quoting identifiers" do
@@ -176,60 +116,6 @@ context "A PostgreSQL dataset" do
       'SELECT * FROM "test" ORDER BY "name" ASC, "test" DESC'
   end
   
-  specify "should support transactions" do
-    POSTGRES_DB.transaction do
-      @d << {:name => 'abc', :value => 1}
-    end
-
-    @d.count.should == 1
-  end
-  
-  specify "should have #transaction yield the connection" do
-    POSTGRES_DB.transaction do |conn|
-      conn.should_not == nil
-    end
-  end
-  
-  specify "should correctly rollback transactions" do
-    proc do
-      POSTGRES_DB.transaction do
-        @d << {:name => 'abc', :value => 1}
-        raise Interrupt, 'asdf'
-      end
-    end.should raise_error(Interrupt)
-
-    proc do
-      POSTGRES_DB.transaction do
-        @d << {:name => 'abc', :value => 1}
-        raise Sequel::Rollback
-      end
-    end.should_not raise_error
-
-    @d.count.should == 0
-  end
-  
-  specify "should handle returning inside of the block by committing" do
-    def POSTGRES_DB.ret_commit
-      transaction do
-        self[:test] << {:name => 'abc'}
-        return
-        self[:test] << {:name => 'd'}
-      end
-    end
-    @d.count.should == 0
-    POSTGRES_DB.ret_commit
-    @d.count.should == 1
-    POSTGRES_DB.ret_commit
-    @d.count.should == 2
-    proc do
-      POSTGRES_DB.transaction do
-        raise Interrupt, 'asdf'
-      end
-    end.should raise_error(Interrupt)
-
-    @d.count.should == 2
-  end
-
   specify "should support nested transactions through savepoints using the savepoint option" do
     POSTGRES_DB.transaction do
       @d << {:name => '1'}
@@ -259,33 +145,6 @@ context "A PostgreSQL dataset" do
     @d << {:name => 'bcd', :value => 2}
     @d.filter(:name => /bc/).count.should == 2
     @d.filter(:name => /^bc/).count.should == 1
-  end
-
-  specify "should correctly escape strings" do
-    POSTGRES_DB['SELECT ? AS a', "\\dingo"].get(:a) == "\\dingo"
-  end
-
-  specify "should correctly escape strings with quotes" do
-    POSTGRES_DB['SELECT ? AS a', "\\'dingo"].get(:a) == "\\'dingo"
-  end
-
-  specify "should properly escape binary data" do
-    POSTGRES_DB['SELECT ? AS a', "\1\2\3".to_sequel_blob].get(:a) == "\1\2\3"
-  end
-
-  specify "should retrieve binary data as Blob object" do
-    d = POSTGRES_DB[:test4]
-    d << {:name => '123', :value => "\1\2\3".to_sequel_blob}
-    retrieved_binary_value = d[:name => '123'][:value]
-    retrieved_binary_value.should be_a_kind_of(::Sequel::SQL::Blob)
-    retrieved_binary_value.should == "\1\2\3"
-    retrieved_binary_value = d[:value => "\1\2\3".to_sequel_blob][:value]
-    retrieved_binary_value.should be_a_kind_of(::Sequel::SQL::Blob)
-    retrieved_binary_value.should == "\1\2\3"
-  end
-
-  specify "should properly receive binary data" do
-    POSTGRES_DB['SELECT ?::bytea AS a', "a"].get(:a) == "a"
   end
 end
 
@@ -342,9 +201,6 @@ context "A PostgreSQL database" do
 end  
 
 context "A PostgreSQL database" do
-  before do
-  end
-  
   specify "should support fulltext indexes" do
     g = Sequel::Schema::Generator.new(POSTGRES_DB) do
       text :title

@@ -68,28 +68,6 @@ context "A MySQL database" do
     @db.server_version.should >= 40000
   end
 
-  specify "should support sequential primary keys" do
-    @db.create_table!(:with_pk) {primary_key :id; text :name}
-    @db[:with_pk] << {:name => 'abc'}
-    @db[:with_pk] << {:name => 'def'}
-    @db[:with_pk] << {:name => 'ghi'}
-    @db[:with_pk].order(:name).all.should == [
-      {:id => 1, :name => 'abc'},
-      {:id => 2, :name => 'def'},
-      {:id => 3, :name => 'ghi'}
-    ]
-  end
-  
-  specify "should provide disconnect functionality" do
-    @db.pool.size.should == 1
-    @db.disconnect
-    @db.pool.size.should == 0
-  end
-
-  specify "should convert Mysql::Errors to Sequel::Errors" do
-   proc{@db << "SELECT 1 + blah;"}.should raise_error(Sequel::Error)
-  end
-
   specify "should correctly parse the schema" do
     @db.schema(:booltest, :reload=>true).should == [[:value, {:type=>:boolean, :allow_null=>true, :primary_key=>false, :default=>nil, :db_type=>"tinyint(4)"}]]
     
@@ -103,54 +81,6 @@ context "A MySQL dataset" do
     @d = MYSQL_DB[:items]
     @d.delete # remove all records
     MYSQL_DB.sqls.clear
-  end
-  
-  specify "should return the correct record count" do
-    @d.count.should == 0
-    @d << {:name => 'abc', :value => 123}
-    @d << {:name => 'abc', :value => 456}
-    @d << {:name => 'def', :value => 789}
-    @d.count.should == 3
-  end
-  
-  specify "should return the correct records" do
-    @d.to_a.should == []
-    @d << {:name => 'abc', :value => 123}
-    @d << {:name => 'abc', :value => 456}
-    @d << {:name => 'def', :value => 789}
-
-    @d.order(:value).to_a.should == [
-      {:name => 'abc', :value => 123},
-      {:name => 'abc', :value => 456},
-      {:name => 'def', :value => 789}
-    ]
-  end
-  
-  specify "should update records correctly" do
-    @d << {:name => 'abc', :value => 123}
-    @d << {:name => 'abc', :value => 456}
-    @d << {:name => 'def', :value => 789}
-    @d.filter(:name => 'abc').update(:value => 530)
-    
-    # the third record should stay the same
-    # floating-point precision bullshit
-    @d[:name => 'def'][:value].should == 789
-    @d.filter(:value => 530).count.should == 2
-  end
-  
-  specify "should delete records correctly" do
-    @d << {:name => 'abc', :value => 123}
-    @d << {:name => 'abc', :value => 456}
-    @d << {:name => 'def', :value => 789}
-    @d.filter(:name => 'abc').delete
-    
-    @d.count.should == 1
-    @d.first[:name].should == 'def'
-  end
-  
-  specify "should be able to literalize booleans" do
-    proc {@d.literal(true)}.should_not raise_error
-    proc {@d.literal(false)}.should_not raise_error
   end
   
   specify "should quote columns and tables using back-ticks if quoting identifiers" do
@@ -221,37 +151,6 @@ context "A MySQL dataset" do
   specify "should support LIMIT clause in UPDATE statements" do
     @d.limit(10).update_sql(:value => 1).should == \
       'UPDATE items SET value = 1 LIMIT 10'
-  end
-  
-  specify "should support transactions" do
-    MYSQL_DB.transaction do
-      @d << {:name => 'abc', :value => 1}
-    end
-
-    @d.count.should == 1
-  end
-  
-  specify "should correctly rollback transactions" do
-    proc do
-      MYSQL_DB.transaction do
-        @d << {:name => 'abc'}
-        raise Interrupt, 'asdf'
-      end
-    end.should raise_error(Interrupt)
-
-    MYSQL_DB.sqls.should == [SQL_BEGIN, "INSERT INTO items (name) VALUES ('abc')", SQL_ROLLBACK]
-  end
-
-  specify "should handle returning inside of the block by committing" do
-    def MYSQL_DB.ret_commit
-      transaction do
-        self[:items] << {:name => 'abc'}
-        return
-        self[:items] << {:name => 'd'}
-      end
-    end
-    MYSQL_DB.ret_commit
-    MYSQL_DB.sqls.should == [SQL_BEGIN, "INSERT INTO items (name) VALUES ('abc')", SQL_COMMIT]
   end
   
   specify "should support regexps" do
@@ -548,8 +447,6 @@ end
   end
   
   specify "should handle multiple select statements at once" do
-    @db << 'DELETE FROM items; '
-    
     @db[:items].delete
     @db[:items].insert(:name => 'tutu', :value => 1234)
     @db["SELECT * FROM items; SELECT * FROM items"].all.should == \
