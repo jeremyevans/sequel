@@ -188,8 +188,13 @@ module Sequel
         super
       end
 
-      # MySQL specific full text search syntax.
+      # Adds full text filter
       def full_text_search(cols, terms, opts = {})
+        filter(full_text_sql(cols, terms, opts))
+      end
+      
+      # MySQL specific full text search syntax.
+      def full_text_sql(cols, terms, opts = {})
         mode = opts[:boolean] ? " IN BOOLEAN MODE" : ""
         s = if Array === terms
           if mode.empty?
@@ -200,7 +205,7 @@ module Sequel
         else
           "MATCH #{literal(Array(cols))} AGAINST (#{literal(terms)}#{mode})"
         end
-        filter(s)
+        s
       end
 
       # MySQL allows HAVING clause on ungrouped datasets.
