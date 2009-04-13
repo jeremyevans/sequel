@@ -697,7 +697,7 @@ describe "statistics associations" do
          group(:project_id).
          select{[project_id, sum(hours).as(hours)]}.
          all do |t|
-          p = kh[:id][t.values.delete(:project_id)].first
+          p = kh[:id][t.values.delete(:project_id).to_i].first
           p.associations[:ticket_hours] = t
          end
        end)  
