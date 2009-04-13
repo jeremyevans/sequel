@@ -1,5 +1,9 @@
 === HEAD
 
+* Add Dataset#full_text_sql to the MySQL adapter (dusty)
+
+* Fix schema type parsing of decimal types on MySQL (jeremyevans)
+
 * Make Dataset#quote_identifier work with SQL::Identifiers (jeremyevans)
 
 * Remove methods and features deprecated in 2.12.0 (jeremyevans)
