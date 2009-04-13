@@ -695,9 +695,9 @@ describe "statistics associations" do
         projects.each{|p| p.associations[:ticket_hours] = nil}
         Ticket.filter(:project_id=>kh[:id].keys).
          group(:project_id).
-         select{[project_id, sum(hours).as(hours)]}.
+         select{[project_id.as(project_id), sum(hours).as(hours)]}.
          all do |t|
-          p = kh[:id][t.values.delete(:project_id).to_i].first
+          p = kh[:id][t.values.delete(:project_id)].first
           p.associations[:ticket_hours] = t
          end
        end)  
