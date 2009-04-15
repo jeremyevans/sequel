@@ -1,5 +1,7 @@
 === HEAD
 
+* Add Amalgalite adapter (jeremyevans)
+
 * Remove Sequel::Metaprogramming#metaattr_accessor and metaattr_reader (jeremyevans)
 
 * Remove Dataset#irregular_function_sql (jeremyevans)
