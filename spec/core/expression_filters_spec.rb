@@ -202,6 +202,12 @@ context "Blockless Ruby Filters" do
     @d.l(:x => nil, :y => [1,2,3])[1...-1].split(' AND ').sort.should == ['(x IS NULL)', '(y IN (1, 2, 3))']
   end
   
+  it "should support sql_expr on hashes" do
+    @d.l({:x => 100, :y => 'a'}.sql_expr)[1...-1].split(' AND ').sort.should == ['(x = 100)', '(y = \'a\')']
+    @d.l({:x => true, :y => false}.sql_expr)[1...-1].split(' AND ').sort.should == ['(x IS TRUE)', '(y IS FALSE)']
+    @d.l({:x => nil, :y => [1,2,3]}.sql_expr)[1...-1].split(' AND ').sort.should == ['(x IS NULL)', '(y IN (1, 2, 3))']
+  end
+  
   it "should support sql_negate on hashes" do
     @d.l({:x => 100, :y => 'a'}.sql_negate)[1...-1].split(' AND ').sort.should == ['(x != 100)', '(y != \'a\')']
     @d.l({:x => true, :y => false}.sql_negate)[1...-1].split(' AND ').sort.should == ['(x IS NOT TRUE)', '(y IS NOT FALSE)']
@@ -224,6 +230,12 @@ context "Blockless Ruby Filters" do
     @d.l([[:x, 100],[:y, 'a']]).should == '((x = 100) AND (y = \'a\'))'
     @d.l([[:x, true], [:y, false]]).should == '((x IS TRUE) AND (y IS FALSE))'
     @d.l([[:x, nil], [:y, [1,2,3]]]).should == '((x IS NULL) AND (y IN (1, 2, 3)))'
+  end
+  
+  it "should support sql_expr on arrays with all two pairs" do
+    @d.l([[:x, 100],[:y, 'a']].sql_expr).should == '((x = 100) AND (y = \'a\'))'
+    @d.l([[:x, true], [:y, false]].sql_expr).should == '((x IS TRUE) AND (y IS FALSE))'
+    @d.l([[:x, nil], [:y, [1,2,3]]].sql_expr).should == '((x IS NULL) AND (y IN (1, 2, 3)))'
   end
   
   it "should support sql_negate on arrays with all two pairs" do

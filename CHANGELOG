@@ -1,5 +1,9 @@
 === HEAD
 
+* Remove Sequel::Metaprogramming#metaattr_accessor and metaattr_reader (jeremyevans)
+
+* Remove Dataset#irregular_function_sql (jeremyevans)
+
 * Add Dataset#full_text_sql to the MySQL adapter (dusty)
 
 * Fix schema type parsing of decimal types on MySQL (jeremyevans)

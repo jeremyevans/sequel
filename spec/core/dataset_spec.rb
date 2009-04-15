@@ -2560,10 +2560,9 @@ end
 context "Dataset prepared statements and bound variables " do
   before do
     @db = Sequel::Database.new
-    @db.send :metaattr_accessor, :sqls
-    @db.sqls = []
+    @db.meta_def(:sqls){@sqls||=[]}
     def @db.execute(sql, opts={})
-      @sqls << sql
+      sqls << sql
     end
     def @db.dataset
       ds = super()
@@ -2648,10 +2647,9 @@ end
 context Sequel::Dataset::UnnumberedArgumentMapper do
   before do
     @db = Sequel::Database.new
-    @db.send :metaattr_accessor, :sqls
-    @db.sqls = []
+    @db.meta_def(:sqls){@sqls||=[]}
     def @db.execute(sql, opts={})
-      @sqls << [sql, *opts[:arguments]]
+      sqls << [sql, *opts[:arguments]]
     end
     @ds = @db[:items].filter(:num=>:$n)
     def @ds.fetch_rows(sql, &block)

@@ -6,29 +6,35 @@ describe "Model attribute setters" do
     MODEL_DB.reset
 
     @c = Class.new(Sequel::Model(:items)) do
-      columns :id, :x, :y
+      columns :id, :x, :y, :"x y"
     end
+    @o = @c.new
   end
 
   it "should mark the column value as changed" do
-    o = @c.new
-    o.changed_columns.should == []
+    @o.changed_columns.should == []
 
-    o.x = 2
-    o.changed_columns.should == [:x]
+    @o.x = 2
+    @o.changed_columns.should == [:x]
 
-    o.y = 3
-    o.changed_columns.should == [:x, :y]
+    @o.y = 3
+    @o.changed_columns.should == [:x, :y]
 
-    o.changed_columns.clear
+    @o.changed_columns.clear
 
-    o[:x] = 2
-    o.changed_columns.should == [:x]
+    @o[:x] = 2
+    @o.changed_columns.should == [:x]
 
-    o[:y] = 3
-    o.changed_columns.should == [:x, :y]
+    @o[:y] = 3
+    @o.changed_columns.should == [:x, :y]
   end
 
+  it "should have columns that can't be called like normal ruby methods" do
+    @o.send(:"x y=", 3)
+    @o.changed_columns.should == [:"x y"]
+    @o.values.should == {:"x y"=>3}
+    @o.send(:"x y").should == 3
+  end
 end
 
 describe Sequel::Model, "dataset" do
@@ -367,11 +373,6 @@ describe Sequel::Model, ".[] optimization" do
     Class.new(@c).simple_table.should == nil
     @c.instance_variable_set(:@simple_table, "'b'")
     Class.new(@c).simple_table.should == "'b'"
-  end
-
-  specify "should have simple_table = nil if inheriting and sti_key is set" do
-    @c.plugin :single_table_inheritance, :x
-    Class.new(@c).simple_table.should == nil
   end
 
   it "should use Dataset#with_sql if simple_table and simple_pk are true" do
