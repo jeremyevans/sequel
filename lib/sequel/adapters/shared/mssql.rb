@@ -38,7 +38,7 @@ module Sequel
       
       # Use mssql specific syntax for create table for temporary table
       def create_table_sql_list(name, columns, indexes = nil, options = {})
-        sql = ["CREATE TABLE #{TEMPORARY if options[:temporary]}#{quote_schema_table(name)} (#{column_list_sql(columns)})"]
+        sql = ["CREATE TABLE #{temporary_table_sql if options[:temporary]}#{quote_schema_table(name)} (#{column_list_sql(columns)})"]
         sql.concat(index_list_sql_list(name, indexes)) if indexes && !indexes.empty?
         sql
       end
