@@ -603,3 +603,47 @@ name, with no duplicates?
         records.each{|r| r.associations[:songs].uniq!}
       end)
   end
+
+=== Statistics Associations (Sum of Associated Table Column)
+
+In addition to getting associated records, you can use Sequel's association support
+to get aggregate information for columns in associated tables (sums, averages, etc.).
+
+Let's say you have a database with projects and tickets.  A project can have many
+tickets, and each ticket has a number of hours associated with it.  You can use the
+association support to create a Project association that gives the sum of hours for all
+associated tickets.
+
+
+  class Project < Sequel::Model
+    one_to_many :tickets
+    many_to_one :ticket_hours, :read_only=>true, :key=>:id,
+     :dataset=>proc{Ticket.filter(:project_id=>id).select{sum(hours).as(hours)}},
+     :eager_loader=>(proc do |kh, projects, a|
+      projects.each{|p| p.associations[:ticket_hours] = nil}
+      Ticket.filter(:project_id=>kh[:id].keys).
+       group(:project_id).
+       select{[project_id, sum(hours).as(hours)]}.
+       all do |t|
+        p = kh[:id][t.values.delete(:project_id)].first
+        p.associations[:ticket_hours] = t
+       end
+     end)
+    # The association method returns a Ticket object with a single aggregate
+    # sum-of-hours value, but you want it to return an Integer/Float of just the
+    # sum of hours, so you call super and return just the sum-of-hours value.
+    # This works for both lazy loading and eager loading.
+    def ticket_hours
+      if s = super
+        s[:hours]
+      end
+    end
+  end
+  class Ticket < Sequel::Model
+    many_to_one :project
+  end
+
+Note that it is often better to use a sum cache instead of this approach.  You can implement
+a sum cache using before or after save and delete hooks, or using a database trigger
+(the preferred method if you only have to support one database and that database supports
+triggers).

@@ -53,10 +53,13 @@ module Sequel
     #     index :title
     #   end
     #
+    # Options:
+    # * :temp - Create the table as a temporary table.
+    #
     # See Schema::Generator.
     def create_table(name, options={}, &block)
       options = {:generator=>options} if options.is_a?(Schema::Generator)
-      create_table_sql_list(name, *((options[:generator] || Schema::Generator.new(self, &block)).create_info << options)).flatten.each {|sql| execute_ddl(sql)}
+      create_table_sql_list(name, *((options[:generator] || Schema::Generator.new(self, &block)).create_info << options)).each {|sql| execute_ddl(sql)}
     end
     
     # Forcibly creates a table, attempting to drop it unconditionally (and catching any errors), then creating it.

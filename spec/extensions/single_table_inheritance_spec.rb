@@ -14,6 +14,11 @@ describe Sequel::Model, "#sti_key" do
     @ds = StiTest.dataset
     MODEL_DB.reset
   end 
+
+  specify "should have simple_table = nil" do
+    StiTest.simple_table.should == nil
+    StiTestSub1.simple_table.should == nil
+  end
   
   it "should return rows with the correct class based on the polymorphic_key value" do
     def @ds.fetch_rows(sql)

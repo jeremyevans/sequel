@@ -10,6 +10,7 @@ module Sequel
     RESTRICT = 'RESTRICT'.freeze
     SET_DEFAULT = 'SET DEFAULT'.freeze
     SET_NULL = 'SET NULL'.freeze
+    TEMPORARY = 'TEMPORARY '.freeze
     TYPES = Hash.new {|h, k| k}
     TYPES.merge!(:double=>'double precision', String=>'varchar(255)',
       Integer=>'integer', Fixnum=>'integer', Bignum=>'bigint',
@@ -117,13 +118,16 @@ module Sequel
       sql
     end
 
+    # DDL statement for creating a table with the given name, columns, and options
+    def create_table_sql(name, columns, options)
+      "CREATE #{temporary_table_sql if options[:temp]}TABLE #{quote_schema_table(name)} (#{column_list_sql(columns)})"
+    end
+
     # Array of SQL DDL statements, the first for creating a table with the given
     # name and column specifications, and the others for specifying indexes on
     # the table.
-    def create_table_sql_list(name, columns, indexes = nil, options = {})
-      sql = ["CREATE TABLE #{quote_schema_table(name)} (#{column_list_sql(columns)})"]
-      sql.concat(index_list_sql_list(name, indexes)) if indexes && !indexes.empty?
-      sql
+    def create_table_sql_list(name, columns, indexes, options = {})
+      [create_table_sql(name, columns, options), (index_list_sql_list(name, indexes) unless indexes.empty?)].compact.flatten
     end
     
     # Default index name for the table and columns, may be too long
@@ -205,6 +209,11 @@ module Sequel
     # SQL DDL statement for renaming a table.
     def rename_table_sql(name, new_name)
       "ALTER TABLE #{quote_schema_table(name)} RENAME TO #{quote_schema_table(new_name)}"
+    end
+
+    # SQL DDL fragment for temporary table
+    def temporary_table_sql
+      self.class.const_get(:TEMPORARY)
     end
 
     # SQL fragment specifying the type of a given column.

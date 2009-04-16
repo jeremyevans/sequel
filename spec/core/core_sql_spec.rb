@@ -302,6 +302,11 @@ context "Symbol" do
     :abc.cast(:integer).to_s(@ds).should == "CAST(abc AS integer)"
   end
 
+  specify "should support sql array accesses via sql_subscript" do
+    @ds.literal(:abc.sql_subscript(1)).should == "abc[1]"
+    @ds.literal(:abc.sql_subscript(1)|2).should == "abc[1, 2]"
+  end
+
   specify "should support cast_numeric and cast_string" do
     x = :abc.cast_numeric
     x.should be_a_kind_of(Sequel::SQL::NumericExpression)

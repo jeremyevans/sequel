@@ -154,7 +154,7 @@ describe "Association Extensions" do
     INTEGRATION_DB.create_table!(:authorships) do
       primary_key :id
       foreign_key :author_id, :authors
-      text :name
+      String :name
     end
     class ::Authorship < Sequel::Model
       many_to_one :author
@@ -364,8 +364,8 @@ describe "Polymorphic Associations" do
     INTEGRATION_DB.instance_variable_set(:@schemas, nil)
     INTEGRATION_DB.create_table!(:assets) do
       primary_key :id
-      integer :attachable_id
-      text :attachable_type
+      Integer :attachable_id
+      String :attachable_type
     end
     class ::Asset < Sequel::Model
       m = method(:constantize)
@@ -536,7 +536,7 @@ describe "many_to_one/one_to_many not referencing primary key" do
     INTEGRATION_DB.instance_variable_set(:@schemas, nil)
     INTEGRATION_DB.create_table!(:clients) do
       primary_key :id
-      text :name
+      String :name
     end
     class ::Client < Sequel::Model
       one_to_many :invoices, :reciprocal=>:client, \
@@ -570,7 +570,7 @@ describe "many_to_one/one_to_many not referencing primary key" do
   
     INTEGRATION_DB.create_table!(:invoices) do
       primary_key :id
-      text :client_name
+      String :client_name
     end
     class ::Invoice < Sequel::Model
       many_to_one :client, :key=>:client_name, \
@@ -679,5 +679,66 @@ describe "many_to_one/one_to_many not referencing primary key" do
     @invoice1.client_name.should == nil
     @invoice2.refresh.client.should == nil
     @invoice2.client_name.should == nil
+  end
+end
+
+describe "statistics associations" do
+  before do
+    INTEGRATION_DB.create_table!(:projects) do
+      primary_key :id
+      String :name
+    end
+    class ::Project < Sequel::Model
+      many_to_one :ticket_hours, :read_only=>true, :key=>:id,
+       :dataset=>proc{Ticket.filter(:project_id=>id).select{sum(hours).as(hours)}},
+       :eager_loader=>(proc do |kh, projects, a|
+        projects.each{|p| p.associations[:ticket_hours] = nil}
+        Ticket.filter(:project_id=>kh[:id].keys).
+         group(:project_id).
+         select{[project_id.as(project_id), sum(hours).as(hours)]}.
+         all do |t|
+          p = kh[:id][t.values.delete(:project_id)].first
+          p.associations[:ticket_hours] = t
+         end
+       end)  
+      def ticket_hours
+        if s = super
+          s[:hours]
+        end
+      end 
+    end 
+
+    INTEGRATION_DB.create_table!(:tickets) do
+      primary_key :id
+      foreign_key :project_id, :projects
+      Integer :hours
+    end
+    class ::Ticket < Sequel::Model
+      many_to_one :project
+    end
+
+    @project1 = Project.create(:name=>'X')
+    @project2 = Project.create(:name=>'Y')
+    @ticket1 = Ticket.create(:project=>@project1, :hours=>1)
+    @ticket2 = Ticket.create(:project=>@project1, :hours=>10)
+    @ticket3 = Ticket.create(:project=>@project2, :hours=>2)
+    @ticket4 = Ticket.create(:project=>@project2, :hours=>20)
+    clear_sqls
+  end
+  after do
+    INTEGRATION_DB.drop_table :tickets, :projects
+    Object.send(:remove_const, :Project)
+    Object.send(:remove_const, :Ticket)
+  end
+
+  it "should give the correct sum of ticket hours for each project" do
+    @project1.ticket_hours.to_i.should == 11
+    @project2.ticket_hours.to_i.should == 22
+  end
+
+  it "should give the correct sum of ticket hours for each project when eager loading" do
+    p1, p2 = Project.order(:name).eager(:ticket_hours).all
+    p1.ticket_hours.to_i.should == 11
+    p2.ticket_hours.to_i.should == 22
   end
 end

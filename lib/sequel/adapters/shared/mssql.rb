@@ -7,6 +7,7 @@ module Sequel
       SQL_BEGIN = "BEGIN TRANSACTION".freeze
       SQL_COMMIT = "COMMIT TRANSACTION".freeze
       SQL_ROLLBACK = "ROLLBACK TRANSACTION".freeze
+      TEMPORARY = "#".freeze
       
       def dataset(opts = nil)
         ds = super
@@ -33,6 +34,11 @@ module Sequel
       # SQL to ROLLBACK a transaction.
       def rollback_transaction_sql
         SQL_ROLLBACK
+      end
+
+      # SQL fragment for marking a table as temporary
+      def temporary_table_sql
+        TEMPORARY
       end
     end
   

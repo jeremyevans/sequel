@@ -43,6 +43,33 @@ describe "Database transactions" do
     @d.count.should == 0
   end
 
+  specify "should support nested transactions" do
+    @db = INTEGRATION_DB
+    @db.transaction do
+      @db.transaction do
+        @d << {:name => 'abc', :value => 1}
+      end 
+    end 
+    @d.count.should == 1
+
+    @d.delete
+    proc {@db.transaction do
+      @d << {:name => 'abc', :value => 1}
+      @db.transaction do
+        raise Sequel::Rollback
+      end 
+    end}.should_not raise_error
+    @d.count.should == 0
+
+    proc {@db.transaction do
+      @d << {:name => 'abc', :value => 1}
+      @db.transaction do
+        raise Interrupt, 'asdf'
+      end 
+    end}.should raise_error(Interrupt)
+    @d.count.should == 0
+  end 
+
   specify "should handle returning inside of the block by committing" do
     def INTEGRATION_DB.ret_commit
       transaction do

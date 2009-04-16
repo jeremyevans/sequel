@@ -369,6 +369,19 @@ context "Database#create_table" do
       'CREATE UNIQUE INDEX test_name_index ON test (name)'
     ]
   end
+  
+  specify "should create a temporary table" do
+    @db.create_table :test_tmp, :temp => true do
+      primary_key :id, :integer, :null => false
+      column :name, :text
+      index :name, :unique => true
+    end
+    
+    @db.sqls.should == [
+      'CREATE TEMPORARY TABLE test_tmp (id integer NOT NULL PRIMARY KEY AUTOINCREMENT, name text)',
+      'CREATE UNIQUE INDEX test_tmp_name_index ON test_tmp (name)'
+    ]
+  end
 end
 
 context "Database#alter_table" do
@@ -1088,5 +1101,30 @@ context "Database#typecast_value" do
     proc{@db.typecast_value(:date, 'a')}.should raise_error(Sequel::InvalidValue)
     proc{@db.typecast_value(:time, Date.new)}.should raise_error(Sequel::InvalidValue)
     proc{@db.typecast_value(:datetime, 4)}.should raise_error(Sequel::InvalidValue)
+  end
+end
+
+context "Database#blank_object?" do
+  specify "should return whether the object is considered blank" do
+    db = Sequel::Database.new
+    c = lambda{|meth, value| Class.new{define_method(meth){value}}.new}
+
+    db.send(:blank_object?, "").should == true
+    db.send(:blank_object?, "  ").should == true
+    db.send(:blank_object?, nil).should == true
+    db.send(:blank_object?, false).should == true
+    db.send(:blank_object?, []).should == true
+    db.send(:blank_object?, {}).should == true
+    db.send(:blank_object?, c[:empty?, true]).should == true
+    db.send(:blank_object?, c[:blank?, true]).should == true
+
+    db.send(:blank_object?, " a ").should == false
+    db.send(:blank_object?, 1).should == false
+    db.send(:blank_object?, 1.0).should == false
+    db.send(:blank_object?, true).should == false
+    db.send(:blank_object?, [1]).should == false
+    db.send(:blank_object?, {1.0=>2.0}).should == false
+    db.send(:blank_object?, c[:empty?, false]).should == false
+    db.send(:blank_object?, c[:blank?, false]).should == false 
   end
 end

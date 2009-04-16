@@ -359,11 +359,6 @@ module Sequel
       clone(o)
     end
 
-    # SQL fragment specifying an Irregular (cast/extract) SQL function call
-    def irregular_function_sql(f)
-      "#{f.f}(#{literal(f.arg1)} #{f.joiner} #{literal(f.arg2)})"
-    end
-
     # SQL fragment specifying a JOIN clause without ON or USING.
     def join_clause_sql(jc)
       table = jc.table
@@ -605,6 +600,7 @@ module Sequel
     # quote the name with quoted_identifier.
     def quote_identifier(name)
       return name if name.is_a?(LiteralString)
+      name = name.value if name.is_a?(SQL::Identifier)
       name = input_identifier(name)
       name = quoted_identifier(name) if quote_identifiers?
       name

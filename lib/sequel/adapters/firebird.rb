@@ -9,6 +9,7 @@ module Sequel
       set_adapter_scheme :firebird
 
       AUTO_INCREMENT = ''.freeze
+      TEMPORARY = 'GLOBAL TEMPORARY '.freeze
       TYPES = Sequel::Database::TYPES.merge(:text=>'BLOB SUB_TYPE TEXT')
 
       # Add the primary_keys and primary_key_sequences instance variables,
@@ -154,7 +155,7 @@ module Sequel
         "CREATE SEQUENCE #{quote_identifier(name)}"
       end
 
-      def create_table_sql_list(name, columns, indexes = nil, options={})
+      def create_table_sql_list(name, columns, indexes, options={})
         statements = super
         drop_seq_statement = nil
         columns.each do |c|

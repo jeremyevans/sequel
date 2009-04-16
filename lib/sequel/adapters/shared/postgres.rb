@@ -384,7 +384,7 @@ module Sequel
       end
 
       private
-
+      
       # SQL statement to create database function.
       def create_function_sql(name, definition, opts={})
         args = opts[:args]

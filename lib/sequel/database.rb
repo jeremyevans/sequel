@@ -654,7 +654,7 @@ module Sequel
         :boolean
       when /\A(real|float|double( precision)?)\z/io
         :float
-      when /\A(numeric(\(\d+,\d+\))?|decimal|money)\z/io
+      when /\A(((numeric|decimal)(\(\d+,\d+\))?)|money)\z/io
         :decimal
       when /bytea|blob/io
         :blob

@@ -86,9 +86,6 @@ describe String::Inflections do
     String.inflections.plurals.replace(@plurals)
     String.inflections.singulars.replace(@singulars)
     String.inflections.uncountables.replace(@uncountables)
-    Sequel.inflections.plurals.replace(@plurals)
-    Sequel.inflections.singulars.replace(@singulars)
-    Sequel.inflections.uncountables.replace(@uncountables)
   end
 
   it "should be possible to clear the list of singulars, plurals, and uncountables" do

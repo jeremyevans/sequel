@@ -5,7 +5,7 @@ module Sequel
   # Top level module for holding all SQLite-related modules and classes
   # for Sequel.
   module SQLite
-    # Database class for PostgreSQL databases used with Sequel and the
+    # Database class for SQLite databases used with Sequel and the
     # ruby-sqlite3 driver.
     class Database < Sequel::Database
       UNIX_EPOCH_TIME_FORMAT = /\A\d+\z/.freeze
@@ -106,7 +106,7 @@ module Sequel
       private
       
       # Log the SQL and the arguments, and yield an available connection.  Rescue
-      # any SQLite3::Exceptions and turn the into DatabaseErrors.
+      # any SQLite3::Exceptions and turn them into DatabaseErrors.
       def _execute(sql, opts)
         begin
           log_info(sql, opts[:arguments])
@@ -116,7 +116,7 @@ module Sequel
         end
       end
       
-      # SQLite does not need the pool to convert exceptions.
+      # The SQLite adapter does not need the pool to convert exceptions.
       # Also, force the max connections to 1 if a memory database is being
       # used, as otherwise each connection gets a separate database.
       def connection_pool_default_options
@@ -226,6 +226,7 @@ module Sequel
       
       private
       
+      # Quote the string using the adapter class method.
       def literal_string(v)
         "'#{::SQLite3::Database.quote(v)}'"
       end

@@ -85,13 +85,11 @@ module Sequel
       end
       
       # Use MySQL specific syntax for engine type and character encoding
-      def create_table_sql_list(name, columns, indexes = nil, options = {})
-        options[:engine] = Sequel::MySQL.default_engine unless options.include?(:engine)
-        options[:charset] = Sequel::MySQL.default_charset unless options.include?(:charset)
-        options[:collate] = Sequel::MySQL.default_collate unless options.include?(:collate)
-        sql = ["CREATE TABLE #{quote_schema_table(name)} (#{column_list_sql(columns)})#{" ENGINE=#{options[:engine]}" if options[:engine]}#{" DEFAULT CHARSET=#{options[:charset]}" if options[:charset]}#{" DEFAULT COLLATE=#{options[:collate]}" if options[:collate]}"]
-        sql.concat(index_list_sql_list(name, indexes)) if indexes && !indexes.empty?
-        sql
+      def create_table_sql(name, columns, options = {})
+        engine = options.include?(:engine) ? options[:engine] : Sequel::MySQL.default_engine
+        charset = options.include?(:charset) ? options[:charset] : Sequel::MySQL.default_charset
+        collate = options.include?(:collate) ? options[:collate] : Sequel::MySQL.default_collate
+        "#{super}#{" ENGINE=#{engine}" if engine}#{" DEFAULT CHARSET=#{charset}" if charset}#{" DEFAULT COLLATE=#{collate}" if collate}"
       end
 
       # MySQL folds unquoted identifiers to lowercase, so it shouldn't need to upcase identifiers on input.
@@ -188,8 +186,13 @@ module Sequel
         super
       end
 
-      # MySQL specific full text search syntax.
+      # Adds full text filter
       def full_text_search(cols, terms, opts = {})
+        filter(full_text_sql(cols, terms, opts))
+      end
+      
+      # MySQL specific full text search syntax.
+      def full_text_sql(cols, terms, opts = {})
         mode = opts[:boolean] ? " IN BOOLEAN MODE" : ""
         s = if Array === terms
           if mode.empty?
@@ -200,7 +203,7 @@ module Sequel
         else
           "MATCH #{literal(Array(cols))} AGAINST (#{literal(terms)}#{mode})"
         end
-        filter(s)
+        s
       end
 
       # MySQL allows HAVING clause on ungrouped datasets.

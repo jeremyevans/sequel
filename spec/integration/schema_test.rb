@@ -19,13 +19,13 @@ describe "Database schema parser" do
     INTEGRATION_DB.identifier_output_method = :reverse
     INTEGRATION_DB.identifier_input_method = :reverse
     INTEGRATION_DB.default_schema = nil if INTEGRATION_DB.default_schema
-    INTEGRATION_DB.create_table!(:items){integer :number}
+    INTEGRATION_DB.create_table!(:items){Integer :number}
     INTEGRATION_DB.schema(:items, :reload=>true).should be_a_kind_of(Array)
     INTEGRATION_DB.schema(:items, :reload=>true).first.first.should == :number
   end
 
   specify "should not issue an sql query if the schema has been loaded unless :reload is true" do
-    INTEGRATION_DB.create_table!(:items){integer :number}
+    INTEGRATION_DB.create_table!(:items){Integer :number}
     INTEGRATION_DB.schema(:items, :reload=>true)
     clear_sqls
     INTEGRATION_DB.schema(:items)
@@ -40,7 +40,7 @@ describe "Database schema parser" do
   end
 
   specify "should return the schema correctly" do
-    INTEGRATION_DB.create_table!(:items){integer :number}
+    INTEGRATION_DB.create_table!(:items){Integer :number}
     schema = INTEGRATION_DB.schema(:items, :reload=>true)
     schema.should be_a_kind_of(Array)
     schema.length.should == 1
@@ -57,28 +57,57 @@ describe "Database schema parser" do
   end
 
   specify "should parse primary keys from the schema properly" do
-    INTEGRATION_DB.create_table!(:items){integer :number}
+    INTEGRATION_DB.create_table!(:items){Integer :number}
     INTEGRATION_DB.schema(:items).collect{|k,v| k if v[:primary_key]}.compact.should == []
     INTEGRATION_DB.create_table!(:items){primary_key :number}
     INTEGRATION_DB.schema(:items).collect{|k,v| k if v[:primary_key]}.compact.should == [:number]
-    INTEGRATION_DB.create_table!(:items){integer :number1; integer :number2; primary_key [:number1, :number2]}
+    INTEGRATION_DB.create_table!(:items){Integer :number1; Integer :number2; primary_key [:number1, :number2]}
     INTEGRATION_DB.schema(:items).collect{|k,v| k if v[:primary_key]}.compact.should == [:number1, :number2]
   end
 
   specify "should parse NULL/NOT NULL from the schema properly" do
-    INTEGRATION_DB.create_table!(:items){integer :number, :null=>true}
+    INTEGRATION_DB.create_table!(:items){Integer :number, :null=>true}
     INTEGRATION_DB.schema(:items).first.last[:allow_null].should == true
-    INTEGRATION_DB.create_table!(:items){integer :number, :null=>false}
+    INTEGRATION_DB.create_table!(:items){Integer :number, :null=>false}
     INTEGRATION_DB.schema(:items).first.last[:allow_null].should == false
   end
 
   specify "should parse defaults from the schema properly" do
-    INTEGRATION_DB.create_table!(:items){integer :number}
+    INTEGRATION_DB.create_table!(:items){Integer :number}
     INTEGRATION_DB.schema(:items).first.last[:default].should == nil
-    INTEGRATION_DB.create_table!(:items){integer :number, :default=>0}
+    INTEGRATION_DB.create_table!(:items){Integer :number, :default=>0}
     INTEGRATION_DB.schema(:items).first.last[:default].to_s.should == "0"
-    INTEGRATION_DB.create_table!(:items){varchar :a, :default=>"blah", :size=>4}
-    INTEGRATION_DB.schema(:items).first.last[:default].gsub(/::character varying\z/, '').gsub("'", '').should == "blah"
+    INTEGRATION_DB.create_table!(:items){String :a, :default=>"blah"}
+    INTEGRATION_DB.schema(:items).first.last[:default].should include('blah')
+  end
+
+  specify "should parse types from the schema properly" do
+    INTEGRATION_DB.create_table!(:items){Integer :number}
+    INTEGRATION_DB.schema(:items).first.last[:type].should == :integer
+    INTEGRATION_DB.create_table!(:items){Fixnum :number}
+    INTEGRATION_DB.schema(:items).first.last[:type].should == :integer
+    INTEGRATION_DB.create_table!(:items){Bignum :number}
+    INTEGRATION_DB.schema(:items).first.last[:type].should == :integer
+    INTEGRATION_DB.create_table!(:items){Float :number}
+    INTEGRATION_DB.schema(:items).first.last[:type].should == :float
+    INTEGRATION_DB.create_table!(:items){BigDecimal :number}
+    INTEGRATION_DB.schema(:items).first.last[:type].should == :decimal
+    INTEGRATION_DB.create_table!(:items){Numeric :number}
+    INTEGRATION_DB.schema(:items).first.last[:type].should == :decimal
+    INTEGRATION_DB.create_table!(:items){String :number}
+    INTEGRATION_DB.schema(:items).first.last[:type].should == :string
+    INTEGRATION_DB.create_table!(:items){Date :number}
+    INTEGRATION_DB.schema(:items).first.last[:type].should == :date
+    INTEGRATION_DB.create_table!(:items){Time :number}
+    INTEGRATION_DB.schema(:items).first.last[:type].should == :datetime
+    INTEGRATION_DB.create_table!(:items){DateTime :number}
+    INTEGRATION_DB.schema(:items).first.last[:type].should == :datetime
+    INTEGRATION_DB.create_table!(:items){File :number}
+    INTEGRATION_DB.schema(:items).first.last[:type].should == :blob
+    INTEGRATION_DB.create_table!(:items){TrueClass :number}
+    INTEGRATION_DB.schema(:items).first.last[:type].should == :boolean
+    INTEGRATION_DB.create_table!(:items){FalseClass :number}
+    INTEGRATION_DB.schema(:items).first.last[:type].should == :boolean
   end
 end
 end
@@ -106,7 +135,7 @@ describe "Database schema modifiers" do
     INTEGRATION_DB.alter_table(:items){add_column :name, :text}
     INTEGRATION_DB.schema(:items, :reload=>true).map{|x| x.first}.should == [:number, :name]
     @ds.columns!.should == [:number, :name]
-    unless INTEGRATION_DB.url =~ /sqlite/
+    unless INTEGRATION_DB.url =~ /sqlite|amalgalite/
       INTEGRATION_DB.alter_table(:items){add_primary_key :id}
       INTEGRATION_DB.schema(:items, :reload=>true).map{|x| x.first}.should == [:number, :name, :id]
       @ds.columns!.should == [:number, :name, :id]

@@ -250,6 +250,7 @@ module Sequel
       
       # SQLite uses string literals instead of identifiers in AS clauses.
       def as_sql(expression, aliaz)
+        aliaz = aliaz.value if aliaz.is_a?(SQL::Identifier)
         "#{expression} AS #{literal(aliaz.to_s)}"
       end
     end
