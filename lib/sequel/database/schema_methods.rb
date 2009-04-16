@@ -53,6 +53,9 @@ module Sequel
     #     index :title
     #   end
     #
+    # Options:
+    # * :temp - Create the table as a temporary table.
+    #
     # See Schema::Generator.
     def create_table(name, options={}, &block)
       options = {:generator=>options} if options.is_a?(Schema::Generator)

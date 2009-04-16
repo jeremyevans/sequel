@@ -1,5 +1,7 @@
 === HEAD
 
+* Add temporary table support, via :temp option to Database#create_table (EppO, jeremyevans)
+
 * Add Amalgalite adapter (jeremyevans)
 
 * Remove Sequel::Metaprogramming#metaattr_accessor and metaattr_reader (jeremyevans)

@@ -9,7 +9,7 @@ module Sequel
       set_adapter_scheme :firebird
 
       AUTO_INCREMENT = ''.freeze
-      TEMPORARY = ''.freeze
+      TEMPORARY = 'GLOBAL TEMPORARY '.freeze
 
       # Add the primary_keys and primary_key_sequences instance variables,
       # so we can get the correct return values for inserted rows.
@@ -154,7 +154,7 @@ module Sequel
         "CREATE SEQUENCE #{quote_identifier(name)}"
       end
 
-      def create_table_sql_list(name, columns, indexes = nil, options={})
+      def create_table_sql_list(name, columns, indexes, options={})
         statements = super
         drop_seq_statement = nil
         columns.each do |c|

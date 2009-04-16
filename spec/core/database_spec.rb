@@ -371,7 +371,7 @@ context "Database#create_table" do
   end
   
   specify "should create a temporary table" do
-    @db.create_table :test_tmp, :temporary => true do
+    @db.create_table :test_tmp, :temp => true do
       primary_key :id, :integer, :null => false
       column :name, :text
       index :name, :unique => true

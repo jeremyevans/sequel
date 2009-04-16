@@ -18,7 +18,6 @@ module Sequel
       NOT_NULL = Sequel::Database::NOT_NULL
       NULL = Sequel::Database::NULL
       PRIMARY_KEY = Sequel::Database::PRIMARY_KEY
-      TEMPORARY = Sequel::Database::TEMPORARY
       TYPES = Sequel::Database::TYPES.merge(DateTime=>'datetime', \
         TrueClass=>'tinyint', FalseClass=>'tinyint')
       UNIQUE = Sequel::Database::UNIQUE
@@ -86,13 +85,11 @@ module Sequel
       end
       
       # Use MySQL specific syntax for engine type and character encoding
-      def create_table_sql_list(name, columns, indexes = nil, options = {})
-        options[:engine] = Sequel::MySQL.default_engine unless options.include?(:engine)
-        options[:charset] = Sequel::MySQL.default_charset unless options.include?(:charset)
-        options[:collate] = Sequel::MySQL.default_collate unless options.include?(:collate)
-        sql = ["CREATE #{temporary_table_sql if options[:temporary]}TABLE #{quote_schema_table(name)} (#{column_list_sql(columns)})#{" ENGINE=#{options[:engine]}" if options[:engine]}#{" DEFAULT CHARSET=#{options[:charset]}" if options[:charset]}#{" DEFAULT COLLATE=#{options[:collate]}" if options[:collate]}"]
-        sql.concat(index_list_sql_list(name, indexes)) if indexes && !indexes.empty?
-        sql
+      def create_table_sql(name, columns, options = {})
+        engine = options.include?(:engine) ? options[:engine] : Sequel::MySQL.default_engine
+        charset = options.include?(:charset) ? options[:charset] : Sequel::MySQL.default_charset
+        collate = options.include?(:collate) ? options[:collate] : Sequel::MySQL.default_collate
+        "#{super}#{" ENGINE=#{engine}" if engine}#{" DEFAULT CHARSET=#{charset}" if charset}#{" DEFAULT COLLATE=#{collate}" if collate}"
       end
 
       # MySQL folds unquoted identifiers to lowercase, so it shouldn't need to upcase identifiers on input.

@@ -13,6 +13,13 @@ module Sequel
       def table_exists?(name)
         from(:tab).filter(:tname =>dataset.send(:input_identifier, name), :tabtype => 'TABLE').count > 0
       end
+
+      private
+
+      # SQL fragment for showing a table is temporary
+      def temporary_table_sql
+        TEMPORARY
+      end
     end
     
     module DatasetMethods

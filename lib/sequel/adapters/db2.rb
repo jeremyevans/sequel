@@ -4,6 +4,7 @@ module Sequel
   module DB2
     class Database < Sequel::Database
       set_adapter_scheme :db2
+
       include DB2CLI
 
       TEMPORARY = 'GLOBAL TEMPORARY '.freeze
