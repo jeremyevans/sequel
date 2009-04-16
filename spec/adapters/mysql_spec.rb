@@ -1,7 +1,7 @@
 require File.join(File.dirname(__FILE__), 'spec_helper.rb')
 
 unless defined?(MYSQL_USER)
-  MYSQL_USER = 'root'
+  MYSQL_USER = 'root:EppO'
 end
 unless defined?(MYSQL_DB)
   MYSQL_URL = (ENV['SEQUEL_MY_SPEC_DB']||"mysql://#{MYSQL_USER}@localhost/sandbox") unless defined? MYSQL_URL
@@ -46,13 +46,21 @@ end
 context "MySQL", '#create_table' do
   before do
     @db = MYSQL_DB
+    MYSQL_DB.sqls.clear
   end
-  after(:each) do
+  after(:all) do
     @db.drop_table :dolls
+    @db.drop_table :tmp_dolls
   end
+  
   specify "should allow to specify options for MySQL" do
     @db.create_table(:dolls, :engine => 'MyISAM', :charset => 'latin2') { text :name }
     @db.sqls.should == ["CREATE TABLE dolls (name text) ENGINE=MyISAM DEFAULT CHARSET=latin2"]
+  end
+  
+  specify "should create a temporary table" do
+    @db.create_table(:tmp_dolls, :temporary => true, :engine => 'MyISAM', :charset => 'latin2') { text :name }
+    @db.sqls.should == ["CREATE TEMPORARY TABLE tmp_dolls (name text) ENGINE=MyISAM DEFAULT CHARSET=latin2"]
   end
 end
 
