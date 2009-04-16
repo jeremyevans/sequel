@@ -127,7 +127,7 @@ module Sequel
     # name and column specifications, and the others for specifying indexes on
     # the table.
     def create_table_sql_list(name, columns, indexes, options = {})
-      [create_table_sql(name, columns, options), (index_list_sql_list(name, indexes) unless indexes.empty?)].compact
+      [create_table_sql(name, columns, options), (index_list_sql_list(name, indexes) unless indexes.empty?)].compact.flatten
     end
     
     # Default index name for the table and columns, may be too long
