@@ -1,5 +1,7 @@
 === HEAD
 
+* Fix altering a column name, type, default, or NULL/NOT NULL status on MySQL (jeremyevans)
+
 * Fix index type syntax on MySQL (jeremyevans)
 
 * Add temporary table support, via :temp option to Database#create_table (EppO, jeremyevans)

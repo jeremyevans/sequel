@@ -420,6 +420,45 @@ context "A MySQL database" do
     @db.sqls.should == ["CREATE TABLE items (id integer)", "ALTER TABLE items ADD COLUMN p_id integer NOT NULL", "ALTER TABLE items ADD FOREIGN KEY (p_id) REFERENCES users(id) ON DELETE CASCADE"]
   end
   
+  specify "should have rename_column support keep existing options" do
+    @db.create_table(:items){Integer :id, :null=>false, :default=>5}
+    @db.alter_table(:items){rename_column :id, :nid}
+    @db.sqls.should == ["CREATE TABLE items (id integer NOT NULL DEFAULT 5)", "DESCRIBE items", "ALTER TABLE items CHANGE COLUMN id nid int(11) NOT NULL DEFAULT 5"]
+    @db[:items].insert
+    @db[:items].all.should == [{:nid=>5}]
+    proc{@db[:items].insert(:nid=>nil)}.should raise_error(Sequel::DatabaseError)
+  end
+  
+  specify "should have set_column_type support keep existing options" do
+    @db.create_table(:items){Integer :id, :null=>false, :default=>5}
+    @db.alter_table(:items){set_column_type :id, Bignum}
+    @db.sqls.should == ["CREATE TABLE items (id integer NOT NULL DEFAULT 5)", "DESCRIBE items", "ALTER TABLE items CHANGE COLUMN id id bigint NOT NULL DEFAULT 5"]
+    @db[:items].insert
+    @db[:items].all.should == [{:id=>5}]
+    proc{@db[:items].insert(:id=>nil)}.should raise_error(Sequel::DatabaseError)
+    @db[:items].delete
+    @db[:items].insert(2**40)
+    @db[:items].all.should == [{:id=>2**40}]
+  end
+  
+  specify "should have set_column_default support keep existing options" do
+    @db.create_table(:items){Integer :id, :null=>false, :default=>5}
+    @db.alter_table(:items){set_column_default :id, 6}
+    @db.sqls.should == ["CREATE TABLE items (id integer NOT NULL DEFAULT 5)", "DESCRIBE items", "ALTER TABLE items CHANGE COLUMN id id int(11) NOT NULL DEFAULT 6"]
+    @db[:items].insert
+    @db[:items].all.should == [{:id=>6}]
+    proc{@db[:items].insert(:id=>nil)}.should raise_error(Sequel::DatabaseError)
+  end
+  
+  specify "should have set_column_allow_null support keep existing options" do
+    @db.create_table(:items){Integer :id, :null=>false, :default=>5}
+    @db.alter_table(:items){set_column_allow_null :id, true}
+    @db.sqls.should == ["CREATE TABLE items (id integer NOT NULL DEFAULT 5)", "DESCRIBE items", "ALTER TABLE items CHANGE COLUMN id id int(11) NULL DEFAULT 5"]
+    @db[:items].insert
+    @db[:items].all.should == [{:id=>5}]
+    proc{@db[:items].insert(:id=>nil)}.should_not
+  end
+  
   specify "should accept repeated raw sql statements using Database#<<" do
     @db.create_table(:items){String :name; Integer :value}
     @db << 'DELETE FROM items'

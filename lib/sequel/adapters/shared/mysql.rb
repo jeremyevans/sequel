@@ -63,10 +63,15 @@ module Sequel
           else
             super(table, op)
           end
-        when :rename_column
-          "ALTER TABLE #{quote_schema_table(table)} CHANGE COLUMN #{quote_identifier(op[:name])} #{quote_identifier(op[:new_name])} #{type_literal(op)}"
-        when :set_column_type
-          "ALTER TABLE #{quote_schema_table(table)} CHANGE COLUMN #{quote_identifier(op[:name])} #{quote_identifier(op[:name])} #{type_literal(op)}"
+        when :rename_column, :set_column_type, :set_column_null, :set_column_default
+          o = op[:op]
+          opts = schema(table).find{|x| x.first == op[:name]}
+          old_opts = opts ? opts.last : {}
+          name = o == :rename_column ? op[:new_name] : op[:name]
+          type = o == :set_column_type ? op[:type] : old_opts[:db_type]
+          null = o == :set_column_null ? op[:null] : old_opts[:allow_null]
+          default = o == :set_column_default ? op[:default] : (old_opts[:default].lit if old_opts[:default])
+          "ALTER TABLE #{quote_schema_table(table)} CHANGE COLUMN #{quote_identifier(op[:name])} #{column_definition_sql(:name=>name, :type=>type, :null=>null, :default=>default)}"
         when :drop_index
           "#{drop_index_sql(table, op)} ON #{quote_schema_table(table)}"
         else
