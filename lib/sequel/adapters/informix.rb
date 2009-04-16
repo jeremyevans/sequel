@@ -6,6 +6,8 @@ module Sequel
     class Database < Sequel::Database
       set_adapter_scheme :informix
       
+      TEMPORARY = 'TEMP '.freeze
+      
       def connect(server)
         opts = server_opts(server)
         ::Informix.connect(opts[:database], opts[:user], opts[:password])

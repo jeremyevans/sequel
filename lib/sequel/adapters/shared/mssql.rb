@@ -7,6 +7,7 @@ module Sequel
       SQL_BEGIN = "BEGIN TRANSACTION".freeze
       SQL_COMMIT = "COMMIT TRANSACTION".freeze
       SQL_ROLLBACK = "ROLLBACK TRANSACTION".freeze
+      TEMPORARY = "#".freeze
       
       def dataset(opts = nil)
         ds = super
@@ -35,10 +36,9 @@ module Sequel
         SQL_ROLLBACK
       end
       
-      # mssql supports temporary table
+      # Use mssql specific syntax for create table for temporary table
       def create_table_sql_list(name, columns, indexes = nil, options = {})
-        is_temporary = options[:temporary] ? "#" : ""
-        sql = ["CREATE TABLE #{is_temporary}#{quote_schema_table(name)} (#{column_list_sql(columns)})"]
+        sql = ["CREATE TABLE #{TEMPORARY if options[:temporary]}#{quote_schema_table(name)} (#{column_list_sql(columns)})"]
         sql.concat(index_list_sql_list(name, indexes)) if indexes && !indexes.empty?
         sql
       end

@@ -10,6 +10,7 @@ module Sequel
     RESTRICT = 'RESTRICT'.freeze
     SET_DEFAULT = 'SET DEFAULT'.freeze
     SET_NULL = 'SET NULL'.freeze
+    TEMPORARY = 'TEMPORARY '.freeze
     TYPES = Hash.new {|h, k| k}
     TYPES.merge!(:double=>'double precision', String=>'varchar(255)',
       Integer=>'integer', Fixnum=>'integer', Bignum=>'bigint',
@@ -117,11 +118,16 @@ module Sequel
       sql
     end
 
+    # SQL DDL fragment for temporary table
+    def temporary_table_sql
+      TEMPORARY
+    end
+
     # Array of SQL DDL statements, the first for creating a table with the given
     # name and column specifications, and the others for specifying indexes on
     # the table.
     def create_table_sql_list(name, columns, indexes = nil, options = {})
-      sql = ["CREATE TABLE #{quote_schema_table(name)} (#{column_list_sql(columns)})"]
+      sql = ["CREATE #{temporary_table_sql if options[:temporary]}TABLE #{quote_schema_table(name)} (#{column_list_sql(columns)})"]
       sql.concat(index_list_sql_list(name, indexes)) if indexes && !indexes.empty?
       sql
     end

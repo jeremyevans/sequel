@@ -3,6 +3,8 @@ Sequel.require %w'date_format unsupported', 'adapters/utils'
 module Sequel
   module Oracle
     module DatabaseMethods
+      TEMPORARY = 'GLOBAL TEMPORARY '.freeze
+
       def tables(opts={})
         ds = from(:tab).server(opts[:server]).select(:tname).filter(:tabtype => 'TABLE')
         ds.map{|r| ds.send(:output_identifier, r[:tname])}
@@ -10,14 +12,6 @@ module Sequel
 
       def table_exists?(name)
         from(:tab).filter(:tname =>dataset.send(:input_identifier, name), :tabtype => 'TABLE').count > 0
-      end
-      
-      # oracle supports temporary table
-      def create_table_sql_list(name, columns, indexes = nil, options = {})
-        is_temporary = options[:temporary] ? "GLOBAL TEMPORARY " : ""
-        sql = ["CREATE #{is_temporary}TABLE #{quote_schema_table(name)} (#{column_list_sql(columns)})"]
-        sql.concat(index_list_sql_list(name, indexes)) if indexes && !indexes.empty?
-        sql
       end
     end
     

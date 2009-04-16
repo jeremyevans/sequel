@@ -384,14 +384,6 @@ module Sequel
       end
 
       private
-
-      # postgresql supports temporary table
-      def create_table_sql_list(name, columns, indexes = nil, options = {})
-        is_temporary = options[:temporary] ? "TEMPORARY " : ""
-        sql = ["CREATE #{is_temporary}TABLE #{quote_schema_table(name)} (#{column_list_sql(columns)})"]
-        sql.concat(index_list_sql_list(name, indexes)) if indexes && !indexes.empty?
-        sql
-      end
       
       # SQL statement to create database function.
       def create_function_sql(name, definition, opts={})

@@ -18,6 +18,7 @@ module Sequel
       NOT_NULL = Sequel::Database::NOT_NULL
       NULL = Sequel::Database::NULL
       PRIMARY_KEY = Sequel::Database::PRIMARY_KEY
+      TEMPORARY = Sequel::Database::TEMPORARY
       TYPES = Sequel::Database::TYPES.merge(DateTime=>'datetime', \
         TrueClass=>'tinyint', FalseClass=>'tinyint')
       UNIQUE = Sequel::Database::UNIQUE
@@ -89,8 +90,7 @@ module Sequel
         options[:engine] = Sequel::MySQL.default_engine unless options.include?(:engine)
         options[:charset] = Sequel::MySQL.default_charset unless options.include?(:charset)
         options[:collate] = Sequel::MySQL.default_collate unless options.include?(:collate)
-        is_temporary = "TEMPORARY " if options.include?(:temporary)
-        sql = ["CREATE #{is_temporary}TABLE #{quote_schema_table(name)} (#{column_list_sql(columns)})#{" ENGINE=#{options[:engine]}" if options[:engine]}#{" DEFAULT CHARSET=#{options[:charset]}" if options[:charset]}#{" DEFAULT COLLATE=#{options[:collate]}" if options[:collate]}"]
+        sql = ["CREATE #{TEMPORARY if options[:temporary]}TABLE #{quote_schema_table(name)} (#{column_list_sql(columns)})#{" ENGINE=#{options[:engine]}" if options[:engine]}#{" DEFAULT CHARSET=#{options[:charset]}" if options[:charset]}#{" DEFAULT COLLATE=#{options[:collate]}" if options[:collate]}"]
         sql.concat(index_list_sql_list(name, indexes)) if indexes && !indexes.empty?
         sql
       end

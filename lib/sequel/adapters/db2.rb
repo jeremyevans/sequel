@@ -5,6 +5,8 @@ module Sequel
     class Database < Sequel::Database
       set_adapter_scheme :db2
       include DB2CLI
+
+      TEMPORARY = 'GLOBAL TEMPORARY '.freeze
       
       rc, @@env = SQLAllocHandle(SQL_HANDLE_ENV, SQL_NULL_HANDLE)
       #check_error(rc, "Could not allocate DB2 environment")
