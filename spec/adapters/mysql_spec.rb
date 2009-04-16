@@ -54,13 +54,13 @@ context "MySQL", '#create_table' do
   end
   
   specify "should allow to specify options for MySQL" do
-    @db.create_table(:dolls, :engine => 'MyISAM', :charset => 'latin2'){text :name}
-    @db.sqls.should == ["CREATE TABLE dolls (name text) ENGINE=MyISAM DEFAULT CHARSET=latin2"]
+    @db.create_table!(:dolls, :engine => 'MyISAM', :charset => 'latin2'){text :name}
+    @db.sqls.last.should == "CREATE TABLE dolls (name text) ENGINE=MyISAM DEFAULT CHARSET=latin2"
   end
   
   specify "should create a temporary table" do
-    @db.create_table(:tmp_dolls, :temp => true, :engine => 'MyISAM', :charset => 'latin2'){text :name}
-    @db.sqls.should == ["CREATE TEMPORARY TABLE tmp_dolls (name text) ENGINE=MyISAM DEFAULT CHARSET=latin2"]
+    @db.create_table!(:tmp_dolls, :temp => true, :engine => 'MyISAM', :charset => 'latin2'){text :name}
+    @db.sqls.last.should == "CREATE TEMPORARY TABLE tmp_dolls (name text) ENGINE=MyISAM DEFAULT CHARSET=latin2"
   end
 end
 
