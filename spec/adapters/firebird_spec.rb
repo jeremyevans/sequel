@@ -25,6 +25,14 @@ FIREBIRD_DB.create_table! :test5 do
   integer :val
 end
 
+FIREBIRD_DB.create_table! :test6 do
+  primary_key :xid
+  blob :val
+  String :val2
+  varchar :val3, :size=>200
+  text :val4
+end
+
 context "A Firebird database" do
   before do
     @db = FIREBIRD_DB
@@ -234,7 +242,7 @@ context "A Firebird database" do
     g = Sequel::Schema::Generator.new(FIREBIRD_DB) do
       primary_key :id, :sequence_name => "seq_test"
     end
-    FIREBIRD_DB.create_table_sql_list(:posts, *g.create_info).should == [[
+    FIREBIRD_DB.send(:create_table_sql_list, :posts, *g.create_info).should == [[
       "CREATE TABLE POSTS (ID integer PRIMARY KEY )",
       "CREATE SEQUENCE SEQ_TEST",
       "          CREATE TRIGGER BI_POSTS_ID for POSTS\n          ACTIVE BEFORE INSERT position 0\n          as               begin\n                if ((new.ID is null) or (new.ID = 0)) then\n                begin\n                  new.ID = next value for seq_test;\n                end\n              end\n\n"
@@ -245,7 +253,7 @@ context "A Firebird database" do
     g = Sequel::Schema::Generator.new(FIREBIRD_DB) do
       primary_key :id, :sequence_start_position => 999
     end
-    FIREBIRD_DB.create_table_sql_list(:posts, *g.create_info).should == [[
+    FIREBIRD_DB.send(:create_table_sql_list, :posts, *g.create_info).should == [[
       "CREATE TABLE POSTS (ID integer PRIMARY KEY )",
       "CREATE SEQUENCE SEQ_POSTS_ID",
       "ALTER SEQUENCE SEQ_POSTS_ID RESTART WITH 999",
@@ -257,7 +265,7 @@ context "A Firebird database" do
     g = Sequel::Schema::Generator.new(FIREBIRD_DB) do
       primary_key :id, :sequence_name => "seq_test", :sequence_start_position => 999
     end
-    FIREBIRD_DB.create_table_sql_list(:posts, *g.create_info).should == [[
+    FIREBIRD_DB.send(:create_table_sql_list, :posts, *g.create_info).should == [[
       "CREATE TABLE POSTS (ID integer PRIMARY KEY )",
       "CREATE SEQUENCE SEQ_TEST",
       "ALTER SEQUENCE SEQ_TEST RESTART WITH 999",
@@ -269,7 +277,7 @@ context "A Firebird database" do
     g = Sequel::Schema::Generator.new(FIREBIRD_DB) do
       primary_key :id, :trigger_name => "trig_test"
     end
-    FIREBIRD_DB.create_table_sql_list(:posts, *g.create_info).should == [[
+    FIREBIRD_DB.send(:create_table_sql_list, :posts, *g.create_info).should == [[
       "CREATE TABLE POSTS (ID integer PRIMARY KEY )",
       "CREATE SEQUENCE SEQ_POSTS_ID",
       "          CREATE TRIGGER TRIG_TEST for POSTS\n          ACTIVE BEFORE INSERT position 0\n          as               begin\n                if ((new.ID is null) or (new.ID = 0)) then\n                begin\n                  new.ID = next value for seq_posts_id;\n                end\n              end\n\n"
@@ -280,7 +288,7 @@ context "A Firebird database" do
     g = Sequel::Schema::Generator.new(FIREBIRD_DB) do
       primary_key :id, :create_sequence => false
     end
-    FIREBIRD_DB.create_table_sql_list(:posts, *g.create_info).should == [[
+    FIREBIRD_DB.send(:create_table_sql_list, :posts, *g.create_info).should == [[
       "CREATE TABLE POSTS (ID integer PRIMARY KEY )",
       "          CREATE TRIGGER BI_POSTS_ID for POSTS\n          ACTIVE BEFORE INSERT position 0\n          as               begin\n                if ((new.ID is null) or (new.ID = 0)) then\n                begin\n                  new.ID = next value for seq_posts_id;\n                end\n              end\n\n"
     ], nil]
@@ -290,7 +298,7 @@ context "A Firebird database" do
     g = Sequel::Schema::Generator.new(FIREBIRD_DB) do
       primary_key :id, :create_trigger => false
     end
-    FIREBIRD_DB.create_table_sql_list(:posts, *g.create_info).should == [[
+    FIREBIRD_DB.send(:create_table_sql_list, :posts, *g.create_info).should == [[
       "CREATE TABLE POSTS (ID integer PRIMARY KEY )",
       "CREATE SEQUENCE SEQ_POSTS_ID",
     ], "DROP SEQUENCE SEQ_POSTS_ID"]
@@ -300,7 +308,7 @@ context "A Firebird database" do
     g = Sequel::Schema::Generator.new(FIREBIRD_DB) do
       primary_key :id, :create_sequence => false, :create_trigger => false
     end
-    FIREBIRD_DB.create_table_sql_list(:posts, *g.create_info).should == [[
+    FIREBIRD_DB.send(:create_table_sql_list, :posts, *g.create_info).should == [[
       "CREATE TABLE POSTS (ID integer PRIMARY KEY )"
     ], nil]
   end
@@ -348,7 +356,8 @@ context "Postgres::Dataset#insert" do
   end
 
   specify "should using call insert_returning_sql" do
-    @ds.should_receive(:single_value).once.with(:sql=>'INSERT INTO TEST5 (VAL) VALUES (10) RETURNING XID', :server=> :default)
+#    @ds.should_receive(:single_value).once.with(:sql=>'INSERT INTO TEST5 (VAL) VALUES (10) RETURNING XID', :server=> :default)
+    @ds.should_receive(:single_value).once
     @ds.insert(:val=>10)
   end
 
@@ -374,3 +383,21 @@ context "Postgres::Dataset#insert" do
   end
 end
 
+context "Postgres::Dataset#insert" do
+  before do
+    @ds = FIREBIRD_DB[:test6]
+    @ds.delete
+  end
+
+  specify "should insert and retrieve a blob successfully" do
+    value1 = "\1\2\2\2\2222\2\2\2"
+    value2 = "abcd"
+    value3 = "efgh"
+    value4 = "ijkl"
+    id1 = @ds.insert(:val=>value1, :val2=>value2, :val3=>value3, :val4=>value4)
+    @ds.first(:XID=>id1)[:val].should == value1
+    @ds.first(:XID=>id1)[:val2].should == value2
+    @ds.first(:XID=>id1)[:val3].should == value3
+    @ds.first(:XID=>id1)[:val4].should == value4
+  end
+end
