@@ -4,6 +4,16 @@ unless defined?(POSTGRES_DB)
   POSTGRES_URL = 'postgres://postgres:postgres@localhost:5432/reality_spec' unless defined? POSTGRES_URL
   POSTGRES_DB = Sequel.connect(ENV['SEQUEL_PG_SPEC_DB']||POSTGRES_URL)
 end
+
+def POSTGRES_DB.sqls
+  (@sqls ||= [])
+end
+logger = Object.new
+def logger.method_missing(m, msg)
+  POSTGRES_DB.sqls << msg
+end
+POSTGRES_DB.logger = logger
+
 #POSTGRES_DB.instance_variable_set(:@server_version, 80100)
 POSTGRES_DB.create_table! :test do
   text :name
@@ -20,10 +30,6 @@ end
 POSTGRES_DB.create_table! :test4 do
   varchar :name, :size => 20
   bytea :value
-end
-POSTGRES_DB.create_table! :test5 do
-  primary_key :xid
-  integer :value
 end
 
 context "A PostgreSQL database" do
@@ -201,139 +207,151 @@ context "A PostgreSQL database" do
 end  
 
 context "A PostgreSQL database" do
-  specify "should support fulltext indexes" do
-    g = Sequel::Schema::Generator.new(POSTGRES_DB) do
-      text :title
-      text :body
-      full_text_index [:title, :body]
-    end
-    POSTGRES_DB.send(:create_table_sql_list, :posts, *g.create_info).should == [
-      "CREATE TABLE posts (title text, body text)",
-      "CREATE INDEX posts_title_body_index ON posts USING gin (to_tsvector('simple', (COALESCE(title, '') || ' ' || COALESCE(body, ''))))"
-    ]
+  before do
+    @db = POSTGRES_DB
+    @db.drop_table(:posts) rescue nil
+    @db.sqls.clear
+  end
+  after do
+    @db.drop_table(:posts) rescue nil
   end
   
-  specify "should support fulltext indexes with a specific language" do
-    g = Sequel::Schema::Generator.new(POSTGRES_DB) do
-      text :title
-      text :body
-      full_text_index [:title, :body], :language => 'french'
-    end
-    POSTGRES_DB.send(:create_table_sql_list, :posts, *g.create_info).should == [
+  specify "should support fulltext indexes and searching" do
+    @db.create_table(:posts){text :title; text :body; full_text_index [:title, :body]; full_text_index :title, :language => 'french'}
+    @db.sqls.should == [
       "CREATE TABLE posts (title text, body text)",
-      "CREATE INDEX posts_title_body_index ON posts USING gin (to_tsvector('french', (COALESCE(title, '') || ' ' || COALESCE(body, ''))))"
+      "CREATE INDEX posts_title_body_index ON posts USING gin (to_tsvector('simple', (COALESCE(title, '') || ' ' || COALESCE(body, ''))))",
+      "CREATE INDEX posts_title_index ON posts USING gin (to_tsvector('french', (COALESCE(title, ''))))"
     ]
-  end
-  
-  specify "should support full_text_search" do
-    POSTGRES_DB[:posts].full_text_search(:title, 'ruby').sql.should ==
-      "SELECT * FROM posts WHERE (to_tsvector('simple', (COALESCE(title, ''))) @@ to_tsquery('simple', 'ruby'))"
-    
-    POSTGRES_DB[:posts].full_text_search([:title, :body], ['ruby', 'sequel']).sql.should ==
-      "SELECT * FROM posts WHERE (to_tsvector('simple', (COALESCE(title, '') || ' ' || COALESCE(body, ''))) @@ to_tsquery('simple', 'ruby | sequel'))"
-      
-    POSTGRES_DB[:posts].full_text_search(:title, 'ruby', :language => 'french').sql.should ==
-      "SELECT * FROM posts WHERE (to_tsvector('french', (COALESCE(title, ''))) @@ to_tsquery('french', 'ruby'))"
+
+    @db[:posts].insert(:title=>'ruby rails', :body=>'yowsa')
+    @db[:posts].insert(:title=>'sequel', :body=>'ruby')
+    @db[:posts].insert(:title=>'ruby scooby', :body=>'x')
+    @db.sqls.clear
+
+    @db[:posts].full_text_search(:title, 'rails').all.should == [{:title=>'ruby rails', :body=>'yowsa'}]
+    @db[:posts].full_text_search([:title, :body], ['yowsa', 'rails']).all.should == [:title=>'ruby rails', :body=>'yowsa']
+    @db[:posts].full_text_search(:title, 'scooby', :language => 'french').all.should == [{:title=>'ruby scooby', :body=>'x'}]
+    @db.sqls.should == [
+      "SELECT * FROM posts WHERE (to_tsvector('simple', (COALESCE(title, ''))) @@ to_tsquery('simple', 'rails'))",
+      "SELECT * FROM posts WHERE (to_tsvector('simple', (COALESCE(title, '') || ' ' || COALESCE(body, ''))) @@ to_tsquery('simple', 'yowsa | rails'))",
+      "SELECT * FROM posts WHERE (to_tsvector('french', (COALESCE(title, ''))) @@ to_tsquery('french', 'scooby'))"]
   end
 
   specify "should support spatial indexes" do
-    g = Sequel::Schema::Generator.new(POSTGRES_DB) do
-      geometry :geom
-      spatial_index [:geom]
-    end
-    POSTGRES_DB.send(:create_table_sql_list, :posts, *g.create_info).should == [
-      "CREATE TABLE posts (geom geometry)",
+    @db.create_table(:posts){box :geom; spatial_index [:geom]}
+    @db.sqls.should == [
+      "CREATE TABLE posts (geom box)",
       "CREATE INDEX posts_geom_index ON posts USING gist (geom)"
     ]
   end
   
   specify "should support indexes with index type" do
-    g = Sequel::Schema::Generator.new(POSTGRES_DB) do
-      varchar :title, :size => 5
-      index :title, :type => 'hash'
-    end
-    POSTGRES_DB.send(:create_table_sql_list, :posts, *g.create_info).should == [
+    @db.create_table(:posts){varchar :title, :size => 5; index :title, :type => 'hash'}
+    @db.sqls.should == [
       "CREATE TABLE posts (title varchar(5))",
       "CREATE INDEX posts_title_index ON posts USING hash (title)"
     ]
   end
   
   specify "should support unique indexes with index type" do
-    g = Sequel::Schema::Generator.new(POSTGRES_DB) do
-      varchar :title, :size => 5
-      index :title, :type => 'hash', :unique => true
-    end
-    POSTGRES_DB.send(:create_table_sql_list, :posts, *g.create_info).should == [
+    @db.create_table(:posts){varchar :title, :size => 5; index :title, :type => 'btree', :unique => true}
+    @db.sqls.should == [
       "CREATE TABLE posts (title varchar(5))",
-      "CREATE UNIQUE INDEX posts_title_index ON posts USING hash (title)"
+      "CREATE UNIQUE INDEX posts_title_index ON posts USING btree (title)"
     ]
   end
   
   specify "should support partial indexes" do
-    g = Sequel::Schema::Generator.new(POSTGRES_DB) do
-      varchar :title, :size => 5
-      index :title, :where => {:something => 5}
-    end
-    POSTGRES_DB.send(:create_table_sql_list, :posts, *g.create_info).should == [
+    @db.create_table(:posts){varchar :title, :size => 5; index :title, :where => {:title => '5'}}
+    @db.sqls.should == [
       "CREATE TABLE posts (title varchar(5))",
-      "CREATE INDEX posts_title_index ON posts (title) WHERE (something = 5)"
+      "CREATE INDEX posts_title_index ON posts (title) WHERE (title = '5')"
     ]
   end
   
   specify "should support identifiers for table names in indicies" do
-    g = Sequel::Schema::Generator.new(POSTGRES_DB) do
-      varchar :title, :size => 5
-      index :title, :where => {:something => 5}
-    end
-    POSTGRES_DB.send(:create_table_sql_list, Sequel::SQL::Identifier.new(:posts__test), *g.create_info).should == [
-      "CREATE TABLE posts__test (title varchar(5))",
-      "CREATE INDEX posts__test_title_index ON posts__test (title) WHERE (something = 5)"
+    @db.create_table(Sequel::SQL::Identifier.new(:posts)){varchar :title, :size => 5; index :title, :where => {:title => '5'}}
+    @db.sqls.should == [
+      "CREATE TABLE posts (title varchar(5))",
+      "CREATE INDEX posts_title_index ON posts (title) WHERE (title = '5')"
     ]
   end
 end
 
-context "Postgres::Dataset#multi_insert_sql" do
+context "Postgres::Dataset#import" do
   before do
-    @ds = POSTGRES_DB[:test]
+    @db = POSTGRES_DB
+    @db.create_table!(:test){Integer :x; Integer :y}
+    @db.sqls.clear
+    @ds = @db[:test]
+  end
+  after do
+    @db.drop_table(:test) rescue nil
   end
   
-  specify "should return separate insert statements if server_version < 80200" do
+  specify "#import should return separate insert statements if server_version < 80200" do
     @ds.meta_def(:server_version){80199}
     
-    @ds.multi_insert_sql([:x, :y], [[1, 2], [3, 4]]).should == [
+    @ds.import([:x, :y], [[1, 2], [3, 4]])
+    
+    @db.sqls.should == [
+      'BEGIN',
       'INSERT INTO test (x, y) VALUES (1, 2)',
-      'INSERT INTO test (x, y) VALUES (3, 4)'
+      'INSERT INTO test (x, y) VALUES (3, 4)',
+      'COMMIT'
     ]
+    @ds.all.should == [{:x=>1, :y=>2}, {:x=>3, :y=>4}]
   end
   
-  specify "should a single insert statement if server_version >= 80200" do
+  specify "#import should a single insert statement if server_version >= 80200" do
     @ds.meta_def(:server_version){80200}
-   
-    @ds.multi_insert_sql([:x, :y], [[1, 2], [3, 4]]).should == [
-      'INSERT INTO test (x, y) VALUES (1, 2), (3, 4)'
-    ]
-
-    @ds.meta_def(:server_version){80201}
     
-    @ds.multi_insert_sql([:x, :y], [[1, 2], [3, 4]]).should == [
-      'INSERT INTO test (x, y) VALUES (1, 2), (3, 4)'
+    @ds.import([:x, :y], [[1, 2], [3, 4]])
+    
+    @db.sqls.should == [
+      'BEGIN',
+      'INSERT INTO test (x, y) VALUES (1, 2), (3, 4)',
+      'COMMIT'
     ]
+    @ds.all.should == [{:x=>1, :y=>2}, {:x=>3, :y=>4}]
   end
 end
 
 context "Postgres::Dataset#insert" do
   before do
-    @ds = POSTGRES_DB[:test5]
-    @ds.delete
+    @db = POSTGRES_DB
+    @db.create_table!(:test5){primary_key :xid; Integer :value}
+    @db.sqls.clear
+    @ds = @db[:test5]
+  end
+  after do
+    @db.drop_table(:test5) rescue nil
+  end
+
+  specify "should work regardless of how it is used" do
+    @ds.insert(:value=>10).should == 1
+    @ds.disable_insert_returning.insert(:value=>20).should == 2
+    @ds.meta_def(:server_version){80100}
+    @ds.insert(:value=>13).should == 3
+    
+    @db.sqls.reject{|x| x =~ /pg_class/}.should == [
+      'INSERT INTO test5 (value) VALUES (10) RETURNING xid',
+      'INSERT INTO test5 (value) VALUES (20)',
+      "SELECT currval('\"public\".\"test5_xid_seq\"')",
+      'INSERT INTO test5 (value) VALUES (13)',
+      "SELECT currval('\"public\".\"test5_xid_seq\"')"
+    ]
+    @ds.all.should == [{:xid=>1, :value=>10}, {:xid=>2, :value=>20}, {:xid=>3, :value=>13}]
   end
   
-  specify "should call insert_sql if server_version < 80200" do
+  specify "should call execute_insert if server_version < 80200" do
     @ds.meta_def(:server_version){80100}
     @ds.should_receive(:execute_insert).once.with('INSERT INTO test5 (value) VALUES (10)', :table=>:test5, :values=>{:value=>10})
     @ds.insert(:value=>10)
   end
 
-  specify "should call insert_sql if disabling insert returning" do
+  specify "should call execute_insert if disabling insert returning" do
     @ds.disable_insert_returning!
     @ds.should_receive(:execute_insert).once.with('INSERT INTO test5 (value) VALUES (10)', :table=>:test5, :values=>{:value=>10})
     @ds.insert(:value=>10)
@@ -493,9 +511,9 @@ context "Postgres::Database functions, languages, and triggers" do
     @d.drop_function('tf', :if_exists=>true, :cascade=>true)
     @d.drop_function('tf', :if_exists=>true, :cascade=>true, :args=>%w'integer integer')
     @d.drop_language(:plpgsql, :if_exists=>true, :cascade=>true)
-    @d.drop_trigger(:test5, :identity, :if_exists=>true, :cascade=>true)
+    @d.drop_table(:test) rescue nil
   end
-  
+
   specify "#create_function and #drop_function should create and drop functions" do
     proc{@d['SELECT tf()'].all}.should raise_error(Sequel::DatabaseError)
     args = ['tf', 'SELECT 1', {:returns=>:integer}]
@@ -538,6 +556,7 @@ context "Postgres::Database functions, languages, and triggers" do
     @d.create_language(:plpgsql)
     @d.create_function(:tf, 'BEGIN IF NEW.value IS NULL THEN RAISE EXCEPTION \'Blah\'; END IF; RETURN NEW; END;', :language=>:plpgsql, :returns=>:trigger)
     @d.send(:create_trigger_sql, :test, :identity, :tf, :each_row=>true).should == 'CREATE TRIGGER identity BEFORE INSERT OR UPDATE OR DELETE ON public.test FOR EACH ROW EXECUTE PROCEDURE tf()'
+    @d.create_table(:test){String :name; Integer :value}
     @d.create_trigger(:test, :identity, :tf, :each_row=>true)
     @d[:test].insert(:name=>'a', :value=>1)
     @d[:test].filter(:name=>'a').all.should == [{:name=>'a', :value=>1}]
