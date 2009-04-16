@@ -58,6 +58,19 @@ context "An Oracle database" do
       expected_schema.should == schema
     end
   end
+  
+  specify "should create a temporary table" do
+    ORACLE_DB.create_table :test_tmp, :temporary => true do
+      primary_key :id, :integer, :null => false
+      column :name, :text
+      index :name, :unique => true
+    end
+    
+    ORACLE_DB.sqls.should == [
+      'CREATE GLOBAL TEMPORARY TABLE test_tmp (id integer NOT NULL PRIMARY KEY AUTOINCREMENT, name text)',
+      'CREATE UNIQUE INDEX test_tmp_name_index ON test_tmp (name)'
+    ]
+  end
 end
 
 context "An Oracle dataset" do
