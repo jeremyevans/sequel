@@ -13,16 +13,9 @@ end
 
 MYSQL_URI = URI.parse(MYSQL_DB.uri)
 
-MYSQL_DB.create_table! :items do
-  text :name
-  integer :value, :index => true
-end
 MYSQL_DB.create_table! :test2 do
   text :name
   integer :value
-end
-MYSQL_DB.create_table! :booltest do
-  tinyint :value
 end
 def MYSQL_DB.sqls
   (@sqls ||= [])
@@ -32,6 +25,9 @@ def logger.method_missing(m, msg)
   MYSQL_DB.sqls << msg
 end
 MYSQL_DB.logger = logger
+MYSQL_DB.drop_table(:items) rescue nil
+MYSQL_DB.drop_table(:dolls) rescue nil
+MYSQL_DB.drop_table(:booltest) rescue nil
 
 if MYSQL_DB.class.adapter_scheme == :do
   SQL_BEGIN = 'Transaction.begin'
@@ -49,27 +45,28 @@ context "MySQL", '#create_table' do
     MYSQL_DB.sqls.clear
   end
   after do
-    drop_table(:dolls) rescue nil
-    drop_table(:tmp_dolls) rescue nil
+    @db.drop_table(:dolls) rescue nil
   end
   
   specify "should allow to specify options for MySQL" do
-    @db.create_table!(:dolls, :engine => 'MyISAM', :charset => 'latin2'){text :name}
-    @db.sqls.last.should == "CREATE TABLE dolls (name text) ENGINE=MyISAM DEFAULT CHARSET=latin2"
+    @db.create_table(:dolls, :engine => 'MyISAM', :charset => 'latin2'){text :name}
+    @db.sqls.should == ["CREATE TABLE dolls (name text) ENGINE=MyISAM DEFAULT CHARSET=latin2"]
   end
   
   specify "should create a temporary table" do
-    @db.create_table!(:tmp_dolls, :temp => true, :engine => 'MyISAM', :charset => 'latin2'){text :name}
-    @db.sqls.last.should == "CREATE TEMPORARY TABLE tmp_dolls (name text) ENGINE=MyISAM DEFAULT CHARSET=latin2"
+    @db.create_table(:tmp_dolls, :temp => true, :engine => 'MyISAM', :charset => 'latin2'){text :name}
+    @db.sqls.should == ["CREATE TEMPORARY TABLE tmp_dolls (name text) ENGINE=MyISAM DEFAULT CHARSET=latin2"]
   end
 end
 
 context "A MySQL database" do
   before do
     @db = MYSQL_DB
+    @db.create_table(:booltest){TrueClass :value}
   end
   after do
     Sequel.convert_tinyint_to_bool = true
+    @db.drop_table(:booltest)
   end
 
   specify "should provide the server version" do
@@ -82,13 +79,40 @@ context "A MySQL database" do
     Sequel.convert_tinyint_to_bool = false
     @db.schema(:booltest, :reload=>true).should == [[:value, {:type=>:integer, :allow_null=>true, :primary_key=>false, :default=>nil, :db_type=>"tinyint(4)"}]]
   end
+  
+  specify "should accept and return tinyints as bools or integers when configured to do so" do
+    MYSQL_DB[:booltest].delete
+    MYSQL_DB[:booltest] << {:value=>true}
+    MYSQL_DB[:booltest].all.should == [{:value=>true}]
+    MYSQL_DB[:booltest].delete
+    MYSQL_DB[:booltest] << {:value=>false}
+    MYSQL_DB[:booltest].all.should == [{:value=>false}]
+    
+    Sequel.convert_tinyint_to_bool = false
+    MYSQL_DB[:booltest].delete
+    MYSQL_DB[:booltest] << {:value=>true}
+    MYSQL_DB[:booltest].all.should == [{:value=>1}]
+    MYSQL_DB[:booltest].delete
+    MYSQL_DB[:booltest] << {:value=>false}
+    MYSQL_DB[:booltest].all.should == [{:value=>0}]
+    
+    MYSQL_DB[:booltest].delete
+    MYSQL_DB[:booltest] << {:value=>1}
+    MYSQL_DB[:booltest].all.should == [{:value=>1}]
+    MYSQL_DB[:booltest].delete
+    MYSQL_DB[:booltest] << {:value=>0}
+    MYSQL_DB[:booltest].all.should == [{:value=>0}]
+  end
 end
 
 context "A MySQL dataset" do
   before do
+    MYSQL_DB.create_table(:items){String :name; Integer :value}
     @d = MYSQL_DB[:items]
-    @d.delete # remove all records
     MYSQL_DB.sqls.clear
+  end
+  after do
+    MYSQL_DB.drop_table(:items)
   end
   
   specify "should quote columns and tables using back-ticks if quoting identifiers" do
@@ -180,9 +204,6 @@ context "MySQL datasets" do
   before do
     @d = MYSQL_DB[:orders]
   end
-  after do
-    Sequel.convert_tinyint_to_bool = true
-  end
   
   specify "should correctly quote column references" do
     @d.quote_identifiers = true
@@ -192,30 +213,6 @@ context "MySQL datasets" do
       where{|o|(:ack.sql_number > ack_stamp) & {:market => market}}.
       group_by(:minute.sql_function(:from_unixtime.sql_function(:ack))).sql.should == \
       "SELECT `market`, minute(from_unixtime(`ack`)) AS `minute` FROM `orders` WHERE ((`ack` > #{@d.literal(ack_stamp)}) AND (`market` = 'ICE')) GROUP BY minute(from_unixtime(`ack`))"
-  end
-
-  specify "should accept and return tinyints as bools or integers when configured to do so" do
-    MYSQL_DB[:booltest].delete
-    MYSQL_DB[:booltest] << {:value=>true}
-    MYSQL_DB[:booltest].all.should == [{:value=>true}]
-    MYSQL_DB[:booltest].delete
-    MYSQL_DB[:booltest] << {:value=>false}
-    MYSQL_DB[:booltest].all.should == [{:value=>false}]
-    
-    Sequel.convert_tinyint_to_bool = false
-    MYSQL_DB[:booltest].delete
-    MYSQL_DB[:booltest] << {:value=>true}
-    MYSQL_DB[:booltest].all.should == [{:value=>1}]
-    MYSQL_DB[:booltest].delete
-    MYSQL_DB[:booltest] << {:value=>false}
-    MYSQL_DB[:booltest].all.should == [{:value=>0}]
-    
-    MYSQL_DB[:booltest].delete
-    MYSQL_DB[:booltest] << {:value=>1}
-    MYSQL_DB[:booltest].all.should == [{:value=>1}]
-    MYSQL_DB[:booltest].delete
-    MYSQL_DB[:booltest] << {:value=>0}
-    MYSQL_DB[:booltest].all.should == [{:value=>0}]
   end
 end
 
@@ -361,89 +358,70 @@ context "A MySQL database" do
   end
 end  
 
-context "A MySQL database", "with table options" do
-  before(:all) do
-    @options = {}
-    @options[:engine] = 'MyISAM'
-    @options[:charset] = 'latin2'
-    @options[:collate] = 'swedish'
+context "A MySQL database with table options" do
+  before do
+    @options = {:engine=>'MyISAM', :charset=>'latin1', :collate => 'latin1_swedish_ci'}
     
     Sequel::MySQL.default_engine = 'InnoDB'
     Sequel::MySQL.default_charset = 'utf8'
-    Sequel::MySQL.default_collate = 'utf8'    
+    Sequel::MySQL.default_collate = 'utf8_general_ci'    
     
     @db = MYSQL_DB
-    @g = Sequel::Schema::Generator.new(@db) do
-      integer :size
-      text :name
-    end
+    @db.drop_table(:items) rescue nil
+    
+    MYSQL_DB.sqls.clear
   end
-  
-  after(:all) do
+  after do
+    @db.drop_table(:items) rescue nil
     Sequel::MySQL.default_engine = nil
     Sequel::MySQL.default_charset = nil
     Sequel::MySQL.default_collate = nil
   end
   
   specify "should allow to pass custom options (engine, charset, collate) for table creation" do
-    statements = @db.send(:create_table_sql_list, :items, *(@g.create_info << @options))
-    statements.should == [
-      "CREATE TABLE items (size integer, name text) ENGINE=MyISAM DEFAULT CHARSET=latin2 DEFAULT COLLATE=swedish"
-    ]
+    @db.create_table(:items, @options){Integer :size; text :name}
+    @db.sqls.should == ["CREATE TABLE items (size integer, name text) ENGINE=MyISAM DEFAULT CHARSET=latin1 DEFAULT COLLATE=latin1_swedish_ci"]
   end
   
   specify "should use default options if specified (engine, charset, collate) for table creation" do
-    statements = @db.send(:create_table_sql_list, :items, *(@g.create_info))
-    statements.should == [
-      "CREATE TABLE items (size integer, name text) ENGINE=InnoDB DEFAULT CHARSET=utf8 DEFAULT COLLATE=utf8"
-    ]
+    @db.create_table(:items){Integer :size; text :name}
+    @db.sqls.should == ["CREATE TABLE items (size integer, name text) ENGINE=InnoDB DEFAULT CHARSET=utf8 DEFAULT COLLATE=utf8_general_ci"]
   end
   
   specify "should not use default if option has a nil value" do
-    statements = @db.send(:create_table_sql_list, :items, *(@g.create_info << {:engine=>nil, :charset=>nil, :collate=>nil}))
-    statements.should == [
-      "CREATE TABLE items (size integer, name text)"
-    ]
+    @db.create_table(:items, :engine=>nil, :charset=>nil, :collate=>nil){Integer :size; text :name}
+    @db.sqls.should == ["CREATE TABLE items (size integer, name text)"]
   end
 end
 
 context "A MySQL database" do
   before do
     @db = MYSQL_DB
+    @db.drop_table(:items) rescue nil
+    MYSQL_DB.sqls.clear
+  end
+  after do
+    @db.drop_table(:items) rescue nil
   end
   
   specify "should support defaults for boolean columns" do
-    g = Sequel::Schema::Generator.new(@db) do
-      boolean :active1, :default => true
-      boolean :active2, :default => false
-    end
-    statements = @db.send(:create_table_sql_list, :items, *g.create_info)
-    statements.should == [
-      "CREATE TABLE items (active1 boolean DEFAULT 1, active2 boolean DEFAULT 0)"
-    ]
+    @db.create_table(:items){TrueClass :active1, :default=>true; FalseClass :active2, :default => false}
+    @db.sqls.should == ["CREATE TABLE items (active1 tinyint DEFAULT 1, active2 tinyint DEFAULT 0)"]
   end
   
   specify "should correctly format CREATE TABLE statements with foreign keys" do
-    g = Sequel::Schema::Generator.new(@db) do
-      foreign_key :p_id, :table => :users, :key => :id, 
-        :null => false, :on_delete => :cascade
-    end
-    @db.send(:create_table_sql_list, :items, *g.create_info).should == [
-      "CREATE TABLE items (p_id integer NOT NULL, FOREIGN KEY (p_id) REFERENCES users(id) ON DELETE CASCADE)"
-    ]
+    @db.create_table(:items){Integer :id; foreign_key :p_id, :items, :key => :id, :null => false, :on_delete => :cascade}
+    @db.sqls.should == ["CREATE TABLE items (id integer, p_id integer NOT NULL, FOREIGN KEY (p_id) REFERENCES items(id) ON DELETE CASCADE)"]
   end
   
-specify "should correctly format ALTER TABLE statements with foreign keys" do
-  g = Sequel::Schema::AlterTableGenerator.new(@db) do
-    add_foreign_key :p_id, :users, :key => :id, :null => false, :on_delete => :cascade
+  specify "should correctly format ALTER TABLE statements with foreign keys" do
+    @db.create_table(:items){Integer :id}
+    @db.alter_table(:items){add_foreign_key :p_id, :users, :key => :id, :null => false, :on_delete => :cascade}
+    @db.sqls.should == ["CREATE TABLE items (id integer)", "ALTER TABLE items ADD COLUMN p_id integer NOT NULL", "ALTER TABLE items ADD FOREIGN KEY (p_id) REFERENCES users(id) ON DELETE CASCADE"]
   end
-  @db.send(:alter_table_sql_list, :items, g.operations).should == [[
-    "ALTER TABLE items ADD COLUMN p_id integer NOT NULL",
-    "ALTER TABLE items ADD FOREIGN KEY (p_id) REFERENCES users(id) ON DELETE CASCADE"
-  ]]
-end
   
   specify "should accept repeated raw sql statements using Database#<<" do
+    @db.create_table(:items){String :name; Integer :value}
     @db << 'DELETE FROM items'
     @db[:items].count.should == 0
     
@@ -455,6 +433,7 @@ end
   end
   
   specify "should handle multiple select statements at once" do
+    @db.create_table(:items){String :name; Integer :value}
     @db[:items].delete
     @db[:items].insert(:name => 'tutu', :value => 1234)
     @db["SELECT * FROM items; SELECT * FROM items"].all.should == \
@@ -505,19 +484,22 @@ context "A grouped MySQL dataset" do
 end
 
 context "A MySQL database" do
-  specify "should support fulltext indexes" do
-    g = Sequel::Schema::Generator.new(MYSQL_DB) do
-      text :title
-      text :body
-      full_text_index [:title, :body]
-    end
-    MYSQL_DB.send(:create_table_sql_list, :posts, *g.create_info).should == [
+  before do
+    @db = MYSQL_DB
+    @db.drop_table(:posts) rescue nil
+    MYSQL_DB.sqls.clear
+  end
+  after do
+    @db.drop_table(:posts) rescue nil
+  end
+  
+  specify "should support fulltext indexes and full_text_search" do
+    @db.create_table(:posts){text :title; text :body; full_text_index [:title, :body]}
+    @db.sqls.should == [
       "CREATE TABLE posts (title text, body text)",
       "CREATE FULLTEXT INDEX posts_title_body_index ON posts (title, body)"
     ]
-  end
-  
-  specify "should support full_text_search" do
+
     MYSQL_DB[:posts].full_text_search(:title, 'ruby').sql.should ==
       "SELECT * FROM posts WHERE (MATCH (title) AGAINST ('ruby'))"
     
@@ -529,47 +511,41 @@ context "A MySQL database" do
   end
 
   specify "should support spatial indexes" do
-    g = Sequel::Schema::Generator.new(MYSQL_DB) do
-      point :geom
-      spatial_index [:geom]
-    end
-    MYSQL_DB.send(:create_table_sql_list, :posts, *g.create_info).should == [
-      "CREATE TABLE posts (geom point)",
+    @db.create_table(:posts){point :geom, :null=>false; spatial_index [:geom]}
+    @db.sqls.should == [
+      "CREATE TABLE posts (geom point NOT NULL)",
       "CREATE SPATIAL INDEX posts_geom_index ON posts (geom)"
     ]
   end
 
   specify "should support indexes with index type" do
-    g = Sequel::Schema::Generator.new(MYSQL_DB) do
-      text :title
-      index :title, :type => :hash
-    end
-    MYSQL_DB.send(:create_table_sql_list, :posts, *g.create_info).should == [
-      "CREATE TABLE posts (title text)",
-      "CREATE INDEX posts_title_index ON posts (title) USING hash"
+    @db.create_table(:posts){Integer :id; index :id, :type => :btree}
+    @db.sqls.should == [
+      "CREATE TABLE posts (id integer)",
+      "CREATE INDEX posts_id_index USING btree ON posts (id)"
     ]
   end
 
   specify "should support unique indexes with index type" do
-    g = Sequel::Schema::Generator.new(MYSQL_DB) do
-      text :title
-      index :title, :type => :hash, :unique => true
-    end
-    MYSQL_DB.send(:create_table_sql_list, :posts, *g.create_info).should == [
-      "CREATE TABLE posts (title text)",
-      "CREATE UNIQUE INDEX posts_title_index ON posts (title) USING hash"
+    @db.create_table(:posts){Integer :id; index :id, :type => :btree, :unique => true}
+    @db.sqls.should == [
+      "CREATE TABLE posts (id integer)",
+      "CREATE UNIQUE INDEX posts_id_index USING btree ON posts (id)"
     ]
   end
 end
 
-context "MySQL::Dataset#insert" do
+context "MySQL::Dataset#insert and related methods" do
   before do
+    MYSQL_DB.create_table(:items){String :name; Integer :value}
     @d = MYSQL_DB[:items]
-    @d.delete
     MYSQL_DB.sqls.clear
   end
+  after do
+    MYSQL_DB.drop_table(:items)
+  end
 
-  specify "should insert record with default values when no arguments given" do
+  specify "#insert should insert record with default values when no arguments given" do
     @d.insert
     
     MYSQL_DB.sqls.should == [
@@ -581,7 +557,7 @@ context "MySQL::Dataset#insert" do
     ]
   end
 
-  specify "should insert record with default values when empty hash given" do
+  specify "#insert  should insert record with default values when empty hash given" do
     @d.insert({})
     
     MYSQL_DB.sqls.should == [
@@ -593,7 +569,7 @@ context "MySQL::Dataset#insert" do
     ]
   end
 
-  specify "should insert record with default values when empty array given" do
+  specify "#insert should insert record with default values when empty array given" do
     @d.insert []
     
     MYSQL_DB.sqls.should == [
@@ -604,16 +580,8 @@ context "MySQL::Dataset#insert" do
       {:name => nil, :value => nil}
     ]
   end
-end
 
-context "MySQL::Dataset#multi_insert" do
-  before do
-    @d = MYSQL_DB[:items]
-    @d.delete
-    MYSQL_DB.sqls.clear
-  end
-  
-  specify "should insert multiple records in a single statement" do
+  specify "#multi_insert should insert multiple records in a single statement" do
     @d.multi_insert([{:name => 'abc'}, {:name => 'def'}])
     
     MYSQL_DB.sqls.should == [
@@ -627,7 +595,7 @@ context "MySQL::Dataset#multi_insert" do
     ]
   end
 
-  specify "should split the list of records into batches if :commit_every option is given" do
+  specify "#multi_insert should split the list of records into batches if :commit_every option is given" do
     @d.multi_insert([{:value => 1}, {:value => 2}, {:value => 3}, {:value => 4}],
       :commit_every => 2)
 
@@ -648,7 +616,7 @@ context "MySQL::Dataset#multi_insert" do
     ]
   end
 
-  specify "should split the list of records into batches if :slice option is given" do
+  specify "#multi_insert should split the list of records into batches if :slice option is given" do
     @d.multi_insert([{:value => 1}, {:value => 2}, {:value => 3}, {:value => 4}],
       :slice => 2)
 
@@ -669,7 +637,7 @@ context "MySQL::Dataset#multi_insert" do
     ]
   end
   
-  specify "should support inserting using columns and values arrays" do
+  specify "#import should support inserting using columns and values arrays" do
     @d.import([:name, :value], [['abc', 1], ['def', 2]])
 
     MYSQL_DB.sqls.should == [
@@ -683,16 +651,8 @@ context "MySQL::Dataset#multi_insert" do
       {:name => 'def', :value => 2}
     ]
   end
-end
-
-context "MySQL::Dataset#insert_ignore" do
-  before do
-    @d = MYSQL_DB[:items]
-    @d.delete
-    MYSQL_DB.sqls.clear
-  end
   
-  specify "should add the IGNORE keyword when inserting" do
+  specify "#insert_ignore should add the IGNORE keyword when inserting" do
     @d.insert_ignore.multi_insert([{:name => 'abc'}, {:name => 'def'}])
     
     MYSQL_DB.sqls.should == [
@@ -705,16 +665,8 @@ context "MySQL::Dataset#insert_ignore" do
       {:name => 'abc', :value => nil}, {:name => 'def', :value => nil}
     ]
   end
-end
-
-context "MySQL::Dataset#on_duplicate_key_update" do
-  before do
-    @d = MYSQL_DB[:items]
-    @d.delete
-    MYSQL_DB.sqls.clear
-  end
   
-  specify "should add the ON DUPLICATE KEY UPDATE and ALL columns when no args given" do
+  specify "#on_duplicate_key_update should add the ON DUPLICATE KEY UPDATE and ALL columns when no args given" do
     @d.on_duplicate_key_update.import([:name,:value], 
       [['abc', 1], ['def',2]]
     )
@@ -729,7 +681,8 @@ context "MySQL::Dataset#on_duplicate_key_update" do
       {:name => 'abc', :value => 1}, {:name => 'def', :value => 2}
     ]
   end
-  specify "should add the ON DUPLICATE KEY UPDATE and columns specified when args are given" do
+  
+  specify "#on_duplicate_key_update should add the ON DUPLICATE KEY UPDATE and columns specified when args are given" do
     @d.on_duplicate_key_update(:value).import([:name,:value], 
       [['abc', 1], ['def',2]]
     )
@@ -749,13 +702,12 @@ end
 
 context "MySQL::Dataset#replace" do
   before do
-    MYSQL_DB.drop_table(:items) if MYSQL_DB.table_exists?(:items)
-    MYSQL_DB.create_table :items do
-      integer :id, :unique => true
-      integer :value, :index => true
-    end
+    MYSQL_DB.create_table(:items){Integer :id, :unique=>true; Integer :value}
     @d = MYSQL_DB[:items]
     MYSQL_DB.sqls.clear
+  end
+  after do
+    MYSQL_DB.drop_table(:items)
   end
   
   specify "should create a record if the condition is not met" do
@@ -801,7 +753,13 @@ end
 
 unless MYSQL_DB.class.adapter_scheme == :do
   context "MySQL Stored Procedures" do
+    before do
+      MYSQL_DB.create_table(:items){Integer :id; Integer :value}
+      @d = MYSQL_DB[:items]
+      MYSQL_DB.sqls.clear
+    end
     after do
+      MYSQL_DB.drop_table(:items)
       MYSQL_DB.execute('DROP PROCEDURE test_sproc')
     end
     

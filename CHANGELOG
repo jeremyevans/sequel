@@ -1,5 +1,7 @@
 === HEAD
 
+* Fix index type syntax on MySQL (jeremyevans)
+
 * Add temporary table support, via :temp option to Database#create_table (EppO, jeremyevans)
 
 * Add Amalgalite adapter (jeremyevans)

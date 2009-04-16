@@ -114,7 +114,7 @@ module Sequel
           using = " USING #{index[:type]}" unless index[:type] == nil
           "UNIQUE " if index[:unique]
         end
-        "CREATE #{index_type}INDEX #{index_name} ON #{quote_schema_table(table_name)} #{literal(index[:columns])}#{using}"
+        "CREATE #{index_type}INDEX #{index_name}#{using} ON #{quote_schema_table(table_name)} #{literal(index[:columns])}"
       end
       
       # Use the MySQL specific DESCRIBE syntax to get a table description.
