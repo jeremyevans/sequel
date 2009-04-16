@@ -1,5 +1,7 @@
 === HEAD
 
+* Fix full text searching with multiple search terms on MySQL (jeremyevans)
+
 * Fix altering a column name, type, default, or NULL/NOT NULL status on MySQL (jeremyevans)
 
 * Fix index type syntax on MySQL (jeremyevans)

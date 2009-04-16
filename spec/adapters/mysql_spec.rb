@@ -526,27 +526,32 @@ context "A MySQL database" do
   before do
     @db = MYSQL_DB
     @db.drop_table(:posts) rescue nil
-    MYSQL_DB.sqls.clear
+    @db.sqls.clear
   end
   after do
     @db.drop_table(:posts) rescue nil
   end
   
   specify "should support fulltext indexes and full_text_search" do
-    @db.create_table(:posts){text :title; text :body; full_text_index [:title, :body]}
+    @db.create_table(:posts){text :title; text :body; full_text_index :title; full_text_index [:title, :body]}
     @db.sqls.should == [
       "CREATE TABLE posts (title text, body text)",
+      "CREATE FULLTEXT INDEX posts_title_index ON posts (title)",
       "CREATE FULLTEXT INDEX posts_title_body_index ON posts (title, body)"
     ]
-
-    MYSQL_DB[:posts].full_text_search(:title, 'ruby').sql.should ==
-      "SELECT * FROM posts WHERE (MATCH (title) AGAINST ('ruby'))"
     
-    MYSQL_DB[:posts].full_text_search([:title, :body], ['ruby', 'sequel']).sql.should ==
-      "SELECT * FROM posts WHERE (MATCH (title, body) AGAINST ('ruby', 'sequel'))"
-      
-    MYSQL_DB[:posts].full_text_search(:title, '+ruby -rails', :boolean => true).sql.should ==
-      "SELECT * FROM posts WHERE (MATCH (title) AGAINST ('+ruby -rails' IN BOOLEAN MODE))"
+    @db[:posts].insert(:title=>'ruby rails', :body=>'y')
+    @db[:posts].insert(:title=>'sequel', :body=>'ruby')
+    @db[:posts].insert(:title=>'ruby scooby', :body=>'x')
+    @db.sqls.clear
+
+    @db[:posts].full_text_search(:title, 'rails').all.should == [{:title=>'ruby rails', :body=>'y'}]
+    @db[:posts].full_text_search([:title, :body], ['sequel', 'ruby']).all.should == [{:title=>'sequel', :body=>'ruby'}]
+    @db[:posts].full_text_search(:title, '+ruby -rails', :boolean => true).all.should == [{:title=>'ruby scooby', :body=>'x'}]
+    @db.sqls.should == [
+      "SELECT * FROM posts WHERE (MATCH (title) AGAINST ('rails'))",
+      "SELECT * FROM posts WHERE (MATCH (title, body) AGAINST ('sequel ruby'))",
+      "SELECT * FROM posts WHERE (MATCH (title) AGAINST ('+ruby -rails' IN BOOLEAN MODE))"]
   end
 
   specify "should support spatial indexes" do
