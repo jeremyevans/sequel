@@ -369,6 +369,19 @@ context "Database#create_table" do
       'CREATE UNIQUE INDEX test_name_index ON test (name)'
     ]
   end
+  
+  specify "should create a temporary table" do
+    @db.create_table :test_tmp, :temporary => true do
+      primary_key :id, :integer, :null => false
+      column :name, :text
+      index :name, :unique => true
+    end
+    
+    @db.sqls.should == [
+      'CREATE TEMPORARY TABLE test_tmp (id integer NOT NULL PRIMARY KEY AUTOINCREMENT, name text)',
+      'CREATE UNIQUE INDEX test_tmp_name_index ON test_tmp (name)'
+    ]
+  end
 end
 
 context "Database#alter_table" do

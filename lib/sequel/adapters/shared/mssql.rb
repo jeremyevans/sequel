@@ -34,6 +34,14 @@ module Sequel
       def rollback_transaction_sql
         SQL_ROLLBACK
       end
+      
+      # mssql supports temporary table
+      def create_table_sql_list(name, columns, indexes = nil, options = {})
+        is_temporary = options[:temporary] ? "#" : ""
+        sql = ["CREATE TABLE #{is_temporary}#{quote_schema_table(name)} (#{column_list_sql(columns)})"]
+        sql.concat(index_list_sql_list(name, indexes)) if indexes && !indexes.empty?
+        sql
+      end
     end
   
     module DatasetMethods

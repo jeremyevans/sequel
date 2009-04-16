@@ -126,6 +126,14 @@ module Sequel
         end
       end
       
+      # sqlite supports temporary table
+      def create_table_sql_list(name, columns, indexes = nil, options = {})
+        is_temporary = options[:temporary] ? "TEMPORARY " : ""
+        sql = ["CREATE #{is_temporary}TABLE #{quote_schema_table(name)} (#{column_list_sql(columns)})"]
+        sql.concat(index_list_sql_list(name, indexes)) if indexes && !indexes.empty?
+        sql
+      end
+      
       # The array of column symbols in the table, except for ones given in opts[:except]
       def backup_table_name(table, opts={})
         (opts[:times]||1000).times do |i|

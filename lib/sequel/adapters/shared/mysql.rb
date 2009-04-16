@@ -89,7 +89,8 @@ module Sequel
         options[:engine] = Sequel::MySQL.default_engine unless options.include?(:engine)
         options[:charset] = Sequel::MySQL.default_charset unless options.include?(:charset)
         options[:collate] = Sequel::MySQL.default_collate unless options.include?(:collate)
-        sql = ["CREATE TABLE #{quote_schema_table(name)} (#{column_list_sql(columns)})#{" ENGINE=#{options[:engine]}" if options[:engine]}#{" DEFAULT CHARSET=#{options[:charset]}" if options[:charset]}#{" DEFAULT COLLATE=#{options[:collate]}" if options[:collate]}"]
+        is_temporary = "TEMPORARY " if options.include?(:temporary)
+        sql = ["CREATE #{is_temporary}TABLE #{quote_schema_table(name)} (#{column_list_sql(columns)})#{" ENGINE=#{options[:engine]}" if options[:engine]}#{" DEFAULT CHARSET=#{options[:charset]}" if options[:charset]}#{" DEFAULT COLLATE=#{options[:collate]}" if options[:collate]}"]
         sql.concat(index_list_sql_list(name, indexes)) if indexes && !indexes.empty?
         sql
       end
