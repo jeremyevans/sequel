@@ -73,7 +73,6 @@ module Sequel
     
     # SQL DDL fragment containing the column creation SQL for the given column.
     def column_definition_sql(column)
-      return constraint_definition_sql(column) if column[:type] == :check
       sql = "#{quote_identifier(column[:name])} #{type_literal(column)}"
       sql << UNIQUE if column[:unique]
       sql << NOT_NULL if column[:null] == false
@@ -87,8 +86,8 @@ module Sequel
     
     # SQL DDL fragment containing the column creation
     # SQL for all given columns, used inside a CREATE TABLE block.
-    def column_list_sql(columns)
-      columns.map{|c| column_definition_sql(c)}.join(COMMA_SEPARATOR)
+    def column_list_sql(generator)
+      (generator.columns.map{|c| column_definition_sql(c)} + generator.constraints.map{|c| constraint_definition_sql(c)}).join(COMMA_SEPARATOR)
     end
 
     # SQL DDL fragment for column foreign key references
@@ -103,7 +102,10 @@ module Sequel
     # SQL DDL fragment specifying a constraint on a table.
     def constraint_definition_sql(constraint)
       sql = constraint[:name] ? "CONSTRAINT #{quote_identifier(constraint[:name])} " : ""
-      case constraint[:constraint_type]
+      case constraint[:type]
+      when :check
+        check = constraint[:check]
+        sql << "CHECK #{filter_expr((check.is_a?(Array) && check.length == 1) ? check.first : check)}"
       when :primary_key
         sql << "PRIMARY KEY #{literal(constraint[:columns])}"
       when :foreign_key
@@ -112,24 +114,16 @@ module Sequel
       when :unique
         sql << "UNIQUE #{literal(constraint[:columns])}"
       else
-        check = constraint[:check]
-        sql << "CHECK #{filter_expr((check.is_a?(Array) && check.length == 1) ? check.first : check)}"
+        raise Error, "Invalid constriant type #{constraint[:type]}, should be :check, :primary_key, :foreign_key, or :unique"
       end
       sql
     end
 
     # DDL statement for creating a table with the given name, columns, and options
-    def create_table_sql(name, columns, options)
-      "CREATE #{temporary_table_sql if options[:temp]}TABLE #{quote_schema_table(name)} (#{column_list_sql(columns)})"
+    def create_table_sql(name, generator, options)
+      "CREATE #{temporary_table_sql if options[:temp]}TABLE #{quote_schema_table(name)} (#{column_list_sql(generator)})"
     end
 
-    # Array of SQL DDL statements, the first for creating a table with the given
-    # name and column specifications, and the others for specifying indexes on
-    # the table.
-    def create_table_sql_list(name, columns, indexes, options = {})
-      [create_table_sql(name, columns, options), (index_list_sql_list(name, indexes) unless indexes.empty?)].compact.flatten
-    end
-    
     # Default index name for the table and columns, may be too long
     # for certain databases.
     def default_index_name(table_name, columns)
@@ -167,7 +161,7 @@ module Sequel
   
     # Array of SQL DDL statements, one for each index specification,
     # for the given table.
-    def index_list_sql_list(table_name, indexes)
+    def index_sql_list(table_name, indexes)
       indexes.map{|i| index_definition_sql(table_name, i)}
     end
 

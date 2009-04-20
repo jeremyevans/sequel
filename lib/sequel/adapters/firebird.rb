@@ -46,13 +46,10 @@ module Sequel
       # generator for auto-incrementing primary keys.
       def create_table(name, options={}, &block)
         options = {:generator=>options} if options.is_a?(Schema::Generator)
-        statements = create_table_sql_list(name, *((options[:generator] ||= Schema::Generator.new(self, &block)).create_info << options))
-        begin
-          execute_ddl(statements[1])
-        rescue
-          nil
-        end if statements[1]
-        statements[0].flatten.each {|sql| execute_ddl(sql)}
+        generator = options[:generator] || Schema::Generator.new(self, &block)
+        drop_statement, create_statements = create_table_sql_list(name, generator, options)
+        (execute_ddl(drop_statement) rescue nil) if drop_statement
+        (create_statements + index_sql_list(name, generator.indexes)).each{|sql| execute_ddl(sql)}
       end
 
       def create_trigger(*args)
@@ -155,10 +152,10 @@ module Sequel
         "CREATE SEQUENCE #{quote_identifier(name)}"
       end
 
-      def create_table_sql_list(name, columns, indexes, options={})
-        statements = super
+      def create_table_sql_list(name, generator, options={})
+        statements = [create_table_sql(name, generator, options)]
         drop_seq_statement = nil
-        columns.each do |c|
+        generator.columns.each do |c|
           if c[:auto_increment]
             c[:sequence_name] ||= "seq_#{name}_#{c[:name]}"
             unless c[:create_sequence] == false
@@ -181,7 +178,7 @@ module Sequel
             end
           end
         end
-        [statements, drop_seq_statement]
+        [drop_seq_statement, statements]
       end
 
       def create_trigger_sql(table, name, definition, opts={})

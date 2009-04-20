@@ -141,6 +141,11 @@ module Sequel
         cols
       end
 
+      # Allow use without a generator, needed for the alter table hackery that Sequel allows.
+      def column_list_sql(generator)
+        generator.is_a?(Schema::Generator) ? super : generator.map{|c| column_definition_sql(c)}.join(', ')
+      end
+
       # The array of column schema hashes, except for the ones given in opts[:except]
       def defined_columns_for(table, opts={})
         cols = parse_pragma(table, {})

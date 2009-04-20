@@ -90,7 +90,7 @@ module Sequel
       end
       
       # Use MySQL specific syntax for engine type and character encoding
-      def create_table_sql(name, columns, options = {})
+      def create_table_sql(name, generator, options = {})
         engine = options.include?(:engine) ? options[:engine] : Sequel::MySQL.default_engine
         charset = options.include?(:charset) ? options[:charset] : Sequel::MySQL.default_charset
         collate = options.include?(:collate) ? options[:collate] : Sequel::MySQL.default_collate

@@ -17,14 +17,25 @@ module Sequel
       GENERIC_TYPES=[String, Integer, Fixnum, Bignum, Float, Numeric, BigDecimal,
       Date, DateTime, Time, File, TrueClass, FalseClass]
       
+      # Return the columns created by this generator
+      attr_reader :columns
+
+      # Return the constraints created by this generator
+      attr_reader :constraints
+
+      # Return the indexes created by this generator
+      attr_reader :indexes
+
       # Set the database in which to create the table, and evaluate the block
       # in the context of this object.
       def initialize(db, &block)
         @db = db
         @columns = []
         @indexes = []
+        @constraints = []
         @primary_key = nil
         instance_eval(&block) if block
+        @columns.unshift(@primary_key) if @primary_key && !has_column?(primary_key_name)
       end
       
       # Add a method for each of the given types that creates a column
@@ -79,17 +90,9 @@ module Sequel
       # Adds a named constraint (or unnamed if name is nil) to the DDL,
       # with the given block or args.
       def constraint(name, *args, &block)
-        @columns << {:name => name, :type => :check, :check => block || args,
-                     :constraint_type => :check}
+        @constraints << {:name => name, :type => :check, :check => block || args}
       end
       
-      # Return the DDL created by the generator as a array of two elements,
-      # the first being the columns and the second being the indexes.
-      def create_info
-        @columns.unshift(@primary_key) if @primary_key && !has_column?(primary_key_name)
-        [@columns, @indexes]
-      end
-
       # Add a foreign key in the table that references another table to the DDL. See column
       # for available options.
       def foreign_key(name, table=nil, opts = {})
@@ -171,8 +174,7 @@ module Sequel
 
       # Add a unique constraint on the given columns to the DDL.
       def unique(columns, opts = {})
-        @columns << {:type => :check, :constraint_type => :unique,
-                     :name => nil, :columns => Array(columns)}.merge(opts)
+        @constraints << {:type => :unique, :columns => Array(columns)}.merge(opts)
       end
 
       private
@@ -180,14 +182,12 @@ module Sequel
       # Add a composite primary key constraint
       def composite_primary_key(columns, *args)
         opts = args.pop || {}
-        @columns << {:type => :check, :constraint_type => :primary_key,
-                     :name => nil, :columns => columns}.merge(opts)
+        @constraints << {:type => :primary_key, :columns => columns}.merge(opts)
       end
 
       # Add a composite foreign key constraint
       def composite_foreign_key(columns, opts)
-        @columns << {:type => :check, :constraint_type => :foreign_key,
-                     :name => nil, :columns => columns }.merge(opts)
+        @constraints << {:type => :foreign_key, :columns => columns}.merge(opts)
       end
       
       add_type_method(*GENERIC_TYPES)
@@ -220,13 +220,11 @@ module Sequel
       # Add a constraint with the given name and args to the DDL for the table.
       # See Generator#constraint.
       def add_constraint(name, *args, &block)
-        @operations << {:op => :add_constraint, :name => name, :type => :check, \
-          :constraint_type => :check, :check => block || args}
+        @operations << {:op => :add_constraint, :name => name, :type => :check, :check => block || args}
       end
 
       def add_unique_constraint(columns, opts = {})
-        @operations << {:op => :add_constraint, :type => :check,
-          :constraint_type => :unique, :columns => Array(columns)}.merge(opts)
+        @operations << {:op => :add_constraint, :type => :unique, :columns => Array(columns)}.merge(opts)
       end
 
       # Add a foreign key with the given name and referencing the given table
@@ -308,15 +306,12 @@ module Sequel
 
       # Add a composite primary key constraint
       def add_composite_primary_key(columns, opts)
-        @operations << {:op => :add_constraint, :type => :check,
-          :constraint_type => :primary_key, :columns => columns}.merge(opts)
+        @operations << {:op => :add_constraint, :type => :primary_key, :columns => columns}.merge(opts)
       end
 
       # Add a composite foreign key constraint
       def add_composite_foreign_key(columns, table, opts)
-        @operations << {:op => :add_constraint, :type => :check,
-          :constraint_type => :foreign_key, :columns => columns,
-          :table => table}.merge(opts)
+        @operations << {:op => :add_constraint, :type => :foreign_key, :columns => columns, :table => table}.merge(opts)
       end
     end
   end

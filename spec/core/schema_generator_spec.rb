@@ -10,30 +10,27 @@ describe Sequel::Schema::Generator do
       check 'price > 100'
       constraint(:xxx) {:yyy == :zzz}
       index :title
-      index [:title, :body]
+      index [:title, :body], :unique => true
       foreign_key :node_id, :nodes
       primary_key [:title, :parent_id], :name => :cpk
       foreign_key [:node_id, :prop_id], :nodes_props, :name => :cfk
     end
-    @columns, @indexes = @generator.create_info
+    @columns, @indexes, @constraints = @generator.columns, @generator.indexes, @generator.constraints
   end
   
-  {:name => :id, :primary_key => true}.each do |column, expected|
-    it "uses default primary key #{column}" do
-      @columns.first[column].should == expected
-    end
+  it "should primary key column first" do
+    @columns.first[:name].should == :id
+    @columns.first[:primary_key].should == true
+    @columns[3][:name].should == :parent_id
+    @columns[3][:primary_key].should == nil
   end
   
-  it "counts primary key, column and constraint definitions as columns" do
-    @columns.size.should == 9
+  it "counts definitions correctly" do
+    @columns.size.should == 5
+    @indexes.size.should == 2
+    @constraints.size.should == 4
   end
   
-  it "places primary key first" do
-    @columns[0][:primary_key].should     be_true
-    @columns[1][:primary_key].should_not be_true
-    @columns[2][:primary_key].should_not be_true
-  end
-
   it "retrieves primary key name" do
     @generator.primary_key_name.should == :id
   end
@@ -48,14 +45,14 @@ describe Sequel::Schema::Generator do
   it "creates foreign key column" do
     @columns[3][:name].should == :parent_id
     @columns[3][:type].should == Integer
-    @columns[6][:name].should == :node_id
-    @columns[6][:type].should == Integer
+    @columns[4][:name].should == :node_id
+    @columns[4][:type].should == Integer
   end
   
   it "uses table for foreign key columns, if specified" do
-    @columns[6][:table].should == :nodes
     @columns[3][:table].should == nil
-    @columns[8][:table].should == :nodes_props
+    @columns[4][:table].should == :nodes
+    @constraints[3][:table].should == :nodes_props
   end
   
   it "finds columns" do
@@ -66,24 +63,22 @@ describe Sequel::Schema::Generator do
   end
   
   it "creates constraints" do
-    @columns[4][:name].should == nil
-    @columns[4][:type].should == :check
-    @columns[4][:check].should == ['price > 100']
+    @constraints[0][:name].should == nil
+    @constraints[0][:type].should == :check
+    @constraints[0][:check].should == ['price > 100']
 
-    @columns[5][:name].should == :xxx
-    @columns[5][:type].should == :check
-    @columns[5][:check].should be_a_kind_of(Proc)
+    @constraints[1][:name].should == :xxx
+    @constraints[1][:type].should == :check
+    @constraints[1][:check].should be_a_kind_of(Proc)
 
-    @columns[7][:name].should == :cpk
-    @columns[7][:type].should == :check
-    @columns[7][:constraint_type].should == :primary_key
-    @columns[7][:columns].should == [ :title, :parent_id ]
+    @constraints[2][:name].should == :cpk
+    @constraints[2][:type].should == :primary_key
+    @constraints[2][:columns].should == [ :title, :parent_id ]
 
-    @columns[8][:name].should == :cfk
-    @columns[8][:type].should == :check
-    @columns[8][:constraint_type].should == :foreign_key
-    @columns[8][:columns].should == [ :node_id, :prop_id ]
-    @columns[8][:table].should == :nodes_props
+    @constraints[3][:name].should == :cfk
+    @constraints[3][:type].should == :foreign_key
+    @constraints[3][:columns].should == [ :node_id, :prop_id ]
+    @constraints[3][:table].should == :nodes_props
   end
   
   it "creates indexes" do
@@ -130,20 +125,20 @@ describe Sequel::Schema::AlterTableGenerator do
       {:op => :add_index, :columns => [:geom], :type => :spatial},
       {:op => :add_index, :columns => [:blah], :type => :hash},
       {:op => :add_index, :columns => [:blah], :where => {:something => true}},
-      {:op => :add_constraint, :type => :check, :constraint_type => :check, :name => :con1, :check => ['fred > 100']},
+      {:op => :add_constraint, :type => :check, :name => :con1, :check => ['fred > 100']},
       {:op => :drop_constraint, :name => :con2},
-      {:op => :add_constraint, :type => :check, :constraint_type => :unique, :name => :con3, :columns => [:aaa, :bbb, :ccc]},
+      {:op => :add_constraint, :type => :unique, :name => :con3, :columns => [:aaa, :bbb, :ccc]},
       {:op => :add_column, :name => :id, :type => Integer, :primary_key=>true, :auto_increment=>true},
       {:op => :add_column, :name => :node_id, :type => Integer, :table=>:nodes},
-      {:op => :add_constraint, :type => :check, :constraint_type => :primary_key, :columns => [:aaa, :bbb]},
-      {:op => :add_constraint, :type => :check, :constraint_type => :foreign_key, :columns => [:node_id, :prop_id], :table => :nodes_props}
+      {:op => :add_constraint, :type => :primary_key, :columns => [:aaa, :bbb]},
+      {:op => :add_constraint, :type => :foreign_key, :columns => [:node_id, :prop_id], :table => :nodes_props}
     ]
   end
 end
 
 describe "Sequel::Schema::Generator generic type methods" do
-  before do
-    @generator = Sequel::Schema::Generator.new(SchemaDummyDatabase.new) do
+  it "should store the type class in :type for each column" do
+    Sequel::Schema::Generator.new(SchemaDummyDatabase.new) do
       String :a
       Integer :b
       Fixnum :c
@@ -157,11 +152,6 @@ describe "Sequel::Schema::Generator generic type methods" do
       File :k
       TrueClass :l
       FalseClass :m
-    end
-    @columns, @indexes = @generator.create_info
-  end
-  
-  it "should store the type class in :type for each column" do
-    @columns.map{|c| c[:type]}.should == [String, Integer, Fixnum, Bignum, Float, BigDecimal, Date, DateTime, Time, Numeric, File, TrueClass, FalseClass]
+    end.columns.map{|c| c[:type]}.should == [String, Integer, Fixnum, Bignum, Float, BigDecimal, Date, DateTime, Time, Numeric, File, TrueClass, FalseClass]
   end
 end
