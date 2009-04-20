@@ -1,5 +1,7 @@
 === HEAD
 
+* Change Dataset#exclude to invert given hash argument, not negate it (jeremyevans)
+
 * Make Dataset#filter and related methods treat multiple arguments more intuitively (jeremyevans)
 
 * Fix full text searching with multiple search terms on MySQL (jeremyevans)

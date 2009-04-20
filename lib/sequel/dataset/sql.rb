@@ -135,7 +135,6 @@ module Sequel
     def exclude(*cond, &block)
       clause = (@opts[:having] ? :having : :where)
       cond = cond.first if cond.size == 1
-      cond = SQL::BooleanExpression.from_value_pairs(cond, :OR) if Sequel.condition_specifier?(cond)
       cond = filter_expr(cond, &block)
       cond = SQL::BooleanExpression.invert(cond)
       cond = SQL::BooleanExpression.new(:AND, @opts[clause], cond) if @opts[clause]

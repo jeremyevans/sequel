@@ -543,15 +543,15 @@ context "Dataset#exclude" do
     @dataset = Sequel::Dataset.new(nil).from(:test)
   end
 
-  specify "should correctly include the NOT operator when one condition is given" do
+  specify "should correctly negate the expression when one condition is given" do
     @dataset.exclude(:region=>'Asia').select_sql.should ==
       "SELECT * FROM test WHERE (region != 'Asia')"
   end
 
   specify "should take multiple conditions as a hash and express the logic correctly in SQL" do
     @dataset.exclude(:region => 'Asia', :name => 'Japan').select_sql.
-      should match(Regexp.union(/WHERE \(\(region != 'Asia'\) AND \(name != 'Japan'\)\)/,
-                                /WHERE \(\(name != 'Japan'\) AND \(region != 'Asia'\)\)/))
+      should match(Regexp.union(/WHERE \(\(region != 'Asia'\) OR \(name != 'Japan'\)\)/,
+                                /WHERE \(\(name != 'Japan'\) OR \(region != 'Asia'\)\)/))
   end
 
   specify "should parenthesize a single string condition correctly" do
@@ -577,6 +577,8 @@ context "Dataset#exclude" do
   specify "should allow the use of blocks and arguments simultaneously" do
     @dataset.exclude(:id => (7..11)){:id.sql_number < 6}.sql.should == 
       'SELECT * FROM test WHERE (((id < 7) OR (id > 11)) OR (id >= 6))'
+    @dataset.exclude([:id, 1], [:x, 3]){:id.sql_number < 6}.sql.should == 
+      'SELECT * FROM test WHERE (((id != 1) OR (x != 3)) OR (id >= 6))'
   end
 end
 
