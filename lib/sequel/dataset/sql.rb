@@ -839,8 +839,10 @@ module Sequel
       when Array
         if String === expr[0]
           SQL::PlaceholderLiteralString.new(expr.shift, expr, true)
-        else
+        elsif Sequel.condition_specifier?(expr)
           SQL::BooleanExpression.from_value_pairs(expr)
+        else
+          SQL::BooleanExpression.new(:AND, *expr.map{|x| filter_expr(x)})
         end
       when Proc
         filter_expr(virtual_row_block_call(expr))

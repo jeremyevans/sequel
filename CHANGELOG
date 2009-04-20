@@ -1,5 +1,7 @@
 === HEAD
 
+* Make Dataset#filter and related methods treat multiple arguments more intuitively (jeremyevans)
+
 * Fix full text searching with multiple search terms on MySQL (jeremyevans)
 
 * Fix altering a column name, type, default, or NULL/NOT NULL status on MySQL (jeremyevans)

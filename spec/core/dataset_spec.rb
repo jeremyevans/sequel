@@ -417,6 +417,15 @@ context "Dataset#where" do
       "SELECT * FROM test WHERE 'f'"
   end
 
+  specify "should allow the use of multiple arguments" do
+    @dataset.filter(:a, :b).sql.should ==
+      'SELECT * FROM test WHERE (a AND b)'
+    @dataset.filter(:a, :b=>1).sql.should ==
+      'SELECT * FROM test WHERE (a AND (b = 1))'
+    @dataset.filter(:a, :c.sql_number > 3, :b=>1).sql.should ==
+      'SELECT * FROM test WHERE (a AND (c > 3) AND (b = 1))'
+  end
+
   specify "should allow the use of blocks and arguments simultaneously" do
     @dataset.filter(:zz.sql_number < 3){:yy.sql_number > 3}.sql.should ==
       'SELECT * FROM test WHERE ((zz < 3) AND (yy > 3))'
