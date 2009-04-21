@@ -155,6 +155,13 @@ begin
     t.spec_opts  = spec_opts.call
   end
   
+  desc "Run extention/plugin specs with coverage"
+  Spec::Rake::SpecTask.new("spec_plugin_cov") do |t|
+    t.spec_files = Dir["spec/extensions/*_spec.rb"]
+    t.spec_opts  = spec_opts.call
+    t.rcov, t.rcov_opts = rcov_opts.call
+  end
+  
   desc "Run integration tests"
   Spec::Rake::SpecTask.new("integration") do |t|
     t.spec_files = FileList["spec/integration/*_test.rb"]
