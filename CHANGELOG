@@ -1,5 +1,9 @@
 === HEAD
 
+* Add schema_dumper extension, for dumping schema of tables (jeremyevans)
+
+* Allow generic database types specified as ruby types to take options (jeremyevans)
+
 * Change Dataset#exclude to invert given hash argument, not negate it (jeremyevans)
 
 * Make Dataset#filter and related methods treat multiple arguments more intuitively (jeremyevans)
