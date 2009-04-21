@@ -72,6 +72,10 @@ context "DB#create_table" do
     @db.sqls.should == ['CREATE TABLE cats (a varchar(50), b text, c char(40), d time, e numeric(11, 2))']
   end
 
+  specify "should raise an error if you use a ruby class that isn't handled" do
+    proc{@db.create_table(:cats){column :a, Class}}.should raise_error(Sequel::Error)
+  end
+
   specify "should accept primary key definition" do
     @db.create_table(:cats) do
       primary_key :id
