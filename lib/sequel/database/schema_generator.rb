@@ -44,7 +44,7 @@ module Sequel
       # as a constant/class.
       def self.add_type_method(*types)
         types.each do |type|
-          class_eval "def #{type}(name, opts={}); column(name, #{type}, opts); end"
+          class_eval("def #{type}(name, opts={}); column(name, #{type}, opts); end", __FILE__, __LINE__)
         end
       end
       
