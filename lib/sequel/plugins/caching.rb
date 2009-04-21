@@ -104,12 +104,6 @@ module Sequel
           super
         end
 
-        # Remove the object from the cache when updating
-        def update_values(*args)
-          cache_delete
-          super
-        end
-
         private
     
         # Delete this object from the cache

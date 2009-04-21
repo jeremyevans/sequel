@@ -51,6 +51,8 @@ describe "Serialization plugin" do
     o = @c.first
     o.id.should == 1
     o.abc.should == 1
+    o.abc.should == 1
+    o.def.should == "hello"
     o.def.should == "hello"
 
     o.update(:abc => 23)
@@ -71,6 +73,8 @@ describe "Serialization plugin" do
     o = @c.first
     o.id.should == 1
     o.abc.should == 1
+    o.abc.should == 1
+    o.def.should == "hello"
     o.def.should == "hello"
 
     o.update(:abc => 23)
@@ -91,6 +95,8 @@ describe "Serialization plugin" do
     o = Class.new(@c).first
     o.id.should == 1
     o.abc.should == 1
+    o.abc.should == 1
+    o.def.should == "hello"
     o.def.should == "hello"
 
     o.update(:abc => 23)
@@ -105,6 +111,7 @@ describe "Serialization plugin" do
     o = @c.load(:id => 1, :abc => "--- 1\n", :def => "--- hello\n")
     o.abc = 23
     o.deserialized_values.length.should == 1
+    o.abc.should == 23
     o.refresh
     o.deserialized_values.length.should == 0
   end
