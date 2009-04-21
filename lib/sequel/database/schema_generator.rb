@@ -83,14 +83,14 @@ module Sequel
       # * :unsigned - Make the column type unsigned, only useful for integer
       #   columns.
       def column(name, type, opts = {})
-        @columns << {:name => name, :type => type}.merge(opts)
+        columns << {:name => name, :type => type}.merge(opts)
         index(name) if opts[:index]
       end
       
       # Adds a named constraint (or unnamed if name is nil) to the DDL,
       # with the given block or args.
       def constraint(name, *args, &block)
-        @constraints << {:name => name, :type => :check, :check => block || args}
+        constraints << {:name => name, :type => :check, :check => block || args}
       end
       
       # Add a foreign key in the table that references another table to the DDL. See column
@@ -109,7 +109,7 @@ module Sequel
         return composite_foreign_key(name, opts) if name.is_a?(Array)
         column(name, Integer, opts)
       end
-      
+
       # Add a full text index on the given columns to the DDL.
       def full_text_index(columns, opts = {})
         index(columns, opts.merge(:type => :full_text))
@@ -117,7 +117,7 @@ module Sequel
       
       # True if the DDL includes the creation of a column with the given name.
       def has_column?(name)
-        @columns.any?{|c| c[:name] == name}
+        columns.any?{|c| c[:name] == name}
       end
       
       # Add an index on the given column(s) with the given options to the DDL.
@@ -127,7 +127,7 @@ module Sequel
       # * :unique - Make the index unique, so duplicate values are not allowed.
       # * :where - Create a partial index (only supported by some databases)
       def index(columns, opts = {})
-        @indexes << {:columns => Array(columns)}.merge(opts)
+        indexes << {:columns => Array(columns)}.merge(opts)
       end
       
       # Add a column with the given type, name, and opts to the DDL.  See column for available
@@ -174,7 +174,7 @@ module Sequel
 
       # Add a unique constraint on the given columns to the DDL.
       def unique(columns, opts = {})
-        @constraints << {:type => :unique, :columns => Array(columns)}.merge(opts)
+        constraints << {:type => :unique, :columns => Array(columns)}.merge(opts)
       end
 
       private
@@ -182,12 +182,12 @@ module Sequel
       # Add a composite primary key constraint
       def composite_primary_key(columns, *args)
         opts = args.pop || {}
-        @constraints << {:type => :primary_key, :columns => columns}.merge(opts)
+        constraints << {:type => :primary_key, :columns => columns}.merge(opts)
       end
 
       # Add a composite foreign key constraint
       def composite_foreign_key(columns, opts)
-        @constraints << {:type => :foreign_key, :columns => columns}.merge(opts)
+        constraints << {:type => :foreign_key, :columns => columns}.merge(opts)
       end
       
       add_type_method(*GENERIC_TYPES)

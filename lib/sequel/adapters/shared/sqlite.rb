@@ -7,7 +7,6 @@ module Sequel
       SYNCHRONOUS = [:off, :normal, :full].freeze
       TABLES_FILTER = "type = 'table' AND NOT name = 'sqlite_sequence'"
       TEMP_STORE = [:default, :file, :memory].freeze
-      TYPES = Sequel::Database::TYPES.merge(Bignum=>'integer')
       
       # Run all alter_table commands in a transaction.  This is technically only
       # needed for drop column.
@@ -193,9 +192,12 @@ module Sequel
         end
       end
       
-      # Override the standard type conversions with SQLite specific ones
-      def type_literal_base(column)
-        TYPES[column[:type]]
+      # SQLite uses the integer data type even for bignums.  This is because they
+      # are both stored internally as text, and converted when returned from
+      # the database.  Using an integer type instead of bigint makes it more likely
+      # that software will automatically return the column as an integer.
+      def type_literal_generic_bignum(column)
+        :integer
       end
     end
     

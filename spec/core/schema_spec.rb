@@ -61,6 +61,17 @@ context "DB#create_table" do
     @db.sqls.should == ['CREATE TABLE cats (o varchar(255) PRIMARY KEY AUTOINCREMENT, a varchar(255), b integer, c integer, d bigint, e double precision, f numeric, g date, h timestamp, i timestamp, j numeric, k blob, l boolean, m boolean, n integer, p date REFERENCES f)']
   end
 
+  specify "should allow the use of modifiers with ruby class types" do
+    @db.create_table(:cats) do
+      String :a, :size=>50
+      String :b, :text=>true
+      String :c, :fixed=>true, :size=>40
+      Time :d, :only_time=>true
+      BigDecimal :e, :size=>[11,2]
+    end
+    @db.sqls.should == ['CREATE TABLE cats (a varchar(50), b text, c char(40), d time, e numeric(11, 2))']
+  end
+
   specify "should accept primary key definition" do
     @db.create_table(:cats) do
       primary_key :id
@@ -402,6 +413,10 @@ context "DB#create_table" do
       constraint(:blah_blah) {(:x.sql_number > 0) & (:y.sql_number < 1)}
     end
     @db.sqls.should == ["CREATE TABLE cats (CONSTRAINT blah_blah CHECK ((x > 0) AND (y < 1)))"]
+  end
+
+  specify "should raise an error if an invalid constraint type is used" do
+    proc{@db.create_table(:cats){unique [:a, :b], :type=>:bb}}.should raise_error(Sequel::Error)
   end
 
   specify "should accept composite primary keys" do

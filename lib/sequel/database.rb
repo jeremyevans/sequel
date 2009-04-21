@@ -244,6 +244,11 @@ module Sequel
       prepared_statements[ps_name].call(hash)
     end
     
+    # Cast the given type to a literal type
+    def cast_type_literal(type)
+      type_literal(:type=>type)
+    end
+
     # Connects to the database. This method should be overridden by descendants.
     def connect
       raise NotImplementedError, "#connect should be overridden by adapters"

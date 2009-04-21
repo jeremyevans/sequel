@@ -11,12 +11,6 @@ module Sequel
     SET_DEFAULT = 'SET DEFAULT'.freeze
     SET_NULL = 'SET NULL'.freeze
     TEMPORARY = 'TEMPORARY '.freeze
-    TYPES = Hash.new {|h, k| k}
-    TYPES.merge!(:double=>'double precision', String=>'varchar(255)',
-      Integer=>'integer', Fixnum=>'integer', Bignum=>'bigint',
-      Float=>'double precision', BigDecimal=>'numeric', Numeric=>'numeric',
-      Date=>'date', DateTime=>'timestamp', Time=>'timestamp', File=>'blob',
-      TrueClass=>'boolean', FalseClass=>'boolean')
     UNDERSCORE = '_'.freeze
     UNIQUE = ' UNIQUE'.freeze
     UNSIGNED = ' UNSIGNED'.freeze
@@ -212,16 +206,105 @@ module Sequel
 
     # SQL fragment specifying the type of a given column.
     def type_literal(column)
-      type = type_literal_base(column)
+      column[:type].is_a?(Class) ? type_literal_generic(column) : type_literal_specific(column)
+    end
+    
+    # SQL fragment specifying the full type of a column,
+    # consider the type with possible modifiers.
+    def type_literal_generic(column)
+      meth = "type_literal_generic_#{column[:type].name.to_s.downcase}"
+      if respond_to?(meth, true)
+        send(meth, column)
+      else
+        raise Error, "Unsupported ruby class used as database type: #{column[:type]}"
+      end
+    end
+
+    # Alias for type_literal_generic_numeric, to make overriding in a subclass easier.
+    def type_literal_generic_bigdecimal(column)
+      type_literal_generic_numeric(column)
+    end
+
+    # Sequel uses the bigint type by default for Bignums.
+    def type_literal_generic_bignum(column)
+      :bigint
+    end
+
+    # Sequel uses the date type by default for Dates.
+    def type_literal_generic_date(column)
+      :date
+    end
+
+    # Sequel uses the timestamp type by default for DateTimes.
+    def type_literal_generic_datetime(column)
+      :timestamp
+    end
+
+    # Alias for type_literal_generic_trueclass, to make overriding in a subclass easier.
+    def type_literal_generic_falseclass(column)
+      type_literal_generic_trueclass(column)
+    end
+
+    # Sequel uses the blob type by default for Files.
+    def type_literal_generic_file(column)
+      :blob
+    end
+
+    # Alias for type_literal_generic_integer, to make overriding in a subclass easier.
+    def type_literal_generic_fixnum(column)
+      type_literal_generic_integer(column)
+    end
+
+    # Sequel uses the double precision type by default for Floats.
+    def type_literal_generic_float(column)
+      :"double precision"
+    end
+
+    # Sequel uses the integer type by default for integers
+    def type_literal_generic_integer(column)
+      :integer
+    end
+
+    # Sequel uses the numeric type by default for Numerics and BigDecimals.
+    # If a size is given, it is used, otherwise, it will default to whatever
+    # the database default is for an unsized value.
+    def type_literal_generic_numeric(column)
+      column[:size] ? "numeric(#{Array(column[:size]).join(', ')})" : :numeric
+    end
+
+    # Sequel uses the varchar type by default for Strings.  If a
+    # size isn't present, Sequel assumes a size of 255.  If the
+    # :fixed option is used, Sequel uses the char type.  If the
+    # :text option is used, Sequel uses the :text type.
+    def type_literal_generic_string(column)
+      if column[:text]
+        :text
+      elsif column[:fixed]
+        "char(#{column[:size]||255})"
+      else
+        "varchar(#{column[:size]||255})"
+      end
+    end
+    
+    # Sequel uses the timestamp type by default for Time values.
+    # If the :only_time option is used, the time type is used.
+    def type_literal_generic_time(column)
+      column[:only_time] ? :time : :timestamp
+    end
+
+    # Sequel uses the boolean type by default for TrueClass and FalseClass.
+    def type_literal_generic_trueclass(column)
+      :boolean
+    end
+
+    # SQL fragment for the given type of a column if the column is not one of the
+    # generic types specified with a ruby class.
+    def type_literal_specific(column)
+      type = column[:type]
+      type = "double precision" if type.to_s == 'double'
       column[:size] ||= 255 if type.to_s == 'varchar'
       elements = column[:size] || column[:elements]
       "#{type}#{literal(Array(elements)) if elements}#{UNSIGNED if column[:unsigned]}"
-    end
-
-    # SQL fragment specifying the base type of a given column,
-    # without the size or elements.
-    def type_literal_base(column)
-      TYPES[column[:type]]
     end
   end
 end

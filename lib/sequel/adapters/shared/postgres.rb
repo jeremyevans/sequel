@@ -172,7 +172,6 @@ module Sequel
       SQL_ROLLBACK = 'ROLLBACK'.freeze
       SQL_RELEASE_SAVEPOINT = 'RELEASE SAVEPOINT autopoint_%d'.freeze
       SYSTEM_TABLE_REGEXP = /^pg|sql/.freeze
-      TYPES = Sequel::Database::TYPES.merge(File=>'bytea', String=>'text')
 
       # Creates the function in the database.  Arguments:
       # * name : name of the function to create
@@ -539,9 +538,23 @@ module Sequel
         "(#{Array(args).map{|a| Array(a).reverse.join(' ')}.join(', ')})"
       end
       
-      # Override the standard type conversions with PostgreSQL specific ones
-      def type_literal_base(column)
-        TYPES[column[:type]]
+      # PostgreSQL uses the bytea data type for blobs
+      def type_literal_generic_file(column)
+        :bytea
+      end
+
+      # PostgreSQL prefers the text datatype.  If a fixed size is requested,
+      # the char type is used.  If the text type is specifically
+      # disallowed or there is a size specified, use the varchar type.
+      # Otherwise use the type type.
+      def type_literal_generic_string(column)
+        if column[:fixed]
+          "char(#{column[:size]||255})"
+        elsif column[:text] == false or column[:size]
+          "varchar(#{column[:size]||255})"
+        else
+          :text
+        end
       end
     end
     

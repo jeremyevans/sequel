@@ -15,14 +15,14 @@ module Sequel
     # currently supported by the native and JDBC adapters.
     module DatabaseMethods
       AUTO_INCREMENT = 'AUTO_INCREMENT'.freeze
-      NOT_NULL = Sequel::Database::NOT_NULL
-      NULL = Sequel::Database::NULL
-      PRIMARY_KEY = Sequel::Database::PRIMARY_KEY
-      TYPES = Sequel::Database::TYPES.merge(DateTime=>'datetime', \
-        TrueClass=>'tinyint', FalseClass=>'tinyint')
-      UNIQUE = Sequel::Database::UNIQUE
-      UNSIGNED = Sequel::Database::UNSIGNED
+      CAST_TYPES = {String=>:CHAR, Integer=>:SIGNED, Time=>:DATETIME, DateTime=>:DATETIME, Numeric=>:DECIMAL, BigDecimal=>:DECIMAL, File=>:BINARY}
       
+      # MySQL's cast rules are restrictive in that you can't just cast to any possible
+      # database type.
+      def cast_type_literal(type)
+        CAST_TYPES[type] || super
+      end
+
       # Get version of MySQL server, used for determined capabilities.
       def server_version
         m = /(\d+)\.(\d+)\.(\d+)/.match(get(SQL::Function.new(:version)))
@@ -139,9 +139,22 @@ module Sequel
         end
       end
 
-      # Override the standard type conversions with MySQL specific ones
-      def type_literal_base(column)
-        TYPES[column[:type]]
+      # MySQL has both datetime and timestamp classes, most people are going
+      # to want datetime
+      def type_literal_generic_datetime(column)
+        :datetime
+      end
+
+      # MySQL has both datetime and timestamp classes, most people are going
+      # to want datetime
+      def type_literal_generic_time(column)
+        column[:only_time] ? :time : :datetime
+      end
+
+      # MySQL doesn't have a true boolean class, so it uses tinyint
+      # MySQL doesn't have a true boolean class, so it uses tinyint
+      def type_literal_generic_trueclass(column)
+        :tinyint
       end
     end
   
@@ -151,15 +164,9 @@ module Sequel
 
       BOOL_TRUE = '1'.freeze
       BOOL_FALSE = '0'.freeze
-      CAST_TYPES = {String=>:CHAR, Integer=>:SIGNED, Time=>:DATETIME, DateTime=>:DATETIME, Numeric=>:DECIMAL, BigDecimal=>:DECIMAL, File=>:BINARY}
       TIMESTAMP_FORMAT = "'%Y-%m-%d %H:%M:%S'".freeze
       COMMA_SEPARATOR = ', '.freeze
       
-      # MySQL can't use the varchar type in a cast.
-      def cast_sql(expr, type)
-        "CAST(#{literal(expr)} AS #{CAST_TYPES[type] || db.send(:type_literal_base, :type=>type)})"
-      end
-
       # MySQL specific syntax for LIKE/REGEXP searches, as well as
       # string concatenation.
       def complex_expression_sql(op, args)

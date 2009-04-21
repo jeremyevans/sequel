@@ -10,7 +10,6 @@ module Sequel
 
       AUTO_INCREMENT = ''.freeze
       TEMPORARY = 'GLOBAL TEMPORARY '.freeze
-      TYPES = Sequel::Database::TYPES.merge(:text=>'BLOB SUB_TYPE TEXT')
 
       # Add the primary_keys and primary_key_sequences instance variables,
       # so we can get the correct return values for inserted rows.
@@ -207,8 +206,8 @@ module Sequel
         "ALTER SEQUENCE #{seq_name} RESTART WITH #{opts[:restart_position]}"
       end
 
-      def type_literal_base(column)
-        TYPES[column[:type]]
+      def type_literal_generic_string(column)
+        column[:text] ? :"BLOB SUBTYPE TEXT" : super
       end
     end
 

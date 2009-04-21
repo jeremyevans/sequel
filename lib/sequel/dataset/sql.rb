@@ -49,7 +49,7 @@ module Sequel
 
     # SQL fragment for the SQL CAST expression.
     def cast_sql(expr, type)
-      "CAST(#{literal(expr)} AS #{db.send(:type_literal_base, :type=>type)})"
+      "CAST(#{literal(expr)} AS #{db.cast_type_literal(type)})"
     end
 
     # SQL fragment for specifying all columns in a given table.

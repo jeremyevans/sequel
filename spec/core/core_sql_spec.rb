@@ -322,16 +322,16 @@ context "Symbol" do
 
     x = :abc.cast_string(:varchar)
     x.should be_a_kind_of(Sequel::SQL::StringExpression)
-    x.to_s(@ds).should == "CAST(abc AS varchar)"
+    x.to_s(@ds).should == "CAST(abc AS varchar(255))"
   end
   
   specify "should allow database independent types when casting" do
     m = MockDatabase.new
     m.instance_eval do
-       def type_literal_base(column)
-         return :foo if column[:type] == Integer
-         return :bar if column[:type] == String
-         column
+       def cast_type_literal(type)
+         return :foo if type == Integer
+         return :bar if type == String
+         type
        end
     end
     @ds2 = Sequel::Dataset.new(m)
