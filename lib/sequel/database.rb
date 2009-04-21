@@ -636,6 +636,11 @@ module Sequel
       schema_utility_dataset.schema_and_table(table_name)
     end
 
+    # Return true if the given column schema represents an autoincrementing primary key.
+    def schema_autoincrementing_primary_key?(schema)
+      !!schema[:primary_key]
+    end
+
     # Match the database's column type to a ruby type via a
     # regular expression.  The following ruby types are supported:
     # integer, string, date, datetime, boolean, and float.

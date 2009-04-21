@@ -506,6 +506,12 @@ module Sequel
         "ALTER TABLE #{quote_schema_table(name)} RENAME TO #{quote_identifier(schema_and_table(new_name).last)}"
       end 
 
+      # PostgreSQL's autoincrementing primary keys are of type integer or bigint
+      # using a nextval function call as a default.
+      def schema_autoincrementing_primary_key?(schema)
+        super and schema[:db_type] =~ /\A(?:integer|bigint)\z/io and schema[:default]=~/\Anextval/io
+      end
+
       # The dataset used for parsing table schemas, using the pg_* system catalogs.
       def schema_parse_table(table_name, opts)
         ds2 = dataset

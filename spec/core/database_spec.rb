@@ -1128,3 +1128,11 @@ context "Database#blank_object?" do
     db.send(:blank_object?, c[:blank?, false]).should == false 
   end
 end
+
+context "Database#schema_autoincrementing_primary_key?" do
+  specify "should whether the parsed schema row indicates a primary key" do
+    m = Sequel::Database.new.method(:schema_autoincrementing_primary_key?)
+    m.call(:primary_key=>true).should == true
+    m.call(:primary_key=>false).should == false
+  end
+end

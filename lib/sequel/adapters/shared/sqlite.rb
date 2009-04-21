@@ -183,6 +183,11 @@ module Sequel
         end
       end
       
+      # SQLite treats integer primary keys as autoincrementing (alias of rowid).
+      def schema_autoincrementing_primary_key?(schema)
+        super and schema[:db_type].downcase == 'integer'
+      end
+
       # SQLite supports schema parsing using the table_info PRAGMA, so
       # parse the output of that into the format Sequel expects.
       def schema_parse_table(table_name, opts)

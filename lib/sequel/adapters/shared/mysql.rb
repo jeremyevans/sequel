@@ -122,6 +122,11 @@ module Sequel
         "CREATE #{index_type}INDEX #{index_name}#{using} ON #{quote_schema_table(table_name)} #{literal(index[:columns])}"
       end
       
+      # MySQL treats integer primary keys as autoincrementing.
+      def schema_autoincrementing_primary_key?(schema)
+        super and schema[:db_type] =~ /int/io
+      end
+
       # Use the MySQL specific DESCRIBE syntax to get a table description.
       def schema_parse_table(table_name, opts)
         ds = self["DESCRIBE ?", SQL::Identifier.new(table_name)]
