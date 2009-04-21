@@ -19,6 +19,15 @@ module Sequel
         :sqlite => "SQLite",
         :sqlrelay => "SQLRelay"
       }
+      
+      def initialize(opts)
+        super(opts)
+        case opts[:db_type]
+        when 'mssql'
+          Sequel.require 'adapters/shared/mssql'
+          extend Sequel::MSSQL::DatabaseMethods
+        end
+      end
 
       # Converts a uri to an options hash. These options are then passed
       # to a newly created database object.

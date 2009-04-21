@@ -71,7 +71,11 @@ module Sequel
       end
 
       def quoted_identifier(name)
-        "[#{name}]"
+        if name =~ /\./
+          name.split(".").map { |token| "[#{token}]" }.join(".")
+        else
+          "[#{name}]"
+        end
       end
 
       private
