@@ -170,26 +170,26 @@ describe "Association Extensions" do
 
   it "should allow methods to be called on the dataset method" do
     Authorship.count.should == 0
-    sqls_should_be('SELECT COUNT(*) FROM authorships LIMIT 1')
+    sqls_should_be('SELECT COUNT(*) AS \'count\' FROM authorships LIMIT 1')
     authorship = @author.authorships_dataset.find_or_create_by_name('Bob')
     sqls_should_be("SELECT * FROM authorships WHERE ((authorships.author_id = 1) AND (name = 'Bob')) LIMIT 1",
       /INSERT INTO authorships \((author_id, name|name, author_id)\) VALUES \((1, 'Bob'|'Bob', 1)\)/,
       "SELECT * FROM authorships WHERE (id = 1) LIMIT 1")
     Authorship.count.should == 1
     Authorship.first.should == authorship
-    sqls_should_be('SELECT COUNT(*) FROM authorships LIMIT 1', "SELECT * FROM authorships LIMIT 1")
+    sqls_should_be('SELECT COUNT(*) AS \'count\' FROM authorships LIMIT 1', "SELECT * FROM authorships LIMIT 1")
     authorship.name.should == 'Bob'
     authorship.author_id.should == @author.id
     @author.authorships_dataset.find_or_create_by_name('Bob').should == authorship
     sqls_should_be("SELECT * FROM authorships WHERE ((authorships.author_id = 1) AND (name = 'Bob')) LIMIT 1")
     Authorship.count.should == 1
-    sqls_should_be('SELECT COUNT(*) FROM authorships LIMIT 1')
+    sqls_should_be('SELECT COUNT(*) AS \'count\' FROM authorships LIMIT 1')
     authorship2 = @author.authorships_dataset.find_or_create(:name=>'Jim')
     sqls_should_be("SELECT * FROM authorships WHERE ((authorships.author_id = 1) AND (name = 'Jim')) LIMIT 1",
       /INSERT INTO authorships \((author_id, name|name, author_id)\) VALUES \((1, 'Jim'|'Jim', 1)\)/,
       "SELECT * FROM authorships WHERE (id = 2) LIMIT 1")
     Authorship.count.should == 2
-    sqls_should_be('SELECT COUNT(*) FROM authorships LIMIT 1')
+    sqls_should_be('SELECT COUNT(*) AS \'count\' FROM authorships LIMIT 1')
     Authorship.order(:name).map(:name).should == ['Bob', 'Jim']
     sqls_should_be('SELECT * FROM authorships ORDER BY name')
     authorship2.name.should == 'Jim'

@@ -241,10 +241,10 @@ describe "Sequel::Plugins::ValidationHelpers" do
 
     @user = @c.load(:id=>1, :username => "0records", :password => "anothertest")
     @user.should be_valid
-    MODEL_DB.sqls.last.should == "SELECT COUNT(*) FROM items WHERE ((username = '0records') AND (id != 1)) LIMIT 1"
+    MODEL_DB.sqls.last.should == "SELECT COUNT(*) AS count FROM items WHERE ((username = '0records') AND (id != 1)) LIMIT 1"
     @user = @c.new(:username => "0records", :password => "anothertest")
     @user.should be_valid
-    MODEL_DB.sqls.last.should == "SELECT COUNT(*) FROM items WHERE (username = '0records') LIMIT 1"
+    MODEL_DB.sqls.last.should == "SELECT COUNT(*) AS count FROM items WHERE (username = '0records') LIMIT 1"
   end
   
   it "should support validates_unique with multiple attributes" do
@@ -283,9 +283,9 @@ describe "Sequel::Plugins::ValidationHelpers" do
 
     @user = @c.load(:id=>1, :username => "0records", :password => "anothertest")
     @user.should be_valid
-    MODEL_DB.sqls.last.should == "SELECT COUNT(*) FROM items WHERE (((username = '0records') AND (password = 'anothertest')) AND (id != 1)) LIMIT 1"
+    MODEL_DB.sqls.last.should == "SELECT COUNT(*) AS count FROM items WHERE (((username = '0records') AND (password = 'anothertest')) AND (id != 1)) LIMIT 1"
     @user = @c.new(:username => "0records", :password => "anothertest")
     @user.should be_valid
-    MODEL_DB.sqls.last.should == "SELECT COUNT(*) FROM items WHERE ((username = '0records') AND (password = 'anothertest')) LIMIT 1"
+    MODEL_DB.sqls.last.should == "SELECT COUNT(*) AS count FROM items WHERE ((username = '0records') AND (password = 'anothertest')) LIMIT 1"
   end
 end 
