@@ -657,6 +657,8 @@ module Sequel
 
     # Represents a qualified (column with table or table with schema) reference. 
     class QualifiedIdentifier < GenericExpression
+      include QualifyingMethods
+
       # The column to reference
       attr_reader :column
 

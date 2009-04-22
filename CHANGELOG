@@ -1,5 +1,7 @@
 === HEAD
 
+* Allow QualifiedIdentifiers to be qualified, to allow :column.qualify(:table).qualify(:schema) (jeremyevans)
+
 * Allow :db_type=>'mssql' option to be respected when using the DBI adapter (akitaonrails)
 
 * Add schema_dumper extension, for dumping schema of tables (jeremyevans)

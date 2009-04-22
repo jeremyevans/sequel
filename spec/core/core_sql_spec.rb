@@ -237,6 +237,10 @@ context "Symbol" do
     @ds.literal(:xyz.qualify(:abc)).should == '"ABC"."XYZ"'
   end
 
+  specify "#qualify should work on QualifiedIdentifiers" do
+    @ds.literal(:xyz.qualify(:abc).qualify(:def)).should == '"DEF"."ABC"."XYZ"'
+  end
+
   specify "should be able to qualify an identifier" do
     @ds.literal(:xyz.identifier.qualify(:xyz__abc)).should == '"XYZ"."ABC"."XYZ"'
   end
