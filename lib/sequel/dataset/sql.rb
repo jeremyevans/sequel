@@ -12,7 +12,7 @@ module Sequel
     N_ARITY_OPERATORS = ::Sequel::SQL::ComplexExpression::N_ARITY_OPERATORS
     NULL = "NULL".freeze
     QUESTION_MARK = '?'.freeze
-    STOCK_COUNT_OPTS = {:select => [LiteralString.new("COUNT(*)").freeze], :order => nil}.freeze
+    STOCK_COUNT_OPTS = {:select => [SQL::AliasedExpression.new(LiteralString.new("COUNT(*)").freeze, :count)], :order => nil}.freeze
     SELECT_CLAUSE_ORDER = %w'distinct columns from join where group having compounds order limit'.freeze
     TWO_ARITY_OPERATORS = ::Sequel::SQL::ComplexExpression::TWO_ARITY_OPERATORS
     WILDCARD = '*'.freeze

@@ -1,5 +1,7 @@
 === HEAD
 
+* Alias the count function call in Dataset#count, fixes use on MSSQL (akitaonrails, jeremyevans)
+
 * Allow QualifiedIdentifiers to be qualified, to allow :column.qualify(:table).qualify(:schema) (jeremyevans)
 
 * Allow :db_type=>'mssql' option to be respected when using the DBI adapter (akitaonrails)
