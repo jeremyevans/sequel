@@ -52,6 +52,11 @@ module Sequel
         "#{expression} #{quote_identifier(aliaz)}"
       end
 
+      # Oracle uses the SQL standard of only doubling ' inside strings.
+      def literal_string(v)
+        "'#{v.gsub("'", "''")}'"
+      end
+
       def select_clause_order
         SELECT_CLAUSE_ORDER
       end
