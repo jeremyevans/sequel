@@ -1,5 +1,7 @@
 === HEAD
 
+* Correctly quote SQL Array references, and handle qualified identifiers with them (e.g. :table__column.sql_subscript(1)) (jeremyevans)
+
 * Allow dropping an index with a name different than the default name (jeremyevans)
 
 * Allow Dataset#from to remove existing FROM tables when called without an argument, instead of raising an error later (jeremyevans)

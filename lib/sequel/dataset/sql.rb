@@ -691,7 +691,7 @@ module Sequel
 
     # SQL fragment for specifying subscripts (SQL arrays)
     def subscript_sql(s)
-      "#{s.f}[#{s.sub.join(COMMA_SEPARATOR)}]"
+      "#{literal(s.f)}[#{s.sub.join(COMMA_SEPARATOR)}]"
     end
 
     # Returns a copy of the dataset with no filters (HAVING or WHERE clause) applied.

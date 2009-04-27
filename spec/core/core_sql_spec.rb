@@ -308,6 +308,7 @@ context "Symbol" do
 
   specify "should support sql array accesses via sql_subscript" do
     @ds.literal(:abc.sql_subscript(1)).should == "abc[1]"
+    @ds.literal(:abc__def.sql_subscript(1)).should == "abc.def[1]"
     @ds.literal(:abc.sql_subscript(1)|2).should == "abc[1, 2]"
   end
 
