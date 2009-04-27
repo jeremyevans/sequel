@@ -56,12 +56,12 @@ module Sequel
       
       SELECT_CURRVAL = "SELECT currval('%s')".freeze
       SELECT_CUSTOM_SEQUENCE = proc do |schema, table| <<-end_sql
-        SELECT '"' || name.nspname || '"."' || CASE  
+        SELECT '"' || name.nspname || '".' || CASE  
             WHEN split_part(def.adsrc, '''', 2) ~ '.' THEN  
               substr(split_part(def.adsrc, '''', 2),  
                      strpos(split_part(def.adsrc, '''', 2), '.')+1) 
             ELSE split_part(def.adsrc, '''', 2)  
-          END || '"'
+          END
         FROM pg_class t
         JOIN pg_namespace  name ON (t.relnamespace = name.oid)
         JOIN pg_attribute  attr ON (t.oid = attrelid)
@@ -86,7 +86,7 @@ module Sequel
       end_sql
       end
       SELECT_SERIAL_SEQUENCE = proc do |schema, table| <<-end_sql
-        SELECT  '"' || name.nspname || '"."' || seq.relname || '"'
+        SELECT  '"' || name.nspname || '".' || seq.relname || ''
         FROM pg_class seq, pg_attribute attr, pg_depend dep,
           pg_namespace name, pg_constraint cons
         WHERE seq.oid = dep.objid
@@ -313,6 +313,16 @@ module Sequel
         else
           synchronize(opts[:server]){|con| con.sequence(*schema_and_table(table))}
         end
+      end
+      
+      # Reset the primary key sequence for the given table, baseing it on the
+      # maximum current value of the table's primary key.
+      def reset_primary_key_sequence(table)
+        pk = SQL::Identifier.new(primary_key(table))
+        seq = primary_key_sequence(table)
+        db = self
+        seq_ds = db.from(seq.lit)
+        get{setval(seq, db[table].select{coalesce(max(pk)+seq_ds.select{:increment_by}, seq_ds.select(:min_value))}, false)}
       end
 
       # PostgreSQL uses SERIAL psuedo-type instead of AUTOINCREMENT for

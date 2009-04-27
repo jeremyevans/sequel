@@ -1,5 +1,9 @@
 === HEAD
 
+* Add ability to reset primary key sequences in the PostgreSQL adapter (jeremyevans)
+
+* Fix parsing of non-simple sequence names (that contain uppercase, spaces, etc.) in the PostgreSQL adapter (jeremyevans)
+
 * Support dumping indexes in the schema_dumper extension (jeremyevans)
 
 * Add index parsing to PostgreSQL, MySQL, SQLite, and JDBC adapters (jeremyevans)

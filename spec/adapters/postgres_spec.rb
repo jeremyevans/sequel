@@ -216,6 +216,17 @@ context "A PostgreSQL database" do
     @db.drop_table(:posts) rescue nil
   end
   
+  specify "should support resetting the primary key sequence" do
+    @db.create_table(:posts){primary_key :a}
+    @db[:posts].insert(:a=>20).should == 20
+    @db[:posts].insert.should == 1
+    @db[:posts].insert.should == 2
+    @db[:posts].insert(:a=>10).should == 10
+    @db.reset_primary_key_sequence(:posts).should == 21
+    @db[:posts].insert.should == 21
+    @db[:posts].order(:a).map(:a).should == [1, 2, 10, 20, 21]
+  end
+  
   specify "should support fulltext indexes and searching" do
     @db.create_table(:posts){text :title; text :body; full_text_index [:title, :body]; full_text_index :title, :language => 'french'}
     @db.sqls.should == [
@@ -338,9 +349,9 @@ context "Postgres::Dataset#insert" do
     @db.sqls.reject{|x| x =~ /pg_class/}.should == [
       'INSERT INTO test5 (value) VALUES (10) RETURNING xid',
       'INSERT INTO test5 (value) VALUES (20)',
-      "SELECT currval('\"public\".\"test5_xid_seq\"')",
+      "SELECT currval('\"public\".test5_xid_seq')",
       'INSERT INTO test5 (value) VALUES (13)',
-      "SELECT currval('\"public\".\"test5_xid_seq\"')"
+      "SELECT currval('\"public\".test5_xid_seq')"
     ]
     @ds.all.should == [{:xid=>1, :value=>10}, {:xid=>2, :value=>20}, {:xid=>3, :value=>13}]
   end
@@ -404,6 +415,7 @@ context "Postgres::Database schema qualified tables" do
     POSTGRES_DB.instance_variable_set(:@primary_key_sequences, {})
   end
   after do
+    POSTGRES_DB.quote_identifiers = false
     POSTGRES_DB << "DROP SCHEMA schema_test CASCADE"
     POSTGRES_DB.default_schema = :public
   end
@@ -448,13 +460,26 @@ context "Postgres::Database schema qualified tables" do
   
   specify "should be able to get serial sequences for tables in a given schema" do
     POSTGRES_DB.create_table(:schema_test__schema_test){primary_key :i}
-    POSTGRES_DB.primary_key_sequence(:schema_test__schema_test).should == '"schema_test"."schema_test_i_seq"'
+    POSTGRES_DB.primary_key_sequence(:schema_test__schema_test).should == '"schema_test".schema_test_i_seq'
+  end
+  
+  specify "should be able to get serial sequences for tables that have spaces in the name in a given schema" do
+    POSTGRES_DB.quote_identifiers = true
+    POSTGRES_DB.create_table(:"schema_test__schema test"){primary_key :i}
+    POSTGRES_DB.primary_key_sequence(:"schema_test__schema test").should == '"schema_test"."schema test_i_seq"'
   end
   
   specify "should be able to get custom sequences for tables in a given schema" do
     POSTGRES_DB << "CREATE SEQUENCE schema_test.kseq"
     POSTGRES_DB.create_table(:schema_test__schema_test){integer :j; primary_key :k, :type=>:integer, :default=>"nextval('schema_test.kseq'::regclass)".lit}
-    POSTGRES_DB.primary_key_sequence(:schema_test__schema_test).should == '"schema_test"."kseq"'
+    POSTGRES_DB.primary_key_sequence(:schema_test__schema_test).should == '"schema_test".kseq'
+  end
+  
+  specify "should be able to get custom sequences for tables that have spaces in the name in a given schema" do
+    POSTGRES_DB.quote_identifiers = true
+    POSTGRES_DB << "CREATE SEQUENCE schema_test.\"ks eq\""
+    POSTGRES_DB.create_table(:"schema_test__schema test"){integer :j; primary_key :k, :type=>:integer, :default=>"nextval('schema_test.\"ks eq\"'::regclass)".lit}
+    POSTGRES_DB.primary_key_sequence(:"schema_test__schema test").should == '"schema_test"."ks eq"'
   end
   
   specify "#default_schema= should change the default schema used from public" do
@@ -463,7 +488,7 @@ context "Postgres::Database schema qualified tables" do
     POSTGRES_DB.table_exists?(:schema_test).should == true
     POSTGRES_DB.tables.should == [:schema_test]
     POSTGRES_DB.primary_key(:schema_test__schema_test).should == 'i'
-    POSTGRES_DB.primary_key_sequence(:schema_test__schema_test).should == '"schema_test"."schema_test_i_seq"'
+    POSTGRES_DB.primary_key_sequence(:schema_test__schema_test).should == '"schema_test".schema_test_i_seq'
   end
 end
 
