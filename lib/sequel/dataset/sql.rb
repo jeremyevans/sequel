@@ -220,10 +220,11 @@ module Sequel
 
     # Returns a copy of the dataset with the source changed.
     #
+    #   dataset.from # SQL: SELECT *
     #   dataset.from(:blah) # SQL: SELECT * FROM blah
     #   dataset.from(:blah, :foo) # SQL: SELECT * FROM blah, foo
     def from(*source)
-      clone(:from => source)
+      clone(:from=>source.empty? ? nil : source)
     end
     
     # Returns a dataset selecting from the current dataset.

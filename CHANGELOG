@@ -1,5 +1,7 @@
 === HEAD
 
+* Allow Dataset#from to remove existing FROM tables when called without an argument, instead of raising an error later (jeremyevans)
+
 * Fix string quoting on Oracle so it doesn't double backslashes (jeremyevans)
 
 * Alias the count function call in Dataset#count, fixes use on MSSQL (akitaonrails, jeremyevans)

@@ -819,8 +819,8 @@ context "Dataset#from" do
       "SELECT * FROM (SELECT * FROM a) AS t1"
   end
   
-  specify "should raise if no source is given" do
-    proc {@dataset.from(@dataset.from).select_sql}.should raise_error(Sequel::Error)
+  specify "should remove all FROM tables if called with no arguments" do
+    @dataset.from.sql.should == 'SELECT *'
   end
   
   specify "should accept sql functions" do
