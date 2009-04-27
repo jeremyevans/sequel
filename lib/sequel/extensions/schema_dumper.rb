@@ -27,12 +27,17 @@ END_MIG
     def dump_table_schema(table, options={})
       db = self
       s = db.schema(table).dup
-      options = options.merge(:single_pk=>true) if s.find_all{|x| x.last[:primary_key] == true}.length == 1
+      pks = s.find_all{|x| x.last[:primary_key] == true}.map{|x| x.first}
+      options = options.merge(:single_pk=>true) if pks.length == 1
       m = db.method(:column_schema_to_generator_opts)
+      im = db.method(:index_to_generator_opts)
+      indexes = db.indexes(table) if db.respond_to?(:indexes)
       gen = Schema::Generator.new(self) do
         s.each{|name, info| send(*m.call(name, info, options))}
+        primary_key(pks) if !@primary_key && pks.length > 0
+        indexes.each{|iname, iopts| send(:index, iopts[:columns], im.call(table, iname, iopts))} if indexes
       end
-      commands = gen.dump_columns + gen.dump_constraints + gen.dump_indexes
+      commands = [gen.dump_columns, gen.dump_constraints, gen.dump_indexes].reject{|x| x == ''}.join("\n\n")
       "create_table(#{table.inspect}) do\n#{commands.gsub(/^/o, '  ')}\nend"
     end
 
@@ -114,6 +119,14 @@ END_MIG
       else
         {:type=>String}
       end
+    end
+
+    # Convert the parsed index information into options to the Generators index method. 
+    def index_to_generator_opts(table, name, index_opts)
+      h = {}
+      h[:name] = name unless default_index_name(table, index_opts[:columns]) == name.to_s
+      h[:unique] = true if index_opts[:unique]
+      h
     end
   end
 

@@ -26,6 +26,23 @@ module Sequel
         pragma_set(:auto_vacuum, value)
       end
       
+      # Return a hash containing index information. Hash keys are index name symbols.
+      # Values are subhashes with two keys, :columns and :unique.  The value of :columns
+      # is an array of symbols of column names.  The value of :unique is true or false
+      # depending on if the index is unique.
+      def indexes(table)
+        m = output_identifier_meth
+        im = input_identifier_meth
+        indexes = {}
+        metadata_dataset.with_sql("PRAGMA index_list(?)", im.call(table)).each do |r|
+          indexes[m.call(r[:name])] = {:unique=>r[:unique].to_i==1}
+        end
+        indexes.each do |k, v|
+          v[:columns] = metadata_dataset.with_sql("PRAGMA index_info(?)", im.call(k)).map(:name).map{|x| m.call(x)}
+        end
+        indexes
+      end
+
       # Get the value of the given PRAGMA.
       def pragma_get(name)
         self["PRAGMA #{name}"].single_value
@@ -52,11 +69,8 @@ module Sequel
       # Options:
       # * :server - Set the server to use.
       def tables(opts={})
-        ds = self[:sqlite_master].server(opts[:server]).filter(TABLES_FILTER)
-        ds.identifier_output_method = nil
-        ds.identifier_input_method = nil
-        ds2 = dataset
-        ds.map{|r| ds2.send(:output_identifier, r[:name])}
+        m = output_identifier_meth
+        metadata_dataset.from(:sqlite_master).server(opts[:server]).filter(TABLES_FILTER).map{|r| m.call(r[:name])}
       end
       
       # A symbol signifying the value of the temp_store PRAGMA.
@@ -168,10 +182,7 @@ module Sequel
 
       # Parse the output of the table_info pragma
       def parse_pragma(table_name, opts)
-        ds2 = dataset
-        ds = self["PRAGMA table_info(?)", ds2.send(:input_identifier, table_name)]
-        ds.identifier_output_method = nil
-        ds.map do |row|
+        metadata_dataset.with_sql("PRAGMA table_info(?)", input_identifier_meth.call(table_name)).map do |row|
           row.delete(:cid)
           row[:allow_null] = row.delete(:notnull).to_i == 0
           row[:default] = row.delete(:dflt_value)
@@ -191,9 +202,9 @@ module Sequel
       # SQLite supports schema parsing using the table_info PRAGMA, so
       # parse the output of that into the format Sequel expects.
       def schema_parse_table(table_name, opts)
-        ds = dataset
+        m = output_identifier_meth
         parse_pragma(table_name, opts).map do |row|
-          [ds.send(:output_identifier, row.delete(:name)), row]
+          [m.call(row.delete(:name)), row]
         end
       end
       

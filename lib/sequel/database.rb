@@ -597,6 +597,31 @@ module Sequel
       :downcase
     end
     
+    # Return a Method object for the dataset's output_identifier_method.
+    # Used in metadata parsing to make sure the returned information is in the
+    # correct format.
+    def input_identifier_meth
+      dataset.method(:input_identifier)
+    end
+
+    # Return a dataset that uses the default identifier input and output methods
+    # for this database.  Used when parsing metadata so that column symbols are
+    # returned as expected.
+    def metadata_dataset
+      return @metadata_dataset if @metadata_dataset
+      ds = dataset
+      ds.identifier_input_method = identifier_input_method_default
+      ds.identifier_output_method = identifier_output_method_default
+      @metadata_dataset = ds
+    end
+
+    # Return a Method object for the dataset's output_identifier_method.
+    # Used in metadata parsing to make sure the returned information is in the
+    # correct format.
+    def output_identifier_meth
+      dataset.method(:output_identifier)
+    end
+
     # Whether to quote identifiers by default for this database, true
     # by default.
     def quote_identifiers_default

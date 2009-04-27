@@ -71,8 +71,16 @@ describe "Sequel::Database dump methods" do
     @d.dump_table_schema(:t1).should == "create_table(:t1) do\n  primary_key :c1\n  String :c2, :size=>20\nend"
   end
 
-  it "should not use multiple primary_key calls if there is a composite primary key" do
-    @d.dump_table_schema(:t2).should == "create_table(:t2) do\n  Integer :c1, :null=>false\n  BigDecimal :c2, :null=>false\nend"
+  it "should use a composite primary_key calls if there is a composite primary key" do
+    @d.dump_table_schema(:t2).should == "create_table(:t2) do\n  Integer :c1, :null=>false\n  BigDecimal :c2, :null=>false\n  \n  primary_key [:c1, :c2]\nend"
+  end
+
+  it "should include index information if available" do
+    @d.meta_def(:indexes) do |t|
+      {:i1=>{:columns=>[:c1], :unique=>false},
+       :t1_c2_c1_index=>{:columns=>[:c2, :c1], :unique=>true}}
+    end
+    @d.dump_table_schema(:t1).should == "create_table(:t1) do\n  primary_key :c1\n  String :c2, :size=>20\n  \n  index [:c1], :name=>:i1\n  index [:c2, :c1], :unique=>true\nend"
   end
 
   it "should support dumpting the whole database as a migration" do
@@ -87,6 +95,8 @@ Class.new(Sequel::Migration) do
     create_table(:t2) do
       Integer :c1, :null=>false
       BigDecimal :c2, :null=>false
+      
+      primary_key [:c1, :c2]
     end
   end
   
@@ -110,6 +120,8 @@ Class.new(Sequel::Migration) do
     create_table(:t2) do
       column :c1, "integer", :null=>false
       column :c2, "numeric", :null=>false
+      
+      primary_key [:c1, :c2]
     end
   end
   

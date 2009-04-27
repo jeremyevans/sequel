@@ -1,5 +1,9 @@
 === HEAD
 
+* Support dumping indexes in the schema_dumper extension (jeremyevans)
+
+* Add index parsing to PostgreSQL, MySQL, SQLite, and JDBC adapters (jeremyevans)
+
 * Correctly quote SQL Array references, and handle qualified identifiers with them (e.g. :table__column.sql_subscript(1)) (jeremyevans)
 
 * Allow dropping an index with a name different than the default name (jeremyevans)

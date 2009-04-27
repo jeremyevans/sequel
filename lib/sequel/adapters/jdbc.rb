@@ -185,11 +185,27 @@ module Sequel
         execute(sql, {:type=>:insert}.merge(opts))
       end
       
+      # Return a hash containing index information. Hash keys are index name symbols.
+      # Values are subhashes with two keys, :columns and :unique.  The value of :columns
+      # is an array of symbols of column names.  The value of :unique is true or false
+      # depending on if the index is unique.
+      def indexes(table)
+        indexes = {}
+        ds = dataset
+        m = output_identifier_meth
+        metadata(:getIndexInfo, nil, nil, ds.send(:input_identifier, table), nil, nil)) do |r|
+          next unless name = r[:column_name]
+          i = indexes[m.call(r[:index_name])] ||= {:columns=>[], :unique=>r[:non_unique] == 0}
+          i[:columns] << m.call(name)
+        end
+        indexes
+      end 
+
       # All tables in this database
       def tables
         ts = []
-        ds = dataset
-        metadata(:getTables, nil, nil, nil, ['TABLE'].to_java(:string)){|h| ts << ds.send(:output_identifier, h[:table_name])}
+        m = output_identifier_meth
+        metadata(:getTables, nil, nil, nil, ['TABLE'].to_java(:string)){|h| ts << m.call(h[:table_name])}
         ts
       end
       
@@ -304,9 +320,7 @@ module Sequel
       
       # Yield the metadata for this database
       def metadata(*args, &block)
-        ds = dataset
-        ds.identifier_output_method = :downcase
-        synchronize{|c| ds.send(:process_result_set, c.getMetaData.send(*args), &block)}
+        synchronize{|c| metadata_dataset.send(:process_result_set, c.getMetaData.send(*args), &block)}
       end
       
       # Java being java, you need to specify the type of each argument
@@ -343,16 +357,18 @@ module Sequel
       
       # All tables in this database
       def schema_parse_table(table, opts={})
+        m = output_identifier_meth
+        im = input_identifier_meth
         ds = dataset
         schema, table = schema_and_table(table)
-        schema = ds.send(:input_identifier, schema) if schema
-        table = ds.send(:input_identifier, table)
+        schema = im.call(schema) if schema
+        table = im.call(table)
         pks, ts = [], []
         metadata(:getPrimaryKeys, nil, schema, table) do |h|
           pks << h[:column_name]
         end
         metadata(:getColumns, nil, schema, table, nil) do |h|
-          ts << [ds.send(:output_identifier, h[:column_name]), {:type=>schema_column_type(h[:type_name]), :db_type=>h[:type_name], :default=>(h[:column_def] == '' ? nil : h[:column_def]), :allow_null=>(h[:nullable] != 0), :primary_key=>pks.include?(h[:column_name])}]
+          ts << [m.call(h[:column_name]), {:type=>schema_column_type(h[:type_name]), :db_type=>h[:type_name], :default=>(h[:column_def] == '' ? nil : h[:column_def]), :allow_null=>(h[:nullable] != 0), :primary_key=>pks.include?(h[:column_name])}]
         end
         ts
       end

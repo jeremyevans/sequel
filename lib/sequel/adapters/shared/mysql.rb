@@ -16,11 +16,28 @@ module Sequel
     module DatabaseMethods
       AUTO_INCREMENT = 'AUTO_INCREMENT'.freeze
       CAST_TYPES = {String=>:CHAR, Integer=>:SIGNED, Time=>:DATETIME, DateTime=>:DATETIME, Numeric=>:DECIMAL, BigDecimal=>:DECIMAL, File=>:BINARY}
+      PRIMARY = 'PRIMARY'.freeze
       
       # MySQL's cast rules are restrictive in that you can't just cast to any possible
       # database type.
       def cast_type_literal(type)
         CAST_TYPES[type] || super
+      end
+
+      # Return a hash containing index information. Hash keys are index name symbols.
+      # Values are subhashes with two keys, :columns and :unique.  The value of :columns
+      # is an array of symbols of column names.  The value of :unique is true or false
+      # depending on if the index is unique.
+      def indexes(table)
+        indexes = {}
+        m = output_identifier_meth
+        im = input_identifier_meth
+        metadata_dataset.with_sql("SHOW INDEX FROM ?", SQL::Identifier.new(im.call(table))).each do |r|
+          next if name == PRIMARY
+          i = indexes[m.call(r[:Key_name])] ||= {:columns=>[], :unique=>r[:Non_unique] != 1}
+          i[:columns] << m.call(r[:Column_name])
+        end
+        indexes
       end
 
       # Get version of MySQL server, used for determined capabilities.
@@ -34,10 +51,8 @@ module Sequel
       # Options:
       # * :server - Set the server to use
       def tables(opts={})
-        ds = self['SHOW TABLES'].server(opts[:server])
-        ds.identifier_output_method = nil
-        ds2 = dataset
-        ds.map{|r| ds2.send(:output_identifier, r.values.first)}
+        m = output_identifier_meth
+        metadata_dataset.with_sql('SHOW TABLES').server(opts[:server]).map{|r| m.call(r.values.first)}
       end
       
       # Changes the database in use by issuing a USE statement.  I would be
@@ -129,10 +144,9 @@ module Sequel
 
       # Use the MySQL specific DESCRIBE syntax to get a table description.
       def schema_parse_table(table_name, opts)
-        ds = self["DESCRIBE ?", SQL::Identifier.new(table_name)]
-        ds.identifier_output_method = nil
-        ds2 = dataset
-        ds.map do |row|
+        m = output_identifier_meth
+        im = input_identifier_meth
+        metadata_dataset.with_sql("DESCRIBE ?", SQL::Identifier.new(im.call(table_name))).map do |row|
           row.delete(:Extra)
           row[:allow_null] = row.delete(:Null) == 'YES'
           row[:default] = row.delete(:Default)
@@ -140,7 +154,7 @@ module Sequel
           row[:default] = nil if blank_object?(row[:default])
           row[:db_type] = row.delete(:Type)
           row[:type] = schema_column_type(row[:db_type])
-          [ds2.send(:output_identifier, row.delete(:Field)), row]
+          [m.call(row.delete(:Field)), row]
         end
       end
 

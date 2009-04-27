@@ -112,9 +112,34 @@ describe "Database schema parser" do
 end
 end
 
+if INTEGRATION_DB.respond_to?(:indexes)
+describe "Database index parsing" do
+  after do
+    INTEGRATION_DB.drop_table(:items)
+  end
+
+  specify "should parse indexes into a hash" do
+    INTEGRATION_DB.create_table!(:items){Integer :n; Integer :a}
+    INTEGRATION_DB.indexes(:items).should == {}
+    INTEGRATION_DB.add_index(:items, :n)
+    INTEGRATION_DB.indexes(:items).should == {:items_n_index=>{:columns=>[:n], :unique=>false}}
+    INTEGRATION_DB.drop_index(:items, :n)
+    INTEGRATION_DB.indexes(:items).should == {}
+    INTEGRATION_DB.add_index(:items, :n, :unique=>true, :name=>:blah_blah_index)
+    INTEGRATION_DB.indexes(:items).should == {:blah_blah_index=>{:columns=>[:n], :unique=>true}}
+    INTEGRATION_DB.add_index(:items, [:n, :a])
+    INTEGRATION_DB.indexes(:items).should == {:blah_blah_index=>{:columns=>[:n], :unique=>true}, :items_n_a_index=>{:columns=>[:n, :a], :unique=>false}}
+    INTEGRATION_DB.drop_index(:items, :n, :name=>:blah_blah_index)
+    INTEGRATION_DB.indexes(:items).should == {:items_n_a_index=>{:columns=>[:n, :a], :unique=>false}}
+    INTEGRATION_DB.drop_index(:items, [:n, :a])
+    INTEGRATION_DB.indexes(:items).should == {}
+  end
+end
+end
+
 describe "Database schema modifiers" do
   before do
-    INTEGRATION_DB.create_table!(:items){integer :number}
+    INTEGRATION_DB.create_table!(:items){Integer :number}
     @ds = INTEGRATION_DB[:items]
     @ds.insert([10])
     clear_sqls
@@ -148,8 +173,8 @@ describe "Database schema modifiers" do
   specify "should remove columns from tables correctly" do
     INTEGRATION_DB.create_table!(:items) do
       primary_key :id
-      text :name
-      integer :number
+      String :name
+      Integer :number
       foreign_key :item_id, :items
     end
     @ds.insert(:number=>10)

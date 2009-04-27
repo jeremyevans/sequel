@@ -260,6 +260,34 @@ module Sequel
         self << drop_trigger_sql(table, name, opts)
       end
       
+      # Return a hash containing index information. Hash keys are index name symbols.
+      # Values are subhashes with two keys, :columns and :unique.  The value of :columns
+      # is an array of symbols of column names.  The value of :unique is true or false
+      # depending on if the index is unique.
+      def indexes(table)
+        m = output_identifier_meth
+        im = input_identifier_meth
+        schema, table = schema_and_table(table)
+        ds = metadata_dataset.
+          from(:pg_class___tab).
+          join(:pg_index___ind, :indrelid=>:oid, im.call(table)=>:relname).
+          join(:pg_class___indc, :oid=>:indexrelid).
+          join(:pg_attribute___att, :attrelid=>:tab__oid, :attnum=>SQL::Function.new(:ANY, :ind__indkey)).
+          filter(:indc__relkind=>'i', :ind__indisprimary=>false).
+          exclude(0=>SQL::Function.new(:ANY, :ind__indkey)).
+          order(:indc__relname, (0...32).map{|x| [SQL::Subscript.new(:ind__indkey, [x]), x]}.case(32, :att__attnum)).
+          select(:indc__relname___name, :ind__indisunique___unique, :att__attname___column)
+        
+        ds.join!(:pg_namespace___nsp, :oid=>:tab__relnamespace, :nspname=>schema) if schema
+        
+        indexes = {}
+        ds.each do |r|
+          i = indexes[m.call(r[:name])] ||= {:columns=>[], :unique=>r[:unique]}
+          i[:columns] << m.call(r[:column])
+        end
+        indexes
+      end
+
       # Dataset containing all current database locks 
       def locks
         dataset.from(:pg_class).join(:pg_locks, :relation=>:relfilenode).select(:pg_class__relname, Sequel::SQL::ColumnAll.new(:pg_locks))
@@ -312,9 +340,10 @@ module Sequel
       # * :schema - The schema to search (default_schema by default)
       # * :server - The server to use
       def table_exists?(table, opts={})
+        im = input_identifier_meth
         schema, table = schema_and_table(table)
         opts[:schema] ||= schema
-        tables(opts){|ds| !ds.first(:relname=>ds.send(:input_identifier, table)).nil?}
+        tables(opts){|ds| !ds.first(:relname=>im.call(table)).nil?}
       end
       
       # Array of symbols specifying table names in the current database.
@@ -325,12 +354,10 @@ module Sequel
       # * :schema - The schema to search (default_schema by default)
       # * :server - The server to use
       def tables(opts={})
-        ds = self[:pg_class].filter(:relkind=>'r').select(:relname).exclude(SQL::StringExpression.like(:relname, SYSTEM_TABLE_REGEXP)).server(opts[:server])
+        ds = metadata_dataset.from(:pg_class).filter(:relkind=>'r').select(:relname).exclude(SQL::StringExpression.like(:relname, SYSTEM_TABLE_REGEXP)).server(opts[:server])
         ds.join!(:pg_namespace, :oid=>:relnamespace, :nspname=>(opts[:schema]||default_schema).to_s) if opts[:schema] || default_schema
-        ds.identifier_input_method = nil
-        ds.identifier_output_method = nil
-        ds2 = dataset
-        block_given? ? yield(ds) : ds.map{|r| ds2.send(:output_identifier, r[:relname])}
+        m = output_identifier_meth
+        block_given? ? yield(ds) : ds.map{|r| m.call(r[:relname])}
       end
       
       # PostgreSQL supports multi-level transactions using save points.
@@ -514,8 +541,9 @@ module Sequel
 
       # The dataset used for parsing table schemas, using the pg_* system catalogs.
       def schema_parse_table(table_name, opts)
-        ds2 = dataset
-        ds = dataset.select(:pg_attribute__attname___name,
+        m = output_identifier_meth
+        m2 = input_identifier_meth
+        ds = metadata_dataset.select(:pg_attribute__attname___name,
             SQL::Function.new(:format_type, :pg_type__oid, :pg_attribute__atttypmod).as(:db_type),
             SQL::Function.new(:pg_get_expr, :pg_attrdef__adbin, :pg_class__oid).as(:default),
             SQL::BooleanExpression.new(:NOT, :pg_attribute__attnotnull).as(:allow_null),
@@ -527,15 +555,13 @@ module Sequel
           left_outer_join(:pg_index, :indrelid=>:pg_class__oid, :indisprimary=>true).
           filter(:pg_attribute__attisdropped=>false).
           filter{|o| o.pg_attribute__attnum > 0}.
-          filter(:pg_class__relname=>ds2.send(:input_identifier, table_name)).
+          filter(:pg_class__relname=>m2.call(table_name)).
           order(:pg_attribute__attnum)
         ds.join!(:pg_namespace, :oid=>:pg_class__relnamespace, :nspname=>(opts[:schema] || default_schema).to_s) if opts[:schema] || default_schema
-        ds.identifier_input_method = nil
-        ds.identifier_output_method = nil
         ds.map do |row|
           row[:default] = nil if blank_object?(row[:default])
           row[:type] = schema_column_type(row[:db_type])
-          [ds2.send(:output_identifier, row.delete(:name)), row]
+          [m.call(row.delete(:name)), row]
         end
       end
 
