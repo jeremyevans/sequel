@@ -83,7 +83,7 @@ describe "Sequel::Database dump methods" do
     @d.dump_table_schema(:t1).should == "create_table(:t1) do\n  primary_key :c1\n  String :c2, :size=>20\n  \n  index [:c1], :name=>:i1\n  index [:c2, :c1], :unique=>true\nend"
   end
 
-  it "should support dumpting the whole database as a migration" do
+  it "should support dumping the whole database as a migration" do
     @d.dump_schema_migration.should == <<-END_MIG
 Class.new(Sequel::Migration) do
   def up
@@ -120,6 +120,35 @@ Class.new(Sequel::Migration) do
     create_table(:t2) do
       column :c1, "integer", :null=>false
       column :c2, "numeric", :null=>false
+      
+      primary_key [:c1, :c2]
+    end
+  end
+  
+  def down
+    drop_table(:t1, :t2)
+  end
+end
+END_MIG
+  end
+
+  it "should honor the :indexes => false option to not include indexes" do
+    @d.meta_def(:indexes) do |t|
+      {:i1=>{:columns=>[:c1], :unique=>false},
+       :t1_c2_c1_index=>{:columns=>[:c2, :c1], :unique=>true}}
+    end
+    @d.dump_table_schema(:t1, :indexes=>false).should == "create_table(:t1) do\n  primary_key :c1\n  String :c2, :size=>20\nend"
+    @d.dump_schema_migration(:indexes=>false).should == <<-END_MIG
+Class.new(Sequel::Migration) do
+  def up
+    create_table(:t1) do
+      primary_key :c1
+      String :c2, :size=>20
+    end
+    
+    create_table(:t2) do
+      Integer :c1, :null=>false
+      BigDecimal :c2, :null=>false
       
       primary_key [:c1, :c2]
     end

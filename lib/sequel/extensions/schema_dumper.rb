@@ -31,7 +31,7 @@ END_MIG
       options = options.merge(:single_pk=>true) if pks.length == 1
       m = db.method(:column_schema_to_generator_opts)
       im = db.method(:index_to_generator_opts)
-      indexes = db.indexes(table) if db.respond_to?(:indexes)
+      indexes = db.indexes(table) if options[:indexes] != false and db.respond_to?(:indexes)
       gen = Schema::Generator.new(self) do
         s.each{|name, info| send(*m.call(name, info, options))}
         primary_key(pks) if !@primary_key && pks.length > 0
