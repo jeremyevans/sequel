@@ -72,6 +72,11 @@ module Sequel
         db
       end
       
+      # Amalgalite is just the SQLite database without a separate SQLite installation.
+      def database_type
+        :sqlite
+      end
+
       # Return instance of Sequel::Amalgalite::Dataset with the given options.
       def dataset(opts = nil)
         Amalgalite::Dataset.new(self, opts)

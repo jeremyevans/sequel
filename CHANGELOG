@@ -1,5 +1,7 @@
 === HEAD
 
+* Add Database#database_type method, for identifying which type of database the object is connecting to (jeremyevans)
+
 * Add ability to reset primary key sequences in the PostgreSQL adapter (jeremyevans)
 
 * Fix parsing of non-simple sequence names (that contain uppercase, spaces, etc.) in the PostgreSQL adapter (jeremyevans)

@@ -27,6 +27,11 @@ module Sequel
         pragma_set(:auto_vacuum, value)
       end
       
+      # SQLite uses the :sqlite database type.
+      def database_type
+        :sqlite
+      end
+
       # Return a hash containing index information. Hash keys are index name symbols.
       # Values are subhashes with two keys, :columns and :unique.  The value of :columns
       # is an array of symbols of column names.  The value of :unique is true or false

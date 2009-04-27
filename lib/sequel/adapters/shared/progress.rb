@@ -4,6 +4,11 @@ module Sequel
   module Progress
     module DatabaseMethods
 
+      # Progress uses the :progress database type.
+      def database_type
+        :progress
+      end
+
       def dataset(opts = nil)
         ds = super
         ds.extend(DatasetMethods)

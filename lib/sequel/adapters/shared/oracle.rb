@@ -5,6 +5,11 @@ module Sequel
     module DatabaseMethods
       TEMPORARY = 'GLOBAL TEMPORARY '.freeze
 
+      # Oracle uses the :oracle database type
+      def database_type
+        :oracle
+      end
+
       def tables(opts={})
         ds = from(:tab).server(opts[:server]).select(:tname).filter(:tabtype => 'TABLE')
         ds.map{|r| ds.send(:output_identifier, r[:tname])}

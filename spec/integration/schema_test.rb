@@ -167,7 +167,7 @@ describe "Database schema modifiers" do
     INTEGRATION_DB.alter_table(:items){add_column :name, :text}
     INTEGRATION_DB.schema(:items, :reload=>true).map{|x| x.first}.should == [:number, :name]
     @ds.columns!.should == [:number, :name]
-    unless INTEGRATION_DB.url =~ /sqlite|amalgalite/
+    unless INTEGRATION_DB.database_type == :sqlite
       INTEGRATION_DB.alter_table(:items){add_primary_key :id}
       INTEGRATION_DB.schema(:items, :reload=>true).map{|x| x.first}.should == [:number, :name, :id]
       @ds.columns!.should == [:number, :name, :id]

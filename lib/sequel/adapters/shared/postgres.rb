@@ -221,6 +221,11 @@ module Sequel
         self << create_trigger_sql(table, name, function, opts)
       end
       
+      # PostgreSQL uses the :postgres database type.
+      def database_type
+        :postgres
+      end
+
       # Drops the function from the database. Arguments:
       # * name : name of the function to drop
       # * opts : options hash:

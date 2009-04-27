@@ -654,6 +654,10 @@ context "A Database adapter with a scheme" do
     Sequel::ADAPTER_MAP[:ccc].should == CCC
   end
   
+  specify "should give the database_type as the adapter scheme by default" do
+    CCC.new.database_type.should == :ccc
+  end
+  
   specify "should be instantiated when its scheme is specified" do
     c = Sequel::Database.connect('ccc://localhost/db')
     c.should be_a_kind_of(CCC)

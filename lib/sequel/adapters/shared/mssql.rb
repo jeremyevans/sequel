@@ -9,6 +9,11 @@ module Sequel
       SQL_ROLLBACK = "ROLLBACK TRANSACTION".freeze
       TEMPORARY = "#".freeze
       
+      # Microsoft SQL Server uses the :mssql type.
+      def database_type
+        :mssql
+      end
+
       def dataset(opts = nil)
         ds = super
         ds.extend(DatasetMethods)

@@ -8,6 +8,11 @@ module Sequel
       module DatabaseMethods
         PRIMARY_KEY_INDEX_RE = /\Aprimary_key/i.freeze
       
+        # H2 uses the :h2 database type.
+        def database_type
+          :h2
+        end
+
         # Return Sequel::JDBC::H2::Dataset object with the given opts.
         def dataset(opts=nil)
           Sequel::JDBC::H2::Dataset.new(self, opts)

@@ -254,6 +254,17 @@ module Sequel
       raise NotImplementedError, "#connect should be overridden by adapters"
     end
     
+    # The database type for this database object, the same as the adapter scheme
+    # by default.  Should be overridden in adapters (especially shared adapters)
+    # to be the correct type, so that even if two separate Database objects are
+    # using different adapters you can tell that they are using the same database
+    # type.  Even better, you can tell that two Database objects that are using
+    # the same adapter are connecting to different database types (think JDBC or
+    # DataObjects).
+    def database_type
+      self.class.adapter_scheme
+    end
+    
     # Returns a blank dataset for this database
     def dataset
       ds = Sequel::Dataset.new(self)

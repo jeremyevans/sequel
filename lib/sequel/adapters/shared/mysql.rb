@@ -24,6 +24,11 @@ module Sequel
         CAST_TYPES[type] || super
       end
 
+      # MySQL uses the :mysql database type
+      def database_type
+        :mysql
+      end
+
       # Return a hash containing index information. Hash keys are index name symbols.
       # Values are subhashes with two keys, :columns and :unique.  The value of :columns
       # is an array of symbols of column names.  The value of :unique is true or false
