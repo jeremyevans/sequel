@@ -677,10 +677,9 @@ module Sequel
     #
     #   dataset.select_sql # => "SELECT * FROM items"
     def select_sql
-      opts = @opts
-      return static_sql(opts[:sql]) if opts[:sql]
+      return static_sql(@opts[:sql]) if @opts[:sql]
       sql = 'SELECT'
-      select_clause_order.each{|x| send(:"select_#{x}_sql", sql, opts)}
+      select_clause_order.each{|x| send(:"select_#{x}_sql", sql)}
       sql
     end
 
@@ -1011,13 +1010,13 @@ module Sequel
     end
 
     # Modify the sql to add the columns selected
-    def select_columns_sql(sql, opts)
-      sql << " #{column_list(opts[:select])}"
+    def select_columns_sql(sql)
+      sql << " #{column_list(@opts[:select])}"
     end
 
     # Modify the sql to add the DISTINCT modifier
-    def select_distinct_sql(sql, opts)
-      if distinct = opts[:distinct]
+    def select_distinct_sql(sql)
+      if distinct = @opts[:distinct]
         sql << " DISTINCT#{" ON (#{expression_list(distinct)})" unless distinct.empty?}"
       end
     end
@@ -1025,9 +1024,9 @@ module Sequel
     # Modify the sql to add a dataset to the via an EXCEPT, INTERSECT, or UNION clause.
     # This uses a subselect for the compound datasets used, because using parantheses doesn't
     # work on all databases.  I consider this an ugly hack, but can't I think of a better default.
-    def select_compounds_sql(sql, opts)
-      return unless opts[:compounds]
-      opts[:compounds].each do |type, dataset, all|
+    def select_compounds_sql(sql)
+      return unless @opts[:compounds]
+      @opts[:compounds].each do |type, dataset, all|
         compound_sql = subselect_sql(dataset)
         compound_sql = "SELECT * FROM (#{compound_sql})" if dataset.opts[:compounds]
         sql.replace("#{sql} #{type.to_s.upcase}#{' ALL' if all} #{compound_sql}")
@@ -1035,39 +1034,39 @@ module Sequel
     end
 
     # Modify the sql to add the list of tables to select FROM
-    def select_from_sql(sql, opts)
-      sql << " FROM #{source_list(opts[:from])}" if opts[:from]
+    def select_from_sql(sql)
+      sql << " FROM #{source_list(@opts[:from])}" if @opts[:from]
     end
 
     # Modify the sql to add the expressions to GROUP BY
-    def select_group_sql(sql, opts)
-      sql << " GROUP BY #{expression_list(opts[:group])}" if opts[:group]
+    def select_group_sql(sql)
+      sql << " GROUP BY #{expression_list(@opts[:group])}" if @opts[:group]
     end
 
     # Modify the sql to add the filter criteria in the HAVING clause
-    def select_having_sql(sql, opts)
-      sql << " HAVING #{literal(opts[:having])}" if opts[:having]
+    def select_having_sql(sql)
+      sql << " HAVING #{literal(@opts[:having])}" if @opts[:having]
     end
 
     # Modify the sql to add the list of tables to JOIN to
-    def select_join_sql(sql, opts)
-      opts[:join].each{|j| sql << literal(j)} if opts[:join]
+    def select_join_sql(sql)
+      @opts[:join].each{|j| sql << literal(j)} if @opts[:join]
     end
 
     # Modify the sql to limit the number of rows returned and offset
-    def select_limit_sql(sql, opts)
-      sql << " LIMIT #{opts[:limit]}" if opts[:limit]
-      sql << " OFFSET #{opts[:offset]}" if opts[:offset]
+    def select_limit_sql(sql)
+      sql << " LIMIT #{@opts[:limit]}" if @opts[:limit]
+      sql << " OFFSET #{@opts[:offset]}" if @opts[:offset]
     end
 
     # Modify the sql to add the expressions to ORDER BY
-    def select_order_sql(sql, opts)
-      sql << " ORDER BY #{expression_list(opts[:order])}" if opts[:order]
+    def select_order_sql(sql)
+      sql << " ORDER BY #{expression_list(@opts[:order])}" if @opts[:order]
     end
 
     # Modify the sql to add the filter criteria in the WHERE clause
-    def select_where_sql(sql, opts)
-      sql << " WHERE #{literal(opts[:where])}" if opts[:where]
+    def select_where_sql(sql)
+      sql << " WHERE #{literal(@opts[:where])}" if @opts[:where]
     end
 
     # Converts an array of source names into into a comma separated list.

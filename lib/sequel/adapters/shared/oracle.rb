@@ -62,9 +62,9 @@ module Sequel
       end
 
       # Oracle requires a subselect to do limit and offset
-      def select_limit_sql(sql, opts)
-        if limit = opts[:limit]
-          if (offset = opts[:offset]) && (offset > 0)
+      def select_limit_sql(sql)
+        if limit = @opts[:limit]
+          if (offset = @opts[:offset]) && (offset > 0)
             sql.replace("SELECT * FROM (SELECT raw_sql_.*, ROWNUM raw_rnum_ FROM(#{sql}) raw_sql_ WHERE ROWNUM <= #{limit + offset}) WHERE raw_rnum_ > #{offset}")
           else
             sql.replace("SELECT * FROM (#{sql}) WHERE ROWNUM <= #{limit}")

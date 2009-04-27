@@ -25,9 +25,9 @@ module Sequel
 
       # Progress uses TOP for limit, but it is only supported in Progress 10.
       # The Progress adapter targets Progress 9, so it silently ignores the option.
-      def select_limit_sql(sql, opts)
-        raise(Error, "OFFSET not supported") if opts[:offset]
-        #sql << " TOP #{opts[:limit]}" if opts[:limit]
+      def select_limit_sql(sql)
+        raise(Error, "OFFSET not supported") if @opts[:offset]
+        #sql << " TOP #{@opts[:limit]}" if @opts[:limit]
       end
     end
   end

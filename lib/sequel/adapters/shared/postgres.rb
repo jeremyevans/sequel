@@ -763,9 +763,9 @@ module Sequel
 
       # PostgreSQL is smart and can use parantheses around all datasets to get
       # the correct answers.
-      def select_compounds_sql(sql, opts)
-        return unless opts[:compounds]
-        opts[:compounds].each do |type, dataset, all|
+      def select_compounds_sql(sql)
+        return unless @opts[:compounds]
+        @opts[:compounds].each do |type, dataset, all|
           sql.replace("(#{sql} #{type.to_s.upcase}#{' ALL' if all} #{subselect_sql(dataset)})")
         end
       end
@@ -776,8 +776,8 @@ module Sequel
       end
 
       # Support lock mode, allowing FOR SHARE and FOR UPDATE queries.
-      def select_lock_sql(sql, opts)
-        case opts[:lock]
+      def select_lock_sql(sql)
+        case @opts[:lock]
         when :update
           sql << FOR_UPDATE
         when :share

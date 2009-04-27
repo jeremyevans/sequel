@@ -85,14 +85,14 @@ module Sequel
       end
 
       # MSSQL uses TOP for limit, with no offset support
-      def select_limit_sql(sql, opts)
-        raise(Error, "OFFSET not supported") if opts[:offset]
-        sql << " TOP #{opts[:limit]}" if opts[:limit]
+      def select_limit_sql(sql)
+        raise(Error, "OFFSET not supported") if @opts[:offset]
+        sql << " TOP #{@opts[:limit]}" if @opts[:limit]
       end
 
       # MSSQL uses the WITH statement to lock tables
-      def select_with_sql(sql, opts)
-        sql << " WITH #{opts[:with]}" if opts[:with]
+      def select_with_sql(sql)
+        sql << " WITH #{@opts[:with]}" if @opts[:with]
       end
     end
   end

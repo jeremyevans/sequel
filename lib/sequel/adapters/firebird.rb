@@ -271,9 +271,9 @@ module Sequel
         SELECT_CLAUSE_ORDER
       end
       
-      def select_limit_sql(sql, opts)
-        sql << " FIRST #{opts[:limit]}" if opts[:limit]
-        sql << " SKIP #{opts[:offset]}" if opts[:offset]
+      def select_limit_sql(sql)
+        sql << " FIRST #{@opts[:limit]}" if @opts[:limit]
+        sql << " SKIP #{@opts[:offset]}" if @opts[:offset]
       end
 
       private
