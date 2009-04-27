@@ -33,8 +33,9 @@ module Sequel
         m = output_identifier_meth
         im = input_identifier_meth
         metadata_dataset.with_sql("SHOW INDEX FROM ?", SQL::Identifier.new(im.call(table))).each do |r|
+          name = r[:Key_name]
           next if name == PRIMARY
-          i = indexes[m.call(r[:Key_name])] ||= {:columns=>[], :unique=>r[:Non_unique] != 1}
+          i = indexes[m.call(name)] ||= {:columns=>[], :unique=>r[:Non_unique] != 1}
           i[:columns] << m.call(r[:Column_name])
         end
         indexes

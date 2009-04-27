@@ -6,6 +6,8 @@ module Sequel
     module H2
       # Instance methods for H2 Database objects accessed via JDBC.
       module DatabaseMethods
+        PRIMARY_KEY_INDEX_RE = /\Aprimary_key/i.freeze
+      
         # Return Sequel::JDBC::H2::Dataset object with the given opts.
         def dataset(opts=nil)
           Sequel::JDBC::H2::Dataset.new(self, opts)
@@ -32,6 +34,12 @@ module Sequel
             super(table, op)
           end
         end
+        
+        # Default to a single connection for a memory database.
+        def connection_pool_default_options
+          o = super
+          uri == 'jdbc:h2:mem:' ? o.merge(:max_connections=>1) : o
+        end
       
         # Use IDENTITY() to get the last inserted id.
         def last_insert_id(conn, opts={})
@@ -45,10 +53,8 @@ module Sequel
           end 
         end
         
-        # Default to a single connection for a memory database.
-        def connection_pool_default_options
-          o = super
-          uri == 'jdbc:h2:mem:' ? o.merge(:max_connections=>1) : o
+        def primary_key_index_re
+          PRIMARY_KEY_INDEX_RE
         end
       end
       

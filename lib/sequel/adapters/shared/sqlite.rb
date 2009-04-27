@@ -4,6 +4,7 @@ module Sequel
   module SQLite
     module DatabaseMethods
       AUTO_VACUUM = [:none, :full, :incremental].freeze
+      PRIMARY_KEY_INDEX_RE = /\Asqlite_autoindex_/.freeze
       SYNCHRONOUS = [:off, :normal, :full].freeze
       TABLES_FILTER = "type = 'table' AND NOT name = 'sqlite_sequence'"
       TEMP_STORE = [:default, :file, :memory].freeze
@@ -34,11 +35,17 @@ module Sequel
         m = output_identifier_meth
         im = input_identifier_meth
         indexes = {}
-        metadata_dataset.with_sql("PRAGMA index_list(?)", im.call(table)).each do |r|
-          indexes[m.call(r[:name])] = {:unique=>r[:unique].to_i==1}
-        end
-        indexes.each do |k, v|
-          v[:columns] = metadata_dataset.with_sql("PRAGMA index_info(?)", im.call(k)).map(:name).map{|x| m.call(x)}
+        begin
+          metadata_dataset.with_sql("PRAGMA index_list(?)", im.call(table)).each do |r|
+            next if r[:name] =~ PRIMARY_KEY_INDEX_RE
+            indexes[m.call(r[:name])] = {:unique=>r[:unique].to_i==1}
+          end
+        rescue Sequel::DatabaseError
+          nil
+        else
+          indexes.each do |k, v|
+            v[:columns] = metadata_dataset.with_sql("PRAGMA index_info(?)", im.call(k)).map(:name).map{|x| m.call(x)}
+          end
         end
         indexes
       end

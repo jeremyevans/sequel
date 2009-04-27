@@ -134,6 +134,13 @@ describe "Database index parsing" do
     INTEGRATION_DB.drop_index(:items, [:n, :a])
     INTEGRATION_DB.indexes(:items).should == {}
   end
+  
+  specify "should not include a primary key index" do
+    INTEGRATION_DB.create_table!(:items){primary_key :n}
+    INTEGRATION_DB.indexes(:items).should == {}
+    INTEGRATION_DB.create_table!(:items){Integer :n; Integer :a; primary_key [:n, :a]}
+    INTEGRATION_DB.indexes(:items).should == {}
+  end
 end
 end
 

@@ -191,11 +191,11 @@ module Sequel
       # depending on if the index is unique.
       def indexes(table)
         indexes = {}
-        ds = dataset
         m = output_identifier_meth
-        metadata(:getIndexInfo, nil, nil, ds.send(:input_identifier, table), nil, nil)) do |r|
+        metadata(:getIndexInfo, nil, nil, input_identifier_meth.call(table), false, true) do |r|
           next unless name = r[:column_name]
-          i = indexes[m.call(r[:index_name])] ||= {:columns=>[], :unique=>r[:non_unique] == 0}
+          next if respond_to?(:primary_key_index_re, true) and r[:index_name] =~ primary_key_index_re 
+          i = indexes[m.call(r[:index_name])] ||= {:columns=>[], :unique=>!r[:non_unique]}
           i[:columns] << m.call(name)
         end
         indexes
