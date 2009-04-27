@@ -36,6 +36,28 @@ describe "Sequel::Schema::Generator dump methods" do
     g.indexes.should == g2.indexes
   end
 
+  it "should allow dumping indexes as separate add_index and drop_index methods" do
+    g = @g.new(@d) do
+      index :a
+      index [:c, :e], :name=>:blah
+      index [:b, :c], :unique=>true
+    end
+
+    t = <<END_CODE
+add_index :t, [:a]
+add_index :t, [:c, :e], :name=>:blah
+add_index :t, [:b, :c], :unique=>true
+END_CODE
+    g.dump_indexes(:add_index=>:t).should == t.strip
+
+    t = <<END_CODE
+drop_index :t, [:a]
+drop_index :t, [:c, :e], :name=>:blah
+drop_index :t, [:b, :c], :unique=>true
+END_CODE
+    g.dump_indexes(:drop_index=>:t).should == t.strip
+  end
+
   it "should raise an error if you try to dump a Generator that uses a constraint with a proc" do
     proc{@g.new(@d){check{a>1}}.dump_constraints}.should raise_error(Sequel::Error)
   end
@@ -156,6 +178,27 @@ Class.new(Sequel::Migration) do
   
   def down
     drop_table(:t1, :t2)
+  end
+end
+END_MIG
+  end
+
+  it "should support dumping just indexes as a migration" do
+    @d.meta_def(:tables){[:t1]}
+    @d.meta_def(:indexes) do |t|
+      {:i1=>{:columns=>[:c1], :unique=>false},
+       :t1_c2_c1_index=>{:columns=>[:c2, :c1], :unique=>true}}
+    end
+    @d.dump_indexes_migration.should == <<-END_MIG
+Class.new(Sequel::Migration) do
+  def up
+    add_index :t1, [:c1], :name=>:i1
+    add_index :t1, [:c2, :c1], :unique=>true
+  end
+  
+  def down
+    drop_index :t1, [:c1], :name=>:i1
+    drop_index :t1, [:c2, :c1], :unique=>true
   end
 end
 END_MIG

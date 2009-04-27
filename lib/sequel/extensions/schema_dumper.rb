@@ -1,5 +1,22 @@
 module Sequel
   class Database
+    # Dump indexes for all tables as a migration.  This complements
+    # the :indexes=>false option to dump_schema_migration.
+    def dump_indexes_migration
+      ts = tables
+      <<END_MIG
+Class.new(Sequel::Migration) do
+  def up
+#{ts.map{|t| dump_table_indexes(t, :add_index)}.reject{|x| x == ''}.join("\n\n").gsub(/^/o, '    ')}
+  end
+  
+  def down
+#{ts.map{|t| dump_table_indexes(t, :drop_index)}.reject{|x| x == ''}.join("\n\n").gsub(/^/o, '    ')}
+  end
+end
+END_MIG
+    end
+
     # Return a string that contains a Sequel::Migration subclass that when
     # run would recreate the database structure. Options:
     # * :same_db - Don't attempt to translate database types to ruby types.
@@ -7,6 +24,8 @@ module Sequel
     #   ruby types, but there is no guarantee that the migration generated
     #   will yield the same type.  Without this set, types that aren't
     #   recognized will be translated to a string-like type.
+    # * :indexes - If set to false, don't dump indexes (they can be added
+    #   later via dump_index_migration).
     def dump_schema_migration(options={})
       ts = tables
       <<END_MIG
@@ -25,13 +44,12 @@ END_MIG
     # Return a string with a create table block that will recreate the given
     # table's schema.  Takes the same options as dump_schema_migration.
     def dump_table_schema(table, options={})
-      db = self
-      s = db.schema(table).dup
+      s = schema(table).dup
       pks = s.find_all{|x| x.last[:primary_key] == true}.map{|x| x.first}
       options = options.merge(:single_pk=>true) if pks.length == 1
-      m = db.method(:column_schema_to_generator_opts)
-      im = db.method(:index_to_generator_opts)
-      indexes = db.indexes(table) if options[:indexes] != false and db.respond_to?(:indexes)
+      m = method(:column_schema_to_generator_opts)
+      im = method(:index_to_generator_opts)
+      indexes = indexes(table) if options[:indexes] != false and respond_to?(:indexes)
       gen = Schema::Generator.new(self) do
         s.each{|name, info| send(*m.call(name, info, options))}
         primary_key(pks) if !@primary_key && pks.length > 0
@@ -121,6 +139,18 @@ END_MIG
       end
     end
 
+    # Return a string that containing add_index/drop_index method calls for
+    # creating the index migration.
+    def dump_table_indexes(table, meth)
+      return '' unless respond_to?(:indexes)
+      im = method(:index_to_generator_opts)
+      indexes = indexes(table) 
+      gen = Schema::Generator.new(self) do
+        indexes.each{|iname, iopts| send(:index, iopts[:columns], im.call(table, iname, iopts))}
+      end
+      gen.dump_indexes(meth=>table)
+    end
+
     # Convert the parsed index information into options to the Generators index method. 
     def index_to_generator_opts(table, name, index_opts)
       h = {}
@@ -181,12 +211,20 @@ END_MIG
       end
 
       # Dump this generator's indexes to a string that could be evaled inside
-      # another instance to represent the same indexes
-      def dump_indexes
+      # another instance to represent the same indexes. Options:
+      # * :add_index - Use add_index instead of index, so the methods
+      #   can be called outside of a generator but inside a migration.
+      #   The value of this option should be the table name to use.
+      # * :drop_index - Same as add_index, but create drop_index statements.
+      def dump_indexes(options={})
         indexes.map do |c|
           c = c.dup
           cols = c.delete(:columns)
-          "index #{cols.inspect}#{opts_inspect(c)}"
+          if table = options[:add_index] || options[:drop_index]
+            "#{options[:drop_index] ? 'drop' : 'add'}_index #{table.inspect}, #{cols.inspect}#{opts_inspect(c)}"
+          else
+            "index #{cols.inspect}#{opts_inspect(c)}"
+          end
         end.join("\n")
       end
 
