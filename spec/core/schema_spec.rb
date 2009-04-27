@@ -665,6 +665,13 @@ context "DB#alter_table" do
     @db.sqls.should == ["DROP INDEX cats_name_index"]
   end
 
+  specify "should support drop_index with a given name" do
+    @db.alter_table(:cats) do
+      drop_index :name, :name=>:blah_blah
+    end
+    @db.sqls.should == ["DROP INDEX blah_blah"]
+  end
+
   specify "should support rename_column" do
     @db.alter_table(:cats) do
       rename_column :name, :old_name

@@ -278,8 +278,8 @@ module Sequel
       end
       
       # Remove an index from the DDL for the table.
-      def drop_index(columns)
-        @operations << {:op => :drop_index, :columns => Array(columns)}
+      def drop_index(columns, options={})
+        @operations << {:op => :drop_index, :columns => Array(columns)}.merge(options)
       end
 
       # Modify a column's name in the DDL for the table.

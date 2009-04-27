@@ -104,8 +104,8 @@ module Sequel
     #   DB.drop_index :posts, [:author, :title]
     #
     # See alter_table.
-    def drop_index(table, columns)
-      alter_table(table) {drop_index(columns)}
+    def drop_index(table, columns, options={})
+      alter_table(table){drop_index(columns, options)}
     end
     
     # Drops one or more tables corresponding to the given names:

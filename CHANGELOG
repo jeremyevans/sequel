@@ -1,5 +1,7 @@
 === HEAD
 
+* Allow dropping an index with a name different than the default name (jeremyevans)
+
 * Allow Dataset#from to remove existing FROM tables when called without an argument, instead of raising an error later (jeremyevans)
 
 * Fix string quoting on Oracle so it doesn't double backslashes (jeremyevans)
