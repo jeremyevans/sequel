@@ -653,12 +653,9 @@ module Sequel
       # cached association and changed_columns information.  Raises an Error if the record no longer
       # exists in the database.
       def refresh
-        @values = this.first || raise(Error, "Record not found")
-        changed_columns.clear
-        associations.clear
-        self
+        _refresh(this)
       end
-      
+
       # Alias of refresh, but not aliased directly to make overriding in a plugin easier.
       def reload
         refresh
@@ -674,7 +671,7 @@ module Sequel
       #
       # Takes the following options:
       #
-      # * :changed - save all changed columns, instead of all columns or the columns
+      # * :changed - save all changed columns, instead of all columns or the columns given
       # * :transaction - set to false not to use a transaction
       # * :validate - set to false not to validate the model before saving
       def save(*columns)
@@ -774,6 +771,15 @@ module Sequel
         self
       end
       
+      # Refresh using a particular dataset, used inside save to make sure the same server
+      # is used for reading newly inserted values from the database
+      def _refresh(dataset)
+        @values = dataset.first || raise(Error, "Record not found")
+        changed_columns.clear
+        associations.clear
+        self
+      end
+      
       # Internal version of save, split from save to allow running inside
       # it's own transaction.
       def _save(columns, opts)
@@ -798,7 +804,11 @@ module Sequel
           after_create
           after_save
           @was_new = nil
-          refresh if pk
+          if pk
+            ds = this
+            ds = ds.server(:default) unless ds.opts[:server]
+            _refresh(ds)
+          end
         else
           return save_failure(:update) if before_update == false
           if columns.empty?

@@ -1,5 +1,39 @@
 require File.join(File.dirname(__FILE__), "spec_helper")
 
+describe "Model#save server use" do
+  
+  before(:each) do
+    @c = Class.new(Sequel::Model(:items)) do
+      columns :id, :x, :y
+    end
+    @c.db = MockDatabase.new
+    db2 = @db2 = MockDatabase.new
+    @c.class_eval do
+      define_method(:after_save) do
+        model.db = db2
+        ds = model.dataset
+        def ds.fetch_rows(sql)
+          yield @db.execute(sql, @opts[:server])
+        end
+        @this = nil
+      end
+    end
+  end
+
+  it "should use the :default server if the model doesn't have one already specified" do
+    @c.db.should_receive(:execute).with("INSERT INTO items (x) VALUES (1)").and_return(10)
+    @db2.should_receive(:execute).with('SELECT * FROM items WHERE (id = 10) LIMIT 1', :default).and_return(:x=>1, :id=>10)
+    @c.new(:x=>1).save
+  end
+
+  it "should use the model's server if the model has one already specified" do
+    @c.dataset = @c.dataset.server(:blah)
+    @c.db.should_receive(:execute).with("INSERT INTO items (x) VALUES (1)").and_return(10)
+    @db2.should_receive(:execute).with('SELECT * FROM items WHERE (id = 10) LIMIT 1', :blah).and_return(:x=>1, :id=>10)
+    @c.new(:x=>1).save
+  end
+end
+
 describe "Model#save" do
   
   before(:each) do

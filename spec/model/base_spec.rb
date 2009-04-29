@@ -189,7 +189,7 @@ describe Sequel::Model, ".(allowed|restricted)_columns " do
   before do
     @c = Class.new(Sequel::Model(:blahblah)) do
       columns :x, :y, :z
-      def refresh
+      def _refresh(ds)
         self
       end
     end
