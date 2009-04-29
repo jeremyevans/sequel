@@ -4,7 +4,7 @@ describe Sequel::Model, "#sti_key" do
   before do
     class ::StiTest < Sequel::Model
       def kind=(x); self[:kind] = x; end 
-      def refresh; end 
+      def _refresh(x); end 
       plugin :single_table_inheritance, :kind
     end 
     class ::StiTestSub1 < StiTest
