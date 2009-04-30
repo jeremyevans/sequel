@@ -4,6 +4,27 @@ module Sequel
   module Oracle
     module DatabaseMethods
       TEMPORARY = 'GLOBAL TEMPORARY '.freeze
+      AUTOINCREMENT = ''.freeze
+
+      def create_sequence(name, opts={})
+        self << create_sequence_sql(name, opts)
+      end
+
+      def create_table(name, options={}, &block)
+        options = {:generator=>options} if options.is_a?(Schema::Generator)
+        generator = options[:generator] || Schema::Generator.new(self, &block)
+        drop_statement, create_statements = create_table_sql_list(name, generator, options)
+        (execute_ddl(drop_statement) rescue nil) if drop_statement
+        (create_statements + index_sql_list(name, generator.indexes)).each{|sql| execute_ddl(sql)}
+      end
+
+      def create_trigger(*args)
+        self << create_trigger_sql(*args)
+      end
+
+      def drop_sequence(name)
+        self << drop_sequence_sql(name)
+      end
 
       # Oracle uses the :oracle database type
       def database_type
@@ -21,9 +42,58 @@ module Sequel
 
       private
 
+      def auto_increment_sql
+        AUTOINCREMENT
+      end
+
       # SQL fragment for showing a table is temporary
       def temporary_table_sql
         TEMPORARY
+      end
+
+      def create_sequence_sql(name, opts={})
+        "CREATE SEQUENCE #{quote_identifier(name)} start with #{opts [:start_with]||1} increment by #{opts[:increment_by]||1} nomaxvalue"
+      end
+
+      def create_table_sql_list(name, generator, options={})
+        statements = [create_table_sql(name, generator, options)]
+        drop_seq_statement = nil
+        generator.columns.each do |c|
+          if c[:auto_increment]
+            c[:sequence_name] ||= "seq_#{name}_#{c[:name]}"
+            unless c[:create_sequence] == false
+              drop_seq_statement = drop_sequence_sql(c[:sequence_name])
+              statements << create_sequence_sql(c[:sequence_name], c)
+            end
+            unless c[:create_trigger] == false
+              c[:trigger_name] ||= "BI_#{name}_#{c[:name]}"
+              trigger_definition = <<-end_sql
+              BEGIN
+                IF :NEW.#{quote_identifier(c[:name])} IS NULL THEN
+                  SELECT #{c[:sequence_name]}.nextval INTO :NEW.#{quote_identifier(c[:name])} FROM dual;
+                END IF;
+              END;
+              end_sql
+              statements << create_trigger_sql(name, c[:trigger_name], trigger_definition, {:events => [:insert]})
+            end
+          end
+        end
+        [drop_seq_statement, statements]
+      end
+
+      def create_trigger_sql(table, name, definition, opts={})
+        events = opts[:events] ? Array(opts[:events]) : [:insert, :update, :delete]
+        sql = <<-end_sql
+          CREATE#{' OR REPLACE' if opts[:replace]} TRIGGER #{quote_identifier(name)}
+          #{opts[:after] ? 'AFTER' : 'BEFORE'} #{events.map{|e| e.to_s.upcase}.join(' OR ')} ON #{quote_schema_table(table)}
+          REFERENCING NEW AS NEW FOR EACH ROW
+          #{definition}
+        end_sql
+        sql
+      end
+
+      def drop_sequence_sql(name)
+        "DROP SEQUENCE #{quote_identifier(name)}"
       end
     end
     

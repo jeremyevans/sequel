@@ -1,5 +1,7 @@
 === HEAD
 
+* Add autoincrementing primary key support in the Oracle adapter, using a sequence and trigger (jeremyevans, Mike Golod)
+
 * Make Model#save use the same server it uses for saving as for retrieving the saved record (jeremyevans)
 
 * Add Database#database_type method, for identifying which type of database the object is connecting to (jeremyevans)
