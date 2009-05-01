@@ -55,11 +55,23 @@ context "A connection pool handling connections" do
     @cpool.hold {:block_return}.should == :block_return
   end
 
+  specify "#hold should remove dead threads from the pool if it reaches its max_size" do
+    Thread.new{@cpool.hold{Thread.current.exit!}}
+    sleep 0.01
+    @cpool.allocated.keys.map{|t| t.alive?}.should == [false]
+
+    Thread.new{@cpool.hold{Thread.current.exit!}}
+    sleep 0.01
+    @cpool.allocated.keys.map{|t| t.alive?}.should == [false, false]
+
+    Thread.new{@cpool.hold{}}
+    sleep 0.01
+    @cpool.allocated.should == {}
+  end
+
   specify "#make_new should not make more than max_size connections" do
-    @cpool.send(:make_new, :default).should == :got_connection
-    @cpool.send(:make_new, :default).should == :got_connection
-    @cpool.send(:make_new, :default).should == nil
-    @cpool.created_count.should == 2
+    50.times{Thread.new{@cpool.hold{sleep 0.01}}}
+    @cpool.created_count.should == @max_size
   end
 
   specify ":disconnection_proc option should set the disconnection proc to use" do
