@@ -55,18 +55,17 @@ context "A connection pool handling connections" do
     @cpool.hold {:block_return}.should == :block_return
   end
 
-  specify "#hold should remove dead threads from the pool if it reaches its max_size" do
-    Thread.new{@cpool.hold{Thread.current.exit!}}
-    sleep 0.01
-    @cpool.allocated.keys.map{|t| t.alive?}.should == [false]
+  if RUBY_VERSION < '1.9.0' and (!defined?(RUBY_ENGINE) or RUBY_ENGINE != 'jruby')
+    specify "#hold should remove dead threads from the pool if it reaches its max_size" do
+      Thread.new{@cpool.hold{Thread.current.exit!}}.join
+      @cpool.allocated.keys.map{|t| t.alive?}.should == [false]
 
-    Thread.new{@cpool.hold{Thread.current.exit!}}
-    sleep 0.01
-    @cpool.allocated.keys.map{|t| t.alive?}.should == [false, false]
+      Thread.new{@cpool.hold{Thread.current.exit!}}.join
+      @cpool.allocated.keys.map{|t| t.alive?}.should == [false, false]
 
-    Thread.new{@cpool.hold{}}
-    sleep 0.01
-    @cpool.allocated.should == {}
+      Thread.new{@cpool.hold{}}.join
+      @cpool.allocated.should == {}
+    end
   end
 
   specify "#make_new should not make more than max_size connections" do

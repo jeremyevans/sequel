@@ -49,11 +49,9 @@ class Sequel::ConnectionPool
     @servers += opts[:servers].keys - @servers if opts[:servers] 
     @available_connections = Hash.new{|h,k| h[:default]}
     @allocated = Hash.new{|h,k| h[:default]}
-    @created_count = Hash.new{|h,k| h[:default]}
     @servers.each do |s|
       @available_connections[s] = []
       @allocated[s] = {}
-      @created_count[s] = 0
     end
     @timeout = opts[:pool_timeout] || 5
     @sleep_time = opts[:pool_sleep_time] || 0.001
@@ -75,7 +73,7 @@ class Sequel::ConnectionPool
   # The total number of connections opened for the given server, should
   # be equal to available_connections.length + allocated.length
   def created_count(server=:default)
-    @created_count[server]
+    @allocated[server].length + @available_connections[server].length
   end
   alias size created_count
   
@@ -102,17 +100,17 @@ class Sequel::ConnectionPool
       if conn = owned_connection(t, server)
         return yield(conn)
       end
-      until conn = acquire(t, server)
-        raise(::Sequel::PoolTimeout) if Time.new > timeout
-        sleep sleep_time
-      end
       begin
+        until conn = acquire(t, server)
+          raise(::Sequel::PoolTimeout) if Time.new > timeout
+          sleep sleep_time
+        end
         yield conn
       rescue Sequel::DatabaseDisconnectError => dde
-        remove(t, conn, server)
+        remove(t, conn, server) if conn
         raise
       ensure
-        release(t, conn, server) unless dde
+        @mutex.synchronize{release(t, server)} if conn && !dde
       end
     rescue StandardError => e
       raise e
@@ -132,7 +130,6 @@ class Sequel::ConnectionPool
       @available_connections.each do |server, conns|
         conns.each{|c| block.call(c)} if block
         conns.clear
-        set_created_count(server, allocated(server).length)
       end
     end
   end
@@ -158,7 +155,11 @@ class Sequel::ConnectionPool
   # Creates a new connection to the given server if the size of the pool for
   # the server is less than the maximum size of the pool.
   def make_new(server)
-    if @created_count[server] < @max_size
+    if (n = created_count(server)) >= @max_size
+      allocated(server).keys.reject{|t| t.alive?}.each{|t| release(t, server)}
+      n = nil
+    end
+    if (n || created_count(server)) < @max_size
       raise(Sequel::Error, "No connection proc specified") unless @connection_proc
       begin
         conn = @connection_proc.call(server)
@@ -168,7 +169,6 @@ class Sequel::ConnectionPool
         raise e
       end
       raise(Sequel::DatabaseConnectionError, "Connection parameters not valid") unless conn
-      set_created_count(server, @created_count[server] + 1)
       conn
     end
   end
@@ -180,26 +180,17 @@ class Sequel::ConnectionPool
   end
   
   # Releases the connection assigned to the supplied thread and server.
-  def release(thread, conn, server)
-    @mutex.synchronize do
-      allocated(server).delete(thread)
-      available_connections(server) << conn
-    end
+  # You must already have the mutex before you call this.
+  def release(thread, server)
+    available_connections(server) << allocated(server).delete(thread)
   end
 
   # Removes the currently allocated connection from the connection pool.
   def remove(thread, conn, server)
     @mutex.synchronize do
       allocated(server).delete(thread)
-      set_created_count(server, @created_count[server] - 1)
       @disconnection_proc.call(conn) if @disconnection_proc
     end
-  end
-
-  # Set the created count for the given server type
-  def set_created_count(server, value)
-    server = :default unless @created_count.include?(server)
-    @created_count[server] = value
   end
 end
 

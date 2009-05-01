@@ -1,5 +1,7 @@
 === HEAD
 
+* Remove dead threads from connection pool if the pool is full and a connection is requested (jeremyevans)
+
 * Add autoincrementing primary key support in the Oracle adapter, using a sequence and trigger (jeremyevans, Mike Golod)
 
 * Make Model#save use the same server it uses for saving as for retrieving the saved record (jeremyevans)
