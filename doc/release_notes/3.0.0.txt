@@ -1,0 +1,221 @@
+Deprecated Methods/Features Removed
+-----------------------------------
+
+Methods and features that were deprecated in 2.12.0 have been removed
+in 3.0.0.  Many features were moved into plugins or extensions, so in
+many cases you just need to require an extension or use Model.plugin
+and not make any changes to your code.  See the 2.12.0 release notes
+for the list of methods/features deprecated in 2.12.0.
+
+If you are upgrading from a previous 2.x release, please upgrade to
+2.12.0 first, fix your code to remove all deprecation warnings, and
+then upgrade to 3.0.0.
+
+New Adapter
+-----------
+
+* Sequel now has an Amalgalite adapter.  Amalgalite is a ruby
+  extension that embeds SQLite without requiring a separate SQLite
+  installation.  The adapter is functionality complete but
+  significantly slower than the native SQLite adapter.
+
+New Features
+------------
+
+* The JDBC, PostgreSQL, MySQL, and SQLite adapters all now have a
+  Database#indexes method that returns indexes for a given table:
+
+    DB.indexes(:songs)
+    => {:songs_name_index=>{:unique=>true, :columns=>[:name]},
+        :songs_lyricid_index=>{:unique=>false, :columns=>[:lyricid]}}
+
+* A schema_dumper extension was added to Sequel.  It supports dumping
+  the schema of a table (including indexes) as a string that can be
+  evaluated in the context of a Database object to create the table.
+  It also supports dumping all tables in the database as a string
+  containing a Migration subclass that will rebuild the database.
+
+    require 'sequel/extensions/schema_dumper'
+    DB.dump_table_schema(:table)
+    DB.dump_schema_migration
+    DB.dump_schema_migration(:same_db=>true)
+    DB.dump_schema_migration(:indexes=>false)
+    DB.dump_indexes_migration
+
+  The :same_db option causes Sequel to not translate column types
+  to generic column types.  By default, the migration created will
+  use generic types so it will run on other databases.  However, if
+  you only want to support a single database, using the :same_db
+  option will make the migration use the exact database type parsed
+  from the database.
+
+  The :indexes=>false option causes indexes not be included in the
+  migration.  The dump_indexes_migration can be used to create a
+  separate migration with the indexes.  This can be useful if you 
+  plan on loading a lot of data right after creating the tables,
+  since it is faster to add indexes after the data has been added.
+
+* Using options with the generic database types is now supported to
+  a limited extent.  For example, the following code now works:
+
+    DB.create_table(:table) do
+      String :a, :size=>50               # varchar(50)
+      String :b, :text=>true             # text
+      String :c, :fixed=>true, :size=>30 # char(30)
+      Time :ts                           # timestamp
+      Time :t, :only_time=>true          # time
+    end
+
+* Using Dataset#filter and related methods with multiple arguments
+  now works much more intuitively:
+
+    # 2.12.0
+    dataset.filter(:a, :b=>1) # a IS NULL AND (b = 1) IS NULL
+    # 3.0.0
+    dataset.filter(:a, :b=>1) # a AND b = 1
+
+* You can now create temporary tables by passing the :temp=>true
+  option to Database#create_table.
+
+* The Oracle shared adapter now supports emulation of
+  autoincrementing primary keys by creating a sequence and a trigger,
+  similar to how the Firebird adapter works.
+
+* The Database#database_type method was added that returns a symbol
+  specifying the database type being used.  This can be different
+  than Database.adapter_scheme if you are using an adapter like
+  JDBC that allows connecting to multiple different types of
+  databases.
+
+* Database#drop_index and related methods now support an options
+  hash that respects the :name option, so they can now be used to
+  drop an index that doesn't use the default index name.
+
+* The PostgreSQL shared adapter now supports a
+  Database#reset_primary_key_sequence method to reset the
+  primary key sequence for a given table, based on code from
+  ActiveRecord.
+
+* SQL::QualifiedIdentifiers can now be qualified, allowing you to do:
+
+   :column.qualify(:table).qualify(:schema)
+ 
+* Using the :db_type=>'mssql' option with the DBI adapter will now
+  load the MSSQL support.
+
+* The MySQL shared adapter now supports Dataset#full_text_sql, which
+  you can use in queries like the following:
+
+    ds.select(:table.*, ds.full_text_sql(:column, 'value').as(:ft))
+
+Other Improvements
+------------------
+
+* Sequel will now release connections from the connection pool
+  automatically if they are held by a dead thread.  This can happen
+  if you are using MRI 1.8 and you are heavily multithreaded or
+  you call Thread#exit! or similar method explicitly.  Those methods
+  skip the execution of ensure blocks which normally release the
+  connections when the threads exit.
+
+* Model#save will now always use the same server when refreshing data
+  after an insert.  This fixes an issue when Sequel's master/slave
+  database support is used with models.
+
+* SQL Array references are now quoted correctly, so code like this
+  now works:
+
+    :table__column.sql_subscript(1)
+
+* The PostgreSQL shared adapter now handles sequences that need to be
+  quoted correctly (previously these were quoted twice).
+
+* String quoting on Oracle no longer doubles backslashes. 
+
+* Database#count now works correctly when used on MSSQL when using
+  an adapter that doesn't handle unnamed columns.
+
+* Full text searching in the MySQL adapter now works correctly when
+  multiple search terms are used.
+
+* Altering a column's name, type, default, or NULL/NOT NULL status
+  on MySQL now keeps other relevent column information.  For example,
+  if you alter a column's type, it'll keep an existing default. This
+  functionality isn't complete, there may be other column information
+  that is lost.
+
+* Fix creation of an index with a given type on MySQL, since MySQL's
+  documentation lies.
+
+* The schema parser now handles decimal types with size specifiers,
+  fixing use on MySQL.
+
+* Dataset#quote_identifier now works correctly when given an
+  SQL::Identifier.  This allows you to do:
+
+    dataset.select{sum(hours).as(hours)}
+
+Backwards Compatibility
+-----------------------
+
+* Sequel will now use instance_eval on all virtual row blocks without
+  an argument.  This can lead to much nicer code:
+
+    dataset.filter{(number > 10) & (name > 'M')}
+    # WHERE number > 10 AND name > 'M'
+
+  2.12.0 raised a deprecation warning if you used a virtual row block
+  without an argument and you hadn't set
+  Sequel.virtual_row_instance_eval = true.
+
+* Dataset#exclude now inverts the given argument, instead of negating
+  it. This only changes its behavior if it is called with a hash or
+  array of all two pairs that have more than one element.
+
+    # 2.12.0
+    dataset.exclude(:a=>1, :b=>1) # a != 1 AND b != 1
+    # 3.0.0
+    dataset.exclude(:a=>1, :b=>1) # a != 1 OR b != 1
+
+  This was done for consistency, since exclude would only negate a
+  hash if it was given an argument, it would invert the same hash
+  if you used a block:
+
+    # 2.12.0
+    dataset.exclude{{:a=>1, :b=>1}} # a != 1 OR b != 1
+  
+  If you want the previous behavior,
+  change the code to the following:
+
+    dataset.filter({:a=>1, :b=>1}.sql_negate)
+
+* As noted above, the methods/features deprecated in 2.12.0 were
+  removed.
+
+* The private Dataset#select_*_sql methods now only take a single
+  argument, the SQL string being built.
+
+* Dataset#from when called without arguments would previously cause an
+  error to be raised when the SQL string is generated.  Now it causes
+  no FROM clause to be used, similar to how Dataset#select with no
+  arguments causes SELECT * to be used.
+
+* The internals of the generic type support and the schema generators
+  were changed significantly, which could have some fallout in terms
+  of old migrations breaking if they used the generic types and were
+  relying on some undocumented behavior (such as using Integer as a
+  type with the :unsigned option).
+
+* The Firebird adapter no longer translates the text database
+  specific type.  Use the following instead:
+    
+    String :column, :text=>true 
+
+* The MySQL shared adapter used to use the timestamp type for Time,
+  now it uses datetime.  This is because the timestamp type cannot
+  represent everything that the ruby Time class can represent.
+
+* Metaprogramming#metaattr_accessor and #metaattr_reader methods were
+  removed.
+
+* Dataset#irregular_function_sql was removed.
