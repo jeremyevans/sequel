@@ -17,7 +17,7 @@ module Sequel
     include Metaprogramming
 
     # Array of supported database adapters
-    ADAPTERS = %w'ado db2 dbi do firebird informix jdbc mysql odbc openbase oracle postgres sqlite'.collect{|x| x.to_sym}
+    ADAPTERS = %w'ado amalgalite db2 dbi do firebird informix jdbc mysql odbc openbase oracle postgres sqlite'.collect{|x| x.to_sym}
 
     SQL_BEGIN = 'BEGIN'.freeze
     SQL_COMMIT = 'COMMIT'.freeze

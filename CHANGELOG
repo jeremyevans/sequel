@@ -1,3 +1,7 @@
+=== HEAD
+
+* Add Sequel.amalgalite adapter method (jeremyevans)
+
 === 3.0.0 (2009-05-04)
 
 * Remove dead threads from connection pool if the pool is full and a connection is requested (jeremyevans)
