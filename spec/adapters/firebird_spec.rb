@@ -5,6 +5,15 @@ unless defined?(FIREBIRD_DB)
   FIREBIRD_DB = Sequel.connect(ENV['SEQUEL_FB_SPEC_DB']||FIREBIRD_URL)
 end
 
+def FIREBIRD_DB.sqls
+  (@sqls ||= [])
+end
+logger = Object.new
+def logger.method_missing(m, msg)
+  FIREBIRD_DB.sqls.push(msg)
+end
+FIREBIRD_DB.logger = logger
+
 FIREBIRD_DB.create_table! :test do
   varchar :name,  :size => 50
   integer :val,   :index => true
@@ -30,7 +39,7 @@ FIREBIRD_DB.create_table! :test6 do
   blob :val
   String :val2
   varchar :val3, :size=>200
-  text :val4
+  String :val4, :text=>true
 end
 
 context "A Firebird database" do
@@ -54,6 +63,7 @@ context "A Firebird dataset" do
   before do
     @d = FIREBIRD_DB[:test]
     @d.delete # remove all records
+    @d.quote_identifiers = true
   end
 
   specify "should return the correct record count" do
@@ -236,81 +246,74 @@ end
 context "A Firebird database" do
   before do
     @db = FIREBIRD_DB
+    @db.drop_table(:posts) rescue nil
+    @db.sqls.clear
   end
 
   specify "should allow us to name the sequences" do
-    g = Sequel::Schema::Generator.new(FIREBIRD_DB) do
-      primary_key :id, :sequence_name => "seq_test"
-    end
-    FIREBIRD_DB.send(:create_table_sql_list, :posts, *g.create_info).should == [[
+    @db.create_table(:posts){primary_key :id, :sequence_name => "seq_test"}
+    @db.sqls.should == [
+      "DROP SEQUENCE SEQ_TEST",
       "CREATE TABLE POSTS (ID integer PRIMARY KEY )",
       "CREATE SEQUENCE SEQ_TEST",
       "          CREATE TRIGGER BI_POSTS_ID for POSTS\n          ACTIVE BEFORE INSERT position 0\n          as               begin\n                if ((new.ID is null) or (new.ID = 0)) then\n                begin\n                  new.ID = next value for seq_test;\n                end\n              end\n\n"
-    ], "DROP SEQUENCE SEQ_TEST" ]
+    ]
   end
 
   specify "should allow us to set the starting position for the sequences" do
-    g = Sequel::Schema::Generator.new(FIREBIRD_DB) do
-      primary_key :id, :sequence_start_position => 999
-    end
-    FIREBIRD_DB.send(:create_table_sql_list, :posts, *g.create_info).should == [[
+    @db.create_table(:posts){primary_key :id, :sequence_start_position => 999}
+    @db.sqls.should == [
+      "DROP SEQUENCE SEQ_POSTS_ID",
       "CREATE TABLE POSTS (ID integer PRIMARY KEY )",
       "CREATE SEQUENCE SEQ_POSTS_ID",
       "ALTER SEQUENCE SEQ_POSTS_ID RESTART WITH 999",
       "          CREATE TRIGGER BI_POSTS_ID for POSTS\n          ACTIVE BEFORE INSERT position 0\n          as               begin\n                if ((new.ID is null) or (new.ID = 0)) then\n                begin\n                  new.ID = next value for seq_posts_id;\n                end\n              end\n\n"
-    ], "DROP SEQUENCE SEQ_POSTS_ID" ]
+    ]
   end
 
   specify "should allow us to name and set the starting position for the sequences" do
-    g = Sequel::Schema::Generator.new(FIREBIRD_DB) do
-      primary_key :id, :sequence_name => "seq_test", :sequence_start_position => 999
-    end
-    FIREBIRD_DB.send(:create_table_sql_list, :posts, *g.create_info).should == [[
+    @db.create_table(:posts){primary_key :id, :sequence_name => "seq_test", :sequence_start_position => 999}
+    @db.sqls.should == [
+      "DROP SEQUENCE SEQ_TEST",
       "CREATE TABLE POSTS (ID integer PRIMARY KEY )",
       "CREATE SEQUENCE SEQ_TEST",
       "ALTER SEQUENCE SEQ_TEST RESTART WITH 999",
       "          CREATE TRIGGER BI_POSTS_ID for POSTS\n          ACTIVE BEFORE INSERT position 0\n          as               begin\n                if ((new.ID is null) or (new.ID = 0)) then\n                begin\n                  new.ID = next value for seq_test;\n                end\n              end\n\n"
-    ], "DROP SEQUENCE SEQ_TEST" ]
+    ]
   end
 
   specify "should allow us to name the triggers" do
-    g = Sequel::Schema::Generator.new(FIREBIRD_DB) do
-      primary_key :id, :trigger_name => "trig_test"
-    end
-    FIREBIRD_DB.send(:create_table_sql_list, :posts, *g.create_info).should == [[
+    @db.create_table(:posts){primary_key :id, :trigger_name => "trig_test"}
+    @db.sqls.should == [
+      "DROP SEQUENCE SEQ_POSTS_ID",
       "CREATE TABLE POSTS (ID integer PRIMARY KEY )",
       "CREATE SEQUENCE SEQ_POSTS_ID",
       "          CREATE TRIGGER TRIG_TEST for POSTS\n          ACTIVE BEFORE INSERT position 0\n          as               begin\n                if ((new.ID is null) or (new.ID = 0)) then\n                begin\n                  new.ID = next value for seq_posts_id;\n                end\n              end\n\n"
-    ], "DROP SEQUENCE SEQ_POSTS_ID" ]
+    ]
   end
 
   specify "should allow us to not create the sequence" do
-    g = Sequel::Schema::Generator.new(FIREBIRD_DB) do
-      primary_key :id, :create_sequence => false
-    end
-    FIREBIRD_DB.send(:create_table_sql_list, :posts, *g.create_info).should == [[
+    @db.create_table(:posts){primary_key :id, :create_sequence => false}
+    @db.sqls.should == [
       "CREATE TABLE POSTS (ID integer PRIMARY KEY )",
       "          CREATE TRIGGER BI_POSTS_ID for POSTS\n          ACTIVE BEFORE INSERT position 0\n          as               begin\n                if ((new.ID is null) or (new.ID = 0)) then\n                begin\n                  new.ID = next value for seq_posts_id;\n                end\n              end\n\n"
-    ], nil]
+    ]
   end
 
   specify "should allow us to not create the trigger" do
-    g = Sequel::Schema::Generator.new(FIREBIRD_DB) do
-      primary_key :id, :create_trigger => false
-    end
-    FIREBIRD_DB.send(:create_table_sql_list, :posts, *g.create_info).should == [[
+    @db.create_table(:posts){primary_key :id, :create_trigger => false}
+    @db.sqls.should == [
+      "DROP SEQUENCE SEQ_POSTS_ID",
       "CREATE TABLE POSTS (ID integer PRIMARY KEY )",
       "CREATE SEQUENCE SEQ_POSTS_ID",
-    ], "DROP SEQUENCE SEQ_POSTS_ID"]
+    ]
   end
 
   specify "should allow us to not create either the sequence nor the trigger" do
-    g = Sequel::Schema::Generator.new(FIREBIRD_DB) do
-      primary_key :id, :create_sequence => false, :create_trigger => false
-    end
-    FIREBIRD_DB.send(:create_table_sql_list, :posts, *g.create_info).should == [[
+    @db.create_table(:posts){primary_key :id, :create_sequence => false, :create_trigger => false}
+    @db.sqls.should == [
       "CREATE TABLE POSTS (ID integer PRIMARY KEY )"
-    ], nil]
+    ]
   end
 
   specify "should support column operations" do

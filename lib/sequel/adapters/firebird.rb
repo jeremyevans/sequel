@@ -207,7 +207,7 @@ module Sequel
       end
 
       def type_literal_generic_string(column)
-        column[:text] ? :"BLOB SUBTYPE TEXT" : super
+        column[:text] ? :"BLOB SUB_TYPE TEXT" : super
       end
     end
 
