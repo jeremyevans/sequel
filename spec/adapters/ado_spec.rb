@@ -20,13 +20,13 @@ context "An ADO dataset" do
       @conn_options = {:host => 'MY_SQL_SERVER',
 					  :database => 'MyDB',
 					  :user => 'my_usr',
-					  :password => 'my_pwd'
+					  :password => 'my_pwd',
 					  :command_timeout => 120}
     end
 
-    specify 'it should set the CommandTimeOut parameter on the ADO handle' do
+    specify 'it should set the CommandTimeout parameter on the ADO handle' do
       db = Sequel::ADO::Database.new(@conn_options)
-      db.connect(@conn_options).CommandTimeOut.should == 120
+      db.connect(@conn_options).CommandTimeout.should == 120
     end
   end
 
@@ -40,7 +40,7 @@ context "An ADO dataset" do
 
     specify 'it should remain as the default of 30 seconds' do
       db = Sequel::ADO::Database.new(@conn_options)
-      db.connect(@conn_options).CommandTimeOut.should == 30
+      db.connect(@conn_options).CommandTimeout.should == 30
     end
   end
 end
