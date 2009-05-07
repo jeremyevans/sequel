@@ -29,6 +29,8 @@ module Sequel
         opts = server_opts(server)
         s = "driver=#{opts[:driver]};server=#{opts[:host]};database=#{opts[:database]}#{";uid=#{opts[:user]};pwd=#{opts[:password]}" if opts[:user]}"
         handle = WIN32OLE.new('ADODB.Connection')
+        #increase timeout so ADO doesn't disconnect us in the default 30 seconds
+        handle.CommandTimeOut = 2592000 
         handle.Open(s)
         handle
       end
