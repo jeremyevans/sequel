@@ -25,10 +25,18 @@ module Sequel
         end
       end
 
+      # Connect to the database. In addition to the usual database options,
+      # the following option has effect:
+      #
+      # * :command_timout - Sets the time in seconds to wait while attempting
+      #     to execute a command before cancelling the attempt and generating
+      #     an error. Specificially, it sets the ADO CommandTimeOut property.
+
       def connect(server)
         opts = server_opts(server)
         s = "driver=#{opts[:driver]};server=#{opts[:host]};database=#{opts[:database]}#{";uid=#{opts[:user]};pwd=#{opts[:password]}" if opts[:user]}"
         handle = WIN32OLE.new('ADODB.Connection')
+        handle.CommandTimeOut = opts[:command_timeout] if opts[:command_timeout]
         handle.Open(s)
         handle
       end

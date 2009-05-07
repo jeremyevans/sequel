@@ -1,7 +1,7 @@
 require File.join(File.dirname(__FILE__), 'spec_helper.rb')
 
 unless defined?(ADO_DB)
-  ADO_DB = Sequel.ado(:host => 'MY_SQL_SERVER', :database => 'MyDB', :user => 'my_pwd', :password => 'my_usr')
+  ADO_DB = Sequel.ado(:host => 'MY_SQL_SERVER', :database => 'MyDB', :user => 'my_usr', :password => 'my_pwd')
 end
 
 context "An ADO dataset" do
@@ -13,6 +13,35 @@ context "An ADO dataset" do
     lambda {
       ADO_DB[:items].all
     }.should_not raise_error
+  end
+
+  describe 'setting the :command_timeout option' do
+    before(:each) do
+      @conn_options = {:host => 'MY_SQL_SERVER',
+					  :database => 'MyDB',
+					  :user => 'my_usr',
+					  :password => 'my_pwd'
+					  :command_timeout => 120}
+    end
+
+    specify 'it should set the CommandTimeOut parameter on the ADO handle' do
+      db = Sequel::ADO::Database.new(@conn_options)
+      db.connect(@conn_options).CommandTimeOut.should == 120
+    end
+  end
+
+  describe 'when the :command_timeout option is not implicitly set' do
+    before(:each) do
+      @conn_options = {:host => 'MY_SQL_SERVER',
+					  :database => 'MyDB',
+					  :user => 'my_usr',
+					  :password => 'my_pwd'}
+    end
+
+    specify 'it should remain as the default of 30 seconds' do
+      db = Sequel::ADO::Database.new(@conn_options)
+      db.connect(@conn_options).CommandTimeOut.should == 30
+    end
   end
 end
 
