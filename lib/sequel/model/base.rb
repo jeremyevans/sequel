@@ -380,8 +380,8 @@ module Sequel
         im = instance_methods.collect{|x| x.to_s}
         columns.each do |column|
           meth = "#{column}="
-          overridable_methods_module.module_eval("def #{column}; self[:#{column}] end") unless im.include?(column.to_s)
-          overridable_methods_module.module_eval("def #{meth}(v); self[:#{column}] = v end") unless im.include?(meth)
+          overridable_methods_module.module_eval("def #{column}; self[:#{column}] end", __FILE__, __LINE__) unless im.include?(column.to_s)
+          overridable_methods_module.module_eval("def #{meth}(v); self[:#{column}] = v end", __FILE__, __LINE__) unless im.include?(meth)
         end
       end
   
