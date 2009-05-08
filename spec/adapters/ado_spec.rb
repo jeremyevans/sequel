@@ -18,10 +18,10 @@ context "An ADO dataset" do
   describe 'setting the :command_timeout option' do
     before(:each) do
       @conn_options = {:host => 'MY_SQL_SERVER',
-					  :database => 'MyDB',
-					  :user => 'my_usr',
-					  :password => 'my_pwd',
-					  :command_timeout => 120}
+            :database => 'MyDB',
+            :user => 'my_usr',
+            :password => 'my_pwd',
+            :command_timeout => 120}
     end
 
     specify 'it should set the CommandTimeout parameter on the ADO handle' do
@@ -33,9 +33,9 @@ context "An ADO dataset" do
   describe 'when the :command_timeout option is not implicitly set' do
     before(:each) do
       @conn_options = {:host => 'MY_SQL_SERVER',
-					  :database => 'MyDB',
-					  :user => 'my_usr',
-					  :password => 'my_pwd'}
+            :database => 'MyDB',
+            :user => 'my_usr',
+            :password => 'my_pwd'}
     end
 
     specify 'it should remain as the default of 30 seconds' do
@@ -43,6 +43,23 @@ context "An ADO dataset" do
       db.connect(@conn_options).CommandTimeout.should == 30
     end
   end
+
+  describe 'setting the :provider option' do
+    before(:each) do
+      @conn_options = {:host => 'MY_SQL_SERVER',
+            :database => 'MyDB',
+            :user => 'my_usr',
+            :password => 'my_pwd',
+            :provider => "SQLOLEDB"}
+    end
+
+    specify 'it should set the CommandTimeout parameter on the ADO handle' do
+      db = Sequel::ADO::Database.new(@conn_options)
+      db.connect(@conn_options).Provider.should match /sqloledb/i
+    end
+  end
+
+
 end
 
 context "An MSSQL dataset" do

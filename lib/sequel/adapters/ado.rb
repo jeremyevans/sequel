@@ -32,12 +32,14 @@ module Sequel
       #     to execute a command before cancelling the attempt and generating
       #     an error. Specificially, it sets the ADO CommandTimeout property.
       #     If this property is not set, the default of 30 seconds is used.
+      # * :provider - Sets the Provider of this ADO connection (for example, "SQLOLEDB")
 
       def connect(server)
         opts = server_opts(server)
         s = "driver=#{opts[:driver]};server=#{opts[:host]};database=#{opts[:database]}#{";uid=#{opts[:user]};pwd=#{opts[:password]}" if opts[:user]}"
         handle = WIN32OLE.new('ADODB.Connection')
         handle.CommandTimeout = opts[:command_timeout] if opts[:command_timeout]
+        handle.Provider = opts[:provider] if opts[:provider]
         handle.Open(s)
         handle
       end
