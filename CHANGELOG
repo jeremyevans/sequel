@@ -1,5 +1,11 @@
 === HEAD
 
+* Add :command_timeout and :provider options to ADO adapter (hgimenez)
+
+* Fix exception messages when Sequel.string_to_* fail (jeremyevans)
+
+* Fix String :type=>:text generic type in the Firebird adapter (wishdev)
+
 * Add Sequel.amalgalite adapter method (jeremyevans)
 
 === 3.0.0 (2009-05-04)
