@@ -44,15 +44,15 @@ If you have any comments or suggestions please post to the Google group.
   
   DB.create_table :items do
     primary_key :id
-    String name
-    Float price
+    String :name
+    Float :price
   end
   
   items = DB[:items] # Create a dataset
   
   # Populate the table
   items.insert(:name => 'abc', :price => rand * 100)
-  items.insert(name => 'def', :price => rand * 100)
+  items.insert(:name => 'def', :price => rand * 100)
   items.insert(:name => 'ghi', :price => rand * 100)
   
   # Print out the number of records
