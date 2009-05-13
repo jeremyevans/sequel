@@ -10,7 +10,7 @@ env = nil
 logfile = nil
 migrate_dir = nil
 migrate_ver = nil
-load_dir = nil
+load_dirs = []
 
 opts = OptionParser.new do |opts|
   opts.banner = "Sequel: The Database Toolkit for Ruby"
@@ -42,8 +42,8 @@ opts = OptionParser.new do |opts|
     logfile = v
   end
   
-  opts.on("-L", "--load-dir DIR", "loads all *.rb from specifed directory") do |v|
-    load_dir = v
+  opts.on("-L", "--load-dir DIR", "loads all *.rb under specifed directory") do |v|
+    load_dirs << v
   end
   
   opts.on("-m", "--migrate-directory DIR", "run the migrations in directory") do |v|
@@ -98,7 +98,7 @@ rescue => e
   exit 1
 end
 
-Dir["#{load_dir}/**/*.rb"].each{|f| load(f)} if load_dir
+load_dirs.each{|d| Dir["#{d}/**/*.rb"].each{|f| load(f)}}
 
 require 'irb'
 puts "Your database is stored in DB..."
