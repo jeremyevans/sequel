@@ -129,6 +129,31 @@ end
 END_MIG
   end
 
+  it "should sort table names when dumping a migration" do
+    @d.meta_def(:tables){[:t2, :t1]}
+    @d.dump_schema_migration.should == <<-END_MIG
+Class.new(Sequel::Migration) do
+  def up
+    create_table(:t1) do
+      primary_key :c1
+      String :c2, :size=>20
+    end
+    
+    create_table(:t2) do
+      Integer :c1, :null=>false
+      BigDecimal :c2, :null=>false
+      
+      primary_key [:c1, :c2]
+    end
+  end
+  
+  def down
+    drop_table(:t1, :t2)
+  end
+end
+END_MIG
+  end
+
   it "should honor the :same_db option to not convert types" do
     @d.dump_table_schema(:t1, :same_db=>true).should == "create_table(:t1) do\n  primary_key :c1\n  column :c2, \"varchar(20)\"\nend"
     @d.dump_schema_migration(:same_db=>true).should == <<-END_MIG

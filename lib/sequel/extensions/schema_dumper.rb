@@ -7,11 +7,11 @@ module Sequel
       <<END_MIG
 Class.new(Sequel::Migration) do
   def up
-#{ts.map{|t| dump_table_indexes(t, :add_index)}.reject{|x| x == ''}.join("\n\n").gsub(/^/o, '    ')}
+#{ts.sort_by{|t| t.to_s}.map{|t| dump_table_indexes(t, :add_index)}.reject{|x| x == ''}.join("\n\n").gsub(/^/o, '    ')}
   end
   
   def down
-#{ts.map{|t| dump_table_indexes(t, :drop_index)}.reject{|x| x == ''}.join("\n\n").gsub(/^/o, '    ')}
+#{ts.sort_by{|t| t.to_s}.map{|t| dump_table_indexes(t, :drop_index)}.reject{|x| x == ''}.join("\n\n").gsub(/^/o, '    ')}
   end
 end
 END_MIG
@@ -31,11 +31,11 @@ END_MIG
       <<END_MIG
 Class.new(Sequel::Migration) do
   def up
-#{ts.map{|t| dump_table_schema(t, options)}.join("\n\n").gsub(/^/o, '    ')}
+#{ts.sort_by{|t| t.to_s}.map{|t| dump_table_schema(t, options)}.join("\n\n").gsub(/^/o, '    ')}
   end
   
   def down
-    drop_table(#{ts.inspect[1...-1]})
+    drop_table(#{ts.sort_by{|t| t.to_s}.inspect[1...-1]})
   end
 end
 END_MIG

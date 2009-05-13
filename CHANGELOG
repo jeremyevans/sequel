@@ -1,5 +1,11 @@
 === HEAD
 
+* Make the schema_dumper extension dump tables in alphabetical order in migrations (jeremyevans)
+
+* Add Sequel.extension method for loading extensions, so you don't have to use require (jeremyevans)
+
+* Allow bin/sequel to respect multiple -L options instead of ignoring all but the last one (jeremyevans)
+
 * Add :command_timeout and :provider options to ADO adapter (hgimenez)
 
 * Fix exception messages when Sequel.string_to_* fail (jeremyevans)
