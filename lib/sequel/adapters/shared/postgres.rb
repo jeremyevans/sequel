@@ -742,37 +742,34 @@ module Sequel
         insert_returning_sql(pk ? Sequel::SQL::Identifier.new(pk) : NULL, *values)
       end
       
+      # Use a generic blob quoting method, hopefully overridden in one of the subadapter methods
       def literal_blob(v)
         "'#{v.gsub(/[\000-\037\047\134\177-\377]/){|b| "\\#{("%o" % b[0..1].unpack("C")[0]).rjust(3, '0')}"}}'"
       end
 
+      # PostgreSQL supports fractional timestamps
       def literal_datetime(v)
         "#{v.strftime(PG_TIMESTAMP_FORMAT)}.#{sprintf("%06d", (v.sec_fraction * 86400000000).to_i)}'"
       end
 
+      # PostgreSQL uses FALSE for false values
       def literal_false
         BOOL_FALSE
       end
 
+      # Assume that SQL standard quoting is on, per Sequel's defaults
       def literal_string(v)
         "'#{v.gsub("'", "''")}'"
       end
 
+      # PostgreSQL uses FALSE for false values
       def literal_true
         BOOL_TRUE
       end
 
+      # PostgreSQL supports fractional times
       def literal_time(v)
         "#{v.strftime(PG_TIMESTAMP_FORMAT)}.#{sprintf("%06d",v.usec)}'"
-      end
-
-      # PostgreSQL is smart and can use parantheses around all datasets to get
-      # the correct answers.
-      def select_compounds_sql(sql)
-        return unless @opts[:compounds]
-        @opts[:compounds].each do |type, dataset, all|
-          sql.replace("(#{sql} #{type.to_s.upcase}#{' ALL' if all} #{subselect_sql(dataset)})")
-        end
       end
 
       # The order of clauses in the SELECT SQL statement

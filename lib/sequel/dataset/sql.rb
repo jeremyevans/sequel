@@ -778,6 +778,12 @@ module Sequel
 
     protected
 
+    # Return a from_self dataset if an order or limit is specified, so it works as expected
+    # with UNION, EXCEPT, and INTERSECT clauses.
+    def compound_from_self
+      (@opts[:limit] || @opts[:order]) ? from_self : self
+    end
+    
     # Returns a table reference for use in the FROM clause.  Returns an SQL subquery
     # frgament with an optional table alias.
     def to_table_reference(table_alias=nil)
@@ -815,9 +821,9 @@ module Sequel
     
     # Add the dataset to the list of compounds
     def compound_clone(type, dataset, all)
-      clone(:compounds=>Array(@opts[:compounds]).map{|x| x.dup} + [[type, dataset, all]])
+      compound_from_self.clone(:compounds=>Array(@opts[:compounds]).map{|x| x.dup} + [[type, dataset.compound_from_self, all]]).from_self
     end
-    
+
     # Converts an array of expressions into a comma separated string of
     # expressions.
     def expression_list(columns)
@@ -1028,8 +1034,7 @@ module Sequel
       return unless @opts[:compounds]
       @opts[:compounds].each do |type, dataset, all|
         compound_sql = subselect_sql(dataset)
-        compound_sql = "SELECT * FROM (#{compound_sql})" if dataset.opts[:compounds]
-        sql.replace("#{sql} #{type.to_s.upcase}#{' ALL' if all} #{compound_sql}")
+        sql << " #{type.to_s.upcase}#{' ALL' if all} #{compound_sql}"
       end
     end
 

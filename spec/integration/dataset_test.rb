@@ -238,16 +238,12 @@ describe "Dataset UNION, EXCEPT, and INTERSECT" do
   before do
     INTEGRATION_DB.create_table!(:i1){integer :number}
     INTEGRATION_DB.create_table!(:i2){integer :number}
-    INTEGRATION_DB.create_table!(:i3){integer :number}
     @ds1 = INTEGRATION_DB[:i1]
     @ds1.insert(:number=>10)
     @ds1.insert(:number=>20)
     @ds2 = INTEGRATION_DB[:i2]
     @ds2.insert(:number=>10)
     @ds2.insert(:number=>30)
-    @ds3 = INTEGRATION_DB[:i3]
-    @ds3.insert(:number=>10)
-    @ds3.insert(:number=>40)
     clear_sqls
   end
   
@@ -259,7 +255,34 @@ describe "Dataset UNION, EXCEPT, and INTERSECT" do
     end
   end
   
+  specify "should give the correct results for UNION, EXCEPT, and INTERSECT when used with ordering and limits" do
+    @ds1.insert(:number=>8)
+    @ds2.insert(:number=>9)
+    @ds1.insert(:number=>38)
+    @ds2.insert(:number=>39)
+
+    @ds1.order(:number.desc).union(@ds2).order(:number).map{|x| x[:number].to_s}.should == %w'8 9 10 20 30 38 39'
+    @ds1.union(@ds2.order(:number.desc)).order(:number).map{|x| x[:number].to_s}.should == %w'8 9 10 20 30 38 39'
+
+    @ds1.order(:number.desc).limit(1).union(@ds2).order(:number).map{|x| x[:number].to_s}.should == %w'9 10 30 38 39'
+    @ds2.order(:number.desc).limit(1).union(@ds1).order(:number).map{|x| x[:number].to_s}.should == %w'8 10 20 38 39'
+
+    @ds1.union(@ds2.order(:number).limit(1)).order(:number).map{|x| x[:number].to_s}.should == %w'8 9 10 20 38'
+    @ds2.union(@ds1.order(:number).limit(1)).order(:number).map{|x| x[:number].to_s}.should == %w'8 9 10 30 39'
+
+    @ds1.union(@ds2).limit(2).order(:number).map{|x| x[:number].to_s}.should == %w'8 9'
+    @ds2.union(@ds1).order(:number.desc).limit(2).map{|x| x[:number].to_s}.should == %w'39 38'
+
+    @ds1.order(:number.desc).limit(2).union(@ds2.order(:number.desc).limit(2)).order(:number).limit(3).map{|x| x[:number].to_s}.should == %w'20 30 38'
+    @ds2.order(:number).limit(2).union(@ds1.order(:number).limit(2)).order(:number.desc).limit(3).map{|x| x[:number].to_s}.should == %w'10 9 8'
+  end
+
   specify "should give the correct results for compound UNION, EXCEPT, and INTERSECT" do
+    INTEGRATION_DB.create_table!(:i3){integer :number}
+    @ds3 = INTEGRATION_DB[:i3]
+    @ds3.insert(:number=>10)
+    @ds3.insert(:number=>40)
+
     @ds1.union(@ds2).union(@ds3).order(:number).map{|x| x[:number].to_s}.should == %w'10 20 30 40'
     @ds1.union(@ds2.union(@ds3)).order(:number).map{|x| x[:number].to_s}.should == %w'10 20 30 40'
     unless defined?(Sequel::Dataset::UnsupportedIntersectExcept) and @ds1.class.ancestors.include?(Sequel::Dataset::UnsupportedIntersectExcept)
