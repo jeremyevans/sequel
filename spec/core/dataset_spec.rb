@@ -2431,17 +2431,11 @@ end
 context "Dataset#table_exists?" do
   before do
     @db = DummyMummyDatabase.new
-    @db.instance_variable_set(:@schemas, {:a=>[]})
-    @db2 = DummyMummyDatabase.new
-  end
-  
-  specify "should use the database schema if available" do
-    @db[:a].table_exists?.should be_true
   end
   
   specify "should otherwise try to select the first record from the table's dataset" do
-    @db2[:a].table_exists?.should be_false
-    @db2[:b].table_exists?.should be_true
+    @db[:a].table_exists?.should be_false
+    @db[:b].table_exists?.should be_true
   end
   
   specify "should raise Sequel::Error if dataset references more than one table" do

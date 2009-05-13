@@ -120,7 +120,9 @@ describe Sequel::Dataset do
     proc {@d.literal(true)}.should_not raise_error
     proc {@d.literal(false)}.should_not raise_error
   end
+end
 
+describe Sequel::Database do
   specify "should correctly escape strings" do
     INTEGRATION_DB.get("\\dingo".as(:a)) == "\\dingo"
   end
@@ -131,6 +133,14 @@ describe Sequel::Dataset do
 
   specify "should properly escape binary data" do
     INTEGRATION_DB.get("\1\2\3".to_sequel_blob.as(:a)) == "\1\2\3"
+  end
+
+  specify "should have a working table_exists?" do
+    t = :basdfdsafsaddsaf
+    INTEGRATION_DB.drop_table(t) rescue nil
+    INTEGRATION_DB.table_exists?(t).should == false
+    INTEGRATION_DB.create_table(t){Integer :a}
+    INTEGRATION_DB.table_exists?(t).should == true
   end
 end
 

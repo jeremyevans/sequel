@@ -70,7 +70,7 @@ module Sequel
       @opts ||= opts
       
       @single_threaded = opts.include?(:single_threaded) ? opts[:single_threaded] : @@single_threaded
-      @schemas = nil
+      @schemas = {}
       @default_schema = opts.include?(:default_schema) ? opts[:default_schema] : default_schema_default
       @prepared_statements = {}
       @transactions = []
@@ -438,13 +438,8 @@ module Sequel
       quoted_name = quote_schema_table(table)
       opts = opts.merge(:schema=>sch) if sch && !opts.include?(:schema)
 
-      @schemas.delete(quoted_name) if opts[:reload] && @schemas
-      return @schemas[quoted_name] if @schemas && @schemas[quoted_name]
-
-      @schemas ||= Hash.new do |h,k|
-        quote_name = quote_schema_table(k)
-        h[quote_name] if h.include?(quote_name)
-      end
+      @schemas.delete(quoted_name) if opts[:reload]
+      return @schemas[quoted_name] if @schemas[quoted_name]
 
       cols = schema_parse_table(table_name, opts)
       raise(Error, 'schema parsing returned no columns, table probably doesn\'t exist') if cols.nil? || cols.empty?
@@ -465,15 +460,11 @@ module Sequel
     # to the database unless this database object already has the schema for
     # the given table name.
     def table_exists?(name)
-      if @schemas && @schemas[name]
+      begin 
+        from(name).first
         true
-      else
-        begin 
-          from(name).first
-          true
-        rescue
-          false
-        end
+      rescue
+        false
       end
     end
     

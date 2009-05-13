@@ -557,19 +557,10 @@ context "Database#rename_table" do
 end
 
 context "Database#table_exists?" do
-  before do
-    @db = DummyDatabase.new
-    @db.instance_variable_set(:@schemas, {:a=>[]})
-    @db2 = DummyDatabase.new
-  end
-  
-  specify "should use schema information if available" do
-    @db.table_exists?(:a).should be_true
-  end
-  
-  specify "should otherwise try to select the first record from the table's dataset" do
-    @db2.table_exists?(:a).should be_false
-    @db2.table_exists?(:b).should be_true
+  specify "should try to select the first record from the table's dataset" do
+    db2 = DummyDatabase.new
+    db2.table_exists?(:a).should be_false
+    db2.table_exists?(:b).should be_true
   end
 end
 
