@@ -116,7 +116,8 @@ end
 
 describe Sequel::Model do
   before do
-    @c = Class.new(Sequel::Model) do
+    @c = Class.new(Sequel::Model)
+    @c.class_eval do
       columns :score
       validates_each :score do |o, a, v|
         o.errors[a] << 'too low' if v < 87
@@ -551,12 +552,14 @@ end
 
 context "Superclass validations" do
   before do
-    @c1 = Class.new(Sequel::Model) do
+    @c1 = Class.new(Sequel::Model)
+    @c1.class_eval do
       columns :value
       validates_length_of :value, :minimum => 5
     end
     
-    @c2 = Class.new(@c1) do
+    @c2 = Class.new(@c1)
+    @c2.class_eval do
       columns :value
       validates_format_of :value, :with => /^[a-z]+$/
     end
@@ -601,7 +604,8 @@ end
 
 context ".validates with block" do
   specify "should support calling .each" do
-    @c = Class.new(Sequel::Model) do
+    @c = Class.new(Sequel::Model)
+    @c.class_eval do
       columns :vvv
       validates do
         each :vvv do |o, a, v|
@@ -938,7 +942,8 @@ end
 
 describe "Model#save" do
   before do
-    @c = Class.new(Sequel::Model(:people)) do
+    @c = Class.new(Sequel::Model(:people))
+    @c.class_eval do
       columns :id
 
       validates_each :id do |o, a, v|

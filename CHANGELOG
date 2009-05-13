@@ -1,5 +1,7 @@
 === HEAD
 
+* Fix unlikely threading bug with class level validations (jeremyevans)
+
 * Make the schema_dumper extension dump tables in alphabetical order in migrations (jeremyevans)
 
 * Add Sequel.extension method for loading extensions, so you don't have to use require (jeremyevans)

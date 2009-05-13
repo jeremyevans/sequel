@@ -3,7 +3,19 @@ module Sequel
 
   module Plugins
     module ValidationClassMethods
+      # Setup the validations hash for the given model.
+      def self.apply(model)
+        model.class_eval do
+          @validation_mutex = Mutex.new
+          @validations = {}
+        end
+      end
+
       module ClassMethods
+        # A hash of associations for this model class.  Keys are column symbols,
+        # values are arrays of validation procs.
+        attr_reader :validations
+
         # The Generator class is used to generate validation definitions using 
         # the validates {} idiom.
         class Generator
@@ -22,6 +34,15 @@ module Sequel
         # Returns true if validations are defined.
         def has_validations?
           !validations.empty?
+        end
+
+        # Setup the validations hash in the subclass
+        def inherited(subclass)
+          super
+          subclass.class_eval do
+            @validation_mutex = Mutex.new
+            @validations = {}
+          end
         end
     
         # Instructs the model to skip validations defined in superclasses
@@ -146,7 +167,7 @@ module Sequel
           end
           tag = opts[:tag]
           atts.each do |a| 
-            a_vals = validations[a]
+            a_vals = @validation_mutex.synchronize{validations[a] ||= []}
             if tag && (old = a_vals.find{|x| x[0] == tag})
               old[1] = blk
             else
@@ -348,11 +369,6 @@ module Sequel
           end
         end
     
-        # Returns the validations hash for the class.
-        def validations
-          @validations ||= Hash.new {|h, k| h[k] = []}
-        end
-        
         private
     
         # Removes and returns the last member of the array if it is a hash. Otherwise,
