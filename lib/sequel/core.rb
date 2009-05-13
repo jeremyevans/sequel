@@ -118,6 +118,15 @@ module Sequel
     Database.quote_identifiers = value
   end
 
+  # Load all Sequel extensions given.  Only loads extensions included in this
+  # release of Sequel, doesn't load external extensions.
+  #
+  #   Sequel.extension(:schema_dumper)
+  #   Sequel.extension(:pagination, :query)
+  def self.extension(*extensions)
+    require(extensions, 'extensions')
+  end
+
   # Require all given files which should be in the same or a subdirectory of
   # this file.  If a subdir is given, assume all files are in that subdir.
   def self.require(files, subdir=nil)

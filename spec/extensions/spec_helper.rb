@@ -8,13 +8,8 @@ unless Sequel.const_defined?('Model')
   require 'sequel/model'
 end
 
-Sequel.virtual_row_instance_eval = true
-
-extensions = %w'string_date_time inflector pagination query pretty_table blank migration schema_dumper'
-plugins = {:hook_class_methods=>[], :schema=>[], :validation_class_methods=>[]}
-
-extensions.each{|e| require "sequel/extensions/#{e}"}
-plugins.each{|p, opts| Sequel::Model.plugin(p, *opts)}
+Sequel.extension(*%w'string_date_time inflector pagination query pretty_table blank migration schema_dumper')
+{:hook_class_methods=>[], :schema=>[], :validation_class_methods=>[]}.each{|p, opts| Sequel::Model.plugin(p, *opts)}
 
 class MockDataset < Sequel::Dataset
   def insert(*args)

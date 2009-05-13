@@ -188,6 +188,12 @@ context "Database#disconnect" do
   end
 end
 
+context "Sequel.extension" do
+  specify "should attempt to load the given extension" do
+    proc{Sequel.extension :blah}.should raise_error(LoadError)
+  end
+end
+
 context "Database#connect" do
   specify "should raise NotImplementedError" do
     proc {Sequel::Database.new.connect}.should raise_error(NotImplementedError)
