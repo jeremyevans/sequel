@@ -115,6 +115,11 @@ module Sequel
       include Sequel::Postgres::AdapterMethods
       self.translate_results = false if respond_to?(:translate_results=)
       
+      # Hash of prepared statements for this connection.  Keys are
+      # string names of the server side prepared statement, and values
+      # are SQL strings.
+      attr_reader(:prepared_statements) if SEQUEL_POSTGRES_USES_PG
+      
       # Apply connection settings for this connection.  Current sets
       # the date style to ISO in order make Date object creation in ruby faster,
       # if Postgres.use_iso_date_format is true.
@@ -125,6 +130,7 @@ module Sequel
           @db.log_info(sql)
           execute(sql)
         end
+        @prepared_statements = {} if SEQUEL_POSTGRES_USES_PG
       end
 
       # Execute the given SQL with this connection.  If a block is given,
@@ -151,21 +157,6 @@ module Sequel
         end
       end
 
-      # Reapply the connection settings if the connection is reset.
-      def reset(*args, &block)
-        super(*args, &block)
-        apply_connection_settings
-      end
-      
-      if SEQUEL_POSTGRES_USES_PG
-        # Hash of prepared statements for this connection.  Keys are
-        # string names of the server side prepared statement, and values
-        # are SQL strings.
-        def prepared_statements
-          @prepared_statements ||= {}
-        end
-      end
-      
       private
       
       # Return the requested values for the given row.
