@@ -90,14 +90,9 @@ module Sequel
       # Changes the values of symbols if they start with $ and
       # prepared_args is present.  If so, they are considered placeholders,
       # and they are substituted using prepared_arg.
-      def literal(v)
-        case v
-        when Symbol
-          if match = PLACEHOLDER_RE.match(v.to_s) and @prepared_args
-            super(prepared_arg(match[1].to_sym))
-          else
-            super
-          end
+      def literal_symbol(v)
+        if match = PLACEHOLDER_RE.match(v.to_s) and @prepared_args
+          literal(prepared_arg(match[1].to_sym))
         else
           super
         end
