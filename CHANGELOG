@@ -1,5 +1,7 @@
 === HEAD
 
+* Add -C option to bin/sequel that copies one database to another (jeremyevans)
+
 * In the schema_dumper extension, don't include defaults that contain literal strings unless the DBs are the same (jeremyevans)
 
 * Only include valid non-partial indexes of simple column references in the PostgreSQL adapter (jeremyevans)

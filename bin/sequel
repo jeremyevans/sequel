@@ -5,6 +5,7 @@ require 'optparse'
 require 'sequel'
 
 db_opts = {}
+copy_databases = nil
 dump_migration = nil
 echo = nil
 env = nil
@@ -31,6 +32,10 @@ opts = OptionParser.new do |opts|
     exit
   end
 
+  opts.on("-C", "--copy-databases", "copy one database to another") do 
+    copy_databases = true
+  end
+  
   opts.on("-d", "--dump-migration", "print database migration to STDOUT") do 
     dump_migration = true
   end
@@ -79,6 +84,7 @@ end
 
 error_proc["Error: Must specify -m if using -M"] if migrate_ver && !migrate_dir
 error_proc["Error: Cannot specify -D or -d with -m"] if dump_migration && migrate_dir
+error_proc["Error: Cannot specify -C with -d, -D, or -m"] if copy_databases && (dump_migration || migrate_dir)
 error_proc["Error: Must specify database connection string or path to yaml file as argument"] if db.nil? || db.empty?
 
 if logfile || echo
@@ -88,17 +94,21 @@ if logfile || echo
   db_opts[:loggers] << Logger.new($stdout) if echo
 end
 
-if File.exist?(db)
-  require 'yaml'
-  env ||= "development"
-  db_config = YAML.load_file(db)
-  db_config = db_config[env] || db_config[env.to_sym] || db_config
-  db_config.each{|(k,v)| db_config[k.to_sym] = db_config.delete(k)}
-  db_config.merge!(db_opts)
+connect_proc = lambda do |database|
+  if File.exist?(database)
+    require 'yaml'
+    env ||= "development"
+    db_config = YAML.load_file(database)
+    db_config = db_config[env] || db_config[env.to_sym] || db_config
+    db_config.each{|(k,v)| db_config[k.to_sym] = db_config.delete(k)}
+    Sequel.connect(db_config.merge!(db_opts))
+  else
+    Sequel.connect(database, db_opts)
+  end
 end
 
 begin
-  DB = Sequel.connect(*(db_config ? [db_config] : [db, db_opts]))
+  DB = connect_proc[db]
   DB.test_connection
   if migrate_dir
     Sequel.extension :migration
@@ -108,6 +118,55 @@ begin
   if dump_migration
     Sequel.extension :schema_dumper
     puts DB.dump_schema_migration(:same_db=>dump_migration==:same_db)
+    exit
+  end
+  if copy_databases
+    Sequel.extension :migration, :schema_dumper
+
+    db2 = ARGV.shift
+    error_proc["Error: Must specify database connection string or path to yaml file as second argument for database you want to copy to"] if db2.nil? || db2.empty?
+    start_time = Time.now
+    TO_DB = connect_proc[db2]
+    TO_DB.test_connection
+
+    puts "Databases connections successful"
+    schema_migration = eval(DB.dump_schema_migration(:indexes=>false, :same_db=>DB.database_type==TO_DB.database_type))
+    index_migration = eval(DB.dump_indexes_migration)
+    puts "Migrations dumped successfully"
+
+    schema_migration.apply(TO_DB, :up)
+    puts "Tables created"
+
+    puts "Begin copying data"
+    DB.transaction do
+      TO_DB.transaction do
+        DB.tables.each do |table|
+          puts "Begin copying records for table: #{table}"
+          time = Time.now
+          to_ds = TO_DB.from(table)
+          j = 0
+          DB.from(table).each do |record|
+            if Time.now - time > 5
+              puts "Status: #{j} records copied" 
+              time = Time.now
+            end
+            to_ds.insert(record)
+            j += 1
+          end
+          puts "Finished copying #{j} records for table: #{table}"
+        end
+      end
+    end
+    puts "Finished copying data"
+
+    index_migration.apply(TO_DB, :up)
+    puts "Indexes created"
+
+    if TO_DB.database_type == :postgres
+      TO_DB.tables.each{|t| TO_DB.reset_primary_key_sequence(t)}
+      puts "Primary key sequences reset successfully"
+    end
+    puts "Database copy finished in #{Time.now - start_time} seconds"
     exit
   end
 rescue => e
