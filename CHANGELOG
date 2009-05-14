@@ -1,5 +1,7 @@
 === HEAD
 
+* In the schema_dumper extension, don't include defaults that contain literal strings unless the DBs are the same (jeremyevans)
+
 * Only include valid non-partial indexes of simple column references in the PostgreSQL adapter (jeremyevans)
 
 * Add -h option to bin/sequel for outputting the usage, alias for -? (jeremyevans)

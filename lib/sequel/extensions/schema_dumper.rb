@@ -64,7 +64,7 @@ END_MIG
     # Convert the given default, which should be a database specific string, into
     # a ruby object.  If it can't be converted, return the string with the inspect
     # method modified so that .lit is always appended after it.
-    def column_schema_to_ruby_default(default, type)
+    def column_schema_to_ruby_default(default, type, options)
       case default 
       when /false/
         false
@@ -73,10 +73,12 @@ END_MIG
       when /\A\d+\z/
         default.to_i
       else
-        def default.inspect
-          "#{super}.lit"
+        if options[:same_db] 
+          def default.inspect
+            "#{super}.lit"
+          end
+          default
         end
-        default
       end
     end
 
@@ -89,7 +91,8 @@ END_MIG
         col_opts = options[:same_db] ? {:type=>schema[:db_type]} : column_schema_to_ruby_type(schema)
         type = col_opts.delete(:type)
         col_opts.delete(:size) if col_opts[:size].nil?
-        col_opts[:default] = column_schema_to_ruby_default(schema[:default], type) if schema[:default]
+        default = column_schema_to_ruby_default(schema[:default], type, options) if schema[:default]
+        col_opts[:default] = default unless default.nil?
         col_opts[:null] = false if schema[:allow_null] == false
         [:column, name, type, col_opts]
       end
