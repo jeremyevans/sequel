@@ -269,6 +269,9 @@ module Sequel
       # Values are subhashes with two keys, :columns and :unique.  The value of :columns
       # is an array of symbols of column names.  The value of :unique is true or false
       # depending on if the index is unique.
+      #
+      # This will not output any partial indexes, indexes that aren't valid or ready,
+      # or indexes that contain anything other than simple column references.
       def indexes(table)
         m = output_identifier_meth
         im = input_identifier_meth
@@ -278,8 +281,7 @@ module Sequel
           join(:pg_index___ind, :indrelid=>:oid, im.call(table)=>:relname).
           join(:pg_class___indc, :oid=>:indexrelid).
           join(:pg_attribute___att, :attrelid=>:tab__oid, :attnum=>SQL::Function.new(:ANY, :ind__indkey)).
-          filter(:indc__relkind=>'i', :ind__indisprimary=>false).
-          exclude(0=>SQL::Function.new(:ANY, :ind__indkey)).
+          filter(:indc__relkind=>'i', :ind__indisprimary=>false, :indexprs=>nil, :indpred=>nil, :indisvalid=>true, :indisready=>true, :indcheckxmin=>false).
           order(:indc__relname, (0...32).map{|x| [SQL::Subscript.new(:ind__indkey, [x]), x]}.case(32, :att__attnum)).
           select(:indc__relname___name, :ind__indisunique___unique, :att__attname___column)
         

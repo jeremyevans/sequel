@@ -1,5 +1,7 @@
 === HEAD
 
+* Only include valid non-partial indexes of simple column references in the PostgreSQL adapter (jeremyevans)
+
 * Add -h option to bin/sequel for outputting the usage, alias for -? (jeremyevans)
 
 * Add -d and -D options to bin/sequel for dumping schema migrations (jeremyevans)
