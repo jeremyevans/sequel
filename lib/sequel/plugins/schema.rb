@@ -15,6 +15,11 @@ module Sequel
           drop_table rescue nil
           create_table
         end
+
+        # Creates the table unless the table already exists
+        def create_table?
+          create_table unless table_exists?
+        end
         
         # Drops table.
         def drop_table

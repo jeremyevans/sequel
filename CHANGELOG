@@ -1,5 +1,7 @@
 === HEAD
 
+* Add Model.create_table? to the schema plugin, similar to Database#create_table? (jeremyevans)
+
 * Add Database#create_table?, which creates the table if it doesn't already exist (jeremyevans)
 
 * Handle ordered and limited datasets correctly when using UNION, INTERSECT, or EXCEPT (jeremyevans)

@@ -95,8 +95,7 @@ describe Sequel::Model, "drop_table" do
 end
 
 describe Sequel::Model, "create_table!" do
-
-  before(:each) do
+  before do
     MODEL_DB.reset
     @model = Class.new(Sequel::Model(:items))
   end
@@ -104,8 +103,25 @@ describe Sequel::Model, "create_table!" do
   it "should drop table if it exists and then create the table" do
     @model.should_receive(:drop_table).and_return(true)
     @model.should_receive(:create_table).and_return(true)
-
     @model.create_table!
   end
+end
 
+describe Sequel::Model, "create_table?" do
+  before do
+    MODEL_DB.reset
+    @model = Class.new(Sequel::Model(:items))
+  end
+  
+  it "should not create the table if it already exists" do
+    @model.should_receive(:table_exists?).and_return(true)
+    @model.should_not_receive(:create_table)
+    @model.create_table?.should == nil
+  end
+
+  it "should create the table if it doesn't exist" do
+    @model.should_receive(:table_exists?).and_return(false)
+    @model.should_receive(:create_table).and_return(3)
+    @model.create_table?.should == 3
+  end
 end
