@@ -1,5 +1,9 @@
 === HEAD
 
+* Add -h option to bin/sequel for outputting the usage, alias for -? (jeremyevans)
+
+* Add -d and -D options to bin/sequel for dumping schema migrations (jeremyevans)
+
 * Support eager graphing for model tables that lack primary keys (jeremyevans)
 
 * Add Model.create_table? to the schema plugin, similar to Database#create_table? (jeremyevans)

@@ -5,6 +5,7 @@ require 'optparse'
 require 'sequel'
 
 db_opts = {}
+dump_migration = nil
 echo = nil
 env = nil
 logfile = nil
@@ -25,9 +26,17 @@ opts = OptionParser.new do |opts|
   opts.separator ""
   opts.separator "Options:"
 
-  opts.on_tail("-?", "--help", "Show this message") do
+  opts.on_tail("-h", "-?", "--help", "Show this message") do
     puts opts
     exit
+  end
+
+  opts.on("-d", "--dump-migration", "print database migration to STDOUT") do 
+    dump_migration = true
+  end
+  
+  opts.on("-D", "--dump-migration-same-db", "print database migration to STDOUT without type translation") do
+    dump_migration = :same_db
   end
 
   opts.on("-e", "--env ENV", "use environment config for database") do |v|
@@ -63,10 +72,14 @@ opts.parse!
 
 db = ARGV.shift
 
-if db.nil? || db.empty?
-  puts opts
+error_proc = lambda do |msg|
+  $stderr.puts(msg)
   exit 1
 end
+
+error_proc["Error: Must specify -m if using -M"] if migrate_ver && !migrate_dir
+error_proc["Error: Cannot specify -D or -d with -m"] if dump_migration && migrate_dir
+error_proc["Error: Must specify database connection string or path to yaml file as argument"] if db.nil? || db.empty?
 
 if logfile || echo
   require 'logger'
@@ -88,14 +101,17 @@ begin
   DB = Sequel.connect(*(db_config ? [db_config] : [db, db_opts]))
   DB.test_connection
   if migrate_dir
-    require 'sequel/extensions/migration'
+    Sequel.extension :migration
     Sequel::Migrator.apply(DB, migrate_dir, migrate_ver)
     exit
   end
+  if dump_migration
+    Sequel.extension :schema_dumper
+    puts DB.dump_schema_migration(:same_db=>dump_migration==:same_db)
+    exit
+  end
 rescue => e
-  puts "#{e.class}: #{e.message}"
-  puts e.backtrace.first
-  exit 1
+  error_proc["Error: #{e.class}: #{e.message}#{e.backtrace.first}"]
 end
 
 load_dirs.each{|d| Dir["#{d}/**/*.rb"].each{|f| load(f)}}
