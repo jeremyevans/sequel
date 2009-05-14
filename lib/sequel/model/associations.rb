@@ -790,6 +790,13 @@ module Sequel
 
       # Private instance methods used to implement the associations support.
       module InstanceMethods
+        # Used internally by the associations code, like pk but doesn't raise
+        # an Error if the model has no primary key.
+        def pk_or_nil
+          key = primary_key
+          key.is_a?(Array) ? key.map{|k| @values[k]} : @values[key]
+        end
+
         private
 
         # Backbone behind association dataset methods
@@ -1143,7 +1150,7 @@ module Sequel
           records = []
           record_graphs.each do |record_graph|
             primary_record = record_graph[master]
-            key = primary_record.pk || primary_record.values.sort_by{|x| x[0].to_s}
+            key = primary_record.pk_or_nil || primary_record.values.sort_by{|x| x[0].to_s}
             if cached_pr = records_map[master][key]
               primary_record = cached_pr
             else
@@ -1200,11 +1207,11 @@ module Sequel
           end
           dependency_map.each do |ta, deps|
             next unless rec = record_graph[ta]
-            key = rec.pk || rec.values.sort_by{|x| x[0].to_s}
+            key = rec.pk_or_nil || rec.values.sort_by{|x| x[0].to_s}
             if cached_rec = records_map[ta][key]
               rec = cached_rec
             else
-              records_map[ta][rec.pk] = rec
+              records_map[ta][key] = rec
             end
             assoc_name = alias_map[ta]
             case type_map[ta]

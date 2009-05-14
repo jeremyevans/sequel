@@ -634,12 +634,7 @@ module Sequel
       # If the model has a composite primary key, returns an array of values.
       def pk
         raise(Error, "No primary key is associated with this model") unless key = primary_key
-        case key
-        when Array
-          key.collect{|k| @values[k]}
-        else
-          @values[key]
-        end
+        key.is_a?(Array) ? key.map{|k| @values[k]} : @values[key]
       end
       
       # Returns a hash identifying the model instance.  It should be true that:

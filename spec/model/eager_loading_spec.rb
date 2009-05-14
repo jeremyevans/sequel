@@ -1162,4 +1162,19 @@ describe Sequel::Model, "#eager_graph" do
     GraphAlbum.one_to_many :b_tracks, :class=>'GraphTrack', :key=>:album_id, :graph_conditions=>{:a=>:b}
     GraphAlbum.eager_graph(:a_genres, :b_tracks).sql.should == 'SELECT albums.id, albums.band_id, a_genres.id AS a_genres_id, b_tracks.id AS b_tracks_id, b_tracks.album_id FROM albums LEFT OUTER JOIN ag ON (ag.album_id = albums.id) LEFT OUTER JOIN genres AS a_genres ON (a_genres.id = ag.genre_id) LEFT OUTER JOIN tracks AS b_tracks ON ((b_tracks.album_id = albums.id) AND (b_tracks.a = albums.b))'
   end
+
+  it "should eagerly load associated records for classes that do not have a primary key" do
+    GraphAlbum.no_primary_key
+    GraphGenre.no_primary_key
+    GraphAlbum.many_to_many :inner_genres, :class=>'GraphGenre', :left_key=>:album_id, :left_primary_key=>:band_id, :right_key=>:genre_id, :right_primary_key=>:xxx, :join_table=>:ag
+    ds = GraphAlbum.eager_graph(:inner_genres)
+    ds.sql.should == 'SELECT albums.id, albums.band_id, inner_genres.id AS inner_genres_id FROM albums LEFT OUTER JOIN ag ON (ag.album_id = albums.band_id) LEFT OUTER JOIN genres AS inner_genres ON (inner_genres.xxx = ag.genre_id)'
+    def ds.fetch_rows(sql, &block)
+      yield({:id=>3, :band_id=>2, :inner_genres_id=>5, :xxx=>12})
+      yield({:id=>3, :band_id=>2, :inner_genres_id=>6, :xxx=>22})
+    end
+    as = ds.all
+    as.should == [GraphAlbum.load(:id=>3, :band_id=>2)]
+    as.first.inner_genres.should == [GraphGenre.load(:id=>5), GraphGenre.load(:id=>6)]
+  end
 end
