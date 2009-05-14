@@ -1,5 +1,7 @@
 === HEAD
 
+* Add Database#create_table?, which creates the table if it doesn't already exist (jeremyevans)
+
 * Handle ordered and limited datasets correctly when using UNION, INTERSECT, or EXCEPT (jeremyevans)
 
 * Fix unlikely threading bug with class level validations (jeremyevans)

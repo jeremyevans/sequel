@@ -70,6 +70,11 @@ module Sequel
       create_table(name, options, &block)
     end
     
+    # Creates the table unless the table already exists
+    def create_table?(name, options={}, &block)
+      create_table(name, options, &block) unless table_exists?(name)
+    end
+    
     # Creates a view, replacing it if it already exists:
     #
     #   DB.create_or_replace_view(:cheap_items, "SELECT * FROM items WHERE price < 100")
