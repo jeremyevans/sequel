@@ -1,5 +1,6 @@
 require 'sqlite3'
 Sequel.require 'adapters/shared/sqlite'
+Sequel.require 'adapters/utils/block_transactions'
 
 module Sequel
   # Top level module for holding all SQLite-related modules and classes
@@ -8,6 +9,8 @@ module Sequel
     # Database class for SQLite databases used with Sequel and the
     # ruby-sqlite3 driver.
     class Database < Sequel::Database
+      include BlockTransactions
+      
       UNIX_EPOCH_TIME_FORMAT = /\A\d+\z/.freeze
       include ::Sequel::SQLite::DatabaseMethods
       
@@ -83,26 +86,6 @@ module Sequel
         _execute(sql, opts){|conn| conn.get_first_value(sql, opts[:arguments])}
       end
       
-      # Use the native driver transaction method if there isn't already a transaction
-      # in progress on the connection, always yielding a connection inside a transaction
-      # transaction.
-      def transaction(opts={})
-        synchronize(opts[:server]) do |conn|
-          return yield(conn) if conn.transaction_active?
-          begin
-            result = nil
-            log_info('Transaction.begin')
-            conn.transaction{result = yield(conn)}
-            result
-          rescue ::Exception => e
-            log_info('Transaction.rollback')
-            transaction_error(e, SQLite3::Exception)
-          ensure
-            log_info('Transaction.commit') unless e
-          end
-        end
-      end
-      
       private
       
       # Log the SQL and the arguments, and yield an available connection.  Rescue
@@ -116,6 +99,11 @@ module Sequel
         end
       end
       
+      # Use the connection's transaction_active? method 
+      def already_in_transaction?(conn, opts)
+        conn.transaction_active?
+      end
+      
       # The SQLite adapter does not need the pool to convert exceptions.
       # Also, force the max connections to 1 if a memory database is being
       # used, as otherwise each connection gets a separate database.
@@ -125,6 +113,11 @@ module Sequel
         # because otherwise each connection will get a separate database
         o[:max_connections] = 1 if @opts[:database] == ':memory:' || blank_object?(@opts[:database])
         o
+      end
+      
+      # The main error class that SQLite3 raises
+      def database_error_classes
+        [SQLite3::Exception]
       end
 
       # Disconnect given connections from the database.

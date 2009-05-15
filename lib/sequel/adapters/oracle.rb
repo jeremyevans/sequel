@@ -75,30 +75,33 @@ module Sequel
           end
         end
       end
-      alias do execute
-      
-      def transaction(opts={})
-        synchronize(opts[:server]) do |conn|
-          return yield(conn) if @transactions.include?(Thread.current)
-          conn.autocommit = false
-          begin
-            @transactions << Thread.current
-            yield(conn)
-          rescue => e
-            conn.rollback
-            raise e unless Rollback === e
-          ensure
-            conn.commit unless e
-            conn.autocommit = true
-            @transactions.delete(Thread.current)
-          end
-        end
-      end
+      alias_method :do, :execute
 
       private
+      
+      def begin_transaction(conn)
+        log_info(TRANSACTION_BEGIN)
+        conn.autocommit = false
+        conn
+      end
+      
+      def commit_transaction(conn)
+        log_info(TRANSACTION_COMMIT)
+        conn.commit
+      end
 
       def disconnect_connection(c)
         c.logoff
+      end
+      
+      def remove_transaction(conn)
+        conn.autocommit = true
+        super
+      end
+      
+      def rollback_transaction(conn)
+        log_info(TRANSACTION_ROLLBACK)
+        conn.rollback
       end
     end
     

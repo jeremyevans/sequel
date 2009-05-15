@@ -132,29 +132,6 @@ module Sequel
       def server_version(server=nil)
         @server_version ||= (synchronize(server){|conn| conn.server_version if conn.respond_to?(:server_version)} || super)
       end
-      
-      # Support single level transactions on MySQL.
-      def transaction(opts={})
-        synchronize(opts[:server]) do |conn|
-          return yield(conn) if @transactions.include?(Thread.current)
-          log_info(begin_transaction_sql)
-          conn.query(begin_transaction_sql)
-          begin
-            @transactions << Thread.current
-            yield(conn)
-          rescue ::Exception => e
-            log_info(rollback_transaction_sql)
-            conn.query(rollback_transaction_sql)
-            transaction_error(e, Mysql::Error)
-          ensure
-            unless e
-              log_info(commit_transaction_sql)
-              conn.query(commit_transaction_sql)
-            end
-            @transactions.delete(Thread.current)
-          end
-        end
-      end
 
       private
       
@@ -184,9 +161,19 @@ module Sequel
         end
       end
       
+      # MySQL connections use the query method to execute SQL without a result
+      def connection_execute_method
+        :query
+      end
+      
       # MySQL doesn't need the connection pool to convert exceptions.
       def connection_pool_default_options
         super.merge(:pool_convert_exceptions=>false)
+      end
+      
+      # The MySQL adapter main error class is Mysql::Error
+      def database_error_classes
+        [Mysql::Error]
       end
       
       # The database name when using the native adapter is always stored in

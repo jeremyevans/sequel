@@ -3,7 +3,7 @@ require File.join(File.dirname(__FILE__), 'spec_helper.rb')
 describe "Database transactions" do
   before do
     INTEGRATION_DB.drop_table(:items) if INTEGRATION_DB.table_exists?(:items)
-    INTEGRATION_DB.create_table(:items){String :name; Integer :value}
+    INTEGRATION_DB.create_table(:items, :engine=>'InnoDB'){String :name; Integer :value}
     @d = INTEGRATION_DB[:items]
     clear_sqls
   end
@@ -69,6 +69,33 @@ describe "Database transactions" do
     end}.should raise_error(Interrupt)
     @d.count.should == 0
   end 
+  
+  if INTEGRATION_DB.supports_savepoints?
+    specify "should support nested transactions through savepoints using the savepoint option" do
+      @db = INTEGRATION_DB
+      @db.transaction do
+        @d << {:name => '1'}
+        @db.transaction(:savepoint=>true) do
+          @d << {:name => '2'}
+          @db.transaction do
+            @d << {:name => '3'}
+            raise Sequel::Rollback
+          end
+        end
+        @d << {:name => '4'}
+        @db.transaction do
+          @d << {:name => '6'}
+          @db.transaction(:savepoint=>true) do
+            @d << {:name => '7'}
+            raise Sequel::Rollback
+          end
+        end
+        @d << {:name => '5'}
+      end
+
+      @d.order(:name).map(:name).should == %w{1 4 5 6}
+    end
+  end
 
   specify "should handle returning inside of the block by committing" do
     def INTEGRATION_DB.ret_commit

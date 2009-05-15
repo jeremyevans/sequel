@@ -22,6 +22,10 @@ module Sequel
     SQL_BEGIN = 'BEGIN'.freeze
     SQL_COMMIT = 'COMMIT'.freeze
     SQL_ROLLBACK = 'ROLLBACK'.freeze
+    
+    TRANSACTION_BEGIN = 'Transaction.begin'.freeze
+    TRANSACTION_COMMIT = 'Transaction.commit'.freeze
+    TRANSACTION_ROLLBACK = 'Transaction.rollback'.freeze
 
     # The identifier input method to use by default
     @@identifier_input_method = nil
@@ -455,6 +459,11 @@ module Sequel
     def synchronize(server=nil, &block)
       @pool.hold(server || :default, &block)
     end
+    
+    # Whether the database and adapter support savepoints
+    def supports_savepoints?
+      false
+    end
 
     # Returns true if a table with the given name exists.  This requires a query
     # to the database unless this database object already has the schema for
@@ -475,29 +484,21 @@ module Sequel
       true
     end
 
-    # A simple implementation of SQL transactions. Nested transactions are not 
-    # supported - calling #transaction within a transaction will reuse the 
-    # current transaction. Should be overridden for databases that support nested 
-    # transactions.
-    def transaction(opts={})
+    # Starts a database transaction.  When a database transaction is used,
+    # either all statements are successful or none of the statements are
+    # successful.  Note that MySQL MyISAM tabels do not support transactions.
+    #
+    # The following options are respected:
+    #
+    # * :server  - The server to use for the transaction
+    # * :savepoint - Whether to create a new savepoint for this transaction,
+    #   only respected if the database adapter supports savepoints.  By
+    #   default Sequel will reuse an existing transaction, so if you want to
+    #   use a savepoint you must use this option.
+    def transaction(opts={}, &block)
       synchronize(opts[:server]) do |conn|
-        return yield(conn) if @transactions.include?(Thread.current)
-        log_info(begin_transaction_sql)
-        conn.execute(begin_transaction_sql)
-        begin
-          @transactions << Thread.current
-          yield(conn)
-        rescue Exception => e
-          log_info(rollback_transaction_sql)
-          conn.execute(rollback_transaction_sql)
-          transaction_error(e)
-        ensure
-          unless e
-            log_info(commit_transaction_sql)
-            conn.execute(commit_transaction_sql)
-          end
-          @transactions.delete(Thread.current)
-        end
+        return yield(conn) if already_in_transaction?(conn, opts)
+        _transaction(conn, &block)
       end
     end
     
@@ -545,6 +546,45 @@ module Sequel
     
     private
     
+    # Internal generic transaction method.  Any exception raised by the given
+    # block will cause the transaction to be rolled back.  If the exception is
+    # not Sequel::Rollback, the error will be reraised. If no exception occurs
+    # inside the block, the transaction is commited.
+    def _transaction(conn)
+      begin
+        add_transaction
+        t = begin_transaction(conn)
+        yield(conn)
+      rescue Exception => e
+        rollback_transaction(t)
+        transaction_error(e)
+      ensure
+        begin
+          commit_transaction(t) unless e
+        rescue Exception => e
+          raise_error(e, :classes=>database_error_classes)
+        ensure
+          remove_transaction(t)
+        end
+      end
+    end
+    
+    # Add the current thread to the list of active transactions
+    def add_transaction
+      @transactions << Thread.current
+    end    
+
+    # Whether the current thread/connection is already inside a transaction
+    def already_in_transaction?(conn, opts)
+      @transactions.include?(Thread.current)
+    end
+    
+    # Start a new database transaction on the given connection.
+    def begin_transaction(conn)
+      log_connection_execute(conn, begin_transaction_sql)
+      conn
+    end
+    
     # SQL to BEGIN a transaction.
     def begin_transaction_sql
       SQL_BEGIN
@@ -567,15 +607,31 @@ module Sequel
         obj.respond_to?(:empty?) ? obj.empty? : false
       end
     end
+    
+    # Commit the active transaction on the connection
+    def commit_transaction(conn)
+      log_connection_execute(conn, commit_transaction_sql)
+    end
 
     # SQL to COMMIT a transaction.
     def commit_transaction_sql
       SQL_COMMIT
     end
+    
+    # Method called on the connection object to execute SQL on the database,
+    # used by the transaction code.
+    def connection_execute_method
+      :execute
+    end
 
     # The default options for the connection pool.
     def connection_pool_default_options
       {}
+    end
+    
+    # Which transaction errors to translate, blank by default.
+    def database_error_classes
+      []
     end
     
     # The default value for default_schema.
@@ -604,6 +660,13 @@ module Sequel
     # correct format.
     def input_identifier_meth
       dataset.method(:input_identifier)
+    end
+    
+    # Log the given SQL and then execute it on the connection, used by
+    # the transaction code.
+    def log_connection_execute(conn, sql)
+      log_info(sql)
+      conn.send(connection_execute_method, sql)
     end
 
     # Return a dataset that uses the default identifier input and output methods
@@ -651,11 +714,21 @@ module Sequel
     def remove_cached_schema(table)
       @schemas.delete(quote_schema_table(table)) if @schemas
     end
+    
+    # Remove the current thread from the list of active transactions
+    def remove_transaction(conn)
+      @transactions.delete(Thread.current)
+    end
 
     # Remove the cached schema_utility_dataset, because the identifier
     # quoting has changed.
     def reset_schema_utility_dataset
       @schema_utility_dataset = nil
+    end
+    
+    # Rollback the active transaction on the connection
+    def rollback_transaction(conn)
+      log_connection_execute(conn, rollback_transaction_sql)
     end
 
     # Split the schema information from the table
@@ -724,8 +797,8 @@ module Sequel
     end
 
     # Raise a database error unless the exception is an Rollback.
-    def transaction_error(e, *classes)
-      raise_error(e, :classes=>classes) unless Rollback === e
+    def transaction_error(e)
+      raise_error(e, :classes=>database_error_classes) unless Rollback === e
     end
 
     # Typecast the value to an SQL::Blob

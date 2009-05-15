@@ -209,33 +209,6 @@ module Sequel
         ts
       end
       
-      # Default transaction method that should work on most JDBC
-      # databases.  Does not use the JDBC transaction methods, uses
-      # SQL BEGIN/ROLLBACK/COMMIT statements instead.
-      def transaction(opts={})
-        synchronize(opts[:server]) do |conn|
-          return yield(conn) if @transactions.include?(Thread.current)
-          stmt = conn.createStatement
-          begin
-            log_info(begin_transaction_sql)
-            stmt.execute(begin_transaction_sql)
-            @transactions << Thread.current
-            yield(conn)
-          rescue Exception => e
-            log_info(rollback_transaction_sql)
-            stmt.execute(rollback_transaction_sql)
-            transaction_error(e)
-          ensure
-            unless e
-              log_info(commit_transaction_sql)
-              stmt.execute(commit_transaction_sql)
-            end
-            stmt.close
-            @transactions.delete(Thread.current)
-          end
-        end
-      end
-      
       # The uri for this connection.  You can specify the uri
       # using the :uri, :url, or :database options.  You don't
       # need to worry about this if you use Sequel.connect
@@ -247,6 +220,12 @@ module Sequel
       end
       
       private
+      
+      # JDBC uses a statement object to execute SQL on the database
+      def begin_transaction(conn)
+        conn = conn.createStatement
+        super
+      end
       
       # The JDBC adapter should not need the pool to convert exceptions.
       def connection_pool_default_options
@@ -323,6 +302,12 @@ module Sequel
         synchronize{|c| metadata_dataset.send(:process_result_set, c.getMetaData.send(*args), &block)}
       end
       
+      # Close the given statement when removing the transaction
+      def remove_transaction(stmt)
+        stmt.close if stmt
+        super
+      end
+      
       # Java being java, you need to specify the type of each argument
       # for the prepared statement, and bind it individually.  This
       # guesses which JDBC method to use, and hopefully JRuby will convert
@@ -371,6 +356,11 @@ module Sequel
           ts << [m.call(h[:column_name]), {:type=>schema_column_type(h[:type_name]), :db_type=>h[:type_name], :default=>(h[:column_def] == '' ? nil : h[:column_def]), :allow_null=>(h[:nullable] != 0), :primary_key=>pks.include?(h[:column_name])}]
         end
         ts
+      end
+      
+      # Create a statement object to execute transaction statements.
+      def transaction_statement_object(conn)
+        conn.createStatement
       end
     end
     

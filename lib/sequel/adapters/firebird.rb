@@ -103,28 +103,6 @@ module Sequel
         block_given? ? yield(ds) : ds.map{|r| ds.send(:output_identifier, r[:"rdb$relation_name"])}
       end
 
-      def transaction(opts={})
-        synchronize(opts[:server]) do |conn|
-          return yield(conn) if @transactions.include?(Thread.current)
-          log_info("Transaction.begin")
-          conn.transaction
-          begin
-            @transactions << Thread.current
-            yield(conn)
-          rescue ::Exception => e
-            log_info("Transaction.rollback")
-            conn.rollback
-            transaction_error(e, Fb::Error)
-          ensure
-            unless e
-              log_info("Transaction.commit")
-              conn.commit
-            end
-            @transactions.delete(Thread.current)
-          end
-        end
-      end
-
       private
 
       # Use Firebird specific syntax for add column
@@ -145,6 +123,17 @@ module Sequel
 
       def auto_increment_sql()
         AUTO_INCREMENT
+      end
+      
+      def begin_transaction(conn)
+        log_info(TRANSACTION_BEGIN)
+        conn.transaction
+        conn
+      end
+
+      def commit_transaction(conn)
+        log_info(TRANSACTION_COMMIT)
+        conn.commit
       end
       
       def create_sequence_sql(name, opts={})
@@ -192,6 +181,10 @@ module Sequel
         end_sql
         sql
       end
+      
+      def database_error_classes
+        [Fb::Error]
+      end
 
       def disconnect_connection(c)
         c.close
@@ -204,6 +197,11 @@ module Sequel
       def restart_sequence_sql(name, opts={})
         seq_name = quote_identifier(name)
         "ALTER SEQUENCE #{seq_name} RESTART WITH #{opts[:restart_position]}"
+      end
+      
+      def rollback_transaction(conn)
+        log_info(TRANSACTION_ROLLBACK)
+        conn.rollback
       end
 
       def type_literal_generic_string(column)

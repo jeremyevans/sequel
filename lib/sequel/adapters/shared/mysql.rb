@@ -1,4 +1,4 @@
-Sequel.require 'adapters/utils/unsupported'
+Sequel.require %w'unsupported savepoint_transactions', 'adapters/utils'
 
 module Sequel
   class Database
@@ -14,6 +14,8 @@ module Sequel
     # Methods shared by Database instances that connect to MySQL,
     # currently supported by the native and JDBC adapters.
     module DatabaseMethods
+      include Sequel::Database::SavepointTransactions
+    
       AUTO_INCREMENT = 'AUTO_INCREMENT'.freeze
       CAST_TYPES = {String=>:CHAR, Integer=>:SIGNED, Time=>:DATETIME, DateTime=>:DATETIME, Numeric=>:DECIMAL, BigDecimal=>:DECIMAL, File=>:BINARY}
       PRIMARY = 'PRIMARY'.freeze

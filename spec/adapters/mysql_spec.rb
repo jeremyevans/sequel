@@ -29,15 +29,9 @@ MYSQL_DB.drop_table(:items) rescue nil
 MYSQL_DB.drop_table(:dolls) rescue nil
 MYSQL_DB.drop_table(:booltest) rescue nil
 
-if MYSQL_DB.class.adapter_scheme == :do
-  SQL_BEGIN = 'Transaction.begin'
-  SQL_ROLLBACK = 'Transaction.rollback'
-  SQL_COMMIT = 'Transaction.commit'
-else
-  SQL_BEGIN = 'BEGIN'
-  SQL_ROLLBACK = 'ROLLBACK'
-  SQL_COMMIT = 'COMMIT'
-end
+SQL_BEGIN = 'BEGIN'
+SQL_ROLLBACK = 'ROLLBACK'
+SQL_COMMIT = 'COMMIT'
 
 context "MySQL", '#create_table' do
   before do

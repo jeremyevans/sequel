@@ -1,5 +1,6 @@
 require 'amalgalite'
 Sequel.require 'adapters/shared/sqlite'
+Sequel.require 'adapters/utils/block_transactions'
 
 module Sequel
   # Top level module for holding all Amalgalite-related modules and classes
@@ -49,6 +50,7 @@ module Sequel
     # amalgalite driver.
     class Database < Sequel::Database
       include ::Sequel::SQLite::DatabaseMethods
+      include BlockTransactions
       
       set_adapter_scheme :amalgalite
       
@@ -119,26 +121,6 @@ module Sequel
         _execute(sql, opts){|conn| conn.first_value_from(sql)}
       end
       
-      # Use the native driver transaction method if there isn't already a transaction
-      # in progress on the connection, always yielding a connection inside a transaction
-      # transaction.
-      def transaction(opts={})
-        synchronize(opts[:server]) do |conn|
-          return yield(conn) if conn.in_transaction?
-          begin
-            result = nil
-            log_info('Transaction.begin')
-            conn.transaction{result = yield(conn)}
-            result
-          rescue ::Exception => e
-            log_info('Transaction.rollback')
-            transaction_error(e, ::Amalgalite::Error, ::Amalgalite::SQLite3::Error)
-          ensure
-            log_info('Transaction.commit') unless e
-          end
-        end
-      end
-      
       private
       
       # Log the SQL and yield an available connection.  Rescue
@@ -152,6 +134,11 @@ module Sequel
         end
       end
       
+      # Use the connection's in_transaction? method
+      def already_in_transaction?(conn, opts)
+        conn.in_transaction?
+      end
+      
       # The Amagalite adapter does not need the pool to convert exceptions.
       # Also, force the max connections to 1 if a memory database is being
       # used, as otherwise each connection gets a separate database.
@@ -161,6 +148,11 @@ module Sequel
         # because otherwise each connection will get a separate database
         o[:max_connections] = 1 if @opts[:database] == ':memory:' || blank_object?(@opts[:database])
         o
+      end
+      
+      # Both main error classes that Amalgalite raises
+      def database_error_classes
+        [::Amalgalite::Error, ::Amalgalite::SQLite3::Error]
       end
 
       # Disconnect given connections from the database.

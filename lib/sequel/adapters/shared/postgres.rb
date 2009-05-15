@@ -1,3 +1,5 @@
+Sequel.require 'adapters/utils/savepoint_transactions'
+
 module Sequel
   # Top level module for holding all PostgreSQL-related modules and classes
   # for Sequel.  There are a few module level accessors that are added via
@@ -163,14 +165,13 @@ module Sequel
     
     # Methods shared by Database instances that connect to PostgreSQL.
     module DatabaseMethods
+      include Sequel::Database::SavepointTransactions
+      
       PREPARED_ARG_PLACEHOLDER = LiteralString.new('$').freeze
       RE_CURRVAL_ERROR = /currval of sequence "(.*)" is not yet defined in this session|relation "(.*)" does not exist/.freeze
       SQL_BEGIN = 'BEGIN'.freeze
-      SQL_SAVEPOINT = 'SAVEPOINT autopoint_%d'.freeze
       SQL_COMMIT = 'COMMIT'.freeze
-      SQL_ROLLBACK_TO_SAVEPOINT = 'ROLLBACK TO SAVEPOINT autopoint_%d'.freeze
       SQL_ROLLBACK = 'ROLLBACK'.freeze
-      SQL_RELEASE_SAVEPOINT = 'RELEASE SAVEPOINT autopoint_%d'.freeze
       SYSTEM_TABLE_REGEXP = /^pg|sql/.freeze
 
       # Creates the function in the database.  Arguments:
@@ -376,55 +377,6 @@ module Sequel
         m = output_identifier_meth
         block_given? ? yield(ds) : ds.map{|r| m.call(r[:relname])}
       end
-      
-      # PostgreSQL supports multi-level transactions using save points.
-      # To use a savepoint instead of reusing the current transaction,
-      # use the :savepoint=>true option.
-      def transaction(opts={})
-        synchronize(opts[:server]) do |conn|
-          return yield(conn) if @transactions.include?(Thread.current) and !opts[:savepoint]
-          conn.transaction_depth ||= 0
-          if conn.transaction_depth > 0
-            log_info(SQL_SAVEPOINT % conn.transaction_depth)
-            conn.execute(SQL_SAVEPOINT % conn.transaction_depth)
-          else
-            log_info(SQL_BEGIN)
-            conn.execute(SQL_BEGIN)
-          end
-          begin
-            conn.transaction_depth += 1
-            @transactions << Thread.current
-            yield conn
-          rescue ::Exception => e
-            if conn.transaction_depth > 1
-              log_info(SQL_ROLLBACK_TO_SAVEPOINT % [conn.transaction_depth - 1])
-              conn.execute(SQL_ROLLBACK_TO_SAVEPOINT % [conn.transaction_depth - 1])
-            else
-              log_info(SQL_ROLLBACK)
-              conn.execute(SQL_ROLLBACK) rescue nil
-              @transactions.delete(Thread.current)
-            end
-            transaction_error(e, *CONVERTED_EXCEPTIONS)
-          ensure
-            unless e
-              begin
-                if conn.transaction_depth > 1
-                  log_info(SQL_RELEASE_SAVEPOINT % [conn.transaction_depth - 1])
-                  conn.execute(SQL_RELEASE_SAVEPOINT % [conn.transaction_depth - 1])
-                else
-                  log_info(SQL_COMMIT)
-                  conn.execute(SQL_COMMIT)
-                  @transactions.delete(Thread.current)
-                end
-              rescue => e
-                log_info(e.message)
-                raise_error(e, :classes=>CONVERTED_EXCEPTIONS)
-              end
-            end
-            conn.transaction_depth -= 1
-          end
-        end
-      end
 
       private
       
@@ -459,6 +411,11 @@ module Sequel
         events = opts[:events] ? Array(opts[:events]) : [:insert, :update, :delete]
         whence = opts[:after] ? 'AFTER' : 'BEFORE'
         "CREATE TRIGGER #{name} #{whence} #{events.map{|e| e.to_s.upcase}.join(' OR ')} ON #{quote_schema_table(table)}#{' FOR EACH ROW' if opts[:each_row]} EXECUTE PROCEDURE #{function}(#{Array(opts[:args]).map{|a| literal(a)}.join(', ')})"
+      end
+      
+      # The errors that the main adapters can raise, depends on the adapter being used
+      def database_error_classes
+        CONVERTED_EXCEPTIONS
       end
       
       # SQL for dropping a function from the database. 

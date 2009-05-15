@@ -63,30 +63,11 @@ module Sequel
       end
       alias_method :do, :execute_dui
 
-      # Support single level transactions on ODBC
-      def transaction(opts={})
-        synchronize(opts[:server]) do |conn|
-          return yield(conn) if @transactions.include?(Thread.current)
-          log_info(begin_transaction_sql)
-          conn.do(begin_transaction_sql)
-          begin
-            @transactions << Thread.current
-            yield(conn)
-          rescue ::Exception => e
-            log_info(rollback_transaction_sql)
-            conn.do(rollback_transaction_sql)
-            transaction_error(e)
-          ensure
-            unless e
-              log_info(commit_transaction_sql)
-              conn.do(commit_transaction_sql)
-            end
-            @transactions.delete(Thread.current)
-          end
-        end
-      end
-
       private
+      
+      def connection_execute_method
+        :do
+      end
 
       def disconnect_connection(c)
         c.disconnect

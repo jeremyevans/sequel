@@ -116,37 +116,6 @@ module Sequel
         uri.split(":").first
       end
       
-      # Use DataObject's transaction support for transactions.  This
-      # only supports single level transactions, and it always prepares
-      # transactions and commits them immediately after.  It's wasteful,
-      # but required by DataObject's API.
-      def transaction(opts={})
-        th = Thread.current
-        synchronize(opts[:server]) do |conn|
-          return yield(conn) if @transactions.include?(th)
-          t = ::DataObjects::Transaction.create_for_uri(uri)
-          t.instance_variable_get(:@connection).close
-          t.instance_variable_set(:@connection, conn)
-          begin
-            log_info("Transaction.begin")
-            t.begin
-            @transactions << th
-            yield(conn)
-          rescue Exception => e
-            log_info("Transaction.rollback")
-            t.rollback
-            transaction_error(e)
-          ensure
-            unless e
-              log_info("Transaction.commit")
-              t.prepare
-              t.commit 
-            end
-            @transactions.delete(th)
-          end
-        end
-      end
-      
       # Return the DataObjects URI for the Sequel URI, removing the do:
       # prefix.
       def uri(opts={})
@@ -155,21 +124,60 @@ module Sequel
       end
 
       private
+      
+      # DataObjects uses a special transaction object to keep track of
+      # transactions.  Unfortunately, it tries to create a new connection
+      # to do a transaction.  So we close the connection created and
+      # substitute our own.
+      def begin_transaction(conn)
+        log_info(TRANSACTION_BEGIN)
+        t = ::DataObjects::Transaction.create_for_uri(uri)
+        t.instance_variable_get(:@connection).close
+        t.instance_variable_set(:@connection, conn)
+        t.begin
+        t
+      end
+      
+      # DataObjects requires transactions be prepared before being
+      # committed, so we do that.
+      def commit_transaction(t)
+        log_info(TRANSACTION_ROLLBACK)
+        t.prepare
+        t.commit 
+      end
+      
+      # Method to call on a statement object to execute SQL that does
+      # not return any rows.
+      def connection_execute_method
+        :execute_non_query
+      end
+      
+      # The DataObjects adapter should convert exceptions by default.
+      def connection_pool_default_options
+        super.merge(:pool_convert_exceptions=>false)
+      end
 
       # Close the given database connection.
       def disconnect_connection(c)
         c.close
       end
       
+      # Execute SQL on the connection by creating a command first
+      def log_connection_execute(conn, sql)
+        log_info(sql)
+        conn.create_command(sql).execute_non_query
+      end
+      
+      # We use the transactions rollback method to rollback.
+      def rollback_transaction(t)
+        log_info(TRANSACTION_COMMIT)
+        t.rollback
+      end
+      
       # Allow extending the given connection when it is first created.
       # By default, just returns the connection.
       def setup_connection(conn)
         conn
-      end
-      
-      # The DataObjects adapter should convert exceptions by default.
-      def connection_pool_default_options
-        super.merge(:pool_convert_exceptions=>false)
       end
     end
     

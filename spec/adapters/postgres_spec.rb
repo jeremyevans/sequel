@@ -121,30 +121,6 @@ context "A PostgreSQL dataset" do
     @d.reverse_order(:name.desc, :test).sql.should == \
       'SELECT * FROM "test" ORDER BY "name" ASC, "test" DESC'
   end
-  
-  specify "should support nested transactions through savepoints using the savepoint option" do
-    POSTGRES_DB.transaction do
-      @d << {:name => '1'}
-      POSTGRES_DB.transaction(:savepoint=>true) do
-        @d << {:name => '2'}
-        POSTGRES_DB.transaction do
-          @d << {:name => '3'}
-          raise Sequel::Rollback
-        end
-      end
-      @d << {:name => '4'}
-      POSTGRES_DB.transaction do
-        @d << {:name => '6'}
-        POSTGRES_DB.transaction(:savepoint=>true) do
-          @d << {:name => '7'}
-          raise Sequel::Rollback
-        end
-      end
-      @d << {:name => '5'}
-    end
-
-    @d.order(:name).map(:name).should == %w{1 4 5 6}
-  end
 
   specify "should support regexps" do
     @d << {:name => 'abc', :value => 1}
