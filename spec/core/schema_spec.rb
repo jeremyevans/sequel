@@ -527,14 +527,14 @@ context "DB#create_table?" do
   end
   
   specify "should not create the table if the table already exists" do
-    @db.meta_def(:table_exists?){true}
-    @db.create_table?(:cats) {}
+    @db.meta_def(:table_exists?){|a| true}
+    @db.create_table?(:cats){|*a|}
     @db.sqls.should == nil
   end
   
   specify "should create the table if the table doesn't already exist" do
-    @db.meta_def(:table_exists?){false}
-    @db.create_table?(:cats) {}
+    @db.meta_def(:table_exists?){|a| false}
+    @db.create_table?(:cats){|*a|}
     @db.sqls.should == ['CREATE TABLE cats ()']
   end
 end

@@ -230,11 +230,11 @@ END_MIG
   end
 
   it "should handle not null values and defaults" do
-    @d.dump_table_schema(:t3).should == "create_table(:t3) do\n  Date :c1, :default=>\"'now()'\".lit\n  DateTime :c2, :null=>false\nend"
+    @d.dump_table_schema(:t3).should == "create_table(:t3) do\n  Date :c1\n  DateTime :c2, :null=>false\nend"
   end
 
   it "should handle converting common defaults" do
-    @d.dump_table_schema(:t4).should == "create_table(:t4) do\n  TrueClass :c1, :default=>false\n  TrueClass :c2, :default=>true\n  String :c3, :default=>\"'blah'\".lit\n  Integer :c4, :default=>35\nend"
+    @d.dump_table_schema(:t4).should == "create_table(:t4) do\n  TrueClass :c1, :default=>false\n  TrueClass :c2, :default=>true\n  String :c3\n  Integer :c4, :default=>35\nend"
   end
 
   it "should convert unknown database types to strings" do
