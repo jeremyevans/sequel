@@ -86,12 +86,7 @@ module Sequel
       # the given argument(s).  
       def [](*args)
         args = args.first if (args.size == 1)
-        return dataset[args] if args.is_a?(Hash)
-        if t = simple_table and p = simple_pk
-          with_sql("SELECT * FROM #{t} WHERE #{p} = #{dataset.literal(args)}").first
-        else
-          dataset[primary_key_hash(args)]
-        end
+        args.is_a?(Hash) ? dataset[args] : primary_key_lookup(args)
       end
       
       # Returns the columns in the result set in their original order.
@@ -431,6 +426,16 @@ module Sequel
       def overridable_methods_module
         include(@overridable_methods_module = Module.new) unless @overridable_methods_module
         @overridable_methods_module
+      end
+      
+      # Find the row in the dataset that matches the primary key.  Uses
+      # an static SQL optimization if the table and primary key are simple.
+      def primary_key_lookup(pk)
+        if t = simple_table and p = simple_pk
+          with_sql("SELECT * FROM #{t} WHERE #{p} = #{dataset.literal(pk)}").first
+        else
+          dataset[primary_key_hash(pk)]
+        end
       end
   
       # Set the columns for this model and create accessor methods for each column.

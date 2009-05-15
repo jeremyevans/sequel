@@ -32,20 +32,6 @@ module Sequel
         
         # The time to live for the cache store, in seconds.
         attr_reader :cache_ttl
-    
-        # Check the cache before a database lookup unless a hash is supplied.
-        def [](*args)
-          args = args.first if (args.size == 1)
-          return super(args) if args.is_a?(Hash)
-          ck = cache_key(args)
-          if obj = @cache_store.get(ck)
-            return obj
-          end
-          if obj = super(args)
-            @cache_store.set(ck, obj, @cache_ttl)
-          end 
-          obj
-        end
 
         # Set the time to live for the cache store, in seconds (default is 3600, # so 1 hour).
         def set_cache_ttl(ttl)
@@ -74,6 +60,18 @@ module Sequel
         # Return a key string for the pk
         def cache_key(pk)
           "#{self}:#{Array(pk).join(',')}"
+        end
+        
+        # Check the cache before a database lookup unless a hash is supplied.
+        def primary_key_lookup(pk)
+          ck = cache_key(pk)
+          if obj = @cache_store.get(ck)
+            return obj
+          end
+          if obj = super(pk)
+            @cache_store.set(ck, obj, @cache_ttl)
+          end 
+          obj
         end
       end
 
