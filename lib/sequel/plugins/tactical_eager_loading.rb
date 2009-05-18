@@ -1,17 +1,17 @@
 module Sequel
   module Plugins
     # The tactical_eager_loading plugin allows you to eagerly load
-    # an association for all objects retreived from the same dataset
+    # an association for all objects retrieved from the same dataset
     # without calling eager on the dataset.  If you attempt to load
     # associated objects for a record and the association for that
     # object is currently not cached, it assumes you want to get
-    # the associated objects for all objects retreived with the dataset that
-    # retreived the current object.
+    # the associated objects for all objects retrieved with the dataset that
+    # retrieved the current object.
     #
     # Tactical eager loading requires the identity_map plugin to
     # function correctly.  It only takes affect if you reteived the
     # current object with Dataset#all, it doesn't work if you
-    # retreived the current object with Dataset#each.
+    # retrieved the current object with Dataset#each.
     #
     # Basically, this allows the following code to issue only two queries:
     #
@@ -22,24 +22,24 @@ module Sequel
     #   end
     module TacticalEagerLoading
       module InstanceMethods
-        # The dataset that retreived this object, set if the object was
+        # The dataset that retrieved this object, set if the object was
         # reteived via Dataset#all with an active identity map.
-        attr_accessor :retreived_by
+        attr_accessor :retrieved_by
 
-        # All model objects retreived with this object, set if the object was
+        # All model objects retrieved with this object, set if the object was
         # reteived via Dataset#all with an active identity map.
-        attr_accessor :retreived_with
+        attr_accessor :retrieved_with
 
         private
 
         # If there is an active identity map and the association is not in the
         # associations cache and the object was reteived via Dataset#all,
-        # eagerly load the association for all model objects retreived with the
+        # eagerly load the association for all model objects retrieved with the
         # current object.
         def load_associated_objects(opts, reload=false)
           name = opts[:name]
-          if model.identity_map && !associations.include?(name) && retreived_by
-            retreived_by.send(:eager_load, retreived_with, name=>{})
+          if model.identity_map && !associations.include?(name) && retrieved_by
+            retrieved_by.send(:eager_load, retrieved_with, name=>{})
           end
           super
         end
@@ -55,8 +55,8 @@ module Sequel
           if model.identity_map
             objects.each do |o|
               next unless o.is_a?(Sequel::Model)
-              o.retreived_by = self
-              o.retreived_with = objects
+              o.retrieved_by = self
+              o.retrieved_with = objects
             end
           end
         end
