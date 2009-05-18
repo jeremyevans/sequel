@@ -817,6 +817,19 @@ module Sequel
           ds
         end
 
+        # Return the associated objects from the dataset, without callbacks, reciprocals, and caching.
+        def _load_associated_objects(opts)
+          if opts.returns_array?
+            send(opts.dataset_method).all
+          else
+            if !opts[:key]
+              send(opts.dataset_method).all.first
+            elsif send(opts[:key])
+              send(opts.dataset_method).first
+            end
+          end
+        end
+
         # Add the given associated object to the given association
         def add_associated_object(opts, o)
           raise(Sequel::Error, "model object #{model} does not have a primary key") unless pk
@@ -847,21 +860,13 @@ module Sequel
           a.uniq!
         end
 
-        # Load the associated objects using the dataset
+        # Load the associated objects using the dataset, handling callbacks, reciprocals, and caching.
         def load_associated_objects(opts, reload=false)
           name = opts[:name]
           if associations.include?(name) and !reload
             associations[name]
           else
-            objs = if opts.returns_array?
-              send(opts.dataset_method).all
-            else
-              if !opts[:key]
-                send(opts.dataset_method).all.first
-              elsif send(opts[:key])
-                send(opts.dataset_method).first
-              end
-            end
+            objs = _load_associated_objects(opts)
             run_association_callbacks(opts, :after_load, objs)
             objs.each{|o| add_reciprocal_object(opts, o)} if opts.set_reciprocal_to_self?
             associations[name] = objs
