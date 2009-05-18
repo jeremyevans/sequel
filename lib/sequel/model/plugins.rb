@@ -41,7 +41,8 @@ module Sequel
           dataset.extend(m::DatasetMethods)
         end
         dataset_method_modules << m::DatasetMethods
-        def_dataset_method(*m::DatasetMethods.public_instance_methods.reject{|x| NORMAL_METHOD_NAME_REGEXP !~ x.to_s})
+        meths = m::DatasetMethods.public_instance_methods.reject{|x| NORMAL_METHOD_NAME_REGEXP !~ x.to_s}
+        def_dataset_method(*meths) unless meths.empty?
       end
     end
     
