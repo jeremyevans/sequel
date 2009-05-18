@@ -1272,10 +1272,8 @@ module Sequel
         end
       
         # Eagerly load all specified associations 
-        def eager_load(a)
+        def eager_load(a, eager_assoc=@opts[:eager])
           return if a.empty?
-          # All associations to eager load
-          eager_assoc = @opts[:eager]
           # Key is foreign/primary key name symbol
           # Value is hash with keys being foreign/primary key values (generally integers)
           #  and values being an array of current model objects with that
@@ -1305,6 +1303,7 @@ module Sequel
         def post_load(all_records)
           eager_graph_build_associations(all_records) if @opts[:eager_graph]
           eager_load(all_records) if @opts[:eager]
+          super
         end
       end
     end
