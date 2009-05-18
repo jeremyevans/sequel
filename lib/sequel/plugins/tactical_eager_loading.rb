@@ -54,6 +54,7 @@ module Sequel
           super
           if model.identity_map
             objects.each do |o|
+              next unless o.is_a?(Sequel::Model)
               o.retreived_by = self
               o.retreived_with = objects
             end

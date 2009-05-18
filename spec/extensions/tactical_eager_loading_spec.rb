@@ -33,15 +33,21 @@ describe "Sequel::Plugins::TacticalEagerLoading" do
   end
 
   it "Dataset#all should set the retreived_by and reteived_with attributes if there is an active identity map" do
-    ts = TaticalEagerLoadingModel.all
-    ts.map{|x| [x.retreived_by, x.retreived_with]}.should == [[nil,nil], [nil,nil], [nil,nil], [nil,nil]]
-  end
-
-  it "Dataset#all should not set the retreived_by and reteived_with attributes if there is no active identity map" do
     TaticalEagerLoadingModel.with_identity_map do
       ts = TaticalEagerLoadingModel.all
       ts.map{|x| [x.retreived_by, x.retreived_with]}.should == [[@ds,ts], [@ds,ts], [@ds,ts], [@ds,ts]]
     end
+  end
+
+  it "Dataset#all shouldn't raise an error if a Sequel::Model instance is not returned" do
+    TaticalEagerLoadingModel.with_identity_map do
+      ts = TaticalEagerLoadingModel.naked.all
+    end
+  end
+
+  it "Dataset#all should not set the retreived_by and reteived_with attributes if there is no active identity map" do
+    ts = TaticalEagerLoadingModel.all
+    ts.map{|x| [x.retreived_by, x.retreived_with]}.should == [[nil,nil], [nil,nil], [nil,nil], [nil,nil]]
   end
 
   it "association getter methods should eagerly load the association if there is an active identity map and the association isn't cached" do
