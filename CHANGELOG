@@ -1,5 +1,9 @@
 === HEAD
 
+* Add tactical_eager_loading plugin, similar to DataMapper's strategic eager loading (jeremyevans)
+
+* Don't raise an error when loading a plugin with DatasetMethods where none of the methods are public (jeremyevans)
+
 * Add identity_map plugin, for creating temporary thread-local identity maps with some caching (jeremyevans)
 
 * Support savepoints when using MySQL (jeremyevans)
