@@ -316,6 +316,12 @@ context "Postgres::Dataset#insert" do
     @db.drop_table(:test5) rescue nil
   end
 
+  specify "should work with static SQL" do
+    @ds.with_sql('INSERT INTO test5 (value) VALUES (10)').insert.should == nil
+    @db['INSERT INTO test5 (value) VALUES (20)'].insert.should == nil
+    @ds.all.should == [{:xid=>1, :value=>10}, {:xid=>2, :value=>20}]
+  end
+
   specify "should work regardless of how it is used" do
     @ds.insert(:value=>10).should == 1
     @ds.disable_insert_returning.insert(:value=>20).should == 2

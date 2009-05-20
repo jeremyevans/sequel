@@ -653,11 +653,12 @@ module Sequel
       
       # Insert given values into the database.
       def insert(*values)
-        if !@opts[:sql] and !@opts[:disable_insert_returning] and server_version >= 80200
-          clone(default_server_opts(:sql=>insert_returning_pk_sql(*values))).single_value
+        if @opts[:sql]
+          execute_insert(insert_sql(*values))
+        elsif @opts[:disable_insert_returning] || server_version < 80200
+          execute_insert(insert_sql(*values), :table=>opts[:from].first, :values=>values.size == 1 ? values.first : values)
         else
-          execute_insert(insert_sql(*values), :table=>opts[:from].first,
-            :values=>values.size == 1 ? values.first : values)
+          clone(default_server_opts(:sql=>insert_returning_pk_sql(*values))).single_value
         end
       end
 
@@ -697,7 +698,7 @@ module Sequel
       
       # Use the RETURNING clause to return the primary key of the inserted record, if it exists
       def insert_returning_pk_sql(*values)
-        pk = db.primary_key(opts[:from].first)
+        pk = db.primary_key(opts[:from].first) if opts[:from] && !opts[:from].empty?
         insert_returning_sql(pk ? Sequel::SQL::Identifier.new(pk) : NULL, *values)
       end
       

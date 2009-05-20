@@ -1,5 +1,7 @@
 === HEAD
 
+* Make Dataset#insert on PostgreSQL work with static SQL (jeremyevans)
+
 * Add lazy_attributes plugin, for creating attributes that can be lazily loaded from the database (jeremyevans)
 
 * Add tactical_eager_loading plugin, similar to DataMapper's strategic eager loading (jeremyevans)
