@@ -38,7 +38,7 @@ module Sequel
               if !values.include?(a) && !@new
                 lazy_attribute_lookup(a)
               else
-                super
+                super()
               end
             end
           end
