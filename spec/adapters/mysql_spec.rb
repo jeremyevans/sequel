@@ -51,6 +51,11 @@ context "MySQL", '#create_table' do
     @db.create_table(:tmp_dolls, :temp => true, :engine => 'MyISAM', :charset => 'latin2'){text :name}
     @db.sqls.should == ["CREATE TEMPORARY TABLE tmp_dolls (name text) ENGINE=MyISAM DEFAULT CHARSET=latin2"]
   end
+  
+  specify "should not use a default for a String :text=>true type" do
+    @db.create_table(:dolls){String :name, :text=>true, :default=>'blah'}
+    @db.sqls.should == ["CREATE TABLE dolls (name text)"]
+  end
 end
 
 context "A MySQL database" do

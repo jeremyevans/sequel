@@ -107,6 +107,13 @@ module Sequel
         AUTO_INCREMENT
       end
       
+      # MySQL doesn't allow default values on text columns, so ignore if it the
+      # generic text type is used
+      def column_definition_sql(column)
+        column.delete(:default) if column[:type] == String && column[:text] == true
+        super
+      end
+      
       # Handle MySQL specific syntax for column references
       def column_references_sql(column)
         "#{", FOREIGN KEY (#{quote_identifier(column[:name])})" unless column[:type] == :check}#{super(column)}"
