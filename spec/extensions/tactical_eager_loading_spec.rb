@@ -3,7 +3,6 @@ require File.join(File.dirname(__FILE__), "spec_helper")
 describe "Sequel::Plugins::TacticalEagerLoading" do
   before do
     class ::TaticalEagerLoadingModel < Sequel::Model
-      plugin :identity_map
       plugin :tactical_eager_loading
       columns :id, :parent_id
       many_to_one :parent, :class=>self

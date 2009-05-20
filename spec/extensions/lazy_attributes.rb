@@ -3,8 +3,6 @@ require File.join(File.dirname(__FILE__), "spec_helper")
 describe "Sequel::Plugins::LazyAttributes" do
   before do
     class ::LazyAttributesModel < Sequel::Model(:la)
-      plugin :identity_map
-      plugin :tactical_eager_loading
       plugin :lazy_attributes
       columns :id, :name
       meta_def(:columns){[:id, :name]}

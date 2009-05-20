@@ -54,9 +54,10 @@ describe Sequel::Model, "caching" do
   end
   
   it "should take a ttl option" do
-    @c.plugin :caching, @cache, :ttl => 1234
-    @c.cache_ttl.should == 1234
-    Class.new(@c).cache_ttl.should == 1234
+    c = Class.new(Sequel::Model(:items))
+    c.plugin :caching, @cache, :ttl => 1234
+    c.cache_ttl.should == 1234
+    Class.new(c).cache_ttl.should == 1234
   end
   
   it "should offer a set_cache_ttl method for setting the ttl" do

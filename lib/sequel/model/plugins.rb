@@ -20,12 +20,14 @@ module Sequel
     # require the plugin from either sequel/plugins/#{plugin} or
     # sequel_#{plugin}, and then attempt to load the module using a
     # the camelized plugin name under Sequel::Plugins.
-    def self.plugin(plugin, *args)
+    def self.plugin(plugin, *args, &blk)
       arg = args.first
-      block = lambda{arg}
+      block = args.length > 1 ? lambda{args} : lambda{arg}
       m = plugin.is_a?(Module) ? plugin : plugin_module(plugin)
+      return if @plugins.include?(m)
+      @plugins << m
       if m.respond_to?(:apply)
-        m.apply(self, *args)
+        m.apply(self, *args, &blk)
       end
       if m.const_defined?("InstanceMethods")
         define_method(:"#{plugin}_opts", &block)
@@ -47,6 +49,9 @@ module Sequel
     end
     
     module ClassMethods
+      # Array of plugins loaded by this class
+      attr_reader :plugins
+      
       private
   
       # Returns the new style location for the plugin name.

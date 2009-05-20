@@ -21,6 +21,11 @@ module Sequel
     #     end
     #   end
     module TacticalEagerLoading
+      # Tactical eager loading requires the identity_map plugin
+      def self.apply(model)
+        model.plugin :identity_map  
+      end
+      
       module InstanceMethods
         # The dataset that retrieved this object, set if the object was
         # reteived via Dataset#all with an active identity map.

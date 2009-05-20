@@ -18,6 +18,11 @@ module Sequel
     #     end
     #   end
     module LazyAttributes
+      # Tactical eager loading requires the tactical_eager_loading plugin
+      def self.apply(model)
+        model.plugin :tactical_eager_loading  
+      end
+      
       module ClassMethods
         # Remove the given attributes from the list of columns selected by default.
         # For each attribute given, create an accessor method that allows a lazy

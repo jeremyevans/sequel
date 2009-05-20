@@ -1,5 +1,9 @@
 === HEAD
 
+* Make plugin's plugin_opts methods return an array of arguments if multiple arguments were given, instead of just the first argument (jeremyevans)
+
+* Keep track of loaded plugins at Model.plugins, allows plugins to depend on other plugins (jeremyevans)
+
 * Make Dataset#insert on PostgreSQL work with static SQL (jeremyevans)
 
 * Add lazy_attributes plugin, for creating attributes that can be lazily loaded from the database (jeremyevans)
