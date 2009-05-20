@@ -18,7 +18,7 @@ module Sequel
       # Set the sti_key and sti_dataset for the model, and change the
       # dataset's row_proc so that the dataset yields objects of varying classes,
       # where the class used has the same name as the key field.
-      def self.apply(model, key)
+      def self.configure(model, key)
         m = model.method(:constantize)
         model.instance_eval do
           @sti_key = key 

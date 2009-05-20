@@ -21,46 +21,58 @@ module Sequel
     module Serialization
       # Set up the column readers to do deserialization and the column writers
       # to save the value in deserialized_values.
-      def self.apply(model, format, *columns)
-        raise(Error, "Unsupported serialization format (#{format}), should be :marshal or :yaml") unless [:marshal, :yaml].include?(format)
-        raise(Error, "No columns given.  The serialization plugin requires you specify which columns to serialize") if columns.empty?
-        model.instance_eval do
-          @serialization_format = format
-          @serialized_columns = columns
-          InstanceMethods.module_eval do
-            columns.each do |column|
-              define_method(column) do 
-                if deserialized_values.has_key?(column)
-                  deserialized_values[column]
-                else
-                  deserialized_values[column] = deserialize_value(@values[column])
-                end
-              end
-              define_method("#{column}=") do |v| 
-                changed_columns << column unless changed_columns.include?(column)
-                deserialized_values[column] = v
-              end
-            end
-          end
-        end
+      def self.apply(model, *args)
+        model.instance_eval{@serialization_map = {}}
+      end
+      
+      def self.configure(model, format=nil, *columns)
+        model.serialize_attributes(format, *columns) unless columns.empty?
       end
 
       module ClassMethods
-        # The serialization format to use, should be :marshal or :yaml
-        attr_reader :serialization_format
-
-        # The columns to serialize
-        attr_reader :serialized_columns
+        # A map of the serialized columns for this model.  Keys are column
+        # symbols, values are serialization formats (:marshal or :yaml).
+        attr_reader :serialization_map
 
         # Copy the serialization format and columns to serialize into the subclass.
         def inherited(subclass)
           super
-          sf = serialization_format
-          sc = serialized_columns
-          subclass.instance_eval do
-            @serialization_format = sf
-            @serialized_columns = sc
+          sm = serialization_map.dup
+          subclass.instance_eval{@serialization_map = sm}
+        end
+        
+        # The first value in the serialization map.  This is only for
+        # backwards compatibility, use serialization_map in new code.
+        def serialization_format
+          serialization_map.values.first
+        end
+        
+        # Create instance level reader that deserializes column values on request,
+        # and instance level writer that stores new deserialized value in deserialized
+        # columns
+        def serialize_attributes(format, *columns)
+          raise(Error, "Unsupported serialization format (#{format}), should be :marshal or :yaml") unless [:marshal, :yaml].include?(format)
+          raise(Error, "No columns given.  The serialization plugin requires you specify which columns to serialize") if columns.empty?
+          columns.each do |column|
+            serialization_map[column] = format
+            define_method(column) do 
+              if deserialized_values.has_key?(column)
+                deserialized_values[column]
+              else
+                deserialized_values[column] = deserialize_value(column, @values[column])
+              end
+            end
+            define_method("#{column}=") do |v| 
+              changed_columns << column unless changed_columns.include?(column)
+              deserialized_values[column] = v
+            end
           end
+        end
+        
+        # The columns that will be serialized.  This is only for
+        # backwards compatibility, use serialization_map in new code.
+        def serialized_columns
+          serialization_map.keys
         end
       end
 
@@ -78,7 +90,7 @@ module Sequel
         def before_save
           super
           deserialized_values.each do |k,v|
-            @values[k] = serialize_value(v)
+            @values[k] = serialize_value(k, v)
           end
         end
         
@@ -91,24 +103,28 @@ module Sequel
         private
 
         # Deserialize the column from either marshal or yaml format
-        def deserialize_value(v)
+        def deserialize_value(column, v)
           return v if v.nil?
-          case model.serialization_format 
+          case model.serialization_map[column] 
           when :marshal
             Marshal.load(v.unpack('m')[0]) rescue Marshal.load(v)
           when :yaml
             YAML.load v if v
+          else
+            raise Error, "Bad serialization format (#{model.serialization_map[column].inspect}) for column #{column.inspect}"
           end
         end
 
         # Serialize the column to either marshal or yaml format
-        def serialize_value(v)
+        def serialize_value(column, v)
           return v if v.nil?
-          case model.serialization_format 
+          case model.serialization_map[column] 
           when :marshal
             [Marshal.dump(v)].pack('m')
           when :yaml
             v.to_yaml
+          else
+            raise Error, "Bad serialization format (#{model.serialization_map[column].inspect}) for column #{column.inspect}"
           end
         end
       end

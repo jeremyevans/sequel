@@ -60,6 +60,12 @@ describe Sequel::Model, "caching" do
     Class.new(c).cache_ttl.should == 1234
   end
   
+  it "should allow overriding the ttl option via a plugin :caching call" do
+    @c.plugin :caching, @cache, :ttl => 1234
+    @c.cache_ttl.should == 1234
+    Class.new(@c).cache_ttl.should == 1234
+  end
+  
   it "should offer a set_cache_ttl method for setting the ttl" do
     @c.cache_ttl.should == 3600
     @c.set_cache_ttl 1234

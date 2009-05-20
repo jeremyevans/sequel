@@ -56,7 +56,7 @@ describe Sequel::Model, ".plugin" do
     @c.plugins.should include(m)
   end
 
-  it "should exit if the plugin is already loaded" do
+  it "should not attempt to load a plugin twice" do
     @c.plugins.should_not include(@t)
     @c.plugin @t
     @c.plugins.reject{|m| m != @t}.length.should == 1
@@ -64,23 +64,92 @@ describe Sequel::Model, ".plugin" do
     @c.plugins.reject{|m| m != @t}.length.should == 1
   end
 
-  it "should call apply if the plugin responds to it, with the args and block used" do
+  it "should call apply and configure if the plugin responds to it, with the args and block used" do
     m = Module.new do
       def self.args; @args; end
       def self.block; @block; end
       def self.block_call; @block.call; end
+      def self.args2; @args2; end
+      def self.block2; @block2; end
+      def self.block2_call; @block2.call; end
       def self.apply(model, *args, &block)
         @args = args
         @block = block
         model.send(:define_method, :blah){43}
       end
+      def self.configure(model, *args, &block)
+        @args2 = args
+        @block2 = block
+        model.send(:define_method, :blag){44}
+      end
     end
     b = lambda{42}
     @c.plugin(m, 123, 1=>2, &b)
+    
     m.args.should == [123, {1=>2}]
     m.block.should == b
     m.block_call.should == 42
     @c.new.blah.should == 43
+    
+    m.args2.should == [123, {1=>2}]
+    m.block2.should == b
+    m.block2_call.should == 42
+    @c.new.blag.should == 44
+  end
+  
+  it "should call configure even if the plugin has already been loaded" do
+    m = Module.new do
+      @args = []
+      def self.args; @args; end
+      def self.configure(model, *args, &block)
+        @args << [block, *args]
+      end
+    end
+    
+    b = lambda{42}
+    @c.plugin(m, 123, 1=>2, &b)
+    m.args.should == [[b, 123, {1=>2}]]
+    
+    b2 = lambda{44}
+    @c.plugin(m, 234, 2=>3, &b2)
+    m.args.should == [[b, 123, {1=>2}], [b2, 234, {2=>3}]]
+  end
+  
+  it "should call things in the following order: apply, InstanceMethods, ClassMethods, DatasetMethods, configure" do
+    m = Module.new do
+      @args = []
+      def self.args; @args; end
+      def self.apply(model, *args, &block)
+        @args << :apply
+      end
+      def self.configure(model, *args, &block)
+        @args << :configure
+      end
+      im = Module.new do
+        def self.included(model)
+          model.plugins.last.args << :im
+        end
+      end
+      cm = Module.new do
+        def self.extended(model)
+          model.plugins.last.args << :cm
+        end
+      end
+      dm = Module.new do
+        def self.extended(dataset)
+          dataset.model.plugins.last.args << :dm
+        end
+      end
+      const_set(:InstanceMethods, im)
+      const_set(:ClassMethods, cm)
+      const_set(:DatasetMethods, dm)
+    end
+    
+    b = lambda{44}
+    @c.plugin(m, 123, 1=>2, &b)
+    m.args.should == [:apply, :im, :cm, :dm, :configure]
+    @c.plugin(m, 234, 2=>3, &b)
+    m.args.should == [:apply, :im, :cm, :dm, :configure, :configure]
   end
 
   it "should include an InstanceMethods module in the class if the plugin includes it" do

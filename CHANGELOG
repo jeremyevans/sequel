@@ -1,5 +1,9 @@
 === HEAD
 
+* Allow plugins to have a configure method that is called on every attempt to load them (jeremyevans)
+
+* Attempting to load an already loaded plugin no longer calls the plugin's apply method (jeremyevans)
+
 * Make plugin's plugin_opts methods return an array of arguments if multiple arguments were given, instead of just the first argument (jeremyevans)
 
 * Keep track of loaded plugins at Model.plugins, allows plugins to depend on other plugins (jeremyevans)

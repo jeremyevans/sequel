@@ -14,6 +14,16 @@ describe "Serialization plugin" do
     end
     MODEL_DB.reset
   end
+  
+  it "should allow setting additional serializable attributes via plugin :serialization call" do
+    @c.plugin :serialization, :yaml, :abc
+    @c.create(:abc => 1, :def=> 2)
+    MODEL_DB.sqls.last.should =~ /INSERT INTO items \((abc, def|def, abc)\) VALUES \(('--- 1\n', 2|2, '--- 1\n')\)/
+
+    @c.plugin :serialization, :marshal, :def
+    @c.create(:abc => 1, :def=> 1)
+    MODEL_DB.sqls.last.should =~ /INSERT INTO items \((abc, def|def, abc)\) VALUES \(('--- 1\n', 'BAhpBg==\n'|'BAhpBg==\n', '--- 1\n')\)/
+  end
 
   it "should allow serializing attributes to yaml" do
     @c.plugin :serialization, :yaml, :abc
@@ -114,5 +124,13 @@ describe "Serialization plugin" do
     o.abc.should == 23
     o.refresh
     o.deserialized_values.length.should == 0
+  end
+  
+  it "should raise an error if calling internal serialization methods with bad columns" do
+    @c.set_primary_key :id
+    @c.plugin :serialization
+    o = @c.load(:id => 1, :abc => "--- 1\n", :def => "--- hello\n")
+    lambda{o.send(:serialize_value, :abc, 1)}.should raise_error(Sequel::Error)
+    lambda{o.send(:deserialize_value, :abc, "--- hello\n")}.should raise_error(Sequel::Error)
   end
 end

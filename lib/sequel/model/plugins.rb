@@ -3,14 +3,19 @@ module Sequel
   # so they can be loaded via Model.plugin.
   #
   # Plugins should be modules with one of the following conditions:
-  # * A singleton method named apply, which takes a model and 
-  #   additional arguments.
+  # * A singleton method named apply, which takes a model, 
+  #   additional arguments, and an optional block.  This is called
+  #   once, the first time the plugin is loaded, with the arguments
+  #   and block provide to the call to Model.plugin.
   # * A module inside the plugin module named InstanceMethods,
   #   which will be included in the model class.
   # * A module inside the plugin module named ClassMethods,
   #   which will extend the model class.
   # * A module inside the plugin module named DatasetMethods,
   #   which will extend the model's dataset.
+  # * A singleton method named configure, which takes a model, 
+  #   additional arguments, and an optional block.  This is called
+  #   every time the Model.plugin method is called.
   module Plugins
   end
   
@@ -24,28 +29,28 @@ module Sequel
       arg = args.first
       block = args.length > 1 ? lambda{args} : lambda{arg}
       m = plugin.is_a?(Module) ? plugin : plugin_module(plugin)
-      return if @plugins.include?(m)
-      @plugins << m
-      if m.respond_to?(:apply)
-        m.apply(self, *args, &blk)
-      end
-      if m.const_defined?("InstanceMethods")
-        define_method(:"#{plugin}_opts", &block)
-        include(m::InstanceMethods)
-      end
-      if m.const_defined?("ClassMethods")
-        meta_def(:"#{plugin}_opts", &block)
-        extend(m::ClassMethods)
-      end
-      if m.const_defined?("DatasetMethods")
-        if @dataset
-          dataset.meta_def(:"#{plugin}_opts", &block)
-          dataset.extend(m::DatasetMethods)
+      unless @plugins.include?(m)
+        @plugins << m
+        m.apply(self, *args, &blk) if m.respond_to?(:apply)
+        if m.const_defined?("InstanceMethods")
+          define_method(:"#{plugin}_opts", &block)
+          include(m::InstanceMethods)
         end
-        dataset_method_modules << m::DatasetMethods
-        meths = m::DatasetMethods.public_instance_methods.reject{|x| NORMAL_METHOD_NAME_REGEXP !~ x.to_s}
-        def_dataset_method(*meths) unless meths.empty?
+        if m.const_defined?("ClassMethods")
+          meta_def(:"#{plugin}_opts", &block)
+          extend(m::ClassMethods)
+        end
+        if m.const_defined?("DatasetMethods")
+          if @dataset
+            dataset.meta_def(:"#{plugin}_opts", &block)
+            dataset.extend(m::DatasetMethods)
+          end
+          dataset_method_modules << m::DatasetMethods
+          meths = m::DatasetMethods.public_instance_methods.reject{|x| NORMAL_METHOD_NAME_REGEXP !~ x.to_s}
+          def_dataset_method(*meths) unless meths.empty?
+        end
       end
+      m.configure(self, *args, &blk) if m.respond_to?(:configure)
     end
     
     module ClassMethods

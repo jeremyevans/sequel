@@ -10,8 +10,7 @@ module Sequel
     # So the following code should issue one query to get the albums and one query to
     # get the reviews for all of those albums:
     #
-    #   Album.plugin :lazy_attributes
-    #   Album.lazy_attributes :review
+    #   Album.plugin :lazy_attributes, :review
     #   Sequel::Model.with_identity_map do
     #     Album.filter{id<100}.all do |a|
     #       a.review
@@ -19,8 +18,13 @@ module Sequel
     #   end
     module LazyAttributes
       # Tactical eager loading requires the tactical_eager_loading plugin
-      def self.apply(model)
+      def self.apply(model, *attrs)
         model.plugin :tactical_eager_loading  
+      end
+      
+      # Set the attributes given as lazy attributes
+      def self.configure(model, *attrs)
+        model.lazy_attributes(*attrs) unless attrs.empty?
       end
       
       module ClassMethods

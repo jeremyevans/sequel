@@ -7,7 +7,7 @@ describe "Sequel::Plugins::LazyAttributes" do
       columns :id, :name
       meta_def(:columns){[:id, :name]}
       lazy_attributes :name
-      meta_def(:columns){:id}
+      meta_def(:columns){[:id]}
       ds = dataset
       def ds.fetch_rows(sql)
         execute(sql)
@@ -40,6 +40,22 @@ describe "Sequel::Plugins::LazyAttributes" do
   end
   after do
     Object.send(:remove_const, :LazyAttributesModel)
+  end
+  
+  it "should allowing adding additional lazy attributes via plugin :lazy_attributes" do
+    @c.set_dataset(@ds.select(:id, :blah))
+    @c.dataset.sql.should == 'SELECT id, blah FROM la'
+    @c.plugin :lazy_attributes, :blah
+    @c.dataset.opts[:select].should == [:id]
+    @c.dataset.sql.should == 'SELECT id FROM la'
+  end
+  
+  it "should allowing adding additional lazy attributes via lazy_attributes" do
+    @c.set_dataset(@ds.select(:id, :blah))
+    @c.dataset.sql.should == 'SELECT id, blah FROM la'
+    @c.lazy_attributes :blah
+    @c.dataset.opts[:select].should == [:id]
+    @c.dataset.sql.should == 'SELECT id FROM la'
   end
 
   it "should remove the attributes given from the SELECT columns of the model's dataset" do
