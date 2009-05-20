@@ -203,6 +203,11 @@ context "A PostgreSQL database" do
     @db[:posts].order(:a).map(:a).should == [1, 2, 10, 20, 21]
   end
   
+  specify "should not raise an error if attempting to resetting the primary key sequence for a table without a primary key" do
+    @db.create_table(:posts){Integer :a}
+    @db.reset_primary_key_sequence(:posts).should == nil
+  end
+  
   specify "should support fulltext indexes and searching" do
     @db.create_table(:posts){text :title; text :body; full_text_index [:title, :body]; full_text_index :title, :language => 'french'}
     @db.sqls.should == [

@@ -327,7 +327,7 @@ module Sequel
       # maximum current value of the table's primary key.
       def reset_primary_key_sequence(table)
         pk = SQL::Identifier.new(primary_key(table))
-        seq = primary_key_sequence(table)
+        return unless seq = primary_key_sequence(table)
         db = self
         seq_ds = db.from(seq.lit)
         get{setval(seq, db[table].select{coalesce(max(pk)+seq_ds.select{:increment_by}, seq_ds.select(:min_value))}, false)}
