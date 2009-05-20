@@ -56,6 +56,11 @@ context "MySQL", '#create_table' do
     @db.create_table(:dolls){String :name, :text=>true, :default=>'blah'}
     @db.sqls.should == ["CREATE TABLE dolls (name text)"]
   end
+  
+  specify "should not use a default for a File type" do
+    @db.create_table(:dolls){File :name, :default=>'blah'}
+    @db.sqls.should == ["CREATE TABLE dolls (name blob)"]
+  end
 end
 
 context "A MySQL database" do

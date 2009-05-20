@@ -1,6 +1,6 @@
 === HEAD
 
-* Ignore a :default value if creating a String :text=>true column on MySQL, since it doesn't support defaults on text columns (jeremyevans)
+* Ignore a :default value if creating a String :text=>true or File column on MySQL, since it doesn't support defaults on text/blob columns (jeremyevans)
 
 * On PostgreSQL, do not raise an error when attempting to reset the primary key sequence for a table without a primary key (jeremyevans)
 
