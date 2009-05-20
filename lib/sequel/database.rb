@@ -750,7 +750,7 @@ module Sequel
         Sequel.convert_tinyint_to_bool ? :boolean : :integer
       when /\Ainterval\z/io
         :interval
-      when /\A(character( varying)?|varchar|text)/io
+      when /\A(character( varying)?|(var)?char|text)/io
         :string
       when /\A(int(eger)?|bigint|smallint)/io
         :integer
