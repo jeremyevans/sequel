@@ -55,6 +55,9 @@ module Sequel
     class Database < Sequel::Database
       include Sequel::MySQL::DatabaseMethods
       
+      # Mysql::Error messages that indicate the current connection should be disconnected
+      MYSQL_DATABASE_DISCONNECT_ERRORS = /\ACommands out of sync; you can't run this command now\z/
+      
       set_adapter_scheme :mysql
       
       # Support stored procedures on MySQL
@@ -101,8 +104,7 @@ module Sequel
 
         # By default, MySQL 'where id is null' selects the last inserted id
         conn.query("set SQL_AUTO_IS_NULL=0") unless opts[:auto_is_null]
-
-        conn.query_with_result = false
+        
         class << conn
           attr_accessor :prepared_statements
         end
@@ -139,25 +141,31 @@ module Sequel
       # option is :select, yield the result of the query, otherwise
       # yield the connection if a block is given.
       def _execute(conn, sql, opts)
-        log_info(sql)
-        conn.query(sql)
-        if opts[:type] == :select
-          loop do
-            begin
-              r = conn.use_result
-            rescue Mysql::Error
-              nil
-            else
-              begin
-                yield r
-              ensure
+        begin
+          log_info(sql)
+          r = conn.query(sql)
+          if opts[:type] == :select
+            yield r if r
+            if conn.respond_to?(:next_result) && conn.next_result
+              loop do
                 r.free
+                r = nil
+                begin
+                  r = conn.use_result
+                rescue Mysql::Error
+                  break
+                end
+                yield r
+                break unless conn.next_result
               end
             end
-            break unless conn.respond_to?(:next_result) && conn.next_result
+          else
+            yield conn if block_given?
           end
-        else
-          yield conn if block_given?
+        rescue Mysql::Error => e
+          raise_error(e, :disconnect=>MYSQL_DATABASE_DISCONNECT_ERRORS.match(e.message))
+        ensure
+          r.free if r
         end
       end
       

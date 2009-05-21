@@ -1088,6 +1088,10 @@ context "Database#raise_error" do
   specify "should convert the exception to a DatabaseError if opts[:classes] if not present" do
     proc{MockDatabase.new.send(:raise_error, Interrupt.new(''))}.should raise_error(Sequel::DatabaseError)
   end
+  
+  specify "should convert the exception to a DatabaseDisconnectError if opts[:disconnect] is true" do
+    proc{MockDatabase.new.send(:raise_error, Interrupt.new(''), :disconnect=>true)}.should raise_error(Sequel::DatabaseDisconnectError)
+  end
 end
 
 context "Database#typecast_value" do

@@ -702,7 +702,7 @@ module Sequel
     # and traceback.
     def raise_error(exception, opts={})
       if !opts[:classes] || Array(opts[:classes]).any?{|c| exception.is_a?(c)}
-        e = DatabaseError.new("#{exception.class} #{exception.message}")
+        e = (opts[:disconnect] ? DatabaseDisconnectError : DatabaseError).new("#{exception.class}: #{exception.message}")
         e.set_backtrace(exception.backtrace)
         raise e
       else
