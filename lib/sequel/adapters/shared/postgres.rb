@@ -372,8 +372,7 @@ module Sequel
       # * :schema - The schema to search (default_schema by default)
       # * :server - The server to use
       def tables(opts={})
-        ds = metadata_dataset.from(:pg_class).filter(:relkind=>'r').select(:relname).exclude(SQL::StringExpression.like(:relname, SYSTEM_TABLE_REGEXP)).server(opts[:server])
-        ds.join!(:pg_namespace, :oid=>:relnamespace, :nspname=>(opts[:schema]||default_schema).to_s) if opts[:schema] || default_schema
+        ds = metadata_dataset.from(:pg_class).filter(:relkind=>'r').select(:relname).exclude(SQL::StringExpression.like(:relname, SYSTEM_TABLE_REGEXP)).server(opts[:server]).join(:pg_namespace, :oid=>:relnamespace, :nspname=>(opts[:schema]||default_schema||'public').to_s) 
         m = output_identifier_meth
         block_given? ? yield(ds) : ds.map{|r| m.call(r[:relname])}
       end
