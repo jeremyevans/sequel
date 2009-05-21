@@ -78,11 +78,6 @@ describe "Sequel::Database dump methods" do
       when :t3
         [[:c1, {:db_type=>'date', :default=>"'now()'", :allow_null=>true}],
          [:c2, {:db_type=>'datetime', :allow_null=>false}]]
-      when :t4
-        [[:c1, {:db_type=>'boolean', :default=>"false", :allow_null=>true}],
-         [:c2, {:db_type=>'boolean', :default=>"true", :allow_null=>true}],
-         [:c3, {:db_type=>'varchar', :default=>"'blah'", :allow_null=>true}],
-         [:c4, {:db_type=>'integer', :default=>"35", :allow_null=>true}]]
       when :t5
         [[:c1, {:db_type=>'blahblah', :allow_null=>true}]]
       end
@@ -232,9 +227,89 @@ END_MIG
   it "should handle not null values and defaults" do
     @d.dump_table_schema(:t3).should == "create_table(:t3) do\n  Date :c1\n  DateTime :c2, :null=>false\nend"
   end
-
+  
+  it "should handle converting many default formats" do
+    m = @d.method(:column_schema_to_ruby_default)
+    m.call("adf", :string, :same_db=>true).inspect.should == '"adf".lit'
+    p = lambda{|d,t| m.call(d,t,{})}
+    p[nil, :integer].should == nil
+    p['1', :integer].should == 1
+    p['-1', :integer].should == -1
+    p['1.0', :float].should == 1.0
+    p['-1.0', :float].should == -1.0
+    p['1.0', :decimal].should == BigDecimal.new('1.0')
+    p['-1.0', :decimal].should == BigDecimal.new('-1.0')
+    p['1', :boolean].should == true
+    p['0', :boolean].should == false
+    p['true', :boolean].should == true
+    p['false', :boolean].should == false
+    p["'t'", :boolean].should == true
+    p["'f'", :boolean].should == false
+    p["'a'", :string].should == 'a'
+    p["'a'", :blob].should == 'a'.to_sequel_blob
+    p["'a'", :blob].should be_a_kind_of(Sequel::SQL::Blob)
+    p["''", :string].should == ''
+    p["'\\a''b'", :string].should == "\\a'b"
+    p["'NULL'", :string].should == "NULL"
+    p["'2009-10-29'", :date].should == Date.new(2009,10,29)
+    p["CURRENT_TIMESTAMP", :date].should == nil
+    p["today()", :date].should == nil
+    p["'2009-10-29T10:20:30-07:00'", :datetime].should == DateTime.parse('2009-10-29T10:20:30-07:00')
+    p["'2009-10-29 10:20:30'", :datetime].should == DateTime.parse('2009-10-29 10:20:30')
+    p["'10:20:30'", :time].should == Time.parse('10:20:30')
+  end
+  
   it "should handle converting common defaults" do
-    @d.dump_table_schema(:t4).should == "create_table(:t4) do\n  TrueClass :c1, :default=>false\n  TrueClass :c2, :default=>true\n  String :c3\n  Integer :c4, :default=>35\nend"
+    @d.meta_def(:schema) do |t, *os|
+      [[:c1, {:db_type=>'boolean', :default=>"false", :type=>:boolean, :allow_null=>true}],
+       [:c2, {:db_type=>'varchar', :default=>"'blah'", :type=>:string, :allow_null=>true}],
+       [:c3, {:db_type=>'integer', :default=>"-1", :type=>:integer, :allow_null=>true}],
+       [:c4, {:db_type=>'float', :default=>"1.0", :type=>:float, :allow_null=>true}],
+       [:c5, {:db_type=>'decimal', :default=>"100.50", :type=>:decimal, :allow_null=>true}],
+       [:c6, {:db_type=>'blob', :default=>"'blah'", :type=>:blob, :allow_null=>true}],
+       [:c7, {:db_type=>'date', :default=>"'2008-10-29'", :type=>:date, :allow_null=>true}],
+       [:c8, {:db_type=>'datetime', :default=>"'2008-10-29 10:20:30'", :type=>:datetime, :allow_null=>true}],
+       [:c9, {:db_type=>'time', :default=>"'10:20:30'", :type=>:time, :allow_null=>true}],
+       [:c10, {:db_type=>'interval', :default=>"'6 weeks'", :type=>:interval, :allow_null=>true}]]
+    end
+    @d.dump_table_schema(:t4).gsub(/[+-]\d\d:\d\d"\)/, '")').should == "create_table(:t4) do\n  TrueClass :c1, :default=>false\n  String :c2, :default=>\"blah\"\n  Integer :c3, :default=>-1\n  Float :c4, :default=>1.0\n  BigDecimal :c5, :default=>BigDecimal.new(\"0.1005E3\")\n  File :c6, :default=>Sequel::SQL::Blob.new(\"blah\")\n  Date :c7, :default=>Date.parse(\"2008-10-29\")\n  DateTime :c8, :default=>DateTime.parse(\"2008-10-29T10:20:30\")\n  Time :c9, :default=>Time.parse(\"10:20:30\"), :only_time=>true\n  String :c10\nend"
+    @d.dump_table_schema(:t4, :same_db=>true).gsub(/[+-]\d\d:\d\d"\)/, '")').should == "create_table(:t4) do\n  column :c1, \"boolean\", :default=>false\n  column :c2, \"varchar\", :default=>\"blah\"\n  column :c3, \"integer\", :default=>-1\n  column :c4, \"float\", :default=>1.0\n  column :c5, \"decimal\", :default=>BigDecimal.new(\"0.1005E3\")\n  column :c6, \"blob\", :default=>Sequel::SQL::Blob.new(\"blah\")\n  column :c7, \"date\", :default=>Date.parse(\"2008-10-29\")\n  column :c8, \"datetime\", :default=>DateTime.parse(\"2008-10-29T10:20:30\")\n  column :c9, \"time\", :default=>Time.parse(\"10:20:30\")\n  column :c10, \"interval\", :default=>\"'6 weeks'\".lit\nend"
+  end
+  
+  it "should handle converting PostgreSQL specific default formats" do
+    m = @d.method(:column_schema_to_ruby_default)
+    @d.meta_def(:database_type){:postgres}
+    p = lambda{|d,t| m.call(d,t,{})}
+    p["''::text", :string].should == ""
+    p["'\\a''b'::character varying", :string].should == "\\a'b"
+    p["'a'::bpchar", :string].should == "a"
+    p["(-1)", :integer].should == -1
+    p["(-1.0)", :float].should == -1.0
+    p['(-1.0)', :decimal].should == BigDecimal.new('-1.0')
+    p["'a'::bytea", :blob].should == 'a'.to_sequel_blob
+    p["'a'::bytea", :blob].should be_a_kind_of(Sequel::SQL::Blob)
+    p["'2009-10-29'::date", :date].should == Date.new(2009,10,29)
+    p["'2009-10-29 10:20:30.241343'::timestamp without time zone", :datetime].should == DateTime.parse('2009-10-29 10:20:30.241343')
+    p["'10:20:30'::time without time zone", :time].should == Time.parse('10:20:30')
+  end
+  
+  it "should handle converting MySQL specific default formats" do
+    m = @d.method(:column_schema_to_ruby_default)
+    @d.meta_def(:database_type){:mysql}
+    p = lambda{|d,t| m.call(d,t,{})}
+    s = lambda{|d,t| m.call(d,t,{:same_db=>true})}
+    p["\\a'b", :string].should == "\\a'b"
+    p["a", :string].should == "a"
+    p["NULL", :string].should == "NULL"
+    p["-1", :float].should == -1.0
+    p['-1', :decimal].should == BigDecimal.new('-1.0')
+    p["2009-10-29", :date].should == Date.new(2009,10,29)
+    p["2009-10-29 10:20:30", :datetime].should == DateTime.parse('2009-10-29 10:20:30')
+    p["10:20:30", :time].should == Time.parse('10:20:30')
+    p["CURRENT_DATE", :date].should == nil
+    p["CURRENT_TIMESTAMP", :datetime].should == nil
+    s["CURRENT_DATE", :date].inspect.should == "\"CURRENT_DATE\".lit"
+    s["CURRENT_TIMESTAMP", :datetime].inspect.should == "\"CURRENT_TIMESTAMP\".lit"
   end
 
   it "should convert unknown database types to strings" do

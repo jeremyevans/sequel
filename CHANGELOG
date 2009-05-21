@@ -1,5 +1,7 @@
 === HEAD
 
+* In the schema_dumper extension, do a much better job of parsing defaults from the database (jeremyevans)
+
 * On PostgreSQL, assume the public schema if one is not given and there is no default in Database#tables (jeremyevans)
 
 * Ignore a :default value if creating a String :text=>true or File column on MySQL, since it doesn't support defaults on text/blob columns (jeremyevans)
