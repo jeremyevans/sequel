@@ -60,8 +60,8 @@ module Sequel
     def create_table(name, options={}, &block)
       options = {:generator=>options} if options.is_a?(Schema::Generator)
       generator = options[:generator] || Schema::Generator.new(self, &block)
-      execute_ddl(create_table_sql(name, generator, options))
-      index_sql_list(name, generator.indexes).each{|sql| execute_ddl(sql)}
+      create_table_from_generator(name, generator, options)
+      create_table_indexes_from_generator(name, generator, options)
     end
     
     # Forcibly creates a table, attempting to drop it unconditionally (and catching any errors), then creating it.
@@ -169,6 +169,18 @@ module Sequel
     # See alter_table.
     def set_column_type(table, *args)
       alter_table(table) {set_column_type(*args)}
+    end
+
+    private
+
+    # Execute the create table statements using the generator.
+    def create_table_from_generator(name, generator, options)
+      execute_ddl(create_table_sql(name, generator, options))
+    end
+
+    # Execute the create index statements using the generator.
+    def create_table_indexes_from_generator(name, generator, options)
+      index_sql_list(name, generator.indexes).each{|sql| execute_ddl(sql)}
     end
   end
 end

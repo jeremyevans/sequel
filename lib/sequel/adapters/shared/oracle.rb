@@ -10,14 +10,6 @@ module Sequel
         self << create_sequence_sql(name, opts)
       end
 
-      def create_table(name, options={}, &block)
-        options = {:generator=>options} if options.is_a?(Schema::Generator)
-        generator = options[:generator] || Schema::Generator.new(self, &block)
-        drop_statement, create_statements = create_table_sql_list(name, generator, options)
-        (execute_ddl(drop_statement) rescue nil) if drop_statement
-        (create_statements + index_sql_list(name, generator.indexes)).each{|sql| execute_ddl(sql)}
-      end
-
       def create_trigger(*args)
         self << create_trigger_sql(*args)
       end
@@ -53,6 +45,12 @@ module Sequel
 
       def create_sequence_sql(name, opts={})
         "CREATE SEQUENCE #{quote_identifier(name)} start with #{opts [:start_with]||1} increment by #{opts[:increment_by]||1} nomaxvalue"
+      end
+
+      def create_table_from_generator(name, generator, options)
+        drop_statement, create_statements = create_table_sql_list(name, generator, options)
+        (execute_ddl(drop_statement) rescue nil) if drop_statement
+        create_statements.each{|sql| execute_ddl(sql)}
       end
 
       def create_table_sql_list(name, generator, options={})

@@ -31,26 +31,6 @@ module Sequel
         conn
       end
 
-      # Creates a table with the columns given in the provided block:
-      #
-      #   DB.create_table :posts do
-      #     primary_key :id, :serial
-      #     column :title, :text
-      #     column :content, :text
-      #     index :title
-      #   end
-      #
-      # See Schema::Generator.
-      # Firebird gets an override because of the mess of creating a
-      # generator for auto-incrementing primary keys.
-      def create_table(name, options={}, &block)
-        options = {:generator=>options} if options.is_a?(Schema::Generator)
-        generator = options[:generator] || Schema::Generator.new(self, &block)
-        drop_statement, create_statements = create_table_sql_list(name, generator, options)
-        (execute_ddl(drop_statement) rescue nil) if drop_statement
-        (create_statements + index_sql_list(name, generator.indexes)).each{|sql| execute_ddl(sql)}
-      end
-
       def create_trigger(*args)
         self << create_trigger_sql(*args)
       end
@@ -138,6 +118,14 @@ module Sequel
       
       def create_sequence_sql(name, opts={})
         "CREATE SEQUENCE #{quote_identifier(name)}"
+      end
+
+      # Firebird gets an override because of the mess of creating a
+      # sequence and trigger for auto-incrementing primary keys.
+      def create_table_from_generator(name, generator, options)
+        drop_statement, create_statements = create_table_sql_list(name, generator, options)
+        (execute_ddl(drop_statement) rescue nil) if drop_statement
+        create_statements.each{|sql| execute_ddl(sql)}
       end
 
       def create_table_sql_list(name, generator, options={})
