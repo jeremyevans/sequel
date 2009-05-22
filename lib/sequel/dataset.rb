@@ -259,6 +259,12 @@ module Sequel
       !(@opts.collect{|k,v| k unless v.nil?}.compact & opts).empty?
     end
 
+    # Whether this dataset is a simple SELECT * FROM table.
+    def simple_select_all?
+      o = @opts.reject{|k,v| v.nil?}
+      o.length == 1 && o[:from] && o[:from].length == 1
+    end
+
     private
     
     # Set the server to use to :default unless it is already set in the passed opts

@@ -1,5 +1,7 @@
 === HEAD
 
+* Make graphing a complex dataset work correctly (jeremyevans)
+
 * Fix MySQL command out of sync errors, disconnect from database if they occur (jeremyevans)
 
 * In the schema_dumper extension, do a much better job of parsing defaults from the database (jeremyevans)

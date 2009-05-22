@@ -69,7 +69,7 @@ module Sequel
       raise_alias_error.call if @opts[:graph] && @opts[:graph][:table_aliases] && @opts[:graph][:table_aliases].include?(table_alias)
 
       # Join the table early in order to avoid cloning the dataset twice
-      ds = join_table(options[:join_type] || :left_outer, table, join_conditions, :table_alias=>table_alias, :implicit_qualifier=>options[:implicit_qualifier], &block)
+      ds = join_table(options[:join_type] || :left_outer, dataset.simple_select_all? ? table : dataset, join_conditions, :table_alias=>table_alias, :implicit_qualifier=>options[:implicit_qualifier], &block)
       opts = ds.opts
 
       # Whether to include the table in the result set

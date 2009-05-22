@@ -23,9 +23,14 @@ describe Sequel::Dataset, " graphing" do
     ds1.opts.should_not == o1
   end
 
-  it "#graph should accept a dataset as the dataset" do
+  it "#graph should accept a simple dataset and pass the table to join" do
     ds = @ds1.graph(@ds2, :x=>:id)
     ds.sql.should == 'SELECT points.id, points.x, points.y, lines.id AS lines_id, lines.x AS lines_x, lines.y AS lines_y, lines.graph_id FROM points LEFT OUTER JOIN lines ON (lines.x = points.id)'
+  end
+
+  it "#graph should accept a complex dataset and pass it directly to join" do
+    ds = @ds1.graph(@ds2.filter(:x=>1), {:x=>:id})
+    ds.sql.should == 'SELECT points.id, points.x, points.y, lines.id AS lines_id, lines.x AS lines_x, lines.y AS lines_y, lines.graph_id FROM points LEFT OUTER JOIN (SELECT * FROM lines WHERE (x = 1)) AS lines ON (lines.x = points.id)'
   end
 
   it "#graph should accept a symbol table name as the dataset" do
