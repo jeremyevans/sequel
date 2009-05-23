@@ -12,6 +12,7 @@ env = nil
 logfile = nil
 migrate_dir = nil
 migrate_ver = nil
+backtrace = nil
 load_dirs = []
 
 opts = OptionParser.new do |opts|
@@ -68,6 +69,10 @@ opts = OptionParser.new do |opts|
     migrate_ver = Integer(v)
   end
 
+  opts.on("-t", "--trace", "Output the full backtrace if an exception is raised") do
+    backtrace = true
+  end
+  
   opts.on_tail("-v", "--version", "Show version") do
     puts "sequel #{Sequel.version}"
     exit
@@ -172,6 +177,7 @@ begin
     exit
   end
 rescue => e
+  raise e if backtrace
   error_proc["Error: #{e.class}: #{e.message}#{e.backtrace.first}"]
 end
 
