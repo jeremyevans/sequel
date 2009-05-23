@@ -1,5 +1,7 @@
 === HEAD
 
+* Add :ignore_index_errors option to Database#create_table and :ignore_errors option to Database#add_index (jeremyevans)
+
 * Make graphing a complex dataset work correctly (jeremyevans)
 
 * Fix MySQL command out of sync errors, disconnect from database if they occur (jeremyevans)

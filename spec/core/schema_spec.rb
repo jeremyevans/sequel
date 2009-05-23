@@ -333,6 +333,15 @@ context "DB#create_table" do
     }.should raise_error(Sequel::Error)
   end
 
+  specify "should ignore errors if the database raises an error on an index creation statement and the :ignore_index_errors option is used" do
+    @db.meta_def(:execute_ddl){|*a| raise Sequel::DatabaseError if /blah/.match(a.first); super(*a)}
+    lambda{@db.create_table(:cats){Integer :id; index :blah; index :id}}.should raise_error(Sequel::DatabaseError)
+    @db.sqls.should == ['CREATE TABLE cats (id integer)']
+    @db.sqls.clear
+    lambda{@db.create_table(:cats, :ignore_index_errors=>true){Integer :id; index :blah; index :id}}.should_not raise_error(Sequel::DatabaseError)
+    @db.sqls.should == ['CREATE TABLE cats (id integer)', 'CREATE INDEX cats_id_index ON cats (id)']
+  end
+
   specify "should accept multiple index definitions" do
     @db.create_table(:cats) do
       integer :id
@@ -640,6 +649,13 @@ context "DB#alter_table" do
       add_index :name
     end
     @db.sqls.should == ["CREATE INDEX cats_name_index ON cats (name)"]
+  end
+
+  specify "should ignore errors if the database raises an error on an add_index call and the :ignore_errors option is used" do
+    @db.meta_def(:execute_ddl){|*a| raise Sequel::DatabaseError}
+    lambda{@db.add_index(:cats, :id)}.should raise_error(Sequel::DatabaseError)
+    lambda{@db.add_index(:cats, :id, :ignore_errors=>true)}.should_not raise_error(Sequel::DatabaseError)
+    @db.sqls.should == nil
   end
 
   specify "should support add_primary_key" do

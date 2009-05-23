@@ -16,9 +16,18 @@ module Sequel
     #   DB.add_index :posts, :title
     #   DB.add_index :posts, [:author, :title], :unique => true
     #
+    #
+    # Options:
+    # * :ignore_errors - Ignore any DatabaseErrors that are raised
+    #
     # See alter_table.
-    def add_index(table, *args)
-      alter_table(table) {add_index(*args)}
+    def add_index(table, columns, options={})
+      e = options[:ignore_errors]
+      begin
+        alter_table(table){add_index(columns, options)}
+      rescue DatabaseError
+        raise unless e
+      end
     end
     
     # Alters the given table with the specified block. Example:
@@ -55,6 +64,7 @@ module Sequel
     #
     # Options:
     # * :temp - Create the table as a temporary table.
+    # * :ignore_index_errors - Ignore any errors when creating indexes.
     #
     # See Schema::Generator.
     def create_table(name, options={}, &block)
@@ -180,7 +190,14 @@ module Sequel
 
     # Execute the create index statements using the generator.
     def create_table_indexes_from_generator(name, generator, options)
-      index_sql_list(name, generator.indexes).each{|sql| execute_ddl(sql)}
+      e = options[:ignore_index_errors]
+      index_sql_list(name, generator.indexes).each do |sql|
+        begin
+          execute_ddl(sql)
+        rescue DatabaseError
+          raise unless e
+        end
+      end
     end
   end
 end
