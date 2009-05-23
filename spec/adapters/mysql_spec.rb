@@ -581,6 +581,12 @@ context "A MySQL database" do
       "CREATE UNIQUE INDEX posts_id_index USING btree ON posts (id)"
     ]
   end
+
+  specify "should not dump partial indexes" do
+    @db.create_table(:posts){text :id}
+    @db << "CREATE INDEX posts_id_index ON posts (id(10))"
+    @db.indexes.should == {}
+  end
 end
 
 context "MySQL::Dataset#insert and related methods" do

@@ -1,5 +1,7 @@
 === HEAD
 
+* Don't dump partial indexes in the MySQL adapter (jeremyevans)
+
 * Add :ignore_index_errors option to Database#create_table and :ignore_errors option to Database#add_index (jeremyevans)
 
 * Make graphing a complex dataset work correctly (jeremyevans)
