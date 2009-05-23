@@ -1,5 +1,7 @@
 === HEAD
 
+* Make schema_dumper extension ignore errors with indexes unless it is dumping in the database-specific type format (jeremyevans)
+
 * Don't dump partial indexes in the MySQL adapter (jeremyevans)
 
 * Add :ignore_index_errors option to Database#create_table and :ignore_errors option to Database#add_index (jeremyevans)

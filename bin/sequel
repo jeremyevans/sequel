@@ -128,10 +128,11 @@ begin
     start_time = Time.now
     TO_DB = connect_proc[db2]
     TO_DB.test_connection
+    same_db = DB.database_type==TO_DB.database_type
 
     puts "Databases connections successful"
-    schema_migration = eval(DB.dump_schema_migration(:indexes=>false, :same_db=>DB.database_type==TO_DB.database_type))
-    index_migration = eval(DB.dump_indexes_migration)
+    schema_migration = eval(DB.dump_schema_migration(:indexes=>false, :same_db=>same_db))
+    index_migration = eval(DB.dump_indexes_migration(:same_db=>same_db))
     puts "Migrations dumped successfully"
 
     schema_migration.apply(TO_DB, :up)
@@ -159,8 +160,9 @@ begin
     end
     puts "Finished copying data"
 
+    puts "Begin creating indexes"
     index_migration.apply(TO_DB, :up)
-    puts "Indexes created"
+    puts "Finished creating indexes"
 
     if TO_DB.database_type == :postgres
       TO_DB.tables.each{|t| TO_DB.reset_primary_key_sequence(t)}

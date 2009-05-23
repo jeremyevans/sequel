@@ -97,7 +97,7 @@ describe "Sequel::Database dump methods" do
       {:i1=>{:columns=>[:c1], :unique=>false},
        :t1_c2_c1_index=>{:columns=>[:c2, :c1], :unique=>true}}
     end
-    @d.dump_table_schema(:t1).should == "create_table(:t1) do\n  primary_key :c1\n  String :c2, :size=>20\n  \n  index [:c1], :name=>:i1\n  index [:c2, :c1], :unique=>true\nend"
+    @d.dump_table_schema(:t1).should == "create_table(:t1, :ignore_index_errors=>true) do\n  primary_key :c1\n  String :c2, :size=>20\n  \n  index [:c1], :name=>:i1\n  index [:c2, :c1], :unique=>true\nend"
   end
 
   it "should support dumping the whole database as a migration" do
@@ -212,13 +212,13 @@ END_MIG
     @d.dump_indexes_migration.should == <<-END_MIG
 Class.new(Sequel::Migration) do
   def up
-    add_index :t1, [:c1], :name=>:i1
-    add_index :t1, [:c2, :c1], :unique=>true
+    add_index :t1, [:c1], :ignore_errors=>true, :name=>:i1
+    add_index :t1, [:c2, :c1], :ignore_errors=>true, :unique=>true
   end
   
   def down
-    drop_index :t1, [:c1], :name=>:i1
-    drop_index :t1, [:c2, :c1], :unique=>true
+    drop_index :t1, [:c1], :ignore_errors=>true, :name=>:i1
+    drop_index :t1, [:c2, :c1], :ignore_errors=>true, :unique=>true
   end
 end
 END_MIG

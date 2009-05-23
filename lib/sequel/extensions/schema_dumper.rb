@@ -5,17 +5,19 @@ module Sequel
     STRING_DEFAULT_RE = /\A'(.*)'\z/
     
     # Dump indexes for all tables as a migration.  This complements
-    # the :indexes=>false option to dump_schema_migration.
-    def dump_indexes_migration
+    # the :indexes=>false option to dump_schema_migration. Options:
+    # * :same_db - Create a dump for the same database type, so
+    #   don't ignore errors if the index statements fail.
+    def dump_indexes_migration(options={})
       ts = tables
       <<END_MIG
 Class.new(Sequel::Migration) do
   def up
-#{ts.sort_by{|t| t.to_s}.map{|t| dump_table_indexes(t, :add_index)}.reject{|x| x == ''}.join("\n\n").gsub(/^/o, '    ')}
+#{ts.sort_by{|t| t.to_s}.map{|t| dump_table_indexes(t, :add_index, options)}.reject{|x| x == ''}.join("\n\n").gsub(/^/o, '    ')}
   end
   
   def down
-#{ts.sort_by{|t| t.to_s}.map{|t| dump_table_indexes(t, :drop_index)}.reject{|x| x == ''}.join("\n\n").gsub(/^/o, '    ')}
+#{ts.sort_by{|t| t.to_s}.map{|t| dump_table_indexes(t, :drop_index, options)}.reject{|x| x == ''}.join("\n\n").gsub(/^/o, '    ')}
   end
 end
 END_MIG
@@ -60,7 +62,7 @@ END_MIG
         indexes.each{|iname, iopts| send(:index, iopts[:columns], im.call(table, iname, iopts))} if indexes
       end
       commands = [gen.dump_columns, gen.dump_constraints, gen.dump_indexes].reject{|x| x == ''}.join("\n\n")
-      "create_table(#{table.inspect}) do\n#{commands.gsub(/^/o, '  ')}\nend"
+      "create_table(#{table.inspect}#{', :ignore_index_errors=>true' if !options[:same_db] && options[:indexes] != false && indexes && !indexes.empty?}) do\n#{commands.gsub(/^/o, '  ')}\nend"
     end
 
     private
@@ -193,14 +195,14 @@ END_MIG
 
     # Return a string that containing add_index/drop_index method calls for
     # creating the index migration.
-    def dump_table_indexes(table, meth)
+    def dump_table_indexes(table, meth, options={})
       return '' unless respond_to?(:indexes)
       im = method(:index_to_generator_opts)
       indexes = indexes(table).sort_by{|k,v| k.to_s} 
       gen = Schema::Generator.new(self) do
         indexes.each{|iname, iopts| send(:index, iopts[:columns], im.call(table, iname, iopts))}
       end
-      gen.dump_indexes(meth=>table)
+      gen.dump_indexes(meth=>table, :ignore_errors=>!options[:same_db])
     end
 
     # Convert the parsed index information into options to the Generators index method. 
@@ -268,12 +270,13 @@ END_MIG
       #   can be called outside of a generator but inside a migration.
       #   The value of this option should be the table name to use.
       # * :drop_index - Same as add_index, but create drop_index statements.
+      # * :ignore_errors - Add the ignore_errors option to the outputted indexes
       def dump_indexes(options={})
         indexes.map do |c|
           c = c.dup
           cols = c.delete(:columns)
           if table = options[:add_index] || options[:drop_index]
-            "#{options[:drop_index] ? 'drop' : 'add'}_index #{table.inspect}, #{cols.inspect}#{opts_inspect(c)}"
+            "#{options[:drop_index] ? 'drop' : 'add'}_index #{table.inspect}, #{cols.inspect}#{', :ignore_errors=>true' if options[:ignore_errors]}#{opts_inspect(c)}"
           else
             "index #{cols.inspect}#{opts_inspect(c)}"
           end
