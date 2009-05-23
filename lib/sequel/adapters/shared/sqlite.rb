@@ -264,7 +264,7 @@ module Sequel
       # Allow inserting of values directly from a dataset.
       def insert_sql(*values)
         if (values.size == 1) && values.first.is_a?(Sequel::Dataset)
-          "INSERT INTO #{source_list(@opts[:from])} #{values.first.sql};"
+          "#{insert_sql_base}#{source_list(@opts[:from])} #{values.first.sql};"
         else
           super(*values)
         end

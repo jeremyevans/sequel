@@ -1,5 +1,7 @@
 === HEAD
 
+* On MySQL, make Dataset#insert_ignore affect #insert as well as #multi_insert and #import (jeremyevans, tmm1)
+
 * Add -t option to bin/sequel to output the full backtrace if an exception is raised (jeremyevans)
 
 * Make schema_dumper extension ignore errors with indexes unless it is dumping in the database-specific type format (jeremyevans)

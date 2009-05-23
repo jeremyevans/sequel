@@ -251,11 +251,6 @@ module Sequel
         _filter(:having, *cond, &block)
       end
       
-      # MySQL doesn't use the SQL standard DEFAULT VALUES.
-      def insert_default_values_sql
-        "INSERT INTO #{source_list(@opts[:from])} () VALUES ()"
-      end
-
       # Transforms an CROSS JOIN to an INNER JOIN if the expr is not nil.
       # Raises an error on use of :full_outer type, since MySQL doesn't support it.
       def join_table(type, table, expr=nil, table_alias={})
@@ -325,7 +320,7 @@ module Sequel
           update_string = update_cols.map{|c| "#{quote_identifier(c)}=VALUES(#{quote_identifier(c)})"}.join(COMMA_SEPARATOR)
         end
         values = values.map {|r| literal(Array(r))}.join(COMMA_SEPARATOR)
-        ["INSERT#{' IGNORE' if opts[:insert_ignore]} INTO #{source_list(@opts[:from])} (#{identifier_list(columns)}) VALUES #{values}#{" ON DUPLICATE KEY UPDATE #{update_string}" if update_string}"]
+        ["#{insert_sql_base}#{source_list(@opts[:from])} (#{identifier_list(columns)}) VALUES #{values}#{" ON DUPLICATE KEY UPDATE #{update_string}" if update_string}"]
       end
       
       # MySQL uses the nonstandard ` (backtick) for quoting identifiers.
@@ -378,6 +373,16 @@ module Sequel
       end
 
       private
+
+      # MySQL supports INSERT IGNORE INTO
+      def insert_sql_base
+        "INSERT #{'IGNORE ' if opts[:insert_ignore]}INTO "
+      end
+
+      # MySQL doesn't use the SQL standard DEFAULT VALUES.
+      def insert_default_values_sql
+        "#{insert_sql_base}#{source_list(@opts[:from])} () VALUES ()"
+      end
 
       # Use MySQL Timestamp format
       def literal_datetime(v)

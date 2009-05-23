@@ -67,7 +67,7 @@ module Sequel
       
       def multi_insert_sql(columns, values)
         values = values.map {|r| "SELECT #{expression_list(r)}" }.join(" UNION ALL ")
-        ["INSERT INTO #{source_list(@opts[:from])} (#{identifier_list(columns)}) #{values}"]
+        ["#{insert_sql_base}#{source_list(@opts[:from])} (#{identifier_list(columns)}) #{values}"]
       end
 
       # Allows you to do .nolock on a query

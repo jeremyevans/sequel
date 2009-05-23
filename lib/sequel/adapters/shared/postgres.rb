@@ -690,7 +690,7 @@ module Sequel
         
         # postgresql 8.2 introduces support for multi-row insert
         values = values.map {|r| literal(Array(r))}.join(COMMA_SEPARATOR)
-        ["INSERT INTO #{source_list(@opts[:from])} (#{identifier_list(columns)}) VALUES #{values}"]
+        ["#{insert_sql_base}#{source_list(@opts[:from])} (#{identifier_list(columns)}) VALUES #{values}"]
       end
       
       private

@@ -720,6 +720,12 @@ context "MySQL::Dataset#insert and related methods" do
     ]
   end
   
+  specify "#insert_ignore should add the IGNORE keyword for single inserts" do
+    @d.insert_ignore.insert(:name => 'ghi')
+    MYSQL_DB.sqls.should == ["INSERT IGNORE INTO items (name) VALUES ('ghi')"]
+    @d.all.should == [{:name => 'ghi', :value => nil}]
+  end
+  
   specify "#on_duplicate_key_update should add the ON DUPLICATE KEY UPDATE and ALL columns when no args given" do
     @d.on_duplicate_key_update.import([:name,:value], 
       [['abc', 1], ['def',2]]

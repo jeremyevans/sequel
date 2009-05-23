@@ -7,6 +7,7 @@ module Sequel
     COLUMN_REF_RE2 = /\A([\w ]+)___([\w ]+)\z/.freeze
     COLUMN_REF_RE3 = /\A([\w ]+)__([\w ]+)\z/.freeze
     COUNT_FROM_SELF_OPTS = [:distinct, :group, :sql, :limit, :compounds]
+    INSERT_SQL_BASE="INSERT INTO ".freeze
     IS_LITERALS = {nil=>'NULL'.freeze, true=>'TRUE'.freeze, false=>'FALSE'.freeze}.freeze
     IS_OPERATORS = ::Sequel::SQL::ComplexExpression::IS_OPERATORS
     N_ARITY_OPERATORS = ::Sequel::SQL::ComplexExpression::N_ARITY_OPERATORS
@@ -317,7 +318,7 @@ module Sequel
         if values.empty?
           insert_default_values_sql
         else
-          "INSERT INTO #{from} VALUES #{literal(values)}"
+          "#{insert_sql_base}#{from} VALUES #{literal(values)}"
         end
       when Hash
         values = @opts[:defaults].merge(values) if @opts[:defaults]
@@ -330,10 +331,10 @@ module Sequel
             fl << literal(String === k ? k.to_sym : k)
             vl << literal(v)
           end
-          "INSERT INTO #{from} (#{fl.join(COMMA_SEPARATOR)}) VALUES (#{vl.join(COMMA_SEPARATOR)})"
+          "#{insert_sql_base}#{from} (#{fl.join(COMMA_SEPARATOR)}) VALUES (#{vl.join(COMMA_SEPARATOR)})"
         end
       when Dataset
-        "INSERT INTO #{from} #{literal(values)}"
+        "#{insert_sql_base}#{from} #{literal(values)}"
       end
     end
     
@@ -532,7 +533,7 @@ module Sequel
     # This method should be overridden by descendants if the support
     # inserting multiple records in a single SQL statement.
     def multi_insert_sql(columns, values)
-      s = "INSERT INTO #{source_list(@opts[:from])} (#{identifier_list(columns)}) VALUES "
+      s = "#{insert_sql_base}#{source_list(@opts[:from])} (#{identifier_list(columns)}) VALUES "
       values.map{|r| s + literal(r)}
     end
     
@@ -869,9 +870,14 @@ module Sequel
       columns.map{|i| quote_identifier(i)}.join(COMMA_SEPARATOR)
     end
 
+    # SQL statement for the beginning of an INSERT statement
+    def insert_sql_base
+      INSERT_SQL_BASE
+    end
+
     # SQL statement for formatting an insert statement with default values
     def insert_default_values_sql
-      "INSERT INTO #{source_list(@opts[:from])} DEFAULT VALUES"
+      "#{insert_sql_base}#{source_list(@opts[:from])} DEFAULT VALUES"
     end
 
     # Inverts the given order by breaking it into a list of column references
