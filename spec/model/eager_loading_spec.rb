@@ -856,6 +856,20 @@ describe Sequel::Model, "#eager_graph" do
     a.members.last.values.should == {:id => 5}
   end
 
+  it "should respect the :cartesian_product_number option" do 
+    GraphBand.many_to_one :other_vocalist, :class=>'GraphBandMember', :key=>:vocalist_id, :cartesian_product_number=>1
+    ds = GraphBand.eager_graph(:members, :other_vocalist)
+    ds.sql.should == 'SELECT bands.id, bands.vocalist_id, members.id AS members_id, other_vocalist.id AS other_vocalist_id FROM bands LEFT OUTER JOIN bm ON (bm.band_id = bands.id) LEFT OUTER JOIN members ON (members.id = bm.member_id) LEFT OUTER JOIN members AS other_vocalist ON (other_vocalist.id = bands.vocalist_id)'
+    def ds.fetch_rows(sql, &block)
+      yield({:id=>2, :vocalist_id=>6, :members_id=>5, :other_vocalist_id=>6})
+      yield({:id=>2, :vocalist_id=>6, :members_id=>5, :other_vocalist_id=>6})
+    end
+    a = ds.all
+    a.should == [GraphBand.load(:id=>2, :vocalist_id => 6)]
+    a.first.other_vocalist.should == GraphBandMember.load(:id=>6)
+    a.first.members.should == [GraphBandMember.load(:id=>5)]
+  end
+
   it "should drop duplicate items that occur in sequence if the graph could be a cartesian product" do
     ds = GraphBand.eager_graph(:members, :genres)
     ds.sql.should == 'SELECT bands.id, bands.vocalist_id, members.id AS members_id, genres.id AS genres_id FROM bands LEFT OUTER JOIN bm ON (bm.band_id = bands.id) LEFT OUTER JOIN members ON (members.id = bm.member_id) LEFT OUTER JOIN bg ON (bg.band_id = bands.id) LEFT OUTER JOIN genres ON (genres.id = bg.genre_id)'
@@ -1072,7 +1086,7 @@ describe Sequel::Model, "#eager_graph" do
     GraphAlbum.eager_graph(:inner_genres).sql.should == 'SELECT albums.id, albums.band_id, inner_genres.id AS inner_genres_id FROM albums INNER JOIN ag ON (ag.album_id = albums.id) INNER JOIN genres AS inner_genres ON (inner_genres.id = ag.genre_id)'
   end
 
-  it "should respect the association's :graph_join_type option" do 
+  it "should respect the association's :graph_join_table_join_type option" do 
     GraphAlbum.many_to_many :inner_genres, :class=>'GraphGenre', :left_key=>:album_id, :right_key=>:genre_id, :join_table=>:ag, :graph_join_table_join_type=>:inner
     GraphAlbum.eager_graph(:inner_genres).sql.should == 'SELECT albums.id, albums.band_id, inner_genres.id AS inner_genres_id FROM albums INNER JOIN ag ON (ag.album_id = albums.id) LEFT OUTER JOIN genres AS inner_genres ON (inner_genres.id = ag.genre_id)'
 

@@ -57,6 +57,7 @@ module Sequel
           self[:class] ||= constantize(self[:class_name])
         end
       
+
         # Name symbol for the dataset association method
         def dataset_method
           :"#{self[:name]}_dataset"
@@ -407,6 +408,9 @@ module Sequel
         #     before a new item is added to the association.
         #   - :before_remove - Symbol, Proc, or array of both/either specifying a callback to call
         #     before an item is removed from the association.
+        #   - :cartesian_product_number - he number of joins completed by this association that could cause more
+        #     than one row for each row in the current table (default: 0 for many_to_one associations,
+        #     1 for *_to_many associations).
         #   - :class - The associated class or its name. If not
         #     given, uses the association's name, which is camelized (and
         #     singularized unless the type is :many_to_one)
@@ -642,6 +646,7 @@ module Sequel
           right = (opts[:right_key] ||= opts.default_right_key)
           left_pk = (opts[:left_primary_key] ||= self.primary_key)
           opts[:class_name] ||= camelize(singularize(name))
+          opts[:cartesian_product_number] ||= 1
           join_table = (opts[:join_table] ||= opts.default_join_table)
           left_key_alias = opts[:left_key_alias] ||= opts.default_associated_key_alias
           graph_jt_conds = opts[:graph_join_table_conditions] = opts[:graph_join_table_conditions] ? opts[:graph_join_table_conditions].to_a : []
@@ -698,6 +703,7 @@ module Sequel
           model = self
           opts[:key] = opts.default_key unless opts.include?(:key)
           key = opts[:key]
+          opts[:cartesian_product_number] ||= 0
           opts[:class_name] ||= camelize(name)
           opts[:dataset] ||= proc do
             klass = opts.associated_class
@@ -767,6 +773,7 @@ module Sequel
           use_only_conditions = opts.include?(:graph_only_conditions)
           only_conditions = opts[:graph_only_conditions]
           conditions = opts[:graph_conditions]
+          opts[:cartesian_product_number] ||= 1
           graph_block = opts[:graph_block]
           opts[:eager_grapher] ||= proc do |ds, assoc_alias, table_alias|
             ds = ds.graph(opts.associated_class, use_only_conditions ? only_conditions : [[key, primary_key]] + conditions, :select=>select, :table_alias=>assoc_alias, :join_type=>join_type, :implicit_qualifier=>table_alias, &graph_block)
@@ -1091,7 +1098,7 @@ module Sequel
             # :requirements - array of requirements for this association
             # :alias_association_type_map - the type of association for this association
             # :alias_association_name_map - the name of the association for this association
-            clone(:eager_graph=>{:requirements=>{}, :master=>model.table_name, :alias_association_type_map=>{}, :alias_association_name_map=>{}, :reciprocals=>{}})
+            clone(:eager_graph=>{:requirements=>{}, :master=>model.table_name, :alias_association_type_map=>{}, :alias_association_name_map=>{}, :reciprocals=>{}, :cartesian_product_number=>0})
           end
           ds.eager_graph_associations(ds, model, table_name, [], *associations)
         end
@@ -1120,6 +1127,7 @@ module Sequel
           eager_graph[:requirements][assoc_table_alias] = requirements.dup
           eager_graph[:alias_association_name_map][assoc_table_alias] = assoc_name
           eager_graph[:alias_association_type_map][assoc_table_alias] = r.returns_array?
+          eager_graph[:cartesian_product_number] += r[:cartesian_product_number] || 2
           ds = ds.eager_graph_associations(ds, r.associated_class, assoc_table_alias, requirements + [assoc_table_alias], *associations) unless associations.empty?
           ds
         end
@@ -1207,7 +1215,7 @@ module Sequel
           end
       
           # Remove duplicate records from all associations if this graph could possibly be a cartesian product
-          eager_graph_make_associations_unique(records, dependency_map, alias_map, type_map) if type_map.values.select{|v| v}.length > 1
+          eager_graph_make_associations_unique(records, dependency_map, alias_map, type_map) if eager_graph[:cartesian_product_number] > 1
           
           # Replace the array of object graphs with an array of model objects
           record_graphs.replace(records)
@@ -1259,14 +1267,13 @@ module Sequel
               records_map[ta][key] = rec
             end
             assoc_name = alias_map[ta]
-            case type_map[ta]
-            when false
-              current.associations[assoc_name] = rec
-            else
+            if type_map[ta]
               current.associations[assoc_name].push(rec) 
               if reciprocal = reciprocal_map[ta]
                 rec.associations[reciprocal] = current
               end
+            else
+              current.associations[assoc_name] = rec
             end
             # Recurse into dependencies of the current object
             eager_graph_build_associations_graph(deps, alias_map, type_map, reciprocal_map, records_map, rec, record_graph)
@@ -1281,12 +1288,11 @@ module Sequel
         def eager_graph_make_associations_unique(records, dependency_map, alias_map, type_map)
           records.each do |record|
             dependency_map.each do |ta, deps|
-              list = if !type_map[ta]
-                item = record.send(alias_map[ta])
-                [item] if item
-              else
-                list = record.send(alias_map[ta])
+              list = record.send(alias_map[ta])
+              list = if type_map[ta]
                 list.uniq!
+              else
+                [list] if list
               end
               # Recurse into dependencies
               eager_graph_make_associations_unique(list, deps, alias_map, type_map) if list

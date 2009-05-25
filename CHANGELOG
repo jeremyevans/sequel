@@ -1,5 +1,7 @@
 === HEAD
 
+* Add the :cartesian_product_number option to associations, for specifying if they can cause a cartesian product (jeremyevans)
+
 * Make :eager_graph association option work correctly when eagerly loading many_to_many associations (jeremyevans)
 
 * Make eager_unique_table_alias consider joined tables as well as tables in the FROM clause (jeremyevans)
