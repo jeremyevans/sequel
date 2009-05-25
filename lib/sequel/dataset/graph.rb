@@ -167,7 +167,7 @@ module Sequel
     # #set_graph_aliases.
     def add_graph_aliases(graph_aliases)
       ds = select_more(*graph_alias_columns(graph_aliases))
-      ds.opts[:graph_aliases] = (ds.opts[:graph_aliases] || {}).merge(graph_aliases)
+      ds.opts[:graph_aliases] = (ds.opts[:graph_aliases] || ds.opts[:graph][:column_aliases] || {}).merge(graph_aliases)
       ds
     end
 
