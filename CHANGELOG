@@ -1,5 +1,7 @@
 === HEAD
 
+* Fix using :conditions that are a placeholder string in an association (e.g. :conditions=>['a = ?', 42]) (jeremyevans)
+
 * On MySQL, make Dataset#insert_ignore affect #insert as well as #multi_insert and #import (jeremyevans, tmm1)
 
 * Add -t option to bin/sequel to output the full backtrace if an exception is raised (jeremyevans)

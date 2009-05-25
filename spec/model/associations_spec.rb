@@ -1225,6 +1225,7 @@ describe Sequel::Model, "many_to_many" do
     a = n.attributes_dataset
     a.should be_a_kind_of(Sequel::Dataset)
     a.sql.should == 'SELECT attributes.* FROM attributes INNER JOIN attributes_nodes ON ((attributes_nodes.attribute_id = attributes.id) AND (attributes_nodes.node_id = 1234)) WHERE (a = 32)'
+    n.attributes.should == [@c1.load({})]
   end
   
   it "should support an order option" do

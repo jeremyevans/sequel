@@ -808,7 +808,9 @@ module Sequel
           ds.association_reflection = opts
           opts[:extend].each{|m| ds.extend(m)}
           ds = ds.select(*opts.select) if opts.select
-          ds = ds.filter(opts[:conditions]) if opts[:conditions]
+          if c = opts[:conditions]
+            ds = (c.is_a?(Array) && !Sequel.condition_specifier?(c)) ? ds.filter(*c) : ds.filter(c)
+          end
           ds = ds.order(*opts[:order]) if opts[:order]
           ds = ds.limit(*opts[:limit]) if opts[:limit]
           ds = ds.eager(*opts[:eager]) if opts[:eager]
