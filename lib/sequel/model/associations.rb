@@ -72,6 +72,12 @@ module Sequel
           true
         end
     
+        # By default associations do not need to select a key in an associated table
+        # to eagerly load.
+        def eager_loading_use_associated_key?
+          false
+        end
+
         # Whether to eagerly graph a lazy dataset, true by default.  If this
         # is false, the association won't respect the :eager_graph option
         # when loading the association for a single record.
@@ -223,11 +229,31 @@ module Sequel
       class ManyToManyAssociationReflection < AssociationReflection
         ASSOCIATION_TYPES[:many_to_many] = self
     
+        # The alias to use for the associated key when eagerly loading
+        def associated_key_alias
+          self[:left_key_alias]
+        end
+
+        # The column to use for the associated key when eagerly loading
+        def associated_key_column
+          self[:left_key]
+        end
+
+        # The table containing the column to use for the associated key when eagerly loading
+        def associated_key_table
+          self[:join_table]
+        end
+
+        # The default associated key alias
+        def default_associated_key_alias
+          :x_foreign_key_x
+        end
+      
         # Default name symbol for the join table.
         def default_join_table
           [self[:class_name], self[:model].name].map{|i| underscore(pluralize(demodulize(i)))}.sort.join('_').to_sym
         end
-      
+
         # Default foreign key name symbol for key in join table that points to
         # current table's primary key (or :left_primary_key column).
         def default_left_key
@@ -245,6 +271,11 @@ module Sequel
           self[:left_primary_key]
         end
     
+        # many_to_many associations need to select a key in an associated table to eagerly load
+        def eager_loading_use_associated_key?
+          true
+        end
+
         # Whether the associated object needs a primary key to be added/removed,
         # true for many_to_many associations.
         def need_associated_primary_key?
@@ -532,13 +563,20 @@ module Sequel
           association_reflections.keys
         end
 
-        # Modify and return eager loading dataset based on association options
+        # Modify and return eager loading dataset based on association options. Options:
         def eager_loading_dataset(opts, ds, select, associations)
           ds = ds.select(*select) if select
-          ds = ds.filter(opts[:conditions]) if opts[:conditions]
+          if c = opts[:conditions]
+            ds = (c.is_a?(Array) && !Sequel.condition_specifier?(c)) ? ds.filter(*c) : ds.filter(c)
+          end
           ds = ds.order(*opts[:order]) if opts[:order]
           ds = ds.eager(opts[:eager]) if opts[:eager]
-          ds = ds.eager_graph(opts[:eager_graph]) if opts[:eager_graph]
+          if opts[:eager_graph]
+            ds = ds.eager_graph(opts[:eager_graph])
+            ds = ds.add_graph_aliases(opts.associated_key_alias=>[opts.associated_class.table_name, opts.associated_key_alias, SQL::QualifiedIdentifier.new(opts.associated_key_table, opts.associated_key_column)]) if opts.eager_loading_use_associated_key?
+          else
+            ds.select_more(SQL::AliasedExpression.new(SQL::QualifiedIdentifier.new(opts.associated_key_table, opts.associated_key_column), opts.associated_key_alias)) if opts.eager_loading_use_associated_key?
+          end
           ds = ds.eager(associations) unless Array(associations).empty?
           ds = opts[:eager_block].call(ds) if opts[:eager_block]
           ds
@@ -605,8 +643,7 @@ module Sequel
           left_pk = (opts[:left_primary_key] ||= self.primary_key)
           opts[:class_name] ||= camelize(singularize(name))
           join_table = (opts[:join_table] ||= opts.default_join_table)
-          left_key_alias = opts[:left_key_alias] ||= :x_foreign_key_x
-          left_key_select = opts[:left_key_select] ||= SQL::QualifiedIdentifier.new(join_table, left).as(opts[:left_key_alias])
+          left_key_alias = opts[:left_key_alias] ||= opts.default_associated_key_alias
           graph_jt_conds = opts[:graph_join_table_conditions] = opts[:graph_join_table_conditions] ? opts[:graph_join_table_conditions].to_a : []
           opts[:graph_join_table_join_type] ||= opts[:graph_join_type]
           opts[:after_load].unshift(:array_uniq!) if opts[:uniq]
@@ -616,7 +653,7 @@ module Sequel
           opts[:eager_loader] ||= proc do |key_hash, records, associations|
             h = key_hash[left_pk]
             records.each{|object| object.associations[name] = []}
-            model.eager_loading_dataset(opts, opts.associated_class.inner_join(join_table, [[right, opts.right_primary_key], [left, h.keys]]), Array(opts.select) + Array(left_key_select), associations).all do |assoc_record|
+            model.eager_loading_dataset(opts, opts.associated_class.inner_join(join_table, [[right, opts.right_primary_key], [left, h.keys]]), Array(opts.select), associations).all do |assoc_record|
               next unless objects = h[assoc_record.values.delete(left_key_alias)]
               objects.each{|object| object.associations[name].push(assoc_record)}
             end
@@ -1181,6 +1218,7 @@ module Sequel
         # N (starting at 0 and increasing until an unused one is found).
         def eager_unique_table_alias(ds, table_alias)
           used_aliases = ds.opts[:from]
+          used_aliases += ds.opts[:join].map{|j| j.table_alias || j.table} if ds.opts[:join]
           graph = ds.opts[:graph]
           used_aliases += graph[:table_aliases].keys if graph
           if used_aliases.include?(table_alias)

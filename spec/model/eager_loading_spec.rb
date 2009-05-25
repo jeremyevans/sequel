@@ -22,6 +22,7 @@ describe Sequel::Model, "#eager" do
       one_to_many :albums, :class=>'EagerAlbum', :key=>:band_id, :eager=>:tracks
       one_to_many :graph_albums, :class=>'EagerAlbum', :key=>:band_id, :eager_graph=>:tracks
       many_to_many :members, :class=>'EagerBandMember', :left_key=>:band_id, :right_key=>:member_id, :join_table=>:bm
+      many_to_many :graph_members, :clone=>:members, :eager_graph=>:bands
       one_to_many :good_albums, :class=>'EagerAlbum', :key=>:band_id, :eager_block=>proc{|ds| ds.filter(:name=>'good')} do |ds|
         ds.filter(:name=>'Good')
       end
@@ -299,6 +300,27 @@ describe Sequel::Model, "#eager" do
     MODEL_DB.sqls.length.should == 2
   end
   
+  it "should cascade eagerly loading when the :eager_graph association option is used with a many_to_many association" do
+    EagerBandMember.dataset.extend(Module.new {
+      def columns
+        [:id]
+      end
+      def fetch_rows(sql)
+        @db << sql
+        yield({:id=>5, :bands_id=>2, :p_k=>6, :x_foreign_key_x=>2})
+        yield({:id=>5, :bands_id=>3, :p_k=>6, :x_foreign_key_x=>2})
+      end
+    })
+    a = EagerBand.eager(:graph_members).all
+    a.should == [EagerBand.load(:id=>2)]
+    MODEL_DB.sqls.should == ['SELECT * FROM bands', 
+                             'SELECT members.id, bands.id AS bands_id, bands.p_k, bm.band_id AS x_foreign_key_x FROM members INNER JOIN bm ON ((bm.member_id = members.id) AND (bm.band_id IN (2))) LEFT OUTER JOIN bm AS bm_0 ON (bm_0.member_id = members.id) LEFT OUTER JOIN bands ON (bands.id = bm_0.band_id) ORDER BY bands.id']
+    a = a.first
+    a.graph_members.should == [EagerBandMember.load(:id=>5)]
+    a.graph_members.first.bands.should == [EagerBand.load(:id=>2, :p_k=>6), EagerBand.load(:id=>3, :p_k=>6)]
+    MODEL_DB.sqls.length.should == 2
+  end
+  
   it "should respect :eager_graph when lazily loading an association" do
     a = EagerBand.all
     a.should be_a_kind_of(Array)
@@ -326,6 +348,24 @@ describe Sequel::Model, "#eager" do
     a.tracks.first.should be_a_kind_of(EagerTrack)
     a.tracks.first.values.should == {:id => 3, :album_id => 1}
     MODEL_DB.sqls.length.should == 2
+  end
+  
+  it "should respect :eager_graph when lazily loading a many_to_many association" do
+    EagerBandMember.dataset.extend(Module.new {
+      def columns
+        [:id]
+      end
+      def fetch_rows(sql)
+        @db << sql
+        yield({:id=>5, :bands_id=>2, :p_k=>6})
+        yield({:id=>5, :bands_id=>3, :p_k=>6})
+      end
+    })
+    a = EagerBand.load(:id=>2)
+    a.graph_members.should == [EagerBandMember.load(:id=>5)]
+    MODEL_DB.sqls.should == ['SELECT members.id, bands.id AS bands_id, bands.p_k FROM members INNER JOIN bm ON ((bm.member_id = members.id) AND (bm.band_id = 2)) LEFT OUTER JOIN bm AS bm_0 ON (bm_0.member_id = members.id) LEFT OUTER JOIN bands ON (bands.id = bm_0.band_id) ORDER BY bands.id']
+    a.graph_members.first.bands.should == [EagerBand.load(:id=>2, :p_k=>6), EagerBand.load(:id=>3, :p_k=>6)]
+    MODEL_DB.sqls.length.should == 1
   end
   
   it "should respect :conditions when eagerly loading" do

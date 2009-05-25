@@ -1,5 +1,9 @@
 === HEAD
 
+* Make :eager_graph association option work correctly when eagerly loading many_to_many associations (jeremyevans)
+
+* Make eager_unique_table_alias consider joined tables as well as tables in the FROM clause (jeremyevans)
+
 * Make add_graph_aliases work correctly even if set_graph_aliases hasn't been used (jeremyevans)
 
 * Fix using :conditions that are a placeholder string in an association (e.g. :conditions=>['a = ?', 42]) (jeremyevans)
