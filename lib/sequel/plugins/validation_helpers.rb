@@ -1,30 +1,30 @@
 module Sequel
   module Plugins
+    # The validation_helpers plugin contains instance method equivalents for most of the legacy
+    # class-level validations.  The names and APIs are different, though.
+    #
+    # The validates_unique validation has a unique API, but the other validations have
+    # the API explained here:
+    #
+    # Arguments:
+    # * atts - Single attribute symbol or an array of attribute symbols specifying the
+    #   attribute(s) to validate.
+    # Options:
+    # * :allow_blank - Whether to skip the validation if the value is blank.  You should
+    #   make sure all objects respond to blank if you use this option, which you can do by
+    #   requiring 'sequel/extensions/blank'
+    # * :allow_missing - Whether to skip the validation if the attribute isn't a key in the
+    #   values hash.  This is different from allow_nil, because Sequel only sends the attributes
+    #   in the values when doing an insert or update.  If the attribute is not present, Sequel
+    #   doesn't specify it, so the database will use the table's default value.  This is different
+    #   from having an attribute in values with a value of nil, which Sequel will send as NULL.
+    #   If your database table has a non NULL default, this may be a good option to use.  You
+    #   don't want to use allow_nil, because if the attribute is in values but has a value nil,
+    #   Sequel will attempt to insert a NULL value into the database, instead of using the
+    #   database's default.
+    # * :allow_nil - Whether to skip the validation if the value is nil.
+    # * :message - The message to use
     module ValidationHelpers
-      # ValidationHelpers contains instance method equivalents for most of the previous
-      # default validations.  The names and APIs have changed, though.  
-      #
-      # The validates_unique validation has a unique API, but the other validations have
-      # the API explained here:
-      #
-      # Arguments:
-      # * atts - Single attribute symbol or an array of attribute symbols specifying the
-      #   attribute(s) to validate.
-      # Options:
-      # * :allow_blank - Whether to skip the validation if the value is blank.  You should
-      #   make sure all objects respond to blank if you use this option, which you can do by
-      #   requiring 'sequel/extensions/blank'
-      # * :allow_missing - Whether to skip the validation if the attribute isn't a key in the
-      #   values hash.  This is different from allow_nil, because Sequel only sends the attributes
-      #   in the values when doing an insert or update.  If the attribute is not present, Sequel
-      #   doesn't specify it, so the database will use the table's default value.  This is different
-      #   from having an attribute in values with a value of nil, which Sequel will send as NULL.
-      #   If your database table has a non NULL default, this may be a good option to use.  You
-      #   don't want to use allow_nil, because if the attribute is in values but has a value nil,
-      #   Sequel will attempt to insert a NULL value into the database, instead of using the
-      #   database's default.
-      # * :allow_nil - Whether to skip the validation if the value is nil.
-      # * :message - The message to use
       module InstanceMethods 
         # Check that the attribute values are the given exact length.
         def validates_exact_length(exact, atts, opts={})
