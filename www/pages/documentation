@@ -40,7 +40,7 @@
 <h3>Presentations</h3>
 
 <ul>
-<li><a href="static/larc2009_presentation/sequel-larc2009-pres.html">Jeremy Evans's &quot;Sequel: The Database Toolkit for Ruby&quot; Presentation at LA Ruby Conf 2009</a></li>
+<li><a href="static/larc2009_presentation/sequel-larc2009-pres.html">Jeremy Evans's &quot;Sequel: The Database Toolkit for Ruby&quot; Presentation at LA Ruby Conf 2009</a> (<a href="http://larubyconf2009.confreaks.com/04-apr-2009-11-20-sequel-jeremy-evans.html">Video</a>)</li>
 <li><a href="static/mwrc2009_presentation.html">Jeremy Evans's &quot;Sequel: The Database Toolkit for Ruby&quot; Presentation at MountainWest RubyConf 2009</a> (<a href="http://mwrc2009.confreaks.com/13-mar-2009-12-30-sequel-jeremy-evans.html">Video</a>) (<a href="static/mwrc2009_presentation.txt">Transcript</a>)</li>
 <li><a href="http://assets.loriholden.com/presentations/merbcamp2008/">Lori Holden's &quot;Merb And Sequel&quot; Presentation at Merbcamp 2008</a></li>
 </ul>
