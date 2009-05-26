@@ -585,7 +585,7 @@ context "A MySQL database" do
   specify "should not dump partial indexes" do
     @db.create_table(:posts){text :id}
     @db << "CREATE INDEX posts_id_index ON posts (id(10))"
-    @db.indexes.should == {}
+    @db.indexes(:posts).should == {}
   end
 end
 

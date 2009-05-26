@@ -36,7 +36,7 @@ module Sequel
       # is an array of symbols of column names.  The value of :unique is true or false
       # depending on if the index is unique.
       #
-      # Does not include the primary key index or indexes on partial indexes.
+      # Does not include the primary key index or indexes on partial keys.
       def indexes(table)
         indexes = {}
         remove_indexes = []
@@ -45,8 +45,9 @@ module Sequel
         metadata_dataset.with_sql("SHOW INDEX FROM ?", SQL::Identifier.new(im.call(table))).each do |r|
           name = r[:Key_name]
           next if name == PRIMARY
+          name = m.call(name)
           remove_indexes << name if r[:Sub_part]
-          i = indexes[m.call(name)] ||= {:columns=>[], :unique=>r[:Non_unique] != 1}
+          i = indexes[name] ||= {:columns=>[], :unique=>r[:Non_unique] != 1}
           i[:columns] << m.call(r[:Column_name])
         end
         indexes.reject{|k,v| remove_indexes.include?(k)}
