@@ -10,7 +10,7 @@ module Sequel
     #
     #    Artist.many_through_many :tags, [[:albums_artists, :artist_id, :album_id], [:albums, :id, :id], [:albums_tags, :album_id, :tag_id]]
     #
-    # Which will give you the tags for all of the artists's albums.
+    # Which will give you the tags for all of the artist's albums.
     #
     # Here are some more examples:
     #
@@ -22,7 +22,12 @@ module Sequel
     #
     #   # All albums by artists that are associated to any album that this artist is associated to
     #   Artist.many_through_many :artist_albums, [[:albums_artists, :artist_id, :album_id], [:albums, :id, :id], \
-    #    [:albums_artists, :album_id, :artist_id], [:artists, :id, :id], [:albums_artists, :artist_id, :album_id]]
+    #    [:albums_artists, :album_id, :artist_id], [:artists, :id, :id], [:albums_artists, :artist_id, :album_id]], \
+    #    :class=>:Album
+    #
+    #   # All tracks on albums by this artist
+    #   Artist.many_through_many :tracks, [[:albums_artists, :artist_id, :album_id], [:albums, :id, :id]], \
+    #    :right_primary_key=>:album_id
     module ManyThroughMany
       # The AssociationReflection subclass for many_through_many associations.
       class ManyThroughManyAssociationReflection < Sequel::Model::Associations::ManyToManyAssociationReflection
