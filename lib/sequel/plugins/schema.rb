@@ -1,5 +1,13 @@
 module Sequel
   module Plugins
+    # Sequel's built in schema plugin allows you to define your schema
+    # directly in the model using Model.set_schema (which takes a block
+    # similar to Database#create_table), and use Model.create_table to
+    # create a table using the schema information.
+    #
+    # This plugin is mostly suited to test code.  If there is any
+    # chance that your application's schema could change, you should
+    # be using the migration extension instead.
     module Schema
       module ClassMethods
         # Creates table, using the column information from set_schema.
