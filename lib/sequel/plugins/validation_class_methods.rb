@@ -1,7 +1,12 @@
 module Sequel
-  require 'extensions/blank'
+  extension :blank
 
   module Plugins
+    # Sequel's built-in validation_class_methods plugin adds backwards compatibility
+    # for the legacy class-level validation methods (e.g. validates_presence_of :column).
+    #
+    # It is recommended to use the validation_helpers plugin instead of this one,
+    # as it is less complex and more flexible.
     module ValidationClassMethods
       # Setup the validations hash for the given model.
       def self.apply(model)
