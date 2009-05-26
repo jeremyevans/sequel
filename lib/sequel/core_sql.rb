@@ -210,6 +210,7 @@ class Symbol
   include Sequel::SQL::BooleanMethods
   include Sequel::SQL::NumericMethods
   include Sequel::SQL::StringMethods
+  include Sequel::SQL::SubscriptMethods
   include Sequel::SQL::ComplexExpressionMethods
   include Sequel::SQL::InequalityMethods if RUBY_VERSION < '1.9.0'
 
@@ -237,12 +238,4 @@ class Symbol
     Sequel::SQL::Function.new(self, *args)
   end
   alias_method(:[], :sql_function) if RUBY_VERSION < '1.9.0'
-
-  # Return an SQL array subscript with the given arguments.
-  #
-  #   :array.sql_subscript(1) # SQL: array[1]
-  #   :array.sql_subscript(1, 2) # SQL: array[1, 2]
-  def sql_subscript(*sub)
-    Sequel::SQL::Subscript.new(self, sub.flatten)
-  end
 end

@@ -2759,3 +2759,88 @@ context "Sequel::Dataset #set_overrides" do
     @ds.set_overrides(:x=>2).update_sql.should == "UPDATE items SET x = 1"
   end
 end
+
+context "Sequel::Dataset#qualify_to" do
+  specify "should qualify_to the first source" do
+    MockDatabase.new[:t].filter{a<b}.qualify_to(:e).sql.should == 'SELECT e.* FROM t WHERE (e.a < e.b)'
+  end
+end
+
+context "Sequel::Dataset#qualify_to_first_source" do
+  before do
+    @ds = MockDatabase.new[:t]
+  end
+
+  specify "should qualify_to the first source" do
+    @ds.qualify_to_first_source.sql.should == 'SELECT t.* FROM t'
+    @ds.should_receive(:qualify_to).with(:t).once
+    @ds.qualify_to_first_source
+  end
+
+  specify "should handle the select, order, where, having, and group options/clauses" do
+    @ds.select(:a).filter(:a=>1).order(:a).group(:a).having(:a).qualify_to_first_source.sql.should == \
+      'SELECT t.a FROM t WHERE (t.a = 1) GROUP BY t.a HAVING t.a ORDER BY t.a'
+  end
+
+  specify "should handle the select using a table.* if all columns are currently selected" do
+    @ds.filter(:a=>1).order(:a).group(:a).having(:a).qualify_to_first_source.sql.should == \
+      'SELECT t.* FROM t WHERE (t.a = 1) GROUP BY t.a HAVING t.a ORDER BY t.a'
+  end
+
+  specify "should handle hashes in select option" do
+    @ds.select(:a=>:b).qualify_to_first_source.sql.should == 'SELECT t.a AS b FROM t'
+  end
+
+  specify "should handle symbols" do
+    @ds.select(:a, :b__c, :d___e, :f__g___h).qualify_to_first_source.sql.should == 'SELECT t.a, b.c, t.d AS e, f.g AS h FROM t'
+  end
+
+  specify "should handle arrays" do
+    @ds.filter(:a=>[:b, :c]).qualify_to_first_source.sql.should == 'SELECT t.* FROM t WHERE (t.a IN (t.b, t.c))'
+  end
+
+  specify "should handle hashes" do
+    @ds.filter(:a=>{:b=>:c}).qualify_to_first_source.sql.should == 'SELECT t.* FROM t WHERE (t.a = (t.b = t.c))'
+  end
+
+  specify "should handle SQL::Identifiers" do
+    @ds.select{a}.qualify_to_first_source.sql.should == 'SELECT t.a FROM t'
+  end
+
+  specify "should handle SQL::OrderedExpressions" do
+    @ds.order(:a.desc, :b.asc).qualify_to_first_source.sql.should == 'SELECT t.* FROM t ORDER BY t.a DESC, t.b ASC'
+  end
+
+  specify "should handle SQL::AliasedExpressions" do
+    @ds.select(:a.as(:b)).qualify_to_first_source.sql.should == 'SELECT t.a AS b FROM t'
+  end
+
+  specify "should handle SQL::CaseExpressions" do
+    @ds.filter{{a=>b}.case(c, d)}.qualify_to_first_source.sql.should == 'SELECT t.* FROM t WHERE (CASE t.d WHEN t.a THEN t.b ELSE t.c END)'
+  end
+
+  specify "should handle SQL:Casts" do
+    @ds.filter{a.cast(:boolean)}.qualify_to_first_source.sql.should == 'SELECT t.* FROM t WHERE CAST(t.a AS boolean)'
+  end
+
+  specify "should handle SQL::Functions" do
+    @ds.filter{a(b, 1)}.qualify_to_first_source.sql.should == 'SELECT t.* FROM t WHERE a(t.b, 1)'
+  end
+
+  specify "should handle SQL::ComplexExpressions" do
+    @ds.filter{(a+b)<(c-3)}.qualify_to_first_source.sql.should == 'SELECT t.* FROM t WHERE ((t.a + t.b) < (t.c - 3))'
+  end
+
+  specify "should handle SQL::SQLArrays" do
+    @ds.filter(:a=>[:b, :c]).qualify_to_first_source.sql.should == 'SELECT t.* FROM t WHERE (t.a IN (t.b, t.c))'
+  end
+
+  specify "should handle SQL::Subscripts" do
+    @ds.filter{a.sql_subscript(b,3)}.qualify_to_first_source.sql.should == 'SELECT t.* FROM t WHERE t.a[t.b, 3]'
+  end
+
+  specify "should handle all other objects by returning them unchanged" do
+    @ds.select("a").filter{a(3)}.filter('blah').order('true'.lit).group('?'.lit(:a)).having(false).qualify_to_first_source.sql.should == \
+      "SELECT 'a' FROM t WHERE (a(3) AND (blah)) GROUP BY a HAVING 'f' ORDER BY true"
+  end
+end

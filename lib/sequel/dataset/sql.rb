@@ -12,6 +12,7 @@ module Sequel
     IS_OPERATORS = ::Sequel::SQL::ComplexExpression::IS_OPERATORS
     N_ARITY_OPERATORS = ::Sequel::SQL::ComplexExpression::N_ARITY_OPERATORS
     NULL = "NULL".freeze
+    QUALIFY_KEYS = [:select, :where, :having, :order, :group]
     QUESTION_MARK = '?'.freeze
     STOCK_COUNT_OPTS = {:select => [SQL::AliasedExpression.new(LiteralString.new("COUNT(*)").freeze, :count)], :order => nil}.freeze
     SELECT_CLAUSE_ORDER = %w'distinct columns from join where group having compounds order limit'.freeze
@@ -596,6 +597,30 @@ module Sequel
       [qcr.table, qcr.column].map{|x| [SQL::QualifiedIdentifier, SQL::Identifier, Symbol].any?{|c| x.is_a?(c)} ? literal(x) : quote_identifier(x)}.join('.')
     end
 
+    # Return a copy of the dataset with unqualified identifiers in the
+    # SELECT, WHERE, GROUP, HAVING, and ORDER clauses qualified by the
+    # given table. If no columns are currently selected, select all
+    # columns of the given table.
+    def qualify_to(table)
+      o = @opts
+      return clone if o[:sql]
+      h = {}
+      (o.keys & QUALIFY_KEYS).each do |k|
+        h[k] = qualified_expression(o[k], table)
+      end
+      h[:select] = [SQL::ColumnAll.new(table)] if !o[:select] || o[:select].empty?
+      clone(h)
+    end
+    
+    # Qualify the dataset to its current first source.  This is useful
+    # if you have unqualified identifiers in the query that all refer to
+    # the first source, and you want to join to another table which
+    # has columns with the same name as columns in the current dataset.
+    # See qualify_to.
+    def qualify_to_first_source
+      qualify_to(first_source)
+    end
+
     # Adds quoting to identifiers (columns and tables). If identifiers are not
     # being quoted, returns name as a string.  If identifiers are being quoted
     # quote the name with quoted_identifier.
@@ -655,7 +680,11 @@ module Sequel
     #   dataset.select{|o| o.a, o.sum(:b)} # SELECT a, sum(b) FROM items
     def select(*columns, &block)
       columns += Array(virtual_row_block_call(block)) if block
-      clone(:select => columns)
+      m = []
+      columns.map do |i|
+        i.is_a?(Hash) ? m.concat(i.map{|k, v| SQL::AliasedExpression.new(k,v)}) : m << i
+      end
+      clone(:select => m)
     end
     
     # Returns a copy of the dataset selecting the wildcard.
@@ -691,7 +720,7 @@ module Sequel
 
     # SQL fragment for specifying subscripts (SQL arrays)
     def subscript_sql(s)
-      "#{literal(s.f)}[#{s.sub.join(COMMA_SEPARATOR)}]"
+      "#{literal(s.f)}[#{expression_list(s.sub)}]"
     end
 
     # Returns a copy of the dataset with no filters (HAVING or WHERE clause) applied.
@@ -810,14 +839,7 @@ module Sequel
     # Converts an array of column names into a comma seperated string of 
     # column names. If the array is empty, a wildcard (*) is returned.
     def column_list(columns)
-      if columns.nil? || columns.empty?
-        WILDCARD
-      else
-        m = columns.map do |i|
-          i.is_a?(Hash) ? i.map{|k, v| as_sql(literal(k), v)} : literal(i)
-        end
-        m.join(COMMA_SEPARATOR)
-      end
+      (columns.nil? || columns.empty?) ? WILDCARD : expression_list(columns)
     end
     
     # Add the dataset to the list of compounds
@@ -1013,6 +1035,47 @@ module Sequel
         ::Sequel::SQL::QualifiedIdentifier.new(c_table, column)
       else
         column
+      end
+    end
+    
+    # Qualify the given expression e to the given table.
+    def qualified_expression(e, table)
+      case e
+      when Symbol
+        t, column, aliaz = split_symbol(e)
+        if t
+          e
+        elsif aliaz
+          SQL::AliasedExpression.new(SQL::QualifiedIdentifier.new(table, SQL::Identifier.new(column)), aliaz)
+        else
+          SQL::QualifiedIdentifier.new(table, e)
+        end
+      when Array
+        e.map{|a| qualified_expression(a, table)}
+      when Hash
+        h = {}
+        e.each{|k,v| h[qualified_expression(k, table)] = qualified_expression(v, table)}
+        h
+      when SQL::Identifier
+        SQL::QualifiedIdentifier.new(table, e)
+      when SQL::OrderedExpression
+        SQL::OrderedExpression.new(qualified_expression(e.expression, table), e.descending)
+      when SQL::AliasedExpression
+        SQL::AliasedExpression.new(qualified_expression(e.expression, table), e.aliaz)
+      when SQL::CaseExpression
+        SQL::CaseExpression.new(qualified_expression(e.conditions, table), qualified_expression(e.default, table), qualified_expression(e.expression, table))
+      when SQL::Cast
+        SQL::Cast.new(qualified_expression(e.expr, table), e.type)
+      when SQL::Function
+        SQL::Function.new(e.f, *qualified_expression(e.args, table))
+      when SQL::ComplexExpression 
+        SQL::ComplexExpression.new(e.op, *qualified_expression(e.args, table))
+      when SQL::SQLArray 
+        SQL::SQLArray.new(qualified_expression(e.array, table))
+      when SQL::Subscript 
+        SQL::Subscript.new(qualified_expression(e.f, table), qualified_expression(e.sub, table))
+      else
+        e
       end
     end
 

@@ -1,5 +1,9 @@
 === HEAD
 
+* Add Dataset#qualify_to and #qualify_to_first_source, for qualifying unqualified identifiers in the dataset (jeremyevans)
+
+* All the use of #sql_subscript on most SQL::* objects, and support non-integer subscript values (jeremyevans)
+
 * Add reflection.rdoc file which explains and gives examples of many of Sequel's reflection methods (jeremyevans)
 
 * Add many_through_many plugin, allowing you to construct an association to multiple objects through multiple join tables (jeremyevans)

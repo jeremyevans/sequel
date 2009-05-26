@@ -351,10 +351,22 @@ module Sequel
       end
     end
 
+    # Methods that create Subscripts (SQL array accesses).
+    module SubscriptMethods
+      # Return an SQL array subscript with the given arguments.
+      #
+      #   :array.sql_subscript(1) # SQL: array[1]
+      #   :array.sql_subscript(1, 2) # SQL: array[1, 2]
+      def sql_subscript(*sub)
+        Subscript.new(self, sub.flatten)
+      end
+    end
+
     class ComplexExpression
       include AliasMethods
       include CastMethods
       include OrderMethods
+      include SubscriptMethods
     end
 
     class GenericExpression
@@ -365,6 +377,7 @@ module Sequel
       include BooleanMethods
       include NumericMethods
       include StringMethods
+      include SubscriptMethods
       include InequalityMethods
     end
 
@@ -709,6 +722,9 @@ module Sequel
     # ruby array of all two pairs as an SQL array instead of an ordered
     # hash-like conditions specifier.
     class SQLArray < Expression
+      # The array of objects this SQLArray wraps
+      attr_reader :array
+
       # Create an object with the given array.
       def initialize(array)
         @array = array
