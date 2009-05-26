@@ -1,5 +1,7 @@
 === HEAD
 
+* Add reflection.rdoc file which explains and gives examples of many of Sequel's reflection methods (jeremyevans)
+
 * Add many_through_many plugin, allowing you to construct an association to multiple objects through multiple join tables (jeremyevans)
 
 * Add the :cartesian_product_number option to associations, for specifying if they can cause a cartesian product (jeremyevans)

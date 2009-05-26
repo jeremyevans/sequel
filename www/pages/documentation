@@ -11,6 +11,7 @@
   <li><a href="rdoc/files/doc/sharding_rdoc.html">Master/Slave Databases and Sharding</a></li>
   <li><a href="rdoc/files/doc/schema_rdoc.html">Schema Modification</a></li>
   <li><a href="rdoc/files/doc/virtual_rows_rdoc.html">Virtual Row Blocks</a></li>
+  <li><a href="rdoc/files/doc/reflection_rdoc.html">Reflection</a></li>
 </ul>
 
 <h3>RDoc</h3>
