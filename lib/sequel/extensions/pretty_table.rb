@@ -1,3 +1,7 @@
+# The pretty_table extension adds Sequel::Dataset#print and the
+# Sequel::PrettyTable class for creating nice-looking plain-text
+# tables.
+
 module Sequel
   class Dataset
     # Pretty prints the records in the dataset as plain-text table.

@@ -1,3 +1,7 @@
+# The query extension adds Sequel::Dataset#query which allows
+# a different way to construct queries instead of the usual
+# method chaining.
+
 module Sequel
   class Database
     # Return a dataset modified by the query block

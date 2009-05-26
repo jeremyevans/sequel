@@ -1,3 +1,5 @@
+# The blank extension adds the blank? method to all objects (e.g. Object#blank?).
+
 class FalseClass
   # false is always blank
   def blank?
@@ -5,7 +7,6 @@ class FalseClass
   end
 end
 
-# Helpers from Metaid and a bit more
 class Object
   # Objects are blank if they respond true to empty?
   def blank?

@@ -1,3 +1,7 @@
+# Adds the Sequel::Migration and Sequel::Migrator classes, which allow
+# the user to easily group schema changes and migrate the database
+# to a newer version or revert to a previous version.
+
 module Sequel
   # The Migration class describes a database migration that can be reversed.
   # The migration looks very similar to ActiveRecord (Rails) migrations, e.g.:

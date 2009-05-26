@@ -1,3 +1,7 @@
+# The pagination extension adds the Sequel::Dataset#paginate and #each_page methods,
+# which return paginated (limited and offset) datasets with some helpful methods
+# that make creating a paginated display easier.
+
 module Sequel
   class Dataset
     # Returns a paginated dataset. The returned dataset is limited to

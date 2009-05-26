@@ -1,3 +1,9 @@
+# The schema_dumper extension supports dumping tables and indexes
+# in a Sequel::Migration format, so they can be restored on another
+# database (which can be the same type or a different type than
+# the current database).  The main interface is through
+# Sequel::Database#dump_schema_migration.
+
 module Sequel
   class Database
     POSTGRES_DEFAULT_RE = /\A(?:B?('.*')::[^']+|\((-?\d+(?:\.\d+)?)\))\z/

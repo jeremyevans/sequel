@@ -1,6 +1,7 @@
-# Add inflection methods to String, which allows the easy transformation of
-# words from singular to plural,class names to table names, modularized class
-# names to ones without, and class names to foreign keys.
+# The inflector extension adds inflection instance methods to String, which allows the easy transformation of
+# words from singular to plural, class names to table names, modularized class
+# names to ones without, and class names to foreign keys.  It exists for 
+# backwards compatibility to legacy Sequel code.
 
 class String
   # This module acts as a singleton returned/yielded by String.inflections,

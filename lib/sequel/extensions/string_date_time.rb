@@ -1,7 +1,6 @@
-# This file contains the previous extensions to String for date/time
-# conversions.  These are provided mainly for backward compatibility,
-# Sequel now uses a module level method instead of extending string
-# to handle the internal conversions.
+# The string_date_time extension provides String instance methods
+# for converting the strings to a date (e.g. String#to_date), allowing
+# for backwards compatibility with legacy Sequel code.
 
 class String
   # Converts a string into a Date object.
