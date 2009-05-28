@@ -58,7 +58,7 @@
 
 * Add identity_map plugin, for creating temporary thread-local identity maps with some caching (jeremyevans)
 
-* Support savepoints when using MySQL (jeremyevans)
+* Support savepoints when using MySQL and SQLite (jeremyevans)
 
 * Add -C option to bin/sequel that copies one database to another (jeremyevans)
 

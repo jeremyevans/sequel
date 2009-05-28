@@ -1,6 +1,5 @@
 require 'sqlite3'
 Sequel.require 'adapters/shared/sqlite'
-Sequel.require 'adapters/utils/block_transactions'
 
 module Sequel
   # Top level module for holding all SQLite-related modules and classes
@@ -9,8 +8,6 @@ module Sequel
     # Database class for SQLite databases used with Sequel and the
     # ruby-sqlite3 driver.
     class Database < Sequel::Database
-      include BlockTransactions
-      
       UNIX_EPOCH_TIME_FORMAT = /\A\d+\z/.freeze
       include ::Sequel::SQLite::DatabaseMethods
       
@@ -97,11 +94,6 @@ module Sequel
         rescue SQLite3::Exception => e
           raise_error(e)
         end
-      end
-      
-      # Use the connection's transaction_active? method 
-      def already_in_transaction?(conn, opts)
-        conn.transaction_active?
       end
       
       # The SQLite adapter does not need the pool to convert exceptions.

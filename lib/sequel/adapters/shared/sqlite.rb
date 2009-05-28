@@ -1,8 +1,10 @@
-Sequel.require 'adapters/utils/unsupported'
+Sequel.require %w'savepoint_transactions unsupported', 'adapters/utils'
 
 module Sequel
   module SQLite
     module DatabaseMethods
+      include Sequel::Database::SavepointTransactions
+
       AUTO_VACUUM = [:none, :full, :incremental].freeze
       PRIMARY_KEY_INDEX_RE = /\Asqlite_autoindex_/.freeze
       SYNCHRONOUS = [:off, :normal, :full].freeze

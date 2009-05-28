@@ -1,6 +1,5 @@
 require 'amalgalite'
 Sequel.require 'adapters/shared/sqlite'
-Sequel.require 'adapters/utils/block_transactions'
 
 module Sequel
   # Top level module for holding all Amalgalite-related modules and classes
@@ -50,7 +49,6 @@ module Sequel
     # amalgalite driver.
     class Database < Sequel::Database
       include ::Sequel::SQLite::DatabaseMethods
-      include BlockTransactions
       
       set_adapter_scheme :amalgalite
       
@@ -132,11 +130,6 @@ module Sequel
         rescue ::Amalgalite::Error, ::Amalgalite::SQLite3::Error => e
           raise_error(e)
         end
-      end
-      
-      # Use the connection's in_transaction? method
-      def already_in_transaction?(conn, opts)
-        conn.in_transaction?
       end
       
       # The Amagalite adapter does not need the pool to convert exceptions.
