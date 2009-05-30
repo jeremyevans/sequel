@@ -223,6 +223,7 @@ module Sequel
         @operations << {:op => :add_constraint, :name => name, :type => :check, :check => block || args}
       end
 
+      # Add a unique constraint to the given column(s)
       def add_unique_constraint(columns, opts = {})
         @operations << {:op => :add_constraint, :type => :unique, :columns => Array(columns)}.merge(opts)
       end
