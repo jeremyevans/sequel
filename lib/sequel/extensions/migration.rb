@@ -177,7 +177,7 @@ module Sequel
       opts[:column] ||= :version
       opts[:table]  ||= :schema_info
       r = schema_info_dataset(db, opts).first
-      r ? r[opts[:column]] : 0
+      r ? (r[opts[:column]] || 0) : 0
     end
 
     # Returns the latest version available in the specified directory.
