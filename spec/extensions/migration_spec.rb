@@ -247,7 +247,7 @@ context "Sequel::Migrator" do
 
   specify "should automatically create new APP_version column in schema_info" do
     @db.table_exists?(:schema_info).should be_false
-    Sequel::Migrator.schema_info_dataset(@db, :alt_version)
+    Sequel::Migrator.schema_info_dataset(@db, :column => :alt_version)
     @db.table_exists?(:schema_info).should be_true
   end
   

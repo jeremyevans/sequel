@@ -129,31 +129,15 @@ module Sequel
   module Migrator
     MIGRATION_FILE_PATTERN = /\A\d+_.+\.rb\z/.freeze
 
+    # Wrapper for run, maintaining backwards API compatibility
+    def self.apply(db, directory, target = nil, current = nil)
+      run(db, directory, :target => target, :current => current)
+    end
+
     # Migrates the supplied database in the specified directory from the
     # current version to the target version. If no current version is
     # supplied, it is extracted from a schema_info table. The schema_info
-    # table is automatically created and maintained by the apply function.
-    def self.apply(db, directory, target = nil, current = nil, schema_info_column = :version)
-      # determine current and target version and direction
-      current ||= get_current_migration_version(db, schema_info_column)
-      target ||= latest_migration_version(directory)
-      raise Error, "No current version available" if current.nil?
-      raise Error, "No target version available" if target.nil?
-
-      direction = current < target ? :up : :down
-      
-      classes = migration_classes(directory, target, current, direction)
-
-      db.transaction do
-        classes.each {|c| c.apply(db, direction)}
-        set_current_migration_version(db, target, schema_info_column)
-      end
-      
-      target
-    end
-
-    # run is a wrapper for the apply method
-    # run differs from apply only in the style used to call it (options hash)
+    # table is automatically created and maintained by this method.
     #
     # Example: 
     #   Sequel::Migrator.run(DB, :path => "app1/migrations", :column => :app1_version)
@@ -165,17 +149,35 @@ module Sequel
     #
     # /app2/migrations/001_app2_tables.rb
     # /app2/migrations/002_app2_constraints.rb
-    def self.run(db, options = {:path => nil, :target => nil, :current => nil, :column => :version})
-      options[:column] ||= :version
-      raise "Must supply a valid migration path" unless options[:path] and File.directory?(options[:path])
-      apply(db, options[:path], options[:target], options[:current], options[:column])
+    def self.run(db, directory, opts = {:target => nil, :current => nil, :table => :schema_info, :column => :version})
+      opts[:column] ||= :version
+      opts[:table] ||= :schema_info
+      raise "Must supply a valid migration path" unless directory and File.directory?(directory)
+      # determine current and target version and direction
+      current = opts[:current] || get_current_migration_version(db, :table => opts[:table], :column => opts[:column])
+      target  = opts[:target]  || latest_migration_version(directory)
+      raise Error, "No current version available" if current.nil?
+      raise Error, "No target version available" if target.nil?
+
+      direction = current < target ? :up : :down
+      
+      classes = migration_classes(directory, target, current, direction)
+
+      db.transaction do
+        classes.each {|c| c.apply(db, direction)}
+        set_current_migration_version(db, target, :table => opts[:table], :column => opts[:column])
+      end
+      
+      target
     end
 
     # Gets the current migration version stored in the database. If no version
     # number is stored, 0 is returned.
-    def self.get_current_migration_version(db, column = :version)
-      r = schema_info_dataset(db, column).first
-      r ? r[column] : 0
+    def self.get_current_migration_version(db, opts = {:column => :version, :table => :schema_info})
+      opts[:column] ||= :version
+      opts[:table]  ||= :schema_info
+      r = schema_info_dataset(db, opts).first
+      r ? r[opts[:column]] : 0
     end
 
     # Returns the latest version available in the specified directory.
@@ -217,25 +219,29 @@ module Sequel
     
     # Returns the dataset for the schema_info table. If no such table
     # exists, it is automatically created.
-    def self.schema_info_dataset(db, column = :version)
+    def self.schema_info_dataset(db, opts = {:column => :version, :table => :schema_info})
+      column = opts[:column] || :version
+      table  = opts[:table]  || :schema_info
       if column == :version
-        db.create_table(:schema_info) {integer :version} unless db.table_exists?(:schema_info)
+        db.create_table(table) {integer :version} unless db.table_exists?(table)
       else
-        if db.table_exists?(:schema_info)
-          db.alter_table(:schema_info) do
+        if db.table_exists?(table)
+          db.alter_table(table) do
             add_column column, Integer
-          end unless db[:schema_info].columns.include?(column)
+          end unless db[table].columns.include?(column)
         else
-          db.create_table(:schema_info) {integer :version; integer column}
+          db.create_table(table) {integer :version; integer column}
         end
       end
-      db[:schema_info]
+      db[table]
     end
     
     # Sets the current migration  version stored in the database.
-    def self.set_current_migration_version(db, version, column = :version)
-      dataset = schema_info_dataset(db, column)
-      dataset.send(dataset.first ? :update : :<<, column => version)
+    def self.set_current_migration_version(db, version, opts = {:column => :version, :table => :schema_info})
+      opts[:column] ||= :version
+      opts[:table]  ||= :schema_info
+      dataset = schema_info_dataset(db, opts)
+      dataset.send(dataset.first ? :update : :<<, opts[:column] => version)
     end
   end
 end
