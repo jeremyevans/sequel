@@ -11,7 +11,7 @@ module Sequel
     #
     #   ds[:id=>1] => {:id=1}
     def [](*conditions)
-      raise(Error, ARRAY_ACCESS_ERROR_MSG) if (conditions.length == 1 and conditions.is_a?(Integer)) or conditions.length == 0
+      raise(Error, ARRAY_ACCESS_ERROR_MSG) if (conditions.length == 1 and conditions.first.is_a?(Integer)) or conditions.length == 0
       first(*conditions)
     end
 
