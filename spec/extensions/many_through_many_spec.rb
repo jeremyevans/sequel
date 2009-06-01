@@ -23,6 +23,12 @@ describe Sequel::Model, "many_through_many" do
     Object.send(:remove_const, :Tag)
   end
 
+  it "should raise an error if in invalid form of through is used" do
+    proc{@c1.many_through_many :tags, [[:albums_artists, :artist_id, :album_id], [:albums, :id, :id], [:albums_tags, :album_id]]}.should raise_error(Sequel::Error)
+    proc{@c1.many_through_many :tags, [[:albums_artists, :artist_id, :album_id], [:albums, :id, :id], {:table=>:album_tags, :left=>:album_id}]}.should raise_error(Sequel::Error)
+    proc{@c1.many_through_many :tags, [[:albums_artists, :artist_id, :album_id], [:albums, :id, :id], :album_tags]}.should raise_error(Sequel::Error)
+  end
+
   it "should use join tables given" do
     @c1.many_through_many :tags, [[:albums_artists, :artist_id, :album_id], [:albums, :id, :id], [:albums_tags, :album_id, :tag_id]]
     n = @c1.load(:id => 1234)
@@ -30,6 +36,18 @@ describe Sequel::Model, "many_through_many" do
     a.should be_a_kind_of(Sequel::Dataset)
     a.sql.should == 'SELECT tags.* FROM tags INNER JOIN albums_tags ON (albums_tags.tag_id = tags.id) INNER JOIN albums ON (albums.id = albums_tags.album_id) INNER JOIN albums_artists ON ((albums_artists.album_id = albums.id) AND (albums_artists.artist_id = 1234))'
     n.tags.should == [@c2.load(:id=>1)]
+  end
+
+  it "should handle multiple aliasing of tables" do
+    class ::Album < Sequel::Model
+    end
+    @c1.many_through_many :albums, [[:albums_artists, :artist_id, :album_id], [:albums, :id, :id], [:albums_artists, :album_id, :artist_id], [:artists, :id, :id], [:albums_artists, :artist_id, :album_id]]
+    n = @c1.load(:id => 1234)
+    a = n.albums_dataset
+    a.should be_a_kind_of(Sequel::Dataset)
+    a.sql.should == 'SELECT albums.* FROM albums INNER JOIN albums_artists ON (albums_artists.album_id = albums.id) INNER JOIN artists ON (artists.id = albums_artists.artist_id) INNER JOIN albums_artists AS albums_artists_0 ON (albums_artists_0.artist_id = artists.id) INNER JOIN albums AS albums_0 ON (albums_0.id = albums_artists_0.album_id) INNER JOIN albums_artists AS albums_artists_1 ON ((albums_artists_1.album_id = albums_0.id) AND (albums_artists_1.artist_id = 1234))'
+    n.albums.should == [Album.load(:id=>1, :x=>1)]
+    Object.send(:remove_const, :Album)
   end
 
   it "should use explicit class if given" do

@@ -36,6 +36,16 @@ describe "Serialization plugin" do
     ]
   end
 
+  it "serialization_format should be the serialization format used" do
+    @c.plugin :serialization, :yaml, :abc
+    @c.serialization_format.should == :yaml
+  end
+
+  it "serialized_columns should be the columns serialized" do
+    @c.plugin :serialization, :yaml, :abc
+    @c.serialized_columns.should == [:abc]
+  end
+
   it "should allow serializing attributes to marshal" do
     @c.plugin :serialization, :marshal, :abc
     @c.create(:abc => 1)
