@@ -132,6 +132,7 @@ module Sequel
   #   Sequel::Migrator.apply(DB, '.', 5, 1)
   module Migrator
     MIGRATION_FILE_PATTERN = /\A\d+_.+\.rb\z/.freeze
+    MIGRATION_SPLITTER = '_'.freeze
 
     # Migrates the supplied database in the specified directory from the
     # current version to the target version. If no current version is
@@ -166,7 +167,7 @@ module Sequel
     # Returns the latest version available in the specified directory.
     def self.latest_migration_version(directory)
       l = migration_files(directory).last
-      l ? File.basename(l).to_i : nil
+      l ? migration_version_from_file(File.basename(l)) : nil
     end
 
     # Returns a list of migration classes filtered for the migration range and
@@ -194,7 +195,7 @@ module Sequel
     def self.migration_files(directory, range = nil)
       files = []
       Dir.new(directory).each do |file|
-        files[file.to_i] = File.join(directory, file) if MIGRATION_FILE_PATTERN.match(file)
+        files[migration_version_from_file(file)] = File.join(directory, file) if MIGRATION_FILE_PATTERN.match(file)
       end
       filtered = range ? files[range] : files
       filtered ? filtered.compact : []
@@ -212,5 +213,11 @@ module Sequel
       dataset = schema_info_dataset(db)
       dataset.send(dataset.first ? :update : :<<, :version => version)
     end
+
+    # Return the integer migration version based on the filename.
+    def self.migration_version_from_file(filename)
+      filename.split(MIGRATION_SPLITTER, 2).first.to_i
+    end
+    private_class_method :migration_version_from_file
   end
 end

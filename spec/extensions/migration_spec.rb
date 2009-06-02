@@ -135,7 +135,7 @@ context "Sequel::Migrator" do
     File.open('001_create_sessions.rb', 'w') {|f| f << MIGRATION_001}
     File.open('002_create_nodes.rb', 'w') {|f| f << MIGRATION_002}
     File.open('003_create_users.rb', 'w') {|f| f << MIGRATION_003}
-    File.open('005_create_attributes.rb', 'w') {|f| f << MIGRATION_005}
+    File.open('005_5_create_attributes.rb', 'w') {|f| f << MIGRATION_005}
     
     @db[:schema_info].version = nil
   end
@@ -149,7 +149,7 @@ context "Sequel::Migrator" do
     File.delete('001_create_sessions.rb')
     File.delete('002_create_nodes.rb')
     File.delete('003_create_users.rb')
-    File.delete('005_create_attributes.rb')
+    File.delete('005_5_create_attributes.rb')
   end
   
   specify "should return the list of files for a specified version range" do
@@ -159,8 +159,8 @@ context "Sequel::Migrator" do
     Sequel::Migrator.migration_files('.', 1..3).should == \
       ['./001_create_sessions.rb', './002_create_nodes.rb', './003_create_users.rb']
 
-    Sequel::Migrator.migration_files('.', 3..5).should == \
-      ['./003_create_users.rb', './005_create_attributes.rb']
+    Sequel::Migrator.migration_files('.', 3..6).should == \
+      ['./003_create_users.rb', './005_5_create_attributes.rb']
       
     Sequel::Migrator.migration_files('.', 7..8).should == []
   end
