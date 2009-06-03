@@ -402,7 +402,7 @@ describe "Polymorphic Associations" do
       primary_key :id
     end
     class ::Post < Sequel::Model
-      one_to_many :assets, :key=>:attachable_id do |ds|
+      one_to_many :assets, :key=>:attachable_id, :reciprocal=>:attachable do |ds|
         ds.filter(:attachable_type=>'Post')
       end 
       
@@ -428,7 +428,7 @@ describe "Polymorphic Associations" do
       primary_key :id
     end
     class ::Note < Sequel::Model
-      one_to_many :assets, :key=>:attachable_id do |ds|
+      one_to_many :assets, :key=>:attachable_id, :reciprocal=>:attachable do |ds|
         ds.filter(:attachable_type=>'Note')
       end 
       
