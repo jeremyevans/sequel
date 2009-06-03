@@ -103,7 +103,7 @@ module Sequel
           r_type = reciprocal_type
           key = self[:key]
           associated_class.all_association_reflections.each do |assoc_reflect|
-            if assoc_reflect[:type] == r_type && assoc_reflect[:key] == key
+            if assoc_reflect[:type] == r_type && assoc_reflect[:key] == key && assoc_reflect.associated_class == self[:model]
               return self[:reciprocal] = assoc_reflect[:name]
             end
           end
@@ -290,8 +290,9 @@ module Sequel
           right_key = self[:right_key]
           join_table = self[:join_table]
           associated_class.all_association_reflections.each do |assoc_reflect|
-            if assoc_reflect[:type] == :many_to_many && assoc_reflect[:left_key] == right_key \
-               && assoc_reflect[:right_key] == left_key && assoc_reflect[:join_table] == join_table
+            if assoc_reflect[:type] == :many_to_many && assoc_reflect[:left_key] == right_key &&
+               assoc_reflect[:right_key] == left_key && assoc_reflect[:join_table] == join_table &&
+               assoc_reflect.associated_class == self[:model]
               return self[:reciprocal] = assoc_reflect[:name]
             end
           end
