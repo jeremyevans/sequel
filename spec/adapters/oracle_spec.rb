@@ -3,6 +3,7 @@ require File.join(File.dirname(__FILE__), 'spec_helper.rb')
 unless defined?(ORACLE_DB)
   ORACLE_DB = Sequel.connect('oracle://hr:hr@localhost/XE')
 end
+INTEGRATION_DB = ORACLE_DB unless defined?(INTEGRATION_DB)
 
 if ORACLE_DB.table_exists?(:items)
   ORACLE_DB.drop_table :items

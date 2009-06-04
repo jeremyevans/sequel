@@ -164,14 +164,14 @@ begin
   
   desc "Run integration tests"
   Spec::Rake::SpecTask.new("integration") do |t|
-    t.spec_files = FileList["spec/integration/*_test.rb"]
+    t.spec_files = Dir["spec/integration/*_test.rb"]
     t.spec_opts  = spec_opts.call
   end
   
   %w'postgres sqlite mysql informix oracle ado'.each do |adapter|
     desc "Run #{adapter} specs without coverage"
     Spec::Rake::SpecTask.new("spec_#{adapter}") do |t|
-      t.spec_files = ["spec/adapters/#{adapter}_spec.rb"]
+      t.spec_files = ["spec/adapters/#{adapter}_spec.rb"] + Dir["spec/integration/*_test.rb"]
       t.spec_opts  = spec_opts.call
     end
   end

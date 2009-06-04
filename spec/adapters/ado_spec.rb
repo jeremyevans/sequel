@@ -3,6 +3,7 @@ require File.join(File.dirname(__FILE__), 'spec_helper.rb')
 unless defined?(ADO_DB)
   ADO_DB = Sequel.ado(:host => 'MY_SQL_SERVER', :database => 'MyDB', :user => 'my_usr', :password => 'my_pwd')
 end
+INTEGRATION_DB = ADO_DB unless defined?(INTEGRATION_DB)
 
 context "An ADO dataset" do
   before(:each) do

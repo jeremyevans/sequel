@@ -1,10 +1,11 @@
 require 'rubygems'
+require 'logger'
 unless Object.const_defined?('Sequel')
   $:.unshift(File.join(File.dirname(__FILE__), "../../lib/"))
   require 'sequel'
 end
 begin
-  require File.join(File.dirname(__FILE__), '../spec_config.rb')
+  require File.join(File.dirname(File.dirname(__FILE__)), 'spec_config.rb') unless defined?(INTEGRATION_DB)
 rescue LoadError
 end
 
@@ -16,12 +17,13 @@ def clear_sqls
 end 
 
 class Spec::Example::ExampleGroup
-  def start_logging
-    require 'logger'
-    INTEGRATION_DB.loggers << Logger.new(STDOUT)
-  end
-  def stop_logging
+  def log
+    begin
+      INTEGRATION_DB.loggers << Logger.new(STDOUT)
+      yield
+    ensure
      INTEGRATION_DB.loggers.clear
+    end
   end
 end
 

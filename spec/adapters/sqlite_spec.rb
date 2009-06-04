@@ -4,6 +4,7 @@ unless defined?(SQLITE_DB)
   SQLITE_URL = 'sqlite:/' unless defined? SQLITE_URL
   SQLITE_DB = Sequel.connect(ENV['SEQUEL_SQLITE_SPEC_DB']||SQLITE_URL)
 end
+INTEGRATION_DB = SQLITE_DB unless defined?(INTEGRATION_DB)
 
 context "An SQLite database" do
   before do
