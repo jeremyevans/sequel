@@ -286,7 +286,7 @@ module Sequel
           order(:indc__relname, (0...32).map{|x| [SQL::Subscript.new(:ind__indkey, [x]), x]}.case(32, :att__attnum)).
           select(:indc__relname___name, :ind__indisunique___unique, :att__attname___column)
         
-        ds.join!(:pg_namespace___nsp, :oid=>:tab__relnamespace, :nspname=>schema) if schema
+        ds.join!(:pg_namespace___nsp, :oid=>:tab__relnamespace, :nspname=>schema.to_s) if schema
         
         indexes = {}
         ds.each do |r|

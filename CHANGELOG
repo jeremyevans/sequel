@@ -1,3 +1,7 @@
+=== HEAD
+
+* Fix Database#indexes on PostgreSQL when the schema used is a symbol (jeremyevans)
+
 === 3.1.0 (2009-06-04)
 
 * Require the classes match to consider an association a reciprocal (jeremyevans) (#270)
