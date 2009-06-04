@@ -1,0 +1,406 @@
+New Plugins
+-----------
+
+3 new plugins were added that implement features supported by
+DataMapper: identity_map, tactical_eager_loading, and
+lazy_attributes.  These plugins don't add any real new features, 
+since you can do most of what they allow before simply by being
+a little more explicit in your Sequel code. However, some people
+prefer a less explicit approach that uses a bit more magic, and
+now Sequel can accomodate them.
+
+* The identity_map plugin allows you to create a 1-1
+  correspondence of model objects to database rows via a temporary
+  thread-local identity map.  It makes the following statment true:
+
+    Sequel::Model.with_identity_map do
+      Album.filter{(id > 0) & (id < 2)}.first.object_id == \
+        Album.first(:id=>1).object_id
+    end
+
+  As the code above implies, you need to use the with_identity_map
+  method with a block to use the identity mapping feature.
+
+  By itself, identity maps don't offer much, but Sequel uses them
+  as a cache when looking up objects by primary key or looking up
+  many_to_one associated objects.  Basically, it can be used as a
+  performance enhancer, and it also allows the support of the
+  lazy_attributes plugin.
+
+  The identity_map plugin is expected to be most useful in web
+  applications.  With that in mind, here's a Rack middleware that
+  wraps each request in a with_identity_map call, so the
+  identity_map features are available inside the web app:
+
+    Sequel::Model.plugin :identity_map
+    class SequelIdentityMap
+      def initialize(app)
+        @app = app
+      end
+      def call(env)
+        Sequel::Model.with_identity_map{@app.call(env)}
+      end
+    end
+
+* The tactical_eager_loading plugin allows you to eagerly load an
+  association for all models retrieved in the same group whenever
+  one of the models accesses the association:
+
+    # 2 queries total
+    Album.filter{id<100}.all do |a|
+      a.artists
+    end
+
+  In order for this correctly, you must use Dataset#all to load the
+  records, you cannot iterate over them via Dataset#each.  This is
+  because eager loading requires that you have all records in
+  advance, and when using Dataset#each you cannot know about later
+  records in the dataset.
+
+  Before, you could just be explicit about the associations you
+  needed and make sure to eagerly load them using eager before
+  calling Dataset#all.
+
+* The lazy_attributes plugin builds on the identity_map and
+  tactical_eager_loading plugins and allows you to create
+  attributes that are lazily loaded from the database:
+
+    Album.plugin :lazy_attributes, :review
+
+  This will remove the :review attribute from being selected by
+  default.  If you try to access the attribute after it is selected,
+  it'll retrieve the value from the database.  If the object was
+  retrieved with a group of other objects and an identity map is in
+  use, it'll retrieve the lazy attribute for the entire group of
+  objects at once, similar to the tatical_eager_loading plugin:
+
+    # 2 queries total
+    Sequel::Model.with_identity_map do
+      Album.filter{id<100}.all do |a|
+        a.review
+      end
+    end
+
+  Before, you could just set the default selected columns for a model
+  to not include the lazy attributes, and just use select_more to
+  add them to any query where the resulting model objects will
+  need the attributes.
+
+* A many_through_many plugin was also added.  This very powerful
+  plugin allows you to create associations to multiple objects through
+  multiple join tables.  Here are some examples:
+
+    # Assume the following many to many associations:
+    Artist.many_to_many :albums
+    Album.many_to_many :tags
+
+    # Same as Artist.many_to_many :albums
+    Artist.many_through_many :albums,
+      [[:albums_artists, :artist_id, :album_id]]
+
+    # All tags associated to any album this artist is associated to
+    Artist.many_through_many :tags,
+      [[:albums_artists, :artist_id, :album_id],
+       [:albums, :id, :id],
+       [:albums_tags, :album_id, :tag_id]]
+
+    # All artists associated to any album this artist is associated to
+    Artist.many_through_many :artists,
+      [[:albums_artists, :artist_id, :album_id],
+       [:albums, :id, :id],
+       [:albums_artists, :album_id, :artist_id]]
+
+    # All albums by artists that are associated to any album this
+    # artist is associated to
+    Artist.many_through_many :artist_albums,
+      [[:albums_artists, :artist_id, :album_id],
+       [:albums, :id, :id],
+       [:albums_artists, :album_id, :artist_id],
+       [:artists, :id, :id],
+       [:albums_artists, :artist_id, :album_id]]
+
+  Basically, for each join table between this model and the
+  associated model, you use an array with a join table name, left key
+  name (key closer to this model), and right key name (key closer to
+  the associated model).
+
+  In usual Sequel fashion, this association type works not just
+  for single objects, but it can also be eagerly loaded via eager or
+  eager_graph.  There are numerous additional configuration options,
+  please see the RDoc for details.
+
+New bin/sequel Features
+-----------------------
+
+The bin/sequel command line tool now supports the following options:
+
+* -C: Copies one database to another.  You must specify two database
+  arguments.  Works similar to Taps, copying the table schema, then
+  the table data, then creating the indexes.
+
+* -d: Dump the schema of the database in the database-independent
+  migration format.
+
+* -D: Dump the schema of the database in the database-specific
+  migration format.
+
+* -h: Display the help
+
+* -t: Output the full backtrace if an exception is raised
+
+The bin/sequel tool is now better about checking which options can
+be used together.  It also now supports using the -L option multiple
+times and having it load model files from multiple directory trees.
+
+New Features
+------------
+
+* Dataset#qualify_to and #qualify_to_first_source were added.  They
+  allow you to qualify unqualified columns in the current dataset
+  to the given table or the first source. This can be used to join
+  a dataset that has unqualified columns to a new table which has
+  columns with the same name.
+  
+  For example, take this dataset:
+  
+    ds = DB[:albums].select(:name).order(:name).filter(:id=>1)
+    # SELECT name FROM albums WHERE (id = 1) ORDER BY name
+
+  Let's say you want to join it to the artists table:
+  
+    ds2 = ds.join(:artists, :id=>:artist_id)
+    # SELECT name FROM albums 
+    #  INNER JOIN artists ON (artists.id = albums.artist_id)
+    #  WHERE (id = 1) ORDER BY name
+    
+  That's going to give you an error, as the artists table already has
+  columns named id and name.  This new feature allows you to do the
+  following:
+  
+    ds2 = ds.qualify_to_first_source.join(:artists, :id=>:artist_id)
+    # SELECT albums.name FROM albums
+    #  INNER JOIN artists ON (artists.id = albums.artist_id)
+    #  WHERE (albums.id = 1) ORDER BY albums.name
+    
+  By doing this, all unqualified columns are qualified, so you get
+  a usable query.  This is expected to be most useful for users that
+  have a default order or filter on their models and want to join
+  the model to another table.  Before you had to replace the filters,
+  selection, etc. manually, or use qualified columns by default even
+  though the weren't needed in most cases.
+
+* Savepoints are now supported using SQLite and MySQL, assuming you
+  are using a database version that supports them.  You need to
+  pass the :savepoint option to Database#transaction to use a
+  savepoint.
+
+* Model plugins can now depend on other plugins, simply by calling
+  the Model.plugin method inside the plugin's apply method:
+
+    module LazyAttributes
+      def self.apply(model)
+        model.plugin :tactical_eager_loading
+      end
+
+* Model.plugin now takes a block with is passed to the plugin's
+  apply and configure method (see Backwards Compatibility section for
+  more information on the configure method).
+
+* You can see which plugins are loaded for a model by using
+  Model.plugins.
+
+* You can use Sequel.extension method to load extensions:
+
+    Sequel.extension :pagination, :query
+
+  This will only load extensions that ship with Sequel, unlike the
+  Model.plugin method which will also load external plugins.
+
+* You can now use Database#create_table? to create the table if it
+  doesn't already exist (a very common need, it seems).  The schema
+  plugin now supports Model.create_table? as well.
+
+* #sql_subscript is now an allowed method on most SQL expression
+  objects that Sequel generates.  Also, arguments to #sql_subscript
+  can now be other expressions instead of just integers.
+
+* Associations can now take a :cartesian_product_number option, which
+  can be used to tell Sequel whether to turn on duplicate object
+  detection when eagerly loading objects through eager_graph.  This
+  number should be 0 if the association can never create multiple
+  rows for each row in the current table, 1 if it can create multiple
+  rows in the each row in the current table, and 2 if the association
+  itself causes a cartesian product.
+
+* On MySQL, Dataset#insert_ignore now affects #insert as well as
+  multi_insert and import.
+
+* Database#create_table now supports an :ignore_index_errors option,
+  and Database#add_index now supports an :ignore_errors option.
+  These are used by the schema_dumper when dumping an database
+  schema to be restored on another database type, since indexes
+  aren't usually required for proper operation and some indexes
+  can't be transferred.
+
+* The ADO adapter now takes a :provider option, which can be used
+  to set the provider.
+
+* The ADO adapter now takes a :command_timeout option, which tells
+  the connection how long to wait before giving up and raising an
+  exception.
+
+* The Sequel.amalgalite adapter method was added.  Like the
+  Sequel.sqlite method, you can call it with no arguments to get
+  an in memory database.
+
+Other Improvements
+------------------
+
+* MySQL "commands out of sync" errors should no longer occur unless
+  you are nesting queries (calling Dataset#each inside Dataset#each).
+  A bug dating at least to 2007 and possibly since the initial
+  creation of the Sequel MySQL adapter was the cause.  Before, SQL
+  that caused a result set that was sent using a method where Sequel
+  doesn't yield a result set would cause the "commands out of sync"
+  error on the following query.  For example, the following code
+  would cause the error:
+
+    DB << "SHOW DATABASES"
+
+  If for some reason a "commands out of sync" error does occur,
+  Sequel will disconnect the connection from the connection pool,
+  so it won't continually stay in the pool and raise errors every
+  time it is used.
+
+* The schema_dumper extension is much better about parsing defaults
+  from the database.  It can now correctly parse most defaults on
+  MySQL, SQLite, and PostgreSQL databases.  It no longer includes
+  defaults that it can't parse to a ruby object unless a database-
+  specific dump is requested.
+
+* The schema_dumper extension now dumps tables in alphabetical order.
+
+* Ordered and limited datasets are now handled correctly when using
+  union, intersect, and except.  Also, union, intersect, and except
+  now always return a from_self dataset, so further limiting,
+  filtering, and ordering of them now works as expected.
+
+* Dataset#graph now works correctly with a complex dataset without
+  having to use from_self.  Before, code like the following didn't
+  do what was expected:
+
+    DB[:albums].
+      graph(DB[:artists].filter{name > 'M'}, :id=>:artist_id)
+
+  Before, the filter on DB[:artists] would be dropped.  Now, Sequel
+  correctly uses a subselect.
+
+* You can now specify serialization formats per column in the
+  serialization plugin, either by calling the plugin multiple
+  times or by using the new serialize_attributes method:
+
+    Album.plugin :serialization
+    Album.serialize_attributes :marshal, :review
+    Album.serialize_attributes :yaml, :name
+    Album.serialization_map #{:name=>:yaml, :review=>:marshal}
+
+  The public API for the serialization plugin is still backwards
+  compatible, but the internals have changed slightly to support
+  this new feature.
+
+* You can now use eager_graph to eagerly load associations for models
+  that lack primary keys.
+
+* The :eager_graph association option now works when lazily-loading
+  many_to_many associations.
+
+* Dataset#add_graph_aliases now works correctly even if
+  set_graph_aliases hasn't been used.
+
+* The PostgreSQL Database#tables method now assumes the public schema
+  if a schema is not given and there is no default_schema.
+
+* The PostgreSQL Database#indexes method no longer returns partial
+  indexes or functional indexes.
+  
+* The MySQL Database#indexes method no longer returns indexes on
+  partial columns (prefix indexes).
+
+* Default values for String :text=>true and File columns on MySQL
+  are ignored, since MySQL doesn't support them.  They are not
+  ignored if you use text and blob, since then you are using the
+  database-specific syntax and Sequel doesn't do translation when
+  the database-specific syntax is used.
+
+* On PostgreSQL, attempting the reset the primary key sequence for a
+  table without a primary key no longer causes an error.
+
+* Using a placeholder string in an association's :condition option
+  now works correctly (e.g. :conditions=>['n = ?', 1])
+
+* An error is no longer raised if you attempt to load a plugin that
+  has a DatasetMethods module but no public dataset methods.
+
+* The check for dataset[n] where n is an integer was fixed.  It now
+  raises an error inside of returning a limited dataset.
+
+* On PostgreSQL, Dataset#insert with static SQL now works correctly.
+
+* A reflection.rdoc file was added giving an overview of Sequel's
+  reflection support.
+
+* The Migrator now works correctly with file names like
+  001_12312412_file_name.rb.
+
+* The association code now requires the classes match when looking
+  for a reciprocal association.
+
+* An unlikely threading bug (race condition) was possible when using
+  the validation_class_methods plugin. The plugin was refactored and
+  now uses a mutex to avoid the issue.  One of the refactoring changes
+  makes it so that you can no longer use a class level vaildation
+  inside a Class.new block (since inherited isn't called until the
+  block finishes).
+
+* The exception messages when Sequel.string_to_* fail have been fixed.
+
+* The String :text=>true generic database type has been fixed when
+  using the Firebird adapter.
+
+Backwards Compatibility
+-----------------------
+
+* A plugin's apply method is now only called the first time a plugin
+  is loaded.  Plugins can now have a configure method that is called
+  every time the plugin is loaded, and is always called after the
+  instance methods, class methods, and dataset method submodules have
+  been added to the model.  This is different from apply, which is
+  called before the submodules are loaded.
+
+  If you are a plugin author, please check your implementation to
+  make sure this doesn't cause problems for you.  If you have
+  questions, please post on the Sequel mailing list.
+
+  This new plugin feature will make certain things a lot easier, and
+  it should be mostly backwards compatible.  However, if a plugin
+  was previously expected to be loaded multiple times with the apply
+  method called each time, it will no longer work correctly.
+
+* The plugin_opts methods defined now include multiple args in an
+  array if multiple args are given.  Before, the plugin_opts methods
+  just returned the first argument.
+
+* Database#table_exists? no longer checks the cached schema
+  information.  By default, it will always do a database query
+  (unless overridden in an adapter).  This shouldn't affect the
+  results, but if were using the method a lot and expecting it to
+  use cached information, it doesn't have the same performance
+  characteristics.
+
+* The internal storage of the :select option for datasets have
+  changed.  You can no longer use a hash as a way of aliasing
+  columns.  Dataset#select now does the translation from the hash to
+  SQL::AliasedExpression instances.  Basically, if you were using
+  Dataset#clone directly with a :select option with hashes for
+  aliasing, you should switch to using Dataset#select or changing
+  the hashes to AliasedExpressions yourself.
