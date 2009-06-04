@@ -1,5 +1,8 @@
 require File.join(File.dirname(__FILE__), 'spec_helper')
 
+Regexp.send(:include, Sequel::SQL::StringMethods)
+String.send(:include, Sequel::SQL::StringMethods)
+
 context "Blockless Ruby Filters" do
   before do
     db = Sequel::Database.new
@@ -71,6 +74,21 @@ context "Blockless Ruby Filters" do
     @d.l(:x.like('a', 'b')).should == '((x LIKE \'a\') OR (x LIKE \'b\'))'
     @d.l(:x.like(/a/, /b/i)).should == '((x ~ \'a\') OR (x ~* \'b\'))'
     @d.l(:x.like('a', /b/)).should == '((x LIKE \'a\') OR (x ~ \'b\'))'
+
+    @d.l('a'.like(:x)).should == "('a' LIKE x)"
+    @d.l('a'.like(:x, 'b')).should == "(('a' LIKE x) OR ('a' LIKE 'b'))"
+    @d.l('a'.like(:x, /b/)).should == "(('a' LIKE x) OR ('a' ~ 'b'))"
+    @d.l('a'.like(:x, /b/i)).should == "(('a' LIKE x) OR ('a' ~* 'b'))"
+
+    @d.l(/a/.like(:x)).should == "('a' ~ x)"
+    @d.l(/a/.like(:x, 'b')).should == "(('a' ~ x) OR ('a' ~ 'b'))"
+    @d.l(/a/.like(:x, /b/)).should == "(('a' ~ x) OR ('a' ~ 'b'))"
+    @d.l(/a/.like(:x, /b/i)).should == "(('a' ~ x) OR ('a' ~* 'b'))"
+
+    @d.l(/a/i.like(:x)).should == "('a' ~* x)"
+    @d.l(/a/i.like(:x, 'b')).should == "(('a' ~* x) OR ('a' ~* 'b'))"
+    @d.l(/a/i.like(:x, /b/)).should == "(('a' ~* x) OR ('a' ~* 'b'))"
+    @d.l(/a/i.like(:x, /b/i)).should == "(('a' ~* x) OR ('a' ~* 'b'))"
   end
 
   it "should support NOT LIKE via Symbol#like and Symbol#~" do
@@ -79,6 +97,21 @@ context "Blockless Ruby Filters" do
     @d.l(~:x.like('a', 'b')).should == '((x NOT LIKE \'a\') AND (x NOT LIKE \'b\'))'
     @d.l(~:x.like(/a/, /b/i)).should == '((x !~ \'a\') AND (x !~* \'b\'))'
     @d.l(~:x.like('a', /b/)).should == '((x NOT LIKE \'a\') AND (x !~ \'b\'))'
+
+    @d.l(~'a'.like(:x)).should == "('a' NOT LIKE x)"
+    @d.l(~'a'.like(:x, 'b')).should == "(('a' NOT LIKE x) AND ('a' NOT LIKE 'b'))"
+    @d.l(~'a'.like(:x, /b/)).should == "(('a' NOT LIKE x) AND ('a' !~ 'b'))"
+    @d.l(~'a'.like(:x, /b/i)).should == "(('a' NOT LIKE x) AND ('a' !~* 'b'))"
+
+    @d.l(~/a/.like(:x)).should == "('a' !~ x)"
+    @d.l(~/a/.like(:x, 'b')).should == "(('a' !~ x) AND ('a' !~ 'b'))"
+    @d.l(~/a/.like(:x, /b/)).should == "(('a' !~ x) AND ('a' !~ 'b'))"
+    @d.l(~/a/.like(:x, /b/i)).should == "(('a' !~ x) AND ('a' !~* 'b'))"
+
+    @d.l(~/a/i.like(:x)).should == "('a' !~* x)"
+    @d.l(~/a/i.like(:x, 'b')).should == "(('a' !~* x) AND ('a' !~* 'b'))"
+    @d.l(~/a/i.like(:x, /b/)).should == "(('a' !~* x) AND ('a' !~* 'b'))"
+    @d.l(~/a/i.like(:x, /b/i)).should == "(('a' !~* x) AND ('a' !~* 'b'))"
   end
 
   it "should support ILIKE via Symbol#ilike" do
@@ -87,6 +120,21 @@ context "Blockless Ruby Filters" do
     @d.l(:x.ilike('a', 'b')).should == '((x ILIKE \'a\') OR (x ILIKE \'b\'))'
     @d.l(:x.ilike(/a/, /b/i)).should == '((x ~* \'a\') OR (x ~* \'b\'))'
     @d.l(:x.ilike('a', /b/)).should == '((x ILIKE \'a\') OR (x ~* \'b\'))'
+
+    @d.l('a'.ilike(:x)).should == "('a' ILIKE x)"
+    @d.l('a'.ilike(:x, 'b')).should == "(('a' ILIKE x) OR ('a' ILIKE 'b'))"
+    @d.l('a'.ilike(:x, /b/)).should == "(('a' ILIKE x) OR ('a' ~* 'b'))"
+    @d.l('a'.ilike(:x, /b/i)).should == "(('a' ILIKE x) OR ('a' ~* 'b'))"
+
+    @d.l(/a/.ilike(:x)).should == "('a' ~* x)"
+    @d.l(/a/.ilike(:x, 'b')).should == "(('a' ~* x) OR ('a' ~* 'b'))"
+    @d.l(/a/.ilike(:x, /b/)).should == "(('a' ~* x) OR ('a' ~* 'b'))"
+    @d.l(/a/.ilike(:x, /b/i)).should == "(('a' ~* x) OR ('a' ~* 'b'))"
+
+    @d.l(/a/i.ilike(:x)).should == "('a' ~* x)"
+    @d.l(/a/i.ilike(:x, 'b')).should == "(('a' ~* x) OR ('a' ~* 'b'))"
+    @d.l(/a/i.ilike(:x, /b/)).should == "(('a' ~* x) OR ('a' ~* 'b'))"
+    @d.l(/a/i.ilike(:x, /b/i)).should == "(('a' ~* x) OR ('a' ~* 'b'))"
   end
 
   it "should support NOT ILIKE via Symbol#ilike and Symbol#~" do
@@ -95,6 +143,21 @@ context "Blockless Ruby Filters" do
     @d.l(~:x.ilike('a', 'b')).should == '((x NOT ILIKE \'a\') AND (x NOT ILIKE \'b\'))'
     @d.l(~:x.ilike(/a/, /b/i)).should == '((x !~* \'a\') AND (x !~* \'b\'))'
     @d.l(~:x.ilike('a', /b/)).should == '((x NOT ILIKE \'a\') AND (x !~* \'b\'))'
+
+    @d.l(~'a'.ilike(:x)).should == "('a' NOT ILIKE x)"
+    @d.l(~'a'.ilike(:x, 'b')).should == "(('a' NOT ILIKE x) AND ('a' NOT ILIKE 'b'))"
+    @d.l(~'a'.ilike(:x, /b/)).should == "(('a' NOT ILIKE x) AND ('a' !~* 'b'))"
+    @d.l(~'a'.ilike(:x, /b/i)).should == "(('a' NOT ILIKE x) AND ('a' !~* 'b'))"
+
+    @d.l(~/a/.ilike(:x)).should == "('a' !~* x)"
+    @d.l(~/a/.ilike(:x, 'b')).should == "(('a' !~* x) AND ('a' !~* 'b'))"
+    @d.l(~/a/.ilike(:x, /b/)).should == "(('a' !~* x) AND ('a' !~* 'b'))"
+    @d.l(~/a/.ilike(:x, /b/i)).should == "(('a' !~* x) AND ('a' !~* 'b'))"
+
+    @d.l(~/a/i.ilike(:x)).should == "('a' !~* x)"
+    @d.l(~/a/i.ilike(:x, 'b')).should == "(('a' !~* x) AND ('a' !~* 'b'))"
+    @d.l(~/a/i.ilike(:x, /b/)).should == "(('a' !~* x) AND ('a' !~* 'b'))"
+    @d.l(~/a/i.ilike(:x, /b/i)).should == "(('a' !~* x) AND ('a' !~* 'b'))"
   end
 
   it "should support negating ranges via Hash#~ and Range" do

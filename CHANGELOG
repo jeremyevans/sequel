@@ -1,5 +1,7 @@
 === HEAD
 
+* Support the use of Regexp as first argument to StringExpression.like (jeremyevans)
+
 * Fix Database#indexes on PostgreSQL when the schema used is a symbol (jeremyevans)
 
 === 3.1.0 (2009-06-04)
