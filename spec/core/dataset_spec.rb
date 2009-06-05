@@ -2421,6 +2421,10 @@ context "Dataset#insert_sql" do
   specify "should accept array subscript references" do
     @ds.insert_sql((:day.sql_subscript(1)) => 'd').should == "INSERT INTO items (day[1]) VALUES ('d')"
   end
+
+  specify "should raise an Error if the dataset has no sources" do
+    proc{Sequel::Database.new.dataset.insert_sql}.should raise_error(Sequel::Error)
+  end
 end
 
 class DummyMummyDataset < Sequel::Dataset
@@ -2680,17 +2684,35 @@ context Sequel::Dataset::UnnumberedArgumentMapper do
     def @ds.execute(sql, opts={}, &block)
       @db.execute(sql, {:arguments=>bind_arguments}.merge(opts))
     end
-    @ps = @ds.prepare(:select, :sn)
-    @ps.extend(Sequel::Dataset::UnnumberedArgumentMapper)
+    def @ds.execute_dui(*args, &block)
+      execute(*args, &block)
+    end
+    def @ds.execute_insert(*args, &block)
+      execute(*args, &block)
+    end
+    @ps = []
+    @ps << @ds.prepare(:select, :s)
+    @ps << @ds.prepare(:all, :a)
+    @ps << @ds.prepare(:first, :f)
+    @ps << @ds.prepare(:delete, :d)
+    @ps << @ds.prepare(:insert, :i, :num=>:$n)
+    @ps << @ds.prepare(:update, :u, :num=>:$n)
+    @ps.each{|p| p.extend(Sequel::Dataset::UnnumberedArgumentMapper)}
   end
 
   specify "#inspect should show the actual SQL submitted to the database" do
-    @ps.inspect.should == '<Sequel::Dataset/PreparedStatement "SELECT * FROM items WHERE (num = ?)">'
+    @ps.first.inspect.should == '<Sequel::Dataset/PreparedStatement "SELECT * FROM items WHERE (num = ?)">'
   end
   
   specify "should submitted the SQL to the database with placeholders and bind variables" do
-    @ps.call(:n=>1)
-    @db.sqls.should == [["SELECT * FROM items WHERE (num = ?)", 1]]
+    @ps.each{|p| p.call(:n=>1)}
+    @db.sqls.should == [["SELECT * FROM items WHERE (num = ?)", 1],
+      ["SELECT * FROM items WHERE (num = ?)", 1],
+      ["SELECT * FROM items WHERE (num = ?) LIMIT 1", 1],
+      ["DELETE FROM items WHERE (num = ?)", 1],
+      ["INSERT INTO items (num) VALUES (?)", 1],
+      ["UPDATE items SET num = ? WHERE (num = ?)", 1, 1],
+      ]
   end
 end
 
@@ -2800,7 +2822,7 @@ context "Sequel::Dataset#qualify_to_first_source" do
   end
 
   specify "should handle hashes" do
-    @ds.filter(:a=>{:b=>:c}).qualify_to_first_source.sql.should == 'SELECT t.* FROM t WHERE (t.a = (t.b = t.c))'
+    @ds.select({:b=>{:c=>1}}.case(false)).qualify_to_first_source.sql.should == "SELECT (CASE WHEN t.b THEN (t.c = 1) ELSE 'f' END) FROM t"
   end
 
   specify "should handle SQL::Identifiers" do
@@ -2832,7 +2854,7 @@ context "Sequel::Dataset#qualify_to_first_source" do
   end
 
   specify "should handle SQL::SQLArrays" do
-    @ds.filter(:a=>[:b, :c]).qualify_to_first_source.sql.should == 'SELECT t.* FROM t WHERE (t.a IN (t.b, t.c))'
+    @ds.filter(:a=>[:b, :c].sql_array).qualify_to_first_source.sql.should == 'SELECT t.* FROM t WHERE (t.a IN (t.b, t.c))'
   end
 
   specify "should handle SQL::Subscripts" do

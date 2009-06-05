@@ -159,7 +159,7 @@ context "Sequel::Migrator" do
     File.open('001_create_sessions.rb', 'w') {|f| f << MIGRATION_001}
     File.open('002_create_nodes.rb', 'w') {|f| f << MIGRATION_002}
     File.open('003_create_users.rb', 'w') {|f| f << MIGRATION_003}
-    File.open('005_create_attributes.rb', 'w') {|f| f << MIGRATION_005}
+    File.open('005_5_create_attributes.rb', 'w') {|f| f << MIGRATION_005}
     Dir.mkdir("alt_app")
     File.open('alt_app/001_create_alt_basic.rb', 'w') {|f| f << ALT_MIGRATION_001}
     File.open('alt_app/003_create_alt_advanced.rb', 'w') {|f| f << ALT_MIGRATION_003}
@@ -178,7 +178,7 @@ context "Sequel::Migrator" do
     File.delete('001_create_sessions.rb')
     File.delete('002_create_nodes.rb')
     File.delete('003_create_users.rb')
-    File.delete('005_create_attributes.rb')
+    File.delete('005_5_create_attributes.rb')
     File.delete("alt_app/001_create_alt_basic.rb")
     File.delete("alt_app/003_create_alt_advanced.rb")
     Dir.rmdir("alt_app")
@@ -191,8 +191,8 @@ context "Sequel::Migrator" do
     Sequel::Migrator.migration_files('.', 1..3).should == \
       ['./001_create_sessions.rb', './002_create_nodes.rb', './003_create_users.rb']
 
-    Sequel::Migrator.migration_files('.', 3..5).should == \
-      ['./003_create_users.rb', './005_create_attributes.rb']
+    Sequel::Migrator.migration_files('.', 3..6).should == \
+      ['./003_create_users.rb', './005_5_create_attributes.rb']
       
     Sequel::Migrator.migration_files('.', 7..8).should == []
 

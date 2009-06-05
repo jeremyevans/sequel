@@ -1,5 +1,17 @@
 === HEAD
 
+* Make Model.grep call Dataset#grep instead of Enumerable#grep (jeremyevans)
+
+* Support the use of Regexp as first argument to StringExpression.like (jeremyevans)
+
+* Fix Database#indexes on PostgreSQL when the schema used is a symbol (jeremyevans)
+
+=== 3.1.0 (2009-06-04)
+
+* Require the classes match to consider an association a reciprocal (jeremyevans) (#270)
+
+* Make Migrator work correctly with file names like 001_873465873465873465_some_name.rb (jeremyevans) (#267)
+
 * Add Dataset#qualify_to and #qualify_to_first_source, for qualifying unqualified identifiers in the dataset (jeremyevans)
 
 * All the use of #sql_subscript on most SQL::* objects, and support non-integer subscript values (jeremyevans)
@@ -10,7 +22,7 @@
 
 * Add the :cartesian_product_number option to associations, for specifying if they can cause a cartesian product (jeremyevans)
 
-* Make :eager_graph association option work correctly when eagerly loading many_to_many associations (jeremyevans)
+* Make :eager_graph association option work correctly when lazily loading many_to_many associations (jeremyevans)
 
 * Make eager_unique_table_alias consider joined tables as well as tables in the FROM clause (jeremyevans)
 

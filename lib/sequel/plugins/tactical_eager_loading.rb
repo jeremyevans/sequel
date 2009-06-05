@@ -8,24 +8,16 @@ module Sequel
     # the associated objects for all objects retrieved with the dataset that
     # retrieved the current object.
     #
-    # Tactical eager loading requires the identity_map plugin to
-    # function correctly.  It only takes affect if you reteived the
+    # Tactical eager loading only takes affect if you retrieved the
     # current object with Dataset#all, it doesn't work if you
     # retrieved the current object with Dataset#each.
     #
     # Basically, this allows the following code to issue only two queries:
     #
-    #   Sequel::Model.with_identity_map do
-    #     Album.filter{id<100}.all do |a|
-    #       a.artists
-    #     end
+    #   Album.filter{id<100}.all do |a|
+    #     a.artists
     #   end
     module TacticalEagerLoading
-      # Tactical eager loading requires the identity_map plugin
-      def self.apply(model)
-        model.plugin :identity_map  
-      end
-      
       module InstanceMethods
         # The dataset that retrieved this object, set if the object was
         # reteived via Dataset#all with an active identity map.
@@ -43,7 +35,7 @@ module Sequel
         # current object.
         def load_associated_objects(opts, reload=false)
           name = opts[:name]
-          if model.identity_map && !associations.include?(name) && retrieved_by
+          if !associations.include?(name) && retrieved_by
             retrieved_by.send(:eager_load, retrieved_with, name=>{})
           end
           super
@@ -57,12 +49,10 @@ module Sequel
         # with the current dataset and array of all objects.
         def post_load(objects)
           super
-          if model.identity_map
-            objects.each do |o|
-              next unless o.is_a?(Sequel::Model)
-              o.retrieved_by = self
-              o.retrieved_with = objects
-            end
+          objects.each do |o|
+            next unless o.is_a?(Sequel::Model)
+            o.retrieved_by = self
+            o.retrieved_with = objects
           end
         end
       end

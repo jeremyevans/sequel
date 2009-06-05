@@ -10,6 +10,7 @@ end
 unless defined?(MYSQL_SOCKET_FILE)
   MYSQL_SOCKET_FILE = '/tmp/mysql.sock'
 end
+INTEGRATION_DB = MYSQL_DB unless defined?(INTEGRATION_DB)
 
 MYSQL_URI = URI.parse(MYSQL_DB.uri)
 

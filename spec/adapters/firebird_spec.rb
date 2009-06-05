@@ -4,6 +4,7 @@ unless defined?(FIREBIRD_DB)
   FIREBIRD_URL = 'firebird://sysdba:masterkey@localhost/reality_spec' unless defined? FIREBIRD_URL
   FIREBIRD_DB = Sequel.connect(ENV['SEQUEL_FB_SPEC_DB']||FIREBIRD_URL)
 end
+INTEGRATION_DB = FIREBIRD_DB unless defined?(INTEGRATION_DB)
 
 def FIREBIRD_DB.sqls
   (@sqls ||= [])

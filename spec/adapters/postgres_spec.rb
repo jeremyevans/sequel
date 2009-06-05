@@ -4,6 +4,7 @@ unless defined?(POSTGRES_DB)
   POSTGRES_URL = 'postgres://postgres:postgres@localhost:5432/reality_spec' unless defined? POSTGRES_URL
   POSTGRES_DB = Sequel.connect(ENV['SEQUEL_PG_SPEC_DB']||POSTGRES_URL)
 end
+INTEGRATION_DB = POSTGRES_DB unless defined?(INTEGRATION_DB)
 
 def POSTGRES_DB.sqls
   (@sqls ||= [])

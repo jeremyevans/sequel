@@ -40,7 +40,7 @@ module Sequel
     # Class methods added to model that call the method of the same name on the dataset
     DATASET_METHODS = %w'<< all avg count delete distinct eager eager_graph
        each each_page empty? except exclude filter first from from_self
-       full_outer_join get graph group group_and_count group_by having import
+       full_outer_join get graph grep group group_and_count group_by having import
        inner_join insert insert_multiple intersect interval join join_table
        last left_outer_join limit map multi_insert naked order order_by
        order_more paginate print query range reverse_order right_outer_join

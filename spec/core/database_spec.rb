@@ -614,6 +614,14 @@ context "Database#transaction" do
     @db.sql.should == ['BEGIN', 'DROP TABLE a', 'ROLLBACK']
   end
   
+  specify "should raise database errors when commiting a transaction as Sequel::DatabaseError" do
+    @db.meta_def(:commit_transaction){raise ArgumentError}
+    lambda{@db.transaction{}}.should raise_error(ArgumentError)
+
+    @db.meta_def(:database_error_classes){[ArgumentError]}
+    lambda{@db.transaction{}}.should raise_error(Sequel::DatabaseError)
+  end
+  
   specify "should be re-entrant" do
     stop = false
     cc = nil
@@ -1139,5 +1147,37 @@ context "Database#schema_autoincrementing_primary_key?" do
     m = Sequel::Database.new.method(:schema_autoincrementing_primary_key?)
     m.call(:primary_key=>true).should == true
     m.call(:primary_key=>false).should == false
+  end
+end
+
+context "Database#supports_savepoints?" do
+  specify "should be false by default" do
+    Sequel::Database.new.supports_savepoints?.should == false
+  end
+end
+
+context "Database#input_identifier_meth" do
+  specify "should be the input_identifer method of a default dataset for this database" do
+    db = Sequel::Database.new
+    db.send(:input_identifier_meth).call(:a).should == 'a'
+    db.identifier_input_method = :upcase
+    db.send(:input_identifier_meth).call(:a).should == 'A'
+  end
+end
+
+context "Database#output_identifier_meth" do
+  specify "should be the output_identifer method of a default dataset for this database" do
+    db = Sequel::Database.new
+    db.send(:output_identifier_meth).call('A').should == :A
+    db.identifier_output_method = :downcase
+    db.send(:output_identifier_meth).call('A').should == :a
+  end
+end
+
+context "Database#metadata_dataset" do
+  specify "should be a dataset with the default settings for identifier_input_method and identifier_output_method" do
+    ds = Sequel::Database.new.send(:metadata_dataset)
+    ds.literal(:a).should == 'A'
+    ds.send(:output_identifier, 'A').should == :a
   end
 end

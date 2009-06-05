@@ -37,6 +37,17 @@ describe Sequel::Model::Associations::AssociationReflection, "#primary_key" do
 end
 
 describe Sequel::Model::Associations::AssociationReflection, "#reciprocal" do
+  before do
+    class ::ParParent < Sequel::Model; end
+    class ::ParParentTwo < Sequel::Model; end
+    class ::ParParentThree < Sequel::Model; end
+  end
+  after do
+    Object.send(:remove_const, :ParParent)
+    Object.send(:remove_const, :ParParentTwo)
+    Object.send(:remove_const, :ParParentThree)
+  end
+
   it "should use the :reciprocal value if present" do
     @c = Class.new(Sequel::Model)
     @d = Class.new(Sequel::Model)
@@ -45,10 +56,25 @@ describe Sequel::Model::Associations::AssociationReflection, "#reciprocal" do
     @c.association_reflection(:c).reciprocal.should == :xx
   end
 
+  it "should require the associated class is the current class to be a reciprocal" do
+    ParParent.many_to_one :par_parent_two, :key=>:blah
+    ParParent.many_to_one :par_parent_three, :key=>:blah
+    ParParentTwo.one_to_many :par_parents, :key=>:blah
+    ParParentThree.one_to_many :par_parents, :key=>:blah
+
+    ParParentTwo.association_reflection(:par_parents).reciprocal.should == :par_parent_two
+    ParParentThree.association_reflection(:par_parents).reciprocal.should == :par_parent_three
+
+    ParParent.many_to_many :par_parent_twos, :left_key=>:l, :right_key=>:r, :join_table=>:jt
+    ParParent.many_to_many :par_parent_threes, :left_key=>:l, :right_key=>:r, :join_table=>:jt
+    ParParentTwo.many_to_many :par_parents, :right_key=>:l, :left_key=>:r, :join_table=>:jt
+    ParParentThree.many_to_many :par_parents, :right_key=>:l, :left_key=>:r, :join_table=>:jt
+
+    ParParentTwo.association_reflection(:par_parents).reciprocal.should == :par_parent_twos
+    ParParentThree.association_reflection(:par_parents).reciprocal.should == :par_parent_threes
+  end
+
   it "should figure out the reciprocal if the :reciprocal value is not present" do
-    class ::ParParent < Sequel::Model; end
-    class ::ParParentTwo < Sequel::Model; end
-    class ::ParParentThree < Sequel::Model; end
     ParParent.many_to_one :par_parent_two
     ParParentTwo.one_to_many :par_parents
     ParParent.many_to_many :par_parent_threes

@@ -257,6 +257,7 @@ END_MIG
     p["'2009-10-29T10:20:30-07:00'", :datetime].should == DateTime.parse('2009-10-29T10:20:30-07:00')
     p["'2009-10-29 10:20:30'", :datetime].should == DateTime.parse('2009-10-29 10:20:30')
     p["'10:20:30'", :time].should == Time.parse('10:20:30')
+    p["NaN", :float].should == nil
   end
   
   it "should handle converting common defaults" do

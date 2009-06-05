@@ -693,6 +693,9 @@ module Sequel
       include StringConcatenationMethods
       include InequalityMethods
       include NoBooleanInputMethods
+
+      # Map of [regexp, case_insenstive] to ComplexExpression operator
+      LIKE_MAP = {[true, true]=>:'~*', [true, false]=>:~, [false, true]=>:ILIKE, [false, false]=>:LIKE}
       
       # Creates a SQL pattern match exprssion. left (l) is the SQL string we
       # are matching against, and ces are the patterns we are matching.
@@ -709,13 +712,27 @@ module Sequel
       # if a case insensitive regular expression is used (//i), that particular
       # pattern which will always be case insensitive.
       def self.like(l, *ces)
-        case_insensitive = (ces.last.is_a?(Hash) ? ces.pop : {})[:case_insensitive]
+        l, lre, lci = like_element(l)
+        lci = (ces.last.is_a?(Hash) ? ces.pop : {})[:case_insensitive] ? true : lci
         ces.collect! do |ce|
-          op, expr = Regexp === ce ? [ce.casefold? || case_insensitive ? :'~*' : :~, ce.source] : [case_insensitive ? :ILIKE : :LIKE, ce]
-          BooleanExpression.new(op, l, expr)
+          r, rre, rci = like_element(ce)
+          BooleanExpression.new(LIKE_MAP[[lre||rre, lci||rci]], l, r)
         end
         ces.length == 1 ? ces.at(0) : BooleanExpression.new(:OR, *ces)
       end
+      
+      # An array of three parts:
+      # * The object to use
+      # * Whether it is a regular expression
+      # * Whether it is case insensitive
+      def self.like_element(re) # :nodoc:
+        if re.is_a?(Regexp)
+          [re.source, true, re.casefold?]
+        else
+          [re, false, false]
+        end
+      end
+      private_class_method :like_element
     end
 
     # Represents an SQL array.  Added so it is possible to deal with a
