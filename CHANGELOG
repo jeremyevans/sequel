@@ -1,5 +1,7 @@
 === HEAD
 
+* Add -N option to bin/sequel to not test the database connection (jeremyevans)
+
 * Make Model.grep call Dataset#grep instead of Enumerable#grep (jeremyevans)
 
 * Support the use of Regexp as first argument to StringExpression.like (jeremyevans)

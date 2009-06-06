@@ -13,6 +13,7 @@ logfile = nil
 migrate_dir = nil
 migrate_ver = nil
 backtrace = nil
+test_connection = true
 load_dirs = []
 
 opts = OptionParser.new do |opts|
@@ -69,6 +70,10 @@ opts = OptionParser.new do |opts|
     migrate_ver = Integer(v)
   end
 
+  opts.on("-N", "--no-test-connection", "do not test the connection") do
+    test_connection = false
+  end
+
   opts.on("-t", "--trace", "Output the full backtrace if an exception is raised") do
     backtrace = true
   end
@@ -100,7 +105,7 @@ if logfile || echo
 end
 
 connect_proc = lambda do |database|
-  if File.exist?(database)
+  db = if File.exist?(database)
     require 'yaml'
     env ||= "development"
     db_config = YAML.load_file(database)
@@ -110,11 +115,12 @@ connect_proc = lambda do |database|
   else
     Sequel.connect(database, db_opts)
   end
+  db.test_connection if test_connection
+  db
 end
 
 begin
   DB = connect_proc[db]
-  DB.test_connection
   if migrate_dir
     Sequel.extension :migration
     Sequel::Migrator.apply(DB, migrate_dir, migrate_ver)
@@ -132,7 +138,6 @@ begin
     error_proc["Error: Must specify database connection string or path to yaml file as second argument for database you want to copy to"] if db2.nil? || db2.empty?
     start_time = Time.now
     TO_DB = connect_proc[db2]
-    TO_DB.test_connection
     same_db = DB.database_type==TO_DB.database_type
 
     puts "Databases connections successful"
