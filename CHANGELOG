@@ -1,5 +1,7 @@
 === HEAD
 
+* Raise a Sequel::Error if Sequel.connect is called with something other than a Hash or String (jeremyevans) (#272)
+
 * Add -N option to bin/sequel to not test the database connection (jeremyevans)
 
 * Make Model.grep call Dataset#grep instead of Enumerable#grep (jeremyevans)

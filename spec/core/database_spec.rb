@@ -740,6 +740,13 @@ context "A Database adapter with a scheme" do
 
 end
 
+context "Sequel::Database.connect" do
+  specify "should raise an Error if not given a String or Hash" do
+    proc{Sequel::Database.connect(nil)}.should raise_error(Sequel::Error)
+    proc{Sequel::Database.connect(Object.new)}.should raise_error(Sequel::Error)
+  end
+end
+
 context "An unknown database scheme" do
   specify "should raise an error in Sequel::Database.connect" do
     proc {Sequel::Database.connect('ddd://localhost/db')}.should raise_error(Sequel::AdapterNotFound)
