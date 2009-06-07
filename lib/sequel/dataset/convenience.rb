@@ -210,17 +210,6 @@ module Sequel
       get{|o| o.sum(column)}
     end
 
-    # Returns true if the table exists.  Will raise an error
-    # if the dataset has fixed SQL or selects from another dataset
-    # or more than one table.
-    def table_exists?
-      raise(Sequel::Error, "this dataset has fixed SQL") if @opts[:sql]
-      raise(Sequel::Error, "this dataset selects from multiple sources") if @opts[:from].size != 1
-      t = @opts[:from].first
-      raise(Sequel::Error, "this dataset selects from a sub query") if t.is_a?(Dataset)
-      @db.table_exists?(t)
-    end
-
     # Returns a string in CSV format containing the dataset records. By 
     # default the CSV representation includes the column titles in the
     # first line. You can turn that off by passing false as the 

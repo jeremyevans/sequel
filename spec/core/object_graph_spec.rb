@@ -30,7 +30,18 @@ describe Sequel::Dataset, " graphing" do
 
   it "#graph should accept a complex dataset and pass it directly to join" do
     ds = @ds1.graph(@ds2.filter(:x=>1), {:x=>:id})
-    ds.sql.should == 'SELECT points.id, points.x, points.y, lines.id AS lines_id, lines.x AS lines_x, lines.y AS lines_y, lines.graph_id FROM points LEFT OUTER JOIN (SELECT * FROM lines WHERE (x = 1)) AS lines ON (lines.x = points.id)'
+    ds.sql.should == 'SELECT points.id, points.x, points.y, t1.id AS t1_id, t1.x AS t1_x, t1.y AS t1_y, t1.graph_id FROM points LEFT OUTER JOIN (SELECT * FROM lines WHERE (x = 1)) AS t1 ON (t1.x = points.id)'
+  end
+
+  it "#graph should work on from_self datasets" do
+    ds = @ds1.from_self.graph(@ds2, :x=>:id)
+    ds.sql.should == 'SELECT t1.id, t1.x, t1.y, lines.id AS lines_id, lines.x AS lines_x, lines.y AS lines_y, lines.graph_id FROM (SELECT * FROM points) AS t1 LEFT OUTER JOIN lines ON (lines.x = t1.id)'
+    ds = @ds1.graph(@ds2.from_self, :x=>:id)
+    ds.sql.should == 'SELECT points.id, points.x, points.y, t1.id AS t1_id, t1.x AS t1_x, t1.y AS t1_y, t1.graph_id FROM points LEFT OUTER JOIN (SELECT * FROM (SELECT * FROM lines) AS t1) AS t1 ON (t1.x = points.id)'
+    ds = @ds1.from_self.from_self.graph(@ds2.from_self.from_self, :x=>:id)
+    ds.sql.should == 'SELECT t1.id, t1.x, t1.y, t2.id AS t2_id, t2.x AS t2_x, t2.y AS t2_y, t2.graph_id FROM (SELECT * FROM (SELECT * FROM points) AS t1) AS t1 LEFT OUTER JOIN (SELECT * FROM (SELECT * FROM (SELECT * FROM lines) AS t1) AS t1) AS t2 ON (t2.x = t1.id)'
+    ds = @ds1.from(@ds1, @ds3).graph(@ds2.from_self, :x=>:id)
+    ds.sql.should == 'SELECT t1.id, t1.x, t1.y, t3.id AS t3_id, t3.x AS t3_x, t3.y AS t3_y, t3.graph_id FROM (SELECT * FROM points) AS t1, (SELECT * FROM graphs) AS t2 LEFT OUTER JOIN (SELECT * FROM (SELECT * FROM lines) AS t1) AS t3 ON (t3.x = t1.id)'
   end
 
   it "#graph should accept a symbol table name as the dataset" do

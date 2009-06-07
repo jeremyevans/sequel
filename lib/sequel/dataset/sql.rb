@@ -7,6 +7,7 @@ module Sequel
     COLUMN_REF_RE2 = /\A([\w ]+)___([\w ]+)\z/.freeze
     COLUMN_REF_RE3 = /\A([\w ]+)__([\w ]+)\z/.freeze
     COUNT_FROM_SELF_OPTS = [:distinct, :group, :sql, :limit, :compounds]
+    DATASET_ALIAS_BASE_NAME = 't'.freeze
     INSERT_SQL_BASE="INSERT INTO ".freeze
     IS_LITERALS = {nil=>'NULL'.freeze, true=>'TRUE'.freeze, false=>'FALSE'.freeze}.freeze
     IS_OPERATORS = ::Sequel::SQL::ComplexExpression::IS_OPERATORS
@@ -204,14 +205,14 @@ module Sequel
 
     # The first source (primary table) for this dataset.  If the dataset doesn't
     # have a table, raises an error.  If the table is aliased, returns the aliased name.
-    def first_source
+    def first_source_alias
       source = @opts[:from]
       if source.nil? || source.empty?
         raise Error, 'No source specified for query'
       end
       case s = source.first
-      when Hash
-        s.values.first
+      when SQL::AliasedExpression
+        s.aliaz
       when Symbol
         sch, table, aliaz = split_symbol(s)
         aliaz ? aliaz.to_sym : s
@@ -219,6 +220,7 @@ module Sequel
         s
       end
     end
+    alias first_source first_source_alias
 
     # Returns a copy of the dataset with the source changed.
     #
@@ -226,9 +228,31 @@ module Sequel
     #   dataset.from(:blah) # SQL: SELECT * FROM blah
     #   dataset.from(:blah, :foo) # SQL: SELECT * FROM blah, foo
     def from(*source)
-      clone(:from=>source.empty? ? nil : source)
+      table_alias_num = 0
+      sources = []
+      source.each do |s|
+        case s
+        when Hash
+          s.each{|k,v| sources << SQL::AliasedExpression.new(k,v)}
+        when Dataset
+          sources << SQL::AliasedExpression.new(s, dataset_alias(table_alias_num+=1))
+        when Symbol
+          sch, table, aliaz = split_symbol(s)
+          if aliaz
+            s = sch ? SQL::QualifiedIdentifier.new(sch.to_sym, table.to_sym) : SQL::Identifier.new(table.to_sym)
+            sources << SQL::AliasedExpression.new(s, aliaz.to_sym)
+          else
+            sources << s
+          end
+        else
+          sources << s
+        end
+      end
+      o = {:from=>sources.empty? ? nil : sources}
+      o[:num_dataset_sources] = table_alias_num if table_alias_num > 0
+      clone(o)
     end
-    
+
     # Returns a dataset selecting from the current dataset.
     #
     #   ds = DB[:items].order(:name)
@@ -237,8 +261,7 @@ module Sequel
     def from_self
       fs = {}
       @opts.keys.each{|k| fs[k] = nil} 
-      fs[:from] = [self]
-      clone(fs)
+      clone(fs).from(self)
     end
 
     # SQL fragment specifying an SQL function call
@@ -421,7 +444,7 @@ module Sequel
       if Dataset === table
         if table_alias.nil?
           table_alias_num = (@opts[:num_dataset_sources] || 0) + 1
-          table_alias = "t#{table_alias_num}"
+          table_alias = dataset_alias(table_alias_num)
         end
         table_name = table_alias
       else
@@ -435,7 +458,7 @@ module Sequel
         raise(Sequel::Error, "can't use a block if providing an array of symbols as expr") if block_given?
         SQL::JoinUsingClause.new(expr, type, table, table_alias)
       else
-        last_alias ||= @opts[:last_joined_table] || (first_source.is_a?(Dataset) ? 't1' : first_source)
+        last_alias ||= @opts[:last_joined_table] || first_source_alias
         if Sequel.condition_specifier?(expr)
           expr = expr.collect do |k, v|
             k = qualified_column_name(k, table_name) if k.is_a?(Symbol)
@@ -847,6 +870,11 @@ module Sequel
       compound_from_self.clone(:compounds=>Array(@opts[:compounds]).map{|x| x.dup} + [[type, dataset.compound_from_self, all]]).from_self
     end
 
+    # The alias to use for datasets, takes a number to make sure the name is unique.
+    def dataset_alias(number)
+      :"#{DATASET_ALIAS_BASE_NAME}#{number}"
+    end
+    
     # Converts an array of expressions into a comma separated string of
     # expressions.
     def expression_list(columns)
@@ -1145,20 +1173,8 @@ module Sequel
 
     # Converts an array of source names into into a comma separated list.
     def source_list(source)
-      if source.nil? || source.empty?
-        raise Error, 'No source specified for query'
-      end
-      auto_alias_count = @opts[:num_dataset_sources] || 0
-      m = source.map do |s|
-        case s
-        when Dataset
-          auto_alias_count += 1
-          s.to_table_reference("t#{auto_alias_count}")
-        else
-          table_ref(s)
-        end
-      end
-      m.join(COMMA_SEPARATOR)
+      raise(Error, 'No source specified for query') if source.nil? || source.empty?
+      source.map{|s| table_ref(s)}.join(COMMA_SEPARATOR)
     end
     
     # Splits the symbol into three parts.  Each part will
@@ -1193,18 +1209,7 @@ module Sequel
 
     # SQL fragment specifying a table name.
     def table_ref(t)
-      case t
-      when Symbol
-        literal_symbol(t)
-      when Dataset
-        t.to_table_reference
-      when Hash
-        t.map{|k, v| as_sql(table_ref(k), v)}.join(COMMA_SEPARATOR)
-      when String
-        quote_identifier(t)
-      else
-        literal(t)
-      end
+      t.is_a?(String) ? quote_identifier(t) : literal(t)
     end
   end
 end

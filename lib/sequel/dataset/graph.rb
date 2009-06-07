@@ -48,12 +48,20 @@ module Sequel
       # Allow the use of a model, dataset, or symbol as the first argument
       # Find the table name/dataset based on the argument
       dataset = dataset.dataset if dataset.respond_to?(:dataset)
+      table_alias = options[:table_alias]
       case dataset
       when Symbol
         table = dataset
         dataset = @db[dataset]
+        table_alias ||= table
       when ::Sequel::Dataset
-        table = dataset.first_source
+        if dataset.simple_select_all?
+          table = dataset.opts[:from].first
+          table_alias ||= table
+        else
+          table = dataset
+          table_alias ||= dataset_alias((@opts[:num_dataset_sources] || 0)+1)
+        end
       else
         raise Error, "The dataset argument should be a symbol, dataset, or model"
       end
@@ -65,11 +73,10 @@ module Sequel
       end
 
       # Only allow table aliases that haven't been used
-      table_alias = options[:table_alias] || table
       raise_alias_error.call if @opts[:graph] && @opts[:graph][:table_aliases] && @opts[:graph][:table_aliases].include?(table_alias)
 
       # Join the table early in order to avoid cloning the dataset twice
-      ds = join_table(options[:join_type] || :left_outer, dataset.simple_select_all? ? table : dataset, join_conditions, :table_alias=>table_alias, :implicit_qualifier=>options[:implicit_qualifier], &block)
+      ds = join_table(options[:join_type] || :left_outer, table, join_conditions, :table_alias=>table_alias, :implicit_qualifier=>options[:implicit_qualifier], &block)
       opts = ds.opts
 
       # Whether to include the table in the result set
@@ -79,7 +86,7 @@ module Sequel
 
       # Setup the initial graph data structure if it doesn't exist
       unless graph = opts[:graph]
-        master = ds.first_source
+        master = ds.first_source_alias
         raise_alias_error.call if master == table_alias
         # Master hash storing all .graph related information
         graph = opts[:graph] = {}

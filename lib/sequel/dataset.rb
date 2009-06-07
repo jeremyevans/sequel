@@ -262,7 +262,7 @@ module Sequel
     # Whether this dataset is a simple SELECT * FROM table.
     def simple_select_all?
       o = @opts.reject{|k,v| v.nil?}
-      o.length == 1 && o[:from] && o[:from].length == 1
+      o.length == 1 && (f = o[:from]) && f.length == 1 && f.first.is_a?(Symbol)
     end
 
     private

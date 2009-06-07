@@ -1505,6 +1505,9 @@ context "Dataset#join_table" do
 
     @d.join_table(:left_outer, ds, :item_id => :id).sql.should ==
       'SELECT * FROM "items" LEFT OUTER JOIN (SELECT * FROM categories WHERE (active IS TRUE)) AS "t1" ON ("t1"."item_id" = "items"."id")'
+
+    @d.from_self.join_table(:left_outer, ds, :item_id => :id).sql.should ==
+      'SELECT * FROM (SELECT * FROM "items") AS "t1" LEFT OUTER JOIN (SELECT * FROM categories WHERE (active IS TRUE)) AS "t2" ON ("t2"."item_id" = "t1"."id")'
   end
   
   specify "should support joining datasets and aliasing the join" do
@@ -2446,29 +2449,6 @@ class DummyMummyDatabase < Sequel::Database
 
   def dataset
     DummyMummyDataset.new(self)
-  end
-end
-
-context "Dataset#table_exists?" do
-  before do
-    @db = DummyMummyDatabase.new
-  end
-  
-  specify "should otherwise try to select the first record from the table's dataset" do
-    @db[:a].table_exists?.should be_false
-    @db[:b].table_exists?.should be_true
-  end
-  
-  specify "should raise Sequel::Error if dataset references more than one table" do
-    proc {@db.from(:a, :b).table_exists?}.should raise_error(Sequel::Error)
-  end
-
-  specify "should raise Sequel::Error if dataset is from a subquery" do
-    proc {@db.from(@db[:a]).table_exists?}.should raise_error(Sequel::Error)
-  end
-
-  specify "should raise Sequel::Error if dataset has fixed sql" do
-    proc {@db['select * from blah'].table_exists?}.should raise_error(Sequel::Error)
   end
 end
 
