@@ -47,39 +47,6 @@ context "Migration#apply" do
   end
 end
 
-class DummyMigrationDataset
-  attr_reader :from
-  
-  def initialize(x); @from = x; end
-  
-  @@version = nil
-  
-  def version; @@version; end
-  def version=(x); @@version = x; end
-  def first; @@version ? {:version => @@version} : nil; end
-  def update(h); @@version = h[:version]; end
-  def <<(h); @@version = h[:version]; end
-end
-
-class DummyMigrationDB
-  attr_reader :creates, :drops, :table_created
-  
-  def initialize
-    @creates = []
-    @drops = []
-  end
-  
-  def create(x); @creates << x; end
-  def drop(x); @drops << x; end
-  
-  def [](x); DummyMigrationDataset.new(x); end
-  
-  def create_table(x); raise if @table_created == x; @table_created = x; end
-  def table_exists?(x); @table_created == x; end
-  
-  def transaction; yield; end
-end
-
 MIGRATION_001 = %[
   class CreateSessions < Sequel::Migration
     def up
@@ -154,7 +121,40 @@ ALT_MIGRATION_003 = %[
 
 context "Sequel::Migrator" do
   before do
-    @db = DummyMigrationDB.new
+    dbc = Class.new(MockDatabase) do
+      attr_reader :creates, :drops, :tables_created, :columns_created, :versions
+      def initialize(*args)
+        super
+        @creates = []
+        @drops = []
+        @tables_created = []
+        @columns_created = []
+        @versions = {}
+      end
+  
+      def create(x); @creates << x; end
+      def drop(x); @drops << x; end
+
+      def create_table(name, opts={}, &block)
+        super
+        @columns_created << / \(?(\w+) integer\)?\z/.match(sqls.last)[1].to_sym
+        @tables_created << name
+      end
+      
+      def dataset(opts={})
+        ds = super
+        def ds.columns; db.columns_created end
+        def ds.insert(h); db.versions.merge!(h); super end
+        def ds.update(h); db.versions.merge!(h); super end
+        def ds.fetch_rows(sql); db.execute(sql); yield(db.versions) unless db.versions.empty? end
+        ds
+      end
+
+      def table_exists?(name)
+        @tables_created.include?(name)
+      end
+    end
+    @db = dbc.new
     
     File.open('001_create_sessions.rb', 'w') {|f| f << MIGRATION_001}
     File.open('002_create_nodes.rb', 'w') {|f| f << MIGRATION_002}
@@ -163,8 +163,6 @@ context "Sequel::Migrator" do
     Dir.mkdir("alt_app")
     File.open('alt_app/001_create_alt_basic.rb', 'w') {|f| f << ALT_MIGRATION_001}
     File.open('alt_app/003_create_alt_advanced.rb', 'w') {|f| f << ALT_MIGRATION_003}
-    
-    @db[:schema_info].version = nil
   end
   
   after do
@@ -184,91 +182,85 @@ context "Sequel::Migrator" do
     Dir.rmdir("alt_app")
   end
   
-  specify "should return the list of files for a specified version range" do
-    Sequel::Migrator.migration_files('.', 1..1).should == \
-      ['./001_create_sessions.rb']
-
-    Sequel::Migrator.migration_files('.', 1..3).should == \
-      ['./001_create_sessions.rb', './002_create_nodes.rb', './003_create_users.rb']
-
-    Sequel::Migrator.migration_files('.', 3..6).should == \
-      ['./003_create_users.rb', './005_5_create_attributes.rb']
-      
+  specify "#migration_files should return the list of files for a specified version range" do
+    Sequel::Migrator.migration_files('.', 1..1).should == ['./001_create_sessions.rb']
+    Sequel::Migrator.migration_files('.', 1..3).should == ['./001_create_sessions.rb', './002_create_nodes.rb', './003_create_users.rb']
+    Sequel::Migrator.migration_files('.', 3..6).should == ['./003_create_users.rb', './005_5_create_attributes.rb']
     Sequel::Migrator.migration_files('.', 7..8).should == []
-
-    Sequel::Migrator.migration_files('alt_app', 1..1).should == \
-      ['alt_app/001_create_alt_basic.rb']
-
-    Sequel::Migrator.migration_files('alt_app', 1..3).should == \
-      ['alt_app/001_create_alt_basic.rb','alt_app/003_create_alt_advanced.rb']
+    Sequel::Migrator.migration_files('alt_app', 1..1).should == ['alt_app/001_create_alt_basic.rb']
+    Sequel::Migrator.migration_files('alt_app', 1..3).should == ['alt_app/001_create_alt_basic.rb','alt_app/003_create_alt_advanced.rb']
   end
   
-  specify "should return the latest version available" do
+  specify "#latest_migration_version should return the latest version available" do
     Sequel::Migrator.latest_migration_version('.').should == 5
     Sequel::Migrator.latest_migration_version('alt_app').should == 3
   end
   
-  specify "should load the migration classes for the specified range" do
-    Sequel::Migrator.migration_classes('.', 3, 0, :up).should == \
-      [CreateSessions, CreateNodes, CreateUsers]
-    Sequel::Migrator.migration_classes('alt_app', 3, 0, :up).should == \
-      [CreateAltBasic, CreateAltAdvanced]
+  specify "#migration_classes should load the migration classes for the specified range for the up direction" do
+    Sequel::Migrator.migration_classes('.', 3, 0, :up).should == [CreateSessions, CreateNodes, CreateUsers]
+    Sequel::Migrator.migration_classes('alt_app', 3, 0, :up).should == [CreateAltBasic, CreateAltAdvanced]
   end
   
-  specify "should load the migration classes for the specified range" do
-    Sequel::Migrator.migration_classes('.', 0, 5, :down).should == \
-      [CreateAttributes, CreateUsers, CreateNodes, CreateSessions]
-    Sequel::Migrator.migration_classes('alt_app', 0, 3, :down).should == \
-      [CreateAltAdvanced, CreateAltBasic]
+  specify "#migration_classes should load the migration classes for the specified range for the down direction" do
+    Sequel::Migrator.migration_classes('.', 0, 5, :down).should == [CreateAttributes, CreateUsers, CreateNodes, CreateSessions]
+    Sequel::Migrator.migration_classes('alt_app', 0, 3, :down).should == [CreateAltAdvanced, CreateAltBasic]
   end
   
-  specify "should start from current + 1 for the up direction" do
-    Sequel::Migrator.migration_classes('.', 3, 1, :up).should == \
-      [CreateNodes, CreateUsers]
-    Sequel::Migrator.migration_classes('alt_app', 3, 2, :up).should == \
-      [CreateAltAdvanced]
+  specify "#migration_classes should start from current + 1 for the up direction" do
+    Sequel::Migrator.migration_classes('.', 3, 1, :up).should == [CreateNodes, CreateUsers]
+    Sequel::Migrator.migration_classes('alt_app', 3, 2, :up).should == [CreateAltAdvanced]
   end
   
-  specify "should end on current + 1 for the down direction" do
-    Sequel::Migrator.migration_classes('.', 2, 5, :down).should == \
-      [CreateAttributes, CreateUsers]
-    Sequel::Migrator.migration_classes('alt_app', 2, 4, :down).should == \
-      [CreateAltAdvanced]
+  specify "#migration_classes should end on current + 1 for the down direction" do
+    Sequel::Migrator.migration_classes('.', 2, 5, :down).should == [CreateAttributes, CreateUsers]
+    Sequel::Migrator.migration_classes('alt_app', 2, 4, :down).should == [CreateAltAdvanced]
   end
   
-  specify "should automatically create the schema_info table" do
+  specify "#schema_info_dataset should automatically create the schema_info table" do
     @db.table_exists?(:schema_info).should be_false
     Sequel::Migrator.schema_info_dataset(@db)
     @db.table_exists?(:schema_info).should be_true
-    
-    # should not raise if table already exists
-    proc {Sequel::Migrator.schema_info_dataset(@db)}.should_not raise_error
+    @db.sqls.should == ["CREATE TABLE schema_info (version integer)"]
   end
 
   specify "should automatically create new APP_version column in schema_info" do
     @db.table_exists?(:schema_info).should be_false
     Sequel::Migrator.schema_info_dataset(@db, :column => :alt_version)
     @db.table_exists?(:schema_info).should be_true
+    @db.sqls.should == ["CREATE TABLE schema_info (alt_version integer)"]
   end
   
-  specify "should return a dataset for the schema_info table" do
-    d = Sequel::Migrator.schema_info_dataset(@db)
-    d.from.should == :schema_info
+  specify "should automatically create new APP_version column in schema_info" do
+    @db.table_exists?(:alt_table).should be_false
+    Sequel::Migrator.schema_info_dataset(@db, :table => :alt_table)
+    @db.table_exists?(:alt_table).should be_true
+    Sequel::Migrator.schema_info_dataset(@db, :table => :alt_table, :column=>:alt_version)
+    @db.sqls.should == ["CREATE TABLE alt_table (version integer)",
+      "ALTER TABLE alt_table ADD COLUMN alt_version integer"]
   end
   
-  specify "should get the migration version stored in the database" do
-    # default is 0
+  specify "should return a dataset for the correct table" do
+    Sequel::Migrator.schema_info_dataset(@db).first_source_alias.should == :schema_info
+    Sequel::Migrator.schema_info_dataset(@db, :table=>:blah).first_source_alias.should == :blah
+  end
+  
+  specify "should assume a migration version of 0 if no migration information exists in the database" do
     Sequel::Migrator.get_current_migration_version(@db).should == 0
-    
-    Sequel::Migrator.schema_info_dataset(@db) << {:version => 4321}
-
+    @db.sqls.should == ["CREATE TABLE schema_info (version integer)", "SELECT * FROM schema_info LIMIT 1"]
+  end
+  specify "should use the migration version stored in the database" do
+    Sequel::Migrator.schema_info_dataset(@db).insert(:version => 4321)
     Sequel::Migrator.get_current_migration_version(@db).should == 4321
+    @db.sqls.should == ["CREATE TABLE schema_info (version integer)", "INSERT INTO schema_info (version) VALUES (4321)", "SELECT * FROM schema_info LIMIT 1"]
   end
   
   specify "should set the migration version stored in the database" do
-    Sequel::Migrator.get_current_migration_version(@db).should == 0
     Sequel::Migrator.set_current_migration_version(@db, 6666)
     Sequel::Migrator.get_current_migration_version(@db).should == 6666
+    @db.sqls.should == ["CREATE TABLE schema_info (version integer)",
+      "SELECT * FROM schema_info LIMIT 1",
+      "INSERT INTO schema_info (version) VALUES (6666)",
+      "SELECT * FROM schema_info LIMIT 1"]
   end
   
   specify "should apply migrations correctly in the up direction" do
@@ -281,6 +273,14 @@ context "Sequel::Migrator" do
     @db.creates.should == [3333, 5555]
 
     Sequel::Migrator.get_current_migration_version(@db).should == 5
+    @db.sqls.should == ["CREATE TABLE schema_info (version integer)",
+      "SELECT * FROM schema_info LIMIT 1",
+      "INSERT INTO schema_info (version) VALUES (3)",
+      "SELECT * FROM schema_info LIMIT 1",
+      "SELECT * FROM schema_info LIMIT 1",
+      "SELECT * FROM schema_info LIMIT 1",
+      "UPDATE schema_info SET version = 5",
+      "SELECT * FROM schema_info LIMIT 1"]
   end
   
   specify "should apply migrations correctly in the down direction" do
@@ -288,6 +288,10 @@ context "Sequel::Migrator" do
     @db.drops.should == [5555, 3333, 2222]
 
     Sequel::Migrator.get_current_migration_version(@db).should == 1
+    @db.sqls.should == ["CREATE TABLE schema_info (version integer)",
+      "SELECT * FROM schema_info LIMIT 1",
+      "INSERT INTO schema_info (version) VALUES (1)",
+      "SELECT * FROM schema_info LIMIT 1"]
   end
 
   specify "should apply migrations up to the latest version if no target is given" do
@@ -295,6 +299,11 @@ context "Sequel::Migrator" do
     @db.creates.should == [1111, 2222, 3333, 5555]
 
     Sequel::Migrator.get_current_migration_version(@db).should == 5
+    @db.sqls.should == ["CREATE TABLE schema_info (version integer)",
+      "SELECT * FROM schema_info LIMIT 1",
+      "SELECT * FROM schema_info LIMIT 1",
+      "INSERT INTO schema_info (version) VALUES (5)",
+      "SELECT * FROM schema_info LIMIT 1"]
   end
 
   specify "should apply migrations down to 0 version correctly" do
@@ -302,13 +311,15 @@ context "Sequel::Migrator" do
     @db.drops.should == [5555, 3333, 2222, 1111]
 
     Sequel::Migrator.get_current_migration_version(@db).should == 0
+    @db.sqls.should == ["CREATE TABLE schema_info (version integer)",
+      "SELECT * FROM schema_info LIMIT 1",
+      "INSERT INTO schema_info (version) VALUES (0)",
+      "SELECT * FROM schema_info LIMIT 1"]
   end
   
   specify "should return the target version" do
     Sequel::Migrator.apply(@db, '.', 3, 2).should == 3
-
     Sequel::Migrator.apply(@db, '.', 0).should == 0
-
     Sequel::Migrator.apply(@db, '.').should == 5
   end
 end

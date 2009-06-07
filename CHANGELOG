@@ -1,5 +1,7 @@
 === HEAD
 
+* Support using a given table and column to store schema versions, using new Migrator.run method (bougyman, jeremyevans)
+
 * Fix foreign key table constraints on MySQL (jeremyevans)
 
 * Remove Dataset#table_exists?, use Database#table_exists? instead (jeremyevans)
