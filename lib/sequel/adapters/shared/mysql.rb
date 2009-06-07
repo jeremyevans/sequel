@@ -1,10 +1,6 @@
 Sequel.require %w'unsupported savepoint_transactions', 'adapters/utils'
 
 module Sequel
-  class Database
-    # Keep default column_references_sql for add_foreign_key support
-    alias default_column_references_sql column_references_sql
-  end
   module MySQL
     class << self
       # Set the default options used for CREATE TABLE
@@ -87,7 +83,7 @@ module Sequel
           if related = op.delete(:table)
             sql = super(table, op)
             op[:table] = related
-            [sql, "ALTER TABLE #{quote_schema_table(table)} ADD FOREIGN KEY (#{quote_identifier(op[:name])})#{default_column_references_sql(op)}"]
+            [sql, "ALTER TABLE #{quote_schema_table(table)} ADD FOREIGN KEY (#{quote_identifier(op[:name])})#{column_references_sql(op)}"]
           else
             super(table, op)
           end
@@ -119,9 +115,9 @@ module Sequel
         super
       end
       
-      # Handle MySQL specific syntax for column references
-      def column_references_sql(column)
-        "#{", FOREIGN KEY (#{quote_identifier(column[:name])})" unless column[:type] == :check}#{super(column)}"
+      # MySQL doesn't handle references as column constraints, it must use a separate table constraint
+      def column_references_column_constraint_sql(column)
+        "#{", FOREIGN KEY (#{quote_identifier(column[:name])})" unless column[:type] == :check}#{column_references_sql(column)}"
       end
       
       # Use MySQL specific syntax for engine type and character encoding

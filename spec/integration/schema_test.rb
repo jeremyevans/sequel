@@ -146,9 +146,7 @@ end
 
 describe "Database schema modifiers" do
   before do
-    INTEGRATION_DB.create_table!(:items){Integer :number}
     @ds = INTEGRATION_DB[:items]
-    @ds.insert([10])
     clear_sqls
   end
   after do
@@ -156,12 +154,27 @@ describe "Database schema modifiers" do
   end
 
   specify "should create tables correctly" do
+    INTEGRATION_DB.create_table!(:items){Integer :number}
     INTEGRATION_DB.table_exists?(:items).should == true
     INTEGRATION_DB.schema(:items, :reload=>true).map{|x| x.first}.should == [:number]
+    @ds.insert([10])
     @ds.columns!.should == [:number]
   end
 
+  specify "should handle foreign keys correctly when creating tables" do
+    INTEGRATION_DB.create_table!(:items) do 
+      primary_key :id
+      foreign_key :item_id, :items
+      unique [:item_id, :id]
+      foreign_key [:id, :item_id], :items, :key=>[:item_id, :id]
+    end
+    INTEGRATION_DB.table_exists?(:items).should == true
+    INTEGRATION_DB.schema(:items, :reload=>true).map{|x| x.first}.should == [:id, :item_id]
+    @ds.columns!.should == [:id, :item_id]
+  end
+
   specify "should add columns to tables correctly" do
+    INTEGRATION_DB.create_table!(:items){Integer :number}
     INTEGRATION_DB.schema(:items, :reload=>true).map{|x| x.first}.should == [:number]
     @ds.columns!.should == [:number]
     INTEGRATION_DB.alter_table(:items){add_column :name, :text}
@@ -172,6 +185,12 @@ describe "Database schema modifiers" do
       INTEGRATION_DB.schema(:items, :reload=>true).map{|x| x.first}.should == [:number, :name, :id]
       @ds.columns!.should == [:number, :name, :id]
       INTEGRATION_DB.alter_table(:items){add_foreign_key :item_id, :items}
+      INTEGRATION_DB.schema(:items, :reload=>true).map{|x| x.first}.should == [:number, :name, :id, :item_id]
+      @ds.columns!.should == [:number, :name, :id, :item_id]
+      INTEGRATION_DB.alter_table(:items) do
+        add_unique_constraint [:item_id, :id]
+        add_foreign_key [:id, :item_id], :items, :key=>[:item_id, :id]
+      end
       INTEGRATION_DB.schema(:items, :reload=>true).map{|x| x.first}.should == [:number, :name, :id, :item_id]
       @ds.columns!.should == [:number, :name, :id, :item_id]
     end

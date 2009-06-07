@@ -1,5 +1,7 @@
 === HEAD
 
+* Fix foreign key table constraints on MySQL (jeremyevans)
+
 * Remove Dataset#table_exists?, use Database#table_exists? instead (jeremyevans)
 
 * Fix graphing of datasets with dataset sources (jeremyevans) (#271)

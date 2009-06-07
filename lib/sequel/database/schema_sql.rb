@@ -74,7 +74,7 @@ module Sequel
       sql << " DEFAULT #{literal(column[:default])}" if column.include?(:default)
       sql << PRIMARY_KEY if column[:primary_key]
       sql << " #{auto_increment_sql}" if column[:auto_increment]
-      sql << column_references_sql(column) if column[:table]
+      sql << column_references_column_constraint_sql(column) if column[:table]
       sql
     end
     
@@ -82,6 +82,11 @@ module Sequel
     # SQL for all given columns, used inside a CREATE TABLE block.
     def column_list_sql(generator)
       (generator.columns.map{|c| column_definition_sql(c)} + generator.constraints.map{|c| constraint_definition_sql(c)}).join(COMMA_SEPARATOR)
+    end
+
+    # SQL DDL fragment for column foreign key references (column constraints)
+    def column_references_column_constraint_sql(column)
+      column_references_sql(column)
     end
 
     # SQL DDL fragment for column foreign key references
@@ -93,6 +98,11 @@ module Sequel
       sql
     end
   
+    # SQL DDL fragment for table foreign key references (table constraints)
+    def column_references_table_constraint_sql(constraint)
+      "FOREIGN KEY #{literal(constraint[:columns])} #{column_references_sql(constraint)}"
+    end
+
     # SQL DDL fragment specifying a constraint on a table.
     def constraint_definition_sql(constraint)
       sql = constraint[:name] ? "CONSTRAINT #{quote_identifier(constraint[:name])} " : ""
@@ -103,8 +113,7 @@ module Sequel
       when :primary_key
         sql << "PRIMARY KEY #{literal(constraint[:columns])}"
       when :foreign_key
-        sql << "FOREIGN KEY #{literal(constraint[:columns])}"
-        sql << column_references_sql(constraint)
+        sql << column_references_table_constraint_sql(constraint)
       when :unique
         sql << "UNIQUE #{literal(constraint[:columns])}"
       else
