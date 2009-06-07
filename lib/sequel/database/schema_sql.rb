@@ -100,7 +100,7 @@ module Sequel
   
     # SQL DDL fragment for table foreign key references (table constraints)
     def column_references_table_constraint_sql(constraint)
-      "FOREIGN KEY #{literal(constraint[:columns])} #{column_references_sql(constraint)}"
+      "FOREIGN KEY #{literal(constraint[:columns])}#{column_references_sql(constraint)}"
     end
 
     # SQL DDL fragment specifying a constraint on a table.
