@@ -342,7 +342,7 @@ module Sequel
         if values.empty?
           insert_default_values_sql
         else
-          "#{insert_sql_base}#{from} VALUES #{literal(values)}"
+          "#{insert_sql_base}#{from} VALUES #{literal(values)}#{insert_sql_suffix}"
         end
       when Hash
         values = @opts[:defaults].merge(values) if @opts[:defaults]
@@ -355,10 +355,10 @@ module Sequel
             fl << literal(String === k ? k.to_sym : k)
             vl << literal(v)
           end
-          "#{insert_sql_base}#{from} (#{fl.join(COMMA_SEPARATOR)}) VALUES (#{vl.join(COMMA_SEPARATOR)})"
+          "#{insert_sql_base}#{from} (#{fl.join(COMMA_SEPARATOR)}) VALUES (#{vl.join(COMMA_SEPARATOR)})#{insert_sql_suffix}"
         end
       when Dataset
-        "#{insert_sql_base}#{from} #{literal(values)}"
+        "#{insert_sql_base}#{from} #{literal(values)}#{insert_sql_suffix}"
       end
     end
     
@@ -928,6 +928,11 @@ module Sequel
     # SQL statement for formatting an insert statement with default values
     def insert_default_values_sql
       "#{insert_sql_base}#{source_list(@opts[:from])} DEFAULT VALUES"
+    end
+
+    # SQL statement for end of an INSERT statement
+    def insert_sql_suffix
+      nil
     end
 
     # Inverts the given order by breaking it into a list of column references

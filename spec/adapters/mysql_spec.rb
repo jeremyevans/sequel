@@ -636,6 +636,22 @@ context "MySQL::Dataset#insert and related methods" do
     ]
   end
 
+  specify "#on_duplicate_key_update should work with regular inserts" do
+    @d.insert(:name => 'abc', :value => 1)
+    @d.on_duplicate_key_update(:name, :value => 6).insert(:name => 'abc', :value => 1)
+    @d.on_duplicate_key_update(:name, :value => 6).insert(:name => 'def', :value => 2)
+
+    MYSQL_DB.sqls.should == [
+      "INSERT INTO items (name, value) VALUES ('abc', 1)",
+      "INSERT INTO items (name, value) VALUES ('abc', 1) ON DUPLICATE KEY UPDATE name=VALUES(name), value=6",
+      "INSERT INTO items (name, value) VALUES ('def', 2) ON DUPLICATE KEY UPDATE name=VALUES(name), value=6"
+    ]
+
+    @d.all.should == [
+      {:name => 'abc', :value => 6}, {:name => 'def', :value => 2}
+    ]
+  end
+
   specify "#multi_insert should insert multiple records in a single statement" do
     @d.multi_insert([{:name => 'abc'}, {:name => 'def'}])
     

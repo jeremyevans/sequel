@@ -95,7 +95,7 @@ module Sequel
           type = o == :set_column_type ? op[:type] : old_opts[:db_type]
           null = o == :set_column_null ? op[:null] : old_opts[:allow_null]
           default = o == :set_column_default ? op[:default] : (old_opts[:default].lit if old_opts[:default])
-          "ALTER TABLE #{quote_schema_table(table)} CHANGE COLUMN #{quote_identifier(op[:name])} #{column_definition_sql(:name=>name, :type=>type, :null=>null, :default=>default)}"
+          "ALTER TABLE #{quote_schema_table(table)} CHANGE COLUMN #{quote_identifier(op[:name])} #{column_definition_sql(op.merge(:name=>name, :type=>type, :null=>null, :default=>default))}"
         when :drop_index
           "#{drop_index_sql(table, op)} ON #{quote_schema_table(table)}"
         else
@@ -309,15 +309,30 @@ module Sequel
       def on_duplicate_key_update(*args)
         clone(:on_duplicate_key_update => args)
       end
-      
+
+      # MySQL specific syntax for ON DUPLICATE KEY UPDATE
+      def on_duplicate_key_update_sql
+        if update_cols = opts[:on_duplicate_key_update]
+          update_vals = nil
+
+          if update_cols.empty?
+            update_cols = columns
+          elsif update_cols.last.is_a?(Hash)
+            update_vals = update_cols.last
+            update_cols = update_cols[0..-2]
+          end
+
+          updating = update_cols.map{|c| "#{quote_identifier(c)}=VALUES(#{quote_identifier(c)})" }
+          updating += update_vals.map{|c,v| "#{quote_identifier(c)}=#{literal(v)}" } if update_vals
+
+          " ON DUPLICATE KEY UPDATE #{updating.join(COMMA_SEPARATOR)}"
+        end
+      end
+
       # MySQL specific syntax for inserting multiple values at once.
       def multi_insert_sql(columns, values)
-        if update_cols = opts[:on_duplicate_key_update]
-          update_cols = columns if update_cols.empty?
-          update_string = update_cols.map{|c| "#{quote_identifier(c)}=VALUES(#{quote_identifier(c)})"}.join(COMMA_SEPARATOR)
-        end
         values = values.map {|r| literal(Array(r))}.join(COMMA_SEPARATOR)
-        ["#{insert_sql_base}#{source_list(@opts[:from])} (#{identifier_list(columns)}) VALUES #{values}#{" ON DUPLICATE KEY UPDATE #{update_string}" if update_string}"]
+        ["#{insert_sql_base}#{source_list(@opts[:from])} (#{identifier_list(columns)}) VALUES #{values}#{insert_sql_suffix}"]
       end
       
       # MySQL uses the nonstandard ` (backtick) for quoting identifiers.
@@ -374,6 +389,11 @@ module Sequel
       # MySQL supports INSERT IGNORE INTO
       def insert_sql_base
         "INSERT #{'IGNORE ' if opts[:insert_ignore]}INTO "
+      end
+
+      # MySQL supports INSERT ... ON DUPLICATE KEY UPDATE
+      def insert_sql_suffix
+        on_duplicate_key_update_sql if opts[:on_duplicate_key_update]
       end
 
       # MySQL doesn't use the SQL standard DEFAULT VALUES.
