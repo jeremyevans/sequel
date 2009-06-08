@@ -143,10 +143,12 @@ context "Sequel::Migrator" do
       
       def dataset(opts={})
         ds = super
-        def ds.columns; db.columns_created end
-        def ds.insert(h); db.versions.merge!(h); super(h) end
-        def ds.update(h); db.versions.merge!(h); super(h) end
-        def ds.fetch_rows(sql); db.execute(sql); yield(db.versions) unless db.versions.empty? end
+        ds.extend(Module.new do
+          def columns; db.columns_created end
+          def insert(h); db.versions.merge!(h); super(h) end
+          def update(h); db.versions.merge!(h); super(h) end
+          def fetch_rows(sql); db.execute(sql); yield(db.versions) unless db.versions.empty? end
+        end)
         ds
       end
 
