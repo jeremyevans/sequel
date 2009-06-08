@@ -1,5 +1,9 @@
 === HEAD
 
+* Pass through unsigned/elements/size and other options when altering columns on MySQL (tmm1)
+
+* Allow on_duplicate_key_update to affect Dataset#insert on MySQL (tmm1)
+
 * Support using a given table and column to store schema versions, using new Migrator.run method (bougyman, jeremyevans)
 
 * Fix foreign key table constraints on MySQL (jeremyevans)
