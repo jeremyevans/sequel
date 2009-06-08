@@ -637,19 +637,18 @@ context "MySQL::Dataset#insert and related methods" do
   end
 
   specify "#on_duplicate_key_update should work with regular inserts" do
+    MYSQL_DB.add_index :items, :name, :unique=>true
+    MYSQL_DB.sqls.clear
     @d.insert(:name => 'abc', :value => 1)
     @d.on_duplicate_key_update(:name, :value => 6).insert(:name => 'abc', :value => 1)
     @d.on_duplicate_key_update(:name, :value => 6).insert(:name => 'def', :value => 2)
 
-    MYSQL_DB.sqls.should == [
-      "INSERT INTO items (name, value) VALUES ('abc', 1)",
-      "INSERT INTO items (name, value) VALUES ('abc', 1) ON DUPLICATE KEY UPDATE name=VALUES(name), value=6",
-      "INSERT INTO items (name, value) VALUES ('def', 2) ON DUPLICATE KEY UPDATE name=VALUES(name), value=6"
-    ]
+    MYSQL_DB.sqls.length.should == 3
+    MYSQL_DB.sqls[0].should =~ /\AINSERT INTO items \((name|value), (name|value)\) VALUES \(('abc'|1), (1|'abc')\)\z/
+    MYSQL_DB.sqls[1].should =~ /\AINSERT INTO items \((name|value), (name|value)\) VALUES \(('abc'|1), (1|'abc')\) ON DUPLICATE KEY UPDATE name=VALUES\(name\), value=6\z/
+    MYSQL_DB.sqls[2].should =~ /\AINSERT INTO items \((name|value), (name|value)\) VALUES \(('def'|2), (2|'def')\) ON DUPLICATE KEY UPDATE name=VALUES\(name\), value=6\z/
 
-    @d.all.should == [
-      {:name => 'abc', :value => 6}, {:name => 'def', :value => 2}
-    ]
+    @d.all.should == [{:name => 'abc', :value => 6}, {:name => 'def', :value => 2}]
   end
 
   specify "#multi_insert should insert multiple records in a single statement" do
@@ -744,11 +743,10 @@ context "MySQL::Dataset#insert and related methods" do
   end
   
   specify "#on_duplicate_key_update should add the ON DUPLICATE KEY UPDATE and ALL columns when no args given" do
-    @d.on_duplicate_key_update.import([:name,:value], 
-      [['abc', 1], ['def',2]]
-    )
+    @d.on_duplicate_key_update.import([:name,:value], [['abc', 1], ['def',2]])
     
     MYSQL_DB.sqls.should == [
+      "SELECT * FROM items LIMIT 1",
       SQL_BEGIN,
       "INSERT INTO items (name, value) VALUES ('abc', 1), ('def', 2) ON DUPLICATE KEY UPDATE name=VALUES(name), value=VALUES(value)",
       SQL_COMMIT

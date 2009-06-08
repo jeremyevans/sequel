@@ -310,25 +310,6 @@ module Sequel
         clone(:on_duplicate_key_update => args)
       end
 
-      # MySQL specific syntax for ON DUPLICATE KEY UPDATE
-      def on_duplicate_key_update_sql
-        if update_cols = opts[:on_duplicate_key_update]
-          update_vals = nil
-
-          if update_cols.empty?
-            update_cols = columns
-          elsif update_cols.last.is_a?(Hash)
-            update_vals = update_cols.last
-            update_cols = update_cols[0..-2]
-          end
-
-          updating = update_cols.map{|c| "#{quote_identifier(c)}=VALUES(#{quote_identifier(c)})" }
-          updating += update_vals.map{|c,v| "#{quote_identifier(c)}=#{literal(v)}" } if update_vals
-
-          " ON DUPLICATE KEY UPDATE #{updating.join(COMMA_SEPARATOR)}"
-        end
-      end
-
       # MySQL specific syntax for inserting multiple values at once.
       def multi_insert_sql(columns, values)
         values = values.map {|r| literal(Array(r))}.join(COMMA_SEPARATOR)
@@ -419,6 +400,25 @@ module Sequel
       # Use 1 for true on MySQL
       def literal_true
         BOOL_TRUE
+      end
+      
+      # MySQL specific syntax for ON DUPLICATE KEY UPDATE
+      def on_duplicate_key_update_sql
+        if update_cols = opts[:on_duplicate_key_update]
+          update_vals = nil
+
+          if update_cols.empty?
+            update_cols = columns
+          elsif update_cols.last.is_a?(Hash)
+            update_vals = update_cols.last
+            update_cols = update_cols[0..-2]
+          end
+
+          updating = update_cols.map{|c| "#{quote_identifier(c)}=VALUES(#{quote_identifier(c)})" }
+          updating += update_vals.map{|c,v| "#{quote_identifier(c)}=#{literal(v)}" } if update_vals
+
+          " ON DUPLICATE KEY UPDATE #{updating.join(COMMA_SEPARATOR)}"
+        end
       end
     end
   end
