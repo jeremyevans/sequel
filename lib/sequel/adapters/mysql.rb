@@ -11,7 +11,7 @@ module Sequel
   # invalid dates and times will raise errors.
   module MySQL
     # Mapping of type numbers to conversion procs
-    MYSQL_TYPES = Hash.new(lambda{|v| v})
+    MYSQL_TYPES = {}
 
     # Use only a single proc for each type to save on memory
     MYSQL_TYPE_PROCS = {
@@ -301,7 +301,7 @@ module Sequel
           @columns = cols.map{|c| c.first}
           while row = r.fetch_row
             h = {}
-            cols.each{|n, p, i| v = row[i]; h[n] = v.nil? ? v : p.call(v)}
+            cols.each{|n, p, i| v = row[i]; h[n] = (v && p) ? p.call(v) : v}
             yield h
           end
         end

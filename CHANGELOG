@@ -4,7 +4,7 @@
 
 * Slightly increase SQLite select performance using the native adapter (jeremyevans)
 
-* Significantly increase MySQL select performance using the native adapter (jeremyevans)
+* Majorly increase MySQL select performance using the native adapter (jeremyevans)
 
 * Pass through unsigned/elements/size and other options when altering columns on MySQL (tmm1)
 
