@@ -189,11 +189,12 @@ module Sequel
       # Yield a hash for each row in the dataset.
       def fetch_rows(sql)
         execute(sql) do |result|
-          @columns = result.columns.map{|c| output_identifier(c)}
-          column_count = @columns.size
+          i = -1
+          cols = result.columns.map{|c| [output_identifier(c), i+=1]}
+          @columns = cols.map{|c| c.first}
           result.each do |values|
             row = {}
-            column_count.times {|i| row[@columns[i]] = values[i]}
+            cols.each{|n,i| row[n] = values[i]}
             yield row
           end
         end
