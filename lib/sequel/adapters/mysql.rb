@@ -11,12 +11,13 @@ module Sequel
   # invalid dates and times will raise errors.
   module MySQL
     # Mapping of type numbers to conversion procs
-    MYSQL_TYPES = {}
+    MYSQL_TYPES = Hash.new(lambda{|v| v})
 
     # Use only a single proc for each type to save on memory
     MYSQL_TYPE_PROCS = {
       [0, 246]  => lambda{|v| BigDecimal.new(v)},                       # decimal
-      [1, 2, 3, 8, 9, 13, 247, 248]  => lambda{|v| v.to_i},             # integer
+      [1]  => lambda{|v| Sequel.convert_tinyint_to_bool ? v.to_i != 0 : v.to_i}, # tinyint
+      [2, 3, 8, 9, 13, 247, 248]  => lambda{|v| v.to_i},                # integer
       [4, 5]  => lambda{|v| v.to_f},                                    # float
       [10, 14]  => lambda{|v| convert_date_time(:string_to_date, v)},   # date
       [7, 12] => lambda{|v| convert_date_time(:string_to_datetime, v)}, # datetime
@@ -295,11 +296,12 @@ module Sequel
       # Yield all rows matching this dataset
       def fetch_rows(sql)
         execute(sql) do |r|
-          column_types = []
-          @columns = r.fetch_fields.map{|f| column_types << f.type; output_identifier(f.name)}
+          i = -1
+          cols = r.fetch_fields.map{|f| [output_identifier(f.name), MYSQL_TYPES[f.type], i+=1]}
+          @columns = cols.map{|c| c.first}
           while row = r.fetch_row
             h = {}
-            @columns.each_with_index {|f, i| h[f] = convert_type(row[i], column_types[i])}
+            cols.each{|n, p, i| v = row[i]; h[n] = v.nil? ? v : p.call(v)}
             yield h
           end
         end
@@ -334,21 +336,6 @@ module Sequel
       end
       
       private
-      
-      # Convert the type of v using the method in MYSQL_TYPES[type].
-      def convert_type(v, type)
-        if v
-          if type == 1 && Sequel.convert_tinyint_to_bool
-            # We special case tinyint here to avoid adding
-            # a method to an ancestor of Fixnum
-            v.to_i == 0 ? false : true
-          else
-            (b = MYSQL_TYPES[type]) ? b.call(v) : v
-          end
-        else
-          nil
-        end
-      end
       
       # Set the :type option to :select if it hasn't been set.
       def execute(sql, opts={}, &block)
