@@ -464,14 +464,14 @@ module Sequel
       def process_result_set(result)
         # get column names
         meta = result.getMetaData
-        column_count = meta.getColumnCount
-        @columns = []
-        column_count.times{|i| @columns << output_identifier(meta.getColumnLabel(i+1))}
-
+        cols = []
+        i = 0
+        meta.getColumnCount.times{cols << [output_identifier(meta.getColumnLabel(i+=1)), i]}
+        @columns = cols.map{|c| c.at(0)}
         # get rows
         while result.next
           row = {}
-          @columns.each_with_index{|v, i| row[v] = convert_type(result.getObject(i+1))}
+          cols.each{|n, i| row[n] = convert_type(result.getObject(i))}
           yield row
         end
       end
