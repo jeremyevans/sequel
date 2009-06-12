@@ -28,9 +28,9 @@ module Sequel
       # Connect to the database. In addition to the usual database options,
       # the following option has effect:
       #
-      # * :command_timout - Sets the time in seconds to wait while attempting
+      # * :command_timeout - Sets the time in seconds to wait while attempting
       #     to execute a command before cancelling the attempt and generating
-      #     an error. Specificially, it sets the ADO CommandTimeout property.
+      #     an error. Specifically, it sets the ADO CommandTimeout property.
       #     If this property is not set, the default of 30 seconds is used.
       # * :provider - Sets the Provider of this ADO connection (for example, "SQLOLEDB")
 
