@@ -3,9 +3,10 @@
 All Sequel activity begins with opening a database connection, thus you always need a database connection
 before you can perform any other actions.  Sequel provides a powerful and flexible mechanism for 
 opening database connections.  There are three main approaches to opening and using a database connection:
-  1. Use the connect method
-  2. Use the specialized adapter method
-  3. Passing a block to the either of the above
+
+1. Use the connect method
+2. Use the specialized adapter method
+3. Passing a block to the either of the above
 
 Each adapter has been extended to handle its specialized needs when establishing a connection, so there 
 may be cases where one approach applies to one adapter, but not to the other.
@@ -65,16 +66,22 @@ The following options are supported:
 * :timeout - Timeout period given in milliseconds
 
 === db2 
+Not documented, yet.
 
 === dbi 
+Not documented, yet.
 
 === do 
+Not documented, yet.
 
 === firebird 
+Not documented, yet.
 
 === informix 
+Not documented, yet.
 
 === jdbc 
+Not documented, yet.
 
 === mysql 
 
