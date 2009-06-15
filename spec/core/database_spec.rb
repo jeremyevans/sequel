@@ -39,7 +39,15 @@ context "A new Database" do
   specify "should respect the :single_threaded option" do
     db = Sequel::Database.new(:single_threaded=>true)
     db.pool.should be_a_kind_of(Sequel::SingleThreadedPool)
+    db = Sequel::Database.new(:single_threaded=>'t')
+    db.pool.should be_a_kind_of(Sequel::SingleThreadedPool)
+    db = Sequel::Database.new(:single_threaded=>'1')
+    db.pool.should be_a_kind_of(Sequel::SingleThreadedPool)
     db = Sequel::Database.new(:single_threaded=>false)
+    db.pool.should be_a_kind_of(Sequel::ConnectionPool)
+    db = Sequel::Database.new(:single_threaded=>'f')
+    db.pool.should be_a_kind_of(Sequel::ConnectionPool)
+    db = Sequel::Database.new(:single_threaded=>'0')
     db.pool.should be_a_kind_of(Sequel::ConnectionPool)
   end
 

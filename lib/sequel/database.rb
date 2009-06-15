@@ -73,7 +73,7 @@ module Sequel
     def initialize(opts = {}, &block)
       @opts ||= opts
       
-      @single_threaded = opts.include?(:single_threaded) ? opts[:single_threaded] : @@single_threaded
+      @single_threaded = opts.include?(:single_threaded) ? typecast_value_boolean(opts[:single_threaded]) : @@single_threaded
       @schemas = {}
       @default_schema = opts.include?(:default_schema) ? opts[:default_schema] : default_schema_default
       @prepared_statements = {}
