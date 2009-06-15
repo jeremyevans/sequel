@@ -134,7 +134,9 @@ module Sequel
       
       # Connect to the database using JavaSQL::DriverManager.getConnection.
       def connect(server)
-        setup_connection(JavaSQL::DriverManager.getConnection(uri(server_opts(server))))
+        args = [uri(server_opts(server))]
+        args.concat([opts[:user], opts[:password]]) if opts[:user] && opts[:password]
+        setup_connection(JavaSQL::DriverManager.getConnection(*args))
       end
       
       # Return instances of JDBC::Dataset with the given opts.
