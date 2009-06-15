@@ -44,16 +44,16 @@ module Sequel
         ODBC::Dataset.new(self, opts)
       end
     
-      # ODBC returns native statement objects, which must be dropped if
-      # you call execute manually, or you will get warnings.  See the
-      # fetch_rows method source code for an example of how to drop
-      # the statements.
       def execute(sql, opts={})
         log_info(sql)
         synchronize(opts[:server]) do |conn|
-          r = conn.run(sql)
-          yield(r) if block_given?
-          r
+          begin
+            r = conn.run(sql)
+            yield(r) if block_given?
+          ensure
+            r.drop if r
+          end
+          nil
         end
       end
       
@@ -85,19 +85,15 @@ module Sequel
 
       def fetch_rows(sql, &block)
         execute(sql) do |s|
-          begin
-            untitled_count = 0
-            @columns = s.columns(true).map do |c|
-              if (n = c.name).empty?
-                n = UNTITLED_COLUMN % (untitled_count += 1)
-              end
-              output_identifier(n)
+          untitled_count = 0
+          @columns = s.columns(true).map do |c|
+            if (n = c.name).empty?
+              n = UNTITLED_COLUMN % (untitled_count += 1)
             end
-            rows = s.fetch_all
-            rows.each {|row| yield hash_row(row)} if rows
-          ensure
-            s.drop unless s.nil? rescue nil
+            output_identifier(n)
           end
+          rows = s.fetch_all
+          rows.each {|row| yield hash_row(row)} if rows
         end
         self
       end

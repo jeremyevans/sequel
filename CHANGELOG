@@ -1,5 +1,7 @@
 === HEAD
 
+* Fix warnings when using the ODBC adapter (jeremyevans)
+
 * Add opening_databases.rdoc file for describing how to connect to a database (mwlang, jeremyevans)
 
 * Significantly increase JDBC select performance (jeremyevans)
