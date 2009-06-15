@@ -1,4 +1,6 @@
 === HEAD
+ 
+* Allow connection pool options to be specified in connection string (jeremyevans)
 
 * Handle :user and :password options in the JDBC adapter (jeremyevans)
 

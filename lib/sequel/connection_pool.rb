@@ -41,7 +41,8 @@ class Sequel::ConnectionPool
   #   present, will use a single :default server.  The server name symbol will
   #   be passed to the connection_proc.
   def initialize(opts = {}, &block)
-    @max_size = opts[:max_connections] || 4
+    @max_size = Integer(opts[:max_connections] || 4)
+    raise(Sequel::Error, ':max_connections must be positive') if @max_size < 1
     @mutex = Mutex.new
     @connection_proc = block
     @disconnection_proc = opts[:disconnection_proc]
@@ -53,8 +54,8 @@ class Sequel::ConnectionPool
       @available_connections[s] = []
       @allocated[s] = {}
     end
-    @timeout = opts[:pool_timeout] || 5
-    @sleep_time = opts[:pool_sleep_time] || 0.001
+    @timeout = Integer(opts[:pool_timeout] || 5)
+    @sleep_time = Float(opts[:pool_sleep_time] || 0.001)
     @convert_exceptions = opts.include?(:pool_convert_exceptions) ? opts[:pool_convert_exceptions] : true
   end
   

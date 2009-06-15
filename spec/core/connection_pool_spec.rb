@@ -20,6 +20,22 @@ context "An empty ConnectionPool" do
   end
 end
 
+context "ConnectionPool options" do
+  specify "should support string option values" do
+    cpool = Sequel::ConnectionPool.new({:max_connections=>'5', :pool_timeout=>'3', :pool_sleep_time=>'0.01'})
+    cpool.max_size.should == 5
+    cpool.instance_variable_get(:@timeout).should == 3
+    cpool.instance_variable_get(:@sleep_time).should == 0.01
+  end
+
+  specify "should raise an error unless size is positive" do
+    lambda{Sequel::ConnectionPool.new(:max_connections=>0)}.should raise_error(Sequel::Error)
+    lambda{Sequel::ConnectionPool.new(:max_connections=>-10)}.should raise_error(Sequel::Error)
+    lambda{Sequel::ConnectionPool.new(:max_connections=>'-10')}.should raise_error(Sequel::Error)
+    lambda{Sequel::ConnectionPool.new(:max_connections=>'0')}.should raise_error(Sequel::Error)
+  end
+end
+
 context "A connection pool handling connections" do
   before do
     @max_size = 2
