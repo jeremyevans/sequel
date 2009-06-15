@@ -1,5 +1,7 @@
 === HEAD
 
+* Add opening_databases.rdoc file for describing how to connect to a database (mwlang, jeremyevans)
+
 * Significantly increase JDBC select performance (jeremyevans)
 
 * Slightly increase SQLite select performance using the native adapter (jeremyevans)
