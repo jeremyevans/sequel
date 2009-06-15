@@ -1,5 +1,7 @@
 === HEAD
  
+* Fix bin/sequel using a YAML file on 1.9 (jeremyevans)
+
 * Allow connection pool options to be specified in connection string (jeremyevans)
 
 * Handle :user and :password options in the JDBC adapter (jeremyevans)

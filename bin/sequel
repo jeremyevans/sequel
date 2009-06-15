@@ -110,7 +110,7 @@ connect_proc = lambda do |database|
     env ||= "development"
     db_config = YAML.load_file(database)
     db_config = db_config[env] || db_config[env.to_sym] || db_config
-    db_config.each{|(k,v)| db_config[k.to_sym] = db_config.delete(k)}
+    db_config.keys.each{|k| db_config[k.to_sym] = db_config.delete(k)}
     Sequel.connect(db_config.merge!(db_opts))
   else
     Sequel.connect(database, db_opts)
