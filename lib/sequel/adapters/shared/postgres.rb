@@ -277,16 +277,20 @@ module Sequel
         m = output_identifier_meth
         im = input_identifier_meth
         schema, table = schema_and_table(table)
+        range = 0...32
+        attnums = server_version >= 80100 ? SQL::Function.new(:ANY, :ind__indkey) : range.map{|x| SQL::Subscript.new(:ind__indkey, [x])}
         ds = metadata_dataset.
           from(:pg_class___tab).
           join(:pg_index___ind, :indrelid=>:oid, im.call(table)=>:relname).
           join(:pg_class___indc, :oid=>:indexrelid).
-          join(:pg_attribute___att, :attrelid=>:tab__oid, :attnum=>SQL::Function.new(:ANY, :ind__indkey)).
-          filter(:indc__relkind=>'i', :ind__indisprimary=>false, :indexprs=>nil, :indpred=>nil, :indisvalid=>true, :indisready=>true, :indcheckxmin=>false).
-          order(:indc__relname, (0...32).map{|x| [SQL::Subscript.new(:ind__indkey, [x]), x]}.case(32, :att__attnum)).
+          join(:pg_attribute___att, :attrelid=>:tab__oid, :attnum=>attnums).
+          filter(:indc__relkind=>'i', :ind__indisprimary=>false, :indexprs=>nil, :indpred=>nil).
+          order(:indc__relname, range.map{|x| [SQL::Subscript.new(:ind__indkey, [x]), x]}.case(32, :att__attnum)).
           select(:indc__relname___name, :ind__indisunique___unique, :att__attname___column)
         
         ds.join!(:pg_namespace___nsp, :oid=>:tab__relnamespace, :nspname=>schema.to_s) if schema
+        ds.filter!(:indisvalid=>true) if server_version >= 80200
+        ds.filter!(:indisready=>true, :indcheckxmin=>false) if server_version >= 80300
         
         indexes = {}
         ds.each do |r|
