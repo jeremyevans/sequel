@@ -225,12 +225,6 @@ module Sequel
         sql
       end
 
-      # MySQL doesn't support DISTINCT ON
-      def distinct(*columns)
-        raise(Error, "DISTINCT ON not supported by MySQL") unless columns.empty?
-        super
-      end
-
       # Adds full text filter
       def full_text_search(cols, terms, opts = {})
         filter(full_text_sql(cols, terms, opts))
@@ -355,6 +349,11 @@ module Sequel
         end
       end
       
+      #  does not support DISTINCT ON
+      def supports_distinct_on?
+        false
+      end
+
       # MySQL does not support INTERSECT or EXCEPT
       def supports_intersect_except?
         false

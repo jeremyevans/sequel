@@ -249,6 +249,11 @@ module Sequel
       clone(:overrides=>hash.merge(@opts[:overrides]||{}))
     end
 
+    # Whether the dataset supports the DISTINCT ON clause, true by default.
+    def supports_distinct_on?
+      true
+    end
+
     # Whether the dataset supports the INTERSECT and EXCEPT compound operations, true by default.
     def supports_intersect_except?
       true

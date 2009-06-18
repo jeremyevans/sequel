@@ -1,5 +1,7 @@
 === HEAD
  
+* Add supports_distinct_on? method (jeremyevans)
+
 * Remove SQLStandardDateFormat, replace with requires_sql_standard_datetimes? method (jeremyevans)
 
 * Remove UnsupportedIsTrue module, replace with supports_is_true? method (jeremyevans)

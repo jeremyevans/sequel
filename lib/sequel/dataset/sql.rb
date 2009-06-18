@@ -121,11 +121,13 @@ module Sequel
     # The DISTINCT clause is used to remove duplicate rows from the
     # output.  If arguments are provided, uses a DISTINCT ON clause,
     # in which case it will only be distinct on those columns, instead
-    # of all returned columns.
+    # of all returned columns.  Raises an error if arguments
+    # are given and DISTINCT ON is not supported.
     #
     #  dataset.distinct # SQL: SELECT DISTINCT * FROM items
     #  dataset.order(:id).distinct(:id) # SQL: SELECT DISTINCT ON (id) * FROM items ORDER BY id
     def distinct(*args)
+      raise(InvalidOperation, "DISTINCT ON not supported") if !args.empty? && !supports_distinct_on?
       clone(:distinct => args)
     end
 

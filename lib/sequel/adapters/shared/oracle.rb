@@ -96,12 +96,6 @@ module Sequel
     module DatasetMethods
       SELECT_CLAUSE_ORDER = %w'distinct columns from join where group having compounds order limit'.freeze
 
-      # Oracle doesn't support DISTINCT ON
-      def distinct(*columns)
-        raise(Error, "DISTINCT ON not supported by Oracle") unless columns.empty?
-        super
-      end
-
       # Oracle uses MINUS instead of EXCEPT, and doesn't support EXCEPT ALL
       def except(dataset, all = false)
         raise(Sequel::Error, "EXCEPT ALL not supported") if all
@@ -115,6 +109,11 @@ module Sequel
       # Oracle requires SQL standard datetimes
       def requires_sql_standard_datetimes?
         true
+      end
+
+      # Oracle does not support DISTINCT ON
+      def supports_distinct_on?
+        false
       end
 
       # Oracle does not support INTERSECT ALL or EXCEPT ALL
