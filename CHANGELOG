@@ -1,5 +1,7 @@
 === HEAD
  
+* Fix thread-safety issue in stored procedure code (jeremyevans)
+
 * Remove SavepointTransactions module, integrate into Database code (jeremyevans)
 
 * Add supports_distinct_on? method (jeremyevans)

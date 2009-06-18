@@ -7,9 +7,24 @@ module Sequel
       # The name of the stored procedure to call
       attr_accessor :sproc_name
       
-      # Call the prepared statement
+      # The name of the stored procedure to call
+      attr_writer :sproc_args
+      
+      # Call the stored procedure with the given args
       def call(*args, &block)
-        @sproc_args = args
+        sp = clone
+        sp.sproc_args = args
+        sp.run(&block)
+      end
+
+      # Programmer friendly string showing this is a stored procedure,
+      # showing the name of the procedure.
+      def inspect
+        "<#{self.class.name}/StoredProcedure name=#{@sproc_name}>"
+      end
+      
+      # Run the stored procedure with the current args on the database
+      def run(&block)
         case @sproc_type
         when :select, :all
           all(&block)
@@ -24,13 +39,7 @@ module Sequel
         end
       end
       
-      # Programmer friendly string showing this is a stored procedure,
-      # showing the name of the procedure.
-      def inspect
-        "<#{self.class.name}/StoredProcedure name=#{@sproc_name}>"
-      end
-      
-      # Set the type of the sproc and override the corresponding _sql
+      # Set the type of the stored procedure and override the corresponding _sql
       # method to return the empty string (since the result will be
       # ignored anyway).
       def sproc_type=(type)
