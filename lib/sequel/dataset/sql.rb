@@ -858,13 +858,6 @@ module Sequel
       (@opts[:limit] || @opts[:order]) ? from_self : self
     end
     
-    # Returns a table reference for use in the FROM clause.  Returns an SQL subquery
-    # frgament with an optional table alias.
-    def to_table_reference(table_alias=nil)
-      s = "(#{sql})"
-      table_alias ? as_sql(s, table_alias) : s
-    end
-
     private
 
     # Internal filter method so it works on either the having or where clauses.

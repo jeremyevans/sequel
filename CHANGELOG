@@ -1,5 +1,7 @@
 === HEAD
  
+* Remove Dataset#to_table_reference protected method, no longer used (jeremyevans)
+
 * Fix thread-safety issue in stored procedure code (jeremyevans)
 
 * Remove SavepointTransactions module, integrate into Database code (jeremyevans)
