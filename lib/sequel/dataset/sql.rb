@@ -64,8 +64,15 @@ module Sequel
     def complex_expression_sql(op, args)
       case op
       when *IS_OPERATORS
-        v = IS_LITERALS[args.at(1)] || raise(Error, 'Invalid argument used for IS operator')
-        "(#{literal(args.at(0))} #{op} #{v})"
+        r = args.at(1)
+        if r.nil? || supports_is_true?
+          raise(InvalidOperation, 'Invalid argument used for IS operator') unless v = IS_LITERALS[r]
+          "(#{literal(args.at(0))} #{op} #{v})"
+        elsif op == :IS
+          complex_expression_sql(:"=", args)
+        else
+          complex_expression_sql(:OR, [SQL::BooleanExpression.new(:"!=", *args), SQL::BooleanExpression.new(:IS, args.at(0), nil)])
+        end
       when *TWO_ARITY_OPERATORS
         "(#{literal(args.at(0))} #{op} #{literal(args.at(1))})"
       when *N_ARITY_OPERATORS
@@ -77,7 +84,7 @@ module Sequel
       when :'B~'
         "~#{literal(args.at(0))}"
       else
-        raise(Sequel::Error, "invalid operator #{op}")
+        raise(InvalidOperation, "invalid operator #{op}")
       end
     end
 

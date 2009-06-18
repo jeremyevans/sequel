@@ -51,6 +51,14 @@ context "Blockless Ruby Filters" do
     @d.l(:x => nil).should == '(x IS NULL)'
     @d.l(:x => [1,2,3]).should == '(x IN (1, 2, 3))'
   end
+
+  it "should use = 't' and != 't' OR IS NULL if IS TRUE is not supported" do
+    @d.meta_def(:supports_is_true?){false}
+    @d.l(:x => true).should == "(x = 't')"
+    @d.l(~{:x => true}).should == "((x != 't') OR (x IS NULL))"
+    @d.l(:x => false).should == "(x = 'f')"
+    @d.l(~{:x => false}).should == "((x != 'f') OR (x IS NULL))"
+  end
   
   it "should support != via Hash#~" do
     @d.l(~{:x => 100}).should == '(x != 100)'

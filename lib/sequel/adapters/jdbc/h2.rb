@@ -1,4 +1,4 @@
-Sequel.require %w'date_format unsupported', 'adapters/utils'
+Sequel.require %w'date_format', 'adapters/utils'
 
 module Sequel
   module JDBC
@@ -66,7 +66,11 @@ module Sequel
       # Dataset class for H2 datasets accessed via JDBC.
       class Dataset < JDBC::Dataset
         include Dataset::SQLStandardDateFormat
-        include Dataset::UnsupportedIsTrue
+
+        # H2 doesn't support IS TRUE
+        def supports_is_true?
+          false
+        end
       end
     end
   end

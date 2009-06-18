@@ -1,5 +1,3 @@
-Sequel.require 'adapters/utils/unsupported'
-
 module Sequel
   module MSSQL
     module DatabaseMethods

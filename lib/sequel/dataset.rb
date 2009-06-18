@@ -253,6 +253,11 @@ module Sequel
       true
     end
 
+    # Whether the dataset supports the IS TRUE syntax.
+    def supports_is_true?
+      true
+    end
+
     # Updates values for the dataset.  The returned value is generally the
     # number of rows updated, but that is adapter dependent.
     def update(values={})

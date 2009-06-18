@@ -1,4 +1,4 @@
-Sequel.require %w'date_format unsupported', 'adapters/utils'
+Sequel.require %w'date_format', 'adapters/utils'
 
 module Sequel
   module Progress

@@ -1,4 +1,4 @@
-Sequel.require %w'savepoint_transactions unsupported', 'adapters/utils'
+Sequel.require %w'savepoint_transactions', 'adapters/utils'
 
 module Sequel
   module SQLite
@@ -233,8 +233,6 @@ module Sequel
     
     # Instance methods for datasets that connect to an SQLite database
     module DatasetMethods
-      include Dataset::UnsupportedIsTrue
-
       # SQLite does not support pattern matching via regular expressions.
       # SQLite is case insensitive (depending on pragma), so use LIKE for
       # ILIKE.
@@ -278,6 +276,11 @@ module Sequel
       
       # SQLite does not support INTERSECT ALL or EXCEPT ALL
       def supports_intersect_except_all?
+        false
+      end
+
+      # SQLite does not support IS TRUE
+      def supports_is_true?
         false
       end
 

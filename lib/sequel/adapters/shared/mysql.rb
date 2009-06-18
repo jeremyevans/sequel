@@ -1,4 +1,4 @@
-Sequel.require %w'unsupported savepoint_transactions', 'adapters/utils'
+Sequel.require %w'savepoint_transactions', 'adapters/utils'
 
 module Sequel
   module MySQL

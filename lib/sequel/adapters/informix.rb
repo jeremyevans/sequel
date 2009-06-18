@@ -1,4 +1,3 @@
-Sequel.require 'adapters/utils/unsupported'
 require 'informix'
 
 module Sequel
