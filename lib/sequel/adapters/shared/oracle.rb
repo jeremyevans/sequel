@@ -96,7 +96,6 @@ module Sequel
     end
     
     module DatasetMethods
-      include Dataset::UnsupportedIntersectExceptAll
       include Dataset::SQLStandardDateFormat
 
       SELECT_CLAUSE_ORDER = %w'distinct columns from join where group having compounds order limit'.freeze
@@ -115,6 +114,11 @@ module Sequel
 
       def empty?
         db[:dual].where(exists).get(1) == nil
+      end
+
+      # Oracle does not support INTERSECT ALL or EXCEPT ALL
+      def supports_intersect_except_all?
+        false
       end
 
       private

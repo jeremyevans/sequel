@@ -38,8 +38,6 @@ module Sequel
     end
     
     class Dataset < Sequel::Dataset
-      include UnsupportedIntersectExcept
-
       SELECT_CLAUSE_ORDER = %w'limit distinct columns from join where having group compounds order'.freeze
 
       def fetch_rows(sql, &block)
@@ -63,6 +61,11 @@ module Sequel
       end
 
       private
+
+      # Informix does not support INTERSECT or EXCEPT
+      def supports_intersect_except?
+        false
+      end
 
       def select_clause_order
         SELECT_CLAUSE_ORDER

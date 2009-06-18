@@ -48,8 +48,6 @@ module Sequel
     end
   
     module DatasetMethods
-      include Dataset::UnsupportedIntersectExcept
-
       SELECT_CLAUSE_ORDER = %w'limit distinct columns from with join where group order having compounds'.freeze
 
       def complex_expression_sql(op, args)
@@ -77,6 +75,11 @@ module Sequel
 
       def quoted_identifier(name)
         "[#{name}]"
+      end
+
+      # Microsoft SQL Server does not support INTERSECT or EXCEPT
+      def supports_intersect_except?
+        false
       end
 
       private

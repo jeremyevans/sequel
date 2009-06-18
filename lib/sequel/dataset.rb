@@ -243,6 +243,16 @@ module Sequel
       clone(:overrides=>hash.merge(@opts[:overrides]||{}))
     end
 
+    # Whether the dataset supports the INTERSECT and EXCEPT compound operations, true by default.
+    def supports_intersect_except?
+      true
+    end
+
+    # Whether the dataset supports the INTERSECT ALL and EXCEPT ALL compound operations, true by default.
+    def supports_intersect_except_all?
+      true
+    end
+
     # Updates values for the dataset.  The returned value is generally the
     # number of rows updated, but that is adapter dependent.
     def update(values={})

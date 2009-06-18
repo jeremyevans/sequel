@@ -233,7 +233,6 @@ module Sequel
     
     # Instance methods for datasets that connect to an SQLite database
     module DatasetMethods
-      include Dataset::UnsupportedIntersectExceptAll
       include Dataset::UnsupportedIsTrue
 
       # SQLite does not support pattern matching via regular expressions.
@@ -277,6 +276,11 @@ module Sequel
         "`#{c}`"
       end
       
+      # SQLite does not support INTERSECT ALL or EXCEPT ALL
+      def supports_intersect_except_all?
+        false
+      end
+
       private
 
       def literal_blob(v)

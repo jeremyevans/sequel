@@ -199,8 +199,6 @@ module Sequel
 
     # Dataset class for Firebird datasets
     class Dataset < Sequel::Dataset
-      include UnsupportedIntersectExcept
-
       BOOL_TRUE = '1'.freeze
       BOOL_FALSE = '0'.freeze
       NULL = LiteralString.new('NULL').freeze
@@ -260,6 +258,11 @@ module Sequel
       def select_limit_sql(sql)
         sql << " FIRST #{@opts[:limit]}" if @opts[:limit]
         sql << " SKIP #{@opts[:offset]}" if @opts[:offset]
+      end
+
+      # Firebird does not support INTERSECT or EXCEPT
+      def supports_intersect_except?
+        false
       end
 
       private

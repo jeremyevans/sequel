@@ -1879,6 +1879,22 @@ context "Dataset compound operations" do
     @b.except(@a, true).sql.should == \
       "SELECT * FROM (SELECT * FROM b WHERE (z = 2) EXCEPT ALL SELECT * FROM a WHERE (z = 1)) AS t1"
   end
+
+  specify "should raise an InvalidOperation if INTERSECT or EXCEPT is used and they are not supported" do
+    @a.meta_def(:supports_intersect_except?){false}
+    proc{@a.intersect(@b)}.should raise_error(Sequel::InvalidOperation)
+    proc{@a.intersect(@b, true)}.should raise_error(Sequel::InvalidOperation)
+    proc{@a.except(@b)}.should raise_error(Sequel::InvalidOperation)
+    proc{@a.except(@b, true)}.should raise_error(Sequel::InvalidOperation)
+  end
+    
+  specify "should raise an InvalidOperation if INTERSECT ALL or EXCEPT ALL is used and they are not supported" do
+    @a.meta_def(:supports_intersect_except_all?){false}
+    proc{@a.intersect(@b)}.should_not raise_error
+    proc{@a.intersect(@b, true)}.should raise_error(Sequel::InvalidOperation)
+    proc{@a.except(@b)}.should_not raise_error
+    proc{@a.except(@b, true)}.should raise_error(Sequel::InvalidOperation)
+  end
     
   specify "should handle chained compound operations" do
     @a.union(@b).union(@a, true).sql.should == \

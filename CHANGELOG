@@ -1,5 +1,7 @@
 === HEAD
  
+* Remove UnsupportedIntersectExcept(All)? modules, replace with methods (jeremyevans)
+
 * Make Database#indexes work on PostgreSQL versions prior to 8.3 (tested on 7.4) (jeremyevans)
 
 * Fix bin/sequel using a YAML file on 1.9 (jeremyevans)

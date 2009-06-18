@@ -17,10 +17,14 @@ module Sequel
     end
   
     module DatasetMethods
-      include Dataset::UnsupportedIntersectExcept
       include Dataset::SQLStandardDateFormat
 
       SELECT_CLAUSE_ORDER = %w'limit distinct columns from join where group order having compounds'.freeze
+
+      # Progress does not support INTERSECT or EXCEPT
+      def supports_intersect_except?
+        false
+      end
 
       private
 

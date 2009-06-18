@@ -195,8 +195,6 @@ module Sequel
   
     # Dataset methods shared by datasets that use MySQL databases.
     module DatasetMethods
-      include Dataset::UnsupportedIntersectExcept
-
       BOOL_TRUE = '1'.freeze
       BOOL_FALSE = '0'.freeze
       TIMESTAMP_FORMAT = "'%Y-%m-%d %H:%M:%S'".freeze
@@ -357,6 +355,11 @@ module Sequel
         end
       end
       
+      # MySQL does not support INTERSECT or EXCEPT
+      def supports_intersect_except?
+        false
+      end
+
       # MySQL supports ORDER and LIMIT clauses in UPDATE statements.
       def update_sql(values)
         sql = super

@@ -124,10 +124,15 @@ module Sequel
 
     # Adds an EXCEPT clause using a second dataset object. If all is true the
     # clause used is EXCEPT ALL, which may return duplicate rows.
+    # An EXCEPT compound dataset returns all rows in the current dataset
+    # that are not in the given dataset.
+    # Raises an InvalidOperation if the operation is not supported.
     #
     #   DB[:items].except(DB[:other_items]).sql
     #   #=> "SELECT * FROM items EXCEPT SELECT * FROM other_items"
     def except(dataset, all = false)
+      raise(InvalidOperation, "EXCEPT not supported") unless supports_intersect_except?
+      raise(InvalidOperation, "EXCEPT ALL not supported") if all && !supports_intersect_except_all?
       compound_clone(:except, dataset, all)
     end
 
@@ -364,10 +369,15 @@ module Sequel
     
     # Adds an INTERSECT clause using a second dataset object. If all is true 
     # the clause used is INTERSECT ALL, which may return duplicate rows.
+    # An INTERSECT compound dataset returns all rows in both the current dataset
+    # and the given dataset.
+    # Raises an InvalidOperation if the operation is not supported.
     #
     #   DB[:items].intersect(DB[:other_items]).sql
     #   #=> "SELECT * FROM items INTERSECT SELECT * FROM other_items"
     def intersect(dataset, all = false)
+      raise(InvalidOperation, "INTERSECT not supported") unless supports_intersect_except?
+      raise(InvalidOperation, "INTERSECT ALL not supported") if all && !supports_intersect_except_all?
       compound_clone(:intersect, dataset, all)
     end
 
@@ -755,6 +765,8 @@ module Sequel
 
     # Adds a UNION clause using a second dataset object. If all is true the
     # clause used is UNION ALL, which may return duplicate rows.
+    # A UNION compound dataset returns all rows in either the current dataset
+    # or the given dataset.
     #
     #   DB[:items].union(DB[:other_items]).sql
     #   #=> "SELECT * FROM items UNION SELECT * FROM other_items"
