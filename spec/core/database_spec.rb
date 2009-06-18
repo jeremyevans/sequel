@@ -648,6 +648,106 @@ context "Database#transaction" do
   end
 end
 
+context "Database#transaction with savepoints" do
+  before do
+    @db = Dummy3Database.new
+    @db.meta_def(:supports_savepoints?){true}
+    @db.pool.connection_proc = proc {Dummy3Database::DummyConnection.new(@db)}
+  end
+  
+  specify "should wrap the supplied block with BEGIN + COMMIT statements" do
+    @db.transaction {@db.execute 'DROP TABLE test;'}
+    @db.sql.should == ['BEGIN', 'DROP TABLE test;', 'COMMIT']
+  end
+  
+  specify "should use savepoints if given the :savepoint option" do
+    @db.transaction{@db.transaction(:savepoint=>true){@db.execute 'DROP TABLE test;'}}
+    @db.sql.should == ['BEGIN', 'SAVEPOINT autopoint_1', 'DROP TABLE test;', 'RELEASE SAVEPOINT autopoint_1', 'COMMIT']
+  end
+  
+  specify "should not use a savepoints if no transaction is in progress" do
+    @db.transaction(:savepoint=>true){@db.execute 'DROP TABLE test;'}
+    @db.sql.should == ['BEGIN', 'DROP TABLE test;', 'COMMIT']
+  end
+  
+  specify "should reuse the current transaction if no :savepoint option is given" do
+    @db.transaction{@db.transaction{@db.execute 'DROP TABLE test;'}}
+    @db.sql.should == ['BEGIN', 'DROP TABLE test;', 'COMMIT']
+  end
+  
+  specify "should handle returning inside of the block by committing" do
+    def @db.ret_commit
+      transaction do
+        execute 'DROP TABLE test;'
+        return
+        execute 'DROP TABLE test2;';
+      end
+    end
+    @db.ret_commit
+    @db.sql.should == ['BEGIN', 'DROP TABLE test;', 'COMMIT']
+  end
+  
+  specify "should handle returning inside of a savepoint by committing" do
+    def @db.ret_commit
+      transaction do
+        transaction(:savepoint=>true) do
+          execute 'DROP TABLE test;'
+          return
+          execute 'DROP TABLE test2;';
+        end
+      end
+    end
+    @db.ret_commit
+    @db.sql.should == ['BEGIN', 'SAVEPOINT autopoint_1', 'DROP TABLE test;', 'RELEASE SAVEPOINT autopoint_1', 'COMMIT']
+  end
+  
+  specify "should issue ROLLBACK if an exception is raised, and re-raise" do
+    @db.transaction {@db.execute 'DROP TABLE test'; raise RuntimeError} rescue nil
+    @db.sql.should == ['BEGIN', 'DROP TABLE test', 'ROLLBACK']
+    
+    proc {@db.transaction {raise RuntimeError}}.should raise_error(RuntimeError)
+  end
+  
+  specify "should issue ROLLBACK SAVEPOINT if an exception is raised inside a savepoint, and re-raise" do
+    @db.transaction{@db.transaction(:savepoint=>true){@db.execute 'DROP TABLE test'; raise RuntimeError}} rescue nil
+    @db.sql.should == ['BEGIN', 'SAVEPOINT autopoint_1', 'DROP TABLE test', 'ROLLBACK TO SAVEPOINT autopoint_1', 'ROLLBACK']
+    
+    proc {@db.transaction {raise RuntimeError}}.should raise_error(RuntimeError)
+  end
+  
+  specify "should issue ROLLBACK if Sequel::Rollback is called in the transaction" do
+    @db.transaction do
+      @db.drop_table(:a)
+      raise Sequel::Rollback
+      @db.drop_table(:b)
+    end
+    
+    @db.sql.should == ['BEGIN', 'DROP TABLE a', 'ROLLBACK']
+  end
+  
+  specify "should issue ROLLBACK SAVEPOINT if Sequel::Rollback is called in a savepoint" do
+    @db.transaction do
+      @db.transaction(:savepoint=>true) do
+        @db.drop_table(:a)
+        raise Sequel::Rollback
+      end
+      @db.drop_table(:b)
+    end
+    
+    @db.sql.should == ['BEGIN', 'SAVEPOINT autopoint_1', 'DROP TABLE a', 'ROLLBACK TO SAVEPOINT autopoint_1', 'DROP TABLE b', 'COMMIT']
+  end
+  
+  specify "should raise database errors when commiting a transaction as Sequel::DatabaseError" do
+    @db.meta_def(:commit_transaction){raise ArgumentError}
+    lambda{@db.transaction{}}.should raise_error(ArgumentError)
+    lambda{@db.transaction{@db.transaction(:savepoint=>true){}}}.should raise_error(ArgumentError)
+
+    @db.meta_def(:database_error_classes){[ArgumentError]}
+    lambda{@db.transaction{}}.should raise_error(Sequel::DatabaseError)
+    lambda{@db.transaction{@db.transaction(:savepoint=>true){}}}.should raise_error(Sequel::DatabaseError)
+  end
+end
+
 context "A Database adapter with a scheme" do
   before do
     class CCC < Sequel::Database

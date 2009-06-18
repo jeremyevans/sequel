@@ -1,5 +1,3 @@
-Sequel.require 'adapters/utils/savepoint_transactions'
-
 module Sequel
   # Top level module for holding all PostgreSQL-related modules and classes
   # for Sequel.  There are a few module level accessors that are added via
@@ -165,13 +163,8 @@ module Sequel
     
     # Methods shared by Database instances that connect to PostgreSQL.
     module DatabaseMethods
-      include Sequel::Database::SavepointTransactions
-      
       PREPARED_ARG_PLACEHOLDER = LiteralString.new('$').freeze
       RE_CURRVAL_ERROR = /currval of sequence "(.*)" is not yet defined in this session|relation "(.*)" does not exist/.freeze
-      SQL_BEGIN = 'BEGIN'.freeze
-      SQL_COMMIT = 'COMMIT'.freeze
-      SQL_ROLLBACK = 'ROLLBACK'.freeze
       SYSTEM_TABLE_REGEXP = /^pg|sql/.freeze
 
       # Creates the function in the database.  Arguments:
@@ -356,6 +349,11 @@ module Sequel
         @server_version
       end
       
+      # PostgreSQL supports savepoints
+      def supports_savepoints?
+        true
+      end
+
       # Whether the given table exists in the database
       #
       # Options:

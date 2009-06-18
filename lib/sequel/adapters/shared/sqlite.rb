@@ -1,10 +1,6 @@
-Sequel.require %w'savepoint_transactions', 'adapters/utils'
-
 module Sequel
   module SQLite
     module DatabaseMethods
-      include Sequel::Database::SavepointTransactions
-
       AUTO_VACUUM = [:none, :full, :incremental].freeze
       PRIMARY_KEY_INDEX_RE = /\Asqlite_autoindex_/.freeze
       SYNCHRONOUS = [:off, :normal, :full].freeze
@@ -67,6 +63,11 @@ module Sequel
         execute_ddl("PRAGMA #{name} = #{value}")
       end
       
+      # SQLite supports savepoints
+      def supports_savepoints?
+        true
+      end
+
       # A symbol signifying the value of the synchronous PRAGMA.
       def synchronous
         SYNCHRONOUS[pragma_get(:synchronous).to_i]

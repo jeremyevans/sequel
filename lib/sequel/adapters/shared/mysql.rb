@@ -1,5 +1,3 @@
-Sequel.require %w'savepoint_transactions', 'adapters/utils'
-
 module Sequel
   module MySQL
     class << self
@@ -10,8 +8,6 @@ module Sequel
     # Methods shared by Database instances that connect to MySQL,
     # currently supported by the native and JDBC adapters.
     module DatabaseMethods
-      include Sequel::Database::SavepointTransactions
-    
       AUTO_INCREMENT = 'AUTO_INCREMENT'.freeze
       CAST_TYPES = {String=>:CHAR, Integer=>:SIGNED, Time=>:DATETIME, DateTime=>:DATETIME, Numeric=>:DECIMAL, BigDecimal=>:DECIMAL, File=>:BINARY}
       PRIMARY = 'PRIMARY'.freeze
@@ -64,6 +60,11 @@ module Sequel
         metadata_dataset.with_sql('SHOW TABLES').server(opts[:server]).map{|r| m.call(r.values.first)}
       end
       
+      # MySQL supports savepoints
+      def supports_savepoints?
+        true
+      end
+
       # Changes the database in use by issuing a USE statement.  I would be
       # very careful if I used this.
       def use(db_name)

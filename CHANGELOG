@@ -1,5 +1,7 @@
 === HEAD
  
+* Remove SavepointTransactions module, integrate into Database code (jeremyevans)
+
 * Add supports_distinct_on? method (jeremyevans)
 
 * Remove SQLStandardDateFormat, replace with requires_sql_standard_datetimes? method (jeremyevans)
