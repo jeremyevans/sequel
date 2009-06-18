@@ -130,6 +130,7 @@ module Sequel
       # to do a transaction.  So we close the connection created and
       # substitute our own.
       def begin_transaction(conn)
+        return super if supports_savepoints?
         log_info(TRANSACTION_BEGIN)
         t = ::DataObjects::Transaction.create_for_uri(uri)
         t.instance_variable_get(:@connection).close
@@ -141,6 +142,7 @@ module Sequel
       # DataObjects requires transactions be prepared before being
       # committed, so we do that.
       def commit_transaction(t)
+        return super if supports_savepoints?
         log_info(TRANSACTION_ROLLBACK)
         t.prepare
         t.commit 
@@ -170,6 +172,7 @@ module Sequel
       
       # We use the transactions rollback method to rollback.
       def rollback_transaction(t)
+        return super if supports_savepoints?
         log_info(TRANSACTION_COMMIT)
         t.rollback
       end

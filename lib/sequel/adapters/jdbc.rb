@@ -225,7 +225,7 @@ module Sequel
       
       # JDBC uses a statement object to execute SQL on the database
       def begin_transaction(conn)
-        conn = conn.createStatement
+        conn = conn.createStatement unless supports_savepoints?
         super
       end
       
@@ -306,7 +306,7 @@ module Sequel
       
       # Close the given statement when removing the transaction
       def remove_transaction(stmt)
-        stmt.close if stmt
+        stmt.close if stmt && !supports_savepoints?
         super
       end
       
