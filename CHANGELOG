@@ -1,5 +1,7 @@
 === HEAD
  
+* Remove SQLStandardDateFormat, replace with requires_sql_standard_datetimes? method (jeremyevans)
+
 * Remove UnsupportedIsTrue module, replace with supports_is_true? method (jeremyevans)
 
 * Remove UnsupportedIntersectExcept(All)? modules, replace with methods (jeremyevans)

@@ -758,6 +758,22 @@ context "Dataset#literal" do
     s = d.strftime("'%Y-%m-%d'")
     @dataset.literal(d).should == s
   end
+
+  specify "should literalize Time, DateTime, Date properly if SQL standard format is required" do
+    @dataset.meta_def(:requires_sql_standard_datetimes?){true}
+
+    t = Time.now
+    s = t.strftime("TIMESTAMP '%Y-%m-%d %H:%M:%S'")
+    @dataset.literal(t).should == s
+
+    t = DateTime.now
+    s = t.strftime("TIMESTAMP '%Y-%m-%d %H:%M:%S'")
+    @dataset.literal(t).should == s
+
+    d = Date.today
+    s = d.strftime("DATE '%Y-%m-%d'")
+    @dataset.literal(d).should == s
+  end
   
   specify "should not modify literal strings" do
     @dataset.literal('col1 + 2'.lit).should == 'col1 + 2'

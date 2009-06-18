@@ -218,6 +218,12 @@ module Sequel
       @quote_identifiers
     end
     
+    # Whether the dataset requires SQL standard datetimes (false by default,
+    # as most allow strings with ISO 8601 format.
+    def requires_sql_standard_datetimes?
+      false
+    end
+
     # Set the server for this dataset to use.  Used to pick a specific database
     # shard to run a query against, or to override the default (which is SELECT uses
     # :read_only database and all other queries use the :default database).

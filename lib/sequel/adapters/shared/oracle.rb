@@ -1,5 +1,3 @@
-Sequel.require %w'date_format', 'adapters/utils'
-
 module Sequel
   module Oracle
     module DatabaseMethods
@@ -96,8 +94,6 @@ module Sequel
     end
     
     module DatasetMethods
-      include Dataset::SQLStandardDateFormat
-
       SELECT_CLAUSE_ORDER = %w'distinct columns from join where group having compounds order limit'.freeze
 
       # Oracle doesn't support DISTINCT ON
@@ -114,6 +110,11 @@ module Sequel
 
       def empty?
         db[:dual].where(exists).get(1) == nil
+      end
+
+      # Oracle requires SQL standard datetimes
+      def requires_sql_standard_datetimes?
+        true
       end
 
       # Oracle does not support INTERSECT ALL or EXCEPT ALL

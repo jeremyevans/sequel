@@ -1002,12 +1002,12 @@ module Sequel
 
     # SQL fragment for Date, using the ISO8601 format.
     def literal_date(v)
-      "'#{v}'"
+      requires_sql_standard_datetimes? ? v.strftime("DATE '%Y-%m-%d'") : "'#{v}'"
     end
 
     # SQL fragment for DateTime, using the ISO8601 format.
     def literal_datetime(v)
-      "'#{v}'"
+      requires_sql_standard_datetimes? ? v.strftime("TIMESTAMP '%Y-%m-%d %H:%M:%S'") : "'#{v}'"
     end
 
     # SQL fragment for SQL::Expression, result depends on the specific type of expression.
@@ -1061,7 +1061,7 @@ module Sequel
 
     # SQL fragment for Time, uses the ISO8601 format.
     def literal_time(v)
-      "'#{v.iso8601}'"
+      requires_sql_standard_datetimes? ? v.strftime("TIMESTAMP '%Y-%m-%d %H:%M:%S'") : "'#{v.iso8601}'"
     end
 
     # SQL fragment for true.

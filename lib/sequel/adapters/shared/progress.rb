@@ -1,5 +1,3 @@
-Sequel.require %w'date_format', 'adapters/utils'
-
 module Sequel
   module Progress
     module DatabaseMethods
@@ -17,9 +15,12 @@ module Sequel
     end
   
     module DatasetMethods
-      include Dataset::SQLStandardDateFormat
-
       SELECT_CLAUSE_ORDER = %w'limit distinct columns from join where group order having compounds'.freeze
+
+      # Progress requires SQL standard datetimes
+      def requires_sql_standard_datetimes?
+        true
+      end
 
       # Progress does not support INTERSECT or EXCEPT
       def supports_intersect_except?
