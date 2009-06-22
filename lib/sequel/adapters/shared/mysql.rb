@@ -95,7 +95,7 @@ module Sequel
           name = o == :rename_column ? op[:new_name] : op[:name]
           type = o == :set_column_type ? op[:type] : old_opts[:db_type]
           null = o == :set_column_null ? op[:null] : old_opts[:allow_null]
-          default = o == :set_column_default ? op[:default] : (old_opts[:default].lit if old_opts[:default])
+          default = o == :set_column_default ? op[:default] : old_opts[:ruby_default]
           "ALTER TABLE #{quote_schema_table(table)} CHANGE COLUMN #{quote_identifier(op[:name])} #{column_definition_sql(op.merge(:name=>name, :type=>type, :null=>null, :default=>default))}"
         when :drop_index
           "#{drop_index_sql(table, op)} ON #{quote_schema_table(table)}"

@@ -762,11 +762,11 @@ context "Schema Parser" do
       sqls << t
       [[:a, {:db_type=>t.to_s}]]
     end
-    @db.schema(:x).should == [[:a, {:db_type=>"x"}]]
+    @db.schema(:x).should == [[:a, {:db_type=>"x", :ruby_default=>nil}]]
     @sqls.should == ['x']
-    @db.schema(:x).should == [[:a, {:db_type=>"x"}]]
+    @db.schema(:x).should == [[:a, {:db_type=>"x", :ruby_default=>nil}]]
     @sqls.should == ['x']
-    @db.schema(:x, :reload=>true).should == [[:a, {:db_type=>"x"}]]
+    @db.schema(:x, :reload=>true).should == [[:a, {:db_type=>"x", :ruby_default=>nil}]]
     @sqls.should == ['x', 'x']
   end
 
@@ -775,11 +775,11 @@ context "Schema Parser" do
       [[t, {:db_type=>t}]]
     end
     s1 = @db.schema(:x)
-    s1.should == [['x', {:db_type=>'x'}]]
+    s1.should == [['x', {:db_type=>'x', :ruby_default=>nil}]]
     @db.schema(:x).object_id.should == s1.object_id
     @db.schema(:x.identifier).object_id.should == s1.object_id
     s2 = @db.schema(:x__y)
-    s2.should == [['y', {:db_type=>'y'}]]
+    s2.should == [['y', {:db_type=>'y', :ruby_default=>nil}]]
     @db.schema(:x__y).object_id.should == s2.object_id
     @db.schema(:y.qualify(:x)).object_id.should == s2.object_id
   end

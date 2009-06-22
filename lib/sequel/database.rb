@@ -29,6 +29,10 @@ module Sequel
     TRANSACTION_BEGIN = 'Transaction.begin'.freeze
     TRANSACTION_COMMIT = 'Transaction.commit'.freeze
     TRANSACTION_ROLLBACK = 'Transaction.rollback'.freeze
+    
+    POSTGRES_DEFAULT_RE = /\A(?:B?('.*')::[^']+|\((-?\d+(?:\.\d+)?)\))\z/
+    MYSQL_TIMESTAMP_RE = /\ACURRENT_(?:DATE|TIMESTAMP)?\z/
+    STRING_DEFAULT_RE = /\A'(.*)'\z/
 
     # The identifier input method to use by default
     @@identifier_input_method = nil
@@ -453,6 +457,7 @@ module Sequel
 
       cols = schema_parse_table(table_name, opts)
       raise(Error, 'schema parsing returned no columns, table probably doesn\'t exist') if cols.nil? || cols.empty?
+      cols.each{|_,c| c[:ruby_default] = column_schema_to_ruby_default(c[:default], c[:type])}
       @schemas[quoted_name] = cols
     end
 
@@ -632,6 +637,53 @@ module Sequel
         obj.strip.empty?
       else
         obj.respond_to?(:empty?) ? obj.empty? : false
+      end
+    end
+    
+    # Convert the given default, which should be a database specific string, into
+    # a ruby object.
+    def column_schema_to_ruby_default(default, type)
+      return if default.nil?
+      orig_default = default
+      if database_type == :postgres and m = POSTGRES_DEFAULT_RE.match(default)
+        default = m[1] || m[2]
+      end
+      if [:string, :blob, :date, :datetime, :time].include?(type)
+        if database_type == :mysql
+          return if [:date, :datetime, :time].include?(type) && MYSQL_TIMESTAMP_RE.match(default)
+          orig_default = default = "'#{default.gsub("'", "''").gsub('\\', '\\\\')}'" 
+        end
+        return unless m = STRING_DEFAULT_RE.match(default)
+        default = m[1].gsub("''", "'")
+      end
+      res = begin
+        case type
+        when :boolean
+          case default 
+          when /[f0]/i
+            false
+          when /[t1]/i
+            true
+          end
+        when :string
+          default
+        when :blob
+          Sequel::SQL::Blob.new(default)
+        when :integer
+          Integer(default)
+        when :float
+          Float(default)
+        when :date
+          Sequel.string_to_date(default)
+        when :datetime
+          DateTime.parse(default)
+        when :time
+          Sequel.string_to_time(default)
+        when :decimal
+          BigDecimal.new(default)
+        end
+      rescue
+        nil
       end
     end
    

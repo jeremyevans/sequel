@@ -79,10 +79,10 @@ context "A MySQL database" do
   end
 
   specify "should correctly parse the schema" do
-    @db.schema(:booltest, :reload=>true).should == [[:value, {:type=>:boolean, :allow_null=>true, :primary_key=>false, :default=>nil, :db_type=>"tinyint(4)"}]]
+    @db.schema(:booltest, :reload=>true).should == [[:value, {:type=>:boolean, :allow_null=>true, :primary_key=>false, :default=>nil, :ruby_default=>nil, :db_type=>"tinyint(4)"}]]
     
     Sequel.convert_tinyint_to_bool = false
-    @db.schema(:booltest, :reload=>true).should == [[:value, {:type=>:integer, :allow_null=>true, :primary_key=>false, :default=>nil, :db_type=>"tinyint(4)"}]]
+    @db.schema(:booltest, :reload=>true).should == [[:value, {:type=>:integer, :allow_null=>true, :primary_key=>false, :default=>nil, :ruby_default=>nil, :db_type=>"tinyint(4)"}]]
   end
   
   specify "should accept and return tinyints as bools or integers when configured to do so" do
@@ -426,11 +426,11 @@ context "A MySQL database" do
   end
   
   specify "should have rename_column support keep existing options" do
-    @db.create_table(:items){Integer :id, :null=>false, :default=>5}
+    @db.create_table(:items){String :id, :null=>false, :default=>'blah'}
     @db.alter_table(:items){rename_column :id, :nid}
-    @db.sqls.should == ["CREATE TABLE items (id integer NOT NULL DEFAULT 5)", "DESCRIBE items", "ALTER TABLE items CHANGE COLUMN id nid int(11) NOT NULL DEFAULT 5"]
+    @db.sqls.should == ["CREATE TABLE items (id varchar(255) NOT NULL DEFAULT 'blah')", "DESCRIBE items", "ALTER TABLE items CHANGE COLUMN id nid varchar(255) NOT NULL DEFAULT 'blah'"]
     @db[:items].insert
-    @db[:items].all.should == [{:nid=>5}]
+    @db[:items].all.should == [{:nid=>'blah'}]
     proc{@db[:items].insert(:nid=>nil)}.should raise_error(Sequel::DatabaseError)
   end
   

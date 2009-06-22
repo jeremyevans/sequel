@@ -1,5 +1,9 @@
 === HEAD
  
+* Add :ruby_default to parsed schema information, which contains a ruby object representing the database default (jeremyevans)
+
+* Fix changing a column's name, type, or null status on MySQL when column has a string default (jeremyevans)
+
 * Remove Dataset#to_table_reference protected method, no longer used (jeremyevans)
 
 * Fix thread-safety issue in stored procedure code (jeremyevans)

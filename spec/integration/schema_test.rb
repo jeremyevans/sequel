@@ -74,11 +74,11 @@ describe "Database schema parser" do
 
   specify "should parse defaults from the schema properly" do
     INTEGRATION_DB.create_table!(:items){Integer :number}
-    INTEGRATION_DB.schema(:items).first.last[:default].should == nil
+    INTEGRATION_DB.schema(:items).first.last[:ruby_default].should == nil
     INTEGRATION_DB.create_table!(:items){Integer :number, :default=>0}
-    INTEGRATION_DB.schema(:items).first.last[:default].to_s.should == "0"
+    INTEGRATION_DB.schema(:items).first.last[:ruby_default].should == 0
     INTEGRATION_DB.create_table!(:items){String :a, :default=>"blah"}
-    INTEGRATION_DB.schema(:items).first.last[:default].should include('blah')
+    INTEGRATION_DB.schema(:items).first.last[:ruby_default].should == 'blah'
   end
 
   specify "should parse types from the schema properly" do

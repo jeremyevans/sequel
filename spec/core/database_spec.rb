@@ -1296,3 +1296,62 @@ context "Database#metadata_dataset" do
     ds.send(:output_identifier, 'A').should == :a
   end
 end
+
+context "Database#column_schema_to_ruby_default" do
+  specify "should handle converting many default formats" do
+    db = Sequel::Database.new
+    m = db.method(:column_schema_to_ruby_default)
+    p = lambda{|d,t| m.call(d,t)}
+    p[nil, :integer].should == nil
+    p['1', :integer].should == 1
+    p['-1', :integer].should == -1
+    p['1.0', :float].should == 1.0
+    p['-1.0', :float].should == -1.0
+    p['1.0', :decimal].should == BigDecimal.new('1.0')
+    p['-1.0', :decimal].should == BigDecimal.new('-1.0')
+    p['1', :boolean].should == true
+    p['0', :boolean].should == false
+    p['true', :boolean].should == true
+    p['false', :boolean].should == false
+    p["'t'", :boolean].should == true
+    p["'f'", :boolean].should == false
+    p["'a'", :string].should == 'a'
+    p["'a'", :blob].should == 'a'.to_sequel_blob
+    p["'a'", :blob].should be_a_kind_of(Sequel::SQL::Blob)
+    p["''", :string].should == ''
+    p["'\\a''b'", :string].should == "\\a'b"
+    p["'NULL'", :string].should == "NULL"
+    p["'2009-10-29'", :date].should == Date.new(2009,10,29)
+    p["CURRENT_TIMESTAMP", :date].should == nil
+    p["today()", :date].should == nil
+    p["'2009-10-29T10:20:30-07:00'", :datetime].should == DateTime.parse('2009-10-29T10:20:30-07:00')
+    p["'2009-10-29 10:20:30'", :datetime].should == DateTime.parse('2009-10-29 10:20:30')
+    p["'10:20:30'", :time].should == Time.parse('10:20:30')
+    p["NaN", :float].should == nil
+
+    db.meta_def(:database_type){:postgres}
+    p["''::text", :string].should == ""
+    p["'\\a''b'::character varying", :string].should == "\\a'b"
+    p["'a'::bpchar", :string].should == "a"
+    p["(-1)", :integer].should == -1
+    p["(-1.0)", :float].should == -1.0
+    p['(-1.0)', :decimal].should == BigDecimal.new('-1.0')
+    p["'a'::bytea", :blob].should == 'a'.to_sequel_blob
+    p["'a'::bytea", :blob].should be_a_kind_of(Sequel::SQL::Blob)
+    p["'2009-10-29'::date", :date].should == Date.new(2009,10,29)
+    p["'2009-10-29 10:20:30.241343'::timestamp without time zone", :datetime].should == DateTime.parse('2009-10-29 10:20:30.241343')
+    p["'10:20:30'::time without time zone", :time].should == Time.parse('10:20:30')
+
+    db.meta_def(:database_type){:mysql}
+    p["\\a'b", :string].should == "\\a'b"
+    p["a", :string].should == "a"
+    p["NULL", :string].should == "NULL"
+    p["-1", :float].should == -1.0
+    p['-1', :decimal].should == BigDecimal.new('-1.0')
+    p["2009-10-29", :date].should == Date.new(2009,10,29)
+    p["2009-10-29 10:20:30", :datetime].should == DateTime.parse('2009-10-29 10:20:30')
+    p["10:20:30", :time].should == Time.parse('10:20:30')
+    p["CURRENT_DATE", :date].should == nil
+    p["CURRENT_TIMESTAMP", :datetime].should == nil
+  end
+end
