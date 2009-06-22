@@ -2800,8 +2800,18 @@ context "Sequel::Dataset #set_overrides" do
   end
 end
 
+context "Sequel::Dataset#qualify" do
+  specify "should qualify to the given table" do
+    MockDatabase.new[:t].filter{a<b}.qualify(:e).sql.should == 'SELECT e.* FROM t WHERE (e.a < e.b)'
+  end
+
+  specify "should qualify to the first source if no table if given" do
+    MockDatabase.new[:t].filter{a<b}.qualify.sql.should == 'SELECT t.* FROM t WHERE (t.a < t.b)'
+  end
+end
+
 context "Sequel::Dataset#qualify_to" do
-  specify "should qualify_to the first source" do
+  specify "should qualify to the given table" do
     MockDatabase.new[:t].filter{a<b}.qualify_to(:e).sql.should == 'SELECT e.* FROM t WHERE (e.a < e.b)'
   end
 end

@@ -639,6 +639,11 @@ module Sequel
       [qcr.table, qcr.column].map{|x| [SQL::QualifiedIdentifier, SQL::Identifier, Symbol].any?{|c| x.is_a?(c)} ? literal(x) : quote_identifier(x)}.join('.')
     end
 
+    # Qualify to the given table, or first source if not table is given.
+    def qualify(table=first_source)
+      qualify_to(table)
+    end
+
     # Return a copy of the dataset with unqualified identifiers in the
     # SELECT, WHERE, GROUP, HAVING, and ORDER clauses qualified by the
     # given table. If no columns are currently selected, select all
