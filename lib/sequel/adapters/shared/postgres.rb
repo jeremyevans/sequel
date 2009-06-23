@@ -343,7 +343,7 @@ module Sequel
           (conn.server_version rescue nil) if conn.respond_to?(:server_version)
         end
         unless @server_version
-          m = /PostgreSQL (\d+)\.(\d+)\.(\d+)/.match(get(SQL::Function.new(:version)))
+          m = /PostgreSQL (\d+)\.(\d+)(?:(?:rc\d+)|\.(\d+))?/.match(get(SQL::Function.new(:version)))
           @server_version = (m[1].to_i * 10000) + (m[2].to_i * 100) + m[3].to_i
         end
         @server_version

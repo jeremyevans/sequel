@@ -1,5 +1,7 @@
 === HEAD
  
+* Make parsing of server's version more reliable for PostgreSQL (jeremyevans)
+
 * Add Dataset#qualify, which is qualify_to with a first_source default (jeremyevans)
 
 * Add :ruby_default to parsed schema information, which contains a ruby object representing the database default (jeremyevans)
