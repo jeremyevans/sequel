@@ -209,6 +209,15 @@ context "A PostgreSQL database" do
     @db.reset_primary_key_sequence(:posts).should == nil
   end
   
+  
+  specify "should support opclass specification" do
+    @db.create_table(:posts){text :title; text :body; integer :user_id; index(:user_id, :opclass => :int4_ops, :type => :btree)}
+    @db.sqls.should == [
+    "CREATE TABLE posts (title text, body text, user_id integer)",
+    "CREATE INDEX posts_user_id_index ON posts USING btree (user_id int4_ops)"
+    ]
+  end
+
   specify "should support fulltext indexes and searching" do
     @db.create_table(:posts){text :title; text :body; full_text_index [:title, :body]; full_text_index :title, :language => 'french'}
     @db.sqls.should == [

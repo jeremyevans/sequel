@@ -453,7 +453,11 @@ module Sequel
       def index_definition_sql(table_name, index)
         cols = index[:columns]
         index_name = index[:name] || default_index_name(table_name, cols)
-        expr = literal(Array(cols))
+        expr = if o = index[:opclass] 
+          "(#{Array(cols).map{|c| "#{literal(c)} #{o}"}.join(', ')})"
+        else
+          literal(Array(cols))
+        end
         unique = "UNIQUE " if index[:unique]
         index_type = index[:type]
         filter = index[:where] || index[:filter]
