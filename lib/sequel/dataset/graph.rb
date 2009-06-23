@@ -1,5 +1,14 @@
 module Sequel
   class Dataset
+    # Adds the given graph aliases to the list of graph aliases to use,
+    # unlike #set_graph_aliases, which replaces the list.  See
+    # #set_graph_aliases.
+    def add_graph_aliases(graph_aliases)
+      ds = select_more(*graph_alias_columns(graph_aliases))
+      ds.opts[:graph_aliases] = (ds.opts[:graph_aliases] || ds.opts[:graph][:column_aliases] || {}).merge(graph_aliases)
+      ds
+    end
+
     # Allows you to join multiple datasets/tables and have the result set
     # split into component tables.
     #
@@ -169,13 +178,11 @@ module Sequel
       ds
     end
 
-    # Adds the give graph aliases to the list of graph aliases to use,
-    # unlike #set_graph_aliases, which replaces the list.  See
-    # #set_graph_aliases.
-    def add_graph_aliases(graph_aliases)
-      ds = select_more(*graph_alias_columns(graph_aliases))
-      ds.opts[:graph_aliases] = (ds.opts[:graph_aliases] || ds.opts[:graph][:column_aliases] || {}).merge(graph_aliases)
-      ds
+    # Remove the splitting of results into subhashes.  Also removes
+    # metadata related to graphing, so you should not call graph
+    # any tables to this dataset after calling this method.
+    def ungraphed
+      clone(:graph=>nil)
     end
 
     private

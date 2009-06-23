@@ -1104,6 +1104,14 @@ module Sequel
           ds.eager_graph_associations(ds, model, table_name, [], *associations)
         end
         
+        # Do not attempt to split the result set into associations,
+        # just return results as simple objects.  This is useful if you
+        # want to use eager_graph as a shortcut to have all of the joins
+        # and aliasing set up, but want to do something else with the dataset.
+        def ungraphed
+          super.clone(:eager_graph=>nil)
+        end
+      
         protected
       
         # Call graph on the association with the correct arguments,
@@ -1240,7 +1248,7 @@ module Sequel
           end
           table_alias
         end
-      
+
         private
       
         # Make sure the association is valid for this model, and return the related AssociationReflection.

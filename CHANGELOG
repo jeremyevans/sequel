@@ -1,4 +1,6 @@
 === HEAD
+
+* Add Dataset#ungraphed, to remove the splitting of results into subhashes or associated records (jeremyevans)
  
 * Support :opclass option for PostgreSQL indexes (tmi, jeremyevans)
 

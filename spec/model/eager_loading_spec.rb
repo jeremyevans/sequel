@@ -628,6 +628,15 @@ describe Sequel::Model, "#eager_graph" do
     proc{GraphAlbum.eager_graph(Object.new)}.should raise_error(Sequel::Error)
   end
 
+  it "should not split results and assign associations if ungraphed is called" do
+    ds = GraphAlbum.eager_graph(:band).ungraphed
+    ds.sql.should == 'SELECT albums.id, albums.band_id, band.id AS band_id_0, band.vocalist_id FROM albums LEFT OUTER JOIN bands AS band ON (band.id = albums.band_id)'
+    def ds.fetch_rows(sql, &block)
+      yield({:id=>1, :band_id=>2, :band_id_0=>2, :vocalist_id=>3})
+    end
+    ds.all.should == [GraphAlbum.load(:id=>1, :band_id=>2, :band_id_0=>2, :vocalist_id=>3)]
+  end
+
   it "should eagerly load a single many_to_one association" do
     ds = GraphAlbum.eager_graph(:band)
     ds.sql.should == 'SELECT albums.id, albums.band_id, band.id AS band_id_0, band.vocalist_id FROM albums LEFT OUTER JOIN bands AS band ON (band.id = albums.band_id)'

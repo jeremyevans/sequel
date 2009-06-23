@@ -198,6 +198,14 @@ describe Sequel::Dataset, " graphing" do
     results.first.should == {:points=>{:id=>1, :x=>2, :y=>3}, :lines=>{:id=>4, :x=>5, :y=>6, :graph_id=>7}, :graph=>{:id=>8, :x=>9, :y=>10, :graph_id=>11}}
   end
 
+  it "#ungraphed should remove the splitting of result sets into component tables" do
+    ds = @ds1.graph(@ds2, :x=>:id).ungraphed
+    def ds.fetch_rows(sql, &block)
+      yield({:id=>1,:x=>2,:y=>3,:lines_id=>4,:lines_x=>5,:lines_y=>6,:graph_id=>7})
+    end
+    ds.all.should == [{:id=>1,:x=>2,:y=>3,:lines_id=>4,:lines_x=>5,:lines_y=>6,:graph_id=>7}]
+  end
+
   it "#graph_each should give a nil value instead of a hash when all values for a table are nil" do
     ds = @ds1.graph(@ds2, :x=>:id)
     def ds.fetch_rows(sql, &block)
