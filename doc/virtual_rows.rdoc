@@ -1,65 +1,56 @@
 = Virtual Row Blocks
 
-Dataset methods filter, order, and select all take blocks that yield
-instances of Sequel::SQL::VirtualRow.  These are referred to as
+Dataset methods filter, order, and select all take blocks that either yield
+instances of Sequel::SQL::VirtualRow (if the block takes an argument), or
+are evaluated in the context of an instance of Sequel::SQL::VirtualRow.  These are referred to as
 virtual row blocks.  Many other dataset methods pass the blocks
 they are given into one of those three methods, so there are actually
 many Sequel methods that take virtual row blocks.
 
 VirtualRow is a class that returns SQL::Indentifiers,
-SQL::QualifiedIdentifiers, or SQL::Functions depending on how it is
+SQL::QualifiedIdentifiers, SQL::Functions, or SQL::WindowFunctions depending on how it is
 called.  This is best shown by example:
 
   ds = DB[:items]
-  ds.filter{|o| o.column > 1}        # column > 1
-  ds.filter{|o| o.table__column > 1} # table.column > 1
-  ds.filter{|o| o.function(1) > 1}   # function(1) > 1
-  
-Basically, the rules are:
-
-* If there are arguments, an SQL::Function is returned with the
-  name of the method used and the arguments given.
-
-* If there are no arguments and the method contains a double
-  underscore, split on the double underscore and return an
-  SQL::QualifiedIdentifier with the table and column.
-  
-* Otherwise, create an SQL::Identifier with the name of the
-  method.
-  
-One of the consequences of these rules is that you cannot
-create an SQL::Function that takes no arguments using a VirtualRow
-instance.
-  
-In Sequel 2.12, the following is deprecated by default, as
-virtual row blocks are required to accept an argument:
-
-  ds.filter{:column > 1}                     # column > 1
-  ds.filter{:table__column > 1}              # table.column > 1
-  ds.filter{:function.sql_function(1) > 1}   # function(1) > 1
-  
-This is to keep backwards compatibility while notifying people
-to change their code.  In Sequel 3.0, you will be able to
-do:
-
   ds.filter{column > 1}        # column > 1
   ds.filter{table__column > 1} # table.column > 1
   ds.filter{function(1) > 1}   # function(1) > 1
+  ds.select{version{}}   # version()
+  ds.select{count(:*){}} # count(*)
+  ds.select{count(:distinct, col1){}} # count(DISTINCT col1)
+  ds.select{rank(:over){}} # rank() OVER ()
+  ds.select{count(:over, :*=>true){}} # count(*) OVER ()
+  ds.select{sum(:over, :args=>col1, :partition=>col2, :order=>col3){}} # sum(col1) OVER (PARTITION BY col2 ORDER BY col3)
+  
+Basically, the rules are:
 
-Sequel 3.0 will change the virtual row block support to use
-instance_eval if the block doesn't take an argument.  This
-breaks backward compatibility because instance methods called
-inside the block will now have a virtual row instance as a
-receiver instead of the receiver where the block was defined.
-You can still use local variables in the enclosing scope
-inside the block, as they take on their usual meaning.
-
-If you find yourself needing to call instance methods for the
-current receiver inside a virtual row block, you should change
-the block to accept an argument, and use that argument whenever
-you need the virtual row support.
-
-You can get the Sequel 3.0 behavior in Sequel 2.12 using the
-following method:
-
-  Sequel.virtual_row_instance_eval = true
+* If a block is given:
+  * The block is currently not called.  This may change in a future version.
+  * If there are no arguments, an SQL::Function with the name of
+    method used, and no arguments.
+  * If the first argument is :*, an SQL::Function is created with a single
+    wildcard argument (*).
+  * If the first argument is :distinct, an SQL::Function is created with
+    the keyword DISTINCT prefacing all remaining arguments.
+  * If the first argument is :over, the second argument if provided should
+    be a hash of options to pass to SQL::Window.  The options hash can also
+    contain :*=>true to use a wildcard argument as the function argument, or
+    :args=>... to specify an array of arguments to use as the function arguments.
+* If a block is not given:
+  * If there are arguments, an SQL::Function is returned with the
+    name of the method used and the arguments given.
+  * If there are no arguments and the method contains a double
+    underscore, split on the double underscore and return an
+    SQL::QualifiedIdentifier with the table and column.
+  * Otherwise, create an SQL::Identifier with the name of the
+    method.
+  
+If you use a virtual row block that doesn't take an argument,
+the block is instance_evaled, so you can't reference methods
+in the enclosing scope.  If you need to call methods of the
+enclosing scope, you should assign the results to local variables
+before the block, or just make the block take an argument and use
+that.  If you want to create identifiers or qualified identifiers
+with the same name as existing local variables, make sure ruby
+knows it is a method call instead of a local variable reference
+by not ommiting the parentheses at the end of the method call.

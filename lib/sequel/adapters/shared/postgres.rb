@@ -587,7 +587,7 @@ module Sequel
       QUERY_PLAN = 'QUERY PLAN'.to_sym
       ROW_EXCLUSIVE = 'ROW EXCLUSIVE'.freeze
       ROW_SHARE = 'ROW SHARE'.freeze
-      SELECT_CLAUSE_ORDER = %w'distinct columns from join where group having compounds order limit lock'.freeze
+      SELECT_CLAUSE_ORDER = %w'distinct columns from join where group having window compounds order limit lock'.freeze
       SHARE = 'SHARE'.freeze
       SHARE_ROW_EXCLUSIVE = 'SHARE ROW EXCLUSIVE'.freeze
       SHARE_UPDATE_EXCLUSIVE = 'SHARE UPDATE EXCLUSIVE'.freeze
@@ -698,6 +698,11 @@ module Sequel
         values = values.map {|r| literal(Array(r))}.join(COMMA_SEPARATOR)
         ["#{insert_sql_base}#{source_list(@opts[:from])} (#{identifier_list(columns)}) VALUES #{values}"]
       end
+
+      # Return a clone of the dataset with an addition named window that can be referenced in window functions.
+      def window(name, opts)
+        clone(:window=>(@opts[:windows]||[]) + [[name, SQL::Window.new(opts)]])
+      end
       
       private
       
@@ -740,6 +745,11 @@ module Sequel
       # The order of clauses in the SELECT SQL statement
       def select_clause_order
         SELECT_CLAUSE_ORDER
+      end
+
+      # SQL fragment for named window specifications
+      def select_window_sql(sql)
+        sql << " WINDOW #{@opts[:window].map{|name, window| "#{literal(name)} AS #{literal(window)}"}.join(', ')}" if @opts[:window]
       end
 
       # Support lock mode, allowing FOR SHARE and FOR UPDATE queries.

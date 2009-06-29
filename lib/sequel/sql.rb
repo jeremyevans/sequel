@@ -1,8 +1,12 @@
 module Sequel
+  class LiteralString < ::String
+  end
+
   # The SQL module holds classes whose instances represent SQL fragments.
   # It also holds modules that are included in core ruby classes that
   # make Sequel a friendly DSL.
   module SQL
+
     ### Parent Classes ###
 
     # Classes/Modules aren't an alphabetical order due to the fact that
@@ -786,38 +790,124 @@ module Sequel
     # the methods defined by Sequel, or if you are running on ruby 1.9.
     #
     # An instance of this class is yielded to the block supplied to filter, order, and select.
-    # If Sequel.virtual_row_instance_eval is true and the block doesn't take an argument,
-    # the block is instance_evaled in the context of a new instance of this class.
+    # If the block doesn't take an argument, the block is instance_evaled in the context of
+    # a new instance of this class.
+    #
+    # VirtualRow uses method_missing to return Identifiers, QualifiedIdentifiers, Functions, or WindowFunctions, 
+    # depending on how it is called.  If a block is not given, creates one of the following objects:
+    # * Function - returned if any arguments are supplied, using the method name
+    #   as the function name, and the arguments as the function arguments.
+    # * QualifiedIdentifier - returned if the method name contains __, with the
+    #   table being the part before __, and the column being the part after.
+    # * Identifier - returned otherwise, using the method name.
+    # If a block is given, it returns either a Function or WindowFunction, depending on the first
+    # argument to the method.  Note that the block is currently not called by the code, though
+    # this may change in a future version.  If the first argument is:
+    # * no arguments given - uses a Function with no arguments.
+    # * :* - uses a Function with a literal wildcard argument (*), mostly useful for COUNT.
+    # * :distinct - uses a Function that prepends DISTINCT to the rest of the arguments, mostly
+    #   useful for aggregate functions.
+    # * :over - uses a WindowFunction.  If a second argument is provided, it should be a hash
+    #   of options which are passed to Window (e.g. :window, :partition, :order, :frame).  The
+    #   arguments to the function itself should be specified as :*=>true for a wildcard, or via
+    #   the :args option.
     #
     # Examples:
     #
     #   ds = DB[:t]
+    #   # Argument yielded to block
     #   ds.filter{|r| r.name < 2} # SELECT * FROM t WHERE (name < 2)
-    #   ds.filter{|r| r.table__column + 1 < 2} # SELECT * FROM t WHERE ((table.column + 1) < 2)
-    #   ds.filter{|r| r.is_active(1, 'arg2')} # SELECT * FROM t WHERE is_active(1, 'arg2')
+    #   # Block without argument (instance_eval)
+    #   ds.filter{name < 2} # SELECT * FROM t WHERE (name < 2)
+    #   # Qualified identifiers
+    #   ds.filter{table__column + 1 < 2} # SELECT * FROM t WHERE ((table.column + 1) < 2)
+    #   # Functions
+    #   ds.filter{is_active(1, 'arg2')} # SELECT * FROM t WHERE is_active(1, 'arg2')
+    #   ds.select{version{}} # SELECT version() FROM t
+    #   ds.select{count(:*){}} # SELECT count(*) FROM t
+    #   ds.select{count(:distinct, col1){}} # SELECT count(DISTINCT col1) FROM t
+    #   # Window Functions
+    #   ds.select{rank(:over){}} # SELECT rank() OVER () FROM t
+    #   ds.select{count(:over, :*=>true){}} # SELECT count(*) OVER () FROM t
+    #   ds.select{sum(:over, :args=>col1, :partition=>col2, :order=>col3){}} # SELECT sum(col1) OVER (PARTITION BY col2 ORDER BY col3) FROM t
     class VirtualRow
-      # Can return Identifiers, QualifiedIdentifiers, or Functions:
-      #
-      # * Function - returned if any arguments are supplied, using the method name
-      #   as the function name, and the arguments as the function arguments.
-      # * QualifiedIdentifier - returned if the method name contains __, with the
-      #   table being the part before __, and the column being the part after.
-      # * Identifier - returned otherwise, using the method name.
-      def method_missing(m, *args)
-        if args.empty?
-          table, column = m.to_s.split('__', 2)
+      WILDCARD = LiteralString.new('*').freeze
+      QUESTION_MARK = LiteralString.new('?').freeze
+      COMMA_SEPARATOR = LiteralString.new(', ').freeze
+      DOUBLE_UNDERSCORE = '__'.freeze
+
+      # Return Identifiers, QualifiedIdentifiers, Functions, or WindowFunctions, depending
+      # on arguments and whether a block is provided.  Does not currently call the block.
+      # See the class level documentation.
+      def method_missing(m, *args, &block)
+        if block
+          if args.empty?
+            Function.new(m)
+          else
+            case arg = args.shift
+            when :*
+              Function.new(m, WILDCARD)
+            when :distinct
+              Function.new(m, PlaceholderLiteralString.new("DISTINCT #{args.map{QUESTION_MARK}.join(COMMA_SEPARATOR)}", args))
+            when :over
+              opts = args.shift || {}
+              fun_args = Array(opts[:*] ? WILDCARD : opts[:args])
+              WindowFunction.new(Function.new(m, *fun_args), Window.new(opts))
+            else
+              raise Error, 'unsupported VirtualRow method argument used with block'
+            end
+          end
+        elsif args.empty?
+          table, column = m.to_s.split(DOUBLE_UNDERSCORE, 2)
           column ? QualifiedIdentifier.new(table, column) : Identifier.new(m)
         else
           Function.new(m, *args)
         end
       end
     end
+
+    # A window is part of a window function specifying the window over which the function operates.
+    # It is separated from the WindowFunction class because it also can be used separately on
+    # some databases.
+    class Window < Expression
+      # The options for this window.  Options currently used are:
+      # * :frame - if specified, should be :all or :rows.  :all always operates over all rows in the
+      #   partition, while :rows excludes the current row's later peers.  The default is to include
+      #   all previous rows in the partition up to the current row's last peer.
+      # * :order - order on the column(s) given
+      # * :partition - partition/group on the column(s) given
+      # * :window - base results on a previously specified named window
+      attr_reader :opts
+
+      # Set the options to the options given
+      def initialize(opts={})
+        @opts = opts
+      end
+
+      to_s_method :window_sql, '@opts'
+    end
+
+    # A WindowFunction is a grouping of a function with a window over which it operates.
+    class WindowFunction < Expression
+      # The function to use, should be an SQL::Function.
+      attr_reader :function
+
+      # The window to use, should be an SQL::Window.
+      attr_reader :window
+
+      # Set the function and window.
+      def initialize(function, window)
+        @function, @window = function, window
+      end
+
+      to_s_method :window_function_sql, '@function, @window'
+    end
   end
 
   # LiteralString is used to represent literal SQL expressions. A 
   # LiteralString is copied verbatim into an SQL statement. Instances of
   # LiteralString can be created by calling String#lit.
-  class LiteralString < ::String
+  class LiteralString
     include SQL::OrderMethods
     include SQL::ComplexExpressionMethods
     include SQL::BooleanMethods

@@ -444,3 +444,83 @@ context "Blockless Ruby Filters" do
     end
   end
 end
+
+context Sequel::SQL::VirtualRow do
+  before do
+    db = Sequel::Database.new
+    db.quote_identifiers = true
+    @d = db[:items]
+    def @d.l(*args, &block)
+      literal(filter_expr(*args, &block))
+    end
+  end
+
+  it "should treat methods without arguments as identifiers" do
+    @d.l{column}.should == '"column"'
+  end
+
+  it "should treat methods without arguments that have embedded double underscores as qualified identifiers" do
+    @d.l{table__column}.should == '"table"."column"'
+  end
+
+  it "should treat methods with arguments as functions with the arguments" do
+    @d.l{function(arg1, 10, 'arg3')}.should == 'function("arg1", 10, \'arg3\')'
+  end
+
+  it "should treat methods with a block and no arguments as a function call with no arguments" do
+    @d.l{version{}}.should == 'version()'
+  end
+
+  it "should treat methods with a block and a leading argument :* as a function call with the SQL wildcard" do
+    @d.l{count(:*){}}.should == 'count(*)'
+  end
+
+  it "should treat methods with a block and a leading argument :distinct as a function call with DISTINCT and the additional method arguments" do
+    @d.l{count(:distinct, column1){}}.should == 'count(DISTINCT "column1")'
+    @d.l{count(:distinct, column1, column2){}}.should == 'count(DISTINCT "column1", "column2")'
+  end
+
+  it "should raise an error if an unsupported argument is used with a block" do
+    proc{@d.l{count(:blah){}}}.should raise_error(Sequel::Error)
+  end
+
+  it "should treat methods with a block and a leading argument :over as a window function call" do
+    @d.l{rank(:over){}}.should == 'rank() OVER ()'
+  end
+
+  it "should support :partition options for window function calls" do
+    @d.l{rank(:over, :partition=>column1){}}.should == 'rank() OVER (PARTITION BY "column1")'
+    @d.l{rank(:over, :partition=>[column1, column2]){}}.should == 'rank() OVER (PARTITION BY "column1", "column2")'
+  end
+
+  it "should support :args options for window function calls" do
+    @d.l{avg(:over, :args=>column1){}}.should == 'avg("column1") OVER ()'
+    @d.l{avg(:over, :args=>[column1, column2]){}}.should == 'avg("column1", "column2") OVER ()'
+  end
+
+  it "should support :order option for window function calls" do
+    @d.l{rank(:over, :order=>column1){}}.should == 'rank() OVER (ORDER BY "column1")'
+    @d.l{rank(:over, :order=>[column1, column2]){}}.should == 'rank() OVER (ORDER BY "column1", "column2")'
+  end
+
+  it "should support :window option for window function calls" do
+    @d.l{rank(:over, :window=>:win){}}.should == 'rank() OVER ("win")'
+  end
+
+  it "should support :*=>true option for window function calls" do
+    @d.l{count(:over, :* =>true){}}.should == 'count(*) OVER ()'
+  end
+
+  it "should support :frame=>:all option for window function calls" do
+    @d.l{rank(:over, :frame=>:all){}}.should == 'rank() OVER (ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING)'
+  end
+
+  it "should support :frame=>:rows option for window function calls" do
+    @d.l{rank(:over, :frame=>:rows){}}.should == 'rank() OVER (ROWS UNBOUNDED PRECEDING)'
+  end
+
+  it "should support all these options together" do
+    @d.l{count(:over, :* =>true, :partition=>a, :order=>b, :window=>:win, :frame=>:rows){}}.should == 'count(*) OVER ("win" PARTITION BY "a" ORDER BY "b" ROWS UNBOUNDED PRECEDING)'
+  end
+
+end

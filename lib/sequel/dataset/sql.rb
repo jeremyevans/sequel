@@ -841,6 +841,29 @@ module Sequel
       _filter(:where, *cond, &block)
     end
 
+    # The SQL fragment for the given window's options.
+    def window_sql(opts)
+      window = literal(opts[:window]) if opts[:window]
+      partition = "PARTITION BY #{expression_list(Array(opts[:partition]))}" if opts[:partition]
+      order = "ORDER BY #{expression_list(Array(opts[:order]))}" if opts[:order]
+      frame = case opts[:frame]
+        when nil
+          nil
+        when :all
+          "ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING"
+        when :rows
+          "ROWS UNBOUNDED PRECEDING"
+        else
+          raise Error, "invalid window frame clause, should be :all, :rows, or nil"
+      end
+      "(#{[window, partition, order, frame].compact.join(' ')})"
+    end
+
+    # The SQL fragment for the given window function's function and window.
+    def window_function_sql(function, window)
+      "#{literal(function)} OVER #{literal(window)}"
+    end
+
     # Returns a copy of the dataset with the static SQL used.  This is useful if you want
     # to keep the same row_proc/graph, but change the SQL used to custom SQL.
     #
@@ -1126,6 +1149,15 @@ module Sequel
         SQL::SQLArray.new(qualified_expression(e.array, table))
       when SQL::Subscript 
         SQL::Subscript.new(qualified_expression(e.f, table), qualified_expression(e.sub, table))
+      when SQL::WindowFunction
+        SQL::WindowFunction.new(qualified_expression(e.function, table), qualified_expression(e.window, table))
+      when SQL::Window
+        o = e.opts.dup
+        o[:partition] = qualified_expression(o[:partition], table) if o[:partition]
+        o[:order] = qualified_expression(o[:order], table) if o[:order]
+        SQL::Window.new(o)
+      when SQL::PlaceholderLiteralString
+        SQL::PlaceholderLiteralString.new(e.str, qualified_expression(e.args, table), e.parens)
       else
         e
       end

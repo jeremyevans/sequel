@@ -2889,8 +2889,16 @@ context "Sequel::Dataset#qualify_to_first_source" do
     @ds.filter{a.sql_subscript(b,3)}.qualify_to_first_source.sql.should == 'SELECT t.* FROM t WHERE t.a[t.b, 3]'
   end
 
+  specify "should handle SQL::PlaceholderLiteralStrings" do
+    @ds.filter('? > ?', :a, 1).qualify_to_first_source.sql.should == 'SELECT t.* FROM t WHERE (t.a > 1)'
+  end
+
+  specify "should handle SQL::WindowFunctions" do
+    @ds.select{sum(:over, :args=>:a, :partition=>:b, :order=>:c){}}.qualify_to_first_source.sql.should == 'SELECT sum(t.a) OVER (PARTITION BY t.b ORDER BY t.c) FROM t'
+  end
+
   specify "should handle all other objects by returning them unchanged" do
-    @ds.select("a").filter{a(3)}.filter('blah').order('true'.lit).group('?'.lit(:a)).having(false).qualify_to_first_source.sql.should == \
-      "SELECT 'a' FROM t WHERE (a(3) AND (blah)) GROUP BY a HAVING 'f' ORDER BY true"
+    @ds.select("a").filter{a(3)}.filter('blah').order('true'.lit).group('a > ?'.lit(1)).having(false).qualify_to_first_source.sql.should == \
+      "SELECT 'a' FROM t WHERE (a(3) AND (blah)) GROUP BY a > 1 HAVING 'f' ORDER BY true"
   end
 end
