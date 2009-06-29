@@ -1,5 +1,7 @@
 === HEAD
 
+* In the STI plugin, don't overwrite the STI field if it is already set (jeremyevans)
+
 * Add support for Common Table Expressions, which use the SQL WITH clause (jeremyevans)
 
 * Add SQL::WindowFunction, expand virtual row blocks to support them and other constructions (jeremyevans)

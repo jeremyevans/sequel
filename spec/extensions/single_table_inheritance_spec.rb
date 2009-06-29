@@ -3,6 +3,7 @@ require File.join(File.dirname(__FILE__), "spec_helper")
 describe Sequel::Model, "#sti_key" do
   before do
     class ::StiTest < Sequel::Model
+      def kind; self[:kind]; end 
       def kind=(x); self[:kind] = x; end 
       def _refresh(x); end 
       plugin :single_table_inheritance, :kind
@@ -72,6 +73,11 @@ describe Sequel::Model, "#sti_key" do
     StiTestSub1.new.save
     StiTestSub2.new.save
     MODEL_DB.sqls.should == ["INSERT INTO sti_tests (kind) VALUES ('StiTest')", "INSERT INTO sti_tests (kind) VALUES ('StiTestSub1')", "INSERT INTO sti_tests (kind) VALUES ('StiTestSub2')"]
+  end
+
+  it "should have the before_create hook not override an existing value" do
+    StiTest.create(:kind=>'StiTestSub1')
+    MODEL_DB.sqls.should == ["INSERT INTO sti_tests (kind) VALUES ('StiTestSub1')"]
   end
 
   it "should add a filter to model datasets inside subclasses hook to only retreive objects with the matching key" do
