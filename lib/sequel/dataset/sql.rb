@@ -16,9 +16,10 @@ module Sequel
     QUALIFY_KEYS = [:select, :where, :having, :order, :group]
     QUESTION_MARK = '?'.freeze
     STOCK_COUNT_OPTS = {:select => [SQL::AliasedExpression.new(LiteralString.new("COUNT(*)").freeze, :count)], :order => nil}.freeze
-    SELECT_CLAUSE_ORDER = %w'distinct columns from join where group having compounds order limit'.freeze
+    SELECT_CLAUSE_ORDER = %w'with distinct columns from join where group having compounds order limit'.freeze
     TWO_ARITY_OPERATORS = ::Sequel::SQL::ComplexExpression::TWO_ARITY_OPERATORS
     WILDCARD = '*'.freeze
+    SQL_WITH = "WITH ".freeze
 
     # Adds an further filter to an existing filter using AND. If no filter 
     # exists an error is raised. This method is identical to #filter except
@@ -131,18 +132,21 @@ module Sequel
       clone(:distinct => args)
     end
 
-    # Adds an EXCEPT clause using a second dataset object. If all is true the
-    # clause used is EXCEPT ALL, which may return duplicate rows.
+    # Adds an EXCEPT clause using a second dataset object.
     # An EXCEPT compound dataset returns all rows in the current dataset
     # that are not in the given dataset.
     # Raises an InvalidOperation if the operation is not supported.
+    # Options:
+    # * :all - Set to true to use EXCEPT ALL instead of EXCEPT, so duplicate rows can occur
+    # * :from_self - Set to false to not wrap the returned dataset in a from_self, use with care.
     #
     #   DB[:items].except(DB[:other_items]).sql
     #   #=> "SELECT * FROM items EXCEPT SELECT * FROM other_items"
-    def except(dataset, all = false)
+    def except(dataset, opts={})
+      opts = {:all=>opts} unless opts.is_a?(Hash)
       raise(InvalidOperation, "EXCEPT not supported") unless supports_intersect_except?
-      raise(InvalidOperation, "EXCEPT ALL not supported") if all && !supports_intersect_except_all?
-      compound_clone(:except, dataset, all)
+      raise(InvalidOperation, "EXCEPT ALL not supported") if opts[:all] && !supports_intersect_except_all?
+      compound_clone(:except, dataset, opts)
     end
 
     # Performs the inverse of Dataset#filter.
@@ -376,18 +380,21 @@ module Sequel
       end
     end
     
-    # Adds an INTERSECT clause using a second dataset object. If all is true 
-    # the clause used is INTERSECT ALL, which may return duplicate rows.
+    # Adds an INTERSECT clause using a second dataset object.
     # An INTERSECT compound dataset returns all rows in both the current dataset
     # and the given dataset.
     # Raises an InvalidOperation if the operation is not supported.
+    # Options:
+    # * :all - Set to true to use INTERSECT ALL instead of INTERSECT, so duplicate rows can occur
+    # * :from_self - Set to false to not wrap the returned dataset in a from_self, use with care.
     #
     #   DB[:items].intersect(DB[:other_items]).sql
     #   #=> "SELECT * FROM items INTERSECT SELECT * FROM other_items"
-    def intersect(dataset, all = false)
+    def intersect(dataset, opts={})
+      opts = {:all=>opts} unless opts.is_a?(Hash)
       raise(InvalidOperation, "INTERSECT not supported") unless supports_intersect_except?
-      raise(InvalidOperation, "INTERSECT ALL not supported") if all && !supports_intersect_except_all?
-      compound_clone(:intersect, dataset, all)
+      raise(InvalidOperation, "INTERSECT ALL not supported") if opts[:all] && !supports_intersect_except_all?
+      compound_clone(:intersect, dataset, opts)
     end
 
     # Inverts the current filter
@@ -777,15 +784,18 @@ module Sequel
       clone(:where => nil, :having => nil)
     end
 
-    # Adds a UNION clause using a second dataset object. If all is true the
-    # clause used is UNION ALL, which may return duplicate rows.
+    # Adds a UNION clause using a second dataset object.
     # A UNION compound dataset returns all rows in either the current dataset
     # or the given dataset.
+    # Options:
+    # * :all - Set to true to use UNION ALL instead of UNION, so duplicate rows can occur
+    # * :from_self - Set to false to not wrap the returned dataset in a from_self, use with care.
     #
     #   DB[:items].union(DB[:other_items]).sql
     #   #=> "SELECT * FROM items UNION SELECT * FROM other_items"
-    def union(dataset, all = false)
-      compound_clone(:union, dataset, all)
+    def union(dataset, opts={})
+      opts = {:all=>opts} unless opts.is_a?(Hash)
+      compound_clone(:union, dataset, opts)
     end
 
     # Returns a copy of the dataset with no order.
@@ -832,7 +842,7 @@ module Sequel
 
       sql
     end
-
+    
     # Add a condition to the WHERE clause.  See #filter for argument types.
     #
     #   dataset.group(:a).having(:a).filter(:b) # SELECT * FROM items GROUP BY a HAVING a AND b
@@ -843,6 +853,7 @@ module Sequel
 
     # The SQL fragment for the given window's options.
     def window_sql(opts)
+      raise(Error, 'This dataset does not support window functions') unless supports_window_functions?
       window = literal(opts[:window]) if opts[:window]
       partition = "PARTITION BY #{expression_list(Array(opts[:partition]))}" if opts[:partition]
       order = "ORDER BY #{expression_list(Array(opts[:order]))}" if opts[:order]
@@ -862,6 +873,26 @@ module Sequel
     # The SQL fragment for the given window function's function and window.
     def window_function_sql(function, window)
       "#{literal(function)} OVER #{literal(window)}"
+    end
+    
+    # Add a simple common table expression (CTE) with the given name and a dataset that defines the CTE.
+    # A common table expression acts as an inline view for the query.
+    # Options:
+    # * :args - Specify the arguments/columns for the CTE, should be an array of symbols.
+    # * :recursive - Specify that this is a recursive CTE
+    def with(name, dataset, opts={})
+      raise(Error, 'This datatset does not support common table expressions') unless supports_cte?
+      clone(:with=>(@opts[:with]||[]) + [opts.merge(:name=>name, :dataset=>dataset)])
+    end
+
+    # Add a recursive common table expression (CTE) with the given name, a dataset that
+    # defines the nonrecursive part of the CTE, and a dataset that defines the recursive part
+    # of the CTE.  Options:
+    # * :args - Specify the arguments/columns for the CTE, should be an array of symbols.
+    # * :union_all - Set to false to use UNION instead of UNION ALL combining the nonrecursive and recursive parts.
+    def with_recursive(name, nonrecursive, recursive, opts={})
+      raise(Error, 'This datatset does not support common table expressions') unless supports_cte?
+      clone(:with=>(@opts[:with]||[]) + [opts.merge(:recursive=>true, :name=>name, :dataset=>nonrecursive.union(recursive, {:all=>opts[:union_all] != false, :from_self=>false}))])
     end
 
     # Returns a copy of the dataset with the static SQL used.  This is useful if you want
@@ -895,6 +926,11 @@ module Sequel
       cond = SQL::BooleanExpression.new(:AND, @opts[clause], cond) if @opts[clause]
       clone(clause => cond)
     end
+    
+    # Do a simple join of the arguments (which should be strings or symbols) separated by commas
+    def argument_list(args)
+      args.join(COMMA_SEPARATOR)
+    end
 
     # SQL fragment for specifying an alias.  expression should already be literalized.
     def as_sql(expression, aliaz)
@@ -908,8 +944,9 @@ module Sequel
     end
     
     # Add the dataset to the list of compounds
-    def compound_clone(type, dataset, all)
-      compound_from_self.clone(:compounds=>Array(@opts[:compounds]).map{|x| x.dup} + [[type, dataset.compound_from_self, all]]).from_self
+    def compound_clone(type, dataset, opts)
+      ds = compound_from_self.clone(:compounds=>Array(@opts[:compounds]).map{|x| x.dup} + [[type, dataset.compound_from_self, opts[:all]]])
+      opts[:from_self] == false ? ds : ds.from_self
     end
 
     # The alias to use for datasets, takes a number to make sure the name is unique.
@@ -1225,6 +1262,16 @@ module Sequel
     # Modify the sql to add the filter criteria in the WHERE clause
     def select_where_sql(sql)
       sql << " WHERE #{literal(@opts[:where])}" if @opts[:where]
+    end
+    
+    def select_with_sql(sql)
+      ws = opts[:with]
+      return if !ws || ws.empty?
+      sql.replace("#{select_with_sql_base}#{ws.map{|w| "#{w[:name]}#{"(#{argument_list(w[:args])})" if w[:args]} AS (#{subselect_sql(w[:dataset])})"}.join(COMMA_SEPARATOR)} #{sql}")
+    end
+    
+    def select_with_sql_base
+      SQL_WITH
     end
 
     # Converts an array of source names into into a comma separated list.

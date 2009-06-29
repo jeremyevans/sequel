@@ -343,7 +343,7 @@ module Sequel
           (conn.server_version rescue nil) if conn.respond_to?(:server_version)
         end
         unless @server_version
-          m = /PostgreSQL (\d+)\.(\d+)(?:(?:rc\d+)|\.(\d+))?/.match(get(SQL::Function.new(:version)))
+          m = /PostgreSQL (\d+)\.(\d+)(?:(?:rc\d+)|\.(\d+))?/.match(fetch('SELECT version()').single_value)
           @server_version = (m[1].to_i * 10000) + (m[2].to_i * 100) + m[3].to_i
         end
         @server_version
@@ -587,10 +587,12 @@ module Sequel
       QUERY_PLAN = 'QUERY PLAN'.to_sym
       ROW_EXCLUSIVE = 'ROW EXCLUSIVE'.freeze
       ROW_SHARE = 'ROW SHARE'.freeze
-      SELECT_CLAUSE_ORDER = %w'distinct columns from join where group having window compounds order limit lock'.freeze
+      SELECT_CLAUSE_ORDER = %w'distinct columns from join where group having compounds order limit lock'.freeze
+      SELECT_CLAUSE_ORDER_84 = %w'with distinct columns from join where group having window compounds order limit lock'.freeze
       SHARE = 'SHARE'.freeze
       SHARE_ROW_EXCLUSIVE = 'SHARE ROW EXCLUSIVE'.freeze
       SHARE_UPDATE_EXCLUSIVE = 'SHARE UPDATE EXCLUSIVE'.freeze
+      SQL_WITH_RECURSIVE = "WITH RECURSIVE ".freeze
       
       # Shared methods for prepared statements when used with PostgreSQL databases.
       module PreparedStatementMethods
@@ -617,12 +619,8 @@ module Sequel
       end
 
       # Return the results of an ANALYZE query as a string
-      def analyze(opts = nil)
-        analysis = []
-        fetch_rows(EXPLAIN_ANALYZE + select_sql(opts)) do |r|
-          analysis << r[QUERY_PLAN]
-        end
-        analysis.join("\r\n")
+      def analyze
+        explain(:analyze=>true)
       end
       
       # Disable the use of INSERT RETURNING, even if the server supports it
@@ -631,12 +629,8 @@ module Sequel
       end
 
       # Return the results of an EXPLAIN query as a string
-      def explain(opts = nil)
-        analysis = []
-        fetch_rows(EXPLAIN + select_sql(opts)) do |r|
-          analysis << r[QUERY_PLAN]
-        end
-        analysis.join("\r\n")
+      def explain(opts={})
+        with_sql((opts[:analyze] ? EXPLAIN_ANALYZE : EXPLAIN) + select_sql).map(QUERY_PLAN).join("\r\n")
       end
       
       # Return a cloned dataset with a :share lock type.
@@ -698,6 +692,11 @@ module Sequel
         values = values.map {|r| literal(Array(r))}.join(COMMA_SEPARATOR)
         ["#{insert_sql_base}#{source_list(@opts[:from])} (#{identifier_list(columns)}) VALUES #{values}"]
       end
+      
+      # PostgreSQL 8.4+ supports window functions
+      def supports_window_functions?
+        server_version >= 80400
+      end
 
       # Return a clone of the dataset with an addition named window that can be referenced in window functions.
       def window(name, opts)
@@ -744,7 +743,7 @@ module Sequel
 
       # The order of clauses in the SELECT SQL statement
       def select_clause_order
-        SELECT_CLAUSE_ORDER
+        server_version >= 80400 ? SELECT_CLAUSE_ORDER_84 : SELECT_CLAUSE_ORDER
       end
 
       # SQL fragment for named window specifications
@@ -760,6 +759,11 @@ module Sequel
         when :share
           sql << FOR_SHARE
         end
+      end
+      
+      # Use WITH RECURSIVE instead of WITH if any of the CTEs is recursive
+      def select_with_sql_base
+        opts[:with].any?{|w| w[:recursive]} ? SQL_WITH_RECURSIVE : super
       end
       
       # The version of the database server

@@ -90,6 +90,11 @@ module Sequel
         self
       end
       
+      # DB2 supports window functions
+      def supports_window_functions?
+        true
+      end
+      
       private
 
       def get_column_info(sth)

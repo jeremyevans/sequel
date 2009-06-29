@@ -200,6 +200,7 @@ module Sequel
       BOOL_FALSE = '0'.freeze
       TIMESTAMP_FORMAT = "'%Y-%m-%d %H:%M:%S'".freeze
       COMMA_SEPARATOR = ', '.freeze
+      SELECT_CLAUSE_ORDER = %w'distinct columns from join where group having compounds order limit'.freeze
       
       # MySQL specific syntax for LIKE/REGEXP searches, as well as
       # string concatenation.
@@ -422,6 +423,11 @@ module Sequel
 
           " ON DUPLICATE KEY UPDATE #{updating.join(COMMA_SEPARATOR)}"
         end
+      end
+      
+      # MySQL does not support the SQL WITH clause
+      def select_clause_order
+        SELECT_CLAUSE_ORDER
       end
     end
   end

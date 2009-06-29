@@ -851,7 +851,7 @@ module Sequel
               Function.new(m, PlaceholderLiteralString.new("DISTINCT #{args.map{QUESTION_MARK}.join(COMMA_SEPARATOR)}", args))
             when :over
               opts = args.shift || {}
-              fun_args = Array(opts[:*] ? WILDCARD : opts[:args])
+              fun_args = ::Kernel.Array(opts[:*] ? WILDCARD : opts[:args])
               WindowFunction.new(Function.new(m, *fun_args), Window.new(opts))
             else
               raise Error, 'unsupported VirtualRow method argument used with block'

@@ -46,7 +46,7 @@ module Sequel
     end
   
     module DatasetMethods
-      SELECT_CLAUSE_ORDER = %w'limit distinct columns from with join where group order having compounds'.freeze
+      SELECT_CLAUSE_ORDER = %w'with limit distinct columns from table_options join where group order having compounds'.freeze
 
       def complex_expression_sql(op, args)
         case op
@@ -68,7 +68,7 @@ module Sequel
 
       # Allows you to do .nolock on a query
       def nolock
-        clone(:with => "(NOLOCK)")
+        clone(:table_options => "(NOLOCK)")
       end
 
       def quoted_identifier(name)
@@ -78,6 +78,11 @@ module Sequel
       # Microsoft SQL Server does not support INTERSECT or EXCEPT
       def supports_intersect_except?
         false
+      end
+      
+      # MSSQL 2005+ supports window functions
+      def supports_window_functions?
+        true
       end
 
       private
@@ -97,8 +102,8 @@ module Sequel
       end
 
       # MSSQL uses the WITH statement to lock tables
-      def select_with_sql(sql)
-        sql << " WITH #{@opts[:with]}" if @opts[:with]
+      def select_table_options_sql(sql)
+        sql << " WITH #{@opts[:table_options]}" if @opts[:table_options]
       end
     end
   end

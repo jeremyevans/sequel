@@ -63,6 +63,8 @@ module Sequel
       
       # Dataset class for H2 datasets accessed via JDBC.
       class Dataset < JDBC::Dataset
+        SELECT_CLAUSE_ORDER = %w'distinct columns from join where group having compounds order limit'.freeze
+        
         # H2 requires SQL standard datetimes
         def requires_sql_standard_datetimes?
           true
@@ -71,6 +73,12 @@ module Sequel
         # H2 doesn't support IS TRUE
         def supports_is_true?
           false
+        end
+        
+        private
+      
+        def select_clause_order
+          SELECT_CLAUSE_ORDER
         end
       end
     end

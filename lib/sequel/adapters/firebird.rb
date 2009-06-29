@@ -203,7 +203,7 @@ module Sequel
       NULL = LiteralString.new('NULL').freeze
       COMMA_SEPARATOR = ', '.freeze
       FIREBIRD_TIMESTAMP_FORMAT = "TIMESTAMP '%Y-%m-%d %H:%M:%S".freeze
-      SELECT_CLAUSE_ORDER = %w'distinct limit columns from join where group having compounds order'.freeze
+      SELECT_CLAUSE_ORDER = %w'with distinct limit columns from join where group having compounds order'.freeze
 
       # Yield all rows returned by executing the given SQL and converting
       # the types.

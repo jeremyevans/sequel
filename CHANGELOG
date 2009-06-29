@@ -1,5 +1,7 @@
 === HEAD
 
+* Add support for Common Table Expressions, which use the SQL WITH clause (jeremyevans)
+
 * Add SQL::WindowFunction, expand virtual row blocks to support them and other constructions (jeremyevans)
 
 * Add Model#autoincrementing_primary_key, for when the autoincrementing key isn't the same as the primary key (jeremyevans)

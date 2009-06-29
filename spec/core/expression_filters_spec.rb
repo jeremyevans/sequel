@@ -450,6 +450,7 @@ context Sequel::SQL::VirtualRow do
     db = Sequel::Database.new
     db.quote_identifiers = true
     @d = db[:items]
+    @d.meta_def(:supports_window_functions?){true}
     def @d.l(*args, &block)
       literal(filter_expr(*args, &block))
     end
@@ -523,4 +524,8 @@ context Sequel::SQL::VirtualRow do
     @d.l{count(:over, :* =>true, :partition=>a, :order=>b, :window=>:win, :frame=>:rows){}}.should == 'count(*) OVER ("win" PARTITION BY "a" ORDER BY "b" ROWS UNBOUNDED PRECEDING)'
   end
 
+  it "should raise an error if window functions are not supported" do
+    @d.meta_def(:supports_window_functions?){false}
+    proc{@d.l{count(:over, :* =>true, :partition=>a, :order=>b, :window=>:win, :frame=>:rows){}}}.should raise_error(Sequel::Error)
+  end
 end

@@ -51,6 +51,7 @@ module Sequel
     unfiltered union unordered where with_sql'.collect{|x| x.to_sym}
 
     NOTIMPL_MSG = "This method must be overridden in Sequel adapters".freeze
+    WITH_SUPPORTED='with'.freeze
 
     # The database that corresponds to this dataset
     attr_accessor :db
@@ -248,6 +249,11 @@ module Sequel
     def set_overrides(hash)
       clone(:overrides=>hash.merge(@opts[:overrides]||{}))
     end
+    
+    # Whether the dataset supports common table expressions (the WITH clause).
+    def supports_cte?
+      select_clause_order.include?(WITH_SUPPORTED)
+    end
 
     # Whether the dataset supports the DISTINCT ON clause, true by default.
     def supports_distinct_on?
@@ -267,6 +273,11 @@ module Sequel
     # Whether the dataset supports the IS TRUE syntax.
     def supports_is_true?
       true
+    end
+    
+    # Whether the dataset supports window functions.
+    def supports_window_functions?
+      false
     end
 
     # Updates values for the dataset.  The returned value is generally the

@@ -145,6 +145,14 @@ context "A PostgreSQL dataset with a timestamp field" do
   end
 end
 
+context "PostgreSQL's EXPLAIN and ANALYZE" do
+  specify "should not raise errors" do
+    @d = POSTGRES_DB[:test3]
+    proc{@d.explain}.should_not raise_error
+    proc{@d.analyze}.should_not raise_error
+  end
+end
+
 context "A PostgreSQL database" do
   before do
     @db = POSTGRES_DB
@@ -521,6 +529,36 @@ if POSTGRES_DB.server_version >= 80300
       record = {:title => "multiple words", :body =>nil}
       @ds << record
       @ds.full_text_search([:title, :body], "words").all.should include(record)
+    end
+  end
+end
+
+if POSTGRES_DB.dataset.supports_window_functions?
+  context "Postgres::Dataset named windows" do
+    before do
+      @db = POSTGRES_DB
+      @db.create_table!(:i1){Integer :id; Integer :group_id; Integer :amount}
+      @ds = @db[:i1].order(:id)
+      @ds.insert(:id=>1, :group_id=>1, :amount=>1)
+      @ds.insert(:id=>2, :group_id=>1, :amount=>10)
+      @ds.insert(:id=>3, :group_id=>1, :amount=>100)
+      @ds.insert(:id=>4, :group_id=>2, :amount=>1000)
+      @ds.insert(:id=>5, :group_id=>2, :amount=>10000)
+      @ds.insert(:id=>6, :group_id=>2, :amount=>100000)
+    end
+    after do
+      @db.drop_table(:i1)
+    end
+    
+    specify "should give correct results for window functions" do
+      @ds.window(:win, :partition=>:group_id, :order=>:id).select(:id){sum(:over, :args=>amount, :window=>win){}}.all.should ==
+        [{:sum=>1, :id=>1}, {:sum=>11, :id=>2}, {:sum=>111, :id=>3}, {:sum=>1000, :id=>4}, {:sum=>11000, :id=>5}, {:sum=>111000, :id=>6}]
+      @ds.window(:win, :partition=>:group_id).select(:id){sum(:over, :args=>amount, :window=>win, :order=>id){}}.all.should ==
+        [{:sum=>1, :id=>1}, {:sum=>11, :id=>2}, {:sum=>111, :id=>3}, {:sum=>1000, :id=>4}, {:sum=>11000, :id=>5}, {:sum=>111000, :id=>6}]
+      @ds.window(:win, {}).select(:id){sum(:over, :args=>amount, :window=>:win, :order=>id){}}.all.should ==
+        [{:sum=>1, :id=>1}, {:sum=>11, :id=>2}, {:sum=>111, :id=>3}, {:sum=>1111, :id=>4}, {:sum=>11111, :id=>5}, {:sum=>111111, :id=>6}]
+      @ds.window(:win, :partition=>:group_id).select(:id){sum(:over, :args=>amount, :window=>:win, :order=>id, :frame=>:all){}}.all.should ==
+        [{:sum=>111, :id=>1}, {:sum=>111, :id=>2}, {:sum=>111, :id=>3}, {:sum=>111000, :id=>4}, {:sum=>111000, :id=>5}, {:sum=>111000, :id=>6}]
     end
   end
 end

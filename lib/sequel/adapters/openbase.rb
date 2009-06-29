@@ -37,6 +37,8 @@ module Sequel
     end
     
     class Dataset < Sequel::Dataset
+      SELECT_CLAUSE_ORDER = %w'distinct columns from join where group having compounds order limit'.freeze
+      
       def fetch_rows(sql)
         execute(sql) do |result|
           begin
@@ -51,6 +53,12 @@ module Sequel
           end
         end
         self
+      end
+      
+      private
+      
+      def select_clause_order
+        SELECT_CLAUSE_ORDER
       end
     end
   end

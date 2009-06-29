@@ -234,6 +234,8 @@ module Sequel
     
     # Instance methods for datasets that connect to an SQLite database
     module DatasetMethods
+      SELECT_CLAUSE_ORDER = %w'distinct columns from join where group having compounds order limit'.freeze
+    
       # SQLite does not support pattern matching via regular expressions.
       # SQLite is case insensitive (depending on pragma), so use LIKE for
       # ILIKE.
@@ -286,17 +288,23 @@ module Sequel
       end
 
       private
-
+      
+      # SQLite uses string literals instead of identifiers in AS clauses.
+      def as_sql(expression, aliaz)
+        aliaz = aliaz.value if aliaz.is_a?(SQL::Identifier)
+        "#{expression} AS #{literal(aliaz.to_s)}"
+      end
+      
+      # SQLite uses a preceding X for hex escaping strings
       def literal_blob(v)
         blob = ''
         v.each_byte{|x| blob << sprintf('%02x', x)}
         "X'#{blob}'"
       end
       
-      # SQLite uses string literals instead of identifiers in AS clauses.
-      def as_sql(expression, aliaz)
-        aliaz = aliaz.value if aliaz.is_a?(SQL::Identifier)
-        "#{expression} AS #{literal(aliaz.to_s)}"
+      # SQLite does not support the SQL WITH clause
+      def select_clause_order
+        SELECT_CLAUSE_ORDER
       end
     end
   end

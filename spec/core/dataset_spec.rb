@@ -1886,12 +1886,16 @@ context "Dataset compound operations" do
       "SELECT * FROM (SELECT * FROM a WHERE (z = 1) UNION SELECT * FROM b WHERE (z = 2)) AS t1"
     @b.union(@a, true).sql.should == \
       "SELECT * FROM (SELECT * FROM b WHERE (z = 2) UNION ALL SELECT * FROM a WHERE (z = 1)) AS t1"
+    @b.union(@a, :all=>true).sql.should == \
+      "SELECT * FROM (SELECT * FROM b WHERE (z = 2) UNION ALL SELECT * FROM a WHERE (z = 1)) AS t1"
   end
 
   specify "should support INTERSECT and INTERSECT ALL" do
     @a.intersect(@b).sql.should == \
       "SELECT * FROM (SELECT * FROM a WHERE (z = 1) INTERSECT SELECT * FROM b WHERE (z = 2)) AS t1"
     @b.intersect(@a, true).sql.should == \
+      "SELECT * FROM (SELECT * FROM b WHERE (z = 2) INTERSECT ALL SELECT * FROM a WHERE (z = 1)) AS t1"
+    @b.intersect(@a, :all=>true).sql.should == \
       "SELECT * FROM (SELECT * FROM b WHERE (z = 2) INTERSECT ALL SELECT * FROM a WHERE (z = 1)) AS t1"
   end
 
@@ -1900,6 +1904,24 @@ context "Dataset compound operations" do
       "SELECT * FROM (SELECT * FROM a WHERE (z = 1) EXCEPT SELECT * FROM b WHERE (z = 2)) AS t1"
     @b.except(@a, true).sql.should == \
       "SELECT * FROM (SELECT * FROM b WHERE (z = 2) EXCEPT ALL SELECT * FROM a WHERE (z = 1)) AS t1"
+    @b.except(@a, :all=>true).sql.should == \
+      "SELECT * FROM (SELECT * FROM b WHERE (z = 2) EXCEPT ALL SELECT * FROM a WHERE (z = 1)) AS t1"
+  end
+    
+  specify "should support :from_self=>false option to not wrap the compound in a SELECT * FROM (...)" do
+    @b.union(@a, :from_self=>false).sql.should == \
+      "SELECT * FROM b WHERE (z = 2) UNION SELECT * FROM a WHERE (z = 1)"
+    @b.intersect(@a, :from_self=>false).sql.should == \
+      "SELECT * FROM b WHERE (z = 2) INTERSECT SELECT * FROM a WHERE (z = 1)"
+    @b.except(@a, :from_self=>false).sql.should == \
+      "SELECT * FROM b WHERE (z = 2) EXCEPT SELECT * FROM a WHERE (z = 1)"
+      
+    @b.union(@a, :from_self=>false, :all=>true).sql.should == \
+      "SELECT * FROM b WHERE (z = 2) UNION ALL SELECT * FROM a WHERE (z = 1)"
+    @b.intersect(@a, :from_self=>false, :all=>true).sql.should == \
+      "SELECT * FROM b WHERE (z = 2) INTERSECT ALL SELECT * FROM a WHERE (z = 1)"
+    @b.except(@a, :from_self=>false, :all=>true).sql.should == \
+      "SELECT * FROM b WHERE (z = 2) EXCEPT ALL SELECT * FROM a WHERE (z = 1)"
   end
 
   specify "should raise an InvalidOperation if INTERSECT or EXCEPT is used and they are not supported" do
@@ -2894,11 +2916,48 @@ context "Sequel::Dataset#qualify_to_first_source" do
   end
 
   specify "should handle SQL::WindowFunctions" do
+    @ds.meta_def(:supports_window_functions?){true}
     @ds.select{sum(:over, :args=>:a, :partition=>:b, :order=>:c){}}.qualify_to_first_source.sql.should == 'SELECT sum(t.a) OVER (PARTITION BY t.b ORDER BY t.c) FROM t'
   end
 
   specify "should handle all other objects by returning them unchanged" do
     @ds.select("a").filter{a(3)}.filter('blah').order('true'.lit).group('a > ?'.lit(1)).having(false).qualify_to_first_source.sql.should == \
       "SELECT 'a' FROM t WHERE (a(3) AND (blah)) GROUP BY a > 1 HAVING 'f' ORDER BY true"
+  end
+end
+
+context "Sequel::Dataset #with and #with_recursive" do
+  before do
+    @db = MockDatabase.new
+    @ds = @db[:t]
+  end
+  
+  specify "#with should take a name and dataset and use a WITH clause" do
+    @ds.with(:t, @db[:x]).sql.should == 'WITH t AS (SELECT * FROM x) SELECT * FROM t'
+  end
+
+  specify "#with_recursive should take a name, nonrecursive dataset, and recursive dataset, and use a WITH clause" do
+    @ds.with_recursive(:t, @db[:x], @db[:t]).sql.should == 'WITH t AS (SELECT * FROM x UNION ALL SELECT * FROM t) SELECT * FROM t'
+  end
+  
+  specify "#with and #with_recursive should add to existing WITH clause if called multiple times" do
+    @ds.with(:t, @db[:x]).with(:j, @db[:y]).sql.should == 'WITH t AS (SELECT * FROM x), j AS (SELECT * FROM y) SELECT * FROM t'
+    @ds.with_recursive(:t, @db[:x], @db[:t]).with_recursive(:j, @db[:y], @db[:j]).sql.should == 'WITH t AS (SELECT * FROM x UNION ALL SELECT * FROM t), j AS (SELECT * FROM y UNION ALL SELECT * FROM j) SELECT * FROM t'
+    @ds.with(:t, @db[:x]).with_recursive(:j, @db[:y], @db[:j]).sql.should == 'WITH t AS (SELECT * FROM x), j AS (SELECT * FROM y UNION ALL SELECT * FROM j) SELECT * FROM t'
+  end
+  
+  specify "#with and #with_recursive should take an :args option" do
+    @ds.with(:t, @db[:x], :args=>[:b]).sql.should == 'WITH t(b) AS (SELECT * FROM x) SELECT * FROM t'
+    @ds.with_recursive(:t, @db[:x], @db[:t], :args=>[:b, :c]).sql.should == 'WITH t(b, c) AS (SELECT * FROM x UNION ALL SELECT * FROM t) SELECT * FROM t'
+  end
+  
+  specify "#with_recursive should take an :union_all=>false option" do
+    @ds.with_recursive(:t, @db[:x], @db[:t], :union_all=>false).sql.should == 'WITH t AS (SELECT * FROM x UNION SELECT * FROM t) SELECT * FROM t'
+  end
+
+  specify "#with and #with_recursive should raise an error unless the dataset supports CTEs" do
+    @ds.meta_def(:supports_cte?){false}
+    proc{@ds.with(:t, @db[:x], :args=>[:b])}.should raise_error(Sequel::Error)
+    proc{@ds.with_recursive(:t, @db[:x], @db[:t], :args=>[:b, :c])}.should raise_error(Sequel::Error)
   end
 end

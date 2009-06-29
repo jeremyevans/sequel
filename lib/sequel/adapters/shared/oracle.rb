@@ -94,7 +94,7 @@ module Sequel
     end
     
     module DatasetMethods
-      SELECT_CLAUSE_ORDER = %w'distinct columns from join where group having compounds order limit'.freeze
+      SELECT_CLAUSE_ORDER = %w'with distinct columns from join where group having compounds order limit'.freeze
 
       # Oracle uses MINUS instead of EXCEPT, and doesn't support EXCEPT ALL
       def except(dataset, all = false)
@@ -119,6 +119,11 @@ module Sequel
       # Oracle does not support INTERSECT ALL or EXCEPT ALL
       def supports_intersect_except_all?
         false
+      end
+      
+      # Oracle supports window functions
+      def supports_window_functions?
+        true
       end
 
       private
