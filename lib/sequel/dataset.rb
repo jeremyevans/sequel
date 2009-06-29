@@ -45,10 +45,10 @@ module Sequel
     MUTATION_METHODS = %w'add_graph_aliases and distinct exclude exists
     filter from from_self full_outer_join graph
     group group_and_count group_by having inner_join intersect invert join
-    left_outer_join limit naked or order order_by order_more paginate query reject
+    left_outer_join limit naked or order order_by order_more paginate qualify query reject
     reverse reverse_order right_outer_join select select_all select_more
     set_defaults set_graph_aliases set_overrides sort sort_by
-    unfiltered union unordered where with_sql'.collect{|x| x.to_sym}
+    unfiltered ungraphed union unordered where with with_sql'.collect{|x| x.to_sym}
 
     NOTIMPL_MSG = "This method must be overridden in Sequel adapters".freeze
     WITH_SUPPORTED='with'.freeze
