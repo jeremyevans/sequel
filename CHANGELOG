@@ -1,5 +1,7 @@
 === HEAD
 
+* Add Model#autoincrementing_primary_key, for when the autoincrementing key isn't the same as the primary key (jeremyevans)
+
 * Add Dataset#ungraphed, to remove the splitting of results into subhashes or associated records (jeremyevans)
  
 * Support :opclass option for PostgreSQL indexes (tmi, jeremyevans)

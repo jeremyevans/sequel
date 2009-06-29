@@ -563,6 +563,13 @@ module Sequel
       def associations
         @associations ||= {}
       end
+
+      # The autoincrementing primary key for this model object. Should be
+      # overridden if you have a composite primary key with one part of it
+      # being autoincrementing.
+      def autoincrementing_primary_key
+        primary_key
+      end
   
       # The columns that have been updated.  This isn't completely accurate,
       # see Model#[]=.
@@ -794,7 +801,7 @@ module Sequel
             iid = ds.insert(@values)
             # if we have a regular primary key and it's not set in @values,
             # we assume it's the last inserted id
-            if (pk = primary_key) && !(Array === pk) && !@values[pk]
+            if (pk = autoincrementing_primary_key) && pk.is_a?(Symbol) && !@values[pk]
               @values[pk] = iid
             end
             @this = nil if pk

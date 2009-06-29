@@ -35,19 +35,19 @@ describe "Model#save server use" do
 end
 
 describe "Model#save" do
-  
-  before(:each) do
+  before do
     @c = Class.new(Sequel::Model(:items)) do
       columns :id, :x, :y
     end
+    @c.dataset.meta_def(:insert){|h| super(h); 1}
     MODEL_DB.reset
   end
   
   it "should insert a record for a new model instance" do
     o = @c.new(:x => 1)
     o.save
-    
-    MODEL_DB.sqls.first.should == "INSERT INTO items (x) VALUES (1)"
+    MODEL_DB.sqls.should == ["INSERT INTO items (x) VALUES (1)",
+      "SELECT * FROM items WHERE (id = 1) LIMIT 1"]
   end
 
   it "should use dataset's insert_select method if present" do
@@ -60,15 +60,42 @@ describe "Model#save" do
     o.save
     
     o.values.should == {:y=>2}
-    MODEL_DB.sqls.first.should == "INSERT INTO items (y) VALUES (2)"
+    MODEL_DB.sqls.should == ["INSERT INTO items (y) VALUES (2)"]
+  end
+
+  it "should use value returned by insert as the primary key" do
+    @c.dataset.meta_def(:insert){|h| super(h); 13}
+    o = @c.new(:x => 11)
+    o.save
+    MODEL_DB.sqls.should == ["INSERT INTO items (x) VALUES (11)",
+      "SELECT * FROM items WHERE (id = 13) LIMIT 1"]
+  end
+
+  it "should work correctly for inserting a record without a primary key" do
+    @c.dataset.meta_def(:insert){|h| super(h); 13}
+    @c.no_primary_key
+    o = @c.new(:x => 11)
+    o.save
+    MODEL_DB.sqls.should == ["INSERT INTO items (x) VALUES (11)"]
+  end
+
+  it "should set the autoincrementing_primary_key value to the value returned by insert" do
+    @c.dataset.meta_def(:insert){|h| super(h); 13}
+    @c.unrestrict_primary_key
+    @c.set_primary_key [:x, :y]
+    o = @c.new(:x => 11)
+    o.meta_def(:autoincrementing_primary_key){:y}
+    o.save
+    MODEL_DB.sqls.length.should == 2
+    MODEL_DB.sqls.first.should == "INSERT INTO items (x) VALUES (11)"
+    MODEL_DB.sqls.last.should =~ %r{SELECT \* FROM items WHERE \(\([xy] = 1[13]\) AND \([xy] = 1[13]\)\) LIMIT 1}
   end
 
   it "should update a record for an existing model instance" do
     o = @c.load(:id => 3, :x => 1)
     o.save
-    
-    MODEL_DB.sqls.first.should =~ 
-      /UPDATE items SET (id = 3, x = 1|x = 1, id = 3) WHERE \(id = 3\)/
+    MODEL_DB.sqls.length.should == 1
+    MODEL_DB.sqls.first.should =~ /UPDATE items SET (id = 3, x = 1|x = 1, id = 3) WHERE \(id = 3\)/
   end
   
   it "should update only the given columns if given" do
