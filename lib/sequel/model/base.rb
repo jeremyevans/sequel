@@ -288,7 +288,13 @@ module Sequel
           @dataset_methods.each{|meth, block| @dataset.meta_def(meth, &block)} if @dataset_methods
         end
         @dataset.model = self if @dataset.respond_to?(:model=)
-        @db_schema = (inherited ? superclass.db_schema : get_db_schema) rescue nil
+        begin
+          @db_schema = (inherited ? superclass.db_schema : get_db_schema)
+        rescue Sequel::DatabaseConnectionError => e
+          raise e
+        rescue => e
+          nil
+        end
         self
       end
       alias dataset= set_dataset
@@ -390,7 +396,15 @@ module Sequel
         ds_opts = dataset.opts
         single_table = ds_opts[:from] && (ds_opts[:from].length == 1) \
           && !ds_opts.include?(:join) && !ds_opts.include?(:sql)
-        get_columns = proc{columns rescue []}
+        get_columns = proc{
+          begin
+            columns
+          rescue Sequel::DatabaseConnectionError => e
+            raise e
+          rescue => e
+            []
+          end
+        }
         if single_table && (schema_array = (db.schema(table_name, :reload=>reload) rescue nil))
           schema_array.each{|k,v| schema_hash[k] = v}
           if ds_opts.include?(:select)

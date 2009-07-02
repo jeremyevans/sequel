@@ -64,6 +64,11 @@ describe Sequel::Model, "dataset & schema" do
     ds.should respond_to(:destroy)
   end
 
+  it "should raise an error on set_dataset if there is an error connecting to the database" do
+    @model.meta_def(:get_db_schema){raise Sequel::DatabaseConnectionError}
+    proc{@model.set_dataset(MODEL_DB[:foo])}.should raise_error
+  end
+
   it "doesn't raise an error on set_dataset if there is an error raised getting the schema" do
     @model.meta_def(:get_db_schema){raise Sequel::Error}
     proc{@model.set_dataset(MODEL_DB[:foo])}.should_not raise_error
