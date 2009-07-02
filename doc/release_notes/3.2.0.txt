@@ -1,0 +1,268 @@
+New Features
+------------
+
+* Common table expressions (CTEs) are now supported.  CTEs use the
+  SQL WITH clause, and specify inline views that queries can use.
+  They also support a recursive mode, where the CTE can recursively
+  query its own output, allowing you do do things like load all
+  branches for a given node in a plain tree structure.
+  
+  The standard with takes an alias and a dataset:
+  
+    DB[:vw].with(:vw, DB[:table].filter{col < 1})
+    # WITH vw AS (SELECT * FROM table WHERE col < 1)
+    # SELECT * FROM vw
+    
+  The recursive with takes an alias, a nonrecursive dataset, and a
+  recursive dataset:
+    
+    DB[:vw].with_recursive(:vw,
+      DB[:tree].filter(:id=>1),
+      DB[:tree].join(:vw, :id=>:parent_id).
+                select(:vw__id, :vw__parent_id))
+    # WITH RECURSIVE vw AS (SELECT * FROM tree
+    #     WHERE (id = 1)
+    #     UNION ALL
+    #     SELECT vw.id, vw.parent_id
+    #     FROM tree
+    #     INNER JOIN vw ON (vw.id = tree.parent_id))
+    # SELECT * FROM vw
+
+  CTEs are supported by Microsoft SQL Server 2005+, DB2 7+,
+  Firebird 2.1+, Oracle 9+, and PostgreSQL 8.4+.
+  
+* SQL window functions are now supported, and a DSL has been added to
+  ease their creation.  Window functions act similarly to aggregate
+  functions but operate on sliding ranges of rows.
+  
+  In virtual row blocks (blocks passed to filter, select, order, etc.)
+  you can now provide a block to method calls to change the default
+  behavior to create functions that weren't possible previously.  The
+  blocks aren't called, but their presence serves as a flag.
+  
+  What function is created depends on the arguments to the method:
+  
+  * If there are no arguments, an SQL::Function is created with the
+    name of method used, and no arguments.  Previously, it was not
+    possible to create functions without arguments using the virtual
+    row block DSL.  Example:
+    
+      DB.dataset.select{version{}} # SELECT version()
+    
+  * If the first argument is :*, an SQL::Function is created with a
+    single wildcard argument (*).  This is mostly useful for count:
+    
+      DB[:t].select{count(:*){}} # SELECT count(*) FROM t
+    
+  * If the first argument is :distinct, an SQL::Function is created
+    with the keyword DISTINCT prefacing all remaining arguments. This
+    is useful for aggregate functions such as count:
+    
+      DB[:t].select{count(:distinct, col1){}}
+      # SELECT count(DISTINCT col1) FROM t
+    
+  * If the first argument is :over, the second argument, if provided,
+    should be a hash of options to pass to SQL::Window.  The options
+    hash can also contain :*=>true to use a wildcard argument as the
+    function argument, or :args=>... to specify an array of arguments
+    to use as the function arguments.
+
+      DB[:t].select{rank(:over){}} # SELECT rank() OVER ()
+      DB[:t].select{count(:over, :*=>true){}} # SELECT count(*) OVER ()
+      DB[:t].select{sum(:over, :args=>col1,
+                    :partition=>col2, :order=>col3){}}
+      # SELECT sum(col1) OVER (PARTITION BY col2 ORDER BY col3)
+      
+  PostgreSQL also supports named windows.  Named windows can be
+  specified by Dataset#window, and window functions can reference
+  them using the :window option.
+  
+* Schema information for columns now includes a :ruby_default entry
+  which contains a ruby object that represents the default given by
+  the database (which is stored in :default).  Not all :default
+  entries can be parsed into a :ruby_default, but if the
+  schema_dumper extension previously supported it, it should work.
+
+* Methods to create compound datasets (union, intersect, except), now
+  take an options hash instead of a true/false flag.  The previous
+  API is still supported, but switching to specifying the ALL setting
+  using :all=>true is recommended.
+  
+  Additionally, you can now set :from_self=>false to not wrap the
+  returned dataset in a "SELECT * FROM (...)".
+  
+* Dataset#ungraphed was added that removes the graphing information
+  from the dataset.  This allows you to use Dataset#graph for the
+  automatic aliasing, or #eager_graph for the automatic aliasing and
+  joining, and then remove the graphing information so that the
+  resulting objects will not be split into subhashes or associations.
+
+* There were some introspection methods added to Dataset to describe
+  which capabilities that dataset does or does not support:
+  
+    supports_cte?
+    supports_distinct_on?
+    supports_intersect_except?
+    supports_intersect_except_all?
+    supports_window_functions?
+
+  In addition to being available for the user to use, these are also
+  used internally, so attempting to use a CTE on a dataset that
+  doesn't support it will raise an Error.
+
+* Dataset#qualify was added, which is like qualify_to with a default
+  of first_source.
+
+  Additionally, qualify now affects PlaceholderLiteralStrings.  It
+  doesn't scan the string (as Sequel never attempts to parse SQL),
+  but if you provide the column as a symbol placeholder argument, it
+  will qualify it.
+  
+* You can now specify the table and column Sequel::Migrator will use
+  to record the current schema version.  The new Migrator.run method
+  must be used to use these new options.
+  
+* The JDBC adapter now accepts :user and :password options, instead
+  of requiring them to be specified in the connection string and 
+  handled by the JDBC driver.  This should allow connections to
+  Oracle using the Thin JDBC driver.
+  
+* You can now specify the max_connections, pool_timeout, and
+  single_threaded settings directly in the connection string:
+  
+    postgres:///database?single_threaded=t
+    postgres:///database?max_connections=10&pool_timeout=20
+
+* Dataset#on_duplicate_key_update now affects Dataset#insert when
+  using MySQL.
+
+* You can now specify the :opclass option when creating PostgreSQL
+  indexes.  Currently, this only supports a single operator class
+  for all columns.  If you need different operator classes per
+  column, please post on sequel-talk.
+  
+* Model#autoincrementing_primary_key was added and can be used if
+  the autoincrementing key isn't the same as the primary key.  The
+  only likely use for this is on MySQL MyISAM tables with composite
+  primary keys where only one of the composite parts is
+  autoincrementing.
+
+* You can now use database column values as search patterns and
+  specify the text to search as a String or Regexp:
+  
+    String.send(:include, Sequel::SQL::StringMethods)
+    Regexp.send(:include, Sequel::SQL::StringMethods)
+
+    'a'.like(:x)  # ('a' LIKE x)
+    /a/.like(:x)  # ('a' ~ x)
+    /a/i.like(:x) # ('a' ~* x)
+    /a/.like(:x, 'b') # (('a' ~ x) OR ('a' ~ 'b'))
+
+* The Dataset#dataset_alias private method was added.  It can be
+  overridden if you have tables named t0, t1, etc and want to make
+  sure the default dataset aliases that Sequel uses do not clash
+  with existing table names.
+  
+* Sequel now raises an Error if you call Sequel.connect with
+  something that is not a Hash or String.
+  
+* bin/sequel now accepts a -N option to not test the database
+  connection.
+  
+* An opening_databases.rdoc file was added to the documentation
+  directory, which should be a good introduction for new users about
+  how to set up your Database connection.
+
+Other Improvements
+------------------
+
+* MySQL native adapter SELECT is much faster than before, up to 75%
+  faster.
+
+* JDBC SELECT is about 10% faster than before.  It's still much
+  slower than the native adapters, due to conversion issues.
+
+* bin/sequel now works with a YAML file on ruby 1.9.
+
+* MySQL foreign key table constraints have been fixed.
+
+* Database#indexes now works on PostgreSQL if the schema used is a
+  Symbol.  It also works on PostgreSQL versions all the way back to
+  7.4.
+
+* Graphing of datasets with dataset sources has been fixed.
+
+* Changing a columns name, type, or NULL status on MySQL now
+  supports a much wider selection of column defaults.
+  
+* The stored procedure code is now thread-safe.  Sequel is
+  thread-safe in general, but due to a bug the previous stored 
+  procedure code was not thread-safe.
+
+* The ODBC adapter now drops statements automatically instead of
+  requiring the user to do so manually, making it more similar
+  to other adapters.
+
+* The single_table_inheritance plugin no longer overwrites the STI
+  field if the field already has a value.  This allows you to use
+  create in the generic class to insert a value that will be
+  returned as a subclass:
+  
+    Person.create(:kind => "Manager")
+    
+* When altering colums on MySQL, :unsigned, :elements, :size and other
+  options given are no longer ignored.
+
+* The PostgreSQL shared adapter's explain and analyze methods have
+  been fixed, they had been broken in 3.0.
+  
+* Parsing of the server's version is more robust on PostgreSQL.
+  It should now work correctly for 8.4 and 8.4rc1 type versions.
+
+Backwards Compatibility
+-----------------------
+
+* Dataset#table_exists? has been removed, since it never worked
+  perfectly.  Use Database#table_exists? instead.
+  
+* Model.grep now calls Dataset#grep instead of Enumerable#grep.
+  If you are using Model.grep, you need to modify your application.
+
+* The MSSQL shared adapter previously used the :with option for
+  storing the NOLOCK setting of the query.  That option has been
+  renamed to :table_options, since :with is now used for CTEs.
+  This should not have an effect unless you where using the option
+  manually.
+
+* Previously, providing a block to a method calls in virtual row
+  blocks did not change behavior, where now it causes a different
+  code path to be used.  In both cases, the block is not evaluated,
+  but that may change in a future version.
+  
+* Dataset#to_table_reference protected method was removed, as it was
+  no longer used.
+  
+* The pool_timeout setting is now converted to an Integer, so if you
+  used to pass in a Float, it no longer works the same way.
+  
+* Most files in adapters/utils have been removed, in favor of 
+  integrating the code directly into Database and Dataset.  If you
+  were previously checking for the UnsupportedIntersectExcept or
+  related modules, use the Dataset introspection methods instead
+  (e.g. supports_intersect_except?).
+  
+* If you were using the ODBC adapter and manually dropping returned
+  statements, you should note that now statements are dropped
+  automatically, and the execute method doesn't return a statement
+  object.
+  
+* The MySQL adapter on_duplicate_key_update_sql is now a private
+  method.
+  
+* If you were modifying the :from dataset option directly, note that
+  Sequel now expects this option to be preprocessed.  See the new
+  implementation of Dataset#from for an idea of the changes
+  required.
+  
+* Dataset#simple_select_all? now returns false instead of true for a
+  dataset that selects from another dataset.
