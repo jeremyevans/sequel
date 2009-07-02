@@ -290,9 +290,9 @@ module Sequel
         @dataset.model = self if @dataset.respond_to?(:model=)
         begin
           @db_schema = (inherited ? superclass.db_schema : get_db_schema)
-        rescue Sequel::DatabaseConnectionError => e
-          raise e
-        rescue => e
+        rescue Sequel::DatabaseConnectionError
+          raise
+        rescue
           nil
         end
         self
@@ -396,15 +396,15 @@ module Sequel
         ds_opts = dataset.opts
         single_table = ds_opts[:from] && (ds_opts[:from].length == 1) \
           && !ds_opts.include?(:join) && !ds_opts.include?(:sql)
-        get_columns = proc{
+        get_columns = proc do
           begin
             columns
-          rescue Sequel::DatabaseConnectionError => e
-            raise e
-          rescue => e
+          rescue Sequel::DatabaseConnectionError
+            raise
+          rescue
             []
           end
-        }
+        end
         if single_table && (schema_array = (db.schema(table_name, :reload=>reload) rescue nil))
           schema_array.each{|k,v| schema_hash[k] = v}
           if ds_opts.include?(:select)
