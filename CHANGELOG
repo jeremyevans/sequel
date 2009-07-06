@@ -1,5 +1,7 @@
 === HEAD
 
+* Fix renaming a NOT NULL column without a default on MySQL (nougad, jeremyevans) (#273)
+
 * Don't swallow DatabaseConnectionErrors when creating model subclasses (tommy.midttveit)
 
 === 3.2.0 (2009-07-02)
