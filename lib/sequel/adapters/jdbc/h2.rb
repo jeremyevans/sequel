@@ -27,12 +27,23 @@ module Sequel
         def alter_table_sql(table, op)
           case op[:op]
           when :add_column
-            if op.delete(:primary_key)
-              sql = super(table, op)
-              [sql, "ALTER TABLE #{quote_schema_table(table)} ADD PRIMARY KEY (#{quote_identifier(op[:name])})"]
+            if (pk = op.delete(:primary_key)) || (ref = op.delete(:table))
+              sqls = [super(table, op)]
+              sqls << "ALTER TABLE #{quote_schema_table(table)} ADD PRIMARY KEY (#{quote_identifier(op[:name])})" if pk
+              if ref
+                op[:table] = ref
+                sqls << "ALTER TABLE #{quote_schema_table(table)} ADD FOREIGN KEY (#{quote_identifier(op[:name])}) #{column_references_sql(op)}"
+              end
+              sqls
             else
               super(table, op)
             end
+          when :rename_column
+            "ALTER TABLE #{quote_schema_table(table)} ALTER COLUMN #{quote_identifier(op[:name])} RENAME TO #{quote_identifier(op[:new_name])}"
+          when :set_column_null
+            "ALTER TABLE #{quote_schema_table(table)} ALTER COLUMN #{quote_identifier(op[:name])} SET#{' NOT' unless op[:null]} NULL"
+          when :set_column_type
+            "ALTER TABLE #{quote_schema_table(table)} ALTER COLUMN #{quote_identifier(op[:name])} #{type_literal(op)}"
           else
             super(table, op)
           end

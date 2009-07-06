@@ -1,5 +1,7 @@
 === HEAD
 
+* Support rename_column, set_column_null, set_column_type, and add_foreign_key on H2 (jeremyevans)
+
 * Support adding a column with a primary key or unique constraint to an existing table on SQLite (jeremyevans)
 
 * Support altering a column's type, null status, or default on SQLite (jeremyevans)
