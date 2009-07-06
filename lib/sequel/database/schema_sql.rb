@@ -69,8 +69,9 @@ module Sequel
     def column_definition_sql(column)
       sql = "#{quote_identifier(column[:name])} #{type_literal(column)}"
       sql << UNIQUE if column[:unique]
-      sql << NOT_NULL if column[:null] == false
-      sql << NULL if column[:null] == true
+      null = column.include?(:null) ? column[:null] : column[:allow_null]
+      sql << NOT_NULL if null == false
+      sql << NULL if null == true
       sql << " DEFAULT #{literal(column[:default])}" if column.include?(:default)
       sql << PRIMARY_KEY if column[:primary_key]
       sql << " #{auto_increment_sql}" if column[:auto_increment]

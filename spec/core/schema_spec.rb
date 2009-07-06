@@ -107,16 +107,18 @@ context "DB#create_table" do
     @db.create_table(:cats) do
       integer :id
       text :name, :null => false
+      text :name2, :allow_null => false
     end
-    @db.sqls.should == ["CREATE TABLE cats (id integer, name text NOT NULL)"]
+    @db.sqls.should == ["CREATE TABLE cats (id integer, name text NOT NULL, name2 text NOT NULL)"]
   end
   
   specify "should accept null definition" do
     @db.create_table(:cats) do
       integer :id
       text :name, :null => true
+      text :name2, :allow_null => true
     end
-    @db.sqls.should == ["CREATE TABLE cats (id integer, name text NULL)"]
+    @db.sqls.should == ["CREATE TABLE cats (id integer, name text NULL, name2 text NULL)"]
   end
   
   specify "should accept unique definition" do

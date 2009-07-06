@@ -1,5 +1,9 @@
 === HEAD
 
+* Support adding a column with a primary key or unique constraint to an existing table on SQLite (jeremyevans)
+
+* Support altering a column's type, null status, or default on SQLite (jeremyevans)
+
 * Fix renaming a NOT NULL column without a default on MySQL (nougad, jeremyevans) (#273)
 
 * Don't swallow DatabaseConnectionErrors when creating model subclasses (tommy.midttveit)

@@ -377,10 +377,6 @@ context "A SQLite database" do
     @db[:test3_backup2].columns.should == [:l]
   end
   
-  specify "should not support set_column_type operations" do
-    proc {@db.set_column_type :test2, :value, :integer}.should raise_error(Sequel::Error)
-  end
-  
   specify "should support add_index" do
     @db.add_index :test2, :value, :unique => true
     @db.add_index :test2, [:name, :value]
