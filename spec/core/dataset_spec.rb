@@ -92,6 +92,16 @@ context "Dataset" do
     @dataset.identifier_output_method = :reverse
     @dataset.send(:output_identifier, "at_b_C").should == :C_b_ta
   end
+  
+  specify "should have output_identifier handle empty identifiers" do
+    @dataset.send(:output_identifier, "").should == :untitled
+    @dataset.identifier_output_method = :upcase
+    @dataset.send(:output_identifier, "").should == :UNTITLED
+    @dataset.identifier_output_method = :downcase
+    @dataset.send(:output_identifier, "").should == :untitled
+    @dataset.identifier_output_method = :reverse
+    @dataset.send(:output_identifier, "").should == :deltitnu
+  end
 end
 
 context "Dataset#clone" do

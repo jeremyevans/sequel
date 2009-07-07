@@ -454,25 +454,65 @@ context "Model.db_schema" do
     @c.db_schema.should == {:x=>{:type=>:integer}, :z=>{}}
   end
 
-  specify "should not use schema_for_table if the dataset uses multiple tables or custom sql" do
+  specify "should not use schema if the dataset uses multiple tables or custom sql" do
     ds = @dataset.join(:x, :id)
     d = ds.db
     e = false
-    d.meta_def(:schema){|table| e = true}
+    d.meta_def(:schema){|table, *opts| e = true}
     def @c.columns; [:x]; end
     @c.dataset = ds
     @c.db_schema.should == {:x=>{}}
     e.should == false
   end
 
-  specify "should fallback to fetching records if schema_for_table raises an error" do
+  specify "should fallback to fetching records if schema raises an error" do
     ds = @dataset.join(:x, :id)
     d = ds.db
-    def d.schema(table)
+    def d.schema(table, opts={})
       raise StandardError
     end
     def @c.columns; [:x]; end
     @c.dataset = ds
     @c.db_schema.should == {:x=>{}}
+  end
+  
+  specify "should automatically set a singular primary key based on the schema" do
+    ds = @dataset
+    d = ds.db
+    d.meta_def(:schema){|table, *opts| [[:x, {:primary_key=>true}]]}
+    @c.primary_key.should == :id
+    @c.dataset = ds
+    @c.db_schema.should == {:x=>{:primary_key=>true}}
+    @c.primary_key.should == :x
+  end
+  
+  specify "should automatically set the composite primary key based on the schema" do
+    ds = @dataset
+    d = ds.db
+    d.meta_def(:schema){|table, *opts| [[:x, {:primary_key=>true}], [:y, {:primary_key=>true}]]}
+    @c.primary_key.should == :id
+    @c.dataset = ds
+    @c.db_schema.should == {:x=>{:primary_key=>true}, :y=>{:primary_key=>true}}
+    @c.primary_key.should == [:x, :y]
+  end
+  
+  specify "should automatically set no primary key based on the schema" do
+    ds = @dataset
+    d = ds.db
+    d.meta_def(:schema){|table, *opts| [[:x, {:primary_key=>false}], [:y, {:primary_key=>false}]]}
+    @c.primary_key.should == :id
+    @c.dataset = ds
+    @c.db_schema.should == {:x=>{:primary_key=>false}, :y=>{:primary_key=>false}}
+    @c.primary_key.should == nil
+  end
+  
+  specify "should not modify the primary key unless all column schema hashes have a :primary_key entry" do
+    ds = @dataset
+    d = ds.db
+    d.meta_def(:schema){|table, *opts| [[:x, {:primary_key=>false}], [:y, {}]]}
+    @c.primary_key.should == :id
+    @c.dataset = ds
+    @c.db_schema.should == {:x=>{:primary_key=>false}, :y=>{}}
+    @c.primary_key.should == :id
   end
 end

@@ -839,13 +839,34 @@ context "A Database adapter with a scheme" do
   end
 
   specify "should be accessible through Sequel.connect with URL parameters" do
-    c = Sequel.connect 'ccc://localhost/db?host=/tmp&user=test'
+    c = Sequel.connect 'ccc:///db?host=/tmp&user=test'
     c.should be_a_kind_of(CCC)
     c.opts[:host].should == '/tmp'
     c.opts[:database].should == 'db'
     c.opts[:user].should == 'test'
   end
+  
+  specify "should have URL parameters take precedence over fixed URL parts" do
+    c = Sequel.connect 'ccc://localhost/db?host=a&database=b'
+    c.should be_a_kind_of(CCC)
+    c.opts[:host].should == 'a'
+    c.opts[:database].should == 'b'
+  end
+  
+  specify "should have hash options take predence over URL parameters or parts" do
+    c = Sequel.connect 'ccc://localhost/db?host=/tmp', :host=>'a', :database=>'b', :user=>'c'
+    c.should be_a_kind_of(CCC)
+    c.opts[:host].should == 'a'
+    c.opts[:database].should == 'b'
+    c.opts[:user].should == 'c'
+  end
 
+  specify "should unescape values of URL parameters and parts" do
+    c = Sequel.connect 'ccc:///d%5bb%5d?host=domain%5cinstance'
+    c.should be_a_kind_of(CCC)
+    c.opts[:database].should == 'd[b]'
+    c.opts[:host].should == 'domain\\instance'
+  end
 end
 
 context "Sequel::Database.connect" do

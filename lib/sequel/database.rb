@@ -137,9 +137,10 @@ module Sequel
           scheme = uri.scheme
           scheme = :dbi if scheme =~ /\Adbi-/
           c = adapter_class(scheme)
-          uri_options = {}
+          uri_options = c.send(:uri_to_options, uri)
           uri.query.split('&').collect{|s| s.split('=')}.each{|k,v| uri_options[k.to_sym] = v} unless uri.query.to_s.strip.empty?
-          opts = c.send(:uri_to_options, uri).merge(uri_options).merge(opts)
+          uri_options.entries.each{|k,v| uri_options[k] = URI.unescape(v) if v.is_a?(String)}
+          opts = uri_options.merge(opts)
         end
       when Hash
         opts = conn_string.merge(opts)
@@ -860,13 +861,13 @@ module Sequel
         :datetime
       when /\Atime( with(out)? time zone)?\z/io
         :time
-      when /\Aboolean\z/io
+      when /\A(boolean|bit)\z/io
         :boolean
       when /\A(real|float|double( precision)?)\z/io
         :float
       when /\A(((numeric|decimal)(\(\d+,\d+\))?)|money)\z/io
         :decimal
-      when /bytea|blob/io
+      when /bytea|blob|image/io
         :blob
       end
     end

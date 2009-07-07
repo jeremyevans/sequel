@@ -189,7 +189,6 @@ module Sequel
       end
 
       # MySQL doesn't have a true boolean class, so it uses tinyint
-      # MySQL doesn't have a true boolean class, so it uses tinyint
       def type_literal_generic_trueclass(column)
         :tinyint
       end

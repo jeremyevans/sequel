@@ -419,9 +419,12 @@ module Sequel
             # returned by the schema.
             cols = schema_array.collect{|k,v| k}
             set_columns(cols)
-            # Set the primary key(s) based on the schema information
-            pks = schema_array.collect{|k,v| k if v[:primary_key]}.compact
-            pks.length > 0 ? set_primary_key(*pks) : no_primary_key
+            # Set the primary key(s) based on the schema information,
+            # if the schema information includes primary key information
+            if schema_array.all?{|k,v| v.has_key?(:primary_key)}
+              pks = schema_array.collect{|k,v| k if v[:primary_key]}.compact
+              pks.length > 0 ? set_primary_key(*pks) : no_primary_key
+            end
             # Also set the columns for the dataset, so the dataset
             # doesn't have to do a query to get them.
             dataset.instance_variable_set(:@columns, cols)

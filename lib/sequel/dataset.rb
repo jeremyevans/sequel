@@ -342,6 +342,7 @@ module Sequel
     # Modify the identifier returned from the database based on the
     # identifier_output_method.
     def output_identifier(v)
+      v = 'untitled' if v == ''
       (i = identifier_output_method) ? v.to_s.send(i).to_sym : v.to_sym
     end
 

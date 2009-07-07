@@ -12,8 +12,8 @@ module Sequel
         super(opts)
         case opts[:db_type]
         when 'mssql'
-          Sequel.require 'adapters/shared/mssql'
-          extend Sequel::MSSQL::DatabaseMethods
+          Sequel.require 'adapters/odbc/mssql'
+          extend Sequel::ODBC::MSSQL::DatabaseMethods
         when 'progress'
           Sequel.require 'adapters/shared/progress'
           extend Sequel::Progress::DatabaseMethods
@@ -50,6 +50,8 @@ module Sequel
           begin
             r = conn.run(sql)
             yield(r) if block_given?
+          rescue ::ODBC::Error => e
+            raise_error(e)
           ensure
             r.drop if r
           end
@@ -59,11 +61,21 @@ module Sequel
       
       def execute_dui(sql, opts={})
         log_info(sql)
-        synchronize(opts[:server]){|conn| conn.do(sql)}
+        synchronize(opts[:server]) do |conn|
+          begin
+            conn.do(sql)
+          rescue ::ODBC::Error => e
+            raise_error(e)
+          end
+        end
       end
-      alias_method :do, :execute_dui
+      alias do execute_dui
 
       private
+      
+      def connection_pool_default_options
+        super.merge(:pool_convert_exceptions=>false)
+      end
       
       def connection_execute_method
         :do
@@ -81,19 +93,19 @@ module Sequel
       ODBC_TIMESTAMP_AFTER_SECONDS =
         ODBC_TIMESTAMP_FORMAT.index( '%S' ).succ - ODBC_TIMESTAMP_FORMAT.length
       ODBC_DATE_FORMAT = "{d '%Y-%m-%d'}".freeze
-      UNTITLED_COLUMN = 'untitled_%d'.freeze
 
       def fetch_rows(sql, &block)
         execute(sql) do |s|
-          untitled_count = 0
-          @columns = s.columns(true).map do |c|
-            if (n = c.name).empty?
-              n = UNTITLED_COLUMN % (untitled_count += 1)
+          i = -1
+          cols = s.columns(true).map{|c| [output_identifier(c.name), i+=1]}
+          @columns = cols.map{|c| c.at(0)}
+          if rows = s.fetch_all
+            rows.each do |row|
+              hash = {}
+              cols.each{|n,i| hash[n] = convert_odbc_value(row[i])}
+              yield hash
             end
-            output_identifier(n)
           end
-          rows = s.fetch_all
-          rows.each {|row| yield hash_row(row)} if rows
         end
         self
       end
@@ -119,15 +131,7 @@ module Sequel
           v
         end
       end
-      
-      def hash_row(row)
-        hash = {}
-        row.each_with_index do |v, idx|
-          hash[@columns[idx]] = convert_odbc_value(v)
-        end
-        hash
-      end
-      
+
       def literal_date(v)
         v.strftime(ODBC_DATE_FORMAT)
       end
@@ -149,7 +153,7 @@ module Sequel
 
       def literal_time(v)
         formatted = v.strftime(ODBC_TIMESTAMP_FORMAT)
-        formatted.insert(ODBC_TIMESTAMP_AFTER_SECONDS, ".#{(v.usec.to_f/1000).round}") if usec >= 1000
+        formatted.insert(ODBC_TIMESTAMP_AFTER_SECONDS, ".#{(v.usec.to_f/1000).round}") if v.usec >= 1000
         formatted
       end
     end

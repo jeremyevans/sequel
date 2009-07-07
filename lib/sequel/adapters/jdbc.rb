@@ -58,8 +58,8 @@ module Sequel
         Java::oracle.jdbc.driver.OracleDriver
       end,
       :sqlserver=>proc do |db|
-        Sequel.require 'adapters/shared/mssql'
-        db.extend(Sequel::MSSQL::DatabaseMethods)
+        Sequel.require 'adapters/jdbc/mssql'
+        db.extend(Sequel::JDBC::MSSQL::DatabaseMethods)
         com.microsoft.sqlserver.jdbc.SQLServerDriver
       end,
       :h2=>proc do |db|
