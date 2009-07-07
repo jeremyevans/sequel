@@ -453,7 +453,7 @@ module Sequel
     # * options - a hash of options, with any of the following keys:
     #   * :table_alias - the name of the table's alias when joining, necessary for joining
     #     to the same table more than once.  No alias is used by default.
-    #   * :implicit_qualifer - The name to use for qualifying implicit conditions.  By default,
+    #   * :implicit_qualifier - The name to use for qualifying implicit conditions.  By default,
     #     the last joined or primary table is used.
     # * block - The block argument should only be given if a JOIN with an ON clause is used,
     #   in which case it yields the table alias/name for the table currently being joined,
