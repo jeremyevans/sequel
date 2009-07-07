@@ -22,7 +22,7 @@ module Sequel
         # is necessary as ADO doesn't provide a consistent native connection.
         def insert(values={})
           return super if @opts[:sql]
-          with_sql("SET NOCOUNT ON; #{insert_sql(values)}; SELECT SCOPE_IDENTITY()").single_value
+          with_sql("SET NOCOUNT ON; #{insert_sql(values)}; SELECT CAST(SCOPE_IDENTITY() AS INTEGER)").single_value
         end
       end
     end

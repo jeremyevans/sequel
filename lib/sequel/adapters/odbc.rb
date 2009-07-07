@@ -90,8 +90,7 @@ module Sequel
       BOOL_TRUE = '1'.freeze
       BOOL_FALSE = '0'.freeze
       ODBC_TIMESTAMP_FORMAT = "{ts '%Y-%m-%d %H:%M:%S'}".freeze
-      ODBC_TIMESTAMP_AFTER_SECONDS =
-        ODBC_TIMESTAMP_FORMAT.index( '%S' ).succ - ODBC_TIMESTAMP_FORMAT.length
+      ODBC_TIMESTAMP_FORMAT_USEC = "{ts '%Y-%m-%d %H:%M:%S.%%i'}".freeze
       ODBC_DATE_FORMAT = "{d '%Y-%m-%d'}".freeze
 
       def fetch_rows(sql, &block)
@@ -111,6 +110,14 @@ module Sequel
       end
       
       private
+      
+      def _literal_datetime(v, usec)
+        if usec >= 1000
+          v.strftime(ODBC_TIMESTAMP_FORMAT_USEC) % (usec.to_f/1000).round
+        else
+          v.strftime(ODBC_TIMESTAMP_FORMAT)
+        end
+      end
 
       def convert_odbc_value(v)
         # When fetching a result set, the Ruby ODBC driver converts all ODBC 
@@ -137,10 +144,7 @@ module Sequel
       end
       
       def literal_datetime(v)
-        formatted = v.strftime(ODBC_TIMESTAMP_FORMAT)
-        usec = v.sec_fraction * 86400000000
-        formatted.insert(ODBC_TIMESTAMP_AFTER_SECONDS, ".#{(usec.to_f/1000).round}") if usec >= 1000
-        formatted
+        _literal_datetime(v, v.sec_fraction * 86400000000)
       end
       
       def literal_false
@@ -152,9 +156,7 @@ module Sequel
       end
 
       def literal_time(v)
-        formatted = v.strftime(ODBC_TIMESTAMP_FORMAT)
-        formatted.insert(ODBC_TIMESTAMP_AFTER_SECONDS, ".#{(v.usec.to_f/1000).round}") if v.usec >= 1000
-        formatted
+        _literal_datetime(v, v.usec)
       end
     end
   end

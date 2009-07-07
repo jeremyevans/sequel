@@ -888,7 +888,7 @@ module Sequel
     end
 
     # A WindowFunction is a grouping of a function with a window over which it operates.
-    class WindowFunction < Expression
+    class WindowFunction < GenericExpression
       # The function to use, should be an SQL::Function.
       attr_reader :function
 

@@ -836,13 +836,14 @@ module Sequel
         else
           return save_failure(:update) if before_update == false
           if columns.empty?
-            @columns_updated = opts[:changed] ? @values.reject{|k,v| !changed_columns.include?(k)} : @values
+            @columns_updated = opts[:changed] ? @values.reject{|k,v| !changed_columns.include?(k)} : @values.dup
             changed_columns.clear
           else # update only the specified columns
             @columns_updated = @values.reject{|k, v| !columns.include?(k)}
             changed_columns.reject!{|c| columns.include?(c)}
           end
-          this.update(@columns_updated)
+          Array(primary_key).each{|x| @columns_updated.delete(x)}
+          this.update(@columns_updated) unless @columns_updated.empty?
           after_update
           after_save
           @columns_updated = nil

@@ -66,17 +66,18 @@ describe "Model#before_update && Model#after_update" do
 
     @c = Class.new(Sequel::Model(:items))
     @c.class_eval do
+      columns :id, :x
       def after_update; MODEL_DB << "BLAH after" end
     end
   end
   
   specify "should be called around record update" do
     @c.send(:define_method, :before_update){MODEL_DB << "BLAH before"}
-    m = @c.load(:id => 2233)
+    m = @c.load(:id => 2233, :x=>123)
     m.save
     MODEL_DB.sqls.should == [
       'BLAH before',
-      'UPDATE items SET id = 2233 WHERE (id = 2233)',
+      'UPDATE items SET x = 123 WHERE (id = 2233)',
       'BLAH after'
     ]
   end
@@ -109,11 +110,11 @@ describe "Model#before_save && Model#after_save" do
   
   specify "should be called around record update" do
     @c.send(:define_method, :before_save){MODEL_DB << "BLAH before"}
-    m = @c.load(:id => 2233)
+    m = @c.load(:id => 2233, :x=>123)
     m.save
     MODEL_DB.sqls.should == [
       'BLAH before',
-      'UPDATE items SET id = 2233 WHERE (id = 2233)',
+      'UPDATE items SET x = 123 WHERE (id = 2233)',
       'BLAH after'
     ]
   end
@@ -212,9 +213,9 @@ describe "Model#before_validation && Model#after_validation" do
 
   specify "should be called when calling save" do
     @c.send(:define_method, :before_validation){MODEL_DB << "BLAH before"}
-    m = @c.load(:id => 2233)
+    m = @c.load(:id => 2233, :x=>123)
     m.save.should == m
-    MODEL_DB.sqls.should == ['BLAH before', 'BLAH after', 'UPDATE items SET id = 2233 WHERE (id = 2233)']
+    MODEL_DB.sqls.should == ['BLAH before', 'BLAH after', 'UPDATE items SET x = 123 WHERE (id = 2233)']
 
     MODEL_DB.sqls.clear
     m = @c.load(:id => 22)

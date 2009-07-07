@@ -64,6 +64,11 @@ module Sequel
         SQL_COMMIT
       end
       
+      # The SQL to drop an index for the table.
+      def drop_index_sql(table, op)
+        "DROP INDEX #{quote_identifier(op[:name] || default_index_name(table, op[:columns]))} ON #{quote_schema_table(table)}"
+      end
+      
       # SQL to ROLLBACK a transaction.
       def rollback_transaction_sql
         SQL_ROLLBACK
@@ -120,6 +125,7 @@ module Sequel
       BOOL_TRUE = '1'.freeze
       BOOL_FALSE = '0'.freeze
       SELECT_CLAUSE_ORDER = %w'with limit distinct columns from table_options join where group order having compounds'.freeze
+      TIMESTAMP_FORMAT = "'%Y-%m-%d %H:%M:%S'".freeze
 
       def complex_expression_sql(op, args)
         case op
@@ -163,14 +169,32 @@ module Sequel
       end
 
       private
-
+      
+      # MSSQL uses a literal hexidecimal number for blob strings
+      def literal_blob(v)
+        blob = '0x'
+        v.each_byte{|x| blob << sprintf('%02x', x)}
+        blob
+      end
+      
+      # Use unicode string syntax for all strings
       def literal_string(v)
         "N#{super}"
+      end
+      
+      # Use MSSQL Timestamp format
+      def literal_datetime(v)
+        v.strftime(TIMESTAMP_FORMAT)
       end
       
       # Use 0 for false on MySQL
       def literal_false
         BOOL_FALSE
+      end
+      
+      # Use MSSQL Timestamp format
+      def literal_time(v)
+        v.strftime(TIMESTAMP_FORMAT)
       end
 
       # Use 1 for true on MySQL

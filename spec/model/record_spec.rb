@@ -94,8 +94,7 @@ describe "Model#save" do
   it "should update a record for an existing model instance" do
     o = @c.load(:id => 3, :x => 1)
     o.save
-    MODEL_DB.sqls.length.should == 1
-    MODEL_DB.sqls.first.should =~ /UPDATE items SET (id = 3, x = 1|x = 1, id = 3) WHERE \(id = 3\)/
+    MODEL_DB.sqls.should == ["UPDATE items SET x = 1 WHERE (id = 3)"]
   end
   
   it "should update only the given columns if given" do
@@ -128,7 +127,7 @@ describe "Model#save" do
     o = @c.load(:id => 23,:x => 1, :y => nil)
     o[:x] = 2
     o.save
-    res.should == [{:id => 23,:x => 2, :y => nil}, nil]
+    res.should == [{:x => 2, :y => nil}, nil]
     o.after_save
     res.should == [nil, nil]
 

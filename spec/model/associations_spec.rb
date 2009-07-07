@@ -974,9 +974,8 @@ describe Sequel::Model, "one_to_many" do
     MODEL_DB.sqls.clear
     attrib = @c1.load(:id=>3)
     @c2.new(:id => 1234).attribute = attrib
-    MODEL_DB.sqls.length.should == 2
-    MODEL_DB.sqls.first.should =~ /UPDATE attributes SET (node_id = 1234, id = 3|id = 3, node_id = 1234) WHERE \(id = 3\)/
-    MODEL_DB.sqls.last.should == 'UPDATE attributes SET node_id = NULL WHERE ((node_id = 1234) AND (id != 3))'
+    MODEL_DB.sqls.should == ["UPDATE attributes SET node_id = 1234 WHERE (id = 3)",
+      'UPDATE attributes SET node_id = NULL WHERE ((node_id = 1234) AND (id != 3))']
   end
 
   it "should use a transaction in the setter method if the :one_to_one option is true" do
@@ -985,11 +984,10 @@ describe Sequel::Model, "one_to_many" do
     MODEL_DB.sqls.clear
     attrib = @c1.load(:id=>3)
     @c2.new(:id => 1234).attribute = attrib
-    MODEL_DB.sqls.length.should == 4
-    MODEL_DB.sqls.first.should == 'BEGIN'
-    MODEL_DB.sqls[1].should =~ /UPDATE attributes SET (node_id = 1234, id = 3|id = 3, node_id = 1234) WHERE \(id = 3\)/
-    MODEL_DB.sqls[2].should == 'UPDATE attributes SET node_id = NULL WHERE ((node_id = 1234) AND (id != 3))'
-    MODEL_DB.sqls.last.should == 'COMMIT'
+    MODEL_DB.sqls.should == ['BEGIN',
+      "UPDATE attributes SET node_id = 1234 WHERE (id = 3)",
+      'UPDATE attributes SET node_id = NULL WHERE ((node_id = 1234) AND (id != 3))',
+      'COMMIT']
   end
 
   it "should have the setter method for the :one_to_one option respect the :primary_key option" do
@@ -1006,9 +1004,8 @@ describe Sequel::Model, "one_to_many" do
     MODEL_DB.sqls.clear
     attrib = @c1.load(:id=>3)
     @c2.new(:id => 621, :xxx=>5).attribute = attrib
-    MODEL_DB.sqls.length.should == 2
-    MODEL_DB.sqls.first.should =~ /UPDATE attributes SET (node_id = 5, id = 3|id = 3, node_id = 5) WHERE \(id = 3\)/
-    MODEL_DB.sqls.last.should == 'UPDATE attributes SET node_id = NULL WHERE ((node_id = 5) AND (id != 3))'
+    MODEL_DB.sqls.should == ['UPDATE attributes SET node_id = 5 WHERE (id = 3)',
+      'UPDATE attributes SET node_id = NULL WHERE ((node_id = 5) AND (id != 3))']
   end
 
   it "should raise an error if the one_to_one getter would be the same as the association name" do

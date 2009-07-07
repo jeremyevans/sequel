@@ -109,13 +109,13 @@ end
 describe "Model#save" do
   before do
     @c = Class.new(Sequel::Model(:people)) do
-      columns :id
+      columns :id, :x
 
       def validate
         errors[:id] << 'blah' unless id == 5
       end
     end
-    @m = @c.load(:id => 4)
+    @m = @c.load(:id => 4, :x=>6)
     MODEL_DB.reset
   end
 
@@ -128,14 +128,14 @@ describe "Model#save" do
     @m.id = 5
     @m.should be_valid
     @m.save.should_not be_false
-    MODEL_DB.sqls.should == ['UPDATE people SET id = 5 WHERE (id = 5)']
+    MODEL_DB.sqls.should == ['UPDATE people SET x = 6 WHERE (id = 5)']
   end
   
   specify "should skip validations if the :validate=>false option is used" do
     @m.raise_on_save_failure = false
     @m.should_not be_valid
     @m.save(:validate=>false)
-    MODEL_DB.sqls.should == ['UPDATE people SET id = 4 WHERE (id = 4)']
+    MODEL_DB.sqls.should == ['UPDATE people SET x = 6 WHERE (id = 4)']
   end
     
   specify "should raise error if validations fail and raise_on_save_faiure is true" do

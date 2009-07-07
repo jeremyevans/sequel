@@ -1,5 +1,17 @@
 === HEAD
 
+* SQL::WindowFunction can now be aliased/casted etc. just like SQL::Function (jeremyevans)
+
+* Model#save no longer attempts to update primary key columns (jeremyevans)
+
+* Sequel will now unescape values provided in connection strings (e.g. ado:///db?host=server%5cinstance) (jeremyevans)
+
+* Significant improvements to the ODBC and ADO adapters in general (jeremyevans)
+
+* The ADO adapter no longer attempts to use database transations, since they never worked (jeremyevans)
+
+* Much better support for Microsoft SQL Server using the ADO, ODBC, and JDBC adapters (jeremyevans)
+
 * Support rename_column, set_column_null, set_column_type, and add_foreign_key on H2 (jeremyevans)
 
 * Support adding a column with a primary key or unique constraint to an existing table on SQLite (jeremyevans)

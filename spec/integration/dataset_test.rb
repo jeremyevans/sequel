@@ -326,7 +326,7 @@ if INTEGRATION_DB.dataset.supports_cte?
     end
     
     specify "should give correct results for WITH" do
-      @db[:t].with(:t, @ds.order(:id).filter(:parent_id=>nil).select(:id)).map(:id).should == [1, 2]
+      @db[:t].with(:t, @ds.filter(:parent_id=>nil).select(:id)).order(:id).map(:id).should == [1, 2]
     end
     
     specify "should give correct results for recursive WITH" do
@@ -357,34 +357,44 @@ if INTEGRATION_DB.dataset.supports_window_functions?
       @db.drop_table(:i1)
     end
     
-    specify "should give correct results for window functions" do
-      @ds.select(:id){sum(:over, :args=>amount, :partition=>group_id, :order=>id){}}.all.should ==
-        [{:sum=>1, :id=>1}, {:sum=>11, :id=>2}, {:sum=>111, :id=>3}, {:sum=>1000, :id=>4}, {:sum=>11000, :id=>5}, {:sum=>111000, :id=>6}]
-      @ds.select(:id){sum(:over, :args=>amount, :partition=>group_id){}}.all.should ==
+    specify "should give correct results for aggregate window functions" do
+      @ds.select(:id){sum(:over, :args=>amount, :partition=>group_id){}.as(:sum)}.all.should ==
         [{:sum=>111, :id=>1}, {:sum=>111, :id=>2}, {:sum=>111, :id=>3}, {:sum=>111000, :id=>4}, {:sum=>111000, :id=>5}, {:sum=>111000, :id=>6}]
-      @ds.select(:id){sum(:over, :args=>amount, :order=>id){}}.all.should ==
-        [{:sum=>1, :id=>1}, {:sum=>11, :id=>2}, {:sum=>111, :id=>3}, {:sum=>1111, :id=>4}, {:sum=>11111, :id=>5}, {:sum=>111111, :id=>6}]
-      @ds.select(:id){sum(:over, :args=>amount){}}.all.should ==
+      @ds.select(:id){sum(:over, :args=>amount){}.as(:sum)}.all.should ==
         [{:sum=>111111, :id=>1}, {:sum=>111111, :id=>2}, {:sum=>111111, :id=>3}, {:sum=>111111, :id=>4}, {:sum=>111111, :id=>5}, {:sum=>111111, :id=>6}]
     end
+      
+    specify "should give correct results for ranking window functions with orders" do
+      @ds.select(:id){rank(:over, :partition=>group_id, :order=>id){}.as(:rank)}.all.should ==
+        [{:rank=>1, :id=>1}, {:rank=>2, :id=>2}, {:rank=>3, :id=>3}, {:rank=>1, :id=>4}, {:rank=>2, :id=>5}, {:rank=>3, :id=>6}]
+      @ds.select(:id){rank(:over, :order=>id){}.as(:rank)}.all.should ==
+        [{:rank=>1, :id=>1}, {:rank=>2, :id=>2}, {:rank=>3, :id=>3}, {:rank=>4, :id=>4}, {:rank=>5, :id=>5}, {:rank=>6, :id=>6}]
+    end
+      
+    specify "should give correct results for aggregate window functions with orders" do
+      @ds.select(:id){sum(:over, :args=>amount, :partition=>group_id, :order=>id){}.as(:sum)}.all.should ==
+        [{:sum=>1, :id=>1}, {:sum=>11, :id=>2}, {:sum=>111, :id=>3}, {:sum=>1000, :id=>4}, {:sum=>11000, :id=>5}, {:sum=>111000, :id=>6}]
+      @ds.select(:id){sum(:over, :args=>amount, :order=>id){}.as(:sum)}.all.should ==
+        [{:sum=>1, :id=>1}, {:sum=>11, :id=>2}, {:sum=>111, :id=>3}, {:sum=>1111, :id=>4}, {:sum=>11111, :id=>5}, {:sum=>111111, :id=>6}]
+    end
     
-    specify "should give correct results for window functions with frames" do
-      @ds.select(:id){sum(:over, :args=>amount, :partition=>group_id, :order=>id, :frame=>:all){}}.all.should ==
+    specify "should give correct results for aggregate window functions with frames" do
+      @ds.select(:id){sum(:over, :args=>amount, :partition=>group_id, :order=>id, :frame=>:all){}.as(:sum)}.all.should ==
         [{:sum=>111, :id=>1}, {:sum=>111, :id=>2}, {:sum=>111, :id=>3}, {:sum=>111000, :id=>4}, {:sum=>111000, :id=>5}, {:sum=>111000, :id=>6}]
-      @ds.select(:id){sum(:over, :args=>amount, :partition=>group_id, :frame=>:all){}}.all.should ==
+      @ds.select(:id){sum(:over, :args=>amount, :partition=>group_id, :frame=>:all){}.as(:sum)}.all.should ==
         [{:sum=>111, :id=>1}, {:sum=>111, :id=>2}, {:sum=>111, :id=>3}, {:sum=>111000, :id=>4}, {:sum=>111000, :id=>5}, {:sum=>111000, :id=>6}]
-      @ds.select(:id){sum(:over, :args=>amount, :order=>id, :frame=>:all){}}.all.should ==
+      @ds.select(:id){sum(:over, :args=>amount, :order=>id, :frame=>:all){}.as(:sum)}.all.should ==
         [{:sum=>111111, :id=>1}, {:sum=>111111, :id=>2}, {:sum=>111111, :id=>3}, {:sum=>111111, :id=>4}, {:sum=>111111, :id=>5}, {:sum=>111111, :id=>6}]
-      @ds.select(:id){sum(:over, :args=>amount, :frame=>:all){}}.all.should ==
+      @ds.select(:id){sum(:over, :args=>amount, :frame=>:all){}.as(:sum)}.all.should ==
         [{:sum=>111111, :id=>1}, {:sum=>111111, :id=>2}, {:sum=>111111, :id=>3}, {:sum=>111111, :id=>4}, {:sum=>111111, :id=>5}, {:sum=>111111, :id=>6}]
         
-      @ds.select(:id){sum(:over, :args=>amount, :partition=>group_id, :order=>id, :frame=>:rows){}}.all.should ==
+      @ds.select(:id){sum(:over, :args=>amount, :partition=>group_id, :order=>id, :frame=>:rows){}.as(:sum)}.all.should ==
         [{:sum=>1, :id=>1}, {:sum=>11, :id=>2}, {:sum=>111, :id=>3}, {:sum=>1000, :id=>4}, {:sum=>11000, :id=>5}, {:sum=>111000, :id=>6}]
-      @ds.select(:id){sum(:over, :args=>amount, :partition=>group_id, :frame=>:rows){}}.all.should ==
+      @ds.select(:id){sum(:over, :args=>amount, :partition=>group_id, :frame=>:rows){}.as(:sum)}.all.should ==
         [{:sum=>1, :id=>1}, {:sum=>11, :id=>2}, {:sum=>111, :id=>3}, {:sum=>1000, :id=>4}, {:sum=>11000, :id=>5}, {:sum=>111000, :id=>6}]
-      @ds.select(:id){sum(:over, :args=>amount, :order=>id, :frame=>:rows){}}.all.should ==
+      @ds.select(:id){sum(:over, :args=>amount, :order=>id, :frame=>:rows){}.as(:sum)}.all.should ==
         [{:sum=>1, :id=>1}, {:sum=>11, :id=>2}, {:sum=>111, :id=>3}, {:sum=>1111, :id=>4}, {:sum=>11111, :id=>5}, {:sum=>111111, :id=>6}]
-      @ds.select(:id){sum(:over, :args=>amount, :frame=>:rows){}}.all.should ==
+      @ds.select(:id){sum(:over, :args=>amount, :frame=>:rows){}.as(:sum)}.all.should ==
         [{:sum=>1, :id=>1}, {:sum=>11, :id=>2}, {:sum=>111, :id=>3}, {:sum=>1111, :id=>4}, {:sum=>11111, :id=>5}, {:sum=>111111, :id=>6}]
     end
   end

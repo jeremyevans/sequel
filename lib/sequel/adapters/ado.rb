@@ -51,14 +51,21 @@ module Sequel
         nil
       end
       alias do execute
+
+      private
       
       # The ADO adapter doesn't support transactions, since it appears not to
       # use a single native connection for each connection in the pool
-      def transaction(opts={})
-        yield nil
+      def _transaction(conn)
+        th = Thread.current
+        begin
+          @transactions << th
+          yield conn
+        rescue Sequel::Rollback
+        ensure
+          @transactions.delete(th)
+        end
       end
-
-      private
       
       def connection_pool_default_options
         super.merge(:pool_convert_exceptions=>false)
@@ -73,7 +80,7 @@ module Sequel
       def fetch_rows(sql)
         execute(sql) do |s|
           @columns = cols = s.Fields.extend(Enumerable).map{|column| output_identifier(column.Name)}
-          s.getRows.transpose.each{|r| yield cols.inject({}){|m,c| m[c] = r.shift; m}}
+          s.getRows.transpose.each{|r| yield cols.inject({}){|m,c| m[c] = r.shift; m}} unless s.eof
         end
       end
     end
