@@ -203,6 +203,13 @@ Example connections strings:
   jdbc:mysql://localhost/test?user=root&password=root
   jdbc:h2:mem:
 
+The following additional options are supported:
+
+* :convert_types - If set to false, does not attempt to convert some Java types to ruby types.
+  Setting to false roughly doubles performance when selecting large numbers of rows.
+  Note that you can't provide this option inside the connection string (as that is passed
+  directly to JDBC), you have to pass it as a separate option.
+
 === mysql 
 
 The MySQL adapter does not support the pure-ruby MySQL adapter that ships with

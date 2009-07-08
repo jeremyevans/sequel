@@ -88,12 +88,18 @@ module Sequel
       # The type of database we are connecting to
       attr_reader :database_type
       
+      # Whether to convert some Java types to ruby types when retrieving rows.
+      # True by default, can be set to false to roughly double performance when
+      # fetching rows.
+      attr_accessor :convert_types
+      
       # Call the DATABASE_SETUP proc directly after initialization,
       # so the object always uses sub adapter specific code.  Also,
       # raise an error immediately if the connection doesn't have a
       # uri, since JDBC requires one.
       def initialize(opts)
         @opts = opts
+        @convert_types = opts.include?(:convert_types) ? typecast_value_boolean(opts[:convert_types]) : true
         raise(Error, "No connection string specified") unless uri
         if match = /\Ajdbc:([^:]+)/.match(uri) and prok = DATABASE_SETUP[match[1].to_sym]
           prok.call(self)
@@ -418,6 +424,17 @@ module Sequel
         end
       end
       
+      # Whether to convert some Java types to ruby types when retrieving rows.
+      # Uses the database's setting by default, can be set to false to roughly
+      # double performance when fetching rows.
+      attr_accessor :convert_types
+      
+      # Use the convert_types default setting from the database
+      def initialize(db, opts={})
+        @convert_types = db.convert_types
+        super
+      end
+      
       # Correctly return rows from the database and return them as hashes.
       def fetch_rows(sql, &block)
         execute(sql){|result| process_result_set(result, &block)}
@@ -470,10 +487,16 @@ module Sequel
         i = 0
         meta.getColumnCount.times{cols << [output_identifier(meta.getColumnLabel(i+=1)), i]}
         @columns = cols.map{|c| c.at(0)}
+        row = {}
+        blk = if @convert_types
+          lambda{|n, i| row[n] = convert_type(result.getObject(i))}
+        else
+          lambda{|n, i| row[n] = result.getObject(i)}
+        end
         # get rows
         while result.next
           row = {}
-          cols.each{|n, i| row[n] = convert_type(result.getObject(i))}
+          cols.each(&blk)
           yield row
         end
       end

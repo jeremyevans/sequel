@@ -1,5 +1,7 @@
 === HEAD
 
+* Make the JDBC adapter accept a :convert_types option to turn off Java type conversion and double performance (jeremyevans)
+
 * Slight increase in ConnectionPool performance (jeremyevans)
 
 * SQL::WindowFunction can now be aliased/casted etc. just like SQL::Function (jeremyevans)
