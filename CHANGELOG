@@ -1,5 +1,7 @@
 === HEAD
 
+* Slight increase in ConnectionPool performance (jeremyevans)
+
 * SQL::WindowFunction can now be aliased/casted etc. just like SQL::Function (jeremyevans)
 
 * Model#save no longer attempts to update primary key columns (jeremyevans)

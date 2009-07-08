@@ -95,16 +95,19 @@ class Sequel::ConnectionPool
   def hold(server=:default)
     begin
       t = Thread.current
-      time = Time.new
-      timeout = time + @timeout
-      sleep_time = @sleep_time
       if conn = owned_connection(t, server)
         return yield(conn)
       end
       begin
-        until conn = acquire(t, server)
-          raise(::Sequel::PoolTimeout) if Time.new > timeout
+        unless conn = acquire(t, server)
+          time = Time.new
+          timeout = time + @timeout
+          sleep_time = @sleep_time
           sleep sleep_time
+          until conn = acquire(t, server)
+            raise(::Sequel::PoolTimeout) if Time.new > timeout
+            sleep sleep_time
+          end
         end
         yield conn
       rescue Sequel::DatabaseDisconnectError => dde
