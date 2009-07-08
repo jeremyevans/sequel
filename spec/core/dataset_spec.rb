@@ -1399,6 +1399,25 @@ context "Dataset#empty?" do
   end
 end
 
+context "Dataset#from_self" do
+  before do
+    @ds = Sequel::Dataset.new(nil).from(:test).select(:name).limit(1)
+  end
+  specify "should set up a default alias" do
+    @ds.from_self.sql.should == 'SELECT * FROM (SELECT name FROM test LIMIT 1) AS t1'
+  end
+  specify "should modify only the new dataset" do
+    @ds.from_self.select(:bogus).sql.should == 'SELECT bogus FROM (SELECT name FROM test LIMIT 1) AS t1'
+  end
+  specify "should use the user-specified alias" do
+    @ds.from_self(:alias=>:some_name).sql.should == 'SELECT * FROM (SELECT name FROM test LIMIT 1) AS some_name'
+  end
+  specify "should use the user-specified alias for joins" do
+    @ds.from_self(:alias=>:some_name).inner_join(:posts, :alias=>:name).sql.should == \
+      'SELECT * FROM (SELECT name FROM test LIMIT 1) AS some_name INNER JOIN posts ON (posts.alias = some_name.name)'
+  end
+end
+
 context "Dataset#join_table" do
   before do
     @d = MockDataset.new(nil).from(:items)

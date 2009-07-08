@@ -272,14 +272,16 @@ module Sequel
     end
 
     # Returns a dataset selecting from the current dataset.
+    # Supplying the :alias option controls the name of the result.
     #
-    #   ds = DB[:items].order(:name)
-    #   ds.sql #=> "SELECT * FROM items ORDER BY name"
-    #   ds.from_self.sql #=> "SELECT * FROM (SELECT * FROM items ORDER BY name)"
-    def from_self
+    #   ds = DB[:items].order(:name).select(:id, :name)
+    #   ds.sql                         #=> "SELECT id,name FROM items ORDER BY name"
+    #   ds.from_self.sql               #=> "SELECT * FROM (SELECT id, name FROM items ORDER BY name) AS 't1'"
+    #   ds.from_self(:alias=>:foo).sql #=> "SELECT * FROM (SELECT id, name FROM items ORDER BY name) AS 'foo'"
+    def from_self(opts={})
       fs = {}
       @opts.keys.each{|k| fs[k] = nil} 
-      clone(fs).from(self)
+      clone(fs).from(opts[:alias] ? as(opts[:alias]) : self)
     end
 
     # SQL fragment specifying an SQL function call

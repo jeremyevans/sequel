@@ -1,5 +1,7 @@
 === HEAD
 
+* Make Dataset#from_self take an options hash and respect an :alias option, giving the alias to use (Phrogz)
+
 * Make the JDBC adapter accept a :convert_types option to turn off Java type conversion and double performance (jeremyevans)
 
 * Slight increase in ConnectionPool performance (jeremyevans)
@@ -12,7 +14,7 @@
 
 * Significant improvements to the ODBC and ADO adapters in general (jeremyevans)
 
-* The ADO adapter no longer attempts to use database transations, since they never worked (jeremyevans)
+* The ADO adapter no longer attempts to use database transactions, since they never worked (jeremyevans)
 
 * Much better support for Microsoft SQL Server using the ADO, ODBC, and JDBC adapters (jeremyevans)
 
