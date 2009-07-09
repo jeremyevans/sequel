@@ -188,9 +188,9 @@ module Sequel
         column[:only_time] ? :time : :datetime
       end
 
-      # MySQL doesn't have a true boolean class, so it uses tinyint
+      # MySQL doesn't have a true boolean class, so it uses tinyint(1)
       def type_literal_generic_trueclass(column)
-        :tinyint
+        :'tinyint(1)'
       end
     end
   

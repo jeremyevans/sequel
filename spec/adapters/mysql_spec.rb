@@ -65,48 +65,52 @@ context "MySQL", '#create_table' do
 end
 
 context "A MySQL database" do
-  before do
-    @db = MYSQL_DB
-    @db.create_table(:booltest){TrueClass :value}
-  end
-  after do
-    Sequel.convert_tinyint_to_bool = true
-    @db.drop_table(:booltest)
-  end
-
   specify "should provide the server version" do
-    @db.server_version.should >= 40000
+    MYSQL_DB.server_version.should >= 40000
   end
+end
 
-  specify "should correctly parse the schema" do
-    @db.schema(:booltest, :reload=>true).should == [[:value, {:type=>:boolean, :allow_null=>true, :primary_key=>false, :default=>nil, :ruby_default=>nil, :db_type=>"tinyint(4)"}]]
+if MYSQL_DB.class.adapter_scheme == :mysql
+  context "Sequel::MySQL.convert_tinyint_to_bool" do
+    before do
+      @db = MYSQL_DB
+      @db.create_table(:booltest){column :b, 'tinyint(1)'; column :i, 'tinyint(4)'}
+      @ds = @db[:booltest]
+    end
+    after do
+      Sequel::MySQL.convert_tinyint_to_bool = true
+      @db.drop_table(:booltest)
+    end
     
-    Sequel.convert_tinyint_to_bool = false
-    @db.schema(:booltest, :reload=>true).should == [[:value, {:type=>:integer, :allow_null=>true, :primary_key=>false, :default=>nil, :ruby_default=>nil, :db_type=>"tinyint(4)"}]]
-  end
-  
-  specify "should accept and return tinyints as bools or integers when configured to do so" do
-    MYSQL_DB[:booltest].delete
-    MYSQL_DB[:booltest] << {:value=>true}
-    MYSQL_DB[:booltest].all.should == [{:value=>true}]
-    MYSQL_DB[:booltest].delete
-    MYSQL_DB[:booltest] << {:value=>false}
-    MYSQL_DB[:booltest].all.should == [{:value=>false}]
+    specify "should consider tinyint(1) datatypes as boolean if set, but not larger tinyints" do
+      @db.schema(:booltest, :reload=>true).should == [[:b, {:type=>:boolean, :allow_null=>true, :primary_key=>false, :default=>nil, :ruby_default=>nil, :db_type=>"tinyint(1)"}, ], [:i, {:type=>:integer, :allow_null=>true, :primary_key=>false, :default=>nil, :ruby_default=>nil, :db_type=>"tinyint(4)"}, ]]
+      Sequel::MySQL.convert_tinyint_to_bool = false
+      @db.schema(:booltest, :reload=>true).should == [[:b, {:type=>:integer, :allow_null=>true, :primary_key=>false, :default=>nil, :ruby_default=>nil, :db_type=>"tinyint(1)"}, ], [:i, {:type=>:integer, :allow_null=>true, :primary_key=>false, :default=>nil, :ruby_default=>nil, :db_type=>"tinyint(4)"}, ]]
+    end
     
-    Sequel.convert_tinyint_to_bool = false
-    MYSQL_DB[:booltest].delete
-    MYSQL_DB[:booltest] << {:value=>true}
-    MYSQL_DB[:booltest].all.should == [{:value=>1}]
-    MYSQL_DB[:booltest].delete
-    MYSQL_DB[:booltest] << {:value=>false}
-    MYSQL_DB[:booltest].all.should == [{:value=>0}]
-    
-    MYSQL_DB[:booltest].delete
-    MYSQL_DB[:booltest] << {:value=>1}
-    MYSQL_DB[:booltest].all.should == [{:value=>1}]
-    MYSQL_DB[:booltest].delete
-    MYSQL_DB[:booltest] << {:value=>0}
-    MYSQL_DB[:booltest].all.should == [{:value=>0}]
+    specify "should return tinyints as bools when set" do
+      @ds.delete
+      @ds << {:b=>true, :i=>10}
+      @ds.all.should == [{:b=>true, :i=>true}]
+      @ds.delete
+      @ds << {:b=>false, :i=>0}
+      @ds.all.should == [{:b=>false, :i=>false}]
+      
+      Sequel::MySQL.convert_tinyint_to_bool = false
+      @ds.delete
+      @ds << {:b=>true, :i=>10}
+      @ds.all.should == [{:b=>1, :i=>10}]
+      @ds.delete
+      @ds << {:b=>false, :i=>0}
+      @ds.all.should == [{:b=>0, :i=>0}]
+      
+      @ds.delete
+      @ds << {:b=>1, :i=>10}
+      @ds.all.should == [{:b=>1, :i=>10}]
+      @ds.delete
+      @ds << {:b=>0, :i=>0}
+      @ds.all.should == [{:b=>0, :i=>0}]
+    end
   end
 end
 
@@ -411,7 +415,7 @@ context "A MySQL database" do
   
   specify "should support defaults for boolean columns" do
     @db.create_table(:items){TrueClass :active1, :default=>true; FalseClass :active2, :default => false}
-    @db.sqls.should == ["CREATE TABLE items (active1 tinyint DEFAULT 1, active2 tinyint DEFAULT 0)"]
+    @db.sqls.should == ["CREATE TABLE items (active1 tinyint(1) DEFAULT 1, active2 tinyint(1) DEFAULT 0)"]
   end
   
   specify "should correctly format CREATE TABLE statements with foreign keys" do

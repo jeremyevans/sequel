@@ -9,29 +9,38 @@ module Sequel
   # like 0000-00-00 and times like 838:00:00 as nil values.  If set to :string,
   # it returns the strings as is.  If is false by default, which means that
   # invalid dates and times will raise errors.
+  #
+  #   Sequel::MySQL.convert_invalid_date_time = true
+  #
+  # Sequel converts the column type tinyint(1) to a boolean by default when
+  # using the native MySQL adapter.  You can turn off the conversion to use
+  # tinyint as an integer:
+  #
+  #   Sequel.convert_tinyint_to_bool = false
   module MySQL
     # Mapping of type numbers to conversion procs
     MYSQL_TYPES = {}
 
     # Use only a single proc for each type to save on memory
     MYSQL_TYPE_PROCS = {
-      [0, 246]  => lambda{|v| BigDecimal.new(v)},                       # decimal
-      [1]  => lambda{|v| Sequel.convert_tinyint_to_bool ? v.to_i != 0 : v.to_i}, # tinyint
-      [2, 3, 8, 9, 13, 247, 248]  => lambda{|v| v.to_i},                # integer
-      [4, 5]  => lambda{|v| v.to_f},                                    # float
-      [10, 14]  => lambda{|v| convert_date_time(:string_to_date, v)},   # date
-      [7, 12] => lambda{|v| convert_date_time(:string_to_datetime, v)}, # datetime
-      [11]  => lambda{|v| convert_date_time(:string_to_time, v)},       # time
-      [249, 250, 251, 252]  => lambda{|v| Sequel::SQL::Blob.new(v)}     # blob
+      [0, 246]  => lambda{|v| BigDecimal.new(v)},                         # decimal
+      [1]  => lambda{|v| convert_tinyint_to_bool ? v.to_i != 0 : v.to_i}, # tinyint
+      [2, 3, 8, 9, 13, 247, 248]  => lambda{|v| v.to_i},                  # integer
+      [4, 5]  => lambda{|v| v.to_f},                                      # float
+      [10, 14]  => lambda{|v| convert_date_time(:string_to_date, v)},     # date
+      [7, 12] => lambda{|v| convert_date_time(:string_to_datetime, v)},   # datetime
+      [11]  => lambda{|v| convert_date_time(:string_to_time, v)},         # time
+      [249, 250, 251, 252]  => lambda{|v| Sequel::SQL::Blob.new(v)}       # blob
     }
     MYSQL_TYPE_PROCS.each do |k,v|
       k.each{|n| MYSQL_TYPES[n] = v}
     end
     
     @convert_invalid_date_time = false
+    @convert_tinyint_to_bool = true
 
     class << self
-      attr_accessor :convert_invalid_date_time
+      attr_accessor :convert_invalid_date_time, :convert_tinyint_to_bool
     end
 
     # If convert_invalid_date_time is nil, :nil, or :string and
@@ -221,6 +230,11 @@ module Sequel
           end
           _execute(conn, "EXECUTE #{ps_name}#{" USING #{(1..i).map{|j| "@sequel_arg_#{j}"}.join(', ')}" unless i == 0}", opts, &block)
         end
+      end
+      
+      # Convert tinyint(1) type to boolean if convert_tinyint_to_bool is true
+      def schema_column_type(db_type)
+        Sequel::MySQL.convert_tinyint_to_bool && db_type == 'tinyint(1)' ? :boolean : super
       end
     end
     

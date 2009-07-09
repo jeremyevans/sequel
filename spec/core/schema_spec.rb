@@ -746,9 +746,6 @@ context "Schema Parser" do
     @sqls = []
     @db = Sequel::Database.new
   end
-  after do
-    Sequel.convert_tinyint_to_bool = true
-  end
 
   specify "should raise an error if there are no columns" do
     @db.meta_def(:schema_parse_table) do |t, opts|
@@ -790,9 +787,7 @@ context "Schema Parser" do
     @db.meta_def(:schema_parse_table) do |t, opts|
       [[:x, {:type=>schema_column_type(t.to_s)}]]
     end
-    @db.schema(:tinyint).first.last[:type].should == :boolean
-    Sequel.convert_tinyint_to_bool = false
-    @db.schema(:tinyint, :reload=>true).first.last[:type].should == :integer
+    @db.schema(:tinyint).first.last[:type].should == :integer
     @db.schema(:interval).first.last[:type].should == :interval
     @db.schema(:int).first.last[:type].should == :integer
     @db.schema(:integer).first.last[:type].should == :integer
@@ -823,5 +818,12 @@ context "Schema Parser" do
     @db.schema(:bytea).first.last[:type].should == :blob
     @db.schema(:blob).first.last[:type].should == :blob
     @db.schema(:image).first.last[:type].should == :blob
+    @db.schema(:nchar).first.last[:type].should == :string
+    @db.schema(:nvarchar).first.last[:type].should == :string
+    @db.schema(:ntext).first.last[:type].should == :string
+    @db.schema(:smalldatetime).first.last[:type].should == :datetime
+    @db.schema(:smallmoney).first.last[:type].should == :decimal
+    @db.schema(:binary).first.last[:type].should == :blob
+    @db.schema(:varbinary).first.last[:type].should == :blob
   end
 end

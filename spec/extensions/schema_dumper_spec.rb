@@ -253,13 +253,14 @@ END_MIG
 
   it "should convert many database types to ruby types" do
     types = %w"mediumint smallint int integer mediumint(6) smallint(7) int(8) integer(9)
-      tinyint tinyint(1) bigint bigint(20) real float double boolean tinytext mediumtext
+      tinyint tinyint(2) bigint bigint(20) real float double boolean tinytext mediumtext
       longtext text clob date datetime timestamp time char character
       varchar varchar(255) varchar(30) bpchar string money
       decimal decimal(10,2) numeric numeric(15,3) number bytea tinyblob mediumblob longblob
       blob varbinary varbinary(10) binary binary(20) year" +
       ["double precision", "timestamp with time zone", "timestamp without time zone",
-       "time with time zone", "time without time zone", "character varying(20)"]
+       "time with time zone", "time without time zone", "character varying(20)"] +
+      %w"nvarchar ntext smalldatetime smallmoney binary varbinary nchar"
     @d.meta_def(:schema) do |t, *o|
       i = 0
       types.map{|x| [:"c#{i+=1}", {:db_type=>x, :allow_null=>true}]}
@@ -274,8 +275,8 @@ create_table(:x) do
   Integer :c6
   Integer :c7
   Integer :c8
-  TrueClass :c9
-  TrueClass :c10
+  Integer :c9
+  Integer :c10
   Bignum :c11
   Bignum :c12
   Float :c13
@@ -320,6 +321,13 @@ create_table(:x) do
   Time :c52, :only_time=>true
   Time :c53, :only_time=>true
   String :c54, :size=>20
+  String :c55
+  String :c56, :text=>true
+  DateTime :c57
+  BigDecimal :c58, :size=>[19, 2]
+  File :c59
+  File :c60
+  String :c61, :fixed=>true
 end
 END_MIG
     @d.dump_table_schema(:x).should == table.chomp

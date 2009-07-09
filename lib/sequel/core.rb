@@ -15,12 +15,7 @@
 # object, which is closed (disconnected) when the block exits, just
 # like a block passed to connect.  For example:
 #
-#   Sequel.sqlite('blog.db'){|db| puts db[:users].count}  
-#
-# Sequel converts the column type tinyint to a boolean by default,
-# you can override the conversion to use tinyint as an integer:
-#
-#   Sequel.convert_tinyint_to_bool = false
+#   Sequel.sqlite('blog.db'){|db| puts db[:users].count} 
 #
 # Sequel converts two digit years in Dates and DateTimes by default,
 # so 01/02/03 is interpreted at January 2nd, 2003, and 12/13/99 is interpreted
@@ -37,13 +32,12 @@
 # You can set the SEQUEL_NO_CORE_EXTENSIONS constant or environment variable to have
 # Sequel not extend the core classes.
 module Sequel
-  @convert_tinyint_to_bool = true
   @convert_two_digit_years = true
   @datetime_class = Time
   @virtual_row_instance_eval = true
   
   class << self
-    attr_accessor :convert_tinyint_to_bool, :convert_two_digit_years, :datetime_class, :virtual_row_instance_eval
+    attr_accessor :convert_two_digit_years, :datetime_class, :virtual_row_instance_eval
   end
 
   # Returns true if the passed object could be a specifier of conditions, false otherwise.

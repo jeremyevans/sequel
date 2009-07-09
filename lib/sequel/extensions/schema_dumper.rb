@@ -109,30 +109,30 @@ END_MIG
       case t = schema[:db_type].downcase
       when /\A(?:medium|small)?int(?:eger)?(?:\((?:\d+)\))?\z/o
         {:type=>Integer}
-      when /\Atinyint(?:\((?:\d+)\))?\z/o
-        {:type=>(Sequel.convert_tinyint_to_bool ? TrueClass : Integer)}
+      when /\Atinyint(?:\((\d+)\))?\z/o
+        {:type=>(self.class.adapter_scheme == :mysql && $1 == '1' && Sequel::MySQL.convert_tinyint_to_bool ? TrueClass : Integer)}
       when /\Abigint(?:\((?:\d+)\))?\z/o
         {:type=>Bignum}
       when /\A(?:real|float|double(?: precision)?)\z/o
         {:type=>Float}
       when 'boolean'
         {:type=>TrueClass}
-      when /\A(?:(?:tiny|medium|long)?text|clob)\z/o
+      when /\A(?:(?:tiny|medium|long|n)?text|clob)\z/o
         {:type=>String, :text=>true}
       when 'date'
         {:type=>Date}
-      when 'datetime'
+      when /\A(?:small)?datetime\z/o
         {:type=>DateTime}
       when /\Atimestamp(?: with(?:out)? time zone)?\z/o
         {:type=>DateTime}
       when /\Atime(?: with(?:out)? time zone)?\z/o
         {:type=>Time, :only_time=>true}
-      when /\Achar(?:acter)?(?:\((\d+)\))?\z/o
+      when /\An?char(?:acter)?(?:\((\d+)\))?\z/o
         {:type=>String, :size=>($1.to_i if $1), :fixed=>true}
-      when /\A(?:varchar|character varying|bpchar|string)(?:\((\d+)\))?\z/o
+      when /\A(?:n?varchar|character varying|bpchar|string)(?:\((\d+)\))?\z/o
         s = ($1.to_i if $1)
         {:type=>String, :size=>(s == 255 ? nil : s)}
-      when 'money'
+      when /\A(?:small)?money\z/o
         {:type=>BigDecimal, :size=>[19,2]}
       when /\A(?:decimal|numeric|number)(?:\((\d+)(?:,\s*(\d+))?\))?\z/o
         s = [($1.to_i if $1), ($2.to_i if $2)].compact
