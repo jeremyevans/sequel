@@ -1018,24 +1018,20 @@ context "Dataset#order" do
 end
 
 context "Dataset#unfiltered" do
-  before do
-    @dataset = Sequel::Dataset.new(nil).from(:test)
-  end
-  
   specify "should remove filtering from the dataset" do
-    @dataset.filter(:score=>1).unfiltered.sql.should ==
-      'SELECT * FROM test'
+    Sequel::Dataset.new(nil).from(:test).filter(:score=>1).unfiltered.sql.should == 'SELECT * FROM test'
+  end
+end
+
+context "Dataset#unlimited" do
+  specify "should remove limit and offset from the dataset" do
+    Sequel::Dataset.new(nil).from(:test).limit(1, 2).unlimited.sql.should == 'SELECT * FROM test'
   end
 end
 
 context "Dataset#unordered" do
-  before do
-    @dataset = Sequel::Dataset.new(nil).from(:test)
-  end
-  
   specify "should remove ordering from the dataset" do
-    @dataset.order(:name).unordered.sql.should ==
-      'SELECT * FROM test'
+    Sequel::Dataset.new(nil).from(:test).order(:name).unordered.sql.should == 'SELECT * FROM test'
   end
 end
 

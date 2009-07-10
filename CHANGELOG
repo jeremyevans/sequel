@@ -1,5 +1,7 @@
 === HEAD
 
+* Add Dataset#unlimited, similar to unfiltered and unordered (jeremyevans)
+
 * Make Dataset#from_self take an options hash and respect an :alias option, giving the alias to use (Phrogz)
 
 * Make the JDBC adapter accept a :convert_types option to turn off Java type conversion and double performance (jeremyevans)

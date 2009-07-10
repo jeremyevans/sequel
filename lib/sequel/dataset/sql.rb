@@ -799,6 +799,13 @@ module Sequel
       opts = {:all=>opts} unless opts.is_a?(Hash)
       compound_clone(:union, dataset, opts)
     end
+    
+    # Returns a copy of the dataset with no limit or offset.
+    # 
+    #   dataset.limit(10, 20).unlimited # SELECT * FROM items
+    def unlimited
+      clone(:limit=>nil, :offset=>nil)
+    end
 
     # Returns a copy of the dataset with no order.
     # 

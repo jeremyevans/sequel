@@ -12,12 +12,6 @@ module Sequel
         :mssql
       end
 
-      def dataset(opts = nil)
-        ds = super
-        ds.extend(DatasetMethods)
-        ds
-      end
-      
       # Microsoft SQL Server supports using the INFORMATION_SCHEMA to get
       # information on tables.
       def tables(opts={})
@@ -29,11 +23,13 @@ module Sequel
       end
 
       private
-
+      
+      # MSSQL uses the IDENTITY(1,1) column for autoincrementing columns.
       def auto_increment_sql
         AUTO_INCREMENT
       end
       
+      # MSSQL specific syntax for altering tables.
       def alter_table_sql(table, op)
         case op[:op]
         when :add_column
@@ -74,6 +70,8 @@ module Sequel
         SQL_ROLLBACK
       end
       
+      # MSSQL uses the INFORMATION_SCHEMA to hold column information.  This method does
+      # not support the parsing of primary key information.
       def schema_parse_table(table_name, opts)
         m = output_identifier_meth
         m2 = input_identifier_meth
@@ -126,7 +124,9 @@ module Sequel
       BOOL_FALSE = '0'.freeze
       SELECT_CLAUSE_ORDER = %w'with limit distinct columns from table_options join where group order having compounds'.freeze
       TIMESTAMP_FORMAT = "'%Y-%m-%d %H:%M:%S'".freeze
-
+      WILDCARD = LiteralString.new('*').freeze
+      
+      # MSSQL uses + for string concatenation
       def complex_expression_sql(op, args)
         case op
         when :'||'
@@ -136,10 +136,18 @@ module Sequel
         end
       end
       
+      # When returning all rows, if an offset is used, delete the row_number column
+      # before yielding the row.
+      def each(&block)
+        @opts[:offset] ? super{|r| r.delete(row_number_column); yield r} : super(&block)
+      end
+      
+      # MSSQL uses the CONTAINS keyword for full text search
       def full_text_search(cols, terms, opts = {})
         filter("CONTAINS (#{literal(cols)}, #{literal(terms)})")
       end
       
+      # MSSQL uses a UNION ALL statement to insert multiple values at once.
       def multi_insert_sql(columns, values)
         values = values.map {|r| "SELECT #{expression_list(r)}" }.join(" UNION ALL ")
         ["#{insert_sql_base}#{source_list(@opts[:from])} (#{identifier_list(columns)}) #{values}"]
@@ -149,9 +157,36 @@ module Sequel
       def nolock
         clone(:table_options => "(NOLOCK)")
       end
-
+      
+      # MSSQL uses [] to quote identifiers
       def quoted_identifier(name)
         "[#{name}]"
+      end
+      
+      # MSSQL Requires the use of the ROW_NUMBER window function to emulate
+      # an offset.  This implementation requires MSSQL 2005 or greater (offset
+      # can't be emulated well in MSSQL 2000).
+      # 
+      # The implementation is ugly, cloning the current dataset and modifying
+      # the clone to add a ROW_NUMBER window function (and some other things),
+      # then using the modified clone in a CTE which is selected from.
+      #
+      # If offset is used, an order must be provided, because the use of ROW_NUMBER
+      # requires an order.
+      def select_sql
+        return super unless o = @opts[:offset]
+        raise(Error, 'MSSQL requires an order be provided if using an offset') unless order = @opts[:order]
+        dsa1 = dataset_alias(1)
+        dsa2 = dataset_alias(2)
+        rn = row_number_column
+        unlimited.
+          unordered.
+          from_self(:alias=>dsa2).
+          select{[WILDCARD, ROW_NUMBER(:over, :order=>order){}.as(rn)]}.
+          from_self(:alias=>dsa1).
+          limit(@opts[:limit]).
+          where(rn > o).
+          select_sql
       end
 
       # Microsoft SQL Server does not support INTERSECT or EXCEPT
@@ -159,6 +194,7 @@ module Sequel
         false
       end
       
+      # MSSQL does not support IS TRUE
       def supports_is_true?
         false
       end
@@ -187,7 +223,7 @@ module Sequel
         v.strftime(TIMESTAMP_FORMAT)
       end
       
-      # Use 0 for false on MySQL
+      # Use 0 for false on MSSQL
       def literal_false
         BOOL_FALSE
       end
@@ -197,18 +233,23 @@ module Sequel
         v.strftime(TIMESTAMP_FORMAT)
       end
 
-      # Use 1 for true on MySQL
+      # Use 1 for true on MSSQL
       def literal_true
         BOOL_TRUE
       end
+      
+      # The alias to use for the row_number column when emulating OFFSET
+      def row_number_column
+        :x_sequel_row_number_x
+      end
 
+      # MSSQL adds the limit before the columns
       def select_clause_order
         SELECT_CLAUSE_ORDER
       end
 
-      # MSSQL uses TOP for limit, with no offset support
+      # MSSQL uses TOP for limit
       def select_limit_sql(sql)
-        raise(Error, "OFFSET not supported") if @opts[:offset]
         sql << " TOP #{@opts[:limit]}" if @opts[:limit]
       end
 
