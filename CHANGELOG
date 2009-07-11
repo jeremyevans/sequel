@@ -1,5 +1,7 @@
 === HEAD
 
+* Model associations now default to associating to classes in the same scope (jeremyevans, nougad) (#274)
+
 * Add Dataset#unlimited, similar to unfiltered and unordered (jeremyevans)
 
 * Make Dataset#from_self take an options hash and respect an :alias option, giving the alias to use (Phrogz)

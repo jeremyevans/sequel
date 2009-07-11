@@ -125,7 +125,6 @@ module Sequel
           name = opts[:name]
           model = self
           opts[:read_only] = true
-          opts[:class_name] ||= camelize(singularize(name))
           opts[:after_load].unshift(:array_uniq!) if opts[:uniq]
           opts[:cartesian_product_number] ||= 2
           opts[:through] = opts[:through].map do |e|

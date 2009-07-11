@@ -16,6 +16,26 @@ describe Sequel::Model, "associate" do
     klass.association_reflection(:"par_parent2s").associated_class.should == ParParent
   end
 
+  it "should default to associating to other models in the same scope" do
+    class ::AssociationModuleTest
+      class Album < Sequel::Model
+        many_to_one :artist
+        many_to_many :tags
+      end
+      class Artist< Sequel::Model
+        one_to_many :albums
+      end
+      class Tag < Sequel::Model
+        many_to_many :albums
+      end
+    end
+    
+    ::AssociationModuleTest::Album.association_reflection(:artist).associated_class.should == ::AssociationModuleTest::Artist
+    ::AssociationModuleTest::Album.association_reflection(:tags).associated_class.should == ::AssociationModuleTest::Tag
+    ::AssociationModuleTest::Artist.association_reflection(:albums).associated_class.should == ::AssociationModuleTest::Album
+    ::AssociationModuleTest::Tag.association_reflection(:albums).associated_class.should == ::AssociationModuleTest::Album
+  end
+
   it "should add a model_object and association_reflection accessors to the dataset, and return it with the current model object" do
     MODEL_DB.reset
     klass = Class.new(Sequel::Model(:nodes)) do

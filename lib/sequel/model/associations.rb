@@ -548,6 +548,7 @@ module Sequel
             when Class
               opts[:class_name] ||= opts[:class].name
           end
+          opts[:class_name] ||= (opts[:model].name.split("::")[0..-2] + [camelize(opts.returns_array? ? singularize(name) : name)]).join('::')
       
           send(:"def_#{type}", opts)
       
@@ -646,7 +647,6 @@ module Sequel
           left = (opts[:left_key] ||= opts.default_left_key)
           right = (opts[:right_key] ||= opts.default_right_key)
           left_pk = (opts[:left_primary_key] ||= self.primary_key)
-          opts[:class_name] ||= camelize(singularize(name))
           opts[:cartesian_product_number] ||= 1
           join_table = (opts[:join_table] ||= opts.default_join_table)
           left_key_alias = opts[:left_key_alias] ||= opts.default_associated_key_alias
@@ -705,7 +705,6 @@ module Sequel
           opts[:key] = opts.default_key unless opts.include?(:key)
           key = opts[:key]
           opts[:cartesian_product_number] ||= 0
-          opts[:class_name] ||= camelize(name)
           opts[:dataset] ||= proc do
             klass = opts.associated_class
             klass.filter(SQL::QualifiedIdentifier.new(klass.table_name, opts.primary_key)=>send(key))
@@ -750,7 +749,6 @@ module Sequel
           model = self
           key = (opts[:key] ||= opts.default_key)
           primary_key = (opts[:primary_key] ||= self.primary_key)
-          opts[:class_name] ||= camelize(singularize(name))
           opts[:dataset] ||= proc do
             klass = opts.associated_class
             klass.filter(SQL::QualifiedIdentifier.new(klass.table_name, key) => send(primary_key))

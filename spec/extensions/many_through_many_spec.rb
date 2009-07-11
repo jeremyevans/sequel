@@ -23,6 +23,19 @@ describe Sequel::Model, "many_through_many" do
     Object.send(:remove_const, :Tag)
   end
 
+  it "should default to associating to other models in the same scope" do
+    class ::AssociationModuleTest
+      class Artist < Sequel::Model
+        plugin :many_through_many
+        many_through_many :tags, [[:albums_artists, :artist_id, :album_id], [:albums, :id, :id], [:albums_tags, :album_id, :tag_id]]
+      end  
+      class Tag < Sequel::Model
+      end  
+    end  
+    
+    ::AssociationModuleTest::Artist.association_reflection(:tags).associated_class.should == ::AssociationModuleTest::Tag
+  end 
+
   it "should raise an error if in invalid form of through is used" do
     proc{@c1.many_through_many :tags, [[:albums_artists, :artist_id, :album_id], [:albums, :id, :id], [:albums_tags, :album_id]]}.should raise_error(Sequel::Error)
     proc{@c1.many_through_many :tags, [[:albums_artists, :artist_id, :album_id], [:albums, :id, :id], {:table=>:album_tags, :left=>:album_id}]}.should raise_error(Sequel::Error)
