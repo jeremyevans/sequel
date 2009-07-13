@@ -1,5 +1,7 @@
 === HEAD
 
+* Move convert_tinyint_to_bool method from Sequel to Sequel::MySQL (jeremyevans)
+
 * Model associations now default to associating to classes in the same scope (jeremyevans, nougad) (#274)
 
 * Add Dataset#unlimited, similar to unfiltered and unordered (jeremyevans)

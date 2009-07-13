@@ -548,7 +548,7 @@ module Sequel
             when Class
               opts[:class_name] ||= opts[:class].name
           end
-          opts[:class_name] ||= (opts[:model].name.split("::")[0..-2] + [camelize(opts.returns_array? ? singularize(name) : name)]).join('::')
+          opts[:class_name] ||= ((self.name || '').split("::")[0..-2] + [camelize(opts.returns_array? ? singularize(name) : name)]).join('::')
       
           send(:"def_#{type}", opts)
       
