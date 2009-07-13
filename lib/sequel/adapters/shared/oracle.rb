@@ -158,6 +158,14 @@ module Sequel
           end
         end
       end
+
+      # Modify the sql to add the list of tables to select FROM
+      # Oracle doesn't support select without FROM clause
+      # so add dummy DUAL table by default
+      def select_from_sql(sql)
+        from = source_list(@opts[:from] || 'DUAL')  
+        sql << " FROM #{from}"
+      end
     end
   end
 end
