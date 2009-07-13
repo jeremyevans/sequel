@@ -5,6 +5,8 @@ module Sequel
       SQL_BEGIN = "BEGIN TRANSACTION".freeze
       SQL_COMMIT = "COMMIT TRANSACTION".freeze
       SQL_ROLLBACK = "ROLLBACK TRANSACTION".freeze
+      SQL_ROLLBACK_TO_SAVEPOINT = 'ROLLBACK TRANSACTION autopoint_%d'.freeze
+      SQL_SAVEPOINT = 'SAVE TRANSACTION autopoint_%d'.freeze
       TEMPORARY = "#".freeze
       
       # Microsoft SQL Server uses the :mssql type.
@@ -20,6 +22,11 @@ module Sequel
           select(:table_name).
           filter(:table_type=>'BASE TABLE', :table_schema=>(opts[:schema]||default_schema||'dbo').to_s).
           map{|x| m.call(x[:table_name])}
+      end
+        
+      # MSSQL supports savepoints, though it doesn't support committing/releasing them savepoint
+      def supports_savepoints?
+        true
       end
 
       private
@@ -49,10 +56,21 @@ module Sequel
           super(table, op)
         end
       end
+      
+      # SQL to start a new savepoint
+      def begin_savepoint_sql(depth)
+        SQL_SAVEPOINT % depth
+      end
 
       # SQL to BEGIN a transaction.
       def begin_transaction_sql
         SQL_BEGIN
+      end
+      
+      # Commit the active transaction on the connection, does not commit/release
+      # savepoints.
+      def commit_transaction(conn)
+        log_connection_execute(conn, commit_transaction_sql) unless Thread.current[:sequel_transaction_depth] > 1
       end
 
       # SQL to COMMIT a transaction.
@@ -63,6 +81,11 @@ module Sequel
       # The SQL to drop an index for the table.
       def drop_index_sql(table, op)
         "DROP INDEX #{quote_identifier(op[:name] || default_index_name(table, op[:columns]))} ON #{quote_schema_table(table)}"
+      end
+      
+      # SQL to rollback to a savepoint
+      def rollback_savepoint_sql(depth)
+        SQL_ROLLBACK_TO_SAVEPOINT % depth
       end
       
       # SQL to ROLLBACK a transaction.
