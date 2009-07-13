@@ -65,8 +65,13 @@ describe Sequel::Model, "dataset & schema" do
   end
 
   it "should raise an error on set_dataset if there is an error connecting to the database" do
-    @model.meta_def(:get_db_schema){raise Sequel::DatabaseConnectionError}
-    proc{@model.set_dataset(MODEL_DB[:foo])}.should raise_error
+    @model.meta_def(:columns){raise Sequel::DatabaseConnectionError}
+    proc{@model.set_dataset(MODEL_DB[:foo].join(:blah))}.should raise_error
+  end
+
+  it "should not raise an error if there is a problem getting the columns for a dataset" do
+    @model.meta_def(:columns){raise Sequel::Error}
+    proc{@model.set_dataset(MODEL_DB[:foo].join(:blah))}.should_not raise_error
   end
 
   it "doesn't raise an error on set_dataset if there is an error raised getting the schema" do

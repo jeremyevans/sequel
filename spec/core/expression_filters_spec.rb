@@ -520,6 +520,10 @@ context Sequel::SQL::VirtualRow do
     @d.l{rank(:over, :frame=>:rows){}}.should == 'rank() OVER (ROWS UNBOUNDED PRECEDING)'
   end
 
+  it "should raise an error if an invalid :frame option is used" do
+    proc{@d.l{rank(:over, :frame=>:blah){}}}.should raise_error(Sequel::Error)
+  end
+
   it "should support all these options together" do
     @d.l{count(:over, :* =>true, :partition=>a, :order=>b, :window=>:win, :frame=>:rows){}}.should == 'count(*) OVER ("win" PARTITION BY "a" ORDER BY "b" ROWS UNBOUNDED PRECEDING)'
   end
@@ -527,5 +531,6 @@ context Sequel::SQL::VirtualRow do
   it "should raise an error if window functions are not supported" do
     @d.meta_def(:supports_window_functions?){false}
     proc{@d.l{count(:over, :* =>true, :partition=>a, :order=>b, :window=>:win, :frame=>:rows){}}}.should raise_error(Sequel::Error)
+    proc{Sequel::Dataset.new(nil).filter{count(:over, :* =>true, :partition=>a, :order=>b, :window=>:win, :frame=>:rows){}}.sql}.should raise_error(Sequel::Error)
   end
 end
