@@ -1059,6 +1059,20 @@ describe Sequel::Model, "one_to_many" do
     p.instance_variable_get(:@x).should == c
   end
 
+  it "should allow additional arguments given to the add_ method and pass them onwards to the _add_ method" do
+    @c2.one_to_many :attributes, :class => @c1
+    p = @c2.load(:id=>10)
+    c = @c1.load(:id=>123)
+    def p._add_attribute(x,*y)
+      @x = x
+      @y = y
+    end
+    c.should_not_receive(:node_id=)
+    p.add_attribute(c,:foo,:bar=>:baz)
+    p.instance_variable_get(:@x).should == c
+    p.instance_variable_get(:@y).should == [:foo,{:bar=>:baz}]
+  end
+
   it "should call a _remove_ method internally to remove attributes" do
     @c2.one_to_many :attributes, :class => @c1
     @c2.private_instance_methods.collect{|x| x.to_s}.sort.should(include("_remove_attribute"))
@@ -1070,6 +1084,32 @@ describe Sequel::Model, "one_to_many" do
     c.should_not_receive(:node_id=)
     p.remove_attribute(c)
     p.instance_variable_get(:@x).should == c
+  end
+
+  it "should allow additional arguments given to the remove_ method and pass them onwards to the _remove_ method" do
+    @c2.one_to_many :attributes, :class => @c1
+    p = @c2.load(:id=>10)
+    c = @c1.load(:id=>123)
+    def p._remove_attribute(x,*y)
+      @x = x
+      @y = y
+    end
+    c.should_not_receive(:node_id=)
+    p.remove_attribute(c,:foo,:bar=>:baz)
+    p.instance_variable_get(:@x).should == c
+    p.instance_variable_get(:@y).should == [:foo,{:bar=>:baz}]
+  end
+
+  it "should allow additional arguments given to the remove_all_ method and pass them onwards to the _remove_all_ method" do
+    @c2.one_to_many :attributes, :class => @c1
+    p = @c2.load(:id=>10)
+    c = @c1.load(:id=>123)
+    def p._remove_all_attributes(*y)
+      @y = y
+    end
+    c.should_not_receive(:node_id=)
+    p.remove_all_attributes(:foo,:bar=>:baz)
+    p.instance_variable_get(:@y).should == [:foo,{:bar=>:baz}]
   end
 
   it "should support (before|after)_(add|remove) callbacks" do
@@ -1589,6 +1629,19 @@ describe Sequel::Model, "many_to_many" do
     MODEL_DB.sqls.should == []
   end
 
+  it "should allow additional arguments given to the add_ method and pass them onwards to the _add_ method" do
+    @c2.many_to_many :attributes, :class => @c1
+    p = @c2.load(:id=>10)
+    c = @c1.load(:id=>123)
+    def p._add_attribute(x,*y)
+      @x = x
+      @y = y
+    end
+    p.add_attribute(c,:foo,:bar=>:baz)
+    p.instance_variable_get(:@x).should == c
+    p.instance_variable_get(:@y).should == [:foo,{:bar=>:baz}]
+  end
+
   it "should call a _remove_ method internally to remove attributes" do
     @c2.many_to_many :attributes, :class => @c1
     @c2.private_instance_methods.collect{|x| x.to_s}.sort.should(include("_remove_attribute"))
@@ -1600,6 +1653,30 @@ describe Sequel::Model, "many_to_many" do
     p.remove_attribute(c)
     p.instance_variable_get(:@x).should == c
     MODEL_DB.sqls.should == []
+  end
+
+  it "should allow additional arguments given to the remove_ method and pass them onwards to the _remove_ method" do
+    @c2.many_to_many :attributes, :class => @c1
+    p = @c2.load(:id=>10)
+    c = @c1.load(:id=>123)
+    def p._remove_attribute(x,*y)
+      @x = x
+      @y = y
+    end
+    p.remove_attribute(c,:foo,:bar=>:baz)
+    p.instance_variable_get(:@x).should == c
+    p.instance_variable_get(:@y).should == [:foo,{:bar=>:baz}]
+  end
+
+  it "should allow additional arguments given to the remove_all_ method and pass them onwards to the _remove_all_ method" do
+    @c2.many_to_many :attributes, :class => @c1
+    p = @c2.load(:id=>10)
+    c = @c1.load(:id=>123)
+    def p._remove_all_attributes(*y)
+      @y = y
+    end
+    p.remove_all_attributes(:foo,:bar=>:baz)
+    p.instance_variable_get(:@y).should == [:foo,{:bar=>:baz}]
   end
 
   it "should support (before|after)_(add|remove) callbacks" do

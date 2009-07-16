@@ -626,7 +626,7 @@ module Sequel
       
         # Add the add_ instance method 
         def def_add_method(opts)
-          association_module_def(opts.add_method){|o| add_associated_object(opts, o)}
+          association_module_def(opts.add_method){|o,*args| add_associated_object(opts, o, *args)}
         end
       
         # Adds methods to the module included in the class related to getting the
@@ -826,8 +826,8 @@ module Sequel
         
         # Add the remove_ and remove_all instance methods
         def def_remove_methods(opts)
-          association_module_def(opts.remove_method){|o| remove_associated_object(opts, o)}
-          association_module_def(opts.remove_all_method){remove_all_associated_objects(opts)}
+          association_module_def(opts.remove_method){|o,*args| remove_associated_object(opts, o, *args)}
+          association_module_def(opts.remove_all_method){|*args| remove_all_associated_objects(opts, *args)}
         end
       end
 
@@ -876,11 +876,11 @@ module Sequel
         end
 
         # Add the given associated object to the given association
-        def add_associated_object(opts, o)
+        def add_associated_object(opts, o, *args)
           raise(Sequel::Error, "model object #{model} does not have a primary key") unless pk
           raise(Sequel::Error, "associated object #{o.model} does not have a primary key") if opts.need_associated_primary_key? && !o.pk
           return if run_association_callbacks(opts, :before_add, o) == false
-          send(opts._add_method, o)
+          send(opts._add_method, o, *args)
           associations[opts[:name]].push(o) if associations.include?(opts[:name])
           add_reciprocal_object(opts, o)
           run_association_callbacks(opts, :after_add, o)
@@ -919,20 +919,20 @@ module Sequel
         end
 
         # Remove all associated objects from the given association
-        def remove_all_associated_objects(opts)
+        def remove_all_associated_objects(opts, *args)
           raise(Sequel::Error, "model object #{model} does not have a primary key") unless pk
-          send(opts._remove_all_method)
+          send(opts._remove_all_method, *args)
           ret = associations[opts[:name]].each{|o| remove_reciprocal_object(opts, o)} if associations.include?(opts[:name])
           associations[opts[:name]] = []
           ret
         end
 
         # Remove the given associated object from the given association
-        def remove_associated_object(opts, o)
+        def remove_associated_object(opts, o, *args)
           raise(Sequel::Error, "model object #{model} does not have a primary key") unless pk
           raise(Sequel::Error, "associated object #{o.model} does not have a primary key") if opts.need_associated_primary_key? && !o.pk
           return if run_association_callbacks(opts, :before_remove, o) == false
-          send(opts._remove_method, o)
+          send(opts._remove_method, o, *args)
           associations[opts[:name]].delete_if{|x| o === x} if associations.include?(opts[:name])
           remove_reciprocal_object(opts, o)
           run_association_callbacks(opts, :after_remove, o)
