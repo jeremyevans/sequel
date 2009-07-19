@@ -1112,6 +1112,17 @@ describe Sequel::Model, "one_to_many" do
     p.instance_variable_get(:@y).should == [:foo,{:bar=>:baz}]
   end
 
+  it "should call a _remove_all_ method internally to remove attributes" do
+    @c2.one_to_many :attributes, :class => @c1
+    @c2.private_instance_methods.collect{|x| x.to_s}.sort.should(include("_remove_all_attributes"))
+    p = @c2.load(:id=>10)
+    def p._remove_all_attributes
+      @x = :foo
+    end
+    p.remove_all_attributes
+    p.instance_variable_get(:@x).should == :foo
+  end
+
   it "should support (before|after)_(add|remove) callbacks" do
     h = []
     @c2.one_to_many :attributes, :class => @c1, :before_add=>[proc{|x,y| h << x.pk; h << -y.pk}, :blah], :after_add=>proc{h << 3}, :before_remove=>:blah, :after_remove=>[:blahr]
@@ -1677,6 +1688,18 @@ describe Sequel::Model, "many_to_many" do
     end
     p.remove_all_attributes(:foo,:bar=>:baz)
     p.instance_variable_get(:@y).should == [:foo,{:bar=>:baz}]
+  end
+
+  it "should call a _remove_all_ method internally to remove attributes" do
+    @c2.many_to_many :attributes, :class => @c1
+    @c2.private_instance_methods.collect{|x| x.to_s}.sort.should(include("_remove_all_attributes"))
+    p = @c2.load(:id=>10)
+    def p._remove_all_attributes
+      @x = :foo
+    end
+    p.remove_all_attributes
+    p.instance_variable_get(:@x).should == :foo
+    MODEL_DB.sqls.should == []
   end
 
   it "should support (before|after)_(add|remove) callbacks" do
