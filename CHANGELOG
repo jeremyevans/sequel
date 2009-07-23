@@ -1,5 +1,7 @@
 === HEAD
 
+* Add an assocation_proxies plugin that uses proxies for associations (jeremyevans)
+
 * Have the add/remove/remove_all methods take additional arguments and pass them to the internal methods (clivecrous)
 
 * Move convert_tinyint_to_bool method from Sequel to Sequel::MySQL (jeremyevans)

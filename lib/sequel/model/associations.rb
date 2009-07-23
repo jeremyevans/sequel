@@ -629,14 +629,18 @@ module Sequel
           association_module_def(opts.add_method){|o,*args| add_associated_object(opts, o, *args)}
         end
       
-        # Adds methods to the module included in the class related to getting the
-        # dataset and associated object(s).
+        # Adds methods related to the association's dataset to the module included in the class.
         def def_association_dataset_methods(opts)
           # If a block is given, define a helper method for it, because it takes
           # an argument.  This is unnecessary in Ruby 1.9, as that has instance_exec.
           association_module_private_def(opts.dataset_helper_method, &opts[:block]) if opts[:block]
           association_module_private_def(opts._dataset_method, &opts[:dataset])
           association_module_def(opts.dataset_method){_dataset(opts)}
+          def_association_method(opts)
+        end
+
+        # Adds method for retrieving the associated objects to the module included in the class.
+        def def_association_method(opts)
           association_module_def(opts.association_method){|*reload| load_associated_objects(opts, reload[0])}
         end
       

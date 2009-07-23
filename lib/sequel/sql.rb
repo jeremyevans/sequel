@@ -1,4 +1,10 @@
 module Sequel
+  if RUBY_VERSION < '1.9.0'
+    class BasicObject
+      (instance_methods - %w"__id__ __send__ instance_eval == equal?").each{|m| undef_method(m)}
+    end
+  end
+
   class LiteralString < ::String
   end
 
@@ -776,15 +782,6 @@ module Sequel
       to_s_method :subscript_sql
     end
 
-    if RUBY_VERSION >= '1.9.0'
-      class VirtualRow < BasicObject
-      end
-    else
-      class VirtualRow
-        (instance_methods - %w"__id__ __send__ instance_eval == equal?").each{|m| undef_method(m)}
-      end
-    end
-
     # The purpose of this class is to allow the easy creation of SQL identifiers and functions
     # without relying on methods defined on Symbol.  This is useful if another library defines
     # the methods defined by Sequel, or if you are running on ruby 1.9.
@@ -830,7 +827,7 @@ module Sequel
     #   ds.select{rank(:over){}} # SELECT rank() OVER () FROM t
     #   ds.select{count(:over, :*=>true){}} # SELECT count(*) OVER () FROM t
     #   ds.select{sum(:over, :args=>col1, :partition=>col2, :order=>col3){}} # SELECT sum(col1) OVER (PARTITION BY col2 ORDER BY col3) FROM t
-    class VirtualRow
+    class VirtualRow < BasicObject
       WILDCARD = LiteralString.new('*').freeze
       QUESTION_MARK = LiteralString.new('?').freeze
       COMMA_SEPARATOR = LiteralString.new(', ').freeze
