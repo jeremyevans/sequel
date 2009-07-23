@@ -4,4 +4,4 @@
 /coverage
 /www/public/*.html
 /www/public/rdoc*
-/www/public/static/larc2009_presentation
+/www/public/static/*_presentation
