@@ -2,6 +2,11 @@ Sequel.require 'adapters/shared/mssql'
 
 module Sequel
   module JDBC
+    class Database
+      # Alias the generic JDBC version so it can be called directly later
+      alias jdbc_schema_parse_table schema_parse_table
+    end
+    
     # Database and Dataset instance methods for MSSQL specific
     # support via JDBC.
     module MSSQL
@@ -28,6 +33,12 @@ module Sequel
           ensure
             stmt.close
           end
+        end
+        
+        # Call the generic JDBC version instead of MSSQL version,
+        # since the JDBC version handles primary keys.
+        def schema_parse_table(table, opts={})
+          jdbc_schema_parse_table(table, opts)
         end
       end
       
