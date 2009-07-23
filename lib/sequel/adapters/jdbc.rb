@@ -285,7 +285,7 @@ module Sequel
                 cps.execute
               when :insert
                 cps.executeUpdate
-                last_insert_id(conn, opts)
+                last_insert_id(conn, opts.merge(:prepared=>true))
               else
                 cps.executeUpdate
               end

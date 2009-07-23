@@ -20,7 +20,9 @@ module Sequel
         def last_insert_id(conn, opts={})
           stmt = conn.createStatement
           begin
-            rs = stmt.executeQuery('SELECT SCOPE_IDENTITY()')
+            sql = opts[:prepared] ? 'SELECT @@IDENTITY' : 'SELECT SCOPE_IDENTITY()'
+            log_info(sql)
+            rs = stmt.executeQuery(sql)
             rs.next
             rs.getInt(1)
           ensure
