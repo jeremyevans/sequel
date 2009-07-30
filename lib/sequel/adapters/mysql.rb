@@ -7,7 +7,7 @@ module Sequel
   # A class level convert_invalid_date_time accessor exists if
   # the native adapter is used.  If set to nil or :nil, the adapter treats dates
   # like 0000-00-00 and times like 838:00:00 as nil values.  If set to :string,
-  # it returns the strings as is.  If is false by default, which means that
+  # it returns the strings as is.  It is false by default, which means that
   # invalid dates and times will raise errors.
   #
   #   Sequel::MySQL.convert_invalid_date_time = true
@@ -158,8 +158,10 @@ module Sequel
             yield r if r
             if conn.respond_to?(:next_result) && conn.next_result
               loop do
-                r.free
-                r = nil
+                if r
+                  r.free
+                  r = nil
+                end
                 begin
                   r = conn.use_result
                 rescue Mysql::Error
