@@ -31,7 +31,7 @@ module Sequel
 
       module ClassMethods
         # A map of the serialized columns for this model.  Keys are column
-        # symbols, values are serialization formats (:marshal or :yaml).
+        # symbols, values are serialization formats (:marshal, :yaml, or :json).
         attr_reader :serialization_map
 
         # Copy the serialization format and columns to serialize into the subclass.
@@ -51,8 +51,14 @@ module Sequel
         # and instance level writer that stores new deserialized value in deserialized
         # columns
         def serialize_attributes(format, *columns)
-          raise(Error, "Unsupported serialization format (#{format}), should be :marshal or :yaml") unless [:marshal, :yaml].include?(format)
-          raise(Error, "No columns given.  The serialization plugin requires you specify which columns to serialize") if columns.empty?
+          unless [:marshal, :yaml, :json].include?(format)
+            raise(Error, "Unsupported serialization format (#{format}), should be :marshal, :yaml, or :json") 
+          end
+          
+          if columns.empty?
+            raise(Error, "No columns given.  The serialization plugin requires you specify which columns to serialize") 
+          end
+          
           columns.each do |column|
             serialization_map[column] = format
             define_method(column) do 
@@ -110,6 +116,8 @@ module Sequel
             Marshal.load(v.unpack('m')[0]) rescue Marshal.load(v)
           when :yaml
             YAML.load v if v
+          when :json
+            JSON.parse v if v
           else
             raise Error, "Bad serialization format (#{model.serialization_map[column].inspect}) for column #{column.inspect}"
           end
@@ -123,6 +131,8 @@ module Sequel
             [Marshal.dump(v)].pack('m')
           when :yaml
             v.to_yaml
+          when :json
+            JSON.generate v
           else
             raise Error, "Bad serialization format (#{model.serialization_map[column].inspect}) for column #{column.inspect}"
           end
