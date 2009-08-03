@@ -2,7 +2,7 @@ New Features
 ------------
 
 * An association_proxies plugin has been added.  This is not a
-  full-blown proxy implemention, but it allows you to write code
+  full-blown proxy implementation, but it allows you to write code
   such as:
   
     artist.albums.filter{num_tracks > 10}
