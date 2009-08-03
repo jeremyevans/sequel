@@ -51,13 +51,8 @@ module Sequel
         # and instance level writer that stores new deserialized value in deserialized
         # columns
         def serialize_attributes(format, *columns)
-          unless [:marshal, :yaml, :json].include?(format)
-            raise(Error, "Unsupported serialization format (#{format}), should be :marshal, :yaml, or :json") 
-          end
-          
-          if columns.empty?
-            raise(Error, "No columns given.  The serialization plugin requires you specify which columns to serialize") 
-          end
+          raise(Error, "Unsupported serialization format (#{format}), should be :marshal, :yaml, or :json") unless [:marshal, :yaml, :json].include?(format)
+          raise(Error, "No columns given.  The serialization plugin requires you specify which columns to serialize") if columns.empty?
           
           columns.each do |column|
             serialization_map[column] = format

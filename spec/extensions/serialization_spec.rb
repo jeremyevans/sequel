@@ -1,6 +1,7 @@
 require File.join(File.dirname(__FILE__), "spec_helper")
 
 require 'yaml'
+require 'json'
 
 describe "Serialization plugin" do
   before do
@@ -24,8 +25,6 @@ describe "Serialization plugin" do
     @c.create(:abc => 1, :def=> 1)
     MODEL_DB.sqls.last.should =~ /INSERT INTO items \((abc, def|def, abc)\) VALUES \(('--- 1\n', 'BAhpBg==\n'|'BAhpBg==\n', '--- 1\n')\)/
     
-    # TODO: Jeremy, how should I handle this?
-    require 'json/ext'
     @c.plugin :serialization, :json, :ghi
     @c.create(:ghi => [123])
     MODEL_DB.sqls.last.should =~ /INSERT INTO items \((ghi)\) VALUES \('\[123\]'\)/
