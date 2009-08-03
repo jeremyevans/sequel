@@ -1,0 +1,192 @@
+New Features
+------------
+
+* An association_proxies plugin has been added.  This is not a
+  full-blown proxy implemention, but it allows you to write code
+  such as:
+  
+    artist.albums.filter{num_tracks > 10}
+    
+  Without the plugin, you have to call filter specifically on the
+  association's dataset:
+  
+    artist.albums_dataset.filter{num_tracks > 10}
+
+  The plugin works by proxying array methods to the array of
+  associated objects, and all other methods to the association's
+  dataset.  This results in the following behavior:
+  
+    # Will load the associated objects (unless they are already
+    # cached), and return the length of the array
+    artist.albums.length
+    
+    # Will issue an SQL query with COUNT (even if the association
+    # is already cached), and return the result
+    artist.albums.count
+
+* The add_*/remove_*/remove_all_* association methods now take
+  additional arguments that are passed down to the
+  _add_*/_remove_*/_remove_all_* methods.  One of the things this
+  allows you to do is update additional columns in join tables for
+  many_to_many associations:
+
+    class Album
+      many_to_many :artists
+      def _add_artist(artist, values={})
+        DB[:albums_artists].
+          insert(values.merge(:album_id=>id,
+                              :artist_id=>artist.id))
+      end
+    end
+    
+    album = Album[1]
+    artist1 = Artist[2]
+    artist2 = Artist[3]
+    album.add_artist(artist1, :relationship=>'composer')
+    album.add_artist(artist2, :relationship=>'arranger')
+
+* The JDBC adapter now accepts a :convert_types option to turn off
+  Java type conversion.  The option is true by default for
+  backwards compatibility and correctness, but can be set to false
+  to double performance.  The option can be set at the database
+  and dataset levels:
+
+    DB = Sequel.jdbc('jdbc:postgresql://host/database',
+                     :convert_types=>false)
+    DB.convert_types = true
+    ds = DB[:table]
+    ds.convert_types = false
+
+* Dataset#from_self now takes an option hash and respects an
+  :alias option, giving the table alias to use.
+
+* Dataset#unlimited was added, similar to unfiltered and unordered.
+
+* SQL::WindowFunction is now a subclass of SQL::GenericExpression,
+  so you can alias it and treat it like any other SQL::Function.
+
+Other Improvements
+------------------
+
+* Microsoft SQL Server support is much, much better in Sequel 3.3.0
+  than in previous versions.  Support is pretty good with the ODBC,
+  ADO, and JDBC adapters, close to the level of support for
+  PostreSQL, MySQL, SQLite, and H2.  Improvements are too numerous
+  to list, but here are some highlights:
+  
+  * Dataset#insert now returns the primary key (identity field), so
+    it can be used easier with models.
+    
+  * Transactions can now use savepoints (except on ADO).
+  
+  * Offsets are supported when using SQL Server 2005 or 2008, using
+    a ROW_NUMBER window function.  However, you must specify an
+    order for your dataset (which you probably are already doing if
+    you are using offsets).
+
+  * Schema parsing has been implemented, though it doesn't support
+    primary key parsing (except on JDBC, since the JDBC support is
+    used there).
+  
+  * The SQL syntax Sequel uses is now much more compatible, and
+    most schema modification methods and database types now work
+    correctly.
+
+* The ADO and ODBC adapters both work much better now.  The ADO
+  adapter no longer attempts to use transactions, since I've found
+  that ADO does not give a stable native connection (and hence
+  transactions weren't possible).  I strongly recommend against
+  using the ADO adapter in production.
+
+* The H2 JDBC subadapter now supports rename_column, set_column_null,
+  set_column_type, and add_foreign_key.
+
+* Altering a columns type, null status, or default is now supported
+  on SQLite.  You can also add primary keys and unique columns.
+
+* Both the ADO and ODBC adapters now catch the native exception
+  classes and raise Sequel::DatabaseErrors.
+
+* Model classes now default to associating to other classes in the
+  same scope.  This makes it easier to use namespaced models.
+
+* The schema parser and schema dumper now support the following
+  types: nchar, nvarchar, ntext, smalldatetime, smallmoney, binary,
+  and varbinary.
+
+* You can now specify the null status for a column using :allow_null
+  in addition to :null.  This is to make it easier to use the
+  table creation methods with the results of the schema parser.
+
+* Renaming a NOT NULL column without a default now works on MySQL.
+
+* Model class initialization now raises an exception if there is a
+  problem connecting to the database.
+  
+* Connection pool performance has been increased slightly.
+
+* The literal_time method in the ODBC adapter has been fixed.
+
+* An unlikely but potential bug in the MySQL adapter has been fixed.
+
+Backwards Compatibility
+-----------------------
+
+* The convert_tinyint_to_bool setting moved from the main Sequel
+  module to the Sequel::MySQL module.  The native MySQL adapter is
+  the only adapter that converted tinyint columns to booleans when
+  the rows are returned, so you can only use the setting with the
+  native MySQL adapter.
+  
+  Additionally, the setting's behavior has changed.  When parsing
+  the schema, now only tinyint(1) columns are now considered as
+  boolean, instead of all tinyint columns. This allows you to use
+  tinyint(4) columns for storing small integers and tinyint(1)
+  columns as booleans, and not have the schema parsing support
+  consider the tinyint(4) columns as booleans.  Unfortunately,
+  due to limitations in the native MySQL driver, all tinyint
+  column values are converted to booleans upon retrieval, not just
+  tinyint(1) column values.
+  
+  Unfortunately, the previous Sequel behavior was to use the
+  default tinyint size (tinyint(4)) when creating boolean columns
+  (using the TrueClass or FalseClass generic types).  If you were
+  using the generic type support to create the columns, you should
+  modify your database to change the column type from tinyint(4) to
+  tinyint(1).
+  
+  If you use MySQL with tinyint columns, these changes have the
+  potential to break applications.  Care should be taken when
+  upgrading if these changes apply to you.
+
+* Model classes now default to associating to other classes in the
+  same scope.  It's highly unlikely anyone was relying on the
+  previous behavior, but if you have a model inside a module that
+  you are associating to a model outside of a module, you now need
+  to specify the associated class using the :class option. 
+  
+* Model#save no longer includes the primary key fields in the SET
+  clause of the UPDATE query, only in the WHERE clause.  I'm not
+  sure if this affects backwards compatibility of production code,
+  but it can break tests that expect specific SQL.
+
+* Behavior to handle empty identifiers has now been standardized.
+  If any database adapter returns an empty identifier, Sequel will
+  use 'untitled' as the identifier.  This can break backwards
+  compatibility if the adapter previously used another default and
+  you were relying on that default.  This was necessary to fix any
+  possible "interning empty string" exceptions.
+
+* On MSSQL, Sequel now uses the datetime type instead of the
+  timestamp type for generic DateTimes.  It now uses bit for the
+  TrueClass and FalseClass generic types, and image for the File
+  generic type.
+
+* Sequel now unescapes URL parts:
+
+    Sequel.connect(ado:///db?host=server%5cinstance)
+
+  However, this can break backward compatibility if you previously
+  expected it not to be unescaped.
+
+* The columns_for private SQLite Database method has been removed.
