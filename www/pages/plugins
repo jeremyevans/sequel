@@ -15,6 +15,7 @@
 <li><a href="rdoc-plugins/classes/Sequel/Plugins/Serialization.html">serialization</a>: Supports serializing column values and storing them as either marshal, yaml, or json in the database.</li>
 <li><a href="rdoc-plugins/classes/Sequel/Plugins/SingleTableInheritance.html">single_table_inheritance</a>: Sets up STI by making subclasses of this model only load rows that match the class, and returning instances of the subclasses.</li>
 <li><a href="rdoc-plugins/classes/Sequel/Plugins/TacticalEagerLoading.html">tactical_eager_loading</a>: Allows you to eagerly load an association for all objects retreived from the same dataset when calling the association method on any of the objects in the dataset.</li>
+<li><a href='rdoc-plugins/classes/Sequel/Plugins/Timestamps.html'>timestamps</a>: Creates hooks for automatically setting create and update timestamps.</li>
 <li><a href="rdoc-plugins/classes/Sequel/Plugins/ValidationClassMethods.html">validation_class_methods</a>: Adds backwards compatibility for the legacy class-level validation methods (e.g. validates_presence_of :column).</li>
 <li><a href="rdoc-plugins/classes/Sequel/Plugins/ValidationHelpers.html">validation_helpers</a>: The preferred default validations plugin, which uses instance-level methods.</li>
 </ul>
@@ -28,8 +29,6 @@
 <li><a href='http://github.com/boof/sequel_notnaughty'>sequel_notnaughty</a>: Port of the NotNaughty validation framework.</li>
 <li><a href='http://github.com/jackdempsey/sequel_polymorphic'>sequel_polymorphic</a>: Lets you easily create polymorphic associations.</li>
 <li><a href='http://github.com/jackdempsey/sequel_taggable'>sequel_taggable</a>: Allows easily adding tags to any model.</li>
-<li><a href='http://github.com/bricooke/sequel_timestamped'>sequel_timestamped</a>: Adds support for autotimestamped created_at and updated_at columns if they exist.</li>
-<li><a href='http://github.com/sbfaulkner/sequel_timestamped'>sequel_timestamped</a> (2): Another take on timestamping.</li>
 </ul>
 
 <h2>Sequel Extensions</h2>
