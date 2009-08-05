@@ -540,6 +540,22 @@ module Sequel
 
       to_s_method :column_all_sql
     end
+    
+    # Represents constants or psuedo-constants (e.g. CURRENT_DATE) in SQL
+    class Constant < GenericExpression
+      # Create an object with the given table
+      def initialize(constant)
+        @constant = constant
+      end
+      
+      to_s_method :constant_sql, '@constant'
+    end
+    
+    module Constants
+      CURRENT_DATE = Constant.new(:CURRENT_DATE)
+      CURRENT_TIME = Constant.new(:CURRENT_TIME)
+      CURRENT_TIMESTAMP = Constant.new(:CURRENT_TIMESTAMP)
+    end
 
     # Represents an SQL function call.
     class Function < GenericExpression
@@ -912,4 +928,6 @@ module Sequel
     include SQL::StringMethods
     include SQL::InequalityMethods
   end
+  
+  include SQL::Constants
 end

@@ -419,3 +419,42 @@ if INTEGRATION_DB.dataset.supports_window_functions?
     end
   end
 end
+
+describe Sequel::SQL::Constants do
+  before do
+    @db = INTEGRATION_DB
+    @ds = @db[:constants]
+    @c = proc do |v|
+      case v
+      when Time
+        v
+      when DateTime, String
+        Time.parse(v.to_s)
+      else
+        v
+      end
+    end
+    @c2 = proc{|v| v.is_a?(Date) ? v : Date.parse(v) }
+  end
+  after do
+    @db.drop_table(:constants)
+  end
+  
+  it "should have working CURRENT_DATE" do
+    @db.create_table!(:constants){Date :d}
+    @ds.insert(:d=>Sequel::CURRENT_DATE)
+    Date.today.should == @c2[@ds.get(:d)]
+  end
+
+  it "should have working CURRENT_TIME" do
+    @db.create_table!(:constants){Time :t, :only_time=>true}
+    @ds.insert(:t=>Sequel::CURRENT_TIME)
+    (Time.now - @c[@ds.get(:t)]).should be_close(0, 1)
+  end
+
+  it "should have working CURRENT_TIMESTAMP" do
+    @db.create_table!(:constants){DateTime :ts}
+    @ds.insert(:ts=>Sequel::CURRENT_TIMESTAMP)
+    (Time.now - @c[@ds.get(:ts)]).should be_close(0, 1)
+  end
+end

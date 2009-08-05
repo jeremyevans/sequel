@@ -2986,3 +2986,24 @@ context "Sequel::Dataset #with and #with_recursive" do
     proc{@ds.with_recursive(:t, @db[:x], @db[:t], :args=>[:b, :c])}.should raise_error(Sequel::Error)
   end
 end
+
+describe Sequel::SQL::Constants do
+  before do
+    @db = MockDatabase.new
+  end
+  
+  it "should have CURRENT_DATE" do
+    @db.literal(Sequel::SQL::Constants::CURRENT_DATE) == 'CURRENT_DATE'
+    @db.literal(Sequel::CURRENT_DATE) == 'CURRENT_DATE'
+  end
+
+  it "should have CURRENT_TIME" do
+    @db.literal(Sequel::SQL::Constants::CURRENT_TIME) == 'CURRENT_TIME'
+    @db.literal(Sequel::CURRENT_TIME) == 'CURRENT_TIME'
+  end
+
+  it "should have CURRENT_TIMESTAMP" do
+    @db.literal(Sequel::SQL::Constants::CURRENT_TIMESTAMP) == 'CURRENT_TIMESTAMP'
+    @db.literal(Sequel::CURRENT_TIMESTAMP) == 'CURRENT_TIMESTAMP'
+  end
+end

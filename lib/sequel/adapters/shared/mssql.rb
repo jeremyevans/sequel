@@ -148,6 +148,7 @@ module Sequel
       SELECT_CLAUSE_ORDER = %w'with limit distinct columns from table_options join where group order having compounds'.freeze
       TIMESTAMP_FORMAT = "'%Y-%m-%d %H:%M:%S'".freeze
       WILDCARD = LiteralString.new('*').freeze
+      CONSTANT_MAP = {:CURRENT_DATE=>'CAST(CURRENT_TIMESTAMP AS DATE)'.freeze, :CURRENT_TIME=>'CAST(CURRENT_TIMESTAMP AS TIME)'.freeze}
       
       # MSSQL uses + for string concatenation
       def complex_expression_sql(op, args)
@@ -157,6 +158,11 @@ module Sequel
         else
           super(op, args)
         end
+      end
+      
+      # MSSQL doesn't support the SQL standard CURRENT_DATE or CURRENT_TIME
+      def constant_sql(constant)
+        CONSTANT_MAP[constant] || super
       end
       
       # When returning all rows, if an offset is used, delete the row_number column

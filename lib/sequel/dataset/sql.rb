@@ -88,6 +88,11 @@ module Sequel
         raise(InvalidOperation, "invalid operator #{op}")
       end
     end
+    
+    # SQL fragment for constants
+    def constant_sql(constant)
+      constant.to_s
+    end
 
     # Returns the number of records in the dataset.
     def count
