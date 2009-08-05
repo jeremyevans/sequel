@@ -1,5 +1,7 @@
 === HEAD
 
+* Give a much more descriptive error message if the mysql.rb driver is detected (jeremyevans)
+
 * Make postgres adapter work with a modified postgres-pr that raises PGError (jeremyevans)
 
 * Make ODBC adapter respect Sequel.datetime_class (jeremyevans)
