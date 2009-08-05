@@ -1,5 +1,7 @@
 === HEAD
 
+* Make ODBC adapter respect Sequel.datetime_class (jeremyevans)
+
 * Add support for generic concepts of CURRENT_{DATE,TIME,TIMESTAMP} (jeremyevans)
 
 * Add a timestamps plugin for automatically creating hooks for create and update timestamps (jeremyevans)

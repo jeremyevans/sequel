@@ -128,9 +128,9 @@ module Sequel
         # ODBCColumn#mapSqlTypeToGenericType and Column#klass.
         case v
         when ::ODBC::TimeStamp
-          DateTime.new(v.year, v.month, v.day, v.hour, v.minute, v.second)
+          Sequel.datetime_class.send(Sequel.datetime_class == Time ? :mktime : :new, v.year, v.month, v.day, v.hour, v.minute, v.second)
         when ::ODBC::Time
-          now = DateTime.now
+          now = Time.now
           Time.gm(now.year, now.month, now.day, v.hour, v.minute, v.second)
         when ::ODBC::Date
           Date.new(v.year, v.month, v.day)
