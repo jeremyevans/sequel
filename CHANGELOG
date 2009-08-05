@@ -1,5 +1,7 @@
 === HEAD
 
+* Make postgres adapter work with a modified postgres-pr that raises PGError (jeremyevans)
+
 * Make ODBC adapter respect Sequel.datetime_class (jeremyevans)
 
 * Add support for generic concepts of CURRENT_{DATE,TIME,TIMESTAMP} (jeremyevans)

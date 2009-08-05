@@ -65,6 +65,11 @@ rescue LoadError => e
       unless defined?(CONNECTION_OK)
         CONNECTION_OK = -1
       end
+      unless method_defined?(:status)
+        def status
+          CONNECTION_OK
+        end
+      end
     end
     class PGresult 
       alias_method :nfields, :num_fields unless method_defined?(:nfields) 
