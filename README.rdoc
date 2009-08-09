@@ -327,7 +327,7 @@ Which is equivalent to the SQL:
 When retrieving records from joined datasets, you get the results in a single hash, which is subject to clobbering if you have columns with the same name in multiple tables:
 
   DB[:items].join(:order_items, :item_id => :id).first
-  => {:id=>order_items.id), :item_id=>order_items.item_id}
+  => {:id=>order_items.id, :item_id=>order_items.item_id}
 
 Using graph, you can split the result hashes into subhashes, one per join:
 
