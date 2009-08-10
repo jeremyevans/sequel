@@ -463,12 +463,12 @@ describe "Sequel::Dataset#import and #multi_insert" do
   before do
     @db = INTEGRATION_DB
     @db.create_table!(:imp){Integer :i}
-    @db.create_table!(:exp){Integer :i}
+    @db.create_table!(:exp2){Integer :i}
     @ids = @db[:imp].order(:i)
-    @eds = @db[:exp]
+    @eds = @db[:exp2]
   end
   after do
-    @db.drop_table(:imp, :exp)
+    @db.drop_table(:imp, :exp2)
   end
 
   it "should import with multi_insert and an array of hashes" do
