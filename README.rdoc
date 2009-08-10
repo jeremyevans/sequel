@@ -327,7 +327,7 @@ Which is equivalent to the SQL:
 When retrieving records from joined datasets, you get the results in a single hash, which is subject to clobbering if you have columns with the same name in multiple tables:
 
   DB[:items].join(:order_items, :item_id => :id).first
-  => {:id=>order_items.id), :item_id=>order_items.item_id}
+  => {:id=>order_items.id, :item_id=>order_items.item_id}
 
 Using graph, you can split the result hashes into subhashes, one per join:
 
@@ -518,7 +518,7 @@ many_to_one creates a getter and setter for each model object:
   post.author = Author[:name => 'Sharon']
   post.author
 
-one_to_many and many_to_many create a getter method, a method for adding an object to the association, a method for removing an object from the association, and a method for removing all associated objected from the association:
+one_to_many and many_to_many create a getter method, a method for adding an object to the association, a method for removing an object from the association, and a method for removing all associated objects from the association:
 
   class Post < Sequel::Model
     one_to_many :comments
@@ -539,10 +539,10 @@ one_to_many and many_to_many create a getter method, a method for adding an obje
 All associations add a dataset method that can be used to further filter or reorder the returned objects, or modify all of them:
 
   # Delete all of this post's comments from the database
-  Post.comments_dataset.destroy
+  post.comments_dataset.destroy
 
   # Return all tags related to this post with no subscribers, ordered by the tag's name
-  Post.tags_dataset.filter(:subscribers=>0).order(:name).all
+  post.tags_dataset.filter(:subscribers=>0).order(:name).all
 
 === Eager Loading
 
