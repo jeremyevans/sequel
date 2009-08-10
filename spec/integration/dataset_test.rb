@@ -164,7 +164,7 @@ describe Sequel::Database do
   end
 end
 
-context "An SQLite dataset" do
+context Sequel::Dataset do
   before do
     INTEGRATION_DB.create_table! :items do
       primary_key :id 
@@ -456,5 +456,34 @@ describe Sequel::SQL::Constants do
     @db.create_table!(:constants){DateTime :ts}
     @ds.insert(:ts=>Sequel::CURRENT_TIMESTAMP)
     (Time.now - @c[@ds.get(:ts)]).should be_close(0, 1)
+  end
+end
+
+describe "Sequel::Dataset#import and #multi_insert" do
+  before do
+    @db = INTEGRATION_DB
+    @db.create_table!(:imp){Integer :i}
+    @db.create_table!(:exp){Integer :i}
+    @ids = @db[:imp].order(:i)
+    @eds = @db[:exp]
+  end
+  after do
+    @db.drop_table(:imp, :exp)
+  end
+
+  it "should import with multi_insert and an array of hashes" do
+    @ids.multi_insert([{:i=>10}, {:i=>20}])
+    @ids.all.should == [{:i=>10}, {:i=>20}]
+  end
+
+  it "should import with an array of arrays of values" do
+    @ids.import([:i], [[10], [20]])
+    @ids.all.should == [{:i=>10}, {:i=>20}]
+  end
+
+  it "should import with a dataset" do
+    @eds.import([:i], [[10], [20]])
+    @ids.import([:i], @eds)
+    @ids.all.should == [{:i=>10}, {:i=>20}]
   end
 end

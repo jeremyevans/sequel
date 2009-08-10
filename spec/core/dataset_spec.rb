@@ -2254,7 +2254,7 @@ context "Dataset#import" do
     @ds.import([:x, :y], @ds2)
     @db.sqls.should == [
       'BEGIN',
-      "INSERT INTO items (x, y) VALUES (SELECT a, b FROM cats WHERE (purr IS TRUE))",
+      "INSERT INTO items (x, y) SELECT a, b FROM cats WHERE (purr IS TRUE)",
       'COMMIT'
     ]
   end
