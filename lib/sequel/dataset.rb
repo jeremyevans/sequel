@@ -175,6 +175,10 @@ module Sequel
     
     # Iterates over the records in the dataset as they are yielded from the
     # database adapter, and returns self.
+    #
+    # Note that this method is not safe to use on many adapters if you are
+    # running additional queries inside the provided block.  If you are
+    # running queries inside the block, you use should all instead of each.
     def each(&block)
       if @opts[:graph]
         graph_each(&block)
