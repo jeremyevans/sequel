@@ -1,5 +1,9 @@
 === HEAD
 
+* Make Database#schema on JDBC include a :column_size entry specifying the maximum length/precision for the column (jfirebaugh)
+
+* Make Database#schema on JDBC accept a :schema option (dlee)
+
 * Fix Dataset#import when called with a dataset (jeremyevans)
 
 * Give a much more descriptive error message if the mysql.rb driver is detected (jeremyevans)

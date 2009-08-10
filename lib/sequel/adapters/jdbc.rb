@@ -348,12 +348,13 @@ module Sequel
         conn
       end
       
-      # All tables in this database
+      # Parse the table schema for the given table.
       def schema_parse_table(table, opts={})
         m = output_identifier_meth
         im = input_identifier_meth
         ds = dataset
         schema, table = schema_and_table(table)
+        schema ||= opts[:schema]
         schema = im.call(schema) if schema
         table = im.call(table)
         pks, ts = [], []
@@ -361,7 +362,7 @@ module Sequel
           pks << h[:column_name]
         end
         metadata(:getColumns, nil, schema, table, nil) do |h|
-          ts << [m.call(h[:column_name]), {:type=>schema_column_type(h[:type_name]), :db_type=>h[:type_name], :default=>(h[:column_def] == '' ? nil : h[:column_def]), :allow_null=>(h[:nullable] != 0), :primary_key=>pks.include?(h[:column_name])}]
+          ts << [m.call(h[:column_name]), {:type=>schema_column_type(h[:type_name]), :db_type=>h[:type_name], :default=>(h[:column_def] == '' ? nil : h[:column_def]), :allow_null=>(h[:nullable] != 0), :primary_key=>pks.include?(h[:column_name]), :column_size=>h[:column_size]}]
         end
         ts
       end
