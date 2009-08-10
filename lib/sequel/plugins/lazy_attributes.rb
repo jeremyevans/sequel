@@ -29,12 +29,24 @@ module Sequel
       end
       
       module ClassMethods
+        # Module to store the lazy attribute getter methods, so they can
+        # be overridden and call super to get the lazy attribute behavior
+        attr_accessor :lazy_attributes_module
+
         # Remove the given attributes from the list of columns selected by default.
         # For each attribute given, create an accessor method that allows a lazy
         # lookup of the attribute.  Each attribute should be given as a symbol.
         def lazy_attributes(*attrs)
           set_dataset(dataset.select(*(columns - attrs)))
-          attrs.each do |a|
+          attrs.each{|a| define_lazy_attribute_getter(a)}
+        end
+        
+        private
+
+        # Add a lazy attribute getter method to the lazy_attributes_module
+        def define_lazy_attribute_getter(a)
+          include(self.lazy_attributes_module ||= Module.new) unless lazy_attributes_module
+          lazy_attributes_module.class_eval do
             define_method(a) do
               if !values.include?(a) && !new?
                 lazy_attribute_lookup(a)

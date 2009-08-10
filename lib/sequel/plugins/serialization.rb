@@ -34,6 +34,10 @@ module Sequel
         # symbols, values are serialization formats (:marshal, :yaml, or :json).
         attr_reader :serialization_map
 
+        # Module to store the serialized column accessor methods, so they can
+        # call be overridden and call super to get the serialization behavior
+        attr_accessor :serialization_module
+
         # Copy the serialization format and columns to serialize into the subclass.
         def inherited(subclass)
           super
@@ -53,27 +57,37 @@ module Sequel
         def serialize_attributes(format, *columns)
           raise(Error, "Unsupported serialization format (#{format}), should be :marshal, :yaml, or :json") unless [:marshal, :yaml, :json].include?(format)
           raise(Error, "No columns given.  The serialization plugin requires you specify which columns to serialize") if columns.empty?
-          
-          columns.each do |column|
-            serialization_map[column] = format
-            define_method(column) do 
-              if deserialized_values.has_key?(column)
-                deserialized_values[column]
-              else
-                deserialized_values[column] = deserialize_value(column, @values[column])
-              end
-            end
-            define_method("#{column}=") do |v| 
-              changed_columns << column unless changed_columns.include?(column)
-              deserialized_values[column] = v
-            end
-          end
+          define_serialized_attribute_accessor(format, *columns)
         end
         
         # The columns that will be serialized.  This is only for
         # backwards compatibility, use serialization_map in new code.
         def serialized_columns
           serialization_map.keys
+        end
+
+        private
+
+        # Add serializated attribute acessor methods to the serialization_module
+        def define_serialized_attribute_accessor(format, *columns)
+          m = self
+          include(self.serialization_module ||= Module.new) unless serialization_module
+          serialization_module.class_eval do
+            columns.each do |column|
+              m.serialization_map[column] = format
+              define_method(column) do 
+                if deserialized_values.has_key?(column)
+                  deserialized_values[column]
+                else
+                  deserialized_values[column] = deserialize_value(column, super())
+                end
+              end
+              define_method("#{column}=") do |v| 
+                changed_columns << column unless changed_columns.include?(column)
+                deserialized_values[column] = v
+              end
+            end
+          end
         end
       end
 

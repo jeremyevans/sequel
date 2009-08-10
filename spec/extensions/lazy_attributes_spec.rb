@@ -4,7 +4,7 @@ describe "Sequel::Plugins::LazyAttributes" do
   before do
     class ::LazyAttributesModel < Sequel::Model(:la)
       plugin :lazy_attributes
-      columns :id, :name
+      set_columns([:id, :name])
       meta_def(:columns){[:id, :name]}
       lazy_attributes :name
       meta_def(:columns){[:id]}
@@ -13,10 +13,11 @@ describe "Sequel::Plugins::LazyAttributes" do
         execute(sql)
         select = @opts[:select]
         where = @opts[:where]
+        block = @mod_block || proc{|s| s}
         if !where
           if select.include?(:name)
-            yield(:id=>1, :name=>'1')
-            yield(:id=>2, :name=>'2')
+            yield(block[:id=>1, :name=>'1'])
+            yield(block[:id=>2, :name=>'2'])
           else
             yield(:id=>1)
             yield(:id=>2)
@@ -26,9 +27,9 @@ describe "Sequel::Plugins::LazyAttributes" do
           i = i.instance_variable_get(:@array) if i.is_a?(Sequel::SQL::SQLArray)
           Array(i).each do |x|
             if sql =~ /SELECT name FROM/
-              yield(:name=>x.to_s)
+              yield(block[:name=>x.to_s])
             else
-              yield(:id=>x, :name=>x.to_s)
+              yield(block[:id=>x, :name=>x.to_s])
             end
           end
         end
@@ -108,6 +109,45 @@ describe "Sequel::Plugins::LazyAttributes" do
       ms.map{|m| m.name}.should == %w'1 2'
       ms.map{|m| m.values}.should == [{:id=>1, :name=>'1'}, {:id=>2, :name=>'2'}]
       MODEL_DB.sqls.should == ['SELECT id FROM la', 'SELECT id, name FROM la WHERE (id IN (1, 2))']
+    end
+  end
+
+  it "should add the accessors to a module included in the class, so they can be easily overridden" do
+    @c.class_eval do
+      def name
+        "#{super}-blah"
+      end
+    end
+    @c.with_identity_map do
+      ms = @c.all
+      ms.map{|m| m.values}.should == [{:id=>1}, {:id=>2}]
+      ms.map{|m| m.name}.should == %w'1-blah 2-blah'
+      ms.map{|m| m.values}.should == [{:id=>1, :name=>'1'}, {:id=>2, :name=>'2'}]
+      MODEL_DB.sqls.should == ['SELECT id FROM la', 'SELECT id, name FROM la WHERE (id IN (1, 2))']
+    end
+  end
+
+  it "should work with the serialization plugin" do
+    @c.plugin :serialization, :yaml, :name
+    @ds.instance_variable_set(:@mod_block, proc{|s| s.merge(:name=>"--- #{s[:name].to_i*3}\n")})
+    @c.with_identity_map do
+      ms = @ds.all
+      ms.map{|m| m.values}.should == [{:id=>1}, {:id=>2}]
+      ms.map{|m| m.name}.should == [3,6]
+      ms.map{|m| m.values}.should == [{:id=>1, :name=>"--- 3\n"}, {:id=>2, :name=>"--- 6\n"}]
+      ms.map{|m| m.deserialized_values}.should == [{:name=>3}, {:name=>6}]
+      ms.map{|m| m.name}.should == [3,6]
+      MODEL_DB.sqls.should == ['SELECT id FROM la', 'SELECT id, name FROM la WHERE (id IN (1, 2))']
+    end
+    MODEL_DB.reset
+    @c.with_identity_map do
+      m = @ds.first
+      m.values.should == {:id=>1}
+      m.name.should == 3
+      m.values.should == {:id=>1, :name=>"--- 3\n"}
+      m.deserialized_values.should == {:name=>3}
+      m.name.should == 3
+      MODEL_DB.sqls.should == ["SELECT id FROM la LIMIT 1", "SELECT name FROM la WHERE (id = 1) LIMIT 1"]
     end
   end
 end

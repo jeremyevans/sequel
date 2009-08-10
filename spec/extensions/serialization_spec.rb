@@ -183,4 +183,27 @@ describe "Serialization plugin" do
     lambda{o.send(:serialize_value, :abc, 1)}.should raise_error(Sequel::Error)
     lambda{o.send(:deserialize_value, :abc, "--- hello\n")}.should raise_error(Sequel::Error)
   end
+
+  it "should add the accessors to a module included in the class, so they can be easily overridden" do
+    @c.class_eval do
+      def abc
+        "#{super}-blah"
+      end
+    end
+    @c.plugin :serialization, :yaml, :abc
+    o = @c.load(:abc => "--- 1\n")
+    o.abc.should == "1-blah"
+  end
+
+  it "should call super to get the deserialized value from a previous accessor" do
+    m = Module.new do
+      def abc
+        "--- #{@values[:abc]*3}\n"
+      end
+    end
+    @c.send(:include, m)
+    @c.plugin :serialization, :yaml, :abc
+    o = @c.load(:abc => 3)
+    o.abc.should == 9
+  end
 end
