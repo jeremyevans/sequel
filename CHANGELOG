@@ -1,5 +1,7 @@
 === HEAD
 
+* Refactor the inflection support and modify the default inflections (jeremyevans, dlee)
+
 * Make the serialization and lazy_attribute plugins add accessor methods to modules included in the class (jeremyevans)
 
 * Make Database#schema on JDBC include a :column_size entry specifying the maximum length/precision for the column (jfirebaugh)

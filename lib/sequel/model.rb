@@ -102,7 +102,7 @@ module Sequel
     @use_transactions = true
   end
 
-  require %w"inflections plugins base exceptions errors", "model"
+  require %w"default_inflections inflections plugins base exceptions errors", "model"
   if !defined?(::SEQUEL_NO_ASSOCIATIONS) && !ENV.has_key?('SEQUEL_NO_ASSOCIATIONS')
     require 'associations', 'model'
     Model.plugin Model::Associations

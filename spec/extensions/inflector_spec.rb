@@ -48,16 +48,16 @@ describe String do
 
   it "#pluralize should transform words from singular to plural" do
     "post".pluralize.should == "posts"
-    "octopus".pluralize.should =="octopi"
+    "octopus".pluralize.should =="octopuses"
     "the blue mailman".pluralize.should == "the blue mailmen"
-    "CamelOctopus".pluralize.should == "CamelOctopi"
+    "CamelOctopus".pluralize.should == "CamelOctopuses"
   end
   
   it "#singularize should transform words from plural to singular" do
     "posts".singularize.should == "post"
-    "octopi".singularize.should == "octopus"
+    "octopuses".singularize.should == "octopus"
     "the blue mailmen".singularize.should == "the blue mailman"
-    "CamelOctopi".singularize.should == "CamelOctopus"
+    "CamelOctopuses".singularize.should == "CamelOctopus"
   end
   
   it "#tableize should transform class names to table names" do
@@ -115,5 +115,68 @@ describe String::Inflections do
 
   it "should be yielded and returned by String.inflections" do
     String.inflections{|i| i.should == String::Inflections}.should == String::Inflections
+  end
+end
+
+describe 'Default inflections' do
+  it "should support the default inflection rules" do
+    {
+      :test=>:tests,
+      :ax=>:axes,
+      :testis=>:testes,
+      :octopus=>:octopuses,
+      :virus=>:viruses,
+      :alias=>:aliases,
+      :status=>:statuses,
+      :bus=>:buses,
+      :buffalo=>:buffaloes,
+      :tomato=>:tomatoes,
+      :datum=>:data,
+      :bacterium=>:bacteria,
+      :analysis=>:analyses,
+      :basis=>:bases,
+      :diagnosis=>:diagnoses,
+      :parenthesis=>:parentheses,
+      :prognosis=>:prognoses,
+      :synopsis=>:synopses,
+      :thesis=>:theses,
+      :wife=>:wives,
+      :giraffe=>:giraffes,
+      :self=>:selves,
+      :dwarf=>:dwarves,
+      :hive=>:hives,
+      :fly=>:flies,
+      :buy=>:buys,
+      :soliloquy=>:soliloquies,
+      :day=>:days,
+      :attorney=>:attorneys,
+      :boy=>:boys,
+      :hoax=>:hoaxes,
+      :lunch=>:lunches,
+      :princess=>:princesses,
+      :matrix=>:matrices,
+      :vertex=>:vertices,
+      :index=>:indices,
+      :mouse=>:mice,
+      :louse=>:lice,
+      :ox=>:oxen,
+      :quiz=>:quizzes,
+      :motive=>:motives,
+      :movie=>:movies,
+      :series=>:series,
+      :crisis=>:crises,
+      :person=>:people,
+      :man=>:men,
+      :woman=>:women,
+      :child=>:children,
+      :sex=>:sexes,
+      :move=>:moves
+    }.each do |k, v|
+      k.to_s.pluralize.should == v.to_s
+      v.to_s.singularize.should == k.to_s
+    end
+    [:equipment, :information, :rice, :money, :species, :series, :fish, :sheep, :news].each do |a|
+      a.to_s.pluralize.should == a.to_s.singularize
+    end
   end
 end
