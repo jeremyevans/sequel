@@ -1,5 +1,7 @@
 === HEAD
 
+* Make JDBC adapter prepared statements support booleans, and raise errors for unsupported types (jfirebaugh)
+
 * Refactor the inflection support and modify the default inflections (jeremyevans, dlee)
 
 * Make the serialization and lazy_attribute plugins add accessor methods to modules included in the class (jeremyevans)
