@@ -924,6 +924,8 @@ module Sequel
         Date.new(value.year, value.month, value.day)
       when String
         Sequel.string_to_date(value)
+      when Hash
+        Date.new(*[:year, :month, :day].map{|x| (value[x] || value[x.to_s]).to_i})
       else
         raise InvalidValue, "invalid value for Date: #{value.inspect}"
       end
@@ -931,10 +933,13 @@ module Sequel
 
     # Typecast the value to a DateTime or Time depending on Sequel.datetime_class
     def typecast_value_datetime(value)
-      raise(Sequel::InvalidValue, "invalid value for Datetime: #{value.inspect}") unless [DateTime, Date, Time, String].any?{|c| value.is_a?(c)}
-      if Sequel.datetime_class === value
+      raise(Sequel::InvalidValue, "invalid value for Datetime: #{value.inspect}") unless [DateTime, Date, Time, String, Hash].any?{|c| value.is_a?(c)}
+      klass = Sequel.datetime_class
+      if value.is_a?(klass)
         # Already the correct class, no need to convert
        value
+      elsif value.is_a?(Hash)
+        klass.send(klass == Time ? :mktime : :new, *[:year, :month, :day, :hour, :minute, :second].map{|x| (value[x] || value[x.to_s]).to_i})
       else
         # First convert it to standard ISO 8601 time, then
         # parse that string using the time class.
@@ -976,6 +981,9 @@ module Sequel
         value
       when String
         Sequel.string_to_time(value)
+      when Hash
+        t = Time.now
+        Time.mktime(t.year, t.month, t.day, *[:hour, :minute, :second].map{|x| (value[x] || value[x.to_s]).to_i})
       else
         raise Sequel::InvalidValue, "invalid value for Time: #{value.inspect}"
       end

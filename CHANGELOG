@@ -1,5 +1,7 @@
 === HEAD
 
+* Accept a hash when typecasting values to date, time, and datetime types (jeremyevans)
+
 * Make JDBC adapter prepared statements support booleans, and raise errors for unsupported types (jfirebaugh)
 
 * Refactor the inflection support and modify the default inflections (jeremyevans, dlee)

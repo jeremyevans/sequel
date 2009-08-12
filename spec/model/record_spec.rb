@@ -1120,6 +1120,16 @@ describe Sequel::Model, "typecasting" do
     m.x.should == y
   end
 
+  specify "should accept a hash with symbol or string keys for a date field" do
+    @c.instance_variable_set(:@db_schema, {:x=>{:type=>:date}})
+    m = @c.new
+    y = Date.new(2007,10,21)
+    m.x = {:year=>2007, :month=>10, :day=>21}
+    m.x.should == y
+    m.x = {'year'=>'2007', 'month'=>'10', 'day'=>'21'}
+    m.x.should == y
+  end
+
   specify "should raise an error if invalid data is used in a date field" do
     @c.instance_variable_set(:@db_schema, {:x=>{:type=>:date}})
     proc{@c.new.x = 'a'}.should raise_error(Sequel::InvalidValue)
@@ -1142,6 +1152,16 @@ describe Sequel::Model, "typecasting" do
     m.x = x
     m.x.should == y
     m.x = y
+    m.x.should == y
+  end
+
+  specify "should accept a hash with symbol or string keys for a time field" do
+    @c.instance_variable_set(:@db_schema, {:x=>{:type=>:time}})
+    m = @c.new
+    y = Time.parse('10:20:30')
+    m.x = {:hour=>10, :minute=>20, :second=>30}
+    m.x.should == y
+    m.x = {'hour'=>'10', 'minute'=>'20', 'second'=>'30'}
     m.x.should == y
   end
 
@@ -1184,6 +1204,22 @@ describe Sequel::Model, "typecasting" do
     m.x.should == y
     m.x = Date.parse('2007-10-21')
     m.x.should == DateTime.parse('2007-10-21')
+  end
+
+  specify "should accept a hash with symbol or string keys for a datetime field" do
+    @c.instance_variable_set(:@db_schema, {:x=>{:type=>:datetime}})
+    m = @c.new
+    y = Time.parse('2007-10-21 10:20:30')
+    m.x = {:year=>2007, :month=>10, :day=>21, :hour=>10, :minute=>20, :second=>30}
+    m.x.should == y
+    m.x = {'year'=>'2007', 'month'=>'10', 'day'=>'21', 'hour'=>'10', 'minute'=>'20', 'second'=>'30'}
+    m.x.should == y
+    Sequel.datetime_class = DateTime
+    y = DateTime.parse('2007-10-21 10:20:30')
+    m.x = {:year=>2007, :month=>10, :day=>21, :hour=>10, :minute=>20, :second=>30}
+    m.x.should == y
+    m.x = {'year'=>'2007', 'month'=>'10', 'day'=>'21', 'hour'=>'10', 'minute'=>'20', 'second'=>'30'}
+    m.x.should == y
   end
 
   specify "should raise an error if invalid data is used in a datetime field" do
