@@ -332,8 +332,12 @@ module Sequel
           cps.setTimestamp(i, arg)
         when Float
           cps.setDouble(i, arg)
+        when TrueClass, FalseClass
+          cps.setBoolean(i, arg)
         when nil
           cps.setNull(i, JavaSQL::Types::NULL)
+        else
+          raise "Cannot bind prepared statement argument #{arg} (#{arg.class})"
         end
       end
       
