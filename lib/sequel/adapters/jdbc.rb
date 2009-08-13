@@ -337,7 +337,7 @@ module Sequel
         when nil
           cps.setNull(i, JavaSQL::Types::NULL)
         else
-          raise Sequel::Error, "Cannot bind prepared statement argument #{arg} (#{arg.class})"
+          cps.setObject(i, arg)
         end
       end
       
