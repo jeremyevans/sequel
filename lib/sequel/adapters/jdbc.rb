@@ -324,6 +324,8 @@ module Sequel
         case arg
         when Integer
           cps.setInt(i, arg)
+        when Sequel::SQL::Blob
+          cps.setBytes(i, arg.to_java_bytes)
         when String
           cps.setString(i, arg)
         when Date, Java::JavaSql::Date
@@ -473,6 +475,8 @@ module Sequel
           lines.join("\n")
         when Java::JavaMath::BigDecimal
           BigDecimal.new(v.to_string)
+        when Java::byte[]
+          Sequel::SQL::Blob.new(String.from_java_bytes(v))
         else
           v
         end
