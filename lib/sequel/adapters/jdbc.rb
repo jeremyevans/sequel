@@ -197,10 +197,15 @@ module Sequel
       # Values are subhashes with two keys, :columns and :unique.  The value of :columns
       # is an array of symbols of column names.  The value of :unique is true or false
       # depending on if the index is unique.
-      def indexes(table)
-        indexes = {}
+      def indexes(table, opts={})
         m = output_identifier_meth
-        metadata(:getIndexInfo, nil, nil, input_identifier_meth.call(table), false, true) do |r|
+        im = input_identifier_meth
+        schema, table = schema_and_table(table)
+        schema ||= opts[:schema]
+        schema = im.call(schema) if schema
+        table = im.call(table)
+        indexes = {}
+        metadata(:getIndexInfo, nil, schema, table, false, true) do |r|
           next unless name = r[:column_name]
           next if respond_to?(:primary_key_index_re, true) and r[:index_name] =~ primary_key_index_re 
           i = indexes[m.call(r[:index_name])] ||= {:columns=>[], :unique=>[false, 0].include?(r[:non_unique])}
