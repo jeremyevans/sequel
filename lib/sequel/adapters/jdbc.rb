@@ -203,7 +203,7 @@ module Sequel
         metadata(:getIndexInfo, nil, nil, input_identifier_meth.call(table), false, true) do |r|
           next unless name = r[:column_name]
           next if respond_to?(:primary_key_index_re, true) and r[:index_name] =~ primary_key_index_re 
-          i = indexes[m.call(r[:index_name])] ||= {:columns=>[], :unique=>!r[:non_unique]}
+          i = indexes[m.call(r[:index_name])] ||= {:columns=>[], :unique=>[false, 0].include?(r[:non_unique])}
           i[:columns] << m.call(name)
         end
         indexes
