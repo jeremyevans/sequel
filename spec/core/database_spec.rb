@@ -286,21 +286,30 @@ context "Database#execute" do
   end
 end
 
-context "Database#<<" do
+context "Database#<< and run" do
   before do
+    sqls = @sqls = []
     @c = Class.new(Sequel::Database) do
-      define_method(:execute) {|sql, opts| sql}
+      define_method(:execute_ddl){|sql, *opts| sqls.clear; sqls << sql; sqls.concat(opts)}
     end
     @db = @c.new({})
   end
   
-  specify "should pass the supplied sql to #execute" do
-    (@db << "DELETE FROM items").should == "DELETE FROM items"
+  specify "should pass the supplied sql to #execute_ddl" do
+    (@db << "DELETE FROM items")
+    @sqls.should == ["DELETE FROM items", {}]
+    @db.run("DELETE FROM items2")
+    @sqls.should == ["DELETE FROM items2", {}]
   end
   
-  specify "should not remove comments and whitespace from strings" do
-    s = "INSERT INTO items VALUES ('---abc')"
-    (@db << s).should == s
+  specify "should return nil" do
+    (@db << "DELETE FROM items").should == nil
+    @db.run("DELETE FROM items").should == nil
+  end
+  
+  specify "should accept options passed to execute_ddl" do
+    @db.run("DELETE FROM items", :server=>:s1)
+    @sqls.should == ["DELETE FROM items", {:server=>:s1}]
   end
 end
 

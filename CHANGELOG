@@ -1,5 +1,7 @@
 === HEAD
 
+* Add Database#run method for executing arbitrary SQL on a database (jeremyevans)
+
 * Handle index parsing correctly for tables in a non-default schema on JDBC (jfirebaugh)
 
 * Handle unique index parsing correctly when connecting to MSSQL via JDBC (jfirebaugh)

@@ -234,9 +234,10 @@ module Sequel
     
     ### Instance Methods ###
 
-    # Executes the supplied SQL statement string.
+    # Runs the supplied SQL statement string on the database server.
+    # Alias for run.
     def <<(sql)
-      execute_ddl(sql)
+      run(sql)
     end
     
     # Returns a dataset from the database. If the first argument is a string,
@@ -427,6 +428,14 @@ module Sequel
     def quote_identifiers?
       return @quote_identifiers unless @quote_identifiers.nil?
       @quote_identifiers = @opts.include?(:quote_identifiers) ? @opts[:quote_identifiers] : (@@quote_identifiers.nil? ? quote_identifiers_default : @@quote_identifiers)
+    end
+    
+    # Runs the supplied SQL statement string on the database server. Returns nil.
+    # Options:
+    # * :server - The server to run the SQL on.
+    def run(sql, opts={})
+      execute_ddl(sql, opts)
+      nil
     end
     
     # Returns a new dataset with the select method invoked.
