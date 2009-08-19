@@ -1,5 +1,7 @@
 === HEAD
 
+* Add support for converting Time/DateTime to local or UTC time upon storage, retrieval, or typecasting (jeremyevans)
+
 * Accept a hash when typecasting values to date, time, and datetime types (jeremyevans)
 
 * Make JDBC adapter prepared statements support booleans and potentially any type of object (jfirebaugh)

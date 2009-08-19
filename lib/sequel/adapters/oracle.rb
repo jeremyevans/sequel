@@ -129,7 +129,7 @@ module Sequel
       def literal_other(v)
         case v
         when OraDate
-          literal_time(Time.local(*v.to_a))
+          literal(Sequel.database_to_application_timestamp(v))
         else
           super
         end

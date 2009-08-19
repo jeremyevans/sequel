@@ -693,6 +693,11 @@ module Sequel
         ["#{insert_sql_base}#{source_list(@opts[:from])} (#{identifier_list(columns)}) VALUES #{values}"]
       end
       
+      # PostgreSQL supports timezones in literal timestamps
+      def supports_timestamp_timezones?
+        true
+      end
+      
       # PostgreSQL 8.4+ supports window functions
       def supports_window_functions?
         server_version >= 80400
@@ -716,11 +721,6 @@ module Sequel
         "'#{v.gsub(/[\000-\037\047\134\177-\377]/){|b| "\\#{("%o" % b[0..1].unpack("C")[0]).rjust(3, '0')}"}}'"
       end
 
-      # PostgreSQL supports fractional timestamps
-      def literal_datetime(v)
-        "#{v.strftime(PG_TIMESTAMP_FORMAT)}.#{sprintf("%06d", (v.sec_fraction * 86400000000).to_i)}'"
-      end
-
       # PostgreSQL uses FALSE for false values
       def literal_false
         BOOL_FALSE
@@ -734,11 +734,6 @@ module Sequel
       # PostgreSQL uses FALSE for false values
       def literal_true
         BOOL_TRUE
-      end
-
-      # PostgreSQL supports fractional times
-      def literal_time(v)
-        "#{v.strftime(PG_TIMESTAMP_FORMAT)}.#{sprintf("%06d",v.usec)}'"
       end
 
       # The order of clauses in the SELECT SQL statement

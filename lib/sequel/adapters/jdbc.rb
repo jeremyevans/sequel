@@ -464,7 +464,7 @@ module Sequel
       def convert_type(v)
         case v
         when Java::JavaSQL::Timestamp, Java::JavaSQL::Time
-          Sequel.string_to_datetime(v.to_string)
+          Sequel.database_to_application_timestamp(v.to_string)
         when Java::JavaSQL::Date
           Sequel.string_to_date(v.to_string)
         when Java::JavaIo::BufferedReader

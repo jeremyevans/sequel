@@ -228,6 +228,11 @@ module Sequel
         false
       end
       
+      # MSSQL supports timezones in literal timestamps
+      def supports_timestamp_timezones?
+        true
+      end
+      
       # MSSQL 2005+ supports window functions
       def supports_window_functions?
         true

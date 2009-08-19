@@ -202,7 +202,6 @@ module Sequel
       BOOL_FALSE = '0'.freeze
       NULL = LiteralString.new('NULL').freeze
       COMMA_SEPARATOR = ', '.freeze
-      FIREBIRD_TIMESTAMP_FORMAT = "TIMESTAMP '%Y-%m-%d %H:%M:%S".freeze
       SELECT_CLAUSE_ORDER = %w'with distinct limit columns from join where group having compounds order'.freeze
 
       # Yield all rows returned by executing the given SQL and converting
@@ -248,6 +247,10 @@ module Sequel
       def insert_select(*values)
         naked.clone(default_server_opts(:sql=>insert_returning_sql(nil, *values))).single_record
       end
+      
+      def requires_sql_standard_datetimes?
+        true
+      end
 
       # The order of clauses in the SELECT SQL statement
       def select_clause_order
@@ -273,16 +276,8 @@ module Sequel
         end
       end
 
-      def literal_datetime(v)
-        "#{v.strftime(FIREBIRD_TIMESTAMP_FORMAT)}.#{sprintf("%04d",(v.sec_fraction * 864000000))}'"
-      end
-
       def literal_false
         BOOL_FALSE
-      end
-
-      def literal_time(v)
-        "#{v.strftime(FIREBIRD_TIMESTAMP_FORMAT)}.#{sprintf("%04d",v.usec / 100)}'"
       end
 
       def literal_true

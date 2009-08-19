@@ -32,10 +32,10 @@ module Sequel
         db.busy_timeout(opts.fetch(:timeout, 5000))
         db.type_translation = true
         
-        # Handle datetime's with Sequel.datetime_class
+        # Handle datetimes with Sequel.datetime_class
         prok = proc do |t,v|
           v = Time.at(v.to_i).iso8601 if UNIX_EPOCH_TIME_FORMAT.match(v)
-          Sequel.string_to_datetime(v)
+          Sequel.database_to_application_timestamp(v)
         end
         db.translator.add_translator("timestamp", &prok)
         db.translator.add_translator("datetime", &prok)

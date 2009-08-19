@@ -89,9 +89,8 @@ module Sequel
     class Dataset < Sequel::Dataset
       BOOL_TRUE = '1'.freeze
       BOOL_FALSE = '0'.freeze
-      ODBC_TIMESTAMP_FORMAT = "{ts '%Y-%m-%d %H:%M:%S'}".freeze
-      ODBC_TIMESTAMP_FORMAT_USEC = "{ts '%Y-%m-%d %H:%M:%S.%%i'}".freeze
       ODBC_DATE_FORMAT = "{d '%Y-%m-%d'}".freeze
+      TIMESTAMP_FORMAT="{ts '%Y-%m-%d %H:%M:%S%N'}".freeze
 
       def fetch_rows(sql, &block)
         execute(sql) do |s|
@@ -110,14 +109,6 @@ module Sequel
       end
       
       private
-      
-      def _literal_datetime(v, usec)
-        if usec >= 1000
-          v.strftime(ODBC_TIMESTAMP_FORMAT_USEC) % (usec.to_f/1000).round
-        else
-          v.strftime(ODBC_TIMESTAMP_FORMAT)
-        end
-      end
 
       def convert_odbc_value(v)
         # When fetching a result set, the Ruby ODBC driver converts all ODBC 
@@ -128,23 +119,22 @@ module Sequel
         # ODBCColumn#mapSqlTypeToGenericType and Column#klass.
         case v
         when ::ODBC::TimeStamp
-          Sequel.datetime_class.send(Sequel.datetime_class == Time ? :mktime : :new, v.year, v.month, v.day, v.hour, v.minute, v.second)
+          Sequel.database_to_application_timestamp([v.year, v.month, v.day, v.hour, v.minute, v.second])
         when ::ODBC::Time
-          now = Time.now
-          Time.gm(now.year, now.month, now.day, v.hour, v.minute, v.second)
+          Sequel.database_to_application_timestamp([now.year, now.month, now.day, v.hour, v.minute, v.second])
         when ::ODBC::Date
           Date.new(v.year, v.month, v.day)
         else
           v
         end
       end
+      
+      def default_timestamp_format
+        TIMESTAMP_FORMAT
+      end
 
       def literal_date(v)
         v.strftime(ODBC_DATE_FORMAT)
-      end
-      
-      def literal_datetime(v)
-        _literal_datetime(v, v.sec_fraction * 86400000000)
       end
       
       def literal_false
@@ -153,10 +143,6 @@ module Sequel
       
       def literal_true
         BOOL_TRUE
-      end
-
-      def literal_time(v)
-        _literal_datetime(v, v.usec)
       end
     end
   end

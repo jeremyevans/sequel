@@ -29,7 +29,7 @@ module Sequel
       
       # Return datetime types as instances of Sequel.datetime_class
       def datetime(s)
-        Sequel.string_to_datetime(s)
+        Sequel.database_to_application_timestamp(s)
       end
       
       # Don't raise an error if the value is a string and the declared

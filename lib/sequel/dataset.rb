@@ -279,6 +279,16 @@ module Sequel
       true
     end
     
+    # Whether the dataset supports timezones in literal timestamps
+    def supports_timestamp_timezones?
+      false
+    end
+    
+    # Whether the dataset supports fractional seconds in literal timestamps
+    def supports_timestamp_usecs?
+      true
+    end
+    
     # Whether the dataset supports window functions.
     def supports_window_functions?
       false

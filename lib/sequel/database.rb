@@ -935,15 +935,10 @@ module Sequel
     def typecast_value_datetime(value)
       raise(Sequel::InvalidValue, "invalid value for Datetime: #{value.inspect}") unless [DateTime, Date, Time, String, Hash].any?{|c| value.is_a?(c)}
       klass = Sequel.datetime_class
-      if value.is_a?(klass)
-        # Already the correct class, no need to convert
-       value
-      elsif value.is_a?(Hash)
+      if value.is_a?(Hash)
         klass.send(klass == Time ? :mktime : :new, *[:year, :month, :day, :hour, :minute, :second].map{|x| (value[x] || value[x.to_s]).to_i})
       else
-        # First convert it to standard ISO 8601 time, then
-        # parse that string using the time class.
-        Sequel.string_to_datetime(Time === value ? value.iso8601 : value.to_s)
+        Sequel.typecast_to_application_timestamp(value)
       end
     end
 

@@ -99,7 +99,7 @@ module Sequel
       [790, 1700] => lambda{|s| BigDecimal.new(s)}, # numeric
       [1082] => lambda{|s| @use_iso_date_format ? Date.new(*s.split("-").map{|x| x.to_i}) : Sequel.string_to_date(s)}, # date
       [1083, 1266] => lambda{|s| Sequel.string_to_time(s)}, # time
-      [1114, 1184] => lambda{|s| Sequel.string_to_datetime(s)}, # timestamp
+      [1114, 1184] => lambda{|s| Sequel.database_to_application_timestamp(s)}, # timestamp
     }
     PG_TYPE_PROCS.each do |k,v|
       k.each{|n| PG_TYPES[n] = v}

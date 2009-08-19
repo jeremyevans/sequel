@@ -29,15 +29,58 @@
 #
 #   Sequel.datetime_class = DateTime
 #
+# Sequel doesn't pay much attention to timezones by default, but you can set it
+# handle timezones if you want.  There are three separate timezone settings:
+#
+# * application_timezone - The timezone you want the application to use.  This is
+#   the timezone that incoming times from the database and typecasting are converted
+#   to.
+# * database_timezone - The timezone for storage in the database.  This is the
+#   timezone to which Sequel will convert timestamps before literalizing them
+#   for storage in the database.  It is also the timezone that Sequel will assume
+#   database timestamp values are already in (if they don't include an offset).
+# * typecast_timezone - The timezone that incoming data that Sequel needs to typecast
+#   is assumed to be already in (if they don't include an offset).
+#
+# You can set also set all three timezones to the same value at once via
+# Sequel.default_timezone=.
+#
+#   Sequel.application_timezone = :utc # or :local or nil
+#   Sequel.database_timezone = :utc # or :local or nil
+#   Sequel.typecast_timezone = :utc # or :local or nil
+#   Sequel.default_timezone = :utc # or :local or nil
+#
+# The only timezone values that are supported by default are :utc (convert to UTC),
+# :local (convert to local time), and nil (don't convert).  If you need to
+# convert to a specific timezone, or need the timezones being used to change based
+# on the environment (e.g. current user), you need to use an extension (and use
+# DateTime as the datetime_class).
+#
 # You can set the SEQUEL_NO_CORE_EXTENSIONS constant or environment variable to have
 # Sequel not extend the core classes.
 module Sequel
+  # The offset of the current time zone from UTC, in seconds.
+  LOCAL_DATETIME_OFFSET_SECS = Time.now.utc_offset
+  
+  # The offset of the current time zone from UTC, as a fraction of a day.
+  LOCAL_DATETIME_OFFSET = respond_to?(:Rational, true) ? Rational(LOCAL_DATETIME_OFFSET_SECS, 60*60*24) : LOCAL_DATETIME_OFFSET_SECS/60/60/24.0
+  
+  @application_timezone = nil
   @convert_two_digit_years = true
+  @database_timezone = nil
   @datetime_class = Time
+  @typecast_timezone = nil
   @virtual_row_instance_eval = true
   
   class << self
     attr_accessor :convert_two_digit_years, :datetime_class, :virtual_row_instance_eval
+    attr_accessor :application_timezone, :database_timezone, :typecast_timezone
+  end
+  
+  # Convert the given Time/DateTime object into the database timezone, used when
+  # literalizing objects in an SQL string.
+  def self.application_to_database_timestamp(v)
+    convert_output_timestamp(v, Sequel.database_timezone)
   end
 
   # Returns true if the passed object could be a specifier of conditions, false otherwise.
@@ -71,6 +114,29 @@ module Sequel
   #   Sequel.connect('sqlite://blog.db'){|db| puts db[:users].count}  
   def self.connect(*args, &block)
     Database.connect(*args, &block)
+  end
+  
+  # Convert the given object into an object of Sequel.datetime_class in the
+  # application_timezone.  Used when coverting datetime/timestamp columns
+  # returned by the database.
+  def self.database_to_application_timestamp(v)
+    convert_timestamp(v, Sequel.database_timezone)
+  end
+  
+  # Sets the database, application, and typecasting timezones to the given timezone. 
+  def self.default_timezone=(tz)
+    self.database_timezone = tz
+    self.application_timezone = tz
+    self.typecast_timezone = tz
+  end
+  
+  # Load all Sequel extensions given.  Only loads extensions included in this
+  # release of Sequel, doesn't load external extensions.
+  #
+  #   Sequel.extension(:schema_dumper)
+  #   Sequel.extension(:pagination, :query)
+  def self.extension(*extensions)
+    require(extensions, 'extensions')
   end
   
   # Set the method to call on identifiers going into the database.  This affects
@@ -110,15 +176,6 @@ module Sequel
   #   Sequel.quote_identifiers = false
   def self.quote_identifiers=(value)
     Database.quote_identifiers = value
-  end
-
-  # Load all Sequel extensions given.  Only loads extensions included in this
-  # release of Sequel, doesn't load external extensions.
-  #
-  #   Sequel.extension(:schema_dumper)
-  #   Sequel.extension(:pagination, :query)
-  def self.extension(*extensions)
-    require(extensions, 'extensions')
   end
 
   # Require all given files which should be in the same or a subdirectory of
@@ -168,7 +225,14 @@ module Sequel
       raise InvalidValue, "Invalid Time value #{s.inspect} (#{e.message})"
     end
   end
-
+  
+  # Convert the given object into an object of Sequel.datetime_class in the
+  # application_timezone.  Used when typecasting values when assigning them
+  # to model datetime attributes.
+  def self.typecast_to_application_timestamp(v)
+    convert_timestamp(v, Sequel.typecast_timezone)
+  end
+  
   ### Private Class Methods ###
 
   # Helper method that the database adapter class methods that are added to Sequel via
@@ -184,6 +248,78 @@ module Sequel
     end
     connect(opts, &block)
   end
+  
+  # Converts the object from a String, Array, Date, DateTime, or Time into an
+  # instance of Sequel.datetime_class.  If a string and an offset is not given,
+  # assume that the string is already in the given input_timezone.
+  def self.convert_input_timestamp(v, input_timezone) # :nodoc:
+    case v
+    when String
+      v2 = Sequel.string_to_datetime(v)
+      if !input_timezone || Date._parse(v).has_key?(:offset)
+        v2
+      else
+        # Correct for potentially wrong offset if offset is given
+        if v2.is_a?(DateTime)
+          # DateTime assumes UTC if no offset is given
+          v2 = v2.new_offset(LOCAL_DATETIME_OFFSET) - LOCAL_DATETIME_OFFSET if input_timezone == :local
+        else
+          # Time assumes local time if no offset is given
+          v2 = v2.getutc + LOCAL_DATETIME_OFFSET_SECS if input_timezone == :utc
+        end
+        v2
+      end
+    when Array
+      y, mo, d, h, mi, s = v
+      if datetime_class == DateTime
+        DateTime.civil(y, mo, d, h, mi, s, input_timezone == :utc ? 0 : LOCAL_DATETIME_OFFSET)
+      else
+        Time.send(input_timezone == :utc ? :utc : :local, y, mo, d, h, mi, s)
+      end
+    when Time
+      if datetime_class == DateTime
+        v.respond_to?(:to_datetime) ? v.to_datetime : string_to_datetime(v.iso8601)
+      else
+        v
+      end
+    when DateTime
+      if datetime_class == DateTime
+        v
+      else
+        v.respond_to?(:to_time) ? v.to_time : string_to_datetime(v.to_s)
+      end
+    when Date
+      convert_input_timestamp(v.to_s, input_timezone)
+    else
+      raise InvalidValue, "Invalid convert_input_timestamp type: #{v.inspect}"
+    end
+  end
+  
+  # Converts the object to the given output_timezone.
+  def self.convert_output_timestamp(v, output_timezone) # :nodoc:
+    if output_timezone
+      if v.is_a?(DateTime)
+        v.new_offset(output_timezone == :utc ? 0 : LOCAL_DATETIME_OFFSET)
+      else
+        v.send(output_timezone == :utc ? :getutc : :getlocal)
+      end
+    else
+      v
+    end
+  end
+  
+  # Converts the given object from the given input timezone to the
+  # application timezone using convert_input_timestamp and
+  # convert_output_timestamp.
+  def self.convert_timestamp(v, input_timezone) # :nodoc:
+    begin
+      convert_output_timestamp(convert_input_timestamp(v, input_timezone), Sequel.application_timezone)
+    rescue InvalidValue
+      raise
+    rescue
+      raise InvalidValue, "Invalid #{datetime_class} value: #{v.inspect}"
+    end
+  end
 
   # Method that adds a database adapter class method to Sequel that calls
   # Sequel.adapter_method.
@@ -193,7 +329,7 @@ module Sequel
     end
   end
 
-  private_class_method :adapter_method, :def_adapter_method
+  private_class_method :adapter_method, :convert_input_timestamp, :convert_output_timestamp, :convert_timestamp, :def_adapter_method
   
   require(%w"metaprogramming sql connection_pool exceptions dataset database version")
   require(%w"schema_generator schema_methods schema_sql", 'database')

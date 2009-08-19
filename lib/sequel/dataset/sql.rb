@@ -17,6 +17,8 @@ module Sequel
     QUESTION_MARK = '?'.freeze
     STOCK_COUNT_OPTS = {:select => [SQL::AliasedExpression.new(LiteralString.new("COUNT(*)").freeze, :count)], :order => nil}.freeze
     SELECT_CLAUSE_ORDER = %w'with distinct columns from join where group having compounds order limit'.freeze
+    TIMESTAMP_FORMAT = "'%Y-%m-%d %H:%M:%S%N%z'".freeze
+    STANDARD_TIMESTAMP_FORMAT = "TIMESTAMP #{TIMESTAMP_FORMAT}".freeze
     TWO_ARITY_OPERATORS = ::Sequel::SQL::ComplexExpression::TWO_ARITY_OPERATORS
     WILDCARD = '*'.freeze
     SQL_WITH = "WITH ".freeze
@@ -974,6 +976,11 @@ module Sequel
       columns.map{|i| literal(i)}.join(COMMA_SEPARATOR)
     end
     
+    # The strftime format to use when literalizing the time.
+    def default_timestamp_format
+      requires_sql_standard_datetimes? ? STANDARD_TIMESTAMP_FORMAT : TIMESTAMP_FORMAT
+    end
+    
     # SQL fragment based on the expr type.  See #filter.
     def filter_expr(expr = nil, &block)
       expr = nil if expr == []
@@ -1006,6 +1013,27 @@ module Sequel
       else
         raise(Error, 'Invalid filter argument')
       end
+    end
+    
+    # Format the timestamp based on the default_timestamp_format, with a couple
+    # of modifiers.  First, allow %N to be used for fractions seconds (if the
+    # database supports them), and override %z to always use a numeric offset
+    # of hours and minutes.
+    def format_timestamp(v)
+      v2 = Sequel.application_to_database_timestamp(v)
+      fmt = default_timestamp_format.gsub(/%[Nz]/) do |m|
+        if m == '%N'
+          sprintf(".%06d", v.is_a?(DateTime) ? v.sec_fraction*86400000000 : v.usec) if supports_timestamp_usecs?
+        else
+          if supports_timestamp_timezones?
+            # Would like to just use %z format, but it doesn't appear to work on Windows
+            # Instead, the offset fragment is constructed manually
+            minutes = (v2.is_a?(DateTime) ? v2.offset * 1440 : v2.utc_offset/60).to_i
+            sprintf("%+03i%02i", *minutes.divmod(60))
+          end
+        end
+      end
+      v2.strftime(fmt)
     end
 
     # SQL fragment specifying a list of identifiers
@@ -1079,9 +1107,9 @@ module Sequel
       requires_sql_standard_datetimes? ? v.strftime("DATE '%Y-%m-%d'") : "'#{v}'"
     end
 
-    # SQL fragment for DateTime, using the ISO8601 format.
+    # SQL fragment for DateTime
     def literal_datetime(v)
-      requires_sql_standard_datetimes? ? v.strftime("TIMESTAMP '%Y-%m-%d %H:%M:%S'") : "'#{v}'"
+      format_timestamp(v)
     end
 
     # SQL fragment for SQL::Expression, result depends on the specific type of expression.
@@ -1133,12 +1161,12 @@ module Sequel
       c_alias ? as_sql(qc, c_alias) : qc
     end
 
-    # SQL fragment for Time, uses the ISO8601 format.
+    # SQL fragment for Time
     def literal_time(v)
-      requires_sql_standard_datetimes? ? v.strftime("TIMESTAMP '%Y-%m-%d %H:%M:%S'") : "'#{v.iso8601}'"
+      format_timestamp(v)
     end
 
-    # SQL fragment for true.
+    # SQL fragment for true
     def literal_true
       BOOL_TRUE
     end

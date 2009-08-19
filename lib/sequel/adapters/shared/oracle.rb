@@ -121,6 +121,11 @@ module Sequel
         false
       end
       
+      # Oracle supports timezones in literal timestamps.
+      def supports_timestamp_timezones?
+        true
+      end
+      
       # Oracle supports window functions
       def supports_window_functions?
         true

@@ -290,6 +290,12 @@ module Sequel
       def supports_is_true?
         false
       end
+      
+      # SQLite supports timezones in literal timestamps, since it stores them
+      # as text.
+      def supports_timestamp_timezones?
+        true
+      end
 
       private
       

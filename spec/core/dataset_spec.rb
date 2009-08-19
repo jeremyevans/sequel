@@ -753,14 +753,14 @@ context "Dataset#literal" do
   
   specify "should literalize Time properly" do
     t = Time.now
-    s = t.strftime("'%Y-%m-%dT%H:%M:%S%z'").gsub(/(\d\d')\z/, ':\1')
-    @dataset.literal(t).should == s
+    s = t.strftime("'%Y-%m-%d %H:%M:%S")
+    @dataset.literal(t).should == "#{s}.#{sprintf('%06i', t.usec)}'"
   end
   
   specify "should literalize DateTime properly" do
     t = DateTime.now
-    s = t.strftime("'%Y-%m-%dT%H:%M:%S%z'").gsub(/(\d\d')\z/, ':\1')
-    @dataset.literal(t).should == s
+    s = t.strftime("'%Y-%m-%d %H:%M:%S")
+    @dataset.literal(t).should == "#{s}.#{sprintf('%06i', t.sec_fraction* 86400000000)}'"
   end
   
   specify "should literalize Date properly" do
@@ -773,16 +773,50 @@ context "Dataset#literal" do
     @dataset.meta_def(:requires_sql_standard_datetimes?){true}
 
     t = Time.now
-    s = t.strftime("TIMESTAMP '%Y-%m-%d %H:%M:%S'")
-    @dataset.literal(t).should == s
+    s = t.strftime("TIMESTAMP '%Y-%m-%d %H:%M:%S")
+    @dataset.literal(t).should == "#{s}.#{sprintf('%06i', t.usec)}'"
 
     t = DateTime.now
-    s = t.strftime("TIMESTAMP '%Y-%m-%d %H:%M:%S'")
-    @dataset.literal(t).should == s
+    s = t.strftime("TIMESTAMP '%Y-%m-%d %H:%M:%S")
+    @dataset.literal(t).should == "#{s}.#{sprintf('%06i', t.sec_fraction* 86400000000)}'"
 
     d = Date.today
     s = d.strftime("DATE '%Y-%m-%d'")
     @dataset.literal(d).should == s
+  end
+  
+  specify "should literalize Time and DateTime properly if the database support timezones in timestamps" do
+    @dataset.meta_def(:supports_timestamp_timezones?){true}
+
+    t = Time.now.utc
+    s = t.strftime("'%Y-%m-%d %H:%M:%S")
+    @dataset.literal(t).should == "#{s}.#{sprintf('%06i', t.usec)}+0000'"
+
+    t = DateTime.now.new_offset(0)
+    s = t.strftime("'%Y-%m-%d %H:%M:%S")
+    @dataset.literal(t).should == "#{s}.#{sprintf('%06i', t.sec_fraction* 86400000000)}+0000'"
+  end
+  
+  specify "should literalize Time and DateTime properly if the database doesn't support usecs in timestamps" do
+    @dataset.meta_def(:supports_timestamp_usecs?){false}
+    
+    t = Time.now.utc
+    s = t.strftime("'%Y-%m-%d %H:%M:%S")
+    @dataset.literal(t).should == "#{s}'"
+
+    t = DateTime.now.new_offset(0)
+    s = t.strftime("'%Y-%m-%d %H:%M:%S")
+    @dataset.literal(t).should == "#{s}'"
+    
+    @dataset.meta_def(:supports_timestamp_timezones?){true}
+    
+    t = Time.now.utc
+    s = t.strftime("'%Y-%m-%d %H:%M:%S")
+    @dataset.literal(t).should == "#{s}+0000'"
+
+    t = DateTime.now.new_offset(0)
+    s = t.strftime("'%Y-%m-%d %H:%M:%S")
+    @dataset.literal(t).should == "#{s}+0000'"
   end
   
   specify "should not modify literal strings" do
@@ -3005,5 +3039,138 @@ describe Sequel::SQL::Constants do
   it "should have CURRENT_TIMESTAMP" do
     @db.literal(Sequel::SQL::Constants::CURRENT_TIMESTAMP) == 'CURRENT_TIMESTAMP'
     @db.literal(Sequel::CURRENT_TIMESTAMP) == 'CURRENT_TIMESTAMP'
+  end
+end
+
+describe "Sequel timezone support" do
+  before do
+    @db = MockDatabase.new
+    @dataset = @db.dataset
+    @dataset.meta_def(:supports_timestamp_timezones?){true}
+    @dataset.meta_def(:supports_timestamp_usecs?){false}
+    @offset = sprintf("%+03i%02i", *(Time.now.utc_offset/60).divmod(60))
+  end
+  after do
+    Sequel.default_timezone = nil
+    Sequel.datetime_class = Time
+  end
+  
+  specify "should handle an database timezone of :utc when literalizing values" do
+    Sequel.database_timezone = :utc
+
+    t = Time.now
+    s = t.getutc.strftime("'%Y-%m-%d %H:%M:%S")
+    @dataset.literal(t).should == "#{s}+0000'"
+
+    t = DateTime.now
+    s = t.new_offset(0).strftime("'%Y-%m-%d %H:%M:%S")
+    @dataset.literal(t).should == "#{s}+0000'"
+  end
+  
+  specify "should handle an database timezone of :local when literalizing values" do
+    Sequel.database_timezone = :local
+
+    t = Time.now.utc
+    s = t.getlocal.strftime("'%Y-%m-%d %H:%M:%S")
+    @dataset.literal(t).should == "#{s}#{@offset}'"
+
+    t = DateTime.now.new_offset(0)
+    s = t.new_offset(Sequel::LOCAL_DATETIME_OFFSET).strftime("'%Y-%m-%d %H:%M:%S")
+    @dataset.literal(t).should == "#{s}#{@offset}'"
+  end
+  
+  specify "should handle converting database timestamps into application timestamps" do
+    Sequel.database_timezone = :utc
+    Sequel.application_timezone = :local
+    t = Time.now.utc
+    Sequel.database_to_application_timestamp(t).to_s.should == t.getlocal.to_s
+    Sequel.database_to_application_timestamp(t.to_s).to_s.should == t.getlocal.to_s
+    Sequel.database_to_application_timestamp(t.strftime('%Y-%m-%d %H:%M:%S')).to_s.should == t.getlocal.to_s
+    
+    Sequel.datetime_class = DateTime
+    dt = DateTime.now
+    dt2 = dt.new_offset(0)
+    Sequel.database_to_application_timestamp(dt2).to_s.should == dt.to_s
+    Sequel.database_to_application_timestamp(dt2.to_s).to_s.should == dt.to_s
+    Sequel.database_to_application_timestamp(dt2.strftime('%Y-%m-%d %H:%M:%S')).to_s.should == dt.to_s
+    
+    Sequel.datetime_class = Time
+    Sequel.database_timezone = :local
+    Sequel.application_timezone = :utc
+    Sequel.database_to_application_timestamp(t.getlocal).to_s.should == t.to_s
+    Sequel.database_to_application_timestamp(t.getlocal.to_s).to_s.should == t.to_s
+    Sequel.database_to_application_timestamp(t.getlocal.strftime('%Y-%m-%d %H:%M:%S')).to_s.should == t.to_s
+    
+    Sequel.datetime_class = DateTime
+    Sequel.database_to_application_timestamp(dt).to_s.should == dt2.to_s
+    Sequel.database_to_application_timestamp(dt.to_s).to_s.should == dt2.to_s
+    Sequel.database_to_application_timestamp(dt.strftime('%Y-%m-%d %H:%M:%S')).to_s.should == dt2.to_s
+  end
+  
+  specify "should handle typecasting timestamp columns" do
+    Sequel.typecast_timezone = :utc
+    Sequel.application_timezone = :local
+    t = Time.now.utc
+    @db.typecast_value(:datetime, t).to_s.should == t.getlocal.to_s
+    @db.typecast_value(:datetime, t.to_s).to_s.should == t.getlocal.to_s
+    @db.typecast_value(:datetime, t.strftime('%Y-%m-%d %H:%M:%S')).to_s.should == t.getlocal.to_s
+    
+    Sequel.datetime_class = DateTime
+    dt = DateTime.now
+    dt2 = dt.new_offset(0)
+    @db.typecast_value(:datetime, dt2).to_s.should == dt.to_s
+    @db.typecast_value(:datetime, dt2.to_s).to_s.should == dt.to_s
+    @db.typecast_value(:datetime, dt2.strftime('%Y-%m-%d %H:%M:%S')).to_s.should == dt.to_s
+    
+    Sequel.datetime_class = Time
+    Sequel.typecast_timezone = :local
+    Sequel.application_timezone = :utc
+    @db.typecast_value(:datetime, t.getlocal).to_s.should == t.to_s
+    @db.typecast_value(:datetime, t.getlocal.to_s).to_s.should == t.to_s
+    @db.typecast_value(:datetime, t.getlocal.strftime('%Y-%m-%d %H:%M:%S')).to_s.should == t.to_s
+    
+    Sequel.datetime_class = DateTime
+    @db.typecast_value(:datetime, dt).to_s.should == dt2.to_s
+    @db.typecast_value(:datetime, dt.to_s).to_s.should == dt2.to_s
+    @db.typecast_value(:datetime, dt.strftime('%Y-%m-%d %H:%M:%S')).to_s.should == dt2.to_s
+  end
+  
+  specify "should handle converting database timestamp columns from an array of values" do
+    Sequel.database_timezone = :utc
+    Sequel.application_timezone = :local
+    t = Time.now.utc
+    Sequel.database_to_application_timestamp([t.year, t.mon, t.day, t.hour, t.min, t.sec]).to_s.should == t.getlocal.to_s
+    
+    Sequel.datetime_class = DateTime
+    dt = DateTime.now
+    dt2 = dt.new_offset(0)
+    Sequel.database_to_application_timestamp([dt2.year, dt2.mon, dt2.day, dt2.hour, dt2.min, dt2.sec]).to_s.should == dt.to_s
+    
+    Sequel.datetime_class = Time
+    Sequel.database_timezone = :local
+    Sequel.application_timezone = :utc
+    t = t.getlocal
+    Sequel.database_to_application_timestamp([t.year, t.mon, t.day, t.hour, t.min, t.sec]).to_s.should == t.getutc.to_s
+    
+    Sequel.datetime_class = DateTime
+    Sequel.database_to_application_timestamp([dt.year, dt.mon, dt.day, dt.hour, dt.min, dt.sec]).to_s.should == dt2.to_s
+  end
+  
+  specify "should raise an InvalidValue error when an error occurs while converting a timestamp" do
+    proc{Sequel.database_to_application_timestamp([0, 0, 0, 0, 0, 0])}.should raise_error(Sequel::InvalidValue)
+  end
+  
+  specify "should raise an error when attempting to typecast to a timestamp from an unsupported type" do
+    proc{Sequel.database_to_application_timestamp(Object.new)}.should raise_error(Sequel::InvalidValue)
+  end
+  
+  specify "should have Sequel.default_timezone= should set all other timezones" do
+    Sequel.database_timezone.should == nil
+    Sequel.application_timezone.should == nil
+    Sequel.typecast_timezone.should == nil
+    Sequel.default_timezone = :utc
+    Sequel.database_timezone.should == :utc
+    Sequel.application_timezone.should == :utc
+    Sequel.typecast_timezone.should == :utc
   end
 end

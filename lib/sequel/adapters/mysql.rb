@@ -29,7 +29,7 @@ module Sequel
       [2, 3, 8, 9, 13, 247, 248]  => lambda{|v| v.to_i},                  # integer
       [4, 5]  => lambda{|v| v.to_f},                                      # float
       [10, 14]  => lambda{|v| convert_date_time(:string_to_date, v)},     # date
-      [7, 12] => lambda{|v| convert_date_time(:string_to_datetime, v)},   # datetime
+      [7, 12] => lambda{|v| convert_date_time(:database_to_application_timestamp, v)},   # datetime
       [11]  => lambda{|v| convert_date_time(:string_to_time, v)},         # time
       [249, 250, 251, 252]  => lambda{|v| Sequel::SQL::Blob.new(v)}       # blob
     }

@@ -198,7 +198,6 @@ module Sequel
     module DatasetMethods
       BOOL_TRUE = '1'.freeze
       BOOL_FALSE = '0'.freeze
-      TIMESTAMP_FORMAT = "'%Y-%m-%d %H:%M:%S'".freeze
       COMMA_SEPARATOR = ', '.freeze
       SELECT_CLAUSE_ORDER = %w'distinct columns from join where group having compounds order limit'.freeze
       
@@ -360,6 +359,13 @@ module Sequel
       def supports_intersect_except?
         false
       end
+      
+      # MySQL does support fractional timestamps in literal timestamps, but it
+      # ignores them.  Also, using them seems to cause problems on 1.9.  Since
+      # they are ignored anyway, not using them is probably best.
+      def supports_timestamp_usecs?
+        false
+      end
 
       # MySQL supports ORDER and LIMIT clauses in UPDATE statements.
       def update_sql(values)
@@ -385,20 +391,10 @@ module Sequel
       def insert_default_values_sql
         "#{insert_sql_base}#{source_list(@opts[:from])} () VALUES ()"
       end
-
-      # Use MySQL Timestamp format
-      def literal_datetime(v)
-        v.strftime(TIMESTAMP_FORMAT)
-      end
-
+      
       # Use 0 for false on MySQL
       def literal_false
         BOOL_FALSE
-      end
-
-      # Use MySQL Timestamp format
-      def literal_time(v)
-        v.strftime(TIMESTAMP_FORMAT)
       end
 
       # Use 1 for true on MySQL
