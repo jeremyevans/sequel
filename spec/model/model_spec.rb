@@ -1,5 +1,34 @@
 require File.join(File.dirname(__FILE__), "spec_helper")
 
+describe "Sequel::Model()" do
+  before do
+    @db = Sequel::Model.db
+  end
+  it "should return a model subclass with the given dataset if given a dataset" do
+    ds = @db[:blah]
+    c = Sequel::Model(ds)
+    c.superclass.should == Sequel::Model
+    c.dataset.should == ds
+  end
+  it "should return a model subclass with a dataset with the default database and given table name if given a symbol" do
+    c = Sequel::Model(:blah)
+    c.superclass.should == Sequel::Model
+    c.db.should == @db
+    c.table_name.should == :blah
+  end
+  it "should return a model subclass associated to the given database if given a database" do
+    db = Sequel::Database.new
+    c = Sequel::Model(db)
+    c.superclass.should == Sequel::Model
+    c.db.should == db
+    proc{c.dataset}.should raise_error(Sequel::Error)
+    class SmBlahTest < c
+    end
+    SmBlahTest.db.should == db
+    SmBlahTest.table_name.should == :sm_blah_tests
+  end
+end
+
 describe Sequel::Model do
   it "should have class method aliased as model" do
     Sequel::Model.instance_methods.collect{|x| x.to_s}.should include("model")

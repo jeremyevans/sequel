@@ -184,10 +184,10 @@ module Sequel
         unless ivs.include?("@dataset")
           db
           begin
-            if self == Model
+            if self == Model || !@dataset
               subclass.set_dataset(subclass.implicit_table_name) unless subclass.name.empty?
-            elsif ds = instance_variable_get(:@dataset)
-              subclass.set_dataset(ds.clone, :inherited=>true)
+            elsif @dataset
+              subclass.set_dataset(@dataset.clone, :inherited=>true)
             end
           rescue
             nil

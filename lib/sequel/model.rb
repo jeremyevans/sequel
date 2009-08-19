@@ -17,7 +17,13 @@ module Sequel
   #     table_name # => :something
   #   end
   def self.Model(source)
-    Model::ANONYMOUS_MODEL_CLASSES[source] ||= Class.new(Model).set_dataset(source)
+    Model::ANONYMOUS_MODEL_CLASSES[source] ||= if source.is_a?(Database)
+      c = Class.new(Model)
+      c.db = source
+      c
+    else
+      Class.new(Model).set_dataset(source)
+    end
   end
 
   # Sequel::Model is an object relational mapper built on top of Sequel core.  Each

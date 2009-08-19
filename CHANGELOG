@@ -1,5 +1,7 @@
 === HEAD
 
+* Allow class Item < Sequel::Model(DB2) to work (jeremyevans)
+
 * Add Dataset#truncate for truncating tables (jeremyevans)
 
 * Add Database#run method for executing arbitrary SQL on a database (jeremyevans)
