@@ -6,7 +6,7 @@ describe "Sequel timezone support" do
     @db[:t].insert(t)
     t2 = @db[:t].single_value
     t2 = Sequel.database_to_application_timestamp(t2.to_s) unless t2.is_a?(Time)
-    (t2 - t).should be_close(0, 1)
+    (t2 - t).should be_close(0, 2)
     t2.utc_offset.should == 0 if Sequel.application_timezone == :utc
     t2.utc_offset.should == t.getlocal.utc_offset if Sequel.application_timezone == :local
     @db[:t].delete
@@ -16,7 +16,7 @@ describe "Sequel timezone support" do
     @db[:t].insert(dt)
     dt2 = @db[:t].single_value
     dt2 = Sequel.database_to_application_timestamp(dt2.to_s) unless dt2.is_a?(DateTime)
-    (dt2 - dt).should be_close(0, 0.00001)
+    (dt2 - dt).should be_close(0, 0.00002)
     dt2.offset.should == 0 if Sequel.application_timezone == :utc
     dt2.offset.should == dt.offset if Sequel.application_timezone == :local
   end
