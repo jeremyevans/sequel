@@ -135,6 +135,15 @@ describe Sequel::Dataset do
     @d.count.should == 1
     @d.first[:name].should == 'def'
   end
+  
+  specify "should be able to truncate the table" do
+    @d << {:name => 'abc', :value => 123}
+    @d << {:name => 'abc', :value => 456}
+    @d << {:name => 'def', :value => 789}
+    @d.count.should == 3
+    @d.truncate.should == nil
+    @d.count.should == 0
+  end
 
   specify "should be able to literalize booleans" do
     proc {@d.literal(true)}.should_not raise_error

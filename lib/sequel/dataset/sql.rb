@@ -110,11 +110,7 @@ module Sequel
 
       return static_sql(opts[:sql]) if opts[:sql]
 
-      if opts[:group]
-        raise InvalidOperation, "Grouped datasets cannot be deleted from"
-      elsif opts[:from].is_a?(Array) && opts[:from].size > 1
-        raise InvalidOperation, "Joined datasets cannot be deleted from"
-      end
+      check_deletion_allowed!
 
       sql = "DELETE FROM #{source_list(opts[:from])}"
 
@@ -785,6 +781,17 @@ module Sequel
     def subscript_sql(s)
       "#{literal(s.f)}[#{expression_list(s.sub)}]"
     end
+    
+    # SQL query to truncate the table
+    def truncate_sql
+      if opts[:sql]
+        static_sql(opts[:sql])
+      else
+        check_deletion_allowed!
+        raise(InvalidOperation, "Can't truncate filtered datasets") if opts[:where]
+        _truncate_sql(source_list(opts[:from]))
+      end
+    end
 
     # Returns a copy of the dataset with no filters (HAVING or WHERE clause) applied.
     # 
@@ -951,6 +958,13 @@ module Sequel
     # SQL fragment for specifying an alias.  expression should already be literalized.
     def as_sql(expression, aliaz)
       "#{expression} AS #{quote_identifier(aliaz)}"
+    end
+    
+    # Raise an InvalidOperation exception if deletion is not allowed
+    # for this dataset
+    def check_deletion_allowed!
+      raise(InvalidOperation, "Grouped datasets cannot be deleted from") if opts[:group]
+      raise(InvalidOperation, "Joined datasets cannot be deleted from") if (opts[:from].is_a?(Array) && opts[:from].size > 1) || opts[:join]
     end
 
     # Converts an array of column names into a comma seperated string of 
@@ -1355,6 +1369,12 @@ module Sequel
     # SQL fragment specifying a table name.
     def table_ref(t)
       t.is_a?(String) ? quote_identifier(t) : literal(t)
+    end
+    
+    # Formats the truncate statement.  Assumes the table given has already been
+    # literalized.
+    def _truncate_sql(table)
+      "TRUNCATE TABLE #{table}"
     end
   end
 end

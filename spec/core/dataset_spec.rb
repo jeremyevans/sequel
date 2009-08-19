@@ -172,6 +172,10 @@ context "A simple dataset" do
     @dataset.delete_sql.should == 'DELETE FROM test'
   end
   
+  specify "should format a truncate statement" do
+    @dataset.truncate_sql.should == 'TRUNCATE TABLE test'
+  end
+  
   specify "should format an insert statement with default values" do
     @dataset.insert_sql.should == 'INSERT INTO test DEFAULT VALUES'
   end
@@ -233,6 +237,7 @@ context "A simple dataset" do
     ds.insert_sql.should == sql
     ds.delete_sql.should == sql
     ds.update_sql.should == sql
+    ds.truncate_sql.should == sql
   end
 end
 
@@ -247,6 +252,10 @@ context "A dataset with multiple tables in its FROM clause" do
 
   specify "should raise on #delete_sql" do
     proc {@dataset.delete_sql}.should raise_error(Sequel::InvalidOperation)
+  end
+  
+  specify "should raise on #truncate_sql" do
+    proc {@dataset.truncate_sql}.should raise_error(Sequel::InvalidOperation)
   end
 
   specify "should generate a select query FROM all specified tables" do
@@ -650,6 +659,10 @@ context "a grouped dataset" do
 
   specify "should raise when trying to generate a delete statement" do
     proc {@dataset.delete_sql}.should raise_error
+  end
+  
+  specify "should raise when trying to generate a truncate statement" do
+    proc {@dataset.truncate_sql}.should raise_error
   end
 
   specify "should specify the grouping in generated select statement" do
@@ -2651,7 +2664,7 @@ context "Dataset#grep" do
   end
 end
 
-context "Dataset default #fetch_rows, #insert, #update, and #delete, #execute" do
+context "Dataset default #fetch_rows, #insert, #update, #delete, #truncate, #execute" do
   before do
     @db = Sequel::Database.new
     @ds = @db[:items]
@@ -2664,16 +2677,33 @@ context "Dataset default #fetch_rows, #insert, #update, and #delete, #execute" d
   specify "#delete should execute delete SQL" do
     @db.should_receive(:execute).once.with('DELETE FROM items', :server=>:default)
     @ds.delete
+    @db.should_receive(:execute_dui).once.with('DELETE FROM items', :server=>:default)
+    @ds.delete
   end
 
   specify "#insert should execute insert SQL" do
     @db.should_receive(:execute).once.with('INSERT INTO items DEFAULT VALUES', :server=>:default)
+    @ds.insert([])
+    @db.should_receive(:execute_insert).once.with('INSERT INTO items DEFAULT VALUES', :server=>:default)
     @ds.insert([])
   end
 
   specify "#update should execute update SQL" do
     @db.should_receive(:execute).once.with('UPDATE items SET number = 1', :server=>:default)
     @ds.update(:number=>1)
+    @db.should_receive(:execute_dui).once.with('UPDATE items SET number = 1', :server=>:default)
+    @ds.update(:number=>1)
+  end
+  
+  specify "#truncate should execute truncate SQL" do
+    @db.should_receive(:execute).once.with('TRUNCATE TABLE items', :server=>:default)
+    @ds.truncate.should == nil
+    @db.should_receive(:execute_ddl).once.with('TRUNCATE TABLE items', :server=>:default)
+    @ds.truncate.should == nil
+  end
+  
+  specify "#truncate should raise an InvalidOperation exception if the dataset is filtered" do
+    proc{@ds.filter(:a=>1).truncate}.should raise_error(Sequel::InvalidOperation)
   end
   
   specify "#execute should execute the SQL on the database" do

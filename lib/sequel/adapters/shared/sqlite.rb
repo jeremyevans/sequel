@@ -316,6 +316,11 @@ module Sequel
       def select_clause_order
         SELECT_CLAUSE_ORDER
       end
+      
+      # SQLite treats a DELETE with no WHERE clause as a TRUNCATE
+      def _truncate_sql(table)
+        "DELETE FROM #{table}"
+      end
     end
   end
 end

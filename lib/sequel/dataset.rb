@@ -293,6 +293,11 @@ module Sequel
     def supports_window_functions?
       false
     end
+    
+    # Truncates the dataset.  Returns nil.
+    def truncate
+      execute_ddl(truncate_sql)
+    end
 
     # Updates values for the dataset.  The returned value is generally the
     # number of rows updated, but that is adapter dependent.
@@ -326,6 +331,12 @@ module Sequel
     # Execute the given SQL on the database using execute.
     def execute(sql, opts={}, &block)
       @db.execute(sql, {:server=>@opts[:server] || :read_only}.merge(opts), &block)
+    end
+    
+    # Execute the given SQL on the database using execute_ddl.
+    def execute_ddl(sql, opts={}, &block)
+      @db.execute_ddl(sql, default_server_opts(opts), &block)
+      nil
     end
     
     # Execute the given SQL on the database using execute_dui.

@@ -1,5 +1,7 @@
 === HEAD
 
+* Add Dataset#truncate for truncating tables (jeremyevans)
+
 * Add Database#run method for executing arbitrary SQL on a database (jeremyevans)
 
 * Handle index parsing correctly for tables in a non-default schema on JDBC (jfirebaugh)
