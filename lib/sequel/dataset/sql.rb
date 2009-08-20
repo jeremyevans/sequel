@@ -110,7 +110,7 @@ module Sequel
 
       return static_sql(opts[:sql]) if opts[:sql]
 
-      check_deletion_allowed!
+      check_modification_allowed!
 
       sql = "DELETE FROM #{source_list(opts[:from])}"
 
@@ -346,6 +346,8 @@ module Sequel
     #     'INSERT INTO items (a, b) VALUES (1, 2)'
     def insert_sql(*values)
       return static_sql(@opts[:sql]) if @opts[:sql]
+
+      check_modification_allowed!
 
       from = source_list(@opts[:from])
       case values.size
@@ -787,7 +789,7 @@ module Sequel
       if opts[:sql]
         static_sql(opts[:sql])
       else
-        check_deletion_allowed!
+        check_modification_allowed!
         raise(InvalidOperation, "Can't truncate filtered datasets") if opts[:where]
         _truncate_sql(source_list(opts[:from]))
       end
@@ -840,11 +842,7 @@ module Sequel
 
       return static_sql(opts[:sql]) if opts[:sql]
 
-      if opts[:group]
-        raise InvalidOperation, "A grouped dataset cannot be updated"
-      elsif (opts[:from].size > 1) or opts[:join]
-        raise InvalidOperation, "A joined dataset cannot be updated"
-      end
+      check_modification_allowed!
       
       sql = "UPDATE #{source_list(@opts[:from])} SET "
       set = if values.is_a?(Hash)
@@ -962,9 +960,9 @@ module Sequel
     
     # Raise an InvalidOperation exception if deletion is not allowed
     # for this dataset
-    def check_deletion_allowed!
-      raise(InvalidOperation, "Grouped datasets cannot be deleted from") if opts[:group]
-      raise(InvalidOperation, "Joined datasets cannot be deleted from") if (opts[:from].is_a?(Array) && opts[:from].size > 1) || opts[:join]
+    def check_modification_allowed!
+      raise(InvalidOperation, "Grouped datasets cannot be modified") if opts[:group]
+      raise(InvalidOperation, "Joined datasets cannot be modified") if (opts[:from].is_a?(Array) && opts[:from].size > 1) || opts[:join]
     end
 
     # Converts an array of column names into a comma seperated string of 

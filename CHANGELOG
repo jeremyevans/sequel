@@ -1,5 +1,7 @@
 === HEAD
 
+* Don't allow inserting on a grouped dataset or a dataset that selects from multiple tables (jeremyevans)
+
 * Allow class Item < Sequel::Model(DB2) to work (jeremyevans)
 
 * Add Dataset#truncate for truncating tables (jeremyevans)

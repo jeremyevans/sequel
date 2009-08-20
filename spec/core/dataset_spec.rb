@@ -258,6 +258,10 @@ context "A dataset with multiple tables in its FROM clause" do
     proc {@dataset.truncate_sql}.should raise_error(Sequel::InvalidOperation)
   end
 
+  specify "should raise on #insert_sql" do
+    proc {@dataset.insert_sql}.should raise_error(Sequel::InvalidOperation)
+  end
+
   specify "should generate a select query FROM all specified tables" do
     @dataset.select_sql.should == "SELECT * FROM t1, t2"
   end
@@ -663,6 +667,10 @@ context "a grouped dataset" do
   
   specify "should raise when trying to generate a truncate statement" do
     proc {@dataset.truncate_sql}.should raise_error
+  end
+
+  specify "should raise when trying to generate an insert statement" do
+    proc {@dataset.insert_sql}.should raise_error
   end
 
   specify "should specify the grouping in generated select statement" do
@@ -1726,6 +1734,13 @@ context "Dataset#join_table" do
       'SELECT * FROM "items" INNER JOIN "categories" ON (("categories"."a" = "items"."d") AND ("categories"."b" = "items"."c"))'
     @d.join(:categories, :a=>:d){|j,lj,js| :b.qualify(j) > :c.qualify(lj)}.sql.should ==
       'SELECT * FROM "items" INNER JOIN "categories" ON (("categories"."a" = "items"."d") AND ("categories"."b" > "items"."c"))'
+  end
+  
+  specify "should not allow insert, update, delete, or truncate" do
+    proc{@d.join(:categories, :a=>:d).insert_sql}.should raise_error(Sequel::InvalidOperation)
+    proc{@d.join(:categories, :a=>:d).update_sql(:a=>1)}.should raise_error(Sequel::InvalidOperation)
+    proc{@d.join(:categories, :a=>:d).delete_sql}.should raise_error(Sequel::InvalidOperation)
+    proc{@d.join(:categories, :a=>:d).truncate_sql}.should raise_error(Sequel::InvalidOperation)
   end
 end
 
