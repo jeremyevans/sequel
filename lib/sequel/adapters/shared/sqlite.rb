@@ -10,7 +10,9 @@ module Sequel
       # Run all alter_table commands in a transaction.  This is technically only
       # needed for drop column.
       def alter_table(name, generator=nil, &block)
-        transaction{super}
+        remove_cached_schema(name)
+        generator ||= Schema::AlterTableGenerator.new(self, &block)
+        transaction{generator.operations.each{|op| alter_table_sql_list(name, [op]).flatten.each{|sql| execute_ddl(sql)}}}
       end
 
       # A symbol signifying the value of the auto_vacuum PRAGMA.
@@ -164,6 +166,7 @@ module Sequel
       # from the existing table into the new table, deleting the existing table
       # and renaming the new table to the existing table's name.
       def duplicate_table(table, opts={})
+        remove_cached_schema(table)
         def_columns = defined_columns_for(table)
         old_columns = def_columns.map{|c| c[:name]}
         opts[:old_columns_proc].call(old_columns) if opts[:old_columns_proc]

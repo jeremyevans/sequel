@@ -343,6 +343,8 @@ context "A SQLite database" do
   end
   
   specify "should choose a temporary table name that isn't already used when dropping or renaming columns" do
+    sqls = []
+    @db.loggers << (l=Class.new{define_method(:info){|sql| sqls << sql}}.new)
     @db.create_table! :test3 do
       Integer :h
       Integer :i
@@ -357,9 +359,10 @@ context "A SQLite database" do
     @db[:test3].columns.should == [:h, :i]
     @db[:test3_backup0].columns.should == [:j]
     @db[:test3_backup1].columns.should == [:k]
-    sqls = @db.drop_column(:test3, :i)
-    sqls.any?{|x| x =~ /test3_backup2/}.should == true
-    sqls.any?{|x| x =~ /test3_backup[01]/}.should == false
+    sqls.clear
+    @db.drop_column(:test3, :i)
+    sqls.any?{|x| x =~ /\ACREATE TABLE.*test3_backup2/}.should == true
+    sqls.any?{|x| x =~ /\ACREATE TABLE.*test3_backup[01]/}.should == false
     @db[:test3].columns.should == [:h]
     @db[:test3_backup0].columns.should == [:j]
     @db[:test3_backup1].columns.should == [:k]
@@ -368,13 +371,15 @@ context "A SQLite database" do
       Integer :l
     end
 
-    sqls = @db.rename_column(:test3, :h, :i)
-    sqls.any?{|x| x =~ /test3_backup3/}.should == true
-    sqls.any?{|x| x =~ /test3_backup[012]/}.should == false
+    sqls.clear
+    @db.rename_column(:test3, :h, :i)
+    sqls.any?{|x| x =~ /\ACREATE TABLE.*test3_backup3/}.should == true
+    sqls.any?{|x| x =~ /\ACREATE TABLE.*test3_backup[012]/}.should == false
     @db[:test3].columns.should == [:i]
     @db[:test3_backup0].columns.should == [:j]
     @db[:test3_backup1].columns.should == [:k]
     @db[:test3_backup2].columns.should == [:l]
+    @db.loggers.delete(l)
   end
   
   specify "should support add_index" do

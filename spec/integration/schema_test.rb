@@ -293,6 +293,23 @@ describe "Database schema modifiers" do
     @db.schema(:items, :reload=>true).map{|x| x.first}.should == [:id]
     @ds.columns!.should == [:id]
   end
+
+  specify "should remove multiple columns in a single alter_table block" do
+    @db.create_table!(:items) do
+      primary_key :id
+      String :name
+      Integer :number
+    end
+    @ds.insert(:number=>10)
+    @db.schema(:items, :reload=>true).map{|x| x.first}.should == [:id, :name, :number]
+    @ds.columns!.should == [:id, :name, :number]
+    @db.alter_table(:items) do
+      drop_column :name
+      drop_column :number
+    end
+    @db.schema(:items, :reload=>true).map{|x| x.first}.should == [:id]
+    @ds.columns!.should == [:id]
+  end
 end
 
 if INTEGRATION_DB.respond_to?(:tables)
