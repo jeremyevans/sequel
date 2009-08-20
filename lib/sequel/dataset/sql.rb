@@ -311,7 +311,9 @@ module Sequel
     #   dataset.group(:id) # SELECT * FROM items GROUP BY id
     #   dataset.group(:id, :name) # SELECT * FROM items GROUP BY id, name
     def group(*columns)
-      clone(:group => columns)
+      columns.flatten!
+      columns.compact!
+      clone(:group => (columns.empty? ? nil : columns))
     end
     alias group_by group
 

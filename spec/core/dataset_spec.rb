@@ -370,12 +370,6 @@ context "Dataset#where" do
       "SELECT * FROM test WHERE ((a = 1) AND (e < 5))"
   end
   
-  specify "should raise if the dataset is grouped" do
-    proc {@dataset.group(:t).where(:a => 1)}.should_not raise_error
-    @dataset.group(:t).where(:a => 1).sql.should ==
-      "SELECT * FROM test WHERE (a = 1) GROUP BY t"
-  end
-  
   specify "should accept ranges" do
     @dataset.filter(:id => 4..7).sql.should ==
       'SELECT * FROM test WHERE ((id >= 4) AND (id <= 7))'
@@ -703,11 +697,24 @@ context "Dataset#group_by" do
       "SELECT * FROM test GROUP BY type_id"
     @dataset.group_by(:a, :b).select_sql.should ==
       "SELECT * FROM test GROUP BY a, b"
-  end
-
-  specify "should specify the grouping in generated select statement" do
     @dataset.group_by(:type_id=>nil).select_sql.should ==
       "SELECT * FROM test GROUP BY (type_id IS NULL)"
+  end
+
+  specify "should ungroup when passed nil, empty, or no arguments" do
+    @dataset.group_by.select_sql.should ==
+      "SELECT * FROM test"
+    @dataset.group_by(nil).select_sql.should ==
+      "SELECT * FROM test"
+    @dataset.group_by([]).select_sql.should ==
+      "SELECT * FROM test"
+  end
+
+  specify "should undo previous grouping" do
+    @dataset.group_by(:a).group_by(:b).select_sql.should ==
+      "SELECT * FROM test GROUP BY b"
+    @dataset.group_by(:a, :b).group_by.select_sql.should ==
+      "SELECT * FROM test"
   end
 
   specify "should be aliased as #group" do
