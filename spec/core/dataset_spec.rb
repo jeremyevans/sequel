@@ -706,8 +706,6 @@ context "Dataset#group_by" do
       "SELECT * FROM test"
     @dataset.group_by(nil).select_sql.should ==
       "SELECT * FROM test"
-    @dataset.group_by([]).select_sql.should ==
-      "SELECT * FROM test"
   end
 
   specify "should undo previous grouping" do
@@ -1088,6 +1086,12 @@ end
 context "Dataset#unlimited" do
   specify "should remove limit and offset from the dataset" do
     Sequel::Dataset.new(nil).from(:test).limit(1, 2).unlimited.sql.should == 'SELECT * FROM test'
+  end
+end
+
+context "Dataset#ungrouped" do
+  specify "should remove group and having clauses from the dataset" do
+    Sequel::Dataset.new(nil).from(:test).group(:a).having(:b).ungrouped.sql.should == 'SELECT * FROM test'
   end
 end
 

@@ -311,9 +311,7 @@ module Sequel
     #   dataset.group(:id) # SELECT * FROM items GROUP BY id
     #   dataset.group(:id, :name) # SELECT * FROM items GROUP BY id, name
     def group(*columns)
-      columns.flatten!
-      columns.compact!
-      clone(:group => (columns.empty? ? nil : columns))
+      clone(:group => (columns.compact.empty? ? nil : columns))
     end
     alias group_by group
 
@@ -799,9 +797,16 @@ module Sequel
 
     # Returns a copy of the dataset with no filters (HAVING or WHERE clause) applied.
     # 
-    #   dataset.group(:a).having(:a=>1).where(:b).unfiltered # SELECT * FROM items
+    #   dataset.group(:a).having(:a=>1).where(:b).unfiltered # SELECT * FROM items GROUP BY a
     def unfiltered
       clone(:where => nil, :having => nil)
+    end
+
+    # Returns a copy of the dataset with no grouping (GROUP or HAVING clause) applied.
+    # 
+    #   dataset.group(:a).having(:a=>1).where(:b).ungrouped # SELECT * FROM items WHERE b
+    def ungrouped
+      clone(:group => nil, :having => nil)
     end
 
     # Adds a UNION clause using a second dataset object.

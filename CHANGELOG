@@ -1,5 +1,9 @@
 === HEAD
 
+* Add Dataset#ungrouped which removes existing grouping (jeremyevans)
+
+* Make Dataset#group with nil or no arguments to remove existing grouping (dlee)
+
 * Fix using multiple emulated ALTER TABLE statements (e.g. drop_column) in a single alter_table block on SQLite (jeremyevans)
 
 * Don't allow inserting on a grouped dataset or a dataset that selects from multiple tables (jeremyevans)
