@@ -6,6 +6,7 @@
 
 <ul>
 <li><a href="rdoc-plugins/classes/Sequel/Plugins/AssociationProxies.html">association_proxies</a>: Changes the *_to_many association method to return a proxy instead of an array of objects.</li>
+<li><a href="rdoc-plugins/classes/Sequel/Plugins/BooleanReaders.html">boolean_readers</a>: Adds attribute? methods for all boolean columns.</li>
 <li><a href="rdoc-plugins/classes/Sequel/Plugins/Caching.html">caching</a>: Supports caching primary key lookups of model objects to any object that supports the Ruby-Memcache API.</li>
 <li><a href="rdoc-plugins/classes/Sequel/Plugins/HookClassMethods.html">hook_class_methods</a>: Adds backwards compatiblity for the legacy class-level hook methods (e.g. before_save :do_something).</li>
 <li><a href="rdoc-plugins/classes/Sequel/Plugins/IdentityMap.html">identity_map</a>: Allows you to create temporary identity maps which ensure a 1-1 correspondence of model objects to database rows.</li>

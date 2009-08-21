@@ -1,5 +1,7 @@
 === HEAD
 
+* Add a boolean_readers plugin for creating attribute? methods for boolean columns (jeremyevans)
+
 * Add Dataset#ungrouped which removes existing grouping (jeremyevans)
 
 * Make Dataset#group with nil or no arguments to remove existing grouping (dlee)
