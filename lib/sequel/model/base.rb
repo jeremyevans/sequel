@@ -260,6 +260,7 @@ module Sequel
       # If a dataset is used, the model's database is changed to the given
       # dataset.  If a symbol is used, a dataset is created from the current
       # database with the table name given. Other arguments raise an Error.
+      # Returns self.
       #
       # This changes the row_proc of the given dataset to return
       # model objects, extends the dataset with the dataset_method_modules,

@@ -29,6 +29,7 @@ module Sequel
         def set_dataset(*args)
           super
           create_boolean_readers
+          self
         end
 
         private
