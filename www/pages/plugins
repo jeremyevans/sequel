@@ -53,6 +53,7 @@
 
 <ul>
 <li><a href='http://github.com/jeremyevans/fixture_dependencies'>fixture_dependencies</a>: YAML fixture loader that handles dependencies/associated objects, respecting foreign key constraints.</li>
+<li><a href='http://github.com/pk/merb_sequel'>merb_sequel</a>: Merb plugin that provides support for Sequel models.</li>
 <li><a href='http://github.com/pusewicz/rails_sequel/'>rails-sequel</a>: Rails plugin that allows you to use Sequel instead of ActiveRecord.</li>
 <li><a href='http://github.com/openhood/rspec_sequel_matchers'>rspec_sequel_matchers</a>: RSpec matchers for Sequel validations, associations, and columns.</li>
 <li><a href='http://github.com/gyordanov/sequel_extjs'>sequel_extjs</a>: Generates JSON from datasets that is consumable by the ExtJS JsonStore.</li>
