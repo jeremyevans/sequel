@@ -145,11 +145,25 @@ module Sequel
     module DatasetMethods
       BOOL_TRUE = '1'.freeze
       BOOL_FALSE = '0'.freeze
+      COMMA_SEPARATOR = ', '.freeze
+      DELETE_CLAUSE_ORDER = %w'from output where'.freeze
+      INSERT_CLAUSE_ORDER = %w'into columns output values'.freeze
       SELECT_CLAUSE_ORDER = %w'with limit distinct columns from table_options join where group order having compounds'.freeze
+      UPDATE_CLAUSE_ORDER = %w'table set output where'.freeze
       TIMESTAMP_FORMAT = "'%Y-%m-%d %H:%M:%S'".freeze
       WILDCARD = LiteralString.new('*').freeze
       CONSTANT_MAP = {:CURRENT_DATE=>'CAST(CURRENT_TIMESTAMP AS DATE)'.freeze, :CURRENT_TIME=>'CAST(CURRENT_TIMESTAMP AS TIME)'.freeze}
-      
+
+      # Add the output! mutation method
+      def self.extended(obj)
+        obj.def_mutation_method(:output)
+      end
+
+      # Add the output! mutation method
+      def self.included(mod)
+        mod.def_mutation_method(:output)
+      end
+
       # MSSQL uses + for string concatenation
       def complex_expression_sql(op, args)
         case op
@@ -185,7 +199,31 @@ module Sequel
       def nolock
         clone(:table_options => "(NOLOCK)")
       end
-      
+
+      # Include an OUTPUT clause in the eventual INSERT, UPDATE, or DELETE query.
+      #
+      # The first argument is the table to output into, and the second argument
+      # is either an Array of column values to select, or a Hash which maps output
+      # column names to selected values, in the style of #insert or #update.
+      #
+      # Output into a returned result set is not currently supported.
+      #
+      # Examples:
+      #
+      #   dataset.output(:output_table, [:deleted__id, :deleted__name])
+      #   dataset.output(:output_table, :id => :inserted__id, :name => :inserted__name)
+      def output(into, values)
+        output = {}
+        case values
+          when Hash:
+            output[:column_list], output[:select_list] = values.keys, values.values
+          when Array:
+            output[:select_list] = values
+        end
+        output[:into] = into
+        clone({:output => output})
+      end
+
       # MSSQL uses [] to quote identifiers
       def quoted_identifier(name)
         "[#{name}]"
@@ -276,9 +314,24 @@ module Sequel
         :x_sequel_row_number_x
       end
 
+      # MSSQL supports the OUTPUT clause for DELETE statements
+      def delete_clause_order
+        DELETE_CLAUSE_ORDER
+      end
+
+      # MSSQL supports the OUTPUT clause for INSERT statements
+      def insert_clause_order
+        INSERT_CLAUSE_ORDER
+      end
+
       # MSSQL adds the limit before the columns
       def select_clause_order
         SELECT_CLAUSE_ORDER
+      end
+
+      # MSSQL supports the OUTPUT clause for UPDATE statements
+      def update_clause_order
+        UPDATE_CLAUSE_ORDER
       end
 
       # MSSQL uses TOP for limit
@@ -290,6 +343,22 @@ module Sequel
       def select_table_options_sql(sql)
         sql << " WITH #{@opts[:table_options]}" if @opts[:table_options]
       end
+
+      def output_sql(sql)
+        return unless output = @opts[:output]
+        sql << " OUTPUT #{column_list(output[:select_list])}"
+        if into = output[:into]
+          sql << " INTO #{table_ref(into)}"
+          if column_list = output[:column_list]
+            cl = []
+            column_list.each { |k, v| cl << literal(String === k ? k.to_sym : k) }
+            sql << " (#{cl.join(COMMA_SEPARATOR)})"
+          end
+        end
+      end
+      alias delete_output_sql output_sql
+      alias update_output_sql output_sql
+      alias insert_output_sql output_sql
     end
   end
 end
