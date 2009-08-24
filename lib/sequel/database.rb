@@ -31,6 +31,7 @@ module Sequel
     TRANSACTION_ROLLBACK = 'Transaction.rollback'.freeze
     
     POSTGRES_DEFAULT_RE = /\A(?:B?('.*')::[^']+|\((-?\d+(?:\.\d+)?)\))\z/
+    MSSQL_DEFAULT_RE = /\A(?:\(N?('.*')\)|\(\((-?\d+(?:\.\d+)?)\)\))\z/
     MYSQL_TIMESTAMP_RE = /\ACURRENT_(?:DATE|TIMESTAMP)?\z/
     STRING_DEFAULT_RE = /\A'(.*)'\z/
 
@@ -656,6 +657,9 @@ module Sequel
       return if default.nil?
       orig_default = default
       if database_type == :postgres and m = POSTGRES_DEFAULT_RE.match(default)
+        default = m[1] || m[2]
+      end
+      if database_type == :mssql and m = MSSQL_DEFAULT_RE.match(default)
         default = m[1] || m[2]
       end
       if [:string, :blob, :date, :datetime, :time].include?(type)
