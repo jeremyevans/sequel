@@ -79,3 +79,19 @@ context "MSSQL Dataset#output" do
     @db[:out].all.should == [{:name => "name", :value => 1}, {:name => "name", :value => 2}]
   end
 end
+
+context "MSSQL joined datasets" do
+  before do
+    @db = MSSQL_DB
+  end
+
+  specify "should format DELETE statements" do
+    @db[:t1].inner_join(:t2, :t1__pk => :t2__pk).delete_sql.should ==
+      "DELETE FROM T1 FROM T1 INNER JOIN T2 ON (T1.PK = T2.PK)"
+  end
+
+  specify "should format UPDATE statements" do
+    @db[:t1].inner_join(:t2, :t1__pk => :t2__pk).update_sql(:pk => :t2__pk).should ==
+      "UPDATE T1 SET PK = T2.PK FROM T1 INNER JOIN T2 ON (T1.PK = T2.PK)"
+  end
+end

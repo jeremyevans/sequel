@@ -146,10 +146,10 @@ module Sequel
       BOOL_TRUE = '1'.freeze
       BOOL_FALSE = '0'.freeze
       COMMA_SEPARATOR = ', '.freeze
-      DELETE_CLAUSE_ORDER = %w'from output where'.freeze
+      DELETE_CLAUSE_ORDER = %w'from output from2 where'.freeze
       INSERT_CLAUSE_ORDER = %w'into columns output values'.freeze
       SELECT_CLAUSE_ORDER = %w'with limit distinct columns from table_options join where group order having compounds'.freeze
-      UPDATE_CLAUSE_ORDER = %w'table set output where'.freeze
+      UPDATE_CLAUSE_ORDER = %w'table set output from where'.freeze
       TIMESTAMP_FORMAT = "'%Y-%m-%d %H:%M:%S'".freeze
       WILDCARD = LiteralString.new('*').freeze
       CONSTANT_MAP = {:CURRENT_DATE=>'CAST(CURRENT_TIMESTAMP AS DATE)'.freeze, :CURRENT_TIME=>'CAST(CURRENT_TIMESTAMP AS TIME)'.freeze}
@@ -276,6 +276,20 @@ module Sequel
       end
 
       private
+
+      # MSSQL can modify joined datasets
+      def check_modification_allowed!
+        raise(InvalidOperation, "Grouped datasets cannot be modified") if opts[:group]
+      end
+
+      def from_sql(sql)
+        if (opts[:from].is_a?(Array) && opts[:from].size > 1) || opts[:join]
+          select_from_sql(sql)
+          select_join_sql(sql)
+        end
+      end
+      alias delete_from2_sql from_sql
+      alias update_from_sql from_sql
       
       # MSSQL uses a literal hexidecimal number for blob strings
       def literal_blob(v)
