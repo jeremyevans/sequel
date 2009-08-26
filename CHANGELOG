@@ -1,5 +1,9 @@
 === HEAD
 
+* Automatically save a new many_to_many associated object when associating the object via add_* (jeremyevans)
+
+* Add a nested_attributes plugin for modifying associated objects directly through a model object (jeremyevans)
+
 * Add an instance_hooks plugin for adding hooks to specific model instances (jeremyevans)
 
 * Add a boolean_readers plugin for creating attribute? methods for boolean columns (jeremyevans)

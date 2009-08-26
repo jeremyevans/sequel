@@ -1207,7 +1207,7 @@ end
 
 describe Sequel::Model, "many_to_many" do
 
-  before(:each) do
+  before do
     MODEL_DB.reset
 
     @c1 = Class.new(Sequel::Model(:attributes)) do
@@ -1216,6 +1216,10 @@ describe Sequel::Model, "many_to_many" do
       def self.name; 'Attribute'; end
       def self.to_s; 'Attribute'; end
       columns :id
+      def _refresh(ds)
+        self.id = 1
+        self
+      end
     end
 
     @c2 = Class.new(Sequel::Model(:nodes)) do
@@ -1403,8 +1407,8 @@ describe Sequel::Model, "many_to_many" do
   it "should define an add_ method" do
     @c2.many_to_many :attributes, :class => @c1
     
-    n = @c2.new(:id => 1234)
-    a = @c1.new(:id => 2345)
+    n = @c2.load(:id => 1234)
+    a = @c1.load(:id => 2345)
     a.should == n.add_attribute(a)
     ['INSERT INTO attributes_nodes (node_id, attribute_id) VALUES (1234, 2345)',
      'INSERT INTO attributes_nodes (attribute_id, node_id) VALUES (2345, 1234)'
@@ -1423,8 +1427,8 @@ describe Sequel::Model, "many_to_many" do
   it "should have the add_ method respect the :left_primary_key and :right_primary_key options" do
     @c2.many_to_many :attributes, :class => @c1, :left_primary_key=>:xxx, :right_primary_key=>:yyy
     
-    n = @c2.new(:id => 1234, :xxx=>5)
-    a = @c1.new(:id => 2345, :yyy=>8)
+    n = @c2.load(:id => 1234).set(:xxx=>5)
+    a = @c1.load(:id => 2345).set(:yyy=>8)
     a.should == n.add_attribute(a)
     ['INSERT INTO attributes_nodes (node_id, attribute_id) VALUES (5, 8)',
      'INSERT INTO attributes_nodes (attribute_id, node_id) VALUES (8, 5)'
@@ -1450,12 +1454,20 @@ describe Sequel::Model, "many_to_many" do
     proc{a.remove_attribute(n)}.should raise_error(Sequel::Error)
     proc{a.remove_all_attributes}.should raise_error(Sequel::Error)
   end
-
-  it "should raise an error if trying to add/remove a model object that doesn't have a valid primary key" do
+  
+  it "should save the associated object first if passed a new model object" do
     @c2.many_to_many :attributes, :class => @c1 
     n = @c1.new
     a = @c2.load(:id=>123)
-    proc{a.add_attribute(n)}.should raise_error(Sequel::Error)
+    n.new?.should == true
+    a.add_attribute(n)
+    n.new?.should == false
+  end
+
+  it "should raise an error if trying to remove a model object that doesn't have a valid primary key" do
+    @c2.many_to_many :attributes, :class => @c1 
+    n = @c1.new
+    a = @c2.load(:id=>123)
     proc{a.remove_attribute(n)}.should raise_error(Sequel::Error)
   end
 

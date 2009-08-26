@@ -882,7 +882,10 @@ module Sequel
         # Add the given associated object to the given association
         def add_associated_object(opts, o, *args)
           raise(Sequel::Error, "model object #{model} does not have a primary key") unless pk
-          raise(Sequel::Error, "associated object #{o.model} does not have a primary key") if opts.need_associated_primary_key? && !o.pk
+          if opts.need_associated_primary_key?
+            o.save if o.new?
+            raise(Sequel::Error, "associated object #{o.model} does not have a primary key") unless o.pk
+          end
           return if run_association_callbacks(opts, :before_add, o) == false
           send(opts._add_method, o, *args)
           associations[opts[:name]].push(o) if associations.include?(opts[:name])
