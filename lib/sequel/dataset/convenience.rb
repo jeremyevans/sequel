@@ -109,7 +109,7 @@ module Sequel
     #   # this will commit every 50 records
     #   dataset.import([:x, :y], [[1, 2], [3, 4], ...], :slice => 50)
     def import(columns, values, opts={})
-      return @db.transaction{execute_dui("#{insert_sql_base}#{quote_schema_table(@opts[:from].first)} (#{identifier_list(columns)}) #{subselect_sql(values)}")} if values.is_a?(Dataset)
+      return @db.transaction{insert(columns, values)} if values.is_a?(Dataset)
 
       return if values.empty?
       raise(Error, IMPORT_ERROR_MSG) if columns.empty?

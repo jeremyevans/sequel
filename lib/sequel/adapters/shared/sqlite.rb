@@ -265,20 +265,6 @@ module Sequel
         @opts[:where] ? super : filter(1=>1).delete
       end
       
-      # Insert the values into the database.
-      def insert(*values)
-        execute_insert(insert_sql(*values))
-      end
-      
-      # Allow inserting of values directly from a dataset.
-      def insert_sql(*values)
-        if (values.size == 1) && values.first.is_a?(Sequel::Dataset)
-          "#{insert_sql_base}#{source_list(@opts[:from])} #{values.first.sql};"
-        else
-          super(*values)
-        end
-      end
-      
       # SQLite uses the nonstandard ` (backtick) for quoting identifiers.
       def quoted_identifier(c)
         "`#{c}`"

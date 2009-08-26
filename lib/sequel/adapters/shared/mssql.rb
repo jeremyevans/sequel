@@ -178,8 +178,7 @@ module Sequel
       
       # MSSQL uses a UNION ALL statement to insert multiple values at once.
       def multi_insert_sql(columns, values)
-        values = values.map {|r| "SELECT #{expression_list(r)}" }.join(" UNION ALL ")
-        ["#{insert_sql_base}#{source_list(@opts[:from])} (#{identifier_list(columns)}) #{values}"]
+        [insert_sql(columns, LiteralString.new(values.map {|r| "SELECT #{expression_list(r)}" }.join(" UNION ALL ")))]
       end
 
       # Allows you to do .nolock on a query

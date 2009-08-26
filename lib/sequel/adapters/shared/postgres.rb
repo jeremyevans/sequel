@@ -689,8 +689,7 @@ module Sequel
         return super if server_version < 80200
         
         # postgresql 8.2 introduces support for multi-row insert
-        values = values.map {|r| literal(Array(r))}.join(COMMA_SEPARATOR)
-        ["#{insert_sql_base}#{source_list(@opts[:from])} (#{identifier_list(columns)}) VALUES #{values}"]
+        [insert_sql(columns, LiteralString.new('VALUES ' + values.map {|r| literal(Array(r))}.join(COMMA_SEPARATOR)))]
       end
       
       # PostgreSQL supports timezones in literal timestamps

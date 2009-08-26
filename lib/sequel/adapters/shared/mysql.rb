@@ -199,7 +199,10 @@ module Sequel
       BOOL_TRUE = '1'.freeze
       BOOL_FALSE = '0'.freeze
       COMMA_SEPARATOR = ', '.freeze
+      DELETE_CLAUSE_ORDER = %w'from where order limit'.freeze
+      INSERT_CLAUSE_ORDER = %w'ignore into columns values on_duplicate_key_update'.freeze
       SELECT_CLAUSE_ORDER = %w'distinct columns from join where group having compounds order limit'.freeze
+      UPDATE_CLAUSE_ORDER = %w'table set where order limit'.freeze
       
       # MySQL specific syntax for LIKE/REGEXP searches, as well as
       # string concatenation.
@@ -216,14 +219,6 @@ module Sequel
         else
           super(op, args)
         end
-      end
-      
-      # MySQL supports ORDER and LIMIT clauses in DELETE statements.
-      def delete_sql
-        sql = super
-        sql << " ORDER BY #{expression_list(opts[:order])}" if opts[:order]
-        sql << " LIMIT #{opts[:limit]}" if opts[:limit]
-        sql
       end
 
       # Adds full text filter
@@ -305,8 +300,7 @@ module Sequel
 
       # MySQL specific syntax for inserting multiple values at once.
       def multi_insert_sql(columns, values)
-        values = values.map {|r| literal(Array(r))}.join(COMMA_SEPARATOR)
-        ["#{insert_sql_base}#{source_list(@opts[:from])} (#{identifier_list(columns)}) VALUES #{values}#{insert_sql_suffix}"]
+        [insert_sql(columns, LiteralString.new('VALUES ' + values.map {|r| literal(Array(r))}.join(COMMA_SEPARATOR)))]
       end
       
       # MySQL uses the nonstandard ` (backtick) for quoting identifiers.
@@ -367,31 +361,41 @@ module Sequel
         false
       end
 
-      # MySQL supports ORDER and LIMIT clauses in UPDATE statements.
-      def update_sql(values)
-        sql = super
-        sql << " ORDER BY #{expression_list(opts[:order])}" if opts[:order]
-        sql << " LIMIT #{opts[:limit]}" if opts[:limit]
-        sql
-      end
-
       private
 
       # MySQL supports INSERT IGNORE INTO
-      def insert_sql_base
-        "INSERT #{'IGNORE ' if opts[:insert_ignore]}INTO "
+      def insert_ignore_sql(sql)
+        sql << " IGNORE" if opts[:insert_ignore]
       end
 
       # MySQL supports INSERT ... ON DUPLICATE KEY UPDATE
-      def insert_sql_suffix
-        on_duplicate_key_update_sql if opts[:on_duplicate_key_update]
+      def insert_on_duplicate_key_update_sql(sql)
+        sql << on_duplicate_key_update_sql if opts[:on_duplicate_key_update]
       end
 
       # MySQL doesn't use the SQL standard DEFAULT VALUES.
-      def insert_default_values_sql
-        "#{insert_sql_base}#{source_list(@opts[:from])} () VALUES ()"
+      def insert_columns_sql(sql, columns, values)
+        if values.is_a?(Array) && values.empty?
+          sql << " ()"
+        else
+          super
+        end
       end
-      
+
+      def insert_values_sql(sql, columns, values)
+        if values.is_a?(Array) && values.empty?
+          sql << " VALUES ()"
+        else
+          super
+        end
+      end
+
+      def limit_sql(sql)
+        sql << " LIMIT #{@opts[:limit]}" if @opts[:limit]
+      end
+      alias delete_limit_sql limit_sql
+      alias update_limit_sql limit_sql
+
       # Use 0 for false on MySQL
       def literal_false
         BOOL_FALSE
@@ -420,10 +424,25 @@ module Sequel
           " ON DUPLICATE KEY UPDATE #{updating.join(COMMA_SEPARATOR)}"
         end
       end
-      
-      # MySQL does not support the SQL WITH clause
+
+      # MySQL supports the ORDER BY and LIMIT clauses for DELETE statements
+      def delete_clause_order
+        DELETE_CLAUSE_ORDER
+      end
+
+      # MySQL supports the IGNORE and ON DUPLICATE KEY UPDATE clauses for INSERT statements
+      def insert_clause_order
+        INSERT_CLAUSE_ORDER
+      end
+
+      # MySQL does not support the SQL WITH clause for SELECT statements
       def select_clause_order
         SELECT_CLAUSE_ORDER
+      end
+
+      # MySQL supports the ORDER BY and LIMIT clauses for UPDATE statements
+      def update_clause_order
+        UPDATE_CLAUSE_ORDER
       end
     end
   end
