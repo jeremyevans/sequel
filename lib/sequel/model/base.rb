@@ -653,6 +653,12 @@ module Sequel
       def keys
         @values.keys
       end
+      
+      # Whether this object has been modified since last saved, used by
+      # save_changes to determine whether changes should be saved
+      def modified?
+        !changed_columns.empty?
+      end
   
       # Returns true if the current instance represents a new record.
       def new?
@@ -706,11 +712,11 @@ module Sequel
         use_transaction ? db.transaction(opts){_save(columns, opts)} : _save(columns, opts)
       end
 
-      # Saves only changed columns or does nothing if no columns are marked as 
-      # chanaged.  If no columns have been changed, returns nil.  If unable to
+      # Saves only changed columns if the object has been modified.
+      # If the object has not been modified, returns nil.  If unable to
       # save, returns false unless raise_on_save_failure is true.
       def save_changes
-        save(:changed=>true) || false unless changed_columns.empty?
+        save(:changed=>true) || false if modified? 
       end
   
       # Updates the instance with the supplied values with support for virtual
