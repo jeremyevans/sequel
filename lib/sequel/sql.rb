@@ -691,6 +691,18 @@ module Sequel
         @expression, @descending = expression, descending
       end
 
+      def invert
+        OrderedExpression.new(@expression, !@descending)
+      end
+
+      def desc
+        OrderedExpression.new(@expression)
+      end
+
+      def asc
+        OrderedExpression.new(@expression, false)
+      end
+
       to_s_method :ordered_expression_sql
     end
 

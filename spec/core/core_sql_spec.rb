@@ -249,6 +249,15 @@ context "Symbol" do
     @ds.literal(:column.qualify(:table.qualify(:schema))).should == '"SCHEMA"."TABLE"."COLUMN"'
     @ds.literal(:column.qualify(:table__name.identifier.qualify(:schema))).should == '"SCHEMA"."TABLE__NAME"."COLUMN"'
   end
+
+  specify "should be able to specify order" do
+    @oe = :xyz.desc
+    @oe.class.should == Sequel::SQL::OrderedExpression
+    @oe.descending.should == true
+    @oe = :xyz.asc
+    @oe.class.should == Sequel::SQL::OrderedExpression
+    @oe.descending.should == false
+  end
 end
 
 context "Dataset#literal" do
@@ -368,5 +377,25 @@ context "Sequel::SQL::Function#==" do
     c.should_not == d
     (a == d).should == false
     (c == d).should == false
+  end
+end
+
+context "Sequel::SQL::OrderedExpression" do
+  specify "should #desc" do
+    @oe = :column.asc
+    @oe.descending.should == false
+    @oe.desc.descending.should == true
+  end
+
+  specify "should #asc" do
+    @oe = :column.desc
+    @oe.descending.should == true
+    @oe.asc.descending.should == false
+  end
+
+  specify "should #invert" do
+    @oe = :column.desc
+    @oe.invert.descending.should == false
+    @oe.invert.invert.descending.should == true
   end
 end

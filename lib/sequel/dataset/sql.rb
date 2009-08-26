@@ -1087,7 +1087,7 @@ module Sequel
       order.map do |f|
         case f
         when SQL::OrderedExpression
-          SQL::OrderedExpression.new(f.expression, !f.descending)
+          f.invert
         else
           SQL::OrderedExpression.new(f)
         end
