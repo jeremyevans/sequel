@@ -32,7 +32,7 @@ Let's say you have 4 slave database servers with names slave_server0,
 slave_server1, slave_server2, and slave_server3.
 
   DB=Sequel.connect('postgres://master_server/database', \
-    :servers=>{:read_only=>proc{|db| :host=>db.get_slave_host}})
+    :servers=>{:read_only=>proc{|db| {:host=>db.get_slave_host}}})
   def DB.get_slave_host
     @current_host ||= -1
     "slave_server#{(@current_host+=1)%4}"
@@ -50,8 +50,8 @@ it shows that the master database is named :default.  So for 4 masters and
 4 slaves:
 
   DB=Sequel.connect('postgres://master_server/database', \
-    :servers=>{:read_only=>proc{|db| :host=>db.get_slave_host}, \
-      :default=>proc{|db| :host=>db.get_master_host}})
+    :servers=>{:read_only=>proc{|db| {:host=>db.get_slave_host}}, \
+      :default=>proc{|db| {:host=>db.get_master_host}}})
   def DB.get_slave_host
     @current_slave_host ||= -1
     "slave_server#{(@current_slave_host+=1)%4}"
