@@ -30,6 +30,7 @@
 <li><a href='http://github.com/sbfaulkner/sequel_container'>sequel_container</a>: Contained documents (i.e. attachments) for models.</li>
 <li><a href='http://github.com/pkondzior/sequel_nested_set'>sequel_nested_set</a>: Nested set implementation, ported from the Awesome Nested Set Active Record plugin.</li>
 <li><a href='http://github.com/boof/sequel_notnaughty'>sequel_notnaughty</a>: Port of the NotNaughty validation framework.</li>
+<li><a href='http://github.com/aemadrid/sequel_orderable'>sequel_orderable</a>: Allows for model instances to be part of an ordered list, based on a 'position' field in the database.</li>
 <li><a href='http://github.com/jackdempsey/sequel_polymorphic'>sequel_polymorphic</a>: Lets you easily create polymorphic associations.</li>
 <li><a href='http://github.com/jackdempsey/sequel_taggable'>sequel_taggable</a>: Allows easily adding tags to any model.</li>
 </ul>
