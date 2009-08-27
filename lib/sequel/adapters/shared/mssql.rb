@@ -121,6 +121,18 @@ module Sequel
         end
       end
 
+      def server_version(server=nil)
+        return @server_version if @server_version
+        @server_version = synchronize(server) do |conn|
+          (conn.server_version rescue nil) if conn.respond_to?(:server_version)
+        end
+        unless @server_version
+          m = /^(\d+)\.(\d+)\.(\d+)/.match(fetch("SELECT SERVERPROPERTY('ProductVersion')").single_value)
+          @server_version = (m[1].to_i * 1000000) + (m[2].to_i * 10000) + m[3].to_i
+        end
+        @server_version
+      end
+      
       # SQL fragment for marking a table as temporary
       def temporary_table_sql
         TEMPORARY
@@ -254,6 +266,11 @@ module Sequel
           limit(@opts[:limit]).
           where(rn > o).
           select_sql
+      end
+
+      # The version of the database server
+      def server_version
+        db.server_version(@opts[:server])
       end
 
       # Microsoft SQL Server does not support INTERSECT or EXCEPT
