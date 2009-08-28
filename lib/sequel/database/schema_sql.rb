@@ -159,7 +159,7 @@ module Sequel
       elsif index[:where]
         raise Error, "Partial indexes are not supported for this database"
       else
-        "CREATE #{'UNIQUE ' if index[:unique]}INDEX #{quote_identifier(index_name)} ON #{quote_identifier(table_name)} #{literal(index[:columns])}"
+        "CREATE #{'UNIQUE ' if index[:unique]}INDEX #{quote_identifier(index_name)} ON #{quote_schema_table(table_name)} #{literal(index[:columns])}"
       end
     end
   
