@@ -303,7 +303,7 @@ module Sequel
       # breaks the use of subselects in prepared statements, so extend the
       # temporary prepared statement that this creates with a module that
       # fixes it.
-      def call(type, bind_arguments={}, values=nil)
+      def call(type, bind_arguments={}, *values)
         ps = to_prepared_statement(type, values)
         ps.extend(CallableStatementMethods)
         ps.call(bind_arguments)
@@ -346,7 +346,7 @@ module Sequel
       
       # Store the given type of prepared statement in the associated database
       # with the given name.
-      def prepare(type, name=nil, values=nil)
+      def prepare(type, name=nil, *values)
         ps = to_prepared_statement(type, values)
         ps.extend(PreparedStatementMethods)
         if name

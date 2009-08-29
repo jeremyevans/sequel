@@ -76,9 +76,9 @@ module Sequel
         when :first
           clone(:limit=>1).select_sql
         when :insert
-          insert_sql(@prepared_modify_values)
+          insert_sql(*@prepared_modify_values)
         when :update
-          update_sql(@prepared_modify_values)
+          update_sql(*@prepared_modify_values)
         when :delete
           delete_sql
         end
@@ -115,9 +115,9 @@ module Sequel
         when :first
           first
         when :insert
-          insert(@prepared_modify_values)
+          insert(*@prepared_modify_values)
         when :update
-          update(@prepared_modify_values)
+          update(*@prepared_modify_values)
         when :delete
           delete
         end
@@ -179,8 +179,8 @@ module Sequel
     # specified in the hash.  values is a hash of passed to
     # insert or update (if one of those types is used),
     # which may contain placeholders.
-    def call(type, bind_vars={}, values=nil, &block)
-      prepare(type, nil, values).call(bind_vars, &block)
+    def call(type, bind_variables={}, *values)
+      prepare(type, nil, *values).call(bind_variables)
     end
     
     # Prepare an SQL statement for later execution. This returns
@@ -192,7 +192,7 @@ module Sequel
     #   ps = prepare(:select, :select_by_name)
     #   ps.call(:name=>'Blah')
     #   db.call(:select_by_name, :name=>'Blah')
-    def prepare(type, name=nil, values=nil)
+    def prepare(type, name=nil, *values)
       ps = to_prepared_statement(type, values)
       db.prepared_statements[name] = ps if name
       ps

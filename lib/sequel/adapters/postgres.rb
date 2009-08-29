@@ -413,7 +413,7 @@ module Sequel
         end
         
         # Execute the given type of statement with the hash of values.
-        def call(type, bind_vars={}, values=nil, &block)
+        def call(type, hash, *values, &block)
           ps = to_prepared_statement(type, values)
           ps.extend(BindArgumentMethods)
           ps.call(bind_vars, &block)
@@ -421,7 +421,7 @@ module Sequel
         
         # Prepare the given type of statement with the given name, and store
         # it in the database to be called later.
-        def prepare(type, name=nil, values=nil)
+        def prepare(type, name=nil, *values)
           ps = to_prepared_statement(type, values)
           ps.extend(PreparedStatementMethods)
           if name

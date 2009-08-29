@@ -601,7 +601,7 @@ module Sequel
           return @prepared_sql if @prepared_sql
           super
           if @prepared_type == :insert and !@opts[:disable_insert_returning] and server_version >= 80200
-            @prepared_sql = insert_returning_pk_sql(@prepared_modify_values)
+            @prepared_sql = insert_returning_pk_sql(*@prepared_modify_values)
             meta_def(:insert_returning_pk_sql){|*args| prepared_sql}
           end
           @prepared_sql

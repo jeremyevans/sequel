@@ -455,7 +455,7 @@ module Sequel
       
       # Create a named prepared statement that is stored in the
       # database (and connection) for reuse.
-      def prepare(type, name=nil, values=nil)
+      def prepare(type, name=nil, *values)
         ps = to_prepared_statement(type, values)
         ps.extend(PreparedStatementMethods)
         if name

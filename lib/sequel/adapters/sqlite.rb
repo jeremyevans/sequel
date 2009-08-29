@@ -188,7 +188,7 @@ module Sequel
       # Prepare the given type of query with the given name and store
       # it in the database.  Note that a new native prepared statement is
       # created on each call to this prepared statement.
-      def prepare(type, name=nil, values=nil)
+      def prepare(type, name=nil, *values)
         ps = to_prepared_statement(type, values)
         ps.extend(PreparedStatementMethods)
         db.prepared_statements[name] = ps if name
