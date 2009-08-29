@@ -288,4 +288,22 @@ describe "Sequel::Plugins::ValidationHelpers" do
     @user.should be_valid
     MODEL_DB.sqls.last.should == "SELECT COUNT(*) AS count FROM items WHERE ((username = '0records') AND (password = 'anothertest')) LIMIT 1"
   end
+
+  it "should support validates_unique with a block" do
+    @c.columns(:id, :username, :password)
+    @c.set_dataset MODEL_DB[:items]
+    @c.set_validations{validates_unique(:username){|ds| ds.filter(:active)}}
+    @c.dataset.extend(Module.new {
+      def fetch_rows (sql)
+        @db << sql
+        yield({:v => 0})
+      end
+    })
+    
+    MODEL_DB.reset
+    @c.new(:username => "0records", :password => "anothertest").should be_valid
+    @c.load(:id=>3, :username => "0records", :password => "anothertest").should be_valid
+    MODEL_DB.sqls.should == ["SELECT COUNT(*) AS count FROM items WHERE ((username = '0records') AND active) LIMIT 1",
+                    "SELECT COUNT(*) AS count FROM items WHERE (((username = '0records') AND active) AND (id != 3)) LIMIT 1"]
+  end
 end 

@@ -117,11 +117,17 @@ module Sequel
         #   validates_unique(:column1, :column2)
         # validates them separately.
         #
+        # You can pass a block, which is yielded the dataset in which the columns
+        # must be unique. So if you are doing a soft delete of records, in which
+        # the name must be unique, but only for active records:
+        #
+        #   validates_unique(:name){|ds| ds.filter(:active)}
+        #
         # You should also add a unique index in the
         # database, as this suffers from a fairly obvious race condition.
         #
         # This validation does not respect the :allow_* options that the other validations accept,
-        # since it can deals with multiple attributes at once.
+        # since it can deal with a grouping of multiple attributes.
         #
         # Possible Options:
         # * :message - The message to use (default: 'is already taken')
@@ -129,6 +135,7 @@ module Sequel
           message = (atts.pop[:message] if atts.last.is_a?(Hash)) || 'is already taken'
           atts.each do |a|
             ds = model.filter(Array(a).map{|x| [x, send(x)]})
+            ds = yield(ds) if block_given?
             errors.add(a, message) unless (new? ? ds : ds.exclude(pk_hash)).count == 0
           end
         end
