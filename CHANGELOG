@@ -1,5 +1,7 @@
 === HEAD
 
+* Add #invert, #asc, and #desc to OrderedExpression (dlee)
+
 * Allow validates_unique to take a block used to scope the uniqueness constraint (drfreeze, jeremyevans)
 
 * Automatically save a new many_to_many associated object when associating the object via add_* (jeremyevans)

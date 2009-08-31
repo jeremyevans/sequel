@@ -691,14 +691,17 @@ module Sequel
         @expression, @descending = expression, descending
       end
 
+      # Return an inverted expression, changing ASC to DESC and vice versa
       def invert
         OrderedExpression.new(@expression, !@descending)
       end
 
+      # Return a copy that is DESC
       def desc
         OrderedExpression.new(@expression)
       end
 
+      # Return a copy that is ASC
       def asc
         OrderedExpression.new(@expression, false)
       end
