@@ -148,6 +148,14 @@ module Sequel
         SELECT_CLAUSE_ORDER
       end
 
+      # Modify the SQL to add the list of tables to select FROM
+      # Oracle doesn't support select without FROM clause
+      # so add the dummy DUAL table if the dataset doesn't select
+      # from a table.
+      def select_from_sql(sql)
+        sql << " FROM #{source_list(@opts[:from] || ['DUAL'])}"
+      end
+
       # Oracle requires a subselect to do limit and offset
       def select_limit_sql(sql)
         if limit = @opts[:limit]
@@ -157,14 +165,6 @@ module Sequel
             sql.replace("SELECT * FROM (#{sql}) WHERE ROWNUM <= #{limit}")
           end
         end
-      end
-
-      # Modify the sql to add the list of tables to select FROM
-      # Oracle doesn't support select without FROM clause
-      # so add dummy DUAL table by default
-      def select_from_sql(sql)
-        from = source_list(@opts[:from] || 'DUAL')  
-        sql << " FROM #{from}"
       end
     end
   end

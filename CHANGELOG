@@ -1,5 +1,7 @@
 === HEAD
 
+* Allow datasets without tables to work correctly on Oracle (mikegolod)
+
 * Add #invert, #asc, and #desc to OrderedExpression (dlee)
 
 * Allow validates_unique to take a block used to scope the uniqueness constraint (drfreeze, jeremyevans)
