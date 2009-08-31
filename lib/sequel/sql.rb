@@ -691,9 +691,9 @@ module Sequel
         @expression, @descending = expression, descending
       end
 
-      # Return an inverted expression, changing ASC to DESC and vice versa
-      def invert
-        OrderedExpression.new(@expression, !@descending)
+      # Return a copy that is ASC
+      def asc
+        OrderedExpression.new(@expression, false)
       end
 
       # Return a copy that is DESC
@@ -701,9 +701,9 @@ module Sequel
         OrderedExpression.new(@expression)
       end
 
-      # Return a copy that is ASC
-      def asc
-        OrderedExpression.new(@expression, false)
+      # Return an inverted expression, changing ASC to DESC and vice versa
+      def invert
+        OrderedExpression.new(@expression, !@descending)
       end
 
       to_s_method :ordered_expression_sql
