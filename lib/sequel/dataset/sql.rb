@@ -913,6 +913,7 @@ module Sequel
       clause_sql(:insert)
     end
 
+    # Formats an UPDATE statement using the stored values.
     def _update_sql
       clause_sql(:update)
     end
@@ -956,9 +957,10 @@ module Sequel
       raise(InvalidOperation, "Joined datasets cannot be modified") if (opts[:from].is_a?(Array) && opts[:from].size > 1) || opts[:join]
     end
 
-    def clause_sql(clause)
-      sql = clause.to_s.upcase
-      send("#{clause}_clause_methods").each{|x| send(x, sql)}
+    # Prepare an SQL statement by calling all clause methods for the given statement type.
+    def clause_sql(type)
+      sql = type.to_s.upcase
+      send("#{type}_clause_methods").each{|x| send(x, sql)}
       sql
     end
 
@@ -1055,6 +1057,7 @@ module Sequel
       columns.map{|i| quote_identifier(i)}.join(COMMA_SEPARATOR)
     end
 
+    # SQL fragment specifying the table to insert INTO
     def insert_into_sql(sql)
       sql << " INTO #{source_list(@opts[:from])}"
     end
@@ -1064,11 +1067,13 @@ module Sequel
       INSERT_CLAUSE_METHODS
     end
 
+    # SQL fragment specifying the columns to insert into
     def insert_columns_sql(sql)
       columns = opts[:columns]
       sql << " (#{columns.join(COMMA_SEPARATOR)})" if columns && !columns.empty?
     end
 
+    # SQL fragment specifying the values to insert.
     def insert_values_sql(sql)
       case values = opts[:values]
       when Array
@@ -1161,7 +1166,9 @@ module Sequel
       v.to_s
     end
 
-    # SQL fragmento for a type of object not handled by Dataset#literal.  Raises an error.  If a database specific type is allowed, this should be overriden in a subclass.
+    # SQL fragmento for a type of object not handled by Dataset#literal.
+    # Raises an error.  If a database specific type is allowed,
+    # this should be overriden in a subclass.
     def literal_other(v)
       raise Error, "can't express #{v.inspect} as a SQL literal"
     end
@@ -1335,12 +1342,14 @@ module Sequel
     alias delete_where_sql select_where_sql
     alias update_where_sql select_where_sql
     
+    # SQL Fragment specifying the WITH clause
     def select_with_sql(sql)
       ws = opts[:with]
       return if !ws || ws.empty?
       sql.replace("#{select_with_sql_base}#{ws.map{|w| "#{w[:name]}#{"(#{argument_list(w[:args])})" if w[:args]} AS (#{subselect_sql(w[:dataset])})"}.join(COMMA_SEPARATOR)} #{sql}")
     end
     
+    # The base keyword to use for the SQL WITH clause
     def select_with_sql_base
       SQL_WITH
     end
@@ -1391,10 +1400,12 @@ module Sequel
       UPDATE_CLAUSE_METHODS
     end
 
+    # SQL fragment specifying the tables from with to delete
     def update_table_sql(sql)
       sql << " #{source_list(@opts[:from])}"
     end
 
+    # The SQL fragment specifying the columns and values to SET.
     def update_set_sql(sql)
       values = opts[:values]
       set = if values.is_a?(Hash)

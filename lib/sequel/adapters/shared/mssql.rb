@@ -214,6 +214,7 @@ module Sequel
         clone({:output => output})
       end
 
+      # An output method that modifies the receiver.
       def output!(into, values)
         mutation_method(:output, into, values)
       end
@@ -281,6 +282,7 @@ module Sequel
         DELETE_CLAUSE_METHODS
       end
 
+      # MSSQL supports FROM clauses in DELETE and UPDATE statements.
       def from_sql(sql)
         if (opts[:from].is_a?(Array) && opts[:from].size > 1) || opts[:join]
           select_from_sql(sql)
@@ -347,6 +349,7 @@ module Sequel
         sql << " WITH #{@opts[:table_options]}" if @opts[:table_options]
       end
 
+      # SQL fragment for MSSQL's OUTPUT clause.
       def output_sql(sql)
         return unless output = @opts[:output]
         sql << " OUTPUT #{column_list(output[:select_list])}"

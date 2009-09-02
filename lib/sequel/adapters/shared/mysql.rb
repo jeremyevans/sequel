@@ -392,6 +392,7 @@ module Sequel
         sql << on_duplicate_key_update_sql if opts[:on_duplicate_key_update]
       end
 
+      # MySQL doesn't use the standard DEFAULT VALUES for empty values.
       def insert_values_sql(sql, columns, values)
         if values.is_a?(Array) && values.empty?
           sql << " VALUES ()"
@@ -400,6 +401,7 @@ module Sequel
         end
       end
 
+      # MySQL allows a LIMIT in DELETE and UPDATE statements.
       def limit_sql(sql)
         sql << " LIMIT #{@opts[:limit]}" if @opts[:limit]
       end
