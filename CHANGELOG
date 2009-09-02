@@ -1,3 +1,13 @@
+=== HEAD
+
+* Support updating and deleting joined datasets on MSSQL (jfirebaugh)
+
+* Support the OUTPUT SQL clause on MSSQL delete, insert, and update statements (jfirebaugh)
+
+* Refactor generation of delete, insert, select, and update statements (jfirebaugh, jeremyevans)
+
+* Do a better job of parsing defaults on MSSQL (jfirebaugh)
+
 === 3.4.0 (2009-09-02)
 
 * Allow datasets without tables to work correctly on Oracle (mikegolod)
