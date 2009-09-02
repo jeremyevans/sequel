@@ -211,7 +211,7 @@ context "A simple dataset" do
   specify "should format an insert statement with sub-query" do
     @sub = Sequel::Dataset.new(nil).from(:something).filter(:x => 2)
     @dataset.insert_sql(@sub).should == \
-      "INSERT INTO test (SELECT * FROM something WHERE (x = 2))"
+      "INSERT INTO test SELECT * FROM something WHERE (x = 2)"
   end
   
   specify "should format an insert statement with array" do

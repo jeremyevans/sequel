@@ -8,7 +8,6 @@ module Sequel
     COLUMN_REF_RE3 = /\A([\w ]+)__([\w ]+)\z/.freeze
     COUNT_FROM_SELF_OPTS = [:distinct, :group, :sql, :limit, :compounds]
     DATASET_ALIAS_BASE_NAME = 't'.freeze
-    INSERT_SQL_BASE="INSERT INTO ".freeze
     IS_LITERALS = {nil=>'NULL'.freeze, true=>'TRUE'.freeze, false=>'FALSE'.freeze}.freeze
     IS_OPERATORS = ::Sequel::SQL::ComplexExpression::IS_OPERATORS
     N_ARITY_OPERATORS = ::Sequel::SQL::ComplexExpression::N_ARITY_OPERATORS
@@ -16,7 +15,10 @@ module Sequel
     QUALIFY_KEYS = [:select, :where, :having, :order, :group]
     QUESTION_MARK = '?'.freeze
     STOCK_COUNT_OPTS = {:select => [SQL::AliasedExpression.new(LiteralString.new("COUNT(*)").freeze, :count)], :order => nil}.freeze
+    DELETE_CLAUSE_ORDER = %w'from where'.freeze
+    INSERT_CLAUSE_ORDER = %w'into columns values'.freeze
     SELECT_CLAUSE_ORDER = %w'with distinct columns from join where group having compounds order limit'.freeze
+    UPDATE_CLAUSE_ORDER = %w'table set where'.freeze
     TIMESTAMP_FORMAT = "'%Y-%m-%d %H:%M:%S%N%z'".freeze
     STANDARD_TIMESTAMP_FORMAT = "TIMESTAMP #{TIMESTAMP_FORMAT}".freeze
     TWO_ARITY_OPERATORS = ::Sequel::SQL::ComplexExpression::TWO_ARITY_OPERATORS
@@ -112,12 +114,8 @@ module Sequel
 
       check_modification_allowed!
 
-      sql = "DELETE FROM #{source_list(opts[:from])}"
-
-      if where = opts[:where]
-        sql << " WHERE #{literal(where)}"
-      end
-
+      sql = 'DELETE'
+      delete_clause_order.each{|x| send(:"delete_#{x}_sql", sql)}
       sql
     end
 
@@ -349,7 +347,8 @@ module Sequel
 
       check_modification_allowed!
 
-      from = source_list(@opts[:from])
+      columns = []
+
       case values.size
       when 0
         values = {}
@@ -360,33 +359,34 @@ module Sequel
         elsif vals.respond_to?(:values)
           values = vals.values
         end
+      when 2
+        if values.at(0).is_a?(Array)
+          columns, values = values.at(0), values.at(1)
+        end
       end
 
-      case values
-      when Array
-        if values.empty?
-          insert_default_values_sql
-        else
-          "#{insert_sql_base}#{from} VALUES #{literal(values)}#{insert_sql_suffix}"
-        end
-      when Hash
+      if Hash === values
         values = @opts[:defaults].merge(values) if @opts[:defaults]
         values = values.merge(@opts[:overrides]) if @opts[:overrides]
-        if values.empty?
-          insert_default_values_sql
-        else
-          fl, vl = [], []
-          values.each do |k, v|
-            fl << literal(String === k ? k.to_sym : k)
-            vl << literal(v)
-          end
-          "#{insert_sql_base}#{from} (#{fl.join(COMMA_SEPARATOR)}) VALUES (#{vl.join(COMMA_SEPARATOR)})#{insert_sql_suffix}"
-        end
-      when Dataset
-        "#{insert_sql_base}#{from} #{literal(values)}#{insert_sql_suffix}"
+
+        columns = values.keys
+        values = values.values
       end
+
+      columns = columns.map{|k| literal(String === k ? k.to_sym : k)}
+
+      sql = 'INSERT'
+      insert_clause_order.each do |x|
+        m = :"insert_#{x}_sql"
+        if method(m).arity == 3
+          send(m, sql, columns, values)
+        else
+          send(m, sql)
+        end
+      end
+      sql
     end
-    
+
     # Adds an INTERSECT clause using a second dataset object.
     # An INTERSECT compound dataset returns all rows in both the current dataset
     # and the given dataset.
@@ -590,8 +590,7 @@ module Sequel
     # This method should be overridden by descendants if the support
     # inserting multiple records in a single SQL statement.
     def multi_insert_sql(columns, values)
-      s = "#{insert_sql_base}#{source_list(@opts[:from])} (#{identifier_list(columns)}) VALUES "
-      values.map{|r| s + literal(r)}
+      values.map{|r| insert_sql(columns, r)}
     end
     
     # Adds an alternate filter to an existing filter using OR. If no filter 
@@ -851,26 +850,18 @@ module Sequel
 
       check_modification_allowed!
       
-      sql = "UPDATE #{source_list(@opts[:from])} SET "
-      set = if values.is_a?(Hash)
-        values = opts[:defaults].merge(values) if opts[:defaults]
-        values = values.merge(opts[:overrides]) if opts[:overrides]
-        # get values from hash
-        values.map do |k, v|
-          "#{[String, Symbol].any?{|c| k.is_a?(c)} ? quote_identifier(k) : literal(k)} = #{literal(v)}"
-        end.join(COMMA_SEPARATOR)
-      else
-        # copy values verbatim
-        values
+      sql = 'UPDATE'
+      update_clause_order.each do |x|
+        m = :"update_#{x}_sql"
+        if method(m).arity == 2
+          send(m, sql, values)
+        else
+          send(m, sql)
+        end
       end
-      sql << set
-      if where = opts[:where]
-        sql << " WHERE #{literal(where)}"
-      end
-
       sql
     end
-    
+
     # Add a condition to the WHERE clause.  See #filter for argument types.
     #
     #   dataset.group(:a).having(:a).filter(:b) # SELECT * FROM items GROUP BY a HAVING a AND b
@@ -1060,19 +1051,23 @@ module Sequel
       columns.map{|i| quote_identifier(i)}.join(COMMA_SEPARATOR)
     end
 
-    # SQL statement for the beginning of an INSERT statement
-    def insert_sql_base
-      INSERT_SQL_BASE
+    def insert_into_sql(sql)
+      sql << " INTO #{source_list(@opts[:from])}"
     end
 
-    # SQL statement for formatting an insert statement with default values
-    def insert_default_values_sql
-      "#{insert_sql_base}#{source_list(@opts[:from])} DEFAULT VALUES"
+    def insert_columns_sql(sql, columns, values)
+      sql << " (#{columns.join(COMMA_SEPARATOR)})" unless columns.empty?
     end
 
-    # SQL statement for end of an INSERT statement
-    def insert_sql_suffix
-      nil
+    def insert_values_sql(sql, columns, values)
+      case values
+      when Array
+        sql << (values.empty? ? " DEFAULT VALUES" : " VALUES #{literal(values)}")
+      when Dataset
+        sql << " #{subselect_sql(values)}"
+      else
+        sql << " #{literal(values)}"
+      end
     end
 
     # Inverts the given order by breaking it into a list of column references
@@ -1261,9 +1256,24 @@ module Sequel
       end
     end
 
+    # The order of methods to call to build the DELETE SQL statement
+    def delete_clause_order
+      DELETE_CLAUSE_ORDER
+    end
+
+    # The order of methods to call to build the INSERT SQL statement
+    def insert_clause_order
+      INSERT_CLAUSE_ORDER
+    end
+
     # The order of methods to call to build the SELECT SQL statement
     def select_clause_order
       SELECT_CLAUSE_ORDER
+    end
+
+    # The order of methods to call to build the UPDATE SQL statement
+    def update_clause_order
+      UPDATE_CLAUSE_ORDER
     end
 
     # Modify the sql to add the columns selected
@@ -1293,6 +1303,7 @@ module Sequel
     def select_from_sql(sql)
       sql << " FROM #{source_list(@opts[:from])}" if @opts[:from]
     end
+    alias delete_from_sql select_from_sql
 
     # Modify the sql to add the expressions to GROUP BY
     def select_group_sql(sql)
@@ -1319,11 +1330,15 @@ module Sequel
     def select_order_sql(sql)
       sql << " ORDER BY #{expression_list(@opts[:order])}" if @opts[:order]
     end
+    alias delete_order_sql select_order_sql
+    alias update_order_sql select_order_sql
 
     # Modify the sql to add the filter criteria in the WHERE clause
     def select_where_sql(sql)
       sql << " WHERE #{literal(@opts[:where])}" if @opts[:where]
     end
+    alias delete_where_sql select_where_sql
+    alias update_where_sql select_where_sql
     
     def select_with_sql(sql)
       ws = opts[:with]
@@ -1380,6 +1395,25 @@ module Sequel
     # literalized.
     def _truncate_sql(table)
       "TRUNCATE TABLE #{table}"
+    end
+
+    def update_table_sql(sql)
+      sql << " #{source_list(@opts[:from])}"
+    end
+
+    def update_set_sql(sql, values)
+      set = if values.is_a?(Hash)
+        values = opts[:defaults].merge(values) if opts[:defaults]
+        values = values.merge(opts[:overrides]) if opts[:overrides]
+        # get values from hash
+        values.map do |k, v|
+          "#{[String, Symbol].any?{|c| k.is_a?(c)} ? quote_identifier(k) : literal(k)} = #{literal(v)}"
+        end.join(COMMA_SEPARATOR)
+      else
+        # copy values verbatim
+        values
+      end
+      sql << " SET #{set}"
     end
   end
 end
