@@ -587,8 +587,8 @@ module Sequel
       QUERY_PLAN = 'QUERY PLAN'.to_sym
       ROW_EXCLUSIVE = 'ROW EXCLUSIVE'.freeze
       ROW_SHARE = 'ROW SHARE'.freeze
-      SELECT_CLAUSE_ORDER = %w'distinct columns from join where group having compounds order limit lock'.freeze
-      SELECT_CLAUSE_ORDER_84 = %w'with distinct columns from join where group having window compounds order limit lock'.freeze
+      SELECT_CLAUSE_METHODS = Dataset.clause_methods(:select, %w'distinct columns from join where group having compounds order limit lock')
+      SELECT_CLAUSE_METHODS_84 = Dataset.clause_methods(:select, %w'with distinct columns from join where group having window compounds order limit lock')
       SHARE = 'SHARE'.freeze
       SHARE_ROW_EXCLUSIVE = 'SHARE ROW EXCLUSIVE'.freeze
       SHARE_UPDATE_EXCLUSIVE = 'SHARE UPDATE EXCLUSIVE'.freeze
@@ -736,8 +736,8 @@ module Sequel
       end
 
       # The order of clauses in the SELECT SQL statement
-      def select_clause_order
-        server_version >= 80400 ? SELECT_CLAUSE_ORDER_84 : SELECT_CLAUSE_ORDER
+      def select_clause_methods
+        server_version >= 80400 ? SELECT_CLAUSE_METHODS_84 : SELECT_CLAUSE_METHODS
       end
 
       # SQL fragment for named window specifications

@@ -235,7 +235,7 @@ module Sequel
     
     # Instance methods for datasets that connect to an SQLite database
     module DatasetMethods
-      SELECT_CLAUSE_ORDER = %w'distinct columns from join where group having compounds order limit'.freeze
+      SELECT_CLAUSE_METHODS = Dataset.clause_methods(:select, %w'distinct columns from join where group having compounds order limit')
       CONSTANT_MAP = {:CURRENT_DATE=>"date(CURRENT_TIMESTAMP, 'localtime')".freeze, :CURRENT_TIMESTAMP=>"datetime(CURRENT_TIMESTAMP, 'localtime')".freeze, :CURRENT_TIME=>"time(CURRENT_TIMESTAMP, 'localtime')".freeze}
     
       # SQLite does not support pattern matching via regular expressions.
@@ -302,8 +302,8 @@ module Sequel
       end
       
       # SQLite does not support the SQL WITH clause
-      def select_clause_order
-        SELECT_CLAUSE_ORDER
+      def select_clause_methods
+        SELECT_CLAUSE_METHODS
       end
       
       # SQLite treats a DELETE with no WHERE clause as a TRUNCATE

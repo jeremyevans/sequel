@@ -1,5 +1,12 @@
 module Sequel
   class Dataset
+
+    # Given a type (e.g. select) and an array of clauses,
+    # return an array of methods to call to build the SQL string.
+    def self.clause_methods(type, clauses)
+      clauses.map{|clause| :"#{type}_#{clause}_sql"}.freeze
+    end
+
     AND_SEPARATOR = " AND ".freeze
     BOOL_FALSE = "'f'".freeze
     BOOL_TRUE = "'t'".freeze
@@ -15,10 +22,10 @@ module Sequel
     QUALIFY_KEYS = [:select, :where, :having, :order, :group]
     QUESTION_MARK = '?'.freeze
     STOCK_COUNT_OPTS = {:select => [SQL::AliasedExpression.new(LiteralString.new("COUNT(*)").freeze, :count)], :order => nil}.freeze
-    DELETE_CLAUSE_ORDER = %w'from where'.freeze
-    INSERT_CLAUSE_ORDER = %w'into columns values'.freeze
-    SELECT_CLAUSE_ORDER = %w'with distinct columns from join where group having compounds order limit'.freeze
-    UPDATE_CLAUSE_ORDER = %w'table set where'.freeze
+    DELETE_CLAUSE_METHODS = clause_methods(:delete, %w'from where')
+    INSERT_CLAUSE_METHODS = clause_methods(:insert, %w'into columns values')
+    SELECT_CLAUSE_METHODS = clause_methods(:select, %w'with distinct columns from join where group having compounds order limit')
+    UPDATE_CLAUSE_METHODS = clause_methods(:update, %w'table set where')
     TIMESTAMP_FORMAT = "'%Y-%m-%d %H:%M:%S%N%z'".freeze
     STANDARD_TIMESTAMP_FORMAT = "TIMESTAMP #{TIMESTAMP_FORMAT}".freeze
     TWO_ARITY_OPERATORS = ::Sequel::SQL::ComplexExpression::TWO_ARITY_OPERATORS
@@ -108,15 +115,9 @@ module Sequel
     #   dataset.filter{|o| o.price >= 100}.delete_sql #=>
     #     "DELETE FROM items WHERE (price >= 100)"
     def delete_sql
-      opts = @opts
-
       return static_sql(opts[:sql]) if opts[:sql]
-
       check_modification_allowed!
-
-      sql = 'DELETE'
-      delete_clause_order.each{|x| send(:"delete_#{x}_sql", sql)}
-      sql
+      clause_sql(:delete)
     end
 
     # Returns a copy of the dataset with the SQL DISTINCT clause.
@@ -338,10 +339,12 @@ module Sequel
     # the resulting statement includes column names. If no values are given, 
     # the resulting statement includes a DEFAULT VALUES clause.
     #
-    #   dataset.insert_sql #=> 'INSERT INTO items DEFAULT VALUES'
-    #   dataset.insert_sql(1,2,3) #=> 'INSERT INTO items VALUES (1, 2, 3)'
-    #   dataset.insert_sql(:a => 1, :b => 2) #=>
+    #   DB[:items].insert_sql #=> 'INSERT INTO items DEFAULT VALUES'
+    #   DB[:items].insert_sql(1,2,3) #=> 'INSERT INTO items VALUES (1, 2, 3)'
+    #   DB[:items].insert_sql(:a => 1, :b => 2) #=>
     #     'INSERT INTO items (a, b) VALUES (1, 2)'
+    #   DB[:items].insert_sql(DB[:old_items]) #=>
+    #     'INSERT INTO items SELECT * FROM old_items
     def insert_sql(*values)
       return static_sql(@opts[:sql]) if @opts[:sql]
 
@@ -374,17 +377,7 @@ module Sequel
       end
 
       columns = columns.map{|k| literal(String === k ? k.to_sym : k)}
-
-      sql = 'INSERT'
-      insert_clause_order.each do |x|
-        m = :"insert_#{x}_sql"
-        if method(m).arity == 3
-          send(m, sql, columns, values)
-        else
-          send(m, sql)
-        end
-      end
-      sql
+      clone(:columns=>columns, :values=>values)._insert_sql
     end
 
     # Adds an INTERSECT clause using a second dataset object.
@@ -768,9 +761,7 @@ module Sequel
     #   dataset.select_sql # => "SELECT * FROM items"
     def select_sql
       return static_sql(@opts[:sql]) if @opts[:sql]
-      sql = 'SELECT'
-      select_clause_order.each{|x| send(:"select_#{x}_sql", sql)}
-      sql
+      clause_sql(:select)
     end
 
     # Same as select_sql, not aliased directly to make subclassing simpler.
@@ -844,22 +835,9 @@ module Sequel
     # Raises an error if the dataset is grouped or includes more
     # than one table.
     def update_sql(values = {})
-      opts = @opts
-
       return static_sql(opts[:sql]) if opts[:sql]
-
       check_modification_allowed!
-      
-      sql = 'UPDATE'
-      update_clause_order.each do |x|
-        m = :"update_#{x}_sql"
-        if method(m).arity == 2
-          send(m, sql, values)
-        else
-          send(m, sql)
-        end
-      end
-      sql
+      clone(:values=>values)._update_sql
     end
 
     # Add a condition to the WHERE clause.  See #filter for argument types.
@@ -930,6 +908,15 @@ module Sequel
 
     protected
 
+    # Formats in INSERT statement using the stored columns and values.
+    def _insert_sql
+      clause_sql(:insert)
+    end
+
+    def _update_sql
+      clause_sql(:update)
+    end
+
     # Return a from_self dataset if an order or limit is specified, so it works as expected
     # with UNION, EXCEPT, and INTERSECT clauses.
     def compound_from_self
@@ -946,6 +933,12 @@ module Sequel
       clone(clause => cond)
     end
     
+    # Formats the truncate statement.  Assumes the table given has already been
+    # literalized.
+    def _truncate_sql(table)
+      "TRUNCATE TABLE #{table}"
+    end
+
     # Do a simple join of the arguments (which should be strings or symbols) separated by commas
     def argument_list(args)
       args.join(COMMA_SEPARATOR)
@@ -961,6 +954,12 @@ module Sequel
     def check_modification_allowed!
       raise(InvalidOperation, "Grouped datasets cannot be modified") if opts[:group]
       raise(InvalidOperation, "Joined datasets cannot be modified") if (opts[:from].is_a?(Array) && opts[:from].size > 1) || opts[:join]
+    end
+
+    def clause_sql(clause)
+      sql = clause.to_s.upcase
+      send("#{clause}_clause_methods").each{|x| send(x, sql)}
+      sql
     end
 
     # Converts an array of column names into a comma seperated string of 
@@ -980,6 +979,11 @@ module Sequel
       :"#{DATASET_ALIAS_BASE_NAME}#{number}"
     end
     
+    # The order of methods to call to build the DELETE SQL statement
+    def delete_clause_methods
+      DELETE_CLAUSE_METHODS
+    end
+
     # Converts an array of expressions into a comma separated string of
     # expressions.
     def expression_list(columns)
@@ -1055,12 +1059,18 @@ module Sequel
       sql << " INTO #{source_list(@opts[:from])}"
     end
 
-    def insert_columns_sql(sql, columns, values)
-      sql << " (#{columns.join(COMMA_SEPARATOR)})" unless columns.empty?
+    # The order of methods to call to build the INSERT SQL statement
+    def insert_clause_methods
+      INSERT_CLAUSE_METHODS
     end
 
-    def insert_values_sql(sql, columns, values)
-      case values
+    def insert_columns_sql(sql)
+      columns = opts[:columns]
+      sql << " (#{columns.join(COMMA_SEPARATOR)})" if columns && !columns.empty?
+    end
+
+    def insert_values_sql(sql)
+      case values = opts[:values]
       when Array
         sql << (values.empty? ? " DEFAULT VALUES" : " VALUES #{literal(values)}")
       when Dataset
@@ -1256,24 +1266,9 @@ module Sequel
       end
     end
 
-    # The order of methods to call to build the DELETE SQL statement
-    def delete_clause_order
-      DELETE_CLAUSE_ORDER
-    end
-
-    # The order of methods to call to build the INSERT SQL statement
-    def insert_clause_order
-      INSERT_CLAUSE_ORDER
-    end
-
     # The order of methods to call to build the SELECT SQL statement
-    def select_clause_order
-      SELECT_CLAUSE_ORDER
-    end
-
-    # The order of methods to call to build the UPDATE SQL statement
-    def update_clause_order
-      UPDATE_CLAUSE_ORDER
+    def select_clause_methods
+      SELECT_CLAUSE_METHODS
     end
 
     # Modify the sql to add the columns selected
@@ -1391,17 +1386,17 @@ module Sequel
       t.is_a?(String) ? quote_identifier(t) : literal(t)
     end
     
-    # Formats the truncate statement.  Assumes the table given has already been
-    # literalized.
-    def _truncate_sql(table)
-      "TRUNCATE TABLE #{table}"
+    # The order of methods to call to build the UPDATE SQL statement
+    def update_clause_methods
+      UPDATE_CLAUSE_METHODS
     end
 
     def update_table_sql(sql)
       sql << " #{source_list(@opts[:from])}"
     end
 
-    def update_set_sql(sql, values)
+    def update_set_sql(sql)
+      values = opts[:values]
       set = if values.is_a?(Hash)
         values = opts[:defaults].merge(values) if opts[:defaults]
         values = values.merge(opts[:overrides]) if opts[:overrides]

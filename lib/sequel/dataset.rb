@@ -51,7 +51,7 @@ module Sequel
     unlimited unordered where with with_recursive with_sql'.collect{|x| x.to_sym}
 
     NOTIMPL_MSG = "This method must be overridden in Sequel adapters".freeze
-    WITH_SUPPORTED='with'.freeze
+    WITH_SUPPORTED=:select_with_sql
 
     # The database that corresponds to this dataset
     attr_accessor :db
@@ -256,7 +256,7 @@ module Sequel
     
     # Whether the dataset supports common table expressions (the WITH clause).
     def supports_cte?
-      select_clause_order.include?(WITH_SUPPORTED)
+      select_clause_methods.include?(WITH_SUPPORTED)
     end
 
     # Whether the dataset supports the DISTINCT ON clause, true by default.

@@ -199,10 +199,10 @@ module Sequel
       BOOL_TRUE = '1'.freeze
       BOOL_FALSE = '0'.freeze
       COMMA_SEPARATOR = ', '.freeze
-      DELETE_CLAUSE_ORDER = %w'from where order limit'.freeze
-      INSERT_CLAUSE_ORDER = %w'ignore into columns values on_duplicate_key_update'.freeze
-      SELECT_CLAUSE_ORDER = %w'distinct columns from join where group having compounds order limit'.freeze
-      UPDATE_CLAUSE_ORDER = %w'table set where order limit'.freeze
+      DELETE_CLAUSE_METHODS = Dataset.clause_methods(:delete, %w'from where order limit')
+      INSERT_CLAUSE_METHODS = Dataset.clause_methods(:insert, %w'ignore into columns values on_duplicate_key_update')
+      SELECT_CLAUSE_METHODS = Dataset.clause_methods(:select, %w'distinct columns from join where group having compounds order limit')
+      UPDATE_CLAUSE_METHODS = Dataset.clause_methods(:update, %w'table set where order limit')
       
       # MySQL specific syntax for LIKE/REGEXP searches, as well as
       # string concatenation.
@@ -363,14 +363,14 @@ module Sequel
 
       private
 
-      # MySQL supports INSERT IGNORE INTO
-      def insert_ignore_sql(sql)
-        sql << " IGNORE" if opts[:insert_ignore]
+      # MySQL supports the ORDER BY and LIMIT clauses for DELETE statements
+      def delete_clause_methods
+        DELETE_CLAUSE_METHODS
       end
 
-      # MySQL supports INSERT ... ON DUPLICATE KEY UPDATE
-      def insert_on_duplicate_key_update_sql(sql)
-        sql << on_duplicate_key_update_sql if opts[:on_duplicate_key_update]
+      # MySQL supports the IGNORE and ON DUPLICATE KEY UPDATE clauses for INSERT statements
+      def insert_clause_methods
+        INSERT_CLAUSE_METHODS
       end
 
       # MySQL doesn't use the SQL standard DEFAULT VALUES.
@@ -380,6 +380,16 @@ module Sequel
         else
           super
         end
+      end
+
+      # MySQL supports INSERT IGNORE INTO
+      def insert_ignore_sql(sql)
+        sql << " IGNORE" if opts[:insert_ignore]
+      end
+
+      # MySQL supports INSERT ... ON DUPLICATE KEY UPDATE
+      def insert_on_duplicate_key_update_sql(sql)
+        sql << on_duplicate_key_update_sql if opts[:on_duplicate_key_update]
       end
 
       def insert_values_sql(sql, columns, values)
@@ -425,24 +435,14 @@ module Sequel
         end
       end
 
-      # MySQL supports the ORDER BY and LIMIT clauses for DELETE statements
-      def delete_clause_order
-        DELETE_CLAUSE_ORDER
-      end
-
-      # MySQL supports the IGNORE and ON DUPLICATE KEY UPDATE clauses for INSERT statements
-      def insert_clause_order
-        INSERT_CLAUSE_ORDER
-      end
-
       # MySQL does not support the SQL WITH clause for SELECT statements
-      def select_clause_order
-        SELECT_CLAUSE_ORDER
+      def select_clause_methods
+        SELECT_CLAUSE_METHODS
       end
 
       # MySQL supports the ORDER BY and LIMIT clauses for UPDATE statements
-      def update_clause_order
-        UPDATE_CLAUSE_ORDER
+      def update_clause_methods
+        UPDATE_CLAUSE_METHODS
       end
     end
   end

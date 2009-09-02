@@ -74,7 +74,7 @@ module Sequel
       
       # Dataset class for H2 datasets accessed via JDBC.
       class Dataset < JDBC::Dataset
-        SELECT_CLAUSE_ORDER = %w'distinct columns from join where group having compounds order limit'.freeze
+        SELECT_CLAUSE_METHODS = clause_methods(:select, %w'distinct columns from join where group having compounds order limit')
         
         # H2 requires SQL standard datetimes
         def requires_sql_standard_datetimes?
@@ -88,8 +88,8 @@ module Sequel
         
         private
       
-        def select_clause_order
-          SELECT_CLAUSE_ORDER
+        def select_clause_methods
+          SELECT_CLAUSE_METHODS
         end
       end
     end

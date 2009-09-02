@@ -146,23 +146,13 @@ module Sequel
       BOOL_TRUE = '1'.freeze
       BOOL_FALSE = '0'.freeze
       COMMA_SEPARATOR = ', '.freeze
-      DELETE_CLAUSE_ORDER = %w'from output from2 where'.freeze
-      INSERT_CLAUSE_ORDER = %w'into columns output values'.freeze
-      SELECT_CLAUSE_ORDER = %w'with limit distinct columns from table_options join where group order having compounds'.freeze
-      UPDATE_CLAUSE_ORDER = %w'table set output from where'.freeze
+      DELETE_CLAUSE_METHODS = Dataset.clause_methods(:delete, %w'from output from2 where')
+      INSERT_CLAUSE_METHODS = Dataset.clause_methods(:insert, %w'into columns output values')
+      SELECT_CLAUSE_METHODS = Dataset.clause_methods(:select, %w'with limit distinct columns from table_options join where group order having compounds')
+      UPDATE_CLAUSE_METHODS = Dataset.clause_methods(:update, %w'table set output from where')
       TIMESTAMP_FORMAT = "'%Y-%m-%d %H:%M:%S'".freeze
       WILDCARD = LiteralString.new('*').freeze
       CONSTANT_MAP = {:CURRENT_DATE=>'CAST(CURRENT_TIMESTAMP AS DATE)'.freeze, :CURRENT_TIME=>'CAST(CURRENT_TIMESTAMP AS TIME)'.freeze}
-
-      # Add the output! mutation method
-      def self.extended(obj)
-        obj.def_mutation_method(:output)
-      end
-
-      # Add the output! mutation method
-      def self.included(mod)
-        mod.def_mutation_method(:output)
-      end
 
       # MSSQL uses + for string concatenation
       def complex_expression_sql(op, args)
@@ -224,6 +214,10 @@ module Sequel
         clone({:output => output})
       end
 
+      def output!(into, values)
+        mutation_method(:output, into, values)
+      end
+
       # MSSQL uses [] to quote identifiers
       def quoted_identifier(name)
         "[#{name}]"
@@ -282,6 +276,11 @@ module Sequel
         raise(InvalidOperation, "Grouped datasets cannot be modified") if opts[:group]
       end
 
+      # MSSQL supports the OUTPUT clause for DELETE statements
+      def delete_clause_methods
+        DELETE_CLAUSE_METHODS
+      end
+
       def from_sql(sql)
         if (opts[:from].is_a?(Array) && opts[:from].size > 1) || opts[:join]
           select_from_sql(sql)
@@ -291,6 +290,11 @@ module Sequel
       alias delete_from2_sql from_sql
       alias update_from_sql from_sql
       
+      # MSSQL supports the OUTPUT clause for INSERT statements
+      def insert_clause_methods
+        INSERT_CLAUSE_METHODS
+      end
+
       # MSSQL uses a literal hexidecimal number for blob strings
       def literal_blob(v)
         blob = '0x'
@@ -328,24 +332,9 @@ module Sequel
         :x_sequel_row_number_x
       end
 
-      # MSSQL supports the OUTPUT clause for DELETE statements
-      def delete_clause_order
-        DELETE_CLAUSE_ORDER
-      end
-
-      # MSSQL supports the OUTPUT clause for INSERT statements
-      def insert_clause_order
-        INSERT_CLAUSE_ORDER
-      end
-
       # MSSQL adds the limit before the columns
-      def select_clause_order
-        SELECT_CLAUSE_ORDER
-      end
-
-      # MSSQL supports the OUTPUT clause for UPDATE statements
-      def update_clause_order
-        UPDATE_CLAUSE_ORDER
+      def select_clause_methods
+        SELECT_CLAUSE_METHODS
       end
 
       # MSSQL uses TOP for limit
@@ -373,6 +362,11 @@ module Sequel
       alias delete_output_sql output_sql
       alias update_output_sql output_sql
       alias insert_output_sql output_sql
+
+      # MSSQL supports the OUTPUT clause for UPDATE statements
+      def update_clause_methods
+        UPDATE_CLAUSE_METHODS
+      end
     end
   end
 end
