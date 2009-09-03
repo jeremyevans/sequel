@@ -11,14 +11,19 @@ context "A MSSQL database" do
     @db = MSSQL_DB
   end
 
-  specify "read milliseconds" do
+  specify "should be able to read fractional part of timestamp" do
     rs = @db["select getutcdate() as full_date, cast(datepart(millisecond, getutcdate()) as int) as milliseconds"].first
     rs[:milliseconds].should == rs[:full_date].usec/1000
   end
 
-  specify "write milliseconds" do
+  specify "should be able to write fractional part of timestamp" do
     t = Time.utc(2001, 12, 31, 23, 59, 59, 997000)
     (t.usec/1000).should == @db["select cast(datepart(millisecond, ?) as int) as milliseconds", t].get
+  end
+  
+  specify "should not raise an error when getting the server version" do
+    proc{@db.server_version}.should_not raise_error
+    proc{@db.dataset.server_version}.should_not raise_error
   end
 end
 

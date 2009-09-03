@@ -2,6 +2,8 @@ module Sequel
   module MSSQL
     module DatabaseMethods
       AUTO_INCREMENT = 'IDENTITY(1,1)'.freeze
+      SERVER_VERSION_RE = /^(\d+)\.(\d+)\.(\d+)/.freeze
+      SERVER_VERSION_SQL = "SELECT CAST(SERVERPROPERTY('ProductVersion') AS varchar)".freeze
       SQL_BEGIN = "BEGIN TRANSACTION".freeze
       SQL_COMMIT = "COMMIT TRANSACTION".freeze
       SQL_ROLLBACK = "ROLLBACK TRANSACTION".freeze
@@ -13,7 +15,26 @@ module Sequel
       def database_type
         :mssql
       end
-
+      
+      # The version of the MSSQL server, as an integer (e.g. 10001600 for
+      # SQL Server 2008 Express).
+      def server_version(server=nil)
+        return @server_version if @server_version
+        @server_version = synchronize(server) do |conn|
+          (conn.server_version rescue nil) if conn.respond_to?(:server_version)
+        end
+        unless @server_version
+          m = SERVER_VERSION_RE.match(fetch(SERVER_VERSION_SQL).single_value.to_s)
+          @server_version = (m[1].to_i * 1000000) + (m[2].to_i * 10000) + m[3].to_i
+        end
+        @server_version
+      end
+        
+      # MSSQL supports savepoints, though it doesn't support committing/releasing them savepoint
+      def supports_savepoints?
+        true
+      end
+      
       # Microsoft SQL Server supports using the INFORMATION_SCHEMA to get
       # information on tables.
       def tables(opts={})
@@ -22,11 +43,6 @@ module Sequel
           select(:table_name).
           filter(:table_type=>'BASE TABLE', :table_schema=>(opts[:schema]||default_schema||'dbo').to_s).
           map{|x| m.call(x[:table_name])}
-      end
-        
-      # MSSQL supports savepoints, though it doesn't support committing/releasing them savepoint
-      def supports_savepoints?
-        true
       end
 
       private
@@ -119,18 +135,6 @@ module Sequel
           row[:type] = schema_column_type(row[:db_type])
           [m.call(row.delete(:column)), row]
         end
-      end
-
-      def server_version(server=nil)
-        return @server_version if @server_version
-        @server_version = synchronize(server) do |conn|
-          (conn.server_version rescue nil) if conn.respond_to?(:server_version)
-        end
-        unless @server_version
-          m = /^(\d+)\.(\d+)\.(\d+)/.match(fetch("SELECT SERVERPROPERTY('ProductVersion')").single_value)
-          @server_version = (m[1].to_i * 1000000) + (m[2].to_i * 10000) + m[3].to_i
-        end
-        @server_version
       end
       
       # SQL fragment for marking a table as temporary
@@ -268,7 +272,7 @@ module Sequel
           select_sql
       end
 
-      # The version of the database server
+      # The version of the database server.
       def server_version
         db.server_version(@opts[:server])
       end

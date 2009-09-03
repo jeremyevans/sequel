@@ -1,5 +1,7 @@
 === HEAD
 
+* Support Database#server_version on MSSQL (dlee, jeremyevans)
+
 * Support updating and deleting joined datasets on MSSQL (jfirebaugh)
 
 * Support the OUTPUT SQL clause on MSSQL delete, insert, and update statements (jfirebaugh)
