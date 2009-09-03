@@ -97,7 +97,7 @@ module Sequel
     # options of the resulting dataset.
     def self.def_mutation_method(*meths)
       meths.each do |meth|
-        class_eval("def #{meth}!(*args, &block); mutation_method(:#{meth}, *args, &block) end")
+        class_eval("def #{meth}!(*args, &block); mutation_method(:#{meth}, *args, &block) end", __FILE__, __LINE__)
       end
     end
 
@@ -163,7 +163,7 @@ module Sequel
     # Add a mutation method to this dataset instance.
     def def_mutation_method(*meths)
       meths.each do |meth|
-        instance_eval("def #{meth}!(*args, &block); mutation_method(:#{meth}, *args, &block) end")
+        instance_eval("def #{meth}!(*args, &block); mutation_method(:#{meth}, *args, &block) end", __FILE__, __LINE__)
       end
     end
 

@@ -911,7 +911,7 @@ module Sequel
     end
 
     [:inner, :full_outer, :right_outer, :left_outer].each do |jtype|
-      class_eval("def #{jtype}_join(*args, &block); join_table(:#{jtype}, *args, &block) end")
+      class_eval("def #{jtype}_join(*args, &block); join_table(:#{jtype}, *args, &block) end", __FILE__, __LINE__)
     end
     alias join inner_join
 

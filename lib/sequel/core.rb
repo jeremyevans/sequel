@@ -325,7 +325,7 @@ module Sequel
   # Sequel.adapter_method.
   def self.def_adapter_method(*adapters) # :nodoc:
     adapters.each do |adapter|
-      instance_eval("def #{adapter}(*args, &block); adapter_method('#{adapter}', *args, &block) end")
+      instance_eval("def #{adapter}(*args, &block); adapter_method('#{adapter}', *args, &block) end", __FILE__, __LINE__)
     end
   end
 

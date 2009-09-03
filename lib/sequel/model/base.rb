@@ -489,7 +489,7 @@ module Sequel
       # same name, caching the result in an instance variable.  Define
       # standard attr_writer method for modifying that instance variable
       def self.class_attr_overridable(*meths) # :nodoc:
-        meths.each{|meth| class_eval("def #{meth}; !defined?(@#{meth}) ? (@#{meth} = self.class.#{meth}) : @#{meth} end")}
+        meths.each{|meth| class_eval("def #{meth}; !defined?(@#{meth}) ? (@#{meth} = self.class.#{meth}) : @#{meth} end", __FILE__, __LINE__)}
         attr_writer(*meths) 
       end 
     
@@ -498,7 +498,7 @@ module Sequel
       #   
       #   define_method(meth){self.class.send(meth)}
       def self.class_attr_reader(*meths) # :nodoc:
-        meths.each{|meth| class_eval("def #{meth}; model.#{meth} end")}
+        meths.each{|meth| class_eval("def #{meth}; model.#{meth} end", __FILE__, __LINE__)}
       end
 
       private_class_method :class_attr_overridable, :class_attr_reader
