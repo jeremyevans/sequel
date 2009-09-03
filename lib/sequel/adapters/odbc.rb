@@ -90,7 +90,7 @@ module Sequel
       BOOL_TRUE = '1'.freeze
       BOOL_FALSE = '0'.freeze
       ODBC_DATE_FORMAT = "{d '%Y-%m-%d'}".freeze
-      TIMESTAMP_FORMAT="{ts '%Y-%m-%d %H:%M:%S%N'}".freeze
+      TIMESTAMP_FORMAT="{ts '%Y-%m-%d %H:%M:%S'}".freeze
 
       def fetch_rows(sql, &block)
         execute(sql) do |s|

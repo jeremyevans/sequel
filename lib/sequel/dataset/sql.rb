@@ -1039,7 +1039,7 @@ module Sequel
       v2 = Sequel.application_to_database_timestamp(v)
       fmt = default_timestamp_format.gsub(/%[Nz]/) do |m|
         if m == '%N'
-          sprintf(".%06d", v.is_a?(DateTime) ? v.sec_fraction*86400000000 : v.usec) if supports_timestamp_usecs?
+          format_timestamp_usec(v.is_a?(DateTime) ? v.sec_fraction*86400000000 : v.usec) if supports_timestamp_usecs?
         else
           if supports_timestamp_timezones?
             # Would like to just use %z format, but it doesn't appear to work on Windows
@@ -1050,6 +1050,12 @@ module Sequel
         end
       end
       v2.strftime(fmt)
+    end
+    
+    # Return the SQL timestamp fragment to use for the fractional time part.
+    # Should start with the decimal point.  Uses 6 decimal places by default.
+    def format_timestamp_usec(usec)
+      sprintf(".%06d", usec)
     end
 
     # SQL fragment specifying a list of identifiers

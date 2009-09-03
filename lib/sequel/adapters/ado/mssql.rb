@@ -20,9 +20,9 @@ module Sequel
         # Use a nasty hack of multiple SQL statements in the same call and
         # having the last one return the most recently inserted id.  This
         # is necessary as ADO doesn't provide a consistent native connection.
-        def insert(values={})
+        def insert(*values)
           return super if @opts[:sql]
-          with_sql("SET NOCOUNT ON; #{insert_sql(values)}; SELECT CAST(SCOPE_IDENTITY() AS INTEGER)").single_value
+          with_sql("SET NOCOUNT ON; #{insert_sql(*values)}; SELECT CAST(SCOPE_IDENTITY() AS INTEGER)").single_value
         end
       end
     end

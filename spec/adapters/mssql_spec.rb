@@ -12,13 +12,13 @@ context "A MSSQL database" do
   end
 
   specify "read milliseconds" do
-    rs = @db["select getutcdate() as full_date, datepart(millisecond, getutcdate()) as milliseconds"].first
+    rs = @db["select getutcdate() as full_date, cast(datepart(millisecond, getutcdate()) as int) as milliseconds"].first
     rs[:milliseconds].should == rs[:full_date].usec/1000
   end
 
   specify "write milliseconds" do
-    t = Time.utc(9999, 12, 31, 23, 59, 59, 997000)
-    @db["select cast(datepart(millisecond, ?) as int) as milliseconds", t].get.should == t.usec/1000
+    t = Time.utc(2001, 12, 31, 23, 59, 59, 997000)
+    (t.usec/1000).should == @db["select cast(datepart(millisecond, ?) as int) as milliseconds", t].get
   end
 end
 
@@ -35,24 +35,24 @@ context "MSSQL Dataset#output" do
   end
 
   specify "should format OUTPUT clauses for DELETE statements" do
-    @ds.output(:out, [:deleted__name, :deleted__value]).delete_sql.should ==
-      "DELETE FROM ITEMS OUTPUT DELETED.NAME, DELETED.VALUE INTO OUT"
-    @ds.output(:out, {:name => :deleted__name, :value => :deleted__value}).delete_sql.should ==
-      "DELETE FROM ITEMS OUTPUT DELETED.NAME, DELETED.VALUE INTO OUT (NAME, VALUE)"
+    @ds.output(:out, [:deleted__name, :deleted__value]).delete_sql.should =~
+      /DELETE FROM ITEMS OUTPUT DELETED.(NAME|VALUE), DELETED.(NAME|VALUE) INTO OUT/
+    @ds.output(:out, {:name => :deleted__name, :value => :deleted__value}).delete_sql.should =~
+      /DELETE FROM ITEMS OUTPUT DELETED.(NAME|VALUE), DELETED.(NAME|VALUE) INTO OUT \((NAME|VALUE), (NAME|VALUE)\)/
   end
 
   specify "should format OUTPUT clauses for INSERT statements" do
-    @ds.output(:out, [:inserted__name, :inserted__value]).insert_sql(:name => "name", :value => 1).should ==
-      "INSERT INTO ITEMS (NAME, VALUE) OUTPUT INSERTED.NAME, INSERTED.VALUE INTO OUT VALUES (N'name', 1)"
-    @ds.output(:out, {:name => :inserted__name, :value => :inserted__value}).insert_sql(:name => "name", :value => 1).should ==
-      "INSERT INTO ITEMS (NAME, VALUE) OUTPUT INSERTED.NAME, INSERTED.VALUE INTO OUT (NAME, VALUE) VALUES (N'name', 1)"
+    @ds.output(:out, [:inserted__name, :inserted__value]).insert_sql(:name => "name", :value => 1).should =~
+      /INSERT INTO ITEMS \((NAME|VALUE), (NAME|VALUE)\) OUTPUT INSERTED.(NAME|VALUE), INSERTED.(NAME|VALUE) INTO OUT VALUES \((N'name'|1), (N'name'|1)\)/
+    @ds.output(:out, {:name => :inserted__name, :value => :inserted__value}).insert_sql(:name => "name", :value => 1).should =~
+      /INSERT INTO ITEMS \((NAME|VALUE), (NAME|VALUE)\) OUTPUT INSERTED.(NAME|VALUE), INSERTED.(NAME|VALUE) INTO OUT \((NAME|VALUE), (NAME|VALUE)\) VALUES \((N'name'|1), (N'name'|1)\)/
   end
 
   specify "should format OUTPUT clauses for UPDATE statements" do
-    @ds.output(:out, [:inserted__name, :deleted__value]).update_sql(:value => 2).should ==
-      "UPDATE ITEMS SET VALUE = 2 OUTPUT INSERTED.NAME, DELETED.VALUE INTO OUT"
-    @ds.output(:out, {:name => :inserted__name, :value => :deleted__value}).update_sql(:value => 2).should ==
-      "UPDATE ITEMS SET VALUE = 2 OUTPUT INSERTED.NAME, DELETED.VALUE INTO OUT (NAME, VALUE)"
+    @ds.output(:out, [:inserted__name, :deleted__value]).update_sql(:value => 2).should =~
+      /UPDATE ITEMS SET VALUE = 2 OUTPUT (INSERTED.NAME|DELETED.VALUE), (INSERTED.NAME|DELETED.VALUE) INTO OUT/
+    @ds.output(:out, {:name => :inserted__name, :value => :deleted__value}).update_sql(:value => 2).should =~
+      /UPDATE ITEMS SET VALUE = 2 OUTPUT (INSERTED.NAME|DELETED.VALUE), (INSERTED.NAME|DELETED.VALUE) INTO OUT \((NAME|VALUE), (NAME|VALUE)\)/
   end
 
   specify "should execute OUTPUT clauses in DELETE statements" do

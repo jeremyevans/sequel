@@ -374,7 +374,8 @@ module Sequel
       end
 
       # MySQL doesn't use the SQL standard DEFAULT VALUES.
-      def insert_columns_sql(sql, columns, values)
+      def insert_columns_sql(sql)
+        values = opts[:values]
         if values.is_a?(Array) && values.empty?
           sql << " ()"
         else
@@ -393,7 +394,8 @@ module Sequel
       end
 
       # MySQL doesn't use the standard DEFAULT VALUES for empty values.
-      def insert_values_sql(sql, columns, values)
+      def insert_values_sql(sql)
+        values = opts[:values]
         if values.is_a?(Array) && values.empty?
           sql << " VALUES ()"
         else

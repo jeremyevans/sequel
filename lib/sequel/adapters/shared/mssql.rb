@@ -83,6 +83,13 @@ module Sequel
         "DROP INDEX #{quote_identifier(op[:name] || default_index_name(table, op[:columns]))} ON #{quote_schema_table(table)}"
       end
       
+      # Always quote identifiers in the metadata_dataset, so schema parsing works.
+      def metadata_dataset
+        ds = super
+        ds.quote_identifiers = true
+        ds
+      end
+      
       # SQL to rollback to a savepoint
       def rollback_savepoint_sql(depth)
         SQL_ROLLBACK_TO_SAVEPOINT % depth
@@ -150,7 +157,6 @@ module Sequel
       INSERT_CLAUSE_METHODS = Dataset.clause_methods(:insert, %w'into columns output values')
       SELECT_CLAUSE_METHODS = Dataset.clause_methods(:select, %w'with limit distinct columns from table_options join where group order having compounds')
       UPDATE_CLAUSE_METHODS = Dataset.clause_methods(:update, %w'table set output from where')
-      TIMESTAMP_FORMAT = "'%Y-%m-%d %H:%M:%S'".freeze
       WILDCARD = LiteralString.new('*').freeze
       CONSTANT_MAP = {:CURRENT_DATE=>'CAST(CURRENT_TIMESTAMP AS DATE)'.freeze, :CURRENT_TIME=>'CAST(CURRENT_TIMESTAMP AS TIME)'.freeze}
 
@@ -259,12 +265,7 @@ module Sequel
       def supports_is_true?
         false
       end
-      
-      # MSSQL supports timezones in literal timestamps
-      def supports_timestamp_timezones?
-        true
-      end
-      
+
       # MSSQL 2005+ supports window functions
       def supports_window_functions?
         true
@@ -280,6 +281,13 @@ module Sequel
       # MSSQL supports the OUTPUT clause for DELETE statements
       def delete_clause_methods
         DELETE_CLAUSE_METHODS
+      end
+      
+      # MSSQL raises an error if you try to provide more than 3 decimal places
+      # for a fractional timestamp.  This probably doesn't work for smalldatetime
+      # fields.
+      def format_timestamp_usec(usec)
+        sprintf(".%03d", usec/1000)
       end
 
       # MSSQL supports FROM clauses in DELETE and UPDATE statements.
@@ -309,19 +317,9 @@ module Sequel
         "N#{super}"
       end
       
-      # Use MSSQL Timestamp format
-      def literal_datetime(v)
-        v.strftime(TIMESTAMP_FORMAT)
-      end
-      
       # Use 0 for false on MSSQL
       def literal_false
         BOOL_FALSE
-      end
-      
-      # Use MSSQL Timestamp format
-      def literal_time(v)
-        v.strftime(TIMESTAMP_FORMAT)
       end
 
       # Use 1 for true on MSSQL
