@@ -1,5 +1,9 @@
 === HEAD
 
+* Don't attempt to use unparseable defaults as literals when dumping the schema for a MySQL database (jeremyevans)
+
+* Handle MySQL enum defaults in the schema dumper (jeremyevans)
+
 * Support Database#server_version on MSSQL (dlee, jeremyevans)
 
 * Support updating and deleting joined datasets on MSSQL (jfirebaugh)

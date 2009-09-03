@@ -1383,5 +1383,12 @@ context "Database#column_schema_to_ruby_default" do
     p["10:20:30", :time].should == Time.parse('10:20:30')
     p["CURRENT_DATE", :date].should == nil
     p["CURRENT_TIMESTAMP", :datetime].should == nil
+    p["a", :enum].should == "a"
+    
+    db.meta_def(:database_type){:mssql}
+    p["(N'a')", :string].should == "a"
+    p["((-12))", :integer].should == -12
+    p["((12.1))", :float].should == 12.1
+    p["((-12.1))", :decimal].should == BigDecimal.new('-12.1')
   end
 end

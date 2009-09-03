@@ -73,7 +73,7 @@ END_MIG
     # method modified so that .lit is always appended after it, only if the
     # :same_db option is used.
     def column_schema_to_ruby_default_fallback(default, options)
-      if options[:same_db] && default.is_a?(String)
+      if default.is_a?(String) && options[:same_db] && use_column_schema_to_ruby_default_fallback?
         default = default.to_s
         def default.inspect
           "#{super}.lit"
@@ -164,6 +164,12 @@ END_MIG
       h[:name] = name unless default_index_name(table, index_opts[:columns]) == name.to_s
       h[:unique] = true if index_opts[:unique]
       h
+    end
+    
+    # Don't use the "...".lit fallback on MySQL, since the defaults it uses aren't
+    # valid literal SQL values.
+    def use_column_schema_to_ruby_default_fallback?
+      database_type != :mysql
     end
   end
 

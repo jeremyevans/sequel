@@ -662,10 +662,10 @@ module Sequel
       if database_type == :mssql and m = MSSQL_DEFAULT_RE.match(default)
         default = m[1] || m[2]
       end
-      if [:string, :blob, :date, :datetime, :time].include?(type)
+      if [:string, :blob, :date, :datetime, :time, :enum].include?(type)
         if database_type == :mysql
           return if [:date, :datetime, :time].include?(type) && MYSQL_TIMESTAMP_RE.match(default)
-          orig_default = default = "'#{default.gsub("'", "''").gsub('\\', '\\\\')}'" 
+          orig_default = default = "'#{default.gsub("'", "''").gsub('\\', '\\\\')}'"
         end
         return unless m = STRING_DEFAULT_RE.match(default)
         default = m[1].gsub("''", "'")
@@ -679,7 +679,7 @@ module Sequel
           when /[t1]/i
             true
           end
-        when :string
+        when :string, :enum
           default
         when :blob
           Sequel::SQL::Blob.new(default)
@@ -880,6 +880,8 @@ module Sequel
         :decimal
       when /bytea|blob|image|(var)?binary/io
         :blob
+      when /\Aenum/
+        :enum
       end
     end
 

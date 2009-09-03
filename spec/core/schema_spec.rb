@@ -825,5 +825,6 @@ context "Schema Parser" do
     @db.schema(:smallmoney).first.last[:type].should == :decimal
     @db.schema(:binary).first.last[:type].should == :blob
     @db.schema(:varbinary).first.last[:type].should == :blob
+    @db.schema(:enum).first.last[:type].should == :enum
   end
 end
