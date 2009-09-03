@@ -192,27 +192,70 @@ describe "Model#save" do
   end
 end
 
+describe "Model#modified?" do
+  before do
+    @c = Class.new(Sequel::Model(:items))
+    @c.class_eval do
+      columns :id, :x
+      @db_schema = {:x => {:type => :integer}}
+    end
+    MODEL_DB.reset
+  end
+  
+  it "should be true if the object is new" do
+    @c.new.modified?.should == true
+  end
+  
+  it "should be false if the object has not been modified" do
+    @c.load(:id=>1).modified?.should == false
+  end
+  
+  it "should be true if the object has been modified" do
+    o = @c.load(:id=>1, :x=>2)
+    o.x = 3
+    o.modified?.should == true
+  end
+  
+  it "should be false if a column value is set that is the same as the current value after typecasting" do
+    o = @c.load(:id=>1, :x=>2)
+    o.x = '2'
+    o.modified?.should == false
+  end
+  
+  it "should be true if a column value is set that is the different as the current value after typecasting" do
+    o = @c.load(:id=>1, :x=>'2')
+    o.x = '2'
+    o.modified?.should == true
+  end
+end
+
 describe "Model#save_changes" do
   
-  before(:each) do
-    MODEL_DB.reset
-
+  before do
     @c = Class.new(Sequel::Model(:items)) do
       unrestrict_primary_key
       columns :id, :x, :y
     end
+    MODEL_DB.reset
   end
   
-  it "should do nothing if no changed columns" do
-    o = @c.new(:id => 3, :x => 1, :y => nil)
+  it "should always save if the object is new" do
+    o = @c.new(:x => 1)
     o.save_changes
-    
-    MODEL_DB.sqls.should be_empty
+    MODEL_DB.sqls.first.should == "INSERT INTO items (x) VALUES (1)"
+  end
 
+  it "should do nothing if no changed columns" do
     o = @c.load(:id => 3, :x => 1, :y => nil)
     o.save_changes
-    
-    MODEL_DB.sqls.should be_empty
+    MODEL_DB.sqls.should == []
+  end
+  
+  it "should do nothing if modified? is false" do
+    o = @c.load(:id => 3, :x => 1, :y => nil)
+    def o.modified?; false; end
+    o.save_changes
+    MODEL_DB.sqls.should == []
   end
   
   it "should update only changed columns" do

@@ -1,5 +1,9 @@
 === HEAD
 
+* Model#modified? now always considers new records as modified (jeremyevans)
+
+* Typecast before checking current model attribute value, instead of after (jeremyevans)
+
 * Don't attempt to use unparseable defaults as literals when dumping the schema for a MySQL database (jeremyevans)
 
 * Handle MySQL enum defaults in the schema dumper (jeremyevans)

@@ -539,21 +539,19 @@ module Sequel
         @values[column]
       end
   
-      # Sets value of the column's attribute and marks the column as changed.
-      # If the column already has the same value, this is a no-op. Note that
-      # changing a columns value and then changing it back will cause the
-      # column to appear in changed_columns.  Similarly, providing a
-      # value that is different from the column's current value but is the
-      # same after typecasting will also cause changed_columns to include the
-      # column.
+      # Sets the value for the given column.  If typecasting is enabled for
+      # this object, typecast the value based on the column's type.
+      # If this a a new record or the typecasted value isn't the same
+      # as the current value for the column, mark the column as changed.
       def []=(column, value)
         # If it is new, it doesn't have a value yet, so we should
         # definitely set the new value.
         # If the column isn't in @values, we can't assume it is
         # NULL in the database, so assume it has changed.
-        if new? || !@values.include?(column) || value != @values[column]
+        v = typecast_value(column, value)
+        if new? || !@values.include?(column) || v != @values[column]
           changed_columns << column unless changed_columns.include?(column)
-          @values[column] = typecast_value(column, value)
+          @values[column] = v
         end
       end
   
@@ -655,9 +653,10 @@ module Sequel
       end
       
       # Whether this object has been modified since last saved, used by
-      # save_changes to determine whether changes should be saved
+      # save_changes to determine whether changes should be saved.  New
+      # values are always considered modified.
       def modified?
-        !changed_columns.empty?
+        new? || !changed_columns.empty?
       end
   
       # Returns true if the current instance represents a new record.
