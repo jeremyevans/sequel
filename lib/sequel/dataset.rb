@@ -168,7 +168,7 @@ module Sequel
     end
 
     # Deletes the records in the dataset.  The returned value is generally the
-    # number of records deleted, but that is adapter dependent.
+    # number of records deleted, but that is adapter dependent.  See delete_sql.
     def delete
       execute_dui(delete_sql)
     end
@@ -200,6 +200,7 @@ module Sequel
   
     # Inserts values into the associated table.  The returned value is generally
     # the value of the primary key for the inserted row, but that is adapter dependent.
+    # See insert_sql.
     def insert(*values)
       execute_insert(insert_sql(*values))
     end
@@ -242,7 +243,7 @@ module Sequel
       update(*args)
     end
 
-    # Set the default values for insert and update statements.  The values passed
+    # Set the default values for insert and update statements.  The values hash passed
     # to insert or update are merged into this hash.
     def set_defaults(hash)
       clone(:defaults=>(@opts[:defaults]||{}).merge(hash))
@@ -300,7 +301,7 @@ module Sequel
     end
 
     # Updates values for the dataset.  The returned value is generally the
-    # number of rows updated, but that is adapter dependent.
+    # number of rows updated, but that is adapter dependent.  See update_sql.
     def update(values={})
       execute_dui(update_sql(values))
     end

@@ -2586,6 +2586,56 @@ context "Dataset#insert_sql" do
   specify "should raise an Error if the dataset has no sources" do
     proc{Sequel::Database.new.dataset.insert_sql}.should raise_error(Sequel::Error)
   end
+  
+  specify "should accept datasets" do
+    @ds.insert_sql(@ds).should == "INSERT INTO items SELECT * FROM items"
+  end
+  
+  specify "should accept datasets with columns" do
+    @ds.insert_sql([:a, :b], @ds).should == "INSERT INTO items (a, b) SELECT * FROM items"
+  end
+  
+  specify "should raise if given bad values" do
+    proc{@ds.clone(:values=>'a').send(:_insert_sql)}.should raise_error(Sequel::Error)
+  end
+  
+  specify "should accept separate values" do
+    @ds.insert_sql(1).should == "INSERT INTO items VALUES (1)"
+    @ds.insert_sql(1, 2).should == "INSERT INTO items VALUES (1, 2)"
+    @ds.insert_sql(1, 2, 3).should == "INSERT INTO items VALUES (1, 2, 3)"
+  end
+  
+  specify "should accept a single array of values" do
+    @ds.insert_sql([1, 2, 3]).should == "INSERT INTO items VALUES (1, 2, 3)"
+  end
+  
+  specify "should accept an array of columns and an array of values" do
+    @ds.insert_sql([:a, :b, :c], [1, 2, 3]).should == "INSERT INTO items (a, b, c) VALUES (1, 2, 3)"
+  end
+  
+  specify "should raise an array if the columns and values differ in size" do
+    proc{@ds.insert_sql([:a, :b], [1, 2, 3])}.should raise_error(Sequel::Error)
+  end
+  
+  specify "should accept a single LiteralString" do
+    @ds.insert_sql('VALUES (1, 2, 3)'.lit).should == "INSERT INTO items VALUES (1, 2, 3)"
+  end
+  
+  specify "should accept an array of columns and an LiteralString" do
+    @ds.insert_sql([:a, :b, :c], 'VALUES (1, 2, 3)'.lit).should == "INSERT INTO items (a, b, c) VALUES (1, 2, 3)"
+  end
+  
+  specify "should accept an object that responds to values and returns a hash by using that hash as the columns and values" do
+    o = Object.new
+    def o.values; {:c=>'d'}; end
+    @ds.insert_sql(o).should == "INSERT INTO items (c) VALUES ('d')"
+  end
+  
+  specify "should accept an object that responds to values and returns something other than a hash by using the object itself as a single value" do
+    o = Date.civil(2000, 1, 1)
+    def o.values; self; end
+    @ds.insert_sql(o).should == "INSERT INTO items VALUES ('2000-01-01')"
+  end
 end
 
 class DummyMummyDataset < Sequel::Dataset

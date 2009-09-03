@@ -335,16 +335,22 @@ module Sequel
       end
     end
 
-    # Formats an INSERT statement using the given values. If a hash is given,
-    # the resulting statement includes column names. If no values are given, 
-    # the resulting statement includes a DEFAULT VALUES clause.
+    # Formats an INSERT statement using the given values. The API is a little
+    # complex, and best explained by example:
     #
+    #   # Default values
     #   DB[:items].insert_sql #=> 'INSERT INTO items DEFAULT VALUES'
+    #   DB[:items].insert_sql({}) #=> 'INSERT INTO items DEFAULT VALUES'
+    #   # Values without columns
     #   DB[:items].insert_sql(1,2,3) #=> 'INSERT INTO items VALUES (1, 2, 3)'
-    #   DB[:items].insert_sql(:a => 1, :b => 2) #=>
-    #     'INSERT INTO items (a, b) VALUES (1, 2)'
-    #   DB[:items].insert_sql(DB[:old_items]) #=>
-    #     'INSERT INTO items SELECT * FROM old_items
+    #   DB[:items].insert_sql([1,2,3]) #=> 'INSERT INTO items VALUES (1, 2, 3)'
+    #   # Values with columns
+    #   DB[:items].insert_sql([:a, :b], [1,2]) #=> 'INSERT INTO items (a, b) VALUES (1, 2)'
+    #   DB[:items].insert_sql(:a => 1, :b => 2) #=> 'INSERT INTO items (a, b) VALUES (1, 2)'
+    #   # Using a subselect
+    #   DB[:items].insert_sql(DB[:old_items]) #=> 'INSERT INTO items SELECT * FROM old_items
+    #   # Using a subselect with columns
+    #   DB[:items].insert_sql([:a, :b], DB[:old_items]) #=> 'INSERT INTO items (a, b) SELECT * FROM old_items
     def insert_sql(*values)
       return static_sql(@opts[:sql]) if @opts[:sql]
 
@@ -354,26 +360,29 @@ module Sequel
 
       case values.size
       when 0
-        values = {}
+        return insert_sql({})
       when 1
-        vals = values.at(0)
-        if [Hash, Dataset, Array].any?{|c| vals.is_a?(c)}
+        case vals = values.at(0)
+        when Hash
+          vals = @opts[:defaults].merge(vals) if @opts[:defaults]
+          vals = vals.merge(@opts[:overrides]) if @opts[:overrides]
+          values = []
+          vals.each do |k,v| 
+            columns << k
+            values << v
+          end
+        when Dataset, Array, LiteralString
           values = vals
-        elsif vals.respond_to?(:values)
-          values = vals.values
+        else
+          if vals.respond_to?(:values) && (v = vals.values).is_a?(Hash)
+            return insert_sql(v) 
+          end
         end
       when 2
-        if values.at(0).is_a?(Array)
-          columns, values = values.at(0), values.at(1)
+        if (v0 = values.at(0)).is_a?(Array) && ((v1 = values.at(1)).is_a?(Array) || v1.is_a?(Dataset) || v1.is_a?(LiteralString))
+          columns, values = v0, v1
+          raise(Error, "Different number of values and columns given to insert_sql") if values.is_a?(Array) and columns.length != values.length
         end
-      end
-
-      if Hash === values
-        values = @opts[:defaults].merge(values) if @opts[:defaults]
-        values = values.merge(@opts[:overrides]) if @opts[:overrides]
-
-        columns = values.keys
-        values = values.values
       end
 
       columns = columns.map{|k| literal(String === k ? k.to_sym : k)}
@@ -1086,8 +1095,10 @@ module Sequel
         sql << (values.empty? ? " DEFAULT VALUES" : " VALUES #{literal(values)}")
       when Dataset
         sql << " #{subselect_sql(values)}"
+      when LiteralString
+        sql << " #{values}"
       else
-        sql << " #{literal(values)}"
+        raise Error, "Unsupported INSERT values type, should be an Array or Dataset: #{values.inspect}"
       end
     end
 
