@@ -97,9 +97,10 @@ module Sequel
       SELECT_CLAUSE_METHODS = Dataset.clause_methods(:select, %w'with distinct columns from join where group having compounds order limit')
 
       # Oracle uses MINUS instead of EXCEPT, and doesn't support EXCEPT ALL
-      def except(dataset, all = false)
-        raise(Sequel::Error, "EXCEPT ALL not supported") if all
-        compound_clone(:minus, dataset, all)
+      def except(dataset, opts={})
+        opts = {:all=>opts} unless opts.is_a?(Hash)
+        raise(Sequel::Error, "EXCEPT ALL not supported") if opts[:all]
+        compound_clone(:minus, dataset, opts)
       end
 
       def empty?
