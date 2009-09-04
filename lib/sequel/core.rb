@@ -116,6 +116,17 @@ module Sequel
     Database.connect(*args, &block)
   end
   
+  # Convert the exception to the given class.  The given class should be
+  # Sequel::Error or a subclass.  Returns an instance of klass with
+  # the message and backtrace of exception.
+  def self.convert_exception_class(exception, klass)
+    return exception if exception.is_a?(klass)
+    e = klass.new("#{exception.class}: #{exception.message}")
+    e.wrapped_exception = exception
+    e.set_backtrace(exception.backtrace)
+    e
+  end
+
   # Convert the given object into an object of Sequel.datetime_class in the
   # application_timezone.  Used when coverting datetime/timestamp columns
   # returned by the database.
@@ -199,7 +210,7 @@ module Sequel
     begin
       Date.parse(s, Sequel.convert_two_digit_years)
     rescue => e
-      raise InvalidValue, "Invalid Date value #{s.inspect} (#{e.message})"
+      raise convert_exception_class(e, InvalidValue)
     end
   end
 
@@ -213,7 +224,7 @@ module Sequel
         datetime_class.parse(s)
       end
     rescue => e
-      raise InvalidValue, "Invalid #{datetime_class} value #{s.inspect} (#{e.message})"
+      raise convert_exception_class(e, InvalidValue)
     end
   end
 
@@ -222,7 +233,7 @@ module Sequel
     begin
       Time.parse(s)
     rescue => e
-      raise InvalidValue, "Invalid Time value #{s.inspect} (#{e.message})"
+      raise convert_exception_class(e, InvalidValue)
     end
   end
   
@@ -316,8 +327,8 @@ module Sequel
       convert_output_timestamp(convert_input_timestamp(v, input_timezone), Sequel.application_timezone)
     rescue InvalidValue
       raise
-    rescue
-      raise InvalidValue, "Invalid #{datetime_class} value: #{v.inspect}"
+    rescue => e
+      raise convert_exception_class(e, InvalidValue)
     end
   end
 

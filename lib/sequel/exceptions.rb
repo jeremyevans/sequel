@@ -2,6 +2,9 @@ module Sequel
   # The default exception class for exceptions raised by Sequel.
   # All exception classes defined by Sequel are descendants of this class.
   class Error < ::StandardError
+    # If this exception wraps an underlying exception, the underlying
+    # exception is held here.
+    attr_accessor :wrapped_exception
   end  
     
   # Raised when the adapter requested doesn't exist or can't be loaded.

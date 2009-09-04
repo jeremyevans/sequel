@@ -144,14 +144,14 @@ module Sequel
         q = nil
         begin
           q = args ? async_exec(sql, args) : async_exec(sql)
-        rescue PGError
+        rescue PGError => e
           begin
             s = status
           rescue PGError
-            raise(Sequel::DatabaseDisconnectError)
+            raise Sequel.convert_exception_class(e, Sequel::DatabaseDisconnectError)
           end
           status_ok = (s == Adapter::CONNECTION_OK)
-          status_ok ? raise : raise(Sequel::DatabaseDisconnectError)
+          status_ok ? raise : Sequel.convert_exception_class(e, Sequel::DatabaseDisconnectError)
         ensure
           block if status_ok
         end

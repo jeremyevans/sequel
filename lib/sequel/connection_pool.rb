@@ -116,8 +116,8 @@ class Sequel::ConnectionPool
       ensure
         @mutex.synchronize{release(t, server)} if conn && !dde
       end
-    rescue StandardError => e
-      raise e
+    rescue StandardError 
+      raise
     rescue Exception => e
       raise(@convert_exceptions ? RuntimeError.new(e.message) : e)
     end
@@ -168,9 +168,7 @@ class Sequel::ConnectionPool
       begin
         conn = @connection_proc.call(server)
       rescue Exception=>exception
-        e = Sequel::DatabaseConnectionError.new("#{exception.class} #{exception.message}")
-        e.set_backtrace(exception.backtrace)
-        raise e
+        raise Sequel.convert_exception_class(exception, Sequel::DatabaseConnectionError)
       end
       raise(Sequel::DatabaseConnectionError, "Connection parameters not valid") unless conn
       conn
@@ -236,7 +234,7 @@ class Sequel::SingleThreadedPool
     begin
       begin
         yield(c = (@conns[server] ||= @connection_proc.call(server)))
-      rescue Sequel::DatabaseDisconnectError => dde
+      rescue Sequel::DatabaseDisconnectError
         @conns.delete(server)
         @disconnection_proc.call(c) if @disconnection_proc
         raise

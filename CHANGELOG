@@ -1,5 +1,7 @@
 === HEAD
 
+* Add Sequel.convert_exception_class for wrapping exceptions (jeremyevans)
+
 * Model#modified? now always considers new records as modified (jeremyevans)
 
 * Typecast before checking current model attribute value, instead of after (jeremyevans)

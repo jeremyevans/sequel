@@ -12,6 +12,14 @@ describe Sequel::Database do
     proc{INTEGRATION_DB << "SELECT"}.should raise_error(Sequel::DatabaseError)
   end
 
+  specify "should store underlying wrapped exception in Sequel::DatabaseError" do
+    begin
+      INTEGRATION_DB << "SELECT"
+    rescue Sequel::DatabaseError=>e
+      e.wrapped_exception.should be_a_kind_of(Exception)
+    end
+  end
+
   specify "should not have the connection pool swallow non-StandardError based exceptions" do
     proc{INTEGRATION_DB.pool.hold{raise Interrupt, "test"}}.should raise_error(Interrupt)
   end

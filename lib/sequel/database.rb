@@ -110,7 +110,7 @@ module Sequel
         begin
           Sequel.require "adapters/#{scheme}"
         rescue LoadError => e
-          raise AdapterNotFound, "Could not load #{scheme} adapter:\n  #{e.message}"
+          raise Sequel.convert_exception_class(e, AdapterNotFound)
         end
         
         # make sure we actually loaded the adapter
@@ -534,10 +534,8 @@ module Sequel
       meth = "typecast_value_#{column_type}"
       begin
         respond_to?(meth, true) ? send(meth, value) : value
-      rescue ArgumentError, TypeError => exp
-        e = Sequel::InvalidValue.new("#{exp.class} #{exp.message}")
-        e.set_backtrace(exp.backtrace)
-        raise e
+      rescue ArgumentError, TypeError => e
+        raise Sequel.convert_exception_class(e, InvalidValue)
       end
     end
     
@@ -805,9 +803,7 @@ module Sequel
     # and traceback.
     def raise_error(exception, opts={})
       if !opts[:classes] || Array(opts[:classes]).any?{|c| exception.is_a?(c)}
-        e = (opts[:disconnect] ? DatabaseDisconnectError : DatabaseError).new("#{exception.class}: #{exception.message}")
-        e.set_backtrace(exception.backtrace)
-        raise e
+        raise Sequel.convert_exception_class(exception, opts[:disconnect] ? DatabaseDisconnectError : DatabaseError)
       else
         raise exception
       end
@@ -912,7 +908,7 @@ module Sequel
 
     # Raise a database error unless the exception is an Rollback.
     def transaction_error(e)
-      raise_error(e, :classes=>database_error_classes) unless Rollback === e
+      raise_error(e, :classes=>database_error_classes) unless e.is_a?(Rollback)
     end
 
     # Typecast the value to an SQL::Blob

@@ -8,7 +8,7 @@ class String
     begin
       Date.parse(self, Sequel.convert_two_digit_years)
     rescue => e
-      raise Sequel::InvalidValue, "Invalid Date value '#{self}' (#{e.message})"
+      raise Sequel.convert_exception_class(e, Sequel::InvalidValue)
     end
   end
 
@@ -17,7 +17,7 @@ class String
     begin
       DateTime.parse(self, Sequel.convert_two_digit_years)
     rescue => e
-      raise Sequel::InvalidValue, "Invalid DateTime value '#{self}' (#{e.message})"
+      raise Sequel.convert_exception_class(e, Sequel::InvalidValue)
     end
   end
 
@@ -31,7 +31,7 @@ class String
         Sequel.datetime_class.parse(self)
       end
     rescue => e
-      raise Sequel::InvalidValue, "Invalid #{Sequel.datetime_class} value '#{self}' (#{e.message})"
+      raise Sequel.convert_exception_class(e, Sequel::InvalidValue)
     end
   end
 
@@ -40,7 +40,7 @@ class String
     begin
       Time.parse(self)
     rescue => e
-      raise Sequel::InvalidValue, "Invalid Time value '#{self}' (#{e.message})"
+      raise Sequel.convert_exception_class(e, Sequel::InvalidValue)
     end
   end
 end
