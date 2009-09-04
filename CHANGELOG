@@ -1,5 +1,7 @@
 === HEAD
 
+* Detect more types of MySQL disconnection errors (jeremyevans)
+
 * Add Sequel.convert_exception_class for wrapping exceptions (jeremyevans)
 
 * Model#modified? now always considers new records as modified (jeremyevans)
