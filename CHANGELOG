@@ -1,5 +1,7 @@
 === HEAD
 
+* Add typecast_on_load plugin, for fixing bad database typecasting when loading model objects (jeremyevans)
+
 * Detect more types of MySQL disconnection errors (jeremyevans)
 
 * Add Sequel.convert_exception_class for wrapping exceptions (jeremyevans)
