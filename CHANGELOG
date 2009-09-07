@@ -1,5 +1,7 @@
 === HEAD
 
+* Catch database errors when preparing statements or setting variable values when using the native MySQL adapter (jeremyevans)
+
 * Add typecast_on_load plugin, for fixing bad database typecasting when loading model objects (jeremyevans)
 
 * Detect more types of MySQL disconnection errors (jeremyevans)

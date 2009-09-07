@@ -132,12 +132,12 @@ module Sequel
       # Executes the given SQL using an available connection, yielding the
       # connection if the block is given.
       def execute(sql, opts={}, &block)
-        return call_sproc(sql, opts, &block) if opts[:sproc]
-        return execute_prepared_statement(sql, opts, &block) if Symbol === sql
-        begin
+        if opts[:sproc]
+          call_sproc(sql, opts, &block)
+        elsif sql.is_a?(Symbol)
+          execute_prepared_statement(sql, opts, &block)
+        else
           synchronize(opts[:server]){|conn| _execute(conn, sql, opts, &block)}
-        rescue Mysql::Error => e
-          raise_error(e)
         end
       end
       
@@ -221,16 +221,10 @@ module Sequel
         synchronize(opts[:server]) do |conn|
           unless conn.prepared_statements[ps_name] == sql
             conn.prepared_statements[ps_name] = sql
-            s = "PREPARE #{ps_name} FROM '#{::Mysql.quote(sql)}'"
-            log_info(s)
-            conn.query(s)
+            _execute(conn, "PREPARE #{ps_name} FROM '#{::Mysql.quote(sql)}'", opts)
           end
           i = 0
-          args.each do |arg|
-            s = "SET @sequel_arg_#{i+=1} = #{literal(arg)}"
-            log_info(s)
-            conn.query(s)
-          end
+          args.each{|arg| _execute(conn, "SET @sequel_arg_#{i+=1} = #{literal(arg)}", opts)}
           _execute(conn, "EXECUTE #{ps_name}#{" USING #{(1..i).map{|j| "@sequel_arg_#{j}"}.join(', ')}" unless i == 0}", opts, &block)
         end
       end
