@@ -22,7 +22,29 @@ class Spec::Example::ExampleGroup
       INTEGRATION_DB.loggers << Logger.new(STDOUT)
       yield
     ensure
-     INTEGRATION_DB.loggers.clear
+     INTEGRATION_DB.loggers.pop
+    end
+  end
+
+  def self.cspecify(message, *checked, &block)
+    pending = false
+    checked.each do |c|
+      case c
+      when INTEGRATION_DB.database_type
+        pending = c
+      when Array
+        case c.length
+        when 1
+          pending = c if c.first == INTEGRATION_DB.class.adapter_scheme
+        when 2
+          pending = c if c.first == INTEGRATION_DB.class.adapter_scheme && c.last == INTEGRATION_DB.database_type
+        end
+      end
+    end
+    if pending
+      specify(message){pending("Not yet working on #{Array(pending).join(', ')}", &block)}
+    else
+      specify(message, &block)
     end
   end
 end
