@@ -17,6 +17,7 @@
 <li><a href="rdoc-plugins/classes/Sequel/Plugins/Schema.html">schema</a>: Adds backwards compatibility for Model.set_schema and Model.create_table.</li>
 <li><a href="rdoc-plugins/classes/Sequel/Plugins/Serialization.html">serialization</a>: Supports serializing column values and storing them as either marshal, yaml, or json in the database.</li>
 <li><a href="rdoc-plugins/classes/Sequel/Plugins/SingleTableInheritance.html">single_table_inheritance</a>: Sets up STI by making subclasses of this model only load rows that match the class, and returning instances of the subclasses.</li>
+<li><a href="rdoc-plugins/classes/Sequel/Plugins/Subclasses.html">subclasses</a>: Allows easy access all model subclasses and descendent classes, without using ObjectSpace.</li>
 <li><a href="rdoc-plugins/classes/Sequel/Plugins/TacticalEagerLoading.html">tactical_eager_loading</a>: Allows you to eagerly load an association for all objects retreived from the same dataset when calling the association method on any of the objects in the dataset.</li>
 <li><a href='rdoc-plugins/classes/Sequel/Plugins/Timestamps.html'>timestamps</a>: Creates hooks for automatically setting create and update timestamps.</li>
 <li><a href='rdoc-plugins/classes/Sequel/Plugins/TypecastOnLoad.html'>typecast_on_load</a>: Fixes bad database typecasting when loading model objects.</li>
