@@ -1,5 +1,7 @@
 === HEAD
 
+* Add looser_typecasting extension, for using .to_f and .to_i instead of Kernel.Float and Kernel.Integer when typecasting floats and integers (jeremyevans)
+
 * Catch database errors when preparing statements or setting variable values when using the native MySQL adapter (jeremyevans)
 
 * Add typecast_on_load plugin, for fixing bad database typecasting when loading model objects (jeremyevans)

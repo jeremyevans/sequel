@@ -19,6 +19,7 @@
 <li><a href="rdoc-plugins/classes/Sequel/Plugins/SingleTableInheritance.html">single_table_inheritance</a>: Sets up STI by making subclasses of this model only load rows that match the class, and returning instances of the subclasses.</li>
 <li><a href="rdoc-plugins/classes/Sequel/Plugins/TacticalEagerLoading.html">tactical_eager_loading</a>: Allows you to eagerly load an association for all objects retreived from the same dataset when calling the association method on any of the objects in the dataset.</li>
 <li><a href='rdoc-plugins/classes/Sequel/Plugins/Timestamps.html'>timestamps</a>: Creates hooks for automatically setting create and update timestamps.</li>
+<li><a href='rdoc-plugins/classes/Sequel/Plugins/TypecastOnLoad.html'>typecast_on_load</a>: Fixes bad database typecasting when loading model objects.</li>
 <li><a href="rdoc-plugins/classes/Sequel/Plugins/ValidationClassMethods.html">validation_class_methods</a>: Adds backwards compatibility for the legacy class-level validation methods (e.g. validates_presence_of :column).</li>
 <li><a href="rdoc-plugins/classes/Sequel/Plugins/ValidationHelpers.html">validation_helpers</a>: The preferred default validations plugin, which uses instance-level methods.</li>
 </ul>
@@ -44,6 +45,7 @@
 <ul>
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/blank_rb.html">blank</a>: Adds blank? instance methods to all objects.</li>
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/inflector_rb.html">inflector</a>: Adds instance-level inflection methods to String.</li>
+<li><a href="rdoc-plugins/files/lib/sequel/extensions/looser_typecasting_rb.html">looser_typecasting</a>: Uses .to_f and .to_i instead of Kernel.Float and Kernel.Integer when typecasting floats and integers.</li>
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/migration_rb.html">migration</a>: Adds Migration and Migrator classes for easily migrating the database schema forward or reverting to a previous version.</li>
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/pagination_rb.html">pagination</a>: Adds Dataset#paginate for easier pagination of datasets.</li>
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/pretty_table_rb.html">pretty_table</a>: Adds Dataset#print for printing a dataset as a simple plain-text table.</li>
