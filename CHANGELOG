@@ -1,5 +1,7 @@
 === HEAD
 
+* Add :validate association option, set to false to not validate when implicitly saving associated objects (jeremyevans)
+
 * Add subclasses plugin, for recording all of a models subclasses and descendent classes (jeremyevans)
 
 * Add looser_typecasting extension, for using .to_f and .to_i instead of Kernel.Float and Kernel.Integer when typecasting floats and integers (jeremyevans)

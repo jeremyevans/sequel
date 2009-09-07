@@ -520,8 +520,7 @@ describe Sequel::Model, "many_to_one" do
 end
 
 describe Sequel::Model, "one_to_many" do
-
-  before(:each) do
+  before do
     MODEL_DB.reset
 
     @c1 = Class.new(Sequel::Model(:attributes)) do
@@ -641,6 +640,15 @@ describe Sequel::Model, "one_to_many" do
     def a.valid?; false; end
     proc{n.add_attribute(a)}.should raise_error(Sequel::Error)
     proc{n.remove_attribute(a)}.should raise_error(Sequel::Error)
+  end
+
+  it "should not validate the associated object in add_ and remove_ if the :validate=>false option is used" do
+    @c2.one_to_many :attributes, :class => @c1, :validate=>false
+    n = @c2.new(:id => 1234)
+    a = @c1.new(:id => 2345)
+    def a.valid?; false; end
+    n.add_attribute(a).should == a
+    n.remove_attribute(a).should == a
   end
 
   it "should raise an error if the model object doesn't have a valid primary key" do
@@ -929,7 +937,7 @@ describe Sequel::Model, "one_to_many" do
     d = @c1.dataset
     def d.fetch_rows(s); end
     node.attributes.should == []
-    def attrib.save; self end
+    def attrib.save(*); self end
     node.add_attribute(attrib)
     node.associations[:attributes].should == [attrib]
     node.remove_all_attributes.should == [attrib]
@@ -951,7 +959,7 @@ describe Sequel::Model, "one_to_many" do
     node = @c2.new(:id => 1234)
     node.attributes.should == []
     attrib.node.should == nil
-    def attrib.save; self end
+    def attrib.save(*); self end
     node.add_attribute(attrib)
     attrib.associations[:node].should == node 
     node.remove_all_attributes
@@ -1455,11 +1463,37 @@ describe Sequel::Model, "many_to_many" do
     proc{a.remove_all_attributes}.should raise_error(Sequel::Error)
   end
   
-  it "should save the associated object first if passed a new model object" do
+  it "should save the associated object first in add_ if passed a new model object" do
     @c2.many_to_many :attributes, :class => @c1 
     n = @c1.new
     a = @c2.load(:id=>123)
     n.new?.should == true
+    a.add_attribute(n)
+    n.new?.should == false
+  end
+
+  it "should raise a ValidationFailed in add_ if the associated object is new and invalid" do
+    @c2.many_to_many :attributes, :class => @c1 
+    n = @c1.new
+    a = @c2.load(:id=>123)
+    def n.valid?; false; end
+    proc{a.add_attribute(n)}.should raise_error(Sequel::ValidationFailed)
+  end
+
+  it "should raise an Error in add_ if the associated object is new and invalid and raise_on_save_failure is false" do
+    @c2.many_to_many :attributes, :class => @c1 
+    n = @c1.new
+    n.raise_on_save_failure = false
+    a = @c2.load(:id=>123)
+    def n.valid?; false; end
+    proc{a.add_attribute(n)}.should raise_error(Sequel::Error)
+  end
+
+  it "should not attempt to validate the associated object in add_ if the :validate=>false option is used" do
+    @c2.many_to_many :attributes, :class => @c1, :validate=>false
+    n = @c1.new
+    a = @c2.load(:id=>123)
+    def n.valid?; false; end
     a.add_attribute(n)
     n.new?.should == false
   end

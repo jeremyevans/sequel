@@ -220,7 +220,7 @@ describe "NestedAttributes plugin" do
     @mods.should == [[:u, :artists, {:name=>"Ar"}, '(id = 20)']]
   end
   
-  it "should not save if nested attribute is not validate and should include nested attribute validation errors in the main object's validation errors" do
+  it "should not save if nested attribute is not valid and should include nested attribute validation errors in the main object's validation errors" do
     @Artist.class_eval do
       def validate
         super
@@ -232,6 +232,34 @@ describe "NestedAttributes plugin" do
     proc{a.save}.should raise_error(Sequel::ValidationFailed)
     a.errors.full_messages.should == ['artist name cannot be Ar']
     @mods.should == []
+  end
+  
+  it "should not attempt to validate nested attributes if the :validate=>false association option is used" do
+    @Album.many_to_one :artist, :class=>@Artist, :validate=>false
+    @Album.nested_attributes :artist, :tags, :destroy=>true, :remove=>true
+    @Artist.class_eval do
+      def validate
+        super
+        errors.add(:name, 'cannot be Ar') if name == 'Ar'
+      end
+    end
+    a = @Album.new(:name=>'Al', :artist_attributes=>{:name=>'Ar'})
+    @mods.should == []
+    a.save
+    @mods.should == [[:is, :artists, {:name=>"Ar"}, 1], [:is, :albums, {:name=>"Al", :artist_id=>1}, 2]]
+  end
+  
+  it "should not attempt to validate nested attributes if the :validate=>false option is passed to save" do
+    @Artist.class_eval do
+      def validate
+        super
+        errors.add(:name, 'cannot be Ar') if name == 'Ar'
+      end
+    end
+    a = @Album.new(:name=>'Al', :artist_attributes=>{:name=>'Ar'})
+    @mods.should == []
+    a.save(:validate=>false)
+    @mods.should == [[:is, :artists, {:name=>"Ar"}, 1], [:is, :albums, {:name=>"Al", :artist_id=>1}, 2]]
   end
   
   it "should not accept nested attributes unless explicitly specified" do

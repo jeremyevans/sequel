@@ -473,6 +473,7 @@ module Sequel
         #     use this option, but beware that the join table attributes can clash with
         #     attributes from the model table, so you should alias any attributes that have
         #     the same name in both the join table and the associated table.
+        #   - :validate - Set to false to not validate when implicitly saving any associated object.
         # * :many_to_one:
         #   - :key - foreign_key in current model's table that references
         #     associated model's primary key, as a symbol.  Defaults to :"#{name}_id".
@@ -788,16 +789,17 @@ module Sequel
           def_association_dataset_methods(opts)
           
           unless opts[:read_only]
+            validate = opts[:validate]
             association_module_private_def(opts._add_method) do |o|
               o.send(:"#{key}=", send(primary_key))
-              o.save || raise(Sequel::Error, "invalid associated object, cannot save")
+              o.save(:validate=>validate) || raise(Sequel::Error, "invalid associated object, cannot save")
             end
             def_add_method(opts)
       
             unless opts[:one_to_one]
               association_module_private_def(opts._remove_method) do |o|
                 o.send(:"#{key}=", nil)
-                o.save || raise(Sequel::Error, "invalid associated object, cannot save")
+                o.save(:validate=>validate) || raise(Sequel::Error, "invalid associated object, cannot save")
               end
               association_module_private_def(opts._remove_all_method) do
                 opts.associated_class.filter(key=>send(primary_key)).update(key=>nil)
@@ -883,7 +885,7 @@ module Sequel
         def add_associated_object(opts, o, *args)
           raise(Sequel::Error, "model object #{model} does not have a primary key") unless pk
           if opts.need_associated_primary_key?
-            o.save if o.new?
+            o.save(:validate=>opts[:validate]) if o.new?
             raise(Sequel::Error, "associated object #{o.model} does not have a primary key") unless o.pk
           end
           return if run_association_callbacks(opts, :before_add, o) == false

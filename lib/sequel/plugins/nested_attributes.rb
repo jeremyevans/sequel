@@ -84,7 +84,9 @@ module Sequel
           if reflection.returns_array?
             after_save_hook{send(reflection.add_method, obj)}
           else
-            before_save_hook{send(reflection.setter_method, obj.save)}
+            # Don't need to validate the object twice if :validate association option is not false
+            # and don't want to validate it at all if it is false.
+            before_save_hook{send(reflection.setter_method, obj.save(:validate=>false))}
           end
         end
         
@@ -155,13 +157,16 @@ module Sequel
           if obj = nested_attributes_find(reflection, pk)
             obj.set(attributes)
             after_validation_hook{validate_associated_object(reflection, obj)}
-            after_save_hook{obj.save}
+            # Don't need to validate the object twice if :validate association option is not false
+            # and don't want to validate it at all if it is false.
+            after_save_hook{obj.save(:validate=>false)}
           end
         end
         
         # Validate the given associated object, adding any validation error messages from the
         # given object to the parent object.
         def validate_associated_object(reflection, obj)
+          return if reflection[:validate] == false
           association = reflection[:name]
           obj.errors.full_messages.each{|m| errors.add(association, m)} unless obj.valid?
         end
