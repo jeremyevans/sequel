@@ -85,7 +85,7 @@ context "A connection pool handling connections" do
   end
 
   specify "#make_new should not make more than max_size connections" do
-    50.times{Thread.new{@cpool.hold{sleep 0.01}}}
+    50.times{Thread.new{@cpool.hold{sleep 0.001}}}
     @cpool.created_count.should == @max_size
   end
 
