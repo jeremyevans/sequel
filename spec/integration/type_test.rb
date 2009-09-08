@@ -6,7 +6,7 @@ describe "Supported types" do
     INTEGRATION_DB[:items]
   end
 
-  cspecify "should support casting correctly", :sqlite do
+  cspecify "should support casting correctly", [:sqlite, :sqlite] do
     ds = create_items_table_with_column(:number, Integer)
     ds.insert(:number => 1)
     ds.select(:number.cast_string.as(:n)).map(:n).should == %w'1'
@@ -60,14 +60,14 @@ describe "Supported types" do
     ds.all.should == [{:name=>'Test User'}]
   end
   
-  specify "should support generic date type" do
+  cspecify "should support generic date type", [:do, :sqlite], [:jdbc, :sqlite] do
     ds = create_items_table_with_column(:dat, Date)
     d = Date.today
     ds.insert(:dat => d)
     ds.first[:dat].should == d
   end
   
-  specify "should support generic datetime type" do
+  cspecify "should support generic datetime type", [:do, :sqlite], [:jdbc, :sqlite] do
     ds = create_items_table_with_column(:tim, DateTime)
     t = DateTime.now
     ds.insert(:tim => t)
@@ -78,14 +78,14 @@ describe "Supported types" do
     ds.first[:tim].strftime('%Y%m%d%H%M%S').should == t.strftime('%Y%m%d%H%M%S')
   end
   
-  specify "should support generic file type" do
+  cspecify "should support generic file type", [:do], :h2 do
     ds = create_items_table_with_column(:name, File)
     ds.insert(:name => ("a\0"*300).to_sequel_blob)
     ds.all.should == [{:name=>("a\0"*300).to_sequel_blob}]
     ds.first[:name].should be_a_kind_of(::Sequel::SQL::Blob)
   end
   
-  specify "should support generic boolean type" do
+  cspecify "should support generic boolean type", [:do, :sqlite], [:jdbc, :sqlite] do
     ds = create_items_table_with_column(:number, TrueClass)
     ds.insert(:number => true)
     ds.all.should == [{:number=>true}]

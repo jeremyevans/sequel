@@ -68,7 +68,7 @@ context "An SQLite database" do
     proc {@db.temp_store = :invalid}.should raise_error(Sequel::Error)
   end
   
-  specify "should support timestamps and datetimes and respect datetime_class" do
+  cspecify "should support timestamps and datetimes and respect datetime_class", :do, :jdbc, :amalgalite do
     @db.create_table!(:time){timestamp :t; datetime :d}
     t1 = Time.at(1)
     @db[:time] << {:t => t1, :d => t1.to_i}

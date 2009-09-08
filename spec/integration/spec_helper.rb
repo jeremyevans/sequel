@@ -37,9 +37,18 @@ class Spec::Example::ExampleGroup
         when 1
           pending = c if c.first == INTEGRATION_DB.class.adapter_scheme
         when 2
-          pending = c if c.first == INTEGRATION_DB.class.adapter_scheme && c.last == INTEGRATION_DB.database_type
-        end
+          if c.first.is_a?(Proc)
+            pending = c if c.first.call(INTEGRATION_DB) && c.last == INTEGRATION_DB.database_type
+          elsif c.last.is_a?(Proc)
+            pending = c if c.first == INTEGRATION_DB.class.adapter_scheme && c.last.call(INTEGRATION_DB)
+          else
+            pending = c if c.first == INTEGRATION_DB.class.adapter_scheme && c.last == INTEGRATION_DB.database_type
+          end
+        when 3
+          pending = c if c[0] == INTEGRATION_DB.class.adapter_scheme && c[1] == INTEGRATION_DB.database_type && c[2].call(INTEGRATION_DB)
+        end          
       end
+      break if pending
     end
     if pending
       specify(message){pending("Not yet working on #{Array(pending).join(', ')}", &block)}

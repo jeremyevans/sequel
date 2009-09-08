@@ -480,7 +480,7 @@ context "A MySQL database" do
     @db[:items].first.should == nil
   end
   
-  specify "should handle multiple select statements at once" do
+  cspecify "should handle multiple select statements at once", :do, :jdbc do
     @db.create_table(:items){String :name; Integer :value}
     @db[:items].delete
     @db[:items].insert(:name => 'tutu', :value => 1234)

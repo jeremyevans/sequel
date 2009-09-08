@@ -137,7 +137,7 @@ context "A PostgreSQL dataset with a timestamp field" do
     @d.delete
   end
 
-  specify "should store milliseconds in time fields" do
+  cspecify "should store milliseconds in time fields", :do do
     t = Time.now
     @d << {:value=>1, :time=>t}
     @d.literal(@d[:value =>'1'][:time]).should == @d.literal(t)

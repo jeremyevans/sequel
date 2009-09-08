@@ -81,7 +81,7 @@ describe "Database schema parser" do
     INTEGRATION_DB.schema(:items).first.last[:ruby_default].should == 'blah'
   end
 
-  specify "should parse types from the schema properly" do
+  cspecify "should parse types from the schema properly", [:do, :mysql], [:jdbc, :mysql] do
     INTEGRATION_DB.create_table!(:items){Integer :number}
     INTEGRATION_DB.schema(:items).first.last[:type].should == :integer
     INTEGRATION_DB.create_table!(:items){Fixnum :number}
@@ -183,7 +183,7 @@ describe "Database schema modifiers" do
     @ds.all.should == [{:number=>10, :name=>nil}]
   end
 
-  specify "should add primary key columns to tables correctly" do
+  cspecify "should add primary key columns to tables correctly", :h2 do
     @db.create_table!(:items){Integer :number}
     @ds.insert(:number=>10)
     @db.alter_table(:items){add_primary_key :id}
@@ -220,7 +220,7 @@ describe "Database schema modifiers" do
     @ds.all.should == [{:n2=>'blah'}, {:n2=>'blah'}]
   end
 
-  specify "should rename columns with not null constraints" do
+  cspecify "should rename columns with not null constraints", [:mysql, :mysql] do
     @db.create_table!(:items){String :n, :null=>false}
     @ds.insert(:n=>'blah')
     @db.alter_table(:items){rename_column :n, :n2}
@@ -231,7 +231,7 @@ describe "Database schema modifiers" do
     proc{@ds.insert}.should raise_error(Sequel::DatabaseError)
   end
 
-  specify "should set column NULL/NOT NULL correctly" do
+  cspecify "should set column NULL/NOT NULL correctly", [:mysql, :mysql] do
     @db.create_table!(:items){Integer :id}
     @ds.insert(:id=>10)
     @db.alter_table(:items){set_column_allow_null :id, false}
@@ -273,7 +273,7 @@ describe "Database schema modifiers" do
     @ds.columns!.should == [:id, :item_id]
   end
 
-  specify "should remove columns from tables correctly" do
+  cspecify "should remove columns from tables correctly", :h2 do
     @db.create_table!(:items) do
       primary_key :id
       String :name
