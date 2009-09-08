@@ -1,5 +1,7 @@
 === HEAD
 
+* Speed up execution of prepared statements with bound variables on MySQL (ibc@aliax.net)
+ 
 * Add association_dependencies plugin, for deleting, destroying, or nullifying associated objects when destroying a model object (jeremyevans)
 
 * Add :validate association option, set to false to not validate when implicitly saving associated objects (jeremyevans)

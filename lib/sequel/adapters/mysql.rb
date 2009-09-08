@@ -224,7 +224,7 @@ module Sequel
             _execute(conn, "PREPARE #{ps_name} FROM '#{::Mysql.quote(sql)}'", opts)
           end
           i = 0
-          args.each{|arg| _execute(conn, "SET @sequel_arg_#{i+=1} = #{literal(arg)}", opts)}
+          _execute(conn, "SET " + args.map {|arg| "@sequel_arg_#{i+=1} = #{literal(arg)}"}.join(", "), opts) unless args.empty?
           _execute(conn, "EXECUTE #{ps_name}#{" USING #{(1..i).map{|j| "@sequel_arg_#{j}"}.join(', ')}" unless i == 0}", opts, &block)
         end
       end
