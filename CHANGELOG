@@ -1,5 +1,7 @@
 === HEAD
 
+* Add association_dependencies plugin, for deleting, destroying, or nullifying associated objects when destroying a model object (jeremyevans)
+
 * Add :validate association option, set to false to not validate when implicitly saving associated objects (jeremyevans)
 
 * Add subclasses plugin, for recording all of a models subclasses and descendent classes (jeremyevans)
