@@ -1,5 +1,9 @@
 === HEAD
 
+* Fix MySQL commands out of sync error when using queries with multiple result sets without retrieving all result sets (jeremyevans)
+
+* Allow splitting of multiple result sets into separate arrays when using multiple statements in a single query in the native MySQL adapter (jeremyevans)
+
 * Don't include primary key indexes when parsing MSSQL indexes on JDBC (jeremyevans)
 
 * Make Dataset#insert_select return nil on PostgreSQL if disable_insert_returning is used (jeremyevans)

@@ -178,7 +178,16 @@ module Sequel
         rescue Mysql::Error => e
           raise_error(e, :disconnect=>MYSQL_DATABASE_DISCONNECT_ERRORS.match(e.message))
         ensure
-          r.free if r
+          if r
+            r.free 
+            # Use up all results to avoid a commands out of sync message.
+            if conn.respond_to?(:next_result)
+              while conn.next_result
+                r = conn.use_result
+                r.free if r
+              end
+            end
+          end
         end
       end
       
@@ -304,19 +313,29 @@ module Sequel
         execute_dui(delete_sql){|c| c.affected_rows}
       end
       
-      # Yield all rows matching this dataset
-      def fetch_rows(sql)
+      # Yield all rows matching this dataset.  If the dataset is set to
+      # split multiple statements, yield arrays of hashes one per statement
+      # instead of yielding results for all statements as hashes.
+      def fetch_rows(sql, &block)
         execute(sql) do |r|
           i = -1
           cols = r.fetch_fields.map{|f| [output_identifier(f.name), MYSQL_TYPES[f.type], i+=1]}
           @columns = cols.map{|c| c.first}
-          while row = r.fetch_row
-            h = {}
-            cols.each{|n, p, i| v = row[i]; h[n] = (v && p) ? p.call(v) : v}
-            yield h
+          if opts[:split_multiple_result_sets]
+            s = []
+            yield_rows(r, cols){|h| s << h}
+            yield s
+          else
+            yield_rows(r, cols, &block)
           end
         end
         self
+      end
+      
+      # Don't allow graphing a dataset that splits multiple statements
+      def graph(*)
+        raise(Error, "Can't graph a dataset that splits multiple result sets") if opts[:split_multiple_result_sets]
+        super
       end
       
       # Insert a new value into this dataset
@@ -339,6 +358,22 @@ module Sequel
       # Replace (update or insert) the matching row.
       def replace(*args)
         execute_dui(replace_sql(*args)){|c| c.insert_id}
+      end
+      
+      # Makes each yield arrays of rows, with each array containing the rows
+      # for a given result set.  Does not work with graphing.  So you can submit
+      # SQL with multiple statements and easily determine which statement
+      # returned which results.
+      #
+      # Modifies the row_proc of the returned dataset so that it still works
+      # as expected (running on the hashes instead of on the arrays of hashes).
+      # If you modify the row_proc afterward, note that it will receive an array
+      # of hashes instead of a hash.
+      def split_multiple_result_sets
+        raise(Error, "Can't split multiple statements on a graphed dataset") if opts[:graph]
+        ds = clone(:split_multiple_result_sets=>true)
+        ds.row_proc = proc{|x| x.map{|h| row_proc.call(h)}} if row_proc
+        ds
       end
       
       # Update the matching rows.
@@ -366,6 +401,16 @@ module Sequel
       # Extend the dataset with the MySQL stored procedure methods.
       def prepare_extend_sproc(ds)
         ds.extend(StoredProcedureMethods)
+      end
+      
+      # Yield each row of the given result set r with columns cols
+      # as a hash with symbol keys
+      def yield_rows(r, cols)
+        while row = r.fetch_row
+          h = {}
+          cols.each{|n, p, i| v = row[i]; h[n] = (v && p) ? p.call(v) : v}
+          yield h
+        end
       end
     end
   end

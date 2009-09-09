@@ -479,14 +479,6 @@ context "A MySQL database" do
     @db << 'DELETE FROM items'
     @db[:items].first.should == nil
   end
-  
-  cspecify "should handle multiple select statements at once", :do, :jdbc do
-    @db.create_table(:items){String :name; Integer :value}
-    @db[:items].delete
-    @db[:items].insert(:name => 'tutu', :value => 1234)
-    @db["SELECT * FROM items; SELECT * FROM items"].all.should == \
-      [{:name => 'tutu', :value => 1234}, {:name => 'tutu', :value => 1234}]
-  end
 end  
 
 # Socket tests should only be run if the MySQL server is on localhost
@@ -904,6 +896,46 @@ if MYSQL_DB.class.adapter_scheme == :mysql
       MYSQL_DB["SELECT CAST('0000-00-00' AS date)"].single_value.should == '0000-00-00'
       MYSQL_DB["SELECT CAST('0000-00-00 00:00:00' AS datetime)"].single_value.should == '0000-00-00 00:00:00'
       MYSQL_DB["SELECT CAST('25:00:00' AS time)"].single_value.should == '25:00:00'
+    end
+  end
+  
+  context "MySQL multiple result sets" do
+    before do
+      MYSQL_DB.create_table!(:a){Integer :a}
+      MYSQL_DB.create_table!(:b){Integer :b}
+      @ds = MYSQL_DB['SELECT * FROM a; SELECT * FROM b']
+      MYSQL_DB[:a].insert(10)
+      MYSQL_DB[:a].insert(15)
+      MYSQL_DB[:b].insert(20)
+      MYSQL_DB[:b].insert(25)
+    end
+    after do
+      MYSQL_DB.drop_table(:a, :b)
+    end
+    
+    specify "should combine all results by default" do
+      @ds.all.should == [{:a=>10}, {:a=>15}, {:b=>20}, {:b=>25}]
+    end
+    
+    specify "should split results returned into arrays if split_multiple_result_sets is used" do
+      @ds.split_multiple_result_sets.all.should == [[{:a=>10}, {:a=>15}], [{:b=>20}, {:b=>25}]]
+    end
+    
+    specify "should have regular row_procs work when splitting multiple result sets" do
+      @ds.row_proc = proc{|x| x[x.keys.first] *= 2; x}
+      @ds.split_multiple_result_sets.all.should == [[{:a=>20}, {:a=>30}], [{:b=>40}, {:b=>50}]]
+    end
+    
+    specify "should use the columns from the first result set when splitting result sets" do
+      @ds.split_multiple_result_sets.columns.should == [:a]
+    end
+    
+    specify "should not allow graphing a dataset that splits multiple statements" do
+      proc{@ds.split_multiple_result_sets.graph(:b, :b=>:a)}.should raise_error(Sequel::Error)
+    end
+    
+    specify "should not allow splitting a graphed dataset" do
+      proc{MYSQL_DB[:a].graph(:b, :b=>:a).split_multiple_result_sets}.should raise_error(Sequel::Error)
     end
   end
 end
