@@ -12,6 +12,8 @@ module Sequel
     module MSSQL
       # Database instance methods for MSSQL databases accessed via JDBC.
       module DatabaseMethods
+        PRIMARY_KEY_INDEX_RE = /\Apk__/i.freeze
+        
         include Sequel::MSSQL::DatabaseMethods
         
         # Return instance of Sequel::JDBC::MSSQL::Dataset with the given opts.
@@ -39,6 +41,11 @@ module Sequel
         # since the JDBC version handles primary keys.
         def schema_parse_table(table, opts={})
           jdbc_schema_parse_table(table, opts)
+        end
+        
+        # Primary key indexes appear to start with pk__ on MSSQL
+        def primary_key_index_re
+          PRIMARY_KEY_INDEX_RE
         end
       end
       
