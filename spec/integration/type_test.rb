@@ -45,7 +45,7 @@ describe "Supported types" do
     ds.all.should == [{:number=>2.1}]
   end
   
-  specify "should support generic numeric type" do
+  cspecify "should support generic numeric type", [:odbc, :mssql] do
     ds = create_items_table_with_column(:number, Numeric, :size=>[15, 10])
     ds.insert(:number => BigDecimal.new('2.123456789'))
     ds.all.should == [{:number=>BigDecimal.new('2.123456789')}]
@@ -60,7 +60,7 @@ describe "Supported types" do
     ds.all.should == [{:name=>'Test User'}]
   end
   
-  cspecify "should support generic date type", [:do, :sqlite], [:jdbc, :sqlite] do
+  cspecify "should support generic date type", [:do, :sqlite], [:jdbc, :sqlite], :mssql do
     ds = create_items_table_with_column(:dat, Date)
     d = Date.today
     ds.insert(:dat => d)
@@ -78,14 +78,14 @@ describe "Supported types" do
     ds.first[:tim].strftime('%Y%m%d%H%M%S').should == t.strftime('%Y%m%d%H%M%S')
   end
   
-  cspecify "should support generic file type", [:do], :h2 do
+  cspecify "should support generic file type", [:do], :h2, [:odbc, :mssql] do
     ds = create_items_table_with_column(:name, File)
     ds.insert(:name => ("a\0"*300).to_sequel_blob)
     ds.all.should == [{:name=>("a\0"*300).to_sequel_blob}]
     ds.first[:name].should be_a_kind_of(::Sequel::SQL::Blob)
   end
   
-  cspecify "should support generic boolean type", [:do, :sqlite], [:jdbc, :sqlite] do
+  cspecify "should support generic boolean type", [:do, :sqlite], [:jdbc, :sqlite], [:odbc, :mssql] do
     ds = create_items_table_with_column(:number, TrueClass)
     ds.insert(:number => true)
     ds.all.should == [{:number=>true}]

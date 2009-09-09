@@ -23,7 +23,7 @@ describe "Simple Dataset operations" do
       {:id => 3, :number=>30} ]   
   end 
 
-  specify "should insert with a primary key specified" do
+  cspecify "should insert with a primary key specified", :mssql do
     @ds.insert(:id=>100, :number=>20)
     sqls_should_be(/INSERT INTO items \((number, id|id, number)\) VALUES \((100, 20|20, 100)\)/)
     @ds.count.should == 2
@@ -74,7 +74,7 @@ describe "Simple Dataset operations" do
     @ds.order(:id).limit(2, 1).all.should == [{:id=>2, :number=>20}]
   end
   
-  specify "should fetch correctly with a limit and offset without an order" do
+  cspecify "should fetch correctly with a limit and offset without an order", :mssql do
     @ds.limit(2, 1).all.should == []
   end
 
@@ -244,7 +244,7 @@ describe "Simple Dataset operations in transactions" do
     INTEGRATION_DB.drop_table(:items_insert_in_transaction)
   end
 
-  specify "should insert correctly with a primary key specified inside a transaction" do
+  cspecify "should insert correctly with a primary key specified inside a transaction", :mssql do
     INTEGRATION_DB.transaction do
       @ds.insert(:id=>100, :number=>20)
       sqls_should_be('BEGIN', /INSERT INTO items_insert_in_transaction \((number, id|id, number)\) VALUES \((100, 20|20, 100)\)/)
@@ -284,7 +284,7 @@ describe "Dataset UNION, EXCEPT, and INTERSECT" do
     end
   end
   
-  specify "should give the correct results for UNION, EXCEPT, and INTERSECT when used with ordering and limits" do
+  cspecify "should give the correct results for UNION, EXCEPT, and INTERSECT when used with ordering and limits", :mssql do
     @ds1.insert(:number=>8)
     @ds2.insert(:number=>9)
     @ds1.insert(:number=>38)
@@ -400,14 +400,14 @@ if INTEGRATION_DB.dataset.supports_window_functions?
         [{:rank=>1, :id=>1}, {:rank=>2, :id=>2}, {:rank=>3, :id=>3}, {:rank=>4, :id=>4}, {:rank=>5, :id=>5}, {:rank=>6, :id=>6}]
     end
       
-    specify "should give correct results for aggregate window functions with orders" do
+    cspecify "should give correct results for aggregate window functions with orders", :mssql do
       @ds.select(:id){sum(:over, :args=>amount, :partition=>group_id, :order=>id){}.as(:sum)}.all.should ==
         [{:sum=>1, :id=>1}, {:sum=>11, :id=>2}, {:sum=>111, :id=>3}, {:sum=>1000, :id=>4}, {:sum=>11000, :id=>5}, {:sum=>111000, :id=>6}]
       @ds.select(:id){sum(:over, :args=>amount, :order=>id){}.as(:sum)}.all.should ==
         [{:sum=>1, :id=>1}, {:sum=>11, :id=>2}, {:sum=>111, :id=>3}, {:sum=>1111, :id=>4}, {:sum=>11111, :id=>5}, {:sum=>111111, :id=>6}]
     end
     
-    specify "should give correct results for aggregate window functions with frames" do
+    cspecify "should give correct results for aggregate window functions with frames", :mssql do
       @ds.select(:id){sum(:over, :args=>amount, :partition=>group_id, :order=>id, :frame=>:all){}.as(:sum)}.all.should ==
         [{:sum=>111, :id=>1}, {:sum=>111, :id=>2}, {:sum=>111, :id=>3}, {:sum=>111000, :id=>4}, {:sum=>111000, :id=>5}, {:sum=>111000, :id=>6}]
       @ds.select(:id){sum(:over, :args=>amount, :partition=>group_id, :frame=>:all){}.as(:sum)}.all.should ==
@@ -449,7 +449,7 @@ describe Sequel::SQL::Constants do
     @db.drop_table(:constants)
   end
   
-  it "should have working CURRENT_DATE" do
+  cspecify "should have working CURRENT_DATE", [:odbc, :mssql] do
     @db.create_table!(:constants){Date :d}
     @ds.insert(:d=>Sequel::CURRENT_DATE)
     Date.today.should == @c2[@ds.get(:d)]
