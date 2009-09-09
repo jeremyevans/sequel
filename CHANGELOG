@@ -1,5 +1,7 @@
 === HEAD
 
+* Add active_model plugin, which gives Sequel::Model an ActiveModel compliant API, passes the ActiveModel::Lint tests (jeremyevans)
+
 * Fix MySQL commands out of sync error when using queries with multiple result sets without retrieving all result sets (jeremyevans)
 
 * Allow splitting of multiple result sets into separate arrays when using multiple statements in a single query in the native MySQL adapter (jeremyevans)
