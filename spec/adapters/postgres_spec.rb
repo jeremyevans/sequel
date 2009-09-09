@@ -389,6 +389,10 @@ context "Postgres::Dataset#insert" do
     @ds.insert_select(:value=>10).should == nil
   end
 
+  specify "should have insert_select return nil if disable_insert_returning is used" do
+    @ds.disable_insert_returning.insert_select(:value=>10).should == nil
+  end
+
   specify "should have insert_select insert the record and return the inserted record if server_version < 80200" do
     @ds.meta_def(:server_version){80201}
     h = @ds.insert_select(:value=>10)

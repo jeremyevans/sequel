@@ -668,7 +668,8 @@ module Sequel
 
       # Insert a record returning the record inserted
       def insert_select(*values)
-        naked.clone(default_server_opts(:sql=>insert_returning_sql(nil, *values))).single_record if server_version >= 80200
+        return if opts[:disable_insert_returning] || server_version < 80200
+        naked.clone(default_server_opts(:sql=>insert_returning_sql(nil, *values))).single_record
       end
 
       # Locks the table with the specified mode.

@@ -1,5 +1,7 @@
 === HEAD
 
+* Make Dataset#insert_select return nil on PostgreSQL if disable_insert_returning is used (jeremyevans)
+
 * Speed up execution of prepared statements with bound variables on MySQL (ibc@aliax.net)
  
 * Add association_dependencies plugin, for deleting, destroying, or nullifying associated objects when destroying a model object (jeremyevans)
