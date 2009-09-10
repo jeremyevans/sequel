@@ -8,7 +8,7 @@ unless Sequel.const_defined?('Model')
   require 'sequel/model'
 end
 
-Sequel.extension(*%w'string_date_time inflector pagination query pretty_table blank migration schema_dumper looser_typecasting')
+Sequel.extension(*%w'string_date_time inflector pagination query pretty_table blank migration schema_dumper looser_typecasting sql_expr')
 {:hook_class_methods=>[], :schema=>[], :validation_class_methods=>[]}.each{|p, opts| Sequel::Model.plugin(p, *opts)}
 
 class MockDataset < Sequel::Dataset
