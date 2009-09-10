@@ -1251,6 +1251,7 @@ context "Database#typecast_value" do
   before do
     @db = Sequel::Database.new
   end
+
   specify "should raise an InvalidValue when given an invalid value" do
     proc{@db.typecast_value(:integer, "13a")}.should raise_error(Sequel::InvalidValue)
     proc{@db.typecast_value(:float, "4.e2")}.should raise_error(Sequel::InvalidValue)
@@ -1259,6 +1260,24 @@ context "Database#typecast_value" do
     proc{@db.typecast_value(:date, 'a')}.should raise_error(Sequel::InvalidValue)
     proc{@db.typecast_value(:time, Date.new)}.should raise_error(Sequel::InvalidValue)
     proc{@db.typecast_value(:datetime, 4)}.should raise_error(Sequel::InvalidValue)
+  end
+
+  specify "should have an underlying exception class available at wrapped_exception" do
+    begin
+      @db.typecast_value(:date, 'a')
+      true.should == false
+    rescue Sequel::InvalidValue => e
+      e.wrapped_exception.should be_a_kind_of(ArgumentError)
+    end
+  end
+
+  specify "should include underlying exception class in #inspect" do
+    begin
+      @db.typecast_value(:date, 'a')
+      true.should == false
+    rescue Sequel::InvalidValue => e
+      e.inspect.should =~ /\A#<Sequel::InvalidValue: ArgumentError: .*>\z/
+    end
   end
 end
 
