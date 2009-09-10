@@ -1,5 +1,8 @@
 module Sequel
   if RUBY_VERSION < '1.9.0'
+    # If on Ruby 1.8, create a Sequel::BasicObject class that is similar to the
+    # the Ruby 1.9 BasicObject class.  This is used in a few places where proxy
+    # objects are needed that respond to any method call.
     class BasicObject
       (instance_methods - %w"__id__ __send__ instance_eval == equal?").each{|m| undef_method(m)}
     end
@@ -137,9 +140,7 @@ module Sequel
       ComplexExpression::BITWISE_OPERATORS.each do |o|
         define_method(o) do |ce|
           case ce
-          when NumericExpression 
-            NumericExpression.new(o, self, ce)
-          when ComplexExpression
+          when BooleanExpression, StringExpression
             raise(Sequel::Error, "cannot apply #{o} to a non-numeric expression")
           else  
             NumericExpression.new(o, self, ce)
@@ -167,9 +168,7 @@ module Sequel
       ComplexExpression::BOOLEAN_OPERATOR_METHODS.each do |m, o|
         define_method(m) do |ce|
           case ce
-          when BooleanExpression
-            BooleanExpression.new(o, self, ce)
-          when ComplexExpression
+          when NumericExpression, StringExpression
             raise(Sequel::Error, "cannot apply #{o} to a non-boolean expression")
           else  
             BooleanExpression.new(o, self, ce)
@@ -296,9 +295,7 @@ module Sequel
       ComplexExpression::MATHEMATICAL_OPERATORS.each do |o|
         define_method(o) do |ce|
           case ce
-          when NumericExpression
-            NumericExpression.new(o, self, ce)
-          when ComplexExpression
+          when BooleanExpression, StringExpression
             raise(Sequel::Error, "cannot apply #{o} to a non-numeric expression")
           else  
             NumericExpression.new(o, self, ce)
@@ -370,25 +367,6 @@ module Sequel
       def sql_subscript(*sub)
         Subscript.new(self, sub.flatten)
       end
-    end
-
-    class ComplexExpression
-      include AliasMethods
-      include CastMethods
-      include OrderMethods
-      include SubscriptMethods
-    end
-
-    class GenericExpression
-      include AliasMethods
-      include CastMethods
-      include OrderMethods
-      include ComplexExpressionMethods
-      include BooleanMethods
-      include NumericMethods
-      include StringMethods
-      include SubscriptMethods
-      include InequalityMethods
     end
 
     ### Classes ###
@@ -475,8 +453,8 @@ module Sequel
           else
             BooleanExpression.new(OPERTATOR_INVERSIONS[op], *ce.args.dup)
           end
-        when ComplexExpression
-          raise(Sequel::Error, "operator #{ce.op} cannot be inverted")
+        when StringExpression, NumericExpression
+          raise(Sequel::Error, "cannot invert #{ce.inspect}")
         else
           BooleanExpression.new(:NOT, ce)
         end
@@ -541,6 +519,13 @@ module Sequel
       to_s_method :column_all_sql
     end
     
+    class ComplexExpression
+      include AliasMethods
+      include CastMethods
+      include OrderMethods
+      include SubscriptMethods
+    end
+
     # Represents constants or psuedo-constants (e.g. CURRENT_DATE) in SQL
     class Constant < GenericExpression
       # Create an object with the given table
@@ -551,6 +536,10 @@ module Sequel
       to_s_method :constant_sql, '@constant'
     end
     
+    # Holds default generic constants that can be referenced.  These
+    # are included in the Sequel top level module and are also available
+    # in this module which can be required at the top level to get
+    # direct access to the constants.
     module Constants
       CURRENT_DATE = Constant.new(:CURRENT_DATE)
       CURRENT_TIME = Constant.new(:CURRENT_TIME)
@@ -579,6 +568,18 @@ module Sequel
       to_s_method :function_sql
     end
     
+    class GenericExpression
+      include AliasMethods
+      include BooleanMethods
+      include CastMethods
+      include ComplexExpressionMethods
+      include InequalityMethods
+      include NumericMethods
+      include OrderMethods
+      include StringMethods
+      include SubscriptMethods
+    end
+
     # Represents an identifier (column or table). Can be used
     # to specify a Symbol with multiple underscores should not be
     # split, or for creating an identifier without using a symbol.
