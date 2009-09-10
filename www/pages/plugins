@@ -5,6 +5,7 @@
 <h3>Built-in Plugins</h3>
 
 <ul>
+<li><a href="rdoc-plugins/classes/Sequel/Plugins/ActiveModel.html">active_model</a>: Makes Sequel::Model objects compliant to the ActiveModel::Lint specs, so they should work correctly in Rails 3.</li>
 <li><a href="rdoc-plugins/classes/Sequel/Plugins/AssociationDependencies.html">association_dependencies</a>: Allows easy deleting, destroying, or nullifying associated objects when destroying a model object.</li>
 <li><a href="rdoc-plugins/classes/Sequel/Plugins/AssociationProxies.html">association_proxies</a>: Changes the *_to_many association method to return a proxy instead of an array of objects.</li>
 <li><a href="rdoc-plugins/classes/Sequel/Plugins/BooleanReaders.html">boolean_readers</a>: Adds attribute? methods for all boolean columns.</li>
