@@ -121,9 +121,12 @@ You can use arithmetic operators and specify SQL functions:
 
 == Joins
 
-  DB[:items].left_outer_join(:categories, :id => :category_id).sql #=>
-    "SELECT * FROM items LEFT OUTER JOIN categories ON categories.id = items.category_id"
+  DB[:items].left_outer_join(:categories, :id => :category_id).sql 
+  #=> "SELECT * FROM items LEFT OUTER JOIN categories ON categories.id = items.category_id"
 
+  DB[:items].join(:categories, :id => :category_id).join(:groups, :id => :items__group_id) 
+  #=> "SELECT * FROM items INNER JOIN categories ON categories.id = items.category_id INNER JOIN groups ON groups.id = items.group_id"
+	
 == Summarizing
 
   dataset.count #=> record count
