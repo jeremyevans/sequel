@@ -1,5 +1,7 @@
 === HEAD
 
+* Add touch plugin, which adds Model#touch for updating an instance's timestamp, as well as touching associations when an instance is updated or destroyed (jeremyevans)
+
 * Add sql_expr extension, which adds the sql_expr to all objects, giving them easy access to Sequel's DSL (jeremyevans)
 
 * Add active_model plugin, which gives Sequel::Model an ActiveModel compliant API, passes the ActiveModel::Lint tests (jeremyevans)
