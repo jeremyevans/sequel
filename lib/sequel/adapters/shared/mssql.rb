@@ -169,10 +169,10 @@ module Sequel
       BOOL_TRUE = '1'.freeze
       BOOL_FALSE = '0'.freeze
       COMMA_SEPARATOR = ', '.freeze
-      DELETE_CLAUSE_METHODS = Dataset.clause_methods(:delete, %w'from output from2 where')
-      INSERT_CLAUSE_METHODS = Dataset.clause_methods(:insert, %w'into columns output values')
+      DELETE_CLAUSE_METHODS = Dataset.clause_methods(:delete, %w'with from output from2 where')
+      INSERT_CLAUSE_METHODS = Dataset.clause_methods(:insert, %w'with into columns output values')
       SELECT_CLAUSE_METHODS = Dataset.clause_methods(:select, %w'with limit distinct columns from table_options join where group order having compounds')
-      UPDATE_CLAUSE_METHODS = Dataset.clause_methods(:update, %w'table set output from where')
+      UPDATE_CLAUSE_METHODS = Dataset.clause_methods(:update, %w'with table set output from where')
       WILDCARD = LiteralString.new('*').freeze
       CONSTANT_MAP = {:CURRENT_DATE=>'CAST(CURRENT_TIMESTAMP AS DATE)'.freeze, :CURRENT_TIME=>'CAST(CURRENT_TIMESTAMP AS TIME)'.freeze}
 
@@ -299,10 +299,19 @@ module Sequel
         raise(InvalidOperation, "Grouped datasets cannot be modified") if opts[:group]
       end
 
-      # MSSQL supports the OUTPUT clause for DELETE statements
+      # MSSQL supports the OUTPUT clause for DELETE statements.
+      # It also allows prepending a WITH clause.
       def delete_clause_methods
         DELETE_CLAUSE_METHODS
       end
+
+      # Handle the with clause for delete, insert, and update statements
+      # to be the same as the insert statement.
+      def delete_with_sql(sql)
+        select_with_sql(sql)
+      end
+      alias insert_with_sql delete_with_sql
+      alias update_with_sql delete_with_sql
       
       # MSSQL raises an error if you try to provide more than 3 decimal places
       # for a fractional timestamp.  This probably doesn't work for smalldatetime
@@ -321,7 +330,8 @@ module Sequel
       alias delete_from2_sql from_sql
       alias update_from_sql from_sql
       
-      # MSSQL supports the OUTPUT clause for INSERT statements
+      # MSSQL supports the OUTPUT clause for INSERT statements.
+      # It also allows prepending a WITH clause.
       def insert_clause_methods
         INSERT_CLAUSE_METHODS
       end
@@ -385,7 +395,8 @@ module Sequel
       alias update_output_sql output_sql
       alias insert_output_sql output_sql
 
-      # MSSQL supports the OUTPUT clause for UPDATE statements
+      # MSSQL supports the OUTPUT clause for UPDATE statements.
+      # It also allows prepending a WITH clause.
       def update_clause_methods
         UPDATE_CLAUSE_METHODS
       end
