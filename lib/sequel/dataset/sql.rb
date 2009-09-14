@@ -620,7 +620,7 @@ module Sequel
     #   ds.order{|o| o.sum(:name)}.sql #=> 'SELECT * FROM items ORDER BY sum(name)'
     #   ds.order(nil).sql #=> 'SELECT * FROM items'
     def order(*columns, &block)
-      columns += Array(virtual_row_block_call(block)) if block
+      columns += Array(Sequel.virtual_row(&block)) if block
       clone(:order => (columns.compact.empty?) ? nil : columns)
     end
     alias_method :order_by, :order
@@ -741,7 +741,7 @@ module Sequel
     #   dataset.select(:a, :b) # SELECT a, b FROM items
     #   dataset.select{|o| o.a, o.sum(:b)} # SELECT a, sum(b) FROM items
     def select(*columns, &block)
-      columns += Array(virtual_row_block_call(block)) if block
+      columns += Array(Sequel.virtual_row(&block)) if block
       m = []
       columns.map do |i|
         i.is_a?(Hash) ? m.concat(i.map{|k, v| SQL::AliasedExpression.new(k,v)}) : m << i
@@ -1026,7 +1026,7 @@ module Sequel
           SQL::BooleanExpression.new(:AND, *expr.map{|x| filter_expr(x)})
         end
       when Proc
-        filter_expr(virtual_row_block_call(expr))
+        filter_expr(Sequel.virtual_row(&expr))
       when SQL::NumericExpression, SQL::StringExpression
         raise(Error, "Invalid SQL Expression type: #{expr.inspect}") 
       when Symbol, SQL::Expression

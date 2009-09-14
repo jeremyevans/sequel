@@ -1,5 +1,7 @@
 === HEAD
 
+* Replace Dataset#virtual_row_block_call with Sequel.virtual_row (jeremyevans)
+
 * Allow Dataset #delete, #update, and #insert to respect existing WITH clauses on MSSQL (dlee, jeremyevans)
 
 * Add touch plugin, which adds Model#touch for updating an instance's timestamp, as well as touching associations when an instance is updated or destroyed (jeremyevans)

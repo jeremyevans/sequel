@@ -243,6 +243,20 @@ module Sequel
   def self.typecast_to_application_timestamp(v)
     convert_timestamp(v, Sequel.typecast_timezone)
   end
+
+  # If the supplied block takes a single argument,
+  # yield a new SQL::VirtualRow instance to the block
+  # argument.  Otherwise, evaluate the block in the context of a new
+  # SQL::VirtualRow instance.
+  def self.virtual_row(&block)
+    vr = SQL::VirtualRow.new
+    case block.arity
+    when -1, 0
+      vr.instance_eval(&block)
+    else
+      block.call(vr)
+    end  
+  end
   
   ### Private Class Methods ###
 

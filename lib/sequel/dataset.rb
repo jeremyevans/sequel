@@ -378,19 +378,5 @@ module Sequel
     # default, added to make the model eager loading code simpler.
     def post_load(all_records)
     end
-
-    # If a block argument is passed to a method that uses a VirtualRow,
-    # yield a new VirtualRow instance to the block if it accepts a single
-    # argument.  Otherwise, evaluate the block in the context of a new
-    # VirtualRow instance.
-    def virtual_row_block_call(block)
-      return unless block
-      case block.arity
-      when -1, 0
-        SQL::VirtualRow.new.instance_eval(&block)
-      else
-        block.call(SQL::VirtualRow.new)
-      end
-    end
   end
 end
