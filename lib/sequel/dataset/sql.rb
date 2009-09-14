@@ -1363,7 +1363,7 @@ module Sequel
     def select_with_sql(sql)
       ws = opts[:with]
       return if !ws || ws.empty?
-      sql.replace("#{select_with_sql_base}#{ws.map{|w| "#{w[:name]}#{"(#{argument_list(w[:args])})" if w[:args]} AS (#{subselect_sql(w[:dataset])})"}.join(COMMA_SEPARATOR)} #{sql}")
+      sql.replace("#{select_with_sql_base}#{ws.map{|w| "#{quote_identifier(w[:name])}#{"(#{argument_list(w[:args])})" if w[:args]} AS #{literal_dataset(w[:dataset])}"}.join(COMMA_SEPARATOR)} #{sql}")
     end
     
     # The base keyword to use for the SQL WITH clause
