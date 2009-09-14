@@ -76,6 +76,28 @@ class Numeric
   end
 end
 
+class Proc
+  # Evaluates the proc as a virtual row block.
+  # If a hash or array of two element arrays is returned,
+  # they are converted to a Sequel::SQL::BooleanExpression.  Otherwise,
+  # unless the object returned is already an Sequel::SQL::Expression,
+  # convert the object to an Sequel::SQL::GenericComplexExpression.
+  #
+  #   proc{a(b)}.sql_expr + 1  # a(b) + 1
+  #   proc{{a=>b}}.sql_expr | true  # (a = b) OR TRUE
+  #   proc{1}.sql_expr + :a  # 1 + a
+  def sql_expr
+    o = Sequel.virtual_row(&self)
+    if Sequel.condition_specifier?(o)
+      Sequel::SQL::BooleanExpression.from_value_pairs(o, :AND)
+    elsif o.is_a?(Sequel::SQL::Expression)
+      o
+    else
+      Sequel::SQL::GenericComplexExpression.new(:NOOP, o)
+    end
+  end
+end
+
 class String
   # Returns a copy of the object wrapped in a
   # Sequel::SQL::StringExpression, allowing easy use
