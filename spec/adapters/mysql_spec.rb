@@ -449,6 +449,12 @@ context "A MySQL database" do
     @db[:items].insert(2**40)
     @db[:items].all.should == [{:id=>2**40}]
   end
+
+  specify "should have set_column_type pass through options" do
+    @db.create_table(:items){integer :id; enum :list, :elements=>%w[one]}
+    @db.alter_table(:items){set_column_type :id, :int, :unsigned=>true, :size=>8; set_column_type :list, :enum, :elements=>%w[two]}
+    @db.sqls.should == ["CREATE TABLE items (id integer, list enum('one'))", "DESCRIBE items", "ALTER TABLE items CHANGE COLUMN id id int(8) UNSIGNED NULL", "ALTER TABLE items CHANGE COLUMN list list enum('two') NULL"]
+  end
   
   specify "should have set_column_default support keep existing options" do
     @db.create_table(:items){Integer :id, :null=>false, :default=>5}

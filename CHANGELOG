@@ -1,5 +1,7 @@
 === HEAD
 
+* Pass through unsigned/elements/size and other options when altering columns on MySQL (tmm1)
+
 * Replace Dataset#virtual_row_block_call with Sequel.virtual_row (jeremyevans)
 
 * Allow Dataset #delete, #update, and #insert to respect existing WITH clauses on MSSQL (dlee, jeremyevans)

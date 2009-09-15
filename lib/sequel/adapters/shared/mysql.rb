@@ -97,7 +97,7 @@ module Sequel
           opts[:null] = o == :set_column_null ? op[:null] : opts[:allow_null]
           opts[:default] = o == :set_column_default ? op[:default] : opts[:ruby_default]
           opts.delete(:default) if opts[:default] == nil
-          "ALTER TABLE #{quote_schema_table(table)} CHANGE COLUMN #{quote_identifier(op[:name])} #{column_definition_sql(opts)}"
+          "ALTER TABLE #{quote_schema_table(table)} CHANGE COLUMN #{quote_identifier(op[:name])} #{column_definition_sql(op.merge(opts))}"
         when :drop_index
           "#{drop_index_sql(table, op)} ON #{quote_schema_table(table)}"
         else
