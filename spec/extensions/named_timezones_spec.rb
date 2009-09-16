@@ -63,5 +63,10 @@ describe "Sequel named_timezones extension" do
     dt.should == @dt + Rational(1, 6)
     dt.offset.should == Rational(-7, 24)
   end
+  
+  it "should work with the thread_local_timezones extension" do
+    [Thread.new{Sequel.thread_application_timezone = 'America/New_York'; sleep 0.03; Sequel.application_timezone.should == @tz_out},
+     Thread.new{sleep 0.01; Sequel.thread_application_timezone = 'America/Los_Angeles'; sleep 0.01; Sequel.application_timezone.should == @tz_in}].each{|x| x.join}
+  end
 end
 end

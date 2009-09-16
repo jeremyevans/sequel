@@ -27,29 +27,35 @@ require 'tzinfo'
 module Sequel
   self.datetime_class = DateTime
   
-  %w'application database typecast'.each do |t|
-    instance_eval("def #{t}_timezone=(tz); @#{t}_timezone = tz.is_a?(String) ? TZInfo::Timezone.get(tz) : tz; end", __FILE__, __LINE__)
-  end
-  
-  # Assume the given DateTime has a correct time but a wrong timezone.  It is
-  # currently in UTC timezone, but it should be converted to the input_timzone.
-  # Keep the time the same but convert the timezone to the input_timezone.
-  # Expects the input_timezone to be a TZInfo::Timezone instance.
-  def self.convert_input_datetime_other(v, input_timezone) # :nodoc:
-    local_offset = input_timezone.period_for_local(v).utc_total_offset_rational
-    (v - local_offset).new_offset(local_offset)
-  end
+  module NamedTimezones
+    private 
+    
+    # Assume the given DateTime has a correct time but a wrong timezone.  It is
+    # currently in UTC timezone, but it should be converted to the input_timzone.
+    # Keep the time the same but convert the timezone to the input_timezone.
+    # Expects the input_timezone to be a TZInfo::Timezone instance.
+    def convert_input_datetime_other(v, input_timezone)
+      local_offset = input_timezone.period_for_local(v).utc_total_offset_rational
+      (v - local_offset).new_offset(local_offset)
+    end
 
-  # Convert the given DateTime to use the given output_timezone.
-  # Expects the output_timezone to be a TZInfo::Timezone instance.
-  def self.convert_output_datetime_other(v, output_timezone) # :nodoc:
-    # TZInfo converts times, but expects the given DateTime to have an offset
-    # of 0 and always leaves the timezone offset as 0
-    v = output_timezone.utc_to_local(v.new_offset(0))
-    local_offset = output_timezone.period_for_local(v).utc_total_offset_rational
-    # Convert timezone offset from UTC to the offset for the output_timezone
-    (v - local_offset).new_offset(local_offset)
+    # Convert the given DateTime to use the given output_timezone.
+    # Expects the output_timezone to be a TZInfo::Timezone instance.
+    def convert_output_datetime_other(v, output_timezone)
+      # TZInfo converts times, but expects the given DateTime to have an offset
+      # of 0 and always leaves the timezone offset as 0
+      v = output_timezone.utc_to_local(v.new_offset(0))
+      local_offset = output_timezone.period_for_local(v).utc_total_offset_rational
+      # Convert timezone offset from UTC to the offset for the output_timezone
+      (v - local_offset).new_offset(local_offset)
+    end
+    
+    # Convert the timezone setter argument.  Returns argument given by default,
+    # exists for easier overriding in extensions.
+    def convert_timezone_setter_arg(tz)
+      tz.is_a?(String) ? TZInfo::Timezone.get(tz) : super
+    end
   end
   
-  private_class_method :convert_input_datetime_other, :convert_output_datetime_other
+  extend NamedTimezones
 end
