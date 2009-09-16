@@ -1,5 +1,7 @@
 === HEAD
 
+* Add named_timezones extension for using named timezones such as "America/Los_Angeles" using TZInfo (jeremyevans)
+
 * Pass through unsigned/elements/size and other options when altering columns on MySQL (tmm1)
 
 * Replace Dataset#virtual_row_block_call with Sequel.virtual_row (jeremyevans)

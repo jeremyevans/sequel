@@ -3269,7 +3269,19 @@ describe "Sequel timezone support" do
   specify "should raise an error when attempting to typecast to a timestamp from an unsupported type" do
     proc{Sequel.database_to_application_timestamp(Object.new)}.should raise_error(Sequel::InvalidValue)
   end
+
+  specify "should raise an InvalidValue error when the DateTime class is used and when a bad application timezone is used when attempting to convert timestamps" do
+    Sequel.application_timezone = :blah
+    Sequel.datetime_class = DateTime
+    proc{Sequel.database_to_application_timestamp('2009-06-01 10:20:30')}.should raise_error(Sequel::InvalidValue)
+  end
   
+  specify "should raise an InvalidValue error when the DateTime class is used and when a bad database timezone is used when attempting to convert timestamps" do
+    Sequel.database_timezone = :blah
+    Sequel.datetime_class = DateTime
+    proc{Sequel.database_to_application_timestamp('2009-06-01 10:20:30')}.should raise_error(Sequel::InvalidValue)
+  end
+
   specify "should have Sequel.default_timezone= should set all other timezones" do
     Sequel.database_timezone.should == nil
     Sequel.application_timezone.should == nil

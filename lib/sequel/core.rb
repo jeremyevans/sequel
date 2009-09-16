@@ -274,9 +274,29 @@ module Sequel
     connect(opts, &block)
   end
   
+  # Convert the given DateTime to the given input_timezone, keeping the
+  # same time and just modifying the timezone.
+  def self.convert_input_datetime_no_offset(v, input_timezone) # :nodoc:
+    case input_timezone
+    when :utc
+      v# DateTime assumes UTC if no offset is given
+    when :local
+      v.new_offset(LOCAL_DATETIME_OFFSET) - LOCAL_DATETIME_OFFSET
+    else
+      convert_input_datetime_other(v, input_timezone)
+    end
+  end
+  
+  # Convert the given DateTime to the given input_timezone that is not supported
+  # by default (such as nil, :local, or :utc).  Raises an error by default.
+  # Can be overridden in extensions.
+  def self.convert_input_datetime_other(v, input_timezone) # :nodoc:
+    raise InvalidValue, "Invalid input_timezone: #{input_timezone.inspect}"
+  end
+  
   # Converts the object from a String, Array, Date, DateTime, or Time into an
-  # instance of Sequel.datetime_class.  If a string and an offset is not given,
-  # assume that the string is already in the given input_timezone.
+  # instance of Sequel.datetime_class.  If given an array or a string that doesn't
+  # contain an offset, assume that the array/string is already in the given input_timezone.
   def self.convert_input_timestamp(v, input_timezone) # :nodoc:
     case v
     when String
@@ -284,10 +304,9 @@ module Sequel
       if !input_timezone || Date._parse(v).has_key?(:offset)
         v2
       else
-        # Correct for potentially wrong offset if offset is given
+        # Correct for potentially wrong offset if string doesn't include offset
         if v2.is_a?(DateTime)
-          # DateTime assumes UTC if no offset is given
-          v2 = v2.new_offset(LOCAL_DATETIME_OFFSET) - LOCAL_DATETIME_OFFSET if input_timezone == :local
+          v2 = convert_input_datetime_no_offset(v2, input_timezone)
         else
           # Time assumes local time if no offset is given
           v2 = v2.getutc + LOCAL_DATETIME_OFFSET_SECS if input_timezone == :utc
@@ -297,7 +316,7 @@ module Sequel
     when Array
       y, mo, d, h, mi, s = v
       if datetime_class == DateTime
-        DateTime.civil(y, mo, d, h, mi, s, input_timezone == :utc ? 0 : LOCAL_DATETIME_OFFSET)
+        convert_input_datetime_no_offset(DateTime.civil(y, mo, d, h, mi, s, 0), input_timezone)
       else
         Time.send(input_timezone == :utc ? :utc : :local, y, mo, d, h, mi, s)
       end
@@ -320,11 +339,25 @@ module Sequel
     end
   end
   
+  # Convert the given DateTime to the given output_timezone that is not supported
+  # by default (such as nil, :local, or :utc).  Raises an error by default.
+  # Can be overridden in extensions.
+  def self.convert_output_datetime_other(v, output_timezone) # :nodoc:
+    raise InvalidValue, "Invalid output_timezone: #{output_timezone.inspect}"
+  end
+  
   # Converts the object to the given output_timezone.
   def self.convert_output_timestamp(v, output_timezone) # :nodoc:
     if output_timezone
       if v.is_a?(DateTime)
-        v.new_offset(output_timezone == :utc ? 0 : LOCAL_DATETIME_OFFSET)
+        case output_timezone
+        when :utc
+          v.new_offset(0)
+        when :local
+          v.new_offset(LOCAL_DATETIME_OFFSET)
+        else
+          convert_output_datetime_other(v, output_timezone)
+        end
       else
         v.send(output_timezone == :utc ? :getutc : :getlocal)
       end
@@ -354,7 +387,10 @@ module Sequel
     end
   end
 
-  private_class_method :adapter_method, :convert_input_timestamp, :convert_output_timestamp, :convert_timestamp, :def_adapter_method
+  private_class_method :adapter_method, :convert_input_datetime_no_offset,
+    :convert_input_datetime_other, :convert_input_timestamp,
+    :convert_output_datetime_other, :convert_output_timestamp,
+    :convert_timestamp, :def_adapter_method
   
   require(%w"metaprogramming sql connection_pool exceptions dataset database version")
   require(%w"schema_generator schema_methods schema_sql", 'database')
