@@ -504,13 +504,14 @@ module Sequel
         table_name = table_alias || table
       end
 
+      last_alias ||= @opts[:last_joined_table] || first_source_alias
+
       join = if expr.nil? and !block_given?
         SQL::JoinClause.new(type, table, table_alias)
       elsif Array === expr and !expr.empty? and expr.all?{|x| Symbol === x}
         raise(Sequel::Error, "can't use a block if providing an array of symbols as expr") if block_given?
-        SQL::JoinUsingClause.new(expr, type, table, table_alias)
+        SQL::JoinUsingClause.new(expr, type, table, table_alias, last_alias)
       else
-        last_alias ||= @opts[:last_joined_table] || first_source_alias
         if Sequel.condition_specifier?(expr)
           expr = expr.collect do |k, v|
             k = qualified_column_name(k, table_name) if k.is_a?(Symbol)
@@ -522,7 +523,7 @@ module Sequel
           expr2 = yield(table_name, last_alias, @opts[:join] || [])
           expr = expr ? SQL::BooleanExpression.new(:AND, expr, expr2) : expr2
         end
-        SQL::JoinOnClause.new(expr, type, table, table_alias)
+        SQL::JoinOnClause.new(expr, type, table, table_alias, last_alias)
       end
 
       opts = {:join => (@opts[:join] || []) + [join], :last_joined_table => table_name}
