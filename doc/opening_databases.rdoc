@@ -97,6 +97,8 @@ The following options are supported:
     to execute a command before cancelling the attempt and generating
     an error. Specifically, it sets the ADO CommandTimeout property.
     If this property is not set, the default of 30 seconds is used.
+* :conn_string - The full ADO connection string.  If this is provided,
+  the general connection options are ignored.
 * :provider - Sets the Provider of this ADO connection (for example, "SQLOLEDB")
 
 === amalgalite 

@@ -1,5 +1,7 @@
 === HEAD
 
+* Allow the user to specify the ADO connection string via the :conn_string option (jeremyevans)
+
 * Add thread_local_timezones extension for allow per-thread overrides of the global timezone settings (jeremyevans)
 
 * Add named_timezones extension for using named timezones such as "America/Los_Angeles" using TZInfo (jeremyevans)
