@@ -1,5 +1,7 @@
 === HEAD
 
+* Add the forced_encoding plugin for forcing encoding of strings for models (requires ruby 1.9) (jeremyevans)
+
 * Support DataObjects 0.10 (previous DataObjects versions are now unsupported) (jeremyevans)
 
 * Allow the user to specify the ADO connection string via the :conn_string option (jeremyevans)
