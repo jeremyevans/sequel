@@ -1,5 +1,7 @@
 === HEAD
 
+* Support DataObjects 0.10 (previous DataObjects versions are now unsupported) (jeremyevans)
+
 * Allow the user to specify the ADO connection string via the :conn_string option (jeremyevans)
 
 * Add thread_local_timezones extension for allow per-thread overrides of the global timezone settings (jeremyevans)

@@ -1,7 +1,7 @@
 Sequel.require 'adapters/shared/postgres'
 
 module Sequel
-  Postgres::CONVERTED_EXCEPTIONS << PostgresError
+  Postgres::CONVERTED_EXCEPTIONS << ::DataObjects::Error
   
   module DataObjects
     # Adapter, Database, and Dataset support for accessing a PostgreSQL
@@ -27,7 +27,7 @@ module Sequel
             else
               command.execute_non_query
             end
-          rescue PostgresError => e
+          rescue ::DataObjects::Error => e
             raise_error(e)
           end
         end

@@ -16,19 +16,16 @@ module Sequel
     DATABASE_SETUP = {:postgres=>proc do |db|
         require 'do_postgres'
         Sequel.require 'adapters/do/postgres'
-        db.converted_exceptions << PostgresError
         db.extend(Sequel::DataObjects::Postgres::DatabaseMethods)
       end,
       :mysql=>proc do |db|
         require 'do_mysql'
         Sequel.require 'adapters/do/mysql'
-        db.converted_exceptions << MysqlError
         db.extend(Sequel::DataObjects::MySQL::DatabaseMethods)
       end,
       :sqlite3=>proc do |db|
         require 'do_sqlite3'
         Sequel.require 'adapters/do/sqlite'
-        db.converted_exceptions << Sqlite3Error
         db.extend(Sequel::DataObjects::SQLite::DatabaseMethods)
       end
     }
@@ -41,18 +38,12 @@ module Sequel
     class Database < Sequel::Database
       set_adapter_scheme :do
       
-      # Convert the given exceptions to Sequel:Errors, necessary
-      # because DO raises errors specific to database types in
-      # certain cases.
-      attr_accessor :converted_exceptions
-      
       # Call the DATABASE_SETUP proc directly after initialization,
       # so the object always uses sub adapter specific code.  Also,
       # raise an error immediately if the connection doesn't have a
       # uri, since DataObjects requires one.
       def initialize(opts)
         @opts = opts
-        @converted_exceptions = []
         raise(Error, "No connection string specified") unless uri
         if prok = DATABASE_SETUP[subadapter.to_sym]
           prok.call(self)
@@ -81,8 +72,8 @@ module Sequel
           begin
             command = conn.create_command(sql)
             res = block_given? ? command.execute_reader : command.execute_non_query
-          rescue Exception => e
-            raise_error(e, :classes=>@converted_exceptions)
+          rescue ::DataObjects::Error => e
+            raise_error(e)
           end
           if block_given?
             begin

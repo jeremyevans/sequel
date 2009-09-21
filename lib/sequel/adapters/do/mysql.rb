@@ -32,6 +32,13 @@ module Sequel
         def replace(*args)
           execute_insert(replace_sql(*args))
         end
+        
+        private
+        
+        # do_mysql sets NO_BACKSLASH_ESCAPES, so use standard SQL string escaping
+        def literal_string(s)
+          "'#{s.gsub("'", "''")}'"
+        end
       end
     end
   end
