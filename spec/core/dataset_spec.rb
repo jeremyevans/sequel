@@ -1459,6 +1459,11 @@ context "Dataset#group_and_count" do
     @ds.group_and_count(:a, :b).sql.should == 
       "SELECT a, b, count(*) AS count FROM test GROUP BY a, b ORDER BY count"
   end
+
+  specify "should format column aliases in the select clause but not in the group clause" do
+    @ds.group_and_count(:name___n).sql.should ==
+      "SELECT name AS n, count(*) AS count FROM test GROUP BY name ORDER BY count"
+  end
 end
 
 context "Dataset#empty?" do
