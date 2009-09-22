@@ -350,6 +350,8 @@ describe Sequel::Model, ".[] optimization" do
     @c.simple_pk.should == nil
     @c.set_primary_key :b, :a
     @c.simple_pk.should == nil
+    @c.set_primary_key [:b, :a]
+    @c.simple_pk.should == nil
   end
 
   it "should have simple table set if passed a Symbol to set_dataset" do

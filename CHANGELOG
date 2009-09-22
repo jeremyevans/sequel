@@ -1,5 +1,7 @@
 === HEAD
 
+* Support composite keys with set_primary_key when called with an array of multiple symbols (jeremyevans)
+
 * Fix select_more and order_more to not affect receiver (tamas.denes, jeremyevans)
 
 * Support composite keys in model associations (jeremyevans)

@@ -317,8 +317,9 @@ module Sequel
       # You can set it to nil to not have a primary key, but that
       # cause certain things not to work, see no_primary_key.
       def set_primary_key(*key)
+        key = key.flatten
         @simple_pk = key.length == 1 ? db.literal(key.first) : nil 
-        @primary_key = (key.length == 1) ? key[0] : key.flatten
+        @primary_key = (key.length == 1) ? key[0] : key
       end
   
       # Set the columns to restrict in new/set/update.  Using this means that

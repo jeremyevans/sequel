@@ -436,8 +436,15 @@ describe Sequel::Model, ".[]" do
     $sqls.last.should == "SELECT * FROM items WHERE (name = 'sharon') LIMIT 1"
   end
 
-  it "should work correctly for composite primary key" do
+  it "should work correctly for composite primary key specified as array" do
     @c.set_primary_key [:node_id, :kind]
+    @c[3921, 201].should be_a_kind_of(@c)
+    $sqls.last.should =~ \
+    /^SELECT \* FROM items WHERE \((\(node_id = 3921\) AND \(kind = 201\))|(\(kind = 201\) AND \(node_id = 3921\))\) LIMIT 1$/
+  end
+  
+  it "should work correctly for composite primary key specified as separate arguments" do
+    @c.set_primary_key :node_id, :kind
     @c[3921, 201].should be_a_kind_of(@c)
     $sqls.last.should =~ \
     /^SELECT \* FROM items WHERE \((\(node_id = 3921\) AND \(kind = 201\))|(\(kind = 201\) AND \(node_id = 3921\))\) LIMIT 1$/
