@@ -1,6 +1,8 @@
 === HEAD
 
-* Add the forced_encoding plugin for forcing encoding of strings for models (requires ruby 1.9) (jeremyevans)
+* Support composite keys in model associations (jeremyevans)
+
+* Add the force_encoding plugin for forcing encoding of strings for models (requires ruby 1.9) (jeremyevans)
 
 * Support DataObjects 0.10 (previous DataObjects versions are now unsupported) (jeremyevans)
 

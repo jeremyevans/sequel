@@ -250,7 +250,8 @@ module Sequel
           self[:join_table]
         end
 
-        # The default associated key alias
+        # The default associated key alias(es) to use when eager loading
+        # associations via eager.
         def default_associated_key_alias
           self[:uses_left_composite_keys] ? (0...self[:left_keys].length).map{|i| :"x_foreign_key_#{i}_x"} : :x_foreign_key_x
         end
@@ -486,13 +487,16 @@ module Sequel
         #   - :validate - Set to false to not validate when implicitly saving any associated object.
         # * :many_to_one:
         #   - :key - foreign_key in current model's table that references
-        #     associated model's primary key, as a symbol.  Defaults to :"#{name}_id".
+        #     associated model's primary key, as a symbol.  Defaults to :"#{name}_id".  Can use an
+        #     array of symbols for a composite key association.
         #   - :primary_key - column in the associated table that :key option references, as a symbol.
-        #     Defaults to the primary key of the associated table.
+        #     Defaults to the primary key of the associated table. Can use an
+        #     array of symbols for a composite key association.
         # * :one_to_many:
         #   - :key - foreign key in associated model's table that references
         #     current model's primary key, as a symbol.  Defaults to
-        #     :"#{self.name.underscore}_id".
+        #     :"#{self.name.underscore}_id".  Can use an
+        #     array of symbols for a composite key association.
         #   - :one_to_one: Create a getter and setter similar to those of many_to_one
         #     associations.  The getter returns a singular matching record, or raises an
         #     error if multiple records match.  The setter updates the record given and removes
@@ -503,7 +507,8 @@ module Sequel
         #     table instead of the current table.  Note that using this option still requires
         #     you to use a plural name when creating and using the association (e.g. for reflections, eager loading, etc.).
         #   - :primary_key - column in the current table that :key option references, as a symbol.
-        #     Defaults to primary key of the current table.
+        #     Defaults to primary key of the current table. Can use an
+        #     array of symbols for a composite key association.
         # * :many_to_many:
         #   - :graph_join_table_block - The block to pass to join_table for
         #     the join table when eagerly loading the association via eager_graph.
@@ -522,13 +527,17 @@ module Sequel
         #     of current model and name of associated model, pluralized,
         #     underscored, sorted, and joined with '_'.
         #   - :left_key - foreign key in join table that points to current model's
-        #     primary key, as a symbol. Defaults to :"#{self.name.underscore}_id".
+        #     primary key, as a symbol. Defaults to :"#{self.name.underscore}_id".  
+        #     Can use an array of symbols for a composite key association.
         #   - :left_primary_key - column in current table that :left_key points to, as a symbol.
-        #     Defaults to primary key of current table.
+        #     Defaults to primary key of current table.  Can use an
+        #     array of symbols for a composite key association.
         #   - :right_key - foreign key in join table that points to associated
         #     model's primary key, as a symbol.  Defaults to Defaults to :"#{name.to_s.singularize}_id".
+        #     Can use an array of symbols for a composite key association.
         #   - :right_primary_key - column in associated table that :right_key points to, as a symbol.
-        #     Defaults to primary key of the associated table.
+        #     Defaults to primary key of the associated table.  Can use an
+        #     array of symbols for a composite key association.
         #   - :uniq - Adds a after_load callback that makes the array of objects unique.
         def associate(type, name, opts = {}, &block)
           raise(Error, 'invalid association type') unless assoc_class = ASSOCIATION_TYPES[type]
