@@ -186,6 +186,19 @@ describe Sequel::Model, "many_to_one" do
     @c2.new(:id => 1, :blah => 567).parent
     MODEL_DB.sqls.should == ["SELECT * FROM nodes WHERE (nodes.pk = 567) LIMIT 1"]
   end
+  
+  it "should support composite keys" do
+    @c2.many_to_one :parent, :class => @c2, :key=>[:id, :parent_id], :primary_key=>[:parent_id, :id]
+    @c2.new(:id => 1, :parent_id => 234).parent
+    MODEL_DB.sqls.should == ["SELECT * FROM nodes WHERE ((nodes.parent_id = 1) AND (nodes.id = 234)) LIMIT 1"]
+  end
+  
+  it "should raise an Error unless same number of composite keys used" do
+    proc{@c2.many_to_one :parent, :class => @c2, :primary_key=>[:parent_id, :id]}.should raise_error(Sequel::Error)
+    proc{@c2.many_to_one :parent, :class => @c2, :key=>[:id, :parent_id], :primary_key=>:id}.should raise_error(Sequel::Error)
+    proc{@c2.many_to_one :parent, :class => @c2, :key=>:id, :primary_key=>[:parent_id, :id]}.should raise_error(Sequel::Error)
+    proc{@c2.many_to_one :parent, :class => @c2, :key=>[:id, :parent_id, :blah], :primary_key=>[:parent_id, :id]}.should raise_error(Sequel::Error)
+  end
 
   it "should use :select option if given" do
     @c2.many_to_one :parent, :class => @c2, :key => :blah, :select=>[:id, :name]
@@ -263,6 +276,21 @@ describe Sequel::Model, "many_to_one" do
     e = @c2.new(:id => 6677, :blah=>8)
     d.parent = e
     d.values.should == {:id => 1, :parent_id => 8}
+  end
+  
+  it "should have the setter method respect composite keys" do
+    @c2.many_to_one :parent, :class => @c2, :key=>[:id, :parent_id], :primary_key=>[:parent_id, :id]
+
+    d = @c2.new(:id => 1, :parent_id=> 234)
+    d.parent = @c2.new(:id => 4, :parent_id=>52)
+    d.values.should == {:id => 52, :parent_id => 4}
+
+    d.parent = nil
+    d.values.should == {:id => nil, :parent_id => nil}
+
+    e = @c2.new(:id => 6677, :parent_id=>8)
+    d.parent = e
+    d.values.should == {:id => 8, :parent_id => 6677}
   end
   
   it "should not persist changes until saved" do
@@ -525,7 +553,7 @@ describe Sequel::Model, "one_to_many" do
 
     @c1 = Class.new(Sequel::Model(:attributes)) do
       unrestrict_primary_key
-      columns :id, :node_id
+      columns :id, :node_id, :y
     end
 
     @c2 = Class.new(Sequel::Model(:nodes)) do
@@ -534,7 +562,7 @@ describe Sequel::Model, "one_to_many" do
       
       def self.name; 'Node'; end
       def self.to_s; 'Node'; end
-      columns :id
+      columns :id, :x
     end
     @dataset = @c2.dataset
     
@@ -598,6 +626,19 @@ describe Sequel::Model, "one_to_many" do
     a.should be_a_kind_of(Sequel::Dataset)
     a.sql.should == 'SELECT * FROM attributes WHERE (attributes.nodeid = 1234)'
   end
+  
+  it "should support_composite keys" do
+    @c2.one_to_many :attributes, :class => @c1, :key =>[:node_id, :id], :primary_key=>[:id, :x]
+    @c2.load(:id => 1234, :x=>234).attributes_dataset.sql.should == 'SELECT * FROM attributes WHERE ((attributes.node_id = 1234) AND (attributes.id = 234))'
+  end
+  
+  it "should raise an Error unless same number of composite keys used" do
+    proc{@c2.one_to_many :attributes, :class => @c1, :key=>[:node_id, :id]}.should raise_error(Sequel::Error)
+    proc{@c2.one_to_many :attributes, :class => @c1, :primary_key=>[:node_id, :id]}.should raise_error(Sequel::Error)
+    proc{@c2.one_to_many :attributes, :class => @c1, :key=>[:node_id, :id], :primary_key=>:id}.should raise_error(Sequel::Error)
+    proc{@c2.one_to_many :attributes, :class => @c1, :key=>:id, :primary_key=>[:node_id, :id]}.should raise_error(Sequel::Error)
+    proc{@c2.one_to_many :attributes, :class => @c1, :key=>[:node_id, :id, :x], :primary_key=>[:parent_id, :id]}.should raise_error(Sequel::Error)
+  end
 
   it "should define an add_ method" do
     @c2.one_to_many :attributes, :class => @c1
@@ -632,6 +673,23 @@ describe Sequel::Model, "one_to_many" do
     MODEL_DB.sqls.should == ['UPDATE attributes SET node_id = 5 WHERE (id = 2345)']
   end
 
+  it "should have add_ method respect composite keys" do
+    @c2.one_to_many :attributes, :class => @c1, :key =>[:node_id, :y], :primary_key=>[:id, :x]
+    
+    n = @c2.load(:id => 1234, :x=>5)
+    a = @c1.load(:id => 2345)
+    a.should == n.add_attribute(a)
+    MODEL_DB.sqls.first.should =~ /UPDATE attributes SET (node_id = 1234|y = 5), (node_id = 1234|y = 5) WHERE \(id = 2345\)/
+  end
+  
+  it "should have remove_ method respect composite keys" do
+    @c2.one_to_many :attributes, :class => @c1, :key =>[:node_id, :y], :primary_key=>[:id, :x]
+    
+    n = @c2.load(:id => 1234, :x=>5)
+    a = @c1.load(:id => 2345, :node_id=>1234, :y=>5)
+    a.should == n.remove_attribute(a)
+    MODEL_DB.sqls.first.should =~ /UPDATE attributes SET (node_id|y) = NULL, (node_id|y) = NULL WHERE \(id = 2345\)/
+  end
   
   it "should raise an error in add_ and remove_ if the passed object returns false to save (is not valid)" do
     @c2.one_to_many :attributes, :class => @c1
@@ -922,6 +980,12 @@ describe Sequel::Model, "one_to_many" do
     @c2.new(:id => 1234, :xxx=>5).remove_all_attributes
     MODEL_DB.sqls.first.should == 'UPDATE attributes SET node_id = NULL WHERE (node_id = 5)'
   end
+  
+  it "should have the remove_all_ method respect composite keys" do
+    @c2.one_to_many :attributes, :class => @c1, :key=>[:node_id, :y], :primary_key=>[:id, :x]
+    @c2.new(:id => 1234, :x=>5).remove_all_attributes
+    MODEL_DB.sqls.first.should =~ /UPDATE attributes SET (node_id|y) = NULL, (node_id|y) = NULL WHERE \(\(node_id = 1234\) AND \(y = 5\)\)/
+  end
 
   it "remove_all should set the cached instance variable to []" do
     @c2.one_to_many :attributes, :class => @c1
@@ -1034,6 +1098,16 @@ describe Sequel::Model, "one_to_many" do
     @c2.new(:id => 621, :xxx=>5).attribute = attrib
     MODEL_DB.sqls.should == ['UPDATE attributes SET node_id = 5 WHERE (id = 3)',
       'UPDATE attributes SET node_id = NULL WHERE ((node_id = 5) AND (id != 3))']
+    end
+    
+  it "should have the setter method for the :one_to_one option respect composite keys" do
+    @c2.one_to_many :attributes, :class => @c1, :one_to_one=>true, :key=>[:node_id, :y], :primary_key=>[:id, :x]
+    attrib = @c1.load(:id=>3, :y=>6)
+    d = @c1.dataset
+    def d.fetch_rows(s); yield({:id=>3, :y=>6}) end
+    @c2.load(:id => 1234, :x=>5).attribute = attrib
+    MODEL_DB.sqls.first.should =~ /UPDATE attributes SET (node_id = 1234|y = 5), (node_id = 1234|y = 5) WHERE \(id = 3\)/
+    MODEL_DB.sqls.last.should =~ /UPDATE attributes SET (node_id|y) = NULL, (node_id|y) = NULL WHERE \(\(\(node_id = 1234\) AND \(y = 5\)\) AND \(id != 3\)\)/
   end
 
   it "should raise an error if the one_to_one getter would be the same as the association name" do
@@ -1223,7 +1297,7 @@ describe Sequel::Model, "many_to_many" do
       attr_accessor :yyy
       def self.name; 'Attribute'; end
       def self.to_s; 'Attribute'; end
-      columns :id
+      columns :id, :y
       def _refresh(ds)
         self.id = 1
         self
@@ -1236,7 +1310,7 @@ describe Sequel::Model, "many_to_many" do
       
       def self.name; 'Node'; end
       def self.to_s; 'Node'; end
-      columns :id
+      columns :id, :x
     end
     @dataset = @c2.dataset
 
@@ -1329,6 +1403,24 @@ describe Sequel::Model, "many_to_many" do
   it "should support :left_primary_key and :right_primary_key options" do
     @c2.many_to_many :attributes, :class => @c1, :left_primary_key=>:xxx, :right_primary_key=>:yyy
     @c2.new(:id => 1234, :xxx=>5).attributes_dataset.sql.should == 'SELECT attributes.* FROM attributes INNER JOIN attributes_nodes ON ((attributes_nodes.attribute_id = attributes.yyy) AND (attributes_nodes.node_id = 5))'
+  end
+  
+  it "should support composite keys" do
+    @c2.many_to_many :attributes, :class => @c1, :left_key=>[:l1, :l2], :right_key=>[:r1, :r2], :left_primary_key=>[:id, :x], :right_primary_key=>[:id, :y]
+    @c2.load(:id => 1234, :x=>5).attributes_dataset.sql.should == 'SELECT attributes.* FROM attributes INNER JOIN attributes_nodes ON ((attributes_nodes.r1 = attributes.id) AND (attributes_nodes.r2 = attributes.y) AND (attributes_nodes.l1 = 1234) AND (attributes_nodes.l2 = 5))'
+  end
+  
+  it "should raise an Error unless same number of composite keys used" do
+    proc{@c2.many_to_many :attributes, :class => @c1, :left_key=>[:node_id, :id]}.should raise_error(Sequel::Error)
+    proc{@c2.many_to_many :attributes, :class => @c1, :left_primary_key=>[:node_id, :id]}.should raise_error(Sequel::Error)
+    proc{@c2.many_to_many :attributes, :class => @c1, :left_key=>[:node_id, :id], :left_primary_key=>:id}.should raise_error(Sequel::Error)
+    proc{@c2.many_to_many :attributes, :class => @c1, :left_key=>:id, :left_primary_key=>[:node_id, :id]}.should raise_error(Sequel::Error)
+    proc{@c2.many_to_many :attributes, :class => @c1, :left_key=>[:node_id, :id, :x], :left_primary_key=>[:parent_id, :id]}.should raise_error(Sequel::Error)
+    
+    proc{@c2.many_to_many :attributes, :class => @c1, :right_primary_key=>[:node_id, :id]}.should raise_error(Sequel::Error)
+    proc{@c2.many_to_many :attributes, :class => @c1, :right_key=>[:node_id, :id], :right_primary_key=>:id}.should raise_error(Sequel::Error)
+    proc{@c2.many_to_many :attributes, :class => @c1, :right_key=>:id, :left_primary_key=>[:node_id, :id]}.should raise_error(Sequel::Error)
+    proc{@c2.many_to_many :attributes, :class => @c1, :right_key=>[:node_id, :id, :x], :right_primary_key=>[:parent_id, :id]}.should raise_error(Sequel::Error)
   end
   
   it "should support a select option" do
@@ -1442,6 +1534,26 @@ describe Sequel::Model, "many_to_many" do
      'INSERT INTO attributes_nodes (attribute_id, node_id) VALUES (8, 5)'
     ].should(include(MODEL_DB.sqls.first))
   end
+  
+  it "should have the add_ method respect composite keys" do
+    @c2.many_to_many :attributes, :class => @c1, :left_key=>[:l1, :l2], :right_key=>[:r1, :r2], :left_primary_key=>[:id, :x], :right_primary_key=>[:id, :y]
+    n = @c2.load(:id => 1234, :x=>5)
+    a = @c1.load(:id => 2345, :y=>8)
+    a.should == n.add_attribute(a)
+    m = /INSERT INTO attributes_nodes \((\w+), (\w+), (\w+), (\w+)\) VALUES \((\d+), (\d+), (\d+), (\d+)\)/.match(MODEL_DB.sqls.first)
+    m.should_not == nil
+    map = {'l1'=>1234, 'l2'=>5, 'r1'=>2345, 'r2'=>8}
+    %w[l1 l2 r1 r2].each do |x|
+      v = false
+      4.times do |i| i += 1
+        if m[i] == x
+          m[i+4].should == map[x].to_s
+          v = true
+        end
+      end
+      v.should == true
+    end
+  end
 
   it "should have the remove_ method respect the :left_primary_key and :right_primary_key options" do
     @c2.many_to_many :attributes, :class => @c1, :left_primary_key=>:xxx, :right_primary_key=>:yyy
@@ -1450,6 +1562,14 @@ describe Sequel::Model, "many_to_many" do
     a = @c1.new(:id => 2345, :yyy=>8)
     a.should == n.remove_attribute(a)
     MODEL_DB.sqls.first.should == 'DELETE FROM attributes_nodes WHERE ((node_id = 5) AND (attribute_id = 8))'
+  end
+  
+  it "should have the remove_ method respect composite keys" do
+    @c2.many_to_many :attributes, :class => @c1, :left_key=>[:l1, :l2], :right_key=>[:r1, :r2], :left_primary_key=>[:id, :x], :right_primary_key=>[:id, :y]
+    n = @c2.load(:id => 1234, :x=>5)
+    a = @c1.load(:id => 2345, :y=>8)
+    a.should == n.remove_attribute(a)
+    MODEL_DB.sqls.should == ["DELETE FROM attributes_nodes WHERE ((l1 = 1234) AND (l2 = 5) AND (r1 = 2345) AND (r2 = 8))"]
   end
 
   it "should raise an error if the model object doesn't have a valid primary key" do
@@ -1630,6 +1750,12 @@ describe Sequel::Model, "many_to_many" do
     @c2.many_to_many :attributes, :class => @c1, :left_primary_key=>:xxx
     @c2.new(:id => 1234, :xxx=>5).remove_all_attributes
     MODEL_DB.sqls.first.should == 'DELETE FROM attributes_nodes WHERE (node_id = 5)'
+  end
+  
+  it "should have the remove_all_ method respect composite keys" do
+    @c2.many_to_many :attributes, :class => @c1, :left_primary_key=>[:id, :x], :left_key=>[:l1, :l2]
+    @c2.load(:id => 1234, :x=>5).remove_all_attributes
+    MODEL_DB.sqls.should == ['DELETE FROM attributes_nodes WHERE ((l1 = 1234) AND (l2 = 5))']
   end
 
   it "remove_all should set the cached instance variable to []" do

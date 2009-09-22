@@ -73,6 +73,24 @@ describe Sequel::Model::Associations::AssociationReflection, "#reciprocal" do
     ParParentTwo.association_reflection(:par_parents).reciprocal.should == :par_parent_twos
     ParParentThree.association_reflection(:par_parents).reciprocal.should == :par_parent_threes
   end
+  
+  it "should handle composite keys" do
+    ParParent.many_to_one :par_parent_two, :key=>[:a, :b], :primary_key=>[:c, :b]
+    ParParent.many_to_one :par_parent_three, :key=>[:d, :e], :primary_key=>[:c, :b]
+    ParParentTwo.one_to_many :par_parents, :primary_key=>[:c, :b], :key=>[:a, :b]
+    ParParentThree.one_to_many :par_parents, :primary_key=>[:c, :b], :key=>[:d, :e]
+
+    ParParentTwo.association_reflection(:par_parents).reciprocal.should == :par_parent_two
+    ParParentThree.association_reflection(:par_parents).reciprocal.should == :par_parent_three
+
+    ParParent.many_to_many :par_parent_twos, :left_key=>[:l1, :l2], :right_key=>[:r1, :r2], :left_primary_key=>[:pl1, :pl2], :right_primary_key=>[:pr1, :pr2], :join_table=>:jt
+    ParParent.many_to_many :par_parent_threes, :right_key=>[:l1, :l2], :left_key=>[:r1, :r2], :left_primary_key=>[:pl1, :pl2], :right_primary_key=>[:pr1, :pr2], :join_table=>:jt
+    ParParentTwo.many_to_many :par_parents, :right_key=>[:l1, :l2], :left_key=>[:r1, :r2], :right_primary_key=>[:pl1, :pl2], :left_primary_key=>[:pr1, :pr2], :join_table=>:jt
+    ParParentThree.many_to_many :par_parents, :left_key=>[:l1, :l2], :right_key=>[:r1, :r2], :right_primary_key=>[:pl1, :pl2], :left_primary_key=>[:pr1, :pr2], :join_table=>:jt
+
+    ParParentTwo.association_reflection(:par_parents).reciprocal.should == :par_parent_twos
+    ParParentThree.association_reflection(:par_parents).reciprocal.should == :par_parent_threes
+  end
 
   it "should figure out the reciprocal if the :reciprocal value is not present" do
     ParParent.many_to_one :par_parent_two

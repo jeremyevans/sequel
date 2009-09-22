@@ -101,9 +101,9 @@ module Sequel
         def reciprocal
           return self[:reciprocal] if include?(:reciprocal)
           r_type = reciprocal_type
-          key = self[:key]
+          keys = self[:keys]
           associated_class.all_association_reflections.each do |assoc_reflect|
-            if assoc_reflect[:type] == r_type && assoc_reflect[:key] == key && assoc_reflect.associated_class == self[:model]
+            if assoc_reflect[:type] == r_type && assoc_reflect[:keys] == keys && assoc_reflect.associated_class == self[:model]
               return self[:reciprocal] = assoc_reflect[:name]
             end
           end
@@ -174,9 +174,14 @@ module Sequel
           self[:key]
         end
     
-        # The column in the associated table that the key in the current table references.
+        # The column(s) in the associated table that the key in the current table references (either a symbol or an array).
         def primary_key
          self[:primary_key] ||= associated_class.primary_key
+        end
+       
+        # The columns in the associated table that the key in the current table references (always an array).
+        def primary_keys
+         self[:primary_keys] ||= Array(primary_key)
         end
       
         # Whether this association returns an array of objects instead of a single object,
@@ -286,12 +291,12 @@ module Sequel
         # Returns the reciprocal association symbol, if one exists.
         def reciprocal
           return self[:reciprocal] if include?(:reciprocal)
-          left_key = self[:left_key]
-          right_key = self[:right_key]
+          left_keys = self[:left_keys]
+          right_keys = self[:right_keys]
           join_table = self[:join_table]
           associated_class.all_association_reflections.each do |assoc_reflect|
-            if assoc_reflect[:type] == :many_to_many && assoc_reflect[:left_key] == right_key &&
-               assoc_reflect[:right_key] == left_key && assoc_reflect[:join_table] == join_table &&
+            if assoc_reflect[:type] == :many_to_many && assoc_reflect[:left_keys] == right_keys &&
+               assoc_reflect[:right_keys] == left_keys && assoc_reflect[:join_table] == join_table &&
                assoc_reflect.associated_class == self[:model]
               return self[:reciprocal] = assoc_reflect[:name]
             end
@@ -299,9 +304,14 @@ module Sequel
           self[:reciprocal] = nil
         end
     
-        # The primary key column to use in the associated table.
+        # The primary key column(s) to use in the associated table (can be symbol or array).
         def right_primary_key
           self[:right_primary_key] ||= associated_class.primary_key
+        end
+        
+        # The primary key columns to use in the associated table (always array).
+        def right_primary_keys
+          self[:right_primary_keys] ||= Array(right_primary_key)
         end
     
         # The columns to select when loading the association, associated_class.table_name.* by default.
@@ -650,15 +660,20 @@ module Sequel
           name = opts[:name]
           model = self
           left = (opts[:left_key] ||= opts.default_left_key)
+          lcks = opts[:left_keys] = Array(left)
           right = (opts[:right_key] ||= opts.default_right_key)
+          rcks = opts[:right_keys] = Array(right)
           left_pk = (opts[:left_primary_key] ||= self.primary_key)
+          lcpks = opts[:left_primary_keys] = Array(left_pk)
+          raise(Error, 'mismatched number of left composite keys') unless lcks.length == lcpks.length
+          raise(Error, 'mismatched number of right composite keys') if opts[:right_primary_key] && rcks.length != Array(opts[:right_primary_key]).length
           opts[:cartesian_product_number] ||= 1
           join_table = (opts[:join_table] ||= opts.default_join_table)
           left_key_alias = opts[:left_key_alias] ||= opts.default_associated_key_alias
           graph_jt_conds = opts[:graph_join_table_conditions] = opts[:graph_join_table_conditions] ? opts[:graph_join_table_conditions].to_a : []
           opts[:graph_join_table_join_type] ||= opts[:graph_join_type]
           opts[:after_load].unshift(:array_uniq!) if opts[:uniq]
-          opts[:dataset] ||= proc{opts.associated_class.inner_join(join_table, [[right, opts.right_primary_key], [left, send(left_pk)]])}
+          opts[:dataset] ||= proc{opts.associated_class.inner_join(join_table, rcks.zip(opts.right_primary_keys) + lcks.zip(lcpks.map{|k| send(k)}))}
           database = db
           
           opts[:eager_loader] ||= proc do |key_hash, records, associations|
@@ -690,13 +705,16 @@ module Sequel
           return if opts[:read_only]
       
           association_module_private_def(opts._add_method) do |o|
-            database.dataset.from(join_table).insert(left=>send(left_pk), right=>o.send(opts.right_primary_key))
+            h = {}
+            lcks.zip(lcpks).each{|k, pk| h[k] = send(pk)}
+            rcks.zip(opts.right_primary_keys).each{|k, pk| h[k] = o.send(pk)}
+            database.dataset.from(join_table).insert(h)
           end
           association_module_private_def(opts._remove_method) do |o|
-            database.dataset.from(join_table).filter([[left, send(left_pk)], [right, o.send(opts.right_primary_key)]]).delete
+            database.dataset.from(join_table).filter(lcks.zip(lcpks.map{|k| send(k)}) + rcks.zip(opts.right_primary_keys.map{|k| o.send(k)})).delete
           end
           association_module_private_def(opts._remove_all_method) do
-            database.dataset.from(join_table).filter(left=>send(left_pk)).delete
+            database.dataset.from(join_table).filter(lcks.zip(lcpks.map{|k| send(k)})).delete
           end
       
           def_add_method(opts)
@@ -709,10 +727,12 @@ module Sequel
           model = self
           opts[:key] = opts.default_key unless opts.include?(:key)
           key = opts[:key]
+          cks = opts[:keys] = Array(opts[:key])
+          raise(Error, 'mismatched number of composite keys') if opts[:primary_key] && cks.length != Array(opts[:primary_key]).length
           opts[:cartesian_product_number] ||= 0
           opts[:dataset] ||= proc do
             klass = opts.associated_class
-            klass.filter(SQL::QualifiedIdentifier.new(klass.table_name, opts.primary_key)=>send(key))
+            klass.filter(opts.primary_keys.map{|k| SQL::QualifiedIdentifier.new(klass.table_name, k)}.zip(cks.map{|k| send(k)}))
           end
           opts[:eager_loader] ||= proc do |key_hash, records, associations|
             h = key_hash[key]
@@ -744,7 +764,7 @@ module Sequel
           
           return if opts[:read_only]
       
-          association_module_private_def(opts._setter_method){|o| send(:"#{key}=", (o.send(opts.primary_key) if o))}
+          association_module_private_def(opts._setter_method){|o| cks.zip(opts.primary_keys).each{|k, pk| send(:"#{k}=", (o.send(pk) if o))}}
           association_module_def(opts.setter_method){|o| set_associated_object(opts, o)}
         end
         
@@ -753,10 +773,13 @@ module Sequel
           name = opts[:name]
           model = self
           key = (opts[:key] ||= opts.default_key)
+          cks = opts[:keys] = Array(key)
           primary_key = (opts[:primary_key] ||= self.primary_key)
+          cpks = opts[:primary_keys] = Array(primary_key)
+          raise(Error, 'mismatched number of composite keys') unless cks.length == cpks.length
           opts[:dataset] ||= proc do
             klass = opts.associated_class
-            klass.filter(SQL::QualifiedIdentifier.new(klass.table_name, key) => send(primary_key))
+            klass.filter(cks.map{|k| SQL::QualifiedIdentifier.new(klass.table_name, k)}.zip(cpks.map{|k| send(k)}))
           end
           opts[:eager_loader] ||= proc do |key_hash, records, associations|
             h = key_hash[primary_key]
@@ -788,21 +811,24 @@ module Sequel
       
           def_association_dataset_methods(opts)
           
+          ck_nil_hash ={}
+          cks.each{|k| ck_nil_hash[k] = nil}
+          
           unless opts[:read_only]
             validate = opts[:validate]
             association_module_private_def(opts._add_method) do |o|
-              o.send(:"#{key}=", send(primary_key))
+              cks.zip(cpks).each{|k, pk| o.send(:"#{k}=", send(pk))}
               o.save(:validate=>validate) || raise(Sequel::Error, "invalid associated object, cannot save")
             end
             def_add_method(opts)
       
             unless opts[:one_to_one]
               association_module_private_def(opts._remove_method) do |o|
-                o.send(:"#{key}=", nil)
+                cks.each{|k| o.send(:"#{k}=", nil)}
                 o.save(:validate=>validate) || raise(Sequel::Error, "invalid associated object, cannot save")
               end
               association_module_private_def(opts._remove_all_method) do
-                opts.associated_class.filter(key=>send(primary_key)).update(key=>nil)
+                opts.associated_class.filter(cks.zip(cpks.map{|k| send(k)})).update(ck_nil_hash)
               end
               def_remove_methods(opts)
             end
@@ -822,7 +848,7 @@ module Sequel
                 klass = opts.associated_class
                 update_database = lambda do 
                   send(opts.add_method, o)
-                  klass.filter(Sequel::SQL::BooleanExpression.new(:AND, {key=>send(primary_key)}, SQL::BooleanExpression.new(:'!=', klass.primary_key, o.pk))).update(key=>nil)
+                  klass.filter(cks.zip(cpks.map{|k| send(k)})).exclude(o.pk_hash).update(ck_nil_hash)
                 end
                 use_transactions ? db.transaction(opts){update_database.call} : update_database.call
               end
@@ -875,7 +901,7 @@ module Sequel
           else
             if !opts[:key]
               send(opts.dataset_method).all.first
-            elsif send(opts[:key])
+            elsif opts[:keys].all?{|k| send(k)}
               send(opts.dataset_method).first
             end
           end
