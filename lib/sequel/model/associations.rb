@@ -252,7 +252,7 @@ module Sequel
 
         # The default associated key alias
         def default_associated_key_alias
-          :x_foreign_key_x
+          self[:uses_left_composite_keys] ? (0...self[:left_keys].length).map{|i| :"x_foreign_key_#{i}_x"} : :x_foreign_key_x
         end
       
         # Default name symbol for the join table.
@@ -591,8 +591,13 @@ module Sequel
           if opts[:eager_graph]
             ds = ds.eager_graph(opts[:eager_graph])
             ds = ds.add_graph_aliases(opts.associated_key_alias=>[opts.associated_class.table_name, opts.associated_key_alias, SQL::QualifiedIdentifier.new(opts.associated_key_table, opts.associated_key_column)]) if opts.eager_loading_use_associated_key?
-          else
-            ds.select_more(SQL::AliasedExpression.new(SQL::QualifiedIdentifier.new(opts.associated_key_table, opts.associated_key_column), opts.associated_key_alias)) if opts.eager_loading_use_associated_key?
+          elsif opts.eager_loading_use_associated_key?
+            if opts[:uses_left_composite_keys]
+              t = opts.associated_key_table
+              ds.select_more(*opts.associated_key_alias.zip(opts.associated_key_column).map{|a, c| SQL::AliasedExpression.new(SQL::QualifiedIdentifier.new(t, c), a)})
+            else
+              ds.select_more(SQL::AliasedExpression.new(SQL::QualifiedIdentifier.new(opts.associated_key_table, opts.associated_key_column), opts.associated_key_alias)) 
+            end
           end
           ds = ds.eager(associations) unless Array(associations).empty?
           ds = opts[:eager_block].call(ds) if opts[:eager_block]
@@ -667,6 +672,8 @@ module Sequel
           lcpks = opts[:left_primary_keys] = Array(left_pk)
           raise(Error, 'mismatched number of left composite keys') unless lcks.length == lcpks.length
           raise(Error, 'mismatched number of right composite keys') if opts[:right_primary_key] && rcks.length != Array(opts[:right_primary_key]).length
+          uses_lcks = opts[:uses_left_composite_keys] = lcks.length > 1
+          uses_rcks = opts[:uses_right_composite_keys] = rcks.length > 1
           opts[:cartesian_product_number] ||= 1
           join_table = (opts[:join_table] ||= opts.default_join_table)
           left_key_alias = opts[:left_key_alias] ||= opts.default_associated_key_alias
@@ -679,8 +686,15 @@ module Sequel
           opts[:eager_loader] ||= proc do |key_hash, records, associations|
             h = key_hash[left_pk]
             records.each{|object| object.associations[name] = []}
-            model.eager_loading_dataset(opts, opts.associated_class.inner_join(join_table, [[right, opts.right_primary_key], [left, h.keys]]), Array(opts.select), associations).all do |assoc_record|
-              next unless objects = h[assoc_record.values.delete(left_key_alias)]
+            r = uses_rcks ? rcks.zip(opts.right_primary_keys) : [[right, opts.right_primary_key]]
+            l = uses_lcks ? [[lcks.map{|k| SQL::QualifiedIdentifier.new(join_table, k)}, SQL::SQLArray.new(h.keys)]] : [[left, h.keys]]
+            model.eager_loading_dataset(opts, opts.associated_class.inner_join(join_table, r + l), Array(opts.select), associations).all do |assoc_record|
+              hash_key = if uses_lcks
+                left_key_alias.map{|k| assoc_record.values.delete(k)}
+              else
+                assoc_record.values.delete(left_key_alias)
+              end
+              next unless objects = h[hash_key]
               objects.each{|object| object.associations[name].push(assoc_record)}
             end
           end
@@ -729,6 +743,7 @@ module Sequel
           key = opts[:key]
           cks = opts[:keys] = Array(opts[:key])
           raise(Error, 'mismatched number of composite keys') if opts[:primary_key] && cks.length != Array(opts[:primary_key]).length
+          uses_cks = opts[:uses_composite_keys] = cks.length > 1
           opts[:cartesian_product_number] ||= 0
           opts[:dataset] ||= proc do
             klass = opts.associated_class
@@ -743,8 +758,9 @@ module Sequel
             # Skip eager loading if no objects have a foreign key for this association
             unless keys.empty?
               klass = opts.associated_class
-              model.eager_loading_dataset(opts, klass.filter(SQL::QualifiedIdentifier.new(klass.table_name, opts.primary_key)=>keys), opts.select, associations).all do |assoc_record|
-                next unless objects = h[assoc_record.send(opts.primary_key)]
+              model.eager_loading_dataset(opts, klass.filter(uses_cks ? {opts.primary_keys.map{|k| SQL::QualifiedIdentifier.new(klass.table_name, k)}=>SQL::SQLArray.new(keys)} : {SQL::QualifiedIdentifier.new(klass.table_name, opts.primary_key)=>keys}), opts.select, associations).all do |assoc_record|
+                hash_key = uses_cks ? opts.primary_keys.map{|k| assoc_record.send(k)} : assoc_record.send(opts.primary_key)
+                next unless objects = h[hash_key]
                 objects.each{|object| object.associations[name] = assoc_record}
               end
             end
@@ -777,6 +793,7 @@ module Sequel
           primary_key = (opts[:primary_key] ||= self.primary_key)
           cpks = opts[:primary_keys] = Array(primary_key)
           raise(Error, 'mismatched number of composite keys') unless cks.length == cpks.length
+          uses_cks = opts[:uses_composite_keys] = cks.length > 1
           opts[:dataset] ||= proc do
             klass = opts.associated_class
             klass.filter(cks.map{|k| SQL::QualifiedIdentifier.new(klass.table_name, k)}.zip(cpks.map{|k| send(k)}))
@@ -786,8 +803,9 @@ module Sequel
             records.each{|object| object.associations[name] = []}
             reciprocal = opts.reciprocal
             klass = opts.associated_class
-            model.eager_loading_dataset(opts, klass.filter(SQL::QualifiedIdentifier.new(klass.table_name, key)=>h.keys), opts.select, associations).all do |assoc_record|
-              next unless objects = h[assoc_record[key]]
+            model.eager_loading_dataset(opts, klass.filter(uses_cks ? {cks.map{|k| SQL::QualifiedIdentifier.new(klass.table_name, k)}=>SQL::SQLArray.new(h.keys)} : {SQL::QualifiedIdentifier.new(klass.table_name, key)=>h.keys}), opts.select, associations).all do |assoc_record|
+              hash_key = uses_cks ? cks.map{|k| assoc_record.send(k)} : assoc_record.send(key)
+              next unless objects = h[hash_key]
               objects.each do |object| 
                 object.associations[name].push(assoc_record)
                 assoc_record.associations[reciprocal] = object if reciprocal
@@ -1376,7 +1394,12 @@ module Sequel
           # Associate each object with every key being monitored
           a.each do |rec|
             key_hash.each do |key, id_map|
-              id_map[rec[key]] << rec if rec[key]
+              case key
+              when Array
+                id_map[key.map{|k| rec[k]}] << rec if key.all?{|k| rec[k]}
+              when Symbol
+                id_map[rec[key]] << rec if rec[key]
+              end
             end
           end
           

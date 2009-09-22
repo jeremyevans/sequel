@@ -504,7 +504,50 @@ describe Sequel::Model, "#eager" do
     as.length.should == 1
     as.first.special_tracks.should == [EagerTrack.load(:album_id=>2, :id=>1)]
   end
+  
+  it "should respect the many_to_one association's composite keys" do
+    EagerAlbum.many_to_one :special_band, :class=>:EagerBand, :primary_key=>[:id, :p_k], :key=>[:band_id, :id]
+    EagerBand.dataset.extend(Module.new {
+      def fetch_rows(sql)
+        MODEL_DB.sqls << sql
+        yield({:p_k=>1, :id=>2})
+      end
+    })
+    as = EagerAlbum.eager(:special_band).all
+    MODEL_DB.sqls.should == ['SELECT * FROM albums', "SELECT * FROM bands WHERE ((bands.id, bands.p_k) IN ((2, 1)))"]
+    as.length.should == 1
+    as.first.special_band.should == EagerBand.load(:p_k=>1, :id=>2)
+  end
+  
+  it "should respect the one_to_many association's composite keys" do
+    EagerAlbum.one_to_many :special_tracks, :class=>:EagerTrack, :primary_key=>[:band_id, :id], :key=>[:id, :album_id]
+    EagerTrack.dataset.extend(Module.new {
+      def fetch_rows(sql)
+        MODEL_DB.sqls << sql
+        yield({:album_id=>1, :id=>2})
+      end
+    })
+    as = EagerAlbum.eager(:special_tracks).all
+    MODEL_DB.sqls.should == ['SELECT * FROM albums', "SELECT * FROM tracks WHERE ((tracks.id, tracks.album_id) IN ((2, 1)))"]
+    as.length.should == 1
+    as.first.special_tracks.should == [EagerTrack.load(:album_id=>1, :id=>2)]
+  end
 
+  it "should respect many_to_many association's composite keys" do
+    EagerAlbum.many_to_many :special_genres, :class=>:EagerGenre, :left_primary_key=>[:band_id, :id], :left_key=>[:l1, :l2], :right_primary_key=>[:xxx, :id], :right_key=>[:r1, :r2], :join_table=>:ag
+    EagerGenre.dataset.extend(Module.new {
+      def fetch_rows(sql)
+        MODEL_DB.sqls << sql
+        yield({:x_foreign_key_0_x=>2, :x_foreign_key_1_x=>1, :id=>5})
+        yield({:x_foreign_key_0_x=>2, :x_foreign_key_1_x=>1, :id=>6})
+      end
+    })
+    as = EagerAlbum.eager(:special_genres).all
+    MODEL_DB.sqls.should == ['SELECT * FROM albums', "SELECT genres.*, ag.l1 AS x_foreign_key_0_x, ag.l2 AS x_foreign_key_1_x FROM genres INNER JOIN ag ON ((ag.r1 = genres.xxx) AND (ag.r2 = genres.id) AND ((ag.l1, ag.l2) IN ((2, 1))))"]
+    as.length.should == 1
+    as.first.special_genres.should == [EagerGenre.load(:id=>5), EagerGenre.load(:id=>6)]
+  end
+  
   it "should respect many_to_many association's :left_primary_key and :right_primary_key options" do
     EagerAlbum.many_to_many :special_genres, :class=>:EagerGenre, :left_primary_key=>:band_id, :left_key=>:album_id, :right_primary_key=>:xxx, :right_key=>:genre_id, :join_table=>:ag
     EagerGenre.dataset.extend(Module.new {
