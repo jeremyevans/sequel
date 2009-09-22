@@ -1,5 +1,7 @@
 === HEAD
 
+* Fix select_more and order_more to not affect receiver (tamas.denes, jeremyevans)
+
 * Support composite keys in model associations (jeremyevans)
 
 * Add the force_encoding plugin for forcing encoding of strings for models (requires ruby 1.9) (jeremyevans)

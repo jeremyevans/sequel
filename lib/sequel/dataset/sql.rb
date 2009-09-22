@@ -631,7 +631,8 @@ module Sequel
     #   ds.order(:a).order(:b).sql #=> 'SELECT * FROM items ORDER BY b'
     #   ds.order(:a).order_more(:b).sql #=> 'SELECT * FROM items ORDER BY a, b'
     def order_more(*columns, &block)
-      order(*Array(@opts[:order]).concat(columns), &block)
+      columns = @opts[:order] + columns if @opts[:order]
+      order(*columns, &block)
     end
     
     # SQL fragment for the ordered expression, used in the ORDER BY
@@ -762,7 +763,8 @@ module Sequel
     #   dataset.select(:a).select(:b) # SELECT b FROM items
     #   dataset.select(:a).select_more(:b) # SELECT a, b FROM items
     def select_more(*columns, &block)
-      select(*Array(@opts[:select]).concat(columns), &block)
+      columns = @opts[:select] + columns if @opts[:select]
+      select(*columns, &block)
     end
     
     # Formats a SELECT statement
