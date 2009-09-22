@@ -1102,6 +1102,43 @@ describe Sequel::Model, "#eager_graph" do
     as.should == [GraphAlbum.load(:id=>3, :band_id=>2)]
     as.first.right_tracks.should == [GraphTrack.load(:id=>5, :album_id=>2), GraphTrack.load(:id=>6, :album_id=>2)]
   end
+  
+  it "should respect many_to_one association's composite keys" do 
+    GraphAlbum.many_to_one :inner_band, :class=>'GraphBand', :key=>[:band_id, :id], :primary_key=>[:vocalist_id, :id]
+    ds = GraphAlbum.eager_graph(:inner_band)
+    ds.sql.should == 'SELECT albums.id, albums.band_id, inner_band.id AS inner_band_id, inner_band.vocalist_id FROM albums LEFT OUTER JOIN bands AS inner_band ON ((inner_band.vocalist_id = albums.band_id) AND (inner_band.id = albums.id))'
+    def ds.fetch_rows(sql, &block)
+      yield({:id=>3, :band_id=>2, :inner_band_id=>3, :vocalist_id=>2})
+    end
+    as = ds.all
+    as.should == [GraphAlbum.load(:id=>3, :band_id=>2)]
+    as.first.inner_band.should == GraphBand.load(:id=>3, :vocalist_id=>2)
+  end
+
+  it "should respect one_to_many association's composite keys" do 
+    GraphAlbum.one_to_many :right_tracks, :class=>'GraphTrack', :key=>[:album_id, :id], :primary_key=>[:band_id, :id]
+    ds = GraphAlbum.eager_graph(:right_tracks)
+    ds.sql.should == 'SELECT albums.id, albums.band_id, right_tracks.id AS right_tracks_id, right_tracks.album_id FROM albums LEFT OUTER JOIN tracks AS right_tracks ON ((right_tracks.album_id = albums.band_id) AND (right_tracks.id = albums.id))'
+    def ds.fetch_rows(sql, &block)
+      yield({:id=>3, :band_id=>2, :right_tracks_id=>3, :album_id=>2})
+    end
+    as = ds.all
+    as.should == [GraphAlbum.load(:id=>3, :band_id=>2)]
+    as.first.right_tracks.should == [GraphTrack.load(:id=>3, :album_id=>2)]
+  end
+  
+  it "should respect many_to_many association's composite keys" do 
+    GraphAlbum.many_to_many :sbands, :class=>'GraphBand', :left_key=>[:l1, :l2], :left_primary_key=>[:band_id, :id], :right_key=>[:r1, :r2], :right_primary_key=>[:vocalist_id, :id], :join_table=>:b
+    ds = GraphAlbum.eager_graph(:sbands)
+    ds.sql.should == 'SELECT albums.id, albums.band_id, sbands.id AS sbands_id, sbands.vocalist_id FROM albums LEFT OUTER JOIN b ON ((b.l1 = albums.band_id) AND (b.l2 = albums.id)) LEFT OUTER JOIN bands AS sbands ON ((sbands.vocalist_id = b.r1) AND (sbands.id = b.r2))'
+    def ds.fetch_rows(sql, &block)
+      yield({:id=>3, :band_id=>2, :sbands_id=>5, :vocalist_id=>6})
+      yield({:id=>3, :band_id=>2, :sbands_id=>6, :vocalist_id=>22})
+    end
+    as = ds.all
+    as.should == [GraphAlbum.load(:id=>3, :band_id=>2)]
+    as.first.sbands.should == [GraphBand.load(:id=>5, :vocalist_id=>6), GraphBand.load(:id=>6, :vocalist_id=>22)]
+  end
 
   it "should respect many_to_many association's :left_primary_key and :right_primary_key options" do 
     GraphAlbum.many_to_many :inner_genres, :class=>'GraphGenre', :left_key=>:album_id, :left_primary_key=>:band_id, :right_key=>:genre_id, :right_primary_key=>:xxx, :join_table=>:ag
