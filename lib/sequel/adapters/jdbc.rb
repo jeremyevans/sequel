@@ -1,6 +1,15 @@
 require 'java'
 Sequel.require 'adapters/utils/stored_procedures'
 
+class Time
+  def to_java_sql_timestamp
+    millis = to_i * 1000
+    ts = java.sql.Timestamp.new(millis)
+    ts.setNanos(usec * 1000)
+    ts
+  end
+end
+
 module Sequel
   # Houses Sequel's JDBC support when running on JRuby.
   # Support for individual database types is done using sub adapters.
@@ -335,8 +344,10 @@ module Sequel
           cps.setString(i, arg)
         when Date, Java::JavaSql::Date
           cps.setDate(i, arg)
-        when Time, DateTime, Java::JavaSql::Timestamp
+        when DateTime, Java::JavaSql::Timestamp
           cps.setTimestamp(i, arg)
+        when Time
+          cps.setTimestamp(i, arg.to_java_sql_timestamp)
         when Float
           cps.setDouble(i, arg)
         when TrueClass, FalseClass
