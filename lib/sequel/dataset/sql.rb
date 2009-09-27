@@ -167,7 +167,7 @@ module Sequel
     # Returns an EXISTS clause for the dataset as a LiteralString.
     #
     #   DB.select(1).where(DB[:items].exists).sql
-    #   #=> "SELECT 1 WHERE EXISTS (SELECT * FROM items)"
+    #   #=> "SELECT 1 WHERE (EXISTS (SELECT * FROM items))"
     def exists
       LiteralString.new("EXISTS (#{select_sql})")
     end
