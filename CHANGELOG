@@ -1,10 +1,12 @@
 === HEAD
 
+* Fix MSSQL emulated offset support for datasets with row_procs (e.g. Model datasets) (jeremyevans)
+
 * Support composite keys with set_primary_key when called with an array of multiple symbols (jeremyevans)
 
 * Fix select_more and order_more to not affect receiver (tamas.denes, jeremyevans)
 
-* Support composite keys in model associations (jeremyevans)
+* Support composite keys in model associations, including many_through_many plugin support (jeremyevans)
 
 * Add the force_encoding plugin for forcing encoding of strings for models (requires ruby 1.9) (jeremyevans)
 
