@@ -164,6 +164,29 @@ context "MSSQL joined datasets" do
   end
 end
 
+describe "Offset support" do
+  before do
+    @db = MSSQL_DB
+    @db.create_table!(:i){Integer :id; Integer :parent_id}
+    @ds = @db[:i].order(:id)
+    @hs = []
+    @ds.row_proc = proc{|r| @hs << r.dup; r[:id] *= 2; r[:parent_id] *= 3; r}
+    @ds.import [:id, :parent_id], [[1,nil],[2,nil],[3,1],[4,1],[5,3],[6,5]]
+  end
+  after do
+    @db.drop_table(:i)
+  end
+  
+  specify "should return correct rows" do
+    @ds.limit(2, 2).all.should == [{:id=>6, :parent_id=>3}, {:id=>8, :parent_id=>3}]
+  end
+  
+  specify "should not include offset column in hashes passed to row_proc" do
+    @ds.limit(2, 2).all
+    @hs.should == [{:id=>3, :parent_id=>1}, {:id=>4, :parent_id=>1}]
+  end
+end
+
 describe "Common Table Expressions" do
   before do
     @db = MSSQL_DB

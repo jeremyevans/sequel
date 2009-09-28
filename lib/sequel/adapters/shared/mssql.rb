@@ -193,8 +193,8 @@ module Sequel
       
       # When returning all rows, if an offset is used, delete the row_number column
       # before yielding the row.
-      def each(&block)
-        @opts[:offset] ? super{|r| r.delete(row_number_column); yield r} : super(&block)
+      def fetch_rows(sql, &block)
+        @opts[:offset] ? super(sql){|r| r.delete(row_number_column); yield r} : super(sql, &block)
       end
       
       # MSSQL uses the CONTAINS keyword for full text search
