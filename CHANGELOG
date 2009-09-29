@@ -1,5 +1,11 @@
 === HEAD
 
+* Add class_table_inheritance plugin, supporting inheritance in the database using a table-per-model-class approach (jeremyevans)
+
+* Allow easier overriding of model code to insert and update individual records (jeremyevans)
+
+* Allow graphing to work on previously joined datasets, and eager graphing of models backed by joined datasets (jeremyevans)
+
 * Support composite keys with set_primary_key when called with an array of multiple symbols (jeremyevans)
 
 * Fix select_more and order_more to not affect receiver (tamas.denes, jeremyevans)
