@@ -15,6 +15,7 @@ module Sequel
     COLUMN_REF_RE3 = /\A([\w ]+)__([\w ]+)\z/.freeze
     COUNT_FROM_SELF_OPTS = [:distinct, :group, :sql, :limit, :compounds]
     DATASET_ALIAS_BASE_NAME = 't'.freeze
+    FROM_SELF_KEEP_OPTS = [:graph, :eager_graph, :graph_aliases]
     IS_LITERALS = {nil=>'NULL'.freeze, true=>'TRUE'.freeze, false=>'FALSE'.freeze}.freeze
     IS_OPERATORS = ::Sequel::SQL::ComplexExpression::IS_OPERATORS
     N_ARITY_OPERATORS = ::Sequel::SQL::ComplexExpression::N_ARITY_OPERATORS
@@ -282,7 +283,7 @@ module Sequel
     #   ds.from_self(:alias=>:foo).sql #=> "SELECT * FROM (SELECT id, name FROM items ORDER BY name) AS 'foo'"
     def from_self(opts={})
       fs = {}
-      @opts.keys.each{|k| fs[k] = nil} 
+      @opts.keys.each{|k| fs[k] = nil unless FROM_SELF_KEEP_OPTS.include?(k)}
       clone(fs).from(opts[:alias] ? as(opts[:alias]) : self)
     end
 

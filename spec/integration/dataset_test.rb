@@ -449,7 +449,7 @@ describe Sequel::SQL::Constants do
     @db.drop_table(:constants)
   end
   
-  cspecify "should have working CURRENT_DATE", [:odbc, :mssql] do
+  cspecify "should have working CURRENT_DATE", [:odbc, :mssql], [:jdbc, :sqlite] do
     @db.create_table!(:constants){Date :d}
     @ds.insert(:d=>Sequel::CURRENT_DATE)
     Date.today.should == @c2[@ds.get(:d)]

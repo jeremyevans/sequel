@@ -41,6 +41,10 @@ module Sequel
     #   or an object that responds to .dataset and return a symbol or a dataset
     # * join_conditions - Any condition(s) allowed by join_table.
     # * options -  A hash of graph options.  The following options are currently used:
+    #   * :from_self_alias - The alias to use when the receiver is not a graphed
+    #     dataset but it contains multiple FROM tables or a JOIN.  In this case,
+    #     the receiver is wrapped in a from_self before graphing, and this option
+    #     determines the alias to use.
     #   * :implicit_qualifier - The qualifier of implicit conditions, see #join_table.
     #   * :join_type - The type of join to use (passed to join_table).  Defaults to
     #     :left_outer.
@@ -83,9 +87,12 @@ module Sequel
 
       # Only allow table aliases that haven't been used
       raise_alias_error.call if @opts[:graph] && @opts[:graph][:table_aliases] && @opts[:graph][:table_aliases].include?(table_alias)
-
+      
+      # Use a from_self if this is already a joined table
+      ds = (!@opts[:graph] && (@opts[:from].length > 1 || @opts[:join])) ? from_self(:alias=>options[:from_self_alias] || first_source) : self
+      
       # Join the table early in order to avoid cloning the dataset twice
-      ds = join_table(options[:join_type] || :left_outer, table, join_conditions, :table_alias=>table_alias, :implicit_qualifier=>options[:implicit_qualifier], &block)
+      ds = ds.join_table(options[:join_type] || :left_outer, table, join_conditions, :table_alias=>table_alias, :implicit_qualifier=>options[:implicit_qualifier], &block)
       opts = ds.opts
 
       # Whether to include the table in the result set
