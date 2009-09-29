@@ -802,6 +802,22 @@ module Sequel
         self
       end
       
+      def _insert
+        ds = model.dataset
+        if ds.respond_to?(:insert_select) and h = ds.insert_select(@values)
+          @values = h
+          nil
+        else
+          iid = ds.insert(@values)
+          # if we have a regular primary key and it's not set in @values,
+          # we assume it's the last inserted id
+          if (pk = autoincrementing_primary_key) && pk.is_a?(Symbol) && !@values[pk]
+            @values[pk] = iid
+          end
+          pk
+        end
+      end
+      
       # Refresh using a particular dataset, used inside save to make sure the same server
       # is used for reading newly inserted values from the database
       def _refresh(dataset)
@@ -817,19 +833,8 @@ module Sequel
         return save_failure(:save) if before_save == false
         if new?
           return save_failure(:create) if before_create == false
-          ds = model.dataset
-          if ds.respond_to?(:insert_select) and h = ds.insert_select(@values)
-            @values = h
-            @this = nil
-          else
-            iid = ds.insert(@values)
-            # if we have a regular primary key and it's not set in @values,
-            # we assume it's the last inserted id
-            if (pk = autoincrementing_primary_key) && pk.is_a?(Symbol) && !@values[pk]
-              @values[pk] = iid
-            end
-            @this = nil if pk
-          end
+          pk = _insert
+          @this = nil if pk
           @new = false
           @was_new = true
           after_create
@@ -850,12 +855,16 @@ module Sequel
             changed_columns.reject!{|c| columns.include?(c)}
           end
           Array(primary_key).each{|x| @columns_updated.delete(x)}
-          this.update(@columns_updated) unless @columns_updated.empty?
+          _update(@columns_updated) unless @columns_updated.empty?
           after_update
           after_save
           @columns_updated = nil
         end
         self
+      end
+      
+      def _update(columns)
+        this.update(columns)
       end
       
       # Default inspection output for the values hash, overwrite to change what #inspect displays.
