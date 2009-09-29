@@ -1,5 +1,7 @@
 === HEAD
 
+* Correctly literalize timezones in timestamps when using Oracle (jeremyevans)
+
 * Add class_table_inheritance plugin, supporting inheritance in the database using a table-per-model-class approach (jeremyevans)
 
 * Allow easier overriding of model code to insert and update individual records (jeremyevans)

@@ -140,6 +140,16 @@ module Sequel
         "#{expression} #{quote_identifier(aliaz)}"
       end
 
+      # The strftime format to use when literalizing the time.
+      def default_timestamp_format
+        "TIMESTAMP '%Y-%m-%d %H:%M:%S%N %z'".freeze
+      end
+
+      # Use a colon for the timestamp offset, since Oracle appears to require it.
+      def format_timestamp_offset(hour, minute)
+        sprintf("%+03i:%02i", hour, minute)
+      end
+
       # Oracle uses the SQL standard of only doubling ' inside strings.
       def literal_string(v)
         "'#{v.gsub("'", "''")}'"

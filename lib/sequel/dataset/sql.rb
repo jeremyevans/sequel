@@ -1057,19 +1057,25 @@ module Sequel
             # Would like to just use %z format, but it doesn't appear to work on Windows
             # Instead, the offset fragment is constructed manually
             minutes = (v2.is_a?(DateTime) ? v2.offset * 1440 : v2.utc_offset/60).to_i
-            sprintf("%+03i%02i", *minutes.divmod(60))
+            format_timestamp_offset(*minutes.divmod(60))
           end
         end
       end
       v2.strftime(fmt)
     end
     
+    # Return the SQL timestamp fragment to use for the timezone offset.
+    def format_timestamp_offset(hour, minute)
+      sprintf("%+03i%02i", hour, minute)
+    end
+
     # Return the SQL timestamp fragment to use for the fractional time part.
     # Should start with the decimal point.  Uses 6 decimal places by default.
     def format_timestamp_usec(usec)
       sprintf(".%06d", usec)
     end
 
+    # SQL fragment specifying a list of identifiers
     # SQL fragment specifying a list of identifiers
     def identifier_list(columns)
       columns.map{|i| quote_identifier(i)}.join(COMMA_SEPARATOR)
