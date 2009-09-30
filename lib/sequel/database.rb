@@ -576,7 +576,7 @@ module Sequel
         t = begin_transaction(conn)
         yield(conn)
       rescue Exception => e
-        rollback_transaction(t)
+        rollback_transaction(t) if t
         transaction_error(e)
       ensure
         begin

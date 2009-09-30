@@ -91,7 +91,7 @@ module Sequel
       end
       
       def remove_transaction(conn)
-        conn.autocommit = true
+        conn.autocommit = true if conn
         super
       end
       
