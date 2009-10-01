@@ -56,7 +56,6 @@ module Sequel
         def associated_class
           self[:class] ||= constantize(self[:class_name])
         end
-      
 
         # Name symbol for the dataset association method
         def dataset_method
@@ -432,6 +431,8 @@ module Sequel
         #   - :conditions - The conditions to use to filter the association, can be any argument passed to filter.
         #   - :dataset - A proc that is instance_evaled to get the base dataset
         #     to use for the _dataset method (before the other options are applied).
+        #   - :distinct - Use the DISTINCT clause when selecting associating object, both when
+        #     lazy loading and eager loading via .eager (but not when using .eager_graph).
         #   - :eager - The associations to eagerly load via #eager when loading the associated object(s).
         #     For many_to_one associations, this is ignored unless this association is
         #     being eagerly loaded, as it doesn't save queries unless multiple objects
@@ -597,6 +598,7 @@ module Sequel
           end
           ds = ds.order(*opts[:order]) if opts[:order]
           ds = ds.eager(opts[:eager]) if opts[:eager]
+          ds = ds.distinct if opts[:distinct]
           if opts[:eager_graph]
             ds = ds.eager_graph(opts[:eager_graph])
             ds = ds.add_graph_aliases(opts.associated_key_alias=>[opts.associated_class.table_name, opts.associated_key_alias, SQL::QualifiedIdentifier.new(opts.associated_key_table, opts.associated_key_column)]) if opts.eager_loading_use_associated_key?
@@ -916,6 +918,7 @@ module Sequel
           ds = ds.order(*opts[:order]) if opts[:order]
           ds = ds.limit(*opts[:limit]) if opts[:limit]
           ds = ds.eager(*opts[:eager]) if opts[:eager]
+          ds = ds.distinct if opts[:distinct]
           ds = ds.eager_graph(opts[:eager_graph]) if opts[:eager_graph] && opts.eager_graph_lazy_dataset?
           ds = send(opts.dataset_helper_method, ds) if opts[:block]
           ds

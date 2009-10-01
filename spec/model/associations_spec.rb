@@ -1957,7 +1957,6 @@ describe Sequel::Model, "many_to_many" do
   end
 
   it "should support a :uniq option that removes duplicates from the association" do
-    h = []
     @c2.many_to_many :attributes, :class => @c1, :uniq=>true
     @c1.class_eval do
       def @dataset.fetch_rows(sql)
@@ -1968,6 +1967,11 @@ describe Sequel::Model, "many_to_many" do
       end
     end
     @c2.load(:id=>10, :parent_id=>20).attributes.should == [@c1.load(:id=>20), @c1.load(:id=>30)]
+  end
+  
+  it "should support a :distinct option that uses the DISTINCT clause" do
+    @c2.many_to_many :attributes, :class => @c1, :distinct=>true
+    @c2.load(:id=>10).attributes_dataset.sql.should == "SELECT DISTINCT attributes.* FROM attributes INNER JOIN attributes_nodes ON ((attributes_nodes.attribute_id = attributes.id) AND (attributes_nodes.node_id = 10))"
   end
 end
 

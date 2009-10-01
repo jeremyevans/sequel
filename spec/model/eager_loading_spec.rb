@@ -610,6 +610,29 @@ describe Sequel::Model, "#eager" do
     a.al_tracks.should == [EagerTrack.load(:id=>6, :album_id=>1)]
     a.al_genres.should == [EagerGenre.load(:id=>8)]
   end
+  
+  it "should respect :uniq option when eagerly loading many_to_many associations" do
+    EagerAlbum.many_to_many :al_genres, :class=>'EagerGenre', :left_key=>:album_id, :right_key=>:genre_id, :join_table=>:ag, :uniq=>true
+    EagerGenre.dataset.extend(Module.new {
+      def fetch_rows(sql)
+        MODEL_DB.sqls << sql
+        yield({:x_foreign_key_x=>1, :id=>8})
+        yield({:x_foreign_key_x=>1, :id=>8})
+      end
+    })
+    a = EagerAlbum.eager(:al_genres).all.first
+    MODEL_DB.sqls.should == ['SELECT * FROM albums', "SELECT genres.*, ag.album_id AS x_foreign_key_x FROM genres INNER JOIN ag ON ((ag.genre_id = genres.id) AND (ag.album_id IN (1)))"]
+    a.should == EagerAlbum.load(:id => 1, :band_id => 2)
+    a.al_genres.should == [EagerGenre.load(:id=>8)]
+  end
+  
+  it "should respect :distinct option when eagerly loading many_to_many associations" do
+    EagerAlbum.many_to_many :al_genres, :class=>'EagerGenre', :left_key=>:album_id, :right_key=>:genre_id, :join_table=>:ag, :distinct=>true
+    a = EagerAlbum.eager(:al_genres).all.first
+    MODEL_DB.sqls.should == ['SELECT * FROM albums', "SELECT DISTINCT genres.*, ag.album_id AS x_foreign_key_x FROM genres INNER JOIN ag ON ((ag.genre_id = genres.id) AND (ag.album_id IN (1)))"]
+    a.should == EagerAlbum.load(:id => 1, :band_id => 2)
+    a.al_genres.should == [EagerGenre.load(:id=>4)]
+  end
 end
 
 describe Sequel::Model, "#eager_graph" do
