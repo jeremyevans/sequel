@@ -533,4 +533,10 @@ context Sequel::SQL::VirtualRow do
     proc{@d.l{count(:over, :* =>true, :partition=>a, :order=>b, :window=>:win, :frame=>:rows){}}}.should raise_error(Sequel::Error)
     proc{Sequel::Dataset.new(nil).filter{count(:over, :* =>true, :partition=>a, :order=>b, :window=>:win, :frame=>:rows){}}.sql}.should raise_error(Sequel::Error)
   end
+  
+  it "should deal with classes without requiring :: prefix" do
+    @d.l{date < Date.today}.should == "(\"date\" < '#{Date.today}')"
+    @d.l{date < Sequel::CURRENT_DATE}.should == "(\"date\" < CURRENT_DATE)"
+    @d.l{num < Math::PI.to_i}.should == "(\"num\" < 3)"
+  end
 end

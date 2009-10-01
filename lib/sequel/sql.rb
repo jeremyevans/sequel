@@ -6,6 +6,19 @@ module Sequel
     class BasicObject
       (instance_methods - %w"__id__ __send__ instance_eval == equal?").each{|m| undef_method(m)}
     end
+  else
+    # If on 1.9, create a Sequel::BasicObject class that is just like the
+    # default BasicObject class, except that missing constants are resolved in
+    # Object.  This allows the virtual row support to work with classes
+    # without prefixing them with ::, such as:
+    #
+    #   DB[:bonds].filter{maturity_date > Time.now}
+    class BasicObject < ::BasicObject
+      # Lookup missing constants in ::Object
+      def self.const_missing(name)
+        ::Object.const_get(name)
+      end
+    end
   end
 
   class LiteralString < ::String
