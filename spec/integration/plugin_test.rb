@@ -137,3 +137,114 @@ describe "Class Table Inheritance Plugin" do
   end
 end
 end
+
+describe "Many Through Many Plugin" do
+  before do
+    @db = INTEGRATION_DB
+    @db.instance_variable_set(:@schemas, {})
+    @db.create_table!(:albums) do
+      primary_key :id
+      String :name
+    end
+    @db.create_table!(:artists) do
+      primary_key :id
+      String :name
+    end
+    @db.create_table!(:albums_artists) do
+      foreign_key :album_id, :albums
+      foreign_key :artist_id, :artists
+    end
+    class ::Album < Sequel::Model(@db)
+      many_to_many :artists
+    end 
+    class ::Artist < Sequel::Model(@db)
+      plugin :many_through_many
+    end 
+    
+    @artist1 = Artist.create(:name=>'1')
+    @artist2 = Artist.create(:name=>'2')
+    @artist3 = Artist.create(:name=>'3')
+    @artist4 = Artist.create(:name=>'4')
+    @album1 = Album.create(:name=>'A')
+    @album1.add_artist(@artist1)
+    @album1.add_artist(@artist2)
+    @album2 = Album.create(:name=>'B')
+    @album2.add_artist(@artist3)
+    @album2.add_artist(@artist4)
+    @album3 = Album.create(:name=>'C')
+    @album3.add_artist(@artist2)
+    @album3.add_artist(@artist3)
+    @album4 = Album.create(:name=>'D')
+    @album4.add_artist(@artist1)
+    @album4.add_artist(@artist4)
+    
+    clear_sqls
+  end
+  after do
+    @db.drop_table :albums_artists, :albums, :artists
+    [:Album, :Artist].each{|s| Object.send(:remove_const, s)}
+  end
+  
+  specify "should handle super simple case with 1 join table" do
+    Artist.many_through_many :albums, [[:albums_artists, :artist_id, :album_id]]
+    Artist[1].albums.map{|x| x.name}.sort.should == %w'A D'
+    Artist[2].albums.map{|x| x.name}.sort.should == %w'A C'
+    Artist[3].albums.map{|x| x.name}.sort.should == %w'B C'
+    Artist[4].albums.map{|x| x.name}.sort.should == %w'B D'
+    
+    Artist.filter(:id=>1).eager(:albums).all.map{|x| x.albums.map{|a| a.name}}.flatten.sort.should == %w'A D'
+    Artist.filter(:id=>2).eager(:albums).all.map{|x| x.albums.map{|a| a.name}}.flatten.sort.should == %w'A C'
+    Artist.filter(:id=>3).eager(:albums).all.map{|x| x.albums.map{|a| a.name}}.flatten.sort.should == %w'B C'
+    Artist.filter(:id=>4).eager(:albums).all.map{|x| x.albums.map{|a| a.name}}.flatten.sort.should == %w'B D'
+    
+    Artist.filter(:artists__id=>1).eager_graph(:albums).all.map{|x| x.albums.map{|a| a.name}}.flatten.sort.should == %w'A D'
+    Artist.filter(:artists__id=>2).eager_graph(:albums).all.map{|x| x.albums.map{|a| a.name}}.flatten.sort.should == %w'A C'
+    Artist.filter(:artists__id=>3).eager_graph(:albums).all.map{|x| x.albums.map{|a| a.name}}.flatten.sort.should == %w'B C'
+    Artist.filter(:artists__id=>4).eager_graph(:albums).all.map{|x| x.albums.map{|a| a.name}}.flatten.sort.should == %w'B D'
+  end
+
+  specify "should handle typical case with 3 join tables" do
+    Artist.many_through_many :related_artists, [[:albums_artists, :artist_id, :album_id], [:albums, :id, :id], [:albums_artists, :album_id, :artist_id]], :class=>Artist, :distinct=>true
+    Artist[1].related_artists.map{|x| x.name}.sort.should == %w'1 2 4'
+    Artist[2].related_artists.map{|x| x.name}.sort.should == %w'1 2 3'
+    Artist[3].related_artists.map{|x| x.name}.sort.should == %w'2 3 4'
+    Artist[4].related_artists.map{|x| x.name}.sort.should == %w'1 3 4'
+    
+    Artist.filter(:id=>1).eager(:related_artists).all.map{|x| x.related_artists.map{|a| a.name}}.flatten.sort.should == %w'1 2 4'
+    Artist.filter(:id=>2).eager(:related_artists).all.map{|x| x.related_artists.map{|a| a.name}}.flatten.sort.should == %w'1 2 3'
+    Artist.filter(:id=>3).eager(:related_artists).all.map{|x| x.related_artists.map{|a| a.name}}.flatten.sort.should == %w'2 3 4'
+    Artist.filter(:id=>4).eager(:related_artists).all.map{|x| x.related_artists.map{|a| a.name}}.flatten.sort.should == %w'1 3 4'
+    
+    Artist.filter(:artists__id=>1).eager_graph(:related_artists).all.map{|x| x.related_artists.map{|a| a.name}}.flatten.sort.should == %w'1 2 4'
+    Artist.filter(:artists__id=>2).eager_graph(:related_artists).all.map{|x| x.related_artists.map{|a| a.name}}.flatten.sort.should == %w'1 2 3'
+    Artist.filter(:artists__id=>3).eager_graph(:related_artists).all.map{|x| x.related_artists.map{|a| a.name}}.flatten.sort.should == %w'2 3 4'
+    Artist.filter(:artists__id=>4).eager_graph(:related_artists).all.map{|x| x.related_artists.map{|a| a.name}}.flatten.sort.should == %w'1 3 4'
+  end
+
+  specify "should handle extreme case with 5 join tables" do
+    Artist.many_through_many :related_albums, [[:albums_artists, :artist_id, :album_id], [:albums, :id, :id], [:albums_artists, :album_id, :artist_id], [:artists, :id, :id], [:albums_artists, :artist_id, :album_id]], :class=>Album, :distinct=>true
+    @db[:albums_artists].delete
+    @album1.add_artist(@artist1)
+    @album1.add_artist(@artist2)
+    @album2.add_artist(@artist2)
+    @album2.add_artist(@artist3)
+    @album3.add_artist(@artist1)
+    @album4.add_artist(@artist3)
+    @album4.add_artist(@artist4)
+    
+    Artist[1].related_albums.map{|x| x.name}.sort.should == %w'A B C'
+    Artist[2].related_albums.map{|x| x.name}.sort.should == %w'A B C D'
+    Artist[3].related_albums.map{|x| x.name}.sort.should == %w'A B D'
+    Artist[4].related_albums.map{|x| x.name}.sort.should == %w'B D'
+    
+    Artist.filter(:id=>1).eager(:related_albums).all.map{|x| x.related_albums.map{|a| a.name}}.flatten.sort.should == %w'A B C'
+    Artist.filter(:id=>2).eager(:related_albums).all.map{|x| x.related_albums.map{|a| a.name}}.flatten.sort.should == %w'A B C D'
+    Artist.filter(:id=>3).eager(:related_albums).all.map{|x| x.related_albums.map{|a| a.name}}.flatten.sort.should == %w'A B D'
+    Artist.filter(:id=>4).eager(:related_albums).all.map{|x| x.related_albums.map{|a| a.name}}.flatten.sort.should == %w'B D'
+    
+    Artist.filter(:artists__id=>1).eager_graph(:related_albums).all.map{|x| x.related_albums.map{|a| a.name}}.flatten.sort.should == %w'A B C'
+    Artist.filter(:artists__id=>2).eager_graph(:related_albums).all.map{|x| x.related_albums.map{|a| a.name}}.flatten.sort.should == %w'A B C D'
+    Artist.filter(:artists__id=>3).eager_graph(:related_albums).all.map{|x| x.related_albums.map{|a| a.name}}.flatten.sort.should == %w'A B D'
+    Artist.filter(:artists__id=>4).eager_graph(:related_albums).all.map{|x| x.related_albums.map{|a| a.name}}.flatten.sort.should == %w'B D'
+  end
+end

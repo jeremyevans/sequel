@@ -1,5 +1,7 @@
 === HEAD
 
+* Add a :distinct option for all associations, which uses the SQL DISTINCT clause (jeremyevans)
+
 * Don't require :: prefix for constant lookups in instance_evaled virtual row blocks on ruby 1.9 (jeremyevans)
 
 === 3.5.0 (2009-10-01)
