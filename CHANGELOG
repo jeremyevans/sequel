@@ -1,4 +1,4 @@
-=== HEAD
+=== 3.5.0 (2009-10-01)
 
 * Correctly literalize timezones in timestamps when using Oracle (jeremyevans)
 

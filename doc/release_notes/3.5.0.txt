@@ -1,0 +1,510 @@
+New Plugins
+-----------
+
+* A class_table_inheritance plugin has been added, supporting model
+  inheritance in the database using a table-per-model-class approach.
+  Each table stores only attributes unique to that model or subclass
+  hierarchy.
+  
+  For example, with this hierarchy:
+
+                Employee
+               /        \
+            Staff     Manager
+                         |
+                      Executive
+
+  the following database schema may be used (table - columns):
+
+  * employees - id, name, kind
+  * staff - id, manager_id
+  * managers - id, num_staff
+  * executives - id, num_managers
+
+  The class_table_inheritance plugin assumes that the main table
+  (e.g. employees) has a primary key field (usually
+  autoincrementing), and all other tables have a foreign key of the
+  same name that points to the same key in their superclass's table.
+  For example:
+
+  * employees.id  - primary key, autoincrementing
+  * staff.id - foreign key referencing employees(id)
+  * managers.id - foreign key referencing employees(id)
+  * executives.id - foreign key referencing managers(id)
+
+  When using the class_table_inheritance plugin, subclasses use joined
+  datasets:
+
+    Employee.dataset.sql  # SELECT * FROM employees
+    Manager.dataset.sql   # SELECT * FROM employees
+                          # INNER JOIN managers USING (id)
+    Executive.dataset.sql # SELECT * FROM employees
+                          # INNER JOIN managers USING (id)
+                          # INNER JOIN executives USING (id)
+
+  This allows Executive.all to return instances with all attributes
+  loaded.  The plugin overrides deleting, inserting, and updating
+  in the model to work with multiple tables, by handling each table
+  individually.
+
+  This plugin allows and encourages the use of a :key option to mark
+  a column holding the class name.  This allows methods on the
+  superclass to return instances of specific subclasses.
+
+    a = Employee.all # [<#Staff>, <#Manager>, <#Executive>]
+    
+  This plugin requires the lazy_attributes plugin and uses it to
+  handle subclass specific attributes that would not be loaded
+  when calling superclass methods (since those wouldn't join
+  to the subclass tables).  For example:
+    
+    a.first.values # {:id=>1, name=>'S', :kind=>'Staff'}
+    a.first.manager_id # Loads the manager_id attribute from the
+                       # database
+                       
+  The class_table_inheritance plugin requires JOIN USING and
+  therefore is not supported on H2 or Microsoft SQL Server, which do
+  not support that SQL-92 feature.
+  
+* An associations_dependencies plugin was added for deleting,
+  destroying, or nullifying associated objects when destroying a
+  model object.  This just gives an easy way to add the necessary
+  before and after destroy hooks.  The following association types
+  support the following dependency actions:
+
+  * :many_to_many - :nullify (removes all related entries in join
+    table)
+  * :many_to_one - :delete, :destroy
+  * :one_to_many - :delete, :destroy, :nullify (sets foreign key to
+    NULL for all associated objects)
+    
+  This plugin works directly with the association datasets and does
+  not use any cached association values.  The :delete action will
+  delete all associated objects from the database in a single SQL
+  call. The :destroy action will load each associated object from the
+  database and call the destroy method on it.
+  
+  The plugin call takes a hash of association symbol keys and 
+  dependency action symbol values.  Alternatively, you can specify
+  additional dependencies later using add_association_dependencies:
+  
+    Business.plugin :association_dependencies, :address=>:delete
+    # or:
+    Artist.plugin :association_dependencies
+    Artist.add_association_dependencies :albums=>:destroy,
+      :reviews=>:delete, :tags=>:nullify
+
+* A force_encoding plugin was added that forces the encoding of
+  strings used in model instances.  When model instances are loaded
+  from the database, all values in the hash that are strings are
+  forced to the given encoding.  Whenever you update a model column
+  attribute, the resulting value is forced to a given encoding if the
+  value is a string.  There are two ways to specify the encoding.
+  You can either do so in the plugin call itself, or via the
+  forced_encoding class accessor:
+  
+    class Album < Sequel::Model
+      plugin :force_encoding, 'UTF-8'
+      # or
+      plugin :force_encoding
+      self.forced_encoding = 'UTF-8'
+    end
+    
+  This plugin only works on ruby 1.9, since strings don't have
+  encodings in 1.8.
+  
+* A typecast_on_load plugin was added, for fixing bad database
+  typecasting when loading model objects. Most of Sequel's database
+  adapters don't have complete control over typecasting, and may
+  return columns that aren't typecast correctly (with correct being
+  defined as how the model object would typecast the same column
+  values).
+
+  This plugin modifies Model.load to call the setter methods (which
+  typecast by default) for all columns given.  You can either specify
+  the columns to typecast on load in the plugin call itself, or
+  afterwards using add_typecast_on_load_columns:
+
+    Album.plugin :typecast_on_load, :release_date, :record_date
+    # or:
+    Album.plugin :typecast_on_load
+    Album.add_typecast_on_load_columns :release_date, :record_date
+
+  If the database returns release_date and record_date columns as
+  strings instead of dates, this will ensure that if you access those
+  columns through the model object, you'll get Date objects instead of
+  strings.
+
+* A touch plugin was added, which adds Model#touch for updating an
+  instance's timestamp, as well as touching associations when an
+  instance is updated or destroyed.
+  
+  The Model#touch instance method saves the object with a modified
+  timestamp.  By default, it uses the :updated_at column, but you can
+  set which column to use. It also supports touching of associations,
+  so that when the current model object is updated or destroyed, the
+  associated rows in the database can have their modified timestamp
+  updated to the current timestamp.  Example:
+  
+    class Album < Sequel::Model
+      plugin :touch, :column=>:modified_on, :associations=>:artist
+    end
+
+* A subclasses plugin was added, for recording all of a models
+  subclasses and descendent classes.  Direct subclasses are available
+  via the subclasses method, and all descendent classes are available
+  via the descendents method:
+
+    c = Class.new(Sequel::Model)
+    c.plugin :subclasses
+    sc1 = Class.new(c)
+    sc2 = Class.new(c)
+    ssc1 = Class.new(sc1)
+    c.subclasses    # [sc1, sc2]
+    sc1.subclasses  # [ssc1]
+    sc2.subclasses  # []
+    ssc1.subclasses # []
+    c.descendents   # [sc1, ssc1, sc2]
+
+  The main use case for this is if you want to modify all models
+  after the model subclasses have been created.  Since mutable
+  options are copied when subclassing, modifying parent classes
+  does not affect current subclasses, only future ones.  The
+  subclasses plugin allows you get all subclasses so that you can
+  easily modify them.  The plugin only records subclasses
+  created after the plugin call, though.
+
+* An active_model plugin was added, giving Sequel::Model an
+  ActiveModel complaint API, in so much as it passes the
+  ActiveModel::Lint tests.
+
+New Extensions
+--------------
+
+* A named_timezones extension was added, allowing you to use named
+  timezones such as "America/Los_Angeles" (the default Sequel
+  timezone support only supports UTC or local time). This extension
+  requires TZInfo.  It also sets the Sequel.datetime_class to 
+  DateTime, so database timestamps will be returned as DateTime
+  instances instead of Time instances.  This is because ruby's
+  Time class doesn't support timezones other than UTC and local time.
+  
+  This plugin allows you to pass either strings or TZInfo::Timezone
+  instance to Sequel.database_timezone=, application_timezone=, and
+  typecast_timezone=.  If a string is passed, it is converted to a
+  TZInfo::Timezone using TZInfo::Timezone.get.
+
+  Let's say you have the database server in New York and the
+  application server in Los Angeles.  For historical reasons, data
+  is stored in local New York time, but the application server only
+  services clients in Los Angeles, so you want to use New York
+  time in the database and Los Angeles time in the application.  This
+  is easily done via:
+
+    Sequel.database_timezone = 'America/New_York'
+    Sequel.application_timezone = 'America/Los_Angeles'
+
+  Then, before timestamps are stored in the database, they are
+  converted to New York time.  When timestamps are retrieved from the
+  database, they are converted to Los Angeles time.
+
+* A thread_local_timezones extension was added.  This allows you to
+  set a per-thread timezone that will override the default global
+  timezone while the thread is executing.  The main use case is for
+  web applications that execute each request in its own thread, and
+  want to set the timezones based on the request.  The most common
+  example is having the database always store time in UTC, but have
+  the application deal with the timezone of the current user.  That
+  can be done with:
+  
+    Sequel.database_timezone = :utc
+    # In each thread:
+    Sequel.thread_application_timezone = current_user.timezone
+
+  This extension is designed to work with the named_timezones
+  extension.
+  
+* An sql_expr extension was added that adds .sql_expr methods to
+  all objects, giving them easy access to Sequel's DSL:
+  
+    1.sql_expr < :a     # 1 < a
+    false.sql_expr & :a # FALSE AND a
+    true.sql_expr | :a  # TRUE OR a
+    ~nil.sql_expr       # NOT NULL
+    "a".sql_expr + "b"  # 'a' || 'b'
+
+  Proc#sql_expr uses a virtual row:
+
+    proc{[[a, b], [a, c]]}.sql_expr | :x
+    # (((a = b) AND (a = c)) OR x)
+
+* A looser_typecasting extension was added, for using to_f and to_i
+  instead of the more strict Kernel.Float and Kernel.Integer when
+  typecasting floats and integers. To use it, you should extend the
+  database with the Sequel::LooserTypecasting module after loading
+  the extension:
+
+    Sequel.extension :looser_typecasting
+    DB.extend(Sequel::LooserTypecasting)
+
+  This makes the behavior more like ActiveRecord:
+  
+    a = Artist.new(:num_albums=>'a')
+    a.num_albums # => 0
+
+Other New Features
+------------------
+
+* Associations now support composite keys.  All of the :*key options
+  options now accept arrays of symbols instead of plain symbols.
+  Example:
+  
+    Artist.primary_key # [:name, :city]
+    Album.many_to_one :artist, :key=>[:artist_name, :artist_city]
+    Artist.one_to_many :albums, :key=>[:artist_name, :artist_city]
+    
+  All association types are supported, including the built-in
+  many_to_many association and the many_through_many plugin.  Both
+  methods of eager loading work with composite keys for all
+  association types. Setter and add/remove/remove_all methods
+  also now work with composite keys.
+  
+* Associations now respect a :validate option, which can be set to
+  false to not validate when implicitly saving associated objects.
+  
+  There isn't a lot of implicit saving in Sequel's association
+  methods, but this gives the user the control over validation when
+  the association methods implicitly save an object.
+
+* In addition to the regular association methods, the
+  nested_attributes plugin was also updated to respect the
+  :validate_association option. It was also modified to not validate
+  associated objects twice, once when the parent object was validated
+  and again when the associated object was saved.  Additionally, if
+  you pass :validate=>false to the save method when saving the parent
+  object, it will not longer attempt to validate associated objects
+  when saving them.
+
+* Dataset#insert and #insert_sql were refactored and now support the
+  following API:
+  
+  * No arguments - Treat as a single empty hash argument
+  * Single argument:
+    * Hash - Use keys as columns and values as values
+    * Array - Use as values, without specifying columns
+    * Dataset - Use a subselect, without specifying columns
+    * LiteralString - Use as the values
+  * 2 arguments:
+    * Array, Array - Use first array as keys, second as values
+    * Array, Dataset - Use a subselect, with the array as columns
+    * Array, LiteralString - Use LiteralString as the values, with
+      the array as the columns
+  * Anything else: Treat all given values an an array of values
+
+* Graphing now works with previously joined datasets.  The main use
+  case of this is when eagerly loading (via eager_graph) model
+  associations for models backed by joined datasets, such as those
+  created by the class_table_inheritance plugin.
+  
+* Sequel.virtual_row was added allowing you to easily use the
+  VirtualRow support outside of select, order, and filter calls:
+  
+    net_benefit = Sequel.virtual_row{revenue > cost}
+    good_employee = Sequel.virtual_row{num_commendations > 0}
+    fire = ~net_benefit & ~good_employee
+    demote = ~net_benefit & good_employee
+    promote = net_benefit & good_employee
+    DB[:employees].filter(fire).update(:employed=>false)
+    DB[:employees].filter(demote).update(:rank=>:rank-1)
+    DB[:employees].filter(promote).update(:rank=>:rank+1)
+
+* When Sequel wraps exception in its own classes (to provide database
+  independence), it now keeps the wrapped exception available in
+  a wrapped_exception accessor.  This allows you to more easily
+  determine the wrapped exception class, without resorting to parsing
+  the exception message.
+  
+    begin
+      DB.run('...')
+    rescue Sequel::DatabaseError => e
+      case e.wrapped_exception
+      when Mysql::Error
+        ...
+      when PGError
+        ...
+      end
+    end
+    
+* The MySQL adapter now supports a Dataset#split_multiple_result_sets
+  method that yields arrays of rows (one per result set), instead of
+  rows.  This allows you to submit multiple statements at the same
+  time (or call a stored procedure that returns multiple result
+  sets), and know which rows are related to which result sets.
+  
+  This violates a lot of Sequel's internal assumptions and should be
+  used with care.  Existing row_procs are modified to work correctly,
+  but graphing will not work on these datasets.
+
+* The ADO adapter now accepts a :conn_string option and uses that
+  as the full ADO connection string.  This can be used to connect to
+  any datasource ADO supports, such as Microsoft Excel.
+  
+* The Microsoft SQL Server shared adapter now supports a
+  Database#server_version method.
+  
+* The Microsoft SQL Server shared adapter now supports updating and
+  deleting from joined datasets.
+  
+* The Microsoft SQL Server shared adapter now supports a
+  Dataset#output method that uses the OUTPUT clause.
+
+* Model#_save now calls either Model#_insert or Model#_update for
+  inserting/updating the row in the database.  This allows for easier
+  overriding when you want to allow creating and updating model
+  objects backed by a joined dataset.
+  
+* Dataset#graph now takes a :from_self_alias option specifying the
+  alias to use for the subselect created if the receiver is a joined
+  but not yet graphed dataset.  It defaults to the first source table
+  in the receiver.
+
+Other Improvements
+------------------
+
+* Typecasting model attributes is now done before checking existing
+  values, instead of after.  Before, the code for the model attribute
+  setters would compare the given value to the existing entry.  If it
+  didn't match, the value was typecasted and then assigned.  That led
+  to the following situation:
+
+    a = Album[1]
+    a.num_tracks # => 10
+    params # => {'num_tracks'=>'10'}
+    a.set(params)
+    a.changed_columns # => [:num_tracks]
+
+  The new behavior typecasts the value first, and only sets it and
+  records the column as changed if it doesn't match the typecasted
+  value.
+  
+* Model#modified? is now always true if the record is new.  modified?
+  indicates the instance's status relative to the database, and since
+  a new object is not yet in the database, and saving the object
+  would add it, the object is considered modified. A consequence of
+  this is that Model#save_changes now always saves if the object is
+  new.
+  
+  If you want to check if there were changes to columns since the
+  object was first initialized, you should use
+  !changed_columns.empty?, which was the historical way to handle
+  the situation.
+
+* The DataObjects (do) adpater now supports DataObjects 0.10.
+
+* Dataset#select_more and Dataset#order_more no longer affect the
+  receiver.  They are supposed to just return a modified copy of the
+  receiver instead of modifying the receiver itself.  For a few
+  versions they have been broken in that they modified the receiver
+  in addition to returning a modified copy.
+  
+* Performance was increased for execution of prepared statements
+  with multiple bound variables on MySQL.
+  
+* On MySQL, database errors raised when preparing statements or
+  setting bound variable values are now caught and raised as
+  Sequel::DatabaseErrors.
+  
+* On MySQL, more types of disconnection errors are detected.
+  
+* When altering columns in MySQL, options such as :unsigned,
+  :elements, and :size that are given in the call are now respected.
+
+* MySQL enum defaults are now handled correctly in the schema dumper.
+
+* The schema dumper no longer attempts to use unparseable defaults
+  as literals on MySQL, since MySQL does not provide defaults as
+  valid literals.
+
+* The emulated offset support in the shared Microsoft SQL Server
+  adapter now works better with model classes (or any datasets with
+  row_procs).
+  
+* Microsoft SQL Server now supports using the WITH clause in delete,
+  update, and insert calls.
+  
+* Parsed indexes when connecting to Microsoft SQL Server via JDBC no
+  longer include primary key indexes.
+  
+* Dataset#insert_select now returns nil if disable_insert_returning
+  is used in the shared PostgreSQL adapter.  This makes it work as
+  expected with model object creation.
+  
+* Calling Model.set_primary_key with an array of symbols to set
+  a composite primary key is now supported.  You can also provide
+  multiple symbol arguments to do the same thing.  Before, specifying
+  an array of symbols broke the Model.[] optimization.
+
+* Literalization of timezones in timestamps now works correctly on
+  Oracle.
+  
+* __FILE__ and __LINE__ are now used everywhere that eval is called
+  with a string, which makes for better backtraces.
+  
+* The native MySQL adapter now correctly handles returning before
+  yielding all result sets.  Previously, this caused a commands out
+  of sync error.
+  
+* Table names in common table expressions are now quoted.
+
+* The Oracle adapter's Dataset#except now accepts a hash, giving it
+  the same API as the default Dataset#except.
+  
+* When connecting to Microsoft SQL Server via ADO, allow
+  Dataset#insert to take multiple arguments.
+  
+* Fractional timestamps are no longer used on ODBC.
+
+* Schema parsing now works on MSSQL when the database is set to not
+  quote identifiers.
+  
+* Timezone offsets are no longer used on Microsoft SQL Server, since
+  they only work for the datetimeoffset type.
+  
+* Only 3 fractional digits in timestamps are used in Microsoft SQL
+  Server, since an error is raised if the use the datetime type
+  with more than that.
+
+* The integration test suite now has guards for expected failures
+  when run on known databases.  Expected failures are marked as
+  pending.
+
+Backwards Compatibility
+-----------------------
+
+* Graphing to an previously joined (but not graphed) dataset now
+  causes the receiver to be wrapped in a subselect, so if you
+  graph a dataset to a previously joined dataset, and then filter
+  the dataset referring to tables that were in the joined dataset
+  (other than the first table), the SQL produced will probably no
+  longer be valid.  You should either filter the dataset before
+  graphing or use the name of the first source of the joined
+  dataset (which is what the subselected is aliased to) if filtering
+  afterward.
+  
+  In certain cases, this change can cause tables to be aliased
+  differently, so if you were graphing previously joined datasets
+  and then filtering using the automatically generated aliases, you
+  might need to modify your code.
+
+* The DataObjects (do) adpater no longer supports DataObjects 0.9.x.
+
+* The Dataset#virtual_row_block_call private instance method has
+  been removed.
+
+* Sequel's timezone support was significantly refactored, so if you
+  had any custom modifications to the timezone support, they might
+  need to be refactored as well.
+
+* The SQL generation code was significantly refactored, so if you
+  had any custom modifications in that area, you might need to
+  refactor as well.
