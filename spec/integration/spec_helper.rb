@@ -64,30 +64,6 @@ if defined?(INTEGRATION_DB) || defined?(INTEGRATION_URL) || ENV['SEQUEL_INTEGRAT
     INTEGRATION_DB = Sequel.connect(url)
     #INTEGRATION_DB.instance_variable_set(:@server_version, 80100)
   end
-  class Spec::Example::ExampleGroup
-    def sqls_should_be(*args)
-    end 
-  end
 else
-  sql_logger = Object.new
-  def sql_logger.info(str)
-    $sqls << str 
-  end
-  INTEGRATION_DB = Sequel.sqlite('', :loggers=>[sql_logger], :quote_identifiers=>false)
-  class Spec::Example::ExampleGroup
-    def sqls_should_be(*sqls)
-      sqls.zip($sqls).each do |should_be, is|
-        case should_be
-        when String
-          is.should == should_be
-        when Regexp
-          is.should =~ should_be
-        else
-          raise ArgumentError, "need String or RegExp"
-        end
-      end
-      $sqls.length.should == sqls.length
-      clear_sqls
-    end 
-  end
+  INTEGRATION_DB = Sequel.sqlite('', :quote_identifiers=>false)
 end

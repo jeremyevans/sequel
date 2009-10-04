@@ -75,13 +75,6 @@ describe "Eagerly loading a tree structure" do
 
   it "#descendants should get all descendants in one call" do
     nodes = Node.filter(:id=>1).eager(:descendants).all
-    sqls_should_be('SELECT * FROM nodes WHERE (id = 1)',
-      'SELECT * FROM nodes WHERE ((parent_id IN (1)) AND (id != parent_id))',
-      'SELECT * FROM nodes WHERE ((parent_id IN (2, 3)) AND (id != parent_id))',
-      'SELECT * FROM nodes WHERE ((parent_id IN (4)) AND (id != parent_id))',
-      'SELECT * FROM nodes WHERE ((parent_id IN (5)) AND (id != parent_id))',
-      'SELECT * FROM nodes WHERE ((parent_id IN (6)) AND (id != parent_id))',
-      'SELECT * FROM nodes WHERE ((parent_id IN (7)) AND (id != parent_id))')
     nodes.length.should == 1
     node = nodes.first
     node.pk.should == 1
@@ -104,17 +97,10 @@ describe "Eagerly loading a tree structure" do
     node.children.length.should == 1
     node.children.first.pk.should == 7
     node.children.first.parent.should == node
-    sqls_should_be
   end
 
   it "#ancestors should get all ancestors in one call" do
     nodes = Node.filter(:id=>[7,3]).order(:id).eager(:ancestors).all
-    sqls_should_be('SELECT * FROM nodes WHERE (id IN (7, 3)) ORDER BY id',
-      'SELECT * FROM nodes WHERE (id IN (1, 6))',
-      'SELECT * FROM nodes WHERE (id IN (5))',
-      'SELECT * FROM nodes WHERE (id IN (4))',
-      'SELECT * FROM nodes WHERE (id IN (2))',
-      'SELECT * FROM nodes WHERE (id IN (1))')
     nodes.length.should == 2
     nodes.collect{|x| x.pk}.should == [3, 7]
     nodes.first.parent.pk.should == 1
@@ -130,7 +116,6 @@ describe "Eagerly loading a tree structure" do
     node = node.parent
     node.parent.pk.should == 1
     node.parent.parent.should == nil
-    sqls_should_be
   end
 end
 
@@ -170,32 +155,19 @@ describe "Association Extensions" do
 
   it "should allow methods to be called on the dataset method" do
     Authorship.count.should == 0
-    sqls_should_be('SELECT COUNT(*) AS \'count\' FROM authorships LIMIT 1')
     authorship = @author.authorships_dataset.find_or_create_by_name('Bob')
-    sqls_should_be("SELECT * FROM authorships WHERE ((authorships.author_id = 1) AND (name = 'Bob')) LIMIT 1",
-      /INSERT INTO authorships \((author_id, name|name, author_id)\) VALUES \((1, 'Bob'|'Bob', 1)\)/,
-      "SELECT * FROM authorships WHERE (id = 1) LIMIT 1")
     Authorship.count.should == 1
     Authorship.first.should == authorship
-    sqls_should_be('SELECT COUNT(*) AS \'count\' FROM authorships LIMIT 1', "SELECT * FROM authorships LIMIT 1")
     authorship.name.should == 'Bob'
     authorship.author_id.should == @author.id
     @author.authorships_dataset.find_or_create_by_name('Bob').should == authorship
-    sqls_should_be("SELECT * FROM authorships WHERE ((authorships.author_id = 1) AND (name = 'Bob')) LIMIT 1")
     Authorship.count.should == 1
-    sqls_should_be('SELECT COUNT(*) AS \'count\' FROM authorships LIMIT 1')
     authorship2 = @author.authorships_dataset.find_or_create(:name=>'Jim')
-    sqls_should_be("SELECT * FROM authorships WHERE ((authorships.author_id = 1) AND (name = 'Jim')) LIMIT 1",
-      /INSERT INTO authorships \((author_id, name|name, author_id)\) VALUES \((1, 'Jim'|'Jim', 1)\)/,
-      "SELECT * FROM authorships WHERE (id = 2) LIMIT 1")
     Authorship.count.should == 2
-    sqls_should_be('SELECT COUNT(*) AS \'count\' FROM authorships LIMIT 1')
     Authorship.order(:name).map(:name).should == ['Bob', 'Jim']
-    sqls_should_be('SELECT * FROM authorships ORDER BY name')
     authorship2.name.should == 'Jim'
     authorship2.author_id.should == @author.id
     @author.authorships_dataset.find_or_create(:name=>'Jim').should == authorship2
-    sqls_should_be("SELECT * FROM authorships WHERE ((authorships.author_id = 1) AND (name = 'Jim')) LIMIT 1")
   end
 end
 
@@ -290,19 +262,16 @@ describe "has_many :through has_many and has_one :through belongs_to" do
 
   it "should return has_many :through has_many records for a single object" do
     invs = @firm1.invoices.sort_by{|x| x.pk}
-    sqls_should_be("SELECT invoices.id, invoices.client_id, client.id AS 'client_id_0', client.firm_id FROM invoices LEFT OUTER JOIN clients AS 'client' ON (client.id = invoices.client_id) WHERE (client.firm_id = 1)")
     invs.should == [@invoice1, @invoice2, @invoice3]
     invs[0].client.should == @client1
     invs[1].client.should == @client1
     invs[2].client.should == @client2
     invs.collect{|i| i.firm}.should == [@firm1, @firm1, @firm1]
     invs.collect{|i| i.client.firm}.should == [@firm1, @firm1, @firm1]
-    sqls_should_be
   end
 
   it "should eagerly load has_many :through has_many records for multiple objects" do
     firms = Firm.order(:id).eager(:invoices).all
-    sqls_should_be("SELECT * FROM firms ORDER BY id", "SELECT invoices.id, invoices.client_id, client.id AS 'client_id_0', client.firm_id FROM invoices LEFT OUTER JOIN clients AS 'client' ON (client.id = invoices.client_id) WHERE (client.firm_id IN (1, 2))")
     firms.should == [@firm1, @firm2]
     firm1, firm2 = firms
     invs1 = firm1.invoices.sort_by{|x| x.pk}
@@ -318,22 +287,18 @@ describe "has_many :through has_many and has_one :through belongs_to" do
     invs2.collect{|i| i.firm}.should == [@firm2, @firm2]
     invs1.collect{|i| i.client.firm}.should == [@firm1, @firm1, @firm1]
     invs2.collect{|i| i.client.firm}.should == [@firm2, @firm2]
-    sqls_should_be
   end
 
   it "should return has_one :through belongs_to records for a single object" do
     firm = @invoice1.firm
-    sqls_should_be("SELECT firms.id, clients.id AS 'clients_id', clients.firm_id FROM firms LEFT OUTER JOIN clients ON (clients.firm_id = firms.id) WHERE (clients.id = 1)")
     firm.should == @firm1
     @invoice1.client.should == @client1
     @invoice1.client.firm.should == @firm1
-    sqls_should_be
     firm.associations[:clients].should == nil
   end
 
   it "should eagerly load has_one :through belongs_to records for multiple objects" do
     invs = Invoice.order(:id).eager(:firm).all
-    sqls_should_be("SELECT * FROM invoices ORDER BY id", "SELECT firms.id, clients.id AS 'clients_id', clients.firm_id FROM firms LEFT OUTER JOIN clients ON (clients.firm_id = firms.id) WHERE (clients.id IN (1, 2, 3))")
     invs.should == [@invoice1, @invoice2, @invoice3, @invoice4, @invoice5]
     invs[0].firm.should == @firm1
     invs[0].client.should == @client1
@@ -355,7 +320,6 @@ describe "has_many :through has_many and has_one :through belongs_to" do
     invs[4].client.should == @client3
     invs[4].client.firm.should == @firm2
     invs[4].firm.associations[:clients].should == nil
-    sqls_should_be
   end
 end
 
@@ -468,22 +432,18 @@ describe "Polymorphic Associations" do
   it "should load the correct associated object for a single object" do
     @asset1.attachable.should == @post
     @asset2.attachable.should == @note
-    sqls_should_be("SELECT * FROM posts WHERE (id = 1) LIMIT 1", "SELECT * FROM notes WHERE (id = 2) LIMIT 1")
   end
 
   it "should eagerly load the correct associated object for a group of objects" do
     assets = Asset.order(:id).eager(:attachable).all
-    sqls_should_be("SELECT * FROM assets ORDER BY id", "SELECT * FROM posts WHERE (id IN (1))", "SELECT * FROM notes WHERE (id IN (2))")
     assets.should == [@asset1, @asset2]
     assets[0].attachable.should == @post
     assets[1].attachable.should == @note
-    sqls_should_be
   end
 
   it "should set items correctly" do
     @asset1.attachable = @note
     @asset2.attachable = @post
-    sqls_should_be("SELECT * FROM posts WHERE (id = 1) LIMIT 1", "SELECT * FROM notes WHERE (id = 2) LIMIT 1")
     @asset1.attachable.should == @note
     @asset1.attachable_id.should == @note.pk
     @asset1.attachable_type.should == 'Note'
@@ -494,38 +454,29 @@ describe "Polymorphic Associations" do
     @asset1.attachable.should == nil
     @asset1.attachable_id.should == nil
     @asset1.attachable_type.should == nil
-    sqls_should_be
   end
 
   it "should add items correctly" do
     @post.assets.should == [@asset1]
-    sqls_should_be("SELECT * FROM assets WHERE ((assets.attachable_id = 1) AND (attachable_type = 'Post'))")
     @post.add_asset(@asset2)
-    sqls_should_be(/UPDATE assets SET ((attachable_id = 1|attachable_type = 'Post'|id = 2)(, )?){3} WHERE \(id = 2\)/)
     @post.assets.should == [@asset1, @asset2]
     @asset2.attachable.should == @post
     @asset2.attachable_id.should == @post.pk
     @asset2.attachable_type.should == 'Post'
-    sqls_should_be
   end
 
   it "should remove items correctly" do
     @note.assets.should == [@asset2]
-    sqls_should_be("SELECT * FROM assets WHERE ((assets.attachable_id = 2) AND (attachable_type = 'Note'))")
     @note.remove_asset(@asset2)
-    sqls_should_be(/UPDATE assets SET ((attachable_id = NULL|attachable_type = NULL|id = 2)(, )?){3} WHERE \(id = 2\)/)
     @note.assets.should == []
     @asset2.attachable.should == nil
     @asset2.attachable_id.should == nil
     @asset2.attachable_type.should == nil
-    sqls_should_be
   end
 
   it "should remove all items correctly" do
     @post.remove_all_assets
     @note.remove_all_assets
-    sqls_should_be(/UPDATE assets SET attachable_(id|type) = NULL, attachable_(type|id) = NULL WHERE \(\(attachable_(id|type) = (1|'Post')\) AND \(attachable_(type|id) = ('Post'|1)\)\)/,
-      /UPDATE assets SET attachable_(id|type) = NULL, attachable_(type|id) = NULL WHERE \(\(attachable_(id|type) = (2|'Note')\) AND \(attachable_(type|id) = ('Note'|2)\)\)/)
     @asset1.reload.attachable.should == nil
     @asset2.reload.attachable.should == nil
   end
@@ -604,77 +555,61 @@ describe "many_to_one/one_to_many not referencing primary key" do
 
   it "should load all associated one_to_many objects for a single object" do
     invs = @client1.invoices
-    sqls_should_be("SELECT * FROM invoices WHERE (client_name = 'X')")
     invs.should == [@invoice1, @invoice2]
     invs[0].client.should == @client1
     invs[1].client.should == @client1
-    sqls_should_be
   end
 
   it "should load the associated many_to_one object for a single object" do
     client = @invoice1.client
-    sqls_should_be("SELECT * FROM clients WHERE (name = 'X') LIMIT 1")
     client.should == @client1
   end
 
   it "should eagerly load all associated one_to_many objects for a group of objects" do
     clients = Client.order(:id).eager(:invoices).all
-    sqls_should_be("SELECT * FROM clients ORDER BY id", "SELECT * FROM invoices WHERE (client_name IN ('X', 'Y'))")
     clients.should == [@client1, @client2]
     clients[1].invoices.should == []
     invs = clients[0].invoices.sort_by{|x| x.pk}
     invs.should == [@invoice1, @invoice2]
     invs[0].client.should == @client1
     invs[1].client.should == @client1
-    sqls_should_be
   end
 
   it "should eagerly load the associated many_to_one object for a group of objects" do
     invoices = Invoice.order(:id).eager(:client).all
-    sqls_should_be("SELECT * FROM invoices ORDER BY id", "SELECT * FROM clients WHERE (name IN ('X'))")
     invoices.should == [@invoice1, @invoice2]
     invoices[0].client.should == @client1
     invoices[1].client.should == @client1
-    sqls_should_be
   end
 
   it "should set the associated object correctly" do
     @invoice1.client = @client2
-    sqls_should_be("SELECT * FROM clients WHERE (name = 'X') LIMIT 1")
     @invoice1.client.should == @client2
     @invoice1.client_name.should == 'Y'
     @invoice1.client = nil
     @invoice1.client_name.should == nil
-    sqls_should_be
   end
 
   it "should add the associated object correctly" do
     @client2.invoices.should == []
-    sqls_should_be("SELECT * FROM invoices WHERE (client_name = 'Y')")
     @client2.add_invoice(@invoice1)
-    sqls_should_be(/UPDATE invoices SET (client_name = 'Y'|id = 1), (client_name = 'Y'|id = 1) WHERE \(id = 1\)/)
     @client2.invoices.should == [@invoice1]
     @invoice1.client_name.should == 'Y'
     @invoice1.client = nil
     @invoice1.client_name.should == nil
-    sqls_should_be
   end
 
   it "should remove the associated object correctly" do
     invs = @client1.invoices.sort_by{|x| x.pk}
-    sqls_should_be("SELECT * FROM invoices WHERE (client_name = 'X')")
     invs.should == [@invoice1, @invoice2]
     @client1.remove_invoice(@invoice1)
-    sqls_should_be(/UPDATE invoices SET (client_name = NULL|id = 1), (client_name = NULL|id = 1) WHERE \(id = 1\)/)
     @client1.invoices.should == [@invoice2]
     @invoice1.client_name.should == nil
     @invoice1.client.should == nil
-    sqls_should_be
   end
 
   it "should remove all associated objects correctly" do
     invs = @client1.remove_all_invoices
-    sqls_should_be("UPDATE invoices SET client_name = NULL WHERE (client_name = 'X')")
     @invoice1.refresh.client.should == nil
     @invoice1.client_name.should == nil
     @invoice2.refresh.client.should == nil

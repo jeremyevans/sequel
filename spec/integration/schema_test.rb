@@ -29,10 +29,8 @@ describe "Database schema parser" do
     INTEGRATION_DB.schema(:items, :reload=>true)
     clear_sqls
     INTEGRATION_DB.schema(:items)
-    sqls_should_be
     clear_sqls
     INTEGRATION_DB.schema(:items, :reload=>true)
-    sqls_should_be "PRAGMA table_info('items')"
   end
 
   specify "should raise an error when the table doesn't exist" do
@@ -53,7 +51,6 @@ describe "Database schema parser" do
     col_info[:type].should == :integer
     clear_sqls
     INTEGRATION_DB.schema(:items)
-    sqls_should_be
   end
 
   cspecify "should parse primary keys from the schema properly", [proc{|db| db.class.adapter_scheme != :jdbc}, :mssql] do

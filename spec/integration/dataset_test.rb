@@ -25,37 +25,31 @@ describe "Simple Dataset operations" do
 
   cspecify "should insert with a primary key specified", :mssql do
     @ds.insert(:id=>100, :number=>20)
-    sqls_should_be(/INSERT INTO items \((number, id|id, number)\) VALUES \((100, 20|20, 100)\)/)
     @ds.count.should == 2
     @ds.order(:id).all.should == [{:id=>1, :number=>10}, {:id=>100, :number=>20}]
   end
 
   specify "should have insert return primary key value" do
     @ds.insert(:number=>20).should == 2
-    sqls_should_be('INSERT INTO items (number) VALUES (20)')
     @ds.filter(:id=>2).first[:number].should == 20
   end
 
   specify "should delete correctly" do
     @ds.filter(1=>1).delete.should == 1
-    sqls_should_be('DELETE FROM items WHERE (1 = 1)')
     @ds.count.should == 0
   end
 
   specify "should update correctly" do
     @ds.update(:number=>:number+1).should == 1
-    sqls_should_be('UPDATE items SET number = (number + 1)')
     @ds.all.should == [{:id=>1, :number=>11}]
   end
 
   specify "should fetch all results correctly" do
     @ds.all.should == [{:id=>1, :number=>10}]
-    sqls_should_be('SELECT * FROM items')
   end
 
   specify "should fetch a single row correctly" do
     @ds.first.should == {:id=>1, :number=>10}
-    sqls_should_be('SELECT * FROM items LIMIT 1')
   end
   
   specify "should fetch correctly with a limit" do
@@ -80,7 +74,6 @@ describe "Simple Dataset operations" do
 
   specify "should alias columns correctly" do
     @ds.select(:id___x, :number___n).first.should == {:x=>1, :n=>10}
-    sqls_should_be("SELECT id AS 'x', number AS 'n' FROM items LIMIT 1")
   end
 end
 
@@ -247,7 +240,6 @@ describe "Simple Dataset operations in transactions" do
   cspecify "should insert correctly with a primary key specified inside a transaction", :mssql do
     INTEGRATION_DB.transaction do
       @ds.insert(:id=>100, :number=>20)
-      sqls_should_be('BEGIN', /INSERT INTO items_insert_in_transaction \((number, id|id, number)\) VALUES \((100, 20|20, 100)\)/)
       @ds.count.should == 1
       @ds.order(:id).all.should == [{:id=>100, :number=>20}]
     end
@@ -256,7 +248,6 @@ describe "Simple Dataset operations in transactions" do
   specify "should have insert return primary key value inside a transaction" do
     INTEGRATION_DB.transaction do
       @ds.insert(:number=>20).should == 1
-      sqls_should_be('BEGIN', /INSERT INTO items_insert_in_transaction \(number\) VALUES \(20\)/)
       @ds.count.should == 1
       @ds.order(:id).all.should == [{:id=>1, :number=>20}]
     end
