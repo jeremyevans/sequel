@@ -82,10 +82,10 @@ module Sequel
     end
 
     # Returns a dataset grouped by the given column with count by group,
-    # order by the count of records.  Examples:
+    # order by the count of records (in ascending order).  Examples:
     #
-    #   ds.group_and_count(:name) => [{:name=>'a', :count=>1}, ...]
-    #   ds.group_and_count(:first_name, :last_name) => [{:first_name=>'a', :last_name=>'b', :count=>1}, ...]
+    #   ds.group_and_count(:name).all => [{:name=>'a', :count=>1}, ...]
+    #   ds.group_and_count(:first_name, :last_name).all => [{:first_name=>'a', :last_name=>'b', :count=>1}, ...]
     def group_and_count(*columns)
       group(*columns).select(*(columns + [COUNT_OF_ALL_AS_COUNT])).order(:count)
     end
