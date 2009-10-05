@@ -487,3 +487,168 @@ describe "Sequel::Dataset#import and #multi_insert" do
     @ids.all.should == [{:i=>10}, {:i=>20}]
   end
 end
+
+describe "Sequel::Dataset DSL support" do
+  before do
+    @db = INTEGRATION_DB
+    @db.create_table!(:a){Integer :a; Integer :b}
+    @ds = @db[:a].order(:a)
+  end
+  after do
+    @db.drop_table(:a)
+  end
+  
+  it "should work with standard mathematical operators" do
+    @ds.insert(20, 10)
+    @ds.get{a + b}.to_i.should == 30
+    @ds.get{a - b}.to_i.should == 10
+    @ds.get{a * b}.to_i.should == 200
+    @ds.get{a / b}.to_i.should == 2
+  end
+  
+  cspecify "should work with standard bitwise mathematical operators", :mssql, :h2 do
+    @ds.insert(24, 2)
+    @ds.get{a.sql_number << b}.to_i.should == 96
+    @ds.get{a.sql_number >> b}.to_i.should == 6
+    @ds.delete
+    @ds.insert(3, 5)
+    @ds.get{a.sql_number | b}.to_i.should == 7
+    @ds.get{a.sql_number & b}.to_i.should == 1
+  end
+  
+  cspecify "should work with the bitwise compliment operator", :mysql, :h2 do
+    @ds.insert(3, 5)
+    @ds.get{~a.sql_number}.to_i.should == -4
+  end
+  
+  cspecify "should work with inequality operators", :mssql do
+    @ds.insert(20, 20)
+    ['0', 0, false].should include(@ds.get{a > b})
+    ['0', 0, false].should include(@ds.get{a < b})
+    ['1', 1, true].should include(@ds.get{a <= b})
+    ['1', 1, true].should include(@ds.get{a >= b})
+  end
+  
+  cspecify "should work with casting and string concatentation", :mssql do
+    @ds.insert(20, 20)
+    @ds.get{a.cast_string + b}.should == '2020'
+  end
+  
+  it "should work with ordering" do
+    @ds.insert(10, 20)
+    @ds.insert(20, 10)
+    @ds.order(:a, :b).all.should == [{:a=>10, :b=>20}, {:a=>20, :b=>10}]
+    @ds.order(:a.asc, :b.asc).all.should == [{:a=>10, :b=>20}, {:a=>20, :b=>10}]
+    @ds.order(:a.desc, :b.desc).all.should == [{:a=>20, :b=>10}, {:a=>10, :b=>20}]
+  end
+  
+  it "should work with qualifying" do
+    @ds.insert(10, 20)
+    @ds.get(:a__b).should == 20
+    @ds.get{a__b}.should == 20
+    @ds.get(:b.qualify(:a)).should == 20
+  end
+  
+  it "should work with aliasing" do
+    @ds.insert(10, 20)
+    @ds.get(:a__b___c).should == 20
+    @ds.get{a__b.as(c)}.should == 20
+    @ds.get(:b.qualify(:a).as(:c)).should == 20
+    @ds.get(:b.as(:c)).should == 20
+  end
+  
+  it "should work with selecting all columns of a table" do
+    @ds.insert(20, 10)
+    @ds.select(:a.*).all.should == [{:a=>20, :b=>10}]
+  end
+  
+  it "should work with ranges as hash values" do
+    @ds.insert(20, 10)
+    @ds.filter(:a=>(10..30)).all.should == [{:a=>20, :b=>10}]
+    @ds.filter(:a=>(25..30)).all.should == []
+    @ds.filter(:a=>(10..15)).all.should == []
+    @ds.exclude(:a=>(10..30)).all.should == []
+    @ds.exclude(:a=>(25..30)).all.should == [{:a=>20, :b=>10}]
+    @ds.exclude(:a=>(10..15)).all.should == [{:a=>20, :b=>10}]
+  end
+  
+  it "should work with nil as hash value" do
+    @ds.insert(20, nil)
+    @ds.filter(:a=>nil).all.should == []
+    @ds.filter(:b=>nil).all.should == [{:a=>20, :b=>nil}]
+    @ds.exclude(:b=>nil).all.should == []
+    @ds.exclude(:a=>nil).all.should == [{:a=>20, :b=>nil}]
+  end
+  
+  it "should work with ranges as hash values" do
+    @ds.insert(20, 10)
+    @ds.filter(:a=>(10..30)).all.should == [{:a=>20, :b=>10}]
+    @ds.filter(:a=>(25..30)).all.should == []
+    @ds.filter(:a=>(10..15)).all.should == []
+    @ds.exclude(:a=>(10..30)).all.should == []
+    @ds.exclude(:a=>(25..30)).all.should == [{:a=>20, :b=>10}]
+    @ds.exclude(:a=>(10..15)).all.should == [{:a=>20, :b=>10}]
+  end
+  
+  it "should work with CASE statements" do
+    @ds.insert(20, 10)
+    @ds.filter({{:a=>20}=>20}.case(0) > 0).all.should == [{:a=>20, :b=>10}]
+    @ds.filter({{:a=>15}=>20}.case(0) > 0).all.should == []
+    @ds.filter({20=>20}.case(0, :a) > 0).all.should == [{:a=>20, :b=>10}]
+    @ds.filter({15=>20}.case(0, :a) > 0).all.should == []
+  end
+end
+
+describe "SQL Extract Function" do
+  before do
+    @db = INTEGRATION_DB
+    @db.create_table!(:a){DateTime :a}
+    @ds = @db[:a].order(:a)
+  end
+  after do
+    @db.drop_table(:a)
+  end
+  
+  cspecify "should return the part of the datetime asked for", :sqlite, :mssql do
+    t = Time.now
+    @ds.insert(t)
+    @ds.get{a.extract(:year)}.should == t.year
+    @ds.get{a.extract(:month)}.should == t.month
+    @ds.get{a.extract(:day)}.should == t.day
+  end
+end
+
+describe "Dataset string searching methods" do
+  before do
+    @db = INTEGRATION_DB
+    @db.create_table!(:a){String :a; String :b}
+    @ds = @db[:a].order(:a)
+  end
+  after do
+    @db.drop_table(:a)
+  end
+  
+  cspecify "#grep should return matching rows" do
+    @ds.insert('foo', 'bar')
+    @ds.grep(:a, 'foo').all.should == [{:a=>'foo', :b=>'bar'}]
+    @ds.grep(:b, 'foo').all.should == []
+    @ds.grep(:b, 'bar').all.should == [{:a=>'foo', :b=>'bar'}]
+    @ds.grep(:a, 'bar').all.should == []
+    @ds.grep([:a, :b], %w'foo bar').all.should == [{:a=>'foo', :b=>'bar'}]
+    @ds.grep([:a, :b], %w'boo far').all.should == []
+  end
+  
+  cspecify "#like should return matching rows" do
+    @ds.insert('foo', 'bar')
+    @ds.filter(:a.like('foo')).all.should == [{:a=>'foo', :b=>'bar'}]
+    @ds.filter(:a.like('bar')).all.should == []
+    @ds.filter(:a.like('foo', 'bar')).all.should == [{:a=>'foo', :b=>'bar'}]
+  end
+  
+  cspecify "#ilike should return matching rows, in a case insensitive manner" do
+    @ds.insert('foo', 'bar')
+    @ds.filter(:a.ilike('Foo')).all.should == [{:a=>'foo', :b=>'bar'}]
+    @ds.filter(:a.ilike('baR')).all.should == []
+    @ds.filter(:a.ilike('FOO', 'BAR')).all.should == [{:a=>'foo', :b=>'bar'}]
+  end
+end
