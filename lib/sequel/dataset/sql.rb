@@ -323,12 +323,10 @@ module Sequel
     end
     alias group_by group
 
-    # Returns a copy of the dataset with the HAVING conditions changed. Raises 
-    # an error if the dataset has not been grouped. See #filter for argument types.
+    # Returns a copy of the dataset with the HAVING conditions changed. See #filter for argument types.
     #
     #   dataset.group(:sum).having(:sum=>10) # SQL: SELECT * FROM items GROUP BY sum HAVING sum = 10 
     def having(*cond, &block)
-      raise(InvalidOperation, "Can only specify a HAVING clause on a grouped dataset") unless @opts[:group]
       _filter(:having, *cond, &block)
     end
     

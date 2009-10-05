@@ -1,5 +1,7 @@
 === HEAD
 
+* No longer require GROUP BY to use HAVING, except on SQLite (jeremyevans)
+
 * Add emulated support for the lack of multiple column IN/NOT IN support in MSSQL and SQLite (jeremyevans)
 
 * Add emulated support for #ilike on MSSQL and H2 (jeremyevans)

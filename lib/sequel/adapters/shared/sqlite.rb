@@ -265,6 +265,12 @@ module Sequel
         @opts[:where] ? super : filter(1=>1).delete
       end
       
+      # HAVING requires GROUP BY on SQLite
+      def having(*cond, &block)
+        raise(InvalidOperation, "Can only specify a HAVING clause on a grouped dataset") unless @opts[:group]
+        super
+      end
+      
       # SQLite uses the nonstandard ` (backtick) for quoting identifiers.
       def quoted_identifier(c)
         "`#{c}`"

@@ -626,10 +626,6 @@ context "Dataset#having" do
     @columns = "region, sum(population), avg(gdp)"
   end
 
-  specify "should raise if the dataset is not grouped" do
-    proc {@dataset.having('avg(gdp) > 10')}.should raise_error(Sequel::InvalidOperation)
-  end
-
   specify "should affect select statements" do
     @d1.select_sql.should ==
       "SELECT #{@columns} FROM test GROUP BY region HAVING (sum(population) > 10)"
