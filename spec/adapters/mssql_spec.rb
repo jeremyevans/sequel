@@ -6,6 +6,32 @@ unless defined?(MSSQL_DB)
 end
 INTEGRATION_DB = MSSQL_DB unless defined?(INTEGRATION_DB)
 
+def MSSQL_DB.sqls
+  (@sqls ||= [])
+end
+logger = Object.new
+def logger.method_missing(m, msg)
+  MSSQL_DB.sqls << msg
+end
+MSSQL_DB.logger = logger
+
+MSSQL_DB.create_table! :test do
+  text :name
+  integer :value, :index => true
+end
+MSSQL_DB.create_table! :test2 do
+  text :name
+  integer :value
+end
+MSSQL_DB.create_table! :test3 do
+  integer :value
+  timestamp :time
+end
+MSSQL_DB.create_table! :test4 do
+  varchar :name, :size => 20
+  varbinary :value
+end
+
 context "A MSSQL database" do
   before do
     @db = MSSQL_DB
@@ -50,21 +76,42 @@ context "MSSQL Dataset#output" do
     @db.drop_table(:out)
   end
 
-  specify "should format OUTPUT clauses for DELETE statements" do
+  specify "should format OUTPUT clauses without INTO for DELETE statements" do
+    @ds.output(nil, [:deleted__name, :deleted__value]).delete_sql.should =~
+      /DELETE FROM ITEMS OUTPUT DELETED.(NAME|VALUE), DELETED.(NAME|VALUE)/
+    @ds.output(nil, [:deleted.*]).delete_sql.should =~
+      /DELETE FROM ITEMS OUTPUT DELETED.*/
+  end
+  
+  specify "should format OUTPUT clauses with INTO for DELETE statements" do
     @ds.output(:out, [:deleted__name, :deleted__value]).delete_sql.should =~
       /DELETE FROM ITEMS OUTPUT DELETED.(NAME|VALUE), DELETED.(NAME|VALUE) INTO OUT/
     @ds.output(:out, {:name => :deleted__name, :value => :deleted__value}).delete_sql.should =~
       /DELETE FROM ITEMS OUTPUT DELETED.(NAME|VALUE), DELETED.(NAME|VALUE) INTO OUT \((NAME|VALUE), (NAME|VALUE)\)/
   end
 
-  specify "should format OUTPUT clauses for INSERT statements" do
+  specify "should format OUTPUT clauses without INTO for INSERT statements" do
+    @ds.output(nil, [:inserted__name, :inserted__value]).insert_sql(:name => "name", :value => 1).should =~
+      /INSERT INTO ITEMS \((NAME|VALUE), (NAME|VALUE)\) OUTPUT INSERTED.(NAME|VALUE), INSERTED.(NAME|VALUE) VALUES \((N'name'|1), (N'name'|1)\)/
+    @ds.output(nil, [:inserted.*]).insert_sql(:name => "name", :value => 1).should =~
+      /INSERT INTO ITEMS \((NAME|VALUE), (NAME|VALUE)\) OUTPUT INSERTED.* VALUES \((N'name'|1), (N'name'|1)\)/
+  end
+
+  specify "should format OUTPUT clauses with INTO for INSERT statements" do
     @ds.output(:out, [:inserted__name, :inserted__value]).insert_sql(:name => "name", :value => 1).should =~
       /INSERT INTO ITEMS \((NAME|VALUE), (NAME|VALUE)\) OUTPUT INSERTED.(NAME|VALUE), INSERTED.(NAME|VALUE) INTO OUT VALUES \((N'name'|1), (N'name'|1)\)/
     @ds.output(:out, {:name => :inserted__name, :value => :inserted__value}).insert_sql(:name => "name", :value => 1).should =~
       /INSERT INTO ITEMS \((NAME|VALUE), (NAME|VALUE)\) OUTPUT INSERTED.(NAME|VALUE), INSERTED.(NAME|VALUE) INTO OUT \((NAME|VALUE), (NAME|VALUE)\) VALUES \((N'name'|1), (N'name'|1)\)/
   end
 
-  specify "should format OUTPUT clauses for UPDATE statements" do
+  specify "should format OUTPUT clauses without INTO for UPDATE statements" do
+    @ds.output(nil, [:inserted__name, :deleted__value]).update_sql(:value => 2).should =~
+      /UPDATE ITEMS SET VALUE = 2 OUTPUT (INSERTED.NAME|DELETED.VALUE), (INSERTED.NAME|DELETED.VALUE)/
+    @ds.output(nil, [:inserted.*]).update_sql(:value => 2).should =~
+      /UPDATE ITEMS SET VALUE = 2 OUTPUT INSERTED.*/
+  end
+
+  specify "should format OUTPUT clauses with INTO for UPDATE statements" do
     @ds.output(:out, [:inserted__name, :deleted__value]).update_sql(:value => 2).should =~
       /UPDATE ITEMS SET VALUE = 2 OUTPUT (INSERTED.NAME|DELETED.VALUE), (INSERTED.NAME|DELETED.VALUE) INTO OUT/
     @ds.output(:out, {:name => :inserted__name, :value => :deleted__value}).update_sql(:value => 2).should =~
@@ -127,26 +174,26 @@ context "MSSQL dataset" do
       before do
         @db = @db.clone
         class << @db
-          attr_reader :sqls
+          attr_reader :import_sqls
 
           def execute(sql, opts={})
-            @sqls ||= []
-            @sqls << sql
+            @import_sqls ||= []
+            @import_sqls << sql
           end
           alias execute_dui execute
 
           def transaction(opts={})
-            @sqls ||= []
-            @sqls << 'BEGIN'
+            @import_sqls ||= []
+            @import_sqls << 'BEGIN'
             yield
-            @sqls << 'COMMIT'
+            @import_sqls << 'COMMIT'
           end
         end
       end
 
       specify "should prepend INSERT statements with WITH clause" do
         @db[:items].with(:items, @db[:inventory].group(:type)).import([:x, :y], [[1, 2], [3, 4], [5, 6]], :slice => 2)
-        @db.sqls.should == [
+        @db.import_sqls.should == [
           'BEGIN',
           "WITH ITEMS AS (SELECT * FROM INVENTORY GROUP BY TYPE) INSERT INTO ITEMS (X, Y) SELECT 1, 2 UNION ALL SELECT 3, 4",
           'COMMIT',
@@ -271,3 +318,25 @@ describe "Common Table Expressions" do
   end
 end
 
+context "MSSSQL::Dataset#insert" do
+  before do
+    @db = MSSQL_DB
+    @db.create_table!(:test5){primary_key :xid; Integer :value}
+    @db.sqls.clear
+    @ds = @db[:test5]
+  end
+  after do
+    @db.drop_table(:test5) rescue nil
+  end
+
+  specify "should have insert_select return nil if disable_insert_output is used" do
+    @ds.disable_insert_output.insert_select(:value=>10).should == nil
+  end
+
+  specify "should have insert_select insert the record and return the inserted record" do
+    @ds.meta_def(:server_version){80201}
+    h = @ds.insert_select(:value=>10)
+    h[:value].should == 10
+    @ds.first(:xid=>h[:xid])[:value].should == 10
+  end
+end

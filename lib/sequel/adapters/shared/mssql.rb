@@ -195,6 +195,16 @@ module Sequel
         CONSTANT_MAP[constant] || super
       end
       
+      # Disable the use of INSERT OUPUT
+      def disable_insert_output
+        clone(:disable_insert_output=>true)
+      end
+
+      # Disable the use of INSERT OUPUT
+      def disable_insert_output!
+        mutation_method(:disable_insert_output)
+      end
+
       # When returning all rows, if an offset is used, delete the row_number column
       # before yielding the row.
       def fetch_rows(sql, &block)
@@ -204,6 +214,11 @@ module Sequel
       # MSSQL uses the CONTAINS keyword for full text search
       def full_text_search(cols, terms, opts = {})
         filter("CONTAINS (#{literal(cols)}, #{literal(terms)})")
+      end
+
+      def insert_select(*values)
+        return if opts[:disable_insert_output]
+        naked.clone(default_server_opts(:sql=>output(nil, [:inserted.*]).insert_sql(*values))).single_record
       end
 
       # MSSQL doesn't support the USING clause, so emulate it using a ON clause.
