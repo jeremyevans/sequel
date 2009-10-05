@@ -193,6 +193,12 @@ describe Sequel::Model, "many_to_one" do
     MODEL_DB.sqls.should == ["SELECT * FROM nodes WHERE ((nodes.parent_id = 1) AND (nodes.id = 234)) LIMIT 1"]
   end
   
+  it "should not issue query if not all keys have values" do
+    @c2.many_to_one :parent, :class => @c2, :key=>[:id, :parent_id], :primary_key=>[:parent_id, :id]
+    @c2.new(:id => 1, :parent_id => nil).parent.should == nil
+    MODEL_DB.sqls.should == []
+  end
+  
   it "should raise an Error unless same number of composite keys used" do
     proc{@c2.many_to_one :parent, :class => @c2, :primary_key=>[:parent_id, :id]}.should raise_error(Sequel::Error)
     proc{@c2.many_to_one :parent, :class => @c2, :key=>[:id, :parent_id], :primary_key=>:id}.should raise_error(Sequel::Error)
@@ -632,6 +638,12 @@ describe Sequel::Model, "one_to_many" do
     @c2.load(:id => 1234, :x=>234).attributes_dataset.sql.should == 'SELECT * FROM attributes WHERE ((attributes.node_id = 1234) AND (attributes.id = 234))'
   end
   
+  it "should not issue query if not all keys have values" do
+    @c2.one_to_many :attributes, :class => @c1, :key =>[:node_id, :id], :primary_key=>[:id, :x]
+    @c2.load(:id => 1234, :x=>nil).attributes.should == []
+    MODEL_DB.sqls.should == []
+  end
+  
   it "should raise an Error unless same number of composite keys used" do
     proc{@c2.one_to_many :attributes, :class => @c1, :key=>[:node_id, :id]}.should raise_error(Sequel::Error)
     proc{@c2.one_to_many :attributes, :class => @c1, :primary_key=>[:node_id, :id]}.should raise_error(Sequel::Error)
@@ -714,7 +726,6 @@ describe Sequel::Model, "one_to_many" do
     a = @c2.new
     n = @c1.load(:id=>123)
     proc{a.attributes_dataset}.should raise_error(Sequel::Error)
-    proc{a.attributes}.should raise_error(Sequel::Error)
     proc{a.add_attribute(n)}.should raise_error(Sequel::Error)
     proc{a.remove_attribute(n)}.should raise_error(Sequel::Error)
     proc{a.remove_all_attributes}.should raise_error(Sequel::Error)
@@ -1410,6 +1421,12 @@ describe Sequel::Model, "many_to_many" do
     @c2.load(:id => 1234, :x=>5).attributes_dataset.sql.should == 'SELECT attributes.* FROM attributes INNER JOIN attributes_nodes ON ((attributes_nodes.r1 = attributes.id) AND (attributes_nodes.r2 = attributes.y) AND (attributes_nodes.l1 = 1234) AND (attributes_nodes.l2 = 5))'
   end
   
+  it "should not issue query if not all keys have values" do
+    @c2.many_to_many :attributes, :class => @c1, :left_key=>[:l1, :l2], :right_key=>[:r1, :r2], :left_primary_key=>[:id, :x], :right_primary_key=>[:id, :y]
+    @c2.load(:id => 1234, :x=>nil).attributes.should == []
+    MODEL_DB.sqls.should == []
+  end
+  
   it "should raise an Error unless same number of composite keys used" do
     proc{@c2.many_to_many :attributes, :class => @c1, :left_key=>[:node_id, :id]}.should raise_error(Sequel::Error)
     proc{@c2.many_to_many :attributes, :class => @c1, :left_primary_key=>[:node_id, :id]}.should raise_error(Sequel::Error)
@@ -1577,7 +1594,6 @@ describe Sequel::Model, "many_to_many" do
     a = @c2.new
     n = @c1.load(:id=>123)
     proc{a.attributes_dataset}.should raise_error(Sequel::Error)
-    proc{a.attributes}.should raise_error(Sequel::Error)
     proc{a.add_attribute(n)}.should raise_error(Sequel::Error)
     proc{a.remove_attribute(n)}.should raise_error(Sequel::Error)
     proc{a.remove_all_attributes}.should raise_error(Sequel::Error)

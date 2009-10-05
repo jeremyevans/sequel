@@ -135,3 +135,8 @@ describe Sequel::Model::Associations::AssociationReflection, "#select" do
   end
 end
 
+describe Sequel::Model::Associations::AssociationReflection, "#can_have_associated_objects?" do
+  it "should be true for any given object (for backward compatibility)" do
+    Sequel::Model::Associations::AssociationReflection.new.can_have_associated_objects?(Object.new).should == true
+  end
+end

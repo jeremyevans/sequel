@@ -56,6 +56,13 @@ module Sequel
         def associated_class
           self[:class] ||= constantize(self[:class_name])
         end
+        
+        # Whether this association can have associated objects, given the current
+        # object.  Should be false if obj cannot have associated objects because
+        # the necessary key columns are NULL.
+        def can_have_associated_objects?(obj)
+          true
+        end
 
         # Name symbol for the dataset association method
         def dataset_method
@@ -151,6 +158,12 @@ module Sequel
       class ManyToOneAssociationReflection < AssociationReflection
         ASSOCIATION_TYPES[:many_to_one] = self
     
+        # many_to_one associations can only have associated objects if none of
+        # the :keys options have a nil value.
+        def can_have_associated_objects?(obj)
+          !self[:keys].any?{|k| obj.send(k).nil?}
+        end
+        
         # Whether the dataset needs a primary key to function, false for many_to_one associations.
         def dataset_need_primary_key?
           false
@@ -199,6 +212,12 @@ module Sequel
     
       class OneToManyAssociationReflection < AssociationReflection
         ASSOCIATION_TYPES[:one_to_many] = self
+        
+        # one_to_many associations can only have associated objects if none of
+        # the :keys options have a nil value.
+        def can_have_associated_objects?(obj)
+          !self[:primary_keys].any?{|k| obj.send(k).nil?}
+        end
     
         # Default foreign key name symbol for key in associated table that points to
         # current table's primary key.
@@ -247,6 +266,12 @@ module Sequel
         # The table containing the column to use for the associated key when eagerly loading
         def associated_key_table
           self[:join_table]
+        end
+        
+        # many_to_many associations can only have associated objects if none of
+        # the :left_primary_keys options have a nil value.
+        def can_have_associated_objects?(obj)
+          !self[:left_primary_keys].any?{|k| obj.send(k).nil?}
         end
 
         # The default associated key alias(es) to use when eager loading
@@ -927,11 +952,11 @@ module Sequel
         # Return the associated objects from the dataset, without callbacks, reciprocals, and caching.
         def _load_associated_objects(opts)
           if opts.returns_array?
-            send(opts.dataset_method).all
+            opts.can_have_associated_objects?(self) ? send(opts.dataset_method).all : []
           else
             if !opts[:key]
               send(opts.dataset_method).all.first
-            elsif opts[:keys].all?{|k| send(k)}
+            elsif opts.can_have_associated_objects?(self)
               send(opts.dataset_method).first
             end
           end

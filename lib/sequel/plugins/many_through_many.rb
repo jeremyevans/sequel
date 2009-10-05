@@ -156,7 +156,7 @@ module Sequel
           uses_lcks = opts[:uses_left_composite_keys] = left_key.is_a?(Array)
           left_keys = Array(left_key)
           left_pk = (opts[:left_primary_key] ||= self.primary_key)
-          left_pks = Array(left_pk)
+          left_pks = opts[:left_primary_keys] = Array(left_pk)
           opts[:dataset] ||= lambda do
             ds = opts.associated_class
             opts.reverse_edges.each{|t| ds = ds.join(t[:table], Array(t[:left]).zip(Array(t[:right])), :table_alias=>t[:alias])}
