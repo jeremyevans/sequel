@@ -486,6 +486,66 @@ describe "Sequel::Dataset#import and #multi_insert" do
     @ids.import([:i], @eds)
     @ids.all.should == [{:i=>10}, {:i=>20}]
   end
+  
+  it "should have import work with the :slice_size option" do
+    @ids.import([:i], [[10], [20], [30]], :slice_size=>1)
+    @ids.all.should == [{:i=>10}, {:i=>20}, {:i=>30}]
+    @ids.delete
+    @ids.import([:i], [[10], [20], [30]], :slice_size=>2)
+    @ids.all.should == [{:i=>10}, {:i=>20}, {:i=>30}]
+    @ids.delete
+    @ids.import([:i], [[10], [20], [30]], :slice_size=>3)
+    @ids.all.should == [{:i=>10}, {:i=>20}, {:i=>30}]
+  end
+end
+
+describe "Sequel::Dataset convenience methods" do
+  before do
+    @db = INTEGRATION_DB
+    @db.create_table!(:a){Integer :a; Integer :b}
+    @ds = @db[:a].order(:a)
+  end
+  after do
+    @db.drop_table(:a)
+  end
+  
+  it "#[]= should update matching rows" do
+    @ds.insert(20, 10)
+    @ds[:a=>20] = {:b=>30}
+    @ds.all.should == [{:a=>20, :b=>30}]
+  end
+  
+  it "#empty? should return whether the dataset returns no rows" do
+    @ds.empty?.should == true
+    @ds.insert(20, 10)
+    @ds.empty?.should == false
+  end
+  
+  it "#group_and_count should return a grouping by count" do
+    @ds.group_and_count(:a).all.should == []
+    @ds.insert(20, 10)
+    @ds.group_and_count(:a).all.each{|h| h[:count] = h[:count].to_i}.should == [{:a=>20, :count=>1}]
+    @ds.insert(20, 30)
+    @ds.group_and_count(:a).all.each{|h| h[:count] = h[:count].to_i}.should == [{:a=>20, :count=>2}]
+    @ds.insert(30, 30)
+    @ds.group_and_count(:a).all.each{|h| h[:count] = h[:count].to_i}.should == [{:a=>30, :count=>1}, {:a=>20, :count=>2}]
+  end
+  
+  cspecify "#range should return the range between the maximum and minimum values", :sqlite do
+    @ds = @ds.unordered
+    @ds.insert(20, 10)
+    @ds.insert(30, 10)
+    @ds.range(:a).should == (20..30)
+    @ds.range(:b).should == (10..10)
+  end
+  
+  it "#interval should return the different between the maximum and minimum values" do
+    @ds = @ds.unordered
+    @ds.insert(20, 10)
+    @ds.insert(30, 10)
+    @ds.interval(:a).to_i.should == 10
+    @ds.interval(:b).to_i.should == 0
+  end
 end
 
 describe "Sequel::Dataset DSL support" do
