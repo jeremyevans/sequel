@@ -796,6 +796,7 @@ module Sequel
     class SQLArray < Expression
       # The array of objects this SQLArray wraps
       attr_reader :array
+      alias to_a array
 
       # Create an object with the given array.
       def initialize(array)

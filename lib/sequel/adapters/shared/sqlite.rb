@@ -280,6 +280,11 @@ module Sequel
         false
       end
       
+      # SQLite does not support multiple columns for the IN/NOT IN operators
+      def supports_multiple_column_in?
+        false
+      end
+      
       # SQLite supports timezones in literal timestamps, since it stores them
       # as text.
       def supports_timestamp_timezones?

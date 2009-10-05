@@ -86,6 +86,14 @@ module Sequel
         else
           complex_expression_sql(:OR, [SQL::BooleanExpression.new(:"!=", *args), SQL::BooleanExpression.new(:IS, args.at(0), nil)])
         end
+      when :IN, :"NOT IN"
+        cols = args.at(0)
+        if !supports_multiple_column_in? && cols.is_a?(Array)
+          expr = SQL::BooleanExpression.new(:OR, *args.at(1).to_a.map{|vals| SQL::BooleanExpression.from_value_pairs(cols.zip(vals).map{|col, val| [col, val]})})
+          literal(op == :IN ? expr : ~expr)
+        else
+          "(#{literal(cols)} #{op} #{literal(args.at(1))})"
+        end
       when *TWO_ARITY_OPERATORS
         "(#{literal(args.at(0))} #{op} #{literal(args.at(1))})"
       when *N_ARITY_OPERATORS

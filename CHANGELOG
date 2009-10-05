@@ -1,5 +1,7 @@
 === HEAD
 
+* Add emulated support for the lack of multiple column IN/NOT IN support in MSSQL and SQLite (jeremyevans)
+
 * Add emulated support for #ilike on MSSQL and H2 (jeremyevans)
 
 * Add a :distinct option for all associations, which uses the SQL DISTINCT clause (jeremyevans)

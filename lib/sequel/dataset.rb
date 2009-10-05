@@ -280,6 +280,12 @@ module Sequel
       true
     end
     
+    # Whether the IN/NOT IN operators support multiple columns when an
+    # array of values is given.
+    def supports_multiple_column_in?
+      true
+    end
+    
     # Whether the dataset supports timezones in literal timestamps
     def supports_timestamp_timezones?
       false

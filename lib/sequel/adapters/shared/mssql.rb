@@ -290,6 +290,11 @@ module Sequel
       def supports_is_true?
         false
       end
+      
+      # MSSQL does not support multiple columns for the IN/NOT IN operators
+      def supports_multiple_column_in?
+        false
+      end
 
       # MSSQL 2005+ supports window functions
       def supports_window_functions?

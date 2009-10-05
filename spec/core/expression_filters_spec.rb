@@ -327,6 +327,17 @@ context "Blockless Ruby Filters" do
     @d.l([[:x, nil], [:y, [1,2,3]]].sql_or).should == '((x IS NULL) OR (y IN (1, 2, 3)))'
   end
   
+  it "should emulate columns for array values" do
+    @d.l([:x, :y]=>[[1,2], [3,4]].sql_array).should == '((x, y) IN ((1, 2), (3, 4)))'
+    @d.l([:x, :y, :z]=>[[1,2,5], [3,4,6]]).should == '((x, y, z) IN ((1, 2, 5), (3, 4, 6)))'
+  end
+  
+  it "should emulate multiple column in if not supported" do
+    @d.meta_def(:supports_multiple_column_in?){false}
+    @d.l([:x, :y]=>[[1,2], [3,4]].sql_array).should == '(((x = 1) AND (y = 2)) OR ((x = 3) AND (y = 4)))'
+    @d.l([:x, :y, :z]=>[[1,2,5], [3,4,6]]).should == '(((x = 1) AND (y = 2) AND (z = 5)) OR ((x = 3) AND (y = 4) AND (z = 6)))'
+  end
+  
   it "should support Array#sql_string_join for concatenation of SQL strings" do
     @d.lit([:x].sql_string_join).should == '(x)'
     @d.lit([:x].sql_string_join(', ')).should == '(x)'
