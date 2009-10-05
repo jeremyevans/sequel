@@ -597,6 +597,29 @@ describe "Sequel::Dataset DSL support" do
     @ds.filter({20=>20}.case(0, :a) > 0).all.should == [{:a=>20, :b=>10}]
     @ds.filter({15=>20}.case(0, :a) > 0).all.should == []
   end
+  
+  it "should work multiple value arrays" do
+    @ds.insert(20, 10)
+    @ds.quote_identifiers = false
+    @ds.filter([:a, :b]=>[[20, 10]].sql_array).all.should == [{:a=>20, :b=>10}]
+    @ds.filter([:a, :b]=>[[10, 20]].sql_array).all.should == []
+    @ds.filter([:a, :b]=>[[20, 10], [1, 2]].sql_array).all.should == [{:a=>20, :b=>10}]
+    @ds.filter([:a, :b]=>[[10, 10], [20, 20]].sql_array).all.should == []
+    
+    @ds.exclude([:a, :b]=>[[20, 10]].sql_array).all.should == []
+    @ds.exclude([:a, :b]=>[[10, 20]].sql_array).all.should == [{:a=>20, :b=>10}]
+    @ds.exclude([:a, :b]=>[[20, 10], [1, 2]].sql_array).all.should == []
+    @ds.exclude([:a, :b]=>[[10, 10], [20, 20]].sql_array).all.should == [{:a=>20, :b=>10}]
+  end
+  
+  it "should work multiple conditions" do
+    @ds.insert(20, 10)
+    @ds.filter(:a=>20, :b=>10).all.should == [{:a=>20, :b=>10}]
+    @ds.filter([[:a, 20], [:b, 10]]).all.should == [{:a=>20, :b=>10}]
+    @ds.filter({:a=>20} & {:b=>10}).all.should == [{:a=>20, :b=>10}]
+    @ds.filter({:a=>20} | {:b=>5}).all.should == [{:a=>20, :b=>10}]
+    @ds.filter(~{:a=>10}).all.should == [{:a=>20, :b=>10}]
+  end
 end
 
 describe "SQL Extract Function" do
@@ -618,7 +641,7 @@ describe "SQL Extract Function" do
   end
 end
 
-describe "Dataset string searching methods" do
+describe "Dataset string methods" do
   before do
     @db = INTEGRATION_DB
     @db.create_table!(:a){String :a; String :b}
@@ -650,5 +673,11 @@ describe "Dataset string searching methods" do
     @ds.filter(:a.ilike('Foo')).all.should == [{:a=>'foo', :b=>'bar'}]
     @ds.filter(:a.ilike('baR')).all.should == []
     @ds.filter(:a.ilike('FOO', 'BAR')).all.should == [{:a=>'foo', :b=>'bar'}]
+  end
+  
+  it "should work with strings created with sql_string_join" do
+    @ds.insert('foo', 'bar')
+    @ds.get([:a, :b].sql_string_join).should == 'foobar'
+    @ds.get([:a, :b].sql_string_join(' ')).should == 'foo bar'
   end
 end
