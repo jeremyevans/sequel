@@ -176,11 +176,15 @@ module Sequel
       WILDCARD = LiteralString.new('*').freeze
       CONSTANT_MAP = {:CURRENT_DATE=>'CAST(CURRENT_TIMESTAMP AS DATE)'.freeze, :CURRENT_TIME=>'CAST(CURRENT_TIMESTAMP AS TIME)'.freeze}
 
-      # MSSQL uses + for string concatenation
+      # MSSQL uses + for string concatenation, and LIKE is case insensitive by default.
       def complex_expression_sql(op, args)
         case op
         when :'||'
           super(:+, args)
+        when :ILIKE
+          super(:LIKE, args)
+        when :"NOT ILIKE"
+          super(:"NOT LIKE", args)
         else
           super(op, args)
         end

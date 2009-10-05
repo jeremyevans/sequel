@@ -76,6 +76,18 @@ module Sequel
       class Dataset < JDBC::Dataset
         SELECT_CLAUSE_METHODS = clause_methods(:select, %w'distinct columns from join where group having compounds order limit')
         
+        # Work around H2's lack of a case insensitive LIKE operator
+        def complex_expression_sql(op, args)
+          case op
+          when :ILIKE
+            super(:LIKE, [SQL::PlaceholderLiteralString.new("CAST(? AS VARCHAR_IGNORECASE)", [args.at(0)]), args.at(1)])
+          when :"NOT ILIKE"
+            super(:"NOT LIKE", [SQL::PlaceholderLiteralString.new("CAST(? AS VARCHAR_IGNORECASE)", [args.at(0)]), args.at(1)])
+          else
+            super(op, args)
+          end
+        end
+        
         # H2 requires SQL standard datetimes
         def requires_sql_standard_datetimes?
           true
