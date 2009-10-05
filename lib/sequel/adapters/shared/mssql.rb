@@ -163,6 +163,17 @@ module Sequel
       def type_literal_generic_file(column)
         :image
       end
+
+      # support for clustered index type
+      def index_definition_sql(table_name, index)
+        index_name = index[:name] || default_index_name(table_name, index[:columns])
+        clustered = index[:type] == :clustered
+        if index[:where]
+          raise Error, "Partial indexes are not supported for this database"
+        else
+          "CREATE #{'UNIQUE ' if index[:unique]}#{'CLUSTERED ' if clustered}INDEX #{quote_identifier(index_name)} ON #{quote_schema_table(table_name)} #{literal(index[:columns])}"
+        end
+      end
     end
   
     module DatasetMethods
