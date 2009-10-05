@@ -162,15 +162,18 @@ describe "Sequel::Model Composite Key Associations" do
       foreign_key [:tag_id1, :tag_id2], :tags
     end
     class ::Artist < Sequel::Model(@db)
+      set_primary_key :id1, :id2
       unrestrict_primary_key
       one_to_many :albums, :key=>[:artist_id1, :artist_id2], :primary_key=>[:id1, :id2]
     end
     class ::Album < Sequel::Model(@db)
+      set_primary_key :id1, :id2
       unrestrict_primary_key
       many_to_one :artist, :key=>[:artist_id1, :artist_id2], :primary_key=>[:id1, :id2]
       many_to_many :tags, :left_key=>[:album_id1, :album_id2], :right_key=>[:tag_id1, :tag_id2], :left_primary_key=>[:id1, :id2], :right_primary_key=>[:id1, :id2]
     end
     class ::Tag < Sequel::Model(@db)
+      set_primary_key :id1, :id2
       unrestrict_primary_key
       many_to_many :albums, :right_key=>[:album_id1, :album_id2], :left_key=>[:tag_id1, :tag_id2], :left_primary_key=>[:id1, :id2], :right_primary_key=>[:id1, :id2]
     end
