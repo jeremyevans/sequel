@@ -158,6 +158,14 @@ describe "Database schema modifiers" do
     @ds.insert([10])
     @ds.columns!.should == [:number]
   end
+  
+  specify "should allow creating indexes with tables" do
+    @db.create_table!(:items){Integer :number; index :number}
+    @db.table_exists?(:items).should == true
+    @db.schema(:items, :reload=>true).map{|x| x.first}.should == [:number]
+    @ds.insert([10])
+    @ds.columns!.should == [:number]
+  end
 
   specify "should handle foreign keys correctly when creating tables" do
     @db.create_table!(:items) do 

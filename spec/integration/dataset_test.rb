@@ -651,7 +651,7 @@ describe "Dataset string methods" do
     @db.drop_table(:a)
   end
   
-  cspecify "#grep should return matching rows" do
+  it "#grep should return matching rows" do
     @ds.insert('foo', 'bar')
     @ds.grep(:a, 'foo').all.should == [{:a=>'foo', :b=>'bar'}]
     @ds.grep(:b, 'foo').all.should == []
@@ -661,14 +661,14 @@ describe "Dataset string methods" do
     @ds.grep([:a, :b], %w'boo far').all.should == []
   end
   
-  cspecify "#like should return matching rows" do
+  it "#like should return matching rows" do
     @ds.insert('foo', 'bar')
     @ds.filter(:a.like('foo')).all.should == [{:a=>'foo', :b=>'bar'}]
     @ds.filter(:a.like('bar')).all.should == []
     @ds.filter(:a.like('foo', 'bar')).all.should == [{:a=>'foo', :b=>'bar'}]
   end
   
-  cspecify "#ilike should return matching rows, in a case insensitive manner" do
+  it "#ilike should return matching rows, in a case insensitive manner" do
     @ds.insert('foo', 'bar')
     @ds.filter(:a.ilike('Foo')).all.should == [{:a=>'foo', :b=>'bar'}]
     @ds.filter(:a.ilike('baR')).all.should == []
@@ -679,5 +679,59 @@ describe "Dataset string methods" do
     @ds.insert('foo', 'bar')
     @ds.get([:a, :b].sql_string_join).should == 'foobar'
     @ds.get([:a, :b].sql_string_join(' ')).should == 'foo bar'
+  end
+end
+
+describe "Dataset identifier methods" do
+  before do
+    class ::String
+      def uprev
+        upcase.reverse
+      end
+    end
+    @db = INTEGRATION_DB
+    @db.create_table!(:a){Integer :ab}
+    @ds = @db[:a].order(:ab)
+    @ds.insert(1)
+  end
+  after do
+    @db.drop_table(:a)
+  end
+  
+  it "#identifier_output_method should change how identifiers are output" do
+    @ds.identifier_output_method = :upcase
+    @ds.first.should == {:AB=>1}
+    @ds.identifier_output_method = :uprev
+    @ds.first.should == {:BA=>1}
+  end
+  
+  it "should work when not quoting identifiers" do
+    @ds.quote_identifiers = false
+    @ds.first.should == {:ab=>1}
+  end
+end
+
+describe "Dataset defaults and overrides" do
+  before do
+    @db = INTEGRATION_DB
+    @db.create_table!(:a){Integer :a}
+    @ds = @db[:a].order(:a)
+  end
+  after do
+    @db.drop_table(:a)
+  end
+  
+  it "#set_defaults should set defaults that can be overridden" do
+    @ds = @ds.set_defaults(:a=>10)
+    @ds.insert
+    @ds.insert(:a=>20)
+    @ds.all.should == [{:a=>10}, {:a=>20}]
+  end
+  
+  it "#set_overrides should set defaults that cannot be overridden" do
+    @ds = @ds.set_overrides(:a=>10)
+    @ds.insert
+    @ds.insert(:a=>20)
+    @ds.all.should == [{:a=>10}, {:a=>10}]
   end
 end
