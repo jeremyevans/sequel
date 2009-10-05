@@ -547,6 +547,57 @@ describe "Sequel::Dataset convenience methods" do
     @ds.interval(:b).to_i.should == 0
   end
 end
+  
+describe "Sequel::Dataset main SQL methods" do
+  before do
+    @db = INTEGRATION_DB
+    @db.create_table!(:a){Integer :a; Integer :b}
+    @ds = @db[:a].order(:a)
+  end
+  after do
+    @db.drop_table(:a)
+  end
+  
+  it "#exists should return a usable exists clause" do
+    @ds.filter(@db[:a___c].filter(:c__a=>:a__b).exists).all.should == []
+    @ds.insert(20, 30)
+    @ds.insert(10, 20)
+    @ds.filter(@db[:a___c].filter(:c__a=>:a__b).exists).all.should == [{:a=>10, :b=>20}]
+  end
+  
+  it "#filter and #exclude should work with placeholder strings" do
+    @ds.insert(20, 30)
+    @ds.filter("a > ?", 15).all.should == [{:a=>20, :b=>30}]
+    @ds.exclude("b < ?", 15).all.should == [{:a=>20, :b=>30}]
+    @ds.filter("b < ?", 15).invert.all.should == [{:a=>20, :b=>30}]
+  end
+  
+  it "#and and #or should work with placeholder strings" do
+    @ds.insert(20, 30)
+    @ds.filter(:a=>20).and(:b=>30).all.should == [{:a=>20, :b=>30}]
+    @ds.filter(:a=>20).and(:b=>15).all.should == []
+    @ds.filter(:a=>20).or(:b=>15).all.should == [{:a=>20, :b=>30}]
+    @ds.filter(:a=>10).or(:b=>15).all.should == []
+  end
+  
+  it "#having should work correctly" do
+    @ds.unordered!
+    @ds.select{[b, max(a).as(c)]}.group(:b).having{max(a) > 30}.all.should == []
+    @ds.insert(20, 30)
+    @ds.select{[b, max(a).as(c)]}.group(:b).having{max(a) > 30}.all.should == []
+    @ds.insert(40, 20)
+    @ds.select{[b, max(a).as(c)]}.group(:b).having{max(a) > 30}.all.each{|h| h[:c] = h[:c].to_i}.should == [{:b=>20, :c=>40}]
+  end
+  
+  cspecify "#having should work without a previous group", :sqlite do
+    @ds.unordered!
+    @ds.select{max(a).as(c)}.having{max(a) > 30}.all.should == []
+    @ds.insert(20, 30)
+    @ds.select{max(a).as(c)}.having{max(a) > 30}.all.should == []
+    @ds.insert(40, 20)
+    @ds.select{max(a).as(c)}.having{max(a) > 30}.all.each{|h| h[:c] = h[:c].to_i}.should == [{:c=>40}]
+  end
+end
 
 describe "Sequel::Dataset DSL support" do
   before do
