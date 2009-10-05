@@ -1,5 +1,7 @@
 === HEAD
 
+* Fix use of MSSQL with ruby 1.9 (cult hero)
+
 * Don't try to load associated objects when the current object has NULL for one of the key fields (jeremyevans)
 
 * No longer require GROUP BY to use HAVING, except on SQLite (jeremyevans)

@@ -231,9 +231,9 @@ module Sequel
       def output(into, values)
         output = {}
         case values
-          when Hash:
+          when Hash
             output[:column_list], output[:select_list] = values.keys, values.values
-          when Array:
+          when Array
             output[:select_list] = values
         end
         output[:into] = into
