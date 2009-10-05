@@ -219,7 +219,7 @@ module Sequel
     #   software.filter{|o| o.price < 100}.sql #=>
     #     "SELECT * FROM items WHERE ((category = 'software') AND (price < 100))"
     #
-    # See doc/dataset_filters.rdoc for more examples and details.
+    # See doc/dataset_filtering.rdoc for more examples and details.
     def filter(*cond, &block)
       _filter(@opts[:having] ? :having : :where, *cond, &block)
     end
