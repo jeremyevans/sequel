@@ -173,6 +173,7 @@ module Sequel
       # is created.  Also, make sure the inherited class instance variables
       # are copied into the subclass.
       def inherited(subclass)
+        super
         ivs = subclass.instance_variables.collect{|x| x.to_s}
         EMPTY_INSTANCE_VARIABLES.each{|iv| subclass.instance_variable_set(iv, nil) unless ivs.include?(iv.to_s)}
         INHERITED_INSTANCE_VARIABLES.each do |iv, dup|

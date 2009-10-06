@@ -1,5 +1,7 @@
 === HEAD
 
+* Don't ignore Class.inherited in Sequel::Model.inherited (antage) (#277)
+
 * Optimize JDBC::MySQL::DatabaseMethods#last_insert_id to prevent additional queries (tmm1)
 
 * Fix use of MSSQL with ruby 1.9 (cult hero)
