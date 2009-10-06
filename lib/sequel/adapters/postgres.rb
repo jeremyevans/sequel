@@ -304,22 +304,28 @@ module Sequel
       
       # Yield all rows returned by executing the given SQL and converting
       # the types.
-      def fetch_rows(sql)
-        cols = []
-        execute(sql) do |res|
-          res.nfields.times do |fieldnum|
-            cols << [fieldnum, PG_TYPES[res.ftype(fieldnum)], output_identifier(res.fname(fieldnum))]
-          end
-          @columns = cols.map{|c| c.at(2)}
-          res.ntuples.times do |recnum|
-            converted_rec = {}
-            cols.each do |fieldnum, type_proc, fieldsym|
-              value = res.getvalue(recnum, fieldnum)
-              converted_rec[fieldsym] = (value && type_proc) ? type_proc.call(value) : value
-            end
-            yield converted_rec
-          end
-        end
+      def fetch_rows(sql, &block)
+        return cursor_fetch_rows(sql, &block) if @opts[:cursor]
+        execute(sql){|res| yield_hash_rows(res, fetch_rows_set_cols(res), &block)}
+      end
+      
+      # Uses a cursor for fetching records, instead of fetching the entire result
+      # set at once.  Can be used to process large datasets without holding
+      # all rows in memory (which is what the underlying drivers do
+      # by default). Options:
+      #
+      # * :rows_per_fetch - the number of rows per fetch (default 1000).  Higher
+      #   numbers result in fewer queries but greater memory use.
+      #
+      # Usage:
+      #
+      #   DB[:huge_table].use_cursor.each{|row| p row}
+      #   DB[:huge_table].use_cursor(:rows_per_fetch=>10000).each{|row| p row}
+      #
+      # This is untested with the prepared statement/bound variable support,
+      # and unlikely to work with either.
+      def use_cursor(opts={})
+        clone(:cursor=>{:rows_per_fetch=>1000}.merge(opts))
       end
 
       if SEQUEL_POSTGRES_USES_PG
@@ -435,15 +441,67 @@ module Sequel
       end
       
       private
-
+      
+      # Use a cursor to fetch groups of records at a time, yielding them to the block.
+      def cursor_fetch_rows(sql, &block)
+        db.transaction(:server=>@opts[:server]) do 
+          begin
+            execute_ddl("DECLARE sequel_cursor NO SCROLL CURSOR WITHOUT HOLD FOR #{sql}")
+            rows_per_fetch = @opts[:cursor][:rows_per_fetch].to_i
+            rows_per_fetch = 1000 if rows_per_fetch <= 0
+            fetch_sql = "FETCH FORWARD #{rows_per_fetch} FROM sequel_cursor"
+            cols = nil
+            # Load columns only in the first fetch, so subsequent fetches are faster
+            execute(fetch_sql) do |res|
+              cols = fetch_rows_set_cols(res)
+              yield_hash_rows(res, cols, &block)
+              return if res.ntuples < rows_per_fetch
+            end
+            loop do
+              execute(fetch_sql) do |res|
+                yield_hash_rows(res, cols, &block)
+                return if res.ntuples < rows_per_fetch
+              end
+            end
+          ensure
+            execute_ddl("CLOSE sequel_cursor")
+          end
+        end
+      end
+      
+      # Set the @columns based on the result set, and return the array of
+      # field numers, type conversion procs, and name symbol arrays.
+      def fetch_rows_set_cols(res)
+        cols = []
+        res.nfields.times do |fieldnum|
+          cols << [fieldnum, PG_TYPES[res.ftype(fieldnum)], output_identifier(res.fname(fieldnum))]
+        end
+        @columns = cols.map{|c| c.at(2)}
+        cols
+      end
+      
+      # Use the driver's escape_bytea
       def literal_blob(v)
         db.synchronize{|c| "'#{c.escape_bytea(v)}'"}
       end
-
+      
+      # Use the driver's escape_string
       def literal_string(v)
         db.synchronize{|c| "'#{c.escape_string(v)}'"}
       end
-
+      
+      # For each row in the result set, yield a hash with column name symbol
+      # keys and typecasted values.
+      def yield_hash_rows(res, cols)
+        res.ntuples.times do |recnum|
+          converted_rec = {}
+          cols.each do |fieldnum, type_proc, fieldsym|
+            value = res.getvalue(recnum, fieldnum)
+            converted_rec[fieldsym] = (value && type_proc) ? type_proc.call(value) : value
+          end
+          yield converted_rec
+        end
+      end
     end
   end
 end

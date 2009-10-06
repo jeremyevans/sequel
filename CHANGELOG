@@ -1,5 +1,7 @@
 === HEAD
 
+* Add Dataset#use_cursor to the native postgres adapter, for processing large datasets (jeremyevans)
+
 * Don't ignore Class.inherited in Sequel::Model.inherited (antage) (#277)
 
 * Optimize JDBC::MySQL::DatabaseMethods#last_insert_id to prevent additional queries (tmm1)

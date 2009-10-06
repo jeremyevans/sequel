@@ -635,3 +635,37 @@ context "Postgres::Database functions, languages, and triggers" do
     @d.drop_trigger(:test, :identity, :if_exists=>true, :cascade=>true)
   end
 end
+
+context "Postgres::Dataset #use_cursor" do
+  before(:all) do
+    @db = POSTGRES_DB
+    @db.create_table!(:test_cursor){Integer :x}
+    @db.sqls.clear
+    @ds = @db[:test_cursor]
+    @db.transaction{1001.times{|i| @ds.insert(i)}}
+  end
+  after(:all) do
+    @db.drop_table(:test) rescue nil
+  end
+  
+    specify "should return the same results as the non-cursor use" do
+      @ds.all.should == @ds.use_cursor.all
+    end
+    
+    specify "should respect the :rows_per_fetch option" do
+      @db.sqls.clear
+      @ds.use_cursor.all
+      @db.sqls.length.should == 6
+      @db.sqls.clear
+      @ds.use_cursor(:rows_per_fetch=>100).all
+      @db.sqls.length.should == 15
+    end
+    
+    specify "should handle returning inside block" do
+      def @ds.check_return
+        use_cursor.each{|r| return}
+      end
+      @ds.check_return
+      @ds.all.should == @ds.use_cursor.all
+    end
+end
