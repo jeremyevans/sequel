@@ -1178,7 +1178,12 @@ module Sequel
         # Like eager, you need to call .all on the dataset for the eager loading to work.  If you just
         # call each, you will get a normal graphed result back (a hash with model object values).
         def eager_graph(*associations)
-          table_name = model.table_name
+          table_name = begin
+            first_source_alias
+          rescue
+            model.table_name
+          end
+            
           ds = if @opts[:eager_graph]
             self
           else
@@ -1187,7 +1192,7 @@ module Sequel
             # :requirements - array of requirements for this association
             # :alias_association_type_map - the type of association for this association
             # :alias_association_name_map - the name of the association for this association
-            clone(:eager_graph=>{:requirements=>{}, :master=>model.table_name, :alias_association_type_map=>{}, :alias_association_name_map=>{}, :reciprocals=>{}, :cartesian_product_number=>0})
+            clone(:eager_graph=>{:requirements=>{}, :master=>table_name, :alias_association_type_map=>{}, :alias_association_name_map=>{}, :reciprocals=>{}, :cartesian_product_number=>0})
           end
           ds.eager_graph_associations(ds, model, table_name, [], *associations)
         end
