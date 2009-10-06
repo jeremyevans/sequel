@@ -6,7 +6,7 @@ module Sequel
       SERVER_VERSION_SQL = "SELECT CAST(SERVERPROPERTY('ProductVersion') AS varchar)".freeze
       SQL_BEGIN = "BEGIN TRANSACTION".freeze
       SQL_COMMIT = "COMMIT TRANSACTION".freeze
-      SQL_ROLLBACK = "ROLLBACK TRANSACTION".freeze
+      SQL_ROLLBACK = "IF @@TRANCOUNT > 0 ROLLBACK TRANSACTION".freeze
       SQL_ROLLBACK_TO_SAVEPOINT = 'ROLLBACK TRANSACTION autopoint_%d'.freeze
       SQL_SAVEPOINT = 'SAVE TRANSACTION autopoint_%d'.freeze
       TEMPORARY = "#".freeze
