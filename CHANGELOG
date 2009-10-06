@@ -1,5 +1,7 @@
 === HEAD
 
+* Optimize JDBC::MySQL::DatabaseMethods#last_insert_id to prevent additional queries (tmm1)
+
 * Fix use of MSSQL with ruby 1.9 (cult hero)
 
 * Don't try to load associated objects when the current object has NULL for one of the key fields (jeremyevans)

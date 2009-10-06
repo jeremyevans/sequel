@@ -26,13 +26,26 @@ module Sequel
         
         # Get the last inserted id using LAST_INSERT_ID().
         def last_insert_id(conn, opts={})
-          stmt = conn.createStatement
-          begin
-            rs = stmt.executeQuery('SELECT LAST_INSERT_ID()')
-            rs.next
-            rs.getInt(1)
-          ensure
-            stmt.close
+          if stmt = opts[:stmt]
+            rs = stmt.getGeneratedKeys
+            begin
+              if rs.next
+                rs.getInt(1)
+              else
+                0
+              end
+            ensure
+              rs.close
+            end
+          else
+            stmt = conn.createStatement
+            begin
+              rs = stmt.executeQuery('SELECT LAST_INSERT_ID()')
+              rs.next
+              rs.getInt(1)
+            ensure
+              stmt.close
+            end
           end
         end
       end

@@ -167,7 +167,7 @@ module Sequel
                 stmt.execute(sql)
               when :insert
                 stmt.executeUpdate(sql)
-                last_insert_id(conn, opts)
+                last_insert_id(conn, opts.merge(:stmt=>stmt))
               else
                 stmt.executeUpdate(sql)
               end
