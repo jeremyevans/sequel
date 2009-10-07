@@ -249,7 +249,6 @@ describe "Many Through Many Plugin" do
   end
 end
 
-
 describe "Lazy Attributes plugin" do 
   before do
     @db = INTEGRATION_DB
@@ -286,5 +285,56 @@ describe "Lazy Attributes plugin" do
       a.map{|x| x[:num]}.should == [1, 2]
       a.last.num.should == 2
     end
+  end
+end
+
+describe "Many Through Many Plugin" do
+  before do
+    @db = INTEGRATION_DB
+    @db.instance_variable_set(:@schemas, {})
+    @db.create_table!(:artists) do
+      primary_key :id
+      String :name
+    end
+    @db.create_table!(:albums) do
+      primary_key :id
+      String :name
+      foreign_key :artist_id, :artists
+    end
+    class ::Album < Sequel::Model(@db)
+      plugin :tactical_eager_loading
+      many_to_one :artist
+    end
+    class ::Artist < Sequel::Model(@db)
+      plugin :tactical_eager_loading
+      one_to_many :albums, :order=>:name
+    end 
+    
+    @artist1 = Artist.create(:name=>'1')
+    @artist2 = Artist.create(:name=>'2')
+    @artist3 = Artist.create(:name=>'3')
+    @artist4 = Artist.create(:name=>'4')
+    @album1 = Album.create(:name=>'A', :artist=>@artist1)
+    @album2 = Album.create(:name=>'B', :artist=>@artist1)
+    @album3 = Album.create(:name=>'C', :artist=>@artist2)
+    @album4 = Album.create(:name=>'D', :artist=>@artist3)
+    
+    clear_sqls
+  end
+  after do
+    @db.drop_table :albums, :artists
+    [:Album, :Artist].each{|s| Object.send(:remove_const, s)}
+  end
+
+  specify "should eagerly load associations for all items when accessing any item" do
+    a = Artist.order(:name).all
+    a.map{|x| x.associations}.should == [{}, {}, {}, {}]
+    a.first.albums.should == [@album1, @album2]
+    a.map{|x| x.associations}.should == [{:albums=>[@album1, @album2]}, {:albums=>[@album3]}, {:albums=>[@album4]}, {:albums=>[]}]
+    
+    a = Album.order(:name).all
+    a.map{|x| x.associations}.should == [{}, {}, {}, {}]
+    a.first.artist.should == @artist1
+    a.map{|x| x.associations}.should == [{:artist=>@artist1}, {:artist=>@artist1}, {:artist=>@artist2}, {:artist=>@artist3}]
   end
 end
