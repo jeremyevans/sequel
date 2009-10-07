@@ -311,37 +311,7 @@ module Sequel
       # MySQL specific syntax for REPLACE (aka UPSERT, or update if exists,
       # insert if it doesn't).
       def replace_sql(*values)
-        from = source_list(@opts[:from])
-        if values.empty?
-          "REPLACE INTO #{from} DEFAULT VALUES"
-        else
-          values = values[0] if values.size == 1
-          
-          case values
-          when Array
-            if values.empty?
-              "REPLACE INTO #{from} DEFAULT VALUES"
-            else
-              "REPLACE INTO #{from} VALUES #{literal(values)}"
-            end
-          when Hash
-            if values.empty?
-              "REPLACE INTO #{from} DEFAULT VALUES"
-            else
-              fl, vl = [], []
-              values.each {|k, v| fl << literal(k.is_a?(String) ? k.to_sym : k); vl << literal(v)}
-              "REPLACE INTO #{from} (#{fl.join(COMMA_SEPARATOR)}) VALUES (#{vl.join(COMMA_SEPARATOR)})"
-            end
-          when Dataset
-            "REPLACE INTO #{from} #{literal(values)}"
-          else
-            if values.respond_to?(:values)
-              replace_sql(values.values)
-            else  
-              "REPLACE INTO #{from} VALUES (#{literal(values)})"
-            end
-          end
-        end
+        clone(:replace=>true).insert_sql(*values)
       end
       
       #  does not support DISTINCT ON
@@ -360,6 +330,13 @@ module Sequel
       def supports_timestamp_usecs?
         false
       end
+      
+      protected
+      
+      # If this is an replace instead of an insert, use replace instead
+      def _insert_sql
+        @opts[:replace] ? clause_sql(:replace) : super
+      end
 
       private
 
@@ -372,6 +349,7 @@ module Sequel
       def insert_clause_methods
         INSERT_CLAUSE_METHODS
       end
+      alias replace_clause_methods insert_clause_methods
 
       # MySQL doesn't use the SQL standard DEFAULT VALUES.
       def insert_columns_sql(sql)

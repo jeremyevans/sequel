@@ -787,6 +787,25 @@ context "MySQL::Dataset#replace" do
     MYSQL_DB.drop_table(:items)
   end
   
+  specify "should use default values if they exist" do
+    MYSQL_DB.alter_table(:items){set_column_default :id, 1; set_column_default :value, 2}
+    @d.replace
+    @d.all.should == [{:id=>1, :value=>2}]
+    @d.replace([])
+    @d.all.should == [{:id=>1, :value=>2}]
+    @d.replace({})
+    @d.all.should == [{:id=>1, :value=>2}]
+  end
+  
+  specify "should use support arrays, datasets, and multiple values" do
+    @d.replace([1, 2])
+    @d.all.should == [{:id=>1, :value=>2}]
+    @d.replace(1, 2)
+    @d.all.should == [{:id=>1, :value=>2}]
+    @d.replace(@d)
+    @d.all.should == [{:id=>1, :value=>2}]
+  end
+  
   specify "should create a record if the condition is not met" do
     @d.replace(:id => 111, :value => 333)
     @d.all.should == [{:id => 111, :value => 333}]

@@ -1,5 +1,7 @@
 === HEAD
 
+* Fix Dataset#replace with default values on MySQL, and respect insert-related options (jeremyevans)
+
 * Fix Dataset#lock on PostgreSQL (jeremyevans)
 
 * Fix Dataset#explain on SQLite (jeremyevans)
