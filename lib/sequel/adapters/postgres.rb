@@ -444,9 +444,10 @@ module Sequel
       
       # Use a cursor to fetch groups of records at a time, yielding them to the block.
       def cursor_fetch_rows(sql, &block)
-        db.transaction(:server=>@opts[:server]) do 
+        server_opts = {:server=>@opts[:server] || :read_only}
+        db.transaction(server_opts) do 
           begin
-            execute_ddl("DECLARE sequel_cursor NO SCROLL CURSOR WITHOUT HOLD FOR #{sql}")
+            execute_ddl("DECLARE sequel_cursor NO SCROLL CURSOR WITHOUT HOLD FOR #{sql}", server_opts)
             rows_per_fetch = @opts[:cursor][:rows_per_fetch].to_i
             rows_per_fetch = 1000 if rows_per_fetch <= 0
             fetch_sql = "FETCH FORWARD #{rows_per_fetch} FROM sequel_cursor"
@@ -464,7 +465,7 @@ module Sequel
               end
             end
           ensure
-            execute_ddl("CLOSE sequel_cursor")
+            execute_ddl("CLOSE sequel_cursor", server_opts)
           end
         end
       end
