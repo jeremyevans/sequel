@@ -248,3 +248,43 @@ describe "Many Through Many Plugin" do
     Artist.filter(:artists__id=>4).eager_graph(:related_albums).all.map{|x| x.related_albums.map{|a| a.name}}.flatten.sort.should == %w'B D'
   end
 end
+
+
+describe "Lazy Attributes plugin" do 
+  before do
+    @db = INTEGRATION_DB
+    @db.create_table!(:items) do
+      primary_key :id
+      String :name
+      Integer :num
+    end
+    class ::Item < Sequel::Model(@db)
+      plugin :lazy_attributes, :num
+    end
+    Item.create(:name=>'J', :num=>1)
+  end
+  after do
+    @db.drop_table(:items)
+    Object.send(:remove_const, :Item)
+  end
+  
+  specify "should not include lazy attribute columns by default" do
+    Item.first.should == Item.load(:id=>1, :name=>'J')
+  end
+  
+  specify "should load lazy attribute on access" do
+    Item.first.num.should == 1
+  end
+  
+  specify "should load lazy attribute for all items returned when accessing any item if using identity map " do
+    Item.create(:name=>'K', :num=>2)
+    Item.with_identity_map do
+      a = Item.order(:name).all
+      a.should == [Item.load(:id=>1, :name=>'J'), Item.load(:id=>2, :name=>'K')]
+      a.map{|x| x[:num]}.should == [nil, nil]
+      a.first.num.should == 1
+      a.map{|x| x[:num]}.should == [1, 2]
+      a.last.num.should == 2
+    end
+  end
+end
