@@ -288,7 +288,7 @@ describe "Lazy Attributes plugin" do
   end
 end
 
-describe "Many Through Many Plugin" do
+describe "Tactical Eager Loading Plugin" do
   before do
     @db = INTEGRATION_DB
     @db.instance_variable_set(:@schemas, {})
@@ -368,5 +368,78 @@ describe "Identity Map plugin" do
       Item.first
       i.values.should == {:id=>1, :name=>'J', :num=>3}
     end
+  end
+end
+
+describe "Touch plugin" do
+  before do
+    @db = INTEGRATION_DB
+    @db.instance_variable_set(:@schemas, {})
+    @db.create_table!(:artists) do
+      primary_key :id
+      String :name
+      DateTime :updated_at
+    end
+    @db.create_table!(:albums) do
+      primary_key :id
+      String :name
+      foreign_key :artist_id, :artists
+      DateTime :updated_at
+    end
+    class ::Album < Sequel::Model(@db)
+      many_to_one :artist
+      plugin :touch, :associations=>:artist
+    end
+    class ::Artist < Sequel::Model(@db)
+    end 
+    
+    @artist = Artist.create(:name=>'1')
+    @album = Album.create(:name=>'A', :artist=>@artist)
+  end
+  after do
+    @db.drop_table :albums, :artists
+    [:Album, :Artist].each{|s| Object.send(:remove_const, s)}
+  end
+
+  specify "should update the timestamp column when touching the record" do
+    @album.updated_at.should == nil
+    @album.touch
+    @album.updated_at.to_i.should be_close(Time.now.to_i, 2)
+  end
+  
+  cspecify "should update the timestamp column for associated records when the record is updated or destroyed", [:do], [:jdbc, :sqlite] do
+    @artist.updated_at.should == nil
+    @album.update(:name=>'B')
+    @artist.reload.updated_at.to_i.should be_close(Time.now.to_i, 2)
+    @artist.update(:updated_at=>nil)
+    @album.destroy
+    @artist.reload.updated_at.to_i.should be_close(Time.now.to_i, 2)
+  end
+end
+
+describe "Serialization plugin" do 
+  before do
+    @db = INTEGRATION_DB
+    @db.create_table!(:items) do
+      primary_key :id
+      String :stuff
+    end
+    class ::Item < Sequel::Model(@db)
+      plugin :serialization, :marshal, :stuff
+    end
+  end
+  after do
+    @db.drop_table(:items)
+    Object.send(:remove_const, :Item)
+  end
+
+  specify "should serialize and deserialize items as needed" do
+    i = Item.create(:stuff=>{:a=>1})
+    i.stuff.should == {:a=>1}
+    i.stuff = [1, 2, 3]
+    i.save
+    Item.first.stuff.should == [1, 2, 3]
+    i.update(:stuff=>Item.new)
+    Item.first.stuff.should == Item.new
   end
 end
