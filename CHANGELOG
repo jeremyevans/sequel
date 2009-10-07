@@ -1,5 +1,7 @@
 === HEAD
 
+* Fix Dataset#explain on SQLite (jeremyevans)
+
 * Add Dataset#use_cursor to the native postgres adapter, for processing large datasets (jeremyevans)
 
 * Don't ignore Class.inherited in Sequel::Model.inherited (antage) (#277)

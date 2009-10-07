@@ -122,7 +122,6 @@ module Sequel
     class Dataset < Sequel::Dataset
       include ::Sequel::SQLite::DatasetMethods
       
-      EXPLAIN = 'EXPLAIN %s'.freeze
       PREPARED_ARG_PLACEHOLDER = ':'.freeze
       
       # SQLite already supports named bind arguments, so use directly.
@@ -176,14 +175,6 @@ module Sequel
       # given values.
       def call(type, hash, values=nil, &block)
         prepare(type, nil, values).call(hash, &block)
-      end
-      
-      # Return an array of strings specifying a query explanation for the
-      # current dataset.
-      def explain
-        res = []
-        @db.result_set(EXPLAIN % select_sql(opts), nil) {|r| res << r}
-        res
       end
       
       # Yield a hash for each row in the dataset.

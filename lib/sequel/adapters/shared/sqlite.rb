@@ -265,6 +265,13 @@ module Sequel
         @opts[:where] ? super : filter(1=>1).delete
       end
       
+      # Return an array of strings specifying a query explanation for a SELECT of the
+      # current dataset.
+      def explain
+        db.send(:metadata_dataset).clone(:sql=>"EXPLAIN #{select_sql}").
+          map{|x| "#{x[:addr]}|#{x[:opcode]}|#{(1..5).map{|i| x[:"p#{i}"]}.join('|')}|#{x[:comment]}"}
+      end
+      
       # HAVING requires GROUP BY on SQLite
       def having(*cond, &block)
         raise(InvalidOperation, "Can only specify a HAVING clause on a grouped dataset") unless @opts[:group]

@@ -241,6 +241,16 @@ context "SQLite dataset" do
     SQLITE_DB[:test].select(:name, :value).order(:value).to_a.should == \
       @d.select(:name, :value).order(:value).to_a
   end
+    
+  specify "should support #explain" do
+    SQLITE_DB[:test].explain.should be_a_kind_of(Array)
+  end
+  
+  specify "should have #explain work when identifier_output_method is modified" do
+    ds = SQLITE_DB[:test]
+    ds.identifier_output_method = :upcase
+    ds.explain.should be_a_kind_of(Array)
+  end
 end
 
 context "A SQLite database" do
