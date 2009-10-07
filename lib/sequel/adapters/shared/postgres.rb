@@ -672,17 +672,18 @@ module Sequel
         naked.clone(default_server_opts(:sql=>insert_returning_sql(nil, *values))).single_record
       end
 
-      # Locks the table with the specified mode.
-      def lock(mode, server=nil)
-        sql = LOCK % [source_list(@opts[:from]), mode]
-        @db.synchronize(server) do
-          if block_given? # perform locking inside a transaction and yield to block
-            @db.transaction(server){@db.execute(sql, :server=>server); yield}
-          else
-            @db.execute(sql, :server=>server) # lock without a transaction
-            self
-          end
+      # Locks all tables in the dataset's FROM clause (but not in JOINs) with
+      # the specified mode (e.g. 'EXCLUSIVE').  If a block is given, starts
+      # a new transaction, locks the table, and yields.  If a block is not given
+      # just locks the tables.  Note that PostgreSQL will probably raise an error
+      # if you lock the table outside of an existing transaction.  Returns nil.
+      def lock(mode, opts={})
+        if block_given? # perform locking inside a transaction and yield to block
+          @db.transaction(opts){lock(mode, opts); yield}
+        else
+          @db.execute(LOCK % [source_list(@opts[:from]), mode], opts) # lock without a transaction
         end
+        nil
       end
       
       # For PostgreSQL version > 8.2, allow inserting multiple rows at once.

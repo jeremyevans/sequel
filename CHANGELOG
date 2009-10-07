@@ -1,5 +1,7 @@
 === HEAD
 
+* Fix Dataset#lock on PostgreSQL (jeremyevans)
+
 * Fix Dataset#explain on SQLite (jeremyevans)
 
 * Add Dataset#use_cursor to the native postgres adapter, for processing large datasets (jeremyevans)

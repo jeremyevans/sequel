@@ -129,6 +129,28 @@ context "A PostgreSQL dataset" do
     @d.filter(:name => /bc/).count.should == 2
     @d.filter(:name => /^bc/).count.should == 1
   end
+  
+  specify "should support for_share and for_update" do
+    @d.for_share.all.should == []
+    @d.for_update.all.should == []
+  end
+  
+  specify "#lock should lock tables and yield if a block is given" do
+    @d.lock('EXCLUSIVE'){@d.insert(:name=>'a')}
+  end
+  
+  specify "#lock should lock table if inside a transaction" do
+    POSTGRES_DB.transaction{@d.lock('EXCLUSIVE'); @d.insert(:name=>'a')}
+  end
+  
+  specify "#lock without block and outside transation should raise error" do
+    proc{@d.lock('EXCLUSIVE')}.should raise_error(Sequel::DatabaseError)
+  end
+  
+  specify "#lock should return nil" do
+    @d.lock('EXCLUSIVE'){@d.insert(:name=>'a')}.should == nil
+    POSTGRES_DB.transaction{@d.lock('EXCLUSIVE').should == nil; @d.insert(:name=>'a')}
+  end
 end
 
 context "A PostgreSQL dataset with a timestamp field" do
@@ -189,6 +211,11 @@ context "A PostgreSQL database" do
     
     @db[:test2].first[:xyz].should == 57
   end
+  
+  specify "#locks should be a dataset returning database locks " do
+    @db.locks.should be_a_kind_of(Sequel::Dataset)
+    @db.locks.all.should be_a_kind_of(Array)
+  end
 end  
 
 context "A PostgreSQL database" do
@@ -216,7 +243,6 @@ context "A PostgreSQL database" do
     @db.create_table(:posts){Integer :a}
     @db.reset_primary_key_sequence(:posts).should == nil
   end
-  
   
   specify "should support opclass specification" do
     @db.create_table(:posts){text :title; text :body; integer :user_id; index(:user_id, :opclass => :int4_ops, :type => :btree)}
@@ -286,6 +312,11 @@ context "A PostgreSQL database" do
       "CREATE TABLE posts (title varchar(5))",
       "CREATE INDEX posts_title_index ON posts (title) WHERE (title = '5')"
     ]
+  end
+  
+  specify "should support renaming tables" do
+    @db.create_table!(:posts1){primary_key :a}
+    @db.rename_table(:posts1, :posts)
   end
 end
 
