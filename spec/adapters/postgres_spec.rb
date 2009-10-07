@@ -143,10 +143,6 @@ context "A PostgreSQL dataset" do
     POSTGRES_DB.transaction{@d.lock('EXCLUSIVE'); @d.insert(:name=>'a')}
   end
   
-  specify "#lock without block and outside transation should raise error" do
-    proc{@d.lock('EXCLUSIVE')}.should raise_error(Sequel::DatabaseError)
-  end
-  
   specify "#lock should return nil" do
     @d.lock('EXCLUSIVE'){@d.insert(:name=>'a')}.should == nil
     POSTGRES_DB.transaction{@d.lock('EXCLUSIVE').should == nil; @d.insert(:name=>'a')}
