@@ -85,6 +85,35 @@ shared_examples_for "regular and composite key associations" do
     a.first.albums.should == [@album]
     a.first.albums.first.artist.should == @artist
   end
+  
+  specify "should work with a many_through_many association" do
+    @album.update(:artist => @artist)
+    @album.add_tag(@tag)
+
+    @album.reload
+    @artist.reload
+    @tag.reload
+    
+    @album.tags.should == [@tag]
+    
+    a = Artist.eager(:tags).all
+    a.should == [@artist]
+    a.first.tags.should == [@tag]
+    
+    a = Artist.eager_graph(:tags).all
+    a.should == [@artist]
+    a.first.tags.should == [@tag]
+    
+    a = Album.eager(:artist=>:tags).all
+    a.should == [@album]
+    a.first.artist.should == @artist
+    a.first.artist.tags.should == [@tag]
+    
+    a = Album.eager_graph(:artist=>:tags).all
+    a.should == [@album]
+    a.first.artist.should == @artist
+    a.first.artist.tags.should == [@tag]
+  end
 end
 
 describe "Sequel::Model Simple Associations" do
@@ -109,6 +138,8 @@ describe "Sequel::Model Simple Associations" do
     end
     class ::Artist < Sequel::Model(@db)
       one_to_many :albums
+      plugin :many_through_many
+      Artist.many_through_many :tags, [[:albums, :artist_id, :id], [:albums_tags, :album_id, :tag_id]]
     end
     class ::Album < Sequel::Model(@db)
       many_to_one :artist
@@ -164,18 +195,20 @@ describe "Sequel::Model Composite Key Associations" do
     class ::Artist < Sequel::Model(@db)
       set_primary_key :id1, :id2
       unrestrict_primary_key
-      one_to_many :albums, :key=>[:artist_id1, :artist_id2], :primary_key=>[:id1, :id2]
+      one_to_many :albums, :key=>[:artist_id1, :artist_id2]
+      plugin :many_through_many
+      Artist.many_through_many :tags, [[:albums, [:artist_id1, :artist_id2], [:id1, :id2]], [:albums_tags, [:album_id1, :album_id2], [:tag_id1, :tag_id2]]]
     end
     class ::Album < Sequel::Model(@db)
       set_primary_key :id1, :id2
       unrestrict_primary_key
-      many_to_one :artist, :key=>[:artist_id1, :artist_id2], :primary_key=>[:id1, :id2]
-      many_to_many :tags, :left_key=>[:album_id1, :album_id2], :right_key=>[:tag_id1, :tag_id2], :left_primary_key=>[:id1, :id2], :right_primary_key=>[:id1, :id2]
+      many_to_one :artist, :key=>[:artist_id1, :artist_id2]
+      many_to_many :tags, :left_key=>[:album_id1, :album_id2], :right_key=>[:tag_id1, :tag_id2]
     end
     class ::Tag < Sequel::Model(@db)
       set_primary_key :id1, :id2
       unrestrict_primary_key
-      many_to_many :albums, :right_key=>[:album_id1, :album_id2], :left_key=>[:tag_id1, :tag_id2], :left_primary_key=>[:id1, :id2], :right_primary_key=>[:id1, :id2]
+      many_to_many :albums, :right_key=>[:album_id1, :album_id2], :left_key=>[:tag_id1, :tag_id2]
     end
     @album = Album.create(:name=>'Al', :id1=>1, :id2=>2)
     @artist = Artist.create(:name=>'Ar', :id1=>3, :id2=>4)
