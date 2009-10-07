@@ -636,6 +636,7 @@ context "Postgres::Database functions, languages, and triggers" do
   end
 end
 
+if POSTGRES_DB.class.adapter_scheme == :postgres
 context "Postgres::Dataset #use_cursor" do
   before(:all) do
     @db = POSTGRES_DB
@@ -668,4 +669,5 @@ context "Postgres::Dataset #use_cursor" do
       @ds.check_return
       @ds.all.should == @ds.use_cursor.all
     end
+end
 end
