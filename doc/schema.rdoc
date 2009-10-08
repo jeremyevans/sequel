@@ -11,22 +11,26 @@ Migrations are not required, you can just call the schema modification methods d
 Sequel has the ability to have database independent migrations using ruby classes as types.  When you use a ruby class as a type, Sequel translates it to the most comparable type in the database you are using.  Here's an example using all supported types:
 
     DB.create_table(:cats) do
-      primary_key :id, :type=>Integer # integer
-      String :a                       # varchar(255)
-      column :b, File                 # blob
-      Fixnum :c                       # integer
+      primary_key :id, :type=>Integer             # integer
+      String :a                                   # varchar(255)
+      String :a2, :size=>50                       # varchar(50)
+      String :a3, :fixed=>true                    # char(255)
+      String :a4, :fixed=>true, :size=>50         # char(50)
+      String :a5, :text=>true                     # text
+      column :b, File                             # blob
+      Fixnum :c                                   # integer
       foreign_key :d, :other_table, :type=>Bignum # bigint
-      Float :e                        # double precision
-      BigDecimal :f                   # numeric
-      decimal :amount, :size => [10,2] # decimal (10, 2)
-      Date :g                         # date
-      DateTime :h                     # timestamp
-      Time :i                         # timestamp
-      Numeric :j                      # numeric
-      TrueClass :k                    # boolean
-      FalseClass :l                   # boolean
+      Float :e                                    # double precision
+      BigDecimal :f                               # numeric
+      BigDecimal :f2, :size=>10                   # numeric(10)
+      BigDecimal :f3, :size=>[10, 2]              # numeric(10, 2)
+      Date :g                                     # date
+      DateTime :h                                 # timestamp
+      Time :i                                     # timestamp
+      Time :i2, :only_time=>true                  # time
+      Numeric :j                                  # numeric
+      TrueClass :k                                # boolean
+      FalseClass :l                               # boolean
     end
 
 Basically, if you use one of the ruby classes above, it will translate into a database specific type.  If you use a lowercase method, symbol, or string to specify the type, Sequel won't attempt to translate it.
-
-Note that if you use a ruby class, you shouldn't use a :size option.  Using a ruby class means that you want Sequel to pick the database type to use.  If you want to specify the size, you are no longer in database independent territory, and you need to specify the type as well, using a lowercase method, symbol, or string.  The :size option can take either an integer value or an array of values.  An example of where you would want to pass an array such as "[10, 2]" is for a fixed decimal column specification that corresponds to a size and precision (a.k.a. whole number and decimals).
