@@ -18,6 +18,7 @@ Sequel has the ability to have database independent migrations using ruby classe
       foreign_key :d, :other_table, :type=>Bignum # bigint
       Float :e                        # double precision
       BigDecimal :f                   # numeric
+      decimal :amount, :size => [10,2] # decimal (10, 2)
       Date :g                         # date
       DateTime :h                     # timestamp
       Time :i                         # timestamp
@@ -28,4 +29,4 @@ Sequel has the ability to have database independent migrations using ruby classe
 
 Basically, if you use one of the ruby classes above, it will translate into a database specific type.  If you use a lowercase method, symbol, or string to specify the type, Sequel won't attempt to translate it.
 
-Note that if you use a ruby class, you shouldn't use a :size option.  Using a ruby class means that you want Sequel to pick the database type to use.  If you want to specify the size, you are no longer in database independent territory, and you need to specify the type as well, using a lowercase method, symbol, or string.
+Note that if you use a ruby class, you shouldn't use a :size option.  Using a ruby class means that you want Sequel to pick the database type to use.  If you want to specify the size, you are no longer in database independent territory, and you need to specify the type as well, using a lowercase method, symbol, or string.  The :size option can take either an integer value or an array of values.  An example of where you would want to pass an array such as "[10, 2]" is for a fixed decimal column specification that corresponds to a size and precision (a.k.a. whole number and decimals).
