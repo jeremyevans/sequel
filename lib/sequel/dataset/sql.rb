@@ -7,6 +7,17 @@ module Sequel
       clauses.map{|clause| :"#{type}_#{clause}_sql"}.freeze
     end
 
+    # These symbols have _join methods created (e.g. inner_join) that
+    # call join_table with the symbol, passing along the arguments and
+    # block from the method call.
+    CONDITIONED_JOIN_TYPES = [:inner, :full_outer, :right_outer, :left_outer, :full, :right, :left]
+
+    # These symbols have _join methods created (e.g. natural_join) that
+    # call join_table with the symbol.  They only accept a single table
+    # argument which is passed to join_table, and they raise an error
+    # if called with a block.
+    UNCONDITIONED_JOIN_TYPES = [:natural, :natural_left, :natural_right, :natural_full, :cross]
+
     AND_SEPARATOR = " AND ".freeze
     BOOL_FALSE = "'f'".freeze
     BOOL_TRUE = "'t'".freeze
@@ -918,8 +929,11 @@ module Sequel
       clone(:sql=>sql)
     end
 
-    [:inner, :full_outer, :right_outer, :left_outer].each do |jtype|
+    CONDITIONED_JOIN_TYPES.each do |jtype|
       class_eval("def #{jtype}_join(*args, &block); join_table(:#{jtype}, *args, &block) end", __FILE__, __LINE__)
+    end
+    UNCONDITIONED_JOIN_TYPES.each do |jtype|
+      class_eval("def #{jtype}_join(table); raise(Sequel::Error, '#{jtype}_join does not accept join table blocks') if block_given?; join_table(:#{jtype}, table) end", __FILE__, __LINE__)
     end
     alias join inner_join
 

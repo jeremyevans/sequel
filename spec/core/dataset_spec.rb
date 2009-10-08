@@ -1507,38 +1507,54 @@ context "Dataset#join_table" do
       'SELECT * FROM "items" INNER JOIN "b" ON ("b"."items_id" = "items"."id") LEFT OUTER JOIN "c" ON ("c"."b_id" = "b"."id")'
   end
   
-  specify "should support left outer joins" do
-    @d.join_table(:left_outer, :categories, :category_id=>:id).sql.should ==
-      'SELECT * FROM "items" LEFT OUTER JOIN "categories" ON ("categories"."category_id" = "items"."id")'
+  specify "should support arbitrary join types" do
+    @d.join_table(:magic, :categories, :category_id=>:id).sql.should ==
+      'SELECT * FROM "items" MAGIC JOIN "categories" ON ("categories"."category_id" = "items"."id")'
+  end
 
+  specify "should support many join methods" do
     @d.left_outer_join(:categories, :category_id=>:id).sql.should ==
       'SELECT * FROM "items" LEFT OUTER JOIN "categories" ON ("categories"."category_id" = "items"."id")'
-  end
-
-  specify "should support right outer joins" do
-    @d.join_table(:right_outer, :categories, :category_id=>:id).sql.should ==
-      'SELECT * FROM "items" RIGHT OUTER JOIN "categories" ON ("categories"."category_id" = "items"."id")'
-
     @d.right_outer_join(:categories, :category_id=>:id).sql.should ==
       'SELECT * FROM "items" RIGHT OUTER JOIN "categories" ON ("categories"."category_id" = "items"."id")'
-  end
-
-  specify "should support full outer joins" do
-    @d.join_table(:full_outer, :categories, :category_id=>:id).sql.should ==
-      'SELECT * FROM "items" FULL OUTER JOIN "categories" ON ("categories"."category_id" = "items"."id")'
-
     @d.full_outer_join(:categories, :category_id=>:id).sql.should ==
       'SELECT * FROM "items" FULL OUTER JOIN "categories" ON ("categories"."category_id" = "items"."id")'
-  end
-
-  specify "should support inner joins" do
-    @d.join_table(:inner, :categories, :category_id=>:id).sql.should ==
-      'SELECT * FROM "items" INNER JOIN "categories" ON ("categories"."category_id" = "items"."id")'
-
     @d.inner_join(:categories, :category_id=>:id).sql.should ==
       'SELECT * FROM "items" INNER JOIN "categories" ON ("categories"."category_id" = "items"."id")'
+    @d.left_join(:categories, :category_id=>:id).sql.should ==
+      'SELECT * FROM "items" LEFT JOIN "categories" ON ("categories"."category_id" = "items"."id")'
+    @d.right_join(:categories, :category_id=>:id).sql.should ==
+      'SELECT * FROM "items" RIGHT JOIN "categories" ON ("categories"."category_id" = "items"."id")'
+    @d.full_join(:categories, :category_id=>:id).sql.should ==
+      'SELECT * FROM "items" FULL JOIN "categories" ON ("categories"."category_id" = "items"."id")'
+    @d.natural_join(:categories).sql.should ==
+      'SELECT * FROM "items" NATURAL JOIN "categories"'
+    @d.natural_left_join(:categories).sql.should ==
+      'SELECT * FROM "items" NATURAL LEFT JOIN "categories"'
+    @d.natural_right_join(:categories).sql.should ==
+      'SELECT * FROM "items" NATURAL RIGHT JOIN "categories"'
+    @d.natural_full_join(:categories).sql.should ==
+      'SELECT * FROM "items" NATURAL FULL JOIN "categories"'
+    @d.cross_join(:categories).sql.should ==
+      'SELECT * FROM "items" CROSS JOIN "categories"'
   end
   
+  specify "should raise an error if additional arguments are provided to join methods that don't take conditions" do
+    proc{@d.natural_join(:categories, :id=>:id)}.should raise_error(ArgumentError)
+    proc{@d.natural_left_join(:categories, :id=>:id)}.should raise_error(ArgumentError)
+    proc{@d.natural_right_join(:categories, :id=>:id)}.should raise_error(ArgumentError)
+    proc{@d.natural_full_join(:categories, :id=>:id)}.should raise_error(ArgumentError)
+    proc{@d.cross_join(:categories, :id=>:id)}.should raise_error(ArgumentError)
+  end
+
+  specify "should raise an error if blocks are provided to join methods that don't pass them" do
+    proc{@d.natural_join(:categories){}}.should raise_error(Sequel::Error)
+    proc{@d.natural_left_join(:categories){}}.should raise_error(Sequel::Error)
+    proc{@d.natural_right_join(:categories){}}.should raise_error(Sequel::Error)
+    proc{@d.natural_full_join(:categories){}}.should raise_error(Sequel::Error)
+    proc{@d.cross_join(:categories){}}.should raise_error(Sequel::Error)
+  end
+
   specify "should default to a plain join if nil is used for the type" do
     @d.join_table(nil, :categories, :category_id=>:id).sql.should ==
       'SELECT * FROM "items"  JOIN "categories" ON ("categories"."category_id" = "items"."id")'

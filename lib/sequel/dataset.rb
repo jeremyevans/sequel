@@ -20,17 +20,6 @@ module Sequel
   #
   # Datasets are Enumerable objects, so they can be manipulated using any
   # of the Enumerable methods, such as map, inject, etc.
-  #
-  # === Methods added via metaprogramming
-  #
-  # Some methods are added via metaprogramming:
-  #
-  # * ! methods - These methods are the same as their non-! counterparts,
-  #   but they modify the receiver instead of returning a modified copy
-  #   of the dataset.
-  # * inner_join, full_outer_join, right_outer_join, left_outer_join - 
-  #   This methods are shortcuts to join_table with the join type
-  #   already specified.
   class Dataset
     extend Metaprogramming
     include Metaprogramming
