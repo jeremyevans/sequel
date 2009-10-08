@@ -49,7 +49,7 @@ may itself contain placeholders:
 == Prepared Statements
 
 Prepared statement support is similar to bound variable support, but you
-use Dataset#prepare with a name, and Dataset#call later with the values:
+use Dataset#prepare with a name, and Dataset#call or Database#call later with the values:
 
   ds = DB[:items].filter(:name=>:$n)
   ps = ds.prepare(:select, :select_by_name)
