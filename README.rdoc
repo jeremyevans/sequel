@@ -410,7 +410,7 @@ Sequel models allow you to use any column as a primary key, and even composite k
   post = Post['ruby', 'hello world']
   post.pk #=> ['ruby', 'hello world']
 
-You can also define a model class that does not have a primary key, but then you lose the ability to update records.
+You can also define a model class that does not have a primary key, but then you lose the ability to easily update records.
 
 A model instance can also be fetched by specifying a condition:
 
@@ -442,9 +442,14 @@ You can read the record values as object attributes (assuming the attribute name
 You can also change record values:
 
   post.title = 'hey there'
+  # or 
+  post.set(:title=>'hey there')
+
+That will just change the value for the object, it will not persist the changes to the database.  To persist the record, call the #save method:
+
   post.save
 
-Another way to change values by using the #update method:
+If you want to modify record values and save the object after doing so, use the #update method:
 
   post.update(:title => 'hey there')
 
@@ -454,7 +459,7 @@ New records can be created by calling Model.create:
 
   post = Post.create(:title => 'hello world')
 
-Another way is to construct a new instance and save it:
+Another way is to construct a new instance and save it later:
 
   post = Post.new
   post.title = 'hello world'
@@ -462,12 +467,11 @@ Another way is to construct a new instance and save it:
 
 You can also supply a block to Model.new and Model.create:
 
-  post = Post.create{|p| p.title = 'hello world'}
-
   post = Post.new do |p|
     p.title = 'hello world'
-    p.save
   end
+
+  post = Post.create{|p| p.title = 'hello world'}
 
 === Hooks
 
@@ -475,13 +479,17 @@ You can execute custom code when creating, updating, or deleting records by defi
 
   class Post < Sequel::Model
     def after_create
+      super
       author.increase_post_count
     end
 
     def after_destroy
+      super
       author.decrease_post_count
     end
   end
+
+Note the use of super if you define your own hook methods.  Almost all Sequel::Model class and instance methods (not just hook methods) can be overridden safely, but you have to make sure to call super when doing so, otherwise you risk breaking things.
 
 For the example above, you should probably use a database trigger if you can.  Hooks can be used for data integrity, but they will only enforce that integrity when you are using the model.  If you plan on allowing any other access to the database, it's best to use database triggers for data integrity.
 
@@ -639,7 +647,7 @@ Sequel models also provide a short hand notation for filters:
 
 === Model Validations
 
-You can define a validate method for your model, which save
+You can define a validate method for your model, which #save
 will check before attempting to save the model in the database.
 If an attribute of the model isn't valid, you should add a error
 message for that attribute to the model object's errors. If an
@@ -648,8 +656,8 @@ raise an error or return false depending on how it is configured.
 
   class Post < Sequel::Model
     def validate
-      errors[:name] << "can't be empty" if name.empty?
-      errors[:written_on] << "should be in the past" if written_on >= Time.now
+      errors.add(:name, "can't be empty") if name.empty?
+      errors.add(:written_on, "should be in the past") if written_on >= Time.now
     end
   end
 
