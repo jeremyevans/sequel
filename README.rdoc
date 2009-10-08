@@ -75,13 +75,13 @@ Sequel is designed to take the hassle away from connecting to databases and mani
 
 Sequel uses the concept of datasets to retrieve data. A Dataset object encapsulates an SQL query and supports chainability, letting you fetch data using a convenient Ruby DSL that is both concise and flexible.
 
-For example, the following one-liner returns the average GDP for the five biggest countries in the middle east region:
+For example, the following one-liner returns the average GDP for countries in the middle east region:
 
-  DB[:countries].filter(:region => 'Middle East').reverse_order(:area).limit(5).avg(:GDP)
+  DB[:countries].filter(:region => 'Middle East').avg(:GDP)
   
 Which is equivalent to:
 
-  SELECT avg(GDP) FROM countries WHERE region = 'Middle East' ORDER BY area DESC LIMIT 5
+  SELECT avg(GDP) FROM countries WHERE region = 'Middle East'
 
 Since datasets retrieve records only when needed, they can be stored and later reused. Records are fetched as hashes (or custom model objects), and are accessed using an Enumerable interface:
 
