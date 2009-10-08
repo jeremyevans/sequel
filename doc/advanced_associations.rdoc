@@ -196,8 +196,8 @@ Sequel::Model:
   @author = Author.first
   @author.books
 
-If you use an association other than belongs_to in the associated model, things
-are a bit more involved (has_many :through a has_many association):
+If you use an association other than belongs_to in the associated model, you'll have
+to specify some of the :*key options and write a short method.
 
 ActiveRecord:
 
@@ -222,23 +222,7 @@ Sequel::Model:
 
   class Firm < Sequel::Model
     one_to_many :clients
-    one_to_many :invoices, :read_only=>true, \
-      :dataset=>proc{Invoice.eager_graph(:client).filter(:client__firm_id=>pk)}, \
-      :after_load=>(proc do |firm, invs|
-        invs.each do |inv|
-          inv.client.associations[:firm] = inv.associations[:firm] = firm
-        end
-      end), \
-      :eager_loader=>(proc do |key_hash, firms, associations|
-        id_map = key_hash[Firm.primary_key]
-        firms.each{|firm| firm.associations[:invoices] = []} 
-        Invoice.eager_graph(:client).filter(:client__firm_id=>id_map.keys).all do |inv|
-          id_map[inv.client.firm_id].each do |firm|
-            inv.client.associations[:firm] = inv.associations[:firm] = firm
-            firm.associations[:invoices] << inv 
-          end
-        end
-      end)
+    many_to_many :invoices, :join_table=>:clients, :right_key=>:id, :right_primary_key=>:client_id
   end 
 
   class Client < Sequel::Model
@@ -248,55 +232,28 @@ Sequel::Model:
 
   class Invoice < Sequel::Model
     many_to_one :client
-    many_to_one :firm, :key=>nil, :read_only=>true, \
-      :dataset=>proc{Firm.eager_graph(:clients).filter(:clients__id=>client_id)}, \
-      :after_load=>(proc do |inv, firm|
-        # Delete the cached associations from firm, because it only has the
-        # client with this invoice, instead of all clients of the firm
-        inv.associations[:client] = firm.associations.delete(:clients).first
-      end), \
-      :eager_loader=>(proc do |key_hash, invoices, associations|
-        id_map = {}
-        invoices.each do |inv|
-          inv.associations[:firm] = nil
-          inv.associations[:client] = nil
-          (id_map[inv.client_id] ||= []) << inv
-        end
-        Firm.eager_graph(:clients).filter(:clients__id=>id_map.keys).all do |firm|
-          # Delete the cached associations from firm, because it only has the
-          # clients related the invoices being eagerly loaded, instead of all
-          # clients of the firm.
-          firm.associations.delete(:clients).each do |client|
-            id_map[client.pk].each do |inv|
-              inv.associations[:firm] = firm
-              inv.associations[:client] = client
-            end
-          end
-        end
-      end)
-  end
-  Firm.find(:first).invoices
 
-It is significantly more code in Sequel Model, but quite a bit of it is setting
-the intermediate associated record (the client) and the reciprocal association
-in the associations cache for each object, which ActiveRecord won't do for you.
-The reason you would want to do this is that then firm.invoices.first.firm or
-firm.invoices.first.client doesn't do another query to get the firm/client.
+    def firm
+      client.firm if client
+    end
+  end
+
+  Firm.first.invoices
 
 === Polymorphic Associations
 
-Polymorphic associations are really a design flaw.  The only advantage
-polymorphic associations offer is that they require fewer join tables.
+Sequel discourages the use of polymorphic associations, which is the reason they
+are not supported by default.  All polymorphic associations can be made non-polymorphic
+by using additional tables and/or columns instead of having a column
+containing the associated class name as a string.
 
-Proof by Reductio ad absurdum: If fewer join tables are preferable, then surely
-fewer tables and columns are preferrable, so you might as well store all of
-your data in a single column in a single table if you think polymorphic
-associations are a good idea.
+Polymorphic associations break referential integrity and are significantly more
+complex than non-polymorphic associations, so their use is not recommended unless
+you are stuck with an existing design that uses them.
 
-Compelling Argument: Polymorphic associations are more complex than normal
-associations, and they break referential integrity, so the only reason you
-should use them is if you are already stuck with an existing design that
-uses them.  You should never use them in new code.
+If you must use them, look for the sequel_polymorphic plugin, as it makes using
+polymorphic associations in Sequel about as easy as it is in ActiveRecord.  However,
+here's how they can be done using Sequel's custom associations:
 
 ActiveRecord:
 
@@ -464,12 +421,22 @@ design, but sometimes you have to play with the cards you are dealt).
 === Joining on multiple keys
 
 Let's say you have two tables that are associated with each other with multiple
-keys.  For example:
+keys.  This can now be handled using Sequel's built in composite key support for
+associations:
 
   # Both of these models have an album_id, number, and disc_number fields.
   # All FavoriteTracks have an associated track, but not all tracks have an
   # associated favorite track
   
+  class Track < Sequel::Model
+    many_to_one :favorite_track, :key=>[:disc_number, :number, :album_id], :primary_key=>[:disc_number, :number, :album_id]
+  end
+  class FavoriteTrack < Sequel::Model
+    one_to_many :tracks, :key=>[:disc_number, :number, :album_id], :primary_key=>[:disc_number, :number, :album_id], :one_to_one=>true
+  end
+
+Here's the old way to do it via custom associations:
+
   class Track < Sequel::Model
     many_to_one :favorite_track, \
       :dataset=>(proc do
@@ -572,6 +539,37 @@ without knowing the depth of the tree?
     end)
   end
 
+Note that unlike ActiveRecord, Sequel supports common table expressions, which allows you to use recursive queries.
+The results are not the same as in the above case, as all descendents are stored in a single association,
+but all descendants can be both lazy loaded or eager loaded in a single query (assuming your database
+supports recursive common table expressions):
+
+  class Node < Sequel::Model
+    one_to_many :descendants, :class=>Node, :dataset=>(proc do
+        Node.from(:t).
+        with_recursive(:t, Node.filter(:parent_id=>pk),
+          Node.join(:t, :id=>:parent_id).
+          select(:nodes.*))
+      end),
+      :eager_loader=>(proc do |key_hash, nodes, associations|
+        id_map = key_hash[:id]
+        nodes.each{|n| n.associations[:descendants] = []}
+        Node.from(:t).
+        with_recursive(:t, Node.filter(:parent_id=>id_map.keys).
+           select(:parent_id___root, :id, :parent_id),
+          Node.join(:t, :id=>:parent_id).
+          select(:t__root, :nodes.*)).
+        all.each do |node|
+          if root = id_map[node.values.delete(:root)].first
+            root.associations[:descendants] << node
+          end
+        end
+      end)
+  end
+
+You could modify the code to also store direct children relationships at the same time,
+for functionality similar to the non-common table expression case.
+
 === Joining multiple keys to a single key, through a third table
 
 Let's say you have a database, of songs, lyrics, and artists.  Each song
@@ -614,7 +612,6 @@ tickets, and each ticket has a number of hours associated with it.  You can use 
 association support to create a Project association that gives the sum of hours for all
 associated tickets.
 
-
   class Project < Sequel::Model
     one_to_many :tickets
     many_to_one :ticket_hours, :read_only=>true, :key=>:id,
@@ -644,6 +641,6 @@ associated tickets.
   end
 
 Note that it is often better to use a sum cache instead of this approach.  You can implement
-a sum cache using before or after save and delete hooks, or using a database trigger
+a sum cache using after_create and after_delete hooks, or using a database trigger
 (the preferred method if you only have to support one database and that database supports
 triggers).
