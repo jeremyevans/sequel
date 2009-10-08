@@ -112,6 +112,23 @@ describe "Model#save" do
     o.save(:y)
     o.changed_columns.should == []
   end
+  
+  it "should mark all columns as not changed if this is a new record" do
+    o = @c.new(:x => 1, :y => nil)
+    o.x = 4
+    o.changed_columns.should == [:x]
+    o.save
+    o.changed_columns.should == []
+  end
+  
+  it "should mark all columns as not changed if this is a new record and insert_select was used" do
+    @c.dataset.meta_def(:insert_select){|h| h.merge(:id=>1)}
+    o = @c.new(:x => 1, :y => nil)
+    o.x = 4
+    o.changed_columns.should == [:x]
+    o.save
+    o.changed_columns.should == []
+  end
 
   it "should store previous value of @new in @was_new and as well as the hash used for updating in @columns_updated until after hooks finish running" do
     res = nil
@@ -294,6 +311,14 @@ describe "Model#save_changes" do
     o[:y] = 4
     o.save_changes
     MODEL_DB.sqls.should == ["UPDATE items SET y = 4 WHERE (id = 3)"]
+  end
+  
+  it "should clear changed_columns" do
+    o = @c.load(:id => 3, :x => 1, :y => nil)
+    o.x = 4
+    o.changed_columns.should == [:x]
+    o.save_changes
+    o.changed_columns.should == []
   end
 
   it "should update columns changed in a before_update hook" do

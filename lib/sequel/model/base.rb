@@ -845,6 +845,8 @@ module Sequel
             ds = this
             ds = ds.server(:default) unless ds.opts[:server]
             _refresh(ds)
+          else
+            changed_columns.clear
           end
         else
           return save_failure(:update) if before_update == false
