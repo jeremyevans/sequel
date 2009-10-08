@@ -120,8 +120,10 @@ You can specify a block to connect, which will disconnect from the database afte
 
 === Arbitrary SQL queries
 
-  DB << "create table t (a text, b text)"
-  DB << "insert into t values ('a', 'b')"
+You can execute arbitrary SQL code using Database#run:
+
+  DB.run("create table t (a text, b text)")
+  DB.run("insert into t values ('a', 'b')")
 
 You can also create datasets based on raw SQL:
 
@@ -137,6 +139,7 @@ You can also fetch records with raw SQL through the dataset:
 
 You can use placeholders in your SQL string as well:
 
+  name = 'Jim'
   DB['select * from items where name = ?', name].each do |row|
     p row
   end
