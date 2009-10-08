@@ -25,7 +25,7 @@ Without a filename argument, the sqlite adapter will setup a new sqlite database
 
 == Using raw SQL
 
-  DB << "CREATE TABLE users (name VARCHAR(255) NOT NULL, age INT(3) NOT NULL)"
+  DB.run "CREATE TABLE users (name VARCHAR(255) NOT NULL, age INT(3) NOT NULL)"
   dataset = DB["SELECT age FROM users WHERE name = ?", name]
   dataset.map(:age)
   DB.fetch("SELECT name FROM users") do |row|
@@ -79,9 +79,9 @@ Without a filename argument, the sqlite adapter will setup a new sqlite database
   dataset.where(:value=>[50,75,100])
 
   dataset.filter(:name => 'abc').first
-  dataset[:name => 'abc'] # same as above
+  dataset[:name => 'abc']
 
-  # Filter using a subquery
+  dataset.where('price > (SELECT avg(price) + 100 FROM table)')
   dataset.filter{|o| o.price > dataset.select(o.avg(price) + 100)}
 
 === Advanced filtering using ruby expressions
@@ -198,12 +198,21 @@ Transactions can also be aborted by raising Sequel::Rollback:
     raise(Sequel::Rollback) if something_bad_happened
   end # ROLLBACK issued and no error raised
 
-Miscellaneous:
+Savepoints can be used if the database supports it:
+
+  DB.transaction do
+    dataset << {:first_name => 'Farm', :last_name => 'Boy'} # Inserted
+    DB.transaction(:savepoint=>true) # This savepoint is rolled back
+      dataset << {:first_name => 'Inigo', :last_name => 'Montoya'} # Not inserted
+      raise(Sequel::Rollback) if something_bad_happened
+    end
+    dataset << {:first_name => 'Prince', :last_name => 'Humperdink'} # Inserted
+  end
+
+== Miscellaneous:
 
   dataset.sql #=> "SELECT * FROM items"
   dataset.delete_sql #=> "DELETE FROM items"
-  dataset.where(:name => 'sequel').exists #=> "EXISTS ( SELECT 1 FROM items WHERE name = 'sequel' )"
+  dataset.where(:name => 'sequel').exists #=> "EXISTS ( SELECT * FROM items WHERE name = 'sequel' )"
   dataset.columns #=> array of columns in the result set, does a SELECT
-
-  # Works on PostgreSQL, MySQL, SQLite, and JDBC
   DB.schema(:items) => [[:id, {:type=>:integer, ...}], [:name, {:type=>:string, ...}], ...]
