@@ -1848,6 +1848,14 @@ context "Dataset aggregate methods" do
   specify "should accept qualified columns" do
     @d.avg(:test__bc).should == 'SELECT avg(test.bc) FROM test LIMIT 1'
   end
+  
+  specify "should use a subselect for the same conditions as count" do
+    d = @d.order(:a).limit(5)
+    d.avg(:a).should == 'SELECT avg(a) FROM (SELECT * FROM test ORDER BY a LIMIT 5) AS t1 LIMIT 1'
+    d.sum(:a).should == 'SELECT sum(a) FROM (SELECT * FROM test ORDER BY a LIMIT 5) AS t1 LIMIT 1'
+    d.min(:a).should == 'SELECT min(a) FROM (SELECT * FROM test ORDER BY a LIMIT 5) AS t1 LIMIT 1'
+    d.max(:a).should == 'SELECT max(a) FROM (SELECT * FROM test ORDER BY a LIMIT 5) AS t1 LIMIT 1'
+  end
 end
 
 context "Dataset#range" do
@@ -1876,6 +1884,11 @@ context "Dataset#range" do
   specify "should return a range object" do
     @d.range(:tryme).should == (1..10)
   end
+  
+  specify "should use a subselect for the same conditions as count" do
+    @d.order(:stamp).limit(5).range(:stamp).should == (1..10)
+    @d.last_sql.should == 'SELECT min(stamp) AS v1, max(stamp) AS v2 FROM (SELECT * FROM test ORDER BY stamp LIMIT 5) AS t1 LIMIT 1'
+  end
 end
 
 context "Dataset#interval" do
@@ -1903,6 +1916,11 @@ context "Dataset#interval" do
   
   specify "should return an integer" do
     @d.interval(:tryme).should == 1234
+  end
+  
+  specify "should use a subselect for the same conditions as count" do
+    @d.order(:stamp).limit(5).interval(:stamp).should == 1234
+    @d.last_sql.should == 'SELECT (max(stamp) - min(stamp)) FROM (SELECT * FROM test ORDER BY stamp LIMIT 5) AS t1 LIMIT 1'
   end
 end
 

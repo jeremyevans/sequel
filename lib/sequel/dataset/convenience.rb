@@ -25,7 +25,7 @@ module Sequel
 
     # Returns the average value for the given column.
     def avg(column)
-      get{|o| o.avg(column)}
+      aggregate_dataset.get{avg(column)}
     end
     
     # Returns true if no records exist in the dataset, false otherwise
@@ -130,7 +130,7 @@ module Sequel
     # Returns the interval between minimum and maximum values for the given 
     # column.
     def interval(column)
-      get{|o| o.max(column) - o.min(column)}
+      aggregate_dataset.get{max(column) - min(column)}
     end
 
     # Reverses the order and then runs first.  Note that this
@@ -159,12 +159,12 @@ module Sequel
 
     # Returns the maximum value for the given column.
     def max(column)
-      get{|o| o.max(column)}
+      aggregate_dataset.get{max(column)}
     end
 
     # Returns the minimum value for the given column.
     def min(column)
-      get{|o| o.min(column)}
+      aggregate_dataset.get{min(column)}
     end
 
     # This is a front end for import that allows you to submit an array of
@@ -186,7 +186,7 @@ module Sequel
     # Returns a Range object made from the minimum and maximum values for the
     # given column.
     def range(column)
-      if r = select{|o| [o.min(column).as(:v1), o.max(column).as(:v2)]}.first
+      if r = aggregate_dataset.select{[min(column).as(v1), max(column).as(v2)]}.first
         (r[:v1]..r[:v2])
       end
     end
@@ -207,7 +207,7 @@ module Sequel
     
     # Returns the sum for the given column.
     def sum(column)
-      get{|o| o.sum(column)}
+      aggregate_dataset.get{sum(column)}
     end
 
     # Returns a string in CSV format containing the dataset records. By 

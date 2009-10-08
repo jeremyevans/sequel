@@ -98,6 +98,20 @@ describe Sequel::Dataset do
     @d.count.should == 3
   end
 
+  specify "should handle aggregate methods on limited datasets correctly" do
+    @d << {:name => 'abc', :value => 6}
+    @d << {:name => 'bcd', :value => 12}
+    @d << {:name => 'def', :value => 18}
+    @d = @d.order(:name).limit(2)
+    @d.count.should == 2
+    @d.avg(:value).to_i.should == 9
+    @d.min(:value).to_i.should == 6
+    @d.reverse.min(:value).to_i.should == 12
+    @d.max(:value).to_i.should == 12
+    @d.sum(:value).to_i.should == 18
+    @d.interval(:value).to_i.should == 6
+  end
+
   specify "should return the correct records" do
     @d.to_a.should == []
     @d << {:name => 'abc', :value => 123}

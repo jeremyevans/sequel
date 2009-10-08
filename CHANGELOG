@@ -1,5 +1,7 @@
 === HEAD
 
+* Fix use a dataset aggregate methods (e.g. sum) on limited/grouped/etc. datasets (jeremyevans)
+
 * Clear changed_columns when saving new model objects with a database adapter that supports insert_select, such as postgres (jeremyevans)
 
 * Fix Dataset#replace with default values on MySQL, and respect insert-related options (jeremyevans)

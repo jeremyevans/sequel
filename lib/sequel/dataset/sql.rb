@@ -22,7 +22,6 @@ module Sequel
     NULL = "NULL".freeze
     QUALIFY_KEYS = [:select, :where, :having, :order, :group]
     QUESTION_MARK = '?'.freeze
-    STOCK_COUNT_OPTS = {:select => [SQL::AliasedExpression.new(LiteralString.new("COUNT(*)").freeze, :count)], :order => nil}.freeze
     DELETE_CLAUSE_METHODS = clause_methods(:delete, %w'from where')
     INSERT_CLAUSE_METHODS = clause_methods(:insert, %w'into columns values')
     SELECT_CLAUSE_METHODS = clause_methods(:select, %w'with distinct columns from join where group having compounds order limit')
@@ -116,7 +115,7 @@ module Sequel
 
     # Returns the number of records in the dataset.
     def count
-      options_overlap(COUNT_FROM_SELF_OPTS) ? from_self.count : clone(STOCK_COUNT_OPTS).single_value.to_i
+      aggregate_dataset.get{COUNT(:*){}.as(count)}.to_i
     end
 
     # Formats a DELETE statement using the given options and dataset options.
@@ -956,6 +955,14 @@ module Sequel
     # literalized.
     def _truncate_sql(table)
       "TRUNCATE TABLE #{table}"
+    end
+
+    # Clone of this dataset usable in aggregate operations.  Does
+    # a from_self if dataset contains any parameters that would
+    # affect normal aggregation, or just removes an existing
+    # order if not.
+    def aggregate_dataset
+      options_overlap(COUNT_FROM_SELF_OPTS) ? from_self : unordered
     end
 
     # Do a simple join of the arguments (which should be strings or symbols) separated by commas
