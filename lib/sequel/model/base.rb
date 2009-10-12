@@ -525,7 +525,7 @@ module Sequel
       def initialize(values = {}, from_db = false)
         if from_db
           @new = false
-          @values = values
+          set_values(values)
         else
           @values = {}
           @new = true
@@ -822,7 +822,7 @@ module Sequel
       # Refresh using a particular dataset, used inside save to make sure the same server
       # is used for reading newly inserted values from the database
       def _refresh(dataset)
-        @values = dataset.first || raise(Error, "Record not found")
+        set_values(dataset.first || raise(Error, "Record not found"))
         changed_columns.clear
         associations.clear
         self
@@ -900,7 +900,12 @@ module Sequel
         end
         self
       end
-  
+      
+      # Replace the current values with hash.
+      def set_values(hash)
+        @values = hash
+      end
+      
       # Returns all methods that can be used for attribute
       # assignment (those that end with =), modified by the only
       # and except arguments:

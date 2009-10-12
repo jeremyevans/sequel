@@ -34,17 +34,28 @@ module Sequel
           super
           subclass.forced_encoding = forced_encoding
         end
-        
-        # Force the encoding of all strings for the given row to the model's
-        # forced_encoding.
-        def load(row)
-          row.values.each{|v| v.force_encoding(forced_encoding) if v.is_a?(String)} if forced_encoding
-          super
-        end
       end
     
       module InstanceMethods
+        # Allow the force encoding plugin to work with the identity_map
+        # plugin by typecasting new values.
+        def merge_db_update(row)
+          super(force_hash_encoding(row))
+        end
+        
         private
+        
+        # Force the encoding for all string values in the given row hash.
+        def force_hash_encoding(row)
+          fe = model.forced_encoding
+          row.values.each{|v| v.force_encoding(fe) if v.is_a?(String)} if fe
+          row
+        end
+        
+        # Force the encoding of all string values when setting the instance's values.
+        def set_values(row)
+          super(force_hash_encoding(row))
+        end
         
         # Force the encoding of all returned strings to the model's forced_encoding.
         def typecast_value(column, value)
