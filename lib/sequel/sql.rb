@@ -665,6 +665,9 @@ module Sequel
     # required for the prepared statement support
     class PlaceholderLiteralString < Expression
       # The arguments that will be subsituted into the placeholders.
+      # Either an array of unnamed placeholders (which will be substituted in
+      # order for ? characters), or a hash of named placeholders (which will be
+      # substituted for :key phrases).
       attr_reader :args
 
       # The literal string containing placeholders

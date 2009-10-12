@@ -1,5 +1,7 @@
 === HEAD
 
+* Allow named placeholders in placeholder literal strings (jeremyevans)
+
 * Allow the force_encoding plugin to work when refreshing (jeremyevans)
 
 * Add Dataset#bind for setting bound variable values before calling #call (jeremyevans)

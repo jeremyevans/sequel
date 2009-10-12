@@ -300,7 +300,7 @@ context "Dataset#where" do
       should match(/WHERE \(\(name = 'xyz'\) AND \(price = 342\)\)|WHERE \(\(price = 342\) AND \(name = 'xyz'\)\)/)
   end
   
-  specify "should work with arrays (ala ActiveRecord)" do
+  specify "should work with a string with placeholders and arguments for those placeholders" do
     @dataset.where('price < ? AND id in ?', 100, [1, 2, 3]).select_sql.should ==
       "SELECT * FROM test WHERE (price < 100 AND id in (1, 2, 3))"
   end
@@ -308,6 +308,21 @@ context "Dataset#where" do
   specify "should work with strings (custom SQL expressions)" do
     @dataset.where('(a = 1 AND b = 2)').select_sql.should ==
       "SELECT * FROM test WHERE ((a = 1 AND b = 2))"
+  end
+    
+  specify "should work with a string with named placeholders and a hash of placeholder value arguments" do
+    @dataset.where('price < :price AND id in :ids', :price=>100, :ids=>[1, 2, 3]).select_sql.should ==
+      "SELECT * FROM test WHERE (price < 100 AND id in (1, 2, 3))"
+  end
+    
+  specify "should not replace named placeholders that don't existin in the hash" do
+    @dataset.where('price < :price AND id in :ids', :price=>100).select_sql.should ==
+      "SELECT * FROM test WHERE (price < 100 AND id in :ids)"
+  end
+    
+  specify "should handle partial names" do
+    @dataset.where('price < :price AND id = :p', :p=>2, :price=>100).select_sql.should ==
+      "SELECT * FROM test WHERE (price < 100 AND id = 2)"
   end
   
   specify "should affect select, delete and update statements" do

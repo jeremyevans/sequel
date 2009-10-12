@@ -82,6 +82,15 @@ context "String#lit" do
     ds.quote_identifiers = true
     ds.literal(a).should == 'DISTINCT "a"'
   end
+  
+  specify "should handle named placeholders if given a single argument hash" do
+    a = 'DISTINCT :b'.lit(:b=>:a)
+    a.should be_a_kind_of(Sequel::SQL::PlaceholderLiteralString)
+    ds = MockDatabase.new.dataset
+    ds.literal(a).should == 'DISTINCT a'
+    ds.quote_identifiers = true
+    ds.literal(a).should == 'DISTINCT "a"'
+  end
 end
 
 context "String#to_sequel_blob" do

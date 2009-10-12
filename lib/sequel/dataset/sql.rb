@@ -660,8 +660,14 @@ module Sequel
 
     # SQL fragment for a literal string with placeholders
     def placeholder_literal_string_sql(pls)
-      args = pls.args.dup
-      s = pls.str.gsub(QUESTION_MARK){literal(args.shift)}
+      args = pls.args
+      if args.is_a?(Hash)
+        s = pls.str.dup
+        args.each{|k,v| s.gsub!(/:#{Regexp.escape(k.to_s)}\b/, literal(v))}
+      else
+        i = -1
+        s = pls.str.gsub(QUESTION_MARK){literal(args.at(i+=1))}
+      end
       s = "(#{s})" if pls.parens
       s
     end
@@ -1049,7 +1055,9 @@ module Sequel
         SQL::BooleanExpression.from_value_pairs(expr)
       when Array
         if String === expr[0]
-          SQL::PlaceholderLiteralString.new(expr.shift, expr, true)
+          s = expr.shift
+          expr = expr.at(0) if expr.length == 1 && expr.at(0).is_a?(Hash)
+          SQL::PlaceholderLiteralString.new(s, expr, true)
         elsif Sequel.condition_specifier?(expr)
           SQL::BooleanExpression.from_value_pairs(expr)
         else

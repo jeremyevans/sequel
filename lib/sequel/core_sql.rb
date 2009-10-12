@@ -190,7 +190,13 @@ class String
   #    DB[:items].select{|o| o.count('DISTINCT ?'.lit(:a))}.sql #=>
   #      "SELECT count(DISTINCT a) FROM items"
   def lit(*args)
-    args.empty? ? Sequel::LiteralString.new(self) : Sequel::SQL::PlaceholderLiteralString.new(self, args)
+    if args.empty?
+      Sequel::LiteralString.new(self)
+    elsif args.length == 1 && (v = args.at(0)).is_a?(Hash)
+      Sequel::SQL::PlaceholderLiteralString.new(self, v)
+    else
+      Sequel::SQL::PlaceholderLiteralString.new(self, args)
+    end
   end
   
   # Returns a Sequel::SQL::Blob that holds the same data as this string. Blobs provide proper
