@@ -23,6 +23,26 @@ describe "Prepared Statements and Bound Arguments" do
     @ds.filter(:number=>@ds.ba(:$n)).call(:all, :n=>10).should == [{:id=>1, :number=>10}]
     @ds.filter(:number=>@ds.ba(:$n)).call(:first, :n=>10).should == {:id=>1, :number=>10}
   end
+    
+  specify "should support binding variables before the call with #bind" do
+    @ds.filter(:number=>@ds.ba(:$n)).bind(:n=>10).call(:select).should == [{:id=>1, :number=>10}]
+    @ds.filter(:number=>@ds.ba(:$n)).bind(:n=>10).call(:all).should == [{:id=>1, :number=>10}]
+    @ds.filter(:number=>@ds.ba(:$n)).bind(:n=>10).call(:first).should == {:id=>1, :number=>10}
+    
+    @ds.bind(:n=>10).filter(:number=>@ds.ba(:$n)).call(:select).should == [{:id=>1, :number=>10}]
+    @ds.bind(:n=>10).filter(:number=>@ds.ba(:$n)).call(:all).should == [{:id=>1, :number=>10}]
+    @ds.bind(:n=>10).filter(:number=>@ds.ba(:$n)).call(:first).should == {:id=>1, :number=>10}
+  end
+  
+  specify "should allow overriding variables specified with #bind" do
+    @ds.filter(:number=>@ds.ba(:$n)).bind(:n=>1).call(:select, :n=>10).should == [{:id=>1, :number=>10}]
+    @ds.filter(:number=>@ds.ba(:$n)).bind(:n=>1).call(:all, :n=>10).should == [{:id=>1, :number=>10}]
+    @ds.filter(:number=>@ds.ba(:$n)).bind(:n=>1).call(:first, :n=>10).should == {:id=>1, :number=>10}
+    
+    @ds.filter(:number=>@ds.ba(:$n)).bind(:n=>1).bind(:n=>10).call(:select).should == [{:id=>1, :number=>10}]
+    @ds.filter(:number=>@ds.ba(:$n)).bind(:n=>1).bind(:n=>10).call(:all).should == [{:id=>1, :number=>10}]
+    @ds.filter(:number=>@ds.ba(:$n)).bind(:n=>1).bind(:n=>10).call(:first).should == {:id=>1, :number=>10}
+  end
 
   specify "should support placeholder literal strings" do
     @ds.filter("number = ?", @ds.ba(:$n)).call(:select, :n=>10).should == [{:id=>1, :number=>10}]

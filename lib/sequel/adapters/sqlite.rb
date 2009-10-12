@@ -171,12 +171,6 @@ module Sequel
         end
       end
       
-      # Prepare an unnamed statement of the given type and call it with the
-      # given values.
-      def call(type, hash, values=nil, &block)
-        prepare(type, nil, values).call(hash, &block)
-      end
-      
       # Yield a hash for each row in the dataset.
       def fetch_rows(sql)
         execute(sql) do |result|

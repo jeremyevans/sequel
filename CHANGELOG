@@ -1,5 +1,7 @@
 === HEAD
 
+* Add Dataset#bind for setting bound variable values before calling #call (jeremyevans)
+
 * Add additional join methods to Dataset: (cross|natural|(natural_)?(full|left|right))_join (jeremyevans)
 
 * Fix use a dataset aggregate methods (e.g. sum) on limited/grouped/etc. datasets (jeremyevans)

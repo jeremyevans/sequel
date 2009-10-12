@@ -257,6 +257,7 @@ module Sequel
         def subselect_sql(ds)
           ps = ds.to_prepared_statement(:select)
           ps.extend(CallableStatementMethods)
+          ps = ps.bind(@opts[:bind_vars]) if @opts[:bind_vars]
           ps.prepared_args = prepared_args
           ps.prepared_sql
         end

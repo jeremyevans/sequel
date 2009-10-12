@@ -343,7 +343,7 @@ module Sequel
           # Return an array of strings for each of the hash values, inserting
           # them to the correct position in the array.
           def map_to_prepared_args(hash)
-            @prepared_args.map{|k| hash[k.to_sym].to_s}
+            prepared_args.map{|k| hash[k.to_sym].to_s}
           end
 
           private
@@ -355,11 +355,11 @@ module Sequel
           # elminate ambiguity (and PostgreSQL from raising an exception).
           def prepared_arg(k)
             y, type = k.to_s.split("__")
-            if i = @prepared_args.index(y)
+            if i = prepared_args.index(y)
               i += 1
             else
-              @prepared_args << y
-              i = @prepared_args.length
+              prepared_args << y
+              i = prepared_args.length
             end
             LiteralString.new("#{prepared_arg_placeholder}#{i}#{"::#{type}" if type}")
           end
@@ -413,10 +413,10 @@ module Sequel
         end
         
         # Execute the given type of statement with the hash of values.
-        def call(type, hash, values=nil, &block)
+        def call(type, bind_vars={}, values=nil, &block)
           ps = to_prepared_statement(type, values)
           ps.extend(BindArgumentMethods)
-          ps.call(hash, &block)
+          ps.call(bind_vars, &block)
         end
         
         # Prepare the given type of statement with the given name, and store

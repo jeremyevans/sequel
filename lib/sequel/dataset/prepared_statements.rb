@@ -16,11 +16,10 @@ module Sequel
       attr_accessor :bind_arguments
       
       # Set the bind arguments based on the hash and call super.
-      def call(hash, &block)
-        ds = clone
+      def call(bind_vars={}, &block)
+        ds = bind(bind_vars)
         ds.prepared_sql
-        ds.bind_arguments = ds.map_to_prepared_args(hash)
-        ds.prepared_args = hash
+        ds.bind_arguments = ds.map_to_prepared_args(ds.opts[:bind_vars])
         ds.run(&block)
       end
         
@@ -55,7 +54,7 @@ module Sequel
       # :insert, :update, or :delete
       attr_accessor :prepared_type
       
-      # The bind variable hash to use when substituting
+      # The array/hash of bound variable placeholder names.
       attr_accessor :prepared_args
       
       # The argument to supply to insert and update, which may use
@@ -64,10 +63,8 @@ module Sequel
       
       # Sets the prepared_args to the given hash and runs the
       # prepared statement.
-      def call(hash, &block)
-        ds = clone
-        ds.prepared_args = hash
-        ds.run(&block)
+      def call(bind_vars={}, &block)
+        bind(bind_vars).run(&block)
       end
       
       # Returns the SQL for the prepared statement, depending on
@@ -91,8 +88,9 @@ module Sequel
       # prepared_args is present.  If so, they are considered placeholders,
       # and they are substituted using prepared_arg.
       def literal_symbol(v)
-        if match = PLACEHOLDER_RE.match(v.to_s) and @prepared_args
-          literal(prepared_arg(match[1].to_sym))
+        if @opts[:bind_vars] and match = PLACEHOLDER_RE.match(v.to_s)
+          v2 = prepared_arg(match[1].to_sym)
+          v2 ? literal(v2) : v
         else
           super
         end
@@ -129,7 +127,7 @@ module Sequel
       
       # Returns the value of the prepared_args hash for the given key.
       def prepared_arg(k)
-        @prepared_args[k]
+        @opts[:bind_vars][k]
       end
 
       # Use a clone of the dataset extended with prepared statement
@@ -137,6 +135,7 @@ module Sequel
       # bind variables/prepared arguments in subselects.
       def subselect_sql(ds)
         ps = ds.prepare(:select)
+        ps = ps.bind(@opts[:bind_vars]) if @opts[:bind_vars]
         ps.prepared_args = prepared_args
         ps.prepared_sql
       end
@@ -154,8 +153,8 @@ module Sequel
       # Returns a single output array mapping the values of the input hash.
       # Keys in the input hash that are used more than once in the query
       # have multiple entries in the output array.
-      def map_to_prepared_args(hash)
-        @prepared_args.map{|v| hash[v]}
+      def map_to_prepared_args(bind_vars)
+        prepared_args.map{|v| bind_vars[v]}
       end
       
       private
@@ -163,9 +162,16 @@ module Sequel
       # Associates the argument with name k with the next position in
       # the output array.
       def prepared_arg(k)
-        @prepared_args << k
+        prepared_args << k
         prepared_arg_placeholder
       end
+    end
+    
+    # Set the bind variables to use for the call.  If bind variables have
+    # already been set for this dataset, they are updated with the contents
+    # of bind_vars.
+    def bind(bind_vars={})
+      clone(:bind_vars=>@opts[:bind_vars] ? @opts[:bind_vars].merge(bind_vars) : bind_vars)
     end
     
     # For the given type (:select, :insert, :update, or :delete),
@@ -173,8 +179,8 @@ module Sequel
     # specified in the hash.  values is a hash of passed to
     # insert or update (if one of those types is used),
     # which may contain placeholders.
-    def call(type, bind_variables={}, values=nil)
-      prepare(type, nil, values).call(bind_variables)
+    def call(type, bind_vars={}, values=nil, &block)
+      prepare(type, nil, values).call(bind_vars, &block)
     end
     
     # Prepare an SQL statement for later execution. This returns
@@ -197,7 +203,7 @@ module Sequel
     # Return a cloned copy of the current dataset extended with
     # PreparedStatementMethods, setting the type and modify values.
     def to_prepared_statement(type, values=nil)
-      ps = clone
+      ps = bind
       ps.extend(PreparedStatementMethods)
       ps.prepared_type = type
       ps.prepared_modify_values = values
