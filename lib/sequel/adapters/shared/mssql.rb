@@ -208,7 +208,7 @@ module Sequel
       
       # Disable the use of INSERT OUPUT
       def disable_insert_output
-        clone(:disable_insert_output=>true)
+        clone(:disable_insert_output=>nil)
       end
 
       # Disable the use of INSERT OUPUT
@@ -228,7 +228,7 @@ module Sequel
       end
 
       def insert_select(*values)
-        return if opts[:disable_insert_output]
+        return if opts.has_key? :disable_insert_output
         naked.clone(default_server_opts(:sql=>output(nil, [:inserted.*]).insert_sql(*values))).single_record
       end
 
