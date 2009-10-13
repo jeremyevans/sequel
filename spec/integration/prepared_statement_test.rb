@@ -48,6 +48,13 @@ describe "Prepared Statements and Bound Arguments" do
     @ds.filter("number = ?", @ds.ba(:$n)).call(:select, :n=>10).should == [{:id=>1, :number=>10}]
   end
 
+  specify "should support named placeholder literal strings and handle multiple named placeholders correctly" do
+    @ds.filter("number = :n", :n=>@ds.ba(:$n)).call(:select, :n=>10).should == [{:id=>1, :number=>10}]
+    @ds.insert(:number=>20)
+    @ds.insert(:number=>30)
+    @ds.filter("number > :n1 AND number < :n2 AND number = :n3", :n3=>@ds.ba(:$n3), :n2=>@ds.ba(:$n2), :n1=>@ds.ba(:$n1)).call(:select, :n3=>20, :n2=>30, :n1=>10).should == [{:id=>2, :number=>20}]
+  end
+
   specify "should support datasets with static sql and placeholders" do
     INTEGRATION_DB["SELECT * FROM items WHERE number = ?", @ds.ba(:$n)].call(:select, :n=>10).should == [{:id=>1, :number=>10}]
   end

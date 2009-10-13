@@ -661,12 +661,12 @@ module Sequel
     # SQL fragment for a literal string with placeholders
     def placeholder_literal_string_sql(pls)
       args = pls.args
-      if args.is_a?(Hash)
-        s = pls.str.dup
-        args.each{|k,v| s.gsub!(/:#{Regexp.escape(k.to_s)}\b/, literal(v))}
+      s = if args.is_a?(Hash)
+        re = /:(#{args.keys.map{|k| Regexp.escape(k.to_s)}.join('|')})\b/
+        pls.str.gsub(re){literal(args[$1.to_sym])}
       else
         i = -1
-        s = pls.str.gsub(QUESTION_MARK){literal(args.at(i+=1))}
+        pls.str.gsub(QUESTION_MARK){literal(args.at(i+=1))}
       end
       s = "(#{s})" if pls.parens
       s
