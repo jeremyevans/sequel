@@ -1117,10 +1117,18 @@ context "Dataset#with_sql" do
     @dataset = Sequel::Dataset.new(nil).from(:test)
   end
   
-  specify "should remove use static sql" do
+  specify "should use static sql" do
     @dataset.with_sql('SELECT 1 FROM test').sql.should == 'SELECT 1 FROM test'
   end
   
+  specify "should work with placeholders" do
+    @dataset.with_sql('SELECT ? FROM test', 1).sql.should == 'SELECT 1 FROM test'
+  end
+
+  specify "should work with named placeholders" do
+    @dataset.with_sql('SELECT :x FROM test', :x=>1).sql.should == 'SELECT 1 FROM test'
+  end
+
   specify "should keep row_proc" do
     @dataset.with_sql('SELECT 1 FROM test').row_proc.should == @dataset.row_proc
   end
@@ -3123,6 +3131,10 @@ context "Sequel::Dataset#qualify_to_first_source" do
 
   specify "should handle SQL::PlaceholderLiteralStrings" do
     @ds.filter('? > ?', :a, 1).qualify_to_first_source.sql.should == 'SELECT t.* FROM t WHERE (t.a > 1)'
+  end
+
+  specify "should handle SQL::PlaceholderLiteralStrings with named placeholders" do
+    @ds.filter(':a > :b', :a=>:c, :b=>1).qualify_to_first_source.sql.should == 'SELECT t.* FROM t WHERE (t.c > 1)'
   end
 
   specify "should handle SQL::WindowFunctions" do

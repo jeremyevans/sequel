@@ -1055,9 +1055,7 @@ module Sequel
         SQL::BooleanExpression.from_value_pairs(expr)
       when Array
         if String === expr[0]
-          s = expr.shift
-          expr = expr.at(0) if expr.length == 1 && expr.at(0).is_a?(Hash)
-          SQL::PlaceholderLiteralString.new(s, expr, true)
+          SQL::PlaceholderLiteralString.new(expr.shift, expr, true)
         elsif Sequel.condition_specifier?(expr)
           SQL::BooleanExpression.from_value_pairs(expr)
         else
@@ -1328,7 +1326,14 @@ module Sequel
         o[:order] = qualified_expression(o[:order], table) if o[:order]
         SQL::Window.new(o)
       when SQL::PlaceholderLiteralString
-        SQL::PlaceholderLiteralString.new(e.str, qualified_expression(e.args, table), e.parens)
+        args = if e.args.is_a?(Hash)
+          h = {}
+          e.args.each{|k,v| h[k] = qualified_expression(v, table)}
+          h
+        else
+          qualified_expression(e.args, table)
+        end
+        SQL::PlaceholderLiteralString.new(e.str, args, e.parens)
       else
         e
       end

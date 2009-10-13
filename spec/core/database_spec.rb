@@ -1027,10 +1027,14 @@ context "Database#fetch" do
     @db.fetch('select * from xyz where x = ? and y = ?', 15, 'abc') {|r| sql = r[:sql]}
     sql.should == "select * from xyz where x = 15 and y = 'abc'"
     
-    # and Aman Gupta's example
-    @db.fetch('select name from table where name = ? or id in ?',
-    'aman', [3,4,7]) {|r| sql = r[:sql]}
+    @db.fetch('select name from table where name = ? or id in ?', 'aman', [3,4,7]) {|r| sql = r[:sql]}
     sql.should == "select name from table where name = 'aman' or id in (3, 4, 7)"
+  end
+  
+  specify "should format the given sql with named arguments" do
+    sql = nil
+    @db.fetch('select * from xyz where x = :x and y = :y', :x=>15, :y=>'abc') {|r| sql = r[:sql]}
+    sql.should == "select * from xyz where x = 15 and y = 'abc'"
   end
   
   specify "should return the dataset if no block is given" do
@@ -1065,7 +1069,7 @@ context "Database#[]" do
     ds.opts[:from].should == [:items]
   end
   
-  specify "should return an enumerator when a string is given" do
+  specify "should return a dataset when a string is given" do
     c = Class.new(Sequel::Dataset) do
       def fetch_rows(sql); yield({:sql => sql}); end
     end

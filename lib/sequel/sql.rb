@@ -679,7 +679,7 @@ module Sequel
       # Create an object with the given string, placeholder arguments, and parens flag.
       def initialize(str, args, parens=false)
         @str = str
-        @args = args
+        @args = args.is_a?(Array) && args.length == 1 && (v = args.at(0)).is_a?(Hash) ? v : args
         @parens = parens
       end
 
