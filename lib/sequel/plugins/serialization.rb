@@ -3,7 +3,7 @@ module Sequel
     # Sequel's built in Serialization plugin allows you to keep serialized
     # ruby objects in the database, while giving you deserialized objects
     # when you call an accessor.
-    # 
+    #
     # This plugin works by keeping the serialized value in the values, and
     # adding a @deserialized_values hash.  The reader method for serialized columns
     # will check the @deserialized_values for the value, return it if present,
@@ -11,13 +11,24 @@ module Sequel
     # set the @deserialized_values entry.  This plugin adds a before_save hook
     # that serializes all @deserialized_values to @values.
     #
-    # You can use either marshal or yaml as the serialization format.
-    # If you use yaml, you should require yaml yourself.
+    # You can use emarshal, yaml, or json as the serialization format.
+    # If you use yaml or json, you should require them by yourself.
     #
     # Because of how this plugin works, it must be used inside each model class
     # that needs serialization, after any set_dataset method calls in that class.
     # Otherwise, it is possible that the default column accessors will take
     # precedence.
+    #
+    # == Example
+    #
+    #   require 'sequel'
+    #   require 'json'
+    #   class User < Sequel::Model
+    #     plugin :serialization, :json, :permissions
+    #   end
+    #   user = User.create
+    #   user.permissions = { :global => 'read-only' }
+    #   user.save
     module Serialization
       # Set up the column readers to do deserialization and the column writers
       # to save the value in deserialized_values.
