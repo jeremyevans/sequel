@@ -11,7 +11,7 @@ module Sequel
     # set the @deserialized_values entry.  This plugin adds a before_save hook
     # that serializes all @deserialized_values to @values.
     #
-    # You can use emarshal, yaml, or json as the serialization format.
+    # You can use either marshal, yaml, or json as the serialization format.
     # If you use yaml or json, you should require them by yourself.
     #
     # Because of how this plugin works, it must be used inside each model class
@@ -25,6 +25,9 @@ module Sequel
     #   require 'json'
     #   class User < Sequel::Model
     #     plugin :serialization, :json, :permissions
+    #     # or
+    #     plugin :serialization
+    #     serialize_attributes :marshal, :permissions, :attributes
     #   end
     #   user = User.create
     #   user.permissions = { :global => 'read-only' }
