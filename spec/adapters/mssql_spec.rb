@@ -340,3 +340,9 @@ context "MSSSQL::Dataset#insert" do
     @ds.first(:xid=>h[:xid])[:value].should == 10
   end
 end
+
+context "MSSSQL::Dataset#disable_insert_output" do
+  specify "should play nicely with simple_select_all?" do
+    MSSQL_DB[:test].disable_insert_output.send(:simple_select_all?).should == true
+  end
+end
