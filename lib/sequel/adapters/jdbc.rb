@@ -1,15 +1,6 @@
 require 'java'
 Sequel.require 'adapters/utils/stored_procedures'
 
-class Time
-  def to_java_sql_timestamp
-    millis = to_i * 1000
-    ts = java.sql.Timestamp.new(millis)
-    ts.setNanos(usec * 1000)
-    ts
-  end
-end
-
 module Sequel
   # Houses Sequel's JDBC support when running on JRuby.
   # Support for individual database types is done using sub adapters.
@@ -312,6 +303,14 @@ module Sequel
         end
       end
       
+      # Support fractional seconds for Time objects used in bound variables
+      def java_sql_timestamp(time)
+        millis = time.to_i * 1000
+        ts = java.sql.Timestamp.new(millis)
+        ts.setNanos(time.usec * 1000)
+        ts
+      end
+
       # By default, there is no support for determining the last inserted
       # id, so return nil.  This method should be overridden in
       # sub adapters.
@@ -347,7 +346,7 @@ module Sequel
         when DateTime, Java::JavaSql::Timestamp
           cps.setTimestamp(i, arg)
         when Time
-          cps.setTimestamp(i, arg.to_java_sql_timestamp)
+          cps.setTimestamp(i, java_sql_timestamp(arg))
         when Float
           cps.setDouble(i, arg)
         when TrueClass, FalseClass
