@@ -84,6 +84,7 @@ rescue LoadError => e
 end
 
 module Sequel
+  Dataset::NON_SQL_OPTIONS << :cursor
   module Postgres
     CONVERTED_EXCEPTIONS << PGError
     
@@ -413,7 +414,7 @@ module Sequel
         end
         
         # Execute the given type of statement with the hash of values.
-        def call(type, hash, *values, &block)
+        def call(type, bind_vars={}, *values, &block)
           ps = to_prepared_statement(type, values)
           ps.extend(BindArgumentMethods)
           ps.call(bind_vars, &block)
