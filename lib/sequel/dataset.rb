@@ -39,6 +39,10 @@ module Sequel
     set_defaults set_graph_aliases set_overrides unfiltered ungraphed ungrouped union
     unlimited unordered where with with_recursive with_sql'.collect{|x| x.to_sym}
 
+    # Which options don't affect the SQL generation.  Used by simple_select_all?
+    # to determine if this is a simple SELECT * FROM table.
+    NON_SQL_OPTIONS = [:server, :defaults, :overrides]
+
     NOTIMPL_MSG = "This method must be overridden in Sequel adapters".freeze
     WITH_SUPPORTED=:select_with_sql
 
@@ -318,7 +322,7 @@ module Sequel
 
     # Whether this dataset is a simple SELECT * FROM table.
     def simple_select_all?
-      o = @opts.reject{|k,v| v.nil?}
+      o = @opts.reject{|k,v| v.nil? || NON_SQL_OPTIONS.include?(k)}
       o.length == 1 && (f = o[:from]) && f.length == 1 && f.first.is_a?(Symbol)
     end
 

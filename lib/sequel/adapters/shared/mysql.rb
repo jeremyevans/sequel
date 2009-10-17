@@ -1,4 +1,7 @@
 module Sequel
+  Dataset::NON_SQL_OPTIONS << :insert_ignore
+  Dataset::NON_SQL_OPTIONS << :on_duplicate_key_update
+
   module MySQL
     class << self
       # Set the default options used for CREATE TABLE

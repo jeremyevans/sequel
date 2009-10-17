@@ -1,4 +1,5 @@
 module Sequel
+  Dataset::NON_SQL_OPTIONS << :disable_insert_output
   module MSSQL
     module DatabaseMethods
       AUTO_INCREMENT = 'IDENTITY(1,1)'.freeze
@@ -206,12 +207,12 @@ module Sequel
         CONSTANT_MAP[constant] || super
       end
       
-      # Disable the use of INSERT OUPUT
+      # Disable the use of INSERT OUTPUT
       def disable_insert_output
-        clone(:disable_insert_output=>nil)
+        clone(:disable_insert_output=>true)
       end
 
-      # Disable the use of INSERT OUPUT
+      # Disable the use of INSERT OUTPUT, modifying the receiver
       def disable_insert_output!
         mutation_method(:disable_insert_output)
       end
@@ -227,9 +228,9 @@ module Sequel
         filter("CONTAINS (#{literal(cols)}, #{literal(terms)})")
       end
 
+      # Use the OUTPUT clause to get the value of all columns for the newly inserted record.
       def insert_select(*values)
-        return if opts.has_key? :disable_insert_output
-        naked.clone(default_server_opts(:sql=>output(nil, [:inserted.*]).insert_sql(*values))).single_record
+        naked.clone(default_server_opts(:sql=>output(nil, [:inserted.*]).insert_sql(*values))).single_record unless opts[:disable_insert_output]
       end
 
       # MSSQL uses a UNION ALL statement to insert multiple values at once.

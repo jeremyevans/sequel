@@ -1,4 +1,6 @@
 module Sequel
+  Dataset::NON_SQL_OPTIONS << :disable_insert_returning
+
   # Top level module for holding all PostgreSQL-related modules and classes
   # for Sequel.  There are a few module level accessors that are added via
   # metaprogramming.  These are:
@@ -706,7 +708,7 @@ module Sequel
 
       # Return a clone of the dataset with an addition named window that can be referenced in window functions.
       def window(name, opts)
-        clone(:window=>(@opts[:windows]||[]) + [[name, SQL::Window.new(opts)]])
+        clone(:window=>(@opts[:window]||[]) + [[name, SQL::Window.new(opts)]])
       end
       
       private
