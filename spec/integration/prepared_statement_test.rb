@@ -24,6 +24,11 @@ describe "Prepared Statements and Bound Arguments" do
     @ds.filter(:number=>@ds.ba(:$n)).call(:first, :n=>10).should == {:id=>1, :number=>10}
   end
     
+  specify "should support blocks for select and all" do
+    @ds.filter(:number=>@ds.ba(:$n)).call(:select, :n=>10){|r| r[:number] *= 2}.should == [{:id=>1, :number=>20}]
+    @ds.filter(:number=>@ds.ba(:$n)).call(:all, :n=>10){|r| r[:number] *= 2}.should == [{:id=>1, :number=>20}]
+  end
+    
   specify "should support binding variables before the call with #bind" do
     @ds.filter(:number=>@ds.ba(:$n)).bind(:n=>10).call(:select).should == [{:id=>1, :number=>10}]
     @ds.filter(:number=>@ds.ba(:$n)).bind(:n=>10).call(:all).should == [{:id=>1, :number=>10}]

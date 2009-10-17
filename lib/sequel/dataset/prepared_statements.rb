@@ -179,8 +179,8 @@ module Sequel
     # specified in the hash.  values is a hash of passed to
     # insert or update (if one of those types is used),
     # which may contain placeholders.
-    def call(type, bind_variables={}, *values)
-      prepare(type, nil, *values).call(bind_variables)
+    def call(type, bind_variables={}, *values, &block)
+      prepare(type, nil, *values).call(bind_variables, &block)
     end
     
     # Prepare an SQL statement for later execution. This returns
