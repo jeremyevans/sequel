@@ -545,6 +545,16 @@ describe "Sequel::Dataset convenience methods" do
     @ds.group_and_count(:a).all.each{|h| h[:count] = h[:count].to_i}.should == [{:a=>30, :count=>1}, {:a=>20, :count=>2}]
   end
   
+  it "#group_and_count should support column aliases" do
+    @ds.group_and_count(:a___c).all.should == []
+    @ds.insert(20, 10)
+    @ds.group_and_count(:a___c).all.each{|h| h[:count] = h[:count].to_i}.should == [{:c=>20, :count=>1}]
+    @ds.insert(20, 30)
+    @ds.group_and_count(:a___c).all.each{|h| h[:count] = h[:count].to_i}.should == [{:c=>20, :count=>2}]
+    @ds.insert(30, 30)
+    @ds.group_and_count(:a___c).all.each{|h| h[:count] = h[:count].to_i}.should == [{:c=>30, :count=>1}, {:c=>20, :count=>2}]
+  end
+  
   cspecify "#range should return the range between the maximum and minimum values", :sqlite do
     @ds = @ds.unordered
     @ds.insert(20, 10)
