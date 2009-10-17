@@ -1720,6 +1720,11 @@ context "Dataset#join_table" do
       'SELECT * FROM "items" INNER JOIN "categories" USING ("id1", "id2")'
   end
 
+  specify "should emulate JOIN USING (poorly) if the dataset doesn't support it" do
+    @d.meta_def(:supports_join_using?){false}
+    @d.join(:categories, [:id]).sql.should == 'SELECT * FROM "items" INNER JOIN "categories" ON ("categories"."id" = "items"."id")'
+  end
+
   specify "should raise an error if using an array of symbols with a block" do
     proc{@d.join(:categories, [:id]){|j,lj,js|}}.should raise_error(Sequel::Error)
   end

@@ -98,6 +98,11 @@ module Sequel
           false
         end
         
+        # H2 doesn't support JOIN USING
+        def supports_join_using?
+          false
+        end 
+
         private
       
         def select_clause_methods

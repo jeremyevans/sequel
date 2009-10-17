@@ -269,6 +269,11 @@ module Sequel
       true
     end
     
+    # Whether the dataset supports the JOIN table USING (column1, ...) syntax.
+    def supports_join_using?
+      true
+    end
+    
     # Whether the IN/NOT IN operators support multiple columns when an
     # array of values is given.
     def supports_multiple_column_in?

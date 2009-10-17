@@ -232,15 +232,6 @@ module Sequel
         naked.clone(default_server_opts(:sql=>output(nil, [:inserted.*]).insert_sql(*values))).single_record
       end
 
-      # MSSQL doesn't support the USING clause, so emulate it using a ON clause.
-      def join_using_clause_sql(jc)
-        expr = jc.using.collect do |col|
-          [qualified_column_name(col, jc.table_alias || jc.table),
-           qualified_column_name(col, jc.last_alias)]
-        end
-        join_on_clause_sql(SQL::JoinOnClause.new(expr, jc.join_type, jc.table, jc.table_alias, jc.last_alias))
-      end
-
       # MSSQL uses a UNION ALL statement to insert multiple values at once.
       def multi_insert_sql(columns, values)
         [insert_sql(columns, LiteralString.new(values.map {|r| "SELECT #{expression_list(r)}" }.join(" UNION ALL ")))]
@@ -326,6 +317,11 @@ module Sequel
         false
       end
       
+      # MSSQL doesn't support JOIN USING
+      def supports_join_using?
+        false
+      end
+
       # MSSQL does not support multiple columns for the IN/NOT IN operators
       def supports_multiple_column_in?
         false

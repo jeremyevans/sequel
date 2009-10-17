@@ -621,12 +621,9 @@ module Sequel
       # The table alias to use for the join, if any
       attr_reader :table_alias
 
-      # The table or table alias that forms the left side of the join
-      attr_reader :last_alias
-
       # Create an object with the given join_type, table, and table alias
-      def initialize(join_type, table, table_alias = nil, last_alias = nil)
-        @join_type, @table, @table_alias, @last_alias = join_type, table, table_alias, last_alias
+      def initialize(join_type, table, table_alias = nil)
+        @join_type, @table, @table_alias = join_type, table, table_alias
       end
 
       to_s_method :join_clause_sql
