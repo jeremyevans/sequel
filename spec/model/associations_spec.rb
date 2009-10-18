@@ -652,7 +652,7 @@ describe Sequel::Model, "one_to_many" do
     proc{@c2.one_to_many :attributes, :class => @c1, :key=>[:node_id, :id, :x], :primary_key=>[:parent_id, :id]}.should raise_error(Sequel::Error)
   end
 
-  it "should define an add_ method" do
+  it "should define an add_ method that works on existing records" do
     @c2.one_to_many :attributes, :class => @c1
     
     n = @c2.new(:id => 1234)
@@ -660,17 +660,52 @@ describe Sequel::Model, "one_to_many" do
     a.save
     MODEL_DB.reset
     a.should == n.add_attribute(a)
+    a.values.should == {:node_id => 1234, :id => 2345}
     MODEL_DB.sqls.should == ['UPDATE attributes SET node_id = 1234 WHERE (id = 2345)']
   end
 
-  it "should define a remove_ method" do
+  it "should define an add_ method that works on new records" do
     @c2.one_to_many :attributes, :class => @c1
     
     n = @c2.new(:id => 1234)
     a = @c1.new(:id => 2345)
+    # do not save
+    MODEL_DB.reset
+    a.should == n.add_attribute(a)
+    MODEL_DB.sqls.should == ["INSERT INTO attributes (id, node_id) VALUES (2345, 1234)",
+                             "SELECT * FROM attributes WHERE (id = 2345) LIMIT 1"]
+    a.values.should == {:node_id => 1234, :id => 2345}
+  end
+
+  it "should define a remove_ method that works on existing records" do
+    @c2.one_to_many :attributes, :class => @c1
+    
+    n = @c2.new(:id => 1234)
+    a = @c1.new(:id => 2345, :node_id => 1234)
     a.save
     MODEL_DB.reset
     a.should == n.remove_attribute(a)
+    a.values.should == {:node_id => nil, :id => 2345}
+    MODEL_DB.sqls.should == ['UPDATE attributes SET node_id = NULL WHERE (id = 2345)']
+  end
+
+  it "should accept a hash for the add_ method and create a new record" do
+    @c2.one_to_many :attributes, :class => @c1
+    n = @c2.new(:id => 1234)
+    a = @c1.new(:id => 2345)
+    MODEL_DB.reset
+    a.should == n.add_attribute(:id => 2345)
+    MODEL_DB.sqls.should == ["INSERT INTO attributes (id, node_id) VALUES (2345, 1234)",
+                             "SELECT * FROM attributes WHERE (id = 2345) LIMIT 1"]
+    a.values.should == {:node_id => 1234, :id => 2345}
+  end
+
+  it "should accept an id for the remove_ method and remove an existing record" do
+    @c2.one_to_many :attributes, :class => @c1
+    n = @c2.new(:id => 1234)
+    a = @c1.create(:id => 2345, :node_id => 1234)
+    MODEL_DB.reset
+    a.should == n.remove_attribute(a.id)
     MODEL_DB.sqls.should == ['UPDATE attributes SET node_id = NULL WHERE (id = 2345)']
   end
   
