@@ -1020,7 +1020,7 @@ module Sequel
 
         # Remove the given associated object from the given association
         def remove_associated_object(opts, o, *args)
-          o = opts.associated_class[o] if o.is_a?(Fixnum) or o.is_a?(String)
+          o = send(opts.dataset_method).filter(opts.associated_class.primary_key_hash(o)).first if o.is_a?(Fixnum) or o.is_a?(String)
           raise(Sequel::Error, "model object #{model} does not have a primary key") unless pk
           raise(Sequel::Error, "associated object #{o.model} does not have a primary key") if opts.need_associated_primary_key? && !o.pk
           return if run_association_callbacks(opts, :before_remove, o) == false

@@ -558,11 +558,13 @@ describe Sequel::Model, "one_to_many" do
     MODEL_DB.reset
 
     @c1 = Class.new(Sequel::Model(:attributes)) do
+      def _refresh(ds); end
       unrestrict_primary_key
       columns :id, :node_id, :y
     end
 
     @c2 = Class.new(Sequel::Model(:nodes)) do
+      def _refresh(ds); end
       unrestrict_primary_key
       attr_accessor :xxx
       
@@ -668,13 +670,12 @@ describe Sequel::Model, "one_to_many" do
     @c2.one_to_many :attributes, :class => @c1
     
     n = @c2.new(:id => 1234)
-    a = @c1.new(:id => 2345)
+    a = @c1.new(:id => 234)
     # do not save
     MODEL_DB.reset
     a.should == n.add_attribute(a)
-    MODEL_DB.sqls.should == ["INSERT INTO attributes (id, node_id) VALUES (2345, 1234)",
-                             "SELECT * FROM attributes WHERE (id = 2345) LIMIT 1"]
-    a.values.should == {:node_id => 1234, :id => 2345}
+    MODEL_DB.sqls.first.should =~ /INSERT INTO attributes \((node_)?id, (node_)?id\) VALUES \(1?234, 1?234\)/
+    a.values.should == {:node_id => 1234, :id => 234}
   end
 
   it "should define a remove_ method that works on existing records" do
@@ -692,21 +693,23 @@ describe Sequel::Model, "one_to_many" do
   it "should accept a hash for the add_ method and create a new record" do
     @c2.one_to_many :attributes, :class => @c1
     n = @c2.new(:id => 1234)
-    a = @c1.new(:id => 2345)
     MODEL_DB.reset
-    a.should == n.add_attribute(:id => 2345)
-    MODEL_DB.sqls.should == ["INSERT INTO attributes (id, node_id) VALUES (2345, 1234)",
-                             "SELECT * FROM attributes WHERE (id = 2345) LIMIT 1"]
-    a.values.should == {:node_id => 1234, :id => 2345}
+    @c1.load(:node_id => 1234, :id => 234).should == n.add_attribute(:id => 234)
+    MODEL_DB.sqls.first.should =~ /INSERT INTO attributes \((node_)?id, (node_)?id\) VALUES \(1?234, 1?234\)/
   end
 
-  it "should accept an id for the remove_ method and remove an existing record" do
+  it "should accept a primary key for the remove_ method and remove an existing record" do
     @c2.one_to_many :attributes, :class => @c1
     n = @c2.new(:id => 1234)
-    a = @c1.create(:id => 2345, :node_id => 1234)
+    ds = @c1.dataset
+    def ds.fetch_rows(sql)
+      db << sql
+      yield({:id=>234, :node_id=>1234})
+    end
     MODEL_DB.reset
-    a.should == n.remove_attribute(a.id)
-    MODEL_DB.sqls.should == ['UPDATE attributes SET node_id = NULL WHERE (id = 2345)']
+    @c1.load(:node_id => nil, :id => 234).should == n.remove_attribute(234)
+    MODEL_DB.sqls.should == ['SELECT * FROM attributes WHERE ((attributes.node_id = 1234) AND (id = 234)) LIMIT 1',
+      'UPDATE attributes SET node_id = NULL WHERE (id = 234)']
   end
   
   it "should have add_ method respect the :primary_key option" do
@@ -1102,6 +1105,7 @@ describe Sequel::Model, "one_to_many" do
     @c2.one_to_many :attributes, :class => @c1, :one_to_one=>true
     attrib = @c1.new(:id=>3)
     d = @c1.dataset
+    @c1.class_eval{remove_method :_refresh}
     def d.fetch_rows(s); yield({:id=>3}) end
     @c2.new(:id => 1234).attribute = attrib
     ['INSERT INTO attributes (node_id, id) VALUES (1234, 3)',
@@ -1132,6 +1136,7 @@ describe Sequel::Model, "one_to_many" do
     @c2.one_to_many :attributes, :class => @c1, :one_to_one=>true, :primary_key=>:xxx
     attrib = @c1.new(:id=>3)
     d = @c1.dataset
+    @c1.class_eval{remove_method :_refresh}
     def d.fetch_rows(s); yield({:id=>3}) end
     @c2.new(:id => 1234, :xxx=>5).attribute = attrib
     ['INSERT INTO attributes (node_id, id) VALUES (5, 3)',
