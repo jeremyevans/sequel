@@ -3,11 +3,11 @@ module Sequel
     # Errors represents validation errors, a simple hash subclass
     # with a few convenience methods.
     class Errors < ::Hash
-      ATTRIBUTE_JOINER = ' and '
+      ATTRIBUTE_JOINER = ' and '.freeze
 
       # Assign an array of messages for each attribute on access
-      def initialize
-        super{|h,k| h[k] = []}
+      def [](k)
+        has_key?(k) ? super : (self[k] = [])
       end
 
       # Adds an error for the given attribute.
@@ -32,7 +32,7 @@ module Sequel
       # Returns the array of errors for the given attribute, or nil
       # if there are no errors for the attribute.
       def on(att)
-        self[att] if include?(att)
+        self[att] if has_key?(att)
       end
     end
   end

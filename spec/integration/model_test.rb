@@ -85,4 +85,13 @@ describe "Sequel::Model basic support" do
     i = Item.create(:name=>'J')
     Item.to_hash(:name).should == {'J'=>Item.load(:id=>1, :name=>'J')}
   end
+  
+  specify "should be marshalable before and after saving" do
+    i = Item.new(:name=>'J')
+    proc{Marshal.dump(i)}.should_not raise_error
+    i.save
+    proc{Marshal.dump(i)}.should_not raise_error
+    i.save
+    proc{Marshal.dump(i)}.should_not raise_error
+  end
 end

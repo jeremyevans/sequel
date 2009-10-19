@@ -209,6 +209,25 @@ describe "Model#save" do
   end
 end
 
+describe "Model marshalling" do
+  before do
+    class ::Album < Sequel::Model
+      columns :id, :x, :y
+    end
+    Album.dataset.meta_def(:insert){|h| super(h); 1}
+  end
+  after do
+    Object.send(:remove_const, :Album)
+  end
+
+  it "save should not prohibit marshalling" do
+    o = Album.load(:id => 3, :x => 1, :y => nil)
+    proc{Marshal.dump(o)}.should_not raise_error
+    o.save
+    proc{Marshal.dump(o)}.should_not raise_error
+  end
+end
+
 describe "Model#modified?" do
   before do
     @c = Class.new(Sequel::Model(:items))

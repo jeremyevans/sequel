@@ -962,6 +962,12 @@ module Sequel
       # The model class associated with this dataset
       attr_accessor :model
 
+      # Dump model datasets as nil objects.  Bad, ugly hack, but required to
+      # allow marshalling of saved model records.
+      def _dump(*)
+        Marshal.dump(nil)
+      end
+
       # Destroy each row in the dataset by instantiating it and then calling
       # destroy on the resulting model object.  This isn't as fast as deleting
       # the dataset, which does a single SQL call, but this runs any destroy
