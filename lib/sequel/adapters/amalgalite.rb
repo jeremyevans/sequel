@@ -158,16 +158,6 @@ module Sequel
     class Dataset < Sequel::Dataset
       include ::Sequel::SQLite::DatasetMethods
       
-      EXPLAIN = 'EXPLAIN %s'.freeze
-      
-      # Return an array of strings specifying a query explanation for the
-      # current dataset.
-      def explain
-        res = []
-        @db.result_set(EXPLAIN % select_sql(opts), nil) {|r| res << r}
-        res
-      end
-      
       # Yield a hash for each row in the dataset.
       def fetch_rows(sql)
         execute(sql) do |stmt|
@@ -186,7 +176,7 @@ module Sequel
       
       # Quote the string using the adapter instance method.
       def literal_string(v)
-        "#{db.synchronize{|c| c.quote(v)}}"
+        db.synchronize{|c| c.quote(v)}
       end
     end
   end
