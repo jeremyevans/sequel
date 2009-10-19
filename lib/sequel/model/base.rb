@@ -358,7 +358,7 @@ module Sequel
       
       # Returns name of primary table for the dataset.
       def table_name
-        dataset.opts[:from].first
+        dataset.first_source_alias
       end
   
       # Allow the setting of the primary key(s) inside new/set/update.

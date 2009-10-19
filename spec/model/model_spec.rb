@@ -4,18 +4,21 @@ describe "Sequel::Model()" do
   before do
     @db = Sequel::Model.db
   end
+
   it "should return a model subclass with the given dataset if given a dataset" do
     ds = @db[:blah]
     c = Sequel::Model(ds)
     c.superclass.should == Sequel::Model
     c.dataset.should == ds
   end
+
   it "should return a model subclass with a dataset with the default database and given table name if given a symbol" do
     c = Sequel::Model(:blah)
     c.superclass.should == Sequel::Model
     c.db.should == @db
     c.table_name.should == :blah
   end
+
   it "should return a model subclass associated to the given database if given a database" do
     db = Sequel::Database.new
     c = Sequel::Model(db)
@@ -82,6 +85,11 @@ describe Sequel::Model, "dataset & schema" do
     @model.table_name.should == :foo
   end
 
+  it "table_name should respect table aliases" do
+    @model.set_dataset(:foo___x)
+    @model.table_name.should == :x
+  end
+  
   it "set_dataset should raise an error unless given a Symbol or Dataset" do
     proc{@model.set_dataset(Object.new)}.should raise_error(Sequel::Error)
   end

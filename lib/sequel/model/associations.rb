@@ -1204,11 +1204,7 @@ module Sequel
         # Like eager, you need to call .all on the dataset for the eager loading to work.  If you just
         # call each, you will get a normal graphed result back (a hash with model object values).
         def eager_graph(*associations)
-          table_name = begin
-            first_source_alias
-          rescue
-            model.table_name
-          end
+          table_name = model.table_name
             
           ds = if @opts[:eager_graph]
             self
