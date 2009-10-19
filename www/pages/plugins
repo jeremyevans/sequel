@@ -1,4 +1,4 @@
-<h2>Sequel::Model Plugins</h2>
+<h2>Sequel::Model Plugins for v<%= Sequel.version %></h2>
 
 <p>Sequel::Model has a very flexible and standardized plugin architecture, see the <a href="rdoc/classes/Sequel/Plugins.html">RDoc</a>. Here is a list of plugins that members of the Sequel community have developed:</p>
 

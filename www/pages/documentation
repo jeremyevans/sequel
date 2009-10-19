@@ -1,4 +1,4 @@
-<h2>Documentation</h2>
+<h2>Documentation for Sequel (v<%= Sequel.version %>)</h2>
 
 <h3>General Info, Guides, Examples, and Tutorials</h3>
 
