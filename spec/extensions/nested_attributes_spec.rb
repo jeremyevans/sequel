@@ -7,6 +7,7 @@ describe "NestedAttributes plugin" do
     gi = lambda{i}
     ii = lambda{i+=1}
     ds_mod = Module.new do
+      def empty?; false; end
       define_method(:insert) do |h|
         x = ii.call
         mods << [:i, first_source, h, x]

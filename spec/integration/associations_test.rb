@@ -158,6 +158,35 @@ describe "Sequel::Model Simple Associations" do
   end
   
   it_should_behave_like "regular and composite key associations"
+
+  specify "should have add method accept hashes and create new records" do
+    @artist.remove_all_albums
+    Album.delete
+    @album = @artist.add_album(:name=>'Al2')
+    Album.first[:name].should == 'Al2'
+    @artist.albums_dataset.first[:name].should == 'Al2'
+    
+    @album.remove_all_tags
+    Tag.delete
+    @album.add_tag(:name=>'T2')
+    Tag.first[:name].should == 'T2'
+    @album.tags_dataset.first[:name].should == 'T2'
+  end
+  
+  specify "should have remove method accept primary key and remove related album" do
+    @artist.add_album(@album)
+    @artist.reload.remove_album(@album.id)
+    @artist.reload.albums.should == []
+    
+    @album.add_tag(@tag)
+    @album.reload.remove_tag(@tag.id)
+    @tag.reload.albums.should == []
+  end
+  
+  specify "should have remove method raise an error for one_to_many records if the object isn't already associated" do
+    proc{@artist.remove_album(@album.id)}.should raise_error(Sequel::Error)
+    proc{@artist.remove_album(@album)}.should raise_error(Sequel::Error)
+  end
 end
 
 describe "Sequel::Model Composite Key Associations" do
@@ -220,4 +249,33 @@ describe "Sequel::Model Composite Key Associations" do
   end
 
   it_should_behave_like "regular and composite key associations"
+
+  specify "should have add method accept hashes and create new records" do
+    @artist.remove_all_albums
+    Album.delete
+    @artist.add_album(:id1=>1, :id2=>2, :name=>'Al2')
+    Album.first[:name].should == 'Al2'
+    @artist.albums_dataset.first[:name].should == 'Al2'
+    
+    @album.remove_all_tags
+    Tag.delete
+    @album.add_tag(:id1=>1, :id2=>2, :name=>'T2')
+    Tag.first[:name].should == 'T2'
+    @album.tags_dataset.first[:name].should == 'T2'
+  end
+  
+  specify "should have remove method accept primary key and remove related album" do
+    @artist.add_album(@album)
+    @artist.reload.remove_album([@album.id1, @album.id2])
+    @artist.reload.albums.should == []
+    
+    @album.add_tag(@tag)
+    @album.reload.remove_tag([@tag.id1, @tag.id2])
+    @tag.reload.albums.should == []
+  end
+  
+  specify "should have remove method raise an error for one_to_many records if the object isn't already associated" do
+    proc{@artist.remove_album([@album.id1, @album.id2])}.should raise_error(Sequel::Error)
+    proc{@artist.remove_album(@album)}.should raise_error(Sequel::Error)
+  end
 end

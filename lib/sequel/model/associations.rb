@@ -132,6 +132,11 @@ module Sequel
           :"remove_#{singularize(self[:name])}"
         end
       
+        # Whether to check that an object to be disassociated is already associated to this object, false by default.
+        def remove_should_check_existing?
+          false
+        end
+
         # Whether this association returns an array of objects instead of a single object,
         # true by default.
         def returns_array?
@@ -242,6 +247,11 @@ module Sequel
           false
         end
     
+        # The one_to_many association needs to check that an object to be removed already is associated.
+        def remove_should_check_existing?
+          true
+        end
+
         private
     
         # The reciprocal type of a one_to_many association is a many_to_one association.
@@ -1028,10 +1038,11 @@ module Sequel
           klass = opts.associated_class
           if o.is_a?(Integer) || o.is_a?(String) || o.is_a?(Array)
             key = o
-            raise(Sequel::Error, "no object with key(s) #{key} is currently associated to #{inspect}") unless o = send(opts.dataset_method).filter(klass.primary_key_hash(key)).first
+            pkh = klass.primary_key_hash(key)
+            raise(Sequel::Error, "no object with key(s) #{key} is currently associated to #{inspect}") unless o = (opts.remove_should_check_existing? ? send(opts.dataset_method) : klass).first(pkh)
           elsif !o.is_a?(klass)
             raise(Sequel::Error, "associated object #{o.inspect} not of correct type #{klass}")
-          elsif send(opts.dataset_method).filter(o.pk_hash).empty?
+          elsif opts.remove_should_check_existing? && send(opts.dataset_method).filter(o.pk_hash).empty?
             raise(Sequel::Error, "associated object #{o.inspect} is not currently associated to #{inspect}")
           end
           raise(Sequel::Error, "model object #{inspect} does not have a primary key") unless pk
