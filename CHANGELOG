@@ -1,5 +1,7 @@
 === HEAD
 
+* Fix Dataset#explain in the amalgalite adapter (jeremyevans)
+
 * Have Model.table_name respect table aliases (jeremyevans)
 
 * Fix marshalling of saved model records (jeremyevans)
