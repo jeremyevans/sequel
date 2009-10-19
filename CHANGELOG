@@ -1,5 +1,23 @@
 === HEAD
 
+* Have Model.table_name respect table aliases (jeremyevans)
+
+* Fix marshalling of saved model records (jeremyevans)
+
+* one_to_many association methods now make sure that the removed object is currently associated to the receiver (jeremyevans)
+
+* Model association add_ and remove_ methods now have more descriptive error messages (jeremyevans)
+
+* Model association add_ and remove_ methods now make sure passed object is of the correct class (jeremyevans)
+
+* Model association remove_ methods now accept a primary key value and disassociate the associated model object (natewiger, jeremyevans)
+
+* Model association add_ methods now accept a hash and create a new associated model object (natewiger, jeremyevans)
+
+* Dataset#window for PostgreSQL datasets now respects previous windows (jeremyevans)
+
+* Dataset#simple_select_all? now ignores options that don't affect the SQL being issued (jeremyevans)
+
 * Account for table aliases in eager_graph (mluu)
 
 * Add support for MSSQL clustered index creation (mluu)
@@ -8,9 +26,9 @@
 
 * Correct error handling when beginning a transaction fails (jfirebaugh, mluu)
 
-* Correct JDBC binding for Time objects in prepared statements (jfirebaugh)
+* Correct JDBC binding for Time objects in prepared statements (jfirebaugh, jeremyevans)
 
-* Emulate the join USING clause with ON in the MSSQL adapter (jfirebaugh)
+* Emulate JOIN USING clause poorly using JOIN ON if the database doesn't support JOIN USING (e.g. MSSQL, H2) (jfirebaugh, jeremyevans)
 
 * Support column aliases in Dataset#group_and_count (jfirebaugh)
 
