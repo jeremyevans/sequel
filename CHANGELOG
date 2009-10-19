@@ -1,5 +1,7 @@
 === HEAD
 
+* Have Dataset#literal_other call sql_literal on the object if it responds to it (heda)
+
 * Fix Dataset#explain in the amalgalite adapter (jeremyevans)
 
 * Have Model.table_name respect table aliases (jeremyevans)

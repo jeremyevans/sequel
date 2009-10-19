@@ -1233,10 +1233,14 @@ module Sequel
     end
 
     # SQL fragmento for a type of object not handled by Dataset#literal.
-    # Raises an error.  If a database specific type is allowed,
-    # this should be overriden in a subclass.
+    # Calls sql_literal if object responds to it, otherwise raises an error.
+    # If a database specific type is allowed, this should be overriden in a subclass.
     def literal_other(v)
-      raise Error, "can't express #{v.inspect} as a SQL literal"
+      if v.respond_to?(:sql_literal)
+        v.sql_literal
+      else
+        raise Error, "can't express #{v.inspect} as a SQL literal"
+      end
     end
 
     # SQL fragment for String.  Doubles \ and ' by default.

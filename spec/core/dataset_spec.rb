@@ -779,8 +779,17 @@ context "Dataset#literal" do
     @dataset.literal(:items__name).should == "items.name"
   end
   
-  specify "should raise an error for unsupported types" do
-    proc {@dataset.literal({})}.should raise_error
+  specify "should call sql_literal on type if not natively supports and the method exists" do
+    @a = Class.new do
+      def sql_literal
+        "called"
+      end
+    end
+    @dataset.literal(@a.new).should == "called"
+  end
+  
+  specify "should raise an error for unsupported types with no sql_literal method" do
+    proc {@dataset.literal(Object.new)}.should raise_error
   end
   
   specify "should literalize datasets as subqueries" do
