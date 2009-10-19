@@ -1,5 +1,23 @@
 === HEAD
 
+* Account for table aliases in eager_graph (mluu)
+
+* Add support for MSSQL clustered index creation (mluu)
+
+* Implement insert_select in the MSSQL adapter via OUTPUT. Can be disabled via disable_insert_output. (jfirebaugh, mluu)
+
+* Correct error handling when beginning a transaction fails (jfirebaugh, mluu)
+
+* Correct JDBC binding for Time objects in prepared statements (jfirebaugh)
+
+* Emulate the join USING clause with ON in the MSSQL adapter (jfirebaugh)
+
+* Support column aliases in Dataset#group_and_count (jfirebaugh)
+
+* Support preparing insert statements of the form insert(1,2,3) and insert(columns, values) (jfirebaugh)
+
+* Fix add_index for tables in non-default schema (jfirebaugh)
+
 * Allow named placeholders in placeholder literal strings (jeremyevans)
 
 * Allow the force_encoding plugin to work when refreshing (jeremyevans)
