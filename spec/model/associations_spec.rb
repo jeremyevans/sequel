@@ -558,11 +558,13 @@ describe Sequel::Model, "one_to_many" do
     MODEL_DB.reset
 
     @c1 = Class.new(Sequel::Model(:attributes)) do
+      def _refresh(ds); end
       unrestrict_primary_key
       columns :id, :node_id, :y
     end
 
     @c2 = Class.new(Sequel::Model(:nodes)) do
+      def _refresh(ds); end
       unrestrict_primary_key
       attr_accessor :xxx
       
@@ -573,6 +575,7 @@ describe Sequel::Model, "one_to_many" do
     @dataset = @c2.dataset
     
     @c2.dataset.extend(Module.new {
+      def empty?; false; end
       def fetch_rows(sql)
         @db << sql
         yield Hash.new
@@ -580,6 +583,7 @@ describe Sequel::Model, "one_to_many" do
     })
 
     @c1.dataset.extend(Module.new {
+      def empty?; opts.has_key?(:empty) ? (super; true) : false; end
       def fetch_rows(sql)
         @db << sql
         yield Hash.new
@@ -652,7 +656,7 @@ describe Sequel::Model, "one_to_many" do
     proc{@c2.one_to_many :attributes, :class => @c1, :key=>[:node_id, :id, :x], :primary_key=>[:parent_id, :id]}.should raise_error(Sequel::Error)
   end
 
-  it "should define an add_ method" do
+  it "should define an add_ method that works on existing records" do
     @c2.one_to_many :attributes, :class => @c1
     
     n = @c2.new(:id => 1234)
@@ -660,20 +664,77 @@ describe Sequel::Model, "one_to_many" do
     a.save
     MODEL_DB.reset
     a.should == n.add_attribute(a)
+    a.values.should == {:node_id => 1234, :id => 2345}
     MODEL_DB.sqls.should == ['UPDATE attributes SET node_id = 1234 WHERE (id = 2345)']
   end
 
-  it "should define a remove_ method" do
+  it "should define an add_ method that works on new records" do
     @c2.one_to_many :attributes, :class => @c1
     
     n = @c2.new(:id => 1234)
-    a = @c1.new(:id => 2345)
+    a = @c1.new(:id => 234)
+    # do not save
+    MODEL_DB.reset
+    a.should == n.add_attribute(a)
+    MODEL_DB.sqls.first.should =~ /INSERT INTO attributes \((node_)?id, (node_)?id\) VALUES \(1?234, 1?234\)/
+    a.values.should == {:node_id => 1234, :id => 234}
+  end
+
+  it "should define a remove_ method that works on existing records" do
+    @c2.one_to_many :attributes, :class => @c1
+    
+    n = @c2.new(:id => 1234)
+    a = @c1.new(:id => 2345, :node_id => 1234)
     a.save
     MODEL_DB.reset
     a.should == n.remove_attribute(a)
+    a.values.should == {:node_id => nil, :id => 2345}
     MODEL_DB.sqls.should == ['UPDATE attributes SET node_id = NULL WHERE (id = 2345)']
   end
+
+  it "should have the remove_ method raise an error if the passed object is not already associated" do
+    @c2.one_to_many :attributes, :class => @c1
+    @c1.dataset.opts[:empty] = true
+    
+    n = @c2.new(:id => 1234)
+    a = @c1.load(:id => 2345, :node_id => 1234)
+    MODEL_DB.reset
+    proc{n.remove_attribute(a)}.should raise_error(Sequel::Error)
+    MODEL_DB.sqls.should == ["SELECT 1 FROM attributes WHERE ((attributes.node_id = 1234) AND (id = 2345)) LIMIT 1"]
+  end
+
+  it "should accept a hash for the add_ method and create a new record" do
+    @c2.one_to_many :attributes, :class => @c1
+    n = @c2.new(:id => 1234)
+    MODEL_DB.reset
+    @c1.load(:node_id => 1234, :id => 234).should == n.add_attribute(:id => 234)
+    MODEL_DB.sqls.first.should =~ /INSERT INTO attributes \((node_)?id, (node_)?id\) VALUES \(1?234, 1?234\)/
+  end
+
+  it "should raise an error in the add_ method if the passed associated object is not of the correct type" do
+    @c2.one_to_many :attributes, :class => @c1
+    proc{@c2.new(:id => 1234).add_attribute(@c2.new)}.should raise_error(Sequel::Error)
+  end
+
+  it "should accept a primary key for the remove_ method and remove an existing record" do
+    @c2.one_to_many :attributes, :class => @c1
+    n = @c2.new(:id => 1234)
+    ds = @c1.dataset
+    def ds.fetch_rows(sql)
+      db << sql
+      yield({:id=>234, :node_id=>1234})
+    end
+    MODEL_DB.reset
+    @c1.load(:node_id => nil, :id => 234).should == n.remove_attribute(234)
+    MODEL_DB.sqls.should == ['SELECT * FROM attributes WHERE ((attributes.node_id = 1234) AND (id = 234)) LIMIT 1',
+      'UPDATE attributes SET node_id = NULL WHERE (id = 234)']
+  end
   
+  it "should raise an error in the remove_ method if the passed associated object is not of the correct type" do
+    @c2.one_to_many :attributes, :class => @c1
+    proc{@c2.new(:id => 1234).remove_attribute(@c2.new)}.should raise_error(Sequel::Error)
+  end
+
   it "should have add_ method respect the :primary_key option" do
     @c2.one_to_many :attributes, :class => @c1, :primary_key=>:xxx
     
@@ -701,6 +762,22 @@ describe Sequel::Model, "one_to_many" do
     a = @c1.load(:id => 2345, :node_id=>1234, :y=>5)
     a.should == n.remove_attribute(a)
     MODEL_DB.sqls.first.should =~ /UPDATE attributes SET (node_id|y) = NULL, (node_id|y) = NULL WHERE \(id = 2345\)/
+  end
+  
+  it "should accept a array of composite primary key values for the remove_ method and remove an existing record" do
+    @c1.set_primary_key :id, :y
+    @c2.one_to_many :attributes, :class => @c1, :key=>:node_id, :primary_key=>:id
+    n = @c2.new(:id => 123)
+    ds = @c1.dataset
+    def ds.fetch_rows(sql)
+      db << sql
+      yield({:id=>234, :node_id=>123, :y=>5})
+    end
+    MODEL_DB.reset
+    @c1.load(:node_id => nil, :y => 5, :id => 234).should == n.remove_attribute([234, 5])
+    MODEL_DB.sqls.length.should == 2
+    MODEL_DB.sqls.first.should =~ /SELECT \* FROM attributes WHERE \(\(attributes.node_id = 123\) AND \(\((id|y) = (234|5)\) AND \((id|y) = (234|5)\)\)\) LIMIT 1/
+    MODEL_DB.sqls.last.should =~ /UPDATE attributes SET node_id = NULL WHERE \(\((id|y) = (234|5)\) AND \((id|y) = (234|5)\)\)/
   end
   
   it "should raise an error in add_ and remove_ if the passed object returns false to save (is not valid)" do
@@ -1067,6 +1144,7 @@ describe Sequel::Model, "one_to_many" do
     @c2.one_to_many :attributes, :class => @c1, :one_to_one=>true
     attrib = @c1.new(:id=>3)
     d = @c1.dataset
+    @c1.class_eval{remove_method :_refresh}
     def d.fetch_rows(s); yield({:id=>3}) end
     @c2.new(:id => 1234).attribute = attrib
     ['INSERT INTO attributes (node_id, id) VALUES (1234, 3)',
@@ -1097,6 +1175,7 @@ describe Sequel::Model, "one_to_many" do
     @c2.one_to_many :attributes, :class => @c1, :one_to_one=>true, :primary_key=>:xxx
     attrib = @c1.new(:id=>3)
     d = @c1.dataset
+    @c1.class_eval{remove_method :_refresh}
     def d.fetch_rows(s); yield({:id=>3}) end
     @c2.new(:id => 1234, :xxx=>5).attribute = attrib
     ['INSERT INTO attributes (node_id, id) VALUES (5, 3)',
@@ -1521,7 +1600,7 @@ describe Sequel::Model, "many_to_many" do
     @c2.new(:id => 1234).attributes_dataset.opts[:eager].should == {:attributes=>nil}
   end
   
-  it "should define an add_ method" do
+  it "should define an add_ method that works on existing records" do
     @c2.many_to_many :attributes, :class => @c1
     
     n = @c2.load(:id => 1234)
@@ -1532,13 +1611,48 @@ describe Sequel::Model, "many_to_many" do
     ].should(include(MODEL_DB.sqls.first))
   end
 
-  it "should define a remove_ method" do
+  it "should allow passing a hash to the add_ method which creates a new record" do
+    @c2.many_to_many :attributes, :class => @c1
+    
+    n = @c2.load(:id => 1234)
+    @c1.load(:id => 1).should == n.add_attribute(:id => 1)
+    MODEL_DB.sqls.first.should == 'INSERT INTO attributes (id) VALUES (1)'
+    ['INSERT INTO attributes_nodes (node_id, attribute_id) VALUES (1234, 1)',
+     'INSERT INTO attributes_nodes (attribute_id, node_id) VALUES (1, 1234)'
+    ].should(include(MODEL_DB.sqls.last))
+  end
+
+  it "should define a remove_ method that works on existing records" do
     @c2.many_to_many :attributes, :class => @c1
     
     n = @c2.new(:id => 1234)
     a = @c1.new(:id => 2345)
     a.should == n.remove_attribute(a)
     MODEL_DB.sqls.first.should == 'DELETE FROM attributes_nodes WHERE ((node_id = 1234) AND (attribute_id = 2345))'
+  end
+
+  it "should raise an error in the add_ method if the passed associated object is not of the correct type" do
+    @c2.many_to_many :attributes, :class => @c1
+    proc{@c2.new(:id => 1234).add_attribute(@c2.new)}.should raise_error(Sequel::Error)
+  end
+
+  it "should accept a primary key for the remove_ method and remove an existing record" do
+    @c2.many_to_many :attributes, :class => @c1
+    n = @c2.new(:id => 1234)
+    ds = @c1.dataset
+    def ds.fetch_rows(sql)
+      db << sql
+      yield({:id=>234})
+    end
+    MODEL_DB.reset
+    @c1.load(:id => 234).should == n.remove_attribute(234)
+    MODEL_DB.sqls.should == ['SELECT * FROM attributes WHERE (id = 234) LIMIT 1',
+      'DELETE FROM attributes_nodes WHERE ((node_id = 1234) AND (attribute_id = 234))']
+  end
+    
+  it "should raise an error in the remove_ method if the passed associated object is not of the correct type" do
+    @c2.many_to_many :attributes, :class => @c1
+    proc{@c2.new(:id => 1234).remove_attribute(@c2.new)}.should raise_error(Sequel::Error)
   end
 
   it "should have the add_ method respect the :left_primary_key and :right_primary_key options" do
@@ -1589,6 +1703,22 @@ describe Sequel::Model, "many_to_many" do
     MODEL_DB.sqls.should == ["DELETE FROM attributes_nodes WHERE ((l1 = 1234) AND (l2 = 5) AND (r1 = 2345) AND (r2 = 8))"]
   end
 
+  it "should accept a array of composite primary key values for the remove_ method and remove an existing record" do
+    @c1.set_primary_key [:id, :y]
+    @c2.many_to_many :attributes, :class => @c1
+    n = @c2.new(:id => 1234)
+    ds = @c1.dataset
+    def ds.fetch_rows(sql)
+      db << sql
+      yield({:id=>234, :y=>8})
+    end
+    MODEL_DB.reset
+    @c1.load(:id => 234, :y=>8).should == n.remove_attribute([234, 8])
+    MODEL_DB.sqls.length.should == 2
+    MODEL_DB.sqls.first.should =~ /SELECT \* FROM attributes WHERE \(\((id|y) = (234|8)\) AND \((id|y) = (234|8)\)\) LIMIT 1/
+    MODEL_DB.sqls.last.should == 'DELETE FROM attributes_nodes WHERE ((node_id = 1234) AND (attribute_id = 234))'
+  end
+    
   it "should raise an error if the model object doesn't have a valid primary key" do
     @c2.many_to_many :attributes, :class => @c1 
     a = @c2.new

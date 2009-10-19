@@ -132,6 +132,11 @@ module Sequel
           :"remove_#{singularize(self[:name])}"
         end
       
+        # Whether to check that an object to be disassociated is already associated to this object, false by default.
+        def remove_should_check_existing?
+          false
+        end
+
         # Whether this association returns an array of objects instead of a single object,
         # true by default.
         def returns_array?
@@ -242,6 +247,11 @@ module Sequel
           false
         end
     
+        # The one_to_many association needs to check that an object to be removed already is associated.
+        def remove_should_check_existing?
+          true
+        end
+
         private
     
         # The reciprocal type of a one_to_many association is a many_to_one association.
@@ -930,7 +940,7 @@ module Sequel
 
         # Backbone behind association dataset methods
         def _dataset(opts)
-          raise(Sequel::Error, "model object #{model} does not have a primary key") if opts.dataset_need_primary_key? && !pk
+          raise(Sequel::Error, "model object #{inspect} does not have a primary key") if opts.dataset_need_primary_key? && !pk
           ds = send(opts._dataset_method)
           ds.extend(AssociationDatasetMethods)
           ds.model_object = self
@@ -964,10 +974,16 @@ module Sequel
 
         # Add the given associated object to the given association
         def add_associated_object(opts, o, *args)
-          raise(Sequel::Error, "model object #{model} does not have a primary key") unless pk
+          klass = opts.associated_class
+          if o.is_a?(Hash)
+            o = klass.new(o)
+          elsif !o.is_a?(klass)
+            raise(Sequel::Error, "associated object #{o.inspect} not of correct type #{klass}")
+          end
+          raise(Sequel::Error, "model object #{inspect} does not have a primary key") unless pk
           if opts.need_associated_primary_key?
             o.save(:validate=>opts[:validate]) if o.new?
-            raise(Sequel::Error, "associated object #{o.model} does not have a primary key") unless o.pk
+            raise(Sequel::Error, "associated object #{o.inspect} does not have a primary key") unless o.pk
           end
           return if run_association_callbacks(opts, :before_add, o) == false
           send(opts._add_method, o, *args)
@@ -1010,7 +1026,7 @@ module Sequel
 
         # Remove all associated objects from the given association
         def remove_all_associated_objects(opts, *args)
-          raise(Sequel::Error, "model object #{model} does not have a primary key") unless pk
+          raise(Sequel::Error, "model object #{inspect} does not have a primary key") unless pk
           send(opts._remove_all_method, *args)
           ret = associations[opts[:name]].each{|o| remove_reciprocal_object(opts, o)} if associations.include?(opts[:name])
           associations[opts[:name]] = []
@@ -1019,8 +1035,18 @@ module Sequel
 
         # Remove the given associated object from the given association
         def remove_associated_object(opts, o, *args)
-          raise(Sequel::Error, "model object #{model} does not have a primary key") unless pk
-          raise(Sequel::Error, "associated object #{o.model} does not have a primary key") if opts.need_associated_primary_key? && !o.pk
+          klass = opts.associated_class
+          if o.is_a?(Integer) || o.is_a?(String) || o.is_a?(Array)
+            key = o
+            pkh = klass.primary_key_hash(key)
+            raise(Sequel::Error, "no object with key(s) #{key} is currently associated to #{inspect}") unless o = (opts.remove_should_check_existing? ? send(opts.dataset_method) : klass).first(pkh)
+          elsif !o.is_a?(klass)
+            raise(Sequel::Error, "associated object #{o.inspect} not of correct type #{klass}")
+          elsif opts.remove_should_check_existing? && send(opts.dataset_method).filter(o.pk_hash).empty?
+            raise(Sequel::Error, "associated object #{o.inspect} is not currently associated to #{inspect}")
+          end
+          raise(Sequel::Error, "model object #{inspect} does not have a primary key") unless pk
+          raise(Sequel::Error, "associated object #{o.inspect} does not have a primary key") if opts.need_associated_primary_key? && !o.pk
           return if run_association_callbacks(opts, :before_remove, o) == false
           send(opts._remove_method, o, *args)
           associations[opts[:name]].delete_if{|x| o === x} if associations.include?(opts[:name])
@@ -1055,7 +1081,7 @@ module Sequel
               raise Error, "callbacks should either be Procs or Symbols"
             end
             if res == false and stop_on_false
-              raise(BeforeHookFailed, "Unable to modify association for record: one of the #{callback_type} hooks returned false") if raise_error
+              raise(BeforeHookFailed, "Unable to modify association for #{inspect}: one of the #{callback_type} hooks returned false") if raise_error
               return false
             end
           end
@@ -1063,7 +1089,7 @@ module Sequel
 
         # Set the given object as the associated object for the given association
         def set_associated_object(opts, o)
-          raise(Sequel::Error, "model object #{model} does not have a primary key") if o && !o.pk
+          raise(Sequel::Error, "associated object #{o.inspect} does not have a primary key") if o && !o.pk
           old_val = send(opts.association_method)
           return o if old_val == o
           return if old_val and run_association_callbacks(opts, :before_remove, old_val) == false
