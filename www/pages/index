@@ -1,4 +1,4 @@
-<h2>Sequel: The Database Toolkit for Ruby</h2>
+<h2>Sequel: The Database Toolkit for Ruby (v<%= Sequel::VERSION %>)</h2>
 
 <ul>
 <li>Sequel provides thread safety, connection pooling and a concise DSL for constructing database queries and table schemas.</li>
