@@ -303,10 +303,10 @@ module Sequel
       # breaks the use of subselects in prepared statements, so extend the
       # temporary prepared statement that this creates with a module that
       # fixes it.
-      def call(type, bind_arguments={}, *values)
+      def call(type, bind_arguments={}, *values, &block)
         ps = to_prepared_statement(type, values)
         ps.extend(CallableStatementMethods)
-        ps.call(bind_arguments)
+        ps.call(bind_arguments, &block)
       end
       
       # Delete rows matching this dataset
