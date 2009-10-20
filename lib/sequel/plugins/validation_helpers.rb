@@ -30,22 +30,50 @@ module Sequel
     #   Sequel will attempt to insert a NULL value into the database, instead of using the
     #   database's default.
     # * :allow_nil - Whether to skip the validation if the value is nil.
-    # * :message - The message to use
+    # * :message - The message to use.  Can be a string which is used directly, or a
+    #   proc which is called.
+    #
+    # The default validation error messages for all models can be modified by
+    # changing the values of the ValidationHelpers::MESSAGE_PROCS hash.  You
+    # change change the default validation error messages on a per model basis
+    # by overriding a private instance method named default_validation_error_message_proc.
     module ValidationHelpers
+      # Default validation message procs used by Sequel.  Can be modified to change the error
+      # messages for all models, or for internationalization.  Uses procs instead of format
+      # strings to allow for complete flexibility.
+      #
+      # If the validation method takes a argument before the array of attributes,
+      # that argument is passed as an argument to the proc.  The exception is the
+      # validates_not_string method, which doesn't take an argument, but passes
+      # the schema type symbol as the argument to the proc.
+      MESSAGE_PROCS = {
+        :exact_length=>lambda{|exact| "is not #{exact} characters"},
+        :format=>lambda{|with| 'is invalid'},
+        :includes=>lambda{|set| "is not in range or set: #{set.inspect}"},
+        :integer=>lambda{"is not a number"},
+        :length_range=>lambda{|range| "is too short or too long"},
+        :max_length=>lambda{|max| "is longer than #{max} characters"},
+        :min_length=>lambda{|min| "is shorter than #{min} characters"},
+        :not_string=>lambda{|type| type ? "is not a valid #{type}" : "is a string"},
+        :numeric=>lambda{"is not a number"},
+        :presence=>lambda{"is not present"},
+        :unique=>lambda{'is already taken'}
+      }
+      
       module InstanceMethods 
         # Check that the attribute values are the given exact length.
         def validates_exact_length(exact, atts, opts={})
-          validatable_attributes(atts, opts){|a,v,m| (m || "is not #{exact} characters") unless v && v.length == exact}
+          validatable_attributes(atts, opts){|a,v,m| validation_error_message(m, :exact_length, exact) unless v && v.length == exact}
         end
 
         # Check the string representation of the attribute value(s) against the regular expression with.
         def validates_format(with, atts, opts={})
-          validatable_attributes(atts, opts){|a,v,m| (m || 'is invalid') unless v.to_s =~ with}
+          validatable_attributes(atts, opts){|a,v,m| validation_error_message(m, :format, with) unless v.to_s =~ with}
         end
     
         # Check attribute value(s) is included in the given set.
         def validates_includes(set, atts, opts={})
-          validatable_attributes(atts, opts){|a,v,m| (m || "is not in range or set: #{set.inspect}") unless set.include?(v)}
+          validatable_attributes(atts, opts){|a,v,m| validation_error_message(m, :includes, set) unless set.include?(v)}
         end
     
         # Check attribute value(s) string representation is a valid integer.
@@ -55,24 +83,24 @@ module Sequel
               Kernel.Integer(v.to_s)
               nil
             rescue
-              m || 'is not a number'
+              validation_error_message(m, :integer)
             end
           end
         end
 
         # Check that the attribute values length is in the specified range.
         def validates_length_range(range, atts, opts={})
-          validatable_attributes(atts, opts){|a,v,m| (m || "is outside the allowed range") unless v && range.include?(v.length)}
+          validatable_attributes(atts, opts){|a,v,m| validation_error_message(m, :length_range, range) unless v && range.include?(v.length)}
         end
     
         # Check that the attribute values are not longer than the given max length.
         def validates_max_length(max, atts, opts={})
-          validatable_attributes(atts, opts){|a,v,m| (m || "is longer than #{max} characters") unless v && v.length <= max}
+          validatable_attributes(atts, opts){|a,v,m| validation_error_message(m, :max_length, max) unless v && v.length <= max}
         end
 
         # Check that the attribute values are not shorter than the given min length.
         def validates_min_length(min, atts, opts={})
-          validatable_attributes(atts, opts){|a,v,m| (m || "is shorter than #{min} characters") unless v && v.length >= min}
+          validatable_attributes(atts, opts){|a,v,m| validation_error_message(m, :min_length, min) unless v && v.length >= min}
         end
 
         # Check that the attribute value(s) is not a string.  This is generally useful
@@ -82,11 +110,7 @@ module Sequel
         # be a string in an invalid format, and if typecasting succeeds, the value will
         # not be a string.
         def validates_not_string(atts, opts={})
-          validatable_attributes(atts, opts) do |a,v,m|
-            next unless v.is_a?(String)
-            next m if m
-            (sch = db_schema[a] and typ = sch[:type]) ?  "is not a valid #{typ}" : "is a string"
-          end
+          validatable_attributes(atts, opts){|a,v,m| validation_error_message(m, :not_string, (db_schema[a]||{})[:type]) if v.is_a?(String)}
         end
     
         # Check attribute value(s) string representation is a valid float.
@@ -96,14 +120,14 @@ module Sequel
               Kernel.Float(v.to_s)
               nil
             rescue
-              m || 'is not a number'
+              validation_error_message(m, :numeric)
             end
           end
         end
     
         # Check attribute value(s) is not considered blank by the database, but allow false values.
         def validates_presence(atts, opts={})
-          validatable_attributes(atts, opts){|a,v,m| (m || "is not present") if model.db.send(:blank_object?, v) && v != false}
+          validatable_attributes(atts, opts){|a,v,m| validation_error_message(m, :presence) if model.db.send(:blank_object?, v) && v != false}
         end
         
         # Checks that there are no duplicate values in the database for the given
@@ -132,7 +156,7 @@ module Sequel
         # Possible Options:
         # * :message - The message to use (default: 'is already taken')
         def validates_unique(*atts)
-          message = (atts.pop[:message] if atts.last.is_a?(Hash)) || 'is already taken'
+          message = validation_error_message((atts.pop[:message] if atts.last.is_a?(Hash)), :unique)
           atts.each do |a|
             ds = model.filter(Array(a).map{|x| [x, send(x)]})
             ds = yield(ds) if block_given?
@@ -141,6 +165,12 @@ module Sequel
         end
         
         private
+        
+        # A default proc for the given type that can be called to produce a
+        # validation error message.  Can be overridden on a per model basis.
+        def default_validation_error_message_proc(type)
+          MESSAGE_PROCS[type]
+        end
 
         # Skip validating any attribute that matches one of the allow_* options.
         # Otherwise, yield the attribute, value, and passed option :message to
@@ -156,6 +186,18 @@ module Sequel
             if message = yield(a, v, m)
               errors.add(a, message)
             end
+          end
+        end
+        
+        # The validation error message to use, as a string.  If an override_message
+        # argument is nil, call the default proc with the args.  Otherwise, if it
+        # is a proc, call it with the args.  Otherwise, assume it is a string and
+        # return it.
+        def validation_error_message(override_message, type, *args)
+          if override_message
+            override_message.is_a?(Proc) ? override_message.call(*args) : override_message
+          else
+            default_validation_error_message_proc(type).call(*args)
           end
         end
       end

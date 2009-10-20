@@ -55,6 +55,13 @@ describe "Sequel::Plugins::ValidationHelpers" do
     @m.value = '1_1'
     @m.should be_valid
   end
+  
+  specify "should allow a proc for the :message option" do
+    @c.set_validations{validates_format(/.+_.+/, :value, :message=>proc{|f| "doesn't match #{f.inspect}"})}
+    @m.value = 'abc_'
+    @m.should_not be_valid
+    @m.errors.should == {:value=>["doesn't match /.+_.+/"]}
+  end
 
   specify "should take multiple attributes in the same call" do
     @c.columns :value, :value2
@@ -64,6 +71,58 @@ describe "Sequel::Plugins::ValidationHelpers" do
     @m.should_not be_valid
     @m.value2 = 1
     @m.should be_valid
+  end
+  
+  specify "should support modifying default validation error messages for all models" do
+    @c.set_validations{validates_presence(:value)}
+    @m.should_not be_valid
+    @m.errors.should == {:value=>['is not present']}
+    p = Sequel::Plugins::ValidationHelpers::MESSAGE_PROCS[:presence]
+    Sequel::Plugins::ValidationHelpers::MESSAGE_PROCS[:presence] = lambda{"was not entered"}
+    @m.should_not be_valid
+    @m.errors.should == {:value=>["was not entered"]}
+    @m.value = 1
+    @m.should be_valid
+    
+    c = Class.new(Sequel::Model)
+    c.class_eval do
+      plugin :validation_helpers
+      attr_accessor :value
+      def validate
+        validates_presence(:value)
+      end
+    end
+    m = c.new
+    m.should_not be_valid
+    m.errors.should == {:value=>["was not entered"]}
+    Sequel::Plugins::ValidationHelpers::MESSAGE_PROCS[:presence] = p
+  end
+  
+  specify "should support modifying default validation error messages for a particular model" do
+    @c.set_validations{validates_presence(:value)}
+    @m.should_not be_valid
+    @m.errors.should == {:value=>['is not present']}
+    @c.class_eval do
+      def default_validation_error_message_proc(type)
+        proc{'was not entered'}
+      end
+    end
+    @m.should_not be_valid
+    @m.errors.should == {:value=>["was not entered"]}
+    @m.value = 1
+    @m.should be_valid
+    
+    c = Class.new(Sequel::Model)
+    c.class_eval do
+      plugin :validation_helpers
+      attr_accessor :value
+      def validate
+        validates_presence(:value)
+      end
+    end
+    m = c.new
+    m.should_not be_valid
+    m.errors.should == {:value=>['is not present']}
   end
 
   specify "should support validates_exact_length" do
