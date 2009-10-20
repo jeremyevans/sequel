@@ -344,7 +344,7 @@ module Sequel
           # Return an array of strings for each of the hash values, inserting
           # them to the correct position in the array.
           def map_to_prepared_args(hash)
-            prepared_args.map{|k| hash[k.to_sym].to_s}
+            prepared_args.map{|k| hash[k.to_sym]}
           end
 
           private
