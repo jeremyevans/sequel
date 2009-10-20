@@ -341,8 +341,7 @@ module Sequel
           
           protected
           
-          # Return an array of strings for each of the hash values, inserting
-          # them to the correct position in the array.
+          # An array of bound variable values for this query, in the correct order.
           def map_to_prepared_args(hash)
             prepared_args.map{|k| hash[k.to_sym]}
           end
