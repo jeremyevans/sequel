@@ -1,5 +1,7 @@
 === HEAD
 
+* Speed up Amalgalite adapter (copiousfreetime)
+
 * Fix bound variables on PostgreSQL when using nil and potentially other values (jeremyevans)
 
 * Allow easier overriding of default error messages used in the validation_helpers plugin (jeremyevans)

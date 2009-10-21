@@ -99,13 +99,8 @@ module Sequel
       end
       
       # Run the given SQL with the given arguments and yield each row.
-      def execute(sql, opts={})
-        retried = false
-        _execute(sql, opts) do |conn|
-          conn.prepare(sql) do |stmt|
-            yield stmt
-          end
-        end
+      def execute(sql, opts={}, &block)
+        _execute(sql, opts){|conn| conn.prepare(sql, &block)}
       end
       
       # Run the given SQL with the given arguments and return the first value of the first row.
