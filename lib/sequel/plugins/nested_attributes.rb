@@ -78,6 +78,7 @@ module Sequel
         
         # Create a new associated object with the given attributes, validate
         # it when the parent is validated, and save it when the object is saved.
+        # Returns the object created.
         def nested_attributes_create(reflection, attributes)
           obj = reflection.associated_class.new(attributes)
           after_validation_hook{validate_associated_object(reflection, obj)}
@@ -88,6 +89,7 @@ module Sequel
             # and don't want to validate it at all if it is false.
             before_save_hook{send(reflection.setter_method, obj.save(:validate=>false))}
           end
+          obj
         end
         
         # Find an associated object with the matching pk.  If a matching option
@@ -114,6 +116,7 @@ module Sequel
         
         # Remove the matching associated object from the current object.
         # If the :destroy option is given, destroy the object after disassociating it.
+        # Returns the object removed, if it exists.
         def nested_attributes_remove(reflection, pk, opts={})
           if obj = nested_attributes_find(reflection, pk)
             before_save_hook do
@@ -124,6 +127,7 @@ module Sequel
               end
             end
             after_save_hook{obj.destroy} if opts[:destroy]
+            obj
           end
         end
         
@@ -153,6 +157,7 @@ module Sequel
         # Update the matching associated object with the attributes,
         # validating it when the parent object is validated and saving it
         # when the parent is saved.
+        # Returns the object updated, if it exists.
         def nested_attributes_update(reflection, pk, attributes)
           if obj = nested_attributes_find(reflection, pk)
             obj.set(attributes)
@@ -160,6 +165,7 @@ module Sequel
             # Don't need to validate the object twice if :validate association option is not false
             # and don't want to validate it at all if it is false.
             after_save_hook{obj.save(:validate=>false)}
+            obj
           end
         end
         

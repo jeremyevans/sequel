@@ -295,7 +295,17 @@ describe "NestedAttributes plugin" do
     @mods.should == [[:is, :albums, {:name=>"Al"}, 1], [:is, :tags, {:name=>"T"}, 2], [:i, :at, {:album_id=>1, :tag_id=>2}, 3], [:is, :tags, {:name=>"T2"}, 4], [:i, :at, {:album_id=>1, :tag_id=>4}, 5]]
   end
   
-  it "should deal properly with accessing the same nested attribute associated object with conflicting actions" do
-    
+  it "should return objects created/modified in the internal methods" do
+    @Album.nested_attributes :tags, :remove=>true, :strict=>false
+    objs = []
+    @Album.class_eval do
+      define_method(:nested_attributes_create){|*a| objs << [super(*a), :create]}
+      define_method(:nested_attributes_remove){|*a| objs << [super(*a), :remove]}
+      define_method(:nested_attributes_update){|*a| objs << [super(*a), :update]}
+    end
+    a = @Album.new(:name=>'Al')
+    a.associations[:tags] = [@Tag.load(:id=>6, :name=>'A'), @Tag.load(:id=>7, :name=>'A2')] 
+    a.tags_attributes = [{:id=>6, :name=>'T'}, {:id=>7, :name=>'T2', :_remove=>true}, {:name=>'T3'}, {:id=>8, :name=>'T4'}, {:id=>9, :name=>'T5', :_remove=>true}]
+    objs.should == [[@Tag.load(:id=>6, :name=>'T'), :update], [@Tag.load(:id=>7, :name=>'A2'), :remove], [@Tag.new(:name=>'T3'), :create], [nil, :update], [nil, :remove]]
   end
 end
