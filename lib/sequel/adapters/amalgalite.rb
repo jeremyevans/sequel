@@ -82,9 +82,9 @@ module Sequel
         Amalgalite::Dataset.new(self, opts)
       end
       
-      # Run the given SQL with the given arguments and reload the schema.  Returns nil.
+      # Run the given SQL with the given arguments. Returns nil.
       def execute_ddl(sql, opts={})
-        _execute(sql, opts){|conn| conn.execute_batch(sql); conn.reload_schema!}
+        _execute(sql, opts){|conn| conn.execute_batch(sql);}
         nil
       end
       
@@ -103,12 +103,6 @@ module Sequel
         retried = false
         _execute(sql, opts) do |conn|
           conn.prepare(sql) do |stmt|
-            begin
-             stmt.result_meta
-            rescue NoMethodError
-              conn.reload_schema!
-              stmt.result_meta
-            end
             yield stmt
           end
         end
@@ -161,7 +155,6 @@ module Sequel
       # Yield a hash for each row in the dataset.
       def fetch_rows(sql)
         execute(sql) do |stmt|
-          stmt.result_meta
           @columns = cols = stmt.result_fields.map{|c| output_identifier(c)}
           col_count = cols.size
           stmt.each do |result|
