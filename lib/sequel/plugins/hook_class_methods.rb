@@ -19,6 +19,8 @@ module Sequel
     #      return false if super == false
     #      self.created_at = Time.now
     #    end
+    #
+    # Note that returning false here will abort the save.
     module HookClassMethods
       # Set up the hooks instance variable in the model.
       def self.apply(model)
