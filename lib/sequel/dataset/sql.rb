@@ -1062,7 +1062,7 @@ module Sequel
         SQL::BooleanExpression.from_value_pairs(expr)
       when Array
         if String === expr[0]
-          SQL::PlaceholderLiteralString.new(expr.shift, expr, true)
+          SQL::PlaceholderLiteralString.new(expr.at(0), expr[1..-1], true)
         elsif Sequel.condition_specifier?(expr)
           SQL::BooleanExpression.from_value_pairs(expr)
         else

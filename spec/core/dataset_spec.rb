@@ -305,6 +305,13 @@ context "Dataset#where" do
       "SELECT * FROM test WHERE (price < 100 AND id in (1, 2, 3))"
   end
   
+  specify "should not modify passed array with placeholders" do
+    a = ['price < ? AND id in ?', 100, 1, 2, 3]
+    b = a.dup
+    @dataset.where(a)
+    b.should == a
+  end
+
   specify "should work with strings (custom SQL expressions)" do
     @dataset.where('(a = 1 AND b = 2)').select_sql.should ==
       "SELECT * FROM test WHERE ((a = 1 AND b = 2))"
@@ -315,6 +322,13 @@ context "Dataset#where" do
       "SELECT * FROM test WHERE (price < 100 AND id in (1, 2, 3))"
   end
     
+  specify "should not modify passed array with named placeholders" do
+    a = ['price < :price AND id in :ids', {:price=>100}]
+    b = a.dup
+    @dataset.where(a)
+    b.should == a
+  end
+
   specify "should not replace named placeholders that don't existin in the hash" do
     @dataset.where('price < :price AND id in :ids', :price=>100).select_sql.should ==
       "SELECT * FROM test WHERE (price < 100 AND id in :ids)"
