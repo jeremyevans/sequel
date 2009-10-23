@@ -27,9 +27,26 @@ describe Sequel::Model, "caching" do
       
       columns :name, :id
     end
-    
+  
+    @c3 = Class.new(Sequel::Model(:items))
+    @c3.class_eval do
+      plugin :caching, @memcached
+      def self.name; 'Item' end
+      
+      columns :name, :id
+    end
+
+    @c4 = Class.new(Sequel::Model(:items))
+    @c4.class_eval do
+      plugin :caching, @memcached, :ignore_exceptions => true
+      def self.name; 'Item' end
+      
+      columns :name, :id
+    end
+   
+
     $cache_dataset_row = {:name => 'sharon', :id => 1}
-    @dataset = @c.dataset
+    @dataset = @c.dataset = @c3.dataset = @c4.dataset
     $sqls = []
     @dataset.extend(Module.new {
       def fetch_rows(sql)
@@ -49,15 +66,7 @@ describe Sequel::Model, "caching" do
     
     @c2 = Class.new(@c) do
       def self.name; 'SubItem' end
-    end
-    
-    @c3 = Class.new(Sequel::Model(:items))
-    @c3.class_eval do
-      plugin :caching, @memcached
-      def self.name; 'Item' end
-      
-      columns :name, :id
-    end
+    end    
   end
   
   it "should set the model's cache store" do
@@ -234,8 +243,6 @@ describe Sequel::Model, "caching" do
   end
   
   it "should rescue an exception if cache_store is memcached and ignore_exception is enabled" do
-    c = Class.new(Sequel::Model(:items))
-    c.plugin :caching, @memcached, :ignore_exceptions => true
-    c[:id => 1].should be_nil
+    @c4[:id => 1].values.should == $cache_dataset_row
   end
 end
