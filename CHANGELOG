@@ -1,5 +1,7 @@
 === HEAD
 
+* Support the memcached protocol in the caching plugin via the new :ignore_exceptions option (EppO, jeremyevans)
+
 * Don't modify array with a string and placeholders passed to Dataset#filter or related methods (jeremyevans)
 
 * Speed up Amalgalite adapter (copiousfreetime)

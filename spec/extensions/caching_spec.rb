@@ -15,7 +15,7 @@ describe Sequel::Model, "caching" do
     @memcached_class = Class.new(Hash) do
       attr_accessor :ttl
       def set(k, v, ttl); self[k] = v; @ttl = ttl; end
-      def get(k); if self[k] then return self[k]; else raise; end end
+      def get(k); if self[k] then return self[k]; else raise ArgumentError; end end
     end
     cache2 = @memcached_class.new
     @memcached = cache2
@@ -30,7 +30,7 @@ describe Sequel::Model, "caching" do
   
     @c3 = Class.new(Sequel::Model(:items))
     @c3.class_eval do
-      plugin :caching, @memcached
+      plugin :caching, cache2
       def self.name; 'Item' end
       
       columns :name, :id
@@ -38,7 +38,7 @@ describe Sequel::Model, "caching" do
 
     @c4 = Class.new(Sequel::Model(:items))
     @c4.class_eval do
-      plugin :caching, @memcached, :ignore_exceptions => true
+      plugin :caching, cache2, :ignore_exceptions => true
       def self.name; 'Item' end
       
       columns :name, :id
@@ -238,11 +238,11 @@ describe Sequel::Model, "caching" do
     Class.new(c).cache_ignore_exceptions.should == true
   end
   
-  it "should raise an exception if cache_store is not memcached and ignore_exception is enabled" do
-    @c3[:id => 1].should raise_error
+  it "should raise an exception if cache_store is memcached and ignore_exception is not enabled" do
+    proc{@c3[1]}.should raise_error
   end
   
   it "should rescue an exception if cache_store is memcached and ignore_exception is enabled" do
-    @c4[:id => 1].values.should == $cache_dataset_row
+    @c4[1].values.should == $cache_dataset_row
   end
 end
