@@ -12,6 +12,14 @@ describe Sequel::Model, "caching" do
     cache = @cache_class.new
     @cache = cache
     
+    @memcached_class = Class.new(Hash) do
+      attr_accessor :ttl
+      def set(k, v, ttl); self[k] = v; @ttl = ttl; end
+      def get(k); if self[k] then return self[k]; else raise; end end
+    end
+    cache2 = @memcached_class.new
+    @memcached = cache2
+    
     @c = Class.new(Sequel::Model(:items))
     @c.class_eval do
       plugin :caching, cache
@@ -19,9 +27,26 @@ describe Sequel::Model, "caching" do
       
       columns :name, :id
     end
-    
+  
+    @c3 = Class.new(Sequel::Model(:items))
+    @c3.class_eval do
+      plugin :caching, @memcached
+      def self.name; 'Item' end
+      
+      columns :name, :id
+    end
+
+    @c4 = Class.new(Sequel::Model(:items))
+    @c4.class_eval do
+      plugin :caching, @memcached, :ignore_exceptions => true
+      def self.name; 'Item' end
+      
+      columns :name, :id
+    end
+   
+
     $cache_dataset_row = {:name => 'sharon', :id => 1}
-    @dataset = @c.dataset
+    @dataset = @c.dataset = @c3.dataset = @c4.dataset
     $sqls = []
     @dataset.extend(Module.new {
       def fetch_rows(sql)
@@ -38,9 +63,10 @@ describe Sequel::Model, "caching" do
         $sqls << delete_sql
       end
     })
+    
     @c2 = Class.new(@c) do
       def self.name; 'SubItem' end
-    end
+    end    
   end
   
   it "should set the model's cache store" do
@@ -204,5 +230,19 @@ describe Sequel::Model, "caching" do
     $sqls.should == ["SELECT * FROM items WHERE (id = 3) LIMIT 1", \
       "SELECT * FROM items WHERE (id = 1) LIMIT 1", \
       "SELECT * FROM items WHERE (id = 4) LIMIT 1"]
+  end
+  
+  it "should support ignore_exception option" do
+    c = Class.new(Sequel::Model(:items))
+    c.plugin :caching, @cache, :ignore_exceptions => true
+    Class.new(c).cache_ignore_exceptions.should == true
+  end
+  
+  it "should raise an exception if cache_store is not memcached and ignore_exception is enabled" do
+    @c3[:id => 1].should raise_error
+  end
+  
+  it "should rescue an exception if cache_store is memcached and ignore_exception is enabled" do
+    @c4[:id => 1].values.should == $cache_dataset_row
   end
 end
