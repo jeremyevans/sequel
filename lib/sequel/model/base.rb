@@ -751,7 +751,7 @@ module Sequel
         @this ||= model.dataset.filter(pk_hash).limit(1).naked
       end
       
-      # Runs set with the passed hash and runs save_changes (which runs any callback methods).
+      # Runs set with the passed hash and then runs save_changes.
       def update(hash)
         update_restricted(hash, nil, nil)
       end
