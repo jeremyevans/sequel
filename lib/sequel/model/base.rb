@@ -654,6 +654,12 @@ module Sequel
         @values.keys
       end
       
+      # Remove elements of the model object that make marshalling fail. Returns self.
+      def marshallable!
+        @this = nil
+        self
+      end
+
       # Whether this object has been modified since last saved, used by
       # save_changes to determine whether changes should be saved.  New
       # values are always considered modified.
@@ -961,12 +967,6 @@ module Sequel
     module DatasetMethods
       # The model class associated with this dataset
       attr_accessor :model
-
-      # Dump model datasets as nil objects.  Bad, ugly hack, but required to
-      # allow marshalling of saved model records.
-      def _dump(*)
-        Marshal.dump(nil)
-      end
 
       # Destroy each row in the dataset by instantiating it and then calling
       # destroy on the resulting model object.  This isn't as fast as deleting

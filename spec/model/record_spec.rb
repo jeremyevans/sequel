@@ -209,10 +209,10 @@ describe "Model#save" do
   end
 end
 
-describe "Model marshalling" do
+describe "Model#marshallable" do
   before do
     class ::Album < Sequel::Model
-      columns :id, :x, :y
+      columns :id, :x
     end
     Album.dataset.meta_def(:insert){|h| super(h); 1}
   end
@@ -220,11 +220,26 @@ describe "Model marshalling" do
     Object.send(:remove_const, :Album)
   end
 
-  it "save should not prohibit marshalling" do
-    o = Album.load(:id => 3, :x => 1, :y => nil)
-    proc{Marshal.dump(o)}.should_not raise_error
-    o.save
-    proc{Marshal.dump(o)}.should_not raise_error
+  it "should make an object marshallable" do
+    i = Album.new(:x=>2)
+    s = nil
+    i2 = nil
+    i.marshallable!
+    proc{s = Marshal.dump(i)}.should_not raise_error
+    proc{i2 = Marshal.load(s)}.should_not raise_error
+    i2.should == i
+
+    i.save
+    i.marshallable!
+    proc{s = Marshal.dump(i)}.should_not raise_error
+    proc{i2 = Marshal.load(s)}.should_not raise_error
+    i2.should == i
+
+    i.save
+    i.marshallable!
+    proc{s = Marshal.dump(i)}.should_not raise_error
+    proc{i2 = Marshal.load(s)}.should_not raise_error
+    i2.should == i
   end
 end
 

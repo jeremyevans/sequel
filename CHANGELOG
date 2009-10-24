@@ -16,7 +16,7 @@
 
 * Have Model.table_name respect table aliases (jeremyevans)
 
-* Fix marshalling of saved model records (jeremyevans)
+* Allow marshalling of saved model records after calling #marshallable! (jeremyevans)
 
 * one_to_many association methods now make sure that the removed object is currently associated to the receiver (jeremyevans)
 
