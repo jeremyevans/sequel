@@ -20,7 +20,9 @@ module Sequel
     #      self.created_at = Time.now
     #    end
     #
-    # Note that returning false here will abort the save.
+    # Note that returning false in any before hook block will skip further
+    # before hooks and abort the action.  So if a before_save hook block returns
+    # false, future before_save hook blocks are not called, and the save is aborted.
     module HookClassMethods
       # Set up the hooks instance variable in the model.
       def self.apply(model)
