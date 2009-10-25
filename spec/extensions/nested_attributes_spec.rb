@@ -308,4 +308,25 @@ describe "NestedAttributes plugin" do
     a.tags_attributes = [{:id=>6, :name=>'T'}, {:id=>7, :name=>'T2', :_remove=>true}, {:name=>'T3'}, {:id=>8, :name=>'T4'}, {:id=>9, :name=>'T5', :_remove=>true}]
     objs.should == [[@Tag.load(:id=>6, :name=>'T'), :update], [@Tag.load(:id=>7, :name=>'A2'), :remove], [@Tag.new(:name=>'T3'), :create], [nil, :update], [nil, :remove]]
   end
+
+  it "should raise an error if updating modifies the associated objects keys" do
+    @Artist.columns :id, :name, :artist_id
+    @Album.columns :id, :name, :artist_id
+    @Tag.columns :id, :name, :tag_id
+    @Artist.one_to_many :albums, :class=>@Album, :key=>:artist_id, :primary_key=>:artist_id
+    @Album.many_to_one :artist, :class=>@Artist, :primary_key=>:artist_id
+    @Album.many_to_many :tags, :class=>@Tag, :left_key=>:album_id, :right_key=>:tag_id, :join_table=>:at, :right_primary_key=>:tag_id
+    @Artist.nested_attributes :albums, :destroy=>true, :remove=>true
+    @Album.nested_attributes :artist, :tags, :destroy=>true, :remove=>true
+
+    al = @Album.load(:id=>10, :name=>'Al', :artist_id=>25)
+    ar = @Artist.load(:id=>20, :name=>'Ar', :artist_id=>25)
+    t = @Artist.load(:id=>30, :name=>'T', :tag_id=>15)
+    al.associations[:artist] = ar
+    ar.associations[:albums] = [al]
+    ar.associations[:tag] = [t]
+    proc{ar.set(:albums_attributes=>[{:id=>10, :name=>'Al2', :artist_id=>'3'}])}.should raise_error(Sequel::Error)
+    proc{ar.set(:tag_attributes=>[{:id=>30, :name=>'T2', :tag_id=>'3'}])}.should raise_error(Sequel::Error)
+    proc{al.set(:artist_attributes=>{:id=>20, :name=>'Ar2', :artist_id=>'3'})}.should raise_error(Sequel::Error)
+  end
 end

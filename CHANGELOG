@@ -1,5 +1,7 @@
 === HEAD
 
+* Don't allow modifying keys related to the association when updating existing objects in the nested_attributes plugin (jeremyevans)
+
 * Add associated_object_keys method to AssociationReflection objects, specifying the key(s) in the associated model table related to the association (jeremyevans)
 
 * Support the memcached protocol in the caching plugin via the new :ignore_exceptions option (EppO, jeremyevans)

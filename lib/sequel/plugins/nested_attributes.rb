@@ -160,13 +160,19 @@ module Sequel
         # Returns the object updated, if it exists.
         def nested_attributes_update(reflection, pk, attributes)
           if obj = nested_attributes_find(reflection, pk)
-            obj.set(attributes)
+            nested_attributes_update_attributes(reflection, obj){obj.set(attributes)}
             after_validation_hook{validate_associated_object(reflection, obj)}
             # Don't need to validate the object twice if :validate association option is not false
             # and don't want to validate it at all if it is false.
             after_save_hook{obj.save(:validate=>false)}
             obj
           end
+        end
+
+        def nested_attributes_update_attributes(reflection, obj)
+          keys = reflection.associated_object_keys.map{|x| obj.send(x)}
+          yield
+          raise(Error, "Modifying association dependent key(s) when updating associated objects is not allowed") unless keys == reflection.associated_object_keys.map{|x| obj.send(x)}
         end
         
         # Validate the given associated object, adding any validation error messages from the
