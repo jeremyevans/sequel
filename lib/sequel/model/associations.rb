@@ -200,6 +200,7 @@ module Sequel
         def primary_keys
          self[:primary_keys] ||= Array(primary_key)
         end
+        alias associated_object_keys primary_keys
       
         # Whether this association returns an array of objects instead of a single object,
         # false for a many_to_one association.
@@ -218,6 +219,11 @@ module Sequel
       class OneToManyAssociationReflection < AssociationReflection
         ASSOCIATION_TYPES[:one_to_many] = self
         
+        # The keys in the associated model's table related to this association
+        def associated_object_keys
+          self[:keys]
+        end
+
         # one_to_many associations can only have associated objects if none of
         # the :keys options have a nil value.
         def can_have_associated_objects?(obj)
@@ -348,6 +354,7 @@ module Sequel
         def right_primary_keys
           self[:right_primary_keys] ||= Array(right_primary_key)
         end
+        alias associated_object_keys right_primary_keys
     
         # The columns to select when loading the association, associated_class.table_name.* by default.
         def select
