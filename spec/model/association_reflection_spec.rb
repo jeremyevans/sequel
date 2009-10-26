@@ -140,3 +140,36 @@ describe Sequel::Model::Associations::AssociationReflection, "#can_have_associat
     Sequel::Model::Associations::AssociationReflection.new.can_have_associated_objects?(Object.new).should == true
   end
 end
+
+describe Sequel::Model::Associations::AssociationReflection, "#associated_object_keys" do
+  before do
+    @c = Class.new(Sequel::Model)
+    class ::ParParent < Sequel::Model; end
+  end
+
+  it "should use the primary keys for a many_to_one association" do
+    @c.many_to_one :c, :class=>ParParent
+    @c.association_reflection(:c).associated_object_keys.should == [:id]
+    @c.many_to_one :c, :class=>ParParent, :primary_key=>:d_id
+    @c.association_reflection(:c).associated_object_keys.should == [:d_id]
+    @c.many_to_one :c, :class=>ParParent, :key=>[:c_id1, :c_id2], :primary_key=>[:id1, :id2]
+    @c.association_reflection(:c).associated_object_keys.should == [:id1, :id2]
+  end
+  it "should use the keys for a one_to_many association" do
+    ParParent.one_to_many :cs, :class=>ParParent
+    ParParent.association_reflection(:cs).associated_object_keys.should == [:par_parent_id]
+    @c.one_to_many :cs, :class=>ParParent, :key=>:d_id
+    @c.association_reflection(:cs).associated_object_keys.should == [:d_id]
+    @c.one_to_many :cs, :class=>ParParent, :key=>[:c_id1, :c_id2], :primary_key=>[:id1, :id2]
+    @c.association_reflection(:cs).associated_object_keys.should == [:c_id1, :c_id2]
+  end
+  it "should use the right primary keys for a many_to_many association" do
+    @c.many_to_many :cs, :class=>ParParent
+    @c.association_reflection(:cs).associated_object_keys.should == [:id]
+    @c.many_to_many :cs, :class=>ParParent, :right_primary_key=>:d_id
+    @c.association_reflection(:cs).associated_object_keys.should == [:d_id]
+    @c.many_to_many :cs, :class=>ParParent, :right_key=>[:c_id1, :c_id2], :right_primary_key=>[:id1, :id2]
+    @c.association_reflection(:cs).associated_object_keys.should == [:id1, :id2]
+  end
+end
+
