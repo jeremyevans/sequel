@@ -243,7 +243,7 @@ describe "Model#marshallable" do
   end
 end
 
-describe "Model#modified?" do
+describe "Model#modified[!?]" do
   before do
     @c = Class.new(Sequel::Model(:items))
     @c.class_eval do
@@ -264,6 +264,21 @@ describe "Model#modified?" do
   it "should be true if the object has been modified" do
     o = @c.load(:id=>1, :x=>2)
     o.x = 3
+    o.modified?.should == true
+  end
+  
+  it "should be true if the object is marked modified!" do
+    o = @c.load(:id=>1, :x=>2)
+    o.modified!
+    o.modified?.should == true
+  end
+  
+  it "should be false if the object is marked modified! after saving until modified! again" do
+    o = @c.load(:id=>1, :x=>2)
+    o.modified!
+    o.save
+    o.modified?.should == false
+    o.modified!
     o.modified?.should == true
   end
   

@@ -1,5 +1,7 @@
 === HEAD
 
+* Add Model#modified! for explicitly marking an object as modified, so save_changes/update will run callbacks even if no columns have been modified (jeremyevans)
+ 
 * Add support for a :fields option in the nested attributes plugin, and only allow updating of the fields specified (jeremyevans)
 
 * Don't allow modifying keys related to the association when updating existing objects in the nested_attributes plugin (jeremyevans)

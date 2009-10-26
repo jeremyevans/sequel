@@ -529,6 +529,7 @@ module Sequel
         else
           @values = {}
           @new = true
+          @modified = true
           set(values)
           changed_columns.clear 
           yield self if block_given?
@@ -660,11 +661,17 @@ module Sequel
         self
       end
 
+      # Explicitly mark the object as modified, so save_changes/update will
+      # run callbacks even if no columns have changed.
+      def modified!
+        @modified = true
+      end
+
       # Whether this object has been modified since last saved, used by
       # save_changes to determine whether changes should be saved.  New
       # values are always considered modified.
       def modified?
-        new? || !changed_columns.empty?
+        @modified || !changed_columns.empty?
       end
   
       # Returns true if the current instance represents a new record.
@@ -869,6 +876,7 @@ module Sequel
           after_save
           @columns_updated = nil
         end
+        @modified = false
         self
       end
       

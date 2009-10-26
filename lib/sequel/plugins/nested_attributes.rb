@@ -70,12 +70,6 @@ module Sequel
       end
       
       module InstanceMethods
-        # Assume if an instance has nested attributes set on it, that it has
-        # been modified even if none of the instance's columns have been modified.
-        def modified?
-          super || @has_nested_attributes
-        end
-        
         private
         
         # Check that the keys related to the association are not modified inside the block.  Does
@@ -160,7 +154,7 @@ module Sequel
         # * Otherwise, update the matching associated object with the contents of the hash.
         def nested_attributes_setter(reflection, attributes)
           return if (b = reflection[:nested_attributes][:reject_if]) && b.call(attributes)
-          @has_nested_attributes = true
+          modified!
           klass = reflection.associated_class
           if pk = attributes.delete(klass.primary_key) || attributes.delete(klass.primary_key.to_s)
             if klass.db.send(:typecast_value_boolean, attributes[:_delete] || attributes['_delete']) && reflection[:nested_attributes][:destroy]
