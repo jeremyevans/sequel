@@ -27,6 +27,8 @@ module Sequel
         
         # Allow nested attributes to be set for the given associations.  Options:
         # * :destroy - Allow destruction of nested records.
+        # * :fields - If provided, should be an Array.  Restricts the fields allowed to be
+        #   modified through the association_attributes= method to the specific fields given.
         # * :limit - For *_to_many associations, a limit on the number of records
         #   that will be processed, to prevent denial of service attacks.
         # * :remove - Allow disassociation of nested records (can remove the associated
@@ -76,11 +78,20 @@ module Sequel
         
         private
         
+        # Check that the keys related to the association are not modified inside the block.  Does
+        # not use an ensure block, so callers should be careful.
+        def nested_attributes_check_key_modifications(reflection, obj)
+          keys = reflection.associated_object_keys.map{|x| obj.send(x)}
+          yield
+          raise(Error, "Modifying association dependent key(s) when updating associated objects is not allowed") unless keys == reflection.associated_object_keys.map{|x| obj.send(x)}
+        end
+        
         # Create a new associated object with the given attributes, validate
         # it when the parent is validated, and save it when the object is saved.
         # Returns the object created.
         def nested_attributes_create(reflection, attributes)
-          obj = reflection.associated_class.new(attributes)
+          obj = reflection.associated_class.new
+          nested_attributes_set_attributes(reflection, obj, attributes)
           after_validation_hook{validate_associated_object(reflection, obj)}
           if reflection.returns_array?
             after_save_hook{send(reflection.add_method, obj)}
@@ -131,6 +142,16 @@ module Sequel
           end
         end
         
+        # Set the fields in the obj based on the association, only allowing
+        # specific :fields if configured.
+        def nested_attributes_set_attributes(reflection, obj, attributes)
+          if fields = reflection[:nested_attributes][:fields]
+            obj.set_only(attributes, fields)
+          else
+            obj.set(attributes)
+          end
+        end
+
         # Modify the associated object based on the contents of the attribtues hash:
         # * If a block was given to nested_attributes, call it with the attributes and return immediately if the block returns true.
         # * If no primary key exists in the attributes hash, create a new object.
@@ -160,7 +181,7 @@ module Sequel
         # Returns the object updated, if it exists.
         def nested_attributes_update(reflection, pk, attributes)
           if obj = nested_attributes_find(reflection, pk)
-            nested_attributes_update_attributes(reflection, obj){obj.set(attributes)}
+            nested_attributes_update_attributes(reflection, obj, attributes)
             after_validation_hook{validate_associated_object(reflection, obj)}
             # Don't need to validate the object twice if :validate association option is not false
             # and don't want to validate it at all if it is false.
@@ -169,12 +190,13 @@ module Sequel
           end
         end
 
-        def nested_attributes_update_attributes(reflection, obj)
-          keys = reflection.associated_object_keys.map{|x| obj.send(x)}
-          yield
-          raise(Error, "Modifying association dependent key(s) when updating associated objects is not allowed") unless keys == reflection.associated_object_keys.map{|x| obj.send(x)}
+        # Update the attributes for the given object related to the current object through the association.
+        def nested_attributes_update_attributes(reflection, obj, attributes)
+          nested_attributes_check_key_modifications(reflection, obj) do
+            nested_attributes_set_attributes(reflection, obj, attributes)
+          end
         end
-        
+
         # Validate the given associated object, adding any validation error messages from the
         # given object to the parent object.
         def validate_associated_object(reflection, obj)

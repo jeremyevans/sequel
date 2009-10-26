@@ -321,12 +321,27 @@ describe "NestedAttributes plugin" do
 
     al = @Album.load(:id=>10, :name=>'Al', :artist_id=>25)
     ar = @Artist.load(:id=>20, :name=>'Ar', :artist_id=>25)
-    t = @Artist.load(:id=>30, :name=>'T', :tag_id=>15)
+    t = @Tag.load(:id=>30, :name=>'T', :tag_id=>15)
     al.associations[:artist] = ar
+    al.associations[:tags] = [t]
     ar.associations[:albums] = [al]
-    ar.associations[:tag] = [t]
     proc{ar.set(:albums_attributes=>[{:id=>10, :name=>'Al2', :artist_id=>'3'}])}.should raise_error(Sequel::Error)
-    proc{ar.set(:tag_attributes=>[{:id=>30, :name=>'T2', :tag_id=>'3'}])}.should raise_error(Sequel::Error)
     proc{al.set(:artist_attributes=>{:id=>20, :name=>'Ar2', :artist_id=>'3'})}.should raise_error(Sequel::Error)
+    proc{al.set(:tags_attributes=>[{:id=>30, :name=>'T2', :tag_id=>'3'}])}.should raise_error(Sequel::Error)
+  end
+
+  it "should accept a :fields option and only allow modification of those fields" do
+    @Tag.columns :id, :name, :number
+    @Album.nested_attributes :tags, :destroy=>true, :remove=>true, :fields=>[:name]
+
+    al = @Album.load(:id=>10, :name=>'Al')
+    t = @Tag.load(:id=>30, :name=>'T', :number=>10)
+    al.associations[:tags] = [t]
+    al.set(:tags_attributes=>[{:id=>30, :name=>'T2'}, {:name=>'T3'}])
+    @mods.should == []
+    al.save
+    @mods.should == [[:u, :albums, {:name=>'Al'}, '(id = 10)'], [:u, :tags, {:name=>'T2', :number=>10}, '(id = 30)'], [:is, :tags, {:name=>"T3"}, 1], [:i, :at, {:album_id=>10, :tag_id=>1}, 2]]
+    proc{al.set(:tags_attributes=>[{:id=>30, :name=>'T2', :number=>3}])}.should raise_error(Sequel::Error)
+    proc{al.set(:tags_attributes=>[{:name=>'T2', :number=>3}])}.should raise_error(Sequel::Error)
   end
 end

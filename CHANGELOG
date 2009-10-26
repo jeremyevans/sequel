@@ -1,5 +1,7 @@
 === HEAD
 
+* Add support for a :fields option in the nested attributes plugin, and only allow updating of the fields specified (jeremyevans)
+
 * Don't allow modifying keys related to the association when updating existing objects in the nested_attributes plugin (jeremyevans)
 
 * Add associated_object_keys method to AssociationReflection objects, specifying the key(s) in the associated model table related to the association (jeremyevans)
