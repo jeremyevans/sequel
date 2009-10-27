@@ -994,7 +994,9 @@ module Sequel
           end
           return if run_association_callbacks(opts, :before_add, o) == false
           send(opts._add_method, o, *args)
-          associations[opts[:name]].push(o) if associations.include?(opts[:name])
+          if array = associations[opts[:name]] and !array.include?(o)
+            array.push(o)
+          end
           add_reciprocal_object(opts, o)
           run_association_callbacks(opts, :after_add, o)
           o

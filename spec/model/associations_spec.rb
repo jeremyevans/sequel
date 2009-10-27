@@ -745,6 +745,21 @@ describe Sequel::Model, "one_to_many" do
     a.should == n.add_attribute(a)
     MODEL_DB.sqls.should == ['UPDATE attributes SET node_id = 5 WHERE (id = 2345)']
   end
+  
+  it "should have add_ method not add the same object to the cached association array if the object is already in the array" do
+    @c2.one_to_many :attributes, :class => @c1
+    
+    n = @c2.new(:id => 1234)
+    a = @c1.new(:id => 2345)
+    a.save
+    MODEL_DB.reset
+    n.associations[:attributes] = []
+    a.should == n.add_attribute(a)
+    a.should == n.add_attribute(a)
+    a.values.should == {:node_id => 1234, :id => 2345}
+    MODEL_DB.sqls.should == ['UPDATE attributes SET node_id = 1234 WHERE (id = 2345)'] * 2
+    n.attributes.should == [a]
+  end
 
   it "should have add_ method respect composite keys" do
     @c2.one_to_many :attributes, :class => @c1, :key =>[:node_id, :y], :primary_key=>[:id, :x]
@@ -1664,6 +1679,17 @@ describe Sequel::Model, "many_to_many" do
     ['INSERT INTO attributes_nodes (node_id, attribute_id) VALUES (5, 8)',
      'INSERT INTO attributes_nodes (attribute_id, node_id) VALUES (8, 5)'
     ].should(include(MODEL_DB.sqls.first))
+  end
+  
+  it "should have add_ method not add the same object to the cached association array if the object is already in the array" do
+    @c2.many_to_many :attributes, :class => @c1
+    
+    n = @c2.load(:id => 1234).set(:xxx=>5)
+    a = @c1.load(:id => 2345).set(:yyy=>8)
+    n.associations[:attributes] = []
+    a.should == n.add_attribute(a)
+    a.should == n.add_attribute(a)
+    n.attributes.should == [a]
   end
   
   it "should have the add_ method respect composite keys" do
