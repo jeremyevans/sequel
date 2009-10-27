@@ -810,12 +810,15 @@ module Sequel
       v.to_s
     end
 
-    # SQL fragmento for a type of object not handled by Dataset#literal.
+    # SQL fragment for a type of object not handled by Dataset#literal.
     # Calls sql_literal if object responds to it, otherwise raises an error.
+    # Classes implementing sql_literal should call a class-specific method on the dataset
+    # provided and should add that method to Sequel::Dataset, allowing for adapters
+    # to provide customized literalizations.
     # If a database specific type is allowed, this should be overriden in a subclass.
     def literal_other(v)
       if v.respond_to?(:sql_literal)
-        v.sql_literal
+        v.sql_literal(self)
       else
         raise Error, "can't express #{v.inspect} as a SQL literal"
       end

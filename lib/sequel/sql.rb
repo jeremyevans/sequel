@@ -49,6 +49,11 @@ module Sequel
       def lit
         self
       end
+      
+      # Alias for to_s
+      def sql_literal(ds)
+        to_s(ds)
+      end
     end
 
     # Represents a complex SQL expression, with a given operator and one
