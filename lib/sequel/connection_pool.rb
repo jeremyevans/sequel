@@ -11,7 +11,7 @@ class Sequel::ConnectionPool
   # The maximum number of connections.
   attr_reader :max_size
   
-  # The mutex that protects access to the other internal vairables.  You must use
+  # The mutex that protects access to the other internal variables.  You must use
   # this if you want to manipulate the variables safely.
   attr_reader :mutex
   
