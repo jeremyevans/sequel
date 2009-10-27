@@ -793,13 +793,16 @@ context "Dataset#literal" do
     @dataset.literal(:items__name).should == "items.name"
   end
   
-  specify "should call sql_literal on type if not natively supports and the method exists" do
+  specify "should call sql_literal with dataset on type if not natively supported and the object responds to it" do
     @a = Class.new do
-      def sql_literal
-        "called"
+      def sql_literal(ds)
+        "called #{ds.blah}"
       end
     end
-    @dataset.literal(@a.new).should == "called"
+    def @dataset.blah
+      "ds"
+    end
+    @dataset.literal(@a.new).should == "called ds"
   end
   
   specify "should raise an error for unsupported types with no sql_literal method" do
