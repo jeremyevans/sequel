@@ -18,7 +18,7 @@
 
 * Allow easier overriding of default error messages used in the validation_helpers plugin (jeremyevans)
 
-* Have Dataset#literal_other call sql_literal on the object if it responds to it (heda)
+* Have Dataset#literal_other call sql_literal on the object if it responds to it (heda, michaeldiamond)
 
 * Fix Dataset#explain in the amalgalite adapter (jeremyevans)
 
