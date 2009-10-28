@@ -88,6 +88,7 @@ module Sequel
           nested_attributes_set_attributes(reflection, obj, attributes)
           after_validation_hook{validate_associated_object(reflection, obj)}
           if reflection.returns_array?
+            send(reflection[:name]) << obj
             after_save_hook{send(reflection.add_method, obj)}
           else
             # Don't need to validate the object twice if :validate association option is not false

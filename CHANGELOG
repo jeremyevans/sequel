@@ -1,5 +1,7 @@
 === HEAD
 
+* Make nested_attributes plugin add newly created objects to cached association array immediately (jeremyevans)
+
 * Make add_ association method not add the associated object to the cached array if it's already there (jeremyevans)
 
 * Add Model#modified! for explicitly marking an object as modified, so save_changes/update will run callbacks even if no columns have been modified (jeremyevans)

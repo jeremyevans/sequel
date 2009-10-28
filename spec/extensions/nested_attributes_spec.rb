@@ -72,6 +72,12 @@ describe "NestedAttributes plugin" do
     @mods.should == [[:is, :albums, {:name=>"Al"}, 1], [:is, :tags, {:name=>"T"}, 2], [:i, :at, {:album_id=>1, :tag_id=>2}, 3]]
   end
   
+  it "should add new objects to the cached association array as soon as the *_attributes= method is called" do
+    a = @Artist.new({:name=>'Ar', :albums_attributes=>[{:name=>'Al', :tags_attributes=>[{:name=>'T'}]}]})
+    a.albums.should == [@Album.new(:name=>'Al')]
+    a.albums.first.tags.should == [@Tag.new(:name=>'T')]
+  end
+  
   it "should support updating many_to_one objects" do
     al = @Album.load(:id=>10, :name=>'Al')
     ar = @Artist.load(:id=>20, :name=>'Ar')
