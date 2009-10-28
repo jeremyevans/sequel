@@ -40,6 +40,7 @@
 <li><a href='http://github.com/aemadrid/sequel_orderable'>sequel_orderable</a>: Allows for model instances to be part of an ordered list, based on a 'position' field in the database.</li>
 <li><a href='http://github.com/jackdempsey/sequel_polymorphic'>sequel_polymorphic</a>: Lets you easily create polymorphic associations.</li>
 <li><a href='http://github.com/jackdempsey/sequel_taggable'>sequel_taggable</a>: Allows easily adding tags to any model.</li>
+<li><a href='http://github.com/jeremyevans/sequel_validation_helpers_block'>sequel_validation_helpers_block</a>: Allows easy determination of which validation rules apply to a given column, at the expense of increased verbosity.</li>
 </ul>
 
 <h2>Sequel Extensions</h2>
