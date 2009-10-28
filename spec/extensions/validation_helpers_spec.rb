@@ -73,43 +73,55 @@ describe "Sequel::Plugins::ValidationHelpers" do
     @m.should be_valid
   end
   
-  specify "should support modifying default validation error messages for all models" do
+  specify "should support modifying default options for all models" do
     @c.set_validations{validates_presence(:value)}
     @m.should_not be_valid
     @m.errors.should == {:value=>['is not present']}
-    p = Sequel::Plugins::ValidationHelpers::MESSAGE_PROCS[:presence]
-    Sequel::Plugins::ValidationHelpers::MESSAGE_PROCS[:presence] = lambda{"was not entered"}
+    o = Sequel::Plugins::ValidationHelpers::DEFAULT_OPTIONS[:presence].dup
+    Sequel::Plugins::ValidationHelpers::DEFAULT_OPTIONS[:presence][:message] = lambda{"was not entered"}
     @m.should_not be_valid
     @m.errors.should == {:value=>["was not entered"]}
     @m.value = 1
     @m.should be_valid
     
+    @m.values.clear
+    Sequel::Plugins::ValidationHelpers::DEFAULT_OPTIONS[:presence][:allow_missing] = true
+    @m.should be_valid
+    @m.value = nil
+    @m.should_not be_valid
+    @m.errors.should == {:value=>["was not entered"]}
+
+    
     c = Class.new(Sequel::Model)
     c.class_eval do
       plugin :validation_helpers
-      attr_accessor :value
+      set_columns([:value])
       def validate
         validates_presence(:value)
       end
     end
-    m = c.new
+    m = c.new(:value=>nil)
     m.should_not be_valid
     m.errors.should == {:value=>["was not entered"]}
-    Sequel::Plugins::ValidationHelpers::MESSAGE_PROCS[:presence] = p
+    Sequel::Plugins::ValidationHelpers::DEFAULT_OPTIONS[:presence] = o
   end
   
-  specify "should support modifying default validation error messages for a particular model" do
+  specify "should support modifying default validation options for a particular model" do
     @c.set_validations{validates_presence(:value)}
     @m.should_not be_valid
     @m.errors.should == {:value=>['is not present']}
     @c.class_eval do
-      def default_validation_error_message_proc(type)
-        proc{'was not entered'}
+      def default_validation_helpers_options(type)
+        {:allow_missing=>true, :message=>proc{'was not entered'}}
       end
     end
+    @m.value = nil
     @m.should_not be_valid
     @m.errors.should == {:value=>["was not entered"]}
     @m.value = 1
+    @m.should be_valid
+    
+    @m.values.clear
     @m.should be_valid
     
     c = Class.new(Sequel::Model)

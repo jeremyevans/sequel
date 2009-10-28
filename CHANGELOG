@@ -18,7 +18,7 @@
 
 * Fix bound variables on PostgreSQL when using nil and potentially other values (jeremyevans)
 
-* Allow easier overriding of default error messages used in the validation_helpers plugin (jeremyevans)
+* Allow easier overriding of default options used in the validation_helpers plugin (jeremyevans)
 
 * Have Dataset#literal_other call sql_literal on the object if it responds to it (heda, michaeldiamond)
 
