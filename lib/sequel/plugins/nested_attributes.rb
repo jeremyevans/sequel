@@ -180,7 +180,7 @@ module Sequel
             after_validation_hook{validate_associated_object(reflection, obj)}
             # Don't need to validate the object twice if :validate association option is not false
             # and don't want to validate it at all if it is false.
-            after_save_hook{obj.save(:validate=>false)}
+            after_save_hook{obj.save_changes(:validate=>false)}
             obj
           end
         end

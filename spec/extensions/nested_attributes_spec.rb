@@ -346,7 +346,7 @@ describe "NestedAttributes plugin" do
     al.set(:tags_attributes=>[{:id=>30, :name=>'T2'}, {:name=>'T3'}])
     @mods.should == []
     al.save
-    @mods.should == [[:u, :albums, {:name=>'Al'}, '(id = 10)'], [:u, :tags, {:name=>'T2', :number=>10}, '(id = 30)'], [:is, :tags, {:name=>"T3"}, 1], [:i, :at, {:album_id=>10, :tag_id=>1}, 2]]
+    @mods.should == [[:u, :albums, {:name=>'Al'}, '(id = 10)'], [:u, :tags, {:name=>'T2'}, '(id = 30)'], [:is, :tags, {:name=>"T3"}, 1], [:i, :at, {:album_id=>10, :tag_id=>1}, 2]]
     proc{al.set(:tags_attributes=>[{:id=>30, :name=>'T2', :number=>3}])}.should raise_error(Sequel::Error)
     proc{al.set(:tags_attributes=>[{:name=>'T2', :number=>3}])}.should raise_error(Sequel::Error)
   end
