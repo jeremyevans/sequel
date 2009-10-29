@@ -1,5 +1,7 @@
 === HEAD
 
+* Make the MSSQL shared adapter correctly parse the column schema information for tables in the non-default database schema (rohit.namjoshi)
+
 * Use save_changes instead of save when updating existing associated objects in the nested_attributes plugin (jeremyevans)
 
 * Allow Model#save_changes to accept an option hash that is passed to save, so you can save changes without validating (jeremyevans)

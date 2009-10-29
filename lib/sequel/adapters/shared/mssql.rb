@@ -128,7 +128,7 @@ module Sequel
          select(:column_name___column, :data_type___db_type, :character_maximum_length___max_chars, :column_default___default, :is_nullable___allow_null).
          filter(:c__table_name=>m2.call(table_name.to_s))
         if schema = opts[:schema] || default_schema
-          ds.filter!(:table_schema=>schema)
+          ds.filter!(:c__table_schema=>schema)
         end
         ds.map do |row|
           row[:allow_null] = row[:allow_null] == 'YES' ? true : false
