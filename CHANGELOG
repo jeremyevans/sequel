@@ -1,5 +1,7 @@
 === HEAD
 
+* Allow Model#save_changes to accept an option hash that is passed to save, so you can save changes without validating (jeremyevans)
+
 * Make nested_attributes plugin add newly created objects to cached association array immediately (jeremyevans)
 
 * Make add_ association method not add the associated object to the cached array if it's already there (jeremyevans)

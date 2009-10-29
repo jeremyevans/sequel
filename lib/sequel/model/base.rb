@@ -729,8 +729,8 @@ module Sequel
       # Saves only changed columns if the object has been modified.
       # If the object has not been modified, returns nil.  If unable to
       # save, returns false unless raise_on_save_failure is true.
-      def save_changes
-        save(:changed=>true) || false if modified? 
+      def save_changes(opts={})
+        save(opts.merge(:changed=>true)) || false if modified? 
       end
   
       # Updates the instance with the supplied values with support for virtual

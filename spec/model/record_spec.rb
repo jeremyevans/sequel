@@ -311,6 +311,15 @@ describe "Model#save_changes" do
     MODEL_DB.sqls.first.should == "INSERT INTO items (x) VALUES (1)"
   end
 
+  it "should take options passed to save" do
+    o = @c.new(:x => 1)
+    def o.valid?; false; end
+    proc{o.save_changes}.should raise_error(Sequel::Error)
+    MODEL_DB.sqls.should == []
+    o.save_changes(:validate=>false)
+    MODEL_DB.sqls.first.should == "INSERT INTO items (x) VALUES (1)"
+  end
+
   it "should do nothing if no changed columns" do
     o = @c.load(:id => 3, :x => 1, :y => nil)
     o.save_changes
