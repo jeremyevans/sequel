@@ -1,4 +1,4 @@
-=== HEAD
+=== 3.6.0 (2009-11-02)
 
 * Make the MSSQL shared adapter correctly parse the column schema information for tables in the non-default database schema (rohit.namjoshi)
 

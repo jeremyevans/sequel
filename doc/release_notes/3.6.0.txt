@@ -1,0 +1,366 @@
+New Features
+------------
+
+* Dataset#filter and related methods now accept a string with named
+  placeholders, and a hash with placeholder values:
+
+    ds.filter('copies_sold > :sales', :sales=>500000)
+
+  Sequel's general support for this syntax is nicer:
+
+    ds.filter{copies_sold > 500000}
+
+  But named placeholder support can make it easier to port code
+  from other database libraries.  Also, it works much better than
+  the ? placeholder support if you have a long SQL statement:
+
+    DB['SELECT :n FROM t WHERE p > :q AND p < :r', :n=>1,:q=>2,:r=>3]
+
+  Sequel doesn't subsitute values that don't appear in the hash:
+
+    ds.where('price < :p AND id in :ids', :p=>100)
+    # WHERE (price < 100 AND id in :ids)
+
+  This makes it easier to spot missed placeholders, and avoids issues
+  with PostgreSQL's :: casting syntax or : inside string literals.
+
+* The Model add_ association method now accepts a hash and creates
+  a new associated model object associated to the receiver:
+
+    Artist[:name=>'YJM'].add_album(:name=>'RF')
+
+* The Model remove_ association method now accepts a primary key
+  and removes the associated model object from the association. For
+  models using composite primary keys, an array of primary key values
+  can be used.  Example:
+
+    Artist[:name=>'YJM'].remove_album(1) # regular pk
+    Artist[:name=>'YJM'].remove_album([2, 3]) # composite pk
+
+* Dataset#bind was added, allowing you to bind values before calling
+  Dataset#call.  This is more consistent with Sequel's general
+  approach where queries can be built in any order.
+
+* The native postgres adapter now has Dataset#use_cursor, which
+  allows you to process huge datasets without keeping all records in
+  memory.  The default number of rows per cursor fetch is 1000, but
+  that can be modified:
+
+    DB[:huge_table].use_cursor.each{|r| p r}
+    DB[:huge_table].use_cursor(:rows_per_fetch=>10000).each{|r| p r}
+
+  This probably won't work with prepared statements or
+  bound variables.
+
+* The nested_attributes plugin now adds newly created objects to the
+  cached association array immediately, even though the changes
+  are not persisted to the database until after the object is saved.
+  The reasoning for this is that otherwise there is no way to access
+  the newly created associated objects before the save, and no way
+  to access them at all if validation fails.
+  
+  This makes the nested_attributes plugin much easier to use, since
+  now you can just iterate over the cached association array when
+  building the form.  If validation fails, it will have the newly
+  created failed objects in the array, so you can easily display the
+  form as the user entered it for them to make changes.
+
+  This change doesn't affect many_to_one associations, since those
+  don't have a cached association array.  This also does not affect
+  updating existing records, since those are already in the cached
+  array.
+
+* You can now easily override the default options used in the
+  validation_helpers plugin (the recommended validation plugin).
+  Options can be overridden at a global level:
+
+    Sequel::Plugins::ValidationHelpers::DEFAULT_OPTIONS[:format].
+      merge!(:message=>"incorrect format", :allow_missing=>true)
+
+  Options can also be overridden on a per-class level:
+
+    class Album < Sequel::Model
+      plugin :validation_helpers
+      DEFAULT_VALIDATION_OPTIONS = {
+       :format=>{:message=>"incorrect format", :allow_missing=>true}}
+    
+      private
+    
+      def default_validation_helpers_options(type)
+        super.merge(DEFAULT_VALIDATION_OPTIONS[type] || {})
+      end
+    end
+
+* You can now use a proc instead of a string for the
+  validation_helpers :message option.  This should allow much
+  easier internationalization support.  If a proc is given, Sequel
+  calls it to get the format string to use.  Whether the proc should
+  take an argument depends on whether the associated validation
+  method takes an argument before the array of columns to validate,
+  and the argument provided is what is passed to the proc.  The
+  exception to this is the validates_not_string method, which doesn't
+  take an argument, but does pass one to the proc (a symbol with the
+  schema type of the column).
+
+  Combined with the above default option support, full
+  internationalization support for the validation_helpers plugin
+  should be fairly easy.
+
+* The nested_attributes plugin now accepts a :fields option that
+  specifies the fields that are allowed.  If specified, the
+  plugin will use set_only instead of set when mass assigning
+  attributes.  Without this, the only way to control which fields
+  are allowed is to set allowed/restricted attributes at a class
+  level in the associated class.
+
+* Associations now accept a :distinct option which uses the SQL
+  DISTINCT clause.  This can be used instead of :uniq for
+  many_to_many and many_through_many associations to handle
+  the uniqueness in the database instead of in ruby.  It can
+  also be useful for one_to_many associations to models that
+  don't have primary keys.
+
+* The caching plugin now accepts an :ignore_exceptions option that
+  allows it to work with memcached (which raises exceptions instead
+  of returning nil for missing records).
+
+* Sequel now emulates JOIN USING poorly using JOIN ON for databases
+  that don't support JOIN USING (MSSQL and H2).  This isn't
+  guaranteed to work for all queries, since USING and ON have
+  different semantics, but should work in most cases.
+
+* The MSSQL shared adapter now supports insert_select, for faster
+  model object creation.  If for some reason you need to disable it,
+  you can use disable_insert_output.
+
+* Model#modified! has been added which explicitly marks the object
+  as modified.  So even if no column values have been modified,
+  calling save_changes/update will still run through the regular
+  save process and call all before and after save/update hooks.
+
+* Model#marshallable! has been added which removes unmarshallable
+  attributes from the object.  Previously, you couldn't marshal
+  a saved model object because it contained a dataset with a
+  singleton class.  Custom _dump and _load methods could be used
+  instead, but this approach is easier to implement.
+
+* Dataset#literal_other now calls sql_literal on the object with
+  the current dataset instance, if the object responds to it.
+  This makes it easier to support the literalization of arbitrary
+  objects.
+
+  Note that if the object is a subclass of a class handled by
+  an existing dataset literalization method, you cannot use this
+  method.  You have to override the specific Dataset#literal_* method
+  in that case.
+
+* Model#save_changes now accepts an option hash that is passed to
+  save:
+
+    album.save_changes(:validate=>false)
+  
+* A bunch of Dataset#*_join methods have been added, for specific
+  join types:
+
+  * cross_join
+  * natural_join
+  * full_join
+  * left_join
+  * right_join
+  * natural_full_join
+  * natural_left_join
+  * natural_right_join
+
+  Previously, you had to use join_table(:cross, ...) to use a CROSS
+  JOIN.
+
+* You can now create clustered indexes on Microsoft SQL Server using
+  the :clustered option.
+
+* AssociationReflection#associated_object_keys has been added,
+  specifying the keys in the associated model object that are related
+  to this association. 
+
+* Sequel::SQL::SQLArray#to_a was added.
+
+Other Improvements
+------------------
+
+* Constant lookup in virtual row blocks now works correctly in ruby
+  1.9.  Virtual row blocks are based on BasicObject on ruby 1.9,
+  which doesn't allow referencing objects in the top level scope. So
+  the following code would cause an error on 1.9:
+
+    DB[:bonds].filter{maturity_date > Time.now}
+
+  Sequel now uses a Sequel::BasicObject class on 1.9 with a
+  const_missing that looks up constants in Object, which allows the
+  above code to work.
+
+* Sequel no longer attempts to load associated objects when
+  one of the key fields in the current table is NULL.  This fixes
+  the behavior when the :primary_key option for the association
+  is used to point to a non-primary key.
+
+  A consequence of this change is that attempting to load a
+  *_to_many association for a new model object now returns
+  an empty array instead of raising an exception.  This has its
+  own advantage of allowing the same association viewing code
+  to work on both new and existing objects.  Previously, you had
+  to actively avoid calling the association method on new objects,
+  or Sequel would raise an exception.
+
+* Dataset aggreate methods (sum/avg/min/max/range/interval) now
+  work correctly with limited, grouped, or compound datasets.
+  Previously, count worked with them, but other aggregate methods
+  did not.  These methods now use a subquery if called on a
+  limited, grouped or compound dataset.
+
+* It is no longer required to have an existing GROUP BY clause
+  to use a HAVING clause (except on SQLite, which doesn't permit
+  it).  Sequel has always had this limitation, but it's not required
+  by the SQL standard, and there are valid reasons to use HAVING
+  without GROUP BY.
+
+* Sequel will now emulate support for databases that don't support
+  multiple column IN/NOT IN syntax, such as MSSQL and SQLite:
+
+    ds.filter([:col1, :col2]=>[[1, 2], [3, 4]].sql_array)
+    # default:  WHERE (col1, col2) IN ((1, 2), (3, 4))
+    # emulated: WHERE (((col1 = 1) AND (col2 = 2)) OR
+    #                  ((col1 = 3) AND (col2 = 4)))
+
+  This is necessary for eager loading associated objects for models
+  with composite primary keys.
+
+* Sequel now emulates :column.ilike('blah%') for case insensitive
+  searches on MSSQL and H2.  MSSQL is case insensitive by default,
+  so it is the same as like.  H2 is case sensitive, so Sequel
+  uses a case insensitive cast there.
+
+* The nested_attributes plugin no longer allows modification of
+  keys related to the association.  This fixes a possible security
+  issue with the plugin, where a user could associate the nested
+  record to a different record.  For example:
+
+    Artist.one_to_many :albums
+    Artist.plugin :nested_attributes
+    Artist.nested_attributes :albums
+    artist = Artist.create
+    artist2 = Artist.create
+    album = Album.create
+    artist.add_album(album)
+    artist.albums_attributes = [{:id=>album.id,
+     :artist_id=>artist2.id}]
+    artist.save
+
+* The one_to_many remove_* association method now makes sure that the
+  object to be removed is currently associated to this object.
+  Before, the method could be abused to disassociate the object from
+  whatever object it was associated to.
+
+* Model add_ and remove_ association methods now check that the passed
+  object is of the correct class.
+  
+* Calling the add_* association method no longer adds the record
+  to the cached association array if the object is already in the
+  array.  Previously, Sequel did this for reciprocal associations,
+  but not for regular associations.
+
+  This makes the most sense for one_to_many associations, since
+  those can only be associated to the object once.  For many_to_many
+  associations, if you want an option to disable the behavior, please
+  bring it up on the Sequel mailing list.
+
+* An array with a string and placeholders that is passed to
+  Dataset#filter is no longer modified.  Previously:
+
+    options = ["name like ?", "%dog%"]
+    DB[:players].where(options)
+    options # => ["%dog%"]
+
+* Getting the most recently inserted autoincremented primary key
+  is now optimized when connecting to MySQL via JDBC.
+
+* Model.inherited now calls Class.inherited.
+
+* The MSSQL shared adapter once again works on ruby 1.9.  It was
+  broken in 3.5.0 due to minor syntax issues.
+
+* The force_encoding plugin now handles refreshing an existing
+  object, either explicitly or implicitly when new objects are
+  created.
+
+  To use the force_encoding plugin with the identity_map plugin, the
+  identity_map plugin should be loaded first.
+
+* Using nil as a bound variable now works on PostgreSQL.  Before,
+  Sequel would incorrectly use "" instead of NULL, since it
+  transformed all objects to strings before binding them.  Sequel
+  now binds the objects directly.
+
+* The Amalgalite adapter is now significantly faster, especially for
+  code that modifies the schema or submits arbitrary SQL statements
+  using Database <<, run, or execute_ddl.
+
+* Model#save_changes is now used when updating existing associated
+  objects in the nested_attributes plugin.  This should be
+  significantly faster for the common case of submitting a complex
+  form with nested objects without making modifications.
+
+* You can now prepare insert statements that take multiple arguments,
+  such as insert(1, 2, 3) and insert(columns, values).
+
+* Dataset#group_and_count now supports aliased columns.
+
+* Adding indexes to tables outside the default schema now works.
+
+* Eager graphing now works better with models that use aliased tables.
+
+* Sequel now correctly parses the column schema information for tables
+  in a non-default schema on Microsoft SQL Server.
+
+* changed_columns is now cleared for when saving new model objects
+  for adapters that support insert_select, such as PostgreSQL.
+
+* Dataset#replace on MySQL now works correctly when default values
+  are used.
+
+* Dataset#lock on PostgreSQL now works correctly.
+
+* Dataset#explain now works correctly on SQLite, and works using
+  any adapter.  It also works correctly on Amalgalite.
+
+* The JDBC adapter now handles binding Time arguments correctly when
+  using prepared statements.
+
+* Model add_ and remove_ association methods now have more
+  descriptive exception messages.
+
+* Dataset#simple_select_all? now ignores options that don't affect
+  the SQL, such as :server.
+
+* Dataset#window in the PostgreSQL adapter now respects existing
+  named windows.
+
+* Sequel now better handles a failure to begin a new transaction.
+
+* The dataset code was split into some additional files for improved
+  readability.
+
+* Many documentation improvements were made.
+
+Backwards Compatibility
+-----------------------
+
+* Model::Errors no longer uses a default proc, but emulates one in the
+  [] method.  This is unlikely to have a negative affect unless you
+  are calling a method on it that doesn't call [] (maybe using it in
+  a C extension?).
+
+* Model#table_name now only provides the alias if an aliased table is
+  used.
+
+* The Sequel::Dataset::STOCK_COUNT_OPTS constant has been removed.
+
+* Dataset#lock on PostgreSQL now returns nil instead of a dataset.
