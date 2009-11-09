@@ -1377,7 +1377,7 @@ module Sequel
       
         # Make sure the association is valid for this model, and return the related AssociationReflection.
         def check_association(model, association)
-          raise(Sequel::Error, 'Invalid association') unless reflection = model.association_reflection(association)
+          raise(Sequel::Error, "Invalid association #{association} for #{model.name}") unless reflection = model.association_reflection(association)
           raise(Sequel::Error, "Eager loading is not allowed for #{model.name} association #{association}") if reflection[:allow_eager] == false
           reflection
         end
