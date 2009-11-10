@@ -93,7 +93,8 @@ module Sequel
       def connect(server)
         opts = server_opts(server)
         conn = Mysql.init
-        conn.options(Mysql::OPT_LOCAL_INFILE, "client")
+        # reads additional options defined under the [client] tag in the mysql configuration file
+        conn.options(Mysql::READ_DEFAULT_GROUP, "client")
         if encoding = opts[:encoding] || opts[:charset]
           # set charset _before_ the connect. using an option instead of "SET (NAMES|CHARACTER_SET_*)" works across reconnects
           conn.options(Mysql::SET_CHARSET_NAME, encoding)
