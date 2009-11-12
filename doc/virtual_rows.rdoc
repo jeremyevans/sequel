@@ -15,6 +15,7 @@ called.  This is best shown by example:
   ds.filter{column > 1}        # column > 1
   ds.filter{table__column > 1} # table.column > 1
   ds.filter{function(1) > 1}   # function(1) > 1
+  ds.select{[column1, sum(column2).as(sum)]} # column1, sum(column2) AS sum
   ds.select{version{}}   # version()
   ds.select{count(:*){}} # count(*)
   ds.select{count(:distinct, col1){}} # count(DISTINCT col1)
@@ -54,3 +55,5 @@ that.  If you want to create identifiers or qualified identifiers
 with the same name as existing local variables, make sure ruby
 knows it is a method call instead of a local variable reference
 by not ommiting the parentheses at the end of the method call.
+If you want to return multiple arguments (common for select and
+order), have the block return an array of arguments.
