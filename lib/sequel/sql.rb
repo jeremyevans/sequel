@@ -36,6 +36,16 @@ module Sequel
 
     # Base class for all SQL fragments
     class Expression
+      # all instance variables declared to be readers are to be used for comparison.
+      def self.attr_reader(*args)
+        super
+        comparison_attrs.concat args
+      end
+
+      def self.comparison_attrs
+        @comparison_attrs ||= self == Expression ? [] : superclass.comparison_attrs.clone
+      end
+
       # Create a to_s instance method that takes a dataset, and calls
       # the method provided on the dataset with args as the argument (self by default).
       # Used to DRY up some code.
@@ -54,6 +64,13 @@ module Sequel
       def sql_literal(ds)
         to_s(ds)
       end
+
+      # Returns true if the receiver is the same expression as the
+      # the +other+ expression.
+      def eql?(other)
+        other.is_a?(self.class) && !self.class.comparison_attrs.find {|a| send(a) != other.send(a)}
+      end
+      alias == eql?
     end
 
     # Represents a complex SQL expression, with a given operator and one
@@ -125,13 +142,6 @@ module Sequel
         @op = op
         @args = args
       end
-
-      # Returns true if the receiver is the same expression as the
-      # the +other+ expression.
-      def eql?(other)
-        other.is_a?(self.class) && @op.eql?(other.op) && @args.eql?(other.args)
-      end
-      alias == eql?
       
       to_s_method :complex_expression_sql, '@op, @args'
     end

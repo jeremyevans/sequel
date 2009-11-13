@@ -408,3 +408,10 @@ context "Sequel::SQL::OrderedExpression" do
     @oe.invert.invert.descending.should == true
   end
 end
+
+context "Expression" do
+  specify "should ==" do
+    :column.qualify(:table).cast(:type).*(:numeric_column).asc.should == :column.qualify(:table).cast(:type).*(:numeric_column).asc
+    :other_column.qualify(:table).cast(:type).*(:numeric_column).asc.should_not == :column.qualify(:table).cast(:type).*(:numeric_column).asc
+  end
+end
