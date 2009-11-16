@@ -335,7 +335,7 @@ module Sequel
       # PostgreSQL uses SERIAL psuedo-type instead of AUTOINCREMENT for
       # managing incrementing primary keys.
       def serial_primary_key_options
-        {:primary_key => true, :type => :serial}
+        {:primary_key => true, :serial => true, :type=>Integer}
       end
       
       # The version of the PostgreSQL server, used for determining capability.
@@ -551,9 +551,19 @@ module Sequel
         "(#{Array(args).map{|a| Array(a).reverse.join(' ')}.join(', ')})"
       end
       
+      # Handle bigserial type if :serial option is present
+      def type_literal_generic_bignum(column)
+        column[:serial] ? :bigserial : super
+      end
+
       # PostgreSQL uses the bytea data type for blobs
       def type_literal_generic_file(column)
         :bytea
+      end
+
+      # Handle serial type if :serial option is present
+      def type_literal_generic_integer(column)
+        column[:serial] ? :serial : super
       end
 
       # PostgreSQL prefers the text datatype.  If a fixed size is requested,

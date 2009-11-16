@@ -1,5 +1,9 @@
 === HEAD
 
+* In the schema_dumper, explicitly specify the :type option if it isn't Integer (jeremyevans)
+
+* On postgres, use bigserial type if :type=>Bignum is given as an option to primary_key (jeremyevans)
+
 * Use READ_DEFAULT_GROUP in the mysql adapter to load the options in the client section of the my.cnf file (crohr)
 
 === 3.6.0 (2009-11-02)

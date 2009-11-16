@@ -86,7 +86,12 @@ END_MIG
     # name and arguments to it to pass to a Schema::Generator to recreate the column.
     def column_schema_to_generator_opts(name, schema, options)
       if options[:single_pk] && schema_autoincrementing_primary_key?(schema)
-        [:primary_key, name]
+        type_hash = column_schema_to_ruby_type(schema)
+        if type_hash == {:type=>Integer}
+          [:primary_key, name]
+        else
+          [:primary_key, name, type_hash]
+        end
       else
         col_opts = options[:same_db] ? {:type=>schema[:db_type]} : column_schema_to_ruby_type(schema)
         type = col_opts.delete(:type)

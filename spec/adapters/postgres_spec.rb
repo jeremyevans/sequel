@@ -235,6 +235,18 @@ context "A PostgreSQL database" do
     @db[:posts].order(:a).map(:a).should == [1, 2, 10, 20, 21]
   end
   
+  specify "should support specifying Integer/Bignum/Fixnum types in primary keys and have them be auto incrementing" do
+    @db.create_table(:posts){primary_key :a, :type=>Integer}
+    @db[:posts].insert.should == 1
+    @db[:posts].insert.should == 2
+    @db.create_table!(:posts){primary_key :a, :type=>Fixnum}
+    @db[:posts].insert.should == 1
+    @db[:posts].insert.should == 2
+    @db.create_table!(:posts){primary_key :a, :type=>Bignum}
+    @db[:posts].insert.should == 1
+    @db[:posts].insert.should == 2
+  end
+
   specify "should not raise an error if attempting to resetting the primary key sequence for a table without a primary key" do
     @db.create_table(:posts){Integer :a}
     @db.reset_primary_key_sequence(:posts).should == nil

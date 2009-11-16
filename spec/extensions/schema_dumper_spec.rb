@@ -80,12 +80,18 @@ describe "Sequel::Database dump methods" do
          [:c2, {:db_type=>'datetime', :allow_null=>false}]]
       when :t5
         [[:c1, {:db_type=>'blahblah', :allow_null=>true}]]
+      when :t6
+        [[:c1, {:db_type=>'bigint', :primary_key=>true, :allow_null=>true}]]
       end
     end
   end
 
   it "should support dumping table schemas as create_table method calls" do
     @d.dump_table_schema(:t1).should == "create_table(:t1) do\n  primary_key :c1\n  String :c2, :size=>20\nend"
+  end
+
+  it "should dump non-Integer primary key columns with explicit :type" do
+    @d.dump_table_schema(:t6).should == "create_table(:t6) do\n  primary_key :c1, :type=>Bignum\nend"
   end
 
   it "should use a composite primary_key calls if there is a composite primary key" do
