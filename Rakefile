@@ -116,7 +116,6 @@ begin
   spec_opts = lambda do
     lib_dir = File.join(File.dirname(__FILE__), 'lib')
     ENV['RUBYLIB'] ? (ENV['RUBYLIB'] += ":#{lib_dir}") : (ENV['RUBYLIB'] = lib_dir)
-    File.read("spec/spec.opts").split("\n")
   end
 
   rcov_opts = lambda do
@@ -126,7 +125,7 @@ begin
   desc "Run core and model specs with coverage"
   Spec::Rake::SpecTask.new("spec_coverage") do |t|
     t.spec_files = Dir["spec/{core,model}/*_spec.rb"]
-    t.spec_opts  = spec_opts.call
+    spec_opts.call
     t.rcov, t.rcov_opts = rcov_opts.call
   end
   
@@ -134,44 +133,44 @@ begin
   task :default => [:spec]
   Spec::Rake::SpecTask.new("spec") do |t|
     t.spec_files = Dir["spec/{core,model}/*_spec.rb"]
-    t.spec_opts  = spec_opts.call
+    spec_opts.call
   end
   
   desc "Run core specs"
   Spec::Rake::SpecTask.new("spec_core") do |t|
     t.spec_files = Dir["spec/core/*_spec.rb"]
-    t.spec_opts  = spec_opts.call
+    spec_opts.call
   end
   
   desc "Run model specs"
   Spec::Rake::SpecTask.new("spec_model") do |t|
     t.spec_files = Dir["spec/model/*_spec.rb"]
-    t.spec_opts  = spec_opts.call
+    spec_opts.call
   end
   
   desc "Run extension/plugin specs"
   Spec::Rake::SpecTask.new("spec_plugin") do |t|
     t.spec_files = Dir["spec/extensions/*_spec.rb"]
-    t.spec_opts  = spec_opts.call
+    spec_opts.call
   end
   
   desc "Run extention/plugin specs with coverage"
   Spec::Rake::SpecTask.new("spec_plugin_cov") do |t|
     t.spec_files = Dir["spec/extensions/*_spec.rb"]
-    t.spec_opts  = spec_opts.call
+    spec_opts.call
     t.rcov, t.rcov_opts = rcov_opts.call
   end
   
   desc "Run integration tests"
   Spec::Rake::SpecTask.new("integration") do |t|
     t.spec_files = Dir["spec/integration/*_test.rb"]
-    t.spec_opts  = spec_opts.call
+    spec_opts.call
   end
   
   desc "Run integration tests with coverage"
   Spec::Rake::SpecTask.new("integration_cov") do |t|
     t.spec_files = Dir["spec/integration/*_test.rb"]
-    t.spec_opts  = spec_opts.call
+    spec_opts.call
     t.rcov, t.rcov_opts = rcov_opts.call
   end
   
@@ -179,13 +178,13 @@ begin
     desc "Run #{adapter} specs"
     Spec::Rake::SpecTask.new("spec_#{adapter}") do |t|
       t.spec_files = ["spec/adapters/#{adapter}_spec.rb"] + Dir["spec/integration/*_test.rb"]
-      t.spec_opts  = spec_opts.call
+      spec_opts.call
     end
 
     desc "Run #{adapter} specs with coverage"
     Spec::Rake::SpecTask.new("spec_#{adapter}_cov") do |t|
       t.spec_files = ["spec/adapters/#{adapter}_spec.rb"] + Dir["spec/integration/*_test.rb"]
-      t.spec_opts  = spec_opts.call
+      spec_opts.call
       t.rcov, t.rcov_opts = rcov_opts.call
     end
   end
