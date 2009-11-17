@@ -1,5 +1,9 @@
 === HEAD
 
+* Allow Model#destroy to take an options hash and respect a :transaction option (john_firebaugh)
+
+* If a transaction is being used, raise_on_save_failure is false, and a before hook returns false, rollback the transaction (john_firebaugh, jeremyevans)
+
 * In the schema_dumper, explicitly specify the :type option if it isn't Integer (jeremyevans)
 
 * On postgres, use bigserial type if :type=>Bignum is given as an option to primary_key (jeremyevans)

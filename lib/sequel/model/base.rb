@@ -506,19 +506,7 @@ module Sequel
       private_class_method :class_attr_overridable, :class_attr_reader
 
       class_attr_reader :columns, :db, :primary_key, :db_schema
-      class_attr_overridable :raise_on_save_failure, :raise_on_typecast_failure, :strict_param_setting, :typecast_empty_string_to_nil, :typecast_on_assignment
-
-      attr_writer :use_transactions
-      def use_transactions(opts = {})
-        case
-          when opts.include?(:transaction)
-            opts[:transaction]
-          when defined?(@use_transactions)
-            @use_transactions
-          else
-            self.class.use_transactions
-        end
-      end
+      class_attr_overridable :raise_on_save_failure, :raise_on_typecast_failure, :strict_param_setting, :typecast_empty_string_to_nil, :typecast_on_assignment, :use_transactions
 
       # The hash of attribute values.  Keys are symbols with the names of the
       # underlying database columns.
@@ -619,9 +607,10 @@ module Sequel
       # If before_destroy returns false, returns false without
       # deleting the object the the database. Otherwise, deletes
       # the item from the database and returns self.  Uses a transaction
-      # if use_transactions is true.
+      # if use_transactions is true or if the :transaction option is given and
+      # true.
       def destroy(opts = {})
-        use_transactions(opts) ? db.transaction{_destroy(opts)} : _destroy(opts)
+        use_transaction?(opts) ? db.transaction{_destroy(opts)} : _destroy(opts)
       end
 
       # Iterates through all of the current values using each.
@@ -734,7 +723,7 @@ module Sequel
       def save(*columns)
         opts = columns.last.is_a?(Hash) ? columns.pop : {}
         return save_failure(:invalid) if opts[:validate] != false and !valid?
-        use_transactions(opts) ? db.transaction(opts){_save(columns, opts)} : _save(columns, opts)
+        use_transaction?(opts) ? db.transaction(opts){_save(columns, opts)} : _save(columns, opts)
       end
 
       # Saves only changed columns if the object has been modified.
@@ -908,7 +897,7 @@ module Sequel
           else
             raise BeforeHookFailed, "one of the before_#{type} hooks returned false"
           end
-        elsif type != :invalid && use_transactions(opts)
+        elsif type != :invalid && use_transaction?(opts)
           raise Rollback
         end
       end
@@ -980,6 +969,13 @@ module Sequel
       def update_restricted(hash, only, except)
         set_restricted(hash, only, except)
         save_changes
+      end
+      
+      # Whether to use a transaction for this action.  If the :transaction
+      # option is present in the hash, use that, otherwise, fallback to the
+      # object's default (if set), or class's default (if not).
+      def use_transaction?(opts = {})
+        opts.include?(:transaction) ? opts[:transaction] : use_transactions
       end
     end
 

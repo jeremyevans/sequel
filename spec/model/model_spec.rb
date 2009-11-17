@@ -569,23 +569,25 @@ end
 context "Model#use_transactions" do
   before do
     @c = Class.new(Sequel::Model(:items))
-    @instance = @c.new
   end
 
   specify "should return class value by default" do
-    @instance.use_transactions.should == Sequel::Model.use_transactions
+    @c.use_transactions = true
+    @c.new.use_transactions.should == true
+    @c.use_transactions = false
+    @c.new.use_transactions.should == false
   end
 
   specify "should return set value if manually set" do
-    @instance.use_transactions = false
-    @instance.use_transactions.should == false
-    @instance.use_transactions = true
-    @instance.use_transactions.should == true
-  end
-
-  specify "should return :transaction option if given" do
-    @instance.use_transactions(:transaction => false).should == false
-    @instance.use_transactions = false
-    @instance.use_transactions(:transaction => true).should == true
+    instance = @c.new
+    instance.use_transactions = false
+    instance.use_transactions.should == false
+    @c.use_transactions = true
+    instance.use_transactions.should == false
+    
+    instance.use_transactions = true
+    instance.use_transactions.should == true
+    @c.use_transactions = false
+    instance.use_transactions.should == true
   end
 end

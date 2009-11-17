@@ -236,9 +236,9 @@ describe "Model#save" do
     o = @c.load(:id => 3, :x => 1, :y => nil)
     o.use_transactions = false
     def o.before_save
-      raise Sequel::Error::Rollback
+      raise Sequel::Rollback
     end
-    proc { o.save(:y) }.should raise_error(Sequel::Error::Rollback)
+    proc { o.save(:y) }.should raise_error(Sequel::Rollback)
     MODEL_DB.sqls.should == []
     MODEL_DB.reset
   end
