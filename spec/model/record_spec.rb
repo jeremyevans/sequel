@@ -207,6 +207,41 @@ describe "Model#save" do
     MODEL_DB.sqls.should == ["BEGIN", "UPDATE items SET y = NULL WHERE (id = 3)", "COMMIT"]
     MODEL_DB.reset
   end
+
+  it "should rollback if before_save returns false and raise_on_save_failure = true" do
+    o = @c.load(:id => 3, :x => 1, :y => nil)
+    o.use_transactions = true
+    o.raise_on_save_failure = true
+    def o.before_save
+      false
+    end
+    proc { o.save(:y) }.should raise_error(Sequel::BeforeHookFailed)
+    MODEL_DB.sqls.should == ["BEGIN", "ROLLBACK"]
+    MODEL_DB.reset
+  end
+
+  it "should rollback if before_save returns false and raise_on_save_failure = false" do
+    o = @c.load(:id => 3, :x => 1, :y => nil)
+    o.use_transactions = true
+    o.raise_on_save_failure = false
+    def o.before_save
+      false
+    end
+    o.save(:y).should == nil
+    MODEL_DB.sqls.should == ["BEGIN", "ROLLBACK"]
+    MODEL_DB.reset
+  end
+
+  it "should not rollback if before_save throws Rollback and use_transactions = false" do
+    o = @c.load(:id => 3, :x => 1, :y => nil)
+    o.use_transactions = false
+    def o.before_save
+      raise Sequel::Error::Rollback
+    end
+    proc { o.save(:y) }.should raise_error(Sequel::Error::Rollback)
+    MODEL_DB.sqls.should == []
+    MODEL_DB.reset
+  end
 end
 
 describe "Model#marshallable" do
@@ -758,6 +793,18 @@ describe Sequel::Model, "#destroy" do
     @instance.use_transactions = false
     @model.db.should_not_receive(:transaction)
     @instance.destroy
+  end
+
+  it "should run within a transaction if :transaction option is true" do
+    @instance.use_transactions = false
+    @model.db.should_receive(:transaction)
+    @instance.destroy(:transaction => true)
+  end
+
+  it "should not run within a transaction if :transaction option is false" do
+    @instance.use_transactions = true
+    @model.db.should_not_receive(:transaction)
+    @instance.destroy(:transaction => false)
   end
 
   it "should run before_destroy and after_destroy hooks" do

@@ -506,8 +506,20 @@ module Sequel
       private_class_method :class_attr_overridable, :class_attr_reader
 
       class_attr_reader :columns, :db, :primary_key, :db_schema
-      class_attr_overridable :raise_on_save_failure, :raise_on_typecast_failure, :strict_param_setting, :typecast_empty_string_to_nil, :typecast_on_assignment, :use_transactions
-      
+      class_attr_overridable :raise_on_save_failure, :raise_on_typecast_failure, :strict_param_setting, :typecast_empty_string_to_nil, :typecast_on_assignment
+
+      attr_writer :use_transactions
+      def use_transactions(opts = {})
+        case
+          when opts.include?(:transaction)
+            opts[:transaction]
+          when defined?(@use_transactions)
+            @use_transactions
+          else
+            self.class.use_transactions
+        end
+      end
+
       # The hash of attribute values.  Keys are symbols with the names of the
       # underlying database columns.
       attr_reader :values
@@ -608,8 +620,8 @@ module Sequel
       # deleting the object the the database. Otherwise, deletes
       # the item from the database and returns self.  Uses a transaction
       # if use_transactions is true.
-      def destroy
-        use_transactions ? db.transaction{_destroy} : _destroy
+      def destroy(opts = {})
+        use_transactions(opts) ? db.transaction{_destroy(opts)} : _destroy(opts)
       end
 
       # Iterates through all of the current values using each.
@@ -722,8 +734,7 @@ module Sequel
       def save(*columns)
         opts = columns.last.is_a?(Hash) ? columns.pop : {}
         return save_failure(:invalid) if opts[:validate] != false and !valid?
-        use_transaction = opts.include?(:transaction) ? opts[:transaction] : use_transactions
-        use_transaction ? db.transaction(opts){_save(columns, opts)} : _save(columns, opts)
+        use_transactions(opts) ? db.transaction(opts){_save(columns, opts)} : _save(columns, opts)
       end
 
       # Saves only changed columns if the object has been modified.
@@ -809,8 +820,8 @@ module Sequel
   
       # Internal destroy method, separted from destroy to
       # allow running inside a transaction
-      def _destroy
-        return save_failure(:destroy) if before_destroy == false
+      def _destroy(opts)
+        return save_failure(:destroy, opts) if before_destroy == false
         delete
         after_destroy
         self
@@ -844,9 +855,9 @@ module Sequel
       # Internal version of save, split from save to allow running inside
       # it's own transaction.
       def _save(columns, opts)
-        return save_failure(:save) if before_save == false
+        return save_failure(:save, opts) if before_save == false
         if new?
-          return save_failure(:create) if before_create == false
+          return save_failure(:create, opts) if before_create == false
           pk = _insert
           @this = nil if pk
           @new = false
@@ -862,7 +873,7 @@ module Sequel
             changed_columns.clear
           end
         else
-          return save_failure(:update) if before_update == false
+          return save_failure(:update, opts) if before_update == false
           if columns.empty?
             @columns_updated = opts[:changed] ? @values.reject{|k,v| !changed_columns.include?(k)} : @values.dup
             changed_columns.clear
@@ -890,13 +901,15 @@ module Sequel
       end
   
       # Raise an error if raise_on_save_failure is true, return nil otherwise.
-      def save_failure(type)
+      def save_failure(type, opts = {})
         if raise_on_save_failure
           if type == :invalid
             raise ValidationFailed, errors.full_messages.join(', ')
           else
             raise BeforeHookFailed, "one of the before_#{type} hooks returned false"
           end
+        elsif type != :invalid && use_transactions(opts)
+          raise Rollback
         end
       end
   
