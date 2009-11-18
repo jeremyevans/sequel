@@ -17,7 +17,10 @@ module Sequel
   # using the native MySQL adapter.  You can turn off the conversion to use
   # tinyint as an integer:
   #
-  #   Sequel.convert_tinyint_to_bool = false
+  #   Sequel::MySQL.convert_tinyint_to_bool = false
+  #
+  # In most cases these settings need to be made after the adapter has been
+  # loaded, since the Sequel::MySQL module probably won't exist before then.
   module MySQL
     # Mapping of type numbers to conversion procs
     MYSQL_TYPES = {}
