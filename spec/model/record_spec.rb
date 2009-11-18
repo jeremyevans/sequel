@@ -158,7 +158,7 @@ describe "Model#save" do
     res.should == [nil, nil]
   end
   
-  it "should use Model's save_in_transaction setting by default" do
+  it "should use Model's use_transactions setting by default" do
     @c.use_transactions = true
     @c.load(:id => 3, :x => 1, :y => nil).save(:y)
     MODEL_DB.sqls.should == ["BEGIN", "UPDATE items SET y = NULL WHERE (id = 3)", "COMMIT"]
@@ -169,7 +169,7 @@ describe "Model#save" do
     MODEL_DB.reset
   end
 
-  it "should inherit Model's save_in_transaction setting" do
+  it "should inherit Model's use_transactions setting" do
     @c.use_transactions = true
     Class.new(@c).load(:id => 3, :x => 1, :y => nil).save(:y)
     MODEL_DB.sqls.should == ["BEGIN", "UPDATE items SET y = NULL WHERE (id = 3)", "COMMIT"]
@@ -180,7 +180,7 @@ describe "Model#save" do
     MODEL_DB.reset
   end
 
-  it "should use object's save_in_transaction setting" do
+  it "should use object's use_transactions setting" do
     o = @c.load(:id => 3, :x => 1, :y => nil)
     o.use_transactions = false
     @c.use_transactions = true
@@ -217,6 +217,21 @@ describe "Model#save" do
     end
     proc { o.save(:y) }.should raise_error(Sequel::BeforeHookFailed)
     MODEL_DB.sqls.should == ["BEGIN", "ROLLBACK"]
+    MODEL_DB.reset
+  end
+
+  it "should not rollback outer transactions if before_save returns false and raise_on_save_failure = false" do
+    o = @c.load(:id => 3, :x => 1, :y => nil)
+    o.use_transactions = true
+    o.raise_on_save_failure = false
+    def o.before_save
+      false
+    end
+    MODEL_DB.transaction do
+      o.save(:y).should == nil
+      MODEL_DB.run "BLAH"
+    end
+    MODEL_DB.sqls.should == ["BEGIN", "BLAH", "COMMIT"]
     MODEL_DB.reset
   end
 

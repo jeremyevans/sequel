@@ -610,7 +610,7 @@ module Sequel
       # if use_transactions is true or if the :transaction option is given and
       # true.
       def destroy(opts = {})
-        use_transaction?(opts) ? db.transaction{_destroy(opts)} : _destroy(opts)
+        checked_save_failure{checked_transaction(opts){_destroy(opts)}}
       end
 
       # Iterates through all of the current values using each.
@@ -722,8 +722,11 @@ module Sequel
       # * :validate - set to false not to validate the model before saving
       def save(*columns)
         opts = columns.last.is_a?(Hash) ? columns.pop : {}
-        return save_failure(:invalid) if opts[:validate] != false and !valid?
-        use_transaction?(opts) ? db.transaction(opts){_save(columns, opts)} : _save(columns, opts)
+        if opts[:validate] != false and !valid?
+          raise(ValidationFailed, errors.full_messages.join(', ')) if raise_on_save_failure 
+          return
+        end
+        checked_save_failure{checked_transaction(opts){_save(columns, opts)}}
       end
 
       # Saves only changed columns if the object has been modified.
@@ -797,7 +800,7 @@ module Sequel
       def valid?
         errors.clear
         if before_validation == false
-          save_failure(:validation)
+          save_failure(:validation) if raise_on_save_failure
           return false
         end
         validate
@@ -810,7 +813,7 @@ module Sequel
       # Internal destroy method, separted from destroy to
       # allow running inside a transaction
       def _destroy(opts)
-        return save_failure(:destroy, opts) if before_destroy == false
+        return save_failure(:destroy) if before_destroy == false
         delete
         after_destroy
         self
@@ -844,9 +847,9 @@ module Sequel
       # Internal version of save, split from save to allow running inside
       # it's own transaction.
       def _save(columns, opts)
-        return save_failure(:save, opts) if before_save == false
+        return save_failure(:save) if before_save == false
         if new?
-          return save_failure(:create, opts) if before_create == false
+          return save_failure(:create) if before_create == false
           pk = _insert
           @this = nil if pk
           @new = false
@@ -862,7 +865,7 @@ module Sequel
             changed_columns.clear
           end
         else
-          return save_failure(:update, opts) if before_update == false
+          return save_failure(:update) if before_update == false
           if columns.empty?
             @columns_updated = opts[:changed] ? @values.reject{|k,v| !changed_columns.include?(k)} : @values.dup
             changed_columns.clear
@@ -880,26 +883,38 @@ module Sequel
         self
       end
       
+      # Update this instance's dataset with the supplied column hash.
       def _update(columns)
         this.update(columns)
       end
+
+      # If raise_on_save_failure is false, check for BeforeHookFailed
+      # beind raised by yielding and swallow it.
+      def checked_save_failure
+        if raise_on_save_failure
+          yield
+        else
+          begin
+            yield
+          rescue BeforeHookFailed 
+            nil
+          end
+        end
+      end
       
+      # If transactions should be used, wrap the yield in a transaction block.
+      def checked_transaction(opts)
+        use_transaction?(opts)? db.transaction(opts){yield} : yield
+      end
+
       # Default inspection output for the values hash, overwrite to change what #inspect displays.
       def inspect_values
         @values.inspect
       end
   
       # Raise an error if raise_on_save_failure is true, return nil otherwise.
-      def save_failure(type, opts = {})
-        if raise_on_save_failure
-          if type == :invalid
-            raise ValidationFailed, errors.full_messages.join(', ')
-          else
-            raise BeforeHookFailed, "one of the before_#{type} hooks returned false"
-          end
-        elsif type != :invalid && use_transaction?(opts)
-          raise Rollback
-        end
+      def save_failure(type)
+        raise BeforeHookFailed, "one of the before_#{type} hooks returned false"
       end
   
       # Set the columns, filtered by the only and except arrays.
