@@ -1,5 +1,7 @@
 === HEAD
 
+* Allow specifying the dataset alias via :alias option when using union/intersect/except (jeremyevans)
+
 * Allow Model#destroy to take an options hash and respect a :transaction option (john_firebaugh)
 
 * If a transaction is being used, raise_on_save_failure is false, and a before hook returns false, rollback the transaction (john_firebaugh, jeremyevans)

@@ -2095,6 +2095,15 @@ context "Dataset compound operations" do
       "SELECT * FROM (SELECT * FROM b WHERE (z = 2) EXCEPT ALL SELECT * FROM a WHERE (z = 1)) AS t1"
   end
     
+  specify "should support :alias option for specifying identifier" do
+    @a.union(@b, :alias=>:xx).sql.should == \
+      "SELECT * FROM (SELECT * FROM a WHERE (z = 1) UNION SELECT * FROM b WHERE (z = 2)) AS xx"
+    @a.intersect(@b, :alias=>:xx).sql.should == \
+      "SELECT * FROM (SELECT * FROM a WHERE (z = 1) INTERSECT SELECT * FROM b WHERE (z = 2)) AS xx"
+    @a.except(@b, :alias=>:xx).sql.should == \
+      "SELECT * FROM (SELECT * FROM a WHERE (z = 1) EXCEPT SELECT * FROM b WHERE (z = 2)) AS xx"
+  end
+
   specify "should support :from_self=>false option to not wrap the compound in a SELECT * FROM (...)" do
     @b.union(@a, :from_self=>false).sql.should == \
       "SELECT * FROM b WHERE (z = 2) UNION SELECT * FROM a WHERE (z = 1)"
