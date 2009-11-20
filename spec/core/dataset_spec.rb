@@ -3413,3 +3413,120 @@ describe "Sequel timezone support" do
     Sequel.typecast_timezone.should == :utc
   end
 end
+
+context "Sequel::Dataset#select_map" do
+  before do
+    @ds = MockDatabase.new[:t]
+    def @ds.fetch_rows(sql)
+      db << sql
+      yield({:c=>1})
+      yield({:c=>2})
+    end
+    @ds.db.reset
+  end
+
+  specify "should do select and map in one step" do
+    @ds.select_map(:a).should == [1, 2]
+    @ds.db.sqls.should == ['SELECT a FROM t']
+  end
+
+  specify "should handle implicit qualifiers in arguments" do
+    @ds.select_map(:a__b).should == [1, 2]
+    @ds.db.sqls.should == ['SELECT a.b FROM t']
+  end
+
+  specify "should handle implicit aliases in arguments" do
+    @ds.select_map(:a___b).should == [1, 2]
+    @ds.db.sqls.should == ['SELECT a AS b FROM t']
+  end
+
+  specify "should handle other objects" do
+    @ds.select_map("a".lit.as(:b)).should == [1, 2]
+    @ds.db.sqls.should == ['SELECT a AS b FROM t']
+  end
+  
+  specify "should accept a block" do
+    @ds.select_map{a(t__c)}.should == [1, 2]
+    @ds.db.sqls.should == ['SELECT a(t.c) FROM t']
+  end
+end
+
+context "Sequel::Dataset#select_order_map" do
+  before do
+    @ds = MockDatabase.new[:t]
+    def @ds.fetch_rows(sql)
+      db << sql
+      yield({:c=>1})
+      yield({:c=>2})
+    end
+    @ds.db.reset
+  end
+
+  specify "should do select and map in one step" do
+    @ds.select_order_map(:a).should == [1, 2]
+    @ds.db.sqls.should == ['SELECT a FROM t ORDER BY a']
+  end
+
+  specify "should handle implicit qualifiers in arguments" do
+    @ds.select_order_map(:a__b).should == [1, 2]
+    @ds.db.sqls.should == ['SELECT a.b FROM t ORDER BY a.b']
+  end
+
+  specify "should handle implicit aliases in arguments" do
+    @ds.select_order_map(:a___b).should == [1, 2]
+    @ds.db.sqls.should == ['SELECT a AS b FROM t ORDER BY a']
+  end
+
+  specify "should handle implicit qualifiers and aliases in arguments" do
+    @ds.select_order_map(:t__a___b).should == [1, 2]
+    @ds.db.sqls.should == ['SELECT t.a AS b FROM t ORDER BY t.a']
+  end
+
+  specify "should handle AliasedExpressions" do
+    @ds.select_order_map("a".lit.as(:b)).should == [1, 2]
+    @ds.db.sqls.should == ['SELECT a AS b FROM t ORDER BY a']
+  end
+  
+  specify "should accept a block" do
+    @ds.select_order_map{a(t__c)}.should == [1, 2]
+    @ds.db.sqls.should == ['SELECT a(t.c) FROM t ORDER BY a(t.c)']
+  end
+end
+
+context "Sequel::Dataset#select_hash" do
+  before do
+    @ds = MockDatabase.new[:t]
+    def @ds.set_fr_yield(hs)
+      @hs = hs
+    end
+    def @ds.fetch_rows(sql)
+      db << sql
+      @hs.each{|h| yield h}
+    end
+    @ds.db.reset
+  end
+
+  specify "should do select and map in one step" do
+    @ds.set_fr_yield([{:a=>1, :b=>2}, {:a=>3, :b=>4}])
+    @ds.select_hash(:a, :b).should == {1=>2, 3=>4}
+    @ds.db.sqls.should == ['SELECT a, b FROM t']
+  end
+
+  specify "should handle implicit qualifiers in arguments" do
+    @ds.set_fr_yield([{:a=>1, :b=>2}, {:a=>3, :b=>4}])
+    @ds.select_hash(:t__a, :t__b).should == {1=>2, 3=>4}
+    @ds.db.sqls.should == ['SELECT t.a, t.b FROM t']
+  end
+
+  specify "should handle implicit aliases in arguments" do
+    @ds.set_fr_yield([{:a=>1, :b=>2}, {:a=>3, :b=>4}])
+    @ds.select_hash(:c___a, :d___b).should == {1=>2, 3=>4}
+    @ds.db.sqls.should == ['SELECT c AS a, d AS b FROM t']
+  end
+
+  specify "should handle implicit qualifiers and aliases in arguments" do
+    @ds.set_fr_yield([{:a=>1, :b=>2}, {:a=>3, :b=>4}])
+    @ds.select_hash(:t__c___a, :t__d___b).should == {1=>2, 3=>4}
+    @ds.db.sqls.should == ['SELECT t.c AS a, t.d AS b FROM t']
+  end
+end
