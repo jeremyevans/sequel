@@ -377,4 +377,39 @@ describe "Sequel::Plugins::ValidationHelpers" do
     MODEL_DB.sqls.should == ["SELECT COUNT(*) AS count FROM items WHERE ((username = '0records') AND active) LIMIT 1",
                     "SELECT COUNT(*) AS count FROM items WHERE (((username = '0records') AND active) AND (id != 3)) LIMIT 1"]
   end
+
+  it "should support :only_if_modified option for validates_unique, and not check uniqueness for existing records if values haven't changed" do
+    @c.columns(:id, :username, :password)
+    @c.set_dataset MODEL_DB[:items]
+    @c.set_validations{validates_unique([:username, :password], :only_if_modified=>true)}
+    
+    @c.dataset.extend(Module.new {
+      def fetch_rows (sql)
+        @db << sql
+        yield({:v => 0})
+      end
+    })
+    
+    MODEL_DB.reset
+    @c.new(:username => "0records", :password => "anothertest").should be_valid
+    MODEL_DB.sqls.should == ["SELECT COUNT(*) AS count FROM items WHERE ((username = '0records') AND (password = 'anothertest')) LIMIT 1"]
+    MODEL_DB.reset
+    m = @c.load(:id=>3, :username => "0records", :password => "anothertest")
+    m.should be_valid
+    MODEL_DB.sqls.should == []
+
+    m.username = '1'
+    m.should be_valid
+    MODEL_DB.sqls.should == ["SELECT COUNT(*) AS count FROM items WHERE (((username = '1') AND (password = 'anothertest')) AND (id != 3)) LIMIT 1"]
+
+    m = @c.load(:id=>3, :username => "0records", :password => "anothertest")
+    MODEL_DB.reset
+    m.password = '1'
+    m.should be_valid
+    MODEL_DB.sqls.should == ["SELECT COUNT(*) AS count FROM items WHERE (((username = '0records') AND (password = '1')) AND (id != 3)) LIMIT 1"]
+    MODEL_DB.reset
+    m.username = '2'
+    m.should be_valid
+    MODEL_DB.sqls.should == ["SELECT COUNT(*) AS count FROM items WHERE (((username = '2') AND (password = '1')) AND (id != 3)) LIMIT 1"]
+  end
 end 

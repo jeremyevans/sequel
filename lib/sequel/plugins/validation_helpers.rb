@@ -153,6 +153,8 @@ module Sequel
         #
         # Possible Options:
         # * :message - The message to use (default: 'is already taken')
+        # * :only_if_modified - Only check the uniqueness if the object is new or
+        #   one of the columns has been modified.
         def validates_unique(*atts)
           opts = default_validation_helpers_options(:unique)
           if atts.last.is_a?(Hash)
@@ -160,9 +162,12 @@ module Sequel
           end
           message = validation_error_message(opts[:message])
           atts.each do |a|
-            ds = model.filter(Array(a).map{|x| [x, send(x)]})
+            arr = Array(a)
+            next if opts[:only_if_modified] && !new? && !arr.any?{|x| changed_columns.include?(x)}
+            ds = model.filter(arr.map{|x| [x, send(x)]})
             ds = yield(ds) if block_given?
-            errors.add(a, message) unless (new? ? ds : ds.exclude(pk_hash)).count == 0
+            ds = ds.exclude(pk_hash) unless new?
+            errors.add(a, message) unless ds.count == 0
           end
         end
         
