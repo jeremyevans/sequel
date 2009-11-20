@@ -1,5 +1,7 @@
 === HEAD
 
+* Make Dataset#group_and_count handle arguments other than Symbols (jeremyevans)
+
 * Add :only_if_modified option to validates_unique method in validation_helpers plugin (jeremyevans)
 
 * Allow specifying the dataset alias via :alias option when using union/intersect/except (jeremyevans)

@@ -91,13 +91,9 @@ module Sequel
     #   ds.group_and_count(:first_name, :last_name).all => [{:first_name=>'a', :last_name=>'b', :count=>1}, ...]
     #   ds.group_and_count(:first_name___name).all => [{:name=>'a', :count=>1}, ...]
     def group_and_count(*columns)
-      groups = columns.map do |c|
-        c_table, column, _ = split_symbol(c)
-        c_table ? column.to_sym.qualify(c_table) : column.to_sym
-      end
-      group(*groups).select(*(columns + [COUNT_OF_ALL_AS_COUNT])).order(:count)
+      group(*columns.map{|c| unaliased_identifier(c)}).select(*(columns + [COUNT_OF_ALL_AS_COUNT])).order(:count)
     end
-    
+
     # Inserts multiple records into the associated table. This method can be
     # to efficiently insert a large amounts of records into a table. Inserts
     # are automatically wrapped in a transaction.
@@ -243,6 +239,23 @@ module Sequel
       inject({}) do |m, r|
         m[r[key_column]] = value_column ? r[value_column] : r
         m
+      end
+    end
+
+    private
+
+    # Return the unaliased part of the identifier.  Handles both
+    # implicit aliases in symbols, as well as SQL::AliasedExpression
+    # objects.  Other objects are returned as is.
+    def unaliased_identifier(c)
+      case c
+      when Symbol
+        c_table, column, _ = split_symbol(c)
+        c_table ? column.to_sym.qualify(c_table) : column.to_sym
+      when SQL::AliasedExpression
+        c.expression
+      else
+        c
       end
     end
   end
