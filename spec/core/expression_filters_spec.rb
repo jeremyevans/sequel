@@ -399,6 +399,13 @@ context "Blockless Ruby Filters" do
     y.lit.should == y
   end
 
+  it "should return have .sql_literal operate like .to_s" do
+    y = :x + 1
+    y.sql_literal(@d).should == '(x + 1)'
+    y.sql_literal(@d).should == y.to_s(@d)
+    y.sql_literal(@d).should == @d.literal(y)
+  end
+
   it "should raise an error if trying to create an invalid complex expression" do
     proc{Sequel::SQL::ComplexExpression.new(:BANG, 1, 2)}.should raise_error(Sequel::Error)
   end
