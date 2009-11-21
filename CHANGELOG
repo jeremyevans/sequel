@@ -1,5 +1,7 @@
 === HEAD
 
+* Bring support for modifying joined datasets into Sequel proper, supported on MySQL and PostgreSQL (jeremyevans)
+
 * No longer use native autoreconnection in the mysql adapter (jeremyevans)
 
 * Add NULL, NOTNULL, TRUE, SQLTRUE, FALSE, and SQLFALSE constants (jeremyevans)

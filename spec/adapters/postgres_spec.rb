@@ -147,6 +147,10 @@ context "A PostgreSQL dataset" do
     @d.lock('EXCLUSIVE'){@d.insert(:name=>'a')}.should == nil
     POSTGRES_DB.transaction{@d.lock('EXCLUSIVE').should == nil; @d.insert(:name=>'a')}
   end
+  
+  specify "should raise an error if attempting to update a joined dataset with a single FROM table" do
+    proc{POSTGRES_DB[:test].join(:test2, [:name]).update(:name=>'a')}.should raise_error(Sequel::Error, 'Need multiple FROM tables if updating/deleting a dataset with JOINs')
+  end
 end
 
 context "A PostgreSQL dataset with a timestamp field" do

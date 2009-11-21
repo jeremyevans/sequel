@@ -588,6 +588,7 @@ module Sequel
       BOOL_FALSE = 'false'.freeze
       BOOL_TRUE = 'true'.freeze
       COMMA_SEPARATOR = ', '.freeze
+      DELETE_CLAUSE_METHODS = Dataset.clause_methods(:delete, %w'from using where')
       EXCLUSIVE = 'EXCLUSIVE'.freeze
       EXPLAIN = 'EXPLAIN '.freeze
       EXPLAIN_ANALYZE = 'EXPLAIN ANALYZE '.freeze
@@ -605,6 +606,7 @@ module Sequel
       SHARE_ROW_EXCLUSIVE = 'SHARE ROW EXCLUSIVE'.freeze
       SHARE_UPDATE_EXCLUSIVE = 'SHARE UPDATE EXCLUSIVE'.freeze
       SQL_WITH_RECURSIVE = "WITH RECURSIVE ".freeze
+      UPDATE_CLAUSE_METHODS = Dataset.clause_methods(:update, %w'table set from where')
       
       # Shared methods for prepared statements when used with PostgreSQL databases.
       module PreparedStatementMethods
@@ -706,6 +708,11 @@ module Sequel
         [insert_sql(columns, LiteralString.new('VALUES ' + values.map {|r| literal(Array(r))}.join(COMMA_SEPARATOR)))]
       end
       
+      # PostgreSQL supports modifying joined datasets
+      def supports_modifying_joins?
+        true
+      end
+
       # PostgreSQL supports timezones in literal timestamps
       def supports_timestamp_timezones?
         true
@@ -723,12 +730,38 @@ module Sequel
       
       private
       
+      # PostgreSQL allows deleting from joined datasets
+      def delete_clause_methods
+        DELETE_CLAUSE_METHODS
+      end 
+
+      # Only include the primary table in the main delete clause
+      def delete_from_sql(sql)
+        sql << " FROM #{source_list(@opts[:from][0..0])}"
+      end
+
+      # Use USING to specify additional tables in a delete query
+      def delete_using_sql(sql)
+        join_from_sql(:USING, sql)
+      end
+
       # Use the RETURNING clause to return the primary key of the inserted record, if it exists
       def insert_returning_pk_sql(*values)
         pk = db.primary_key(opts[:from].first) if opts[:from] && !opts[:from].empty?
         insert_returning_sql(pk ? Sequel::SQL::Identifier.new(pk) : NULL, *values)
       end
       
+      # For multiple table support, PostgreSQL requires at least
+      # two from tables, with joins allowed.
+      def join_from_sql(type, sql)
+        if(from = @opts[:from][1..-1]).empty?
+          raise(Error, 'Need multiple FROM tables if updating/deleting a dataset with JOINs') if @opts[:join]
+        else
+          sql << " #{type} #{source_list(from)}"
+          select_join_sql(sql)
+        end
+      end
+
       # Use a generic blob quoting method, hopefully overridden in one of the subadapter methods
       def literal_blob(v)
         "'#{v.gsub(/[\000-\037\047\134\177-\377]/){|b| "\\#{("%o" % b[0..1].unpack("C")[0]).rjust(3, '0')}"}}'"
@@ -785,6 +818,21 @@ module Sequel
         cols = cols.zip([' '] * cols.length).flatten
         cols.pop
         literal(SQL::StringExpression.new(:'||', *cols))
+      end
+
+      # PostgreSQL splits the main table from the joined tables
+      def update_clause_methods
+        UPDATE_CLAUSE_METHODS
+      end
+
+      # Use FROM to specify additional tables in an update query
+      def update_from_sql(sql)
+        join_from_sql(:FROM, sql)
+      end
+
+      # Only include the primary table in the main update clause
+      def update_table_sql(sql)
+        sql << " #{source_list(@opts[:from][0..0])}"
       end
     end
   end

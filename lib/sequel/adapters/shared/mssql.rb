@@ -323,6 +323,11 @@ module Sequel
         false
       end
 
+      # MSSQL 2005+ supports modifying joined datasets
+      def supports_modifying_joins?
+        true
+      end
+
       # MSSQL does not support multiple columns for the IN/NOT IN operators
       def supports_multiple_column_in?
         false
@@ -335,17 +340,26 @@ module Sequel
 
       private
 
-      # MSSQL can modify joined datasets
-      def check_modification_allowed!
-        raise(InvalidOperation, "Grouped datasets cannot be modified") if opts[:group]
-      end
-
       # MSSQL supports the OUTPUT clause for DELETE statements.
       # It also allows prepending a WITH clause.
       def delete_clause_methods
         DELETE_CLAUSE_METHODS
       end
 
+      # Only include the primary table in the main delete clause
+      def delete_from_sql(sql)
+        sql << " FROM #{source_list(@opts[:from][0..0])}"
+      end
+
+      # MSSQL supports FROM clauses in DELETE and UPDATE statements.
+      def delete_from2_sql(sql)
+        if joined_dataset?
+          select_from_sql(sql)
+          select_join_sql(sql)
+        end
+      end
+      alias update_from_sql delete_from2_sql
+      
       # Handle the with clause for delete, insert, and update statements
       # to be the same as the insert statement.
       def delete_with_sql(sql)
@@ -361,16 +375,6 @@ module Sequel
         sprintf(".%03d", usec/1000)
       end
 
-      # MSSQL supports FROM clauses in DELETE and UPDATE statements.
-      def from_sql(sql)
-        if (opts[:from].is_a?(Array) && opts[:from].size > 1) || opts[:join]
-          select_from_sql(sql)
-          select_join_sql(sql)
-        end
-      end
-      alias delete_from2_sql from_sql
-      alias update_from_sql from_sql
-      
       # MSSQL supports the OUTPUT clause for INSERT statements.
       # It also allows prepending a WITH clause.
       def insert_clause_methods
@@ -440,6 +444,11 @@ module Sequel
       # It also allows prepending a WITH clause.
       def update_clause_methods
         UPDATE_CLAUSE_METHODS
+      end
+
+      # Only include the primary table in the main update clause
+      def update_table_sql(sql)
+        sql << " #{source_list(@opts[:from][0..0])}"
       end
     end
   end

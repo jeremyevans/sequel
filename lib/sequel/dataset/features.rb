@@ -41,6 +41,11 @@ module Sequel
       true
     end
     
+    # Whether modifying joined datasets is supported.
+    def supports_modifying_joins?
+      false
+    end
+    
     # Whether the IN/NOT IN operators support multiple columns when an
     # array of values is given.
     def supports_multiple_column_in?

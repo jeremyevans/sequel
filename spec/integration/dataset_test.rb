@@ -870,3 +870,38 @@ describe "Dataset defaults and overrides" do
     @ds.all.should == [{:a=>10}, {:a=>10}]
   end
 end
+
+if INTEGRATION_DB.dataset.supports_modifying_joins?
+  describe "Modifying joined datasets" do
+    before do
+      @db = INTEGRATION_DB
+      @db.create_table!(:a){Integer :a; Integer :d}
+      @db.create_table!(:b){Integer :b}
+      @db.create_table!(:c){Integer :c}
+      @ds = @db.from(:a, :b).join(:c, :c=>:b.identifier).where(:d=>:b).order(:a)
+      @db[:a].insert(1, 2)
+      @db[:a].insert(3, 4)
+      @db[:b].insert(2)
+      @db[:c].insert(2)
+    end
+    after do
+      @db.drop_table(:a, :b, :c)
+    end
+    
+    it "#update should allow updating joined datasets" do
+      @ds.update(:a=>10)
+      @ds.all.should == [{:c=>2, :b=>2, :a=>10, :d=>2}]
+      @db[:a].order(:a).all.should == [{:a=>3, :d=>4}, {:a=>10, :d=>2}]
+      @db[:b].all.should == [{:b=>2}]
+      @db[:c].all.should == [{:c=>2}]
+    end
+    
+    it "#delete should allow deleting from joined datasets" do
+      @ds.delete
+      @ds.all.should == []
+      @db[:a].order(:a).all.should == [{:a=>3, :d=>4}]
+      @db[:b].all.should == [{:b=>2}]
+      @db[:c].all.should == [{:c=>2}]
+    end
+  end
+end

@@ -653,7 +653,7 @@ module Sequel
     # for this dataset
     def check_modification_allowed!
       raise(InvalidOperation, "Grouped datasets cannot be modified") if opts[:group]
-      raise(InvalidOperation, "Joined datasets cannot be modified") if (opts[:from].is_a?(Array) && opts[:from].size > 1) || opts[:join]
+      raise(InvalidOperation, "Joined datasets cannot be modified") if !supports_modifying_joins? && joined_dataset?
     end
 
     # Prepare an SQL statement by calling all clause methods for the given statement type.
@@ -677,6 +677,12 @@ module Sequel
     # The order of methods to call to build the DELETE SQL statement
     def delete_clause_methods
       DELETE_CLAUSE_METHODS
+    end
+
+    # Included both from a join tables if modifying joins is allowed
+    def delete_from_sql(sql)
+      select_from_sql(sql)
+      select_join_sql(sql) if supports_modifying_joins?
     end
 
     # Converts an array of expressions into a comma separated string of
@@ -762,6 +768,11 @@ module Sequel
     # spaces and upcases.
     def join_type_sql(join_type)
       "#{join_type.to_s.gsub('_', ' ').upcase} JOIN"
+    end
+
+    # Whether this dataset is a joined dataset
+    def joined_dataset?
+     (opts[:from].is_a?(Array) && opts[:from].size > 1) || opts[:join]
     end
 
     # SQL fragment for Array.  Treats as an expression if an array of all two pairs, or as a SQL array otherwise.
@@ -973,7 +984,6 @@ module Sequel
     def select_from_sql(sql)
       sql << " FROM #{source_list(@opts[:from])}" if @opts[:from]
     end
-    alias delete_from_sql select_from_sql
 
     # Modify the sql to add the expressions to GROUP BY
     def select_group_sql(sql)
@@ -1068,9 +1078,11 @@ module Sequel
       UPDATE_CLAUSE_METHODS
     end
 
-    # SQL fragment specifying the tables from with to delete
+    # SQL fragment specifying the tables from with to delete.
+    # Includes join table if modifying joins is allowed.
     def update_table_sql(sql)
       sql << " #{source_list(@opts[:from])}"
+      select_join_sql(sql) if supports_modifying_joins?
     end
 
     # The SQL fragment specifying the columns and values to SET.

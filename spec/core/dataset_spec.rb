@@ -3554,3 +3554,21 @@ context "Sequel::Dataset#select_hash" do
     @ds.db.sqls.should == ['SELECT t.c AS a, t.d AS b FROM t']
   end
 end
+
+context "Modifying joined datasets" do
+  before do
+    @ds = MockDatabase.new.from(:b, :c).join(:d, [:id]).where(:id => 2)
+    @ds.meta_def(:supports_modifying_joins?){true}
+    @ds.db.reset
+  end
+
+  specify "should allow deleting from joined datasets" do
+    @ds.delete
+    @ds.db.sqls.should == ['DELETE FROM b, c INNER JOIN d USING (id) WHERE (id = 2)']
+  end
+
+  specify "should allow updating joined datasets" do
+    @ds.update(:a=>1)
+    @ds.db.sqls.should == ['UPDATE b, c INNER JOIN d USING (id) SET a = 1 WHERE (id = 2)']
+  end
+end
