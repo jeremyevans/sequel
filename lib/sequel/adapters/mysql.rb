@@ -70,7 +70,7 @@ module Sequel
       include Sequel::MySQL::DatabaseMethods
       
       # Mysql::Error messages that indicate the current connection should be disconnected
-      MYSQL_DATABASE_DISCONNECT_ERRORS = /\A(Commands out of sync; you can't run this command now\z|Can't connect to local MySQL server through socket)/
+      MYSQL_DATABASE_DISCONNECT_ERRORS = /\A(Commands out of sync; you can't run this command now|Can't connect to local MySQL server through socket|MySQL server has gone away)/
       
       set_adapter_scheme :mysql
       
@@ -124,7 +124,6 @@ module Sequel
           attr_accessor :prepared_statements
         end
         conn.prepared_statements = {}
-        conn.reconnect = true
         conn
       end
       

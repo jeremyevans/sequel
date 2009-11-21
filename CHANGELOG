@@ -1,5 +1,7 @@
 === HEAD
 
+* No longer use native autoreconnection in the mysql adapter (jeremyevans)
+
 * Add NULL, NOTNULL, TRUE, SQLTRUE, FALSE, and SQLFALSE constants (jeremyevans)
 
 * Add Dataset #select_map, #select_order_map, and #select_hash (jeremyevans)
