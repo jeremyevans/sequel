@@ -876,13 +876,15 @@ if INTEGRATION_DB.dataset.supports_modifying_joins?
     before do
       @db = INTEGRATION_DB
       @db.create_table!(:a){Integer :a; Integer :d}
-      @db.create_table!(:b){Integer :b}
-      @db.create_table!(:c){Integer :c}
-      @ds = @db.from(:a, :b).join(:c, :c=>:b.identifier).where(:d=>:b).order(:a)
+      @db.create_table!(:b){Integer :b; Integer :e}
+      @db.create_table!(:c){Integer :c; Integer :f}
+      @ds = @db.from(:a, :b).join(:c, :c=>:e.identifier).where(:d=>:b, :f=>6).order(:a)
       @db[:a].insert(1, 2)
       @db[:a].insert(3, 4)
-      @db[:b].insert(2)
-      @db[:c].insert(2)
+      @db[:b].insert(2, 5)
+      @db[:c].insert(5, 6)
+      @db[:b].insert(4, 7)
+      @db[:c].insert(7, 8)
     end
     after do
       @db.drop_table(:a, :b, :c)
@@ -890,18 +892,18 @@ if INTEGRATION_DB.dataset.supports_modifying_joins?
     
     it "#update should allow updating joined datasets" do
       @ds.update(:a=>10)
-      @ds.all.should == [{:c=>2, :b=>2, :a=>10, :d=>2}]
+      @ds.all.should == [{:c=>5, :b=>2, :a=>10, :d=>2, :e=>5, :f=>6}]
       @db[:a].order(:a).all.should == [{:a=>3, :d=>4}, {:a=>10, :d=>2}]
-      @db[:b].all.should == [{:b=>2}]
-      @db[:c].all.should == [{:c=>2}]
+      @db[:b].order(:b).all.should == [{:b=>2, :e=>5}, {:b=>4, :e=>7}]
+      @db[:c].order(:c).all.should == [{:c=>5, :f=>6}, {:c=>7, :f=>8}]
     end
     
     it "#delete should allow deleting from joined datasets" do
       @ds.delete
       @ds.all.should == []
       @db[:a].order(:a).all.should == [{:a=>3, :d=>4}]
-      @db[:b].all.should == [{:b=>2}]
-      @db[:c].all.should == [{:c=>2}]
+      @db[:b].order(:b).all.should == [{:b=>2, :e=>5}, {:b=>4, :e=>7}]
+      @db[:c].order(:c).all.should == [{:c=>5, :f=>6}, {:c=>7, :f=>8}]
     end
   end
 end
