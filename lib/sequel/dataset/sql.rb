@@ -52,6 +52,11 @@ module Sequel
       a.empty? ? '(NULL)' : "(#{expression_list(a)})"     
     end
 
+    # SQL fragment for BooleanConstants
+    def boolean_constant_sql(constant)
+      literal(constant)
+    end
+
     # SQL fragment for specifying given CaseExpression.
     def case_expression_sql(ce)
       sql = '(CASE '
@@ -386,6 +391,11 @@ module Sequel
       values.map{|r| insert_sql(columns, r)}
     end
     
+    # SQL fragment for NegativeBooleanConstants
+    def negative_boolean_constant_sql(constant)
+      "NOT #{boolean_constant_sql(constant)}"
+    end
+
     # SQL fragment for the ordered expression, used in the ORDER BY
     # clause.
     def ordered_expression_sql(oe)

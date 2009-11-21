@@ -406,6 +406,24 @@ context "Blockless Ruby Filters" do
     y.sql_literal(@d).should == @d.literal(y)
   end
 
+  it "should support SQL::Constants" do
+    @d.l({:x => Sequel::NULL}).should == '(x IS NULL)'
+    @d.l({:x => Sequel::NOTNULL}).should == '(x IS NOT NULL)'
+    @d.l({:x => Sequel::TRUE}).should == '(x IS TRUE)'
+    @d.l({:x => Sequel::FALSE}).should == '(x IS FALSE)'
+    @d.l({:x => Sequel::SQLTRUE}).should == '(x IS TRUE)'
+    @d.l({:x => Sequel::SQLFALSE}).should == '(x IS FALSE)'
+  end
+  
+  it "should support negation of SQL::Constants" do
+    @d.l(~{:x => Sequel::NULL}).should == '(x IS NOT NULL)'
+    @d.l(~{:x => Sequel::NOTNULL}).should == '(x IS NULL)'
+    @d.l(~{:x => Sequel::TRUE}).should == '(x IS NOT TRUE)'
+    @d.l(~{:x => Sequel::FALSE}).should == '(x IS NOT FALSE)'
+    @d.l(~{:x => Sequel::SQLTRUE}).should == '(x IS NOT TRUE)'
+    @d.l(~{:x => Sequel::SQLFALSE}).should == '(x IS NOT FALSE)'
+  end
+  
   it "should raise an error if trying to create an invalid complex expression" do
     proc{Sequel::SQL::ComplexExpression.new(:BANG, 1, 2)}.should raise_error(Sequel::Error)
   end

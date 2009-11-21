@@ -446,6 +446,10 @@ module Sequel
             new(:AND, new(:>=, l, r.begin), new(r.exclude_end? ? :< : :<=, l, r.end))
           when Array, ::Sequel::Dataset, SQLArray
             new(:IN, l, r)
+          when NegativeBooleanConstant
+            new(:"IS NOT", l, r.constant)
+          when BooleanConstant
+            new(:IS, l, r.constant)
           when NilClass, TrueClass, FalseClass
             new(:IS, l, r)
           when Regexp
@@ -553,6 +557,20 @@ module Sequel
       
       to_s_method :constant_sql, '@constant'
     end
+
+    # Represents boolean constants such as NULL, NOTNULL, TRUE, and FALSE.
+    class BooleanConstant < Constant
+      # The underlying constant related for this object.
+      attr_reader :constant
+
+      to_s_method :boolean_constant_sql, '@constant'
+    end
+    
+    # Represents inverse boolean constants (currently only NOTNULL). A
+    # special class to allow for special behavior
+    class NegativeBooleanConstant < BooleanConstant
+      to_s_method :negative_boolean_constant_sql, '@constant'
+    end
     
     # Holds default generic constants that can be referenced.  These
     # are included in the Sequel top level module and are also available
@@ -562,6 +580,10 @@ module Sequel
       CURRENT_DATE = Constant.new(:CURRENT_DATE)
       CURRENT_TIME = Constant.new(:CURRENT_TIME)
       CURRENT_TIMESTAMP = Constant.new(:CURRENT_TIMESTAMP)
+      SQLTRUE = TRUE = BooleanConstant.new(true)
+      SQLFALSE = FALSE = BooleanConstant.new(false)
+      NULL = BooleanConstant.new(nil)
+      NOTNULL = NegativeBooleanConstant.new(nil)
     end
 
     # Represents an SQL function call.

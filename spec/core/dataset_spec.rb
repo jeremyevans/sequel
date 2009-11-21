@@ -3267,6 +3267,30 @@ describe Sequel::SQL::Constants do
     @db.literal(Sequel::SQL::Constants::CURRENT_TIMESTAMP) == 'CURRENT_TIMESTAMP'
     @db.literal(Sequel::CURRENT_TIMESTAMP) == 'CURRENT_TIMESTAMP'
   end
+
+  it "should have NULL" do
+    @db.literal(Sequel::SQL::Constants::NULL) == 'NULL'
+    @db.literal(Sequel::NULL) == 'NULL'
+  end
+
+  it "should have NOTNULL" do
+    @db.literal(Sequel::SQL::Constants::NOTNULL) == 'NOT NULL'
+    @db.literal(Sequel::NOTNULL) == 'NOT NULL'
+  end
+
+  it "should have TRUE and SQLTRUE" do
+    @db.literal(Sequel::SQL::Constants::TRUE) == '1'
+    @db.literal(Sequel::TRUE) == '1'
+    @db.literal(Sequel::SQL::Constants::SQLTRUE) == '1'
+    @db.literal(Sequel::SQLTRUE) == '1'
+  end
+
+  it "should have FALSE and SQLFALSE" do
+    @db.literal(Sequel::SQL::Constants::FALSE) == '0'
+    @db.literal(Sequel::FALSE) == '0'
+    @db.literal(Sequel::SQL::Constants::SQLFALSE) == '0'
+    @db.literal(Sequel::SQLFALSE) == '0'
+  end
 end
 
 describe "Sequel timezone support" do
