@@ -55,11 +55,9 @@ task :uninstall=>[:clean] do
   sh %{sudo gem uninstall #{NAME}}
 end
 
-desc "Upload sequel gem to rubyforge"
+desc "Upload sequel gem to gemcutter"
 task :release=>[:package] do
-  sh %{rubyforge login}
-  sh %{rubyforge add_release sequel #{NAME} #{VERS.call} pkg/#{NAME}-#{VERS.call}.tgz}
-  sh %{rubyforge add_file sequel #{NAME} #{VERS.call} pkg/#{NAME}-#{VERS.call}.gem} 
+  sh %{gem push pkg/#{NAME}-#{VERS.call}.gem} 
 end
 
 ### RDoc
