@@ -766,7 +766,7 @@ module Sequel
       #   Artist[1].destroy # BEGIN; DELETE FROM artists WHERE (id = 1); COMMIT;
       #   # => #<Artist {:id=>1, ...}>
       def destroy(opts = {})
-        checked_save_failure{checked_transaction(opts){_destroy(opts)}}
+        checked_save_failure(opts){checked_transaction(opts){_destroy(opts)}}
       end
 
       # Iterates through all of the current values using each.
@@ -928,34 +928,37 @@ module Sequel
       end
   
       # Creates or updates the record, after making sure the record
-      # is valid.  If the record is not valid, or before_save,
-      # before_create (if new?), or before_update (if !new?) return
-      # false, returns nil unless +raise_on_save_failure+ is true (if it
-      # is true, it raises an error).
-      # Otherwise, returns self. You can provide an optional list of
-      # columns to update, in which case it only updates those columns.
+      # is valid and before hooks execute successfully. Fails if:
+      #
+      # * the record is not valid, or
+      # * before_save returns false, or
+      # * the record is new and before_create returns false, or
+      # * the record is not new and before_update returns false.
+      #
+      # If +save+ fails and either raise_on_save_failure or the
+      # :raise_on_failure option is true, it raises ValidationFailed
+      # or BeforeHookFailed. Otherwise it returns nil.
+      #
+      # If it succeeds, it returns self.
+      #
+      # You can provide an optional list of columns to update, in which
+      # case it only updates those columns.
       #
       # Takes the following options:
       #
-      # :changed :: save all changed columns, instead of all columns or the columns given
-      # :transaction :: set to false not to use a transaction
-      # :validate :: set to false not to validate the model before saving
-      #
-      #   a = Artist.new(:name=>'Bob')
-      #   a.save # INSERT INTO artists (name) VALUES ('Bob')
-      #
-      #   a = Artist[1]
-      #   a.save # UPDATE artists SET name = 'Bob', hometown = 'Sac' WHERE (id = 1)
-      #   a.save(:name) # UPDATE artists SET name = 'Bob' WHERE (id = 1)
-      #   a.hometown = 'LA'
-      #   a.save(:changes=>true) # UPDATE artists SET hometown = 'Sac' WHERE (id = 1)
+      # * :changed - save all changed columns, instead of all columns or the columns given
+      # * :transaction - set to true or false to override the current
+      #   use_transactions setting
+      # * :validate - set to false to skip validation
+      # * :raise_on_failure - set to true or false to override the current
+      #   raise_on_save_failure setting
       def save(*columns)
         opts = columns.last.is_a?(Hash) ? columns.pop : {}
-        if opts[:validate] != false and !valid?
-          raise(ValidationFailed.new(errors)) if raise_on_save_failure
+        if opts[:validate] != false and !valid?(opts)
+          raise(ValidationFailed.new(errors)) if raise_on_failure?(opts)
           return
         end
-        checked_save_failure{checked_transaction(opts){_save(columns, opts)}}
+        checked_save_failure(opts){checked_transaction(opts){_save(columns, opts)}}
       end
 
       # Saves only changed columns if the object has been modified.
@@ -1096,10 +1099,10 @@ module Sequel
       #   artist(:name=>'Valid').valid? # => true
       #   artist(:name=>'Invalid').valid? # => false
       #   artist.errors.full_messages # => ['name cannot be Invalid']
-      def valid?
+      def valid?(opts = {})
         errors.clear
         if before_validation == false
-          save_failure(:validation) if raise_on_save_failure
+          raise_hook_failure(:validation) if raise_on_failure?(opts)
           return false
         end
         validate
@@ -1125,7 +1128,7 @@ module Sequel
       # Internal destroy method, separted from destroy to
       # allow running inside a transaction
       def _destroy(opts)
-        return save_failure(:destroy) if before_destroy == false
+        raise_hook_failure(:destroy) if before_destroy == false
         _destroy_delete
         after_destroy
         self
@@ -1173,9 +1176,9 @@ module Sequel
       # Internal version of save, split from save to allow running inside
       # it's own transaction.
       def _save(columns, opts)
-        return save_failure(:save) if before_save == false
+        raise_hook_failure(:save) if before_save == false
         if new?
-          return save_failure(:create) if before_create == false
+          raise_hook_failure(:create) if before_create == false
           pk = _insert
           @this = nil
           @new = false
@@ -1185,7 +1188,7 @@ module Sequel
           @was_new = nil
           pk ? _save_refresh : changed_columns.clear
         else
-          return save_failure(:update) if before_update == false
+          raise_hook_failure(:update) if before_update == false
           if columns.empty?
             @columns_updated = if opts[:changed]
               @values.reject{|k,v| !changed_columns.include?(k)}
@@ -1239,10 +1242,10 @@ module Sequel
         this
       end
 
-      # If raise_on_save_failure is false, check for BeforeHookFailed
+      # If not raising on failure, check for BeforeHookFailed
       # being raised by yielding and swallow it.
-      def checked_save_failure
-        if raise_on_save_failure
+      def checked_save_failure(opts)
+        if raise_on_failure?(opts)
           yield
         else
           begin
@@ -1262,9 +1265,18 @@ module Sequel
       def inspect_values
         @values.inspect
       end
-  
-      # Raise a +BeforeHookFailed+ exception.
-      def save_failure(type)
+
+      # Whether to raise or return false if this action fails. If the
+      # :raise_on_failure option is present in the hash, use that, otherwise,
+      # fallback to the object's raise_on_save_failure (if set), or
+      # class's default (if not).
+      def raise_on_failure?(opts)
+        opts.fetch(:raise_on_failure, raise_on_save_failure)
+      end
+
+      # Raise an error appropriate to the hook type. May be swallowed by
+      # checked_save_failure depending on the raise_on_failure? setting.
+      def raise_hook_failure(type)
         raise BeforeHookFailed, "one of the before_#{type} hooks returned false"
       end
   

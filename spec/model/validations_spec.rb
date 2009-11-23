@@ -128,7 +128,7 @@ describe "Model#save" do
       columns :id, :x
 
       def validate
-        errors[:id] << 'blah' unless x == 7
+        errors.add(:id, 'blah') unless x == 7
       end
     end
     @m = @c.load(:id => 4, :x=>6)
@@ -153,11 +153,16 @@ describe "Model#save" do
     @m.save(:validate=>false)
     MODEL_DB.sqls.should == ['UPDATE people SET x = 6 WHERE (id = 4)']
   end
-    
+
   specify "should raise error if validations fail and raise_on_save_faiure is true" do
-    proc{@m.save}.should raise_error(Sequel::ValidationFailed){ |e| e.errors.should == @m.errors }
+    proc{@m.save}.should raise_error(Sequel::ValidationFailed){|e| e.errors.should == @m.errors }
   end
-  
+
+  specify "should raise error if validations fail and :raise_on_failure option is true" do
+    @m.raise_on_save_failure = false
+    proc{@m.save(:raise_on_failure => true)}.should raise_error(Sequel::ValidationFailed)
+  end
+
   specify "should return nil if validations fail and raise_on_save_faiure is false" do
     @m.raise_on_save_failure = false
     @m.save.should == nil

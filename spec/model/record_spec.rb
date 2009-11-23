@@ -243,6 +243,18 @@ describe "Model#save" do
     MODEL_DB.reset
   end
 
+  it "should rollback if before_save returns false and :raise_on_failure option is true" do
+    o = @c.load(:id => 3, :x => 1, :y => nil)
+    o.use_transactions = true
+    o.raise_on_save_failure = false
+    def o.before_save
+      false
+    end
+    proc { o.save(:y, :raise_on_failure => true) }.should raise_error(Sequel::BeforeHookFailed)
+    MODEL_DB.sqls.should == ["BEGIN", "ROLLBACK"]
+    MODEL_DB.reset
+  end
+
   it "should not rollback outer transactions if before_save returns false and raise_on_save_failure = false" do
     o = @c.load(:id => 3, :x => 1, :y => nil)
     o.use_transactions = true
@@ -386,7 +398,7 @@ describe "Model#save_changes" do
 
   it "should take options passed to save" do
     o = @c.new(:x => 1)
-    def o.valid?; false; end
+    def o.before_validation; false; end
     proc{o.save_changes}.should raise_error(Sequel::Error)
     MODEL_DB.sqls.should == []
     o.save_changes(:validate=>false)
