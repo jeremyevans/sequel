@@ -352,6 +352,17 @@ module Sequel
       def delete_clause_methods
         DELETE_CLAUSE_METHODS
       end
+      
+      # Consider the first table in the joined dataset is the table to delete
+      # from, but include the others for the purposes of selecting rows.
+      def delete_from_sql(sql)
+        if joined_dataset?
+          sql << " #{source_list(@opts[:from][0..0])} FROM #{source_list(@opts[:from])}"
+          select_join_sql(sql)
+        else
+          super
+        end
+      end
 
       # MySQL supports the IGNORE and ON DUPLICATE KEY UPDATE clauses for INSERT statements
       def insert_clause_methods

@@ -679,12 +679,6 @@ module Sequel
       DELETE_CLAUSE_METHODS
     end
 
-    # Included both from a join tables if modifying joins is allowed
-    def delete_from_sql(sql)
-      select_from_sql(sql)
-      select_join_sql(sql) if supports_modifying_joins?
-    end
-
     # Converts an array of expressions into a comma separated string of
     # expressions.
     def expression_list(columns)
@@ -984,6 +978,7 @@ module Sequel
     def select_from_sql(sql)
       sql << " FROM #{source_list(@opts[:from])}" if @opts[:from]
     end
+    alias delete_from_sql select_from_sql
 
     # Modify the sql to add the expressions to GROUP BY
     def select_group_sql(sql)

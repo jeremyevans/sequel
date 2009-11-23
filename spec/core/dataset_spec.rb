@@ -3564,7 +3564,7 @@ context "Modifying joined datasets" do
 
   specify "should allow deleting from joined datasets" do
     @ds.delete
-    @ds.db.sqls.should == ['DELETE FROM b, c INNER JOIN d USING (id) WHERE (id = 2)']
+    @ds.db.sqls.should == ['DELETE FROM b, c WHERE (id = 2)']
   end
 
   specify "should allow updating joined datasets" do

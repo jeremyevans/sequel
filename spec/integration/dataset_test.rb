@@ -878,7 +878,7 @@ if INTEGRATION_DB.dataset.supports_modifying_joins?
       @db.create_table!(:a){Integer :a; Integer :d}
       @db.create_table!(:b){Integer :b; Integer :e}
       @db.create_table!(:c){Integer :c; Integer :f}
-      @ds = @db.from(:a, :b).join(:c, :c=>:e.identifier).where(:d=>:b, :f=>6).order(:a)
+      @ds = @db.from(:a, :b).join(:c, :c=>:e.identifier).where(:d=>:b, :f=>6)
       @db[:a].insert(1, 2)
       @db[:a].insert(3, 4)
       @db[:b].insert(2, 5)
