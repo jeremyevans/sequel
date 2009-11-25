@@ -322,7 +322,13 @@ module Sequel
       def metadata(*args, &block)
         synchronize{|c| metadata_dataset.send(:process_result_set, c.getMetaData.send(*args), &block)}
       end
-      
+
+      # Treat SQLExceptions with a "Connection Error" SQLState as disconnects
+      def raise_error(exception, opts={})
+        cause = exception.respond_to?(:cause) ? exception.cause : exception
+        super(exception, {:disconnect => cause.respond_to?(:getSQLState) && cause.getSQLState =~ /^08/}.merge(opts))
+      end
+
       # Close the given statement when removing the transaction
       def remove_transaction(stmt)
         stmt.close if stmt && !supports_savepoints?
