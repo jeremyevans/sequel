@@ -11,7 +11,7 @@ module Sequel
   # it returns the strings as is.  It is false by default, which means that
   # invalid dates and times will raise errors.
   #
-  #   Sequel::MySQL.convert_invalid_date_time = true
+  #   Sequel::MySQL.convert_invalid_date_time = nil
   #
   # Sequel converts the column type tinyint(1) to a boolean by default when
   # using the native MySQL adapter.  You can turn off the conversion to use
