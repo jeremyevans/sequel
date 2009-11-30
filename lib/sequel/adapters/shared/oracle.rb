@@ -107,9 +107,27 @@ module Sequel
         db[:dual].where(exists).get(1) == nil
       end
 
+      # If this dataset is associated with a sequence, return the most recently
+      # inserted sequence value.
+      def insert(*args)
+        r = super
+        if s = opts[:sequence]
+          with_sql("SELECT #{literal(s)}.currval FROM dual").single_value.to_i
+        else
+          r
+        end
+      end
+
       # Oracle requires SQL standard datetimes
       def requires_sql_standard_datetimes?
         true
+      end
+
+      # Create a copy of this dataset associated to the given sequence name,
+      # which will be used when calling insert to find the most recently
+      # inserted value for the sequence.
+      def sequence(s)
+        clone(:sequence=>s)
       end
 
       # Oracle does not support DISTINCT ON
