@@ -97,8 +97,8 @@ New Features
   database could be changed between retrieving the model object and
   updating it.
   
-* The Dataest #union, #intersect, and #except methods now accept an
-  :alias option that it used as the alias for the returned dataset.
+* The Dataset #union, #intersect, and #except methods now accept an
+  :alias option which is used as the alias for the returned dataset.
   
     DB[:table].union(DB[:old_table], :alias=>:table)
 
