@@ -1232,6 +1232,34 @@ context "Database#server_opts" do
   end
 end
 
+context "Database#add_servers" do
+  specify "should add new servers to Database#server_opts" do
+    opts = {:host=>1, :database=>2, :servers=>{:server1=>{:host=>3}}}
+    db = MockDatabase.new(opts)
+    
+    new_server = {:servers=>{:server2=>{:host=>6}}}
+    db.add_servers(new_server)
+    db.send(:server_opts, :server2).should == {:host=>6, :database=>2}
+  end
+
+  specify "should raise an error if the options don't contain a :servers key" do
+    opts = {:host=>1, :database=>2, :servers=>{:server1=>{:host=>3}}}
+    db = MockDatabase.new(opts)
+    
+    new_server = {:server=>{:server2=>{:host=>6}}}
+    proc{db.add_servers(new_server)}.should raise_error(Sequel::Error)
+  end
+
+  specify "should add the servers to the pool" do
+    opts = {:host=>1, :database=>2, :servers=>{:server1=>{:host=>3}}}
+    db = MockDatabase.new(opts)
+    
+    new_server = {:servers=>{:server2=>{:host=>6}}}
+    db.pool.should_receive(:add_servers).with(new_server[:servers].keys)
+    db.add_servers(new_server)
+  end
+end
+
 context "Database#raise_error" do
   specify "should reraise if the exception class is not in opts[:classes]" do
     e = Class.new(StandardError)

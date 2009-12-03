@@ -45,18 +45,32 @@ class Sequel::ConnectionPool
     raise(Sequel::Error, ':max_connections must be positive') if @max_size < 1
     @mutex = Mutex.new
     @connection_proc = block
-    @disconnection_proc = opts[:disconnection_proc]
-    @servers = [:default]
-    @servers += opts[:servers].keys - @servers if opts[:servers] 
+    @disconnection_proc = opts[:disconnection_proc]    
     @available_connections = Hash.new{|h,k| h[:default]}
     @allocated = Hash.new{|h,k| h[:default]}
-    @servers.each do |s|
-      @available_connections[s] = []
-      @allocated[s] = {}
-    end
+    @servers = []
+    add_servers([:default])
+    add_servers((opts[:servers] || {}).keys)
     @timeout = Integer(opts[:pool_timeout] || 5)
     @sleep_time = Float(opts[:pool_sleep_time] || 0.001)
     @convert_exceptions = opts.include?(:pool_convert_exceptions) ? opts[:pool_convert_exceptions] : true
+  end
+  
+  # Adds new servers to the connection pool. Primarily used in conjunction with master/slave
+  # or shard configurations. Allows for dynamic expansion of the potential slaves/shards
+  # at runtime. Duplicate server names are ignored.
+  #
+  # Usually not called directly by user code.
+  def add_servers(keys)
+    @mutex.synchronize do
+      keys.each do |server|
+        unless @servers.include? server
+          @servers << server
+          @available_connections[server] = []
+          @allocated[server] = {}
+        end
+      end
+    end
   end
   
   # A hash of connections currently being used for the given server, key is the

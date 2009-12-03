@@ -564,6 +564,26 @@ module Sequel
       uri
     end
     
+    # Dynamically add new servers or modify server options at runtime. Also adds new
+    # servers to the connection pool. Intended for use with master/slave or shard
+    # configurations where it is useful to add new server hosts at runtime.
+    #
+    # Duplicated servers are ignored.
+    #
+    #  servers = {}
+    #  (('0'..'9').to_a + ('a'..'e').to_a).each do |hex|
+    #    servers[hex.to_sym] = {:host=>"hash_host_#{hex}"}
+    #  end
+    #  DB=Sequel.connect('postgres://hash_host/hashes', :servers=>servers)
+    #
+    #  # add another shard
+    #  DB.add_servers(:servers => {:f=>{:host=>"hash_host_f"}})
+    def add_servers(opts)
+      raise Error, 'Options hash must contain a :servers key' unless opts.has_key? :servers
+      @opts.merge!(opts)
+      @pool.add_servers(opts[:servers].keys)
+    end
+    
     private
     
     # Internal generic transaction method.  Any exception raised by the given
@@ -905,7 +925,7 @@ module Sequel
       opts.delete(:servers)
       opts
     end
-
+    
     # Raise a database error unless the exception is an Rollback.
     def transaction_error(e)
       raise_error(e, :classes=>database_error_classes) unless e.is_a?(Rollback)
