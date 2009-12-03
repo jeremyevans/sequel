@@ -1,5 +1,7 @@
 require File.join(File.dirname(__FILE__), 'spec_helper.rb')
 
+require ENV['SEQUEL_MSSQL_SPEC_REQUIRE'] if ENV['SEQUEL_MSSQL_SPEC_REQUIRE']
+
 unless defined?(MSSQL_DB)
   MSSQL_URL = 'jdbc:sqlserver://localhost;integratedSecurity=true;database=sandbox' unless defined? MSSQL_URL
   MSSQL_DB = Sequel.connect(ENV['SEQUEL_MSSQL_SPEC_DB']||MSSQL_URL)
