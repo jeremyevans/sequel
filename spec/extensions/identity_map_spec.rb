@@ -4,6 +4,7 @@ describe "Sequel::Plugins::IdentityMap" do
   before do
     class ::IdentityMapModel < Sequel::Model
       plugin :identity_map
+      attr_accessor :foo
       columns :id
       ds = dataset
       def ds.fetch_rows(sql)
@@ -103,10 +104,37 @@ describe "Sequel::Plugins::IdentityMap" do
       MODEL_DB.sqls.length.should == 0
       o = @c[1]
       MODEL_DB.sqls.length.should == 1
+      o.foo = 1
+      @c[1].foo.should == o.foo
+      MODEL_DB.sqls.length.should == 1
+      @c[2].foo.should_not == o.foo
+      MODEL_DB.sqls.length.should == 2
+    end
+  end
+
+  it "should remove instances from the identity map if they are deleted or destroyed" do
+    @c.with_identity_map do
+      MODEL_DB.sqls.length.should == 0
+      o = @c[1]
+      MODEL_DB.sqls.length.should == 1
+      o.foo = 1
       @c[1].should == o
       MODEL_DB.sqls.length.should == 1
-      @c[2].should_not == o
+      o.destroy
       MODEL_DB.sqls.length.should == 2
+      @c[1].foo.should_not == o.foo
+      MODEL_DB.sqls.length.should == 3
+
+      MODEL_DB.reset
+      o = @c[2]
+      MODEL_DB.sqls.length.should == 1
+      o.foo = 1
+      @c[2].should == o
+      MODEL_DB.sqls.length.should == 1
+      o.delete
+      MODEL_DB.sqls.length.should == 2
+      @c[2].foo.should_not == o.foo
+      MODEL_DB.sqls.length.should == 3
     end
   end
 

@@ -80,6 +80,15 @@ module Sequel
       end
 
       module InstanceMethods
+        # Remove instances from the identity map cache if they are deleted.
+        def delete
+          super
+          if idm = model.identity_map
+            idm.delete(model.identity_map_key(pk))
+          end
+          self
+        end
+
         # Merge the current values into the values provided in the row, ensuring
         # that current values are not overridden by new values.
         def merge_db_update(row)

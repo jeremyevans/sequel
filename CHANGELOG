@@ -1,5 +1,7 @@
 === HEAD
 
+* In the identity_map plugin, remove instances from the cache if they are deleted/destroyed (jeremyevans)
+
 * Add Database#add_servers, for adding new servers/shards on the fly (chuckremes, jeremyevans)
 
 === 3.7.0 (2009-12-01)
