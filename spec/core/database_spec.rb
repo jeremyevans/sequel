@@ -1233,30 +1233,45 @@ context "Database#server_opts" do
 end
 
 context "Database#add_servers" do
-  specify "should add new servers to Database#server_opts" do
-    opts = {:host=>1, :database=>2, :servers=>{:server1=>{:host=>3}}}
-    db = MockDatabase.new(opts)
-    
-    new_server = {:servers=>{:server2=>{:host=>6}}}
-    db.add_servers(new_server)
-    db.send(:server_opts, :server2).should == {:host=>6, :database=>2}
+  before do
+    @db = MockDatabase.new(:host=>1, :database=>2, :servers=>{:server1=>{:host=>3}})
+    def @db.connect(server)
+      server_opts(server)
+    end
+    def @db.disconnect_connection(c)
+    end
   end
 
-  specify "should raise an error if the options don't contain a :servers key" do
-    opts = {:host=>1, :database=>2, :servers=>{:server1=>{:host=>3}}}
-    db = MockDatabase.new(opts)
-    
-    new_server = {:server=>{:server2=>{:host=>6}}}
-    proc{db.add_servers(new_server)}.should raise_error(Sequel::Error)
+  specify "should add new servers to the connection pool" do
+    @db.synchronize{|c| c[:host].should == 1}
+    @db.synchronize(:server1){|c| c[:host].should == 3}
+    @db.synchronize(:server2){|c| c[:host].should == 1}
+
+    @db.add_servers(:server2=>{:host=>6})
+    @db.synchronize{|c| c[:host].should == 1}
+    @db.synchronize(:server1){|c| c[:host].should == 3}
+    @db.synchronize(:server2){|c| c[:host].should == 6}
+
+    @db.disconnect
+    @db.synchronize{|c| c[:host].should == 1}
+    @db.synchronize(:server1){|c| c[:host].should == 3}
+    @db.synchronize(:server2){|c| c[:host].should == 6}
   end
 
-  specify "should add the servers to the pool" do
-    opts = {:host=>1, :database=>2, :servers=>{:server1=>{:host=>3}}}
-    db = MockDatabase.new(opts)
-    
-    new_server = {:servers=>{:server2=>{:host=>6}}}
-    db.pool.should_receive(:add_servers).with(new_server[:servers].keys)
-    db.add_servers(new_server)
+  specify "should replace options for future connections to existing servers" do
+    @db.synchronize{|c| c[:host].should == 1}
+    @db.synchronize(:server1){|c| c[:host].should == 3}
+    @db.synchronize(:server2){|c| c[:host].should == 1}
+
+    @db.add_servers(:default=>proc{{:host=>4}}, :server1=>{:host=>8})
+    @db.synchronize{|c| c[:host].should == 1}
+    @db.synchronize(:server1){|c| c[:host].should == 3}
+    @db.synchronize(:server2){|c| c[:host].should == 1}
+
+    @db.disconnect
+    @db.synchronize{|c| c[:host].should == 4}
+    @db.synchronize(:server1){|c| c[:host].should == 8}
+    @db.synchronize(:server2){|c| c[:host].should == 4}
   end
 end
 

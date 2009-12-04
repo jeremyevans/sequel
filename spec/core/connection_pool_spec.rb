@@ -465,19 +465,81 @@ context "A connection pool with multiple servers" do
     @pool.hold{|c| c.should == 'default2'}
   end
   
-  specify "#add_server_keys should ignore duplicated keys" do
-    class Sequel::ConnectionPool
-      attr_reader :servers
+  specify "#add_servers should add new servers to the pool" do
+    pool = Sequel::ConnectionPool.new(:servers=>{:server1=>{}}){|s| s}
+    
+    pool.hold{}
+    pool.hold(:server2){}
+    pool.hold(:server3){}
+    pool.hold(:server1) do
+      pool.allocated.length.should == 0
+      pool.allocated(:server1).length.should == 1
+      pool.allocated(:server2).length.should == 0
+      pool.allocated(:server3).length.should == 0
+      pool.available_connections.length.should == 1
+      pool.available_connections(:server1).length.should == 0
+      pool.available_connections(:server2).length.should == 1
+      pool.available_connections(:server3).length.should == 1
+
+      pool.add_servers([:server2, :server3])
+      pool.hold(:server2){}
+      pool.hold(:server3) do 
+        pool.allocated.length.should == 0
+        pool.allocated(:server1).length.should == 1
+        pool.allocated(:server2).length.should == 0
+        pool.allocated(:server3).length.should == 1
+        pool.available_connections.length.should == 1
+        pool.available_connections(:server1).length.should == 0
+        pool.available_connections(:server2).length.should == 1
+        pool.available_connections(:server3).length.should == 0
+      end
     end
-    pool = Sequel::ConnectionPool.new
+  end
+
+  specify "#add_servers should ignore existing keys" do
+    pool = Sequel::ConnectionPool.new(:servers=>{:server1=>{}}){|s| s}
     
-    key = [:server1]
-    pool.add_servers(key)
-    pool.servers.size.should == 2 # :default + :server1
-    
-    # add duplicate
-    pool.add_servers(key)
-    pool.servers.size.should == 2
+    pool.allocated.length.should == 0
+    pool.allocated(:server1).length.should == 0
+    pool.available_connections.length.should == 0
+    pool.available_connections(:server1).length.should == 0
+    pool.hold do |c1| 
+      c1.should == :default
+      pool.allocated.length.should == 1
+      pool.allocated(:server1).length.should == 0
+      pool.available_connections.length.should == 0
+      pool.available_connections(:server1).length.should == 0
+      pool.hold(:server1) do |c2| 
+        c2.should == :server1
+        pool.allocated.length.should == 1
+        pool.allocated(:server1).length.should == 1
+        pool.available_connections.length.should == 0
+        pool.available_connections(:server1).length.should == 0
+        pool.add_servers([:default, :server1])
+        pool.allocated.length.should == 1
+        pool.allocated(:server1).length.should == 1
+        pool.available_connections.length.should == 0
+        pool.available_connections(:server1).length.should == 0
+      end
+      pool.allocated.length.should == 1
+      pool.allocated(:server1).length.should == 0
+      pool.available_connections.length.should == 0
+      pool.available_connections(:server1).length.should == 1
+      pool.add_servers([:default, :server1])
+      pool.allocated.length.should == 1
+      pool.allocated(:server1).length.should == 0
+      pool.available_connections.length.should == 0
+      pool.available_connections(:server1).length.should == 1
+    end
+    pool.allocated.length.should == 0
+    pool.allocated(:server1).length.should == 0
+    pool.available_connections.length.should == 1
+    pool.available_connections(:server1).length.should == 1
+    pool.add_servers([:default, :server1])
+    pool.allocated.length.should == 0
+    pool.allocated(:server1).length.should == 0
+    pool.available_connections.length.should == 1
+    pool.available_connections(:server1).length.should == 1
   end
 end
 

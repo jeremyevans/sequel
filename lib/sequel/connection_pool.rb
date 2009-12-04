@@ -50,7 +50,7 @@ class Sequel::ConnectionPool
     @allocated = Hash.new{|h,k| h[:default]}
     @servers = []
     add_servers([:default])
-    add_servers((opts[:servers] || {}).keys)
+    add_servers(opts[:servers].keys) if opts[:servers]
     @timeout = Integer(opts[:pool_timeout] || 5)
     @sleep_time = Float(opts[:pool_sleep_time] || 0.001)
     @convert_exceptions = opts.include?(:pool_convert_exceptions) ? opts[:pool_convert_exceptions] : true
@@ -58,13 +58,11 @@ class Sequel::ConnectionPool
   
   # Adds new servers to the connection pool. Primarily used in conjunction with master/slave
   # or shard configurations. Allows for dynamic expansion of the potential slaves/shards
-  # at runtime. Duplicate server names are ignored.
-  #
-  # Usually not called directly by user code.
-  def add_servers(keys)
+  # at runtime. servers argument should be an array of symbols. 
+  def add_servers(servers)
     @mutex.synchronize do
-      keys.each do |server|
-        unless @servers.include? server
+      servers.each do |server|
+        unless @servers.include?(server)
           @servers << server
           @available_connections[server] = []
           @allocated[server] = {}
