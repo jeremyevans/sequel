@@ -464,6 +464,21 @@ context "A connection pool with multiple servers" do
     @pool.hold(:read_only){|c| c.should == 'read_only2'}
     @pool.hold{|c| c.should == 'default2'}
   end
+  
+  specify "#add_server_keys should ignore duplicated keys" do
+    class Sequel::ConnectionPool
+      attr_reader :servers
+    end
+    pool = Sequel::ConnectionPool.new
+    
+    key = [:server1]
+    pool.add_servers(key)
+    pool.servers.size.should == 2 # :default + :server1
+    
+    # add duplicate
+    pool.add_servers(key)
+    pool.servers.size.should == 2
+  end
 end
 
 context "SingleThreadedPool" do
