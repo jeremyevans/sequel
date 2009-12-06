@@ -44,7 +44,8 @@ module Sequel
         # Add attribute? methods for all of the boolean attributes for this model.
         def create_boolean_readers
           im = instance_methods.collect{|x| x.to_s}
-          columns.each{|c| create_boolean_reader(c) if boolean_attribute?(c) && !im.include?("#{c}?")}
+          cs = columns rescue return
+          cs.each{|c| create_boolean_reader(c) if boolean_attribute?(c) && !im.include?("#{c}?")}
         end
       end
     end
