@@ -290,13 +290,7 @@ module Sequel
           @dataset_methods.each{|meth, block| @dataset.meta_def(meth, &block)} if @dataset_methods
         end
         @dataset.model = self if @dataset.respond_to?(:model=)
-        begin
-          @db_schema = (inherited ? superclass.db_schema : get_db_schema)
-        rescue Sequel::DatabaseConnectionError
-          raise
-        rescue
-          nil
-        end
+        check_non_connection_error{@db_schema = (inherited ? superclass.db_schema : get_db_schema)}
         self
       end
       alias dataset= set_dataset
@@ -368,6 +362,17 @@ module Sequel
   
       private
       
+      # Yield to the passed block and swallow all errors other than DatabaseConnectionErrors.
+      def check_non_connection_error
+        begin
+          yield
+        rescue Sequel::DatabaseConnectionError
+          raise
+        rescue
+          nil
+        end
+      end
+
       # Create a column accessor for a column with a method name that is hard to use in ruby code.
       def def_bad_column_accessor(column)
         overridable_methods_module.module_eval do
@@ -399,15 +404,7 @@ module Sequel
         ds_opts = dataset.opts
         single_table = ds_opts[:from] && (ds_opts[:from].length == 1) \
           && !ds_opts.include?(:join) && !ds_opts.include?(:sql)
-        get_columns = proc do
-          begin
-            columns
-          rescue Sequel::DatabaseConnectionError
-            raise
-          rescue
-            []
-          end
-        end
+        get_columns = proc{check_non_connection_error{columns} || []}
         if single_table && (schema_array = (db.schema(table_name, :reload=>reload) rescue nil))
           schema_array.each{|k,v| schema_hash[k] = v}
           if ds_opts.include?(:select)
