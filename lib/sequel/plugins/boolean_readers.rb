@@ -15,7 +15,7 @@ module Sequel
     module BooleanReaders
       # Default proc for determining if given column is a boolean, which
       # just checks that the :type is boolean.
-      DEFAULT_BOOLEAN_ATTRIBUTE_PROC = lambda{|c| db_schema[c][:type] == :boolean}
+      DEFAULT_BOOLEAN_ATTRIBUTE_PROC = lambda{|c| s = db_schema[c] and s[:type] == :boolean}
 
       # Add the boolean_attribute? class method to the model, and create
       # attribute? boolean reader methods for the class's columns if the class has a dataset.
