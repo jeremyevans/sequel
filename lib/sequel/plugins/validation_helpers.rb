@@ -54,6 +54,7 @@ module Sequel
         :min_length=>{:message=>lambda{|min| "is shorter than #{min} characters"}},
         :not_string=>{:message=>lambda{|type| type ? "is not a valid #{type}" : "is a string"}},
         :numeric=>{:message=>lambda{"is not a number"}},
+        :type=>{:message=>lambda{|klass| "is not a #{type}"}},
         :presence=>{:message=>lambda{"is not present"}},
         :unique=>{:message=>lambda{'is already taken'}}
       }
@@ -110,7 +111,7 @@ module Sequel
         def validates_not_string(atts, opts={})
           validatable_attributes_for_type(:not_string, atts, opts){|a,v,m| validation_error_message(m, (db_schema[a]||{})[:type]) if v.is_a?(String)}
         end
-    
+
         # Check attribute value(s) string representation is a valid float.
         def validates_numeric(atts, opts={})
           validatable_attributes_for_type(:numeric, atts, opts) do |a,v,m|
@@ -121,6 +122,12 @@ module Sequel
               validation_error_message(m)
             end
           end
+        end
+
+        # Check if value is an instance of a class
+        def validates_type(klass, atts, opts={})
+          klass = klass.constantize if klass.is_a?(String)
+          validatable_attributes_for_type(:type, atts, opts){|a,v,m| validation_error_message(m, klass) if v && !v.is_a?(klass)}
         end
     
         # Check attribute value(s) is not considered blank by the database, but allow false values.

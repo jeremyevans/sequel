@@ -291,6 +291,26 @@ module Sequel
             end
           end
         end
+
+        # Validates whether an attribute is an instance of a specific class.
+        #
+        # Possible Options:
+        # * :class - can be a name or string (required!)
+        # * :message - The message to use (default: 'is not a %s'. '%s' will be replaced with the class name)
+        def validates_type_of(*atts)
+          opts = {
+            :message  => 'is not a %s',
+            :tag      => :type
+          }.merge!(extract_options!(atts))
+          return unless opts[:class]
+          opts[:class] = opts[:class].constantize if opts[:class].is_a?(String)
+          opts[:message] = sprintf(opts[:message], opts[:class])
+
+          atts << opts
+          validates_each(*atts) do |o, a, v|
+            o.errors.add(a, opts[:message]) if v && !v.is_a?(opts[:class])
+          end
+        end
     
         # Validates the presence of an attribute.  Requires the value not be blank,
         # with false considered present instead of absent.
