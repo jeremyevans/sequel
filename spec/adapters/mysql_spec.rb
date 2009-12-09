@@ -942,6 +942,17 @@ if MYSQL_DB.class.adapter_scheme == :mysql
       @ds.all.should == [{:a=>10}, {:a=>15}, {:b=>20}, {:b=>25}]
     end
     
+    specify "should work with Database#run" do
+      proc{MYSQL_DB.run('SELECT * FROM a; SELECT * FROM b')}.should_not raise_error
+      proc{MYSQL_DB.run('SELECT * FROM a; SELECT * FROM b')}.should_not raise_error
+    end
+    
+    specify "should work with Database#run and other statements" do
+      proc{MYSQL_DB.run('UPDATE a SET a = 1; SELECT * FROM a; DELETE FROM b')}.should_not raise_error
+      MYSQL_DB[:a].select_order_map(:a).should == [1, 1]
+      MYSQL_DB[:b].all.should == []
+    end
+    
     specify "should split results returned into arrays if split_multiple_result_sets is used" do
       @ds.split_multiple_result_sets.all.should == [[{:a=>10}, {:a=>15}], [{:b=>20}, {:b=>25}]]
     end

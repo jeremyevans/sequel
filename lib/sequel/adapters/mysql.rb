@@ -160,35 +160,40 @@ module Sequel
           r = conn.query(sql)
           if opts[:type] == :select
             yield r if r
-            if conn.respond_to?(:next_result) && conn.next_result
-              loop do
-                if r
-                  r.free
-                  r = nil
-                end
-                begin
-                  r = conn.use_result
-                rescue Mysql::Error
-                  break
-                end
-                yield r
-                break unless conn.next_result
+          elsif block_given?
+            yield conn
+          end
+          if conn.respond_to?(:more_results?)
+            while conn.more_results? do
+              if r
+                r.free
+                r = nil
               end
+              begin
+                conn.next_result
+                r = conn.use_result
+              rescue Mysql::Error => e
+                raise_error(e, :disconnect=>true) if MYSQL_DATABASE_DISCONNECT_ERRORS.match(e.message)
+                break
+              end
+              yield r if opts[:type] == :select
             end
-          else
-            yield conn if block_given?
           end
         rescue Mysql::Error => e
           raise_error(e, :disconnect=>MYSQL_DATABASE_DISCONNECT_ERRORS.match(e.message))
         ensure
-          if r
-            r.free 
-            # Use up all results to avoid a commands out of sync message.
-            if conn.respond_to?(:next_result)
-              while conn.next_result
+          r.free if r
+          # Use up all results to avoid a commands out of sync message.
+          if conn.respond_to?(:more_results?)
+            while conn.more_results? do
+              begin
+                conn.next_result
                 r = conn.use_result
-                r.free if r
+              rescue Mysql::Error => e
+                raise_error(e, :disconnect=>true) if MYSQL_DATABASE_DISCONNECT_ERRORS.match(e.message)
+                break
               end
+              r.free if r
             end
           end
         end
@@ -314,7 +319,7 @@ module Sequel
       
       # Delete rows matching this dataset
       def delete
-        execute_dui(delete_sql){|c| c.affected_rows}
+        execute_dui(delete_sql){|c| return c.affected_rows}
       end
       
       # Yield all rows matching this dataset.  If the dataset is set to
@@ -344,7 +349,7 @@ module Sequel
       
       # Insert a new value into this dataset
       def insert(*values)
-        execute_dui(insert_sql(*values)){|c| c.insert_id}
+        execute_dui(insert_sql(*values)){|c| return c.insert_id}
       end
       
       # Store the given type of prepared statement in the associated database
@@ -361,7 +366,7 @@ module Sequel
       
       # Replace (update or insert) the matching row.
       def replace(*args)
-        execute_dui(replace_sql(*args)){|c| c.insert_id}
+        execute_dui(replace_sql(*args)){|c| return c.insert_id}
       end
       
       # Makes each yield arrays of rows, with each array containing the rows
@@ -382,7 +387,7 @@ module Sequel
       
       # Update the matching rows.
       def update(values={})
-        execute_dui(update_sql(values)){|c| c.affected_rows}
+        execute_dui(update_sql(values)){|c| return c.affected_rows}
       end
       
       private

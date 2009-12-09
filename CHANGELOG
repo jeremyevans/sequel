@@ -1,5 +1,7 @@
 === HEAD
 
+* Handle multiple statements in a single query in the native MySQL adapter in all cases, not just when selecting via Dataset#each (jeremyevans)
+
 * In the boolean_readers plugin, don't raise an error if the model's columns can't be determined (jeremyevans)
 
 * In the identity_map plugin, remove instances from the cache if they are deleted/destroyed (jeremyevans)
