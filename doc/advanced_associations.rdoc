@@ -476,8 +476,8 @@ Let's say you want to store a tree relationship in your database, it's pretty
 simple:
 
   class Node < Sequel::Model
-    many_to_one :parent
-    one_to_many :children, :key=>:parent_id
+    many_to_one :parent, :class=>self
+    one_to_many :children, :key=>:parent_id, :class=>self
   end
   
 You can easily get a node's parent with node.parent, and a node's children with
@@ -492,7 +492,8 @@ What if you want to get all ancestors up to the root node, or all descendents,
 without knowing the depth of the tree?
 
   class Node < Sequel::Model
-    many_to_one :ancestors, :eager_loader=>(proc do |key_hash, nodes, associations|
+    many_to_one :ancestors, :class=>self,
+     :eager_loader=>(proc do |key_hash, nodes, associations|
       # Handle cases where the root node has the same parent_id as primary_key
       # and also when it is NULL
       non_root_nodes = nodes.reject do |n| 
