@@ -1,5 +1,7 @@
 === HEAD
 
+* Remove meta_eval and metaclass private methods from Sequel::Metaprogramming (jeremyevans)
+
 * Merge Dataset::FROM_SELF_KEEP_OPTS into Dataset::NON_SQL_OPTIONS (jeremyevans)
 
 * Add Database#remove_servers for removing servers from the pool on the fly (jeremyevans)

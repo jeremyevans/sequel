@@ -1,23 +1,9 @@
 module Sequel
-  # Contains methods that ease metaprogramming, used by some of Sequel's classes.
+  # Contains meta_def method for adding methods to objects via blocks, used by some of Sequel's classes and objects.
   module Metaprogramming
-    # Add methods to the object's metaclass
+    # Define a method with the given name and block body on the receiver.
     def meta_def(name, &block)
-      meta_eval{define_method(name, &block)}
-    end 
-  
-    private
-  
-    # Evaluate the block in the context of the object's metaclass
-    def meta_eval(&block)
-      metaclass.instance_eval(&block)
-    end 
-  
-    # The hidden singleton lurks behind everyone
-    def metaclass
-      class << self
-        self
-      end 
-    end 
+      (class << self; self end).send(:define_method, name, &block)
+    end
   end
 end
