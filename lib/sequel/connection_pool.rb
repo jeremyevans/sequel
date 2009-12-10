@@ -46,9 +46,10 @@ class Sequel::ConnectionPool
     @mutex = Mutex.new
     @connection_proc = block
     @disconnection_proc = opts[:disconnection_proc]    
-    @available_connections = Hash.new{|h,k| h[:default]}
-    @allocated = Hash.new{|h,k| h[:default]}
-    @servers = []
+    @available_connections = {}
+    @allocated = {}
+    @connections_to_remove = []
+    @servers = Hash.new(:default)
     add_servers([:default])
     add_servers(opts[:servers].keys) if opts[:servers]
     @timeout = Integer(opts[:pool_timeout] || 5)
@@ -60,10 +61,10 @@ class Sequel::ConnectionPool
   # or shard configurations. Allows for dynamic expansion of the potential slaves/shards
   # at runtime. servers argument should be an array of symbols. 
   def add_servers(servers)
-    @mutex.synchronize do
+    sync do
       servers.each do |server|
-        unless @servers.include?(server)
-          @servers << server
+        unless @servers.has_key?(server)
+          @servers[server] = server
           @available_connections[server] = []
           @allocated[server] = {}
         end
@@ -72,23 +73,46 @@ class Sequel::ConnectionPool
   end
   
   # A hash of connections currently being used for the given server, key is the
-  # Thread, value is the connection.
+  # Thread, value is the connection.  Nonexistent servers will return nil.  Treat
+  # this as read only, do not modify the resulting object.
   def allocated(server=:default)
     @allocated[server]
   end
   
   # An array of connections opened but not currently used, for the given
-  # server.
+  # server. Nonexistent servers will return nil. Treat this as read only, do
+  # not modify the resulting object.
   def available_connections(server=:default)
     @available_connections[server]
   end
   
   # The total number of connections opened for the given server, should
-  # be equal to available_connections.length + allocated.length
+  # be equal to available_connections.length + allocated.length.  Nonexistent
+  # servers will return the created count of the default server.
   def created_count(server=:default)
+    server = @servers[server]
     @allocated[server].length + @available_connections[server].length
   end
   alias size created_count
+  
+  # Removes all connection currently available on all servers, optionally
+  # yielding each connection to the given block. This method has the effect of 
+  # disconnecting from the database, assuming that no connections are currently
+  # being used.  If connections are being used, they are scheduled to be
+  # disconnected as soon as they are returned to the pool.
+  # 
+  # Once a connection is requested using #hold, the connection pool
+  # creates new connections to the database. Options:
+  # * :server - Should be a symbol specifing the server to disconnect from,
+  #   or an array of symbols to specify multiple servers.
+  def disconnect(opts={}, &block)
+    block ||= @disconnection_proc
+    sync do
+      (opts[:server] ? Array(opts[:server]) : @servers.keys).each do |s|
+        disconnect_server(s, &block)
+      end
+    end
+  end
   
   # Chooses the first available connection to the given server, or if none are
   # available, creates a new connection.  Passes the connection to the supplied
@@ -106,27 +130,28 @@ class Sequel::ConnectionPool
   # raised.
   def hold(server=:default)
     begin
+      sync{server = @servers[server]}
       t = Thread.current
       if conn = owned_connection(t, server)
         return yield(conn)
       end
       begin
         unless conn = acquire(t, server)
-          time = Time.new
+          time = Time.now
           timeout = time + @timeout
           sleep_time = @sleep_time
           sleep sleep_time
           until conn = acquire(t, server)
-            raise(::Sequel::PoolTimeout) if Time.new > timeout
+            raise(::Sequel::PoolTimeout) if Time.now > timeout
             sleep sleep_time
           end
         end
         yield conn
-      rescue Sequel::DatabaseDisconnectError => dde
-        remove(t, conn, server) if conn
+      rescue Sequel::DatabaseDisconnectError
+        sync{@connections_to_remove << conn} if conn
         raise
       ensure
-        @mutex.synchronize{release(t, server)} if conn && !dde
+        sync{release(t, conn, server)} if conn
       end
     rescue StandardError 
       raise
@@ -134,28 +159,32 @@ class Sequel::ConnectionPool
       raise(@convert_exceptions ? RuntimeError.new(e.message) : e)
     end
   end
-  
-  # Removes all connection currently available on all servers, optionally
-  # yielding each connection to the given block. This method has the effect of 
-  # disconnecting from the database, assuming that no connections are currently
-  # being used. Once a connection is requested using #hold, the connection pool
-  # creates new connections to the database.
-  def disconnect(&block)
-    block ||= @disconnection_proc
-    @mutex.synchronize do
-      @available_connections.each do |server, conns|
-        conns.each{|c| block.call(c)} if block
-        conns.clear
+
+  # Remove servers from the connection pool. Primarily used in conjunction with master/slave
+  # or shard configurations.  Similar to disconnecting from all given servers,
+  # except that after it is used, future requests for the server will use the
+  # :default server instead.
+  def remove_servers(servers)
+    sync do
+      raise(Sequel::Error, "cannot remove default server") if servers.include?(:default)
+      servers.each do |server|
+        if @servers.include?(server)
+          disconnect_server(server, &@disconnection_proc)
+          @available_connections.delete(server)
+          @allocated.delete(server)
+          @servers.delete(server)
+        end
       end
     end
   end
-  
+
   private
 
   # Assigns a connection to the supplied thread for the given server, if one
-  # is available.
+  # is available. The calling code should NOT already have the mutex when
+  # calling this.
   def acquire(thread, server)
-    @mutex.synchronize do
+    sync do
       if conn = available(server)
         allocated(server)[thread] = conn
       end
@@ -163,16 +192,30 @@ class Sequel::ConnectionPool
   end
   
   # Returns an available connection to the given server. If no connection is
-  # available, tries to create a new connection.
+  # available, tries to create a new connection. The calling code should already
+  # have the mutex before calling this.
   def available(server)
     available_connections(server).pop || make_new(server)
   end
-  
+
+  # Disconnect from the given server.  Disconnects available connections
+  # immediately, and schedules currently allocated connections for disconnection
+  # as soon as they are returned to the pool. The calling code should already
+  # have the mutex before calling this.
+  def disconnect_server(server, &block)
+    if conns = available_connections(server)
+      conns.each{|conn| block.call(conn)} if block
+      conns.clear
+    end
+    @connections_to_remove.concat(allocated(server).values)
+  end
+
   # Creates a new connection to the given server if the size of the pool for
-  # the server is less than the maximum size of the pool.
+  # the server is less than the maximum size of the pool. The calling code
+  # should already have the mutex before calling this.
   def make_new(server)
     if (n = created_count(server)) >= @max_size
-      allocated(server).keys.reject{|t| t.alive?}.each{|t| release(t, server)}
+      allocated(server).to_a.each{|t, c| release(t, c, server) unless t.alive?}
       n = nil
     end
     if (n || created_count(server)) < @max_size
@@ -188,23 +231,35 @@ class Sequel::ConnectionPool
   end
   
   # Returns the connection owned by the supplied thread for the given server,
-  # if any.
+  # if any. The calling code should NOT already have the mutex before calling this.
   def owned_connection(thread, server)
-    @mutex.synchronize{@allocated[server][thread]}
+    sync{@allocated[server][thread]}
   end
   
-  # Releases the connection assigned to the supplied thread and server.
-  # You must already have the mutex before you call this.
-  def release(thread, server)
-    available_connections(server) << allocated(server).delete(thread)
+  # Releases the connection assigned to the supplied thread and server. If the
+  # server or connection given is scheduled for disconnection, remove the
+  # connection instead of releasing it back to the pool.
+  # The calling code should already have the mutex before calling this.
+  def release(thread, conn, server)
+    if @connections_to_remove.include?(conn)
+      remove(thread, conn, server)
+    else
+      available_connections(server) << allocated(server).delete(thread)
+    end
   end
 
-  # Removes the currently allocated connection from the connection pool.
+  # Removes the currently allocated connection from the connection pool. The
+  # calling code should already have the mutex before calling this.
   def remove(thread, conn, server)
-    @mutex.synchronize do
-      allocated(server).delete(thread)
-      @disconnection_proc.call(conn) if @disconnection_proc
-    end
+    @connections_to_remove.delete(conn)
+    allocated(server).delete(thread) if @servers.include?(server)
+    @disconnection_proc.call(conn) if @disconnection_proc
+  end
+  
+  # Yield to the block while inside the mutex. The calling code should NOT
+  # already have the mutex before calling this.
+  def sync
+    @mutex.synchronize{yield}
   end
 end
 

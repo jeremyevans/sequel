@@ -191,7 +191,7 @@ context "Database#disconnect" do
   specify "should call pool.disconnect" do
     d = Sequel::Database.new
     p = d.pool
-    p.should_receive(:disconnect).once.and_return(2)
+    p.should_receive(:disconnect).once.with({}).and_return(2)
     d.disconnect.should == 2
   end
 end
@@ -1272,6 +1272,61 @@ context "Database#add_servers" do
     @db.synchronize{|c| c[:host].should == 4}
     @db.synchronize(:server1){|c| c[:host].should == 8}
     @db.synchronize(:server2){|c| c[:host].should == 4}
+  end
+end
+
+context "Database#remove_servers" do
+  before do
+    @db = MockDatabase.new(:host=>1, :database=>2, :servers=>{:server1=>{:host=>3}, :server2=>{:host=>4}})
+    def @db.connect(server)
+      server_opts(server)
+    end
+    def @db.disconnect_connection(c)
+    end
+  end
+
+  specify "should remove servers from the connection pool" do
+    @db.synchronize{|c| c[:host].should == 1}
+    @db.synchronize(:server1){|c| c[:host].should == 3}
+    @db.synchronize(:server2){|c| c[:host].should == 4}
+
+    @db.remove_servers(:server1, :server2)
+    @db.synchronize{|c| c[:host].should == 1}
+    @db.synchronize(:server1){|c| c[:host].should == 1}
+    @db.synchronize(:server2){|c| c[:host].should == 1}
+  end
+  
+  specify "should accept arrays of symbols" do
+    @db.remove_servers([:server1, :server2])
+    @db.synchronize{|c| c[:host].should == 1}
+    @db.synchronize(:server1){|c| c[:host].should == 1}
+    @db.synchronize(:server2){|c| c[:host].should == 1}
+  end
+
+  specify "should allow removal while connections are still open" do
+    @db.synchronize do |c1|
+      c1[:host].should == 1
+      @db.synchronize(:server1) do |c2|
+        c2[:host].should == 3
+        @db.synchronize(:server2) do |c3|
+          c3[:host].should == 4
+          @db.remove_servers(:server1, :server2)
+            @db.synchronize(:server1) do |c4|
+              c4.should_not == c2
+              c4.should == c1
+              c4[:host].should == 1
+              @db.synchronize(:server2) do |c5|
+                c5.should_not == c3
+                c5.should == c1
+                c5[:host].should == 1
+              end
+            end
+          c3[:host].should == 4
+         end
+        c2[:host].should == 3
+      end
+      c1[:host].should == 1
+    end
   end
 end
 

@@ -302,9 +302,11 @@ module Sequel
     end
     
     # Disconnects all available connections from the connection pool.  Any
-    # connections currently in use will not be disconnected.
-    def disconnect
-      pool.disconnect
+    # connections currently in use will not be disconnected. Options:
+    # * :servers - Should be a symbol specifing the server to disconnect from,
+    #   or an array of symbols to specify multiple servers.
+    def disconnect(opts = {})
+      pool.disconnect(opts)
     end
 
     # Executes the given SQL on the database. This method should be overridden in descendants.
@@ -443,6 +445,26 @@ module Sequel
     def quote_identifiers?
       return @quote_identifiers unless @quote_identifiers.nil?
       @quote_identifiers = @opts.include?(:quote_identifiers) ? @opts[:quote_identifiers] : (@@quote_identifiers.nil? ? quote_identifiers_default : @@quote_identifiers)
+    end
+    
+    # Dynamically remove existing servers from the connection pool. Intended for
+    # use with master/slave or shard configurations where it is useful to remove
+    # existing server hosts at runtime.
+    #
+    # servers should be symbols or arrays of symbols.  If a nonexistent server
+    # is specified, it is ignored.  If no servers have been specified for
+    # this database, no changes are made. If you attempt to remove the :default server,
+    # an error will be raised.
+    #
+    #   DB.remove_servers(:f1, :f2)
+    def remove_servers(*servers)
+      if @opts[:servers] && !@opts[:servers].empty?
+        servs = @opts[:servers].dup
+        servers.flatten!
+        servers.each{|s| servs.delete(s)}
+        @opts[:servers] = servs
+        @pool.remove_servers(servers)
+      end
     end
     
     # Runs the supplied SQL statement string on the database server. Returns nil.

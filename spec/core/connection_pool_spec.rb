@@ -86,7 +86,7 @@ context "A connection pool handling connections" do
 
   specify "#make_new should not make more than max_size connections" do
     50.times{Thread.new{@cpool.hold{sleep 0.001}}}
-    @cpool.created_count.should == @max_size
+    @cpool.created_count.should <= @max_size
   end
 
   specify ":disconnection_proc option should set the disconnection proc to use" do
@@ -383,7 +383,7 @@ context "ConnectionPool#disconnect" do
     @pool.size.should == 0
   end
 
-  specify "should not touch connections in use" do
+  specify "should disconnect connections in use as soon as they are no longer in use" do
     threads = []
     stop = nil
     5.times {|i| threads << Thread.new {@pool.hold {|c| while !stop;sleep 0.01;end}}; sleep 0.01}
@@ -402,8 +402,9 @@ context "ConnectionPool#disconnect" do
       conns = []
       @pool.disconnect {|c| conns << c}
       conns.size.should == 4
+      @pool.size.should == 1
     end
-    @pool.size.should == 1
+    @pool.size.should == 0
   end
 end
 
@@ -474,12 +475,12 @@ context "A connection pool with multiple servers" do
     pool.hold(:server1) do
       pool.allocated.length.should == 0
       pool.allocated(:server1).length.should == 1
-      pool.allocated(:server2).length.should == 0
-      pool.allocated(:server3).length.should == 0
+      pool.allocated(:server2).should == nil
+      pool.allocated(:server3).should == nil
       pool.available_connections.length.should == 1
       pool.available_connections(:server1).length.should == 0
-      pool.available_connections(:server2).length.should == 1
-      pool.available_connections(:server3).length.should == 1
+      pool.available_connections(:server2).should == nil
+      pool.available_connections(:server3).should == nil
 
       pool.add_servers([:server2, :server3])
       pool.hold(:server2){}
@@ -540,6 +541,67 @@ context "A connection pool with multiple servers" do
     pool.allocated(:server1).length.should == 0
     pool.available_connections.length.should == 1
     pool.available_connections(:server1).length.should == 1
+  end
+  
+  specify "#remove_servers should disconnect available connections immediately" do
+    pool = Sequel::ConnectionPool.new(:max_connections=>5, :servers=>{:server1=>{}}){|s| s}
+    threads = []
+    stop = nil
+    5.times {|i| threads << Thread.new{pool.hold(:server1){|c| sleep 0.05}}}
+    sleep 0.1
+    threads.each {|t| t.join}
+    
+    pool.size(:server1).should == 5
+    pool.remove_servers([:server1])
+    pool.size(:server1).should == 0
+  end
+  
+  specify "#remove_servers should disconnect connections in use as soon as they are returned to the pool" do
+    dc = []
+    pool = Sequel::ConnectionPool.new(:servers=>{:server1=>{}}, :disconnection_proc=>proc{|c| dc << c}){|s| s}
+    c1 = nil
+    pool.hold(:server1) do |c|
+      pool.size(:server1).should == 1
+      dc.should == []
+      pool.remove_servers([:server1])
+      pool.size(:server1).should == 0
+      dc.should == []
+      c1 = c
+    end
+    pool.size(:server1).should == 0
+    dc.should == [c1]
+  end
+  
+  specify "#remove_servers should remove server related data structures immediately" do
+    pool = Sequel::ConnectionPool.new(:servers=>{:server1=>{}}){|s| s}
+    pool.available_connections(:server1).should == []
+    pool.allocated(:server1).should == {}
+    pool.remove_servers([:server1])
+    pool.available_connections(:server1).should == nil
+    pool.allocated(:server1).should == nil
+  end
+  
+  specify "#remove_servers should not allow the removal of the default server" do
+    pool = Sequel::ConnectionPool.new(:servers=>{:server1=>{}}){|s| s}
+    proc{pool.remove_servers([:server1])}.should_not raise_error
+    proc{pool.remove_servers([:default])}.should raise_error(Sequel::Error)
+  end
+  
+  specify "#remove_servers should ignore servers that have already been removed" do
+    dc = []
+    pool = Sequel::ConnectionPool.new(:servers=>{:server1=>{}}, :disconnection_proc=>proc{|c| dc << c}){|s| s}
+    c1 = nil
+    pool.hold(:server1) do |c|
+      pool.size(:server1).should == 1
+      dc.should == []
+      pool.remove_servers([:server1])
+      pool.remove_servers([:server1])
+      pool.size(:server1).should == 0
+      dc.should == []
+      c1 = c
+    end
+    pool.size(:server1).should == 0
+    dc.should == [c1]
   end
 end
 
