@@ -41,7 +41,7 @@ module Sequel
 
     # Which options don't affect the SQL generation.  Used by simple_select_all?
     # to determine if this is a simple SELECT * FROM table.
-    NON_SQL_OPTIONS = [:server, :defaults, :overrides]
+    NON_SQL_OPTIONS = [:server, :defaults, :overrides, :graph, :eager_graph, :graph_aliases]
 
     NOTIMPL_MSG = "This method must be overridden in Sequel adapters".freeze
     WITH_SUPPORTED=:select_with_sql

@@ -1,8 +1,5 @@
 module Sequel
   class Dataset
-
-    FROM_SELF_KEEP_OPTS = [:graph, :eager_graph, :graph_aliases]
-
     # Adds an further filter to an existing filter using AND. If no filter 
     # exists an error is raised. This method is identical to #filter except
     # it expects an existing filter.
@@ -148,7 +145,7 @@ module Sequel
     #   ds.from_self(:alias=>:foo).sql #=> "SELECT * FROM (SELECT id, name FROM items ORDER BY name) AS foo"
     def from_self(opts={})
       fs = {}
-      @opts.keys.each{|k| fs[k] = nil unless FROM_SELF_KEEP_OPTS.include?(k)}
+      @opts.keys.each{|k| fs[k] = nil unless NON_SQL_OPTIONS.include?(k)}
       clone(fs).from(opts[:alias] ? as(opts[:alias]) : self)
     end
 
@@ -263,7 +260,7 @@ module Sequel
       columns += Array(Sequel.virtual_row(&block)) if block
       clone(:order => (columns.compact.empty?) ? nil : columns)
     end
-    alias_method :order_by, :order
+    alias order_by order
     
     # Returns a copy of the dataset with the order columns added
     # to the existing order.

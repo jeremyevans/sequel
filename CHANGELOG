@@ -1,5 +1,7 @@
 === HEAD
 
+* Merge Dataset::FROM_SELF_KEEP_OPTS into Dataset::NON_SQL_OPTIONS (jeremyevans)
+
 * Add Database#remove_servers for removing servers from the pool on the fly (jeremyevans)
 
 * When disconnecting servers, if there are any connections to the server currently in use, schedule them to be disconnected (jeremyevans)
