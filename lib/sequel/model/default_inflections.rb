@@ -37,7 +37,6 @@ module Sequel
     irregular('child', 'children')
     irregular('sex', 'sexes')
     irregular('move', 'moves')
-    irregular('ox', 'oxen')
     irregular('quiz', 'quizzes')
     irregular('testis', 'testes')
 

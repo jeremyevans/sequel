@@ -159,7 +159,6 @@ describe 'Default inflections' do
       :index=>:indices,
       :mouse=>:mice,
       :louse=>:lice,
-      :ox=>:oxen,
       :quiz=>:quizzes,
       :motive=>:motives,
       :movie=>:movies,
