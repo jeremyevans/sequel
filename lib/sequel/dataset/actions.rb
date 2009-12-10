@@ -1,6 +1,5 @@
 module Sequel
   class Dataset
-
     # Alias for insert, but not aliased directly so subclasses
     # don't have to override both methods.
     def <<(*args)
@@ -56,12 +55,10 @@ module Sequel
     def each(&block)
       if @opts[:graph]
         graph_each(&block)
+      elsif row_proc = @row_proc
+        fetch_rows(select_sql){|r| yield row_proc.call(r)}
       else
-        if row_proc = @row_proc
-          fetch_rows(select_sql){|r| yield row_proc.call(r)}
-        else
-          fetch_rows(select_sql, &block)
-        end
+        fetch_rows(select_sql, &block)
       end
       self
     end
@@ -79,7 +76,7 @@ module Sequel
       execute_insert(insert_sql(*values))
     end
   
-    # Alias for set, but not aliased directly so subclasses
+    # Alias for update, but not aliased directly so subclasses
     # don't have to override both methods.
     def set(*args)
       update(*args)
@@ -118,6 +115,5 @@ module Sequel
     def execute_insert(sql, opts={}, &block)
       @db.execute_insert(sql, default_server_opts(opts), &block)
     end
-  
   end
 end
