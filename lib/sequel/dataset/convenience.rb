@@ -194,10 +194,16 @@ module Sequel
       end
     end
     
+    # Returns a hash with key_column values as keys and value_column values as
+    # values.  Similar to to_hash, but only selects the two columns.
     def select_hash(key_column, value_column)
       select(key_column, value_column).to_hash(hash_key_symbol(key_column), hash_key_symbol(value_column))
     end
-
+    
+    # Selects the column given (either as an argument or as a block), and
+    # returns an array of all values of that column in the dataset.  If you
+    # give a block argument that returns an array with multiple entries,
+    # the contents of the resulting array are undefined.
     def select_map(column=nil, &block)
       ds = naked.ungraphed
       ds = if column
@@ -208,7 +214,8 @@ module Sequel
       end
       ds.map{|r| r.values.first}
     end
-
+    
+    # The same as select_map, but in addition orders the array by the column.
     def select_order_map(column=nil, &block)
       ds = naked.ungraphed
       ds = if column
