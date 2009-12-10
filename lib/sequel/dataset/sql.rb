@@ -1,6 +1,5 @@
 module Sequel
   class Dataset
-
     # Given a type (e.g. select) and an array of clauses,
     # return an array of methods to call to build the SQL string.
     def self.clause_methods(type, clauses)

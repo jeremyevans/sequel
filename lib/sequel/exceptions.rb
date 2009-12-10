@@ -28,14 +28,14 @@ module Sequel
   # Raised on an invalid operation, such as trying to update or delete
   # a joined or grouped dataset.
   class InvalidOperation < Error; end
-                                     
+
   # Raised when attempting an invalid type conversion.
   class InvalidValue < Error ; end
-                                     
+
   # Raised when the connection pool cannot acquire a database connection
   # before the timeout.
   class PoolTimeout < Error ; end
-                                     
+
   # Exception that you should raise to signal a rollback of the current transaction.
   # The transaction block will catch this exception, rollback the current transaction,
   # and won't reraise it.

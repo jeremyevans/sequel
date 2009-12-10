@@ -1,6 +1,5 @@
 module Sequel
-  # The Schema module holds the schema generators and the SQL code relating
-  # to SQL DDL (Data Definition Language).
+  # The Schema module holds the schema generators.
   module Schema
     # Schema::Generator is an internal class that the user is not expected
     # to instantiate directly.  Instances are created by Database#create_table.

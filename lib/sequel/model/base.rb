@@ -573,7 +573,7 @@ module Sequel
       # self.class.
       alias_method :model, :class
   
-      # The current cached associations.  A hash with the keys being the
+      # The currently cached associations.  A hash with the keys being the
       # association name symbols and the values being the associated object
       # or nil (many_to_one), or the array of associated objects (*_to_many).
       def associations
@@ -901,7 +901,7 @@ module Sequel
       
       # If transactions should be used, wrap the yield in a transaction block.
       def checked_transaction(opts)
-        use_transaction?(opts)? db.transaction(opts){yield} : yield
+        use_transaction?(opts) ? db.transaction(opts){yield} : yield
       end
 
       # Default inspection output for the values hash, overwrite to change what #inspect displays.

@@ -74,10 +74,10 @@ module Sequel
         :'!~*' => :'~*', :NOT => :NOOP, :NOOP => :NOT, :ILIKE => :'NOT ILIKE',
         :'NOT ILIKE'=>:ILIKE}
 
-      # Mathematical Operators used in NumericMethods
+      # Standard Mathematical Operators used in NumericMethods
       MATHEMATICAL_OPERATORS = [:+, :-, :/, :*]
 
-      # Mathematical Operators used in NumericMethods
+      # Bitwise Mathematical Operators used in NumericMethods
       BITWISE_OPERATORS = [:&, :|, :^, :<<, :>>]
 
       # Inequality Operators used in InequalityMethods
@@ -548,7 +548,7 @@ module Sequel
       include SubscriptMethods
     end
 
-    # Represents constants or psuedo-constants (e.g. CURRENT_DATE) in SQL
+    # Represents constants or psuedo-constants (e.g. CURRENT_DATE) in SQL.
     class Constant < GenericExpression
       # Create an object with the given table
       def initialize(constant)
@@ -567,7 +567,7 @@ module Sequel
     end
     
     # Represents inverse boolean constants (currently only NOTNULL). A
-    # special class to allow for special behavior
+    # special class to allow for special behavior.
     class NegativeBooleanConstant < BooleanConstant
       to_s_method :negative_boolean_constant_sql, '@constant'
     end

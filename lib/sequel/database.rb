@@ -524,8 +524,7 @@ module Sequel
     end
 
     # Returns true if a table with the given name exists.  This requires a query
-    # to the database unless this database object already has the schema for
-    # the given table name.
+    # to the database.
     def table_exists?(name)
       begin 
         from(name).first
@@ -1032,4 +1031,3 @@ module Sequel
     end
   end
 end
-
