@@ -183,7 +183,7 @@ module Sequel
       COMMA_SEPARATOR = ', '.freeze
       DELETE_CLAUSE_METHODS = Dataset.clause_methods(:delete, %w'with from output from2 where')
       INSERT_CLAUSE_METHODS = Dataset.clause_methods(:insert, %w'with into columns output values')
-      SELECT_CLAUSE_METHODS = Dataset.clause_methods(:select, %w'with limit distinct columns from table_options join where group order having compounds')
+      SELECT_CLAUSE_METHODS = Dataset.clause_methods(:select, %w'with limit distinct columns from table_options join where group having order compounds')
       UPDATE_CLAUSE_METHODS = Dataset.clause_methods(:update, %w'with table set output from where')
       WILDCARD = LiteralString.new('*').freeze
       CONSTANT_MAP = {:CURRENT_DATE=>'CAST(CURRENT_TIMESTAMP AS DATE)'.freeze, :CURRENT_TIME=>'CAST(CURRENT_TIMESTAMP AS TIME)'.freeze}
