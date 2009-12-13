@@ -414,6 +414,10 @@ context "A connection pool with multiple servers" do
     @pool = Sequel::ConnectionPool.new(CONNECTION_POOL_DEFAULTS.merge(:servers=>{:read_only=>{}})){|server| "#{server}#{@invoked_counts[server] += 1}"}
   end
   
+  specify "#servers should return symbols for all servers" do
+    @pool.servers.sort_by{|s| s.to_s}.should == [:default, :read_only]
+  end
+
   specify "should use the :default server by default" do
     @pool.size.should == 0
     @pool.hold do |c|

@@ -1330,6 +1330,42 @@ context "Database#remove_servers" do
   end
 end
 
+context "Database#each_server" do
+  before do
+    @db = Sequel.connect(:adapter=>:mock, :host=>1, :database=>2, :servers=>{:server1=>{:host=>3}, :server2=>{:host=>4}})
+    def @db.connect(server)
+      server_opts(server)
+    end
+    def @db.disconnect_connection(c)
+    end
+  end
+
+  specify "should yield a separate database object for each server" do
+    hosts = []
+    @db.each_server do |db|
+      db.should be_a_kind_of(Sequel::Database)
+      db.should_not == @db
+      db.opts[:database].should == 2
+      hosts << db.opts[:host]
+    end
+    hosts.sort.should == [1, 3, 4]
+  end
+
+  specify "should disconnect and remove entry from Sequel::DATABASES after use" do
+    dbs = []
+    dcs = []
+    @db.each_server do |db|
+      dbs << db
+      Sequel::DATABASES.should include(db)
+      db.meta_def(:disconnect){dcs << db}
+    end
+    dbs.each do |db|
+      Sequel::DATABASES.should_not include(db)
+    end
+    dbs.should == dcs
+  end
+end
+  
 context "Database#raise_error" do
   specify "should reraise if the exception class is not in opts[:classes]" do
     e = Class.new(StandardError)

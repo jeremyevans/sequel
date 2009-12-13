@@ -309,6 +309,15 @@ module Sequel
       pool.disconnect(opts)
     end
 
+    # Yield a new database object for every server in the connection pool.
+    # Intended for use in sharded environments where there is a need to make schema
+    # modifications (DDL queries) on each shard.
+    #
+    #   DB.each_server{|db| db.create_table(:users){primary_key :id; String :name}}
+    def each_server(&block)
+      servers.each{|s| self.class.connect(server_opts(s), &block)}
+    end
+
     # Executes the given SQL on the database. This method should be overridden in descendants.
     # This method should not be called directly by user code.
     def execute(sql, opts={})
@@ -475,11 +484,6 @@ module Sequel
       nil
     end
     
-    # Returns a new dataset with the select method invoked.
-    def select(*args, &block)
-      dataset.select(*args, &block)
-    end
-    
     # Parse the schema from the database.
     # Returns the schema for the given table as an array with all members being arrays of length 2,
     # the first member being the column name, and the second member being a hash of column information.
@@ -506,6 +510,16 @@ module Sequel
       raise(Error, 'schema parsing returned no columns, table probably doesn\'t exist') if cols.nil? || cols.empty?
       cols.each{|_,c| c[:ruby_default] = column_schema_to_ruby_default(c[:default], c[:type])}
       @schemas[quoted_name] = cols
+    end
+
+    # Returns a new dataset with the select method invoked.
+    def select(*args, &block)
+      dataset.select(*args, &block)
+    end
+
+    # An array of servers/shards for this Database object.
+    def servers
+      pool.servers
     end
 
     # Returns true if the database is using a single-threaded connection pool.

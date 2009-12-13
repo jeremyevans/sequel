@@ -178,6 +178,11 @@ class Sequel::ConnectionPool
     end
   end
 
+  # Return an array of symbols for servers in the connection pool.
+  def servers
+    sync{@servers.keys}
+  end
+
   private
 
   # Assigns a connection to the supplied thread for the given server, if one

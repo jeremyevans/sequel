@@ -3069,6 +3069,30 @@ context "Sequel::Dataset#server" do
   end
 end
 
+context "Sequel::Dataset#each_server" do
+  before do
+    @db = Sequel::Database.new(:servers=>{:s=>{}, :i=>{}})
+    @ds = @db[:items]
+    sqls = @sqls = []
+    @db.meta_def(:execute) do |sql, opts|
+      sqls << [sql, opts[:server]]
+    end
+    def @ds.fetch_rows(sql, &block)
+      execute(sql)
+    end
+  end
+
+  specify "should yield a dataset for each server" do
+    @ds.each_server do |ds|
+      ds.should be_a_kind_of(Sequel::Dataset)
+      ds.should_not == @ds
+      ds.sql.should == @ds.sql
+      ds.all
+    end
+    @sqls.sort_by{|sql, s| s.to_s}.should == [['SELECT * FROM items', :default], ['SELECT * FROM items', :i], ['SELECT * FROM items', :s]]
+  end
+end
+
 context "Sequel::Dataset #set_defaults" do
   before do
     @ds = Sequel::Dataset.new(nil).from(:items).set_defaults(:x=>1)

@@ -1,5 +1,9 @@
 === HEAD
 
+* Add Database#each_server, which yields a new Database object for each server in the connection pool which is connected to only that server (jeremyevans)
+
+* Add Dataset#each_server, which yields a dataset for each server in the connection pool which is will execute on that server (jeremyevans)
+
 * Remove meta_eval and metaclass private methods from Sequel::Metaprogramming (jeremyevans)
 
 * Merge Dataset::FROM_SELF_KEEP_OPTS into Dataset::NON_SQL_OPTIONS (jeremyevans)
