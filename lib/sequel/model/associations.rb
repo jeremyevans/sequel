@@ -461,7 +461,7 @@ module Sequel
         #     before a new item is added to the association.
         #   - :before_remove - Symbol, Proc, or array of both/either specifying a callback to call
         #     before an item is removed from the association.
-        #   - :cartesian_product_number - he number of joins completed by this association that could cause more
+        #   - :cartesian_product_number - the number of joins completed by this association that could cause more
         #     than one row for each row in the current table (default: 0 for many_to_one associations,
         #     1 for *_to_many associations).
         #   - :class - The associated class or its name. If not
