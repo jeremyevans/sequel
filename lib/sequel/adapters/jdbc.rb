@@ -492,6 +492,8 @@ module Sequel
           BigDecimal.new(v.to_string)
         when Java::byte[]
           Sequel::SQL::Blob.new(String.from_java_bytes(v))
+        when Java::JavaSQL::Blob
+          convert_type(v.getBytes(0, v.length))
         else
           v
         end
