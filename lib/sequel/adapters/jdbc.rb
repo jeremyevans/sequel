@@ -336,7 +336,7 @@ module Sequel
       def set_ps_arg(cps, arg, i)
         case arg
         when Integer
-          cps.setInt(i, arg)
+          cps.setLong(i, arg)
         when Sequel::SQL::Blob
           cps.setBytes(i, arg.to_java_bytes)
         when String
