@@ -1,5 +1,7 @@
 === HEAD
 
+* Fix handling of non-existent server in single-threaded connection pool (jeremyevans)
+
 * Default to using mysqlplus driver in the native mysql adapter, fall back to mysql driver (ibc, jeremyevans)
 
 * Handle 64-bit integers in JDBC prepared statements (paulfras)

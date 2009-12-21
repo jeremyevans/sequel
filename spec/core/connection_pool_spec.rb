@@ -428,6 +428,18 @@ context "A connection pool with multiple servers" do
     @pool.size.should == 1
     @invoked_counts.should == {:default=>1}
   end
+  
+  specify "should use the :default server an invalid server is used" do
+    @pool.hold do |c1|
+      c1.should == "default1"
+      @pool.hold(:blah) do |c2|
+        c2.should == c1
+        @pool.hold(:blah2) do |c3|
+          c2.should == c3
+        end
+      end
+    end
+  end
 
   specify "should use the requested server if server is given" do
     @pool.size(:read_only).should == 0
@@ -639,6 +651,18 @@ context "A single threaded pool with multiple servers" do
   specify "should use the :default server by default" do
     @pool.hold{|c| c.should == :default}
     @pool.conn.should == :default
+  end
+  
+  specify "should use the :default server an invalid server is used" do
+    @pool.hold do |c1|
+      c1.should == :default
+      @pool.hold(:blah) do |c2|
+        c2.should == c1
+        @pool.hold(:blah2) do |c3|
+          c2.should == c3
+        end
+      end
+    end
   end
 
   specify "should use the requested server if server is given" do

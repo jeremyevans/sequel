@@ -292,12 +292,16 @@ class Sequel::SingleThreadedPool
     @connection_proc = block
     @disconnection_proc = opts[:disconnection_proc]
     @conns = {}
+    @servers = Hash.new(:default)
+    if servers = opts[:servers]
+      servers.keys.each{|s| @servers[s] = s}
+    end
     @convert_exceptions = opts.include?(:pool_convert_exceptions) ? opts[:pool_convert_exceptions] : true
   end
   
   # The connection for the given server.
   def conn(server=:default)
-    @conns[server]
+    @conns[@servers[server]]
   end
   
   # Yields the connection to the supplied block for the given server.
@@ -305,10 +309,11 @@ class Sequel::SingleThreadedPool
   def hold(server=:default)
     begin
       begin
+        server = @servers[server]
         yield(c = (@conns[server] ||= @connection_proc.call(server)))
       rescue Sequel::DatabaseDisconnectError
         @conns.delete(server)
-        @disconnection_proc.call(c) if @disconnection_proc
+        @disconnection_proc.call(c) if @disconnection_proc && c
         raise
       end
     rescue Exception => e
