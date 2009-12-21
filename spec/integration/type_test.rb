@@ -78,7 +78,7 @@ describe "Supported types" do
     ds.first[:tim].strftime('%Y%m%d%H%M%S').should == t.strftime('%Y%m%d%H%M%S')
   end
   
-  cspecify "should support generic file type", [:do], [:odbc, :mssql] do
+  cspecify "should support generic file type", [:do], :h2, [:odbc, :mssql] do
     ds = create_items_table_with_column(:name, File)
     ds.insert(:name => ("a\0"*300).to_sequel_blob)
     ds.all.should == [{:name=>("a\0"*300).to_sequel_blob}]
