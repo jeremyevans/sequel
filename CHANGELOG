@@ -1,5 +1,7 @@
 === HEAD
 
+* Default to using mysqlplus driver in the native mysql adapter, fall back to mysql driver (ibc, jeremyevans)
+
 * Handle 64-bit integers in JDBC prepared statements (paulfras)
 
 * Return blobs as Sequel::SQL::Blob when using H2 (jeremyevans, paulfras)
