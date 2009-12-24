@@ -105,6 +105,11 @@ module Sequel
 
         private
       
+        # H2 expects hexadecimal strings for blob values
+        def literal_blob(v)
+          literal_string v.unpack("H*").first
+        end
+        
         def select_clause_methods
           SELECT_CLAUSE_METHODS
         end
