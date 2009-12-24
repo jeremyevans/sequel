@@ -110,6 +110,15 @@ module Sequel
           literal_string v.unpack("H*").first
         end
         
+        def convert_type(v)
+          case v
+          when Java::OrgH2Jdbc::JdbcClob
+            convert_type(v.getSubString(1, v.length))
+          else
+            super(v)
+          end
+        end
+        
         def select_clause_methods
           SELECT_CLAUSE_METHODS
         end
