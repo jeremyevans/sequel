@@ -310,7 +310,7 @@ class Sequel::SingleThreadedPool
     begin
       begin
         server = @servers[server]
-        yield(c = (@conns[server] ||= @connection_proc.call(server)))
+        yield(c = (@conns[server] ||= make_new(server)))
       rescue Sequel::DatabaseDisconnectError
         @conns.delete(server)
         @disconnection_proc.call(c) if @disconnection_proc && c
@@ -328,5 +328,19 @@ class Sequel::SingleThreadedPool
     block ||= @disconnection_proc
     @conns.values.each{|conn| block.call(conn) if block}
     @conns = {}
+  end
+  
+  private
+  
+  # Return a connection to the given server, raising DatabaseConnectionError
+  # if the connection_proc raises an error or doesn't return a valid connection.
+  def make_new(server)
+    begin
+      conn = @connection_proc.call(server)
+    rescue Exception=>exception
+      raise Sequel.convert_exception_class(exception, Sequel::DatabaseConnectionError)
+    end
+    raise(Sequel::DatabaseConnectionError, "Connection parameters not valid") unless conn
+    conn
   end
 end

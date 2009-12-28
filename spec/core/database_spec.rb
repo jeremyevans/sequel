@@ -951,12 +951,19 @@ context "A single threaded database" do
     @db.pool.hold {|c| c.should == 1234568}
   end
   
-  specify "should convert an Exception into a RuntimeError" do
-    db = Sequel::Database.new(:single_threaded => true) do
-      raise Exception
-    end
-    
-    proc {db.pool.hold {|c|}}.should raise_error(RuntimeError)
+  specify "should convert an Exception on connection into a DatabaseConnectionError" do
+    db = Sequel::Database.new(:single_threaded => true){raise Exception}
+    proc {db.pool.hold {|c|}}.should raise_error(Sequel::DatabaseConnectionError)
+  end
+  
+  specify "should raise a DatabaseConnectionError if the connection proc returns nil" do
+    db = Sequel::Database.new(:single_threaded => true){nil}
+    proc {db.pool.hold {|c|}}.should raise_error(Sequel::DatabaseConnectionError)
+  end
+  
+  specify "should convert an Exceptions during use into RuntimeErrors" do
+    db = Sequel::Database.new(:single_threaded => true){Object.new}
+    proc {db.synchronize{raise Exception}}.should raise_error(RuntimeError)
   end
 end
 
