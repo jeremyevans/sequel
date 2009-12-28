@@ -6,7 +6,7 @@
 
 * Handle 64-bit integers in JDBC prepared statements (paulfras)
 
-* Return blobs as Sequel::SQL::Blob when using H2 (jeremyevans, paulfras)
+* Improve blob support when using the H2 JDBC subadapter (nullstyle, jeremyevans, paulfras)
 
 * Add Database#each_server, which yields a new Database object for each server in the connection pool which is connected to only that server (jeremyevans)
 
