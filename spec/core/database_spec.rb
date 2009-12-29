@@ -951,6 +951,17 @@ context "A single threaded database" do
     @db.pool.hold {|c| c.should == 1234568}
   end
   
+  specify "should disconnect correctly" do
+    def @db.disconnect_connection(c); @dc = c end
+    def @db.dc; @dc end
+    x = nil
+    @db.pool.hold{|c| x = c}
+    @db.pool.conn.should == x
+    proc{@db.disconnect}.should_not raise_error
+    @db.pool.conn.should == nil
+    @db.dc.should == x
+  end
+  
   specify "should convert an Exception on connection into a DatabaseConnectionError" do
     db = Sequel::Database.new(:single_threaded => true){raise Exception}
     proc {db.pool.hold {|c|}}.should raise_error(Sequel::DatabaseConnectionError)

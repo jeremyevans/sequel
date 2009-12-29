@@ -324,7 +324,7 @@ class Sequel::SingleThreadedPool
   
   # Disconnects from the database. Once a connection is requested using
   # #hold, the connection is reestablished.
-  def disconnect(&block)
+  def disconnect(opts={}, &block)
     block ||= @disconnection_proc
     @conns.values.each{|conn| block.call(conn) if block}
     @conns = {}
