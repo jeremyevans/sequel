@@ -388,9 +388,9 @@ module Sequel
         blob
       end
       
-      # Use unicode string syntax for all strings
+      # Use unicode string syntax for all strings. Don't double backslashes.
       def literal_string(v)
-        "N#{super}"
+        "N'#{v.gsub(/'/, "''")}'"
       end
       
       # Use 0 for false on MSSQL
