@@ -230,6 +230,7 @@ module Sequel
 
       # Use the OUTPUT clause to get the value of all columns for the newly inserted record.
       def insert_select(*values)
+        return unless supports_output_clause?
         naked.clone(default_server_opts(:sql=>output(nil, [:inserted.*]).insert_sql(*values))).single_record unless opts[:disable_insert_output]
       end
 
@@ -256,6 +257,7 @@ module Sequel
       #   dataset.output(:output_table, [:deleted__id, :deleted__name])
       #   dataset.output(:output_table, :id => :inserted__id, :name => :inserted__name)
       def output(into, values)
+        raise(Error, "SQL Server versions 2000 and earlier do not support the OUTPUT clause") unless supports_output_clause?
         output = {}
         case values
           when Hash
@@ -331,6 +333,11 @@ module Sequel
       # MSSQL does not support multiple columns for the IN/NOT IN operators
       def supports_multiple_column_in?
         false
+      end
+      
+      # Only 2005+ supports the output clause.
+      def supports_output_clause?
+        server_version >= 9000000
       end
 
       # MSSQL 2005+ supports window functions
@@ -425,6 +432,7 @@ module Sequel
 
       # SQL fragment for MSSQL's OUTPUT clause.
       def output_sql(sql)
+        return unless supports_output_clause?
         return unless output = @opts[:output]
         sql << " OUTPUT #{column_list(output[:select_list])}"
         if into = output[:into]

@@ -334,9 +334,13 @@ context "MSSSQL::Dataset#insert" do
   specify "should have insert_select return nil if disable_insert_output is used" do
     @ds.disable_insert_output.insert_select(:value=>10).should == nil
   end
+  
+  specify "should have insert_select return nil if the server version is not 2005+" do
+    @ds.meta_def(:server_version){8000760}
+    @ds.insert_select(:value=>10).should == nil
+  end
 
   specify "should have insert_select insert the record and return the inserted record" do
-    @ds.meta_def(:server_version){80201}
     h = @ds.insert_select(:value=>10)
     h[:value].should == 10
     @ds.first(:xid=>h[:xid])[:value].should == 10

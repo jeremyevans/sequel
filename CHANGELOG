@@ -1,5 +1,7 @@
 === HEAD
 
+* Don't use the OUTPUT clause on SQL Server versions that don't support it (pre-2005) (jeremyevans) (#281)
+
 * Raise DatabaseConnectionErrors in the single-threaded connection pool if unable to connect (jeremyevans)
 
 * Fix handling of non-existent server in single-threaded connection pool (jeremyevans)
