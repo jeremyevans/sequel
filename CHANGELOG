@@ -1,5 +1,7 @@
 === HEAD
 
+* Catch cases in the postgres adapter where exceptions weren't converted or raised appropriately (jeremyevans)
+
 * Don't double escape backslashes in string literals in the mssql shared adapter (john_firebaugh)
 
 * Fix order of ORDER and HAVING clauses in the mssql shared adapter (mluu)

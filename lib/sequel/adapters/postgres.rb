@@ -138,24 +138,29 @@ module Sequel
         end
         @prepared_statements = {} if SEQUEL_POSTGRES_USES_PG
       end
-
-      # Execute the given SQL with this connection.  If a block is given,
-      # yield the results, otherwise, return the number of changed rows.
-      def execute(sql, args=nil)
-        q = nil
+      
+      # Raise a Sequel::DatabaseDisconnectError if a PGError is raised and
+      # the connection status cannot be determined or it is not OK.
+      def check_disconnect_errors
         begin
-          q = args ? async_exec(sql, args) : async_exec(sql)
-        rescue PGError => e
+          yield
+        rescue PGError =>e
           begin
             s = status
           rescue PGError
             raise Sequel.convert_exception_class(e, Sequel::DatabaseDisconnectError)
           end
           status_ok = (s == Adapter::CONNECTION_OK)
-          status_ok ? raise : Sequel.convert_exception_class(e, Sequel::DatabaseDisconnectError)
+          status_ok ? raise : raise(Sequel.convert_exception_class(e, Sequel::DatabaseDisconnectError))
         ensure
           block if status_ok
         end
+      end
+
+      # Execute the given SQL with this connection.  If a block is given,
+      # yield the results, otherwise, return the number of changed rows.
+      def execute(sql, args=nil)
+        q = check_disconnect_errors{args ? async_exec(sql, args) : async_exec(sql)}
         begin
           block_given? ? yield(q) : q.cmd_tuples
         ensure
@@ -218,13 +223,10 @@ module Sequel
       
       # Execute the given SQL with the given args on an available connection.
       def execute(sql, opts={}, &block)
-        return execute_prepared_statement(sql, opts, &block) if Symbol === sql
-        begin
+        check_database_errors do
+          return execute_prepared_statement(sql, opts, &block) if Symbol === sql
           log_info(sql, opts[:arguments])
           synchronize(opts[:server]){|conn| conn.execute(sql, opts[:arguments], &block)}
-        rescue => e
-          log_info(e.message)
-          raise_error(e, :classes=>CONVERTED_EXCEPTIONS)
         end
       end
       
@@ -232,19 +234,25 @@ module Sequel
       # automatically generated).
       def execute_insert(sql, opts={})
         return execute(sql, opts) if Symbol === sql
-        begin 
+        check_database_errors do
           log_info(sql, opts[:arguments])
           synchronize(opts[:server]) do |conn|
             conn.execute(sql, opts[:arguments])
             insert_result(conn, opts[:table], opts[:values])
           end
-        rescue => e
-          log_info(e.message)
-          raise_error(e, :classes=>CONVERTED_EXCEPTIONS)
         end
       end
       
       private
+      
+      # Convert exceptions raised from the block into DatabaseErrors.
+      def check_database_errors
+        begin
+          yield
+        rescue => e
+          raise_error(e, :classes=>CONVERTED_EXCEPTIONS)
+        end
+      end
 
       # PostgreSQL doesn't need the connection pool to convert exceptions.
       def connection_pool_default_options
@@ -281,10 +289,10 @@ module Sequel
             end
             conn.prepared_statements[ps_name] = sql
             log_info("PREPARE #{ps_name} AS #{sql}")
-            conn.prepare(ps_name, sql)
+            conn.check_disconnect_errors{conn.prepare(ps_name, sql)}
           end
           log_info("EXECUTE #{ps_name}", args)
-          q = conn.exec_prepared(ps_name, args)
+          q = conn.check_disconnect_errors{conn.exec_prepared(ps_name, args)}
           if opts[:table] && opts[:values]
             insert_result(conn, opts[:table], opts[:values])
           else
