@@ -1,5 +1,15 @@
 === HEAD
 
+* Don't double escape backslashes in string literals in the mssql shared adapter (john_firebaugh)
+
+* Fix order of ORDER and HAVING clauses in the mssql shared adapter (mluu)
+
+* Add validates_type to the validation_helpers plugin (mluu)
+
+* Attempt to detect database disconnects in the JDBC adapter (john_firebaugh)
+
+* Add Sequel::SQL::Expression#==, so arbtirary expressions can be compared by value (dlee)
+
 * Respect the :size option for the generic File type on MySQL to create tinyblob, mediumblob, and longblob (ibc)
 
 * Don't use the OUTPUT clause on SQL Server versions that don't support it (pre-2005) (jeremyevans) (#281)
