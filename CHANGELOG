@@ -1,5 +1,7 @@
 === HEAD
 
+* Respect the :size option for the generic File type on MySQL to create tinyblob, mediumblob, and longblob (ibc)
+
 * Don't use the OUTPUT clause on SQL Server versions that don't support it (pre-2005) (jeremyevans) (#281)
 
 * Raise DatabaseConnectionErrors in the single-threaded connection pool if unable to connect (jeremyevans)

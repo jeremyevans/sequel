@@ -179,6 +179,22 @@ module Sequel
         end
       end
 
+      # Allow different sizes.
+      def type_literal_generic_file(column)
+        case column[:size]
+          when :small, :tiny  # < 2^8 bytes
+            :tinyblob
+          when :normal        # < 2^16 bytes
+            :blob
+          when :medium        # < 2^24 bytes
+            :mediumblob
+          when :long, :big    # < 2^32 bytes
+            :longblob
+          else
+            :blob
+        end
+      end
+
       # MySQL has both datetime and timestamp classes, most people are going
       # to want datetime
       def type_literal_generic_datetime(column)

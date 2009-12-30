@@ -62,6 +62,17 @@ context "MySQL", '#create_table' do
     @db.create_table(:dolls){File :name, :default=>'blah'}
     @db.sqls.should == ["CREATE TABLE dolls (name blob)"]
   end
+  
+  specify "should respect the size option for File type" do
+    @db.create_table(:dolls) do
+      File :n1
+      File :n2, :size=>:tiny
+      File :n3, :size=>:medium
+      File :n4, :size=>:long
+      File :n5, :size=>255
+    end
+    @db.schema(:dolls).map{|k, v| v[:db_type]}.should == %w"blob tinyblob mediumblob longblob blob"
+  end
 end
 
 context "A MySQL database" do
