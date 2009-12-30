@@ -54,7 +54,7 @@ module Sequel
         :min_length=>{:message=>lambda{|min| "is shorter than #{min} characters"}},
         :not_string=>{:message=>lambda{|type| type ? "is not a valid #{type}" : "is a string"}},
         :numeric=>{:message=>lambda{"is not a number"}},
-        :type=>{:message=>lambda{|klass| "is not a #{type}"}},
+        :type=>{:message=>lambda{|klass| "is not a #{klass}"}},
         :presence=>{:message=>lambda{"is not present"}},
         :unique=>{:message=>lambda{'is already taken'}}
       }
@@ -126,7 +126,7 @@ module Sequel
 
         # Check if value is an instance of a class
         def validates_type(klass, atts, opts={})
-          klass = klass.constantize if klass.is_a?(String)
+          klass = klass.to_s.constantize if klass.is_a?(String) || klass.is_a?(Symbol)
           validatable_attributes_for_type(:type, atts, opts){|a,v,m| validation_error_message(m, klass) if v && !v.is_a?(klass)}
         end
     

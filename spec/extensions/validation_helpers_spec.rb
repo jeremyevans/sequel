@@ -258,6 +258,29 @@ describe "Sequel::Plugins::ValidationHelpers" do
     @m.should be_valid
     @m.value = '.0123'
   end
+  
+  specify "should support validates_type" do
+    @c.set_validations{validates_type(Integer, :value)}
+    @m.value = 123
+    @m.should be_valid
+    @m.value = '123'
+    @m.should_not be_valid
+    @m.errors.full_messages.should == ['value is not a Integer']
+    
+    @c.set_validations{validates_type(:String, :value)}
+    @m.value = '123'
+    @m.should be_valid
+    @m.value = 123
+    @m.should_not be_valid
+    @m.errors.full_messages.should == ['value is not a String']
+    
+    @c.set_validations{validates_type('Integer', :value)}
+    @m.value = 123
+    @m.should be_valid
+    @m.value = 123.05
+    @m.should_not be_valid
+    @m.errors.full_messages.should == ['value is not a Integer']
+  end
 
   specify "should support validates_presence" do
     @c.set_validations{validates_presence(:value)}
