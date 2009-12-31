@@ -293,15 +293,30 @@ class Sequel::SingleThreadedPool
     @disconnection_proc = opts[:disconnection_proc]
     @conns = {}
     @servers = Hash.new(:default)
-    if servers = opts[:servers]
-      servers.keys.each{|s| @servers[s] = s}
-    end
+    add_servers([:default])
+    add_servers(opts[:servers].keys) if opts[:servers]
     @convert_exceptions = opts.include?(:pool_convert_exceptions) ? opts[:pool_convert_exceptions] : true
+  end
+  
+  # Adds new servers to the connection pool. Primarily used in conjunction with master/slave
+  # or shard configurations. Allows for dynamic expansion of the potential slaves/shards
+  # at runtime. servers argument should be an array of symbols. 
+  def add_servers(servers)
+    servers.each{|s| @servers[s] = s}
   end
   
   # The connection for the given server.
   def conn(server=:default)
     @conns[@servers[server]]
+  end
+  
+  # Disconnects from the database. Once a connection is requested using
+  # #hold, the connection is reestablished. Options:
+  # * :server - Should be a symbol specifing the server to disconnect from,
+  #   or an array of symbols to specify multiple servers.
+  def disconnect(opts={}, &block)
+    block ||= @disconnection_proc
+    (opts[:server] ? Array(opts[:server]) : servers).each{|s| disconnect_server(s, &block)}
   end
   
   # Yields the connection to the supplied block for the given server.
@@ -312,8 +327,7 @@ class Sequel::SingleThreadedPool
         server = @servers[server]
         yield(c = (@conns[server] ||= make_new(server)))
       rescue Sequel::DatabaseDisconnectError
-        @conns.delete(server)
-        @disconnection_proc.call(c) if @disconnection_proc && c
+        disconnect_server(server, &@disconnection_proc)
         raise
       end
     rescue Exception => e
@@ -322,15 +336,31 @@ class Sequel::SingleThreadedPool
     end
   end
   
-  # Disconnects from the database. Once a connection is requested using
-  # #hold, the connection is reestablished.
-  def disconnect(opts={}, &block)
-    block ||= @disconnection_proc
-    @conns.values.each{|conn| block.call(conn) if block}
-    @conns = {}
+  # Remove servers from the connection pool. Primarily used in conjunction with master/slave
+  # or shard configurations.  Similar to disconnecting from all given servers,
+  # except that after it is used, future requests for the server will use the
+  # :default server instead.
+  def remove_servers(servers)
+    raise(Sequel::Error, "cannot remove default server") if servers.include?(:default)
+    servers.each do |server|
+      disconnect_server(server, &@disconnection_proc)
+      @servers.delete(server)
+    end
+  end
+  
+  # Return an array of symbols for servers in the connection pool.
+  def servers
+    @servers.keys
   end
   
   private
+  
+  # Disconnect from the given server, if connected.
+  def disconnect_server(server, &block)
+    if conn = @conns.delete(server)
+      block.call(conn) if block
+    end
+  end
   
   # Return a connection to the given server, raising DatabaseConnectionError
   # if the connection_proc raises an error or doesn't return a valid connection.

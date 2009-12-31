@@ -648,6 +648,47 @@ context "A single threaded pool with multiple servers" do
     @pool = Sequel::SingleThreadedPool.new(CONNECTION_POOL_DEFAULTS.merge(:disconnection_proc=>proc{|c| @max_size=3}, :servers=>{:read_only=>{}})){|server| server}
   end
   
+  specify "#servers should return symbols for all servers" do
+    @pool.servers.sort_by{|s| s.to_s}.should == [:default, :read_only]
+  end
+  
+  specify "#add_servers should add new servers to the pool" do
+    @pool.hold(:blah){|c| c.should == :default}
+    @pool.add_servers([:blah])
+    @pool.hold(:blah){|c| c.should == :blah}
+  end
+  
+  specify "#add_servers should ignore keys already existing" do
+    @pool.hold{|c| c.should == :default}
+    @pool.hold(:read_only){|c| c.should == :read_only}
+    @pool.add_servers([:default, :read_only])
+    @pool.conn.should == :default
+    @pool.conn(:read_only).should == :read_only
+  end
+  
+  specify "#remove_servers should remove servers from the pool" do
+    @pool.hold(:read_only){|c| c.should == :read_only}
+    @pool.remove_servers([:read_only])
+    @pool.hold(:read_only){|c| c.should == :default}
+  end
+  
+  specify "#remove_servers should not allow the removal of the default server" do
+    proc{@pool.remove_servers([:default])}.should raise_error(Sequel::Error)
+  end
+  
+  specify "#remove_servers should disconnect connection immediately" do
+    @pool.hold(:read_only){|c| c.should == :read_only}
+    @pool.conn(:read_only).should == :read_only
+    @pool.remove_servers([:read_only])
+    @pool.conn(:read_only).should == nil
+    @pool.hold{}
+    @pool.conn(:read_only).should == :default
+  end
+  
+  specify "#remove_servers should ignore keys that do not exist" do
+    proc{@pool.remove_servers([:blah])}.should_not raise_error
+  end
+  
   specify "should use the :default server by default" do
     @pool.hold{|c| c.should == :default}
     @pool.conn.should == :default
