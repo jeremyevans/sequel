@@ -38,7 +38,7 @@
 
 * When disconnecting servers, if there are any connections to the server currently in use, schedule them to be disconnected (jeremyevans)
 
-* Allow disconnecting specific server(s)/shard(s) in Database#disconnect via a :server option (jeremyevans)
+* Allow disconnecting specific server(s)/shard(s) in Database#disconnect via a :servers option (jeremyevans)
 
 * Handle multiple statements in a single query in the native MySQL adapter in all cases, not just when selecting via Dataset#each (jeremyevans)
 
