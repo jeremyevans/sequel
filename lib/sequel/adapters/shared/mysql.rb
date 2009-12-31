@@ -179,19 +179,19 @@ module Sequel
         end
       end
 
-      # Allow different sizes.
+      # Respect the :size option if given to produce
+      # tinyblob, mediumblob, and longblob if :tiny,
+      # :medium, or :long is given.
       def type_literal_generic_file(column)
         case column[:size]
-          when :small, :tiny  # < 2^8 bytes
-            :tinyblob
-          when :normal        # < 2^16 bytes
-            :blob
-          when :medium        # < 2^24 bytes
-            :mediumblob
-          when :long, :big    # < 2^32 bytes
-            :longblob
-          else
-            :blob
+        when :tiny    # < 2^8 bytes
+          :tinyblob
+        when :medium  # < 2^24 bytes
+          :mediumblob
+        when :long    # < 2^32 bytes
+          :longblob
+        else          # 2^16 bytes
+          :blob
         end
       end
 
