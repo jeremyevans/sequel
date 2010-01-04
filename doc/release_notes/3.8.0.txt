@@ -1,0 +1,151 @@
+New Features
+------------
+
+* Dataset#each_server was added, allowing you to run the same query
+  (most likely insert/update/delete) on all shards.  This is useful
+  if you have a sharded database but have lookup tables that should
+  be identical on all shards.  It works by yielding copies of the
+  current dataset that are tied to each server/shard:
+  
+    DB[:table].filter(:id=>1).each_server do |ds|
+      ds.update(:name=>'foo')
+    end
+
+* Database#each_server was added, allowing you to run schema
+  modification methods on all shards.  It works by yielding a
+  new Sequel::Database object for each shard, that will connect to
+  only that shard:
+  
+    DB.each_server do |db|
+      db.create_table(:t){Integer :num}
+    end
+    
+* You can now add and remove servers/shards from the connection
+  pool while Sequel is running:
+  
+    DB.add_servers(:shard1=>{:host=>'s1'}, :shard2=>{:host=>'s2'})
+    DB.remove_servers(:shard1, :shard2)
+    
+* When you attempt to disconnect from a server that has connections
+  currently in use, Sequel will now schedule those connections to
+  be disconnected when they are returned to the pool.  Previously,
+  Sequel disconnected available connections, but ignored connections
+  currently in use, so it wasn't possible to guarantee complete
+  disconnection from the server.  Even with this new feature, you can
+  only guarantee eventual disconnection, since disconnection of
+  connections in use happens asynchronously.
+  
+* Database#disconnect now accepts a :servers option specifying the
+  server(s) from which to disconnect.  This should be a symbol or
+  array of symbols representing servers/shards.  Only those specified
+  will be disconnected:
+  
+    DB.disconnect(:servers=>[:shard1, :shard2])
+
+* A validates_type validation was added to the validation_helpers
+  plugin.  It allows you to check that a given column contains
+  the correct type.  I can be helpful if you are also using the
+  serialization plugin to store serialized ruby objects, by making
+  sure that the objects are of the correct type (e.g. Hash):
+  
+    def validate
+      validates_type(Hash, :options)
+    end
+
+* Sequel::SQL::Expression#== is now supported for all expressions:
+
+    :column.qualify(:table).cast(:type) == \
+      :column.qualify(:table).cast(:type)
+    # => true
+    :column.qualify(:table).cast(:type) == \
+      :other_column.qualify(:table).cast(:type)
+    # => false
+
+* When using the generic File type to create blob columns on
+  MySQL, you can specify the specific database type by using the
+  :size option (with :tiny, :medium, and :long values recognized):
+  
+    DB.create_table(:docs){File :body, :size=>:long} # longblob
+
+* The mysql adapter will now default to using mysqlplus, falling
+  back to use mysql.  mysqlplus is significantly better for threaded
+  code because queries do not block the entire interpreter.
+
+* The JDBC adapter is now able to detect certain types of disconnect
+  errors.
+  
+* ConnectionPool.servers and Database.servers were added, which
+  return an array of symbols specifying the servers/shards in use.
+
+Other Improvements
+------------------
+
+* The single-threaded connection pool now raises
+  DatabaseConnectionErrors if unable to connect, so it now operates
+  more similarly to the default connection pool.
+
+* The single-threaded connection pool now operates more similar
+  to the default connection pool when given a nonexistent server.
+
+* PGErrors are now correctly converted to DatabaseErrors in the
+  postgres adapter when preparing statements or executing prepared
+  statements.
+  
+* DatabaseDisconnectErrors are now raised correctly in the postgres
+  adapter if the connection status is not OK after a query raises an
+  error.
+
+* In the mysql adapter, multiple statements in a single query should
+  now be handled correctly in the all cases, not just when using
+  Dataset#each.  So you can now submit multiple queries in a single
+  string to Database#run.
+
+* Model object creation on Microsoft SQL Server 2000 once again
+  works correctly.  Previously, an optimization was used that was
+  only supported on 2005+.
+
+* Backslashes are no longer doubled inside string literals when
+  connecting to Microsoft SQL Server.
+  
+* The ORDER clause now correctly comes after the HAVING clause on
+  Microsoft SQL Server.
+  
+* Sequel now checks that there is an active transaction before
+  rolling back transactions on Microsoft SQL Server, since
+  there are cases where Microsoft SQL Server will roll back
+  transactions implicitly.
+  
+* Blobs are now handled correctly when connecting to H2.
+
+* 64-bit integers are now handled correctly in JDBC prepared
+  statements.
+
+* In the boolean_readers plugin, correctly handle columns not in
+  the db_schema, and don't raise an error if the model's columns
+  can't be determined.
+  
+* In the identity_map plugin, remove instances from the cache if they
+  are deleted or destroyed.
+
+Backwards Compatibility
+-----------------------
+
+* Dataset::FROM_SELF_KEEP_OPTS was merged into
+  Dataset::NON_SQL_OPTIONS.  While used in different places, they
+  were used for the same purpose, and entries missing from one should
+  have been included in the other.
+
+* The connection pool internals changed substantially.  Now,
+  ConnectionPool #allocated and #available_connections will return
+  nil instead of an array or hash if they are called with a
+  nonexistent server.  These are generally only used internally,
+  though they are part of the public API.  #created_count and #size
+  still return the size of the :default server when called with a
+  nonexistent server, though.
+
+* The meta_eval and metaclass private methods were removed from
+  Sequel::MetaProgramming (only the meta_def public method remains).
+  If you want these methods, use the metaid gem.
+
+* The irregular ox->oxen pluralization rule was removed from the
+  default inflections, as it screws up the more common box->boxes.
