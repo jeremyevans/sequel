@@ -360,7 +360,7 @@ module Sequel
     # and SQL::StringExpression).
     #
     # This defines the like (LIKE) and ilike methods, used for pattern matching.
-    # like is case sensitive, ilike is case insensitive.
+    # like is case sensitive (if the database supports it), ilike is case insensitive.
     module StringMethods
       # Create a BooleanExpression case insensitive pattern match of self
       # with the given patterns.  See StringExpression.like.
@@ -368,7 +368,7 @@ module Sequel
         StringExpression.like(self, *(ces << {:case_insensitive=>true}))
       end
 
-      # Create a BooleanExpression case sensitive pattern match of self with
+      # Create a BooleanExpression case sensitive (if the database supports it) pattern match of self with
       # the given patterns.  See StringExpression.like.
       def like(*ces)
         StringExpression.like(self, *ces)
