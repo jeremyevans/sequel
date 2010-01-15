@@ -50,7 +50,7 @@ module Sequel
           begin
             r = conn.run(sql)
             yield(r) if block_given?
-          rescue ::ODBC::Error => e
+          rescue ::ODBC::Error, ArgumentError => e
             raise_error(e)
           ensure
             r.drop if r
@@ -64,7 +64,7 @@ module Sequel
         synchronize(opts[:server]) do |conn|
           begin
             conn.do(sql)
-          rescue ::ODBC::Error => e
+          rescue ::ODBC::Error, ArgumentError => e
             raise_error(e)
           end
         end
