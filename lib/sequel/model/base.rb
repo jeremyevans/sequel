@@ -720,7 +720,7 @@ module Sequel
       def save(*columns)
         opts = columns.last.is_a?(Hash) ? columns.pop : {}
         if opts[:validate] != false and !valid?
-          raise(ValidationFailed, errors.full_messages.join(', ')) if raise_on_save_failure 
+          raise(ValidationFailed.new(errors)) if raise_on_save_failure
           return
         end
         checked_save_failure{checked_transaction(opts){_save(columns, opts)}}

@@ -1,3 +1,7 @@
+=== HEAD
+
+* Add Sequel::ValidationFailed#errors (tmm1)
+
 === 3.8.0 (2010-01-04)
 
 * Catch cases in the postgres adapter where exceptions weren't converted or raised appropriately (jeremyevans)
