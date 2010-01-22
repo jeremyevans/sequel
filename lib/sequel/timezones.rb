@@ -49,8 +49,8 @@ module Sequel
     # same time and just modifying the timezone.
     def convert_input_datetime_no_offset(v, input_timezone)
       case input_timezone
-      when :utc
-        v# DateTime assumes UTC if no offset is given
+      when :utc, nil
+        v # DateTime assumes UTC if no offset is given
       when :local
         v.new_offset(LOCAL_DATETIME_OFFSET) - LOCAL_DATETIME_OFFSET
       else

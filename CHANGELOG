@@ -1,5 +1,7 @@
 === HEAD
 
+* Correctly handle ODBC timestamps when database_timezone is nil (jeremyevans)
+
 * Add Sequel::ValidationFailed#errors (tmm1)
 
 === 3.8.0 (2010-01-04)
