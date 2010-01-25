@@ -366,6 +366,7 @@ module Sequel
           ps.prepared_statement_name = name
           db.prepared_statements[name] = ps
         end
+        ps.prepared_sql
         ps
       end
       

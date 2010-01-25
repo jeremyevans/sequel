@@ -3036,7 +3036,7 @@ context Sequel::Dataset::UnnumberedArgumentMapper do
   end
   
   specify "should submitted the SQL to the database with placeholders and bind variables" do
-    @ps.each{|p| p.call(:n=>1)}
+    @ps.each{|p| p.prepared_sql; p.call(:n=>1)}
     @db.sqls.should == [["SELECT * FROM items WHERE (num = ?)", 1],
       ["SELECT * FROM items WHERE (num = ?)", 1],
       ["SELECT * FROM items WHERE (num = ?) LIMIT 1", 1],

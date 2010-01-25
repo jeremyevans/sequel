@@ -192,6 +192,7 @@ module Sequel
         ps = to_prepared_statement(type, values)
         ps.extend(PreparedStatementMethods)
         db.prepared_statements[name] = ps if name
+        ps.prepared_sql
         ps
       end
       
