@@ -158,13 +158,17 @@ context "Sequel::Migrator" do
     end
     @db = dbc.new
     
-    File.open('001_create_sessions.rb', 'w') {|f| f << MIGRATION_001}
-    File.open('002_create_nodes.rb', 'w') {|f| f << MIGRATION_002}
-    File.open('003_create_users.rb', 'w') {|f| f << MIGRATION_003}
-    File.open('005_5_create_attributes.rb', 'w') {|f| f << MIGRATION_005}
-    Dir.mkdir("alt_app")
-    File.open('alt_app/001_create_alt_basic.rb', 'w') {|f| f << ALT_MIGRATION_001}
-    File.open('alt_app/003_create_alt_advanced.rb', 'w') {|f| f << ALT_MIGRATION_003}
+    @dirname = "migrate_#{$$}"
+    Dir.mkdir(@dirname)
+    File.open("#{@dirname}/001_create_sessions.rb", 'w') {|f| f << MIGRATION_001}
+    File.open("#{@dirname}/002_create_nodes.rb", 'w') {|f| f << MIGRATION_002}
+    File.open("#{@dirname}/003_create_users.rb", 'w') {|f| f << MIGRATION_003}
+    File.open("#{@dirname}/005_5_create_attributes.rb", 'w') {|f| f << MIGRATION_005}
+    
+    @alt_dirname = "migrate_alt_#{$$}"
+    Dir.mkdir(@alt_dirname)
+    File.open("#{@alt_dirname}/001_create_alt_basic.rb", 'w') {|f| f << ALT_MIGRATION_001}
+    File.open("#{@alt_dirname}/003_create_alt_advanced.rb", 'w') {|f| f << ALT_MIGRATION_003}
   end
   
   after do
@@ -175,47 +179,48 @@ context "Sequel::Migrator" do
     Object.send(:remove_const, "CreateAltBasic") if Object.const_defined?("CreateAltBasic")
     Object.send(:remove_const, "CreateAltAdvanced") if Object.const_defined?("CreateAltAdvanced")
 
-    File.delete('001_create_sessions.rb')
-    File.delete('002_create_nodes.rb')
-    File.delete('003_create_users.rb')
-    File.delete('005_5_create_attributes.rb')
-    File.delete("alt_app/001_create_alt_basic.rb")
-    File.delete("alt_app/003_create_alt_advanced.rb")
-    Dir.rmdir("alt_app")
+    File.delete("#{@dirname}/001_create_sessions.rb")
+    File.delete("#{@dirname}/002_create_nodes.rb")
+    File.delete("#{@dirname}/003_create_users.rb")
+    File.delete("#{@dirname}/005_5_create_attributes.rb")
+    Dir.rmdir(@dirname)
+    File.delete("#{@alt_dirname}/001_create_alt_basic.rb")
+    File.delete("#{@alt_dirname}/003_create_alt_advanced.rb")
+    Dir.rmdir(@alt_dirname)
   end
   
   specify "#migration_files should return the list of files for a specified version range" do
-    Sequel::Migrator.migration_files('.', 1..1).should == ['./001_create_sessions.rb']
-    Sequel::Migrator.migration_files('.', 1..3).should == ['./001_create_sessions.rb', './002_create_nodes.rb', './003_create_users.rb']
-    Sequel::Migrator.migration_files('.', 3..6).should == ['./003_create_users.rb', './005_5_create_attributes.rb']
-    Sequel::Migrator.migration_files('.', 7..8).should == []
-    Sequel::Migrator.migration_files('alt_app', 1..1).should == ['alt_app/001_create_alt_basic.rb']
-    Sequel::Migrator.migration_files('alt_app', 1..3).should == ['alt_app/001_create_alt_basic.rb','alt_app/003_create_alt_advanced.rb']
+    Sequel::Migrator.migration_files(@dirname, 1..1).map{|f| File.basename(f)}.should == ['001_create_sessions.rb']
+    Sequel::Migrator.migration_files(@dirname, 1..3).map{|f| File.basename(f)}.should == ['001_create_sessions.rb', '002_create_nodes.rb', '003_create_users.rb']
+    Sequel::Migrator.migration_files(@dirname, 3..6).map{|f| File.basename(f)}.should == ['003_create_users.rb', '005_5_create_attributes.rb']
+    Sequel::Migrator.migration_files(@dirname, 7..8).map{|f| File.basename(f)}.should == []
+    Sequel::Migrator.migration_files(@alt_dirname, 1..1).map{|f| File.basename(f)}.should == ['001_create_alt_basic.rb']
+    Sequel::Migrator.migration_files(@alt_dirname, 1..3).map{|f| File.basename(f)}.should == ['001_create_alt_basic.rb','003_create_alt_advanced.rb']
   end
   
   specify "#latest_migration_version should return the latest version available" do
-    Sequel::Migrator.latest_migration_version('.').should == 5
-    Sequel::Migrator.latest_migration_version('alt_app').should == 3
+    Sequel::Migrator.latest_migration_version(@dirname).should == 5
+    Sequel::Migrator.latest_migration_version(@alt_dirname).should == 3
   end
   
   specify "#migration_classes should load the migration classes for the specified range for the up direction" do
-    Sequel::Migrator.migration_classes('.', 3, 0, :up).should == [CreateSessions, CreateNodes, CreateUsers]
-    Sequel::Migrator.migration_classes('alt_app', 3, 0, :up).should == [CreateAltBasic, CreateAltAdvanced]
+    Sequel::Migrator.migration_classes(@dirname, 3, 0, :up).should == [CreateSessions, CreateNodes, CreateUsers]
+    Sequel::Migrator.migration_classes(@alt_dirname, 3, 0, :up).should == [CreateAltBasic, CreateAltAdvanced]
   end
   
   specify "#migration_classes should load the migration classes for the specified range for the down direction" do
-    Sequel::Migrator.migration_classes('.', 0, 5, :down).should == [CreateAttributes, CreateUsers, CreateNodes, CreateSessions]
-    Sequel::Migrator.migration_classes('alt_app', 0, 3, :down).should == [CreateAltAdvanced, CreateAltBasic]
+    Sequel::Migrator.migration_classes(@dirname, 0, 5, :down).should == [CreateAttributes, CreateUsers, CreateNodes, CreateSessions]
+    Sequel::Migrator.migration_classes(@alt_dirname, 0, 3, :down).should == [CreateAltAdvanced, CreateAltBasic]
   end
   
   specify "#migration_classes should start from current + 1 for the up direction" do
-    Sequel::Migrator.migration_classes('.', 3, 1, :up).should == [CreateNodes, CreateUsers]
-    Sequel::Migrator.migration_classes('alt_app', 3, 2, :up).should == [CreateAltAdvanced]
+    Sequel::Migrator.migration_classes(@dirname, 3, 1, :up).should == [CreateNodes, CreateUsers]
+    Sequel::Migrator.migration_classes(@alt_dirname, 3, 2, :up).should == [CreateAltAdvanced]
   end
   
   specify "#migration_classes should end on current + 1 for the down direction" do
-    Sequel::Migrator.migration_classes('.', 2, 5, :down).should == [CreateAttributes, CreateUsers]
-    Sequel::Migrator.migration_classes('alt_app', 2, 4, :down).should == [CreateAltAdvanced]
+    Sequel::Migrator.migration_classes(@dirname, 2, 5, :down).should == [CreateAttributes, CreateUsers]
+    Sequel::Migrator.migration_classes(@alt_dirname, 2, 4, :down).should == [CreateAltAdvanced]
   end
   
   specify "#schema_info_dataset should automatically create the schema_info table" do
@@ -266,12 +271,12 @@ context "Sequel::Migrator" do
   end
   
   specify "should apply migrations correctly in the up direction" do
-    Sequel::Migrator.apply(@db, '.', 3, 2)
+    Sequel::Migrator.apply(@db, @dirname, 3, 2)
     @db.creates.should == [3333]
     
     Sequel::Migrator.get_current_migration_version(@db).should == 3
 
-    Sequel::Migrator.apply(@db, '.', 5)
+    Sequel::Migrator.apply(@db, @dirname, 5)
     @db.creates.should == [3333, 5555]
 
     Sequel::Migrator.get_current_migration_version(@db).should == 5
@@ -286,7 +291,7 @@ context "Sequel::Migrator" do
   end
   
   specify "should apply migrations correctly in the down direction" do
-    Sequel::Migrator.apply(@db, '.', 1, 5)
+    Sequel::Migrator.apply(@db, @dirname, 1, 5)
     @db.drops.should == [5555, 3333, 2222]
 
     Sequel::Migrator.get_current_migration_version(@db).should == 1
@@ -297,7 +302,7 @@ context "Sequel::Migrator" do
   end
 
   specify "should apply migrations up to the latest version if no target is given" do
-    Sequel::Migrator.apply(@db, '.')
+    Sequel::Migrator.apply(@db, @dirname)
     @db.creates.should == [1111, 2222, 3333, 5555]
 
     Sequel::Migrator.get_current_migration_version(@db).should == 5
@@ -309,7 +314,7 @@ context "Sequel::Migrator" do
   end
 
   specify "should apply migrations down to 0 version correctly" do
-    Sequel::Migrator.apply(@db, '.', 0, 5)
+    Sequel::Migrator.apply(@db, @dirname, 0, 5)
     @db.drops.should == [5555, 3333, 2222, 1111]
 
     Sequel::Migrator.get_current_migration_version(@db).should == 0
@@ -320,8 +325,8 @@ context "Sequel::Migrator" do
   end
   
   specify "should return the target version" do
-    Sequel::Migrator.apply(@db, '.', 3, 2).should == 3
-    Sequel::Migrator.apply(@db, '.', 0).should == 0
-    Sequel::Migrator.apply(@db, '.').should == 5
+    Sequel::Migrator.apply(@db, @dirname, 3, 2).should == 3
+    Sequel::Migrator.apply(@db, @dirname, 0).should == 0
+    Sequel::Migrator.apply(@db, @dirname).should == 5
   end
 end
