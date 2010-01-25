@@ -18,6 +18,7 @@ module Sequel
       # Set the bind arguments based on the hash and call super.
       def call(bind_vars={}, &block)
         ds = bind(bind_vars)
+        ds.prepared_sql
         ds.bind_arguments = ds.map_to_prepared_args(ds.opts[:bind_vars])
         ds.run(&block)
       end
