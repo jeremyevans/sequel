@@ -49,34 +49,34 @@ describe "Prepared Statements and Bound Arguments" do
     @ds.filter(:number=>@ds.ba(:$n)).bind(:n=>1).bind(:n=>10).call(:first).should == {:id=>1, :number=>10}
   end
 
-  specify "should support placeholder literal strings" do
+  specify "should support placeholder literal strings with call" do
     @ds.filter("number = ?", @ds.ba(:$n)).call(:select, :n=>10).should == [{:id=>1, :number=>10}]
   end
 
-  specify "should support named placeholder literal strings and handle multiple named placeholders correctly" do
+  specify "should support named placeholder literal strings and handle multiple named placeholders correctly with call" do
     @ds.filter("number = :n", :n=>@ds.ba(:$n)).call(:select, :n=>10).should == [{:id=>1, :number=>10}]
     @ds.insert(:number=>20)
     @ds.insert(:number=>30)
     @ds.filter("number > :n1 AND number < :n2 AND number = :n3", :n3=>@ds.ba(:$n3), :n2=>@ds.ba(:$n2), :n1=>@ds.ba(:$n1)).call(:select, :n3=>20, :n2=>30, :n1=>10).should == [{:id=>2, :number=>20}]
   end
 
-  specify "should support datasets with static sql and placeholders" do
+  specify "should support datasets with static sql and placeholders with call" do
     INTEGRATION_DB["SELECT * FROM items WHERE number = ?", @ds.ba(:$n)].call(:select, :n=>10).should == [{:id=>1, :number=>10}]
   end
 
-  specify "should support subselects" do
+  specify "should support subselects with call" do
     @ds.filter(:id=>:$i).filter(:number=>@ds.select(:number).filter(:number=>@ds.ba(:$n))).filter(:id=>:$j).call(:select, :n=>10, :i=>1, :j=>1).should == [{:id=>1, :number=>10}]
   end
 
-  specify "should support subselects with literal strings" do
+  specify "should support subselects with literal strings with call" do
     @ds.filter(:id=>:$i, :number=>@ds.select(:number).filter("number = ?", @ds.ba(:$n))).call(:select, :n=>10, :i=>1).should == [{:id=>1, :number=>10}]
   end
 
-  specify "should support subselects with static sql and placeholders" do
+  specify "should support subselects with static sql and placeholders with call" do
     @ds.filter(:id=>:$i, :number=>INTEGRATION_DB["SELECT number FROM items WHERE number = ?", @ds.ba(:$n)]).call(:select, :n=>10, :i=>1).should == [{:id=>1, :number=>10}]
   end
 
-  specify "should support subselects of subselects" do
+  specify "should support subselects of subselects with call" do
     @ds.filter(:id=>:$i).filter(:number=>@ds.select(:number).filter(:number=>@ds.select(:number).filter(:number=>@ds.ba(:$n)))).filter(:id=>:$j).call(:select, :n=>10, :i=>1, :j=>1).should == [{:id=>1, :number=>10}]
   end
 
@@ -113,6 +113,37 @@ describe "Prepared Statements and Bound Arguments" do
       # dropping of a table when using SQLite over JDBC
       INTEGRATION_DB.synchronize{|c| c.prepared_statements[:select_n][1].close}
     end
+  end
+
+  specify "should support placeholder literal strings with prepare" do
+    @ds.filter("number = ?", @ds.ba(:$n)).prepare(:select, :seq_select).call(:n=>10).should == [{:id=>1, :number=>10}]
+  end
+
+  specify "should support named placeholder literal strings and handle multiple named placeholders correctly with prepare" do
+    @ds.filter("number = :n", :n=>@ds.ba(:$n)).prepare(:select, :seq_select).call(:n=>10).should == [{:id=>1, :number=>10}]
+    @ds.insert(:number=>20)
+    @ds.insert(:number=>30)
+    @ds.filter("number > :n1 AND number < :n2 AND number = :n3", :n3=>@ds.ba(:$n3), :n2=>@ds.ba(:$n2), :n1=>@ds.ba(:$n1)).call(:select, :n3=>20, :n2=>30, :n1=>10).should == [{:id=>2, :number=>20}]
+  end
+
+  specify "should support datasets with static sql and placeholders with prepare" do
+    INTEGRATION_DB["SELECT * FROM items WHERE number = ?", @ds.ba(:$n)].prepare(:select, :seq_select).call(:n=>10).should == [{:id=>1, :number=>10}]
+  end
+
+  specify "should support subselects with prepare" do
+    @ds.filter(:id=>:$i).filter(:number=>@ds.select(:number).filter(:number=>@ds.ba(:$n))).filter(:id=>:$j).prepare(:select, :seq_select).call(:n=>10, :i=>1, :j=>1).should == [{:id=>1, :number=>10}]
+  end
+
+  specify "should support subselects with literal strings with prepare" do
+    @ds.filter(:id=>:$i, :number=>@ds.select(:number).filter("number = ?", @ds.ba(:$n))).prepare(:select, :seq_select).call(:n=>10, :i=>1).should == [{:id=>1, :number=>10}]
+  end
+
+  specify "should support subselects with static sql and placeholders with prepare" do
+    @ds.filter(:id=>:$i, :number=>INTEGRATION_DB["SELECT number FROM items WHERE number = ?", @ds.ba(:$n)]).prepare(:select, :seq_select).call(:n=>10, :i=>1).should == [{:id=>1, :number=>10}]
+  end
+
+  specify "should support subselects of subselects with prepare" do
+    @ds.filter(:id=>:$i).filter(:number=>@ds.select(:number).filter(:number=>@ds.select(:number).filter(:number=>@ds.ba(:$n)))).filter(:id=>:$j).prepare(:select, :seq_select).call(:n=>10, :i=>1, :j=>1).should == [{:id=>1, :number=>10}]
   end
 
   specify "should support prepared statements with insert" do
