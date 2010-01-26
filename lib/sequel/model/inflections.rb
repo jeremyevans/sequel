@@ -39,7 +39,14 @@ module Sequel
     @plurals, @singulars, @uncountables = [], [], []
 
     class << self
-      attr_reader :plurals, :singulars, :uncountables
+      # Array of 2 element arrays, first containing a regex, and the second containing a substitution pattern, used for plurization.
+      attr_reader :plurals
+
+      # Array of 2 element arrays, first containing a regex, and the second containing a substitution pattern, used for singularization.
+      attr_reader :singulars
+
+      # Array of strings for words were the singular form is the same as the plural form
+      attr_reader :uncountables
     end
 
     # Clears the loaded inflections within a given scope (default is :all). Give the scope as a symbol of the inflection type,

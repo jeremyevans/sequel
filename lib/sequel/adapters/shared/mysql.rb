@@ -4,8 +4,17 @@ module Sequel
 
   module MySQL
     class << self
-      # Set the default options used for CREATE TABLE
-      attr_accessor :default_charset, :default_collate, :default_engine
+      # Set the default charset used for CREATE TABLE.  You can pass the
+      # :charset option to create_table to override this setting.
+      attr_accessor :default_charset
+
+      # Set the default collation used for CREATE TABLE.  You can pass the
+      # :collate option to create_table to override this setting.
+      attr_accessor :default_collate
+
+      # Set the default engine used for CREATE TABLE.  You can pass the
+      # :engine option to create_table to override this setting.
+      attr_accessor :default_engine
     end
 
     # Methods shared by Database instances that connect to MySQL,

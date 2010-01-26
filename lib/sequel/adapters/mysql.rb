@@ -9,23 +9,6 @@ Sequel.require %w'shared/mysql utils/stored_procedures', 'adapters'
 
 module Sequel
   # Module for holding all MySQL-related classes and modules for Sequel.
-  #
-  # A class level convert_invalid_date_time accessor exists if
-  # the native adapter is used.  If set to nil or :nil, the adapter treats dates
-  # like 0000-00-00 and times like 838:00:00 as nil values.  If set to :string,
-  # it returns the strings as is.  It is false by default, which means that
-  # invalid dates and times will raise errors.
-  #
-  #   Sequel::MySQL.convert_invalid_date_time = nil
-  #
-  # Sequel converts the column type tinyint(1) to a boolean by default when
-  # using the native MySQL adapter.  You can turn off the conversion to use
-  # tinyint as an integer:
-  #
-  #   Sequel::MySQL.convert_tinyint_to_bool = false
-  #
-  # In most cases these settings need to be made after the adapter has been
-  # loaded, since the Sequel::MySQL module probably won't exist before then.
   module MySQL
     # Mapping of type numbers to conversion procs
     MYSQL_TYPES = {}
@@ -49,7 +32,16 @@ module Sequel
     @convert_tinyint_to_bool = true
 
     class << self
-      attr_accessor :convert_invalid_date_time, :convert_tinyint_to_bool
+      # By default, Sequel raises an exception if in invalid date or time is used.
+      # However, if this is set to nil or :nil, the adapter treats dates
+      # like 0000-00-00 and times like 838:00:00 as nil values.  If set to :string,
+      # it returns the strings as is.  
+      attr_accessor :convert_invalid_date_time
+
+      # Sequel converts the column type tinyint(1) to a boolean by default when
+      # using the native MySQL adapter.  You can turn off the conversion by setting
+      # this to false.
+      attr_accessor :convert_tinyint_to_bool
     end
 
     # If convert_invalid_date_time is nil, :nil, or :string and
