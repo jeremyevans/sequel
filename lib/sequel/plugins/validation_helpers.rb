@@ -18,8 +18,8 @@ module Sequel
     #   attribute(s) to validate.
     # Options:
     # * :allow_blank - Whether to skip the validation if the value is blank.  You should
-    #   make sure all objects respond to blank if you use this option, which you can do by
-    #   requiring 'sequel/extensions/blank'
+    #   make sure all objects respond to blank if you use this option, which you can do by:
+    #     Sequel.extension :blank
     # * :allow_missing - Whether to skip the validation if the attribute isn't a key in the
     #   values hash.  This is different from allow_nil, because Sequel only sends the attributes
     #   in the values when doing an insert or update.  If the attribute is not present, Sequel

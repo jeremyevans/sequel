@@ -14,18 +14,18 @@ module Sequel
     # Contains procs keyed on sub adapter type that extend the
     # given database object so it supports the correct database type.
     DATABASE_SETUP = {:postgres=>proc do |db|
-        require 'do_postgres'
-        Sequel.require 'adapters/do/postgres'
+        Sequel.tsk_require 'do_postgres'
+        Sequel.ts_require 'adapters/do/postgres'
         db.extend(Sequel::DataObjects::Postgres::DatabaseMethods)
       end,
       :mysql=>proc do |db|
-        require 'do_mysql'
-        Sequel.require 'adapters/do/mysql'
+        Sequel.tsk_require 'do_mysql'
+        Sequel.ts_require 'adapters/do/mysql'
         db.extend(Sequel::DataObjects::MySQL::DatabaseMethods)
       end,
       :sqlite3=>proc do |db|
-        require 'do_sqlite3'
-        Sequel.require 'adapters/do/sqlite'
+        Sequel.tsk_require 'do_sqlite3'
+        Sequel.ts_require 'adapters/do/sqlite'
         db.extend(Sequel::DataObjects::SQLite::DatabaseMethods)
       end
     }
@@ -43,12 +43,11 @@ module Sequel
       # raise an error immediately if the connection doesn't have a
       # uri, since DataObjects requires one.
       def initialize(opts)
-        @opts = opts
+        super
         raise(Error, "No connection string specified") unless uri
         if prok = DATABASE_SETUP[subadapter.to_sym]
           prok.call(self)
         end
-        super(opts)
       end
       
       # Setup a DataObjects::Connection to the database.
@@ -145,11 +144,6 @@ module Sequel
         :execute_non_query
       end
       
-      # The DataObjects adapter should convert exceptions by default.
-      def connection_pool_default_options
-        super.merge(:pool_convert_exceptions=>false)
-      end
-
       # Close the given database connection.
       def disconnect_connection(c)
         c.close

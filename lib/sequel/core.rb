@@ -51,6 +51,9 @@ module Sequel
   @datetime_class = Time
   @virtual_row_instance_eval = true
   
+  # Mutex used to protect file loading
+  @require_mutex = Mutex.new
+  
   class << self
     # Sequel converts two digit years in Dates and DateTimes by default,
     # so 01/02/03 is interpreted at January 2nd, 2003, and 12/13/99 is interpreted
@@ -63,6 +66,9 @@ module Sequel
     attr_accessor :datetime_class
 
     attr_accessor :virtual_row_instance_eval
+    
+    # Alias to the standard version of require
+    alias k_require require
   end
 
   # Returns true if the passed object could be a specifier of conditions, false otherwise.
@@ -114,8 +120,8 @@ module Sequel
   #
   #   Sequel.extension(:schema_dumper)
   #   Sequel.extension(:pagination, :query)
-  def self.extension(*extensions)
-    require(extensions, 'extensions')
+  def self.extension(*args)
+    @require_mutex.synchronize{nts_extension(*args)}
   end
   
   # Set the method to call on identifiers going into the database.  This affects
@@ -149,6 +155,12 @@ module Sequel
     Database.identifier_output_method = value
   end
   
+  # A non-thread safe version of Sequel.extension, should be used only in
+  # code that is already protected by Sequel's require mutex.
+  def self.nts_extension(*extensions)
+    require(extensions, 'extensions')
+  end
+  
   # Set whether to quote identifiers for all databases by default. By default,
   # Sequel quotes identifiers in all SQL strings, so to turn that off:
   #
@@ -156,7 +168,7 @@ module Sequel
   def self.quote_identifiers=(value)
     Database.quote_identifiers = value
   end
-
+  
   # Require all given files which should be in the same or a subdirectory of
   # this file.  If a subdir is given, assume all files are in that subdir.
   def self.require(files, subdir=nil)
@@ -203,6 +215,16 @@ module Sequel
     rescue => e
       raise convert_exception_class(e, InvalidValue)
     end
+  end
+
+  # Same as Sequel.require, but wrapped in a mutex in order to be thread safe.
+  def self.ts_require(*args)
+    @require_mutex.synchronize{require(*args)}
+  end
+  
+  # Same as Kernel.require, but wrapped in a mutex in order to be thread safe.
+  def self.tsk_require(*args)
+    @require_mutex.synchronize{k_require(*args)}
   end
 
   # If the supplied block takes a single argument,

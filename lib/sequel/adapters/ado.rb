@@ -7,11 +7,11 @@ module Sequel
       set_adapter_scheme :ado
 
       def initialize(opts)
-        super(opts)
-        opts[:driver] ||= 'SQL Server'
-        case opts[:driver]
+        super
+        @opts[:driver] ||= 'SQL Server'
+        case @opts[:driver]
         when 'SQL Server'
-          Sequel.require 'adapters/ado/mssql'
+          Sequel.ts_require 'adapters/ado/mssql'
           extend Sequel::ADO::MSSQL::DatabaseMethods
         end
       end
@@ -69,10 +69,6 @@ module Sequel
         end
       end
       
-      def connection_pool_default_options
-        super.merge(:pool_convert_exceptions=>false)
-      end
-
       def disconnect_connection(conn)
         conn.Close
       end

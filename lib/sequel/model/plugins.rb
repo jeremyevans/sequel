@@ -60,25 +60,15 @@ module Sequel
       
       private
   
-      # Returns the new style location for the plugin name.
-      def plugin_gem_location(plugin)
-        "sequel/plugins/#{plugin}"
-      end
-
-      # Returns the old style location for the plugin name.
-      def plugin_gem_location_old(plugin)
-        "sequel_#{plugin}"
-      end
-  
       # Returns the module for the specified plugin. If the module is not 
       # defined, the corresponding plugin gem is automatically loaded.
       def plugin_module(plugin)
         module_name = plugin.to_s.gsub(/(^|_)(.)/){|x| x[-1..-1].upcase}
         if not Sequel::Plugins.const_defined?(module_name)
           begin
-            require plugin_gem_location(plugin)
+            Sequel.ts_require plugin, 'plugins'
           rescue LoadError
-            require plugin_gem_location_old(plugin)
+            Sequel.tsk_require "sequel_#{plugin}"
           end
         end
         Sequel::Plugins.const_get(module_name)

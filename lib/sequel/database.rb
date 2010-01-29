@@ -80,20 +80,22 @@ module Sequel
     # is given, it is used as the connection_proc for the ConnectionPool.
     def initialize(opts = {}, &block)
       @opts ||= opts
+      @opts = connection_pool_default_options.merge(@opts)
+      @loggers = Array(@opts[:logger]) + Array(@opts[:loggers])
+      @opts[:disconnection_proc] ||= proc{|conn| disconnect_connection(conn)}
+      block ||= proc{|server| connect(server)}
+      @opts[:servers] = {} if @opts[:servers].is_a?(String)
       
-      @single_threaded = opts.include?(:single_threaded) ? typecast_value_boolean(opts[:single_threaded]) : @@single_threaded
+      @opts[:single_threaded] = @single_threaded = @opts.include?(:single_threaded) ? typecast_value_boolean(@opts[:single_threaded]) : @@single_threaded
       @schemas = {}
-      @default_schema = opts.include?(:default_schema) ? opts[:default_schema] : default_schema_default
+      @default_schema = opts.include?(:default_schema) ? @opts[:default_schema] : default_schema_default
       @prepared_statements = {}
       @transactions = []
       @identifier_input_method = nil
       @identifier_output_method = nil
       @quote_identifiers = nil
-      @pool = (@single_threaded ? SingleThreadedPool : ConnectionPool).new(connection_pool_default_options.merge(opts), &block)
-      @pool.connection_proc = proc{|server| connect(server)} unless block
-      @pool.disconnection_proc = proc{|conn| disconnect_connection(conn)} unless opts[:disconnection_proc]
+      @pool = ConnectionPool.get_pool(@opts, &block)
 
-      @loggers = Array(opts[:logger]) + Array(opts[:loggers])
       ::Sequel::DATABASES.push(self)
     end
     
@@ -108,7 +110,7 @@ module Sequel
       unless klass = ADAPTER_MAP[scheme]
         # attempt to load the adapter file
         begin
-          Sequel.require "adapters/#{scheme}"
+          Sequel.ts_require "adapters/#{scheme}"
         rescue LoadError => e
           raise Sequel.convert_exception_class(e, AdapterNotFound)
         end
@@ -139,7 +141,7 @@ module Sequel
           scheme = :dbi if scheme =~ /\Adbi-/
           c = adapter_class(scheme)
           uri_options = c.send(:uri_to_options, uri)
-          uri.query.split('&').collect{|s| s.split('=')}.each{|k,v| uri_options[k.to_sym] = v} unless uri.query.to_s.strip.empty?
+          uri.query.split('&').collect{|s| s.split('=')}.each{|k,v| uri_options[k.to_sym] = v if k && !k.empty?} unless uri.query.to_s.strip.empty?
           uri_options.entries.each{|k,v| uri_options[k] = URI.unescape(v) if v.is_a?(String)}
           opts = uri_options.merge(opts)
         end
@@ -281,7 +283,7 @@ module Sequel
     end
 
     # Connects to the database. This method should be overridden by descendants.
-    def connect
+    def connect(server)
       raise NotImplementedError, "#connect should be overridden by adapters"
     end
     

@@ -201,11 +201,6 @@ module Sequel
         :query
       end
       
-      # MySQL doesn't need the connection pool to convert exceptions.
-      def connection_pool_default_options
-        super.merge(:pool_convert_exceptions=>false)
-      end
-      
       # The MySQL adapter main error class is Mysql::Error
       def database_error_classes
         [Mysql::Error]

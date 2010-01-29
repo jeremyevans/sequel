@@ -21,10 +21,10 @@ module Sequel
       }
       
       def initialize(opts)
-        super(opts)
-        case opts[:db_type]
+        super
+        case @opts[:db_type]
         when 'mssql'
-          Sequel.require 'adapters/shared/mssql'
+          Sequel.ts_require 'adapters/shared/mssql'
           extend Sequel::MSSQL::DatabaseMethods
         end
       end

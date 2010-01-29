@@ -254,11 +254,6 @@ module Sequel
         end
       end
 
-      # PostgreSQL doesn't need the connection pool to convert exceptions.
-      def connection_pool_default_options
-        super.merge(:pool_convert_exceptions=>false)
-      end
-      
       # Disconnect given connection
       def disconnect_connection(conn)
         begin

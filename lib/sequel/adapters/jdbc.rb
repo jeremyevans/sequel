@@ -35,35 +35,35 @@ module Sequel
     # Contains procs keyed on sub adapter type that extend the
     # given database object so it supports the correct database type.
     DATABASE_SETUP = {:postgresql=>proc do |db|
-        Sequel.require 'adapters/jdbc/postgresql'
+        Sequel.ts_require 'adapters/jdbc/postgresql'
         db.extend(Sequel::JDBC::Postgres::DatabaseMethods)
         JDBC.load_gem('postgres')
         org.postgresql.Driver
       end,
       :mysql=>proc do |db|
-        Sequel.require 'adapters/jdbc/mysql'
+        Sequel.ts_require 'adapters/jdbc/mysql'
         db.extend(Sequel::JDBC::MySQL::DatabaseMethods)
         JDBC.load_gem('mysql')
         com.mysql.jdbc.Driver
       end,
       :sqlite=>proc do |db|
-        Sequel.require 'adapters/jdbc/sqlite'
+        Sequel.ts_require 'adapters/jdbc/sqlite'
         db.extend(Sequel::JDBC::SQLite::DatabaseMethods)
         JDBC.load_gem('sqlite3')
         org.sqlite.JDBC
       end,
       :oracle=>proc do |db|
-        Sequel.require 'adapters/jdbc/oracle'
+        Sequel.ts_require 'adapters/jdbc/oracle'
         db.extend(Sequel::JDBC::Oracle::DatabaseMethods)
         Java::oracle.jdbc.driver.OracleDriver
       end,
       :sqlserver=>proc do |db|
-        Sequel.require 'adapters/jdbc/mssql'
+        Sequel.ts_require 'adapters/jdbc/mssql'
         db.extend(Sequel::JDBC::MSSQL::DatabaseMethods)
         com.microsoft.sqlserver.jdbc.SQLServerDriver
       end,
       :h2=>proc do |db|
-        Sequel.require 'adapters/jdbc/h2'
+        Sequel.ts_require 'adapters/jdbc/h2'
         db.extend(Sequel::JDBC::H2::DatabaseMethods)
         JDBC.load_gem('h2')
         org.h2.Driver
@@ -74,7 +74,7 @@ module Sequel
     # works for PostgreSQL, MySQL, and SQLite.
     def self.load_gem(name)
       begin
-        require "jdbc/#{name}"
+        Sequel.tsk_require "jdbc/#{name}"
       rescue LoadError
         # jdbc gem not used, hopefully the user has the .jar in their CLASSPATH
       end
@@ -98,13 +98,12 @@ module Sequel
       # raise an error immediately if the connection doesn't have a
       # uri, since JDBC requires one.
       def initialize(opts)
-        @opts = opts
-        @convert_types = opts.include?(:convert_types) ? typecast_value_boolean(opts[:convert_types]) : true
+        super
+        @convert_types = @opts.include?(:convert_types) ? typecast_value_boolean(@opts[:convert_types]) : true
         raise(Error, "No connection string specified") unless uri
         if match = /\Ajdbc:([^:]+)/.match(uri) and prok = DATABASE_SETUP[match[1].to_sym]
           prok.call(self)
         end
-        super(opts)
       end
       
       # Execute the given stored procedure with the give name. If a block is
@@ -238,11 +237,6 @@ module Sequel
       def begin_transaction(conn)
         conn = conn.createStatement unless supports_savepoints?
         super
-      end
-      
-      # The JDBC adapter should not need the pool to convert exceptions.
-      def connection_pool_default_options
-        super.merge(:pool_convert_exceptions=>false)
       end
       
       # Close given adapter connections
