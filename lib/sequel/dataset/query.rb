@@ -285,7 +285,7 @@ module Sequel
     #
     #   dataset.select(:a) # SELECT a FROM items
     #   dataset.select(:a, :b) # SELECT a, b FROM items
-    #   dataset.select{|o| o.a, o.sum(:b)} # SELECT a, sum(b) FROM items
+    #   dataset.select{|o| [o.a, o.sum(:b)]} # SELECT a, sum(b) FROM items
     def select(*columns, &block)
       columns += Array(Sequel.virtual_row(&block)) if block
       m = []
