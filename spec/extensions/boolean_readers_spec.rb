@@ -8,7 +8,7 @@ describe Sequel::Model, "BooleanReaders plugin" do
     end
 
     @c = Class.new(Sequel::Model(@db[:items]))
-    @p =lambda do
+    @p = proc do
       @columns = [:id, :b, :y]
       def columns; @columns; end
     end

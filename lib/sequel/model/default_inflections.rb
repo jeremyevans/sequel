@@ -1,7 +1,7 @@
 module Sequel
   # Proc that is instance evaled to create the default inflections for both the
   # model inflector and the inflector extension.
-  DEFAULT_INFLECTIONS_PROC = lambda do
+  DEFAULT_INFLECTIONS_PROC = proc do
     plural(/$/, 's')
     plural(/s$/i, 's')
     plural(/(alias|(?:stat|octop|vir|b)us)$/i, '\1es')
