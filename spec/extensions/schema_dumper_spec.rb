@@ -66,7 +66,7 @@ end
 describe "Sequel::Database dump methods" do
   before do
     @d = Sequel::Database.new
-    @d.meta_def(:tables){[:t1, :t2]}
+    @d.meta_def(:tables){|o| [:t1, :t2]}
     @d.meta_def(:schema) do |t, *o|
       case t
       when :t1
@@ -131,7 +131,7 @@ END_MIG
   end
 
   it "should sort table names when dumping a migration" do
-    @d.meta_def(:tables){[:t2, :t1]}
+    @d.meta_def(:tables){|o| [:t2, :t1]}
     @d.dump_schema_migration.should == <<-END_MIG
 Class.new(Sequel::Migration) do
   def up
@@ -210,7 +210,7 @@ END_MIG
   end
 
   it "should support dumping just indexes as a migration" do
-    @d.meta_def(:tables){[:t1]}
+    @d.meta_def(:tables){|o| [:t1]}
     @d.meta_def(:indexes) do |t|
       {:i1=>{:columns=>[:c1], :unique=>false},
        :t1_c2_c1_index=>{:columns=>[:c2, :c1], :unique=>true}}

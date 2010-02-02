@@ -214,7 +214,7 @@ module Sequel
       end 
 
       # All tables in this database
-      def tables
+      def tables(opts={})
         ts = []
         m = output_identifier_meth
         metadata(:getTables, nil, nil, nil, ['TABLE'].to_java(:string)){|h| ts << m.call(h[:table_name])}

@@ -11,7 +11,7 @@ module Sequel
     # * :same_db - Create a dump for the same database type, so
     #   don't ignore errors if the index statements fail.
     def dump_indexes_migration(options={})
-      ts = tables
+      ts = tables(options)
       <<END_MIG
 Class.new(Sequel::Migration) do
   def up
@@ -35,7 +35,7 @@ END_MIG
     # * :indexes - If set to false, don't dump indexes (they can be added
     #   later via dump_index_migration).
     def dump_schema_migration(options={})
-      ts = tables
+      ts = tables(options)
       <<END_MIG
 Class.new(Sequel::Migration) do
   def up
