@@ -1,5 +1,17 @@
 === HEAD
 
+* Have schema_dumper extension pass options hash to Database#tables (jeremyevans) (#283)
+
+* Make all internal uses of require thread-safe (jeremyevans)
+
+* Refactor connection pool into 4 separate pools, increase performance for unsharded setups (jeremyevans)
+
+* Change a couple instance_evaled lambdas into procs, for 1.9.2 compatibility (jeremyevans)
+
+* Raise error message earlier if DISTINCT ON is used on SQLite (jeremyevans)
+
+* Speed up prepared statements on SQLite (jeremyevans)
+
 * Correctly handle ODBC timestamps when database_timezone is nil (jeremyevans)
 
 * Add Sequel::ValidationFailed#errors (tmm1)
