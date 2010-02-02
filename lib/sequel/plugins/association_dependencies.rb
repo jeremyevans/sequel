@@ -16,7 +16,7 @@ module Sequel
     # and dependency action values.  You can provide the hash to the plugin call itself or
     # to the add_association_dependencies method:
     #
-    #   Business.plugin :association_dependencies, :address=>delete
+    #   Business.plugin :association_dependencies, :address=>:delete
     #   # or:
     #   Artist.plugin :association_dependencies
     #   Artist.add_association_dependencies :albums=>:destroy, :reviews=>:delete, :tags=>:nullify
