@@ -1,5 +1,7 @@
 === HEAD
 
+* Handle implicitly qualified symbols in UPDATE statements, useful for updating joined datasets (jeremyevans)
+
 * Have schema_dumper extension pass options hash to Database#tables (jeremyevans) (#283)
 
 * Make all internal uses of require thread-safe (jeremyevans)

@@ -1087,7 +1087,7 @@ module Sequel
         values = values.merge(opts[:overrides]) if opts[:overrides]
         # get values from hash
         values.map do |k, v|
-          "#{[String, Symbol].any?{|c| k.is_a?(c)} ? quote_identifier(k) : literal(k)} = #{literal(v)}"
+          "#{k.is_a?(String) && !k.is_a?(LiteralString) ? quote_identifier(k) : literal(k)} = #{literal(v)}"
         end.join(COMMA_SEPARATOR)
       else
         # copy values verbatim
