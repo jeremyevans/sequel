@@ -811,11 +811,18 @@ module Sequel
       # allow running inside a transaction
       def _destroy(opts)
         return save_failure(:destroy) if before_destroy == false
-        delete
+        _destroy_delete
         after_destroy
         self
       end
       
+      # Internal delete method to call when destroying an object,
+      # separated from delete to allow you to override destroy's version
+      # without affecting delete.
+      def _destroy_delete
+        delete
+      end
+
       def _insert
         ds = model.dataset
         if ds.respond_to?(:insert_select) and h = ds.insert_select(@values)

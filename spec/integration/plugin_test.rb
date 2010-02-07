@@ -443,3 +443,42 @@ describe "Serialization plugin" do
     Item.first.stuff.should == Item.new
   end
 end
+
+describe "OptimisticLocking plugin" do 
+  before do
+    @db = INTEGRATION_DB
+    @db.create_table!(:people) do
+      primary_key :id
+      String :name
+      Integer :lock_version, :default=>0, :null=>false
+    end
+    class ::Person < Sequel::Model(@db)
+      plugin :optimistic_locking
+      create(:name=>'John')
+    end
+  end
+  after do
+    @db.drop_table(:people)
+    Object.send(:remove_const, :Person)
+  end
+
+  specify "should raise an error when updating a stale record" do
+    p1 = Person[1]
+    p2 = Person[1]
+    p1.update(:name=>'Jim')
+    proc{p2.update(:name=>'Bob')}.should raise_error(Sequel::Plugins::OptimisticLocking::Error)
+  end
+
+  specify "should raise an error when destroying a stale record" do
+    p1 = Person[1]
+    p2 = Person[1]
+    p1.update(:name=>'Jim')
+    proc{p2.destroy}.should raise_error(Sequel::Plugins::OptimisticLocking::Error)
+  end
+
+  specify "should not raise an error when updating the same record twice" do
+    p1 = Person[1]
+    p1.update(:name=>'Jim')
+    proc{p1.update(:name=>'Bob')}.should_not raise_error
+  end
+end
