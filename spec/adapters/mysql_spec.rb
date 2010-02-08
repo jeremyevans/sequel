@@ -79,6 +79,10 @@ context "A MySQL database" do
   specify "should provide the server version" do
     MYSQL_DB.server_version.should >= 40000
   end
+  
+  specify "should handle the creation and dropping of an InnoDB table with foreign keys" do
+    proc{MYSQL_DB.create_table!(:test_innodb, :engine=>:InnoDB){primary_key :id; foreign_key :fk, :test_innodb, :key=>:id}}.should_not raise_error
+  end
 end
 
 if MYSQL_DB.class.adapter_scheme == :mysql

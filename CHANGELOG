@@ -1,5 +1,7 @@
 === HEAD
 
+* Correctly create foreign key constraints on MySQL with the InnoDB engine, but you must specify the :key option (jeremyevans)
+
 * Add an optimistic_locking plugin for models, similar to ActiveRecord's optimistic locking support (jeremyevans)
 
 * Handle implicitly qualified symbols in UPDATE statements, useful for updating joined datasets (jeremyevans)

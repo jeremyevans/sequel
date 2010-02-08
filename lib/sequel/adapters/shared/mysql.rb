@@ -129,16 +129,16 @@ module Sequel
         super
       end
       
-      # MySQL doesn't handle references as column constraints, it must use a separate table constraint
-      def column_references_column_constraint_sql(column)
-        "#{", FOREIGN KEY (#{quote_identifier(column[:name])})" unless column[:type] == :check}#{column_references_sql(column)}"
-      end
-      
       # Use MySQL specific syntax for engine type and character encoding
       def create_table_sql(name, generator, options = {})
         engine = options.include?(:engine) ? options[:engine] : Sequel::MySQL.default_engine
         charset = options.include?(:charset) ? options[:charset] : Sequel::MySQL.default_charset
         collate = options.include?(:collate) ? options[:collate] : Sequel::MySQL.default_collate
+        generator.columns.each do |c|
+          if t = c.delete(:table)
+            generator.foreign_key([c[:name]], t, c.merge(:name=>nil, :type=>:foreign_key))
+          end
+        end
         "#{super}#{" ENGINE=#{engine}" if engine}#{" DEFAULT CHARSET=#{charset}" if charset}#{" DEFAULT COLLATE=#{collate}" if collate}"
       end
 
