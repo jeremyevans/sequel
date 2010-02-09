@@ -66,7 +66,7 @@ module Sequel
         module_name = plugin.to_s.gsub(/(^|_)(.)/){|x| x[-1..-1].upcase}
         if not Sequel::Plugins.const_defined?(module_name)
           begin
-            Sequel.ts_require plugin, 'plugins'
+            Sequel.tsk_require "sequel/plugins/#{plugin}"
           rescue LoadError
             Sequel.tsk_require "sequel_#{plugin}"
           end
