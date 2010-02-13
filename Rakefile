@@ -9,7 +9,7 @@ end
 
 NAME = 'sequel'
 VERS = lambda do
-  require "lib/sequel/version"
+  require File.expand_path("../lib/sequel/version", __FILE__)
   Sequel.version
 end
 CLEAN.include ["**/.*.sw?", "pkg", ".config", "rdoc", "coverage", "www/public/*.html", "www/public/rdoc*"]
