@@ -5,6 +5,8 @@ module Sequel
     # hopefully mean full ActiveModel compliance.  This should
     # allow the full support of Sequel::Model objects in Rails 3.
     module ActiveModel
+      ClassMethods = ::ActiveModel::Naming
+
       module InstanceMethods
         # Record that an object was destroyed, for later use by
         # destroyed?

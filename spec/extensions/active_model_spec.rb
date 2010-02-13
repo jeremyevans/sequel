@@ -20,7 +20,16 @@ describe "ActiveModel plugin" do
       if f
         s = f.read
       else
-        ActiveModel::Lint.test(@m)
+        require 'test/unit'
+        require "test/unit/ui/console/testrunner"
+        $c = @c
+        class AMLintTest < Test::Unit::TestCase
+          def setup
+            @model = $c.new
+          end
+          include ActiveModel::Lint::Tests
+        end
+        Test::Unit::UI::Console::TestRunner.run(AMLintTest)
       end
     end
     s.should =~ /0 failures, 0 errors/
