@@ -832,6 +832,13 @@ context "Dataset#literal" do
     @dataset.literal(d).should == s
   end
 
+  specify "should literalize Date properly, even if to_s is overridden" do
+    d = Date.today
+    def d.to_s; "adsf" end
+    s = d.strftime("'%Y-%m-%d'")
+    @dataset.literal(d).should == s
+  end
+
   specify "should literalize Time, DateTime, Date properly if SQL standard format is required" do
     @dataset.meta_def(:requires_sql_standard_datetimes?){true}
 
