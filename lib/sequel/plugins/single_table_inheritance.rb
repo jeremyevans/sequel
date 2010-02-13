@@ -42,7 +42,7 @@ module Sequel
           super
           sk = sti_key
           sd = sti_dataset
-          subclass.set_dataset(sd.filter(sk=>subclass.name.to_s), :inherited=>true)
+          subclass.set_dataset(sd.filter(SQL::QualifiedIdentifier.new(table_name, sk)=>subclass.name.to_s), :inherited=>true)
           subclass.instance_eval do
             @sti_key = sk
             @sti_dataset = sd
