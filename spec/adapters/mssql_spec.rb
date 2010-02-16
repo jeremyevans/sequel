@@ -352,3 +352,22 @@ context "MSSSQL::Dataset#disable_insert_output" do
     MSSQL_DB[:test].disable_insert_output.send(:simple_select_all?).should == true
   end
 end
+
+context "MSSSQL::Dataset#into" do
+  before do
+    @db = MSSQL_DB
+  end
+
+  specify "should format SELECT statement" do
+    @db[:t].into(:new).select_sql.should == "SELECT * INTO NEW FROM T"
+  end
+
+  specify "should select rows into a new table" do
+    @db.create_table!(:t) {Integer :id; String :value}
+    @db[:t].insert(:id => 1, :value => "test")
+    @db << @db[:t].into(:new).select_sql
+    @db[:new].all.should == [{:id => 1, :value => "test"}]
+    @db.drop_table(:t)
+    @db.drop_table(:new)
+  end
+end

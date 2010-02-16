@@ -183,7 +183,7 @@ module Sequel
       COMMA_SEPARATOR = ', '.freeze
       DELETE_CLAUSE_METHODS = Dataset.clause_methods(:delete, %w'with from output from2 where')
       INSERT_CLAUSE_METHODS = Dataset.clause_methods(:insert, %w'with into columns output values')
-      SELECT_CLAUSE_METHODS = Dataset.clause_methods(:select, %w'with limit distinct columns from table_options join where group having order compounds')
+      SELECT_CLAUSE_METHODS = Dataset.clause_methods(:select, %w'with limit distinct columns into from table_options join where group having order compounds')
       UPDATE_CLAUSE_METHODS = Dataset.clause_methods(:update, %w'with table set output from where')
       WILDCARD = LiteralString.new('*').freeze
       CONSTANT_MAP = {:CURRENT_DATE=>'CAST(CURRENT_TIMESTAMP AS DATE)'.freeze, :CURRENT_TIME=>'CAST(CURRENT_TIMESTAMP AS TIME)'.freeze}
@@ -232,6 +232,11 @@ module Sequel
       def insert_select(*values)
         return unless supports_output_clause?
         naked.clone(default_server_opts(:sql=>output(nil, [:inserted.*]).insert_sql(*values))).single_record unless opts[:disable_insert_output]
+      end
+
+      # Specify a table for a SELECT ... INTO query.
+      def into(table)
+        clone(:into => table)
       end
 
       # MSSQL uses a UNION ALL statement to insert multiple values at once.
@@ -418,6 +423,10 @@ module Sequel
       # MSSQL adds the limit before the columns
       def select_clause_methods
         SELECT_CLAUSE_METHODS
+      end
+
+      def select_into_sql(sql)
+        sql << " INTO #{table_ref(@opts[:into])}" if @opts[:into]
       end
 
       # MSSQL uses TOP for limit
