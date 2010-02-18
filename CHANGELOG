@@ -1,5 +1,7 @@
 === HEAD
 
+* Fix MSSQL 2005+ offset emulation on ruby 1.9 (jeremyevans)
+
 * Make active_model plugin work with ActiveModel 3.0 beta Lint specs, now requires active_model (jeremyevans)
 
 * Correctly create foreign key constraints on MySQL with the InnoDB engine, but you must specify the :key option (jeremyevans)

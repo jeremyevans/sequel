@@ -285,7 +285,7 @@ module Sequel
       # 
       # The implementation is ugly, cloning the current dataset and modifying
       # the clone to add a ROW_NUMBER window function (and some other things),
-      # then using the modified clone in a CTE which is selected from.
+      # then using the modified clone in a subselect which is selected from.
       #
       # If offset is used, an order must be provided, because the use of ROW_NUMBER
       # requires an order.
@@ -301,7 +301,7 @@ module Sequel
           select{[WILDCARD, ROW_NUMBER(:over, :order=>order){}.as(rn)]}.
           from_self(:alias=>dsa1).
           limit(@opts[:limit]).
-          where(rn > o).
+          where(SQL::Identifier.new(rn) > o).
           select_sql
       end
 
