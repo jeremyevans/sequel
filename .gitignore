@@ -1,6 +1,6 @@
+/sequel-*.gem
 /spec/spec_config.rb
 /rdoc
-/pkg
 /coverage
 /www/public/*.html
 /www/public/rdoc*

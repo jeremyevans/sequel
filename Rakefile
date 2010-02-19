@@ -12,42 +12,20 @@ VERS = lambda do
   require File.expand_path("../lib/sequel/version", __FILE__)
   Sequel.version
 end
-CLEAN.include ["**/.*.sw?", "pkg", ".config", "rdoc", "coverage", "www/public/*.html", "www/public/rdoc*"]
+CLEAN.include ["**/.*.sw?", "sequel-*.gem", ".config", "rdoc", "coverage", "www/public/*.html", "www/public/rdoc*"]
 RDOC_DEFAULT_OPTS = ["--quiet", "--line-numbers", "--inline-source", '--title', 'Sequel: The Database Toolkit for Ruby']
 RDOC_OPTS = RDOC_DEFAULT_OPTS + ['--main', 'README.rdoc']
 
 # Gem Packaging and Release
 
-spec = Gem::Specification.new do |s|
-  s.name = NAME
-  s.rubyforge_project = 'sequel'
-  s.version = VERS.call
-  s.platform = Gem::Platform::RUBY
-  s.has_rdoc = true
-  s.extra_rdoc_files = ["README.rdoc", "CHANGELOG", "COPYING"] + Dir["doc/*.rdoc"] + Dir['doc/release_notes/*.txt']
-  s.rdoc_options += RDOC_OPTS 
-  s.summary = "The Database Toolkit for Ruby"
-  s.description = s.summary
-  s.author = "Jeremy Evans"
-  s.email = "code@jeremyevans.net"
-  s.homepage = "http://sequel.rubyforge.org"
-  s.required_ruby_version = ">= 1.8.4"
-  s.files = %w(COPYING CHANGELOG README.rdoc Rakefile) + Dir["{bin,doc,spec,lib}/**/*"]
-  s.require_path = "lib"
-  s.bindir = 'bin'
-  s.executables << 'sequel'
-end
-
 desc "Packages sequel"
-task :package=>[:clean]
-Rake::GemPackageTask.new(spec) do |p|
-  p.need_tar = true
-  p.gem_spec = spec
+task :package=>[:clean] do |p|
+  sh %{gem build sequel.gemspec}
 end
 
 desc "Install sequel gem"
 task :install=>[:package] do
-  sh %{sudo gem install pkg/#{NAME}-#{VERS.call} --local}
+  sh %{sudo gem install ./#{NAME}-#{VERS.call} --local}
 end
 
 desc "Uninstall sequel gem"
@@ -57,7 +35,7 @@ end
 
 desc "Upload sequel gem to gemcutter"
 task :release=>[:package] do
-  sh %{gem push pkg/#{NAME}-#{VERS.call}.gem} 
+  sh %{gem push ./#{NAME}-#{VERS.call}.gem} 
 end
 
 ### RDoc
