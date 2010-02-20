@@ -95,7 +95,6 @@ end
 error_proc["Error: Must specify -m if using -M"] if migrate_ver && !migrate_dir
 error_proc["Error: Cannot specify -D or -d with -m"] if dump_migration && migrate_dir
 error_proc["Error: Cannot specify -C with -d, -D, or -m"] if copy_databases && (dump_migration || migrate_dir)
-error_proc["Error: Must specify database connection string or path to yaml file as argument"] if db.nil? || db.empty?
 
 if logfile || echo
   require 'logger'
@@ -105,7 +104,13 @@ if logfile || echo
 end
 
 connect_proc = lambda do |database|
-  db = if File.exist?(database)
+  db = if database.nil? || database.empty?
+    db = Sequel::Database.new(:quote_identifiers=>false)
+    def db.connect(*args); Object.new; end
+    db.identifier_input_method = nil
+    db.identifier_output_method = nil
+    db
+  elsif File.exist?(database)
     require 'yaml'
     env ||= "development"
     db_config = YAML.load_file(database)

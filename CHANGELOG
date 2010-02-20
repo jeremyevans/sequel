@@ -1,5 +1,7 @@
 === HEAD
 
+* Support an empty database argument in bin/sequel, useful for testing things without a real database (jeremyevans)
+
 * Support for schemas and aliases when eager graphing (jeremyevans)
 
 * Handle using an SQL::Identifier as an 4th option to Dataset#join_table (jeremyevans)
