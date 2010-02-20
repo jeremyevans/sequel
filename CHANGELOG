@@ -1,5 +1,9 @@
 === HEAD
 
+* Support for schemas and aliases when eager graphing (jeremyevans)
+
+* Handle using an SQL::Identifier as an 4th option to Dataset#join_table (jeremyevans)
+
 * Move gem spec from Rakefile to a .gemspec file, for compatibility with gem build and builder (jeremyevans) (#285)
 
 * Fix MSSQL 2005+ offset emulation on ruby 1.9 (jeremyevans)

@@ -543,6 +543,186 @@ context "Postgres::Database schema qualified tables" do
   end
 end
 
+context "Postgres::Database schema qualified tables and eager graphing" do
+  before(:all) do
+    @db = POSTGRES_DB
+    @db.run "DROP SCHEMA s CASCADE" rescue nil
+    @db.run "CREATE SCHEMA s"
+    @db.quote_identifiers = true
+    
+    @db.create_table(:s__bands){primary_key :id; String :name}
+    @db.create_table(:s__albums){primary_key :id; String :name; foreign_key :band_id, :s__bands}
+    @db.create_table(:s__tracks){primary_key :id; String :name; foreign_key :album_id, :s__albums}
+    @db.create_table(:s__members){primary_key :id; String :name; foreign_key :band_id, :s__bands}
+    
+    @Band = Class.new(Sequel::Model(:s__bands))
+    @Album = Class.new(Sequel::Model(:s__albums))
+    @Track = Class.new(Sequel::Model(:s__tracks))
+    @Member = Class.new(Sequel::Model(:s__members))
+    def @Band.name; :Band; end
+    def @Album.name; :Album; end
+    def @Track.name; :Track; end
+    def @Member.name; :Member; end
+    
+    @Band.one_to_many :albums, :class=>@Album, :order=>:name
+    @Band.one_to_many :members, :class=>@Member, :order=>:name
+    @Album.many_to_one :band, :class=>@Band, :order=>:name
+    @Album.one_to_many :tracks, :class=>@Track, :order=>:name
+    @Track.many_to_one :album, :class=>@Album, :order=>:name
+    @Member.many_to_one :band, :class=>@Band, :order=>:name
+    
+    @Member.many_to_many :members, :class=>@Member, :join_table=>:s__bands, :right_key=>:id, :left_key=>:id, :left_primary_key=>:band_id, :right_primary_key=>:band_id, :order=>:name
+    @Band.many_to_many :tracks, :class=>@Track, :join_table=>:s__albums, :right_key=>:id, :right_primary_key=>:album_id, :order=>:name
+    
+    @b1 = @Band.create(:name=>"BM")
+    @b2 = @Band.create(:name=>"J")
+    @a1 = @Album.create(:name=>"BM1", :band=>@b1)
+    @a2 = @Album.create(:name=>"BM2", :band=>@b1)
+    @a3 = @Album.create(:name=>"GH", :band=>@b2)
+    @a4 = @Album.create(:name=>"GHL", :band=>@b2)
+    @t1 = @Track.create(:name=>"BM1-1", :album=>@a1)
+    @t2 = @Track.create(:name=>"BM1-2", :album=>@a1)
+    @t3 = @Track.create(:name=>"BM2-1", :album=>@a2)
+    @t4 = @Track.create(:name=>"BM2-2", :album=>@a2)
+    @m1 = @Member.create(:name=>"NU", :band=>@b1)
+    @m2 = @Member.create(:name=>"TS", :band=>@b1)
+    @m3 = @Member.create(:name=>"NS", :band=>@b2)
+    @m4 = @Member.create(:name=>"JC", :band=>@b2)
+  end
+  after(:all) do
+    @db.quote_identifiers = false
+    @db.run "DROP SCHEMA s CASCADE"
+  end
+  
+  specify "should return all eager graphs correctly" do
+    bands = @Band.order(:bands__name).eager_graph(:albums).all
+    bands.should == [@b1, @b2]
+    bands.map{|x| x.albums}.should == [[@a1, @a2], [@a3, @a4]]
+
+    bands = @Band.order(:bands__name).eager_graph(:albums=>:tracks).all
+    bands.should == [@b1, @b2]
+    bands.map{|x| x.albums}.should == [[@a1, @a2], [@a3, @a4]]
+    bands.map{|x| x.albums.map{|y| y.tracks}}.should == [[[@t1, @t2], [@t3, @t4]], [[], []]]
+
+    bands = @Band.order(:bands__name).eager_graph({:albums=>:tracks}, :members).all
+    bands.should == [@b1, @b2]
+    bands.map{|x| x.albums}.should == [[@a1, @a2], [@a3, @a4]]
+    bands.map{|x| x.albums.map{|y| y.tracks}}.should == [[[@t1, @t2], [@t3, @t4]], [[], []]]
+    bands.map{|x| x.members}.should == [[@m1, @m2], [@m4, @m3]]
+  end
+
+  specify "should have eager graphs work with previous joins" do
+    bands = @Band.order(:bands__name).select(:s__bands.*).join(:s__members, :band_id=>:id).from_self(:alias=>:bands0).eager_graph(:albums=>:tracks).all
+    bands.should == [@b1, @b2]
+    bands.map{|x| x.albums}.should == [[@a1, @a2], [@a3, @a4]]
+    bands.map{|x| x.albums.map{|y| y.tracks}}.should == [[[@t1, @t2], [@t3, @t4]], [[], []]]
+  end
+
+  specify "should have eager graphs work with joins with the same tables" do
+    bands = @Band.order(:bands__name).select(:s__bands.*).join(:s__members, :band_id=>:id).eager_graph({:albums=>:tracks}, :members).all
+    bands.should == [@b1, @b2]
+    bands.map{|x| x.albums}.should == [[@a1, @a2], [@a3, @a4]]
+    bands.map{|x| x.albums.map{|y| y.tracks}}.should == [[[@t1, @t2], [@t3, @t4]], [[], []]]
+    bands.map{|x| x.members}.should == [[@m1, @m2], [@m4, @m3]]
+  end
+
+  specify "should have eager graphs work with self referential associations" do
+    bands = @Band.order(:bands__name).eager_graph(:tracks=>{:album=>:band}).all
+    bands.should == [@b1, @b2]
+    bands.map{|x| x.tracks}.should == [[@t1, @t2, @t3, @t4], []]
+    bands.map{|x| x.tracks.map{|y| y.album}}.should == [[@a1, @a1, @a2, @a2], []]
+    bands.map{|x| x.tracks.map{|y| y.album.band}}.should == [[@b1, @b1, @b1, @b1], []]
+
+    members = @Member.order(:members__name).eager_graph(:members).all
+    members.should == [@m4, @m3, @m1, @m2]
+    members.map{|x| x.members}.should == [[@m4, @m3], [@m4, @m3], [@m1, @m2], [@m1, @m2]]
+
+    members = @Member.order(:members__name).eager_graph(:band, :members=>:band).all
+    members.should == [@m4, @m3, @m1, @m2]
+    members.map{|x| x.band}.should == [@b2, @b2, @b1, @b1]
+    members.map{|x| x.members}.should == [[@m4, @m3], [@m4, @m3], [@m1, @m2], [@m1, @m2]]
+    members.map{|x| x.members.map{|y| y.band}}.should == [[@b2, @b2], [@b2, @b2], [@b1, @b1], [@b1, @b1]]
+  end
+
+  specify "should have eager graphs work with a from_self dataset" do
+    bands = @Band.order(:bands__name).from_self.eager_graph(:tracks=>{:album=>:band}).all
+    bands.should == [@b1, @b2]
+    bands.map{|x| x.tracks}.should == [[@t1, @t2, @t3, @t4], []]
+    bands.map{|x| x.tracks.map{|y| y.album}}.should == [[@a1, @a1, @a2, @a2], []]
+    bands.map{|x| x.tracks.map{|y| y.album.band}}.should == [[@b1, @b1, @b1, @b1], []]
+  end
+
+  specify "should have eager graphs work with different types of aliased from tables" do
+    bands = @Band.order(:tracks__name).from(:s__bands___tracks).eager_graph(:tracks).all
+    bands.should == [@b1, @b2]
+    bands.map{|x| x.tracks}.should == [[@t1, @t2, @t3, @t4], []]
+
+    bands = @Band.order(:tracks__name).from(:s__bands.as(:tracks)).eager_graph(:tracks).all
+    bands.should == [@b1, @b2]
+    bands.map{|x| x.tracks}.should == [[@t1, @t2, @t3, @t4], []]
+
+    bands = @Band.order(:tracks__name).from(:s__bands.as(:tracks.identifier)).eager_graph(:tracks).all
+    bands.should == [@b1, @b2]
+    bands.map{|x| x.tracks}.should == [[@t1, @t2, @t3, @t4], []]
+
+    bands = @Band.order(:tracks__name).from(:s__bands.as('tracks')).eager_graph(:tracks).all
+    bands.should == [@b1, @b2]
+    bands.map{|x| x.tracks}.should == [[@t1, @t2, @t3, @t4], []]
+  end
+
+  specify "should have eager graphs work with join tables with aliases" do
+    bands = @Band.order(:bands__name).eager_graph(:members).join(:s__albums___tracks, :band_id=>:id.qualify(:s__bands)).eager_graph(:albums=>:tracks).all
+    bands.should == [@b1, @b2]
+    bands.map{|x| x.albums}.should == [[@a1, @a2], [@a3, @a4]]
+    bands.map{|x| x.members}.should == [[@m1, @m2], [@m4, @m3]]
+
+    bands = @Band.order(:bands__name).eager_graph(:members).join(:s__albums.as(:tracks), :band_id=>:id.qualify(:s__bands)).eager_graph(:albums=>:tracks).all
+    bands.should == [@b1, @b2]
+    bands.map{|x| x.albums}.should == [[@a1, @a2], [@a3, @a4]]
+    bands.map{|x| x.members}.should == [[@m1, @m2], [@m4, @m3]]
+
+    bands = @Band.order(:bands__name).eager_graph(:members).join(:s__albums.as('tracks'), :band_id=>:id.qualify(:s__bands)).eager_graph(:albums=>:tracks).all
+    bands.should == [@b1, @b2]
+    bands.map{|x| x.albums}.should == [[@a1, @a2], [@a3, @a4]]
+    bands.map{|x| x.members}.should == [[@m1, @m2], [@m4, @m3]]
+
+    bands = @Band.order(:bands__name).eager_graph(:members).join(:s__albums.as(:tracks.identifier), :band_id=>:id.qualify(:s__bands)).eager_graph(:albums=>:tracks).all
+    bands.should == [@b1, @b2]
+    bands.map{|x| x.albums}.should == [[@a1, @a2], [@a3, @a4]]
+    bands.map{|x| x.members}.should == [[@m1, @m2], [@m4, @m3]]
+
+    bands = @Band.order(:bands__name).eager_graph(:members).join(:s__albums, {:band_id=>:id.qualify(:s__bands)}, :table_alias=>:tracks).eager_graph(:albums=>:tracks).all
+    bands.should == [@b1, @b2]
+    bands.map{|x| x.albums}.should == [[@a1, @a2], [@a3, @a4]]
+    bands.map{|x| x.members}.should == [[@m1, @m2], [@m4, @m3]]
+
+    bands = @Band.order(:bands__name).eager_graph(:members).join(:s__albums, {:band_id=>:id.qualify(:s__bands)}, :table_alias=>'tracks').eager_graph(:albums=>:tracks).all
+    bands.should == [@b1, @b2]
+    bands.map{|x| x.albums}.should == [[@a1, @a2], [@a3, @a4]]
+    bands.map{|x| x.members}.should == [[@m1, @m2], [@m4, @m3]]
+
+    bands = @Band.order(:bands__name).eager_graph(:members).join(:s__albums, {:band_id=>:id.qualify(:s__bands)}, :table_alias=>:tracks.identifier).eager_graph(:albums=>:tracks).all
+    bands.should == [@b1, @b2]
+    bands.map{|x| x.albums}.should == [[@a1, @a2], [@a3, @a4]]
+    bands.map{|x| x.members}.should == [[@m1, @m2], [@m4, @m3]]
+  end
+
+  specify "should have eager graphs work with different types of qualified from tables" do
+    bands = @Band.order(:bands__name).from(:bands.qualify(:s)).eager_graph(:tracks).all
+    bands.should == [@b1, @b2]
+    bands.map{|x| x.tracks}.should == [[@t1, @t2, @t3, @t4], []]
+
+    bands = @Band.order(:bands__name).from(:bands.identifier.qualify(:s)).eager_graph(:tracks).all
+    bands.should == [@b1, @b2]
+    bands.map{|x| x.tracks}.should == [[@t1, @t2, @t3, @t4], []]
+
+    bands = @Band.order(:bands__name).from(Sequel::SQL::QualifiedIdentifier.new(:s, 'bands')).eager_graph(:tracks).all
+    bands.should == [@b1, @b2]
+    bands.map{|x| x.tracks}.should == [[@t1, @t2, @t3, @t4], []]
+  end
+
+end
+
 if POSTGRES_DB.server_version >= 80300
 
   POSTGRES_DB.create_table! :test6 do

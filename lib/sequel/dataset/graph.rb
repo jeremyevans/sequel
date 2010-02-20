@@ -102,7 +102,7 @@ module Sequel
 
       # Setup the initial graph data structure if it doesn't exist
       unless graph = opts[:graph]
-        master = ds.first_source_alias
+        master = alias_symbol(ds.first_source_alias)
         raise_alias_error.call if master == table_alias
         # Master hash storing all .graph related information
         graph = opts[:graph] = {}

@@ -1,4 +1,5 @@
 require 'rubygems'
+require 'logger'
 unless Object.const_defined?('Sequel')
   $:.unshift(File.join(File.dirname(__FILE__), "../../lib/"))
   require 'sequel'
@@ -10,6 +11,19 @@ rescue LoadError
 end
 
 class Spec::Example::ExampleGroup
+  def log 
+    begin
+      INTEGRATION_DB.loggers << Logger.new(STDOUT)
+      yield
+    ensure
+     INTEGRATION_DB.loggers.pop
+    end 
+  end 
+
+  def self.log_specify(message, &block)
+    specify(message){log{instance_eval(&block)}}
+  end
+
   def self.cspecify(message, *checked, &block)
     pending = false
     checked.each do |c|

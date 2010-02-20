@@ -288,13 +288,17 @@ module Sequel
         return join_table(type, table, h, options)
       end
 
-      if [Symbol, String].any?{|c| options.is_a?(c)}
+      case options
+      when Hash
+        table_alias = options[:table_alias]
+        last_alias = options[:implicit_qualifier]
+      when Symbol, String, SQL::Identifier
         table_alias = options
         last_alias = nil 
       else
-        table_alias = options[:table_alias]
-        last_alias = options[:implicit_qualifier]
+        raise Error, "invalid options format for join_table: #{options.inspect}"
       end
+
       if Dataset === table
         if table_alias.nil?
           table_alias_num = (@opts[:num_dataset_sources] || 0) + 1
@@ -628,6 +632,41 @@ module Sequel
     # literalized.
     def _truncate_sql(table)
       "TRUNCATE TABLE #{table}"
+    end
+
+    # Returns an appropriate symbol for the alias represented by s.
+    def alias_alias_symbol(s)
+      case s
+      when Symbol
+        s
+      when String
+        s.to_sym
+      when SQL::Identifier
+        s.value.to_s.to_sym
+      else
+        raise Error, "Invalid alias for alias_alias_symbol: #{s.inspect}"
+      end
+    end
+
+    # Returns an appropriate alias symbol for the given object, which can be
+    # a Symbol, String, SQL::Identifier, SQL::QualifiedIdentifier, or
+    # SQL::AliasedExpression.
+    def alias_symbol(sym)
+      case sym
+      when Symbol
+        s, t, a = split_symbol(sym)
+        a || s ? (a || t).to_sym : sym
+      when String
+        sym.to_sym
+      when SQL::Identifier
+        sym.value.to_s.to_sym
+      when SQL::QualifiedIdentifier
+        alias_symbol(sym.column)
+      when SQL::AliasedExpression
+        alias_alias_symbol(sym.aliaz)
+      else
+        raise Error, "Invalid alias for alias_symbol: #{sym.inspect}"
+      end
     end
 
     # Clone of this dataset usable in aggregate operations.  Does

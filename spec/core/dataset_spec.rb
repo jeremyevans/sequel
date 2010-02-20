@@ -1859,6 +1859,11 @@ context "Dataset#join_table" do
     proc{@d.join(:categories, :a=>:d).delete_sql}.should raise_error(Sequel::InvalidOperation)
     proc{@d.join(:categories, :a=>:d).truncate_sql}.should raise_error(Sequel::InvalidOperation)
   end
+
+  specify "should raise an error if an invalid option is passed" do
+    proc{@d.join(:c, [:id], nil)}.should raise_error(Sequel::Error)
+    proc{@d.join(:c, [:id], :c.qualify(:d))}.should raise_error(Sequel::Error)
+  end
 end
 
 context "Dataset#[]=" do

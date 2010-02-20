@@ -1213,8 +1213,6 @@ module Sequel
         # Like eager, you need to call .all on the dataset for the eager loading to work.  If you just
         # call each, you will get a normal graphed result back (a hash with model object values).
         def eager_graph(*associations)
-          table_name = model.table_name
-            
           ds = if @opts[:eager_graph]
             self
           else
@@ -1223,9 +1221,9 @@ module Sequel
             # :requirements - array of requirements for this association
             # :alias_association_type_map - the type of association for this association
             # :alias_association_name_map - the name of the association for this association
-            clone(:eager_graph=>{:requirements=>{}, :master=>table_name, :alias_association_type_map=>{}, :alias_association_name_map=>{}, :reciprocals=>{}, :cartesian_product_number=>0})
+            clone(:eager_graph=>{:requirements=>{}, :master=>alias_symbol(first_source), :alias_association_type_map=>{}, :alias_association_name_map=>{}, :reciprocals=>{}, :cartesian_product_number=>0})
           end
-          ds.eager_graph_associations(ds, model, table_name, [], *associations)
+          ds.eager_graph_associations(ds, model, ds.opts[:eager_graph][:master], [], *associations)
         end
         
         # Do not attempt to split the result set into associations,
@@ -1358,8 +1356,9 @@ module Sequel
         # Will either be the table_alias itself or table_alias_N for some integer
         # N (starting at 0 and increasing until an unused one is found).
         def eager_unique_table_alias(ds, table_alias)
-          used_aliases = ds.opts[:from]
-          used_aliases += ds.opts[:join].map{|j| j.table_alias || j.table} if ds.opts[:join]
+          table_alias = alias_symbol(table_alias)
+          used_aliases = ds.opts[:from].map{|t| alias_symbol(t)}
+          used_aliases += ds.opts[:join].map{|j| j.table_alias ? alias_alias_symbol(j.table_alias) : alias_symbol(j.table)} if ds.opts[:join]
           graph = ds.opts[:graph]
           used_aliases += graph[:table_aliases].keys if graph
           if used_aliases.include?(table_alias)
