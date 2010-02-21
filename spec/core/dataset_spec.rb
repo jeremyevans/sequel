@@ -267,6 +267,33 @@ context "A dataset with multiple tables in its FROM clause" do
   end
 end
 
+context "Dataset#unused_table_alias" do
+  before do
+    @ds = Sequel::Dataset.new(nil).from(:test)
+  end
+  
+  specify "should return given symbol if it hasn't already been used" do
+    @ds.unused_table_alias(:blah).should == :blah
+  end
+
+  specify "should return a symbol specifying an alias that hasn't already been used if it has already been used" do
+    @ds.unused_table_alias(:test).should == :test_0
+    @ds.from(:test, :test_0).unused_table_alias(:test).should == :test_1
+    @ds.from(:test, :test_0).cross_join(:test_1).unused_table_alias(:test).should == :test_2
+  end
+
+  specify "should return an appropriate symbol if given other forms of identifiers" do
+    @ds.unused_table_alias('test').should == :test_0
+    @ds.unused_table_alias(:b__t___test).should == :test_0
+    @ds.unused_table_alias(:b__test).should == :test_0
+    @ds.unused_table_alias(:test.qualify(:b)).should == :test_0
+    @ds.unused_table_alias(:b.as(:test)).should == :test_0
+    @ds.unused_table_alias(:b.as(:test.identifier)).should == :test_0
+    @ds.unused_table_alias(:b.as('test')).should == :test_0
+    @ds.unused_table_alias(:test.identifier).should == :test_0
+  end
+end
+
 context "Dataset#exists" do
   before do
     @ds1 = Sequel::Dataset.new(nil).from(:test)

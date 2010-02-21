@@ -274,6 +274,29 @@ module Sequel
       end
     end
 
+    # Creates a unique table alias that hasn't already been used in the dataset.
+    # table_alias can be any type of object accepted by alias_symbol.
+    # The symbol returned will be the implicit alias in the argument,
+    # possibly appended with "_N" if the implicit alias has already been
+    # used, where N is an integer starting at 0 and increasing until an
+    # unused one is found.
+    def unused_table_alias(table_alias)
+      table_alias = alias_symbol(table_alias)
+      used_aliases = []
+      used_aliases += opts[:from].map{|t| alias_symbol(t)} if opts[:from]
+      used_aliases += opts[:join].map{|j| j.table_alias ? alias_alias_symbol(j.table_alias) : alias_symbol(j.table)} if opts[:join]
+      if used_aliases.include?(table_alias)
+        i = 0
+        loop do
+          ta = :"#{table_alias}_#{i}"
+          return ta unless used_aliases.include?(ta)
+          i += 1 
+        end
+      else
+        table_alias
+      end
+    end
+
     private
 
     # Return a plain symbol given a potentially qualified or aliased symbol,

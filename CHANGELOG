@@ -1,5 +1,7 @@
 === HEAD
 
+* Add Dataset#unused_table_alias, for generating a table alias that has not yet been used in the query (jeremyevans)
+
 * Support an empty database argument in bin/sequel, useful for testing things without a real database (jeremyevans)
 
 * Support for schemas and aliases when eager graphing (jeremyevans)

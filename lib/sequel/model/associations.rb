@@ -763,7 +763,7 @@ module Sequel
           jt_join_type = opts[:graph_join_table_join_type]
           jt_graph_block = opts[:graph_join_table_block]
           opts[:eager_grapher] ||= proc do |ds, assoc_alias, table_alias|
-            ds = ds.graph(join_table, use_jt_only_conditions ? jt_only_conditions : lcks.zip(lcpks) + graph_jt_conds, :select=>false, :table_alias=>ds.send(:eager_unique_table_alias, ds, join_table), :join_type=>jt_join_type, :implicit_qualifier=>table_alias, :from_self_alias=>ds.opts[:eager_graph][:master], &jt_graph_block)
+            ds = ds.graph(join_table, use_jt_only_conditions ? jt_only_conditions : lcks.zip(lcpks) + graph_jt_conds, :select=>false, :table_alias=>ds.unused_table_alias(join_table), :join_type=>jt_join_type, :implicit_qualifier=>table_alias, :from_self_alias=>ds.opts[:eager_graph][:master], &jt_graph_block)
             ds.graph(opts.associated_class, use_only_conditions ? only_conditions : opts.right_primary_keys.zip(rcks) + conditions, :select=>select, :table_alias=>assoc_alias, :join_type=>join_type, &graph_block)
           end
       
@@ -1251,7 +1251,7 @@ module Sequel
         def eager_graph_association(ds, model, ta, requirements, r, *associations)
           klass = r.associated_class
           assoc_name = r[:name]
-          assoc_table_alias = ds.eager_unique_table_alias(ds, assoc_name)
+          assoc_table_alias = ds.unused_table_alias(assoc_name)
           ds = r[:eager_grapher].call(ds, assoc_table_alias, ta)
           ds = ds.order_more(*Array(r[:order]).map{|c| eager_graph_qualify_order(assoc_table_alias, c)}) if r[:order] and r[:order_eager_graph]
           eager_graph = ds.opts[:eager_graph]
@@ -1352,26 +1352,6 @@ module Sequel
           record_graphs.replace(records)
         end
       
-        # Creates a unique table alias that hasn't already been used in the query.
-        # Will either be the table_alias itself or table_alias_N for some integer
-        # N (starting at 0 and increasing until an unused one is found).
-        def eager_unique_table_alias(ds, table_alias)
-          table_alias = alias_symbol(table_alias)
-          used_aliases = ds.opts[:from].map{|t| alias_symbol(t)}
-          used_aliases += ds.opts[:join].map{|j| j.table_alias ? alias_alias_symbol(j.table_alias) : alias_symbol(j.table)} if ds.opts[:join]
-          graph = ds.opts[:graph]
-          used_aliases += graph[:table_aliases].keys if graph
-          if used_aliases.include?(table_alias)
-            i = 0
-            loop do
-              ta = :"#{table_alias}_#{i}"
-              return ta unless used_aliases.include?(ta)
-              i += 1
-            end
-          end
-          table_alias
-        end
-
         private
       
         # Make sure the association is valid for this model, and return the related AssociationReflection.
