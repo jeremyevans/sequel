@@ -50,6 +50,7 @@ module Sequel
   @convert_two_digit_years = true
   @datetime_class = Time
   @virtual_row_instance_eval = true
+  @require_thread = nil
   
   # Mutex used to protect file loading
   @require_mutex = Mutex.new
@@ -69,6 +70,22 @@ module Sequel
     
     # Alias to the standard version of require
     alias k_require require
+
+    private
+
+    # Make thread safe requiring reentrant to prevent deadlocks.
+    def check_requiring_thread
+      t = Thread.current
+      return(yield) if @require_thread == t
+      @require_mutex.synchronize do
+        begin
+          @require_thread = t 
+          yield
+        ensure
+          @require_thread = nil
+        end
+      end
+    end
   end
 
   # Returns true if the passed object could be a specifier of conditions, false otherwise.
@@ -120,8 +137,8 @@ module Sequel
   #
   #   Sequel.extension(:schema_dumper)
   #   Sequel.extension(:pagination, :query)
-  def self.extension(*args)
-    @require_mutex.synchronize{nts_extension(*args)}
+  def self.extension(*extensions)
+    ts_require(extensions, 'extensions')
   end
   
   # Set the method to call on identifiers going into the database.  This affects
@@ -153,12 +170,6 @@ module Sequel
   # Other String instance methods work as well.
   def self.identifier_output_method=(value)
     Database.identifier_output_method = value
-  end
-  
-  # A non-thread safe version of Sequel.extension, should be used only in
-  # code that is already protected by Sequel's require mutex.
-  def self.nts_extension(*extensions)
-    require(extensions, 'extensions')
   end
   
   # Set whether to quote identifiers for all databases by default. By default,
@@ -219,12 +230,12 @@ module Sequel
 
   # Same as Sequel.require, but wrapped in a mutex in order to be thread safe.
   def self.ts_require(*args)
-    @require_mutex.synchronize{require(*args)}
+    check_requiring_thread{require(*args)}
   end
   
   # Same as Kernel.require, but wrapped in a mutex in order to be thread safe.
   def self.tsk_require(*args)
-    @require_mutex.synchronize{k_require(*args)}
+    check_requiring_thread{k_require(*args)}
   end
 
   # If the supplied block takes a single argument,

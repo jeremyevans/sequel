@@ -1,5 +1,5 @@
 module Sequel
-  nts_extension :blank
+  extension :blank
 
   module Plugins
     # Sequel's built-in validation_class_methods plugin adds backwards compatibility
