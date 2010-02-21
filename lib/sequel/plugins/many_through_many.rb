@@ -193,7 +193,7 @@ module Sequel
           opts[:eager_grapher] ||= proc do |ds, assoc_alias, table_alias|
             iq = table_alias
             opts.edges.each do |t|
-              ds = ds.graph(t[:table], t.include?(:only_conditions) ? t[:only_conditions] : (Array(t[:right]).zip(Array(t[:left])) + t[:conditions]), :select=>false, :table_alias=>ds.send(:eager_unique_table_alias, ds, t[:table]), :join_type=>t[:join_type], :implicit_qualifier=>iq, &t[:block])
+              ds = ds.graph(t[:table], t.include?(:only_conditions) ? t[:only_conditions] : (Array(t[:right]).zip(Array(t[:left])) + t[:conditions]), :select=>false, :table_alias=>ds.unused_table_alias(t[:table]), :join_type=>t[:join_type], :implicit_qualifier=>iq, &t[:block])
               iq = nil
             end
             fe = opts[:final_edge]
