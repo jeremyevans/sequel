@@ -1,5 +1,9 @@
 === HEAD
 
+* Handle IN/NOT IN with an empty array (jeremyevans)
+
+* Emulate IN/NOT IN with multiple columns where the database doesn't support it and a dataset is given (jeremyevans)
+
 * Add Dataset#unused_table_alias, for generating a table alias that has not yet been used in the query (jeremyevans)
 
 * Support an empty database argument in bin/sequel, useful for testing things without a real database (jeremyevans)

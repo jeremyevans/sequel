@@ -715,6 +715,14 @@ describe "Sequel::Dataset DSL support" do
     @ds.exclude(:a=>nil).all.should == [{:a=>20, :b=>nil}]
   end
   
+  it "should work with arrays as hash values" do
+    @ds.insert(20, 10)
+    @ds.filter(:a=>[10]).all.should == []
+    @ds.filter(:a=>[20, 10]).all.should == [{:a=>20, :b=>10}]
+    @ds.exclude(:a=>[10]).all.should == [{:a=>20, :b=>10}]
+    @ds.exclude(:a=>[20, 10]).all.should == []
+  end
+  
   it "should work with ranges as hash values" do
     @ds.insert(20, 10)
     @ds.filter(:a=>(10..30)).all.should == [{:a=>20, :b=>10}]
@@ -733,7 +741,7 @@ describe "Sequel::Dataset DSL support" do
     @ds.filter({15=>20}.case(0, :a) > 0).all.should == []
   end
   
-  it "should work multiple value arrays" do
+  it "should work with multiple value arrays" do
     @ds.insert(20, 10)
     @ds.quote_identifiers = false
     @ds.filter([:a, :b]=>[[20, 10]].sql_array).all.should == [{:a=>20, :b=>10}]
@@ -745,6 +753,40 @@ describe "Sequel::Dataset DSL support" do
     @ds.exclude([:a, :b]=>[[10, 20]].sql_array).all.should == [{:a=>20, :b=>10}]
     @ds.exclude([:a, :b]=>[[20, 10], [1, 2]].sql_array).all.should == []
     @ds.exclude([:a, :b]=>[[10, 10], [20, 20]].sql_array).all.should == [{:a=>20, :b=>10}]
+  end
+
+  it "should work with IN/NOT in with datasets" do
+    @ds.insert(20, 10)
+    @ds.quote_identifiers = false
+
+    @ds.filter(:a=>@ds.select(:a)).all.should == [{:a=>20, :b=>10}]
+    @ds.filter(:a=>@ds.select(:b)).all.should == []
+    @ds.exclude(:a=>@ds.select(:a)).all.should == []
+    @ds.exclude(:a=>@ds.select(:b)).all.should == [{:a=>20, :b=>10}]
+
+    @ds.filter([:a, :b]=>@ds.select(:a, :b)).all.should == [{:a=>20, :b=>10}]
+    @ds.filter([:a, :b]=>@ds.select(:b, :a)).all.should == []
+    @ds.exclude([:a, :b]=>@ds.select(:a, :b)).all.should == []
+    @ds.exclude([:a, :b]=>@ds.select(:b, :a)).all.should == [{:a=>20, :b=>10}]
+
+    @ds.filter([:a, :b]=>@ds.select(:a, :b).where(:a=>15)).all.should == []
+    @ds.exclude([:a, :b]=>@ds.select(:a, :b).where(:a=>15)).all.should == [{:a=>20, :b=>10}]
+  end
+
+  specify "should work empty arrays" do
+    @ds.insert(20, 10)
+    @ds.filter(:a=>[]).all.should == []
+    @ds.exclude(:a=>[]).all.should == [{:a=>20, :b=>10}]
+    @ds.filter([:a, :b]=>[]).all.should == []
+    @ds.exclude([:a, :b]=>[]).all.should == [{:a=>20, :b=>10}]
+  end
+  
+  specify "should work empty arrays with nulls" do
+    @ds.insert(nil, nil)
+    @ds.filter(:a=>[]).all.should == []
+    @ds.exclude(:a=>[]).all.should == [{:a=>nil, :b=>nil}]
+    @ds.filter([:a, :b]=>[]).all.should == []
+    @ds.exclude([:a, :b]=>[]).all.should == [{:a=>nil, :b=>nil}]
   end
   
   it "should work multiple conditions" do

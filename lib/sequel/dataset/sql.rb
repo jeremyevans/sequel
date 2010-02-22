@@ -91,11 +91,42 @@ module Sequel
         end
       when :IN, :"NOT IN"
         cols = args.at(0)
-        if !supports_multiple_column_in? && cols.is_a?(Array)
-          expr = SQL::BooleanExpression.new(:OR, *args.at(1).to_a.map{|vals| SQL::BooleanExpression.from_value_pairs(cols.zip(vals).map{|col, val| [col, val]})})
-          literal(op == :IN ? expr : ~expr)
+        vals = args.at(1)
+        col_array = true if cols.is_a?(Array) || cols.is_a?(SQL::SQLArray)
+        if vals.is_a?(Array) || vals.is_a?(SQL::SQLArray)
+          val_array = true
+          empty_val_array = vals.to_a == []
+        end
+        if col_array
+          if empty_val_array
+            if op == :IN
+              literal(SQL::BooleanExpression.from_value_pairs(cols.to_a.map{|x| [x, x]}, :AND, true))
+            else
+              literal(1=>1)
+            end
+          elsif !supports_multiple_column_in?
+            if val_array
+              expr = SQL::BooleanExpression.new(:OR, *vals.to_a.map{|vs| SQL::BooleanExpression.from_value_pairs(cols.to_a.zip(vs).map{|c, v| [c, v]})})
+              literal(op == :IN ? expr : ~expr)
+            else
+              old_vals = vals
+              vals = vals.to_a
+              val_cols = old_vals.columns
+              complex_expression_sql(op, [cols, vals.map!{|x| x.values_at(*val_cols)}])
+            end
+          else
+            "(#{literal(cols)} #{op} #{literal(vals)})"
+          end
         else
-          "(#{literal(cols)} #{op} #{literal(args.at(1))})"
+          if empty_val_array
+            if op == :IN
+              literal(SQL::BooleanExpression.from_value_pairs([[cols, cols]], :AND, true))
+            else
+              literal(1=>1)
+            end
+          else
+            "(#{literal(cols)} #{op} #{literal(vals)})"
+          end
         end
       when *TWO_ARITY_OPERATORS
         "(#{literal(args.at(0))} #{op} #{literal(args.at(1))})"
