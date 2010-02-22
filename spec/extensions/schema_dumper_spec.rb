@@ -311,7 +311,7 @@ create_table(:x) do
   String :c26, :fixed=>true
   String :c27, :fixed=>true
   String :c28
-  String :c29
+  String :c29, :size=>255
   String :c30, :size=>30
   String :c31
   String :c32

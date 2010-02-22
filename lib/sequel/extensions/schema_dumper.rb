@@ -135,8 +135,7 @@ END_MIG
       when /\An?char(?:acter)?(?:\((\d+)\))?\z/o
         {:type=>String, :size=>($1.to_i if $1), :fixed=>true}
       when /\A(?:n?varchar|character varying|bpchar|string)(?:\((\d+)\))?\z/o
-        s = ($1.to_i if $1)
-        {:type=>String, :size=>(s == 255 ? nil : s)}
+        {:type=>String, :size=>($1.to_i if $1)}
       when /\A(?:small)?money\z/o
         {:type=>BigDecimal, :size=>[19,2]}
       when /\A(?:decimal|numeric|number)(?:\((\d+)(?:,\s*(\d+))?\))?\z/o
