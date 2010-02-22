@@ -298,12 +298,10 @@ module Sequel
         return super unless o = @opts[:offset]
         raise(Error, 'MSSQL requires an order be provided if using an offset') unless order = @opts[:order]
         dsa1 = dataset_alias(1)
-        dsa2 = dataset_alias(2)
         rn = row_number_column
         unlimited.
           unordered.
-          from_self(:alias=>dsa2).
-          select{[WILDCARD, ROW_NUMBER(:over, :order=>order){}.as(rn)]}.
+          select_more(Sequel::SQL::WindowFunction.new(:ROW_NUMBER.sql_function, Sequel::SQL::Window.new(:order=>order)).as(rn)).
           from_self(:alias=>dsa1).
           limit(@opts[:limit]).
           where(SQL::Identifier.new(rn) > o).
