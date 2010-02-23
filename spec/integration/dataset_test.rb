@@ -757,20 +757,21 @@ describe "Sequel::Dataset DSL support" do
 
   it "should work with IN/NOT in with datasets" do
     @ds.insert(20, 10)
+    ds = @ds.unordered
     @ds.quote_identifiers = false
 
-    @ds.filter(:a=>@ds.select(:a)).all.should == [{:a=>20, :b=>10}]
-    @ds.filter(:a=>@ds.select(:b)).all.should == []
-    @ds.exclude(:a=>@ds.select(:a)).all.should == []
-    @ds.exclude(:a=>@ds.select(:b)).all.should == [{:a=>20, :b=>10}]
+    @ds.filter(:a=>ds.select(:a)).all.should == [{:a=>20, :b=>10}]
+    @ds.filter(:a=>ds.select(:a).where(:a=>15)).all.should == []
+    @ds.exclude(:a=>ds.select(:a)).all.should == []
+    @ds.exclude(:a=>ds.select(:a).where(:a=>15)).all.should == [{:a=>20, :b=>10}]
 
-    @ds.filter([:a, :b]=>@ds.select(:a, :b)).all.should == [{:a=>20, :b=>10}]
-    @ds.filter([:a, :b]=>@ds.select(:b, :a)).all.should == []
-    @ds.exclude([:a, :b]=>@ds.select(:a, :b)).all.should == []
-    @ds.exclude([:a, :b]=>@ds.select(:b, :a)).all.should == [{:a=>20, :b=>10}]
+    @ds.filter([:a, :b]=>ds.select(:a, :b)).all.should == [{:a=>20, :b=>10}]
+    @ds.filter([:a, :b]=>ds.select(:b, :a)).all.should == []
+    @ds.exclude([:a, :b]=>ds.select(:a, :b)).all.should == []
+    @ds.exclude([:a, :b]=>ds.select(:b, :a)).all.should == [{:a=>20, :b=>10}]
 
-    @ds.filter([:a, :b]=>@ds.select(:a, :b).where(:a=>15)).all.should == []
-    @ds.exclude([:a, :b]=>@ds.select(:a, :b).where(:a=>15)).all.should == [{:a=>20, :b=>10}]
+    @ds.filter([:a, :b]=>ds.select(:a, :b).where(:a=>15)).all.should == []
+    @ds.exclude([:a, :b]=>ds.select(:a, :b).where(:a=>15)).all.should == [{:a=>20, :b=>10}]
   end
 
   specify "should work empty arrays" do

@@ -101,6 +101,11 @@ module Sequel
         # H2 doesn't support JOIN USING
         def supports_join_using?
           false
+        end
+        
+        # H2 doesn't support multiple columns in IN/NOT IN
+        def supports_multiple_column_in?
+          false
         end 
 
         private
