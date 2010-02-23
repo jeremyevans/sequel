@@ -299,9 +299,11 @@ module Sequel
         raise(Error, 'MSSQL requires an order be provided if using an offset') unless order = @opts[:order]
         dsa1 = dataset_alias(1)
         rn = row_number_column
+        sel = [Sequel::SQL::WindowFunction.new(:ROW_NUMBER.sql_function, Sequel::SQL::Window.new(:order=>order)).as(rn)]
+        sel.unshift(WILDCARD) unless osel = @opts[:select] and !osel.empty?
         unlimited.
           unordered.
-          select_more(Sequel::SQL::WindowFunction.new(:ROW_NUMBER.sql_function, Sequel::SQL::Window.new(:order=>order)).as(rn)).
+          select_more(*sel).
           from_self(:alias=>dsa1).
           limit(@opts[:limit]).
           where(SQL::Identifier.new(rn) > o).
