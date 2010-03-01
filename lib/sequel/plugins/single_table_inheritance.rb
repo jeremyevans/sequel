@@ -19,11 +19,10 @@ module Sequel
       # dataset's row_proc so that the dataset yields objects of varying classes,
       # where the class used has the same name as the key field.
       def self.configure(model, key)
-        m = model.method(:constantize)
         model.instance_eval do
           @sti_key = key 
           @sti_dataset = dataset
-          dataset.row_proc = lambda{|r| (m.call(r[key]) rescue model).load(r)}
+          dataset.row_proc = lambda{|r| model.sti_load(r)}
         end
       end
 
@@ -48,6 +47,18 @@ module Sequel
             @sti_dataset = sd
             @simple_table = nil
           end
+        end
+
+        # Return an instance of the class specified by sti_key,
+        # used by the row_proc.
+        def sti_load(r)
+          v = r[sti_key]
+          model = if (v && v != '')
+            constantize(v) rescue self
+          else
+            self
+          end
+          model.load(r)
         end
       end
 

@@ -1,5 +1,7 @@
 === HEAD
 
+* In the single_table_inheritance plugin, handle case where the sti_key is nil or '' specially (jeremyevans) (#287)
+
 * Handle IN/NOT IN with an empty array (jeremyevans)
 
 * Emulate IN/NOT IN with multiple columns where the database doesn't support it and a dataset is given (jeremyevans)

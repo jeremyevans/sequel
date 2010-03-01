@@ -54,18 +54,26 @@ describe Sequel::Model, "#sti_key" do
     StiTest.all.collect{|x| x.class}.should == [StiTest, StiTestSub1, StiTestSub2]
   end 
 
-  it "should fallback to the main class if polymophic_key value is NULL" do
-    def @ds.fetch_rows(sql)
-      yield({:kind=>nil})
-    end 
-    StiTest.all.collect{|x| x.class}.should == [StiTest]
-  end 
-  
   it "should fallback to the main class if the given class does not exist" do
     def @ds.fetch_rows(sql)
       yield({:kind=>'StiTestSub3'})
     end
     StiTest.all.collect{|x| x.class}.should == [StiTest]
+  end
+
+  it "should fallback to the main class if the sti_key field is empty or nil without calling constantize" do
+    called = false
+    StiTest.meta_def(:constantize) do |s|
+      called = true
+      Object
+    end
+    StiTest.plugin :single_table_inheritance, :kind
+    def @ds.fetch_rows(sql)
+      yield({:kind=>''})
+      yield({:kind=>nil})
+    end
+    StiTest.all.collect{|x| x.class}.should == [StiTest, StiTest]
+    called.should == false
   end
 
   it "should add a before_create hook that sets the model class name for the key" do
