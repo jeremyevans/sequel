@@ -1363,6 +1363,21 @@ context "Dataset#limit" do
   specify "should include an offset if a second argument is given" do
     @dataset.limit(6, 10).sql.should ==
       'SELECT * FROM test LIMIT 6 OFFSET 10'
+    end
+    
+  specify "should convert regular strings to integers" do
+    @dataset.limit('6', 'a() - 1').sql.should ==
+      'SELECT * FROM test LIMIT 6 OFFSET 0'
+  end
+  
+  specify "should not convert literal strings to integers" do
+    @dataset.limit('6'.lit, 'a() - 1'.lit).sql.should ==
+      'SELECT * FROM test LIMIT 6 OFFSET a() - 1'
+  end
+    
+  specify "should not convert other objects" do
+    @dataset.limit(6, :a.sql_function - 1).sql.should ==
+      'SELECT * FROM test LIMIT 6 OFFSET (a() - 1)'
   end
   
   specify "should work with fixed sql datasets" do

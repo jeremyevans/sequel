@@ -1066,8 +1066,8 @@ module Sequel
 
     # Modify the sql to limit the number of rows returned and offset
     def select_limit_sql(sql)
-      sql << " LIMIT #{@opts[:limit]}" if @opts[:limit]
-      sql << " OFFSET #{@opts[:offset]}" if @opts[:offset]
+      sql << " LIMIT #{literal(@opts[:limit])}" if @opts[:limit]
+      sql << " OFFSET #{literal(@opts[:offset])}" if @opts[:offset]
     end
 
     # Modify the sql to add the expressions to ORDER BY

@@ -301,13 +301,12 @@ module Sequel
         rn = row_number_column
         sel = [Sequel::SQL::WindowFunction.new(:ROW_NUMBER.sql_function, Sequel::SQL::Window.new(:order=>order)).as(rn)]
         sel.unshift(WILDCARD) unless osel = @opts[:select] and !osel.empty?
-        unlimited.
+        subselect_sql(unlimited.
           unordered.
           select_more(*sel).
           from_self(:alias=>dsa1).
           limit(@opts[:limit]).
-          where(SQL::Identifier.new(rn) > o).
-          select_sql
+          where(SQL::Identifier.new(rn) > o))
       end
 
       # The version of the database server.
@@ -431,7 +430,7 @@ module Sequel
 
       # MSSQL uses TOP for limit
       def select_limit_sql(sql)
-        sql << " TOP #{@opts[:limit]}" if @opts[:limit]
+        sql << " TOP (#{literal(@opts[:limit])})" if @opts[:limit]
       end
 
       # MSSQL uses the WITH statement to lock tables

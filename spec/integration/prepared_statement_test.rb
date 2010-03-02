@@ -79,6 +79,16 @@ describe "Prepared Statements and Bound Arguments" do
   specify "should support subselects of subselects with call" do
     @ds.filter(:id=>:$i).filter(:number=>@ds.select(:number).filter(:number=>@ds.select(:number).filter(:number=>@ds.ba(:$n)))).filter(:id=>:$j).call(:select, :n=>10, :i=>1, :j=>1).should == [{:id=>1, :number=>10}]
   end
+  
+  specify "should support using a bound variable for a limit and offset" do
+    @ds.insert(:number=>20)
+    ds = @ds.limit(@ds.ba(:$n), @ds.ba(:$n2)).order(:id)
+    ds.call(:select, :n=>1, :n2=>0).should == [{:id=>1, :number=>10}]
+    ds.call(:select, :n=>1, :n2=>1).should == [{:id=>2, :number=>20}]
+    ds.call(:select, :n=>1, :n2=>2).should == []
+    ds.call(:select, :n=>2, :n2=>0).should == [{:id=>1, :number=>10}, {:id=>2, :number=>20}]
+    ds.call(:select, :n=>2, :n2=>1).should == [{:id=>2, :number=>20}]
+  end
 
   specify "should support bound variables with insert" do
     @ds.call(:insert, {:n=>20}, :number=>@ds.ba(:$n))
@@ -144,6 +154,16 @@ describe "Prepared Statements and Bound Arguments" do
 
   specify "should support subselects of subselects with prepare" do
     @ds.filter(:id=>:$i).filter(:number=>@ds.select(:number).filter(:number=>@ds.select(:number).filter(:number=>@ds.ba(:$n)))).filter(:id=>:$j).prepare(:select, :seq_select).call(:n=>10, :i=>1, :j=>1).should == [{:id=>1, :number=>10}]
+  end
+  
+  specify "should support using a prepared_statement for a limit and offset" do
+    @ds.insert(:number=>20)
+    ps = @ds.limit(@ds.ba(:$n), @ds.ba(:$n2)).order(:id).prepare(:select, :seq_select)
+    ps.call(:n=>1, :n2=>0).should == [{:id=>1, :number=>10}]
+    ps.call(:n=>1, :n2=>1).should == [{:id=>2, :number=>20}]
+    ps.call(:n=>1, :n2=>2).should == []
+    ps.call(:n=>2, :n2=>0).should == [{:id=>1, :number=>10}, {:id=>2, :number=>20}]
+    ps.call(:n=>2, :n2=>1).should == [{:id=>2, :number=>20}]
   end
 
   specify "should support prepared statements with insert" do

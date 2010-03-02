@@ -221,12 +221,16 @@ module Sequel
         o = l.first
         l = l.last - l.first + (l.exclude_end? ? 0 : 1)
       end
-      l = l.to_i
-      raise(Error, 'Limits must be greater than or equal to 1') unless l >= 1
+      l = l.to_i if l.is_a?(String) && !l.is_a?(LiteralString)
+      if l.is_a?(Integer)
+        raise(Error, 'Limits must be greater than or equal to 1') unless l >= 1
+      end
       opts = {:limit => l}
       if o
-        o = o.to_i
-        raise(Error, 'Offsets must be greater than or equal to 0') unless o >= 0
+        o = o.to_i if o.is_a?(String) && !o.is_a?(LiteralString)
+        if o.is_a?(Integer)
+          raise(Error, 'Offsets must be greater than or equal to 0') unless o >= 0
+        end
         opts[:offset] = o
       end
       clone(opts)
