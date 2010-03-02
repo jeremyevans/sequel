@@ -1,5 +1,9 @@
 === HEAD
 
+* Allow loading adapters from outside of the Sequel lib directory (jeremyevans)
+
+* Make limit and offset work as bound variables in prepared statements (jeremyevans)
+
 * In the single_table_inheritance plugin, handle case where the sti_key is nil or '' specially (jeremyevans) (#287)
 
 * Handle IN/NOT IN with an empty array (jeremyevans)
