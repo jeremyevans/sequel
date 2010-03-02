@@ -1,6 +1,6 @@
 === HEAD
 
-* Allow loading adapters from outside of the Sequel lib directory (jeremyevans)
+* Allow loading adapters and extensions from outside of the Sequel lib directory (jeremyevans)
 
 * Make limit and offset work as bound variables in prepared statements (jeremyevans)
 

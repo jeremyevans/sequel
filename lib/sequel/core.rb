@@ -138,7 +138,7 @@ module Sequel
   #   Sequel.extension(:schema_dumper)
   #   Sequel.extension(:pagination, :query)
   def self.extension(*extensions)
-    ts_require(extensions, 'extensions')
+    extensions.each{|e| tsk_require "sequel/extensions/#{e}"}
   end
   
   # Set the method to call on identifiers going into the database.  This affects
