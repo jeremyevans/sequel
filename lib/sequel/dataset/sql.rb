@@ -395,7 +395,7 @@ module Sequel
       when BigDecimal
         literal_big_decimal(v)
       when NilClass
-        NULL
+        literal_nil
       when TrueClass
         literal_true
       when FalseClass
@@ -892,6 +892,11 @@ module Sequel
     # SQL fragment for Integer
     def literal_integer(v)
       v.to_s
+    end
+    
+    # SQL fragment for nil
+    def literal_nil
+      NULL
     end
 
     # SQL fragment for a type of object not handled by Dataset#literal.
