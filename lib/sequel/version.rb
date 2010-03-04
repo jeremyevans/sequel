@@ -1,6 +1,6 @@
 module Sequel
   MAJOR = 3
-  MINOR = 8
+  MINOR = 9
   TINY  = 0
   
   VERSION = [MAJOR, MINOR, TINY].join('.')
