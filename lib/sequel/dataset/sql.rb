@@ -189,6 +189,25 @@ module Sequel
       end
     end
     alias first_source first_source_alias
+    
+    # The first source (primary table) for this dataset.  If the dataset doesn't
+    # have a table, raises an error.  If the table is aliased, returns the original
+    # table, not the alias
+    def first_source_table
+      source = @opts[:from]
+      if source.nil? || source.empty?
+        raise Error, 'No source specified for query'
+      end
+      case s = source.first
+      when SQL::AliasedExpression
+        s.expression
+      when Symbol
+        sch, table, aliaz = split_symbol(s)
+        aliaz ? (sch ? SQL::QualifiedIdentifier.new(sch, table) : table.to_sym) : s
+      else
+        s
+      end
+    end
 
     # SQL fragment specifying an SQL function call
     def function_sql(f)

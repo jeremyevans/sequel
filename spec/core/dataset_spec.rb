@@ -1632,6 +1632,59 @@ context "Dataset#empty?" do
   end
 end
 
+context "Dataset#first_source_alias" do
+  before do
+    @ds = Sequel::Dataset.new(nil)
+  end
+  
+  specify "should be the entire first source if not aliased" do
+    @ds.from(:t).first_source_alias.should == :t
+    @ds.from(:t__a.identifier).first_source_alias.should == :t__a.identifier
+    @ds.from(:s__t).first_source_alias.should == :s__t
+    @ds.from(:t.qualify(:s)).first_source_alias.should == :t.qualify(:s)
+  end
+  
+  specify "should be the alias if aliased" do
+    @ds.from(:t___a).first_source_alias.should == :a
+    @ds.from(:s__t___a).first_source_alias.should == :a
+    @ds.from(:t.as(:a)).first_source_alias.should == :a
+  end
+  
+  specify "should be aliased as first_source" do
+    @ds.from(:t).first_source.should == :t
+    @ds.from(:t__a.identifier).first_source.should == :t__a.identifier
+    @ds.from(:s__t___a).first_source.should == :a
+    @ds.from(:t.as(:a)).first_source.should == :a
+  end
+  
+  specify "should raise exception if table doesn't have a source" do
+    proc{@ds.first_source_alias.should == :t}.should raise_error(Sequel::Error)
+  end
+end
+
+context "Dataset#first_source_table" do
+  before do
+    @ds = Sequel::Dataset.new(nil)
+  end
+  
+  specify "should be the entire first source if not aliased" do
+    @ds.from(:t).first_source_table.should == :t
+    @ds.from(:t__a.identifier).first_source_table.should == :t__a.identifier
+    @ds.from(:s__t).first_source_table.should == :s__t
+    @ds.from(:t.qualify(:s)).first_source_table.should == :t.qualify(:s)
+  end
+  
+  specify "should be the unaliased part if aliased" do
+    @ds.from(:t___a).first_source_table.should == :t.identifier
+    @ds.from(:s__t___a).first_source_table.should == :t.qualify(:s)
+    @ds.from(:t.as(:a)).first_source_table.should == :t
+  end
+  
+  specify "should raise exception if table doesn't have a source" do
+    proc{@ds.first_source_table.should == :t}.should raise_error(Sequel::Error)
+  end
+end
+
 context "Dataset#from_self" do
   before do
     @ds = Sequel::Dataset.new(nil).from(:test).select(:name).limit(1)
