@@ -602,17 +602,8 @@ module Sequel
           [:before_add, :before_remove, :after_add, :after_remove, :after_load, :extend].each do |cb_type|
             opts[cb_type] = Array(opts[cb_type])
           end
-      
-          # find class
-          case opts[:class]
-            when String, Symbol
-              # Delete :class to allow late binding
-              opts[:class_name] ||= opts.delete(:class).to_s
-            when Class
-              opts[:class_name] ||= opts[:class].name
-          end
-          opts[:class_name] ||= ((self.name || '').split("::")[0..-2] + [camelize(opts.returns_array? ? singularize(name) : name)]).join('::')
-      
+          late_binding_class_option(opts, opts.returns_array? ? singularize(name) : name)
+          
           send(:"def_#{type}", opts)
       
           orig_opts.delete(:clone)

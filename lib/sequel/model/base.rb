@@ -437,6 +437,21 @@ module Sequel
         end
         schema_hash
       end
+      
+      # For the given opts hash and default name or :class option, add a
+      # :class_name option unless already present which contains the name
+      # of the class to use as a string.  The purpose is to allow late
+      # binding to the class later using constantize.
+      def late_binding_class_option(opts, default)
+        case opts[:class]
+          when String, Symbol
+            # Delete :class to allow late binding
+            opts[:class_name] ||= opts.delete(:class).to_s
+          when Class
+            opts[:class_name] ||= opts[:class].name
+        end
+        opts[:class_name] ||= ((name || '').split("::")[0..-2] + [camelize(default)]).join('::')
+      end
   
       # Module that the class includes that holds methods the class adds for column accessors and
       # associations so that the methods can be overridden with super
