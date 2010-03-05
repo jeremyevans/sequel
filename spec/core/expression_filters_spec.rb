@@ -216,7 +216,7 @@ context "Blockless Ruby Filters" do
   it "should support AND conditions via &" do
     @d.l(:x & :y).should == '(x AND y)'
     @d.l(:x.sql_boolean & :y).should == '(x AND y)'
-    @d.l(:x & :y & :z).should == '((x AND y) AND z)'
+    @d.l(:x & :y & :z).should == '(x AND y AND z)'
     @d.l(:x & {:y => :z}).should == '(x AND (y = z))'
     @d.l({:y => :z} & :x).should == '((y = z) AND x)'
     @d.l({:x => :a} & {:y => :z}).should == '((x = a) AND (y = z))'
@@ -229,7 +229,7 @@ context "Blockless Ruby Filters" do
   it "should support OR conditions via |" do
     @d.l(:x | :y).should == '(x OR y)'
     @d.l(:x.sql_boolean | :y).should == '(x OR y)'
-    @d.l(:x | :y | :z).should == '((x OR y) OR z)'
+    @d.l(:x | :y | :z).should == '(x OR y OR z)'
     @d.l(:x | {:y => :z}).should == '(x OR (y = z))'
     @d.l({:y => :z} | :x).should == '((y = z) OR x)'
     @d.l({:x => :a} | {:y => :z}).should == '((x = a) OR (y = z))'
@@ -263,7 +263,7 @@ context "Blockless Ruby Filters" do
     @d.l('x'.lit + 1 > 100).should == '((x + 1) > 100)'
     @d.l(('x'.lit * :y) < 100.01).should == '((x * y) < 100.01)'
     @d.l(('x'.lit - :y/2) >= 100000000000000000000000000000000000).should == '((x - (y / 2)) >= 100000000000000000000000000000000000)'
-    @d.l(('z'.lit * (('x'.lit / :y)/(:x + :y))) <= 100).should == '((z * ((x / y) / (x + y))) <= 100)'
+    @d.l(('z'.lit * (('x'.lit / :y)/(:x + :y))) <= 100).should == '((z * (x / y / (x + y))) <= 100)'
     @d.l(~(((('x'.lit - :y)/(:x + :y))*:z) <= 100)).should == '((((x - y) / (x + y)) * z) > 100)'
   end
 
@@ -350,13 +350,13 @@ context "Blockless Ruby Filters" do
     @d.lit([:x, 1, :y].sql_string_join(:y__z)).should == "(x || y.z || '1' || y.z || y)"
     @d.lit([:x, 1, :y].sql_string_join(1)).should == "(x || '1' || '1' || '1' || y)"
     @d.lit([:x, :y].sql_string_join('y.x || x.y'.lit)).should == "(x || y.x || x.y || y)"
-    @d.lit([[:x, :y].sql_string_join, [:a, :b].sql_string_join].sql_string_join).should == "((x || y) || (a || b))"
+    @d.lit([[:x, :y].sql_string_join, [:a, :b].sql_string_join].sql_string_join).should == "(x || y || a || b)"
   end
 
   it "should support StringExpression#+ for concatenation of SQL strings" do
     @d.lit(:x.sql_string + :y).should == '(x || y)'
-    @d.lit([:x].sql_string_join + :y).should == '((x) || y)'
-    @d.lit([:x, :z].sql_string_join(' ') + :y).should == "((x || ' ' || z) || y)"
+    @d.lit([:x].sql_string_join + :y).should == '(x || y)'
+    @d.lit([:x, :z].sql_string_join(' ') + :y).should == "(x || ' ' || z || y)"
   end
 
   it "should be supported inside blocks" do

@@ -1,5 +1,7 @@
 === HEAD
 
+* Combine multiple complex expressions for simpler SQL and object tree (jeremyevans)
+
 * Add Dataset#first_source_table, for the unaliased version of the table for the first source (jeremyevans)
 
 * Raise a more explicit error if attempting to use the sqlite adapter with sqlite3 instead of sqlite3-ruby (jeremyevans)

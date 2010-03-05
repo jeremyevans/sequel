@@ -702,9 +702,9 @@ context "Dataset#exclude" do
   
   specify "should allow the use of blocks and arguments simultaneously" do
     @dataset.exclude(:id => (7..11)){:id.sql_number < 6}.sql.should == 
-      'SELECT * FROM test WHERE (((id < 7) OR (id > 11)) OR (id >= 6))'
+      'SELECT * FROM test WHERE ((id < 7) OR (id > 11) OR (id >= 6))'
     @dataset.exclude([:id, 1], [:x, 3]){:id.sql_number < 6}.sql.should == 
-      'SELECT * FROM test WHERE (((id != 1) OR (x != 3)) OR (id >= 6))'
+      'SELECT * FROM test WHERE ((id != 1) OR (x != 3) OR (id >= 6))'
   end
 end
 
@@ -1726,7 +1726,7 @@ context "Dataset#join_table" do
   
   specify "should handle multiple conditions on the same join table column" do
     @d.join_table(:left_outer, :categories, [[:category_id, :id], [:category_id, 0..100]]).sql.should ==
-      'SELECT * FROM "items" LEFT OUTER JOIN "categories" ON (("categories"."category_id" = "items"."id") AND (("categories"."category_id" >= 0) AND ("categories"."category_id" <= 100)))'
+      'SELECT * FROM "items" LEFT OUTER JOIN "categories" ON (("categories"."category_id" = "items"."id") AND ("categories"."category_id" >= 0) AND ("categories"."category_id" <= 100))'
   end
   
   specify "should include WHERE clause if applicable" do
@@ -3008,12 +3008,12 @@ context "Dataset#grep" do
   
   specify "should support multiple search terms" do
     @ds.grep(:title, ['abc', 'def']).sql.should == 
-      "SELECT * FROM posts WHERE (((title LIKE 'abc') OR (title LIKE 'def')))"
+      "SELECT * FROM posts WHERE ((title LIKE 'abc') OR (title LIKE 'def'))"
   end
   
   specify "should support multiple columns and search terms" do
     @ds.grep([:title, :body], ['abc', 'def']).sql.should ==
-      "SELECT * FROM posts WHERE (((title LIKE 'abc') OR (title LIKE 'def')) OR ((body LIKE 'abc') OR (body LIKE 'def')))"
+      "SELECT * FROM posts WHERE ((title LIKE 'abc') OR (title LIKE 'def') OR (body LIKE 'abc') OR (body LIKE 'def'))"
   end
   
   specify "should support regexps though the database may not support it" do
@@ -3021,7 +3021,7 @@ context "Dataset#grep" do
       "SELECT * FROM posts WHERE ((title ~ 'ruby'))"
 
     @ds.grep(:title, [/^ruby/, 'ruby']).sql.should ==
-      "SELECT * FROM posts WHERE (((title ~ '^ruby') OR (title LIKE 'ruby')))"
+      "SELECT * FROM posts WHERE ((title ~ '^ruby') OR (title LIKE 'ruby'))"
   end
 
   specify "should support searching against other columns" do
@@ -3146,7 +3146,7 @@ context "Dataset prepared statements and bound variables " do
     
   specify "should handle subselects" do
     @ds.filter(:$b).filter(:num=>@ds.select(:num).filter(:num=>:$n)).filter(:$c).call(:select, :n=>1, :b=>0, :c=>2)
-    @db.sqls.should == ['SELECT * FROM items WHERE ((0 AND (num IN (SELECT num FROM items WHERE (num = 1)))) AND 2)']
+    @db.sqls.should == ['SELECT * FROM items WHERE (0 AND (num IN (SELECT num FROM items WHERE (num = 1))) AND 2)']
   end
     
   specify "should handle subselects in subselects" do

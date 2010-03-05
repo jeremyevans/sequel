@@ -791,7 +791,7 @@ describe Sequel::Model, "one_to_many" do
     MODEL_DB.reset
     @c1.load(:node_id => nil, :y => 5, :id => 234).should == n.remove_attribute([234, 5])
     MODEL_DB.sqls.length.should == 2
-    MODEL_DB.sqls.first.should =~ /SELECT \* FROM attributes WHERE \(\(attributes.node_id = 123\) AND \(\((id|y) = (234|5)\) AND \((id|y) = (234|5)\)\)\) LIMIT 1/
+    MODEL_DB.sqls.first.should =~ /SELECT \* FROM attributes WHERE \(\(attributes.node_id = 123\) AND \((id|y) = (234|5)\) AND \((id|y) = (234|5)\)\) LIMIT 1/
     MODEL_DB.sqls.last.should =~ /UPDATE attributes SET node_id = NULL WHERE \(\((id|y) = (234|5)\) AND \((id|y) = (234|5)\)\)/
   end
   
@@ -1212,7 +1212,7 @@ describe Sequel::Model, "one_to_many" do
     def d.fetch_rows(s); yield({:id=>3, :y=>6}) end
     @c2.load(:id => 1234, :x=>5).attribute = attrib
     MODEL_DB.sqls.first.should =~ /UPDATE attributes SET (node_id = 1234|y = 5), (node_id = 1234|y = 5) WHERE \(id = 3\)/
-    MODEL_DB.sqls.last.should =~ /UPDATE attributes SET (node_id|y) = NULL, (node_id|y) = NULL WHERE \(\(\(node_id = 1234\) AND \(y = 5\)\) AND \(id != 3\)\)/
+    MODEL_DB.sqls.last.should =~ /UPDATE attributes SET (node_id|y) = NULL, (node_id|y) = NULL WHERE \(\(node_id = 1234\) AND \(y = 5\) AND \(id != 3\)\)/
   end
 
   it "should raise an error if the one_to_one getter would be the same as the association name" do

@@ -132,6 +132,9 @@ module Sequel
         case op
         when *N_ARITY_OPERATORS
           raise(Error, "The #{op} operator requires at least 1 argument") unless args.length >= 1
+          old_args = args
+          args = []
+          old_args.each{|a| a.is_a?(self.class) && a.op == op ? args.concat(a.args) : args.push(a)}
         when *TWO_ARITY_OPERATORS
           raise(Error, "The #{op} operator requires precisely 2 arguments") unless args.length == 2
         when *ONE_ARITY_OPERATORS
