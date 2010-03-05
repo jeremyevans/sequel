@@ -482,3 +482,56 @@ describe "OptimisticLocking plugin" do
     proc{p1.update(:name=>'Bob')}.should_not raise_error
   end
 end
+
+describe "Composition plugin" do 
+  before do
+    @db = INTEGRATION_DB
+    @db.create_table!(:events) do
+      primary_key :id
+      Integer :year
+      Integer :month
+      Integer :day
+    end
+    class ::Event < Sequel::Model(@db)
+      plugin :composition
+      composition :date, :composer=>proc{Date.new(year, month, day) if year && month && day}, :decomposer=>(proc do
+          if date
+            self.year = date.year
+            self.month = date.month
+            self.day = date.day
+          else
+            self.year, self.month, self.day = nil
+          end
+        end)
+      composition :date, :mapping=>[:year, :month, :day]
+    end
+    @e1 = Event.create(:year=>2010, :month=>2, :day=>15)
+    @e2 = Event.create({})
+  end
+  after do
+    @db.drop_table(:events)
+    Object.send(:remove_const, :Event)
+  end
+
+  specify "should return a composed object if the underlying columns have a value" do
+    @e1.date.should == Date.civil(2010, 2, 15)
+    @e2.date.should == nil
+  end
+
+  specify "should decompose the object when saving the record" do
+    @e1.date = Date.civil(2009, 1, 2)
+    @e1.save
+    @e1.year.should == 2009
+    @e1.month.should == 1
+    @e1.day.should == 2
+  end
+
+  specify "should save all columns when saving changes" do
+    @e2.date = Date.civil(2009, 10, 2)
+    @e2.save_changes
+    @e2.reload
+    @e2.year.should == 2009
+    @e2.month.should == 10
+    @e2.day.should == 2
+  end
+end
