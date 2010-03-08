@@ -2,13 +2,13 @@
 # It is just a wrapper around a single connection that uses the connection pool
 # API.
 class Sequel::SingleConnectionPool < Sequel::ConnectionPool  
-  # The SingleConnectionPool always has a size of 1, since the connection
-  # is always available.
+  # The SingleConnectionPool always has a size of 1 if connected
+  # and 0 if not.
   def size
     @conn ? 1 : 0
   end
   
-  # Disconnect and immediately reconnect from the database.
+  # Disconnect the connection from the database.
   def disconnect(opts=nil, &block)
     block ||= @disconnection_proc
     block.call(@conn) if block
