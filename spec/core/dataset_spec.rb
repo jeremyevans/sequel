@@ -3769,3 +3769,21 @@ context "Modifying joined datasets" do
     @ds.db.sqls.should == ['UPDATE b, c INNER JOIN d USING (id) SET a = 1 WHERE (id = 2)']
   end
 end
+
+context "Dataset#lock_style and for_update" do
+  before do
+    @ds = MockDatabase.new[:t]
+  end
+  
+  specify "#for_update should use FOR UPDATE" do
+    @ds.for_update.sql.should == "SELECT * FROM t FOR UPDATE"
+  end
+  
+  specify "#lock_style should accept symbols" do
+    @ds.lock_style(:update).sql.should == "SELECT * FROM t FOR UPDATE"
+  end
+  
+  specify "#lock_style should accept strings for arbitrary SQL" do
+    @ds.lock_style("FOR SHARE").sql.should == "SELECT * FROM t FOR SHARE"
+  end
+end

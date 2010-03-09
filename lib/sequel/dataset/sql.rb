@@ -1101,7 +1101,7 @@ module Sequel
       when :update
         sql << FOR_UPDATE
       when String
-        sql << @opts[:lock]
+        sql << " #{@opts[:lock]}"
       end
     end
 
