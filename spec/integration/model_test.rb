@@ -107,4 +107,12 @@ describe "Sequel::Model basic support" do
     proc{i2 = Marshal.load(s)}.should_not raise_error
     i2.should == i
   end
+  
+  specify "#lock! should lock records" do
+    Item.db.transaction do
+      i = Item.create(:name=>'J')
+      i.lock!
+      i.update(:name=>'K')
+    end
+  end
 end
