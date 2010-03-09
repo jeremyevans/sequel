@@ -668,6 +668,11 @@ module Sequel
         @values.keys
       end
       
+      # Refresh this record using for_update unless this is a new record.  Returns self.
+      def lock!
+        new? ? self : _refresh(this.for_update)
+      end
+      
       # Remove elements of the model object that make marshalling fail. Returns self.
       def marshallable!
         @this = nil

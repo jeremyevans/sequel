@@ -1,5 +1,7 @@
 === HEAD
 
+* Add Model#lock! which uses Dataset#for_update to lock model rows (jeremyevans)
+
 * Add Dataset#for_update as a standard dataset method (jeremyevans)
 
 * Add composition plugin, simlar to ActiveRecord's composed_of (jeremyevans)

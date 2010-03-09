@@ -1433,3 +1433,37 @@ describe Sequel::Model, "typecasting" do
     model.x.should == 'a'
   end
 end
+
+describe "Model#lock!" do
+  before do
+    @c = Class.new(Sequel::Model(:items)) do
+      columns :id
+    end
+    ds = @c.dataset
+    def ds.fetch_rows(sql)
+      db.execute(sql)
+      yield({:id=>1})
+    end
+    MODEL_DB.reset
+  end
+  
+  it "should do nothing if the record is a new record" do
+    o = @c.new
+    called = false
+    o.meta_def(:_refresh){|x| called = true; super(x)}
+    x = o.lock!
+    x.should == o
+    called.should == false
+    MODEL_DB.sqls.should == []
+  end
+    
+  it "should refresh the record using for_update if it is not a new record" do
+    o = @c.load(:id => 1)
+    called = false
+    o.meta_def(:_refresh){|x| called = true; super(x)}
+    x = o.lock!
+    x.should == o
+    called.should == true
+    MODEL_DB.sqls.should == ["SELECT * FROM items WHERE (id = 1) LIMIT 1 FOR UPDATE"]
+  end
+end
