@@ -31,11 +31,12 @@ module Sequel
 
     # All methods that should have a ! method added that modifies
     # the receiver.
-    MUTATION_METHODS = %w'add_graph_aliases and distinct except exclude
-    filter from from_self full_outer_join graph
-    group group_and_count group_by having inner_join intersect invert join join_table
-    left_outer_join limit naked or order order_by order_more paginate qualify query
-    reverse reverse_order right_outer_join select select_all select_more server
+    MUTATION_METHODS = %w'add_graph_aliases and cross_join distinct except exclude
+    filter for_update from from_self full_join full_outer_join graph
+    group group_and_count group_by having inner_join intersect invert join join_table left_join
+    left_outer_join limit lock_style naked natural_full_join natural_join
+    natural_left_join natural_right_join or order order_by order_more paginate qualify query
+    reverse reverse_order right_join right_outer_join select select_all select_more server
     set_defaults set_graph_aliases set_overrides unfiltered ungraphed ungrouped union
     unlimited unordered where with with_recursive with_sql'.collect{|x| x.to_sym}
 
