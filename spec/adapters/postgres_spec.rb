@@ -130,11 +130,6 @@ context "A PostgreSQL dataset" do
     @d.filter(:name => /^bc/).count.should == 1
   end
   
-  specify "should support for_share and for_update" do
-    @d.for_share.all.should == []
-    @d.for_update.all.should == []
-  end
-  
   specify "#lock should lock tables and yield if a block is given" do
     @d.lock('EXCLUSIVE'){@d.insert(:name=>'a')}
   end
@@ -150,6 +145,61 @@ context "A PostgreSQL dataset" do
   
   specify "should raise an error if attempting to update a joined dataset with a single FROM table" do
     proc{POSTGRES_DB[:test].join(:test2, [:name]).update(:name=>'a')}.should raise_error(Sequel::Error, 'Need multiple FROM tables if updating/deleting a dataset with JOINs')
+  end
+end
+
+if POSTGRES_DB.pool.respond_to?(:max_size) and POSTGRES_DB.pool.max_size > 1
+  describe "Dataset#for_update support" do
+    before do
+      @db = POSTGRES_DB.create_table!(:items) do
+        primary_key :id
+        Integer :number
+        String :name
+      end
+      @ds = POSTGRES_DB[:items]
+      clear_sqls
+    end
+    after do
+      POSTGRES_DB.drop_table(:items)
+      POSTGRES_DB.disconnect
+    end
+    
+    specify "should handle FOR UPDATE" do
+      @ds.insert(:number=>20)
+      c = nil
+      t = nil
+      POSTGRES_DB.transaction do
+        @ds.for_update.first(:id=>1)
+        t = Thread.new do
+          POSTGRES_DB.transaction do
+            @ds.filter(:id=>1).update(:name=>'Jim')
+            c = @ds.first(:id=>1)
+          end
+        end
+        sleep 0.01
+        @ds.filter(:id=>1).update(:number=>30)
+      end
+      t.join
+      c.should == {:id=>1, :number=>30, :name=>'Jim'}
+    end
+  
+    specify "should handle FOR SHARE" do
+      @ds.insert(:number=>20)
+      c = nil
+      t = nil
+      POSTGRES_DB.transaction do
+        @ds.for_share.first(:id=>1)
+        t = Thread.new do
+          POSTGRES_DB.transaction do
+            c = @ds.for_share.filter(:id=>1).first
+          end
+        end
+        sleep 0.05
+        @ds.filter(:id=>1).update(:name=>'Jim')
+        c.should == {:id=>1, :number=>20, :name=>nil}
+      end
+      t.join
+    end
   end
 end
 

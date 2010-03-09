@@ -25,6 +25,7 @@ module Sequel
     COLUMN_REF_RE3 = /\A([\w ]+)__([\w ]+)\z/.freeze
     COUNT_FROM_SELF_OPTS = [:distinct, :group, :sql, :limit, :compounds]
     DATASET_ALIAS_BASE_NAME = 't'.freeze
+    FOR_UPDATE = ' FOR UPDATE'.freeze
     IS_LITERALS = {nil=>'NULL'.freeze, true=>'TRUE'.freeze, false=>'FALSE'.freeze}.freeze
     IS_OPERATORS = ::Sequel::SQL::ComplexExpression::IS_OPERATORS
     N_ARITY_OPERATORS = ::Sequel::SQL::ComplexExpression::N_ARITY_OPERATORS
@@ -33,7 +34,7 @@ module Sequel
     QUESTION_MARK = '?'.freeze
     DELETE_CLAUSE_METHODS = clause_methods(:delete, %w'from where')
     INSERT_CLAUSE_METHODS = clause_methods(:insert, %w'into columns values')
-    SELECT_CLAUSE_METHODS = clause_methods(:select, %w'with distinct columns from join where group having compounds order limit')
+    SELECT_CLAUSE_METHODS = clause_methods(:select, %w'with distinct columns from join where group having compounds order limit lock')
     UPDATE_CLAUSE_METHODS = clause_methods(:update, %w'table set where')
     TIMESTAMP_FORMAT = "'%Y-%m-%d %H:%M:%S%N%z'".freeze
     STANDARD_TIMESTAMP_FORMAT = "TIMESTAMP #{TIMESTAMP_FORMAT}".freeze
@@ -1092,6 +1093,16 @@ module Sequel
     def select_limit_sql(sql)
       sql << " LIMIT #{literal(@opts[:limit])}" if @opts[:limit]
       sql << " OFFSET #{literal(@opts[:offset])}" if @opts[:offset]
+    end
+  
+    # Modify the sql to support the different types of locking modes.
+    def select_lock_sql(sql)
+      case @opts[:lock]
+      when :update
+        sql << FOR_UPDATE
+      when String
+        sql << @opts[:lock]
+      end
     end
 
     # Modify the sql to add the expressions to ORDER BY

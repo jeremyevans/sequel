@@ -266,6 +266,10 @@ describe "Simple Dataset operations in transactions" do
       @ds.order(:id).all.should == [{:id=>1, :number=>20}]
     end
   end
+  
+  specify "should support for_update" do
+    INTEGRATION_DB.transaction{@ds.for_update.all.should == []}
+  end
 end
 
 describe "Dataset UNION, EXCEPT, and INTERSECT" do
@@ -596,7 +600,7 @@ describe "Sequel::Dataset main SQL methods" do
     @ds.filter("b < ?", 15).invert.all.should == [{:a=>20, :b=>30}]
   end
   
-  it "#and and #or should work with placeholder strings" do
+  it "#and and #or should work correctly" do
     @ds.insert(20, 30)
     @ds.filter(:a=>20).and(:b=>30).all.should == [{:a=>20, :b=>30}]
     @ds.filter(:a=>20).and(:b=>15).all.should == []

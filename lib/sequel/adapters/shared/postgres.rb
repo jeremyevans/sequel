@@ -593,7 +593,6 @@ module Sequel
       EXPLAIN = 'EXPLAIN '.freeze
       EXPLAIN_ANALYZE = 'EXPLAIN ANALYZE '.freeze
       FOR_SHARE = ' FOR SHARE'.freeze
-      FOR_UPDATE = ' FOR UPDATE'.freeze
       LOCK = 'LOCK TABLE %s IN %s MODE'.freeze
       NULL = LiteralString.new('NULL').freeze
       PG_TIMESTAMP_FORMAT = "TIMESTAMP '%Y-%m-%d %H:%M:%S".freeze
@@ -647,14 +646,9 @@ module Sequel
         with_sql((opts[:analyze] ? EXPLAIN_ANALYZE : EXPLAIN) + select_sql).map(QUERY_PLAN).join("\r\n")
       end
       
-      # Return a cloned dataset with a :share lock type.
+      # Return a cloned dataset which will use FOR SHARE to lock returned rows.
       def for_share
-        clone(:lock => :share)
-      end
-      
-      # Return a cloned dataset with a :update lock type.
-      def for_update
-        clone(:lock => :update)
+        lock_style(:share)
       end
       
       # PostgreSQL specific full text search syntax, using tsearch2 (included
@@ -786,20 +780,15 @@ module Sequel
       def select_clause_methods
         server_version >= 80400 ? SELECT_CLAUSE_METHODS_84 : SELECT_CLAUSE_METHODS
       end
+      
+      # Support FOR SHARE locking when using the :share lock style.
+      def select_lock_sql(sql)
+        @opts[:lock] == :share ? (sql << FOR_SHARE) : super
+      end
 
       # SQL fragment for named window specifications
       def select_window_sql(sql)
         sql << " WINDOW #{@opts[:window].map{|name, window| "#{literal(name)} AS #{literal(window)}"}.join(', ')}" if @opts[:window]
-      end
-
-      # Support lock mode, allowing FOR SHARE and FOR UPDATE queries.
-      def select_lock_sql(sql)
-        case @opts[:lock]
-        when :update
-          sql << FOR_UPDATE
-        when :share
-          sql << FOR_SHARE
-        end
       end
       
       # Use WITH RECURSIVE instead of WITH if any of the CTEs is recursive

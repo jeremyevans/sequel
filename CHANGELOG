@@ -1,5 +1,7 @@
 === HEAD
 
+* Add Dataset#for_update as a standard dataset method (jeremyevans)
+
 * Add composition plugin, simlar to ActiveRecord's composed_of (jeremyevans)
 
 * Combine multiple complex expressions for simpler SQL and object tree (jeremyevans)

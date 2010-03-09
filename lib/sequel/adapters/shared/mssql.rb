@@ -183,8 +183,10 @@ module Sequel
       COMMA_SEPARATOR = ', '.freeze
       DELETE_CLAUSE_METHODS = Dataset.clause_methods(:delete, %w'with from output from2 where')
       INSERT_CLAUSE_METHODS = Dataset.clause_methods(:insert, %w'with into columns output values')
-      SELECT_CLAUSE_METHODS = Dataset.clause_methods(:select, %w'with limit distinct columns into from table_options join where group having order compounds')
+      SELECT_CLAUSE_METHODS = Dataset.clause_methods(:select, %w'with limit distinct columns into from lock join where group having order compounds')
       UPDATE_CLAUSE_METHODS = Dataset.clause_methods(:update, %w'with table set output from where')
+      NOLOCK = ' WITH (NOLOCK)'.freeze
+      UPDLOCK = ' WITH (UPDLOCK)'.freeze
       WILDCARD = LiteralString.new('*').freeze
       CONSTANT_MAP = {:CURRENT_DATE=>'CAST(CURRENT_TIMESTAMP AS DATE)'.freeze, :CURRENT_TIME=>'CAST(CURRENT_TIMESTAMP AS TIME)'.freeze}
 
@@ -244,9 +246,9 @@ module Sequel
         [insert_sql(columns, LiteralString.new(values.map {|r| "SELECT #{expression_list(r)}" }.join(" UNION ALL ")))]
       end
 
-      # Allows you to do .nolock on a query
+      # Allows you to do a dirty read of uncommitted data using WITH (NOLOCK).
       def nolock
-        clone(:table_options => "(NOLOCK)")
+        lock_style(:dirty)
       end
 
       # Include an OUTPUT clause in the eventual INSERT, UPDATE, or DELETE query.
@@ -433,9 +435,16 @@ module Sequel
         sql << " TOP (#{literal(@opts[:limit])})" if @opts[:limit]
       end
 
-      # MSSQL uses the WITH statement to lock tables
-      def select_table_options_sql(sql)
-        sql << " WITH #{@opts[:table_options]}" if @opts[:table_options]
+      # Support different types of locking styles
+      def select_lock_sql(sql)
+        case @opts[:lock]
+        when :update
+          sql << UPDLOCK
+        when :dirty
+          sql << NOLOCK
+        else
+          super
+        end
       end
 
       # SQL fragment for MSSQL's OUTPUT clause.

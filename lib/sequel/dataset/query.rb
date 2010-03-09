@@ -104,6 +104,11 @@ module Sequel
     def filter(*cond, &block)
       _filter(@opts[:having] ? :having : :where, *cond, &block)
     end
+    
+    # Returns a cloned dataset with a :update lock style.
+    def for_update
+      lock_style(:update)
+    end
 
     # Returns a copy of the dataset with the source changed.
     #
@@ -234,6 +239,14 @@ module Sequel
         opts[:offset] = o
       end
       clone(opts)
+    end
+    
+    # Returns a cloned dataset with the given lock style.  If style is a
+    # string, it will be used directly.  Otherwise, a symbol may be used
+    # for database independent locking.  Currently :update is respected
+    # by most databases, and :share is supported by some.
+    def lock_style(style)
+      clone(:lock => style)
     end
     
     # Adds an alternate filter to an existing filter using OR. If no filter 

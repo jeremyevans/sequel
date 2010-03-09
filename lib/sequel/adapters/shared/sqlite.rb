@@ -329,6 +329,11 @@ module Sequel
         SELECT_CLAUSE_METHODS
       end
       
+      # Support FOR SHARE locking when using the :share lock style.
+      def select_lock_sql(sql)
+        super unless @opts[:lock] == :update
+      end
+      
       # SQLite treats a DELETE with no WHERE clause as a TRUNCATE
       def _truncate_sql(table)
         "DELETE FROM #{table}"

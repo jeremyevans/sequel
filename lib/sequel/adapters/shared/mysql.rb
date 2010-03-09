@@ -227,9 +227,10 @@ module Sequel
       BOOL_TRUE = '1'.freeze
       BOOL_FALSE = '0'.freeze
       COMMA_SEPARATOR = ', '.freeze
+      FOR_SHARE = ' LOCK IN SHARE MODE'.freeze
       DELETE_CLAUSE_METHODS = Dataset.clause_methods(:delete, %w'from where order limit')
       INSERT_CLAUSE_METHODS = Dataset.clause_methods(:insert, %w'ignore into columns values on_duplicate_key_update')
-      SELECT_CLAUSE_METHODS = Dataset.clause_methods(:select, %w'distinct columns from join where group having compounds order limit')
+      SELECT_CLAUSE_METHODS = Dataset.clause_methods(:select, %w'distinct columns from join where group having compounds order limit lock')
       UPDATE_CLAUSE_METHODS = Dataset.clause_methods(:update, %w'table set where order limit')
       
       # MySQL specific syntax for LIKE/REGEXP searches, as well as
@@ -247,6 +248,11 @@ module Sequel
         else
           super(op, args)
         end
+      end
+      
+      # Return a cloned dataset which will use LOCK IN SHARE MODE to lock returned rows.
+      def for_share
+        lock_style(:share)
       end
 
       # Adds full text filter
@@ -464,6 +470,11 @@ module Sequel
       # MySQL does not support the SQL WITH clause for SELECT statements
       def select_clause_methods
         SELECT_CLAUSE_METHODS
+      end
+      
+      # Support FOR SHARE locking when using the :share lock style.
+      def select_lock_sql(sql)
+        @opts[:lock] == :share ? (sql << FOR_SHARE) : super
       end
 
       # MySQL supports the ORDER BY and LIMIT clauses for UPDATE statements

@@ -53,6 +53,10 @@ context "A MSSQL database" do
     proc{@db.server_version}.should_not raise_error
     proc{@db.dataset.server_version}.should_not raise_error
   end
+  
+  specify "should work with NOLOCK" do
+    @db.transaction{@db[:test3].nolock.all.should == []}
+  end
 end
 
 context "MSSQL Dataset#join_table" do
