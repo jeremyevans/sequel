@@ -1134,7 +1134,7 @@ describe Sequel::Model, "one_to_many" do
   end
 
   it "should add a getter method if the :one_to_one option is true" do
-    @c2.one_to_many :attributes, :class => @c1, :one_to_one=>true
+    @c2.one_to_many :attribute, :class => @c1, :one_to_one=>true
     att = @c2.new(:id => 1234).attribute
     MODEL_DB.sqls.should == ['SELECT * FROM attributes WHERE (attributes.node_id = 1234)']
     att.should be_a_kind_of(@c1)
@@ -1142,21 +1142,21 @@ describe Sequel::Model, "one_to_many" do
   end
 
   it "should not add a setter method if the :one_to_one option is true and :read_only option is true" do
-    @c2.one_to_many :attributes, :class => @c1, :one_to_one=>true, :read_only=>true
+    @c2.one_to_many :attribute, :class => @c1, :one_to_one=>true, :read_only=>true
     im = @c2.instance_methods.collect{|x| x.to_s}
     im.should(include('attribute'))
     im.should_not(include('attribute='))
   end
 
   it "should have the getter method raise an error if more than one record is found" do
-    @c2.one_to_many :attributes, :class => @c1, :one_to_one=>true
+    @c2.one_to_many :attribute, :class => @c1, :one_to_one=>true
     d = @c1.dataset
     def d.fetch_rows(s); 2.times{yield Hash.new} end
     proc{@c2.new(:id => 1234).attribute}.should raise_error(Sequel::Error)
   end
 
   it "should add a setter method if the :one_to_one option is true" do
-    @c2.one_to_many :attributes, :class => @c1, :one_to_one=>true
+    @c2.one_to_many :attribute, :class => @c1, :one_to_one=>true
     attrib = @c1.new(:id=>3)
     d = @c1.dataset
     @c1.class_eval{remove_method :_refresh}
@@ -1175,7 +1175,7 @@ describe Sequel::Model, "one_to_many" do
   end
 
   it "should use a transaction in the setter method if the :one_to_one option is true" do
-    @c2.one_to_many :attributes, :class => @c1, :one_to_one=>true
+    @c2.one_to_many :attribute, :class => @c1, :one_to_one=>true
     @c2.use_transactions = true
     MODEL_DB.sqls.clear
     attrib = @c1.load(:id=>3)
@@ -1187,7 +1187,7 @@ describe Sequel::Model, "one_to_many" do
   end
 
   it "should have the setter method for the :one_to_one option respect the :primary_key option" do
-    @c2.one_to_many :attributes, :class => @c1, :one_to_one=>true, :primary_key=>:xxx
+    @c2.one_to_many :attribute, :class => @c1, :one_to_one=>true, :primary_key=>:xxx
     attrib = @c1.new(:id=>3)
     d = @c1.dataset
     @c1.class_eval{remove_method :_refresh}
@@ -1206,7 +1206,7 @@ describe Sequel::Model, "one_to_many" do
     end
     
   it "should have the setter method for the :one_to_one option respect composite keys" do
-    @c2.one_to_many :attributes, :class => @c1, :one_to_one=>true, :key=>[:node_id, :y], :primary_key=>[:id, :x]
+    @c2.one_to_many :attribute, :class => @c1, :one_to_one=>true, :key=>[:node_id, :y], :primary_key=>[:id, :x]
     attrib = @c1.load(:id=>3, :y=>6)
     d = @c1.dataset
     def d.fetch_rows(s); yield({:id=>3, :y=>6}) end
@@ -1215,22 +1215,17 @@ describe Sequel::Model, "one_to_many" do
     MODEL_DB.sqls.last.should =~ /UPDATE attributes SET (node_id|y) = NULL, (node_id|y) = NULL WHERE \(\(node_id = 1234\) AND \(y = 5\) AND \(id != 3\)\)/
   end
 
-  it "should raise an error if the one_to_one getter would be the same as the association name" do
-    proc{@c2.one_to_many :song, :class => @c1, :one_to_one=>true}.should raise_error(Sequel::Error)
-  end
-
   it "should not create remove_ and remove_all methods if :one_to_one option is used" do
-    @c2.one_to_many :attributes, :class => @c1, :one_to_one=>true
+    @c2.one_to_many :attribute, :class => @c1, :one_to_one=>true
     @c2.new.should_not(respond_to(:remove_attribute))
     @c2.new.should_not(respond_to(:remove_all_attributes))
   end
 
   it "should make non getter and setter methods private if :one_to_one option is used" do 
-    @c2.one_to_many :attributes, :class => @c1, :one_to_one=>true do |ds| end
+    @c2.one_to_many :attribute, :class => @c1, :one_to_one=>true do |ds| end
     meths = @c2.private_instance_methods.collect{|x| x.to_s}
-    meths.should(include("attributes"))
     meths.should(include("add_attribute"))
-    meths.should(include("attributes_dataset"))
+    meths.should(include("attribute_dataset"))
   end
 
   it "should call an _add_ method internally to add attributes" do

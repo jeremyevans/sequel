@@ -677,3 +677,49 @@ describe "statistics associations" do
     p2.ticket_hours.to_i.should == 22
   end
 end
+
+describe "one to one associations" do
+  before do
+    INTEGRATION_DB.create_table!(:books) do
+      primary_key :id
+    end
+    class ::Book < Sequel::Model
+      one_to_many :first_page, :class=>:Page, :conditions=>{:page_number=>1}, :one_to_one=>true
+    end
+
+    INTEGRATION_DB.create_table!(:pages) do
+      primary_key :id
+      foreign_key :book_id, :books
+      Integer :page_number
+    end
+    class ::Page < Sequel::Model
+      many_to_one :book
+    end
+
+    @book1 = Book.create
+    @book2 = Book.create
+    @page1 = Page.create(:book=>@book1, :page_number=>1)
+    @page2 = Page.create(:book=>@book1, :page_number=>2)
+    @page3 = Page.create(:book=>@book2, :page_number=>1)
+    @page4 = Page.create(:book=>@book2, :page_number=>2)
+    clear_sqls
+  end
+
+  after do
+    INTEGRATION_DB.drop_table :pages, :books
+    Object.send(:remove_const, :Book)
+    Object.send(:remove_const, :Page)
+  end
+
+  it "should be eager loadable" do
+    bk1, bk2 = Book.filter(:books__id=>[1,2]).eager(:first_page).all
+    bk1.first_page.should == @page1
+    bk2.first_page.should == @page3
+  end
+
+  it "should be eager graphable" do
+    bk1, bk2 = Book.filter(:books__id=>[1,2]).eager_graph(:first_page).all
+    bk1.first_page.should == @page1
+    bk2.first_page.should == @page3
+  end
+end

@@ -443,9 +443,7 @@ module Sequel
         # :one_to_one option specified on the table without the foreign key.  The
         # two associations will operate similarly, except that the many_to_one
         # association setter doesn't update the database until you call save manually.
-        # Also, in most cases you need to specify the plural association name when using
-        # one_to_many with the :one_to_one option.
-        # 
+        #
         # The following options can be supplied:
         # * *ALL types*:
         #   - :after_add - Symbol, Proc, or array of both/either specifying a callback to call
@@ -547,8 +545,7 @@ module Sequel
         #     association methods usually added are either removed or made private,
         #     so using this is similar to using many_to_one, in terms of the methods
         #     it adds, the main difference is that the foreign key is in the associated
-        #     table instead of the current table.  Note that using this option still requires
-        #     you to use a plural name when creating and using the association (e.g. for reflections, eager loading, etc.).
+        #     table instead of the current table.
         #   - :primary_key - column in the current table that :key option references, as a symbol.
         #     Defaults to primary key of the current table. Can use an
         #     array of symbols for a composite key association.
@@ -896,17 +893,15 @@ module Sequel
             end
           end
           if opts[:one_to_one]
-            overridable_methods_module.send(:private, opts.association_method, opts.dataset_method)
-            n = singularize(name).to_sym
-            raise(Sequel::Error, "one_to_many association names should still be plural even when using the :one_to_one option") if n == name
-            association_module_def(n) do |*o|
-              objs = send(name, *o)
+            overridable_methods_module.send(:private, opts.dataset_method)
+            association_module_def(name) do |*reload|
+              objs = load_associated_objects(opts, reload[0])
               raise(Sequel::Error, "multiple values found for a one-to-one relationship") if objs.length > 1
               objs.first
             end
             unless opts[:read_only]
               overridable_methods_module.send(:private, opts.add_method)
-              association_module_def(:"#{n}=") do |o|
+              association_module_def(:"#{name}=") do |o|
                 klass = opts.associated_class
                 update_database = lambda do 
                   send(opts.add_method, o)
