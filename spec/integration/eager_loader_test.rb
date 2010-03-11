@@ -685,6 +685,7 @@ describe "one to one associations" do
     end
     class ::Book < Sequel::Model
       one_to_many :first_page, :class=>:Page, :conditions=>{:page_number=>1}, :one_to_one=>true
+      one_to_many :second_page, :class=>:Page, :conditions=>{:page_number=>2}, :one_to_one=>true
     end
 
     INTEGRATION_DB.create_table!(:pages) do
@@ -721,5 +722,13 @@ describe "one to one associations" do
     bk1, bk2 = Book.filter(:books__id=>[1,2]).eager_graph(:first_page).all
     bk1.first_page.should == @page1
     bk2.first_page.should == @page3
+  end
+
+  it "should be eager graphable two at once" do
+    bk1, bk2 = Book.filter(:books__id=>[1,2]).eager_graph(:first_page, :second_page).all
+    bk1.first_page.should == @page1
+    bk1.second_page.should == @page2
+    bk2.first_page.should == @page3
+    bk2.second_page.should == @page4
   end
 end

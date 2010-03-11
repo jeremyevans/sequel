@@ -859,7 +859,7 @@ module Sequel
           use_only_conditions = opts.include?(:graph_only_conditions)
           only_conditions = opts[:graph_only_conditions]
           conditions = opts[:graph_conditions]
-          opts[:cartesian_product_number] ||= 1
+          opts[:cartesian_product_number] ||= opts[:one_to_one] ? 0 : 1
           graph_block = opts[:graph_block]
           opts[:eager_grapher] ||= proc do |ds, assoc_alias, table_alias|
             ds = ds.graph(opts.associated_class, use_only_conditions ? only_conditions : cks.zip(cpks) + conditions, :select=>select, :table_alias=>assoc_alias, :join_type=>join_type, :implicit_qualifier=>table_alias, :from_self_alias=>ds.opts[:eager_graph][:master], &graph_block)
