@@ -112,7 +112,7 @@ The connection URL can also include such stuff as the user name and password:
 You can also specify optional parameters, such as the connection pool size, or loggers for logging SQL queries:
 
   DB = Sequel.connect("postgres://postgres:postgres@localhost/my_db",
-    :max_connections => 10, :loggers => [Logger.new('log/db.log']))
+    :max_connections => 10, :logger => Logger.new('log/db.log'))
 
 You can specify a block to connect, which will disconnect from the database after it completes:
 
