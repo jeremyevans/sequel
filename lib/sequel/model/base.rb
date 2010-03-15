@@ -301,7 +301,7 @@ module Sequel
       # Example:
       #   class Tagging < Sequel::Model
       #     # composite key
-      #     set_primary_key :taggable_id, :tag_id
+      #     set_primary_key [:taggable_id, :tag_id]
       #   end
       #
       #   class Person < Sequel::Model
