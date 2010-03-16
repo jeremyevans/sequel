@@ -103,7 +103,7 @@ module Sequel
         def nested_attributes_find(reflection, pk)
           pk = pk.to_s
           unless obj = Array(associated_objects = send(reflection[:name])).find{|x| x.pk.to_s == pk}
-            raise(Error, 'no associated object with that primary key does not exist') unless reflection[:nested_attributes][:strict] == false
+            raise(Error, "no matching associated object with given primary key (association: #{reflection[:name]}, pk: #{pk})") unless reflection[:nested_attributes][:strict] == false
           end
           obj
         end
