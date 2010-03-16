@@ -382,6 +382,33 @@ describe Sequel::Model, "many_to_one" do
     MODEL_DB.sqls.should == ['SELECT * FROM nodes WHERE (nodes.parent_id = 2)']
   end
 
+  it "should have many_to_one setter deal with a one_to_one reciprocal" do
+    @c2.many_to_one :parent, :class => @c2
+    @c2.one_to_one :child, :class => @c2, :key=>:parent_id
+    ds = @c2.dataset
+    def ds.fetch_rows(sql, &block)
+      MODEL_DB.sqls << sql
+    end
+
+    d = @c2.new(:id => 1)
+    e = @c2.new(:id => 2)
+    MODEL_DB.sqls.should == []
+    e.associations[:child] = []
+    d.parent = e
+    e.child.should == d
+    d.parent = nil
+    e.child.should == nil
+    d.parent = e
+    e.child.should == d
+
+    f = @c2.new(:id => 3)
+    d.parent = nil
+    e.child.should == nil
+    e.associations[:child] = [f]
+    d.parent = e
+    e.child.should == d
+  end
+
   it "should have the setter remove the object from the previous associated object's reciprocal one_to_many cached association list if it exists" do
     @c2.many_to_one :parent, :class => @c2
     @c2.one_to_many :children, :class => @c2, :key=>:parent_id
@@ -1133,10 +1160,20 @@ describe Sequel::Model, "one_to_many" do
     attrib.associations.fetch(:node, 2).should == nil
   end
 
-  it "should add a getter method if the :one_to_one option is true" do
+  it "should have the getter method return a single object if the :one_to_one option is true" do
     @c2.one_to_many :attribute, :class => @c1, :one_to_one=>true
     att = @c2.new(:id => 1234).attribute
-    MODEL_DB.sqls.should == ['SELECT * FROM attributes WHERE (attributes.node_id = 1234)']
+    MODEL_DB.sqls.should == ['SELECT * FROM attributes WHERE (attributes.node_id = 1234) LIMIT 1']
+    att.should be_a_kind_of(@c1)
+    att.values.should == {}
+  end
+
+  it "should have the one_to_one method create a one_to_many association with one_to_one option" do
+    @c2.one_to_one :attribute, :class => @c1
+    @c2.association_reflection(:attribute)[:type].should == :one_to_many
+    @c2.association_reflection(:attribute)[:one_to_one].should == true
+    att = @c2.new(:id => 1234).attribute
+    MODEL_DB.sqls.should == ['SELECT * FROM attributes WHERE (attributes.node_id = 1234) LIMIT 1']
     att.should be_a_kind_of(@c1)
     att.values.should == {}
   end
@@ -1146,13 +1183,6 @@ describe Sequel::Model, "one_to_many" do
     im = @c2.instance_methods.collect{|x| x.to_s}
     im.should(include('attribute'))
     im.should_not(include('attribute='))
-  end
-
-  it "should have the getter method raise an error if more than one record is found" do
-    @c2.one_to_many :attribute, :class => @c1, :one_to_one=>true
-    d = @c1.dataset
-    def d.fetch_rows(s); 2.times{yield Hash.new} end
-    proc{@c2.new(:id => 1234).attribute}.should raise_error(Sequel::Error)
   end
 
   it "should add a setter method if the :one_to_one option is true" do
@@ -1215,17 +1245,11 @@ describe Sequel::Model, "one_to_many" do
     MODEL_DB.sqls.last.should =~ /UPDATE attributes SET (node_id|y) = NULL, (node_id|y) = NULL WHERE \(\(node_id = 1234\) AND \(y = 5\) AND \(id != 3\)\)/
   end
 
-  it "should not create remove_ and remove_all methods if :one_to_one option is used" do
+  it "should not create add_, remove_, and remove_all methods if :one_to_one option is used" do
     @c2.one_to_many :attribute, :class => @c1, :one_to_one=>true
+    @c2.new.should_not(respond_to(:add_attribute))
     @c2.new.should_not(respond_to(:remove_attribute))
     @c2.new.should_not(respond_to(:remove_all_attributes))
-  end
-
-  it "should make non getter and setter methods private if :one_to_one option is used" do 
-    @c2.one_to_many :attribute, :class => @c1, :one_to_one=>true do |ds| end
-    meths = @c2.private_instance_methods.collect{|x| x.to_s}
-    meths.should(include("add_attribute"))
-    meths.should(include("attribute_dataset"))
   end
 
   it "should call an _add_ method internally to add attributes" do

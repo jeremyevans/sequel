@@ -538,14 +538,16 @@ module Sequel
         #     current model's primary key, as a symbol.  Defaults to
         #     :"#{self.name.underscore}_id".  Can use an
         #     array of symbols for a composite key association.
-        #   - :one_to_one: Create a getter and setter similar to those of many_to_one
-        #     associations.  The getter returns a singular matching record, or raises an
-        #     error if multiple records match.  The setter updates the record given and removes
-        #     associations with all other records. When this option is used, the other
-        #     association methods usually added are either removed or made private,
-        #     so using this is similar to using many_to_one, in terms of the methods
+        #   - :one_to_one: Change the associate getter method to return a single record instead
+        #     of an array, and create a setter that updates the record given and removes associations
+        #     from all other records.  If there are actually multiple associated records, the getter
+        #     method will raise an exception, so make sure that the association dataset can
+        #     only return a single record (maybe be adding a unique index to the database).
+        #     When this option is used, add_ and remove_ methods are not added.
+        #     So using this is similar to using many_to_one, in terms of the methods
         #     it adds, the main difference is that the foreign key is in the associated
-        #     table instead of the current table.
+        #     table instead of the current table.  Note that if you are using this option, the
+        #     association name should be singular, not plural.
         #   - :primary_key - column in the current table that :key option references, as a symbol.
         #     Defaults to primary key of the current table. Can use an
         #     array of symbols for a composite key association.
@@ -664,6 +666,11 @@ module Sequel
         # Shortcut for adding a one_to_many association, see associate
         def one_to_many(*args, &block)
           associate(:one_to_many, *args, &block)
+        end
+
+        # Shortcut for adding a one_to_many association with the :one_to_one option, see associate.
+        def one_to_one(name, opts={}, &block)
+          one_to_many(name, opts.merge(:one_to_one=>true), &block)
         end
         
         private
@@ -831,6 +838,7 @@ module Sequel
           model = self
           key = (opts[:key] ||= opts.default_key)
           cks = opts[:keys] = Array(key)
+          opts[:limit] = opts.fetch(:limit, 1) if opts[:one_to_one]
           primary_key = (opts[:primary_key] ||= self.primary_key)
           cpks = opts[:primary_keys] = Array(primary_key)
           raise(Error, 'mismatched number of composite keys') unless cks.length == cpks.length
@@ -869,19 +877,31 @@ module Sequel
           end
       
           def_association_dataset_methods(opts)
+          association_module_def(opts.association_method){|*reload| load_associated_objects(opts, reload[0]).last} if opts[:one_to_one]
           
           ck_nil_hash ={}
           cks.each{|k| ck_nil_hash[k] = nil}
-          
+
           unless opts[:read_only]
             validate = opts[:validate]
-            association_module_private_def(opts._add_method) do |o|
-              cks.zip(cpks).each{|k, pk| o.send(:"#{k}=", send(pk))}
-              o.save(:validate=>validate) || raise(Sequel::Error, "invalid associated object, cannot save")
-            end
-            def_add_method(opts)
+
+            if opts[:one_to_one]
+              association_module_def(:"#{name}=") do |o|
+                klass = opts.associated_class
+                cks.zip(cpks).each{|k, pk| o.send(:"#{k}=", send(pk))}
+                update_database = lambda do 
+                  o.save(:validate=>validate) || raise(Sequel::Error, "invalid associated object, cannot save")
+                  klass.filter(cks.zip(cpks.map{|k| send(k)})).exclude(o.pk_hash).update(ck_nil_hash)
+                end
+                use_transactions ? db.transaction(opts){update_database.call} : update_database.call
+              end
+            else 
+              association_module_private_def(opts._add_method) do |o|
+                cks.zip(cpks).each{|k, pk| o.send(:"#{k}=", send(pk))}
+                o.save(:validate=>validate) || raise(Sequel::Error, "invalid associated object, cannot save")
+              end
+              def_add_method(opts)
       
-            unless opts[:one_to_one]
               association_module_private_def(opts._remove_method) do |o|
                 cks.each{|k| o.send(:"#{k}=", nil)}
                 o.save(:validate=>validate) || raise(Sequel::Error, "invalid associated object, cannot save")
@@ -890,25 +910,6 @@ module Sequel
                 opts.associated_class.filter(cks.zip(cpks.map{|k| send(k)})).update(ck_nil_hash)
               end
               def_remove_methods(opts)
-            end
-          end
-          if opts[:one_to_one]
-            overridable_methods_module.send(:private, opts.dataset_method)
-            association_module_def(name) do |*reload|
-              objs = load_associated_objects(opts, reload[0])
-              raise(Sequel::Error, "multiple values found for a one-to-one relationship") if objs.length > 1
-              objs.first
-            end
-            unless opts[:read_only]
-              overridable_methods_module.send(:private, opts.add_method)
-              association_module_def(:"#{name}=") do |o|
-                klass = opts.associated_class
-                update_database = lambda do 
-                  send(opts.add_method, o)
-                  klass.filter(cks.zip(cpks.map{|k| send(k)})).exclude(o.pk_hash).update(ck_nil_hash)
-                end
-                use_transactions ? db.transaction(opts){update_database.call} : update_database.call
-              end
             end
           end
         end
