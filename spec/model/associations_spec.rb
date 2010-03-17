@@ -1164,7 +1164,7 @@ describe Sequel::Model, "one_to_many" do
 
   it "should have the one_to_one method create a one_to_many association with one_to_one option" do
     @c2.one_to_one :attribute, :class => @c1
-    @c2.association_reflection(:attribute)[:type].should == :one_to_many
+    @c2.association_reflection(:attribute)[:type].should == :one_to_one
     @c2.association_reflection(:attribute)[:one_to_one].should == true
     att = @c2.new(:id => 1234).attribute
     MODEL_DB.sqls.should == ['SELECT * FROM attributes WHERE (attributes.node_id = 1234) LIMIT 1']

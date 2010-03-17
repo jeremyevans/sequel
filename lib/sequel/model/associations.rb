@@ -106,10 +106,10 @@ module Sequel
         # it sets album.artist to this_artist.
         def reciprocal
           return self[:reciprocal] if include?(:reciprocal)
-          r_type = reciprocal_type
+          r_types = Array(reciprocal_type)
           keys = self[:keys]
           associated_class.all_association_reflections.each do |assoc_reflect|
-            if assoc_reflect[:type] == r_type && assoc_reflect[:keys] == keys && assoc_reflect.associated_class == self[:model]
+            if r_types.include?(assoc_reflect[:type]) && assoc_reflect[:keys] == keys && assoc_reflect.associated_class == self[:model]
               return self[:reciprocal] = assoc_reflect[:name]
             end
           end
@@ -210,9 +210,10 @@ module Sequel
     
         private
     
-        # The reciprocal type of a many_to_one association is a one_to_many association.
+        # The reciprocal type of a many_to_one association is either
+        # a one_to_many or a one_to_one association.
         def reciprocal_type
-          :one_to_many
+          [:one_to_many, :one_to_one]
         end
       end
     
@@ -264,6 +265,10 @@ module Sequel
         def reciprocal_type
           :many_to_one
         end
+      end
+      
+      class OneToOneAssociationReflection < OneToManyAssociationReflection
+        ASSOCIATION_TYPES[:one_to_one] = self
       end
     
       class ManyToManyAssociationReflection < AssociationReflection
@@ -378,6 +383,7 @@ module Sequel
       # 
       #   class Project < Sequel::Model
       #     many_to_one :portfolio
+      #     # or: one_to_one :portfolio
       #     one_to_many :milestones
       #     # or: many_to_many :milestones 
       #   end
@@ -385,7 +391,7 @@ module Sequel
       # The project class now has the following instance methods:
       # * portfolio - Returns the associated portfolio.
       # * portfolio=(obj) - Sets the associated portfolio to the object,
-      #   but the change is not persisted until you save the record.
+      #   but the change is not persisted until you save the record (for many_to_one associations).
       # * portfolio_dataset - Returns a dataset that would return the associated
       #   portfolio, only useful in fairly specific circumstances.
       # * milestones - Returns an array of associated milestones
@@ -395,16 +401,16 @@ module Sequel
       # * milestones_dataset - Returns a dataset that would return the associated
       #   milestones, allowing for further filtering/limiting/etc.
       #
-      # If you want to override the behavior of the add_/remove_/remove_all_ methods,
-      # there are private instance methods created that a prepended with an
-      # underscore (e.g. _add_milestone).  The private instance methods can be
+      # If you want to override the behavior of the add_/remove_/remove_all_/ methods
+      # or the association setter method, there are private instance methods created that are prepended
+      # with an underscore (e.g. _add_milestone or _portfolio=).  The private instance methods can be
       # easily overridden, but you shouldn't override the public instance methods without
       # calling super, as they deal with callbacks and caching.
       #
       # By default the classes for the associations are inferred from the association
       # name, so for example the Project#portfolio will return an instance of 
       # Portfolio, and Project#milestones will return an array of Milestone 
-      # instances.
+      # instances.  You can use the :class option to change which class is used.
       #
       # Association definitions are also reflected by the class, e.g.:
       #
@@ -432,17 +438,15 @@ module Sequel
         #   model's primary key.   Each current model object can be associated with
         #   more than one associated model objects.  Each associated model object
         #   can be associated with only one current model object.
+        # * :one_to_one - Similar to one_to_many in terms of foreign keys, but
+        #   only one object is associated to the current object through the
+        #   association.  The methods created are similar to many_to_one, except
+        #   that the one_to_one setter method saves the passed object.
         # * :many_to_many - A join table is used that has a foreign key that points
         #   to this model's primary key and a foreign key that points to the
         #   associated model's primary key.  Each current model object can be
         #   associated with many associated model objects, and each associated
         #   model object can be associated with many current model objects.
-        #
-        # A one to one relationship can be set up with a many_to_one association
-        # on the table with the foreign key, and a one_to_many association with the
-        # :one_to_one option specified on the table without the foreign key.  The
-        # two associations will operate similarly, except that the many_to_one
-        # association setter doesn't update the database until you call save manually.
         #
         # The following options can be supplied:
         # * *ALL types*:
@@ -542,16 +546,6 @@ module Sequel
         #     current model's primary key, as a symbol.  Defaults to
         #     :"#{self.name.underscore}_id".  Can use an
         #     array of symbols for a composite key association.
-        #   - :one_to_one: Change the associate getter method to return a single record instead
-        #     of an array, and create a setter that updates the record given and removes associations
-        #     from all other records.  If there are actually multiple associated records, the getter
-        #     method will raise an exception, so make sure that the association dataset can
-        #     only return a single record (maybe be adding a unique index to the database).
-        #     When this option is used, add_ and remove_ methods are not added.
-        #     So using this is similar to using many_to_one, in terms of the methods
-        #     it adds, the main difference is that the foreign key is in the associated
-        #     table instead of the current table.  Note that if you are using this option, the
-        #     association name should be singular, not plural.
         #   - :primary_key - column in the current table that :key option references, as a symbol.
         #     Defaults to primary key of the current table. Can use an
         #     array of symbols for a composite key association.
@@ -658,23 +652,23 @@ module Sequel
         end
       
         # Shortcut for adding a many_to_many association, see associate
-        def many_to_many(*args, &block)
-          associate(:many_to_many, *args, &block)
+        def many_to_many(name, opts={}, &block)
+          associate(:many_to_many, name, opts, &block)
         end
         
         # Shortcut for adding a many_to_one association, see associate
-        def many_to_one(*args, &block)
-          associate(:many_to_one, *args, &block)
+        def many_to_one(name, opts={}, &block)
+          associate(:many_to_one, name, opts, &block)
         end
         
         # Shortcut for adding a one_to_many association, see associate
-        def one_to_many(*args, &block)
-          associate(:one_to_many, *args, &block)
+        def one_to_many(name, opts={}, &block)
+          associate(opts[:one_to_one] ? :one_to_one : :one_to_many, name, opts, &block)
         end
 
-        # Shortcut for adding a one_to_many association with the :one_to_one option, see associate.
+        # Shortcut for adding a one_to_one association, see associate.
         def one_to_one(name, opts={}, &block)
-          one_to_many(name, opts.merge(:one_to_one=>true), &block)
+          associate(:one_to_one, name, opts.merge(:one_to_one=>true), &block)
         end
         
         private
@@ -918,6 +912,7 @@ module Sequel
             end
           end
         end
+        alias def_one_to_one def_one_to_many
         
         # Add the remove_ and remove_all instance methods
         def def_remove_methods(opts)
