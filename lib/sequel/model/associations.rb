@@ -885,10 +885,13 @@ module Sequel
 
             if opts[:one_to_one]
               association_module_private_def(opts._setter_method) do |o|
-                klass = opts.associated_class
-                cks.zip(cpks).each{|k, pk| o.send(:"#{k}=", send(pk))} if o
+                up_ds = opts.associated_class.filter(cks.zip(cpks.map{|k| send(k)}))
+                if o
+                  up_ds = up_ds.exclude(o.pk_hash)
+                  cks.zip(cpks).each{|k, pk| o.send(:"#{k}=", send(pk))}
+                end
                 update_database = lambda do
-                  klass.filter(cks.zip(cpks.map{|k| send(k)})).exclude(o.pk_hash).update(ck_nil_hash)
+                  up_ds.update(ck_nil_hash)
                   o.save(:validate=>validate) || raise(Sequel::Error, "invalid associated object, cannot save") if o
                 end
                 use_transactions && o ? db.transaction(opts){update_database.call} : update_database.call

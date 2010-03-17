@@ -574,6 +574,475 @@ describe Sequel::Model, "many_to_one" do
   end
 end
 
+describe Sequel::Model, "one_to_one" do
+  before do
+    @c1 = Class.new(Sequel::Model(:attributes)) do
+      def _refresh(ds); end
+      unrestrict_primary_key
+      columns :id, :node_id, :y
+    end
+
+    @c2 = Class.new(Sequel::Model(:nodes)) do
+      def _refresh(ds); end
+      unrestrict_primary_key
+      attr_accessor :xxx
+      
+      def self.name; 'Node'; end
+      def self.to_s; 'Node'; end
+      columns :id, :x, :parent_id, :par_parent_id, :blah, :node_id
+    end
+    @dataset = @c2.dataset
+    
+    @c2.dataset.extend(Module.new {
+      def empty?; false; end
+      def fetch_rows(sql)
+        @db << sql
+        yield Hash.new
+      end
+    })
+
+    @c1.dataset.extend(Module.new {
+      def empty?; opts.has_key?(:empty) ? (super; true) : false; end
+      def fetch_rows(sql)
+        @db << sql
+        yield Hash.new
+      end
+    })
+
+    @dataset = @c2.dataset
+    MODEL_DB.reset
+  end
+  
+  it "should have the getter method return a single object if the :one_to_one option is true" do
+    @c2.one_to_one :attribute, :class => @c1
+    att = @c2.new(:id => 1234).attribute
+    MODEL_DB.sqls.should == ['SELECT * FROM attributes WHERE (attributes.node_id = 1234) LIMIT 1']
+    att.should be_a_kind_of(@c1)
+    att.values.should == {}
+  end
+
+  it "should not add a setter method if the :read_only option is true" do
+    @c2.one_to_one :attribute, :class => @c1, :read_only=>true
+    im = @c2.instance_methods.collect{|x| x.to_s}
+    im.should(include('attribute'))
+    im.should_not(include('attribute='))
+  end
+
+  it "should add a setter method" do
+    @c2.one_to_one :attribute, :class => @c1
+    attrib = @c1.new(:id=>3)
+    d = @c1.dataset
+    @c1.class_eval{remove_method :_refresh}
+    def d.fetch_rows(s); yield({:id=>3}) end
+    @c2.new(:id => 1234).attribute = attrib
+    ['INSERT INTO attributes (node_id, id) VALUES (1234, 3)',
+      'INSERT INTO attributes (id, node_id) VALUES (3, 1234)'].should(include(MODEL_DB.sqls.last))
+    MODEL_DB.sqls.first.should == 'UPDATE attributes SET node_id = NULL WHERE ((node_id = 1234) AND (id != 3))'
+    MODEL_DB.sqls.length.should == 2
+    @c2.new(:id => 1234).attribute.should == attrib
+    MODEL_DB.sqls.clear
+    attrib = @c1.load(:id=>3)
+    @c2.new(:id => 1234).attribute = attrib
+    MODEL_DB.sqls.should == ['UPDATE attributes SET node_id = NULL WHERE ((node_id = 1234) AND (id != 3))',
+      "UPDATE attributes SET node_id = 1234 WHERE (id = 3)"]
+  end
+
+  it "should use a transaction in the setter method" do
+    @c2.one_to_one :attribute, :class => @c1
+    @c2.use_transactions = true
+    MODEL_DB.sqls.clear
+    attrib = @c1.load(:id=>3)
+    @c2.new(:id => 1234).attribute = attrib
+    MODEL_DB.sqls.should == ['BEGIN',
+      'UPDATE attributes SET node_id = NULL WHERE ((node_id = 1234) AND (id != 3))',
+      "UPDATE attributes SET node_id = 1234 WHERE (id = 3)",
+      'COMMIT']
+  end
+
+  it "should have the setter method respect the :primary_key option" do
+    @c2.one_to_one :attribute, :class => @c1, :primary_key=>:xxx
+    attrib = @c1.new(:id=>3)
+    d = @c1.dataset
+    @c1.class_eval{remove_method :_refresh}
+    def d.fetch_rows(s); yield({:id=>3}) end
+    @c2.new(:id => 1234, :xxx=>5).attribute = attrib
+    ['INSERT INTO attributes (node_id, id) VALUES (5, 3)',
+      'INSERT INTO attributes (id, node_id) VALUES (3, 5)'].should(include(MODEL_DB.sqls.last))
+    MODEL_DB.sqls.first.should == 'UPDATE attributes SET node_id = NULL WHERE ((node_id = 5) AND (id != 3))'
+    MODEL_DB.sqls.length.should == 2
+    @c2.new(:id => 321, :xxx=>5).attribute.should == attrib
+    MODEL_DB.sqls.clear
+    attrib = @c1.load(:id=>3)
+    @c2.new(:id => 621, :xxx=>5).attribute = attrib
+    MODEL_DB.sqls.should == ['UPDATE attributes SET node_id = NULL WHERE ((node_id = 5) AND (id != 3))',
+      'UPDATE attributes SET node_id = 5 WHERE (id = 3)']
+    end
+    
+  it "should have the setter method respect composite keys" do
+    @c2.one_to_one :attribute, :class => @c1, :key=>[:node_id, :y], :primary_key=>[:id, :x]
+    attrib = @c1.load(:id=>3, :y=>6)
+    d = @c1.dataset
+    def d.fetch_rows(s); yield({:id=>3, :y=>6}) end
+    @c2.load(:id => 1234, :x=>5).attribute = attrib
+    MODEL_DB.sqls.last.should =~ /UPDATE attributes SET (node_id = 1234|y = 5), (node_id = 1234|y = 5) WHERE \(id = 3\)/
+    MODEL_DB.sqls.first.should =~ /UPDATE attributes SET (node_id|y) = NULL, (node_id|y) = NULL WHERE \(\(node_id = 1234\) AND \(y = 5\) AND \(id != 3\)\)/
+  end
+
+  it "should use implicit key if omitted" do
+    @c2.one_to_one :parent, :class => @c2
+
+    d = @c2.new(:id => 234)
+    p = d.parent
+    p.class.should == @c2
+    p.values.should == {}
+
+    MODEL_DB.sqls.should == ["SELECT * FROM nodes WHERE (nodes.node_id = 234) LIMIT 1"]
+  end
+  
+  it "should use implicit class if omitted" do
+    class ::ParParent < Sequel::Model
+    end
+    
+    @c2.one_to_one :par_parent
+    
+    d = @c2.new(:id => 234)
+    p = d.par_parent
+    p.class.should == ParParent
+    
+    MODEL_DB.sqls.should == ["SELECT * FROM par_parents WHERE (par_parents.node_id = 234) LIMIT 1"]
+  end
+
+  it "should use class inside module if given as a string" do
+    module ::Par 
+      class Parent < Sequel::Model
+      end
+    end
+    
+    @c2.one_to_one :par_parent, :class=>"Par::Parent"
+    
+    d = @c2.new(:id => 234)
+    p = d.par_parent
+    p.class.should == Par::Parent
+    
+    MODEL_DB.sqls.should == ["SELECT * FROM parents WHERE (parents.node_id = 234) LIMIT 1"]
+  end
+
+  it "should use explicit key if given" do
+    @c2.one_to_one :parent, :class => @c2, :key => :blah
+
+    d = @c2.new(:id => 234)
+    p = d.parent
+    p.class.should == @c2
+    p.values.should == {}
+
+    MODEL_DB.sqls.should == ["SELECT * FROM nodes WHERE (nodes.blah = 234) LIMIT 1"]
+  end
+
+  it "should use :primary_key option if given" do
+    @c2.one_to_one :parent, :class => @c2, :key => :pk, :primary_key => :blah
+    @c2.new(:id => 1, :blah => 567).parent
+    MODEL_DB.sqls.should == ["SELECT * FROM nodes WHERE (nodes.pk = 567) LIMIT 1"]
+  end
+  
+  it "should support composite keys" do
+    @c2.one_to_one :parent, :class => @c2, :primary_key=>[:id, :parent_id], :key=>[:parent_id, :id]
+    @c2.new(:id => 1, :parent_id => 234).parent
+    MODEL_DB.sqls.should == ["SELECT * FROM nodes WHERE ((nodes.parent_id = 1) AND (nodes.id = 234)) LIMIT 1"]
+  end
+  
+  it "should not issue query if not all keys have values" do
+    @c2.one_to_one :parent, :class => @c2, :key=>[:id, :parent_id], :primary_key=>[:parent_id, :id]
+    @c2.new(:id => 1, :parent_id => nil).parent.should == nil
+    MODEL_DB.sqls.should == []
+  end
+  
+  it "should raise an Error unless same number of composite keys used" do
+    proc{@c2.one_to_one :parent, :class => @c2, :primary_key=>[:parent_id, :id]}.should raise_error(Sequel::Error)
+    proc{@c2.one_to_one :parent, :class => @c2, :key=>[:id, :parent_id], :primary_key=>:id}.should raise_error(Sequel::Error)
+    proc{@c2.one_to_one :parent, :class => @c2, :key=>:id, :primary_key=>[:parent_id, :id]}.should raise_error(Sequel::Error)
+    proc{@c2.one_to_one :parent, :class => @c2, :key=>[:id, :parent_id, :blah], :primary_key=>[:parent_id, :id]}.should raise_error(Sequel::Error)
+  end
+
+  it "should use :select option if given" do
+    @c2.one_to_one :parent, :class => @c2, :select=>[:id, :name]
+    @c2.new(:id => 567).parent
+    MODEL_DB.sqls.should == ["SELECT id, name FROM nodes WHERE (nodes.node_id = 567) LIMIT 1"]
+  end
+
+  it "should use :conditions option if given" do
+    @c2.one_to_one :parent, :class => @c2, :conditions=>{:a=>32}
+    @c2.new(:id => 567).parent
+    MODEL_DB.sqls.should == ["SELECT * FROM nodes WHERE ((nodes.node_id = 567) AND (a = 32)) LIMIT 1"]
+
+    @c2.one_to_one :parent, :class => @c2, :conditions=>:a
+    MODEL_DB.sqls.clear
+    @c2.new(:id => 567).parent
+    MODEL_DB.sqls.should == ["SELECT * FROM nodes WHERE ((nodes.node_id = 567) AND a) LIMIT 1"]
+  end
+
+  it "should support :order, :limit (only for offset), and :dataset options, as well as a block" do
+    c2 = @c2
+    @c2.one_to_one :child_20, :class => @c2, :key=>:id, :dataset=>proc{c2.filter(:parent_id=>pk)}, :limit=>[10,20], :order=>:name do |ds|
+      ds.filter(:x.sql_number > 1)
+    end
+    @c2.load(:id => 100).child_20
+    MODEL_DB.sqls.should == ["SELECT * FROM nodes WHERE ((parent_id = 100) AND (x > 1)) ORDER BY name LIMIT 1 OFFSET 20"]
+  end
+
+  it "should return nil if primary_key value is nil" do
+    @c2.one_to_one :parent, :class => @c2, :primary_key=>:node_id
+
+    d = @c2.new(:id => 1)
+    d.parent.should == nil
+    MODEL_DB.sqls.should == []
+  end
+
+  it "should cache negative lookup" do
+    @c2.one_to_one :parent, :class => @c2
+    ds = @c2.dataset
+    def ds.fetch_rows(sql, &block)
+      MODEL_DB.sqls << sql
+    end
+
+    d = @c2.new(:id => 555)
+    MODEL_DB.sqls.should == []
+    d.parent.should == nil
+    MODEL_DB.sqls.should == ['SELECT * FROM nodes WHERE (nodes.node_id = 555) LIMIT 1']
+    d.parent.should == nil
+    MODEL_DB.sqls.should == ['SELECT * FROM nodes WHERE (nodes.node_id = 555) LIMIT 1']
+  end
+
+  it "should define a setter method" do
+    @c2.one_to_one :parent, :class => @c2
+
+    d = @c2.new(:id => 1)
+    f = @c2.new(:id => 3, :node_id=> 4321)
+    d.parent = f
+    f.values.should == {:id => 3, :node_id=>1}
+    d.parent.should == f
+    
+    d.parent = nil
+    d.parent.should == nil
+  end
+  
+  it "should have the setter method respect the :primary_key option" do
+    @c2.one_to_one :parent, :class => @c2, :primary_key=>:blah
+    d = @c2.new(:id => 1, :blah => 3)
+    e = @c2.new(:id => 4321, :node_id=>444)
+    d.parent = e
+    e.values.should == {:id => 4321, :node_id => 3}
+  end
+  
+  it "should have the setter method respect the :key option" do
+    @c2.one_to_one :parent, :class => @c2, :key=>:blah
+    d = @c2.new(:id => 3)
+    e = @c2.new(:id => 4321, :blah=>444)
+    d.parent = e
+    e.values.should == {:id => 4321, :blah => 3}
+  end
+  
+  it "should persist changes to associated object when the setter is called" do
+    @c2.one_to_one :parent, :class => @c2
+    d = @c2.load(:id => 1)
+    d.parent = @c2.load(:id => 3, :node_id=>345)
+    MODEL_DB.sqls.should == ["UPDATE nodes SET node_id = NULL WHERE ((node_id = 1) AND (id != 3))",
+      "UPDATE nodes SET node_id = 1 WHERE (id = 3)"] 
+  end
+
+  it "should set cached instance variable when accessed" do
+    @c2.one_to_one :parent, :class => @c2
+
+    d = @c2.load(:id => 1)
+    d.associations[:parent].should == nil
+    ds = @c2.dataset
+    def ds.fetch_rows(sql, &block); MODEL_DB.sqls << sql; yield({:id=>234}) end
+    e = d.parent 
+    MODEL_DB.sqls.should == ["SELECT * FROM nodes WHERE (nodes.node_id = 1) LIMIT 1"]
+    d.parent
+    MODEL_DB.sqls.should == ["SELECT * FROM nodes WHERE (nodes.node_id = 1) LIMIT 1"]
+    d.associations[:parent].should == [e]
+  end
+
+  it "should set cached instance variable when assigned" do
+    @c2.one_to_one :parent, :class => @c2
+
+    d = @c2.load(:id => 1)
+    d.associations[:parent].should == nil
+    e = @c2.load(:id => 234)
+    d.parent = e
+    f = d.parent 
+    d.associations[:parent].should == [e]
+    e.should == f
+  end
+
+  it "should use cached instance variable if available" do
+    @c2.one_to_one :parent, :class => @c2
+    d = @c2.load(:id => 1, :parent_id => 234)
+    d.associations[:parent] = [42]
+    d.parent.should == 42
+    MODEL_DB.sqls.should == []
+  end
+
+  it "should not use cached instance variable if asked to reload" do
+    @c2.one_to_one :parent, :class => @c2
+    d = @c2.load(:id => 1)
+    d.associations[:parent] = [42]
+    d.parent(true).should_not == 42 
+    MODEL_DB.sqls.should == ["SELECT * FROM nodes WHERE (nodes.node_id = 1) LIMIT 1"]
+  end
+  
+  it "should have the setter set the reciprocal many_to_one cached association" do
+    @c2.one_to_one :parent, :class => @c2, :key=>:parent_id
+    @c2.many_to_one :child, :class => @c2, :key=>:parent_id
+    
+    d = @c2.load(:id => 1)
+    e = @c2.load(:id => 2)
+    d.parent = e
+    e.child.should == d
+    MODEL_DB.sqls.should == ["UPDATE nodes SET parent_id = NULL WHERE ((parent_id = 1) AND (id != 2))",
+      "UPDATE nodes SET parent_id = 1 WHERE (id = 2)"]
+    MODEL_DB.reset
+    d.parent = nil
+    e.child.should == nil
+    MODEL_DB.sqls.should == ["UPDATE nodes SET parent_id = NULL WHERE (parent_id = 1)"]
+  end
+
+  it "should have the setter remove the object from the previous associated object's reciprocal many_to_one cached association list if it exists" do
+    @c2.one_to_one :parent, :class => @c2, :key=>:parent_id
+    @c2.many_to_one :child, :class => @c2, :key=>:parent_id
+    ds = @c2.dataset
+    def ds.fetch_rows(sql, &block)
+      MODEL_DB.sqls << sql
+    end
+
+    d = @c2.load(:id => 1)
+    e = @c2.load(:id => 2)
+    f = @c2.load(:id => 3)
+    e.child.should == nil
+    f.child.should == nil
+    MODEL_DB.reset
+    d.parent = e
+    e.child.should == d
+    d.parent = f
+    f.child.should == d
+    e.child.should == nil
+    d.parent = nil
+    f.child.should == nil
+  end
+
+  it "should not add associations methods directly to class" do
+    @c2.one_to_one :parent, :class => @c2
+    @c2.instance_methods.collect{|x| x.to_s}.should(include('parent'))
+    @c2.instance_methods.collect{|x| x.to_s}.should(include('parent='))
+    @c2.instance_methods(false).collect{|x| x.to_s}.should_not(include('parent'))
+    @c2.instance_methods(false).collect{|x| x.to_s}.should_not(include('parent='))
+  end
+
+  it "should raise an error if the current model object that doesn't have a valid primary key" do
+    @c2.one_to_one :parent, :class => @c2
+    p = @c2.new
+    c = @c2.load(:id=>123)
+    proc{p.parent = c}.should raise_error(Sequel::Error)
+  end
+
+  it "should make the change to the foreign_key value inside a _association= method" do
+    @c2.one_to_one :parent, :class => @c2
+    @c2.private_instance_methods.collect{|x| x.to_s}.sort.should(include("_parent="))
+    c = @c2.new
+    p = @c2.load(:id=>123)
+    def p._parent=(x)
+      @x = x
+    end
+    p.should_not_receive(:parent_id=)
+    p.parent = c
+    p.instance_variable_get(:@x).should == c
+  end
+
+  it "should support (before|after)_set callbacks" do
+    h = []
+    @c2.one_to_one :parent, :class => @c2, :before_set=>[proc{|x,y| h << x.pk; h << (y ? -y.pk : :y)}, :blah], :after_set=>proc{h << 3}
+    @c2.class_eval do
+      @@blah = h
+      def blah(x)
+        @@blah << (x ? x.pk : :x)
+      end
+      def blahr(x)
+        @@blah << 6
+      end
+    end
+    p = @c2.load(:id=>10)
+    c = @c2.load(:id=>123)
+    h.should == []
+    p.parent = c
+    h.should == [10, -123, 123, 3]
+    p.parent = nil
+    h.should == [10, -123, 123, 3, 10, :y, :x, 3]
+  end
+
+  it "should support after_load association callback" do
+    h = []
+    @c2.one_to_one :parent, :class => @c2, :after_load=>[proc{|x,y| h << [x.pk, y.first.pk]}, :al]
+    @c2.class_eval do
+      @@blah = h
+      def al(v)
+        @@blah << v.first.pk
+      end
+      def @dataset.fetch_rows(sql)
+        yield({:id=>20})
+      end
+    end
+    p = @c2.load(:id=>10)
+    parent = p.parent
+    h.should == [[10, 20], 20]
+    parent.pk.should == 20
+  end
+
+  it "should raise error and not call internal add or remove method if before callback returns false, even if raise_on_save_failure is false" do
+    # The reason for this is that assignment in ruby always returns the argument instead of the result
+    # of the method, so we can't return nil to signal that the association callback prevented the modification
+    p = @c2.new
+    c = @c2.load(:id=>123)
+    p.raise_on_save_failure = false
+    @c2.one_to_one :parent, :class => @c2, :before_set=>:bs
+    p.meta_def(:bs){|x| false}
+    p.should_not_receive(:_parent=)
+    proc{p.parent = c}.should raise_error(Sequel::Error)
+    
+    p.parent.should == nil
+    p.associations[:parent] = [c]
+    p.parent.should == c
+    proc{p.parent = nil}.should raise_error(Sequel::Error)
+  end
+
+  it "should raise an error if a callback is not a proc or symbol" do
+    @c2.one_to_one :parent, :class => @c2, :before_set=>Object.new
+    proc{@c2.new.parent = @c2.load(:id=>1)}.should raise_error(Sequel::Error)
+  end
+
+  it "should call the set callbacks" do
+    c = @c2.load(:id=>123)
+    d = @c2.load(:id=>321)
+    p = @c2.load(:id=>32)
+    p.associations[:parent] = [d]
+    h = []
+    @c2.one_to_one :parent, :class => @c2, :before_set=>:bs, :after_set=>:as
+    @c2.class_eval do
+      @@blah = h
+      def []=(a, v)
+        a == :node_id ? (@@blah << 5) : super
+      end
+      def bs(x)
+        @@blah << x.pk
+      end
+      def as(x)
+        @@blah << x.pk * 2
+      end
+    end
+    p.parent = c
+    h.should == [123, 5, 246]
+  end
+end
+
 describe Sequel::Model, "one_to_many" do
   before do
     MODEL_DB.reset
@@ -1154,98 +1623,6 @@ describe Sequel::Model, "one_to_many" do
     attrib.associations.fetch(:node, 2).should == nil
   end
 
-  it "should have the getter method return a single object if the :one_to_one option is true" do
-    @c2.one_to_many :attribute, :class => @c1, :one_to_one=>true
-    att = @c2.new(:id => 1234).attribute
-    MODEL_DB.sqls.should == ['SELECT * FROM attributes WHERE (attributes.node_id = 1234) LIMIT 1']
-    att.should be_a_kind_of(@c1)
-    att.values.should == {}
-  end
-
-  it "should have the one_to_one method create a one_to_many association with one_to_one option" do
-    @c2.one_to_one :attribute, :class => @c1
-    @c2.association_reflection(:attribute)[:type].should == :one_to_one
-    @c2.association_reflection(:attribute)[:one_to_one].should == true
-    att = @c2.new(:id => 1234).attribute
-    MODEL_DB.sqls.should == ['SELECT * FROM attributes WHERE (attributes.node_id = 1234) LIMIT 1']
-    att.should be_a_kind_of(@c1)
-    att.values.should == {}
-  end
-
-  it "should not add a setter method if the :one_to_one option is true and :read_only option is true" do
-    @c2.one_to_many :attribute, :class => @c1, :one_to_one=>true, :read_only=>true
-    im = @c2.instance_methods.collect{|x| x.to_s}
-    im.should(include('attribute'))
-    im.should_not(include('attribute='))
-  end
-
-  it "should add a setter method if the :one_to_one option is true" do
-    @c2.one_to_many :attribute, :class => @c1, :one_to_one=>true
-    attrib = @c1.new(:id=>3)
-    d = @c1.dataset
-    @c1.class_eval{remove_method :_refresh}
-    def d.fetch_rows(s); yield({:id=>3}) end
-    @c2.new(:id => 1234).attribute = attrib
-    ['INSERT INTO attributes (node_id, id) VALUES (1234, 3)',
-      'INSERT INTO attributes (id, node_id) VALUES (3, 1234)'].should(include(MODEL_DB.sqls.last))
-    MODEL_DB.sqls.first.should == 'UPDATE attributes SET node_id = NULL WHERE ((node_id = 1234) AND (id != 3))'
-    MODEL_DB.sqls.length.should == 2
-    @c2.new(:id => 1234).attribute.should == attrib
-    MODEL_DB.sqls.clear
-    attrib = @c1.load(:id=>3)
-    @c2.new(:id => 1234).attribute = attrib
-    MODEL_DB.sqls.should == ['UPDATE attributes SET node_id = NULL WHERE ((node_id = 1234) AND (id != 3))',
-      "UPDATE attributes SET node_id = 1234 WHERE (id = 3)"]
-  end
-
-  it "should use a transaction in the setter method if the :one_to_one option is true" do
-    @c2.one_to_many :attribute, :class => @c1, :one_to_one=>true
-    @c2.use_transactions = true
-    MODEL_DB.sqls.clear
-    attrib = @c1.load(:id=>3)
-    @c2.new(:id => 1234).attribute = attrib
-    MODEL_DB.sqls.should == ['BEGIN',
-      'UPDATE attributes SET node_id = NULL WHERE ((node_id = 1234) AND (id != 3))',
-      "UPDATE attributes SET node_id = 1234 WHERE (id = 3)",
-      'COMMIT']
-  end
-
-  it "should have the setter method for the :one_to_one option respect the :primary_key option" do
-    @c2.one_to_many :attribute, :class => @c1, :one_to_one=>true, :primary_key=>:xxx
-    attrib = @c1.new(:id=>3)
-    d = @c1.dataset
-    @c1.class_eval{remove_method :_refresh}
-    def d.fetch_rows(s); yield({:id=>3}) end
-    @c2.new(:id => 1234, :xxx=>5).attribute = attrib
-    ['INSERT INTO attributes (node_id, id) VALUES (5, 3)',
-      'INSERT INTO attributes (id, node_id) VALUES (3, 5)'].should(include(MODEL_DB.sqls.last))
-    MODEL_DB.sqls.first.should == 'UPDATE attributes SET node_id = NULL WHERE ((node_id = 5) AND (id != 3))'
-    MODEL_DB.sqls.length.should == 2
-    @c2.new(:id => 321, :xxx=>5).attribute.should == attrib
-    MODEL_DB.sqls.clear
-    attrib = @c1.load(:id=>3)
-    @c2.new(:id => 621, :xxx=>5).attribute = attrib
-    MODEL_DB.sqls.should == ['UPDATE attributes SET node_id = NULL WHERE ((node_id = 5) AND (id != 3))',
-      'UPDATE attributes SET node_id = 5 WHERE (id = 3)']
-    end
-    
-  it "should have the setter method for the :one_to_one option respect composite keys" do
-    @c2.one_to_many :attribute, :class => @c1, :one_to_one=>true, :key=>[:node_id, :y], :primary_key=>[:id, :x]
-    attrib = @c1.load(:id=>3, :y=>6)
-    d = @c1.dataset
-    def d.fetch_rows(s); yield({:id=>3, :y=>6}) end
-    @c2.load(:id => 1234, :x=>5).attribute = attrib
-    MODEL_DB.sqls.last.should =~ /UPDATE attributes SET (node_id = 1234|y = 5), (node_id = 1234|y = 5) WHERE \(id = 3\)/
-    MODEL_DB.sqls.first.should =~ /UPDATE attributes SET (node_id|y) = NULL, (node_id|y) = NULL WHERE \(\(node_id = 1234\) AND \(y = 5\) AND \(id != 3\)\)/
-  end
-
-  it "should not create add_, remove_, and remove_all methods if :one_to_one option is used" do
-    @c2.one_to_many :attribute, :class => @c1, :one_to_one=>true
-    @c2.new.should_not(respond_to(:add_attribute))
-    @c2.new.should_not(respond_to(:remove_attribute))
-    @c2.new.should_not(respond_to(:remove_all_attributes))
-  end
-
   it "should call an _add_ method internally to add attributes" do
     @c2.one_to_many :attributes, :class => @c1
     @c2.private_instance_methods.collect{|x| x.to_s}.sort.should(include("_add_attribute"))
@@ -1402,6 +1779,11 @@ describe Sequel::Model, "one_to_many" do
     p.should_receive(:br).once.with(c).and_return(false)
     p.remove_attribute(c).should == nil
     p.attributes.should == [c]
+  end
+  
+  it "should have the :one_to_one option return a one_to_one association" do
+    @c2.one_to_many :attribute, :class => @c1, :one_to_one=>true
+    @c2.association_reflection(:attribute)[:type].should == :one_to_one
   end
 end
 
