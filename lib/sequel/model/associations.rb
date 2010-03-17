@@ -453,12 +453,16 @@ module Sequel
         #     when eager loading via eager_graph, but called when eager loading via eager.
         #   - :after_remove - Symbol, Proc, or array of both/either specifying a callback to call
         #     after an item is removed from the association.
+        #   - :after_set - Symbol, Proc, or array of both/either specifying a callback to call
+        #     after an item is set using the association setter method.
         #   - :allow_eager - If set to false, you cannot load the association eagerly
         #     via eager or eager_graph
         #   - :before_add - Symbol, Proc, or array of both/either specifying a callback to call
         #     before a new item is added to the association.
         #   - :before_remove - Symbol, Proc, or array of both/either specifying a callback to call
         #     before an item is removed from the association.
+        #   - :before_set - Symbol, Proc, or array of both/either specifying a callback to call
+        #     before an item is set using the association setter method.
         #   - :cartesian_product_number - the number of joins completed by this association that could cause more
         #     than one row for each row in the current table (default: 0 for many_to_one associations,
         #     1 for *_to_many associations).
@@ -598,7 +602,7 @@ module Sequel
           opts[:graph_conditions] = conds if !opts.include?(:graph_conditions) and Sequel.condition_specifier?(conds)
           opts[:graph_conditions] = opts[:graph_conditions] ? opts[:graph_conditions].to_a : []
           opts[:graph_select] = Array(opts[:graph_select]) if opts[:graph_select]
-          [:before_add, :before_remove, :after_add, :after_remove, :after_load, :extend].each do |cb_type|
+          [:before_add, :before_remove, :after_add, :after_remove, :after_load, :before_set, :after_set, :extend].each do |cb_type|
             opts[cb_type] = Array(opts[cb_type])
           end
           late_binding_class_option(opts, opts.returns_array? ? singularize(name) : name)
@@ -886,15 +890,16 @@ module Sequel
             validate = opts[:validate]
 
             if opts[:one_to_one]
-              association_module_def(:"#{name}=") do |o|
+              association_module_private_def(opts._setter_method) do |o|
                 klass = opts.associated_class
-                cks.zip(cpks).each{|k, pk| o.send(:"#{k}=", send(pk))}
-                update_database = lambda do 
-                  o.save(:validate=>validate) || raise(Sequel::Error, "invalid associated object, cannot save")
+                cks.zip(cpks).each{|k, pk| o.send(:"#{k}=", send(pk))} if o
+                update_database = lambda do
                   klass.filter(cks.zip(cpks.map{|k| send(k)})).exclude(o.pk_hash).update(ck_nil_hash)
+                  o.save(:validate=>validate) || raise(Sequel::Error, "invalid associated object, cannot save") if o
                 end
-                use_transactions ? db.transaction(opts){update_database.call} : update_database.call
+                use_transactions && o ? db.transaction(opts){update_database.call} : update_database.call
               end
+              association_module_def(opts.setter_method){|o| set_one_to_one_associated_object(opts, o)}
             else 
               association_module_private_def(opts._add_method) do |o|
                 cks.zip(cpks).each{|k, pk| o.send(:"#{k}=", send(pk))}
@@ -1066,7 +1071,7 @@ module Sequel
         # Run the callback for the association with the object.
         def run_association_callbacks(reflection, callback_type, object)
           raise_error = raise_on_save_failure || !reflection.returns_array?
-          stop_on_false = [:before_add, :before_remove].include?(callback_type)
+          stop_on_false = [:before_add, :before_remove, :before_set].include?(callback_type)
           reflection[callback_type].each do |cb|
             res = case cb
             when Symbol
@@ -1085,19 +1090,29 @@ module Sequel
 
         # Set the given object as the associated object for the given association
         def set_associated_object(opts, o)
-          raise(Sequel::Error, "associated object #{o.inspect} does not have a primary key") if o && !o.pk
-          old_val = send(opts.association_method)
-          return o if old_val == o
-          return if old_val and run_association_callbacks(opts, :before_remove, old_val) == false
-          return if o and run_association_callbacks(opts, :before_add, o) == false
+          raise(Error, "associated object #{o.inspect} does not have a primary key") if o && !o.pk
+          run_association_callbacks(opts, :before_set, o)
+          if a = associations[opts[:name]]
+            remove_reciprocal_object(opts, a)
+          end
           send(opts._setter_method, o)
           associations[opts[:name]] = o
-          remove_reciprocal_object(opts, old_val) if old_val
-          if o
-            add_reciprocal_object(opts, o)
-            run_association_callbacks(opts, :after_add, o)
+          add_reciprocal_object(opts, o) if o
+          run_association_callbacks(opts, :after_set, o)
+          o
+        end
+        
+        # Set the given object as the associated object for the given association
+        def set_one_to_one_associated_object(opts, o)
+          raise(Error, "object #{inspect} does not have a primary key") unless pk
+          run_association_callbacks(opts, :before_set, o)
+          if arr = associations[opts[:name]] and a = arr.last
+            remove_reciprocal_object(opts, a)
           end
-          run_association_callbacks(opts, :after_remove, old_val) if old_val
+          send(opts._setter_method, o)
+          associations[opts[:name]] = [o]
+          add_reciprocal_object(opts, o) if o
+          run_association_callbacks(opts, :after_set, o)
           o
         end
       end

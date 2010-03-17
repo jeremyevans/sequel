@@ -486,16 +486,16 @@ describe Sequel::Model, "many_to_one" do
     p.instance_variable_get(:@x).should == c
   end
 
-  it "should support (before|after)_(add|remove) callbacks" do
+  it "should support (before|after)_set callbacks" do
     h = []
-    @c2.many_to_one :parent, :class => @c2, :before_add=>[proc{|x,y| h << x.pk; h << -y.pk}, :blah], :after_add=>proc{h << 3}, :before_remove=>:blah, :after_remove=>[:blahr]
+    @c2.many_to_one :parent, :class => @c2, :before_set=>[proc{|x,y| h << x.pk; h << (y ? -y.pk : :y)}, :blah], :after_set=>proc{h << 3}
     @c2.class_eval do
       @@blah = h
       def []=(a, v)
         a == :parent_id ? (@@blah << (v ? 4 : 5)) : super
       end
       def blah(x)
-        @@blah << x.pk
+        @@blah << (x ? x.pk : :x)
       end
       def blahr(x)
         @@blah << 6
@@ -507,7 +507,7 @@ describe Sequel::Model, "many_to_one" do
     p.parent = c
     h.should == [10, -123, 123, 4, 3]
     p.parent = nil
-    h.should == [10, -123, 123, 4, 3, 123, 5, 6]
+    h.should == [10, -123, 123, 4, 3, 10, :y, :x, 5, 3]
   end
 
   it "should support after_load association callback" do
@@ -534,19 +534,19 @@ describe Sequel::Model, "many_to_one" do
     p = @c2.new
     c = @c2.load(:id=>123)
     p.raise_on_save_failure = false
-    @c2.many_to_one :parent, :class => @c2, :before_add=>:ba, :before_remove=>:br
-    p.should_receive(:ba).once.with(c).and_return(false)
+    @c2.many_to_one :parent, :class => @c2, :before_set=>:bs
+    p.meta_def(:bs){|x| false}
     p.should_not_receive(:_parent=)
     proc{p.parent = c}.should raise_error(Sequel::Error)
+    
     p.parent.should == nil
     p.associations[:parent] = c
     p.parent.should == c
-    p.should_receive(:br).once.with(c).and_return(false)
     proc{p.parent = nil}.should raise_error(Sequel::Error)
   end
 
   it "should raise an error if a callback is not a proc or symbol" do
-    @c2.many_to_one :parent, :class => @c2, :before_add=>Object.new
+    @c2.many_to_one :parent, :class => @c2, :before_set=>Object.new
     proc{@c2.new.parent = @c2.load(:id=>1)}.should raise_error(Sequel::Error)
   end
 
@@ -556,27 +556,21 @@ describe Sequel::Model, "many_to_one" do
     p = @c2.new
     p.associations[:parent] = d
     h = []
-    @c2.many_to_one :parent, :class => @c2, :before_add=>:ba, :before_remove=>:br, :after_add=>:aa, :after_remove=>:ar
+    @c2.many_to_one :parent, :class => @c2, :before_set=>:bs, :after_set=>:as
     @c2.class_eval do
       @@blah = h
       def []=(a, v)
         a == :parent_id ? (@@blah << 5) : super
       end
-      def ba(x)
+      def bs(x)
         @@blah << x.pk
       end
-      def br(x)
-        @@blah << x.pk * -1
-      end
-      def aa(x)
+      def as(x)
         @@blah << x.pk * 2
-      end
-      def ar(x)
-        @@blah << x.pk * -2
       end
     end
     p.parent = c
-    h.should == [-321, 123, 5, 246, -642]
+    h.should == [123, 5, 246]
   end
 end
 
@@ -1193,15 +1187,15 @@ describe Sequel::Model, "one_to_many" do
     def d.fetch_rows(s); yield({:id=>3}) end
     @c2.new(:id => 1234).attribute = attrib
     ['INSERT INTO attributes (node_id, id) VALUES (1234, 3)',
-      'INSERT INTO attributes (id, node_id) VALUES (3, 1234)'].should(include(MODEL_DB.sqls.first))
-    MODEL_DB.sqls.last.should == 'UPDATE attributes SET node_id = NULL WHERE ((node_id = 1234) AND (id != 3))'
+      'INSERT INTO attributes (id, node_id) VALUES (3, 1234)'].should(include(MODEL_DB.sqls.last))
+    MODEL_DB.sqls.first.should == 'UPDATE attributes SET node_id = NULL WHERE ((node_id = 1234) AND (id != 3))'
     MODEL_DB.sqls.length.should == 2
     @c2.new(:id => 1234).attribute.should == attrib
     MODEL_DB.sqls.clear
     attrib = @c1.load(:id=>3)
     @c2.new(:id => 1234).attribute = attrib
-    MODEL_DB.sqls.should == ["UPDATE attributes SET node_id = 1234 WHERE (id = 3)",
-      'UPDATE attributes SET node_id = NULL WHERE ((node_id = 1234) AND (id != 3))']
+    MODEL_DB.sqls.should == ['UPDATE attributes SET node_id = NULL WHERE ((node_id = 1234) AND (id != 3))',
+      "UPDATE attributes SET node_id = 1234 WHERE (id = 3)"]
   end
 
   it "should use a transaction in the setter method if the :one_to_one option is true" do
@@ -1211,8 +1205,8 @@ describe Sequel::Model, "one_to_many" do
     attrib = @c1.load(:id=>3)
     @c2.new(:id => 1234).attribute = attrib
     MODEL_DB.sqls.should == ['BEGIN',
-      "UPDATE attributes SET node_id = 1234 WHERE (id = 3)",
       'UPDATE attributes SET node_id = NULL WHERE ((node_id = 1234) AND (id != 3))',
+      "UPDATE attributes SET node_id = 1234 WHERE (id = 3)",
       'COMMIT']
   end
 
@@ -1224,15 +1218,15 @@ describe Sequel::Model, "one_to_many" do
     def d.fetch_rows(s); yield({:id=>3}) end
     @c2.new(:id => 1234, :xxx=>5).attribute = attrib
     ['INSERT INTO attributes (node_id, id) VALUES (5, 3)',
-      'INSERT INTO attributes (id, node_id) VALUES (3, 5)'].should(include(MODEL_DB.sqls.first))
-    MODEL_DB.sqls.last.should == 'UPDATE attributes SET node_id = NULL WHERE ((node_id = 5) AND (id != 3))'
+      'INSERT INTO attributes (id, node_id) VALUES (3, 5)'].should(include(MODEL_DB.sqls.last))
+    MODEL_DB.sqls.first.should == 'UPDATE attributes SET node_id = NULL WHERE ((node_id = 5) AND (id != 3))'
     MODEL_DB.sqls.length.should == 2
     @c2.new(:id => 321, :xxx=>5).attribute.should == attrib
     MODEL_DB.sqls.clear
     attrib = @c1.load(:id=>3)
     @c2.new(:id => 621, :xxx=>5).attribute = attrib
-    MODEL_DB.sqls.should == ['UPDATE attributes SET node_id = 5 WHERE (id = 3)',
-      'UPDATE attributes SET node_id = NULL WHERE ((node_id = 5) AND (id != 3))']
+    MODEL_DB.sqls.should == ['UPDATE attributes SET node_id = NULL WHERE ((node_id = 5) AND (id != 3))',
+      'UPDATE attributes SET node_id = 5 WHERE (id = 3)']
     end
     
   it "should have the setter method for the :one_to_one option respect composite keys" do
@@ -1241,8 +1235,8 @@ describe Sequel::Model, "one_to_many" do
     d = @c1.dataset
     def d.fetch_rows(s); yield({:id=>3, :y=>6}) end
     @c2.load(:id => 1234, :x=>5).attribute = attrib
-    MODEL_DB.sqls.first.should =~ /UPDATE attributes SET (node_id = 1234|y = 5), (node_id = 1234|y = 5) WHERE \(id = 3\)/
-    MODEL_DB.sqls.last.should =~ /UPDATE attributes SET (node_id|y) = NULL, (node_id|y) = NULL WHERE \(\(node_id = 1234\) AND \(y = 5\) AND \(id != 3\)\)/
+    MODEL_DB.sqls.last.should =~ /UPDATE attributes SET (node_id = 1234|y = 5), (node_id = 1234|y = 5) WHERE \(id = 3\)/
+    MODEL_DB.sqls.first.should =~ /UPDATE attributes SET (node_id|y) = NULL, (node_id|y) = NULL WHERE \(\(node_id = 1234\) AND \(y = 5\) AND \(id != 3\)\)/
   end
 
   it "should not create add_, remove_, and remove_all methods if :one_to_one option is used" do

@@ -114,10 +114,13 @@ a swiss army chainsaw.
 
 === Association callbacks
 
-Sequel supports the same callbacks that ActiveRecord does: :before_add,
-:before_remove, :after_add, and :after_remove. It also supports a
-callback that ActiveRecord does not, :after_load, which is called
-after the association has been loaded.
+Sequel supports the same callbacks that ActiveRecord does on one_to_many and
+many_to_many associations: :before_add, :before_remove, :after_add, and
+:after_remove. One many_to_one associations and one_to_one associations
+(which are one_to_many associations with the :one_to_one option), Sequel
+supports the :before_set and :after_set callbacks.  On all associations,
+Sequel supports :after_load, which is called after the association has been
+loaded.
 
 Each of these options can be a Symbol specifying an instance method
 that takes one argument (the associated object), or a Proc that takes
@@ -128,12 +131,6 @@ the associated object argument is an array of associated objects.
 If any of the before callbacks return false, the adding/removing
 does not happen and it either raises an error (the default), or
 returns nil (if raise_on_save_failure is false).
-
-All callbacks are also run on many_to_one associations.  If there
-was already an existing object for the association, it calls the
-remove callbacks on the existing object and the add callbacks on the
-new object.  The remove callback calls are placed around the add
-callback calls.
 
 === Association extensions
 
