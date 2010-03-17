@@ -82,6 +82,8 @@ describe "Sequel::Database dump methods" do
         [[:c1, {:db_type=>'blahblah', :allow_null=>true}]]
       when :t6
         [[:c1, {:db_type=>'bigint', :primary_key=>true, :allow_null=>true}]]
+      when :t7
+        [[:c1, {:db_type=>'somedbspecifictype', :primary_key=>true, :allow_null=>false}]]
       end
     end
   end
@@ -92,6 +94,10 @@ describe "Sequel::Database dump methods" do
 
   it "should dump non-Integer primary key columns with explicit :type" do
     @d.dump_table_schema(:t6).should == "create_table(:t6) do\n  primary_key :c1, :type=>Bignum\nend"
+  end
+
+  it "should dump primary key columns with explicit :type equal to the database type when :same_db option is passed" do
+    @d.dump_table_schema(:t7, :same_db => true).should == "create_table(:t7) do\n  primary_key :c1, :type=>\"somedbspecifictype\"\nend"
   end
 
   it "should use a composite primary_key calls if there is a composite primary key" do
