@@ -110,6 +110,7 @@ module Sequel
           keys = self[:keys]
           associated_class.all_association_reflections.each do |assoc_reflect|
             if r_types.include?(assoc_reflect[:type]) && assoc_reflect[:keys] == keys && assoc_reflect.associated_class == self[:model]
+              self[:reciprocal_type] = assoc_reflect[:type]
               return self[:reciprocal] = assoc_reflect[:name]
             end
           end
@@ -201,11 +202,22 @@ module Sequel
          self[:primary_keys] ||= Array(primary_key)
         end
         alias associated_object_keys primary_keys
+        
+        # True only if the reciprocal is a one_to_many association.
+        def reciprocal_array?
+          !set_reciprocal_to_self?
+        end
       
         # Whether this association returns an array of objects instead of a single object,
         # false for a many_to_one association.
         def returns_array?
           false
+        end
+        
+        # True only if the reciprocal is a one_to_one association.
+        def set_reciprocal_to_self?
+          reciprocal
+          self[:reciprocal_type] == :one_to_one
         end
     
         private
@@ -213,7 +225,7 @@ module Sequel
         # The reciprocal type of a many_to_one association is either
         # a one_to_many or a one_to_one association.
         def reciprocal_type
-          [:one_to_many, :one_to_one]
+          self[:reciprocal_type] ||= [:one_to_many, :one_to_one]
         end
       end
     
@@ -269,6 +281,11 @@ module Sequel
       
       class OneToOneAssociationReflection < OneToManyAssociationReflection
         ASSOCIATION_TYPES[:one_to_one] = self
+        
+        # one_to_one associations return a single object, not an array
+        def returns_array?
+          false
+        end
       end
     
       class ManyToManyAssociationReflection < AssociationReflection
@@ -786,6 +803,7 @@ module Sequel
           name = opts[:name]
           model = self
           opts[:key] = opts.default_key unless opts.include?(:key)
+          opts[:limit] = opts.fetch(:limit, 1)
           key = opts[:key]
           cks = opts[:keys] = Array(opts[:key])
           raise(Error, 'mismatched number of composite keys') if opts[:primary_key] && cks.length != Array(opts[:primary_key]).length
@@ -875,7 +893,6 @@ module Sequel
           end
       
           def_association_dataset_methods(opts)
-          association_module_def(opts.association_method){|*reload| load_associated_objects(opts, reload[0]).last} if opts[:one_to_one]
           
           ck_nil_hash ={}
           cks.each{|k| ck_nil_hash[k] = nil}
@@ -949,6 +966,7 @@ module Sequel
           end
           ds = ds.order(*opts[:order]) if opts[:order]
           ds = ds.limit(*opts[:limit]) if opts[:limit]
+          ds = ds.limit(1) unless opts.returns_array?
           ds = ds.eager(*opts[:eager]) if opts[:eager]
           ds = ds.distinct if opts[:distinct]
           ds = ds.eager_graph(opts[:eager_graph]) if opts[:eager_graph] && opts.eager_graph_lazy_dataset?
@@ -961,10 +979,8 @@ module Sequel
           if opts.returns_array?
             opts.can_have_associated_objects?(self) ? send(opts.dataset_method).all : []
           else
-            if !opts[:key]
+            if opts.can_have_associated_objects?(self)
               send(opts.dataset_method).all.first
-            elsif opts.can_have_associated_objects?(self)
-              send(opts.dataset_method).first
             end
           end
         end
@@ -1018,7 +1034,13 @@ module Sequel
           else
             objs = _load_associated_objects(opts)
             run_association_callbacks(opts, :after_load, objs)
-            objs.each{|o| add_reciprocal_object(opts, o)} if opts.set_reciprocal_to_self?
+            if opts.set_reciprocal_to_self?
+              if opts.returns_array?
+                objs.each{|o| add_reciprocal_object(opts, o)}
+              elsif objs
+                add_reciprocal_object(opts, objs)
+              end
+            end
             associations[name] = objs
           end
         end
@@ -1104,11 +1126,11 @@ module Sequel
         def set_one_to_one_associated_object(opts, o)
           raise(Error, "object #{inspect} does not have a primary key") unless pk
           run_association_callbacks(opts, :before_set, o)
-          if arr = associations[opts[:name]] and a = arr.last
+          if a = associations[opts[:name]]
             remove_reciprocal_object(opts, a)
           end
           send(opts._setter_method, o)
-          associations[opts[:name]] = [o]
+          associations[opts[:name]] = o
           add_reciprocal_object(opts, o) if o
           run_association_callbacks(opts, :after_set, o)
           o

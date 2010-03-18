@@ -383,17 +383,12 @@ describe Sequel::Model, "many_to_one" do
   end
 
   it "should have many_to_one setter deal with a one_to_one reciprocal" do
-    @c2.many_to_one :parent, :class => @c2
+    @c2.many_to_one :parent, :class => @c2, :key=>:parent_id
     @c2.one_to_one :child, :class => @c2, :key=>:parent_id
-    ds = @c2.dataset
-    def ds.fetch_rows(sql, &block)
-      MODEL_DB.sqls << sql
-    end
 
     d = @c2.new(:id => 1)
     e = @c2.new(:id => 2)
-    MODEL_DB.sqls.should == []
-    e.associations[:child] = []
+    e.associations[:child] = nil
     d.parent = e
     e.child.should == d
     d.parent = nil
@@ -404,7 +399,7 @@ describe Sequel::Model, "many_to_one" do
     f = @c2.new(:id => 3)
     d.parent = nil
     e.child.should == nil
-    e.associations[:child] = [f]
+    e.associations[:child] = f
     d.parent = e
     e.child.should == d
   end
@@ -447,7 +442,7 @@ describe Sequel::Model, "many_to_one" do
     end
     p = @c2.new(:parent_id=>2)
     fgp = p.first_grand_parent
-    MODEL_DB.sqls.should == ["SELECT nodes.id, nodes.parent_id, nodes.par_parent_id, nodes.blah, children.id AS children_id, children.parent_id AS children_parent_id, children.par_parent_id AS children_par_parent_id, children.blah AS children_blah FROM nodes LEFT OUTER JOIN nodes AS children ON (children.parent_id = nodes.id) WHERE (children_id = 2)"]
+    MODEL_DB.sqls.should == ["SELECT nodes.id, nodes.parent_id, nodes.par_parent_id, nodes.blah, children.id AS children_id, children.parent_id AS children_parent_id, children.par_parent_id AS children_par_parent_id, children.blah AS children_blah FROM nodes LEFT OUTER JOIN nodes AS children ON (children.parent_id = nodes.id) WHERE (children_id = 2) LIMIT 1"]
     fgp.values.should == {:id=>1, :parent_id=>0, :par_parent_id=>3, :blah=>4}
     fgp.children.first.values.should == {:id=>2, :parent_id=>1, :par_parent_id=>5, :blah=>6}
   end
@@ -860,7 +855,7 @@ describe Sequel::Model, "one_to_one" do
     MODEL_DB.sqls.should == ["SELECT * FROM nodes WHERE (nodes.node_id = 1) LIMIT 1"]
     d.parent
     MODEL_DB.sqls.should == ["SELECT * FROM nodes WHERE (nodes.node_id = 1) LIMIT 1"]
-    d.associations[:parent].should == [e]
+    d.associations[:parent].should == e
   end
 
   it "should set cached instance variable when assigned" do
@@ -871,14 +866,14 @@ describe Sequel::Model, "one_to_one" do
     e = @c2.load(:id => 234)
     d.parent = e
     f = d.parent 
-    d.associations[:parent].should == [e]
+    d.associations[:parent].should == e
     e.should == f
   end
 
   it "should use cached instance variable if available" do
     @c2.one_to_one :parent, :class => @c2
     d = @c2.load(:id => 1, :parent_id => 234)
-    d.associations[:parent] = [42]
+    d.associations[:parent] = 42
     d.parent.should == 42
     MODEL_DB.sqls.should == []
   end
@@ -981,11 +976,11 @@ describe Sequel::Model, "one_to_one" do
 
   it "should support after_load association callback" do
     h = []
-    @c2.one_to_one :parent, :class => @c2, :after_load=>[proc{|x,y| h << [x.pk, y.first.pk]}, :al]
+    @c2.one_to_one :parent, :class => @c2, :after_load=>[proc{|x,y| h << [x.pk, y.pk]}, :al]
     @c2.class_eval do
       @@blah = h
       def al(v)
-        @@blah << v.first.pk
+        @@blah << v.pk
       end
       def @dataset.fetch_rows(sql)
         yield({:id=>20})
@@ -1009,7 +1004,7 @@ describe Sequel::Model, "one_to_one" do
     proc{p.parent = c}.should raise_error(Sequel::Error)
     
     p.parent.should == nil
-    p.associations[:parent] = [c]
+    p.associations[:parent] = c
     p.parent.should == c
     proc{p.parent = nil}.should raise_error(Sequel::Error)
   end

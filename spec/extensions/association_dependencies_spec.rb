@@ -28,7 +28,7 @@ describe "AssociationDependencies plugin" do
   specify "should allow destroying associated many_to_one associated object" do
     @Album.add_association_dependencies :artist=>:destroy
     @Album.load(:id=>1, :name=>'Al', :artist_id=>2).destroy
-    MODEL_DB.sqls.should == ['DELETE FROM albums WHERE (id = 1)', 'SELECT * FROM artists WHERE (artists.id = 2)', 'DELETE FROM artists WHERE (id = 2)']
+    MODEL_DB.sqls.should == ['DELETE FROM albums WHERE (id = 1)', 'SELECT * FROM artists WHERE (artists.id = 2) LIMIT 1', 'DELETE FROM artists WHERE (id = 2)']
   end
 
   specify "should allow deleting associated many_to_one associated object" do
@@ -86,14 +86,14 @@ describe "AssociationDependencies plugin" do
   specify "should allow specifying association dependencies in the plugin call" do
     @Album.plugin :association_dependencies, :artist=>:destroy
     @Album.load(:id=>1, :name=>'Al', :artist_id=>2).destroy
-    MODEL_DB.sqls.should == ['DELETE FROM albums WHERE (id = 1)', 'SELECT * FROM artists WHERE (artists.id = 2)', 'DELETE FROM artists WHERE (id = 2)']
+    MODEL_DB.sqls.should == ['DELETE FROM albums WHERE (id = 1)', 'SELECT * FROM artists WHERE (artists.id = 2) LIMIT 1', 'DELETE FROM artists WHERE (id = 2)']
   end
 
   specify "should work with subclasses" do
     c = Class.new(@Album)
     c.add_association_dependencies :artist=>:destroy
     c.load(:id=>1, :name=>'Al', :artist_id=>2).destroy
-    MODEL_DB.sqls.should == ['DELETE FROM albums WHERE (id = 1)', 'SELECT * FROM artists WHERE (artists.id = 2)', 'DELETE FROM artists WHERE (id = 2)']
+    MODEL_DB.sqls.should == ['DELETE FROM albums WHERE (id = 1)', 'SELECT * FROM artists WHERE (artists.id = 2) LIMIT 1', 'DELETE FROM artists WHERE (id = 2)']
     MODEL_DB.reset
 
     @Album.load(:id=>1, :name=>'Al', :artist_id=>2).destroy
@@ -103,6 +103,6 @@ describe "AssociationDependencies plugin" do
     @Album.add_association_dependencies :artist=>:destroy
     c2 = Class.new(@Album)
     c2.load(:id=>1, :name=>'Al', :artist_id=>2).destroy
-    MODEL_DB.sqls.should == ['DELETE FROM albums WHERE (id = 1)', 'SELECT * FROM artists WHERE (artists.id = 2)', 'DELETE FROM artists WHERE (id = 2)']
+    MODEL_DB.sqls.should == ['DELETE FROM albums WHERE (id = 1)', 'SELECT * FROM artists WHERE (artists.id = 2) LIMIT 1', 'DELETE FROM artists WHERE (id = 2)']
   end
 end
