@@ -124,6 +124,15 @@ describe Sequel::Model, "#eager" do
     MODEL_DB.sqls.length.should == 2
   end
   
+  it "should eagerly load a single one_to_one association" do
+    EagerAlbum.one_to_one :track, :class=>'EagerTrack', :key=>:album_id
+    a = EagerAlbum.eager(:track).all
+    a.should == [EagerAlbum.load(:id => 1, :band_id => 2)]
+    MODEL_DB.sqls.should == ['SELECT * FROM albums', 'SELECT * FROM tracks WHERE (tracks.album_id IN (1))']
+    a.first.track.should == EagerTrack.load(:id => 3, :album_id=>1)
+    MODEL_DB.sqls.length.should == 2
+  end
+  
   it "should eagerly load a single one_to_many association" do
     a = EagerAlbum.eager(:tracks).all
     a.should be_a_kind_of(Array)
@@ -717,6 +726,18 @@ describe Sequel::Model, "#eager_graph" do
     a = a.first
     a.band.should be_a_kind_of(GraphBand)
     a.band.values.should == {:id => 2, :vocalist_id=>3}
+  end
+  
+  it "should eagerly load a single one_to_one association" do
+    GraphAlbum.one_to_one :track, :class=>'GraphTrack', :key=>:album_id
+    ds = GraphAlbum.eager_graph(:track)
+    ds.sql.should == 'SELECT albums.id, albums.band_id, track.id AS track_id, track.album_id FROM albums LEFT OUTER JOIN tracks AS track ON (track.album_id = albums.id)'
+    def ds.fetch_rows(sql, &block)
+      yield({:id=>1, :band_id=>2, :track_id=>3, :album_id=>1})
+    end
+    a = ds.all
+    a.should == [GraphAlbum.load(:id => 1, :band_id => 2)]
+    a.first.track.should == GraphTrack.load(:id => 3, :album_id=>1)
   end
 
   it "should eagerly load a single one_to_many association" do
