@@ -1036,6 +1036,12 @@ describe Sequel::Model, "one_to_one" do
     p.parent = c
     h.should == [123, 5, 246]
   end
+  
+  it "should work_correctly when used with associate" do
+    @c2.associate :one_to_one, :parent, :class => @c2
+    @c2.load(:id => 567).parent.should == @c2.load({})
+    MODEL_DB.sqls.should == ["SELECT * FROM nodes WHERE (nodes.node_id = 567) LIMIT 1"]
+  end
 end
 
 describe Sequel::Model, "one_to_many" do
@@ -1776,9 +1782,9 @@ describe Sequel::Model, "one_to_many" do
     p.attributes.should == [c]
   end
   
-  it "should have the :one_to_one option return a one_to_one association" do
-    @c2.one_to_many :attribute, :class => @c1, :one_to_one=>true
-    @c2.association_reflection(:attribute)[:type].should == :one_to_one
+  it "should raise an error if trying to use the :one_to_one option" do
+    proc{@c2.one_to_many :attribute, :class => @c1, :one_to_one=>true}.should raise_error(Sequel::Error)
+    proc{@c2.associate :one_to_many, :attribute, :class => @c1, :one_to_one=>true}.should raise_error(Sequel::Error)
   end
 end
 

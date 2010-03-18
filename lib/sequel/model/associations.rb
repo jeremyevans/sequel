@@ -597,6 +597,7 @@ module Sequel
         #     array of symbols for a composite key association.
         #   - :uniq - Adds a after_load callback that makes the array of objects unique.
         def associate(type, name, opts = {}, &block)
+          raise(Error, 'one_to_many association type with :one_to_one option removed, used one_to_one association type') if opts[:one_to_one] && type == :one_to_many
           raise(Error, 'invalid association type') unless assoc_class = ASSOCIATION_TYPES[type]
           raise(Error, 'Model.associate name argument must be a symbol') unless Symbol === name
       
@@ -680,12 +681,12 @@ module Sequel
         
         # Shortcut for adding a one_to_many association, see associate
         def one_to_many(name, opts={}, &block)
-          associate(opts[:one_to_one] ? :one_to_one : :one_to_many, name, opts, &block)
+          associate(:one_to_many, name, opts, &block)
         end
 
         # Shortcut for adding a one_to_one association, see associate.
         def one_to_one(name, opts={}, &block)
-          associate(:one_to_one, name, opts.merge(:one_to_one=>true), &block)
+          associate(:one_to_one, name, opts, &block)
         end
         
         private
@@ -849,6 +850,7 @@ module Sequel
         
         # Adds one_to_many association instance methods
         def def_one_to_many(opts)
+          one_to_one = opts[:type] == :one_to_one
           name = opts[:name]
           model = self
           key = (opts[:key] ||= opts.default_key)
@@ -861,7 +863,6 @@ module Sequel
             klass = opts.associated_class
             klass.filter(cks.map{|k| SQL::QualifiedIdentifier.new(klass.table_name, k)}.zip(cpks.map{|k| send(k)}))
           end
-          one_to_one = opts[:one_to_one]
           opts[:eager_loader] ||= proc do |key_hash, records, associations|
             h = key_hash[primary_key]
             if one_to_one
@@ -893,7 +894,7 @@ module Sequel
           use_only_conditions = opts.include?(:graph_only_conditions)
           only_conditions = opts[:graph_only_conditions]
           conditions = opts[:graph_conditions]
-          opts[:cartesian_product_number] ||= opts[:one_to_one] ? 0 : 1
+          opts[:cartesian_product_number] ||= one_to_one ? 0 : 1
           graph_block = opts[:graph_block]
           opts[:eager_grapher] ||= proc do |ds, assoc_alias, table_alias|
             ds = ds.graph(opts.associated_class, use_only_conditions ? only_conditions : cks.zip(cpks) + conditions, :select=>select, :table_alias=>assoc_alias, :join_type=>join_type, :implicit_qualifier=>table_alias, :from_self_alias=>ds.opts[:eager_graph][:master], &graph_block)
@@ -910,7 +911,7 @@ module Sequel
           unless opts[:read_only]
             validate = opts[:validate]
 
-            if opts[:one_to_one]
+            if one_to_one
               association_module_private_def(opts._setter_method) do |o|
                 up_ds = opts.associated_class.filter(cks.zip(cpks.map{|k| send(k)}))
                 if o
