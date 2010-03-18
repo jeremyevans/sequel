@@ -624,7 +624,7 @@ describe "statistics associations" do
       String :name
     end
     class ::Project < Sequel::Model
-      many_to_one :ticket_hours, :read_only=>true, :key=>:id,
+      many_to_one :ticket_hours, :read_only=>true, :key=>:id, :class=>:Ticket,
        :dataset=>proc{Ticket.filter(:project_id=>id).select{sum(hours).as(hours)}},
        :eager_loader=>(proc do |kh, projects, a|
         projects.each{|p| p.associations[:ticket_hours] = nil}
@@ -684,8 +684,8 @@ describe "one to one associations" do
       primary_key :id
     end
     class ::Book < Sequel::Model
-      one_to_many :first_page, :class=>:Page, :conditions=>{:page_number=>1}, :one_to_one=>true
-      one_to_many :second_page, :class=>:Page, :conditions=>{:page_number=>2}, :one_to_one=>true
+      one_to_one :first_page, :class=>:Page, :conditions=>{:page_number=>1}
+      one_to_one :second_page, :class=>:Page, :conditions=>{:page_number=>2}
     end
 
     INTEGRATION_DB.create_table!(:pages) do

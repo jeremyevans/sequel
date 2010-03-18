@@ -442,7 +442,7 @@ describe Sequel::Model, "many_to_one" do
     end
     p = @c2.new(:parent_id=>2)
     fgp = p.first_grand_parent
-    MODEL_DB.sqls.should == ["SELECT nodes.id, nodes.parent_id, nodes.par_parent_id, nodes.blah, children.id AS children_id, children.parent_id AS children_parent_id, children.par_parent_id AS children_par_parent_id, children.blah AS children_blah FROM nodes LEFT OUTER JOIN nodes AS children ON (children.parent_id = nodes.id) WHERE (children_id = 2) LIMIT 1"]
+    MODEL_DB.sqls.should == ["SELECT nodes.id, nodes.parent_id, nodes.par_parent_id, nodes.blah, children.id AS children_id, children.parent_id AS children_parent_id, children.par_parent_id AS children_par_parent_id, children.blah AS children_blah FROM nodes LEFT OUTER JOIN nodes AS children ON (children.parent_id = nodes.id) WHERE (children_id = 2)"]
     fgp.values.should == {:id=>1, :parent_id=>0, :par_parent_id=>3, :blah=>4}
     fgp.children.first.values.should == {:id=>2, :parent_id=>1, :par_parent_id=>5, :blah=>6}
   end

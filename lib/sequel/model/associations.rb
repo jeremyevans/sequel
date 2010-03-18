@@ -803,7 +803,6 @@ module Sequel
           name = opts[:name]
           model = self
           opts[:key] = opts.default_key unless opts.include?(:key)
-          opts[:limit] = opts.fetch(:limit, 1)
           key = opts[:key]
           cks = opts[:keys] = Array(opts[:key])
           raise(Error, 'mismatched number of composite keys') if opts[:primary_key] && cks.length != Array(opts[:primary_key]).length
@@ -854,7 +853,6 @@ module Sequel
           model = self
           key = (opts[:key] ||= opts.default_key)
           cks = opts[:keys] = Array(key)
-          opts[:limit] = opts.fetch(:limit, 1) if opts[:one_to_one]
           primary_key = (opts[:primary_key] ||= self.primary_key)
           cpks = opts[:primary_keys] = Array(primary_key)
           raise(Error, 'mismatched number of composite keys') unless cks.length == cpks.length
@@ -863,17 +861,29 @@ module Sequel
             klass = opts.associated_class
             klass.filter(cks.map{|k| SQL::QualifiedIdentifier.new(klass.table_name, k)}.zip(cpks.map{|k| send(k)}))
           end
+          one_to_one = opts[:one_to_one]
           opts[:eager_loader] ||= proc do |key_hash, records, associations|
             h = key_hash[primary_key]
-            records.each{|object| object.associations[name] = []}
+            if one_to_one
+              records.each{|object| object.associations[name] = nil}
+            else
+              records.each{|object| object.associations[name] = []}
+            end
             reciprocal = opts.reciprocal
             klass = opts.associated_class
             model.eager_loading_dataset(opts, klass.filter(uses_cks ? {cks.map{|k| SQL::QualifiedIdentifier.new(klass.table_name, k)}=>SQL::SQLArray.new(h.keys)} : {SQL::QualifiedIdentifier.new(klass.table_name, key)=>h.keys}), opts.select, associations).all do |assoc_record|
               hash_key = uses_cks ? cks.map{|k| assoc_record.send(k)} : assoc_record.send(key)
               next unless objects = h[hash_key]
-              objects.each do |object| 
-                object.associations[name].push(assoc_record)
-                assoc_record.associations[reciprocal] = object if reciprocal
+              if one_to_one
+                objects.each do |object| 
+                  object.associations[name] = assoc_record
+                  assoc_record.associations[reciprocal] = object if reciprocal
+                end
+              else
+                objects.each do |object| 
+                  object.associations[name].push(assoc_record)
+                  assoc_record.associations[reciprocal] = object if reciprocal
+                end
               end
             end
           end
@@ -966,7 +976,7 @@ module Sequel
           end
           ds = ds.order(*opts[:order]) if opts[:order]
           ds = ds.limit(*opts[:limit]) if opts[:limit]
-          ds = ds.limit(1) unless opts.returns_array?
+          ds = ds.limit(1) if !opts.returns_array? && opts[:key]
           ds = ds.eager(*opts[:eager]) if opts[:eager]
           ds = ds.distinct if opts[:distinct]
           ds = ds.eager_graph(opts[:eager_graph]) if opts[:eager_graph] && opts.eager_graph_lazy_dataset?
