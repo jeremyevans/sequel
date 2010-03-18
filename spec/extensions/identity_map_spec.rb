@@ -155,6 +155,22 @@ describe "Sequel::Plugins::IdentityMap" do
     end
   end
 
+  it "should not use the identity map as a lookup cache for a one_to_one association" do
+    c = @c2
+    @c2.one_to_one :artist, :class=>@c1, :key=>:artist_id
+    @c.with_identity_map do
+      MODEL_DB.sqls.length.should == 0
+      o = @c2.load(:id=>2)
+      a = o.artist
+      a.should be_a_kind_of(@c1)
+      MODEL_DB.sqls.length.should == 1
+      o.reload
+      MODEL_DB.sqls.length.should == 2
+      o.artist.should == a
+      MODEL_DB.sqls.length.should == 3
+    end
+  end
+  
   it "should not use the identity map as a lookup cache if the assocation has a nil :key option" do
     c = @c2
     @c1.many_to_one :artist, :class=>@c2, :key=>nil, :dataset=>proc{c.filter(:artist_id=>artist_id)}
