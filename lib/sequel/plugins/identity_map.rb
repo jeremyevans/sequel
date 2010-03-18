@@ -103,8 +103,8 @@ module Sequel
         # map for the associated object and return it if present.
         def _load_associated_objects(opts)
           klass = opts.associated_class
-          if idm = model.identity_map and !opts.returns_array? and opts[:key] and pk = send(opts[:key]) and
-           opts[:primary_key] == klass.primary_key and o = idm[klass.identity_map_key(pk)]
+          if idm = model.identity_map and opts[:type] == :many_to_one and opts[:primary_key] == klass.primary_key and
+           opts[:key] and pk = send(opts[:key]) and o = idm[klass.identity_map_key(pk)]
             o
           else
             super
