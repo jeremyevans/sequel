@@ -1,5 +1,17 @@
 === HEAD
 
+* Fix Dataset#limit on MSSQL 2000 (jeremyevans)
+
+* Support eagerly load nested associations when lazily loading *_to_one associations using the :eager option (jeremyevans)
+
+* Fix the one_to_one setter to work with a nil argument (jeremyevans)
+
+* Cache one_to_one associations like many_to_one associations instead of one_to_many associations (jeremyevans)
+
+* Use the singular form for one_to_one association names instead of the plural form (john_firebaugh)
+
+* Add real one_to_one associations, using the :one_to_one option of one_to_many is now an error (jeremyevans)
+
 * Add Model#lock! which uses Dataset#for_update to lock model rows (jeremyevans)
 
 * Add Dataset#for_update as a standard dataset method (jeremyevans)
