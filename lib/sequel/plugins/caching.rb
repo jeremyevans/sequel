@@ -15,11 +15,15 @@ module Sequel
     #    cache_store.get(key) => obj     # Returns object set with same key.
     #    cache_store.get(key2) => nil    # nil returned if there isn't an object
     #                                    # currently in the cache with that key.
+    #    cache_store.delete(key)         # Remove key from cache
     #
     # If the :ignore_exceptions option is true, exceptions raised by cache_store.get
     # are ignored and nil is returned instead.  The memcached API is to
     # raise an exception for a missing record, so if you use memcached, you will
     # want to use this option.
+    #
+    # Note that only Model.[] method calls with a primary key argument are cached
+    # using this plugin.
     module Caching
       # Set the cache_store and cache_ttl attributes for the given model.
       # If the :ttl option is not given, 3600 seconds is the default.
