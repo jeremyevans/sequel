@@ -1580,36 +1580,36 @@ context "Dataset#group_and_count" do
   
   specify "should format SQL properly" do
     @ds.group_and_count(:name).sql.should == 
-      "SELECT name, count(*) AS count FROM test GROUP BY name ORDER BY count"
+      "SELECT name, count(*) AS count FROM test GROUP BY name"
   end
 
   specify "should accept multiple columns for grouping" do
     @ds.group_and_count(:a, :b).sql.should == 
-      "SELECT a, b, count(*) AS count FROM test GROUP BY a, b ORDER BY count"
+      "SELECT a, b, count(*) AS count FROM test GROUP BY a, b"
   end
 
   specify "should format column aliases in the select clause but not in the group clause" do
     @ds.group_and_count(:name___n).sql.should ==
-      "SELECT name AS n, count(*) AS count FROM test GROUP BY name ORDER BY count"
+      "SELECT name AS n, count(*) AS count FROM test GROUP BY name"
     @ds.group_and_count(:name__n).sql.should ==
-      "SELECT name.n, count(*) AS count FROM test GROUP BY name.n ORDER BY count"
+      "SELECT name.n, count(*) AS count FROM test GROUP BY name.n"
   end
 
   specify "should handle identifiers" do
     @ds.group_and_count(:name___n.identifier).sql.should ==
-      "SELECT name___n, count(*) AS count FROM test GROUP BY name___n ORDER BY count"
+      "SELECT name___n, count(*) AS count FROM test GROUP BY name___n"
   end
 
   specify "should handle literal strings" do
     @ds.group_and_count("name".lit).sql.should ==
-      "SELECT name, count(*) AS count FROM test GROUP BY name ORDER BY count"
+      "SELECT name, count(*) AS count FROM test GROUP BY name"
   end
 
   specify "should handle aliased expressions" do
     @ds.group_and_count(:name.as(:n)).sql.should ==
-      "SELECT name AS n, count(*) AS count FROM test GROUP BY name ORDER BY count"
+      "SELECT name AS n, count(*) AS count FROM test GROUP BY name"
     @ds.group_and_count(:name.identifier.as(:n)).sql.should ==
-      "SELECT name AS n, count(*) AS count FROM test GROUP BY name ORDER BY count"
+      "SELECT name AS n, count(*) AS count FROM test GROUP BY name"
   end
 end
 

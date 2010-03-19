@@ -1,5 +1,7 @@
 === HEAD
 
+* Dataset#group_and_count no longer orders by the count (jeremyevans)
+
 * Fix Dataset#limit on MSSQL 2000 (jeremyevans)
 
 * Support eagerly load nested associations when lazily loading *_to_one associations using the :eager option (jeremyevans)
