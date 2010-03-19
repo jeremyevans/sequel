@@ -430,9 +430,14 @@ module Sequel
         sql << " INTO #{table_ref(@opts[:into])}" if @opts[:into]
       end
 
-      # MSSQL uses TOP for limit
+      # MSSQL uses TOP N for limit.  For MSSQL 2005+ TOP (N) is used
+      # to allow the limit to be a bound variable.
       def select_limit_sql(sql)
-        sql << " TOP (#{literal(@opts[:limit])})" if @opts[:limit]
+        if l = @opts[:limit]
+          l = literal(l)
+          l = "(#{l})" if server_version >= 9000000
+          sql << " TOP #{l}"
+        end
       end
 
       # Support different types of locking styles
