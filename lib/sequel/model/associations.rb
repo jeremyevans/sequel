@@ -189,7 +189,7 @@ module Sequel
     
         # The key to use for the key hash when eager loading
         def eager_loader_key
-          self[:key]
+          self[:eager_loader_key] ||= self[:key]
         end
     
         # The column(s) in the associated table that the key in the current table references (either a symbol or an array).
@@ -248,12 +248,16 @@ module Sequel
         def default_key
           :"#{underscore(demodulize(self[:model].name))}_id"
         end
+        
+        # The key to use for the key hash when eager loading
+        def eager_loader_key
+          self[:eager_loader_key] ||= primary_key
+        end
     
         # The column in the current table that the key in the associated table references.
         def primary_key
          self[:primary_key] ||= self[:model].primary_key
         end
-        alias eager_loader_key primary_key
       
         # One to many associations set the reciprocal to self when loading associated records.
         def set_reciprocal_to_self?
@@ -337,7 +341,7 @@ module Sequel
       
         # The key to use for the key hash when eager loading
         def eager_loader_key
-          self[:left_primary_key]
+          self[:eager_loader_key] ||= self[:left_primary_key]
         end
     
         # many_to_many associations need to select a key in an associated table to eagerly load
@@ -518,6 +522,8 @@ module Sequel
         #     and a hash of dependent associations.  The associated records should
         #     be queried from the database and the associations cache for each
         #     record should be populated for this to work correctly.
+        #   - :eager_loader_key - A symbol for the key column to use to populate the key hash
+        #     for the eager loader.
         #   - :extend - A module or array of modules to extend the dataset with.
         #   - :graph_block - The block to pass to join_table when eagerly loading
         #     the association via eager_graph.

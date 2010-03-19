@@ -1,5 +1,7 @@
 === HEAD
 
+* Add the :eager_loader_key option to associations, useful for custom eager loaders (jeremyevans)
+
 * Dataset#group_and_count no longer orders by the count (jeremyevans)
 
 * Fix Dataset#limit on MSSQL 2000 (jeremyevans)
