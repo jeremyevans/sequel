@@ -4,7 +4,7 @@ module Sequel
     # the Ruby 1.9 BasicObject class.  This is used in a few places where proxy
     # objects are needed that respond to any method call.
     class BasicObject
-      (instance_methods - %w"__id__ __send__ instance_eval == equal?").each{|m| undef_method(m)}
+      (instance_methods - %w"__id__ __send__ __metaclass__ instance_eval == equal?").each{|m| undef_method(m)}
     end
   else
     # If on 1.9, create a Sequel::BasicObject class that is just like the
