@@ -69,6 +69,8 @@ module Sequel
         org.h2.Driver
       end,
       :as400=>proc do |db|
+        Sequel.ts_require 'adapters/jdbc/as400'
+        db.extend(Sequel::JDBC::AS400::DatabaseMethods)
         com.ibm.as400.access.AS400JDBCDriver
       end
     }

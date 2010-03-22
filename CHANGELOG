@@ -1,6 +1,8 @@
 === HEAD
 
-* Make JDBC adapter recognize as400 connection strings and automatically load the Java class (need jt400.jar in classpath) (jeremyevans)
+* Add an AS400 JDBC subadapter (need jt400.jar in classpath) (jeremyevans, bhauff)
+
+* Fix the emulated MSSQL offset support when core extensions are not used (jeremyevans)
 
 * Make Sequel::BasicObject work correctly on Rubinius (kronos)
 
