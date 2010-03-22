@@ -67,6 +67,9 @@ module Sequel
         db.extend(Sequel::JDBC::H2::DatabaseMethods)
         JDBC.load_gem('h2')
         org.h2.Driver
+      end,
+      :as400=>proc do |db|
+        com.ibm.as400.access.AS400JDBCDriver
       end
     }
     
