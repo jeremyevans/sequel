@@ -17,7 +17,7 @@ module Sequel
     #     end
     #   end
     module LazyAttributes
-      # Tactical eager loading requires the tactical_eager_loading plugin
+      # Lazy attributes requires the identity map and tactical eager loading plugins
       def self.apply(model, *attrs)
         model.plugin :identity_map
         model.plugin :tactical_eager_loading  
