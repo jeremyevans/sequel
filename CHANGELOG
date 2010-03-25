@@ -1,5 +1,7 @@
 === HEAD
 
+* Fix transactions when connecting to Oracle via JDBC (jeremyevans)
+
 * Fix plugin loading when plugin module name is the same as an already defined top level constant (jeremyevans)
 
 * Add an AS400 JDBC subadapter (need jt400.jar in classpath) (jeremyevans, bhauff)
