@@ -1,5 +1,7 @@
 === HEAD
 
+* Fix plugin loading when plugin module name is the same as an already defined top level constant (jeremyevans)
+
 * Add an AS400 JDBC subadapter (need jt400.jar in classpath) (jeremyevans, bhauff)
 
 * Fix the emulated MSSQL offset support when core extensions are not used (jeremyevans)

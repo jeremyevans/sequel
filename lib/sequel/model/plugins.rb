@@ -64,7 +64,9 @@ module Sequel
       # defined, the corresponding plugin gem is automatically loaded.
       def plugin_module(plugin)
         module_name = plugin.to_s.gsub(/(^|_)(.)/){|x| x[-1..-1].upcase}
-        if not Sequel::Plugins.const_defined?(module_name)
+        if !Sequel::Plugins.const_defined?(module_name) ||
+           (Sequel.const_defined?(module_name) &&
+            Sequel::Plugins.const_get(module_name) == Sequel.const_get(module_name))
           begin
             Sequel.tsk_require "sequel/plugins/#{plugin}"
           rescue LoadError
