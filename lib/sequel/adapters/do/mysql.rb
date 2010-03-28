@@ -22,6 +22,10 @@ module Sequel
         def database_name
           (m = /\/(.*)/.match(URI.parse(uri).path)) && m[1]
         end
+
+        def schema_column_type(db_type)
+          db_type == 'tinyint(1)' ? :boolean : super
+        end
       end
       
       # Dataset class for MySQL datasets accessed via DataObjects.

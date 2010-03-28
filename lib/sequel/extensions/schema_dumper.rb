@@ -115,7 +115,7 @@ END_MIG
       when /\A(?:medium|small)?int(?:eger)?(?:\((?:\d+)\))?\z/o
         {:type=>Integer}
       when /\Atinyint(?:\((\d+)\))?\z/o
-        {:type=>(self.class.adapter_scheme == :mysql && $1 == '1' && Sequel::MySQL.convert_tinyint_to_bool ? TrueClass : Integer)}
+        {:type =>schema[:type] == :boolean ? TrueClass : Integer}
       when /\Abigint(?:\((?:\d+)\))?\z/o
         {:type=>Bignum}
       when /\A(?:real|float|double(?: precision)?)\z/o
