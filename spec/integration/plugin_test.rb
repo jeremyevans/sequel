@@ -535,3 +535,187 @@ describe "Composition plugin" do
     @e2.day.should == 2
   end
 end
+
+if INTEGRATION_DB.dataset.supports_cte?
+  describe "RcteTree Plugin" do
+    before do
+      @db = INTEGRATION_DB
+      @db.create_table!(:nodes) do
+        primary_key :id
+        Integer :parent_id
+        String :name
+      end
+      class ::Node < Sequel::Model(@db)
+        plugin :rcte_tree, :order=>:name
+      end
+      
+      @a = Node.create(:name=>'a')
+      @b = Node.create(:name=>'b')
+      @aa = Node.create(:name=>'aa', :parent=>@a)
+      @ab = Node.create(:name=>'ab', :parent=>@a)
+      @ba = Node.create(:name=>'ba', :parent=>@b)
+      @bb = Node.create(:name=>'bb', :parent=>@b)
+      @aaa = Node.create(:name=>'aaa', :parent=>@aa)
+      @aab = Node.create(:name=>'aab', :parent=>@aa)
+      @aba = Node.create(:name=>'aba', :parent=>@ab)
+      @abb = Node.create(:name=>'abb', :parent=>@ab)
+      @aaaa = Node.create(:name=>'aaaa', :parent=>@aaa)
+      @aaab = Node.create(:name=>'aaab', :parent=>@aaa)
+      @aaaaa = Node.create(:name=>'aaaaa', :parent=>@aaaa)
+    end
+    after do
+      @db.drop_table :nodes
+      Object.send(:remove_const, :Node)
+    end
+    
+    specify "should load all standard (not-CTE) methods correctly" do
+      @a.children.should == [@aa, @ab]
+      @b.children.should == [@ba, @bb]
+      @aa.children.should == [@aaa, @aab]
+      @ab.children.should == [@aba, @abb]
+      @ba.children.should == []
+      @bb.children.should == []
+      @aaa.children.should == [@aaaa, @aaab]
+      @aab.children.should == []
+      @aba.children.should == []
+      @abb.children.should == []
+      @aaaa.children.should == [@aaaaa]
+      @aaab.children.should == []
+      @aaaaa.children.should == []
+      
+      @a.parent.should == nil
+      @b.parent.should == nil
+      @aa.parent.should == @a
+      @ab.parent.should == @a
+      @ba.parent.should == @b
+      @bb.parent.should == @b
+      @aaa.parent.should == @aa
+      @aab.parent.should == @aa
+      @aba.parent.should == @ab
+      @abb.parent.should == @ab
+      @aaaa.parent.should == @aaa
+      @aaab.parent.should == @aaa
+      @aaaaa.parent.should == @aaaa
+    end
+    
+    specify "should load all ancestors and descendants lazily for a given instance" do
+      @a.descendants.should == [@aa, @aaa, @aaaa, @aaaaa, @aaab, @aab, @ab, @aba, @abb]
+      @b.descendants.should == [@ba, @bb]
+      @aa.descendants.should == [@aaa, @aaaa, @aaaaa, @aaab, @aab]
+      @ab.descendants.should == [@aba, @abb]
+      @ba.descendants.should == []
+      @bb.descendants.should == []
+      @aaa.descendants.should == [@aaaa, @aaaaa, @aaab]
+      @aab.descendants.should == []
+      @aba.descendants.should == []
+      @abb.descendants.should == []
+      @aaaa.descendants.should == [@aaaaa]
+      @aaab.descendants.should == []
+      @aaaaa.descendants.should == []
+      
+      @a.ancestors.should == []
+      @b.ancestors.should == []
+      @aa.ancestors.should == [@a]
+      @ab.ancestors.should == [@a]
+      @ba.ancestors.should == [@b]
+      @bb.ancestors.should == [@b]
+      @aaa.ancestors.should == [@a, @aa]
+      @aab.ancestors.should == [@a, @aa]
+      @aba.ancestors.should == [@a, @ab]
+      @abb.ancestors.should == [@a, @ab]
+      @aaaa.ancestors.should == [@a, @aa, @aaa]
+      @aaab.ancestors.should == [@a, @aa, @aaa]
+      @aaaaa.ancestors.should == [@a, @aa, @aaa, @aaaa]
+    end
+    
+    specify "should eagerly load all ancestors and descendants for a dataset" do
+      nodes = Node.filter(:id=>[@a.id, @b.id, @aaa.id]).order(:name).eager(:ancestors, :descendants).all
+      nodes.should == [@a, @aaa, @b]
+      nodes[0].descendants.should == [@aa, @aaa, @aaaa, @aaaaa, @aaab, @aab, @ab, @aba, @abb]
+      nodes[1].descendants.should == [@aaaa, @aaaaa, @aaab]
+      nodes[2].descendants.should == [@ba, @bb]
+      nodes[0].ancestors.should == []
+      nodes[1].ancestors.should == [@a, @aa]
+      nodes[2].ancestors.should == []
+    end
+    
+    specify "should eagerly load descendants to a given level" do
+      nodes = Node.filter(:id=>[@a.id, @b.id, @aaa.id]).order(:name).eager(:descendants=>1).all
+      nodes.should == [@a, @aaa, @b]
+      nodes[0].descendants.should == [@aa, @ab]
+      nodes[1].descendants.should == [@aaaa, @aaab]
+      nodes[2].descendants.should == [@ba, @bb]
+      
+      nodes = Node.filter(:id=>[@a.id, @b.id, @aaa.id]).order(:name).eager(:descendants=>2).all
+      nodes.should == [@a, @aaa, @b]
+      nodes[0].descendants.should == [@aa, @aaa, @aab, @ab, @aba, @abb]
+      nodes[1].descendants.should == [@aaaa, @aaaaa, @aaab]
+      nodes[2].descendants.should == [@ba, @bb]
+    end
+    
+    specify "should populate all :children associations when eagerly loading descendants for a dataset" do
+      nodes = Node.filter(:id=>[@a.id, @b.id, @aaa.id]).order(:name).eager(:descendants).all
+      nodes[0].associations[:children].should == [@aa, @ab]
+      nodes[1].associations[:children].should == [@aaaa, @aaab]
+      nodes[2].associations[:children].should == [@ba, @bb]
+      nodes[0].associations[:children].map{|c1| c1.associations[:children]}.should == [[@aaa, @aab], [@aba, @abb]]
+      nodes[1].associations[:children].map{|c1| c1.associations[:children]}.should == [[@aaaaa], []]
+      nodes[2].associations[:children].map{|c1| c1.associations[:children]}.should == [[], []]
+      nodes[0].associations[:children].map{|c1| c1.associations[:children].map{|c2| c2.associations[:children]}}.should == [[[@aaaa, @aaab], []], [[], []]]
+      nodes[1].associations[:children].map{|c1| c1.associations[:children].map{|c2| c2.associations[:children]}}.should == [[[]], []]
+      nodes[0].associations[:children].map{|c1| c1.associations[:children].map{|c2| c2.associations[:children].map{|c3| c3.associations[:children]}}}.should == [[[[@aaaaa], []], []], [[], []]]
+      nodes[0].associations[:children].map{|c1| c1.associations[:children].map{|c2| c2.associations[:children].map{|c3| c3.associations[:children].map{|c4| c4.associations[:children]}}}}.should == [[[[[]], []], []], [[], []]]
+    end
+    
+    specify "should populate all :children associations when lazily loading descendants" do
+      @a.descendants
+      @a.associations[:children].should == [@aa, @ab]
+      @a.associations[:children].map{|c1| c1.associations[:children]}.should == [[@aaa, @aab], [@aba, @abb]]
+      @a.associations[:children].map{|c1| c1.associations[:children].map{|c2| c2.associations[:children]}}.should == [[[@aaaa, @aaab], []], [[], []]]
+      @a.associations[:children].map{|c1| c1.associations[:children].map{|c2| c2.associations[:children].map{|c3| c3.associations[:children]}}}.should == [[[[@aaaaa], []], []], [[], []]]
+      @a.associations[:children].map{|c1| c1.associations[:children].map{|c2| c2.associations[:children].map{|c3| c3.associations[:children].map{|c4| c4.associations[:children]}}}}.should == [[[[[]], []], []], [[], []]]
+      
+      @b.descendants
+      @b.associations[:children].should == [@ba, @bb]
+      @b.associations[:children].map{|c1| c1.associations[:children]}.should == [[], []]
+      
+      @aaa.descendants
+      @aaa.associations[:children].map{|c1| c1.associations[:children]}.should == [[@aaaaa], []]
+      @aaa.associations[:children].map{|c1| c1.associations[:children].map{|c2| c2.associations[:children]}}.should == [[[]], []]
+    end
+    
+    specify "should populate all :parent associations when eagerly loading ancestors for a dataset" do
+      nodes = Node.filter(:id=>[@a.id, @ba.id, @aaa.id, @aaaaa.id]).order(:name).eager(:ancestors).all
+      nodes[0].associations.fetch(:parent, 1).should == nil
+      nodes[1].associations[:parent].should == @aa
+      nodes[1].associations[:parent].associations[:parent].should == @a
+      nodes[1].associations[:parent].associations[:parent].associations.fetch(:parent, 1) == nil
+      nodes[2].associations[:parent].should == @aaaa
+      nodes[2].associations[:parent].associations[:parent].should == @aaa
+      nodes[2].associations[:parent].associations[:parent].associations[:parent].should == @aa
+      nodes[2].associations[:parent].associations[:parent].associations[:parent].associations[:parent].should == @a
+      nodes[2].associations[:parent].associations[:parent].associations[:parent].associations[:parent].associations.fetch(:parent, 1).should == nil
+      nodes[3].associations[:parent].should == @b
+      nodes[3].associations[:parent].associations.fetch(:parent, 1).should == nil
+    end
+    
+    specify "should populate all :parent associations when lazily loading ancestors" do
+      @a.reload
+      @a.ancestors
+      @a.associations[:parent].should == nil
+      
+      @ba.reload
+      @ba.ancestors
+      @ba.associations[:parent].should == @b
+      @ba.associations[:parent].associations.fetch(:parent, 1).should == nil
+      
+      @ba.reload
+      @aaaaa.ancestors
+      @aaaaa.associations[:parent].should == @aaaa
+      @aaaaa.associations[:parent].associations[:parent].should == @aaa
+      @aaaaa.associations[:parent].associations[:parent].associations[:parent].should == @aa
+      @aaaaa.associations[:parent].associations[:parent].associations[:parent].associations[:parent].should == @a
+      @aaaaa.associations[:parent].associations[:parent].associations[:parent].associations[:parent].associations.fetch(:parent, 1).should == nil
+    end
+  end
+end

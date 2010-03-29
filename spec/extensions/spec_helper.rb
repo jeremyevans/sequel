@@ -45,6 +45,12 @@ class MockDatabase < Sequel::Database
     @sqls ||= []
     @sqls << sql
   end
+  
+  def new_sqls
+    s = sqls
+    reset
+    s
+  end
 
   def reset
     @sqls = []

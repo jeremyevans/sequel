@@ -1,5 +1,7 @@
 === HEAD
 
+* Add an rcte_tree plugin, which uses recursive common table expressions for loading trees stored as adjacency lists (jeremyevans)
+
 * Make typecast_on_load plugin also typecast when refreshing the object (either explicitly or implicitly after creation) (jeremyevans)
 
 * Fix schema parsing and dumping of tinyint columns when connecting to MySQL via the do adapter (ricardochimal)
