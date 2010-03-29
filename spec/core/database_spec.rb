@@ -794,6 +794,7 @@ context "A Database adapter with a scheme" do
     x = nil
     y = nil
     z = nil
+    returnValue = 'anything'
 
     p = proc do |c|
       c.should be_a_kind_of(CCC)
@@ -802,15 +803,16 @@ context "A Database adapter with a scheme" do
       z = y
       y = x
       x = c
+      returnValue
     end
-    Sequel::Database.connect('ccc://localhost/db', &p).should == nil
+    Sequel::Database.connect('ccc://localhost/db', &p).should == returnValue
     CCC::DISCONNECTS.should == [x]
 
-    Sequel.connect('ccc://localhost/db', &p).should == nil
+    Sequel.connect('ccc://localhost/db', &p).should == returnValue
     CCC::DISCONNECTS.should == [y, x]
 
     Sequel.send(:def_adapter_method, :ccc)
-    Sequel.ccc('db', :host=>'localhost', &p).should == nil
+    Sequel.ccc('db', :host=>'localhost', &p).should == returnValue
     CCC::DISCONNECTS.should == [z, y, x]
   end
 
