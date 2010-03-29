@@ -1,5 +1,9 @@
 === HEAD
 
+* Make typecast_on_load plugin also typecast when refreshing the object (either explicitly or implicitly after creation) (jeremyevans)
+
+* Fix schema parsing and dumping of tinyint columns when connecting to MySQL via the do adapter (ricardochimal)
+
 * Fix transactions when connecting to Oracle via JDBC (jeremyevans)
 
 * Fix plugin loading when plugin module name is the same as an already defined top level constant (jeremyevans)

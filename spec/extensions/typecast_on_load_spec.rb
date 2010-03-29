@@ -7,6 +7,7 @@ describe Sequel::Model, "TypecastOnLoad plugin" do
       [[:id, {}], [:y, {:type=>:boolean, :db_type=>'tinyint(1)'}], [:b, {:type=>:integer, :db_type=>'integer'}]]
     end
     @c = Class.new(Sequel::Model(@db[:items])) do
+      include(Module.new{def _refresh(ds); values[:b] = b.to_s; self; end})
       attr_accessor :bset
       def b=(x)
         self.bset = true
@@ -22,6 +23,14 @@ describe Sequel::Model, "TypecastOnLoad plugin" do
   specify "should call setter method with value when loading the object, for all given columns" do
     @c.plugin :typecast_on_load, :b
     o = @c.load(:id=>1, :b=>"1", :y=>"0")
+    o.values.should == {:id=>1, :b=>1, :y=>"0"}
+    o.bset.should == true
+  end
+
+  specify "should call setter method with value when reloading the object, for all given columns" do
+    @c.plugin :typecast_on_load, :b
+    o = @c.new({:id=>1, :b=>"1", :y=>"0"}, true)
+    o.refresh
     o.values.should == {:id=>1, :b=>1, :y=>"0"}
     o.bset.should == true
   end

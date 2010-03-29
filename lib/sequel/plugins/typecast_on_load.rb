@@ -46,14 +46,25 @@ module Sequel
         # ensuring the model object will have the correct typecasting even
         # if the database doesn't typecast the columns correctly.
         def load(values)
-          o = super
-          typecast_on_load_columns.each do |c|
+          super.load_typecast
+        end
+      end
+
+      module InstanceMethods
+        def load_typecast
+          model.typecast_on_load_columns.each do |c|
             if v = values[c]
-              o.send("#{c}=", v)
+              send("#{c}=", v)
             end
           end
-          o.changed_columns.clear
-          o
+          changed_columns.clear
+          self
+        end
+
+        private
+
+        def _refresh(dataset)
+          super.load_typecast
         end
       end
     end
