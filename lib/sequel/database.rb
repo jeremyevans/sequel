@@ -158,13 +158,14 @@ module Sequel
         m
       end
       if block
+        result = nil
         begin
-          yield(db = c.new(opts))
+          result = yield(db = c.new(opts))
         ensure
           db.disconnect if db
           ::Sequel::DATABASES.delete(db)
         end
-        nil
+        result
       else
         c.new(opts)
       end
