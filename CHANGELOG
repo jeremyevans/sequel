@@ -1,5 +1,7 @@
 === HEAD
 
+* Change Sequel.connect with a block to return the block's value (jonas11235)
+
 * Add an rcte_tree plugin, which uses recursive common table expressions for loading trees stored as adjacency lists (jeremyevans)
 
 * Make typecast_on_load plugin also typecast when refreshing the object (either explicitly or implicitly after creation) (jeremyevans)
