@@ -178,9 +178,9 @@ describe Sequel::Model, "rcte_tree" do
     os.map{|o| o.descendants}.should == [[@c.load(:id=>6, :parent_id=>2, :name=>'C'), @c.load(:id=>9, :parent_id=>2, :name=>'E'), @c.load(:id=>3, :name=>'00', :parent_id=>6)],
       [@c.load(:id=>3, :name=>'00', :parent_id=>6)],
       [@c.load(:id=>4, :name=>'?', :parent_id=>7), @c.load(:id=>5, :name=>'?', :parent_id=>4)]]
-    os.map{|o| o.children}.should == [[@c.load(:id=>6, :parent_id=>2, :name=>'C'), @c.load(:id=>9, :parent_id=>2, :name=>'E')], [@c.load(:id=>3, :name=>'00', :parent_id=>6)], [@c.load(:id=>4, :name=>'?', :parent_id=>7)]]
-    os.map{|o1| o1.children.map{|o2| o2.children}}.should == [[[@c.load(:id=>3, :name=>'00', :parent_id=>6)], []], [[]], [[@c.load(:id=>5, :name=>'?', :parent_id=>4)]]]
-    os.map{|o1| o1.children.map{|o2| o2.children.map{|o3| o3.children}}}.should == [[[[]], []], [[]], [[[]]]]
+    os.map{|o| o.associations[:children]}.should == [[@c.load(:id=>6, :parent_id=>2, :name=>'C'), @c.load(:id=>9, :parent_id=>2, :name=>'E')], [@c.load(:id=>3, :name=>'00', :parent_id=>6)], [@c.load(:id=>4, :name=>'?', :parent_id=>7)]]
+    os.map{|o1| o1.associations[:children].map{|o2| o2.associations[:children]}}.should == [[[@c.load(:id=>3, :name=>'00', :parent_id=>6)], []], [[]], [[@c.load(:id=>5, :name=>'?', :parent_id=>4)]]]
+    os.map{|o1| o1.associations[:children].map{|o2| o2.associations[:children].map{|o3| o3.associations[:children]}}}.should == [[[[]], []], [[]], [[nil]]]
     MODEL_DB.new_sqls.should == []
   end
   
@@ -197,9 +197,9 @@ describe Sequel::Model, "rcte_tree" do
     os.map{|o| o.ds}.should == [[@c.load(:i=>6, :pi=>2, :name=>'C'), @c.load(:i=>9, :pi=>2, :name=>'E'), @c.load(:i=>3, :name=>'00', :pi=>6)],
       [@c.load(:i=>3, :name=>'00', :pi=>6)],
       [@c.load(:i=>4, :name=>'?', :pi=>7), @c.load(:i=>5, :name=>'?', :pi=>4)]]
-    os.map{|o| o.cs}.should == [[@c.load(:i=>6, :pi=>2, :name=>'C'), @c.load(:i=>9, :pi=>2, :name=>'E')], [@c.load(:i=>3, :name=>'00', :pi=>6)], [@c.load(:i=>4, :name=>'?', :pi=>7)]]
-    os.map{|o1| o1.cs.map{|o2| o2.cs}}.should == [[[@c.load(:i=>3, :name=>'00', :pi=>6)], []], [[]], [[@c.load(:i=>5, :name=>'?', :pi=>4)]]]
-    os.map{|o1| o1.cs.map{|o2| o2.cs.map{|o3| o3.cs}}}.should == [[[[]], []], [[]], [[[]]]]
+    os.map{|o| o.associations[:cs]}.should == [[@c.load(:i=>6, :pi=>2, :name=>'C'), @c.load(:i=>9, :pi=>2, :name=>'E')], [@c.load(:i=>3, :name=>'00', :pi=>6)], [@c.load(:i=>4, :name=>'?', :pi=>7)]]
+    os.map{|o1| o1.associations[:cs].map{|o2| o2.associations[:cs]}}.should == [[[@c.load(:i=>3, :name=>'00', :pi=>6)], []], [[]], [[@c.load(:i=>5, :name=>'?', :pi=>4)]]]
+    os.map{|o1| o1.associations[:cs].map{|o2| o2.associations[:cs].map{|o3| o3.associations[:cs]}}}.should == [[[[]], []], [[]], [[nil]]]
     MODEL_DB.new_sqls.should == []
   end
 end

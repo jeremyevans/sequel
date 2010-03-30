@@ -240,6 +240,7 @@ module Sequel
            select(SQL::QualifiedIdentifier.new(t, ka), c_all)
           if associations.is_a?(Integer)
             level = associations
+            no_cache_level = level - 1
             associations = {}
             base_case = base_case.select_more(SQL::AliasedExpression.new(0, la))
             recursive_case = recursive_case.select_more(SQL::AliasedExpression.new(SQL::QualifiedIdentifier.new(t, la) + 1, la)).filter(SQL::QualifiedIdentifier.new(t, la) < level - 1)
@@ -248,7 +249,9 @@ module Sequel
            model.from(t).with_recursive(t, base_case, recursive_case),
            r.select,
            associations).all do |obj|
-            obj.values.delete(la) if level
+            if level
+              no_cache = no_cache_level == obj.values.delete(la)
+            end
             
             opk = obj[prkey]
             if in_pm = parent_map.has_key?(opk)
@@ -257,7 +260,7 @@ module Sequel
                 obj = idm_obj
               end
             else
-              obj.associations[childrena] = []
+              obj.associations[childrena] = [] unless no_cache
               parent_map[opk] = obj
             end
             

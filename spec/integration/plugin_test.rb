@@ -667,6 +667,39 @@ if INTEGRATION_DB.dataset.supports_cte?
       nodes[0].associations[:children].map{|c1| c1.associations[:children].map{|c2| c2.associations[:children].map{|c3| c3.associations[:children].map{|c4| c4.associations[:children]}}}}.should == [[[[[]], []], []], [[], []]]
     end
     
+    specify "should not populate :children associations for final level when loading descendants to a given level" do
+      nodes = Node.filter(:id=>[@a.id, @b.id, @aaa.id]).order(:name).eager(:descendants=>1).all
+      nodes[0].associations[:children].should == [@aa, @ab]
+      nodes[0].associations[:children].map{|c1| c1.associations[:children]}.should == [nil, nil]
+      nodes[1].associations[:children].should == [@aaaa, @aaab]
+      nodes[1].associations[:children].map{|c1| c1.associations[:children]}.should == [nil, nil]
+      nodes[2].associations[:children].should == [@ba, @bb]
+      nodes[2].associations[:children].map{|c1| c1.associations[:children]}.should == [nil, nil]
+      
+      nodes[0].associations[:children].map{|c1| c1.children}.should == [[@aaa, @aab], [@aba, @abb]]
+      nodes[1].associations[:children].map{|c1| c1.children}.should == [[@aaaaa], []]
+      nodes[2].associations[:children].map{|c1| c1.children}.should == [[], []]
+      
+      nodes = Node.filter(:id=>[@a.id, @b.id, @aaa.id]).order(:name).eager(:descendants=>2).all
+      nodes[0].associations[:children].should == [@aa, @ab]
+      nodes[0].associations[:children].map{|c1| c1.associations[:children]}.should == [[@aaa, @aab], [@aba, @abb]]
+      nodes[0].associations[:children].map{|c1| c1.associations[:children].map{|c2| c2.associations[:children]}}.should == [[[@aaaa, @aaab], nil], [nil, nil]]
+      nodes[0].associations[:children].map{|c1| c1.associations[:children].map{|c2| (cc2 = c2.associations[:children]) ? cc2.map{|c3| c3.associations[:children]} : nil}}.should == [[[[@aaaaa], []], nil], [nil, nil]]
+      nodes[0].associations[:children].map{|c1| c1.associations[:children].map{|c2| (cc2 = c2.associations[:children]) ? cc2.map{|c3| (cc3 = c3.associations[:children]) ? cc3.map{|c4| c4.associations[:children]} : nil} : nil}}.should == [[[[nil], []], nil], [nil, nil]]
+      
+      nodes[1].associations[:children].should == [@aaaa, @aaab]
+      nodes[1].associations[:children].map{|c1| c1.associations[:children]}.should == [[@aaaaa], []]
+      nodes[1].associations[:children].map{|c1| c1.associations[:children].map{|c2| c2.associations[:children]}}.should == [[nil], []]
+      
+      nodes[2].associations[:children].should == [@ba, @bb]
+      nodes[2].associations[:children].map{|c1| c1.associations[:children]}.should == [[], []]
+      
+      nodes[0].associations[:children].map{|c1| c1.associations[:children].map{|c2| c2.children}}.should == [[[@aaaa, @aaab], []], [[], []]]
+      nodes[0].associations[:children].map{|c1| c1.associations[:children].map{|c2| c2.children.map{|c3| c3.children}}}.should == [[[[@aaaaa], []], []], [[], []]]
+      nodes[0].associations[:children].map{|c1| c1.associations[:children].map{|c2| c2.children.map{|c3| c3.children.map{|c4| c4.children}}}}.should == [[[[[]], []], []], [[], []]]
+      nodes[1].associations[:children].map{|c1| c1.associations[:children].map{|c2| c2.children}}.should == [[[]], []]
+    end
+    
     specify "should populate all :children associations when lazily loading descendants" do
       @a.descendants
       @a.associations[:children].should == [@aa, @ab]
