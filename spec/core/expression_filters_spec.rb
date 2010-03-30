@@ -575,4 +575,21 @@ context Sequel::SQL::VirtualRow do
     @d.l{date < Sequel::CURRENT_DATE}.should == "(\"date\" < CURRENT_DATE)"
     @d.l{num < Math::PI.to_i}.should == "(\"num\" < 3)"
   end
+  
+  it "should deal with methods added to Object after requiring Sequel" do
+    class Object
+      def adsoiwemlsdaf; 42; end
+    end
+    Sequel::BasicObject.remove_methods!
+    @d.l{a > adsoiwemlsdaf}.should == '("a" > "adsoiwemlsdaf")'
+  end
+  
+  it "should deal with private methods added to Kernel after requiring Sequel" do
+    module Kernel
+      private
+      def adsoiwemlsdaf2; 42; end
+    end
+    Sequel::BasicObject.remove_methods!
+    @d.l{a > adsoiwemlsdaf2}.should == '("a" > "adsoiwemlsdaf2")'
+  end
 end

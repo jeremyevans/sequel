@@ -4,7 +4,17 @@ module Sequel
     # the Ruby 1.9 BasicObject class.  This is used in a few places where proxy
     # objects are needed that respond to any method call.
     class BasicObject
-      (instance_methods - %w"__id__ __send__ __metaclass__ instance_eval == equal?").each{|m| undef_method(m)}
+      # The instance methods to not remove from the class when removing
+      # other methods.
+      KEEP_METHODS = %w"__id__ __send__ __metaclass__ instance_eval == equal? initialize"
+
+      # Remove all but the most basic instance methods from the class.  A separate
+      # method so that it can be called again if necessary if you load libraries
+      # after Sequel that add instance methods to Object.
+      def self.remove_methods!
+        ((private_instance_methods + instance_methods) - KEEP_METHODS).each{|m| undef_method(m)}
+      end
+      remove_methods!
     end
   else
     # If on 1.9, create a Sequel::BasicObject class that is just like the
@@ -17,6 +27,10 @@ module Sequel
       # Lookup missing constants in ::Object
       def self.const_missing(name)
         ::Object.const_get(name)
+      end
+
+      # No-op method on ruby 1.9, which has a real BasicObject class.
+      def self.remove_methods!
       end
     end
   end
