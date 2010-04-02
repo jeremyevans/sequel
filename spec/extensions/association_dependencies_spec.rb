@@ -20,7 +20,8 @@ describe "AssociationDependencies plugin" do
     @Artist.columns :id, :name
     @Album.columns :id, :name, :artist_id
     @Artist.one_to_many :albums, :class=>@Album, :key=>:artist_id
-    @Artist.many_to_many :other_artists, :class=>@artist, :join_table=>:aoa, :left_key=>:l, :right_key=>:r
+    @Artist.one_to_one :first_album, :class=>@Album, :key=>:artist_id, :conditions=>{:position=>1}
+    @Artist.many_to_many :other_artists, :class=>@Artist, :join_table=>:aoa, :left_key=>:l, :right_key=>:r
     @Album.many_to_one :artist, :class=>@Artist
     MODEL_DB.reset
   end
@@ -36,6 +37,18 @@ describe "AssociationDependencies plugin" do
     @Album.load(:id=>1, :name=>'Al', :artist_id=>2).destroy
     MODEL_DB.sqls.should == ['DELETE FROM albums WHERE (id = 1)', 'DELETE FROM artists WHERE (artists.id = 2)']
   end
+  
+  specify "should allow destroying associated one_to_one associated object" do
+    @Artist.add_association_dependencies :first_album=>:destroy
+    @Artist.load(:id=>2, :name=>'Ar').destroy
+    MODEL_DB.sqls.should == ['SELECT * FROM albums WHERE ((albums.artist_id = 2) AND (position = 1)) LIMIT 1', 'DELETE FROM albums WHERE (id = 1)', 'DELETE FROM artists WHERE (id = 2)']
+  end
+
+  specify "should allow deleting associated one_to_one associated object" do
+    @Artist.add_association_dependencies :first_album=>:delete
+    @Artist.load(:id=>2, :name=>'Ar').destroy
+    MODEL_DB.sqls.should == ['DELETE FROM albums WHERE ((albums.artist_id = 2) AND (position = 1))', 'DELETE FROM artists WHERE (id = 2)']
+  end
 
   specify "should allow destroying associated one_to_many objects" do
     @Artist.add_association_dependencies :albums=>:destroy
@@ -47,6 +60,12 @@ describe "AssociationDependencies plugin" do
     @Artist.add_association_dependencies :albums=>:delete
     @Artist.load(:id=>2, :name=>'Ar').destroy
     MODEL_DB.sqls.should == ['DELETE FROM albums WHERE (albums.artist_id = 2)', 'DELETE FROM artists WHERE (id = 2)']
+  end
+  
+  specify "should allow nullifying associated one_to_one objects" do
+    @Artist.add_association_dependencies :first_album=>:nullify
+    @Artist.load(:id=>2, :name=>'Ar').destroy
+    MODEL_DB.sqls.should == ['UPDATE albums SET artist_id = NULL WHERE ((artist_id = 2) AND (position = 1))', 'DELETE FROM artists WHERE (id = 2)']
   end
 
   specify "should allow nullifying associated one_to_many objects" do

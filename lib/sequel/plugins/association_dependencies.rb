@@ -6,7 +6,7 @@ module Sequel
     # 
     # * :many_to_many - :nullify (removes all related entries in join table)
     # * :many_to_one - :delete, :destroy
-    # * :one_to_many - :delete, :destroy, :nullify (sets foreign key to NULL for all associated objects)
+    # * :one_to_many, one_to_one - :delete, :destroy, :nullify (sets foreign key to NULL for all associated objects)
     #
     # This plugin works directly with the association datasets and does not use any cached association values.
     # The :delete action will delete all associated objects from the database in a single SQL call.
@@ -23,7 +23,7 @@ module Sequel
     module AssociationDependencies
       # Mapping of association types to when the dependency calls should be made (either
       # :before for in before_destroy or :after for in after_destroy)
-      ASSOCIATION_MAPPING = {:one_to_many=>:before, :many_to_one=>:after, :many_to_many=>:before}
+      ASSOCIATION_MAPPING = {:one_to_many=>:before, :many_to_one=>:after, :many_to_many=>:before, :one_to_one=>:before}
 
       # The valid dependence actions
       DEPENDENCE_ACTIONS = [:delete, :destroy, :nullify]
@@ -52,13 +52,20 @@ module Sequel
         def add_association_dependencies(hash)
           hash.each do |association, action|
             raise(Error, "Nonexistent association: #{association}") unless r = association_reflection(association)
+            type = r[:type]
             raise(Error, "Invalid dependence action type: association: #{association}, dependence action: #{action}") unless DEPENDENCE_ACTIONS.include?(action)
-            raise(Error, "Invalid association type: association: #{association}, type: #{r[:type]}") unless time = ASSOCIATION_MAPPING[r[:type]]
+            raise(Error, "Invalid association type: association: #{association}, type: #{type}") unless time = ASSOCIATION_MAPPING[type]
             association_dependencies[:"#{time}_#{action}"] << if action == :nullify
-              raise(Error, "Can't nullify many_to_one associated objects: association: #{association}") if r[:type] == :many_to_one
-              r.remove_all_method
+              case type
+              when :one_to_many , :many_to_many
+                proc{send(r.remove_all_method)}
+              when :one_to_one
+                proc{send(r.setter_method, nil)}
+              else
+                raise(Error, "Can't nullify many_to_one associated objects: association: #{association}")
+              end
             else
-              raise(Error, "Can only nullify many_to_many associations: association: #{association}") if r[:type] == :many_to_many
+              raise(Error, "Can only nullify many_to_many associations: association: #{association}") if type == :many_to_many
               r.dataset_method
             end
           end
@@ -87,7 +94,7 @@ module Sequel
         def before_destroy
           model.association_dependencies[:before_delete].each{|m| send(m).delete}
           model.association_dependencies[:before_destroy].each{|m| send(m).destroy}
-          model.association_dependencies[:before_nullify].each{|m| send(m)}
+          model.association_dependencies[:before_nullify].each{|p| instance_eval(&p)}
           super
         end
       end
