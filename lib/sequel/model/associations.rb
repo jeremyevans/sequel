@@ -798,7 +798,7 @@ module Sequel
             database.dataset.from(join_table).filter(lcks.zip(lcpks.map{|k| send(k)}) + rcks.zip(opts.right_primary_keys.map{|k| o.send(k)})).delete
           end
           association_module_private_def(opts._remove_all_method) do
-            database.dataset.from(join_table).filter(lcks.zip(lcpks.map{|k| send(k)})).delete
+            _apply_association_options(opts, database.dataset.from(join_table).filter(lcks.zip(lcpks.map{|k| send(k)}))).delete
           end
       
           def_add_method(opts)
@@ -919,7 +919,7 @@ module Sequel
 
             if one_to_one
               association_module_private_def(opts._setter_method) do |o|
-                up_ds = opts.associated_class.filter(cks.zip(cpks.map{|k| send(k)}))
+                up_ds = _apply_association_options(opts, opts.associated_class.filter(cks.zip(cpks.map{|k| send(k)})))
                 if o
                   up_ds = up_ds.exclude(o.pk_hash)
                   cks.zip(cpks).each{|k, pk| o.send(:"#{k}=", send(pk))}
@@ -943,7 +943,7 @@ module Sequel
                 o.save(:validate=>validate) || raise(Sequel::Error, "invalid associated object, cannot save")
               end
               association_module_private_def(opts._remove_all_method) do
-                opts.associated_class.filter(cks.zip(cpks.map{|k| send(k)})).update(ck_nil_hash)
+                _apply_association_options(opts, opts.associated_class.filter(cks.zip(cpks.map{|k| send(k)}))).update(ck_nil_hash)
               end
               def_remove_methods(opts)
             end
@@ -968,11 +968,8 @@ module Sequel
         end
 
         private
-
-        # Backbone behind association dataset methods
-        def _dataset(opts)
-          raise(Sequel::Error, "model object #{inspect} does not have a primary key") if opts.dataset_need_primary_key? && !pk
-          ds = send(opts._dataset_method)
+        
+        def _apply_association_options(opts, ds)
           ds.extend(AssociationDatasetMethods)
           ds.model_object = self
           ds.association_reflection = opts
@@ -989,6 +986,12 @@ module Sequel
           ds = ds.eager_graph(opts[:eager_graph]) if opts[:eager_graph] && opts.eager_graph_lazy_dataset?
           ds = send(opts.dataset_helper_method, ds) if opts[:block]
           ds
+        end
+
+        # Backbone behind association dataset methods
+        def _dataset(opts)
+          raise(Sequel::Error, "model object #{inspect} does not have a primary key") if opts.dataset_need_primary_key? && !pk
+          _apply_association_options(opts, send(opts._dataset_method))
         end
 
         # Return the associated objects from the dataset, without callbacks, reciprocals, and caching.

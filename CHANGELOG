@@ -1,5 +1,9 @@
 === HEAD
 
+* Make one_to_one setter and *_to_many remove_all methods apply the association options (jeremyevans)
+
+* Make nested_attributes plugin handle invalid many_to_one associations better (john_firebaugh)
+
 * Remove private methods from Sequel::BasicObject on ruby 1.8 (i.e. most Kernel methods) (jeremyevans)
 
 * Add Sequel::BasicObject.remove_methods!, useful on 1.8 if libraries required after Sequel add methods to Object (jeremyevans)

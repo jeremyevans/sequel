@@ -653,6 +653,17 @@ describe Sequel::Model, "one_to_one" do
       "UPDATE attributes SET node_id = 1234 WHERE (id = 3)",
       'COMMIT']
   end
+    
+  it "should have setter method respect association filters" do
+    @c2.one_to_one :attribute, :class => @c1, :conditions=>{:a=>1} do |ds|
+      ds.filter(:b=>2)
+    end
+    MODEL_DB.sqls.clear
+    attrib = @c1.load(:id=>3)
+    @c2.new(:id => 1234).attribute = attrib
+    MODEL_DB.sqls.should == ['UPDATE attributes SET node_id = NULL WHERE ((node_id = 1234) AND (a = 1) AND (b = 2) AND (id != 3))',
+      "UPDATE attributes SET node_id = 1234 WHERE (id = 3)"]
+  end
 
   it "should have the setter method respect the :primary_key option" do
     @c2.one_to_one :attribute, :class => @c1, :primary_key=>:xxx
@@ -1569,6 +1580,14 @@ describe Sequel::Model, "one_to_many" do
     MODEL_DB.sqls.first.should == 'UPDATE attributes SET node_id = NULL WHERE (node_id = 1234)'
   end
 
+  it "should have remove_all method respect association filters" do
+    @c2.one_to_many :attributes, :class => @c1, :conditions=>{:a=>1} do |ds|
+      ds.filter(:b=>2)
+    end
+    @c2.new(:id => 1234).remove_all_attributes
+    MODEL_DB.sqls.should == ['UPDATE attributes SET node_id = NULL WHERE ((node_id = 1234) AND (a = 1) AND (b = 2))']
+  end
+
   it "should have the remove_all_ method respect the :primary_key option" do
     @c2.one_to_many :attributes, :class => @c1, :primary_key=>:xxx
     @c2.new(:id => 1234, :xxx=>5).remove_all_attributes
@@ -2312,6 +2331,14 @@ describe Sequel::Model, "many_to_many" do
     @c2.many_to_many :attributes, :class => @c1
     @c2.new(:id => 1234).remove_all_attributes
     MODEL_DB.sqls.first.should == 'DELETE FROM attributes_nodes WHERE (node_id = 1234)'
+  end
+
+  it "should have remove_all method respect association filters" do
+    @c2.many_to_many :attributes, :class => @c1, :conditions=>{:a=>1} do |ds|
+      ds.filter(:b=>2)
+    end
+    @c2.new(:id => 1234).remove_all_attributes
+    MODEL_DB.sqls.should == ['DELETE FROM attributes_nodes WHERE ((node_id = 1234) AND (a = 1) AND (b = 2))']
   end
 
   it "should have the remove_all_ method respect the :left_primary_key option" do
