@@ -31,6 +31,15 @@ module Sequel
     module JavaSQL
       include_package 'java.sql'
     end
+
+    # Make it accesing the javax.naming hierarchy more ruby friendly.
+    module JavaxNaming
+      include_package 'javax.naming'
+    end
+
+    # Used to identify a jndi connection and to extract the jndi
+    # resource name.
+    JNDI_URI_REGEXP = /\Ajdbc:jndi:(.+)/
     
     # Contains procs keyed on sub adapter type that extend the
     # given database object so it supports the correct database type.
@@ -106,9 +115,12 @@ module Sequel
         super
         @convert_types = @opts.include?(:convert_types) ? typecast_value_boolean(@opts[:convert_types]) : true
         raise(Error, "No connection string specified") unless uri
-        if match = /\Ajdbc:([^:]+)/.match(uri) and prok = DATABASE_SETUP[match[1].to_sym]
+        
+        resolved_uri = jndi? ? get_uri_from_jndi : uri
+
+        if match = /\Ajdbc:([^:]+)/.match(resolved_uri) and prok = DATABASE_SETUP[match[1].to_sym]
           prok.call(self)
-        end
+        end        
       end
       
       # Execute the given stored procedure with the give name. If a block is
@@ -141,12 +153,17 @@ module Sequel
           end
         end
       end
-      
+         
       # Connect to the database using JavaSQL::DriverManager.getConnection.
       def connect(server)
-        args = [uri(server_opts(server))]
-        args.concat([opts[:user], opts[:password]]) if opts[:user] && opts[:password]
-        setup_connection(JavaSQL::DriverManager.getConnection(*args))
+        conn = if jndi?
+          get_connection_from_jndi
+        else
+          args = [uri(server_opts(server))]
+          args.concat([opts[:user], opts[:password]]) if opts[:user] && opts[:password]
+          JavaSQL::DriverManager.getConnection(*args)
+        end       
+        setup_connection(conn)
       end
       
       # Return instances of JDBC::Dataset with the given opts.
@@ -235,9 +252,14 @@ module Sequel
         ur = opts[:uri] || opts[:url] || opts[:database]
         ur =~ /^\Ajdbc:/ ? ur : "jdbc:#{ur}"
       end
+
+      # Whether or not JNDI is being used for this connection.
+      def jndi?
+        !!(uri =~ JNDI_URI_REGEXP)
+      end
       
       private
-      
+         
       # JDBC uses a statement object to execute SQL on the database
       def begin_transaction(conn)
         conn = conn.createStatement unless supports_savepoints?
@@ -301,7 +323,18 @@ module Sequel
           end
         end
       end
+
+      # Gets the JDBC connection uri from the JNDI resource.
+      def get_uri_from_jndi
+        get_connection_from_jndi.meta_data.url
+      end
       
+      # Gets the connection from JNDI.
+      def get_connection_from_jndi
+        jndi_name = JNDI_URI_REGEXP.match(uri)[1]
+        JavaxNaming::InitialContext.new.lookup(jndi_name).connection
+      end
+            
       # Support fractional seconds for Time objects used in bound variables
       def java_sql_timestamp(time)
         millis = time.to_i * 1000
