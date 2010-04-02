@@ -43,5 +43,8 @@ describe "Sequel::Plugins::AssociationProxies" do
   it "should not return a proxy object for associations that do not return an array" do
     Item.many_to_one :tag
     proc{@i.tag.filter(:a=>1)}.should raise_error(NoMethodError)
+    
+    Tag.one_to_one :item
+    proc{Tag.load(:id=>1, :item_id=>2).item.filter(:a=>1)}.should raise_error(NoMethodError)
   end
 end
