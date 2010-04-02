@@ -45,9 +45,10 @@ describe "NestedAttributes plugin" do
     @Album.columns :id, :name, :artist_id
     @Tag.columns :id, :name
     @Artist.one_to_many :albums, :class=>@Album, :key=>:artist_id
+    @Artist.one_to_one :first_album, :class=>@Album, :key=>:artist_id
     @Album.many_to_one :artist, :class=>@Artist
     @Album.many_to_many :tags, :class=>@Tag, :left_key=>:album_id, :right_key=>:tag_id, :join_table=>:at
-    @Artist.nested_attributes :albums, :destroy=>true, :remove=>true
+    @Artist.nested_attributes :albums, :first_album, :destroy=>true, :remove=>true
     @Album.nested_attributes :artist, :tags, :destroy=>true, :remove=>true
   end
   
@@ -56,6 +57,15 @@ describe "NestedAttributes plugin" do
     @mods.should == []
     a.save
     @mods.should == [[:is, :artists, {:name=>"Ar"}, 1], [:is, :albums, {:name=>"Al", :artist_id=>1}, 2]]
+  end
+  
+  it "should support creating new one_to_one objects" do
+    a = @Artist.new(:name=>'Ar')
+    a.id = 1
+    a.first_album_attributes = {:name=>'Al'}
+    @mods.should == []
+    a.save
+    @mods.should == [[:is, :artists, {:name=>"Ar", :id=>1}, 1], [:is, :albums, {:name=>"Al"}, 2], [:u, :albums, {:artist_id=>nil}, "((artist_id = 1) AND (id != 2))"], [:u, :albums, {:name=>"Al", :artist_id=>1}, "(id = 2)"]]
   end
   
   it "should support creating new one_to_many objects" do
@@ -88,6 +98,16 @@ describe "NestedAttributes plugin" do
     @mods.should == [[:u, :albums, {:name=>"Al"}, '(id = 10)'], [:u, :artists, {:name=>"Ar2"}, '(id = 20)']]
   end
   
+  it "should support updating one_to_one objects" do
+    al = @Album.load(:id=>10, :name=>'Al')
+    ar = @Artist.load(:id=>20, :name=>'Ar')
+    ar.associations[:first_album] = al
+    ar.set(:first_album_attributes=>{:id=>10, :name=>'Al2'})
+    @mods.should == []
+    ar.save
+    @mods.should == [[:u, :artists, {:name=>"Ar"}, '(id = 20)'], [:u, :albums, {:name=>"Al2"}, '(id = 10)']]
+  end
+  
   it "should support updating one_to_many objects" do
     al = @Album.load(:id=>10, :name=>'Al')
     ar = @Artist.load(:id=>20, :name=>'Ar')
@@ -118,6 +138,17 @@ describe "NestedAttributes plugin" do
     @mods.should == [[:u, :albums, {:artist_id=>nil, :name=>'Al'}, '(id = 10)']]
   end
   
+  it "should support removing one_to_one objects" do
+    al = @Album.load(:id=>10, :name=>'Al')
+    ar = @Artist.load(:id=>20, :name=>'Ar')
+    ar.associations[:first_album] = al
+    ar.set(:first_album_attributes=>{:id=>10, :_remove=>'t'})
+    @mods.should == []
+    ar.save
+    @mods.should == [[:u, :albums, {:artist_id=>nil}, "(artist_id = 20)"], [:u, :artists, {:name=>"Ar"}, "(id = 20)"]]
+    
+  end
+  
   it "should support removing one_to_many objects" do
     al = @Album.load(:id=>10, :name=>'Al')
     ar = @Artist.load(:id=>20, :name=>'Ar')
@@ -146,6 +177,16 @@ describe "NestedAttributes plugin" do
     @mods.should == []
     al.save
     @mods.should == [[:u, :albums, {:artist_id=>nil, :name=>'Al'}, '(id = 10)'], [:d, :artists, '(id = 20)']]
+  end
+  
+  it "should support destroying one_to_one objects" do
+    al = @Album.load(:id=>10, :name=>'Al')
+    ar = @Artist.load(:id=>20, :name=>'Ar')
+    ar.associations[:first_album] = al
+    ar.set(:first_album_attributes=>{:id=>10, :_delete=>'t'})
+    @mods.should == []
+    ar.save
+    @mods.should == [[:u, :albums, {:artist_id=>nil}, "(artist_id = 20)"], [:u, :artists, {:name=>"Ar"}, "(id = 20)"], [:d, :albums, "(id = 10)"]]
   end
   
   it "should support destroying one_to_many objects" do
