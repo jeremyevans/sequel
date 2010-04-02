@@ -1,5 +1,7 @@
 === HEAD
 
+* Update active_model plugin to work with the ActiveModel::Lint 3.0.0beta2 specs (jeremyevans)
+
 * Support JNDI connection strings in the JDBC adapter (jrun)
 
 === 3.10.0 (2010-04-02)
