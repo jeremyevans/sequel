@@ -91,6 +91,7 @@ module Sequel
             send(reflection[:name]) << obj
             after_save_hook{send(reflection.add_method, obj)}
           else
+            associations[reflection[:name]] = obj
             # Don't need to validate the object twice if :validate association option is not false
             # and don't want to validate it at all if it is false.
             before_save_hook{send(reflection.setter_method, obj.save(:validate=>false))}

@@ -239,6 +239,8 @@ describe "NestedAttributes plugin" do
     proc{a.save}.should raise_error(Sequel::ValidationFailed)
     a.errors.full_messages.should == ['artist name cannot be Ar']
     @mods.should == []
+    # Should preserve attributes
+    a.artist.name.should == 'Ar'
   end
   
   it "should not attempt to validate nested attributes if the :validate=>false association option is used" do
