@@ -1,4 +1,4 @@
-=== HEAD
+=== 3.10.0 (2010-04-02)
 
 * Make one_to_one setter and *_to_many remove_all methods apply the association options (jeremyevans)
 

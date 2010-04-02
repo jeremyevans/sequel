@@ -1,0 +1,286 @@
+New Features
+------------
+
+* A real one_to_one association was added to Sequel, replacing the
+  previous :one_to_one option of the one_to_many association.
+  
+  This is a fully backwards incompatible change, any code that uses
+  the :one_to_one option of one_to_many will be broken in Sequel
+  3.10.0, as that option now raises an exception.  Keeping backwards
+  compatibility was not possible, as even the name of the association
+  needs to be changed.  Here are the code changes you need to make:
+  
+  * The association definition needs to change from one_to_many to
+    one_to_one, with no :one_to_one option, and with the association
+    name changed from the plural form to the singular form:
+    
+      # Before
+      Lyric.one_to_many :songs, :one_to_one=>true
+      # After
+      Lyric.one_to_one :song
+      
+  * All usage of the association when eager loading or when getting
+    reflections need to use the new singular association name:
+    
+      # Before
+      Lyric.eager(:songs).all
+      Lyric.eager_graph(:songs).all
+      Lyric.association_reflection(:songs)
+      # After
+      Lyric.eager(:song).all
+      Lyric.eager_graph(:song).all
+      Lyric.association_reflection(:song)
+      
+  Any Sequel plugins or extensions that deal with the internals of
+  associations need to be made aware of the one_to_one association,
+  and how it is different than one_to_many's previous :one_to_one
+  option.  Here are some internal changes that may affect you:
+  
+  * one_to_one associations are now cached like many_to_one
+    associations instead of like one_to_many associations.  So the
+    cache includes the associated object or nil, instead of an array.
+    Note that this change means that all custom :eager_loader options
+    for one_to_one associations need to change to use this new
+    caching scheme.
+    
+  * The one_to_one association setter method is now handled similarly
+    to the many_to_one setter method, instead of using the internal
+    one_to_many association add method.
+    
+  * Instead of raising an error when multiple rows are returned,
+    one_to_one associations now use limit(1) to only return a single
+    row.
+    
+  There were some other fixes made during these changes:
+  
+  * The one_to_one setter now accepts nil to disassociate the record.
+    Previously, this raised an error.
+    
+  * If the one_to_one association already had a separate object
+    associated, and you assigned a different object in the setter
+    method, Sequel now disassociates the old object before
+    associating the new object, fixing some potential issues if there
+    is a UNIQUE constraint on the foreign key column.
+    
+  * Using the many_to_one association setter where the reciprocal
+    association is a one_to_one association with a currently
+    different cached associated object no longer raises an exception.
+  
+  * The nested_attributes and association_dependencies plugins
+    both now correctly handle one_to_one associations.
+
+  If you need any help migrating, please post on the Sequel Google
+  Group or ask in the #sequel IRC channel.
+
+* Both many_to_one and one_to_one associations now use before_set
+  and after_set callbacks instead of trying to make the one_to_many
+  and many_to_many associations' (before|after)_(add|remove)
+  callbacks work.
+  
+  This change makes the code simpler, makes writing callbacks easier,
+  and no longer requires Sequel to send a query to the database to
+  get the currently associated object in the many_to_one association
+  setter method (you can still do so manually in a before_set
+  callback if you want to).
+  
+* Dataset#for_update was added as a default dataset method.
+  Previously, it was only supported on PostgreSQL.  It has been
+  tested to work on PostgreSQL, MySQL, SQLite (where it is ignored),
+  H2, and MSSQL.
+  
+* Dataset#lock_style was added as a backbone for Dataset#for_update,
+  but allowing you to specify custom lock styles.  These can either
+  be symbols recognized by the adapters, or strings which are treated
+  as literal SQL.
+
+* Model#lock! was added, which uses Dataset#for_update to lock model
+  rows for specific instances.  Combined with the Dataset#for_update,
+  Sequel now has an equivalent to ActiveRecord's pessimistic locking
+  support.
+
+* A composition plugin was added, given similar functionality as
+  ActiveRecord's composed_of.
+  
+  The composition plugin allows you to easily define getter and
+  setter instance methods for a class where the backing data is
+  composed of other getters and decomposed to other setters.
+
+  A simple example of this is when you have a database table with
+  separate columns for year, month, and day, but where you want to
+  deal with Date objects in your ruby code.  This can be handled
+  with:
+
+    Model.composition :date, :mapping=>[:year, :month, :day]
+
+  The :mapping option is optional, but if not used, you need define
+  custom composition and decomposition procs via the :composer and
+  :decomposer options.
+
+  Note that when using the composition object, you should not modify
+  the underlying columns if you are also instantiating the
+  composition, as otherwise the composition object values will
+  override any underlying columns when the object is saved.
+
+* An rcte_tree plugin was added, which uses recursive common table
+  expressions to load all ancestors and descendants in a single
+  query.  If your database supports recursive common table
+  expressions (PostgreSQL 8.4+, MSSQL 2005+, newer versions of
+  Firebird), using recursive common table expressions to load
+  all ancestors and descendants is significantly faster than storing
+  trees as nested sets and using nested set queries.  Usage:
+  
+    Model.plugin :rcte_tree
+   
+    # Lazy loading
+    model = Model.first
+    model.parent
+    model.children
+    model.ancestors # Populates :parent association as well
+    model.descendants # Populates :children association as well
+   
+    # Eager loading - also populates the :parent and children 
+    # associations for all ancestors and descendants
+    Model.filter(:id=>[1, 2]).eager(:ancestors, :descendants).all
+   
+    # Eager loading children and grandchildren
+    Model.filter(:id=>[1, 2]).eager(:descendants=>2).all
+    # Eager loading children, grandchildren, and great grandchildren
+    Model.filter(:id=>[1, 2]).eager(:descendants=>3).all
+
+* Dataset#first_source_table was added, giving you the unaliased
+  version of the table for the first source.
+
+* Add Sequel::BasicObject.remove_methods!, useful on ruby 1.8 if you
+  require other libraries after Sequel that add methods to Object.
+  For example, if YAML is required after sequel, then the following
+  will raise an error:
+  
+    DB[:a].filter{x > y}
+    
+  because YAML adds the y method to all objects.  Now, you can call
+  Sequel::BasicObject.remove_methods!, which will remove those
+  methods from Sequel::BasicObject, allowing them to be used as
+  intended in the above DSL.
+
+* Sequel associations now accept an :eager_loader_key option, which
+  can be useful for associations to specify the column to use for the
+  key_hash for custom :eager_loaders.
+
+* A JDBC subadapter for the AS400 database was added.
+
+Other Improvements
+------------------
+
+* The one_to_one setter method and the one_to_many and many_to_many
+  remove_all methods now apply the association options (such as
+  filters) on the appropriate dataset:
+  
+    Artist.one_to_many :good_albums, :class=>:Album,
+     :conditions=>{:good=>true}
+    a = Artist[10]
+    a.remove_all_good_albums
+    # Before: WHERE artist_id = 10
+    # After:  WHERE artist_id = 10 AND good IS TRUE
+
+* Plugin loading now works correctly when the plugin module name
+  is the same name as an already defined top level constant.  This
+  means that the active_model plugin should now work correctly if
+  you require active_model before loading the Sequel plugin.
+
+* The nested_attributes plugin now preserves nested attributes for
+  *_to_one associations on validation failures.
+
+* Transactions now work correctly on Oracle when using the JDBC
+  adapter.
+  
+* Dataset#limit once again works correctly on MSSQL 2000.  It was
+  broken in Sequel 3.9.0.
+
+* many_to_one associations now use limit(1) to ensure only one
+  record is returned.  If you don't want this (because maybe you
+  are using the :eager_graph association option), you need to
+  set the :key option to nil and use a custom :dataset option.
+  
+* many_to_one and one_to_many associations now work correctly
+  with the association :eager option to eagerly load associations
+  specified by :eager when lazy loading the association.
+
+* The typecast_on_load plugin now correctly handles
+  reloading/refreshing the object, both explicitly and implicitly
+  on object creation.
+
+* The schema parser and dumper now return tinyint columns as
+  booleans when connecting to mysql using the do adapter, since
+  DataObjects now returns the columns as booleans.
+  
+* The schema dumper now deals better with unusual or database
+  specific primary key types when using the :same_db option.
+
+* On ruby 1.8, Sequel::BasicObject now undefs private methods in
+  addition to public and protected methods.  So the following
+  code now works as expected:
+  
+    DB[:a].filter{x > p} # WHERE x > p
+    
+* Sequel.connect with a block now returns the value of the block:
+
+    max_price = Sequel.connect('sqlite://items.db') do |db|
+      db[:items].max(:price)
+    end
+    
+* MSSQL emulated offset support now works correctly when Sequel's
+  core extensions are not loaded.
+  
+* Sequel::BasicObject now works correctly on rubinius, and almost
+  all Sequel specs now pass on rubinius.
+  
+* The nested_attributes plugin now uses a better exception message
+  no matching associated object is found.
+  
+* Sequel now raises a more informative error if you attempt to use
+  the native sqlite adapter with the sqlite3 gem instead of the
+  sqlite3-ruby gem.
+  
+* Multiple complex expressions with the same operator are now
+  combined for simpler SQL:
+  
+    DB[:a].filter(:a=>1, :b=>2).filter(:c=>3)
+    # Before: (((a = 1) AND (b = 2)) AND (c = 3))
+    # After:  ((a = 1) AND (b = 2) AND (c = 3))
+  
+* The Sequel::Model dataset methods (class methods proxied to the
+  model's dataset) and the Sequel::Dataset mutation methods
+  (methods that have a ! counterpart to modify the object in place)
+  have both been updated to use new dataset methods added in recent
+  versions.
+
+Backwards Compatibility
+-----------------------
+
+* The :one_to_one option of the one_to_many associations now raises
+  an exception.  Please see the section above about the new real
+  one_to_one association.
+
+* The change to apply the association options to the one_to_many and
+  many_to_many remove_all methods has the potential to break some
+  code that uses the remove_all method on associations that use
+  association options. This is especially true for many_to_many
+  associations, as filters in many_to_many associations will often
+  reference columns in the associated table, while the dataset
+  used in the remove_all method only contains the join table.  Such
+  cases should be handled by manually overriding the _remove_all
+  association instance method in the class.  It was determined that
+  it was better to issue possibly invalid queries than to issue
+  queries that make unexpected modifications.
+
+* Dataset#group_and_count now longer orders the dataset by the count.
+  Since it returns a modified dataset, if you want to order the
+  dataset, just call order on the returned dataset.
+
+* many_to_one associations now require a working :class option.
+  Previously, if you provided a custom :dataset option, a working
+  :class option was not required in some cases.
+
+* The MSSQL shared adapter dataset methods switched from using
+  the :table_options internal option key to using the :lock internal
+  option key.
