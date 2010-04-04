@@ -50,6 +50,10 @@ module Sequel
     # The default schema to use, generally should be nil.
     attr_accessor :default_schema
 
+    # Numeric specifying the duration beyond which queries are logged at warn
+    # level instead of info level.
+    attr_accessor :log_warn_duration
+
     # Array of SQL loggers to use for this database
     attr_accessor :loggers
     
@@ -82,6 +86,7 @@ module Sequel
       @opts ||= opts
       @opts = connection_pool_default_options.merge(@opts)
       @loggers = Array(@opts[:logger]) + Array(@opts[:loggers])
+      self.log_warn_duration = @opts[:log_warn_duration]
       @opts[:disconnection_proc] ||= proc{|conn| disconnect_connection(conn)}
       block ||= proc{|server| connect(server)}
       @opts[:servers] = {} if @opts[:servers].is_a?(String)
@@ -435,11 +440,25 @@ module Sequel
       schema_utility_dataset.literal(v)
     end
 
-    # Log a message at level info to all loggers.  All SQL logging
-    # goes through this method.
+    # Log a message at level info to all loggers.
     def log_info(message, args=nil)
-      message = "#{message}; #{args.inspect}" if args
-      @loggers.each{|logger| logger.info(message)}
+      log_each(:info, args ? "#{message}; #{args.inspect}" : message)
+    end
+
+    # Yield to the block, logging any errors at error level to all loggers,
+    # and all other queries with the duration at warn or info level.
+    def log_yield(sql, args=nil)
+      return yield if @loggers.empty?
+      sql = "#{sql}; #{args.inspect}" if args
+      start = Time.now
+      begin
+        yield
+      rescue => e
+        log_each(:error, "#{e.to_s.strip}: #{sql}")
+        raise
+      ensure
+        log_duration(Time.now - start, sql) unless e
+      end
     end
 
     # Remove any existing loggers and just use the given logger.
@@ -818,8 +837,19 @@ module Sequel
     # Log the given SQL and then execute it on the connection, used by
     # the transaction code.
     def log_connection_execute(conn, sql)
-      log_info(sql)
       conn.send(connection_execute_method, sql)
+    end
+
+    # Log message with message prefixed by duration at info level, or
+    # warn level if duration is greater than log_warn_duration.
+    def log_duration(duration, message)
+      log_each((lwd = log_warn_duration and duration > lwd) ? :warn : :info, "(#{sprintf('%0.6fs', duration)}) #{message}")
+    end
+
+    # Log message at level (which should be :error, :warn, or :info)
+    # to all loggers.
+    def log_each(level, message)
+      @loggers.each{|logger| logger.send(level, message)}
     end
 
     # Return a dataset that uses the default identifier input and output methods
