@@ -70,32 +70,37 @@ module Sequel
       
       # Run the given SQL with the given arguments and return the number of changed rows.
       def execute_dui(sql, opts={})
-        _execute(sql, opts){|conn| conn.execute_batch(sql, opts[:arguments]); conn.changes}
+        _execute(opts){|conn| log_yield(sql, opts[:arguments]){conn.execute_batch(sql, opts[:arguments])}; conn.changes}
       end
       
       # Run the given SQL with the given arguments and return the last inserted row id.
       def execute_insert(sql, opts={})
-        _execute(sql, opts){|conn| conn.execute(sql, opts[:arguments]); conn.last_insert_row_id}
+        _execute(opts){|conn| log_yield(sql, opts[:arguments]){conn.execute(sql, opts[:arguments])}; conn.last_insert_row_id}
       end
       
       # Run the given SQL with the given arguments and yield each row.
-      def execute(sql, opts={}, &block)
-        _execute(sql, opts){|conn| conn.query(sql, opts[:arguments], &block)}
+      def execute(sql, opts={})
+        _execute(opts) do |conn|
+          begin
+            yield(result = log_yield(sql, opts[:arguments]){conn.query(sql, opts[:arguments])})
+          ensure
+            result.close if result
+          end
+        end
       end
       
       # Run the given SQL with the given arguments and return the first value of the first row.
       def single_value(sql, opts={})
-        _execute(sql, opts){|conn| conn.get_first_value(sql, opts[:arguments])}
+        _execute(opts){|conn| log_yield(sql, opts[:arguments]){conn.get_first_value(sql, opts[:arguments])}}
       end
       
       private
       
-      # Log the SQL and the arguments, and yield an available connection.  Rescue
+      # Yield an available connection.  Rescue
       # any SQLite3::Exceptions and turn them into DatabaseErrors.
-      def _execute(sql, opts)
+      def _execute(opts, &block)
         begin
-          log_info(sql, opts[:arguments])
-          synchronize(opts[:server]){|conn| yield conn}
+          synchronize(opts[:server], &block)
         rescue SQLite3::Exception => e
           raise_error(e)
         end
