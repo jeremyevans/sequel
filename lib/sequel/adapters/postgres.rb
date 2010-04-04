@@ -133,7 +133,6 @@ module Sequel
         super
         if Postgres.use_iso_date_format
           sql = "SET DateStyle = 'ISO'"
-          @db.log_info(sql)
           execute(sql)
         end
         @prepared_statements = {} if SEQUEL_POSTGRES_USES_PG
@@ -160,7 +159,7 @@ module Sequel
       # Execute the given SQL with this connection.  If a block is given,
       # yield the results, otherwise, return the number of changed rows.
       def execute(sql, args=nil)
-        q = check_disconnect_errors{args ? async_exec(sql, args) : async_exec(sql)}
+        q = check_disconnect_errors{@db.log_yield(sql, args){args ? async_exec(sql, args) : async_exec(sql)}}
         begin
           block_given? ? yield(q) : q.cmd_tuples
         ensure
@@ -225,7 +224,6 @@ module Sequel
       def execute(sql, opts={}, &block)
         check_database_errors do
           return execute_prepared_statement(sql, opts, &block) if Symbol === sql
-          log_info(sql, opts[:arguments])
           synchronize(opts[:server]){|conn| conn.execute(sql, opts[:arguments], &block)}
         end
       end
@@ -235,7 +233,6 @@ module Sequel
       def execute_insert(sql, opts={})
         return execute(sql, opts) if Symbol === sql
         check_database_errors do
-          log_info(sql, opts[:arguments])
           synchronize(opts[:server]) do |conn|
             conn.execute(sql, opts[:arguments])
             insert_result(conn, opts[:table], opts[:values])
@@ -278,16 +275,12 @@ module Sequel
         synchronize(opts[:server]) do |conn|
           unless conn.prepared_statements[ps_name] == sql
             if conn.prepared_statements.include?(ps_name)
-              s = "DEALLOCATE #{ps_name}"
-              log_info(s)
-              conn.execute(s) unless conn.prepared_statements[ps_name] == sql
+              conn.execute("DEALLOCATE #{ps_name}") unless conn.prepared_statements[ps_name] == sql
             end
             conn.prepared_statements[ps_name] = sql
-            log_info("PREPARE #{ps_name} AS #{sql}")
-            conn.check_disconnect_errors{conn.prepare(ps_name, sql)}
+            conn.check_disconnect_errors{log_yield("PREPARE #{ps_name} AS #{sql}"){conn.prepare(ps_name, sql)}}
           end
-          log_info("EXECUTE #{ps_name}", args)
-          q = conn.check_disconnect_errors{conn.exec_prepared(ps_name, args)}
+          q = conn.check_disconnect_errors{log_yield("EXECUTE #{ps_name}", args){conn.exec_prepared(ps_name, args)}}
           if opts[:table] && opts[:values]
             insert_result(conn, opts[:table], opts[:values])
           else

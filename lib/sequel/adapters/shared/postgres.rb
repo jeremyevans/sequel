@@ -113,24 +113,19 @@ module Sequel
       # is true.
       def apply_connection_settings
         if Postgres.force_standard_strings
-          sql = "SET standard_conforming_strings = ON"
-          @db.log_info(sql)
           # This setting will only work on PostgreSQL 8.2 or greater
           # and we don't know the server version at this point, so
           # try it unconditionally and rescue any errors.
-          execute(sql) rescue nil
+          execute("SET standard_conforming_strings = ON") rescue nil
         end
         if cmm = Postgres.client_min_messages
-          sql = "SET client_min_messages = '#{cmm.to_s.upcase}'"
-          @db.log_info(sql)
-          execute(sql)
+          execute("SET client_min_messages = '#{cmm.to_s.upcase}'")
         end
       end
 
       # Get the last inserted value for the given sequence.
       def last_insert_id(sequence)
         sql = SELECT_CURRVAL % sequence
-        @db.log_info(sql)
         execute(sql) do |r|
           val = single_value(r)
           return val.to_i if val
@@ -140,7 +135,6 @@ module Sequel
       # Get the primary key for the given table.
       def primary_key(schema, table)
         sql = SELECT_PK[schema, table]
-        @db.log_info(sql)
         execute(sql) do |r|
           return single_value(r)
         end
@@ -149,14 +143,12 @@ module Sequel
       # Get the primary key and sequence for the given table.
       def sequence(schema, table)
         sql = SELECT_SERIAL_SEQUENCE[schema, table]
-        @db.log_info(sql)
         execute(sql) do |r|
           seq = single_value(r)
           return seq if seq
         end
         
         sql = SELECT_CUSTOM_SEQUENCE[schema, table]
-        @db.log_info(sql)
         execute(sql) do |r|
           return single_value(r)
         end

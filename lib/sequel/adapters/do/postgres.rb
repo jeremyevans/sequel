@@ -19,13 +19,13 @@ module Sequel
           begin
             if block_given?
               begin
-                reader = command.execute_reader
+                reader = log_yield(sql){command.execute_reader}
                 yield(reader)
               ensure
                 reader.close if reader
               end
             else
-              command.execute_non_query
+              log_yield(sql){command.execute_non_query}
             end
           rescue ::DataObjects::Error => e
             raise_error(e)
@@ -64,9 +64,9 @@ module Sequel
         # Run the INSERT sql on the database and return the primary key
         # for the record.
         def execute_insert(sql, opts={})
-          log_info(sql)
           synchronize(opts[:server]) do |conn|
-            conn.create_command(sql).execute_non_query
+            com = conn.create_command(sql)
+            log_yield(sql){com.execute_non_query}
             insert_result(conn, opts[:table], opts[:values])
           end
         end
