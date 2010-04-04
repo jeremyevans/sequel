@@ -10,6 +10,12 @@ begin
 rescue LoadError
 end
 
+class Sequel::Database
+  def log_duration(duration, message)
+    log_info(message)
+  end
+end
+
 class Spec::Example::ExampleGroup
   def log 
     begin
