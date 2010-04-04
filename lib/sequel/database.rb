@@ -454,7 +454,7 @@ module Sequel
       begin
         yield
       rescue => e
-        log_each(:error, "#{e.to_s.strip}: #{sql}")
+        log_each(:error, "#{e.class}: #{e.message.strip}: #{sql}")
         raise
       ensure
         log_duration(Time.now - start, sql) unless e
@@ -843,7 +843,7 @@ module Sequel
     # Log message with message prefixed by duration at info level, or
     # warn level if duration is greater than log_warn_duration.
     def log_duration(duration, message)
-      log_each((lwd = log_warn_duration and duration > lwd) ? :warn : :info, "(#{sprintf('%0.6fs', duration)}) #{message}")
+      log_each((lwd = log_warn_duration and duration >= lwd) ? :warn : :info, "(#{sprintf('%0.6fs', duration)}) #{message}")
     end
 
     # Log message at level (which should be :error, :warn, or :info)

@@ -209,6 +209,88 @@ context "Database#connect" do
   end
 end
 
+context "Database#log_info" do
+  before do
+    @o = Object.new
+    def @o.logs; @logs || []; end
+    def @o.method_missing(*args); (@logs ||= []) << args; end
+    @db = Sequel::Database.new(:logger=>@o)
+  end
+
+  specify "should log message at info level to all loggers" do
+    @db.log_info('blah')
+    @o.logs.should == [[:info, 'blah']]
+  end
+
+  specify "should log message with args at info level to all loggers" do
+    @db.log_info('blah', [1, 2])
+    @o.logs.should == [[:info, 'blah; [1, 2]']]
+  end
+end
+
+context "Database#log_yield" do
+  before do
+    @o = Object.new
+    def @o.logs; @logs || []; end
+    def @o.warn(*args); (@logs ||= []) << [:warn] + args; end
+    def @o.method_missing(*args); (@logs ||= []) << args; end
+    @db = Sequel::Database.new(:logger=>@o)
+  end
+
+  specify "should yield to the passed block" do
+    a = nil
+    @db.log_yield('blah'){a = 1}
+    a.should == 1
+  end
+
+  specify "should raise an exception if a block is not passed" do
+    proc{@db.log_yield('blah')}.should raise_error
+  end
+
+  specify "should log message with duration at info level to all loggers" do
+    @db.log_yield('blah'){}
+    @o.logs.length.should == 1
+    @o.logs.first.length.should == 2
+    @o.logs.first.first.should == :info
+    @o.logs.first.last.should =~ /\A\(\d\.\d{6}s\) blah\z/ 
+  end
+
+  specify "should log message with duration at warn level if duration greater than log_warn_duration" do
+    @db.log_warn_duration = 0
+    @db.log_yield('blah'){}
+    @o.logs.length.should == 1
+    @o.logs.first.length.should == 2
+    @o.logs.first.first.should == :warn
+    @o.logs.first.last.should =~ /\A\(\d\.\d{6}s\) blah\z/ 
+  end
+
+  specify "should log message with duration at info level if duration less than log_warn_duration" do
+    @db.log_warn_duration = 1000
+    @db.log_yield('blah'){}
+    @o.logs.length.should == 1
+    @o.logs.first.length.should == 2
+    @o.logs.first.first.should == :info
+    @o.logs.first.last.should =~ /\A\(\d\.\d{6}s\) blah\z/ 
+  end
+
+  specify "should log message at error level if block raises an error" do
+    @db.log_warn_duration = 0
+    proc{@db.log_yield('blah'){raise Sequel::Error, 'adsf'}}.should raise_error
+    @o.logs.length.should == 1
+    @o.logs.first.length.should == 2
+    @o.logs.first.first.should == :error
+    @o.logs.first.last.should =~ /\ASequel::Error: adsf: blah\z/ 
+  end
+
+  specify "should include args with message if args passed" do
+    @db.log_yield('blah', [1, 2]){}
+    @o.logs.length.should == 1
+    @o.logs.first.length.should == 2
+    @o.logs.first.first.should == :info
+    @o.logs.first.last.should =~ /\A\(\d\.\d{6}s\) blah; \[1, 2\]\z/ 
+  end
+end
+
 context "Database#uri" do
   before do
     @c = Class.new(Sequel::Database) do
