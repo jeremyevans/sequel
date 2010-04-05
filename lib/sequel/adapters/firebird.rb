@@ -43,15 +43,13 @@ module Sequel
       end
 
       def execute(sql, opts={})
-        log_info(sql)
         begin
           synchronize(opts[:server]) do |conn|
-            r = conn.execute(sql)
+            r = log_yield(sql){conn.execute(sql)}
             yield(r) if block_given?
             r
           end
         rescue => e
-          log_info(e.message)
           raise_error(e, :classes=>[Fb::Error])
         end
       end
@@ -105,14 +103,12 @@ module Sequel
       end
       
       def begin_transaction(conn)
-        log_info(TRANSACTION_BEGIN)
-        conn.transaction
+        log_yield(TRANSACTION_BEGIN){conn.transaction}
         conn
       end
 
       def commit_transaction(conn)
-        log_info(TRANSACTION_COMMIT)
-        conn.commit
+        log_yield(TRANSACTION_COMMIT){conn.commit}
       end
       
       def create_sequence_sql(name, opts={})
@@ -187,8 +183,7 @@ module Sequel
       end
       
       def rollback_transaction(conn)
-        log_info(TRANSACTION_ROLLBACK)
-        conn.rollback
+        log_yield(TRANSACTION_ROLLBACK){conn.rollback}
       end
 
       def type_literal_generic_string(column)
