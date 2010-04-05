@@ -78,6 +78,13 @@ module Sequel
         def last_insert_id(conn, opts)
           insert_result(conn, opts[:table], opts[:values])
         end
+        
+        # Override shared postgresql adapter method to actually log,
+        # since on JDBC the first argument is a statement and not a
+        # connection, so it wouldn't be logged otherwise.
+        def log_connection_execute(stmt, sql) 
+          log_yield(sql){stmt.execute(sql)}
+        end
       end
       
       # Dataset subclass used for datasets that connect to PostgreSQL via JDBC.
