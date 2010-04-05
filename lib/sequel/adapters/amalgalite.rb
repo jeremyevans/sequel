@@ -84,37 +84,42 @@ module Sequel
       
       # Run the given SQL with the given arguments. Returns nil.
       def execute_ddl(sql, opts={})
-        _execute(sql, opts){|conn| conn.execute_batch(sql);}
+        _execute(sql, opts){|conn| log_yield(sql){conn.execute_batch(sql)}}
         nil
       end
       
       # Run the given SQL with the given arguments and return the number of changed rows.
       def execute_dui(sql, opts={})
-        _execute(sql, opts){|conn| conn.execute_batch(sql); conn.row_changes}
+        _execute(sql, opts){|conn| log_yield(sql){conn.execute_batch(sql)}; conn.row_changes}
       end
       
       # Run the given SQL with the given arguments and return the last inserted row id.
       def execute_insert(sql, opts={})
-        _execute(sql, opts){|conn| conn.execute_batch(sql); conn.last_insert_rowid}
+        _execute(sql, opts){|conn| log_yield(sql){conn.execute_batch(sql)}; conn.last_insert_rowid}
       end
       
       # Run the given SQL with the given arguments and yield each row.
-      def execute(sql, opts={}, &block)
-        _execute(sql, opts){|conn| conn.prepare(sql, &block)}
+      def execute(sql, opts={})
+        _execute(sql, opts) do |conn|
+          begin
+            yield(stmt = log_yield(sql){conn.prepare(sql)})
+          ensure
+            stmt.close if stmt
+          end
+        end
       end
       
       # Run the given SQL with the given arguments and return the first value of the first row.
       def single_value(sql, opts={})
-        _execute(sql, opts){|conn| conn.first_value_from(sql)}
+        _execute(sql, opts){|conn| log_yield(sql){conn.first_value_from(sql)}}
       end
       
       private
       
-      # Log the SQL and yield an available connection.  Rescue
+      # Yield an available connection.  Rescue
       # any Amalgalite::Errors and turn them into DatabaseErrors.
       def _execute(sql, opts)
         begin
-          log_info(sql)
           synchronize(opts[:server]){|conn| yield conn}
         rescue ::Amalgalite::Error, ::Amalgalite::SQLite3::Error => e
           raise_error(e)
