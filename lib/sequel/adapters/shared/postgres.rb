@@ -493,6 +493,11 @@ module Sequel
           nil
         end
       end
+
+      # Don't log, since logging is done by the underlying connection.
+      def log_connection_execute(conn, sql) 
+        conn.execute(sql)
+      end
       
       # Use a dollar sign instead of question mark for the argument
       # placeholder.

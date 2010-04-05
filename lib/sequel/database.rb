@@ -837,7 +837,7 @@ module Sequel
     # Log the given SQL and then execute it on the connection, used by
     # the transaction code.
     def log_connection_execute(conn, sql)
-      conn.send(connection_execute_method, sql)
+      log_yield(sql){conn.send(connection_execute_method, sql)}
     end
 
     # Log message with message prefixed by duration at info level, or
