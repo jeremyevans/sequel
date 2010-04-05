@@ -60,10 +60,9 @@ module Sequel
       end
 
       def execute(sql, opts={})
-        log_info(sql)
         synchronize(opts[:server]) do |conn|
           begin
-            r = conn.exec(sql)
+            r = log_yield(sql){conn.exec(sql)}
             yield(r) if block_given?
             r
           rescue OCIException => e
@@ -76,14 +75,12 @@ module Sequel
       private
       
       def begin_transaction(conn)
-        log_info(TRANSACTION_BEGIN)
-        conn.autocommit = false
+        log_yield(TRANSACTION_BEGIN){conn.autocommit = false}
         conn
       end
       
       def commit_transaction(conn)
-        log_info(TRANSACTION_COMMIT)
-        conn.commit
+        log_yield(TRANSACTION_COMMIT){conn.commit}
       end
 
       def disconnect_connection(c)
@@ -96,8 +93,7 @@ module Sequel
       end
       
       def rollback_transaction(conn)
-        log_info(TRANSACTION_ROLLBACK)
-        conn.rollback
+        log_yield(TRANSACTION_ROLLBACK){conn.rollback}
       end
     end
     
