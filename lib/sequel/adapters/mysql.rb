@@ -85,6 +85,10 @@ module Sequel
       #   inserted row.
       # * :charset - Same as :encoding (:encoding takes precendence)
       # * :compress - Set to false to not compress results from the server
+      # * :config_default_group - The default group to read from the in
+      #   the MySQL config file.
+      # * :config_local_infile - If provided, sets the Mysql::OPT_LOCAL_INFILE
+      #   option on the connection with the given value.
       # * :encoding - Set all the related character sets for this
       #   connection (connection, client, database, server, and results).
       # * :socket - Use a unix socket file instead of connecting via TCP/IP.
@@ -93,8 +97,8 @@ module Sequel
       def connect(server)
         opts = server_opts(server)
         conn = Mysql.init
-        # reads additional options defined under the [client] tag in the mysql configuration file
-        conn.options(Mysql::READ_DEFAULT_GROUP, "client")
+        conn.options(Mysql::READ_DEFAULT_GROUP, opts[:config_default_group] || "client")
+        conn.options(Mysql::OPT_LOCAL_INFILE, opts[:config_local_infile]) if opts.has_key?(:config_local_infile)
         if encoding = opts[:encoding] || opts[:charset]
           # set charset _before_ the connect. using an option instead of "SET (NAMES|CHARACTER_SET_*)" works across reconnects
           conn.options(Mysql::SET_CHARSET_NAME, encoding)

@@ -218,7 +218,7 @@ The following additional options are supported:
 
 === mysql 
 
-The MySQL adapter does not support the pure-ruby MySQL adapter that ships with
+The MySQL adapter does not support the pure-ruby MySQL adapter that used to ship with
 ActiveRecord, it requires the native adapter.
 
 The following additional options are supported:
@@ -226,6 +226,8 @@ The following additional options are supported:
 * :auto_is_null - If set to true, makes "WHERE primary_key IS NULL" select the last inserted id.
 * :charset - Same as :encoding, :encoding takes precedence.
 * :compress - Whether to compress data sent/received via the socket connection.
+* :config_default_group - The default group to read from the in the MySQL config file.
+* :config_local_infile - If provided, sets the Mysql::OPT_LOCAL_INFILE option on the connection with the given value.
 * :encoding - Specify the encoding/character set to use for the connection.
 * :socket - Can be used to specify a Unix socket file to connect to instead of a TCP host and port.
 * :timeout - Sets the wait_timeout for the connection, defaults to 1 month.

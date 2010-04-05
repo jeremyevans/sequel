@@ -1,5 +1,11 @@
 === HEAD
 
+* Add :config_default_group and :config_local_infile options to the native MySQL adapter (jeremyevans)
+
+* Add log_warn_duration attribute to Database, queries that take longer than it will be logged at warn level (jeremyevans)
+
+* Switch Database logging to use log_yield instead of log_info, queries that raise errors are now logged at error level (jeremyevans)
+
 * Update active_model plugin to work with the ActiveModel::Lint 3.0.0beta2 specs (jeremyevans)
 
 * Support JNDI connection strings in the JDBC adapter (jrun)
