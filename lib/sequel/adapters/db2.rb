@@ -33,13 +33,12 @@ module Sequel
       end
       
       def execute(sql, opts={})
-        log_info(sql)
         synchronize(opts[:server]) do |conn|
           rc, sth = SQLAllocHandle(SQL_HANDLE_STMT, @handle) 
           check_error(rc, "Could not allocate statement")
 
           begin
-            rc = SQLExecDirect(sth, sql) 
+            rc = log_yield(sql){SQLExecDirect(sth, sql)}
             check_error(rc, "Could not execute statement")
             
             yield(sth) if block_given?
