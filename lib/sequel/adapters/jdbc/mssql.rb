@@ -28,8 +28,7 @@ module Sequel
           stmt = conn.createStatement
           begin
             sql = opts[:prepared] ? 'SELECT @@IDENTITY' : 'SELECT SCOPE_IDENTITY()'
-            log_info(sql)
-            rs = stmt.executeQuery(sql)
+            rs = log_yield(sql){stmt.executeQuery(sql)}
             rs.next
             rs.getInt(1)
           ensure

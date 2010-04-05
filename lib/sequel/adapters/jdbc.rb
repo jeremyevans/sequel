@@ -136,14 +136,14 @@ module Sequel
 
           begin
             if block_given?
-              yield cps.executeQuery
+              yield log_yield(sql){cps.executeQuery}
             else
               case opts[:type]
               when :insert
-                cps.executeUpdate
+                log_yield(sql){cps.executeUpdate}
                 last_insert_id(conn, opts)
               else
-                cps.executeUpdate
+                log_yield(sql){cps.executeUpdate}
               end
             end
           rescue NativeException, JavaSQL::SQLException => e
@@ -176,21 +176,20 @@ module Sequel
       def execute(sql, opts={}, &block)
         return call_sproc(sql, opts, &block) if opts[:sproc]
         return execute_prepared_statement(sql, opts, &block) if [Symbol, Dataset].any?{|c| sql.is_a?(c)}
-        log_info(sql)
         synchronize(opts[:server]) do |conn|
           stmt = conn.createStatement
           begin
             if block_given?
-              yield stmt.executeQuery(sql)
+              yield log_yield(sql){stmt.executeQuery(sql)}
             else
               case opts[:type]
               when :ddl
-                stmt.execute(sql)
+                log_yield(sql){stmt.execute(sql)}
               when :insert
-                stmt.executeUpdate(sql)
+                log_yield(sql){stmt.executeUpdate(sql)}
                 last_insert_id(conn, opts.merge(:stmt=>stmt))
               else
-                stmt.executeUpdate(sql)
+                log_yield(sql){stmt.executeUpdate(sql)}
               end
             end
           rescue NativeException, JavaSQL::SQLException => e
@@ -291,29 +290,25 @@ module Sequel
           if name and cps = conn.prepared_statements[name] and cps[0] == sql
             cps = cps[1]
           else
-            if cps
-              log_info("Closing #{name}")
-              cps[1].close
-            end
-            log_info("Preparing#{" #{name}:" if name} #{sql}")
-            cps = conn.prepareStatement(sql)
+            log_yield("Closing #{name}"){cps[1].close} if cps
+            cps = log_yield("Preparing#{" #{name}:" if name} #{sql}"){conn.prepareStatement(sql)}
             conn.prepared_statements[name] = [sql, cps] if name
           end
           i = 0
           args.each{|arg| set_ps_arg(cps, arg, i+=1)}
-          log_info("Executing#{" #{name}" if name}", args)
+          msg = "Executing#{" #{name}" if name}"
           begin
             if block_given?
-              yield cps.executeQuery
+              yield log_yield(msg, args){cps.executeQuery}
             else
               case opts[:type]
               when :ddl
-                cps.execute
+                log_yield(msg, args){cps.execute}
               when :insert
-                cps.executeUpdate
+                log_yield(msg, args){cps.executeUpdate}
                 last_insert_id(conn, opts.merge(:prepared=>true))
               else
-                cps.executeUpdate
+                log_yield(msg, args){cps.executeUpdate}
               end
             end
           rescue NativeException, JavaSQL::SQLException => e
