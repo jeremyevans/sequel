@@ -66,11 +66,10 @@ module Sequel
       # Otherwise, the return value is the insert id if opts[:type] is :insert,
       # or the number of affected rows, otherwise.
       def execute(sql, opts={})
-        log_info(sql)
         synchronize(opts[:server]) do |conn|
           begin
             command = conn.create_command(sql)
-            res = block_given? ? command.execute_reader : command.execute_non_query
+            res = log_yield(sql){block_given? ? command.execute_reader : command.execute_non_query}
           rescue ::DataObjects::Error => e
             raise_error(e)
           end
@@ -121,21 +120,23 @@ module Sequel
       # substitute our own.
       def begin_transaction(conn)
         return super if supports_savepoints?
-        log_info(TRANSACTION_BEGIN)
-        t = ::DataObjects::Transaction.create_for_uri(uri)
-        t.instance_variable_get(:@connection).close
-        t.instance_variable_set(:@connection, conn)
-        t.begin
-        t
+        log_yield(TRANSACTION_BEGIN) do
+          t = ::DataObjects::Transaction.create_for_uri(uri)
+          t.instance_variable_get(:@connection).close
+          t.instance_variable_set(:@connection, conn)
+          t.begin
+          t
+        end
       end
       
       # DataObjects requires transactions be prepared before being
       # committed, so we do that.
       def commit_transaction(t)
         return super if supports_savepoints?
-        log_info(TRANSACTION_ROLLBACK)
-        t.prepare
-        t.commit 
+        log_yield(TRANSACTION_ROLLBACK) do
+          t.prepare
+          t.commit 
+        end
       end
       
       # Method to call on a statement object to execute SQL that does
@@ -151,15 +152,13 @@ module Sequel
       
       # Execute SQL on the connection by creating a command first
       def log_connection_execute(conn, sql)
-        log_info(sql)
-        conn.create_command(sql).execute_non_query
+        log_yield(sql){conn.create_command(sql).execute_non_query}
       end
       
       # We use the transactions rollback method to rollback.
       def rollback_transaction(t)
         return super if supports_savepoints?
-        log_info(TRANSACTION_COMMIT)
-        t.rollback
+        log_yield(TRANSACTION_COMMIT){t.rollback}
       end
       
       # Allow extending the given connection when it is first created.
