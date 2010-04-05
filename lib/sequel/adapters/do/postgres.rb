@@ -19,13 +19,12 @@ module Sequel
           begin
             if block_given?
               begin
-                reader = log_yield(sql){command.execute_reader}
-                yield(reader)
+                yield(reader = @db.log_yield(sql){command.execute_reader})
               ensure
                 reader.close if reader
               end
             else
-              log_yield(sql){command.execute_non_query}
+              @db.log_yield(sql){command.execute_non_query}
             end
           rescue ::DataObjects::Error => e
             raise_error(e)

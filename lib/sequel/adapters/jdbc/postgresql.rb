@@ -18,7 +18,7 @@ module Sequel
           method = block_given? ? :executeQuery : :execute
           stmt = createStatement
           begin
-            rows = log_yield(sql){stmt.send(method, sql)}
+            rows = @db.log_yield(sql){stmt.send(method, sql)}
             yield(rows) if block_given?
           rescue NativeException => e
             raise_error(e)
