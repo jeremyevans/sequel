@@ -18,14 +18,12 @@ module Sequel
       
       # Returns number of rows affected
       def execute_dui(sql, opts={})
-        log_info(sql)
-        synchronize(opts[:server]){|c| c.immediate(sql)}
+        synchronize(opts[:server]){|c| log_yield(sql){c.immediate(sql)}}
       end
       alias_method :do, :execute_dui
       
       def execute(sql, opts={})
-        log_info(sql)
-        synchronize(opts[:server]){|c| yield c.cursor(sql)}
+        synchronize(opts[:server]){|c| yield log_yield(sql){c.cursor(sql)}}
       end
       alias_method :query, :execute
       
