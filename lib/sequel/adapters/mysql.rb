@@ -153,8 +153,7 @@ module Sequel
       # yield the connection if a block is given.
       def _execute(conn, sql, opts)
         begin
-          log_info(sql)
-          r = conn.query(sql)
+          r = log_yield(sql){conn.query(sql)}
           if opts[:type] == :select
             yield r if r
           elsif block_given?
