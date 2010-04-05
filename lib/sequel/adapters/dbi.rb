@@ -63,17 +63,15 @@ module Sequel
       end
     
       def execute(sql, opts={})
-        log_info(sql)
         synchronize(opts[:server]) do |conn|
-          r = conn.execute(sql)
+          r = log_yield(sql){conn.execute(sql)}
           yield(r) if block_given?
           r
         end
       end
       
       def do(sql, opts={})
-        log_info(sql)
-        synchronize(opts[:server]){|conn| conn.do(sql)}
+        synchronize(opts[:server]){|conn| log_yield(sql){conn.do(sql)}}
       end
       alias_method :execute_dui, :do
 
