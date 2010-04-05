@@ -16,13 +16,11 @@ module Sequel
         
         # Return the last inserted identity value.
         def execute_insert(sql, opts={})
-          log_info(sql)
           synchronize(opts[:server]) do |conn|
             begin
-              conn.do(sql)
-              log_info(LAST_INSERT_ID_SQL)
+              log_yield(sql){conn.do(sql)}
               begin
-                s = conn.run(LAST_INSERT_ID_SQL)
+                s = log_yield(LAST_INSERT_ID_SQL){conn.run(LAST_INSERT_ID_SQL)}
                 if (rows = s.fetch_all) and (row = rows.first)
                   Integer(row.first)
                 end

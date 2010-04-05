@@ -45,10 +45,9 @@ module Sequel
       end
     
       def execute(sql, opts={})
-        log_info(sql)
         synchronize(opts[:server]) do |conn|
           begin
-            r = conn.run(sql)
+            r = log_yield(sql){conn.run(sql)}
             yield(r) if block_given?
           rescue ::ODBC::Error, ArgumentError => e
             raise_error(e)
@@ -60,10 +59,9 @@ module Sequel
       end
       
       def execute_dui(sql, opts={})
-        log_info(sql)
         synchronize(opts[:server]) do |conn|
           begin
-            conn.do(sql)
+            log_yield(sql){conn.do(sql)}
           rescue ::ODBC::Error, ArgumentError => e
             raise_error(e)
           end
