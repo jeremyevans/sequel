@@ -41,10 +41,9 @@ module Sequel
       end
     
       def execute(sql, opts={})
-        log_info(sql)
         synchronize(opts[:server]) do |conn|
           begin
-            r = conn.Execute(sql)
+            r = log_yield(sql){conn.Execute(sql)}
             yield(r) if block_given?
           rescue ::WIN32OLERuntimeError => e
             raise_error(e)
