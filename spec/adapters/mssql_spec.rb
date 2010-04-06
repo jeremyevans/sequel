@@ -375,3 +375,29 @@ context "MSSSQL::Dataset#into" do
     @db.drop_table(:new)
   end
 end
+
+context "A MSSQL database" do
+  before do
+    @db = MSSQL_DB
+  end
+  after do
+    @db.drop_table(:a)
+  end
+  
+  specify "should handle many existing types for set_column_allow_null" do
+    @db.create_table!(:a){column :a, 'integer'}
+    @db.alter_table(:a){set_column_allow_null :a, false}
+    @db.create_table!(:a){column :a, 'decimal(24, 2)'}
+    @db.alter_table(:a){set_column_allow_null :a, false}
+    @db.schema(:a).first.last[:column_size].should == 24
+    @db.schema(:a).first.last[:scale].should == 2
+    @db.create_table!(:a){column :a, 'decimal(10)'}
+    @db.schema(:a).first.last[:column_size].should == 10
+    @db.schema(:a).first.last[:scale].should == 0
+    @db.alter_table(:a){set_column_allow_null :a, false}
+    @db.create_table!(:a){column :a, 'nchar(2)'}
+    @db.alter_table(:a){set_column_allow_null :a, false}
+    s = @db.schema(:a).first.last
+    (s[:max_chars] || s[:column_size]).should == 2
+  end
+end
