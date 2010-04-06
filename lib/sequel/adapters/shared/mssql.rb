@@ -65,7 +65,7 @@ module Sequel
         when :set_column_null
           sch = schema(table).find{|k,v| k.to_s == op[:name].to_s}.last
           type = {:type=>sch[:db_type]}
-          type[:size] = sch[:max_chars] if sch[:max_chars]
+          type[:type] += "(#{sch[:max_chars]})"  if sch[:max_chars]
           "ALTER TABLE #{quote_schema_table(table)} ALTER COLUMN #{quote_identifier(op[:name])} #{type_literal(type)} #{'NOT ' unless op[:null]}NULL"
         when :set_column_default
           "ALTER TABLE #{quote_schema_table(table)} ADD CONSTRAINT #{quote_identifier("sequel_#{table}_#{op[:name]}_def")} DEFAULT #{literal(op[:default])} FOR #{quote_identifier(op[:name])}"
