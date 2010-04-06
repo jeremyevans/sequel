@@ -65,8 +65,8 @@ module Sequel
         when :set_column_null
           sch = schema(table).find{|k,v| k.to_s == op[:name].to_s}.last
           type = sch[:db_type]
-          if size = sch[:max_chars] || sch[:column_size]
-            type += "(#{size})"
+          if size = (sch[:max_chars] || sch[:column_size])
+            type += "(#{size}#{", #{sch[:scale]}" if sch[:scale]})"
           end
           "ALTER TABLE #{quote_schema_table(table)} ALTER COLUMN #{quote_identifier(op[:name])} #{type_literal(:type=>type)} #{'NOT ' unless op[:null]}NULL"
         when :set_column_default
@@ -127,7 +127,7 @@ module Sequel
         ds = metadata_dataset.from(:information_schema__tables___t).
          join(:information_schema__columns___c, :table_catalog=>:table_catalog,
               :table_schema => :table_schema, :table_name => :table_name).
-         select(:column_name___column, :data_type___db_type, :character_maximum_length___max_chars, :column_default___default, :is_nullable___allow_null).
+         select(:column_name___column, :data_type___db_type, :character_maximum_length___max_chars, :column_default___default, :is_nullable___allow_null, :numeric_precision___column_size, :numeric_scale___scale).
          filter(:c__table_name=>m2.call(table_name.to_s))
         if schema = opts[:schema] || default_schema
           ds.filter!(:c__table_schema=>schema)
