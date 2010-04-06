@@ -65,8 +65,8 @@ module Sequel
         when :set_column_null
           sch = schema(table).find{|k,v| k.to_s == op[:name].to_s}.last
           type = sch[:db_type]
-          if size = (sch[:max_chars] || sch[:column_size])
-            type += "(#{size}#{", #{sch[:scale]}" if sch[:scale]})"
+          if [:string, :decimal].include?(sch[:type]) and size = (sch[:max_chars] || sch[:column_size])
+            type += "(#{size}#{", #{sch[:scale]}" if sch[:scale] && sch[:scale].to_i > 0})"
           end
           "ALTER TABLE #{quote_schema_table(table)} ALTER COLUMN #{quote_identifier(op[:name])} #{type_literal(:type=>type)} #{'NOT ' unless op[:null]}NULL"
         when :set_column_default
