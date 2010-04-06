@@ -587,13 +587,6 @@ module Sequel
       # this alias makes it so you can use model instead of
       # self.class.
       alias_method :model, :class
-  
-      # The currently cached associations.  A hash with the keys being the
-      # association name symbols and the values being the associated object
-      # or nil (many_to_one), or the array of associated objects (*_to_many).
-      def associations
-        @associations ||= {}
-      end
 
       # The autoincrementing primary key for this model object. Should be
       # overridden if you have a composite primary key with one part of it
@@ -864,7 +857,6 @@ module Sequel
       def _refresh(dataset)
         set_values(dataset.first || raise(Error, "Record not found"))
         changed_columns.clear
-        associations.clear
         self
       end
       

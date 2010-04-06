@@ -960,6 +960,13 @@ module Sequel
 
       # Private instance methods used to implement the associations support.
       module InstanceMethods
+        # The currently cached associations.  A hash with the keys being the
+        # association name symbols and the values being the associated object
+        # or nil (many_to_one), or the array of associated objects (*_to_many).
+        def associations
+          @associations ||= {}
+        end
+      
         # Used internally by the associations code, like pk but doesn't raise
         # an Error if the model has no primary key.
         def pk_or_nil
@@ -1003,6 +1010,12 @@ module Sequel
               send(opts.dataset_method).all.first
             end
           end
+        end
+        
+        # Clear the associations cache when refreshing
+        def _refresh(dataset)
+          associations.clear
+          super
         end
 
         # Add the given associated object to the given association
