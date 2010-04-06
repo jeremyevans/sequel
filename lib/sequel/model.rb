@@ -51,7 +51,7 @@ module Sequel
        last left_join left_outer_join limit lock_style map max min multi_insert naked
        natural_full_join natural_join natural_left_join natural_right_join order order_by
        order_more paginate print qualify query range reverse reverse_order right_join right_outer_join
-       select select_all select_hash select_map select_more select_order_map
+       select select_all select_append select_hash select_map select_more select_order_map
        server set set_defaults set_graph_aliases set_overrides
        single_value sum to_csv to_hash truncate unfiltered ungraphed ungrouped union unlimited unordered 
        update where with with_recursive with_sql'.map{|x| x.to_sym}

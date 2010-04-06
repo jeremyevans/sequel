@@ -39,7 +39,7 @@ module Sequel
     TIMESTAMP_FORMAT = "'%Y-%m-%d %H:%M:%S%N%z'".freeze
     STANDARD_TIMESTAMP_FORMAT = "TIMESTAMP #{TIMESTAMP_FORMAT}".freeze
     TWO_ARITY_OPERATORS = ::Sequel::SQL::ComplexExpression::TWO_ARITY_OPERATORS
-    WILDCARD = '*'.freeze
+    WILDCARD = LiteralString.new('*').freeze
     SQL_WITH = "WITH ".freeze
 
     # SQL fragment for the aliased expression

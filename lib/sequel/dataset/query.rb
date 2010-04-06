@@ -318,12 +318,27 @@ module Sequel
     def select_all
       clone(:select => nil)
     end
+    
+    # Returns a copy of the dataset with the given columns added
+    # to the existing selected columns.  If no columns are currently selected
+    # it will select the columns given in addition to *.
+    #
+    #   dataset.select(:a).select(:b) # SELECT b FROM items
+    #   dataset.select(:a).select_append(:b) # SELECT a, b FROM items
+    #   dataset.select_append(:b) # SELECT *, b FROM items
+    def select_append(*columns, &block)
+      cur_sel = @opts[:select]
+      cur_sel = [WILDCARD] if !cur_sel || cur_sel.empty?
+      select(*(cur_sel + columns), &block)
+    end
 
     # Returns a copy of the dataset with the given columns added
-    # to the existing selected columns.
+    # to the existing selected columns. If no columns are currently selected
+    # it will just select the columns given. 
     #
     #   dataset.select(:a).select(:b) # SELECT b FROM items
     #   dataset.select(:a).select_more(:b) # SELECT a, b FROM items
+    #   dataset.select_more(:b) # SELECT b FROM items
     def select_more(*columns, &block)
       columns = @opts[:select] + columns if @opts[:select]
       select(*columns, &block)

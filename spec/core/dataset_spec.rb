@@ -1151,6 +1151,28 @@ context "Dataset#select_more" do
   end
 end
 
+context "Dataset#select_append" do
+  before do
+    @d = Sequel::Dataset.new(nil).from(:test)
+  end
+  
+  specify "should select * in addition to columns if no columns selected" do
+    @d.select_append(:a, :b).sql.should == 'SELECT *, a, b FROM test'
+    @d.select_all.select_append(:a, :b).sql.should == 'SELECT *, a, b FROM test'
+    @d.select(:blah).select_all.select_append(:a, :b).sql.should == 'SELECT *, a, b FROM test'
+  end
+
+  specify "should add to the currently selected columns" do
+    @d.select(:a).select_append(:b).sql.should == 'SELECT a, b FROM test'
+    @d.select(:a.*).select_append(:b.*).sql.should == 'SELECT a.*, b.* FROM test'
+  end
+
+  specify "should accept a block that yields a virtual row" do
+    @d.select(:a).select_append{|o| o.b}.sql.should == 'SELECT a, b FROM test'
+    @d.select(:a.*).select_append(:b.*){b(1)}.sql.should == 'SELECT a.*, b.*, b(1) FROM test'
+  end
+end
+
 context "Dataset#order" do
   before do
     @dataset = Sequel::Dataset.new(nil).from(:test)

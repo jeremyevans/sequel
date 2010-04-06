@@ -1,5 +1,7 @@
 === HEAD
 
+* Add Dataset#select_append, which always appends to the existing SELECTed columns (jeremyevans)
+
 * Emulate DISTINCT ON on MySQL using GROUP BY (jeremyevans)
 
 * Make MSSQL shared adapter emulate set_column_null alter table op better with types containing sizes (jeremyevans) (#291)
