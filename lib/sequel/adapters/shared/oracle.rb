@@ -130,11 +130,6 @@ module Sequel
         clone(:sequence=>s)
       end
 
-      # Oracle does not support DISTINCT ON
-      def supports_distinct_on?
-        false
-      end
-
       # Oracle does not support INTERSECT ALL or EXCEPT ALL
       def supports_intersect_except_all?
         false

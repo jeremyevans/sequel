@@ -148,6 +148,29 @@ context "A PostgreSQL dataset" do
   end
 end
 
+describe "Dataset#distinct" do
+  before do
+    @db = POSTGRES_DB
+    @db.create_table!(:a) do
+      Integer :a
+      Integer :b
+    end
+    @ds = @db[:a]
+  end
+  after do
+    @db.drop_table(:a)
+  end
+  
+  it "#distinct with arguments should return results distinct on those arguments" do
+    @ds.insert(20, 10)
+    @ds.insert(30, 10)
+    @ds.order(:b, :a).distinct.map(:a).should == [20, 30]
+    @ds.order(:b, :a.desc).distinct.map(:a).should == [30, 20]
+    @ds.order(:b, :a).distinct(:b).map(:a).should == [20]
+    @ds.order(:b, :a.desc).distinct(:b).map(:a).should == [30]
+  end
+end
+
 if POSTGRES_DB.pool.respond_to?(:max_size) and POSTGRES_DB.pool.max_size > 1
   describe "Dataset#for_update support" do
     before do
@@ -194,7 +217,7 @@ if POSTGRES_DB.pool.respond_to?(:max_size) and POSTGRES_DB.pool.max_size > 1
             c = @ds.for_share.filter(:id=>1).first
           end
         end
-        sleep 0.05
+        sleep 0.1
         @ds.filter(:id=>1).update(:name=>'Jim')
         c.should == {:id=>1, :number=>20, :name=>nil}
       end

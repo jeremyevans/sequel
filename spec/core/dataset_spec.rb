@@ -1484,13 +1484,13 @@ context "Dataset#distinct" do
     @dataset.distinct.sql.should == 'SELECT DISTINCT name FROM test'
   end
   
-  specify "should raise an error if columns given and distinct on not supported" do
-    @dataset.meta_def(:supports_distinct_on?){false}
+  specify "should raise an error if columns given and DISTINCT ON is not supported" do
     proc{@dataset.distinct}.should_not raise_error
     proc{@dataset.distinct(:a)}.should raise_error(Sequel::InvalidOperation)
   end
   
-  specify "should accept an expression list" do
+  specify "should use DISTINCT ON if columns are given and DISTINCT ON is supported" do
+    @dataset.meta_def(:supports_distinct_on?){true}
     @dataset.distinct(:a, :b).sql.should == 'SELECT DISTINCT ON (a, b) name FROM test'
     @dataset.distinct(:stamp.cast(:integer), :node_id=>nil).sql.should == 'SELECT DISTINCT ON (CAST(stamp AS integer), (node_id IS NULL)) name FROM test'
   end
@@ -2541,7 +2541,7 @@ context "Dataset#columns" do
   end
   
   specify "should ignore any filters, orders, or DISTINCT clauses" do
-    @dataset.filter!(:b=>100).order!(:b).distinct!(:b)
+    @dataset.filter!(:b=>100).order!(:b).distinct!
     @dataset.columns = nil
     @dataset.columns.should == 'SELECT * FROM items LIMIT 1a'
   end

@@ -244,6 +244,29 @@ context "MySQL datasets" do
   end
 end
 
+describe "Dataset#distinct" do
+  before do
+    @db = MYSQL_DB
+    @db.create_table!(:a) do
+      Integer :a
+      Integer :b
+    end
+    @ds = @db[:a]
+  end
+  after do
+    @db.drop_table(:a)
+  end
+  
+  it "#distinct with arguments should return results distinct on those arguments" do
+    @ds.insert(20, 10)
+    @ds.insert(30, 10)
+    @ds.order(:b, :a).distinct.map(:a).should == [20, 30]
+    @ds.order(:b, :a.desc).distinct.map(:a).should == [30, 20]
+    # MySQL doesn't respect orders when using the nonstandard GROUP BY
+    [[20], [30]].should include(@ds.order(:b, :a).distinct(:b).map(:a))
+  end
+end
+
 context "MySQL join expressions" do
   before do
     @ds = MYSQL_DB[:nodes]

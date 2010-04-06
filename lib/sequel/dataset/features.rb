@@ -16,9 +16,9 @@ module Sequel
       select_clause_methods.include?(WITH_SUPPORTED)
     end
 
-    # Whether the dataset supports the DISTINCT ON clause, true by default.
+    # Whether the dataset supports the DISTINCT ON clause, false by default.
     def supports_distinct_on?
-      true
+      false
     end
 
     # Whether the dataset supports the INTERSECT and EXCEPT compound operations, true by default.

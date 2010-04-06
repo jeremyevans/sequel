@@ -265,11 +265,6 @@ module Sequel
         @opts[:where] ? super : filter(1=>1).delete
       end
       
-      # SQLite does not support DISTINCT ON
-      def supports_distinct_on?
-        false
-      end
-      
       # Return an array of strings specifying a query explanation for a SELECT of the
       # current dataset.
       def explain

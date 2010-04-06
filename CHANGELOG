@@ -1,5 +1,7 @@
 === HEAD
 
+* Emulate DISTINCT ON on MySQL using GROUP BY (jeremyevans)
+
 * Make MSSQL shared adapter emulate set_column_null alter table op better with types containing sizes (jeremyevans) (#291)
 
 * Add :config_default_group and :config_local_infile options to the native MySQL adapter (jeremyevans)

@@ -250,6 +250,11 @@ module Sequel
         end
       end
       
+      # Use GROUP BY instead of DISTINCT ON if arguments are provided.
+      def distinct(*args)
+        args.empty? ? super : group(*args)
+      end
+      
       # Return a cloned dataset which will use LOCK IN SHARE MODE to lock returned rows.
       def for_share
         lock_style(:share)
@@ -348,9 +353,10 @@ module Sequel
         clone(:replace=>true).insert_sql(*values)
       end
       
-      #  does not support DISTINCT ON
+      # MySQL can emulate DISTINCT ON with its non-standard GROUP BY implementation,
+      # though the rows returned cannot be made deterministic through ordering.
       def supports_distinct_on?
-        false
+        true
       end
 
       # MySQL does not support INTERSECT or EXCEPT
