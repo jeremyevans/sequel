@@ -1,5 +1,7 @@
 === HEAD
 
+* Add support for :test option to Database to be automatically test the connection (jeremyevans)
+
 * Add Dataset#select_append, which always appends to the existing SELECTed columns (jeremyevans)
 
 * Emulate DISTINCT ON on MySQL using GROUP BY (jeremyevans)

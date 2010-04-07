@@ -134,7 +134,7 @@ module Sequel
     end
     
     # Connects to a database.  See Sequel.connect.
-    def self.connect(conn_string, opts = {}, &block)
+    def self.connect(conn_string, opts = {})
       case conn_string
       when String
         if match = /\A(jdbc|do):/o.match(conn_string)
@@ -162,18 +162,17 @@ module Sequel
         m[k.to_sym] = v
         m
       end
-      if block
-        result = nil
-        begin
-          result = yield(db = c.new(opts))
-        ensure
+      begin
+        db = c.new(opts)
+        db.test_connection if opts[:test] && db.send(:typecast_value_boolean, opts[:test])
+        result = yield(db) if block_given?
+      ensure
+        if block_given?
           db.disconnect if db
           ::Sequel::DATABASES.delete(db)
         end
-        result
-      else
-        c.new(opts)
       end
+      block_given? ? result : db
     end
     
     # The method to call on identifiers going into the database

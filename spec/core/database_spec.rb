@@ -424,13 +424,17 @@ context "Database#test_connection" do
     @db = Sequel::Database.new{@test = rand(100)}
   end
   
-  specify "should call pool#hold" do
+  specify "should pool#hold" do
     @db.test_connection
     @test.should_not be_nil
   end
   
   specify "should return true if successful" do
     @db.test_connection.should be_true
+  end
+
+  specify "should raise an error if the attempting to connect raises an error" do
+    proc{Sequel::Database.new{raise Sequel::Error, 'blah'}.test_connection}.should raise_error(Sequel::Error)
   end
 end
 
@@ -956,6 +960,20 @@ context "A Database adapter with a scheme" do
     c.should be_a_kind_of(CCC)
     c.opts[:database].should == 'd[b]'
     c.opts[:host].should == 'domain\\instance'
+  end
+
+  specify "should test the connection if test parameter is truthy" do
+    proc{Sequel.connect 'ccc:///d%5bb%5d?test=t'}.should raise_error(Sequel::DatabaseConnectionError)
+    proc{Sequel.connect 'ccc:///d%5bb%5d?test=1'}.should raise_error(Sequel::DatabaseConnectionError)
+    proc{Sequel.connect 'ccc:///d%5bb%5d', :test=>true}.should raise_error(Sequel::DatabaseConnectionError)
+    proc{Sequel.connect 'ccc:///d%5bb%5d', :test=>'t'}.should raise_error(Sequel::DatabaseConnectionError)
+  end
+
+  specify "should not test the connection if test parameter is not truthy" do
+    proc{Sequel.connect 'ccc:///d%5bb%5d?test=f'}.should_not raise_error
+    proc{Sequel.connect 'ccc:///d%5bb%5d?test=0'}.should_not raise_error
+    proc{Sequel.connect 'ccc:///d%5bb%5d', :test=>false}.should_not raise_error
+    proc{Sequel.connect 'ccc:///d%5bb%5d', :test=>'f'}.should_not raise_error
   end
 end
 

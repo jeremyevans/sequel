@@ -4,7 +4,7 @@ require 'rubygems'
 require 'optparse'
 require 'sequel'
 
-db_opts = {}
+db_opts = {:test=>true}
 copy_databases = nil
 dump_migration = nil
 echo = nil
@@ -13,7 +13,6 @@ logfile = nil
 migrate_dir = nil
 migrate_ver = nil
 backtrace = nil
-test_connection = true
 load_dirs = []
 
 opts = OptionParser.new do |opts|
@@ -71,7 +70,7 @@ opts = OptionParser.new do |opts|
   end
 
   opts.on("-N", "--no-test-connection", "do not test the connection") do
-    test_connection = false
+    db_opts[:test] = false
   end
 
   opts.on("-t", "--trace", "Output the full backtrace if an exception is raised") do
@@ -120,7 +119,6 @@ connect_proc = lambda do |database|
   else
     Sequel.connect(database, db_opts)
   end
-  db.test_connection if test_connection
   db
 end
 
