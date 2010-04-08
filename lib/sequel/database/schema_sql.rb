@@ -69,7 +69,7 @@ module Sequel
     def column_definition_sql(column)
       sql = "#{quote_identifier(column[:name])} #{type_literal(column)}"
       sql << UNIQUE if column[:unique]
-      null = column.include?(:null) ? column[:null] : column[:allow_null]
+      null = column.fetch(:null, column[:allow_null])
       sql << NOT_NULL if null == false
       sql << NULL if null == true
       sql << " DEFAULT #{literal(column[:default])}" if column.include?(:default)

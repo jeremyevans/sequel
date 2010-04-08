@@ -131,9 +131,9 @@ module Sequel
       
       # Use MySQL specific syntax for engine type and character encoding
       def create_table_sql(name, generator, options = {})
-        engine = options.include?(:engine) ? options[:engine] : Sequel::MySQL.default_engine
-        charset = options.include?(:charset) ? options[:charset] : Sequel::MySQL.default_charset
-        collate = options.include?(:collate) ? options[:collate] : Sequel::MySQL.default_collate
+        engine = options.fetch(:engine, Sequel::MySQL.default_engine)
+        charset = options.fetch(:charset, Sequel::MySQL.default_charset)
+        collate = options.fetch(:collate, Sequel::MySQL.default_collate)
         generator.columns.each do |c|
           if t = c.delete(:table)
             generator.foreign_key([c[:name]], t, c.merge(:name=>nil, :type=>:foreign_key))

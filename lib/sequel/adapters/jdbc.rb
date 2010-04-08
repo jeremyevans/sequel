@@ -113,7 +113,7 @@ module Sequel
       # uri, since JDBC requires one.
       def initialize(opts)
         super
-        @convert_types = @opts.include?(:convert_types) ? typecast_value_boolean(@opts[:convert_types]) : true
+        @convert_types = typecast_value_boolean(@opts.fetch(:convert_types, true))
         raise(Error, "No connection string specified") unless uri
         
         resolved_uri = jndi? ? get_uri_from_jndi : uri

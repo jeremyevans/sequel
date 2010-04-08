@@ -91,9 +91,9 @@ module Sequel
       block ||= proc{|server| connect(server)}
       @opts[:servers] = {} if @opts[:servers].is_a?(String)
       
-      @opts[:single_threaded] = @single_threaded = @opts.include?(:single_threaded) ? typecast_value_boolean(@opts[:single_threaded]) : @@single_threaded
+      @opts[:single_threaded] = @single_threaded = typecast_value_boolean(@opts.fetch(:single_threaded, @@single_threaded))
       @schemas = {}
-      @default_schema = opts.include?(:default_schema) ? @opts[:default_schema] : default_schema_default
+      @default_schema = @opts.fetch(:default_schema, default_schema_default)
       @prepared_statements = {}
       @transactions = []
       @identifier_input_method = nil
@@ -393,7 +393,7 @@ module Sequel
     def identifier_input_method
       case @identifier_input_method
       when nil
-        @identifier_input_method = @opts.include?(:identifier_input_method) ? @opts[:identifier_input_method] : (@@identifier_input_method.nil? ? identifier_input_method_default : @@identifier_input_method)
+        @identifier_input_method = @opts.fetch(:identifier_input_method, (@@identifier_input_method.nil? ? identifier_input_method_default : @@identifier_input_method))
         @identifier_input_method == "" ? nil : @identifier_input_method
       when ""
         nil
@@ -412,7 +412,7 @@ module Sequel
     def identifier_output_method
       case @identifier_output_method
       when nil
-        @identifier_output_method = @opts.include?(:identifier_output_method) ? @opts[:identifier_output_method] : (@@identifier_output_method.nil? ? identifier_output_method_default : @@identifier_output_method)
+        @identifier_output_method = @opts.fetch(:identifier_output_method, (@@identifier_output_method.nil? ? identifier_output_method_default : @@identifier_output_method))
         @identifier_output_method == "" ? nil : @identifier_output_method
       when ""
         nil
@@ -474,7 +474,7 @@ module Sequel
     # Returns true if the database quotes identifiers.
     def quote_identifiers?
       return @quote_identifiers unless @quote_identifiers.nil?
-      @quote_identifiers = @opts.include?(:quote_identifiers) ? @opts[:quote_identifiers] : (@@quote_identifiers.nil? ? quote_identifiers_default : @@quote_identifiers)
+      @quote_identifiers = @opts.fetch(:quote_identifiers, (@@quote_identifiers.nil? ? quote_identifiers_default : @@quote_identifiers))
     end
     
     # Dynamically remove existing servers from the connection pool. Intended for

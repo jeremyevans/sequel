@@ -156,7 +156,7 @@ module Sequel
         events = opts[:events] ? Array(opts[:events]) : [:insert, :update, :delete]
         whence = opts[:after] ? 'AFTER' : 'BEFORE'
         inactive = opts[:inactive] ? 'INACTIVE' : 'ACTIVE'
-        position = opts[:position] ? opts[:position] : 0
+        position = opts.fetch(:position, 0)
         sql = <<-end_sql
           CREATE TRIGGER #{quote_identifier(name)} for #{quote_identifier(table)}
           #{inactive} #{whence} #{events.map{|e| e.to_s.upcase}.join(' OR ')} position #{position}

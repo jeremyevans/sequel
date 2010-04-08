@@ -618,7 +618,7 @@ module Sequel
           opts[:order_eager_graph] = true unless opts.include?(:order_eager_graph)
           conds = opts[:conditions]
           opts[:graph_conditions] = conds if !opts.include?(:graph_conditions) and Sequel.condition_specifier?(conds)
-          opts[:graph_conditions] = opts[:graph_conditions] ? opts[:graph_conditions].to_a : []
+          opts[:graph_conditions] = opts.fetch(:graph_conditions, []).to_a
           opts[:graph_select] = Array(opts[:graph_select]) if opts[:graph_select]
           [:before_add, :before_remove, :after_add, :after_remove, :after_load, :before_set, :after_set, :extend].each do |cb_type|
             opts[cb_type] = Array(opts[cb_type])
@@ -747,7 +747,7 @@ module Sequel
           opts[:cartesian_product_number] ||= 1
           join_table = (opts[:join_table] ||= opts.default_join_table)
           left_key_alias = opts[:left_key_alias] ||= opts.default_associated_key_alias
-          graph_jt_conds = opts[:graph_join_table_conditions] = opts[:graph_join_table_conditions] ? opts[:graph_join_table_conditions].to_a : []
+          graph_jt_conds = opts[:graph_join_table_conditions] = opts.fetch(:graph_join_table_conditions, []).to_a
           opts[:graph_join_table_join_type] ||= opts[:graph_join_type]
           opts[:after_load].unshift(:array_uniq!) if opts[:uniq]
           opts[:dataset] ||= proc{opts.associated_class.inner_join(join_table, rcks.zip(opts.right_primary_keys) + lcks.zip(lcpks.map{|k| send(k)}))}

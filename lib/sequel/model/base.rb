@@ -1006,7 +1006,7 @@ module Sequel
       # option is present in the hash, use that, otherwise, fallback to the
       # object's default (if set), or class's default (if not).
       def use_transaction?(opts = {})
-        opts.include?(:transaction) ? opts[:transaction] : use_transactions
+        opts.fetch(:transaction, use_transactions)
       end
     end
 
