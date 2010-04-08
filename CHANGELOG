@@ -1,5 +1,7 @@
 === HEAD
 
+* Fix rolling back transactions when connecting to Oracle via JDBC (jeremyevans)
+
 * Fix syntax errors when connecting to MSSQL via the dbi adapter (jeremyevans) (#292)
 
 * Add support for an :after_connect option when connection, called with each new connection made (jeremyevans)

@@ -32,7 +32,7 @@ module Sequel
         # Use JDBC connection's setAutoCommit to true to enable non-transactional behavior
         def remove_transaction(conn)
           conn.setAutoCommit(true) if conn
-          super
+          @transactions.delete(Thread.current)
         end
         
         # Use JDBC connection's rollback method to rollback transactions
