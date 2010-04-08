@@ -1,5 +1,7 @@
 === HEAD
 
+* Add an Database#sqlite_version method when connecting to SQLite, used to determine feature support (jeremyevans)
+
 * Fix rolling back transactions when connecting to Oracle via JDBC (jeremyevans)
 
 * Fix syntax errors when connecting to MSSQL via the dbi adapter (jeremyevans) (#292)

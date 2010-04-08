@@ -65,9 +65,21 @@ module Sequel
         execute_ddl("PRAGMA #{name} = #{value}")
       end
       
-      # SQLite supports savepoints
+      # The version of the server as an integer, where 3.6.19 = 30619.
+      # If the server version can't be determined, 0 is used.
+      def sqlite_version
+        return @server_version if defined?(@server_version)
+        @server_version = begin
+          v = get{sqlite_version{}}
+          [10000, 100, 1].zip(v.split('.')).inject(0){|a, m| a + m[0] * Integer(m[1])}
+        rescue
+          0
+        end
+      end
+      
+      # SQLite 3.6.8+ supports savepoints. 
       def supports_savepoints?
-        true
+        sqlite_version >= 30608
       end
 
       # A symbol signifying the value of the synchronous PRAGMA.
