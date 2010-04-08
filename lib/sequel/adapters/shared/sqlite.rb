@@ -1,5 +1,8 @@
 module Sequel
   module SQLite
+    # No matter how you connect to SQLite, the following Database options
+    # can be used to set PRAGMAs on connections in a thread-safe manner:
+    # :auto_vacuum, :foreign_keys, :synchronous, and :temp_store.
     module DatabaseMethods
       AUTO_VACUUM = [:none, :full, :incremental].freeze
       PRIMARY_KEY_INDEX_RE = /\Asqlite_autoindex_/.freeze
@@ -21,7 +24,8 @@ module Sequel
       end
       
       # Set the auto_vacuum PRAGMA using the given symbol (:none, :full, or
-      # :incremental).
+      # :incremental).  See pragma_set.  Consider using the :auto_vacuum
+      # Database option instead.
       def auto_vacuum=(value)
         value = AUTO_VACUUM.index(value) || (raise Error, "Invalid value for auto_vacuum option. Please specify one of :none, :full, :incremental.")
         pragma_set(:auto_vacuum, value)
@@ -39,7 +43,8 @@ module Sequel
       end
       
       # Set the foreign_keys PRAGMA using the given boolean value, if using
-      # SQLite 3.6.19+.  If not using 3.6.19+, no error is raised.
+      # SQLite 3.6.19+.  If not using 3.6.19+, no error is raised. See pragma_set.
+      # Consider using the :foreign_keys Database option instead.
       def foreign_keys=(value)
         pragma_set(:foreign_keys, !!value ? 'on' : 'off') if sqlite_version >= 30619
       end
@@ -73,6 +78,11 @@ module Sequel
       end
       
       # Set the value of the given PRAGMA to value.
+      #
+      # This method is not thread safe, and will not work correctly if there
+      # are multiple connections in the Database's connection pool. PRAGMA
+      # modifications should be done when the connection is created, using
+      # an option provided when creating the Database object.
       def pragma_set(name, value)
         execute_ddl("PRAGMA #{name} = #{value}")
       end
@@ -80,8 +90,8 @@ module Sequel
       # The version of the server as an integer, where 3.6.19 = 30619.
       # If the server version can't be determined, 0 is used.
       def sqlite_version
-        return @server_version if defined?(@server_version)
-        @server_version = begin
+        return @sqlite_version if defined?(@sqlite_version)
+        @sqlite_version = begin
           v = get{sqlite_version{}}
           [10000, 100, 1].zip(v.split('.')).inject(0){|a, m| a + m[0] * Integer(m[1])}
         rescue
@@ -99,7 +109,8 @@ module Sequel
         SYNCHRONOUS[pragma_get(:synchronous).to_i]
       end
       
-      # Set the synchronous PRAGMA using the given symbol (:off, :normal, or :full).
+      # Set the synchronous PRAGMA using the given symbol (:off, :normal, or :full). See pragma_set.
+      # Consider using the :synchronous Database option instead.
       def synchronous=(value)
         value = SYNCHRONOUS.index(value) || (raise Error, "Invalid value for synchronous option. Please specify one of :off, :normal, :full.")
         pragma_set(:synchronous, value)
@@ -119,7 +130,8 @@ module Sequel
         TEMP_STORE[pragma_get(:temp_store).to_i]
       end
       
-      # Set the temp_store PRAGMA using the given symbol (:default, :file, or :memory).
+      # Set the temp_store PRAGMA using the given symbol (:default, :file, or :memory). See pragma_set.
+      # Consider using the :temp_store Database option instead.
       def temp_store=(value)
         value = TEMP_STORE.index(value) || (raise Error, "Invalid value for temp_store option. Please specify one of :default, :file, :memory.")
         pragma_set(:temp_store, value)
@@ -218,6 +230,21 @@ module Sequel
       # SQLite folds unquoted identifiers to lowercase, so it shouldn't need to upcase identifiers on output.
       def identifier_output_method_default
         nil
+      end
+      
+      # Array of PRAGMA SQL statements based on the Database options that should be applied to
+      # new connections.
+      def connection_pragmas
+        ps = []
+        v = typecast_value_boolean(opts.fetch(:foreign_keys, 1))
+        ps << "PRAGMA foreign_keys = #{v ? 1 : 0}"
+        [[:auto_vacuum, AUTO_VACUUM], [:synchronous, SYNCHRONOUS], [:temp_store, TEMP_STORE]].each do |prag, con|
+          if v = opts[prag]
+            raise(Error, "Value for PRAGMA #{prag} not supported, should be one of #{con.join(', ')}") unless v = con.index(v.to_sym)
+            ps << "PRAGMA #{prag} = #{v}"
+          end
+        end
+        ps
       end
 
       # Parse the output of the table_info pragma

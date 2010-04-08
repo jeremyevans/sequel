@@ -47,7 +47,7 @@ describe "Class Table Inheritance Plugin" do
     clear_sqls
   end
   after do
-    @db.drop_table :executives, :managers, :staff, :employees
+    @db.drop_table :staff, :executives, :managers, :employees
     [:Executive, :Manager, :Staff, :Employee].each{|s| Object.send(:remove_const, s)}
   end
 

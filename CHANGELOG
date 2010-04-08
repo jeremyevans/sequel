@@ -1,6 +1,8 @@
 === HEAD
 
-* Add foreign_keys accessor to SQLite Database objects, which modifies the foreign_keys PRAGMA available in 3.6.19+ (jeremyevans)
+* Support :auto_vacuum, :foreign_keys, :synchronous, and :temp_store Database options on SQLite, for thread-safe PRAGMA setting (jeremyevans)
+
+* Add foreign_keys accessor to SQLite Database objects (enabled by default), which modifies the foreign_keys PRAGMA available in 3.6.19+ (jeremyevans)
 
 * Add an Database#sqlite_version method when connecting to SQLite, used to determine feature support (jeremyevans)
 

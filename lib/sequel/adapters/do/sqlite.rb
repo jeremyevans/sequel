@@ -20,6 +20,15 @@ module Sequel
           o = super
           uri == 'sqlite3::memory:' ? o.merge(:max_connections=>1) : o
         end
+        
+        # Execute the connection pragmas on the connection
+        def setup_connection(conn)
+          connection_pragmas.each do |s|
+            com = conn.create_command(s)
+            log_yield(s){com.execute_non_query}
+          end
+          super
+        end
       end
       
       # Dataset class for SQLite datasets accessed via DataObjects.

@@ -32,6 +32,18 @@ module Sequel
           o = super
           uri == 'jdbc:sqlite::memory:' ? o.merge(:max_connections=>1) : o
         end
+        
+        # Execute the connection pragmas on the connection.
+        def setup_connection(conn)
+          conn = super(conn)
+          begin
+            stmt = conn.createStatement
+            connection_pragmas.each{|s| log_yield(s){stmt.execute(s)}}
+          ensure
+            stmt.close if stmt
+          end
+          conn
+        end
       end
       
       # Dataset class for SQLite datasets accessed via JDBC.

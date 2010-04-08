@@ -37,6 +37,8 @@ module Sequel
         db.busy_timeout(opts.fetch(:timeout, 5000))
         db.type_translation = true
         
+        connection_pragmas.each{|s| log_yield(s){db.execute_batch(s)}}
+        
         # Handle datetimes with Sequel.datetime_class
         prok = proc do |t,v|
           v = Time.at(v.to_i).iso8601 if UNIX_EPOCH_TIME_FORMAT.match(v)
