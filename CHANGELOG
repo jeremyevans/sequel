@@ -1,5 +1,7 @@
 === HEAD
 
+* No longer create the #{plugin}_opts methods for plugins (jeremyevans)
+
 * Support :auto_vacuum, :foreign_keys, :synchronous, and :temp_store Database options on SQLite, for thread-safe PRAGMA setting (jeremyevans)
 
 * Add foreign_keys accessor to SQLite Database objects (enabled by default), which modifies the foreign_keys PRAGMA available in 3.6.19+ (jeremyevans)

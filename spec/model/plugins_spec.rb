@@ -163,19 +163,9 @@ describe Sequel::Model, ".plugin" do
     m.get_stamp.should == t
   end
 
-  it "should define a plugin_opts instance method if the plugin has an InstanceMethods module" do
-    @c.plugin :timestamped, 1, 2=>3
-    @c.new.timestamped_opts.should == [1, {2=>3}]
-  end
-
   it "should extend the class with a ClassMethods module if the plugin includes it" do
     @c.plugin @t
     @c.def.should == 234
-  end
-
-  it "should define a plugin_opts class method if the plugin has a ClassMethods module" do
-    @c.plugin :timestamped, 1, 2=>3
-    @c.timestamped_opts.should == [1, {2=>3}]
   end
 
   it "should extend the class's dataset with a DatasetMethods module if the plugin includes it" do
@@ -184,18 +174,6 @@ describe Sequel::Model, ".plugin" do
     @c.ghi.should == 345
   end
 
-  it "should define a plugin_opts dataset method if the plugin has a DatasetMethods module" do
-    @c.plugin :timestamped, 1, 2=>3
-    @c.dataset.timestamped_opts.should == [1, {2=>3}]
-  end
-  
-  it "should use a single arg for the plugin_opts method if only a single arg was given" do
-    @c.plugin :timestamped, 1
-    @c.new.timestamped_opts.should == 1
-    @c.timestamped_opts.should == 1
-    @c.dataset.timestamped_opts.should == 1
-  end
-  
   it "should save the DatasetMethods module and apply it later if the class doesn't have a dataset" do
     c = Class.new(Sequel::Model)
     c.plugin @t

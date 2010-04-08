@@ -28,24 +28,14 @@ module Sequel
     # the camelized plugin name under Sequel::Plugins.
     def self.plugin(plugin, *args, &blk)
       arg = args.first
-      block = args.length > 1 ? lambda{args} : lambda{arg}
       m = plugin.is_a?(Module) ? plugin : plugin_module(plugin)
       unless @plugins.include?(m)
         @plugins << m
         m.apply(self, *args, &blk) if m.respond_to?(:apply)
-        if m.const_defined?("InstanceMethods")
-          define_method(:"#{plugin}_opts", &block)
-          include(m::InstanceMethods)
-        end
-        if m.const_defined?("ClassMethods")
-          meta_def(:"#{plugin}_opts", &block)
-          extend(m::ClassMethods)
-        end
+        include(m::InstanceMethods) if m.const_defined?("InstanceMethods")
+        extend(m::ClassMethods)if m.const_defined?("ClassMethods")
         if m.const_defined?("DatasetMethods")
-          if @dataset
-            dataset.meta_def(:"#{plugin}_opts", &block)
-            dataset.extend(m::DatasetMethods)
-          end
+          dataset.extend(m::DatasetMethods) if @dataset
           dataset_method_modules << m::DatasetMethods
           meths = m::DatasetMethods.public_instance_methods.reject{|x| NORMAL_METHOD_NAME_REGEXP !~ x.to_s}
           def_dataset_method(*meths) unless meths.empty?
