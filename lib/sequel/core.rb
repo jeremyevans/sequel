@@ -117,6 +117,8 @@ module Sequel
   # closed when the block exits.  For example:
   #
   #   Sequel.connect('sqlite://blog.db'){|db| puts db[:users].count}  
+  # 
+  # For details, see the "Connecting to a Database" Guide.
   def self.connect(*args, &block)
     Database.connect(*args, &block)
   end

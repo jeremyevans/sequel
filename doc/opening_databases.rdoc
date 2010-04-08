@@ -67,7 +67,8 @@ These options are shared by all adapters unless otherwise noted.
 * :loggers - An array of SQL loggers to log to
 * :password - The password for the user account
 * :servers - A hash with symbol keys and hash or proc values, used with master/slave/partitioned database configurations
-* :single_threaded - Whether to use the single-threaded (non-thread safe) connection pool
+* :single_threaded - Whether to use a single-threaded (non-thread safe) connection pool
+* :test - Whether to test that a valid database connection can be made (false by default)
 * :user - The user account name to use logging in
 
 The following options can be specified and are passed to the the database's internal connection pool.
