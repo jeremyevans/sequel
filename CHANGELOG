@@ -1,5 +1,7 @@
 === HEAD
 
+* Add foreign_keys accessor to SQLite Database objects, which modifies the foreign_keys PRAGMA available in 3.6.19+ (jeremyevans)
+
 * Add an Database#sqlite_version method when connecting to SQLite, used to determine feature support (jeremyevans)
 
 * Fix rolling back transactions when connecting to Oracle via JDBC (jeremyevans)

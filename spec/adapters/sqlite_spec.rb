@@ -36,6 +36,34 @@ context "An SQLite database" do
     end
   end
   
+  specify "should provide the SQLite version as an integer" do
+    @db.sqlite_version.should be_a_kind_of(Integer)
+  end
+  
+  specify "should support setting and getting the foreign_keys pragma" do
+    (@db.sqlite_version >= 30619 ? [true, false] : [nil]).should include(@db.foreign_keys)
+    @db.foreign_keys = true
+    @db.foreign_keys = false
+  end
+  
+  if SQLITE_DB.sqlite_version >= 30619
+    specify "should enforce foreign key integrity if foreign_keys pragma is set" do
+      @db.foreign_keys = true
+      @db.create_table!(:fk){primary_key :id; foreign_key :parent_id, :fk}
+      @db[:fk].insert(1, nil)
+      @db[:fk].insert(2, 1)
+      @db[:fk].insert(3, 3)
+      proc{@db[:fk].insert(4, 5)}.should raise_error(Sequel::Error)
+    end
+  end
+  
+  specify "should not enforce foreign key integrity if foreign_keys pragma is unset" do
+    @db.foreign_keys = false
+    @db.create_table!(:fk){primary_key :id; foreign_key :parent_id, :fk}
+    @db[:fk].insert(1, 2)
+    @db[:fk].all.should == [{:id=>1, :parent_id=>2}]
+  end
+  
   specify "should provide a list of existing tables" do
     @db.drop_table(:testing) rescue nil
     @db.tables.should be_a_kind_of(Array)

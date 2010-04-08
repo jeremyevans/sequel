@@ -31,6 +31,18 @@ module Sequel
       def database_type
         :sqlite
       end
+      
+      # Boolean signifying the value of the foreign_keys PRAGMA, or nil
+      # if not using SQLite 3.6.19+.
+      def foreign_keys
+        pragma_get(:foreign_keys).to_i == 1 if sqlite_version >= 30619
+      end
+      
+      # Set the foreign_keys PRAGMA using the given boolean value, if using
+      # SQLite 3.6.19+.  If not using 3.6.19+, no error is raised.
+      def foreign_keys=(value)
+        pragma_set(:foreign_keys, !!value ? 'on' : 'off') if sqlite_version >= 30619
+      end
 
       # Return a hash containing index information. Hash keys are index name symbols.
       # Values are subhashes with two keys, :columns and :unique.  The value of :columns
