@@ -36,7 +36,6 @@
 <h3>External Plugins</h3>
 
 <ul>
-<li><a href='http://github.com/sbfaulkner/sequel_cascading'>sequel_cascading</a>: Destroy associated records, nullify foreign keys or raise an exception when destroying a record.</li>
 <li><a href='http://github.com/sbfaulkner/sequel_container'>sequel_container</a>: Contained documents (i.e. attachments) for models.</li>
 <li><a href='http://github.com/pkondzior/sequel_nested_set'>sequel_nested_set</a>: Nested set implementation, ported from the Awesome Nested Set Active Record plugin.</li>
 <li><a href='http://github.com/boof/sequel_notnaughty'>sequel_notnaughty</a>: Port of the NotNaughty validation framework.</li>
