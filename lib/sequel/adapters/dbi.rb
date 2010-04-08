@@ -26,6 +26,11 @@ module Sequel
         when 'mssql'
           Sequel.ts_require 'adapters/shared/mssql'
           extend Sequel::MSSQL::DatabaseMethods
+          def self.dataset(*args)
+            ds = super
+            ds.extend Sequel::MSSQL::DatasetMethods
+            ds
+          end
         end
       end
 
