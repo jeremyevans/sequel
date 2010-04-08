@@ -73,6 +73,7 @@ These options are shared by all adapters unless otherwise noted.
 
 The following options can be specified and are passed to the the database's internal connection pool.
 
+* :after_connect - A proc called after a new connection is made, with the connection object (default: nil)
 * :max_connections - The maximum size of the connection pool (default: 4 connections on most databases)
 * :pool_sleep_time - The number of seconds to sleep before trying to acquire a connection again (default: 0.001 seconds)
 * :pool_timeout - The number of seconds to wait if a connection cannot be acquired before raising an error (default: 5 seconds)

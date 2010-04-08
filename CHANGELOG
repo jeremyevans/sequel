@@ -1,6 +1,8 @@
 === HEAD
 
-* Add support for :test option to Database to be automatically test the connection (jeremyevans)
+* Add support for an :after_connect option when connection, called with each new connection made (jeremyevans)
+
+* Add support for a :test option when connecting to be automatically test the connection (jeremyevans)
 
 * Add Dataset#select_append, which always appends to the existing SELECTed columns (jeremyevans)
 

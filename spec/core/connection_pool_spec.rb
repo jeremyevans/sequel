@@ -746,6 +746,12 @@ shared_examples_for "All connection pools classes" do
     x.should == [:default, :default]
   end
   
+  specify "should have respect an :after_connect proc that is called with each newly created connection" do
+    x = nil
+    @class.new(:after_connect=>proc{|c| x = [c, c]}){|c| 123}.hold{}
+    x.should == [123, 123]
+  end
+  
   specify "should raise a DatabaseConnectionError if the connection raises an exception" do
     proc{@class.new({}){|c| raise Exception}.hold{}}.should raise_error(Sequel::DatabaseConnectionError)
   end
