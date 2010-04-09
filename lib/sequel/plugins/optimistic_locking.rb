@@ -1,4 +1,6 @@
 module Sequel
+  require 'plugins/instance_filters'
+  
   module Plugins
     # This plugin implements a simple database-independent locking mechanism
     # to ensure that concurrent updates do not override changes. This is
@@ -16,10 +18,14 @@ module Sequel
     # table has a lock_version column (or other column you name via the lock_column
     # class level accessor) that defaults to 0.
     #
-    # This plugin does not work with the class_table_inheritance plugin.
+    # This plugin relies on the instance_filters plugin.
     module OptimisticLocking
       # Exception class raised when trying to update or destroy a stale object.
-      class Error < Sequel::Error
+      Error = InstanceFilters::Error
+      
+      # Load the instance_filters plugin into the model.
+      def self.apply(model, opts={})
+        model.plugin :instance_filters
       end
 
       # Set the lock_column to the :lock_column option, or :lock_version if
@@ -40,23 +46,33 @@ module Sequel
       end
     
       module InstanceMethods
+        # Add the lock column instance filter to the object before destroying it.
+        def before_destroy
+          lock_column_instance_filter
+          super
+        end
+        
+        # Add the lock column instance filter to the object before updating it.
+        def before_update
+          lock_column_instance_filter
+          super
+        end
+        
         private
         
-        # Only delete the object when destroying if it has the same lock version.  If the row
-        # doesn't have the same lock version, raise an error.
-        def _destroy_delete
+        # Add the lock column instance filter to the object.
+        def lock_column_instance_filter
           lc = model.lock_column
-          raise(Error, "Attempt to destroy a stale object") if this.filter(lc=>send(lc)).delete != 1
+          instance_filter(lc=>send(lc))
         end
         
         # Only update the row if it has the same lock version, and increment the
-        # lock version.  If the row doesn't have the same lock version, raise
-        # an Error.
+        # lock version.
         def _update(columns)
           lc = model.lock_column
           lcv = send(lc)
           columns[lc] = lcv + 1
-          raise(Error, "Attempt to update a stale object") if this.filter(lc=>lcv).update(columns) != 1
+          super
           send("#{lc}=", lcv + 1)
         end
       end
