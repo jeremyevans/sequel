@@ -604,7 +604,7 @@ module Sequel
       # Deletes and returns self.  Does not run destroy hooks.
       # Look into using destroy instead.
       def delete
-        this.delete
+        _delete
         self
       end
       
@@ -819,6 +819,17 @@ module Sequel
       end
 
       private
+      
+      # Actually do the deletion of the object's dataset.
+      def _delete
+        _delete_dataset.delete
+      end
+      
+      # The dataset to use when deleting the object.   The same as the object's
+      # dataset by default.
+      def _delete_dataset
+        this
+      end
   
       # Internal destroy method, separted from destroy to
       # allow running inside a transaction
@@ -901,7 +912,13 @@ module Sequel
       
       # Update this instance's dataset with the supplied column hash.
       def _update(columns)
-        this.update(columns)
+        _update_dataset.update(columns)
+      end
+      
+      # The dataset to use when updating an object.  The same as the object's
+      # dataset by default.
+      def _update_dataset
+        this
       end
 
       # If raise_on_save_failure is false, check for BeforeHookFailed
