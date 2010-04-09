@@ -752,3 +752,63 @@ if INTEGRATION_DB.dataset.supports_cte?
     end
   end
 end
+
+describe "Instance Filters plugin" do 
+  before do
+    @db = INTEGRATION_DB
+    @db.create_table!(:items) do
+      primary_key :id
+      String :name
+      Integer :cost
+      Integer :number
+    end
+    class ::Item < Sequel::Model(@db)
+      plugin :instance_filters
+    end
+    @i = Item.create(:name=>'J', :number=>1, :cost=>2)
+    @i.instance_filter(:number=>1)
+    @i.set(:name=>'K')
+  end
+  after do
+    @db.drop_table(:items)
+    Object.send(:remove_const, :Item)
+  end
+  
+  specify "should not raise an error if saving only updates one row" do
+    @i.save
+    @i.refresh.name.should == 'K'
+  end
+  
+  specify "should raise error if saving doesn't update a row" do
+    @i.this.update(:number=>2)
+    proc{@i.save}.should raise_error(Sequel::Error)
+  end
+  
+  specify "should apply all instance filters" do
+    @i.instance_filter{cost <= 2}
+    @i.this.update(:number=>2)
+    proc{@i.save}.should raise_error(Sequel::Error)
+    @i.this.update(:number=>1, :cost=>3)
+    proc{@i.save}.should raise_error(Sequel::Error)
+    @i.this.update(:cost=>2)
+    @i.save
+    @i.refresh.name.should == 'K'
+  end
+  
+  specify "should clear instance filters after successful save" do
+    @i.save
+    @i.this.update(:number=>2)
+    @i.update(:name=>'L')
+    @i.refresh.name.should == 'L'
+  end
+  
+  specify "should not raise an error if deleting only deletes one row" do
+    @i.destroy
+    proc{@i.refresh}.should raise_error(Sequel::Error, 'Record not found')
+  end
+  
+  specify "should raise error if destroying doesn't delete a row" do
+    @i.this.update(:number=>2)
+    proc{@i.destroy}.should raise_error(Sequel::Error)
+  end
+end

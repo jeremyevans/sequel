@@ -1,5 +1,7 @@
 === HEAD
 
+* Add instance_filters plugin, for adding arbitrary filters when updating/destroying the instance (jeremyevans)
+
 * No longer create the #{plugin}_opts methods for plugins (jeremyevans)
 
 * Support :auto_vacuum, :foreign_keys, :synchronous, and :temp_store Database options on SQLite, for thread-safe PRAGMA setting (jeremyevans)
