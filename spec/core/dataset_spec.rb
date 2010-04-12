@@ -322,6 +322,16 @@ context "Dataset#where" do
     @d3 = @dataset.where("a = 1")
   end
   
+  specify "should just clone if given an empty argument" do
+    @dataset.where({}).sql.should == @dataset.sql
+    @dataset.where([]).sql.should == @dataset.sql
+    @dataset.where('').sql.should == @dataset.sql
+
+    @dataset.filter({}).sql.should == @dataset.sql
+    @dataset.filter([]).sql.should == @dataset.sql
+    @dataset.filter('').sql.should == @dataset.sql
+  end
+  
   specify "should work with hashes" do
     @dataset.where(:name => 'xyz', :price => 342).select_sql.
       should match(/WHERE \(\(name = 'xyz'\) AND \(price = 342\)\)|WHERE \(\(price = 342\) AND \(name = 'xyz'\)\)/)
@@ -735,6 +745,12 @@ context "Dataset#having" do
     @columns = "region, sum(population), avg(gdp)"
   end
 
+  specify "should just clone if given an empty argument" do
+    @dataset.having({}).sql.should == @dataset.sql
+    @dataset.having([]).sql.should == @dataset.sql
+    @dataset.having('').sql.should == @dataset.sql
+  end
+  
   specify "should affect select statements" do
     @d1.select_sql.should ==
       "SELECT #{@columns} FROM test GROUP BY region HAVING (sum(population) > 10)"

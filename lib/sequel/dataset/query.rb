@@ -391,9 +391,13 @@ module Sequel
     # Internal filter method so it works on either the having or where clauses.
     def _filter(clause, *cond, &block)
       cond = cond.first if cond.size == 1
-      cond = filter_expr(cond, &block)
-      cond = SQL::BooleanExpression.new(:AND, @opts[clause], cond) if @opts[clause]
-      clone(clause => cond)
+      if cond.respond_to?(:empty?) && cond.empty? && !block
+        clone
+      else
+        cond = filter_expr(cond, &block)
+        cond = SQL::BooleanExpression.new(:AND, @opts[clause], cond) if @opts[clause]
+        clone(clause => cond)
+      end
     end
     
     # Add the dataset to the list of compounds
