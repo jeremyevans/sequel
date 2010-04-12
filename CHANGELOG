@@ -1,5 +1,7 @@
 === HEAD
 
+* Add Dataset#provides_accurate_rows_matched?, for seeing if update and delete are likely to return correct numbers (jeremyevans)
+
 * Add require_modification to Sequel::Model, for checking that model instance updating and deleting affects a single row (jeremyevans)
 
 * Fix leak of ResultSets when getting metadata in the jdbc adapter (jrun)

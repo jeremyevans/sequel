@@ -38,10 +38,17 @@ describe "Simple Dataset operations" do
     @ds.filter(1=>1).delete.should == 1
     @ds.count.should == 0
   end
-
+  
   specify "should update correctly" do
     @ds.update(:number=>:number+1).should == 1
     @ds.all.should == [{:id=>1, :number=>11}]
+  end
+  
+  cspecify "should have update return the number of matched rows", [:mysql, :mysql], [:do, :mysql], [:ado] do
+    @ds.update(:number=>:number).should == 1
+    @ds.filter(:id=>1).update(:number=>:number).should == 1
+    @ds.filter(:id=>2).update(:number=>:number).should == 0
+    @ds.all.should == [{:id=>1, :number=>10}]
   end
 
   specify "should fetch all results correctly" do

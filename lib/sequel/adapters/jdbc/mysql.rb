@@ -63,6 +63,11 @@ module Sequel
         def replace(*args)
           execute_insert(replace_sql(*args))
         end
+        
+        # MySQL on JDBC does provides an accurate number of rows matched.
+        def provides_accurate_rows_matched?
+          true
+        end
       end
     end
   end

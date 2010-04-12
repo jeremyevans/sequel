@@ -5,6 +5,13 @@ module Sequel
       @quote_identifiers
     end
     
+    # Whether this dataset will provide accurate number of rows matched for
+    # delete and update statements.  Accurate in this case is the number of
+    # rows matched by the dataset's filter.
+    def provides_accurate_rows_matched?
+      true
+    end
+    
     # Whether the dataset requires SQL standard datetimes (false by default,
     # as most allow strings with ISO 8601 format.
     def requires_sql_standard_datetimes?

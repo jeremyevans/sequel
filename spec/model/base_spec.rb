@@ -327,6 +327,33 @@ describe Sequel::Model, ".strict_param_setting" do
   end
 end
 
+describe Sequel::Model, ".require_modification" do
+  before do
+    @ds1 = MODEL_DB[:items]
+    @ds1.meta_def(:provides_accurate_rows_matched?){false}
+    @ds2 = MODEL_DB[:items]
+    @ds2.meta_def(:provides_accurate_rows_matched?){true}
+  end
+  after do
+    Sequel::Model.require_modification = nil
+  end
+
+  it "should depend on whether the dataset provides an accurate number of rows matched by default" do
+    Class.new(Sequel::Model(@ds1)).require_modification.should == false
+    Class.new(Sequel::Model(@ds2)).require_modification.should == true
+  end
+
+  it "should obey global setting regardless of dataset support if set" do
+    Sequel::Model.require_modification = true
+    Class.new(Sequel::Model(@ds1)).require_modification.should == true
+    Class.new(Sequel::Model(@ds2)).require_modification.should == true
+    
+    Sequel::Model.require_modification = false
+    Class.new(Sequel::Model(@ds1)).require_modification.should == false
+    Class.new(Sequel::Model(@ds2)).require_modification.should == false
+  end
+end
+
 describe Sequel::Model, ".[] optimization" do
   before do
     @c = Class.new(Sequel::Model(:a))

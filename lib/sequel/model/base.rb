@@ -287,6 +287,7 @@ module Sequel
           raise(Error, "Model.set_dataset takes a Symbol or a Sequel::Dataset")
         end
         @dataset.row_proc = Proc.new{|r| load(r)}
+        @require_modification = Sequel::Model.require_modification.nil? ? @dataset.provides_accurate_rows_matched? : Sequel::Model.require_modification
         if inherited
           @simple_table = superclass.simple_table
           @columns = @dataset.columns rescue nil

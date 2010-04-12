@@ -80,6 +80,11 @@ module Sequel
           s.getRows.transpose.each{|r| yield cols.inject({}){|m,c| m[c] = r.shift; m}} unless s.eof
         end
       end
+      
+      # ADO returns nil for all for delete and update statements.
+      def provides_accurate_rows_matched?
+        false
+      end
     end
   end
 end

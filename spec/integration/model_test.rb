@@ -78,6 +78,7 @@ describe "Sequel::Model basic support" do
   
   specify "#save should check that the only a single row is modified, unless require_modification is false" do
     i = Item.create(:name=>'a')
+    i.require_modification = true
     i.delete
     proc{i.save}.should raise_error(Sequel::NoExistingObject)
     proc{i.delete}.should raise_error(Sequel::NoExistingObject)

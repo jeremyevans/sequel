@@ -33,12 +33,18 @@ module Sequel
     #   # delete now works.
     #   i1.delete
     #
-    # You must have require_modification on the class and instances
-    # that use this plugin.
+    # This plugin sets the require_modification flag on the model,
+    # so if the model's dataset doesn't provide an accurate number
+    # of matched rows, this could result in invalid exceptions being raised.
     module InstanceFilters
       # Exception class raised when updating or deleting an object does
       # not affect exactly one row.
       Error = Sequel::NoExistingObject
+      
+      # Set the require_modification flag to true for the model.
+      def self.configure(model)
+        model.require_modification = true
+      end
 
       module InstanceMethods
         # Clear the instance filters after successfully destroying the object.

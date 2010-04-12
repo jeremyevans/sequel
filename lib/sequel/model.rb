@@ -101,7 +101,7 @@ module Sequel
     @primary_key = :id
     @raise_on_save_failure = true
     @raise_on_typecast_failure = true
-    @require_modification = true
+    @require_modification = nil
     @restrict_primary_key = true
     @restricted_columns = nil
     @simple_pk = nil
