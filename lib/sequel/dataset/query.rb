@@ -1,5 +1,16 @@
 module Sequel
   class Dataset
+    # These symbols have _join methods created (e.g. inner_join) that
+    # call join_table with the symbol, passing along the arguments and
+    # block from the method call.
+    CONDITIONED_JOIN_TYPES = [:inner, :full_outer, :right_outer, :left_outer, :full, :right, :left]
+
+    # These symbols have _join methods created (e.g. natural_join) that
+    # call join_table with the symbol.  They only accept a single table
+    # argument which is passed to join_table, and they raise an error
+    # if called with a block.
+    UNCONDITIONED_JOIN_TYPES = [:natural, :natural_left, :natural_right, :natural_full, :cross]
+    
     # Adds an further filter to an existing filter using AND. If no filter 
     # exists an error is raised. This method is identical to #filter except
     # it expects an existing filter.
@@ -213,6 +224,100 @@ module Sequel
       clone(o)
     end
 
+    # Returns a joined dataset.  Uses the following arguments:
+    #
+    # * type - The type of join to do (e.g. :inner)
+    # * table - Depends on type:
+    #   * Dataset - a subselect is performed with an alias of tN for some value of N
+    #   * Model (or anything responding to :table_name) - table.table_name
+    #   * String, Symbol: table
+    # * expr - specifies conditions, depends on type:
+    #   * Hash, Array with all two pairs - Assumes key (1st arg) is column of joined table (unless already
+    #     qualified), and value (2nd arg) is column of the last joined or primary table (or the
+    #     :implicit_qualifier option).
+    #     To specify multiple conditions on a single joined table column, you must use an array.
+    #     Uses a JOIN with an ON clause.
+    #   * Array - If all members of the array are symbols, considers them as columns and 
+    #     uses a JOIN with a USING clause.  Most databases will remove duplicate columns from
+    #     the result set if this is used.
+    #   * nil - If a block is not given, doesn't use ON or USING, so the JOIN should be a NATURAL
+    #     or CROSS join. If a block is given, uses a ON clause based on the block, see below.
+    #   * Everything else - pretty much the same as a using the argument in a call to filter,
+    #     so strings are considered literal, symbols specify boolean columns, and blockless
+    #     filter expressions can be used. Uses a JOIN with an ON clause.
+    # * options - a hash of options, with any of the following keys:
+    #   * :table_alias - the name of the table's alias when joining, necessary for joining
+    #     to the same table more than once.  No alias is used by default.
+    #   * :implicit_qualifier - The name to use for qualifying implicit conditions.  By default,
+    #     the last joined or primary table is used.
+    # * block - The block argument should only be given if a JOIN with an ON clause is used,
+    #   in which case it yields the table alias/name for the table currently being joined,
+    #   the table alias/name for the last joined (or first table), and an array of previous
+    #   SQL::JoinClause.
+    def join_table(type, table, expr=nil, options={}, &block)
+      using_join = expr.is_a?(Array) && !expr.empty? && expr.all?{|x| x.is_a?(Symbol)}
+      if using_join && !supports_join_using?
+        h = {}
+        expr.each{|s| h[s] = s}
+        return join_table(type, table, h, options)
+      end
+
+      case options
+      when Hash
+        table_alias = options[:table_alias]
+        last_alias = options[:implicit_qualifier]
+      when Symbol, String, SQL::Identifier
+        table_alias = options
+        last_alias = nil 
+      else
+        raise Error, "invalid options format for join_table: #{options.inspect}"
+      end
+
+      if Dataset === table
+        if table_alias.nil?
+          table_alias_num = (@opts[:num_dataset_sources] || 0) + 1
+          table_alias = dataset_alias(table_alias_num)
+        end
+        table_name = table_alias
+      else
+        table = table.table_name if table.respond_to?(:table_name)
+        table_name = table_alias || table
+      end
+
+      join = if expr.nil? and !block_given?
+        SQL::JoinClause.new(type, table, table_alias)
+      elsif using_join
+        raise(Sequel::Error, "can't use a block if providing an array of symbols as expr") if block_given?
+        SQL::JoinUsingClause.new(expr, type, table, table_alias)
+      else
+        last_alias ||= @opts[:last_joined_table] || first_source_alias
+        if Sequel.condition_specifier?(expr)
+          expr = expr.collect do |k, v|
+            k = qualified_column_name(k, table_name) if k.is_a?(Symbol)
+            v = qualified_column_name(v, last_alias) if v.is_a?(Symbol)
+            [k,v]
+          end
+        end
+        if block_given?
+          expr2 = yield(table_name, last_alias, @opts[:join] || [])
+          expr = expr ? SQL::BooleanExpression.new(:AND, expr, expr2) : expr2
+        end
+        SQL::JoinOnClause.new(expr, type, table, table_alias)
+      end
+
+      opts = {:join => (@opts[:join] || []) + [join], :last_joined_table => table_name}
+      opts[:num_dataset_sources] = table_alias_num if table_alias_num
+      clone(opts)
+    end
+    
+    CONDITIONED_JOIN_TYPES.each do |jtype|
+      class_eval("def #{jtype}_join(*args, &block); join_table(:#{jtype}, *args, &block) end", __FILE__, __LINE__)
+    end
+    UNCONDITIONED_JOIN_TYPES.each do |jtype|
+      class_eval("def #{jtype}_join(table); raise(Sequel::Error, '#{jtype}_join does not accept join table blocks') if block_given?; join_table(:#{jtype}, table) end", __FILE__, __LINE__)
+    end
+    alias join inner_join
+
     # If given an integer, the dataset will contain only the first l results.
     # If given a range, it will contain only those at offsets within that
     # range. If a second argument is given, it is used as an offset.
@@ -287,6 +392,35 @@ module Sequel
     def order_more(*columns, &block)
       columns = @opts[:order] + columns if @opts[:order]
       order(*columns, &block)
+    end
+    
+    # Qualify to the given table, or first source if not table is given.
+    def qualify(table=first_source)
+      qualify_to(table)
+    end
+
+    # Return a copy of the dataset with unqualified identifiers in the
+    # SELECT, WHERE, GROUP, HAVING, and ORDER clauses qualified by the
+    # given table. If no columns are currently selected, select all
+    # columns of the given table.
+    def qualify_to(table)
+      o = @opts
+      return clone if o[:sql]
+      h = {}
+      (o.keys & QUALIFY_KEYS).each do |k|
+        h[k] = qualified_expression(o[k], table)
+      end
+      h[:select] = [SQL::ColumnAll.new(table)] if !o[:select] || o[:select].empty?
+      clone(h)
+    end
+    
+    # Qualify the dataset to its current first source.  This is useful
+    # if you have unqualified identifiers in the query that all refer to
+    # the first source, and you want to join to another table which
+    # has columns with the same name as columns in the current dataset.
+    # See qualify_to.
+    def qualify_to_first_source
+      qualify_to(first_source)
     end
     
     # Returns a copy of the dataset with the order reversed. If no order is
@@ -384,6 +518,34 @@ module Sequel
     #   dataset.order(:a).unordered # SELECT * FROM items
     def unordered
       order(nil)
+    end
+    
+    # Add a condition to the WHERE clause.  See #filter for argument types.
+    #
+    #   dataset.group(:a).having(:a).filter(:b) # SELECT * FROM items GROUP BY a HAVING a AND b
+    #   dataset.group(:a).having(:a).where(:b) # SELECT * FROM items WHERE b GROUP BY a HAVING a
+    def where(*cond, &block)
+      _filter(:where, *cond, &block)
+    end
+    
+    # Add a simple common table expression (CTE) with the given name and a dataset that defines the CTE.
+    # A common table expression acts as an inline view for the query.
+    # Options:
+    # * :args - Specify the arguments/columns for the CTE, should be an array of symbols.
+    # * :recursive - Specify that this is a recursive CTE
+    def with(name, dataset, opts={})
+      raise(Error, 'This datatset does not support common table expressions') unless supports_cte?
+      clone(:with=>(@opts[:with]||[]) + [opts.merge(:name=>name, :dataset=>dataset)])
+    end
+
+    # Add a recursive common table expression (CTE) with the given name, a dataset that
+    # defines the nonrecursive part of the CTE, and a dataset that defines the recursive part
+    # of the CTE.  Options:
+    # * :args - Specify the arguments/columns for the CTE, should be an array of symbols.
+    # * :union_all - Set to false to use UNION instead of UNION ALL combining the nonrecursive and recursive parts.
+    def with_recursive(name, nonrecursive, recursive, opts={})
+      raise(Error, 'This datatset does not support common table expressions') unless supports_cte?
+      clone(:with=>(@opts[:with]||[]) + [opts.merge(:recursive=>true, :name=>name, :dataset=>nonrecursive.union(recursive, {:all=>opts[:union_all] != false, :from_self=>false}))])
     end
 
     private
