@@ -1,5 +1,12 @@
 module Sequel
-  # This exception will be raised when raise_on_save_failure is set and validation fails
+  # Exception class raised when raise_on_save_failure is set and a before hook returns false
+  class BeforeHookFailed < Error; end
+  
+  # Exception class raised when require_modification is set and an UPDATE or DELETE statement to modify the dataset doesn't
+  # modify a single row.
+  class NoExistingObject < Error; end
+  
+  # Exception class raised when raise_on_save_failure is set and validation fails
   class ValidationFailed < Error
     def initialize(errors)
       if errors.respond_to?(:full_messages)
@@ -11,7 +18,4 @@ module Sequel
     end
     attr_reader :errors
   end
-
-  # This exception will be raised when raise_on_save_failure is set and a before hook returns false
-  class BeforeHookFailed < Error; end
 end

@@ -57,10 +57,12 @@ describe Sequel::Model, "caching" do
       def update(values)
         $sqls << update_sql(values)
         $cache_dataset_row.merge!(values)
+        1
       end
       
       def delete
         $sqls << delete_sql
+        1
       end
     })
     

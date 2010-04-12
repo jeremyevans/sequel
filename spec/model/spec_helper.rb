@@ -15,10 +15,12 @@ class MockDataset < Sequel::Dataset
   
   def update(*args)
     @db.execute update_sql(*args)
+    1
   end
   
   def delete(*args)
     @db.execute delete_sql(*args)
+    1
   end
   
   def fetch_rows(sql)

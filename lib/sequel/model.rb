@@ -72,7 +72,8 @@ module Sequel
     # If the value is nil, the superclass's instance variable is used directly in the subclass.
     INHERITED_INSTANCE_VARIABLES = {:@allowed_columns=>:dup, :@dataset_methods=>:dup, 
       :@dataset_method_modules=>:dup, :@primary_key=>nil, :@use_transactions=>nil,
-      :@raise_on_save_failure=>nil, :@restricted_columns=>:dup, :@restrict_primary_key=>nil,
+      :@raise_on_save_failure=>nil, :@require_modification=>nil, 
+      :@restricted_columns=>:dup, :@restrict_primary_key=>nil,
       :@simple_pk=>nil, :@simple_table=>nil, :@strict_param_setting=>nil,
       :@typecast_empty_string_to_nil=>nil, :@typecast_on_assignment=>nil,
       :@raise_on_typecast_failure=>nil, :@plugins=>:dup}
@@ -100,6 +101,7 @@ module Sequel
     @primary_key = :id
     @raise_on_save_failure = true
     @raise_on_typecast_failure = true
+    @require_modification = true
     @restrict_primary_key = true
     @restricted_columns = nil
     @simple_pk = nil

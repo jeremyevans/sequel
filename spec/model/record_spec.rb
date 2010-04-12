@@ -97,6 +97,22 @@ describe "Model#save" do
     MODEL_DB.sqls.should == ["UPDATE items SET x = 1 WHERE (id = 3)"]
   end
   
+  it "should raise a NoExistingObject exception if the dataset update call doesn't return 1, unless require_modification is false" do
+    o = @c.load(:id => 3, :x => 1)
+    o.this.meta_def(:update){|*a| 0}
+    proc{o.save}.should raise_error(Sequel::NoExistingObject)
+    o.this.meta_def(:update){|*a| 2}
+    proc{o.save}.should raise_error(Sequel::NoExistingObject)
+    o.this.meta_def(:update){|*a| 1}
+    proc{o.save}.should_not raise_error
+    
+    o.require_modification = false
+    o.this.meta_def(:update){|*a| 0}
+    proc{o.save}.should_not raise_error
+    o.this.meta_def(:update){|*a| 2}
+    proc{o.save}.should_not raise_error
+  end
+  
   it "should update only the given columns if given" do
     o = @c.load(:id => 3, :x => 1, :y => nil)
     o.save(:y)
@@ -788,7 +804,7 @@ describe Sequel::Model, "#destroy" do
     MODEL_DB.reset
     @model = Class.new(Sequel::Model(:items))
     @model.columns :id
-    @model.dataset.meta_def(:delete) {MODEL_DB.execute delete_sql}
+    @model.dataset.meta_def(:delete){MODEL_DB.execute delete_sql;1}
     
     @instance = @model.load(:id => 1234)
   end
@@ -796,6 +812,21 @@ describe Sequel::Model, "#destroy" do
   it "should return self" do
     @model.send(:define_method, :after_destroy){3}
     @instance.destroy.should == @instance
+  end
+  
+  it "should raise a NoExistingObject exception if the dataset delete call doesn't return 1" do
+    @instance.this.meta_def(:delete){|*a| 0}
+    proc{@instance.delete}.should raise_error(Sequel::NoExistingObject)
+    @instance.this.meta_def(:delete){|*a| 2}
+    proc{@instance.delete}.should raise_error(Sequel::NoExistingObject)
+    @instance.this.meta_def(:delete){|*a| 1}
+    proc{@instance.delete}.should_not raise_error
+    
+    @instance.require_modification = false
+    @instance.this.meta_def(:delete){|*a| 0}
+    proc{@instance.delete}.should_not raise_error
+    @instance.this.meta_def(:delete){|*a| 2}
+    proc{@instance.delete}.should_not raise_error
   end
 
   it "should run within a transaction if use_transactions is true" do

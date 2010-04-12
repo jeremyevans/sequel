@@ -75,6 +75,17 @@ describe "Sequel::Model basic support" do
     i.save(:num)
     Item.all.should == [Item.load(:id=>1, :name=>'K', :num=>2)]
   end
+  
+  specify "#save should check that the only a single row is modified, unless require_modification is false" do
+    i = Item.create(:name=>'a')
+    i.delete
+    proc{i.save}.should raise_error(Sequel::NoExistingObject)
+    proc{i.delete}.should raise_error(Sequel::NoExistingObject)
+    
+    i.require_modification = false
+    i.save
+    i.delete
+  end
 
   specify ".to_hash should return a hash keyed on primary key if no argument provided" do
     i = Item.create(:name=>'J')

@@ -42,6 +42,11 @@ module Sequel
       # plugins) in connection with option to check for typecast failures for
       # columns that aren't blobs or strings.
       attr_accessor :raise_on_typecast_failure
+      
+      # Whether to raise an error if an UPDATE or DELETE query related to
+      # a model instance does not modify exactly 1 row.  If set to false,
+      # Sequel will not check the number of rows modified (default: true).
+      attr_accessor :require_modification
   
       # Which columns are specifically restricted in a call to set/update/new/etc.
       # (default: not set).  Some columns are restricted regardless of
@@ -493,7 +498,7 @@ module Sequel
     # * The following instance_methods all call the class method of the same
     #   name: columns, dataset, db, primary_key, db_schema.
     # * The following instance methods allow boolean flags to be set on a per-object
-    #   basis: raise_on_save_failure, raise_on_typecast_failure, strict_param_setting, 
+    #   basis: raise_on_save_failure, raise_on_typecast_failure, require_modification, strict_param_setting, 
     #   typecast_empty_string_to_nil, typecast_on_assignment, use_transactions.
     #   If they are not used, the object will default to whatever the model setting is.
     module InstanceMethods
@@ -518,7 +523,7 @@ module Sequel
       private_class_method :class_attr_overridable, :class_attr_reader
 
       class_attr_reader :columns, :db, :primary_key, :db_schema
-      class_attr_overridable :raise_on_save_failure, :raise_on_typecast_failure, :strict_param_setting, :typecast_empty_string_to_nil, :typecast_on_assignment, :use_transactions
+      class_attr_overridable :raise_on_save_failure, :raise_on_typecast_failure, :require_modification, :strict_param_setting, :typecast_empty_string_to_nil, :typecast_on_assignment, :use_transactions
 
       # The hash of attribute values.  Keys are symbols with the names of the
       # underlying database columns.
@@ -822,7 +827,9 @@ module Sequel
       
       # Actually do the deletion of the object's dataset.
       def _delete
-        _delete_dataset.delete
+        n = _delete_dataset.delete
+        raise(NoExistingObject, "Attempt to delete object did not result in a single row modification (Rows Deleted: #{n}, SQL: #{_delete_dataset.delete_sql})") if require_modification && n != 1
+        n
       end
       
       # The dataset to use when deleting the object.   The same as the object's
@@ -912,7 +919,9 @@ module Sequel
       
       # Update this instance's dataset with the supplied column hash.
       def _update(columns)
-        _update_dataset.update(columns)
+        n = _update_dataset.update(columns)
+        raise(NoExistingObject, "Attempt to update object did not result in a single row modification (SQL: #{_update_dataset.update_sql(columns)})") if require_modification && n != 1
+        n
       end
       
       # The dataset to use when updating an object.  The same as the object's

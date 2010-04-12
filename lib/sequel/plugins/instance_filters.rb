@@ -32,11 +32,13 @@ module Sequel
     #   # database row has been updated to allow deleting,
     #   # delete now works.
     #   i1.delete
+    #
+    # You must have require_modification on the class and instances
+    # that use this plugin.
     module InstanceFilters
       # Exception class raised when updating or deleting an object does
       # not affect exactly one row.
-      class Error < Sequel::Error
-      end
+      Error = Sequel::NoExistingObject
 
       module InstanceMethods
         # Clear the instance filters after successfully destroying the object.
@@ -83,18 +85,6 @@ module Sequel
         # Apply the instance filters to the dataset returned by super.
         def _update_dataset
           apply_instance_filters(super)
-        end
-        
-        # Raise an Error if calling deleting doesn't
-        # indicate that a single row was deleted.
-        def _delete
-          raise(Error, "No matching object for instance filtered dataset (SQL: #{_delete_dataset.delete_sql})") if super != 1
-        end
-        
-        # Raise an Error if updating doesn't indicate that a single
-        # row was updated.
-        def _update(columns)
-          raise(Error, "No matching object for instance filtered dataset (SQL: #{_update_dataset.update_sql(columns)})") if super != 1
         end
       end
     end

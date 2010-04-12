@@ -19,6 +19,8 @@ module Sequel
     # class level accessor) that defaults to 0.
     #
     # This plugin relies on the instance_filters plugin.
+    # You must have require_modification on the class and instances
+    # that use this plugin.
     module OptimisticLocking
       # Exception class raised when trying to update or destroy a stale object.
       Error = InstanceFilters::Error
