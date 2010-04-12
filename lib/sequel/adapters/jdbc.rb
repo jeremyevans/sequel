@@ -321,7 +321,10 @@ module Sequel
 
       # Gets the JDBC connection uri from the JNDI resource.
       def get_uri_from_jndi
-        get_connection_from_jndi.meta_data.url
+        conn = get_connection_from_jndi
+        conn.meta_data.url
+      ensure
+        conn.close if conn
       end
       
       # Gets the connection from JNDI.
