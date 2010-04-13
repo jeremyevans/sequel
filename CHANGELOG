@@ -1,5 +1,7 @@
 === HEAD
 
+* Fix leak of ResultSets when getting metadata in the jdbc adapter (jrun)
+
 * Make Dataset#filter and related methods just clone receiver if given an empty argument, such as {}, [], or '' (jeremyevans)
 
 * Add instance_filters plugin, for adding arbitrary filters when updating/destroying the instance (jeremyevans)
