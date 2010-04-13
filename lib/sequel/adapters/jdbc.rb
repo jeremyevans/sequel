@@ -350,7 +350,14 @@ module Sequel
       
       # Yield the metadata for this database
       def metadata(*args, &block)
-        synchronize{|c| metadata_dataset.send(:process_result_set, c.getMetaData.send(*args), &block)}
+        synchronize do |c|
+          result = c.getMetaData.send(*args)
+          begin
+            metadata_dataset.send(:process_result_set, result, &block)
+          ensure
+            result.close
+          end
+        end
       end
 
       # Treat SQLExceptions with a "Connection Error" SQLState as disconnects
