@@ -18,6 +18,7 @@ Sequel is a lightweight database access toolkit for Ruby.
 == Resources
 
 * {Website}[http://sequel.rubyforge.org]
+* {Website}[http://sequel.heroku.com]
 * {Source code}[http://github.com/jeremyevans/sequel]
 * {Bug tracking}[http://code.google.com/p/ruby-sequel/issues/list]
 * {Google group}[http://groups.google.com/group/sequel-talk]
@@ -158,6 +159,7 @@ Datasets will only fetch records when you tell them to. They can be manipulated 
 You can retrieve all records by using the all method:
 
   posts.all
+  # SELECT * FROM posts
 
 The all method returns an array of hashes, where each hash corresponds to a record.
 
@@ -173,53 +175,66 @@ Or perform more advanced stuff:
 You can also retrieve the first record in a dataset:
 
   posts.first
+  # SELECT * FROM posts LIMIT 1
   
 Or retrieve a single record with a specific value:
 
   posts[:id => 1]
+  # SELECT * FROM posts WHERE id = 1 LIMIT 1
   
 If the dataset is ordered, you can also ask for the last record:
 
   posts.order(:stamp).last
+  # SELECT * FROM posts ORDER BY stamp DESC LIMIT 1
   
 === Filtering Records
 
 An easy way to filter records is to provide a hash of values to match:
 
   my_posts = posts.filter(:category => 'ruby', :author => 'david')
+  # WHERE category = 'ruby' AND author = 'david'
   
 You can also specify ranges:
 
   my_posts = posts.filter(:stamp => (Date.today - 14)..(Date.today - 7))
+  # WHERE stamp >= '2010-06-30' AND stamp <= '2010-07-07'
   
 Or arrays of values:
 
   my_posts = posts.filter(:category => ['ruby', 'postgres', 'linux'])
+  # WHERE category IN ('ruby', 'postgres', 'linux')
   
 Sequel also accepts expressions:
   
   my_posts = posts.filter{|o| o.stamp > Date.today << 1}
+  # WHERE stamp > '2010-06-14'
   
 Some adapters will also let you specify Regexps:
 
   my_posts = posts.filter(:category => /ruby/i)
+  # WHERE category ~* 'ruby'
   
 You can also use an inverse filter:
 
   my_posts = posts.exclude(:category => /ruby/i)
+  # WHERE category !~* 'ruby'
 
 You can also specify a custom WHERE clause using a string:
 
   posts.filter('stamp IS NOT NULL')
+  # WHERE stamp IS NOT NULL
 
 You can use parameters in your string, as well:
 
+  author_name = 'JKR'
   posts.filter('(stamp < ?) AND (author != ?)', Date.today - 3, author_name)
+  # WHERE (stamp < '2010-07-11') AND (author != 'JKR')
   posts.filter{|o| (o.stamp < Date.today - 3) & ~{:author => author_name}} # same as above
 
 Datasets can also be used as subqueries:
 
   DB[:items].filter('price > ?', DB[:items].select{|o| o.avg(:price) + 100})
+  # WHERE price > (SELECT avg(price) + 100 FROM items)
 
 After filtering you can retrieve the matching records by using any of the retrieval methods:
 
@@ -230,77 +245,108 @@ See the doc/dataset_filtering.rdoc file for more details.
 === Summarizing Records
 
 Counting records is easy:
+
   posts.filter(:category => /ruby/i).count
+  # SELECT COUNT(*) FROM posts WHERE category ~* 'ruby'
 
 And you can also query maximum/minimum values:
+
   max = DB[:history].max(:value)
+  # SELECT max(value) FROM history
+  
   min = DB[:history].min(:value)
+  # SELECT min(value) FROM history
   
 Or calculate a sum or average:
   sum = DB[:items].sum(:price)
+  # SELECT sum(price) FROM items
   avg = DB[:items].avg(:price)
+  # SELECT avg(price) FROM items
   
 === Ordering Records
 
 Ordering datasets is simple:
 
-  posts.order(:stamp) # ORDER BY stamp
-  posts.order(:stamp, :name) # ORDER BY stamp, name
+  posts.order(:stamp)
+  # ORDER BY stamp
+  posts.order(:stamp, :name)
+  # ORDER BY stamp, name
 
 Chaining order doesn't work the same as filter:
 
-  posts.order(:stamp).order(:name) # ORDER BY name
+  posts.order(:stamp).order(:name)
+  # ORDER BY name
 
 The order_more method chains this way, though:
 
-  posts.order(:stamp).order_more(:name) # ORDER BY stamp, name
+  posts.order(:stamp).order_more(:name)
+  # ORDER BY stamp, name
   
 You can also specify descending order:
 
-  posts.order(:stamp.desc) # ORDER BY stamp DESC
+  posts.order(:stamp.desc)
+  # ORDER BY stamp DESC
 
 === Selecting Columns
 
 Selecting specific columns to be returned is also simple:
 
-  posts.select(:stamp) # SELECT stamp FROM posts
-  posts.select(:stamp, :name) # SELECT stamp, name FROM posts
+  posts.select(:stamp)
+  # SELECT stamp FROM posts
+  posts.select(:stamp, :name)
+  # SELECT stamp, name FROM posts
 
 Chaining select works like order, not filter:
 
-  posts.select(:stamp).select(:name) # SELECT name FROM posts
+  posts.select(:stamp).select(:name)
+  # SELECT name FROM posts
 
 As you might expect, there is an order_more equivalent for select:
 
-  posts.select(:stamp).select_more(:name) # SELECT stamp, name FROM posts
+  posts.select(:stamp).select_more(:name)
+  # SELECT stamp, name FROM posts
   
 === Deleting Records
 
 Deleting records from the table is done with delete:
 
   posts.filter('stamp < ?', Date.today - 3).delete
+  # DELETE FROM posts WHERE stamp < '2010-07-11'
   
 Be very careful when deleting, as delete affects all rows in the dataset.
-Filter first, delete second, unless you want to empty the table.
+Filter first, delete second, unless you want to empty the table:
+
+  # DO THIS:
+  posts.filter('stamp < ?', Date.today - 7).delete
+  # NOT THIS:
+  posts.delete.filter('stamp < ?', Date.today - 7)
 
 === Inserting Records
 
 Inserting records into the table is done with insert:
 
   posts.insert(:category => 'ruby', :author => 'david')
+  # INSERT INTO posts (category, author) VALUES ('ruby', 'david')
   
 === Updating Records
 
 Updating records in the table is done with update:
 
   posts.filter('stamp < ?', Date.today - 7).update(:state => 'archived')
+  # UPDATE posts SET state = 'archived' WHERE stamp < '2010-07-07'
 
 You can reference table columns when choosing what values to set:
 
   posts.filter{|o| o.stamp < Date.today - 7}.update(:backup_number => :backup_number + 1)
+  # UPDATE posts SET backup_number = backup_number + 1 WHERE stamp < '2010-07-07'
 
 As with delete, this affects all rows in the dataset, so filter first,
-update second, unless you want to update all rows.
+update second, unless you want to update all rows:
+
+  # DO THIS:
+  posts.filter('stamp < ?', Date.today - 7).update(:state => 'archived')
+  # NOT THIS:
+  posts.update(:state => 'archived').filter('stamp < ?', Date.today - 7)
 
 === Joining Tables
 
@@ -339,31 +385,38 @@ Using graph, you can split the result hashes into subhashes, one per join:
 
 == An aside: column references in Sequel
 
-Sequel expects column names to be specified using symbols. In addition, returned hashes always use symbols as their keys. This allows you to freely mix literal values and column references. For example, the two following lines produce equivalent SQL:
+Sequel expects column names to be specified using symbols. In addition, returned hashes always use symbols as their keys. This allows you to freely mix literal values and column references in many cases. For example, the two following lines produce equivalent SQL:
 
-  items.filter(:x => 1) #=> "SELECT * FROM items WHERE (x = 1)" 
-  items.filter(1 => :x) #=> "SELECT * FROM items WHERE (1 = x)" 
+  items.filter(:x => 1)
+  # SELECT * FROM items WHERE (x = 1)
+  items.filter(1 => :x)
+  # SELECT * FROM items WHERE (1 = x)"
 
 Ruby strings are generally treated as SQL strings:
 
-  items.filter(:x => 'x') #=> "SELECT * FROM items WHERE (x = 'x')" 
+  items.filter(:x => 'x')
+  # SELECT * FROM items WHERE (x = 'x')
 
 === Qualifying column names
 
 Column references can be qualified by using the double underscore special notation :table__column:
 
-  items.literal(:items__price) #=> "items.price"
+  items.literal(:items__price)
+  # items.price
 
 === Column aliases
 
 You can also alias columns by using the triple undersecore special notation :column___alias or :table__column___alias:
 
-  items.literal(:price___p) #=> "price AS p"
-  items.literal(:items__price___p) #=> "items.price AS p"
+  items.literal(:price___p)
+  # price AS p
+  items.literal(:items__price___p)
+  # items.price AS p
 
 Another way to alias columns is to use the #as method:
 
-  items.literal(:price.as(:p)) #=> "price AS p"
+  items.literal(:price.as(:p))
+  # price AS p
 
 == Sequel Models
 
@@ -386,14 +439,14 @@ You can, however, explicitly set the table name or even the dataset used:
   # or:
   Post.set_dataset :my_posts
 
-If you use a symbol, it assumes you are referring to the table with the same name.  You can also give it a dataset:
+If you use a symbol, it assumes you are referring to the table with the same name.  You can also give it a dataset, which will set the defaults for all retrievals for that model:
 
   Post.set_dataset DB[:my_posts].filter(:category => 'ruby')
   Post.set_dataset DB[:my_posts].select(:id, :name).order(:date)
 
 === Model instances
 
-Model instance are identified by a primary key. By default, Sequel assumes the primary key column to be :id, unless it can get the primary key information from the database. The Model.[] method can be used to fetch records by their primary key:
+Model instances are identified by a primary key.  In most cases, Sequel can introspec the database to determine the primary key, but if not, it defaults to using :id. The Model.[] method can be used to fetch records by their primary key:
 
   post = Post[123]
 
@@ -410,7 +463,7 @@ Sequel models allow you to use any column as a primary key, and even composite k
   post = Post['ruby', 'hello world']
   post.pk #=> ['ruby', 'hello world']
 
-You can also define a model class that does not have a primary key, but then you lose the ability to easily update records.
+You can also define a model class that does not have a primary key, but then you lose the ability to easily update and delete records.
 
 A model instance can also be fetched by specifying a condition:
 
@@ -434,10 +487,15 @@ A model instances stores its values as a hash:
 
   post.values #=> {:id => 123, :category => 'ruby', :title => 'hello world'}
 
-You can read the record values as object attributes (assuming the attribute names are valid columns in the model's dataset):
+You can read the record values as object attributes, assuming the attribute names are valid columns in the model's dataset:
 
   post.id #=> 123
   post.title #=> 'hello world'
+  
+If the record's attributes names are not valid columns in the model's dataset (maybe because you used select_more to add a computed value column), you can use Model#[] to access the values:
+
+  post[:id] #=> 123
+  post[:title] #=> 'hello world'
 
 You can also change record values:
 
@@ -449,7 +507,7 @@ That will just change the value for the object, it will not persist the changes 
 
   post.save
 
-If you want to modify record values and save the object after doing so, use the #update method:
+If you want to modify record values and save the changes to the object after doing so, use the #update method:
 
   post.update(:title => 'hey there')
 
@@ -506,12 +564,12 @@ Records can also be deleted en-masse by invoking Model.delete and Model.destroy.
   Post.filter(:category => 32).destroy #=> runs hooks
 
 Please note that if Model.destroy is called, each record is deleted 
-separately, but Model.delete deletes all relevant records with a single 
-SQL statement.
+separately, but Model.delete deletes all matching records with a single 
+SQL query.
 
 === Associations
 
-Associations are used in order to specify relationships between model classes that reflect relations between tables in the database using foreign keys.
+Associations are used in order to specify relationships between model classes that reflect relationships between tables in the database, which are usually specified using foreign keys.
 
   class Post < Sequel::Model
     many_to_one :author
@@ -546,6 +604,8 @@ one_to_many and many_to_many create a getter method, a method for adding an obje
   post.add_tag(tag)
   post.remove_tag(tag)
   post.remove_all_tags
+  
+Note that the remove_* and remove_all_* methods do not delete the object from the database, they merely disassociate the associated object from the receiver.
 
 All associations add a dataset method that can be used to further filter or reorder the returned objects, or modify all of them:
 
