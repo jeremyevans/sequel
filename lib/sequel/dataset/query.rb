@@ -1,5 +1,17 @@
 module Sequel
   class Dataset
+    # ---------------------
+    # :section: Methods that return modified datasets
+    # These methods all return modified copies of the receiver.
+    # ---------------------
+    # The dataset options that require the removal of cached columns
+    # if changed.
+    COLUMN_CHANGE_OPTS = [:select, :sql, :from, :join].freeze
+
+    # Which options don't affect the SQL generation.  Used by simple_select_all?
+    # to determine if this is a simple SELECT * FROM table.
+    NON_SQL_OPTIONS = [:server, :defaults, :overrides, :graph, :eager_graph, :graph_aliases]
+    
     # These symbols have _join methods created (e.g. inner_join) that
     # call join_table with the symbol, passing along the arguments and
     # block from the method call.
@@ -19,6 +31,16 @@ module Sequel
     def and(*cond, &block)
       raise(InvalidOperation, "No existing filter found.") unless @opts[:having] || @opts[:where]
       filter(*cond, &block)
+    end
+    
+    # Returns a new clone of the dataset with with the given options merged.
+    # If the options changed include options in COLUMN_CHANGE_OPTS, the cached
+    # columns are deleted.
+    def clone(opts = {})
+      c = super()
+      c.opts = @opts.merge(opts)
+      c.instance_variable_set(:@columns, nil) if opts.keys.any?{|o| COLUMN_CHANGE_OPTS.include?(o)}
+      c
     end
 
     # Returns a copy of the dataset with the SQL DISTINCT clause.
@@ -186,6 +208,19 @@ module Sequel
       clone(:group => (columns.compact.empty? ? nil : columns))
     end
     alias group_by group
+    
+    # Returns a dataset grouped by the given column with count by group,
+    # order by the count of records. Column aliases may be supplied, and will
+    # be included in the select clause.
+    #
+    # Examples:
+    #
+    #   ds.group_and_count(:name).all => [{:name=>'a', :count=>1}, ...]
+    #   ds.group_and_count(:first_name, :last_name).all => [{:first_name=>'a', :last_name=>'b', :count=>1}, ...]
+    #   ds.group_and_count(:first_name___name).all => [{:name=>'a', :count=>1}, ...]
+    def group_and_count(*columns)
+      group(*columns.map{|c| unaliased_identifier(c)}).select(*(columns + [COUNT_OF_ALL_AS_COUNT]))
+    end
 
     # Returns a copy of the dataset with the HAVING conditions changed. See #filter for argument types.
     #
@@ -354,6 +389,14 @@ module Sequel
       clone(:lock => style)
     end
     
+    # Returns a naked dataset clone - i.e. a dataset that returns records as
+    # hashes instead of calling the row proc.
+    def naked
+      ds = clone
+      ds.row_proc = nil
+      ds
+    end
+    
     # Adds an alternate filter to an existing filter using OR. If no filter 
     # exists an error is raised.
     #
@@ -478,6 +521,25 @@ module Sequel
       select(*columns, &block)
     end
     
+    # Set the server for this dataset to use.  Used to pick a specific database
+    # shard to run a query against, or to override the default (which is SELECT uses
+    # :read_only database and all other queries use the :default database).
+    def server(servr)
+      clone(:server=>servr)
+    end
+
+    # Set the default values for insert and update statements.  The values hash passed
+    # to insert or update are merged into this hash.
+    def set_defaults(hash)
+      clone(:defaults=>(@opts[:defaults]||{}).merge(hash))
+    end
+
+    # Set values that override hash arguments given to insert and update statements.
+    # This hash is merged into the hash provided to insert or update.
+    def set_overrides(hash)
+      clone(:overrides=>hash.merge(@opts[:overrides]||{}))
+    end
+    
     # Returns a copy of the dataset with no filters (HAVING or WHERE clause) applied.
     # 
     #   dataset.group(:a).having(:a=>1).where(:b).unfiltered # SELECT * FROM items GROUP BY a
@@ -546,6 +608,28 @@ module Sequel
     def with_recursive(name, nonrecursive, recursive, opts={})
       raise(Error, 'This datatset does not support common table expressions') unless supports_cte?
       clone(:with=>(@opts[:with]||[]) + [opts.merge(:recursive=>true, :name=>name, :dataset=>nonrecursive.union(recursive, {:all=>opts[:union_all] != false, :from_self=>false}))])
+    end
+    
+    # Returns a copy of the dataset with the static SQL used.  This is useful if you want
+    # to keep the same row_proc/graph, but change the SQL used to custom SQL.
+    #
+    #   dataset.with_sql('SELECT * FROM foo') # SELECT * FROM foo
+    def with_sql(sql, *args)
+      sql = SQL::PlaceholderLiteralString.new(sql, args) unless args.empty?
+      clone(:sql=>sql)
+    end
+    
+    protected
+
+    # Return true if the dataset has a non-nil value for any key in opts.
+    def options_overlap(opts)
+      !(@opts.collect{|k,v| k unless v.nil?}.compact & opts).empty?
+    end
+
+    # Whether this dataset is a simple SELECT * FROM table.
+    def simple_select_all?
+      o = @opts.reject{|k,v| v.nil? || NON_SQL_OPTIONS.include?(k)}
+      o.length == 1 && (f = o[:from]) && f.length == 1 && f.first.is_a?(Symbol)
     end
 
     private

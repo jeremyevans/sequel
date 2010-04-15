@@ -1,5 +1,11 @@
 module Sequel 
   class Dataset
+    # ---------------------
+    # :section: Methods related to prepared statements or bound variables
+    # On some adapters, these use native prepared statements and bound variables, on others
+    # support is emulated.
+    # ---------------------
+    
     PREPARED_ARG_PLACEHOLDER = LiteralString.new('?').freeze
     
     # Default implementation of the argument mapper to allow

@@ -1,5 +1,14 @@
 module Sequel
   class Dataset
+    # ---------------------
+    # :section: Methods that describe what the dataset supports
+    # These methods all return booleans, with most describing whether or not the
+    # dataset supports a feature.
+    # ---------------------
+    
+    # Method used to check if WITH is supported
+    WITH_SUPPORTED=:select_with_sql
+    
     # Whether this dataset quotes identifiers.
     def quote_identifiers?
       @quote_identifiers
