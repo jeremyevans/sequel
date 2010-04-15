@@ -159,6 +159,17 @@ describe "Database schema modifiers" do
     @ds.columns!.should == [:number]
   end
   
+  specify "should rename tables correctly" do
+    @db.drop_table(:items) rescue nil
+    @db.create_table!(:items2){Integer :number}
+    @db.rename_table(:items2, :items)
+    @db.table_exists?(:items).should == true
+    @db.table_exists?(:items2).should == false
+    @db.schema(:items, :reload=>true).map{|x| x.first}.should == [:number]
+    @ds.insert([10])
+    @ds.columns!.should == [:number]
+  end
+  
   specify "should allow creating indexes with tables" do
     @db.create_table!(:items){Integer :number; index :number}
     @db.table_exists?(:items).should == true

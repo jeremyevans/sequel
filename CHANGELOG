@@ -1,5 +1,7 @@
 === HEAD
 
+* Fix Database#rename_table on Microsoft SQL Server (rohit.namjoshi) (#293)
+
 * Add Dataset#provides_accurate_rows_matched?, for seeing if update and delete are likely to return correct numbers (jeremyevans)
 
 * Add require_modification to Sequel::Model, for checking that model instance updating and deleting affects a single row (jeremyevans)

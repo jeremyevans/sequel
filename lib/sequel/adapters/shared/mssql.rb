@@ -109,6 +109,11 @@ module Sequel
         ds
       end
       
+      # Use SP_RENAME to rename the table
+      def rename_table_sql(name, new_name)
+        "SP_RENAME #{quote_schema_table(name)}, #{quote_schema_table(new_name)}"
+      end
+      
       # SQL to rollback to a savepoint
       def rollback_savepoint_sql(depth)
         SQL_ROLLBACK_TO_SAVEPOINT % depth
