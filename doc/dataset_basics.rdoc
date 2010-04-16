@@ -2,7 +2,7 @@
 
 == Introduction
 
-Datasets are probably the thing that separate Sequel from other database libraries.  While most database libraries have specific support for updating all records or only a single record, Sequel's ability to represent SQL queries themselves as objects is what gives Sequel most of it's power.  However, if you haven't been exposed to the dataset concept before, it can be a little disorienting.  This document aims to give a basic introduction to datasets and how to use them.
+Datasets are probably the thing that separate Sequel from other database libraries.  While most database libraries have specific support for updating all records or only a single record, Sequel's ability to represent SQL queries themselves as objects is what gives Sequel most of its power.  However, if you haven't been exposed to the dataset concept before, it can be a little disorienting.  This document aims to give a basic introduction to datasets and how to use them.
 
 == What a Dataset Represents
 
