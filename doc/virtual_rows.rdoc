@@ -1,29 +1,187 @@
 = Virtual Row Blocks
 
-Dataset methods filter, order, and select all take blocks that either yield
-instances of Sequel::SQL::VirtualRow (if the block takes an argument), or
-are evaluated in the context of an instance of Sequel::SQL::VirtualRow.  These are referred to as
+Dataset methods filter, order, and select all take blocks that are referred to as
 virtual row blocks.  Many other dataset methods pass the blocks
 they are given into one of those three methods, so there are actually
-many Sequel methods that take virtual row blocks.
+many Sequel::Dataset methods that take virtual row blocks.
 
-VirtualRow is a class that returns SQL::Indentifiers,
-SQL::QualifiedIdentifiers, SQL::Functions, or SQL::WindowFunctions depending on how it is
-called.  This is best shown by example:
+== Regular Proc vs InstanceEvaled Procs
+
+Virtual row blocks behave differently depending on whether the block accepts
+an argument.  If the block accepts an argument, it is called with an instance
+of Sequel::SQL::VirtualRow.  If it does not accept an argument, it is
+evaluated in the context of an instance of Sequel::SQL::VirtualRow.
 
   ds = DB[:items]
-  ds.filter{column > 1}        # column > 1
-  ds.filter{table__column > 1} # table.column > 1
-  ds.filter{function(1) > 1}   # function(1) > 1
-  ds.select{[column1, sum(column2).as(sum)]} # column1, sum(column2) AS sum
-  ds.select{version{}}   # version()
-  ds.select{count(:*){}} # count(*)
-  ds.select{count(:distinct, col1){}} # count(DISTINCT col1)
-  ds.select{rank(:over){}} # rank() OVER ()
-  ds.select{count(:over, :*=>true){}} # count(*) OVER ()
-  ds.select{sum(:over, :args=>col1, :partition=>col2, :order=>col3){}} # sum(col1) OVER (PARTITION BY col2 ORDER BY col3)
+  # Regular proc
+  ds.filter{|o| o.column > 1}
+  # WHERE column > 1
   
-Basically, the rules are:
+  # Instance-evaled proc
+  ds.filter{column > 1}
+  # WHERE column > 1
+  
+If you aren't familiar with the difference between regular blocks and instance
+evaled blocks, you should probably consult a general ruby reference, but briefly,
+with regular procs, methods called without an explicit receiver inside the
+proc call the method on the receiver in the surrounding scope, while instance
+evaled procs call the method on the receiver of the instance_eval call.  However,
+in both cases, local variables available in the surrounding scope will be available
+inside the proc.  If that doesn't make sense, maybe this example will help:
+
+  def self.a
+    42
+  end
+  b = 32
+  
+  # Regular proc
+  ds.filter{|o| o.c > a - b}
+  # WHERE c > 10
+  
+  # Instance-evaled proc
+  ds.filter{c > a - b}
+  # WHERE c > (a - 32)
+  
+There are two related differences here.  First is the usage of "o.c" vs "c",
+and second is the difference between the the use of "a".  In the regular proc,
+you couldn't call c without an explicit receiver in the proc, unless the self of the
+surrounding scope responded to it.  For a, note how ruby calls the method on
+the receiver of the surrounding scope in the regular proc, which returns an integer,
+and does the substraction before Sequel gets access to it.  In the instance evaled
+proc, calling a without a receiver calls the a method on the VirtualRow instance.
+For b, note that it operates the same in both cases, as it is a local variable.
+
+Basically, the choice for whether to use a regular proc or an instance evaled proc is
+completely up to you.  The same things can be accomplished with both.
+Instance evaled procs tend to produce shorter code, but by modifying the scope
+can be more difficult for a new user to understand.  That being said, I usually
+use instance evaled procs unless I need to call methods on the receiver of the
+surrounding scope inside the proc.
+
+== Local Variables vs Method Calls
+
+If you have a method that accepts 0 arguments and has the same name as a local
+variable, you can call it with () to differentiate the method call from the
+local variable access.  This is mostly useful in instance_evaled procs:
+
+  b = 32
+  ds.filter{b() > b}
+  # WHERE b > 32
+
+== VirtualRow Methods
+
+VirtualRow is a class that returns SQL::Identifiers, SQL::QualifiedIdentifiers,
+SQL::Functions, or SQL::WindowFunctions depending on how it is called.
+
+== SQL::Identifiers - Regular columns
+
+SQL::Identifiers can be thought of as regular column references in SQL,
+not qualified by any table. You get an SQL::Identifier if the method is called
+without a block or arguments, and doesn't have a double underscore in the method
+name:
+
+  ds.filter{|o| o.column > 1}
+  ds.filter{column > 1}
+  # WHERE column > 1
+  
+== SQL::QualifiedIdentifiers - Qualified columns
+
+SQL::QualifiedIdentifiers can be thought of as column references in SQL that
+are qualified to a specific table.  You get an SQL::QualifiedIdentifier if
+the method is called without a block or arguments, and has a double underscore
+in the method name:
+
+  ds.filter{|o| o.table__column > 1}
+  ds.filter{table__column > 1}
+  # WHERE table.column > 1
+
+Using the double underscore for SQL::QualifiedIdentifiers was done to make
+usage very similar to using symbols, which also translate the double underscore
+into a qualified column.
+
+== SQL::Functions - SQL function calls
+
+SQL::Functions can be thought of as function calls in SQL.  You get a simple
+function call if you call a method with arguments and without a block:
+
+  ds.filter{|o| o.function(1) > 1}
+  ds.filter{function(1) > 1}
+  # WHERE function(1) > 1
+  
+To call a SQL function with multiple arguments, just use those arguments in
+your function call:
+  
+  ds.filter{|o| o.function(1, o.a) > 1}
+  ds.filter{function(1, a) > 1}
+  # WHERE function(1, a) > 1
+
+If the SQL function does not accept any arguments, you need to provide an empty
+block to the method to distinguish it from a call that will produce an
+SQL::Identifier:
+
+  ds.select{|o| o.version{}}
+  ds.select{version{}}
+  # SELECT version()
+  
+To use the SQL wildcard (*) as the sole argument in a function call (most often
+used with the count function), you should provide :* as the sole argument to
+the method, and provide an empty block to the method:
+  
+  ds.select{|o| o.count(:*){}}
+  ds.select{count(:*){}}
+  # SELECT count(*)
+
+To append the DISTINCT keyword before the method arguments, you need to make
+:distinct the first argument of the method call, and provide an empty block to
+the method:
+
+  ds.select{|o| o.count(:distinct, o.col1){}}
+  ds.select{count(:distinct, col1){}}
+  # SELECT count(DISTINCT col1)
+  
+To use multiple columns with the DISTINCT keyword, use multiple arguments in
+the method call:
+
+  ds.select{|o| o.count(:distinct, o.col1, o.col2){}}
+  ds.select{count(:distinct, col1, col2){}}
+  # SELECT count(DISTINCT col1, col2)
+  
+== SQL::WindowFunctions - SQL window function calls
+
+SQL::WindowFunctions can be thought of as calls to SQL window functions.  Not
+all databases support them, but they are very helpful for certain types of
+queries.  To use them, you need to make :over the first argument of the method
+call, with an optional hash as the second argument: Here are some examples of use:
+
+  ds.select{|o| o.rank(:over){}}
+  ds.select{rank(:over){}}
+  # SELECT rank() OVER ()
+  
+  ds.select{|o| o.count(:over, :*=>true){}}
+  ds.select{count(:over, :*=>true){}}
+  # SELECT count(*) OVER ()
+  
+  ds.select{|o| o.sum(:over, :args=>o.col1, :partition=>o.col2, :order=>o.col3){}}
+  ds.select{sum(:over, :args=>col1, :partition=>col2, :order=>col3){}}
+  # SELECT sum(col1) OVER (PARTITION BY col2 ORDER BY col3)
+
+== Returning multiple values
+
+It's common when using select and order virtual row blocks to want to
+return multiple values.  If you want to do that, you just need to return a single
+array:
+
+  ds.select{|o| [o.column1, o.sum(o.column2).as(o.sum)]}
+  ds.select{[column1, sum(column2).as(sum)]}
+  # SELECT column1, sum(column2) AS sum
+  
+Note that if you forget the array brackets, you'll end up with a syntax error:
+
+  # Invalid ruby syntax
+  ds.select{|o| o.column1, o.sum(o.column2).as(o.sum)}
+  ds.select{column1, sum(column2).as(sum)}
+  
+== Alternative Description of the VirtualRow method call rules
 
 * If a block is given:
   * The block is currently not called.  This may change in a future version.
@@ -45,15 +203,3 @@ Basically, the rules are:
     SQL::QualifiedIdentifier with the table and column.
   * Otherwise, create an SQL::Identifier with the name of the
     method.
-  
-If you use a virtual row block that doesn't take an argument,
-the block is instance_evaled, so you can't reference methods
-in the enclosing scope.  If you need to call methods of the
-enclosing scope, you should assign the results to local variables
-before the block, or just make the block take an argument and use
-that.  If you want to create identifiers or qualified identifiers
-with the same name as existing local variables, make sure ruby
-knows it is a method call instead of a local variable reference
-by not ommiting the parentheses at the end of the method call.
-If you want to return multiple arguments (common for select and
-order), have the block return an array of arguments.
