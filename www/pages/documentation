@@ -42,6 +42,7 @@
 <h3>Presentations</h3>
 
 <ul>
+<li><a href="static/sacruby201004_presentation/index.html">Jeremy Evans's &quot;Ruby Techniques By Example&quot; Presentation at April 2010 Sacramento Ruby Group Meeting (Examples Mostly Taken From Sequel)</a></li>
 <li><a href="static/mwrc2010_presentation/mwrc2010.html">Jeremy Evans's &quot;Ruby Techniques By Example&quot; Presentation at MountainWest RubyConf 2010 (Examples Mostly Taken From Sequel)</a></li>
 <li><a href="static/lsrc2009_presentation/sequel-lsrc2009.html">Jeremy Evans's &quot;Sequel: SQL in Ruby&quot; Presentation at Lone Star Ruby Conference 2009</a></li>
 <li><a href="static/rk2009_presentation/sequel-rubykaigi2009.html">Jeremy Evans's &quot;Sequel: SQL in Ruby&quot; Presentation at RubyKaigi 2009</a> (<a href="http://www.ustream.tv/recorded/1825816">Video</a>)</li>
