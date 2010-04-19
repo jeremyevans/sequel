@@ -107,7 +107,8 @@ module Sequel
     #
     # filter also takes a block, which should return one of the above argument
     # types, and is treated the same way.  This block yields a virtual row object,
-    # which is easy to use to create identifiers and functions.
+    # which is easy to use to create identifiers and functions.  For more details
+    # on the virtual row support, see the {"Virtual Rows" guide}[link:files/doc/virtual_rows_rdoc.html]
     #
     # If both a block and regular argument
     # are provided, they get ANDed together.
@@ -133,7 +134,7 @@ module Sequel
     #   software.filter{|o| o.price < 100}.sql #=>
     #     "SELECT * FROM items WHERE ((category = 'software') AND (price < 100))"
     #
-    # See doc/dataset_filtering.rdoc for more examples and details.
+    # See the the {"Dataset Filtering" guide}[link:files/doc/dataset_filtering_rdoc.html] for more examples and details.
     def filter(*cond, &block)
       _filter(@opts[:having] ? :having : :where, *cond, &block)
     end

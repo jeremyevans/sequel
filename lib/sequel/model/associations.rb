@@ -410,17 +410,17 @@ module Sequel
       #   end
       # 
       # The project class now has the following instance methods:
-      # * portfolio - Returns the associated portfolio.
-      # * portfolio=(obj) - Sets the associated portfolio to the object,
-      #   but the change is not persisted until you save the record (for many_to_one associations).
-      # * portfolio_dataset - Returns a dataset that would return the associated
-      #   portfolio, only useful in fairly specific circumstances.
-      # * milestones - Returns an array of associated milestones
-      # * add_milestone(obj) - Associates the passed milestone with this object.
-      # * remove_milestone(obj) - Removes the association with the passed milestone.
-      # * remove_all_milestones - Removes associations with all associated milestones.
-      # * milestones_dataset - Returns a dataset that would return the associated
-      #   milestones, allowing for further filtering/limiting/etc.
+      # portfolio :: Returns the associated portfolio.
+      # portfolio=(obj) :: Sets the associated portfolio to the object,
+      #                    but the change is not persisted until you save the record (for many_to_one associations).
+      # portfolio_dataset :: Returns a dataset that would return the associated
+      #                      portfolio, only useful in fairly specific circumstances.
+      # milestones :: Returns an array of associated milestones
+      # add_milestone(obj) :: Associates the passed milestone with this object.
+      # remove_milestone(obj) :: Removes the association with the passed milestone.
+      # remove_all_milestones :: Removes associations with all associated milestones.
+      # milestones_dataset :: Returns a dataset that would return the associated
+      #                       milestones, allowing for further filtering/limiting/etc.
       #
       # If you want to override the behavior of the add_/remove_/remove_all_/ methods
       # or the association setter method, there are private instance methods created that are prepended
@@ -439,6 +439,8 @@ module Sequel
       #   => [:portfolio, :milestones]
       #   Project.association_reflection(:portfolio)
       #   => {:type => :many_to_one, :name => :portfolio, :class_name => "Portfolio"}
+      #
+      # For examples of advanced usage, see the {Advanced Associations page}[link:files/doc/advanced_associations_rdoc.html].
       module ClassMethods
         # All association reflections defined for this model (default: none).
         attr_reader :association_reflections

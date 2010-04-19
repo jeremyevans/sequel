@@ -3,7 +3,7 @@ module Sequel
     # ---------------------
     # :section: Methods related to prepared statements or bound variables
     # On some adapters, these use native prepared statements and bound variables, on others
-    # support is emulated.
+    # support is emulated.  For details, see the {"Prepared Statements/Bound Variables" guide}[link:files/doc/prepared_statements_rdoc.html].
     # ---------------------
     
     PREPARED_ARG_PLACEHOLDER = LiteralString.new('?').freeze

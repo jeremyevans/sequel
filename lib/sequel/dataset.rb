@@ -20,6 +20,8 @@ module Sequel
   #
   # Datasets are Enumerable objects, so they can be manipulated using any
   # of the Enumerable methods, such as map, inject, etc.
+  #
+  # For more information, see the {"Dataset Basics" guide}[link:files/doc/dataset_basics_rdoc.html].
   class Dataset
     extend Metaprogramming
     include Metaprogramming

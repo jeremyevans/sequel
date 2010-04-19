@@ -11,6 +11,9 @@ module Sequel
     # Schema::Generator has some methods but also includes method_missing,
     # allowing users to specify column type as a method instead of using
     # the column method, which makes for a nicer DSL.
+    #
+    # For more information on Sequel's support for schema modification, see
+    # the {"Schema Modification" guide}[link:files/doc/schema_rdoc.html].
     class Generator
       # Classes specifying generic types that Sequel will convert to database-specific types.
       GENERIC_TYPES=[String, Integer, Fixnum, Bignum, Float, Numeric, BigDecimal,
@@ -200,6 +203,9 @@ module Sequel
     # object and a block of operations to perform on the table, and
     # gives the Database a table an array of operations, which the database uses to
     # alter a table's description.
+    #
+    # For more information on Sequel's support for schema modification, see
+    # the {"Schema Modification" guide}[link:files/doc/schema_rdoc.html].
     class AlterTableGenerator
       # An array of DDL operations to perform
       attr_reader :operations
