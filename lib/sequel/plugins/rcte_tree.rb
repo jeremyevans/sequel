@@ -116,9 +116,17 @@ module Sequel
         a[:read_only] = true unless a.has_key?(:read_only)
         a[:eager_loader_key] = key
         a[:dataset] ||= proc do
-          model.from(t).
-           with_recursive(t, model.filter(prkey=>send(key)),
-            model.join(t, key=>prkey).
+          base_ds = model.filter(prkey=>send(key))
+          recursive_ds = model.join(t, key=>prkey)
+          if c = a[:conditions]
+            (base_ds, recursive_ds) = [base_ds, recursive_ds].collect do |ds|
+              (c.is_a?(Array) && !Sequel.condition_specifier?(c)) ? ds.filter(*c) : ds.filter(c)
+            end
+          end
+          table_alias = model.dataset.schema_and_table(model.table_name)[1].to_sym
+          model.from(t => table_alias).
+           with_recursive(t, base_ds,
+            recursive_ds.
             select(c_all))
         end
         aal = Array(a[:after_load])
@@ -154,12 +162,20 @@ module Sequel
             obj.associations[parent] = nil
           end
           r = model.association_reflection(ancestors)
+          base_case = model.filter(prkey=>id_map.keys).
+           select(SQL::AliasedExpression.new(prkey, ka), c_all)
+          recursive_case = model.join(t, key=>prkey).
+           select(SQL::QualifiedIdentifier.new(t, ka), c_all)
+          if c = r[:conditions]
+            (base_case, recursive_case) = [base_case, recursive_case].collect do |ds|
+              (c.is_a?(Array) && !Sequel.condition_specifier?(c)) ? ds.filter(*c) : ds.filter(c)
+            end
+          end
+          table_alias = model.dataset.schema_and_table(model.table_name)[1].to_sym
           model.eager_loading_dataset(r,
-           model.from(t).
-            with_recursive(t, model.filter(prkey=>id_map.keys).
-              select(SQL::AliasedExpression.new(prkey, ka), c_all),
-             model.join(t, key=>prkey).
-             select(SQL::QualifiedIdentifier.new(t, ka), c_all)),
+           model.from(t => table_alias).
+            with_recursive(t, base_case,
+             recursive_case),
            r.select,
            eo[:associations], eo).all do |obj|
             opk = obj[prkey]
@@ -195,9 +211,17 @@ module Sequel
         d[:read_only] = true unless d.has_key?(:read_only)
         la = d[:level_alias] ||= :x_level_x
         d[:dataset] ||= proc do
-          model.from(t).
-           with_recursive(t, model.filter(key=>send(prkey)),
-            model.join(t, prkey=>key).
+          base_ds = model.filter(key=>send(prkey))
+          recursive_ds = model.join(t, prkey=>key)
+          if c = d[:conditions]
+            (base_ds, recursive_ds) = [base_ds, recursive_ds].collect do |ds|
+              (c.is_a?(Array) && !Sequel.condition_specifier?(c)) ? ds.filter(*c) : ds.filter(c)
+            end
+          end
+          table_alias = model.dataset.schema_and_table(model.table_name)[1].to_sym
+          model.from(t => table_alias).
+           with_recursive(t, base_ds,
+            recursive_ds.
             select(SQL::ColumnAll.new(model.table_name)))
           end
         dal = Array(d[:after_load])
@@ -236,6 +260,11 @@ module Sequel
            select(SQL::AliasedExpression.new(key, ka), c_all)
           recursive_case = model.join(t, prkey=>key).
            select(SQL::QualifiedIdentifier.new(t, ka), c_all)
+          if c = r[:conditions]
+            (base_case, recursive_case) = [base_case, recursive_case].collect do |ds|
+              (c.is_a?(Array) && !Sequel.condition_specifier?(c)) ? ds.filter(*c) : ds.filter(c)
+            end
+          end
           if associations.is_a?(Integer)
             level = associations
             no_cache_level = level - 1
@@ -243,8 +272,9 @@ module Sequel
             base_case = base_case.select_more(SQL::AliasedExpression.new(0, la))
             recursive_case = recursive_case.select_more(SQL::AliasedExpression.new(SQL::QualifiedIdentifier.new(t, la) + 1, la)).filter(SQL::QualifiedIdentifier.new(t, la) < level - 1)
           end
+          table_alias = model.dataset.schema_and_table(model.table_name)[1].to_sym
           model.eager_loading_dataset(r,
-           model.from(t).with_recursive(t, base_case, recursive_case),
+           model.from(t => table_alias).with_recursive(t, base_case, recursive_case),
            r.select,
            associations, eo).all do |obj|
             if level
