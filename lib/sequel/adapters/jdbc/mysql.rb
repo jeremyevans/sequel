@@ -48,6 +48,10 @@ module Sequel
             end
           end
         end
+
+        def requires_return_generated_keys?
+          true
+        end
       end
       
       # Dataset class for MySQL datasets accessed via JDBC.

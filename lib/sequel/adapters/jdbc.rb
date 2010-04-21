@@ -186,7 +186,13 @@ module Sequel
               when :ddl
                 log_yield(sql){stmt.execute(sql)}
               when :insert
-                log_yield(sql){stmt.executeUpdate(sql)}
+                log_yield(sql) do
+                  if requires_return_generated_keys?
+                    stmt.executeUpdate(sql, JavaSQL::Statement.RETURN_GENERATED_KEYS)
+                  else
+                    stmt.executeUpdate(sql)
+                  end
+                end
                 last_insert_id(conn, opts.merge(:stmt=>stmt))
               else
                 log_yield(sql){stmt.executeUpdate(sql)}
@@ -434,6 +440,13 @@ module Sequel
       # Create a statement object to execute transaction statements.
       def transaction_statement_object(conn)
         conn.createStatement
+      end
+
+      # This method determines whether or not to add
+      # Statement.RETURN_GENERATED_KEYS as an argument when inserting rows.
+      # Sub-adapters that require this should override this method.
+      def requires_return_generated_keys?
+        false
       end
     end
     
