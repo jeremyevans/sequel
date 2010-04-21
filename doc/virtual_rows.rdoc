@@ -5,7 +5,47 @@ virtual row blocks.  Many other dataset methods pass the blocks
 they are given into one of those three methods, so there are actually
 many Sequel::Dataset methods that take virtual row blocks.
 
-== Regular Proc vs InstanceEvaled Procs
+== Why Virtual Rows
+
+Virtual Rows were created to work around the issue that some parts of
+Sequel's standard DSL could not be used on ruby 1.9.  For example, the
+following Sequel code works on ruby 1.8, but not ruby 1.9:
+
+  dataset.filter(:a > :b[:c])
+  # WHERE a > b(c)
+  
+This code does not work on ruby 1.9 for two reasons.  First, Symbol#>
+(like other inequality methods) is already defined in ruby 1.9, so Sequel
+does not override it to return an SQL inequality expression.  Second, Symbol#[]
+is already defined on ruby 1.9, so Sequel does not override it to return an
+SQL function expression.
+
+Prior to the introduction of virtual rows, the way to handle this was
+to use the methods that work on both ruby 1.8 and ruby 1.9:
+
+  dataset.filter(:a.identifier > :b.sql_function(:c))
+  # WHERE a > b(c)
+
+However, that code is a little verbose.  The virtual row DSL makes such code
+more concise:
+
+  dataset.filter{a > b(c)}
+
+Another use of virtual rows is when you turn off Sequel's core extensions off
+using the SEQUEL_NO_CORE_EXTENSIONS constant or environment variable.  With
+the core extensions turned off, much of the standard Sequel DSL is not
+available.  For example, you are no longer able to do:
+
+  dataset.filter(:a & (:b | ~:c))
+  # WHERE a AND (b OR NOT c)
+  
+Because Symbol#&, Symbol#| and Symbol#~ are not defined when the core
+extensions are turned off.  However, with virtual rows allow almost the same
+syntax even without the core extensions:
+
+  dataset.filter{a & (b | ~c)}
+
+== Regular Procs vs Instance Evaled Procs
 
 Virtual row blocks behave differently depending on whether the block accepts
 an argument.  If the block accepts an argument, it is called with an instance
