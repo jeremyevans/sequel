@@ -49,6 +49,8 @@ module Sequel
           end
         end
 
+        # MySQL 5.1.12 JDBC adapter requires this to be true,
+        # and previous versions don't mind.
         def requires_return_generated_keys?
           true
         end
