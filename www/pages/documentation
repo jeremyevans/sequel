@@ -8,6 +8,7 @@
   <li><a href="rdoc/files/doc/opening_databases_rdoc.html">Connecting to a Database</a></li>
   <li><a href="rdoc/files/doc/dataset_basics_rdoc.html">Dataset Basics</a></li>
   <li><a href="rdoc/files/doc/dataset_filtering_rdoc.html">Dataset Filtering</a></li>
+  <li><a href="rdoc/files/doc/association_basics_rdoc.html">Associations Basics</a></li>
   <li><a href="rdoc/files/doc/advanced_associations_rdoc.html">Advanced Associations</a></li>
   <li><a href="rdoc/files/doc/prepared_statements_rdoc.html">Prepared Statements/Bound Variables</a></li>
   <li><a href="rdoc/files/doc/sharding_rdoc.html">Master/Slave Databases and Sharding</a></li>

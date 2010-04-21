@@ -440,6 +440,8 @@ module Sequel
       #   Project.association_reflection(:portfolio)
       #   => {:type => :many_to_one, :name => :portfolio, :class_name => "Portfolio"}
       #
+      # For a more in depth general overview, as well as a reference guide,
+      # see the {Association Basics page}[link:files/doc/association_basics_rdoc.html].
       # For examples of advanced usage, see the {Advanced Associations page}[link:files/doc/advanced_associations_rdoc.html].
       module ClassMethods
         # All association reflections defined for this model (default: none).
@@ -566,7 +568,7 @@ module Sequel
         #   - :primary_key - column in the associated table that :key option references, as a symbol.
         #     Defaults to the primary key of the associated table. Can use an
         #     array of symbols for a composite key association.
-        # * :one_to_many:
+        # * :one_to_many and :one_to_one:
         #   - :key - foreign key in associated model's table that references
         #     current model's primary key, as a symbol.  Defaults to
         #     :"#{self.name.underscore}_id".  Can use an
