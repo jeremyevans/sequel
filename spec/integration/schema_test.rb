@@ -87,10 +87,10 @@ describe "Database schema parser" do
     INTEGRATION_DB.schema(:items).first.last[:type].should == :integer
     INTEGRATION_DB.create_table!(:items){Float :number}
     INTEGRATION_DB.schema(:items).first.last[:type].should == :float
-    INTEGRATION_DB.create_table!(:items){BigDecimal :number}
+    INTEGRATION_DB.create_table!(:items){BigDecimal :number, :size=>[11, 2]}
     INTEGRATION_DB.schema(:items).first.last[:type].should == :decimal
-    INTEGRATION_DB.create_table!(:items){Numeric :number}
-    INTEGRATION_DB.schema(:items).first.last[:type].should == :decimal
+    INTEGRATION_DB.create_table!(:items){Numeric :number, :size=>[12, 0]}
+    INTEGRATION_DB.schema(:items).first.last[:type].should == :integer
     INTEGRATION_DB.create_table!(:items){String :number}
     INTEGRATION_DB.schema(:items).first.last[:type].should == :string
     INTEGRATION_DB.create_table!(:items){Date :number}

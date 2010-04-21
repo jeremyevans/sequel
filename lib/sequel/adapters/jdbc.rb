@@ -41,6 +41,10 @@ module Sequel
     # resource name.
     JNDI_URI_REGEXP = /\Ajdbc:jndi:(.+)/
     
+    # The types to check for 0 scale to transform :decimal types
+    # to :integer.
+    DECIMAL_TYPE_RE = /number|numeric|decimal/io
+    
     # Contains procs keyed on sub adapter type that extend the
     # given database object so it supports the correct database type.
     DATABASE_SETUP = {:postgresql=>proc do |db|
@@ -426,7 +430,11 @@ module Sequel
           pks << h[:column_name]
         end
         metadata(:getColumns, nil, schema, table, nil) do |h|
-          ts << [m.call(h[:column_name]), {:type=>schema_column_type(h[:type_name]), :db_type=>h[:type_name], :default=>(h[:column_def] == '' ? nil : h[:column_def]), :allow_null=>(h[:nullable] != 0), :primary_key=>pks.include?(h[:column_name]), :column_size=>h[:column_size], :scale=>h[:decimal_digits]}]
+          s = {:type=>schema_column_type(h[:type_name]), :db_type=>h[:type_name], :default=>(h[:column_def] == '' ? nil : h[:column_def]), :allow_null=>(h[:nullable] != 0), :primary_key=>pks.include?(h[:column_name]), :column_size=>h[:column_size], :scale=>h[:decimal_digits]}
+          if s[:db_type] =~ DECIMAL_TYPE_RE && s[:scale] == 0
+            s[:type] = :integer
+          end
+          ts << [m.call(h[:column_name]), s]
         end
         ts
       end

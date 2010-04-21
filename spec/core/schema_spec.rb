@@ -812,8 +812,12 @@ context "Schema Parser" do
     @db.schema(:float).first.last[:type].should == :float
     @db.schema(:double).first.last[:type].should == :float
     @db.schema(:"double precision").first.last[:type].should == :float
+    @db.schema(:number).first.last[:type].should == :decimal
     @db.schema(:numeric).first.last[:type].should == :decimal
     @db.schema(:decimal).first.last[:type].should == :decimal
+    @db.schema(:"number(10,0)").first.last[:type].should == :integer
+    @db.schema(:"numeric(10, 10)").first.last[:type].should == :decimal
+    @db.schema(:"decimal(10,1)").first.last[:type].should == :decimal
     @db.schema(:money).first.last[:type].should == :decimal
     @db.schema(:bytea).first.last[:type].should == :blob
     @db.schema(:blob).first.last[:type].should == :blob

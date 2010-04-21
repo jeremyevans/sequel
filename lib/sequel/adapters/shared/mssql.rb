@@ -12,6 +12,10 @@ module Sequel
       SQL_SAVEPOINT = 'SAVE TRANSACTION autopoint_%d'.freeze
       TEMPORARY = "#".freeze
       
+      # The types to check for 0 scale to transform :decimal types
+      # to :integer.
+      DECIMAL_TYPE_RE = /number|numeric|decimal/io
+      
       # Microsoft SQL Server uses the :mssql type.
       def database_type
         :mssql
@@ -140,7 +144,11 @@ module Sequel
         ds.map do |row|
           row[:allow_null] = row[:allow_null] == 'YES' ? true : false
           row[:default] = nil if blank_object?(row[:default])
-          row[:type] = schema_column_type(row[:db_type])
+          row[:type] = if row[:db_type] =~ DECIMAL_TYPE_RE && row[:scale] == 0
+            :integer
+          else
+            schema_column_type(row[:db_type])
+          end
           [m.call(row.delete(:column)), row]
         end
       end

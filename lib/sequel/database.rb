@@ -953,11 +953,11 @@ module Sequel
         :boolean
       when /\A(real|float|double( precision)?)\z/io
         :float
-      when /\A(((numeric|decimal)(\(\d+,\d+\))?)|(small)?money)\z/io
-        :decimal
+      when /\A(?:(?:(?:num(?:ber|eric)?|decimal)(?:\(\d+,\s*(\d+)\))?)|(?:small)?money)\z/io
+        $1 && $1 == '0' ? :integer : :decimal
       when /bytea|blob|image|(var)?binary/io
         :blob
-      when /\Aenum/
+      when /\Aenum/io
         :enum
       end
     end
