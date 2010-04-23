@@ -107,14 +107,17 @@ if MYSQL_DB.class.adapter_scheme == :mysql
       @db.schema(:booltest, :reload=>true).should == [[:b, {:type=>:integer, :allow_null=>true, :primary_key=>false, :default=>nil, :ruby_default=>nil, :db_type=>"tinyint(1)"}, ], [:i, {:type=>:integer, :allow_null=>true, :primary_key=>false, :default=>nil, :ruby_default=>nil, :db_type=>"tinyint(4)"}, ]]
     end
     
-    specify "should return tinyints as bools when set" do
+    specify "should return tinyint(1)s as bools and tinyint(4)s as integers when set" do
+      Sequel::MySQL.convert_tinyint_to_bool = true
       @ds.delete
       @ds << {:b=>true, :i=>10}
-      @ds.all.should == [{:b=>true, :i=>true}]
+      @ds.all.should == [{:b=>true, :i=>10}]
       @ds.delete
       @ds << {:b=>false, :i=>0}
-      @ds.all.should == [{:b=>false, :i=>false}]
-      
+      @ds.all.should == [{:b=>false, :i=>0}]
+    end
+
+    specify "should return all tinyints as integers when unset" do
       Sequel::MySQL.convert_tinyint_to_bool = false
       @ds.delete
       @ds << {:b=>true, :i=>10}

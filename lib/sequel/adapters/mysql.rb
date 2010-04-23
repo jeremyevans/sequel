@@ -323,7 +323,13 @@ module Sequel
       def fetch_rows(sql, &block)
         execute(sql) do |r|
           i = -1
-          cols = r.fetch_fields.map{|f| [output_identifier(f.name), MYSQL_TYPES[f.type], i+=1]}
+          cols = r.fetch_fields.map do |f| 
+            # Pretend tinyint is another integer type if its length is not 1, to
+            # avoid casting to boolean if Sequel::MySQL.convert_tinyint_to_bool
+            # is set.
+            type_proc = f.type == 1 && f.length != 1 ? MYSQL_TYPES[2] : MYSQL_TYPES[f.type]
+            [output_identifier(f.name), type_proc, i+=1]
+          end
           @columns = cols.map{|c| c.first}
           if opts[:split_multiple_result_sets]
             s = []
