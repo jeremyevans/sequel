@@ -106,6 +106,9 @@ module Sequel
       # The type of database we are connecting to
       attr_reader :database_type
       
+      # The Java database driver we are using
+      attr_reader :driver
+      
       # Whether to convert some Java types to ruby types when retrieving rows.
       # True by default, can be set to false to roughly double performance when
       # fetching rows.
@@ -123,7 +126,7 @@ module Sequel
         resolved_uri = jndi? ? get_uri_from_jndi : uri
 
         if match = /\Ajdbc:([^:]+)/.match(resolved_uri) and prok = DATABASE_SETUP[match[1].to_sym]
-          prok.call(self)
+          @driver = prok.call(self)
         end        
       end
       
@@ -166,8 +169,19 @@ module Sequel
         else
           args = [uri(opts)]
           args.concat([opts[:user], opts[:password]]) if opts[:user] && opts[:password]
-          JavaSQL::DriverManager.getConnection(*args)
-        end       
+          begin
+            JavaSQL::DriverManager.getConnection(*args)
+          rescue
+            # If the DriverManager can't get the connection - use the connect
+            # method of the driver. (This happens under Tomcat for instance)
+            props = java.util.Properties.new
+            if opts && opts[:user] && opts[:password]
+              props.setProperty("user", opts[:user])
+              props.setProperty("password", opts[:pass])
+            end
+            driver.new.connect(args[0], props)
+          end
+        end
         setup_connection(conn)
       end
       
