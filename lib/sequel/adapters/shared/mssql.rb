@@ -198,7 +198,7 @@ module Sequel
       COMMA_SEPARATOR = ', '.freeze
       DELETE_CLAUSE_METHODS = Dataset.clause_methods(:delete, %w'with from output from2 where')
       INSERT_CLAUSE_METHODS = Dataset.clause_methods(:insert, %w'with into columns output values')
-      SELECT_CLAUSE_METHODS = Dataset.clause_methods(:select, %w'with limit distinct columns into from lock join where group having order compounds')
+      SELECT_CLAUSE_METHODS = Dataset.clause_methods(:select, %w'with distinct limit columns into from lock join where group having order compounds')
       UPDATE_CLAUSE_METHODS = Dataset.clause_methods(:update, %w'with table set output from where')
       NOLOCK = ' WITH (NOLOCK)'.freeze
       UPDLOCK = ' WITH (UPDLOCK)'.freeze

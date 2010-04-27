@@ -59,6 +59,10 @@ describe "Simple Dataset operations" do
     @ds.first.should == {:id=>1, :number=>10}
   end
   
+  specify "should have distinct work with limit" do
+    @ds.limit(1).distinct.all.should == [{:id=>1, :number=>10}]
+  end
+  
   specify "should fetch correctly with a limit" do
     @ds.order(:id).limit(2).all.should == [{:id=>1, :number=>10}]
     @ds.insert(:number=>20)
