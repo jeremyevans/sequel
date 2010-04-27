@@ -94,7 +94,7 @@ other:: clone, distinct, naked, server, with_sql
 Most other dataset methods commonly used will execute the dataset's SQL on the database:
 
 SELECT (All Records):: all, each, map, to_hash, select_map, select_order_map, select_hash, to_csv
-SELECT (First Record):: first, last, get, [], empty?
+SELECT (First Record):: first, last, get, []
 SELECT (Aggregates):: count, avg, max, min, sum, range, interval
 INSERT:: insert, <<, import, multi_insert, insert_multiple
 UPDATE:: update, set, []=
