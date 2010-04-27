@@ -191,10 +191,10 @@ module Sequel
     # Execute the create index statements using the generator.
     def create_table_indexes_from_generator(name, generator, options)
       e = options[:ignore_index_errors]
-      index_sql_list(name, generator.indexes).each do |sql|
+      generator.indexes.each do |index|
         begin
-          execute_ddl(sql)
-        rescue DatabaseError
+          index_sql_list(name, [index]).each{|sql| execute_ddl(sql)}
+        rescue Error
           raise unless e
         end
       end

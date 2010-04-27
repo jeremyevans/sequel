@@ -299,6 +299,15 @@ context "DB#create_table" do
     @db.sqls.should == ["CREATE TABLE cats (name text, UNIQUE (name))"]
   end
 
+  specify "should not raise on index error for unsupported index definitions if ignore_index_errors is used" do
+    proc {
+      @db.create_table(:cats, :ignore_index_errors=>true) do
+        text :name
+        full_text_index :name
+      end
+    }.should_not raise_error
+  end
+
   specify "should raise on full-text index definitions" do
     proc {
       @db.create_table(:cats) do
