@@ -160,10 +160,11 @@ module Sequel
          
       # Connect to the database using JavaSQL::DriverManager.getConnection.
       def connect(server)
+        opts = server_opts(server)
         conn = if jndi?
           get_connection_from_jndi
         else
-          args = [uri(server_opts(server))]
+          args = [uri(opts)]
           args.concat([opts[:user], opts[:password]]) if opts[:user] && opts[:password]
           JavaSQL::DriverManager.getConnection(*args)
         end       
