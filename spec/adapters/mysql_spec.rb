@@ -115,6 +115,9 @@ if MYSQL_DB.class.adapter_scheme == :mysql
       @ds.delete
       @ds << {:b=>false, :i=>0}
       @ds.all.should == [{:b=>false, :i=>0}]
+      @ds.delete
+      @ds << {:b=>true, :i=>1}
+      @ds.all.should == [{:b=>true, :i=>1}]
     end
 
     specify "should return all tinyints as integers when unset" do
