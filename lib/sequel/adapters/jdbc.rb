@@ -177,7 +177,7 @@ module Sequel
             props = java.util.Properties.new
             if opts && opts[:user] && opts[:password]
               props.setProperty("user", opts[:user])
-              props.setProperty("password", opts[:pass])
+              props.setProperty("password", opts[:password])
             end
             driver.new.connect(args[0], props)
           end
