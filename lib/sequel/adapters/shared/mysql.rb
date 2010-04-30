@@ -293,23 +293,19 @@ module Sequel
         end
       end
       
-      # Sets up multi_insert or import to use INSERT IGNORE.
+      # Sets up the insert methods to use INSERT IGNORE.
       # Useful if you have a unique key and want to just skip
       # inserting rows that violate the unique key restriction.
       #
-      # Example:
-      #
-      # dataset.insert_ignore.multi_insert(
-      #  [{:name => 'a', :value => 1}, {:name => 'b', :value => 2}]
-      # )
-      #
-      # INSERT IGNORE INTO tablename (name, value) VALUES (a, 1), (b, 2)
-      #
+      #   dataset.insert_ignore.multi_insert(
+      #    [{:name => 'a', :value => 1}, {:name => 'b', :value => 2}]
+      #   )
+      #   # INSERT IGNORE INTO tablename (name, value) VALUES (a, 1), (b, 2)
       def insert_ignore
         clone(:insert_ignore=>true)
       end
       
-      # Sets up multi_insert or import to use ON DUPLICATE KEY UPDATE
+      # Sets up the insert methods to use ON DUPLICATE KEY UPDATE
       # If you pass no arguments, ALL fields will be
       # updated with the new values.  If you pass the fields you
       # want then ONLY those field will be updated.
@@ -317,22 +313,17 @@ module Sequel
       # Useful if you have a unique key and want to update
       # inserting rows that violate the unique key restriction.
       #
-      # Examples:
+      #   dataset.on_duplicate_key_update.multi_insert(
+      #    [{:name => 'a', :value => 1}, {:name => 'b', :value => 2}]
+      #   )
+      #   # INSERT INTO tablename (name, value) VALUES (a, 1), (b, 2)
+      #   # ON DUPLICATE KEY UPDATE name=VALUES(name), value=VALUES(value)
       #
-      # dataset.on_duplicate_key_update.multi_insert(
-      #  [{:name => 'a', :value => 1}, {:name => 'b', :value => 2}]
-      # )
-      #
-      # INSERT INTO tablename (name, value) VALUES (a, 1), (b, 2)
-      # ON DUPLICATE KEY UPDATE name=VALUES(name), value=VALUES(value)
-      #
-      # dataset.on_duplicate_key_update(:value).multi_insert(
-      #  [{:name => 'a', :value => 1}, {:name => 'b', :value => 2}]
-      # )
-      #
-      # INSERT INTO tablename (name, value) VALUES (a, 1), (b, 2)
-      # ON DUPLICATE KEY UPDATE value=VALUES(value)
-      #
+      #   dataset.on_duplicate_key_update(:value).multi_insert(
+      #     [{:name => 'a', :value => 1}, {:name => 'b', :value => 2}]
+      #   )
+      #   # INSERT INTO tablename (name, value) VALUES (a, 1), (b, 2)
+      #   # ON DUPLICATE KEY UPDATE value=VALUES(value)
       def on_duplicate_key_update(*args)
         clone(:on_duplicate_key_update => args)
       end
