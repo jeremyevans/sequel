@@ -240,8 +240,8 @@ shared_examples_for "A threaded connection pool" do
     threads = []
     stop = nil
     
-    5.times {|i| threads << Thread.new {@pool.hold {|c| cc[i] = c; while !stop;sleep 0.01;end}}; sleep 0.01}
-    sleep 0.02
+    5.times {|i| threads << Thread.new {@pool.hold {|c| cc[i] = c; while !stop;sleep 0.02;end}}; sleep 0.02}
+    sleep 0.04
     threads.each {|t| t.should be_alive}
     cc.size.should == 5
     @invoked_count.should == 5
@@ -253,16 +253,16 @@ shared_examples_for "A threaded connection pool" do
     @pool.allocated.should == h
     
     threads[0].raise "your'e dead"
-    sleep 0.01
+    sleep 0.02
     threads[3].raise "your'e dead too"
     
-    sleep 0.01
+    sleep 0.02
     
     @pool.available_connections.should == [1, 4]
     @pool.allocated.should == {threads[1]=>2, threads[2]=>3, threads[4]=>5}
     
     stop = true
-    sleep 0.02
+    sleep 0.04
     
     @pool.available_connections.size.should == 5
     @pool.allocated.should be_empty
