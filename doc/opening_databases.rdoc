@@ -94,14 +94,24 @@ on WIN32OLE library, so it isn't usable on other operating systems (except
 possibly through WINE, but that's fairly unlikely).
 
 The following options are supported:
-* :driver - The driver to use.  The default if not specified is 'SQL Server'.
-* :command_timeout - Sets the time in seconds to wait while attempting
-  to execute a command before cancelling the attempt and generating
-  an error. Specifically, it sets the ADO CommandTimeout property.
-  If this property is not set, the default of 30 seconds is used.
-* :conn_string - The full ADO connection string.  If this is provided,
-  the general connection options are ignored.
-* :provider - Sets the Provider of this ADO connection (for example, "SQLOLEDB")
+
+:command_timeout :: Sets the time in seconds to wait while attempting
+                    to execute a command before cancelling the attempt and generating
+                    an error. Specifically, it sets the ADO CommandTimeout property.
+                    If this property is not set, the default of 30 seconds is used.
+:driver :: The driver to use in the ADO connection string.  If not provided, a default
+           of "SQL Server" is used.
+:conn_string :: The full ADO connection string.  If this is provided,
+                the usual options are ignored.
+:provider :: Sets the Provider of this ADO connection (for example, "SQLOLEDB").
+             If you don't specify a provider, the default one used by WIN32OLE
+             has major problems, such as creating a new native database connection
+             for every query, which breaks things such as transactions and temporary tables.
+
+Pay special attention to the :provider option, as without specifying a provider,
+many things will be broken.  The SQLNCLI10 provider appears to work well if you
+are connecting to Microsoft SQL Server, but it is not the default as that would
+break backwards compatability.
 
 === amalgalite 
 

@@ -1,5 +1,7 @@
 === HEAD
 
+* Support transactions in the ADO adapter if not using the default :provider (jeremyevans)
+
 * Make Database#disconnect not raise an exception when using the unsharded single connection pool (jeremyevans)
 
 * Attempt to handle JDBC connection problems in cases where driver auto loading doesn't work (e.g. Tomcat) (elskwid)

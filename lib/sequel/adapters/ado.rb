@@ -16,16 +16,26 @@ module Sequel
         end
       end
 
-      # Connect to the database. In addition to the usual database options,
+      # In addition to the usual database options,
       # the following options have an effect:
       #
-      # * :command_timeout - Sets the time in seconds to wait while attempting
-      #   to execute a command before cancelling the attempt and generating
-      #   an error. Specifically, it sets the ADO CommandTimeout property.
-      #   If this property is not set, the default of 30 seconds is used.
-      # * :conn_string - The full ADO connection string.  If this is provided,
-      #   the usual options are ignored.
-      # * :provider - Sets the Provider of this ADO connection (for example, "SQLOLEDB")
+      # :command_timeout :: Sets the time in seconds to wait while attempting
+      #                     to execute a command before cancelling the attempt and generating
+      #                     an error. Specifically, it sets the ADO CommandTimeout property.
+      #                     If this property is not set, the default of 30 seconds is used.
+      # :driver :: The driver to use in the ADO connection string.  If not provided, a default
+      #            of "SQL Server" is used.
+      # :conn_string :: The full ADO connection string.  If this is provided,
+      #                 the usual options are ignored.
+      # :provider :: Sets the Provider of this ADO connection (for example, "SQLOLEDB").
+      #              If you don't specify a provider, the default one used by WIN32OLE
+      #              has major problems, such as creating a new native database connection
+      #              for every query, which breaks things such as temporary tables.
+      #
+      # Pay special attention to the :provider option, as without specifying a provider,
+      # many things will be broken.  The SQLNCLI10 provider appears to work well if you
+      # are connecting to Microsoft SQL Server, but it is not the default as that would
+      # break backwards compatability.
       def connect(server)
         opts = server_opts(server)
         s = opts[:conn_string] || "driver=#{opts[:driver]};server=#{opts[:host]};database=#{opts[:database]}#{";uid=#{opts[:user]};pwd=#{opts[:password]}" if opts[:user]}"
@@ -55,9 +65,11 @@ module Sequel
 
       private
       
-      # The ADO adapter doesn't support transactions, since it appears not to
-      # use a single native connection for each connection in the pool
+      # The ADO adapter's default provider doesn't support transactions, since it 
+      # creates a new native connection for each query.  So Sequel only attempts
+      # to use transactions if an explicit :provider is given.
       def _transaction(conn)
+        return super if opts[:provider]
         th = Thread.current
         begin
           @transactions << th

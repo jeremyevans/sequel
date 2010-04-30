@@ -1,0 +1,210 @@
+= Querying in Sequel
+
+This guide is based on http://guides.rubyonrails.org/active_record_querying.html
+
+== Purpose of this Guide
+
+Sequel is a simple to use, very flexible, and powerful database library
+that supports a wide variety of different querying methods.  This guide
+aims to be a gentle introduction to Sequel's querying support.
+
+While you can easily use raw SQL with Sequel, a large part of the
+advantage you get from using Sequel is Sequel's ability to abstract
+SQL from you and give you a much nicer interface.
+
+== Setup
+
+Some examples in this guide assume you will be using Sequel::Model
+for modeling, but most should work with plain datasets.  The examples
+specific to Sequel::Model will have [Sequel::Model] in the heading.
+
+Many of the examples in this guide will refer to the following model
+classes:
+
+  # All classes use :id as the primary key column
+  
+  class Artist < Sequel::Model
+    one_to_many :albums
+    one_to_one :address
+  end
+  
+  class Album < Sequel::Model
+    many_to_one :artist
+    one_to_many :tracks
+    many_to_many :tags
+  end
+  
+  class Address < Sequel::Model
+    many_to_one :artist
+  end
+  
+  class Tag < Sequel::Model
+    many_to_many :albums
+  end
+  
+  class Track < Sequel::Model
+    many_to_one :album
+  end
+
+If you want to play with the code examples, here's some Sequel code
+that will set up the database structure for you:
+
+  DB.create_table(:artists) do
+    primary_key :id
+    String :name
+  end
+  
+  DB.create_table(:albums) do
+    primary_key :id
+    foreign_key :artist_id, :artists
+    String :name
+  end
+  
+  DB.create_table(:addresses) do
+    primary_key :id
+    foreign_key :artist_id, :artists, :unique=>true
+    String :street
+    String :city
+    String :state
+    String :zip
+  end
+  
+  DB.create_table(:tags) do
+    primary_key :id
+    String :tag
+  end
+  
+  DB.create_table(:albums_tags) do
+    foreign_key :album_id, :albums
+    foreign_key :tag_id, :tags
+  end
+  
+  DB.create_table(:tracks) do
+    primary_key :id
+    foreign_key :album_id, :albums
+    Integer :number
+    String :name
+  end
+  
+== Retrieving Objects
+
+Sequel provides a few separate methods for retrieving objects from the
+database.  The underlying method is Sequel::Dataset#each, which yields each
+row as the Sequel::Database provides it.  However, while Dataset#each can and
+often is used directly, in many cases there is a more convenient retrieval
+method you can use.
+
+=== Sequel::Dataset
+
+If you are new to Sequel and aren't familiar with Sequel, you should probably
+read the {"Dataset Basics" guide}[link:files/doc/dataset_basics_rdoc.html],
+then come back here.
+
+=== Retrieving a Single Object
+
+Sequel offers quite a few ways to to retrieve a single object.
+
+==== Using a Primary Key [Sequel::Model]
+
+The <tt>Sequel::Model.[]</tt> is the easiest method to use to find a model instance
+by its primary key value:
+
+  # Find artist with primary key (id) 1
+  artist = Artist[1]
+  # SQL: SELECT * FROM artists WHERE id = 1
+  => #<Artist @values={:name=>"YJM", :id=>1}>
+
+If there is no record with the given primary key, nil will be returned.
+
+==== Using +first+
+
+If you just want the first record in the dataset,
+<tt>Sequel::Dataset#first</tt> is probably the most obvious method to use:
+
+  artist = Artist.first
+  # SQL: SELECT * FROM artists LIMIT 1
+  => #<Artist @values={:name=>"YJM", :id=>1}>
+
+Any options you pass to +first+ will be used as a filter:
+
+  artist = Artist.first(:name => 'YJM')
+  # SQL: SELECT * FROM artists WHERE (name = 'YJM') LIMIT 1
+  => #<Artist @values={:name=>"YJM", :id=>1}>
+  
+  artist = Artist.first(:name.like('Y%'))
+  # SQL: SELECT * FROM artists WHERE (name LIKE 'Y%') LIMIT 1
+  => #<Artist @values={:name=>"YJM", :id=>1}>
+  
+<tt>Sequel::Dataset#[]</tt> is basically an alias for +first+, except it
+requires an argument:
+
+  DB[:artists][:name => 'YJM']
+  # SQL: SELECT * FROM artists WHERE (name = 'YJM') LIMIT 1
+  => {:name=>"YJM", :id=>1}
+
+Note that while Model.[] allows you to pass a primary key directly,
+Dataset#[] does not.
+
+==== Using +last+
+
+If you want the last record in the dataset,
+<tt>Sequel::Dataset#last</tt> is an obvious method to use.  Note first
+that last requires that the dataset be ordered.  Without an order, any
+object can be considered the first as well as the last.
+
+  artist = Artist.order(:name).last
+  # SQL: SELECT * FROM artists ORDER BY name DESC LIMIT 1
+  => #<Artist @values={:name=>"YJM", :id=>1}>
+
+Note that all +last+ does is reverse the order of the dataset and then
+call +first+.  This is why +last+ raises a Sequel::Error if there is no
+order on the dataset, because otherwise it would provide the same record
+as +first+, and most users would fine that confusing.
+
+Note that +last+ is not necessarily going to give you the last record
+in the dataset unless you give the dataset an unambiguous order.
+
+==== Retrieving a Single Column Value
+
+Sometimes, intead of wanting an entire row, you only want the value of
+a specific column.  For this <tt>Sequel::Dataset#get</tt> is the method
+you want:
+
+  artist_name = Artist.get(:name)
+  # SQL: SELECT name FROM artists LIMIT 1
+  => "YJM"
+
+=== Retrieving Multiple Objects
+
+==== As a Array of Hashes or Model Objects
+
+In many cases, you want an array of all of the rows associated with the
+dataset, in which case <tt>Sequel::Dataset#all</tt> is the method you
+want to use:
+
+  artists = Artist.all
+  # SQL: SELECT * FROM artists
+  => [#<Artist @values={:name=>"YJM", :id=>1}>,
+      #<Artist @values={:name=>"AS", :id=>2}>]
+
+==== Using an Enumerable Interface
+
+<tt>Sequel::Dataset</tt> uses an Enumerable Interface, so it provides a
+method named each that yields hashes or model objects as they are retrieved
+from the database:
+
+  Artist.each{|x| p x.name}
+  # SQL: SELECT * FROM artists
+  "YJM"
+  "AS"
+
+This means that all of the methods in the Enumerable module are available,
+such as +map+:
+
+  artist_names = Artist.map{|x| x.name}
+  # SQL: SELECT * FROM artists
+  => ["YJM", "AS"]
+
+==== As an Array of Column Values
+
+At 1.2.2 in Rails Guide
