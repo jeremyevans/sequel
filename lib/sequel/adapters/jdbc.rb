@@ -3,24 +3,6 @@ Sequel.require 'adapters/utils/stored_procedures'
 
 module Sequel
   # Houses Sequel's JDBC support when running on JRuby.
-  # Support for individual database types is done using sub adapters.
-  # PostgreSQL, MySQL, SQLite, Oracle, and MSSQL all have relatively good support,
-  # close the the level supported by the native adapter.
-  # PostgreSQL, MySQL, SQLite can load necessary support using
-  # the jdbc-* gem, if it is installed, though they will work if you
-  # have the correct .jar in your CLASSPATH.  Oracle and MSSQL should
-  # load the necessary support if you have the .jar in your CLASSPATH.
-  # For all other databases, the Java class should be loaded manually
-  # before calling Sequel.connect.
-  #
-  # Note that when using a JDBC adapter, the best way to use Sequel
-  # is via Sequel.connect, NOT Sequel.jdbc.  Use the JDBC connection
-  # string when connecting, which will be in a different format than
-  # the native connection string.  The connection string should start
-  # with 'jdbc:'.  For PostgreSQL, use 'jdbc:postgresql:', and for
-  # SQLite you do not need 2 preceding slashes for the database name
-  # (use no preceding slashes for a relative path, and one preceding
-  # slash for an absolute path).
   module JDBC
     # Make it accesing the java.lang hierarchy more ruby friendly.
     module JavaLang
@@ -74,6 +56,12 @@ module Sequel
         Sequel.ts_require 'adapters/jdbc/mssql'
         db.extend(Sequel::JDBC::MSSQL::DatabaseMethods)
         com.microsoft.sqlserver.jdbc.SQLServerDriver
+      end,
+      :jtds=>proc do |db|
+        Sequel.ts_require 'adapters/jdbc/mssql'
+        db.extend(Sequel::JDBC::MSSQL::DatabaseMethods)
+        JDBC.load_gem('jtds')
+        Java::net.sourceforge.jtds.jdbc.Driver
       end,
       :h2=>proc do |db|
         Sequel.ts_require 'adapters/jdbc/h2'
@@ -572,7 +560,7 @@ module Sequel
         when Java::byte[]
           Sequel::SQL::Blob.new(String.from_java_bytes(v))
         when Java::JavaSQL::Blob
-          convert_type(v.getBytes(0, v.length))
+          convert_type(v.getBytes(1, v.length))
         else
           v
         end

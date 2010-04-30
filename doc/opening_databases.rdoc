@@ -200,9 +200,9 @@ Requires: java
 Houses Sequel's JDBC support when running on JRuby.
 Support for individual database types is done using sub adapters.
 There are currently subadapters for PostgreSQL, MySQL, SQLite, H2,
-Oracle, MSSQL, and AS400.  All except Oracle, MSSQL, and AS400 can load the
-JDBC gem, for those you need to have the .jar in your CLASSPATH
-or load the Java class manually.
+Oracle, MSSQL, JTDS, and AS400.  All except Oracle, MSSQL, and AS400 can load the
+jdbc-* gem, for those you need to have the .jar in your CLASSPATH
+or load the Java class manually before calling Sequel.connect.
 
 You just use the JDBC connection string directly, which can be specified
 via the string given to Sequel.connect or via the :uri, :url, or :database options.
@@ -210,12 +210,23 @@ Sequel does no preprocessing of the string, it passes it directly to JDBC.
 So if you have problems getting a connection string to work, look up the JDBC
 documentation.
 
-Example connections strings:
+Note that when using a JDBC adapter, the best way to use Sequel
+is via Sequel.connect, NOT Sequel.jdbc.  Use the JDBC connection
+string when connecting, which will be in a different format than
+the native connection string.  The connection string should start
+with 'jdbc:'.  For PostgreSQL, use 'jdbc:postgresql:', and for
+SQLite you do not need 2 preceding slashes for the database name
+(use no preceding slashes for a relative path, and one preceding
+slash for an absolute path).
+
+Example connection strings:
 
   jdbc:sqlite::memory:
   jdbc:postgresql://localhost/database?user=username
   jdbc:mysql://localhost/test?user=root&password=root
   jdbc:h2:mem:
+  jdbc:sqlserver://localhost;database=sequel_test;integratedSecurity=true
+  jdbc:jtds:sqlserver://localhost/sequel_test;user=sequel_test;password=sequel_test
   
 You can also use JNDI connection strings:
 
