@@ -734,6 +734,12 @@ context "A single threaded pool with multiple servers" do
 end
 
 shared_examples_for "All connection pools classes" do
+  specify "should not raise an error when disconnecting twice" do
+    c = @class.new({}){123}
+    proc{c.disconnect}.should_not raise_error
+    proc{c.disconnect}.should_not raise_error
+  end
+  
   specify "should yield a connection created by the initialize block to hold" do
     x = nil
     @class.new({}){123}.hold{|c| x = c}

@@ -1,5 +1,9 @@
 === HEAD
 
+* Make Database#disconnect not raise an exception when using the unsharded single connection pool (jeremyevans)
+
+* Attempt to handle JDBC connection problems in cases where driver auto loading doesn't work (e.g. Tomcat) (elskwid)
+
 * Make native MySQL adapter's tinyint to boolean conversion only convert tinyint(1) columns and not larger tinyint columns (roland.swingler) (#294)
 
 * Fix use of limit with distinct on Microsoft SQL Server (jeremyevans) (#297)
