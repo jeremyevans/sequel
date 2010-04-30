@@ -1,5 +1,7 @@
 === HEAD
 
+* Support returning the number of rows updated/deleted on MSSQL when using the ADO adapter with an explicit :provider (jeremyevans)
+
 * Support transactions in the ADO adapter if not using the default :provider (jeremyevans)
 
 * Make Database#disconnect not raise an exception when using the unsharded single connection pool (jeremyevans)
