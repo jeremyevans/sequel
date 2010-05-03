@@ -760,7 +760,7 @@ module Sequel
 
       # Use a generic blob quoting method, hopefully overridden in one of the subadapter methods
       def literal_blob(v)
-        "'#{v.gsub(/[\000-\037\047\134\177-\377]/){|b| "\\#{("%o" % b[0..1].unpack("C")[0]).rjust(3, '0')}"}}'"
+        "'#{v.gsub(/[\000-\037\047\134\177-\377]/n){|b| "\\#{("%o" % b[0..1].unpack("C")[0]).rjust(3, '0')}"}}'"
       end
 
       # PostgreSQL uses FALSE for false values

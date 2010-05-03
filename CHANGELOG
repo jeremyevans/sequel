@@ -1,5 +1,7 @@
 === HEAD
 
+* Allow shared postgresql adapter to work with ruby 1.9 with the -Ku switch (golubev.pavel) (#298)
+
 * Add support for connecting to MSSQL via JTDS in the JDBC adapter (jeremyevans)
 
 * Support returning the number of rows updated/deleted on MSSQL when using the ADO adapter with an explicit :provider (jeremyevans)
