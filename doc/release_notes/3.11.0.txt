@@ -1,0 +1,254 @@
+= New Features
+
+* A few new features were added to query logging.  Sequel now
+  includes execution time when logging queries.  Queries that
+  raise exceptions are now logged at ERROR level.  You can now
+  set the log_warn_duration attribute on the Database instance
+  and queries that take longer than that will be logged at WARN 
+  level.  By using different log levels, you can now only log
+  queries that raise errors, or only log queries that take a long
+  time.
+
+    # The default - Log all successful queries at INFO level
+    DB.log_warn_duration = nil
+
+    # Log all successful queries at WARN level
+    DB.log_warn_duration = 0
+
+    # Log successful queries that take the database more than half a
+    # second at WARN level, other successful queries at INFO level
+    DB.log_warn_duration = 0.5
+
+  All adapters included with Sequel have been modified to support
+  the new logging API.  The previous API is still available, so
+  any external adapters should still work, though switching to the
+  new logging API is encouraged.
+  
+* Sequel::Model now has a require_modification flag.  If not set
+  explicitly, it is enabled by default if the dataset provides an
+  accurate number of rows matched by an update or delete statement.  
+  When this setting is enabled, Sequel will raise an exception if
+  you attempt to update or delete a model object and it doesn't end
+  up affecting exactly one row.  For example:
+
+    DB.create_table(:as){primary_key :id}
+    class A < Sequel::Model; end
+    a = A.create
+
+    # delete object from database
+    a.delete
+
+    a.require_modification = false
+    a.save # no error!
+    a.delete # no error!
+
+    a.require_modification = true
+    a.save # Sequel::NoExistingObject exception raised
+    a.delete # Sequel::NoExistingObject exception raised
+
+  Like many other Sequel::Model settings, this can be set on a
+  global, per class, and per instance level:
+
+    Sequel::Model.require_modification = false # global
+    Album.require_modification = true # class
+    album.require_modification = false # instance
+
+* An instance_filters plugin was added to the list of built in
+  plugins, allowing you to add arbitrary filters when updating or
+  destroying an instance.  This allows you to continue using models
+  when previously you would have had to drop down to using datasets
+  to get the desired behavior:
+
+    class Item < Sequel::Model
+      plugin :instance_filters
+    end
+    
+    # These are two separate objects that represent the same
+    # database row. 
+    i1 = Item.first(:id=>1, :delete_allowed=>false)
+    i2 = Item.first(:id=>1, :delete_allowed=>false)
+    
+    # Add an instance filter to the object. This filter is in effect
+    # until the object is successfully updated or deleted.
+    i1.instance_filter(:delete_allowed=>true)
+    
+    # Attempting to delete the object where the filter doesn't
+    # match any rows raises an error.
+    i1.delete # raises Sequel::Error
+    
+    # The other object that represents the same row has no
+    # instance filters, and can be updated normally.
+    i2.update(:delete_allowed=>true)
+    
+    # Even though the filter is now still in effect, since the
+    # database row has been updated to allow deleting,
+    # delete now works.
+    i1.delete
+
+* An :after_connect database option is now supported.  If provided,
+  the option value should be a proc that takes a single argument.
+  It will be called with the underlying connection object before
+  connection object is added to the connection pool, allowing you
+  to set per connection options in a thread-safe manner.
+
+  This is useful for customizations you want set on every connection
+  that Sequel doesn't already support.  For example, on PostgreSQL
+  if you wanted to set the schema search_path on every connection:
+                  
+    DB = Sequel.postgres('dbname', :after_connect=>(proc do |conn|
+      conn.execute('SET search_path TO schema1,schema2')
+    end))
+
+* A :test database option is now supported.  If set to true, it
+  automatically calls test_connection to make sure a connection can
+  be made before returning a Database instance.  For backwards
+  compatibility reasons, this is not set to true by default, but it
+  is possible that the default will change in a future version of
+  Sequel.
+
+* The Dataset#select_append method was added, which always appends
+  to the existing selected columns.  It operates identically to
+  select_more, except in the case that no columns are currently
+  selected:
+
+    ds = DB[:a]
+    # SELECT * FROM items
+    ds.select_more({:id=>DB[:b].select(:a_id)}.as(:in_b))
+    # SELECT id IN (SELECT a_id FROM b) AS in_b FROM a
+    ds.select_append({:id=>DB[:b].select(:a_id)}.as(:in_b))
+    # SELECT *, id IN (SELECT a_id FROM b) AS in_b FROM a
+
+* The Dataset#provides_accurate_rows_matched? method was added which
+  allows you to see if the dataset will return the actual number of
+  rows matched/affected by an update or delete call.
+
+* Sequel will now emulate DISTINCT ON support using GROUP BY on
+  MySQL.  On MySQL, GROUP BY is similar to DISTINCT ON, except that
+  the order of returned rows is not deterministic.
+
+* Support for connecting to Microsoft SQL Server using the JTDS JDBC
+  driver was added to the jdbc adapter.
+
+* JDNI connection strings are now supported in the JDBC adapter.
+
+* The JDBC adapter should now work in situations where driver
+  auto-loading has problems, just as when using Tomcat or Trinidad.
+
+* Sequel's JDBC adapter schema parsing now supports a :scale option,
+  useful for numeric/decimal columns.
+
+* Sequel's schema parsing on Microsoft SQL Server now supports
+  :column_size and :scale options.
+
+* When connecting to SQLite, a Database#sqlite_version method is
+  available that gives you the SQLite version as an integer (e.g.
+  30613 for 3.6.13).
+
+= Other Improvements
+
+* Sequel no longer raises an error if you give Dataset#filter or
+  related method an empty argument such as {}, [], or ''. This allows
+  code such as the following to work:
+
+    h = {}
+    h[:name] = name if name
+    h[:number] = number if number
+    ds = ds.filter(h)
+    
+  Before, this would raise an error if both name and number were
+  nil. 
+
+* Numeric and decimal columns with a 0 scale are now treated as
+  integer columns by the model typecasting code, since such columns
+  cannot store non-integer values.
+
+* Calling Database#disconnect when using the single threaded
+  connection pool no longer raises an error if there is no current
+  connection.
+
+* When using the :ignore_index_errors options to
+  Database#create_table, correctly swallow errors raised by Sequel
+  due to the adapter not supporting the given index type.
+  
+* The JDBC adapter no longer leaks ResultSets when retrieving
+  metadata.
+
+* You can now connect to PostgreSQL when using ruby 1.9 with the
+  -Ku switch.
+
+* When using the native MySQL adapter, only tinyint(1) columns are
+  now returned as booleans when using the convert_tinyint_to_bool
+  setting (the default).  Previously, all tinyint columns would
+  be converted to booleans if the setting was enabled.
+
+* Correctly handle inserts returning the autogenerated keys when
+  using MySQL JDBC Driver version 5.1.12 with the jdbc adapter.
+
+* The native MySQL adapter now supports :config_default_group and
+  :config_local_infile options.
+
+* When connecting to SQLite, you can provide the :auto_vacuum,
+  :foreign_keys, :synchronous, and :temp_store options for
+  making the appropriate PRAGMA setting on the database in a
+  thread-safe manner.  The previous thread-unsafe PRAGMA setting
+  methods are available, but their use is discouraged.
+
+* Sequel will not enable savepoints when connecting to SQLite
+  unless the version is 3.6.8 or greater.
+
+* Using limit with distinct now works correctly on Microsoft SQL
+  Server.
+  
+* Database#rename_table now works correctly on Microsoft SQL Server.
+
+* If you specify an explicit :provider when using the ADO adapter,
+  transactions will now work correctly.  The default :provider uses
+  a new native connection for each query, so it cannot work with
+  transactions, or things like temporary tables.
+
+* If you specify an explicit :provider when connecting to Microsoft
+  SQL Server using the ADO adapter (e.g. SQLNCLI10 or SQLNCLI),
+  Sequel is now able to provide an accurate number of rows modified
+  and deleted.
+
+* Using set_column_allow_null with a decimal column with a precision
+  and scale now works correctly when connecting to Microsoft SQL
+  Server.
+
+* You can now connect to Microsoft SQL Server using the dbi adapter.
+
+* Sequel now recognizes the NUMBER database type as a synonym for
+  NUMERIC and DECIMAL, which may help some Oracle users.
+
+* Transactions can now be rolled back correctly when connecting to
+  Oracle via JDBC.
+
+* The active_model plugin now supports ActiveModel 3.0.0beta2.
+
+* Many documentation improvements were made, including the addition
+  of a dataset basics guide, an association basics guide, an expanded
+  virtual row guide, and the separation of the Sequel::Dataset RDoc
+  page into sections.  Additional, the RDoc class/method
+  documentation now contains links to the appropriate guides.
+
+= Backwards Compatibility
+
+* When connecting to SQLite, Sequel now automatically sets the
+  foreign_keys PRAGMA to true, which will make SQLite 3.6.19+ use
+  database enforced foreign key constraints.  If you do not want
+  the database to enforce the foreign key constraints, you should
+  use the :foreign_keys=>false option when connecting to the
+  database.
+
+* Sequel no longer creates #{plugin_name}_opts class, instance, and
+  dataset methods for each plugin loaded.  No built-in plugin used
+  them, and I couldn't find an external plugin that did either.
+
+* The Model#associations method is no longer available if the 
+  default Associations plugin is not loaded due to the 
+  SEQUEL_NO_ASSOCIATIONS constant or environment variable being set.
+
+* DISTINCT ON support is turned off by default, and only enabled when
+  using PostgreSQL, since that appears to be the only database that
+  supports it.  Previously, it was enabled by default and most common
+  adapters turned it off.
