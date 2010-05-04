@@ -541,7 +541,7 @@ context "Postgres::Database schema qualified tables" do
   after do
     POSTGRES_DB.quote_identifiers = false
     POSTGRES_DB << "DROP SCHEMA schema_test CASCADE"
-    POSTGRES_DB.default_schema = :public
+    POSTGRES_DB.default_schema = nil
   end
   
   specify "should be able to create, drop, select and insert into tables in a given schema" do
@@ -914,7 +914,7 @@ context "Postgres::Database functions, languages, and triggers" do
   specify "#create_trigger and #drop_trigger should create and drop triggers" do
     @d.create_language(:plpgsql)
     @d.create_function(:tf, 'BEGIN IF NEW.value IS NULL THEN RAISE EXCEPTION \'Blah\'; END IF; RETURN NEW; END;', :language=>:plpgsql, :returns=>:trigger)
-    @d.send(:create_trigger_sql, :test, :identity, :tf, :each_row=>true).should == 'CREATE TRIGGER identity BEFORE INSERT OR UPDATE OR DELETE ON public.test FOR EACH ROW EXECUTE PROCEDURE tf()'
+    @d.send(:create_trigger_sql, :test, :identity, :tf, :each_row=>true).should == 'CREATE TRIGGER identity BEFORE INSERT OR UPDATE OR DELETE ON test FOR EACH ROW EXECUTE PROCEDURE tf()'
     @d.create_table(:test){String :name; Integer :value}
     @d.create_trigger(:test, :identity, :tf, :each_row=>true)
     @d[:test].insert(:name=>'a', :value=>1)
@@ -923,10 +923,10 @@ context "Postgres::Database functions, languages, and triggers" do
     @d[:test].filter(:name=>'a').all.should == [{:name=>'a', :value=>1}]
     @d[:test].filter(:name=>'a').update(:value=>3)
     @d[:test].filter(:name=>'a').all.should == [{:name=>'a', :value=>3}]
-    @d.send(:drop_trigger_sql, :test, :identity).should == 'DROP TRIGGER identity ON public.test'
+    @d.send(:drop_trigger_sql, :test, :identity).should == 'DROP TRIGGER identity ON test'
     @d.drop_trigger(:test, :identity)
-    @d.send(:create_trigger_sql, :test, :identity, :tf, :after=>true, :events=>:insert, :args=>[1, 'a']).should == 'CREATE TRIGGER identity AFTER INSERT ON public.test EXECUTE PROCEDURE tf(1, \'a\')'
-    @d.send(:drop_trigger_sql, :test, :identity, :if_exists=>true, :cascade=>true).should == 'DROP TRIGGER IF EXISTS identity ON public.test CASCADE'
+    @d.send(:create_trigger_sql, :test, :identity, :tf, :after=>true, :events=>:insert, :args=>[1, 'a']).should == 'CREATE TRIGGER identity AFTER INSERT ON test EXECUTE PROCEDURE tf(1, \'a\')'
+    @d.send(:drop_trigger_sql, :test, :identity, :if_exists=>true, :cascade=>true).should == 'DROP TRIGGER IF EXISTS identity ON test CASCADE'
     # Make sure if exists works
     @d.drop_trigger(:test, :identity, :if_exists=>true, :cascade=>true)
   end
