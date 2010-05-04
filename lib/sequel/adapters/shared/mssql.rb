@@ -10,7 +10,6 @@ module Sequel
       SQL_ROLLBACK = "IF @@TRANCOUNT > 0 ROLLBACK TRANSACTION".freeze
       SQL_ROLLBACK_TO_SAVEPOINT = 'IF @@TRANCOUNT > 0 ROLLBACK TRANSACTION autopoint_%d'.freeze
       SQL_SAVEPOINT = 'SAVE TRANSACTION autopoint_%d'.freeze
-      TEMPORARY = "#".freeze
       
       # The types to check for 0 scale to transform :decimal types
       # to :integer.
@@ -100,6 +99,13 @@ module Sequel
       def commit_transaction_sql
         SQL_COMMIT
       end
+        
+      # MSSQL uses the name of the table to decide the difference between
+      # a regular and temporary table, with temporary table names starting with
+      # a #.
+      def create_table_sql(name, generator, options)
+        "CREATE TABLE #{quote_schema_table(options[:temp] ? "##{name}" : name)} (#{column_list_sql(generator)})"
+      end
       
       # The SQL to drop an index for the table.
       def drop_index_sql(table, op)
@@ -151,11 +157,6 @@ module Sequel
           end
           [m.call(row.delete(:column)), row]
         end
-      end
-      
-      # SQL fragment for marking a table as temporary
-      def temporary_table_sql
-        TEMPORARY
       end
       
       # MSSQL has both datetime and timestamp classes, most people are going

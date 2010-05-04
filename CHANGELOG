@@ -1,3 +1,7 @@
+=== HEAD
+
+* Fix MSSQL temporary table creation, but watch out as it changes the table name (gpd, jeremyevans) (#299)
+
 === 3.11.0 (2010-05-03)
 
 * Allow shared postgresql adapter to work with ruby 1.9 with the -Ku switch (golubev.pavel) (#298)

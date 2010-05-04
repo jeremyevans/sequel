@@ -159,6 +159,10 @@ describe "Database schema modifiers" do
     @ds.columns!.should == [:number]
   end
   
+  specify "should create temporary tables without raising an exception" do
+    @db.create_table!(:items, :temp=>true){Integer :number}
+  end
+  
   specify "should rename tables correctly" do
     @db.drop_table(:items) rescue nil
     @db.create_table!(:items2){Integer :number}
