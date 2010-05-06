@@ -58,78 +58,6 @@ context "Migration#apply" do
   end
 end
 
-MIGRATION_001 = %[
-  class CreateSessions < Sequel::Migration
-    def up
-      create(1111)
-    end
-    
-    def down
-      drop(1111)
-    end
-  end
-]
-
-MIGRATION_002 = %[
-  class CreateNodes < Sequel::Migration
-    def up
-      create(2222)
-    end
-    
-    def down
-      drop(2222)
-    end
-  end
-]
-
-MIGRATION_003 = %[
-  class CreateUsers < Sequel::Migration
-    def up
-      create(3333)
-    end
-    
-    def down
-      drop(3333)
-    end
-  end
-]
-
-MIGRATION_005 = %[
-  class CreateAttributes < Sequel::Migration
-    def up
-      create(5555)
-    end
-    
-    def down
-      drop(5555)
-    end
-  end
-]
-
-ALT_MIGRATION_001 = %[
-  class CreateAltBasic < Sequel::Migration
-    def up
-      create(11111)
-    end
-    
-    def down
-      drop(11111)
-    end
-  end
-]
-
-ALT_MIGRATION_003 = %[
-  class CreateAltAdvanced < Sequel::Migration
-    def up
-      create(33333)
-    end
-    
-    def down
-      drop(33333)
-    end
-  end
-]
-
 context "Sequel::Migrator" do
   before do
     dbc = Class.new(MockDatabase) do
@@ -169,17 +97,8 @@ context "Sequel::Migrator" do
     end
     @db = dbc.new
     
-    @dirname = "migrate_#{$$}"
-    Dir.mkdir(@dirname)
-    File.open("#{@dirname}/001_create_sessions.rb", 'w') {|f| f << MIGRATION_001}
-    File.open("#{@dirname}/002_create_nodes.rb", 'w') {|f| f << MIGRATION_002}
-    File.open("#{@dirname}/003_create_users.rb", 'w') {|f| f << MIGRATION_003}
-    File.open("#{@dirname}/005_5_create_attributes.rb", 'w') {|f| f << MIGRATION_005}
-    
-    @alt_dirname = "migrate_alt_#{$$}"
-    Dir.mkdir(@alt_dirname)
-    File.open("#{@alt_dirname}/001_create_alt_basic.rb", 'w') {|f| f << ALT_MIGRATION_001}
-    File.open("#{@alt_dirname}/003_create_alt_advanced.rb", 'w') {|f| f << ALT_MIGRATION_003}
+    @dirname = "spec/files/integer_migrations"
+    @alt_dirname = "spec/files/alt_integer_migrations"
   end
   
   after do
@@ -189,15 +108,6 @@ context "Sequel::Migrator" do
     Object.send(:remove_const, "CreateAttributes") if Object.const_defined?("CreateAttributes")
     Object.send(:remove_const, "CreateAltBasic") if Object.const_defined?("CreateAltBasic")
     Object.send(:remove_const, "CreateAltAdvanced") if Object.const_defined?("CreateAltAdvanced")
-
-    File.delete("#{@dirname}/001_create_sessions.rb")
-    File.delete("#{@dirname}/002_create_nodes.rb")
-    File.delete("#{@dirname}/003_create_users.rb")
-    File.delete("#{@dirname}/005_5_create_attributes.rb")
-    Dir.rmdir(@dirname)
-    File.delete("#{@alt_dirname}/001_create_alt_basic.rb")
-    File.delete("#{@alt_dirname}/003_create_alt_advanced.rb")
-    Dir.rmdir(@alt_dirname)
   end
   
   specify "#migration_files should return the list of files for a specified version range" do
