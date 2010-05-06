@@ -104,7 +104,6 @@ context "Sequel::Migrator" do
     Object.send(:remove_const, "CreateSessions") if Object.const_defined?("CreateSessions")
     Object.send(:remove_const, "CreateNodes") if Object.const_defined?("CreateNodes")
     Object.send(:remove_const, "CreateUsers") if Object.const_defined?("CreateUsers")
-    Object.send(:remove_const, "CreateAttributes") if Object.const_defined?("CreateAttributes")
     Object.send(:remove_const, "CreateAltBasic") if Object.const_defined?("CreateAltBasic")
     Object.send(:remove_const, "CreateAltAdvanced") if Object.const_defined?("CreateAltAdvanced")
   end
@@ -112,14 +111,14 @@ context "Sequel::Migrator" do
   specify "#migration_files should return the list of files for a specified version range" do
     Sequel::Migrator.migration_files(@dirname, 1..1).map{|f| File.basename(f)}.should == ['001_create_sessions.rb']
     Sequel::Migrator.migration_files(@dirname, 1..3).map{|f| File.basename(f)}.should == ['001_create_sessions.rb', '002_create_nodes.rb', '003_create_users.rb']
-    Sequel::Migrator.migration_files(@dirname, 3..6).map{|f| File.basename(f)}.should == ['003_create_users.rb', '005_5_create_attributes.rb']
+    Sequel::Migrator.migration_files(@dirname, 3..6).map{|f| File.basename(f)}.should == ['003_create_users.rb']
     Sequel::Migrator.migration_files(@dirname, 7..8).map{|f| File.basename(f)}.should == []
     Sequel::Migrator.migration_files(@alt_dirname, 1..1).map{|f| File.basename(f)}.should == ['001_create_alt_basic.rb']
-    Sequel::Migrator.migration_files(@alt_dirname, 1..3).map{|f| File.basename(f)}.should == ['001_create_alt_basic.rb','003_create_alt_advanced.rb']
+    Sequel::Migrator.migration_files(@alt_dirname, 1..3).map{|f| File.basename(f)}.should == ['001_create_alt_basic.rb','003_3_create_alt_advanced.rb']
   end
   
   specify "#latest_migration_version should return the latest version available" do
-    Sequel::Migrator.latest_migration_version(@dirname).should == 5
+    Sequel::Migrator.latest_migration_version(@dirname).should == 3
     Sequel::Migrator.latest_migration_version(@alt_dirname).should == 3
   end
   
@@ -129,7 +128,7 @@ context "Sequel::Migrator" do
   end
   
   specify "#migration_classes should load the migration classes for the specified range for the down direction" do
-    Sequel::Migrator.migration_classes(@dirname, 0, 5, :down).should == [CreateAttributes, CreateUsers, CreateNodes, CreateSessions]
+    Sequel::Migrator.migration_classes(@dirname, 0, 5, :down).should == [CreateUsers, CreateNodes, CreateSessions]
     Sequel::Migrator.migration_classes(@alt_dirname, 0, 3, :down).should == [CreateAltAdvanced, CreateAltBasic]
   end
   
@@ -139,7 +138,7 @@ context "Sequel::Migrator" do
   end
   
   specify "#migration_classes should end on current + 1 for the down direction" do
-    Sequel::Migrator.migration_classes(@dirname, 2, 5, :down).should == [CreateAttributes, CreateUsers]
+    Sequel::Migrator.migration_classes(@dirname, 2, 5, :down).should == [CreateUsers]
     Sequel::Migrator.migration_classes(@alt_dirname, 2, 4, :down).should == [CreateAltAdvanced]
   end
   
@@ -191,34 +190,34 @@ context "Sequel::Migrator" do
   end
   
   specify "should apply migrations correctly in the up direction" do
-    Sequel::Migrator.apply(@db, @dirname, 3, 2)
-    @db.creates.should == [3333]
+    Sequel::Migrator.apply(@db, @dirname, 2, 1)
+    @db.creates.should == [2222]
     
+    Sequel::Migrator.get_current_migration_version(@db).should == 2
+
+    Sequel::Migrator.apply(@db, @dirname, 3)
+    @db.creates.should == [2222, 3333]
+
     Sequel::Migrator.get_current_migration_version(@db).should == 3
-
-    Sequel::Migrator.apply(@db, @dirname, 5)
-    @db.creates.should == [3333, 5555]
-
-    Sequel::Migrator.get_current_migration_version(@db).should == 5
   end
   
   specify "should apply migrations correctly in the down direction" do
-    Sequel::Migrator.apply(@db, @dirname, 1, 5)
-    @db.drops.should == [5555, 3333, 2222]
+    Sequel::Migrator.apply(@db, @dirname, 1, 3)
+    @db.drops.should == [3333, 2222]
 
     Sequel::Migrator.get_current_migration_version(@db).should == 1
   end
 
   specify "should apply migrations up to the latest version if no target is given" do
     Sequel::Migrator.apply(@db, @dirname)
-    @db.creates.should == [1111, 2222, 3333, 5555]
+    @db.creates.should == [1111, 2222, 3333]
 
-    Sequel::Migrator.get_current_migration_version(@db).should == 5
+    Sequel::Migrator.get_current_migration_version(@db).should == 3
   end
 
   specify "should apply migrations down to 0 version correctly" do
-    Sequel::Migrator.apply(@db, @dirname, 0, 5)
-    @db.drops.should == [5555, 3333, 2222, 1111]
+    Sequel::Migrator.apply(@db, @dirname, 0, 3)
+    @db.drops.should == [3333, 2222, 1111]
 
     Sequel::Migrator.get_current_migration_version(@db).should == 0
   end
@@ -226,6 +225,6 @@ context "Sequel::Migrator" do
   specify "should return the target version" do
     Sequel::Migrator.apply(@db, @dirname, 3, 2).should == 3
     Sequel::Migrator.apply(@db, @dirname, 0).should == 0
-    Sequel::Migrator.apply(@db, @dirname).should == 5
+    Sequel::Migrator.apply(@db, @dirname).should == 3
   end
 end
