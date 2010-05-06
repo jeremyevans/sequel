@@ -44,18 +44,9 @@ module Sequel
     ANONYMOUS_MODEL_CLASSES = {}
 
     # Class methods added to model that call the method of the same name on the dataset
-    DATASET_METHODS = %w'<< add_graph_aliases all avg count cross_join delete distinct
-       each each_page each_server eager eager_graph empty? except exclude filter first for_update from from_self
-       full_join full_outer_join get graph grep group group_and_count group_by having import
-       inner_join insert insert_multiple intersect interval invert join join_table
-       last left_join left_outer_join limit lock_style map max min multi_insert naked
-       natural_full_join natural_join natural_left_join natural_right_join order order_by
-       order_more paginate print qualify query range reverse reverse_order right_join right_outer_join
-       select select_all select_append select_hash select_map select_more select_order_map
-       server set set_defaults set_graph_aliases set_overrides
-       single_value sum to_csv to_hash truncate unfiltered ungraphed ungrouped union unlimited unordered 
-       update where with with_recursive with_sql'.map{|x| x.to_sym}
-  
+    DATASET_METHODS = (Dataset::ACTION_METHODS + Dataset::QUERY_METHODS +
+      [:eager, :eager_graph, :each_page, :each_server, :print]) - [:and, :or, :[], :[]=, :columns, :columns!]
+    
     # Class instance variables to set to nil when a subclass is created, for -w compliance
     EMPTY_INSTANCE_VARIABLES = [:@overridable_methods_module, :@db]
 
@@ -85,7 +76,7 @@ module Sequel
 
     # The setter methods (methods ending with =) that are never allowed
     # to be called automatically via set/update/new/etc..
-    RESTRICTED_SETTER_METHODS = %w"== === []= taguri= typecast_empty_string_to_nil= typecast_on_assignment= strict_param_setting= raise_on_save_failure= raise_on_typecast_failure="
+    RESTRICTED_SETTER_METHODS = %w"== === []= taguri= typecast_empty_string_to_nil= typecast_on_assignment= strict_param_setting= raise_on_save_failure= raise_on_typecast_failure= require_modification="
 
     # Regular expression that determines if the method is a valid setter name
     # (i.e. it ends with =).

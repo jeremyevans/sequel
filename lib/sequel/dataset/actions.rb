@@ -7,6 +7,12 @@ module Sequel
     # they should be the last method called.
     # ---------------------
     
+    # Action methods defined by Sequel that execute code on the database.
+    ACTION_METHODS = %w'<< [] []= all avg count columns columns! delete each
+    empty? fetch_rows first get import insert insert_multiple interval last
+    map max min multi_insert range select_hash select_map select_order_map
+    set single_record single_value sum to_csv to_hash truncate update'.map{|x| x.to_sym}
+
     # Alias for insert, but not aliased directly so subclasses
     # don't have to override both methods.
     def <<(*args)

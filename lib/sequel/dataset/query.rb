@@ -4,6 +4,7 @@ module Sequel
     # :section: Methods that return modified datasets
     # These methods all return modified copies of the receiver.
     # ---------------------
+
     # The dataset options that require the removal of cached columns
     # if changed.
     COLUMN_CHANGE_OPTS = [:select, :sql, :from, :join].freeze
@@ -23,6 +24,17 @@ module Sequel
     # if called with a block.
     UNCONDITIONED_JOIN_TYPES = [:natural, :natural_left, :natural_right, :natural_full, :cross]
     
+    # All methods that return modified datasets with a joined table added.
+    JOIN_METHODS = (CONDITIONED_JOIN_TYPES + UNCONDITIONED_JOIN_TYPES).map{|x| "#{x}_join".to_sym} + [:join, :join_table]
+    
+    # Methods that return modified datasets
+    QUERY_METHODS = %w'add_graph_aliases and distinct except exclude
+    filter for_update from from_self graph grep group group_and_count group_by having intersect invert
+    limit lock_style naked or order order_by order_more paginate qualify query
+    reverse reverse_order select select_all select_append select_more server
+    set_defaults set_graph_aliases set_overrides unfiltered ungraphed ungrouped union
+    unlimited unordered where with with_recursive with_sql'.collect{|x| x.to_sym} + JOIN_METHODS
+
     # Adds an further filter to an existing filter using AND. If no filter 
     # exists an error is raised. This method is identical to #filter except
     # it expects an existing filter.
