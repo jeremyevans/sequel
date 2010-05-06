@@ -50,6 +50,9 @@ module Sequel
     # Class instance variables to set to nil when a subclass is created, for -w compliance
     EMPTY_INSTANCE_VARIABLES = [:@overridable_methods_module, :@db]
 
+    # Boolean settings that can be modified at the global, class, or instance level.
+    BOOLEAN_SETTINGS = [:typecast_empty_string_to_nil, :typecast_on_assignment, :strict_param_setting, :raise_on_save_failure, :raise_on_typecast_failure, :require_modification, :use_transactions]
+
     # Empty instance methods to create that the user can override to get hook/callback behavior.
     # Just like any other method defined by Sequel, if you override one of these, you should
     # call super to get the default behavior (while empty by default, they can also be defined
@@ -74,10 +77,6 @@ module Sequel
     # avoid problems when using eval with a string to define methods.
     NORMAL_METHOD_NAME_REGEXP = /\A[A-Za-z_][A-Za-z0-9_]*\z/
 
-    # The setter methods (methods ending with =) that are never allowed
-    # to be called automatically via set/update/new/etc..
-    RESTRICTED_SETTER_METHODS = %w"== === []= taguri= typecast_empty_string_to_nil= typecast_on_assignment= strict_param_setting= raise_on_save_failure= raise_on_typecast_failure= require_modification="
-
     # Regular expression that determines if the method is a valid setter name
     # (i.e. it ends with =).
     SETTER_METHOD_REGEXP = /=\z/
@@ -101,11 +100,15 @@ module Sequel
     @typecast_empty_string_to_nil = true
     @typecast_on_assignment = true
     @use_transactions = true
-  end
 
-  require %w"default_inflections inflections plugins base exceptions errors", "model"
-  if !defined?(::SEQUEL_NO_ASSOCIATIONS) && !ENV.has_key?('SEQUEL_NO_ASSOCIATIONS')
-    require 'associations', 'model'
-    Model.plugin Model::Associations
+    Sequel.require %w"default_inflections inflections plugins base exceptions errors", "model"
+    if !defined?(::SEQUEL_NO_ASSOCIATIONS) && !ENV.has_key?('SEQUEL_NO_ASSOCIATIONS')
+      Sequel.require 'associations', 'model'
+      plugin Model::Associations
+    end
+
+    # The setter methods (methods ending with =) that are never allowed
+    # to be called automatically via set/update/new/etc..
+    RESTRICTED_SETTER_METHODS = instance_methods.map{|x| x.to_s}.grep(SETTER_METHOD_REGEXP)
   end
 end
