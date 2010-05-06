@@ -27,23 +27,34 @@ context "Migration#apply" do
       define_method(:two) {|x| [2222, x]}
     end
     @db = @c.new
-    
-    @migration = Class.new(Sequel::Migration) do
-      define_method(:up) {one(3333)}
-      define_method(:down) {two(4444)}
-    end
   end
   
   specify "should raise for an invalid direction" do
-    proc {@migration.apply(@db, :hahaha)}.should raise_error(ArgumentError)
+    proc {Sequel::Migration.apply(@db, :hahaha)}.should raise_error(ArgumentError)
   end
   
-  specify "should apply the up direction correctly" do
-    @migration.apply(@db, :up).should == [1111, 3333]
+  specify "should apply the up and down directions correctly" do
+    m = Class.new(Sequel::Migration) do
+      define_method(:up) {one(3333)}
+      define_method(:down) {two(4444)}
+    end
+    m.apply(@db, :up).should == [1111, 3333]
+    m.apply(@db, :down).should == [2222, 4444]
   end
 
-  specify "should apply the down direction correctly" do
-    @migration.apply(@db, :down).should == [2222, 4444]
+  specify "should support the simpler DSL" do
+    m = Sequel.migration do
+      up{one(3333)}
+      down{two(4444)}
+    end
+    m.apply(@db, :up).should == [1111, 3333]
+    m.apply(@db, :down).should == [2222, 4444]
+  end
+
+  specify "should have default up and down actions that do nothing" do
+    m = Class.new(Sequel::Migration)
+    m.apply(@db, :up).should == nil
+    m.apply(@db, :down).should == nil
   end
 end
 

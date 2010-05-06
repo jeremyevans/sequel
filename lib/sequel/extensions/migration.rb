@@ -3,11 +3,11 @@
 # to a newer version or revert to a previous version.
 
 module Sequel
-  # The Migration class describes a database migration that can be reversed.
-  # The migration looks very similar to ActiveRecord (Rails) migrations, e.g.:
+  # The +Migration+ class describes a database migration that can be reversed.
+  # Example:
   #
-  #   class CreateSessions < Sequel::Migration
-  #     def up
+  #   migration1 = Sequel.migration do
+  #     up do
   #       create_table :sessions do
   #         primary_key :id
   #         String :session_id, :size => 32, :unique => true
@@ -16,37 +16,38 @@ module Sequel
   #       end
   #     end
   # 
-  #     def down
+  #     down do
   #       # You can use raw SQL if you need to
   #       self << 'DROP TABLE sessions'
   #     end
   #   end
   #
-  #   class AlterItems < Sequel::Migration
-  #     def up
+  #   migration2 = Sequel.migration do
+  #     up do
   #       alter_table :items do
   #         add_column :category, String, :default => 'ruby'
   #       end
   #     end
   # 
-  #     def down
+  #     down do
   #       alter_table :items do
   #         drop_column :category
   #       end  
   #     end
   #   end
   #
-  # To apply a migration to a database, you can invoke the #apply with
-  # the target database instance and the direction :up or :down, e.g.:
+  # To apply a migration to a database, you can invoke +apply+ with
+  # the target database instance and the direction <tt>:up</tt> or <tt>:down</tt>, e.g.:
   #
   #   DB = Sequel.connect('sqlite://mydb')
-  #   CreateSessions.apply(DB, :up)
+  #   migration1.apply(DB, :up)
   #
-  # See Sequel::Schema::Generator for the syntax to use for creating tables,
-  # and Sequel::Schema::AlterTableGenerator for the syntax to use when
-  # altering existing tables.  Migrations act as a proxy for the database
-  # given in #apply, so inside #down and #up, you can act as though self
-  # refers to the database.  So you can use any of the Sequel::Database
+  # See <tt>Sequel::Schema::Generator</tt> for the syntax to use for creating tables
+  # with +create_table+, and <tt>Sequel::Schema::AlterTableGenerator</tt> for the
+  # syntax to use when altering existing tables with +alter_table+.
+  # Migrations act as a proxy for the database
+  # given in +apply+, so inside the +down+ and +up+ blocks, you can act as though +self+
+  # refers to the database, which allows you to use any of the <tt>Sequel::Database</tt>
   # instance methods directly.
   class Migration
     # Creates a new instance of the migration and sets the @db attribute.
@@ -57,15 +58,8 @@ module Sequel
     # Applies the migration to the supplied database in the specified
     # direction.
     def self.apply(db, direction)
-      obj = new(db)
-      case direction
-      when :up
-        obj.up
-      when :down
-        obj.down
-      else
-        raise ArgumentError, "Invalid migration direction specified (#{direction.inspect})"
-      end
+      raise(ArgumentError, "Invalid migration direction specified (#{direction.inspect})") unless [:up, :down].include?(direction)
+      new(db).send(direction)
     end
 
     # Returns the list of Migration descendants.
@@ -90,6 +84,66 @@ module Sequel
     # The default up action does nothing
     def up
     end
+  end
+
+  # Internal class used by the Sequel.migration DSL.
+  class MigrationDSL < BasicObject
+    # The underlying Migration class.
+    attr_reader :migration
+
+    def self.create(&block)
+      new(&block).migration
+    end
+
+    # Create a new migration class, and instance_eval the block.
+    def initialize(&block)
+      @migration = Class.new(Sequel::Migration)
+      instance_eval(&block)
+    end
+
+    # Defines the migration's down action.
+    def down(&block)
+      @migration.send(:define_method, :down, &block)
+    end
+
+    # Defines the migration's up action.
+    def up(&block)
+      @migration.send(:define_method, :up, &block)
+    end
+  end
+
+  # A short cut for creating anonymous migration classes. For example,
+  # this code:
+  # 
+  #   Sequel.migration do
+  #     up do
+  #       create_table(:artists) do
+  #         primary_key :id
+  #         String :name
+  #       end
+  #     end
+  #     
+  #     down do
+  #       drop_table(:artists)
+  #     end
+  #   end
+  #
+  # is just a easier way of writing:
+  # 
+  #   Class.new(Sequel::Migration) do
+  #     def up 
+  #       create_table(:artists) do
+  #         primary_key :id
+  #         String :name
+  #       end
+  #     end
+  #     
+  #     def down 
+  #       drop_table(:artists)
+  #     end
+  #   end
+  def self.migration(&block)
+    MigrationDSL.create(&block)
   end
 
   # The Migrator module performs migrations based on migration files in a 
