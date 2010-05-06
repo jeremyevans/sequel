@@ -105,6 +105,14 @@ context "Sequel::Migrator" do
     Object.send(:remove_const, "CreateSessions") if Object.const_defined?("CreateSessions")
   end
   
+  specify "should raise and error if there is a missing integer migration version" do
+    proc{Sequel::Migrator.apply(@db, "spec/files/missing_integer_migrations")}.should raise_error(Sequel::Migrator::Error)
+  end
+
+  specify "should raise and error if there is a duplicate integer migration version" do
+    proc{Sequel::Migrator.apply(@db, "spec/files/duplicate_integer_migrations")}.should raise_error(Sequel::Migrator::Error)
+  end
+
   specify "should automatically create the schema_info table with the version column" do
     @db.table_exists?(:schema_info).should be_false
     Sequel::Migrator.run(@db, @dirname, :target=>0)

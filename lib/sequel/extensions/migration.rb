@@ -190,6 +190,11 @@ module Sequel
     MIGRATION_FILE_PATTERN = /\A\d+_.+\.rb\z/.freeze
     MIGRATION_SPLITTER = '_'.freeze
 
+    # Exception class raised when there is an error with the migration
+    # file structure.
+    class Error < Sequel::Error
+    end
+
     # Wrapper for run, maintaining backwards API compatibility
     def self.apply(db, directory, target = nil, current = nil)
       run(db, directory, :target => target, :current => current)
@@ -261,8 +266,12 @@ module Sequel
     def self.migration_files(directory, range = nil)
       files = []
       Dir.new(directory).each do |file|
-        files[migration_version_from_file(file)] = File.join(directory, file) if MIGRATION_FILE_PATTERN.match(file)
+        next unless MIGRATION_FILE_PATTERN.match(file)
+        version = migration_version_from_file(file)
+        raise(Error, "Duplicate migration version: #{version}") if files[version]
+        files[version] = File.join(directory, file)
       end
+      1.upto(files.length - 1){|i| raise(Error, "Missing migration version: #{i}") unless files[i]}
       filtered = range ? files[range] : files
       filtered ? filtered.compact : []
     end
