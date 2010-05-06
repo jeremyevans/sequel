@@ -70,6 +70,7 @@ context "Sequel::Migrator" do
         @versions = {}
       end
   
+      def version; versions.values.first || 0; end
       def creates; @tables_created.map{|x| y = x.to_s; y !~ /\Asm(\d+)/; $1.to_i if $1}.compact; end
       def drop_table(*a); super; @drops.concat(a.map{|x| y = x.to_s; y !~ /\Asm(\d+)/; $1.to_i if $1}.compact); end
 
@@ -170,56 +171,47 @@ context "Sequel::Migrator" do
     Sequel::Migrator.schema_info_dataset(@db, :table=>:blah).first_source_alias.should == :blah
   end
   
-  specify "should assume a migration version of 0 if no migration information exists in the database" do
-    Sequel::Migrator.get_current_migration_version(@db).should == 0
-    @db.sqls.should == ["CREATE TABLE schema_info (version integer)", "SELECT * FROM schema_info LIMIT 1"]
-  end
   specify "should use the migration version stored in the database" do
     Sequel::Migrator.schema_info_dataset(@db).insert(:version => 4321)
-    Sequel::Migrator.get_current_migration_version(@db).should == 4321
-    @db.sqls.should == ["CREATE TABLE schema_info (version integer)", "INSERT INTO schema_info (version) VALUES (4321)", "SELECT * FROM schema_info LIMIT 1"]
+    @db.version.should == 4321
   end
   
   specify "should set the migration version stored in the database" do
     Sequel::Migrator.set_current_migration_version(@db, 6666)
-    Sequel::Migrator.get_current_migration_version(@db).should == 6666
-    @db.sqls.should == ["CREATE TABLE schema_info (version integer)",
-      "SELECT * FROM schema_info LIMIT 1",
-      "INSERT INTO schema_info (version) VALUES (6666)",
-      "SELECT * FROM schema_info LIMIT 1"]
+    @db.version.should == 6666
   end
   
   specify "should apply migrations correctly in the up direction" do
     Sequel::Migrator.apply(@db, @dirname, 2, 1)
     @db.creates.should == [2222]
     
-    Sequel::Migrator.get_current_migration_version(@db).should == 2
+    @db.version.should == 2
 
     Sequel::Migrator.apply(@db, @dirname, 3)
     @db.creates.should == [2222, 3333]
 
-    Sequel::Migrator.get_current_migration_version(@db).should == 3
+    @db.version.should == 3
   end
   
   specify "should apply migrations correctly in the down direction" do
     Sequel::Migrator.apply(@db, @dirname, 1, 3)
     @db.drops.should == [3333, 2222]
 
-    Sequel::Migrator.get_current_migration_version(@db).should == 1
+    @db.version.should == 1
   end
 
   specify "should apply migrations up to the latest version if no target is given" do
     Sequel::Migrator.apply(@db, @dirname)
     @db.creates.should == [1111, 2222, 3333]
 
-    Sequel::Migrator.get_current_migration_version(@db).should == 3
+    @db.version.should == 3
   end
 
   specify "should apply migrations down to 0 version correctly" do
     Sequel::Migrator.apply(@db, @dirname, 0, 3)
     @db.drops.should == [3333, 2222, 1111]
 
-    Sequel::Migrator.get_current_migration_version(@db).should == 0
+    @db.version.should == 0
   end
   
   specify "should return the target version" do
