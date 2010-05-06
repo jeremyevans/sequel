@@ -1,9 +1,9 @@
 CreateNodes = Class.new(Sequel::Migration) do
   def up
-    create(2222)
+    create_table(:sm2222){Integer :smc2}
   end
     
   def down
-    drop(2222)
+    drop_table(:sm2222)
   end
 end

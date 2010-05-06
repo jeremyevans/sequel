@@ -1,4 +1,4 @@
 CreateAltAdvanced = Sequel.migration do
-  up{create(33333)}
-  down{drop(33333)}
+  up{create_table(:sm33333){Integer :smc3}}
+  down{drop_table(:sm33333)}
 end

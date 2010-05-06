@@ -1,4 +1,4 @@
 CreateAttributes = Sequel.migration do
-  up{create(5555)}
-  down{drop(5555)}
+  up{create_table(:sm5555){Integer :smc5}}
+  down{drop_table(:sm5555)}
 end

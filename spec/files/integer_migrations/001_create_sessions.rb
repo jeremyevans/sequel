@@ -1,9 +1,9 @@
 class CreateSessions < Sequel::Migration
   def up
-    create(1111)
+    create_table(:sm1111){Integer :smc1}
   end
   
   def down
-    drop(1111)
+    drop_table(:sm1111)
   end
 end

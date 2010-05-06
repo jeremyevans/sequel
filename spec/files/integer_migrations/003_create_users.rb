@@ -1,4 +1,4 @@
 CreateUsers = Sequel.migration do
-  up{create(3333)}
-  down{drop(3333)}
+  up{create_table(:sm3333){Integer :smc3}}
+  down{drop_table(:sm3333)}
 end

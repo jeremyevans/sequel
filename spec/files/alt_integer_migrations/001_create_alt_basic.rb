@@ -1,4 +1,4 @@
 CreateAltBasic = Sequel.migration do
-  up{create(11111)}
-  down{drop(11111)}
+  up{create_table(:sm11111){Integer :smc1}}
+  down{drop_table(:sm11111)}
 end

@@ -61,18 +61,17 @@ end
 context "Sequel::Migrator" do
   before do
     dbc = Class.new(MockDatabase) do
-      attr_reader :creates, :drops, :tables_created, :columns_created, :versions
+      attr_reader :drops, :tables_created, :columns_created, :versions
       def initialize(*args)
         super
-        @creates = []
         @drops = []
         @tables_created = []
         @columns_created = []
         @versions = {}
       end
   
-      def create(x); @creates << x; end
-      def drop(x); @drops << x; end
+      def creates; @tables_created.map{|x| y = x.to_s; y !~ /\Asm(\d+)/; $1.to_i if $1}.compact; end
+      def drop_table(*a); super; @drops.concat(a.map{|x| y = x.to_s; y !~ /\Asm(\d+)/; $1.to_i if $1}.compact); end
 
       def create_table(name, opts={}, &block)
         super
@@ -201,14 +200,6 @@ context "Sequel::Migrator" do
     @db.creates.should == [3333, 5555]
 
     Sequel::Migrator.get_current_migration_version(@db).should == 5
-    @db.sqls.should == ["CREATE TABLE schema_info (version integer)",
-      "SELECT * FROM schema_info LIMIT 1",
-      "INSERT INTO schema_info (version) VALUES (3)",
-      "SELECT * FROM schema_info LIMIT 1",
-      "SELECT * FROM schema_info LIMIT 1",
-      "SELECT * FROM schema_info LIMIT 1",
-      "UPDATE schema_info SET version = 5",
-      "SELECT * FROM schema_info LIMIT 1"]
   end
   
   specify "should apply migrations correctly in the down direction" do
@@ -216,10 +207,6 @@ context "Sequel::Migrator" do
     @db.drops.should == [5555, 3333, 2222]
 
     Sequel::Migrator.get_current_migration_version(@db).should == 1
-    @db.sqls.should == ["CREATE TABLE schema_info (version integer)",
-      "SELECT * FROM schema_info LIMIT 1",
-      "INSERT INTO schema_info (version) VALUES (1)",
-      "SELECT * FROM schema_info LIMIT 1"]
   end
 
   specify "should apply migrations up to the latest version if no target is given" do
@@ -227,11 +214,6 @@ context "Sequel::Migrator" do
     @db.creates.should == [1111, 2222, 3333, 5555]
 
     Sequel::Migrator.get_current_migration_version(@db).should == 5
-    @db.sqls.should == ["CREATE TABLE schema_info (version integer)",
-      "SELECT * FROM schema_info LIMIT 1",
-      "SELECT * FROM schema_info LIMIT 1",
-      "INSERT INTO schema_info (version) VALUES (5)",
-      "SELECT * FROM schema_info LIMIT 1"]
   end
 
   specify "should apply migrations down to 0 version correctly" do
@@ -239,10 +221,6 @@ context "Sequel::Migrator" do
     @db.drops.should == [5555, 3333, 2222, 1111]
 
     Sequel::Migrator.get_current_migration_version(@db).should == 0
-    @db.sqls.should == ["CREATE TABLE schema_info (version integer)",
-      "SELECT * FROM schema_info LIMIT 1",
-      "INSERT INTO schema_info (version) VALUES (0)",
-      "SELECT * FROM schema_info LIMIT 1"]
   end
   
   specify "should return the target version" do
