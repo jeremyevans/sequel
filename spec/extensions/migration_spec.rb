@@ -76,15 +76,16 @@ context "Sequel::Migrator" do
 
       def create_table(name, opts={}, &block)
         super
-        @columns_created << / \(?(\w+) integer\)?\z/.match(sqls.last)[1].to_sym
+        @columns_created << / \(?(\w+) integer.*\)?\z/.match(sqls.last)[1].to_sym
         @tables_created << name
       end
       
       def dataset(opts={})
         ds = super
         ds.extend(Module.new do
+          def count; 1; end
           def columns; db.columns_created end
-          def insert(h); db.versions.merge!(h); super(h) end
+          def insert(h); db.versions.merge!(h); super(h) rescue nil end
           def update(h); db.versions.merge!(h); super(h) end
           def fetch_rows(sql); db.execute(sql); yield(db.versions) unless db.versions.empty? end
         end)
@@ -98,7 +99,6 @@ context "Sequel::Migrator" do
     @db = dbc.new
     
     @dirname = "spec/files/integer_migrations"
-    @alt_dirname = "spec/files/alt_integer_migrations"
   end
   
   after do
@@ -131,31 +131,38 @@ context "Sequel::Migrator" do
     Sequel::Migrator.apply(@db, @dirname)
     @db.creates.should == [1111, 2222, 3333]
     @db.version.should == 3
+    @db.sqls.map{|x| x =~ /\AUPDATE.*(\d+)/ ? $1.to_i : nil}.compact.should == [1, 2, 3]
   end 
 
   specify "should apply migrations correctly in the up direction with target" do
     Sequel::Migrator.apply(@db, @dirname, 2)
     @db.creates.should == [1111, 2222]
     @db.version.should == 2
+    @db.sqls.map{|x| x =~ /\AUPDATE.*(\d+)/ ? $1.to_i : nil}.compact.should == [1, 2]
   end
   
   specify "should apply migrations correctly in the up direction with target and existing" do
     Sequel::Migrator.apply(@db, @dirname, 2, 1)
     @db.creates.should == [2222]
     @db.version.should == 2
+    @db.sqls.map{|x| x =~ /\AUPDATE.*(\d+)/ ? $1.to_i : nil}.compact.should == [2]
   end
 
   specify "should apply migrations correctly in the down direction with target" do
+    @db.create_table(:schema_info){Integer :version, :default=>0}
     @db[:schema_info].insert(:version=>3)
+    @db.version.should == 3
     Sequel::Migrator.apply(@db, @dirname, 0)
     @db.drops.should == [3333, 2222, 1111]
     @db.version.should == 0
+    @db.sqls.map{|x| x =~ /\AUPDATE.*(\d+)/ ? $1.to_i : nil}.compact.should == [2, 1, 0]
   end
   
   specify "should apply migrations correctly in the down direction with target and existing" do
     Sequel::Migrator.apply(@db, @dirname, 1, 2)
     @db.drops.should == [2222]
     @db.version.should == 1
+    @db.sqls.map{|x| x =~ /\AUPDATE.*(\d+)/ ? $1.to_i : nil}.compact.should == [1]
   end
   
   specify "should return the target version" do

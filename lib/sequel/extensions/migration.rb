@@ -218,12 +218,17 @@ module Sequel
       raise(Error, "No target version available") unless target  = opts[:target]  || latest_migration_version(directory)
 
       direction = current < target ? :up : :down
-      
       classes = migration_classes(directory, target, current, direction)
+      versions = direction == :up ? ((current+1)..target).to_a : (target..(current - 1)).to_a.reverse
 
-      db.transaction do
-        classes.each {|c| c.apply(db, direction)}
-        set_current_migration_version(db, target, opts)
+      # Make sure the schema info table exists
+      schema_info_dataset(db, opts)
+
+      classes.zip(versions).each do |c, v|
+        db.transaction do
+          c.apply(db, direction)
+          set_current_migration_version(db, v, opts)
+        end
       end
       
       target
@@ -281,9 +286,15 @@ module Sequel
     def self.schema_info_dataset(db, opts={})
       column = opts[:column] || DEFAULT_SCHEMA_COLUMN
       table  = opts[:table]  || DEFAULT_SCHEMA_TABLE
-      db.create_table?(table){Integer column}
-      db.alter_table(table){add_column column, Integer} unless db.from(table).columns.include?(column)
-      db.from(table)
+      ds = db.from(table)
+      if !db.table_exists?(table)
+        db.create_table(table){Integer column, :default=>0}
+      elsif !ds.columns.include?(column)
+        db.alter_table(table){add_column column, Integer, :default=>0}
+      end
+      ds.insert(column=>0) if ds.empty?
+      raise(Error, "More than 1 row in migrator table") if ds.count > 1
+      ds
     end
     
     # Sets the current migration  version stored in the database.
