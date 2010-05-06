@@ -1,4 +1,4 @@
-CreateNodes = Class.new(Sequel::Migration) do
+Class.new(Sequel::Migration) do
   def up
     create_table(:sm2222){Integer :smc2}
   end
