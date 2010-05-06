@@ -85,8 +85,8 @@ context "Sequel::Migrator" do
         ds.extend(Module.new do
           def count; 1; end
           def columns; db.columns_created end
-          def insert(h); db.versions.merge!(h); super(h) rescue nil end
-          def update(h); db.versions.merge!(h); super(h) end
+          def insert(h); db.versions.merge!(h); db.sqls << insert_sql(h) end
+          def update(h); db.versions.merge!(h); db.sqls << update_sql(h) end
           def fetch_rows(sql); db.execute(sql); yield(db.versions) unless db.versions.empty? end
         end)
         ds
