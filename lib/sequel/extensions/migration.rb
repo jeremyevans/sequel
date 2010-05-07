@@ -334,10 +334,14 @@ module Sequel
     # Apply all migrations on the database
     def run
       migrations.zip(version_numbers).each do |m, v|
+        t = Time.now
+        lv = up? ? v : v + 1
+        db.log_info("Begin applying migration version #{lv}, direction: #{direction}")
         db.transaction do
           m.apply(db, direction)
           set_migration_version(v)
         end
+        db.log_info("Finished applying migration version #{lv}, direction: #{direction}, took #{sprintf('%0.6f', Time.now - t)} seconds")
       end
       
       target
@@ -444,10 +448,13 @@ module Sequel
     # Apply all migration tuples on the database
     def run
       migration_tuples.each do |m, f, direction|
+        t = Time.now
+        db.log_info("Begin applying migration #{f}, direction: #{direction}")
         db.transaction do
           m.apply(db, direction)
           direction == :up ? ds.insert(column=>f) : ds.filter(column=>f).delete
         end
+        db.log_info("Finished applying migration #{f}, direction: #{direction}, took #{sprintf('%0.6f', Time.now - t)} seconds")
       end
       nil
     end
