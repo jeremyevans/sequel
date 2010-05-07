@@ -3,52 +3,21 @@
 # to a newer version or revert to a previous version.
 
 module Sequel
-  # The +Migration+ class describes a database migration that can be reversed.
-  # Example:
-  #
-  #   migration1 = Sequel.migration do
-  #     up do
-  #       create_table :sessions do
+  # Sequel's older migration class, available for backward compatibility.
+  # Uses subclasses with up and down instance methods for each migration:
+  # 
+  #   Class.new(Sequel::Migration) do
+  #     def up
+  #       create_table(:artists) do
   #         primary_key :id
-  #         String :session_id, :size => 32, :unique => true
-  #         DateTime :created_at
-  #         text :data
+  #         String :name
   #       end
   #     end
-  # 
-  #     down do
-  #       # You can use raw SQL if you need to
-  #       self << 'DROP TABLE sessions'
+  #     
+  #     def down
+  #       drop_table(:artists)
   #     end
   #   end
-  #
-  #   migration2 = Sequel.migration do
-  #     up do
-  #       alter_table :items do
-  #         add_column :category, String, :default => 'ruby'
-  #       end
-  #     end
-  # 
-  #     down do
-  #       alter_table :items do
-  #         drop_column :category
-  #       end  
-  #     end
-  #   end
-  #
-  # To apply a migration to a database, you can invoke +apply+ with
-  # the target database instance and the direction <tt>:up</tt> or <tt>:down</tt>, e.g.:
-  #
-  #   DB = Sequel.connect('sqlite://mydb')
-  #   migration1.apply(DB, :up)
-  #
-  # See <tt>Sequel::Schema::Generator</tt> for the syntax to use for creating tables
-  # with +create_table+, and <tt>Sequel::Schema::AlterTableGenerator</tt> for the
-  # syntax to use when altering existing tables with +alter_table+.
-  # Migrations act as a proxy for the database
-  # given in +apply+, so inside the +down+ and +up+ blocks, you can act as though +self+
-  # refers to the database, which allows you to use any of the <tt>Sequel::Database</tt>
-  # instance methods directly.
   class Migration
     # Creates a new instance of the migration and sets the @db attribute.
     def initialize(db)
@@ -87,8 +56,9 @@ module Sequel
   end
 
   # Migration class used by the Sequel.migration DSL,
-  # using instances instead of anonymous subclasses
-  # for each migration.
+  # using instances for each migration, unlike the
+  # +Migration+ class, which uses subclasses for each
+  # migration.
   class SimpleMigration
     # Proc used for the down action
     attr_accessor :down
@@ -131,8 +101,7 @@ module Sequel
     end
   end
 
-  # A short cut for creating anonymous migration classes. For example,
-  # this code:
+  # The preferred method for writing Sequel migrations, using a DSL:
   # 
   #   Sequel.migration do
   #     up do
@@ -147,25 +116,12 @@ module Sequel
   #     end
   #   end
   #
-  # is just a easier way of writing:
-  # 
-  #   Class.new(Sequel::Migration) do
-  #     def up 
-  #       create_table(:artists) do
-  #         primary_key :id
-  #         String :name
-  #       end
-  #     end
-  #     
-  #     def down 
-  #       drop_table(:artists)
-  #     end
-  #   end
+  # Designed to be used with the +Migrator+ class.
   def self.migration(&block)
     MigrationDSL.create(&block)
   end
 
-  # The Migrator class performs migrations based on migration files in a 
+  # The +Migrator+ class performs migrations based on migration files in a 
   # specified directory. The migration files should be named using the
   # following pattern:
   # 
