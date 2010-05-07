@@ -146,9 +146,9 @@ module Sequel
     MigrationDSL.create(&block)
   end
 
-  # The Migrator module performs migrations based on migration files in a 
+  # The Migrator class performs migrations based on migration files in a 
   # specified directory. The migration files should be named using the
-  # following pattern (in similar fashion to ActiveRecord migrations):
+  # following pattern:
   # 
   #   <version>_<title>.rb
   #
@@ -156,10 +156,21 @@ module Sequel
   #   
   #   001_create_sessions.rb
   #   002_add_data_column.rb
-  #   ...
+  #   
+  # You can also use timestamps as version numbers:
   #
-  # The migration files should contain one or more migration classes based
-  # on Sequel::Migration.
+  #   1273253850_create_sessions.rb
+  #   1273257248_add_data_column.rb
+  #
+  # If any migration filenames use timestamps as version numbers, Sequel
+  # uses the +TimestampMigrator+ to migrate, otherwise it uses the +IntegerMigrator+.
+  # The +TimestampMigrator+ can handle migrations that are run out of order
+  # as well as migrations with the same timestamp,
+  # while the +IntegerMigrator+ is more strict and raises exceptions for missing
+  # or duplicate migration files.
+  #
+  # The migration files should contain either one +Migration+
+  # subclass or one <tt>Sequel.migration</tt> call.
   #
   # Migrations are generally run via the sequel command line tool,
   # using the -m and -M switches.  The -m switch specifies the migration
@@ -168,10 +179,11 @@ module Sequel
   # You can apply migrations using the Migrator API, as well (this is necessary
   # if you want to specify the version from which to migrate in addition to the version
   # to which to migrate).
-  # To apply a migration, the +apply+ method must be invoked with the database
+  # To apply a migrator, the +apply+ method must be invoked with the database
   # instance, the directory of migration files and the target version. If
   # no current version is supplied, it is read from the database. The migrator
-  # automatically creates a schema_info table in the database to keep track
+  # automatically creates a table (schema_info for integer migrations and
+  # schema_migrations for timestamped migrations). in the database to keep track
   # of the current migration version. If no migration version is stored in the
   # database, the version is considered to be 0. If no target version is 
   # specified, the database is migrated to the latest version available in the
@@ -181,21 +193,28 @@ module Sequel
   #
   #   Sequel::Migrator.apply(DB, '.')
   #
+  # For example, to migrate the database all the way down:
+  #
+  #   Sequel::Migrator.apply(DB, '.', 0)
+  #
+  # For example, to migrate the database to version 4:
+  #
+  #   Sequel::Migrator.apply(DB, '.', 4)
+  #
   # To migrate the database from version 1 to version 5:
   #
   #   Sequel::Migrator.apply(DB, '.', 5, 1)
   class Migrator
-    DEFAULT_SCHEMA_COLUMN = :version
-    DEFAULT_SCHEMA_TABLE = :schema_info
     MIGRATION_FILE_PATTERN = /\A\d+_.+\.rb\z/.freeze
     MIGRATION_SPLITTER = '_'.freeze
+    MINIMUM_TIMESTAMP = 1104566400
 
-    # Exception class raised when there is an error with the migration
-    # file structure.
+    # Exception class raised when there is an error with the migrator's
+    # file structure, database, or arguments.
     class Error < Sequel::Error
     end
 
-    # Wrapper for run, maintaining backwards API compatibility
+    # Wrapper for +run+, maintaining backwards API compatibility
     def self.apply(db, directory, target = nil, current = nil)
       run(db, directory, :target => target, :current => current)
     end
@@ -213,53 +232,101 @@ module Sequel
     #   Sequel::Migrator.run(DB, "app1/migrations", :column=> :app2_version)
     #   Sequel::Migrator.run(DB, "app2/migrations", :column => :app2_version, :table=>:schema_info2)
     def self.run(db, directory, opts={})
-      new(db, directory, opts).run
+      migrator_class(directory).new(db, directory, opts).run
     end
 
-    # The column to use to hold the migration version number (defaults to :version)
+    # Choose the Migrator subclass to use.  Uses the TimestampMigrator
+    # if the version number appears to be a unix time integer for a year
+    # after 2005, otherwise uses the IntegerMigrator.
+    def self.migrator_class(directory)
+      Dir.new(directory).each do |file|
+        next unless MIGRATION_FILE_PATTERN.match(file)
+        return TimestampMigrator if file.split(MIGRATION_SPLITTER, 2).first.to_i > MINIMUM_TIMESTAMP
+      end
+      IntegerMigrator
+    end
+    private_class_method :migrator_class
+    
+    # The column to use to hold the migration version number for integer migrations or
+    # filename for timestamp migrations (defaults to :version for integer migrations and
+    # :filename for timestamp migrations)
     attr_reader :column
-
-    # The current version for this migrator
-    attr_reader :current
 
     # The database related to this migrator
     attr_reader :db
 
-    # The direction of the migrator, either :up or :down
-    attr_reader :direction
-
     # The directory for this migrator's files
     attr_reader :directory
 
-    # The schema info dataset for this migrator
+    # The dataset for this migrator, representing the +schema_info+ table for integer
+    # migrations and the +schema_migrations+ table for timestamp migrations
     attr_reader :ds
 
     # All migration files in this migrator's directory
     attr_reader :files
 
-    # The migrations used by this migrator
-    attr_reader :migrations
-
-    # The table to use to hold the migration version number (defaults to :schema_info)
+    # The table to use to hold the applied migration data (defaults to :schema_info for
+    # integer migrations and :schema_migrations for timestamp migrations)
     attr_reader :table
 
     # The target version for this migrator
     attr_reader :target
 
-    # Set up all state for the migrator instance
+    # Setup the state for the migrator
     def initialize(db, directory, opts={})
+      raise(Error, "Must supply a valid migration path") unless File.directory?(directory)
       @db = db
       @directory = directory
       @files = get_migration_files
-      @table = opts[:table]  || DEFAULT_SCHEMA_TABLE
-      @column = opts[:column] || DEFAULT_SCHEMA_COLUMN
-      @ds = schema_info_dataset
+      @table = opts[:table]  || self.class.const_get(:DEFAULT_SCHEMA_TABLE)
+      @column = opts[:column] || self.class.const_get(:DEFAULT_SCHEMA_COLUMN)
+      @ds = schema_dataset
+    end
+
+    private
+
+    # Remove all migration classes.  Done by the migrator to ensure that
+    # the correct migration classes are picked up.
+    def remove_migration_classes
+      # Remove class definitions
+      Migration.descendants.each do |c|
+        Object.send(:remove_const, c.to_s) rescue nil
+      end
+      Migration.descendants.clear # remove any defined migration classes
+    end
+
+    # Return the integer migration version based on the filename.
+    def migration_version_from_file(filename)
+      filename.split(MIGRATION_SPLITTER, 2).first.to_i
+    end
+  end
+
+  # The default migrator, recommended in most cases.  Uses a simple incrementing
+  # version number starting with 1, where missing or duplicate migration file
+  # versions are not allowed.
+  class IntegerMigrator < Migrator
+    DEFAULT_SCHEMA_COLUMN = :version
+    DEFAULT_SCHEMA_TABLE = :schema_info
+
+    Error = Migrator::Error
+
+    # The current version for this migrator
+    attr_reader :current
+
+    # The direction of the migrator, either :up or :down
+    attr_reader :direction
+
+    # The migrations used by this migrator
+    attr_reader :migrations
+
+    # Set up all state for the migrator instance
+    def initialize(db, directory, opts={})
+      super
       @target = opts[:target] || latest_migration_version
       @current = opts[:current] || current_migration_version
       @direction = current < target ? :up : :down
       @migrations = get_migrations
 
-      raise(Error, "Must supply a valid migration path") unless File.directory?(directory)
       raise(Error, "No current version available") unless current
       raise(Error, "No target version available") unless target
     end
@@ -300,11 +367,7 @@ module Sequel
     # Returns a list of migration classes filtered for the migration range and
     # ordered according to the migration direction.
     def get_migrations
-      # Remove class definitions
-      Migration.descendants.each do |c|
-        Object.send(:remove_const, c.to_s) rescue nil
-      end
-      Migration.descendants.clear # remove any defined migration classes
+      remove_migration_classes
 
       # load migration files
       files[up? ? (current + 1)..target : (target + 1)..current].compact.each{|f| load(f)}
@@ -320,20 +383,15 @@ module Sequel
       l ? migration_version_from_file(File.basename(l)) : nil
     end
     
-    # Return the integer migration version based on the filename.
-    def migration_version_from_file(filename)
-      filename.split(MIGRATION_SPLITTER, 2).first.to_i
-    end
-    
     # Returns the dataset for the schema_info table. If no such table
     # exists, it is automatically created.
-    def schema_info_dataset
+    def schema_dataset
       c = column
       ds = db.from(table)
       if !db.table_exists?(table)
-        db.create_table(table){Integer c, :default=>0}
+        db.create_table(table){Integer c, :default=>0, :null=>false}
       elsif !ds.columns.include?(c)
-        db.alter_table(table){add_column c, Integer, :default=>0}
+        db.alter_table(table){add_column c, Integer, :default=>0, :null=>false}
       end
       ds.insert(c=>0) if ds.empty?
       raise(Error, "More than 1 row in migrator table") if ds.count > 1
@@ -355,6 +413,119 @@ module Sequel
     # that will be in affect after the migration is run.
     def version_numbers
       up? ? ((current+1)..target).to_a : (target..(current - 1)).to_a.reverse
+    end
+  end
+
+  # The migrator used if any migration file version appears to be a timestamp.
+  # Stores filenames of migration files, and can figure out which migrations
+  # have not been applied and apply them, even if earlier migrations are added
+  # after later migrations.  If you plan to do that, the responsibility is on
+  # you to make sure the migrations don't conflict.
+  class TimestampMigrator < Migrator
+    DEFAULT_SCHEMA_COLUMN = :filename
+    DEFAULT_SCHEMA_TABLE = :schema_migrations
+    
+    Error = Migrator::Error
+
+    # Array of strings of applied migration filenames
+    attr_reader :applied_migrations
+
+    # Get tuples of migrations, filenames, and actions for each migration
+    attr_reader :migration_tuples
+
+    # Set up all state for the migrator instance
+    def initialize(db, directory, opts={})
+      super
+      @target = opts[:target]
+      @applied_migrations = get_applied_migrations
+      @migration_tuples = get_migration_tuples
+    end
+
+    # Apply all migration tuples on the database
+    def run
+      migration_tuples.each do |m, f, direction|
+        db.transaction do
+          m.apply(db, direction)
+          direction == :up ? ds.insert(column=>f) : ds.filter(column=>f).delete
+        end
+      end
+      nil
+    end
+
+    private
+
+    # Convert the schema_info table to the new schema_migrations table format,
+    # using the version of the schema_info table and the current migration files.
+    def convert_from_schema_info
+      v = db[IntegerMigrator::DEFAULT_SCHEMA_TABLE].get(IntegerMigrator::DEFAULT_SCHEMA_COLUMN)
+      ds = db.from(table)
+      files.each do |path|
+        f = File.basename(path)
+        if migration_version_from_file(f) <= v
+          ds.insert(column=>f)
+        end
+      end
+    end
+
+    # Returns filenames of all applied migrations
+    def get_applied_migrations
+      am = ds.select_order_map(column)
+      missing_migration_files = am - files.map{|f| File.basename(f)}
+      raise(Error, "Applied migration files not in file system: #{missing_migration_files.join(', ')}") if missing_migration_files.length > 0
+      am
+    end
+    
+    # Returns any migration files found in the migrator's directory.
+    def get_migration_files
+      files = []
+      Dir.new(directory).each do |file|
+        next unless MIGRATION_FILE_PATTERN.match(file)
+        files << File.join(directory, file)
+      end
+      files.sort
+    end
+    
+    # Returns tuples of migration, filename, and direction
+    def get_migration_tuples
+      remove_migration_classes
+      up_mts = []
+      down_mts = []
+      ms = Migration.descendants
+      files.each do |path|
+        f = File.basename(path)
+        if target
+          if migration_version_from_file(f) > target
+            if applied_migrations.include?(f)
+              load(path)
+              down_mts << [ms.last, f, :down]
+            end
+          elsif !applied_migrations.include?(f)
+            load(path)
+            up_mts << [ms.last, f, :up]
+          end
+        elsif !applied_migrations.include?(f)
+          load(path)
+          up_mts << [ms.last, f, :up]
+        end
+      end
+      up_mts + down_mts.reverse
+    end
+    
+    # Returns the dataset for the schema_migrations table. If no such table
+    # exists, it is automatically created.
+    def schema_dataset
+      c = column
+      ds = db.from(table)
+      if !db.table_exists?(table)
+        db.create_table(table){String c, :primary_key=>true}
+        if db.table_exists?(:schema_info) and vha = db[:schema_info].all and vha.length == 1 and
+           vha.first.keys == [:version] and vha.first.values.first.is_a?(Integer)
+          convert_from_schema_info
+        end
+      elsif !ds.columns.include?(c)
+        raise(Error, "Migrator table #{table} does not contain column #{c}")
+      end
+      ds
     end
   end
 end
