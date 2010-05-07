@@ -86,6 +86,24 @@ module Sequel
     end
   end
 
+  # Migration class used by the Sequel.migration DSL,
+  # using instances instead of anonymous subclasses
+  # for each migration.
+  class SimpleMigration
+    # Proc used for the down action
+    attr_accessor :down
+
+    # Proc used for the up action
+    attr_accessor :up
+
+    # Apply the appropriate block on the +Database+
+    # instance using instance_eval.
+    def apply(db, direction)
+      raise(ArgumentError, "Invalid migration direction specified (#{direction.inspect})") unless [:up, :down].include?(direction)
+      db.instance_eval(&send(direction))
+    end
+  end
+
   # Internal class used by the Sequel.migration DSL.
   class MigrationDSL < BasicObject
     # The underlying Migration class.
@@ -97,18 +115,19 @@ module Sequel
 
     # Create a new migration class, and instance_eval the block.
     def initialize(&block)
-      @migration = Class.new(Sequel::Migration)
+      @migration = SimpleMigration.new
+      Migration.descendants << migration
       instance_eval(&block)
     end
 
     # Defines the migration's down action.
     def down(&block)
-      @migration.send(:define_method, :down, &block)
+      migration.down = block
     end
 
     # Defines the migration's up action.
     def up(&block)
-      @migration.send(:define_method, :up, &block)
+      migration.up = block
     end
   end
 
