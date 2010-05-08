@@ -855,8 +855,10 @@ module Sequel
         delete
       end
 
+      # Insert the record into the database, returning the primary key if
+      # the record should be refreshed from the database.
       def _insert
-        ds = model.dataset
+        ds = _insert_dataset
         if ds.respond_to?(:insert_select) and h = ds.insert_select(@values)
           @values = h
           nil
@@ -871,6 +873,12 @@ module Sequel
         end
       end
       
+      # The dataset to use when inserting a new object.   The same as the model's
+      # dataset by default.
+      def _insert_dataset
+        model.dataset
+      end
+  
       # Refresh using a particular dataset, used inside save to make sure the same server
       # is used for reading newly inserted values from the database
       def _refresh(dataset)
