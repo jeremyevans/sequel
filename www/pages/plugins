@@ -24,6 +24,7 @@
 <li><a href="rdoc-plugins/classes/Sequel/Plugins/RcteTree.html">rcte_tree</a>: Supports retrieving all ancestors and descendants for tree structured data using recursive common table expressions.</li>
 <li><a href="rdoc-plugins/classes/Sequel/Plugins/Schema.html">schema</a>: Adds backwards compatibility for Model.set_schema and Model.create_table.</li>
 <li><a href="rdoc-plugins/classes/Sequel/Plugins/Serialization.html">serialization</a>: Supports serializing column values and storing them as either marshal, yaml, or json in the database.</li>
+<li><a href="rdoc-plugins/classes/Sequel/Plugins/Sharding.html">sharding</a>: Allows model objects work well with Sequel's sharding support.</li>
 <li><a href="rdoc-plugins/classes/Sequel/Plugins/SingleTableInheritance.html">single_table_inheritance</a>: Supports inheritance in the database by using a single table for all classes in a class hierarchy.</li>
 <li><a href="rdoc-plugins/classes/Sequel/Plugins/Subclasses.html">subclasses</a>: Allows easy access all model subclasses and descendent classes, without using ObjectSpace.</li>
 <li><a href="rdoc-plugins/classes/Sequel/Plugins/TacticalEagerLoading.html">tactical_eager_loading</a>: Allows you to eagerly load an association for all objects retreived from the same dataset when calling the association method on any of the objects in the dataset.</li>
