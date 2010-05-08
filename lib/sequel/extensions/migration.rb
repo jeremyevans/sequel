@@ -70,7 +70,9 @@ module Sequel
     # instance using instance_eval.
     def apply(db, direction)
       raise(ArgumentError, "Invalid migration direction specified (#{direction.inspect})") unless [:up, :down].include?(direction)
-      db.instance_eval(&send(direction))
+      if prok = send(direction)
+        db.instance_eval(&prok)
+      end
     end
   end
 

@@ -1,26 +1,34 @@
 require File.join(File.dirname(__FILE__), 'spec_helper')
 
-context "Migration classes" do
+context "Migration.descendants" do
   before do
     Sequel::Migration.descendants.clear
   end
 
-  specify "should be registred in Migration.descendants" do
+  specify "should include Migration subclasses" do
     @class = Class.new(Sequel::Migration)
     
     Sequel::Migration.descendants.should == [@class]
   end
   
-  specify "should be registered in the right order" do
+  specify "should include Migration subclasses in order of creation" do
     @c1 = Class.new(Sequel::Migration)
     @c2 = Class.new(Sequel::Migration)
     @c3 = Class.new(Sequel::Migration)
     
     Sequel::Migration.descendants.should == [@c1, @c2, @c3]
   end
+
+  specify "should include SimpleMigration instances created by migration DSL" do
+    i1 = Sequel.migration{}
+    i2 = Sequel.migration{}
+    i3 = Sequel.migration{}
+    
+    Sequel::Migration.descendants.should == [i1, i2, i3]
+  end
 end
 
-context "Migration#apply" do
+context "Migration.apply" do
   before do
     @c = Class.new do
       define_method(:one) {|x| [1111, x]}
@@ -42,7 +50,27 @@ context "Migration#apply" do
     m.apply(@db, :down).should == [2222, 4444]
   end
 
-  specify "should support the simpler DSL" do
+  specify "should have default up and down actions that do nothing" do
+    m = Class.new(Sequel::Migration)
+    m.apply(@db, :up).should == nil
+    m.apply(@db, :down).should == nil
+  end
+end
+
+context "SimpleMigration#apply" do
+  before do
+    @c = Class.new do
+      define_method(:one) {|x| [1111, x]}
+      define_method(:two) {|x| [2222, x]}
+    end
+    @db = @c.new
+  end
+  
+  specify "should raise for an invalid direction" do
+    proc {Sequel.migration{}.apply(@db, :hahaha)}.should raise_error(ArgumentError)
+  end
+  
+  specify "should apply the up and down directions correctly" do
     m = Sequel.migration do
       up{one(3333)}
       down{two(4444)}
@@ -52,13 +80,13 @@ context "Migration#apply" do
   end
 
   specify "should have default up and down actions that do nothing" do
-    m = Class.new(Sequel::Migration)
+    m = Sequel.migration{}
     m.apply(@db, :up).should == nil
     m.apply(@db, :down).should == nil
   end
 end
 
-context "Sequel::Migrator" do
+context "Sequel::IntegerMigrator" do
   before do
     dbc = Class.new(MockDatabase) do
       attr_reader :drops, :tables_created, :columns_created, :versions
