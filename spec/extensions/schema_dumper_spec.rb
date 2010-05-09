@@ -282,7 +282,8 @@ END_MIG
       blob varbinary varbinary(10) binary binary(20) year" +
       ["double precision", "timestamp with time zone", "timestamp without time zone",
        "time with time zone", "time without time zone", "character varying(20)"] +
-      %w"nvarchar ntext smalldatetime smallmoney binary varbinary nchar"
+      %w"nvarchar ntext smalldatetime smallmoney binary varbinary nchar" +
+      ["timestamp(6) without time zone", "timestamp(6) with time zone"]
     @d.meta_def(:schema) do |t, *o|
       i = 0
       types.map{|x| [:"c#{i+=1}", {:db_type=>x, :allow_null=>true}]}
@@ -350,6 +351,8 @@ create_table(:x) do
   File :c59
   File :c60
   String :c61, :fixed=>true
+  DateTime :c62, :size=>6
+  DateTime :c63, :size=>6
 end
 END_MIG
     @d.dump_table_schema(:x).should == table.chomp

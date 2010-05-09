@@ -128,8 +128,8 @@ END_MIG
         {:type=>Date}
       when /\A(?:small)?datetime\z/o
         {:type=>DateTime}
-      when /\Atimestamp(?: with(?:out)? time zone)?\z/o
-        {:type=>DateTime}
+      when /\Atimestamp(?:\((\d+)\))?(?: with(?:out)? time zone)?\z/o
+        {:type=>DateTime, :size=>($1.to_i if $1)}
       when /\Atime(?: with(?:out)? time zone)?\z/o
         {:type=>Time, :only_time=>true}
       when /\An?char(?:acter)?(?:\((\d+)\))?\z/o
