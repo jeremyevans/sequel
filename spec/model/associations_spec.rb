@@ -2076,7 +2076,7 @@ describe Sequel::Model, "many_to_many" do
     end
     MODEL_DB.reset
     @c1.load(:id => 234).should == n.remove_attribute(234)
-    MODEL_DB.sqls.should == ['SELECT * FROM attributes WHERE (id = 234) LIMIT 1',
+    MODEL_DB.sqls.should == ['SELECT attributes.* FROM attributes WHERE (id = 234) LIMIT 1',
       'DELETE FROM attributes_nodes WHERE ((node_id = 1234) AND (attribute_id = 234))']
   end
     
@@ -2156,7 +2156,7 @@ describe Sequel::Model, "many_to_many" do
     MODEL_DB.reset
     @c1.load(:id => 234, :y=>8).should == n.remove_attribute([234, 8])
     MODEL_DB.sqls.length.should == 2
-    MODEL_DB.sqls.first.should =~ /SELECT \* FROM attributes WHERE \(\((id|y) = (234|8)\) AND \((id|y) = (234|8)\)\) LIMIT 1/
+    MODEL_DB.sqls.first.should =~ /SELECT attributes\.\* FROM attributes WHERE \(\((id|y) = (234|8)\) AND \((id|y) = (234|8)\)\) LIMIT 1/
     MODEL_DB.sqls.last.should == 'DELETE FROM attributes_nodes WHERE ((node_id = 1234) AND (attribute_id = 234))'
   end
     

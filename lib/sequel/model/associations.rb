@@ -796,13 +796,13 @@ module Sequel
             h = {}
             lcks.zip(lcpks).each{|k, pk| h[k] = send(pk)}
             rcks.zip(opts.right_primary_keys).each{|k, pk| h[k] = o.send(pk)}
-            database.dataset.from(join_table).insert(h)
+            _join_table_dataset(opts).insert(h)
           end
           association_module_private_def(opts._remove_method) do |o|
-            database.dataset.from(join_table).filter(lcks.zip(lcpks.map{|k| send(k)}) + rcks.zip(opts.right_primary_keys.map{|k| o.send(k)})).delete
+            _join_table_dataset(opts).filter(lcks.zip(lcpks.map{|k| send(k)}) + rcks.zip(opts.right_primary_keys.map{|k| o.send(k)})).delete
           end
           association_module_private_def(opts._remove_all_method) do
-            _apply_association_options(opts, database.dataset.from(join_table).filter(lcks.zip(lcpks.map{|k| send(k)}))).delete
+            _apply_association_options(opts, _join_table_dataset(opts).filter(lcks.zip(lcpks.map{|k| send(k)}))).delete
           end
       
           def_add_method(opts)
@@ -1005,6 +1005,11 @@ module Sequel
           _apply_association_options(opts, send(opts._dataset_method))
         end
 
+        # Dataset for the join table of the given many to many association reflection
+        def _join_table_dataset(opts)
+          model.db.from(opts[:join_table])
+        end
+
         # Return the associated objects from the dataset, without callbacks, reciprocals, and caching.
         def _load_associated_objects(opts)
           if opts.returns_array?
@@ -1031,10 +1036,7 @@ module Sequel
             raise(Sequel::Error, "associated object #{o.inspect} not of correct type #{klass}")
           end
           raise(Sequel::Error, "model object #{inspect} does not have a primary key") unless pk
-          if opts.need_associated_primary_key?
-            o.save(:validate=>opts[:validate]) if o.new?
-            raise(Sequel::Error, "associated object #{o.inspect} does not have a primary key") unless o.pk
-          end
+          ensure_associated_primary_key(opts, o, *args)
           return if run_association_callbacks(opts, :before_add, o) == false
           send(opts._add_method, o, *args)
           if array = associations[opts[:name]] and !array.include?(o)
@@ -1061,6 +1063,16 @@ module Sequel
         # and is an actual method for memory reasons.
         def array_uniq!(a)
           a.uniq!
+        end
+
+        # Save the associated object if the associated object needs a primary key
+        # and the associated object is new and does not have one.  Raise an error if
+        # the object still does not have a primary key
+        def ensure_associated_primary_key(opts, o, *args)
+          if opts.need_associated_primary_key?
+            o.save(:validate=>opts[:validate]) if o.new?
+            raise(Sequel::Error, "associated object #{o.inspect} does not have a primary key") unless o.pk
+          end
         end
 
         # Load the associated objects using the dataset, handling callbacks, reciprocals, and caching.
@@ -1095,9 +1107,7 @@ module Sequel
         def remove_associated_object(opts, o, *args)
           klass = opts.associated_class
           if o.is_a?(Integer) || o.is_a?(String) || o.is_a?(Array)
-            key = o
-            pkh = klass.primary_key_hash(key)
-            raise(Sequel::Error, "no object with key(s) #{key} is currently associated to #{inspect}") unless o = (opts.remove_should_check_existing? ? send(opts.dataset_method) : klass).first(pkh)
+            o = remove_check_existing_object_from_pk(opts, o, *args)
           elsif !o.is_a?(klass)
             raise(Sequel::Error, "associated object #{o.inspect} not of correct type #{klass}")
           elsif opts.remove_should_check_existing? && send(opts.dataset_method).filter(o.pk_hash).empty?
@@ -1110,6 +1120,18 @@ module Sequel
           associations[opts[:name]].delete_if{|x| o === x} if associations.include?(opts[:name])
           remove_reciprocal_object(opts, o)
           run_association_callbacks(opts, :after_remove, o)
+          o
+        end
+
+        # If necessary, check that the object from the associated table specified by the primary key
+        # is currently associated to the object.  If it is associated, return the object, otherwise
+        # raise an error.
+        def remove_check_existing_object_from_pk(opts, o, *args)
+          klass = opts.associated_class
+          key = o
+          pkh = klass.primary_key_hash(key)
+          o = (opts.remove_should_check_existing? ? send(opts.dataset_method) : _apply_association_options(opts, klass.dataset)).first(pkh)
+          raise(Sequel::Error, "no object with key(s) #{key.inspect} is currently associated to #{inspect}") unless o
           o
         end
 
