@@ -1127,11 +1127,9 @@ module Sequel
         # is currently associated to the object.  If it is associated, return the object, otherwise
         # raise an error.
         def remove_check_existing_object_from_pk(opts, o, *args)
-          klass = opts.associated_class
           key = o
-          pkh = klass.primary_key_hash(key)
-          o = (opts.remove_should_check_existing? ? send(opts.dataset_method) : _apply_association_options(opts, klass.dataset)).first(pkh)
-          raise(Sequel::Error, "no object with key(s) #{key.inspect} is currently associated to #{inspect}") unless o
+          pkh = opts.associated_class.primary_key_hash(key)
+          raise(Sequel::Error, "no object with key(s) #{key.inspect} is currently associated to #{inspect}") unless o = send(opts.dataset_method).first(pkh)
           o
         end
 

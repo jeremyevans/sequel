@@ -2076,8 +2076,8 @@ describe Sequel::Model, "many_to_many" do
     end
     MODEL_DB.reset
     @c1.load(:id => 234).should == n.remove_attribute(234)
-    MODEL_DB.sqls.should == ['SELECT attributes.* FROM attributes WHERE (id = 234) LIMIT 1',
-      'DELETE FROM attributes_nodes WHERE ((node_id = 1234) AND (attribute_id = 234))']
+    MODEL_DB.sqls.should == ["SELECT attributes.* FROM attributes INNER JOIN attributes_nodes ON ((attributes_nodes.attribute_id = attributes.id) AND (attributes_nodes.node_id = 1234)) WHERE (id = 234) LIMIT 1",
+      "DELETE FROM attributes_nodes WHERE ((node_id = 1234) AND (attribute_id = 234))"]
   end
     
   it "should raise an error in the remove_ method if the passed associated object is not of the correct type" do
@@ -2155,9 +2155,10 @@ describe Sequel::Model, "many_to_many" do
     end
     MODEL_DB.reset
     @c1.load(:id => 234, :y=>8).should == n.remove_attribute([234, 8])
+    ["SELECT attributes.* FROM attributes INNER JOIN attributes_nodes ON ((attributes_nodes.attribute_id = attributes.id) AND (attributes_nodes.node_id = 1234)) WHERE ((id = 234) AND (y = 8)) LIMIT 1",
+      "SELECT attributes.* FROM attributes INNER JOIN attributes_nodes ON ((attributes_nodes.attribute_id = attributes.id) AND (attributes_nodes.node_id = 1234)) WHERE ((y = 8) AND (id = 234)) LIMIT 1"].should include(MODEL_DB.sqls.first)
+    MODEL_DB.sqls.last.should == "DELETE FROM attributes_nodes WHERE ((node_id = 1234) AND (attribute_id = 234))"
     MODEL_DB.sqls.length.should == 2
-    MODEL_DB.sqls.first.should =~ /SELECT attributes\.\* FROM attributes WHERE \(\((id|y) = (234|8)\) AND \((id|y) = (234|8)\)\) LIMIT 1/
-    MODEL_DB.sqls.last.should == 'DELETE FROM attributes_nodes WHERE ((node_id = 1234) AND (attribute_id = 234))'
   end
     
   it "should raise an error if the model object doesn't have a valid primary key" do
@@ -2567,6 +2568,21 @@ describe Sequel::Model, "many_to_many" do
     end
     @c2.load(:id=>1).remove_all_attributes
     MODEL_DB.sqls.should == ["DELETE FROM attributes_nodes WHERE (node_id = 1)"]
+  end
+
+  it "should use assocation's dataset when grabbing a record to remove from the assocation by primary key" do
+    @c2.many_to_many :attributes, :class => @c1 do |ds|
+      ds.filter(:join_table_att=>3)
+    end
+    @c1.dataset.instance_eval do
+      def fetch_rows(sql, &block)
+        db.sqls << sql
+        yield(:id=>2)
+      end
+    end
+    @c2.load(:id=>1).remove_attribute(2)
+    MODEL_DB.sqls.should == ["SELECT attributes.* FROM attributes INNER JOIN attributes_nodes ON ((attributes_nodes.attribute_id = attributes.id) AND (attributes_nodes.node_id = 1)) WHERE ((join_table_att = 3) AND (id = 2)) LIMIT 1",
+      "DELETE FROM attributes_nodes WHERE ((node_id = 1) AND (attribute_id = 2))"] 
   end
 end
 
