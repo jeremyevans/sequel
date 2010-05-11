@@ -72,19 +72,19 @@ module Sequel
       
       # Run the given SQL with the given arguments and return the number of changed rows.
       def execute_dui(sql, opts={})
-        _execute(opts){|conn| log_yield(sql, opts[:arguments]){conn.execute_batch(sql, opts[:arguments])}; conn.changes}
+        _execute(opts){|conn| log_yield(sql, opts[:arguments]){conn.execute_batch(sql, opts.fetch(:arguments, []))}; conn.changes}
       end
       
       # Run the given SQL with the given arguments and return the last inserted row id.
       def execute_insert(sql, opts={})
-        _execute(opts){|conn| log_yield(sql, opts[:arguments]){conn.execute(sql, opts[:arguments])}; conn.last_insert_row_id}
+        _execute(opts){|conn| log_yield(sql, opts[:arguments]){conn.execute(sql, opts.fetch(:arguments, []))}; conn.last_insert_row_id}
       end
       
       # Run the given SQL with the given arguments and yield each row.
       def execute(sql, opts={})
         _execute(opts) do |conn|
           begin
-            yield(result = log_yield(sql, opts[:arguments]){conn.query(sql, opts[:arguments])})
+            yield(result = log_yield(sql, opts[:arguments]){conn.query(sql, opts.fetch(:arguments, []))})
           ensure
             result.close if result
           end
@@ -93,7 +93,7 @@ module Sequel
       
       # Run the given SQL with the given arguments and return the first value of the first row.
       def single_value(sql, opts={})
-        _execute(opts){|conn| log_yield(sql, opts[:arguments]){conn.get_first_value(sql, opts[:arguments])}}
+        _execute(opts){|conn| log_yield(sql, opts[:arguments]){conn.get_first_value(sql, opts.fetch(:arguments, []))}}
       end
       
       private
