@@ -18,6 +18,8 @@ module Sequel
   #       drop_table(:artists)
   #     end
   #   end
+  #
+  # Part of the +migration+ extension.
   class Migration
     # Creates a new instance of the migration and sets the @db attribute.
     def initialize(db)
@@ -58,7 +60,7 @@ module Sequel
   # Migration class used by the Sequel.migration DSL,
   # using instances for each migration, unlike the
   # +Migration+ class, which uses subclasses for each
-  # migration.
+  # migration. Part of the +migration+ extension.
   class SimpleMigration
     # Proc used for the down action
     attr_accessor :down
@@ -76,7 +78,7 @@ module Sequel
     end
   end
 
-  # Internal class used by the Sequel.migration DSL.
+  # Internal class used by the Sequel.migration DSL, part of the +migration+ extension.
   class MigrationDSL < BasicObject
     # The underlying Migration class.
     attr_reader :migration
@@ -118,7 +120,7 @@ module Sequel
   #     end
   #   end
   #
-  # Designed to be used with the +Migrator+ class.
+  # Designed to be used with the +Migrator+ class, part of the +migration+ extension.
   def self.migration(&block)
     MigrationDSL.create(&block)
   end
@@ -181,6 +183,8 @@ module Sequel
   # To migrate the database from version 1 to version 5:
   #
   #   Sequel::Migrator.apply(DB, '.', 5, 1)
+  #
+  # Part of the +migration+ extension.
   class Migrator
     MIGRATION_FILE_PATTERN = /\A\d+_.+\.rb\z/.freeze
     MIGRATION_SPLITTER = '_'.freeze
@@ -280,7 +284,7 @@ module Sequel
 
   # The default migrator, recommended in most cases.  Uses a simple incrementing
   # version number starting with 1, where missing or duplicate migration file
-  # versions are not allowed.
+  # versions are not allowed.  Part of the +migration+ extension.
   class IntegerMigrator < Migrator
     DEFAULT_SCHEMA_COLUMN = :version
     DEFAULT_SCHEMA_TABLE = :schema_info
@@ -401,7 +405,7 @@ module Sequel
   # Stores filenames of migration files, and can figure out which migrations
   # have not been applied and apply them, even if earlier migrations are added
   # after later migrations.  If you plan to do that, the responsibility is on
-  # you to make sure the migrations don't conflict.
+  # you to make sure the migrations don't conflict. Part of the +migration+ extension.
   class TimestampMigrator < Migrator
     DEFAULT_SCHEMA_COLUMN = :filename
     DEFAULT_SCHEMA_TABLE = :schema_migrations
