@@ -1,5 +1,7 @@
 === HEAD
 
+* No longer apply association options to join table dataset when removing all many_to_many associated objects (jeremyevans)
+
 * Log the execution times of migrations to the database's loggers (jeremyevans)
 
 * Add a TimestampMigrator that can work with migrations where versions are timestamps, and handle migrations applied out of order (jeremyevans)

@@ -2333,14 +2333,6 @@ describe Sequel::Model, "many_to_many" do
     MODEL_DB.sqls.first.should == 'DELETE FROM attributes_nodes WHERE (node_id = 1234)'
   end
 
-  it "should have remove_all method respect association filters" do
-    @c2.many_to_many :attributes, :class => @c1, :conditions=>{:a=>1} do |ds|
-      ds.filter(:b=>2)
-    end
-    @c2.new(:id => 1234).remove_all_attributes
-    MODEL_DB.sqls.should == ['DELETE FROM attributes_nodes WHERE ((node_id = 1234) AND (a = 1) AND (b = 2))']
-  end
-
   it "should have the remove_all_ method respect the :left_primary_key option" do
     @c2.many_to_many :attributes, :class => @c1, :left_primary_key=>:xxx
     @c2.new(:id => 1234, :xxx=>5).remove_all_attributes
@@ -2567,6 +2559,14 @@ describe Sequel::Model, "many_to_many" do
   it "should support a :distinct option that uses the DISTINCT clause" do
     @c2.many_to_many :attributes, :class => @c1, :distinct=>true
     @c2.load(:id=>10).attributes_dataset.sql.should == "SELECT DISTINCT attributes.* FROM attributes INNER JOIN attributes_nodes ON ((attributes_nodes.attribute_id = attributes.id) AND (attributes_nodes.node_id = 10))"
+  end
+
+  it "should not apply association options when removing all associated records" do
+    @c2.many_to_many :attributes, :class => @c1 do |ds|
+      ds.filter(:name=>'John')
+    end
+    @c2.load(:id=>1).remove_all_attributes
+    MODEL_DB.sqls.should == ["DELETE FROM attributes_nodes WHERE (node_id = 1)"]
   end
 end
 

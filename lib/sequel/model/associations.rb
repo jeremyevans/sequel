@@ -802,7 +802,7 @@ module Sequel
             _join_table_dataset(opts).filter(lcks.zip(lcpks.map{|k| send(k)}) + rcks.zip(opts.right_primary_keys.map{|k| o.send(k)})).delete
           end
           association_module_private_def(opts._remove_all_method) do
-            _apply_association_options(opts, _join_table_dataset(opts).filter(lcks.zip(lcpks.map{|k| send(k)}))).delete
+            _join_table_dataset(opts).filter(lcks.zip(lcpks.map{|k| send(k)})).delete
           end
       
           def_add_method(opts)
