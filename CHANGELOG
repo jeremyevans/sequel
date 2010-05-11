@@ -1,5 +1,23 @@
 === HEAD
 
+* Log the execution times of migrations to the database's loggers (jeremyevans)
+
+* Add a TimestampMigrator that can work with migrations where versions are timestamps, and handle migrations applied out of order (jeremyevans)
+
+* Completely refactor Sequel::Migrator, now a class instead of a module (jeremyevans)
+
+* Save migration version after each migration, instead of after all migrations (jeremyevans)
+
+* Raise an error if missing a migration version (jeremyevans)
+
+* Raise an error if using a duplicate migration version (jeremyevans)
+
+* Add a Sequel.migration DSL for defining migrations (jeremyevans)
+
+* Add a sharding plugin giving Sequel::Model objects support for dealing with sharding (jeremyevans)
+
+* Handle timestamp(N) with time zone data types (hone)
+
 * Fix MSSQL temporary table creation, but watch out as it changes the table name (gpd, jeremyevans) (#299)
 
 === 3.11.0 (2010-05-03)
