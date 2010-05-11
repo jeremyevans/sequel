@@ -13,12 +13,12 @@ module Sequel
     def dump_indexes_migration(options={})
       ts = tables(options)
       <<END_MIG
-Class.new(Sequel::Migration) do
-  def up
+Sequel.migration do
+  up do
 #{ts.sort_by{|t| t.to_s}.map{|t| dump_table_indexes(t, :add_index, options)}.reject{|x| x == ''}.join("\n\n").gsub(/^/o, '    ')}
   end
   
-  def down
+  down do
 #{ts.sort_by{|t| t.to_s}.map{|t| dump_table_indexes(t, :drop_index, options)}.reject{|x| x == ''}.join("\n\n").gsub(/^/o, '    ')}
   end
 end
@@ -37,12 +37,12 @@ END_MIG
     def dump_schema_migration(options={})
       ts = tables(options)
       <<END_MIG
-Class.new(Sequel::Migration) do
-  def up
+Sequel.migration do
+  up do
 #{ts.sort_by{|t| t.to_s}.map{|t| dump_table_schema(t, options)}.join("\n\n").gsub(/^/o, '    ')}
   end
   
-  def down
+  down do
     drop_table(#{ts.sort_by{|t| t.to_s}.inspect[1...-1]})
   end
 end
