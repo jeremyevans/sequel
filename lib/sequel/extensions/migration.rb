@@ -186,7 +186,7 @@ module Sequel
   #
   # Part of the +migration+ extension.
   class Migrator
-    MIGRATION_FILE_PATTERN = /\A\d+_.+\.rb\z/.freeze
+    MIGRATION_FILE_PATTERN = /\A\d+_.+\.rb\z/i.freeze
     MIGRATION_SPLITTER = '_'.freeze
     MINIMUM_TIMESTAMP = 20000101
 
@@ -433,7 +433,8 @@ module Sequel
         db.log_info("Begin applying migration #{f}, direction: #{direction}")
         db.transaction do
           m.apply(db, direction)
-          direction == :up ? ds.insert(column=>f) : ds.filter(column=>f).delete
+          fi = f.downcase
+          direction == :up ? ds.insert(column=>fi) : ds.filter(column=>fi).delete
         end
         db.log_info("Finished applying migration #{f}, direction: #{direction}, took #{sprintf('%0.6f', Time.now - t)} seconds")
       end
@@ -458,7 +459,7 @@ module Sequel
     # Returns filenames of all applied migrations
     def get_applied_migrations
       am = ds.select_order_map(column)
-      missing_migration_files = am - files.map{|f| File.basename(f)}
+      missing_migration_files = am - files.map{|f| File.basename(f).downcase}
       raise(Error, "Applied migration files not in file system: #{missing_migration_files.join(', ')}") if missing_migration_files.length > 0
       am
     end
@@ -481,17 +482,18 @@ module Sequel
       ms = Migration.descendants
       files.each do |path|
         f = File.basename(path)
+        fi = f.downcase
         if target
           if migration_version_from_file(f) > target
-            if applied_migrations.include?(f)
+            if applied_migrations.include?(fi)
               load(path)
               down_mts << [ms.last, f, :down]
             end
-          elsif !applied_migrations.include?(f)
+          elsif !applied_migrations.include?(fi)
             load(path)
             up_mts << [ms.last, f, :up]
           end
-        elsif !applied_migrations.include?(f)
+        elsif !applied_migrations.include?(fi)
           load(path)
           up_mts << [ms.last, f, :up]
         end

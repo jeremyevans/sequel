@@ -422,6 +422,17 @@ context "Sequel::TimestampMigrator" do
     proc{@m.run(@db, @dir, :column=>:fn)}.should raise_error(Sequel::Migrator::Error)
   end
   
+  specify "should handle migration filenames in a case insensitive manner" do
+    @dir = 'spec/files/uppercase_timestamped_migrations'
+    @m.apply(@db, @dir)
+    [:schema_migrations, :sm1111, :sm2222, :sm3333].each{|n| @db.table_exists?(n).should be_true}
+    @db[:schema_migrations].select_order_map(:filename).should == %w'1273253849_create_sessions.rb 1273253851_create_nodes.rb 1273253853_3_create_users.rb'
+    @dir = 'spec/files/timestamped_migrations'
+    @m.apply(@db, @dir, 0)
+    [:sm1111, :sm2222, :sm3333].each{|n| @db.table_exists?(n).should be_false}
+    @db[:schema_migrations].select_order_map(:filename).should == []
+  end
+
   specify "should :table and :column options" do
     @dir = 'spec/files/timestamped_migrations'
     @m.run(@db, @dir, :table=>:sm, :column=>:fn)
