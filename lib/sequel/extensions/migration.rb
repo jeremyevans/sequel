@@ -188,7 +188,7 @@ module Sequel
   class Migrator
     MIGRATION_FILE_PATTERN = /\A\d+_.+\.rb\z/.freeze
     MIGRATION_SPLITTER = '_'.freeze
-    MINIMUM_TIMESTAMP = 1104566400
+    MINIMUM_TIMESTAMP = 20000101
 
     # Exception class raised when there is an error with the migrator's
     # file structure, database, or arguments.
