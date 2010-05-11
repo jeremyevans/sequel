@@ -75,7 +75,7 @@ module Sequel
       #   or not allowing NULL values (if false).  If unspecified, will default
       #   to whatever the database default is.
       # * :on_delete - Specify the behavior of this column when being deleted.
-      #   See Dataset#on_delete_clause for options.
+      #   See Schema::SQL#on_delete_clause for options.
       # * :on_update - Specify the behavior of this column when being updated.
       #   See Schema::SQL#on_delete_clause for options.
       # * :size - The size of the column, generally used with string

@@ -44,18 +44,18 @@ Here is a fairly basic Sequel migration:
     end
   end
 
-This migration has an up block which adds an artist table with an integer primary key named id,
+This migration has an +up+ block which adds an artist table with an integer primary key named id,
 and a varchar or text column (depending on the database) named name that doesn't accept NULL values.
-Migrations should include both up and down blocks, with the down block reversing
+Migrations should include both up and +down+ blocks, with the +down+ block reversing
 the change made by up.  However, if you never need to be able to migrate down
 (i.e. you are one of the people that doesn't make mistakes), you can leave out
-the down block.  In this case, the down block just reverses the changes made by up,
+the +down+ block.  In this case, the +down+ block just reverses the changes made by up,
 dropping the table.
 
-In normal usage, when Sequel's migrator runs, it runs the up blocks for all
+In normal usage, when Sequel's migrator runs, it runs the +up+ blocks for all
 migrations that have not yet been applied.  However, you can use the <tt>-M</tt>
 switch to specify the version to which to migrate, and if it is lower than the
-current version, Sequel will run the down block on the appropriate migrations.
+current version, Sequel will run the +down+ block on the appropriate migrations.
 
 You are not limited to creating tables inside a migration, you can alter existing tables
 as well as modify data.  Let's say your artist database originally only included artists
@@ -74,14 +74,14 @@ from Sacramento, CA, USA, but now you want to branch out and include artists in 
 
 This migration adds a +location+ column to the +artists+ table, and sets the +location+ column
 to <tt>'Sacramento'</tt> for all existing artists.  It doesn't use a default on the column,
-because future artists should not be assumed to come from Sacramento.  In the down block, it
+because future artists should not be assumed to come from Sacramento.  In the +down+ block, it
 just drops the +location+ column from the +artists+ table, reversing the actions of the up
 block.
 
 Note that when updating the +artists+ table in the update, a plain dataset is used, <tt>self[:artists]</tt>.
-This looks a little weird, but you need to be aware that inside an up or down block in a migration,
+This looks a little weird, but you need to be aware that inside an up or +down+ block in a migration,
 self always refers to the <tt>Sequel::Database</tt> object that the migration is being applied to.
-Since <tt>Database#[]</tt> creates datasets, using <tt>self[:artists]</tt> inside the up block creates
+Since <tt>Database#[]</tt> creates datasets, using <tt>self[:artists]</tt> inside the +up+ block creates
 a dataset on the database representing all columns in the +artists+ table, and updates it to set the
 +location+ column to <tt>'Sacramento'</tt>.
 
@@ -222,7 +222,7 @@ to worry about that issue until the 1000th migration:
 
 It should be fairly obvious, but migrations start at 1, not 0.  The migration version number 0
 is important though, as it is used to mean that all migrations should be unapplied (i.e. all
-down blocks run).  In Sequel, you can do that with:
++down+ blocks run).  In Sequel, you can do that with:
 
   sequel -m db/migrations -M 0 postgres://localhost/sequel_test
 
@@ -301,8 +301,8 @@ contains a <tt>Sequel.migration</tt> call.  The minimal do-nothing migration is:
 
   Sequel.migration{}
 
-However, the migrations you right should contain an up block that does something, and a down block that
-reverses the changes made by up:
+However, the migrations you write should contain an +up+ block that does something, and a +down+ block that
+reverses the changes made by the +up+ block:
 
   Sequel.migration do
     up{...}
@@ -311,7 +311,7 @@ reverses the changes made by up:
 
 == Schema modification methods
 
-Inside your migration's down and up blocks is where you will call the +Database+ schema modification methods.
+Inside your migration's down and +up+ blocks is where you will call the +Database+ schema modification methods.
 Here's a brief description of the most common schema modification methods:
 
 === +create_table+
@@ -329,8 +329,8 @@ by default.
 
 ==== Column types
 
-Most method calls inside the create_table block will create columns, though the index method
-will create an index.  Columns are generally created by specifying the column type as the method
+Most method calls inside the create_table block will create columns, since +method_missing+ calls +column+
+Columns are generally created by specifying the column type as the method
 name, followed by the column name symbol to use, and after that any options that should be used.
 If the method is a ruby class name that Sequel recognizes, Sequel will transform it into the appropriate
 type for the given database.  So while you specified +String+, Sequel will actually use +varchar+ or
@@ -373,15 +373,637 @@ cases, Sequel uses the type specified verbatim:
     inet :a4                       # inet
   end
 
-In addition to specifying the types as methods, you can use the column method and specify the types
+In addition to specifying the types as methods, you can use the +column+ method and specify the types
 as the second argument, either as ruby classes, symbols, or strings:
 
   create_table(:columns_types) do  # database type used
     column :a1, :string            # string
     column :a2, String             # varchar(255)
     column :a3, 'string'           # string
-    datetime :a2                   # datetime
-    blob :a3                       # blob
-    inet :a4                       # inet
+    column :a4, :datetime          # datetime
+    column :a5, DateTime           # timestamp
+    column :a6, 'timestamp(6)'     # timestamp(6)
   end
 
+==== Column options
+
+When using the type name as method, the third argument is an options hash, and when using the +column+
+method, the fourth argument is the options hash.  The following options are supported:
+
+:default :: The default value for the column.
+:index :: Create an index on this column.
+:null :: Mark the column as allowing NULL values (if true),
+         or not allowing NULL values (if false).  If unspecified, will default
+         to whatever the database default is.
+:size :: The size of the column, generally used with string
+         columns to specify the maximum number of characters the column will hold.
+         An array of two integers can be provided to set the size and the
+         precision, respectively, of decimal columns.
+:unique :: Mark the column as unique, generally has the same effect as
+           creating a unique index on the column.
+:unsigned :: Make the column type unsigned, only useful for integer
+             columns.
+
+==== Other methods
+
+In addition to the +column+ method and other methods that create columns, there are a other methods that can be used:
+
+==== +primary_key+
+
+You've seen this one used already.  It's used to create an autoincrementing integer primary key column.
+
+  create_table(:a0){primary_key :id}
+
+If you want to create a primary key column that doesn't use an autoincrementing integer, you should
+not use this method.  Instead, you should use the :primary_key option to the +column+ method or type
+method:
+
+  create_table(:a1){Integer :id, :primary_key=>true} # Non autoincrementing integer primary key
+  create_table(:a2){String :name, :primary_key=>true} # varchar(255) primary key
+
+If you want to create a composite primary key, you should call the +primary_key+ method with an
+array of column symbols:
+
+  create_table(:items) do
+    Integer :group_id
+    Integer :position
+    primary_key [:group_id, :position]
+  end 
+
+If provided with an array, +primary_key+ does not create a column, it just sets up the primary key constraint.
+
+==== +foreign_key+
+
++foreign_key+ is used to create a foreign key column that references a column in another table (or the same table).
+It takes the column name as the first argument, the table it references as the second argument, and an options hash
+as it's third argument.  A simple example is:
+
+  create_table(:albums) do
+    primary_key :id
+    foreign_key :artist_id, :artists
+    String :name
+  end
+
++foreign_key+ accepts some specific options:
+
+:key :: For foreign key columns, the column in the associated table
+        that this column references.  Unnecessary if this column
+        references the primary key of the associated table, at least
+        on most databases.
+:on_delete :: Specify the behavior of this foreign key column when the row with the primary key
+              it references is deleted , can be :restrict, :cascade, :set_null, or :set_default.
+:on_update :: Specify the behavior of this foreign key column when the row with the primary key
+              it references modifies the value of the primary key, can be
+              :restrict, :cascade, :set_null, or :set_default.
+
+Like +primary_key+, if you provide +foreign_key+ with an array of symbols, it will not create a
+column, but create a foreign key constraint:
+
+  create_table(:artists) do
+    String :name
+    String :location
+    primary_key [:name, :location]
+  end
+  create_table(:albums) do
+    String :artist_name
+    String :artist_location
+    String :name
+    foreign_key [:artist_name, :artist_location], :artists
+  end
+
+==== +index+
+
++index+ creates indexes on the table.  For single columns, calling index is the same as using the
+<tt>:index</tt> option when creating the column:
+
+  create_table(:a){Integer :id, :index=>true}
+  # Same as:
+  create_table(:a) do
+    Integer :id
+    index :id
+  end
+
+Similar to the +primary_key+ and +foreign_key+ methods, calling +index+ with an array of symbols
+will create a multiple column index:
+
+  create_table(:albums) do
+    primary_key :id
+    foreign_key :artist_id, :artists
+    Integer :position
+    index [:artist_id, :position]
+  end
+
+The +index+ method also accepts some options:
+
+:name :: The name of the index (generated based on the table and column names if not provided).
+:type :: The type of index to use (only supported by some databases)
+:unique :: Make the index unique, so duplicate values are not allowed.
+:where :: Create a partial index (only supported by some databases)
+
+==== +unique+
+
+The +unique+ method creates a unique constraint on the table.  A unique constraint generally
+operates identically to a unique index, so the following three +create_table+ blocks are
+pretty much identical:
+
+  create_table(:a){Integer :a, :unique=>true}
+
+  create_table(:a) do
+    Integer :a
+    index :a, :unique=>true
+  end
+
+  create_table(:a) do
+    Integer :a
+    unique :a
+  end
+
+Just like +index+, +unique+ can set up a multiple column unique constraint, where the
+combination of the columns must be unique:
+
+  create_table(:a) do
+    Integer :a
+    Integer :b
+    unique [:a, :b]
+  end
+
+==== +full_text_index+ and +spatial_index+
+
+Both of these create specialized index types supported by some databases.  They
+both take the same options as +index+.
+
+==== +constraint+
+
++constraint+ creates a named table constraint:
+
+  create_table(:artists) do
+    primary_key :id
+    String :name
+    constraint(:name_min_length){char_length(name) > 2}
+  end
+  
+Instead of using a block, you can use arguments that will be handled similarly
+to <tt>Dataset#filter</tt>:
+
+  create_table(:artists) do
+    primary_key :id
+    String :name
+    constraint(:name_length_range, :char_length.sql_function(:name)=>3..50)
+  end
+  
+==== +check+
+
++check+ operates just like +constraint+, except that it doesn't take a name
+and it creates an unnamed constraint
+
+  create_table(:artists) do
+    primary_key :id
+    String :name
+    check{char_length(name) > 2}
+  end
+  
+=== +alter_table+
+
++alter_table+ is used to alter existing tables, changing their columns, indexes,
+or constraints.  It it used just like +create_table+, accepting a block which
+is instance_evaled, and providing its own methods:
+
+==== +add_column+
+
+One of the most common methods, +add_column+ is used to add a column to the table.
+Its API is similar to that of +create_table+'s +column+ method, where the first
+argument is the column name, the second is the type, and the third is an options
+hash:
+
+  alter_table(:albums) do
+    add_column :copies_sold, Integer, :default=>0
+  end
+
+When adding a column, it's a good idea to provide a default value, unless you
+want the value for all rows to be set to NULL.
+
+==== +drop_column+
+
+As you may expect, +drop_column+ takes a column name and drops the column.  It's
+often used in the +down+ block of a migration to drop a column added in an +up+ block:
+
+  alter_table(:albums) do
+    drop_column :copies_sold
+  end
+
+==== +rename_column+
+
++rename_column+ is used to rename a column.  It takes the old column name as the first
+argument, and the new column name as the second argument:
+
+  alter_table(:albums) do
+    rename_column :copies_sold, :total_sales
+  end
+
+==== +add_primary_key+
+
+If you forgot to include a primary key on the table, and want to add one later, you
+can use +add_primary_key+.  A common use of this is to make many_to_many association
+join tables into real models:
+
+  alter_table(:albums_artists) do
+    add_primary_key :id
+  end
+
+Just like +create_table+'s +primary_key+ method, if you provide an array of symbols,
+Sequel will not add a column, but will add a composite primary key constraint:
+
+  alter_table(:albums_artists) do
+    add_primary_key [:album_id, :artist_id]
+  end
+
+If you just want to take an existing single column and make it a primary key, call
++add_primary_key+ with an array with a single symbol:
+
+  alter_table(:artists) do
+    add_primary_key [:id]
+  end
+
+==== +add_foreign_key+
+
++add_foreign_key+ can be used to add a new foreign key column or constraint to a table.
+Like +add_primary_key+, if you provide it with a symbol as the first argument, it
+creates a new column:
+
+  alter_table(:albums) do
+    add_foreign_key :artist_id, :artists
+  end
+
+If you want to add a new foreign key constraint to an existing column, you provide an
+array with a single element:
+
+  alter_table(:albums) do
+    add_foreign_key [:artist_id], :artists
+  end
+
+To set up a multiple column foreign key constraint, use an array with multiple column
+symbols:
+
+  alter_table(:albums) do
+    add_foreign_key [:artist_name, :artist_location], :artists
+  end
+
+==== +add_index+
+
++add_index+ works just like +create_table+'s +index+ method, creating a new index on
+the table:
+
+  alter_table(:albums) do
+    add_index :artist_id
+  end
+
+It accepts the same options as +create_table+'s +index+ method, and you can set up
+a multiple column index using an array:
+
+  alter_table(:albums_artists) do
+    add_index [:album_id, :artist_id], :unique=>true
+  end
+
+==== +drop_index+
+
+As you may expect, +drop_index+ drops an existing index:
+
+  alter_table(:albums) do
+    drop_index :artist_id
+  end
+
+Just like +drop_column+, it is often used in the +down+ block of a migration.
+
+==== +add_full_text_index+, +add_spatial_index+
+
+Corresponding to +create_table+'s +full_text_index+ and +spatial_index+ methods,
+these two methods create new indexes on the table.
+
+==== +add_constraint+
+
+This adds a named constraint to the table, similar to +create_table+'s +constraint+
+method:
+
+  alter_table(:albums) do
+    add_constraint(:name_min_length){char_length(name) > 2}
+  end
+
+There is no method to add an unnamed constraint, but you can pass nil as the first
+argument of +add_constraint+ to do so.  However, it's not recommend to do that
+as it is difficult to drop such a constraint.
+
+==== +add_unique_constraint+
+
+This adds a unique constraint to the table, similar to +create_table+'s +unique+
+method.  This usually has the same effect as adding a unique index.
+
+  alter_table(:albums) do
+    add_unique_constraint [:artist_id, :name]
+  end
+
+==== +drop_constraint+
+
+This method drops an existing named constraint:
+
+  alter_table(:albums) do
+    drop_constraint(:name_min_length)
+  end
+
+There is no database independent method to drop an unnamed constraint.  Generally, the
+database will give it a name automatically, and you will have to figure out what it is.
+For that reason, you should not add unnamed constraints that you ever might need to remove.
+
+==== +set_column_default+
+
+This modifies the default value of a column:
+
+  alter_table(:albums) do
+    set_column_default :copies_sold, 0
+  end
+
+==== +set_column_type+
+
+This modifies a column's type.  Most databases will attempt to convert existing values in
+the columns to the new type:
+
+  alter_table(:albums) do
+    set_column_type :copies_sold, Bignum
+  end
+
+You can specify the type as a string or symbol, in which case it is used verbatim, or as a supported
+ruby class, in which case it gets converted to an appropriate database type.
+
+==== +set_column_allow_null+
+
+This changes the NULL or NOT NULL setting of a column:
+
+  alter_table(:albums) do
+    set_column_allow_null :artist_id, true    # NULL
+    set_column_allow_null :copies_sold, false # NOT NULL
+  end
+
+=== Other +Database+ schema modification methods
+
+<tt>Sequel::Database</tt> has many schema modification instance methods,
+most of which are shortcuts to the same methods in +alter_table+.  The
+following +Database+ instance methods just call +alter_table+ with a
+block that calls the method with the same name inside the +alter_table+
+block with all arguments after the first argument (which is used as
+the table name):
+
+* +add_column+
+* +drop_column+
+* +rename_column+
+* +add_index+
+* +drop_index+
+* +set_column_default+
+* +set_column_type+
+
+For example, the following two method calls do the same thing:
+
+  alter_table(:artists){add_column :copies_sold, Integer}
+  add_column :artists, :copies_sold, Integer
+
+There are some other schema modification methods that have no +alter_table+
+counterpart:
+
+==== +drop_table+
+
++drop_table+ takes multiple arguments and treats all arguments as a
+table name to drop:
+
+  drop_table(:albums_artists, :albums, :artists)
+
+Note that when dropping tables, you may need to drop them in a specific order
+if you are using foreign keys and the database is enforcing referential
+integrity.  In general, you need to drop the tables containing the foreign
+keys before the tables containing the primary keys they reference.
+
+==== +rename_table+
+
+You can rename an existing table using +rename_table+.  Like +rename_column+,
+the first argument is the current name, and the second is the new name:
+
+  rename_table(:artist, :artists)
+
+==== <tt>create_table!</tt>
+
+<tt>create_table!</tt> with the bang drops the table unconditionally (swallowing
+any errors) before attempting to create it, so:
+
+  create_table!(:artists)
+    primary_key :id
+  end
+
+is the same as:
+
+  drop_table(:artists) rescue nil
+  create_table(:artists)
+    primary_key :id
+  end
+
+It should not be used inside migrations, as if the table does not exist, it may
+mess up the migration.
+
+==== <tt>create_table?</tt>
+
+<tt>create_table?</tt> with a question mark only creates the table if it does
+not already exist, so:
+
+  create_table!(:artists)
+    primary_key :id
+  end
+
+is the same as:
+
+  create_table(:artists)
+    primary_key :id
+  end unless table_exists?(:artists)
+
+Like <tt>create_table!</tt>, it should not be used inside migrations.
+
+==== +create_view+ and +create_or_replace_view+
+
+These can be used to create views.  The difference between them is that
++create_or_replace_view+ will unconditionally replace an existing view of
+the same name, while +create_view+ will probably raise an error.  Both methods
+take the name as the first argument, and either an string or a dataset as the
+second argument:
+
+  create_view(:gold_albums, DB[:albums].filter{copies_sold > 500000})
+  create_or_replace_view(:gold_albums, "SELECT * FROM albums WHERE copies_sold > 500000")
+
+==== +drop_view+
+
++drop_view+ drops existing views.  Just like +drop_table+, it can accept multiple
+arguments:
+
+  drop_view(:gold_albums, :platinum_albums)
+
+== What to put in your migration's +down+ block
+
+It's usually easy to determine what you should put in your migration's +up+ block,
+as it's whatever change you want to make to the database.  The +down+ block is
+less obvious.  In general, it should reverse the changes made by the +up+ block, which means
+it should execute the opposite of what the +up+ block does in the reverse order in which 
+the +up+ block does it.  Here's an example where you are switching from having a single
+artist per album to multiple artists per album:
+
+  Sequel.migration do
+    up do
+      # Create albums_artists table
+      create_table(:albums_artists) do
+        foreign_key :album_id, :albums
+        foreign_key :artist_id, :artists
+        index [:album_id, :artist_id], :unique=>true
+      end
+
+      # Insert one row in the albums_artists table
+      # for each row in the albums table where there
+      # is an associated artist
+      DB[:albums_artists].insert([:album_id, :artist_id],
+       DB[:albums].select(:id, :artist_id).exclude(:artist_id=>nil))
+
+      # Drop the now unnecesssary column from the albums table
+      drop_column :albums, :artist_id
+    end
+    down do
+      # Add the foreign key column back to the artists table
+      alter_table(:albums){add_foreign_key :artist_id, :artists}
+
+      # If possible, associate each album with one of the artists
+      # it was associated with.  This loses information, but
+      # there's no way around that.
+      DB[:albums_artists].
+       group(:album_id).
+       select{[album_id, max(artist_id).as(artist_id)]}.
+       having{artist_id >  0}.
+       all do |r|
+         DB[:artists].
+          filter(:id=>r[:album_id]).
+          update(:artist_id=>r[:artist_id])
+       end
+
+      # Drop the albums_artists table
+      drop_table(:albums_artists)
+    end
+  end
+
+Note that the order in which things were done in the +down+ block is in
+reverse order to how they were done in the +up+ block.  Also note how it
+isn't always possible to reverse exactly what was done in the +up+ block.
+You should try to do so as much as possible, but if you can't, you may
+want to have your +down+ block raise a <tt>Sequel::Error</tt> exception
+saying why the migration cannot be reverted.
+
+== Running migrations
+
+You can run migrations using the +sequel+ command line program that
+comes with Sequel.  If you use the <tt>-m</tt> switch, +sequel+ will
+run the migrator instead of giving you an IRB session.  The <tt>-m</tt>
+switch requires an argument that should be a path to a directory of migration
+files:
+
+  sequel -m relative/path/to/migrations postgres://host/database
+  sequel -m /absolute/path/to/migrations postgres://host/database
+
+If you do not provide a <tt>-M</tt> switch, +sequel+ will migrate to the latest
+version in the directory.  If you provide a <tt>-M</tt> switch, it should specify
+an integer version to which to migrate.
+
+  # Migrate all the way down
+  sequel -m db/migrations -M 0 postgres://host/database
+
+  # Migrate to version 10 (IntegerMigrator style migrations)
+  sequel -m db/migrations -M 10 postgres://host/database
+
+  # Migrate to version 20100510 (TimestampMigrator migrations using YYYYMMDD)
+  sequel -m db/migrations -M 20100510 postgres://host/database
+
+Whether or not migrations use the +up+ or +down+ block depends on the version
+to which you are migrating.  If you don't provide a <tt>-M</tt> switch, all
+unapplied migrations will be migrated up.  If you provide a <tt>-M</tt>, it will
+depend on which migrations that have been applied.  Applied migrations greater
+than that version will be migrated down, while unapplied migrations less than
+or equal to that version will be migrated up.
+
+== Verbose migrations
+
+By default, <tt>sequel -m</tt> operates as a well behaved command line utility
+should, printing out nothing if there is no error.  If you want to see the SQL
+being executed during a migration, as well as the amount of time that each
+migration takes, you can use the <tt>-E</tt> option to +sequel+ to set up a
++Database+ logger that logs to +STDOUT+.  You can also log that same output to
+a file using the <tt>-l</tt> option with a log file name.
+
+== Using models in your migrations
+
+Just don't do it.
+
+It can be tempting to use models in your migrations, especially since it's easy
+to load them at the same time using the <tt>-L</tt> option to +sequel+.  However,
+this ties your migrations to your models, and makes it so that changes in your
+models can break old migrations.
+
+With Sequel, it should be easy to use plain datasets to accomplish pretty much
+anything you would want to accomplish in a migration.  Even if you have to
+copy some code from a model method into a migration itself, it's better than
+having your migration use models and call model methods.
+
+== Dumping the current schema as a migration
+
+Sequel comes with a +schema_dumper+ extension that dumps the current schema of
+the database as a migration to +STDOUT+ (which you can redirect to a file using
+>).  This is exposed in the +sequel+ command line tool with the <tt>-d</tt> and
+<tt>-D</tt> switches.  <tt>-d</tt> dumps the schema in database independent
+format, while <tt>-D</tt> dumps the schema using a non-portable format, useful
+if you are using nonportable columns such as +inet+ in your database.
+
+Let's say you have an existing database and want to create a migration that
+would recreate the database's schema:
+
+  sequel -d postgres://host/database > db/migrations/001_start.rb
+
+or using a nonportable format:
+
+  sequel -D postgres://host/database > db/migrations/001_start.rb
+
+The main difference between the two is that <tt>-d</tt> will use the type methods
+with the database independent ruby class types, while <tt>-D</tt> will use
+the +column+ method with string types.
+
+Note that Sequel cannot dump constraints other than primary key constraints,
+so it dumps foreign key columns as plain integers.  If you are using any real
+database features such as foreign keys, constraints, or triggers, you should
+use your database's dump and restore programs instead of Sequel's schema
+dumper.
+
+You can take the migration created by the schema dumper to another computer
+with an empty database, and attempt to recreate the schema using:
+
+  sequel -m db/migrations postgres://host/database
+
+== Old-style migration classes
+
+Before the <tt>Sequel.migration</tt> DSL was introduced, Sequel used classes
+for Migrations:
+
+  Class.new(Sequel::Migration) do
+    def up
+    end
+    def down
+    end
+  end
+
+or:
+
+  class DoSomething < Sequel::Migration
+    def up
+    end
+    def down
+    end
+  end
+
+This usage is discouraged in new code, but will continue to be supported indefinitely.
+It is not recommended to convert old-style migration classes to the <tt>Sequel.migration</tt>
+DSL, but it is recommended to use the <tt>Sequel.migration</tt> DSL for all new migrations.

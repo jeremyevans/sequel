@@ -59,7 +59,7 @@ task :website_rdoc=>[:website_rdoc_main, :website_rdoc_adapters, :website_rdoc_p
 Rake::RDocTask.new(:website_rdoc_main) do |rdoc|
   rdoc.rdoc_dir = "www/public/rdoc"
   rdoc.options += RDOC_OPTS
-  rdoc.rdoc_files.add %w"README.rdoc CHANGELOG COPYING lib/*.rb lib/sequel/*.rb lib/sequel/{connection_pool,dataset,database,model}/*.rb doc/*.rdoc doc/release_notes/*.txt"
+  rdoc.rdoc_files.add %w"README.rdoc CHANGELOG COPYING lib/*.rb lib/sequel/*.rb lib/sequel/{connection_pool,dataset,database,model}/*.rb doc/*.rdoc doc/release_notes/*.txt lib/sequel/extensions/migration.rb"
 end
 
 Rake::RDocTask.new(:website_rdoc_adapters) do |rdoc|

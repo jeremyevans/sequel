@@ -13,7 +13,7 @@
   <li><a href="rdoc/files/doc/advanced_associations_rdoc.html">Advanced Associations</a></li>
   <li><a href="rdoc/files/doc/prepared_statements_rdoc.html">Prepared Statements/Bound Variables</a></li>
   <li><a href="rdoc/files/doc/sharding_rdoc.html">Master/Slave Databases and Sharding</a></li>
-  <li><a href="rdoc/files/doc/schema_rdoc.html">Schema Modification</a></li>
+  <li><a href="rdoc/files/doc/migration_rdoc.html">Migrations and Schema Modification</a></li>
   <li><a href="rdoc/files/doc/virtual_rows_rdoc.html">Virtual Row Blocks</a></li>
   <li><a href="rdoc/files/doc/reflection_rdoc.html">Reflection</a></li>
 </ul>
