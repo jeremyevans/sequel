@@ -12,8 +12,13 @@ describe Sequel::Model::Errors do
     @errors.should == {}
   end
   
-  specify "should be empty if no errors are added" do
+  specify "should be empty if there are no errors" do
     @errors.should be_empty
+    @errors[:blah]
+    @errors.should be_empty
+  end
+  
+  specify "should not be empty if there are errors" do
     @errors[:blah] << "blah"
     @errors.should_not be_empty
   end

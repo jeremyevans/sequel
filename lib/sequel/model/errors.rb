@@ -20,6 +20,11 @@ module Sequel
         values.inject(0){|m, v| m + v.length}
       end
       
+      # Return true if there are no error messages, false otherwise.
+      def empty?
+        count == 0
+      end
+      
       # Returns an array of fully-formatted error messages.
       def full_messages
         inject([]) do |m, kv| 
