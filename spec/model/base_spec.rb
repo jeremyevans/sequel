@@ -157,6 +157,50 @@ describe "A model inheriting from a model" do
   end
 end
 
+describe "Model.primary_key" do
+  before do
+    @c = Class.new(Sequel::Model)
+  end
+  
+  specify "should default to id" do
+    @c.primary_key.should == :id
+  end
+
+  specify "should be overridden by set_primary_key" do
+    @c.set_primary_key :cid
+    @c.primary_key.should == :cid
+
+    @c.set_primary_key([:id1, :id2])
+    @c.primary_key.should == [:id1, :id2]
+  end
+  
+  specify "should use nil for no primary key" do
+    @c.no_primary_key
+    @c.primary_key.should == nil
+  end
+end
+
+describe "Model.primary_key_hash" do
+  before do
+    @c = Class.new(Sequel::Model)
+  end
+  
+  specify "should handle a single primary key" do
+    @c.primary_key_hash(1).should == {:id=>1}
+  end
+
+  specify "should handle a composite primary key" do
+    @c.set_primary_key([:id1, :id2])
+    @c.primary_key.should == [:id1, :id2]
+    @c.primary_key_hash([1, 2]).should == {:id1=>1, :id2=>2}
+  end
+
+  specify "should raise an error for no primary key" do
+    @c.no_primary_key
+    proc{@c.primary_key_hash(1)}.should raise_error(Sequel::Error)
+  end
+end
+
 describe "Model.db=" do
   before do
     $db1 = MockDatabase.new
