@@ -236,6 +236,14 @@ module Sequel
           {key => value}
         end
       end
+
+      # Return a hash where the keys are qualified column references.  Uses the given
+      # qualifier if provided, or the table_name otherwise.
+      def qualified_primary_key_hash(value, qualifier=table_name)
+        h = primary_key_hash(value)
+        h.to_a.each{|k,v| h[SQL::QualifiedIdentifier.new(qualifier, k)] = h.delete(k)}
+        h
+      end
   
       # Restrict the setting of the primary key(s) inside new/set/update.  Because
       # this is the default, this only make sense to use in a subclass where the

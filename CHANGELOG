@@ -1,5 +1,9 @@
 === HEAD
 
+* Add Model.qualified_primary_key_hash, similar to primary_key_hash but with qualified columns (jeremyevans)
+
+* Make Model::Errors#empty? handle attributes with empty error arrays (jeremyevans)
+
 * No longer apply association options to join table dataset when removing all many_to_many associated objects (jeremyevans)
 
 * Log the execution times of migrations to the database's loggers (jeremyevans)

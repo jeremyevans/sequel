@@ -191,13 +191,38 @@ describe "Model.primary_key_hash" do
 
   specify "should handle a composite primary key" do
     @c.set_primary_key([:id1, :id2])
-    @c.primary_key.should == [:id1, :id2]
     @c.primary_key_hash([1, 2]).should == {:id1=>1, :id2=>2}
   end
 
   specify "should raise an error for no primary key" do
     @c.no_primary_key
     proc{@c.primary_key_hash(1)}.should raise_error(Sequel::Error)
+  end
+end
+
+describe "Model.qualified_primary_key_hash" do
+  before do
+    @c = Class.new(Sequel::Model(:items))
+  end
+  
+  specify "should handle a single primary key" do
+    @c.qualified_primary_key_hash(1).should == {:id.qualify(:items)=>1}
+  end
+
+  specify "should handle a composite primary key" do
+    @c.set_primary_key([:id1, :id2])
+    @c.qualified_primary_key_hash([1, 2]).should == {:id1.qualify(:items)=>1, :id2.qualify(:items)=>2}
+  end
+
+  specify "should raise an error for no primary key" do
+    @c.no_primary_key
+    proc{@c.qualified_primary_key_hash(1)}.should raise_error(Sequel::Error)
+  end
+
+  specify "should allow specifying a different qualifier" do
+    @c.qualified_primary_key_hash(1, :apple).should == {:id.qualify(:apple)=>1}
+    @c.set_primary_key([:id1, :id2])
+    @c.qualified_primary_key_hash([1, 2], :bear).should == {:id1.qualify(:bear)=>1, :id2.qualify(:bear)=>2}
   end
 end
 
