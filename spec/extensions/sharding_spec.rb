@@ -143,11 +143,11 @@ describe "sharding plugin" do
     @Artist.actions.clear
 
     artist.remove_album(1)
-    @Album.actions.should == [[:fetch, "((albums.artist_id = 2) AND (id = 1))", :s2], [:update, {:name=>"RF", :artist_id=>nil}, "(id = 1)", :s2]]
+    @Album.actions.should == [[:fetch, "((albums.artist_id = 2) AND (albums.id = 1))", :s2], [:update, {:name=>"RF", :artist_id=>nil}, "(id = 1)", :s2]]
     @Album.actions.clear
     
     album.remove_tag(3)
-    @Tag.actions.should == [[:fetch, "(id = 3)", :s1]]
+    @Tag.actions.should == [[:fetch, "(tags.id = 3)", :s1]]
     @Album.actions.should == [[:delete, "((album_id = 1) AND (tag_id = 3))", :s1]]
   end 
 

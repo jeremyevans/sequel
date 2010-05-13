@@ -1128,7 +1128,7 @@ module Sequel
         # raise an error.
         def remove_check_existing_object_from_pk(opts, o, *args)
           key = o
-          pkh = opts.associated_class.primary_key_hash(key)
+          pkh = opts.associated_class.qualified_primary_key_hash(key)
           raise(Sequel::Error, "no object with key(s) #{key.inspect} is currently associated to #{inspect}") unless o = send(opts.dataset_method).first(pkh)
           o
         end

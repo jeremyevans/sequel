@@ -1228,7 +1228,7 @@ describe Sequel::Model, "one_to_many" do
     end
     MODEL_DB.reset
     @c1.load(:node_id => nil, :id => 234).should == n.remove_attribute(234)
-    MODEL_DB.sqls.should == ['SELECT * FROM attributes WHERE ((attributes.node_id = 1234) AND (id = 234)) LIMIT 1',
+    MODEL_DB.sqls.should == ['SELECT * FROM attributes WHERE ((attributes.node_id = 1234) AND (attributes.id = 234)) LIMIT 1',
       'UPDATE attributes SET node_id = NULL WHERE (id = 234)']
   end
   
@@ -1293,7 +1293,7 @@ describe Sequel::Model, "one_to_many" do
     MODEL_DB.reset
     @c1.load(:node_id => nil, :y => 5, :id => 234).should == n.remove_attribute([234, 5])
     MODEL_DB.sqls.length.should == 2
-    MODEL_DB.sqls.first.should =~ /SELECT \* FROM attributes WHERE \(\(attributes.node_id = 123\) AND \((id|y) = (234|5)\) AND \((id|y) = (234|5)\)\) LIMIT 1/
+    MODEL_DB.sqls.first.should =~ /SELECT \* FROM attributes WHERE \(\(attributes.node_id = 123\) AND \(attributes\.(id|y) = (234|5)\) AND \(attributes\.(id|y) = (234|5)\)\) LIMIT 1/
     MODEL_DB.sqls.last.should =~ /UPDATE attributes SET node_id = NULL WHERE \(\((id|y) = (234|5)\) AND \((id|y) = (234|5)\)\)/
   end
   
@@ -2076,7 +2076,7 @@ describe Sequel::Model, "many_to_many" do
     end
     MODEL_DB.reset
     @c1.load(:id => 234).should == n.remove_attribute(234)
-    MODEL_DB.sqls.should == ["SELECT attributes.* FROM attributes INNER JOIN attributes_nodes ON ((attributes_nodes.attribute_id = attributes.id) AND (attributes_nodes.node_id = 1234)) WHERE (id = 234) LIMIT 1",
+    MODEL_DB.sqls.should == ["SELECT attributes.* FROM attributes INNER JOIN attributes_nodes ON ((attributes_nodes.attribute_id = attributes.id) AND (attributes_nodes.node_id = 1234)) WHERE (attributes.id = 234) LIMIT 1",
       "DELETE FROM attributes_nodes WHERE ((node_id = 1234) AND (attribute_id = 234))"]
   end
     
@@ -2155,8 +2155,8 @@ describe Sequel::Model, "many_to_many" do
     end
     MODEL_DB.reset
     @c1.load(:id => 234, :y=>8).should == n.remove_attribute([234, 8])
-    ["SELECT attributes.* FROM attributes INNER JOIN attributes_nodes ON ((attributes_nodes.attribute_id = attributes.id) AND (attributes_nodes.node_id = 1234)) WHERE ((id = 234) AND (y = 8)) LIMIT 1",
-      "SELECT attributes.* FROM attributes INNER JOIN attributes_nodes ON ((attributes_nodes.attribute_id = attributes.id) AND (attributes_nodes.node_id = 1234)) WHERE ((y = 8) AND (id = 234)) LIMIT 1"].should include(MODEL_DB.sqls.first)
+    ["SELECT attributes.* FROM attributes INNER JOIN attributes_nodes ON ((attributes_nodes.attribute_id = attributes.id) AND (attributes_nodes.node_id = 1234)) WHERE ((attributes.id = 234) AND (attributes.y = 8)) LIMIT 1",
+      "SELECT attributes.* FROM attributes INNER JOIN attributes_nodes ON ((attributes_nodes.attribute_id = attributes.id) AND (attributes_nodes.node_id = 1234)) WHERE ((attributes.y = 8) AND (attributes.id = 234)) LIMIT 1"].should include(MODEL_DB.sqls.first)
     MODEL_DB.sqls.last.should == "DELETE FROM attributes_nodes WHERE ((node_id = 1234) AND (attribute_id = 234))"
     MODEL_DB.sqls.length.should == 2
   end
@@ -2581,7 +2581,7 @@ describe Sequel::Model, "many_to_many" do
       end
     end
     @c2.load(:id=>1).remove_attribute(2)
-    MODEL_DB.sqls.should == ["SELECT attributes.* FROM attributes INNER JOIN attributes_nodes ON ((attributes_nodes.attribute_id = attributes.id) AND (attributes_nodes.node_id = 1)) WHERE ((join_table_att = 3) AND (id = 2)) LIMIT 1",
+    MODEL_DB.sqls.should == ["SELECT attributes.* FROM attributes INNER JOIN attributes_nodes ON ((attributes_nodes.attribute_id = attributes.id) AND (attributes_nodes.node_id = 1)) WHERE ((join_table_att = 3) AND (attributes.id = 2)) LIMIT 1",
       "DELETE FROM attributes_nodes WHERE ((node_id = 1) AND (attribute_id = 2))"] 
   end
 end
