@@ -410,8 +410,24 @@ context "Sequel::SQL::OrderedExpression" do
 end
 
 context "Expression" do
-  specify "should ==" do
+  specify "should consider objects == only if they have the same attributes" do
     :column.qualify(:table).cast(:type).*(:numeric_column).asc.should == :column.qualify(:table).cast(:type).*(:numeric_column).asc
     :other_column.qualify(:table).cast(:type).*(:numeric_column).asc.should_not == :column.qualify(:table).cast(:type).*(:numeric_column).asc
+
+    :column.qualify(:table).cast(:type).*(:numeric_column).asc.should eql(:column.qualify(:table).cast(:type).*(:numeric_column).asc)
+    :other_column.qualify(:table).cast(:type).*(:numeric_column).asc.should_not eql(:column.qualify(:table).cast(:type).*(:numeric_column).asc)
+  end
+
+  specify "should use the same hash value for objects that have the same attributes" do
+    :column.qualify(:table).cast(:type).*(:numeric_column).asc.hash.should == :column.qualify(:table).cast(:type).*(:numeric_column).asc.hash
+    :other_column.qualify(:table).cast(:type).*(:numeric_column).asc.hash.should_not == :column.qualify(:table).cast(:type).*(:numeric_column).asc.hash
+
+    h = {}
+    a = :column.qualify(:table).cast(:type).*(:numeric_column).asc
+    b = :column.qualify(:table).cast(:type).*(:numeric_column).asc
+    h[a] = 1
+    h[b] = 2
+    h[a].should == 2
+    h[b].should == 2
   end
 end
