@@ -1,5 +1,7 @@
 === HEAD
 
+* Add Model#set_fields and update_fields, similar to set_only and update_only but ignoring other keys in the hash (jeremyevans)
+
 * Add Model.qualified_primary_key_hash, similar to primary_key_hash but with qualified columns (jeremyevans)
 
 * Make Model::Errors#empty? handle attributes with empty error arrays (jeremyevans)

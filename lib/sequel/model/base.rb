@@ -780,6 +780,13 @@ module Sequel
         set_restricted(hash, false, except.flatten)
       end
   
+      # For each of the fields in the given array +fields+, call the setter
+      # method with the value of that +hash+ entry for the field. Returns self.
+      def set_fields(hash, fields)
+        fields.each{|f| send("#{f}=", hash[f])}
+        self
+      end
+  
       # Set the values using the entries in the hash, only if the key
       # is included in only.
       def set_only(hash, *only)
@@ -808,6 +815,13 @@ module Sequel
         update_restricted(hash, false, except.flatten)
       end
   
+      # Update the instances values by calling +set_fields+ with the +hash+
+      # and +fields+, then save any changes to the record.  Returns self.
+      def update_fields(hash, fields)
+        set_fields(hash, fields)
+        save_changes
+      end
+
       # Update the values using the entries in the hash, only if the key
       # is included in only.
       def update_only(hash, *only)

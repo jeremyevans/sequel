@@ -737,6 +737,54 @@ describe Sequel::Model, "#update" do
   end
 end
 
+describe Sequel::Model, "#set_fields" do
+  before do
+    @c = Class.new(Sequel::Model(:items))
+    @c.class_eval do
+      set_primary_key :id
+      columns :x, :y, :z, :id
+    end
+    @c.strict_param_setting = true 
+    @o1 = @c.new
+    MODEL_DB.reset
+  end
+
+  it "should set only the given fields" do
+    @o1.set_fields({:x => 1, :y => 2, :z=>3, :id=>4}, [:x, :y])
+    @o1.values.should == {:x => 1, :y => 2}
+    @o1.set_fields({:x => 9, :y => 8, :z=>6, :id=>7}, [:x, :y, :id])
+    @o1.values.should == {:x => 9, :y => 8, :id=>7}
+    MODEL_DB.sqls.should == []
+  end
+end
+
+describe Sequel::Model, "#update_fields" do
+  before do
+    @c = Class.new(Sequel::Model(:items))
+    @c.class_eval do
+      set_primary_key :id
+      columns :x, :y, :z, :id
+      def _refresh(ds); end
+    end
+    @c.strict_param_setting = true 
+    @o1 = @c.load(:id=>1)
+    MODEL_DB.reset
+  end
+
+  it "should set only the given fields, and then save the changes to the record" do
+    @o1.update_fields({:x => 1, :y => 2, :z=>3, :id=>4}, [:x, :y])
+    @o1.values.should == {:x => 1, :y => 2, :id=>1}
+    MODEL_DB.sqls.first.should =~ /UPDATE items SET [xy] = [12], [xy] = [12] WHERE \(id = 1\)/
+    MODEL_DB.sqls.length.should == 1
+    MODEL_DB.reset
+
+    @o1.update_fields({:x => 1, :y => 5, :z=>6, :id=>7}, [:x, :y])
+    @o1.values.should == {:x => 1, :y => 5, :id=>1}
+    MODEL_DB.sqls.should == ["UPDATE items SET y = 5 WHERE (id = 1)"]
+    MODEL_DB.reset
+  end
+end
+
 describe Sequel::Model, "#(set|update)_(all|except|only)" do
   before do
     MODEL_DB.reset
@@ -752,7 +800,25 @@ describe Sequel::Model, "#(set|update)_(all|except|only)" do
     @o1 = @c.new
   end
 
-  it "#set_all should set all attributes" do
+  it "should raise errors if not all hash fields can be set and strict_param_setting is true" do
+    @c.strict_param_setting = true
+
+    proc{@c.new.set_all(:x => 1, :y => 2, :z=>3, :id=>4)}.should raise_error(Sequel::Error)
+    (o = @c.new).set_all(:x => 1, :y => 2, :z=>3)
+    o.values.should == {:x => 1, :y => 2, :z=>3}
+
+    proc{@c.new.set_only({:x => 1, :y => 2, :z=>3, :id=>4}, :x, :y)}.should raise_error(Sequel::Error)
+    proc{@c.new.set_only({:x => 1, :y => 2, :z=>3}, :x, :y)}.should raise_error(Sequel::Error)
+    (o = @c.new).set_only({:x => 1, :y => 2}, :x, :y)
+    o.values.should == {:x => 1, :y => 2}
+
+    proc{@c.new.set_except({:x => 1, :y => 2, :z=>3, :id=>4}, :x, :y)}.should raise_error(Sequel::Error)
+    proc{@c.new.set_except({:x => 1, :y => 2, :z=>3}, :x, :y)}.should raise_error(Sequel::Error)
+    (o = @c.new).set_except({:z => 3}, :x, :y)
+    o.values.should == {:z=>3}
+  end
+
+  it "#set_all should set all attributes except the primary key" do
     @o1.set_all(:x => 1, :y => 2, :z=>3, :id=>4)
     @o1.values.should == {:x => 1, :y => 2, :z=>3}
   end
@@ -762,9 +828,11 @@ describe Sequel::Model, "#(set|update)_(all|except|only)" do
     @o1.values.should == {:x => 1, :y => 2}
     @o1.set_only({:x => 4, :y => 5, :z=>6, :id=>7}, :x, :y)
     @o1.values.should == {:x => 4, :y => 5}
+    @o1.set_only({:x => 9, :y => 8, :z=>6, :id=>7}, :x, :y, :id)
+    @o1.values.should == {:x => 9, :y => 8, :id=>7}
   end
 
-  it "#set_except should not set given attributes" do
+  it "#set_except should not set given attributes or the primary key" do
     @o1.set_except({:x => 1, :y => 2, :z=>3, :id=>4}, [:y, :z])
     @o1.values.should == {:x => 1}
     @o1.set_except({:x => 4, :y => 2, :z=>3, :id=>4}, :y, :z)
