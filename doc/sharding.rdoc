@@ -114,7 +114,7 @@ the shard to use.  This is fairly easy using a Sequel::Model:
 
 === Sharding Plugin
 
-Sequel comes with a sharding plugin that makes it easy to use sharing with model objects.
+Sequel comes with a sharding plugin that makes it easy to use sharding with model objects.
 It makes sure that objects retrieved from a specific shard are always saved back to that
 shard, allows you to create objects on specific shards, and even makes sure associations
 work well with shards.  You just need to remember to set to model to use the plugin:
