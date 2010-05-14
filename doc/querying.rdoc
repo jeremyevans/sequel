@@ -368,6 +368,24 @@ already seen an example earlier:
 In this case Symbol#like returns a Sequel::SQL::BooleanExpression object,
 which is used directly in the filter.
 
+You can use the DSL to create arbitrarily complex expressions.  SQL::Expression
+objects support the & operator for +AND+, the | operator for +OR+, and the ~ operator
+for inversion:
+
+  Artist.filter(:name.like('Y%') & ({:b=>1} | ~{:c=>3}))
+  # SELECT * FROM artists WHERE name LIKE 'Y%' AND (b = 1 OR c != 3)
+
+You can combine these expression operators with the virtual row support:
+
+  Artist.filter{(a > 1) & ~((b(c) < 1) | d)}
+  # SELECT * FROM artists WHERE a > 1 AND b(c) >= 1 AND NOT d
+
+Note the use of parentheses when using the & and | operators, as they have lower
+precedence than other operators.  The following will not work:
+
+  Artist.filter{a > 1 & ~(b(c) < 1 | d)}
+  # Raises a TypeError, as it calls Integer#| with a Sequel::SQL::Identifier
+
 === Strings with Placeholders
 
 Assuming you want to get your hands dirty and write some SQL, Sequel allows you
