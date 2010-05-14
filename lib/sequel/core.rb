@@ -285,7 +285,6 @@ module Sequel
   private_class_method :adapter_method, :def_adapter_method
   
   require(%w"metaprogramming sql connection_pool exceptions dataset database timezones version")
-  require(%w"schema_generator schema_methods schema_sql", 'database')
   require('core_sql') if !defined?(::SEQUEL_NO_CORE_EXTENSIONS) && !ENV.has_key?('SEQUEL_NO_CORE_EXTENSIONS')
 
   # Add the database adapter class methods to Sequel via metaprogramming
