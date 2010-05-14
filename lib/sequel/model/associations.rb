@@ -755,8 +755,11 @@ module Sequel
           rcks = opts[:right_keys] = Array(right)
           left_pk = (opts[:left_primary_key] ||= self.primary_key)
           lcpks = opts[:left_primary_keys] = Array(left_pk)
-          raise(Error, 'mismatched number of left composite keys') unless lcks.length == lcpks.length
-          raise(Error, 'mismatched number of right composite keys') if opts[:right_primary_key] && rcks.length != Array(opts[:right_primary_key]).length
+          raise(Error, "mismatched number of left composite keys: #{lcks.inspect} vs #{lcpks.inspect}") unless lcks.length == lcpks.length
+          if opts[:right_primary_key]
+            rcpks = Array(opts[:right_primary_key])
+            raise(Error, "mismatched number of right composite keys: #{rcks.inspect} vs #{rcpks.inspect}") unless rcks.length == rcpks.length
+          end
           uses_lcks = opts[:uses_left_composite_keys] = lcks.length > 1
           uses_rcks = opts[:uses_right_composite_keys] = rcks.length > 1
           opts[:cartesian_product_number] ||= 1
@@ -827,7 +830,10 @@ module Sequel
           opts[:key] = opts.default_key unless opts.include?(:key)
           key = opts[:key]
           cks = opts[:keys] = Array(opts[:key])
-          raise(Error, 'mismatched number of composite keys') if opts[:primary_key] && cks.length != Array(opts[:primary_key]).length
+          if opts[:primary_key]
+            cpks = Array(opts[:primary_key])
+            raise(Error, "mismatched number of composite keys: #{cks.inspect} vs #{cpks.inspect}") unless cks.length == cpks.length
+          end
           uses_cks = opts[:uses_composite_keys] = cks.length > 1
           opts[:cartesian_product_number] ||= 0
           opts[:dataset] ||= proc do
@@ -878,7 +884,7 @@ module Sequel
           cks = opts[:keys] = Array(key)
           primary_key = (opts[:primary_key] ||= self.primary_key)
           cpks = opts[:primary_keys] = Array(primary_key)
-          raise(Error, 'mismatched number of composite keys') unless cks.length == cpks.length
+          raise(Error, "mismatched number of composite keys: #{cks.inspect} vs #{cpks.inspect}") unless cks.length == cpks.length
           uses_cks = opts[:uses_composite_keys] = cks.length > 1
           opts[:dataset] ||= proc do
             klass = opts.associated_class
