@@ -28,6 +28,19 @@ module Sequel
     #   # All tracks on albums by this artist
     #   Artist.many_through_many :tracks, [[:albums_artists, :artist_id, :album_id], [:albums, :id, :id]], \
     #    :right_primary_key=>:album_id
+    #
+    # Often you don't want the current object to appear in the array of associated objects.  This is easiest to handle via an :after_load hook:
+    # 
+    #   Artist.many_through_many :artists, [[:albums_artists, :artist_id, :album_id], [:albums, :id, :id], [:albums_artists, :album_id, :artist_id]],
+    #     :after_load=>proc{|artist, associated_artists| associated_artists.delete(artist)}
+    #
+    # You can also handle it by adding a dataset block that excludes the current record (so it won't be retrieved at all), but
+    # that won't work when eagerly loading, which is why the :after_load proc is recommended instead.
+    #
+    # It's also common to not want duplicate records, in which case the :distinct option can be used:
+    # 
+    #   Artist.many_through_many :artists, [[:albums_artists, :artist_id, :album_id], [:albums, :id, :id], [:albums_artists, :album_id, :artist_id]],
+    #    :distinct=>true
     module ManyThroughMany
       # The AssociationReflection subclass for many_through_many associations.
       class ManyThroughManyAssociationReflection < Sequel::Model::Associations::ManyToManyAssociationReflection
