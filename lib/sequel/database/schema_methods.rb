@@ -66,7 +66,7 @@ module Sequel
     # definitions using create_table, and #add_index accepts all the options
     # available for index definition.
     #
-    # See Schema::AlterTableGenerator and the {"Schema Modification" guide}[link:files/doc/schema_rdoc.html].
+    # See Schema::AlterTableGenerator and the {"Migrations and Schema Modification" guide}[link:files/doc/migration_rdoc.html].
     def alter_table(name, generator=nil, &block)
       remove_cached_schema(name)
       generator ||= Schema::AlterTableGenerator.new(self, &block)
@@ -86,7 +86,7 @@ module Sequel
     # * :temp - Create the table as a temporary table.
     # * :ignore_index_errors - Ignore any errors when creating indexes.
     #
-    # See Schema::Generator and the {"Schema Modification" guide}[link:files/doc/schema_rdoc.html].
+    # See Schema::Generator and the {"Migrations and Schema Modification" guide}[link:files/doc/migration_rdoc.html].
     def create_table(name, options={}, &block)
       options = {:generator=>options} if options.is_a?(Schema::Generator)
       generator = options[:generator] || Schema::Generator.new(self, &block)
