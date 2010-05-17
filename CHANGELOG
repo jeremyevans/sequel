@@ -1,5 +1,9 @@
 === HEAD
 
+* When using multiple plugins that add before hooks, the order that the hooks are called may have changed (jeremyevans)
+
+* The hook_class_methods plugin no longer skips later after hooks if earlier after hooks return false (jeremyevans)
+
 * Add Model#set_fields and update_fields, similar to set_only and update_only but ignoring other keys in the hash (jeremyevans)
 
 * Add Model.qualified_primary_key_hash, similar to primary_key_hash but with qualified columns (jeremyevans)

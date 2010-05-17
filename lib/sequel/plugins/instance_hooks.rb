@@ -21,17 +21,18 @@ module Sequel
     #   Album.plugin :instance_hooks
     module InstanceHooks
       module InstanceMethods 
-        HOOKS = Sequel::Model::HOOKS - [:after_initialize]
+        BEFORE_HOOKS = Sequel::Model::BEFORE_HOOKS
+        AFTER_HOOKS = Sequel::Model::AFTER_HOOKS - [:after_initialize]
+        HOOKS = BEFORE_HOOKS + AFTER_HOOKS
         HOOKS.each{|h| class_eval("def #{h}_hook(&block); add_instance_hook(:#{h}, &block) end", __FILE__, __LINE__)}
         
-        BEFORE_HOOKS, AFTER_HOOKS = HOOKS.partition{|hook| hook.to_s =~ /\Abefore_/}
-        BEFORE_HOOKS.each{|h| class_eval("def #{h}; run_instance_hooks(:#{h}) == false ? false : super end", __FILE__, __LINE__)}
-        AFTER_HOOKS.each{|h| class_eval("def #{h}; super; run_instance_hooks(:#{h}) end", __FILE__, __LINE__)}
+        BEFORE_HOOKS.each{|h| class_eval("def #{h}; run_before_instance_hooks(:#{h}) == false ? false : super end", __FILE__, __LINE__)}
+        (AFTER_HOOKS - [:after_save]).each{|h| class_eval("def #{h}; super; run_after_instance_hooks(:#{h}) end", __FILE__, __LINE__)}
         
         # Clear the instance level hooks after saving the object.
         def after_save
           super
-          run_instance_hooks(:after_save)
+          run_after_instance_hooks(:after_save)
           @instance_hooks.clear if @instance_hooks
         end
         
@@ -50,14 +51,15 @@ module Sequel
           @instance_hooks[hook] ||= []
         end
         
-        # Run all hook blocks of the given hook type.  If a before hook,
-        # immediately return false if any hook block call returns false.
-        def run_instance_hooks(hook)
-          if BEFORE_HOOKS.include?(hook)
-            instance_hooks(hook).each{|b| return false if b.call == false}
-          else
-            instance_hooks(hook).each{|b| b.call}
-          end
+        # Run all hook blocks of the given hook type.
+        def run_after_instance_hooks(hook)
+          instance_hooks(hook).each{|b| b.call}
+        end
+
+        # Run all hook blocks of the given hook type.  If a hook block returns false,
+        # immediately return false without running the remaining blocks.
+        def run_before_instance_hooks(hook)
+          instance_hooks(hook).each{|b| return false if b.call == false}
         end
       end
     end

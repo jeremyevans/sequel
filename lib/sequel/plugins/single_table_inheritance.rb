@@ -65,8 +65,8 @@ module Sequel
       module InstanceMethods
         # Set the sti_key column to the name of the model.
         def before_create
-          return false if super == false
           send("#{model.sti_key}=", model.name.to_s) unless send(model.sti_key)
+          super
         end
       end
     end

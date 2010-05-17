@@ -64,14 +64,14 @@ module Sequel
       module InstanceMethods
         # Set the create timestamp when creating
         def before_create
-          super
           set_create_timestamp
+          super
         end
         
         # Set the update timestamp when updating
         def before_update
-          super
           set_update_timestamp
+          super
         end
         
         private

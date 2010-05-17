@@ -117,10 +117,8 @@ module Sequel
 
         # Serialize all deserialized values
         def before_save
+          deserialized_values.each{|k,v| @values[k] = serialize_value(k, v)}
           super
-          deserialized_values.each do |k,v|
-            @values[k] = serialize_value(k, v)
-          end
         end
         
         # Empty the deserialized values when refreshing.

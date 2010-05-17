@@ -112,8 +112,8 @@ module Sequel
       module InstanceMethods
         # Remove the object from the cache when updating
         def before_update
-          return false if super == false
           cache_delete
+          super
         end
 
         # Return a key unique to the underlying record for caching, based on the

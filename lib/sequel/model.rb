@@ -53,13 +53,20 @@ module Sequel
     # Boolean settings that can be modified at the global, class, or instance level.
     BOOLEAN_SETTINGS = [:typecast_empty_string_to_nil, :typecast_on_assignment, :strict_param_setting, :raise_on_save_failure, :raise_on_typecast_failure, :require_modification, :use_transactions]
 
+    # Hooks that are called before an action.  Can return false to not do the action.  When
+    # overriding these, it is recommended to call super as the last line of your method,
+    # so later hooks are called before earlier hooks.
+    BEFORE_HOOKS = [:before_create, :before_update, :before_save, :before_destroy, :before_validation]
+
+    # Hooks that are called after an action.  When overriding these, it is recommended to call
+    # super on the first line of your method, so later hooks are called before earlier hooks.
+    AFTER_HOOKS = [:after_initialize, :after_create, :after_update, :after_save, :after_destroy, :after_validation]
+
     # Empty instance methods to create that the user can override to get hook/callback behavior.
     # Just like any other method defined by Sequel, if you override one of these, you should
     # call super to get the default behavior (while empty by default, they can also be defined
     # by plugins).  
-    HOOKS = [:after_initialize, :before_create, :after_create, :before_update,
-      :after_update, :before_save, :after_save, :before_destroy, :after_destroy,
-      :before_validation, :after_validation]
+    HOOKS = BEFORE_HOOKS + AFTER_HOOKS
 
     # Class instance variables that are inherited in subclasses.  If the value is :dup, dup is called
     # on the superclass's instance variable when creating the instance variable in the subclass.

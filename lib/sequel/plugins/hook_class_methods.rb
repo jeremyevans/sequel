@@ -52,7 +52,7 @@ module Sequel
         # the symbol specifies an instance method to call and adds it to the hook
         # type.
         #
-        # If any hook block returns false, the instance method will return false
+        # If any before hook block returns false, the instance method will return false
         # immediately without running the rest of the hooks of that type.
         #
         # It is recommended that you always provide a symbol to this method,
@@ -74,7 +74,7 @@ module Sequel
           hooks.each do |hook|
             @hooks[hook] = []
             instance_eval("def #{hook}(method = nil, &block); add_hook(:#{hook}, method, &block) end", __FILE__, __LINE__)
-            class_eval("def #{hook}; run_hooks(:#{hook}); end", __FILE__, __LINE__)
+            class_eval("def #{hook}; model.hook_blocks(:#{hook}){|b| return false if instance_eval(&b) == false}; end", __FILE__, __LINE__)
           end
         end
     
@@ -119,15 +119,8 @@ module Sequel
       end
 
       module InstanceMethods
-        Model::HOOKS.each{|h| class_eval("def #{h}; return false if super == false; run_hooks(:#{h}); end", __FILE__, __LINE__)}
-
-        private
-
-        # Runs all hook blocks of given hook type on this object.
-        # Stops running hook blocks and returns false if any hook block returns false.
-        def run_hooks(hook)
-          model.hook_blocks(hook){|block| return false if instance_eval(&block) == false}
-        end
+        Model::BEFORE_HOOKS.each{|h| class_eval("def #{h}; model.hook_blocks(:#{h}){|b| return false if instance_eval(&b) == false}; super; end", __FILE__, __LINE__)}
+        Model::AFTER_HOOKS.each{|h| class_eval("def #{h}; super; model.hook_blocks(:#{h}){|b| instance_eval(&b)}; end", __FILE__, __LINE__)}
       end
     end
   end

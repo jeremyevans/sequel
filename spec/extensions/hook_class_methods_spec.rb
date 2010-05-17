@@ -135,38 +135,38 @@ describe "Model hooks" do
     $adds.should == ['456']
   end
   
-  specify "should stop processing if a hook returns false" do
+  specify "should stop processing if a before hook returns false" do
     $flag = true
     $adds = []
     
     a = Class.new(Sequel::Model)
     a.class_eval do
-      after_save {$adds << 'blah'; $flag}
-      after_save {$adds << 'cruel'}
+      before_save {$adds << 'cruel'; $flag}
+      before_save {$adds << 'blah'; $flag}
     end
     
-    a.new.after_save
+    a.new.before_save
     $adds.should == ['blah', 'cruel']
 
     # chain should not break on nil
     $adds = []
     $flag = nil
-    a.new.after_save
+    a.new.before_save
     $adds.should == ['blah', 'cruel']
     
     $adds = []
     $flag = false
-    a.new.after_save
+    a.new.before_save
     $adds.should == ['blah']
     
     b = Class.new(a)
     b.class_eval do
-      after_save {$adds << 'mau'}
+      before_save {$adds << 'mau'}
     end
     
     $adds = []
-    b.new.after_save
-    $adds.should == ['blah']
+    b.new.before_save
+    $adds.should == ['mau', 'blah']
   end
 end
 
