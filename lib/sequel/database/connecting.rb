@@ -1,7 +1,7 @@
 module Sequel
   class Database
     # ---------------------
-    # :section: Methods relating to adapters, connecting, disconnecting, and sharding.
+    # :section: Methods relating to adapters, connecting, disconnecting, and sharding
     # This methods involve the Database's connection pool.
     # ---------------------
 
