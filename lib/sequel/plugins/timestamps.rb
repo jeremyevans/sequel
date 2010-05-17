@@ -5,6 +5,19 @@ module Sequel
     # can also set whether to overwrite existing create timestamps (false
     # by default), or whether to set the update timestamp when creating (also
     # false by default).
+    # 
+    # Usage:
+    #
+    #   # Timestamp all model instances using +created_at+ and +updated_at+
+    #   # (called before loading subclasses)
+    #   Sequel::Model.plugin :timestamps
+    #
+    #   # Timestamp Album instances, with custom column names
+    #   Album.plugin :timestamps, :create=>:created_on, :update=>:updated_on
+    #
+    #   # Timestamp Artist instances, forcing an overwrite of the create
+    #   # timestamp, and setting the update timestamp when creating
+    #   Album.plugin :timestamps, :force=>true, :update_on_create=>true
     module Timestamps
       # Configure the plugin by setting the avialable options.  Note that
       # if this method is run more than once, previous settings are ignored,

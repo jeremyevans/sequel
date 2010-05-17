@@ -8,6 +8,14 @@ module Sequel
     # return associated objects from that shard, and using the
     # add/remove/remove_all association methods will only affect
     # that shard.
+    # 
+    # Usage:
+    #
+    #   # Add the sharding support to all model subclasses (called before loading subclasses)
+    #   Sequel::Model.plugin :sharding
+    #
+    #   # Add the sharding support to the Album class
+    #   Album.plugin :sharding
     module Sharding
       module ClassMethods
         # Create a new object on the given shard s.

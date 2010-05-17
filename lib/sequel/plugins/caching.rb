@@ -2,12 +2,7 @@ module Sequel
   module Plugins
     # Sequel's built-in caching plugin supports caching to any object that
     # implements the Ruby-Memcache API (or memcached API with the :ignore_exceptions
-    # option).  You can add caching for any model or for all models via:
-    #
-    #   Model.plugin :caching, store   # Cache all models
-    #   MyModel.plugin :caching, store # Just cache MyModel
-    #
-    # The cache store should implement the Ruby-Memcache API:
+    # option):
     #
     #    cache_store.set(key, obj, time) # Associate the obj with the given key
     #                                    # in the cache for the time (specified
@@ -24,6 +19,18 @@ module Sequel
     #
     # Note that only Model.[] method calls with a primary key argument are cached
     # using this plugin.
+    # 
+    # Usage:
+    #
+    #   # Make all subclasses use the same cache (called before loading subclasses)
+    #   # using the Ruby-Memcache API, with the cache stored in the CACHE constant
+    #   Sequel::Model.plugin :caching, CACHE
+    #
+    #   # Make the Album class use the cache with a 30 minute time-to-live
+    #   Album.plugin :caching, CACHE, :ttl=>1800
+    #
+    #   # Make the Artist class use a cache with the memcached protocol
+    #   Artist.plugin :caching, MEMCACHED_CACHE, :ignore_exceptions=>true
     module Caching
       # Set the cache_store and cache_ttl attributes for the given model.
       # If the :ttl option is not given, 3600 seconds is the default.

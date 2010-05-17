@@ -7,6 +7,14 @@ module Sequel
     #
     # It is recommended to use the validation_helpers plugin instead of this one,
     # as it is less complex and more flexible.
+    # 
+    # Usage:
+    #
+    #   # Add the validation class methods to all model subclasses (called before loading subclasses)
+    #   Sequel::Model.plugin :validation_class_methods
+    #
+    #   # Add the validation class methods to the Album class
+    #   Album.plugin :validation_class_methods
     module ValidationClassMethods
       # Setup the validations hash for the given model.
       def self.apply(model)

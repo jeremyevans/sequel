@@ -9,7 +9,8 @@ module Sequel
     # to deal with Date objects in your ruby code.  This can be handled
     # with:
     #
-    #   Model.composition :date, :mapping=>[:year, :month, :day]
+    #   Album.plugin :composition
+    #   Album.composition :date, :mapping=>[:year, :month, :day]
     #
     # The :mapping option is optional, but you can define custom
     # composition and decomposition procs via the :composer and

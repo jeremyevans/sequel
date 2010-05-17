@@ -4,14 +4,20 @@ module Sequel
     # for boolean columns, which provide a nicer API.  By default, the accessors
     # are created for all columns of type :boolean.  However, you can provide a
     # block to the plugin to change the criteria used to determine if a
-    # column is boolean:
+    # column is boolean.  The block is yielded with the column symbol for each
+    # column in the models dataset.
     #
-    #   Sequel::Model.plugin(:boolean_readers){|c| db_schema[c][:db_type] =~ /\Atinyint/}
+    # Usage:
     #
-    # This may be useful if you are using MySQL and have some tinyint columns
-    # that represent booleans and others that represent integers.  You can turn
-    # the convert_tinyint_to_bool setting off and use the attribute methods for
-    # the integer value and the attribute? methods for the boolean value.
+    #   # Add boolean attribute? methods for all columns of type :boolean
+    #   # in all model subclasses (called before loading subclasses)
+    #   Sequel::Model.plugin :boolean_readers
+    #
+    #   # Add boolean readers for all tinyint columns in the Album class
+    #   Album.plugin(:boolean_readers){|c| db_schema[c][:db_type] =~ /\Atinyint/}
+    #
+    #   # Add a boolean reader for a specific columns in the Artist class
+    #   Artist.plugin(:boolean_readers){|c| [:column1, :column2, :column3].include?(c)}
     module BooleanReaders
       # Default proc for determining if given column is a boolean, which
       # just checks that the :type is boolean.

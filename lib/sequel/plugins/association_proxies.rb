@@ -5,6 +5,14 @@ module Sequel
     # method returns a dataset.  This plugin makes the association method return a proxy
     # that will load the association and call a method on the association array if sent
     # an array method, and otherwise send the method to the association's dataset.
+    # 
+    # Usage:
+    #
+    #   # Use association proxies in all model subclasses (called before loading subclasses)
+    #   Sequel::Model.plugin :association_proxies
+    #
+    #   # Use association proxies in a specific model subclass
+    #   Album.plugin :association_proxies
     module AssociationProxies
       # A proxy for the association.  Calling an array method will load the
       # associated objects and call the method on the associated object array.

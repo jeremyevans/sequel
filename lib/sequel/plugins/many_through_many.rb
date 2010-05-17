@@ -8,6 +8,7 @@ module Sequel
     #
     # The many_through_many plugin would allow this:
     #
+    #    Artist.plugin :many_through_many
     #    Artist.many_through_many :tags, [[:albums_artists, :artist_id, :album_id], [:albums, :id, :id], [:albums_tags, :album_id, :tag_id]]
     #
     # Which will give you the tags for all of the artist's albums.

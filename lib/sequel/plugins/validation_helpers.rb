@@ -3,8 +3,8 @@ module Sequel
     # The validation_helpers plugin contains instance method equivalents for most of the legacy
     # class-level validations.  The names and APIs are different, though. Example:
     #
+    #   Sequel::Model.plugin :validation_helpers
     #   class Album < Sequel::Model
-    #     plugin :validation_helpers
     #     def validate
     #       validates_min_length 1, :num_tracks
     #     end

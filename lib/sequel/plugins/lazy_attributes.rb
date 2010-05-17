@@ -16,6 +16,9 @@ module Sequel
     #       a.review
     #     end
     #   end
+    #
+    #   # You can specify multiple columns to lazily load:
+    #   Album.plugin :lazy_attributes, :review, :tracklist
     module LazyAttributes
       # Lazy attributes requires the identity map and tactical eager loading plugins
       def self.apply(model, *attrs)

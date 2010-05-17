@@ -5,11 +5,11 @@ module Sequel
     # unique to that model class (or subclass hierarchy) being stored in the related
     # table.  For example, with this hierarchy:
     #
-    #                        Employee
-    #                       /        \ 
-    #                    Staff     Manager
-    #                                 |
-    #                             Executive
+    #       Employee
+    #      /        \ 
+    #   Staff     Manager
+    #                |
+    #            Executive
     #
     # the following database schema may be used (table - columns):
     #
@@ -54,6 +54,16 @@ module Sequel
     #   a = Employee.all # [<#Staff>, <#Manager>, <#Executive>]
     #   a.first.values # {:id=>1, name=>'S', :kind=>'Staff'}
     #   a.first.manager_id # Loads the manager_id attribute from the database
+    # 
+    # Usage:
+    #
+    #   # Set up class table inheritance in the parent class
+    #   # (Not in the subclasses)
+    #   Employee.plugin :class_table_inheritance
+    #
+    #   # Set the +kind+ column to hold the class name, and
+    #   # set the subclass table to map to for each subclass 
+    #   Employee.plugin :class_table_inheritance, :key=>:kind, :table_map=>{:Staff=>:staff}
     module ClassTableInheritance
       # The class_table_inheritance plugin requires the lazy_attributes plugin
       # to handle lazily-loaded attributes for subclass instances returned
@@ -71,10 +81,6 @@ module Sequel
       # * :table_map - Hash with class name symbol keys and table name symbol
       #   values.  Necessary if the implicit table name for the model class
       #   does not match the database table name
-      # Example:
-      #   class Employee < Sequel::Model
-      #     plugin :class_table_inheritance, :key=>:kind, :table_map=>{:Staff=>:staff}
-      #   end
       def self.configure(model, opts={}, &block)
         model.instance_eval do
           m = method(:constantize)

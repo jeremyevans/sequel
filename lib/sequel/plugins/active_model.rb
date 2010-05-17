@@ -7,6 +7,14 @@ module Sequel
     # allow the full support of Sequel::Model objects in Rails 3.
     # This plugin requires active_model in order to use
     # ActiveModel::Naming.
+    # 
+    # Usage:
+    #
+    #   # Make all subclasses active_model compliant (called before loading subclasses)
+    #   Sequel::Model.plugin :active_model
+    #
+    #   # Make the Album class active_model compliant
+    #   Album.plugin :active_model
     module ActiveModel
       ClassMethods = ::ActiveModel::Naming
 

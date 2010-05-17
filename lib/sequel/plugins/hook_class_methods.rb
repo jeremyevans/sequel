@@ -23,6 +23,14 @@ module Sequel
     # Note that returning false in any before hook block will skip further
     # before hooks and abort the action.  So if a before_save hook block returns
     # false, future before_save hook blocks are not called, and the save is aborted.
+    # 
+    # Usage:
+    #
+    #   # Allow use of hook class methods in all model subclasses (called before loading subclasses)
+    #   Sequel::Model.plugin :hook_class_methods
+    #
+    #   # Allow the use of hook class methods in the Album class
+    #   Album.plugin :hook_class_methods
     module HookClassMethods
       # Set up the hooks instance variable in the model.
       def self.apply(model)

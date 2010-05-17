@@ -17,6 +17,14 @@ module Sequel
     #   Album.filter{id<100}.all do |a|
     #     a.artists
     #   end
+    # 
+    # Usage:
+    #
+    #   # Make all model subclass instances use tactical eager loading (called before loading subclasses)
+    #   Sequel::Model.plugin :tactical_eager_loading
+    #
+    #   # Make the Album class use tactical eager loading
+    #   Album.plugin :tactical_eager_loading
     module TacticalEagerLoading
       module InstanceMethods
         # The dataset that retrieved this object, set if the object was

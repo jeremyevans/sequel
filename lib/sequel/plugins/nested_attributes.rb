@@ -7,6 +7,7 @@ module Sequel
     # Nested attributes are created using the nested_attributes method:
     #
     #   Artist.one_to_many :albums
+    #   Artist.plugin :nested_attributes
     #   Artist.nested_attributes :albums
     #   a = Artist.new(:name=>'YJM',
     #    :albums_attributes=>[{:name=>'RF'}, {:name=>'MO'}])

@@ -21,6 +21,15 @@ module Sequel
     #
     # Identity maps are thread-local and only presist for the duration of the block,
     # so they should be should only be considered as a possible performance enhancer.
+    # 
+    # Usage:
+    #
+    #   # Use an identity map that will affect all model classes (called before loading subclasses)
+    #   Sequel::Model.plugin :identity_map
+    #
+    #   # Use an identity map just for the Album class
+    #   Album.plugin :identity_map
+    #   # would need to do Album.with_identity_map{} to use the identity map
     module IdentityMap
       module ClassMethods
         # Returns the current thread-local identity map.  Should be a hash if

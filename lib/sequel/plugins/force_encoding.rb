@@ -10,12 +10,15 @@ module Sequel
     # can either do so in the plugin call itself, or via the
     # forced_encoding class accessor:
     #
-    #   class Album < Sequel::Model
-    #     plugin :force_encoding, 'UTF-8'
-    #     # or
-    #     plugin :force_encoding
-    #     self.forced_encoding = 'UTF-8'
-    #   end
+    # Usage:
+    #
+    #   # Force all strings to be UTF8 encoded in a all model subclasses
+    #   # (called before loading subclasses)
+    #   Sequel::Model.plugin :force_encoding, 'UTF-8'
+    #
+    #   # Force the encoding for the Album model to UTF8
+    #   Album.plugin :force_encoding
+    #   Album.forced_encoding = 'UTF-8'
     module ForceEncoding
       # Set the forced_encoding based on the value given in the plugin call.
       # Note that if a the plugin has been previously loaded, any previous

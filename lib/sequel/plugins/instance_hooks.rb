@@ -11,6 +11,14 @@ module Sequel
     # false, no more instance level before hooks are called and false is returned.
     #
     # Instance level hooks are cleared when the object is saved successfully.
+    # 
+    # Usage:
+    #
+    #   # Add the instance hook methods to all model subclass instances (called before loading subclasses)
+    #   Sequel::Model.plugin :instance_hooks
+    #
+    #   # Add the instance hook methods just to Album instances
+    #   Album.plugin :instance_hooks
     module InstanceHooks
       module InstanceMethods 
         HOOKS = Sequel::Model::HOOKS - [:after_initialize]

@@ -13,6 +13,19 @@ module Sequel
     # on datasets, so it updates all related rows in a single query, using
     # the SQL standard CURRENT_TIMESTAMP.  Both of these can be overridden
     # easily if necessary.
+    # 
+    # Usage:
+    #
+    #   # Allow touching of all model instances (called before loading subclasses)
+    #   Sequel::Model.plugin :touch
+    #
+    #   # Allow touching of Album instances, with a custom column
+    #   Album.plugin :touch, :column=>:updated_on
+    #
+    #   # Allow touching of Artist instances, updating the albums and tags
+    #   # associations when touching, touching the +updated_on+ column for
+    #   # albums and the +updated_at+ column for tags
+    #   Artist.plugin :touch, :associations=>[{:albums=>:updated_on}, :tags]
     module Touch
       # The default column to update when touching
       TOUCH_COLUMN_DEFAULT = :updated_at

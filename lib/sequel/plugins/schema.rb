@@ -8,6 +8,14 @@ module Sequel
     # This plugin is mostly suited to test code.  If there is any
     # chance that your application's schema could change, you should
     # be using the migration extension instead.
+    # 
+    # Usage:
+    #
+    #   # Add the schema methods to all model subclasses (called before loading subclasses)
+    #   Sequel::Model.plugin :schema
+    #
+    #   # Add the schema methods to the Album class
+    #   Album.plugin :schema
     module Schema
       module ClassMethods
         # Creates table, using the column information from set_schema.
