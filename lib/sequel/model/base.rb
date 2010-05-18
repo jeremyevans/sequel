@@ -830,7 +830,8 @@ module Sequel
       
       # Validates the object.  If the object is invalid, errors should be added
       # to the errors attribute.  By default, does nothing, as all models
-      # are valid by default.
+      # are valid by default.  See the {"Model Validations" guide}[link:files/doc/validations_rdoc.html].
+      # for details about validation.
       def validate
       end
 
