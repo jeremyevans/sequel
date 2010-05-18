@@ -10,6 +10,7 @@
   <li><a href="rdoc/files/doc/querying_rdoc.html">Querying in Sequel</a></li>
   <li><a href="rdoc/files/doc/dataset_filtering_rdoc.html">Dataset Filtering</a></li>
   <li><a href="rdoc/files/doc/validations_rdoc.html">Model Validations</a></li>
+  <li><a href="rdoc/files/doc/model_hooks_rdoc.html">Model Hooks</a></li>
   <li><a href="rdoc/files/doc/association_basics_rdoc.html">Model Associations Basics</a></li>
   <li><a href="rdoc/files/doc/advanced_associations_rdoc.html">Advanced Model Associations</a></li>
   <li><a href="rdoc/files/doc/prepared_statements_rdoc.html">Prepared Statements/Bound Variables</a></li>
