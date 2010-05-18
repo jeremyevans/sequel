@@ -1,5 +1,7 @@
 === HEAD
 
+* Make Model::Errors#on always return nil if there are no errors on that attribute (jeremyevans)
+
 * When using multiple plugins that add before hooks, the order that the hooks are called may have changed (jeremyevans)
 
 * The hook_class_methods plugin no longer skips later after hooks if earlier after hooks return false (jeremyevans)

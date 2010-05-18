@@ -23,16 +23,23 @@ describe Sequel::Model::Errors do
     @errors.should_not be_empty
   end
   
-  specify "should return errors for a specific attribute using #on or #[]" do
+  specify "should return errors for a specific attribute using #[]" do
     @errors[:blah].should == []
-    @errors.on(:blah).should == []
-
     @errors[:blah] << 'blah'
     @errors[:blah].should == ['blah']
-    @errors.on(:blah).should == ['blah']
 
     @errors[:bleu].should == []
-    @errors.on(:bleu).should == []
+  end
+  
+  specify "should return an array of errors for a specific attribute using #on if there are errors" do
+    @errors[:blah] << 'blah'
+    @errors.on(:blah).should == ['blah']
+  end
+  
+  specify "should return nil using #on if there are no errors for that attribute" do
+    @errors.on(:blah).should == nil
+    @errors[:blah]
+    @errors.on(:blah).should == nil
   end
   
   specify "should accept errors using #[] << or #add" do

@@ -19,7 +19,7 @@ module Sequel
       def count
         values.inject(0){|m, v| m + v.length}
       end
-      
+       
       # Return true if there are no error messages, false otherwise.
       def empty?
         count == 0
@@ -37,7 +37,9 @@ module Sequel
       # Returns the array of errors for the given attribute, or nil
       # if there are no errors for the attribute.
       def on(att)
-        self[att] if has_key?(att)
+        if v = fetch(att, nil) and !v.empty?
+          v
+        end
       end
     end
   end
