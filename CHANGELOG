@@ -1,5 +1,7 @@
 === HEAD
 
+* Make :encoding option work on MySQL in some cases where it was ignored (jeremyevans) (#300)
+
 * Make Model::Errors#on always return nil if there are no errors on that attribute (jeremyevans)
 
 * When using multiple plugins that add before hooks, the order that the hooks are called may have changed (jeremyevans)

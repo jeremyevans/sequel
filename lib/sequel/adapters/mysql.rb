@@ -99,10 +99,6 @@ module Sequel
         conn = Mysql.init
         conn.options(Mysql::READ_DEFAULT_GROUP, opts[:config_default_group] || "client")
         conn.options(Mysql::OPT_LOCAL_INFILE, opts[:config_local_infile]) if opts.has_key?(:config_local_infile)
-        if encoding = opts[:encoding] || opts[:charset]
-          # set charset _before_ the connect. using an option instead of "SET (NAMES|CHARACTER_SET_*)" works across reconnects
-          conn.options(Mysql::SET_CHARSET_NAME, encoding)
-        end
         conn.real_connect(
           opts[:host] || 'localhost',
           opts[:user],
@@ -114,6 +110,11 @@ module Sequel
           Mysql::CLIENT_MULTI_STATEMENTS +
           (opts[:compress] == false ? 0 : Mysql::CLIENT_COMPRESS)
         )
+        if encoding = opts[:encoding] || opts[:charset]
+          # Setting encoding before the connect appears not to work
+          # with READ_DEFAULT_GROUP, so set it afterwards.
+          conn.options(Mysql::SET_CHARSET_NAME, encoding)
+        end
 
         # increase timeout so mysql server doesn't disconnect us
         conn.query("set @@wait_timeout = #{opts[:timeout] || 2592000}")
