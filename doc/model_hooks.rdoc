@@ -192,3 +192,7 @@ So if you define the same before hook in both a model and a plugin that the mode
 * model after hook
 
 Again, Sequel does not enforce that, and you are free to call +super+ in an order other than the recommended one (just make sure that you call it).
+
+== +hook_class_methods+
+
+While it's recommended to write your hooks as instance methods, Sequel ships with a +hook_class_methods+ plugin that allows you to define hooks via class methods. It exists mostly for legacy compatibility, but is still supported. 
