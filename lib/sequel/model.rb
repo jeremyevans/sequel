@@ -65,7 +65,8 @@ module Sequel
     # Empty instance methods to create that the user can override to get hook/callback behavior.
     # Just like any other method defined by Sequel, if you override one of these, you should
     # call super to get the default behavior (while empty by default, they can also be defined
-    # by plugins).  
+    # by plugins).  See the {"Model Hooks" guide}[link:files/doc/model_hooks_rdoc.html] for
+    # more detail on hooks.
     HOOKS = BEFORE_HOOKS + AFTER_HOOKS
 
     # Class instance variables that are inherited in subclasses.  If the value is :dup, dup is called
