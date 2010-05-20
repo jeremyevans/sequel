@@ -184,8 +184,7 @@ module Sequel
         return call_sproc(sql, opts, &block) if opts[:sproc]
         return execute_prepared_statement(sql, opts, &block) if [Symbol, Dataset].any?{|c| sql.is_a?(c)}
         synchronize(opts[:server]) do |conn|
-          stmt = conn.createStatement
-          begin
+          statement(conn) do |stmt|
             if block_given?
               yield log_yield(sql){stmt.executeQuery(sql)}
             else
@@ -205,10 +204,6 @@ module Sequel
                 log_yield(sql){stmt.executeUpdate(sql)}
               end
             end
-          rescue NativeException, JavaSQL::SQLException => e
-            raise_error(e)
-          ensure
-            stmt.close
           end
         end
       end
@@ -272,12 +267,6 @@ module Sequel
       
       private
          
-      # JDBC uses a statement object to execute SQL on the database
-      def begin_transaction(conn)
-        conn = conn.createStatement unless supports_savepoints?
-        super
-      end
-      
       # Close given adapter connections
       def disconnect_connection(c)
         c.close
@@ -354,6 +343,12 @@ module Sequel
         ts
       end
 
+      # Log the given SQL and then execute it on the connection, used by
+      # the transaction code.
+      def log_connection_execute(conn, sql)
+        statement(conn){|s| log_yield(sql){s.execute(sql)}}
+      end
+
       # By default, there is no support for determining the last inserted
       # id, so return nil.  This method should be overridden in
       # sub adapters.
@@ -379,12 +374,6 @@ module Sequel
         super(exception, {:disconnect => cause.respond_to?(:getSQLState) && cause.getSQLState =~ /^08/}.merge(opts))
       end
 
-      # Close the given statement when removing the transaction
-      def remove_transaction(stmt)
-        stmt.close if stmt && !supports_savepoints?
-        super
-      end
-      
       # Java being java, you need to specify the type of each argument
       # for the prepared statement, and bind it individually.  This
       # guesses which JDBC method to use, and hopefully JRuby will convert
@@ -448,9 +437,14 @@ module Sequel
         ts
       end
       
-      # Create a statement object to execute transaction statements.
-      def transaction_statement_object(conn)
-        conn.createStatement
+      # Yield a new statement object, and ensure that it is closed before returning.
+      def statement(conn)
+        stmt = conn.createStatement
+        yield stmt
+      rescue NativeException, JavaSQL::SQLException => e
+        raise_error(e)
+      ensure
+        stmt.close if stmt
       end
 
       # This method determines whether or not to add

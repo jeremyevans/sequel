@@ -192,7 +192,6 @@ module Sequel
       if supports_savepoints?
         th = Thread.current
         depth = th[:sequel_transaction_depth]
-        conn = transaction_statement_object(conn) if respond_to?(:transaction_statement_object, true)
         log_connection_execute(conn, depth > 0 ? begin_savepoint_sql(depth) : begin_transaction_sql)
         th[:sequel_transaction_depth] += 1
       else

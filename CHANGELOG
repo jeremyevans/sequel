@@ -1,5 +1,7 @@
 === HEAD
 
+* Fix leak of JDBC Statement objects when using transactions on JDBC on databases that support savepoints (jeremyevans)
+
 * Add DatabaseDisconnectError support to the ODBC adapter (Joshua Hansen)
 
 * Make :encoding option work on MySQL in some cases where it was ignored (jeremyevans) (#300)
