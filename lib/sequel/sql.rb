@@ -564,12 +564,6 @@ module Sequel
         @table = table
       end
 
-      # ColumnAll expressions are considered equivalent if they
-      # have the same class and string representation
-      def ==(x)
-        x.class == self.class and @table == x.table
-      end
-
       to_s_method :column_all_sql
     end
     
@@ -629,12 +623,6 @@ module Sequel
       # Set the attributes to the given arguments
       def initialize(f, *args)
         @f, @args = f, args
-      end
-
-      # Functions are considered equivalent if they
-      # have the same class, function, and arguments.
-      def ==(x)
-         x.class == self.class && @f == x.f && @args == x.args
       end
 
       to_s_method :function_sql
