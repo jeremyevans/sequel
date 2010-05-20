@@ -1,5 +1,7 @@
 === HEAD
 
+* Add DatabaseDisconnectError support to the ODBC adapter (Joshua Hansen)
+
 * Make :encoding option work on MySQL in some cases where it was ignored (jeremyevans) (#300)
 
 * Make Model::Errors#on always return nil if there are no errors on that attribute (jeremyevans)

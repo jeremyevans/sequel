@@ -7,6 +7,7 @@ module Sequel
 
       GUARDED_DRV_NAME = /^\{.+\}$/.freeze
       DRV_NAME_GUARDS = '{%s}'.freeze
+      DISCONNECT_ERRORS = /\A08S01/.freeze 
 
       def initialize(opts)
         super
@@ -50,7 +51,7 @@ module Sequel
             r = log_yield(sql){conn.run(sql)}
             yield(r) if block_given?
           rescue ::ODBC::Error, ArgumentError => e
-            raise_error(e)
+            raise_error(e, :disconnect=>DISCONNECT_ERRORS.match(e.message))
           ensure
             r.drop if r
           end
@@ -63,7 +64,7 @@ module Sequel
           begin
             log_yield(sql){conn.do(sql)}
           rescue ::ODBC::Error, ArgumentError => e
-            raise_error(e)
+            raise_error(e, :disconnect=>DISCONNECT_ERRORS.match(e.message))
           end
         end
       end
