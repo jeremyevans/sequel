@@ -159,7 +159,8 @@ module Sequel
           args.concat([opts[:user], opts[:password]]) if opts[:user] && opts[:password]
           begin
             JavaSQL::DriverManager.getConnection(*args)
-          rescue
+          rescue => e
+            raise e unless driver
             # If the DriverManager can't get the connection - use the connect
             # method of the driver. (This happens under Tomcat for instance)
             props = java.util.Properties.new
@@ -167,7 +168,7 @@ module Sequel
               props.setProperty("user", opts[:user])
               props.setProperty("password", opts[:password])
             end
-            driver.new.connect(args[0], props)
+            driver.new.connect(args[0], props) rescue (raise e)
           end
         end
         setup_connection(conn)
