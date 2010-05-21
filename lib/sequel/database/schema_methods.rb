@@ -68,9 +68,10 @@ module Sequel
     #
     # See Schema::AlterTableGenerator and the {"Migrations and Schema Modification" guide}[link:files/doc/migration_rdoc.html].
     def alter_table(name, generator=nil, &block)
-      remove_cached_schema(name)
       generator ||= Schema::AlterTableGenerator.new(self, &block)
       alter_table_sql_list(name, generator.operations).flatten.each {|sql| execute_ddl(sql)}
+      remove_cached_schema(name)
+      nil
     end
     
     # Creates a table with the columns given in the provided block:
@@ -92,6 +93,7 @@ module Sequel
       generator = options[:generator] || Schema::Generator.new(self, &block)
       create_table_from_generator(name, generator, options)
       create_table_indexes_from_generator(name, generator, options)
+      nil
     end
     
     # Forcibly creates a table, attempting to drop it unconditionally (and catching any errors), then creating it.
@@ -110,9 +112,10 @@ module Sequel
     #   DB.create_or_replace_view(:cheap_items, "SELECT * FROM items WHERE price < 100")
     #   DB.create_or_replace_view(:ruby_items, DB[:items].filter(:category => 'ruby'))
     def create_or_replace_view(name, source)
-      remove_cached_schema(name)
       source = source.sql if source.is_a?(Dataset)
       execute_ddl("CREATE OR REPLACE VIEW #{quote_schema_table(name)} AS #{source}")
+      remove_cached_schema(name)
+      nil
     end
     
     # Creates a view based on a dataset or an SQL string:
@@ -148,9 +151,10 @@ module Sequel
     #   DB.drop_table(:posts, :comments)
     def drop_table(*names)
       names.each do |n|
-        remove_cached_schema(n)
         execute_ddl(drop_table_sql(n))
+        remove_cached_schema(n)
       end
+      nil
     end
     
     # Drops one or more views corresponding to the given names:
@@ -158,9 +162,10 @@ module Sequel
     #   DB.drop_view(:cheap_items)
     def drop_view(*names)
       names.each do |n|
-        remove_cached_schema(n)
         execute_ddl("DROP VIEW #{quote_schema_table(n)}")
+        remove_cached_schema(n)
       end
+      nil
     end
 
     # Renames a table:
@@ -169,8 +174,9 @@ module Sequel
     #   DB.rename_table :items, :old_items
     #   DB.tables #=> [:old_items]
     def rename_table(name, new_name)
-      remove_cached_schema(name)
       execute_ddl(rename_table_sql(name, new_name))
+      remove_cached_schema(name)
+      nil
     end
     
     # Renames a column in the specified table. This method expects the current
