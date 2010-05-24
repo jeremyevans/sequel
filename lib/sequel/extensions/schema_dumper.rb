@@ -52,6 +52,8 @@ END_MIG
     # Return a string with a create table block that will recreate the given
     # table's schema.  Takes the same options as dump_schema_migration.
     def dump_table_schema(table, options={})
+      table = table.value.to_s if table.is_a?(SQL::Identifier)
+      raise(Error, "must provide table as a Symbol, String, or Sequel::SQL::Identifier") unless [String, Symbol].any?{|c| table.is_a?(c)}
       s = schema(table).dup
       pks = s.find_all{|x| x.last[:primary_key] == true}.map{|x| x.first}
       options = options.merge(:single_pk=>true) if pks.length == 1

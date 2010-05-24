@@ -69,7 +69,7 @@ describe "Sequel::Database dump methods" do
     @d.meta_def(:tables){|o| [:t1, :t2]}
     @d.meta_def(:schema) do |t, *o|
       case t
-      when :t1
+      when :t1, 't__t1', :t__t1.identifier
         [[:c1, {:db_type=>'integer', :primary_key=>true, :allow_null=>false}],
          [:c2, {:db_type=>'varchar(20)', :allow_null=>true}]]
       when :t2
@@ -90,6 +90,14 @@ describe "Sequel::Database dump methods" do
 
   it "should support dumping table schemas as create_table method calls" do
     @d.dump_table_schema(:t1).should == "create_table(:t1) do\n  primary_key :c1\n  String :c2, :size=>20\nend"
+  end
+
+  it "should support dumping table schemas when given a string" do
+    @d.dump_table_schema('t__t1').should == "create_table(\"t__t1\") do\n  primary_key :c1\n  String :c2, :size=>20\nend"
+  end
+
+  it "should support dumping table schemas when given an identifier" do
+    @d.dump_table_schema(:t__t1.identifier).should == "create_table(\"t__t1\") do\n  primary_key :c1\n  String :c2, :size=>20\nend"
   end
 
   it "should dump non-Integer primary key columns with explicit :type" do
