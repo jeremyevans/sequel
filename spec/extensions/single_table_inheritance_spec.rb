@@ -93,4 +93,70 @@ describe Sequel::Model, "#sti_key" do
     StiTestSub1.dataset.sql.should == "SELECT * FROM sti_tests WHERE (sti_tests.kind = 'StiTestSub1')"
     StiTestSub2.dataset.sql.should == "SELECT * FROM sti_tests WHERE (sti_tests.kind = 'StiTestSub2')"
   end
+
+  context "with custom options" do
+    before do
+      class ::StiTest2 < Sequel::Model
+        columns :id, :kind
+        def _refresh(x); end
+      end
+    end
+    after do
+      Object.send(:remove_const, :StiTest2)
+      Object.send(:remove_const, :StiTest3)
+      Object.send(:remove_const, :StiTest4)
+    end
+
+    it "should work with custom procs with strings" do
+      StiTest2.plugin :single_table_inheritance, :kind, :model_map=>proc{|v| v == 1 ? 'StiTest3' : 'StiTest4'}, :key_map=>proc{|klass| klass.name == 'StiTest3' ? 1 : 2}
+      class ::StiTest3 < ::StiTest2; end
+      class ::StiTest4 < ::StiTest2; end
+      StiTest2.dataset.row_proc.call(:kind=>0).should be_a_instance_of(StiTest4)
+      StiTest2.dataset.row_proc.call(:kind=>1).should be_a_instance_of(StiTest3)
+      StiTest2.dataset.row_proc.call(:kind=>2).should be_a_instance_of(StiTest4)
+
+      StiTest2.create.kind.should == 2
+      StiTest3.create.kind.should == 1
+      StiTest4.create.kind.should == 2
+    end
+
+    it "should work with custom procs with symbols" do
+      StiTest2.plugin :single_table_inheritance, :kind, :model_map=>proc{|v| v == 1 ? :StiTest3 : :StiTest4}, :key_map=>proc{|klass| klass.name == 'StiTest3' ? 1 : 2}
+      class ::StiTest3 < ::StiTest2; end
+      class ::StiTest4 < ::StiTest2; end
+      StiTest2.dataset.row_proc.call(:kind=>0).should be_a_instance_of(StiTest4)
+      StiTest2.dataset.row_proc.call(:kind=>1).should be_a_instance_of(StiTest3)
+      StiTest2.dataset.row_proc.call(:kind=>2).should be_a_instance_of(StiTest4)
+
+      StiTest2.create.kind.should == 2
+      StiTest3.create.kind.should == 1
+      StiTest4.create.kind.should == 2
+    end
+
+    it "should work with custom hashes" do
+      StiTest2.plugin :single_table_inheritance, :kind, :model_map=>{0=>StiTest2, 1=>:StiTest3, 2=>'StiTest4'}, :key_map=>{StiTest2=>4, 'StiTest3'=>5, 'StiTest4'=>6}
+      class ::StiTest3 < ::StiTest2; end
+      class ::StiTest4 < ::StiTest2; end
+      StiTest2.dataset.row_proc.call(:kind=>0).should be_a_instance_of(StiTest2)
+      StiTest2.dataset.row_proc.call(:kind=>1).should be_a_instance_of(StiTest3)
+      StiTest2.dataset.row_proc.call(:kind=>2).should be_a_instance_of(StiTest4)
+
+      StiTest2.create.kind.should == 4
+      StiTest3.create.kind.should == 5
+      StiTest4.create.kind.should == 6
+    end
+
+    it "should infer key_map from model_map if provided as a hash" do
+      StiTest2.plugin :single_table_inheritance, :kind, :model_map=>{0=>StiTest2, 1=>'StiTest3', 2=>:StiTest4}
+      class ::StiTest3 < ::StiTest2; end
+      class ::StiTest4 < ::StiTest2; end
+      StiTest2.dataset.row_proc.call(:kind=>0).should be_a_instance_of(StiTest2)
+      StiTest2.dataset.row_proc.call(:kind=>1).should be_a_instance_of(StiTest3)
+      StiTest2.dataset.row_proc.call(:kind=>2).should be_a_instance_of(StiTest4)
+
+      StiTest2.create.kind.should == 0
+      StiTest3.create.kind.should == 1
+      StiTest4.create.kind.should == 2
+    end
+  end
 end
