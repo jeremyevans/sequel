@@ -63,12 +63,19 @@ describe "Model#save" do
     MODEL_DB.sqls.should == ["INSERT INTO items (y) VALUES (2)"]
   end
 
-  it "should use value returned by insert as the primary key" do
+  it "should use value returned by insert as the primary key and refresh the object" do
     @c.dataset.meta_def(:insert){|h| super(h); 13}
     o = @c.new(:x => 11)
     o.save
     MODEL_DB.sqls.should == ["INSERT INTO items (x) VALUES (11)",
       "SELECT * FROM items WHERE (id = 13) LIMIT 1"]
+  end
+
+  it "should allow you to skip refreshing by overridding _save_refresh" do
+    @c.dataset.meta_def(:insert){|h| super(h); 13}
+    @c.send(:define_method, :_save_refresh){}
+    @c.create(:x => 11)
+    MODEL_DB.sqls.should == ["INSERT INTO items (x) VALUES (11)"]
   end
 
   it "should work correctly for inserting a record without a primary key" do

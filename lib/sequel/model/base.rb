@@ -923,13 +923,7 @@ module Sequel
           after_create
           after_save
           @was_new = nil
-          if pk
-            ds = this
-            ds = ds.server(:default) unless ds.opts[:server]
-            _refresh(ds)
-          else
-            changed_columns.clear
-          end
+          pk ? _save_refresh : changed_columns.clear
         else
           return save_failure(:update) if before_update == false
           if columns.empty?
@@ -947,6 +941,13 @@ module Sequel
         end
         @modified = false
         self
+      end
+
+      # Refresh the object after saving it, used to get
+      # default values of all columns.  Separated from _save so it
+      # can be overridden to avoid the refresh.
+      def _save_refresh
+        _refresh(this.opts[:server] ? this : this.server(:default))
       end
       
       # Update this instance's dataset with the supplied column hash.
