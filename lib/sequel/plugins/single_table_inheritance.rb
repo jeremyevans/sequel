@@ -20,11 +20,6 @@ module Sequel
     # direct class references in the plugin class.  You should specify subclasses
     # in the plugin call using class name strings or symbols, see usage below.
     #   
-    # The filters and row_proc that sti_key sets up in subclasses may not work correctly if
-    # those subclasses have further subclasses.  For those middle subclasses,
-    # you may need to call set_dataset manually with the correct filter and
-    # row_proc.
-    # 
     # Usage:
     #
     #   # Use the default of storing the class name in the sti_key
@@ -56,6 +51,7 @@ module Sequel
       # Setup the necessary STI variables, see the module RDoc for SingleTableInheritance
       def self.configure(model, key, opts={})
         model.instance_eval do
+          @sti_key_array = nil
           @sti_key = key 
           @sti_dataset = dataset
           @sti_model_map = opts[:model_map] || lambda{|v| v if v && v != ''}
@@ -87,6 +83,10 @@ module Sequel
         # The column name holding the STI key for this model
         attr_reader :sti_key
 
+        # Array holding keys for all subclasses of this class, used for the
+        # dataset filter in subclasses. Nil in the main class.
+        attr_reader :sti_key_array
+
         # A hash/proc with class keys and column value values, mapping
         # the the class to a particular value given to the sti_key column.
         # Used to set the column value when creating objects, and for the
@@ -105,9 +105,13 @@ module Sequel
           sd = sti_dataset
           skm = sti_key_map
           smm = sti_model_map
-          subclass.set_dataset(sd.filter(SQL::QualifiedIdentifier.new(table_name, sk)=>skm[subclass]), :inherited=>true)
+          key = skm[subclass] 
+          sti_subclass_added(key)
+          ska = [key]
+          subclass.set_dataset(sd.filter(SQL::QualifiedIdentifier.new(table_name, sk)=>ska), :inherited=>true)
           subclass.instance_eval do
             @sti_key = sk
+            @sti_key_array = ska
             @sti_dataset = sd
             @sti_key_map = skm
             @sti_model_map = smm
@@ -119,6 +123,15 @@ module Sequel
         # used by the row_proc.
         def sti_load(r)
           sti_class(sti_model_map[r[sti_key]]).load(r)
+        end
+
+        # Make sure that all subclasses of the parent class correctly include 
+        # keys for all of their descendant classes.
+        def sti_subclass_added(key)
+          if sti_key_array
+            sti_key_array << key
+            superclass.sti_subclass_added(key)
+          end
         end
 
         private

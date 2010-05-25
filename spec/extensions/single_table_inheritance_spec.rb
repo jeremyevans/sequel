@@ -41,8 +41,8 @@ describe Sequel::Model, "#sti_key" do
     end 
     StiTest.all.collect{|x| x.class}.should == [StiTest, StiTestSub1, StiTestSub2]
     StiTest.dataset.sql.should == "SELECT * FROM sti_tests"
-    StiTestSub1.dataset.sql.should == "SELECT * FROM sti_tests WHERE (sti_tests.blah = 'StiTestSub1')"
-    StiTestSub2.dataset.sql.should == "SELECT * FROM sti_tests WHERE (sti_tests.blah = 'StiTestSub2')"
+    StiTestSub1.dataset.sql.should == "SELECT * FROM sti_tests WHERE (sti_tests.blah IN ('StiTestSub1'))"
+    StiTestSub2.dataset.sql.should == "SELECT * FROM sti_tests WHERE (sti_tests.blah IN ('StiTestSub2'))"
   end 
   
   it "should return rows with the correct class based on the polymorphic_key value" do
@@ -90,8 +90,21 @@ describe Sequel::Model, "#sti_key" do
 
   it "should add a filter to model datasets inside subclasses hook to only retreive objects with the matching key" do
     StiTest.dataset.sql.should == "SELECT * FROM sti_tests"
-    StiTestSub1.dataset.sql.should == "SELECT * FROM sti_tests WHERE (sti_tests.kind = 'StiTestSub1')"
-    StiTestSub2.dataset.sql.should == "SELECT * FROM sti_tests WHERE (sti_tests.kind = 'StiTestSub2')"
+    StiTestSub1.dataset.sql.should == "SELECT * FROM sti_tests WHERE (sti_tests.kind IN ('StiTestSub1'))"
+    StiTestSub2.dataset.sql.should == "SELECT * FROM sti_tests WHERE (sti_tests.kind IN ('StiTestSub2'))"
+  end
+
+  it "should add a correct filter for multiple levels of subclasses" do
+    class ::StiTestSub1A < StiTestSub1; end
+    StiTestSub1.dataset.sql.should == "SELECT * FROM sti_tests WHERE (sti_tests.kind IN ('StiTestSub1', 'StiTestSub1A'))"
+    StiTestSub1A.dataset.sql.should == "SELECT * FROM sti_tests WHERE (sti_tests.kind IN ('StiTestSub1A'))"
+    class ::StiTestSub2A < StiTestSub2; end
+    StiTestSub2.dataset.sql.should == "SELECT * FROM sti_tests WHERE (sti_tests.kind IN ('StiTestSub2', 'StiTestSub2A'))"
+    StiTestSub2A.dataset.sql.should == "SELECT * FROM sti_tests WHERE (sti_tests.kind IN ('StiTestSub2A'))"
+    class ::StiTestSub1B < StiTestSub1A; end
+    StiTestSub1.dataset.sql.should == "SELECT * FROM sti_tests WHERE (sti_tests.kind IN ('StiTestSub1', 'StiTestSub1A', 'StiTestSub1B'))"
+    StiTestSub1A.dataset.sql.should == "SELECT * FROM sti_tests WHERE (sti_tests.kind IN ('StiTestSub1A', 'StiTestSub1B'))"
+    StiTestSub1B.dataset.sql.should == "SELECT * FROM sti_tests WHERE (sti_tests.kind IN ('StiTestSub1B'))"
   end
 
   context "with custom options" do
