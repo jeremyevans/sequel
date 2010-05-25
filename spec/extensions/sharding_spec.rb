@@ -106,6 +106,27 @@ describe "sharding plugin" do
     @Album.actions.should == [[:fetch, nil, :s1], [:fetch, "(id = 1)", :s1]]
   end 
 
+  specify "should use current dataset's shard when eager loading if eagerly loaded dataset doesn't have it's own shard" do
+    albums = @Album.server(:s1).eager(:artist).all
+    @Album.actions.should == [[:fetch, nil, :s1]]
+    @Artist.actions.should == [[:fetch, "(artists.id IN (2))", :s1]]
+    @Artist.actions.clear
+    albums.length == 1
+    albums.first.artist.save
+    @Artist.actions.should == [[:update, {:name=>"YJM"}, "(id = 2)", :s1]]
+  end 
+
+  specify "should not use current dataset's shard when eager loading if eagerly loaded dataset has its own shard" do
+    @Artist.dataset.opts[:server] = :s2
+    albums = @Album.server(:s1).eager(:artist).all
+    @Album.actions.should == [[:fetch, nil, :s1]]
+    @Artist.actions.should == [[:fetch, "(artists.id IN (2))", :s2]]
+    @Artist.actions.clear
+    albums.length == 1
+    albums.first.artist.save
+    @Artist.actions.should == [[:update, {:name=>"YJM"}, "(id = 2)", :s2]]
+  end 
+
   specify "should have objects retrieved from a specific shard use associated objects from that shard, with modifications to the associated objects using that shard" do
     album = @Album.server(:s1).first
     @Album.actions.should == [[:fetch, nil, :s1]]
