@@ -577,9 +577,9 @@ describe Sequel::Model, "#eager" do
       item = EagerBand.filter(:album_id=>records.collect{|r| [r.pk, r.pk*2]}.flatten).order(:name).first
       records.each{|r| r.associations[:special_band] = item}
     end)
-    EagerAlbum.one_to_many :special_tracks, :eager_loader=>(proc do |key_hash, records, assocs| 
-      items = EagerTrack.filter(:album_id=>records.collect{|r| [r.pk, r.pk*2]}.flatten).all
-      records.each{|r| r.associations[:special_tracks] = items}
+    EagerAlbum.one_to_many :special_tracks, :eager_loader=>(proc do |eo|
+      items = EagerTrack.filter(:album_id=>eo[:rows].collect{|r| [r.pk, r.pk*2]}.flatten).all
+      eo[:rows].each{|r| r.associations[:special_tracks] = items}
     end)
     EagerAlbum.many_to_many :special_genres, :class=>:EagerGenre, :eager_loader=>(proc do |key_hash, records, assocs| 
       items = EagerGenre.inner_join(:ag, [:genre_id]).filter(:album_id=>records.collect{|r| r.pk}).all
@@ -607,6 +607,10 @@ describe Sequel::Model, "#eager" do
     a.special_genres.first.should be_a_kind_of(EagerGenre)
     a.special_genres.first.values.should == {:id => 4}
     MODEL_DB.sqls.length.should == 4
+  end
+
+  it "should raise an error if you use an :eager_loader proc with the wrong arity" do
+    proc{EagerAlbum.many_to_one :special_band, :eager_loader=>proc{|a, b|}}.should raise_error(Sequel::Error)
   end
   
   it "should respect :after_load callbacks on associations when eager loading" do

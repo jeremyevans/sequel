@@ -337,7 +337,7 @@ With either way of eager loading, you must call +all+ to retrieve all records at
   
 Like ActiveRecord, Sequel supports cascading of eager loading for both methods of eager loading.
 
-Unlike ActiveRecord, Sequel allows you to eager load custom associations using the <tt>:eager_loader</tt> and <tt>:eager_grapher</tt> association options.
+Unlike ActiveRecord, Sequel allows you to eager load custom associations using the <tt>:eager_loader</tt> and <tt>:eager_grapher</tt> association options.  See the {Advanced Associations guide}[link:files/doc/advanced_associations_rdoc.html] for more details.
 
 Table aliasing when eager loading via +eager_graph+ is different in Sequel than ActiveRecord.  Sequel will always attempt to use the association name, not the table name, for any associations.  If the association name has already been used, Sequel will append _N to it, where N starts at 0 and increases by 1.  For example, for a self referential association:
 

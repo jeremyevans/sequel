@@ -179,15 +179,15 @@ module Sequel
           end
 
           left_key_alias = opts[:left_key_alias] ||= opts.default_associated_key_alias
-          opts[:eager_loader] ||= lambda do |key_hash, records, associations|
-            h = key_hash[left_pk]
-            records.each{|object| object.associations[name] = []}
+          opts[:eager_loader] ||= lambda do |eo|
+            h = eo[:key_hash][left_pk]
+            eo[:rows].each{|object| object.associations[name] = []}
             ds = opts.associated_class 
             opts.reverse_edges.each{|t| ds = ds.join(t[:table], Array(t[:left]).zip(Array(t[:right])), :table_alias=>t[:alias])}
             ft = opts[:final_reverse_edge]
             conds = uses_lcks ? [[left_keys.map{|k| SQL::QualifiedIdentifier.new(ft[:table], k)}, SQL::SQLArray.new(h.keys)]] : [[left_key, h.keys]]
             ds = ds.join(ft[:table], Array(ft[:left]).zip(Array(ft[:right])) + conds, :table_alias=>ft[:alias])
-            model.eager_loading_dataset(opts, ds, Array(opts.select), associations).all do |assoc_record|
+            model.eager_loading_dataset(opts, ds, Array(opts.select), eo[:associations], eo).all do |assoc_record|
               hash_key = if uses_lcks
                 left_key_alias.map{|k| assoc_record.values.delete(k)}
               else

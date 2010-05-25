@@ -445,8 +445,8 @@ module Sequel
       #   => {:type => :many_to_one, :name => :portfolio, :class_name => "Portfolio"}
       #
       # For a more in depth general overview, as well as a reference guide,
-      # see the {Association Basics page}[link:files/doc/association_basics_rdoc.html].
-      # For examples of advanced usage, see the {Advanced Associations page}[link:files/doc/advanced_associations_rdoc.html].
+      # see the {Association Basics guide}[link:files/doc/association_basics_rdoc.html].
+      # For examples of advanced usage, see the {Advanced Associations guide}[link:files/doc/advanced_associations_rdoc.html].
       module ClassMethods
         # All association reflections defined for this model (default: none).
         attr_reader :association_reflections
@@ -525,9 +525,11 @@ module Sequel
         #     Takes three arguments, a dataset, an alias to use for the table to graph for this association,
         #     and the alias that was used for the current table (since you can cascade associations),
         #     Should return a copy of the dataset with the association graphed into it.
-        #   - :eager_loader - A proc to use to implement eager loading, overriding the default.  Takes three arguments,
-        #     a key hash (used solely to enhance performance), an array of records,
-        #     and a hash of dependent associations.  The associated records should
+        #   - :eager_loader - A proc to use to implement eager loading, overriding the default.  Takes one or three arguments.
+        #     If three arguments, the first should be a key hash (used solely to enhance performance), the second an array of records,
+        #     and the third a hash of dependent associations. If one argument, is passed a hash with keys :key_hash,
+        #     :rows, and :associations, corresponding to the three arguments, and an additional key :self, which is
+        #     the dataset doing the eager loading. In the proc, the associated records should
         #     be queried from the database and the associations cache for each
         #     record should be populated for this to work correctly.
         #   - :eager_loader_key - A symbol for the key column to use to populate the key hash
@@ -614,6 +616,7 @@ module Sequel
           raise(Error, 'one_to_many association type with :one_to_one option removed, used one_to_one association type') if opts[:one_to_one] && type == :one_to_many
           raise(Error, 'invalid association type') unless assoc_class = ASSOCIATION_TYPES[type]
           raise(Error, 'Model.associate name argument must be a symbol') unless Symbol === name
+          raise(Error, ':eager_loader option must have an arity of 1 or 3') if opts[:eager_loader] && ![1, 3].include?(opts[:eager_loader].arity)
       
           # merge early so we don't modify opts
           orig_opts = opts.dup
@@ -653,7 +656,7 @@ module Sequel
         end
 
         # Modify and return eager loading dataset based on association options. Options:
-        def eager_loading_dataset(opts, ds, select, associations)
+        def eager_loading_dataset(opts, ds, select, associations, eager_options={})
           ds = ds.select(*select) if select
           if c = opts[:conditions]
             ds = (c.is_a?(Array) && !Sequel.condition_specifier?(c)) ? ds.filter(*c) : ds.filter(c)
@@ -761,12 +764,12 @@ module Sequel
           opts[:dataset] ||= proc{opts.associated_class.inner_join(join_table, rcks.zip(opts.right_primary_keys) + lcks.zip(lcpks.map{|k| send(k)}))}
           database = db
           
-          opts[:eager_loader] ||= proc do |key_hash, records, associations|
-            h = key_hash[left_pk]
-            records.each{|object| object.associations[name] = []}
+          opts[:eager_loader] ||= proc do |eo|
+            h = eo[:key_hash][left_pk]
+            eo[:rows].each{|object| object.associations[name] = []}
             r = uses_rcks ? rcks.zip(opts.right_primary_keys) : [[right, opts.right_primary_key]]
             l = uses_lcks ? [[lcks.map{|k| SQL::QualifiedIdentifier.new(join_table, k)}, SQL::SQLArray.new(h.keys)]] : [[left, h.keys]]
-            model.eager_loading_dataset(opts, opts.associated_class.inner_join(join_table, r + l), Array(opts.select), associations).all do |assoc_record|
+            model.eager_loading_dataset(opts, opts.associated_class.inner_join(join_table, r + l), Array(opts.select), eo[:associations], eo).all do |assoc_record|
               hash_key = if uses_lcks
                 left_key_alias.map{|k| assoc_record.values.delete(k)}
               else
@@ -827,16 +830,16 @@ module Sequel
             klass = opts.associated_class
             klass.filter(opts.primary_keys.map{|k| SQL::QualifiedIdentifier.new(klass.table_name, k)}.zip(cks.map{|k| send(k)}))
           end
-          opts[:eager_loader] ||= proc do |key_hash, records, associations|
-            h = key_hash[key]
+          opts[:eager_loader] ||= proc do |eo|
+            h = eo[:key_hash][key]
             keys = h.keys
             # Default the cached association to nil, so any object that doesn't have it
             # populated will have cached the negative lookup.
-            records.each{|object| object.associations[name] = nil}
+            eo[:rows].each{|object| object.associations[name] = nil}
             # Skip eager loading if no objects have a foreign key for this association
             unless keys.empty?
               klass = opts.associated_class
-              model.eager_loading_dataset(opts, klass.filter(uses_cks ? {opts.primary_keys.map{|k| SQL::QualifiedIdentifier.new(klass.table_name, k)}=>SQL::SQLArray.new(keys)} : {SQL::QualifiedIdentifier.new(klass.table_name, opts.primary_key)=>keys}), opts.select, associations).all do |assoc_record|
+              model.eager_loading_dataset(opts, klass.filter(uses_cks ? {opts.primary_keys.map{|k| SQL::QualifiedIdentifier.new(klass.table_name, k)}=>SQL::SQLArray.new(keys)} : {SQL::QualifiedIdentifier.new(klass.table_name, opts.primary_key)=>keys}), opts.select, eo[:associations], eo).all do |assoc_record|
                 hash_key = uses_cks ? opts.primary_keys.map{|k| assoc_record.send(k)} : assoc_record.send(opts.primary_key)
                 next unless objects = h[hash_key]
                 objects.each{|object| object.associations[name] = assoc_record}
@@ -877,16 +880,16 @@ module Sequel
             klass = opts.associated_class
             klass.filter(cks.map{|k| SQL::QualifiedIdentifier.new(klass.table_name, k)}.zip(cpks.map{|k| send(k)}))
           end
-          opts[:eager_loader] ||= proc do |key_hash, records, associations|
-            h = key_hash[primary_key]
+          opts[:eager_loader] ||= proc do |eo|
+            h = eo[:key_hash][primary_key]
             if one_to_one
-              records.each{|object| object.associations[name] = nil}
+              eo[:rows].each{|object| object.associations[name] = nil}
             else
-              records.each{|object| object.associations[name] = []}
+              eo[:rows].each{|object| object.associations[name] = []}
             end
             reciprocal = opts.reciprocal
             klass = opts.associated_class
-            model.eager_loading_dataset(opts, klass.filter(uses_cks ? {cks.map{|k| SQL::QualifiedIdentifier.new(klass.table_name, k)}=>SQL::SQLArray.new(h.keys)} : {SQL::QualifiedIdentifier.new(klass.table_name, key)=>h.keys}), opts.select, associations).all do |assoc_record|
+            model.eager_loading_dataset(opts, klass.filter(uses_cks ? {cks.map{|k| SQL::QualifiedIdentifier.new(klass.table_name, k)}=>SQL::SQLArray.new(h.keys)} : {SQL::QualifiedIdentifier.new(klass.table_name, key)=>h.keys}), opts.select, eo[:associations], eo).all do |assoc_record|
               hash_key = uses_cks ? cks.map{|k| assoc_record.send(k)} : assoc_record.send(key)
               next unless objects = h[hash_key]
               if one_to_one
@@ -1526,7 +1529,12 @@ module Sequel
           end
           
           reflections.each do |r|
-            r[:eager_loader].call(key_hash, a, eager_assoc[r[:name]])
+            loader = r[:eager_loader]
+            if loader.arity == 1
+              loader.call(:key_hash=>key_hash, :rows=>a, :associations=>eager_assoc[r[:name]], :self=>self)
+            else
+              loader.call(key_hash, a, eager_assoc[r[:name]])
+            end
             a.each{|object| object.send(:run_association_callbacks, r, :after_load, object.associations[r[:name]])} unless r[:after_load].empty?
           end 
         end

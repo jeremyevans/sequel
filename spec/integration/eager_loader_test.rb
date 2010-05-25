@@ -12,10 +12,10 @@ describe "Eagerly loading a tree structure" do
       one_to_many :children, :key=>:parent_id
     
       # Only useful when eager loading
-      many_to_one :ancestors, :eager_loader=>(proc do |key_hash, nodes, associations|
+      many_to_one :ancestors, :eager_loader=>(proc do |eo|
         # Handle cases where the root node has the same parent_id as primary_key
         # and also when it is NULL
-        non_root_nodes = nodes.reject do |n| 
+        non_root_nodes = eo[:rows].reject do |n| 
           if [nil, n.pk].include?(n.parent_id)
             # Make sure root nodes have their parent association set to nil
             n.associations[:parent] = nil
@@ -36,9 +36,9 @@ describe "Eagerly loading a tree structure" do
           end
         end
       end)
-      many_to_one :descendants, :eager_loader=>(proc do |key_hash, nodes, associations|
+      many_to_one :descendants, :eager_loader=>(proc do |eo|
         id_map = {}
-        nodes.each do |n|
+        eo[:rows].each do |n|
           # Initialize an empty array of child associations for each parent node
           n.associations[:children] = []
           # Populate identity map of nodes
@@ -186,9 +186,9 @@ describe "has_many :through has_many and has_one :through belongs_to" do
             inv.client.associations[:firm] = inv.associations[:firm] = firm
           end
         end), \
-        :eager_loader=>(proc do |key_hash, firms, associations|
-          id_map = key_hash[Firm.primary_key]
-          firms.each{|firm| firm.associations[:invoices] = []}
+        :eager_loader=>(proc do |eo|
+          id_map = eo[:key_hash][Firm.primary_key]
+          eo[:rows].each{|firm| firm.associations[:invoices] = []}
           Invoice.eager_graph(:client).filter(:client__firm_id=>id_map.keys).all do |inv|
             id_map[inv.client.firm_id].each do |firm|
               firm.associations[:invoices] << inv
@@ -222,9 +222,9 @@ describe "has_many :through has_many and has_one :through belongs_to" do
           end
           inv.associations[:client] ||= firm.associations[:invoice_client]
         end), \
-        :eager_loader=>(proc do |key_hash, invoices, associations|
+        :eager_loader=>(proc do |eo|
           id_map = {}
-          invoices.each do |inv|
+          eo[:rows].each do |inv|
             inv.associations[:firm] = nil
             (id_map[inv.client_id] ||= []) << inv
           end
@@ -338,9 +338,9 @@ describe "Polymorphic Associations" do
           klass = m.call(attachable_type)
           klass.filter(klass.primary_key=>attachable_id)
         end), \
-        :eager_loader=>(proc do |key_hash, assets, associations|
+        :eager_loader=>(proc do |eo|
           id_map = {}
-          assets.each do |asset|
+          eo[:rows].each do |asset|
             asset.associations[:attachable] = nil 
             ((id_map[asset.attachable_type] ||= {})[asset.attachable_id] ||= []) << asset
           end 
@@ -492,9 +492,9 @@ describe "many_to_one/one_to_many not referencing primary key" do
     class ::Client < Sequel::Model
       one_to_many :invoices, :reciprocal=>:client, \
         :dataset=>proc{Invoice.filter(:client_name=>name)}, \
-        :eager_loader=>(proc do |key_hash, clients, associations|
+        :eager_loader=>(proc do |eo|
           id_map = {}
-          clients.each do |client|
+          eo[:rows].each do |client|
             id_map[client.name] = client
             client.associations[:invoices] = []
           end 
@@ -526,9 +526,9 @@ describe "many_to_one/one_to_many not referencing primary key" do
     class ::Invoice < Sequel::Model
       many_to_one :client, :key=>:client_name, \
         :dataset=>proc{Client.filter(:name=>client_name)}, \
-        :eager_loader=>(proc do |key_hash, invoices, associations|
-          id_map = key_hash[:client_name]
-          invoices.each{|inv| inv.associations[:client] = nil}
+        :eager_loader=>(proc do |eo|
+          id_map = eo[:key_hash][:client_name]
+          eo[:rows].each{|inv| inv.associations[:client] = nil}
           Client.filter(:name=>id_map.keys).all do |client|
             id_map[client.name].each{|inv| inv.associations[:client] = client}
           end 
@@ -626,13 +626,13 @@ describe "statistics associations" do
     class ::Project < Sequel::Model
       many_to_one :ticket_hours, :read_only=>true, :key=>:id, :class=>:Ticket,
        :dataset=>proc{Ticket.filter(:project_id=>id).select{sum(hours).as(hours)}},
-       :eager_loader=>(proc do |kh, projects, a|
-        projects.each{|p| p.associations[:ticket_hours] = nil}
-        Ticket.filter(:project_id=>kh[:id].keys).
+       :eager_loader=>(proc do |eo|
+        eo[:rows].each{|p| p.associations[:ticket_hours] = nil}
+        Ticket.filter(:project_id=>eo[:key_hash][:id].keys).
          group(:project_id).
          select{[project_id.as(project_id), sum(hours).as(hours)]}.
          all do |t|
-          p = kh[:id][t.values.delete(:project_id)].first
+          p = eo[:key_hash][:id][t.values.delete(:project_id)].first
           p.associations[:ticket_hours] = t
          end
        end)  

@@ -1093,16 +1093,9 @@ to eagerly load:
 
 ==== :eager_loader
 
-A custom loader to use when eagerly load associated objects via eager. If
-specified, should be a proc that takes three arguments: a key hash (used
-solely to enhance performance), an array of current model instances, and a
-hash of dependent associations to eagerly load.  The proc is responsible for
-querying the database to retrieve all associated records for any of the model
-instances (the second argument), and modifying the associations cache for each
-record to correctly set the associated records for that record.
-
+A custom loader to use when eagerly load associated objects via eager.
 For many details and examples of custom eager loaders, please see the
-{Advanced Associations page}[link:files/doc/advanced_associations_rdoc.html].
+{Advanced Associations guide}[link:files/doc/advanced_associations_rdoc.html].
 
 ==== :eager_loader_key
 

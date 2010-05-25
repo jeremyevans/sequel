@@ -1,5 +1,7 @@
 === HEAD
 
+* Allow the :eager_loader association proc to accept a single hash instead of 3 arguments (jeremyevans)
+
 * Add a Dataset#order_append alias for order_more, for consistency with order_prepend (jeremyevans)
 
 * Add a Dataset#order_prepend method that adds to the end of an existing order (jeremyevans)

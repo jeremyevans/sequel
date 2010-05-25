@@ -146,11 +146,11 @@ module Sequel
           end
         end
         a[:after_load] ||= aal
-        a[:eager_loader] ||= proc do |key_hash, objects, associations|
-          id_map = key_hash[key]
+        a[:eager_loader] ||= proc do |eo|
+          id_map = eo[:key_hash][key]
           parent_map = {}
           children_map = {}
-          objects.each do |obj|
+          eo[:rows].each do |obj|
             parent_map[obj[prkey]] = obj
             (children_map[obj[key]] ||= []) << obj
             obj.associations[ancestors] = []
@@ -164,7 +164,7 @@ module Sequel
              model.join(t, key=>prkey).
              select(SQL::QualifiedIdentifier.new(t, ka), c_all)),
            r.select,
-           associations).all do |obj|
+           eo[:associations], eo).all do |obj|
             opk = obj[prkey]
             if in_pm = parent_map.has_key?(opk)
               if idm_obj = parent_map[opk]
@@ -224,11 +224,12 @@ module Sequel
           end
         end
         d[:after_load] = dal
-        d[:eager_loader] ||= proc do |key_hash, objects, associations|
-          id_map = key_hash[prkey]
+        d[:eager_loader] ||= proc do |eo|
+          id_map = eo[:key_hash][prkey]
+          associations = eo[:associations]
           parent_map = {}
           children_map = {}
-          objects.each do |obj|
+          eo[:rows].each do |obj|
             parent_map[obj[prkey]] = obj
             obj.associations[descendants] = []
             obj.associations[childrena] = []
@@ -248,7 +249,7 @@ module Sequel
           model.eager_loading_dataset(r,
            model.from(t).with_recursive(t, base_case, recursive_case),
            r.select,
-           associations).all do |obj|
+           associations, eo).all do |obj|
             if level
               no_cache = no_cache_level == obj.values.delete(la)
             end

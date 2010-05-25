@@ -77,9 +77,21 @@ option.  Though it can often be verbose (compared to other things in Sequel),
 it allows you complete control over how to eagerly load associations for a
 group of objects.
 
-:eager_loader should be a proc that takes 3 arguments, a key_hash,
-an array of records, and a hash of dependent associations.  Since you
-are given all of the records, you can do things like filter on
+:eager_loader should be a proc that takes 1 or 3 arguments.  If the proc
+takes one argument, it will be given a hash with the following keys:
+
+:key_hash :: A key_hash, described below
+:rows :: An array of model objects
+:associations :: A hash of dependent associations to eagerly load
+:self :: The dataset that is doing the eager loading
+
+If the proc takes three arguments, it gets passed the :key_hash, :rows,
+and :associations values.  The only way to get the :self value is to
+accept one argument.  The 3 argument procs are allowed for backwards
+compatibility, and it is recommended to use the 1 argument proc format
+for new code.
+
+Since you are given all of the records, you can do things like filter on
 associations that are specified by multiple keys, or do multiple
 queries depending on the content of the records (which would be
 necessary for polymorphic associations).  Inside the :eager_loader
@@ -277,9 +289,9 @@ Sequel::Model:
         klass = attachable_type.constantize
         klass.filter(klass.primary_key=>attachable_id)
       end), \
-      :eager_loader=>(proc do |key_hash, assets, associations|
+      :eager_loader=>(proc do |eo|
         id_map = {}
-        assets.each do |asset|
+        eo[:rows].each do |asset|
           asset.associations[:attachable] = nil 
           ((id_map[asset.attachable_type] ||= {})[asset.attachable_id] ||= []) << asset
         end
@@ -370,9 +382,9 @@ design, but sometimes you have to play with the cards you are dealt).
   class Client < Sequel::Model
     one_to_many :invoices, :reciprocal=>:client, \
       :dataset=>proc{Invoice.filter(:client_name=>name)}, \
-      :eager_loader=>(proc do |key_hash, clients, associations|
+      :eager_loader=>(proc do |eo|
         id_map = {}
-        clients.each do |client|
+        eo[:rows].each do |client|
           id_map[client.name] = client
           client.associations[:invoices] = []
         end
@@ -400,9 +412,9 @@ design, but sometimes you have to play with the cards you are dealt).
   class Invoice < Sequel::Model
     many_to_one :client, :key=>:client_name, \
       :dataset=>proc{Client.filter(:name=>client_name)}, \
-      :eager_loader=>(proc do |key_hash, invoices, associations|
-        id_map = key_hash[:client_name]
-        invoices.each{|inv| inv.associations[:client] = nil}
+      :eager_loader=>(proc do |eo|
+        id_map = eo[:key_hash][:client_name]
+        eo[:rows].each{|inv| inv.associations[:client] = nil}
         Client.filter(:name=>id_map.keys).all do |client|
           id_map[client.name].each{|inv| inv.associations[:client] = client}
         end
@@ -439,9 +451,9 @@ Here's the old way to do it via custom associations:
       :dataset=>(proc do
         FavoriteTrack.filter(:disc_number=>disc_number, :number=>number, :album_id=>album_id)
       end), \
-      :eager_loader=>(proc do |key_hash, tracks, associations|
+      :eager_loader=>(proc do |eo|
         id_map = {}
-        tracks.each do |t|
+        eo[:rows].each do |t|
           t.associations[:favorite_track] = nil
           id_map[[t[:album_id], t[:disc_number], t[:number]]] = t
         end
@@ -458,9 +470,9 @@ Here's the old way to do it via custom associations:
       :dataset=>(proc do
         Track.filter(:disc_number=>disc_number, :number=>number, :album_id=>album_id)
       end), \
-      :eager_loader=>(proc do |key_hash, ftracks, associations|
+      :eager_loader=>(proc do |eo|
         id_map = {}
-        ftracks.each{|ft| id_map[[ft[:album_id], ft[:disc_number], ft[:number]]] = ft}
+        eo[:rows].each{|ft| id_map[[ft[:album_id], ft[:disc_number], ft[:number]]] = ft}
         Track.filter([:album_id, :disc_number, :number]=>id_map.keys).all do |t|
           id_map[[t[:album_id], t[:disc_number], t[:number]]].associations[:track] = t
         end
@@ -490,10 +502,10 @@ without knowing the depth of the tree?
 
   class Node < Sequel::Model
     many_to_one :ancestors, :class=>self,
-     :eager_loader=>(proc do |key_hash, nodes, associations|
+     :eager_loader=>(proc do |eo|
       # Handle cases where the root node has the same parent_id as primary_key
       # and also when it is NULL
-      non_root_nodes = nodes.reject do |n| 
+      non_root_nodes = eo[:rows].reject do |n| 
         if [nil, n.pk].include?(n.parent_id)
           # Make sure root nodes have their parent association set to nil
           n.associations[:parent] = nil 
@@ -514,9 +526,9 @@ without knowing the depth of the tree?
         end 
       end 
     end)
-    many_to_one :descendants, :eager_loader=>(proc do |key_hash, nodes, associations|
+    many_to_one :descendants, :eager_loader=>(proc do |eo|
       id_map = {}
-      nodes.each do |n| 
+      eo[:rows].each do |n| 
         # Initialize an empty array of child associations for each parent node
         n.associations[:children] = []
         # Populate identity map of nodes
@@ -549,9 +561,9 @@ supports recursive common table expressions):
           Node.join(:t, :id=>:parent_id).
           select(:nodes.*))
       end),
-      :eager_loader=>(proc do |key_hash, nodes, associations|
-        id_map = key_hash[:id]
-        nodes.each{|n| n.associations[:descendants] = []}
+      :eager_loader=>(proc do |eo|
+        id_map = eo[:key_hash][:id]
+        eo[:rows].each{|n| n.associations[:descendants] = []}
         Node.from(:t).
         with_recursive(:t, Node.filter(:parent_id=>id_map.keys).
            select(:parent_id___root, :id, :parent_id),
@@ -565,8 +577,11 @@ supports recursive common table expressions):
       end)
   end
 
-You could modify the code to also store direct children relationships at the same time,
-for functionality similar to the non-common table expression case.
+Sequel ships with an +rcte_tree+ plugin that allows simple creation
+of ancestors and descendants relationships that use recursive common
+table expressions:
+
+  Node.plugin :rcte_tree
 
 === Joining multiple keys to a single key, through a third table
 
@@ -584,10 +599,10 @@ name, with no duplicates?
   class Artist < Sequel::Model
     one_to_many :songs, :order=>:songs__name, \
       :dataset=>proc{Song.select(:songs.*).join(Lyric, :id=>:lyric_id, id=>[:composer_id, :arranger_id, :vocalist_id, :lyricist_id])}, \
-      :eager_loader=>(proc do |key_hash, records, associations|
-        h = key_hash[:id]
+      :eager_loader=>(proc do |eo|
+        h = eo[:key_hash][:id]
         ids = h.keys
-        records.each{|r| r.associations[:songs] = []}
+        eo[:rows].each{|r| r.associations[:songs] = []}
         Song.select(:songs.*, :lyrics__composer_id, :lyrics__arranger_id, :lyrics__vocalist_id, :lyrics__lyricist_id)\
          .join(Lyric, :id=>:lyric_id){{:composer_id=>ids, :arranger_id=>ids, :vocalist_id=>ids, :lyricist_id=>ids}.sql_or}\
          .order(:songs__name).all do |song|
@@ -596,7 +611,7 @@ name, with no duplicates?
             recs.each{|r| r.associations[:songs] << song} if recs
           end
         end
-        records.each{|r| r.associations[:songs].uniq!}
+        eo[:rows].each{|r| r.associations[:songs].uniq!}
       end)
   end
 
@@ -614,13 +629,13 @@ associated tickets.
     one_to_many :tickets
     many_to_one :ticket_hours, :read_only=>true, :key=>:id,
      :dataset=>proc{Ticket.filter(:project_id=>id).select{sum(hours).as(hours)}},
-     :eager_loader=>(proc do |kh, projects, a|
-      projects.each{|p| p.associations[:ticket_hours] = nil}
-      Ticket.filter(:project_id=>kh[:id].keys).
+     :eager_loader=>(proc do |eo|
+      eo[:rows].each{|p| p.associations[:ticket_hours] = nil}
+      Ticket.filter(:project_id=>eo[:key_hash][:id].keys).
        group(:project_id).
        select{[project_id, sum(hours).as(hours)]}.
        all do |t|
-        p = kh[:id][t.values.delete(:project_id)].first
+        p = eo[:key_hash][:id][t.values.delete(:project_id)].first
         p.associations[:ticket_hours] = t
        end
      end)
