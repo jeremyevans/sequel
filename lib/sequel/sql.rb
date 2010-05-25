@@ -68,12 +68,16 @@ module Sequel
       end
       private_class_method :to_s_method
 
+      # Alias of eql?
+      def ==(other)
+        eql?(other)
+      end
+
       # Returns true if the receiver is the same expression as the
       # the +other+ expression.
       def eql?(other)
         other.is_a?(self.class) && !self.class.comparison_attrs.find {|a| send(a) != other.send(a)}
       end
-      alias == eql?
 
       # Make sure that the hash value is the same if the attributes are the same.
       def hash
@@ -86,7 +90,7 @@ module Sequel
         self
       end
       
-      # Alias for to_s
+      # Alias of to_s
       def sql_literal(ds)
         to_s(ds)
       end

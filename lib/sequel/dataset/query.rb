@@ -220,7 +220,11 @@ module Sequel
     def group(*columns)
       clone(:group => (columns.compact.empty? ? nil : columns))
     end
-    alias group_by group
+
+    # Alias of group
+    def group_by(*columns)
+      group(*columns)
+    end
     
     # Returns a dataset grouped by the given column with count by group,
     # order by the count of records. Column aliases may be supplied, and will
@@ -270,6 +274,11 @@ module Sequel
       o[:having] = SQL::BooleanExpression.invert(having) if having
       o[:where] = SQL::BooleanExpression.invert(where) if where
       clone(o)
+    end
+
+    # Alias of inner_join
+    def join(*args, &block)
+      inner_join(*args, &block)
     end
 
     # Returns a joined dataset.  Uses the following arguments:
@@ -364,7 +373,6 @@ module Sequel
     UNCONDITIONED_JOIN_TYPES.each do |jtype|
       class_eval("def #{jtype}_join(table); raise(Sequel::Error, '#{jtype}_join does not accept join table blocks') if block_given?; join_table(:#{jtype}, table) end", __FILE__, __LINE__)
     end
-    alias join inner_join
 
     # If given an integer, the dataset will contain only the first l results.
     # If given a range, it will contain only those at offsets within that
@@ -438,11 +446,15 @@ module Sequel
       columns += Array(Sequel.virtual_row(&block)) if block
       clone(:order => (columns.compact.empty?) ? nil : columns)
     end
-    alias order_by order
     
-    # Alias for order_more, for naming consistency with order_prepend.
+    # Alias of order_more, for naming consistency with order_prepend.
     def order_append(*columns, &block)
       order_more(*columns, &block)
+    end
+
+    # Alias of order
+    def order_by(*columns, &block)
+      order(*columns, &block)
     end
 
     # Returns a copy of the dataset with the order columns added
@@ -461,7 +473,8 @@ module Sequel
     #   ds.order(:a).order(:b).sql #=> 'SELECT * FROM items ORDER BY b'
     #   ds.order(:a).order_prepend(:b).sql #=> 'SELECT * FROM items ORDER BY b, a'
     def order_prepend(*columns, &block)
-      order(*columns, &block).order_more(*@opts[:order])
+      ds = order(*columns, &block)
+      @opts[:order] ? ds.order_more(*@opts[:order]) : ds
     end
     
     # Qualify to the given table, or first source if not table is given.
@@ -495,10 +508,14 @@ module Sequel
     
     # Returns a copy of the dataset with the order reversed. If no order is
     # given, the existing order is inverted.
-    def reverse_order(*order)
+    def reverse(*order)
       order(*invert_order(order.empty? ? @opts[:order] : order))
     end
-    alias reverse reverse_order
+
+    # Alias of reverse
+    def reverse_order(*order)
+      reverse(*order)
+    end
 
     # Returns a copy of the dataset with the columns selected changed
     # to the given columns. This also takes a virtual row block,

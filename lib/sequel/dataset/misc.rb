@@ -49,6 +49,11 @@ module Sequel
       db.servers.each{|s| yield server(s)}
     end
    
+    # Alias of first_source_alias
+    def first_source
+      first_source_alias
+    end
+
     # The first source (primary table) for this dataset.  If the dataset doesn't
     # have a table, raises an error.  If the table is aliased, returns the aliased name.
     def first_source_alias
@@ -66,7 +71,6 @@ module Sequel
         s
       end
     end
-    alias first_source first_source_alias
     
     # The first source (primary table) for this dataset.  If the dataset doesn't
     # have a table, raises an error.  If the table is aliased, returns the original

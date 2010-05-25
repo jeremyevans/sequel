@@ -310,6 +310,11 @@ module Sequel
           self[:join_table]
         end
         
+        # Alias of right_primary_keys
+        def associated_object_keys
+          right_primary_keys
+        end
+
         # many_to_many associations can only have associated objects if none of
         # the :left_primary_keys options have a nil value.
         def can_have_associated_objects?(obj)
@@ -380,7 +385,6 @@ module Sequel
         def right_primary_keys
           self[:right_primary_keys] ||= Array(right_primary_key)
         end
-        alias associated_object_keys right_primary_keys
     
         # The columns to select when loading the association, associated_class.table_name.* by default.
         def select
@@ -953,7 +957,11 @@ module Sequel
             end
           end
         end
-        alias def_one_to_one def_one_to_many
+
+        # Alias of def_one_to_many
+        def def_one_to_one(opts)
+          def_one_to_many(opts)
+        end
         
         # Add the remove_ and remove_all instance methods
         def def_remove_methods(opts)

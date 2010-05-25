@@ -113,6 +113,11 @@ module Sequel
       def dataset
         @dataset || raise(Error, "No dataset associated with #{self}")
       end
+
+      # Alias of set_dataset
+      def dataset=(ds)
+        set_dataset(ds)
+      end
     
       # Returns the database associated with the Model class.
       # If this model doesn't have a database associated with it,
@@ -307,7 +312,6 @@ module Sequel
         check_non_connection_error{@db_schema = (inherited ? superclass.db_schema : get_db_schema)}
         self
       end
-      alias dataset= set_dataset
     
       # Sets the primary key for this model. You can use either a regular 
       # or a composite primary key.
@@ -584,11 +588,10 @@ module Sequel
         end
       end
   
-      # Compares model instances by values.
+      # Alias of eql?
       def ==(obj)
-        (obj.class == model) && (obj.values == @values)
+        eql?(obj)
       end
-      alias eql? ==
   
       # If pk is not nil, true only if the objects have the same class and pk.
       # If pk is nil, false.
@@ -640,6 +643,11 @@ module Sequel
         @values.each(&block)
       end
   
+      # Compares model instances by values.
+      def eql?(obj)
+        (obj.class == model) && (obj.values == @values)
+      end
+
       # Returns the validation errors associated with this object.
       def errors
         @errors ||= Errors.new
