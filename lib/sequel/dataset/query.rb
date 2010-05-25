@@ -440,6 +440,11 @@ module Sequel
     end
     alias order_by order
     
+    # Alias for order_more, for naming consistency with order_prepend.
+    def order_append(*columns, &block)
+      order_more(*columns, &block)
+    end
+
     # Returns a copy of the dataset with the order columns added
     # to the end of the existing order.
     #

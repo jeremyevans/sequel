@@ -1316,24 +1316,26 @@ context "Dataset#order_by" do
   end
 end
 
-context "Dataset#order_more" do
+context "Dataset#order_more and order_append" do
   before do
     @dataset = Sequel::Dataset.new(nil).from(:test)
   end
   
   specify "should include an ORDER BY clause in the select statement" do
-    @dataset.order_more(:name).sql.should == 
-      'SELECT * FROM test ORDER BY name'
+    @dataset.order_more(:name).sql.should == 'SELECT * FROM test ORDER BY name'
+    @dataset.order_append(:name).sql.should == 'SELECT * FROM test ORDER BY name'
   end
   
   specify "should add to the end of a previous ordering" do
-    @dataset.order(:name).order_more(:stamp.desc).sql.should ==
-      'SELECT * FROM test ORDER BY name, stamp DESC'
+    @dataset.order(:name).order_more(:stamp.desc).sql.should == 'SELECT * FROM test ORDER BY name, stamp DESC'
+    @dataset.order(:name).order_append(:stamp.desc).sql.should == 'SELECT * FROM test ORDER BY name, stamp DESC'
   end
 
   specify "should accept a block that yields a virtual row" do
     @dataset.order(:a).order_more{|o| o.b}.sql.should == 'SELECT * FROM test ORDER BY a, b'
     @dataset.order(:a, :b).order_more(:c, :d){[e, f(1, 2)]}.sql.should == 'SELECT * FROM test ORDER BY a, b, c, d, e, f(1, 2)'
+    @dataset.order(:a).order_append{|o| o.b}.sql.should == 'SELECT * FROM test ORDER BY a, b'
+    @dataset.order(:a, :b).order_append(:c, :d){[e, f(1, 2)]}.sql.should == 'SELECT * FROM test ORDER BY a, b, c, d, e, f(1, 2)'
   end
 end
 
