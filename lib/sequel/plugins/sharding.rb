@@ -104,6 +104,26 @@ module Sequel
           end
           ds
         end
+
+        private
+
+        # Set the shard of all retrieved objects to the shard of
+        # the table's dataset, or the current shard if the table's
+        # dataset does not have a shard.
+        def graph_each
+          ta = @opts[:graph][:table_aliases]
+          s = @opts[:server]
+          super do |r|
+            r.each do |k, v|
+              if ds = ta[k]
+                dss = ds.opts[:server]
+              end
+              vs = dss || s
+              v.set_server(vs) if vs && v.respond_to?(:set_server)
+            end
+            yield r
+          end
+        end
       end
     end
   end

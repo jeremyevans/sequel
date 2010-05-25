@@ -2,14 +2,16 @@ require File.join(File.dirname(__FILE__), "spec_helper")
 
 describe "sharding plugin" do
   before do
-    @Artist = Class.new(Sequel::Model(:artists)) do
+    @Artist = Class.new(Sequel::Model(:artists))
+    @Artist.class_eval do
       columns :id, :name
 
       def self.y
         {:id=>2, :name=>'YJM'}
       end
     end
-    @Album = Class.new(Sequel::Model(:albums)) do
+    @Album = Class.new(Sequel::Model(:albums))
+    @Album.class_eval do
       columns :id, :artist_id, :name
 
       def self.ds_ext(m=nil)
@@ -31,7 +33,8 @@ describe "sharding plugin" do
         ds
       end
     end
-    @Tag = Class.new(Sequel::Model(:tags)) do
+    @Tag = Class.new(Sequel::Model(:tags))
+    @Tag.class_eval do
       columns :id, :name
 
       def self.y
@@ -106,7 +109,7 @@ describe "sharding plugin" do
     @Album.actions.should == [[:fetch, nil, :s1], [:fetch, "(id = 1)", :s1]]
   end 
 
-  specify "should use current dataset's shard when eager loading if eagerly loaded dataset doesn't have it's own shard" do
+  specify "should use current dataset's shard when eager loading if eagerly loaded dataset doesn't have its own shard" do
     albums = @Album.server(:s1).eager(:artist).all
     @Album.actions.should == [[:fetch, nil, :s1]]
     @Artist.actions.should == [[:fetch, "(artists.id IN (2))", :s1]]
@@ -122,6 +125,47 @@ describe "sharding plugin" do
     @Album.actions.should == [[:fetch, nil, :s1]]
     @Artist.actions.should == [[:fetch, "(artists.id IN (2))", :s2]]
     @Artist.actions.clear
+    albums.length == 1
+    albums.first.artist.save
+    @Artist.actions.should == [[:update, {:name=>"YJM"}, "(id = 2)", :s2]]
+  end 
+
+  specify "should use current dataset's shard when eager graphing if eagerly graphed dataset doesn't have its own shard" do
+    ds = @Album.server(:s1).eager_graph(:artist)
+    def ds.fetch_rows(sql)
+      super(sql)
+      yield({:id=>1, :artist_id=>2, :name=>'RF', :artist_id_0=>2, :artist_name=>'YJM'})
+    end
+    albums = ds.all
+    @Album.actions.should == [[:fetch, "( LEFT OUTER JOIN artists AS artist ON (artist.id = albums.artist_id))", :s1]]
+    albums.length == 1
+    albums.first.artist.save
+    @Artist.actions.should == [[:update, {:name=>"YJM"}, "(id = 2)", :s1]]
+  end 
+
+  specify "should not use current dataset's shard when eager graphing if eagerly graphed dataset has its own shard" do
+    @Artist.dataset.opts[:server] = :s2
+    ds = @Album.server(:s1).eager_graph(:artist)
+    def ds.fetch_rows(sql)
+      super(sql)
+      yield({:id=>1, :artist_id=>2, :name=>'RF', :artist_id_0=>2, :artist_name=>'YJM'})
+    end
+    albums = ds.all
+    @Album.actions.should == [[:fetch, "( LEFT OUTER JOIN artists AS artist ON (artist.id = albums.artist_id))", :s1]]
+    albums.length == 1
+    albums.first.artist.save
+    @Artist.actions.should == [[:update, {:name=>"YJM"}, "(id = 2)", :s2]]
+  end 
+
+  specify "should use eagerly graphed dataset shard for eagerly graphed objects even if current dataset does not have a shard" do
+    @Artist.dataset.opts[:server] = :s2
+    ds = @Album.eager_graph(:artist)
+    def ds.fetch_rows(sql)
+      super(sql)
+      yield({:id=>1, :artist_id=>2, :name=>'RF', :artist_id_0=>2, :artist_name=>'YJM'})
+    end
+    albums = ds.all
+    @Album.actions.should == [[:fetch, "( LEFT OUTER JOIN artists AS artist ON (artist.id = albums.artist_id))", nil]]
     albums.length == 1
     albums.first.artist.save
     @Artist.actions.should == [[:update, {:name=>"YJM"}, "(id = 2)", :s2]]
