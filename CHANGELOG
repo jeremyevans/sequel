@@ -1,5 +1,7 @@
 === HEAD
 
+* Add a Dataset#order_prepend method that adds to the end of an existing order (jeremyevans)
+
 * Add a Sequel::NotImplemented exception class, use instead of NotImplementedError (jeremyevans)
 
 * Correctly handle more than 2 hierarchy levels in the single table inheritance plugin (jeremyevans)

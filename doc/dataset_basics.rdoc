@@ -80,7 +80,7 @@ JOIN:: join, left_join, right_join, full_join, natural_join, natural_left_join, 
 WHERE:: where, filter, exclude, and, or, grep, invert, unfiltered
 GROUP:: group, group_by, group_and_count, ungrouped
 HAVING:: having, filter, exclude, and, or, grep, invert, unfiltered
-ORDER:: order, order_by, order_more, reverse, reverse_order, unordered
+ORDER:: order, order_by, order_append, order_prepend, order_more, reverse, reverse_order, unordered
 LIMIT:: limit, unlimited
 compounds:: union, intersect, except
 locking:: for_update, lock_style

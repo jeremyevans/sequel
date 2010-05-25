@@ -481,8 +481,13 @@ append to an existing order:
   
 If you want to add a column to the end of the existing order:
 
-  Artist.order(:id).order_more(:name)
+  Artist.order(:id).order_append(:name)
   # SELECT * FROM artists ORDER BY id, name
+
+If you want to add a column to the beginning of the existing order:
+
+  Artist.order(:id).order_prepend(:name)
+  # SELECT * FROM artists ORDER BY name, id
 
 === Reversing
 

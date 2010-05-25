@@ -441,13 +441,22 @@ module Sequel
     alias order_by order
     
     # Returns a copy of the dataset with the order columns added
-    # to the existing order.
+    # to the end of the existing order.
     #
     #   ds.order(:a).order(:b).sql #=> 'SELECT * FROM items ORDER BY b'
     #   ds.order(:a).order_more(:b).sql #=> 'SELECT * FROM items ORDER BY a, b'
     def order_more(*columns, &block)
       columns = @opts[:order] + columns if @opts[:order]
       order(*columns, &block)
+    end
+    
+    # Returns a copy of the dataset with the order columns added
+    # to the beginning of the existing order.
+    #
+    #   ds.order(:a).order(:b).sql #=> 'SELECT * FROM items ORDER BY b'
+    #   ds.order(:a).order_prepend(:b).sql #=> 'SELECT * FROM items ORDER BY b, a'
+    def order_prepend(*columns, &block)
+      order(*columns, &block).order_more(*@opts[:order])
     end
     
     # Qualify to the given table, or first source if not table is given.
