@@ -109,7 +109,11 @@ describe "Database schema parser" do
 end
 end
 
-if INTEGRATION_DB.respond_to?(:indexes)
+begin
+  INTEGRATION_DB.drop_table(:blah) rescue nil
+  INTEGRATION_DB.indexes(:blah)
+rescue Sequel::NotImplemented
+rescue
 describe "Database index parsing" do
   after do
     INTEGRATION_DB.drop_table(:items)
@@ -332,7 +336,10 @@ describe "Database schema modifiers" do
   end
 end
 
-if INTEGRATION_DB.respond_to?(:tables)
+begin
+  INTEGRATION_DB.tables
+rescue Sequel::NotImplemented
+rescue
 describe "Database#tables" do
   before do
     class ::String
