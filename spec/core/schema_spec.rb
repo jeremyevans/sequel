@@ -23,6 +23,12 @@ context "DB#create_table" do
     proc{@db.create_table(:cats.as(:c)) {}}.should raise_error(Sequel::Error)
   end
 
+  specify "should remove cached schema entry" do
+    @db.instance_variable_set(:@schemas, {'cats'=>[]})
+    @db.create_table(:cats){Integer :a}
+    @db.instance_variable_get(:@schemas).should be_empty
+  end
+  
   specify "should accept multiple columns" do
     @db.create_table(:cats) do
       column :id, :integer

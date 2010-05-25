@@ -89,6 +89,7 @@ module Sequel
     #
     # See Schema::Generator and the {"Migrations and Schema Modification" guide}[link:files/doc/migration_rdoc.html].
     def create_table(name, options={}, &block)
+      remove_cached_schema(name)
       options = {:generator=>options} if options.is_a?(Schema::Generator)
       generator = options[:generator] || Schema::Generator.new(self, &block)
       create_table_from_generator(name, generator, options)
