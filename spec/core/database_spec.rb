@@ -204,8 +204,8 @@ context "Sequel.extension" do
 end
 
 context "Database#connect" do
-  specify "should raise NotImplementedError" do
-    proc {Sequel::Database.new.connect(:default)}.should raise_error(NotImplementedError)
+  specify "should raise Sequel::NotImplemented" do
+    proc {Sequel::Database.new.connect(:default)}.should raise_error(Sequel::NotImplemented)
   end
 end
 
@@ -363,9 +363,21 @@ context "Database#dataset" do
 end
 
 context "Database#execute" do
-  specify "should raise NotImplementedError" do
-    proc {Sequel::Database.new.execute('blah blah')}.should raise_error(NotImplementedError)
-    proc {Sequel::Database.new << 'blah blah'}.should raise_error(NotImplementedError)
+  specify "should raise Sequel::NotImplemented" do
+    proc {Sequel::Database.new.execute('blah blah')}.should raise_error(Sequel::NotImplemented)
+    proc {Sequel::Database.new << 'blah blah'}.should raise_error(Sequel::NotImplemented)
+  end
+end
+
+context "Database#tables" do
+  specify "should raise Sequel::NotImplemented" do
+    proc {Sequel::Database.new.tables}.should raise_error(Sequel::NotImplemented)
+  end
+end
+
+context "Database#indexes" do
+  specify "should raise Sequel::NotImplemented" do
+    proc {Sequel::Database.new.indexes(:table)}.should raise_error(Sequel::NotImplemented)
   end
 end
 

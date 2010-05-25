@@ -1,5 +1,7 @@
 === HEAD
 
+* Add a Sequel::NotImplemented exception class, use instead of NotImplementedError (jeremyevans)
+
 * Correctly handle more than 2 hierarchy levels in the single table inheritance plugin (jeremyevans)
 
 * Allow using a custom column value<->class mapping to the single_table_inheritance plugin (jeremyevans, tmm1)

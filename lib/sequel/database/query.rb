@@ -39,7 +39,7 @@ module Sequel
     # Executes the given SQL on the database. This method should be overridden in descendants.
     # This method should not be called directly by user code.
     def execute(sql, opts={})
-      raise NotImplementedError, "#execute should be overridden by adapters"
+      raise NotImplemented, "#execute should be overridden by adapters"
     end
     
     # Method that should be used when submitting any DDL (Data Definition
@@ -72,6 +72,16 @@ module Sequel
     #   DB.get(:version.sql_function) #=> ...
     def get(*args, &block)
       dataset.get(*args, &block)
+    end
+    
+    # Return a hash containing index information. Hash keys are index name symbols.
+    # Values are subhashes with two keys, :columns and :unique.  The value of :columns
+    # is an array of symbols of column names.  The value of :unique is true or false
+    # depending on if the index is unique.
+    #
+    # Should not include the primary key index, functional indexes, or partial indexes.
+    def indexes(table, opts={})
+      raise NotImplemented, "#indexes should be overridden by adapters"
     end
     
     # Runs the supplied SQL statement string on the database server. Returns nil.
@@ -119,6 +129,11 @@ module Sequel
       rescue
         false
       end
+    end
+    
+    # Return all tables in the database as an array of symbols.
+    def tables(opts={})
+      raise NotImplemented, "#tables should be overridden by adapters"
     end
     
     # Starts a database transaction.  When a database transaction is used,
@@ -371,6 +386,5 @@ module Sequel
     def transaction_error(e)
       raise_error(e, :classes=>database_error_classes) unless e.is_a?(Rollback)
     end
-
   end
 end

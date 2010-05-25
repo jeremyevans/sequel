@@ -222,10 +222,7 @@ module Sequel
         execute(sql, {:type=>:insert}.merge(opts))
       end
       
-      # Return a hash containing index information. Hash keys are index name symbols.
-      # Values are subhashes with two keys, :columns and :unique.  The value of :columns
-      # is an array of symbols of column names.  The value of :unique is true or false
-      # depending on if the index is unique.
+      # Use the JDBC metadata to get the index information for the table.
       def indexes(table, opts={})
         m = output_identifier_meth
         im = input_identifier_meth

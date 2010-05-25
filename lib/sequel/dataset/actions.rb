@@ -110,7 +110,7 @@ module Sequel
     # Executes a select query and fetches records, passing each record to the
     # supplied block.  The yielded records should be hashes with symbol keys.
     def fetch_rows(sql, &block)
-      raise NotImplementedError, NOTIMPL_MSG
+      raise NotImplemented, NOTIMPL_MSG
     end
     
     # If a integer argument is

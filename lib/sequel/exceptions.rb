@@ -32,6 +32,9 @@ module Sequel
   # Raised when attempting an invalid type conversion.
   class InvalidValue < Error ; end
 
+  # Raised when the adapter adapter hasn't implemented a method such as +tables+:
+  class NotImplemented < Error; end
+
   # Raised when the connection pool cannot acquire a database connection
   # before the timeout.
   class PoolTimeout < Error ; end

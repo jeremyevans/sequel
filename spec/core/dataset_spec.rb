@@ -3074,8 +3074,8 @@ context "Dataset default #fetch_rows, #insert, #update, #delete, #truncate, #exe
     @ds = @db[:items]
   end
 
-  specify "#fetch_rows should raise a NotImplementedError" do
-    proc{@ds.fetch_rows(''){}}.should raise_error(NotImplementedError)
+  specify "#fetch_rows should raise a Sequel::NotImplemented" do
+    proc{@ds.fetch_rows(''){}}.should raise_error(Sequel::NotImplemented)
   end
 
   specify "#delete should execute delete SQL" do

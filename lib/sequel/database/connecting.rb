@@ -123,7 +123,7 @@ module Sequel
     
     # Connects to the database. This method should be overridden by descendants.
     def connect(server)
-      raise NotImplementedError, "#connect should be overridden by adapters"
+      raise NotImplemented, "#connect should be overridden by adapters"
     end
     
     # The database type for this database object, the same as the adapter scheme

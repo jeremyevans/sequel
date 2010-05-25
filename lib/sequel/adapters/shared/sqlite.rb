@@ -49,11 +49,8 @@ module Sequel
         pragma_set(:foreign_keys, !!value ? 'on' : 'off') if sqlite_version >= 30619
       end
 
-      # Return a hash containing index information. Hash keys are index name symbols.
-      # Values are subhashes with two keys, :columns and :unique.  The value of :columns
-      # is an array of symbols of column names.  The value of :unique is true or false
-      # depending on if the index is unique.
-      def indexes(table)
+      # Use the index_list and index_info PRAGMAs to determine the indexes on the table.
+      def indexes(table, opts={})
         m = output_identifier_meth
         im = input_identifier_meth
         indexes = {}

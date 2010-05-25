@@ -253,14 +253,8 @@ module Sequel
         self << drop_trigger_sql(table, name, opts)
       end
       
-      # Return a hash containing index information. Hash keys are index name symbols.
-      # Values are subhashes with two keys, :columns and :unique.  The value of :columns
-      # is an array of symbols of column names.  The value of :unique is true or false
-      # depending on if the index is unique.
-      #
-      # This will not output any partial indexes, indexes that aren't valid or ready,
-      # or indexes that contain anything other than simple column references.
-      def indexes(table)
+      # Use the pg_* system tables to determine indexes on a table
+      def indexes(table, opts={})
         m = output_identifier_meth
         im = input_identifier_meth
         schema, table = schema_and_table(table)
