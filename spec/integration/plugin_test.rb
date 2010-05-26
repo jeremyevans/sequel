@@ -812,3 +812,58 @@ describe "Instance Filters plugin" do
     proc{@i.destroy}.should raise_error(Sequel::Error)
   end
 end
+
+describe "UpdatePrimaryKey plugin" do 
+  before do
+    @db = INTEGRATION_DB
+    @db.create_table!(:t) do
+      Integer :a, :primary_key=>true
+      Integer :b
+    end
+    @ds = @db[:t]
+    @ds.insert(:a=>1, :b=>3)
+    @c = Class.new(Sequel::Model(@ds))
+    @c.set_primary_key(:a)
+    @c.unrestrict_primary_key
+    @c.plugin :update_primary_key
+  end
+  after do
+    @db.drop_table(:t)
+  end
+
+  specify "should handle regular updates" do
+    @c.first.update(:b=>4)
+    @db[:t].all.should == [{:a=>1, :b=>4}]
+    @c.first.set(:b=>5).save
+    @db[:t].all.should == [{:a=>1, :b=>5}]
+    @c.first.set(:b=>6).save(:b)
+    @db[:t].all.should == [{:a=>1, :b=>6}]
+  end
+
+  specify "should handle updating the primary key field with another field" do
+    @c.first.update(:a=>2, :b=>4)
+    @db[:t].all.should == [{:a=>2, :b=>4}]
+  end
+
+  specify "should handle updating just the primary key field when saving changes" do
+    @c.first.update(:a=>2)
+    @db[:t].all.should == [{:a=>2, :b=>3}]
+    @c.first.set(:a=>3).save(:a)
+    @db[:t].all.should == [{:a=>3, :b=>3}]
+  end
+
+  specify "should handle saving after modifying the primary key field with another field" do
+    @c.first.set(:a=>2, :b=>4).save
+    @db[:t].all.should == [{:a=>2, :b=>4}]
+  end
+
+  specify "should handle saving after modifying just the primary key field" do
+    @c.first.set(:a=>2).save
+    @db[:t].all.should == [{:a=>2, :b=>3}]
+  end
+
+  specify "should handle saving after updating the primary key" do
+    @c.first.update(:a=>2).update(:b=>4).set(:b=>5).save
+    @db[:t].all.should == [{:a=>2, :b=>5}]
+  end
+end

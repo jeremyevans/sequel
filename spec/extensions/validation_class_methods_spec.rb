@@ -944,10 +944,10 @@ describe "Model#save" do
   before do
     @c = Class.new(Sequel::Model(:people))
     @c.class_eval do
-      columns :id
+      columns :id, :x
 
-      validates_each :id do |o, a, v|
-        o.errors[a] << 'blah' unless v == 5
+      validates_each :x do |o, a, v|
+        o.errors[a] << 'blah' unless v == 7
       end
     end
     @m = @c.load(:id => 4, :x=>6)
@@ -960,10 +960,10 @@ describe "Model#save" do
     @m.save
     MODEL_DB.sqls.should be_empty
     
-    @m.id = 5
+    @m.x = 7
     @m.should be_valid
     @m.save.should_not be_false
-    MODEL_DB.sqls.should == ['UPDATE people SET x = 6 WHERE (id = 5)']
+    MODEL_DB.sqls.should == ['UPDATE people SET x = 7 WHERE (id = 4)']
   end
   
   specify "should skip validations if the :validate=>false option is used" do

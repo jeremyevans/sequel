@@ -1,5 +1,7 @@
 === HEAD
 
+* Add a UpdatePrimaryKey plugin that allows you to update the primary key of a model object (jeremyevans)
+
 * Add a SkipCreateRefresh plugin that skips the refresh when saving new model objects (jeremyevans)
 
 * Add a StringStripper plugin that strips strings before assigning them to model attributes (jeremyevans)

@@ -33,6 +33,7 @@
 <li><a href='rdoc-plugins/classes/Sequel/Plugins/Timestamps.html'>timestamps</a>: Creates hooks for automatically setting create and update timestamps.</li>
 <li><a href='rdoc-plugins/classes/Sequel/Plugins/Touch.html'>touch</a>: Allows easily updating timestamps via Model#touch, as well as touching associations when model instances are updated or destroyed.</li>
 <li><a href='rdoc-plugins/classes/Sequel/Plugins/TypecastOnLoad.html'>typecast_on_load</a>: Fixes bad database typecasting when loading model objects.</li>
+<li><a href="rdoc-plugins/classes/Sequel/Plugins/UpdatePrimaryKey.html">update_primary_key</a>: Allows you to safely update the primary key of a model object.</li>
 <li><a href="rdoc-plugins/classes/Sequel/Plugins/ValidationClassMethods.html">validation_class_methods</a>: Adds backwards compatibility for the legacy class-level validation methods (e.g. validates_presence_of :column).</li>
 <li><a href="rdoc-plugins/classes/Sequel/Plugins/ValidationHelpers.html">validation_helpers</a>: The preferred default validations plugin, which uses instance-level methods.</li>
 </ul>
