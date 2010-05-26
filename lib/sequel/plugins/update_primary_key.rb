@@ -15,10 +15,10 @@ module Sequel
     #
     #   # Make all model subclasses support primary key updates
     #   # (called before loading subclasses)
-    #   Sequel::Model.plugin :string_stripper
+    #   Sequel::Model.plugin :update_primary_key
     #
-    #   # Make the Album class support 
-    #   Album.plugin :string_stripper
+    #   # Make the Album class support primary key updates
+    #   Album.plugin :update_primary_key
     module UpdatePrimaryKey
       module ClassMethods
         # Cache the pk_hash when loading records
