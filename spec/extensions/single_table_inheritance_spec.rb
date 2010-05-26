@@ -171,5 +171,14 @@ describe Sequel::Model, "#sti_key" do
       StiTest3.create.kind.should == 1
       StiTest4.create.kind.should == 2
     end
+
+    it "should raise exceptions if a bad model value is used" do
+      StiTest2.plugin :single_table_inheritance, :kind, :model_map=>{0=>1,1=>1.5, 2=>Date.today}
+      class ::StiTest3 < ::StiTest2; end
+      class ::StiTest4 < ::StiTest2; end
+      proc{StiTest2.dataset.row_proc.call(:kind=>0)}.should raise_error(Sequel::Error)
+      proc{StiTest2.dataset.row_proc.call(:kind=>1)}.should raise_error(Sequel::Error)
+      proc{StiTest2.dataset.row_proc.call(:kind=>2)}.should raise_error(Sequel::Error)
+    end
   end
 end

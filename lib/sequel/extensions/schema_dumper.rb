@@ -62,6 +62,7 @@ END_MIG
       begin
         indexes = indexes(table).sort_by{|k,v| k.to_s} if options[:indexes] != false
       rescue Sequel::NotImplemented
+        nil
       end
       gen = Schema::Generator.new(self) do
         s.each{|name, info| send(*m.call(name, info, options))}
@@ -213,7 +214,7 @@ END_MIG
       # Dump this generator's constraints to a string that could be evaled inside
       # another instance to represent the same constraints
       def dump_constraints
-        constraints.map do |c|
+        cs = constraints.map do |c|
           c = c.dup
           type = c.delete(:type)
           case type
@@ -229,7 +230,8 @@ END_MIG
             cols = c.delete(:columns)
             "#{type} #{cols.inspect}#{opts_inspect(c)}"
           end
-        end.join("\n")
+        end
+        cs.join("\n")
       end
 
       # Dump this generator's indexes to a string that could be evaled inside
@@ -240,7 +242,7 @@ END_MIG
       # * :drop_index - Same as add_index, but create drop_index statements.
       # * :ignore_errors - Add the ignore_errors option to the outputted indexes
       def dump_indexes(options={})
-        indexes.map do |c|
+        is = indexes.map do |c|
           c = c.dup
           cols = c.delete(:columns)
           if table = options[:add_index] || options[:drop_index]
@@ -248,7 +250,8 @@ END_MIG
           else
             "index #{cols.inspect}#{opts_inspect(c)}"
           end
-        end.join("\n")
+        end
+        is.join("\n")
       end
 
       private
