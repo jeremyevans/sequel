@@ -925,7 +925,7 @@ module Sequel
         if new?
           return save_failure(:create) if before_create == false
           pk = _insert
-          @this = nil if pk
+          @this = nil
           @new = false
           @was_new = true
           after_create
@@ -935,14 +935,18 @@ module Sequel
         else
           return save_failure(:update) if before_update == false
           if columns.empty?
-            @columns_updated = opts[:changed] ? @values.reject{|k,v| !changed_columns.include?(k)} : @values.dup
+            @columns_updated = if opts[:changed]
+              @values.reject{|k,v| !changed_columns.include?(k)}
+            else
+              _save_update_all_columns_hash
+            end
             changed_columns.clear
           else # update only the specified columns
             @columns_updated = @values.reject{|k, v| !columns.include?(k)}
             changed_columns.reject!{|c| columns.include?(c)}
           end
-          Array(primary_key).each{|x| @columns_updated.delete(x)}
           _update(@columns_updated) unless @columns_updated.empty?
+          @this = nil
           after_update
           after_save
           @columns_updated = nil
@@ -956,6 +960,18 @@ module Sequel
       # can be overridden to avoid the refresh.
       def _save_refresh
         _refresh(this.opts[:server] ? this : this.server(:default))
+      end
+
+      # Return a hash of values used when saving all columns of an
+      # existing object (i.e. not passing specific columns to save
+      # or using update/save_changes).  Defaults to all of the
+      # object's values except unmodified primary key columns, as some
+      # databases don't like you setting primary key values even
+      # to their existing values.
+      def _save_update_all_columns_hash
+        v = @values.dup
+        Array(primary_key).each{|x| v.delete(x) unless changed_columns.include?(x)}
+        v
       end
       
       # Update this instance's dataset with the supplied column hash.
