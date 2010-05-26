@@ -1,5 +1,7 @@
 === HEAD
 
+* Add a SkipCreateRefresh plugin that skips the refresh when saving new model objects (jeremyevans)
+
 * Add a StringStripper plugin that strips strings before assigning them to model attributes (jeremyevans)
 
 * Allow the :eager_loader association proc to accept a single hash instead of 3 arguments (jeremyevans)
