@@ -1,6 +1,8 @@
 === HEAD
 
-* Add a UpdatePrimaryKey plugin that allows you to update the primary key of a model object (jeremyevans)
+* Add an AssociationPks plugin that adds association_pks and association_pks= methods for *_to_many associations (jeremyevans)
+
+* Add an UpdatePrimaryKey plugin that allows you to update the primary key of a model object (jeremyevans)
 
 * Add a SkipCreateRefresh plugin that skips the refresh when saving new model objects (jeremyevans)
 

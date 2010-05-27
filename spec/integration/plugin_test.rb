@@ -867,3 +867,98 @@ describe "UpdatePrimaryKey plugin" do
     @db[:t].all.should == [{:a=>2, :b=>5}]
   end
 end
+
+describe "AssociationPks plugin" do 
+  before do
+    @db = INTEGRATION_DB
+    @db.create_table!(:artists) do
+      primary_key :id
+      String :name
+    end
+    @db.create_table!(:albums) do
+      primary_key :id
+      String :name
+      foreign_key :artist_id, :artists
+    end
+    @db.create_table!(:tags) do
+      primary_key :id
+      String :name
+    end
+    @db.create_table!(:albums_tags) do
+      foreign_key :album_id, :albums
+      foreign_key :tag_id, :tags
+    end
+    class ::Artist < Sequel::Model
+      plugin :association_pks
+      one_to_many :albums, :order=>:id
+    end 
+    class ::Album < Sequel::Model
+      plugin :association_pks
+      many_to_many :tags, :order=>:id
+    end 
+    class ::Tag < Sequel::Model
+    end 
+    
+    @ar1 =@db[:artists].insert(:name=>'YJM')
+    @ar2 =@db[:artists].insert(:name=>'AS')
+    @al1 =@db[:albums].insert(:name=>'RF', :artist_id=>@ar1)
+    @al2 =@db[:albums].insert(:name=>'MO', :artist_id=>@ar1)
+    @al3 =@db[:albums].insert(:name=>'T', :artist_id=>@ar1)
+    @t1 = @db[:tags].insert(:name=>'A')
+    @t2 = @db[:tags].insert(:name=>'B')
+    @t3 = @db[:tags].insert(:name=>'C')
+    {@al1=>[@t1, @t2, @t3], @al2=>[@t2]}.each do |aid, tids|
+      tids.each{|tid| @db[:albums_tags].insert([aid, tid])}
+    end
+  end
+  after do
+    @db.drop_table :albums_tags, :tags, :albums, :artists
+    [:Artist, :Album, :Tag].each{|s| Object.send(:remove_const, s)}
+  end
+
+  specify "should return correct associated pks for one_to_many associations" do
+    Artist.order(:id).all.map{|a| a.album_pks}.should == [[@al1, @al2, @al3], []]
+  end
+
+  specify "should return correct associated pks for many_to_many associations" do
+    Album.order(:id).all.map{|a| a.tag_pks.sort}.should == [[@t1, @t2, @t3], [@t2], []]
+  end
+
+  specify "should set associated pks correctly for a one_to_many association" do
+    Artist.use_transactions = true
+    Album.order(:id).select_map(:artist_id).should == [@ar1, @ar1, @ar1]
+
+    Artist[@ar2].album_pks = [@t1, @t3]
+    Artist[@ar1].album_pks.should == [@t2]
+    Album.order(:id).select_map(:artist_id).should == [@ar2, @ar1, @ar2]
+
+    Artist[@ar1].album_pks = [@t1]
+    Artist[@ar2].album_pks.should == [@t3]
+    Album.order(:id).select_map(:artist_id).should == [@ar1, nil, @ar2]
+
+    Artist[@ar1].album_pks = [@t1, @t2]
+    Artist[@ar2].album_pks.should == [@t3]
+    Album.order(:id).select_map(:artist_id).should == [@ar1, @ar1, @ar2]
+  end
+
+  specify "should set associated pks correctly for a many_to_many association" do
+    Artist.use_transactions = true
+    @db[:albums_tags].filter(:album_id=>@al1).select_order_map(:tag_id).should == [@t1, @t2, @t3]
+    Album[@al1].tag_pks = [@t1, @t3]
+    @db[:albums_tags].filter(:album_id=>@al1).select_order_map(:tag_id).should == [@t1, @t3]
+    Album[@al1].tag_pks = []
+    @db[:albums_tags].filter(:album_id=>@al1).select_order_map(:tag_id).should == []
+
+    @db[:albums_tags].filter(:album_id=>@al2).select_order_map(:tag_id).should == [@t2]
+    Album[@al2].tag_pks = [@t1, @t2]
+    @db[:albums_tags].filter(:album_id=>@al2).select_order_map(:tag_id).should == [@t1, @t2]
+    Album[@al2].tag_pks = []
+    @db[:albums_tags].filter(:album_id=>@al1).select_order_map(:tag_id).should == []
+
+    @db[:albums_tags].filter(:album_id=>@al3).select_order_map(:tag_id).should == []
+    Album[@al3].tag_pks = [@t1, @t3]
+    @db[:albums_tags].filter(:album_id=>@al3).select_order_map(:tag_id).should == [@t1, @t3]
+    Album[@al3].tag_pks = []
+    @db[:albums_tags].filter(:album_id=>@al1).select_order_map(:tag_id).should == []
+  end
+end
