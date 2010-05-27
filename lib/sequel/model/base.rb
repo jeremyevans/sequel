@@ -1002,7 +1002,7 @@ module Sequel
       end
       
       # If transactions should be used, wrap the yield in a transaction block.
-      def checked_transaction(opts)
+      def checked_transaction(opts={})
         use_transaction?(opts) ? db.transaction(opts){yield} : yield
       end
 

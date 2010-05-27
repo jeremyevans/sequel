@@ -935,11 +935,10 @@ module Sequel
                   up_ds = up_ds.exclude(o.pk_hash)
                   cks.zip(cpks).each{|k, pk| o.send(:"#{k}=", send(pk))}
                 end
-                update_database = lambda do
+                checked_transaction do
                   up_ds.update(ck_nil_hash)
                   o.save(:validate=>validate) || raise(Sequel::Error, "invalid associated object, cannot save") if o
                 end
-                use_transactions && o ? db.transaction(opts){update_database.call} : update_database.call
               end
               association_module_def(opts.setter_method){|o| set_one_to_one_associated_object(opts, o)}
             else 
