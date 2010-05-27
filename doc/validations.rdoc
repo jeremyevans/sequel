@@ -20,7 +20,7 @@ database-level constraints.
 
 == Data Integrity
 
-Data Integrity is best handled by the database itself.  For example, if you have
+Data integrity is best handled by the database itself.  For example, if you have
 a date column that should never contain a NULL value, the column should be
 specified in the database as NOT NULL.  If you have an integer column that should
 only have values from 1 to 10, there should be a CHECK constraint that ensures
@@ -52,12 +52,12 @@ instance, before sending the INSERT or UPDATE query to the database,
 <tt>Sequel::Model</tt> will attempt to validate the instance by calling
 +validate+.  If +validate+ does not add any errors to the object, the object is
 considered valid, and <tt>valid?</tt> will return true.  If +validate+ adds any errors
-to the object, <tt>valid?</tt> will return false, and the save will either return raise
+to the object, <tt>valid?</tt> will return false, and the save will either raise
 a <tt>Sequel::ValidationFailed</tt> exception (the default), or return nil (if +raise_on_save_failure+
 is false).
 
 By validating the object before sending the database query, Sequel attempts to
-ensure that invalidate objects are not saved in the database.  However, if you
+ensure that invalid objects are not saved in the database.  However, if you
 are not enforcing the same validations in the database via constraints, it's
 possible that invalid data can get added to the database via some other method.
 This leads to odd cases such as retrieving a model object from the database,
@@ -128,7 +128,7 @@ will be covered later in this guide.
 
 While <tt>Sequel::Model</tt> does provide a validations framework, it does not define
 any built-in validation helper methods that you can call.  However, Sequel ships with a
-plugin call +validation_helpers+ that handles most basic validation needs.  So instead of
+plugin called +validation_helpers+ that handles most basic validation needs.  So instead of
 specifying validations like this:
 
   class Album < Sequel::Model
@@ -168,7 +168,7 @@ The following methods are provided by +validation_helpers+:
 
 === +validates_presence+
 
-This is probably the most commonly used helper method, which checks if the specified attributes are not blank.  In general, if an object responds to <tt>blank?</tt>, it calls the method to determine if the object is blank.  Otherwise, nil is considered blank, empty strings or strings that just contain whitespace are blank, and objects that respond to <tt>empty?</tt> and return a true valid are considered blank.  All other objects are considered non-blank for the purposes of +validates_presence+.  This means that +validates_presence+ is safe to use on boolean columns where you want to ensure that either true or false is used, but not NULL.
+This is probably the most commonly used helper method, which checks if the specified attributes are not blank.  In general, if an object responds to <tt>blank?</tt>, it calls the method to determine if the object is blank.  Otherwise, nil is considered blank, empty strings or strings that just contain whitespace are blank, and objects that respond to <tt>empty?</tt> and return true are considered blank.  All other objects are considered non-blank for the purposes of +validates_presence+.  This means that +validates_presence+ is safe to use on boolean columns where you want to ensure that either true or false is used, but not NULL.
 
   class Album < Sequel::Model
     def validate
@@ -247,7 +247,7 @@ The <tt>raise_on_typecast_failure = false</tt> setting tells Sequel to attempt t
   album.copies_sold = 'banana'
   album.copies_sold # => 'banana'
 
-+validates_not_string+ is designed to be used in web applications where all user input comes in as strings.  When the <tt>raise_on_typecast_failure = false</tt> setting is used in such an application, you can call +validates_not_string+ with all non-string columns.  If any of those columns has a string value, it's because the column was set and Sequel was not able to typecast it correctly, which means it probably isn't valid.  For example, let's say that you want to check that a couple columns contain valid dates:
++validates_not_string+ is designed to be used in web applications where all user input comes in as strings.  When the <tt>raise_on_typecast_failure = false</tt> setting is used in such an application, you can call +validates_not_string+ with all non-string columns.  If any of those columns has a string value, it's because the column was set and Sequel was not able to typecast it correctly, which means it probably isn't valid.  For example, let's say that you want to check that a couple of columns contain valid dates:
 
   class Album < Sequel::Model
     self.raise_on_typecast_failure = false
@@ -264,7 +264,7 @@ The <tt>raise_on_typecast_failure = false</tt> setting tells Sequel to attempt t
   album.valid? # => false
   album.errors # => {:release_date=>["is not a valid date"]}
 
-For web applications, you usually want the <tt>raise_on_typecast_failure = false</tt> setting, so that you can accept all of the input without raising an error, and then present the user with all error messages.  Without the setting, if the user submits any invalid data, Sequel will immediately raise an error.  +validates_not_string+ is helpful because it allows you to check for typecasting errors on non-string columns, and provides a good default error message stating that it the attribute is not of the expected type.
+For web applications, you usually want the <tt>raise_on_typecast_failure = false</tt> setting, so that you can accept all of the input without raising an error, and then present the user with all error messages.  Without the setting, if the user submits any invalid data, Sequel will immediately raise an error.  +validates_not_string+ is helpful because it allows you to check for typecasting errors on non-string columns, and provides a good default error message stating that the attribute is not of the expected type.
 
 === +validates_unique+
 
@@ -293,7 +293,7 @@ Additionally, you can also include an optional options hash as the last argument
 :message :: The message to use
 :only_if_modified :: Only check the uniqueness if the object is new or one of the columns has been modified.
 
-+validates_unique+ is the only method in +validation_helpers+ that checks with the database.  Attempting to validate uniqueness outside of the database suffers from a race condition, so any time you want to add a uniqueness validation, you should make sure to add a uniqueness constraint or unique index on the underlying database table.  See the the {"Migrations and Schema Modification" guide}[link:files/doc/migration_rdoc.html] for details on how to do that.  
++validates_unique+ is the only method in +validation_helpers+ that checks with the database.  Attempting to validate uniqueness outside of the database suffers from a race condition, so any time you want to add a uniqueness validation, you should make sure to add a uniqueness constraint or unique index on the underlying database table.  See the {"Migrations and Schema Modification" guide}[link:files/doc/migration_rdoc.html] for details on how to do that.  
 
 == +validation_helpers+ Options
 
@@ -301,7 +301,7 @@ All +validation_helpers+ methods except +validates_unique+ accept the following 
 
 === <tt>:message</tt>
 
-The most commonly used option, used to override the default validation message.  Can be either a string or proc.  If a string, it is used directly.  If a proc, the proc is called and should return a string.  If the validation method takes a argument before the array of attributes, that argument is passed as an argument to the proc. The exception is the +validates_not_string+ method, which doesn’t take an argument, but passes the schema type symbol as the argument to the proc. 
+The most commonly used option, used to override the default validation message.  Can be either a string or a proc.  If a string, it is used directly.  If a proc, the proc is called and should return a string.  If the validation method takes an argument before the array of attributes, that argument is passed as an argument to the proc. The exception is the +validates_not_string+ method, which doesn’t take an argument, but passes the schema type symbol as the argument to the proc. 
 
   class Album < Sequel::Model
     def validate
@@ -460,7 +460,7 @@ This will make sure that all string columns in the model are validated to make s
 If you forget to call +super+, the validations that you defined in <tt>Sequel::Model</tt> will not be enforced.  It's a good idea to call super whenever you override one of <tt>Sequel::Model</tt>'s methods, unless you specifically do not want the default behavior.
 
 == <tt>Sequel::Model::Errors</tt>
-
+'
 As mentioned earlier, <tt>Sequel::Model::Errors</tt> is a subclass of Hash with a few special methods, the most common of which are described here:
 
 === +add+
@@ -483,7 +483,7 @@ Here, you don't care about validating the release date if there were validation 
 
 === +full_messages+
 
-+full_messages+ returns an area of error messages for the object.  It's commonly called after validation to get a list of error messages to display to the user:
++full_messages+ returns an array of error messages for the object.  It's commonly called after validation to get a list of error messages to display to the user:
 
   album.errors
   # => {:name=>["cannot be empty"]}
