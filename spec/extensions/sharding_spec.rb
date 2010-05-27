@@ -2,7 +2,8 @@ require File.join(File.dirname(__FILE__), "spec_helper")
 
 describe "sharding plugin" do
   before do
-    @Artist = Class.new(Sequel::Model(:artists))
+    @db = Sequel::Model.db.clone
+    @Artist = Class.new(Sequel::Model(@db[:artists]))
     @Artist.class_eval do
       columns :id, :name
 
@@ -10,7 +11,7 @@ describe "sharding plugin" do
         {:id=>2, :name=>'YJM'}
       end
     end
-    @Album = Class.new(Sequel::Model(:albums))
+    @Album = Class.new(Sequel::Model(@db[:albums]))
     @Album.class_eval do
       columns :id, :artist_id, :name
 
@@ -33,7 +34,7 @@ describe "sharding plugin" do
         ds
       end
     end
-    @Tag = Class.new(Sequel::Model(:tags))
+    @Tag = Class.new(Sequel::Model(@db[:tags]))
     @Tag.class_eval do
       columns :id, :name
 
@@ -73,7 +74,11 @@ describe "sharding plugin" do
       end)
       @Album.ds_ext(ds_ext)
     end
-    @db = Sequel::Model.db
+    def @db.actions; @actions ||= []; end
+    def @db.transaction(opts)
+      actions << [:transaction, opts[:server]]
+      super
+    end
   end 
 
   specify "should allow you to instantiate a new object for a specified shard" do
@@ -249,5 +254,19 @@ describe "sharding plugin" do
   specify "should be able to set a shard to use for any object using set_server" do
     @Album.server(:s1).first.set_server(:s2).reload
     @Album.actions.should == [[:fetch, nil, :s1], [:fetch, "(id = 1)", :s2]]
+  end 
+
+  specify "should use transactions on the correct shard" do
+    @Album.use_transactions = true
+    @Album.server(:s2).first.save
+    @Album.actions.should == [[:fetch, nil, :s2], [:update, {:name=>"RF", :artist_id=>2}, "(id = 1)", :s2]]
+    @db.actions.should == [[:transaction, :s2]]
+  end 
+
+  specify "should use not override shard given when saving" do
+    @Album.use_transactions = true
+    @Album.server(:s2).first.save(:server=>:s1)
+    @Album.actions.should == [[:fetch, nil, :s2], [:update, {:name=>"RF", :artist_id=>2}, "(id = 1)", :s2]]
+    @db.actions.should == [[:transaction, :s1]]
   end 
 end
