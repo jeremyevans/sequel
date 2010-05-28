@@ -599,6 +599,8 @@ module Sequel
         #     the current model and the associated model, as a symbol.  Defaults to the name
         #     of current model and name of associated model, pluralized,
         #     underscored, sorted, and joined with '_'.
+        #   - :join_table_block - proc that can be used to modify the dataset used in the add/remove/remove_all
+        #     methods.  Should accept a dataset argument and return a modified dataset if present.
         #   - :left_key - foreign key in join table that points to current model's
         #     primary key, as a symbol. Defaults to :"#{self.name.underscore}_id".  
         #     Can use an array of symbols for a composite key association.
@@ -1017,7 +1019,8 @@ module Sequel
 
         # Dataset for the join table of the given many to many association reflection
         def _join_table_dataset(opts)
-          model.db.from(opts[:join_table])
+          ds = model.db.from(opts[:join_table])
+          opts[:join_table_block] ? opts[:join_table_block].call(ds) : ds
         end
 
         # Return the associated objects from the dataset, without callbacks, reciprocals, and caching.

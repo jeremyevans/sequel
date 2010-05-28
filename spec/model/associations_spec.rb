@@ -2387,6 +2387,17 @@ describe Sequel::Model, "many_to_many" do
     attrib.associations[:nodes].should == []
   end
 
+  it "add, remove, and remove_all methods should respect :join_table_block option" do
+    @c2.many_to_many :attributes, :class => @c1, :join_table_block=>proc{|ds| ds.filter(:x=>123).set_overrides(:x=>123)}
+    o = @c2.load(:id => 1234)
+    o.add_attribute(@c1.load(:id=>44))
+    o.remove_attribute(@c1.load(:id=>45))
+    o.remove_all_attributes
+    MODEL_DB.sqls.first =~ /INSERT INTO attributes_nodes \((node_id|attribute_id|x), (node_id|attribute_id|x), (node_id|attribute_id|x)\) VALUES \((1234|123|44), (1234|123|44), (1234|123|44)\)/
+    MODEL_DB.sqls[1..-1].should == ["DELETE FROM attributes_nodes WHERE ((x = 123) AND (node_id = 1234) AND (attribute_id = 45))",
+      "DELETE FROM attributes_nodes WHERE ((x = 123) AND (node_id = 1234))"]
+  end
+
   it "should call an _add_ method internally to add attributes" do
     @c2.many_to_many :attributes, :class => @c1
     @c2.private_instance_methods.collect{|x| x.to_s}.sort.should(include("_add_attribute"))

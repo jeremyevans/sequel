@@ -1,5 +1,7 @@
 === HEAD
 
+* Add a :join_table_block many_to_many association option used by the add/remove/remove_all methods (jeremyevans)
+
 * Add an AssociationPks plugin that adds association_pks and association_pks= methods for *_to_many associations (jeremyevans)
 
 * Add an UpdatePrimaryKey plugin that allows you to update the primary key of a model object (jeremyevans)

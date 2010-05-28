@@ -943,6 +943,18 @@ Defaults to primary key of the associated table.
 
 Can use an array of symbols for a composite key association.
 
+==== :join_table_block [+many_to_many+]
+
+A proc that can be used to modify the dataset used in the add/remove/remove_all
+methods.  It's separate from the association block, as that is called on a
+join of the join table and the associated table, whereas this option just
+applies to the join table.  It can be used to make sure additional columns are
+used when inserting, or that filters are used when deleting.
+
+  Artist.many_to_many :lead_guitar_albums, :join_table_block=>proc do |ds|
+    ds.filter(:instrument_id=>5).set_overrides(:instrument_id=>5)
+  end
+
 === Callback Options
 
 All callbacks can be specified as a Symbol, Proc, or array of both/either
