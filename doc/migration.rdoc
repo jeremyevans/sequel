@@ -446,6 +446,8 @@ as it's third argument.  A simple example is:
 
 +foreign_key+ accepts some specific options:
 
+:deferrable :: Makes the foreign key constraint checks deferrable, so they aren't checked
+               until the end of the transaction.
 :key :: For foreign key columns, the column in the associated table
         that this column references.  Unnecessary if this column
         references the primary key of the associated table, at least

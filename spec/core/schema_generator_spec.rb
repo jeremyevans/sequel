@@ -12,6 +12,7 @@ describe Sequel::Schema::Generator do
       index :title
       index [:title, :body], :unique => true
       foreign_key :node_id, :nodes
+      foreign_key :deferrable_node_id, :nodes, :deferrable => true
       primary_key [:title, :parent_id], :name => :cpk
       foreign_key [:node_id, :prop_id], :nodes_props, :name => :cfk
     end
@@ -26,7 +27,7 @@ describe Sequel::Schema::Generator do
   end
   
   it "counts definitions correctly" do
-    @columns.size.should == 5
+    @columns.size.should == 6
     @indexes.size.should == 2
     @constraints.size.should == 4
   end
@@ -47,6 +48,12 @@ describe Sequel::Schema::Generator do
     @columns[3][:type].should == Integer
     @columns[4][:name].should == :node_id
     @columns[4][:type].should == Integer
+  end
+
+  it "creates deferrable altered foreign key column" do
+    @columns[5][:name].should == :deferrable_node_id
+    @columns[5][:type].should == Integer
+    @columns[5][:deferrable].should == true
   end
   
   it "uses table for foreign key columns, if specified" do

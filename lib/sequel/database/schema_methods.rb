@@ -284,6 +284,7 @@ module Sequel
       sql << "(#{Array(column[:key]).map{|x| quote_identifier(x)}.join(COMMA_SEPARATOR)})" if column[:key]
       sql << " ON DELETE #{on_delete_clause(column[:on_delete])}" if column[:on_delete]
       sql << " ON UPDATE #{on_delete_clause(column[:on_update])}" if column[:on_update]
+      sql << " DEFERRABLE INITIALLY DEFERRED" if column[:deferrable]
       sql
     end
   

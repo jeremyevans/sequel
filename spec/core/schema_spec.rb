@@ -274,6 +274,13 @@ context "DB#create_table" do
     @db.sqls.clear
   end
   
+  specify "should accept foreign keys with deferrable option" do
+    @db.create_table(:cats) do
+      foreign_key :project_id, :projects, :deferrable=>true
+    end
+    @db.sqls.should == ["CREATE TABLE cats (project_id integer REFERENCES projects DEFERRABLE INITIALLY DEFERRED)"]
+  end
+
   specify "should accept inline index definition" do
     @db.create_table(:cats) do
       integer :id, :index => true

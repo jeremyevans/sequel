@@ -86,6 +86,10 @@ module Sequel
       #   creating a unique index on the column.
       # * :unsigned - Make the column type unsigned, only useful for integer
       #   columns.
+      # * :deferrable - This ensure Referential Integrity will work even if
+      #   reference table will use for its foreign key a value that does not
+      #   exists(yet) on referenced table. Basically it adds
+      #   DEFERRABLE INITIALLY DEFERRED on key creation.
       def column(name, type, opts = {})
         columns << {:name => name, :type => type}.merge(opts)
         index(name) if opts[:index]
