@@ -21,7 +21,7 @@ Sequel will autogenerate the column accessors, so you can do:
   album = Album.new
   album.name = 'RF'
 
-If the table name for the class doesn't match the default one Sequel to use, you can specify it manually:
+If the table name for the class doesn't match the default one Sequel will choose, you can specify it manually:
 
   class Album < Sequel::Model(:records)
   end
@@ -61,7 +61,7 @@ Sequel's +validation_class_methods+ plugin is modeled directly on ActiveRecord's
 
 == Hooks/Callbacks
 
-Sequel's +hook_class_methods+ plugin is modeled directly on ActiveRecord's callbacks, but the recommended approach is to define you hooks/callbacks as instance methods:
+Sequel's +hook_class_methods+ plugin is modeled directly on ActiveRecord's callbacks, but the recommended approach is to define your hooks/callbacks as instance methods:
 
   class Album < Sequel::Model
     def before_create
@@ -98,7 +98,7 @@ Sequel supports both single table inheritance and class table inheritance using 
 
 == Transactions
 
-Sequel supports transactions via the Database object (which we recommend using the DB constant for single database applications):
+Sequel supports transactions via the Database object (we recommend using the DB constant for single database applications):
 
   DB.transaction do
     album.artist.num_albums -= 1
@@ -132,7 +132,7 @@ Just like ActiveRecord, Sequel doesn't use sessions, it lets you modify objects 
 
 == Database Abstraction
 
-Sequel supports far more database abstraction than ActiveRecord, and setting up the database connection is easy:
+Sequel supports far more database abstractions than ActiveRecord, and setting up the database connection is easy:
 
   DB = Sequel.sqlite # memory database
   DB = Sequel.connect('postgres://user:pass@host/database') # connection string
@@ -218,7 +218,7 @@ This is because LIKE is case sensitive on PostgreSQL, but case insensitive on My
 
 This will do a case insensitive search on both databases.  If you want a case sensitive search on both, you can use +like+ instead of +ilike+.
 
-String concatention is a similar area, where MySQL and PostgreSQL handle things differently.  With Sequel, the same code can work on both databases:
+String concatenation is a similar area, where MySQL and PostgreSQL handle things differently.  With Sequel, the same code can work on both databases:
 
   Album.select(:name.sql_string + ' - Name')
 
@@ -302,7 +302,7 @@ Sequel doesn't have a <tt>has_many :through</tt> association, instead you can us
 
 Sequel doesn't come with support for polymorphic associations.  Using polymorphic associations is generally bad from a database design perspective, as it violates referential integrity.  If you have an old database and must have polymorphic associations, there is an external +sequel_polymorphic+ plugin that can handle them, just by using the standard association options provided by Sequel.
 
-Sequel doesn't directly support creating a bunch of associated objects and delaying saving them to the database when the main object with save, like you can with the <tt>association.build</tt> methods in ActiveRecord.  You can use +before_save or +after_save+ hooks, or the +nested_attributes+ or +instance_hooks+ plugins to get similar support.
+Sequel doesn't directly support creating a bunch of associated objects and delaying saving them to the database until the main object is saved, like you can with the <tt>association.build</tt> methods in ActiveRecord.  You can use +before_save or +after_save+ hooks, or the +nested_attributes+ or +instance_hooks+ plugins to get similar support.
 
 Sequel supports the same basic association hooks/callbacks as ActiveRecord.  It also supports <tt>:after_load</tt>, which is run after the associated objects are loaded.  For <tt>*_to_one</tt> associations, it supports +before_set+ and +after_set+ hooks, since a setter method is used instead of an add/remove method pair.
 
@@ -442,7 +442,7 @@ This part of the guide will list Sequel equivalents for ActiveRecord methods, ho
 
 ==== +abstract_class+, <tt>abstract_class=</tt>, <tt>abstract_class?</tt>
 
-With Sequel, these methods don't exist because it is it doesn't default to using single table inheritance in subclasses.  ActiveRecord assumes that subclasses of Model classes use single table inheritance, and you have to set <tt>abstract_class = true</tt> to use an abstract class.  In Sequel, you must use the +single_table_inheritance+ or +class_tabble_inheritance+ plugin to configure inheritance in the database.
+With Sequel, these methods don't exist because it doesn't default to using single table inheritance in subclasses.  ActiveRecord assumes that subclasses of Model classes use single table inheritance, and you have to set <tt>abstract_class = true</tt> to use an abstract class.  In Sequel, you must use the +single_table_inheritance+ or +class_tabble_inheritance+ plugin to configure inheritance in the database.
 
 ==== +all+
 
@@ -479,7 +479,7 @@ Note that +test_connection+ will return true if a connection can be made, but wi
 
 ==== +connection+
 
-Sequel only uses connections for the minimum about of time necessary, checking them out to do a query, and returning them as soon as the query finishes.  If you do want direct access to the connection object:
+Sequel only uses connections for the minimum amount of time necessary, checking them out to do a query, and returning them as soon as the query finishes.  If you do want direct access to the connection object:
 
   Sequel::Model.db.synchronize do |connection|
     ...
@@ -667,7 +667,7 @@ Note that +update+ in that case will operate on a dataset, so it won't run model
 
 ==== +with_scope+
 
-Sequel works a little differently than with_scope.  Instead of using nested blocks, you just use a cleaner method chain.  +with_scope+ is often used an an around_filter or similar construct, where in Sequel, you would just need to assign do a dataset in a before filter, and use that dataset in the action.
+Sequel works a little differently than with_scope.  Instead of using nested blocks, you just use a cleaner method chain.  +with_scope+ is often used as an around_filter or similar construct, where in Sequel, you would just need to assign to a dataset in a before filter, and use that dataset in the action.
 
 === Class Methods with Roughly the Same Behavior
 
