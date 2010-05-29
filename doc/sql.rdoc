@@ -78,7 +78,7 @@ Almost everywhere in Sequel, you can drop down to literal SQL by providing a lit
   DB[:albums].select('name') # SELECT 'name' FROM albums
   DB[:albums].select('name'.lit) # SELECT name FROM albums
 
-So you can use Sequel's DSL for everywhere you find it helpful, and fallback to literal SQL if the DSL can't do what you want or you just find literal SQL easier.
+So you can use Sequel's DSL everywhere you find it helpful, and fallback to literal SQL if the DSL can't do what you want or you just find literal SQL easier.
 
 == Translating SQL Expressions into Sequel
 
@@ -315,7 +315,7 @@ Note that the following does not work:
 
   1 + :column # raises TypeError
 
-For commutative operates such as + and *, this isn't a problem as you can just reorder, but non-commutative operators such as - and * cannot be expressed directly.  However, Sequel comes with an +sql_expr+ extension that adds an +sql_expr+ method to all objects, allowing you to do:
+For commutative operates such as + and *, this isn't a problem as you can just reorder, but non-commutative operators such as - and / cannot be expressed directly.  However, Sequel comes with an +sql_expr+ extension that adds an +sql_expr+ method to all objects, allowing you to do:
 
   Sequel.extension :sql_expr
   1.sql_expr / :column # (1 / "column")
@@ -413,7 +413,7 @@ Just like for the mathematical operators, you can use the +sql_expr+ extension t
   Sequel.extension :sql_expr
   'Name - '.sql_expr + :name # ('Name - ' || "name")
   
-Sequel also adds an <tt>Array#sql_string_join</tt> method, which concatentates all of the elements in the array:
+Sequel also adds an <tt>Array#sql_string_join</tt> method, which concatenates all of the elements in the array:
 
   ['Name', :name].sql_string_join # ('Name' || "name")
 
