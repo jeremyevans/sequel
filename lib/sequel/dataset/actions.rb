@@ -162,7 +162,8 @@ module Sequel
     end
     
     # Inserts multiple records into the associated table. This method can be
-    # used to efficiently insert a large amounts of records into a table. Inserts
+    # used to efficiently insert a large number of records into a table in a
+    # single query if the database supports it. Inserts
     # are automatically wrapped in a transaction.
     # 
     # This method is called with a columns array and an array of value arrays:
