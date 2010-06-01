@@ -1,4 +1,4 @@
-=== HEAD
+=== 3.12.0 (2010-06-01)
 
 * Add a :deferrable option to foreign_key for creating deferrable foreign keys (hydrow)
 

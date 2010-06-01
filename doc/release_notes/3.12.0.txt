@@ -1,0 +1,304 @@
+= Migration Changes
+
+* A TimestampMigrator has been added to Sequel, and is
+  automatically used if any migration has a version greater than
+  20000100.  This migrator operates similarly to the default
+  ActiveRecord migrator, in that it allows missing migrations.
+  It differs from the ActiveRecord migrator in that it supports
+  migrations with the same timestamp/version as well as a wide
+  variety of timestamp formats (though the ActiveRecord default
+  of YYYYMMDDHHMMSS is recommended and should be used in
+  portable code).
+  
+  Sequel still defaults to the old migrator, but you can use the
+  new one without making changes to your old migrations.  Just
+  make sure your new migration starts with a version greater than
+  20000100, and Sequel will automatically convert the previous
+  schema table to the new format.
+
+* A new migration DSL was added:
+
+    Sequel.migration do
+      up do
+      end
+
+      down do
+      end
+    end
+
+  The old style of using a Sequel::Migration subclass is still
+  supported, but it is recommended that new code use the new DSL.
+
+* The default migrator also had significant issues fixed.  First,
+  it now saves the migration version after each migration, instead
+  of after all migrations, which means Sequel won't attempt to
+  apply already applied migrations if there was previously an error
+  when applying multiple migrations at once on a database that
+  didn't support transactional schema modification.
+
+  Second, duplicate migration versions in the default migrator now
+  raise an exception, as do missing migration versions.  Neither
+  should happen when using the default migrator, which requires
+  consecutive integer versions, similar to the old ActiveRecord
+  migrator.
+
+* Execution times for migrations are now logged to the database's
+  loggers.
+
+= New Plugins
+
+* A sharding plugin has been added that allows model objects to
+  work well with sharded databases.  When using it, model objects
+  know which shard they were retrieved from, so when you save
+  the object, it is saved back to that shard.  The sharding plugin
+  also works with associations, so associated records are retrieved
+  from the same shard the main object was retreived from.  The
+  sharding plugin also works with both methods of eager loading, and
+  provides methods that you can use to create objects on specific
+  shards.
+
+* An update_primary_key plugin has been added that allows Sequel
+  to work correctly if you modify the primary key of a model object.
+  This should not be necessary if you are using surrogate keys, but
+  if your database uses natural primary keys which can change, this
+  should be helpful.
+
+* An association_pks plugin has been added that adds association_pks
+  and association_pks= methods to model objects for both one_to_many
+  and many_to_many associations.  The association_pks method returns
+  an array of primary key values for the associated objects, and
+  the association_pks= method modifies the database to ensure that
+  the object is only associated to the objects specified by the
+  array of primary keys provided to it.
+
+* A string_stripper plugin has been added that strips all strings
+  that are assigned to attribute values.  This is useful for web
+  applications where you want to easily remove leading and trailing
+  whitespace in form entries before storing them in the database.
+
+* A skip_create_refresh plugin has been added that skips the refresh
+  of after you save a new model object.  On most databases, Sequel
+  refreshes the model object after inserting it in order to get
+  values for all of the columns.  For performance reasons, you can
+  use this plugin to skip the refresh if it isn't necessary for you.
+
+= Other New Features
+
+* Sequel::Model#set_fields and update_fields were added.  These
+  methods have a similar API to set_only and update_only, but they
+  operate differently. While set_only and update_only operate over
+  the hash, these methods operate over the array of fields,
+  so they don't raise errors if the hash contains fields not
+  in the array:
+
+    params = {:a=>1, :b=>2, :c=>3}
+    album = Album[1]
+
+    # raises Error because :a is not in the fields
+    album.set_only(params, [:b, :c])
+
+    # Just sets the value of album.b and album.c
+    album.set_fields(params, [:b, :c])
+
+  Other than handling entries in the hash that aren't in the array,
+  set_fields and update_fields also handle entries not in the hash
+  differently:
+
+    # Doesn't modify the object, since the hash is empty
+    album.set_only({}, [:b, :c])
+
+    # Sets album.b and album.c to nil, since they aren't in the hash
+    album.set_fields({}, [:b, :c])
+
+* The :eager_loader association option has a new API, though the
+  previous API still works.  Instead of accepting three arguments,
+  it can now accept a single hash argument, which will use the
+  :key_hash, :rows, and :association keys for the previous three
+  arguments.  The hash will also contain a :self key whose value
+  is the dataset doing the eager load, which was not possible to
+  determine using the old API.
+
+* Sequel::SQL::Expression#hash has been added so that the objects
+  are now safe to use as hash keys.
+
+* A Dataset#order_prepend method has been added allowing you to
+  prepend to an existing order.  This is useful if want to modify
+  a dataset's order such that it first orders by the columns you
+  provide, but for any rows where the columns you provide are
+  equal, uses the existing order to further order the dataset:
+
+    ds.order(:albums__name).order_prepend(:artists__name)
+    # ORDER BY artists.name, albums.name
+
+* When creating foreign key columns, you can now use a :deferrable
+  option to set up a foreign key constraint that is not checked
+  until the end of the transaction:
+
+    DB.create_table(:albums) do
+      primary_key :id
+      String :name
+      foreign_key :artist_id, :artists, :deferrable=>true
+    end
+
+* many_to_many associations now support a :join_table block option
+  that is used by the add/remove/remove_all methods.  It can modify
+  the dataset to ensure that certain columns are included when
+  inserting or to add a filter so that only certain records are
+  deleted.  It's useful if you have a many_to_many association that
+  is filtered to only a subset of the matching rows in the join
+  table.
+
+* The single_table_inheritance plugin now supports :model_map and
+  :key_map options to set up a custom mapping of column values to
+  model classes.  For simple situations such as when you are mapping
+  integer values to certain classes, a :model_map hash is sufficient:
+
+    Employee.plugin :single_table_inheritance, :type_id,
+     :model_map=>{1=>:Staff, 2=>:Manager}
+   
+  Here the :model_map keys are type_id column values, and the
+  :model_map values are symbols or strings specifying class names.
+
+  For more complex conditions, you can use a pair of procs:
+
+    Employee.plugin :single_table_inheritance, :type_name,
+     :model_map=>proc{|v| v.reverse},
+     :key_map=>proc{|klass| klass.name.reverse}
+
+  Here the type_name column is a string column holding the reverse
+  of the class's name.
+
+* The single_table_inheritance plugin now correctly sets up subclass
+  filters for middle tables in a class hierarchy with more than 2
+  levels.  For example, with this code:
+
+    class Employee < Sequel::Model; end
+    Employee.plugin :single_table_inheritance, :kind
+    class Manager < Employee; end
+    class Executive < Manager; end
+
+  Sequel previously would not return Executives if you used
+  Manager.all.  It now correctly recognizes subclasses so that it
+  will return both Managers and Executives.
+
+* Sequel::Model.qualified_primary_key_hash has been added, giving
+  you a hash that can be used for filtering.  It is similar to
+  primary_key_hash, but it qualifies the keys with the model's
+  table.  It's useful if you have joined the table to another table
+  that has columns with the same name, but you want to only look
+  for a single model object in that dataset.
+
+* For consistency, you can now use Dataset#order_append as an alias
+  for order_more.
+
+= Other Improvements
+
+* Sequel now correctly removes schema entries when altering tables.
+  Previously, some adapters that had to query the existing schema
+  when altering tables resulted in the previous schema being cached.
+
+* Sequel::Model::Errors#on now always returns nil if there are no
+  errors on the attribute.  Previously, it would return an empty
+  array in certain cases.  Additionally, Sequel::Model::Errors#empty?
+  now returns true if there are no errors, where it certain cases
+  it would return false even if there were no errors.
+
+* The schema_dumper extension now works with tables specified as
+  Sequel::SQL::Identifiers.
+
+* Sequel now recognizes the timestamp(N) with(out) time zone column
+  type.
+
+* The lazy_attributes plugin no longer requires the core extensions
+  to work correctly.
+
+* DatabaseDisconnectError support has been added to the ODBC adapter,
+  allowing Sequel to detect disconnects and remove the connection
+  from the connection pool.
+
+* A leak of JDBC statement objects when using transactions was
+  fixed in the jdbc adapter.
+
+* The jdbc adapter now gives a nicer error message if you use a
+  connection string that it doesn't recognize and there is an error
+  when connecting.
+
+* Temporary table creation was fixed on Microsoft SQL Server, but
+  it is not recommended as it changes the name of the table.  If
+  you use Microsoft SQL Server, you should prefix your temporary
+  table names with # and use the regular create table method.
+
+* A large number of guides were added to Sequel to make it easier
+  for new and existing users to learn more about Sequel.  The
+  following guides were added:
+
+  * Querying in Sequel
+  * Migration and Schema Modification
+  * Model Hooks
+  * Model Validations
+  * Sequel for SQL Users
+  * Sequel for ActiveRecord Users
+
+* RDoc section support was added to Sequel::Database, making the
+  method documentation easier to read.
+
+= Backwards Compatibility
+
+* Sequel::Database now defines the indexes and tables methods, even
+  if the adapter does not implement them, similar to how connect
+  and execute are defined.  Previously, you could use respond_to to
+  check if the adapter supported them, now they raise
+  Sequel::NotImplemented if the database adapter does not implement
+  them.
+
+* Sequel used to raise NotImplementedError in certain default
+  definitions of methods inside Sequel::Database and Sequel::Dataset,
+  when the methods were supposed to be overridden in subclasses.
+  Sequel now uses a Sequel::NotImplemented exception class for these
+  exceptions, which is a subclass of Sequel::Error.
+
+* Sequel no longer applies all association options to the dataset
+  used to remove all many_to_many associated objects.  You should
+  use the new :join_table_block option to get similar behavior if
+  you were filtering the many_to_many association based on columns
+  in the join table and you wanted remove_all to only remove the
+  related columns.
+
+* Sequel now calls certain before and after hook actions in plugins
+  in a different order than before.  This should not have an effect
+  unless you were relying on them being called in the previous order.
+  Now, when overriding before hooks in plugins, Sequel always does
+  actions before calling super, and when overriding after hooks in
+  plugins, Sequel always does actions after calling super.
+
+* The hook_class_methods plugin no longer skips later after hooks if
+  a previous after hook returns false.  That behavior now only occurs
+  for before hooks.
+
+* Sequel now only removes primary key values when updating objects if
+  you are saving the entire object and you have not modified the
+  values of the primary keys.  Previously, Sequel would remove
+  primary key values when updating even if you specified the primary
+  key column specifically or the primary key column was modified and
+  you used save_changes/update.
+
+* Sequel now uses explicit methods instead of aliases for certain
+  methods.  This should only affect you if for example you overrode
+  Dataset#group to do one thing and wanted Dataset#group_by to do
+  the default action.  Now, Dataset#group_by, and methods like it, are
+  explicit methods that just call the methods they previously
+  aliased.  This also means that if you were overriding Dataset#group
+  and explicitly aliasing group_by to it, you no longer need the
+  alias.
+
+* The single_table_inheritance plugin now uses IN instead of = for
+  subclass filters.  This could lead to poor performance if the
+  database has a very bad query planner.
+
+* The private transaction_statement_object method was removed from
+  the JDBC adapter, and Sequel will no longer check for the presence
+  of the method in the transaction code.
+
+* The Sequel::Migrator object is now a class instead of a module, and
+  has been pretty much rewritten.  If you were using any methods of
+  it besides apply and run, they no longer work.
