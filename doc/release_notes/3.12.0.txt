@@ -140,7 +140,7 @@
       foreign_key :artist_id, :artists, :deferrable=>true
     end
 
-* many_to_many associations now support a :join_table block option
+* many_to_many associations now support a :join_table_block option
   that is used by the add/remove/remove_all methods.  It can modify
   the dataset to ensure that certain columns are included when
   inserting or to add a filter so that only certain records are
@@ -246,7 +246,7 @@
 
 * Sequel::Database now defines the indexes and tables methods, even
   if the adapter does not implement them, similar to how connect
-  and execute are defined.  Previously, you could use respond_to to
+  and execute are defined.  Previously, you could use respond_to? to
   check if the adapter supported them, now they raise
   Sequel::NotImplemented if the database adapter does not implement
   them.
