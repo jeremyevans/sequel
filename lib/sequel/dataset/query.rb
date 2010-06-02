@@ -226,9 +226,8 @@ module Sequel
       group(*columns)
     end
     
-    # Returns a dataset grouped by the given column with count by group,
-    # order by the count of records. Column aliases may be supplied, and will
-    # be included in the select clause.
+    # Returns a dataset grouped by the given column with count by group.
+    # Column aliases may be supplied, and will be included in the select clause.
     #
     # Examples:
     #
