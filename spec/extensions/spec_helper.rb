@@ -74,7 +74,7 @@ end
 class << Sequel::Model
   alias orig_columns columns
   def columns(*cols)
-    return if cols.empty?
+    return @columns if cols.empty?
     define_method(:columns){cols}
     @dataset.instance_variable_set(:@columns, cols) if @dataset
     def_column_accessor(*cols)
