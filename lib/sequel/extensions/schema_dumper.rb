@@ -118,7 +118,7 @@ END_MIG
     # database type is not recognized, return it as a String type.
     def column_schema_to_ruby_type(schema)
       case t = schema[:db_type].downcase
-      when /\A(?:medium|small)?int(?:eger)?(?:\((?:\d+)\))?\z/o
+      when /\A(?:medium|small)?int(?:eger)?(?:\((?:\d+)\))?(?: unsigned)?\z/o
         {:type=>Integer}
       when /\Atinyint(?:\((\d+)\))?\z/o
         {:type =>schema[:type] == :boolean ? TrueClass : Integer}
