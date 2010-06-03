@@ -90,7 +90,8 @@ module Sequel
     #
     # Note that this method is not safe to use on many adapters if you are
     # running additional queries inside the provided block.  If you are
-    # running queries inside the block, you use should all instead of each.
+    # running queries inside the block, you should use +all+ instead of +each+
+    # for the outer queries, or use a separate thread or shard inside +each+.
     def each(&block)
       if @opts[:graph]
         graph_each(&block)
