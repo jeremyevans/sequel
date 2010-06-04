@@ -1,6 +1,8 @@
 === HEAD
 
-* Add a JsonSerializer plugin for serializing model objects to JSON (jeremyevans)
+* Add a XmlSerializer plugin for serializing/deserializing model objects to/from XML (jeremyevans)
+
+* Add a JsonSerializer plugin for serializing/deserializing model objects to/from JSON (jeremyevans)
 
 * Handle unsigned integers in the schema dumper (jeremyevans)
 

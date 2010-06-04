@@ -38,6 +38,7 @@
 <li><a href="rdoc-plugins/classes/Sequel/Plugins/UpdatePrimaryKey.html">update_primary_key</a>: Allows you to safely update the primary key of a model object.</li>
 <li><a href="rdoc-plugins/classes/Sequel/Plugins/ValidationClassMethods.html">validation_class_methods</a>: Adds backwards compatibility for the legacy class-level validation methods (e.g. validates_presence_of :column).</li>
 <li><a href="rdoc-plugins/classes/Sequel/Plugins/ValidationHelpers.html">validation_helpers</a>: The preferred default validations plugin, which uses instance-level methods.</li>
+<li><a href="rdoc-plugins/classes/Sequel/Plugins/XmlSerializer.html">xml_serializer</a>: Allows you to serialize/deserialize model objects to/from XML.</li>
 </ul>
 
 <h3>External Plugins</h3>
