@@ -89,7 +89,11 @@ module Sequel
           @cti_tables = [table_name]
           @cti_columns = {table_name=>columns}
           @cti_table_map = opts[:table_map] || {}
-          dataset.row_proc = lambda{|r| (m.call(r[key]) rescue model).load(r)}
+          dataset.row_proc = if key
+            lambda{|r| (m.call(r[key]) rescue model).load(r)}
+          else
+            lambda{|r| model.load(r)}
+          end
         end
       end
 
@@ -147,7 +151,11 @@ module Sequel
           super
           subclass.instance_eval do
             m = method(:constantize)
-            dataset.row_proc = lambda{|r| (m.call(r[ck]) rescue subclass).load(r)}
+            dataset.row_proc = if cti_key
+              lambda{|r| (m.call(r[ck]) rescue subclass).load(r)}
+            else
+              lambda{|r| subclass.load(r)}
+            end
             (columns - [cbm.primary_key]).each{|a| define_lazy_attribute_getter(a)}
             cti_tables.reverse.each do |table|
               db.schema(table).each{|k,v| db_schema[k] = v}

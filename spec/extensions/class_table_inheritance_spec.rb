@@ -88,7 +88,8 @@ describe "class_table_inheritance plugin" do
   
   it "should return rows with the current class if cti_key is nil" do
     Employee.plugin(:class_table_inheritance)
-    def @ds.fetch_rows(sql)
+    ds = Employee.dataset
+    def ds.fetch_rows(sql)
       yield({:kind=>'Employee'})
       yield({:kind=>'Manager'})
       yield({:kind=>'Executive'})
