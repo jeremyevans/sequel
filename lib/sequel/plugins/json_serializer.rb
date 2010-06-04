@@ -2,9 +2,10 @@ module Sequel
   tsk_require 'json'
 
   module Plugins
-    # The json_serializer plugin handles deserializing entire Sequel::Model
-    # objects to JSON.  It requires the json library, can can work with either
-    # the pure ruby version or the C extension.
+    # The json_serializer plugin handles serializing entire Sequel::Model
+    # objects to JSON, as well as support for deserializing JSON directly
+    # into Sequel::Model objects.  It requires the json library, and can
+    # work with either the pure ruby version or the C extension.
     #
     # Basic Example:
     #
