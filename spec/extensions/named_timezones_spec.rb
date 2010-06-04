@@ -1,11 +1,10 @@
 require File.join(File.dirname(__FILE__), "spec_helper")
 
-if (begin
+begin
   require 'tzinfo'
-  true
-  rescue LoadError
-  end) 
-
+rescue LoadError => e
+  skip_warn "named_timezones_spec: can't load tzinfo (#{e.class}: #{e})"
+else
 Sequel.extension :named_timezones
 Sequel.datetime_class = Time
 

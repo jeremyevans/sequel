@@ -73,4 +73,6 @@ describe "ActiveModel plugin" do
     s.should =~ /0 failures, 0 errors/
   end
 end 
+else
+  skip_warn "active_model plugin: currently requires forking, and doesn't work on windows or Java"
 end

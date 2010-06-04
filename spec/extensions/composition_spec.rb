@@ -1,9 +1,6 @@
 require File.join(File.dirname(__FILE__), "spec_helper")
 
-require 'yaml'
-require 'json'
-
-describe "Serialization plugin" do
+describe "Composition plugin" do
   before do
     @c = Class.new(Sequel::Model(:items))
     @c.plugin :composition

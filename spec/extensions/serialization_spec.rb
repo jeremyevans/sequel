@@ -1,8 +1,11 @@
 require File.join(File.dirname(__FILE__), "spec_helper")
 
+begin
 require 'yaml'
 require 'json'
-
+rescue LoadError => e
+  skip_warn "serialization plugin: can't load json (#{e.class}: #{e})"
+else
 describe "Serialization plugin" do
   before do
     @c = Class.new(Sequel::Model(:items)) do
@@ -206,4 +209,5 @@ describe "Serialization plugin" do
     o = @c.load(:abc => 3)
     o.abc.should == 9
   end
+end
 end

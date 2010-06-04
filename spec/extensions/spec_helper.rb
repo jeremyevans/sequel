@@ -11,6 +11,10 @@ end
 Sequel.extension(*%w'string_date_time inflector pagination query pretty_table blank migration schema_dumper looser_typecasting sql_expr thread_local_timezones')
 {:hook_class_methods=>[], :schema=>[], :validation_class_methods=>[]}.each{|p, opts| Sequel::Model.plugin(p, *opts)}
 
+def skip_warn(s)
+  warn "Skipping test of #{s}" if ENV["SKIPPED_TEST_WARN"]
+end
+
 class MockDataset < Sequel::Dataset
   def insert(*args)
     @db.execute insert_sql(*args)

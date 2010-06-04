@@ -1,5 +1,10 @@
 require File.join(File.dirname(__FILE__), "spec_helper")
 
+begin
+  require 'json'
+rescue LoadError => e
+  skip_warn "json_serializer plugin: can't load json (#{e.class}: #{e})"
+else
 describe "Sequel::Plugins::JsonSerializer" do
   before do
     class ::Artist < Sequel::Model
@@ -99,4 +104,5 @@ describe "Sequel::Plugins::JsonSerializer" do
     ds.meta_def(:all){[album.values]}
     JSON.parse(ds.to_json).should == [@album.values.inject({}){|h, (k, v)| h[k.to_s] = v; h}]
   end
+end
 end

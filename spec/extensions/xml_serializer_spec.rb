@@ -3,7 +3,7 @@ require File.join(File.dirname(__FILE__), "spec_helper")
 begin
   require 'nokogiri'
 rescue LoadError => e
-  warn "Skipping test of xml_serializer plugin, can't load nokogiri (#{e.class}: #{e})" if ENV["SKIPPED_TEST_WARN"]
+  skip_warn "xml_serializer plugin: can't load nokogiri (#{e.class}: #{e})"
 else
 describe "Sequel::Plugins::XmlSerializer" do
   before do

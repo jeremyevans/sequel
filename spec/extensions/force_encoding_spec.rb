@@ -114,4 +114,6 @@ describe "force_encoding plugin" do
     end
   end
 end 
+else
+  skip_warn "force_encoding plugin: only works on ruby 1.9"
 end
