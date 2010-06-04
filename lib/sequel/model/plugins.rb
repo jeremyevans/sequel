@@ -59,8 +59,13 @@ module Sequel
             Sequel::Plugins.const_get(module_name) == Sequel.const_get(module_name))
           begin
             Sequel.tsk_require "sequel/plugins/#{plugin}"
-          rescue LoadError
-            Sequel.tsk_require "sequel_#{plugin}"
+          rescue LoadError => e
+            begin
+              Sequel.tsk_require "sequel_#{plugin}"
+            rescue LoadError => e2
+              e.message << "; #{e2.message}"
+              raise e
+            end
           end
         end
         Sequel::Plugins.const_get(module_name)
