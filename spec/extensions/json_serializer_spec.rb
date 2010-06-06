@@ -32,6 +32,9 @@ describe "Sequel::Plugins::JsonSerializer" do
     @album2 = Album2.load(:id=>2, :name=>'JK')
     @album2.artist = @artist
     @album2.blah = 'Gak'
+    @album3 = Album2.load(:id=>3, :name=>'NP')
+    @album3.artist = @artist
+    @album3.blah = 'Fooey'
   end
   after do
     Object.send(:remove_const, :Artist)
@@ -118,6 +121,17 @@ describe "Sequel::Plugins::JsonSerializer" do
     JSON.parse(@album2.to_json).should == @album2.values.reject{|k,v| k.to_s == 'id'}.inject({}){|h, (k, v)| h[k.to_s] = v; h}
     JSON.parse(@album2.to_json(:only => :name)).should == @album2.values.reject{|k,v| k.to_s != 'name'}.inject({}){|h, (k, v)| h[k.to_s] = v; h}
     JSON.parse(@album2.to_json(:except => :artist_id)).should == @album2.values.reject{|k,v| k.to_s == 'artist_id'}.inject({}){|h, (k, v)| h[k.to_s] = v; h}
+  end
+  
+  it "should handle the :root option to qualify single records" do
+    @album.to_json(:root=>true, :except => [:name, :artist_id]).to_s.should == '{"album":{"id":1}}'
+    @album.to_json(:root=>true, :only => :name).to_s.should == '{"album":{"name":"RF"}}'
+  end
+  
+  it "should handle the :root option to qualify a dataset of records" do
+    album = @album
+    Album.dataset.meta_def(:all){[album, album]}
+    Album.dataset.to_json(:root=>true, :only => :id).to_s.should == '{"albums":[{"album":{"id":1}},{"album":{"id":1}}]}'
   end
 end
 end

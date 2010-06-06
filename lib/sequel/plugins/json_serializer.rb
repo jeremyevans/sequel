@@ -30,6 +30,12 @@ module Sequel
     #   # => '{"json_class":"Album","id":1,"name":"RF","artist_id":2,
     #          "artist":{"json_class":"Artist","name":"YJM"}}'
     #
+    # You can specify the <tt>:root</tt> option to nest the JSON under the
+    # name of the model:
+    #
+    #   album.to_json(:root => true)
+    #   # => '{"album":{"id":1,"name":"RF","artist_id":2}}'
+    #
     # In addition to creating JSON, this plugin also enables Sequel::Model
     # objects to be automatically created when JSON is parsed:
     #
@@ -146,6 +152,8 @@ module Sequel
         # :only :: Symbol or Array of Symbols of columns to only
         #          include in the JSON output, ignoring all other
         #          columns.
+        # :root :: Qualify the JSON with the name of the object.
+        #          Implies :naked since the object name is explicit.
         def to_json(*a)
           if opts = a.first.is_a?(Hash)
             opts = self.class.json_serializer_options.merge(a.first)
@@ -159,7 +167,7 @@ module Sequel
           else
             vals.keys - Array(opts[:except])
           end
-          h = (JSON.create_id && !opts[:naked]) ? {JSON.create_id=>model.name} : {}
+          h = (JSON.create_id && !opts[:naked] && !opts[:root]) ? {JSON.create_id=>model.name} : {}
           cols.each{|c| h[c.to_s] = vals[c]}
           if inc = opts[:include]
             if inc.is_a?(Hash)
@@ -176,6 +184,7 @@ module Sequel
               Array(inc).each{|c| h[c.to_s] = send(c)}
             end
           end
+          h = {model.to_s.underscore => h} if opts[:root]
           h.to_json(*a)
         end
       end
@@ -191,11 +200,8 @@ module Sequel
           else
             opts = model.json_serializer_options
           end
-          if row_proc
-            all.map{|obj| Literal.new(obj.to_json(opts))}.to_json(*a)
-          else
-            all.to_json(*a)
-          end
+          res = row_proc ? all.map{|obj| Literal.new(obj.to_json(opts))} : all
+          opts[:root] ? {model.to_s.underscore.pluralize => res}.to_json(*a) : res.to_json(*a)
         end
       end
     end
