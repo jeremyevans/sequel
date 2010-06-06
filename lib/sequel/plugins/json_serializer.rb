@@ -58,6 +58,12 @@ module Sequel
     #   # Add JSON output capability to Album class instances
     #   Album.plugin :json_serializer
     module JsonSerializer
+      # Set up the column readers to do deserialization and the column writers
+      # to save the value in deserialized_values.
+      def self.apply(model, opts={})
+        model.instance_variable_set(:@json_serializer_options, opts)
+      end
+      
       # Helper class used for making sure that cascading options
       # for model associations works correctly.  Cascaded options
       # work by creating instances of this class, which take a
@@ -75,6 +81,8 @@ module Sequel
       end
 
       module ClassMethods
+        attr_reader :json_serializer_options
+
         # Create a new model object from the hash provided by parsing
         # JSON.  Handles column values (stored in +values+), associations
         # (stored in +associations+), and other values (by calling a
@@ -104,6 +112,14 @@ module Sequel
         def to_json(*a)
           dataset.to_json(*a)
         end
+        
+        # Copy the current model object's default json options into the subclass.
+        def inherited(subclass)
+          super
+          opts = json_serializer_options.dup
+          opts.keys.each{|k| opts[k] = [true,false].include?(opts[k]) ? opts[k] : opts[k].dup}
+          subclass.instance_variable_set(:@json_serializer_options, opts)
+        end
       end
 
       module InstanceMethods
@@ -132,10 +148,10 @@ module Sequel
         #          columns.
         def to_json(*a)
           if opts = a.first.is_a?(Hash)
-            opts = a.first
+            opts = self.class.json_serializer_options.merge(a.first)
             a = []
           else
-            opts = {}
+            opts = self.class.json_serializer_options
           end
           vals = values
           cols = if only = opts[:only]
@@ -169,11 +185,11 @@ module Sequel
         # this dataset.  Takes the same options as the the instance
         # method, and passes them to every instance.
         def to_json(*a)
-          if a.first.is_a?(Hash)
-            opts = a.first
+          if opts = a.first.is_a?(Hash)
+            opts = model.json_serializer_options.merge(a.first)
             a = []
           else
-            opts = {}
+            opts = model.json_serializer_options
           end
           if row_proc
             all.map{|obj| Literal.new(obj.to_json(opts))}.to_json(*a)

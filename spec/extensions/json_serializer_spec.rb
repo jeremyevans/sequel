@@ -1,4 +1,4 @@
-require File.join(File.dirname(__FILE__), "spec_helper")
+require File.expand_path File.join(File.dirname(__FILE__), "spec_helper")
 
 begin
   require 'json'
@@ -18,11 +18,20 @@ describe "Sequel::Plugins::JsonSerializer" do
       columns :id, :name, :artist_id
       many_to_one :artist
     end
+    class ::Album2 < Sequel::Model
+      attr_accessor :blah
+      plugin :json_serializer, :naked => true, :except => :id
+      columns :id, :name, :artist_id
+      many_to_one :artist
+    end
     @artist = Artist.load(:id=>2, :name=>'YJM')
     @artist.associations[:albums] = []
     @album = Album.load(:id=>1, :name=>'RF')
     @album.artist = @artist
     @album.blah = 'Blah'
+    @album2 = Album2.load(:id=>2, :name=>'JK')
+    @album2.artist = @artist
+    @album2.blah = 'Gak'
   end
   after do
     Object.send(:remove_const, :Artist)
@@ -103,6 +112,12 @@ describe "Sequel::Plugins::JsonSerializer" do
     ds = Album.dataset.naked
     ds.meta_def(:all){[album.values]}
     JSON.parse(ds.to_json).should == [@album.values.inject({}){|h, (k, v)| h[k.to_s] = v; h}]
+  end
+
+  it "should propagate class default options to instance to_json output" do
+    JSON.parse(@album2.to_json).should == @album2.values.reject{|k,v| k.to_s == 'id'}.inject({}){|h, (k, v)| h[k.to_s] = v; h}
+    JSON.parse(@album2.to_json(:only => :name)).should == @album2.values.reject{|k,v| k.to_s != 'name'}.inject({}){|h, (k, v)| h[k.to_s] = v; h}
+    JSON.parse(@album2.to_json(:except => :artist_id)).should == @album2.values.reject{|k,v| k.to_s == 'artist_id'}.inject({}){|h, (k, v)| h[k.to_s] = v; h}
   end
 end
 end
