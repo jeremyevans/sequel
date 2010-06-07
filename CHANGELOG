@@ -1,5 +1,7 @@
 === HEAD
 
+* Make :encoding option work on MySQL even if config file specifies different encoding (jeremyevans) (#300)
+
 * Don't attempt to use class polymorphism in the class_table_inheritance plugin if no cti_key is defined (jeremyevans)
 
 * Add a XmlSerializer plugin for serializing/deserializing model objects to/from XML (jeremyevans)
