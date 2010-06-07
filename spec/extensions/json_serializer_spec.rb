@@ -1,4 +1,4 @@
-require File.expand_path File.join(File.dirname(__FILE__), "spec_helper")
+require File.join(File.dirname(__FILE__), "spec_helper")
 
 begin
   require 'json'
@@ -18,23 +18,11 @@ describe "Sequel::Plugins::JsonSerializer" do
       columns :id, :name, :artist_id
       many_to_one :artist
     end
-    class ::Album2 < Sequel::Model
-      attr_accessor :blah
-      plugin :json_serializer, :naked => true, :except => :id
-      columns :id, :name, :artist_id
-      many_to_one :artist
-    end
     @artist = Artist.load(:id=>2, :name=>'YJM')
     @artist.associations[:albums] = []
     @album = Album.load(:id=>1, :name=>'RF')
     @album.artist = @artist
     @album.blah = 'Blah'
-    @album2 = Album2.load(:id=>2, :name=>'JK')
-    @album2.artist = @artist
-    @album2.blah = 'Gak'
-    @album3 = Album2.load(:id=>3, :name=>'NP')
-    @album3.artist = @artist
-    @album3.blah = 'Fooey'
   end
   after do
     Object.send(:remove_const, :Artist)
@@ -118,6 +106,15 @@ describe "Sequel::Plugins::JsonSerializer" do
   end
 
   it "should propagate class default options to instance to_json output" do
+    class ::Album2 < Sequel::Model
+      attr_accessor :blah
+      plugin :json_serializer, :naked => true, :except => :id
+      columns :id, :name, :artist_id
+      many_to_one :artist
+    end
+    @album2 = Album2.load(:id=>2, :name=>'JK')
+    @album2.artist = @artist
+    @album2.blah = 'Gak'
     JSON.parse(@album2.to_json).should == @album2.values.reject{|k,v| k.to_s == 'id'}.inject({}){|h, (k, v)| h[k.to_s] = v; h}
     JSON.parse(@album2.to_json(:only => :name)).should == @album2.values.reject{|k,v| k.to_s != 'name'}.inject({}){|h, (k, v)| h[k.to_s] = v; h}
     JSON.parse(@album2.to_json(:except => :artist_id)).should == @album2.values.reject{|k,v| k.to_s == 'artist_id'}.inject({}){|h, (k, v)| h[k.to_s] = v; h}
@@ -132,6 +129,26 @@ describe "Sequel::Plugins::JsonSerializer" do
     album = @album
     Album.dataset.meta_def(:all){[album, album]}
     Album.dataset.to_json(:root=>true, :only => :id).to_s.should == '{"albums":[{"album":{"id":1}},{"album":{"id":1}}]}'
+  end
+
+  it "should store the default options in json_serializer_opts" do
+    Album.json_serializer_opts.should == {}
+    c = Class.new(Album)
+    c.plugin :json_serializer, :naked=>true
+    c.json_serializer_opts.should == {:naked=>true}
+  end
+
+  it "should work correctly when subclassing" do
+    class ::Artist2 < Artist
+      plugin :json_serializer, :only=>:name
+    end
+    JSON.parse(Artist2.load(:id=>2, :name=>'YYY').to_json).should == Artist2.load(:name=>'YYY')
+    class ::Artist3 < Artist2
+      plugin :json_serializer, :naked=>:true
+    end
+    JSON.parse(Artist3.load(:id=>2, :name=>'YYY').to_json).should == {"name"=>'YYY'}
+    Object.send(:remove_const, :Artist2)
+    Object.send(:remove_const, :Artist3)
   end
 end
 end

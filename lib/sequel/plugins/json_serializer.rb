@@ -66,8 +66,10 @@ module Sequel
     module JsonSerializer
       # Set up the column readers to do deserialization and the column writers
       # to save the value in deserialized_values.
-      def self.apply(model, opts={})
-        model.instance_variable_set(:@json_serializer_options, opts)
+      def self.configure(model, opts={})
+        model.instance_eval do
+          @json_serializer_opts = (@json_serializer_opts || {}).merge(opts)
+        end
       end
       
       # Helper class used for making sure that cascading options
@@ -87,7 +89,8 @@ module Sequel
       end
 
       module ClassMethods
-        attr_reader :json_serializer_options
+        # The default opts to use when serializing model objects to JSON.
+        attr_reader :json_serializer_opts
 
         # Create a new model object from the hash provided by parsing
         # JSON.  Handles column values (stored in +values+), associations
@@ -122,9 +125,9 @@ module Sequel
         # Copy the current model object's default json options into the subclass.
         def inherited(subclass)
           super
-          opts = json_serializer_options.dup
-          opts.keys.each{|k| opts[k] = [true,false].include?(opts[k]) ? opts[k] : opts[k].dup}
-          subclass.instance_variable_set(:@json_serializer_options, opts)
+          opts = {}
+          json_serializer_opts.each{|k, v| opts[k] = (v.is_a?(Array) || v.is_a?(Hash)) ? v.dup : v}
+          subclass.instance_variable_set(:@json_serializer_opts, opts)
         end
       end
 
@@ -156,10 +159,10 @@ module Sequel
         #          Implies :naked since the object name is explicit.
         def to_json(*a)
           if opts = a.first.is_a?(Hash)
-            opts = self.class.json_serializer_options.merge(a.first)
+            opts = model.json_serializer_opts.merge(a.first)
             a = []
           else
-            opts = self.class.json_serializer_options
+            opts = model.json_serializer_opts
           end
           vals = values
           cols = if only = opts[:only]
@@ -184,7 +187,7 @@ module Sequel
               Array(inc).each{|c| h[c.to_s] = send(c)}
             end
           end
-          h = {model.to_s.underscore => h} if opts[:root]
+          h = {model.send(:underscore, model.to_s) => h} if opts[:root]
           h.to_json(*a)
         end
       end
@@ -195,13 +198,13 @@ module Sequel
         # method, and passes them to every instance.
         def to_json(*a)
           if opts = a.first.is_a?(Hash)
-            opts = model.json_serializer_options.merge(a.first)
+            opts = model.json_serializer_opts.merge(a.first)
             a = []
           else
-            opts = model.json_serializer_options
+            opts = model.json_serializer_opts
           end
           res = row_proc ? all.map{|obj| Literal.new(obj.to_json(opts))} : all
-          opts[:root] ? {model.to_s.underscore.pluralize => res}.to_json(*a) : res.to_json(*a)
+          opts[:root] ? {model.send(:pluralize, model.send(:underscore, model.to_s)) => res}.to_json(*a) : res.to_json(*a)
         end
       end
     end
