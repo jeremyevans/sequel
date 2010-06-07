@@ -1,3 +1,7 @@
+=== 3.12.1 (2010-06-09)
+
+* Make :encoding option work on MySQL even if config file specifies different encoding (jeremyevans) (#300)
+
 === 3.12.0 (2010-06-01)
 
 * Add a :deferrable option to foreign_key for creating deferrable foreign keys (hydrow)
