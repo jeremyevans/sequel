@@ -962,3 +962,154 @@ describe "AssociationPks plugin" do
     @db[:albums_tags].filter(:album_id=>@al1).select_order_map(:tag_id).should == []
   end
 end
+
+
+describe "List plugin without a scope" do
+  before do
+    @db = INTEGRATION_DB
+    @db.create_table :sites do
+      primary_key :id
+      String :name
+      Integer :position
+    end
+
+    @c = Class.new(Sequel::Model(@db[:sites]))
+    @c.plugin :list
+    @c.delete
+    @c.create :name => "hig", :position => 3
+    @c.create :name => "def", :position => 2
+    @c.create :name => "abc", :position => 1
+  end
+
+  after do
+    @db.drop_table(:sites)
+  end
+
+  it "should return rows in order of position" do
+    @c.map(:position).should == [1,2,3]
+    @c.map(:name).should == %w[ abc def hig ]
+  end
+
+  it "should define prev and next" do
+    i = @c[:name => "abc"]
+    i.prev.should == nil
+    i = @c[:name => "def"]
+    i.prev.should == @c[:name => "abc"]
+    i.next.should == @c[:name => "hig"]
+    i = @c[:name => "hig"]
+    i.next.should == nil
+  end
+
+  it "should define move_to" do
+    @c[:name => "def"].move_to(1)
+    @c.map(:name).should == %w[ def abc hig ]
+
+    @c[:name => "abc"].move_to(3)
+    @c.map(:name).should == %w[ def hig abc ]
+
+    proc { @c[:name => "abc"].move_to(-1) }.should raise_error(Sequel::Error)
+    proc { @c[:name => "abc"].move_to(10) }.should raise_error(Sequel::Error)
+  end
+
+  it "should define move_to_top and move_to_bottom" do
+    @c[:name => "def"].move_to_top
+    @c.map(:name).should == %w[ def abc hig ]
+
+    @c[:name => "def"].move_to_bottom
+    @c.map(:name).should == %w[ abc hig def ]
+  end
+
+  it "should define move_up and move_down" do
+    @c[:name => "def"].move_up
+    @c.map(:name).should == %w[ def abc hig ]
+
+    @c[:name => "abc"].move_down
+    @c.map(:name).should == %w[ def hig abc ]
+
+    @c[:name => "abc"].move_up(2)
+    @c.map(:name).should == %w[ abc def hig ]
+
+    @c[:name => "abc"].move_down(2)
+    @c.map(:name).should == %w[ def hig abc ]
+
+    proc { @c[:name => "def"].move_up(10) }.should raise_error(Sequel::Error)
+    proc { @c[:name => "def"].move_down(10) }.should raise_error(Sequel::Error)
+  end
+end
+
+describe "List plugin with a scope" do
+  before do
+    @db = INTEGRATION_DB
+    @db.create_table :pages do
+      primary_key :id
+      String :name
+      Integer :pos
+      Integer :parent_id
+    end
+
+    @c = Class.new(Sequel::Model(@db[:pages]))
+    @c.plugin :list, :field => :pos, :scope => :parent_id
+    p1 = @c.create :name => "Hm", :pos => 1, :parent_id => 0
+    p2 = @c.create :name => "Ps", :pos => 1, :parent_id => p1.id
+    @c.create :name => "P1", :pos => 1, :parent_id => p2.id
+    @c.create :name => "P2", :pos => 2, :parent_id => p2.id
+    @c.create :name => "P3", :pos => 3, :parent_id => p2.id
+    @c.create :name => "Au", :pos => 2, :parent_id => p1.id
+  end
+
+  after do
+    @db.drop_table(:pages)
+  end
+
+  it "should return rows in order of position" do
+    @c.map(:name).should == %w[ Hm Ps Au P1 P2 P3 ]
+  end
+
+  it "should define prev and next" do
+    @c[:name => "Ps"].next.name.should == 'Au'
+    @c[:name => "Au"].prev.name.should == 'Ps'
+    @c[:name => "P1"].next.name.should == 'P2'
+    @c[:name => "P2"].prev.name.should == 'P1'
+
+    @c[:name => "P1"].next(2).name.should == 'P3'
+    @c[:name => "P2"].next(-1).name.should == 'P1'
+    @c[:name => "P3"].prev(2).name.should == 'P1'
+    @c[:name => "P2"].prev(-1).name.should == 'P3'
+
+    @c[:name => "Ps"].prev.should == nil
+    @c[:name => "Au"].next.should == nil
+    @c[:name => "P1"].prev.should == nil
+    @c[:name => "P3"].next.should == nil
+  end
+
+  it "should define move_to" do
+    @c[:name => "P2"].move_to(1)
+    @c.map(:name).should == %w[ Hm Ps Au P2 P1 P3 ]
+
+    @c[:name => "P2"].move_to(3)
+    @c.map(:name).should == %w[ Hm Ps Au P1 P3 P2 ]
+
+    proc { @c[:name => "P2"].move_to(-1) }.should raise_error(Sequel::Error)
+    proc { @c[:name => "P2"].move_to(10) }.should raise_error(Sequel::Error)
+  end
+
+  it "should define move_to_top and move_to_bottom" do
+    @c[:name => "Au"].move_to_top
+    @c.map(:name).should == %w[ Hm Au Ps P1 P2 P3 ]
+
+    @c[:name => "Au"].move_to_bottom
+    @c.map(:name).should == %w[ Hm Ps Au P1 P2 P3 ]
+  end
+
+  it "should define move_up and move_down" do
+    @c[:name => "P2"].move_up
+    @c.map(:name).should == %w[ Hm Ps Au P2 P1 P3 ]
+
+    @c[:name => "P1"].move_down
+    @c.map(:name).should == %w[ Hm Ps Au P2 P3 P1 ]
+
+    proc { @c[:name => "P1"].move_up(10) }.should raise_error(Sequel::Error)
+    proc { @c[:name => "P1"].move_down(10) }.should raise_error(Sequel::Error)
+  end
+
+end
