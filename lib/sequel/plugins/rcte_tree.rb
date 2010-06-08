@@ -95,19 +95,18 @@ module Sequel
       # Create the appropriate parent, children, ancestors, and descendants
       # associations for the model.
       def self.apply(model, opts={})
+        model.plugin :tree, opts
+
         opts = opts.dup
         opts[:class] = model
+        opts[:methods_module] = Module.new
+        model.send(:include, opts[:methods_module])
         
         key = opts[:key] ||= :parent_id
         prkey = opts[:primary_key] ||= model.primary_key
         
-        par = opts.merge(opts.fetch(:parent, {}))
-        parent = par.fetch(:name, :parent)
-        model.many_to_one parent, par
-        
-        chi = opts.merge(opts.fetch(:children, {}))
-        childrena = chi.fetch(:name, :children)
-        model.one_to_many childrena, chi
+        parent = opts.merge(opts.fetch(:parent, {})).fetch(:name, :parent)
+        childrena = opts.merge(opts.fetch(:children, {})).fetch(:name, :children)
         
         ka = opts[:key_alias] ||= :x_root_x
         t = opts[:cte_name] ||= :t

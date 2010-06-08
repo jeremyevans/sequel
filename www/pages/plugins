@@ -21,8 +21,8 @@
 <li><a href="rdoc-plugins/classes/Sequel/Plugins/JsonSerializer.html">json_serializer</a>: Allows you to serialize/deserialize model objects to/from JSON.</li>
 <li><a href="rdoc-plugins/classes/Sequel/Plugins/LazyAttributes.html">lazy_attributes</a>: Allows you to set some attributes that should not be loaded by default, but only loaded when an object requests them.</li>
 <li><a href="rdoc-plugins/classes/Sequel/Plugins/List.html">list</a>: Allows you to treat model objects as being part of a list, so you can move them up/down and get next/previous entries.</li>
-<li><a href="rdoc-plugins/classes/Sequel/Plugins/ManyThroughMany.html">many_through_many</a>: Allow you to create an association to multiple objects through multiple join tables.</li>
-<li><a href="rdoc-plugins/classes/Sequel/Plugins/NestedAttributes.html">nested_attributes</a>: Allow you to modified associated objects directly through a model object, similar to ActiveRecord's Nested Attributes.</li>
+<li><a href="rdoc-plugins/classes/Sequel/Plugins/ManyThroughMany.html">many_through_many</a>: Allows you to create an association to multiple objects through multiple join tables.</li>
+<li><a href="rdoc-plugins/classes/Sequel/Plugins/NestedAttributes.html">nested_attributes</a>: Allows you to modified associated objects directly through a model object, similar to ActiveRecord's Nested Attributes.</li>
 <li><a href="rdoc-plugins/classes/Sequel/Plugins/OptimisticLocking.html">optimistic_locking</a>: Adds a database-independent locking mechanism to models to prevent concurrent updates overwriting changes.</li>
 <li><a href="rdoc-plugins/classes/Sequel/Plugins/RcteTree.html">rcte_tree</a>: Supports retrieving all ancestors and descendants for tree structured data using recursive common table expressions.</li>
 <li><a href="rdoc-plugins/classes/Sequel/Plugins/Schema.html">schema</a>: Adds backwards compatibility for Model.set_schema and Model.create_table.</li>
@@ -35,6 +35,7 @@
 <li><a href="rdoc-plugins/classes/Sequel/Plugins/TacticalEagerLoading.html">tactical_eager_loading</a>: Allows you to eagerly load an association for all objects retreived from the same dataset when calling the association method on any of the objects in the dataset.</li>
 <li><a href='rdoc-plugins/classes/Sequel/Plugins/Timestamps.html'>timestamps</a>: Creates hooks for automatically setting create and update timestamps.</li>
 <li><a href='rdoc-plugins/classes/Sequel/Plugins/Touch.html'>touch</a>: Allows easily updating timestamps via Model#touch, as well as touching associations when model instances are updated or destroyed.</li>
+<li><a href="rdoc-plugins/classes/Sequel/Plugins/Tree.html">tree</a>: Allows you to treat model objects as being part of a tree, finding ancestors, descendants, siblings, and tree roots.</li>
 <li><a href='rdoc-plugins/classes/Sequel/Plugins/TypecastOnLoad.html'>typecast_on_load</a>: Fixes bad database typecasting when loading model objects.</li>
 <li><a href="rdoc-plugins/classes/Sequel/Plugins/UpdatePrimaryKey.html">update_primary_key</a>: Allows you to safely update the primary key of a model object.</li>
 <li><a href="rdoc-plugins/classes/Sequel/Plugins/ValidationClassMethods.html">validation_class_methods</a>: Adds backwards compatibility for the legacy class-level validation methods (e.g. validates_presence_of :column).</li>
@@ -48,7 +49,6 @@
 <li><a href='http://github.com/sbfaulkner/sequel_container'>sequel_container</a>: Contained documents (i.e. attachments) for models.</li>
 <li><a href='http://github.com/pkondzior/sequel_nested_set'>sequel_nested_set</a>: Nested set implementation, ported from the Awesome Nested Set Active Record plugin.</li>
 <li><a href='http://github.com/boof/sequel_notnaughty'>sequel_notnaughty</a>: Port of the NotNaughty validation framework.</li>
-<li><a href='http://github.com/mwlang/sequel_plus'>sequel_plus</a>: Collection of sequel plugins, currently including a tree plugin.</li>
 <li><a href='http://github.com/jackdempsey/sequel_polymorphic'>sequel_polymorphic</a>: Lets you easily create polymorphic associations.</li>
 <li><a href='http://github.com/daicoden/sequel_proc_error_handling'>sequel_proc_error_handling</a>: Let's you add procs that automatically rescue and fix model errors.</li>
 <li><a href='http://github.com/pk/sequel_sluggable'>sequel_sluggable</a>: Easy slug behaviour for any model.</li>
@@ -86,6 +86,7 @@
 <li><a href='http://github.com/mooman/rails3_sequel'>rails3-sequel</a>: Rails 3 plugin that allows you to use Sequel instead of ActiveRecord.</li>
 <li><a href='http://github.com/openhood/rspec_sequel_matchers'>rspec_sequel_matchers</a>: RSpec matchers for Sequel validations, associations, and columns.</li>
 <li><a href='http://github.com/gyordanov/sequel_extjs'>sequel_extjs</a>: Generates JSON from datasets that is consumable by the ExtJS JsonStore.</li>
+<li><a href='http://github.com/mwlang/sequel_plus'>sequel_plus</a>: Collection of sequel extensions.</li>
 <li><a href='http://github.com/jeremyevans/sequel_postgresql_triggers'>sequel_postgresql_triggers</a>: Database enforced timestamps, immutable columns, and counter/sum caches.</li>
 <li><a href='http://github.com/jsvd/sequel_vectorized'>sequel_vectorized</a>: Allows Sequel::Dataset to be exported as an Hash of Arrays and NArrays.</li>
 </ul>
