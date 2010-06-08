@@ -550,6 +550,8 @@ module Sequel
         #     columns in the associated table.
         #   - :limit - Limit the number of records to the provided value.  Use
         #     an array with two arguments for the value to specify a limit and an offset.
+        #   - :methods_module - The module that methods the association creates will be placed into. Defaults
+        #     to the module containing the model's columns.
         #   - :order - the column(s) by which to order the association dataset.  Can be a
         #     singular column or an array.
         #   - :order_eager_graph - Whether to add the order to the dataset's order when graphing
@@ -710,37 +712,43 @@ module Sequel
         
         private
       
+        # The module to use for the association's methods.  Defaults to
+        # the overridable_methods_module.
+        def association_module(opts={})
+          opts.fetch(:methods_module, overridable_methods_module)
+        end
+
         # Add a method to the module included in the class, so the method
         # can be easily overridden in the class itself while allowing for
         # super to be called.
-        def association_module_def(name, &block)
-          overridable_methods_module.module_eval{define_method(name, &block)}
+        def association_module_def(name, opts={}, &block)
+          association_module(opts).module_eval{define_method(name, &block)}
         end
       
         # Add a private method to the module included in the class.
-        def association_module_private_def(name, &block)
-          association_module_def(name, &block)
-          overridable_methods_module.send(:private, name)
+        def association_module_private_def(name, opts={}, &block)
+          association_module_def(name, opts, &block)
+          association_module(opts).send(:private, name)
         end
       
         # Add the add_ instance method 
         def def_add_method(opts)
-          association_module_def(opts.add_method){|o,*args| add_associated_object(opts, o, *args)}
+          association_module_def(opts.add_method, opts){|o,*args| add_associated_object(opts, o, *args)}
         end
       
         # Adds methods related to the association's dataset to the module included in the class.
         def def_association_dataset_methods(opts)
           # If a block is given, define a helper method for it, because it takes
           # an argument.  This is unnecessary in Ruby 1.9, as that has instance_exec.
-          association_module_private_def(opts.dataset_helper_method, &opts[:block]) if opts[:block]
-          association_module_private_def(opts._dataset_method, &opts[:dataset])
-          association_module_def(opts.dataset_method){_dataset(opts)}
+          association_module_private_def(opts.dataset_helper_method, opts, &opts[:block]) if opts[:block]
+          association_module_private_def(opts._dataset_method, opts, &opts[:dataset])
+          association_module_def(opts.dataset_method, opts){_dataset(opts)}
           def_association_method(opts)
         end
 
         # Adds method for retrieving the associated objects to the module included in the class.
         def def_association_method(opts)
-          association_module_def(opts.association_method){|*reload| load_associated_objects(opts, reload[0])}
+          association_module_def(opts.association_method, opts){|*reload| load_associated_objects(opts, reload[0])}
         end
       
         # Adds many_to_many association instance methods
@@ -801,16 +809,16 @@ module Sequel
       
           return if opts[:read_only]
       
-          association_module_private_def(opts._add_method) do |o|
+          association_module_private_def(opts._add_method, opts) do |o|
             h = {}
             lcks.zip(lcpks).each{|k, pk| h[k] = send(pk)}
             rcks.zip(opts.right_primary_keys).each{|k, pk| h[k] = o.send(pk)}
             _join_table_dataset(opts).insert(h)
           end
-          association_module_private_def(opts._remove_method) do |o|
+          association_module_private_def(opts._remove_method, opts) do |o|
             _join_table_dataset(opts).filter(lcks.zip(lcpks.map{|k| send(k)}) + rcks.zip(opts.right_primary_keys.map{|k| o.send(k)})).delete
           end
-          association_module_private_def(opts._remove_all_method) do
+          association_module_private_def(opts._remove_all_method, opts) do
             _join_table_dataset(opts).filter(lcks.zip(lcpks.map{|k| send(k)})).delete
           end
       
@@ -863,8 +871,8 @@ module Sequel
           
           return if opts[:read_only]
       
-          association_module_private_def(opts._setter_method){|o| cks.zip(opts.primary_keys).each{|k, pk| send(:"#{k}=", (o.send(pk) if o))}}
-          association_module_def(opts.setter_method){|o| set_associated_object(opts, o)}
+          association_module_private_def(opts._setter_method, opts){|o| cks.zip(opts.primary_keys).each{|k, pk| send(:"#{k}=", (o.send(pk) if o))}}
+          association_module_def(opts.setter_method, opts){|o| set_associated_object(opts, o)}
         end
         
         # Adds one_to_many association instance methods
@@ -931,7 +939,7 @@ module Sequel
             validate = opts[:validate]
 
             if one_to_one
-              association_module_private_def(opts._setter_method) do |o|
+              association_module_private_def(opts._setter_method, opts) do |o|
                 up_ds = _apply_association_options(opts, opts.associated_class.filter(cks.zip(cpks.map{|k| send(k)})))
                 if o
                   up_ds = up_ds.exclude(o.pk_hash)
@@ -942,19 +950,19 @@ module Sequel
                   o.save(:validate=>validate) || raise(Sequel::Error, "invalid associated object, cannot save") if o
                 end
               end
-              association_module_def(opts.setter_method){|o| set_one_to_one_associated_object(opts, o)}
+              association_module_def(opts.setter_method, opts){|o| set_one_to_one_associated_object(opts, o)}
             else 
-              association_module_private_def(opts._add_method) do |o|
+              association_module_private_def(opts._add_method, opts) do |o|
                 cks.zip(cpks).each{|k, pk| o.send(:"#{k}=", send(pk))}
                 o.save(:validate=>validate) || raise(Sequel::Error, "invalid associated object, cannot save")
               end
               def_add_method(opts)
       
-              association_module_private_def(opts._remove_method) do |o|
+              association_module_private_def(opts._remove_method, opts) do |o|
                 cks.each{|k| o.send(:"#{k}=", nil)}
                 o.save(:validate=>validate) || raise(Sequel::Error, "invalid associated object, cannot save")
               end
-              association_module_private_def(opts._remove_all_method) do
+              association_module_private_def(opts._remove_all_method, opts) do
                 _apply_association_options(opts, opts.associated_class.filter(cks.zip(cpks.map{|k| send(k)}))).update(ck_nil_hash)
               end
               def_remove_methods(opts)
@@ -969,8 +977,8 @@ module Sequel
         
         # Add the remove_ and remove_all instance methods
         def def_remove_methods(opts)
-          association_module_def(opts.remove_method){|o,*args| remove_associated_object(opts, o, *args)}
-          association_module_def(opts.remove_all_method){|*args| remove_all_associated_objects(opts, *args)}
+          association_module_def(opts.remove_method, opts){|o,*args| remove_associated_object(opts, o, *args)}
+          association_module_def(opts.remove_all_method, opts){|*args| remove_all_associated_objects(opts, *args)}
         end
       end
 

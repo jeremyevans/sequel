@@ -39,13 +39,13 @@ module Sequel
 
         # Define a association_pks method using the block for the association reflection 
         def def_association_pks_getter(opts, &block)
-          association_module_def(:"#{singularize(opts[:name])}_pks", &block)
+          association_module_def(:"#{singularize(opts[:name])}_pks", opts, &block)
         end
 
         # Define a association_pks= method using the block for the association reflection,
         # if the association is not read only.
         def def_association_pks_setter(opts, &block)
-          association_module_def(:"#{singularize(opts[:name])}_pks=", &block) unless opts[:read_only]
+          association_module_def(:"#{singularize(opts[:name])}_pks=", opts, &block) unless opts[:read_only]
         end
 
         # Add a getter that checks the join table for matching records and

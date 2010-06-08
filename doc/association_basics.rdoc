@@ -1386,3 +1386,16 @@ a one_to_one association that can actually return more than one row
 a many_to_many association where there is a unique index in the join table
 so that you know only one object will ever be associated through the
 association.
+
+==== :methods_module
+
+The module that the methods created by the association will be placed
+into.  Defaults to the module containing the model's columns.  This
+is not included in the model's class, so you are responsible for doing
+that manually.
+
+This is only useful in rare cases, such as when a plugin that adds
+associations depends on another plugin that defines instance methods of
+the same name.  In that case, the instance methods of the dependent
+plugin would override the association methods created by the main
+plugin.

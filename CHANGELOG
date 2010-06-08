@@ -1,5 +1,9 @@
 === HEAD
 
+* Add a :methods_module association option, for choosing the module into which association methods are placed (jeremyevans)
+
+* Add a List plugin for treating model objects as being part of a list (jeremyevans)
+
 * Make :encoding option work on MySQL even if config file specifies different encoding (jeremyevans) (#300)
 
 * Don't attempt to use class polymorphism in the class_table_inheritance plugin if no cti_key is defined (jeremyevans)

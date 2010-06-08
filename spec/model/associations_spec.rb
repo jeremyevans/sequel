@@ -461,6 +461,21 @@ describe Sequel::Model, "many_to_one" do
     @c2.instance_methods(false).collect{|x| x.to_s}.should_not(include('parent='))
   end
 
+  it "should add associations methods to the :methods_module option" do
+    m = Module.new
+    @c2.many_to_one :parent, :class => @c2, :methods_module=>m
+    m.instance_methods.collect{|x| x.to_s}.should(include('parent'))
+    m.instance_methods.collect{|x| x.to_s}.should(include('parent='))
+    @c2.instance_methods.collect{|x| x.to_s}.should_not(include('parent'))
+    @c2.instance_methods.collect{|x| x.to_s}.should_not(include('parent='))
+  end
+
+  it "should add associations methods directly to class if :methods_module is the class itself" do
+    @c2.many_to_one :parent, :class => @c2, :methods_module=>@c2
+    @c2.instance_methods(false).collect{|x| x.to_s}.should(include('parent'))
+    @c2.instance_methods(false).collect{|x| x.to_s}.should(include('parent='))
+  end
+
   it "should raise an error if trying to set a model object that doesn't have a valid primary key" do
     @c2.many_to_one :parent, :class => @c2
     p = @c2.new

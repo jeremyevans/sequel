@@ -41,7 +41,7 @@ module Sequel
         # Changes the association method to return a proxy instead of the associated objects
         # directly.
         def def_association_method(opts)
-          opts.returns_array? ? association_module_def(opts.association_method){|*r| AssociationProxy.new(self, opts, r[0])} : super
+          opts.returns_array? ? association_module_def(opts.association_method, opts){|*r| AssociationProxy.new(self, opts, r[0])} : super
         end
       end
     end
