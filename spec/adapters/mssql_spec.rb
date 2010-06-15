@@ -15,7 +15,7 @@ logger = Object.new
 def logger.method_missing(m, msg)
   MSSQL_DB.sqls << msg
 end
-MSSQL_DB.logger = logger
+MSSQL_DB.loggers = [logger]
 
 MSSQL_DB.create_table! :test do
   text :name

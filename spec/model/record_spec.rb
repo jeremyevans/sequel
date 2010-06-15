@@ -1462,7 +1462,6 @@ describe Sequel::Model, "typecasting" do
   specify "should raise an error if invalid data is used in a time field" do
     @c.instance_variable_set(:@db_schema, {:x=>{:type=>:time}})
     proc{@c.new.x = '0000'}.should raise_error
-    proc{@c.new.x = 'a'}.should_not raise_error # Valid Time
     proc{@c.new.x = Date.parse('2008-10-21')}.should raise_error(Sequel::InvalidValue)
     proc{@c.new.x = DateTime.parse('2008-10-21')}.should raise_error(Sequel::InvalidValue)
   end
@@ -1519,7 +1518,6 @@ describe Sequel::Model, "typecasting" do
   specify "should raise an error if invalid data is used in a datetime field" do
     @c.instance_variable_set(:@db_schema, {:x=>{:type=>:datetime}})
     proc{@c.new.x = '0000'}.should raise_error(Sequel::InvalidValue)
-    proc{@c.new.x = 'a'}.should_not raise_error # Valid Time
     Sequel.datetime_class = DateTime
     proc{@c.new.x = '0000'}.should raise_error(Sequel::InvalidValue)
     proc{@c.new.x = 'a'}.should raise_error(Sequel::InvalidValue)

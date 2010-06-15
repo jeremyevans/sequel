@@ -213,6 +213,7 @@ context "Database#log_info" do
   before do
     @o = Object.new
     def @o.logs; @logs || []; end
+    def @o.to_ary; [self]; end
     def @o.method_missing(*args); (@logs ||= []) << args; end
     @db = Sequel::Database.new(:logger=>@o)
   end
@@ -234,6 +235,7 @@ context "Database#log_yield" do
     def @o.logs; @logs || []; end
     def @o.warn(*args); (@logs ||= []) << [:warn] + args; end
     def @o.method_missing(*args); (@logs ||= []) << args; end
+    def @o.to_ary; [self]; end
     @db = Sequel::Database.new(:logger=>@o)
   end
 

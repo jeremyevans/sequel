@@ -84,6 +84,12 @@ module Sequel
         ([self.class] + self.class.comparison_attrs.map{|x| send(x)}).hash
       end
 
+      # Show the class name and instance variables for the object, necessary
+      # for correct operation on ruby 1.9.2.
+      def inspect
+        "#<#{self.class} #{instance_variables.map{|iv| "#{iv}=>#{instance_variable_get(iv)}"}.join(', ')}>"
+      end
+
       # Returns self, because SQL::Expression already acts like
       # LiteralString.
       def lit
