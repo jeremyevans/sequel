@@ -1,4 +1,4 @@
-require File.join(File.dirname(__FILE__), 'spec_helper.rb')
+require File.join(File.dirname(File.expand_path(__FILE__)), 'spec_helper.rb')
 
 # H2 and MSSQL don't support USING joins
 unless [:h2, :mssql].include?(INTEGRATION_DB.database_type)

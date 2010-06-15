@@ -1,4 +1,4 @@
-require File.join(File.dirname(__FILE__), 'spec_helper.rb')
+require File.join(File.dirname(File.expand_path(__FILE__)), 'spec_helper.rb')
 
 if INTEGRATION_DB.respond_to?(:schema_parse_table, true)
 describe "Database schema parser" do

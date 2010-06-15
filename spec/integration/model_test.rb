@@ -1,4 +1,4 @@
-require File.join(File.dirname(__FILE__), 'spec_helper.rb')
+require File.join(File.dirname(File.expand_path(__FILE__)), 'spec_helper.rb')
 
 describe "Sequel::Model basic support" do 
   before do

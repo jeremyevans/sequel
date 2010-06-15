@@ -1,4 +1,4 @@
-require File.join(File.dirname(__FILE__), 'spec_helper')
+require File.join(File.dirname(File.expand_path(__FILE__)), 'spec_helper')
 
 context "Sequel sql_expr extension" do
   specify "Object#sql_expr should wrap the object in a GenericComplexExpression" do

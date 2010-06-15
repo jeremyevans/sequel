@@ -1,4 +1,4 @@
-require File.join(File.dirname(__FILE__), 'spec_helper.rb')
+require File.join(File.dirname(File.expand_path(__FILE__)), 'spec_helper.rb')
 
 unless defined?(SQLITE_DB)
   SQLITE_URL = 'sqlite:/' unless defined? SQLITE_URL

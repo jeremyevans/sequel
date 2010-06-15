@@ -1,4 +1,4 @@
-require File.join(File.dirname(__FILE__), 'spec_helper')
+require File.join(File.dirname(File.expand_path(__FILE__)), 'spec_helper')
 
 describe String do
   it "#camelize and #camelcase should transform the word to CamelCase" do

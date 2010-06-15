@@ -1,4 +1,4 @@
-require File.join(File.dirname(__FILE__), 'spec_helper.rb')
+require File.join(File.dirname(File.expand_path(__FILE__)), 'spec_helper.rb')
 
 shared_examples_for "regular and composite key associations" do  
   specify "should return no objects if none are associated" do

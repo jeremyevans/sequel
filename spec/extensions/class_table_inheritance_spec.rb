@@ -1,4 +1,4 @@
-require File.join(File.dirname(__FILE__), "spec_helper")
+require File.join(File.dirname(File.expand_path(__FILE__)), "spec_helper")
 
 describe "class_table_inheritance plugin" do
   before do

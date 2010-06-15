@@ -1,4 +1,4 @@
-require File.join(File.dirname(__FILE__), "spec_helper")
+require File.join(File.dirname(File.expand_path(__FILE__)), "spec_helper")
 if RUBY_VERSION >= '1.9.0'
 describe "force_encoding plugin" do
   before do

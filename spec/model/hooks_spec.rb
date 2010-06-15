@@ -1,4 +1,4 @@
-require File.join(File.dirname(__FILE__), "spec_helper")
+require File.join(File.dirname(File.expand_path(__FILE__)), "spec_helper")
 
 describe "Model#after_initialize" do
   specify "should be called after initialization" do
