@@ -402,3 +402,25 @@ context "A MSSQL database" do
     (s[:max_chars] || s[:column_size]).should == 2
   end
 end
+
+context "MSSQL::Database#rename_table" do
+  specify "should work on non-schema bound tables which need escaping" do
+    MSSQL_DB.quote_identifiers = true
+    MSSQL_DB.create_table! :'foo bar' do
+      text :name
+    end
+    proc { MSSQL_DB.rename_table 'foo bar', 'baz' }.should_not raise_error
+  end
+  
+  specify "should workd on schema bound tables" do
+    MSSQL_DB.execute(<<-SQL)
+      IF NOT EXISTS (SELECT * FROM sys.schemas WHERE name = 'MY')
+        EXECUTE sp_executesql N'create schema MY'
+    SQL
+    MSSQL_DB.create_table! :MY__foo do
+      text :name
+    end
+    proc { MSSQL_DB.rename_table :MY__foo, :MY__bar }.should_not raise_error
+    proc { MSSQL_DB.rename_table :MY__bar, :foo }.should_not raise_error
+  end
+end

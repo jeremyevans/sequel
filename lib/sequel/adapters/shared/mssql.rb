@@ -67,7 +67,7 @@ module Sequel
         when :add_column
           "ALTER TABLE #{quote_schema_table(table)} ADD #{column_definition_sql(op)}"
         when :rename_column
-          "SP_RENAME #{literal("#{quote_schema_table(table)}.#{quote_identifier(op[:name])}")}, #{literal(op[:new_name].to_s)}, 'COLUMN'"
+          "sp_rename #{literal("#{quote_schema_table(table)}.#{quote_identifier(op[:name])}")}, #{literal(op[:new_name].to_s)}, 'COLUMN'"
         when :set_column_type
           "ALTER TABLE #{quote_schema_table(table)} ALTER COLUMN #{quote_identifier(op[:name])} #{type_literal(op)}"
         when :set_column_null
@@ -124,9 +124,9 @@ module Sequel
         ds
       end
       
-      # Use SP_RENAME to rename the table
+      # Use sp_rename to rename the table
       def rename_table_sql(name, new_name)
-        "SP_RENAME #{quote_schema_table(name)}, #{quote_schema_table(new_name)}"
+        "sp_rename #{literal(quote_schema_table(name))}, #{quote_identifier(schema_and_table(new_name).pop)}"
       end
       
       # SQL to rollback to a savepoint
