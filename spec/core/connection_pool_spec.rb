@@ -70,7 +70,7 @@ context "A connection pool handling connections" do
     @cpool.hold {:block_return}.should == :block_return
   end
 
-  if RUBY_VERSION < '1.9.0' and (!defined?(RUBY_ENGINE) or RUBY_ENGINE != 'jruby')
+  if RUBY_VERSION < '1.9.0' and !defined?(RUBY_ENGINE)
     specify "#hold should remove dead threads from the pool if it reaches its max_size" do
       Thread.new{@cpool.hold{Thread.current.exit!}}.join
       @cpool.allocated.keys.map{|t| t.alive?}.should == [false]
