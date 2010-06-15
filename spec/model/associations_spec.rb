@@ -500,15 +500,15 @@ describe Sequel::Model, "many_to_one" do
     h = []
     @c2.many_to_one :parent, :class => @c2, :before_set=>[proc{|x,y| h << x.pk; h << (y ? -y.pk : :y)}, :blah], :after_set=>proc{h << 3}
     @c2.class_eval do
-      @@blah = h
+      class_variable_set(:@@blah, h)
       def []=(a, v)
-        a == :parent_id ? (@@blah << (v ? 4 : 5)) : super
+        a == :parent_id ? (self.class.send(:class_variable_get, :@@blah) << (v ? 4 : 5)) : super
       end
       def blah(x)
-        @@blah << (x ? x.pk : :x)
+        self.class.send(:class_variable_get, :@@blah) << (x ? x.pk : :x)
       end
       def blahr(x)
-        @@blah << 6
+        self.class.send(:class_variable_get, :@@blah) << 6
       end
     end
     p = @c2.load(:id=>10)
@@ -524,9 +524,9 @@ describe Sequel::Model, "many_to_one" do
     h = []
     @c2.many_to_one :parent, :class => @c2, :after_load=>[proc{|x,y| h << [x.pk, y.pk]}, :al]
     @c2.class_eval do
-      @@blah = h
+      class_variable_set(:@@blah, h)
       def al(v)
-        @@blah << v.pk
+        self.class.send(:class_variable_get, :@@blah) << v.pk
       end
       def @dataset.fetch_rows(sql)
         yield({:id=>20})
@@ -568,15 +568,15 @@ describe Sequel::Model, "many_to_one" do
     h = []
     @c2.many_to_one :parent, :class => @c2, :before_set=>:bs, :after_set=>:as
     @c2.class_eval do
-      @@blah = h
+      class_variable_set(:@@blah, h)
       def []=(a, v)
-        a == :parent_id ? (@@blah << 5) : super
+        a == :parent_id ? (self.class.send(:class_variable_get, :@@blah) << 5) : super
       end
       def bs(x)
-        @@blah << x.pk
+        self.class.send(:class_variable_get, :@@blah) << x.pk
       end
       def as(x)
-        @@blah << x.pk * 2
+        self.class.send(:class_variable_get, :@@blah) << x.pk * 2
       end
     end
     p.parent = c
@@ -983,12 +983,12 @@ describe Sequel::Model, "one_to_one" do
     h = []
     @c2.one_to_one :parent, :class => @c2, :before_set=>[proc{|x,y| h << x.pk; h << (y ? -y.pk : :y)}, :blah], :after_set=>proc{h << 3}
     @c2.class_eval do
-      @@blah = h
+      class_variable_set(:@@blah, h)
       def blah(x)
-        @@blah << (x ? x.pk : :x)
+        self.class.send(:class_variable_get, :@@blah) << (x ? x.pk : :x)
       end
       def blahr(x)
-        @@blah << 6
+        self.class.send(:class_variable_get, :@@blah) << 6
       end
     end
     p = @c2.load(:id=>10)
@@ -1004,9 +1004,9 @@ describe Sequel::Model, "one_to_one" do
     h = []
     @c2.one_to_one :parent, :class => @c2, :after_load=>[proc{|x,y| h << [x.pk, y.pk]}, :al]
     @c2.class_eval do
-      @@blah = h
+      class_variable_set(:@@blah, h)
       def al(v)
-        @@blah << v.pk
+        self.class.send(:class_variable_get, :@@blah) << v.pk
       end
       def @dataset.fetch_rows(sql)
         yield({:id=>20})
@@ -1048,15 +1048,15 @@ describe Sequel::Model, "one_to_one" do
     h = []
     @c2.one_to_one :parent, :class => @c2, :before_set=>:bs, :after_set=>:as
     @c2.class_eval do
-      @@blah = h
+      class_variable_set(:@@blah, h)
       def []=(a, v)
-        a == :node_id ? (@@blah << 5) : super
+        a == :node_id ? (self.class.send(:class_variable_get, :@@blah) << 5) : super
       end
       def bs(x)
-        @@blah << x.pk
+        self.class.send(:class_variable_get, :@@blah) << x.pk
       end
       def as(x)
-        @@blah << x.pk * 2
+        self.class.send(:class_variable_get, :@@blah) << x.pk * 2
       end
     end
     p.parent = c
@@ -1739,18 +1739,18 @@ describe Sequel::Model, "one_to_many" do
     h = []
     @c2.one_to_many :attributes, :class => @c1, :before_add=>[proc{|x,y| h << x.pk; h << -y.pk}, :blah], :after_add=>proc{h << 3}, :before_remove=>:blah, :after_remove=>[:blahr]
     @c2.class_eval do
-      @@blah = h
+      class_variable_set(:@@blah, h)
       def _add_attribute(v)
-        @@blah << 4
+        self.class.send(:class_variable_get, :@@blah) << 4
       end
       def _remove_attribute(v)
-        @@blah << 5
+        self.class.send(:class_variable_get, :@@blah) << 5
       end
       def blah(x)
-        @@blah << x.pk
+        self.class.send(:class_variable_get, :@@blah) << x.pk
       end
       def blahr(x)
-        @@blah << 6
+        self.class.send(:class_variable_get, :@@blah) << 6
       end
     end
     p = @c2.load(:id=>10)
@@ -1766,9 +1766,9 @@ describe Sequel::Model, "one_to_many" do
     h = []
     @c2.one_to_many :attributes, :class => @c1, :after_load=>[proc{|x,y| h << [x.pk, y.collect{|z|z.pk}]}, :al]
     @c2.class_eval do
-      @@blah = h
+      class_variable_set(:@@blah, h)
       def al(v)
-        v.each{|x| @@blah << x.pk}
+        v.each{|x| self.class.send(:class_variable_get, :@@blah) << x.pk}
       end
     end
     @c1.class_eval do
@@ -2492,18 +2492,18 @@ describe Sequel::Model, "many_to_many" do
     h = []
     @c2.many_to_many :attributes, :class => @c1, :before_add=>[proc{|x,y| h << x.pk; h << -y.pk}, :blah], :after_add=>proc{h << 3}, :before_remove=>:blah, :after_remove=>[:blahr]
     @c2.class_eval do
-      @@blah = h
+      class_variable_set(:@@blah, h)
       def _add_attribute(v)
-        @@blah << 4
+        self.class.send(:class_variable_get, :@@blah) << 4
       end
       def _remove_attribute(v)
-        @@blah << 5
+        self.class.send(:class_variable_get, :@@blah) << 5
       end
       def blah(x)
-        @@blah << x.pk
+        self.class.send(:class_variable_get, :@@blah) << x.pk
       end
       def blahr(x)
-        @@blah << 6
+        self.class.send(:class_variable_get, :@@blah) << 6
       end
     end
     p = @c2.load(:id=>10)
@@ -2519,9 +2519,9 @@ describe Sequel::Model, "many_to_many" do
     h = []
     @c2.many_to_many :attributes, :class => @c1, :after_load=>[proc{|x,y| h << [x.pk, y.collect{|z|z.pk}]}, :al]
     @c2.class_eval do
-      @@blah = h
+      class_variable_set(:@@blah, h)
       def al(v)
-        v.each{|x| @@blah << x.pk}
+        v.each{|x| self.class.send(:class_variable_get, :@@blah) << x.pk}
       end
     end
     @c1.class_eval do

@@ -3,12 +3,12 @@ require File.join(File.dirname(File.expand_path(__FILE__)), "spec_helper")
 describe Sequel::Model::DatasetMethods, "#destroy"  do
   before do
     @c = Class.new(Sequel::Model(:items)) do
-      @@destroyed = []
+      class_variable_set(:@@destroyed, [])
       def destroy
-        @@destroyed << self
+        self.class.send(:class_variable_get, :@@destroyed) << self
       end
       def self.destroyed
-        @@destroyed
+        class_variable_get(:@@destroyed)
       end
     end
     @d = @c.dataset

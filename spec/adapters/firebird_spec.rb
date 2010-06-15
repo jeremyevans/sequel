@@ -13,7 +13,7 @@ logger = Object.new
 def logger.method_missing(m, msg)
   FIREBIRD_DB.sqls.push(msg)
 end
-FIREBIRD_DB.logger = logger
+FIREBIRD_DB.loggers = [logger]
 
 FIREBIRD_DB.create_table! :test do
   varchar :name,  :size => 50

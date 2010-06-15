@@ -25,7 +25,7 @@ logger = Object.new
 def logger.method_missing(m, msg)
   MYSQL_DB.sqls << msg
 end
-MYSQL_DB.logger = logger
+MYSQL_DB.loggers = [logger]
 MYSQL_DB.drop_table(:items) rescue nil
 MYSQL_DB.drop_table(:dolls) rescue nil
 MYSQL_DB.drop_table(:booltest) rescue nil

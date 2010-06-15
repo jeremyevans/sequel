@@ -2185,12 +2185,12 @@ end
 context "Dataset#range" do
   before do
     c = Class.new(Sequel::Dataset) do
-      @@sql = nil
+      class_variable_set(:@@sql, nil)
       
-      def last_sql; @@sql; end
+      def last_sql; self.class.send(:class_variable_get, :@@sql); end
       
       def fetch_rows(sql)
-        @@sql = sql
+        self.class.send(:class_variable_set, :@@sql, sql)
         yield(:v1 => 1, :v2 => 10)
       end
     end
@@ -2218,12 +2218,12 @@ end
 context "Dataset#interval" do
   before do
     c = Class.new(Sequel::Dataset) do
-      @@sql = nil
+      class_variable_set(:@@sql, nil)
       
-      def last_sql; @@sql; end
+      def last_sql; self.class.send(:class_variable_get, :@@sql); end
       
       def fetch_rows(sql)
-        @@sql = sql
+        self.class.send(:class_variable_set, :@@sql, sql)
         yield(:v => 1234)
       end
     end
@@ -2428,14 +2428,14 @@ end
 context "Dataset#[]" do
   before do
     @c = Class.new(Sequel::Dataset) do
-      @@last_dataset = nil
+      class_variable_set(:@@last_dataset, nil)
       
       def self.last_dataset
-        @@last_dataset
+        class_variable_get(:@@last_dataset)
       end
 
       def single_record
-        @@last_dataset = opts ? clone(opts) : self
+        self.class.send(:class_variable_set, :@@last_dataset, opts ? clone(opts) : self)
         {1 => 2, 3 => 4}
       end
     end

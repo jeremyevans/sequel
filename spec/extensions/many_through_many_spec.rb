@@ -245,9 +245,9 @@ describe Sequel::Model, "many_through_many" do
     h = []
     @c1.many_through_many :tags, [[:albums_artists, :artist_id, :album_id], [:albums, :id, :id], [:albums_tags, :album_id, :tag_id]], :after_load=>:al
     @c1.class_eval do
-      @@blah = h
+      class_variable_set(:@@blah, h)
       def al(v)
-        v.each{|x| @@blah << x.pk * 20}
+        v.each{|x| self.class.send(:class_variable_get, :@@blah) << x.pk * 20}
       end
     end
     @c2.class_eval do
