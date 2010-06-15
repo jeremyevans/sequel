@@ -295,8 +295,8 @@ Examples:
 
 == Dataset Method
 
-In addition to the above methods, associations also add a dataset method
-that returns a dataset representing the objects in the associated table:
+In addition to the above methods, associations also add a instance method
+ending in +_dataset+ that returns a dataset representing the objects in the associated table:
 
   @album.artist_id
   # 10
