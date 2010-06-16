@@ -89,82 +89,37 @@ end
 begin
   require "spec/rake/spectask"
 
-  spec_opts = lambda do
-    lib_dir = File.join(File.dirname(__FILE__), 'lib')
+  spec = lambda do |name, files, d|
+    lib_dir = File.join(File.dirname(File.expand_path(__FILE__)), 'lib')
     ENV['RUBYLIB'] ? (ENV['RUBYLIB'] += ":#{lib_dir}") : (ENV['RUBYLIB'] = lib_dir)
+    desc d
+    Spec::Rake::SpecTask.new(name) do |t|
+      t.spec_files = files
+      t.spec_opts = ENV['SEQUEL_SPEC_OPTS'].split if ENV['SEQUEL_SPEC_OPTS']
+    end
   end
 
-  rcov_opts = lambda do
-    [true, File.read("spec/rcov.opts").split("\n")]
+  spec_with_cov = lambda do |name, files, d|
+    spec.call(name, files, d)
+    t = spec.call("#{name}_cov", files, "#{d} with coverage")
+    t.rcov = true
+    t.rcov_opts = File.read("spec/rcov.opts").split("\n")
   end
   
-  desc "Run core and model specs with coverage"
-  Spec::Rake::SpecTask.new("spec_coverage") do |t|
-    t.spec_files = Dir["spec/{core,model}/*_spec.rb"]
-    spec_opts.call
-    t.rcov, t.rcov_opts = rcov_opts.call
-  end
-  
-  desc "Run core and model specs"
   task :default => [:spec]
-  Spec::Rake::SpecTask.new("spec") do |t|
-    t.spec_files = Dir["spec/{core,model}/*_spec.rb"]
-    spec_opts.call
-  end
-  
-  desc "Run core specs"
-  Spec::Rake::SpecTask.new("spec_core") do |t|
-    t.spec_files = Dir["spec/core/*_spec.rb"]
-    spec_opts.call
-  end
-  
-  desc "Run model specs"
-  Spec::Rake::SpecTask.new("spec_model") do |t|
-    t.spec_files = Dir["spec/model/*_spec.rb"]
-    spec_opts.call
-  end
-  
-  desc "Run extension/plugin specs"
-  Spec::Rake::SpecTask.new("spec_plugin") do |t|
-    t.spec_files = Dir["spec/extensions/*_spec.rb"]
-    spec_opts.call
-  end
-  
-  desc "Run extention/plugin specs with coverage"
-  Spec::Rake::SpecTask.new("spec_plugin_cov") do |t|
-    t.spec_files = Dir["spec/extensions/*_spec.rb"]
-    spec_opts.call
-    t.rcov, t.rcov_opts = rcov_opts.call
-  end
-  
-  desc "Run integration tests"
-  Spec::Rake::SpecTask.new("integration") do |t|
-    t.spec_files = Dir["spec/integration/*_test.rb"]
-    spec_opts.call
-  end
-  
-  desc "Run integration tests with coverage"
-  Spec::Rake::SpecTask.new("integration_cov") do |t|
-    t.spec_files = Dir["spec/integration/*_test.rb"]
-    spec_opts.call
-    t.rcov, t.rcov_opts = rcov_opts.call
-  end
+  spec_with_cov.call("spec", Dir["spec/{core,model}/*_spec.rb"], "Run core and model specs")
+  spec.call("spec_core", Dir["spec/core/*_spec.rb"], "Run core specs")
+  spec.call("spec_model", Dir["spec/model/*_spec.rb"], "Run model specs")
+  spec_with_cov.call("spec_plugin", Dir["spec/extensions/*_spec.rb"], "Run extension/plugin specs")
+  spec_with_cov.call("spec_integration", Dir["spec/integration/*_test.rb"], "Run integration tests")
   
   %w'postgres sqlite mysql informix oracle firebird mssql'.each do |adapter|
-    desc "Run #{adapter} specs"
-    Spec::Rake::SpecTask.new("spec_#{adapter}") do |t|
-      t.spec_files = ["spec/adapters/#{adapter}_spec.rb"] + Dir["spec/integration/*_test.rb"]
-      spec_opts.call
-    end
-
-    desc "Run #{adapter} specs with coverage"
-    Spec::Rake::SpecTask.new("spec_#{adapter}_cov") do |t|
-      t.spec_files = ["spec/adapters/#{adapter}_spec.rb"] + Dir["spec/integration/*_test.rb"]
-      spec_opts.call
-      t.rcov, t.rcov_opts = rcov_opts.call
-    end
+    spec_with_cov.call("spec_#{adapter}", ["spec/adapters/#{adapter}_spec.rb"] + Dir["spec/integration/*_test.rb"], "Run #{adapter} specs")
   end
 rescue LoadError
+  task :default do
+    puts "Must install rspec to run the default task (which runs specs)"
+  end
 end
 
 desc "check documentation coverage"
