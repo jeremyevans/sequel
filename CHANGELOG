@@ -1,5 +1,7 @@
 === HEAD
 
+* Cache prepared statements when using the native sqlite driver, improving performance (jeremyevans)
+
 * Add a Tree plugin for treating model objects as being part of a tree (jeremyevans, mwlang)
 
 * Add a :methods_module association option, for choosing the module into which association methods are placed (jeremyevans)

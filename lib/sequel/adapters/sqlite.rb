@@ -61,6 +61,11 @@ module Sequel
         
         # Handle blob values with Sequel::SQL::Blob
         db.translator.add_translator("blob"){|t,v| ::Sequel::SQL::Blob.new(v)}
+
+        class << db
+          attr_reader :prepared_statements
+        end
+        db.instance_variable_set(:@prepared_statements, {})
         
         db
       end
@@ -70,39 +75,60 @@ module Sequel
         SQLite::Dataset.new(self, opts)
       end
       
+      # Run the given SQL with the given arguments and yield each row.
+      def execute(sql, opts={}, &block)
+        _execute(:select, sql, opts, &block)
+      end
+
       # Run the given SQL with the given arguments and return the number of changed rows.
       def execute_dui(sql, opts={})
-        _execute(opts){|conn| log_yield(sql, opts[:arguments]){conn.execute_batch(sql, opts.fetch(:arguments, []))}; conn.changes}
+        _execute(:update, sql, opts)
+      end
+      
+      # Drop any prepared statements on the connection when executing DDL.  This is because
+      # prepared statements lock the table in such a way that you can't drop or alter the
+      # table while a prepared statement that references it still exists.
+      def execute_ddl(sql, opts={})
+        synchronize(opts[:server]) do |conn|
+          conn.prepared_statements.values.each{|cps, s| cps.close}
+          conn.prepared_statements.clear
+          super
+        end
       end
       
       # Run the given SQL with the given arguments and return the last inserted row id.
       def execute_insert(sql, opts={})
-        _execute(opts){|conn| log_yield(sql, opts[:arguments]){conn.execute(sql, opts.fetch(:arguments, []))}; conn.last_insert_row_id}
-      end
-      
-      # Run the given SQL with the given arguments and yield each row.
-      def execute(sql, opts={})
-        _execute(opts) do |conn|
-          begin
-            yield(result = log_yield(sql, opts[:arguments]){conn.query(sql, opts.fetch(:arguments, []))})
-          ensure
-            result.close if result
-          end
-        end
+        _execute(:insert, sql, opts)
       end
       
       # Run the given SQL with the given arguments and return the first value of the first row.
       def single_value(sql, opts={})
-        _execute(opts){|conn| log_yield(sql, opts[:arguments]){conn.get_first_value(sql, opts.fetch(:arguments, []))}}
+        _execute(:single_value, sql, opts)
       end
       
       private
       
       # Yield an available connection.  Rescue
       # any SQLite3::Exceptions and turn them into DatabaseErrors.
-      def _execute(opts, &block)
+      def _execute(type, sql, opts, &block)
         begin
-          synchronize(opts[:server], &block)
+          synchronize(opts[:server]) do |conn|
+            return execute_prepared_statement(conn, type, sql, opts, &block) if sql.is_a?(Symbol)
+            log_args = opts[:arguments]
+            args = opts.fetch(:arguments, [])
+            case type
+            when :select
+              log_yield(sql, log_args){conn.query(sql, args, &block)}
+            when :single_value
+              log_yield(sql, log_args){conn.get_first_value(sql, args)}
+            when :insert
+              log_yield(sql, log_args){conn.execute(sql, args)}
+              conn.last_insert_row_id
+            when :update
+              log_yield(sql, log_args){conn.execute_batch(sql, args)}
+              conn.changes
+            end
+          end
         rescue SQLite3::Exception => e
           raise_error(e)
         end
@@ -117,6 +143,35 @@ module Sequel
         # because otherwise each connection will get a separate database
         o[:max_connections] = 1 if @opts[:database] == ':memory:' || blank_object?(@opts[:database])
         o
+      end
+      
+      # Execute a prepared statement on the database using the given name.
+      def execute_prepared_statement(conn, type, name, opts, &block)
+        ps = prepared_statements[name]
+        sql = ps.prepared_sql
+        args = opts[:arguments]
+        if cpsa = conn.prepared_statements[name]
+          cps, cps_sql = cpsa
+          if cps_sql != sql
+            cps.close
+            cps = nil
+          end
+        end
+        unless cps
+          cps = conn.prepare(sql)
+          conn.prepared_statements[name] = [cps, sql]
+        end
+        if block
+          log_yield("Executing prepared statement #{name}", args){cps.execute(args, &block)}
+        else
+          log_yield("Executing prepared statement #{name}", args){cps.execute!(args){|r|}}
+          case type
+          when :insert
+            conn.last_insert_row_id
+          when :update
+            conn.changes
+          end
+        end
       end
       
       # The main error class that SQLite3 raises
@@ -161,7 +216,7 @@ module Sequel
       
       # SQLite prepared statement uses a new prepared statement each time
       # it is called, but it does use the bind arguments.
-      module PreparedStatementMethods
+      module BindArgumentMethods
         include ArgumentMapper
         
         private
@@ -181,6 +236,35 @@ module Sequel
         def execute_insert(sql, opts={}, &block)
           super(sql, {:arguments=>bind_arguments}.merge(opts), &block)
         end
+      end
+
+      module PreparedStatementMethods
+        include BindArgumentMethods
+          
+        private
+          
+        # Execute the stored prepared statement name and the stored bind
+        # arguments instead of the SQL given.
+        def execute(sql, opts={}, &block)
+          super(prepared_statement_name, opts, &block)
+        end
+         
+        # Same as execute, explicit due to intricacies of alias and super.
+        def execute_dui(sql, opts={}, &block)
+          super(prepared_statement_name, opts, &block)
+        end
+          
+        # Same as execute, explicit due to intricacies of alias and super.
+        def execute_insert(sql, opts={}, &block)
+          super(prepared_statement_name, opts, &block)
+        end
+      end
+        
+      # Execute the given type of statement with the hash of values.
+      def call(type, bind_vars={}, *values, &block)
+        ps = to_prepared_statement(type, values)
+        ps.extend(BindArgumentMethods)
+        ps.call(bind_vars, &block)
       end
       
       # Yield a hash for each row in the dataset.
@@ -203,7 +287,10 @@ module Sequel
       def prepare(type, name=nil, *values)
         ps = to_prepared_statement(type, values)
         ps.extend(PreparedStatementMethods)
-        db.prepared_statements[name] = ps if name
+        if name
+          ps.prepared_statement_name = name
+          db.prepared_statements[name] = ps
+        end
         ps.prepared_sql
         ps
       end

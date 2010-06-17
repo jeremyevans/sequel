@@ -82,8 +82,7 @@ in the SQL).  Prepared statements are always server side.
 
 === SQLite
 
-SQLite supports bound variables and prepared statements exactly the same, since
-a new native prepared statement is created and executed for each call.
+SQLite supports both prepared statements and bound variables.
 
 === MySQL
 
