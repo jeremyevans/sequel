@@ -1,5 +1,7 @@
 === HEAD
 
+* Allow NULLS FIRST/LAST when ordering using the :nulls=>:first/:last option to asc and desc (jeremyevans)
+
 * On PostgreSQL, if no :schema option is provided for #tables, #table_exists?, or #schema, assume all schemas except the default non-public ones (jeremyevans) (#305)
 
 * Cache prepared statements when using the native sqlite driver, improving performance (jeremyevans)

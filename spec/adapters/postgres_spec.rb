@@ -130,6 +130,15 @@ context "A PostgreSQL dataset" do
     @d.filter(:name => /^bc/).count.should == 1
   end
   
+  specify "should support NULLS FIRST and NULLS LAST" do
+    @d << {:name => 'abc'}
+    @d << {:name => 'bcd'}
+    @d << {:name => 'bcd', :value => 2}
+    @d.order(:value.asc(:nulls=>:first), :name).select_map(:name).should == %w[abc bcd bcd]
+    @d.order(:value.asc(:nulls=>:last), :name).select_map(:name).should == %w[bcd abc bcd]
+    @d.order(:value.asc(:nulls=>:first), :name).reverse.select_map(:name).should == %w[bcd bcd abc]
+  end
+  
   specify "#lock should lock tables and yield if a block is given" do
     @d.lock('EXCLUSIVE'){@d.insert(:name=>'a')}
   end

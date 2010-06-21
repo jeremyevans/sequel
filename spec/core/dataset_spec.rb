@@ -1204,6 +1204,11 @@ context "Dataset#order" do
       'SELECT * FROM test ORDER BY name, price DESC'
   end
   
+  specify "should accept :nulls options for asc and desc" do
+    @dataset.order(:name.asc(:nulls=>:last), :price.desc(:nulls=>:first)).sql.should ==
+      'SELECT * FROM test ORDER BY name ASC NULLS LAST, price DESC NULLS FIRST'
+  end
+  
   specify "should overrun a previous ordering" do
     @dataset.order(:name).order(:stamp).sql.should ==
       'SELECT * FROM test ORDER BY stamp'
@@ -1383,6 +1388,11 @@ context "Dataset#reverse_order" do
   specify "should accept multiple arguments" do
     @dataset.reverse_order(:name, :price.desc).sql.should ==
       'SELECT * FROM test ORDER BY name DESC, price ASC'
+  end
+
+  specify "should handles NULLS ordering correctly when reversing" do
+    @dataset.reverse_order(:name.asc(:nulls=>:first), :price.desc(:nulls=>:last)).sql.should ==
+      'SELECT * FROM test ORDER BY name DESC NULLS LAST, price ASC NULLS FIRST'
   end
 
   specify "should reverse a previous ordering if no arguments are given" do

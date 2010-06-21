@@ -350,7 +350,15 @@ module Sequel
     # SQL fragment for the ordered expression, used in the ORDER BY
     # clause.
     def ordered_expression_sql(oe)
-      "#{literal(oe.expression)} #{oe.descending ? 'DESC' : 'ASC'}"
+      s = "#{literal(oe.expression)} #{oe.descending ? 'DESC' : 'ASC'}"
+      case oe.opts[:nulls]
+      when :first
+        "#{s} NULLS FIRST"
+      when :last
+        "#{s} NULLS LAST"
+      else
+        s
+      end
     end
 
     # SQL fragment for a literal string with placeholders

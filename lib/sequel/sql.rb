@@ -368,13 +368,13 @@ module Sequel
     # or more complex expressions.
     module OrderMethods
       # Mark the receiving SQL column as sorting in a descending fashion.
-      def desc
-        OrderedExpression.new(self)
+      def desc(opts={})
+        OrderedExpression.new(self, true, opts)
       end
       
       # Mark the receiving SQL column as sorting in an ascending fashion (generally a no-op).
-      def asc
-        OrderedExpression.new(self, false)
+      def asc(opts={})
+        OrderedExpression.new(self, false, opts)
       end
     end
 
@@ -754,30 +754,44 @@ module Sequel
 
     # Represents a column/expression to order the result set by.
     class OrderedExpression < Expression
+      INVERT_NULLS = {:first=>:last, :last=>:first}.freeze
+
       # The expression to order the result set by.
       attr_reader :expression
 
       # Whether the expression should order the result set in a descending manner
       attr_reader :descending
 
+      # Other options supported, such as :nulls
+      attr_reader :opts
+
       # Set the expression and descending attributes to the given values.
-      def initialize(expression, descending = true)
-        @expression, @descending = expression, descending
+      def initialize(expression, descending = true, opts={})
+        @expression, @descending, @opts = expression, descending, opts
       end
 
       # Return a copy that is ASC
       def asc
-        OrderedExpression.new(@expression, false)
+        OrderedExpression.new(@expression, false, @opts)
       end
 
       # Return a copy that is DESC
       def desc
-        OrderedExpression.new(@expression)
+        OrderedExpression.new(@expression, true, @opts)
+      end
+
+      # Make sure that the hash value is the same if the attributes are the same.
+      def hash
+        [self.class, expression, descending, opts[:nulls]].hash
       end
 
       # Return an inverted expression, changing ASC to DESC and vice versa
       def invert
-        OrderedExpression.new(@expression, !@descending)
+        opts = @opts
+        if nul_dir = @opts[:nulls]
+          opts = opts.merge(:nulls=>INVERT_NULLS.fetch(nul_dir, nul_dir))
+        end
+        OrderedExpression.new(@expression, !@descending, opts)
       end
 
       to_s_method :ordered_expression_sql
