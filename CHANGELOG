@@ -1,5 +1,7 @@
 === HEAD
 
+* On PostgreSQL, if no :schema option is provided for #tables, #table_exists?, or #schema, assume all schemas except the default non-public ones (jeremyevans) (#305)
+
 * Cache prepared statements when using the native sqlite driver, improving performance (jeremyevans)
 
 * Add a Tree plugin for treating model objects as being part of a tree (jeremyevans, mwlang)

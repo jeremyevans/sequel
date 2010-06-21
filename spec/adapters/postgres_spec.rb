@@ -557,9 +557,11 @@ context "Postgres::Database schema qualified tables" do
     POSTGRES_DB.drop_table(:schema_test.qualify(:schema_test))
   end
   
-  specify "#tables should include only tables in the public schema if no schema is given" do
+  specify "#tables should not include tables in a default non-public schema" do
     POSTGRES_DB.create_table(:schema_test__schema_test){integer :i}
-    POSTGRES_DB.tables.should_not include(:schema_test)
+    POSTGRES_DB.tables.should include(:schema_test)
+    POSTGRES_DB.tables.should_not include(:pg_am)
+    POSTGRES_DB.tables.should_not include(:domain_udt_usage)
   end
   
   specify "#tables should return tables in the schema provided by the :schema argument" do
@@ -567,9 +569,28 @@ context "Postgres::Database schema qualified tables" do
     POSTGRES_DB.tables(:schema=>:schema_test).should == [:schema_test]
   end
   
-  specify "#table_exists? should assume the public schema if no schema is provided" do
+  specify "#schema should not include columns from tables in a default non-public schema" do
+    POSTGRES_DB.create_table(:schema_test__domains){integer :i}
+    sch = POSTGRES_DB.schema(:domains)
+    cs = sch.map{|x| x.first}
+    cs.should include(:i)
+    cs.should_not include(:data_type)
+  end
+  
+  specify "#schema should only include columns from the table in the given :schema argument" do
+    POSTGRES_DB.create_table!(:domains){integer :d}
+    POSTGRES_DB.create_table(:schema_test__domains){integer :i}
+    sch = POSTGRES_DB.schema(:domains, :schema=>:schema_test)
+    cs = sch.map{|x| x.first}
+    cs.should include(:i)
+    cs.should_not include(:d)
+    POSTGRES_DB.drop_table(:domains)
+  end
+  
+  specify "#table_exists? should not include tables from the default non-public schemas" do
     POSTGRES_DB.create_table(:schema_test__schema_test){integer :i}
-    POSTGRES_DB.table_exists?(:schema_test).should == false
+    POSTGRES_DB.table_exists?(:schema_test).should == true
+    POSTGRES_DB.table_exists?(:domain_udt_usage).should == false
   end
   
   specify "#table_exists? should see if the table is in a given schema" do

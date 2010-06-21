@@ -157,6 +157,7 @@ module Sequel
     
     # Methods shared by Database instances that connect to PostgreSQL.
     module DatabaseMethods
+      EXCLUDE_SCHEMAS = %w[pg_catalog pg_toast pg_temp_1 pg_toast_temp_1 information_schema]
       PREPARED_ARG_PLACEHOLDER = LiteralString.new('$').freeze
       RE_CURRVAL_ERROR = /currval of sequence "(.*)" is not yet defined in this session|relation "(.*)" does not exist/.freeze
       SYSTEM_TABLE_REGEXP = /^pg|sql/.freeze
@@ -362,13 +363,14 @@ module Sequel
       # * :schema - The schema to search (default_schema by default)
       # * :server - The server to use
       def tables(opts={})
-        ds = metadata_dataset.from(:pg_class).filter(:relkind=>'r').select(:relname).exclude(SQL::StringExpression.like(:relname, SYSTEM_TABLE_REGEXP)).server(opts[:server]).join(:pg_namespace, :oid=>:relnamespace, :nspname=>(opts[:schema]||default_schema||'public').to_s) 
+        ds = metadata_dataset.from(:pg_class).filter(:relkind=>'r').select(:relname).exclude(SQL::StringExpression.like(:relname, SYSTEM_TABLE_REGEXP)).server(opts[:server]).join(:pg_namespace, :oid=>:relnamespace) 
+        ds = filter_schema(ds, opts)
         m = output_identifier_meth
         block_given? ? yield(ds) : ds.map{|r| m.call(r[:relname])}
       end
 
       private
-      
+
       # SQL statement to create database function.
       def create_function_sql(name, definition, opts={})
         args = opts[:args]
@@ -427,6 +429,16 @@ module Sequel
         "DROP TRIGGER#{' IF EXISTS' if opts[:if_exists]} #{name} ON #{quote_schema_table(table)}#{' CASCADE' if opts[:cascade]}"
       end
 
+      # If opts includes a :schema option, or a default schema is used, restrict the dataset to
+      # that schema.  Otherwise, just exclude the default PostgreSQL schemas except for public.
+      def filter_schema(ds, opts)
+        if schema = opts[:schema] || default_schema
+          ds.filter(:pg_namespace__nspname=>schema.to_s)
+        else
+          ds.exclude(:pg_namespace__nspname=>EXCLUDE_SCHEMAS)
+        end
+      end
+      
       # PostgreSQL folds unquoted identifiers to lowercase, so it shouldn't need to upcase identifiers on input.
       def identifier_input_method_default
         nil
@@ -523,13 +535,14 @@ module Sequel
           from(:pg_class).
           join(:pg_attribute, :attrelid=>:oid).
           join(:pg_type, :oid=>:atttypid).
+          join(:pg_namespace, :oid=>:pg_class__relnamespace).
           left_outer_join(:pg_attrdef, :adrelid=>:pg_class__oid, :adnum=>:pg_attribute__attnum).
           left_outer_join(:pg_index, :indrelid=>:pg_class__oid, :indisprimary=>true).
           filter(:pg_attribute__attisdropped=>false).
           filter{|o| o.pg_attribute__attnum > 0}.
           filter(:pg_class__relname=>m2.call(table_name)).
           order(:pg_attribute__attnum)
-        ds.join!(:pg_namespace, :oid=>:pg_class__relnamespace, :nspname=>(opts[:schema] || default_schema).to_s) if opts[:schema] || default_schema
+        ds = filter_schema(ds, opts)
         ds.map do |row|
           row[:default] = nil if blank_object?(row[:default])
           row[:type] = schema_column_type(row[:db_type])
