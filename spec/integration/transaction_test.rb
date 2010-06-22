@@ -127,4 +127,11 @@ describe "Database transactions" do
       @d.select_order_map(:name).should == []
     end
   end
+
+  specify "should support all transaction isolation levels" do
+    [:uncommitted, :committed, :repeatable, :serializable].each_with_index do |l, i|
+      @db.transaction(:isolation=>l){@d << {:name => 'abc', :value => 1}}
+      @d.count.should == i + 1
+    end
+  end
 end

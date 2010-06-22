@@ -39,6 +39,11 @@ module Sequel
         true
       end
       
+      # MSSQL supports transaction isolation levels
+      def supports_transaction_isolation_levels?
+        true
+      end
+
       # Microsoft SQL Server supports using the INFORMATION_SCHEMA to get
       # information on tables.
       def tables(opts={})

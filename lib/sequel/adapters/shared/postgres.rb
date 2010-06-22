@@ -362,6 +362,11 @@ module Sequel
         true
       end
 
+      # PostgreSQL supports transaction isolation levels
+      def supports_transaction_isolation_levels?
+        true
+      end
+
       # Whether the given table exists in the database
       #
       # Options:

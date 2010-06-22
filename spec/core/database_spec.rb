@@ -695,8 +695,31 @@ context "Database#transaction" do
   end
   
   specify "should wrap the supplied block with BEGIN + COMMIT statements" do
-    @db.transaction {@db.execute 'DROP TABLE test;'}
+    @db.transaction{@db.execute 'DROP TABLE test;'}
     @db.sql.should == ['BEGIN', 'DROP TABLE test;', 'COMMIT']
+  end
+  
+  specify "should support transaction isolation levels" do
+    @db.meta_def(:supports_transaction_isolation_levels?){true}
+    [:uncommitted, :committed, :repeatable, :serializable].each do |l|
+      @db.transaction(:isolation=>l){@db.run "DROP TABLE #{l}"}
+    end
+    @db.sql.should == ['BEGIN', 'SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED', 'DROP TABLE uncommitted', 'COMMIT',
+                       'BEGIN', 'SET TRANSACTION ISOLATION LEVEL READ COMMITTED', 'DROP TABLE committed', 'COMMIT',
+                       'BEGIN', 'SET TRANSACTION ISOLATION LEVEL REPEATABLE READ', 'DROP TABLE repeatable', 'COMMIT',
+                       'BEGIN', 'SET TRANSACTION ISOLATION LEVEL SERIALIZABLE', 'DROP TABLE serializable', 'COMMIT']
+  end
+
+  specify "should allow specifying a default transaction isolation level" do
+    @db.meta_def(:supports_transaction_isolation_levels?){true}
+    [:uncommitted, :committed, :repeatable, :serializable].each do |l|
+      @db.transaction_isolation_level = l
+      @db.transaction{@db.run "DROP TABLE #{l}"}
+    end
+    @db.sql.should == ['BEGIN', 'SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED', 'DROP TABLE uncommitted', 'COMMIT',
+                       'BEGIN', 'SET TRANSACTION ISOLATION LEVEL READ COMMITTED', 'DROP TABLE committed', 'COMMIT',
+                       'BEGIN', 'SET TRANSACTION ISOLATION LEVEL REPEATABLE READ', 'DROP TABLE repeatable', 'COMMIT',
+                       'BEGIN', 'SET TRANSACTION ISOLATION LEVEL SERIALIZABLE', 'DROP TABLE serializable', 'COMMIT']
   end
   
   specify "should handle returning inside of the block by committing" do
@@ -1586,6 +1609,12 @@ end
 context "Database#supports_prepared_transactions?" do
   specify "should be false by default" do
     Sequel::Database.new.supports_prepared_transactions?.should == false
+  end
+end
+
+context "Database#supports_transaction_isolation_levels?" do
+  specify "should be false by default" do
+    Sequel::Database.new.supports_transaction_isolation_levels?.should == false
   end
 end
 

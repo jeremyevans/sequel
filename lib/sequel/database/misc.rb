@@ -90,6 +90,11 @@ module Sequel
       false
     end
 
+    # Whether the database and adapter support transaction isolation levels, false by default
+    def supports_transaction_isolation_levels?
+      false
+    end
+
     # Typecast the value to the given column_type. Calls
     # typecast_value_#{column_type} if the method exists,
     # otherwise returns the value.

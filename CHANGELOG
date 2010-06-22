@@ -1,5 +1,7 @@
 === HEAD
 
+* Support transaction isolation levels on PostgreSQL, MySQL, and MSSQL (jeremyevans)
+
 * Support prepared transactions/two-phase commit on PostgreSQL, MySQL, and H2 (jeremyevans)
 
 * Allow NULLS FIRST/LAST when ordering using the :nulls=>:first/:last option to asc and desc (jeremyevans)

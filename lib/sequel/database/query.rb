@@ -15,6 +15,11 @@ module Sequel
     TRANSACTION_BEGIN = 'Transaction.begin'.freeze
     TRANSACTION_COMMIT = 'Transaction.commit'.freeze
     TRANSACTION_ROLLBACK = 'Transaction.rollback'.freeze
+
+    TRANSACTION_ISOLATION_LEVELS = {:uncommitted=>'READ UNCOMMITTED'.freeze,
+      :committed=>'READ COMMITTED'.freeze,
+      :repeatable=>'REPEATABLE READ'.freeze,
+      :serializable=>'SERIALIZABLE'.freeze}
     
     POSTGRES_DEFAULT_RE = /\A(?:B?('.*')::[^']+|\((-?\d+(?:\.\d+)?)\))\z/
     MSSQL_DEFAULT_RE = /\A(?:\(N?('.*')\)|\(\((-?\d+(?:\.\d+)?)\)\))\z/
@@ -23,6 +28,13 @@ module Sequel
 
     # The prepared statement objects for this database, keyed by name
     attr_reader :prepared_statements
+    
+    # The default transaction isolation level for this database,
+    # used for all future transactions.  For MSSQL, this should be set
+    # to something if you ever plan to use the :isolation option to
+    # Database#transaction, as on MSSQL if affects all future transactions
+    # on the same connection.
+    attr_accessor :transaction_isolation_level
     
     # Runs the supplied SQL statement string on the database server.
     # Alias for run.
@@ -142,6 +154,8 @@ module Sequel
     #
     # The following options are respected:
     #
+    # :isolation :: The transaction isolation level to use for this transaction,
+    #               should be :uncommitted, :committed, :repeatable, or :serializable.
     # :prepare :: A string to use as the transaction identifier for a
     #             prepared transaction (two-phase commit), if the database/adapter
     #             supports prepared transactions
@@ -205,15 +219,24 @@ module Sequel
       SQL_SAVEPOINT % depth
     end
 
-    # Start a new database transaction on the given connection.
+    # Start a new database connection on the given connection
+    def begin_new_transaction(conn, opts)
+      log_connection_execute(conn, begin_transaction_sql)
+      set_transaction_isolation(conn, opts)
+    end
+
+    # Start a new database transaction or a new savepoint on the given connection.
     def begin_transaction(conn, opts={})
       if supports_savepoints?
         th = Thread.current
-        depth = th[:sequel_transaction_depth]
-        log_connection_execute(conn, depth > 0 ? begin_savepoint_sql(depth) : begin_transaction_sql)
+        if (depth = th[:sequel_transaction_depth]) > 0
+          log_connection_execute(conn, begin_savepoint_sql(depth))
+        else
+          begin_new_transaction(conn, opts)
+        end
         th[:sequel_transaction_depth] += 1
       else
-        log_connection_execute(conn, begin_transaction_sql)
+        begin_new_transaction(conn, opts)
       end
       conn
     end
@@ -383,6 +406,18 @@ module Sequel
       when /\Aenum/io
         :enum
       end
+    end
+
+    # Set the transaction isolation level on the given connection
+    def set_transaction_isolation(conn, opts)
+      if supports_transaction_isolation_levels? and level = opts.fetch(:isolation, transaction_isolation_level)
+        log_connection_execute(conn, set_transaction_isolation_sql(level))
+      end
+    end
+
+    # SQL to set the transaction isolation level
+    def set_transaction_isolation_sql(level)
+      "SET TRANSACTION ISOLATION LEVEL #{TRANSACTION_ISOLATION_LEVELS[level]}"
     end
 
     # Raise a database error unless the exception is an Rollback.

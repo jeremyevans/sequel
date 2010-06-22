@@ -89,6 +89,11 @@ module Sequel
         true
       end
 
+      # MySQL supports transaction isolation levels
+      def supports_transaction_isolation_levels?
+        true
+      end
+
       # Changes the database in use by issuing a USE statement.  I would be
       # very careful if I used this.
       def use(db_name)
@@ -134,6 +139,12 @@ module Sequel
         AUTO_INCREMENT
       end
       
+      # MySQL needs to set transaction isolation before begining a transaction
+      def begin_new_transaction(conn, opts)
+        set_transaction_isolation(conn, opts)
+        log_connection_execute(conn, begin_transaction_sql)
+      end
+
       # Use XA START to start a new prepared transaction if the :prepare
       # option is given.
       def begin_transaction(conn, opts={})
