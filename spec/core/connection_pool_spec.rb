@@ -96,7 +96,7 @@ context "A connection pool handling connections" do
 
   specify "#hold should remove the connection if a DatabaseDisconnectError is raised" do
     @cpool.created_count.should == 0
-    @cpool.hold{Thread.new{@cpool.hold{}}; sleep 0.02}
+    @cpool.hold{Thread.new{@cpool.hold{}}; sleep 0.03}
     @cpool.created_count.should == 2
     proc{@cpool.hold{raise Sequel::DatabaseDisconnectError}}.should raise_error(Sequel::DatabaseDisconnectError)
     @cpool.created_count.should == 1
