@@ -142,15 +142,18 @@ module Sequel
     #
     # The following options are respected:
     #
-    # * :server  - The server to use for the transaction
-    # * :savepoint - Whether to create a new savepoint for this transaction,
-    #   only respected if the database adapter supports savepoints.  By
-    #   default Sequel will reuse an existing transaction, so if you want to
-    #   use a savepoint you must use this option.
+    # :prepare :: A string to use as the transaction identifier for a
+    #             prepared transaction (two-phase commit), if the database/adapter
+    #             supports prepared transactions
+    # :server :: The server to use for the transaction
+    # :savepoint :: Whether to create a new savepoint for this transaction,
+    #               only respected if the database adapter supports savepoints.  By
+    #               default Sequel will reuse an existing transaction, so if you want to
+    #               use a savepoint you must use this option.
     def transaction(opts={}, &block)
       synchronize(opts[:server]) do |conn|
         return yield(conn) if already_in_transaction?(conn, opts)
-        _transaction(conn, &block)
+        _transaction(conn, opts, &block)
       end
     end
     
@@ -160,17 +163,17 @@ module Sequel
     # block will cause the transaction to be rolled back.  If the exception is
     # not Sequel::Rollback, the error will be reraised. If no exception occurs
     # inside the block, the transaction is commited.
-    def _transaction(conn)
+    def _transaction(conn, opts={})
       begin
         add_transaction
-        t = begin_transaction(conn)
+        t = begin_transaction(conn, opts)
         yield(conn)
       rescue Exception => e
-        rollback_transaction(t) if t
+        rollback_transaction(t, opts) if t
         transaction_error(e)
       ensure
         begin
-          commit_transaction(t) unless e
+          commit_transaction(t, opts) unless e
         rescue Exception => e
           raise_error(e, :classes=>database_error_classes)
         ensure
@@ -203,7 +206,7 @@ module Sequel
     end
 
     # Start a new database transaction on the given connection.
-    def begin_transaction(conn)
+    def begin_transaction(conn, opts={})
       if supports_savepoints?
         th = Thread.current
         depth = th[:sequel_transaction_depth]
@@ -276,7 +279,7 @@ module Sequel
     end
 
     # Commit the active transaction on the connection
-    def commit_transaction(conn)
+    def commit_transaction(conn, opts={})
       if supports_savepoints?
         depth = Thread.current[:sequel_transaction_depth]
         log_connection_execute(conn, depth > 1 ? commit_savepoint_sql(depth-1) : commit_transaction_sql)
@@ -343,7 +346,7 @@ module Sequel
     end
 
     # Rollback the active transaction on the connection
-    def rollback_transaction(conn)
+    def rollback_transaction(conn, opts={})
       if supports_savepoints?
         depth = Thread.current[:sequel_transaction_depth]
         log_connection_execute(conn, depth > 1 ? rollback_savepoint_sql(depth-1) : rollback_transaction_sql)

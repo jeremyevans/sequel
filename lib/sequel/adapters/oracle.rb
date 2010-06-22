@@ -74,12 +74,12 @@ module Sequel
 
       private
       
-      def begin_transaction(conn)
+      def begin_transaction(conn, opts={})
         log_yield(TRANSACTION_BEGIN){conn.autocommit = false}
         conn
       end
       
-      def commit_transaction(conn)
+      def commit_transaction(conn, opts={})
         log_yield(TRANSACTION_COMMIT){conn.commit}
       end
 
@@ -92,7 +92,7 @@ module Sequel
         super
       end
       
-      def rollback_transaction(conn)
+      def rollback_transaction(conn, opts={})
         log_yield(TRANSACTION_ROLLBACK){conn.rollback}
       end
     end

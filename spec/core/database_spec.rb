@@ -1583,6 +1583,12 @@ context "Database#supports_savepoints?" do
   end
 end
 
+context "Database#supports_prepared_transactions?" do
+  specify "should be false by default" do
+    Sequel::Database.new.supports_prepared_transactions?.should == false
+  end
+end
+
 context "Database#input_identifier_meth" do
   specify "should be the input_identifer method of a default dataset for this database" do
     db = Sequel::Database.new

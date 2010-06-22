@@ -118,7 +118,7 @@ module Sequel
       # transactions.  Unfortunately, it tries to create a new connection
       # to do a transaction.  So we close the connection created and
       # substitute our own.
-      def begin_transaction(conn)
+      def begin_transaction(conn, opts={})
         return super if supports_savepoints?
         log_yield(TRANSACTION_BEGIN) do
           t = ::DataObjects::Transaction.create_for_uri(uri)
@@ -131,7 +131,7 @@ module Sequel
       
       # DataObjects requires transactions be prepared before being
       # committed, so we do that.
-      def commit_transaction(t)
+      def commit_transaction(t, opts={})
         return super if supports_savepoints?
         log_yield(TRANSACTION_ROLLBACK) do
           t.prepare
@@ -156,7 +156,7 @@ module Sequel
       end
       
       # We use the transactions rollback method to rollback.
-      def rollback_transaction(t)
+      def rollback_transaction(t, opts={})
         return super if supports_savepoints?
         log_yield(TRANSACTION_COMMIT){t.rollback}
       end

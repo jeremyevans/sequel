@@ -68,7 +68,7 @@ module Sequel
       # The ADO adapter's default provider doesn't support transactions, since it 
       # creates a new native connection for each query.  So Sequel only attempts
       # to use transactions if an explicit :provider is given.
-      def _transaction(conn)
+      def _transaction(conn, o={})
         return super if opts[:provider]
         th = Thread.current
         begin

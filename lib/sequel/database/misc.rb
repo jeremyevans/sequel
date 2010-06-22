@@ -79,6 +79,12 @@ module Sequel
       {:primary_key => true, :type => Integer, :auto_increment => true}
     end
 
+    # Whether the database and adapter support prepared transactions
+    # (two-phase commit), false by default
+    def supports_prepared_transactions?
+      false
+    end
+
     # Whether the database and adapter support savepoints, false by default
     def supports_savepoints?
       false

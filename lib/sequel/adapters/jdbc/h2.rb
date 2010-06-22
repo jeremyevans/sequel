@@ -6,6 +6,12 @@ module Sequel
       module DatabaseMethods
         PRIMARY_KEY_INDEX_RE = /\Aprimary_key/i.freeze
       
+        # Commit an existing prepared transaction with the given transaction
+        # identifier string.
+        def commit_prepared_transaction(transaction_id)
+          run("COMMIT TRANSACTION #{transaction_id}")
+        end
+
         # H2 uses the :h2 database type.
         def database_type
           :h2
@@ -16,13 +22,39 @@ module Sequel
           Sequel::JDBC::H2::Dataset.new(self, opts)
         end
         
+        # Rollback an existing prepared transaction with the given transaction
+        # identifier string.
+        def rollback_prepared_transaction(transaction_id)
+          run("ROLLBACK TRANSACTION #{transaction_id}")
+        end
+
         # H2 uses an IDENTITY type
         def serial_primary_key_options
           {:primary_key => true, :type => :identity}
         end
+
+        # H2 supports prepared transactions
+        def supports_prepared_transactions?
+          true
+        end
+        
+        # H2 supports savepoints
+        def supports_savepoints?
+          true
+        end
         
         private
         
+        # If the :prepare option is given and we aren't in a savepoint,
+        # prepare the transaction for a two-phase commit.
+        def commit_transaction(conn, opts={})
+          if opts[:prepare] && Thread.current[:sequel_transaction_depth] <= 1
+            log_connection_execute(conn, "PREPARE COMMIT #{opts[:prepare]}")
+          else
+            super
+          end
+        end
+
         # H2 needs to add a primary key column as a constraint
         def alter_table_sql(table, op)
           case op[:op]

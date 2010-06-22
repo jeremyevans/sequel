@@ -91,7 +91,7 @@ module Sequel
       
       # Commit the active transaction on the connection, does not commit/release
       # savepoints.
-      def commit_transaction(conn)
+      def commit_transaction(conn, opts={})
         log_connection_execute(conn, commit_transaction_sql) unless Thread.current[:sequel_transaction_depth] > 1
       end
 

@@ -162,6 +162,12 @@ module Sequel
       RE_CURRVAL_ERROR = /currval of sequence "(.*)" is not yet defined in this session|relation "(.*)" does not exist/.freeze
       SYSTEM_TABLE_REGEXP = /^pg|sql/.freeze
 
+      # Commit an existing prepared transaction with the given transaction
+      # identifier string.
+      def commit_prepared_transaction(transaction_id)
+        run("COMMIT PREPARED #{literal(transaction_id)}")
+      end
+
       # Creates the function in the database.  Arguments:
       # * name : name of the function to create
       # * definition : string definition of the function, or object file for a dynamically loaded C function.
@@ -319,6 +325,12 @@ module Sequel
         get{setval(seq, db[table].select{coalesce(max(pk)+seq_ds.select{:increment_by}, seq_ds.select(:min_value))}, false)}
       end
 
+      # Rollback an existing prepared transaction with the given transaction
+      # identifier string.
+      def rollback_prepared_transaction(transaction_id)
+        run("ROLLBACK PREPARED #{literal(transaction_id)}")
+      end
+
       # PostgreSQL uses SERIAL psuedo-type instead of AUTOINCREMENT for
       # managing incrementing primary keys.
       def serial_primary_key_options
@@ -338,6 +350,13 @@ module Sequel
         @server_version
       end
       
+      # PostgreSQL supports prepared transactions (two-phase commit) if
+      # max_prepared_transactions is greater than 0.
+      def supports_prepared_transactions?
+        return @supports_prepared_transactions if defined?(@supports_prepared_transactions)
+        @supports_prepared_transactions = self['SHOW max_prepared_transactions'].get.to_i > 0
+      end
+
       # PostgreSQL supports savepoints
       def supports_savepoints?
         true
@@ -370,6 +389,16 @@ module Sequel
       end
 
       private
+
+      # If the :prepare option is given and we aren't in a savepoint,
+      # prepare the transaction for a two-phase commit.
+      def commit_transaction(conn, opts={})
+        if opts[:prepare] && Thread.current[:sequel_transaction_depth] <= 1
+          log_connection_execute(conn, "PREPARE TRANSACTION #{literal(opts[:prepare])}")
+        else
+          super
+        end
+      end
 
       # SQL statement to create database function.
       def create_function_sql(name, definition, opts={})

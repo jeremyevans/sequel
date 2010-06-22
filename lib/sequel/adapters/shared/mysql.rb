@@ -30,6 +30,12 @@ module Sequel
         CAST_TYPES[type] || super
       end
 
+      # Commit an existing prepared transaction with the given transaction
+      # identifier string.
+      def commit_prepared_transaction(transaction_id)
+        run("XA COMMIT #{literal(transaction_id)}")
+      end
+
       # MySQL uses the :mysql database type
       def database_type
         :mysql
@@ -52,6 +58,12 @@ module Sequel
         indexes.reject{|k,v| remove_indexes.include?(k)}
       end
 
+      # Rollback an existing prepared transaction with the given transaction
+      # identifier string.
+      def rollback_prepared_transaction(transaction_id)
+        run("XA ROLLBACK #{literal(transaction_id)}")
+      end
+
       # Get version of MySQL server, used for determined capabilities.
       def server_version
         m = /(\d+)\.(\d+)\.(\d+)/.match(get(SQL::Function.new(:version)))
@@ -67,6 +79,11 @@ module Sequel
         metadata_dataset.with_sql('SHOW TABLES').server(opts[:server]).map{|r| m.call(r.values.first)}
       end
       
+      # MySQL supports prepared transactions (two-phase commit) using XA
+      def supports_prepared_transactions?
+        true
+      end
+
       # MySQL supports savepoints
       def supports_savepoints?
         true
@@ -117,6 +134,17 @@ module Sequel
         AUTO_INCREMENT
       end
       
+      # Use XA START to start a new prepared transaction if the :prepare
+      # option is given.
+      def begin_transaction(conn, opts={})
+        if s = opts[:prepare]
+          log_connection_execute(conn, "XA START #{literal(s)}")
+          conn
+        else
+          super
+        end
+      end
+
       # MySQL doesn't allow default values on text columns, so ignore if it the
       # generic text type is used
       def column_definition_sql(column)
@@ -124,6 +152,17 @@ module Sequel
         super
       end
       
+      # Prepare the XA transaction for a two-phase commit if the
+      # :prepare option is given.
+      def commit_transaction(conn, opts={})
+        if s = opts[:prepare]
+          log_connection_execute(conn, "XA END #{literal(s)}")
+          log_connection_execute(conn, "XA PREPARE #{literal(s)}")
+        else
+          super
+        end
+      end
+
       # Use MySQL specific syntax for engine type and character encoding
       def create_table_sql(name, generator, options = {})
         engine = options.fetch(:engine, Sequel::MySQL.default_engine)
@@ -162,6 +201,17 @@ module Sequel
         "CREATE #{index_type}INDEX #{index_name}#{using} ON #{quote_schema_table(table_name)} #{literal(index[:columns])}"
       end
       
+      # Rollback the currently open XA transaction
+      def rollback_transaction(conn, opts={})
+        if s = opts[:prepare]
+          log_connection_execute(conn, "XA END #{literal(s)}")
+          log_connection_execute(conn, "XA PREPARE #{literal(s)}")
+          log_connection_execute(conn, "XA ROLLBACK #{literal(s)}")
+        else
+          super
+        end
+      end
+
       # MySQL treats integer primary keys as autoincrementing.
       def schema_autoincrementing_primary_key?(schema)
         super and schema[:db_type] =~ /int/io

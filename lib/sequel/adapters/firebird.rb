@@ -102,12 +102,12 @@ module Sequel
         AUTO_INCREMENT
       end
       
-      def begin_transaction(conn)
+      def begin_transaction(conn, opts={})
         log_yield(TRANSACTION_BEGIN){conn.transaction}
         conn
       end
 
-      def commit_transaction(conn)
+      def commit_transaction(conn, opts={})
         log_yield(TRANSACTION_COMMIT){conn.commit}
       end
       
@@ -182,7 +182,7 @@ module Sequel
         "ALTER SEQUENCE #{seq_name} RESTART WITH #{opts[:restart_position]}"
       end
       
-      def rollback_transaction(conn)
+      def rollback_transaction(conn, opts={})
         log_yield(TRANSACTION_ROLLBACK){conn.rollback}
       end
 
