@@ -556,6 +556,10 @@ context Sequel::SQL::VirtualRow do
     @d.l{rank(:over, :frame=>:rows){}}.should == 'rank() OVER (ROWS UNBOUNDED PRECEDING)'
   end
 
+  it "should support :frame=>'some string' option for window function calls" do
+    @d.l{rank(:over, :frame=>'RANGE BETWEEN 3 PRECEDING AND CURRENT ROW'){}}.should == 'rank() OVER (RANGE BETWEEN 3 PRECEDING AND CURRENT ROW)'
+  end
+
   it "should raise an error if an invalid :frame option is used" do
     proc{@d.l{rank(:over, :frame=>:blah){}}}.should raise_error(Sequel::Error)
   end

@@ -442,8 +442,10 @@ module Sequel
           "ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING"
         when :rows
           "ROWS UNBOUNDED PRECEDING"
+        when String
+          opts[:frame]
         else
-          raise Error, "invalid window frame clause, should be :all, :rows, or nil"
+          raise Error, "invalid window frame clause, should be :all, :rows, a string, or nil"
       end
       "(#{[window, partition, order, frame].compact.join(' ')})"
     end

@@ -1,5 +1,7 @@
 === HEAD
 
+* Allow :frame option for windows to take a string that is used literally (jeremyevans)
+
 * Support transaction isolation levels on PostgreSQL, MySQL, and MSSQL (jeremyevans)
 
 * Support prepared transactions/two-phase commit on PostgreSQL, MySQL, and H2 (jeremyevans)
