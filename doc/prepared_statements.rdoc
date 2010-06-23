@@ -8,7 +8,7 @@ the following databases:
 * PostgreSQL (using the pg driver, requires type specifiers)
 * MySQL (prepared statements only, as the ruby mysql driver doesn't support
   bound variables)
-* SQLite (a new native prepared statement is used for each call, though)
+* SQLite
 * JDBC
 
 Support on other databases is emulated via string interpolation.
@@ -31,7 +31,7 @@ Using bound variables for this query is simple:
   ds.call(:select, :n=>'Jim')
 
 This will do the equivalent of selecting records that have the name 'Jim'. It
-returns all records, and can take a block that is passed to Dataset#all.
+returns all records, and can take a block that is passed to <tt>Dataset#all</tt>.
 
 Deleting or returning the first record works similarly:
 
@@ -49,16 +49,16 @@ may itself contain placeholders:
 == Prepared Statements
 
 Prepared statement support is similar to bound variable support, but you
-use Dataset#prepare with a name, and Dataset#call or Database#call later with the values:
+use <tt>Dataset#prepare</tt> with a name, and <tt>Dataset#call</tt> or <tt>Database#call</tt> later with the values:
 
   ds = DB[:items].filter(:name=>:$n)
   ps = ds.prepare(:select, :select_by_name)
   ps.call(:n=>'Jim')
   DB.call(:select_by_name, :n=>'Jim') # same as above
 
-The Dataset#prepare method returns a prepared statement, and also stores a
+The <tt>Dataset#prepare</tt> method returns a prepared statement, and also stores a
 copy of the prepared statement in the database for later use.  For insert
-and update queries, the hash to insert/update is passed to prepare:
+and update queries, the hash to insert/update is passed to +prepare+:
 
   ps1 = DB[:items].prepare(:insert, :insert_with_name, :name=>:$n)
   ps1.call(:n=>'Jim')
@@ -82,7 +82,8 @@ in the SQL).  Prepared statements are always server side.
 
 === SQLite
 
-SQLite supports both prepared statements and bound variables.
+SQLite supports both prepared statements and bound variables.  Prepared
+statements are cached per connection.
 
 === MySQL
 
