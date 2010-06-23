@@ -2,43 +2,41 @@
 
 Sequel::Model has the most powerful and flexible associations of any ruby ORM.
 
-  "Extraordinary claims require extraordinary proof" - Carl Sagan
-
 == Background: Sequel::Model association options
 
 There are a bunch of advanced association options that are available to
-handle the other-than-bog-standard cases.  First we'll go over some of
+handle more complex cases.  First we'll go over some of
 the simpler ones:
 
 All associations take a block that can be used to further filter/modify the
 default dataset.  There's also an :eager_block option if you want to use
-a different block when eager loading via Dataset#eager. Association blocks are
+a different block when eager loading via <tt>Dataset#eager</tt>. Association blocks are
 useful for things like:
 
   Artist.one_to_many :gold_albums, :class=>:Album do |ds|
-    ds.filter{|o| o.copies_sold > 500000}
+    ds.filter{copies_sold > 500000}
   end
 
 There are a whole bunch of options for changing how the association is eagerly
-loaded via Dataset#eager_graph: :graph_block, :graph_conditions,
-:graph_only_conditions, :graph_join_type (and :graph_join_table_* ones for
+loaded via <tt>Dataset#eager_graph</tt>: <tt>:graph_block</tt>, <tt>:graph_conditions</tt>,
+<tt>:graph_only_conditions</tt>, <tt>:graph_join_type</tt> (and <tt>:graph_join_table_*</tt> ones for
 JOINing to the join table in a many_to_many association).
 
-- :graph_join_type - The type of join to do
-- :graph_conditions - Additional conditions to put on join (needs to be a
-  hash or array of all two pairs).  Automatically assumes unqualified symbols
-  as first element of the pair to be columns of the associated model, and
-  unqualified symbols of the second element of the pair to be columns of the
-  current model.
-- :graph_block - A block passed to join_table, allowing you to specify
-  conditions other than equality, or to use OR, or set up any arbitrary
-  condition.  The block is passed the associated table alias, current model
-  alias, and array of previous joins.
-- :graph_only_conditions - Use these conditions instead of the standard
-  association conditions. This is necessary when you don't want to have an
-  equal condition between the foreign key and primary key of the tables.
-  You can also use this to have a JOIN USING (array of symbols), or a NATURAL
-  or CROSS JOIN (nil, with the appropriate :graph_join_type).
+:graph_join_type :: The type of join to do (<tt>:inner</tt>, <tt>:left</tt>, <tt>:right</tt>)
+:graph_conditions :: Additional conditions to put on join (needs to be a
+                     hash or array of all two pairs).  Automatically assumes unqualified symbols
+                     or first element of the pair to be columns of the associated model, and
+                     unqualified symbols of the second element of the pair to be columns of the
+                     current model.
+:graph_block :: A block passed to +join_table+, allowing you to specify
+                conditions other than equality, or to use OR, or set up any arbitrary
+                condition.  The block is passed the associated table alias, current table 
+                alias, and an array of previous joins clause objects.
+:graph_only_conditions :: Use these conditions instead of the standard
+                          association conditions. This is necessary when you don't want to have an
+                          equal condition between the foreign key and primary key of the tables.
+                          You can also use this to have a JOIN USING (array of symbols), or a NATURAL
+                          or CROSS JOIN (nil, with the appropriate <tt>:graph_join_type</tt>).
   
 These can be used like this:
 
@@ -54,7 +52,7 @@ These can be used like this:
   Artist.one_to_many :gold_albums, :class=>:Album, \
     :graph_block=>proc{|j,lj,js| :copies_sold.qualify(j) > 500000}
     
-  # Handles the case where the to tables are associated by a case insensitive name string
+  # Handles the case where the tables are associated by a case insensitive name string
   Artist.one_to_many :albums, :key=>:artist_name, \
     :graph_only_conditions=>nil, \
     :graph_block=>proc{|j,lj,js| {:lower.sql_function(artist_name.qualify(j))=>:lower.sql_function(name.qualify(lj))}}
@@ -63,15 +61,15 @@ These can be used like this:
   # a JOIN USING
   Artist.one_to_many :albums, :key=>:artist_name, :graph_only_conditions=>[:artist_name]
   
-Remember, using #eager_graph is generally only necessary when you need to
+Remember, using +eager_graph+ is generally only necessary when you need to
 filter/order based on columns in an associated table, it is recommended to
-use #eager for eager loading if possible.
+use +eager+ for eager loading if possible.
 
-For lazy loading (e.g. Model[1].association), the :dataset option can be used
+For lazy loading (e.g. Model[1].association), the <tt>:dataset</tt> option can be used
 to specify an arbitrary dataset (one that uses different keys, multiple keys,
 joins to other tables, etc.).
 
-For eager loading via #eager, the :eager_loader option can be used to specify
+For eager loading via +eager+, the <tt>:eager_loader</tt> option can be used to specify
 how to eagerly load a complex association.  This is an extremely powerful
 option.  Though it can often be verbose (compared to other things in Sequel),
 it allows you complete control over how to eagerly load associations for a
@@ -94,13 +92,13 @@ for new code.
 Since you are given all of the records, you can do things like filter on
 associations that are specified by multiple keys, or do multiple
 queries depending on the content of the records (which would be
-necessary for polymorphic associations).  Inside the :eager_loader
+necessary for polymorphic associations).  Inside the <tt>:eager_loader</tt>
 proc, you should get the related objects and populate the
 associations cache for all objects in the array of records.  The hash
 of dependent associations is available for you to cascade the eager
 loading down multiple levels, but it is up to you to use it.  The
 key_hash is a performance enhancement that is used by the default
-code and is also available to you.  It is a hash with keys being
+association loaders and is also available to you.  It is a hash with keys being
 foreign/primary key symbols in the current table, and the values
 being hashes where the key is foreign/primary key values and values
 being arrays of current model objects having the foreign/primary key
@@ -115,38 +113,36 @@ give an example:
   # The key_hash provided to the :eager_loader proc would be:
   {:id=>{1=>[album1], 3=>[album2]}, :artist_id=>{2=>[album1, album2]}}
 
-Using these options, you can build associations Sequel doesn't natively support,
+Using these options, you can build associations that Sequel doesn't natively support,
 and still be able to use the same eager loading features that you are used to.
 
 == ActiveRecord associations
 
-Sequel supports all of associations that ActiveRecord supports, one way or
-another.  Sometimes this requires more code, as Sequel is a toolkit and not
-a swiss army chainsaw.
+Sequel supports all of associations that ActiveRecord supports, though some
+require different approaches or custom <tt>:eager_loader</tt> options.
 
 === Association callbacks
 
-Sequel supports the same callbacks that ActiveRecord does on one_to_many and
-many_to_many associations: :before_add, :before_remove, :after_add, and
-:after_remove. One many_to_one associations and one_to_one associations
-(which are one_to_many associations with the :one_to_one option), Sequel
-supports the :before_set and :after_set callbacks.  On all associations,
-Sequel supports :after_load, which is called after the association has been
+Sequel supports the same callbacks that ActiveRecord does on +one_to_many+ and
++many_to_many+ associations: <tt>:before_add</tt>, <tt>:before_remove</tt>, <tt>:after_add</tt>, and
+<tt>:after_remove</tt>. One +many_to_one+ associations and +one_to_one+ associations, Sequel
+supports the <tt>:before_set</tt> and <tt>:after_set</tt> callbacks.  On all associations,
+Sequel supports <tt>:after_load</tt>, which is called after the association has been
 loaded.
 
-Each of these options can be a Symbol specifying an instance method
-that takes one argument (the associated object), or a Proc that takes
+Each of these options can be a symbol specifying an instance method
+that takes one argument (the associated object), or a proc that takes
 two arguments (the current object and the associated object), or an
-array of Symbols and Procs.  For :after_load with a *_to_many association,
+array of symbols and procs.  For <tt>:after_load</tt> with a *_to_many association,
 the associated object argument is an array of associated objects.
 
-If any of the before callbacks return false, the adding/removing
-does not happen and it either raises an error (the default), or
-returns nil (if raise_on_save_failure is false).
+If any of the before callbacks return +false+, the adding/removing
+does not happen and it either raises a <tt>Sequel::BeforeHookFailed</tt> (the default), or
+returns false (if +raise_on_save_failure+ is false).
 
 === Association extensions
 
-All associations come with an association_dataset method that can be further filtered or
+All associations come with an <tt><i>association</i>_dataset</tt> method that can be further filtered or
 otherwise modified:
 
   class Author < Sequel::Model
@@ -154,10 +150,10 @@ otherwise modified:
   end
   Author.first.authorships_dataset.filter{|o| o.number < 10}.first
  
-You can extend a dataset with a module easily with :extend.  You can reference
+You can extend a dataset with a module using the <tt>:extend</tt> association option.  You can reference
 the model object that created the association dataset via the dataset's
-model_object method, and the related association reflection via the dataset's
-association_reflection method:
++model_object+ method, and the related association reflection via the dataset's
++association_reflection+ method:
 
   module FindOrCreate
     def find_or_create(vals)
@@ -169,11 +165,11 @@ association_reflection method:
   end
   Author.first.authorships_dataset.find_or_create(:name=>'Blah', :number=>10)
 
-=== has_many :through associations
+=== <tt>has_many :through</tt> associations
 
-many_to_many handles the usual case of a has_many :through with a belongs_to in
++many_to_many+ handles the usual case of a <tt>has_many :through</tt> with a +belongs_to+ in
 the associated model.  It doesn't break on the case where the join table is a
-model table, unlike ActiveRecord's has_and_belongs_to_many.
+model table, unlike ActiveRecord's +has_and_belongs_to_many+.
 
 ActiveRecord:
 
@@ -205,8 +201,8 @@ Sequel::Model:
   @author = Author.first
   @author.books
 
-If you use an association other than belongs_to in the associated model, you'll have
-to specify some of the :*key options and write a short method.
+If you use an association other than +belongs_to+ in the associated model, such as a +has_many+,
+you still use a +many_to_many+ association, but you need to use some options:
 
 ActiveRecord:
 
@@ -241,10 +237,6 @@ Sequel::Model:
 
   class Invoice < Sequel::Model
     many_to_one :client
-
-    def firm
-      client.firm if client
-    end
   end
 
   Firm.first.invoices
@@ -262,7 +254,8 @@ you are stuck with an existing design that uses them.
 
 If you must use them, look for the sequel_polymorphic plugin, as it makes using
 polymorphic associations in Sequel about as easy as it is in ActiveRecord.  However,
-here's how they can be done using Sequel's custom associations:
+here's how they can be done using Sequel's custom associations (the sequel_polymorphic
+plugin is just a generic version of this code):
 
 ActiveRecord:
 
@@ -362,75 +355,12 @@ Sequel::Model:
   @asset.attachable = @post
   @asset.attachable = @note
 
-== More advanced associations
-
-So far, we've only shown that Sequel::Model has associations as powerful as
-ActiveRecord's.  Now we will show how Sequel::Model's associations are more
-powerful.
-
-=== many_to_one/one_to_many not referencing primary key
-
-This can now be handled easily in Sequel using the :primary_key association
-option.  However, this example shows how the association was possible before
-the introduction of that option.
-
-Let's say you have two tables, invoices and clients, where each client is
-associated with many invoices.  However, instead of using the client's primary
-key, the invoice is associated to the client by name (this is bad database
-design, but sometimes you have to play with the cards you are dealt).
-
-  class Client < Sequel::Model
-    one_to_many :invoices, :reciprocal=>:client, \
-      :dataset=>proc{Invoice.filter(:client_name=>name)}, \
-      :eager_loader=>(proc do |eo|
-        id_map = {}
-        eo[:rows].each do |client|
-          id_map[client.name] = client
-          client.associations[:invoices] = []
-        end
-        Invoice.filter(:client_name=>id_map.keys.sort).all do |inv|
-          inv.associations[:client] = client = id_map[inv.client_name]
-          client.associations[:invoices] << inv 
-        end
-      end)
-
-    private
-
-    def _add_invoice(invoice)
-      invoice.client_name = name
-      invoice.save
-    end 
-    def _remove_invoice(invoice)
-      invoice.client_name = nil 
-      invoice.save
-    end 
-    def _remove_all_invoices
-      Invoice.filter(:client_name=>name).update(:client_name=>nil)
-    end 
-  end 
-
-  class Invoice < Sequel::Model
-    many_to_one :client, :key=>:client_name, \
-      :dataset=>proc{Client.filter(:name=>client_name)}, \
-      :eager_loader=>(proc do |eo|
-        id_map = eo[:key_hash][:client_name]
-        eo[:rows].each{|inv| inv.associations[:client] = nil}
-        Client.filter(:name=>id_map.keys).all do |client|
-          id_map[client.name].each{|inv| inv.associations[:client] = client}
-        end
-      end)
-
-    private
-
-    def _client=(client)
-      self.client_name = (client.name if client)
-    end
-  end
+== Other advanced associations
 
 === Joining on multiple keys
 
 Let's say you have two tables that are associated with each other with multiple
-keys.  This can now be handled using Sequel's built in composite key support for
+keys.  This can be handled using Sequel's built in composite key support for
 associations:
 
   # Both of these models have an album_id, number, and disc_number fields.
@@ -441,42 +371,7 @@ associations:
     many_to_one :favorite_track, :key=>[:disc_number, :number, :album_id], :primary_key=>[:disc_number, :number, :album_id]
   end
   class FavoriteTrack < Sequel::Model
-    one_to_many :tracks, :key=>[:disc_number, :number, :album_id], :primary_key=>[:disc_number, :number, :album_id], :one_to_one=>true
-  end
-
-Here's the old way to do it via custom associations:
-
-  class Track < Sequel::Model
-    many_to_one :favorite_track, \
-      :dataset=>(proc do
-        FavoriteTrack.filter(:disc_number=>disc_number, :number=>number, :album_id=>album_id)
-      end), \
-      :eager_loader=>(proc do |eo|
-        id_map = {}
-        eo[:rows].each do |t|
-          t.associations[:favorite_track] = nil
-          id_map[[t[:album_id], t[:disc_number], t[:number]]] = t
-        end
-        FavoriteTrack.filter([:album_id, :disc_number, :number]=>id_map.keys).all do |ft|
-          if t = id_map[[ft[:album_id], ft[:disc_number], ft[:number]]]
-            t.associations[:favorite_track] = ft
-          end
-        end
-      end)
-  end
-
-  class FavoriteTrack < Sequel::Model
-    many_to_one :track, \
-      :dataset=>(proc do
-        Track.filter(:disc_number=>disc_number, :number=>number, :album_id=>album_id)
-      end), \
-      :eager_loader=>(proc do |eo|
-        id_map = {}
-        eo[:rows].each{|ft| id_map[[ft[:album_id], ft[:disc_number], ft[:number]]] = ft}
-        Track.filter([:album_id, :disc_number, :number]=>id_map.keys).all do |t|
-          id_map[[t[:album_id], t[:disc_number], t[:number]]].associations[:track] = t
-        end
-      end)
+    one_to_one :tracks, :key=>[:disc_number, :number, :album_id], :primary_key=>[:disc_number, :number, :album_id]
   end
 
 === Tree - All Ancestors and Descendents
@@ -552,36 +447,12 @@ without knowing the depth of the tree?
 Note that unlike ActiveRecord, Sequel supports common table expressions, which allows you to use recursive queries.
 The results are not the same as in the above case, as all descendents are stored in a single association,
 but all descendants can be both lazy loaded or eager loaded in a single query (assuming your database
-supports recursive common table expressions):
+supports recursive common table expressions).  Sequel ships with an +rcte_tree+ plugin that makes
+this easy:
 
   class Node < Sequel::Model
-    one_to_many :descendants, :class=>Node, :dataset=>(proc do
-        Node.from(:t).
-        with_recursive(:t, Node.filter(:parent_id=>pk),
-          Node.join(:t, :id=>:parent_id).
-          select(:nodes.*))
-      end),
-      :eager_loader=>(proc do |eo|
-        id_map = eo[:key_hash][:id]
-        eo[:rows].each{|n| n.associations[:descendants] = []}
-        Node.from(:t).
-        with_recursive(:t, Node.filter(:parent_id=>id_map.keys).
-           select(:parent_id___root, :id, :parent_id),
-          Node.join(:t, :id=>:parent_id).
-          select(:t__root, :nodes.*)).
-        all.each do |node|
-          if root = id_map[node.values.delete(:root)].first
-            root.associations[:descendants] << node
-          end
-        end
-      end)
+    plugin :rcte_tree
   end
-
-Sequel ships with an +rcte_tree+ plugin that allows simple creation
-of ancestors and descendants relationships that use recursive common
-table expressions:
-
-  Node.plugin :rcte_tree
 
 === Joining multiple keys to a single key, through a third table
 
@@ -654,6 +525,6 @@ associated tickets.
   end
 
 Note that it is often better to use a sum cache instead of this approach.  You can implement
-a sum cache using after_create and after_delete hooks, or using a database trigger
+a sum cache using +after_create+ and +after_delete+ hooks, or using a database trigger
 (the preferred method if you only have to support one database and that database supports
 triggers).
