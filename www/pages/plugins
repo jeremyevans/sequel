@@ -1,8 +1,8 @@
 <h2>Sequel::Model Plugins for v<%= Sequel.version %></h2>
 
-<p>Sequel::Model has a very flexible and standardized plugin architecture, see the <a href="rdoc/classes/Sequel/Plugins.html">RDoc</a>. Here is a list of plugins that members of the Sequel community have developed:</p>
+<p>Sequel::Model has a standardized and very flexible plugin architecture, see the <a href="rdoc/classes/Sequel/Plugins.html">RDoc</a>. Here is a list of plugins that members of the Sequel community have developed:</p>
 
-<h3>Built-in Plugins</h3>
+<h3>Plugins that ship with Sequel</h3>
 
 <ul>
 <li><a href="rdoc-plugins/classes/Sequel/Plugins/ActiveModel.html">active_model</a>: Makes Sequel::Model objects compliant to the ActiveModel::Lint specs, so they should work correctly in Rails 3.</li>
@@ -50,7 +50,7 @@
 <li><a href='http://github.com/pkondzior/sequel_nested_set'>sequel_nested_set</a>: Nested set implementation, ported from the Awesome Nested Set Active Record plugin.</li>
 <li><a href='http://github.com/boof/sequel_notnaughty'>sequel_notnaughty</a>: Port of the NotNaughty validation framework.</li>
 <li><a href='http://github.com/jackdempsey/sequel_polymorphic'>sequel_polymorphic</a>: Lets you easily create polymorphic associations.</li>
-<li><a href='http://github.com/daicoden/sequel_proc_error_handling'>sequel_proc_error_handling</a>: Let's you add procs that automatically rescue and fix model errors.</li>
+<li><a href='http://github.com/daicoden/sequel_proc_error_handling'>sequel_proc_error_handling</a>: Lets you add procs that automatically rescue and fix model errors.</li>
 <li><a href='http://github.com/pk/sequel_sluggable'>sequel_sluggable</a>: Easy slug behaviour for any model.</li>
 <li><a href='http://github.com/jackdempsey/sequel_taggable'>sequel_taggable</a>: Allows easily adding tags to any model.</li>
 <li><a href='http://github.com/jeremyevans/sequel_validation_helpers_block'>sequel_validation_helpers_block</a>: Allows easy determination of which validation rules apply to a given column, at the expense of increased verbosity.</li>
@@ -58,9 +58,9 @@
 
 <h2>Sequel Extensions</h2>
 
-<p>Extensions are modification or additions to Sequel that affect core Sequel, not just Sequel::Model.</p>
+<p>Extensions are modifications or additions to Sequel that affect core Sequel, not just Sequel::Model.</p>
 
-<h3>Built-in Extensions</h3>
+<h3>Extensions that ship with Sequel</h3>
 
 <ul>
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/blank_rb.html">blank</a>: Adds blank? instance methods to all objects.</li>
