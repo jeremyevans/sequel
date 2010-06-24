@@ -48,8 +48,8 @@ Without a filename argument, the sqlite adapter will setup a new sqlite database
 == Retrieve rows
 
   dataset.each{|r| p r}
-  dataset.all #=> [{...}, {...}, ...]
-  dataset.first
+  dataset.all # => [{...}, {...}, ...]
+  dataset.first # => {...}
 
 == Update/Delete rows
 
@@ -66,47 +66,51 @@ Without a filename argument, the sqlite adapter will setup a new sqlite database
 
 == Filtering (see also doc/dataset_filtering.rdoc)
 
+=== Equality
+
   dataset.filter(:name => 'abc')
   dataset.filter('name = ?', 'abc')
 
-  dataset.filter{|o| o.value > 100}
-  dataset.exclude{|o| o.value <= 100}
+=== Inequality
+
+  dataset.filter{value > 100}
+  dataset.exclude{value <= 100}
+
+=== Inclusion
 
   dataset.filter(:value => 50..100)
-  dataset.where{|o| (o.value >= 50) & (o.value <= 100)}
+  dataset.where{(value >= 50) & (value <= 100)}
 
   dataset.where('value IN ?', [50,75,100])
   dataset.where(:value=>[50,75,100])
 
-  dataset.filter(:name => 'abc').first
-  dataset[:name => 'abc']
+  dataset.where(:id=>other_dataset.select(:other_id))
+
+=== Subselects as scalar values
 
   dataset.where('price > (SELECT avg(price) + 100 FROM table)')
-  dataset.filter{|o| o.price > dataset.select(o.avg(price) + 100)}
+  dataset.filter{price > dataset.select(avg(price) + 100)}
 
-=== Advanced filtering using ruby expressions
+=== LIKE/Regexp
 
-  DB[:items].filter{|o| o.price < 100}.sql 
-  #=> "SELECT * FROM items WHERE (price < 100)" 
+  DB[:items].filter(:name.like('AL%'))
+  DB[:items].filter(:name => /^AL/)
 
-  DB[:items].filter(:name.like('AL%')).sql 
-  #=> "SELECT * FROM items WHERE (name LIKE 'AL%')" 
+=== AND/OR/NOT
 
-There's support for nested expressions with AND, OR and NOT:
-
-  DB[:items].filter{|o| (o.x > 5) & (o.y > 10)}.sql 
-  #=> "SELECT * FROM items WHERE ((x > 5) AND (y > 10))" 
+  DB[:items].filter{(x > 5) & (y > 10)}.sql 
+  # SELECT * FROM items WHERE ((x > 5) AND (y > 10))
 
   DB[:items].filter({:x => 1, :y => 2}.sql_or & ~{:z => 3}).sql 
-  #=> "SELECT * FROM items WHERE (((x = 1) OR (y = 2)) AND (z != 3))"
+  # SELECT * FROM items WHERE (((x = 1) OR (y = 2)) AND (z != 3))
 
-You can use arithmetic operators and specify SQL functions:
+=== Mathematical operators
 
   DB[:items].filter((:x + :y) > :z).sql 
-  #=> "SELECT * FROM items WHERE ((x + y) > z)" 
+  # SELECT * FROM items WHERE ((x + y) > z)
 
-  DB[:items].filter{|o| :price - 100 < o.avg(:price)}.sql 
-  #=> "SELECT * FROM items WHERE ((price - 100) < avg(price))" 
+  DB[:items].filter{price - 100 < avg(price)}.sql 
+  # SELECT * FROM items WHERE ((price - 100) < avg(price))
 
 == Ordering
 
@@ -114,7 +118,7 @@ You can use arithmetic operators and specify SQL functions:
   dataset.reverse_order(:kind)
   dataset.order(:kind.desc, :name)
 
-== Row ranges
+== Limit/Offset
 
   dataset.limit(30) # LIMIT 30
   dataset.limit(30, 10) # LIMIT 30 OFFSET 10
@@ -122,12 +126,12 @@ You can use arithmetic operators and specify SQL functions:
 == Joins
 
   DB[:items].left_outer_join(:categories, :id => :category_id).sql 
-  #=> "SELECT * FROM items LEFT OUTER JOIN categories ON categories.id = items.category_id"
+  # SELECT * FROM items LEFT OUTER JOIN categories ON categories.id = items.category_id
 
   DB[:items].join(:categories, :id => :category_id).join(:groups, :id => :items__group_id) 
-  #=> "SELECT * FROM items INNER JOIN categories ON categories.id = items.category_id INNER JOIN groups ON groups.id = items.group_id"
+  # SELECT * FROM items INNER JOIN categories ON categories.id = items.category_id INNER JOIN groups ON groups.id = items.group_id
 	
-== Summarizing
+== Aggregate functions methods
 
   dataset.count #=> record count
   dataset.max(:price)
@@ -135,6 +139,7 @@ You can use arithmetic operators and specify SQL functions:
   dataset.avg(:price)
   dataset.sum(:stock)
 
+  dataset.group_and_count(:category)
   dataset.group(:category).select(:category, :AVG.sql_function(:price))
 
 == SQL Functions / Literals
@@ -150,11 +155,11 @@ You can use arithmetic operators and specify SQL functions:
   DB.create_table :items do
     primary_key :id
     String :name, :unique => true, :null => false
-    boolean :active, :default => true
+    TrueClass :active, :default => true
     foreign_key :category_id, :categories
-    Time :created_at
+    DateTime :created_at
     
-    index :grade
+    index :created_at
   end
 
   DB.drop_table :items
@@ -169,7 +174,7 @@ You can use arithmetic operators and specify SQL functions:
   DB[:items].select(:name.as(:item_name))
   DB[:items].select(:name___item_name)
   DB[:items___items_table].select(:items_table__name___item_name)
-  # => "SELECT items_table.name AS item_name FROM items AS items_table"
+  # SELECT items_table.name AS item_name FROM items AS items_table
 
 == Transactions
 
@@ -211,8 +216,8 @@ Savepoints can be used if the database supports it:
 
 == Miscellaneous:
 
-  dataset.sql #=> "SELECT * FROM items"
-  dataset.delete_sql #=> "DELETE FROM items"
-  dataset.where(:name => 'sequel').exists #=> "EXISTS ( SELECT * FROM items WHERE name = 'sequel' )"
+  dataset.sql # "SELECT * FROM items"
+  dataset.delete_sql # "DELETE FROM items"
+  dataset.where(:name => 'sequel').exists # "EXISTS ( SELECT * FROM items WHERE name = 'sequel' )"
   dataset.columns #=> array of columns in the result set, does a SELECT
   DB.schema(:items) => [[:id, {:type=>:integer, ...}], [:name, {:type=>:string, ...}], ...]

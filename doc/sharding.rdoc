@@ -4,7 +4,7 @@ Sequel has support for read only slave databases
 with a writable master database, as well as database sharding (where you can
 pick a server to use for a given dataset).  Support for both
 features is database independent, and should work for all database adapters
-included with Sequel.
+that ship with Sequel.
 
 == The :servers Database option
 

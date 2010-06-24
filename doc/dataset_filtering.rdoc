@@ -1,6 +1,6 @@
 = Dataset Filtering 
 
-Sequel offers unparalleled flexibility when it comes to filtering records. You can specify your conditions as a custom string, as a string with parameters, as a hash of values to compare against, or as ruby code that Sequel translates into SQL expressions.
+Sequel is very flexibile when it comes to filtering records. You can specify your conditions as a custom string, as a string with parameters, as a hash of values to compare against, or as ruby code that Sequel translates into SQL expressions.
 
 == Filtering using a custom filter string
 
@@ -14,11 +14,20 @@ In order to prevent SQL injection, you can replace literal values with question 
   items.filter('category = ?', 'ruby').sql
   #=> "SELECT * FROM items WHERE category = 'ruby'"
 
+You can also use placeholders with :placeholder and a hash of placeholder values:
+
+  items.filter('category = :category', :category=>'ruby').sql
+  #=> "SELECT * FROM items WHERE category = 'ruby'"
+
 === Specifying SQL functions
 
-Sequel also allows you to specify functions by using the Symbol#sql_function method (and the Symbol#[] method on ruby 1.8):
+Sequel also allows you to specify functions by using the Symbol#sql_function method:
 
   items.literal(:avg.sql_function(:price)) #=> "avg(price)"
+
+If you are specifying a filter/selection/order, you can use a virtual row block:
+
+  items.select{avg(price)}
 
 == Filtering using a hash
 
@@ -57,7 +66,7 @@ Sequel allows you to use ruby expressions directly in the call to filter:
   items.filter(:price * 2 < 50).sql
   #=> "SELECT * FROM items WHERE ((price * 2) < 50) 
 
-This works for the standard inequality and arithmetic operators (though you can't use the inequality operators directly on a symbol in ruby 1.9):
+This works for the standard inequality and arithmetic operators (though you can't use the inequality operators directly on a symbol):
 
   items.filter(:price + 100 < 200).sql
   #=> "SELECT * FROM items WHERE ((price + 100) < 200) 
@@ -94,7 +103,7 @@ This works with other hash values, such as arrays and ranges:
 
 === Negating conditions
 
-You can use the negation operator (~) in most cases:
+You can use the inversion operator (~) in most cases:
 
   items.filter(~{:category => 'ruby'}).sql
   #=> "SELECT * FROM items WHERE (category != 'ruby')"
@@ -109,12 +118,12 @@ You can use the negation operator (~) in most cases:
 
 You can also compare against other columns:
 
-  items.filter{|o| o.credit > :debit}.sql
+  items.filter{credit > debit}.sql
   #=> "SELECT * FROM items WHERE (credit > debit)
 
 Or against SQL functions:
 
-  items.filter{|o| :price - 100 < o.max(:price)}.sql
+  items.filter{price - 100 < max(price)}.sql
   #=> "SELECT * FROM items WHERE ((price - 100) < max(price))"
 
 == String search functions
@@ -155,4 +164,4 @@ One of the best features of Sequel is the ability to use datasets as sub-queries
   consumers.filter(:id => refs).sql
   #=> "SELECT * FROM consumers WHERE (id IN (SELECT consumer_id FROM consumer_refs WHERE logged_in))"
 
-Note that if you compare against a sub-query, you must select a single column in the sub-query.
+Note that if you are checking for the inclusion of a single column in a subselect, the subselect should only select a single column.
