@@ -109,7 +109,7 @@ module Sequel
     when Hash
       true
     when Array
-      !obj.empty? && obj.all?{|i| (Array === i) && (i.length == 2)}
+      !obj.empty? && !obj.is_a?(SQL::ValueList) && obj.all?{|i| (Array === i) && (i.length == 2)}
     else
       false
     end

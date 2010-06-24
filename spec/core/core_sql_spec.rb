@@ -51,14 +51,20 @@ context "Array#case and Hash#case" do
   end
 end
 
-context "Array#sql_array" do
+context "Array#sql_value_list and #sql_array" do
   before do
     @d = Sequel::Dataset.new(nil)
   end
 
-  specify "should treat the array as an SQL array instead of conditions" do
-    @d.literal([[:x, 1], [:y, 2]]).should == '((x = 1) AND (y = 2))'
-    @d.literal([[:x, 1], [:y, 2]].sql_array).should == '((x, 1), (y, 2))'
+  specify "should treat the array as an SQL value list instead of conditions when used as a placeholder value" do
+    @d.filter("(a, b) IN ?", [[:x, 1], [:y, 2]]).sql.should == 'SELECT * WHERE ((a, b) IN ((x = 1) AND (y = 2)))'
+    @d.filter("(a, b) IN ?", [[:x, 1], [:y, 2]].sql_value_list).sql.should == 'SELECT * WHERE ((a, b) IN ((x, 1), (y, 2)))'
+    @d.filter("(a, b) IN ?", [[:x, 1], [:y, 2]].sql_array).sql.should == 'SELECT * WHERE ((a, b) IN ((x, 1), (y, 2)))'
+  end
+
+  specify "should be no difference when used as a hash value" do
+    @d.filter([:a, :b]=>[[:x, 1], [:y, 2]]).sql.should == 'SELECT * WHERE ((a, b) IN ((x, 1), (y, 2)))'
+    @d.filter([:a, :b]=>[[:x, 1], [:y, 2]].sql_value_list).sql.should == 'SELECT * WHERE ((a, b) IN ((x, 1), (y, 2)))'
     @d.filter([:a, :b]=>[[:x, 1], [:y, 2]].sql_array).sql.should == 'SELECT * WHERE ((a, b) IN ((x, 1), (y, 2)))'
   end
 end

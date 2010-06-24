@@ -185,7 +185,7 @@ module Sequel
             ds = opts.associated_class 
             opts.reverse_edges.each{|t| ds = ds.join(t[:table], Array(t[:left]).zip(Array(t[:right])), :table_alias=>t[:alias])}
             ft = opts[:final_reverse_edge]
-            conds = uses_lcks ? [[left_keys.map{|k| SQL::QualifiedIdentifier.new(ft[:table], k)}, SQL::SQLArray.new(h.keys)]] : [[left_key, h.keys]]
+            conds = uses_lcks ? [[left_keys.map{|k| SQL::QualifiedIdentifier.new(ft[:table], k)}, h.keys]] : [[left_key, h.keys]]
             ds = ds.join(ft[:table], Array(ft[:left]).zip(Array(ft[:right])) + conds, :table_alias=>ft[:alias])
             model.eager_loading_dataset(opts, ds, Array(opts.select), eo[:associations], eo).all do |assoc_record|
               hash_key = if uses_lcks

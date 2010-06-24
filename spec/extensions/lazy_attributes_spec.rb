@@ -24,7 +24,6 @@ describe "Sequel::Plugins::LazyAttributes" do
           end
         else
           i = where.args.last
-          i = i.instance_variable_get(:@array) if i.is_a?(Sequel::SQL::SQLArray)
           Array(i).each do |x|
             if sql =~ /SELECT name FROM/
               yield(block[:name=>x.to_s])

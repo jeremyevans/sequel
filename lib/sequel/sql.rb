@@ -87,7 +87,7 @@ module Sequel
       # Show the class name and instance variables for the object, necessary
       # for correct operation on ruby 1.9.2.
       def inspect
-        "#<#{self.class} #{instance_variables.map{|iv| "#{iv}=>#{instance_variable_get(iv)}"}.join(', ')}>"
+        "#<#{self.class} #{instance_variables.map{|iv| "#{iv}=>#{instance_variable_get(iv).inspect}"}.join(', ')}>"
       end
 
       # Returns self, because SQL::Expression already acts like
@@ -132,13 +132,16 @@ module Sequel
       # Hash of ruby operator symbols to SQL operators, used in BooleanMethods
       BOOLEAN_OPERATOR_METHODS = {:& => :AND, :| =>:OR}
 
+      # Operators that use IN/NOT IN for inclusion/exclusion
+      IN_OPERATORS = [:IN, :'NOT IN']
+
       # Operators that use IS, used for special casing to override literal true/false values
       IS_OPERATORS = [:IS, :'IS NOT']
 
       # Operator symbols that take exactly two arguments
       TWO_ARITY_OPERATORS = [:'=', :'!=', :LIKE, :'NOT LIKE', \
-        :~, :'!~', :'~*', :'!~*', :IN, :'NOT IN', :ILIKE, :'NOT ILIKE'] + \
-        INEQUALITY_OPERATORS + BITWISE_OPERATORS + IS_OPERATORS 
+        :~, :'!~', :'~*', :'!~*', :ILIKE, :'NOT ILIKE'] + \
+        INEQUALITY_OPERATORS + BITWISE_OPERATORS + IS_OPERATORS + IN_OPERATORS
 
       # Operator symbols that take one or more arguments
       N_ARITY_OPERATORS = [:AND, :OR, :'||'] + MATHEMATICAL_OPERATORS
@@ -157,7 +160,8 @@ module Sequel
       # Raise an error if the operator doesn't allow boolean input and a boolean argument is given.
       # Raise an error if the wrong number of arguments for a given operator is used.
       def initialize(op, *args)
-        args.map!{|a| Sequel.condition_specifier?(a) ? SQL::BooleanExpression.from_value_pairs(a) : a}
+        orig_args = args
+        args = args.map{|a| Sequel.condition_specifier?(a) ? SQL::BooleanExpression.from_value_pairs(a) : a}
         case op
         when *N_ARITY_OPERATORS
           raise(Error, "The #{op} operator requires at least 1 argument") unless args.length >= 1
@@ -166,6 +170,10 @@ module Sequel
           old_args.each{|a| a.is_a?(self.class) && a.op == op ? args.concat(a.args) : args.push(a)}
         when *TWO_ARITY_OPERATORS
           raise(Error, "The #{op} operator requires precisely 2 arguments") unless args.length == 2
+          # With IN/NOT IN, even if the second argument is an array of two element arrays,
+          # don't convert it into a boolean expression, since it's definitely being used
+          # as a value list.
+          args[1] = orig_args[1] if IN_OPERATORS.include?(op)
         when *ONE_ARITY_OPERATORS
           raise(Error, "The #{op} operator requires a single argument") unless args.length == 1
         else
@@ -319,7 +327,7 @@ module Sequel
       ComplexExpression::INEQUALITY_OPERATORS.each do |o|
         define_method(o) do |ce|
           case ce
-          when BooleanExpression, TrueClass, FalseClass, NilClass, Hash, Array
+          when BooleanExpression, TrueClass, FalseClass, NilClass, Hash, ::Array
             raise(Error, "cannot apply #{o} to a boolean expression")
           else  
             BooleanExpression.new(o, self, ce)
@@ -338,7 +346,7 @@ module Sequel
       def initialize(op, *args)
         args.each do |a|
           case a
-          when BooleanExpression, TrueClass, FalseClass, NilClass, Hash, Array
+          when BooleanExpression, TrueClass, FalseClass, NilClass, Hash, ::Array
             raise(Error, "cannot apply #{op} to a boolean expression")
           end
         end
@@ -486,7 +494,7 @@ module Sequel
           ce = case r
           when Range
             new(:AND, new(:>=, l, r.begin), new(r.exclude_end? ? :< : :<=, l, r.end))
-          when Array, ::Sequel::Dataset, SQLArray
+          when ::Array, ::Sequel::Dataset
             new(:IN, l, r)
           when NegativeBooleanConstant
             new(:"IS NOT", l, r.constant)
@@ -864,22 +872,6 @@ module Sequel
       private_class_method :like_element
     end
 
-    # Represents an SQL array.  Added so it is possible to deal with a
-    # ruby array of all two pairs as an SQL array instead of an ordered
-    # hash-like conditions specifier.
-    class SQLArray < Expression
-      # The array of objects this SQLArray wraps
-      attr_reader :array
-      alias to_a array
-
-      # Create an object with the given array.
-      def initialize(array)
-        @array = array
-      end
-
-      to_s_method :array_sql, '@array'
-    end
-
     # Represents an SQL array access, with multiple possible arguments.
     class Subscript < GenericExpression
       # The SQL array column
@@ -901,6 +893,15 @@ module Sequel
       
       to_s_method :subscript_sql
     end
+
+    # Represents an SQL value list (IN/NOT IN predicate value).  Added so it is possible to deal with a
+    # ruby array of all two pairs as an SQL value list instead of an ordered
+    # hash-like conditions specifier.
+    class ValueList < ::Array
+    end
+
+    # Old name for +ValueList+, used for backwards compatibility
+    SQLArray = ValueList
 
     # The purpose of this class is to allow the easy creation of SQL identifiers and functions
     # without relying on methods defined on Symbol.  This is useful if another library defines

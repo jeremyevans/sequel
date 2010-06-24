@@ -70,7 +70,7 @@ module Sequel
         # the attribute for the current object.
         def lazy_attribute_lookup(a)
           primary_key = model.primary_key
-          model.select(*(Array(primary_key) + [a])).filter(primary_key=>::Sequel::SQL::SQLArray.new(retrieved_with.map{|o| o.pk})).all if model.identity_map && retrieved_with
+          model.select(*(Array(primary_key) + [a])).filter(primary_key=>retrieved_with.map{|o| o.pk}).all if model.identity_map && retrieved_with
           values[a] = this.select(a).first[a] unless values.include?(a)
           values[a]
         end

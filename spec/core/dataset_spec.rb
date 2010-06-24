@@ -465,6 +465,7 @@ context "Dataset#where" do
     @dataset.filter([:id1, :id2] => @d1.select(:id1, :id2)).sql.should == "SELECT * FROM test WHERE ((id1, id2) IN (SELECT id1, id2 FROM test WHERE (region = 'Asia')))"
     @dataset.filter([:id1, :id2] => []).sql.should == "SELECT * FROM test WHERE ((id1 != id1) AND (id2 != id2))"
     @dataset.filter([:id1, :id2] => [[1, 2], [3,4]].sql_array).sql.should == "SELECT * FROM test WHERE ((id1, id2) IN ((1, 2), (3, 4)))"
+    @dataset.filter([:id1, :id2] => [[1, 2], [3,4]]).sql.should == "SELECT * FROM test WHERE ((id1, id2) IN ((1, 2), (3, 4)))"
 
     @dataset.exclude(:id => @d1.select(:id)).sql.should == "SELECT * FROM test WHERE (id NOT IN (SELECT id FROM test WHERE (region = 'Asia')))"
     @dataset.exclude(:id => []).sql.should == "SELECT * FROM test WHERE (1 = 1)"
@@ -472,6 +473,7 @@ context "Dataset#where" do
     @dataset.exclude([:id1, :id2] => @d1.select(:id1, :id2)).sql.should == "SELECT * FROM test WHERE ((id1, id2) NOT IN (SELECT id1, id2 FROM test WHERE (region = 'Asia')))"
     @dataset.exclude([:id1, :id2] => []).sql.should == "SELECT * FROM test WHERE (1 = 1)"
     @dataset.exclude([:id1, :id2] => [[1, 2], [3,4]].sql_array).sql.should == "SELECT * FROM test WHERE ((id1, id2) NOT IN ((1, 2), (3, 4)))"
+    @dataset.exclude([:id1, :id2] => [[1, 2], [3,4]]).sql.should == "SELECT * FROM test WHERE ((id1, id2) NOT IN ((1, 2), (3, 4)))"
   end
 
   specify "should handle IN/NOT IN queries with multiple columns and an array where the database doesn't support it" do
@@ -3453,8 +3455,8 @@ context "Sequel::Dataset#qualify_to_first_source" do
     @ds.filter{(a+b)<(c-3)}.qualify_to_first_source.sql.should == 'SELECT t.* FROM t WHERE ((t.a + t.b) < (t.c - 3))'
   end
 
-  specify "should handle SQL::SQLArrays" do
-    @ds.filter(:a=>[:b, :c].sql_array).qualify_to_first_source.sql.should == 'SELECT t.* FROM t WHERE (t.a IN (t.b, t.c))'
+  specify "should handle SQL::ValueLists" do
+    @ds.filter(:a=>[:b, :c].sql_value_list).qualify_to_first_source.sql.should == 'SELECT t.* FROM t WHERE (t.a IN (t.b, t.c))'
   end
 
   specify "should handle SQL::Subscripts" do

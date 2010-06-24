@@ -778,7 +778,7 @@ module Sequel
             h = eo[:key_hash][left_pk]
             eo[:rows].each{|object| object.associations[name] = []}
             r = uses_rcks ? rcks.zip(opts.right_primary_keys) : [[right, opts.right_primary_key]]
-            l = uses_lcks ? [[lcks.map{|k| SQL::QualifiedIdentifier.new(join_table, k)}, SQL::SQLArray.new(h.keys)]] : [[left, h.keys]]
+            l = uses_lcks ? [[lcks.map{|k| SQL::QualifiedIdentifier.new(join_table, k)}, h.keys]] : [[left, h.keys]]
             model.eager_loading_dataset(opts, opts.associated_class.inner_join(join_table, r + l), Array(opts.select), eo[:associations], eo).all do |assoc_record|
               hash_key = if uses_lcks
                 left_key_alias.map{|k| assoc_record.values.delete(k)}
@@ -849,7 +849,7 @@ module Sequel
             # Skip eager loading if no objects have a foreign key for this association
             unless keys.empty?
               klass = opts.associated_class
-              model.eager_loading_dataset(opts, klass.filter(uses_cks ? {opts.primary_keys.map{|k| SQL::QualifiedIdentifier.new(klass.table_name, k)}=>SQL::SQLArray.new(keys)} : {SQL::QualifiedIdentifier.new(klass.table_name, opts.primary_key)=>keys}), opts.select, eo[:associations], eo).all do |assoc_record|
+              model.eager_loading_dataset(opts, klass.filter(uses_cks ? {opts.primary_keys.map{|k| SQL::QualifiedIdentifier.new(klass.table_name, k)}=>keys} : {SQL::QualifiedIdentifier.new(klass.table_name, opts.primary_key)=>keys}), opts.select, eo[:associations], eo).all do |assoc_record|
                 hash_key = uses_cks ? opts.primary_keys.map{|k| assoc_record.send(k)} : assoc_record.send(opts.primary_key)
                 next unless objects = h[hash_key]
                 objects.each{|object| object.associations[name] = assoc_record}
@@ -899,7 +899,7 @@ module Sequel
             end
             reciprocal = opts.reciprocal
             klass = opts.associated_class
-            model.eager_loading_dataset(opts, klass.filter(uses_cks ? {cks.map{|k| SQL::QualifiedIdentifier.new(klass.table_name, k)}=>SQL::SQLArray.new(h.keys)} : {SQL::QualifiedIdentifier.new(klass.table_name, key)=>h.keys}), opts.select, eo[:associations], eo).all do |assoc_record|
+            model.eager_loading_dataset(opts, klass.filter(uses_cks ? {cks.map{|k| SQL::QualifiedIdentifier.new(klass.table_name, k)}=>h.keys} : {SQL::QualifiedIdentifier.new(klass.table_name, key)=>h.keys}), opts.select, eo[:associations], eo).all do |assoc_record|
               hash_key = uses_cks ? cks.map{|k| assoc_record.send(k)} : assoc_record.send(key)
               next unless objects = h[hash_key]
               if one_to_one

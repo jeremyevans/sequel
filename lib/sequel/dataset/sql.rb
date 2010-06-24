@@ -261,10 +261,10 @@ module Sequel
       when :IN, :"NOT IN"
         cols = args.at(0)
         vals = args.at(1)
-        col_array = true if cols.is_a?(Array) || cols.is_a?(SQL::SQLArray)
-        if vals.is_a?(Array) || vals.is_a?(SQL::SQLArray)
+        col_array = true if cols.is_a?(Array)
+        if vals.is_a?(Array)
           val_array = true
-          empty_val_array = vals.to_a == []
+          empty_val_array = vals == []
         end
         if col_array
           if empty_val_array
@@ -284,7 +284,10 @@ module Sequel
               complex_expression_sql(op, [cols, vals.map!{|x| x.values_at(*val_cols)}])
             end
           else
-            "(#{literal(cols)} #{op} #{literal(vals)})"
+            # If the columns and values are both arrays, use array_sql instead of
+            # literal so that if values is an array of two element arrays, it
+            # will be treated as a value list instead of a condition specifier.
+            "(#{literal(cols)} #{op} #{val_array ? array_sql(vals) : literal(vals)})"
           end
         else
           if empty_val_array
@@ -817,8 +820,6 @@ module Sequel
         SQL::Function.new(e.f, *qualified_expression(e.args, table))
       when SQL::ComplexExpression 
         SQL::ComplexExpression.new(e.op, *qualified_expression(e.args, table))
-      when SQL::SQLArray 
-        SQL::SQLArray.new(qualified_expression(e.array, table))
       when SQL::Subscript 
         SQL::Subscript.new(qualified_expression(e.f, table), qualified_expression(e.sub, table))
       when SQL::WindowFunction

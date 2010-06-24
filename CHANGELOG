@@ -1,5 +1,7 @@
 === HEAD
 
+* Handle arrays of two element arrays as filter hash values automatically (jeremyevans)
+
 * Allow :frame option for windows to take a string that is used literally (jeremyevans)
 
 * Support transaction isolation levels on PostgreSQL, MySQL, and MSSQL (jeremyevans)

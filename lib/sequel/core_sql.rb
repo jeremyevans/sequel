@@ -33,15 +33,19 @@ class Array
     ::Sequel::SQL::CaseExpression.new(self, default, expression)
   end
 
-  # Return a Sequel::SQL::Array created from this array.  Used if this array contains
-  # all two pairs and you want it treated as an SQL array instead of a ordered hash-like
-  # conditions.
+  # Return a Sequel::SQL::ValueList created from this array.  Used if this array contains
+  # all two element arrays and you want it treated as an SQL value list (IN predicate) 
+  # instead of a ordered hash-like conditions.  This is not necessary if you are using
+  # this array as a value in a filter, but may be necessary if you are using it as a
+  # value with placeholder SQL:
   #
-  #   [[1, 2], [3, 4]] # SQL: 1 = 2 AND 3 = 4
-  #   [[1, 2], [3, 4]].sql_array # SQL: ((1, 2), (3, 4))
-  def sql_array
-    ::Sequel::SQL::SQLArray.new(self)
+  #   DB[:a].filter([:a, :b]=>[[1, 2], [3, 4]]) # SQL: (a, b) IN ((1, 2), (3, 4))
+  #   DB[:a].filter('(a, b) IN ?', [[1, 2], [3, 4]]) # SQL: (a, b) IN ((1 = 2) AND (3 = 4))
+  #   DB[:a].filter('(a, b) IN ?', [[1, 2], [3, 4]].sql_value_list) # SQL: (a, b) IN ((1, 2), (3, 4))
+  def sql_value_list
+    ::Sequel::SQL::ValueList.new(self)
   end
+  alias sql_array sql_value_list
 
   # Return a Sequel::SQL::BooleanExpression created from this array, matching all of the
   # conditions.  Rarely do you need to call this explicitly, as Sequel generally
