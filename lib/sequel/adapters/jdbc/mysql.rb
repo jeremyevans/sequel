@@ -54,6 +54,11 @@ module Sequel
         def requires_return_generated_keys?
           true
         end
+      
+        # Convert tinyint(1) type to boolean
+        def schema_column_type(db_type)
+          db_type == 'tinyint(1)' ? :boolean : super
+        end
       end
       
       # Dataset class for MySQL datasets accessed via JDBC.

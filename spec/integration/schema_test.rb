@@ -78,7 +78,7 @@ describe "Database schema parser" do
     INTEGRATION_DB.schema(:items).first.last[:ruby_default].should == 'blah'
   end
 
-  cspecify "should parse types from the schema properly", [:jdbc, :mysql] do
+  specify "should parse types from the schema properly" do
     INTEGRATION_DB.create_table!(:items){Integer :number}
     INTEGRATION_DB.schema(:items).first.last[:type].should == :integer
     INTEGRATION_DB.create_table!(:items){Fixnum :number}

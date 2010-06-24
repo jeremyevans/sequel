@@ -1,5 +1,7 @@
 === HEAD
 
+* Fix handling of tinyint(1) columns when connecting to MySQL via JDBC (jeremyevans)
+
 * Handle arrays of two element arrays as filter hash values automatically (jeremyevans)
 
 * Allow :frame option for windows to take a string that is used literally (jeremyevans)
