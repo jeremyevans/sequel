@@ -1,8 +1,8 @@
-# Sequel extends the Array class to add methods to implement the SQL DSL.
+# Sequel extends +Array+ to add methods to implement the SQL DSL.
 # Most of these methods require that the array not be empty and that it
 # must consist solely of other arrays that have exactly two elements.
 class Array
-  # Return a Sequel::SQL::BooleanExpression created from this array, not matching all of the
+  # Return a <tt>Sequel::SQL::BooleanExpression</tt> created from this array, not matching all of the
   # conditions.
   #
   #   ~[[:a, true]] # SQL: a IS NOT TRUE
@@ -11,8 +11,8 @@ class Array
     sql_expr_if_all_two_pairs(:OR, true)
   end
 
-  # True if the array is not empty and all of its elements are
-  # arrays of size 2, false otherwise.  This is used to determine if the array
+  # +true+ if the array is not empty and all of its elements are
+  # arrays of size 2, +false+ otherwise.  This is used to determine if the array
   # could be a specifier of conditions, used similarly to a hash
   # but allowing for duplicate keys and a specific order.
   #
@@ -24,7 +24,7 @@ class Array
     !empty? && all?{|i| (Array === i) && (i.length == 2)}
   end
 
-  # Return a Sequel::SQL::CaseExpression with this array as the conditions and the given
+  # Return a <tt>Sequel::SQL::CaseExpression</tt> with this array as the conditions and the given
   # default value and expression.
   #
   #   [[{:a=>[2,3]}, 1]].case(0) # SQL: CASE WHEN a IN (2, 3) THEN 1 ELSE 0 END

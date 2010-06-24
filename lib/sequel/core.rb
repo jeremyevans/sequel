@@ -2,7 +2,7 @@
 
 # Top level module for Sequel
 #
-# There are some class methods that are added via metaprogramming, one for
+# There are some module methods that are added via metaprogramming, one for
 # each supported adapter.  For example:
 #
 #   DB = Sequel.sqlite # Memory database
@@ -20,31 +20,30 @@
 # Sequel doesn't pay much attention to timezones by default, but you can set it
 # handle timezones if you want.  There are three separate timezone settings:
 #
-# * application_timezone - The timezone you want the application to use.  This is
-#   the timezone that incoming times from the database and typecasting are converted
-#   to.
-# * database_timezone - The timezone for storage in the database.  This is the
-#   timezone to which Sequel will convert timestamps before literalizing them
-#   for storage in the database.  It is also the timezone that Sequel will assume
-#   database timestamp values are already in (if they don't include an offset).
-# * typecast_timezone - The timezone that incoming data that Sequel needs to typecast
-#   is assumed to be already in (if they don't include an offset).
+# application_timezone :: The timezone you want the application to use.  This is the timezone
+#                         that incoming times from the database and typecasting are converted to.
+# database_timezone :: The timezone for storage in the database.  This is the
+#                      timezone to which Sequel will convert timestamps before literalizing them
+#                      for storage in the database.  It is also the timezone that Sequel will assume
+#                      database timestamp values are already in (if they don't include an offset).
+# typecast_timezone :: The timezone that incoming data that Sequel needs to typecast
+#                      is assumed to be already in (if they don't include an offset).
 #
 # You can set also set all three timezones to the same value at once via
-# Sequel.default_timezone=.
+# <tt>Sequel.default_timezone=</tt>.
 #
 #   Sequel.application_timezone = :utc # or :local or nil
 #   Sequel.database_timezone = :utc # or :local or nil
 #   Sequel.typecast_timezone = :utc # or :local or nil
 #   Sequel.default_timezone = :utc # or :local or nil
 #
-# The only timezone values that are supported by default are :utc (convert to UTC),
-# :local (convert to local time), and nil (don't convert).  If you need to
+# The only timezone values that are supported by default are <tt>:utc</tt> (convert to UTC),
+# <tt>:local</tt> (convert to local time), and +nil+ (don't convert).  If you need to
 # convert to a specific timezone, or need the timezones being used to change based
-# on the environment (e.g. current user), you need to use an extension (and use
-# DateTime as the datetime_class).
+# on the environment (e.g. current user), you need to use the +named_timezones+ extension (and use
+# +DateTime+ as the +datetime_class+).
 #
-# You can set the SEQUEL_NO_CORE_EXTENSIONS constant or environment variable to have
+# You can set the +SEQUEL_NO_CORE_EXTENSIONS+ constant or environment variable to have
 # Sequel not extend the core classes.
 #
 # For a more expanded introduction, see the {README}[link:files/README_rdoc.html].
@@ -55,20 +54,25 @@ module Sequel
   @virtual_row_instance_eval = true
   @require_thread = nil
   
-  # Mutex used to protect file loading
+  # Mutex used to protect file loading/requireing
   @require_mutex = Mutex.new
   
   class << self
-    # Sequel converts two digit years in Dates and DateTimes by default,
+    # Sequel converts two digit years in <tt>Date</tt>s and <tt>DateTime</tt>s by default,
     # so 01/02/03 is interpreted at January 2nd, 2003, and 12/13/99 is interpreted
     # as December 13, 1999. You can override this to treat those dates as
-    # January 2nd, 0003 and December 13, 0099, respectively, by setting this to false.
+    # January 2nd, 0003 and December 13, 0099, respectively, by:
+    #
+    #   Sequel.convert_two_digit_years = false
     attr_accessor :convert_two_digit_years
 
-    # Sequel can use either Time or DateTime for times returned from the
-    # database.  It defaults to Time.  To change it to DateTime, set this to DateTime.
+    # Sequel can use either +Time+ or +DateTime+ for times returned from the
+    # database.  It defaults to +Time+.  To change it to +DateTime+:
+    #
+    #   Sequel.datetime_class = DateTime
     attr_accessor :datetime_class
 
+    # For backwards compatibility, has no effect.
     attr_accessor :virtual_row_instance_eval
     
     # Alias to the standard version of require
@@ -92,8 +96,14 @@ module Sequel
   end
 
   # Returns true if the passed object could be a specifier of conditions, false otherwise.
-  # Currently, Sequel considers hashes and arrays of all two pairs as
+  # Currently, Sequel considers hashes and arrays of two element arrays as
   # condition specifiers.
+  #
+  #   Sequel.condition_specifier?({}) # => true
+  #   Sequel.condition_specifier?([[1, 2]]) # => true
+  #   Sequel.condition_specifier?([]) # => false
+  #   Sequel.condition_specifier?([1]) # => false
+  #   Sequel.condition_specifier?(1) # => false
   def self.condition_specifier?(obj)
     case obj
     when Hash
@@ -116,7 +126,7 @@ module Sequel
   #   DB = Sequel.connect('postgres://user:password@host:port/database_name')
   #   DB = Sequel.connect('sqlite:///blog.db', :max_connections=>10)
   #
-  # If a block is given, it is passed the opened Database object, which is
+  # If a block is given, it is passed the opened +Database+ object, which is
   # closed when the block exits.  For example:
   #
   #   Sequel.connect('sqlite://blog.db'){|db| puts db[:users].count}  
@@ -127,9 +137,9 @@ module Sequel
     Database.connect(*args, &block)
   end
   
-  # Convert the exception to the given class.  The given class should be
-  # Sequel::Error or a subclass.  Returns an instance of klass with
-  # the message and backtrace of exception.
+  # Convert the +exception+ to the given class.  The given class should be
+  # <tt>Sequel::Error</tt> or a subclass.  Returns an instance of +klass+ with
+  # the message and backtrace of +exception+.
   def self.convert_exception_class(exception, klass)
     return exception if exception.is_a?(klass)
     e = klass.new("#{exception.class}: #{exception.message}")
@@ -138,8 +148,13 @@ module Sequel
     e
   end
 
-  # Load all Sequel extensions given.  Only loads extensions included in this
-  # release of Sequel, doesn't load external extensions.
+  # Load all Sequel extensions given.  Extensions are just files that exist under
+  # <tt>sequel/extensions</tt> in the load path, and are just required.  Generally,
+  # extensions modify the behavior of +Database+ and/or +Dataset+, but Sequel ships
+  # with some extensions that modify other classes that exist for backwards compatibility.
+  # In some cases, requiring an extension modifies classes directly, and in others,
+  # it just loads a module that you can extend other classes with.  Consult the documentation
+  # for each extension you plan on using for usage.
   #
   #   Sequel.extension(:schema_dumper)
   #   Sequel.extension(:pagination, :query)
@@ -186,14 +201,16 @@ module Sequel
     Database.quote_identifiers = value
   end
   
-  # Require all given files which should be in the same or a subdirectory of
-  # this file.  If a subdir is given, assume all files are in that subdir.
+  # Require all given +files+ which should be in the same or a subdirectory of
+  # this file.  If a +subdir+ is given, assume all +files+ are in that subdir.
+  # This is used to ensure that the files loaded are from the same version of
+  # Sequel as this file.
   def self.require(files, subdir=nil)
     Array(files).each{|f| super("#{File.dirname(__FILE__)}/#{"#{subdir}/" if subdir}#{f}")}
   end
   
   # Set whether to set the single threaded mode for all databases by default. By default,
-  # Sequel uses a threadsafe connection pool, which isn't as fast as the
+  # Sequel uses a thread-safe connection pool, which isn't as fast as the
   # single threaded connection pool.  If your program will only have one thread,
   # and speed is a priority, you may want to set this to true:
   #
@@ -202,33 +219,39 @@ module Sequel
     Database.single_threaded = value
   end
 
-  # Converts the given string into a Date object.
-  def self.string_to_date(s)
+  # Converts the given +string+ into a +Date+ object.
+  #
+  #   Sequel.string_to_date('2010-09-10') # Date.civil(2010, 09, 10)
+  def self.string_to_date(string)
     begin
-      Date.parse(s, Sequel.convert_two_digit_years)
+      Date.parse(string, Sequel.convert_two_digit_years)
     rescue => e
       raise convert_exception_class(e, InvalidValue)
     end
   end
 
-  # Converts the given string into a Time or DateTime object, depending on the
-  # value of Sequel.datetime_class.
-  def self.string_to_datetime(s)
+  # Converts the given +string+ into a +Time+ or +DateTime+ object, depending on the
+  # value of <tt>Sequel.datetime_class</tt>.
+  #
+  #   Sequel.string_to_datetime('2010-09-10 10:20:30') # Time.local(2010, 09, 10, 10, 20, 30)
+  def self.string_to_datetime(string)
     begin
       if datetime_class == DateTime
-        DateTime.parse(s, convert_two_digit_years)
+        DateTime.parse(string, convert_two_digit_years)
       else
-        datetime_class.parse(s)
+        datetime_class.parse(string)
       end
     rescue => e
       raise convert_exception_class(e, InvalidValue)
     end
   end
 
-  # Converts the given string into a Time object.
-  def self.string_to_time(s)
+  # Converts the given +string+ into a +Time+ object.
+  #
+  #   Sequel.string_to_datetime('10:20:30') # Time.parse('10:20:30')
+  def self.string_to_time(string)
     begin
-      Time.parse(s)
+      Time.parse(string)
     rescue => e
       raise convert_exception_class(e, InvalidValue)
     end
@@ -245,9 +268,12 @@ module Sequel
   end
 
   # If the supplied block takes a single argument,
-  # yield a new SQL::VirtualRow instance to the block
+  # yield a new <tt>SQL::VirtualRow</tt> instance to the block
   # argument.  Otherwise, evaluate the block in the context of a new
-  # SQL::VirtualRow instance.
+  # <tt>SQL::VirtualRow</tt> instance.
+  #
+  #   Sequel.virtual_row{a} # Sequel::SQL::Identifier.new(:a)
+  #   Sequel.virtual_row{|o| o.a{}} # Sequel::SQL::Function.new(:a)
   def self.virtual_row(&block)
     vr = SQL::VirtualRow.new
     case block.arity
