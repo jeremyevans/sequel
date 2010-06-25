@@ -674,6 +674,17 @@ module Sequel
         explain(:analyze=>true)
       end
       
+      # Handle converting the ruby xor operator (^) into the
+      # PostgreSQL xor operator (#).
+      def complex_expression_sql(op, args)
+        case op
+        when :^
+          "(#{literal(args.at(0))} # #{literal(args.at(1))})"
+        else
+          super
+        end
+      end
+
       # Disable the use of INSERT RETURNING, even if the server supports it
       def disable_insert_returning
         clone(:disable_insert_returning=>true)

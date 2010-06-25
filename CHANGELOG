@@ -1,5 +1,7 @@
 === HEAD
 
+* Make PostgreSQL do bitwise xor instead of exponentiation for ^ operator (jeremyevans)
+
 * Fix handling of tinyint(1) columns when connecting to MySQL via JDBC (jeremyevans)
 
 * Handle arrays of two element arrays as filter hash values automatically (jeremyevans)
