@@ -668,9 +668,12 @@ module Sequel
       include SubscriptMethods
     end
 
-    # Represents constants or psuedo-constants (e.g. CURRENT_DATE) in SQL.
+    # Represents constants or psuedo-constants (e.g. +CURRENT_DATE+) in SQL.
     class Constant < GenericExpression
-      # Create an object with the given table
+      # The underlying constant related to this object.
+      attr_reader :constant
+
+      # Create an constant with the given value
       def initialize(constant)
         @constant = constant
       end
@@ -678,15 +681,12 @@ module Sequel
       to_s_method :constant_sql, '@constant'
     end
 
-    # Represents boolean constants such as NULL, NOTNULL, TRUE, and FALSE.
+    # Represents boolean constants such as +NULL+, +NOTNULL+, +TRUE+, and +FALSE+.
     class BooleanConstant < Constant
-      # The underlying constant related for this object.
-      attr_reader :constant
-
       to_s_method :boolean_constant_sql, '@constant'
     end
     
-    # Represents inverse boolean constants (currently only NOTNULL). A
+    # Represents inverse boolean constants (currently only +NOTNULL+). A
     # special class to allow for special behavior.
     class NegativeBooleanConstant < BooleanConstant
       to_s_method :negative_boolean_constant_sql, '@constant'
@@ -714,7 +714,7 @@ module Sequel
       # The SQL function to call
       attr_reader :f
       
-      # Set the attributes to the given arguments
+      # Set the functions and args to the given arguments
       def initialize(f, *args)
         @f, @args = f, args
       end
@@ -735,12 +735,12 @@ module Sequel
     end
 
     # Represents an identifier (column or table). Can be used
-    # to specify a Symbol with multiple underscores should not be
+    # to specify a +Symbol+ with multiple underscores should not be
     # split, or for creating an identifier without using a symbol.
     class Identifier < GenericExpression
       include QualifyingMethods
 
-      # The table and column to reference
+      # The table or column to reference
       attr_reader :value
 
       # Set the value to the given argument
@@ -770,7 +770,7 @@ module Sequel
       to_s_method :join_clause_sql
     end
 
-    # Represents an SQL JOIN table ON conditions clause.
+    # Represents an SQL JOIN clause with ON conditions.
     class JoinOnClause < JoinClause
       # The conditions for the join
       attr_reader :on
@@ -785,7 +785,7 @@ module Sequel
       to_s_method :join_on_clause_sql
     end
 
-    # Represents an SQL JOIN table USING (columns) clause.
+    # Represents an SQL JOIN clause with USING conditions.
     class JoinUsingClause < JoinClause
       # The columns that appear in both tables that should be equal 
       # for the conditions to match.
@@ -803,7 +803,8 @@ module Sequel
 
     # Represents a literal string with placeholders and arguments.
     # This is necessary to ensure delayed literalization of the arguments
-    # required for the prepared statement support
+    # required for the prepared statement support and for database-specific
+    # literalization.
     class PlaceholderLiteralString < Expression
       # The arguments that will be subsituted into the placeholders.
       # Either an array of unnamed placeholders (which will be substituted in
@@ -827,7 +828,7 @@ module Sequel
       to_s_method :placeholder_literal_string_sql
     end
 
-    # Subclass of ComplexExpression where the expression results
+    # Subclass of +ComplexExpression+ where the expression results
     # in a numeric value in SQL.
     class NumericExpression < ComplexExpression
       include BitwiseMethods 
