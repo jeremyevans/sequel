@@ -197,9 +197,11 @@ module Sequel
     
     ### Modules ###
 
-    # Methods that create aliased identifiers
+    # Includes an +as+ method that creates an SQL alias.
     module AliasMethods
-      # Create an SQL column alias (+AliasedExpression+) of the receiving column or expression to the given alias.
+      # Create an SQL alias (+AliasedExpression+) of the receiving column or expression to the given alias.
+      #
+      #   :column.as(:alias) # "column" AS "alias"
       def as(aliaz)
         AliasedExpression.new(self, aliaz)
       end
@@ -208,6 +210,13 @@ module Sequel
     # This defines the bitwise methods: &, |, ^, ~, <<, and >>.  Because these
     # methods overlap with the standard +BooleanMethods methods+, and they only
     # make sense for integers, they are only included in +NumericExpression+.
+    #
+    #   :a.sql_number & :b # "a" & "b"
+    #   :a.sql_number | :b # "a" | "b"
+    #   :a.sql_number ^ :b # "a" ^ "b"
+    #   :a.sql_number << :b # "a" << "b"
+    #   :a.sql_number >> :b # "a" >> "b"
+    #   ~:a.sql_number # ~"a"
     module BitwiseMethods
       ComplexExpression::BITWISE_OPERATORS.each do |o|
         define_method(o) do |ce|
@@ -221,22 +230,21 @@ module Sequel
       end
 
       # Do the bitwise compliment of the self
+      #
+      #   ~:a.sql_number # ~"a"
       def ~
         NumericExpression.new(:'B~', self)
       end
     end
 
-    # This module includes the methods that are defined on objects that can be 
-    # used in a boolean context in SQL (Symbol, LiteralString, SQL::Function,
-    # and SQL::BooleanExpression).
+    # This module includes the boolean/logical AND (&), OR (|) and NOT (~) operators
+    # that are defined on objects that can be used in a boolean context in SQL
+    # (+Symbol+, +LiteralString+, and <tt>SQL::GenericExpression</tt>).
     #
-    # This defines the ~ (NOT), & (AND), and | (OR) methods.
+    #   :a & :b # "a" AND "b"
+    #   :a | :b # "a" OR "b"
+    #   ~:a # NOT "a"
     module BooleanMethods
-      # Create a new BooleanExpression with NOT, representing the inversion of whatever self represents.
-      def ~
-        BooleanExpression.invert(self)
-      end
-      
       ComplexExpression::BOOLEAN_OPERATOR_METHODS.each do |m, o|
         define_method(m) do |ce|
           case ce
@@ -247,35 +255,52 @@ module Sequel
           end
         end
       end
+      
+      # Create a new BooleanExpression with NOT, representing the inversion of whatever self represents.
+      #
+      #   ~:a # NOT :a
+      def ~
+        BooleanExpression.invert(self)
+      end
     end
 
-    # Holds methods that are used to cast objects to differen SQL types.
+    # Holds methods that are used to cast objects to different SQL types.
     module CastMethods 
       # Cast the reciever to the given SQL type.  You can specify a ruby class as a type,
       # and it is handled similarly to using a database independent type in the schema methods.
+      #
+      #   :a.cast(:integer) # CAST(a AS integer)
+      #   :a.cast(String) # CAST(a AS varchar(255))
       def cast(sql_type)
         Cast.new(self, sql_type)
       end
 
-      # Cast the reciever to the given SQL type (or the database's default integer type if none given),
-      # and return the result as a NumericExpression. 
+      # Cast the reciever to the given SQL type (or the database's default Integer type if none given),
+      # and return the result as a +NumericExpression+, so you can use the bitwise operators
+      # on the result. 
+      #
+      #   :a.cast_numeric # CAST(a AS integer)
+      #   :a.cast_numeric(Float) # CAST(a AS double precision)
       def cast_numeric(sql_type = nil)
         cast(sql_type || Integer).sql_number
       end
 
-      # Cast the reciever to the given SQL type (or the database's default string type if none given),
-      # and return the result as a StringExpression, so you can use +
+      # Cast the reciever to the given SQL type (or the database's default String type if none given),
+      # and return the result as a +StringExpression+, so you can use +
       # directly on the result for SQL string concatenation.
+      #
+      #   :a.cast_string # CAST(a AS varchar(255))
+      #   :a.cast_string(:text) # CAST(a AS text)
       def cast_string(sql_type = nil)
         cast(sql_type || String).sql_string
       end
     end
     
     # Adds methods that allow you to treat an object as an instance of a specific
-    # ComplexExpression subclass.  This is useful if another library
+    # +ComplexExpression+ subclass.  This is useful if another library
     # overrides the methods defined by Sequel.
     #
-    # For example, if Symbol#/ is overridden to produce a string (for
+    # For example, if <tt>Symbol#/</tt> is overridden to produce a string (for
     # example, to make file system path creation easier), the
     # following code will not do what you want:
     #
@@ -287,46 +312,59 @@ module Sequel
     module ComplexExpressionMethods
       # Extract a datetime_part (e.g. year, month) from self:
       #
-      #   :date.extract(:year) # SQL:  extract(year FROM "date")
+      #   :date.extract(:year) # extract(year FROM "date")
       #
       # Also has the benefit of returning the result as a
       # NumericExpression instead of a generic ComplexExpression.
       #
       # The extract function is in the SQL standard, but it doesn't
-      # doesn't use the standard function calling convention.
+      # doesn't use the standard function calling convention, and it
+      # doesn't work on all databases.
       def extract(datetime_part)
         Function.new(:extract, PlaceholderLiteralString.new("#{datetime_part} FROM ?", [self])).sql_number
       end
 
-      # Return a BooleanExpression representation of self.
+      # Return a BooleanExpression representation of +self+.
       def sql_boolean
         BooleanExpression.new(:NOOP, self)
       end
 
-      # Return a NumericExpression representation of self.
+      # Return a NumericExpression representation of +self+.
+      # 
+      #   ~:a # NOT "a"
+      #   ~:a.sql_number # ~"a"
       def sql_number
         NumericExpression.new(:NOOP, self)
       end
 
-      # Return a StringExpression representation of self.
+      # Return a StringExpression representation of +self+.
+      #
+      #   :a + :b # "a" + "b"
+      #   :a.sql_string + :b # "a" || "b"
       def sql_string
         StringExpression.new(:NOOP, self)
       end
     end
 
-    # Includes a method that returns Identifiers.
+    # Includes an +identifier+ method that returns <tt>Identifier</tt>s.
     module IdentifierMethods
-      # Return self wrapped as an identifier.
+      # Return self wrapped as an <tt>SQL::Identifier</tt>.
+      #
+      #   :a__b # "a"."b"
+      #   :a__b.identifier # "a__b"
       def identifier
         Identifier.new(self)
       end
     end
 
-    # This module includes the methods that are defined on objects that can be 
-    # used in a numeric or string context in SQL (Symbol (except on ruby 1.9), LiteralString, 
-    # SQL::Function, and SQL::StringExpression).
+    # This module includes the inequality methods (>, <, >=, <=) that are defined on objects that can be 
+    # used in a numeric or string context in SQL (+Symbol+ (except on ruby 1.9), +LiteralString+, 
+    # <tt>SQL::GenericExpression</tt>).
     #
-    # This defines the >, <, >=, and <= methods.
+    #   'a'.lit > :b # a > "b"
+    #   'a'.lit < :b # a > "b"
+    #   'a'.lit >= :b # a >= "b"
+    #   'a'.lit <= :b # a <= "b"
     module InequalityMethods
       ComplexExpression::INEQUALITY_OPERATORS.each do |o|
         define_method(o) do |ce|
@@ -341,11 +379,12 @@ module Sequel
     end
 
     # This module augments the default initalize method for the 
-    # ComplexExpression subclass it is included in, so that
-    # attempting to use boolean input when initializing a NumericExpression
-    # or StringExpression results in an error.
+    # +ComplexExpression+ subclass it is included in, so that
+    # attempting to use boolean input when initializing a +NumericExpression+
+    # or +StringExpression+ results in an error.  It is not expected to be
+    # used directly.
     module NoBooleanInputMethods
-      # Raise an Error if one of the args would be boolean in an SQL
+      # Raise an +Error+ if one of the args would be boolean in an SQL
       # context, otherwise call super.
       def initialize(op, *args)
         args.each do |a|
@@ -358,11 +397,14 @@ module Sequel
       end
     end
 
-    # This module includes the methods that are defined on objects that can be 
-    # used in a numeric context in SQL (Symbol, LiteralString, SQL::Function,
-    # and SQL::NumericExpression).
+    # This module includes the standard mathematical methods (+, -, *, and /)
+    # that are defined on objects that can be used in a numeric context in SQL
+    # (+Symbol+, +LiteralString+, and +SQL::GenericExpression+).
     #
-    # This defines the +, -, *, and / methods.
+    #   :a + :b # "a" + "b"
+    #   :a - :b # "a" - "b"
+    #   :a * :b # "a" * "b"
+    #   :a / :b # "a" / "b"
     module NumericMethods
       ComplexExpression::MATHEMATICAL_OPERATORS.each do |o|
         define_method(o) do |ce|
@@ -376,66 +418,83 @@ module Sequel
       end
     end
 
-    # Methods that create OrderedExpressions, used for sorting by columns
+    # Methods that create +OrderedExpressions+, used for sorting by columns
     # or more complex expressions.
     module OrderMethods
-      # Mark the receiving SQL column as sorting in a descending fashion.
-      def desc(opts={})
-        OrderedExpression.new(self, true, opts)
-      end
-      
       # Mark the receiving SQL column as sorting in an ascending fashion (generally a no-op).
+      # Options:
+      #
+      # :nulls :: Set to :first to use NULLS FIRST (so NULL values are ordered
+      #           before other values), or :last to use NULLS LAST (so NULL values
+      #           are ordered after other values).
       def asc(opts={})
         OrderedExpression.new(self, false, opts)
       end
-    end
-
-    # Methods that created QualifiedIdentifiers, used for qualifying column
-    # names with a table or table names with a schema.
-    module QualifyingMethods
-      # Qualify the current object with the given table/schema.
-      def qualify(ts)
-        QualifiedIdentifier.new(ts, self)
+      
+      # Mark the receiving SQL column as sorting in a descending fashion.
+      # Options:
+      #
+      # :nulls :: Set to :first to use NULLS FIRST (so NULL values are ordered
+      #           before other values), or :last to use NULLS LAST (so NULL values
+      #           are ordered after other values).
+      def desc(opts={})
+        OrderedExpression.new(self, true, opts)
       end
     end
 
-    # This module includes the methods that are defined on objects that can be 
-    # used in a string context in SQL (Symbol, LiteralString, SQL::Function,
-    # and SQL::StringExpression).
-    #
-    # This defines the like (LIKE) and ilike methods, used for pattern matching.
-    # like is case sensitive (if the database supports it), ilike is case insensitive.
+    # Includes a +qualify+ method that created <tt>QualifiedIdentifier</tt>s, used for qualifying column
+    # names with a table or table names with a schema.
+    module QualifyingMethods
+      # Qualify the receiver with the given +qualifier+ (table for column/schema for table).
+      #
+      #   :column.qualify(:table) # "table"."column"
+      #   :table.qualify(:schema) # "schema"."table"
+      #   :column.qualify(:table).qualify(:schema) # "schema"."table"."column"
+      def qualify(qualifier)
+        QualifiedIdentifier.new(qualifier, self)
+      end
+    end
+
+    # This module includes the +like+ and +ilike+ methods used for pattern matching that are defined on objects that can be 
+    # used in a string context in SQL (+Symbol+, +LiteralString+, <tt>SQL::GenericExpression</tt>).
     module StringMethods
-      # Create a BooleanExpression case insensitive pattern match of self
-      # with the given patterns.  See StringExpression.like.
+      # Create a +BooleanExpression+ case insensitive pattern match of the receiver
+      # with the given patterns.  See <tt>StringExpression.like</tt>.
+      #
+      #   :a.ilike('A%') # "a" ILIKE 'A%'
       def ilike(*ces)
         StringExpression.like(self, *(ces << {:case_insensitive=>true}))
       end
 
-      # Create a BooleanExpression case sensitive (if the database supports it) pattern match of self with
-      # the given patterns.  See StringExpression.like.
+      # Create a +BooleanExpression+ case sensitive (if the database supports it) pattern match of the receiver with
+      # the given patterns.  See <tt>StringExpression.like</tt>.
+      #
+      #   :a.like('A%') # "a" LIKE 'A%'
       def like(*ces)
         StringExpression.like(self, *ces)
       end
     end
 
-    # This module is included in StringExpression and can be included elsewhere
-    # to allow the use of the + operator to represent concatenation of SQL
-    # Strings:
-    #
-    #   :x.sql_string + :y => # SQL: x || y
+    # This module includes the <tt>+</tt> method.  It is included in +StringExpression+ and can be included elsewhere
+    # to allow the use of the + operator to represent concatenation of SQL Strings:
     module StringConcatenationMethods
+      # Return a +StringExpression+ representing the concatenation of the receiver
+      # with the given argument.
+      #
+      #   :x.sql_string + :y => # "x" || "y"
       def +(ce)
         StringExpression.new(:'||', self, ce)
       end
     end
 
-    # Methods that create Subscripts (SQL array accesses).
+    # This module includes the +sql_subscript+ method, representing SQL array accesses.
     module SubscriptMethods
-      # Return an SQL array subscript with the given arguments.
+      # Return a <tt>Subscript</tt> with the given arguments, representing an
+      # SQL array access.
       #
-      #   :array.sql_subscript(1) # SQL: array[1]
-      #   :array.sql_subscript(1, 2) # SQL: array[1, 2]
+      #   :array.sql_subscript(1) # array[1]
+      #   :array.sql_subscript(1, 2) # array[1, 2]
+      #   :array.sql_subscript([1, 2]) # array[1, 2]
       def sql_subscript(*sub)
         Subscript.new(self, sub.flatten)
       end
@@ -443,12 +502,12 @@ module Sequel
 
     ### Classes ###
 
-    # Represents an aliasing of an expression/column to a given name.
+    # Represents an aliasing of an expression to a given alias.
     class AliasedExpression < Expression
       # The expression to alias
       attr_reader :expression
 
-      # The alias to use for the expression, not alias since that is
+      # The alias to use for the expression, not +alias+ since that is
       # a keyword in ruby.
       attr_reader :aliaz
 
@@ -460,28 +519,31 @@ module Sequel
       to_s_method :aliased_expression_sql
     end
 
-    # Blob is used to represent binary data in the Ruby environment that is
+    # +Blob+ is used to represent binary data in the Ruby environment that is
     # stored as a blob type in the database. Sequel represents binary data as a Blob object because 
-    # certain database engines require binary data to be escaped.
+    # most database engines require binary data to be escaped differently than regular strings.
     class Blob < ::String
-      # Returns self
+      # Returns +self+, used so that Blobs don't get wrapped in multiple
+      # levels.
       def to_sequel_blob
         self
       end
     end
 
-    # Subclass of ComplexExpression where the expression results
+    # Subclass of +ComplexExpression+ where the expression results
     # in a boolean value in SQL.
     class BooleanExpression < ComplexExpression
       include BooleanMethods
       
-      # Take pairs of values (e.g. a hash or array of arrays of two pairs)
-      # and converts it to a BooleanExpression.  The operator and args
+      # Take pairs of values (e.g. a hash or array of two element arrays)
+      # and converts it to a +BooleanExpression+.  The operator and args
       # used depends on the case of the right (2nd) argument:
       #
       # * 0..10 - left >= 0 AND left <= 10
       # * [1,2] - left IN (1,2)
       # * nil - left IS NULL
+      # * true - left IS TRUE 
+      # * false - left IS FALSE 
       # * /as/ - left ~ 'as'
       # * :blah - left = blah
       # * 'blah' - left = 'blah'
@@ -520,6 +582,8 @@ module Sequel
       # be inverted, raise an error.  An inverted expression should match everything that the
       # uninverted expression did not match, and vice-versa, except for possible issues with
       # SQL NULL (i.e. 1 == NULL is NULL and 1 != NULL is also NULL).
+      #
+      #   BooleanExpression.invert(:a) # NOT "a"
       def self.invert(ce)
         case ce
         when BooleanExpression
@@ -537,20 +601,23 @@ module Sequel
       end
     end
 
-    # Represents an SQL CASE expression, used for conditions.
+    # Represents an SQL CASE expression, used for conditional branching in SQL.
     class CaseExpression < GenericExpression
       # An array of all two pairs with the first element specifying the
-      # condition and the second element specifying the result.
+      # condition and the second element specifying the result if the
+      # condition matches.
       attr_reader :conditions
 
-      # The default value if no conditions are true
+      # The default value if no conditions match. 
       attr_reader :default
 
       # The expression to test the conditions against
       attr_reader :expression
 
       # Create an object with the given conditions and
-      # default value.
+      # default value.  An expression can be provided to
+      # test each condition against, instead of having
+      # all conditions represent their own boolean expression.
       def initialize(conditions, default, expression = nil)
         raise(Sequel::Error, 'CaseExpression conditions must be a hash or array of all two pairs') unless Sequel.condition_specifier?(conditions)
         @conditions, @default, @expression = conditions.to_a, default, expression
