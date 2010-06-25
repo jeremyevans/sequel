@@ -244,24 +244,24 @@ describe "Database schema modifiers" do
     @ds.all.should == [{:n2=>'blah'}, {:n2=>'blah'}]
   end
 
-  cspecify "should rename columns with not null constraints", [:mysql, :mysql] do
-    @db.create_table!(:items){String :n, :null=>false}
+  specify "should rename columns with not null constraints" do
+    @db.create_table!(:items, :engine=>:InnoDB){String :n, :null=>false}
     @ds.insert(:n=>'blah')
     @db.alter_table(:items){rename_column :n, :n2}
     @db.schema(:items, :reload=>true).map{|x| x.first}.should == [:n2]
     @ds.columns!.should == [:n2]
     @ds.insert(:n2=>'blah')
     @ds.all.should == [{:n2=>'blah'}, {:n2=>'blah'}]
-    proc{@ds.insert}.should raise_error(Sequel::DatabaseError)
+    proc{@ds.insert(:n=>nil)}.should raise_error(Sequel::DatabaseError)
   end
 
-  cspecify "should set column NULL/NOT NULL correctly", [:mysql, :mysql] do
-    @db.create_table!(:items){Integer :id}
+  specify "should set column NULL/NOT NULL correctly" do
+    @db.create_table!(:items, :engine=>:InnoDB){Integer :id}
     @ds.insert(:id=>10)
     @db.alter_table(:items){set_column_allow_null :id, false}
     @db.schema(:items, :reload=>true).map{|x| x.first}.should == [:id]
     @ds.columns!.should == [:id]
-    proc{@ds.insert}.should raise_error(Sequel::DatabaseError)
+    proc{@ds.insert(:id=>nil)}.should raise_error(Sequel::DatabaseError)
     @db.alter_table(:items){set_column_allow_null :id, true}
     @ds.insert
     @ds.all.should == [{:id=>10}, {:id=>nil}]
