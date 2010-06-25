@@ -74,6 +74,9 @@ context "Array#sql_value_list and #sql_array" do
 end
 
 context "String#lit" do
+  before do
+    @ds = ds = MockDatabase.new.dataset
+  end
   specify "should return an LiteralString object" do
     'xyz'.lit.should be_a_kind_of(Sequel::LiteralString)
     'xyz'.lit.to_s.should == 'xyz'
@@ -87,19 +90,24 @@ context "String#lit" do
   specify "should return a PlaceholderLiteralString object if args are given" do
     a = 'DISTINCT ?'.lit(:a)
     a.should be_a_kind_of(Sequel::SQL::PlaceholderLiteralString)
-    ds = MockDatabase.new.dataset
-    ds.literal(a).should == 'DISTINCT a'
-    ds.quote_identifiers = true
-    ds.literal(a).should == 'DISTINCT "a"'
+    @ds.literal(a).should == 'DISTINCT a'
+    @ds.quote_identifiers = true
+    @ds.literal(a).should == 'DISTINCT "a"'
   end
   
   specify "should handle named placeholders if given a single argument hash" do
     a = 'DISTINCT :b'.lit(:b=>:a)
     a.should be_a_kind_of(Sequel::SQL::PlaceholderLiteralString)
-    ds = MockDatabase.new.dataset
-    ds.literal(a).should == 'DISTINCT a'
-    ds.quote_identifiers = true
-    ds.literal(a).should == 'DISTINCT "a"'
+    @ds.literal(a).should == 'DISTINCT a'
+    @ds.quote_identifiers = true
+    @ds.literal(a).should == 'DISTINCT "a"'
+  end
+
+  specify "should treat placeholder literal strings as generic expressions" do
+    a = ':b'.lit(:b=>:a)
+    @ds.literal(a + 1).should == "(a + 1)"
+    @ds.literal(a & :b).should == "(a AND b)"
+    @ds.literal(a.sql_string + :b).should == "(a || b)"
   end
 end
 

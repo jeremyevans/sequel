@@ -805,7 +805,7 @@ module Sequel
     # This is necessary to ensure delayed literalization of the arguments
     # required for the prepared statement support and for database-specific
     # literalization.
-    class PlaceholderLiteralString < Expression
+    class PlaceholderLiteralString < GenericExpression
       # The arguments that will be subsituted into the placeholders.
       # Either an array of unnamed placeholders (which will be substituted in
       # order for ? characters), or a hash of named placeholders (which will be

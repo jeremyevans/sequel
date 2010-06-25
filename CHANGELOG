@@ -1,5 +1,7 @@
 === HEAD
 
+* Make PlaceholderLiteralString a GenericExpression subclass (jeremyevans)
+
 * Allow nil/NULL to be used as a CASE expression value (jeremyevans)
 
 * Support bitwise operators on more databases (jeremyevans)
