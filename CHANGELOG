@@ -1,5 +1,7 @@
 === HEAD
 
+* Allow Model.find_or_create to take a block which is yielded the object to be created, if no object is found (zaius, jeremyevans)
+
 * Make PlaceholderLiteralString a GenericExpression subclass (jeremyevans)
 
 * Allow nil/NULL to be used as a CASE expression value (jeremyevans)

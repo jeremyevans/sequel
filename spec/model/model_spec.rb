@@ -302,6 +302,12 @@ describe Sequel::Model, ".find_or_create" do
       "INSERT INTO items (x) VALUES (1)"
     ]
   end
+
+  it "should pass the new record to be created to the block if no record is found" do
+    @c.meta_def(:find){|*|} 
+    @c.find_or_create(:x => 1){|x| x[:y] = 2}
+    ["INSERT INTO items (x, y) VALUES (1, 2)", "INSERT INTO items (y, x) VALUES (2, 1)"].should include(MODEL_DB.sqls.first)
+  end
 end
 
 describe Sequel::Model, ".all" do
