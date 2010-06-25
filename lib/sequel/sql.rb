@@ -1,7 +1,7 @@
 module Sequel
   if RUBY_VERSION < '1.9.0'
-    # If on Ruby 1.8, create a Sequel::BasicObject class that is similar to the
-    # the Ruby 1.9 BasicObject class.  This is used in a few places where proxy
+    # If on Ruby 1.8, create a <tt>Sequel::BasicObject</tt> class that is similar to the
+    # the Ruby 1.9 +BasicObject+ class.  This is used in a few places where proxy
     # objects are needed that respond to any method call.
     class BasicObject
       # The instance methods to not remove from the class when removing
@@ -10,26 +10,26 @@ module Sequel
 
       # Remove all but the most basic instance methods from the class.  A separate
       # method so that it can be called again if necessary if you load libraries
-      # after Sequel that add instance methods to Object.
+      # after Sequel that add instance methods to +Object+.
       def self.remove_methods!
         ((private_instance_methods + instance_methods) - KEEP_METHODS).each{|m| undef_method(m)}
       end
       remove_methods!
     end
   else
-    # If on 1.9, create a Sequel::BasicObject class that is just like the
-    # default BasicObject class, except that missing constants are resolved in
-    # Object.  This allows the virtual row support to work with classes
+    # If on 1.9, create a <tt>Sequel::BasicObject</tt> class that is just like the
+    # default +BasicObject+ class, except that missing constants are resolved in
+    # +Object+.  This allows the virtual row support to work with classes
     # without prefixing them with ::, such as:
     #
     #   DB[:bonds].filter{maturity_date > Time.now}
     class BasicObject < ::BasicObject
-      # Lookup missing constants in ::Object
+      # Lookup missing constants in <tt>::Object</tt>
       def self.const_missing(name)
         ::Object.const_get(name)
       end
 
-      # No-op method on ruby 1.9, which has a real BasicObject class.
+      # No-op method on ruby 1.9, which has a real +BasicObject+ class.
       def self.remove_methods!
       end
     end
@@ -45,17 +45,22 @@ module Sequel
 
     ### Parent Classes ###
 
-    # Classes/Modules aren't an alphabetical order due to the fact that
+    # Classes/Modules aren't in alphabetical order due to the fact that
     # some reference constants defined in others at load time.
 
-    # Base class for all SQL fragments
+    # Base class for all SQL expression objects.
     class Expression
-      # all instance variables declared to be readers are to be used for comparison.
+      # Expression objects are assumed to be value objects, where their
+      # attribute values can't change after assignment.  In order to make
+      # it easy to define equality and hash methods, subclass
+      # instances assume that the only values that affect the results of
+      # such methods are the values of the object's attributes.
       def self.attr_reader(*args)
         super
         comparison_attrs.concat args
       end
 
+      # All attributes used for equality and hash methods.
       def self.comparison_attrs
         @comparison_attrs ||= self == Expression ? [] : superclass.comparison_attrs.clone
       end
@@ -68,7 +73,7 @@ module Sequel
       end
       private_class_method :to_s_method
 
-      # Alias of eql?
+      # Alias of <tt>eql?</tt>
       def ==(other)
         eql?(other)
       end
@@ -76,7 +81,7 @@ module Sequel
       # Returns true if the receiver is the same expression as the
       # the +other+ expression.
       def eql?(other)
-        other.is_a?(self.class) && !self.class.comparison_attrs.find {|a| send(a) != other.send(a)}
+        other.is_a?(self.class) && !self.class.comparison_attrs.find{|a| send(a) != other.send(a)}
       end
 
       # Make sure that the hash value is the same if the attributes are the same.
@@ -90,13 +95,12 @@ module Sequel
         "#<#{self.class} #{instance_variables.map{|iv| "#{iv}=>#{instance_variable_get(iv).inspect}"}.join(', ')}>"
       end
 
-      # Returns self, because SQL::Expression already acts like
-      # LiteralString.
+      # Returns +self+, because <tt>SQL::Expression</tt> already acts like +LiteralString+.
       def lit
         self
       end
       
-      # Alias of to_s
+      # Alias of +to_s+
       def sql_literal(ds)
         to_s(ds)
       end
@@ -104,11 +108,10 @@ module Sequel
 
     # Represents a complex SQL expression, with a given operator and one
     # or more attributes (which may also be ComplexExpressions, forming
-    # a tree).  This class is the backbone of the blockless filter support in
-    # Sequel.
+    # a tree).  This class is the backbone of Sequel's ruby expression DSL.
     #
     # This is an abstract class that is not that useful by itself.  The
-    # subclasses BooleanExpression, NumericExpression, and StringExpression
+    # subclasses +BooleanExpression+, +NumericExpression+, and +StringExpression+
     # define the behavior of the DSL via operators.
     class ComplexExpression < Expression
       # A hash of the opposite for each operator symbol, used for inverting
@@ -120,16 +123,16 @@ module Sequel
         :'!~*' => :'~*', :NOT => :NOOP, :NOOP => :NOT, :ILIKE => :'NOT ILIKE',
         :'NOT ILIKE'=>:ILIKE}
 
-      # Standard Mathematical Operators used in NumericMethods
+      # Standard mathematical operators used in +NumericMethods+
       MATHEMATICAL_OPERATORS = [:+, :-, :/, :*]
 
-      # Bitwise Mathematical Operators used in NumericMethods
+      # Bitwise mathematical operators used in +NumericMethods+
       BITWISE_OPERATORS = [:&, :|, :^, :<<, :>>]
 
-      # Inequality Operators used in InequalityMethods
+      # Inequality operators used in +InequalityMethods+
       INEQUALITY_OPERATORS = [:<, :>, :<=, :>=]
 
-      # Hash of ruby operator symbols to SQL operators, used in BooleanMethods
+      # Hash of ruby operator symbols to SQL operators, used in +BooleanMethods+
       BOOLEAN_OPERATOR_METHODS = {:& => :AND, :| =>:OR}
 
       # Operators that use IN/NOT IN for inclusion/exclusion
@@ -146,7 +149,7 @@ module Sequel
       # Operator symbols that take one or more arguments
       N_ARITY_OPERATORS = [:AND, :OR, :'||'] + MATHEMATICAL_OPERATORS
 
-      # Operator symbols that take one argument
+      # Operator symbols that take only a single argument
       ONE_ARITY_OPERATORS = [:NOT, :NOOP, :'B~']
 
       # An array of args for this object
@@ -156,9 +159,10 @@ module Sequel
       attr_reader :op
       
       # Set the operator symbol and arguments for this object to the ones given.
-      # Convert all args that are hashes or arrays with all two pairs to BooleanExpressions.
-      # Raise an error if the operator doesn't allow boolean input and a boolean argument is given.
-      # Raise an error if the wrong number of arguments for a given operator is used.
+      # Convert all args that are hashes or arrays of two element arrays to +BooleanExpressions+,
+      # other than the second arg for an IN/NOT IN operator.
+      # Raise an +Error+ if the operator doesn't allow boolean input and a boolean argument is given.
+      # Raise an +Error+ if the wrong number of arguments for a given operator is used.
       def initialize(op, *args)
         orig_args = args
         args = args.map{|a| Sequel.condition_specifier?(a) ? SQL::BooleanExpression.from_value_pairs(a) : a}
@@ -187,7 +191,7 @@ module Sequel
     end
 
     # The base class for expressions that can be used in multiple places in
-    # the SQL query.  
+    # an SQL query.  
     class GenericExpression < Expression
     end
     
@@ -195,15 +199,15 @@ module Sequel
 
     # Methods that create aliased identifiers
     module AliasMethods
-      # Create an SQL column alias of the receiving column or expression to the given alias.
+      # Create an SQL column alias (+AliasedExpression+) of the receiving column or expression to the given alias.
       def as(aliaz)
         AliasedExpression.new(self, aliaz)
       end
     end
 
     # This defines the bitwise methods: &, |, ^, ~, <<, and >>.  Because these
-    # methods overlap with the standard BooleanMethods methods, and they only
-    # make sense for numbers, they are only included in NumericExpression.
+    # methods overlap with the standard +BooleanMethods methods+, and they only
+    # make sense for integers, they are only included in +NumericExpression+.
     module BitwiseMethods
       ComplexExpression::BITWISE_OPERATORS.each do |o|
         define_method(o) do |ce|
