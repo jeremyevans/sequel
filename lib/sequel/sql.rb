@@ -847,30 +847,35 @@ module Sequel
       # Whether the expression should order the result set in a descending manner
       attr_reader :descending
 
-      # Other options supported, such as :nulls
+      # Other options supported, currently :nulls
       attr_reader :opts
 
       # Set the expression and descending attributes to the given values.
+      # Options:
+      #
+      # :nulls :: Can be :first/:last for NULLS FIRST/LAST.
       def initialize(expression, descending = true, opts={})
         @expression, @descending, @opts = expression, descending, opts
       end
 
-      # Return a copy that is ASC
+      # Return a copy that is ordered ASC
       def asc
         OrderedExpression.new(@expression, false, @opts)
       end
 
-      # Return a copy that is DESC
+      # Return a copy that is ordered DESC
       def desc
         OrderedExpression.new(@expression, true, @opts)
       end
 
       # Make sure that the hash value is the same if the attributes are the same.
+      # Necessary on 1.8.6 as Hash#hash is different for hashes that are
+      # equal but distinct.
       def hash
         [self.class, expression, descending, opts[:nulls]].hash
       end
 
-      # Return an inverted expression, changing ASC to DESC and vice versa
+      # Return an inverted expression, changing ASC to DESC and NULLS FIRST to NULLS LAST.
       def invert
         opts = @opts
         if nul_dir = @opts[:nulls]
@@ -882,14 +887,14 @@ module Sequel
       to_s_method :ordered_expression_sql
     end
 
-    # Represents a qualified (column with table or table with schema) reference. 
+    # Represents a qualified identifier (column with table or table with schema).
     class QualifiedIdentifier < GenericExpression
       include QualifyingMethods
 
-      # The column to reference
+      # The column/table referenced
       attr_reader :column
 
-      # The table to reference
+      # The table/schema qualifying the reference
       attr_reader :table
 
       # Set the table and column to the given arguments
@@ -900,7 +905,7 @@ module Sequel
       to_s_method :qualified_identifier_sql
     end
     
-    # Subclass of ComplexExpression where the expression results
+    # Subclass of +ComplexExpression+ where the expression results
     # in a text/string/varchar value in SQL.
     class StringExpression < ComplexExpression
       include StringMethods
@@ -908,23 +913,31 @@ module Sequel
       include InequalityMethods
       include NoBooleanInputMethods
 
-      # Map of [regexp, case_insenstive] to ComplexExpression operator
+      # Map of [regexp, case_insenstive] to +ComplexExpression+ operator symbol
       LIKE_MAP = {[true, true]=>:'~*', [true, false]=>:~, [false, true]=>:ILIKE, [false, false]=>:LIKE}
       
       # Creates a SQL pattern match exprssion. left (l) is the SQL string we
       # are matching against, and ces are the patterns we are matching.
-      # The match succeeds if any of the patterns match (SQL OR).  Patterns
-      # can be given as strings or regular expressions.  Strings will cause
-      # the SQL LIKE operator to be used, and should be supported by most
-      # databases.  Regular expressions will probably only work on MySQL
-      # and PostgreSQL, and SQL regular expression syntax is not fully compatible
-      # with ruby regular expression syntax, so be careful if using regular
-      # expressions.
+      # The match succeeds if any of the patterns match (SQL OR).
+      #
+      # If a regular expression is used as a pattern, an SQL regular expression will be
+      # used, which is currently only supported on MySQL and PostgreSQL.  Be aware
+      # that MySQL and PostgreSQL regular expression syntax is similar to ruby
+      # regular expression syntax, but it not exactly the same, especially for
+      # advanced regular expression features.  Sequel just uses the source of the
+      # ruby regular expression verbatim as the SQL regular expression string.
+      #
+      # If any other object is used as a regular expression, the SQL LIKE operator will
+      # be used, and should be supported by most databases.  
       # 
       # The pattern match will be case insensitive if the last argument is a hash
       # with a key of :case_insensitive that is not false or nil. Also,
       # if a case insensitive regular expression is used (//i), that particular
       # pattern which will always be case insensitive.
+      #
+      #   StringExpression.like(:a, 'a%') # "a" LIKE 'a%'
+      #   StringExpression.like(:a, 'a%', :case_insensitive=>true) # "a" ILIKE 'a%'
+      #   StringExpression.like(:a, 'a%', /^a/i) # "a" LIKE 'a%' OR "a" ~* '^a' 
       def self.like(l, *ces)
         l, lre, lci = like_element(l)
         lci = (ces.last.is_a?(Hash) ? ces.pop : {})[:case_insensitive] ? true : lci
@@ -935,7 +948,7 @@ module Sequel
         ces.length == 1 ? ces.at(0) : BooleanExpression.new(:OR, *ces)
       end
       
-      # An array of three parts:
+      # Returns a three element array, made up of:
       # * The object to use
       # * Whether it is a regular expression
       # * Whether it is case insensitive
@@ -962,7 +975,7 @@ module Sequel
         @f, @sub = f, sub
       end
 
-      # Create a new subscript appending the given subscript(s)
+      # Create a new +Subscript+ appending the given subscript(s)
       # the the current array of subscripts.
       def |(sub)
         Subscript.new(@f, @sub + Array(sub))
@@ -972,40 +985,47 @@ module Sequel
     end
 
     # Represents an SQL value list (IN/NOT IN predicate value).  Added so it is possible to deal with a
-    # ruby array of all two pairs as an SQL value list instead of an ordered
+    # ruby array of two element arrays as an SQL value list instead of an ordered
     # hash-like conditions specifier.
     class ValueList < ::Array
     end
 
-    # Old name for +ValueList+, used for backwards compatibility
+    # Deprecated name for +ValueList+, used for backwards compatibility
     SQLArray = ValueList
 
-    # The purpose of this class is to allow the easy creation of SQL identifiers and functions
-    # without relying on methods defined on Symbol.  This is useful if another library defines
-    # the methods defined by Sequel, or if you are running on ruby 1.9.
+    # The purpose of the +VirtualRow+ class is to allow the easy creation of SQL identifiers and functions
+    # without relying on methods defined on +Symbol+.  This is useful if another library defines
+    # the methods defined by Sequel, if you are running on ruby 1.9, or if you are not using the
+    # core extensions.
     #
-    # An instance of this class is yielded to the block supplied to filter, order, and select.
+    # An instance of this class is yielded to the block supplied to <tt>Dataset#filter</tt>, <tt>Dataset#order</tt>, and <tt>Dataset#select</tt>
+    # (and the other methods that accept a block and pass it to one of those methods).
     # If the block doesn't take an argument, the block is instance_evaled in the context of
     # a new instance of this class.
     #
-    # VirtualRow uses method_missing to return Identifiers, QualifiedIdentifiers, Functions, or WindowFunctions, 
-    # depending on how it is called.  If a block is not given, creates one of the following objects:
-    # * Function - returned if any arguments are supplied, using the method name
-    #   as the function name, and the arguments as the function arguments.
-    # * QualifiedIdentifier - returned if the method name contains __, with the
-    #   table being the part before __, and the column being the part after.
-    # * Identifier - returned otherwise, using the method name.
-    # If a block is given, it returns either a Function or WindowFunction, depending on the first
+    # +VirtualRow+ uses +method_missing+ to return either an +Identifier+, +QualifiedIdentifier+, +Function+, or +WindowFunction+, 
+    # depending on how it is called.
+    #
+    # If a block is _not_ given, creates one of the following objects:
+    #
+    # +Function+ :: Returned if any arguments are supplied, using the method name
+    #               as the function name, and the arguments as the function arguments.
+    # +QualifiedIdentifier+ :: Returned if the method name contains __, with the
+    #                          table being the part before __, and the column being the part after.
+    # +Identifier+ :: Returned otherwise, using the method name.
+    #
+    # If a block is given, it returns either a +Function+ or +WindowFunction+, depending on the first
     # argument to the method.  Note that the block is currently not called by the code, though
     # this may change in a future version.  If the first argument is:
-    # * no arguments given - uses a Function with no arguments.
-    # * :* - uses a Function with a literal wildcard argument (*), mostly useful for COUNT.
-    # * :distinct - uses a Function that prepends DISTINCT to the rest of the arguments, mostly
-    #   useful for aggregate functions.
-    # * :over - uses a WindowFunction.  If a second argument is provided, it should be a hash
-    #   of options which are passed to Window (e.g. :window, :partition, :order, :frame).  The
-    #   arguments to the function itself should be specified as :*=>true for a wildcard, or via
-    #   the :args option.
+    #
+    # no arguments given :: creates a +Function+ with no arguments.
+    # :* :: creates a +Function+ with a literal wildcard argument (*), mostly useful for COUNT.
+    # :distinct :: creates a +Function+ that prepends DISTINCT to the rest of the arguments, mostly
+    #              useful for aggregate functions.
+    # :over :: creates a +WindowFunction+.  If a second argument is provided, it should be a hash
+    #          of options which are passed to Window (with possible keys :window, :partition, :order, and :frame).  The
+    #          arguments to the function itself should be specified as <tt>:*=>true</tt> for a wildcard, or via
+    #          the <tt>:args</tt> option.
     #
     # Examples:
     #
@@ -1025,13 +1045,15 @@ module Sequel
     #   ds.select{rank(:over){}} # SELECT rank() OVER () FROM t
     #   ds.select{count(:over, :*=>true){}} # SELECT count(*) OVER () FROM t
     #   ds.select{sum(:over, :args=>col1, :partition=>col2, :order=>col3){}} # SELECT sum(col1) OVER (PARTITION BY col2 ORDER BY col3) FROM t
+    #
+    # For a more detailed explanation, see the {Virtual Rows guide}[link:files/doc/virtual_rows_rdoc.html].
     class VirtualRow < BasicObject
       WILDCARD = LiteralString.new('*').freeze
       QUESTION_MARK = LiteralString.new('?').freeze
       COMMA_SEPARATOR = LiteralString.new(', ').freeze
       DOUBLE_UNDERSCORE = '__'.freeze
 
-      # Return Identifiers, QualifiedIdentifiers, Functions, or WindowFunctions, depending
+      # Return an +Identifier+, +QualifiedIdentifier+, +Function+, or +WindowFunction+, depending
       # on arguments and whether a block is provided.  Does not currently call the block.
       # See the class level documentation.
       def method_missing(m, *args, &block)
@@ -1061,17 +1083,17 @@ module Sequel
       end
     end
 
-    # A window is part of a window function specifying the window over which the function operates.
-    # It is separated from the WindowFunction class because it also can be used separately on
+    # A +Window+ is part of a window function specifying the window over which the function operates.
+    # It is separated from the +WindowFunction+ class because it also can be used separately on
     # some databases.
     class Window < Expression
-      # The options for this window.  Options currently used are:
-      # * :frame - if specified, should be :all or :rows.  :all always operates over all rows in the
-      #   partition, while :rows excludes the current row's later peers.  The default is to include
-      #   all previous rows in the partition up to the current row's last peer.
-      # * :order - order on the column(s) given
-      # * :partition - partition/group on the column(s) given
-      # * :window - base results on a previously specified named window
+      # The options for this window.  Options currently supported:
+      # :frame :: if specified, should be :all, :rows, or a String that is used literally. :all always operates over all rows in the
+      #           partition, while :rows excludes the current row's later peers.  The default is to include
+      #           all previous rows in the partition up to the current row's last peer.
+      # :order :: order on the column(s) given
+      # :partition :: partition/group on the column(s) given
+      # :window :: base results on a previously specified named window
       attr_reader :opts
 
       # Set the options to the options given
@@ -1082,12 +1104,12 @@ module Sequel
       to_s_method :window_sql, '@opts'
     end
 
-    # A WindowFunction is a grouping of a function with a window over which it operates.
+    # A +WindowFunction+ is a grouping of a +Function+ with a +Window+ over which it operates.
     class WindowFunction < GenericExpression
-      # The function to use, should be an SQL::Function.
+      # The function to use, should be an <tt>SQL::Function</tt>.
       attr_reader :function
 
-      # The window to use, should be an SQL::Window.
+      # The window to use, should be an <tt>SQL::Window</tt>.
       attr_reader :window
 
       # Set the function and window.
@@ -1099,9 +1121,9 @@ module Sequel
     end
   end
 
-  # LiteralString is used to represent literal SQL expressions. A 
-  # LiteralString is copied verbatim into an SQL statement. Instances of
-  # LiteralString can be created by calling String#lit.
+  # +LiteralString+ is used to represent literal SQL expressions. A 
+  # +LiteralString+ is copied verbatim into an SQL statement. Instances of
+  # +LiteralString+ can be created by calling <tt>String#lit</tt>.
   class LiteralString
     include SQL::OrderMethods
     include SQL::ComplexExpressionMethods
