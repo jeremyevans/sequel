@@ -2,7 +2,7 @@ module Sequel
   module Plugins
     # The instance_hooks plugin allows you to add hooks to specific instances,
     # by passing a block to a _hook method (e.g. before_save_hook{do_something}).
-    # The block executed when the hook is called (e.g. before_save).
+    # The block is executed when the hook is called (e.g. before_save).
     #
     # All of the standard hooks are supported, except for after_initialize.
     # Instance level before hooks are executed in reverse order of addition before

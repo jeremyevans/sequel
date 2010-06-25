@@ -1,7 +1,7 @@
 module Sequel
   module Plugins
-    # The BooleaReaders plugin allows for the creation of attribute? methods
-    # for boolean columns, which provide a nicer API.  By default, the accessors
+    # The BooleanReaders plugin allows for the creation of attribute? methods
+    # for boolean columns, which provides a nicer API.  By default, the accessors
     # are created for all columns of type :boolean.  However, you can provide a
     # block to the plugin to change the criteria used to determine if a
     # column is boolean.  The block is yielded with the column symbol for each

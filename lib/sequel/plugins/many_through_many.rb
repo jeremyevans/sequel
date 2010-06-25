@@ -1,6 +1,6 @@
 module Sequel
   module Plugins
-    # The many_through_many plugin allow you to create a association to multiple objects using multiple join tables.
+    # The many_through_many plugin allow you to create an association to multiple objects using multiple join tables.
     # For example, assume the following associations:
     #
     #    Artist.many_to_many :albums

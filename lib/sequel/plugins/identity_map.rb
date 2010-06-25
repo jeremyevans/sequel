@@ -10,17 +10,17 @@ module Sequel
     #     Album.filter{(id > 0) & (id < 2)}.first.object_id == Album.first(:id=>1).object_id
     #   end
     #
-    # In additional to providing a 1-1 correspondence, the identity_map plugin
+    # In addition to providing a 1-1 correspondence, the identity_map plugin
     # also provides a cached looked up of records in two cases:
     # * Model.[] (e.g. Album[1])
     # * Model.many_to_one accessor methods (e.g. album.artist)
     #
-    # If the object you are looking up using one of those two methods is already
+    # If the object you are looking up, using one of those two methods, is already
     # in the identity map, the record is returned without a database query being
     # issued.
     #
     # Identity maps are thread-local and only presist for the duration of the block,
-    # so they should be should only be considered as a possible performance enhancer.
+    # so they should only be considered as a possible performance enhancer.
     # 
     # Usage:
     #
