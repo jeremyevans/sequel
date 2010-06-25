@@ -1,5 +1,7 @@
 === HEAD
 
+* Support bitwise operators on more databases (jeremyevans)
+
 * Make PostgreSQL do bitwise xor instead of exponentiation for ^ operator (jeremyevans)
 
 * Fix handling of tinyint(1) columns when connecting to MySQL via JDBC (jeremyevans)

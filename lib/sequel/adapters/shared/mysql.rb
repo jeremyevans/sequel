@@ -301,6 +301,8 @@ module Sequel
           else
             literal(args.at(0))
           end
+        when :'B~'
+          "CAST(~#{literal(args.at(0))} AS SIGNED INTEGER)"
         else
           super(op, args)
         end

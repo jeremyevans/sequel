@@ -656,32 +656,47 @@ describe "Sequel::Dataset DSL support" do
     @ds.get{a / b}.to_i.should == 2
   end
   
-  cspecify "should work with standard bitwise mathematical operators", :mssql, :h2 do
-    @ds.insert(24, 2)
-    @ds.get{a.sql_number << b}.to_i.should == 96
-    @ds.get{a.sql_number >> b}.to_i.should == 6
+  specify "should work with bitwise shift operators" do
+    @ds.insert(3, 2)
+    @ds.get{a.sql_number << b}.to_i.should == 12
+    @ds.get{a.sql_number >> b}.to_i.should == 0
     @ds.delete
+    @ds.insert(3, 1)
+    @ds.get{a.sql_number << b}.to_i.should == 6
+    @ds.get{a.sql_number >> b}.to_i.should == 1
+  end
+
+  specify "should work with bitwise AND and OR operators" do
     @ds.insert(3, 5)
     @ds.get{a.sql_number | b}.to_i.should == 7
     @ds.get{a.sql_number & b}.to_i.should == 1
   end
   
-  cspecify "should work with the bitwise compliment operator", :mysql, :h2 do
+  cspecify "should work with the bitwise compliment operator", :h2 do
+    @ds.insert(-3, 3)
+    @ds.get{~a.sql_number}.to_i.should == 2
+    @ds.get{~b.sql_number}.to_i.should == -4
+  end
+  
+  cspecify "should work with the bitwise xor operator", :sqlite do
     @ds.insert(3, 5)
-    @ds.get{~a.sql_number}.to_i.should == -4
+    @ds.get{a.sql_number ^ b}.to_i.should == 6
   end
   
-  cspecify "should work with inequality operators", :mssql do
+  specify "should work with inequality operators" do
+    @ds.insert(10, 11)
+    @ds.insert(11, 11)
+    @ds.insert(20, 19)
     @ds.insert(20, 20)
-    ['0', 0, false].should include(@ds.get{a > b})
-    ['0', 0, false].should include(@ds.get{a < b})
-    ['1', 1, true].should include(@ds.get{a <= b})
-    ['1', 1, true].should include(@ds.get{a >= b})
+    @ds.filter{a > b}.select_order_map(:a).should == [20]
+    @ds.filter{a >= b}.select_order_map(:a).should == [11, 20, 20]
+    @ds.filter{a < b}.select_order_map(:a).should == [10]
+    @ds.filter{a <= b}.select_order_map(:a).should == [10, 11, 20]
   end
   
-  cspecify "should work with casting and string concatentation", :mssql do
+  specify "should work with casting and string concatentation" do
     @ds.insert(20, 20)
-    @ds.get{a.cast_string + b}.should == '2020'
+    @ds.get{a.cast_string + b.cast_string}.should == '2020'
   end
   
   it "should work with ordering" do

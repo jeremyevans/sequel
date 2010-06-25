@@ -220,6 +220,10 @@ module Sequel
           super(:LIKE, args)
         when :"NOT ILIKE"
           super(:"NOT LIKE", args)
+        when :<<
+          "(#{literal(args[0])} * POWER(2, #{literal(args[1])}))"
+        when :>>
+          "(#{literal(args[0])} / POWER(2, #{literal(args[1])}))"
         else
           super(op, args)
         end
