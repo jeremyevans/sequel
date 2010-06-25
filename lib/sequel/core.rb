@@ -17,32 +17,6 @@
 #
 #   Sequel.sqlite('blog.db'){|db| puts db[:users].count} 
 #
-# Sequel doesn't pay much attention to timezones by default, but you can set it
-# handle timezones if you want.  There are three separate timezone settings:
-#
-# application_timezone :: The timezone you want the application to use.  This is the timezone
-#                         that incoming times from the database and typecasting are converted to.
-# database_timezone :: The timezone for storage in the database.  This is the
-#                      timezone to which Sequel will convert timestamps before literalizing them
-#                      for storage in the database.  It is also the timezone that Sequel will assume
-#                      database timestamp values are already in (if they don't include an offset).
-# typecast_timezone :: The timezone that incoming data that Sequel needs to typecast
-#                      is assumed to be already in (if they don't include an offset).
-#
-# You can set also set all three timezones to the same value at once via
-# <tt>Sequel.default_timezone=</tt>.
-#
-#   Sequel.application_timezone = :utc # or :local or nil
-#   Sequel.database_timezone = :utc # or :local or nil
-#   Sequel.typecast_timezone = :utc # or :local or nil
-#   Sequel.default_timezone = :utc # or :local or nil
-#
-# The only timezone values that are supported by default are <tt>:utc</tt> (convert to UTC),
-# <tt>:local</tt> (convert to local time), and +nil+ (don't convert).  If you need to
-# convert to a specific timezone, or need the timezones being used to change based
-# on the environment (e.g. current user), you need to use the +named_timezones+ extension (and use
-# +DateTime+ as the +datetime_class+).
-#
 # You can set the +SEQUEL_NO_CORE_EXTENSIONS+ constant or environment variable to have
 # Sequel not extend the core classes.
 #

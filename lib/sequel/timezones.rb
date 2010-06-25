@@ -9,21 +9,44 @@ module Sequel
   @database_timezone = nil
   @typecast_timezone = nil
   
+  # Sequel doesn't pay much attention to timezones by default, but you can set it
+  # handle timezones if you want.  There are three separate timezone settings, application_timezone,
+  # database_timezone, and typecast_timezone.  All three timezones have getter and setter methods.
+  # You can set all three timezones to the same value at once via <tt>Sequel.default_timezone=</tt>.
+  #
+  # The only timezone values that are supported by default are <tt>:utc</tt> (convert to UTC),
+  # <tt>:local</tt> (convert to local time), and +nil+ (don't convert).  If you need to
+  # convert to a specific timezone, or need the timezones being used to change based
+  # on the environment (e.g. current user), you need to use the +named_timezones+ extension (and use
+  # +DateTime+ as the +datetime_class+). Sequel also ships with a +thread_local_timezones+ extensions
+  # which allows each thread to have its own timezone values for each of the timezones.
   module Timezones
-    attr_reader :application_timezone, :database_timezone, :typecast_timezone
+    # The timezone you want the application to use.  This is the timezone
+    # that incoming times from the database and typecasting are converted to.
+    attr_reader :application_timezone
+    
+    # The timezone for storage in the database.  This is the
+    # timezone to which Sequel will convert timestamps before literalizing them
+    # for storage in the database.  It is also the timezone that Sequel will assume
+    # database timestamp values are already in (if they don't include an offset).
+    attr_reader :database_timezone
+    
+    # The timezone that incoming data that Sequel needs to typecast
+    # is assumed to be already in (if they don't include an offset).
+    attr_reader :typecast_timezone
   
     %w'application database typecast'.each do |t|
       class_eval("def #{t}_timezone=(tz); @#{t}_timezone = convert_timezone_setter_arg(tz) end", __FILE__, __LINE__)
     end
   
-    # Convert the given Time/DateTime object into the database timezone, used when
+    # Convert the given +Time+/+DateTime+ object into the database timezone, used when
     # literalizing objects in an SQL string.
     def application_to_database_timestamp(v)
       convert_output_timestamp(v, Sequel.database_timezone)
     end
 
-    # Convert the given object into an object of Sequel.datetime_class in the
-    # application_timezone.  Used when coverting datetime/timestamp columns
+    # Convert the given object into an object of <tt>Sequel.datetime_class</tt> in the
+    # +application_timezone+.  Used when coverting datetime/timestamp columns
     # returned by the database.
     def database_to_application_timestamp(v)
       convert_timestamp(v, Sequel.database_timezone)
@@ -36,8 +59,8 @@ module Sequel
       self.typecast_timezone = tz
     end
   
-    # Convert the given object into an object of Sequel.datetime_class in the
-    # application_timezone.  Used when typecasting values when assigning them
+    # Convert the given object into an object of <tt>Sequel.datetime_class</tt> in the
+    # +application_timezone+.  Used when typecasting values when assigning them
     # to model datetime attributes.
     def typecast_to_application_timestamp(v)
       convert_timestamp(v, Sequel.typecast_timezone)
@@ -45,7 +68,7 @@ module Sequel
 
     private
 
-    # Convert the given DateTime to the given input_timezone, keeping the
+    # Convert the given +DateTime+ to the given input_timezone, keeping the
     # same time and just modifying the timezone.
     def convert_input_datetime_no_offset(v, input_timezone)
       case input_timezone
@@ -58,16 +81,16 @@ module Sequel
       end
     end
     
-    # Convert the given DateTime to the given input_timezone that is not supported
-    # by default (such as nil, :local, or :utc).  Raises an error by default.
+    # Convert the given +DateTime+ to the given input_timezone that is not supported
+    # by default (i.e. one other than +nil+, <tt>:local</tt>, or <tt>:utc</tt>).  Raises an +InvalidValue+ by default.
     # Can be overridden in extensions.
     def convert_input_datetime_other(v, input_timezone)
       raise InvalidValue, "Invalid input_timezone: #{input_timezone.inspect}"
     end
     
-    # Converts the object from a String, Array, Date, DateTime, or Time into an
-    # instance of Sequel.datetime_class.  If given an array or a string that doesn't
-    # contain an offset, assume that the array/string is already in the given input_timezone.
+    # Converts the object from a +String+, +Array+, +Date+, +DateTime+, or +Time+ into an
+    # instance of <tt>Sequel.datetime_class</tt>.  If given an array or a string that doesn't
+    # contain an offset, assume that the array/string is already in the given +input_timezone+.
     def convert_input_timestamp(v, input_timezone)
       case v
       when String
@@ -110,14 +133,14 @@ module Sequel
       end
     end
     
-    # Convert the given DateTime to the given output_timezone that is not supported
-    # by default (such as nil, :local, or :utc).  Raises an error by default.
+    # Convert the given +DateTime+ to the given output_timezone that is not supported
+    # by default (i.e. one other than +nil+, <tt>:local</tt>, or <tt>:utc</tt>).  Raises an +InvalidValue+ by default.
     # Can be overridden in extensions.
     def convert_output_datetime_other(v, output_timezone)
       raise InvalidValue, "Invalid output_timezone: #{output_timezone.inspect}"
     end
     
-    # Converts the object to the given output_timezone.
+    # Converts the object to the given +output_timezone+.
     def convert_output_timestamp(v, output_timezone)
       if output_timezone
         if v.is_a?(DateTime)
@@ -138,8 +161,8 @@ module Sequel
     end
     
     # Converts the given object from the given input timezone to the
-    # application timezone using convert_input_timestamp and
-    # convert_output_timestamp.
+    # +application_timezone+ using +convert_input_timestamp+ and
+    # +convert_output_timestamp+.
     def convert_timestamp(v, input_timezone)
       begin
         convert_output_timestamp(convert_input_timestamp(v, input_timezone), Sequel.application_timezone)

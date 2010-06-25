@@ -1,8 +1,14 @@
 module Sequel
+  # The major version of Sequel.  Only bumped for major changes.
   MAJOR = 3
+  # The minor version of Sequel.  Bumped for every non-patch level
+  # release, generally around once a month.
   MINOR = 12
+  # The tiny version of Sequel.  Usually 0, only bumped for bugfix
+  # releases that fix regressions from previous versions.
   TINY  = 1
   
+  # The version of Sequel you are using, as a string (e.g. "2.11.0")
   VERSION = [MAJOR, MINOR, TINY].join('.')
   
   # The version of Sequel you are using, as a string (e.g. "2.11.0")
