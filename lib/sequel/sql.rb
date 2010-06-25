@@ -618,9 +618,14 @@ module Sequel
       # default value.  An expression can be provided to
       # test each condition against, instead of having
       # all conditions represent their own boolean expression.
-      def initialize(conditions, default, expression = nil)
+      def initialize(conditions, default, expression=(no_expression=true; nil))
         raise(Sequel::Error, 'CaseExpression conditions must be a hash or array of all two pairs') unless Sequel.condition_specifier?(conditions)
-        @conditions, @default, @expression = conditions.to_a, default, expression
+        @conditions, @default, @expression, @no_expression = conditions.to_a, default, expression, no_expression
+      end
+
+      # Whether to use an expression for this CASE expression.
+      def expression?
+        !@no_expression
       end
 
       to_s_method :case_expression_sql

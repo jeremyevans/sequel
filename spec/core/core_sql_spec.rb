@@ -39,6 +39,10 @@ context "Array#case and Hash#case" do
     @d.literal([[:x, :y], [:a, :b]].case(:z, :exp__w)).should == '(CASE exp.w WHEN x THEN y WHEN a THEN b ELSE z END)'
   end
 
+  specify "should return SQL CASE expression with expression even if nil" do
+    @d.literal({:x=>:y}.case(:z, nil)).should == '(CASE NULL WHEN x THEN y ELSE z END)'
+  end
+
   specify "should raise an error if an array that isn't all two pairs is used" do
     proc{[:b].case(:a)}.should raise_error(Sequel::Error)
     proc{[:b, :c].case(:a)}.should raise_error(Sequel::Error)

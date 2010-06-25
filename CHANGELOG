@@ -1,5 +1,7 @@
 === HEAD
 
+* Allow nil/NULL to be used as a CASE expression value (jeremyevans)
+
 * Support bitwise operators on more databases (jeremyevans)
 
 * Make PostgreSQL do bitwise xor instead of exponentiation for ^ operator (jeremyevans)

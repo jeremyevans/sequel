@@ -29,8 +29,8 @@ class Array
   #
   #   [[{:a=>[2,3]}, 1]].case(0) # SQL: CASE WHEN a IN (2, 3) THEN 1 ELSE 0 END
   #   [[:a, 1], [:b, 2]].case(:d, :c) # SQL: CASE c WHEN a THEN 1 WHEN b THEN 2 ELSE d END
-  def case(default, expression = nil)
-    ::Sequel::SQL::CaseExpression.new(self, default, expression)
+  def case(*args)
+    ::Sequel::SQL::CaseExpression.new(self, *args)
   end
 
   # Return a <tt>Sequel::SQL::ValueList</tt> created from this array.  Used if this array contains
@@ -147,8 +147,8 @@ class Hash
   #   {{:a=>[2,3]}=>1}.case(0) # SQL: CASE WHEN a IN (2, 3) THEN 1 ELSE 0 END
   #   {:a=>1, :b=>2}.case(:d, :c) # SQL: CASE c WHEN a THEN 1 WHEN b THEN 2 ELSE d END
   #                                 #  or: CASE c WHEN b THEN 2 WHEN a THEN 1 ELSE d END
-  def case(default, expression = nil)
-    ::Sequel::SQL::CaseExpression.new(to_a, default, expression)
+  def case(*args)
+    ::Sequel::SQL::CaseExpression.new(to_a, *args)
   end
 
   # Return a <tt>Sequel::SQL::BooleanExpression</tt> created from this hash, matching all of the

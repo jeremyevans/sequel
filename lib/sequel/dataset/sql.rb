@@ -228,7 +228,7 @@ module Sequel
     # SQL fragment for specifying given CaseExpression.
     def case_expression_sql(ce)
       sql = '(CASE '
-      sql << "#{literal(ce.expression)} " if ce.expression
+      sql << "#{literal(ce.expression)} " if ce.expression?
       ce.conditions.collect{ |c,r|
         sql << "WHEN #{literal(c)} THEN #{literal(r)} "
       }
@@ -813,7 +813,9 @@ module Sequel
       when SQL::AliasedExpression
         SQL::AliasedExpression.new(qualified_expression(e.expression, table), e.aliaz)
       when SQL::CaseExpression
-        SQL::CaseExpression.new(qualified_expression(e.conditions, table), qualified_expression(e.default, table), qualified_expression(e.expression, table))
+        args = [qualified_expression(e.conditions, table), qualified_expression(e.default, table)]
+        args << qualified_expression(e.expression, table) if e.expression?
+        SQL::CaseExpression.new(*args)
       when SQL::Cast
         SQL::Cast.new(qualified_expression(e.expr, table), e.type)
       when SQL::Function
