@@ -92,7 +92,7 @@ in the dataset unless you give the dataset an unambiguous order.
 
 ==== Retrieving a Single Column Value
 
-Sometimes, intead of wanting an entire row, you only want the value of
+Sometimes, instead of wanting an entire row, you only want the value of
 a specific column.  For this <tt>Sequel::Dataset#get</tt> is the method
 you want:
 
@@ -102,7 +102,7 @@ you want:
 
 === Retrieving Multiple Objects
 
-==== As a Array of Hashes or Model Objects
+==== As an Array of Hashes or Model Objects
 
 In many cases, you want an array of all of the rows associated with the
 dataset, in which case <tt>Sequel::Dataset#all</tt> is the method you
@@ -141,7 +141,7 @@ given column.  So the previous example can be handled more easily with:
   # SELECT * FROM artists
   => ["YJM", "AS"]
 
-One difference between these two ways of return an array of values is
+One difference between these two ways of returning an array of values is
 that providing +map+ with an argument is really doing:
 
   artist_names = Artist.map{|x| x[:name]} # not x.name
@@ -172,7 +172,8 @@ using the +to_hash+ method:
   => {"YJM"=>1, "AS"=>2}
 
 As you can see, the +to_hash+ method uses the first symbol as the key
-and the second symbol as the value.  So if you swap the two arguments:
+and the second symbol as the value.  So if you swap the two arguments the hash
+will have its keys and values transposed:
 
   artist_names = Artist.to_hash(:id, :name)
   # SELECT * FROM artists
