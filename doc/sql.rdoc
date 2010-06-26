@@ -1,6 +1,6 @@
 = Sequel for SQL Users
 
-One of the main benefits of Sequel is that it doesn't require the user know SQL in order to use it, though SQL knowledge is certainly helpful.  Unlike most other Sequel documentation, this guide assumes you know SQL, and provides an easy way to discover how to do something in Sequel given the knowledge of how to do so in SQL.
+One of the main benefits of Sequel is that it doesn't require the user to know SQL in order to use it, though SQL knowledge is certainly helpful.  Unlike most other Sequel documentation, this guide assumes you know SQL, and provides an easy way to discover how to do something in Sequel given the knowledge of how to do so in SQL.
 
 == You Can Just Use SQL
 
@@ -32,7 +32,7 @@ What Sequel actually does internally is two separate things.  It first creates a
 
   ds = DB.fetch("SELECT * FROM albums")
 
-Then when you want to retrieve the rows later, you can call +each+ on the dataset to retrieve the rows:
+Then, when you want to retrieve the rows later, you can call +each+ on the dataset to retrieve the rows:
 
   ds.each{|r| puts r[:name]}
 
