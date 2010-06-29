@@ -354,7 +354,7 @@ module Sequel
     # clause.
     def ordered_expression_sql(oe)
       s = "#{literal(oe.expression)} #{oe.descending ? 'DESC' : 'ASC'}"
-      case oe.opts[:nulls]
+      case oe.nulls
       when :first
         "#{s} NULLS FIRST"
       when :last
@@ -809,7 +809,7 @@ module Sequel
       when SQL::Identifier
         SQL::QualifiedIdentifier.new(table, e)
       when SQL::OrderedExpression
-        SQL::OrderedExpression.new(qualified_expression(e.expression, table), e.descending)
+        SQL::OrderedExpression.new(qualified_expression(e.expression, table), e.descending, :nulls=>e.nulls)
       when SQL::AliasedExpression
         SQL::AliasedExpression.new(qualified_expression(e.expression, table), e.aliaz)
       when SQL::CaseExpression

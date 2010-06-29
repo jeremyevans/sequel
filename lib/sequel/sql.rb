@@ -847,41 +847,30 @@ module Sequel
       # Whether the expression should order the result set in a descending manner
       attr_reader :descending
 
-      # Other options supported, currently :nulls
-      attr_reader :opts
+      # Whether to sort NULLS FIRST/LAST
+      attr_reader :nulls
 
       # Set the expression and descending attributes to the given values.
       # Options:
       #
       # :nulls :: Can be :first/:last for NULLS FIRST/LAST.
       def initialize(expression, descending = true, opts={})
-        @expression, @descending, @opts = expression, descending, opts
+        @expression, @descending, @nulls = expression, descending, opts[:nulls]
       end
 
       # Return a copy that is ordered ASC
       def asc
-        OrderedExpression.new(@expression, false, @opts)
+        OrderedExpression.new(@expression, false, :nulls=>@nulls)
       end
 
       # Return a copy that is ordered DESC
       def desc
-        OrderedExpression.new(@expression, true, @opts)
-      end
-
-      # Make sure that the hash value is the same if the attributes are the same.
-      # Necessary on 1.8.6 as Hash#hash is different for hashes that are
-      # equal but distinct.
-      def hash
-        [self.class, expression, descending, opts[:nulls]].hash
+        OrderedExpression.new(@expression, true, :nulls=>@nulls)
       end
 
       # Return an inverted expression, changing ASC to DESC and NULLS FIRST to NULLS LAST.
       def invert
-        opts = @opts
-        if nul_dir = @opts[:nulls]
-          opts = opts.merge(:nulls=>INVERT_NULLS.fetch(nul_dir, nul_dir))
-        end
-        OrderedExpression.new(@expression, !@descending, opts)
+        OrderedExpression.new(@expression, !@descending, :nulls=>INVERT_NULLS.fetch(@nulls, @nulls))
       end
 
       to_s_method :ordered_expression_sql
