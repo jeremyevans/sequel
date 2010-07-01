@@ -1,0 +1,210 @@
+= New Plugins
+
+* A json_serializer plugin was added that allows you to serialize
+  model instances or datasets to JSON using to_json.  It requires
+  the json library.  The API was modeled on ActiveRecord's JSON
+  serialization support.  You can use :only and :except options
+  to specify the columns included, :include to specify associations
+  to include, as well pass options to nested associations using a
+  hash.  In addition to serializing to JSON, it also adds support
+  for parsing JSON to model objects via JSON.parse or #from_json.
+  
+* An xml_serializer plugin was added that allows you to serialize
+  model instances or datasets to XML.  It requries the nokogiri
+  library.  It has a similar API to the json_serializer plugin, using
+  to_xml instead of to_json, and the from_xml class method instead
+  of JSON.parse.
+
+* A tree plugin was added that allows you to treat Sequel::Model
+  objects as being part of a tree.  It provides similar features to
+  rcte_tree, but works on databases that don't support recursive
+  common table expressions.  In addition to the standard parent
+  and children associations, it provides instance methods to get
+  the ancestors, descendants, and siblings of the given tree node,
+  and class methods to get the roots of the tree.
+
+* A list plugin was added that allows you to treat Sequel::Model
+  objects as being part of a list.  This adds instance methods to
+  get the next and prev items in the list, or to move the item
+  to a specific place in the list.  You can specify that all rows
+  in the table belong to the same list, or specify arbitrary scopes
+  so that the same table can contain many separate lists.
+
+= Other New Features
+
+* Sequel is now compatible with Ruby 1.9.2pre3.
+
+* Sequel now supports prepared transactions/two-phase commit on
+  PostgreSQL, MySQL, and H2.  You can specify that you want to
+  use prepared transactions using the :prepare option which
+  should be some transaction id string:
+  
+    DB.transaction(:prepare=>'some string') do ... end
+    
+  Assuming that no exceptions are raised in the transaction block,
+  Sequel will prepare the transaction.  You can then commit the
+  transaction later:
+  
+    DB.commit_prepared_transaction('some string')
+    
+  If you need to rollback the prepared transaction, you can do
+  so as well:
+  
+    DB.rollback_prepared_transaction('some string')
+
+* Sequel now supports customizable transaction isolation levels on
+  PostgreSQL, MySQL, and Microsoft SQL Server.  You can specify the
+  transaction isolation level to use for any transaction using the
+  :isolation option with an :uncommitted, :committed, :repeatable,
+  or :serializable value:
+  
+    DB.transaction(:isolation=>:serializable) do ... end
+    
+  You can also set the default isolation level for transactions via
+  the transaction_isolation_level Database attribute:
+  
+    DB.transaction_isolation_level = :committed
+    
+  If you are connecting to Microsoft SQL Server, it is recommended
+  that you set a default transaction isolation level if you plan
+  on using this feature.
+
+* You can specify a NULLS FIRST/LAST ordering by using the
+  :nulls=>:first/:last option to asc and desc:
+  
+    Album.filter(:release_date.desc(:nulls=>:first),
+                 :name.asc(:nulls=>:last))
+    # ORDER BY release_date DESC NULLS FIRST,
+    #          name ASC NULLS LAST
+
+  This syntax is supported by PostgreSQL 8.3+, Firebird 1.5+,
+  Oracle, and probably some other databases as well, and makes it
+  possible for the user to specify whether NULL values should sort
+  before or after other values.
+
+* Sequel::Model.find_or_create now accepts a block that is a yielded
+  a new model object to be created if an existing model object is
+  not found.  
+  
+    Node.find_or_create(:name=>'A'){|i| i.parent_id = 4}
+
+* The :frame option for windows and window functions can now be a
+  string that is used literally in the SQL.  This is necessary if you
+  want to specify a custom frame, such as one that uses a specific
+  number of rows preceding or following.
+
+* Savepoints are now supported on H2.
+
+* A :methods_module association option was added, allowing you to
+  specify the module into which association instance methods are
+  placed.  By default, it uses the module containing the column
+  accessor methods.
+
+= Other Improvements
+
+* The :encoding option for the native MySQL adapter should now work
+  correctly in all cases.  This fix was included in 3.12.1.
+
+* Sequel now handles arrays of two element arrays automatically when
+  using them as the value of a filter hash:
+  
+    DB[a].filter([:a, :b]=>[[1, 2], [3, 4]])
+    
+  Previously, you had to call .sql_array on the array in order to
+  tell Sequel that it was a value list and not a conditions
+  specifier.
+
+* Sequel no longer attempts to use class polymorphism in the
+  class_table_inheritance plugin if you don't specify a cti_key.
+
+* When using the native SQLite adapter, prepared statements are now
+  cached per connection for increased performance.  Previously,
+  Sequel prepared a new statement for every query.
+
+* tinyint(1) columns are now handled as booleans when connecting to
+  MySQL via JDBC.
+  
+* On PostgreSQL, if no :schema option is provided for
+  Database#tables, #table_exists?, or #schema, and no default_schema
+  is used,  assume all schemas except the default non-public ones.
+  Previously, it assumed the public schema for tables and
+  table_exists?, but did not assume any schema for #schema.
+  
+  This fixes issues if you use table names that overlap with table
+  names in the information_schema, such as domains.  It's still
+  recommended that you specify a default_schema if you are using a
+  schema other than public.
+
+* Unsigned integers are now handled correctly in the schema dumper.
+
+* Sequel::SQL::PlaceholderLiteralString is now a GenericExpression
+  subclass, allowing you to treat it like most other Sequel
+  expression objects:
+  
+    '(a || ?)'.lit(:b).like('Test%')
+    # ((a || b) LIKE 'Test%')
+
+* Sequel now supports the bitwise shift operators (<< and >>) on
+  Microsoft SQL Server by emulating them.
+
+* Sequel now supports most bitwise operators (&, |, ^, <<, >>) on H2
+  by emulating them.  The bitwise complement operator is not yet
+  supported.
+
+* Sequel now logs the SQL queries that are sent when connecting to
+  MySQL.
+
+* If a plugin cannot be loaded, Sequel now gives a more detailed
+  error message.
+
+= Backwards Compatibility
+
+* Array#sql_array and the Sequel::SQL::SQLArray class are now
+  considered deprecated.  Use the Array#sql_value_list and the
+  Sequel::SQL::ValueList class instead.  SQLArray is now just
+  an alias for ValueList, but it now is an Array subclass instead
+  of a Sequel::SQL::Expression subclass.
+
+* Using the ruby bitwise xor operator (^) on PostgreSQL now uses
+  PostgreSQL's bitwise xor operator (#) instead of PostgreSQL's
+  exponentiation operator (^).  If you want exponentiation, use
+  the power function.
+  
+* Using the ruby bitwise complement operator (~) on MySQL now returns
+  a signed integer instead of an unsigned integer, for better
+  compatibility with other databases.
+  
+* Using nil as a case expression value (the 2nd argument to Hash#case
+  and Array#case) will now use NULL as the case expression value,
+  instead of omitting the case expression value:
+  
+    # 3.12.0
+    {1=>2}.case(0, nil)
+    # CASE WHEN 1 THEN 2 ELSE 0 END
+    
+    # 3.13.0
+    {1=>2}.case(0, nil)
+    # CASE NULL WHEN 1 THEN 2 ELSE 0 END
+    
+  In general, you would never use nil explicitly, but the new
+  behavior makes more sense if you have a variable that might be nil:
+  
+    parent_id = Node[1].parent_id
+    {1=>2}.case(0, parent_id)
+
+  If parent_id IS NULL/nil, then previously Sequel would have
+  generated unexpected SQL.  If you don't want a case expression
+  value to be used, do not pass a second argument to #case.
+  
+* Some internal transaction methods now take an optional options
+  hash, so if you have a custom adapter, you will need to make
+  changes.
+  
+* Some internal association methods now take an optional options
+  hash.
+  
+* Some Rakefile task names were modified in the name of consistency:
+
+    spec_coverage -> spec_cov
+    integration -> spec_integration
+    integration_cov -> spec_integration_cov
