@@ -153,7 +153,7 @@ module Sequel
           when :yaml
             v.to_yaml
           when :json
-            JSON.generate v
+            v.to_json
           else
             raise Error, "Bad serialization format (#{model.serialization_map[column].inspect}) for column #{column.inspect}"
           end

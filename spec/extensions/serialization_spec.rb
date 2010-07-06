@@ -71,7 +71,7 @@ describe "Serialization plugin" do
     @c.create(:ghi => [1])
     @c.create(:ghi => ["hello"])
     
-    x = JSON.generate ["hello"]
+    x = ["hello"].to_json
     MODEL_DB.sqls.should == [ \
       "INSERT INTO items (ghi) VALUES ('[1]')", \
       "INSERT INTO items (ghi) VALUES ('#{x}')", \
@@ -129,7 +129,7 @@ describe "Serialization plugin" do
     
     ds = @c.dataset
     def ds.fetch_rows(sql, &block)
-      block.call(:id => 1, :abc => JSON.generate([1]), :def => JSON.generate(["hello"]))
+      block.call(:id => 1, :abc => [1].to_json, :def => ["hello"].to_json)
     end
     
     o = @c.first
@@ -142,8 +142,8 @@ describe "Serialization plugin" do
     o.update(:abc => [23])
     @c.create(:abc => [1,2,3])
     
-    MODEL_DB.sqls.should == ["UPDATE items SET abc = '#{JSON.generate([23])}' WHERE (id = 1)",
-      "INSERT INTO items (abc) VALUES ('#{JSON.generate([1,2,3])}')"]
+    MODEL_DB.sqls.should == ["UPDATE items SET abc = '#{[23].to_json}' WHERE (id = 1)",
+      "INSERT INTO items (abc) VALUES ('#{[1,2,3].to_json}')"]
   end
 
   it "should copy serialization formats and columns to subclasses" do
