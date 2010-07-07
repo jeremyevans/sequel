@@ -1,3 +1,7 @@
+=== HEAD
+
+* Allow Dataset#grep to take :all_patterns, :all_columns, and :case_insensitive options (mighub, jeremyevans)
+
 === 3.13.0 (2010-07-01)
 
 * Allow Model.find_or_create to take a block which is yielded the object to be created, if no object is found (zaius, jeremyevans)

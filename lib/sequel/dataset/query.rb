@@ -200,16 +200,49 @@ module Sequel
       clone(fs).from(opts[:alias] ? as(opts[:alias]) : self)
     end
 
-    # Pattern match any of the columns to any of the terms.  The terms can be
-    # strings (which use LIKE) or regular expressions (which are only supported
-    # in some databases).  See Sequel::SQL::StringExpression.like.  Note that the
-    # total number of pattern matches will be cols.length * terms.length,
+    # Match any of the columns to any of the patterns. The terms can be
+    # strings (which use LIKE) or regular expressions (which are only
+    # supported on MySQL and PostgreSQL).  Note that the total number of
+    # pattern matches will be Array(columns).length * Array(terms).length,
     # which could cause performance issues.
     #
-    #   dataset.grep(:a, '%test%') # SQL: SELECT * FROM items WHERE a LIKE '%test%'
-    #   dataset.grep([:a, :b], %w'%test% foo') # SQL: SELECT * FROM items WHERE a LIKE '%test%' OR a LIKE 'foo' OR b LIKE '%test%' OR b LIKE 'foo' 
-    def grep(cols, terms)
-      filter(SQL::BooleanExpression.new(:OR, *Array(cols).collect{|c| SQL::StringExpression.like(c, *terms)}))
+    # Options (all are boolean):
+    #
+    # :all_columns :: All columns must be matched to any of the given patterns.
+    # :all_patterns :: All patterns must match at least one of the columns.
+    # :case_insensitive :: Use a case insensitive pattern match (the default is
+    #                      case sensitive if the database supports it).
+    #
+    # If both :all_columns and :all_patterns are true, all columns must match all patterns.
+    #
+    # Examples:
+    #
+    #   dataset.grep(:a, '%test%')
+    #   # SELECT * FROM items WHERE (a LIKE '%test%')
+    #
+    #   dataset.grep([:a, :b], %w'%test% foo')
+    #   # SELECT * FROM items WHERE ((a LIKE '%test%') OR (a LIKE 'foo') OR (b LIKE '%test%') OR (b LIKE 'foo'))
+    #
+    #   dataset.grep([:a, :b], %w'%foo% %bar%', :all_patterns=>true)
+    #   # SELECT * FROM a WHERE (((a LIKE '%foo%') OR (b LIKE '%foo%')) AND ((a LIKE '%bar%') OR (b LIKE '%bar%')))
+    #
+    #   dataset.grep([:a, :b], %w'%foo% %bar%', :all_columns=>true)
+    #   # SELECT * FROM a WHERE (((a LIKE '%foo%') OR (a LIKE '%bar%')) AND ((b LIKE '%foo%') OR (b LIKE '%bar%')))
+    #
+    #   dataset.grep([:a, :b], %w'%foo% %bar%', :all_patterns=>true, :all_columns=>true)
+    #   # SELECT * FROM a WHERE ((a LIKE '%foo%') AND (b LIKE '%foo%') AND (a LIKE '%bar%') AND (b LIKE '%bar%'))
+    def grep(columns, patterns, opts={})
+      if opts[:all_patterns]
+        conds = Array(patterns).map do |pat|
+          SQL::BooleanExpression.new(opts[:all_columns] ? :AND : :OR, *Array(columns).map{|c| SQL::StringExpression.like(c, pat, opts)})
+        end
+        filter(SQL::BooleanExpression.new(opts[:all_patterns] ? :AND : :OR, *conds))
+      else
+        conds = Array(columns).map do |c|
+          SQL::BooleanExpression.new(:OR, *Array(patterns).map{|pat| SQL::StringExpression.like(c, pat, opts)})
+        end
+        filter(SQL::BooleanExpression.new(opts[:all_columns] ? :AND : :OR, *conds))
+      end
     end
 
     # Returns a copy of the dataset with the results grouped by the value of 

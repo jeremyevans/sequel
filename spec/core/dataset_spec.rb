@@ -3089,6 +3089,41 @@ context "Dataset#grep" do
       "SELECT * FROM posts WHERE ((title LIKE 'abc') OR (title LIKE 'def') OR (body LIKE 'abc') OR (body LIKE 'def'))"
   end
   
+  specify "should support the :all_patterns option" do
+    @ds.grep([:title, :body], ['abc', 'def'], :all_patterns=>true).sql.should ==
+      "SELECT * FROM posts WHERE (((title LIKE 'abc') OR (body LIKE 'abc')) AND ((title LIKE 'def') OR (body LIKE 'def')))"
+  end
+  
+  specify "should support the :all_columns option" do
+    @ds.grep([:title, :body], ['abc', 'def'], :all_columns=>true).sql.should ==
+      "SELECT * FROM posts WHERE (((title LIKE 'abc') OR (title LIKE 'def')) AND ((body LIKE 'abc') OR (body LIKE 'def')))"
+  end
+  
+  specify "should support the :case_insensitive option" do
+    @ds.grep([:title, :body], ['abc', 'def'], :case_insensitive=>true).sql.should ==
+      "SELECT * FROM posts WHERE ((title ILIKE 'abc') OR (title ILIKE 'def') OR (body ILIKE 'abc') OR (body ILIKE 'def'))"
+  end
+  
+  specify "should support the :all_patterns and :all_columns options together" do
+    @ds.grep([:title, :body], ['abc', 'def'], :all_patterns=>true, :all_columns=>true).sql.should ==
+      "SELECT * FROM posts WHERE ((title LIKE 'abc') AND (body LIKE 'abc') AND (title LIKE 'def') AND (body LIKE 'def'))"
+  end
+  
+  specify "should support the :all_patterns and :case_insensitive options together" do
+    @ds.grep([:title, :body], ['abc', 'def'], :all_patterns=>true, :case_insensitive=>true).sql.should ==
+      "SELECT * FROM posts WHERE (((title ILIKE 'abc') OR (body ILIKE 'abc')) AND ((title ILIKE 'def') OR (body ILIKE 'def')))"
+  end
+  
+  specify "should support the :all_columns and :case_insensitive options together" do
+    @ds.grep([:title, :body], ['abc', 'def'], :all_columns=>true, :case_insensitive=>true).sql.should ==
+      "SELECT * FROM posts WHERE (((title ILIKE 'abc') OR (title ILIKE 'def')) AND ((body ILIKE 'abc') OR (body ILIKE 'def')))"
+  end
+  
+  specify "should support the :all_patterns, :all_columns, and :case_insensitive options together" do
+    @ds.grep([:title, :body], ['abc', 'def'], :all_patterns=>true, :all_columns=>true, :case_insensitive=>true).sql.should ==
+      "SELECT * FROM posts WHERE ((title ILIKE 'abc') AND (body ILIKE 'abc') AND (title ILIKE 'def') AND (body ILIKE 'def'))"
+  end
+
   specify "should support regexps though the database may not support it" do
     @ds.grep(:title, /ruby/).sql.should ==
       "SELECT * FROM posts WHERE ((title ~ 'ruby'))"
