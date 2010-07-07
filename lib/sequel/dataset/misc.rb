@@ -10,7 +10,8 @@ module Sequel
     ARG_BLOCK_ERROR_MSG = 'Must use either an argument or a block, not both'.freeze
     IMPORT_ERROR_MSG = 'Using Sequel::Dataset#import an empty column array is not allowed'.freeze
     
-    # The database that corresponds to this dataset
+    # The database related to this dataset.  This is the Database instance that
+    # will execute all of this dataset's queries.
     attr_accessor :db
 
     # The hash of options for this dataset, keys are symbols.
@@ -22,8 +23,8 @@ module Sequel
     #   DB[:posts]
     #
     # Sequel::Dataset is an abstract class that is not useful by itself. Each
-    # database adaptor should provide a subclass of Sequel::Dataset, and have
-    # the Database#dataset method return an instance of that class.
+    # database adaptor provides a subclass of Sequel::Dataset, and has
+    # the Database#dataset method return an instance of that subclass.
     def initialize(db, opts = nil)
       @db = db
       @quote_identifiers = db.quote_identifiers? if db.respond_to?(:quote_identifiers?)
@@ -36,6 +37,8 @@ module Sequel
     # Return the dataset as an aliased expression with the given alias. You can
     # use this as a FROM or JOIN dataset, or as a column if this dataset
     # returns a single row and column.
+    #
+    #   DB.from(DB[:table].as(:b)) # SELECT * FROM (SELECT * FROM table) AS b
     def as(aliaz)
       ::Sequel::SQL::AliasedExpression.new(self, aliaz)
     end
@@ -49,13 +52,19 @@ module Sequel
       db.servers.each{|s| yield server(s)}
     end
    
-    # Alias of first_source_alias
+    # Alias of +first_source_alias+
     def first_source
       first_source_alias
     end
 
     # The first source (primary table) for this dataset.  If the dataset doesn't
-    # have a table, raises an error.  If the table is aliased, returns the aliased name.
+    # have a table, raises an +Error+.  If the table is aliased, returns the aliased name.
+    #
+    #   DB[:table].first_source_alias
+    #   # => :table
+    #
+    #   DB[:table___t].first_source_alias
+    #   # => :t
     def first_source_alias
       source = @opts[:from]
       if source.nil? || source.empty?
@@ -75,6 +84,12 @@ module Sequel
     # The first source (primary table) for this dataset.  If the dataset doesn't
     # have a table, raises an error.  If the table is aliased, returns the original
     # table, not the alias
+    #
+    #   DB[:table].first_source_alias
+    #   # => :table
+    #
+    #   DB[:table___t].first_source_alias
+    #   # => :table
     def first_source_table
       source = @opts[:from]
       if source.nil? || source.empty?
@@ -103,6 +118,15 @@ module Sequel
     # possibly appended with "_N" if the implicit alias has already been
     # used, where N is an integer starting at 0 and increasing until an
     # unused one is found.
+    #
+    #   DB[:table].unused_table_alias(:t)
+    #   # => :t
+    #
+    #   DB[:table].unused_table_alias(:table)
+    #   # => :table_0
+    #
+    #   DB[:table, :table_0].unused_table_alias(:table)
+    #   # => :table_1
     def unused_table_alias(table_alias)
       table_alias = alias_symbol(table_alias)
       used_aliases = []

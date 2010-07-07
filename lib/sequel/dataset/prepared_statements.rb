@@ -176,6 +176,10 @@ module Sequel
     # Set the bind variables to use for the call.  If bind variables have
     # already been set for this dataset, they are updated with the contents
     # of bind_vars.
+    #
+    #   DB[:table].filter(:id=>:$id).bind(:id=>1).call(:first)
+    #   # SELECT * FROM table WHERE id = ? LIMIT 1 -- (1)
+    #   # => {:id=>1}
     def bind(bind_vars={})
       clone(:bind_vars=>@opts[:bind_vars] ? @opts[:bind_vars].merge(bind_vars) : bind_vars)
     end
@@ -185,6 +189,10 @@ module Sequel
     # specified in the hash.  values is a hash of passed to
     # insert or update (if one of those types is used),
     # which may contain placeholders.
+    #
+    #   DB[:table].filter(:id=>:$id).call(:first, :id=>1)
+    #   # SELECT * FROM table WHERE id = ? LIMIT 1 -- (1)
+    #   # => {:id=>1}
     def call(type, bind_variables={}, *values, &block)
       prepare(type, nil, *values).call(bind_variables, &block)
     end
@@ -195,9 +203,13 @@ module Sequel
     # do substitution.  The prepared statement is also stored in
     # the associated database.  The following usage is identical:
     #
-    #   ps = prepare(:select, :select_by_name)
+    #   ps = DB[:table].filter(:name=>:$name).prepare(:first, :select_by_name)
+    #
     #   ps.call(:name=>'Blah')
-    #   db.call(:select_by_name, :name=>'Blah')
+    #   # SELECT * FROM table WHERE name = ? -- ('Blah')
+    #   # => {:id=>1, :name=>'Blah'}
+    #
+    #   DB.call(:select_by_name, :name=>'Blah') # Same thing
     def prepare(type, name=nil, *values)
       ps = to_prepared_statement(type, values)
       db.prepared_statements[name] = ps if name

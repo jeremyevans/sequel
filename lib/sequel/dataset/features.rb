@@ -22,7 +22,7 @@ module Sequel
     end
     
     # Whether the dataset requires SQL standard datetimes (false by default,
-    # as most allow strings with ISO 8601 format.
+    # as most allow strings with ISO 8601 format).
     def requires_sql_standard_datetimes?
       false
     end

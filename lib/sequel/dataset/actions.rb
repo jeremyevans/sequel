@@ -21,22 +21,30 @@ module Sequel
     
     # Returns the first record matching the conditions. Examples:
     #
-    #   ds[:id=>1] => {:id=1}
+    #   DB[:table][:id=>1] # SELECT * FROM table WHERE (id = 1) LIMIT 1
+    #   # => {:id=1}
     def [](*conditions)
       raise(Error, ARRAY_ACCESS_ERROR_MSG) if (conditions.length == 1 and conditions.first.is_a?(Integer)) or conditions.length == 0
       first(*conditions)
     end
 
-    # Update all records matching the conditions
-    # with the values specified. Examples:
+    # Update all records matching the conditions with the values specified.
+    # Returns the number of rows affected.
     #
-    #   ds[:id=>1] = {:id=>2} # SQL: UPDATE ... SET id = 2 WHERE id = 1
+    #   DB[:table][:id=>1] = {:id=>2} # UPDATE table SET id = 2 WHERE id = 1
+    #   # => 1 # number of rows affected
     def []=(conditions, values)
       filter(conditions).update(values)
     end
 
     # Returns an array with all records in the dataset. If a block is given,
     # the array is iterated over after all items have been loaded.
+    #
+    #   DB[:table].all # SELECT * FROM table
+    #   # => [{:id=>1, ...}, {:id=>2, ...}, ...]
+    #
+    #   # Iterate over all rows in the table
+    #   DB[:table].all{|row| p row}
     def all(&block)
       a = []
       each{|r| a << r}
@@ -46,19 +54,22 @@ module Sequel
     end
     
     # Returns the average value for the given column.
+    #
+    #   DB[:table].avg(:number) # SELECT avg(number) FROM table LIMIT 1
+    #   # => 3
     def avg(column)
       aggregate_dataset.get{avg(column)}
     end
   
-    # Returns the columns in the result set in order.
+    # Returns the columns in the result set in order as an array of symbols.
     # If the columns are currently cached, returns the cached value. Otherwise,
-    # a SELECT query is performed to get a single row. Adapters are expected
-    # to fill the columns cache with the column information when a query is performed.
-    # If the dataset does not have any rows, this may be an empty array depending on how
-    # the adapter is programmed.
+    # a SELECT query is performed to retrieve a single row in order to get the columns.
     #
     # If you are looking for all columns for a single table and maybe some information about
-    # each column (e.g. type), see Database#schema.
+    # each column (e.g. database type), see <tt>Database#schema</tt>.
+    #
+    #   DB[:table].columns
+    #   # => [:id, :name]
     def columns
       return @columns if @columns
       ds = unfiltered.unordered.clone(:distinct => nil, :limit => 1)
@@ -67,20 +78,29 @@ module Sequel
       @columns || []
     end
         
-    # Remove the cached list of columns and do a SELECT query to find
-    # the columns.
+    # Ignore any cached column information and perform a query to retrieve
+    # a row in order to get the columns.
+    #
+    #   DB[:table].columns!
+    #   # => [:id, :name]
     def columns!
       @columns = nil
       columns
     end
     
     # Returns the number of records in the dataset.
+    #
+    #   DB[:table].count # SELECT COUNT(*) AS count FROM table LIMIT 1
+    #   # => 3
     def count
       aggregate_dataset.get{COUNT(:*){}.as(count)}.to_i
     end
     
-    # Deletes the records in the dataset.  The returned value is generally the
-    # number of records deleted, but that is adapter dependent.  See delete_sql.
+    # Deletes the records in the dataset.  The returned value should be 
+    # number of records deleted, but that is adapter dependent.
+    #
+    #   DB[:table].delete # DELETE * FROM table
+    #   # => 3
     def delete
       execute_dui(delete_sql)
     end
@@ -88,10 +108,12 @@ module Sequel
     # Iterates over the records in the dataset as they are yielded from the
     # database adapter, and returns self.
     #
+    #   DB[:table].each{|row| p row} # SELECT * FROM table
+    #
     # Note that this method is not safe to use on many adapters if you are
     # running additional queries inside the provided block.  If you are
     # running queries inside the block, you should use +all+ instead of +each+
-    # for the outer queries, or use a separate thread or shard inside +each+.
+    # for the outer queries, or use a separate thread or shard inside +each+:
     def each(&block)
       if @opts[:graph]
         graph_each(&block)
@@ -104,35 +126,51 @@ module Sequel
     end
     
     # Returns true if no records exist in the dataset, false otherwise
+    #
+    #   DB[:table].empty? # SELECT 1 FROM table LIMIT 1
+    #   # => false
     def empty?
       get(1).nil?
     end
 
     # Executes a select query and fetches records, passing each record to the
     # supplied block.  The yielded records should be hashes with symbol keys.
+    # This method should probably should not be called by user code, use +each+
+    # instead.
     def fetch_rows(sql, &block)
       raise NotImplemented, NOTIMPL_MSG
     end
     
-    # If a integer argument is
-    # given, it is interpreted as a limit, and then returns all 
+    # If a integer argument is given, it is interpreted as a limit, and then returns all 
     # matching records up to that limit.  If no argument is passed,
     # it returns the first matching record.  If any other type of
     # argument(s) is passed, it is given to filter and the
     # first matching record is returned. If a block is given, it is used
     # to filter the dataset before returning anything.  Examples:
     # 
-    #   ds.first => {:id=>7}
-    #   ds.first(2) => [{:id=>6}, {:id=>4}]
-    #   ds.order(:id).first(2) => [{:id=>1}, {:id=>2}]
-    #   ds.first(:id=>2) => {:id=>2}
-    #   ds.first("id = 3") => {:id=>3}
-    #   ds.first("id = ?", 4) => {:id=>4}
-    #   ds.first{|o| o.id > 2} => {:id=>5}
-    #   ds.order(:id).first{|o| o.id > 2} => {:id=>3}
-    #   ds.first{|o| o.id > 2} => {:id=>5}
-    #   ds.first("id > ?", 4){|o| o.id < 6} => {:id=>5}
-    #   ds.order(:id).first(2){|o| o.id < 2} => [{:id=>1}]
+    #   DB[:table].first # SELECT * FROM table LIMIT 1
+    #   # => {:id=>7}
+    #
+    #   DB[:table].first(2) # SELECT * FROM table LIMIT 2
+    #   # => [{:id=>6}, {:id=>4}]
+    #
+    #   DB[:table].first(:id=>2) # SELECT * FROM table WHERE (id = 2) LIMIT 1
+    #   # => {:id=>2}
+    #
+    #   DB[:table].first("id = 3") # SELECT * FROM table WHERE (id = 3) LIMIT 1
+    #   # => {:id=>3}
+    #
+    #   DB[:table].first("id = ?", 4) # SELECT * FROM table WHERE (id = 4) LIMIT 1
+    #   # => {:id=>4}
+    #
+    #   DB[:table].first{id > 2} # SELECT * FROM table WHERE (id > 2) LIMIT 1
+    #   # => {:id=>5}
+    #
+    #   DB[:table].first("id > ?", 4){id < 6} # SELECT * FROM table WHERE ((id > 4) AND (id < 6)) LIMIT 1
+    #   # => {:id=>5}
+    #
+    #   DB[:table].first(2){id < 2} # SELECT * FROM table WHERE (id < 2) LIMIT 2
+    #   # => [{:id=>1}]
     def first(*args, &block)
       ds = block ? filter(&block) : self
 
@@ -151,8 +189,11 @@ module Sequel
     # Return the column value for the first matching record in the dataset.
     # Raises an error if both an argument and block is given.
     #
-    #   ds.get(:id)
-    #   ds.get{|o| o.sum(:id)}
+    #   DB[:table].get(:id) # SELECT id FROM table LIMIT 1
+    #   # => 3
+    #
+    #   ds.get{sum(id)} # SELECT sum(id) FROM table LIMIT 1
+    #   # => 6
     def get(column=nil, &block)
       if column
         raise(Error, ARG_BLOCK_ERROR_MSG) if block
@@ -169,11 +210,14 @@ module Sequel
     # 
     # This method is called with a columns array and an array of value arrays:
     #
-    #   dataset.import([:x, :y], [[1, 2], [3, 4]])
+    #   DB[:table].import([:x, :y], [[1, 2], [3, 4]])
+    #   # INSERT INTO table (x, y) VALUES (1, 2) 
+    #   # INSERT INTO table (x, y) VALUES (3, 4) 
     #
     # This method also accepts a dataset instead of an array of value arrays:
     #
-    #   dataset.import([:x, :y], other_dataset.select(:a___x, :b___y))
+    #   DB[:table].import([:x, :y], DB[:table2].select(:a, :b))
+    #   # INSERT INTO table (x, y) SELECT a, b FROM table2 
     #
     # The method also accepts a :slice or :commit_every option that specifies
     # the number of records to insert per transaction. This is useful especially
@@ -202,15 +246,53 @@ module Sequel
   
     # Inserts values into the associated table.  The returned value is generally
     # the value of the primary key for the inserted row, but that is adapter dependent.
-    # See insert_sql.
+    #
+    # +insert+ handles a number of different argument formats:
+    # * No arguments, single empty hash - Uses DEFAULT VALUES
+    # * Single hash - Most common format, treats keys as columns an values as values
+    # * Single array - Treats entries as values, with no columns
+    # * Two arrays - Treats first array as columns, second array as values
+    # * Single Dataset - Treats as an insert based on a selection from the dataset given,
+    #   with no columns
+    # * Array and dataset - Treats as an insert based on a selection from the dataset
+    #   given, with the columns given by the array.
+    #
+    #   DB[:items].insert
+    #   # INSERT INTO items DEFAULT VALUES
+    #
+    #   DB[:items].insert({})
+    #   # INSERT INTO items DEFAULT VALUES
+    #
+    #   DB[:items].insert([1,2,3])
+    #   # INSERT INTO items VALUES (1, 2, 3)
+    #
+    #   DB[:items].insert([:a, :b], [1,2])
+    #   # INSERT INTO items (a, b) VALUES (1, 2)
+    #
+    #   DB[:items].insert(:a => 1, :b => 2)
+    #   # INSERT INTO items (a, b) VALUES (1, 2)
+    #
+    #   DB[:items].insert(DB[:old_items])
+    #   # INSERT INTO items SELECT * FROM old_items
+    #
+    #   DB[:items].insert([:a, :b], DB[:old_items])
+    #   # INSERT INTO items (a, b) SELECT * FROM old_items
     def insert(*values)
       execute_insert(insert_sql(*values))
     end
     
     # Inserts multiple values. If a block is given it is invoked for each
-    # item in the given array before inserting it.  See #multi_insert as
+    # item in the given array before inserting it.  See +multi_insert+ as
     # a possible faster version that inserts multiple records in one
     # SQL statement.
+    #
+    #   DB[:table].insert_multiple([{:x=>1}, {:x=>2}])
+    #   # INSERT INTO table (x) VALUES (1)
+    #   # INSERT INTO table (x) VALUES (2)
+    #
+    #   DB[:table].insert_multiple([{:x=>1}, {:x=>2}]){|row| row[:y] = row[:x] * 2}
+    #   # INSERT INTO table (x, y) VALUES (1, 2)
+    #   # INSERT INTO table (x, y) VALUES (2, 4)
     def insert_multiple(array, &block)
       if block
         array.each {|i| insert(block[i])}
@@ -221,6 +303,9 @@ module Sequel
     
     # Returns the interval between minimum and maximum values for the given 
     # column.
+    #
+    #   DB[:table].interval(:id) # SELECT (max(id) - min(id)) FROM table LIMIT 1
+    #   # => 6
     def interval(column)
       aggregate_dataset.get{max(column) - min(column)}
     end
@@ -228,18 +313,27 @@ module Sequel
     # Reverses the order and then runs first.  Note that this
     # will not necessarily give you the last record in the dataset,
     # unless you have an unambiguous order.  If there is not
-    # currently an order for this dataset, raises an Error.
+    # currently an order for this dataset, raises an +Error+.
+    #
+    #   DB[:table].order(:id).last # SELECT * FROM table ORDER BY id DESC LIMIT 1
+    #   # => {:id=>10}
+    #
+    #   DB[:table].order(:id.desc).last(2) # SELECT * FROM table ORDER BY id ASC LIMIT 2
+    #   # => [{:id=>1}, {:id=>2}]
     def last(*args, &block)
       raise(Error, 'No order specified') unless @opts[:order]
       reverse.first(*args, &block)
     end
     
     # Maps column values for each record in the dataset (if a column name is
-    # given), or performs the stock mapping functionality of Enumerable. 
-    # Raises an error if both an argument and block are given. Examples:
+    # given), or performs the stock mapping functionality of +Enumerable+ otherwise. 
+    # Raises an +Error+ if both an argument and block are given.
     #
-    #   ds.map(:id) => [1, 2, 3, ...]
-    #   ds.map{|r| r[:id] * 2} => [2, 4, 6, ...]
+    #   DB[:table].map(:id) # SELECT * FROM table
+    #   # => [1, 2, 3, ...]
+    #
+    #   DB[:table].map{|r| r[:id] * 2} # SELECT * FROM table
+    #   # => [2, 4, 6, ...]
     def map(column=nil, &block)
       if column
         raise(Error, ARG_BLOCK_ERROR_MSG) if block
@@ -250,11 +344,17 @@ module Sequel
     end
 
     # Returns the maximum value for the given column.
+    #
+    #   DB[:table].max(:id) # SELECT max(id) FROM table LIMIT 1
+    #   # => 10
     def max(column)
       aggregate_dataset.get{max(column)}
     end
 
     # Returns the minimum value for the given column.
+    #
+    #   DB[:table].min(:id) # SELECT min(id) FROM table LIMIT 1
+    #   # => 1
     def min(column)
       aggregate_dataset.get{min(column)}
     end
@@ -262,7 +362,9 @@ module Sequel
     # This is a front end for import that allows you to submit an array of
     # hashes instead of arrays of columns and values:
     # 
-    #   dataset.multi_insert([{:x => 1}, {:x => 2}])
+    #   DB[:table].multi_insert([{:x => 1}, {:x => 2}])
+    #   # INSERT INTO table (x) VALUES (1)
+    #   # INSERT INTO table (x) VALUES (2)
     #
     # Be aware that all hashes should have the same keys if you use this calling method,
     # otherwise some columns could be missed or set to null instead of to default
@@ -275,8 +377,11 @@ module Sequel
       import(columns, hashes.map{|h| columns.map{|c| h[c]}}, opts)
     end
 
-    # Returns a Range object made from the minimum and maximum values for the
+    # Returns a +Range+ instance made from the minimum and maximum values for the
     # given column.
+    #
+    #   DB[:table].range(:id) # SELECT max(id) AS v1, min(id) AS v2 FROM table LIMIT 1
+    #   # => 1..10
     def range(column)
       if r = aggregate_dataset.select{[min(column).as(v1), max(column).as(v2)]}.first
         (r[:v1]..r[:v2])
@@ -285,6 +390,9 @@ module Sequel
     
     # Returns a hash with key_column values as keys and value_column values as
     # values.  Similar to to_hash, but only selects the two columns.
+    #
+    #   DB[:table].select_hash(:id, :name) # SELECT id, name FROM table
+    #   # => {1=>'a', 2=>'b', ...}
     def select_hash(key_column, value_column)
       select(key_column, value_column).to_hash(hash_key_symbol(key_column), hash_key_symbol(value_column))
     end
@@ -293,6 +401,12 @@ module Sequel
     # returns an array of all values of that column in the dataset.  If you
     # give a block argument that returns an array with multiple entries,
     # the contents of the resulting array are undefined.
+    #
+    #   DB[:table].select_map(:id) # SELECT id FROM table
+    #   # => [3, 5, 8, 1, ...]
+    #
+    #   DB[:table].select_map{abs(id)} # SELECT abs(id) FROM table
+    #   # => [3, 5, 8, 1, ...]
     def select_map(column=nil, &block)
       ds = naked.ungraphed
       ds = if column
@@ -305,6 +419,12 @@ module Sequel
     end
     
     # The same as select_map, but in addition orders the array by the column.
+    #
+    #   DB[:table].select_order_map(:id) # SELECT id FROM table ORDER BY id
+    #   # => [1, 2, 3, 4, ...]
+    #
+    #   DB[:table].select_order_map{abs(id)} # SELECT abs(id) FROM table ORDER BY abs(id)
+    #   # => [1, 2, 3, 4, ...]
     def select_order_map(column=nil, &block)
       ds = naked.ungraphed
       ds = if column
@@ -322,14 +442,17 @@ module Sequel
       update(*args)
     end
     
-    # Returns the first record in the dataset.
+    # Returns the first record in the dataset, or nil if the dataset
+    # has no records. Users should probably use +first+ instead of
+    # this method.
     def single_record
       clone(:limit=>1).each{|r| return r}
       nil
     end
 
     # Returns the first value of the first record in the dataset.
-    # Returns nil if dataset is empty.
+    # Returns nil if dataset is empty.  Users should generally use
+    # +get+ instead of this method.
     def single_value
       if r = naked.ungraphed.single_record
         r.values.first
@@ -337,6 +460,9 @@ module Sequel
     end
     
     # Returns the sum for the given column.
+    #
+    #   DB[:table].sum(:id) # SELECT sum(id) FROM table LIMIT 1
+    #   # => 55
     def sum(column)
       aggregate_dataset.get{sum(column)}
     end
@@ -349,6 +475,11 @@ module Sequel
     # This does not use a CSV library or handle quoting of values in
     # any way.  If any values in any of the rows could include commas or line
     # endings, you shouldn't use this.
+    #
+    #   puts DB[:table].to_csv # SELECT * FROM table
+    #   # id,name
+    #   # 1,Jim
+    #   # 2,Bob
     def to_csv(include_column_titles = true)
       n = naked
       cols = n.columns
@@ -362,6 +493,12 @@ module Sequel
     # If rows have duplicate values for the key column, the latter row(s)
     # will overwrite the value of the previous row(s). If the value_column
     # is not given or nil, uses the entire hash as the value.
+    #
+    #   DB[:table].to_hash(:id, :name) # SELECT * FROM table
+    #   # {1=>'Jim', 2=>'Bob', ...}
+    #
+    #   DB[:table].to_hash(:id) # SELECT * FROM table
+    #   # {1=>{:id=>1, :name=>'Jim'}, 2=>{:id=>2, :name=>'Bob'}, ...}
     def to_hash(key_column, value_column = nil)
       inject({}) do |m, r|
         m[r[key_column]] = value_column ? r[value_column] : r
@@ -370,12 +507,23 @@ module Sequel
     end
 
     # Truncates the dataset.  Returns nil.
+    #
+    #   DB[:table].truncate # TRUNCATE table
+    #   # => nil
     def truncate
       execute_ddl(truncate_sql)
     end
 
     # Updates values for the dataset.  The returned value is generally the
-    # number of rows updated, but that is adapter dependent.  See update_sql.
+    # number of rows updated, but that is adapter dependent. +values+ should
+    # a hash where the keys are columns to set and values are the values to
+    # which to set the columns.
+    #
+    #   DB[:table].update(:x=>nil) # UPDATE table SET x = NULL
+    #   # => 10
+    #
+    #   DB[:table].update(:x=>:x+1, :y=>0) # UPDATE table SET x = (x + 1), :y = 0
+    #   # => 10
     def update(values={})
       execute_dui(update_sql(values))
     end
@@ -387,7 +535,8 @@ module Sequel
       {:server=>@opts[:server] || :default}.merge(opts)
     end
 
-    # Execute the given SQL on the database using execute.
+    # Execute the given select SQL on the database using execute. Use the
+    # :read_only server unless a specific server is set.
     def execute(sql, opts={}, &block)
       @db.execute(sql, {:server=>@opts[:server] || :read_only}.merge(opts), &block)
     end

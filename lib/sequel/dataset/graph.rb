@@ -3,13 +3,17 @@ module Sequel
     # ---------------------
     # :section: Methods related to dataset graphing
     # Dataset graphing changes the dataset to yield hashes where keys are table
-    # name symbols and columns are hashes representing the values related to
+    # name symbols and values are hashes representing the columns related to
     # that table.  All of these methods return modified copies of the receiver.
     # ---------------------
     
     # Adds the given graph aliases to the list of graph aliases to use,
-    # unlike #set_graph_aliases, which replaces the list.  See
-    # #set_graph_aliases.
+    # unlike +set_graph_aliases+, which replaces the list (the equivalent
+    # of +select_more+ when graphing).  See +set_graph_aliases+.
+    #
+    #   DB[:table].add_graph_aliases(:some_alias=>[:table, :column])
+    #   # SELECT ..., table.column AS some_alias
+    #   # => {:table=>{:column=>some_alias_value, ...}, ...}
     def add_graph_aliases(graph_aliases)
       ds = select_more(*graph_alias_columns(graph_aliases))
       ds.opts[:graph_aliases] = (ds.opts[:graph_aliases] || (ds.opts[:graph][:column_aliases] rescue {}) || {}).merge(graph_aliases)
@@ -24,16 +28,18 @@ module Sequel
     #
     #   # CREATE TABLE artists (id INTEGER, name TEXT);
     #   # CREATE TABLE albums (id INTEGER, name TEXT, artist_id INTEGER);
+    #
     #   DB[:artists].left_outer_join(:albums, :artist_id=>:id).first
-    #   => {:id=>albums.id, :name=>albums.name, :artist_id=>albums.artist_id}
+    #   #=> {:id=>albums.id, :name=>albums.name, :artist_id=>albums.artist_id}
+    #
     #   DB[:artists].graph(:albums, :artist_id=>:id).first
-    #   => {:artists=>{:id=>artists.id, :name=>artists.name}, :albums=>{:id=>albums.id, :name=>albums.name, :artist_id=>albums.artist_id}}
+    #   #=> {:artists=>{:id=>artists.id, :name=>artists.name}, :albums=>{:id=>albums.id, :name=>albums.name, :artist_id=>albums.artist_id}}
     #
     # Using a join such as left_outer_join, the attribute names that are shared between
     # the tables are combined in the single return hash.  You can get around that by
-    # using .select with correct aliases for all of the columns, but it is simpler to
-    # use graph and have the result set split for you.  In addition, graph respects
-    # any row_proc of the current dataset and the datasets you use with graph.
+    # using +select+ with correct aliases for all of the columns, but it is simpler to
+    # use +graph+ and have the result set split for you.  In addition, +graph+ respects
+    # any +row_proc+ of the current dataset and the datasets you use with +graph+.
     #
     # If you are graphing a table and all columns for that table are nil, this
     # indicates that no matching rows existed in the table, so graph will return nil
@@ -44,26 +50,26 @@ module Sequel
     #   => {:artists=>{:id=>artists.id, :name=>artists.name}, :albums=>nil}
     #
     # Arguments:
-    # * dataset -  Can be a symbol (specifying a table), another dataset,
-    #   or an object that responds to .dataset and return a symbol or a dataset
-    # * join_conditions - Any condition(s) allowed by join_table.
-    # * options -  A hash of graph options.  The following options are currently used:
-    #   * :from_self_alias - The alias to use when the receiver is not a graphed
-    #     dataset but it contains multiple FROM tables or a JOIN.  In this case,
-    #     the receiver is wrapped in a from_self before graphing, and this option
-    #     determines the alias to use.
-    #   * :implicit_qualifier - The qualifier of implicit conditions, see #join_table.
-    #   * :join_type - The type of join to use (passed to join_table).  Defaults to
-    #     :left_outer.
-    #   * :select - An array of columns to select.  When not used, selects
-    #     all columns in the given dataset.  When set to false, selects no
-    #     columns and is like simply joining the tables, though graph keeps
-    #     some metadata about join that makes it important to use graph instead
-    #     of join.
-    #   * :table_alias - The alias to use for the table.  If not specified, doesn't
-    #     alias the table.  You will get an error if the the alias (or table) name is
-    #     used more than once.
-    # * block - A block that is passed to join_table.
+    # dataset :: Can be a symbol (specifying a table), another dataset,
+    #            or an object that responds to +dataset+ and returns a symbol or a dataset
+    # join_conditions :: Any condition(s) allowed by +join_table+.
+    # block :: A block that is passed to +join_table+.
+    #
+    # Options:
+    # :from_self_alias :: The alias to use when the receiver is not a graphed
+    #                     dataset but it contains multiple FROM tables or a JOIN.  In this case,
+    #                     the receiver is wrapped in a from_self before graphing, and this option
+    #                     determines the alias to use.
+    # :implicit_qualifier :: The qualifier of implicit conditions, see #join_table.
+    # :join_type :: The type of join to use (passed to +join_table+).  Defaults to :left_outer.
+    # :select :: An array of columns to select.  When not used, selects
+    #            all columns in the given dataset.  When set to false, selects no
+    #            columns and is like simply joining the tables, though graph keeps
+    #            some metadata about the join that makes it important to use +graph+ instead
+    #            of +join_table+.
+    # :table_alias :: The alias to use for the table.  If not specified, doesn't
+    #                 alias the table.  You will get an error if the the alias (or table) name is
+    #                 used more than once.
     def graph(dataset, join_conditions = nil, options = {}, &block)
       # Allow the use of a model, dataset, or symbol as the first argument
       # Find the table name/dataset based on the argument
@@ -172,29 +178,31 @@ module Sequel
     # This allows you to manually specify the graph aliases to use
     # when using graph.  You can use it to only select certain
     # columns, and have those columns mapped to specific aliases
-    # in the result set.  This is the equivalent of .select for a
-    # graphed dataset, and must be used instead of .select whenever
-    # graphing is used. Example:
+    # in the result set.  This is the equivalent of +select+ for a
+    # graphed dataset, and must be used instead of +select+ whenever
+    # graphing is used.
     #
-    #   DB[:artists].graph(:albums, :artist_id=>:id).set_graph_aliases(:artist_name=>[:artists, :name], :album_name=>[:albums, :name], :forty_two=>[:albums, :fourtwo, 42]).first
-    #   => {:artists=>{:name=>artists.name}, :albums=>{:name=>albums.name, :fourtwo=>42}}
+    # graph_aliases :: Should be a hash with keys being symbols of
+    #                  column aliases, and values being arrays with two or three elements.
+    #                  The first element of the array should be the table alias symbol,
+    #                  and the second should be the actual column name symbol. If the array
+    #                  has a third element, it is used as the value returned, instead of
+    #                  table_alias.column_name.
     #
-    # Arguments:
-    # * graph_aliases - Should be a hash with keys being symbols of
-    #   column aliases, and values being arrays with two or three elements.
-    #   The first element of the array should be the table alias symbol,
-    #   and the second should be the actual column name symbol. If the array
-    #   has a third element, it is used as the value returned, instead of
-    #   table_alias.column_name.
+    #   DB[:artists].graph(:albums, :artist_id=>:id).
+    #     set_graph_aliases(:artist_name=>[:artists, :name],
+    #                       :album_name=>[:albums, :name],
+    #                       :forty_two=>[:albums, :fourtwo, 42]).first
+    #   # SELECT artists.name AS artist_name, albums.name AS album_name, 42 AS forty_two FROM table
+    #   # => {:artists=>{:name=>artists.name}, :albums=>{:name=>albums.name, :fourtwo=>42}}
     def set_graph_aliases(graph_aliases)
       ds = select(*graph_alias_columns(graph_aliases))
       ds.opts[:graph_aliases] = graph_aliases
       ds
     end
 
-    # Remove the splitting of results into subhashes.  Also removes
-    # metadata related to graphing, so you should not call graph
-    # any tables to this dataset after calling this method.
+    # Remove the splitting of results into subhashes, and all metadata
+    # related to the current graph (if any).
     def ungraphed
       clone(:graph=>nil)
     end

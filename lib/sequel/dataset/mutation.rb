@@ -20,7 +20,6 @@ module Sequel
     # Add the mutation methods via metaprogramming
     def_mutation_method(*MUTATION_METHODS)
     
-    
     # Set the method to call on identifiers going into the database for this dataset
     attr_accessor :identifier_input_method
     
