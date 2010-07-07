@@ -9,7 +9,7 @@ module Sequel
     # level instead of info level.
     attr_accessor :log_warn_duration
 
-    # Array of SQL loggers to use for this database
+    # Array of SQL loggers to use for this database.
     attr_accessor :loggers
     
     # Log a message at level info to all loggers.
@@ -33,7 +33,9 @@ module Sequel
       end
     end
 
-    # Remove any existing loggers and just use the given logger.
+    # Remove any existing loggers and just use the given logger:
+    #
+    #   DB.logger = Logger.new($stdout)
     def logger=(logger)
       @loggers = Array(logger)
     end
@@ -57,6 +59,5 @@ module Sequel
     def log_each(level, message)
       @loggers.each{|logger| logger.send(level, message)}
     end
-
   end
 end

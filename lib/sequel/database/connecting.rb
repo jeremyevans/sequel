@@ -27,13 +27,15 @@ module Sequel
         
         # make sure we actually loaded the adapter
         unless klass = ADAPTER_MAP[scheme]
-          raise AdapterNotFound, "Could not load #{scheme} adapter"
+          raise AdapterNotFound, "Could not load #{scheme} adapter: adapter class not registered in ADAPTER_MAP"
         end
       end
       klass
     end
         
-    # Returns the scheme for the Database class.
+    # Returns the scheme symbol for the Database class:
+    #
+    #   Sequel.connect('jdbc:postgres://...').class.adapter_scheme # => :jdbc
     def self.adapter_scheme
       @scheme
     end
@@ -104,7 +106,8 @@ module Sequel
     end
     private_class_method :set_adapter_scheme
     
-    # The connection pool for this database
+    # The connection pool for this Database instance.  All Database instances have
+    # their own connection pools.
     attr_reader :pool
 
     # Dynamically add new servers or modify server options at runtime. Also adds new
@@ -115,7 +118,7 @@ module Sequel
     # proc values.  If a servers key is already in use, it's value is overridden
     # with the value provided.
     #
-    #  DB.add_servers(:f=>{:host=>"hash_host_f"})
+    #   DB.add_servers(:f=>{:host=>"hash_host_f"})
     def add_servers(servers)
       @opts[:servers] = @opts[:servers] ? @opts[:servers].merge(servers) : servers
       @pool.add_servers(servers.keys)
@@ -133,6 +136,8 @@ module Sequel
     # type.  Even better, you can tell that two Database objects that are using
     # the same adapter are connecting to different database types (think JDBC or
     # DataObjects).
+    #
+    #   Sequel.connect('jdbc:postgres://...').database_type # => :postgres
     def database_type
       self.class.adapter_scheme
     end
@@ -141,11 +146,17 @@ module Sequel
     # connections currently in use will not be disconnected. Options:
     # * :servers - Should be a symbol specifing the server to disconnect from,
     #   or an array of symbols to specify multiple servers.
+    #
+    # Example:
+    #
+    #   DB.disconnect # All servers
+    #   DB.disconnect(:servers=>:server1) # Single server
+    #   DB.disconnect(:servers=>[:server1, :server2]) # Multiple servers
     def disconnect(opts = {})
       pool.disconnect(opts)
     end
 
-    # Yield a new database object for every server in the connection pool.
+    # Yield a new Database instance for every server in the connection pool.
     # Intended for use in sharded environments where there is a need to make schema
     # modifications (DDL queries) on each shard.
     #
@@ -175,6 +186,9 @@ module Sequel
     end
     
     # An array of servers/shards for this Database object.
+    #
+    #   DB.servers # Unsharded: => [:default]
+    #   DB.servers # Sharded:   => [:default, :server1, :server2]
     def servers
       pool.servers
     end
@@ -184,13 +198,27 @@ module Sequel
       @single_threaded
     end
     
-    # Acquires a database connection, yielding it to the passed block.
+    # Acquires a database connection, yielding it to the passed block. This is
+    # useful if you want to make sure the same connection is used for all
+    # database queries in the block.  It is also useful if you want to gain
+    # direct access to the underlying connection object if you need to do
+    # something Sequel does not natively support.
+    #
+    # If a server option is given, acquires a connection for that specific
+    # server, instead of the :default server.
+    #
+    #
+    #   DB.synchronize do |conn|
+    #     ...
+    #   end
     def synchronize(server=nil, &block)
       @pool.hold(server || :default, &block)
     end
     
     # Attempts to acquire a database connection.  Returns true if successful.
-    # Will probably raise an error if unsuccessful.
+    # Will probably raise an Error if unsuccessful.  If a server argument
+    # is given, attempts to acquire a database connection to the given
+    # server/shard.
     def test_connection(server=nil)
       synchronize(server){|conn|}
       true
@@ -207,7 +235,7 @@ module Sequel
     # options for all server with the specific options for the given
     # server specified in the :servers option.
     def server_opts(server)
-      opts = if @opts[:servers] && server_options = @opts[:servers][server]
+      opts = if @opts[:servers] and server_options = @opts[:servers][server]
         case server_options
         when Hash
           @opts.merge(server_options)
@@ -222,6 +250,5 @@ module Sequel
       opts.delete(:servers)
       opts
     end
-    
   end
 end

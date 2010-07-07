@@ -1,4 +1,5 @@
 # A connection pool allowing multi-threaded access to a pool of connections.
+# This is the default connection pool used by Sequel.
 class Sequel::ThreadedConnectionPool < Sequel::ConnectionPool
   # The maximum number of connections this pool will create (per shard/server
   # if sharding).
@@ -35,11 +36,10 @@ class Sequel::ThreadedConnectionPool < Sequel::ConnectionPool
     @allocated.length + @available_connections.length
   end
   
-  # Removes all connection currently available on all servers, optionally
+  # Removes all connections currently available on all servers, optionally
   # yielding each connection to the given block. This method has the effect of 
   # disconnecting from the database, assuming that no connections are currently
-  # being used.  If connections are being used, they are scheduled to be
-  # disconnected as soon as they are returned to the pool.
+  # being used.
   # 
   # Once a connection is requested using #hold, the connection pool
   # creates new connections to the database.

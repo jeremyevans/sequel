@@ -16,24 +16,24 @@ module Sequel
     end
     private_class_method :uri_to_options
     
-    # The options for this database
+    # The options hash for this database
     attr_reader :opts
     
     # Constructs a new instance of a database connection with the specified
     # options hash.
     #
-    # Sequel::Database is an abstract class that is not useful by itself.
+    # Accepts the following options:
+    # :default_schema :: The default schema to use, should generally be nil
+    # :disconnection_proc :: A proc used to disconnect the connection
+    # :identifier_input_method :: A string method symbol to call on identifiers going into the database
+    # :identifier_output_method :: A string method symbol to call on identifiers coming from the database
+    # :logger :: A specific logger to use
+    # :loggers :: An array of loggers to use
+    # :quote_identifiers :: Whether to quote identifiers
+    # :servers :: A hash specifying a server/shard specific options, keyed by shard symbol 
+    # :single_threaded :: Whether to use a single-threaded connection pool
     #
-    # Takes the following options:
-    # * :default_schema : The default schema to use, should generally be nil
-    # * :disconnection_proc: A proc used to disconnect the connection.
-    # * :identifier_input_method: A string method symbol to call on identifiers going into the database
-    # * :identifier_output_method: A string method symbol to call on identifiers coming from the database
-    # * :loggers : An array of loggers to use.
-    # * :quote_identifiers : Whether to quote identifiers
-    # * :single_threaded : Whether to use a single-threaded connection pool
-    #
-    # All options given are also passed to the ConnectionPool.  If a block
+    # All options given are also passed to the connection pool.  If a block
     # is given, it is used as the connection_proc for the ConnectionPool.
     def initialize(opts = {}, &block)
       @opts ||= opts
@@ -58,6 +58,9 @@ module Sequel
     end
     
     # Cast the given type to a literal type
+    #
+    #   DB.cast_type_literal(Float) # double precision
+    #   DB.cast_type_literal(:foo) # foo
     def cast_type_literal(type)
       type_literal(:type=>type)
     end
@@ -69,28 +72,33 @@ module Sequel
       "#<#{self.class}: #{(uri rescue opts).inspect}>" 
     end
 
-    # Proxy the literal call to the dataset, used for default values.
+    # Proxy the literal call to the dataset.
+    #
+    #   DB.literal(1) # 1
+    #   DB.literal(:a) # a
+    #   DB.literal('a') # 'a'
     def literal(v)
       schema_utility_dataset.literal(v)
     end
 
-    # Default serial primary key options.
+    # Default serial primary key options, used by the table creation
+    # code.
     def serial_primary_key_options
       {:primary_key => true, :type => Integer, :auto_increment => true}
     end
 
     # Whether the database and adapter support prepared transactions
-    # (two-phase commit), false by default
+    # (two-phase commit), false by default.
     def supports_prepared_transactions?
       false
     end
 
-    # Whether the database and adapter support savepoints, false by default
+    # Whether the database and adapter support savepoints, false by default.
     def supports_savepoints?
       false
     end
 
-    # Whether the database and adapter support transaction isolation levels, false by default
+    # Whether the database and adapter support transaction isolation levels, false by default.
     def supports_transaction_isolation_levels?
       false
     end
@@ -110,9 +118,14 @@ module Sequel
       end
     end
     
-    # Returns the URI identifying the database.
+    # Returns the URI identifying the database, which may not be the
+    # same as the URI used when connecting.
     # This method can raise an error if the database used options
-    # instead of a connection string.
+    # instead of a connection string, and will not include uri
+    # parameters.
+    #
+    #   Sequel.connect('postgres://localhost/db?user=billg').url
+    #   # => "postgres://billg@localhost/db"
     def uri
       uri = URI::Generic.new(
         self.class.adapter_scheme.to_s,

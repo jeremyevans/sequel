@@ -56,7 +56,7 @@ class Sequel::ShardedThreadedConnectionPool < Sequel::ThreadedConnectionPool
     @allocated[server].length + @available_connections[server].length
   end
   
-  # Removes all connection currently available on all servers, optionally
+  # Removes all connections currently available on all servers, optionally
   # yielding each connection to the given block. This method has the effect of 
   # disconnecting from the database, assuming that no connections are currently
   # being used.  If connections are being used, they are scheduled to be

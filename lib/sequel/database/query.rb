@@ -26,7 +26,7 @@ module Sequel
     MYSQL_TIMESTAMP_RE = /\ACURRENT_(?:DATE|TIMESTAMP)?\z/
     STRING_DEFAULT_RE = /\A'(.*)'\z/
 
-    # The prepared statement objects for this database, keyed by name
+    # The prepared statement object hash for this database, keyed by name symbol
     attr_reader :prepared_statements
     
     # The default transaction isolation level for this database,
@@ -44,6 +44,9 @@ module Sequel
     
     # Call the prepared statement with the given name with the given hash
     # of arguments.
+    #
+    #   DB[:items].filter(:id=>1).prepare(:first, :sa)
+    #   DB.call(:sa) # SELECT * FROM items WHERE id = 1
     def call(ps_name, hash={})
       prepared_statements[ps_name].call(hash)
     end
@@ -55,7 +58,7 @@ module Sequel
     end
     
     # Method that should be used when submitting any DDL (Data Definition
-    # Language) SQL.  By default, calls execute_dui.
+    # Language) SQL, such as +create_table+.  By default, calls +execute_dui+.
     # This method should not be called directly by user code.
     def execute_ddl(sql, opts={}, &block)
       execute_dui(sql, opts, &block)
@@ -77,11 +80,9 @@ module Sequel
 
     # Returns a single value from the database, e.g.:
     #
-    #   # SELECT 1
-    #   DB.get(1) #=> 1 
-    #
-    #   # SELECT version()
-    #   DB.get(:version.sql_function) #=> ...
+    #   DB.get(1) # SELECT 1
+    #   # => 1
+    #   DB.get{version{}} # SELECT server_version()
     def get(*args, &block)
       dataset.get(*args, &block)
     end
@@ -92,13 +93,18 @@ module Sequel
     # depending on if the index is unique.
     #
     # Should not include the primary key index, functional indexes, or partial indexes.
+    #
+    #   DB.indexes(:artists)
+    #   # => {:artists_name_ukey=>{:columns=>[:name], :unique=>true}}
     def indexes(table, opts={})
       raise NotImplemented, "#indexes should be overridden by adapters"
     end
     
     # Runs the supplied SQL statement string on the database server. Returns nil.
     # Options:
-    # * :server - The server to run the SQL on.
+    # :server :: The server to run the SQL on.
+    #
+    #   DB.run("SET some_server_variable = 42")
     def run(sql, opts={})
       execute_ddl(sql, opts)
       nil
@@ -109,13 +115,40 @@ module Sequel
     # the first member being the column name, and the second member being a hash of column information.
     # Available options are:
     #
-    # * :reload - Get fresh information from the database, instead of using
-    #   cached information.  If table_name is blank, :reload should be used
-    #   unless you are sure that schema has not been called before with a
-    #   table_name, otherwise you may only getting the schemas for tables
-    #   that have been requested explicitly.
-    # * :schema - An explicit schema to use.  It may also be implicitly provided
-    #   via the table name.
+    # :reload :: Ignore any cached results, and get fresh information from the database.
+    # :schema :: An explicit schema to use.  It may also be implicitly provided
+    #            via the table name.
+    #
+    # If schema parsing is supported by the database, the column information should at least contain the
+    # following columns:
+    #
+    # :allow_null :: Whether NULL is an allowed value for the column.
+    # :db_type :: The database type for the column, as a database specific string.
+    # :default :: The database default for the column, as a database specific string.
+    # :primary_key :: Whether the columns is a primary key column.  If this column is not present,
+    #                 it means that primary key information is unavailable, not that the column
+    #                 is not a primary key.
+    # :ruby_default :: The database default for the column, as a ruby object.  In many cases, complex
+    #                  database defaults cannot be parsed into ruby objects.
+    # :type :: A symbol specifying the type, such as :integer or :string.
+    #
+    # Example:
+    #
+    #   DB.schema(:artists)
+    #   # [[:id,
+    #   #   {:type=>:integer,
+    #   #    :primary_key=>true,
+    #   #    :default=>"nextval('artist_id_seq'::regclass)",
+    #   #    :ruby_default=>nil,
+    #   #    :db_type=>"integer",
+    #   #    :allow_null=>false}],
+    #   #  [:name,
+    #   #   {:type=>:string,
+    #   #    :primary_key=>false,
+    #   #    :default=>nil,
+    #   #    :ruby_default=>nil,
+    #   #    :db_type=>"text",
+    #   #    :allow_null=>false}]]
     def schema(table, opts={})
       raise(Error, 'schema parsing is not implemented on this database') unless respond_to?(:schema_parse_table, true)
 
@@ -134,6 +167,8 @@ module Sequel
 
     # Returns true if a table with the given name exists.  This requires a query
     # to the database.
+    #
+    #   DB.table_exists?(:foo) # => false
     def table_exists?(name)
       begin 
         from(name).first
@@ -144,6 +179,8 @@ module Sequel
     end
     
     # Return all tables in the database as an array of symbols.
+    #
+    #   DB.tables # => [:albums, :artists]
     def tables(opts={})
       raise NotImplemented, "#tables should be overridden by adapters"
     end
@@ -155,13 +192,15 @@ module Sequel
     # The following options are respected:
     #
     # :isolation :: The transaction isolation level to use for this transaction,
-    #               should be :uncommitted, :committed, :repeatable, or :serializable.
+    #               should be :uncommitted, :committed, :repeatable, or :serializable,
+    #               used if given and the database/adapter supports customizable
+    #               transaction isolation levels.
     # :prepare :: A string to use as the transaction identifier for a
     #             prepared transaction (two-phase commit), if the database/adapter
-    #             supports prepared transactions
-    # :server :: The server to use for the transaction
+    #             supports prepared transactions.
+    # :server :: The server to use for the transaction.
     # :savepoint :: Whether to create a new savepoint for this transaction,
-    #               only respected if the database adapter supports savepoints.  By
+    #               only respected if the database/adapter supports savepoints.  By
     #               default Sequel will reuse an existing transaction, so if you want to
     #               use a savepoint you must use this option.
     def transaction(opts={}, &block)
@@ -175,7 +214,7 @@ module Sequel
     
     # Internal generic transaction method.  Any exception raised by the given
     # block will cause the transaction to be rolled back.  If the exception is
-    # not Sequel::Rollback, the error will be reraised. If no exception occurs
+    # not a Sequel::Rollback, the error will be reraised. If no exception occurs
     # inside the block, the transaction is commited.
     def _transaction(conn, opts={})
       begin
@@ -379,8 +418,8 @@ module Sequel
     end
 
     # Match the database's column type to a ruby type via a
-    # regular expression.  The following ruby types are supported:
-    # integer, string, date, datetime, boolean, and float.
+    # regular expression, and return the ruby type as a symbol
+    # such as :integer or :string.
     def schema_column_type(db_type)
       case db_type
       when /\Ainterval\z/io

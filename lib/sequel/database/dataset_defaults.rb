@@ -58,7 +58,11 @@ module Sequel
       end
     end
     
-    # Set the method to call on identifiers going into the database
+    # Set the method to call on identifiers going into the database:
+    #
+    #   DB[:items] # SELECT * FROM items
+    #   DB.identifier_input_method = :upcase
+    #   DB[:items] # SELECT * FROM ITEMS
     def identifier_input_method=(v)
       reset_schema_utility_dataset
       @identifier_input_method = v || ""
@@ -77,13 +81,21 @@ module Sequel
       end
     end
     
-    # Set the method to call on identifiers coming from the database
+    # Set the method to call on identifiers coming from the database:
+    #
+    #   DB[:items].first # {:id=>1, :name=>'foo'}
+    #   DB.identifier_output_method = :upcase
+    #   DB[:items].first # {:ID=>1, :NAME=>'foo'}
     def identifier_output_method=(v)
       reset_schema_utility_dataset
       @identifier_output_method = v || ""
     end
 
-    # Whether to quote identifiers (columns and tables) for this database
+    # Set whether to quote identifiers (columns and tables) for this database:
+    #
+    #   DB[:items] # SELECT * FROM items
+    #   DB.quote_identifiers = true
+    #   DB[:items] # SELECT * FROM "items"
     def quote_identifiers=(v)
       reset_schema_utility_dataset
       @quote_identifiers = v

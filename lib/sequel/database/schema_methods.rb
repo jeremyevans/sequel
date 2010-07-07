@@ -36,7 +36,6 @@ module Sequel
     #   DB.add_index :posts, :title
     #   DB.add_index :posts, [:author, :title], :unique => true
     #
-    #
     # Options:
     # * :ignore_errors - Ignore any DatabaseErrors that are raised
     #
@@ -62,8 +61,8 @@ module Sequel
     #     drop_index [:group, :category]
     #   end
     #
-    # Note that #add_column accepts all the options available for column
-    # definitions using create_table, and #add_index accepts all the options
+    # Note that +add_column+ accepts all the options available for column
+    # definitions using create_table, and +add_index+ accepts all the options
     # available for index definition.
     #
     # See Schema::AlterTableGenerator and the {"Migrations and Schema Modification" guide}[link:files/doc/migration_rdoc.html].
@@ -84,8 +83,8 @@ module Sequel
     #   end
     #
     # Options:
-    # * :temp - Create the table as a temporary table.
-    # * :ignore_index_errors - Ignore any errors when creating indexes.
+    # :temp :: Create the table as a temporary table.
+    # :ignore_index_errors :: Ignore any errors when creating indexes.
     #
     # See Schema::Generator and the {"Migrations and Schema Modification" guide}[link:files/doc/migration_rdoc.html].
     def create_table(name, options={}, &block)
@@ -98,6 +97,10 @@ module Sequel
     end
     
     # Forcibly creates a table, attempting to drop it unconditionally (and catching any errors), then creating it.
+    # 
+    #   DB.create_table!(:a){Integer :a} 
+    #   # DROP TABLE a
+    #   # CREATE TABLE a (a integer)
     def create_table!(name, options={}, &block)
       drop_table(name) rescue nil
       create_table(name, options, &block)
