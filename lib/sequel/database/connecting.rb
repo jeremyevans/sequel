@@ -33,9 +33,7 @@ module Sequel
       klass
     end
         
-    # Returns the scheme symbol for the Database class:
-    #
-    #   Sequel.connect('jdbc:postgres://...').class.adapter_scheme # => :jdbc
+    # Returns the scheme symbol for the Database class.
     def self.adapter_scheme
       @scheme
     end
@@ -110,6 +108,16 @@ module Sequel
     # their own connection pools.
     attr_reader :pool
 
+    # Returns the scheme symbol for this instance's class, which reflects which
+    # adapter is being used.  In some cases, this can be the same as the
+    # +database_type+ (for native adapters), in others (i.e. adapters with
+    # subadapters), it will be different.
+    #
+    #   Sequel.connect('jdbc:postgres://...').adapter_scheme # => :jdbc
+    def adapter_scheme
+      self.class.adapter_scheme
+    end
+
     # Dynamically add new servers or modify server options at runtime. Also adds new
     # servers to the connection pool. Intended for use with master/slave or shard
     # configurations where it is useful to add new server hosts at runtime.
@@ -139,7 +147,7 @@ module Sequel
     #
     #   Sequel.connect('jdbc:postgres://...').database_type # => :postgres
     def database_type
-      self.class.adapter_scheme
+      adapter_scheme
     end
     
     # Disconnects all available connections from the connection pool.  Any

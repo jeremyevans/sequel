@@ -89,7 +89,7 @@ context "A MySQL database" do
   end
 end
 
-if MYSQL_DB.class.adapter_scheme == :mysql
+if MYSQL_DB.adapter_scheme == :mysql
   context "Sequel::MySQL.convert_tinyint_to_bool" do
     before do
       @db = MYSQL_DB
@@ -536,7 +536,7 @@ context "A MySQL database" do
 end  
 
 # Socket tests should only be run if the MySQL server is on localhost
-if %w'localhost 127.0.0.1 ::1'.include?(MYSQL_URI.host) and MYSQL_DB.class.adapter_scheme == :mysql
+if %w'localhost 127.0.0.1 ::1'.include?(MYSQL_URI.host) and MYSQL_DB.adapter_scheme == :mysql
   context "A MySQL database" do
     specify "should accept a socket option" do
       db = Sequel.mysql(MYSQL_DB.opts[:database], :host => 'localhost', :user => MYSQL_DB.opts[:user], :password => MYSQL_DB.opts[:password], :socket => MYSQL_SOCKET_FILE)
@@ -895,7 +895,7 @@ context "MySQL::Dataset#complex_expression_sql" do
   end
 end
 
-unless MYSQL_DB.class.adapter_scheme == :do
+unless MYSQL_DB.adapter_scheme == :do
   context "MySQL Stored Procedures" do
     before do
       MYSQL_DB.create_table(:items){Integer :id; Integer :value}
@@ -940,7 +940,7 @@ unless MYSQL_DB.class.adapter_scheme == :do
   end
 end
 
-if MYSQL_DB.class.adapter_scheme == :mysql
+if MYSQL_DB.adapter_scheme == :mysql
   context "MySQL bad date/time conversions" do
     after do
       Sequel::MySQL.convert_invalid_date_time = false

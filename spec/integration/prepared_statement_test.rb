@@ -118,7 +118,7 @@ describe "Prepared Statements and Bound Arguments" do
     INTEGRATION_DB.call(:select_n, :n=>10).should == [{:id=>1, :number=>10}]
     @ds.filter(:number=>@ds.ba(:$n)).prepare(:first, :select_n)
     INTEGRATION_DB.call(:select_n, :n=>10).should == {:id=>1, :number=>10}
-    if INTEGRATION_DB.class.adapter_scheme == :jdbc and INTEGRATION_DB.database_type == :sqlite
+    if INTEGRATION_DB.adapter_scheme == :jdbc and INTEGRATION_DB.database_type == :sqlite
       # Work around for open prepared statements on a table not allowing the
       # dropping of a table when using SQLite over JDBC
       INTEGRATION_DB.synchronize{|c| c.prepared_statements[:select_n][1].close}
@@ -204,7 +204,7 @@ describe "Prepared Statements and Bound Arguments" do
     INTEGRATION_DB.call(:select_n, :n=>10).should == [@c.load(:id=>1, :number=>10)]
     @c.filter(:number=>@ds.ba(:$n)).prepare(:first, :select_n)
     INTEGRATION_DB.call(:select_n, :n=>10).should == @c.load(:id=>1, :number=>10)
-    if INTEGRATION_DB.class.adapter_scheme == :jdbc and INTEGRATION_DB.database_type == :sqlite
+    if INTEGRATION_DB.adapter_scheme == :jdbc and INTEGRATION_DB.database_type == :sqlite
       # Work around for open prepared statements on a table not allowing the
       # dropping of a table when using SQLite over JDBC
       INTEGRATION_DB.synchronize{|c| c.prepared_statements[:select_n][1].close}

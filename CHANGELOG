@@ -1,5 +1,7 @@
 === HEAD
 
+* Add Database#adapter_scheme, for checking which adapter a Database uses (jeremyevans)
+
 * Allow Dataset#grep to take :all_patterns, :all_columns, and :case_insensitive options (mighub, jeremyevans)
 
 === 3.13.0 (2010-07-01)

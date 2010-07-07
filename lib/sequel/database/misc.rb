@@ -128,7 +128,7 @@ module Sequel
     #   # => "postgres://billg@localhost/db"
     def uri
       uri = URI::Generic.new(
-        self.class.adapter_scheme.to_s,
+        adapter_scheme.to_s,
         nil,
         @opts[:host],
         @opts[:port],

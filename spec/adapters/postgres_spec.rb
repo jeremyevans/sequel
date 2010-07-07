@@ -962,7 +962,7 @@ context "Postgres::Database functions, languages, and triggers" do
   end
 end
 
-if POSTGRES_DB.class.adapter_scheme == :postgres
+if POSTGRES_DB.adapter_scheme == :postgres
 context "Postgres::Dataset #use_cursor" do
   before(:all) do
     @db = POSTGRES_DB

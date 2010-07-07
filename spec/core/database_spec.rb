@@ -311,7 +311,7 @@ context "Database#uri" do
   end
 end
 
-context "Database.adapter_scheme" do
+context "Database.adapter_scheme and #adapter_scheme" do
   specify "should return the database schema" do
     Sequel::Database.adapter_scheme.should be_nil
 
@@ -320,6 +320,7 @@ context "Database.adapter_scheme" do
     end
     
     @c.adapter_scheme.should == :mau
+    @c.new({}).adapter_scheme.should == :mau
   end
 end
 
