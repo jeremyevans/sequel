@@ -1363,7 +1363,8 @@ module Sequel
       #   # DELETE FROM artists WHERE (id = 2)
       #   # ...
       def destroy
-        @db.transaction{all{|r| r.destroy}.length}
+        pr = proc{all{|r| r.destroy}.length}
+        model.use_transactions ? @db.transaction(&pr) : pr.call
       end
 
       # This allows you to call +to_hash+ without any arguments, which will

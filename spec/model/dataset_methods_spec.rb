@@ -12,6 +12,7 @@ describe Sequel::Model::DatasetMethods, "#destroy"  do
       end
     end
     @d = @c.dataset
+    MODEL_DB.reset
   end
 
   it "should instantiate objects in the dataset and call destroy on each" do
@@ -36,6 +37,18 @@ describe Sequel::Model::DatasetMethods, "#destroy"  do
     def @d.fetch_rows(sql)
     end
     @d.destroy.should == 0
+  end
+
+  it "should use a transaction if use_transactions is true for the model" do
+    @c.use_transactions = true
+    @d.destroy
+    MODEL_DB.sqls.should == ["BEGIN", "SELECT * FROM items", "COMMIT"]
+  end
+
+  it "should not use a transaction if use_transactions is false for the model" do
+    @c.use_transactions = false
+    @d.destroy
+    MODEL_DB.sqls.should == ["SELECT * FROM items"]
   end
 end
 
