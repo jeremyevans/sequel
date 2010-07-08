@@ -944,17 +944,22 @@ end
 describe Sequel::Model, "#exists?" do
   before(:each) do
     @model = Class.new(Sequel::Model(:items))
-    @m = @model.new
+    @ds = @model.dataset
+    def @ds.fetch_rows(sql)
+      db.execute(sql)
+      yield(:x=>1) if sql =~ /id = 1/
+    end
+    MODEL_DB.reset
   end
 
-  it "should returns true when #this.count > 0" do
-    @m.this.meta_def(:count) {1}
-    @m.exists?.should be_true
+  it "should do a query to check if the record exists" do
+    @model.load(:id=>1).exists?.should be_true
+    MODEL_DB.sqls.should == ['SELECT 1 FROM items WHERE (id = 1) LIMIT 1']
   end
 
   it "should return false when #this.count == 0" do
-    @m.this.meta_def(:count) {0}
-    @m.exists?.should be_false
+    @model.load(:id=>2).exists?.should be_false
+    MODEL_DB.sqls.should == ['SELECT 1 FROM items WHERE (id = 2) LIMIT 1']
   end
 end
 

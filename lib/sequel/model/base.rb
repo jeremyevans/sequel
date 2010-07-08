@@ -656,8 +656,11 @@ module Sequel
       # Returns true when current instance exists, false otherwise.
       # Generally an object that isn't new will exist unless it has
       # been deleted.
+      #
+      #   Artist[1].exists? # SELECT 1 FROM artists WHERE (id = 1)
+      #   # => true
       def exists?
-        this.count > 0
+        !this.get(1).nil?
       end
       
       # Value that should be unique for objects with the same class and pk (if pk is not nil), or
