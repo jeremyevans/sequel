@@ -10,7 +10,7 @@ module Sequel
     # * All of the method names in Model::DATASET_METHODS have class methods created that call
     #   the Model's dataset with the method of the same name with the given arguments.
     module ClassMethods
-      # Which columns should be the only columns allowed in a call to set
+      # Which columns should be the only columns allowed in a call to a mass assignment method (e.g. set)
       # (default: not set, so all columns not otherwise restricted).
       attr_reader :allowed_columns
   
@@ -88,7 +88,13 @@ module Sequel
       # Returns the first record from the database matching the conditions.
       # If a hash is given, it is used as the conditions.  If another
       # object is given, it finds the first record whose primary key(s) match
-      # the given argument(s).  
+      # the given argument(s).  If no object is returned by the dataset, returns nil.
+      # 
+      #   Artist[1] # SELECT * FROM artists WHERE id = 1
+      #   # => #<Artist {:id=>1, ...}>
+      #
+      #   Artist[:name=>'Bob'] # SELECT * FROM artists WHERE (name = 'Bob') LIMIT 1
+      #   # => #<Artist {:name=>'Bob', ...}>
       def [](*args)
         args = args.first if (args.size == 1)
         args.is_a?(Hash) ? dataset[args] : primary_key_lookup(args)
@@ -97,19 +103,32 @@ module Sequel
       # Returns the columns in the result set in their original order.
       # Generally, this will use the columns determined via the database
       # schema, but in certain cases (e.g. models that are based on a joined
-      # dataset) it will use Dataset#columns to find the columns, which
-      # may be empty if the Dataset has no records.
+      # dataset) it will use <tt>Dataset#columns</tt> to find the columns.
+      #
+      #   Artist.columns
+      #   # => [:id, :name]
       def columns
         @columns || set_columns(dataset.naked.columns)
       end
     
       # Creates instance using new with the given values and block, and saves it.
+      # 
+      #   Artist.create(:name=>'Bob')
+      #   # INSERT INTO artists (name) VALUES ('Bob')
+      #
+      #   Artist.create do |a|
+      #     a.name = 'Jim'
+      #   end # INSERT INTO artists (name) VALUES ('Jim')
       def create(values = {}, &block)
         new(values, &block).save
       end
   
       # Returns the dataset associated with the Model class.  Raises
-      # an error if there is no associated dataset for this class.
+      # an +Error+ if there is no associated dataset for this class.
+      # In most cases, you don't need to call this directly, as Model
+      # proxies many dataset methods to the underlying dataset.
+      #
+      #   Artist.dataset.all # SELECT * FROM artists
       def dataset
         @dataset || raise(Error, "No dataset associated with #{self}")
       end
@@ -124,6 +143,11 @@ module Sequel
       # assumes the superclass's database, or the first object in
       # Sequel::DATABASES.  If no Sequel::Database object has
       # been created, raises an error.
+      #
+      #   Artist.db.transaction do # BEGIN
+      #     Artist.create(:name=>'Bob')
+      #     # INSERT INTO artists (name) VALUES ('Bob')
+      #   end # COMMIT
       def db
         return @db if @db
         @db = self == Model ? DATABASES.first : superclass.db
@@ -134,25 +158,46 @@ module Sequel
       # Sets the database associated with the Model class. If the
       # model has an associated dataset, sets the model's dataset
       # to a dataset on the new database with the same options
-      # used by the current dataset.
+      # used by the current dataset.  This can be used directly on
+      # Sequel::Model to set the default database to be used
+      # by subclasses, or to override the database used for specific
+      # models:
+      #
+      #   Sequel::Model.db = DB1
+      #   Artist.db = DB2
       def db=(db)
         @db = db
         set_dataset(db.dataset(@dataset.opts)) if @dataset
       end
       
       # Returns the cached schema information if available or gets it
-      # from the database.
+      # from the database.  This is a hash where keys are column symbols
+      # and values are hashes of information related to the column.  See
+      # <tt>Database#schema</tt>.
+      #
+      #   Artist.db_schema
+      #   # {:id=>{:type=>:integer, :primary_key=>true, ...},
+      #   #  :name=>{:type=>:string, :primary_key=>false, ...}} 
       def db_schema
         @db_schema ||= get_db_schema
       end
   
-      # If a block is given, define a method on the dataset (if the model has an associated dataset)  with the given argument name using
-      # the given block as well as a method on the model that calls the
+      # If a block is given, define a method on the dataset (if the model currently has an dataset)  with the given argument name using
+      # the given block.  Also define a class method on the model that calls the
       # dataset method.  Stores the method name and block so that it can be reapplied if the model's
       # dataset changes.
       #
-      # If a block is not given, define a method on the model for each argument
+      # If a block is not given, just define a class method on the model for each argument
       # that calls the dataset method of the same argument name.
+      #
+      #   # Add new dataset method and class method that calls it
+      #   Artist.def_dataset_method(:by_name){order(:name)}
+      #   Artist.filter(:name.like('A%')).by_name
+      #   Artist.by_name.filter(:name.like('A%'))
+      #
+      #   # Just add a class method that calls an existing dataset method
+      #   Artist.def_dataset_method(:server!)
+      #   Artist.server!(:server1)
       def def_dataset_method(*args, &block)
         raise(Error, "No arguments given") if args.empty?
         if block_given?
@@ -164,17 +209,30 @@ module Sequel
         args.each{|arg| instance_eval("def #{arg}(*args, &block); dataset.#{arg}(*args, &block) end", __FILE__, __LINE__) unless respond_to?(arg)}
       end
       
-      # Finds a single record according to the supplied filter, e.g.:
-      #
-      #   Ticket.find :author => 'Sharon' # => record
-      #
+      # Finds a single record according to the supplied filter.
       # You are encouraged to use Model.[] or Model.first instead of this method.
+      #
+      #   Artist.find(:name=>'Bob')
+      #   # SELECT * FROM artists WHERE (name = 'Bob') LIMIT 1
+      #
+      #   Artist.find{name > 'M'}
+      #   # SELECT * FROM artists WHERE (name > 'M') LIMIT 1
       def find(*args, &block)
         filter(*args, &block).first
       end
       
-      # Like find but invokes create with given conditions when record does not
-      # exist.
+      # Like +find+ but invokes create with given conditions when record does not
+      # exist.  Unlike +find+ in that the block used in this method is not passed
+      # to +find+, but instead is passed to +create+ only if +find+ does not
+      # return an object.
+      #
+      #   Artist.find_or_create(:name=>'Bob')
+      #   # SELECT * FROM artists WHERE (name = 'Bob') LIMIT 1
+      #   # INSERT INTO artists (name) VALUES ('Bob')
+      #
+      #   Artist.find_or_create(:name=>'Jim'){|a| a.hometown = 'Sactown'}
+      #   # SELECT * FROM artists WHERE (name = 'Bob') LIMIT 1
+      #   # INSERT INTO artists (name, hometown) VALUES ('Bob', 'Sactown')
       def find_or_create(cond, &block)
         find(cond) || create(cond, &block)
       end
@@ -182,6 +240,12 @@ module Sequel
       # If possible, set the dataset for the model subclass as soon as it
       # is created.  Also, make sure the inherited class instance variables
       # are copied into the subclass.
+      #
+      # Sequel queries the database to get schema information as soon as
+      # a model class is created:
+      #
+      #   class Artist < Sequel::Model # Causes schema query
+      #   end
       def inherited(subclass)
         super
         ivs = subclass.instance_variables.collect{|x| x.to_s}
@@ -206,14 +270,18 @@ module Sequel
         end
       end
     
-      # Returns the implicit table name for the model class.
+      # Returns the implicit table name for the model class, which is the demodulized,
+      # underscored, pluralized name of the class.
+      #
+      #   Artist.implicit_table_name # => :artists
+      #   Foo::ArtistAlias.implicit_table_name # => :artist_aliases
       def implicit_table_name
         pluralize(underscore(demodulize(name))).to_sym
       end
   
       # Initializes a model instance as an existing record. This constructor is
       # used by Sequel to initialize model instances when fetching records.
-      # load requires that values be a hash where all keys are symbols. It
+      # +load+ requires that values be a hash where all keys are symbols. It
       # probably should not be used by external code.
       def load(values)
         new(values, true)
@@ -221,6 +289,10 @@ module Sequel
   
       # Mark the model as not having a primary key. Not having a primary key
       # can cause issues, among which is that you won't be able to update records.
+      #
+      #   Artist.primary_key # => :id
+      #   Artist.no_primary_key
+      #   Artist.primary_key # => nil
       def no_primary_key
         @simple_pk = @primary_key = nil
       end
@@ -229,7 +301,10 @@ module Sequel
       # value such be an array with values for each primary key in the correct
       # order.  For a standard primary key, value should be an object with a
       # compatible type for the key.  If the model does not have a primary key,
-      # raises an Error.
+      # raises an +Error+.
+      #
+      #   Artist.primary_key_hash(1) # => {:id=>1}
+      #   Artist.primary_key_hash([1, 2]) # => {:id1=>1, :id2=>2}
       def primary_key_hash(value)
         raise(Error, "#{self} does not have a primary key") unless key = @primary_key
         case key
@@ -243,49 +318,61 @@ module Sequel
       end
 
       # Return a hash where the keys are qualified column references.  Uses the given
-      # qualifier if provided, or the table_name otherwise.
+      # qualifier if provided, or the table_name otherwise. This is useful if you
+      # plan to join other tables to this table and you want the column references
+      # to be qualified.
+      #
+      #   Artist.filter(Artist.qualified_primary_key_hash(1))
+      #   # SELECT * FROM artists WHERE (artists.id = 1)
       def qualified_primary_key_hash(value, qualifier=table_name)
         h = primary_key_hash(value)
         h.to_a.each{|k,v| h[SQL::QualifiedIdentifier.new(qualifier, k)] = h.delete(k)}
         h
       end
   
-      # Restrict the setting of the primary key(s) inside new/set/update.  Because
+      # Restrict the setting of the primary key(s) when using mass assignment (e.g. +set+).  Because
       # this is the default, this only make sense to use in a subclass where the
-      # parent class has used unrestrict_primary_key.
+      # parent class has used +unrestrict_primary_key+.
       def restrict_primary_key
         @restrict_primary_key = true
       end
   
-      # Whether or not setting the primary key inside new/set/update is
+      # Whether or not setting the primary key(s) when using mass assignment (e.g. +set+) is
       # restricted, true by default.
       def restrict_primary_key?
         @restrict_primary_key
       end
   
-      # Set the columns to allow in new/set/update.  Using this means that
+      # Set the columns to allow when using mass assignment (e.g. +set+).  Using this means that
       # any columns not listed here will not be modified.  If you have any virtual
-      # setter methods (methods that end in =) that you want to be used in
-      # new/set/update, they need to be listed here as well (without the =).
+      # setter methods (methods that end in =) that you want to be used during
+      # mass assignment, they need to be listed here as well (without the =).
       #
-      # It may be better to use (set|update)_only instead of this in places where
+      # It may be better to use a method such as +set_only+ instead of this in places where
       # only certain columns may be allowed.
+      #
+      #   Artist.set_allowed_columns(:name, :hometown)
+      #   Artist.set(:name=>'Bob', :hometown=>'Sactown') # No Error
+      #   Artist.set(:name=>'Bob', :records_sold=>30000) # Error
       def set_allowed_columns(*cols)
         @allowed_columns = cols
       end
   
-      # Sets the dataset associated with the Model class. ds can be a Symbol
-      # (specifying a table name in the current database), or a Dataset.
-      # If a dataset is used, the model's database is changed to the given
+      # Sets the dataset associated with the Model class. +ds+ can be a +Symbol+
+      # (specifying a table name in the current database), or a +Dataset+.
+      # If a dataset is used, the model's database is changed to the database of the given
       # dataset.  If a symbol is used, a dataset is created from the current
-      # database with the table name given. Other arguments raise an Error.
+      # database with the table name given. Other arguments raise an +Error+.
       # Returns self.
       #
-      # This changes the row_proc of the given dataset to return
+      # This changes the row_proc of the dataset to return
       # model objects, extends the dataset with the dataset_method_modules,
       # and defines methods on the dataset using the dataset_methods.
       # It also attempts to determine the database schema for the model,
       # based on the given dataset.
+      #
+      #   Artist.set_dataset(:tbl_artists)
+      #   Artist.set_dataset(DB[:artists])
       def set_dataset(ds, opts={})
         inherited = opts[:inherited]
         @dataset = case ds
@@ -314,46 +401,50 @@ module Sequel
       end
     
       # Sets the primary key for this model. You can use either a regular 
-      # or a composite primary key.
-      #
-      # Example:
-      #   class Tagging < Sequel::Model
-      #     # composite key
-      #     set_primary_key [:taggable_id, :tag_id]
-      #   end
+      # or a composite primary key.  To not use a primary key, set to nil
+      # or use +no_primary_key+.
       #
       #   class Person < Sequel::Model
       #     # regular key
       #     set_primary_key :person_id
       #   end
       #
-      # You can set it to nil to not have a primary key, but that
-      # cause certain things not to work, see no_primary_key.
+      #   class Tagging < Sequel::Model
+      #     # composite key
+      #     set_primary_key [:taggable_id, :tag_id]
+      #   end
       def set_primary_key(*key)
         key = key.flatten
         @simple_pk = key.length == 1 ? db.literal(key.first) : nil 
         @primary_key = (key.length == 1) ? key[0] : key
       end
   
-      # Set the columns to restrict in new/set/update.  Using this means that
+      # Set the columns to restrict when using mass assignment (e.g. +set+).  Using this means that
       # attempts to call setter methods for the columns listed here will cause an
-      # exception or be silently skipped (based on the strict_param_setting setting.
-      # If you have any virtual # setter methods (methods that end in =) that you
-      # want not to be used in new/set/update, they need to be listed here as well (without the =).
+      # exception or be silently skipped (based on the +strict_param_setting+ setting.
+      # If you have any virtual setter methods (methods that end in =) that you
+      # want not to be used during mass assignment, they need to be listed here as well (without the =).
       #
-      # It may be better to use (set|update)_except instead of this in places where
-      # only certain columns may be allowed.
+      # It may be better to use a method such as +set_except+ instead of this in places where
+      # certain columns are restricted.  In general, it's better to have a whitelist approach
+      # where you specify only what is allowed, as opposed to a blacklist approach that this
+      # method uses, where everything is allowed other than what you restrict.
+      #
+      #   Artist.set_restricted_column(:records_sold)
+      #   Artist.set(:name=>'Bob', :hometown=>'Sactown') # No Error
+      #   Artist.set(:name=>'Bob', :records_sold=>30000) # Error
       def set_restricted_columns(*cols)
         @restricted_columns = cols
       end
   
-      # Defines a method that returns a filtered dataset.  Subsets
-      # create dataset methods, so they can be chained for scoping.
+      # Shortcut for +def_dataset_method+ that is restricted to modifying the
+      # dataset's filter. Sometimes thought of as a scope, and like most dataset methods,
+      # they can be chained.
       # For example:
       #
       #   Topic.subset(:joes, :username.like('%joe%'))
-      #   Topic.subset(:popular){|o| o.num_posts > 100}
-      #   Topic.subset(:recent){|o| o.created_on > Date.today - 7}
+      #   Topic.subset(:popular){num_posts > 100}
+      #   Topic.subset(:recent){created_on > Date.today - 7}
       #
       # Allows you to do:
       #
@@ -363,17 +454,26 @@ module Sequel
       # have more than 100 posts and were created less than
       # 7 days ago.
       #
-      # Both the args given and the block are passed to Dataset#filter.
+      # Both the args given and the block are passed to <tt>Dataset#filter</tt>.
       def subset(name, *args, &block)
         def_dataset_method(name){filter(*args, &block)}
       end
       
-      # Returns name of primary table for the dataset.
+      # Returns name of primary table for the dataset. If the table for the dataset
+      # is aliased, returns the aliased name.
+      #
+      #   Artist.table_name # => :artists
+      #   Sequel::Model(:foo).table_name # => :foo
+      #   Sequel::Model(:foo___bar).table_name # => :bar
       def table_name
         dataset.first_source_alias
       end
   
-      # Allow the setting of the primary key(s) inside new/set/update.
+      # Allow the setting of the primary key(s) when using the mass assignment methods.
+      #
+      #   Artist.set(:id=>1) # Error
+      #   Artist.unrestrict_primary_key
+      #   Artist.set(:id=>1) # No Error
       def unrestrict_primary_key
         @restrict_primary_key = false
       end
@@ -472,14 +572,14 @@ module Sequel
       end
   
       # Module that the class includes that holds methods the class adds for column accessors and
-      # associations so that the methods can be overridden with super
+      # associations so that the methods can be overridden with +super+.
       def overridable_methods_module
         include(@overridable_methods_module = Module.new) unless @overridable_methods_module
         @overridable_methods_module
       end
       
       # Find the row in the dataset that matches the primary key.  Uses
-      # an static SQL optimization if the table and primary key are simple.
+      # a static SQL optimization if the table and primary key are simple.
       def primary_key_lookup(pk)
         if t = simple_table and p = simple_pk
           with_sql("SELECT * FROM #{t} WHERE #{p} = #{dataset.literal(pk)}").first
@@ -499,27 +599,30 @@ module Sequel
       DATASET_METHODS.each{|arg| class_eval("def #{arg}(*args, &block); dataset.#{arg}(*args, &block) end", __FILE__, __LINE__)}
   
       # Returns a copy of the model's dataset with custom SQL
+      #
+      #   Artist.fetch("SELECT * FROM artists WHERE name LIKE 'A%'")
+      #   Artist.fetch("SELECT * FROM artists WHERE id = ?", 1)
       alias fetch with_sql
     end
 
     # Sequel::Model instance methods that implement basic model functionality.
     #
-    # * All of the methods in HOOKS create instance methods that are called
+    # * All of the methods in +HOOKS+ create instance methods that are called
     #   by Sequel when the appropriate action occurs.  For example, when destroying
-    #   a model object, Sequel will call before_destroy, do the destroy,
-    #   and then call after_destroy.
+    #   a model object, Sequel will call +before_destroy+, do the destroy,
+    #   and then call +after_destroy+.
     # * The following instance_methods all call the class method of the same
     #   name: columns, dataset, db, primary_key, db_schema.
-    # * The following instance methods allow boolean flags to be set on a per-object
-    #   basis: raise_on_save_failure, raise_on_typecast_failure, require_modification, strict_param_setting, 
-    #   typecast_empty_string_to_nil, typecast_on_assignment, use_transactions.
-    #   If they are not used, the object will default to whatever the model setting is.
+    # * All of the methods in +BOOLEAN_SETTINGS+ create attr_writers allowing you
+    #   to set values for the attribute.  It also creates instnace getters returning
+    #   the value of the setting.  If the value has not yet been set, it
+    #   gets the default value from the class by calling the class method of the same name.
     module InstanceMethods
       HOOKS.each{|h| class_eval("def #{h}; end", __FILE__, __LINE__)}
 
       # Define instance method(s) that calls class method(s) of the
       # same name, caching the result in an instance variable.  Define
-      # standard attr_writer method for modifying that instance variable
+      # standard attr_writer method for modifying that instance variable.
       def self.class_attr_overridable(*meths) # :nodoc:
         meths.each{|meth| class_eval("def #{meth}; !defined?(@#{meth}) ? (@#{meth} = self.class.#{meth}) : @#{meth} end", __FILE__, __LINE__)}
         attr_writer(*meths) 
@@ -540,6 +643,9 @@ module Sequel
 
       # The hash of attribute values.  Keys are symbols with the names of the
       # underlying database columns.
+      #
+      #   Artist.new(:name=>'Bob').values # => {:name=>'Bob'}
+      #   Artist[1].values # => {:id=>1, :name=>'Jim', ...}
       attr_reader :values
 
       # Creates new instance and passes the given values to set.
@@ -549,9 +655,14 @@ module Sequel
       # it has optionally yielded itself to the block.
       #
       # Arguments:
-      # * values - should be a hash to pass to set. 
-      # * from_db - should only be set by Model.load, forget it
-      #   exists.
+      # values :: should be a hash to pass to set. 
+      # from_db :: should only be set by <tt>Model.load</tt>, forget it exists.
+      #
+      #   Artist.new(:name=>'Bob')
+      #
+      #   Artist.new do |a|
+      #     a.name = 'Bob'
+      #   end
       def initialize(values = {}, from_db = false)
         if from_db
           @new = false
@@ -568,6 +679,8 @@ module Sequel
       end
       
       # Returns value of the column's attribute.
+      #
+      #   Artist[1][:id] #=> 1
       def [](column)
         @values[column]
       end
@@ -576,6 +689,10 @@ module Sequel
       # this object, typecast the value based on the column's type.
       # If this a a new record or the typecasted value isn't the same
       # as the current value for the column, mark the column as changed.
+      #
+      #   a = Artist.new
+      #   a[:name] = 'Bob'
+      #   a.values #=> {:name=>'Bob'}
       def []=(column, value)
         # If it is new, it doesn't have a value yet, so we should
         # definitely set the new value.
@@ -595,6 +712,10 @@ module Sequel
   
       # If pk is not nil, true only if the objects have the same class and pk.
       # If pk is nil, false.
+      #
+      #   Artist[1] === Artist[1] # true
+      #   Artist.new === Artist.new # false
+      #   Artist[1].set(:name=>'Bob') == Artist[1] # => true
       def ===(obj)
         pk.nil? ? false : (obj.class == model) && (obj.pk == pk)
       end
@@ -603,6 +724,8 @@ module Sequel
       # and since a lot of instance methods call class methods,
       # this alias makes it so you can use model instead of
       # self.class.
+      #
+      #   Artist.new.model # => Artist
       alias_method :model, :class
 
       # The autoincrementing primary key for this model object. Should be
@@ -613,13 +736,21 @@ module Sequel
       end
   
       # The columns that have been updated.  This isn't completely accurate,
-      # see Model#[]=.
+      # as it could contain columns whose values have not changed.
+      #
+      #   a = Artist[1]
+      #   a.changed_columns # => []
+      #   a.name = 'Bob'
+      #   a.changed_columns # => [:name]
       def changed_columns
         @changed_columns ||= []
       end
   
-      # Deletes and returns self.  Does not run destroy hooks.
-      # Look into using destroy instead.
+      # Deletes and returns +self+.  Does not run destroy hooks.
+      # Look into using +destroy+ instead.
+      #
+      #   Artist[1].delete # DELETE FROM artists WHERE (id = 1)
+      #   # => #<Artist {:id=>1, ...}>
       def delete
         _delete
         self
@@ -631,24 +762,33 @@ module Sequel
       # the item from the database and returns self.  Uses a transaction
       # if use_transactions is true or if the :transaction option is given and
       # true.
+      #
+      #   Artist[1].destroy # BEGIN; DELETE FROM artists WHERE (id = 1); COMMIT;
+      #   # => #<Artist {:id=>1, ...}>
       def destroy(opts = {})
         checked_save_failure{checked_transaction(opts){_destroy(opts)}}
       end
 
       # Iterates through all of the current values using each.
       #
-      # Example:
-      #   Ticket.find(7).each { |k, v| puts "#{k} => #{v}" }
+      #  Album[1].each{|k, v| puts "#{k} => #{v}"}
+      #  # id => 1
+      #  # name => 'Bob'
       def each(&block)
         @values.each(&block)
       end
   
       # Compares model instances by values.
+      #
+      #   Artist[1] == Artist[1] # => true
+      #   Artist.new == Artist.new # => true
+      #   Artist[1].set(:name=>'Bob') == Artist[1] # => false
       def eql?(obj)
         (obj.class == model) && (obj.values == @values)
       end
 
       # Returns the validation errors associated with this object.
+      # See +Errors+.
       def errors
         @errors ||= Errors.new
       end 
@@ -665,12 +805,19 @@ module Sequel
       
       # Value that should be unique for objects with the same class and pk (if pk is not nil), or
       # the same class and values (if pk is nil).
+      #
+      #   Artist[1].hash == Artist[1].hash # true
+      #   Artist[1].set(:name=>'Bob').hash == Artist[1].hash # true
+      #   Artist.new.hash == Artist.new.hash # true
+      #   Artist.new(:name=>'Bob').hash == Artist.new.hash # false
       def hash
         [model, pk.nil? ? @values.sort_by{|k,v| k.to_s} : pk].hash
       end
   
       # Returns value for the :id attribute, even if the primary key is
-      # not id. To get the primary key value, use #pk.
+      # not id. To get the primary key value, use +pk+.
+      #
+      #   Artist[1].id # => 1
       def id
         @values[:id]
       end
@@ -681,24 +828,45 @@ module Sequel
         "#<#{model.name} @values=#{inspect_values}>"
       end
   
-      # Returns the keys in values.  May not include all column names.
+      # Returns the keys in +values+.  May not include all column names.
+      #
+      #   Artist.new.keys # => []
+      #   Artist.new(:name=>'Bob').keys # => [:name]
+      #   Artist[1].keys # => [:id, :name]
       def keys
         @values.keys
       end
       
-      # Refresh this record using for_update unless this is a new record.  Returns self.
+      # Refresh this record using +for_update+ unless this is a new record.  Returns self.
+      # This can be used to make sure no other process is updating the record at the
+      # same time.
+      #
+      #   a = Artist[1]
+      #   Artist.db.transaction do
+      #     a.lock!
+      #     a.update(...)
+      #   end
       def lock!
         new? ? self : _refresh(this.for_update)
       end
       
       # Remove elements of the model object that make marshalling fail. Returns self.
+      #
+      #   a = Artist[1]
+      #   a.marshallable!
+      #   Marshal.dump(a)
       def marshallable!
         @this = nil
         self
       end
 
-      # Explicitly mark the object as modified, so save_changes/update will
+      # Explicitly mark the object as modified, so +save_changes+/+update+ will
       # run callbacks even if no columns have changed.
+      #
+      #   a = Artist[1]
+      #   a.save_changes # No callbacks run, as no changes
+      #   a.modified!
+      #   a.save_changes # Callbacks run, even though no changes made
       def modified!
         @modified = true
       end
@@ -706,11 +874,19 @@ module Sequel
       # Whether this object has been modified since last saved, used by
       # save_changes to determine whether changes should be saved.  New
       # values are always considered modified.
+      #
+      #   a = Artist[1]
+      #   a.modified? # => false
+      #   a.set(:name=>'Jim')
+      #   a.modified # => true
       def modified?
         @modified || !changed_columns.empty?
       end
   
       # Returns true if the current instance represents a new record.
+      #
+      #   Artist.new.new? # => true
+      #   Artist[1].new? # => false
       def new?
         @new
       end
@@ -718,21 +894,30 @@ module Sequel
       # Returns the primary key value identifying the model instance.
       # Raises an error if this model does not have a primary key.
       # If the model has a composite primary key, returns an array of values.
+      #
+      #   Artist[1].pk # => 1
+      #   Artist[[1, 2]].pk # => [1, 2]
       def pk
         raise(Error, "No primary key is associated with this model") unless key = primary_key
         key.is_a?(Array) ? key.map{|k| @values[k]} : @values[key]
       end
       
-      # Returns a hash identifying the model instance.  It should be true that:
+      # Returns a hash identifying mapping the receivers primary key column(s) to their values.
       # 
-      #  Model[model_instance.pk_hash] === model_instance
+      #   Artist[1].pk_hash # => {:id=>1}
+      #   Artist[[1, 2]].pk_hash # => {:id1=>1, :id2=>2}
       def pk_hash
         model.primary_key_hash(pk)
       end
       
       # Reloads attributes from database and returns self. Also clears all
-      # cached association and changed_columns information.  Raises an Error if the record no longer
+      # changed_columns information.  Raises an +Error+ if the record no longer
       # exists in the database.
+      #
+      #   a = Artist[1]
+      #   a.name = 'Jim'
+      #   a.refresh
+      #   a.name # => 'Bob'
       def refresh
         _refresh(this)
       end
@@ -745,16 +930,25 @@ module Sequel
       # Creates or updates the record, after making sure the record
       # is valid.  If the record is not valid, or before_save,
       # before_create (if new?), or before_update (if !new?) return
-      # false, returns nil unless raise_on_save_failure is true (if it
+      # false, returns nil unless +raise_on_save_failure+ is true (if it
       # is true, it raises an error).
       # Otherwise, returns self. You can provide an optional list of
       # columns to update, in which case it only updates those columns.
       #
       # Takes the following options:
       #
-      # * :changed - save all changed columns, instead of all columns or the columns given
-      # * :transaction - set to false not to use a transaction
-      # * :validate - set to false not to validate the model before saving
+      # :changed :: save all changed columns, instead of all columns or the columns given
+      # :transaction :: set to false not to use a transaction
+      # :validate :: set to false not to validate the model before saving
+      #
+      #   a = Artist.new(:name=>'Bob')
+      #   a.save # INSERT INTO artists (name) VALUES ('Bob')
+      #
+      #   a = Artist[1]
+      #   a.save # UPDATE artists SET name = 'Bob', hometown = 'Sac' WHERE (id = 1)
+      #   a.save(:name) # UPDATE artists SET name = 'Bob' WHERE (id = 1)
+      #   a.hometown = 'LA'
+      #   a.save(:changes=>true) # UPDATE artists SET hometown = 'Sac' WHERE (id = 1)
       def save(*columns)
         opts = columns.last.is_a?(Hash) ? columns.pop : {}
         if opts[:validate] != false and !valid?
@@ -766,33 +960,56 @@ module Sequel
 
       # Saves only changed columns if the object has been modified.
       # If the object has not been modified, returns nil.  If unable to
-      # save, returns false unless raise_on_save_failure is true.
+      # save, returns false unless +raise_on_save_failure+ is true.
+      #
+      #   a = Artist[1]
+      #   a.save_changes # => nil
+      #   a.name = 'Jim'
+      #   a.save_changes # UPDATE artists SET name = 'Bob' WHERE (id = 1)
+      #   # => #<Artist {:id=>1, :name=>'Jim', ...}
       def save_changes(opts={})
         save(opts.merge(:changed=>true)) || false if modified? 
       end
   
       # Updates the instance with the supplied values with support for virtual
       # attributes, raising an exception if a value is used that doesn't have
-      # a setter method (or ignoring it if strict_param_setting = false).
+      # a setter method (or ignoring it if <tt>strict_param_setting = false</tt>).
       # Does not save the record.
+      #
+      #   artist.set(:name=>'Jim')
+      #   artist.name # => 'Jim'
       def set(hash)
         set_restricted(hash, nil, nil)
       end
   
       # Set all values using the entries in the hash, ignoring any setting of
       # allowed_columns or restricted columns in the model.
+      #
+      #   Artist.set_restricted_columns(:name)
+      #   artist.set_all(:name=>'Jim')
+      #   artist.name # => 'Jim'
       def set_all(hash)
         set_restricted(hash, false, false)
       end
   
       # Set all values using the entries in the hash, except for the keys
       # given in except.
+      #
+      #   artist.set_except({:name=>'Jim'}, :hometown)
+      #   artist.name # => 'Jim'
       def set_except(hash, *except)
         set_restricted(hash, false, except.flatten)
       end
   
       # For each of the fields in the given array +fields+, call the setter
       # method with the value of that +hash+ entry for the field. Returns self.
+      #
+      #   artist.set_fields({:name=>'Jim'}, :name)
+      #   artist.name # => 'Jim'
+      #
+      #   artist.set_fields({:hometown=>'LA'}, :name)
+      #   artist.name # => nil
+      #   artist.hometown # => 'Sac'
       def set_fields(hash, fields)
         fields.each{|f| send("#{f}=", hash[f])}
         self
@@ -800,34 +1017,55 @@ module Sequel
   
       # Set the values using the entries in the hash, only if the key
       # is included in only.
+      #
+      #   artist.set_only({:name=>'Jim'}, :name)
+      #   artist.name # => 'Jim'
+      #
+      #   artist.set_only({:hometown=>'LA'}, :name) # Raise error
       def set_only(hash, *only)
         set_restricted(hash, only.flatten, false)
       end
   
       # Returns (naked) dataset that should return only this instance.
+      #
+      #   Artist[1].this
+      #   # SELECT * FROM artists WHERE (id = 1) LIMIT 1
       def this
         @this ||= model.dataset.filter(pk_hash).limit(1).naked
       end
       
       # Runs set with the passed hash and then runs save_changes.
+      #
+      #   artist.update(:name=>'Jim') # UPDATE artists SET name = 'Jim' WHERE (id = 1)
       def update(hash)
         update_restricted(hash, nil, nil)
       end
   
       # Update all values using the entries in the hash, ignoring any setting of
       # allowed_columns or restricted columns in the model.
+      #
+      #   Artist.set_restricted_columns(:name)
+      #   artist.update_all(:name=>'Jim') # UPDATE artists SET name = 'Jim' WHERE (id = 1)
       def update_all(hash)
         update_restricted(hash, false, false)
       end
   
       # Update all values using the entries in the hash, except for the keys
       # given in except.
+      #
+      #   artist.update_except({:name=>'Jim'}, :hometown) # UPDATE artists SET name = 'Jim' WHERE (id = 1)
       def update_except(hash, *except)
         update_restricted(hash, false, except.flatten)
       end
   
       # Update the instances values by calling +set_fields+ with the +hash+
       # and +fields+, then save any changes to the record.  Returns self.
+      #
+      #   artist.update_fields({:name=>'Jim'}, :name)
+      #   # UPDATE artists SET name = 'Jim' WHERE (id = 1)
+      #
+      #   artist.update_fields({:hometown=>'LA'}, :name)
+      #   # UPDATE artists SET name = NULL WHERE (id = 1)
       def update_fields(hash, fields)
         set_fields(hash, fields)
         save_changes
@@ -835,6 +1073,11 @@ module Sequel
 
       # Update the values using the entries in the hash, only if the key
       # is included in only.
+      #
+      #   artist.update_only({:name=>'Jim'}, :name)
+      #   # UPDATE artists SET name = 'Jim' WHERE (id = 1)
+      #
+      #   artist.update_only({:hometown=>'LA'}, :name) # Raise Error
       def update_only(hash, *only)
         update_restricted(hash, only.flatten, false)
       end
@@ -842,11 +1085,17 @@ module Sequel
       # Validates the object.  If the object is invalid, errors should be added
       # to the errors attribute.  By default, does nothing, as all models
       # are valid by default.  See the {"Model Validations" guide}[link:files/doc/validations_rdoc.html].
-      # for details about validation.
+      # for details about validation.  Should not be called directly by
+      # user code, call <tt>valid?</tt> instead to check if an object
+      # is valid.
       def validate
       end
 
       # Validates the object and returns true if no errors are reported.
+      #
+      #   artist(:name=>'Valid').valid? # => true
+      #   artist(:name=>'Invalid').valid? # => false
+      #   artist.errors.full_messages # => ['name cannot be Invalid']
       def valid?
         errors.clear
         if before_validation == false
@@ -991,7 +1240,7 @@ module Sequel
       end
 
       # If raise_on_save_failure is false, check for BeforeHookFailed
-      # beind raised by yielding and swallow it.
+      # being raised by yielding and swallow it.
       def checked_save_failure
         if raise_on_save_failure
           yield
@@ -1014,7 +1263,7 @@ module Sequel
         @values.inspect
       end
   
-      # Raise an error if raise_on_save_failure is true, return nil otherwise.
+      # Raise a +BeforeHookFailed+ exception.
       def save_failure(type)
         raise BeforeHookFailed, "one of the before_#{type} hooks returned false"
       end
@@ -1100,19 +1349,31 @@ module Sequel
     # the call to set_dataset.
     module DatasetMethods
       # The model class associated with this dataset
+      #
+      #   Artist.dataset.model # => Artist
       attr_accessor :model
 
       # Destroy each row in the dataset by instantiating it and then calling
       # destroy on the resulting model object.  This isn't as fast as deleting
       # the dataset, which does a single SQL call, but this runs any destroy
       # hooks on each object in the dataset.
+      #
+      #   Artist.dataset.destroy
+      #   # DELETE FROM artists WHERE (id = 1)
+      #   # DELETE FROM artists WHERE (id = 2)
+      #   # ...
       def destroy
         @db.transaction{all{|r| r.destroy}.length}
       end
 
-      # This allows you to call to_hash without any arguments, which will
+      # This allows you to call +to_hash+ without any arguments, which will
       # result in a hash with the primary key value being the key and the
       # model object being the value.
+      #
+      #   Artist.dataset.to_hash # SELECT * FROM artists
+      #   # => {1=>#<Artist {:id=>1, ...}>,
+      #   #     2=>#<Artist {:id=>2, ...}>,
+      #   #     ...}
       def to_hash(key_column=nil, value_column=nil)
         if key_column
           super

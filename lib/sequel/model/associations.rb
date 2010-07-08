@@ -442,13 +442,13 @@ module Sequel
       #   Project.associations
       #   => [:portfolio, :milestones]
       #   Project.association_reflection(:portfolio)
-      #   => {:type => :many_to_one, :name => :portfolio, :class_name => "Portfolio"}
+      #   => {:type => :many_to_one, :name => :portfolio, ...}
       #
       # For a more in depth general overview, as well as a reference guide,
       # see the {Association Basics guide}[link:files/doc/association_basics_rdoc.html].
       # For examples of advanced usage, see the {Advanced Associations guide}[link:files/doc/advanced_associations_rdoc.html].
       module ClassMethods
-        # All association reflections defined for this model (default: none).
+        # All association reflections defined for this model (default: {}).
         attr_reader :association_reflections
 
         # Array of all association reflections for this model class
@@ -497,11 +497,11 @@ module Sequel
         #   - :before_set - Symbol, Proc, or array of both/either specifying a callback to call
         #     before an item is set using the association setter method.
         #   - :cartesian_product_number - the number of joins completed by this association that could cause more
-        #     than one row for each row in the current table (default: 0 for many_to_one associations,
-        #     1 for *_to_many associations).
+        #     than one row for each row in the current table (default: 0 for many_to_one and one_to_one associations,
+        #     1 for one_to_many and many_to_many associations).
         #   - :class - The associated class or its name. If not
         #     given, uses the association's name, which is camelized (and
-        #     singularized unless the type is :many_to_one)
+        #     singularized unless the type is :many_to_one or :one_to_one)
         #   - :clone - Merge the current options and block into the options and block used in defining
         #     the given association.  Can be used to DRY up a bunch of similar associations that
         #     all share the same options such as :class and :key, while changing the order and block used.
@@ -510,18 +510,12 @@ module Sequel
         #     to use for the _dataset method (before the other options are applied).
         #   - :distinct - Use the DISTINCT clause when selecting associating object, both when
         #     lazy loading and eager loading via .eager (but not when using .eager_graph).
-        #   - :eager - The associations to eagerly load via #eager when loading the associated object(s).
-        #     For many_to_one associations, this is ignored unless this association is
-        #     being eagerly loaded, as it doesn't save queries unless multiple objects
-        #     can be loaded at once.
+        #   - :eager - The associations to eagerly load via +eager+ when loading the associated object(s).
         #   - :eager_block - If given, use the block instead of the default block when
         #     eagerly loading.  To not use a block when eager loading (when one is used normally),
         #     set to nil.
-        #   - :eager_graph - The associations to eagerly load via #eager_graph when loading the associated object(s).
-        #     For many_to_one associations, this is ignored unless this association is
-        #     being eagerly loaded, as it doesn't save queries unless multiple objects
-        #     can be loaded at once.
-        #   - :eager_grapher - A proc to use to implement eager loading via eager graph, overriding the default.
+        #   - :eager_graph - The associations to eagerly load via +eager_graph+ when loading the associated object(s).
+        #   - :eager_grapher - A proc to use to implement eager loading via +eager_graph+, overriding the default.
         #     Takes three arguments, a dataset, an alias to use for the table to graph for this association,
         #     and the alias that was used for the current table (since you can cascade associations),
         #     Should return a copy of the dataset with the association graphed into it.
@@ -531,38 +525,38 @@ module Sequel
         #     :rows, and :associations, corresponding to the three arguments, and an additional key :self, which is
         #     the dataset doing the eager loading. In the proc, the associated records should
         #     be queried from the database and the associations cache for each
-        #     record should be populated for this to work correctly.
+        #     record should be populated.
         #   - :eager_loader_key - A symbol for the key column to use to populate the key hash
         #     for the eager loader.
         #   - :extend - A module or array of modules to extend the dataset with.
         #   - :graph_block - The block to pass to join_table when eagerly loading
-        #     the association via eager_graph.
+        #     the association via +eager_graph+.
         #   - :graph_conditions - The additional conditions to use on the SQL join when eagerly loading
-        #     the association via eager_graph.  Should be a hash or an array of all two pairs. If not
-        #     specified, the :conditions option is used if it is a hash or array of all two pairs.
+        #     the association via +eager_graph+.  Should be a hash or an array of two element arrays. If not
+        #     specified, the :conditions option is used if it is a hash or array of two element arrays.
         #   - :graph_join_type - The type of SQL join to use when eagerly loading the association via
         #     eager_graph.  Defaults to :left_outer.
         #   - :graph_only_conditions - The conditions to use on the SQL join when eagerly loading
-        #     the association via eager_graph, instead of the default conditions specified by the
+        #     the association via +eager_graph+, instead of the default conditions specified by the
         #     foreign/primary keys.  This option causes the :graph_conditions option to be ignored.
         #   - :graph_select - A column or array of columns to select from the associated table
-        #     when eagerly loading the association via eager_graph. Defaults to all
+        #     when eagerly loading the association via +eager_graph+. Defaults to all
         #     columns in the associated table.
         #   - :limit - Limit the number of records to the provided value.  Use
-        #     an array with two arguments for the value to specify a limit and an offset.
+        #     an array with two elements for the value to specify a limit (first element) and an offset (second element).
         #   - :methods_module - The module that methods the association creates will be placed into. Defaults
         #     to the module containing the model's columns.
         #   - :order - the column(s) by which to order the association dataset.  Can be a
-        #     singular column or an array.
-        #   - :order_eager_graph - Whether to add the order to the dataset's order when graphing
-        #     via eager graph.  Defaults to true, so set to false to disable.
-        #   - :read_only - Do not add a setter method (for many_to_one or one_to_many with :one_to_one),
-        #     or add_/remove_/remove_all_ methods (for one_to_many, many_to_many)
+        #     singular column symbol or an array of column symbols.
+        #   - :order_eager_graph - Whether to add the association's order to the graphed dataset's order when graphing
+        #     via +eager_graph+.  Defaults to true, so set to false to disable.
+        #   - :read_only - Do not add a setter method (for many_to_one or one_to_one associations),
+        #     or add_/remove_/remove_all_ methods (for one_to_many and many_to_many associations).
         #   - :reciprocal - the symbol name of the reciprocal association,
-        #     if it exists.  By default, sequel will try to determine it by looking at the
+        #     if it exists.  By default, Sequel will try to determine it by looking at the
         #     associated model's assocations for a association that matches
         #     the current association's key(s).  Set to nil to not use a reciprocal.
-        #   - :select - the attributes to select.  Defaults to the associated class's
+        #   - :select - the columns to select.  Defaults to the associated class's
         #     table_name.* in a many_to_many association, which means it doesn't include the attributes from the
         #     join table.  If you want to include the join table attributes, you can
         #     use this option, but beware that the join table attributes can clash with
@@ -585,16 +579,16 @@ module Sequel
         #     Defaults to primary key of the current table. Can use an
         #     array of symbols for a composite key association.
         # * :many_to_many:
-        #   - :graph_join_table_block - The block to pass to join_table for
-        #     the join table when eagerly loading the association via eager_graph.
+        #   - :graph_join_table_block - The block to pass to +join_table+ for
+        #     the join table when eagerly loading the association via +eager_graph+.
         #   - :graph_join_table_conditions - The additional conditions to use on the SQL join for
-        #     the join table when eagerly loading the association via eager_graph. Should be a hash
-        #     or an array of all two pairs.
+        #     the join table when eagerly loading the association via +eager_graph+. Should be a hash
+        #     or an array of two element arrays.
         #   - :graph_join_table_join_type - The type of SQL join to use for the join table when eagerly
-        #     loading the association via eager_graph.  Defaults to the :graph_join_type option or
+        #     loading the association via +eager_graph+.  Defaults to the :graph_join_type option or
         #     :left_outer.
         #   - :graph_join_table_only_conditions - The conditions to use on the SQL join for the join
-        #     table when eagerly loading the association via eager_graph, instead of the default
+        #     table when eagerly loading the association via +eager_graph+, instead of the default
         #     conditions specified by the foreign/primary keys.  This option causes the 
         #     :graph_join_table_conditions option to be ignored.
         #   - :join_table - name of table that includes the foreign keys to both
@@ -622,7 +616,7 @@ module Sequel
           raise(Error, 'Model.associate name argument must be a symbol') unless Symbol === name
           raise(Error, ':eager_loader option must have an arity of 1 or 3') if opts[:eager_loader] && ![1, 3].include?(opts[:eager_loader].arity)
       
-          # merge early so we don't modify opts
+          # dup early so we don't modify opts
           orig_opts = opts.dup
           orig_opts = association_reflection(opts[:clone])[:orig_opts].merge(orig_opts) if opts[:clone]
           opts = orig_opts.merge(:type => type, :name => name, :cache => true, :model => self)
@@ -659,7 +653,7 @@ module Sequel
           association_reflections.keys
         end
 
-        # Modify and return eager loading dataset based on association options. Options:
+        # Modify and return eager loading dataset based on association options.
         def eager_loading_dataset(opts, ds, select, associations, eager_options={})
           ds = ds.select(*select) if select
           if c = opts[:conditions]
@@ -736,7 +730,7 @@ module Sequel
           association_module_def(opts.add_method, opts){|o,*args| add_associated_object(opts, o, *args)}
         end
       
-        # Adds methods related to the association's dataset to the module included in the class.
+        # Adds the association dataset methods to the association methods module.
         def def_association_dataset_methods(opts)
           # If a block is given, define a helper method for it, because it takes
           # an argument.  This is unnecessary in Ruby 1.9, as that has instance_exec.
@@ -746,12 +740,12 @@ module Sequel
           def_association_method(opts)
         end
 
-        # Adds method for retrieving the associated objects to the module included in the class.
+        # Adds the association method to the association methods module. 
         def def_association_method(opts)
           association_module_def(opts.association_method, opts){|*reload| load_associated_objects(opts, reload[0])}
         end
       
-        # Adds many_to_many association instance methods
+        # Configures many_to_many association reflection and adds the related association methods
         def def_many_to_many(opts)
           name = opts[:name]
           model = self
@@ -826,7 +820,7 @@ module Sequel
           def_remove_methods(opts)
         end
         
-        # Adds many_to_one association instance methods
+        # Configures many_to_one association reflection and adds the related association methods
         def def_many_to_one(opts)
           name = opts[:name]
           model = self
@@ -875,7 +869,7 @@ module Sequel
           association_module_def(opts.setter_method, opts){|o| set_associated_object(opts, o)}
         end
         
-        # Adds one_to_many association instance methods
+        # Configures one_to_many and one_to_one association reflections and adds the related association methods
         def def_one_to_many(opts)
           one_to_one = opts[:type] == :one_to_one
           name = opts[:name]
@@ -970,7 +964,7 @@ module Sequel
           end
         end
 
-        # Alias of def_one_to_many
+        # Alias of def_one_to_many, since they share pretty much the same code.
         def def_one_to_one(opts)
           def_one_to_many(opts)
         end
@@ -982,7 +976,7 @@ module Sequel
         end
       end
 
-      # Private instance methods used to implement the associations support.
+      # Instance methods used to implement the associations support.
       module InstanceMethods
         # The currently cached associations.  A hash with the keys being the
         # association name symbols and the values being the associated object
@@ -1000,6 +994,7 @@ module Sequel
 
         private
         
+        # Apply the association options such as :order and :limit to the given dataset, returning a modified dataset.
         def _apply_association_options(opts, ds)
           ds.extend(AssociationDatasetMethods)
           ds.model_object = self
@@ -1019,7 +1014,7 @@ module Sequel
           ds
         end
 
-        # Backbone behind association dataset methods
+        # Return an association dataset for the given association reflection
         def _dataset(opts)
           raise(Sequel::Error, "model object #{inspect} does not have a primary key") if opts.dataset_need_primary_key? && !pk
           _apply_association_options(opts, send(opts._dataset_method))
@@ -1144,8 +1139,8 @@ module Sequel
           o
         end
 
-        # If necessary, check that the object from the associated table specified by the primary key
-        # is currently associated to the object.  If it is associated, return the object, otherwise
+        # Check that the object from the associated table specified by the primary key
+        # is currently associated to the receiver.  If it is associated, return the object, otherwise
         # raise an error.
         def remove_check_existing_object_from_pk(opts, o, *args)
           key = o
@@ -1186,7 +1181,7 @@ module Sequel
           end
         end
 
-        # Set the given object as the associated object for the given association
+        # Set the given object as the associated object for the given many_to_one association reflection
         def set_associated_object(opts, o)
           raise(Error, "associated object #{o.inspect} does not have a primary key") if o && !o.pk
           run_association_callbacks(opts, :before_set, o)
@@ -1200,7 +1195,7 @@ module Sequel
           o
         end
         
-        # Set the given object as the associated object for the given association
+        # Set the given object as the associated object for the given one_to_one association reflection
         def set_one_to_one_associated_object(opts, o)
           raise(Error, "object #{inspect} does not have a primary key") unless pk
           run_association_callbacks(opts, :before_set, o)
@@ -1218,15 +1213,15 @@ module Sequel
       # Eager loading makes it so that you can load all associated records for a
       # set of objects in a single query, instead of a separate query for each object.
       #
-      # Two separate implementations are provided.  #eager should be used most of the
+      # Two separate implementations are provided.  +eager+ should be used most of the
       # time, as it loads associated records using one query per association.  However,
-      # it does not allow you the ability to filter based on columns in associated tables.  #eager_graph loads
-      # all records in one query.  Using #eager_graph you can filter based on columns in associated
-      # tables.  However, #eager_graph can be slower than #eager, especially if multiple
-      # *_to_many associations are joined.
+      # it does not allow you the ability to filter or order based on columns in associated tables.  +eager_graph+ loads
+      # all records in a single query using JOINs, allowing you to filter or order based on columns in associated
+      # tables.  However, +eager_graph+ can be slower than +eager+, especially if multiple
+      # one_to_many or many_to_many associations are joined.
       #
-      # You can cascade the eager loading (loading associations' associations)
-      # with no limit to the depth of the cascades.  You do this by passing a hash to #eager or #eager_graph
+      # You can cascade the eager loading (loading associations on associated objects)
+      # with no limit to the depth of the cascades.  You do this by passing a hash to +eager+ or +eager_graph+
       # with the keys being associations of the current model and values being
       # associations of the model associated with the current model via the key.
       #  
@@ -1244,7 +1239,7 @@ module Sequel
       #   Artist.eager(:albums=>{:tracks=>:genre}).all
       #   Artist.eager_graph(:albums=>{:tracks=>:genre}).all
       module DatasetMethods
-        # Add the #eager! and #eager_graph! mutation methods to the dataset.
+        # Add the <tt>eager!</tt> and <tt>eager_graph!</tt> mutation methods to the dataset.
         def self.extended(obj)
           obj.def_mutation_method(:eager, :eager_graph)
         end
@@ -1253,23 +1248,23 @@ module Sequel
         # query for each association.
         #
         # The basic idea for how it works is that the dataset is first loaded normally.
-        # Then it goes through all associations that have been specified via eager.
+        # Then it goes through all associations that have been specified via +eager+.
         # It loads each of those associations separately, then associates them back
         # to the original dataset via primary/foreign keys.  Due to the necessity of
-        # all objects being present, you need to use .all to use eager loading, as it
-        # can't work with .each.
+        # all objects being present, you need to use +all+ to use eager loading, as it
+        # can't work with +each+.
         #
         # This implementation avoids the complexity of extracting an object graph out
         # of a single dataset, by building the object graph out of multiple datasets,
         # one for each association.  By using a separate dataset for each association,
         # it avoids problems such as aliasing conflicts and creating cartesian product
-        # result sets if multiple *_to_many eager associations are requested.
+        # result sets if multiple one_to_many or many_to_many eager associations are requested.
         #
         # One limitation of using this method is that you cannot filter the dataset
         # based on values of columns in an associated table, since the associations are loaded
         # in separate queries.  To do that you need to load all associations in the
         # same query, and extract an object graph from the results of that query. If you
-        # need to filter based on columns in associated tables, look at #eager_graph
+        # need to filter based on columns in associated tables, look at +eager_graph+
         # or join the tables you need to filter on manually. 
         #
         # Each association's order, if defined, is respected. Eager also works
@@ -1293,25 +1288,26 @@ module Sequel
         end
       
         # The secondary eager loading method.  Loads all associations in a single query. This
-        # method should only be used if you need to filter based on columns in associated tables.
+        # method should only be used if you need to filter or order based on columns in associated tables.
         #
-        # This method builds an object graph using Dataset#graph.  Then it uses the graph
+        # This method builds an object graph using <tt>Dataset#graph</tt>.  Then it uses the graph
         # to build the associations, and finally replaces the graph with a simple array
         # of model objects.
         #
-        # Be very careful when using this with multiple *_to_many associations, as you can
-        # create large cartesian products.  If you must graph multiple *_to_many associations,
-        # make sure your filters are specific if you have a large database.
+        # Be very careful when using this with multiple one_to_many or many_to_many associations, as you can
+        # create large cartesian products.  If you must graph multiple one_to_many and many_to_many associations,
+        # make sure your filters are narrow if you have a large database.
         # 
-        # Each association's order, if definied, is respected. #eager_graph probably
+        # Each association's order, if definied, is respected. +eager_graph+ probably
         # won't work correctly on a limited dataset, unless you are
-        # only graphing many_to_one associations.
+        # only graphing many_to_one and one_to_one associations.
         # 
         # Does not use the block defined for the association, since it does a single query for
         # all objects.  You can use the :graph_* association options to modify the SQL query.
         #
-        # Like eager, you need to call .all on the dataset for the eager loading to work.  If you just
-        # call each, you will get a normal graphed result back (a hash with model object values).
+        # Like +eager+, you need to call +all+ on the dataset for the eager loading to work.  If you just
+        # call +each+, you will get a normal graphed result back (a hash with table alias symbol keys and
+        # model object values).
         def eager_graph(*associations)
           ds = if @opts[:eager_graph]
             self
@@ -1342,12 +1338,12 @@ module Sequel
         # (which would be dependencies of the current association)
         #
         # Arguments:
-        # * ds - Current dataset
-        # * model - Current Model
-        # * ta - table_alias used for the parent association
-        # * requirements - an array, used as a stack for requirements
-        # * r - association reflection for the current association
-        # * *associations - any associations dependent on this one
+        # ds :: Current dataset
+        # model :: Current Model
+        # ta :: table_alias used for the parent association
+        # requirements :: an array, used as a stack for requirements
+        # r :: association reflection for the current association
+        # *associations :: any associations dependent on this one
         def eager_graph_association(ds, model, ta, requirements, r, *associations)
           klass = r.associated_class
           assoc_name = r[:name]
@@ -1367,11 +1363,11 @@ module Sequel
         # Call eager_graph_association on each association.
         #
         # Arguments:
-        # * ds - Current dataset
-        # * model - Current Model
-        # * ta - table_alias used for the parent association
-        # * requirements - an array, used as a stack for requirements
-        # * *associations - the associations to add to the graph
+        # ds :: Current dataset
+        # model :: Current Model
+        # ta :: table_alias used for the parent association
+        # requirements :: an array, used as a stack for requirements
+        # *associations :: the associations to add to the graph
         def eager_graph_associations(ds, model, ta, requirements, *associations)
           return ds if associations.empty?
           associations.flatten.each do |association|
@@ -1465,7 +1461,7 @@ module Sequel
         # to build all dependencies.
         def eager_graph_build_associations_graph(dependency_map, alias_map, type_map, reciprocal_map, records_map, current, record_graph)
           return if dependency_map.empty?
-          # Don't clobber the instance variable array for *_to_many associations if it has already been setup
+          # Don't clobber the cached association value for one_to_many and many_to_many associations if it has already been setup
           dependency_map.keys.each do |ta|
             assoc_name = alias_map[ta]
             current.associations[assoc_name] = type_map[ta] ? [] : nil unless current.associations.include?(assoc_name)
@@ -1494,7 +1490,7 @@ module Sequel
       
         # If the result set is the result of a cartesian product, then it is possible that
         # there are multiple records for each association when there should only be one.
-        # In that case, for each object in all associations loaded via #eager_graph, run
+        # In that case, for each object in all associations loaded via +eager_graph+, run
         # uniq! on the association to make sure no duplicate records show up.
         # Note that this can cause legitimate duplicate records to be removed.
         def eager_graph_make_associations_unique(records, dependency_map, alias_map, type_map)

@@ -6,7 +6,8 @@ module Sequel
   # * A singleton method named apply, which takes a model, 
   #   additional arguments, and an optional block.  This is called
   #   the first time the plugin is loaded for this model (unless it was
-  #   already loaded by an ancestor class), with the arguments
+  #   already loaded by an ancestor class), before including/extending
+  #   any modules, with the arguments
   #   and block provided to the call to Model.plugin.
   # * A module inside the plugin module named InstanceMethods,
   #   which will be included in the model class.
@@ -16,7 +17,8 @@ module Sequel
   #   which will extend the model's dataset.
   # * A singleton method named configure, which takes a model, 
   #   additional arguments, and an optional block.  This is called
-  #   every time the Model.plugin method is called.
+  #   every time the Model.plugin method is called, after including/extending
+  #   any modules.
   module Plugins
   end
   
@@ -45,13 +47,16 @@ module Sequel
     end
     
     module ClassMethods
-      # Array of plugins loaded by this class
+      # Array of plugin modules loaded by this class
+      #
+      #   Sequel::Model.plugins
+      #   # => [Sequel::Model, Sequel::Model::Associations]
       attr_reader :plugins
       
       private
   
       # Returns the module for the specified plugin. If the module is not 
-      # defined, the corresponding plugin gem is automatically loaded.
+      # defined, the corresponding plugin required.
       def plugin_module(plugin)
         module_name = plugin.to_s.gsub(/(^|_)(.)/){|x| x[-1..-1].upcase}
         if !Sequel::Plugins.const_defined?(module_name) ||
