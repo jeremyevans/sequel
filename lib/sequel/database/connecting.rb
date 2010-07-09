@@ -54,6 +54,7 @@ module Sequel
           uri.query.split('&').collect{|s| s.split('=')}.each{|k,v| uri_options[k.to_sym] = v if k && !k.empty?} unless uri.query.to_s.strip.empty?
           uri_options.entries.each{|k,v| uri_options[k] = URI.unescape(v) if v.is_a?(String)}
           opts = uri_options.merge(opts)
+          opts[:adapter] = scheme
         end
       when Hash
         opts = conn_string.merge(opts)
@@ -62,7 +63,7 @@ module Sequel
         raise Error, "Sequel::Database.connect takes either a Hash or a String, given: #{conn_string.inspect}"
       end
       # process opts a bit
-      opts = opts.inject({}) do |m, kv| k, v = *kv
+      opts = opts.inject({}) do |m, (k,v)|
         k = :user if k.to_s == 'username'
         m[k.to_sym] = v
         m

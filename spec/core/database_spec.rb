@@ -186,6 +186,11 @@ context "A new Database" do
     db.should be_a_kind_of(Sequel::Database)
     db.opts[:uri].should == 'do:test://host/db_name'
   end
+
+  specify "should populate :adapter option when using connection string" do
+    Sequel::Database.should_receive(:adapter_class).once.with(:do).and_return(Sequel::Database)
+    Sequel.connect('do:test://host/db_name').opts[:adapter] == :do
+  end
 end
 
 context "Database#disconnect" do
@@ -1494,6 +1499,7 @@ context "Database#each_server" do
     @db.each_server do |db|
       db.should be_a_kind_of(Sequel::Database)
       db.should_not == @db
+      db.opts[:adapter].should == :mock
       db.opts[:database].should == 2
       hosts << db.opts[:host]
     end

@@ -1,5 +1,7 @@
 === HEAD
 
+* Fix Database#each_server when using a connection string to connect (jeremyevans)
+
 * Make Model dataset's destroy method respect the model's use_transactions setting, instead of always using a transaction (jeremyevans)
 
 * Add Database#adapter_scheme, for checking which adapter a Database uses (jeremyevans)
