@@ -34,9 +34,9 @@ module Sequel
       def schema_parse_table(table, opts={})
         ds = dataset
         ds.identifier_output_method = :downcase
-        schema, table = schema_and_table(table)
+        schema_and_table = "#{"#{quote_identifier(opts[:schema])}." if opts[:schema]}#{quote_identifier(table)}"
         table_schema = []
-        metadata = transaction(opts){|conn| conn.describe_table(table.to_s)}
+        metadata = transaction(opts){|conn| conn.describe_table(schema_and_table)}
         metadata.columns.each do |column|
           table_schema << [
             column.name.downcase.to_sym,
