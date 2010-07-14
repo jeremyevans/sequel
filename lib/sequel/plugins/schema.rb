@@ -19,7 +19,8 @@ module Sequel
     module Schema
       module ClassMethods
         # Creates table, using the column information from set_schema.
-        def create_table
+        def create_table(*args, &block)
+          set_schema(*args, &block) if block_given?
           db.create_table(table_name, :generator=>@schema)
           @db_schema = get_db_schema(true)
           columns
@@ -27,14 +28,14 @@ module Sequel
         
         # Drops the table if it exists and then runs create_table.  Should probably
         # not be used except in testing.
-        def create_table!
+        def create_table!(*args, &block)
           drop_table rescue nil
-          create_table
+          create_table(*args, &block)
         end
 
         # Creates the table unless the table already exists
-        def create_table?
-          create_table unless table_exists?
+        def create_table?(*args, &block)
+          create_table(*args, &block) unless table_exists?
         end
         
         # Drops table.

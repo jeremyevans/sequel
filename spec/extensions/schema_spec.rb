@@ -53,6 +53,11 @@ describe Sequel::Model, "create_table and schema" do
     MODEL_DB.sqls.should == ['CREATE TABLE items (name text, price float NOT NULL)']
   end
 
+  it "should allow setting schema and creating the table in one call" do
+    @model.create_table { text :name }
+    MODEL_DB.sqls.should == ['CREATE TABLE items (name text)']
+  end
+
   it "should reload the schema from the database" do
     schem = {:name=>{:type=>:string}, :price=>{:type=>:float}}
     @model.db.should_receive(:schema).with(:items, :reload=>true).and_return(schem.to_a.sort_by{|x| x[0].to_s})
