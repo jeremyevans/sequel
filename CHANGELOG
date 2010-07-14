@@ -1,5 +1,7 @@
 === HEAD
 
+* Fix Database#schema on Oracle when the same table exists in multiple schemas (djwhitt)
+
 * Fix Database#each_server when using a connection string to connect (jeremyevans)
 
 * Make Model dataset's destroy method respect the model's use_transactions setting, instead of always using a transaction (jeremyevans)
