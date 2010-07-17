@@ -48,8 +48,9 @@
 <h3>Presentations</h3>
 
 <ul>
+<li><a href="static/rubymw2010_presentation/index.html">Jeremy Evans's &quot;Ruby Techniques By Example&quot; Presentation at Ruby Midwest 2010 (Examples Mostly Taken From Sequel)</a></li>
 <li><a href="static/sacruby201004_presentation/index.html">Jeremy Evans's &quot;Ruby Techniques By Example&quot; Presentation at April 2010 Sacramento Ruby Group Meeting (Examples Mostly Taken From Sequel)</a></li>
-<li><a href="static/mwrc2010_presentation/mwrc2010.html">Jeremy Evans's &quot;Ruby Techniques By Example&quot; Presentation at MountainWest RubyConf 2010 (Examples Mostly Taken From Sequel)</a></li>
+<li><a href="static/mwrc2010_presentation/mwrc2010.html">Jeremy Evans's &quot;Ruby Techniques By Example&quot; Presentation at MountainWest RubyConf 2010 (Examples Mostly Taken From Sequel)</a> (<a href="http://mwrc2010.confreaks.com/2010-03-12-10-30-jeremy-evans-ruby-techniques-by-example.html">Video</a>)</li>
 <li><a href="static/lsrc2009_presentation/sequel-lsrc2009.html">Jeremy Evans's &quot;Sequel: SQL in Ruby&quot; Presentation at Lone Star Ruby Conference 2009</a></li>
 <li><a href="static/rk2009_presentation/sequel-rubykaigi2009.html">Jeremy Evans's &quot;Sequel: SQL in Ruby&quot; Presentation at RubyKaigi 2009</a> (<a href="http://www.ustream.tv/recorded/1825816">Video</a>)</li>
 <li><a href="static/larc2009_presentation/sequel-larc2009-pres.html">Jeremy Evans's &quot;Sequel: The Database Toolkit for Ruby&quot; Presentation at LA Ruby Conf 2009</a> (<a href="http://larubyconf2009.confreaks.com/04-apr-2009-11-20-sequel-jeremy-evans.html">Video</a>)</li>
