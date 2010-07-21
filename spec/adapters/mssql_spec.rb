@@ -63,8 +63,9 @@ context "MSSQL Dataset#join_table" do
   specify "should emulate the USING clause with ON" do
     MSSQL_DB[:items].join(:categories, [:id]).sql.should ==
       'SELECT * FROM ITEMS INNER JOIN CATEGORIES ON (CATEGORIES.ID = ITEMS.ID)'
-    MSSQL_DB[:items].join(:categories, [:id1, :id2]).sql.should ==
-      'SELECT * FROM ITEMS INNER JOIN CATEGORIES ON ((CATEGORIES.ID1 = ITEMS.ID1) AND (CATEGORIES.ID2 = ITEMS.ID2))'
+    ['SELECT * FROM ITEMS INNER JOIN CATEGORIES ON ((CATEGORIES.ID1 = ITEMS.ID1) AND (CATEGORIES.ID2 = ITEMS.ID2))',
+     'SELECT * FROM ITEMS INNER JOIN CATEGORIES ON ((CATEGORIES.ID2 = ITEMS.ID2) AND (CATEGORIES.ID1 = ITEMS.ID1))'].
+    should include(MSSQL_DB[:items].join(:categories, [:id1, :id2]).sql)
     MSSQL_DB[:items___i].join(:categories___c, [:id]).sql.should ==
       'SELECT * FROM ITEMS AS I INNER JOIN CATEGORIES AS C ON (C.ID = I.ID)'
   end
