@@ -122,6 +122,9 @@ module Sequel
         case v
         when OraDate
           literal(Sequel.database_to_application_timestamp(v))
+        when OCI8::CLOB
+          v.rewind
+          literal(v.read)
         else
           super
         end
