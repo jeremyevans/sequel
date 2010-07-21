@@ -305,11 +305,12 @@ module Sequel
       super
       @target = opts[:target] || latest_migration_version
       @current = opts[:current] || current_migration_version
-      @direction = current < target ? :up : :down
-      @migrations = get_migrations
 
       raise(Error, "No current version available") unless current
       raise(Error, "No target version available") unless target
+
+      @direction = current < target ? :up : :down
+      @migrations = get_migrations
     end
 
     # Apply all migrations on the database
