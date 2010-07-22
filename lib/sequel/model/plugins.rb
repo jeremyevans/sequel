@@ -29,7 +29,6 @@ module Sequel
     # sequel_#{plugin}, and then attempt to load the module using a
     # the camelized plugin name under Sequel::Plugins.
     def self.plugin(plugin, *args, &blk)
-      arg = args.first
       m = plugin.is_a?(Module) ? plugin : plugin_module(plugin)
       unless @plugins.include?(m)
         @plugins << m
