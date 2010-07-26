@@ -424,3 +424,13 @@ context "MSSQL::Database#rename_table" do
     proc { MSSQL_DB.rename_table :MY__bar, :foo }.should_not raise_error
   end
 end
+
+context "MSSQL::Dataset#count" do
+  specify "should work with a distinct query with an order clause" do
+    MSSQL_DB.create_table!(:items){String :name; Integer :value}
+    MSSQL_DB[:items].insert(:name => "name", :value => 1)
+    MSSQL_DB[:items].insert(:name => "name", :value => 1)
+    MSSQL_DB[:items].select(:name, :value).distinct.order(:name).count.should == 1
+    MSSQL_DB[:items].select(:name, :value).group(:name, :value).order(:name).count.should == 1
+  end
+end

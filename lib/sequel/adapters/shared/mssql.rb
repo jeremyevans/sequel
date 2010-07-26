@@ -373,6 +373,12 @@ module Sequel
       def supports_window_functions?
         true
       end
+      
+      protected
+      # MSSQL does not allow ordering in sub-clauses unless 'top' (limit) is specified
+      def aggregate_dataset
+        (options_overlap(Sequel::Dataset::COUNT_FROM_SELF_OPTS) && !options_overlap([:limit])) ? unordered.from_self : super
+      end
 
       private
 
