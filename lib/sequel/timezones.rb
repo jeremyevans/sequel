@@ -4,7 +4,7 @@ module Sequel
   
   # The offset of the current time zone from UTC, as a fraction of a day.
   LOCAL_DATETIME_OFFSET = respond_to?(:Rational, true) ? Rational(LOCAL_DATETIME_OFFSET_SECS, 60*60*24) : LOCAL_DATETIME_OFFSET_SECS/60/60/24.0
-  
+
   @application_timezone = nil
   @database_timezone = nil
   @typecast_timezone = nil
@@ -75,7 +75,8 @@ module Sequel
       when :utc, nil
         v # DateTime assumes UTC if no offset is given
       when :local
-        v.new_offset(LOCAL_DATETIME_OFFSET) - LOCAL_DATETIME_OFFSET
+        offset = local_offset_for_datetime(v)
+        v.new_offset(offset) - offset
       else
         convert_input_datetime_other(v, input_timezone)
       end
@@ -132,7 +133,7 @@ module Sequel
         raise InvalidValue, "Invalid convert_input_timestamp type: #{v.inspect}"
       end
     end
-    
+
     # Convert the given +DateTime+ to the given output_timezone that is not supported
     # by default (i.e. one other than +nil+, <tt>:local</tt>, or <tt>:utc</tt>).  Raises an +InvalidValue+ by default.
     # Can be overridden in extensions.
@@ -148,7 +149,7 @@ module Sequel
           when :utc
             v.new_offset(0)
           when :local
-            v.new_offset(LOCAL_DATETIME_OFFSET)
+            v.new_offset(local_offset_for_datetime(v))
           else
             convert_output_datetime_other(v, output_timezone)
           end
@@ -177,6 +178,17 @@ module Sequel
     # exists for easier overriding in extensions.
     def convert_timezone_setter_arg(tz)
       tz
+    end
+
+    # Takes a DateTime dt, and returns the correct local offset for that dt, daylight savings included.
+    def local_offset_for_datetime(dt)
+      time_offset_to_datetime_offset Time.local(dt.year, dt.month, dt.day, dt.hour, dt.min, dt.sec).utc_offset
+    end
+
+    # Caches offset conversions to avoid excess Rational math.
+    def time_offset_to_datetime_offset(offset_secs)
+      @local_offsets ||= {}
+      @local_offsets[offset_secs] ||= respond_to?(:Rational, true) ? Rational(offset_secs, 60*60*24) : offset_secs/60/60/24.0
     end
   end
 
