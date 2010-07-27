@@ -14,7 +14,9 @@ describe "Sequel timezone support" do
     end
 
     Sequel.datetime_class = DateTime
-    [DateTime.now, DateTime.civil(2010,1,1,12,0,0,Rational(-8,24)), DateTime.civil(2010,6,1,12,0,0,Rational(-7,24))].each do |dt|
+    local_dst_offset = Rational(Time.local(2010, 6).utc_offset, 60*60*24)
+    local_std_offset = Rational(Time.local(2010, 1).utc_offset, 60*60*24)
+    [DateTime.now, DateTime.civil(2010,1,1,12,0,0,local_std_offset), DateTime.civil(2010,6,1,12,0,0,local_dst_offset)].each do |dt|
       @db[:t].insert(dt)
       dt2 = @db[:t].single_value
       dt2 = Sequel.database_to_application_timestamp(dt2.to_s) unless dt2.is_a?(DateTime)
@@ -56,4 +58,4 @@ describe "Sequel timezone support" do
     Sequel.default_timezone = :local
     test_timezone
   end
-  end
+end
