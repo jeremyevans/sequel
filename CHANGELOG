@@ -1,5 +1,11 @@
 === HEAD
 
+* Fix times and datetimes when timezone support is used and you are loading a standard time when in daylight time or vice versa (gcampbell)
+
+* Handle literalization of OCI8::CLOB objects in the native oracle adapter (jeremyevans)
+
+* Raise a Sequel::Error instead of an ArgumentError if the migration current or target version does not exist (jeremyevans)
+
 * Fix Database#schema on Oracle when the same table exists in multiple schemas (djwhitt)
 
 * Fix Database#each_server when using a connection string to connect (jeremyevans)
