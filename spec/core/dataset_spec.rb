@@ -3631,7 +3631,7 @@ describe "Sequel timezone support" do
     @dataset.literal(t).should == "#{s}#{@offset}'"
 
     t = DateTime.now.new_offset(0)
-    s = t.new_offset(Sequel::LOCAL_DATETIME_OFFSET).strftime("'%Y-%m-%d %H:%M:%S")
+    s = t.new_offset(DateTime.now.offset).strftime("'%Y-%m-%d %H:%M:%S")
     @dataset.literal(t).should == "#{s}#{@offset}'"
   end
   

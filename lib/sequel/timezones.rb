@@ -1,10 +1,4 @@
 module Sequel
-  # The offset of the current time zone from UTC, in seconds.
-  LOCAL_DATETIME_OFFSET_SECS = Time.now.utc_offset
-  
-  # The offset of the current time zone from UTC, as a fraction of a day.
-  LOCAL_DATETIME_OFFSET = respond_to?(:Rational, true) ? Rational(LOCAL_DATETIME_OFFSET_SECS, 60*60*24) : LOCAL_DATETIME_OFFSET_SECS/60/60/24.0
-
   @application_timezone = nil
   @database_timezone = nil
   @typecast_timezone = nil

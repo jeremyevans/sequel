@@ -54,7 +54,7 @@ describe "Sequel timezone support" do
     test_timezone
   end
 
-  specify "should support using local time for both database storage and for application" do
+  cspecify "should support using local time for both database storage and for application", [:do, proc{|db| db.database_type != :sqlite}] do
     Sequel.default_timezone = :local
     test_timezone
   end
