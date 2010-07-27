@@ -33,7 +33,7 @@ context "A paginated dataset" do
     @d.paginate(4, 50).next_page.should be_nil
   end
   
-  specify "should return the previous page number or nil if we're on the last" do
+  specify "should return the previous page number or nil if we're on the first" do
     @paginated.prev_page.should be_nil
     @d.paginate(4, 50).prev_page.should == 3
   end
