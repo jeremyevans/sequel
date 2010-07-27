@@ -88,6 +88,13 @@ describe Sequel::Model, "#sti_key" do
     MODEL_DB.sqls.should == ["INSERT INTO sti_tests (kind) VALUES ('StiTestSub1')"]
   end
 
+  it "should have the before_create hook handle columns with the same name as existing method names" do
+    StiTest.plugin :single_table_inheritance, :type
+    StiTest.columns :id, :type
+    StiTest.create
+    MODEL_DB.sqls.should == ["INSERT INTO sti_tests (type) VALUES ('StiTest')"]
+  end
+
   it "should add a filter to model datasets inside subclasses hook to only retreive objects with the matching key" do
     StiTest.dataset.sql.should == "SELECT * FROM sti_tests"
     StiTestSub1.dataset.sql.should == "SELECT * FROM sti_tests WHERE (sti_tests.kind IN ('StiTestSub1'))"

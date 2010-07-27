@@ -1,5 +1,7 @@
 === HEAD
 
+* Handle class discriminator column names that are existing ruby method names in the single table inheritance plugin (jeremyevans)
+
 * Fix times and datetimes when timezone support is used and you are loading a standard time when in daylight time or vice versa (gcampbell)
 
 * Handle literalization of OCI8::CLOB objects in the native oracle adapter (jeremyevans)
