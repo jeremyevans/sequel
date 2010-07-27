@@ -1,5 +1,7 @@
 === HEAD
 
+* Add a :raise_on_failure option to Model#save to override the raise_on_save_failure setting (jfirebaugh)
+
 * Handle class discriminator column names that are existing ruby method names in the single table inheritance plugin (jeremyevans)
 
 * Fix times and datetimes when timezone support is used and you are loading a standard time when in daylight time or vice versa (gcampbell)
