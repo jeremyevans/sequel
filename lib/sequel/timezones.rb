@@ -103,7 +103,7 @@ module Sequel
             v2 = convert_input_datetime_no_offset(v2, input_timezone)
           else
             # Time assumes local time if no offset is given
-            v2 = v2.getutc + LOCAL_DATETIME_OFFSET_SECS if input_timezone == :utc
+            v2 = v2.getutc + v2.utc_offset if input_timezone == :utc
           end
           v2
         end
