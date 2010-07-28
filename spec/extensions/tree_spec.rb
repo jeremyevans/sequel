@@ -103,6 +103,11 @@ describe Sequel::Model, "tree plugin" do
       "SELECT * FROM nodes WHERE (nodes.id = 5) LIMIT 1"]
   end
 
+  it "should have root? return true for a root node and false for a child node" do
+    @c.new(:parent_id => nil).root?.should be_true
+    @c.new(:parent_id => 1).root?.should be_false
+  end
+
   it "should have self_and_siblings return the children of the current node's parent" do
     y(@c, [{:id=>1, :parent_id=>3, :name=>'r'}], [{:id=>7, :parent_id=>1, :name=>'r2'}, @o.values.dup])
     @o.self_and_siblings.should == [@c.load(:id=>7, :parent_id=>1, :name=>'r2'), @o] 

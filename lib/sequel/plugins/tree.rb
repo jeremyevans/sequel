@@ -99,6 +99,11 @@ module Sequel
           ancestors.last || self
         end
 
+        # Returns true if this is a root node, false otherwise.
+        def root?
+          self[self.class.parent_column].nil?
+        end
+
         # Returns all siblings and a reference to the current node.
         #
         #   subchild1.self_and_siblings # => [subchild1, subchild2]
