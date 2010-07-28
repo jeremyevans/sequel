@@ -32,9 +32,7 @@ module Sequel
     #
     # = Usage
     #
-    # The rcte_tree plugin is unlike most plugins in that it doesn't add any class,
-    # instance, or dataset modules.  It only has a single apply method, which
-    # adds four associations to the model: parent, children, ancestors, and
+    # The rcte_tree plugin adds four associations to the model: parent, children, ancestors, and
     # descendants.  Both the parent and children are fairly standard many_to_one
     # and one_to_many associations, respectively.  However, the ancestors and
     # descendants associations are special.  Both the ancestors and descendants
