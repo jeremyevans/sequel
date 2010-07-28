@@ -8,6 +8,9 @@ module Sequel
     #
     # Optionally, a column to control order of nodes returned can be specified
     # by passing column name via :order.
+    #
+    # If you pass true for the :single_root option, the class will ensure there is
+    # only ever one root in the tree.
     # 
     # Examples:
     #
@@ -40,6 +43,8 @@ module Sequel
         chi = opts.merge(opts.fetch(:children, {}))
         children = chi.fetch(:name, :children)
         model.one_to_many children, chi
+
+        model.plugin SingleRoot if opts[:single_root]
       end
       
       module ClassMethods
@@ -118,6 +123,28 @@ module Sequel
           self_and_siblings - [self]
         end
       end
+
+      # Plugin included when :single_root option is passed
+      module SingleRoot
+        module ClassMethods
+          # Returns the single root node.
+          def root
+            roots_dataset.first
+          end
+        end
+
+        module InstanceMethods
+          # Hook that prevents a second root from being created.
+          def before_save
+            if root? && (root = model.root) && pk != root.pk
+              raise TreeMultipleRootError, "there is already a root #{model.name} defined"
+            end
+            super
+          end
+        end
+      end
+
+      class TreeMultipleRootError < Error; end
     end
   end
 end

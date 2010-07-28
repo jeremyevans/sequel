@@ -121,4 +121,31 @@ describe Sequel::Model, "tree plugin" do
     @db.sqls.should == ["SELECT * FROM nodes WHERE (nodes.id = 1) LIMIT 1",
       "SELECT * FROM nodes WHERE (nodes.parent_id = 1)"]
   end
+
+  describe ":single_root option" do
+    before do
+      @c = klass(:single_root => true)
+    end
+
+    it "should have root class method return the root" do
+      y(@c, [{:id=>1, :parent_id=>nil, :name=>'r'}])
+      @c.root.should == @c.load(:id=>1, :parent_id=>nil, :name=>'r')
+    end
+
+    it "prevents creating a second root" do
+      y(@c, [{:id=>1, :parent_id=>nil, :name=>'r'}])
+      lambda { @c.create }.should raise_error(Sequel::Plugins::Tree::TreeMultipleRootError)
+    end
+
+    it "errors when promoting an existing record to a second root" do
+      y(@c, [{:id=>1, :parent_id=>nil, :name=>'r'}])
+      n = @c.load(:id => 2, :parent_id => 1)
+      lambda { n.update(:parent_id => nil) }.should raise_error(Sequel::Plugins::Tree::TreeMultipleRootError)
+    end
+
+    it "allows updating existing root" do
+      y(@c, [{:id=>1, :parent_id=>nil, :name=>'r'}])
+      lambda { @c.root.update(:name => 'fdsa') }.should_not raise_error
+    end
+  end
 end
