@@ -1,5 +1,17 @@
 === HEAD
 
+* Allow calling Model.create_table, .create_table! and .create_table? with blocks containing the schema in the schema plugin (jfirebaugh)
+
+* Fix handling of a :conditions options in the rcte plugin (mluu)
+
+* Fix aggregate methods such as Dataset#sum and #avg on MSSQL on datasets with an order but no limit (mluu)
+
+* Fix rename_table on MSSQL for case sensitive collations and schemas (mluu)
+
+* Add a :single_root option to the tree plugin, for enforcing a single root value via a before_save hook (jfirebaugh)
+
+* Add a Model#root? method to the tree plugin, for checking if the current node is a root (jfirebaugh)
+
 * Add a :raise_on_failure option to Model#save to override the raise_on_save_failure setting (jfirebaugh)
 
 * Handle class discriminator column names that are existing ruby method names in the single table inheritance plugin (jeremyevans)
