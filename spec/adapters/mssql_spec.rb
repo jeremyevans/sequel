@@ -409,6 +409,7 @@ context "MSSQL::Database#rename_table" do
     MSSQL_DB.create_table! :'foo bar' do
       text :name
     end
+    MSSQL_DB.drop_table :baz rescue nil
     proc { MSSQL_DB.rename_table 'foo bar', 'baz' }.should_not raise_error
   end
   
