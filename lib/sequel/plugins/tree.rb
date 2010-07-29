@@ -93,7 +93,7 @@ module Sequel
         #
         #   subchild1.ancestors # => [child1, root]
         def descendants
-          nodes = self.children.dup
+          nodes = children.dup
           nodes.each{|child| nodes.concat(child.descendants)}
           nodes 
         end
@@ -106,7 +106,7 @@ module Sequel
 
         # Returns true if this is a root node, false otherwise.
         def root?
-          self[self.class.parent_column].nil?
+          !new? && self[model.parent_column].nil?
         end
 
         # Returns all siblings and a reference to the current node.
@@ -136,7 +136,7 @@ module Sequel
         module InstanceMethods
           # Hook that prevents a second root from being created.
           def before_save
-            if root? && (root = model.root) && pk != root.pk
+            if self[model.parent_column].nil? && (root = model.root) && pk != root.pk
               raise TreeMultipleRootError, "there is already a root #{model.name} defined"
             end
             super
