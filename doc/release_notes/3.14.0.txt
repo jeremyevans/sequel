@@ -1,0 +1,118 @@
+= New Features
+
+* Dataset#grep now accepts :all_patterns, :all_columns, and
+  :case_insensitive options.  Previously, grep would use a case
+  sensitive search where it would match if any pattern matched any
+  column.  These three options give you more control over how the
+  pattern matching will work:
+  
+    dataset.grep([:a, :b], %w'%test% foo')
+    # WHERE ((a LIKE '%test%') OR (a LIKE 'foo')
+    #    OR (b LIKE '%test%') OR (b LIKE 'foo'))
+
+    dataset.grep([:a, :b], %w'%foo% %bar%', :all_patterns=>true)
+    # WHERE (((a LIKE '%foo%') OR (b LIKE '%foo%'))
+    #   AND ((a LIKE '%bar%') OR (b LIKE '%bar%')))
+
+    dataset.grep([:a, :b], %w'%foo% %bar%', :all_columns=>true)
+    # WHERE (((a LIKE '%foo%') OR (a LIKE '%bar%'))
+    #   AND ((b LIKE '%foo%') OR (b LIKE '%bar%')))
+
+    dataset.grep([:a, :b], %w'%foo% %bar%',
+                 :all_patterns=>true,:all_columns=>true)
+    # WHERE ((a LIKE '%foo%') AND (b LIKE '%foo%')
+    #   AND (a LIKE '%bar%') AND (b LIKE '%bar%'))
+    
+    dataset.grep([:a, :b], %w'%test% foo', :case_insensitive=>true)
+    # WHERE ((a ILIKE '%test%') OR (a ILIKE 'foo')
+    #    OR (b ILIKE '%test%') OR (b ILIKE 'foo')) 
+
+* When using the schema plugin, you can now provide a block to the
+  create_table methods to set the schema and create the table
+  in the same call:
+  
+    class Artist < Sequel::Model
+      create_table do
+        primary_key :id
+        String :name
+      end
+    end
+
+* The tree plugin now accepts a :single_root option, which uses a
+  before_save hook to attempt to ensure that there is only a single
+  root in the tree.  It also adds a Model.root method to get the
+  single root of the tree.
+  
+* The tree plugin now adds a Model#root? instance method to check
+  if the current node is a root of the tree.
+
+* Model#save now takes a :raise_on_failure option which will
+  override the object's raise_on_save_failure setting.  This makes
+  it easier to get the desired behavior (raise or just return false)
+  in library code without using a begin/ensure block.
+  
+* The Database#adapter_scheme instance method was added, which
+  operates the same as the class method.
+  
+* Sequel now handles the literalization of OCI8::CLOB objects in
+  the Oracle adapter.
+
+= Other Improvements
+
+* When using the timezone support, Sequel will now correctly load
+  times and datetimes in standard time when the current timezone is
+  in daylight time, or vice versa.  Previously, if you tried to
+  to load a time or datetime in December when in July in a timezone
+  that used daylight time, it would be off by an hour.
+
+* The rcte_tree plugin now works correctly when a :conditions option
+  is used.
+
+* The single_table_inheritance plugin now works correctly when the
+  class discriminator column has the same name as an existing ruby
+  method (such as type).
+
+* Database#each_server now works correctly when a connection string
+  is used to connect, instead of an options hash.
+  
+* Model#destroy now respects the object's use_transactions setting,
+  instead of always using a transaction.
+  
+* Model#exists? now uses a simpler and faster query.
+
+* Sequel now handles the aggregate methods such as count and sum
+  correctly on Microsoft SQL Server when using an ordered dataset
+  with a clause such as DISTINCT or GROUP and without a limit.
+  
+* Sequel now handles rename_table correctly on Microsoft SQL Server
+  when using a case sensitive collation, or when qualifying the
+  table with a schema.
+
+* Sequel now parses the schema correctly on Oracle when the same
+  table name is used in multiple schemas.
+
+* Sequel now handles OCIInvalidHandle errors when disconnecting
+  in the Oracle adapter.
+  
+* Sequel now raises a Sequel::Error instead of an ArgumentError
+  if the current or target migration version does not exist.
+  
+* When a mismatched number of composite keys are used in
+  associations, Sequel now uses a more detailed error message.
+
+* Significant improvements were made to the Dataset and Model
+  RDoc documentation.
+
+= Backwards Compatibility
+
+* Model#valid? now must accept an optional options hash.
+
+* The Model#save_failure private method was renamed to
+  raise_hook_failure.
+  
+* The LOCAL_DATETIME_OFFSET_SECS and LOCAL_DATETIME_OFFSET constants
+  have been removed from the Sequel module.
+  
+* Sequel now uses obj.to_json instead of JSON.generate(obj).  This
+  shouldn't affect backwards compatibility, but did fix a bug in
+  certain cases.
