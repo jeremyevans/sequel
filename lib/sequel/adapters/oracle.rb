@@ -85,6 +85,8 @@ module Sequel
 
       def disconnect_connection(c)
         c.logoff
+      rescue OCIInvalidHandle
+        nil
       end
       
       def remove_transaction(conn)

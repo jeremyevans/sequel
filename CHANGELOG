@@ -1,5 +1,7 @@
 === HEAD
 
+* Handle OCIInvalidHandle errors when disconnecting in the Oracle adapter (jeremyevans)
+
 * Allow calling Model.create_table, .create_table! and .create_table? with blocks containing the schema in the schema plugin (jfirebaugh)
 
 * Fix handling of a :conditions options in the rcte plugin (mluu)
