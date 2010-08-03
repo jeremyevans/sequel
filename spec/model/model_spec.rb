@@ -506,7 +506,7 @@ context "Model.db_schema" do
     @c.dataset.instance_variable_get(:@columns).should == [:x, :y]
   end
 
-  specify "should restrict the schema and columns for datasets with a :select option" do
+  specify "should not restrict the schema for datasets with a :select option" do
     ds = @dataset.select(:x, :y___z)
     d = ds.db
     def d.schema(table, opts = {})
@@ -514,7 +514,7 @@ context "Model.db_schema" do
     end
     def @c.columns; [:x, :z]; end
     @c.dataset = ds
-    @c.db_schema.should == {:x=>{:type=>:integer}, :z=>{}}
+    @c.db_schema.should == {:x=>{:type=>:integer}, :z=>{}, :y=>{:type=>:string}}
   end
 
   specify "should not use schema if the dataset uses multiple tables or custom sql" do
