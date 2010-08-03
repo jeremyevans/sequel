@@ -1,3 +1,7 @@
+=== HEAD
+
+* Make typecasting work correctly for attributes loaded lazily when using the lazy attributes plugin (jeremyevans)
+
 === 3.14.0 (2010-08-02)
 
 * Handle OCIInvalidHandle errors when disconnecting in the Oracle adapter (jeremyevans)

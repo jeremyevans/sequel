@@ -63,11 +63,7 @@ class MockDatabase < Sequel::Database
   end
 
   def schema(table_name, opts)
-    if table_name
-      [[:id, {:primary_key=>true}]]
-    else
-      {table_name=>[[:id, {:primary_key=>true}]]}
-    end
+    [[:id, {:primary_key=>true}]]
   end
 
   def transaction(opts={}); yield; end

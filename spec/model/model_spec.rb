@@ -381,7 +381,7 @@ describe Sequel::Model, "attribute accessors" do
     @c = Class.new(Sequel::Model) do
       def self.db_schema
          set_columns(Array(@columns))
-        @db_schema = {:x=>{}, :y=>{}}
+        @db_schema = {:x=>{:type=>:integer}, :y=>{:type=>:integer}}
       end
       def self.set_dataset(ds, opts={}) 
         @columns = ds.columns
@@ -416,6 +416,14 @@ describe Sequel::Model, "attribute accessors" do
     o.x.should == 34
     proc{o.send(:x=)}.should raise_error
     proc{o.send(:x=, 3, 4)}.should raise_error
+  end
+
+  it "should have a working typecasting setter even if the column is not selected" do
+    @c.set_dataset(@dataset.select(:y))
+    o = @c.new
+
+    o.x = '34'
+    o.x.should == 34
   end
 end
 

@@ -526,10 +526,10 @@ module Sequel
         if single_table && (schema_array = (db.schema(table_name, :reload=>reload) rescue nil))
           schema_array.each{|k,v| schema_hash[k] = v}
           if ds_opts.include?(:select)
-            # Dataset only selects certain columns, delete the other
-            # columns from the schema
+            # We don't remove the columns from the schema_hash,
+            # as it's possible they will be used for typecasting
+            # even if they are not selected.
             cols = get_columns.call
-            schema_hash.delete_if{|k,v| !cols.include?(k)}
             cols.each{|c| schema_hash[c] ||= {}}
           else
             # Dataset is for a single table with all columns,

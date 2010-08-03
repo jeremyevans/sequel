@@ -2,7 +2,9 @@ require File.join(File.dirname(File.expand_path(__FILE__)), "spec_helper")
 
 describe "Sequel::Plugins::LazyAttributes" do
   before do
-    class ::LazyAttributesModel < Sequel::Model(:la)
+    @db = MockDatabase.new
+    @db.meta_def(:schema){[[:id, {:type=>:integer}], [:name,{:type=>:string}]]}
+    class ::LazyAttributesModel < Sequel::Model(@db[:la])
       plugin :lazy_attributes
       set_columns([:id, :name])
       meta_def(:columns){[:id, :name]}
@@ -36,7 +38,7 @@ describe "Sequel::Plugins::LazyAttributes" do
     end
     @c = ::LazyAttributesModel
     @ds = LazyAttributesModel.dataset
-    MODEL_DB.reset
+    @db.reset
   end
   after do
     Object.send(:remove_const, :LazyAttributesModel)
@@ -63,13 +65,19 @@ describe "Sequel::Plugins::LazyAttributes" do
     @ds.sql.should == 'SELECT id FROM la'
   end
 
+  it "should still typecast correctly in lazy loaded column setters" do
+    m = @c.new
+    m.name = 1
+    m.name.should == '1'
+  end
+
   it "should lazily load the attribute for a single model object if there is an active identity map" do
     @c.with_identity_map do
       m = @c.first
       m.values.should == {:id=>1}
       m.name.should == '1'
       m.values.should == {:id=>1, :name=>'1'}
-      MODEL_DB.sqls.should == ['SELECT id FROM la LIMIT 1', 'SELECT name FROM la WHERE (id = 1) LIMIT 1']
+      @db.sqls.should == ['SELECT id FROM la LIMIT 1', 'SELECT name FROM la WHERE (id = 1) LIMIT 1']
     end
   end
 
@@ -78,7 +86,7 @@ describe "Sequel::Plugins::LazyAttributes" do
     m.values.should == {:id=>1}
     m.name.should == '1'
     m.values.should == {:id=>1, :name=>'1'}
-    MODEL_DB.sqls.should == ['SELECT id FROM la LIMIT 1', 'SELECT name FROM la WHERE (id = 1) LIMIT 1']
+    @db.sqls.should == ['SELECT id FROM la LIMIT 1', 'SELECT name FROM la WHERE (id = 1) LIMIT 1']
   end
 
   it "should not lazily load the attribute for a single model object if the value already exists" do
@@ -88,7 +96,7 @@ describe "Sequel::Plugins::LazyAttributes" do
       m[:name] = '1'
       m.name.should == '1'
       m.values.should == {:id=>1, :name=>'1'}
-      MODEL_DB.sqls.should == ['SELECT id FROM la LIMIT 1']
+      @db.sqls.should == ['SELECT id FROM la LIMIT 1']
     end
   end
 
@@ -97,7 +105,7 @@ describe "Sequel::Plugins::LazyAttributes" do
       m = @c.new
       m.values.should == {}
       m.name.should == nil
-      MODEL_DB.sqls.should == []
+      @db.sqls.should == []
     end
   end
 
@@ -107,7 +115,7 @@ describe "Sequel::Plugins::LazyAttributes" do
       ms.map{|m| m.values}.should == [{:id=>1}, {:id=>2}]
       ms.map{|m| m.name}.should == %w'1 2'
       ms.map{|m| m.values}.should == [{:id=>1, :name=>'1'}, {:id=>2, :name=>'2'}]
-      MODEL_DB.sqls.should == ['SELECT id FROM la', 'SELECT id, name FROM la WHERE (id IN (1, 2))']
+      @db.sqls.should == ['SELECT id FROM la', 'SELECT id, name FROM la WHERE (id IN (1, 2))']
     end
   end
 
@@ -122,7 +130,7 @@ describe "Sequel::Plugins::LazyAttributes" do
       ms.map{|m| m.values}.should == [{:id=>1}, {:id=>2}]
       ms.map{|m| m.name}.should == %w'1-blah 2-blah'
       ms.map{|m| m.values}.should == [{:id=>1, :name=>'1'}, {:id=>2, :name=>'2'}]
-      MODEL_DB.sqls.should == ['SELECT id FROM la', 'SELECT id, name FROM la WHERE (id IN (1, 2))']
+      @db.sqls.should == ['SELECT id FROM la', 'SELECT id, name FROM la WHERE (id IN (1, 2))']
     end
   end
 
@@ -136,9 +144,9 @@ describe "Sequel::Plugins::LazyAttributes" do
       ms.map{|m| m.values}.should == [{:id=>1, :name=>"--- 3\n"}, {:id=>2, :name=>"--- 6\n"}]
       ms.map{|m| m.deserialized_values}.should == [{:name=>3}, {:name=>6}]
       ms.map{|m| m.name}.should == [3,6]
-      MODEL_DB.sqls.should == ['SELECT id FROM la', 'SELECT id, name FROM la WHERE (id IN (1, 2))']
+      @db.sqls.should == ['SELECT id FROM la', 'SELECT id, name FROM la WHERE (id IN (1, 2))']
     end
-    MODEL_DB.reset
+    @db.reset
     @c.with_identity_map do
       m = @ds.first
       m.values.should == {:id=>1}
@@ -146,7 +154,7 @@ describe "Sequel::Plugins::LazyAttributes" do
       m.values.should == {:id=>1, :name=>"--- 3\n"}
       m.deserialized_values.should == {:name=>3}
       m.name.should == 3
-      MODEL_DB.sqls.should == ["SELECT id FROM la LIMIT 1", "SELECT name FROM la WHERE (id = 1) LIMIT 1"]
+      @db.sqls.should == ["SELECT id FROM la LIMIT 1", "SELECT name FROM la WHERE (id = 1) LIMIT 1"]
     end
   end
 end

@@ -33,6 +33,13 @@ describe "Database schema parser" do
     INTEGRATION_DB.schema(:items, :reload=>true)
   end
 
+  specify "Model schema should include columns in the table, even if they aren't selected" do
+    INTEGRATION_DB.create_table!(:items){String :a; Integer :number}
+    m = Sequel::Model(INTEGRATION_DB[:items].select(:a))
+    m.columns.should == [:a]
+    m.db_schema[:number][:type].should == :integer
+  end
+
   specify "should raise an error when the table doesn't exist" do
     proc{INTEGRATION_DB.schema(:no_table)}.should raise_error(Sequel::Error)
   end

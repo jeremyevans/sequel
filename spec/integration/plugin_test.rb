@@ -275,6 +275,12 @@ describe "Lazy Attributes plugin" do
     Item.first.num.should == 1
   end
   
+  specify "should typecast lazy attribute in setter" do
+    i = Item.new
+    i.num = '1'
+    i.num.should == 1
+  end
+  
   specify "should load lazy attribute for all items returned when accessing any item if using identity map " do
     Item.create(:name=>'K', :num=>2)
     Item.with_identity_map do
