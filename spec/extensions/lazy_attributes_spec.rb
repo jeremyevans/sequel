@@ -3,7 +3,7 @@ require File.join(File.dirname(File.expand_path(__FILE__)), "spec_helper")
 describe "Sequel::Plugins::LazyAttributes" do
   before do
     @db = MockDatabase.new
-    @db.meta_def(:schema){[[:id, {:type=>:integer}], [:name,{:type=>:string}]]}
+    @db.meta_def(:schema){|*a| [[:id, {:type=>:integer}], [:name,{:type=>:string}]]}
     class ::LazyAttributesModel < Sequel::Model(@db[:la])
       plugin :lazy_attributes
       set_columns([:id, :name])
