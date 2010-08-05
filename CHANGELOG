@@ -1,5 +1,7 @@
 === HEAD
 
+* Handle Mysql:Error exceptions when disconnecting in the MySQL adapter (jeremyevans)
+
 * Make typecasting work correctly for attributes loaded lazily when using the lazy attributes plugin (jeremyevans)
 
 === 3.14.0 (2010-08-02)

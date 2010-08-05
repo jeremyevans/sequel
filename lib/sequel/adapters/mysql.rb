@@ -227,6 +227,8 @@ module Sequel
       # Closes given database connection.
       def disconnect_connection(c)
         c.close
+      rescue Mysql::Error
+        nil
       end
       
       # Executes a prepared statement on an available connection.  If the
