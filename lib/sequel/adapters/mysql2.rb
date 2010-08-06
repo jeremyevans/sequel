@@ -5,15 +5,6 @@ Sequel.require %w'shared/mysql', 'adapters'
 module Sequel
   # Module for holding all Mysql2-related classes and modules for Sequel.
   module Mysql2
-    @convert_tinyint_to_bool = true
-
-    class << self
-      # Sequel converts the column type tinyint(1) to a boolean by default when
-      # using the native Mysql2 adapter.  You can turn off the conversion by setting
-      # this to false.
-      attr_accessor :convert_tinyint_to_bool
-    end
-
     # Database class for MySQL databases used with Sequel.
     class Database < Sequel::Database
       include Sequel::MySQL::DatabaseMethods
@@ -143,7 +134,7 @@ module Sequel
 
       # Convert tinyint(1) type to boolean if convert_tinyint_to_bool is true
       def schema_column_type(db_type)
-        Sequel::Mysql2.convert_tinyint_to_bool && db_type == 'tinyint(1)' ? :boolean : super
+        Sequel::MySQL.convert_tinyint_to_bool && db_type == 'tinyint(1)' ? :boolean : super
       end
     end
 
@@ -160,7 +151,7 @@ module Sequel
       def fetch_rows(sql, &block)
         execute(sql) do |r|
           @columns = r.fields
-          r.each(:cast_booleans => Sequel::Mysql2.convert_tinyint_to_bool, &block)
+          r.each(:cast_booleans => Sequel::MySQL.convert_tinyint_to_bool, &block)
         end
         self
       end

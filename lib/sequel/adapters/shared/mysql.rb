@@ -3,7 +3,15 @@ module Sequel
   Dataset::NON_SQL_OPTIONS << :on_duplicate_key_update
 
   module MySQL
+    @convert_tinyint_to_bool = true
+
     class << self
+      # Sequel converts the column type tinyint(1) to a boolean by default when
+      # using the native MySQL or Mysql2 adapter.  You can turn off the conversion by setting
+      # this to false. This setting is ignored when connecting to MySQL via the do or jdbc
+      # adapters, both of which automatically do the conversion.
+      attr_accessor :convert_tinyint_to_bool
+
       # Set the default charset used for CREATE TABLE.  You can pass the
       # :charset option to create_table to override this setting.
       attr_accessor :default_charset

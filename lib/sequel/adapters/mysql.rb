@@ -29,7 +29,6 @@ module Sequel
     end
     
     @convert_invalid_date_time = false
-    @convert_tinyint_to_bool = true
 
     class << self
       # By default, Sequel raises an exception if in invalid date or time is used.
@@ -37,11 +36,6 @@ module Sequel
       # like 0000-00-00 and times like 838:00:00 as nil values.  If set to :string,
       # it returns the strings as is.  
       attr_accessor :convert_invalid_date_time
-
-      # Sequel converts the column type tinyint(1) to a boolean by default when
-      # using the native MySQL adapter.  You can turn off the conversion by setting
-      # this to false.
-      attr_accessor :convert_tinyint_to_bool
     end
 
     # If convert_invalid_date_time is nil, :nil, or :string and
