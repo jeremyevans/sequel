@@ -113,7 +113,7 @@ begin
   spec_with_cov.call("spec_plugin", Dir["spec/extensions/*_spec.rb"], "Run extension/plugin specs")
   spec_with_cov.call("spec_integration", Dir["spec/integration/*_test.rb"], "Run integration tests")
   
-  %w'postgres sqlite mysql mysql2 informix oracle firebird mssql'.each do |adapter|
+  %w'postgres sqlite mysql informix oracle firebird mssql'.each do |adapter|
     spec_with_cov.call("spec_#{adapter}", ["spec/adapters/#{adapter}_spec.rb"] + Dir["spec/integration/*_test.rb"], "Run #{adapter} specs")
   end
 rescue LoadError

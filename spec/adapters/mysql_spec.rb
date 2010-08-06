@@ -419,9 +419,10 @@ context "A MySQL database with table options" do
   before do
     @options = {:engine=>'MyISAM', :charset=>'latin1', :collate => 'latin1_swedish_ci'}
     
-    Sequel::MySQL.default_engine = 'InnoDB'
-    Sequel::MySQL.default_charset = 'utf8'
-    Sequel::MySQL.default_collate = 'utf8_general_ci'    
+    klass = MYSQL_DB.adapter_scheme == :mysql2 ? Sequel::Mysql2 : Sequel::MySQL
+    klass.default_engine = 'InnoDB'
+    klass.default_charset = 'utf8'
+    klass.default_collate = 'utf8_general_ci'
     
     @db = MYSQL_DB
     @db.drop_table(:items) rescue nil
@@ -430,9 +431,11 @@ context "A MySQL database with table options" do
   end
   after do
     @db.drop_table(:items) rescue nil
-    Sequel::MySQL.default_engine = nil
-    Sequel::MySQL.default_charset = nil
-    Sequel::MySQL.default_collate = nil
+
+    klass = MYSQL_DB.adapter_scheme == :mysql2 ? Sequel::Mysql2 : Sequel::MySQL
+    klass.default_engine = nil
+    klass.default_charset = nil
+    klass.default_collate = nil
   end
   
   specify "should allow to pass custom options (engine, charset, collate) for table creation" do
@@ -895,7 +898,7 @@ context "MySQL::Dataset#complex_expression_sql" do
   end
 end
 
-unless MYSQL_DB.adapter_scheme == :do
+unless MYSQL_DB.adapter_scheme == :do or MYSQL_DB.adapter_scheme == :mysql2
   context "MySQL Stored Procedures" do
     before do
       MYSQL_DB.create_table(:items){Integer :id; Integer :value}

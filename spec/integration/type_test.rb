@@ -82,7 +82,11 @@ describe "Supported types" do
     ds = create_items_table_with_column(:name, File)
     ds.insert(:name => ("a\0"*300).to_sequel_blob)
     ds.all.should == [{:name=>("a\0"*300).to_sequel_blob}]
-    ds.first[:name].should be_a_kind_of(::Sequel::SQL::Blob)
+    if MYSQL_DB.adapter_scheme == :mysql2
+      ds.first[:name].should be_a_kind_of(::String)
+    else
+      ds.first[:name].should be_a_kind_of(::Sequel::SQL::Blob)
+    end
   end
   
   cspecify "should support generic boolean type", [:do, :sqlite], [:jdbc, :sqlite], [:odbc, :mssql] do
