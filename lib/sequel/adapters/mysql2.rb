@@ -79,19 +79,6 @@ module Sequel
 
       private
 
-      # Use MySQL specific syntax for engine type and character encoding
-      def create_table_sql(name, generator, options = {})
-        engine = options.fetch(:engine, Sequel::MySQL.default_engine)
-        charset = options.fetch(:charset, Sequel::MySQL.default_charset)
-        collate = options.fetch(:collate, Sequel::MySQL.default_collate)
-        generator.columns.each do |c|
-          if t = c.delete(:table)
-            generator.foreign_key([c[:name]], t, c.merge(:name=>nil, :type=>:foreign_key))
-          end
-        end
-        super(name, generator, options.merge(:engine => engine, :charset => charset, :collate => collate))
-      end
-
       # Execute the given SQL on the given connection.  If the :type
       # option is :select, yield the result of the query, otherwise
       # yield the connection if a block is given.
