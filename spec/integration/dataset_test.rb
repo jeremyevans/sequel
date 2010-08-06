@@ -44,7 +44,7 @@ describe "Simple Dataset operations" do
     @ds.all.should == [{:id=>1, :number=>11}]
   end
   
-  cspecify "should have update return the number of matched rows", [:mysql, :mysql], [:do, :mysql], [:ado] do
+  cspecify "should have update return the number of matched rows", [:mysql, :mysql], [:do, :mysql], [:mysql2], [:ado] do
     @ds.update(:number=>:number).should == 1
     @ds.filter(:id=>1).update(:number=>:number).should == 1
     @ds.filter(:id=>2).update(:number=>:number).should == 0
