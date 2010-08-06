@@ -5,20 +5,6 @@ Sequel.require %w'shared/mysql', 'adapters'
 module Sequel
   # Module for holding all Mysql2-related classes and modules for Sequel.
   module Mysql2
-    class << self
-      # Set the default charset used for CREATE TABLE.  You can pass the
-      # :charset option to create_table to override this setting.
-      attr_accessor :default_charset
-
-      # Set the default collation used for CREATE TABLE.  You can pass the
-      # :collate option to create_table to override this setting.
-      attr_accessor :default_collate
-
-      # Set the default engine used for CREATE TABLE.  You can pass the
-      # :engine option to create_table to override this setting.
-      attr_accessor :default_engine
-    end
-
     @convert_tinyint_to_bool = true
 
     class << self
@@ -104,9 +90,9 @@ module Sequel
 
       # Use MySQL specific syntax for engine type and character encoding
       def create_table_sql(name, generator, options = {})
-        engine = options.fetch(:engine, Sequel::Mysql2.default_engine)
-        charset = options.fetch(:charset, Sequel::Mysql2.default_charset)
-        collate = options.fetch(:collate, Sequel::Mysql2.default_collate)
+        engine = options.fetch(:engine, Sequel::MySQL.default_engine)
+        charset = options.fetch(:charset, Sequel::MySQL.default_charset)
+        collate = options.fetch(:collate, Sequel::MySQL.default_collate)
         generator.columns.each do |c|
           if t = c.delete(:table)
             generator.foreign_key([c[:name]], t, c.merge(:name=>nil, :type=>:foreign_key))
