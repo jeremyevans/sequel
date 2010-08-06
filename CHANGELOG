@@ -1,5 +1,7 @@
 === HEAD
 
+* Exclude temporary tables when parsing the schema on PostgreSQL (jeremyevans) (#306)
+
 * Add Mysql2 adapter (brianmario)
 
 * Handle Mysql::Error exceptions when disconnecting in the MySQL adapter (jeremyevans)

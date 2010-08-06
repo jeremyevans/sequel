@@ -157,7 +157,7 @@ module Sequel
     
     # Methods shared by Database instances that connect to PostgreSQL.
     module DatabaseMethods
-      EXCLUDE_SCHEMAS = %w[pg_catalog pg_toast pg_temp_1 pg_toast_temp_1 information_schema]
+      EXCLUDE_SCHEMAS = /pg_*|information_schema/i
       PREPARED_ARG_PLACEHOLDER = LiteralString.new('$').freeze
       RE_CURRVAL_ERROR = /currval of sequence "(.*)" is not yet defined in this session|relation "(.*)" does not exist/.freeze
       SYSTEM_TABLE_REGEXP = /^pg|sql/.freeze
