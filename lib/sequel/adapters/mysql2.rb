@@ -96,11 +96,8 @@ module Sequel
       # option is :select, yield the result of the query, otherwise
       # yield the connection if a block is given.
       def _execute(conn, sql, opts)
-        query_opts = {:symbolize_keys => true}
-        query_opts.merge!(:database_timezone => Sequel.database_timezone) if Sequel.respond_to?(:database_timezone)
-        query_opts.merge!(:application_timezone => Sequel.application_timezone) if Sequel.respond_to?(:application_timezone)
         begin
-          r = log_yield(sql){conn.query(sql, query_opts)}
+          r = log_yield(sql){conn.query(sql, :symbolize_keys => true, :database_timezone => Sequel.database_timezone, :application_timezone => Sequel.application_timezone)}
           if opts[:type] == :select
             yield r if r
           elsif block_given?
@@ -154,12 +151,6 @@ module Sequel
           r.each(:cast_booleans => Sequel::MySQL.convert_tinyint_to_bool, &block)
         end
         self
-      end
-
-      # Don't allow graphing a dataset that splits multiple statements
-      def graph(*)
-        raise(Error, "Can't graph a dataset that splits multiple result sets") if opts[:split_multiple_result_sets]
-        super
       end
 
       # Insert a new value into this dataset
