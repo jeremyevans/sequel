@@ -475,15 +475,10 @@ describe Sequel::SQL::Constants do
     Date.today.should == @c2[@ds.get(:d)]
   end
 
-  cspecify "should have working CURRENT_TIME", [:do, :mysql], [:jdbc, :sqlite] do
+  cspecify "should have working CURRENT_TIME", [:do, :mysql], [:jdbc, :sqlite], [:mysql2] do
     @db.create_table!(:constants){Time :t, :only_time=>true}
     @ds.insert(:t=>Sequel::CURRENT_TIME)
-    if MYSQL_DB.adapter_scheme == :mysql2
-      t = Time.now
-      (Time.parse("2000-01-01 #{t.hour}:#{t.min}:#{t.sec}") - @c[@ds.get(:t)]).should be_close(0, 1)
-    else
-      (Time.now - @c[@ds.get(:t)]).should be_close(0, 1)
-    end
+    (Time.now - @c[@ds.get(:t)]).should be_close(0, 1)
   end
 
   cspecify "should have working CURRENT_TIMESTAMP", [:jdbc, :sqlite] do
@@ -930,13 +925,11 @@ describe "Dataset identifier methods" do
     @db.drop_table(:a)
   end
   
-  unless MYSQL_DB.adapter_scheme == :mysql2
-    it "#identifier_output_method should change how identifiers are output" do
-      @ds.identifier_output_method = :upcase
-      @ds.first.should == {:AB=>1}
-      @ds.identifier_output_method = :uprev
-      @ds.first.should == {:BA=>1}
-    end
+  cspecify "#identifier_output_method should change how identifiers are output", [:mysql2] do
+    @ds.identifier_output_method = :upcase
+    @ds.first.should == {:AB=>1}
+    @ds.identifier_output_method = :uprev
+    @ds.first.should == {:BA=>1}
   end
   
   it "should work when not quoting identifiers" do

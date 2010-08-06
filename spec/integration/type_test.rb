@@ -78,15 +78,11 @@ describe "Supported types" do
     ds.first[:tim].strftime('%Y%m%d%H%M%S').should == t.strftime('%Y%m%d%H%M%S')
   end
   
-  cspecify "should support generic file type", [:do], [:odbc, :mssql] do
+  cspecify "should support generic file type", [:do], [:odbc, :mssql], [:mysql2] do
     ds = create_items_table_with_column(:name, File)
     ds.insert(:name => ("a\0"*300).to_sequel_blob)
     ds.all.should == [{:name=>("a\0"*300).to_sequel_blob}]
-    if MYSQL_DB.adapter_scheme == :mysql2
-      ds.first[:name].should be_a_kind_of(::String)
-    else
-      ds.first[:name].should be_a_kind_of(::Sequel::SQL::Blob)
-    end
+    ds.first[:name].should be_a_kind_of(::Sequel::SQL::Blob)
   end
   
   cspecify "should support generic boolean type", [:do, :sqlite], [:jdbc, :sqlite], [:odbc, :mssql] do
