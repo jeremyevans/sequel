@@ -30,7 +30,7 @@ module Sequel
             if :driver == param and not (value =~ GUARDED_DRV_NAME)
               value = DRV_NAME_GUARDS % value
             end
-            drv.attrs[param.to_s.capitalize] = value
+            drv.attrs[param.to_s.upcase] = value.to_s
           end
           db = ::ODBC::Database.new
           conn = db.drvconnect(drv)
