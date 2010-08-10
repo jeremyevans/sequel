@@ -241,7 +241,7 @@ module Sequel
         m = output_identifier_meth
         im = input_identifier_meth
         metadata_dataset.with_sql("DESCRIBE ?", SQL::Identifier.new(im.call(table_name))).map do |row|
-          row.delete(:Extra)
+          row[:auto_increment] = true if row.delete(:Extra).to_s =~ /auto_increment/io
           row[:allow_null] = row.delete(:Null) == 'YES'
           row[:default] = row.delete(:Default)
           row[:primary_key] = row.delete(:Key) == 'PRI'

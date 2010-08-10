@@ -73,6 +73,15 @@ context "MySQL", '#create_table' do
     end
     @db.schema(:dolls).map{|k, v| v[:db_type]}.should == %w"blob tinyblob mediumblob longblob blob"
   end
+
+  specify "should include an :auto_increment schema attribute if auto incrementing" do
+    @db.create_table(:dolls) do
+      Integer :n2
+      String :n3
+      Integer :n4, :auto_increment=>true, :unique=>true
+    end
+    @db.schema(:dolls).map{|k, v| v[:auto_increment]}.should == [nil, nil, true]
+  end
 end
 
 context "A MySQL database" do

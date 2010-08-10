@@ -1,5 +1,7 @@
 === HEAD
 
+* Add :auto_increment field to column schema values on MySQL if the column is auto incrementing (dbd)
+
 * Handle DSN-less ODBC connections better (Ricardo Ramalho)
 
 * Exclude temporary tables when parsing the schema on PostgreSQL (jeremyevans) (#306)
