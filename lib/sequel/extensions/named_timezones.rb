@@ -50,8 +50,7 @@ module Sequel
       (v - local_offset).new_offset(local_offset)
     end
     
-    # Convert the timezone setter argument.  Returns argument given by default,
-    # exists for easier overriding in extensions.
+    # Returns TZInfo::Timezone instance if given a String.
     def convert_timezone_setter_arg(tz)
       tz.is_a?(String) ? TZInfo::Timezone.get(tz) : super
     end
