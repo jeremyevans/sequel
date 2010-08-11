@@ -14,8 +14,8 @@ describe "Sequel timezone support" do
     end
 
     Sequel.datetime_class = DateTime
-    local_dst_offset = Rational(Time.local(2010, 6).utc_offset, 60*60*24)
-    local_std_offset = Rational(Time.local(2010, 1).utc_offset, 60*60*24)
+    local_dst_offset = Time.local(2010, 6).utc_offset/86400.0
+    local_std_offset = Time.local(2010, 1).utc_offset/86400.0
     [DateTime.now, DateTime.civil(2010,1,1,12,0,0,local_std_offset), DateTime.civil(2010,6,1,12,0,0,local_dst_offset)].each do |dt|
       @db[:t].insert(dt)
       dt2 = @db[:t].single_value
