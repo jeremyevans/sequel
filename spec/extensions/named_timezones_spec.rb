@@ -35,12 +35,14 @@ describe "Sequel named_timezones extension" do
     Sequel.database_timezone.should == @tz_out
   end
     
-  it "should convert datetimes going into the database to named database_timezone" do
-    ds = @db[:a]
-    def ds.supports_timestamp_timezones?; true; end
-    def ds.supports_timestamp_usecs?; false; end
-    ds.insert([@dt, DateTime.civil(2009,6,1,3,20,30,-7/24.0), DateTime.civil(2009,6,1,6,20,30,-1/6.0)])
-    @db.sqls.should == ["INSERT INTO a VALUES ('2009-06-01 06:20:30-0400', '2009-06-01 06:20:30-0400', '2009-06-01 06:20:30-0400')"]
+  unless RUBY_VERSION == '1.8.6' && RUBY_PLATFORM =~ /win/
+    it "should convert datetimes going into the database to named database_timezone" do
+      ds = @db[:a]
+      def ds.supports_timestamp_timezones?; true; end
+      def ds.supports_timestamp_usecs?; false; end
+      ds.insert([@dt, DateTime.civil(2009,6,1,3,20,30,-7/24.0), DateTime.civil(2009,6,1,6,20,30,-1/6.0)])
+      @db.sqls.should == ["INSERT INTO a VALUES ('2009-06-01 06:20:30-0400', '2009-06-01 06:20:30-0400', '2009-06-01 06:20:30-0400')"]
+    end
   end
   
   it "should convert datetimes coming out of the database from database_timezone to application_timezone" do
