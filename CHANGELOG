@@ -1,5 +1,7 @@
 === HEAD
 
+* Make class_table_inheritance plugin work with non integer primary keys on SQLite (jeremyevans, russm)
+
 * Add :auto_increment field to column schema values on MySQL if the column is auto incrementing (dbd)
 
 * Handle DSN-less ODBC connections better (Ricardo Ramalho)

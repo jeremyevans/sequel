@@ -180,8 +180,8 @@ module Sequel
       module InstanceMethods
         # Set the cti_key column to the name of the model.
         def before_create
-          return false if super == false
           send("#{model.cti_key}=", model.name.to_s) if model.cti_key
+          super
         end
         
         # Delete the row from all backing tables, starting from the
@@ -200,11 +200,11 @@ module Sequel
         # in each table.  
         def _insert
           return super if model == model.cti_base_model
-          iid = nil
+          iid = @values[primary_key] 
           m = model
           m.cti_tables.each do |table|
             h = {}
-            h[m.primary_key] = iid if iid
+            h[m.primary_key] ||= iid if iid
             m.cti_columns[table].each{|c| h[c] = @values[c] if @values.include?(c)}
             nid = m.db.from(table).insert(h)
             iid ||= nid
