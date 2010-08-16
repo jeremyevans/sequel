@@ -36,8 +36,10 @@ module Sequel
         
         # An array of primary key values, or nil if the object is not persisted.
         def to_key
-          if persisted?
-            primary_key.is_a?(Symbol) ? [pk] : pk
+          if primary_key.is_a?(Symbol)
+            [pk] if pk
+          else
+            pk if pk.all?
           end
         end
 
@@ -50,7 +52,7 @@ module Sequel
         # An string representing the object's primary key.  For composite
         # primary keys, joins them with to_param_joiner.
         def to_param
-          if k = to_key
+          if persisted? and k = to_key
             k.join(to_param_joiner)
           end
         end

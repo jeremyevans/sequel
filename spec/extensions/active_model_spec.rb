@@ -45,10 +45,17 @@ describe "ActiveModel plugin" do
         assert_equal nil, @m.to_key
         @o.id = 1
         assert_equal [1], @o.to_key
+        @o.id = nil
+        assert_equal nil, @o.to_key
+
         @c.set_primary_key [:id2, :id]
+        assert_equal nil, @o.to_key
+        @o.id = 1
         @o.id2 = 2
         assert_equal [2, 1], @o.to_key
         @o.destroy
+        assert_equal [2, 1], @o.to_key
+        @o.id = nil
         assert_equal nil, @o.to_key
       end
       
@@ -84,6 +91,9 @@ describe "ActiveModel plugin" do
     else
       res = ::Test::Unit::TestResult.new
       tc.suite.run(res){}
+      if res.failure_count > 0
+        puts res.instance_variable_get(:@failures)
+      end
       res.failure_count.should == 0
     end
   end
