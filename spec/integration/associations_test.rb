@@ -86,6 +86,24 @@ shared_examples_for "regular and composite key associations" do
     a.first.albums.first.artist.should == @artist
   end
   
+  specify "should handle aliased tables when eager_graphing" do
+    Artist.set_dataset(:artists___ar)
+    Album.set_dataset(:albums___a)
+    Tag.set_dataset(:tags___t)
+    @album.update(:artist => @artist)
+    @album.add_tag(@tag)
+    
+    a = Artist.eager_graph(:albums=>:tags).all
+    a.should == [@artist]
+    a.first.albums.should == [@album]
+    a.first.albums.first.tags.should == [@tag]
+    
+    a = Tag.eager_graph(:albums=>:artist).all
+    a.should == [@tag]
+    a.first.albums.should == [@album]
+    a.first.albums.first.artist.should == @artist
+  end
+  
   specify "should work with a many_through_many association" do
     @album.update(:artist => @artist)
     @album.add_tag(@tag)

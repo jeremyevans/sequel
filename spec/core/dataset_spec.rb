@@ -2073,6 +2073,14 @@ context "Dataset#join_table" do
     @d.join(:categories, :a=>:d){|j,lj,js| :b.qualify(j) > :c.qualify(lj)}.sql.should ==
       'SELECT * FROM "items" INNER JOIN "categories" ON (("categories"."a" = "items"."d") AND ("categories"."b" > "items"."c"))'
   end
+
+  specify "should prefer explicit aliases over implicit" do
+    @d.from(:items___i).join(:categories___c, {:category_id => :id}, {:table_alias=>:c2, :implicit_qualifier=>:i2}).sql.should ==
+      'SELECT * FROM "items" AS "i" INNER JOIN "categories" AS "c2" ON ("c2"."category_id" = "i2"."id")'
+    @d.from(:items.as(:i)).join(:categories.as(:c), {:category_id => :id}, {:table_alias=>:c2, :implicit_qualifier=>:i2}).sql.should ==
+      'SELECT * FROM "items" AS "i" INNER JOIN "categories" AS "c2" ON ("c2"."category_id" = "i2"."id")'
+  end
+  
   
   specify "should not allow insert, update, delete, or truncate" do
     proc{@d.join(:categories, :a=>:d).insert_sql}.should raise_error(Sequel::InvalidOperation)

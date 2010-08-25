@@ -112,6 +112,21 @@ module Sequel
       "#<#{self.class}: #{sql.inspect}>"
     end
     
+    # Splits a possible implicit alias in C, handling both SQL::AliasedExpressions
+    # and Symbols.  Returns an array of two elements, with the first being the
+    # main expression, and the second being the alias.
+    def split_alias(c)
+      case c
+      when Symbol
+        c_table, column, aliaz = split_symbol(c)
+        [c_table ? SQL::QualifiedIdentifier.new(c_table, column.to_sym) : column.to_sym, aliaz]
+      when SQL::AliasedExpression
+        [c.expression, c.aliaz]
+      else
+        [c, nil]
+      end
+    end
+
     # Creates a unique table alias that hasn't already been used in the dataset.
     # table_alias can be any type of object accepted by alias_symbol.
     # The symbol returned will be the implicit alias in the argument,

@@ -413,6 +413,8 @@ module Sequel
         table_name = table_alias
       else
         table = table.table_name if table.respond_to?(:table_name)
+        table, implicit_table_alias = split_alias(table)
+        table_alias ||= implicit_table_alias
         table_name = table_alias || table
       end
 

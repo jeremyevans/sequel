@@ -587,7 +587,7 @@ module Sequel
       case c
       when Symbol
         c_table, column, _ = split_symbol(c)
-        c_table ? column.to_sym.qualify(c_table) : column.to_sym
+        c_table ? SQL::QualifiedIdentifier.new(c_table, column.to_sym) : column.to_sym
       when SQL::AliasedExpression
         c.expression
       else
