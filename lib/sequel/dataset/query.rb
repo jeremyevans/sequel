@@ -818,7 +818,7 @@ module Sequel
     # Whether this dataset is a simple SELECT * FROM table.
     def simple_select_all?
       o = @opts.reject{|k,v| v.nil? || NON_SQL_OPTIONS.include?(k)}
-      o.length == 1 && (f = o[:from]) && f.length == 1 && f.first.is_a?(Symbol)
+      o.length == 1 && (f = o[:from]) && f.length == 1 && (f.first.is_a?(Symbol) || f.first.is_a?(SQL::AliasedExpression))
     end
 
     private

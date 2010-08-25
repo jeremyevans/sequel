@@ -86,24 +86,6 @@ shared_examples_for "regular and composite key associations" do
     a.first.albums.first.artist.should == @artist
   end
   
-  specify "should handle aliased tables when eager_graphing" do
-    Artist.set_dataset(:artists___ar)
-    Album.set_dataset(:albums___a)
-    Tag.set_dataset(:tags___t)
-    @album.update(:artist => @artist)
-    @album.add_tag(@tag)
-    
-    a = Artist.eager_graph(:albums=>:tags).all
-    a.should == [@artist]
-    a.first.albums.should == [@album]
-    a.first.albums.first.tags.should == [@tag]
-    
-    a = Tag.eager_graph(:albums=>:artist).all
-    a.should == [@tag]
-    a.first.albums.should == [@album]
-    a.first.albums.first.artist.should == @artist
-  end
-  
   specify "should work with a many_through_many association" do
     @album.update(:artist => @artist)
     @album.add_tag(@tag)
@@ -173,6 +155,28 @@ describe "Sequel::Model Simple Associations" do
   after do
     @db.drop_table(:albums_tags, :tags, :albums, :artists)
     [:Tag, :Album, :Artist].each{|x| Object.send(:remove_const, x)}
+  end
+  
+  specify "should handle aliased tables when eager_graphing" do
+    Artist.set_dataset(:artists___ar)
+    Album.set_dataset(:albums___a)
+    Tag.set_dataset(:tags___t)
+    Artist.one_to_many :balbums, :class=>Album, :key=>:artist_id
+    Album.many_to_many :btags, :class=>Tag, :join_table=>:albums_tags, :right_key=>:tag_id
+    Album.many_to_one :bartist, :class=>Artist, :key=>:artist_id
+    Tag.many_to_many :balbums, :class=>Album, :join_table=>:albums_tags, :right_key=>:album_id
+    @album.update(:bartist => @artist)
+    @album.add_tag(@tag)
+    
+    a = Artist.eager_graph(:balbums=>:btags).all
+    a.should == [@artist]
+    a.first.balbums.should == [@album]
+    a.first.balbums.first.btags.should == [@tag]
+    
+    a = Tag.eager_graph(:balbums=>:bartist).all
+    a.should == [@tag]
+    a.first.balbums.should == [@album]
+    a.first.balbums.first.bartist.should == @artist
   end
   
   it_should_behave_like "regular and composite key associations"
