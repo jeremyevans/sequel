@@ -158,6 +158,9 @@ describe "Sequel::Model Simple Associations" do
   end
   
   specify "should handle aliased tables when eager_graphing" do
+    @album.update(:artist => @artist)
+    @album.add_tag(@tag)
+    
     Artist.set_dataset(:artists___ar)
     Album.set_dataset(:albums___a)
     Tag.set_dataset(:tags___t)
@@ -165,9 +168,7 @@ describe "Sequel::Model Simple Associations" do
     Album.many_to_many :btags, :class=>Tag, :join_table=>:albums_tags, :right_key=>:tag_id
     Album.many_to_one :bartist, :class=>Artist, :key=>:artist_id
     Tag.many_to_many :balbums, :class=>Album, :join_table=>:albums_tags, :right_key=>:album_id
-    @album.update(:bartist => @artist)
-    @album.add_tag(@tag)
-    
+
     a = Artist.eager_graph(:balbums=>:btags).all
     a.should == [@artist]
     a.first.balbums.should == [@album]
