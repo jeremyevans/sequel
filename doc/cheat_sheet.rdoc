@@ -29,7 +29,7 @@ Without a filename argument, the sqlite adapter will setup a new sqlite database
   dataset = DB["SELECT age FROM users WHERE name = ?", name]
   dataset.map(:age)
   DB.fetch("SELECT name FROM users") do |row|
-    p r[:name]
+    p row[:name]
   end
 
 == Create a dataset
