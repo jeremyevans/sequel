@@ -96,7 +96,7 @@ module Sequel
       :@restricted_columns=>:dup, :@restrict_primary_key=>nil,
       :@simple_pk=>nil, :@simple_table=>nil, :@strict_param_setting=>nil,
       :@typecast_empty_string_to_nil=>nil, :@typecast_on_assignment=>nil,
-      :@raise_on_typecast_failure=>nil, :@plugins=>:dup}
+      :@raise_on_typecast_failure=>nil, :@plugins=>:dup, :@setter_methods=>nil}
 
     # Regular expression that determines if a method name is normal in the sense that
     # it could be used literally in ruby code without using send.  Used to
@@ -120,6 +120,7 @@ module Sequel
     @require_modification = nil
     @restrict_primary_key = true
     @restricted_columns = nil
+    @setter_methods = nil
     @simple_pk = nil
     @simple_table = nil
     @strict_param_setting = true

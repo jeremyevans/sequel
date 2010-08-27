@@ -286,6 +286,12 @@ module Sequel
       def load(values)
         new(values, true)
       end
+
+      # Clear the setter_methods cache when a method is added
+      def method_added(meth)
+        @setter_methods = nil if meth.to_s =~ SETTER_METHOD_REGEXP
+        super
+      end
   
       # Mark the model as not having a primary key. Not having a primary key
       # can cause issues, among which is that you won't be able to update records.
@@ -294,6 +300,7 @@ module Sequel
       #   Artist.no_primary_key
       #   Artist.primary_key # => nil
       def no_primary_key
+        @setter_methods = nil
         @simple_pk = @primary_key = nil
       end
   
@@ -334,6 +341,7 @@ module Sequel
       # this is the default, this only make sense to use in a subclass where the
       # parent class has used +unrestrict_primary_key+.
       def restrict_primary_key
+        @setter_methods = nil
         @restrict_primary_key = true
       end
   
@@ -355,6 +363,7 @@ module Sequel
       #   Artist.set(:name=>'Bob', :hometown=>'Sactown') # No Error
       #   Artist.set(:name=>'Bob', :records_sold=>30000) # Error
       def set_allowed_columns(*cols)
+        @setter_methods = nil
         @allowed_columns = cols
       end
   
@@ -414,6 +423,7 @@ module Sequel
       #     set_primary_key [:taggable_id, :tag_id]
       #   end
       def set_primary_key(*key)
+        @setter_methods = nil
         key = key.flatten
         @simple_pk = key.length == 1 ? db.literal(key.first) : nil 
         @primary_key = (key.length == 1) ? key[0] : key
@@ -434,7 +444,20 @@ module Sequel
       #   Artist.set(:name=>'Bob', :hometown=>'Sactown') # No Error
       #   Artist.set(:name=>'Bob', :records_sold=>30000) # Error
       def set_restricted_columns(*cols)
+        @setter_methods = nil
         @restricted_columns = cols
+      end
+
+      # Cache of setter methods to allow by default, in order to speed up new/set/update instance methods.
+      def setter_methods
+        @setter_methods ||= if allowed_columns
+          allowed_columns.map{|x| "#{x}="}
+        else
+          meths = instance_methods.collect{|x| x.to_s}.grep(SETTER_METHOD_REGEXP) - RESTRICTED_SETTER_METHODS
+          meths -= Array(primary_key).map{|x| "#{x}="} if primary_key && restrict_primary_key?
+          meths -= restricted_columns.map{|x| "#{x}="} if restricted_columns
+          meths
+        end
       end
   
       # Shortcut for +def_dataset_method+ that is restricted to modifying the
@@ -475,6 +498,7 @@ module Sequel
       #   Artist.unrestrict_primary_key
       #   Artist.set(:id=>1) # No Error
       def unrestrict_primary_key
+        @setter_methods = nil
         @restrict_primary_key = false
       end
   
@@ -502,6 +526,7 @@ module Sequel
       # Create the column accessors.  For columns that can be used as method names directly in ruby code,
       # use a string to define the method for speed.  For other columns names, use a block.
       def def_column_accessor(*columns)
+        @setter_methods = nil
         columns, bad_columns = columns.partition{|x| NORMAL_METHOD_NAME_REGEXP.match(x.to_s)}
         bad_columns.each{|x| def_bad_column_accessor(x)}
         im = instance_methods.collect{|x| x.to_s}
@@ -1029,6 +1054,12 @@ module Sequel
         set_restricted(hash, only.flatten, false)
       end
   
+      # Clear the setter_methods cache when a method is added
+      def singleton_method_added(meth)
+        @singleton_setter_added = true if meth.to_s =~ SETTER_METHOD_REGEXP
+        super
+      end
+  
       # Returns (naked) dataset that should return only this instance.
       #
       #   Artist[1].this
@@ -1282,7 +1313,11 @@ module Sequel
   
       # Set the columns, filtered by the only and except arrays.
       def set_restricted(hash, only, except)
-        meths = setter_methods(only, except)
+        meths = if only.nil? && except.nil? && !@singleton_setter_added
+          model.setter_methods
+        else
+          setter_methods(only, except)
+        end
         strict = strict_param_setting
         hash.each do |k,v|
           m = "#{k}="

@@ -715,6 +715,30 @@ describe Sequel::Model, "#set" do
     returned_value.should == @o1
     MODEL_DB.sqls.should == []
   end
+
+  it "#set should correctly handle cases where an instance method is added to the class" do
+    @o1.set(:x => 1)
+    @o1.values.should == {:x => 1}
+
+    @c.class_eval do
+      def z=(v)
+        self[:z] = v
+      end
+    end
+    @o1.set(:x => 2, :z => 3)
+    @o1.values.should == {:x => 2, :z=>3}
+  end
+
+  it "#set should correctly handle cases where a singleton method is added to the object" do
+    @o1.set(:x => 1)
+    @o1.values.should == {:x => 1}
+
+    def @o1.z=(v)
+      self[:z] = v
+    end
+    @o1.set(:x => 2, :z => 3)
+    @o1.values.should == {:x => 2, :z=>3}
+  end
 end
 
 describe Sequel::Model, "#update" do
