@@ -1,5 +1,9 @@
 === HEAD
 
+* Handle a many_to_many :join_table option that uses an implicit alias (mluu, jeremyevans)
+
+* Work around bug in Microsoft's SQL Server JDBC Adapter version 3.0 (jfirebaugh)
+
 * Make eager graphing a model that uses an aliased table name work correctly (jeremyevans)
 
 * Make class_table_inheritance plugin work with non integer primary keys on SQLite (jeremyevans, russm)
