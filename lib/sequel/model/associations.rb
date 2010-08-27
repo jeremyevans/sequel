@@ -307,7 +307,9 @@ module Sequel
 
         # The table containing the column to use for the associated key when eagerly loading
         def associated_key_table
-          self[:join_table]
+          self[:associated_key_table] ||= (
+          syms = associated_class.dataset.split_alias(self[:join_table]);
+          syms[1] || syms[0])
         end
         
         # Alias of right_primary_keys

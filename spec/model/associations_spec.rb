@@ -1903,6 +1903,13 @@ describe Sequel::Model, "many_to_many" do
     a.sql.should == 'SELECT attributes.* FROM attributes INNER JOIN attribute2node ON ((attribute2node.attributeid = attributes.id) AND (attribute2node.nodeid = 1234))'
   end
   
+  it "should handle an aliased join table when eager loading" do
+    r = @c2.many_to_many(:attributes, :class => @c1, :join_table => :attribute2node___attributes_nodes)
+    
+    a = @c2.eager_loading_dataset(r, @c2.dataset, [:id], nil)
+    a.sql.should == 'SELECT id, attributes_nodes.node_id AS x_foreign_key_x FROM nodes'
+  end
+  
   it "should support a conditions option" do
     @c2.many_to_many :attributes, :class => @c1, :conditions => {:a=>32}
     n = @c2.new(:id => 1234)
