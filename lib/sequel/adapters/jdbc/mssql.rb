@@ -60,9 +60,9 @@ module Sequel
           def ds.result_set_object_getter
             lambda do |result, n, i|
               if n == :is_autoincrement
-                convert_type(result.getString(i))
+                @convert_types ? convert_type(result.getString(i)) : result.getString(i)
               else
-                convert_type(result.getObject(i))
+                @convert_types ? convert_type(result.getObject(i)) : result.getObject(i)
               end
             end
           end

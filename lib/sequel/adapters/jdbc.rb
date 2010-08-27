@@ -583,6 +583,9 @@ module Sequel
         end
       end
 
+      # Proc that takes the ResultSet and an integer field number and returns
+      # the object for that field.  Respects the @convert_types setting to
+      # convert Java types to ruby types.
       def result_set_object_getter
         if @convert_types
           lambda {|result, n, i| convert_type(result.getObject(i))}
