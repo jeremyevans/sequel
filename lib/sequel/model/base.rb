@@ -100,6 +100,11 @@ module Sequel
         args.is_a?(Hash) ? dataset[args] : primary_key_lookup(args)
       end
       
+      # Clear the setter_methods cache
+      def clear_setter_methods_cache
+        @setter_methods = nil
+      end
+  
       # Returns the columns in the result set in their original order.
       # Generally, this will use the columns determined via the database
       # schema, but in certain cases (e.g. models that are based on a joined
@@ -287,9 +292,9 @@ module Sequel
         new(values, true)
       end
 
-      # Clear the setter_methods cache when a method is added
+      # Clear the setter_methods cache when a setter method is added
       def method_added(meth)
-        @setter_methods = nil if meth.to_s =~ SETTER_METHOD_REGEXP
+        clear_setter_methods_cache if meth.to_s =~ SETTER_METHOD_REGEXP
         super
       end
   
@@ -300,7 +305,7 @@ module Sequel
       #   Artist.no_primary_key
       #   Artist.primary_key # => nil
       def no_primary_key
-        @setter_methods = nil
+        clear_setter_methods_cache
         @simple_pk = @primary_key = nil
       end
   
@@ -341,7 +346,7 @@ module Sequel
       # this is the default, this only make sense to use in a subclass where the
       # parent class has used +unrestrict_primary_key+.
       def restrict_primary_key
-        @setter_methods = nil
+        clear_setter_methods_cache
         @restrict_primary_key = true
       end
   
@@ -363,7 +368,7 @@ module Sequel
       #   Artist.set(:name=>'Bob', :hometown=>'Sactown') # No Error
       #   Artist.set(:name=>'Bob', :records_sold=>30000) # Error
       def set_allowed_columns(*cols)
-        @setter_methods = nil
+        clear_setter_methods_cache
         @allowed_columns = cols
       end
   
@@ -423,7 +428,7 @@ module Sequel
       #     set_primary_key [:taggable_id, :tag_id]
       #   end
       def set_primary_key(*key)
-        @setter_methods = nil
+        clear_setter_methods_cache
         key = key.flatten
         @simple_pk = key.length == 1 ? db.literal(key.first) : nil 
         @primary_key = (key.length == 1) ? key[0] : key
@@ -444,7 +449,7 @@ module Sequel
       #   Artist.set(:name=>'Bob', :hometown=>'Sactown') # No Error
       #   Artist.set(:name=>'Bob', :records_sold=>30000) # Error
       def set_restricted_columns(*cols)
-        @setter_methods = nil
+        clear_setter_methods_cache
         @restricted_columns = cols
       end
 
@@ -498,7 +503,7 @@ module Sequel
       #   Artist.unrestrict_primary_key
       #   Artist.set(:id=>1) # No Error
       def unrestrict_primary_key
-        @setter_methods = nil
+        clear_setter_methods_cache
         @restrict_primary_key = false
       end
   
@@ -526,7 +531,7 @@ module Sequel
       # Create the column accessors.  For columns that can be used as method names directly in ruby code,
       # use a string to define the method for speed.  For other columns names, use a block.
       def def_column_accessor(*columns)
-        @setter_methods = nil
+        clear_setter_methods_cache
         columns, bad_columns = columns.partition{|x| NORMAL_METHOD_NAME_REGEXP.match(x.to_s)}
         bad_columns.each{|x| def_bad_column_accessor(x)}
         im = instance_methods.collect{|x| x.to_s}
