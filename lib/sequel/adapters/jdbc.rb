@@ -572,17 +572,22 @@ module Sequel
         i = 0
         meta.getColumnCount.times{cols << [output_identifier(meta.getColumnLabel(i+=1)), i]}
         @columns = cols.map{|c| c.at(0)}
-        row = {}
-        blk = if @convert_types
-          lambda{|n, i| row[n] = convert_type(result.getObject(i))}
-        else
-          lambda{|n, i| row[n] = result.getObject(i)}
-        end
+        blk = result_set_object_getter
         # get rows
         while result.next
           row = {}
-          cols.each(&blk)
+          cols.each do |n, i|
+            row[n] = blk.call(result, n, i)
+          end
           yield row
+        end
+      end
+
+      def result_set_object_getter
+        if @convert_types
+          lambda {|result, n, i| convert_type(result.getObject(i))}
+        else
+          lambda {|result, n, i| result.getObject(i)}
         end
       end
     end
