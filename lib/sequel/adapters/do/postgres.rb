@@ -27,7 +27,7 @@ module Sequel
               @db.log_yield(sql){command.execute_non_query}
             end
           rescue ::DataObjects::Error => e
-            raise_error(e)
+            @db.send(:raise_error, e)
           end
         end
         
