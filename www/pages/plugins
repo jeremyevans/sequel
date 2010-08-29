@@ -46,9 +46,12 @@
 <h3>External Plugins</h3>
 
 <ul>
+<li><a href='http://github.com/gucki/sequel_bulk_attributes'>sequel_bulk_attributes</a>: Provides bulk assignment functionality for one_to_many associations.</li>
 <li><a href='http://github.com/sbfaulkner/sequel_container'>sequel_container</a>: Contained documents (i.e. attachments) for models.</li>
+<li><a href='http://github.com/gucki/sequel_mappable'>sequel_mappable</a>: Provides geocoding functionality to model & dataset.</li>
 <li><a href='http://github.com/pkondzior/sequel_nested_set'>sequel_nested_set</a>: Nested set implementation, ported from the Awesome Nested Set Active Record plugin.</li>
 <li><a href='http://github.com/boof/sequel_notnaughty'>sequel_notnaughty</a>: Port of the NotNaughty validation framework.</li>
+<li><a href='http://github.com/gucki/sequel_paperclip'>sequel_paperclip</a>: Provides attachment functionality for models, including post processing (thumbnail generation, etc).</li>
 <li><a href='http://github.com/jackdempsey/sequel_polymorphic'>sequel_polymorphic</a>: Lets you easily create polymorphic associations.</li>
 <li><a href='http://github.com/daicoden/sequel_proc_error_handling'>sequel_proc_error_handling</a>: Lets you add procs that automatically rescue and fix model errors.</li>
 <li><a href='http://github.com/tadman/sequel_simple_callbacks'>sequel_simple_callbacks</a>: Enables ActiveRecord-compatible class-level before and after filter declarations for models with support for conditional execution.</li>
