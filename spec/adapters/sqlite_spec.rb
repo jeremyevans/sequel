@@ -317,6 +317,7 @@ context "A SQLite database" do
       primary_key :id
       text :name
       integer :value
+      foreign_key :test2_name, :test2, :key => :name, :on_delete => :set_null, :on_update => :cascade
     end
 
     # This lame set of additions and deletions are to test that the primary keys
@@ -325,10 +326,16 @@ context "A SQLite database" do
     @db[:test3] << { :name => "foo", :value => 2}
     @db[:test3] << { :name => "foo", :value => 3}
     @db[:test3].filter(:id => 2).delete
-    
+
     @db.drop_column :test3, :value
 
     @db['PRAGMA table_info(?)', :test3][:id][:pk].to_i.should == 1
+    fi = @db['PRAGMA foreign_key_list(?)', :test3].first # and only
+    fi[:table].should == 'test2'
+    fi[:from].should == 'test2_name'
+    fi[:to].should == 'name'
+    fi[:on_update].should == 'CASCADE'
+    fi[:on_delete].should == 'SET NULL'
     @db[:test3].select(:id).all.should == [{:id => 1}, {:id => 3}]
   end
 
