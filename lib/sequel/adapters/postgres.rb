@@ -502,3 +502,16 @@ module Sequel
     end
   end
 end
+
+if SEQUEL_POSTGRES_USES_PG
+  begin
+    require 'sequel_pg'
+  rescue LoadError
+    if RUBY_PLATFORM =~ /mingw|mswin/
+      begin
+        require "#{RUBY_VERSION[0...3]}/sequel_pg"
+      rescue LoadError
+      end
+    end
+  end
+end
