@@ -181,6 +181,23 @@ module Sequel
         generator.is_a?(Schema::Generator) ? super : generator.map{|c| column_definition_sql(c)}.join(', ')
       end
 
+      # Does the reverse of on_delete_clause, eg. converts strings like +'SET NULL'+
+      # to symbols +:set_null+.
+      def on_delete_sql_to_sym str
+        case str
+        when 'RESTRICT'
+          :restrict
+        when 'CASCADE'
+          :cascade
+        when 'SET NULL'
+          :set_null
+        when 'SET DEFAULT'
+          :set_default
+        when 'NO ACTION'
+          :no_action
+        end
+      end
+
       # The array of column schema hashes, except for the ones given in opts[:except]
       def defined_columns_for(table, opts={})
         cols = parse_pragma(table, {})
@@ -192,9 +209,19 @@ module Sequel
           nono= Array(opts[:except]).compact.map{|n| n.to_s}
           cols.reject!{|c| nono.include? c[:name] }
         end
+
+        # get foreign key list
+        metadata_dataset.with_sql("PRAGMA foreign_key_list(?)", input_identifier_meth.call(table)).each do |row|
+          c = cols.find {|co| co[:name] == row[:from] } or next
+          c[:table] = row[:table]
+          c[:key] = row[:to]
+          c[:on_update] = on_delete_sql_to_sym(row[:on_update])
+          c[:on_delete] = on_delete_sql_to_sym(row[:on_delete])
+          # is there any way to get deferrable status?
+        end
         cols
       end
-      
+
       # Duplicate an existing table by creating a new table, copying all records
       # from the existing table into the new table, deleting the existing table
       # and renaming the new table to the existing table's name.
