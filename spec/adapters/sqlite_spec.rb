@@ -317,7 +317,6 @@ context "A SQLite database" do
       primary_key :id
       text :name
       integer :value
-      foreign_key :test2_name, :test2, :key => :name, :on_delete => :set_null, :on_update => :cascade
     end
 
     # This lame set of additions and deletions are to test that the primary keys
@@ -330,13 +329,47 @@ context "A SQLite database" do
     @db.drop_column :test3, :value
 
     @db['PRAGMA table_info(?)', :test3][:id][:pk].to_i.should == 1
-    fi = @db['PRAGMA foreign_key_list(?)', :test3].first # and only
-    fi[:table].should == 'test2'
-    fi[:from].should == 'test2_name'
-    fi[:to].should == 'name'
-    fi[:on_update].should == 'CASCADE'
-    fi[:on_delete].should == 'SET NULL'
     @db[:test3].select(:id).all.should == [{:id => 1}, {:id => 3}]
+  end
+
+  specify "should keep foreign keys when dropping a column" do
+    @db.foreign_keys = true if defined?(@db.foreign_keys)
+
+    @db.create_table! :test do
+      primary_key :id
+      text :name
+      integer :value
+    end
+    @db.create_table! :test3 do
+      text :name
+      integer :value
+      foreign_key :test_id, :test, :on_delete => :set_null, :on_update => :cascade
+    end
+
+    @db[:test] << { :name => "foo", :value => 3 }
+    @db[:test] << { :name => "bar", :value => 4 }
+
+    @db[:test3] << { :name => "abc", :test_id => @db[:test][:name => 'foo'][:id] }
+    @db[:test3] << { :name => "def", :test_id => @db[:test][:name => 'bar'][:id] }
+
+    @db.drop_column :test3, :value
+
+    @db[:test][:id => @db[:test3][:name => "abc"][:test_id]][:name].should == "foo"
+    @db[:test][:id => @db[:test3][:name => "def"][:test_id]][:name].should == "bar"
+    if defined?(@db.foreign_keys)
+      fi = @db['PRAGMA foreign_key_list(?)', :test3].first # and only
+      fi[:table].should == 'test'
+      fi[:from].should == 'test_id'
+      fi[:to].should be_nil
+      fi[:on_update].should == 'CASCADE'
+      fi[:on_delete].should == 'SET NULL'
+
+      # ensure it really works
+      @db[:test].filter(:name => 'bar').delete
+      @db[:test3][:name => 'def'][:test_id].should be_nil
+    end
+
+    @db.drop_table :test, :test3
   end
 
   specify "should support rename_column operations" do
