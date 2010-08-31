@@ -9,8 +9,10 @@ INTEGRATION_DB = SQLITE_DB unless defined?(INTEGRATION_DB)
 context "An SQLite database" do
   before do
     @db = SQLITE_DB
+    @fk = @db.foreign_keys
   end
   after do
+    @db.foreign_keys = @fk
     Sequel.datetime_class = Time
   end
 
@@ -332,44 +334,32 @@ context "A SQLite database" do
     @db[:test3].select(:id).all.should == [{:id => 1}, {:id => 3}]
   end
 
-  specify "should keep foreign keys when dropping a column" do
-    @db.foreign_keys = true if defined?(@db.foreign_keys)
+  if SQLITE_DB.foreign_keys
+    specify "should keep foreign keys when dropping a column" do
+      @db.create_table! :test do
+        primary_key :id
+        String :name
+        Integer :value
+      end
+      @db.create_table! :test3 do
+        String :name
+        Integer :value
+        foreign_key :test_id, :test, :on_delete => :set_null, :on_update => :cascade
+      end
 
-    @db.create_table! :test do
-      primary_key :id
-      text :name
-      integer :value
-    end
-    @db.create_table! :test3 do
-      text :name
-      integer :value
-      foreign_key :test_id, :test, :on_delete => :set_null, :on_update => :cascade
-    end
+      @db[:test3].insert(:name => "abc", :test_id => @db[:test].insert(:name => "foo", :value => 3))
+      @db[:test3].insert(:name => "def", :test_id => @db[:test].insert(:name => "bar", :value => 4))
 
-    @db[:test] << { :name => "foo", :value => 3 }
-    @db[:test] << { :name => "bar", :value => 4 }
+      @db.drop_column :test3, :value
 
-    @db[:test3] << { :name => "abc", :test_id => @db[:test][:name => 'foo'][:id] }
-    @db[:test3] << { :name => "def", :test_id => @db[:test][:name => 'bar'][:id] }
-
-    @db.drop_column :test3, :value
-
-    @db[:test][:id => @db[:test3][:name => "abc"][:test_id]][:name].should == "foo"
-    @db[:test][:id => @db[:test3][:name => "def"][:test_id]][:name].should == "bar"
-    if defined?(@db.foreign_keys)
-      fi = @db['PRAGMA foreign_key_list(?)', :test3].first # and only
-      fi[:table].should == 'test'
-      fi[:from].should == 'test_id'
-      fi[:to].should be_nil
-      fi[:on_update].should == 'CASCADE'
-      fi[:on_delete].should == 'SET NULL'
-
-      # ensure it really works
       @db[:test].filter(:name => 'bar').delete
       @db[:test3][:name => 'def'][:test_id].should be_nil
-    end
 
-    @db.drop_table :test, :test3
+      @db[:test].filter(:name => 'foo').update(:id=>100)
+      @db[:test3][:name => 'abc'][:test_id].should == 100
+
+      @db.drop_table :test, :test3
+    end
   end
 
   specify "should support rename_column operations" do

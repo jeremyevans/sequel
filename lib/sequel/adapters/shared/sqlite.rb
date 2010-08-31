@@ -181,21 +181,19 @@ module Sequel
         generator.is_a?(Schema::Generator) ? super : generator.map{|c| column_definition_sql(c)}.join(', ')
       end
 
-      # Does the reverse of on_delete_clause, eg. converts strings like +'SET NULL'+
-      # to symbols +:set_null+.
-      def on_delete_sql_to_sym str
-        case str
-        when 'RESTRICT'
-          :restrict
-        when 'CASCADE'
-          :cascade
-        when 'SET NULL'
-          :set_null
-        when 'SET DEFAULT'
-          :set_default
-        when 'NO ACTION'
-          :no_action
+      # Array of PRAGMA SQL statements based on the Database options that should be applied to
+      # new connections.
+      def connection_pragmas
+        ps = []
+        v = typecast_value_boolean(opts.fetch(:foreign_keys, 1))
+        ps << "PRAGMA foreign_keys = #{v ? 1 : 0}"
+        [[:auto_vacuum, AUTO_VACUUM], [:synchronous, SYNCHRONOUS], [:temp_store, TEMP_STORE]].each do |prag, con|
+          if v = opts[prag]
+            raise(Error, "Value for PRAGMA #{prag} not supported, should be one of #{con.join(', ')}") unless v = con.index(v.to_sym)
+            ps << "PRAGMA #{prag} = #{v}"
+          end
         end
+        ps
       end
 
       # The array of column schema hashes, except for the ones given in opts[:except]
@@ -210,14 +208,15 @@ module Sequel
           cols.reject!{|c| nono.include? c[:name] }
         end
 
-        # get foreign key list
-        metadata_dataset.with_sql("PRAGMA foreign_key_list(?)", input_identifier_meth.call(table)).each do |row|
-          c = cols.find {|co| co[:name] == row[:from] } or next
-          c[:table] = row[:table]
-          c[:key] = row[:to]
-          c[:on_update] = on_delete_sql_to_sym(row[:on_update])
-          c[:on_delete] = on_delete_sql_to_sym(row[:on_delete])
-          # is there any way to get deferrable status?
+        if foreign_keys
+          metadata_dataset.with_sql("PRAGMA foreign_key_list(?)", input_identifier_meth.call(table)).each do |row|
+            c = cols.find {|co| co[:name] == row[:from] } or next
+            c[:table] = row[:table]
+            c[:key] = row[:to]
+            c[:on_update] = on_delete_sql_to_sym(row[:on_update])
+            c[:on_delete] = on_delete_sql_to_sym(row[:on_delete])
+            # is there any way to get deferrable status?
+          end
         end
         cols
       end
@@ -256,19 +255,21 @@ module Sequel
         nil
       end
       
-      # Array of PRAGMA SQL statements based on the Database options that should be applied to
-      # new connections.
-      def connection_pragmas
-        ps = []
-        v = typecast_value_boolean(opts.fetch(:foreign_keys, 1))
-        ps << "PRAGMA foreign_keys = #{v ? 1 : 0}"
-        [[:auto_vacuum, AUTO_VACUUM], [:synchronous, SYNCHRONOUS], [:temp_store, TEMP_STORE]].each do |prag, con|
-          if v = opts[prag]
-            raise(Error, "Value for PRAGMA #{prag} not supported, should be one of #{con.join(', ')}") unless v = con.index(v.to_sym)
-            ps << "PRAGMA #{prag} = #{v}"
-          end
+      # Does the reverse of on_delete_clause, eg. converts strings like +'SET NULL'+
+      # to symbols +:set_null+.
+      def on_delete_sql_to_sym str
+        case str
+        when 'RESTRICT'
+          :restrict
+        when 'CASCADE'
+          :cascade
+        when 'SET NULL'
+          :set_null
+        when 'SET DEFAULT'
+          :set_default
+        when 'NO ACTION'
+          :no_action
         end
-        ps
       end
 
       # Parse the output of the table_info pragma
