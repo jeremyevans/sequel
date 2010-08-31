@@ -30,6 +30,33 @@ describe "Sequel::Model()" do
     SmBlahTest.db.should == db
     SmBlahTest.table_name.should == :sm_blah_tests
   end
+
+  describe "reloading" do
+    after do
+      Object.send(:remove_const, :Album) if defined?(::Album)
+    end
+
+    it "should work without raising an exception with a symbol" do
+      proc do
+        class ::Album < Sequel::Model(:table); end
+        class ::Album < Sequel::Model(:table); end
+      end.should_not raise_error
+    end
+
+    it "should work without raising an exception with a database" do
+      proc do
+        class ::Album < Sequel::Model(@db); end
+        class ::Album < Sequel::Model(@db); end
+      end.should_not raise_error
+    end
+
+    it "should work without raising an exception with a dataset" do
+      proc do
+        class ::Album < Sequel::Model(@db[:table]); end
+        class ::Album < Sequel::Model(@db[:table]); end
+      end.should_not raise_error
+    end
+  end
 end
 
 describe Sequel::Model do

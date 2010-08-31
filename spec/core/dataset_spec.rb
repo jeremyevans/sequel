@@ -113,7 +113,7 @@ context "Dataset#clone" do
     @dataset.row_proc = Proc.new{|r| r}
     @clone = @dataset.clone
 
-    @clone.should_not === @dataset
+    @clone.object_id.should_not === @dataset.object_id
     @clone.class.should == @dataset.class
     @clone.opts.should == @dataset.opts
     @clone.row_proc.should == @dataset.row_proc
@@ -156,6 +156,58 @@ context "Dataset#clone" do
     end
     @dataset.extend(m)
     @dataset.clone({}).should respond_to(:__xyz__)
+  end
+end
+
+context "Dataset#==" do
+  before do
+    @db = MockDatabase.new
+    @h = {}
+  end
+  
+  specify "should be the true for dataset with the same db, opts, and SQL" do
+    @db[:t].should == @db[:t]
+  end
+
+  specify "should be different for datasets with different dbs" do
+    @db[:t].should_not == MockDatabase.new[:t]
+  end
+  
+  specify "should be different for datasets with different opts" do
+    @db[:t].should_not == @db[:t].clone(:blah=>1)
+  end
+  
+  specify "should be different for datasets with different SQL" do
+    ds = @db[:t]
+    ds.quote_identifiers = true
+    ds.should_not == @db[:t]
+  end
+end
+
+context "Dataset#hash" do
+  before do
+    @db = MockDatabase.new
+    @h = {}
+  end
+  
+  specify "should be the same for dataset with the same db, opts, and SQL" do
+    @db[:t].hash.should == @db[:t].hash
+    @h[@db[:t]] = 1
+    @h[@db[:t]].should == 1
+  end
+
+  specify "should be different for datasets with different dbs" do
+    @db[:t].hash.should_not == MockDatabase.new[:t].hash
+  end
+  
+  specify "should be different for datasets with different opts" do
+    @db[:t].hash.should_not == @db[:t].clone(:blah=>1).hash
+  end
+  
+  specify "should be different for datasets with different SQL" do
+    ds = @db[:t]
+    ds.quote_identifiers = true
+    ds.hash.should_not == @db[:t].hash
   end
 end
 

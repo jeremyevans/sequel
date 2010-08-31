@@ -1,5 +1,9 @@
 === HEAD
 
+* Make class MyModel < Sequel::Model(DB[:table]) reload safe (jeremyevans)
+
+* Fix a possible error when using the do (DataObjects) adapter with postgres (jeremyevans)
+
 * Handle a many_to_many :join_table option that uses an implicit alias (mluu, jeremyevans)
 
 * Work around bug in Microsoft's SQL Server JDBC Adapter version 3.0 (jfirebaugh)

@@ -408,18 +408,18 @@ describe Sequel::Model, ".require_modification" do
   end
 
   it "should depend on whether the dataset provides an accurate number of rows matched by default" do
-    Class.new(Sequel::Model(@ds1)).require_modification.should == false
-    Class.new(Sequel::Model(@ds2)).require_modification.should == true
+    Class.new(Sequel::Model).set_dataset(@ds1).require_modification.should == false
+    Class.new(Sequel::Model).set_dataset(@ds2).require_modification.should == true
   end
 
   it "should obey global setting regardless of dataset support if set" do
     Sequel::Model.require_modification = true
-    Class.new(Sequel::Model(@ds1)).require_modification.should == true
-    Class.new(Sequel::Model(@ds2)).require_modification.should == true
+    Class.new(Sequel::Model).set_dataset(@ds1).require_modification.should == true
+    Class.new(Sequel::Model).set_dataset(@ds2).require_modification.should == true
     
     Sequel::Model.require_modification = false
-    Class.new(Sequel::Model(@ds1)).require_modification.should == false
-    Class.new(Sequel::Model(@ds2)).require_modification.should == false
+    Class.new(Sequel::Model).set_dataset(@ds1).require_modification.should == false
+    Class.new(Sequel::Model).set_dataset(@ds1).require_modification.should == false
   end
 end
 

@@ -34,6 +34,17 @@ module Sequel
       @row_proc = nil
     end
     
+    # Define a hash value such that datasets with the same DB, opts, and SQL
+    # will be consider equal.
+    def ==(o)
+      o.is_a?(self.class) && db == o.db  && opts == o.opts && sql == o.sql
+    end
+
+    # Alias for ==
+    def eql?(o)
+      self == o
+    end
+    
     # Return the dataset as an aliased expression with the given alias. You can
     # use this as a FROM or JOIN dataset, or as a column if this dataset
     # returns a single row and column.
@@ -104,6 +115,12 @@ module Sequel
       else
         s
       end
+    end
+
+    # Define a hash value such that datasets with the same DB, opts, and SQL
+    # will have the same hash value
+    def hash
+      [db, opts.sort_by{|k| k.to_s}, sql].hash
     end
     
     # Returns a string representation of the dataset including the class name 
