@@ -1,4 +1,8 @@
-=== HEAD
+=== 3.15.0 (2010-09-01)
+
+* Make emulated alter_table tasks on SQLite correctly preserve foreign keys (DirtYiCE, jeremyevans)
+
+* Add support for sequel_pg to the native postgres adapter when pg is used (jeremyevans)
 
 * Make class MyModel < Sequel::Model(DB[:table]) reload safe (jeremyevans)
 

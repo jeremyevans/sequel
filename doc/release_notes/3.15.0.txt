@@ -1,0 +1,78 @@
+= Performance Enhancements
+
+* A mysql2 adapter was added to Sequel.  It offers a large (2-6x)
+  performance increase over the standard mysql adapter. In order to
+  use it, you need to install mysql2, and change your connection
+  strings to use mysql2:// instead of mysql://.
+  
+* Support for sequel_pg was added to the native postgres adapter,
+  when pg is being used as the backend.  sequel_pg also offers a
+  large (2-6x) performance increase over the default row fetching
+  code that the Sequel postgres adapter uses.  In order to use it,
+  you just need to install sequel_pg, and the postgres adapter will
+  pick it up automatically.
+  
+* Mass assignment has been made about 10x faster by caching the
+  allowed setter methods in the model.
+
+= Other Improvements
+
+* The following construct is now safe to use in environments that
+  reload code without unloading existing constants:
+  
+    class MyModel < Sequel::Model(DB[:table])
+    end
+    
+  Previously, this would raise a superclass mismatch TypeError.
+
+* Sequel now handles the case where both an implicit and an explicit
+  table alias are given to join_table, preferring the explicit alias.
+  This can happen if you are using models with aliased table names
+  and eager graphing them.  Previously, this would result in invalid
+  SQL, with both aliases being used.
+
+* You can use use an aliased table for the :join_table option
+  of a many_to_many association.
+
+* The active_model plugin now supports the final release of
+  ActiveModel 3.0.0.
+  
+* Typecasting now works correctly for attributes loaded lazily
+  when using the lazy_attributes plugin.
+  
+* The class_table_inheritance plugin now works with non-integer
+  primary keys on SQLite.
+
+* Temporary tables are now ignored when parsing the schema on
+  PostgreSQL.
+
+* On MySQL, an :auto_increment key with a true value is added to
+  the Database#schema output hash if the related column is
+  auto incrementing.
+
+* The mysql adapter now handles Mysql::Error exceptions raised when
+  disconnecting.
+
+* On SQLite, emulated alter_table commands that require dropping
+  the table now preserve the foreign key information, if SQLite
+  foreign key support is enabled (it is by default).
+
+* DSN-less connections now work correctly in more cases in the
+  ODBC adapter.
+
+* A workaround has been added for a bug in the Microsoft SQL
+  Server JDBC Driver 3.0, involving it incorrectly returning a
+  smallint instead of a char type for the IS_AUTOINCREMENT
+  metadata value.
+
+* An bug in the error handling when connecting to PostgreSQL using
+  the do (DataObjects) adapter has been fixed.
+
+= Backwards Compatibility
+
+* The caching of allowed mass assignment methods can result in the
+  incorrect exception class being raised if you manually undefine
+  instance setter methods in the model class.  If you do this, you
+  need to clear the setter methods cache manually:
+  
+    MyModel.clear_setter_methods_cache
