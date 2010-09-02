@@ -973,7 +973,7 @@ context "Dataset#literal" do
   specify "should literalize DateTime properly" do
     t = DateTime.now
     s = t.strftime("'%Y-%m-%d %H:%M:%S")
-    @dataset.literal(t).should == "#{s}.#{sprintf('%06i', t.sec_fraction* 86400000000)}'"
+    @dataset.literal(t).should == "#{s}.#{sprintf('%06i', t.sec_fraction * (RUBY_VERSION < '1.9.0' ? 86400000000 : 1000000))}'"
   end
   
   specify "should literalize Date properly" do
@@ -998,7 +998,7 @@ context "Dataset#literal" do
 
     t = DateTime.now
     s = t.strftime("TIMESTAMP '%Y-%m-%d %H:%M:%S")
-    @dataset.literal(t).should == "#{s}.#{sprintf('%06i', t.sec_fraction* 86400000000)}'"
+    @dataset.literal(t).should == "#{s}.#{sprintf('%06i', t.sec_fraction* (RUBY_VERSION < '1.9.0' ? 86400000000 : 1000000))}'"
 
     d = Date.today
     s = d.strftime("DATE '%Y-%m-%d'")
@@ -1014,7 +1014,7 @@ context "Dataset#literal" do
 
     t = DateTime.now.new_offset(0)
     s = t.strftime("'%Y-%m-%d %H:%M:%S")
-    @dataset.literal(t).should == "#{s}.#{sprintf('%06i', t.sec_fraction* 86400000000)}+0000'"
+    @dataset.literal(t).should == "#{s}.#{sprintf('%06i', t.sec_fraction* (RUBY_VERSION < '1.9.0' ? 86400000000 : 1000000))}+0000'"
   end
   
   specify "should literalize Time and DateTime properly if the database doesn't support usecs in timestamps" do
