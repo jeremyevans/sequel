@@ -64,7 +64,8 @@ describe "Supported types" do
     ds = create_items_table_with_column(:dat, Date)
     d = Date.today
     ds.insert(:dat => d)
-    ds.first[:dat].should == d
+    ds.first[:dat].should be_a_kind_of(Date)
+    ds.first[:dat].to_s.should == d.to_s
   end
   
   cspecify "should support generic datetime type", [:do, :sqlite], [:jdbc, :sqlite] do

@@ -472,7 +472,9 @@ describe Sequel::SQL::Constants do
   cspecify "should have working CURRENT_DATE", [:odbc, :mssql], [:jdbc, :sqlite] do
     @db.create_table!(:constants){Date :d}
     @ds.insert(:d=>Sequel::CURRENT_DATE)
-    Date.today.should == @c2[@ds.get(:d)]
+    d = @c2[@ds.get(:d)]
+    d.should be_a_kind_of(Date)
+    d.to_s.should == Date.today.to_s
   end
 
   cspecify "should have working CURRENT_TIME", [:do, :mysql], [:jdbc, :sqlite], [:mysql2] do

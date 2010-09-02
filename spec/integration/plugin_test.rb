@@ -413,13 +413,22 @@ describe "Touch plugin" do
     @album.updated_at.to_i.should be_close(Time.now.to_i, 2)
   end
   
-  cspecify "should update the timestamp column for associated records when the record is updated or destroyed", [:do], [:jdbc, :sqlite] do
+  cspecify "should update the timestamp column for associated records when the record is updated or destroyed", [:jdbc, :sqlite] do
     @artist.updated_at.should == nil
     @album.update(:name=>'B')
-    @artist.reload.updated_at.to_i.should be_close(Time.now.to_i, 2)
+    ua = @artist.reload.updated_at
+    if ua.is_a?(Time)
+      ua.to_i.should be_close(Time.now.to_i, 2)
+    else
+      (DateTime.now - ua).should be_close(0, 2.0/86400)
+    end
     @artist.update(:updated_at=>nil)
     @album.destroy
-    @artist.reload.updated_at.to_i.should be_close(Time.now.to_i, 2)
+    if ua.is_a?(Time)
+      ua.to_i.should be_close(Time.now.to_i, 2)
+    else
+      (DateTime.now - ua).should be_close(0, 2.0/86400)
+    end
   end
 end
 
