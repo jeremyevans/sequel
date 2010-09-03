@@ -1,5 +1,7 @@
 === HEAD
 
+* Add swift adapter (jeremyevans)
+
 * Fix literalization of DateTime objects on 1.9 for databases that support fractional seconds (jeremyevans)
 
 === 3.15.0 (2010-09-01)
