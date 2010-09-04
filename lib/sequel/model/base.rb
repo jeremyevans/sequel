@@ -236,8 +236,8 @@ module Sequel
       #   # INSERT INTO artists (name) VALUES ('Bob')
       #
       #   Artist.find_or_create(:name=>'Jim'){|a| a.hometown = 'Sactown'}
-      #   # SELECT * FROM artists WHERE (name = 'Bob') LIMIT 1
-      #   # INSERT INTO artists (name, hometown) VALUES ('Bob', 'Sactown')
+      #   # SELECT * FROM artists WHERE (name = 'Jim') LIMIT 1
+      #   # INSERT INTO artists (name, hometown) VALUES ('Jim', 'Sactown')
       def find_or_create(cond, &block)
         find(cond) || create(cond, &block)
       end
