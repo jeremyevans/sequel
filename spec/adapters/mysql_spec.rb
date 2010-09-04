@@ -905,7 +905,7 @@ context "MySQL::Dataset#complex_expression_sql" do
   end
 end
 
-unless MYSQL_DB.adapter_scheme == :do or MYSQL_DB.adapter_scheme == :mysql2
+if MYSQL_DB.adapter_scheme == :mysql or MYSQL_DB.adapter_scheme == :jdbc
   context "MySQL Stored Procedures" do
     before do
       MYSQL_DB.create_table(:items){Integer :id; Integer :value}
@@ -918,7 +918,7 @@ unless MYSQL_DB.adapter_scheme == :do or MYSQL_DB.adapter_scheme == :mysql2
     end
     
     specify "should be callable on the database object" do
-      MYSQL_DB.execute('CREATE PROCEDURE test_sproc() BEGIN DELETE FROM items; END')
+      MYSQL_DB.execute_ddl('CREATE PROCEDURE test_sproc() BEGIN DELETE FROM items; END')
       MYSQL_DB[:items].delete
       MYSQL_DB[:items].insert(:value=>1)
       MYSQL_DB[:items].count.should == 1
@@ -927,7 +927,7 @@ unless MYSQL_DB.adapter_scheme == :do or MYSQL_DB.adapter_scheme == :mysql2
     end
     
     specify "should be callable on the dataset object" do
-      MYSQL_DB.execute('CREATE PROCEDURE test_sproc(a INTEGER) BEGIN SELECT *, a AS b FROM items; END')
+      MYSQL_DB.execute_ddl('CREATE PROCEDURE test_sproc(a INTEGER) BEGIN SELECT *, a AS b FROM items; END')
       MYSQL_DB[:items].delete
       @d = MYSQL_DB[:items]
       @d.call_sproc(:select, :test_sproc, 3).should == []
@@ -938,7 +938,7 @@ unless MYSQL_DB.adapter_scheme == :do or MYSQL_DB.adapter_scheme == :mysql2
     end
     
     specify "should be callable on the dataset object with multiple arguments" do
-      MYSQL_DB.execute('CREATE PROCEDURE test_sproc(a INTEGER, c INTEGER) BEGIN SELECT *, a AS b, c AS d FROM items; END')
+      MYSQL_DB.execute_ddl('CREATE PROCEDURE test_sproc(a INTEGER, c INTEGER) BEGIN SELECT *, a AS b, c AS d FROM items; END')
       MYSQL_DB[:items].delete
       @d = MYSQL_DB[:items]
       @d.call_sproc(:select, :test_sproc, 3, 4).should == []
