@@ -114,6 +114,10 @@ shared_examples_for "regular and composite key associations" do
     a.first.artist.should == @artist
     a.first.artist.tags.should == [@tag]
   end
+
+  specify "should work with Dataset#first" do
+    Artist.eager_graph(:tags).first.should == @artist
+  end
 end
 
 describe "Sequel::Model Simple Associations" do
