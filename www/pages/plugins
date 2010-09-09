@@ -54,6 +54,7 @@
 <li><a href='http://github.com/gucki/sequel_paperclip'>sequel_paperclip</a>: Provides attachment functionality for models, including post processing (thumbnail generation, etc).</li>
 <li><a href='http://github.com/jackdempsey/sequel_polymorphic'>sequel_polymorphic</a>: Lets you easily create polymorphic associations.</li>
 <li><a href='http://github.com/daicoden/sequel_proc_error_handling'>sequel_proc_error_handling</a>: Lets you add procs that automatically rescue and fix model errors.</li>
+<li><a href='http://github.com/gucki/sequel_sexy_validations'>sequel_sexy_validations</a>: Provides sexy validations (like those in rails 3) for models.</li>
 <li><a href='http://github.com/tadman/sequel_simple_callbacks'>sequel_simple_callbacks</a>: Enables ActiveRecord-compatible class-level before and after filter declarations for models with support for conditional execution.</li>
 <li><a href='http://github.com/pk/sequel_sluggable'>sequel_sluggable</a>: Easy slug behaviour for any model.</li>
 <li><a href='http://github.com/jackdempsey/sequel_taggable'>sequel_taggable</a>: Allows easily adding tags to any model.</li>
