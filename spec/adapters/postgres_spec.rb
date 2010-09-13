@@ -189,7 +189,6 @@ if POSTGRES_DB.pool.respond_to?(:max_size) and POSTGRES_DB.pool.max_size > 1
         String :name
       end
       @ds = POSTGRES_DB[:items]
-      clear_sqls
     end
     after do
       POSTGRES_DB.drop_table(:items)
@@ -244,15 +243,19 @@ context "A PostgreSQL dataset with a timestamp field" do
   cspecify "should store milliseconds in time fields for Time objects", :do do
     t = Time.now
     @d << {:value=>1, :time=>t}
-    @d.literal(@d[:value =>'1'][:time]).should == @d.literal(t)
-    @d[:value=>'1'][:time].strftime('%F %T.%N'[0...-3]).should == t.strftime('%F %T.%N'[0...-3])
+    t2 = @d[:value =>'1'][:time]
+    @d.literal(t2).should == @d.literal(t)
+    t2.strftime('%Y-%m-%d %H:%M:%S').should == t.strftime('%Y-%m-%d %H:%M:%S')
+    t2.is_a?(Time) ? t2.usec : t2.strftime('%N').to_i/1000 == t.usec
   end
 
   cspecify "should store milliseconds in time fields for DateTime objects", :do do
     t = DateTime.now
     @d << {:value=>1, :time=>t}
-    @d.literal(@d[:value =>'1'][:time]).should == @d.literal(t)
-    @d[:value=>'1'][:time].strftime('%F %T.%N'[0...-3]).should == t.strftime('%F %T.%N'[0...-3])
+    t2 = @d[:value =>'1'][:time]
+    @d.literal(t2).should == @d.literal(t)
+    t2.strftime('%Y-%m-%d %H:%M:%S').should == t.strftime('%Y-%m-%d %H:%M:%S')
+    t2.is_a?(Time) ? t2.usec : t2.strftime('%N').to_i/1000 == t.strftime('%N').to_i/1000
   end
 end
 
