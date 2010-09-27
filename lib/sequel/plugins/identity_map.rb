@@ -19,8 +19,12 @@ module Sequel
     # in the identity map, the record is returned without a database query being
     # issued.
     #
-    # Identity maps are thread-local and only presist for the duration of the block,
+    # Identity maps are thread-local and only persist for the duration of the block,
     # so they should only be considered as a possible performance enhancer.
+    #
+    # The identity_map plugin is not compatible with the standard eager loading of
+    # many_to_many and many_through_many associations.  If you want to use the identity_map plugin,
+    # you should use +eager_graph+ instead of +eager+ for those associations.
     # 
     # Usage:
     #
