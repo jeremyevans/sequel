@@ -631,7 +631,7 @@ module Sequel
     def select(*columns, &block)
       columns += Array(Sequel.virtual_row(&block)) if block
       m = []
-      columns.map do |i|
+      columns.each do |i|
         i.is_a?(Hash) ? m.concat(i.map{|k, v| SQL::AliasedExpression.new(k,v)}) : m << i
       end
       clone(:select => m)
