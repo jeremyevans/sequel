@@ -1,5 +1,7 @@
 === HEAD
 
+* Make rcte_tree plugin work when not all columns are selected (jeremyevans)
+
 * Add swift adapter (jeremyevans)
 
 * Fix literalization of DateTime objects on 1.9 for databases that support fractional seconds (jeremyevans)

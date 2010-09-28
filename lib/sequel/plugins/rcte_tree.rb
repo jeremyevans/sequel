@@ -125,7 +125,7 @@ module Sequel
           end
           table_alias = model.dataset.schema_and_table(model.table_name)[1].to_sym
           model.from(t => table_alias).
-           with_recursive(t, base_ds,
+           with_recursive(t, base_ds.select_all,
             recursive_ds.
             select(c_all))
         end
@@ -172,12 +172,14 @@ module Sequel
             end
           end
           table_alias = model.dataset.schema_and_table(model.table_name)[1].to_sym
-          model.eager_loading_dataset(r,
+          elds = model.eager_loading_dataset(r,
            model.from(t => table_alias).
             with_recursive(t, base_case,
              recursive_case),
            r.select,
-           eo[:associations], eo).all do |obj|
+           eo[:associations], eo)
+          elds = elds.select_append(ka) unless elds.opts[:select] == nil
+          elds.all do |obj|
             opk = obj[prkey]
             if in_pm = parent_map.has_key?(opk)
               if idm_obj = parent_map[opk]
@@ -220,7 +222,7 @@ module Sequel
           end
           table_alias = model.dataset.schema_and_table(model.table_name)[1].to_sym
           model.from(t => table_alias).
-           with_recursive(t, base_ds,
+           with_recursive(t, base_ds.select_all,
             recursive_ds.
             select(SQL::ColumnAll.new(model.table_name)))
           end
@@ -273,10 +275,12 @@ module Sequel
             recursive_case = recursive_case.select_more(SQL::AliasedExpression.new(SQL::QualifiedIdentifier.new(t, la) + 1, la)).filter(SQL::QualifiedIdentifier.new(t, la) < level - 1)
           end
           table_alias = model.dataset.schema_and_table(model.table_name)[1].to_sym
-          model.eager_loading_dataset(r,
+          elds = model.eager_loading_dataset(r,
            model.from(t => table_alias).with_recursive(t, base_case, recursive_case),
            r.select,
-           associations, eo).all do |obj|
+           associations, eo)
+          elds = elds.select_append(ka) unless elds.opts[:select] == nil
+          elds.all do |obj|
             if level
               no_cache = no_cache_level == obj.values.delete(la)
             end

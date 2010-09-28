@@ -653,6 +653,16 @@ if INTEGRATION_DB.dataset.supports_cte?
       nodes[1].ancestors.should == [@a, @aa]
       nodes[2].ancestors.should == []
     end
+
+    specify "should work correctly if not all columns are selected" do
+      Node.plugin :lazy_attributes, :name
+      @aaaa.descendants.should == [Node.load(:parent_id=>11, :id=>13)]
+      @aa.ancestors.should == [Node.load(:parent_id=>nil, :id=>1)]
+      nodes = Node.filter(:id=>[@a.id, @b.id, @aaa.id]).order(:name).eager(:ancestors, :descendants).all
+      nodes.should == [{:parent_id=>nil, :id=>1}, {:parent_id=>3, :id=>7}, {:parent_id=>nil, :id=>2}].map{|x| Node.load(x)}
+      nodes[2].descendants.should == [{:parent_id=>2, :id=>5}, {:parent_id=>2, :id=>6}].map{|x| Node.load(x)}
+      nodes[1].ancestors.should == [{:parent_id=>nil, :id=>1}, {:parent_id=>1, :id=>3}].map{|x| Node.load(x)}
+    end
     
     specify "should eagerly load descendants to a given level" do
       nodes = Node.filter(:id=>[@a.id, @b.id, @aaa.id]).order(:name).eager(:descendants=>1).all
