@@ -940,12 +940,12 @@ context "Postgres::Database functions, languages, and triggers" do
   
   specify "#create_language and #drop_language should create and drop languages" do
     @d.send(:create_language_sql, :plpgsql).should == 'CREATE LANGUAGE plpgsql'
-    @d.create_language(:plpgsql)
+    @d.create_language(:plpgsql, :replace=>true)
     proc{@d.create_language(:plpgsql)}.should raise_error(Sequel::DatabaseError)
     @d.send(:drop_language_sql, :plpgsql).should == 'DROP LANGUAGE plpgsql'
     @d.drop_language(:plpgsql)
     proc{@d.drop_language(:plpgsql)}.should raise_error(Sequel::DatabaseError)
-    @d.send(:create_language_sql, :plpgsql, :trusted=>true, :handler=>:a, :validator=>:b).should == 'CREATE TRUSTED LANGUAGE plpgsql HANDLER a VALIDATOR b'
+    @d.send(:create_language_sql, :plpgsql, :replace=>true, :trusted=>true, :handler=>:a, :validator=>:b).should == (@d.server_version >= 90000 ? 'CREATE OR REPLACE TRUSTED LANGUAGE plpgsql HANDLER a VALIDATOR b' : 'CREATE TRUSTED LANGUAGE plpgsql HANDLER a VALIDATOR b')
     @d.send(:drop_language_sql, :plpgsql, :if_exists=>true, :cascade=>true).should == 'DROP LANGUAGE IF EXISTS plpgsql CASCADE'
     # Make sure if exists works
     @d.drop_language(:plpgsql, :if_exists=>true, :cascade=>true)

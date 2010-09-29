@@ -196,6 +196,7 @@ module Sequel
       # * name : Name of the procedural language (e.g. plpgsql)
       # * opts : options hash:
       #   * :handler : The name of a previously registered function used as a call handler for this language.
+      #   * :replace: Replace the installed language if it already exists (on PostgreSQL 9.0+).
       #   * :trusted : Marks the language being created as trusted, allowing unprivileged users to create functions using this language.
       #   * :validator : The name of previously registered function used as a validator of functions defined in this language.
       def create_language(name, opts={})
@@ -428,7 +429,7 @@ module Sequel
       
       # SQL for creating a procedural language.
       def create_language_sql(name, opts={})
-        "CREATE#{' TRUSTED' if opts[:trusted]} LANGUAGE #{name}#{" HANDLER #{opts[:handler]}" if opts[:handler]}#{" VALIDATOR #{opts[:validator]}" if opts[:validator]}"
+        "CREATE#{' OR REPLACE' if opts[:replace] && server_version >= 90000}#{' TRUSTED' if opts[:trusted]} LANGUAGE #{name}#{" HANDLER #{opts[:handler]}" if opts[:handler]}#{" VALIDATOR #{opts[:validator]}" if opts[:validator]}"
       end
       
       # SQL for creating a database trigger. 
