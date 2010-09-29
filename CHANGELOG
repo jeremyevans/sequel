@@ -1,5 +1,7 @@
 === HEAD
 
+* Handle INTERSECT and EXCEPT on Microsoft SQL Server 2005+ (jfirebaugh)
+
 * Add :replace option to Database#create_language in the postgresql adapter (jeremyevans)
 
 * Make rcte_tree plugin work when not all columns are selected (jeremyevans)
