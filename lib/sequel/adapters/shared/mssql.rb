@@ -339,9 +339,9 @@ module Sequel
         db.server_version(@opts[:server])
       end
 
-      # Microsoft SQL Server does not support INTERSECT or EXCEPT
+      # MSSQL 2005+ supports INTERSECT and EXCEPT
       def supports_intersect_except?
-        false
+        is_2005_or_later?
       end
       
       # MSSQL does not support IS TRUE
@@ -356,7 +356,7 @@ module Sequel
 
       # MSSQL 2005+ supports modifying joined datasets
       def supports_modifying_joins?
-        true
+        is_2005_or_later?
       end
 
       # MSSQL does not support multiple columns for the IN/NOT IN operators
@@ -364,9 +364,9 @@ module Sequel
         false
       end
       
-      # Only 2005+ supports the output clause.
+      # MSSQL 2005+ supports the output clause.
       def supports_output_clause?
-        server_version >= 9000000
+        is_2005_or_later?
       end
 
       # MSSQL 2005+ supports window functions
@@ -381,6 +381,9 @@ module Sequel
       end
 
       private
+      def is_2005_or_later?
+        server_version >= 9000000
+      end
 
       # MSSQL supports the OUTPUT clause for DELETE statements.
       # It also allows prepending a WITH clause.
