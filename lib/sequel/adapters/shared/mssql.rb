@@ -339,9 +339,9 @@ module Sequel
         db.server_version(@opts[:server])
       end
 
-      # Microsoft SQL Server does not support INTERSECT or EXCEPT
+      # MSSQL 2005+ supports INTERSECT and EXCEPT
       def supports_intersect_except?
-        false
+        server_version >= 9000000
       end
       
       # MSSQL does not support IS TRUE
