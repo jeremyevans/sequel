@@ -12,7 +12,7 @@ VERS = lambda do
   require File.expand_path("../lib/sequel/version", __FILE__)
   Sequel.version
 end
-CLEAN.include ["**/.*.sw?", "sequel-*.gem", ".config", "rdoc", "coverage", "www/public/*.html", "www/public/rdoc*"]
+CLEAN.include ["**/.*.sw?", "sequel-*.gem", ".config", "rdoc", "coverage", "www/public/*.html", "www/public/rdoc*", '**/*.rbc']
 RDOC_DEFAULT_OPTS = ["--quiet", "--line-numbers", "--inline-source", '--title', 'Sequel: The Database Toolkit for Ruby']
 RDOC_OPTS = RDOC_DEFAULT_OPTS + ['--main', 'README.rdoc']
 

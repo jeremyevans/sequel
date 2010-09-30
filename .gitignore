@@ -5,3 +5,4 @@
 /www/public/*.html
 /www/public/rdoc*
 /www/public/static/*_presentation
+*.rbc
