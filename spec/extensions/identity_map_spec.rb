@@ -5,7 +5,6 @@ describe "Sequel::Plugins::IdentityMap" do
     class ::IdentityMapModel < Sequel::Model
       plugin :identity_map
       attr_accessor :foo
-      columns :id
       ds = dataset
       def ds.fetch_rows(sql)
         c = @opts[:where].args.first
@@ -16,7 +15,7 @@ describe "Sequel::Plugins::IdentityMap" do
       end
     end
     class ::IdentityMapAlbum < ::IdentityMapModel
-      columns :id, :artist_id
+      columns :artist_id
     end
     class ::IdentityMapArtist < ::IdentityMapModel
     end
@@ -73,7 +72,7 @@ describe "Sequel::Plugins::IdentityMap" do
     end
   end
 
-  it "#load should should store the object in the current identity map if it isn't already there" do
+  it "#load should store the object in the current identity map if it isn't already there" do
     @c.with_identity_map do
       @c.identity_map[@c.identity_map_key(1)].should == nil
       o = @c.load(:id=>1)
@@ -138,6 +137,24 @@ describe "Sequel::Plugins::IdentityMap" do
     end
   end
 
+  it "should use the identity map as a lookup cache when retrieving many_to_one associated records via a composite key" do
+    @c1.columns :another_id
+    @c1.many_to_one :artist, :class=>@c2, :key=>[:id, :another_id]
+    @c.with_identity_map do
+      MODEL_DB.sqls.length.should == 0
+      o = @c1.load(:id=>1, :another_id=>1, :artist_id=>2)
+      a = o.artist
+      a.should be_a_kind_of(@c2)
+      MODEL_DB.sqls.length.should == 1
+      o = @c1.load(:id=>1, :another_id=>2, :artist_id=>2)
+      o.artist.should == a
+      MODEL_DB.sqls.length.should == 1
+      o = @c1.load(:id=>3, :another_id=>3, :artist_id=>3)
+      o.artist.should_not == a
+      MODEL_DB.sqls.length.should == 2
+    end
+  end
+
   it "should use the identity map as a lookup cache when retrieving many_to_one associated records" do
     @c1.many_to_one :artist, :class=>@c2
     @c.with_identity_map do
@@ -170,7 +187,7 @@ describe "Sequel::Plugins::IdentityMap" do
       MODEL_DB.sqls.length.should == 3
     end
   end
-  
+
   it "should not use the identity map as a lookup cache if the assocation has a nil :key option" do
     c = @c2
     @c1.many_to_one :artist, :class=>@c2, :key=>nil, :dataset=>proc{c.filter(:artist_id=>artist_id)}
