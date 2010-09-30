@@ -1,5 +1,7 @@
 === HEAD
 
+* Support composite foreign keys for associations in the identity_map plugin (harukizaemon, jeremyevans)
+
 * Handle INTERSECT and EXCEPT on Microsoft SQL Server 2005+ (jfirebaugh)
 
 * Add :replace option to Database#create_language in the postgresql adapter (jeremyevans)

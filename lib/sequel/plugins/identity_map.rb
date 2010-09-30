@@ -110,25 +110,25 @@ module Sequel
 
         private
 
+        # The primary keys values of the associated object, given the foreign
+        # key columns(s).
+        def _associated_object_pk(fk)
+          fk.is_a?(Array) ? fk.map{|c| send(c)} : send(fk)
+        end
+
         # If the association is a many_to_one and it has a :key option and the
         # key option has a value and the association uses the primary key of
         # the associated class as the :primary_key option, check the identity
         # map for the associated object and return it if present.
         def _load_associated_objects(opts)
           klass = opts.associated_class
-          if idm = model.identity_map and opts[:type] == :many_to_one and opts[:primary_key] == klass.primary_key and
+          if klass.respond_to?(:identity_map) && idm = klass.identity_map and opts[:type] == :many_to_one and opts[:primary_key] == klass.primary_key and
            opts[:key] and pk = _associated_object_pk(opts[:key]) and o = idm[klass.identity_map_key(pk)]
             o
           else
             super
           end
         end
-
-        def _associated_object_pk(column)
-          return send(column) unless column.is_a?(Array)
-          column.map { |column| send(column) }.inspect
-        end
-
       end
     end
   end
