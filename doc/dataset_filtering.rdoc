@@ -165,3 +165,10 @@ One of the best features of Sequel is the ability to use datasets as sub-queries
   #=> "SELECT * FROM consumers WHERE (id IN (SELECT consumer_id FROM consumer_refs WHERE logged_in))"
 
 Note that if you are checking for the inclusion of a single column in a subselect, the subselect should only select a single column.
+
+== Using OR instead of AND
+
+By default, if you chain calls to +filter+, the conditions get ANDed together.  If you want to use an OR for a condition, you can use the +or+ method:
+
+  items.filter(:name=>'Food').or(:vendor=>1).sql
+  #=> "SELECT * FROM items WHERE ((name = 'Food') OR (vendor = 1))"
