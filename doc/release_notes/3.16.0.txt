@@ -1,0 +1,45 @@
+= New Adapter
+
+* A swift adapter was added to Sequel.  Swift is a relatively new
+  ruby database library, built on top of a relatively new backend
+  called dbic++.  While not yet considered production ready, it is
+  very fast.  The swift adapter is about 33% faster and 40% more
+  memory efficient for selects than the postgres adapter using pg
+  with sequel_pg, though it is slower and less memory efficient
+  for inserts and updates.
+
+  Sequel's swift adapter currently supports only PostgreSQL and
+  MySQL, but support for other databases will probably be added in
+  the future.
+
+= Other Improvements
+
+* Sequel now correctly literalizes DateTime objects on ruby 1.9 for
+  databases that support fractional seconds.
+
+* The identity_map plugin now handles composite keys in many_to_one
+  associations.
+
+* The rcte_tree plugin now works when the model's dataset does not
+  select all columns.  This can happen when using the lazy_attributes
+  plugin on the same model.
+
+* Sequel now supports INTERSECT and EXCEPT on Microsoft SQL Server
+  2005+.
+
+* The Database#create_language method in the shared PostgreSQL
+  adapter now accepts a :replace option to replace the currently
+  loaded procedural language if it already exists.  This option
+  is ignored for PostgreSQL versions before 9.0.
+
+* The identity_map plugin now handles cases where the plugin is
+  loaded separately by two different models.
+
+= Backwards Compatibility
+
+* While not technically backwards compatibility related, it was
+  discovered that the identity_map plugin is incompatible with
+  the standard eager loading of many_to_many and many_through_many
+  associations.  If you want to eagerly load those associations and
+  use the identity_map plugin, you should use eager_graph instead
+  of eager.

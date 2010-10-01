@@ -1,6 +1,6 @@
-=== HEAD
+=== 3.16.0 (2010-10-01)
 
-* Support composite foreign keys for associations in the identity_map plugin (harukizaemon, jeremyevans)
+* Support composite foreign keys for associations in the identity_map plugin (harukizaemon, jeremyevans) (#310)
 
 * Handle INTERSECT and EXCEPT on Microsoft SQL Server 2005+ (jfirebaugh)
 
