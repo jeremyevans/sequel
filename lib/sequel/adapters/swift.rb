@@ -64,7 +64,7 @@ module Sequel
         synchronize(opts[:server]) do |conn|
           begin
             res = nil
-            log_yield(sql){res = conn.prepare(sql).execute}
+            log_yield(sql){conn.execute(sql); res = conn.results}
             yield res if block_given?
             nil
           rescue SwiftError => e
@@ -92,9 +92,12 @@ module Sequel
       def execute_insert(sql, opts={})
         synchronize(opts[:server]) do |conn|
           begin
-            log_yield(sql){conn.prepare(sql).execute.insert_id}
+            res = nil
+            log_yield(sql){conn.execute(sql); (res = conn.results).insert_id}
           rescue SwiftError => e
             raise_error(e)
+          ensure
+            res.finish if res
           end
         end
       end

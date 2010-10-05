@@ -46,6 +46,21 @@ module Sequel
           Sequel::Swift::Postgres::Dataset.new(self, opts)
         end
         
+        # Run the SELECT SQL on the database and yield the rows
+        def execute(sql, opts={})
+          synchronize(opts[:server]) do |conn|
+            begin
+              conn.execute(sql)
+              res = conn.results
+              yield res if block_given?
+            rescue SwiftError => e
+              raise_error(e)
+            ensure
+              res.finish if res
+            end
+          end
+        end
+        
         # Run the DELETE/UPDATE SQL on the database and return the number
         # of matched rows.
         def execute_dui(sql, opts={})
@@ -62,8 +77,12 @@ module Sequel
         # for the record.
         def execute_insert(sql, opts={})
           synchronize(opts[:server]) do |conn|
-            conn.execute(sql)
-            insert_result(conn, opts[:table], opts[:values])
+            begin
+              conn.execute(sql)
+              insert_result(conn, opts[:table], opts[:values])
+            rescue SwiftError => e
+              raise_error(e)
+            end
           end
         end
         

@@ -1,3 +1,9 @@
+=== HEAD
+
+* Remove unintended use of prepared statements in swift adapter (jeremyevans)
+
+* Fix logging in the swift PostgreSQL subadapter (jeremyevans)
+
 === 3.16.0 (2010-10-01)
 
 * Support composite foreign keys for associations in the identity_map plugin (harukizaemon, jeremyevans) (#310)
