@@ -32,6 +32,7 @@ module Sequel
     # :quote_identifiers :: Whether to quote identifiers
     # :servers :: A hash specifying a server/shard specific options, keyed by shard symbol 
     # :single_threaded :: Whether to use a single-threaded connection pool
+    # :sql_log_level :: Method to use to log SQL to a logger, :info by default.
     #
     # All options given are also passed to the connection pool.  If a block
     # is given, it is used as the connection_proc for the ConnectionPool.
@@ -52,6 +53,7 @@ module Sequel
       @identifier_input_method = nil
       @identifier_output_method = nil
       @quote_identifiers = nil
+      self.sql_log_level = @opts[:sql_log_level] ? @opts[:sql_log_level].to_sym : :info
       @pool = ConnectionPool.get_pool(@opts, &block)
 
       ::Sequel::DATABASES.push(self)

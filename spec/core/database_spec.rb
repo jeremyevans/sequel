@@ -23,6 +23,11 @@ context "A new Database" do
     Sequel::Database.new(1 => 2, :logger => [4], :loggers => [3]).loggers.should == [4,3]
   end
   
+  specify "should set the sql_log_level from opts[:sql_log_level]" do
+    db = Sequel::Database.new(1 => 2, :sql_log_level=>:debug).sql_log_level.should == :debug
+    db = Sequel::Database.new(1 => 2, :sql_log_level=>'debug').sql_log_level.should == :debug
+  end
+  
   specify "should create a connection pool" do
     @db.pool.should be_a_kind_of(Sequel::ConnectionPool)
     @db.pool.max_size.should == 4
@@ -259,6 +264,15 @@ context "Database#log_yield" do
     @o.logs.length.should == 1
     @o.logs.first.length.should == 2
     @o.logs.first.first.should == :info
+    @o.logs.first.last.should =~ /\A\(\d\.\d{6}s\) blah\z/ 
+  end
+
+  specify "should respect sql_log_level setting" do
+    @db.sql_log_level = :debug
+    @db.log_yield('blah'){}
+    @o.logs.length.should == 1
+    @o.logs.first.length.should == 2
+    @o.logs.first.first.should == :debug
     @o.logs.first.last.should =~ /\A\(\d\.\d{6}s\) blah\z/ 
   end
 

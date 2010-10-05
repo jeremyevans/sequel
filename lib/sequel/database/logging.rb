@@ -12,6 +12,11 @@ module Sequel
     # Array of SQL loggers to use for this database.
     attr_accessor :loggers
     
+    # Log level at which to log SQL queries.  This is actually the method
+    # sent to the logger, so it should be the method name symbol. The default
+    # is :info, it can be set to :debug to log at DEBUG level.
+    attr_accessor :sql_log_level
+
     # Log a message at level info to all loggers.
     def log_info(message, args=nil)
       log_each(:info, args ? "#{message}; #{args.inspect}" : message)
@@ -51,7 +56,7 @@ module Sequel
     # Log message with message prefixed by duration at info level, or
     # warn level if duration is greater than log_warn_duration.
     def log_duration(duration, message)
-      log_each((lwd = log_warn_duration and duration >= lwd) ? :warn : :info, "(#{sprintf('%0.6fs', duration)}) #{message}")
+      log_each((lwd = log_warn_duration and duration >= lwd) ? :warn : sql_log_level, "(#{sprintf('%0.6fs', duration)}) #{message}")
     end
 
     # Log message at level (which should be :error, :warn, or :info)
