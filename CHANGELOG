@@ -1,5 +1,7 @@
 === HEAD
 
+* Add Databse#views and #view_exists? to the Oracle adapter (gpheruson)
+
 * Add Database#sql_log_level for changing the level at which SQL queries are logged (jeremyevans)
 
 * Remove unintended use of prepared statements in swift adapter (jeremyevans)
