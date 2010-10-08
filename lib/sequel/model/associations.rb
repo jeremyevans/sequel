@@ -97,7 +97,7 @@ module Sequel
         def need_associated_primary_key?
           false
         end
-    
+        
         # Returns the reciprocal association variable, if one exists. The reciprocal
         # association is the association in the associated class that is the opposite
         # of the current association.  For example, Album.many_to_one :artist and
@@ -128,6 +128,12 @@ module Sequel
           :"remove_all_#{self[:name]}"
         end
       
+        # Whether associated objects need to be removed from the association before
+        # being destroyed in order to preserve referential integrity.
+        def remove_before_destroy?
+          true
+        end
+    
         # Name symbol for the remove_ association method
         def remove_method
           :"remove_#{singularize(self[:name])}"
@@ -144,7 +150,7 @@ module Sequel
           true
         end
     
-        # The columns to select when loading the association, nil by default.
+        # The columns to select when loading the association.
         def select
           self[:select]
         end
@@ -259,14 +265,14 @@ module Sequel
          self[:primary_key] ||= self[:model].primary_key
         end
       
-        # One to many associations set the reciprocal to self when loading associated records.
-        def set_reciprocal_to_self?
-          true
-        end
-    
         # Whether the reciprocal of this association returns an array of objects instead of a single object,
         # false for a one_to_many association.
         def reciprocal_array?
+          false
+        end
+    
+        # Destroying one_to_many associated objects automatically deletes the foreign key.
+        def remove_before_destroy?
           false
         end
     
@@ -275,6 +281,11 @@ module Sequel
           true
         end
 
+        # One to many associations set the reciprocal to self when loading associated records.
+        def set_reciprocal_to_self?
+          true
+        end
+    
         private
     
         # The reciprocal type of a one_to_many association is a many_to_one association.
@@ -286,6 +297,11 @@ module Sequel
       class OneToOneAssociationReflection < OneToManyAssociationReflection
         ASSOCIATION_TYPES[:one_to_one] = self
         
+        # Destroying one_to_one associated objects automatically deletes the foreign key.
+        def remove_before_destroy?
+          false
+        end
+    
         # one_to_one associations return a single object, not an array
         def returns_array?
           false

@@ -186,7 +186,7 @@ describe "NestedAttributes plugin" do
     ar.set(:first_album_attributes=>{:id=>10, :_delete=>'t'})
     @mods.should == []
     ar.save
-    @mods.should == [[:u, :albums, {:artist_id=>nil}, "(artist_id = 20)"], [:u, :artists, {:name=>"Ar"}, "(id = 20)"], [:d, :albums, "(id = 10)"]]
+    @mods.should == [[:u, :artists, {:name=>"Ar"}, "(id = 20)"], [:d, :albums, "(id = 10)"]]
   end
   
   it "should support destroying one_to_many objects" do
@@ -196,7 +196,7 @@ describe "NestedAttributes plugin" do
     ar.set(:albums_attributes=>[{:id=>10, :_delete=>'t'}])
     @mods.should == []
     ar.save
-    @mods.should == [[:u, :albums, {:name=>"Al", :artist_id=>nil}, '(id = 10)'], [:u, :artists, {:name=>"Ar"}, '(id = 20)'], [:d, :albums, '(id = 10)']]
+    @mods.should == [[:u, :artists, {:name=>"Ar"}, '(id = 20)'], [:d, :albums, '(id = 10)']]
   end
   
   it "should support destroying many_to_many objects" do

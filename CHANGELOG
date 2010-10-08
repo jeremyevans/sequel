@@ -1,5 +1,7 @@
 === HEAD
 
+* In the nested_attributes plugin, don't make unnecessary update calls to modify associated objects that are about to be deleted (jeremyevans, gucki)
+
 * Allow Dataset#(add|set)_graph_aliases to accept as hash values symbols and arrays with a single element (jeremyevans)
 
 * Add Databse#views and #view_exists? to the Oracle adapter (gpheruson)
