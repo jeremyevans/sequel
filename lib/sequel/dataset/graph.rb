@@ -15,7 +15,8 @@ module Sequel
     #   # SELECT ..., table.column AS some_alias
     #   # => {:table=>{:column=>some_alias_value, ...}, ...}
     def add_graph_aliases(graph_aliases)
-      ds = select_more(*graph_alias_columns(graph_aliases))
+      columns, graph_aliases = graph_alias_columns(graph_aliases)
+      ds = select_more(*columns)
       ds.opts[:graph_aliases] = (ds.opts[:graph_aliases] || (ds.opts[:graph][:column_aliases] rescue {}) || {}).merge(graph_aliases)
       ds
     end
@@ -183,20 +184,25 @@ module Sequel
     # graphing is used.
     #
     # graph_aliases :: Should be a hash with keys being symbols of
-    #                  column aliases, and values being arrays with two or three elements.
-    #                  The first element of the array should be the table alias symbol,
-    #                  and the second should be the actual column name symbol. If the array
+    #                  column aliases, and values being either symbols or arrays with one to three elements.
+    #                  If the value is a symbol, it is assumed to be the same as a one element
+    #                  array containing that symbol.
+    #                  The first element of the array should be the table alias symbol.
+    #                  The second should be the actual column name symbol.  If the array only
+    #                  has a single element the column name symbol will be assumed to be the
+    #                  same as the corresponding hash key. If the array
     #                  has a third element, it is used as the value returned, instead of
     #                  table_alias.column_name.
     #
     #   DB[:artists].graph(:albums, :artist_id=>:id).
-    #     set_graph_aliases(:artist_name=>[:artists, :name],
+    #     set_graph_aliases(:name=>:artists,
     #                       :album_name=>[:albums, :name],
     #                       :forty_two=>[:albums, :fourtwo, 42]).first
-    #   # SELECT artists.name AS artist_name, albums.name AS album_name, 42 AS forty_two FROM table
+    #   # SELECT artists.name, albums.name AS album_name, 42 AS forty_two ...
     #   # => {:artists=>{:name=>artists.name}, :albums=>{:name=>albums.name, :fourtwo=>42}}
     def set_graph_aliases(graph_aliases)
-      ds = select(*graph_alias_columns(graph_aliases))
+      columns, graph_aliases = graph_alias_columns(graph_aliases)
+      ds = select(*columns)
       ds.opts[:graph_aliases] = graph_aliases
       ds
     end
@@ -209,13 +215,20 @@ module Sequel
 
     private
 
-    # Transform the hash of graph aliases to an array of columns
+    # Transform the hash of graph aliases and return a two element array
+    # where the first element is an array of identifiers suitable to pass to
+    # a select method, and the second is a new hash of preprocessed graph aliases.
     def graph_alias_columns(graph_aliases)
-      graph_aliases.collect do |col_alias, tc| 
-        identifier = tc[2] || SQL::QualifiedIdentifier.new(tc[0], tc[1])
-        identifier = SQL::AliasedExpression.new(identifier, col_alias) if tc[2] or tc[1] != col_alias
+      gas = {}
+      identifiers = graph_aliases.collect do |col_alias, tc| 
+        table, column, value = Array(tc)
+        column ||= col_alias
+        gas[col_alias] = [table, column]
+        identifier = value || SQL::QualifiedIdentifier.new(table, column)
+        identifier = SQL::AliasedExpression.new(identifier, col_alias) if value or column != col_alias
         identifier
       end
+      [identifiers, gas]
     end
 
     # Fetch the rows, split them into component table parts,

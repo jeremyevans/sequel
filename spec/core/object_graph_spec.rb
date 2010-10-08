@@ -160,6 +160,20 @@ describe Sequel::Dataset, " graphing" do
     ].should(include(ds.sql))
   end
 
+  it "#set_graph_aliases should allow a single array entry to specify a table, assuming the same column as the key" do
+    ds = @ds1.graph(:lines, :x=>:id).set_graph_aliases(:x=>[:points], :y=>[:lines])
+    ['SELECT points.x, lines.y FROM points LEFT OUTER JOIN lines ON (lines.x = points.id)',
+    'SELECT lines.y, points.x FROM points LEFT OUTER JOIN lines ON (lines.x = points.id)'
+    ].should(include(ds.sql))
+  end
+
+  it "#set_graph_aliases should allow hash values to be symbols specifying table, assuming the same column as the key" do
+    ds = @ds1.graph(:lines, :x=>:id).set_graph_aliases(:x=>:points, :y=>:lines)
+    ['SELECT points.x, lines.y FROM points LEFT OUTER JOIN lines ON (lines.x = points.id)',
+    'SELECT lines.y, points.x FROM points LEFT OUTER JOIN lines ON (lines.x = points.id)'
+    ].should(include(ds.sql))
+  end
+
   it "#set_graph_aliases should only alias columns if necessary" do
     ds = @ds1.set_graph_aliases(:x=>[:points, :x], :y=>[:lines, :y])
     ['SELECT points.x, lines.y FROM points',
@@ -280,6 +294,26 @@ describe Sequel::Dataset, " graphing" do
     results = ds.all
     results.length.should == 1
     results.first.should == {:points=>{:z1=>2}, :lines=>{:z2=>3}}
+  end
+
+  it "#graph_each should correctly map values when #set_graph_aliases is used with a single argument for each entry" do
+    ds = @ds1.graph(:lines, :x=>:id).set_graph_aliases(:x=>[:points], :y=>[:lines])
+    def ds.fetch_rows(sql, &block)
+      yield({:x=>2,:y=>3})
+    end
+    results = ds.all
+    results.length.should == 1
+    results.first.should == {:points=>{:x=>2}, :lines=>{:y=>3}}
+  end
+
+  it "#graph_each should correctly map values when #set_graph_aliases is used with a symbol for each entry" do
+    ds = @ds1.graph(:lines, :x=>:id).set_graph_aliases(:x=>:points, :y=>:lines)
+    def ds.fetch_rows(sql, &block)
+      yield({:x=>2,:y=>3})
+    end
+    results = ds.all
+    results.length.should == 1
+    results.first.should == {:points=>{:x=>2}, :lines=>{:y=>3}}
   end
 
   it "#graph_each should run the row_proc for graphed datasets" do
