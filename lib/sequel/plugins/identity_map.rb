@@ -24,7 +24,8 @@ module Sequel
     #
     # The identity_map plugin is not compatible with the standard eager loading of
     # many_to_many and many_through_many associations.  If you want to use the identity_map plugin,
-    # you should use +eager_graph+ instead of +eager+ for those associations.
+    # you should use +eager_graph+ instead of +eager+ for those associations. It is also
+    # not compatible with the eager loading in the +rcte_tree+ plugin.
     #
     # Usage:
     #
