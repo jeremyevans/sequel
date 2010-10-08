@@ -1,7 +1,7 @@
 require File.join(File.dirname(File.expand_path(__FILE__)), 'spec_helper')
 
 if defined?(ActiveSupport::Inflector)
-  skip_warn "string inflector extension: active_support string inflector loaded"
+  skip_warn "inflector extension: active_support inflector loaded"
 else
 describe String do
   it "#camelize and #camelcase should transform the word to CamelCase" do
