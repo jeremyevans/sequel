@@ -210,7 +210,7 @@ module Sequel
     # Remove the splitting of results into subhashes, and all metadata
     # related to the current graph (if any).
     def ungraphed
-      clone(:graph=>nil)
+      clone(:graph=>nil, :graph_aliases=>nil)
     end
 
     private
