@@ -42,6 +42,25 @@ describe Sequel::Model, "many_through_many" do
     proc{@c1.many_through_many :tags, [[:albums_artists, :artist_id, :album_id], [:albums, :id, :id], :album_tags]}.should raise_error(Sequel::Error)
   end
 
+  it "should allow only two arguments with the :through option" do
+    @c1.many_through_many :tags, :through=>[[:albums_artists, :artist_id, :album_id], [:albums, :id, :id], [:albums_tags, :album_id, :tag_id]]
+    n = @c1.load(:id => 1234)
+    a = n.tags_dataset
+    a.should be_a_kind_of(Sequel::Dataset)
+    a.sql.should == 'SELECT tags.* FROM tags INNER JOIN albums_tags ON (albums_tags.tag_id = tags.id) INNER JOIN albums ON (albums.id = albums_tags.album_id) INNER JOIN albums_artists ON ((albums_artists.album_id = albums.id) AND (albums_artists.artist_id = 1234))'
+    n.tags.should == [@c2.load(:id=>1)]
+  end
+
+  it "should be clonable" do
+    @c1.many_through_many :tags, [[:albums_artists, :artist_id, :album_id], [:albums, :id, :id], [:albums_tags, :album_id, :tag_id]]
+    @c1.many_through_many :other_tags, :clone=>:tags
+    n = @c1.load(:id => 1234)
+    a = n.other_tags_dataset
+    a.should be_a_kind_of(Sequel::Dataset)
+    a.sql.should == 'SELECT tags.* FROM tags INNER JOIN albums_tags ON (albums_tags.tag_id = tags.id) INNER JOIN albums ON (albums.id = albums_tags.album_id) INNER JOIN albums_artists ON ((albums_artists.album_id = albums.id) AND (albums_artists.artist_id = 1234))'
+    n.tags.should == [@c2.load(:id=>1)]
+  end
+
   it "should use join tables given" do
     @c1.many_through_many :tags, [[:albums_artists, :artist_id, :album_id], [:albums, :id, :id], [:albums_tags, :album_id, :tag_id]]
     n = @c1.load(:id => 1234)

@@ -141,8 +141,8 @@ module Sequel
         #     array of symbols for a composite key association.
         #   * :uniq - Adds a after_load callback that makes the array of objects unique.
         def many_through_many(name, through, opts={}, &block)
-          associate(:many_through_many, name, opts.merge(:through=>through), &block)
-        end 
+          associate(:many_through_many, name, opts.merge(through.is_a?(Hash) ? through : {:through=>through}), &block)
+        end
 
         private
 
