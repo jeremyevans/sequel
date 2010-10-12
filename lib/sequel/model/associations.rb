@@ -297,11 +297,6 @@ module Sequel
       class OneToOneAssociationReflection < OneToManyAssociationReflection
         ASSOCIATION_TYPES[:one_to_one] = self
         
-        # Destroying one_to_one associated objects automatically deletes the foreign key.
-        def remove_before_destroy?
-          false
-        end
-    
         # one_to_one associations return a single object, not an array
         def returns_array?
           false
