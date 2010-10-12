@@ -92,6 +92,7 @@
 <li><a href='http://github.com/openhood/rspec_sequel_matchers'>rspec_sequel_matchers</a>: RSpec matchers for Sequel validations, associations, and columns.</li>
 <li><a href='http://github.com/gucki/sequel_column_type_array'>sequel_column_type_array</a>: Support for PostgreSQL Arrays.</li>
 <li><a href='http://github.com/gyordanov/sequel_extjs'>sequel_extjs</a>: Generates JSON from datasets that is consumable by the ExtJS JsonStore.</li>
+<li><a href='http://github.com/knaveofdiamonds/sequel_fast_columns'>sequel_fast_columns</a>: Attempts to determine columns without issuing a database query.</li>
 <li><a href='http://github.com/jeremyevans/sequel_pg'>sequel_pg</a>: Faster SELECTs when using Sequel with pg.</li>
 <li><a href='http://github.com/mwlang/sequel_plus'>sequel_plus</a>: Collection of sequel extensions.</li>
 <li><a href='http://github.com/jeremyevans/sequel_postgresql_triggers'>sequel_postgresql_triggers</a>: Database enforced timestamps, immutable columns, and counter/sum caches.</li>
