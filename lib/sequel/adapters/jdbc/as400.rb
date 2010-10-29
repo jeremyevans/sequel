@@ -23,6 +23,11 @@ module Sequel
           nil
         end
 
+        # AS400 supports transaction isolation levels
+        def supports_transaction_isolation_levels?
+          true
+        end
+
         private
 
         # Use JDBC connection's setAutoCommit to false to start transactions
@@ -55,8 +60,8 @@ module Sequel
         
         # AS400 needs to use a couple of subselects for queries with offsets.
         def select_sql
-          return super unless l = @opts[:limit]
-          o = @opts[:offset] || 0
+          return super unless o = @opts[:offset]
+          l = @opts[:limit]
           order = @opts[:order]
           dsa1 = dataset_alias(1)
           dsa2 = dataset_alias(2)
