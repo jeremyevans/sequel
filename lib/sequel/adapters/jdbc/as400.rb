@@ -32,6 +32,7 @@ module Sequel
 
         # Use JDBC connection's setAutoCommit to false to start transactions
         def begin_transaction(conn, opts={})
+          set_transaction_isolation(conn, opts)
           log_yield(TRANSACTION_BEGIN){conn.setAutoCommit(false)}
           conn
         end
