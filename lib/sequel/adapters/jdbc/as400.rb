@@ -4,6 +4,10 @@ module Sequel
     module AS400
       # Instance methods for AS400 Database objects accessed via JDBC.
       module DatabaseMethods
+        TRANSACTION_BEGIN = 'Transaction.begin'.freeze
+        TRANSACTION_COMMIT = 'Transaction.commit'.freeze
+        TRANSACTION_ROLLBACK = 'Transaction.rollback'.freeze
+        
         # AS400 uses the :as400 database type.
         def database_type
           :as400
@@ -17,6 +21,31 @@ module Sequel
         # TODO: Fix for AS400
         def last_insert_id(conn, opts={})
           nil
+        end
+
+        private
+
+        # Use JDBC connection's setAutoCommit to false to start transactions
+        def begin_transaction(conn, opts={})
+          log_yield(TRANSACTION_BEGIN){conn.setAutoCommit(false)}
+          conn
+        end
+
+        # Use JDBC connection's commit method to commit transactions
+        def commit_transaction(conn, opts={})
+          log_yield(TRANSACTION_COMMIT){conn.commit}
+        end
+
+        # Use JDBC connection's setAutoCommit to true to enable default
+        # auto-commit mode
+        def remove_transaction(conn)
+          conn.setAutoCommit(true) if conn
+          @transactions.delete(Thread.current)
+        end
+
+        # Use JDBC connection's rollback method to rollback transactions
+        def rollback_transaction(conn, opts={})
+          log_yield(TRANSACTION_ROLLBACK){conn.rollback}
         end
       end
       
@@ -34,12 +63,12 @@ module Sequel
           rn = row_number_column
           irn = Sequel::SQL::Identifier.new(rn).qualify(dsa2)
           subselect_sql(unlimited.
-            from_self(:alias=>dsa1).
-            select_more(Sequel::SQL::QualifiedIdentifier.new(dsa1, WILDCARD),
+              from_self(:alias=>dsa1).
+              select_more(Sequel::SQL::QualifiedIdentifier.new(dsa1, WILDCARD),
               Sequel::SQL::WindowFunction.new(SQL::Function.new(:ROW_NUMBER), Sequel::SQL::Window.new(:order=>order)).as(rn)).
-            from_self(:alias=>dsa2).
-            select(Sequel::SQL::QualifiedIdentifier.new(dsa2, WILDCARD)).
-            where((irn > o) & (irn <= l + o)))
+              from_self(:alias=>dsa2).
+              select(Sequel::SQL::QualifiedIdentifier.new(dsa2, WILDCARD)).
+              where((irn > o) & (irn <= l + o)))
         end
           
         def supports_window_functions?
