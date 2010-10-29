@@ -53,7 +53,7 @@ module Sequel
       class Dataset < JDBC::Dataset
         WILDCARD = Sequel::LiteralString.new('*').freeze
         
-        # AS400 needs to use a couple of subselects for all limits and offsets.
+        # AS400 needs to use a couple of subselects for queries with offsets.
         def select_sql
           return super unless l = @opts[:limit]
           o = @opts[:offset] || 0
@@ -68,7 +68,15 @@ module Sequel
               Sequel::SQL::WindowFunction.new(SQL::Function.new(:ROW_NUMBER), Sequel::SQL::Window.new(:order=>order)).as(rn)).
               from_self(:alias=>dsa2).
               select(Sequel::SQL::QualifiedIdentifier.new(dsa2, WILDCARD)).
-              where((irn > o) & (irn <= l + o)))
+              where(l ? ((irn > o) & (irn <= l + o)) : (irn > o))) # Leave off limit in case of limit(nil, offset)
+        end
+
+        # Modify the sql to limit the number of rows returned
+        def select_limit_sql(sql)
+          if @opts[:limit]
+            sql << " FETCH FIRST ROW ONLY" if @opts[:limit] == 1
+            sql << " FETCH FIRST #{@opts[:limit]} ROWS ONLY" if @opts[:limit] > 1
+          end
         end
           
         def supports_window_functions?
