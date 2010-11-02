@@ -1,5 +1,7 @@
 === HEAD
 
+* Add support for connecting to MySQL over SSL using the :sslca, :sslkey, and related options (jeremyevans)
+
 * Fix Database#each_server when used with jdbc or do connection strings without separate :adapter option (jeremyevans) (#312)
 
 * Much better support in the AS400 JDBC subadapter (bhauff)

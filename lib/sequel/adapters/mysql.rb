@@ -93,6 +93,7 @@ module Sequel
         conn = Mysql.init
         conn.options(Mysql::READ_DEFAULT_GROUP, opts[:config_default_group] || "client")
         conn.options(Mysql::OPT_LOCAL_INFILE, opts[:config_local_infile]) if opts.has_key?(:config_local_infile)
+        conn.ssl_set(opts[:sslkey], opts[:sslcert], opts[:sslca], opts[:sslcapath], opts[:sslcipher]) if opts[:sslca] || opts[:sslkey]
         if encoding = opts[:encoding] || opts[:charset]
           # Set encoding before connecting so that the mysql driver knows what
           # encoding we want to use, but this can be overridden by READ_DEFAULT_GROUP.
