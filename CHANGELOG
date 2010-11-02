@@ -1,5 +1,7 @@
 === HEAD
 
+* Much better support in the AS400 JDBC subadapter (bhauff)
+
 * Allow cloning of many_through_many associations (gucki, jeremyevans)
 
 * In the nested_attributes plugin, don't make unnecessary update calls to modify associated objects that are about to be deleted (jeremyevans, gucki)
