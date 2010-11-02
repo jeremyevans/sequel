@@ -5,7 +5,11 @@ module Sequel
     # If this exception wraps an underlying exception, the underlying
     # exception is held here.
     attr_accessor :wrapped_exception
-  end  
+    # in certain cases (initially just jdbc.connect) there are two underlying
+    # exceptions that might be interesting, and selecting just one would sacrifice
+    # detail.
+    attr_accessor :wrapped_secondary_exception
+  end
     
   # Raised when the adapter requested doesn't exist or can't be loaded.
   class AdapterNotFound < Error ; end

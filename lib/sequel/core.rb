@@ -122,10 +122,11 @@ module Sequel
   # Convert the +exception+ to the given class.  The given class should be
   # <tt>Sequel::Error</tt> or a subclass.  Returns an instance of +klass+ with
   # the message and backtrace of +exception+.
-  def self.convert_exception_class(exception, klass)
+  def self.convert_exception_class(exception, klass, secondary = nil)
     return exception if exception.is_a?(klass)
     e = klass.new("#{exception.class}: #{exception.message}")
     e.wrapped_exception = exception
+    e.wrapped_secondary_exception = secondary
     e.set_backtrace(exception.backtrace)
     e
   end

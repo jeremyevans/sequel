@@ -168,7 +168,11 @@ module Sequel
               props.setProperty("user", opts[:user])
               props.setProperty("password", opts[:password])
             end
-            driver.new.connect(args[0], props) rescue (raise e)
+            begin
+              driver.new.connect(args[0], props)
+            rescue
+              raise Sequel.convert_exception_class(e, Sequel::DatabaseConnectionError, e2)
+            end
           end
         end
         setup_connection(conn)
