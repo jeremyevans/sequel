@@ -968,19 +968,19 @@ context "A Database adapter with a scheme" do
     c = Sequel.ccc('mydb')
     p = proc{c.opts.delete_if{|k,v| k == :disconnection_proc || k == :single_threaded}}
     c.should be_a_kind_of(CCC)
-    p.call.should == {:adapter=>:ccc, :database => 'mydb'}
+    p.call.should == {:adapter=>:ccc, :database => 'mydb', :adapter_class=>CCC}
     
     c = Sequel.ccc('mydb', :host => 'localhost')
     c.should be_a_kind_of(CCC)
-    p.call.should == {:adapter=>:ccc, :database => 'mydb', :host => 'localhost'}
+    p.call.should == {:adapter=>:ccc, :database => 'mydb', :host => 'localhost', :adapter_class=>CCC}
     
     c = Sequel.ccc
     c.should be_a_kind_of(CCC)
-    p.call.should == {:adapter=>:ccc}
+    p.call.should == {:adapter=>:ccc, :adapter_class=>CCC}
     
     c = Sequel.ccc(:database => 'mydb', :host => 'localhost')
     c.should be_a_kind_of(CCC)
-    p.call.should == {:adapter=>:ccc, :database => 'mydb', :host => 'localhost'}
+    p.call.should == {:adapter=>:ccc, :database => 'mydb', :host => 'localhost', :adapter_class=>CCC}
   end
   
   specify "should be accessible through Sequel.connect with options" do
@@ -1495,6 +1495,31 @@ context "Database#remove_servers" do
       end
       c1[:host].should == 1
     end
+  end
+end
+
+context "Database#each_server with do/jdbc adapter connection string without :adapter option" do
+  before do
+    klass = Class.new(Sequel::Database)
+    klass.should_receive(:adapter_class).once.with(:jdbc).and_return(MockDatabase)
+    @db = klass.connect('jdbc:blah:', :host=>1, :database=>2, :servers=>{:server1=>{:host=>3}})
+    def @db.connect(server)
+      server_opts(server)
+    end
+    def @db.disconnect_connection(c)
+    end
+  end
+
+  specify "should yield a separate database object for each server" do
+    hosts = []
+    @db.each_server do |db|
+      db.should be_a_kind_of(Sequel::Database)
+      db.should_not == @db
+      db.opts[:adapter_class].should == MockDatabase
+      db.opts[:database].should == 2
+      hosts << db.opts[:host]
+    end
+    hosts.sort.should == [1, 3]
   end
 end
 

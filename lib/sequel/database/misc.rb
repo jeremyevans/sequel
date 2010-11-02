@@ -44,6 +44,7 @@ module Sequel
       @opts[:disconnection_proc] ||= proc{|conn| disconnect_connection(conn)}
       block ||= proc{|server| connect(server)}
       @opts[:servers] = {} if @opts[:servers].is_a?(String)
+      @opts[:adapter_class] = self.class
       
       @opts[:single_threaded] = @single_threaded = typecast_value_boolean(@opts.fetch(:single_threaded, @@single_threaded))
       @schemas = {}

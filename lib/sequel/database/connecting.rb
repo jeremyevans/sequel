@@ -15,6 +15,8 @@ module Sequel
     # Raises Sequel::AdapterNotFound if the adapter
     # could not be loaded.
     def self.adapter_class(scheme)
+      return scheme if scheme.is_a?(Class)
+
       scheme = scheme.to_s.gsub('-', '_').to_sym
       
       unless klass = ADAPTER_MAP[scheme]
@@ -58,7 +60,7 @@ module Sequel
         end
       when Hash
         opts = conn_string.merge(opts)
-        c = adapter_class(opts[:adapter] || opts['adapter'])
+        c = adapter_class(opts[:adapter_class] || opts[:adapter] || opts['adapter'])
       else
         raise Error, "Sequel::Database.connect takes either a Hash or a String, given: #{conn_string.inspect}"
       end
