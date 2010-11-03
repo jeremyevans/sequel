@@ -205,9 +205,9 @@ module Sequel
                 klass.from_xml_node(node)
               end
             elsif cols.include?(k)
-              self[k.to_sym] = node.children.first.to_s
+              self[k.to_sym] = node[:nil] ? nil : node.children.first.to_s
             elsif meths.include?("#{k}=")
-              send("#{k}=", node.children.first.to_s)
+              send("#{k}=", node[:nil] ? nil : node.children.first.to_s)
             else
               raise Error, "Entry in XML not an association or column and no setter method exists: #{k}"
             end
@@ -268,7 +268,15 @@ module Sequel
           x = model.xml_builder(opts)
           x.send(name_proc[opts.fetch(:root_name, model.send(:underscore, model.name)).to_s]) do |x1|
             cols.each do |c|
-              x1.send(name_proc[c.to_s], vals[c], types ? {:type=>db_schema.fetch(c, {})[:type]} : {})
+              attrs = {}
+              if types
+                attrs[:type] = db_schema.fetch(c, {})[:type]
+              end
+              v = vals[c]
+              if v.nil?
+                attrs[:nil] = ''
+              end
+              x1.send(name_proc[c.to_s], v, attrs)
             end
             if inc.is_a?(Hash)
               inc.each{|k, v| to_xml_include(x1, k, v)}

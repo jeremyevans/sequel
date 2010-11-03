@@ -1,5 +1,7 @@
 === HEAD
 
+* Correctly handle nil values in the xml_serializer plugin, instead of converting them to empty strings (george.haff) (#313)
+
 * Use a default wait_timeout that's allowed on Windows for the mysql and mysql2 adapters (jeremyevans) (#314)
 
 * Add support for connecting to MySQL over SSL using the :sslca, :sslkey, and related options (jeremyevans)

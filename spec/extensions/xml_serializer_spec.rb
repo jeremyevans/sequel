@@ -36,6 +36,16 @@ describe "Sequel::Plugins::XmlSerializer" do
     Album.from_xml(@album.to_xml).should == @album
   end
 
+  it "should round trip successfully with empty strings" do
+    artist = Artist.load(:id=>2, :name=>'')
+    Artist.from_xml(artist.to_xml).should == artist
+  end
+
+  it "should round trip successfully with nil values" do
+    artist = Artist.load(:id=>2, :name=>nil)
+    Artist.from_xml(artist.to_xml).should == artist
+  end
+
   it "should handle the :only option" do
     Artist.from_xml(@artist.to_xml(:only=>:name)).should == Artist.load(:name=>@artist.name)
     Album.from_xml(@album.to_xml(:only=>[:id, :name])).should == Album.load(:id=>@album.id, :name=>@album.name)
