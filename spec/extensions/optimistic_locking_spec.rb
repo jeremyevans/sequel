@@ -20,6 +20,14 @@ describe "optimistic_locking plugin" do
         else
           0
         end
+      when /UPDATE people SET #{lv} = (\d+) WHERE \(\(id = (\d+)\) AND \(#{lv} = (\d+)\)\)/
+        m = h[$2.to_i]
+        if m && m[:lock_version] == $3.to_i
+          m.merge!(:lock_version=>$1.to_i)
+          1
+        else
+          0
+        end
       else
         puts update_sql(opts)
       end
@@ -96,5 +104,22 @@ describe "optimistic_locking plugin" do
     p2 = c[1]
     p1.update(:name=>'Jim')
     proc{p2.update(:name=>'Bob')}.should raise_error(Sequel::Plugins::OptimisticLocking::Error)
-  end 
+  end
+
+  specify "should increment the lock column when #modified! even if no columns are changed" do
+    p1 = @c[1]
+    p1.modified!
+    lv = p1.lock_version
+    p1.save_changes
+    p1.lock_version.should == lv + 1
+  end
+
+  specify "should not increment the lock column when the update fails" do
+    @c.dataset.meta_def(:update) { raise Exception }
+    p1 = @c[1]
+    p1.modified!
+    lv = p1.lock_version
+    proc{p1.save_changes}.should raise_error(Exception)
+    p1.lock_version.should == lv
+  end
 end

@@ -68,7 +68,7 @@ module Sequel
         
         # Only update the row if it has the same lock version, and increment the
         # lock version.
-        def _update(columns)
+        def _update_columns(columns)
           lc = model.lock_column
           lcv = send(lc)
           columns[lc] = lcv + 1

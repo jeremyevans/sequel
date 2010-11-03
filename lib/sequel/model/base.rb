@@ -1236,7 +1236,7 @@ module Sequel
             @columns_updated = @values.reject{|k, v| !columns.include?(k)}
             changed_columns.reject!{|c| columns.include?(c)}
           end
-          _update(@columns_updated) unless @columns_updated.empty?
+          _update_columns(@columns_updated)
           @this = nil
           after_update
           after_save
@@ -1264,7 +1264,14 @@ module Sequel
         Array(primary_key).each{|x| v.delete(x) unless changed_columns.include?(x)}
         v
       end
-      
+
+      # Call _update with the given columns, if any are present.
+      # Plugins can override this method in order to update with
+      # additional columns, even when the column hash is initially empty.
+      def _update_columns(columns)
+        _update(columns) unless columns.empty?
+      end
+
       # Update this instance's dataset with the supplied column hash.
       def _update(columns)
         n = _update_dataset.update(columns)
