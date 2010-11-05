@@ -1,4 +1,6 @@
-=== HEAD
+=== 3.17.0 (2010-11-05)
+
+* Ensure that the optimistic locking plugin increments the lock column when using Model#modified! (jfirebaugh)
 
 * Correctly handle nil values in the xml_serializer plugin, instead of converting them to empty strings (george.haff) (#313)
 

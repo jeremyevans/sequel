@@ -1,0 +1,58 @@
+= New Features
+
+* You can now change the level at which Sequel logs SQL statements,
+  by calling Database#sql_log_level= with the method name symbol.
+  The default is still :info for backwards compatibility. Previously,
+  you had to use a proxy logger to get similar capability.
+
+* You can now specify graph aliases where the alias would be the same
+  as the table column name using just the table name symbol, instead
+  having to repeat the alias as the second element of an array.  More
+  clearly:
+
+    # < 3.17.0:
+    DB[:a].graph(:b, :a_id=>:id).
+      set_graph_aliases(:c=>[:a, :c], :d=>[:b, :d])
+    # >= 3.17.0:
+    DB[:a].graph(:b, :a_id=>:id).set_graph_aliases(:c=>:a, :d=>:b)
+    
+  Both of these now yield the SQL:
+  
+    SELECT a.c, b.d FROM a LEFT OUTER JOIN b ON (b.a_id = a.id)
+
+* You should now be able to connect to MySQL over SSL in the native
+  MySQL adapter using the :sslca, :sslkey, and related options.
+
+* Database#views and Database#view_exists? methods were added to the
+  Oracle adapter, allowing you to get a an array of view name symbols
+  and to check whether a given view exists.
+
+= Other Improvements
+
+* The nested_attributes plugin now avoids unnecessary update calls
+  when deleting associated objects, resulting in better performance.
+
+* The optimistic_locking plugin now increments the lock column if no
+  other columns were modified but the Model#modified! was called. This
+  means it now works correctly with the nested_attributes plugin when
+  no changes to the main model object are made.
+
+* The xml_serializer plugin can now round-trip nil values correctly.
+  Previously, nil values would be converted into empty strings.  This
+  is accomplished by including a nil attribute in the xml tag.
+  
+* Database#each_server now works correctly when using the jdbc and do
+  adapters and a connection string without a separate :adapter option.
+  
+* You can now clone many_through_many associations.
+
+* The default wait_timeout used by the mysql and mysql2 adapters was
+  decreased slightly so that it works correctly with MySQL database
+  servers that run on Windows.
+  
+* Many improvements were made to the AS400 jdbc subadapter.
+
+* Many improvements were made to the swift adapter and subadapters.
+
+* Dataset#ungraphed now removes any cached graph aliases set with
+  set_graph_aliases or add_graph_aliases.
