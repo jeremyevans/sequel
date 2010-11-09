@@ -26,11 +26,13 @@ module Sequel
       #   the MySQL config file.
       # * :config_local_infile - If provided, sets the Mysql::OPT_LOCAL_INFILE
       #   option on the connection with the given value.
+      # * :connect_timeout - Set the timeout in seconds before a connection
+      #   attempt is abandoned.
       # * :encoding - Set all the related character sets for this
       #   connection (connection, client, database, server, and results).
       # * :socket - Use a unix socket file instead of connecting via TCP/IP.
       # * :timeout - Set the timeout in seconds before the server will
-      #   disconnect this connection.
+      #   disconnect this connection (a.k.a. @@wait_timeout).
       def connect(server)
         opts = server_opts(server)
         opts[:host] ||= 'localhost'

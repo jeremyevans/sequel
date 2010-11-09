@@ -83,11 +83,15 @@ module Sequel
       #   the MySQL config file.
       # * :config_local_infile - If provided, sets the Mysql::OPT_LOCAL_INFILE
       #   option on the connection with the given value.
+      # * :connect_timeout - Set the timeout in seconds before a connection
+      #   attempt is abandoned.
       # * :encoding - Set all the related character sets for this
       #   connection (connection, client, database, server, and results).
+      # * :read_timeout - Set the timeout in seconds for reading back results
+      #   to a query.
       # * :socket - Use a unix socket file instead of connecting via TCP/IP.
       # * :timeout - Set the timeout in seconds before the server will
-      #   disconnect this connection.
+      #   disconnect this connection (a.k.a @@wait_timeout).
       def connect(server)
         opts = server_opts(server)
         conn = Mysql.init
@@ -98,6 +102,12 @@ module Sequel
           # Set encoding before connecting so that the mysql driver knows what
           # encoding we want to use, but this can be overridden by READ_DEFAULT_GROUP.
           conn.options(Mysql::SET_CHARSET_NAME, encoding)
+        end
+        if read_timeout = opts[:read_timeout] and Mysql::const_defined(Mysql::OPT_READ_TIMEOUT)
+          conn.options(Mysql::OPT_READ_TIMEOUT, read_timeout)
+        end
+        if connect_timeout = opts[:connect_timeout] and Mysql::const_defined(Mysql::OPT_CONNECT_TIMEOUT)
+          conn.options(Mysql::OPT_CONNECT_TIMEOUT, connect_timeout)
         end
         conn.real_connect(
           opts[:host] || 'localhost',

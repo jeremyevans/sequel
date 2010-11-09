@@ -1,3 +1,9 @@
+=== HEAD
+
+* Support :read_timeout option in the native mysql adapter (tmm1)
+
+* Support :connect_timeout option in the native mysql and mysql2 adapters (tmm1)
+
 === 3.17.0 (2010-11-05)
 
 * Ensure that the optimistic locking plugin increments the lock column when using Model#modified! (jfirebaugh)
