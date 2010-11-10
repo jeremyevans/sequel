@@ -93,7 +93,7 @@ module Sequel
 
     # Use a single proc for each type to conserve memory
     PG_TYPE_PROCS  = {
-      [16] =>  lambda{|s| s == 't'}, # boolean
+      [16] => lambda{|s| s == 't'}, # boolean
       [17] => lambda{|s| ::Sequel::SQL::Blob.new(Adapter.unescape_bytea(s))}, # bytea
       [20, 21, 22, 23, 26] => lambda{|s| s.to_i}, # integer
       [700, 701] => lambda{|s| s.to_f}, # float
