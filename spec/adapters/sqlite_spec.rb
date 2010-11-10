@@ -101,14 +101,13 @@ context "An SQLite database" do
   cspecify "should support timestamps and datetimes and respect datetime_class", :do, :jdbc, :amalgalite do
     @db.create_table!(:time){timestamp :t; datetime :d}
     t1 = Time.at(1)
-    @db[:time] << {:t => t1, :d => t1.to_i}
-    @db[:time] << {:t => t1.to_i, :d => t1}
-    @db[:time].map(:t).should == [t1, t1]
-    @db[:time].map(:d).should == [t1, t1]
+    @db[:time] << {:t => t1, :d => t1}
+    @db[:time].map(:t).should == [t1]
+    @db[:time].map(:d).should == [t1]
     Sequel.datetime_class = DateTime
     t2 = Sequel.string_to_datetime(t1.iso8601)
-    @db[:time].map(:t).should == [t2, t2]
-    @db[:time].map(:d).should == [t2, t2]
+    @db[:time].map(:t).should == [t2]
+    @db[:time].map(:d).should == [t2]
   end
   
   specify "should support sequential primary keys" do

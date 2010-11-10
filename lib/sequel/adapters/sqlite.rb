@@ -10,6 +10,20 @@ module Sequel
   # Top level module for holding all SQLite-related modules and classes
   # for Sequel.
   module SQLite
+    UNIX_EPOCH_TIME_FORMAT = /\A\d+\z/.freeze
+    SQLITE_TYPES = {}
+    SQLITE_TYPE_PROCS = {
+      %w'timestamp datetime' => proc{|v| Sequel.database_to_application_timestamp(v)},
+      %w'date' => proc{|v| Sequel.string_to_date(v)},
+      %w'boolean' => proc{|v| v == 't'},
+      %w'numeric decimal money' => proc{|v| BigDecimal.new(v) rescue v},
+      ['float', 'real', 'double precision'] => proc{|v| Float(v) rescue v},
+      %w'blob' => proc{|v| ::Sequel::SQL::Blob.new(v)}
+    }
+    SQLITE_TYPE_PROCS.each do |k,v|
+      k.each{|n| SQLITE_TYPES[n] = v}
+    end
+    
     # Database class for SQLite databases used with Sequel and the
     # ruby-sqlite3 driver.
     class Database < Sequel::Database
@@ -35,33 +49,9 @@ module Sequel
         opts[:database] = ':memory:' if blank_object?(opts[:database])
         db = ::SQLite3::Database.new(opts[:database])
         db.busy_timeout(opts.fetch(:timeout, 5000))
-        db.type_translation = true
         
         connection_pragmas.each{|s| log_yield(s){db.execute_batch(s)}}
         
-        # Handle datetimes with Sequel.datetime_class
-        prok = proc do |t,v|
-          v = Time.at(v.to_i).iso8601 if UNIX_EPOCH_TIME_FORMAT.match(v)
-          Sequel.database_to_application_timestamp(v)
-        end
-        db.translator.add_translator("timestamp", &prok)
-        db.translator.add_translator("datetime", &prok)
-        
-        # Handle numeric values with BigDecimal
-        prok = proc{|t,v| BigDecimal.new(v) rescue v}
-        db.translator.add_translator("numeric", &prok)
-        db.translator.add_translator("decimal", &prok)
-        db.translator.add_translator("money", &prok)
-        
-        # Handle floating point values with Float
-        prok = proc{|t,v| Float(v) rescue v}
-        db.translator.add_translator("float", &prok)
-        db.translator.add_translator("real", &prok)
-        db.translator.add_translator("double precision", &prok)
-        
-        # Handle blob values with Sequel::SQL::Blob
-        db.translator.add_translator("blob"){|t,v| ::Sequel::SQL::Blob.new(v)}
-
         class << db
           attr_reader :prepared_statements
         end
@@ -271,11 +261,18 @@ module Sequel
       def fetch_rows(sql)
         execute(sql) do |result|
           i = -1
-          cols = result.columns.map{|c| [output_identifier(c), i+=1]}
+          type_procs = result.types.map{|t| SQLITE_TYPES[t]}
+          cols = result.columns.map{|c| i+=1; [output_identifier(c), i, type_procs[i]]}
           @columns = cols.map{|c| c.first}
           result.each do |values|
             row = {}
-            cols.each{|n,i| row[n] = values[i]}
+            cols.each do |name,i,type_proc|
+              v = values[i]
+              if type_proc && v.is_a?(String)
+                v = type_proc.call(v)
+              end
+              row[name] = v
+            end
             yield row
           end
         end
