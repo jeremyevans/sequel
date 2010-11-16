@@ -12,12 +12,15 @@ module Sequel
   module SQLite
     UNIX_EPOCH_TIME_FORMAT = /\A\d+\z/.freeze
     SQLITE_TYPES = {}
+    FALSE_VALUES = %w'0 false f no n'.freeze
     SQLITE_TYPE_PROCS = {
       %w'timestamp datetime' => proc{|v| Sequel.database_to_application_timestamp(v)},
       %w'date' => proc{|v| Sequel.string_to_date(v)},
-      %w'boolean' => proc{|v| v == 't'},
+      %w'time' => proc{|v| Sequel.string_to_time(v)},
+      %w'bit bool boolean' => proc{|v| !FALSE_VALUES.include?(v.downcase)},
+      %w'integer smallint mediumint int bigint' => proc{|v| Integer(v) rescue v},
       %w'numeric decimal money' => proc{|v| BigDecimal.new(v) rescue v},
-      ['float', 'real', 'double precision'] => proc{|v| Float(v) rescue v},
+      %w'float double real dec fixed' + ['double precision'] => proc{|v| Float(v) rescue v},
       %w'blob' => proc{|v| ::Sequel::SQL::Blob.new(v)}
     }
     SQLITE_TYPE_PROCS.each do |k,v|
@@ -261,7 +264,7 @@ module Sequel
       def fetch_rows(sql)
         execute(sql) do |result|
           i = -1
-          type_procs = result.types.map{|t| SQLITE_TYPES[t]}
+          type_procs = result.types.map{|t| SQLITE_TYPES[base_type_name(t)]}
           cols = result.columns.map{|c| i+=1; [output_identifier(c), i, type_procs[i]]}
           @columns = cols.map{|c| c.first}
           result.each do |values|
@@ -294,6 +297,11 @@ module Sequel
       
       private
       
+      # The base type name for a given type, without any parenthetical part.
+      def base_type_name(t)
+        (t =~ /^(.*?)\(/ ? $1 : t).downcase if t
+      end
+
       # Quote the string using the adapter class method.
       def literal_string(v)
         "'#{::SQLite3::Database.quote(v)}'"
