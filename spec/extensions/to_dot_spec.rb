@@ -28,7 +28,10 @@ END
   end
 
   it "should handle WITH" do
-    dot(@ds.with(:a, @ds)).should == ["1 -> 2 [label=\"with\"];", "2 [label=\"Array\"];", "2 -> 3 [label=\"0\"];", "3 [label=\"Hash\"];", "3 -> 4 [label=\"dataset\"];", "4 [label=\"Dataset\"];", "3 -> 5 [label=\"name\"];", "5 [label=\":a\"];"]
+    a = dot(@ds.with(:a, @ds))
+    a[0..3].should == ["1 -> 2 [label=\"with\"];", "2 [label=\"Array\"];", "2 -> 3 [label=\"0\"];", "3 [label=\"Hash\"];"]
+    [["3 -> 4 [label=\"dataset\"];", "4 [label=\"Dataset\"];", "3 -> 5 [label=\"name\"];", "5 [label=\":a\"];"],
+     ["3 -> 4 [label=\"name\"];", "4 [label=\":a\"];", "3 -> 5 [label=\"dataset\"];", "5 [label=\"Dataset\"];"]].should include(a[4..-1])
   end
 
   it "should handle DISTINCT" do
