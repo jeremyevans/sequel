@@ -1,5 +1,9 @@
 === HEAD
 
+* Add to_dot extension, for producing visualizations of Dataset abstract syntax trees with Graphviz (jeremyevans)
+
+* Switch to using manual type translation in the SQLite adapter (jeremyevans)
+
 * Support :read_timeout option in the native mysql adapter (tmm1)
 
 * Support :connect_timeout option in the native mysql and mysql2 adapters (tmm1)
