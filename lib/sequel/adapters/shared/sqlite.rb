@@ -388,6 +388,11 @@ module Sequel
         "#{expression} AS #{literal(aliaz.to_s)}"
       end
       
+      # SQL fragment specifying a list of identifiers
+      def identifier_list(columns)
+        columns.map{|i| quote_identifier(i)}.join(COMMA_SEPARATOR)
+      end
+    
       # SQLite uses a preceding X for hex escaping strings
       def literal_blob(v)
         blob = ''

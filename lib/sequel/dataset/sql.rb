@@ -600,11 +600,6 @@ module Sequel
       sprintf(".%06d", usec)
     end
 
-    # SQL fragment specifying a list of identifiers
-    def identifier_list(columns)
-      columns.map{|i| quote_identifier(i)}.join(COMMA_SEPARATOR)
-    end
-    
     # Modify the identifier returned from the database based on the
     # identifier_output_method.
     def input_identifier(v)
