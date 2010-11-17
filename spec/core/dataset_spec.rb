@@ -1552,6 +1552,10 @@ context "Dataset#qualified_column_name" do
   specify "should not changed the qualifed column's table if given a qualified symbol" do
     @dataset.literal(@dataset.send(:qualified_column_name, :ccc__b, :items)).should == 'ccc.b'
   end
+
+  specify "should handle an aliased identifier" do
+    @dataset.literal(@dataset.send(:qualified_column_name, :ccc, :items.as(:i))).should == 'i.ccc'
+  end
 end
 
 class DummyDataset < Sequel::Dataset
@@ -1934,6 +1938,11 @@ context "Dataset#join_table" do
 
   specify "should support aliased tables using the :table_alias option" do
     @d.from('stats').join('players', {:id => :player_id}, :table_alias=>:p).sql.should ==
+      'SELECT * FROM "stats" INNER JOIN "players" AS "p" ON ("p"."id" = "stats"."player_id")'
+  end
+  
+  specify "should support aliased tables using an implicit alias" do
+    @d.from('stats').join(:players.as(:p), {:id => :player_id}).sql.should ==
       'SELECT * FROM "stats" INNER JOIN "players" AS "p" ON ("p"."id" = "stats"."player_id")'
   end
   

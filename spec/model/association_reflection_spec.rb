@@ -173,3 +173,22 @@ describe Sequel::Model::Associations::AssociationReflection, "#associated_object
   end
 end
 
+describe Sequel::Model::Associations::AssociationReflection, "#remove_before_destroy?" do
+  before do
+    @c = Class.new(Sequel::Model)
+  end
+
+  it "should be true for many_to_one and many_to_many associations" do
+    @c.many_to_one :c, :class=>@c
+    @c.association_reflection(:c).remove_before_destroy?.should be_true
+    @c.many_to_many :cs, :class=>@c
+    @c.association_reflection(:cs).remove_before_destroy?.should be_true
+  end
+  it "should be false for one_to_one and one_to_many associations" do
+    @c.one_to_one :c, :class=>@c
+    @c.association_reflection(:c).remove_before_destroy?.should be_false
+    @c.one_to_many :cs, :class=>@c
+    @c.association_reflection(:cs).remove_before_destroy?.should be_false
+  end
+end
+
