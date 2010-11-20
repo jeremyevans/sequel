@@ -80,7 +80,7 @@ module Sequel
 
   # Internal class used by the Sequel.migration DSL, part of the +migration+ extension.
   class MigrationDSL < BasicObject
-    # The underlying Migration class.
+    # The underlying Migration instance
     attr_reader :migration
 
     def self.create(&block)
@@ -102,6 +102,122 @@ module Sequel
     # Defines the migration's up action.
     def up(&block)
       migration.up = block
+    end
+
+    # Creates a reversible migration.  This is the same as creating
+    # the same block with +up+, but it also calls the block and attempts
+    # to create a +down+ block that will reverse the changes made by
+    # the block.
+    #
+    # There are no guarantees that this will work perfectly
+    # in all cases, but it should work for most common cases.
+    def change(&block)
+      migration.up = block
+      migration.down = MigrationReverser.new.reverse(&block)
+    end
+  end
+
+  # Handles the reversing of reversible migrations.  Basically records
+  # supported methods calls, translates them to reversed calls, and
+  # returns them in reverse order.
+  class MigrationReverser < Sequel::BasicObject
+    def initialize
+      @actions = []
+    end
+
+    # Reverse the actions for the given block.  Takes the block given
+    # and returns a new block that reverses the actions taken by
+    # the given block.
+    def reverse(&block)
+      begin
+        instance_eval(&block)
+      rescue
+        just_raise = true
+      end
+      if just_raise
+        Proc.new{raise Sequel::Error, 'irreversible migration method used, you may need to write your own down method'}
+      else
+        actions = @actions.reverse
+        Proc.new do
+          actions.each do |a|
+            if a.last.is_a?(Proc)
+              pr = a.pop
+              send(*a, &pr)
+            else
+              send(*a)
+            end
+          end
+        end
+      end
+    end
+
+    private
+
+    def add_column(*args)
+      @actions << [:drop_column, args[0], args[1]]
+    end
+
+    def add_index(*args)
+      @actions << [:drop_index, *args]
+    end
+
+    def alter_table(table, &block)
+      @actions << [:alter_table, table, MigrationAlterTableReverser.new.reverse(&block)]
+    end
+
+    def create_table(*args)
+      @actions << [:drop_table, args.first]
+    end
+
+    def create_view(*args)
+      @actions << [:drop_view, args.first]
+    end
+
+    def rename_column(table, name, new_name)
+      @actions << [:rename_column, table, new_name, name]
+    end
+
+    def rename_table(table, new_name)
+      @actions << [:rename_table, new_name, table]
+    end
+  end
+
+  # Handles reversing an alter_table block in a reversible migration.
+  class MigrationAlterTableReverser < Sequel::BasicObject
+    def initialize
+      @actions = []
+    end
+
+    def reverse(&block)
+      instance_eval(&block)
+      actions = @actions.reverse
+      Proc.new{actions.each{|a| send(*a)}}
+    end
+
+    private
+
+    def add_column(*args)
+      @actions << [:drop_column, args.first]
+    end
+
+    def add_constraint(*args)
+      @actions << [:drop_constraint, args.first]
+    end
+
+    def add_foreign_key(*args)
+      raise if args.first.is_a?(Array)
+      @actions << [:drop_column, args.first]
+    end
+    alias add_primary_key add_foreign_key
+
+    def add_index(*args)
+      @actions << [:drop_index, *args]
+    end
+    alias add_full_text_index add_index
+    alias add_spatial_index add_index
+
+    def rename_column(name, new_name)
+      @actions << [:rename_column, new_name, name]
     end
   end
 

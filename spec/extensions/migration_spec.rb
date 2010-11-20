@@ -86,6 +86,113 @@ context "SimpleMigration#apply" do
   end
 end
 
+context "Reversible Migrations with Sequel.migration{change{}}" do
+  before do
+    @c = Class.new do
+      self::AT = Class.new do
+        attr_reader :actions
+        def initialize(&block)
+          @actions = []
+          instance_eval(&block)
+        end
+        def method_missing(*args)
+          @actions << args
+        end
+        self
+      end
+      attr_reader :actions
+      def initialize
+        @actions = []
+      end
+      def method_missing(*args)
+        @actions << args
+      end
+      def alter_table(*args, &block)
+        @actions << [:alter_table, self.class::AT.new(&block).actions]
+      end
+    end
+    @db = @c.new
+    @p = Proc.new do
+      create_table(:a){Integer :a}
+      add_column :a, :b, String
+      add_index :a, :b
+      rename_column :a, :b, :c
+      rename_table :a, :b
+      alter_table(:b) do
+        add_column :d, String
+        add_constraint :blah, 'd IS NOT NULL'
+        add_foreign_key :e, :b
+        add_primary_key :f, :b
+        add_index :e, :name=>'e_n'
+        add_full_text_index :e, :name=>'e_ft'
+        add_spatial_index :e, :name=>'e_s'
+        rename_column :e, :g
+      end
+      create_view(:c, 'SELECT * FROM b')
+    end
+  end
+  
+  specify "should apply up with normal actions in normal order" do
+    p = @p
+    Sequel.migration{change(&p)}.apply(@db, :up)
+    @db.actions.should == [[:create_table, :a],
+      [:add_column, :a, :b, String],
+      [:add_index, :a, :b],
+      [:rename_column, :a, :b, :c],
+      [:rename_table, :a, :b],
+      [:alter_table, [
+        [:add_column, :d, String],
+        [:add_constraint, :blah, "d IS NOT NULL"],
+        [:add_foreign_key, :e, :b],
+        [:add_primary_key, :f, :b],
+        [:add_index, :e, {:name=>"e_n"}],
+        [:add_full_text_index, :e, {:name=>"e_ft"}],
+        [:add_spatial_index, :e, {:name=>"e_s"}],
+        [:rename_column, :e, :g]]
+      ],
+      [:create_view, :c, "SELECT * FROM b"]]
+  end
+
+  specify "should execute down with reversing actions in reverse order" do
+    p = @p
+    Sequel.migration{change(&p)}.apply(@db, :down)
+    @db.actions.should == [[:drop_view, :c],
+      [:alter_table, [
+        [:rename_column, :g, :e],
+        [:drop_index, :e, {:name=>"e_s"}],
+        [:drop_index, :e, {:name=>"e_ft"}],
+        [:drop_index, :e, {:name=>"e_n"}],
+        [:drop_column, :f],
+        [:drop_column, :e],
+        [:drop_constraint, :blah],
+        [:drop_column, :d]]
+      ],
+      [:rename_table, :b, :a],
+      [:rename_column, :a, :c, :b],
+      [:drop_index, :a, :b],
+      [:drop_column, :a, :b],
+      [:drop_table, :a]]
+  end
+  
+  specify "should raise in the down direction if migration uses unsupported method" do
+    m = Sequel.migration{change{run 'SQL'}}
+    proc{m.apply(@db, :up)}.should_not raise_error(Sequel::Error)
+    proc{m.apply(@db, :down)}.should raise_error(Sequel::Error)
+  end
+  
+  specify "should raise in the down direction if migration uses add_primary_key with an array" do
+    m = Sequel.migration{change{alter_table(:a){add_primary_key [:b]}}}
+    proc{m.apply(@db, :up)}.should_not raise_error(Sequel::Error)
+    proc{m.apply(@db, :down)}.should raise_error(Sequel::Error)
+  end
+  
+  specify "should raise in the down direction if migration uses add_foreign_key with an array" do
+    m = Sequel.migration{change{alter_table(:a){add_foreign_key [:b]}}}
+    proc{m.apply(@db, :up)}.should_not raise_error(Sequel::Error)
+    proc{m.apply(@db, :down)}.should raise_error(Sequel::Error)
+  end
+end
+
 context "Sequel::IntegerMigrator" do
   before do
     dbc = Class.new(MockDatabase) do

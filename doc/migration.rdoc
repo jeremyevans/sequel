@@ -52,6 +52,40 @@ the change made by up.  However, if you never need to be able to migrate down
 the +down+ block.  In this case, the +down+ block just reverses the changes made by up,
 dropping the table.
 
+You can simplify the migration given above by using a reversible migration with a +change+
+block:
+
+  Sequel.migration do
+    change do
+      create_table(:artists) do
+        primary_key :id
+        String :name, :null=>false
+      end
+    end
+  end
+
+The +change+ block acts exactly like an +up+ block.  The only difference is that
+it will attempt to create a +down+ block for you, assuming that it knows how to
+reverse the given migration.  The +change+ block can usually correctly reverse
+the following methods:
+
+* +create_table+
+* +add_column+
+* +add_index+
+* +rename_column+
+* +rename_table+
+* +alter_table+ (supporting the following methods in the +alter_table+ block):
+  * +add_column+
+  * +add_constraint+
+  * +add_foreign_key+ (with a symbol, not an array)
+  * +add_primary_key+ (with a symbol, not an array)
+  * +add_index+
+  * +add_full_text_index+
+  * +add_spatial_index+
+  * +rename_column+
+
+If you use any other methods, you should create your own +down+ block.
+
 In normal usage, when Sequel's migrator runs, it runs the +up+ blocks for all
 migrations that have not yet been applied.  However, you can use the <tt>-M</tt>
 switch to specify the version to which to migrate, and if it is lower than the

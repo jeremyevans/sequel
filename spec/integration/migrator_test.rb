@@ -184,4 +184,58 @@ describe Sequel::Migrator do
     [:schema_info, :sm1111, :sm2222, :schema_migrations, :sm3333, :sm1122, :sm2233].each{|n| @db.table_exists?(n).should be_true}
     @db[:schema_migrations].select_order_map(:filename).should == %w'001_create_sessions.rb 002_create_nodes.rb 003_3_create_users.rb 1273253850_create_artists.rb 1273253852_create_albums.rb'
   end
+
+  specify "should handle reversible migrations" do
+    @dir = 'spec/files/reversible_migrations'
+    @db.drop_table(:a) rescue nil
+    @db.drop_table(:b) rescue nil
+    @m.apply(@db, @dir, 1)
+    [:schema_info, :a].each{|n| @db.table_exists?(n).should be_true}
+    [:schema_migrations, :b].each{|n| @db.table_exists?(n).should be_false}
+    @db[:a].columns.should == [:a]
+
+    @m.apply(@db, @dir, 2)
+    [:schema_info, :a].each{|n| @db.table_exists?(n).should be_true}
+    [:schema_migrations, :b].each{|n| @db.table_exists?(n).should be_false}
+    @db[:a].columns.should == [:a, :b]
+
+    @m.apply(@db, @dir, 3)
+    [:schema_info, :a].each{|n| @db.table_exists?(n).should be_true}
+    [:schema_migrations, :b].each{|n| @db.table_exists?(n).should be_false}
+    @db[:a].columns.should == [:a, :c]
+
+    @m.apply(@db, @dir, 4)
+    [:schema_info, :b].each{|n| @db.table_exists?(n).should be_true}
+    [:schema_migrations, :a].each{|n| @db.table_exists?(n).should be_false}
+    @db[:b].columns.should == [:a, :c]
+
+    @m.apply(@db, @dir, 5)
+    [:schema_info, :b].each{|n| @db.table_exists?(n).should be_true}
+    [:schema_migrations, :a].each{|n| @db.table_exists?(n).should be_false}
+    @db[:b].columns.should == [:a, :c, :e]
+
+    @m.apply(@db, @dir, 4)
+    [:schema_info, :b].each{|n| @db.table_exists?(n).should be_true}
+    [:schema_migrations, :a].each{|n| @db.table_exists?(n).should be_false}
+    @db[:b].columns.should == [:a, :c]
+
+    @m.apply(@db, @dir, 3)
+    [:schema_info, :a].each{|n| @db.table_exists?(n).should be_true}
+    [:schema_migrations, :b].each{|n| @db.table_exists?(n).should be_false}
+    @db[:a].columns.should == [:a, :c]
+
+    @m.apply(@db, @dir, 2)
+    [:schema_info, :a].each{|n| @db.table_exists?(n).should be_true}
+    [:schema_migrations, :b].each{|n| @db.table_exists?(n).should be_false}
+    @db[:a].columns.should == [:a, :b]
+
+    @m.apply(@db, @dir, 1)
+    [:schema_info, :a].each{|n| @db.table_exists?(n).should be_true}
+    [:schema_migrations, :b].each{|n| @db.table_exists?(n).should be_false}
+    @db[:a].columns.should == [:a]
+
+    @m.apply(@db, @dir, 0)
+    [:schema_info].each{|n| @db.table_exists?(n).should be_true}
+    [:schema_migrations, :a, :b].each{|n| @db.table_exists?(n).should be_false}
+  end
 end
