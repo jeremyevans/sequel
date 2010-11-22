@@ -1,5 +1,7 @@
 === HEAD
 
+* Add reversible migration support to the migration extension (jeremyevans)
+
 * Add to_dot extension, for producing visualizations of Dataset abstract syntax trees with Graphviz (jeremyevans)
 
 * Switch to using manual type translation in the SQLite adapter (jeremyevans)
