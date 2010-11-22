@@ -10,7 +10,12 @@ module Sequel
     # after calling super.  If any of the instance level before hook blocks return
     # false, no more instance level before hooks are called and false is returned.
     #
-    # Instance level hooks are cleared when the object is saved successfully.
+    # Instance level hooks for before and after are cleared after all related
+    # after level instance hooks have run.  This means that if you add a before_create
+    # and before_update instance hooks to a new object, the before_create hook will
+    # be run the first time you save the object (creating it), and the before_update
+    # hook will be run the second time you save the object (updating it), and no
+    # hooks will be run the third time you save the object.
     # 
     # Usage:
     #
@@ -27,14 +32,14 @@ module Sequel
         HOOKS.each{|h| class_eval("def #{h}_hook(&block); add_instance_hook(:#{h}, &block) end", __FILE__, __LINE__)}
         
         BEFORE_HOOKS.each{|h| class_eval("def #{h}; run_before_instance_hooks(:#{h}) == false ? false : super end", __FILE__, __LINE__)}
-        (AFTER_HOOKS - [:after_save]).each{|h| class_eval("def #{h}; super; run_after_instance_hooks(:#{h}) end", __FILE__, __LINE__)}
-        
-        # Clear the instance level hooks after saving the object.
-        def after_save
-          super
-          run_after_instance_hooks(:after_save)
-          @instance_hooks.clear if @instance_hooks
-        end
+        AFTER_HOOKS.each{|h| class_eval(<<-END, __FILE__, __LINE__ + 1)}
+          def #{h}
+            super
+            run_after_instance_hooks(:#{h})
+            @instance_hooks.delete(:#{h})
+            @instance_hooks.delete(:#{h.to_s.sub('after', 'before')})
+          end
+        END
         
         private
         

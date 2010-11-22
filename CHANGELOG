@@ -1,5 +1,7 @@
 === HEAD
 
+* The instance_hooks plugin now only removes hook pairs that have been run successfully (jeremyevans)
+
 * Add reversible migration support to the migration extension (jeremyevans)
 
 * Add to_dot extension, for producing visualizations of Dataset abstract syntax trees with Graphviz (jeremyevans)

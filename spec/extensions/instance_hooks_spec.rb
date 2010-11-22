@@ -130,4 +130,50 @@ describe "InstanceHooks plugin" do
     @o.valid?.should == false
     @r.should == [4, false]
   end
+
+  it "should clear only related hooks on successful create" do
+    @o.after_destroy_hook{r 1}
+    @o.before_destroy_hook{r 2}
+    @o.after_update_hook{r 3}
+    @o.before_update_hook{r 4}
+    @o.before_save_hook{r 5}
+    @o.after_save_hook{r 6}
+    @o.before_create_hook{r 7}
+    @o.after_create_hook{r 8}
+    @o.save.should_not == nil
+    @r.should == [5, 7, 8, 6]
+    @o.instance_variable_set(:@new, false)
+    @o.save.should_not == nil
+    @r.should == [5, 7, 8, 6, 4, 3]
+    @o.save.should_not == nil
+    @r.should == [5, 7, 8, 6, 4, 3]
+    @o.destroy
+    @r.should == [5, 7, 8, 6, 4, 3, 2, 1]
+  end
+
+  it "should clear only related hooks on successful update" do
+    @x.after_destroy_hook{r 1}
+    @x.before_destroy_hook{r 2}
+    @x.before_update_hook{r 3}
+    @x.after_update_hook{r 4}
+    @x.before_save_hook{r 5}
+    @x.after_save_hook{r 6}
+    @x.save.should_not == nil
+    @r.should == [5, 3, 4, 6]
+    @x.save.should_not == nil
+    @r.should == [5, 3, 4, 6]
+    @x.destroy
+    @r.should == [5, 3, 4, 6, 2, 1]
+  end
+
+  it "should clear only related hooks on successful destroy" do
+    @x.after_destroy_hook{r 1}
+    @x.before_destroy_hook{r 2}
+    @x.before_update_hook{r 3}
+    @x.before_save_hook{r 4}
+    @x.destroy
+    @r.should == [2, 1]
+    @x.save.should_not == nil
+    @r.should == [2, 1, 4, 3]
+  end
 end
