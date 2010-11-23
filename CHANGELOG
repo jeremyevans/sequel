@@ -1,5 +1,7 @@
 === HEAD
 
+* When parsing the schema for a model that uses an aliased table, use the unaliased table name (jeremyevans)
+
 * When emulating schema methods such as drop_column on SQLite, recreate applicable indexes on the recreated table (jeremyevans)
 
 * Only remove hook pairs that have been run successfully in the instance_hooks plugin (jeremyevans)
