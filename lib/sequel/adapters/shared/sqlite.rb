@@ -237,12 +237,18 @@ module Sequel
 
         qt = quote_schema_table(table)
         bt = quote_identifier(backup_table_name(qt))
-        [
+        a = [
            "CREATE TABLE #{bt}(#{def_columns_str})",
            "INSERT INTO #{bt}(#{dataset.send(:identifier_list, new_columns)}) SELECT #{dataset.send(:identifier_list, old_columns)} FROM #{qt}",
            "DROP TABLE #{qt}",
            "ALTER TABLE #{bt} RENAME TO #{qt}"
         ]
+        indexes(table).each do |name, h|
+          if (h[:columns].map{|x| x.to_s} - new_columns).empty?
+            a << alter_table_sql(table, h.merge(:op=>:add_index, :name=>name))
+          end
+        end
+        a
       end
 
       # SQLite folds unquoted identifiers to lowercase, so it shouldn't need to upcase identifiers on input.

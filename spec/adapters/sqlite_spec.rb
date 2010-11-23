@@ -411,7 +411,7 @@ context "A SQLite database" do
   
   specify "should choose a temporary table name that isn't already used when dropping or renaming columns" do
     sqls = []
-    @db.loggers << (l=Class.new{define_method(:info){|sql| sqls << sql}}.new)
+    @db.loggers << (l=Class.new{%w'info error'.each{|m| define_method(m){|sql| sqls << sql}}}.new)
     @db.create_table! :test3 do
       Integer :h
       Integer :i
@@ -457,5 +457,14 @@ context "A SQLite database" do
   specify "should support drop_index" do
     @db.add_index :test2, :value, :unique => true
     @db.drop_index :test2, :value
+  end
+
+  specify "should keep applicable indexes when emulating schema methods" do
+    @db.create_table!(:a){Integer :a; Integer :b}
+    @db.add_index :a, :a
+    @db.add_index :a, :b
+    @db.add_index :a, [:b, :a]
+    @db.drop_column :a, :b
+    @db.indexes(:a).should == {:a_a_index=>{:unique=>false, :columns=>[:a]}}
   end
 end  
