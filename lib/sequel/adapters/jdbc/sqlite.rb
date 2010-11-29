@@ -17,13 +17,10 @@ module Sequel
         
         # Use last_insert_rowid() to get the last inserted id.
         def last_insert_id(conn, opts={})
-          stmt = conn.createStatement
-          begin
+          statement(conn) do |stmt|
             rs = stmt.executeQuery('SELECT last_insert_rowid()')
             rs.next
             rs.getInt(1)
-          ensure
-            stmt.close
           end
         end
         
@@ -36,11 +33,8 @@ module Sequel
         # Execute the connection pragmas on the connection.
         def setup_connection(conn)
           conn = super(conn)
-          begin
-            stmt = conn.createStatement
+          statement(conn) do |stmt|
             connection_pragmas.each{|s| log_yield(s){stmt.execute(s)}}
-          ensure
-            stmt.close if stmt
           end
           conn
         end
