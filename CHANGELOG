@@ -1,5 +1,7 @@
 === HEAD
 
+* Allow the user to control how the connection pool deals with attempts to access shards that aren't configured (jeremyevans)
+
 * Typecast columns when creating model objects from JSON in the json_serializer plugin (jeremyevans)
 
 * When parsing the schema for a model that uses an aliased table, use the unaliased table name (jeremyevans)

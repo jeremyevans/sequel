@@ -315,7 +315,7 @@ context "Threaded Sharded Connection Pool" do
     @invoked_count = 0
     @pool = Sequel::ConnectionPool.get_pool(CONNECTION_POOL_DEFAULTS.merge(:max_connections=>5, :servers=>{})) {@invoked_count += 1}
   end
-  
+
   it_should_behave_like "A threaded connection pool"
 end
 
@@ -416,6 +416,22 @@ context "A connection pool with multiple servers" do
         end
       end
     end
+  end
+
+  specify "should support a :servers_hash option used for converting the server argument" do
+    @pool = Sequel::ConnectionPool.get_pool(CONNECTION_POOL_DEFAULTS.merge(:servers_hash=>Hash.new(:read_only), :servers=>{:read_only=>{}})){|server| "#{server}#{@invoked_counts[server] += 1}"}
+    @pool.hold(:blah) do |c1|
+      c1.should == "read_only1"
+      @pool.hold(:blah) do |c2|
+        c2.should == c1
+        @pool.hold(:blah2) do |c3|
+          c2.should == c3
+        end
+      end
+    end
+
+    @pool = Sequel::ConnectionPool.get_pool(CONNECTION_POOL_DEFAULTS.merge(:servers_hash=>Hash.new{|h,k| raise Sequel::Error}, :servers=>{:read_only=>{}})){|server| "#{server}#{@invoked_counts[server] += 1}"}
+    proc{@pool.hold(:blah){|c1|}}.should raise_error(Sequel::Error)
   end
 
   specify "should use the requested server if server is given" do

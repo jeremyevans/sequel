@@ -10,11 +10,15 @@ class Sequel::ShardedThreadedConnectionPool < Sequel::ThreadedConnectionPool
   # * :servers - A hash of servers to use.  Keys should be symbols.  If not
   #   present, will use a single :default server.  The server name symbol will
   #   be passed to the connection_proc.
+  # * :servers_hash - The base hash to use for the servers.  By default,
+  #   Sequel uses Hash.new(:default).  You can use a hash with a default proc
+  #   that raises an error if you want to catch all cases where a nonexistent
+  #   server is used.
   def initialize(opts = {}, &block)
     super
     @available_connections = {}
     @connections_to_remove = []
-    @servers = Hash.new(:default)
+    @servers = opts.fetch(:servers_hash, Hash.new(:default))
     add_servers([:default])
     add_servers(opts[:servers].keys) if opts[:servers]
   end
