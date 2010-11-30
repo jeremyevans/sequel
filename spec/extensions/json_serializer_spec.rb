@@ -10,12 +10,14 @@ describe "Sequel::Plugins::JsonSerializer" do
     class ::Artist < Sequel::Model
       plugin :json_serializer
       columns :id, :name
+      def_column_accessor :id, :name
       one_to_many :albums
     end
     class ::Album < Sequel::Model
       attr_accessor :blah
       plugin :json_serializer
       columns :id, :name, :artist_id
+      def_column_accessor :id, :name, :artist_id
       many_to_one :artist
     end
     @artist = Artist.load(:id=>2, :name=>'YJM')
@@ -32,6 +34,15 @@ describe "Sequel::Plugins::JsonSerializer" do
   it "should round trip successfully" do
     JSON.parse(@artist.to_json).should == @artist
     JSON.parse(@album.to_json).should == @album
+  end
+
+  it "should handle ruby objects in values" do
+    class ::Artist
+      def name=(v)
+        super(Date.parse(v))
+      end
+    end
+    JSON.parse(Artist.load(:name=>Date.today).to_json).should == Artist.load(:name=>Date.today)
   end
 
   it "should handle the :only option" do

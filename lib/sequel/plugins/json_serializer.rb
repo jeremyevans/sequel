@@ -106,10 +106,10 @@ module Sequel
           hash.each do |k, v|
             if assocs.include?(k)
               obj.associations[k.to_sym] = v
-            elsif cols.include?(k)
-              obj.values[k.to_sym] = v
             elsif meths.include?("#{k}=")
               obj.send("#{k}=", v)
+            elsif cols.include?(k)
+              obj.values[k.to_sym] = v
             else
               raise Error, "Entry in JSON hash not an association or column and no setter method exists: #{k}"
             end
@@ -171,7 +171,7 @@ module Sequel
             vals.keys - Array(opts[:except])
           end
           h = (JSON.create_id && !opts[:naked] && !opts[:root]) ? {JSON.create_id=>model.name} : {}
-          cols.each{|c| h[c.to_s] = vals[c]}
+          cols.each{|c| h[c.to_s] = send(c)}
           if inc = opts[:include]
             if inc.is_a?(Hash)
               inc.each do |k, v|
