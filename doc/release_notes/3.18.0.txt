@@ -1,0 +1,121 @@
+= New Features
+
+* Reversible migration support has been added:
+
+    Sequel.migration do
+      change do
+        create_table(:artists) do
+          primary_key :id
+          String :name, :null=>false
+        end
+      end
+    end
+
+  The change block acts the same way as an up block, except that
+  it automatically creates a down block that reverses the changes.
+  So the above is equivalent to:
+
+    Sequel.migration do
+      up do
+        create_table(:artists) do
+          primary_key :id
+          String :name, :null=>false
+        end
+      end
+      down do
+        drop_table :artists
+      end
+    end
+
+  The following methods are supported in a change block:
+ 
+  * create_table
+  * add_column
+  * add_index
+  * rename_column
+  * rename_table
+  * alter_table (supporting the following methods):
+    * add_column
+    * add_constraint
+    * add_foreign_key (with a symbol, not an array)
+    * add_primary_key (with a symbol, not an array)
+    * add_index
+    * add_full_text_index
+    * add_spatial_index
+    * rename_column
+
+  Use of an other method in a change block will result in the
+  creation of a down block that raises an exception.
+
+* A to_dot extension has been added that adds a Dataset#to_dot
+  method, which returns a string that can be used as input to
+  the graphviz dot program in order to create visualizations
+  of the dataset's abstract syntax tree.  Examples:
+
+  * http://sequel.heroku.com/images/to_dot_simple.gif
+  * http://sequel.heroku.com/images/to_dot_complex.gif
+  * http://imgpaste.com/i/lxngy.gif
+
+  Both the to_dot extension and reversible migrations support
+  were inspired by Aaron Patterson's recent work on ActiveRecord
+  and ARel.
+
+* The user can now control how the connection pool handles attempts
+  to access shards that haven't been configured.  The default is
+  still to assume the :default shard.  However, you can specify a
+  different shard using the :servers_hash option when connecting
+  to the database:
+
+    DB = Sequel.connect(..., :servers_hash=>Hash.new(:some_shard))
+
+  You can also use this feature to raise an exception if an
+  unconfigured shard is used:
+
+    DB = Sequel.connect(..., :servers_hash=>Hash.new{raise ...})
+
+* The mysql and mysql2 adapters now both support the :read_timeout
+  and :connect_timeout options.  read_timeout is the timeout in
+  seconds for reading back results of a query, and connect_timeout
+  is the timeout in seconds before a connection attempt is abandoned.
+
+= Other Improvements
+
+* The json_serializer plugin will now typecast column values for
+  columns with unrestricted setter methods when parsing JSON into
+  model objects.  It now also calls the getter method when creating
+  the JSON, instead of directly taking the values from the underlying
+  hash.
+
+* When parsing the schema for a model with an aliased table name,
+  the unaliased table name is now used.
+
+* The SQLite adapter has been updated to not rely on the native
+  type_translation support, since that will be removed in the next
+  major version of sqlite3-ruby.  Sequel now implements it's own
+  type translation in the sqlite adapter, similarly to how the mysql
+  and postgres adapters handle type translation.
+
+* On SQLite, when emulating natively unsupported schema methods such
+  as drop_column, Sequel will now attempt to recreate applicable
+  indexes on the underlying table.
+
+* A more informative error message is now used when connecting fails
+  when using the jdbc adapter.
+
+* method_missing is no longer removed from Sequel::BasicObject on
+  ruby 1.8.  This should improve compatibility in some cases with
+  Rubinius.
+
+= Backwards Compatibility
+
+* On SQLite, Sequel no longer assumes that a plain integer in a
+  datetime or timestamp field represents a unix epoch time.
+
+* Previously, saving a model object that used the instance_hooks
+  plugin removed all instance hooks.  Now, only the applicable hooks
+  are removed.  So if you save a new object, the update instance
+  hooks won't be removed.  And if you save an existing object, delete
+  instance hooks won't be removed.
+
+* The private Dataset#identifier_list method has been moved into the
+  SQLite adapter, since that is the only place it was used.
