@@ -10,27 +10,36 @@ module Sequel
   # Top level module for holding all SQLite-related modules and classes
   # for Sequel.
   module SQLite
-    UNIX_EPOCH_TIME_FORMAT = /\A\d+\z/.freeze
+    TYPE_TRANSLATOR = tt = Class.new do
+      FALSE_VALUES = %w'0 false f no n'.freeze
+      def boolean(s) !FALSE_VALUES.include?(s.downcase) end
+      def blob(s) ::Sequel::SQL::Blob.new(s) end
+      def integer(s) s.to_i end
+      def float(s) s.to_f end
+      def numeric(s) ::BigDecimal.new(s) rescue s end
+      def date(s) ::Sequel.string_to_date(s) end
+      def time(s) ::Sequel.string_to_time(s) end
+      def timestamp(s) ::Sequel.database_to_application_timestamp(s) end
+    end.new
+
+    # Hash with string keys and callable values for converting SQLite types.
     SQLITE_TYPES = {}
-    FALSE_VALUES = %w'0 false f no n'.freeze
-    SQLITE_TYPE_PROCS = {
-      %w'timestamp datetime' => proc{|v| Sequel.database_to_application_timestamp(v)},
-      %w'date' => proc{|v| Sequel.string_to_date(v)},
-      %w'time' => proc{|v| Sequel.string_to_time(v)},
-      %w'bit bool boolean' => proc{|v| !FALSE_VALUES.include?(v.downcase)},
-      %w'integer smallint mediumint int bigint' => proc{|v| Integer(v) rescue v},
-      %w'numeric decimal money' => proc{|v| BigDecimal.new(v) rescue v},
-      %w'float double real dec fixed' + ['double precision'] => proc{|v| Float(v) rescue v},
-      %w'blob' => proc{|v| ::Sequel::SQL::Blob.new(v)}
-    }
-    SQLITE_TYPE_PROCS.each do |k,v|
+    {
+      %w'timestamp datetime' => tt.method(:timestamp),
+      %w'date' => tt.method(:date),
+      %w'time' => tt.method(:time),
+      %w'bit bool boolean' => tt.method(:boolean),
+      %w'integer smallint mediumint int bigint' => tt.method(:integer),
+      %w'numeric decimal money' => tt.method(:numeric),
+      %w'float double real dec fixed' + ['double precision'] => tt.method(:float),
+      %w'blob' => tt.method(:blob)
+    }.each do |k,v|
       k.each{|n| SQLITE_TYPES[n] = v}
     end
     
     # Database class for SQLite databases used with Sequel and the
     # ruby-sqlite3 driver.
     class Database < Sequel::Database
-      UNIX_EPOCH_TIME_FORMAT = /\A\d+\z/.freeze
       include ::Sequel::SQLite::DatabaseMethods
       
       set_adapter_scheme :sqlite
