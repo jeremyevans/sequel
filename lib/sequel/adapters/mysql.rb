@@ -10,33 +10,60 @@ Sequel.require %w'shared/mysql utils/stored_procedures', 'adapters'
 module Sequel
   # Module for holding all MySQL-related classes and modules for Sequel.
   module MySQL
+    TYPE_TRANSLATOR = tt = Class.new do
+      def boolean(s) s.to_i != 0 end
+      def blob(s) ::Sequel::SQL::Blob.new(s) end
+      def integer(s) s.to_i end
+      def float(s) s.to_f end
+      def decimal(s) ::BigDecimal.new(s) end
+      def date(s) ::Sequel.string_to_date(s) end
+      def time(s) ::Sequel.string_to_time(s) end
+      def timestamp(s) ::Sequel.database_to_application_timestamp(s) end
+      def date_conv(s) ::Sequel::MySQL.convert_date_time(:string_to_date, s) end
+      def time_conv(s) ::Sequel::MySQL.convert_date_time(:string_to_time, s) end
+      def timestamp_conv(s) ::Sequel::MySQL.convert_date_time(:database_to_application_timestamp, s) end
+    end.new
+
     # Mapping of type numbers to conversion procs
     MYSQL_TYPES = {}
 
     # Use only a single proc for each type to save on memory
-    MYSQL_TYPE_PROCS = {
-      [0, 246]  => lambda{|v| BigDecimal.new(v)},                         # decimal
-      [1]  => lambda{|v| convert_tinyint_to_bool ? v.to_i != 0 : v.to_i}, # tinyint
-      [2, 3, 8, 9, 13, 247, 248]  => lambda{|v| v.to_i},                  # integer
-      [4, 5]  => lambda{|v| v.to_f},                                      # float
-      [10, 14]  => lambda{|v| convert_date_time(:string_to_date, v)},     # date
-      [7, 12] => lambda{|v| convert_date_time(:database_to_application_timestamp, v)},   # datetime
-      [11]  => lambda{|v| convert_date_time(:string_to_time, v)},         # time
-      [249, 250, 251, 252]  => lambda{|v| Sequel::SQL::Blob.new(v)}       # blob
-    }
-    MYSQL_TYPE_PROCS.each do |k,v|
+    {
+      [0, 246]  => tt.method(:decimal),
+      [2, 3, 8, 9, 13, 247, 248]  => tt.method(:integer),
+      [4, 5]  => tt.method(:float),
+      [249, 250, 251, 252]  => tt.method(:blob)
+    }.each do |k,v|
       k.each{|n| MYSQL_TYPES[n] = v}
     end
-    
-    @convert_invalid_date_time = false
+
+    # Modify the type translator used for the tinyint type based
+    # on the value given.
+    def self.convert_tinyint_to_bool=(v)
+      MYSQL_TYPES[1] = TYPE_TRANSLATOR.method(v ? :boolean : :integer)
+      @convert_tinyint_to_bool = v
+    end
+    self.convert_tinyint_to_bool = convert_tinyint_to_bool
 
     class << self
       # By default, Sequel raises an exception if in invalid date or time is used.
       # However, if this is set to nil or :nil, the adapter treats dates
       # like 0000-00-00 and times like 838:00:00 as nil values.  If set to :string,
       # it returns the strings as is.  
-      attr_accessor :convert_invalid_date_time
+      attr_reader :convert_invalid_date_time
     end
+
+    # Modify the type translators for the date, time, and timestamp types
+    # depending on the value given.
+    def self.convert_invalid_date_time=(v)
+      MYSQL_TYPES[11] = TYPE_TRANSLATOR.method(v == false ? :time : :time_conv)
+      m = TYPE_TRANSLATOR.method(v == false ? :date : :date_conv)
+      [10, 14].each{|i| MYSQL_TYPES[i] = m}
+      m = TYPE_TRANSLATOR.method(v == false ? :timestamp : :timestamp_conv)
+      [7, 12].each{|i| MYSQL_TYPES[i] = m}
+      @convert_invalid_date_time = v
+    end
+    self.convert_invalid_date_time = false
 
     # If convert_invalid_date_time is nil, :nil, or :string and
     # the conversion raises an InvalidValue exception, return v
