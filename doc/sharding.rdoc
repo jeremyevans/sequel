@@ -112,6 +112,31 @@ the shard to use.  This is fairly easy using a Sequel::Model:
   
   Rainbow.plaintext_for_hash("e580726d31f6e1ad216ffd87279e536d1f74e606")
 
+The connection pool can be further controlled to change how it handles attempts
+to access shards that haven't been configured.  The default is
+to assume the :default shard.  However, you can specify a
+different shard using the :servers_hash option when connecting
+to the database:
+
+  DB = Sequel.connect(..., :servers_hash=>Hash.new(:some_shard))
+
+You can also use this feature to raise an exception if an
+unconfigured shard is used:
+
+  DB = Sequel.connect(..., :servers_hash=>Hash.new{raise ...})
+
+If you specify a :servers_hash option to raise an exception for non configured
+shards you should also explicitly specify a :read_only entry in your :servers option
+for the case where a shard is not specified. In most cases it is sufficient
+to make the :read_only entry the same as the :default shard:
+
+  servers = {:read_only => {}}
+  (('0'..'9').to_a + ('a'..'f').to_a).each do |hex|
+    servers[hex.to_sym] = {:host=>"hash_host_#{hex}"}
+  end
+  DB=Sequel.connect('postgres://hash_host/hashes', :servers=>servers, 
+    :servers_hash=>Hash.new{raise Exception.new("Invalid Server")}) 
+
 === Sharding Plugin
 
 Sequel comes with a sharding plugin that makes it easy to use sharding with model objects.
