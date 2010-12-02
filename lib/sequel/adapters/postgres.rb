@@ -88,32 +88,47 @@ module Sequel
   module Postgres
     CONVERTED_EXCEPTIONS << PGError
     
+    TYPE_TRANSLATOR = tt = Class.new do
+      def boolean(s) s == 't' end
+      def bytea(s) ::Sequel::SQL::Blob.new(Adapter.unescape_bytea(s)) end
+      def integer(s) s.to_i end
+      def float(s) s.to_f end
+      def numeric(s) ::BigDecimal.new(s) end
+      def date(s) ::Sequel.string_to_date(s) end
+      def date_iso(s) ::Date.new(*s.split("-").map{|x| x.to_i}) end
+      def time(s) ::Sequel.string_to_time(s) end
+      def timestamp(s) ::Sequel.database_to_application_timestamp(s) end
+    end.new
+
     # Hash with integer keys and proc values for converting PostgreSQL types.
     PG_TYPES = {}
 
     # Use a single proc for each type to conserve memory
-    PG_TYPE_PROCS  = {
-      [16] => lambda{|s| s == 't'}, # boolean
-      [17] => lambda{|s| ::Sequel::SQL::Blob.new(Adapter.unescape_bytea(s))}, # bytea
-      [20, 21, 22, 23, 26] => lambda{|s| s.to_i}, # integer
-      [700, 701] => lambda{|s| s.to_f}, # float
-      [790, 1700] => lambda{|s| BigDecimal.new(s)}, # numeric
-      [1082] => lambda{|s| @use_iso_date_format ? Date.new(*s.split("-").map{|x| x.to_i}) : Sequel.string_to_date(s)}, # date
-      [1083, 1266] => lambda{|s| Sequel.string_to_time(s)}, # time
-      [1114, 1184] => lambda{|s| Sequel.database_to_application_timestamp(s)}, # timestamp
-    }
-    PG_TYPE_PROCS.each do |k,v|
+    {
+      [16] => tt.method(:boolean),
+      [17] => tt.method(:bytea),
+      [20, 21, 22, 23, 26] => tt.method(:integer),
+      [700, 701] => tt.method(:float),
+      [790, 1700] => tt.method(:numeric),
+      [1083, 1266] => tt.method(:time),
+      [1114, 1184] => tt.method(:timestamp)
+    }.each do |k,v|
       k.each{|n| PG_TYPES[n] = v}
     end
     
-    @use_iso_date_format = true
-
     class << self
       # As an optimization, Sequel sets the date style to ISO, so that PostgreSQL provides
       # the date in a known format that Sequel can parse faster.  This can be turned off
       # if you require a date style other than ISO.
-      attr_accessor :use_iso_date_format
+      attr_reader :use_iso_date_format
     end
+
+    # Modify the type translator for the date type depending on the value given.
+    def self.use_iso_date_format=(v)
+      PG_TYPES[1082] = TYPE_TRANSLATOR.method(v ? :date_iso : :date)
+      @use_iso_date_format = v
+    end
+    self.use_iso_date_format = true
     
     # PGconn subclass for connection specific methods used with the
     # pg, postgres, or postgres-pr driver.
