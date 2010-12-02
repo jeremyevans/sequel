@@ -1,3 +1,7 @@
+=== HEAD
+
+* Improve type translation performance in the postgres, mysql, and sqlite adapters by using methods instead of procs (jeremyevans)
+
 === 3.18.0 (2010-12-01)
 
 * Allow the user to control how the connection pool deals with attempts to access shards that aren't configured (jeremyevans)
