@@ -100,10 +100,8 @@ module Sequel
       def timestamp(s) ::Sequel.database_to_application_timestamp(s) end
     end.new
 
-    # Hash with integer keys and proc values for converting PostgreSQL types.
+    # Hash with integer keys and callable values for converting PostgreSQL types.
     PG_TYPES = {}
-
-    # Use a single proc for each type to conserve memory
     {
       [16] => tt.method(:boolean),
       [17] => tt.method(:bytea),

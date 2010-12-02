@@ -24,10 +24,8 @@ module Sequel
       def timestamp_conv(s) ::Sequel::MySQL.convert_date_time(:database_to_application_timestamp, s) end
     end.new
 
-    # Mapping of type numbers to conversion procs
+    # Hash with integer keys and callable values for converting MySQL types.
     MYSQL_TYPES = {}
-
-    # Use only a single proc for each type to save on memory
     {
       [0, 246]  => tt.method(:decimal),
       [2, 3, 8, 9, 13, 247, 248]  => tt.method(:integer),
