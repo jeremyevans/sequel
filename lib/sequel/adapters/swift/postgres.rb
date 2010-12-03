@@ -14,7 +14,7 @@ module Sequel
         
         # Log all SQL that goes through the execute method to the related
         # database object.
-        def execute(sql, *args, &block)
+        def execute(sql, *args)
           @db.log_yield(sql){super}
         rescue SwiftError => e
           @db.send(:raise_error, e)

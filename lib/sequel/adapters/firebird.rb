@@ -201,7 +201,7 @@ module Sequel
 
       # Yield all rows returned by executing the given SQL and converting
       # the types.
-      def fetch_rows(sql, &block)
+      def fetch_rows(sql)
         execute(sql) do |s|
           begin
             @columns = s.fields.map{|c| output_identifier(c.name)}

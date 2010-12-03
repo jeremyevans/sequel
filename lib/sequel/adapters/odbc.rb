@@ -87,7 +87,7 @@ module Sequel
       ODBC_DATE_FORMAT = "{d '%Y-%m-%d'}".freeze
       TIMESTAMP_FORMAT="{ts '%Y-%m-%d %H:%M:%S'}".freeze
 
-      def fetch_rows(sql, &block)
+      def fetch_rows(sql)
         execute(sql) do |s|
           i = -1
           cols = s.columns(true).map{|c| [output_identifier(c.name), i+=1]}

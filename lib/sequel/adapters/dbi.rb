@@ -88,7 +88,7 @@ module Sequel
     end
     
     class Dataset < Sequel::Dataset
-      def fetch_rows(sql, &block)
+      def fetch_rows(sql)
         execute(sql) do |s|
           begin
             @columns = s.column_names.map{|c| output_identifier(c)}

@@ -102,7 +102,7 @@ module Sequel
     class Dataset < Sequel::Dataset
       include DatasetMethods
 
-      def fetch_rows(sql, &block)
+      def fetch_rows(sql)
         execute(sql) do |cursor|
           begin
             @columns = cursor.get_col_names.map{|c| output_identifier(c)}

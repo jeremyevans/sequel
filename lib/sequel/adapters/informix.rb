@@ -37,7 +37,7 @@ module Sequel
     class Dataset < Sequel::Dataset
       SELECT_CLAUSE_METHODS = clause_methods(:select, %w'limit distinct columns from join where having group compounds order')
 
-      def fetch_rows(sql, &block)
+      def fetch_rows(sql)
         execute(sql) do |cursor|
           begin
             col_map = nil
