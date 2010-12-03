@@ -729,7 +729,7 @@ module Sequel
         # If the column isn't in @values, we can't assume it is
         # NULL in the database, so assume it has changed.
         v = typecast_value(column, value)
-        if new? || !@values.include?(column) || v != @values[column]
+        if new? || !@values.include?(column) || v != (c = @values[column]) || v.class != c.class
           changed_columns << column unless changed_columns.include?(column)
           @values[column] = v
         end

@@ -452,6 +452,17 @@ describe Sequel::Model, "attribute accessors" do
     o.x = '34'
     o.x.should == 34
   end
+
+  it "should typecast if the new value is the same as the existing but has a different class" do
+    @c.set_dataset(@dataset.select(:y))
+    o = @c.new
+
+    o.x = 34
+    o.x = 34.0
+    o.x.should == 34.0
+    o.x = 34
+    o.x.should == 34
+  end
 end
 
 describe Sequel::Model, ".[]" do

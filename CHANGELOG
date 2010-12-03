@@ -1,5 +1,7 @@
 === HEAD
 
+* When typecasting model column values, check the classes of the new and existing values (jeremyevans)
+
 * Improve type translation performance in the postgres, mysql, and sqlite adapters by using methods instead of procs (jeremyevans)
 
 === 3.18.0 (2010-12-01)
