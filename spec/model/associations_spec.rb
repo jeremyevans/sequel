@@ -1077,7 +1077,13 @@ describe Sequel::Model, "one_to_many" do
     @c1 = Class.new(Sequel::Model(:attributes)) do
       def _refresh(ds); end
       unrestrict_primary_key
-      columns :id, :node_id, :y
+      columns :id, :node_id, :y, :z
+
+      def self.[](id)
+        o = id.is_a?(Array) ? new(:id => id[0], :z => id[1]) : new(:id => id)
+        o.instance_variable_set('@new', false)
+        o
+      end
     end
 
     @c2 = Class.new(Sequel::Model(:nodes)) do
@@ -1228,6 +1234,14 @@ describe Sequel::Model, "one_to_many" do
     MODEL_DB.sqls.first.should =~ /INSERT INTO attributes \((node_)?id, (node_)?id\) VALUES \(1?234, 1?234\)/
   end
 
+  it "should accept a primary key for the add_ method" do
+    @c2.one_to_many :attributes, :class => @c1
+    n = @c2.new(:id => 1234)
+    MODEL_DB.reset
+    @c1.load(:node_id => 1234, :id => 234).should == n.add_attribute(234)
+    MODEL_DB.sqls.first.should == "UPDATE attributes SET node_id = 1234 WHERE (id = 234)"
+  end
+
   it "should raise an error in the add_ method if the passed associated object is not of the correct type" do
     @c2.one_to_many :attributes, :class => @c1
     proc{@c2.new(:id => 1234).add_attribute(@c2.new)}.should raise_error(Sequel::Error)
@@ -1285,6 +1299,16 @@ describe Sequel::Model, "one_to_many" do
     a = @c1.load(:id => 2345)
     a.should == n.add_attribute(a)
     MODEL_DB.sqls.first.should =~ /UPDATE attributes SET (node_id = 1234|y = 5), (node_id = 1234|y = 5) WHERE \(id = 2345\)/
+  end
+
+  it "should have add_ method accept a composite key" do
+    @c1.set_primary_key :id, :z
+    @c2.one_to_many :attributes, :class => @c1, :key =>[:node_id, :y], :primary_key=>[:id, :x]
+    
+    n = @c2.load(:id => 1234, :x=>5)
+    a = @c1.load(:id => 2345, :z => 8, :node_id => 1234, :y=>5)
+    a.should == n.add_attribute([2345, 8])
+    MODEL_DB.sqls.first.should == "UPDATE attributes SET node_id = 1234, y = 5 WHERE ((id = 2345) AND (z = 8))"
   end
   
   it "should have remove_ method respect composite keys" do
@@ -1834,8 +1858,13 @@ describe Sequel::Model, "many_to_many" do
       def self.to_s; 'Attribute'; end
       columns :id, :y
       def _refresh(ds)
-        self.id = 1
         self
+      end
+      
+      def self.[](id)
+        o = id.is_a?(Array) ? new(:id => id[0], :y => id[1]) : new(:id => id)
+        o.instance_variable_set('@new', false)
+        o
       end
     end
 
@@ -2063,6 +2092,17 @@ describe Sequel::Model, "many_to_many" do
     ].should(include(MODEL_DB.sqls.first))
   end
 
+  it "should define an add_ method that works with a primary key" do
+    @c2.many_to_many :attributes, :class => @c1
+    
+    n = @c2.load(:id => 1234)
+    a = @c1.load(:id => 2345)
+    a.should == n.add_attribute(2345)
+    ['INSERT INTO attributes_nodes (node_id, attribute_id) VALUES (1234, 2345)',
+     'INSERT INTO attributes_nodes (attribute_id, node_id) VALUES (2345, 1234)'
+    ].should(include(MODEL_DB.sqls.first))
+  end
+
   it "should allow passing a hash to the add_ method which creates a new record" do
     @c2.many_to_many :attributes, :class => @c1
     
@@ -2147,6 +2187,14 @@ describe Sequel::Model, "many_to_many" do
       end
       v.should == true
     end
+  end
+  
+  it "should have the add_ method respect composite keys" do
+    @c2.many_to_many :attributes, :class => @c1, :left_key=>[:l1, :l2], :right_key=>[:r1, :r2], :left_primary_key=>[:id, :x], :right_primary_key=>[:id, :y]
+    n = @c2.load(:id => 1234, :x=>5)
+    a = @c1.load(:id => 2345, :y=>8)
+    a.should == n.add_attribute([2345, 8])
+    MODEL_DB.sqls.should == ["INSERT INTO attributes_nodes (l1, l2, r1, r2) VALUES (1234, 5, 2345, 8)"]
   end
 
   it "should have the remove_ method respect the :left_primary_key and :right_primary_key options" do

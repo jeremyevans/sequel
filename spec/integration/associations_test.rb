@@ -196,6 +196,16 @@ describe "Sequel::Model Simple Associations" do
     @album.tags_dataset.first[:name].should == 'T2'
   end
   
+  specify "should have add method accept primary key and add related records" do
+    @artist.remove_all_albums
+    @artist.add_album(@album.id)
+    @artist.albums_dataset.first[:id].should == @album.id
+
+    @album.remove_all_tags
+    @album.add_tag(@tag.id)
+    @album.tags_dataset.first[:id].should == @tag.id
+  end
+  
   specify "should have remove method accept primary key and remove related album" do
     @artist.add_album(@album)
     @artist.reload.remove_album(@album.id)
@@ -285,6 +295,16 @@ describe "Sequel::Model Composite Key Associations" do
     @album.add_tag(:id1=>1, :id2=>2, :name=>'T2')
     Tag.first[:name].should == 'T2'
     @album.tags_dataset.first[:name].should == 'T2'
+  end
+  
+  specify "should have add method accept primary key and add related records" do
+    @artist.remove_all_albums
+    @artist.add_album([@album.id1, @album.id2])
+    @artist.albums_dataset.first.pk.should == [@album.id1, @album.id2]
+    
+    @album.remove_all_tags
+    @album.add_tag([@tag.id1, @tag.id2])
+    @album.tags_dataset.first.pk.should == [@tag.id1, @tag.id2]
   end
   
   specify "should have remove method accept primary key and remove related album" do
