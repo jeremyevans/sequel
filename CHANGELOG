@@ -1,5 +1,7 @@
 === HEAD
 
+* Allow passing a primary key value to the add_* association method (gucki)
+
 * When typecasting model column values, check the classes of the new and existing values (jeremyevans)
 
 * Improve type translation performance in the postgres, mysql, and sqlite adapters by using methods instead of procs (jeremyevans)

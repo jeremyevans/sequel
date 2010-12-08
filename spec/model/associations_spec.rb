@@ -1080,9 +1080,7 @@ describe Sequel::Model, "one_to_many" do
       columns :id, :node_id, :y, :z
 
       def self.[](id)
-        o = id.is_a?(Array) ? new(:id => id[0], :z => id[1]) : new(:id => id)
-        o.instance_variable_set('@new', false)
-        o
+        load(id.is_a?(Array) ? {:id => id[0], :z => id[1]} : {:id => id})
       end
     end
 
@@ -1308,7 +1306,7 @@ describe Sequel::Model, "one_to_many" do
     n = @c2.load(:id => 1234, :x=>5)
     a = @c1.load(:id => 2345, :z => 8, :node_id => 1234, :y=>5)
     a.should == n.add_attribute([2345, 8])
-    MODEL_DB.sqls.first.should == "UPDATE attributes SET node_id = 1234, y = 5 WHERE ((id = 2345) AND (z = 8))"
+    MODEL_DB.sqls.first.should =~ /UPDATE attributes SET (node_id|y) = (1234|5), (node_id|y) = (1234|5) WHERE \(\((id|z) = (2345|8)\) AND \((id|z) = (2345|8)\)\)/
   end
   
   it "should have remove_ method respect composite keys" do
@@ -1862,9 +1860,7 @@ describe Sequel::Model, "many_to_many" do
       end
       
       def self.[](id)
-        o = id.is_a?(Array) ? new(:id => id[0], :y => id[1]) : new(:id => id)
-        o.instance_variable_set('@new', false)
-        o
+        load(id.is_a?(Array) ? {:id => id[0], :y => id[1]} : {:id => id})
       end
     end
 
@@ -2194,7 +2190,7 @@ describe Sequel::Model, "many_to_many" do
     n = @c2.load(:id => 1234, :x=>5)
     a = @c1.load(:id => 2345, :y=>8)
     a.should == n.add_attribute([2345, 8])
-    MODEL_DB.sqls.should == ["INSERT INTO attributes_nodes (l1, l2, r1, r2) VALUES (1234, 5, 2345, 8)"]
+    MODEL_DB.sqls.first.should =~ /INSERT INTO attributes_nodes \([lr][12], [lr][12], [lr][12], [lr][12]\) VALUES \((1234|5|2345|8), (1234|5|2345|8), (1234|5|2345|8), (1234|5|2345|8)\)/
   end
 
   it "should have the remove_ method respect the :left_primary_key and :right_primary_key options" do
