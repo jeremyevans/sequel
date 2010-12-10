@@ -133,11 +133,11 @@ module Sequel
       get(1).nil?
     end
 
-    # Executes a select query and fetches records, passing each record to the
+    # Executes a select query and fetches records, yielding each record to the
     # supplied block.  The yielded records should be hashes with symbol keys.
     # This method should probably should not be called by user code, use +each+
     # instead.
-    def fetch_rows(sql, &block)
+    def fetch_rows(sql)
       raise NotImplemented, NOTIMPL_MSG
     end
     

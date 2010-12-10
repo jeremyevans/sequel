@@ -20,7 +20,7 @@ module Sequel
     # the model object, you'll get Date objects instead of strings.
     module TypecastOnLoad
       # Call add_typecast_on_load_columns on the passed column arguments.
-      def self.configure(model, *columns, &block)
+      def self.configure(model, *columns)
         model.instance_eval do
           @typecast_on_load_columns ||= []
           add_typecast_on_load_columns(*columns)

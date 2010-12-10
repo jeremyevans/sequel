@@ -17,7 +17,7 @@ module Sequel
     #   c.descendents   # [sc1, ssc1, sc2]
     module Subclasses
       # Initialize the subclasses instance variable for the model.
-      def self.apply(model, &block)
+      def self.apply(model)
         model.instance_variable_set(:@subclasses, [])
       end
 
