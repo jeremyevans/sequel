@@ -20,7 +20,7 @@ module Sequel
       module ClassMethods
         # Creates table, using the column information from set_schema.
         def create_table(*args, &block)
-          set_schema(*args, &block) if block_given?
+          set_schema(*args, &block) if block
           db.create_table(table_name, :generator=>@schema)
           @db_schema = get_db_schema(true)
           columns

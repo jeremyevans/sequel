@@ -191,7 +191,7 @@ module Sequel
         return execute_prepared_statement(sql, opts, &block) if [Symbol, Dataset].any?{|c| sql.is_a?(c)}
         synchronize(opts[:server]) do |conn|
           statement(conn) do |stmt|
-            if block_given?
+            if block
               yield log_yield(sql){stmt.executeQuery(sql)}
             else
               case opts[:type]

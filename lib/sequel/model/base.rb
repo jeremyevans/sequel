@@ -205,7 +205,7 @@ module Sequel
       #   Artist.server!(:server1)
       def def_dataset_method(*args, &block)
         raise(Error, "No arguments given") if args.empty?
-        if block_given?
+        if block
           raise(Error, "Defining a dataset method using a block requires only one argument") if args.length > 1
           meth = args.first
           @dataset_methods[meth] = block
