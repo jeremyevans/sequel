@@ -1,5 +1,7 @@
 === HEAD
 
+* Allow reflecting on validations in the validation_class_methods plugin (jeremyevans)
+
 * Allow passing a primary key value to the add_* association method (gucki)
 
 * When typecasting model column values, check the classes of the new and existing values (jeremyevans)

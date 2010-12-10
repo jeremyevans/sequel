@@ -9,11 +9,30 @@ describe Sequel::Model do
     end
   end
   
-  specify "should respond to validates, validations, has_validations?" do
+  specify "should respond to validations, has_validations?, and validation_reflections" do
     @c.should respond_to(:validations)
     @c.should respond_to(:has_validations?)
+    @c.should respond_to(:validation_reflections)
   end
   
+  specify "should be able to reflect on validations" do
+    @c.validation_reflections.should == {}
+    @c.validates_acceptance_of(:a)
+    @c.validation_reflections.should == {:a=>[[:acceptance, {:tag=>:acceptance, :message=>"is not accepted", :allow_nil=>true, :accept=>"1"}]]}
+    @c.validates_presence_of(:a)
+    @c.validation_reflections[:a].length.should == 2
+    @c.validation_reflections[:a].last.should == [:presence, {:tag=>:presence, :message=>"is not present"}]
+  end
+
+  specify "should handle validation reflections correctly when subclassing" do
+    @c.validates_acceptance_of(:a)
+    c = Class.new(@c)
+    c.validation_reflections.map{|k,v| k}.should == [:a]
+    c.validates_presence_of(:a)
+    @c.validation_reflections.should == {:a=>[[:acceptance, {:tag=>:acceptance, :message=>"is not accepted", :allow_nil=>true, :accept=>"1"}]]}
+    c.validation_reflections[:a].last.should == [:presence, {:tag=>:presence, :message=>"is not present"}]
+  end
+
   specify "should acccept validation definitions using validates_each" do
     @c.validates_each(:xx, :yy) {|o, a, v| o.errors[a] << 'too low' if v < 50}
     o = @c.new

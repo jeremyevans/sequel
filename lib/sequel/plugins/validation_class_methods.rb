@@ -6,7 +6,9 @@ module Sequel
     # for the legacy class-level validation methods (e.g. validates_presence_of :column).
     #
     # It is recommended to use the validation_helpers plugin instead of this one,
-    # as it is less complex and more flexible.
+    # as it is less complex and more flexible.  However, this plugin provides reflection
+    # support, since it is class-level, while the instance-level validation_helpers
+    # plugin does not.
     # 
     # Usage:
     #
@@ -21,13 +23,20 @@ module Sequel
         model.class_eval do
           @validation_mutex = Mutex.new
           @validations = {}
+          @validation_reflections = {}
         end
       end
 
       module ClassMethods
-        # A hash of associations for this model class.  Keys are column symbols,
+        # A hash of validations for this model class.  Keys are column symbols,
         # values are arrays of validation procs.
         attr_reader :validations
+
+        # A hash of validation reflections for this model class.  Keys are column
+        # symbols, values are an array of two element arrays, with the first element
+        # being the validation type symbol and the second being a hash of validation
+        # options.
+        attr_reader :validation_reflections
 
         # The Generator class is used to generate validation definitions using 
         # the validates {} idiom.
@@ -49,12 +58,16 @@ module Sequel
           !validations.empty?
         end
 
-        # Setup the validations hash in the subclass
+        # Setup the validations and validation_reflections hash in the subclass.
         def inherited(subclass)
           super
+          vr = @validation_reflections
           subclass.class_eval do
             @validation_mutex = Mutex.new
             @validations = {}
+            h = {}
+            vr.each{|k,v| h[k] = v.dup}
+            @validation_reflections = h
           end
         end
     
@@ -115,6 +128,7 @@ module Sequel
             :accept => '1',
             :tag => :acceptance,
           }.merge!(extract_options!(atts))
+          reflect_validation(:acceptance, opts, atts)
           atts << opts
           validates_each(*atts) do |o, a, v|
             o.errors.add(a, opts[:message]) unless v == opts[:accept]
@@ -136,6 +150,7 @@ module Sequel
             :message => 'is not confirmed',
             :tag => :confirmation,
           }.merge!(extract_options!(atts))
+          reflect_validation(:confirmation, opts, atts)
           atts << opts
           validates_each(*atts) do |o, a, v|
             o.errors.add(a, opts[:message]) unless v == o.send(:"#{a}_confirmation")
@@ -205,6 +220,7 @@ module Sequel
             raise ArgumentError, "A regular expression must be supplied as the :with option of the options hash"
           end
           
+          reflect_validation(:format, opts, atts)
           atts << opts
           validates_each(*atts) do |o, a, v|
             o.errors.add(a, opts[:message]) unless v.to_s =~ opts[:with]
@@ -231,6 +247,7 @@ module Sequel
           }.merge!(extract_options!(atts))
           
           opts[:tag] ||= ([:length] + [:maximum, :minimum, :is, :within].reject{|x| !opts.include?(x)}).join('-').to_sym
+          reflect_validation(:length, opts, atts)
           atts << opts
           validates_each(*atts) do |o, a, v|
             if m = opts[:maximum]
@@ -261,6 +278,7 @@ module Sequel
           opts = {
             :tag => :not_string,
           }.merge!(extract_options!(atts))
+          reflect_validation(:not_string, opts, atts)
           atts << opts
           validates_each(*atts) do |o, a, v|
             if v.is_a?(String)
@@ -286,6 +304,7 @@ module Sequel
             :message => 'is not a number',
             :tag => :numericality,
           }.merge!(extract_options!(atts))
+          reflect_validation(:numericality, opts, atts)
           atts << opts
           validates_each(*atts) do |o, a, v|
             begin
@@ -310,6 +329,7 @@ module Sequel
             :message => 'is not present',
             :tag => :presence,
           }.merge!(extract_options!(atts))
+          reflect_validation(:presence, opts, atts)
           atts << opts
           validates_each(*atts) do |o, a, v|
             o.errors.add(a, opts[:message]) if v.blank? && v != false
@@ -327,6 +347,7 @@ module Sequel
             raise ArgumentError, "The :in parameter is required, and respond to include?"
           end
           opts[:message] ||= "is not in range or set: #{opts[:in].inspect}"
+          reflect_validation(:inclusion, opts, atts)
           atts << opts
           validates_each(*atts) do |o, a, v|
             o.errors.add(a, opts[:message]) unless opts[:in].include?(v)
@@ -355,6 +376,7 @@ module Sequel
             :tag => :uniqueness,
           }.merge!(extract_options!(atts))
     
+          reflect_validation(:uniqueness, opts, atts)
           atts << opts
           validates_each(*atts) do |o, a, v|
             error_field = a
@@ -389,6 +411,13 @@ module Sequel
         # take an options hash as the last parameter.
         def extract_options!(array)
           array.last.is_a?(Hash) ? array.pop : {}
+        end
+
+        # Add the validation reflection to the class's validations.
+        def reflect_validation(type, opts, atts)
+          atts.each do |att|
+            (validation_reflections[att] ||= []) << [type, opts]
+          end
         end
 
         # Handle the :if option for validations
