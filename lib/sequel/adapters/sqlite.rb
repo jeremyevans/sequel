@@ -183,6 +183,7 @@ module Sequel
 
       # Disconnect given connections from the database.
       def disconnect_connection(c)
+        c.prepared_statements.each_value{|v| v.first.close}
         c.close
       end
     end

@@ -1,5 +1,7 @@
 === HEAD
 
+* Close prepared statements when disconnect when using SQLite (jeremyevans)
+
 * Allow reflecting on validations in the validation_class_methods plugin (jeremyevans)
 
 * Allow passing a primary key value to the add_* association method (gucki)
