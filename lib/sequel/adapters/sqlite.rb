@@ -147,11 +147,24 @@ module Sequel
         o
       end
       
+      def prepared_statement_argument(arg)
+        case arg
+        when Date, DateTime, Time, TrueClass, FalseClass
+          literal(arg)[1...-1]
+        when SQL::Blob
+          arg.to_blob
+        else
+          arg
+        end
+      end
+
       # Execute a prepared statement on the database using the given name.
       def execute_prepared_statement(conn, type, name, opts, &block)
         ps = prepared_statements[name]
         sql = ps.prepared_sql
         args = opts[:arguments]
+        ps_args = {}
+        args.each{|k, v| ps_args[k] = prepared_statement_argument(v)}
         if cpsa = conn.prepared_statements[name]
           cps, cps_sql = cpsa
           if cps_sql != sql
@@ -164,9 +177,9 @@ module Sequel
           conn.prepared_statements[name] = [cps, sql]
         end
         if block
-          log_yield("Executing prepared statement #{name}", args){cps.execute(args, &block)}
+          log_yield("Executing prepared statement #{name}", args){cps.execute(ps_args, &block)}
         else
-          log_yield("Executing prepared statement #{name}", args){cps.execute!(args){|r|}}
+          log_yield("Executing prepared statement #{name}", args){cps.execute!(ps_args){|r|}}
           case type
           when :insert
             conn.last_insert_row_id
