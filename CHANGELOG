@@ -1,6 +1,12 @@
 === HEAD
 
-* Close prepared statements when disconnect when using SQLite (jeremyevans)
+* Handle Date and DateTime types in prepared statements when using the jdbc adapter (jeremyevans)
+
+* Handle Date, DateTime, Time, SQL::Blob, true, and false in prepared statements when using the SQLite adapter (jeremyevans)
+
+* Use varbinary(max) instead of image for the generic blob type on MSSQL (jeremyevans)
+
+* Close prepared statements when disconnecting when using SQLite (jeremyevans)
 
 * Allow reflecting on validations in the validation_class_methods plugin (jeremyevans)
 
