@@ -338,14 +338,25 @@ module Sequel
         JavaxNaming::InitialContext.new.lookup(jndi_name).connection
       end
             
-      # Support fractional seconds for Time objects used in bound variables
-      def java_sql_timestamp(time)
-        millis = time.to_i * 1000
-        ts = java.sql.Timestamp.new(millis)
-        ts.setNanos(time.usec * 1000)
+      # Support Date objects used in bound variables
+      def java_sql_date(date)
+        java.sql.Date.new(Time.local(date.year, date.month, date.day).to_i * 1000)
+      end
+
+      # Support DateTime objects used in bound variables
+      def java_sql_datetime(datetime)
+        ts = java.sql.Timestamp.new(Time.local(datetime.year, datetime.month, datetime.day, datetime.hour, datetime.min, datetime.sec).to_i * 1000)
+        ts.setNanos((datetime.sec_fraction * (RUBY_VERSION >= '1.9.0' ?  1000000000 : 86400000000000)).to_i)
         ts
       end
 
+      # Support fractional seconds for Time objects used in bound variables
+      def java_sql_timestamp(time)
+        ts = java.sql.Timestamp.new(time.to_i * 1000)
+        ts.setNanos(RUBY_VERSION >= '1.9.0' ? time.nsec : time.usec * 1000)
+        ts
+      end 
+      
       # Log the given SQL and then execute it on the connection, used by
       # the transaction code.
       def log_connection_execute(conn, sql)
@@ -389,18 +400,22 @@ module Sequel
           cps.setBytes(i, arg.to_java_bytes)
         when String
           cps.setString(i, arg)
-        when Date, Java::JavaSql::Date
-          cps.setDate(i, arg)
-        when DateTime, Java::JavaSql::Timestamp
-          cps.setTimestamp(i, arg)
-        when Time
-          cps.setTimestamp(i, java_sql_timestamp(arg))
         when Float
           cps.setDouble(i, arg)
         when TrueClass, FalseClass
           cps.setBoolean(i, arg)
         when nil
           cps.setNull(i, JavaSQL::Types::NULL)
+        when DateTime
+          cps.setTimestamp(i, java_sql_datetime(arg))
+        when Date
+          cps.setDate(i, java_sql_date(arg))
+        when Time
+          cps.setTimestamp(i, java_sql_timestamp(arg))
+        when Java::JavaSql::Timestamp
+          cps.setTimestamp(i, arg)
+        when Java::JavaSql::Date
+          cps.setDate(i, arg)
         else
           cps.setObject(i, arg)
         end
