@@ -9,10 +9,10 @@ describe "Database schema parser" do
     clear_sqls
   end
   after do
-    INTEGRATION_DB.drop_table(:items) if INTEGRATION_DB.table_exists?(:items)
     INTEGRATION_DB.identifier_output_method = @iom
     INTEGRATION_DB.identifier_input_method = @iim
     INTEGRATION_DB.default_schema = @defsch
+    INTEGRATION_DB.drop_table(:items) if INTEGRATION_DB.table_exists?(:items)
   end
 
   specify "should handle a database with a identifier_output_method" do
