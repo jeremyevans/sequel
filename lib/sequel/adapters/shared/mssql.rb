@@ -181,9 +181,9 @@ module Sequel
         :bit
       end
       
-      # MSSQL uses image type for blobs
+      # MSSQL uses varbinary(max) type for blobs
       def type_literal_generic_file(column)
-        :image
+        :'varbinary(max)'
       end
 
       # support for clustered index type
