@@ -6,6 +6,9 @@ module Sequel
   # modify a single row.
   class NoExistingObject < Error; end
   
+  # Raised when an undefined association is used when eager loading.
+  class UndefinedAssociation < Error; end
+  
   # Exception class raised when +raise_on_save_failure+ is set and validation fails
   class ValidationFailed < Error
     def initialize(errors)

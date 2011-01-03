@@ -1,3 +1,7 @@
+=== HEAD
+
+* Make class_table_inheritance plugin handle subclass associations better (jeremyevans) (#320)
+
 === 3.19.0 (2011-01-03)
 
 * Handle Date and DateTime types in prepared statements when using the jdbc adapter (jeremyevans)

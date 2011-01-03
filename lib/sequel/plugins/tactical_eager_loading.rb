@@ -44,7 +44,14 @@ module Sequel
         def load_associated_objects(opts, reload=false)
           name = opts[:name]
           if !associations.include?(name) && retrieved_by
-            retrieved_by.send(:eager_load, retrieved_with, name=>{})
+            begin
+              retrieved_by.send(:eager_load, retrieved_with, name=>{})
+            rescue Sequel::UndefinedAssociation
+              # This can happen if class table inheritance is used and the association
+              # is only defined in a subclass.  This particular instance can use the
+              # association, but it can't be eagerly loaded as the parent class doesn't
+              # have access to the association, and that's the class doing the eager loading.
+            end
           end
           super
         end

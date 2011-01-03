@@ -90,6 +90,10 @@ describe "Class Table Inheritance Plugin" do
     @db[:employees][:id=>i].should == nil
   end
   
+  specify "should handle associations only defined in subclasses" do
+    Employee.filter(:id=>@i2).all.first.manager.id.should == @i4
+  end
+
   # See http://www.sqlite.org/src/tktview/3338b3fa19ac4abee6c475126a2e6d9d61f26ab1
   cspecify "should insert rows into all tables", :sqlite do
     e = Executive.create(:name=>'Ex2', :num_managers=>8, :num_staff=>9)
