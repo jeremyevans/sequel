@@ -1,0 +1,67 @@
+= New Features
+
+* The add_* association methods now accept a primary key, and
+  associates the receiver to the associated model object with that
+  primary key:
+  
+    artist.add_album(42)
+    # equivalent to: artist.add_album(Album[42])
+
+* The validation_class_methods plugin now has the ability to
+  reflect on validations:
+  
+    Album.plugin :validation_class_methods
+    Album.validates_acceptance_of(:a)
+    Album.validation_reflections
+    # => {:a=>[[:acceptance, {:tag=>:acceptance, :allow_nil=>true,
+                :message=>"is not accepted", :accept=>"1"}]]}
+
+= Other Improvements
+
+* In the postgres, mysql, and sqlite adapters, typecasting now uses
+  methods instead of procs.  Since methods aren't closures (while
+  procs are), this makes typecasting faster (up to 15%).
+
+* When typecasting model column values, the classes of the new and
+  existing values are checked in addition to the values themselves.
+  Previously, if the new and existing values were equal (i.e. 1.0
+  and 1), it wouldn't update the value.  Now, if the classes are
+  different, it always updates the value.
+
+* Date and DateTime objects are now handled correctly when using
+  prepared statements/bound variables in the jdbc adapter.
+  
+* Date, DateTime, Time, true, false, and SQL::Blob objects are now
+  handled correctly when using prepared statements/bound variables
+  in the sqlite adapter.
+
+* Sequel now uses varbinary(max) instead of image for the generic
+  File (blob) type on Microsoft SQL Server.  This makes it possible
+  to use an SQL::Blob object as a prepared statement argument.
+  
+* Sequel now handles blobs better in the Amalgalite adapter.
+
+* When disconnecting a connection using the sqlite adapter, all
+  open prepared statements are now closed first.  Previously,
+  attempting to disconnect a connection with open prepared statements
+  resulted in an error.
+
+* The license file has been renamed from COPYING to MIT-LICENSE, to
+  make it easier to determine at a glance which license is used.
+
+= Backwards Compatibility
+
+* Because Sequel switched the generic File type from image to
+  varbinary(max) on Microsoft SQL Server, any migrations/schema
+  modification methods that used the File type will now result in a
+  different column type than before.
+
+* The MYSQL_TYPE_PROCS, PG_TYPE_PROCS, and SQLITE_TYPE_PROCS
+  constants have been removed from the mysql, postgres, and sqlite
+  adapters, respectively.  The UNIX_EPOCH_TIME_FORMAT and
+  FALSE_VALUES constants have also been removed from the sqlite
+  adapter.
+
+* Typecasting in the sqlite adapters now uses to_i and to_f instead
+  of Integer() and Float() with rescues.  If you put non-numeric
+  data in numeric columns on SQLite, this could cause problems.

@@ -1,4 +1,4 @@
-=== HEAD
+=== 3.19.0 (2011-01-03)
 
 * Close prepared statements when disconnect when using SQLite (jeremyevans)
 
