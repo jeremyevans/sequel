@@ -613,27 +613,36 @@ module Sequel
       end
       
       private
-      
+
+      JAVA_SQL_TIMESTAMP    = Java::JavaSQL::Timestamp
+      JAVA_SQL_TIME         = Java::JavaSQL::Time
+      JAVA_SQL_DATE         = Java::JavaSQL::Date
+      JAVA_SQL_BLOB         = Java::JavaSQL::Blob
+      JAVA_SQL_CLOB         = Java::JavaSQL::Clob
+      JAVA_BUFFERED_READER  = Java::JavaIo::BufferedReader
+      JAVA_BIG_DECIMAL      = Java::JavaMath::BigDecimal
+      JAVA_BYTE_ARRAY       = Java::byte[]
+
       # Convert the type.  Used for converting Java types to ruby types.
       def convert_type(v)
         case v
-        when Java::JavaSQL::Timestamp
+        when JAVA_SQL_TIMESTAMP
           db.to_application_timestamp([v.getYear + 1900, v.getMonth + 1, v.getDate, v.getHours, v.getMinutes, v.getSeconds, v.getNanos])
-        when Java::JavaSQL::Time
+        when JAVA_SQL_TIME
           Sequel.string_to_time(v.to_string)
-        when Java::JavaSQL::Date
+        when JAVA_SQL_DATE
           Sequel.string_to_date(v.to_string)
-        when Java::JavaIo::BufferedReader
+        when JAVA_BUFFERED_READER
           lines = []
           while(line = v.read_line) do lines << line end
           lines.join("\n")
-        when Java::JavaMath::BigDecimal
+        when JAVA_BIG_DECIMAL
           BigDecimal.new(v.to_string)
-        when Java::byte[]
+        when JAVA_BYTE_ARRAY
           Sequel::SQL::Blob.new(String.from_java_bytes(v))
-        when Java::JavaSQL::Blob
+        when JAVA_SQL_BLOB
           convert_type(v.getBytes(1, v.length))
-        when Java::JavaSQL::Clob
+        when JAVA_SQL_CLOB
           Sequel::SQL::Blob.new(v.getSubString(1, v.length))
         else
           v
