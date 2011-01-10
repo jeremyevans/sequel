@@ -567,12 +567,12 @@ end
 
 context "A MySQL database" do
   specify "should accept a read_timeout option when connecting" do
-    db = Sequel.mysql(MYSQL_DB.opts[:database], :user => MYSQL_DB.opts[:user], :password => MYSQL_DB.opts[:password], :host => MYSQL_DB.opts[:host], :read_timeout => 300)
+    db = Sequel.connect(MYSQL_DB.opts.merge(:read_timeout=>22342))
     proc {db.test_connection}.should_not raise_error
   end
 
   specify "should accept a connect_timeout option when connecting" do
-    db = Sequel.mysql(MYSQL_DB.opts[:database], :user => MYSQL_DB.opts[:user], :password => MYSQL_DB.opts[:password], :host => MYSQL_DB.opts[:host], :connect_timeout => 300)
+    db = Sequel.connect(MYSQL_DB.opts.merge(:connect_timeout=>22342))
     proc {db.test_connection}.should_not raise_error
   end
 end
