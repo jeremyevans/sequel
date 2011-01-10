@@ -565,6 +565,18 @@ if %w'localhost 127.0.0.1 ::1'.include?(MYSQL_URI.host) and MYSQL_DB.adapter_sch
   end
 end
 
+context "A MySQL database" do
+  specify "should accept a read_timeout option when connecting" do
+    db = Sequel.mysql(MYSQL_DB.opts[:database], :user => MYSQL_DB.opts[:user], :password => MYSQL_DB.opts[:password], :host => MYSQL_DB.opts[:host], :read_timeout => 300)
+    proc {db.test_connection}.should_not raise_error
+  end
+
+  specify "should accept a connect_timeout option when connecting" do
+    db = Sequel.mysql(MYSQL_DB.opts[:database], :user => MYSQL_DB.opts[:user], :password => MYSQL_DB.opts[:password], :host => MYSQL_DB.opts[:host], :connect_timeout => 300)
+    proc {db.test_connection}.should_not raise_error
+  end
+end
+
 context "A grouped MySQL dataset" do
   before do
     MYSQL_DB[:test2].delete

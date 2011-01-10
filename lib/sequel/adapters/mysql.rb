@@ -128,10 +128,10 @@ module Sequel
           # encoding we want to use, but this can be overridden by READ_DEFAULT_GROUP.
           conn.options(Mysql::SET_CHARSET_NAME, encoding)
         end
-        if read_timeout = opts[:read_timeout] and Mysql::const_defined(Mysql::OPT_READ_TIMEOUT)
+        if read_timeout = opts[:read_timeout] and defined? Mysql::OPT_READ_TIMEOUT
           conn.options(Mysql::OPT_READ_TIMEOUT, read_timeout)
         end
-        if connect_timeout = opts[:connect_timeout] and Mysql::const_defined(Mysql::OPT_CONNECT_TIMEOUT)
+        if connect_timeout = opts[:connect_timeout] and defined? Mysql::OPT_CONNECT_TIMEOUT
           conn.options(Mysql::OPT_CONNECT_TIMEOUT, connect_timeout)
         end
         conn.real_connect(

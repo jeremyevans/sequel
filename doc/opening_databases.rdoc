@@ -254,6 +254,8 @@ The following additional options are supported:
 * :encoding - Specify the encoding/character set to use for the connection.
 * :socket - Can be used to specify a Unix socket file to connect to instead of a TCP host and port.
 * :timeout - Sets the wait_timeout for the connection, defaults to 1 month.
+* :read_timeout - Set the timeout in seconds for reading back results to a query.
+* :connect_timeout - Set the timeout in seconds before a connection attempt is abandoned.
 
 === odbc 
 
