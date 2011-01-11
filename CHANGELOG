@@ -1,5 +1,7 @@
 === HEAD
 
+* Add some basic Microsoft Access support to the ado adapter, autoincrementing primary keys now work (jeremyevans)
+
 * Make class_table_inheritance plugin handle subclass associations better (jeremyevans) (#320)
 
 === 3.19.0 (2011-01-03)
