@@ -232,15 +232,17 @@ module Sequel
         # Possible Options:
         # * :is - The exact size required for the value to be valid (no default)
         # * :maximum - The maximum size allowed for the value (no default)
-        # * :message - The message to use (no default, overrides :too_long, :too_short, and :wrong_length
+        # * :message - The message to use (no default, overrides :nil_message, :too_long, :too_short, and :wrong_length
         #   options if present)
         # * :minimum - The minimum size allowed for the value (no default)
+        # * :nil_message - The message to use use if :maximum option is used and the value is nil (default: 'is not present')
         # * :too_long - The message to use use if it the value is too long (default: 'is too long')
         # * :too_short - The message to use use if it the value is too short (default: 'is too short')
         # * :within - The array/range that must include the size of the value for it to be valid (no default)
         # * :wrong_length - The message to use use if it the value is not valid (default: 'is the wrong length')
         def validates_length_of(*atts)
           opts = {
+            :nil_message  => 'is not present',
             :too_long     => 'is too long',
             :too_short    => 'is too short',
             :wrong_length => 'is the wrong length'
@@ -251,7 +253,7 @@ module Sequel
           atts << opts
           validates_each(*atts) do |o, a, v|
             if m = opts[:maximum]
-              o.errors.add(a, opts[:message] || opts[:too_long]) unless v && v.size <= m
+              o.errors.add(a, opts[:message] || (v ? opts[:too_long] : opts[:nil_message])) unless v && v.size <= m
             end
             if m = opts[:minimum]
               o.errors.add(a, opts[:message] || opts[:too_short]) unless v && v.size >= m

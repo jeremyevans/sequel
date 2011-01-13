@@ -341,6 +341,20 @@ describe Sequel::Model do
     @m.should be_valid
     @m.value = '123456'
     @m.should_not be_valid
+    @m.errors[:value].should == ['is too long']
+    @m.value = nil
+    @m.should_not be_valid
+    @m.errors[:value].should == ['is not present']
+  end
+
+  specify "should validate length_of with maximum using customized error messages" do
+    @c.validates_length_of :value, :maximum => 5, :too_long=>'tl', :nil_message=>'np'
+    @m.value = '123456'
+    @m.should_not be_valid
+    @m.errors[:value].should == ['tl']
+    @m.value = nil
+    @m.should_not be_valid
+    @m.errors[:value].should == ['np']
   end
 
   specify "should validate length_of with minimum" do

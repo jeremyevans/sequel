@@ -1,5 +1,7 @@
 === HEAD
 
+* Use a better error message if a validates_max_length validation is applied to a nil value (jeremyevans) (#322)
+
 * Add some basic Microsoft Access support to the ado adapter, autoincrementing primary keys now work (jeremyevans)
 
 * Make class_table_inheritance plugin handle subclass associations better (jeremyevans) (#320)

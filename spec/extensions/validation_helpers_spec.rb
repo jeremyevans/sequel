@@ -210,6 +210,20 @@ describe "Sequel::Plugins::ValidationHelpers" do
     @m.should be_valid
     @m.value = '123456'
     @m.should_not be_valid
+    @m.errors[:value].should == ['is longer than 5 characters']
+    @m.value = nil
+    @m.should_not be_valid
+    @m.errors[:value].should == ['is not present']
+  end
+
+  specify "should support validates_max_length with nil value" do
+    @c.set_validations{validates_max_length(5, :value, :message=>'tl', :nil_message=>'np')}
+    @m.value = '123456'
+    @m.should_not be_valid
+    @m.errors[:value].should == ['tl']
+    @m.value = nil
+    @m.should_not be_valid
+    @m.errors[:value].should == ['np']
   end
 
   specify "should support validates_min_length" do
