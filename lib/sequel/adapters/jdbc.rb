@@ -168,6 +168,7 @@ module Sequel
               props.setProperty("user", opts[:user])
               props.setProperty("password", opts[:password])
             end
+            opts[:jdbc_properties].each{|k,v| props.setProperty(k.to_s, v)} if opts[:jdbc_properties]
             begin
               driver.new.connect(args[0], props)
             rescue => e2

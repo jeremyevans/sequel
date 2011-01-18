@@ -1,5 +1,7 @@
 === HEAD
 
+* Allow setting arbitrary JDBC properties in the jdbc adapter with the :jdbc_properties option (jeremyevans)
+
 * Use a better error message if a validates_max_length validation is applied to a nil value (jeremyevans) (#322)
 
 * Add some basic Microsoft Access support to the ado adapter, autoincrementing primary keys now work (jeremyevans)
