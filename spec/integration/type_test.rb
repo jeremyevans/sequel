@@ -39,13 +39,13 @@ describe "Supported types" do
     ds.all.should == [{:number=>2**34}]
   end
   
-  specify "should support generic float type" do
+  cspecify "should support generic float type", [:swift, :sqlite] do
     ds = create_items_table_with_column(:number, Float)
     ds.insert(:number => 2.1)
     ds.all.should == [{:number=>2.1}]
   end
   
-  cspecify "should support generic numeric type", [:odbc, :mssql] do
+  cspecify "should support generic numeric type", [:odbc, :mssql], [:swift, :sqlite] do
     ds = create_items_table_with_column(:number, Numeric, :size=>[15, 10])
     ds.insert(:number => BigDecimal.new('2.123456789'))
     ds.all.should == [{:number=>BigDecimal.new('2.123456789')}]

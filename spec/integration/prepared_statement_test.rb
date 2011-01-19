@@ -255,7 +255,7 @@ describe "Bound Argument Types" do
     @ds.filter(:file=>@ds.ba(:$x, :bytea)).prepare(:first, :ps_blob).call(:x=>@vs[:file])[:file].should == @vs[:file]
   end
 
-  specify "should handle float type" do
+  cspecify "should handle float type", [:swift, :sqlite] do
     @ds.filter(:f=>@ds.ba(:$x, :"double precision")).prepare(:first, :ps_float).call(:x=>@vs[:f])[:f].should == @vs[:f]
   end
 

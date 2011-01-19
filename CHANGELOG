@@ -1,5 +1,9 @@
 === HEAD
 
+* Add a SQLite subadapter to the swift adapter, not yet ready for production use (jeremyevans)
+
+* Update swift adapter to support swift 0.8.1, older versions no longer supported (jeremyevans)
+
 * Allow setting arbitrary JDBC properties in the jdbc adapter with the :jdbc_properties option (jeremyevans)
 
 * Use a better error message if a validates_max_length validation is applied to a nil value (jeremyevans) (#322)
