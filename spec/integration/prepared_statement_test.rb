@@ -251,7 +251,7 @@ describe "Bound Argument Types" do
     @ds.filter(:t=>@ds.ba(:$x, :timestamp)).prepare(:first, :ps_time).call(:x=>@vs[:t])[:t].should == @vs[:t]
   end
 
-  cspecify "should handle blob type", [:swift], [:jdbc, :postgres] do
+  cspecify "should handle blob type", [:swift] do
     @ds.filter(:file=>@ds.ba(:$x, :bytea)).prepare(:first, :ps_blob).call(:x=>@vs[:file])[:file].should == @vs[:file]
   end
 
