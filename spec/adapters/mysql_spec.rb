@@ -660,6 +660,12 @@ context "A MySQL database" do
     @db << "CREATE INDEX posts_id_index ON posts (id(10))"
     @db.indexes(:posts).should == {}
   end
+
+  specify "should dump partial indexes if :partial option is set to true" do
+    @db.create_table(:posts){text :id}
+    @db << "CREATE INDEX posts_id_index ON posts (id(10))"
+    @db.indexes(:posts, :partial => true).should == {:posts_id_index => {:columns => [:id], :unique => false}}
+  end
 end
 
 context "MySQL::Dataset#insert and related methods" do

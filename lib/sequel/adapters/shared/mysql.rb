@@ -49,7 +49,11 @@ module Sequel
         :mysql
       end
 
-      # Use SHOW INDEX FROM to get the index information for the table.
+      # Use SHOW INDEX FROM to get the index information for the
+      # table.
+      #
+      # By default partial indexes are not included, you can use the
+      # option :partial to override this.
       def indexes(table, opts={})
         indexes = {}
         remove_indexes = []
@@ -59,7 +63,7 @@ module Sequel
           name = r[:Key_name]
           next if name == PRIMARY
           name = m.call(name)
-          remove_indexes << name if r[:Sub_part]
+          remove_indexes << name if r[:Sub_part] && ! opts[:partial]
           i = indexes[name] ||= {:columns=>[], :unique=>r[:Non_unique] != 1}
           i[:columns] << m.call(r[:Column_name])
         end
