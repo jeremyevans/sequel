@@ -2,7 +2,7 @@
 
 * Allow a :partial option to Database#indexes on MySQL to include partial indexes (roland.swingler) (#324)
 
-* Add a SQLite subadapter to the swift adapter, not yet ready for production use (jeremyevans)
+* Add a SQLite subadapter to the swift adapter, now that swift supports it (jeremyevans)
 
 * Update swift adapter to support swift 0.8.1, older versions no longer supported (jeremyevans)
 
