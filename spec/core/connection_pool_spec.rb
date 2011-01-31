@@ -168,7 +168,7 @@ context "A connection pool with a max size of 1" do
     cc,c1, c2 = nil
     
     t1 = Thread.new {@pool.hold {|c| cc = c; c1 = c.dup; while c == 'herro';sleep 0.01;end}}
-    sleep 0.02
+    sleep 0.03
     cc.should == 'herro'
     c1.should == 'herro'
     
