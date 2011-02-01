@@ -1,4 +1,4 @@
-=== HEAD
+=== 3.20.0 (2011-02-01)
 
 * Allow a :partial option to Database#indexes on MySQL to include partial indexes (roland.swingler) (#324)
 
