@@ -51,7 +51,7 @@ module Sequel
               yield h2
             end
           ensure
-            cursor.drop
+            cursor.free
           end
         end
         self
