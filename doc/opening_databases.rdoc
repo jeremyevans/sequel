@@ -203,8 +203,17 @@ Does not support the :port option.
 
 === informix 
 
-Does not support the :host or :port options.
+Does not support the :host or :port options.  Depending on the configuration of your server
+it may be necessary to either set
+   
+   DB.quote_identifier = false
 
+or set
+
+   export DELIMIDENT=y
+
+in the scripts environment.
+ 
 === jdbc 
 
 Requires: java
