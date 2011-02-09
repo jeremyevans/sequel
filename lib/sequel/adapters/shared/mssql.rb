@@ -269,9 +269,9 @@ module Sequel
       # SQL Server does not support CTEs on subqueries, so move any CTEs
       # on joined datasets to the top level. The user is responsible for
       # resolving any name clashes this may cause.
-      def join_table(type, table, expr=nil, table_alias={})
+      def join_table(type, table, expr=nil, table_alias={}, &block)
         return super unless Dataset === table && table.opts[:with]
-        clone(:with => (opts[:with] || []) + table.opts[:with]).join_table(type, table.clone(:with => nil), expr, table_alias)
+        clone(:with => (opts[:with] || []) + table.opts[:with]).join_table(type, table.clone(:with => nil), expr, table_alias, &block)
       end
 
       # MSSQL uses a UNION ALL statement to insert multiple values at once.
