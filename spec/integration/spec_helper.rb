@@ -16,7 +16,7 @@ def clear_sqls
   $sqls.clear
 end 
 
-class Spec::Example::ExampleGroup
+(defined?(RSpec) ? RSpec::Core::ExampleGroup : Spec::Example::ExampleGroup).class_eval do
   def log
     begin
       INTEGRATION_DB.loggers << Logger.new(STDOUT)

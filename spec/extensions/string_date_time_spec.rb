@@ -1,6 +1,6 @@
 require File.join(File.dirname(File.expand_path(__FILE__)), 'spec_helper')
 
-context "String#to_time" do
+describe "String#to_time" do
   specify "should convert the string into a Time object" do
     "2007-07-11".to_time.should == Time.parse("2007-07-11")
     "06:30".to_time.should == Time.parse("06:30")
@@ -11,7 +11,7 @@ context "String#to_time" do
   end
 end
 
-context "String#to_date" do
+describe "String#to_date" do
   after do
     Sequel.convert_two_digit_years = true
   end
@@ -34,7 +34,7 @@ context "String#to_date" do
   end
 end
 
-context "String#to_datetime" do
+describe "String#to_datetime" do
   after do
     Sequel.convert_two_digit_years = true
   end
@@ -57,7 +57,7 @@ context "String#to_datetime" do
   end
 end
 
-context "String#to_sequel_time" do
+describe "String#to_sequel_time" do
   after do
     Sequel.datetime_class = Time
     Sequel.convert_two_digit_years = true

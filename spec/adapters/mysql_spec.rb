@@ -34,7 +34,7 @@ SQL_BEGIN = 'BEGIN'
 SQL_ROLLBACK = 'ROLLBACK'
 SQL_COMMIT = 'COMMIT'
 
-context "MySQL", '#create_table' do
+describe "MySQL", '#create_table' do
   before do
     @db = MYSQL_DB
     MYSQL_DB.sqls.clear
@@ -84,7 +84,7 @@ context "MySQL", '#create_table' do
   end
 end
 
-context "A MySQL database" do
+describe "A MySQL database" do
   specify "should provide the server version" do
     MYSQL_DB.server_version.should >= 40000
   end
@@ -99,7 +99,7 @@ context "A MySQL database" do
 end
 
 if MYSQL_DB.adapter_scheme == :mysql
-  context "Sequel::MySQL.convert_tinyint_to_bool" do
+  describe "Sequel::MySQL.convert_tinyint_to_bool" do
     before do
       @db = MYSQL_DB
       @db.create_table(:booltest){column :b, 'tinyint(1)'; column :i, 'tinyint(4)'}
@@ -148,7 +148,7 @@ if MYSQL_DB.adapter_scheme == :mysql
   end
 end
 
-context "A MySQL dataset" do
+describe "A MySQL dataset" do
   before do
     MYSQL_DB.create_table(:items){String :name; Integer :value}
     @d = MYSQL_DB[:items]
@@ -243,7 +243,7 @@ context "A MySQL dataset" do
   end
 end
 
-context "MySQL datasets" do
+describe "MySQL datasets" do
   before do
     @d = MYSQL_DB[:orders]
   end
@@ -282,7 +282,7 @@ describe "Dataset#distinct" do
   end
 end
 
-context "MySQL join expressions" do
+describe "MySQL join expressions" do
   before do
     @ds = MYSQL_DB[:nodes]
     @ds.db.meta_def(:server_version) {50014}
@@ -333,7 +333,7 @@ context "MySQL join expressions" do
   end
 end
 
-context "Joined MySQL dataset" do
+describe "Joined MySQL dataset" do
   before do
     @ds = MYSQL_DB[:nodes]
   end
@@ -357,7 +357,7 @@ context "Joined MySQL dataset" do
   end
 end
 
-context "A MySQL database" do
+describe "A MySQL database" do
   before do
     @db = MYSQL_DB
   end
@@ -424,7 +424,7 @@ context "A MySQL database" do
   end
 end  
 
-context "A MySQL database with table options" do
+describe "A MySQL database with table options" do
   before do
     @options = {:engine=>'MyISAM', :charset=>'latin1', :collate => 'latin1_swedish_ci'}
     
@@ -461,7 +461,7 @@ context "A MySQL database with table options" do
   end
 end
 
-context "A MySQL database" do
+describe "A MySQL database" do
   before do
     @db = MYSQL_DB
     @db.drop_table(:items) rescue nil
@@ -547,7 +547,7 @@ end
 
 # Socket tests should only be run if the MySQL server is on localhost
 if %w'localhost 127.0.0.1 ::1'.include?(MYSQL_URI.host) and MYSQL_DB.adapter_scheme == :mysql
-  context "A MySQL database" do
+  describe "A MySQL database" do
     specify "should accept a socket option" do
       db = Sequel.mysql(MYSQL_DB.opts[:database], :host => 'localhost', :user => MYSQL_DB.opts[:user], :password => MYSQL_DB.opts[:password], :socket => MYSQL_SOCKET_FILE)
       proc {db.test_connection}.should_not raise_error
@@ -565,7 +565,7 @@ if %w'localhost 127.0.0.1 ::1'.include?(MYSQL_URI.host) and MYSQL_DB.adapter_sch
   end
 end
 
-context "A MySQL database" do
+describe "A MySQL database" do
   specify "should accept a read_timeout option when connecting" do
     db = Sequel.connect(MYSQL_DB.opts.merge(:read_timeout=>22342))
     proc {db.test_connection}.should_not raise_error
@@ -577,7 +577,7 @@ context "A MySQL database" do
   end
 end
 
-context "A grouped MySQL dataset" do
+describe "A grouped MySQL dataset" do
   before do
     MYSQL_DB[:test2].delete
     MYSQL_DB[:test2] << {:name => '11', :value => 10}
@@ -599,7 +599,7 @@ context "A grouped MySQL dataset" do
   end
 end
 
-context "A MySQL database" do
+describe "A MySQL database" do
   before do
     @db = MYSQL_DB
     @db.drop_table(:posts) rescue nil
@@ -668,7 +668,7 @@ context "A MySQL database" do
   end
 end
 
-context "MySQL::Dataset#insert and related methods" do
+describe "MySQL::Dataset#insert and related methods" do
   before do
     MYSQL_DB.create_table(:items){String :name; Integer :value}
     @d = MYSQL_DB[:items]
@@ -853,7 +853,7 @@ context "MySQL::Dataset#insert and related methods" do
   
 end
 
-context "MySQL::Dataset#replace" do
+describe "MySQL::Dataset#replace" do
   before do
     MYSQL_DB.create_table(:items){Integer :id, :unique=>true; Integer :value}
     @d = MYSQL_DB[:items]
@@ -895,7 +895,7 @@ context "MySQL::Dataset#replace" do
   end
 end
 
-context "MySQL::Dataset#complex_expression_sql" do
+describe "MySQL::Dataset#complex_expression_sql" do
   before do
     @d = MYSQL_DB.dataset
   end
@@ -924,7 +924,7 @@ context "MySQL::Dataset#complex_expression_sql" do
 end
 
 if MYSQL_DB.adapter_scheme == :mysql or MYSQL_DB.adapter_scheme == :jdbc
-  context "MySQL Stored Procedures" do
+  describe "MySQL Stored Procedures" do
     before do
       MYSQL_DB.create_table(:items){Integer :id; Integer :value}
       @d = MYSQL_DB[:items]
@@ -969,7 +969,7 @@ if MYSQL_DB.adapter_scheme == :mysql or MYSQL_DB.adapter_scheme == :jdbc
 end
 
 if MYSQL_DB.adapter_scheme == :mysql
-  context "MySQL bad date/time conversions" do
+  describe "MySQL bad date/time conversions" do
     after do
       Sequel::MySQL.convert_invalid_date_time = false
     end
@@ -1000,7 +1000,7 @@ if MYSQL_DB.adapter_scheme == :mysql
     end
   end
   
-  context "MySQL multiple result sets" do
+  describe "MySQL multiple result sets" do
     before do
       MYSQL_DB.create_table!(:a){Integer :a}
       MYSQL_DB.create_table!(:b){Integer :b}

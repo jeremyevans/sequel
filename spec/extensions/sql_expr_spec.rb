@@ -1,6 +1,6 @@
 require File.join(File.dirname(File.expand_path(__FILE__)), 'spec_helper')
 
-context "Sequel sql_expr extension" do
+describe "Sequel sql_expr extension" do
   specify "Object#sql_expr should wrap the object in a GenericComplexExpression" do
     o = Object.new
     s = o.sql_expr

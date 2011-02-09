@@ -15,7 +15,7 @@ INFORMIX_DB.create_table :test do
   index :value
 end
 
-context "A Informix database" do
+describe "A Informix database" do
   specify "should provide disconnect functionality" do
     INFORMIX_DB.execute("select user from dual")
     INFORMIX_DB.pool.size.should == 1
@@ -24,7 +24,7 @@ context "A Informix database" do
   end
 end
 
-context "A Informix dataset" do
+describe "A Informix dataset" do
   before do
     @d = INFORMIX_DB[:test]
     @d.delete # remove all records

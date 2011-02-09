@@ -32,7 +32,7 @@ ORACLE_DB.create_table :categories do
   varchar2 :cat_name, :size => 50
 end
 
-context "An Oracle database" do
+describe "An Oracle database" do
   specify "should provide disconnect functionality" do
     ORACLE_DB.execute("select user from dual")
     ORACLE_DB.pool.size.should == 1
@@ -74,7 +74,7 @@ context "An Oracle database" do
   end
 end
 
-context "An Oracle dataset" do
+describe "An Oracle dataset" do
   before do
     @d = ORACLE_DB[:items]
     @d.delete # remove all records
@@ -222,7 +222,7 @@ context "An Oracle dataset" do
   end
 end
 
-context "Joined Oracle dataset" do
+describe "Joined Oracle dataset" do
   before do
     @d1 = ORACLE_DB[:books]
     @d1.delete # remove all records
@@ -263,7 +263,7 @@ context "Joined Oracle dataset" do
   end  
 end
 
-context "Oracle aliasing" do
+describe "Oracle aliasing" do
   before do
     @d1 = ORACLE_DB[:books]
     @d1.delete # remove all records

@@ -3,7 +3,7 @@ require File.join(File.dirname(File.expand_path(__FILE__)), 'spec_helper')
 Regexp.send(:include, Sequel::SQL::StringMethods)
 String.send(:include, Sequel::SQL::StringMethods)
 
-context "Blockless Ruby Filters" do
+describe "Blockless Ruby Filters" do
   before do
     db = Sequel::Database.new
     db.quote_identifiers = false
@@ -481,7 +481,7 @@ context "Blockless Ruby Filters" do
   end
 end
 
-context Sequel::SQL::VirtualRow do
+describe Sequel::SQL::VirtualRow do
   before do
     db = Sequel::Database.new
     db.quote_identifiers = true

@@ -191,7 +191,7 @@ describe Sequel::Database do
   end
 end
 
-context Sequel::Dataset do
+describe Sequel::Dataset do
   before do
     INTEGRATION_DB.create_table! :items do
       primary_key :id 

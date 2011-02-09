@@ -583,7 +583,7 @@ describe Sequel::Model do
   end
 end
 
-context "Superclass validations" do
+describe "Superclass validations" do
   before do
     @c1 = Class.new(Sequel::Model)
     @c1.class_eval do
@@ -635,7 +635,7 @@ context "Superclass validations" do
   end
 end
 
-context ".validates with block" do
+describe ".validates with block" do
   specify "should support calling .each" do
     @c = Class.new(Sequel::Model)
     @c.class_eval do

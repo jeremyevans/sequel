@@ -34,7 +34,7 @@ MSSQL_DB.create_table! :test4 do
   varbinary :value
 end
 
-context "A MSSQL database" do
+describe "A MSSQL database" do
   before do
     @db = MSSQL_DB
   end
@@ -59,7 +59,7 @@ context "A MSSQL database" do
   end
 end
 
-context "MSSQL Dataset#join_table" do
+describe "MSSQL Dataset#join_table" do
   specify "should emulate the USING clause with ON" do
     MSSQL_DB[:items].join(:categories, [:id]).sql.should ==
       'SELECT * FROM ITEMS INNER JOIN CATEGORIES ON (CATEGORIES.ID = ITEMS.ID)'
@@ -71,7 +71,7 @@ context "MSSQL Dataset#join_table" do
   end
 end
 
-context "MSSQL Dataset#output" do
+describe "MSSQL Dataset#output" do
   before do
     @db = MSSQL_DB
     @db.create_table!(:items){String :name; Integer :value}
@@ -150,13 +150,13 @@ context "MSSQL Dataset#output" do
   end
 end
 
-context "MSSQL dataset" do
+describe "MSSQL dataset" do
   before do
     @db = MSSQL_DB
     @ds = MSSQL_DB[:t]
   end
 
-  context "using #with and #with_recursive" do
+  describe "using #with and #with_recursive" do
     before do
       @ds1 = @ds.with(:t, @db[:x])
       @ds2 = @ds.with_recursive(:t, @db[:x], @db[:t])
@@ -177,7 +177,7 @@ context "MSSQL dataset" do
       @ds2.insert_sql(@db[:t]).should == 'WITH T AS (SELECT * FROM X UNION ALL SELECT * FROM T) INSERT INTO T SELECT * FROM T'
     end
 
-    context "on #import" do
+    describe "on #import" do
       before do
         @db = @db.clone
         class << @db
@@ -213,7 +213,7 @@ context "MSSQL dataset" do
   end
 end
 
-context "MSSQL joined datasets" do
+describe "MSSQL joined datasets" do
   before do
     @db = MSSQL_DB
   end
@@ -325,7 +325,7 @@ describe "Common Table Expressions" do
   end
 end
 
-context "MSSSQL::Dataset#insert" do
+describe "MSSSQL::Dataset#insert" do
   before do
     @db = MSSQL_DB
     @db.create_table!(:test5){primary_key :xid; Integer :value}
@@ -352,13 +352,13 @@ context "MSSSQL::Dataset#insert" do
   end
 end
 
-context "MSSSQL::Dataset#disable_insert_output" do
+describe "MSSSQL::Dataset#disable_insert_output" do
   specify "should play nicely with simple_select_all?" do
     MSSQL_DB[:test].disable_insert_output.send(:simple_select_all?).should == true
   end
 end
 
-context "MSSSQL::Dataset#into" do
+describe "MSSSQL::Dataset#into" do
   before do
     @db = MSSQL_DB
   end
@@ -377,7 +377,7 @@ context "MSSSQL::Dataset#into" do
   end
 end
 
-context "A MSSQL database" do
+describe "A MSSQL database" do
   before do
     @db = MSSQL_DB
   end
@@ -403,7 +403,7 @@ context "A MSSQL database" do
   end
 end
 
-context "MSSQL::Database#rename_table" do
+describe "MSSQL::Database#rename_table" do
   specify "should work on non-schema bound tables which need escaping" do
     MSSQL_DB.quote_identifiers = true
     MSSQL_DB.create_table! :'foo bar' do
@@ -426,7 +426,7 @@ context "MSSQL::Database#rename_table" do
   end
 end
 
-context "MSSQL::Dataset#count" do
+describe "MSSQL::Dataset#count" do
   specify "should work with a distinct query with an order clause" do
     MSSQL_DB.create_table!(:items){String :name; Integer :value}
     MSSQL_DB[:items].insert(:name => "name", :value => 1)

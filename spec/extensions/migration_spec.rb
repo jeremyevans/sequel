@@ -1,6 +1,6 @@
 require File.join(File.dirname(File.expand_path(__FILE__)), 'spec_helper')
 
-context "Migration.descendants" do
+describe "Migration.descendants" do
   before do
     Sequel::Migration.descendants.clear
   end
@@ -28,7 +28,7 @@ context "Migration.descendants" do
   end
 end
 
-context "Migration.apply" do
+describe "Migration.apply" do
   before do
     @c = Class.new do
       define_method(:one) {|x| [1111, x]}
@@ -57,7 +57,7 @@ context "Migration.apply" do
   end
 end
 
-context "SimpleMigration#apply" do
+describe "SimpleMigration#apply" do
   before do
     @c = Class.new do
       define_method(:one) {|x| [1111, x]}
@@ -86,7 +86,7 @@ context "SimpleMigration#apply" do
   end
 end
 
-context "Reversible Migrations with Sequel.migration{change{}}" do
+describe "Reversible Migrations with Sequel.migration{change{}}" do
   before do
     @c = Class.new do
       self::AT = Class.new do
@@ -193,7 +193,7 @@ context "Reversible Migrations with Sequel.migration{change{}}" do
   end
 end
 
-context "Sequel::IntegerMigrator" do
+describe "Sequel::IntegerMigrator" do
   before do
     dbc = Class.new(MockDatabase) do
       attr_reader :drops, :tables_created, :columns_created, :versions
@@ -313,7 +313,7 @@ context "Sequel::IntegerMigrator" do
   end
 end
 
-context "Sequel::TimestampMigrator" do
+describe "Sequel::TimestampMigrator" do
   before do
     $sequel_migration_version = 0
     $sequel_migration_files = []

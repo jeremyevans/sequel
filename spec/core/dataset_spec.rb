@@ -1,6 +1,6 @@
 require File.join(File.dirname(File.expand_path(__FILE__)), "spec_helper")
 
-context "Dataset" do
+describe "Dataset" do
   before do
     @dataset = Sequel::Dataset.new("db")
   end
@@ -62,7 +62,7 @@ context "Dataset" do
   end
 end
 
-context "Dataset" do
+describe "Dataset" do
   before do
     @dataset = Sequel::Dataset.new("db")
   end
@@ -104,7 +104,7 @@ context "Dataset" do
   end
 end
 
-context "Dataset#clone" do
+describe "Dataset#clone" do
   before do
     @dataset = Sequel::Dataset.new(nil).from(:items)
   end
@@ -159,7 +159,7 @@ context "Dataset#clone" do
   end
 end
 
-context "Dataset#==" do
+describe "Dataset#==" do
   before do
     @db = MockDatabase.new
     @h = {}
@@ -184,7 +184,7 @@ context "Dataset#==" do
   end
 end
 
-context "Dataset#hash" do
+describe "Dataset#hash" do
   before do
     @db = MockDatabase.new
     @h = {}
@@ -211,7 +211,7 @@ context "Dataset#hash" do
   end
 end
 
-context "A simple dataset" do
+describe "A simple dataset" do
   before do
     @dataset = Sequel::Dataset.new(nil).from(:test)
   end
@@ -293,7 +293,7 @@ context "A simple dataset" do
   end
 end
 
-context "A dataset with multiple tables in its FROM clause" do
+describe "A dataset with multiple tables in its FROM clause" do
   before do
     @dataset = Sequel::Dataset.new(nil).from(:t1, :t2)
   end
@@ -319,7 +319,7 @@ context "A dataset with multiple tables in its FROM clause" do
   end
 end
 
-context "Dataset#unused_table_alias" do
+describe "Dataset#unused_table_alias" do
   before do
     @ds = Sequel::Dataset.new(nil).from(:test)
   end
@@ -346,7 +346,7 @@ context "Dataset#unused_table_alias" do
   end
 end
 
-context "Dataset#exists" do
+describe "Dataset#exists" do
   before do
     @ds1 = Sequel::Dataset.new(nil).from(:test)
     @ds2 = @ds1.filter(:price.sql_number < 100)
@@ -366,7 +366,7 @@ context "Dataset#exists" do
   end
 end
 
-context "Dataset#where" do
+describe "Dataset#where" do
   before do
     @dataset = Sequel::Dataset.new(nil).from(:test)
     @d1 = @dataset.where(:region => 'Asia')
@@ -647,7 +647,7 @@ context "Dataset#where" do
   end
 end
 
-context "Dataset#or" do
+describe "Dataset#or" do
   before do
     @dataset = Sequel::Dataset.new(nil).from(:test)
     @d1 = @dataset.where(:x => 1)
@@ -688,7 +688,7 @@ context "Dataset#or" do
   end
 end
 
-context "Dataset#and" do
+describe "Dataset#and" do
   before do
     @dataset = Sequel::Dataset.new(nil).from(:test)
     @d1 = @dataset.where(:x => 1)
@@ -728,7 +728,7 @@ context "Dataset#and" do
   end
 end
 
-context "Dataset#exclude" do
+describe "Dataset#exclude" do
   before do
     @dataset = Sequel::Dataset.new(nil).from(:test)
   end
@@ -772,7 +772,7 @@ context "Dataset#exclude" do
   end
 end
 
-context "Dataset#invert" do
+describe "Dataset#invert" do
   before do
     @d = Sequel::Dataset.new(nil).from(:test)
   end
@@ -790,7 +790,7 @@ context "Dataset#invert" do
   end
 end
 
-context "Dataset#having" do
+describe "Dataset#having" do
   before do
     @dataset = Sequel::Dataset.new(nil).from(:test)
     @grouped = @dataset.group(:region).select(:region, :sum.sql_function(:population), :avg.sql_function(:gdp))
@@ -821,7 +821,7 @@ context "Dataset#having" do
   end
 end
 
-context "a grouped dataset" do
+describe "a grouped dataset" do
   before do
     @dataset = Sequel::Dataset.new(nil).from(:test).group(:type_id)
   end
@@ -854,7 +854,7 @@ context "a grouped dataset" do
   end
 end
 
-context "Dataset#group_by" do
+describe "Dataset#group_by" do
   before do
     @dataset = Sequel::Dataset.new(nil).from(:test).group_by(:type_id)
   end
@@ -896,7 +896,7 @@ context "Dataset#group_by" do
   end
 end
 
-context "Dataset#as" do
+describe "Dataset#as" do
   specify "should set up an alias" do
     dataset = Sequel::Dataset.new(nil).from(:test)
     dataset.select(dataset.limit(1).select(:name).as(:n)).sql.should == \
@@ -904,7 +904,7 @@ context "Dataset#as" do
   end
 end
 
-context "Dataset#literal" do
+describe "Dataset#literal" do
   before do
     @dataset = Sequel::Dataset.new(nil).from(:test)
   end
@@ -1058,7 +1058,7 @@ context "Dataset#literal" do
   end
 end
 
-context "Dataset#from" do
+describe "Dataset#from" do
   before do
     @dataset = Sequel::Dataset.new(nil)
   end
@@ -1121,7 +1121,7 @@ context "Dataset#from" do
   end
 end
 
-context "Dataset#select" do
+describe "Dataset#select" do
   before do
     @d = Sequel::Dataset.new(nil).from(:test)
   end
@@ -1185,7 +1185,7 @@ context "Dataset#select" do
   end
 end
 
-context "Dataset#select_all" do
+describe "Dataset#select_all" do
   before do
     @d = Sequel::Dataset.new(nil).from(:test)
   end
@@ -1199,7 +1199,7 @@ context "Dataset#select_all" do
   end
 end
 
-context "Dataset#select_more" do
+describe "Dataset#select_more" do
   before do
     @d = Sequel::Dataset.new(nil).from(:test)
   end
@@ -1221,7 +1221,7 @@ context "Dataset#select_more" do
   end
 end
 
-context "Dataset#select_append" do
+describe "Dataset#select_append" do
   before do
     @d = Sequel::Dataset.new(nil).from(:test)
   end
@@ -1243,7 +1243,7 @@ context "Dataset#select_append" do
   end
 end
 
-context "Dataset#order" do
+describe "Dataset#order" do
   before do
     @dataset = Sequel::Dataset.new(nil).from(:test)
   end
@@ -1298,31 +1298,31 @@ context "Dataset#order" do
   end
 end
 
-context "Dataset#unfiltered" do
+describe "Dataset#unfiltered" do
   specify "should remove filtering from the dataset" do
     Sequel::Dataset.new(nil).from(:test).filter(:score=>1).unfiltered.sql.should == 'SELECT * FROM test'
   end
 end
 
-context "Dataset#unlimited" do
+describe "Dataset#unlimited" do
   specify "should remove limit and offset from the dataset" do
     Sequel::Dataset.new(nil).from(:test).limit(1, 2).unlimited.sql.should == 'SELECT * FROM test'
   end
 end
 
-context "Dataset#ungrouped" do
+describe "Dataset#ungrouped" do
   specify "should remove group and having clauses from the dataset" do
     Sequel::Dataset.new(nil).from(:test).group(:a).having(:b).ungrouped.sql.should == 'SELECT * FROM test'
   end
 end
 
-context "Dataset#unordered" do
+describe "Dataset#unordered" do
   specify "should remove ordering from the dataset" do
     Sequel::Dataset.new(nil).from(:test).order(:name).unordered.sql.should == 'SELECT * FROM test'
   end
 end
 
-context "Dataset#with_sql" do
+describe "Dataset#with_sql" do
   before do
     @dataset = Sequel::Dataset.new(nil).from(:test)
   end
@@ -1344,7 +1344,7 @@ context "Dataset#with_sql" do
   end
 end
 
-context "Dataset#order_by" do
+describe "Dataset#order_by" do
   before do
     @dataset = Sequel::Dataset.new(nil).from(:test)
   end
@@ -1375,7 +1375,7 @@ context "Dataset#order_by" do
   end
 end
 
-context "Dataset#order_more and order_append" do
+describe "Dataset#order_more and order_append" do
   before do
     @dataset = Sequel::Dataset.new(nil).from(:test)
   end
@@ -1398,7 +1398,7 @@ context "Dataset#order_more and order_append" do
   end
 end
 
-context "Dataset#order_prepend" do
+describe "Dataset#order_prepend" do
   before do
     @dataset = Sequel::Dataset.new(nil).from(:test)
   end
@@ -1419,7 +1419,7 @@ context "Dataset#order_prepend" do
   end
 end
 
-context "Dataset#reverse_order" do
+describe "Dataset#reverse_order" do
   before do
     @dataset = Sequel::Dataset.new(nil).from(:test)
   end
@@ -1467,7 +1467,7 @@ context "Dataset#reverse_order" do
   end
 end
 
-context "Dataset#limit" do
+describe "Dataset#limit" do
   before do
     @dataset = Sequel::Dataset.new(nil).from(:test)
   end
@@ -1521,7 +1521,7 @@ context "Dataset#limit" do
   end
 end
 
-context "Dataset#naked" do
+describe "Dataset#naked" do
   before do
     @d1 = Sequel::Dataset.new(nil, {1 => 2, 3 => 4})
     @d2 = @d1.clone
@@ -1534,7 +1534,7 @@ context "Dataset#naked" do
   end
 end
 
-context "Dataset#qualified_column_name" do
+describe "Dataset#qualified_column_name" do
   before do
     @dataset = Sequel::Dataset.new(nil).from(:test)
   end
@@ -1569,7 +1569,7 @@ class DummyDataset < Sequel::Dataset
   end
 end
 
-context "Dataset#map" do
+describe "Dataset#map" do
   before do
     @d = DummyDataset.new(nil).from(:items)
   end
@@ -1587,7 +1587,7 @@ context "Dataset#map" do
   end
 end
 
-context "Dataset#to_hash" do
+describe "Dataset#to_hash" do
   before do
     @d = DummyDataset.new(nil).from(:items)
   end
@@ -1603,7 +1603,7 @@ context "Dataset#to_hash" do
   end
 end
 
-context "Dataset#distinct" do
+describe "Dataset#distinct" do
   before do
     @db = MockDatabase.new
     @dataset = @db[:test].select(:name)
@@ -1630,7 +1630,7 @@ context "Dataset#distinct" do
   end
 end
 
-context "Dataset#count" do
+describe "Dataset#count" do
   before do
     @c = Class.new(Sequel::Dataset) do
       def self.sql
@@ -1692,7 +1692,7 @@ context "Dataset#count" do
 end
 
 
-context "Dataset#group_and_count" do
+describe "Dataset#group_and_count" do
   before do
     @c = Class.new(Sequel::Dataset) do
       def self.sql
@@ -1742,7 +1742,7 @@ context "Dataset#group_and_count" do
   end
 end
 
-context "Dataset#empty?" do
+describe "Dataset#empty?" do
   specify "should return true if records exist in the dataset" do
     @c = Class.new(Sequel::Dataset) do
       def self.sql
@@ -1761,7 +1761,7 @@ context "Dataset#empty?" do
   end
 end
 
-context "Dataset#first_source_alias" do
+describe "Dataset#first_source_alias" do
   before do
     @ds = Sequel::Dataset.new(nil)
   end
@@ -1791,7 +1791,7 @@ context "Dataset#first_source_alias" do
   end
 end
 
-context "Dataset#first_source_table" do
+describe "Dataset#first_source_table" do
   before do
     @ds = Sequel::Dataset.new(nil)
   end
@@ -1814,7 +1814,7 @@ context "Dataset#first_source_table" do
   end
 end
 
-context "Dataset#from_self" do
+describe "Dataset#from_self" do
   before do
     @ds = Sequel::Dataset.new(nil).from(:test).select(:name).limit(1)
   end
@@ -1842,7 +1842,7 @@ context "Dataset#from_self" do
 
 end
 
-context "Dataset#join_table" do
+describe "Dataset#join_table" do
   before do
     @d = MockDataset.new(nil).from(:items)
     @d.quote_identifiers = true
@@ -2156,7 +2156,7 @@ context "Dataset#join_table" do
   end
 end
 
-context "Dataset#[]=" do
+describe "Dataset#[]=" do
   before do
     c = Class.new(Sequel::Dataset) do
       def last_sql
@@ -2177,7 +2177,7 @@ context "Dataset#[]=" do
   end
 end
 
-context "Dataset#set" do
+describe "Dataset#set" do
   before do
     c = Class.new(Sequel::Dataset) do
       def last_sql
@@ -2199,7 +2199,7 @@ context "Dataset#set" do
 end
 
 
-context "Dataset#insert_multiple" do
+describe "Dataset#insert_multiple" do
   before do
     c = Class.new(Sequel::Dataset) do
       attr_reader :inserts
@@ -2224,7 +2224,7 @@ context "Dataset#insert_multiple" do
   end
 end
 
-context "Dataset aggregate methods" do
+describe "Dataset aggregate methods" do
   before do
     c = Class.new(Sequel::Dataset) do
       def fetch_rows(sql)
@@ -2263,7 +2263,7 @@ context "Dataset aggregate methods" do
   end
 end
 
-context "Dataset#range" do
+describe "Dataset#range" do
   before do
     c = Class.new(Sequel::Dataset) do
       class_variable_set(:@@sql, nil)
@@ -2296,7 +2296,7 @@ context "Dataset#range" do
   end
 end
 
-context "Dataset#interval" do
+describe "Dataset#interval" do
   before do
     c = Class.new(Sequel::Dataset) do
       class_variable_set(:@@sql, nil)
@@ -2329,7 +2329,7 @@ context "Dataset#interval" do
   end
 end
 
-context "Dataset #first and #last" do
+describe "Dataset #first and #last" do
   before do
     @c = Class.new(Sequel::Dataset) do
       def each(&block)
@@ -2392,7 +2392,7 @@ context "Dataset #first and #last" do
   end
 end
 
-context "Dataset compound operations" do
+describe "Dataset compound operations" do
   before do
     @a = Sequel::Dataset.new(nil).from(:a).filter(:z => 1)
     @b = Sequel::Dataset.new(nil).from(:b).filter(:z => 2)
@@ -2506,7 +2506,7 @@ context "Dataset compound operations" do
 
 end
 
-context "Dataset#[]" do
+describe "Dataset#[]" do
   before do
     @c = Class.new(Sequel::Dataset) do
       class_variable_set(:@@last_dataset, nil)
@@ -2532,7 +2532,7 @@ context "Dataset#[]" do
   end
 end
 
-context "Dataset#single_record" do
+describe "Dataset#single_record" do
   before do
     @c = Class.new(Sequel::Dataset) do
       def fetch_rows(sql)
@@ -2556,7 +2556,7 @@ context "Dataset#single_record" do
   end
 end
 
-context "Dataset#single_value" do
+describe "Dataset#single_value" do
   before do
     @c = Class.new(Sequel::Dataset) do
       def fetch_rows(sql)
@@ -2585,7 +2585,7 @@ context "Dataset#single_value" do
   end
 end
 
-context "Dataset#get" do
+describe "Dataset#get" do
   before do
     @c = Class.new(Sequel::Dataset) do
       attr_reader :last_sql
@@ -2622,7 +2622,7 @@ context "Dataset#get" do
   end
 end
 
-context "Dataset#set_row_proc" do
+describe "Dataset#set_row_proc" do
   before do
     @c = Class.new(Sequel::Dataset) do
       def fetch_rows(sql, &block)
@@ -2649,7 +2649,7 @@ context "Dataset#set_row_proc" do
   end
 end
 
-context "Dataset#<<" do
+describe "Dataset#<<" do
   before do
     @d = Sequel::Dataset.new(nil)
     @d.meta_def(:insert) do |*args|
@@ -2662,7 +2662,7 @@ context "Dataset#<<" do
   end
 end
 
-context "Dataset#columns" do
+describe "Dataset#columns" do
   before do
     @dataset = DummyDataset.new(nil).from(:items)
     @dataset.meta_def(:columns=) {|c| @columns = c}
@@ -2689,7 +2689,7 @@ context "Dataset#columns" do
   end
 end
 
-context "Dataset#columns!" do
+describe "Dataset#columns!" do
   before do
     @dataset = DummyDataset.new(nil).from(:items)
     i = 'a' 
@@ -2704,7 +2704,7 @@ context "Dataset#columns!" do
   end
 end
 
-context "Dataset#import" do
+describe "Dataset#import" do
   before do
     @dbc = Class.new(Sequel::Database) do
       attr_reader :sqls
@@ -2784,7 +2784,7 @@ context "Dataset#import" do
   end
 end
 
-context "Dataset#multi_insert" do
+describe "Dataset#multi_insert" do
   before do
     @dbc = Class.new do
       attr_reader :sqls
@@ -2897,7 +2897,7 @@ context "Dataset#multi_insert" do
   end
 end
 
-context "Dataset" do
+describe "Dataset" do
   before do
     @d = Sequel::Dataset.new(nil).from(:x)
   end
@@ -2944,7 +2944,7 @@ context "Dataset" do
   end
 end
 
-context "Dataset#to_csv" do
+describe "Dataset#to_csv" do
   before do
     @c = Class.new(Sequel::Dataset) do
       attr_accessor :data
@@ -2976,7 +2976,7 @@ context "Dataset#to_csv" do
   end
 end
 
-context "Dataset#update_sql" do
+describe "Dataset#update_sql" do
   before do
     @ds = Sequel::Dataset.new(nil).from(:items)
   end
@@ -2998,7 +2998,7 @@ context "Dataset#update_sql" do
   end
 end
 
-context "Dataset#insert_sql" do
+describe "Dataset#insert_sql" do
   before do
     @ds = Sequel::Dataset.new(nil).from(:items)
   end
@@ -3092,7 +3092,7 @@ class DummyMummyDatabase < Sequel::Database
   end
 end
 
-context "Dataset#inspect" do
+describe "Dataset#inspect" do
   before do
     @ds = Sequel::Dataset.new(nil).from(:blah)
   end
@@ -3102,7 +3102,7 @@ context "Dataset#inspect" do
   end
 end
 
-context "Dataset#all" do
+describe "Dataset#all" do
   before do
     @c = Class.new(Sequel::Dataset) do
       def fetch_rows(sql, &block)
@@ -3133,7 +3133,7 @@ context "Dataset#all" do
   end
 end
 
-context "Dataset#grep" do
+describe "Dataset#grep" do
   before do
     @ds = Sequel::Dataset.new(nil).from(:posts)
   end
@@ -3207,7 +3207,7 @@ context "Dataset#grep" do
   end
 end
 
-context "Dataset default #fetch_rows, #insert, #update, #delete, #truncate, #execute" do
+describe "Dataset default #fetch_rows, #insert, #update, #delete, #truncate, #execute" do
   before do
     @db = Sequel::Database.new
     @ds = @db[:items]
@@ -3255,7 +3255,7 @@ context "Dataset default #fetch_rows, #insert, #update, #delete, #truncate, #exe
   end
 end
 
-context "Dataset prepared statements and bound variables " do
+describe "Dataset prepared statements and bound variables " do
   before do
     @db = Sequel::Database.new
     @db.meta_def(:sqls){@sqls||=[]}
@@ -3342,7 +3342,7 @@ context "Dataset prepared statements and bound variables " do
   end
 end
 
-context Sequel::Dataset::UnnumberedArgumentMapper do
+describe Sequel::Dataset::UnnumberedArgumentMapper do
   before do
     @db = Sequel::Database.new
     @db.meta_def(:sqls){@sqls||=[]}
@@ -3388,7 +3388,7 @@ context Sequel::Dataset::UnnumberedArgumentMapper do
   end
 end
 
-context "Sequel::Dataset#server" do
+describe "Sequel::Dataset#server" do
   specify "should set the server to use for the dataset" do
     @db = Sequel::Database.new
     @ds = @db[:items].server(:s)
@@ -3410,7 +3410,7 @@ context "Sequel::Dataset#server" do
   end
 end
 
-context "Sequel::Dataset#each_server" do
+describe "Sequel::Dataset#each_server" do
   before do
     @db = Sequel::Database.new(:servers=>{:s=>{}, :i=>{}})
     @ds = @db[:items]
@@ -3434,7 +3434,7 @@ context "Sequel::Dataset#each_server" do
   end
 end
 
-context "Sequel::Dataset #set_defaults" do
+describe "Sequel::Dataset #set_defaults" do
   before do
     @ds = Sequel::Dataset.new(nil).from(:items).set_defaults(:x=>1)
   end
@@ -3456,7 +3456,7 @@ context "Sequel::Dataset #set_defaults" do
   end
 end
 
-context "Sequel::Dataset #set_overrides" do
+describe "Sequel::Dataset #set_overrides" do
   before do
     @ds = Sequel::Dataset.new(nil).from(:items).set_overrides(:x=>1)
   end
@@ -3478,7 +3478,7 @@ context "Sequel::Dataset #set_overrides" do
   end
 end
 
-context "Sequel::Dataset#qualify" do
+describe "Sequel::Dataset#qualify" do
   specify "should qualify to the given table" do
     MockDatabase.new[:t].filter{a<b}.qualify(:e).sql.should == 'SELECT e.* FROM t WHERE (e.a < e.b)'
   end
@@ -3488,13 +3488,13 @@ context "Sequel::Dataset#qualify" do
   end
 end
 
-context "Sequel::Dataset#qualify_to" do
+describe "Sequel::Dataset#qualify_to" do
   specify "should qualify to the given table" do
     MockDatabase.new[:t].filter{a<b}.qualify_to(:e).sql.should == 'SELECT e.* FROM t WHERE (e.a < e.b)'
   end
 end
 
-context "Sequel::Dataset#qualify_to_first_source" do
+describe "Sequel::Dataset#qualify_to_first_source" do
   before do
     @ds = MockDatabase.new[:t]
   end
@@ -3586,7 +3586,7 @@ context "Sequel::Dataset#qualify_to_first_source" do
   end
 end
 
-context "Sequel::Dataset #with and #with_recursive" do
+describe "Sequel::Dataset #with and #with_recursive" do
   before do
     @db = MockDatabase.new
     @ds = @db[:t]
@@ -3812,7 +3812,7 @@ describe "Sequel timezone support" do
   end
 end
 
-context "Sequel::Dataset#select_map" do
+describe "Sequel::Dataset#select_map" do
   before do
     @ds = MockDatabase.new[:t]
     def @ds.fetch_rows(sql)
@@ -3849,7 +3849,7 @@ context "Sequel::Dataset#select_map" do
   end
 end
 
-context "Sequel::Dataset#select_order_map" do
+describe "Sequel::Dataset#select_order_map" do
   before do
     @ds = MockDatabase.new[:t]
     def @ds.fetch_rows(sql)
@@ -3891,7 +3891,7 @@ context "Sequel::Dataset#select_order_map" do
   end
 end
 
-context "Sequel::Dataset#select_hash" do
+describe "Sequel::Dataset#select_hash" do
   before do
     @ds = MockDatabase.new[:t]
     def @ds.set_fr_yield(hs)
@@ -3929,7 +3929,7 @@ context "Sequel::Dataset#select_hash" do
   end
 end
 
-context "Modifying joined datasets" do
+describe "Modifying joined datasets" do
   before do
     @ds = MockDatabase.new.from(:b, :c).join(:d, [:id]).where(:id => 2)
     @ds.meta_def(:supports_modifying_joins?){true}
@@ -3947,7 +3947,7 @@ context "Modifying joined datasets" do
   end
 end
 
-context "Dataset#lock_style and for_update" do
+describe "Dataset#lock_style and for_update" do
   before do
     @ds = MockDatabase.new[:t]
   end

@@ -114,7 +114,7 @@ describe Sequel::Model, "#sti_key" do
     StiTestSub1B.dataset.sql.should == "SELECT * FROM sti_tests WHERE (sti_tests.kind IN ('StiTestSub1B'))"
   end
 
-  context "with custom options" do
+  describe "with custom options" do
     before do
       class ::StiTest2 < Sequel::Model
         columns :id, :kind

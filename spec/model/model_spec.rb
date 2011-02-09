@@ -511,7 +511,7 @@ describe Sequel::Model, ".[]" do
   end
 end
 
-context "Model#inspect" do
+describe "Model#inspect" do
   before do
     @o = Sequel::Model.load(:x => 333)
   end
@@ -521,7 +521,7 @@ context "Model#inspect" do
   end
 end
 
-context "Model.db_schema" do
+describe "Model.db_schema" do
   before do
     @c = Class.new(Sequel::Model(:items)) do
       def self.columns; orig_columns; end
@@ -618,7 +618,7 @@ context "Model.db_schema" do
   end
 end
 
-context "Model#use_transactions" do
+describe "Model#use_transactions" do
   before do
     @c = Class.new(Sequel::Model(:items))
   end

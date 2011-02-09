@@ -6,7 +6,7 @@ unless defined?(SQLITE_DB)
 end
 INTEGRATION_DB = SQLITE_DB unless defined?(INTEGRATION_DB)
 
-context "An SQLite database" do
+describe "An SQLite database" do
   before do
     @db = SQLITE_DB
     @fk = @db.foreign_keys
@@ -128,7 +128,7 @@ context "An SQLite database" do
   end
 end
 
-context "An SQLite dataset" do
+describe "An SQLite dataset" do
   before do
     @d = SQLITE_DB[:items]
   end
@@ -148,7 +148,7 @@ context "An SQLite dataset" do
   end
 end
 
-context "An SQLite numeric column" do
+describe "An SQLite numeric column" do
   specify "should handle and return BigDecimal values" do
     SQLITE_DB.create_table!(:d){numeric :d}
     d = SQLITE_DB[:d]
@@ -162,7 +162,7 @@ context "An SQLite numeric column" do
   end
 end
 
-context "An SQLite dataset AS clause" do
+describe "An SQLite dataset AS clause" do
   specify "should use a string literal for :col___alias" do
     SQLITE_DB.literal(:c___a).should == "c AS 'a'"
   end
@@ -188,7 +188,7 @@ context "An SQLite dataset AS clause" do
   end
 end
 
-context "SQLite::Dataset#delete" do
+describe "SQLite::Dataset#delete" do
   before do
     SQLITE_DB.create_table! :items do
       primary_key :id
@@ -220,7 +220,7 @@ context "SQLite::Dataset#delete" do
   end
 end
 
-context "SQLite::Dataset#update" do
+describe "SQLite::Dataset#update" do
   before do
     SQLITE_DB.create_table! :items do
       primary_key :id
@@ -243,7 +243,7 @@ context "SQLite::Dataset#update" do
   end
 end
 
-context "SQLite dataset" do
+describe "SQLite dataset" do
   before do
     SQLITE_DB.create_table! :test do
       primary_key :id
@@ -282,7 +282,7 @@ context "SQLite dataset" do
   end
 end
 
-context "A SQLite database" do
+describe "A SQLite database" do
   before do
     @db = SQLITE_DB
     @db.create_table! :test2 do

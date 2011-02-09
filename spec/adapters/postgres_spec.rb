@@ -33,7 +33,7 @@ POSTGRES_DB.create_table! :test4 do
   bytea :value
 end
 
-context "A PostgreSQL database" do
+describe "A PostgreSQL database" do
   before do
     @db = POSTGRES_DB
   end
@@ -54,7 +54,7 @@ context "A PostgreSQL database" do
   end
 end
 
-context "A PostgreSQL dataset" do
+describe "A PostgreSQL dataset" do
   before do
     @d = POSTGRES_DB[:test]
     @d.delete # remove all records
@@ -234,7 +234,7 @@ if POSTGRES_DB.pool.respond_to?(:max_size) and POSTGRES_DB.pool.max_size > 1
   end
 end
 
-context "A PostgreSQL dataset with a timestamp field" do
+describe "A PostgreSQL dataset with a timestamp field" do
   before do
     @d = POSTGRES_DB[:test3]
     @d.delete
@@ -259,7 +259,7 @@ context "A PostgreSQL dataset with a timestamp field" do
   end
 end
 
-context "PostgreSQL's EXPLAIN and ANALYZE" do
+describe "PostgreSQL's EXPLAIN and ANALYZE" do
   specify "should not raise errors" do
     @d = POSTGRES_DB[:test3]
     proc{@d.explain}.should_not raise_error
@@ -267,7 +267,7 @@ context "PostgreSQL's EXPLAIN and ANALYZE" do
   end
 end
 
-context "A PostgreSQL database" do
+describe "A PostgreSQL database" do
   before do
     @db = POSTGRES_DB
   end
@@ -310,7 +310,7 @@ context "A PostgreSQL database" do
   end
 end  
 
-context "A PostgreSQL database" do
+describe "A PostgreSQL database" do
   before do
     @db = POSTGRES_DB
     @db.drop_table(:posts) rescue nil
@@ -424,7 +424,7 @@ context "A PostgreSQL database" do
   end
 end
 
-context "Postgres::Dataset#import" do
+describe "Postgres::Dataset#import" do
   before do
     @db = POSTGRES_DB
     @db.create_table!(:test){Integer :x; Integer :y}
@@ -463,7 +463,7 @@ context "Postgres::Dataset#import" do
   end
 end
 
-context "Postgres::Dataset#insert" do
+describe "Postgres::Dataset#insert" do
   before do
     @db = POSTGRES_DB
     @db.create_table!(:test5){primary_key :xid; Integer :value}
@@ -551,7 +551,7 @@ context "Postgres::Dataset#insert" do
   end
 end
 
-context "Postgres::Database schema qualified tables" do
+describe "Postgres::Database schema qualified tables" do
   before do
     POSTGRES_DB << "CREATE SCHEMA schema_test"
     POSTGRES_DB.instance_variable_set(:@primary_keys, {})
@@ -656,7 +656,7 @@ context "Postgres::Database schema qualified tables" do
   end
 end
 
-context "Postgres::Database schema qualified tables and eager graphing" do
+describe "Postgres::Database schema qualified tables and eager graphing" do
   before(:all) do
     @db = POSTGRES_DB
     @db.run "DROP SCHEMA s CASCADE" rescue nil
@@ -844,7 +844,7 @@ if POSTGRES_DB.server_version >= 80300
     full_text_index [:title, :body]
   end
 
-  context "PostgreSQL tsearch2" do
+  describe "PostgreSQL tsearch2" do
     before do
       @ds = POSTGRES_DB[:test6]
     end
@@ -873,7 +873,7 @@ if POSTGRES_DB.server_version >= 80300
 end
 
 if POSTGRES_DB.dataset.supports_window_functions?
-  context "Postgres::Dataset named windows" do
+  describe "Postgres::Dataset named windows" do
     before do
       @db = POSTGRES_DB
       @db.create_table!(:i1){Integer :id; Integer :group_id; Integer :amount}
@@ -902,7 +902,7 @@ if POSTGRES_DB.dataset.supports_window_functions?
   end
 end
 
-context "Postgres::Database functions, languages, and triggers" do
+describe "Postgres::Database functions, languages, and triggers" do
   before do
     @d = POSTGRES_DB
   end
@@ -973,7 +973,7 @@ context "Postgres::Database functions, languages, and triggers" do
 end
 
 if POSTGRES_DB.adapter_scheme == :postgres
-context "Postgres::Dataset #use_cursor" do
+describe "Postgres::Dataset #use_cursor" do
   before(:all) do
     @db = POSTGRES_DB
     @db.create_table!(:test_cursor){Integer :x}

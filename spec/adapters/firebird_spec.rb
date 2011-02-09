@@ -43,7 +43,7 @@ FIREBIRD_DB.create_table! :test6 do
   String :val4, :text=>true
 end
 
-context "A Firebird database" do
+describe "A Firebird database" do
   before do
     @db = FIREBIRD_DB
   end
@@ -60,7 +60,7 @@ context "A Firebird database" do
   end
 end
 
-context "A Firebird dataset" do
+describe "A Firebird dataset" do
   before do
     @d = FIREBIRD_DB[:test]
     @d.delete # remove all records
@@ -230,7 +230,7 @@ context "A Firebird dataset" do
   end
 end
 
-context "A Firebird dataset with a timestamp field" do
+describe "A Firebird dataset with a timestamp field" do
   before do
     @d = FIREBIRD_DB[:test3]
     @d.delete
@@ -244,7 +244,7 @@ context "A Firebird dataset with a timestamp field" do
   end
 end
 
-context "A Firebird database" do
+describe "A Firebird database" do
   before do
     @db = FIREBIRD_DB
     @db.drop_table(:posts) rescue nil
@@ -353,7 +353,7 @@ context "A Firebird database" do
   end
 end
 
-context "Postgres::Dataset#insert" do
+describe "Postgres::Dataset#insert" do
   before do
     @ds = FIREBIRD_DB[:test5]
     @ds.delete
@@ -387,7 +387,7 @@ context "Postgres::Dataset#insert" do
   end
 end
 
-context "Postgres::Dataset#insert" do
+describe "Postgres::Dataset#insert" do
   before do
     @ds = FIREBIRD_DB[:test6]
     @ds.delete
