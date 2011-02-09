@@ -1,5 +1,9 @@
 === HEAD
 
+* Fix join_table on MySQL ignoring the block (jfirebaugh)
+
+* Transfer CTE WITH clauses in subselect to main query when joining on MSSQL (jfirebaugh)
+
 * Make specs support both RSpec 1 and RSpec 2 (jeremyevans)
 
 * Work with ruby-informix versions >= 0.7.3 in the informix adapter (jeremyevans) (#326)

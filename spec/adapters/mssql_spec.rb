@@ -177,6 +177,11 @@ describe "MSSQL dataset" do
       @ds2.insert_sql(@db[:t]).should == 'WITH T AS (SELECT * FROM X UNION ALL SELECT * FROM T) INSERT INTO T SELECT * FROM T'
     end
 
+    specify "should move WITH clause on joined dataset to top level" do
+      @db[:s].inner_join(@ds1).sql.should == "WITH T AS (SELECT * FROM X) SELECT * FROM S INNER JOIN (SELECT * FROM T) AS T1"
+      @ds1.inner_join(@db[:s].with(:s, @db[:y])).sql.should == "WITH T AS (SELECT * FROM X), S AS (SELECT * FROM Y) SELECT * FROM T INNER JOIN (SELECT * FROM S) AS T1"
+    end
+
     describe "on #import" do
       before do
         @db = @db.clone

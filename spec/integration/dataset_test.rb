@@ -386,6 +386,11 @@ if INTEGRATION_DB.dataset.supports_cte?
       ps.call(:n=>3).should == [{:id=>5, :parent_id=>3}, {:id=>6, :parent_id=>5}]
       ps.call(:n=>5).should == [{:id=>6, :parent_id=>5}]
     end
+
+    specify "should support joining a dataset with a CTE" do
+      @ds.inner_join(@db[:t].with(:t, @ds.filter(:parent_id=>nil)), :id => :id).select(:i1__id).order(:i1__id).map(:id).should == [1,2]
+      @db[:t].with(:t, @ds).inner_join(@db[:s].with(:s, @ds.filter(:parent_id=>nil)), :id => :id).select(:t__id).order(:t__id).map(:id).should == [1,2]
+    end
   end
 end
 
