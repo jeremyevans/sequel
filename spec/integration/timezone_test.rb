@@ -37,13 +37,13 @@ describe "Sequel timezone support" do
     Sequel.datetime_class = Time
   end
 
-  cspecify "should support using UTC for database storage and local time for the application", [:swift], [:do, proc{|db| db.database_type != :sqlite}] do
+  cspecify "should support using UTC for database storage and local time for the application", [:swift], [:tinytds], [:do, proc{|db| db.database_type != :sqlite}] do
     Sequel.database_timezone = :utc
     Sequel.application_timezone = :local
     test_timezone
   end
 
-  cspecify "should support using local time for database storage and UTC for the application", [:swift], [:do, proc{|db| db.database_type != :sqlite}] do
+  cspecify "should support using local time for database storage and UTC for the application", [:swift], [:tinytds], [:do, proc{|db| db.database_type != :sqlite}] do
     Sequel.database_timezone = :local
     Sequel.application_timezone = :utc
     test_timezone

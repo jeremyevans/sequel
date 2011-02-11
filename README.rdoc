@@ -13,7 +13,7 @@ toolkit for Ruby.
   configurations, and database sharding.
 * Sequel currently has adapters for ADO, Amalgalite, DataObjects,
   DB2, DBI, Firebird, Informix, JDBC, MySQL, Mysql2, ODBC, OpenBase,
-  Oracle, PostgreSQL, SQLite3, and Swift.
+  Oracle, PostgreSQL, SQLite3, Swift, and TinyTDS.
 
 == Resources
 

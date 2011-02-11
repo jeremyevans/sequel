@@ -338,3 +338,31 @@ Examples:
 The following additional options are supported:
 
 * :timeout - the busy timeout to use in milliseconds (default: 5000).
+
+=== swift
+
+swift is a ruby 1.9 only library, so you'll need to be running ruby 1.9.  It
+can connect to SQLite, MySQL, and PostgreSQL, and you must specify which
+database using the db_type option.
+
+Examples:
+
+  swift:///?database=:memory:&db_type=sqlite
+  swift://root:root@localhost/test?db_type=mysql
+  swift://root:root@localhost/test?db_type=postgres
+
+=== tinytds
+
+Because the underscore is not a valid character in a URI schema, the adapter
+is named tinytds instead of tiny_tds.  The connection options are passed directly
+to tiny_tds, except that the tiny_tds :dataserver and :username options are set to
+the Sequel :host and :user options.  The :host option should be an entry in the
+freetds.conf file, it's not currently possible to a host not present in the
+freetds.conf file.  Some options that you may want to set are
+:login_timeout, :timeout, :appname, and :encoding, see the tiny_tds README for details.
+For highest performance, you should disable any identifier output method when
+using the tinytds adapter, which probably means disabling any identifier input method
+as well.  The default for Microsoft SQL Server is to :downcase identifiers on output
+and :upcase them on input, so the highest performance will require changing the setting
+from the default.
+

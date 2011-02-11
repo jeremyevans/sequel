@@ -1,6 +1,8 @@
 === HEAD
 
-* Recognize bigint unsigned as a Bignum type in the schema dumper (gamespy-tech)
+* Add tinytds adapter, the best way to connect to MSSQL from a C based ruby running on *nix (jeremyevans)
+
+* Recognize bigint unsigned as a Bignum type in the schema dumper (gamespy-tech) (#327)
 
 * Add Dataset#calc_found_rows for MySQL datasets (macks)
 
