@@ -1,5 +1,7 @@
 === HEAD
 
+* Add association_autoreloading plugin for clearing association cache when foreign key values change (jfirebaugh, jeremyevans)
+
 * Fix join_table on MySQL ignoring the block (jfirebaugh)
 
 * Transfer CTE WITH clauses in subselect to main query when joining on MSSQL (jfirebaugh)
