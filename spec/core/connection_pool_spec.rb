@@ -168,12 +168,12 @@ describe "A connection pool with a max size of 1" do
     cc,c1, c2 = nil
     
     t1 = Thread.new {@pool.hold {|c| cc = c; c1 = c.dup; while c == 'herro';sleep 0.01;end}}
-    sleep 0.03
+    sleep 0.2
     cc.should == 'herro'
     c1.should == 'herro'
     
     t2 = Thread.new {@pool.hold {|c| c2 = c.dup; while c == 'hello';sleep 0.01;end}}
-    sleep 0.02
+    sleep 0.1
     
     # connection held by t1
     t1.should be_alive
@@ -187,7 +187,7 @@ describe "A connection pool with a max size of 1" do
     @pool.allocated.should == {t1=>cc}
     
     cc.gsub!('rr', 'll')
-    sleep 0.05
+    sleep 0.1
     
     # connection held by t2
     t1.should_not be_alive
@@ -199,7 +199,7 @@ describe "A connection pool with a max size of 1" do
     @pool.allocated.should == {t2=>cc}
     
     cc.gsub!('ll', 'rr')
-    sleep 0.05
+    sleep 0.1
     
     #connection released
     t2.should_not be_alive
