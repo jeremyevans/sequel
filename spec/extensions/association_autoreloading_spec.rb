@@ -59,4 +59,20 @@ describe "AssociationAutoreloading plugin" do
     album.composite_artist
     MODEL_DB.sqls.should == ["SELECT * FROM artists WHERE ((artists.id = 1) AND (artists.name = 'Al2')) LIMIT 1"]
   end
+
+  specify "should work with subclasses" do
+    salbum = Class.new(@Album)
+    oartist = Class.new(@c).set_dataset(:oartist)
+    oartist.columns :id, :name
+    salbum.many_to_one :artist2, :class=>oartist, :key=>:artist_id
+    album = salbum.load(:id => 1, :name=>'Al', :artist_id=>2)
+    album.artist
+    MODEL_DB.sqls.should == ['SELECT * FROM artists WHERE (artists.id = 2) LIMIT 1']
+    MODEL_DB.reset
+
+    album.artist_id = 1
+    album.artist
+    MODEL_DB.sqls.should == ['SELECT * FROM artists WHERE (artists.id = 1) LIMIT 1']
+  end
+
 end
