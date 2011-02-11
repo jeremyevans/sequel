@@ -296,9 +296,10 @@ module Sequel
       BOOL_FALSE = '0'.freeze
       COMMA_SEPARATOR = ', '.freeze
       FOR_SHARE = ' LOCK IN SHARE MODE'.freeze
+      SQL_CALC_FOUND_ROWS = ' SQL_CALC_FOUND_ROWS'.freeze
       DELETE_CLAUSE_METHODS = Dataset.clause_methods(:delete, %w'from where order limit')
       INSERT_CLAUSE_METHODS = Dataset.clause_methods(:insert, %w'ignore into columns values on_duplicate_key_update')
-      SELECT_CLAUSE_METHODS = Dataset.clause_methods(:select, %w'distinct columns from join where group having compounds order limit lock')
+      SELECT_CLAUSE_METHODS = Dataset.clause_methods(:select, %w'distinct calc_found_rows columns from join where group having compounds order limit lock')
       UPDATE_CLAUSE_METHODS = Dataset.clause_methods(:update, %w'table set where order limit')
       
       # MySQL specific syntax for LIKE/REGEXP searches, as well as
@@ -323,6 +324,14 @@ module Sequel
       # Use GROUP BY instead of DISTINCT ON if arguments are provided.
       def distinct(*args)
         args.empty? ? super : group(*args)
+      end
+
+      # Sets up the select methods to use SQL_CALC_FOUND_ROWS option.
+      #
+      #   dataset.calc_found_rows.limit(10)
+      #   # SELECT SQL_CALC_FOUND_ROWS * FROM table LIMIT 10
+      def calc_found_rows
+        clone(:calc_found_rows => true)
       end
       
       # Return a cloned dataset which will use LOCK IN SHARE MODE to lock returned rows.
@@ -548,6 +557,11 @@ module Sequel
       # Support FOR SHARE locking when using the :share lock style.
       def select_lock_sql(sql)
         @opts[:lock] == :share ? (sql << FOR_SHARE) : super
+      end
+
+      # MySQL specific SQL_CALC_FOUND_ROWS option
+      def select_calc_found_rows_sql(sql)
+        sql << SQL_CALC_FOUND_ROWS if opts[:calc_found_rows]
       end
 
       # MySQL supports the ORDER BY and LIMIT clauses for UPDATE statements

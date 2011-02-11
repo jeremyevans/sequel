@@ -923,6 +923,33 @@ describe "MySQL::Dataset#complex_expression_sql" do
   end
 end
 
+describe "MySQL::Dataset#calc_found_rows" do
+  before do
+    MYSQL_DB.create_table!(:items){Integer :a}
+  end
+  after do
+    MYSQL_DB.drop_table(:items)
+  end
+
+  specify "should add the SQL_CALC_FOUND_ROWS keyword when selecting" do
+    MYSQL_DB[:items].select(:a).calc_found_rows.limit(1).sql.should == \
+      'SELECT SQL_CALC_FOUND_ROWS a FROM items LIMIT 1'
+  end
+
+  specify "should count matching rows disregarding LIMIT clause" do
+    MYSQL_DB[:items].multi_insert([{:a => 1}, {:a => 1}, {:a => 2}])
+    MYSQL_DB.sqls.clear
+
+    MYSQL_DB[:items].calc_found_rows.filter(:a => 1).limit(1).all.should == [{:a => 1}]
+    MYSQL_DB.dataset.select(:FOUND_ROWS.sql_function.as(:rows)).all.should == [{:rows => 2 }]
+
+    MYSQL_DB.sqls.should == [
+      'SELECT SQL_CALC_FOUND_ROWS * FROM items WHERE (a = 1) LIMIT 1',
+      'SELECT FOUND_ROWS() AS rows',
+    ]
+  end
+end
+
 if MYSQL_DB.adapter_scheme == :mysql or MYSQL_DB.adapter_scheme == :jdbc
   describe "MySQL Stored Procedures" do
     before do
