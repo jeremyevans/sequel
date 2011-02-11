@@ -13,6 +13,7 @@ describe "AssociationAutoreloading plugin" do
     @Album = Class.new(@c).set_dataset(:albums)
     @Artist.columns :id, :name
     @Album.columns :id, :name, :artist_id
+    @Album.db_schema[:artist_id][:type] = :integer
     @Album.many_to_one :artist, :class=>@Artist
     MODEL_DB.reset
   end
@@ -35,6 +36,10 @@ describe "AssociationAutoreloading plugin" do
     MODEL_DB.reset
 
     album.artist_id = 2
+    album.artist
+    MODEL_DB.sqls.should == []
+
+    album.artist_id = "2"
     album.artist
     MODEL_DB.sqls.should == []
   end
