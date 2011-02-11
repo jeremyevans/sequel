@@ -13,21 +13,33 @@ module Sequel
     #
     module AssociationAutoreloading
       module ClassMethods
+        private
+
+        # Create a setter method for +key+ in an anonymous module included
+        # in the class that calls super and clears the cache for
+        # the given array of associations.
+        def create_autoreloading_association_setter(key, assocs)
+          include(@autoreloading_associations_module ||= Module.new) unless @autoreloading_associations_module
+          @autoreloading_associations_module.class_eval do
+            unless method_defined?("#{key}=")
+              define_method("#{key}=") do |v|
+                o = send(key)
+                super(v)
+                assocs.each{|a| associations.delete(a)} if send(key) != o
+              end
+            end
+          end
+        end
+
+        # For each of the foreign keys in the association, create
+        # a setter method that will clear the association cache.
         def def_many_to_one(opts)
           super
           @autoreloading_associations ||= {}
-          include(@autoreloading_associations_module ||= Module.new) unless @autoreloading_associations_module
-          opts[:keys].each do |k|
-            assocs = @autoreloading_associations[k] ||= []
+          opts[:keys].each do |key|
+            assocs = @autoreloading_associations[key] ||= []
             assocs << opts[:name]
-            @autoreloading_associations_module.class_eval do
-              unless method_defined?("#{k}=")
-                define_method("#{k}=") do |v|
-                  super(v)
-                  assocs.each{|a| associations.delete(a)}
-                end
-              end
-            end
+            create_autoreloading_association_setter(key, assocs)
           end
         end
       end

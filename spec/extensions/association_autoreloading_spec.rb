@@ -28,6 +28,17 @@ describe "AssociationAutoreloading plugin" do
     MODEL_DB.sqls.should == ['SELECT * FROM artists WHERE (artists.id = 1) LIMIT 1']
   end
 
+  specify "should not reload when value has not changed" do
+    album = @Album.load(:id => 1, :name=>'Al', :artist_id=>2)
+    album.artist
+    MODEL_DB.sqls.should == ['SELECT * FROM artists WHERE (artists.id = 2) LIMIT 1']
+    MODEL_DB.reset
+
+    album.artist_id = 2
+    album.artist
+    MODEL_DB.sqls.should == []
+  end
+
   specify "should reload all associations which use the foreign key" do
     @Album.many_to_one :other_artist, :key => :artist_id, :foreign_key => :id, :class => @Artist
     album = @Album.load(:id => 1, :name=>'Al', :artist_id=>2)
