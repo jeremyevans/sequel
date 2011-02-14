@@ -78,7 +78,7 @@ opts = OptionParser.new do |opts|
   end
 
   opts.on("-r", "--require lib", "require the library, before executing your script") do |v|
-    require v
+    load_dirs << [v]
   end
 
   opts.on("-t", "--trace", "Output the full backtrace if an exception is raised") do
@@ -132,7 +132,7 @@ end
 
 begin
   DB = connect_proc[db]
-  load_dirs.each{|d| Dir["#{d}/**/*.rb"].each{|f| load(f)}}
+  load_dirs.each{|d| d.is_a?(Array) ? require(d.first) : Dir["#{d}/**/*.rb"].each{|f| load(f)}}
   if migrate_dir
     Sequel.extension :migration
     Sequel::Migrator.apply(DB, migrate_dir, migrate_ver)
