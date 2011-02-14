@@ -122,7 +122,7 @@ END_MIG
         {:type=>Integer}
       when /\Atinyint(?:\((\d+)\))?\z/o
         {:type =>schema[:type] == :boolean ? TrueClass : Integer}
-      when /\Abigint(?:\((?:\d+)\))?\z/o
+      when /\Abigint(?:\((?:\d+)\))?(?: unsigned)?\z/o
         {:type=>Bignum}
       when /\A(?:real|float|double(?: precision)?)\z/o
         {:type=>Float}
