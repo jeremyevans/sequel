@@ -485,13 +485,13 @@ describe Sequel::SQL::Constants do
   cspecify "should have working CURRENT_TIME", [:do, :mysql], [:jdbc, :sqlite], [:mysql2] do
     @db.create_table!(:constants){Time :t, :only_time=>true}
     @ds.insert(:t=>Sequel::CURRENT_TIME)
-    (Time.now - @c[@ds.get(:t)]).should be_close(0, 1)
+    (Time.now - @c[@ds.get(:t)]).should be_within(1).of(0)
   end
 
   cspecify "should have working CURRENT_TIMESTAMP", [:jdbc, :sqlite] do
     @db.create_table!(:constants){DateTime :ts}
     @ds.insert(:ts=>Sequel::CURRENT_TIMESTAMP)
-    (Time.now - @c[@ds.get(:ts)]).should be_close(0, 1)
+    (Time.now - @c[@ds.get(:ts)]).should be_within(1).of(0)
   end
 end
 
