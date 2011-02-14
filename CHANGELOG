@@ -1,5 +1,7 @@
 === HEAD
 
+* Add support for -I and -r options to bin/sequel (jeremyevans)
+
 * Sequel::Model.plugin can now be overridden just like the other Model methods (jeremyevans)
 
 * Add tinytds adapter, the best way to connect to MSSQL from a C based ruby running on *nix (jeremyevans)

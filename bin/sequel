@@ -53,6 +53,10 @@ opts = OptionParser.new do |opts|
     echo = true
   end
   
+  opts.on("-I", "--include dir", "specify $LOAD_PATH directory") do |v|
+    $: << v
+  end
+
   opts.on("-l", "--log logfile", "log SQL statements to log file") do |v|
     logfile = v
   end
@@ -71,6 +75,10 @@ opts = OptionParser.new do |opts|
 
   opts.on("-N", "--no-test-connection", "do not test the connection") do
     db_opts[:test] = false
+  end
+
+  opts.on("-r", "--require lib", "require the library, before executing your script") do |v|
+    require v
   end
 
   opts.on("-t", "--trace", "Output the full backtrace if an exception is raised") do
