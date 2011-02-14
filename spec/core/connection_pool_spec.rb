@@ -166,14 +166,15 @@ describe "A connection pool with a max size of 1" do
   
   specify "should let only one thread access the connection at any time" do
     cc,c1, c2 = nil
+    m = (defined?(RUBY_ENGINE) && RUBY_ENGINE == 'rbx') ? 30 : 1
     
     t1 = Thread.new {@pool.hold {|c| cc = c; c1 = c.dup; while c == 'herro';sleep 0.01;end}}
-    sleep 0.2
+    sleep 0.02 * m
     cc.should == 'herro'
     c1.should == 'herro'
     
     t2 = Thread.new {@pool.hold {|c| c2 = c.dup; while c == 'hello';sleep 0.01;end}}
-    sleep 0.1
+    sleep 0.02 * m
     
     # connection held by t1
     t1.should be_alive
@@ -187,7 +188,7 @@ describe "A connection pool with a max size of 1" do
     @pool.allocated.should == {t1=>cc}
     
     cc.gsub!('rr', 'll')
-    sleep 0.1
+    sleep 0.05 * m
     
     # connection held by t2
     t1.should_not be_alive
@@ -199,7 +200,7 @@ describe "A connection pool with a max size of 1" do
     @pool.allocated.should == {t2=>cc}
     
     cc.gsub!('ll', 'rr')
-    sleep 0.1
+    sleep 0.05 * m
     
     #connection released
     t2.should_not be_alive
