@@ -1,5 +1,7 @@
 === HEAD
 
+* Sequel::Model.plugin can now be overridden just like the other Model methods (jeremyevans)
+
 * Add tinytds adapter, the best way to connect to MSSQL from a C based ruby running on *nix (jeremyevans)
 
 * Recognize bigint unsigned as a Bignum type in the schema dumper (gamespy-tech) (#327)

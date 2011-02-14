@@ -23,6 +23,12 @@ module Sequel
       # stored so when the dataset changes, methods defined with def_dataset_method
       # will be applied to the new dataset.
       attr_reader :dataset_methods
+      #
+      # Array of plugin modules loaded by this class
+      #
+      #   Sequel::Model.plugins
+      #   # => [Sequel::Model, Sequel::Model::Associations]
+      attr_reader :plugins
   
       # The primary key for the class.  Sequel can determine this automatically for
       # many databases, but not all, so you may need to set it manually.  If not
@@ -307,6 +313,28 @@ module Sequel
       def no_primary_key
         clear_setter_methods_cache
         @simple_pk = @primary_key = nil
+      end
+      
+      # Loads a plugin for use with the model class, passing optional arguments
+      # to the plugin.  If the plugin is a module, load it directly.  Otherwise,
+      # require the plugin from either sequel/plugins/#{plugin} or
+      # sequel_#{plugin}, and then attempt to load the module using a
+      # the camelized plugin name under Sequel::Plugins.
+      def plugin(plugin, *args, &blk)
+        m = plugin.is_a?(Module) ? plugin : plugin_module(plugin)
+        unless @plugins.include?(m)
+          @plugins << m
+          m.apply(self, *args, &blk) if m.respond_to?(:apply)
+          include(m::InstanceMethods) if m.const_defined?("InstanceMethods")
+          extend(m::ClassMethods)if m.const_defined?("ClassMethods")
+          if m.const_defined?("DatasetMethods")
+            dataset.extend(m::DatasetMethods) if @dataset
+            dataset_method_modules << m::DatasetMethods
+            meths = m::DatasetMethods.public_instance_methods.reject{|x| NORMAL_METHOD_NAME_REGEXP !~ x.to_s}
+            def_dataset_method(*meths) unless meths.empty?
+          end
+        end
+        m.configure(self, *args, &blk) if m.respond_to?(:configure)
       end
   
       # Returns primary key attribute hash.  If using a composite primary key
@@ -608,6 +636,27 @@ module Sequel
         @overridable_methods_module
       end
       
+      # Returns the module for the specified plugin. If the module is not 
+      # defined, the corresponding plugin required.
+      def plugin_module(plugin)
+        module_name = plugin.to_s.gsub(/(^|_)(.)/){|x| x[-1..-1].upcase}
+        if !Sequel::Plugins.const_defined?(module_name) ||
+           (Sequel.const_defined?(module_name) &&
+            Sequel::Plugins.const_get(module_name) == Sequel.const_get(module_name))
+          begin
+            Sequel.tsk_require "sequel/plugins/#{plugin}"
+          rescue LoadError => e
+            begin
+              Sequel.tsk_require "sequel_#{plugin}"
+            rescue LoadError => e2
+              e.message << "; #{e2.message}"
+              raise e
+            end
+          end
+        end
+        Sequel::Plugins.const_get(module_name)
+      end
+
       # Find the row in the dataset that matches the primary key.  Uses
       # a static SQL optimization if the table and primary key are simple.
       def primary_key_lookup(pk)
@@ -1444,6 +1493,7 @@ module Sequel
       end
     end
 
+    extend ClassMethods
     plugin self
   end
 end
