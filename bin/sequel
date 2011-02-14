@@ -198,6 +198,12 @@ rescue => e
   error_proc["Error: #{e.class}: #{e.message}#{e.backtrace.first}"]
 end
 
-require 'irb'
-puts "Your database is stored in DB..."
-IRB.start
+if !ARGV.empty? 
+  ARGV.each{|v| load(v)}
+elsif !$stdin.isatty
+  eval($stdin.read)
+else
+  require 'irb'
+  puts "Your database is stored in DB..."
+  IRB.start
+end
