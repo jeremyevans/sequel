@@ -89,14 +89,11 @@ module Sequel
       
         # Use IDENTITY() to get the last inserted id.
         def last_insert_id(conn, opts={})
-          stmt = conn.createStatement
-          begin
+          statement(conn) do |stmt|
             rs = stmt.executeQuery('SELECT IDENTITY();')
             rs.next
             rs.getInt(1)
-          ensure
-            stmt.close
-          end 
+          end
         end
         
         def primary_key_index_re

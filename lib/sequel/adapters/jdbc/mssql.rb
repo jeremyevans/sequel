@@ -25,14 +25,11 @@ module Sequel
         
         # Get the last inserted id using SCOPE_IDENTITY().
         def last_insert_id(conn, opts={})
-          stmt = conn.createStatement
-          begin
+          statement(conn) do |stmt|
             sql = opts[:prepared] ? 'SELECT @@IDENTITY' : 'SELECT SCOPE_IDENTITY()'
             rs = log_yield(sql){stmt.executeQuery(sql)}
             rs.next
             rs.getInt(1)
-          ensure
-            stmt.close
           end
         end
         

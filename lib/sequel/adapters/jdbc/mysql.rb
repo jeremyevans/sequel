@@ -38,13 +38,10 @@ module Sequel
               rs.close
             end
           else
-            stmt = conn.createStatement
-            begin
+            statement(conn) do |stmt|
               rs = stmt.executeQuery('SELECT LAST_INSERT_ID()')
               rs.next
               rs.getInt(1)
-            ensure
-              stmt.close
             end
           end
         end
