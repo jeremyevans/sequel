@@ -132,6 +132,7 @@ end
 
 begin
   DB = connect_proc[db]
+  load_dirs.each{|d| Dir["#{d}/**/*.rb"].each{|f| load(f)}}
   if migrate_dir
     Sequel.extension :migration
     Sequel::Migrator.apply(DB, migrate_dir, migrate_ver)
@@ -196,8 +197,6 @@ rescue => e
   raise e if backtrace
   error_proc["Error: #{e.class}: #{e.message}#{e.backtrace.first}"]
 end
-
-load_dirs.each{|d| Dir["#{d}/**/*.rb"].each{|f| load(f)}}
 
 require 'irb'
 puts "Your database is stored in DB..."
