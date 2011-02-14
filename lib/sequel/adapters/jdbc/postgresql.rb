@@ -16,7 +16,7 @@ module Sequel
         # a statement with the given sql and executes it.
         def execute(sql, args=nil)
           method = block_given? ? :executeQuery : :execute
-          @db.statement do |stmt|
+          @db.send(:statement, self) do |stmt|
             rows = @db.log_yield(sql){stmt.send(method, sql)}
             yield(rows) if block_given?
           end
