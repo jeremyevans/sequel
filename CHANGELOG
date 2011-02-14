@@ -1,8 +1,10 @@
 === HEAD
 
+* Recognize bigint unsigned as a Bignum type in the schema dumper (gamespy-tech)
+
 * Add Dataset#calc_found_rows for MySQL datasets (macks)
 
-* Add association_autoreloading plugin for clearing association cache when foreign key values change (jfirebaugh, jeremyevans)
+* Add association_autoreloading plugin for clearing association cache when foreign key value changes (jfirebaugh, jeremyevans)
 
 * Fix join_table on MySQL ignoring the block (jfirebaugh)
 
