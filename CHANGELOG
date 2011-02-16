@@ -1,5 +1,7 @@
 === HEAD
 
+* Prefer cover? over include? for validates_includes/validates_inclusion_of (jeremyevans)
+
 * Make using NULL/NOT NULL, DEFAULT, and UNIQUE column options work correctly on H2 and possibly Oracle (jeremyevans)
 
 * Make bin/sequel accept file arguments and work correctly when $stdin is not a tty (jeremyevans)

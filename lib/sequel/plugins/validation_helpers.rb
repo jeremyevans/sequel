@@ -72,7 +72,7 @@ module Sequel
     
         # Check attribute value(s) is included in the given set.
         def validates_includes(set, atts, opts={})
-          validatable_attributes_for_type(:includes, atts, opts){|a,v,m| validation_error_message(m, set) unless set.include?(v)}
+          validatable_attributes_for_type(:includes, atts, opts){|a,v,m| validation_error_message(m, set) unless set.send(set.respond_to?(:cover?) ? :cover? : :include?, v)}
         end
     
         # Check attribute value(s) string representation is a valid integer.
@@ -89,7 +89,7 @@ module Sequel
 
         # Check that the attribute values length is in the specified range.
         def validates_length_range(range, atts, opts={})
-          validatable_attributes_for_type(:length_range, atts, opts){|a,v,m| validation_error_message(m, range) unless v && range.include?(v.length)}
+          validatable_attributes_for_type(:length_range, atts, opts){|a,v,m| validation_error_message(m, range) unless v && range.send(range.respond_to?(:cover?) ? :cover? : :include?, v.length)}
         end
     
         # Check that the attribute values are not longer than the given max length.
