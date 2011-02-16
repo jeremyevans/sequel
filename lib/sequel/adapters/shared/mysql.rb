@@ -30,6 +30,7 @@ module Sequel
     module DatabaseMethods
       AUTO_INCREMENT = 'AUTO_INCREMENT'.freeze
       CAST_TYPES = {String=>:CHAR, Integer=>:SIGNED, Time=>:DATETIME, DateTime=>:DATETIME, Numeric=>:DECIMAL, BigDecimal=>:DECIMAL, File=>:BINARY}
+      COLUMN_DEFINITION_ORDER = [:null, :default, :unique, :primary_key, :auto_increment, :references]
       PRIMARY = 'PRIMARY'.freeze
       
       # MySQL's cast rules are restrictive in that you can't just cast to any possible
@@ -166,6 +167,11 @@ module Sequel
         else
           super
         end
+      end
+
+      # The order of the column definition, as an array of symbols.
+      def column_definition_order
+        COLUMN_DEFINITION_ORDER
       end
 
       # MySQL doesn't allow default values on text columns, so ignore if it the

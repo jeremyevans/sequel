@@ -543,7 +543,7 @@ describe "Database#alter_table" do
     end
     
     @db.sqls.should == [
-      'ALTER TABLE xyz ADD COLUMN aaa text UNIQUE NOT NULL',
+      'ALTER TABLE xyz ADD COLUMN aaa text NOT NULL UNIQUE',
       'ALTER TABLE xyz DROP COLUMN bbb',
       'ALTER TABLE xyz RENAME COLUMN ccc TO ddd',
       'ALTER TABLE xyz ALTER COLUMN eee TYPE integer',

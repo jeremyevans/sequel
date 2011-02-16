@@ -1,5 +1,7 @@
 === HEAD
 
+* Make using NULL/NOT NULL, DEFAULT, and UNIQUE column options work correctly on H2 and possibly Oracle (jeremyevans)
+
 * Make bin/sequel accept file arguments and work correctly when $stdin is not a tty (jeremyevans)
 
 * Add support for -I and -r options to bin/sequel (jeremyevans)

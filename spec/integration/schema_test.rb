@@ -193,6 +193,13 @@ describe "Database schema modifiers" do
     @ds.columns!.should == [:number]
   end
 
+  specify "should handle combination of default, unique, and not null" do
+    @db.create_table!(:items){Integer :number, :default=>0, :null=>false, :unique=>true}
+    @db.table_exists?(:items).should == true
+    @db.schema(:items, :reload=>true).map{|x| x.last}.first.values_at(:ruby_default, :allow_null).should == [0, false]
+    @ds.insert([10])
+  end
+
   specify "should handle foreign keys correctly when creating tables" do
     @db.create_table!(:items) do 
       primary_key :id
