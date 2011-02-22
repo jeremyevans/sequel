@@ -177,9 +177,9 @@ module Sequel
     BOOL_FALSE = "'f'".freeze
     BOOL_TRUE = "'t'".freeze
     COMMA_SEPARATOR = ', '.freeze
-    COLUMN_REF_RE1 = /\A([\w ]+)__([\w ]+)___([\w ]+)\z/.freeze
-    COLUMN_REF_RE2 = /\A([\w ]+)___([\w ]+)\z/.freeze
-    COLUMN_REF_RE3 = /\A([\w ]+)__([\w ]+)\z/.freeze
+    COLUMN_REF_RE1 = /\A([^(__)]+)__([^(___)]+)___(.+)\z/.freeze
+    COLUMN_REF_RE2 = /\A([^(___)]+)___(.+)\z/.freeze
+    COLUMN_REF_RE3 = /\A([^(__)]+)__(.+)\z/.freeze
     COUNT_FROM_SELF_OPTS = [:distinct, :group, :sql, :limit, :compounds]
     COUNT_OF_ALL_AS_COUNT = SQL::Function.new(:count, LiteralString.new('*'.freeze)).as(:count)
     DATASET_ALIAS_BASE_NAME = 't'.freeze

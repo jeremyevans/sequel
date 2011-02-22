@@ -927,22 +927,23 @@ describe "Dataset#literal" do
     @dataset.literal(1).should == "1"
     @dataset.literal(1.5).should == "1.5"
   end
-  
+
   specify "should literalize nil as NULL" do
     @dataset.literal(nil).should == "NULL"
   end
-  
+
   specify "should literalize an array properly" do
     @dataset.literal([]).should == "(NULL)"
     @dataset.literal([1, 'abc', 3]).should == "(1, 'abc', 3)"
     @dataset.literal([1, "a'b''c", 3]).should == "(1, 'a''b''''c', 3)"
   end
-  
+
   specify "should literalize symbols as column references" do
     @dataset.literal(:name).should == "name"
     @dataset.literal(:items__name).should == "items.name"
+    @dataset.literal(:"items__na#m$e").should == "items.na#m$e"
   end
-  
+
   specify "should call sql_literal with dataset on type if not natively supported and the object responds to it" do
     @a = Class.new do
       def sql_literal(ds)
@@ -1114,10 +1115,16 @@ describe "Dataset#from" do
   specify "should accept :schema__table___alias symbol format" do
     @dataset.from(:abc__def).select_sql.should ==
       "SELECT * FROM abc.def"
+    @dataset.from(:'#__#').select_sql.should ==
+      'SELECT * FROM #.#'
     @dataset.from(:abc__def___d).select_sql.should ==
       "SELECT * FROM abc.def AS d"
+    @dataset.from(:'#__#___#').select_sql.should ==
+      'SELECT * FROM #.# AS #'
     @dataset.from(:abc___def).select_sql.should ==
       "SELECT * FROM abc AS def"
+    @dataset.from(:'#___#').select_sql.should ==
+      'SELECT * FROM # AS #'
   end
 end
 
