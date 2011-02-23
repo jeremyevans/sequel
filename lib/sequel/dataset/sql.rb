@@ -177,9 +177,9 @@ module Sequel
     BOOL_FALSE = "'f'".freeze
     BOOL_TRUE = "'t'".freeze
     COMMA_SEPARATOR = ', '.freeze
-    COLUMN_REF_RE1 = /\A([^(__)]+)__([^(___)]+)___(.+)\z/.freeze
-    COLUMN_REF_RE2 = /\A([^(___)]+)___(.+)\z/.freeze
-    COLUMN_REF_RE3 = /\A([^(__)]+)__(.+)\z/.freeze
+    COLUMN_REF_RE1 = /\A(((?!__).)+)__(((?!___).)+)___(.+)\z/.freeze
+    COLUMN_REF_RE2 = /\A(((?!___).)+)___(.+)\z/.freeze
+    COLUMN_REF_RE3 = /\A(((?!__).)+)__(.+)\z/.freeze
     COUNT_FROM_SELF_OPTS = [:distinct, :group, :sql, :limit, :compounds]
     COUNT_OF_ALL_AS_COUNT = SQL::Function.new(:count, LiteralString.new('*'.freeze)).as(:count)
     DATASET_ALIAS_BASE_NAME = 't'.freeze
@@ -934,11 +934,11 @@ module Sequel
     def split_symbol(sym)
       s = sym.to_s
       if m = COLUMN_REF_RE1.match(s)
-        m[1..3]
+        [m[1], m[3], m[5]]
       elsif m = COLUMN_REF_RE2.match(s)
-        [nil, m[1], m[2]]
+        [nil, m[1], m[3]]
       elsif m = COLUMN_REF_RE3.match(s)
-        [m[1], m[2], nil]
+        [m[1], m[3], nil]
       else
         [nil, s, nil]
       end

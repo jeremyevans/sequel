@@ -1115,14 +1115,20 @@ describe "Dataset#from" do
   specify "should accept :schema__table___alias symbol format" do
     @dataset.from(:abc__def).select_sql.should ==
       "SELECT * FROM abc.def"
+    @dataset.from(:a_b__c).select_sql.should ==
+      "SELECT * FROM a_b.c"
     @dataset.from(:'#__#').select_sql.should ==
       'SELECT * FROM #.#'
     @dataset.from(:abc__def___d).select_sql.should ==
       "SELECT * FROM abc.def AS d"
+    @dataset.from(:a_b__d_e___f_g).select_sql.should ==
+      "SELECT * FROM a_b.d_e AS f_g"
     @dataset.from(:'#__#___#').select_sql.should ==
       'SELECT * FROM #.# AS #'
     @dataset.from(:abc___def).select_sql.should ==
       "SELECT * FROM abc AS def"
+    @dataset.from(:a_b___c_d).select_sql.should ==
+      "SELECT * FROM a_b AS c_d"
     @dataset.from(:'#___#').select_sql.should ==
       'SELECT * FROM # AS #'
   end
