@@ -1,5 +1,9 @@
 === HEAD
 
+* Make symbol splitting (:table__column___alias) work correctly for identifiers that are not in the \w character class (authorNari)
+
+* Enable row locks in Oracle (authorNari)
+
 * Prefer cover? over include? for validates_includes/validates_inclusion_of (jeremyevans)
 
 * Make using NULL/NOT NULL, DEFAULT, and UNIQUE column options work correctly on H2 and possibly Oracle (jeremyevans)
