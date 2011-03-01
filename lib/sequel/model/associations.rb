@@ -688,6 +688,7 @@ module Sequel
           end
           ds = ds.eager(associations) unless Array(associations).empty?
           ds = opts[:eager_block].call(ds) if opts[:eager_block]
+          ds = eager_options[:eager_block].call(ds) if eager_options[:eager_block]
           ds
         end
 
@@ -1258,6 +1259,19 @@ module Sequel
       #   Artist.eager_graph(:albums=>:tracks).all
       #   Artist.eager(:albums=>{:tracks=>:genre}).all
       #   Artist.eager_graph(:albums=>{:tracks=>:genre}).all
+      #
+      # You can also pass a callback as a hash value in order to customize the dataset being
+      # eager loaded at query time, analogous to the way the :eager_block association option
+      # allows you to customize it at association definition time. For example,
+      # if you wanted artists with their albums since 1990:
+      #
+      #   Artist.eager(:albums => proc {|ds| ds.filter(:year > 1990)})
+      #
+      # To cascade eager loading using this method, call +eager+/+eager_graph+ inside the
+      # callback:
+      #
+      #   Artist.eager(:albums => proc {|ds| ds.filter(:year > 1990).eager(:tracks => :genre)})
+      #
       module DatasetMethods
         # Add the <tt>eager!</tt> and <tt>eager_graph!</tt> mutation methods to the dataset.
         def self.extended(obj)
@@ -1555,10 +1569,15 @@ module Sequel
           
           reflections.each do |r|
             loader = r[:eager_loader]
+            associations = eager_assoc[r[:name]]
+            if associations.respond_to?(:call)
+              eager_block = associations
+              associations = {}
+            end
             if loader.arity == 1
-              loader.call(:key_hash=>key_hash, :rows=>a, :associations=>eager_assoc[r[:name]], :self=>self)
+              loader.call(:key_hash=>key_hash, :rows=>a, :associations=>associations, :self=>self, :eager_block=>eager_block)
             else
-              loader.call(key_hash, a, eager_assoc[r[:name]])
+              loader.call(key_hash, a, associations)
             end
             a.each{|object| object.send(:run_association_callbacks, r, :after_load, object.associations[r[:name]])} unless r[:after_load].empty?
           end 

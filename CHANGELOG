@@ -1,5 +1,7 @@
 === HEAD
 
+* Allow specifying a callback to customize eager loading at query time (jfirebaugh)
+
 * Fix bug in the identity_map plugin for many_to_one associations when the association reflection hadn't been filled in yet (funny-falcon)
 
 * Add serialization_modification_detection plugin for detecting changes in serialized columns (jeremyevans) (#333)

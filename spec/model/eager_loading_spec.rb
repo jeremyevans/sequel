@@ -646,6 +646,86 @@ describe Sequel::Model, "#eager" do
     a.should == EagerAlbum.load(:id => 1, :band_id => 2)
     a.al_genres.should == [EagerGenre.load(:id=>4)]
   end
+
+  it "should eagerly load a many_to_one association with custom eager block" do
+    a = EagerAlbum.eager(:band => proc {|ds| ds.select(:id, :name)}).all
+    a.should be_a_kind_of(Array)
+    a.size.should == 1
+    a.first.should be_a_kind_of(EagerAlbum)
+    a.first.values.should == {:id => 1, :band_id => 2}
+    MODEL_DB.sqls.should == ['SELECT * FROM albums', 'SELECT id, name FROM bands WHERE (bands.id IN (2))']
+    a = a.first
+    a.band.should be_a_kind_of(EagerBand)
+    a.band.values.should == {:id => 2}
+    MODEL_DB.sqls.length.should == 2
+  end
+
+  it "should eagerly load a one_to_one association with custom eager block" do
+    EagerAlbum.one_to_one :track, :class=>'EagerTrack', :key=>:album_id
+    a = EagerAlbum.eager(:track => proc {|ds| ds.select(:id)}).all
+    a.should == [EagerAlbum.load(:id => 1, :band_id => 2)]
+    MODEL_DB.sqls.should == ['SELECT * FROM albums', 'SELECT id FROM tracks WHERE (tracks.album_id IN (1))']
+    a.first.track.should == EagerTrack.load(:id => 3, :album_id=>1)
+    MODEL_DB.sqls.length.should == 2
+  end
+
+  it "should eagerly load a one_to_many association with custom eager block" do
+    a = EagerAlbum.eager(:tracks => proc {|ds| ds.select(:id)}).all
+    a.should be_a_kind_of(Array)
+    a.size.should == 1
+    a.first.should be_a_kind_of(EagerAlbum)
+    a.first.values.should == {:id => 1, :band_id => 2}
+    MODEL_DB.sqls.should == ['SELECT * FROM albums', 'SELECT id FROM tracks WHERE (tracks.album_id IN (1))']
+    a = a.first
+    a.tracks.should be_a_kind_of(Array)
+    a.tracks.size.should == 1
+    a.tracks.first.should be_a_kind_of(EagerTrack)
+    a.tracks.first.values.should == {:id => 3, :album_id=>1}
+    MODEL_DB.sqls.length.should == 2
+  end
+
+  it "should eagerly load a many_to_many association with custom eager block" do
+    a = EagerAlbum.eager(:genres => proc {|ds| ds.select(:name, ds.opts[:select].last)}).all
+    a.should be_a_kind_of(Array)
+    a.size.should == 1
+    a.first.should be_a_kind_of(EagerAlbum)
+    a.first.values.should == {:id => 1, :band_id => 2}
+    MODEL_DB.sqls.should == ['SELECT * FROM albums', "SELECT name, ag.album_id AS x_foreign_key_x FROM genres INNER JOIN ag ON ((ag.genre_id = genres.id) AND (ag.album_id IN (1)))"]
+    a = a.first
+    a.genres.should be_a_kind_of(Array)
+    a.genres.size.should == 1
+    a.genres.first.should be_a_kind_of(EagerGenre)
+    a.genres.first.values.should == {:id => 4}
+    MODEL_DB.sqls.length.should == 2
+  end
+
+  it "should allow cascading of eager loading within a custom eager block" do
+    a = EagerTrack.eager(:album => proc {|ds| ds.eager(:band => :members)}).all
+    a.should be_a_kind_of(Array)
+    a.size.should == 1
+    a.first.should be_a_kind_of(EagerTrack)
+    a.first.values.should == {:id => 3, :album_id => 1}
+    MODEL_DB.sqls.length.should == 4
+    MODEL_DB.sqls.should == ['SELECT * FROM tracks',
+      'SELECT * FROM albums WHERE (albums.id IN (1))',
+      'SELECT * FROM bands WHERE (bands.id IN (2))',
+      "SELECT members.*, bm.band_id AS x_foreign_key_x FROM members INNER JOIN bm ON ((bm.member_id = members.id) AND (bm.band_id IN (2)))"]
+    a = a.first
+    a.album.should be_a_kind_of(EagerAlbum)
+    a.album.values.should == {:id => 1, :band_id => 2}
+    a.album.band.should be_a_kind_of(EagerBand)
+    a.album.band.values.should == {:id => 2}
+    a.album.band.members.should be_a_kind_of(Array)
+    a.album.band.members.size.should == 1
+    a.album.band.members.first.should be_a_kind_of(EagerBandMember)
+    a.album.band.members.first.values.should == {:id => 5}
+    MODEL_DB.sqls.length.should == 4
+  end
+
+  it "should call both association and custom eager blocks" do
+    EagerBand.eager(:good_albums => proc {|ds| ds.select(:name)}).all
+    MODEL_DB.sqls.should == ['SELECT * FROM bands', "SELECT name FROM albums WHERE ((albums.band_id IN (2)) AND (name = 'good'))"]
+  end
 end
 
 describe Sequel::Model, "#eager_graph" do
