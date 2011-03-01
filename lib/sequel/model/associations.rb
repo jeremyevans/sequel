@@ -782,8 +782,7 @@ module Sequel
           opts[:graph_join_table_join_type] ||= opts[:graph_join_type]
           opts[:after_load].unshift(:array_uniq!) if opts[:uniq]
           opts[:dataset] ||= proc{opts.associated_class.inner_join(join_table, rcks.zip(opts.right_primary_keys) + lcks.zip(lcpks.map{|k| send(k)}))}
-          database = db
-          
+
           opts[:eager_loader] ||= proc do |eo|
             h = eo[:key_hash][left_pk]
             eo[:rows].each{|object| object.associations[name] = []}
@@ -1366,7 +1365,6 @@ module Sequel
         # r :: association reflection for the current association
         # *associations :: any associations dependent on this one
         def eager_graph_association(ds, model, ta, requirements, r, *associations)
-          klass = r.associated_class
           assoc_name = r[:name]
           assoc_table_alias = ds.unused_table_alias(assoc_name)
           ds = r[:eager_grapher].call(ds, assoc_table_alias, ta)
