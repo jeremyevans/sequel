@@ -1,4 +1,4 @@
-=== HEAD
+=== 3.21.0 (2011-03-01)
 
 * Make symbol splitting (:table__column___alias) work correctly for identifiers that are not in the \w character class (authorNari)
 
