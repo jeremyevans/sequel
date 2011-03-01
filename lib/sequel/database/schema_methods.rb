@@ -366,7 +366,7 @@ module Sequel
 
     # DDL statement for creating a table with the given name, columns, and options
     def create_table_sql(name, generator, options)
-      "CREATE #{temporary_table_sql if options[:temp]}TABLE #{quote_schema_table(name)} (#{column_list_sql(generator)})"
+      "CREATE #{temporary_table_sql if options[:temp]}TABLE #{options[:temp] ? quote_identifier(name) : quote_schema_table(name)} (#{column_list_sql(generator)})"
     end
 
     # Default index name for the table and columns, may be too long

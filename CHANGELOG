@@ -1,5 +1,7 @@
 === HEAD
 
+* Don't use a schema when creating a temporary table (jeremyevans)
+
 * Make migrator work correctly when a default_schema is set (jeremyevans) (#331)
 
 === 3.21.0 (2011-03-01)
