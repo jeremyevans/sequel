@@ -202,7 +202,7 @@ describe "Sequel::IntegerMigrator" do
         @drops = []
         @tables_created = []
         @columns_created = []
-        @versions = {}
+        @versions = Hash.new{|h,k| h[k.to_sym]}
       end
   
       def version; versions.values.first || 0; end
@@ -212,7 +212,7 @@ describe "Sequel::IntegerMigrator" do
       def create_table(name, opts={}, &block)
         super
         @columns_created << / \(?(\w+) integer.*\)?\z/.match(sqls.last)[1].to_sym
-        @tables_created << name
+        @tables_created << name.to_sym
       end
       
       def dataset(opts={})
@@ -228,7 +228,7 @@ describe "Sequel::IntegerMigrator" do
       end
 
       def table_exists?(name)
-        @tables_created.include?(name)
+        @tables_created.include?(name.to_sym)
       end
     end
     @db = dbc.new
@@ -250,7 +250,7 @@ describe "Sequel::IntegerMigrator" do
 
   specify "should add a column name if it doesn't already exist in the schema_info table" do
     @db.create_table(:schema_info){Integer :v}
-    @db.should_receive(:alter_table).with(:schema_info)
+    @db.should_receive(:alter_table).with('schema_info')
     Sequel::Migrator.apply(@db, @dirname)
   end
 
@@ -320,45 +320,45 @@ describe "Sequel::TimestampMigrator" do
     @dsc = dsc = Class.new(MockDataset) do
       def columns
         case opts[:from].first
-        when :schema_info
+        when :schema_info, 'schema_info'
           [:version]
-        when :schema_migrations
+        when :schema_migrations, 'schema_migrations'
           [:filename]
-        when :sm
+        when :sm, 'sm'
           [:fn]
         end
       end
 
       def fetch_rows(sql)
         case opts[:from].first
-        when :schema_info
+        when :schema_info, 'schema_info'
           yield({:version=>$sequel_migration_version})
-        when :schema_migrations
+        when :schema_migrations, 'schema_migrations'
           $sequel_migration_files.sort.each{|f| yield(:filename=>f)}
-        when :sm
+        when :sm, 'sm'
           $sequel_migration_files.sort.each{|f| yield(:fn=>f)}
         end
       end
 
       def insert(h={})
         case opts[:from].first
-        when :schema_info
+        when :schema_info, 'schema_info'
           $sequel_migration_version = h.values.first
-        when :schema_migrations, :sm
+        when :schema_migrations, :sm, 'schema_migrations', 'sm'
           $sequel_migration_files << h.values.first
         end
       end
 
       def update(h={})
         case opts[:from].first
-        when :schema_info
+        when :schema_info, 'schema_info'
           $sequel_migration_version = h.values.first
         end
       end
 
       def delete
         case opts[:from].first
-        when :schema_migrations, :sm
+        when :schema_migrations, :sm, 'schema_migrations', 'sm'
           $sequel_migration_files.delete(opts[:where].args.last)
         end
       end
@@ -366,9 +366,9 @@ describe "Sequel::TimestampMigrator" do
     dbc = Class.new(MockDatabase) do
       tables = {}
       define_method(:dataset){|*a| dsc.new(self, *a)}
-      define_method(:create_table){|name, *args| tables[name] = true}
-      define_method(:drop_table){|*names| names.each{|n| tables.delete(n)}}
-      define_method(:table_exists?){|name| tables.has_key?(name)}
+      define_method(:create_table){|name, *args| tables[name.to_sym] = true}
+      define_method(:drop_table){|*names| names.each{|n| tables.delete(n.to_sym)}}
+      define_method(:table_exists?){|name| tables.has_key?(name.to_sym)}
     end
     @db = dbc.new
     @m = Sequel::Migrator

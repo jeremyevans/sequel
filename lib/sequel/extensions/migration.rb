@@ -375,7 +375,8 @@ module Sequel
       @db = db
       @directory = directory
       @files = get_migration_files
-      @table = opts[:table]  || self.class.const_get(:DEFAULT_SCHEMA_TABLE)
+      schema, table = @db.send(:schema_and_table, opts[:table]  || self.class.const_get(:DEFAULT_SCHEMA_TABLE))
+      @table = schema ? Sequel::SQL::QualifiedIdentifier.new(schema, table) : table
       @column = opts[:column] || self.class.const_get(:DEFAULT_SCHEMA_COLUMN)
       @ds = schema_dataset
     end
