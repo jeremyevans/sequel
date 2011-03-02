@@ -440,3 +440,11 @@ describe "MSSQL::Dataset#count" do
     MSSQL_DB[:items].select(:name, :value).group(:name, :value).order(:name).count.should == 1
   end
 end
+
+describe "MSSQL::Database#create_table" do
+  specify "should support collate with various other column options" do
+    MSSQL_DB.create_table!(:items){ String :name, :size => 128, :collate => :sql_latin1_general_cp1_ci_as, :default => 'foo', :null => false, :unique => true}
+    MSSQL_DB[:items].insert
+    MSSQL_DB[:items].select_map(:name).should == ["foo"]
+  end
+end
