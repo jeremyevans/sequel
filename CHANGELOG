@@ -1,5 +1,7 @@
 === HEAD
 
+* Support for COLLATE in column definitions (jfirebaugh)
+
 * Don't use a schema when creating a temporary table (jeremyevans)
 
 * Make migrator work correctly when a default_schema is set (jeremyevans) (#331)

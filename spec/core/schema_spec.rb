@@ -281,6 +281,13 @@ describe "DB#create_table" do
     @db.sqls.should == ["CREATE TABLE cats (project_id integer REFERENCES projects DEFERRABLE INITIALLY DEFERRED)"]
   end
 
+  specify "should accept collation" do
+    @db.create_table(:cats) do
+      varchar :name, :collate => :utf8_bin
+    end
+    @db.sqls.should == ["CREATE TABLE cats (name varchar(255) COLLATE utf8_bin)"]
+  end
+
   specify "should accept inline index definition" do
     @db.create_table(:cats) do
       integer :id, :index => true
