@@ -532,7 +532,9 @@ module Sequel
         #     Takes one or three arguments. If three arguments, they are a dataset, an alias to use for
         #     the table to graph for this association, and the alias that was used for the current table
         #     (since you can cascade associations). If one argument, is passed a hash with keys :self,
-        #     :table_alias, and :implicit_qualifier, corresponding to the three arguments.
+        #     :table_alias, and :implicit_qualifier, corresponding to the three arguments, and an optional
+        #     additional key :eager_block, a callback accepting one argument, the associated dataset. This
+        #     is used to customize the association at query time.
         #     Should return a copy of the dataset with the association graphed into it.
         #   - :eager_loader - A proc to use to implement eager loading, overriding the default.  Takes one or three arguments.
         #     If three arguments, the first should be a key hash (used solely to enhance performance), the second an array of records,
@@ -816,7 +818,7 @@ module Sequel
           opts[:eager_grapher] ||= proc do |eo|
             ds = eo[:self]
             ds = ds.graph(join_table, use_jt_only_conditions ? jt_only_conditions : lcks.zip(lcpks) + graph_jt_conds, :select=>false, :table_alias=>ds.unused_table_alias(join_table), :join_type=>jt_join_type, :implicit_qualifier=>eo[:implicit_qualifier], :from_self_alias=>ds.opts[:eager_graph][:master], &jt_graph_block)
-            ds.graph(opts.associated_class, use_only_conditions ? only_conditions : opts.right_primary_keys.zip(rcks) + conditions, :select=>select, :table_alias=>eo[:table_alias], :join_type=>join_type, &graph_block)
+            ds.graph(opts.associated_class, use_only_conditions ? only_conditions : opts.right_primary_keys.zip(rcks) + conditions, :select=>select, :table_alias=>eo[:table_alias], :join_type=>join_type, :eager_block=>eo[:eager_block], &graph_block)
           end
       
           def_association_dataset_methods(opts)
@@ -882,7 +884,7 @@ module Sequel
           graph_block = opts[:graph_block]
           opts[:eager_grapher] ||= proc do |eo|
             ds = eo[:self]
-            ds.graph(opts.associated_class, use_only_conditions ? only_conditions : opts.primary_keys.zip(cks) + conditions, :select=>select, :table_alias=>eo[:table_alias], :join_type=>join_type, :implicit_qualifier=>eo[:implicit_qualifier], :from_self_alias=>ds.opts[:eager_graph][:master], &graph_block)
+            ds.graph(opts.associated_class, use_only_conditions ? only_conditions : opts.primary_keys.zip(cks) + conditions, eo.merge(:select=>select, :join_type=>join_type, :from_self_alias=>ds.opts[:eager_graph][:master]), &graph_block)
           end
       
           def_association_dataset_methods(opts)
@@ -943,10 +945,9 @@ module Sequel
           graph_block = opts[:graph_block]
           opts[:eager_grapher] ||= proc do |eo|
             ds = eo[:self]
-            assoc_alias = eo[:table_alias]
-            ds = ds.graph(opts.associated_class, use_only_conditions ? only_conditions : cks.zip(cpks) + conditions, :select=>select, :table_alias=>assoc_alias, :join_type=>join_type, :implicit_qualifier=>eo[:implicit_qualifier], :from_self_alias=>ds.opts[:eager_graph][:master], &graph_block)
+            ds = ds.graph(opts.associated_class, use_only_conditions ? only_conditions : cks.zip(cpks) + conditions, eo.merge(:select=>select, :join_type=>join_type, :from_self_alias=>ds.opts[:eager_graph][:master]), &graph_block)
             # We only load reciprocals for one_to_many associations, as other reciprocals don't make sense
-            ds.opts[:eager_graph][:reciprocals][assoc_alias] = opts.reciprocal
+            ds.opts[:eager_graph][:reciprocals][eo[:table_alias]] = opts.reciprocal
             ds
           end
       
@@ -1274,6 +1275,10 @@ module Sequel
       #
       #   Artist.eager(:albums => proc {|ds| ds.filter(:year > 1990)})
       #
+      # Or if you needed albums and their artist's name only:
+      #
+      #   Albums.eager_graph(:artist => proc {|ds| ds.select(:name)})
+      #
       # To cascade eager loading using this method, call +eager+/+eager_graph+ inside the
       # callback:
       #
@@ -1389,8 +1394,12 @@ module Sequel
           assoc_name = r[:name]
           assoc_table_alias = ds.unused_table_alias(assoc_name)
           loader = r[:eager_grapher]
+          if !associations.empty? && associations.first.respond_to?(:call)
+            eager_block = associations.first
+            associations = {}
+          end
           ds = if loader.arity == 1
-            loader.call(:self=>ds, :table_alias=>assoc_table_alias, :implicit_qualifier=>ta)
+            loader.call(:self=>ds, :table_alias=>assoc_table_alias, :implicit_qualifier=>ta, :eager_block=>eager_block)
           else
             loader.call(ds, assoc_table_alias, ta)
           end

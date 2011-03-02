@@ -71,26 +71,26 @@ module Sequel
     # :table_alias :: The alias to use for the table.  If not specified, doesn't
     #                 alias the table.  You will get an error if the the alias (or table) name is
     #                 used more than once.
+    # :eager_block :: A callback accepting one argument, the associated dataset, for customization.
     def graph(dataset, join_conditions = nil, options = {}, &block)
       # Allow the use of a model, dataset, or symbol as the first argument
       # Find the table name/dataset based on the argument
       dataset = dataset.dataset if dataset.respond_to?(:dataset)
       table_alias = options[:table_alias]
-      case dataset
-      when Symbol
-        table = dataset
+      if dataset.is_a?(Symbol)
         dataset = @db[dataset]
-        table_alias ||= table
-      when ::Sequel::Dataset
-        if dataset.simple_select_all?
-          table = dataset.opts[:from].first
-          table_alias ||= table
-        else
-          table = dataset
-          table_alias ||= dataset_alias((@opts[:num_dataset_sources] || 0)+1)
-        end
-      else
+      elsif !dataset.is_a?(Sequel::Dataset)
         raise Error, "The dataset argument should be a symbol, dataset, or model"
+      end
+
+      dataset = options[:eager_block].call(dataset) if options[:eager_block]
+
+      if dataset.simple_select_all?
+        table = dataset.opts[:from].first
+        table_alias ||= table
+      else
+        table = dataset
+        table_alias ||= dataset_alias((@opts[:num_dataset_sources] || 0)+1)
       end
 
       # Raise Sequel::Error with explanation that the table alias has been used
@@ -151,7 +151,7 @@ module Sequel
         column_aliases = graph[:column_aliases]
         ca_num = graph[:column_alias_num]
         # Which columns to add to the result set
-        cols = options[:select] || dataset.columns
+        cols = options[:select] || dataset.opts[:select] || dataset.columns
         # If the column hasn't been used yet, don't alias it.
         # If it has been used, try table_column.
         # If that has been used, try table_column_N 

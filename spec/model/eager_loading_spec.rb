@@ -1451,6 +1451,8 @@ describe Sequel::Model, "#eager_graph" do
     as = ds.all
     as.should == [GraphAlbum.load(:id=>3, :band_id=>2)]
     as.first.inner_genres.should == [GraphGenre.load(:id=>5), GraphGenre.load(:id=>6)]
+    GraphAlbum.set_primary_key :id
+    GraphGenre.set_primary_key :id
   end
   
   it "should handle eager loading with schemas and aliases of different types" do
@@ -1475,5 +1477,69 @@ describe Sequel::Model, "#eager_graph" do
     c1.many_to_many :a_genres, :class=>c2, :left_primary_key=>:id, :left_key=>:album_id, :right_key=>:genre_id, :join_table=>:s__ag
     ds = c1.join(:s__t, [:b_id]).eager_graph(:a_genres)
     ds.sql.should == 'SELECT a.id, a_genres.id AS a_genres_id FROM (SELECT * FROM s.a INNER JOIN s.t USING (b_id)) AS a LEFT OUTER JOIN s.ag AS ag ON (ag.album_id = a.id) LEFT OUTER JOIN s.g AS a_genres ON (a_genres.id = ag.genre_id)'
+  end
+
+  it "should eagerly load a many_to_one association with custom eager block" do
+    ds = GraphAlbum.eager_graph(:band => proc {|ds| ds.select(:id)})
+    ds.sql.should == 'SELECT albums.id, albums.band_id, band.id AS band_id_0 FROM albums LEFT OUTER JOIN (SELECT id FROM bands) AS band ON (band.id = albums.band_id)'
+    def ds.fetch_rows(sql, &block)
+      yield({:id=>1, :band_id=>2, :band_id_0=>2})
+    end
+    a = ds.all
+    a.should be_a_kind_of(Array)
+    a.size.should == 1
+    a.first.should be_a_kind_of(GraphAlbum)
+    a.first.values.should == {:id => 1, :band_id => 2}
+    a = a.first
+    a.band.should be_a_kind_of(GraphBand)
+    a.band.values.should == {:id => 2}
+  end
+
+  it "should eagerly load a one_to_one association with custom eager block" do
+    GraphAlbum.one_to_one :track, :class=>'GraphTrack', :key=>:album_id
+    ds = GraphAlbum.eager_graph(:track => proc {|ds| ds.select(:album_id)})
+    ds.sql.should == 'SELECT albums.id, albums.band_id, track.album_id FROM albums LEFT OUTER JOIN (SELECT album_id FROM tracks) AS track ON (track.album_id = albums.id)'
+    def ds.fetch_rows(sql, &block)
+      yield({:id=>1, :band_id=>2, :album_id=>1})
+    end
+    a = ds.all
+    a.should == [GraphAlbum.load(:id => 1, :band_id => 2)]
+    a.first.track.should == GraphTrack.load(:album_id=>1)
+  end
+
+  it "should eagerly load a one_to_many association with custom eager block" do
+    ds = GraphAlbum.eager_graph(:tracks => proc {|ds| ds.select(:album_id)})
+    ds.sql.should == 'SELECT albums.id, albums.band_id, tracks.album_id FROM albums LEFT OUTER JOIN (SELECT album_id FROM tracks) AS tracks ON (tracks.album_id = albums.id)'
+    def ds.fetch_rows(sql, &block)
+      yield({:id=>1, :band_id=>2, :album_id=>1})
+    end
+    a = ds.all
+    a.should be_a_kind_of(Array)
+    a.size.should == 1
+    a.first.should be_a_kind_of(GraphAlbum)
+    a.first.values.should == {:id => 1, :band_id => 2}
+    a = a.first
+    a.tracks.should be_a_kind_of(Array)
+    a.tracks.size.should == 1
+    a.tracks.first.should be_a_kind_of(GraphTrack)
+    a.tracks.first.values.should == {:album_id=>1}
+  end
+
+  it "should eagerly load a many_to_many association with custom eager block" do
+    ds = GraphAlbum.eager_graph(:genres => proc {|ds| ds.select(:id)})
+    ds.sql.should == 'SELECT albums.id, albums.band_id, genres.id AS genres_id FROM albums LEFT OUTER JOIN ag ON (ag.album_id = albums.id) LEFT OUTER JOIN (SELECT id FROM genres) AS genres ON (genres.id = ag.genre_id)'
+    def ds.fetch_rows(sql, &block)
+      yield({:id=>1, :band_id=>2, :genres_id=>4})
+    end
+    a = ds.all
+    a.should be_a_kind_of(Array)
+    a.size.should == 1
+    a.first.should be_a_kind_of(GraphAlbum)
+    a.first.values.should == {:id => 1, :band_id => 2}
+    a = a.first
+    a.genres.should be_a_kind_of(Array)
+    a.genres.size.should == 1
+    a.genres.first.should be_a_kind_of(GraphGenre)
+    a.genres.first.values.should == {:id => 4}
   end
 end
