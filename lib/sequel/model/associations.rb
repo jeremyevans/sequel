@@ -529,8 +529,10 @@ module Sequel
         #     set to nil.
         #   - :eager_graph - The associations to eagerly load via +eager_graph+ when loading the associated object(s).
         #   - :eager_grapher - A proc to use to implement eager loading via +eager_graph+, overriding the default.
-        #     Takes three arguments, a dataset, an alias to use for the table to graph for this association,
-        #     and the alias that was used for the current table (since you can cascade associations),
+        #     Takes one or three arguments. If three arguments, they are a dataset, an alias to use for
+        #     the table to graph for this association, and the alias that was used for the current table
+        #     (since you can cascade associations). If one argument, is passed a hash with keys :self,
+        #     :table_alias, and :implicit_qualifier, corresponding to the three arguments.
         #     Should return a copy of the dataset with the association graphed into it.
         #   - :eager_loader - A proc to use to implement eager loading, overriding the default.  Takes one or three arguments.
         #     If three arguments, the first should be a key hash (used solely to enhance performance), the second an array of records,
@@ -628,7 +630,8 @@ module Sequel
           raise(Error, 'invalid association type') unless assoc_class = ASSOCIATION_TYPES[type]
           raise(Error, 'Model.associate name argument must be a symbol') unless Symbol === name
           raise(Error, ':eager_loader option must have an arity of 1 or 3') if opts[:eager_loader] && ![1, 3].include?(opts[:eager_loader].arity)
-      
+          raise(Error, ':eager_grapher option must have an arity of 1 or 3') if opts[:eager_grapher] && ![1, 3].include?(opts[:eager_grapher].arity)
+
           # dup early so we don't modify opts
           orig_opts = opts.dup
           orig_opts = association_reflection(opts[:clone])[:orig_opts].merge(orig_opts) if opts[:clone]
@@ -810,9 +813,10 @@ module Sequel
           jt_only_conditions = opts[:graph_join_table_only_conditions]
           jt_join_type = opts[:graph_join_table_join_type]
           jt_graph_block = opts[:graph_join_table_block]
-          opts[:eager_grapher] ||= proc do |ds, assoc_alias, table_alias|
-            ds = ds.graph(join_table, use_jt_only_conditions ? jt_only_conditions : lcks.zip(lcpks) + graph_jt_conds, :select=>false, :table_alias=>ds.unused_table_alias(join_table), :join_type=>jt_join_type, :implicit_qualifier=>table_alias, :from_self_alias=>ds.opts[:eager_graph][:master], &jt_graph_block)
-            ds.graph(opts.associated_class, use_only_conditions ? only_conditions : opts.right_primary_keys.zip(rcks) + conditions, :select=>select, :table_alias=>assoc_alias, :join_type=>join_type, &graph_block)
+          opts[:eager_grapher] ||= proc do |eo|
+            ds = eo[:self]
+            ds = ds.graph(join_table, use_jt_only_conditions ? jt_only_conditions : lcks.zip(lcpks) + graph_jt_conds, :select=>false, :table_alias=>ds.unused_table_alias(join_table), :join_type=>jt_join_type, :implicit_qualifier=>eo[:implicit_qualifier], :from_self_alias=>ds.opts[:eager_graph][:master], &jt_graph_block)
+            ds.graph(opts.associated_class, use_only_conditions ? only_conditions : opts.right_primary_keys.zip(rcks) + conditions, :select=>select, :table_alias=>eo[:table_alias], :join_type=>join_type, &graph_block)
           end
       
           def_association_dataset_methods(opts)
@@ -876,8 +880,9 @@ module Sequel
           only_conditions = opts[:graph_only_conditions]
           conditions = opts[:graph_conditions]
           graph_block = opts[:graph_block]
-          opts[:eager_grapher] ||= proc do |ds, assoc_alias, table_alias|
-            ds.graph(opts.associated_class, use_only_conditions ? only_conditions : opts.primary_keys.zip(cks) + conditions, :select=>select, :table_alias=>assoc_alias, :join_type=>join_type, :implicit_qualifier=>table_alias, :from_self_alias=>ds.opts[:eager_graph][:master], &graph_block)
+          opts[:eager_grapher] ||= proc do |eo|
+            ds = eo[:self]
+            ds.graph(opts.associated_class, use_only_conditions ? only_conditions : opts.primary_keys.zip(cks) + conditions, :select=>select, :table_alias=>eo[:table_alias], :join_type=>join_type, :implicit_qualifier=>eo[:implicit_qualifier], :from_self_alias=>ds.opts[:eager_graph][:master], &graph_block)
           end
       
           def_association_dataset_methods(opts)
@@ -936,8 +941,10 @@ module Sequel
           conditions = opts[:graph_conditions]
           opts[:cartesian_product_number] ||= one_to_one ? 0 : 1
           graph_block = opts[:graph_block]
-          opts[:eager_grapher] ||= proc do |ds, assoc_alias, table_alias|
-            ds = ds.graph(opts.associated_class, use_only_conditions ? only_conditions : cks.zip(cpks) + conditions, :select=>select, :table_alias=>assoc_alias, :join_type=>join_type, :implicit_qualifier=>table_alias, :from_self_alias=>ds.opts[:eager_graph][:master], &graph_block)
+          opts[:eager_grapher] ||= proc do |eo|
+            ds = eo[:self]
+            assoc_alias = eo[:table_alias]
+            ds = ds.graph(opts.associated_class, use_only_conditions ? only_conditions : cks.zip(cpks) + conditions, :select=>select, :table_alias=>assoc_alias, :join_type=>join_type, :implicit_qualifier=>eo[:implicit_qualifier], :from_self_alias=>ds.opts[:eager_graph][:master], &graph_block)
             # We only load reciprocals for one_to_many associations, as other reciprocals don't make sense
             ds.opts[:eager_graph][:reciprocals][assoc_alias] = opts.reciprocal
             ds
@@ -1381,7 +1388,12 @@ module Sequel
         def eager_graph_association(ds, model, ta, requirements, r, *associations)
           assoc_name = r[:name]
           assoc_table_alias = ds.unused_table_alias(assoc_name)
-          ds = r[:eager_grapher].call(ds, assoc_table_alias, ta)
+          loader = r[:eager_grapher]
+          ds = if loader.arity == 1
+            loader.call(:self=>ds, :table_alias=>assoc_table_alias, :implicit_qualifier=>ta)
+          else
+            loader.call(ds, assoc_table_alias, ta)
+          end
           ds = ds.order_more(*qualified_expression(r[:order], assoc_table_alias)) if r[:order] and r[:order_eager_graph]
           eager_graph = ds.opts[:eager_graph]
           eager_graph[:requirements][assoc_table_alias] = requirements.dup

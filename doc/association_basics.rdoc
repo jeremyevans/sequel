@@ -1221,21 +1221,26 @@ a JOIN USING or NATURAL JOIN for the graph:
 ==== :eager_grapher
 
 Sets up a custom grapher to use when eager loading the objects via eager_graph.
-This is the eager_graph analogue to the :eager_loader option.
+This is the eager_graph analogue to the :eager_loader option. This isn't generally
+needed, as one of the other eager_graph related association options is usually sufficient.
 
-If specified, should be a proc that accepts three three arguments: a dataset,
-an alias to use for the table to graph for this association, and the alias that
-was used for the current table (since you can cascade associations). Should
-return a modified copy of the dataset with the association graphed into it.
+If specified, should be a proc that accepts one or three three arguments.
+If the proc takes one argument, it will be given a hash with the following keys:
+
+:self :: The dataset that is doing the eager loading
+:table_alias :: An alias to use for the table to graph for this association.
+:implicit_qualifier :: The alias that was used for the current table (since you can cascade associations).
+
+If the proc takes three arguments, it gets passed the :self, :association_alias,
+and :table_alias values. The 3 argument procs are allowed for backwards
+compatibility, and it is recommended to use the 1 argument proc format
+for new code.
 
   Artist.one_to_many :self_title_albums, :class=>:Album,
-   :eager_grapher=>(proc do |ds, ta, iq|
-    ds.graph(Album, {:artist_id=>:id, :name=>:name},
-      :table_alias=>ta, :implicit_qualifier=>iq)
+   :eager_grapher=>(proc do |eo|
+    eo[:self].graph(Album, {:artist_id=>:id, :name=>:name},
+      :table_alias=>eo[:table_alias], :implicit_qualifier=>eo[:implicit_qualifier])
   end)
-
-This isn't generally needed, as one of the other eager_graph related
-association options is usually sufficient.
 
 ==== :order_eager_graph
 

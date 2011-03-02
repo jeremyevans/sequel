@@ -1364,11 +1364,15 @@ describe Sequel::Model, "#eager_graph" do
     GraphAlbum.many_to_one :active_band, :class=>'GraphBand', :key=>:band_id, :eager_grapher=>proc{|ds, aa, ta| ds.graph(GraphBand, {:active=>true}, :table_alias=>aa, :join_type=>:inner)}
     GraphAlbum.eager_graph(:active_band).sql.should == "SELECT albums.id, albums.band_id, active_band.id AS active_band_id, active_band.vocalist_id FROM albums INNER JOIN bands AS active_band ON (active_band.active IS TRUE)"
 
-    GraphAlbum.one_to_many :right_tracks, :class=>'GraphTrack', :key=>:album_id, :eager_grapher=>proc{|ds, aa, ta| ds.graph(GraphTrack, nil, :join_type=>:natural, :table_alias=>aa)}
+    GraphAlbum.one_to_many :right_tracks, :class=>'GraphTrack', :key=>:album_id, :eager_grapher=>proc{|eo| eo[:self].graph(GraphTrack, nil, :join_type=>:natural, :table_alias=>eo[:table_alias])}
     GraphAlbum.eager_graph(:right_tracks).sql.should == 'SELECT albums.id, albums.band_id, right_tracks.id AS right_tracks_id, right_tracks.album_id FROM albums NATURAL JOIN tracks AS right_tracks'
 
     GraphAlbum.many_to_many :active_genres, :class=>'GraphGenre', :eager_grapher=>proc{|ds, aa, ta| ds.graph(:ag, {:album_id=>:id}, :table_alias=>:a123, :implicit_qualifier=>ta).graph(GraphGenre, [:album_id], :table_alias=>aa)}
     GraphAlbum.eager_graph(:active_genres).sql.should == "SELECT albums.id, albums.band_id, active_genres.id AS active_genres_id FROM albums LEFT OUTER JOIN ag AS a123 ON (a123.album_id = albums.id) LEFT OUTER JOIN genres AS active_genres USING (album_id)"
+  end
+
+  it "should raise an error if you use an :eager_grapher proc with the wrong arity" do
+    proc{GraphAlbum.many_to_one :special_band, :eager_grapher=>proc{|a, b|}}.should raise_error(Sequel::Error)
   end
 
   it "should respect the association's :graph_only_conditions option" do 

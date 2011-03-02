@@ -204,14 +204,15 @@ module Sequel
           only_conditions = opts[:graph_only_conditions]
           use_only_conditions = opts.include?(:graph_only_conditions)
           conditions = opts[:graph_conditions]
-          opts[:eager_grapher] ||= proc do |ds, assoc_alias, table_alias|
-            iq = table_alias
+          opts[:eager_grapher] ||= proc do |eo|
+            ds = eo[:self]
+            iq = eo[:implicit_qualifier]
             opts.edges.each do |t|
               ds = ds.graph(t[:table], t.fetch(:only_conditions, (Array(t[:right]).zip(Array(t[:left])) + t[:conditions])), :select=>false, :table_alias=>ds.unused_table_alias(t[:table]), :join_type=>t[:join_type], :implicit_qualifier=>iq, &t[:block])
               iq = nil
             end
             fe = opts[:final_edge]
-            ds.graph(opts.associated_class, use_only_conditions ? only_conditions : (Array(opts.right_primary_key).zip(Array(fe[:left])) + conditions), :select=>select, :table_alias=>assoc_alias, :join_type=>join_type, &graph_block)
+            ds.graph(opts.associated_class, use_only_conditions ? only_conditions : (Array(opts.right_primary_key).zip(Array(fe[:left])) + conditions), :select=>select, :table_alias=>eo[:table_alias], :join_type=>join_type, &graph_block)
           end
 
           def_association_dataset_methods(opts)
