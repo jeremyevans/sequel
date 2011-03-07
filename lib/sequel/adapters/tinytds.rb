@@ -107,7 +107,7 @@ module Sequel
                 yield r
               end
             else
-              result.each(each_opts, &block)
+              result.each(each_opts, &Proc.new)
             end
           end
         end
