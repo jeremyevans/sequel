@@ -54,6 +54,17 @@ describe Sequel::Model, "#sti_key" do
     StiTest.all.collect{|x| x.class}.should == [StiTest, StiTestSub1, StiTestSub2]
   end 
 
+  it "should return rows with the correct class for subclasses based on the polymorphic_key value" do
+    class ::StiTestSub1Sub < StiTestSub1
+    end 
+    ds = StiTestSub1.dataset
+    def ds.fetch_rows(sql)
+      yield({:kind=>'StiTestSub1'})
+      yield({:kind=>'StiTestSub1Sub'})
+    end 
+    StiTestSub1.all.collect{|x| x.class}.should == [StiTestSub1, StiTestSub1Sub]
+  end 
+
   it "should fallback to the main class if the given class does not exist" do
     def @ds.fetch_rows(sql)
       yield({:kind=>'StiTestSub3'})
