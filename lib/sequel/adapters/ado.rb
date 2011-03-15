@@ -12,7 +12,7 @@ module Sequel
         when /Microsoft\.(Jet|ACE)\.OLEDB/io
           Sequel.ts_require 'adapters/shared/access'
           extend Sequel::Access::DatabaseMethods
-        when nil
+        else
           @opts[:driver] ||= 'SQL Server'
           case @opts[:driver]
           when 'SQL Server'

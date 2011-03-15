@@ -1,5 +1,7 @@
 === HEAD
 
+* In the ADO adapter, assume access to SQL Server if a :conn_string option is given that doesn't indicate Access/Jet (damir.si) (#332)
+
 * Use the correct class when loading instances for descendents of model classes that use single table inheritance (jeremyevans)
 
 * Support for COLLATE in column definitions (jfirebaugh)
