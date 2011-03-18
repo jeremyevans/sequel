@@ -1,7 +1,7 @@
 require File.join(File.dirname(File.expand_path(__FILE__)), 'spec_helper')
 CONNECTION_POOL_DEFAULTS = {:pool_timeout=>5, :pool_sleep_time=>0.001, :max_connections=>4}
 
-context "An empty ConnectionPool" do
+describe "An empty ConnectionPool" do
   before do
     @cpool = Sequel::ConnectionPool.get_pool(CONNECTION_POOL_DEFAULTS){}
   end
@@ -19,7 +19,7 @@ context "An empty ConnectionPool" do
   end
 end
 
-context "ConnectionPool options" do
+describe "ConnectionPool options" do
   specify "should support string option values" do
     cpool = Sequel::ConnectionPool.get_pool({:max_connections=>'5', :pool_timeout=>'3', :pool_sleep_time=>'0.01'}){}
     cpool.max_size.should == 5
@@ -35,7 +35,7 @@ context "ConnectionPool options" do
   end
 end
 
-context "A connection pool handling connections" do
+describe "A connection pool handling connections" do
   before do
     @max_size = 2
     @cpool = Sequel::ConnectionPool.get_pool(CONNECTION_POOL_DEFAULTS.merge(:disconnection_proc=>proc{|c| @max_size=3},  :max_connections=>@max_size)) {:got_connection}
@@ -107,7 +107,7 @@ context "A connection pool handling connections" do
   end
 end
 
-context "A connection pool handling connection errors" do 
+describe "A connection pool handling connection errors" do 
   specify "#hold should raise a Sequel::DatabaseConnectionError if an exception is raised by the connection_proc" do
     cpool = Sequel::ConnectionPool.get_pool(CONNECTION_POOL_DEFAULTS){raise Interrupt}
     proc{cpool.hold{:block_return}}.should raise_error(Sequel::DatabaseConnectionError)
@@ -132,7 +132,7 @@ class DummyConnection
   end
 end
 
-context "ConnectionPool#hold" do
+describe "ConnectionPool#hold" do
   before do
     @pool = Sequel::ConnectionPool.get_pool(CONNECTION_POOL_DEFAULTS) {DummyConnection.new}
   end
@@ -158,7 +158,7 @@ context "ConnectionPool#hold" do
   end
 end
 
-context "A connection pool with a max size of 1" do
+describe "A connection pool with a max size of 1" do
   before do
     @invoked_count = 0
     @pool = Sequel::ConnectionPool.get_pool(CONNECTION_POOL_DEFAULTS.merge(:max_connections=>1)) {@invoked_count += 1; 'herro'}
@@ -166,14 +166,15 @@ context "A connection pool with a max size of 1" do
   
   specify "should let only one thread access the connection at any time" do
     cc,c1, c2 = nil
+    m = (defined?(RUBY_ENGINE) && RUBY_ENGINE == 'rbx') ? 30 : 1
     
     t1 = Thread.new {@pool.hold {|c| cc = c; c1 = c.dup; while c == 'herro';sleep 0.01;end}}
-    sleep 0.02
+    sleep 0.02 * m
     cc.should == 'herro'
     c1.should == 'herro'
     
     t2 = Thread.new {@pool.hold {|c| c2 = c.dup; while c == 'hello';sleep 0.01;end}}
-    sleep 0.02
+    sleep 0.02 * m
     
     # connection held by t1
     t1.should be_alive
@@ -187,7 +188,7 @@ context "A connection pool with a max size of 1" do
     @pool.allocated.should == {t1=>cc}
     
     cc.gsub!('rr', 'll')
-    sleep 0.05
+    sleep 0.05 * m
     
     # connection held by t2
     t1.should_not be_alive
@@ -199,7 +200,7 @@ context "A connection pool with a max size of 1" do
     @pool.allocated.should == {t2=>cc}
     
     cc.gsub!('ll', 'rr')
-    sleep 0.05
+    sleep 0.05 * m
     
     #connection released
     t2.should_not be_alive
@@ -290,7 +291,7 @@ shared_examples_for "A threaded connection pool" do
     cc[7].should be_nil
     
     stop = true
-    sleep 0.05
+    sleep 0.1
     
     threads.each {|t| t.should_not be_alive}
     
@@ -301,7 +302,7 @@ shared_examples_for "A threaded connection pool" do
   end
 end
 
-context "Threaded Unsharded Connection Pool" do
+describe "Threaded Unsharded Connection Pool" do
   before do
     @invoked_count = 0
     @pool = Sequel::ConnectionPool.get_pool(CONNECTION_POOL_DEFAULTS.merge(:max_connections=>5)) {@invoked_count += 1}
@@ -310,7 +311,7 @@ context "Threaded Unsharded Connection Pool" do
   it_should_behave_like "A threaded connection pool"
 end
 
-context "Threaded Sharded Connection Pool" do
+describe "Threaded Sharded Connection Pool" do
   before do
     @invoked_count = 0
     @pool = Sequel::ConnectionPool.get_pool(CONNECTION_POOL_DEFAULTS.merge(:max_connections=>5, :servers=>{})) {@invoked_count += 1}
@@ -319,7 +320,7 @@ context "Threaded Sharded Connection Pool" do
   it_should_behave_like "A threaded connection pool"
 end
 
-context "ConnectionPool#disconnect" do
+describe "ConnectionPool#disconnect" do
   before do
     @count = 0
     @pool = Sequel::ConnectionPool.get_pool(CONNECTION_POOL_DEFAULTS.merge(:max_connections=>5, :servers=>{})) {{:id => @count += 1}}
@@ -385,7 +386,7 @@ context "ConnectionPool#disconnect" do
   end
 end
 
-context "A connection pool with multiple servers" do
+describe "A connection pool with multiple servers" do
   before do
     @invoked_counts = Hash.new(0)
     @pool = Sequel::ConnectionPool.get_pool(CONNECTION_POOL_DEFAULTS.merge(:servers=>{:read_only=>{}})){|server| "#{server}#{@invoked_counts[server] += 1}"}
@@ -616,7 +617,7 @@ end
 
 ST_CONNECTION_POOL_DEFAULTS = CONNECTION_POOL_DEFAULTS.merge(:single_threaded=>true)
 
-context "SingleConnectionPool" do
+describe "SingleConnectionPool" do
   before do
     @pool = Sequel::ConnectionPool.get_pool(ST_CONNECTION_POOL_DEFAULTS){1234}
   end
@@ -638,7 +639,7 @@ context "SingleConnectionPool" do
   end
 end
 
-context "A single threaded pool with multiple servers" do
+describe "A single threaded pool with multiple servers" do
   before do
     @max_size=2
     @pool = Sequel::ConnectionPool.get_pool(ST_CONNECTION_POOL_DEFAULTS.merge(:disconnection_proc=>proc{|c| @max_size=3}, :servers=>{:read_only=>{}})){|server| server}

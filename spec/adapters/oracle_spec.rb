@@ -1,4 +1,5 @@
 require File.join(File.dirname(File.expand_path(__FILE__)), 'spec_helper.rb')
+require "timeout"
 
 unless defined?(ORACLE_DB)
   ORACLE_DB = Sequel.connect('oracle://hr:hr@localhost/XE')
@@ -32,7 +33,7 @@ ORACLE_DB.create_table :categories do
   varchar2 :cat_name, :size => 50
 end
 
-context "An Oracle database" do
+describe "An Oracle database" do
   specify "should provide disconnect functionality" do
     ORACLE_DB.execute("select user from dual")
     ORACLE_DB.pool.size.should == 1
@@ -74,7 +75,7 @@ context "An Oracle database" do
   end
 end
 
-context "An Oracle dataset" do
+describe "An Oracle dataset" do
   before do
     @d = ORACLE_DB[:items]
     @d.delete # remove all records
@@ -222,7 +223,7 @@ context "An Oracle dataset" do
   end
 end
 
-context "Joined Oracle dataset" do
+describe "Joined Oracle dataset" do
   before do
     @d1 = ORACLE_DB[:books]
     @d1.delete # remove all records
@@ -263,7 +264,7 @@ context "Joined Oracle dataset" do
   end  
 end
 
-context "Oracle aliasing" do
+describe "Oracle aliasing" do
   before do
     @d1 = ORACLE_DB[:books]
     @d1.delete # remove all records
@@ -282,5 +283,40 @@ context "Oracle aliasing" do
 
   specify "nested queries should work" do
     @d1.select(:title).group_by(:title).count.should == 2
+  end
+end
+
+describe "Row locks in Oracle" do
+  before do
+    @d1 = ORACLE_DB[:books]
+    @d1.delete # remove all records
+    @d1 << {:id => 1, :title => 'aaa'}
+  end
+
+  specify "#for_update should use FOR UPDATE" do
+    @d1.for_update.sql.should == "SELECT * FROM BOOKS FOR UPDATE"
+  end
+
+  specify "#lock_style should accept symbols" do
+    @d1.lock_style(:update).sql.should == "SELECT * FROM BOOKS FOR UPDATE"
+  end
+
+  specify "should not update during row lock" do
+    ORACLE_DB.transaction do
+      @d1.filter(:id => 1).for_update.to_a
+      proc do
+        t1 = Thread.start do
+          # wait for unlock
+          Timeout::timeout(0.02) do
+            ORACLE_DB[:books].filter(:id => 1).update(:title => "bbb")
+          end
+        end
+        t1.join
+      end.should raise_error
+      @d1.filter(:id => 1).first[:title].should == "aaa"
+    end
+    t2 = Thread.start { ORACLE_DB[:books].filter(:id => 1).update(:title => "bbb") }
+    t2.join
+    @d1.filter(:id => 1).first[:title].should == "bbb"
   end
 end

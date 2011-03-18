@@ -50,13 +50,11 @@ module Sequel
         def execute(sql, opts={})
           synchronize(opts[:server]) do |conn|
             begin
-              conn.execute(sql)
-              res = conn.results
+              res = conn.execute(sql)
               yield res if block_given?
+              nil
             rescue SwiftError => e
               raise_error(e)
-            ensure
-              res.finish if res
             end
           end
         end
@@ -66,7 +64,7 @@ module Sequel
         def execute_dui(sql, opts={})
           synchronize(opts[:server]) do |conn|
             begin
-              conn.execute(sql)
+              conn.execute(sql).rows
             rescue SwiftError => e
               raise_error(e)
             end

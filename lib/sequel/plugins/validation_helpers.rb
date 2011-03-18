@@ -50,7 +50,7 @@ module Sequel
         :includes=>{:message=>lambda{|set| "is not in range or set: #{set.inspect}"}},
         :integer=>{:message=>lambda{"is not a number"}},
         :length_range=>{:message=>lambda{|range| "is too short or too long"}},
-        :max_length=>{:message=>lambda{|max| "is longer than #{max} characters"}},
+        :max_length=>{:message=>lambda{|max| "is longer than #{max} characters"}, :nil_message=>lambda{"is not present"}},
         :min_length=>{:message=>lambda{|min| "is shorter than #{min} characters"}},
         :not_string=>{:message=>lambda{|type| type ? "is not a valid #{type}" : "is a string"}},
         :numeric=>{:message=>lambda{"is not a number"}},
@@ -72,7 +72,7 @@ module Sequel
     
         # Check attribute value(s) is included in the given set.
         def validates_includes(set, atts, opts={})
-          validatable_attributes_for_type(:includes, atts, opts){|a,v,m| validation_error_message(m, set) unless set.include?(v)}
+          validatable_attributes_for_type(:includes, atts, opts){|a,v,m| validation_error_message(m, set) unless set.send(set.respond_to?(:cover?) ? :cover? : :include?, v)}
         end
     
         # Check attribute value(s) string representation is a valid integer.
@@ -89,12 +89,15 @@ module Sequel
 
         # Check that the attribute values length is in the specified range.
         def validates_length_range(range, atts, opts={})
-          validatable_attributes_for_type(:length_range, atts, opts){|a,v,m| validation_error_message(m, range) unless v && range.include?(v.length)}
+          validatable_attributes_for_type(:length_range, atts, opts){|a,v,m| validation_error_message(m, range) unless v && range.send(range.respond_to?(:cover?) ? :cover? : :include?, v.length)}
         end
     
         # Check that the attribute values are not longer than the given max length.
+        #
+        # Accepts a :nil_message option that is the error message to use when the
+        # value is nil instead of being too long.
         def validates_max_length(max, atts, opts={})
-          validatable_attributes_for_type(:max_length, atts, opts){|a,v,m| validation_error_message(m, max) unless v && v.length <= max}
+          validatable_attributes_for_type(:max_length, atts, opts){|a,v,m| v ? validation_error_message(m, max) : validation_error_message(opts[:nil_message] || DEFAULT_OPTIONS[:max_length][:nil_message]) unless v && v.length <= max}
         end
 
         # Check that the attribute values are not shorter than the given min length.

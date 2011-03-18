@@ -1,6 +1,6 @@
 require File.join(File.dirname(File.expand_path(__FILE__)), 'spec_helper')
 
-context "A new Database" do
+describe "A new Database" do
   before do
     @db = Sequel::Database.new(1 => 2, :logger => 3)
   end
@@ -198,7 +198,7 @@ context "A new Database" do
   end
 end
 
-context "Database#disconnect" do
+describe "Database#disconnect" do
   specify "should call pool.disconnect" do
     d = Sequel::Database.new
     p = d.pool
@@ -207,19 +207,19 @@ context "Database#disconnect" do
   end
 end
 
-context "Sequel.extension" do
+describe "Sequel.extension" do
   specify "should attempt to load the given extension" do
     proc{Sequel.extension :blah}.should raise_error(LoadError)
   end
 end
 
-context "Database#connect" do
+describe "Database#connect" do
   specify "should raise Sequel::NotImplemented" do
     proc {Sequel::Database.new.connect(:default)}.should raise_error(Sequel::NotImplemented)
   end
 end
 
-context "Database#log_info" do
+describe "Database#log_info" do
   before do
     @o = Object.new
     def @o.logs; @logs || []; end
@@ -239,7 +239,7 @@ context "Database#log_info" do
   end
 end
 
-context "Database#log_yield" do
+describe "Database#log_yield" do
   before do
     @o = Object.new
     def @o.logs; @logs || []; end
@@ -312,7 +312,7 @@ context "Database#log_yield" do
   end
 end
 
-context "Database#uri" do
+describe "Database#uri" do
   before do
     @c = Class.new(Sequel::Database) do
       set_adapter_scheme :mau
@@ -330,7 +330,7 @@ context "Database#uri" do
   end
 end
 
-context "Database.adapter_scheme and #adapter_scheme" do
+describe "Database.adapter_scheme and #adapter_scheme" do
   specify "should return the database schema" do
     Sequel::Database.adapter_scheme.should be_nil
 
@@ -343,7 +343,7 @@ context "Database.adapter_scheme and #adapter_scheme" do
   end
 end
 
-context "Database#dataset" do
+describe "Database#dataset" do
   before do
     @db = Sequel::Database.new
     @ds = @db.dataset
@@ -384,26 +384,26 @@ context "Database#dataset" do
   end
 end
 
-context "Database#execute" do
+describe "Database#execute" do
   specify "should raise Sequel::NotImplemented" do
     proc {Sequel::Database.new.execute('blah blah')}.should raise_error(Sequel::NotImplemented)
     proc {Sequel::Database.new << 'blah blah'}.should raise_error(Sequel::NotImplemented)
   end
 end
 
-context "Database#tables" do
+describe "Database#tables" do
   specify "should raise Sequel::NotImplemented" do
     proc {Sequel::Database.new.tables}.should raise_error(Sequel::NotImplemented)
   end
 end
 
-context "Database#indexes" do
+describe "Database#indexes" do
   specify "should raise Sequel::NotImplemented" do
     proc {Sequel::Database.new.indexes(:table)}.should raise_error(Sequel::NotImplemented)
   end
 end
 
-context "Database#<< and run" do
+describe "Database#<< and run" do
   before do
     sqls = @sqls = []
     @c = Class.new(Sequel::Database) do
@@ -430,7 +430,7 @@ context "Database#<< and run" do
   end
 end
 
-context "Database#synchronize" do
+describe "Database#synchronize" do
   before do
     @db = Sequel::Database.new(:max_connections => 1){12345}
   end
@@ -453,7 +453,7 @@ context "Database#synchronize" do
   end
 end
 
-context "Database#test_connection" do
+describe "Database#test_connection" do
   before do
     @db = Sequel::Database.new{@test = rand(100)}
   end
@@ -494,7 +494,7 @@ class DummyDatabase < Sequel::Database
   end
 end
 
-context "Database#create_table" do
+describe "Database#create_table" do
   before do
     @db = DummyDatabase.new
   end
@@ -523,9 +523,17 @@ context "Database#create_table" do
       'CREATE UNIQUE INDEX test_tmp_name_index ON test_tmp (name)'
     ]
   end
+
+  specify "should not use default schema when creating a temporary table" do
+    @db.default_schema = :foo
+    @db.create_table :test_tmp, :temp => true do
+      column :name, :text
+    end
+    @db.sqls.should == ['CREATE TEMPORARY TABLE test_tmp (name text)']
+  end
 end
 
-context "Database#alter_table" do
+describe "Database#alter_table" do
   before do
     @db = DummyDatabase.new
   end
@@ -543,7 +551,7 @@ context "Database#alter_table" do
     end
     
     @db.sqls.should == [
-      'ALTER TABLE xyz ADD COLUMN aaa text UNIQUE NOT NULL',
+      'ALTER TABLE xyz ADD COLUMN aaa text NOT NULL UNIQUE',
       'ALTER TABLE xyz DROP COLUMN bbb',
       'ALTER TABLE xyz RENAME COLUMN ccc TO ddd',
       'ALTER TABLE xyz ALTER COLUMN eee TYPE integer',
@@ -555,7 +563,7 @@ context "Database#alter_table" do
   end
 end
 
-context "Database#add_column" do
+describe "Database#add_column" do
   before do
     @db = DummyDatabase.new
   end
@@ -568,7 +576,7 @@ context "Database#add_column" do
   end
 end
 
-context "Database#drop_column" do
+describe "Database#drop_column" do
   before do
     @db = DummyDatabase.new
   end
@@ -581,7 +589,7 @@ context "Database#drop_column" do
   end
 end
 
-context "Database#rename_column" do
+describe "Database#rename_column" do
   before do
     @db = DummyDatabase.new
   end
@@ -594,7 +602,7 @@ context "Database#rename_column" do
   end
 end
 
-context "Database#set_column_type" do
+describe "Database#set_column_type" do
   before do
     @db = DummyDatabase.new
   end
@@ -607,7 +615,7 @@ context "Database#set_column_type" do
   end
 end
 
-context "Database#set_column_default" do
+describe "Database#set_column_default" do
   before do
     @db = DummyDatabase.new
   end
@@ -620,7 +628,7 @@ context "Database#set_column_default" do
   end
 end
 
-context "Database#add_index" do
+describe "Database#add_index" do
   before do
     @db = DummyDatabase.new
   end
@@ -640,7 +648,7 @@ context "Database#add_index" do
   end
 end
 
-context "Database#drop_index" do
+describe "Database#drop_index" do
   before do
     @db = DummyDatabase.new
   end
@@ -660,7 +668,7 @@ class Dummy2Database < Sequel::Database
   def transaction; yield; end
 end
 
-context "Database#drop_table" do
+describe "Database#drop_table" do
   before do
     @db = DummyDatabase.new
   end
@@ -680,7 +688,7 @@ context "Database#drop_table" do
   end
 end
 
-context "Database#rename_table" do
+describe "Database#rename_table" do
   before do
     @db = DummyDatabase.new
   end
@@ -691,7 +699,7 @@ context "Database#rename_table" do
   end
 end
 
-context "Database#table_exists?" do
+describe "Database#table_exists?" do
   specify "should try to select the first record from the table's dataset" do
     db2 = DummyDatabase.new
     db2.table_exists?(:a).should be_false
@@ -709,7 +717,7 @@ class Dummy3Database < Sequel::Database
   end
 end
 
-context "Database#transaction" do
+describe "Database#transaction" do
   before do
     @db = Dummy3Database.new{Dummy3Database::DummyConnection.new(@db)}
   end
@@ -797,7 +805,7 @@ context "Database#transaction" do
   end
 end
 
-context "Database#transaction with savepoints" do
+describe "Database#transaction with savepoints" do
   before do
     @db = Dummy3Database.new{Dummy3Database::DummyConnection.new(@db)}
     @db.meta_def(:supports_savepoints?){true}
@@ -896,7 +904,7 @@ context "Database#transaction with savepoints" do
   end
 end
 
-context "A Database adapter with a scheme" do
+describe "A Database adapter with a scheme" do
   before do
     class CCC < Sequel::Database
       if defined?(DISCONNECTS)
@@ -1034,14 +1042,14 @@ context "A Database adapter with a scheme" do
   end
 end
 
-context "Sequel::Database.connect" do
+describe "Sequel::Database.connect" do
   specify "should raise an Error if not given a String or Hash" do
     proc{Sequel::Database.connect(nil)}.should raise_error(Sequel::Error)
     proc{Sequel::Database.connect(Object.new)}.should raise_error(Sequel::Error)
   end
 end
 
-context "An unknown database scheme" do
+describe "An unknown database scheme" do
   specify "should raise an error in Sequel::Database.connect" do
     proc {Sequel::Database.connect('ddd://localhost/db')}.should raise_error(Sequel::AdapterNotFound)
   end
@@ -1051,7 +1059,7 @@ context "An unknown database scheme" do
   end
 end
 
-context "A broken adapter (lib is there but the class is not)" do
+describe "A broken adapter (lib is there but the class is not)" do
   before do
     @fn = File.join(File.dirname(__FILE__), '../../lib/sequel/adapters/blah.rb')
     File.open(@fn,'a'){}
@@ -1066,7 +1074,7 @@ context "A broken adapter (lib is there but the class is not)" do
   end
 end
 
-context "A single threaded database" do
+describe "A single threaded database" do
   after do
     Sequel::Database.single_threaded = false
   end
@@ -1094,7 +1102,7 @@ context "A single threaded database" do
   end
 end
 
-context "A single threaded database" do
+describe "A single threaded database" do
   before do
     conn = 1234567
     @db = Sequel::Database.new(:single_threaded => true) do
@@ -1128,7 +1136,7 @@ context "A single threaded database" do
   end
 end
 
-context "A database" do
+describe "A database" do
   before do
     Sequel::Database.single_threaded = false
   end
@@ -1175,7 +1183,7 @@ context "A database" do
   end
 end
 
-context "Database#fetch" do
+describe "Database#fetch" do
   before do
     @db = Sequel::Database.new
     c = Class.new(Sequel::Dataset) do
@@ -1226,7 +1234,7 @@ context "Database#fetch" do
 end
 
 
-context "Database#[]" do
+describe "Database#[]" do
   before do
     @db = Sequel::Database.new
   end
@@ -1249,7 +1257,7 @@ context "Database#[]" do
   end
 end
 
-context "Database#create_view" do
+describe "Database#create_view" do
   before do
     @db = DummyDatabase.new
   end
@@ -1271,7 +1279,7 @@ context "Database#create_view" do
   end
 end
 
-context "Database#create_or_replace_view" do
+describe "Database#create_or_replace_view" do
   before do
     @db = DummyDatabase.new
   end
@@ -1293,7 +1301,7 @@ context "Database#create_or_replace_view" do
   end
 end
 
-context "Database#drop_view" do
+describe "Database#drop_view" do
   before do
     @db = DummyDatabase.new
   end
@@ -1307,7 +1315,7 @@ context "Database#drop_view" do
   end
 end
 
-context "Database#alter_table_sql" do
+describe "Database#alter_table_sql" do
   before do
     @db = DummyDatabase.new
   end
@@ -1317,7 +1325,7 @@ context "Database#alter_table_sql" do
   end
 end
 
-context "Database#inspect" do
+describe "Database#inspect" do
   before do
     @db = DummyDatabase.new
     
@@ -1329,7 +1337,7 @@ context "Database#inspect" do
   end
 end
 
-context "Database#get" do
+describe "Database#get" do
   before do
     @c = Class.new(DummyDatabase) do
       def dataset
@@ -1362,7 +1370,7 @@ context "Database#get" do
   end
 end
 
-context "Database#call" do
+describe "Database#call" do
   specify "should call the prepared statement with the given name" do
     db = MockDatabase.new
     db[:items].prepare(:select, :select_all)
@@ -1373,7 +1381,7 @@ context "Database#call" do
   end
 end
 
-context "Database#server_opts" do
+describe "Database#server_opts" do
   specify "should return the general opts if no :servers option is used" do
     opts = {:host=>1, :database=>2}
     MockDatabase.new(opts).send(:server_opts, :server1)[:host].should == 1
@@ -1400,7 +1408,7 @@ context "Database#server_opts" do
   end
 end
 
-context "Database#add_servers" do
+describe "Database#add_servers" do
   before do
     @db = MockDatabase.new(:host=>1, :database=>2, :servers=>{:server1=>{:host=>3}})
     def @db.connect(server)
@@ -1443,7 +1451,7 @@ context "Database#add_servers" do
   end
 end
 
-context "Database#remove_servers" do
+describe "Database#remove_servers" do
   before do
     @db = MockDatabase.new(:host=>1, :database=>2, :servers=>{:server1=>{:host=>3}, :server2=>{:host=>4}})
     def @db.connect(server)
@@ -1498,7 +1506,7 @@ context "Database#remove_servers" do
   end
 end
 
-context "Database#each_server with do/jdbc adapter connection string without :adapter option" do
+describe "Database#each_server with do/jdbc adapter connection string without :adapter option" do
   before do
     klass = Class.new(Sequel::Database)
     klass.should_receive(:adapter_class).once.with(:jdbc).and_return(MockDatabase)
@@ -1523,7 +1531,7 @@ context "Database#each_server with do/jdbc adapter connection string without :ad
   end
 end
 
-context "Database#each_server" do
+describe "Database#each_server" do
   before do
     @db = Sequel.connect(:adapter=>:mock, :host=>1, :database=>2, :servers=>{:server1=>{:host=>3}, :server2=>{:host=>4}})
     def @db.connect(server)
@@ -1560,7 +1568,7 @@ context "Database#each_server" do
   end
 end
   
-context "Database#raise_error" do
+describe "Database#raise_error" do
   specify "should reraise if the exception class is not in opts[:classes]" do
     e = Class.new(StandardError)
     proc{MockDatabase.new.send(:raise_error, e.new(''), :classes=>[])}.should raise_error(e)
@@ -1579,7 +1587,7 @@ context "Database#raise_error" do
   end
 end
 
-context "Database#typecast_value" do
+describe "Database#typecast_value" do
   before do
     @db = Sequel::Database.new
   end
@@ -1613,7 +1621,7 @@ context "Database#typecast_value" do
   end
 end
 
-context "Database#blank_object?" do
+describe "Database#blank_object?" do
   specify "should return whether the object is considered blank" do
     db = Sequel::Database.new
     c = lambda{|meth, value| Class.new{define_method(meth){value}}.new}
@@ -1638,7 +1646,7 @@ context "Database#blank_object?" do
   end
 end
 
-context "Database#schema_autoincrementing_primary_key?" do
+describe "Database#schema_autoincrementing_primary_key?" do
   specify "should whether the parsed schema row indicates a primary key" do
     m = Sequel::Database.new.method(:schema_autoincrementing_primary_key?)
     m.call(:primary_key=>true).should == true
@@ -1646,25 +1654,25 @@ context "Database#schema_autoincrementing_primary_key?" do
   end
 end
 
-context "Database#supports_savepoints?" do
+describe "Database#supports_savepoints?" do
   specify "should be false by default" do
     Sequel::Database.new.supports_savepoints?.should == false
   end
 end
 
-context "Database#supports_prepared_transactions?" do
+describe "Database#supports_prepared_transactions?" do
   specify "should be false by default" do
     Sequel::Database.new.supports_prepared_transactions?.should == false
   end
 end
 
-context "Database#supports_transaction_isolation_levels?" do
+describe "Database#supports_transaction_isolation_levels?" do
   specify "should be false by default" do
     Sequel::Database.new.supports_transaction_isolation_levels?.should == false
   end
 end
 
-context "Database#input_identifier_meth" do
+describe "Database#input_identifier_meth" do
   specify "should be the input_identifer method of a default dataset for this database" do
     db = Sequel::Database.new
     db.send(:input_identifier_meth).call(:a).should == 'a'
@@ -1673,7 +1681,7 @@ context "Database#input_identifier_meth" do
   end
 end
 
-context "Database#output_identifier_meth" do
+describe "Database#output_identifier_meth" do
   specify "should be the output_identifer method of a default dataset for this database" do
     db = Sequel::Database.new
     db.send(:output_identifier_meth).call('A').should == :A
@@ -1682,7 +1690,7 @@ context "Database#output_identifier_meth" do
   end
 end
 
-context "Database#metadata_dataset" do
+describe "Database#metadata_dataset" do
   specify "should be a dataset with the default settings for identifier_input_method and identifier_output_method" do
     ds = Sequel::Database.new.send(:metadata_dataset)
     ds.literal(:a).should == 'A'
@@ -1690,7 +1698,7 @@ context "Database#metadata_dataset" do
   end
 end
 
-context "Database#column_schema_to_ruby_default" do
+describe "Database#column_schema_to_ruby_default" do
   specify "should handle converting many default formats" do
     db = Sequel::Database.new
     m = db.method(:column_schema_to_ruby_default)

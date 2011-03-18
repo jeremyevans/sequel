@@ -1,6 +1,6 @@
 require File.join(File.dirname(File.expand_path(__FILE__)), 'spec_helper')
 
-context "Object#blank?" do
+describe "Object#blank?" do
   specify "it should be true if the object responds true to empty?" do
     [].blank?.should == true
     {}.blank?.should == true
@@ -16,7 +16,7 @@ context "Object#blank?" do
   end
 end
 
-context "Numeric#blank?" do
+describe "Numeric#blank?" do
   specify "it should always be false" do
     1.blank?.should == false
     0.blank?.should == false
@@ -31,25 +31,25 @@ context "Numeric#blank?" do
   end
 end
 
-context "NilClass#blank?" do
+describe "NilClass#blank?" do
   specify "it should always be true" do
     nil.blank?.should == true
   end
 end
 
-context "TrueClass#blank?" do
+describe "TrueClass#blank?" do
   specify "it should always be false" do
     true.blank?.should == false
   end
 end
 
-context "FalseClass#blank?" do
+describe "FalseClass#blank?" do
   specify "it should always be true" do
     false.blank?.should == true
   end
 end
 
-context "String#blank?" do
+describe "String#blank?" do
   specify "it should be true if the string is empty" do
     ''.blank?.should == true
   end

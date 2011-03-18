@@ -34,7 +34,7 @@ SQL_BEGIN = 'BEGIN'
 SQL_ROLLBACK = 'ROLLBACK'
 SQL_COMMIT = 'COMMIT'
 
-context "MySQL", '#create_table' do
+describe "MySQL", '#create_table' do
   before do
     @db = MYSQL_DB
     MYSQL_DB.sqls.clear
@@ -82,9 +82,15 @@ context "MySQL", '#create_table' do
     end
     @db.schema(:dolls).map{|k, v| v[:auto_increment]}.should == [nil, nil, true]
   end
+
+  specify "should support collate with various other column options" do
+    @db.create_table!(:dolls){ String :name, :size=>128, :collate=>:utf8_bin, :default=>'foo', :null=>false, :unique=>true}
+    @db[:dolls].insert
+    @db[:dolls].select_map(:name).should == ["foo"]
+  end
 end
 
-context "A MySQL database" do
+describe "A MySQL database" do
   specify "should provide the server version" do
     MYSQL_DB.server_version.should >= 40000
   end
@@ -99,7 +105,7 @@ context "A MySQL database" do
 end
 
 if MYSQL_DB.adapter_scheme == :mysql
-  context "Sequel::MySQL.convert_tinyint_to_bool" do
+  describe "Sequel::MySQL.convert_tinyint_to_bool" do
     before do
       @db = MYSQL_DB
       @db.create_table(:booltest){column :b, 'tinyint(1)'; column :i, 'tinyint(4)'}
@@ -148,7 +154,7 @@ if MYSQL_DB.adapter_scheme == :mysql
   end
 end
 
-context "A MySQL dataset" do
+describe "A MySQL dataset" do
   before do
     MYSQL_DB.create_table(:items){String :name; Integer :value}
     @d = MYSQL_DB[:items]
@@ -243,7 +249,7 @@ context "A MySQL dataset" do
   end
 end
 
-context "MySQL datasets" do
+describe "MySQL datasets" do
   before do
     @d = MYSQL_DB[:orders]
   end
@@ -282,7 +288,7 @@ describe "Dataset#distinct" do
   end
 end
 
-context "MySQL join expressions" do
+describe "MySQL join expressions" do
   before do
     @ds = MYSQL_DB[:nodes]
     @ds.db.meta_def(:server_version) {50014}
@@ -333,7 +339,7 @@ context "MySQL join expressions" do
   end
 end
 
-context "Joined MySQL dataset" do
+describe "Joined MySQL dataset" do
   before do
     @ds = MYSQL_DB[:nodes]
   end
@@ -357,7 +363,7 @@ context "Joined MySQL dataset" do
   end
 end
 
-context "A MySQL database" do
+describe "A MySQL database" do
   before do
     @db = MYSQL_DB
   end
@@ -424,7 +430,7 @@ context "A MySQL database" do
   end
 end  
 
-context "A MySQL database with table options" do
+describe "A MySQL database with table options" do
   before do
     @options = {:engine=>'MyISAM', :charset=>'latin1', :collate => 'latin1_swedish_ci'}
     
@@ -461,7 +467,7 @@ context "A MySQL database with table options" do
   end
 end
 
-context "A MySQL database" do
+describe "A MySQL database" do
   before do
     @db = MYSQL_DB
     @db.drop_table(:items) rescue nil
@@ -547,7 +553,7 @@ end
 
 # Socket tests should only be run if the MySQL server is on localhost
 if %w'localhost 127.0.0.1 ::1'.include?(MYSQL_URI.host) and MYSQL_DB.adapter_scheme == :mysql
-  context "A MySQL database" do
+  describe "A MySQL database" do
     specify "should accept a socket option" do
       db = Sequel.mysql(MYSQL_DB.opts[:database], :host => 'localhost', :user => MYSQL_DB.opts[:user], :password => MYSQL_DB.opts[:password], :socket => MYSQL_SOCKET_FILE)
       proc {db.test_connection}.should_not raise_error
@@ -565,7 +571,19 @@ if %w'localhost 127.0.0.1 ::1'.include?(MYSQL_URI.host) and MYSQL_DB.adapter_sch
   end
 end
 
-context "A grouped MySQL dataset" do
+describe "A MySQL database" do
+  specify "should accept a read_timeout option when connecting" do
+    db = Sequel.connect(MYSQL_DB.opts.merge(:read_timeout=>22342))
+    proc {db.test_connection}.should_not raise_error
+  end
+
+  specify "should accept a connect_timeout option when connecting" do
+    db = Sequel.connect(MYSQL_DB.opts.merge(:connect_timeout=>22342))
+    proc {db.test_connection}.should_not raise_error
+  end
+end
+
+describe "A grouped MySQL dataset" do
   before do
     MYSQL_DB[:test2].delete
     MYSQL_DB[:test2] << {:name => '11', :value => 10}
@@ -587,7 +605,7 @@ context "A grouped MySQL dataset" do
   end
 end
 
-context "A MySQL database" do
+describe "A MySQL database" do
   before do
     @db = MYSQL_DB
     @db.drop_table(:posts) rescue nil
@@ -648,9 +666,15 @@ context "A MySQL database" do
     @db << "CREATE INDEX posts_id_index ON posts (id(10))"
     @db.indexes(:posts).should == {}
   end
+
+  specify "should dump partial indexes if :partial option is set to true" do
+    @db.create_table(:posts){text :id}
+    @db << "CREATE INDEX posts_id_index ON posts (id(10))"
+    @db.indexes(:posts, :partial => true).should == {:posts_id_index => {:columns => [:id], :unique => false}}
+  end
 end
 
-context "MySQL::Dataset#insert and related methods" do
+describe "MySQL::Dataset#insert and related methods" do
   before do
     MYSQL_DB.create_table(:items){String :name; Integer :value}
     @d = MYSQL_DB[:items]
@@ -835,7 +859,7 @@ context "MySQL::Dataset#insert and related methods" do
   
 end
 
-context "MySQL::Dataset#replace" do
+describe "MySQL::Dataset#replace" do
   before do
     MYSQL_DB.create_table(:items){Integer :id, :unique=>true; Integer :value}
     @d = MYSQL_DB[:items]
@@ -877,7 +901,7 @@ context "MySQL::Dataset#replace" do
   end
 end
 
-context "MySQL::Dataset#complex_expression_sql" do
+describe "MySQL::Dataset#complex_expression_sql" do
   before do
     @d = MYSQL_DB.dataset
   end
@@ -905,8 +929,35 @@ context "MySQL::Dataset#complex_expression_sql" do
   end
 end
 
+describe "MySQL::Dataset#calc_found_rows" do
+  before do
+    MYSQL_DB.create_table!(:items){Integer :a}
+  end
+  after do
+    MYSQL_DB.drop_table(:items)
+  end
+
+  specify "should add the SQL_CALC_FOUND_ROWS keyword when selecting" do
+    MYSQL_DB[:items].select(:a).calc_found_rows.limit(1).sql.should == \
+      'SELECT SQL_CALC_FOUND_ROWS a FROM items LIMIT 1'
+  end
+
+  specify "should count matching rows disregarding LIMIT clause" do
+    MYSQL_DB[:items].multi_insert([{:a => 1}, {:a => 1}, {:a => 2}])
+    MYSQL_DB.sqls.clear
+
+    MYSQL_DB[:items].calc_found_rows.filter(:a => 1).limit(1).all.should == [{:a => 1}]
+    MYSQL_DB.dataset.select(:FOUND_ROWS.sql_function.as(:rows)).all.should == [{:rows => 2 }]
+
+    MYSQL_DB.sqls.should == [
+      'SELECT SQL_CALC_FOUND_ROWS * FROM items WHERE (a = 1) LIMIT 1',
+      'SELECT FOUND_ROWS() AS rows',
+    ]
+  end
+end
+
 if MYSQL_DB.adapter_scheme == :mysql or MYSQL_DB.adapter_scheme == :jdbc
-  context "MySQL Stored Procedures" do
+  describe "MySQL Stored Procedures" do
     before do
       MYSQL_DB.create_table(:items){Integer :id; Integer :value}
       @d = MYSQL_DB[:items]
@@ -951,7 +1002,7 @@ if MYSQL_DB.adapter_scheme == :mysql or MYSQL_DB.adapter_scheme == :jdbc
 end
 
 if MYSQL_DB.adapter_scheme == :mysql
-  context "MySQL bad date/time conversions" do
+  describe "MySQL bad date/time conversions" do
     after do
       Sequel::MySQL.convert_invalid_date_time = false
     end
@@ -982,7 +1033,7 @@ if MYSQL_DB.adapter_scheme == :mysql
     end
   end
   
-  context "MySQL multiple result sets" do
+  describe "MySQL multiple result sets" do
     before do
       MYSQL_DB.create_table!(:a){Integer :a}
       MYSQL_DB.create_table!(:b){Integer :b}

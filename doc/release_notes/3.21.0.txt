@@ -1,0 +1,87 @@
+= New Features
+
+* A tinytds adapter was added, enabling Sequel users on a C-based
+  ruby running on *nix easy access to Microsoft SQL Server.
+  Previously, the best way to connect to Microsoft SQL Server from
+  a C-based ruby on *nix was to use the ODBC adapter with unixodbc
+  and freetds.  However, setting that up is nontrivial, while
+  setting up tinytds is very easy.
+  
+  Note that the tinytds adapter currently requires the git master
+  branch of tiny_tds, but tiny_tds 0.4.0 should include the related
+  changes.
+  
+* An association_autoreloading plugin has been added to Sequel,
+  which removes stale many_to_one associations from the cache when
+  the associated foreign key setter is used to change the value of
+  the foreign key.
+
+* bin/sequel now operates more like a standard *nix utility.
+  If given a file on the command line after the connection
+  string, it will assume that file has ruby code and load it.
+  If stdin is not a tty, it will read from stdin and execute it
+  as ruby code.
+  
+  For recent Linux users, this means you can have a shebang line
+  such as:
+  
+    #!/usr/bin/sequel postgres://user:pass@host/db
+    
+  to create a self contained script.
+
+* bin/sequel now supports -r and -I options similar to ruby's
+  -r and -I options.
+  
+* MySQL datasets now have a calc_found_rows method that uses
+  SQL_CALC_FOUND_ROWS, which provides a fast way to limit the
+  number of results returned by a dataset while having an easy
+  way to determine how many rows would have been returned if no
+  limit was applied.
+
+= Other Improvements
+
+* The Sequel::Model.plugin method can now be overridden just like
+  any other method.  Previously, it was the only method that
+  was defined directly on the class.  This allows the creation
+  of plugins that can modify the plugin system itself.
+
+* Symbol splitting (:table__column___alias) now works correctly
+  for identifiers that include characters that aren't in [\w ].
+  Among other things, this means that identifiers with accented
+  characters or even kanji characters can be used with symbol
+  splitting.
+  
+* If cover? is defined, it is now used in preference to include?
+  for the validates_includes/validates_inclusion_of validations.
+  ruby 1.9 defines include? differently for some ranges and can
+  be very slow, while cover? is similar to the 1.8 behavior of
+  just checking the beginning and end of the range.
+  
+* The bin/sequel -L option now takes effect even if the -m,
+  -C, -d, or -D options are used.
+  
+* The schema_dumper extension now recognizes the "bigint unsigned"
+  type.
+  
+* On Microsoft SQL Server, if joining to a subselect that uses a
+  common table expression, that common table expression is
+  promoted to the main dataset.  This allows most queries to work
+  correctly, but is vulnerable to issues if both the current
+  dataset and the joined dataset use common table expressions with
+  the same name.  Unfortunately, unlike PostgreSQL, Microsoft SQL
+  Server does not allow common table expressions to occur in
+  subselects.
+
+* The NULL/NOT NULL, DEFAULT, and UNIQUE column options now
+  use the proper order on H2 and Oracle, so they can now be
+  used in conjunction with each other.
+  
+* Row locks are now enabled on Oracle.
+
+* The join_table method on MySQL no longer ignores the block it was
+  given.
+  
+* The informix adapter now supports ruby-informix version >= 0.7.3,
+  while still being backwards compatible with older versions.
+
+* The specs now run under both RSpec 2 and RSpec 1.

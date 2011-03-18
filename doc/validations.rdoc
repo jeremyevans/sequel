@@ -301,7 +301,7 @@ All +validation_helpers+ methods except +validates_unique+ accept the following 
 
 === <tt>:message</tt>
 
-The most commonly used option, used to override the default validation message.  Can be either a string or a proc.  If a string, it is used directly.  If a proc, the proc is called and should return a string.  If the validation method takes an argument before the array of attributes, that argument is passed as an argument to the proc. The exception is the +validates_not_string+ method, which doesn’t take an argument, but passes the schema type symbol as the argument to the proc. 
+The most commonly used option, used to override the default validation message.  Can be either a string or a proc.  If a string, it is used directly.  If a proc, the proc is called and should return a string.  If the validation method takes an argument before the array of attributes, that argument is passed as an argument to the proc. The exception is the +validates_not_string+ method, which doesn't take an argument, but passes the schema type symbol as the argument to the proc. 
 
   class Album < Sequel::Model
     def validate
@@ -340,7 +340,7 @@ The <tt>:allow_blank</tt> is similar to the <tt>:allow_nil</tt> option, but inst
 
 The <tt>:allow_missing</tt> option is different from the <tt>:allow_nil</tt> option, in that instead of checking if the attribute value is nil, it checks if the attribute is present in the model instance's values hash.   <tt>:allow_nil</tt> will skip the validation when the attribute is in the values hash and has a nil value and when the attribute is not in the values hash.  <tt>:allow_missing</tt> will only skip the validation when the attribute is not in the values hash.  If the attribute is in the values hash but has a nil value, <tt>:allow_missing</tt> will not skip it.
 
-The purpose of this option is to work correctly with missing columns when inserting or updating records.  Sequel only sends the attributes in the values hash when doing an insert or update. If the attribute is not present in the values hash, Sequel doesn’t specify it, so the database will use the table’s default value when inserting the record, or not modify the value when saving it. This is different from having an attribute in the values hash with a value of nil, which Sequel will send as NULL. If your database table has a non NULL default, this may be a good option to use. You don’t want to use allow_nil, because if the attribute is in values but has a value nil, Sequel will attempt to insert a NULL value into the database, instead of using the database’s default.
+The purpose of this option is to work correctly with missing columns when inserting or updating records.  Sequel only sends the attributes in the values hash when doing an insert or update. If the attribute is not present in the values hash, Sequel doesn't specify it, so the database will use the table's default value when inserting the record, or not modify the value when saving it. This is different from having an attribute in the values hash with a value of nil, which Sequel will send as NULL. If your database table has a non NULL default, this may be a good option to use. You don't want to use allow_nil, because if the attribute is in values but has a value nil, Sequel will attempt to insert a NULL value into the database, instead of using the database's default.
 
 == Conditional Validation
 

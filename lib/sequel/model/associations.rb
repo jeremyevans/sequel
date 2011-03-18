@@ -1473,7 +1473,7 @@ module Sequel
       
         # Make sure the association is valid for this model, and return the related AssociationReflection.
         def check_association(model, association)
-          raise(Sequel::Error, "Invalid association #{association} for #{model.name}") unless reflection = model.association_reflection(association)
+          raise(Sequel::UndefinedAssociation, "Invalid association #{association} for #{model.name}") unless reflection = model.association_reflection(association)
           raise(Sequel::Error, "Eager loading is not allowed for #{model.name} association #{association}") if reflection[:allow_eager] == false
           reflection
         end
@@ -1538,7 +1538,7 @@ module Sequel
           #  specific foreign/primary key
           key_hash = {}
           # Reflections for all associations to eager load
-          reflections = eager_assoc.keys.collect{|assoc| model.association_reflection(assoc)}
+          reflections = eager_assoc.keys.collect{|assoc| model.association_reflection(assoc) || (raise Sequel::UndefinedAssociation, "Model: #{self}, Association: #{assoc}")}
       
           # Populate keys to monitor
           reflections.each{|reflection| key_hash[reflection.eager_loader_key] ||= Hash.new{|h,k| h[k] = []}}

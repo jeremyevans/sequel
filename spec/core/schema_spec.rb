@@ -1,6 +1,6 @@
 require File.join(File.dirname(File.expand_path(__FILE__)), 'spec_helper')
 
-context "DB#create_table" do
+describe "DB#create_table" do
   before do
     @db = SchemaDummyDatabase.new
   end
@@ -281,6 +281,13 @@ context "DB#create_table" do
     @db.sqls.should == ["CREATE TABLE cats (project_id integer REFERENCES projects DEFERRABLE INITIALLY DEFERRED)"]
   end
 
+  specify "should accept collation" do
+    @db.create_table(:cats) do
+      varchar :name, :collate => :utf8_bin
+    end
+    @db.sqls.should == ["CREATE TABLE cats (name varchar(255) COLLATE utf8_bin)"]
+  end
+
   specify "should accept inline index definition" do
     @db.create_table(:cats) do
       integer :id, :index => true
@@ -543,7 +550,7 @@ context "DB#create_table" do
   end
 end
 
-context "DB#create_table!" do
+describe "DB#create_table!" do
   before do
     @db = SchemaDummyDatabase.new
   end
@@ -554,7 +561,7 @@ context "DB#create_table!" do
   end
 end
 
-context "DB#create_table?" do
+describe "DB#create_table?" do
   before do
     @db = SchemaDummyDatabase.new
   end
@@ -572,7 +579,7 @@ context "DB#create_table?" do
   end
 end
 
-context "DB#drop_table" do
+describe "DB#drop_table" do
   before do
     @db = SchemaDummyDatabase.new
   end
@@ -583,7 +590,7 @@ context "DB#drop_table" do
   end
 end
 
-context "DB#alter_table" do
+describe "DB#alter_table" do
   before do
     @db = SchemaDummyDatabase.new
   end
@@ -763,7 +770,7 @@ context "DB#alter_table" do
   end
 end
 
-context "Schema Parser" do
+describe "Schema Parser" do
   before do
     @sqls = []
     @db = Sequel::Database.new

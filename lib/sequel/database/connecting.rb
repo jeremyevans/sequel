@@ -6,7 +6,7 @@ module Sequel
     # ---------------------
 
     # Array of supported database adapters
-    ADAPTERS = %w'ado amalgalite db2 dbi do firebird informix jdbc mysql mysql2 odbc openbase oracle postgres sqlite swift'.collect{|x| x.to_sym}
+    ADAPTERS = %w'ado amalgalite db2 dbi do firebird informix jdbc mysql mysql2 odbc openbase oracle postgres sqlite swift tinytds'.collect{|x| x.to_sym}
 
     # Whether to use the single threaded connection pool by default
     @@single_threaded = false

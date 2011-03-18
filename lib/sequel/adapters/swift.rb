@@ -22,6 +22,11 @@ module Sequel
         db.extend(Sequel::Swift::MySQL::DatabaseMethods)
         db.swift_class = ::Swift::DB::Mysql
       end,
+      :sqlite=>proc do |db|
+        Sequel.ts_require 'adapters/swift/sqlite'
+        db.extend(Sequel::Swift::SQLite::DatabaseMethods)
+        db.swift_class = ::Swift::DB::Sqlite3
+      end,
     }
       
     class Database < Sequel::Database
@@ -45,7 +50,7 @@ module Sequel
             raise(Error, "No :db_type option specified")
           end
         else
-          raise(Error, ":db_type option not valid, should be postgres or mysql")
+          raise(Error, ":db_type option not valid, should be postgres, mysql, or sqlite")
         end
       end
       
@@ -63,14 +68,11 @@ module Sequel
       def execute(sql, opts={})
         synchronize(opts[:server]) do |conn|
           begin
-            res = nil
-            log_yield(sql){conn.execute(sql); res = conn.results}
+            res = log_yield(sql){conn.execute(sql)}
             yield res if block_given?
             nil
           rescue SwiftError => e
             raise_error(e)
-          ensure
-            res.finish if res
           end
         end
       end
@@ -80,7 +82,7 @@ module Sequel
       def execute_dui(sql, opts={})
         synchronize(opts[:server]) do |conn|
           begin
-            log_yield(sql){conn.execute(sql)}
+            log_yield(sql){conn.execute(sql).rows}
           rescue SwiftError => e
             raise_error(e)
           end
@@ -92,12 +94,9 @@ module Sequel
       def execute_insert(sql, opts={})
         synchronize(opts[:server]) do |conn|
           begin
-            res = nil
-            log_yield(sql){conn.execute(sql); (res = conn.results).insert_id}
+            log_yield(sql){conn.execute(sql).insert_id}
           rescue SwiftError => e
             raise_error(e)
-          ensure
-            res.finish if res
           end
         end
       end

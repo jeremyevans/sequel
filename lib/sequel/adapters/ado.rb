@@ -8,11 +8,17 @@ module Sequel
 
       def initialize(opts)
         super
-        @opts[:driver] ||= 'SQL Server'
-        case @opts[:driver]
-        when 'SQL Server'
-          Sequel.ts_require 'adapters/ado/mssql'
-          extend Sequel::ADO::MSSQL::DatabaseMethods
+        case @opts[:conn_string]
+        when /Microsoft\.(Jet|ACE)\.OLEDB/io
+          Sequel.ts_require 'adapters/shared/access'
+          extend Sequel::Access::DatabaseMethods
+        else
+          @opts[:driver] ||= 'SQL Server'
+          case @opts[:driver]
+          when 'SQL Server'
+            Sequel.ts_require 'adapters/ado/mssql'
+            extend Sequel::ADO::MSSQL::DatabaseMethods
+          end
         end
       end
 

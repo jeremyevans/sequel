@@ -1,0 +1,41 @@
+= New Features
+
+* The swift adapter now supports an SQLite subadapter.  Use the
+  :db_type => 'sqlite' option when connecting.  You can use an
+  in memory database with the following connection string:
+  
+    swift:///?database=:memory:&db_type=sqlite
+
+* Arbitrary JDBC properties can now be set in the JDBC adapter
+  using the :jdbc_properties option when connecting.  The value
+  of this option should be a hash where keys and values are JDBC
+  property keys and values.
+  
+* Basic Microsoft Access support was added to the ado adapter.
+  The creation of autoincrementing primary key integers now works,
+  and identifiers are now quoted with [].
+
+* The Database#indexes method now supports a :partial option when
+  connecting to MySQL, which makes it include partial indexes (which
+  are usually excluded).
+
+= Other Improvements
+
+* The class_table_inheritance plugin now handles subclass
+  associations better.  Previously, the implicit eager loading code
+  had issues when you called an association method that only existed
+  in the subclass.
+
+* The error message used when a validates_max_length validation is
+  applied to a nil column value has been improved.  You can override
+  the message yourself using the :nil_message option.
+  
+* The read_timeout and connect_timeout options now work correctly in
+  the mysql adapter.
+
+* Another MySQL disconnect error message is now recognized.
+
+= Backwards Compatibility
+
+* The swift adapter was upgraded to support swift 0.8.1.  Older
+  versions of swift are no longer supported.

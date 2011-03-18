@@ -16,7 +16,20 @@ def clear_sqls
   $sqls.clear
 end 
 
-class Spec::Example::ExampleGroup
+unless defined?(RSpec)
+  module Spec::Matchers
+    class BeWithin
+      include Spec::Matchers
+      def initialize(delta); @delta = delta; end
+      def of(expected); be_close(expected, @delta); end 
+    end
+    def be_within(delta)
+      BeWithin.new(delta)
+    end
+  end
+end
+
+(defined?(RSpec) ? RSpec::Core::ExampleGroup : Spec::Example::ExampleGroup).class_eval do
   def log
     begin
       INTEGRATION_DB.loggers << Logger.new(STDOUT)

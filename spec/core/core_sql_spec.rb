@@ -1,6 +1,6 @@
 require File.join(File.dirname(File.expand_path(__FILE__)), 'spec_helper')
 
-context "Array#all_two_pairs?" do
+describe "Array#all_two_pairs?" do
   specify "should return false if empty" do
     [].all_two_pairs?.should == false
   end
@@ -23,7 +23,7 @@ context "Array#all_two_pairs?" do
   end
 end
   
-context "Array#case and Hash#case" do
+describe "Array#case and Hash#case" do
   before do
     @d = Sequel::Dataset.new(nil)
   end
@@ -55,7 +55,7 @@ context "Array#case and Hash#case" do
   end
 end
 
-context "Array#sql_value_list and #sql_array" do
+describe "Array#sql_value_list and #sql_array" do
   before do
     @d = Sequel::Dataset.new(nil)
   end
@@ -73,7 +73,7 @@ context "Array#sql_value_list and #sql_array" do
   end
 end
 
-context "String#lit" do
+describe "String#lit" do
   before do
     @ds = ds = MockDatabase.new.dataset
   end
@@ -111,7 +111,7 @@ context "String#lit" do
   end
 end
 
-context "String#to_sequel_blob" do
+describe "String#to_sequel_blob" do
   specify "should return a Blob object" do
     'xyz'.to_sequel_blob.should be_a_kind_of(::Sequel::SQL::Blob)
     'xyz'.to_sequel_blob.should == 'xyz'
@@ -122,7 +122,7 @@ context "String#to_sequel_blob" do
   end
 end
 
-context "#desc" do
+describe "#desc" do
   before do
     @ds = Sequel::Dataset.new(nil)
   end
@@ -138,7 +138,7 @@ context "#desc" do
   end
 end
 
-context "#asc" do
+describe "#asc" do
   before do
     @ds = Sequel::Dataset.new(nil)
   end
@@ -154,7 +154,7 @@ context "#asc" do
   end
 end
 
-context "#as" do
+describe "#as" do
   before do
     @ds = Sequel::Dataset.new(nil)
   end
@@ -174,7 +174,7 @@ context "#as" do
   end
 end
 
-context "Column references" do
+describe "Column references" do
   before do
     @c = Class.new(Sequel::Dataset) do
       def quoted_identifier(c); "`#{c}`"; end
@@ -211,7 +211,7 @@ context "Column references" do
   end
 end
 
-context "Blob" do
+describe "Blob" do
   specify "#to_sequel_blob should return self" do
     blob = "x".to_sequel_blob
     blob.to_sequel_blob.object_id.should == blob.object_id
@@ -219,7 +219,7 @@ context "Blob" do
 end
 
 if RUBY_VERSION < '1.9.0'
-  context "Symbol#[]" do
+  describe "Symbol#[]" do
     specify "should format an SQL Function" do
       ds = Sequel::Dataset.new(nil)
       ds.literal(:xyz[]).should == 'xyz()'
@@ -229,7 +229,7 @@ if RUBY_VERSION < '1.9.0'
   end
 end
 
-context "Symbol#*" do
+describe "Symbol#*" do
   before do
     @ds = Sequel::Dataset.new(nil)
   end
@@ -249,7 +249,7 @@ context "Symbol#*" do
   end
 end
 
-context "Symbol" do
+describe "Symbol" do
   before do
     @ds = Sequel::Dataset.new(nil)
     @ds.quote_identifiers = true
@@ -287,7 +287,7 @@ context "Symbol" do
   end
 end
 
-context "Dataset#literal" do
+describe "Dataset#literal" do
   before do
     @ds = MockDataset.new(nil)
   end
@@ -323,7 +323,7 @@ context "Dataset#literal" do
   end
 end
 
-context "Symbol" do
+describe "Symbol" do
   before do
     @ds = Sequel::Dataset.new(MockDatabase.new)
   end
@@ -390,7 +390,7 @@ context "Symbol" do
   end
 end
 
-context "Sequel::SQL::Function#==" do
+describe "Sequel::SQL::Function#==" do
   specify "should be true for functions with the same name and arguments, false otherwise" do
     a = :date.sql_function(:t)
     b = :date.sql_function(:t)
@@ -407,7 +407,7 @@ context "Sequel::SQL::Function#==" do
   end
 end
 
-context "Sequel::SQL::OrderedExpression" do
+describe "Sequel::SQL::OrderedExpression" do
   specify "should #desc" do
     @oe = :column.asc
     @oe.descending.should == false
@@ -427,7 +427,7 @@ context "Sequel::SQL::OrderedExpression" do
   end
 end
 
-context "Expression" do
+describe "Expression" do
   specify "should consider objects == only if they have the same attributes" do
     :column.qualify(:table).cast(:type).*(:numeric_column).asc.should == :column.qualify(:table).cast(:type).*(:numeric_column).asc
     :other_column.qualify(:table).cast(:type).*(:numeric_column).asc.should_not == :column.qualify(:table).cast(:type).*(:numeric_column).asc

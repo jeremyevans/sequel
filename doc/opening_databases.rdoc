@@ -113,6 +113,18 @@ many things will be broken.  The SQLNCLI10 provider appears to work well if you
 are connecting to Microsoft SQL Server, but it is not the default as that would
 break backwards compatability.
 
+Example connections:
+
+  # SQL Server
+  Sequel.connect('ado:///sequel_test?host=server%5cdb_instance')
+  Sequel.connect('ado://user:password@server/database?host=server%5cdb_instance&provider=SQLNCLI10')
+  # Access 2007
+  Sequel.ado(:conn_string=>'Provider=Microsoft.ACE.OLEDB.12.0;Data Source=drive:\\path\\filename.accdb')
+  # Access 2000
+  Sequel.ado(:conn_string=>'Provider=Microsoft.Jet.OLEDB.4.0;Data Source=drive:\\path\\filename.mdb')
+  # Excel 2000 (for table names, use a dollar after the sheet name, e.g. Sheet1$)
+  Sequel.ado(:conn_string=>'Provider=Microsoft.Jet.OLEDB.4.0;Data Source=drive:\\path\\filename.xls;Extended Properties=Excel 8.0;')
+
 === amalgalite 
 
 Amalgalite is an ruby extension that provides self contained access to SQLite,
@@ -191,8 +203,17 @@ Does not support the :port option.
 
 === informix 
 
-Does not support the :host or :port options.
+Does not support the :host or :port options.  Depending on the configuration of your server
+it may be necessary to either set
+   
+   DB.quote_identifier = false
 
+or set
+
+   export DELIMIDENT=y
+
+in the scripts environment.
+ 
 === jdbc 
 
 Requires: java
@@ -254,6 +275,8 @@ The following additional options are supported:
 * :encoding - Specify the encoding/character set to use for the connection.
 * :socket - Can be used to specify a Unix socket file to connect to instead of a TCP host and port.
 * :timeout - Sets the wait_timeout for the connection, defaults to 1 month.
+* :read_timeout - Set the timeout in seconds for reading back results to a query.
+* :connect_timeout - Set the timeout in seconds before a connection attempt is abandoned.
 
 === odbc 
 
@@ -315,3 +338,31 @@ Examples:
 The following additional options are supported:
 
 * :timeout - the busy timeout to use in milliseconds (default: 5000).
+
+=== swift
+
+swift is a ruby 1.9 only library, so you'll need to be running ruby 1.9.  It
+can connect to SQLite, MySQL, and PostgreSQL, and you must specify which
+database using the db_type option.
+
+Examples:
+
+  swift:///?database=:memory:&db_type=sqlite
+  swift://root:root@localhost/test?db_type=mysql
+  swift://root:root@localhost/test?db_type=postgres
+
+=== tinytds
+
+Because the underscore is not a valid character in a URI schema, the adapter
+is named tinytds instead of tiny_tds.  The connection options are passed directly
+to tiny_tds, except that the tiny_tds :dataserver and :username options are set to
+the Sequel :host and :user options.  The :host option should be an entry in the
+freetds.conf file, it's not currently possible to a host not present in the
+freetds.conf file.  Some options that you may want to set are
+:login_timeout, :timeout, :appname, and :encoding, see the tiny_tds README for details.
+For highest performance, you should disable any identifier output method when
+using the tinytds adapter, which probably means disabling any identifier input method
+as well.  The default for Microsoft SQL Server is to :downcase identifiers on output
+and :upcase them on input, so the highest performance will require changing the setting
+from the default.
+

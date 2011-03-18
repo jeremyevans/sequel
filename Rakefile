@@ -87,14 +87,24 @@ end
 ### Specs
 
 begin
-  require "spec/rake/spectask"
+  begin
+    # RSpec 1
+    require "spec/rake/spectask"
+    spec_class = Spec::Rake::SpecTask
+    spec_files_meth = :spec_files=
+  rescue LoadError
+    # RSpec 2
+    require "rspec/core/rake_task"
+    spec_class = RSpec::Core::RakeTask
+    spec_files_meth = :pattern=
+  end
 
   spec = lambda do |name, files, d|
     lib_dir = File.join(File.dirname(File.expand_path(__FILE__)), 'lib')
     ENV['RUBYLIB'] ? (ENV['RUBYLIB'] += ":#{lib_dir}") : (ENV['RUBYLIB'] = lib_dir)
     desc d
-    Spec::Rake::SpecTask.new(name) do |t|
-      t.spec_files = files
+    spec_class.new(name) do |t|
+      t.send spec_files_meth, files
       t.spec_opts = ENV['SEQUEL_SPEC_OPTS'].split if ENV['SEQUEL_SPEC_OPTS']
     end
   end

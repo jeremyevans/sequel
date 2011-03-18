@@ -30,6 +30,7 @@ module Sequel
     module DatabaseMethods
       AUTO_INCREMENT = 'AUTO_INCREMENT'.freeze
       CAST_TYPES = {String=>:CHAR, Integer=>:SIGNED, Time=>:DATETIME, DateTime=>:DATETIME, Numeric=>:DECIMAL, BigDecimal=>:DECIMAL, File=>:BINARY}
+      COLUMN_DEFINITION_ORDER = [:null, :default, :unique, :primary_key, :auto_increment, :references]
       PRIMARY = 'PRIMARY'.freeze
       
       # MySQL's cast rules are restrictive in that you can't just cast to any possible
@@ -49,7 +50,11 @@ module Sequel
         :mysql
       end
 
-      # Use SHOW INDEX FROM to get the index information for the table.
+      # Use SHOW INDEX FROM to get the index information for the
+      # table.
+      #
+      # By default partial indexes are not included, you can use the
+      # option :partial to override this.
       def indexes(table, opts={})
         indexes = {}
         remove_indexes = []
@@ -59,7 +64,7 @@ module Sequel
           name = r[:Key_name]
           next if name == PRIMARY
           name = m.call(name)
-          remove_indexes << name if r[:Sub_part]
+          remove_indexes << name if r[:Sub_part] && ! opts[:partial]
           i = indexes[name] ||= {:columns=>[], :unique=>r[:Non_unique] != 1}
           i[:columns] << m.call(r[:Column_name])
         end
@@ -162,6 +167,11 @@ module Sequel
         else
           super
         end
+      end
+
+      # The order of the column definition, as an array of symbols.
+      def column_definition_order
+        COLUMN_DEFINITION_ORDER
       end
 
       # MySQL doesn't allow default values on text columns, so ignore if it the
@@ -292,9 +302,10 @@ module Sequel
       BOOL_FALSE = '0'.freeze
       COMMA_SEPARATOR = ', '.freeze
       FOR_SHARE = ' LOCK IN SHARE MODE'.freeze
+      SQL_CALC_FOUND_ROWS = ' SQL_CALC_FOUND_ROWS'.freeze
       DELETE_CLAUSE_METHODS = Dataset.clause_methods(:delete, %w'from where order limit')
       INSERT_CLAUSE_METHODS = Dataset.clause_methods(:insert, %w'ignore into columns values on_duplicate_key_update')
-      SELECT_CLAUSE_METHODS = Dataset.clause_methods(:select, %w'distinct columns from join where group having compounds order limit lock')
+      SELECT_CLAUSE_METHODS = Dataset.clause_methods(:select, %w'distinct calc_found_rows columns from join where group having compounds order limit lock')
       UPDATE_CLAUSE_METHODS = Dataset.clause_methods(:update, %w'table set where order limit')
       
       # MySQL specific syntax for LIKE/REGEXP searches, as well as
@@ -320,6 +331,14 @@ module Sequel
       def distinct(*args)
         args.empty? ? super : group(*args)
       end
+
+      # Sets up the select methods to use SQL_CALC_FOUND_ROWS option.
+      #
+      #   dataset.calc_found_rows.limit(10)
+      #   # SELECT SQL_CALC_FOUND_ROWS * FROM table LIMIT 10
+      def calc_found_rows
+        clone(:calc_found_rows => true)
+      end
       
       # Return a cloned dataset which will use LOCK IN SHARE MODE to lock returned rows.
       def for_share
@@ -343,10 +362,10 @@ module Sequel
       
       # Transforms an CROSS JOIN to an INNER JOIN if the expr is not nil.
       # Raises an error on use of :full_outer type, since MySQL doesn't support it.
-      def join_table(type, table, expr=nil, table_alias={})
+      def join_table(type, table, expr=nil, table_alias={}, &block)
         type = :inner if (type == :cross) && !expr.nil?
         raise(Sequel::Error, "MySQL doesn't support FULL OUTER JOIN") if type == :full_outer
-        super(type, table, expr, table_alias)
+        super(type, table, expr, table_alias, &block)
       end
       
       # Transforms :natural_inner to NATURAL LEFT JOIN and straight to
@@ -544,6 +563,11 @@ module Sequel
       # Support FOR SHARE locking when using the :share lock style.
       def select_lock_sql(sql)
         @opts[:lock] == :share ? (sql << FOR_SHARE) : super
+      end
+
+      # MySQL specific SQL_CALC_FOUND_ROWS option
+      def select_calc_found_rows_sql(sql)
+        sql << SQL_CALC_FOUND_ROWS if opts[:calc_found_rows]
       end
 
       # MySQL supports the ORDER BY and LIMIT clauses for UPDATE statements

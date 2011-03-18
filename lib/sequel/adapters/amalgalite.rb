@@ -36,7 +36,7 @@ module Sequel
       # type doesn't match a known type, just return the value.
       def result_value_of(declared_type, value)
         if value.is_a?(::Amalgalite::Blob)
-          SQL::Blob.new(value.source)
+          SQL::Blob.new(value.to_s)
         elsif value.is_a?(String) && declared_type
           (meth = self.class.sql_to_method(declared_type.downcase)) ? send(meth, value) : value
         else

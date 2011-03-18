@@ -1,6 +1,6 @@
 require File.join(File.dirname(File.expand_path(__FILE__)), "spec_helper")
 
-context "LooserTypecasting Extension" do
+describe "LooserTypecasting Extension" do
   before do
     @db = Sequel::Database.new({})
     def @db.schema(*args)

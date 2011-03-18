@@ -20,6 +20,9 @@ module Sequel
     UNIQUE = ' UNIQUE'.freeze
     UNSIGNED = ' UNSIGNED'.freeze
 
+    # The order of column modifiers to use when defining a column.
+    COLUMN_DEFINITION_ORDER = [:collate, :default, :null, :unique, :primary_key, :auto_increment, :references]
+
     # Adds a column to the specified table. This method expects a column name,
     # a datatype and optionally a hash with additional constraints and options:
     #
@@ -256,21 +259,55 @@ module Sequel
       AUTOINCREMENT
     end
     
+    # The order of the column definition, as an array of symbols.
+    def column_definition_order
+      self.class.const_get(:COLUMN_DEFINITION_ORDER)
+    end
+
     # SQL DDL fragment containing the column creation SQL for the given column.
     def column_definition_sql(column)
       sql = "#{quote_identifier(column[:name])} #{type_literal(column)}"
-      sql << UNIQUE if column[:unique]
+      column_definition_order.each{|m| send(:"column_definition_#{m}_sql", sql, column)}
+      sql
+    end
+
+    # Add auto increment SQL fragment to column creation SQL.
+    def column_definition_auto_increment_sql(sql, column)
+      sql << " #{auto_increment_sql}" if column[:auto_increment]
+    end
+
+    # Add collate SQL fragment to column creation SQL.
+    def column_definition_collate_sql(sql, column)
+      sql << " COLLATE #{column[:collate]}" if column[:collate]
+    end
+
+    # Add default SQL fragment to column creation SQL.
+    def column_definition_default_sql(sql, column)
+      sql << " DEFAULT #{literal(column[:default])}" if column.include?(:default)
+    end
+    
+    # Add null/not null SQL fragment to column creation SQL.
+    def column_definition_null_sql(sql, column)
       null = column.fetch(:null, column[:allow_null])
       sql << NOT_NULL if null == false
       sql << NULL if null == true
-      sql << " DEFAULT #{literal(column[:default])}" if column.include?(:default)
-      sql << PRIMARY_KEY if column[:primary_key]
-      sql << " #{auto_increment_sql}" if column[:auto_increment]
-      sql << column_references_column_constraint_sql(column) if column[:table]
-      sql
     end
     
-    # SQL DDL fragment containing the column creation
+    # Add primary key SQL fragment to column creation SQL.
+    def column_definition_primary_key_sql(sql, column)
+      sql << PRIMARY_KEY if column[:primary_key]
+    end
+    
+    # Add foreign key reference SQL fragment to column creation SQL.
+    def column_definition_references_sql(sql, column)
+      sql << column_references_column_constraint_sql(column) if column[:table]
+    end
+    
+    # Add unique constraint SQL fragment to column creation SQL.
+    def column_definition_unique_sql(sql, column)
+      sql << UNIQUE if column[:unique]
+    end
+    
     # SQL for all given columns, used inside a CREATE TABLE block.
     def column_list_sql(generator)
       (generator.columns.map{|c| column_definition_sql(c)} + generator.constraints.map{|c| constraint_definition_sql(c)}).join(COMMA_SEPARATOR)
@@ -334,7 +371,7 @@ module Sequel
 
     # DDL statement for creating a table with the given name, columns, and options
     def create_table_sql(name, generator, options)
-      "CREATE #{temporary_table_sql if options[:temp]}TABLE #{quote_schema_table(name)} (#{column_list_sql(generator)})"
+      "CREATE #{temporary_table_sql if options[:temp]}TABLE #{options[:temp] ? quote_identifier(name) : quote_schema_table(name)} (#{column_list_sql(generator)})"
     end
 
     # Default index name for the table and columns, may be too long

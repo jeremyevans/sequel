@@ -181,9 +181,9 @@ module Sequel
         :bit
       end
       
-      # MSSQL uses image type for blobs
+      # MSSQL uses varbinary(max) type for blobs
       def type_literal_generic_file(column)
-        :image
+        :'varbinary(max)'
       end
 
       # support for clustered index type
@@ -264,6 +264,14 @@ module Sequel
       # Specify a table for a SELECT ... INTO query.
       def into(table)
         clone(:into => table)
+      end
+
+      # SQL Server does not support CTEs on subqueries, so move any CTEs
+      # on joined datasets to the top level. The user is responsible for
+      # resolving any name clashes this may cause.
+      def join_table(type, table, expr=nil, table_alias={}, &block)
+        return super unless Dataset === table && table.opts[:with]
+        clone(:with => (opts[:with] || []) + table.opts[:with]).join_table(type, table.clone(:with => nil), expr, table_alias, &block)
       end
 
       # MSSQL uses a UNION ALL statement to insert multiple values at once.

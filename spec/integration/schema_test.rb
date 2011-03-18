@@ -9,10 +9,10 @@ describe "Database schema parser" do
     clear_sqls
   end
   after do
-    INTEGRATION_DB.drop_table(:items) if INTEGRATION_DB.table_exists?(:items)
     INTEGRATION_DB.identifier_output_method = @iom
     INTEGRATION_DB.identifier_input_method = @iim
     INTEGRATION_DB.default_schema = @defsch
+    INTEGRATION_DB.drop_table(:items) if INTEGRATION_DB.table_exists?(:items)
   end
 
   specify "should handle a database with a identifier_output_method" do
@@ -191,6 +191,13 @@ describe "Database schema modifiers" do
     @db.schema(:items, :reload=>true).map{|x| x.first}.should == [:number]
     @ds.insert([10])
     @ds.columns!.should == [:number]
+  end
+
+  specify "should handle combination of default, unique, and not null" do
+    @db.create_table!(:items){Integer :number, :default=>0, :null=>false, :unique=>true}
+    @db.table_exists?(:items).should == true
+    @db.schema(:items, :reload=>true).map{|x| x.last}.first.values_at(:ruby_default, :allow_null).should == [0, false]
+    @ds.insert([10])
   end
 
   specify "should handle foreign keys correctly when creating tables" do

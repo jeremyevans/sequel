@@ -101,9 +101,9 @@ module Sequel
         "DROP SEQUENCE #{quote_identifier(name)}"
       end
     end
-    
+
     module DatasetMethods
-      SELECT_CLAUSE_METHODS = Dataset.clause_methods(:select, %w'with distinct columns from join where group having compounds order limit')
+      SELECT_CLAUSE_METHODS = Dataset.clause_methods(:select, %w'with distinct columns from join where group having compounds order limit lock')
 
       # Oracle uses MINUS instead of EXCEPT, and doesn't support EXCEPT ALL
       def except(dataset, opts={})

@@ -51,7 +51,7 @@ module Sequel
               yield h2
             end
           ensure
-            cursor.drop
+            cursor.respond_to?(:free) ? cursor.free : cursor.drop
           end
         end
         self

@@ -1,6 +1,72 @@
 === HEAD
 
-* Close prepared statements when disconnect when using SQLite (jeremyevans)
+* In the ADO adapter, assume access to SQL Server if a :conn_string option is given that doesn't indicate Access/Jet (damir.si) (#332)
+
+* Use the correct class when loading instances for descendents of model classes that use single table inheritance (jeremyevans)
+
+* Support for COLLATE in column definitions (jfirebaugh)
+
+* Don't use a schema when creating a temporary table (jeremyevans)
+
+* Make migrator work correctly when a default_schema is set (jeremyevans) (#331)
+
+=== 3.21.0 (2011-03-01)
+
+* Make symbol splitting (:table__column___alias) work correctly for identifiers that are not in the \w character class (authorNari)
+
+* Enable row locks in Oracle (authorNari)
+
+* Prefer cover? over include? for validates_includes/validates_inclusion_of (jeremyevans)
+
+* Make using NULL/NOT NULL, DEFAULT, and UNIQUE column options work correctly on H2 and possibly Oracle (jeremyevans)
+
+* Make bin/sequel accept file arguments and work correctly when $stdin is not a tty (jeremyevans)
+
+* Add support for -I and -r options to bin/sequel (jeremyevans)
+
+* Sequel::Model.plugin can now be overridden just like the other Model methods (jeremyevans)
+
+* Add tinytds adapter, the best way to connect to MSSQL from a C based ruby running on *nix (jeremyevans)
+
+* Recognize bigint unsigned as a Bignum type in the schema dumper (gamespy-tech) (#327)
+
+* Add Dataset#calc_found_rows for MySQL datasets (macks)
+
+* Add association_autoreloading plugin for clearing association cache when foreign key value changes (jfirebaugh, jeremyevans)
+
+* Fix join_table on MySQL ignoring the block (jfirebaugh)
+
+* Transfer CTE WITH clauses in subselect to main query when joining on MSSQL (jfirebaugh)
+
+* Make specs support both RSpec 1 and RSpec 2 (jeremyevans)
+
+* Work with ruby-informix versions >= 0.7.3 in the informix adapter (jeremyevans) (#326)
+
+=== 3.20.0 (2011-02-01)
+
+* Allow a :partial option to Database#indexes on MySQL to include partial indexes (roland.swingler) (#324)
+
+* Add a SQLite subadapter to the swift adapter, now that swift supports it (jeremyevans)
+
+* Update swift adapter to support swift 0.8.1, older versions no longer supported (jeremyevans)
+
+* Allow setting arbitrary JDBC properties in the jdbc adapter with the :jdbc_properties option (jeremyevans)
+
+* Use a better error message if a validates_max_length validation is applied to a nil value (jeremyevans) (#322)
+
+* Add some basic Microsoft Access support to the ado adapter, autoincrementing primary keys now work (jeremyevans)
+
+* Make class_table_inheritance plugin handle subclass associations better (jeremyevans) (#320)
+
+=== 3.19.0 (2011-01-03)
+
+* Handle Date and DateTime types in prepared statements when using the jdbc adapter (jeremyevans)
+
+* Handle Date, DateTime, Time, SQL::Blob, true, and false in prepared statements when using the SQLite adapter (jeremyevans)
+
+* Use varbinary(max) instead of image for the generic blob type on MSSQL (jeremyevans)
+
+* Close prepared statements when disconnecting when using SQLite (jeremyevans)
 
 * Allow reflecting on validations in the validation_class_methods plugin (jeremyevans)
 
