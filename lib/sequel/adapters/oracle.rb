@@ -24,6 +24,18 @@ module Sequel
         conn = OCI8.new(opts[:user], opts[:password], dbname, opts[:privilege])
         conn.autocommit = true
         conn.non_blocking = true
+        
+        # The ruby-oci8 gem which retrieves oracle columns with a type of
+        # DATE, TIMESTAMP, TIMESTAMP WITH TIME ZONE is complex based on the
+        # ruby version (1.9.2 or later) and Oracle version (9 or later)
+        # In the now standard case of 1.9.2 and Oracle 9 or later, the timezone
+        # is determined by the Oracle session timezone. Thus if the user
+        # requests Sequel provide UTC timezone to the application,
+        # we need to alter the session timezone to be UTC
+        if Sequel.application_timezone == :utc
+          conn.exec("ALTER SESSION SET TIME_ZONE='-00:00'")
+        end
+        
         conn
       end
       
