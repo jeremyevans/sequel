@@ -1,5 +1,7 @@
 === HEAD
 
+* Fix ODBC::Time instance handling in the odbc adapter (jeremyevans)
+
 * Use Sequel.application_timezone when connecting in the oracle adapter to set the connection's session's timezone (jmthomas)
 
 * In the ADO adapter, assume access to SQL Server if a :conn_string option is given that doesn't indicate Access/Jet (damir.si) (#332)
