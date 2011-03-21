@@ -2087,26 +2087,26 @@ describe "Dataset#join_table" do
 
   specify "should support using a block that receieves the join table/alias, last join table/alias, and array of previous joins" do
     @d.join(:categories) do |join_alias, last_join_alias, joins| 
-      join_alias.should == :categories
-      last_join_alias.should == :items
+      join_alias.should == :categories.identifier
+      last_join_alias.should == :items.identifier
       joins.should == []
     end
 
     @d.from(:items=>:i).join(:categories, nil, :c) do |join_alias, last_join_alias, joins| 
-      join_alias.should == :c
-      last_join_alias.should == :i
+      join_alias.should == :c.identifier
+      last_join_alias.should == :i.identifier
       joins.should == []
     end
 
     @d.from(:items___i).join(:categories, nil, :c) do |join_alias, last_join_alias, joins| 
-      join_alias.should == :c
-      last_join_alias.should == :i
+      join_alias.should == :c.identifier
+      last_join_alias.should == :i.identifier
       joins.should == []
     end
 
     @d.join(:blah).join(:categories, nil, :c) do |join_alias, last_join_alias, joins| 
-      join_alias.should == :c
-      last_join_alias.should == :blah
+      join_alias.should == :c.identifier
+      last_join_alias.should == :blah.identifier
       joins.should be_a_kind_of(Array)
       joins.length.should == 1
       joins.first.should be_a_kind_of(Sequel::SQL::JoinClause)
@@ -2114,8 +2114,8 @@ describe "Dataset#join_table" do
     end
 
     @d.join_table(:natural, :blah, nil, :b).join(:categories, nil, :c) do |join_alias, last_join_alias, joins| 
-      join_alias.should == :c
-      last_join_alias.should == :b
+      join_alias.should == :c.identifier
+      last_join_alias.should == :b.identifier
       joins.should be_a_kind_of(Array)
       joins.length.should == 1
       joins.first.should be_a_kind_of(Sequel::SQL::JoinClause)
@@ -2123,8 +2123,8 @@ describe "Dataset#join_table" do
     end
 
     @d.join(:blah).join(:categories).join(:blah2) do |join_alias, last_join_alias, joins| 
-      join_alias.should == :blah2
-      last_join_alias.should == :categories
+      join_alias.should == :blah2.identifier
+      last_join_alias.should == :categories.identifier
       joins.should be_a_kind_of(Array)
       joins.length.should == 2
       joins.first.should be_a_kind_of(Sequel::SQL::JoinClause)
@@ -2146,6 +2146,13 @@ describe "Dataset#join_table" do
       'SELECT * FROM "items" INNER JOIN "categories" ON (("categories"."a" = "items"."d") AND ("categories"."b" = "items"."c"))'
     @d.join(:categories, :a=>:d){|j,lj,js| :b.qualify(j) > :c.qualify(lj)}.sql.should ==
       'SELECT * FROM "items" INNER JOIN "categories" ON (("categories"."a" = "items"."d") AND ("categories"."b" > "items"."c"))'
+  end
+
+  specify "should allow compact join table qualifications" do
+    @d.join(:categories){|j,lj,js| {j[:b] => lj[:c]}}.sql.should ==
+      'SELECT * FROM "items" INNER JOIN "categories" ON ("categories"."b" = "items"."c")'
+    @d.join(:categories){|j,lj,js| j[:b] > lj[:c]} ==
+      'SELECT * FROM "items" INNER JOIN "categories" ON ("categories"."b" > "items"."c")'
   end
 
   specify "should prefer explicit aliases over implicit" do

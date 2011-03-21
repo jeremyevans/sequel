@@ -433,7 +433,7 @@ module Sequel
           end
         end
         if block
-          expr2 = yield(table_name, last_alias, @opts[:join] || [])
+          expr2 = yield(table_name.identifier, last_alias.identifier, @opts[:join] || [])
           expr = expr ? SQL::BooleanExpression.new(:AND, expr, expr2) : expr2
         end
         SQL::JoinOnClause.new(expr, type, table, table_alias)

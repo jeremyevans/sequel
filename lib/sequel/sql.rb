@@ -453,6 +453,15 @@ module Sequel
       def qualify(qualifier)
         QualifiedIdentifier.new(qualifier, self)
       end
+
+      # Qualify given +column+ with self
+      #
+      #   :table.qualified(:column) # "table"."column"
+      #   :schema.qualified(:table) # "schema"."table"
+      #   :schema.qualified(:table).qualified(:column) # "schema"."table"."column"
+      def qualified(column)
+        column.qualify(self)
+      end
     end
 
     # This module includes the +like+ and +ilike+ methods used for pattern matching that are defined on objects that can be 
@@ -748,6 +757,16 @@ module Sequel
         @value = value
       end
       
+      # Shortcut to +qualified+
+      def [](column)
+        qualified(column)
+      end
+
+      # Mimic Symbol#identifier
+      def identifier
+        self
+      end
+      
       to_s_method :quote_identifier, '@value'
     end
     
@@ -889,6 +908,16 @@ module Sequel
       # Set the table and column to the given arguments
       def initialize(table, column)
         @table, @column = table, column
+      end
+
+      # Shortcut to +qualified+
+      def [](v)
+        qualified(v)
+      end
+      
+      # Mimic Symbol#identifier
+      def identifier
+        self
       end
       
       to_s_method :qualified_identifier_sql

@@ -264,12 +264,29 @@ describe "Symbol" do
     @ds.literal(:xyz.qualify(:abc)).should == '"ABC"."XYZ"'
   end
 
+  specify "#qualified should format a qualified table.column" do
+    @ds.literal(:abc.qualified(:xyz)).should == '"ABC"."XYZ"'
+  end
+
   specify "#qualify should work on QualifiedIdentifiers" do
     @ds.literal(:xyz.qualify(:abc).qualify(:def)).should == '"DEF"."ABC"."XYZ"'
   end
 
+  specify "#qualified should work on QualifiedIdentifiers" do
+    @ds.literal(:def.qualified(:abc).qualified(:xyz)).should == '"DEF"."ABC"."XYZ"'
+  end
+
   specify "should be able to qualify an identifier" do
     @ds.literal(:xyz.identifier.qualify(:xyz__abc)).should == '"XYZ"."ABC"."XYZ"'
+  end
+
+  specify "#qualified should work on identifier" do
+    @ds.literal(:xyz.identifier.qualified(:abc)).should == '"XYZ"."ABC"'
+  end
+
+  specify "#[] should work as shortcut for #qualified on Identifier and QualifiedIdentifier" do
+    @ds.literal(:xyz.identifier[:abc]).should == '"XYZ"."ABC"'
+    @ds.literal(:xyz.identifier[:abc][:xyz]).should == '"XYZ"."ABC"."XYZ"'
   end
 
   specify "should be able to specify a schema.table.column" do
