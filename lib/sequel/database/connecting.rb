@@ -54,7 +54,7 @@ module Sequel
           c = adapter_class(scheme)
           uri_options = c.send(:uri_to_options, uri)
           uri.query.split('&').collect{|s| s.split('=')}.each{|k,v| uri_options[k.to_sym] = v if k && !k.empty?} unless uri.query.to_s.strip.empty?
-          uri_options.entries.each{|k,v| uri_options[k] = URI.unescape(v) if v.is_a?(String)}
+          uri_options.to_a.each{|k,v| uri_options[k] = URI.unescape(v) if v.is_a?(String)}
           opts = uri_options.merge(opts)
           opts[:adapter] = scheme
         end
