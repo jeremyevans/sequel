@@ -1,3 +1,4 @@
+# encoding: utf-8
 require File.join(File.dirname(File.expand_path(__FILE__)), 'spec_helper.rb')
 
 require ENV['SEQUEL_MSSQL_SPEC_REQUIRE'] if ENV['SEQUEL_MSSQL_SPEC_REQUIRE']
@@ -446,5 +447,32 @@ describe "MSSQL::Database#create_table" do
     MSSQL_DB.create_table!(:items){ String :name, :size => 128, :collate => :sql_latin1_general_cp1_ci_as, :default => 'foo', :null => false, :unique => true}
     MSSQL_DB[:items].insert
     MSSQL_DB[:items].select_map(:name).should == ["foo"]
+  end
+end
+
+describe "MSSQL::Database#mssql_unicode_strings = false" do
+  before do
+    MSSQL_DB.mssql_unicode_strings = false
+  end
+  after do
+    MSSQL_DB.drop_table(:items)
+    MSSQL_DB.mssql_unicode_strings = true
+  end
+
+  specify "should work correctly" do
+    MSSQL_DB.create_table!(:items){String :name}
+    MSSQL_DB[:items].mssql_unicode_strings.should == false
+    MSSQL_DB[:items].insert(:name=>'foo')
+    MSSQL_DB[:items].select_map(:name).should == ['foo']
+  end
+
+  specify "should be overridable at the dataset level" do
+    MSSQL_DB.create_table!(:items){String :name}
+    ds = MSSQL_DB[:items]
+    ds.mssql_unicode_strings.should == false
+    ds.mssql_unicode_strings = true
+    ds.mssql_unicode_strings.should == true
+    ds.insert(:name=>'foo')
+    ds.select_map(:name).should == ['foo']
   end
 end

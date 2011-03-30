@@ -11,6 +11,12 @@ module Sequel
       SQL_ROLLBACK_TO_SAVEPOINT = 'IF @@TRANCOUNT > 0 ROLLBACK TRANSACTION autopoint_%d'.freeze
       SQL_SAVEPOINT = 'SAVE TRANSACTION autopoint_%d'.freeze
       
+      # Whether to use N'' to quote strings, which allows unicode characters inside the
+      # strings.  True by default for compatibility, can be set to false for a possible
+      # performance increase.  This sets the default for all datasets created from this
+      # Database object.
+      attr_accessor :mssql_unicode_strings
+
       # The types to check for 0 scale to transform :decimal types
       # to :integer.
       DECIMAL_TYPE_RE = /number|numeric|decimal/io
@@ -163,6 +169,11 @@ module Sequel
           [m.call(row.delete(:column)), row]
         end
       end
+
+      # Set the mssql_unicode_strings settings from the given options.
+      def set_mssql_unicode_strings
+        @mssql_unicode_strings = typecast_value_boolean(@opts.fetch(:mssql_unicode_strings, true))
+      end
       
       # MSSQL has both datetime and timestamp classes, most people are going
       # to want datetime
@@ -210,6 +221,15 @@ module Sequel
       UPDLOCK = ' WITH (UPDLOCK)'.freeze
       WILDCARD = LiteralString.new('*').freeze
       CONSTANT_MAP = {:CURRENT_DATE=>'CAST(CURRENT_TIMESTAMP AS DATE)'.freeze, :CURRENT_TIME=>'CAST(CURRENT_TIMESTAMP AS TIME)'.freeze}
+
+      # Allow overriding of the mssql_unicode_strings option at the dataset level.
+      attr_accessor :mssql_unicode_strings
+
+      # Copy the mssql_unicode_strings option from the +db+ object.
+      def initialize(db, opts={})
+        super
+        @mssql_unicode_strings = db.mssql_unicode_strings
+      end
 
       # MSSQL uses + for string concatenation, and LIKE is case insensitive by default.
       def complex_expression_sql(op, args)
@@ -444,9 +464,7 @@ module Sequel
       # Optionally use unicode string syntax for all strings. Don't double
       # backslashes.
       def literal_string(v)
-        str = "'#{v.gsub(/'/, "''")}'"
-        str = "N#{str}" unless @mssql_unicode_strings == false
-        str
+        "#{'N' if mssql_unicode_strings}'#{v.gsub(/'/, "''")}'"
       end
       
       # Use 0 for false on MSSQL

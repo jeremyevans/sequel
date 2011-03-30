@@ -55,11 +55,13 @@ module Sequel
       :sqlserver=>proc do |db|
         Sequel.ts_require 'adapters/jdbc/mssql'
         db.extend(Sequel::JDBC::MSSQL::DatabaseMethods)
+        db.send(:set_mssql_unicode_strings)
         com.microsoft.sqlserver.jdbc.SQLServerDriver
       end,
       :jtds=>proc do |db|
         Sequel.ts_require 'adapters/jdbc/mssql'
         db.extend(Sequel::JDBC::MSSQL::DatabaseMethods)
+        db.send(:set_mssql_unicode_strings)
         JDBC.load_gem('jtds')
         Java::net.sourceforge.jtds.jdbc.Driver
       end,
@@ -102,11 +104,6 @@ module Sequel
       # fetching rows.
       attr_accessor :convert_types
 
-      # Whether all strings should be prefixed with "N" to imply treat as
-      # unicode strings. True by default, can be set to false to greatly
-      # increase performance depending on your database configuration.
-      attr_accessor :mssql_unicode_strings
-      
       # Call the DATABASE_SETUP proc directly after initialization,
       # so the object always uses sub adapter specific code.  Also,
       # raise an error immediately if the connection doesn't have a
@@ -114,7 +111,6 @@ module Sequel
       def initialize(opts)
         super
         @convert_types = typecast_value_boolean(@opts.fetch(:convert_types, true))
-        @mssql_unicode_strings = typecast_value_boolean(@opts.fetch(:mssql_unicode_strings, true))
         raise(Error, "No connection string specified") unless uri
         
         resolved_uri = jndi? ? get_uri_from_jndi : uri
@@ -537,16 +533,9 @@ module Sequel
       # double performance when fetching rows.
       attr_accessor :convert_types
 
-      # Whether all strings should be prefixed with "N" to imply treat as
-      # unicode strings. True by default, can be set to false to greatly
-      # increase performance depending on your database configuration.
-      attr_accessor :mssql_unicode_strings
-      
-      # Use the convert_types default setting from the database
-      # Use the mssql_unicode_strings default setting from the database
+      # Use the convert_types default setting from the database.
       def initialize(db, opts={})
         @convert_types = db.convert_types
-        @mssql_unicode_strings = db.mssql_unicode_strings
         super
       end
       

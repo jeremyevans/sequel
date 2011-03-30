@@ -1,5 +1,7 @@
 === HEAD
 
+* Add Dataset/Database#mssql_unicode_strings accessor when connecting to MSSQL to control string literalization (semmons99, jeremyevans)
+
 * Fix ODBC::Time instance handling in the odbc adapter (jeremyevans)
 
 * Use Sequel.application_timezone when connecting in the oracle adapter to set the connection's session's timezone (jmthomas)

@@ -6,11 +6,6 @@ module Sequel
     class Database < Sequel::Database
       set_adapter_scheme :ado
 
-      # Whether all strings should be prefixed with "N" to imply treat as
-      # unicode strings. True by default, can be set to false to greatly
-      # increase performance depending on your database configuration.
-      attr_accessor :mssql_unicode_strings
-
       def initialize(opts)
         super
         case @opts[:conn_string]
@@ -23,9 +18,9 @@ module Sequel
           when 'SQL Server'
             Sequel.ts_require 'adapters/ado/mssql'
             extend Sequel::ADO::MSSQL::DatabaseMethods
+            set_mssql_unicode_strings
           end
         end
-        @mssql_unicode_strings = typecast_value_boolean(@opts.fetch(:mssql_unicode_strings, true))
       end
 
       # In addition to the usual database options,
@@ -98,17 +93,6 @@ module Sequel
     end
     
     class Dataset < Sequel::Dataset
-      # Whether all strings should be prefixed with "N" to imply treat as
-      # unicode strings. True by default, can be set to false to greatly
-      # increase performance depending on your database configuration.
-      attr_accessor :mssql_unicode_strings
-
-      # Use the mssql_unicode_strings default setting from the database
-      def initialize(db, opts={})
-        @mssql_unicode_strings = db.mssql_unicode_strings
-        super
-      end
-
       def fetch_rows(sql)
         execute(sql) do |s|
           @columns = cols = s.Fields.extend(Enumerable).map{|column| output_identifier(column.Name)}

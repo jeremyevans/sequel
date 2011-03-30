@@ -13,6 +13,7 @@ module Sequel
         opts = server_opts(server)
         opts[:dataserver] = opts[:host]
         opts[:username] = opts[:user]
+        set_mssql_unicode_strings
         TinyTds::Client.new(opts)
       end
       
@@ -118,7 +119,7 @@ module Sequel
       
       # Properly escape the given string +v+.
       def literal_string(v)
-        db.synchronize{|c| "N'#{c.escape(v)}'"}
+        s = db.synchronize{|c| "#{'N' if mssql_unicode_strings}'#{c.escape(v)}'"}
       end
     end
   end
