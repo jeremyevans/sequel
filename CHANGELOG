@@ -1,5 +1,7 @@
 === HEAD
 
+* Add disconnect detection to tinytds adapter, though correct behavior may require an update to tiny_tds (cult_hero)
+
 * Add Dataset/Database#mssql_unicode_strings accessor when connecting to MSSQL to control string literalization (semmons99, jeremyevans)
 
 * Fix ODBC::Time instance handling in the odbc adapter (jeremyevans)
