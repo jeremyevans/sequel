@@ -9,6 +9,11 @@ module Sequel
       DRV_NAME_GUARDS = '{%s}'.freeze
       DISCONNECT_ERRORS = /\A08S01/.freeze 
 
+      # Whether all strings should be prefixed with "N" to imply treat as
+      # unicode strings. True by default, can be set to false to greatly
+      # increase performance depending on your database configuration.
+      attr_accessor :mssql_unicode_strings
+
       def initialize(opts)
         super
         case @opts[:db_type]
@@ -19,6 +24,7 @@ module Sequel
           Sequel.ts_require 'adapters/shared/progress'
           extend Sequel::Progress::DatabaseMethods
         end
+        @mssql_unicode_strings = typecast_value_boolean(@opts.fetch(:mssql_unicode_strings, true))
       end
 
       def connect(server)
@@ -86,6 +92,17 @@ module Sequel
       BOOL_FALSE = '0'.freeze
       ODBC_DATE_FORMAT = "{d '%Y-%m-%d'}".freeze
       TIMESTAMP_FORMAT="{ts '%Y-%m-%d %H:%M:%S'}".freeze
+
+      # Whether all strings should be prefixed with "N" to imply treat as
+      # unicode strings. True by default, can be set to false to greatly
+      # increase performance depending on your database configuration.
+      attr_accessor :mssql_unicode_strings
+
+      # Use the mssql_unicode_strings default setting from the database
+      def initialize(db, opts={})
+        @mssql_unicode_strings = db.mssql_unicode_strings
+        super
+      end
 
       def fetch_rows(sql)
         execute(sql) do |s|

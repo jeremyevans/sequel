@@ -14,7 +14,7 @@ module Sequel
       # The types to check for 0 scale to transform :decimal types
       # to :integer.
       DECIMAL_TYPE_RE = /number|numeric|decimal/io
-      
+
       # Microsoft SQL Server uses the :mssql type.
       def database_type
         :mssql
@@ -441,9 +441,12 @@ module Sequel
         blob
       end
       
-      # Use unicode string syntax for all strings. Don't double backslashes.
+      # Optionally use unicode string syntax for all strings. Don't double
+      # backslashes.
       def literal_string(v)
-        "N'#{v.gsub(/'/, "''")}'"
+        str = "'#{v.gsub(/'/, "''")}'"
+        str = "N#{str}" unless @mssql_unicode_strings == false
+        str
       end
       
       # Use 0 for false on MSSQL
