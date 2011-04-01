@@ -39,7 +39,7 @@ module Sequel
             end
             yield(r) if block_given?
           rescue TinyTds::Error => e
-            raise_error(e, :disconnect=>c.closed?)
+            raise_error(e, :disconnect=>(c.closed? || (c.respond_to?(:dead?) && c.dead?)))
           ensure
            r.cancel if r && c.sqlsent?
           end
