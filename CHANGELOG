@@ -1,3 +1,7 @@
+=== HEAD
+
+* Add serialization_modification_detection plugin for detecting changes in serialized columns (jeremyevans) (#333)
+
 === 3.22.0 (2011-04-01)
 
 * Add disconnect detection to tinytds adapter, though correct behavior may require an update to tiny_tds (cult_hero)
