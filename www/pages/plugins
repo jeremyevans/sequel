@@ -28,6 +28,7 @@
 <li><a href="rdoc-plugins/classes/Sequel/Plugins/RcteTree.html">rcte_tree</a>: Supports retrieving all ancestors and descendants for tree structured data using recursive common table expressions.</li>
 <li><a href="rdoc-plugins/classes/Sequel/Plugins/Schema.html">schema</a>: Adds backwards compatibility for Model.set_schema and Model.create_table.</li>
 <li><a href="rdoc-plugins/classes/Sequel/Plugins/Serialization.html">serialization</a>: Supports serializing column values and storing them as either marshal, yaml, or json in the database.</li>
+<li><a href="rdoc-plugins/classes/Sequel/Plugins/SerializationModificationDetection.html">serialization_modification_detection</a>: Allows you to detect changes to serialized columns.</li>
 <li><a href="rdoc-plugins/classes/Sequel/Plugins/Sharding.html">sharding</a>: Allows model objects work well with Sequel's sharding support.</li>
 <li><a href="rdoc-plugins/classes/Sequel/Plugins/SingleTableInheritance.html">single_table_inheritance</a>: Supports inheritance in the database by using a single table for all classes in a class hierarchy.</li>
 <li><a href="rdoc-plugins/classes/Sequel/Plugins/SkipCreateRefresh.html">skip_create_refresh</a>: Allows you to skip the refresh when saving new model objects.</li>
