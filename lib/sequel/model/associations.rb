@@ -818,7 +818,7 @@ module Sequel
           opts[:eager_grapher] ||= proc do |eo|
             ds = eo[:self]
             ds = ds.graph(join_table, use_jt_only_conditions ? jt_only_conditions : lcks.zip(lcpks) + graph_jt_conds, :select=>false, :table_alias=>ds.unused_table_alias(join_table), :join_type=>jt_join_type, :implicit_qualifier=>eo[:implicit_qualifier], :from_self_alias=>ds.opts[:eager_graph][:master], &jt_graph_block)
-            ds.graph(opts.associated_class, use_only_conditions ? only_conditions : opts.right_primary_keys.zip(rcks) + conditions, :select=>select, :table_alias=>eo[:table_alias], :join_type=>join_type, :eager_block=>eo[:eager_block], &graph_block)
+            ds.graph(eager_graph_dataset(opts, eo), use_only_conditions ? only_conditions : opts.right_primary_keys.zip(rcks) + conditions, :select=>select, :table_alias=>eo[:table_alias], :join_type=>join_type, &graph_block)
           end
       
           def_association_dataset_methods(opts)
@@ -884,7 +884,7 @@ module Sequel
           graph_block = opts[:graph_block]
           opts[:eager_grapher] ||= proc do |eo|
             ds = eo[:self]
-            ds.graph(opts.associated_class, use_only_conditions ? only_conditions : opts.primary_keys.zip(cks) + conditions, eo.merge(:select=>select, :join_type=>join_type, :from_self_alias=>ds.opts[:eager_graph][:master]), &graph_block)
+            ds.graph(eager_graph_dataset(opts, eo), use_only_conditions ? only_conditions : opts.primary_keys.zip(cks) + conditions, eo.merge(:select=>select, :join_type=>join_type, :from_self_alias=>ds.opts[:eager_graph][:master]), &graph_block)
           end
       
           def_association_dataset_methods(opts)
@@ -945,7 +945,7 @@ module Sequel
           graph_block = opts[:graph_block]
           opts[:eager_grapher] ||= proc do |eo|
             ds = eo[:self]
-            ds = ds.graph(opts.associated_class, use_only_conditions ? only_conditions : cks.zip(cpks) + conditions, eo.merge(:select=>select, :join_type=>join_type, :from_self_alias=>ds.opts[:eager_graph][:master]), &graph_block)
+            ds = ds.graph(eager_graph_dataset(opts, eo), use_only_conditions ? only_conditions : cks.zip(cpks) + conditions, eo.merge(:select=>select, :join_type=>join_type, :from_self_alias=>ds.opts[:eager_graph][:master]), &graph_block)
             # We only load reciprocals for one_to_many associations, as other reciprocals don't make sense
             ds.opts[:eager_graph][:reciprocals][eo[:table_alias]] = opts.reciprocal
             ds
@@ -1000,6 +1000,15 @@ module Sequel
         def def_remove_methods(opts)
           association_module_def(opts.remove_method, opts){|o,*args| remove_associated_object(opts, o, *args)}
           association_module_def(opts.remove_all_method, opts){|*args| remove_all_associated_objects(opts, *args)}
+        end
+
+        # Return dataset to graph into given the association reflection, applying the :callback option if set.
+        def eager_graph_dataset(opts, eager_options)
+          ds = opts.associated_class.dataset
+          if cb = eager_options[:callback]
+            ds = cb.call(ds)
+          end
+          ds
         end
       end
 
@@ -1395,11 +1404,11 @@ module Sequel
           assoc_table_alias = ds.unused_table_alias(assoc_name)
           loader = r[:eager_grapher]
           if !associations.empty? && associations.first.respond_to?(:call)
-            eager_block = associations.first
+            callback = associations.first
             associations = {}
           end
           ds = if loader.arity == 1
-            loader.call(:self=>ds, :table_alias=>assoc_table_alias, :implicit_qualifier=>ta, :eager_block=>eager_block)
+            loader.call(:self=>ds, :table_alias=>assoc_table_alias, :implicit_qualifier=>ta, :callback=>callback)
           else
             loader.call(ds, assoc_table_alias, ta)
           end

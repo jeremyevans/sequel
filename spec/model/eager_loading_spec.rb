@@ -744,6 +744,11 @@ describe Sequel::Model, "#eager_graph" do
         c.instance_variable_set(:@columns, (@columns.dup if @columns))
         c
       end
+      def select_columns(*a)
+        ds = select(*a)
+        ds.instance_variable_set(:@columns, a)
+        ds
+      end
     end
 
     class ::GraphAlbum < Sequel::Model(:albums)
@@ -1480,7 +1485,7 @@ describe Sequel::Model, "#eager_graph" do
   end
 
   it "should eagerly load a many_to_one association with custom eager block" do
-    ds = GraphAlbum.eager_graph(:band => proc {|ds| ds.select(:id)})
+    ds = GraphAlbum.eager_graph(:band => proc {|ds| ds.select_columns(:id)})
     ds.sql.should == 'SELECT albums.id, albums.band_id, band.id AS band_id_0 FROM albums LEFT OUTER JOIN (SELECT id FROM bands) AS band ON (band.id = albums.band_id)'
     def ds.fetch_rows(sql, &block)
       yield({:id=>1, :band_id=>2, :band_id_0=>2})
@@ -1497,7 +1502,7 @@ describe Sequel::Model, "#eager_graph" do
 
   it "should eagerly load a one_to_one association with custom eager block" do
     GraphAlbum.one_to_one :track, :class=>'GraphTrack', :key=>:album_id
-    ds = GraphAlbum.eager_graph(:track => proc {|ds| ds.select(:album_id)})
+    ds = GraphAlbum.eager_graph(:track => proc {|ds| ds.select_columns(:album_id)})
     ds.sql.should == 'SELECT albums.id, albums.band_id, track.album_id FROM albums LEFT OUTER JOIN (SELECT album_id FROM tracks) AS track ON (track.album_id = albums.id)'
     def ds.fetch_rows(sql, &block)
       yield({:id=>1, :band_id=>2, :album_id=>1})
@@ -1508,7 +1513,7 @@ describe Sequel::Model, "#eager_graph" do
   end
 
   it "should eagerly load a one_to_many association with custom eager block" do
-    ds = GraphAlbum.eager_graph(:tracks => proc {|ds| ds.select(:album_id)})
+    ds = GraphAlbum.eager_graph(:tracks => proc {|ds| ds.select_columns(:album_id)})
     ds.sql.should == 'SELECT albums.id, albums.band_id, tracks.album_id FROM albums LEFT OUTER JOIN (SELECT album_id FROM tracks) AS tracks ON (tracks.album_id = albums.id)'
     def ds.fetch_rows(sql, &block)
       yield({:id=>1, :band_id=>2, :album_id=>1})
@@ -1526,7 +1531,7 @@ describe Sequel::Model, "#eager_graph" do
   end
 
   it "should eagerly load a many_to_many association with custom eager block" do
-    ds = GraphAlbum.eager_graph(:genres => proc {|ds| ds.select(:id)})
+    ds = GraphAlbum.eager_graph(:genres => proc {|ds| ds.select_columns(:id)})
     ds.sql.should == 'SELECT albums.id, albums.band_id, genres.id AS genres_id FROM albums LEFT OUTER JOIN ag ON (ag.album_id = albums.id) LEFT OUTER JOIN (SELECT id FROM genres) AS genres ON (genres.id = ag.genre_id)'
     def ds.fetch_rows(sql, &block)
       yield({:id=>1, :band_id=>2, :genres_id=>4})
