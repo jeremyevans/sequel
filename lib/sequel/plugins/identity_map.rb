@@ -111,9 +111,7 @@ module Sequel
       end
 
       def self.apply(base)
-        unless Sequel::Model.kind_of?(CommonModelMethods)
-          Sequel::Model.send(:include, CommonModelMethods)
-        end
+        Sequel::Model.send(:include, CommonModelMethods)
       end
 
       module CommonModelMethods
