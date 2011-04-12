@@ -759,9 +759,20 @@ module Sequel
           def_association_method(opts)
         end
 
-        # Adds the association method to the association methods module. 
-        def def_association_method(opts)
-          association_module_def(opts.association_method, opts){|*reload| load_associated_objects(opts, reload[0])}
+        # Adds the association method to the association methods module. Be backwards
+        # compatible with ruby 1.8.6, which doesn't support blocks taking block arguments.
+        if RUBY_VERSION >= '1.8.7'
+          class_eval <<-END, __FILE__, __LINE__+1
+            def def_association_method(opts)
+              association_module_def(opts.association_method, opts){|*dynamic_opts, &block| load_associated_objects(opts, dynamic_opts[0], &block)}
+            end
+          END
+        else
+          class_eval <<-END, __FILE__, __LINE__+1
+            def def_association_method(opts)
+              association_module_def(opts.association_method, opts){|*dynamic_opts| load_associated_objects(opts, dynamic_opts[0])}
+            end
+          END
         end
       
         # Configures many_to_many association reflection and adds the related association methods
@@ -1050,6 +1061,15 @@ module Sequel
           ds
         end
 
+        # Return a dataset for the association after applying any dynamic callback.
+        def _associated_dataset(opts, dynamic_opts)
+          ds = send(opts.dataset_method)
+          if callback = dynamic_opts[:callback]
+            ds = callback.call(ds)
+          end
+          ds
+        end
+        
         # Return an association dataset for the given association reflection
         def _dataset(opts)
           raise(Sequel::Error, "model object #{inspect} does not have a primary key") if opts.dataset_need_primary_key? && !pk
@@ -1062,13 +1082,14 @@ module Sequel
           opts[:join_table_block] ? opts[:join_table_block].call(ds) : ds
         end
 
-        # Return the associated objects from the dataset, without callbacks, reciprocals, and caching.
-        def _load_associated_objects(opts)
+        # Return the associated objects from the dataset, without association callbacks, reciprocals, and caching.
+        # Still apply the dynamic callback if present.
+        def _load_associated_objects(opts, dynamic_opts={})
           if opts.returns_array?
-            opts.can_have_associated_objects?(self) ? send(opts.dataset_method).all : []
+            opts.can_have_associated_objects?(self) ? _associated_dataset(opts, dynamic_opts).all : []
           else
             if opts.can_have_associated_objects?(self)
-              send(opts.dataset_method).all.first
+              _associated_dataset(opts, dynamic_opts).all.first
             end
           end
         end
@@ -1130,12 +1151,20 @@ module Sequel
         end
 
         # Load the associated objects using the dataset, handling callbacks, reciprocals, and caching.
-        def load_associated_objects(opts, reload=false)
+        def load_associated_objects(opts, dynamic_opts=nil)
+          if dynamic_opts == true or dynamic_opts == false or dynamic_opts == nil
+            dynamic_opts = {:reload=>dynamic_opts}
+          elsif dynamic_opts.respond_to?(:call)
+            dynamic_opts = {:callback=>dynamic_opts}
+          end
+          if block_given?
+            dynamic_opts = dynamic_opts.merge(:callback=>Proc.new)
+          end
           name = opts[:name]
-          if associations.include?(name) and !reload
+          if associations.include?(name) and !dynamic_opts[:callback] and !dynamic_opts[:reload]
             associations[name]
           else
-            objs = _load_associated_objects(opts)
+            objs = _load_associated_objects(opts, dynamic_opts)
             run_association_callbacks(opts, :after_load, objs)
             if opts.set_reciprocal_to_self?
               if opts.returns_array?
@@ -1408,8 +1437,8 @@ module Sequel
             if associations.first.respond_to?(:call)
               callback = associations.first
               associations = {}
-            elsif associations.length == 1 && (assocs = associations.first).is_a?(Hash) && assocs.length == 1 && (pr, assoc = assocs.to_a.first) && pr.respond_to?(:call)
-              callback = pr
+            elsif associations.length == 1 && (assocs = associations.first).is_a?(Hash) && assocs.length == 1 && (pr_assoc = assocs.to_a.first) && pr_assoc.first.respond_to?(:call)
+              callback, assoc = pr_assoc
               associations = assoc.is_a?(Array) ? assoc : [assoc]
             end
           end
@@ -1609,9 +1638,8 @@ module Sequel
             if associations.respond_to?(:call)
               eager_block = associations
               associations = {}
-            elsif associations.is_a?(Hash) && associations.length == 1 && (pr, assoc = associations.to_a.first) && pr.respond_to?(:call)
-              eager_block = pr
-              associations = assoc
+            elsif associations.is_a?(Hash) && associations.length == 1 && (pr_assoc = associations.to_a.first) && pr_assoc.first.respond_to?(:call)
+              eager_block, associations = pr_assoc
             end
             if loader.arity == 1
               loader.call(:key_hash=>key_hash, :rows=>a, :associations=>associations, :self=>self, :eager_block=>eager_block)

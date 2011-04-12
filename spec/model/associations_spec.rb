@@ -357,6 +357,28 @@ describe Sequel::Model, "many_to_one" do
     MODEL_DB.sqls.should == ["SELECT * FROM nodes WHERE (nodes.id = 234) LIMIT 1"]
   end
   
+  it "should use a callback if given one as the argument" do
+    @c2.many_to_one :parent, :class => @c2
+
+    d = @c2.create(:id => 1)
+    MODEL_DB.reset
+    d.parent_id = 234
+    d.associations[:parent] = 42
+    d.parent(proc{|ds| ds.filter{name > 'M'}}).should_not == 42 
+    MODEL_DB.sqls.should == ["SELECT * FROM nodes WHERE ((nodes.id = 234) AND (name > 'M')) LIMIT 1"]
+  end
+  
+  it "should use a block given to the association method as a callback on ruby 1.8.7+" do
+    @c2.many_to_one :parent, :class => @c2
+
+    d = @c2.create(:id => 1)
+    MODEL_DB.reset
+    d.parent_id = 234
+    d.associations[:parent] = 42
+    d.parent{|ds| ds.filter{name > 'M'}}.should_not == 42 
+    MODEL_DB.sqls.should == ["SELECT * FROM nodes WHERE ((nodes.id = 234) AND (name > 'M')) LIMIT 1"]
+  end if RUBY_VERSION >= '1.8.7'
+  
   it "should have the setter add to the reciprocal one_to_many cached association list if it exists" do
     @c2.many_to_one :parent, :class => @c2
     @c2.one_to_many :children, :class => @c2, :key=>:parent_id
@@ -1149,6 +1171,16 @@ describe Sequel::Model, "one_to_many" do
     v.model.should == Historical::Value
   end
 
+  it "should use a callback if given one as the argument" do
+    @c2.one_to_many :attributes, :class => @c1, :key => :nodeid
+    
+    d = @c2.create(:id => 1234)
+    MODEL_DB.reset
+    d.associations[:attributes] = []
+    d.attributes(proc{|ds| ds.filter{name > 'M'}}).should_not == []
+    MODEL_DB.sqls.should == ["SELECT * FROM attributes WHERE ((attributes.nodeid = 1234) AND (name > 'M'))"]
+  end
+  
   it "should use explicit key if given" do
     @c2.one_to_many :attributes, :class => @c1, :key => :nodeid
     

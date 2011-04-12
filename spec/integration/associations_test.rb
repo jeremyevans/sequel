@@ -216,6 +216,48 @@ describe "Sequel::Model Simple Associations" do
     @tag.reload.albums.should == []
   end
   
+  specify "should handle dynamic callbacks for regular loading" do
+    @artist.add_album(@album)
+
+    @artist.albums.should == [@album]
+    @artist.albums(proc{|ds| ds.exclude(:id=>@album.id)}).should == []
+    @artist.albums(proc{|ds| ds.filter(:id=>@album.id)}).should == [@album]
+
+    @album.artist.should == @artist
+    @album.artist(proc{|ds| ds.exclude(:id=>@artist.id)}).should == nil
+    @album.artist(proc{|ds| ds.filter(:id=>@artist.id)}).should == @artist
+
+    if RUBY_VERSION >= '1.8.7'
+      @artist.albums{|ds| ds.exclude(:id=>@album.id)}.should == []
+      @artist.albums{|ds| ds.filter(:id=>@album.id)}.should == [@album]
+      @album.artist{|ds| ds.exclude(:id=>@artist.id)}.should == nil
+      @album.artist{|ds| ds.filter(:id=>@artist.id)}.should == @artist
+    end
+  end
+  
+  specify "should handle dynamic callbacks for eager loading via eager and eager_graph" do
+    @artist.add_album(@album)
+    @album.add_tag(@tag)
+    album2 = @artist.add_album(:name=>'Foo')
+    tag2 = album2.add_tag(:name=>'T2')
+
+    artist = Artist.eager(:albums=>:tags).all.first
+    artist.albums.should == [@album, album2]
+    artist.albums.map{|x| x.tags}.should == [[@tag], [tag2]]
+
+    artist = Artist.eager_graph(:albums=>:tags).all.first
+    artist.albums.should == [@album, album2]
+    artist.albums.map{|x| x.tags}.should == [[@tag], [tag2]]
+
+    artist = Artist.eager(:albums=>{proc{|ds| ds.where(:id=>album2.id)}=>:tags}).all.first
+    artist.albums.should == [album2]
+    artist.albums.first.tags.should == [tag2]
+
+    artist = Artist.eager_graph(:albums=>{proc{|ds| ds.where(:id=>album2.id)}=>:tags}).all.first
+    artist.albums.should == [album2]
+    artist.albums.first.tags.should == [tag2]
+  end
+  
   specify "should have remove method raise an error for one_to_many records if the object isn't already associated" do
     proc{@artist.remove_album(@album.id)}.should raise_error(Sequel::Error)
     proc{@artist.remove_album(@album)}.should raise_error(Sequel::Error)
