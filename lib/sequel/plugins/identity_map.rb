@@ -108,7 +108,15 @@ module Sequel
         def merge_db_update(row)
           @values = row.merge(@values)
         end
+      end
 
+      def self.apply(base)
+        unless Sequel::Model.kind_of?(CommonModelMethods)
+          Sequel::Model.send(:include, CommonModelMethods)
+        end
+      end
+
+      module CommonModelMethods
         private
 
         # The primary keys values of the associated object, given the foreign
