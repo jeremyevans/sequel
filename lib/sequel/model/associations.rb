@@ -1282,17 +1282,18 @@ module Sequel
       # allows you to customize it at association definition time. For example,
       # if you wanted artists with their albums since 1990:
       #
-      #   Artist.eager(:albums => proc {|ds| ds.filter(:year > 1990)})
+      #   Artist.eager(:albums => proc{|ds| ds.filter{year > 1990}})
       #
-      # Or if you needed albums and their artist's name only:
+      # Or if you needed albums and their artist's name only, using a single query:
       #
-      #   Albums.eager_graph(:artist => proc {|ds| ds.select(:name)})
+      #   Albums.eager_graph(:artist => proc{|ds| ds.select(:name)})
       #
-      # To cascade eager loading using this method, call +eager+/+eager_graph+ inside the
-      # callback:
+      # To cascade eager loading while using a callback, you substitute the cascaded
+      # associations with a single entry hash that has the proc callback as the key and 
+      # the cascaded associations as the value.  This will load artists with their albums
+      # since 1990, and also the tracks on those albums and the genre for those tracks:
       #
-      #   Artist.eager(:albums => proc {|ds| ds.filter(:year > 1990).eager(:tracks => :genre)})
-      #
+      #   Artist.eager(:albums => {proc{|ds| ds.filter{year > 1990}}=>{:tracks => :genre}})
       module DatasetMethods
         # Add the <tt>eager!</tt> and <tt>eager_graph!</tt> mutation methods to the dataset.
         def self.extended(obj)
@@ -1403,9 +1404,14 @@ module Sequel
           assoc_name = r[:name]
           assoc_table_alias = ds.unused_table_alias(assoc_name)
           loader = r[:eager_grapher]
-          if !associations.empty? && associations.first.respond_to?(:call)
-            callback = associations.first
-            associations = {}
+          if !associations.empty?
+            if associations.first.respond_to?(:call)
+              callback = associations.first
+              associations = {}
+            elsif associations.length == 1 && (assocs = associations.first).is_a?(Hash) && assocs.length == 1 && (pr, assoc = assocs.to_a.first) && pr.respond_to?(:call)
+              callback = pr
+              associations = assoc.is_a?(Array) ? assoc : [assoc]
+            end
           end
           ds = if loader.arity == 1
             loader.call(:self=>ds, :table_alias=>assoc_table_alias, :implicit_qualifier=>ta, :callback=>callback)
@@ -1603,6 +1609,9 @@ module Sequel
             if associations.respond_to?(:call)
               eager_block = associations
               associations = {}
+            elsif associations.is_a?(Hash) && associations.length == 1 && (pr, assoc = associations.to_a.first) && pr.respond_to?(:call)
+              eager_block = pr
+              associations = assoc
             end
             if loader.arity == 1
               loader.call(:key_hash=>key_hash, :rows=>a, :associations=>associations, :self=>self, :eager_block=>eager_block)

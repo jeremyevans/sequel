@@ -722,6 +722,68 @@ describe Sequel::Model, "#eager" do
     MODEL_DB.sqls.length.should == 4
   end
 
+  it "should allow cascading of eager loading with custom callback with hash value" do
+    a = EagerTrack.eager(:album=>{proc{|ds| ds.select(:id, :band_id)}=>{:band => :members}}).all
+    a.should be_a_kind_of(Array)
+    a.size.should == 1
+    a.first.should be_a_kind_of(EagerTrack)
+    a.first.values.should == {:id => 3, :album_id => 1}
+    MODEL_DB.sqls.length.should == 4
+    MODEL_DB.sqls.should == ['SELECT * FROM tracks',
+      'SELECT id, band_id FROM albums WHERE (albums.id IN (1))',
+      'SELECT * FROM bands WHERE (bands.id IN (2))',
+      "SELECT members.*, bm.band_id AS x_foreign_key_x FROM members INNER JOIN bm ON ((bm.member_id = members.id) AND (bm.band_id IN (2)))"]
+    a = a.first
+    a.album.should be_a_kind_of(EagerAlbum)
+    a.album.values.should == {:id => 1, :band_id => 2}
+    a.album.band.should be_a_kind_of(EagerBand)
+    a.album.band.values.should == {:id => 2}
+    a.album.band.members.should be_a_kind_of(Array)
+    a.album.band.members.size.should == 1
+    a.album.band.members.first.should be_a_kind_of(EagerBandMember)
+    a.album.band.members.first.values.should == {:id => 5}
+    MODEL_DB.sqls.length.should == 4
+  end
+
+  it "should allow cascading of eager loading with custom callback with symbol value" do
+    a = EagerTrack.eager(:album=>{proc{|ds| ds.select(:id, :band_id)}=>:band}).all
+    a.should be_a_kind_of(Array)
+    a.size.should == 1
+    a.first.should be_a_kind_of(EagerTrack)
+    a.first.values.should == {:id => 3, :album_id => 1}
+    MODEL_DB.sqls.length.should == 3
+    MODEL_DB.sqls.should == ['SELECT * FROM tracks',
+      'SELECT id, band_id FROM albums WHERE (albums.id IN (1))',
+      'SELECT * FROM bands WHERE (bands.id IN (2))']
+    a = a.first
+    a.album.should be_a_kind_of(EagerAlbum)
+    a.album.values.should == {:id => 1, :band_id => 2}
+    a.album.band.should be_a_kind_of(EagerBand)
+    a.album.band.values.should == {:id => 2}
+    MODEL_DB.sqls.length.should == 3
+  end
+
+  it "should allow cascading of eager loading with custom callback with array value" do
+    a = EagerTrack.eager(:album=>{proc{|ds| ds.select(:id, :band_id)}=>[:band, :band_name]}).all
+    a.should be_a_kind_of(Array)
+    a.size.should == 1
+    a.first.should be_a_kind_of(EagerTrack)
+    a.first.values.should == {:id => 3, :album_id => 1}
+    MODEL_DB.sqls.length.should == 4
+    MODEL_DB.sqls[0..1].should == ['SELECT * FROM tracks',
+      'SELECT id, band_id FROM albums WHERE (albums.id IN (1))']
+    MODEL_DB.sqls[2..-1].sort.should == ['SELECT * FROM bands WHERE (bands.id IN (2))',
+      'SELECT id, name FROM bands WHERE (bands.id IN (2))']
+    a = a.first
+    a.album.should be_a_kind_of(EagerAlbum)
+    a.album.values.should == {:id => 1, :band_id => 2}
+    a.album.band.should be_a_kind_of(EagerBand)
+    a.album.band.values.should == {:id => 2}
+    a.album.band_name.should be_a_kind_of(EagerBand)
+    a.album.band_name.values.should == {:id => 2}
+    MODEL_DB.sqls.length.should == 4
+  end
+
   it "should call both association and custom eager blocks" do
     EagerBand.eager(:good_albums => proc {|ds| ds.select(:name)}).all
     MODEL_DB.sqls.should == ['SELECT * FROM bands', "SELECT name FROM albums WHERE ((albums.band_id IN (2)) AND (name = 'good'))"]
@@ -1484,7 +1546,7 @@ describe Sequel::Model, "#eager_graph" do
     ds.sql.should == 'SELECT a.id, a_genres.id AS a_genres_id FROM (SELECT * FROM s.a INNER JOIN s.t USING (b_id)) AS a LEFT OUTER JOIN s.ag AS ag ON (ag.album_id = a.id) LEFT OUTER JOIN s.g AS a_genres ON (a_genres.id = ag.genre_id)'
   end
 
-  it "should eagerly load a many_to_one association with custom eager block" do
+  it "should eagerly load a many_to_one association with a custom callback" do
     ds = GraphAlbum.eager_graph(:band => proc {|ds| ds.select_columns(:id)})
     ds.sql.should == 'SELECT albums.id, albums.band_id, band.id AS band_id_0 FROM albums LEFT OUTER JOIN (SELECT id FROM bands) AS band ON (band.id = albums.band_id)'
     def ds.fetch_rows(sql, &block)
@@ -1500,7 +1562,7 @@ describe Sequel::Model, "#eager_graph" do
     a.band.values.should == {:id => 2}
   end
 
-  it "should eagerly load a one_to_one association with custom eager block" do
+  it "should eagerly load a one_to_one association with a custom callback" do
     GraphAlbum.one_to_one :track, :class=>'GraphTrack', :key=>:album_id
     ds = GraphAlbum.eager_graph(:track => proc {|ds| ds.select_columns(:album_id)})
     ds.sql.should == 'SELECT albums.id, albums.band_id, track.album_id FROM albums LEFT OUTER JOIN (SELECT album_id FROM tracks) AS track ON (track.album_id = albums.id)'
@@ -1512,7 +1574,7 @@ describe Sequel::Model, "#eager_graph" do
     a.first.track.should == GraphTrack.load(:album_id=>1)
   end
 
-  it "should eagerly load a one_to_many association with custom eager block" do
+  it "should eagerly load a one_to_many association with a custom callback" do
     ds = GraphAlbum.eager_graph(:tracks => proc {|ds| ds.select_columns(:album_id)})
     ds.sql.should == 'SELECT albums.id, albums.band_id, tracks.album_id FROM albums LEFT OUTER JOIN (SELECT album_id FROM tracks) AS tracks ON (tracks.album_id = albums.id)'
     def ds.fetch_rows(sql, &block)
@@ -1530,7 +1592,7 @@ describe Sequel::Model, "#eager_graph" do
     a.tracks.first.values.should == {:album_id=>1}
   end
 
-  it "should eagerly load a many_to_many association with custom eager block" do
+  it "should eagerly load a many_to_many association with a custom callback" do
     ds = GraphAlbum.eager_graph(:genres => proc {|ds| ds.select_columns(:id)})
     ds.sql.should == 'SELECT albums.id, albums.band_id, genres.id AS genres_id FROM albums LEFT OUTER JOIN ag ON (ag.album_id = albums.id) LEFT OUTER JOIN (SELECT id FROM genres) AS genres ON (genres.id = ag.genre_id)'
     def ds.fetch_rows(sql, &block)
@@ -1547,4 +1609,49 @@ describe Sequel::Model, "#eager_graph" do
     a.genres.first.should be_a_kind_of(GraphGenre)
     a.genres.first.values.should == {:id => 4}
   end
+
+  it "should allow cascading of eager loading with a custom callback with hash value" do
+    ds = GraphTrack.eager_graph(:album=>{proc{|ds| ds.select_columns(:id, :band_id)}=>{:band=>:members}})
+    ds.sql.should == 'SELECT tracks.id, tracks.album_id, album.id AS album_id_0, album.band_id, band.id AS band_id_0, band.vocalist_id, members.id AS members_id FROM tracks LEFT OUTER JOIN (SELECT id, band_id FROM albums) AS album ON (album.id = tracks.album_id) LEFT OUTER JOIN bands AS band ON (band.id = album.band_id) LEFT OUTER JOIN bm ON (bm.band_id = band.id) LEFT OUTER JOIN members ON (members.id = bm.member_id)'
+    def ds.fetch_rows(sql, &block)
+      yield({:id=>3, :album_id=>1, :album_id_0=>1, :band_id=>2, :members_id=>5, :band_id_0=>2, :vocalist_id=>6})
+    end
+    a = ds.all
+    a.should be_a_kind_of(Array)
+    a.size.should == 1
+    a.first.should be_a_kind_of(GraphTrack)
+    a.first.values.should == {:id => 3, :album_id => 1}
+    a = a.first
+    a.album.should be_a_kind_of(GraphAlbum)
+    a.album.values.should == {:id => 1, :band_id => 2}
+    a.album.band.should be_a_kind_of(GraphBand)
+    a.album.band.values.should == {:id => 2, :vocalist_id=>6}
+    a.album.band.members.should be_a_kind_of(Array)
+    a.album.band.members.size.should == 1
+    a.album.band.members.first.should be_a_kind_of(GraphBandMember)
+    a.album.band.members.first.values.should == {:id => 5}
+  end
+  
+  it "should allow cascading of eager loading with a custom callback with array value" do
+    ds = GraphTrack.eager_graph(:album=>{proc{|ds| ds.select_columns(:id, :band_id)}=>[:band, :tracks]})
+    ds.sql.should == 'SELECT tracks.id, tracks.album_id, album.id AS album_id_0, album.band_id, band.id AS band_id_0, band.vocalist_id, tracks_0.id AS tracks_0_id, tracks_0.album_id AS tracks_0_album_id FROM tracks LEFT OUTER JOIN (SELECT id, band_id FROM albums) AS album ON (album.id = tracks.album_id) LEFT OUTER JOIN bands AS band ON (band.id = album.band_id) LEFT OUTER JOIN tracks AS tracks_0 ON (tracks_0.album_id = album.id)'
+    def ds.fetch_rows(sql, &block)
+      yield({:id=>3, :album_id=>1, :album_id_0=>1, :band_id=>2, :band_id_0=>2, :vocalist_id=>6, :tracks_0_id=>3, :tracks_0_album_id=>1})
+    end
+    a = ds.all
+    a.should be_a_kind_of(Array)
+    a.size.should == 1
+    a.first.should be_a_kind_of(GraphTrack)
+    a.first.values.should == {:id => 3, :album_id => 1}
+    a = a.first
+    a.album.should be_a_kind_of(GraphAlbum)
+    a.album.values.should == {:id => 1, :band_id => 2}
+    a.album.band.should be_a_kind_of(GraphBand)
+    a.album.band.values.should == {:id => 2, :vocalist_id=>6}
+    a.album.tracks.should be_a_kind_of(Array)
+    a.album.tracks.size.should == 1
+    a.album.tracks.first.should be_a_kind_of(GraphTrack)
+    a.album.tracks.first.values.should == {:id => 3, :album_id => 1}
+  end
+  
 end
