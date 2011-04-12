@@ -266,7 +266,7 @@ module Sequel
 
           name_proc = model.xml_serialize_name_proc(opts)
           x = model.xml_builder(opts)
-          x.send(name_proc[opts.fetch(:root_name, model.send(:underscore, model.name)).to_s]) do |x1|
+          x.send(name_proc[opts.fetch(:root_name, model.send(:underscore, model.name).gsub('/', '__')).to_s]) do |x1|
             cols.each do |c|
               attrs = {}
               if types

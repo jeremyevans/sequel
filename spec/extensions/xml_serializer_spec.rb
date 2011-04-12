@@ -36,6 +36,18 @@ describe "Sequel::Plugins::XmlSerializer" do
     Album.from_xml(@album.to_xml).should == @album
   end
 
+  it "should round trip successfully for namespaced models" do
+    module XmlSerializerTest
+      class Artist < Sequel::Model
+      plugin :xml_serializer
+      columns :id, :name
+      @db_schema = {:id=>{:type=>:integer}, :name=>{:type=>:string}}
+      end 
+    end
+    artist = XmlSerializerTest::Artist.load(:id=>2, :name=>'YJM')
+    XmlSerializerTest::Artist.from_xml(artist.to_xml).should == artist
+  end
+
   it "should round trip successfully with empty strings" do
     artist = Artist.load(:id=>2, :name=>'')
     Artist.from_xml(artist.to_xml).should == artist

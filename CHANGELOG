@@ -1,8 +1,10 @@
 === HEAD
 
+* Make the xml_serializer plugin handle namespaced models by using __ instead of / as a separator (jeremyevans)
+
 * Allow the :eager_grapher association proc to accept a single hash instead of 3 arguments (jfirebaugh)
 
-* Allow specifying a callback to customize eager loading at query time (jfirebaugh)
+* Allow specifying a callback to customize eager loading at query time (jfirebaugh, jeremyevans)
 
 * Fix bug in the identity_map plugin for many_to_one associations when the association reflection hadn't been filled in yet (funny-falcon)
 
