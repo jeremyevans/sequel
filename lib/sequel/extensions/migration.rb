@@ -302,7 +302,7 @@ module Sequel
   #
   # Part of the +migration+ extension.
   class Migrator
-    MIGRATION_FILE_PATTERN = /\A\d+_.+\.rb\z/i.freeze
+    MIGRATION_FILE_PATTERN = /\A(\d+)_.+\.rb\z/i.freeze
     MIGRATION_SPLITTER = '_'.freeze
     MINIMUM_TIMESTAMP = 20000101
 
@@ -589,7 +589,7 @@ module Sequel
         next unless MIGRATION_FILE_PATTERN.match(file)
         files << File.join(directory, file)
       end
-      files.sort
+      files.sort_by{|f| MIGRATION_FILE_PATTERN.match(File.basename(f))[1].to_i}
     end
     
     # Returns tuples of migration, filename, and direction

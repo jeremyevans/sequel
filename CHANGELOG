@@ -1,5 +1,7 @@
 === HEAD
 
+* When combining old integer migrations and new timestamp migrations, make sure old integer migrations are all applied first (jeremyevans)
+
 * Support dynamic callbacks to customize regular association loading at query time (jeremyevans)
 
 * Support cascading of eager loading with dynamic callbacks for both eager and eager_graph (jeremyevans)
