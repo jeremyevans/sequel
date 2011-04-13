@@ -71,6 +71,7 @@
 
 <ul>
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/blank_rb.html">blank</a>: Adds blank? instance methods to all objects.</li>
+<li><a href="rdoc-plugins/files/lib/sequel/extensions/columns_introspection_rb.html">columns_introspection</a>: Attemps to skip database queries by introspecting the selected columns if possible.</li>
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/inflector_rb.html">inflector</a>: Adds instance-level inflection methods to String.</li>
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/looser_typecasting_rb.html">looser_typecasting</a>: Uses .to_f and .to_i instead of Kernel.Float and Kernel.Integer when typecasting floats and integers.</li>
 <li><a href="rdoc-plugins/files/lib/sequel/extensions/migration_rb.html">migration</a>: Adds Migration and Migrator classes for easily migrating the database schema forward or reverting to a previous version.</li>

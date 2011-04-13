@@ -5,6 +5,11 @@ unless Object.const_defined?('Sequel')
   require 'sequel/core'
 end
 
+if ENV['SEQUEL_COLUMNS_INTROSPECTION']
+  Sequel.extension :columns_introspection
+  Sequel::Dataset.introspect_all_columns
+end
+
 class MockDataset < Sequel::Dataset
   def insert(*args)
     @db.execute insert_sql(*args)

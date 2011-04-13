@@ -9,6 +9,11 @@ begin
 rescue LoadError
 end
 
+if ENV['SEQUEL_COLUMNS_INTROSPECTION']
+  Sequel.extension :columns_introspection
+  Sequel::Dataset.introspect_all_columns
+end
+
 Sequel::Model.use_transactions = false
 
 $sqls = []

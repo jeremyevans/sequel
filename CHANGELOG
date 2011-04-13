@@ -1,5 +1,7 @@
 === HEAD
 
+* Add a columns_introspection extension that attempts to skip database queries by introspecting selected columns (jeremyevans)
+
 * When combining old integer migrations and new timestamp migrations, make sure old integer migrations are all applied first (jeremyevans)
 
 * Support dynamic callbacks to customize regular association loading at query time (jeremyevans)
