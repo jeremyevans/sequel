@@ -63,6 +63,12 @@ describe "Model#save" do
     MODEL_DB.sqls.should == ["INSERT INTO items (y) VALUES (2)"]
   end
 
+  it "should not use dataset's insert_select method if specific columns are selected" do
+    ds = @c.dataset = @c.dataset.select(:y)
+    ds.should_not_receive(:insert_select)
+    @c.new(:x => 1).save
+  end
+
   it "should use value returned by insert as the primary key and refresh the object" do
     @c.dataset.meta_def(:insert){|h| super(h); 13}
     o = @c.new(:x => 11)

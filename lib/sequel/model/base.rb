@@ -1230,7 +1230,7 @@ module Sequel
       # the record should be refreshed from the database.
       def _insert
         ds = _insert_dataset
-        if ds.respond_to?(:insert_select) and h = ds.insert_select(@values)
+        if !ds.opts[:select] and ds.respond_to?(:insert_select) and h = ds.insert_select(@values)
           @values = h
           nil
         else
