@@ -690,9 +690,9 @@ module Sequel
           if !opts[:eager_graph] && opts.eager_loading_use_associated_key?
             ds = if opts[:uses_left_composite_keys]
               t = opts.associated_key_table
-              ds.select_more(*opts.associated_key_alias.zip(opts.associated_key_column).map{|a, c| SQL::AliasedExpression.new(SQL::QualifiedIdentifier.new(t, c), a)})
+              ds.select_append(*opts.associated_key_alias.zip(opts.associated_key_column).map{|a, c| SQL::AliasedExpression.new(SQL::QualifiedIdentifier.new(t, c), a)})
             else
-              ds.select_more(SQL::AliasedExpression.new(SQL::QualifiedIdentifier.new(opts.associated_key_table, opts.associated_key_column), opts.associated_key_alias))
+              ds.select_append(SQL::AliasedExpression.new(SQL::QualifiedIdentifier.new(opts.associated_key_table, opts.associated_key_column), opts.associated_key_alias))
             end
           end
           ds

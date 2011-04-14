@@ -163,6 +163,12 @@ describe Sequel::Model, "#eager" do
     MODEL_DB.sqls.length.should == 2
   end
   
+  it "should correctly handle a :select=>[] option to many_to_many" do
+    EagerAlbum.many_to_many :sgenres, :clone=>:genres, :select=>[]
+    a = EagerAlbum.eager(:sgenres).all
+    MODEL_DB.sqls.should == ['SELECT * FROM albums', "SELECT *, ag.album_id AS x_foreign_key_x FROM genres INNER JOIN ag ON ((ag.genre_id = genres.id) AND (ag.album_id IN (1)))"]
+  end
+  
   it "should eagerly load multiple associations in a single call" do
     a = EagerAlbum.eager(:genres, :tracks, :band).all
     a.should be_a_kind_of(Array)

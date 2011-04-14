@@ -1,5 +1,7 @@
 === HEAD
 
+* Fix bug when using :select=>[] option for a many_to_many association (jeremyevans)
+
 * Add a columns_introspection extension that attempts to skip database queries by introspecting selected columns (jeremyevans)
 
 * When combining old integer migrations and new timestamp migrations, make sure old integer migrations are all applied first (jeremyevans)
