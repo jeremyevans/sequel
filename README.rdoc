@@ -685,6 +685,20 @@ Associations can be eagerly loaded via +eager+ and the <tt>:eager</tt> associati
 
 In addition to using +eager+, you can also use +eager_graph+, which will use a single query to get the object and all associated objects.  This may be necessary if you want to filter or order the result set based on columns in associated tables.  It works with cascading as well, the syntax is exactly the same.  Note that using eager_graph to eagerly load multiple *_to_many associations will cause the result set to be a cartesian product, so you should be very careful with your filters when using it in that case.
 
+You can dynamically customize the eagerly loaded dataset by using using a proc.  This proc is passed the dataset used for eager loading, and should return a modified copy of that dataset:
+
+  # Eagerly load only replies containing 'foo'
+  Post.eager(:replies=>proc{|ds| ds.filter(text.like('%foo%'))}).all
+
+This also works when using +eager_graph+, in which case the proc is called with dataset to graph into the current dataset:
+
+  Post.eager_graph(:replies=>proc{|ds| ds.filter(text.like('%foo%'))}).all
+
+You can dynamically customize eager loads for both +eager+ and +eager_graph+ while also cascading, by making the value a single entry hash with the proc as a key, and the cascaded associations as the value:
+
+  # Eagerly load only replies containing 'foo', and the person and tags for those replies
+  Post.eager(:replies=>{proc{|ds| ds.filter(text.like('%foo%'))}=>[:person, :tags]}).all
+
 === Extending the underlying dataset
 
 The obvious way to add table-wide logic is to define class methods to the model class definition. That way you can define subsets of the underlying dataset, change the ordering, or perform actions on multiple records:

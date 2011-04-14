@@ -293,32 +293,6 @@ Examples:
   @artist.remove_album(@album)
   @artist.remove_all_albums
 
-== Dataset Method
-
-In addition to the above methods, associations also add a instance method
-ending in +_dataset+ that returns a dataset representing the objects in the associated table:
-
-  @album.artist_id
-  # 10
-  @album.artist_dataset
-  # SELECT * FROM artists WHERE (id = 10)
-  
-  @artist.id
-  # 20
-  @artist.albums_dataset
-  # SELECT * FROM albums WHERE (artist_id = 20)
-
-The association dataset is just like any other Sequel dataset, in that
-it can be further filtered, ordered, etc.:
-
-  @artist.albums_dataset.
-   filter(:name.like('A%')).
-   order(:copies_sold).
-   limit(10)
-  # SELECT * FROM albums
-  # WHERE ((artist_id = 20) AND (name LIKE 'A%'))
-  # ORDER BY copies_sold LIMIT 10
-
 == Caching
 
 Associations are cached after being retrieved:
@@ -352,12 +326,57 @@ instance method:
   @album.artists # [<Artist ...>, ...]
   @album.associations[:artists] # [<Artist ...>, ...]
 
-Note that while the association method caches associated objects, if you
-retrieve access through the association dataset directly, the results
-will not be cached:
+== Dataset Method
+
+In addition to the above methods, associations also add a instance method
+ending in +_dataset+ that returns a dataset representing the objects in the associated table:
+
+  @album.artist_id
+  # 10
+  @album.artist_dataset
+  # SELECT * FROM artists WHERE (id = 10)
+  
+  @artist.id
+  # 20
+  @artist.albums_dataset
+  # SELECT * FROM albums WHERE (artist_id = 20)
+
+The association dataset is just like any other Sequel dataset, in that
+it can be further filtered, ordered, etc.:
+
+  @artist.albums_dataset.
+   filter(:name.like('A%')).
+   order(:copies_sold).
+   limit(10)
+  # SELECT * FROM albums
+  # WHERE ((artist_id = 20) AND (name LIKE 'A%'))
+  # ORDER BY copies_sold LIMIT 10
+
+Records retrieved using the +_dataset+ method are not cached in the
+associations cache.
 
   @album.artists_dataset.all # [<Artist ...>, ...]
   @album.associations[:artists] # nil
+
+== Dynamic Association Modification
+
+Similar to the +_dataset+ method, you can provide a block to the association
+method to customize the dataset that will be used to retrieve the records.  So
+you can apply a filter in either of these two ways:
+
+  @artist.albums_dataset.filter(:name.like('A%'))
+  @artist.albums{|ds| ds.filter(:name.like('A%'))}
+
+While they both apply the same filter, using the +_dataset+ method does not
+apply any of the association callbacks or handle association reciprocals (see
+below for details about callbacks and reciprocals).  Using a block instead handles
+all those things, and also caches its results in the associations cache (ignoring
+any previously cached value).
+
+Note that if you are using ruby 1.8.6, you can't pass a block to the association
+method, you have to pass a proc as an argument:
+
+  @artist.albums(proc{|ds| ds.filter(:name.like('A%'))})
 
 == Name Collisions
 
@@ -1230,6 +1249,9 @@ If the proc takes one argument, it will be given a hash with the following keys:
 :self :: The dataset that is doing the eager loading
 :table_alias :: An alias to use for the table to graph for this association.
 :implicit_qualifier :: The alias that was used for the current table (since you can cascade associations).
+:callback :: A callback proc used to dynamically modify the dataset to graph into the
+             current dataset, before such graphing is done. This is nil if no callback
+             proc is used.
 
 If the proc takes three arguments, it gets passed the :self, :association_alias,
 and :table_alias values. The 3 argument procs are allowed for backwards
