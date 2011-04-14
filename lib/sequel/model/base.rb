@@ -1086,10 +1086,10 @@ module Sequel
       # For each of the fields in the given array +fields+, call the setter
       # method with the value of that +hash+ entry for the field. Returns self.
       #
-      #   artist.set_fields({:name=>'Jim'}, :name)
+      #   artist.set_fields({:name=>'Jim'}, [:name])
       #   artist.name # => 'Jim'
       #
-      #   artist.set_fields({:hometown=>'LA'}, :name)
+      #   artist.set_fields({:hometown=>'LA'}, [:name])
       #   artist.name # => nil
       #   artist.hometown # => 'Sac'
       def set_fields(hash, fields)
@@ -1149,10 +1149,10 @@ module Sequel
       # Update the instances values by calling +set_fields+ with the +hash+
       # and +fields+, then save any changes to the record.  Returns self.
       #
-      #   artist.update_fields({:name=>'Jim'}, :name)
+      #   artist.update_fields({:name=>'Jim'}, [:name])
       #   # UPDATE artists SET name = 'Jim' WHERE (id = 1)
       #
-      #   artist.update_fields({:hometown=>'LA'}, :name)
+      #   artist.update_fields({:hometown=>'LA'}, [:name])
       #   # UPDATE artists SET name = NULL WHERE (id = 1)
       def update_fields(hash, fields)
         set_fields(hash, fields)
