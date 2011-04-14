@@ -683,17 +683,18 @@ module Sequel
           if opts[:eager_graph]
             ds = ds.eager_graph(opts[:eager_graph])
             ds = ds.add_graph_aliases(opts.associated_key_alias=>[opts.associated_class.table_name, opts.associated_key_alias, SQL::QualifiedIdentifier.new(opts.associated_key_table, opts.associated_key_column)]) if opts.eager_loading_use_associated_key?
-          elsif opts.eager_loading_use_associated_key?
-            ds = if opts[:uses_left_composite_keys]
-              t = opts.associated_key_table
-              ds.select_more(*opts.associated_key_alias.zip(opts.associated_key_column).map{|a, c| SQL::AliasedExpression.new(SQL::QualifiedIdentifier.new(t, c), a)})
-            else
-              ds.select_more(SQL::AliasedExpression.new(SQL::QualifiedIdentifier.new(opts.associated_key_table, opts.associated_key_column), opts.associated_key_alias)) 
-            end
           end
           ds = ds.eager(associations) unless Array(associations).empty?
           ds = opts[:eager_block].call(ds) if opts[:eager_block]
           ds = eager_options[:eager_block].call(ds) if eager_options[:eager_block]
+          if !opts[:eager_graph] && opts.eager_loading_use_associated_key?
+            ds = if opts[:uses_left_composite_keys]
+              t = opts.associated_key_table
+              ds.select_more(*opts.associated_key_alias.zip(opts.associated_key_column).map{|a, c| SQL::AliasedExpression.new(SQL::QualifiedIdentifier.new(t, c), a)})
+            else
+              ds.select_more(SQL::AliasedExpression.new(SQL::QualifiedIdentifier.new(opts.associated_key_table, opts.associated_key_column), opts.associated_key_alias))
+            end
+          end
           ds
         end
 

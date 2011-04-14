@@ -685,7 +685,7 @@ describe Sequel::Model, "#eager" do
   end
 
   it "should eagerly load a many_to_many association with custom eager block" do
-    a = EagerAlbum.eager(:genres => proc {|ds| ds.select(:name, ds.opts[:select].last)}).all
+    a = EagerAlbum.eager(:genres => proc {|ds| ds.select(:name)}).all
     a.should be_a_kind_of(Array)
     a.size.should == 1
     a.first.should be_a_kind_of(EagerAlbum)
