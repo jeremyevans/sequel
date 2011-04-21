@@ -40,7 +40,7 @@ available.  For example, you are no longer able to do:
   # WHERE a AND (b OR NOT c)
   
 Because Symbol#&, Symbol#| and Symbol#~ are not defined when the core
-extensions are turned off.  However, with virtual rows allow almost the same
+extensions are turned off.  However, virtual rows allow almost the same
 syntax even without the core extensions:
 
   dataset.filter{a & (b | ~c)}
@@ -87,7 +87,7 @@ and second is the difference between the the use of "a".  In the regular proc,
 you couldn't call c without an explicit receiver in the proc, unless the self of the
 surrounding scope responded to it.  For a, note how ruby calls the method on
 the receiver of the surrounding scope in the regular proc, which returns an integer,
-and does the substraction before Sequel gets access to it.  In the instance evaled
+and does the substitution before Sequel gets access to it.  In the instance evaled
 proc, calling a without a receiver calls the a method on the VirtualRow instance.
 For b, note that it operates the same in both cases, as it is a local variable.
 
