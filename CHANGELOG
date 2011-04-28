@@ -1,5 +1,7 @@
 === HEAD
 
+* Add filter_by_associations plugin that allows model datasets to filter using associations (jeremyevans)
+
 * Don't call insert_select when saving a model that doesn't select all columns of the table (jeremyevans)
 
 * Fix bug when using :select=>[] option for a many_to_many association (jeremyevans)
