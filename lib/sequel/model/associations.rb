@@ -1417,22 +1417,15 @@ module Sequel
         def complex_expression_sql(op, args)
           if op == :'=' and args.at(1).is_a?(Sequel::Model)
             l, r = args
-            if a = model.association_reflections[l]
-              unless r.is_a?(a.associated_class)
-                raise Sequel::Error, "invalid association class #{r.class.inspect} for association #{l.inspect} used in dataset filter for model #{model.inspect}, expected class #{a.associated_class.inspect}"
+            if ar = model.association_reflections[l]
+              unless r.is_a?(ar.associated_class)
+                raise Sequel::Error, "invalid association class #{r.class.inspect} for association #{l.inspect} used in dataset filter for model #{model.inspect}, expected class #{ar.associated_class.inspect}"
               end
 
-              case a[:type]
-              when :many_to_one
-                literal(SQL::BooleanExpression.from_value_pairs(a[:keys].zip(a.primary_keys.map{|k| r.send(k)})))
-              when :one_to_one, :one_to_many
-                literal(SQL::BooleanExpression.from_value_pairs(a[:primary_keys].zip(a[:keys].map{|k| r.send(k)})))
-              when :many_to_many
-                lpks, lks, rks = a.values_at(:left_primary_keys, :left_keys, :right_keys)
-                lpks = lpks.first if lpks.length == 1
-                literal(SQL::BooleanExpression.from_value_pairs(lpks=>model.db[a[:join_table]].select(*lks).where(rks.zip(a.right_primary_keys.map{|k| r.send(k)}))))
+              if exp = association_filter_expression(ar, r)
+                literal(exp)
               else
-                raise Sequel::Error, "invalid association type #{a[:type].inspect} for association #{l.inspect} used in dataset filter for model #{model.inspect}"
+                raise Sequel::Error, "invalid association type #{ar[:type].inspect} for association #{l.inspect} used in dataset filter for model #{model.inspect}"
               end
             else
               raise Sequel::Error, "invalid association #{l.inspect} used in dataset filter for model #{model.inspect}"
@@ -1583,6 +1576,12 @@ module Sequel
       
         private
       
+        # Return an expression for filtering by the given association reflection and associated object.
+        def association_filter_expression(ref, obj)
+          meth = :"#{ref[:type]}_association_filter_expression"
+          send(meth, ref, obj) if respond_to?(meth, true)
+        end
+
         # Make sure the association is valid for this model, and return the related AssociationReflection.
         def check_association(model, association)
           raise(Sequel::UndefinedAssociation, "Invalid association #{association} for #{model.name}") unless reflection = model.association_reflection(association)
@@ -1685,6 +1684,24 @@ module Sequel
           end 
         end
       
+        # Return a subquery expression for filering by a many_to_many association
+        def many_to_many_association_filter_expression(ref, obj)
+            lpks, lks, rks = ref.values_at(:left_primary_keys, :left_keys, :right_keys)
+            lpks = lpks.first if lpks.length == 1
+            SQL::BooleanExpression.from_value_pairs(lpks=>model.db[ref[:join_table]].select(*lks).where(rks.zip(ref.right_primary_keys.map{|k| obj.send(k)})))
+        end
+
+        # Return a simple equality expression for filering by a many_to_one association
+        def many_to_one_association_filter_expression(ref, obj)
+          SQL::BooleanExpression.from_value_pairs(ref[:keys].zip(ref.primary_keys.map{|k| obj.send(k)}))
+        end
+
+        # Return a simple equality expression for filering by a one_to_* association
+        def one_to_many_association_filter_expression(ref, obj)
+          SQL::BooleanExpression.from_value_pairs(ref[:primary_keys].zip(ref[:keys].map{|k| obj.send(k)}))
+        end
+        alias one_to_one_association_filter_expression one_to_many_association_filter_expression
+
         # Build associations from the graph if #eager_graph was used, 
         # and/or load other associations if #eager was used.
         def post_load(all_records)
