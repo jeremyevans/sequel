@@ -378,6 +378,60 @@ method, you have to pass a proc as an argument:
 
   @artist.albums(proc{|ds| ds.filter(:name.like('A%'))})
 
+== Filtering By Associations
+
+In addition to using the association method to get associated objects, you
+can also use associated objects in filters.  For example, while to get
+all albums for a given artist, you would usually do:
+
+  @artist.albums
+  # or @artist.albums_dataset for a dataset
+
+You can also do the following:
+
+  Album.filter(:artist=>@artist).all
+  # or leave off the .all for a dataset
+
+For filtering by a single association, this isn't very useful.  However, unlike
+using the association method, using a filter allows you to filter by multiple
+associations:
+
+  Album.filter(:artist=>@artist, :publisher=>@publisher)
+
+This will return all albums by that artist and published by that publisher.
+This isn't possible using just the association method approach, though you
+can combine the approaches:
+
+  @artist.albums_dataset.filter(:publisher=>@publisher)
+
+This doesn't just work for +many_to_one+ associations, it also works for
++one_to_one+, +one_to_many+, and +many_to_many+ associations:
+
+  Album.one_to_one :album_info
+  # The album related to that AlbumInfo instance
+  Album.filter(:album_info=>AlbumInfo[2])
+
+  Album.one_to_many :tracks
+  # The album related to that Track instance
+  Album.filter(:tracks=>Track[3])
+
+  Album.many_to_many :tags
+  # All albums related to that Tag instance
+  Album.filter(:tags=>Tag[4])
+
+Note that for +one_to_many+ and +many_to_many+ associations, you still
+use the plural form even though only a single model object is given.
+You cannot use an array of model objects as the value, only a single model
+object.  To use separate model objects for the same association, you can
+use the array form of condition specifiers:
+
+  Album.filter([[:tags, Tag[1]], [:tags, Tag[2]]])
+
+That will return albums associated with both tag 1 and tag 2.
+
+Note that filtering by associations only works correctly for simple
+associations (ones without conditions).
+
 == Name Collisions
 
 Because associations create instance methods, it's possible to override

@@ -1408,6 +1408,40 @@ module Sequel
           ds.eager_graph_associations(ds, model, ds.opts[:eager_graph][:master], [], *associations)
         end
         
+        # If the expression is in the form <tt>x = y</tt> where +y+ is a <tt>Sequel::Model</tt>
+        # instance, assume +x+ is an association symbol and look up the association reflection
+        # via the dataset's model.  From there, return the appropriate SQL based on the type of
+        # association and the values of the foreign/primary keys of +y+.  For most association
+        # types, this is a simple transformation, but for +many_to_many+ associations this 
+        # creates a subquery to the join table.
+        def complex_expression_sql(op, args)
+          if op == :'=' and args.at(1).is_a?(Sequel::Model)
+            l, r = args
+            if a = model.association_reflections[l]
+              unless r.is_a?(a.associated_class)
+                raise Sequel::Error, "invalid association class #{r.class.inspect} for association #{l.inspect} used in dataset filter for model #{model.inspect}, expected class #{a.associated_class.inspect}"
+              end
+
+              case a[:type]
+              when :many_to_one
+                literal(SQL::BooleanExpression.from_value_pairs(a[:keys].zip(a.primary_keys.map{|k| r.send(k)})))
+              when :one_to_one, :one_to_many
+                literal(SQL::BooleanExpression.from_value_pairs(a[:primary_keys].zip(a[:keys].map{|k| r.send(k)})))
+              when :many_to_many
+                lpks, lks, rks = a.values_at(:left_primary_keys, :left_keys, :right_keys)
+                lpks = lpks.first if lpks.length == 1
+                literal(SQL::BooleanExpression.from_value_pairs(lpks=>model.db[a[:join_table]].select(*lks).where(rks.zip(a.right_primary_keys.map{|k| r.send(k)}))))
+              else
+                raise Sequel::Error, "invalid association type #{a[:type].inspect} for association #{l.inspect} used in dataset filter for model #{model.inspect}"
+              end
+            else
+              raise Sequel::Error, "invalid association #{l.inspect} used in dataset filter for model #{model.inspect}"
+            end
+          else
+            super
+          end
+        end
+
         # Do not attempt to split the result set into associations,
         # just return results as simple objects.  This is useful if you
         # want to use eager_graph as a shortcut to have all of the joins

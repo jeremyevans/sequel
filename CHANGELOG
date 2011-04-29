@@ -1,6 +1,6 @@
 === HEAD
 
-* Add filter_by_associations plugin that allows model datasets to filter using associations (jeremyevans)
+* Add support for filtering by associations to model datasets (jeremyevans)
 
 * Don't call insert_select when saving a model that doesn't select all columns of the table (jeremyevans)
 

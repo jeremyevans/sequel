@@ -22,6 +22,22 @@ shared_examples_for "regular and composite key associations" do
     @tag.albums.should == [@album]
   end
   
+  specify "should work correctly when filtering by associations" do
+    @album.update(:artist => @artist)
+    @album.add_tag(@tag)
+    
+    @album.reload
+    @artist.reload
+    @tag.reload
+    
+    Artist.filter(:albums=>@album).all.should == [@artist]
+    Album.filter(:artist=>@artist).all.should == [@album]
+    Album.filter(:tags=>@tag).all.should == [@album]
+    Tag.filter(:albums=>@album).all.should == [@tag]
+    Album.filter(:artist=>@artist, :tags=>@tag).all.should == [@album]
+    @artist.albums_dataset.filter(:tags=>@tag).all.should == [@album]
+  end
+  
   specify "should have remove methods work" do
     @album.update(:artist => @artist)
     @album.add_tag(@tag)
