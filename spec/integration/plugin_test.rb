@@ -205,6 +205,11 @@ describe "Many Through Many Plugin" do
     Artist.filter(:artists__id=>2).eager_graph(:albums).all.map{|x| x.albums.map{|a| a.name}}.flatten.sort.should == %w'A C'
     Artist.filter(:artists__id=>3).eager_graph(:albums).all.map{|x| x.albums.map{|a| a.name}}.flatten.sort.should == %w'B C'
     Artist.filter(:artists__id=>4).eager_graph(:albums).all.map{|x| x.albums.map{|a| a.name}}.flatten.sort.should == %w'B D'
+
+    Artist.filter(:albums=>@album1).all.map{|a| a.name}.sort.should == %w'1 2'
+    Artist.filter(:albums=>@album2).all.map{|a| a.name}.sort.should == %w'3 4'
+    Artist.filter(:albums=>@album3).all.map{|a| a.name}.sort.should == %w'2 3'
+    Artist.filter(:albums=>@album4).all.map{|a| a.name}.sort.should == %w'1 4'
   end
 
   specify "should handle typical case with 3 join tables" do
@@ -223,6 +228,11 @@ describe "Many Through Many Plugin" do
     Artist.filter(:artists__id=>2).eager_graph(:related_artists).all.map{|x| x.related_artists.map{|a| a.name}}.flatten.sort.should == %w'1 2 3'
     Artist.filter(:artists__id=>3).eager_graph(:related_artists).all.map{|x| x.related_artists.map{|a| a.name}}.flatten.sort.should == %w'2 3 4'
     Artist.filter(:artists__id=>4).eager_graph(:related_artists).all.map{|x| x.related_artists.map{|a| a.name}}.flatten.sort.should == %w'1 3 4'
+
+    Artist.filter(:related_artists=>@artist1).all.map{|a| a.name}.sort.should == %w'1 2 4'
+    Artist.filter(:related_artists=>@artist2).all.map{|a| a.name}.sort.should == %w'1 2 3'
+    Artist.filter(:related_artists=>@artist3).all.map{|a| a.name}.sort.should == %w'2 3 4'
+    Artist.filter(:related_artists=>@artist4).all.map{|a| a.name}.sort.should == %w'1 3 4'
   end
 
   specify "should handle extreme case with 5 join tables" do
@@ -250,6 +260,11 @@ describe "Many Through Many Plugin" do
     Artist.filter(:artists__id=>2).eager_graph(:related_albums).all.map{|x| x.related_albums.map{|a| a.name}}.flatten.sort.should == %w'A B C D'
     Artist.filter(:artists__id=>3).eager_graph(:related_albums).all.map{|x| x.related_albums.map{|a| a.name}}.flatten.sort.should == %w'A B D'
     Artist.filter(:artists__id=>4).eager_graph(:related_albums).all.map{|x| x.related_albums.map{|a| a.name}}.flatten.sort.should == %w'B D'
+
+    Artist.filter(:related_albums=>@album1).all.map{|a| a.name}.sort.should == %w'1 2 3'
+    Artist.filter(:related_albums=>@album2).all.map{|a| a.name}.sort.should == %w'1 2 3 4'
+    Artist.filter(:related_albums=>@album3).all.map{|a| a.name}.sort.should == %w'1 2'
+    Artist.filter(:related_albums=>@album4).all.map{|a| a.name}.sort.should == %w'2 3 4'
   end
 end
 

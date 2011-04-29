@@ -116,6 +116,7 @@ module Sequel
           nil
         end
       end
+
       module ClassMethods
         # Create a many_through_many association.  Arguments:
         # * name - Same as associate, the name of the association.
@@ -216,6 +217,29 @@ module Sequel
           end
 
           def_association_dataset_methods(opts)
+        end
+      end
+
+      module DatasetMethods
+        private
+
+        # Use a subquery to filter rows to those related to the given associated object
+        def many_through_many_association_filter_expression(ref, obj)
+          lpks = ref[:left_primary_keys]
+          lpks = lpks.first if lpks.length == 1
+          edges = ref.edges
+          first, rest = edges.first, edges[1..-1]
+          last = edges.last
+          ds = model.db[first[:table]].select(*Array(first[:right]).map{|x| ::Sequel::SQL::QualifiedIdentifier.new(first[:table], x)})
+          rest.each{|e| ds = ds.join(e[:table], e.fetch(:only_conditions, (Array(e[:right]).zip(Array(e[:left])) + e[:conditions])), :table_alias=>ds.unused_table_alias(e[:table]), &e[:block])}
+          last_alias = if rest.empty?
+            first[:table]
+          else
+            last_join = ds.opts[:join].last
+            last_join.table_alias || last_join.table
+          end
+          ds = ds.where(Array(ref[:final_edge][:left]).map{|x| ::Sequel::SQL::QualifiedIdentifier.new(last_alias, x)}.zip(ref.right_primary_keys.map{|k| obj.send(k)}))
+          SQL::BooleanExpression.from_value_pairs(lpks=>ds)
         end
       end
     end

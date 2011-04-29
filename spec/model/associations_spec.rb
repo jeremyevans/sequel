@@ -2826,8 +2826,8 @@ describe "Filtering by associations" do
   end
 
   it "should raise for an invalid association type" do
-    @Album.plugin :many_through_many
-    @Album.many_through_many :mtmtags, [[:album_id, :album_tags, :tag_id]], :class=>@Tag
+    @Album.many_to_many :iatags, :clone=>:tags
+    @Album.association_reflection(:iatags)[:type] = :foo
     proc{@Album.filter(:mtmtags=>@Tag.load(:id=>3)).sql}.should raise_error(Sequel::Error)
   end
 
