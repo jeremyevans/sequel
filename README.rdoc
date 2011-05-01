@@ -20,7 +20,7 @@ toolkit for Ruby.
 * {Website}[http://sequel.rubyforge.org]
 * {Blog}[http://sequel.heroku.com]
 * {Source code}[http://github.com/jeremyevans/sequel]
-* {Bug tracking}[http://code.google.com/p/ruby-sequel/issues/list]
+* {Bug tracking}[http://github.com/jeremyevans/sequel/issues]
 * {Google group}[http://groups.google.com/group/sequel-talk]
 * {RDoc}[http://sequel.rubyforge.org/rdoc]
 
