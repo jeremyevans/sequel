@@ -1,0 +1,172 @@
+= New Features
+
+* Sequel now allows dynamic customization for eager loading.
+  Previously, the parameters for eager loading were fixed at
+  association creation time.  Now, they can be modified at query
+  time.  To dynamically modify an eager load, you use a hash with
+  the proc as the value. For example, if you have this code:
+
+    Artist.eager(:albums)
+
+  And you only want to eagerly load albums where the id is greater
+  than or equal to some number provided by the user, you do:
+
+    min = params[:min]
+    Artist.eager(:albums=>proc{|ds| ds.where{id > min}})
+    
+  This also works when eager loading via eager_graph:
+  
+    Artist.eager_graph(:albums=>proc{|ds| ds.where{id > min}})
+  
+  For eager_graph, the dataset is the dataset to graph into the
+  current dataset, and filtering it will result in an SQL query
+  that joins to a subquery.
+  
+  You can also use dynamic customization while cascading to also
+  eagerly load dependent associations, by making the hash value
+  a single entry hash with a proc key and the value being the
+  dependent associations to eagerly load. For example, if you want
+  to eagerly load tracks for those albums:
+
+    Artist.eager(:albums=>{proc{|ds| ds.where{id > min}}=>:tracks})
+
+* Sequel also now allows dynamic customization for regular
+  association loading.  Previously, this was possible by using the
+  association's dataset:
+
+    albums = artist.albums_dataset.filter{id > min}
+
+  However, then there was no handling of caching, callbacks, or
+  reciprocals.  For example:
+
+    albums.each{|album| album.artist}
+    
+  Would issue one query per album to get the artist, because the
+  reciprocal association was not set.  Now you can provide a
+  block to the association method:
+  
+    albums = artist.albums{|ds| ds.filter{id > min}}
+    
+  This block is called with the dataset used to retrieve the
+  associated objects, and should return a modified version of that
+  dataset.
+  
+  Note that ruby 1.8.6 doesn't allow blocks to take block arguments,
+  so you have to pass the block as a separate proc argument to the
+  association method if you are still using 1.8.6.
+
+* Sequel now supports filtering by associations.  This wasn't
+  previously supported as filtering is a dataset level feature and
+  associations are a model level feature, and datasets do not depend
+  on models.  Now, model datasets have the ability to filter by
+  associations.  For example, to get all albums for a given artist,
+  you could do:
+  
+    artist = Artist[1]
+    Album.filter(:artist=>artist)
+    
+  Since the above can also be accomplished with:
+  
+    artist.albums
+    
+  this may not seem like a big improvement, but it allows you to
+  filter on multiple associations simultaneously:
+  
+    Album.filter(:artist=>artist, :publisher=>publisher)
+    
+  For simple many_to_one associations, the above is just a simpler
+  way to do:
+  
+    Album.filter(:artist_id=>artist.id, :publisher_id=>publisher.id)
+    
+  Sequel supports this for all association types, including
+  many_to_many and many_through_many, where a subquery is used, and
+  it also works when composite key associations are used:
+  
+    Album.filter(:artist=>artist, :tags=>tag)
+    
+  This will give you the albums for that artist that are also tagged
+  with that tag.  To provide multiple values for the same
+  association, mostly useful for many_to_many associations, you can
+  either use separate filter calls or specify the conditions as an
+  array:
+  
+    Album.filter(:tags=>tag1).filter(:tags=>tag2)
+    Album.filter([[:tags, tag1], [:tags, tag2]])
+
+* A columns_introspection extension has been added that makes
+  datasets attempt to guess their columns in some cases instead of
+  issuing a database query.  This can improve performance in cases
+  where the columns are needed implicitly, such as graphing.  After
+  loading the extension, you can enable the support for specific
+  datasets by extending them with Sequel::ColumnIntrospection.  To
+  enable introspection for all datasets, use:
+  
+    Sequel::Dataset.introspect_all_columns
+
+* A serialization_modification_detection plugin has been added.
+  Previously, Sequel could not detect modifications made to
+  serialized objects.  It could detect modification if you assigned
+  a new value:
+  
+    model.hash_column = model.hash_column.merge(:foo=>:bar)
+    
+  but not if you just modified the object directly:
+  
+    model.hash_columns[:foo] = :bar
+    
+  With this plugin, such modifications can be detected, at a
+  potentially significant performance cost.
+
+= Other Improvements
+
+* When using a migration directory containing both older integer
+  migrations and newer timestamp migrations, where some integer
+  migrations have not been applied, make sure to apply the remaining
+  integer migrations before the timestamp migrations.  Previously,
+  they could be applied out of order due to a lexicographic sort
+  being used instead of a numeric sort.
+
+* If a model does not select all columns from its table, the
+  insert_select optimization is no longer used.  Previously,
+  creating a new model object for such a model could result in the
+  object containing columns that the model does not select.
+
+* You can now use :select=>[] as an option for many_to_many
+  associations to select all columns from both the associated
+  table and the join table.  Previously, this raised an error and
+  required you do :select=>'*'.lit as a workaround.  The default
+  remains to select all columns in the associated table and none
+  from the join table.
+
+* The xml_serializer plugin now handles namespaced models by
+  using __ instead of / as the namespace separator.  Previously, /
+  was used and caused problems as it is not valid XML.
+  
+* The :eager_grapher association option can now accept a proc that
+  takes a single hash of options instead of a fixed 3 arguments.
+  This is the recommended way going forward of writing custom
+  :eager_graphers, and all of the internal ones have been converted.
+  The previous way of using 3 arguments is still supported.
+  
+* A bug in the identity_map plugin for many_to_one associations
+  without full association reflection information has been fixed.
+
+* Sequel is now using GitHub Issues for issue tracking.  Old issues
+  have been migrated from Google Code.
+
+= Backwards Compatibility
+
+* The filter by associations support breaks backward compatibilty for
+  users who previously added an sql_literal instance method to
+  Sequel::Model.  Usually, that was done to for reasons similar to
+  but inferior than the filter by association support.  The following
+  code can be used as a temporary workaround until you can modify
+  your program to use the new filter by associations support:
+  
+    Sequel::Model::Associations::DatasetMethods.
+      send(:remove_method, :complex_expression_sql)
+
+* The private Sequel::Model#_load_associated_objects method now takes
+  an additional, optional options hash.  Plugins that override that
+  method need to be modified.

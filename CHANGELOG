@@ -1,4 +1,6 @@
-=== HEAD
+=== 3.23.0 (2011-05-02)
+
+* Migrate issue tracker from Google Code to GitHub Issues (jeremyevans)
 
 * Add support for filtering by associations to model datasets (jeremyevans)
 
