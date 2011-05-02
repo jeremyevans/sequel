@@ -11,7 +11,7 @@
   And you only want to eagerly load albums where the id is greater
   than or equal to some number provided by the user, you do:
 
-    min = params[:min]
+    min = params[:min].to_i
     Artist.eager(:albums=>proc{|ds| ds.where{id > min}})
     
   This also works when eager loading via eager_graph:
