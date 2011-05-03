@@ -1,3 +1,7 @@
+=== HEAD
+
+* Split informix adapter into shared/specific parts, add JDBC informix subadapter (jeremyevans)
+
 === 3.23.0 (2011-05-02)
 
 * Migrate issue tracker from Google Code to GitHub Issues (jeremyevans)

@@ -1,11 +1,12 @@
 require 'informix'
+Sequel.require 'adapters/shared/informix'
 
 module Sequel
   module Informix
     class Database < Sequel::Database
+      include DatabaseMethods
+
       set_adapter_scheme :informix
-      
-      TEMPORARY = 'TEMP '.freeze
       
       def connect(server)
         opts = server_opts(server)
@@ -35,7 +36,7 @@ module Sequel
     end
     
     class Dataset < Sequel::Dataset
-      SELECT_CLAUSE_METHODS = clause_methods(:select, %w'limit distinct columns from join where having group compounds order')
+      include DatasetMethods
 
       def fetch_rows(sql)
         execute(sql) do |cursor|
@@ -55,22 +56,6 @@ module Sequel
           end
         end
         self
-      end
-
-      private
-
-      # Informix does not support INTERSECT or EXCEPT
-      def supports_intersect_except?
-        false
-      end
-
-      def select_clause_methods
-        SELECT_CLAUSE_METHODS
-      end
-
-      def select_limit_sql(sql)
-        sql << " SKIP #{@opts[:offset]}" if @opts[:offset]
-        sql << " FIRST #{@opts[:limit]}" if @opts[:limit]
       end
     end
   end

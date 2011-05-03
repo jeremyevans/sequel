@@ -75,6 +75,11 @@ module Sequel
         Sequel.ts_require 'adapters/jdbc/as400'
         db.extend(Sequel::JDBC::AS400::DatabaseMethods)
         com.ibm.as400.access.AS400JDBCDriver
+      end,
+      :"informix-sqli"=>proc do |db|
+        Sequel.ts_require 'adapters/jdbc/informix'
+        db.extend(Sequel::JDBC::Informix::DatabaseMethods)
+        com.informix.jdbc.IfxDriver
       end
     }
     
