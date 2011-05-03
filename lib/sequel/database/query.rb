@@ -226,7 +226,7 @@ module Sequel
         transaction_error(e)
       ensure
         begin
-          commit_transaction(t, opts) unless e
+          commit_or_rollback_transaction(e, t, opts)
         rescue Exception => e
           raise_error(e, :classes=>database_error_classes)
         ensure
@@ -234,7 +234,7 @@ module Sequel
         end
       end
     end
-    
+
     # Add the current thread to the list of active transactions
     def add_transaction
       th = Thread.current
@@ -335,6 +335,29 @@ module Sequel
       end
     end
    
+    if (! defined?(RUBY_ENGINE) or RUBY_ENGINE == 'ruby' or RUBY_ENGINE == 'rbx') and RUBY_VERSION < '1.9'
+      # Whether to commit the current transaction. On ruby 1.8 and rubinius,
+      # Thread.current.status is checked because Thread#kill skips rescue
+      # blocks (so exception would be nil), but the transaction should
+      # still be rolled back.
+      def commit_or_rollback_transaction(exception, thread, opts)
+        unless exception
+          if Thread.current.status == 'aborting'
+            rollback_transaction(thread, opts)
+          else
+            commit_transaction(thread, opts)
+          end
+        end
+      end
+    else
+      # Whether to commit the current transaction.  On ruby 1.9 and JRuby,
+      # transactions will be committed if Thread#kill is used on an thread
+      # that has a transaction open, and there isn't a work around.
+      def commit_or_rollback_transaction(exception, thread, opts)
+        commit_transaction(thread, opts) unless exception
+      end
+    end
+    
     # SQL to commit a savepoint
     def commit_savepoint_sql(depth)
       SQL_RELEASE_SAVEPOINT % depth
