@@ -84,7 +84,9 @@ describe "A connection pool handling connections" do
   end
 
   specify "#make_new should not make more than max_size connections" do
-    50.times{Thread.new{@cpool.hold{sleep 0.001}}}
+    q = Queue.new
+    50.times{Thread.new{@cpool.hold{q.pop}}}
+    50.times{q.push nil}
     @cpool.created_count.should <= @max_size
   end
 
@@ -96,7 +98,8 @@ describe "A connection pool handling connections" do
 
   specify "#hold should remove the connection if a DatabaseDisconnectError is raised" do
     @cpool.created_count.should == 0
-    @cpool.hold{Thread.new{@cpool.hold{}}; sleep 0.03}
+    q, q1 = Queue.new, Queue.new
+    @cpool.hold{Thread.new{@cpool.hold{q1.pop; q.push nil}}; q1.push nil; q.pop}
     @cpool.created_count.should == 2
     proc{@cpool.hold{raise Sequel::DatabaseDisconnectError}}.should raise_error(Sequel::DatabaseDisconnectError)
     @cpool.created_count.should == 1
@@ -166,15 +169,14 @@ describe "A connection pool with a max size of 1" do
   
   specify "should let only one thread access the connection at any time" do
     cc,c1, c2 = nil
-    m = (defined?(RUBY_ENGINE) && RUBY_ENGINE == 'rbx') ? 30 : 1
+    q, q1 = Queue.new, Queue.new
     
-    t1 = Thread.new {@pool.hold {|c| cc = c; c1 = c.dup; while c == 'herro';sleep 0.01;end}}
-    sleep 0.02 * m
+    t1 = Thread.new {@pool.hold {|c| cc = c; c1 = c.dup; q1.push nil; q.pop}}
+    q1.pop
     cc.should == 'herro'
     c1.should == 'herro'
     
-    t2 = Thread.new {@pool.hold {|c| c2 = c.dup; while c == 'hello';sleep 0.01;end}}
-    sleep 0.02 * m
+    t2 = Thread.new {@pool.hold {|c| c2 = c.dup; q1.push nil; q.pop;}}
     
     # connection held by t1
     t1.should be_alive
@@ -186,26 +188,22 @@ describe "A connection pool with a max size of 1" do
     
     @pool.available_connections.should be_empty
     @pool.allocated.should == {t1=>cc}
-    
+
     cc.gsub!('rr', 'll')
-    sleep 0.05 * m
-    
-    # connection held by t2
+    q.push nil
+    q1.pop
+
     t1.should_not be_alive
     t2.should be_alive
-
+    
     c2.should == 'hello'
 
     @pool.available_connections.should be_empty
     @pool.allocated.should == {t2=>cc}
     
-    cc.gsub!('ll', 'rr')
-    sleep 0.05 * m
-    
     #connection released
-    t2.should_not be_alive
-    
-    cc.should == 'herro'
+    q.push nil
+    t2.join
     
     @invoked_count.should == 1
     @pool.size.should == 1
@@ -239,31 +237,22 @@ shared_examples_for "A threaded connection pool" do
   specify "should let five threads simultaneously access separate connections" do
     cc = {}
     threads = []
-    stop = nil
+    q, q1, q2 = Queue.new, Queue.new, Queue.new
     
-    5.times {|i| threads << Thread.new {@pool.hold {|c| cc[i] = c; while !stop;sleep 0.02;end}}; sleep 0.02}
-    sleep 0.04
+    5.times{|i| threads << Thread.new{@pool.hold{|c| q.pop; cc[i] = c; q1.push nil; q2.pop}}; q.push nil; q1.pop}
     threads.each {|t| t.should be_alive}
     cc.size.should == 5
     @invoked_count.should == 5
     @pool.size.should == 5
     @pool.available_connections.should be_empty
-    i = 0
+
     h = {}
+    i = 0
     threads.each{|t| h[t] = (i+=1)}
     @pool.allocated.should == h
-    
-    threads[0].raise "your'e dead"
-    sleep 0.02
-    threads[3].raise "your'e dead too"
-    
-    sleep 0.02
-    
-    @pool.available_connections.should == [1, 4]
-    @pool.allocated.should == {threads[1]=>2, threads[2]=>3, threads[4]=>5}
-    
-    stop = true
-    sleep 0.04
+    @pool.available_connections.should == []
+    5.times{q2.push nil}
+    threads.each{|t| t.join}
     
     @pool.available_connections.size.should == 5
     @pool.allocated.should be_empty
@@ -272,16 +261,15 @@ shared_examples_for "A threaded connection pool" do
   specify "should block threads until a connection becomes available" do
     cc = {}
     threads = []
-    stop = nil
+    q, q1 = Queue.new, Queue.new
     
-    5.times {|i| threads << Thread.new {@pool.hold {|c| cc[i] = c; while !stop;sleep 0.01;end}}; sleep 0.01}
-    sleep 0.02
+    5.times{|i| threads << Thread.new{@pool.hold{|c| cc[i] = c; q1.push nil; q.pop}}}
+    5.times{q1.pop}
     threads.each {|t| t.should be_alive}
     @pool.available_connections.should be_empty
 
-    3.times {|i| threads << Thread.new {@pool.hold {|c| cc[i + 5] = c}}}
+    3.times {|i| threads << Thread.new {@pool.hold {|c| cc[i + 5] = c; q1.push nil}}}
     
-    sleep 0.02
     threads[5].should be_alive
     threads[6].should be_alive
     threads[7].should be_alive
@@ -290,8 +278,10 @@ shared_examples_for "A threaded connection pool" do
     cc[6].should be_nil
     cc[7].should be_nil
     
-    stop = true
-    sleep 0.1
+    5.times{q.push nil}
+    5.times{|i| threads[i].join}
+    3.times{q1.pop}
+    3.times{|i| threads[i+5].join}
     
     threads.each {|t| t.should_not be_alive}
     
@@ -324,19 +314,15 @@ describe "ConnectionPool#disconnect" do
   before do
     @count = 0
     @pool = Sequel::ConnectionPool.get_pool(CONNECTION_POOL_DEFAULTS.merge(:max_connections=>5, :servers=>{})) {{:id => @count += 1}}
+    threads = []
+    q, q1 = Queue.new, Queue.new
+    5.times {|i| threads << Thread.new {@pool.hold {|c| q1.push nil; q.pop}}}
+    5.times{q1.pop}
+    5.times{q.push nil}
+    threads.each {|t| t.join}
   end
   
   specify "should invoke the given block for each available connection" do
-    threads = []
-    stop = nil
-    5.times {|i| threads << Thread.new {@pool.hold {|c| while !stop;sleep 0.01;end}}; sleep 0.01}
-    while @pool.size < 5
-      sleep 0.02
-    end
-    stop = true
-    sleep 0.1
-    threads.each {|t| t.join}
-    
     @pool.size.should == 5
     @pool.available_connections.size.should == 5
     @pool.available_connections.each {|c| c[:id].should_not be_nil}
@@ -346,34 +332,13 @@ describe "ConnectionPool#disconnect" do
   end
   
   specify "should remove all available connections" do
-    threads = []
-    stop = nil
-    5.times {|i| threads << Thread.new {@pool.hold {|c| while !stop;sleep 0.01;end}}; sleep 0.01}
-    while @pool.size < 5
-      sleep 0.02
-    end
-    stop = true
-    sleep 0.1
-    threads.each {|t| t.join}
-    
     @pool.size.should == 5
     @pool.disconnect
     @pool.size.should == 0
   end
 
   specify "should disconnect connections in use as soon as they are no longer in use" do
-    threads = []
-    stop = nil
-    5.times {|i| threads << Thread.new {@pool.hold {|c| while !stop;sleep 0.01;end}}; sleep 0.01}
-    while @pool.size < 5
-      sleep 0.02
-    end
-    stop = true
-    sleep 0.1
-    threads.each {|t| t.join}
-    
     @pool.size.should == 5
-    
     @pool.hold do |conn|
       @pool.available_connections.size.should == 4
       @pool.available_connections.each {|c| c.should_not be(conn)}
@@ -556,9 +521,10 @@ describe "A connection pool with multiple servers" do
   specify "#remove_servers should disconnect available connections immediately" do
     pool = Sequel::ConnectionPool.get_pool(:max_connections=>5, :servers=>{:server1=>{}}){|s| s}
     threads = []
-    stop = nil
-    5.times {|i| threads << Thread.new{pool.hold(:server1){|c| sleep 0.05}}}
-    sleep 0.1
+    q, q1 = Queue.new, Queue.new
+    5.times {|i| threads << Thread.new {pool.hold(:server1){|c| q1.push nil; q.pop}}}
+    5.times{q1.pop}
+    5.times{q.push nil}
     threads.each {|t| t.join}
     
     pool.size(:server1).should == 5
