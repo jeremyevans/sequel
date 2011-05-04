@@ -1,5 +1,9 @@
 === HEAD
 
+* Add Database#views for getting an array of symbols of view names for the database (jeremyevans, christian.michon)
+
+* Make Datbase#tables no longer include view names on MySQL (jeremyevans)
+
 * Convert Java CLOB objects to ruby strings when using the JDBC JTDS subadapter (christian.michon)
 
 * If Thread#kill is called on a thread with an open transaction, roll the transaction back on ruby 1.8 and rubinius (jeremyevans)

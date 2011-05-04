@@ -253,12 +253,14 @@ module Sequel
         indexes
       end 
 
+      # Whether or not JNDI is being used for this connection.
+      def jndi?
+        !!(uri =~ JNDI_URI_REGEXP)
+      end
+      
       # All tables in this database
       def tables(opts={})
-        ts = []
-        m = output_identifier_meth
-        metadata(:getTables, nil, nil, nil, ['TABLE'].to_java(:string)){|h| ts << m.call(h[:table_name])}
-        ts
+        get_tables('TABLE', opts)
       end
       
       # The uri for this connection.  You can specify the uri
@@ -271,11 +273,11 @@ module Sequel
         ur =~ /^\Ajdbc:/ ? ur : "jdbc:#{ur}"
       end
 
-      # Whether or not JNDI is being used for this connection.
-      def jndi?
-        !!(uri =~ JNDI_URI_REGEXP)
+      # All views in this database
+      def views(opts={})
+        get_tables('VIEW', opts)
       end
-      
+
       private
          
       # Close given adapter connections
@@ -332,6 +334,12 @@ module Sequel
         end
       end
 
+      # Gets the connection from JNDI.
+      def get_connection_from_jndi
+        jndi_name = JNDI_URI_REGEXP.match(uri)[1]
+        JavaxNaming::InitialContext.new.lookup(jndi_name).connection
+      end
+            
       # Gets the JDBC connection uri from the JNDI resource.
       def get_uri_from_jndi
         conn = get_connection_from_jndi
@@ -340,12 +348,14 @@ module Sequel
         conn.close if conn
       end
       
-      # Gets the connection from JNDI.
-      def get_connection_from_jndi
-        jndi_name = JNDI_URI_REGEXP.match(uri)[1]
-        JavaxNaming::InitialContext.new.lookup(jndi_name).connection
+      # Backbone of the tables and views support.
+      def get_tables(type, opts)
+        ts = []
+        m = output_identifier_meth
+        metadata(:getTables, nil, nil, nil, [type].to_java(:string)){|h| ts << m.call(h[:table_name])}
+        ts
       end
-            
+
       # Support Date objects used in bound variables
       def java_sql_date(date)
         java.sql.Date.new(Time.local(date.year, date.month, date.day).to_i * 1000)

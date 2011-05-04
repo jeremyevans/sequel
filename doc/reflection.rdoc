@@ -16,13 +16,19 @@ In some cases, the adapter scheme will be the same as the database to which you 
 
 == Tables in the Database
 
-On many database types/adapters, Database#tables exists and gives an array of table name symbols:
+Database#tables gives an array of table name symbols:
+
+  DB.tables # [:table1, :table2, :table3, ...]
+
+== Views in the Database
+
+Database#views and gives an array of view name symbols:
 
   DB.tables # [:table1, :table2, :table3, ...]
 
 == Indexes on a table
 
-On a few database types/adapters, Database#indexes takes a table name gives a hash of index information.  Keys are index names, values are subhashes with the keys :columns and :unique :
+Database#indexes takes a table name gives a hash of index information.  Keys are index names, values are subhashes with the keys :columns and :unique :
 
   DB.indexes(:table1) # {:index1=>{:columns=>[:column1], :unique=>false}, :index2=>{:columns=>[:column2, :column3], :unique=>true}}
 

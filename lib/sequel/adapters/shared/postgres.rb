@@ -387,11 +387,17 @@ module Sequel
       # Options:
       # * :schema - The schema to search (default_schema by default)
       # * :server - The server to use
-      def tables(opts={})
-        ds = metadata_dataset.from(:pg_class).filter(:relkind=>'r').select(:relname).exclude(SQL::StringExpression.like(:relname, SYSTEM_TABLE_REGEXP)).server(opts[:server]).join(:pg_namespace, :oid=>:relnamespace) 
-        ds = filter_schema(ds, opts)
-        m = output_identifier_meth
-        block_given? ? yield(ds) : ds.map{|r| m.call(r[:relname])}
+      def tables(opts={}, &block)
+        pg_class_relname('r', opts, &block)
+      end
+
+      # Array of symbols specifying view names in the current database.
+      #
+      # Options:
+      # * :schema - The schema to search (default_schema by default)
+      # * :server - The server to use
+      def views(opts={})
+        pg_class_relname('v', opts)
       end
 
       private
@@ -540,6 +546,14 @@ module Sequel
         conn.execute(sql)
       end
       
+      # Backbone of the tables and views support.
+      def pg_class_relname(type, opts)
+        ds = metadata_dataset.from(:pg_class).filter(:relkind=>type).select(:relname).exclude(SQL::StringExpression.like(:relname, SYSTEM_TABLE_REGEXP)).server(opts[:server]).join(:pg_namespace, :oid=>:relnamespace) 
+        ds = filter_schema(ds, opts)
+        m = output_identifier_meth
+        block_given? ? yield(ds) : ds.map{|r| m.call(r[:relname])}
+      end
+
       # Use a dollar sign instead of question mark for the argument
       # placeholder.
       def prepared_arg_placeholder

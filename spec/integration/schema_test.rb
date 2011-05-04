@@ -362,25 +362,74 @@ describe "Database#tables" do
         "xxxxx#{@@xxxxx += 1}"
       end
     end
-    @iom = INTEGRATION_DB.identifier_output_method
-    @iim = INTEGRATION_DB.identifier_input_method
+    @db = INTEGRATION_DB
+    @db.create_table(:sequel_test_table){Integer :a}
+    @db.create_view :sequel_test_view, @db[:sequel_test_table]
+    @iom = @db.identifier_output_method
+    @iim = @db.identifier_input_method
     clear_sqls
   end
   after do
-    INTEGRATION_DB.identifier_output_method = @iom
-    INTEGRATION_DB.identifier_input_method = @iim
+    @db.drop_view :sequel_test_view
+    @db.drop_table :sequel_test_table
+    @db.identifier_output_method = @iom
+    @db.identifier_input_method = @iim
   end
 
   specify "should return an array of symbols" do
-    ts = INTEGRATION_DB.tables
+    ts = @db.tables
     ts.should be_a_kind_of(Array)
     ts.each{|t| t.should be_a_kind_of(Symbol)}
+    ts.should include(:sequel_test_table)
+    ts.should_not include(:sequel_test_view)
   end
 
   specify "should respect the database's identifier_output_method" do
-    INTEGRATION_DB.identifier_output_method = :xxxxx
-    INTEGRATION_DB.identifier_input_method = :xxxxx
-    INTEGRATION_DB.tables.each{|t| t.to_s.should =~ /\Ax{5}\d+\z/}
+    @db.identifier_output_method = :xxxxx
+    @db.identifier_input_method = :xxxxx
+    @db.tables.each{|t| t.to_s.should =~ /\Ax{5}\d+\z/}
+  end
+end
+end
+
+begin
+  INTEGRATION_DB.views
+rescue Sequel::NotImplemented
+rescue
+describe "Database#views" do
+  before do
+    class ::String
+      @@xxxxx = 0
+      def xxxxx
+        "xxxxx#{@@xxxxx += 1}"
+      end
+    end
+    @db = INTEGRATION_DB
+    @db.create_table(:sequel_test_table){Integer :a}
+    @db.create_view :sequel_test_view, @db[:sequel_test_table]
+    @iom = @db.identifier_output_method
+    @iim = @db.identifier_input_method
+    clear_sqls
+  end
+  after do
+    @db.drop_view :sequel_test_view
+    @db.drop_table :sequel_test_table
+    @db.identifier_output_method = @iom
+    @db.identifier_input_method = @iim
+  end
+
+  specify "should return an array of symbols" do
+    ts = @db.views
+    ts.should be_a_kind_of(Array)
+    ts.each{|t| t.should be_a_kind_of(Symbol)}
+    ts.should_not include(:sequel_test_table)
+    ts.should include(:sequel_test_view)
+  end
+
+  specify "should respect the database's identifier_output_method" do
+    @db.identifier_output_method = :xxxxx
+    @db.identifier_input_method = :xxxxx
+    @db.views.each{|t| t.to_s.should =~ /\Ax{5}\d+\z/}
   end
 end
 end

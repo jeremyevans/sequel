@@ -53,11 +53,13 @@ module Sequel
       # Microsoft SQL Server supports using the INFORMATION_SCHEMA to get
       # information on tables.
       def tables(opts={})
-        m = output_identifier_meth
-        metadata_dataset.from(:information_schema__tables___t).
-          select(:table_name).
-          filter(:table_type=>'BASE TABLE', :table_schema=>(opts[:schema]||default_schema||'dbo').to_s).
-          map{|x| m.call(x[:table_name])}
+        information_schema_tables('BASE TABLE', opts)
+      end
+
+      # Microsoft SQL Server supports using the INFORMATION_SCHEMA to get
+      # information on views.
+      def views(opts={})
+        information_schema_tables('VIEW', opts)
       end
 
       private
@@ -123,6 +125,15 @@ module Sequel
         "DROP INDEX #{quote_identifier(op[:name] || default_index_name(table, op[:columns]))} ON #{quote_schema_table(table)}"
       end
       
+      # Backbone of the tables and views support.
+      def information_schema_tables(type, opts)
+        m = output_identifier_meth
+        metadata_dataset.from(:information_schema__tables___t).
+          select(:table_name).
+          filter(:table_type=>type, :table_schema=>(opts[:schema]||default_schema||'dbo').to_s).
+          map{|x| m.call(x[:table_name])}
+      end
+
       # Always quote identifiers in the metadata_dataset, so schema parsing works.
       def metadata_dataset
         ds = super

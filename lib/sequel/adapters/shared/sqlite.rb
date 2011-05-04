@@ -7,8 +7,9 @@ module Sequel
       AUTO_VACUUM = [:none, :full, :incremental].freeze
       PRIMARY_KEY_INDEX_RE = /\Asqlite_autoindex_/.freeze
       SYNCHRONOUS = [:off, :normal, :full].freeze
-      TABLES_FILTER = "type = 'table' AND NOT name = 'sqlite_sequence'"
+      TABLES_FILTER = "type = 'table' AND NOT name = 'sqlite_sequence'".freeze
       TEMP_STORE = [:default, :file, :memory].freeze
+      VIEWS_FILTER = "type = 'view'".freeze
       
       # Run all alter_table commands in a transaction.  This is technically only
       # needed for drop column.
@@ -118,8 +119,7 @@ module Sequel
       # Options:
       # * :server - Set the server to use.
       def tables(opts={})
-        m = output_identifier_meth
-        metadata_dataset.from(:sqlite_master).server(opts[:server]).filter(TABLES_FILTER).map{|r| m.call(r[:name])}
+        tables_and_views(TABLES_FILTER, opts)
       end
       
       # A symbol signifying the value of the temp_store PRAGMA.
@@ -134,6 +134,14 @@ module Sequel
         pragma_set(:temp_store, value)
       end
       
+      # Array of symbols specifying the view names in the current database.
+      #
+      # Options:
+      # * :server - Set the server to use.
+      def views(opts={})
+        tables_and_views(VIEWS_FILTER, opts)
+      end
+
       private
 
       # SQLite supports limited table modification.  You can add a column
@@ -304,6 +312,12 @@ module Sequel
         parse_pragma(table_name, opts).map do |row|
           [m.call(row.delete(:name)), row]
         end
+      end
+      
+      # Backbone of the tables and views support.
+      def tables_and_views(filter, opts)
+        m = output_identifier_meth
+        metadata_dataset.from(:sqlite_master).server(opts[:server]).filter(filter).map{|r| m.call(r[:name])}
       end
       
       # SQLite uses the integer data type even for bignums.  This is because they

@@ -210,6 +210,13 @@ module Sequel
       end
     end
     
+    # Return all views in the database as an array of symbols.
+    #
+    #   DB.views # => [:gold_albums, :artists_with_many_albums]
+    def views(opts={})
+      raise NotImplemented, "#views should be overridden by adapters"
+    end
+    
     private
     
     # Internal generic transaction method.  Any exception raised by the given

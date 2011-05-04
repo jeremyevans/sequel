@@ -83,15 +83,6 @@ module Sequel
         @server_version ||= (m[1].to_i * 10000) + (m[2].to_i * 100) + m[3].to_i
       end
       
-      # Return an array of symbols specifying table names in the current database.
-      #
-      # Options:
-      # * :server - Set the server to use
-      def tables(opts={})
-        m = output_identifier_meth
-        metadata_dataset.with_sql('SHOW TABLES').server(opts[:server]).map{|r| m.call(r.values.first)}
-      end
-      
       # MySQL supports prepared transactions (two-phase commit) using XA
       def supports_prepared_transactions?
         true
@@ -107,6 +98,14 @@ module Sequel
         true
       end
 
+      # Return an array of symbols specifying table names in the current database.
+      #
+      # Options:
+      # * :server - Set the server to use
+      def tables(opts={})
+        full_tables('BASE TABLE', opts)
+      end
+      
       # Changes the database in use by issuing a USE statement.  I would be
       # very careful if I used this.
       def use(db_name)
@@ -114,6 +113,14 @@ module Sequel
         @opts[:database] = db_name if self << "USE #{db_name}"
         @schemas = {}
         self
+      end
+      
+      # Return an array of symbols specifying view names in the current database.
+      #
+      # Options:
+      # * :server - Set the server to use
+      def views(opts={})
+        full_tables('VIEW', opts)
       end
       
       private
@@ -203,6 +210,12 @@ module Sequel
           end
         end
         "#{super}#{" ENGINE=#{engine}" if engine}#{" DEFAULT CHARSET=#{charset}" if charset}#{" DEFAULT COLLATE=#{collate}" if collate}"
+      end
+
+      # Backbone of the tables and views support using SHOW FULL TABLES.
+      def full_tables(type, opts)
+        m = output_identifier_meth
+        metadata_dataset.with_sql('SHOW FULL TABLES').server(opts[:server]).map{|r| m.call(r.values.first) if r.delete(:Table_type) == type}.compact
       end
 
       # MySQL folds unquoted identifiers to lowercase, so it shouldn't need to upcase identifiers on input.

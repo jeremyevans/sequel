@@ -397,6 +397,12 @@ describe "Database#tables" do
   end
 end
 
+describe "Database#views" do
+  specify "should raise Sequel::NotImplemented" do
+    proc {Sequel::Database.new.views}.should raise_error(Sequel::NotImplemented)
+  end
+end
+
 describe "Database#indexes" do
   specify "should raise Sequel::NotImplemented" do
     proc {Sequel::Database.new.indexes(:table)}.should raise_error(Sequel::NotImplemented)
