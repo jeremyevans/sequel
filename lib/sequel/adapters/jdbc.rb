@@ -53,14 +53,14 @@ module Sequel
         Java::oracle.jdbc.driver.OracleDriver
       end,
       :sqlserver=>proc do |db|
-        Sequel.ts_require 'adapters/jdbc/mssql'
-        db.extend(Sequel::JDBC::MSSQL::DatabaseMethods)
+        Sequel.ts_require 'adapters/jdbc/sqlserver'
+        db.extend(Sequel::JDBC::SQLServer::DatabaseMethods)
         db.send(:set_mssql_unicode_strings)
         com.microsoft.sqlserver.jdbc.SQLServerDriver
       end,
       :jtds=>proc do |db|
-        Sequel.ts_require 'adapters/jdbc/mssql'
-        db.extend(Sequel::JDBC::MSSQL::DatabaseMethods)
+        Sequel.ts_require 'adapters/jdbc/jtds'
+        db.extend(Sequel::JDBC::JTDS::DatabaseMethods)
         db.send(:set_mssql_unicode_strings)
         JDBC.load_gem('jtds')
         Java::net.sourceforge.jtds.jdbc.Driver

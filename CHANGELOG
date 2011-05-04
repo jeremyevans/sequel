@@ -1,5 +1,7 @@
 === HEAD
 
+* Convert Java CLOB objects to ruby strings when using the JDBC JTDS subadapter (christian.michon)
+
 * If Thread#kill is called on a thread with an open transaction, roll the transaction back on ruby 1.8 and rubinius (jeremyevans)
 
 * Split informix adapter into shared/specific parts, add JDBC informix subadapter (jeremyevans)
