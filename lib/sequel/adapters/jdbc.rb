@@ -461,9 +461,11 @@ module Sequel
         table = im.call(table)
         pks, ts = [], []
         metadata(:getPrimaryKeys, nil, schema, table) do |h|
+          next if h[:table_schem] == 'INFORMATION_SCHEMA'
           pks << h[:column_name]
         end
         metadata(:getColumns, nil, schema, table, nil) do |h|
+          next if h[:table_schem] == 'INFORMATION_SCHEMA'
           s = {:type=>schema_column_type(h[:type_name]), :db_type=>h[:type_name], :default=>(h[:column_def] == '' ? nil : h[:column_def]), :allow_null=>(h[:nullable] != 0), :primary_key=>pks.include?(h[:column_name]), :column_size=>h[:column_size], :scale=>h[:decimal_digits]}
           if s[:db_type] =~ DECIMAL_TYPE_RE && s[:scale] == 0
             s[:type] = :integer

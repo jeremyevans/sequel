@@ -1,5 +1,7 @@
 === HEAD
 
+* Exclude columns from tables in the INFORMATION_SCHEMA when parsing table schema on JDBC (jeremyevans)
+
 * Fix limiting rows when connecting to Microsoft Access (jeremyevans)
 
 * Add Database#views for getting an array of symbols of view names for the database (jeremyevans, christian.michon)
