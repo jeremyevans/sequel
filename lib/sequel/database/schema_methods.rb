@@ -111,7 +111,11 @@ module Sequel
     
     # Creates the table unless the table already exists
     def create_table?(name, options={}, &block)
-      create_table(name, options, &block) unless table_exists?(name)
+      if supports_create_table_if_not_exists?
+        create_table(name, options.merge(:if_not_exists=>true), &block)
+      elsif !table_exists?(name)
+        create_table(name, options, &block)
+      end
     end
     
     # Creates a view, replacing it if it already exists:
@@ -371,7 +375,7 @@ module Sequel
 
     # DDL statement for creating a table with the given name, columns, and options
     def create_table_sql(name, generator, options)
-      "CREATE #{temporary_table_sql if options[:temp]}TABLE #{options[:temp] ? quote_identifier(name) : quote_schema_table(name)} (#{column_list_sql(generator)})"
+      "CREATE #{temporary_table_sql if options[:temp]}TABLE#{' IF NOT EXISTS' if options[:if_not_exists]} #{options[:temp] ? quote_identifier(name) : quote_schema_table(name)} (#{column_list_sql(generator)})"
     end
 
     # Default index name for the table and columns, may be too long

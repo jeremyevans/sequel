@@ -33,6 +33,11 @@ module Sequel
           {:primary_key => true, :type => :identity}
         end
 
+        # H2 supports CREATE TABLE IF NOT EXISTS syntax.
+        def supports_create_table_if_not_exists?
+          true
+        end
+      
         # H2 supports prepared transactions
         def supports_prepared_transactions?
           true

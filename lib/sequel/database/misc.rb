@@ -90,6 +90,12 @@ module Sequel
       {:primary_key => true, :type => Integer, :auto_increment => true}
     end
 
+    # Whether the database supports CREATE TABLE IF NOT EXISTS syntax,
+    # false by default.
+    def supports_create_table_if_not_exists?
+      false
+    end
+
     # Whether the database and adapter support prepared transactions
     # (two-phase commit), false by default.
     def supports_prepared_transactions?

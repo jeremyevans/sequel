@@ -83,6 +83,11 @@ module Sequel
         @server_version ||= (m[1].to_i * 10000) + (m[2].to_i * 100) + m[3].to_i
       end
       
+      # MySQL supports CREATE TABLE IF NOT EXISTS syntax.
+      def supports_create_table_if_not_exists?
+        true
+      end
+      
       # MySQL supports prepared transactions (two-phase commit) using XA
       def supports_prepared_transactions?
         true

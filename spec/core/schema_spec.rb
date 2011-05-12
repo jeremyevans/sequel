@@ -577,6 +577,12 @@ describe "DB#create_table?" do
     @db.create_table?(:cats){|*a|}
     @db.sqls.should == ['CREATE TABLE cats ()']
   end
+  
+  specify "should use IF NOT EXISTS if the database supports that" do
+    @db.meta_def(:supports_create_table_if_not_exists?){true}
+    @db.create_table?(:cats){|*a|}
+    @db.sqls.should == ['CREATE TABLE IF NOT EXISTS cats ()']
+  end
 end
 
 describe "DB#drop_table" do

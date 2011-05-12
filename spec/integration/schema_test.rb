@@ -174,6 +174,15 @@ describe "Database schema modifiers" do
     @db.create_table!(:items, :temp=>true){Integer :number}
   end
   
+  specify "should have create_table? only create the table if it doesn't already exist" do
+    @db.create_table!(:items){String :a}
+    @db.create_table?(:items){String :b}
+    @db[:items].columns.should == [:a]
+    @db.drop_table(:items) rescue nil
+    @db.create_table?(:items){String :b}
+    @db[:items].columns.should == [:b]
+  end
+
   specify "should rename tables correctly" do
     @db.drop_table(:items) rescue nil
     @db.create_table!(:items2){Integer :number}

@@ -1,5 +1,7 @@
 === HEAD
 
+* Make create_table? use IF NOT EXISTS instead of using SELECT to determine existence, if supported (jeremyevans)
+
 * Fix bug in association_pks plugin when associated table has a different primary key column name (jfirebaugh)
 
 * Fix limiting rows when connecting to DB2 (semmons99)

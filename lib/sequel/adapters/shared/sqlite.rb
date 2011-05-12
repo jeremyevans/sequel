@@ -97,6 +97,11 @@ module Sequel
         end
       end
       
+      # SQLite supports CREATE TABLE IF NOT EXISTS syntax since 3.3.0.
+      def supports_create_table_if_not_exists?
+        sqlite_version >= 30300
+      end
+      
       # SQLite 3.6.8+ supports savepoints. 
       def supports_savepoints?
         sqlite_version >= 30608
