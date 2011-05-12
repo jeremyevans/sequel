@@ -14,7 +14,7 @@ module Sequel
     #
     # Note that it uses the singular form of the association name. Also note
     # that the setter both associates to new primary keys not in the assocation
-    # and disassociated from primary keys not provided to the method.
+    # and disassociates from primary keys not provided to the method.
     #
     # This plugin makes modifications directly to the underlying tables,
     # it does not create or return any model objects, and therefore does
