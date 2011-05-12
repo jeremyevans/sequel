@@ -57,6 +57,13 @@ describe "Sequel::Plugins::AssociationPks" do
       "UPDATE albums SET artist_id = NULL WHERE ((albums.artist_id = 1) AND (id NOT IN (1, 2)))"]
   end
 
+  specify "should use associated class's primary key for a one_to_many association" do
+    @Album.set_primary_key :foo
+    @Artist.load(:id=>1).album_pks = [1, 2]
+    @db.sqls.should == ["UPDATE albums SET artist_id = 1 WHERE (foo IN (1, 2))",
+      "UPDATE albums SET artist_id = NULL WHERE ((albums.artist_id = 1) AND (foo NOT IN (1, 2)))"]
+  end
+
   specify "should set associated pks correctly for a many_to_many association" do
     @Album.load(:id=>2).tag_pks = [1, 3]
     @db.sqls[0].should == "DELETE FROM albums_tags WHERE ((album_id = 2) AND (tag_id NOT IN (1, 3)))"

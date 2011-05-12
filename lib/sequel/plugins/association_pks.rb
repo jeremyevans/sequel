@@ -71,13 +71,15 @@ module Sequel
           super
           return if opts[:type] == :one_to_one
           def_association_pks_getter(opts) do
-            send(opts.dataset_method).select_map(opts[:primary_key])
+            send(opts.dataset_method).select_map(opts.associated_class.primary_key)
           end
           def_association_pks_setter(opts) do |pks|
             checked_transaction do
               ds = send(opts.dataset_method)
-              ds.unfiltered.filter(opts[:primary_key]=>pks).update(opts[:key]=>pk)
-              ds.exclude(opts[:primary_key]=>pks).update(opts[:key]=>nil)
+              primary_key = opts.associated_class.primary_key
+              key = opts[:key]
+              ds.unfiltered.filter(primary_key=>pks).update(key=>pk)
+              ds.exclude(primary_key=>pks).update(key=>nil)
             end
           end
         end
