@@ -1,5 +1,7 @@
 === HEAD
 
+* Fix limiting rows when connecting to DB2 (semmons99)
+
 * Exclude columns from tables in the INFORMATION_SCHEMA when parsing table schema on JDBC (jeremyevans)
 
 * Fix limiting rows when connecting to Microsoft Access (jeremyevans)

@@ -94,16 +94,15 @@ module Sequel
         true
       end
 
+      private
+
       # Modify the sql to limit the number of rows returned
       def select_limit_sql(sql)
-        if @opts[:limit]
-          sql << " FETCH FIRST ROW ONLY" if @opts[:limit] == 1
-          sql << " FETCH FIRST #{@opts[:limit]} ROWS ONLY" if @opts[:limit] > 1
+        if l = @opts[:limit]
+          sql << " FETCH FIRST #{l == 1 ? 'ROW' : "#{literal(l)} ROWS"} ONLY"
         end
       end
       
-      private
-
       def get_column_info(sth)
         rc, column_count = SQLNumResultCols(sth)
         @db.check_error(rc, "Could not get number of result columns")
