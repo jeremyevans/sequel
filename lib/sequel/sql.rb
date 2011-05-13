@@ -595,6 +595,8 @@ module Sequel
           end
         when StringExpression, NumericExpression
           raise(Sequel::Error, "cannot invert #{ce.inspect}")
+        when Constant
+          CONSTANT_INVERSIONS[ce] || raise(Sequel::Error, "cannot invert #{ce.inspect}")
         else
           BooleanExpression.new(:NOT, ce)
         end
@@ -704,6 +706,12 @@ module Sequel
       SQLFALSE = FALSE = BooleanConstant.new(false)
       NULL = BooleanConstant.new(nil)
       NOTNULL = NegativeBooleanConstant.new(nil)
+    end
+
+    class ComplexExpression
+      # A hash of the opposite for each constant, used for inverting constants.
+      CONSTANT_INVERSIONS = {Constants::TRUE=>Constants::FALSE, Constants::FALSE=>Constants::TRUE,
+                             Constants::NULL=>Constants::NOTNULL, Constants::NOTNULL=>Constants::NULL}
     end
 
     # Represents an SQL function call.

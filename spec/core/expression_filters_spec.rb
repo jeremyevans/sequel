@@ -424,6 +424,19 @@ describe "Blockless Ruby Filters" do
     @d.l(~{:x => Sequel::SQLFALSE}).should == '(x IS NOT FALSE)'
   end
   
+  it "should support direct negation of SQL::Constants" do
+    @d.l({:x => ~Sequel::NULL}).should == '(x IS NOT NULL)'
+    @d.l({:x => ~Sequel::NOTNULL}).should == '(x IS NULL)'
+    @d.l({:x => ~Sequel::TRUE}).should == '(x IS FALSE)'
+    @d.l({:x => ~Sequel::FALSE}).should == '(x IS TRUE)'
+    @d.l({:x => ~Sequel::SQLTRUE}).should == '(x IS FALSE)'
+    @d.l({:x => ~Sequel::SQLFALSE}).should == '(x IS TRUE)'
+  end
+  
+  it "should raise an error if trying to invert an invalid SQL::Constant" do
+    proc{~Sequel::CURRENT_DATE}.should raise_error(Sequel::Error)
+  end
+
   it "should raise an error if trying to create an invalid complex expression" do
     proc{Sequel::SQL::ComplexExpression.new(:BANG, 1, 2)}.should raise_error(Sequel::Error)
   end

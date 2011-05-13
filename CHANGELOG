@@ -1,5 +1,7 @@
 === HEAD
 
+* Add support for inverting some SQL::Constant instances such as TRUE, FALSE, NULL, and NOTNULL (jeremyevans)
+
 * Add support for excluding by associations to model datasets (jeremyevans)
 
 * The Sequel::Postgres.use_iso_date_format setting now only affects future Database objects (jeremyevans)
