@@ -100,6 +100,11 @@ module Sequel
       def timestamp(s) ::Sequel.database_to_application_timestamp(s) end
     end.new
 
+    # Hash with type name strings and callable values for converting PostgreSQL types.
+    # Non-builtin types that don't have fixed numbers should use this to register
+    # conversion procs.
+    PG_NAMED_TYPES = {}
+
     # Hash with integer keys and callable values for converting PostgreSQL types.
     PG_TYPES = {}
     {
@@ -194,6 +199,10 @@ module Sequel
       include Sequel::Postgres::DatabaseMethods
       
       set_adapter_scheme :postgres
+
+      # A hash of conversion procs, keyed by type integer (oid) and
+      # having callable values for the conversion proc for that type.
+      attr_reader :conversion_procs
       
       # Add the primary_keys and primary_key_sequences instance variables,
       # so we can get the correct return values for inserted rows.
@@ -225,6 +234,7 @@ module Sequel
         end
         conn.db = self
         conn.apply_connection_settings
+        @conversion_procs ||= get_conversion_procs(conn)
         conn
       end
       
@@ -304,6 +314,19 @@ module Sequel
             end
           end
         end
+      end
+
+      # Return the conversion procs hash to use for this database
+      def get_conversion_procs(conn)
+        procs = PG_TYPES.dup
+        conn.execute("SELECT oid, typname FROM pg_type where typtype = 'b'") do |res|
+          res.ntuples.times do |recnum|
+            if pr = PG_NAMED_TYPES[res.getvalue(recnum, 1).to_sym]
+              procs[res.getvalue(recnum, 0).to_i] ||= pr
+            end
+          end
+        end
+        procs
       end
     end
     
@@ -483,8 +506,9 @@ module Sequel
       # field numers, type conversion procs, and name symbol arrays.
       def fetch_rows_set_cols(res)
         cols = []
+        procs = db.conversion_procs
         res.nfields.times do |fieldnum|
-          cols << [fieldnum, PG_TYPES[res.ftype(fieldnum)], output_identifier(res.fname(fieldnum))]
+          cols << [fieldnum, procs[res.ftype(fieldnum)], output_identifier(res.fname(fieldnum))]
         end
         @columns = cols.map{|c| c.at(2)}
         cols

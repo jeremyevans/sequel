@@ -1,5 +1,9 @@
 === HEAD
 
+* The Sequel::Postgres.use_iso_date_format setting now only affects future Database objects (jeremyevans)
+
+* Add Sequel::Postgres::PG_NAMED_TYPES hash for extensions to register type conversions for non-standard types (jeremyevans, pvh)
+
 * Make create_table? use IF NOT EXISTS instead of using SELECT to determine existence, if supported (jeremyevans)
 
 * Fix bug in association_pks plugin when associated table has a different primary key column name (jfirebaugh)
