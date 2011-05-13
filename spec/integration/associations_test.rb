@@ -26,10 +26,6 @@ shared_examples_for "regular and composite key associations" do
     @album.update(:artist => @artist)
     @album.add_tag(@tag)
     
-    @album.reload
-    @artist.reload
-    @tag.reload
-    
     Artist.filter(:albums=>@album).all.should == [@artist]
     Album.filter(:artist=>@artist).all.should == [@album]
     Album.filter(:tags=>@tag).all.should == [@album]
@@ -37,7 +33,40 @@ shared_examples_for "regular and composite key associations" do
     Album.filter(:artist=>@artist, :tags=>@tag).all.should == [@album]
     @artist.albums_dataset.filter(:tags=>@tag).all.should == [@album]
   end
+
+  specify "should work correctly when excluding by associations" do
+    @album.update(:artist => @artist)
+    @album.add_tag(@tag)
+    album, artist, tag = @pr.call
+
+    Artist.exclude(:albums=>@album).all.should == [artist]
+    Album.exclude(:artist=>@artist).all.should == [album]
+    Album.exclude(:tags=>@tag).all.should == [album]
+    Tag.exclude(:albums=>@album).all.should == [tag]
+    Album.exclude(:artist=>@artist, :tags=>@tag).all.should == [album]
+  end
   
+  specify "should work correctly when excluding by associations in regards to NULL values" do
+    Artist.exclude(:albums=>@album).all.should == [@artist]
+    Album.exclude(:artist=>@artist).all.should == [@album]
+    Album.exclude(:tags=>@tag).all.should == [@album]
+    Tag.exclude(:albums=>@album).all.should == [@tag]
+    Album.exclude(:artist=>@artist, :tags=>@tag).all.should == [@album]
+
+    @album.update(:artist => @artist)
+    @artist.albums_dataset.exclude(:tags=>@tag).all.should == [@album]
+  end
+
+  specify "should handle NULL values in join table correctly when filtering/excluding many_to_many associations" do
+    @ins.call
+    Album.exclude(:tags=>@tag).all.should == [@album]
+    @album.add_tag(@tag)
+    Album.filter(:tags=>@tag).all.should == [@album]
+    album, artist, tag = @pr.call
+    Album.exclude(:tags=>@tag).all.should == [album]
+    Album.exclude(:tags=>tag).all.sort_by{|x| x.pk}.should == [@album, album]
+  end
+
   specify "should have remove methods work" do
     @album.update(:artist => @artist)
     @album.add_tag(@tag)
@@ -167,6 +196,8 @@ describe "Sequel::Model Simple Associations" do
     @album = Album.create(:name=>'Al')
     @artist = Artist.create(:name=>'Ar')
     @tag = Tag.create(:name=>'T')
+    @pr = lambda{[Album.create(:name=>'Al2'),Artist.create(:name=>'Ar2'),Tag.create(:name=>'T2')]}
+    @ins = lambda{@db[:albums_tags].insert(:tag_id=>@tag.id)}
   end
   after do
     @db.drop_table(:albums_tags, :tags, :albums, :artists)
@@ -333,6 +364,8 @@ describe "Sequel::Model Composite Key Associations" do
     @album = Album.create(:name=>'Al', :id1=>1, :id2=>2)
     @artist = Artist.create(:name=>'Ar', :id1=>3, :id2=>4)
     @tag = Tag.create(:name=>'T', :id1=>5, :id2=>6)
+    @pr = lambda{[Album.create(:name=>'Al2', :id1=>11, :id2=>12),Artist.create(:name=>'Ar2', :id1=>13, :id2=>14),Tag.create(:name=>'T2', :id1=>15, :id2=>16)]}
+    @ins = lambda{@db[:albums_tags].insert(:tag_id1=>@tag.id1, :tag_id2=>@tag.id2)}
   end
   after do
     @db.drop_table(:albums_tags, :tags, :albums, :artists)

@@ -210,6 +210,11 @@ describe "Many Through Many Plugin" do
     Artist.filter(:albums=>@album2).all.map{|a| a.name}.sort.should == %w'3 4'
     Artist.filter(:albums=>@album3).all.map{|a| a.name}.sort.should == %w'2 3'
     Artist.filter(:albums=>@album4).all.map{|a| a.name}.sort.should == %w'1 4'
+
+    Artist.exclude(:albums=>@album1).all.map{|a| a.name}.sort.should == %w'3 4'
+    Artist.exclude(:albums=>@album2).all.map{|a| a.name}.sort.should == %w'1 2'
+    Artist.exclude(:albums=>@album3).all.map{|a| a.name}.sort.should == %w'1 4'
+    Artist.exclude(:albums=>@album4).all.map{|a| a.name}.sort.should == %w'2 3'
   end
 
   specify "should handle typical case with 3 join tables" do
@@ -233,6 +238,11 @@ describe "Many Through Many Plugin" do
     Artist.filter(:related_artists=>@artist2).all.map{|a| a.name}.sort.should == %w'1 2 3'
     Artist.filter(:related_artists=>@artist3).all.map{|a| a.name}.sort.should == %w'2 3 4'
     Artist.filter(:related_artists=>@artist4).all.map{|a| a.name}.sort.should == %w'1 3 4'
+
+    Artist.exclude(:related_artists=>@artist1).all.map{|a| a.name}.sort.should == %w'3'
+    Artist.exclude(:related_artists=>@artist2).all.map{|a| a.name}.sort.should == %w'4'
+    Artist.exclude(:related_artists=>@artist3).all.map{|a| a.name}.sort.should == %w'1'
+    Artist.exclude(:related_artists=>@artist4).all.map{|a| a.name}.sort.should == %w'2'
   end
 
   specify "should handle extreme case with 5 join tables" do
@@ -265,6 +275,11 @@ describe "Many Through Many Plugin" do
     Artist.filter(:related_albums=>@album2).all.map{|a| a.name}.sort.should == %w'1 2 3 4'
     Artist.filter(:related_albums=>@album3).all.map{|a| a.name}.sort.should == %w'1 2'
     Artist.filter(:related_albums=>@album4).all.map{|a| a.name}.sort.should == %w'2 3 4'
+
+    Artist.exclude(:related_albums=>@album1).all.map{|a| a.name}.sort.should == %w'4'
+    Artist.exclude(:related_albums=>@album2).all.map{|a| a.name}.sort.should == %w''
+    Artist.exclude(:related_albums=>@album3).all.map{|a| a.name}.sort.should == %w'3 4'
+    Artist.exclude(:related_albums=>@album4).all.map{|a| a.name}.sort.should == %w'1'
   end
 end
 

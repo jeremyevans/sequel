@@ -1,5 +1,7 @@
 === HEAD
 
+* Add support for excluding by associations to model datasets (jeremyevans)
+
 * The Sequel::Postgres.use_iso_date_format setting now only affects future Database objects (jeremyevans)
 
 * Add Sequel::Postgres::PG_NAMED_TYPES hash for extensions to register type conversions for non-standard types (jeremyevans, pvh)

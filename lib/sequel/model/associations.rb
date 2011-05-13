@@ -1415,14 +1415,14 @@ module Sequel
         # types, this is a simple transformation, but for +many_to_many+ associations this 
         # creates a subquery to the join table.
         def complex_expression_sql(op, args)
-          if op == :'=' and args.at(1).is_a?(Sequel::Model)
+          if (op == :'=' || op == :'!=') and args.at(1).is_a?(Sequel::Model)
             l, r = args
             if ar = model.association_reflections[l]
               unless r.is_a?(ar.associated_class)
                 raise Sequel::Error, "invalid association class #{r.class.inspect} for association #{l.inspect} used in dataset filter for model #{model.inspect}, expected class #{ar.associated_class.inspect}"
               end
 
-              if exp = association_filter_expression(ar, r)
+              if exp = association_filter_expression(op, ar, r)
                 literal(exp)
               else
                 raise Sequel::Error, "invalid association type #{ar[:type].inspect} for association #{l.inspect} used in dataset filter for model #{model.inspect}"
@@ -1577,9 +1577,19 @@ module Sequel
         private
       
         # Return an expression for filtering by the given association reflection and associated object.
-        def association_filter_expression(ref, obj)
+        def association_filter_expression(op, ref, obj)
           meth = :"#{ref[:type]}_association_filter_expression"
-          send(meth, ref, obj) if respond_to?(meth, true)
+          send(meth, op, ref, obj) if respond_to?(meth, true)
+        end
+
+        # Handle inversion for association filters by returning an inverted expression,
+        # plus also handling cases where the referenced columns are NULL.
+        def association_filter_handle_inversion(op, exp, cols)
+          if op == :'!='
+            ~exp | Sequel::SQL::BooleanExpression.from_value_pairs(cols.zip([]), :OR)
+          else
+            exp
+          end
         end
 
         # Make sure the association is valid for this model, and return the related AssociationReflection.
@@ -1685,20 +1695,22 @@ module Sequel
         end
       
         # Return a subquery expression for filering by a many_to_many association
-        def many_to_many_association_filter_expression(ref, obj)
-            lpks, lks, rks = ref.values_at(:left_primary_keys, :left_keys, :right_keys)
-            lpks = lpks.first if lpks.length == 1
-            SQL::BooleanExpression.from_value_pairs(lpks=>model.db[ref[:join_table]].select(*lks).where(rks.zip(ref.right_primary_keys.map{|k| obj.send(k)})))
+        def many_to_many_association_filter_expression(op, ref, obj)
+          lpks, lks, rks = ref.values_at(:left_primary_keys, :left_keys, :right_keys)
+          lpks = lpks.first if lpks.length == 1
+          association_filter_handle_inversion(op, SQL::BooleanExpression.from_value_pairs(lpks=>model.db[ref[:join_table]].select(*lks).where(rks.zip(ref.right_primary_keys.map{|k| obj.send(k)})).exclude(SQL::BooleanExpression.from_value_pairs(lks.zip([]), :OR))), Array(lpks))
         end
 
         # Return a simple equality expression for filering by a many_to_one association
-        def many_to_one_association_filter_expression(ref, obj)
-          SQL::BooleanExpression.from_value_pairs(ref[:keys].zip(ref.primary_keys.map{|k| obj.send(k)}))
+        def many_to_one_association_filter_expression(op, ref, obj)
+          keys = ref[:keys]
+          association_filter_handle_inversion(op, SQL::BooleanExpression.from_value_pairs(keys.zip(ref.primary_keys.map{|k| obj.send(k)})), keys)
         end
 
         # Return a simple equality expression for filering by a one_to_* association
-        def one_to_many_association_filter_expression(ref, obj)
-          SQL::BooleanExpression.from_value_pairs(ref[:primary_keys].zip(ref[:keys].map{|k| obj.send(k)}))
+        def one_to_many_association_filter_expression(op, ref, obj)
+          keys = ref[:primary_keys]
+          association_filter_handle_inversion(op, SQL::BooleanExpression.from_value_pairs(keys.zip(ref[:keys].map{|k| obj.send(k)})), keys)
         end
         alias one_to_one_association_filter_expression one_to_many_association_filter_expression
 

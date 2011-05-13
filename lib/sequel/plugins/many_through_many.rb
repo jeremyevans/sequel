@@ -224,7 +224,7 @@ module Sequel
         private
 
         # Use a subquery to filter rows to those related to the given associated object
-        def many_through_many_association_filter_expression(ref, obj)
+        def many_through_many_association_filter_expression(op, ref, obj)
           lpks = ref[:left_primary_keys]
           lpks = lpks.first if lpks.length == 1
           edges = ref.edges
@@ -238,8 +238,8 @@ module Sequel
             last_join = ds.opts[:join].last
             last_join.table_alias || last_join.table
           end
-          ds = ds.where(Array(ref[:final_edge][:left]).map{|x| ::Sequel::SQL::QualifiedIdentifier.new(last_alias, x)}.zip(ref.right_primary_keys.map{|k| obj.send(k)}))
-          SQL::BooleanExpression.from_value_pairs(lpks=>ds)
+          ds = ds.where(Array(ref[:final_edge][:left]).map{|x| ::Sequel::SQL::QualifiedIdentifier.new(last_alias, x)}.zip(ref.right_primary_keys.map{|k| obj.send(k)})).exclude(SQL::BooleanExpression.from_value_pairs(ds.opts[:select].zip([]), :OR))
+          association_filter_handle_inversion(op, SQL::BooleanExpression.from_value_pairs(lpks=>ds), Array(lpks))
         end
       end
     end
