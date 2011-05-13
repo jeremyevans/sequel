@@ -1415,10 +1415,17 @@ module Sequel
         # types, this is a simple transformation, but for +many_to_many+ associations this 
         # creates a subquery to the join table.
         def complex_expression_sql(op, args)
-          if (op == :'=' || op == :'!=') and args.at(1).is_a?(Sequel::Model)
-            l, r = args
+          r = args.at(1)
+          if (((op == :'=' || op == :'!=') and r.is_a?(Sequel::Model)) ||
+              (multiple = ((op == :IN || op == :'NOT IN') and !r.is_a?(Sequel::Dataset) and r.all?{|x| x.is_a?(Sequel::Model)})))
+            l = args.at(0)
             if ar = model.association_reflections[l]
-              unless r.is_a?(ar.associated_class)
+              if multiple
+                klass = ar.associated_class
+                unless r.all?{|x| x.is_a?(klass)}
+                  raise Sequel::Error, "invalid association class for one object for association #{l.inspect} used in dataset filter for model #{model.inspect}, expected class #{klass.inspect}"
+                end
+              elsif !r.is_a?(ar.associated_class)
                 raise Sequel::Error, "invalid association class #{r.class.inspect} for association #{l.inspect} used in dataset filter for model #{model.inspect}, expected class #{ar.associated_class.inspect}"
               end
 
@@ -1585,11 +1592,34 @@ module Sequel
         # Handle inversion for association filters by returning an inverted expression,
         # plus also handling cases where the referenced columns are NULL.
         def association_filter_handle_inversion(op, exp, cols)
-          if op == :'!='
-            ~exp | Sequel::SQL::BooleanExpression.from_value_pairs(cols.zip([]), :OR)
+          if op == :'!=' || op == :'NOT IN'
+            if exp == SQL::Constants::FALSE
+              ~exp
+            else
+              ~exp | Sequel::SQL::BooleanExpression.from_value_pairs(cols.zip([]), :OR)
+            end
           else
             exp
           end
+        end
+
+        # Return an expression for making sure that the given keys match the value of
+        # the given methods for either the single object given or for any of the objects
+        # given if +obj+ is an array.
+        def association_filter_key_expression(keys, meths, obj)
+          vals = Array(obj).reject{|o| !meths.all?{|m| o.send(m)}}
+          return SQL::Constants::FALSE if vals.empty?
+          vals = if obj.is_a?(Array)
+            if keys.length == 1
+              meth = meths.first
+              {keys.first=>vals.map{|o| o.send(meth)}}
+            else
+              {keys=>vals.map{|o| meths.map{|m| o.send(m)}}}
+            end  
+          else
+            keys.zip(meths.map{|k| obj.send(k)})
+          end
+          SQL::BooleanExpression.from_value_pairs(vals)
         end
 
         # Make sure the association is valid for this model, and return the related AssociationReflection.
@@ -1698,19 +1728,24 @@ module Sequel
         def many_to_many_association_filter_expression(op, ref, obj)
           lpks, lks, rks = ref.values_at(:left_primary_keys, :left_keys, :right_keys)
           lpks = lpks.first if lpks.length == 1
-          association_filter_handle_inversion(op, SQL::BooleanExpression.from_value_pairs(lpks=>model.db[ref[:join_table]].select(*lks).where(rks.zip(ref.right_primary_keys.map{|k| obj.send(k)})).exclude(SQL::BooleanExpression.from_value_pairs(lks.zip([]), :OR))), Array(lpks))
+          exp = association_filter_key_expression(rks, ref.right_primary_keys, obj)
+          if exp == SQL::Constants::FALSE
+            association_filter_handle_inversion(op, exp, Array(lpks))
+          else
+            association_filter_handle_inversion(op, SQL::BooleanExpression.from_value_pairs(lpks=>model.db[ref[:join_table]].select(*lks).where(exp).exclude(SQL::BooleanExpression.from_value_pairs(lks.zip([]), :OR))), Array(lpks))
+          end
         end
 
         # Return a simple equality expression for filering by a many_to_one association
         def many_to_one_association_filter_expression(op, ref, obj)
           keys = ref[:keys]
-          association_filter_handle_inversion(op, SQL::BooleanExpression.from_value_pairs(keys.zip(ref.primary_keys.map{|k| obj.send(k)})), keys)
+          association_filter_handle_inversion(op, association_filter_key_expression(keys, ref.primary_keys, obj), keys)
         end
 
         # Return a simple equality expression for filering by a one_to_* association
         def one_to_many_association_filter_expression(op, ref, obj)
           keys = ref[:primary_keys]
-          association_filter_handle_inversion(op, SQL::BooleanExpression.from_value_pairs(keys.zip(ref[:keys].map{|k| obj.send(k)})), keys)
+          association_filter_handle_inversion(op, association_filter_key_expression(keys, ref[:keys], obj), keys)
         end
         alias one_to_one_association_filter_expression one_to_many_association_filter_expression
 

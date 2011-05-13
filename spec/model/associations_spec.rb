@@ -2873,4 +2873,228 @@ describe "Filtering by associations" do
     @Album.exclude(:ctags=>@Tag.load(:tid1=>3, :tid2=>4)).sql.should == 'SELECT * FROM albums WHERE (((id1, id2) NOT IN (SELECT album_id1, album_id2 FROM albums_tags WHERE ((tag_id1 = 3) AND (tag_id2 = 4) AND (album_id1 IS NOT NULL) AND (album_id2 IS NOT NULL)))) OR (id1 IS NULL) OR (id2 IS NULL))'
   end
 
+  it "should be able to filter on multiple many_to_one associations" do
+    @Album.filter(:artist=>[@Artist.load(:id=>3), @Artist.load(:id=>4)]).sql.should == 'SELECT * FROM albums WHERE (artist_id IN (3, 4))'
+  end
+
+  it "should be able to filter on multiple one_to_many associations" do
+    @Album.filter(:tracks=>[@Track.load(:album_id=>3), @Track.load(:album_id=>4)]).sql.should == 'SELECT * FROM albums WHERE (id IN (3, 4))'
+  end
+
+  it "should be able to filter on multiple one_to_one associations" do
+    @Album.filter(:album_info=>[@AlbumInfo.load(:album_id=>3), @AlbumInfo.load(:album_id=>4)]).sql.should == 'SELECT * FROM albums WHERE (id IN (3, 4))'
+  end
+
+  it "should be able to filter on multiple many_to_many associations" do
+    @Album.filter(:tags=>[@Tag.load(:id=>3), @Tag.load(:id=>4)]).sql.should == 'SELECT * FROM albums WHERE (id IN (SELECT album_id FROM albums_tags WHERE ((tag_id IN (3, 4)) AND (album_id IS NOT NULL))))'
+  end
+
+  it "should be able to filter on multiple many_to_one associations with composite keys" do
+    @Album.filter(:cartist=>[@Artist.load(:id1=>3, :id2=>4), @Artist.load(:id1=>5, :id2=>6)]).sql.should == 'SELECT * FROM albums WHERE ((artist_id1, artist_id2) IN ((3, 4), (5, 6)))'
+  end
+
+  it "should be able to filter on multiple one_to_many associations with composite keys" do
+    @Album.filter(:ctracks=>[@Track.load(:album_id1=>3, :album_id2=>4), @Track.load(:album_id1=>5, :album_id2=>6)]).sql.should == 'SELECT * FROM albums WHERE ((id1, id2) IN ((3, 4), (5, 6)))'
+  end
+
+  it "should be able to filter on multiple one_to_one associations with composite keys" do
+    @Album.filter(:calbum_info=>[@AlbumInfo.load(:album_id1=>3, :album_id2=>4), @AlbumInfo.load(:album_id1=>5, :album_id2=>6)]).sql.should == 'SELECT * FROM albums WHERE ((id1, id2) IN ((3, 4), (5, 6)))' 
+  end
+
+  it "should be able to filter on multiple many_to_many associations with composite keys" do
+    @Album.filter(:ctags=>[@Tag.load(:tid1=>3, :tid2=>4), @Tag.load(:tid1=>5, :tid2=>6)]).sql.should == 'SELECT * FROM albums WHERE ((id1, id2) IN (SELECT album_id1, album_id2 FROM albums_tags WHERE (((tag_id1, tag_id2) IN ((3, 4), (5, 6))) AND (album_id1 IS NOT NULL) AND (album_id2 IS NOT NULL))))'
+  end
+
+  it "should be able to exclude on multiple many_to_one associations" do
+    @Album.exclude(:artist=>[@Artist.load(:id=>3), @Artist.load(:id=>4)]).sql.should == 'SELECT * FROM albums WHERE ((artist_id NOT IN (3, 4)) OR (artist_id IS NULL))'
+  end
+
+  it "should be able to exclude on multiple one_to_many associations" do
+    @Album.exclude(:tracks=>[@Track.load(:album_id=>3), @Track.load(:album_id=>4)]).sql.should == 'SELECT * FROM albums WHERE ((id NOT IN (3, 4)) OR (id IS NULL))'
+  end
+
+  it "should be able to exclude on multiple one_to_one associations" do
+    @Album.exclude(:album_info=>[@AlbumInfo.load(:album_id=>3), @AlbumInfo.load(:album_id=>4)]).sql.should == 'SELECT * FROM albums WHERE ((id NOT IN (3, 4)) OR (id IS NULL))'
+  end
+
+  it "should be able to exclude on multiple many_to_many associations" do
+    @Album.exclude(:tags=>[@Tag.load(:id=>3), @Tag.load(:id=>4)]).sql.should == 'SELECT * FROM albums WHERE ((id NOT IN (SELECT album_id FROM albums_tags WHERE ((tag_id IN (3, 4)) AND (album_id IS NOT NULL)))) OR (id IS NULL))'
+  end
+
+  it "should be able to exclude on multiple many_to_one associations with composite keys" do
+    @Album.exclude(:cartist=>[@Artist.load(:id1=>3, :id2=>4), @Artist.load(:id1=>5, :id2=>6)]).sql.should == 'SELECT * FROM albums WHERE (((artist_id1, artist_id2) NOT IN ((3, 4), (5, 6))) OR (artist_id1 IS NULL) OR (artist_id2 IS NULL))'
+  end
+
+  it "should be able to exclude on multiple one_to_many associations with composite keys" do
+    @Album.exclude(:ctracks=>[@Track.load(:album_id1=>3, :album_id2=>4), @Track.load(:album_id1=>5, :album_id2=>6)]).sql.should == 'SELECT * FROM albums WHERE (((id1, id2) NOT IN ((3, 4), (5, 6))) OR (id1 IS NULL) OR (id2 IS NULL))'
+  end
+
+  it "should be able to exclude on multiple one_to_one associations with composite keys" do
+    @Album.exclude(:calbum_info=>[@AlbumInfo.load(:album_id1=>3, :album_id2=>4), @AlbumInfo.load(:album_id1=>5, :album_id2=>6)]).sql.should == 'SELECT * FROM albums WHERE (((id1, id2) NOT IN ((3, 4), (5, 6))) OR (id1 IS NULL) OR (id2 IS NULL))' 
+  end
+
+  it "should be able to exclude on multiple many_to_many associations with composite keys" do
+    @Album.exclude(:ctags=>[@Tag.load(:tid1=>3, :tid2=>4), @Tag.load(:tid1=>5, :tid2=>6)]).sql.should == 'SELECT * FROM albums WHERE (((id1, id2) NOT IN (SELECT album_id1, album_id2 FROM albums_tags WHERE (((tag_id1, tag_id2) IN ((3, 4), (5, 6))) AND (album_id1 IS NOT NULL) AND (album_id2 IS NOT NULL)))) OR (id1 IS NULL) OR (id2 IS NULL))'
+  end
+
+  it "should be able to handle NULL values when filtering many_to_one associations" do
+    @Album.filter(:artist=>@Artist.new).sql.should == 'SELECT * FROM albums WHERE \'f\''
+  end
+
+  it "should be able to handle NULL values when filtering one_to_many associations" do
+    @Album.filter(:tracks=>@Track.new).sql.should == 'SELECT * FROM albums WHERE \'f\''
+  end
+
+  it "should be able to handle NULL values when filtering one_to_one associations" do
+    @Album.filter(:album_info=>@AlbumInfo.new).sql.should == 'SELECT * FROM albums WHERE \'f\''
+  end
+
+  it "should be able to handle NULL values when filtering many_to_many associations" do
+    @Album.filter(:tags=>@Tag.new).sql.should == 'SELECT * FROM albums WHERE \'f\''
+  end
+
+  it "should be able to handle filteringing with NULL values for many_to_one associations with composite keys" do
+    @Album.filter(:cartist=>@Artist.load(:id2=>4)).sql.should == 'SELECT * FROM albums WHERE \'f\''
+    @Album.filter(:cartist=>@Artist.load(:id1=>3)).sql.should == 'SELECT * FROM albums WHERE \'f\''
+    @Album.filter(:cartist=>@Artist.new).sql.should == 'SELECT * FROM albums WHERE \'f\''
+  end
+
+  it "should be able to filtering with NULL values for one_to_many associations with composite keys" do
+    @Album.filter(:ctracks=>@Track.load(:album_id2=>4)).sql.should == 'SELECT * FROM albums WHERE \'f\''
+    @Album.filter(:ctracks=>@Track.load(:album_id1=>3)).sql.should == 'SELECT * FROM albums WHERE \'f\''
+    @Album.filter(:ctracks=>@Track.new).sql.should == 'SELECT * FROM albums WHERE \'f\''
+  end
+
+  it "should be able to filtering with NULL values for one_to_one associations with composite keys" do
+    @Album.filter(:calbum_info=>@AlbumInfo.load(:album_id2=>4)).sql.should == 'SELECT * FROM albums WHERE \'f\'' 
+    @Album.filter(:calbum_info=>@AlbumInfo.load(:album_id1=>3)).sql.should == 'SELECT * FROM albums WHERE \'f\'' 
+    @Album.filter(:calbum_info=>@AlbumInfo.new).sql.should == 'SELECT * FROM albums WHERE \'f\'' 
+  end
+
+  it "should be able to filtering with NULL values for many_to_many associations with composite keys" do
+    @Album.filter(:ctags=>@Tag.load(:tid1=>3)).sql.should == 'SELECT * FROM albums WHERE \'f\''
+    @Album.filter(:ctags=>@Tag.load(:tid2=>4)).sql.should == 'SELECT * FROM albums WHERE \'f\''
+    @Album.filter(:ctags=>@Tag.new).sql.should == 'SELECT * FROM albums WHERE \'f\''
+  end
+
+  it "should be able to handle NULL values when excluding many_to_one associations" do
+    @Album.exclude(:artist=>@Artist.new).sql.should == 'SELECT * FROM albums WHERE \'t\''
+  end
+
+  it "should be able to handle NULL values when excluding one_to_many associations" do
+    @Album.exclude(:tracks=>@Track.new).sql.should == 'SELECT * FROM albums WHERE \'t\''
+  end
+
+  it "should be able to handle NULL values when excluding one_to_one associations" do
+    @Album.exclude(:album_info=>@AlbumInfo.new).sql.should == 'SELECT * FROM albums WHERE \'t\''
+  end
+
+  it "should be able to handle NULL values when excluding many_to_many associations" do
+    @Album.exclude(:tags=>@Tag.new).sql.should == 'SELECT * FROM albums WHERE \'t\''
+  end
+
+  it "should be able to handle excluding with NULL values for many_to_one associations with composite keys" do
+    @Album.exclude(:cartist=>@Artist.load(:id2=>4)).sql.should == 'SELECT * FROM albums WHERE \'t\''
+    @Album.exclude(:cartist=>@Artist.load(:id1=>3)).sql.should == 'SELECT * FROM albums WHERE \'t\''
+    @Album.exclude(:cartist=>@Artist.new).sql.should == 'SELECT * FROM albums WHERE \'t\''
+  end
+
+  it "should be able to excluding with NULL values for one_to_many associations with composite keys" do
+    @Album.exclude(:ctracks=>@Track.load(:album_id2=>4)).sql.should == 'SELECT * FROM albums WHERE \'t\''
+    @Album.exclude(:ctracks=>@Track.load(:album_id1=>3)).sql.should == 'SELECT * FROM albums WHERE \'t\''
+    @Album.exclude(:ctracks=>@Track.new).sql.should == 'SELECT * FROM albums WHERE \'t\''
+  end
+
+  it "should be able to excluding with NULL values for one_to_one associations with composite keys" do
+    @Album.exclude(:calbum_info=>@AlbumInfo.load(:album_id2=>4)).sql.should == 'SELECT * FROM albums WHERE \'t\'' 
+    @Album.exclude(:calbum_info=>@AlbumInfo.load(:album_id1=>3)).sql.should == 'SELECT * FROM albums WHERE \'t\'' 
+    @Album.exclude(:calbum_info=>@AlbumInfo.new).sql.should == 'SELECT * FROM albums WHERE \'t\'' 
+  end
+
+  it "should be able to excluding with NULL values for many_to_many associations with composite keys" do
+    @Album.exclude(:ctags=>@Tag.load(:tid1=>3)).sql.should == 'SELECT * FROM albums WHERE \'t\''
+    @Album.exclude(:ctags=>@Tag.load(:tid2=>4)).sql.should == 'SELECT * FROM albums WHERE \'t\''
+    @Album.exclude(:ctags=>@Tag.new).sql.should == 'SELECT * FROM albums WHERE \'t\''
+  end
+
+  it "should be able to handle NULL values when filtering multiple many_to_one associations" do
+    @Album.filter(:artist=>[@Artist.load(:id=>3), @Artist.new]).sql.should == 'SELECT * FROM albums WHERE (artist_id IN (3))'
+    @Album.filter(:artist=>[@Artist.new, @Artist.new]).sql.should == 'SELECT * FROM albums WHERE \'f\''
+  end
+
+  it "should be able to handle NULL values when filtering multiple one_to_many associations" do
+    @Album.filter(:tracks=>[@Track.load(:album_id=>3), @Track.new]).sql.should == 'SELECT * FROM albums WHERE (id IN (3))'
+    @Album.filter(:tracks=>[@Track.new, @Track.new]).sql.should == 'SELECT * FROM albums WHERE \'f\''
+  end
+
+  it "should be able to handle NULL values when filtering multiple one_to_one associations" do
+    @Album.filter(:album_info=>[@AlbumInfo.load(:album_id=>3), @AlbumInfo.new]).sql.should == 'SELECT * FROM albums WHERE (id IN (3))'
+    @Album.filter(:album_info=>[@AlbumInfo.new, @AlbumInfo.new]).sql.should == 'SELECT * FROM albums WHERE \'f\''
+  end
+
+  it "should be able to handle NULL values when filtering multiple many_to_many associations" do
+    @Album.filter(:tags=>[@Tag.load(:id=>3), @Tag.new]).sql.should == 'SELECT * FROM albums WHERE (id IN (SELECT album_id FROM albums_tags WHERE ((tag_id IN (3)) AND (album_id IS NOT NULL))))'
+    @Album.filter(:tags=>[@Tag.new, @Tag.new]).sql.should == 'SELECT * FROM albums WHERE \'f\''
+  end
+
+  it "should be able to handle NULL values when filtering multiple many_to_one associations with composite keys" do
+    @Album.filter(:cartist=>[@Artist.load(:id1=>3, :id2=>4), @Artist.load(:id1=>3)]).sql.should == 'SELECT * FROM albums WHERE ((artist_id1, artist_id2) IN ((3, 4)))'
+    @Album.filter(:cartist=>[@Artist.load(:id1=>3, :id2=>4), @Artist.new]).sql.should == 'SELECT * FROM albums WHERE ((artist_id1, artist_id2) IN ((3, 4)))'
+  end
+
+  it "should be able handle NULL values when filtering multiple one_to_many associations with composite keys" do
+    @Album.filter(:ctracks=>[@Track.load(:album_id1=>3, :album_id2=>4), @Track.load(:album_id1=>3)]).sql.should == 'SELECT * FROM albums WHERE ((id1, id2) IN ((3, 4)))'
+    @Album.filter(:ctracks=>[@Track.load(:album_id1=>3, :album_id2=>4), @Track.new]).sql.should == 'SELECT * FROM albums WHERE ((id1, id2) IN ((3, 4)))'
+  end
+
+  it "should be able to handle NULL values when filtering multiple one_to_one associations with composite keys" do
+    @Album.filter(:calbum_info=>[@AlbumInfo.load(:album_id1=>3, :album_id2=>4), @AlbumInfo.load(:album_id1=>5)]).sql.should == 'SELECT * FROM albums WHERE ((id1, id2) IN ((3, 4)))' 
+    @Album.filter(:calbum_info=>[@AlbumInfo.load(:album_id1=>3, :album_id2=>4), @AlbumInfo.new]).sql.should == 'SELECT * FROM albums WHERE ((id1, id2) IN ((3, 4)))' 
+  end
+
+  it "should be able to handle NULL values when filtering multiple many_to_many associations with composite keys" do
+    @Album.filter(:ctags=>[@Tag.load(:tid1=>3, :tid2=>4), @Tag.load(:tid1=>5)]).sql.should == 'SELECT * FROM albums WHERE ((id1, id2) IN (SELECT album_id1, album_id2 FROM albums_tags WHERE (((tag_id1, tag_id2) IN ((3, 4))) AND (album_id1 IS NOT NULL) AND (album_id2 IS NOT NULL))))'
+    @Album.filter(:ctags=>[@Tag.load(:tid1=>3, :tid2=>4), @Tag.new]).sql.should == 'SELECT * FROM albums WHERE ((id1, id2) IN (SELECT album_id1, album_id2 FROM albums_tags WHERE (((tag_id1, tag_id2) IN ((3, 4))) AND (album_id1 IS NOT NULL) AND (album_id2 IS NOT NULL))))'
+  end
+
+  it "should be able to handle NULL values when excluding multiple many_to_one associations" do
+    @Album.exclude(:artist=>[@Artist.load(:id=>3), @Artist.new]).sql.should == 'SELECT * FROM albums WHERE ((artist_id NOT IN (3)) OR (artist_id IS NULL))'
+    @Album.exclude(:artist=>[@Artist.new, @Artist.new]).sql.should == 'SELECT * FROM albums WHERE \'t\''
+  end
+
+  it "should be able to handle NULL values when excluding multiple one_to_many associations" do
+    @Album.exclude(:tracks=>[@Track.load(:album_id=>3), @Track.new]).sql.should == 'SELECT * FROM albums WHERE ((id NOT IN (3)) OR (id IS NULL))'
+    @Album.exclude(:tracks=>[@Track.new, @Track.new]).sql.should == 'SELECT * FROM albums WHERE \'t\''
+  end
+
+  it "should be able to handle NULL values when excluding multiple one_to_one associations" do
+    @Album.exclude(:album_info=>[@AlbumInfo.load(:album_id=>3), @AlbumInfo.new]).sql.should == 'SELECT * FROM albums WHERE ((id NOT IN (3)) OR (id IS NULL))'
+    @Album.exclude(:album_info=>[@AlbumInfo.new, @AlbumInfo.new]).sql.should == 'SELECT * FROM albums WHERE \'t\''
+  end
+
+  it "should be able to handle NULL values when excluding multiple many_to_many associations" do
+    @Album.exclude(:tags=>[@Tag.load(:id=>3), @Tag.new]).sql.should == 'SELECT * FROM albums WHERE ((id NOT IN (SELECT album_id FROM albums_tags WHERE ((tag_id IN (3)) AND (album_id IS NOT NULL)))) OR (id IS NULL))'
+    @Album.exclude(:tags=>[@Tag.new, @Tag.new]).sql.should == 'SELECT * FROM albums WHERE \'t\''
+  end
+
+  it "should be able to handle NULL values when excluding multiple many_to_one associations with composite keys" do
+    @Album.exclude(:cartist=>[@Artist.load(:id1=>3, :id2=>4), @Artist.load(:id1=>3)]).sql.should == 'SELECT * FROM albums WHERE (((artist_id1, artist_id2) NOT IN ((3, 4))) OR (artist_id1 IS NULL) OR (artist_id2 IS NULL))'
+    @Album.exclude(:cartist=>[@Artist.load(:id1=>3, :id2=>4), @Artist.new]).sql.should == 'SELECT * FROM albums WHERE (((artist_id1, artist_id2) NOT IN ((3, 4))) OR (artist_id1 IS NULL) OR (artist_id2 IS NULL))'
+  end
+
+  it "should be able handle NULL values when excluding multiple one_to_many associations with composite keys" do
+    @Album.exclude(:ctracks=>[@Track.load(:album_id1=>3, :album_id2=>4), @Track.load(:album_id1=>3)]).sql.should == 'SELECT * FROM albums WHERE (((id1, id2) NOT IN ((3, 4))) OR (id1 IS NULL) OR (id2 IS NULL))'
+    @Album.exclude(:ctracks=>[@Track.load(:album_id1=>3, :album_id2=>4), @Track.new]).sql.should == 'SELECT * FROM albums WHERE (((id1, id2) NOT IN ((3, 4))) OR (id1 IS NULL) OR (id2 IS NULL))'
+  end
+
+  it "should be able to handle NULL values when excluding multiple one_to_one associations with composite keys" do
+    @Album.exclude(:calbum_info=>[@AlbumInfo.load(:album_id1=>3, :album_id2=>4), @AlbumInfo.load(:album_id1=>5)]).sql.should == 'SELECT * FROM albums WHERE (((id1, id2) NOT IN ((3, 4))) OR (id1 IS NULL) OR (id2 IS NULL))' 
+    @Album.exclude(:calbum_info=>[@AlbumInfo.load(:album_id1=>3, :album_id2=>4), @AlbumInfo.new]).sql.should == 'SELECT * FROM albums WHERE (((id1, id2) NOT IN ((3, 4))) OR (id1 IS NULL) OR (id2 IS NULL))' 
+  end
+
+  it "should be able to handle NULL values when excluding multiple many_to_many associations with composite keys" do
+    @Album.exclude(:ctags=>[@Tag.load(:tid1=>3, :tid2=>4), @Tag.load(:tid1=>5)]).sql.should == 'SELECT * FROM albums WHERE (((id1, id2) NOT IN (SELECT album_id1, album_id2 FROM albums_tags WHERE (((tag_id1, tag_id2) IN ((3, 4))) AND (album_id1 IS NOT NULL) AND (album_id2 IS NOT NULL)))) OR (id1 IS NULL) OR (id2 IS NULL))'
+    @Album.exclude(:ctags=>[@Tag.load(:tid1=>3, :tid2=>4), @Tag.new]).sql.should == 'SELECT * FROM albums WHERE (((id1, id2) NOT IN (SELECT album_id1, album_id2 FROM albums_tags WHERE (((tag_id1, tag_id2) IN ((3, 4))) AND (album_id1 IS NOT NULL) AND (album_id2 IS NOT NULL)))) OR (id1 IS NULL) OR (id2 IS NULL))'
+  end
+
 end
