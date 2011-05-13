@@ -100,7 +100,7 @@ module Sequel
       def timestamp(s) ::Sequel.database_to_application_timestamp(s) end
     end.new
 
-    # Hash with type name strings and callable values for converting PostgreSQL types.
+    # Hash with type name symbols and callable values for converting PostgreSQL types.
     # Non-builtin types that don't have fixed numbers should use this to register
     # conversion procs.
     PG_NAMED_TYPES = {}

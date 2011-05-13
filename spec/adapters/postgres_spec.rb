@@ -973,17 +973,17 @@ describe "Postgres::Database functions, languages, and triggers" do
 end
 
 if POSTGRES_DB.adapter_scheme == :postgres
-describe "Postgres::Dataset #use_cursor" do
-  before(:all) do
-    @db = POSTGRES_DB
-    @db.create_table!(:test_cursor){Integer :x}
-    @db.sqls.clear
-    @ds = @db[:test_cursor]
-    @db.transaction{1001.times{|i| @ds.insert(i)}}
-  end
-  after(:all) do
-    @db.drop_table(:test) rescue nil
-  end
+  describe "Postgres::Dataset #use_cursor" do
+    before(:all) do
+      @db = POSTGRES_DB
+      @db.create_table!(:test_cursor){Integer :x}
+      @db.sqls.clear
+      @ds = @db[:test_cursor]
+      @db.transaction{1001.times{|i| @ds.insert(i)}}
+    end
+    after(:all) do
+      @db.drop_table(:test) rescue nil
+    end
   
     specify "should return the same results as the non-cursor use" do
       @ds.all.should == @ds.use_cursor.all
@@ -1005,5 +1005,30 @@ describe "Postgres::Dataset #use_cursor" do
       @ds.check_return
       @ds.all.should == @ds.use_cursor.all
     end
-end
+  end
+
+  describe "Postgres::PG_NAMED_TYPES" do
+    before do
+      @db = POSTGRES_DB
+      Sequel::Postgres::PG_NAMED_TYPES[:interval] = lambda{|v| v.reverse}
+      @db.instance_eval do
+        disconnect
+        @conversion_procs = nil
+      end 
+    end
+    after do
+      Sequel::Postgres::PG_NAMED_TYPES.delete(:interval)
+      @db.instance_eval do
+        disconnect
+        @conversion_procs = nil
+      end
+      @db.drop_table(:foo)
+    end
+
+    specify "should look up conversion procs by name" do
+      @db.create_table!(:foo){interval :bar}
+      @db[:foo].insert('21 days')
+      @db[:foo].get(:bar).should == 'syad 12'
+    end
+  end
 end
