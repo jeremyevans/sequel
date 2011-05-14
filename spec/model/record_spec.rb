@@ -1167,6 +1167,29 @@ describe Sequel::Model, "#initialize" do
     m.values.should == {:x => 2}
   end
 end
+  
+describe Sequel::Model, "#initialize_set" do
+  before do
+    @c = Class.new(Sequel::Model){columns :id, :x, :y}
+  end
+
+  specify "should be called by initialize to set the column values" do
+    @c.send(:define_method, :initialize_set){set(:y => 3)}
+    @c.new(:x => 2).values.should == {:y => 3}
+  end
+
+  specify "should be called with the hash given to initialize " do
+    x = nil
+    @c.send(:define_method, :initialize_set){|y| x = y}
+    @c.new(:x => 2)
+    x.should == {:x => 2}
+  end
+
+  specify "should not cause columns modified by the method to be considered as changed" do
+    @c.send(:define_method, :initialize_set){set(:y => 3)}
+    @c.new(:x => 2).changed_columns.should == []
+  end
+end
 
 describe Sequel::Model, ".create" do
 

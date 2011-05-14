@@ -751,7 +751,7 @@ module Sequel
           @values = {}
           @new = true
           @modified = true
-          set(values)
+          initialize_set(values)
           changed_columns.clear 
           yield self if block_given?
         end
@@ -1352,6 +1352,13 @@ module Sequel
       # If transactions should be used, wrap the yield in a transaction block.
       def checked_transaction(opts={})
         use_transaction?(opts) ? db.transaction(opts){yield} : yield
+      end
+
+      # Set the columns with the given hash.  By default, the same as +set+, but
+      # exists so it can be overridden.  This is called only for new records, before
+      # changed_columns is cleared.
+      def initialize_set(h)
+        set(h)
       end
 
       # Default inspection output for the values hash, overwrite to change what #inspect displays.
