@@ -809,6 +809,25 @@ describe "Database#transaction" do
     t.join
     @db.transactions.should be_empty
   end
+
+  if (!defined?(RUBY_ENGINE) or RUBY_ENGINE == 'ruby' or RUBY_ENGINE == 'rbx') and RUBY_VERSION < '1.9'
+    specify "should handle Thread#kill for transactions inside threads" do
+      q = Queue.new
+      q1 = Queue.new
+      t = Thread.new do
+        @db.transaction do
+          @db.execute 'DROP TABLE test'
+          q1.push nil
+          q.pop
+          @db.execute 'DROP TABLE test2'
+        end
+      end
+      q1.pop
+      t.kill
+      t.join
+      @db.sql.should == ['BEGIN', 'DROP TABLE test', 'ROLLBACK']
+    end
+  end
 end
 
 describe "Database#transaction with savepoints" do
