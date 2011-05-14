@@ -2828,11 +2828,24 @@ describe "Filtering by associations" do
   it "should raise for an invalid association type" do
     @Album.many_to_many :iatags, :clone=>:tags
     @Album.association_reflection(:iatags)[:type] = :foo
-    proc{@Album.filter(:mtmtags=>@Tag.load(:id=>3)).sql}.should raise_error(Sequel::Error)
+    proc{@Album.filter(:iatags=>@Tag.load(:id=>3)).sql}.should raise_error(Sequel::Error)
   end
 
   it "should raise for an invalid associated object class " do
     proc{@Album.filter(:tags=>@Artist.load(:id=>3)).sql}.should raise_error(Sequel::Error)
+  end
+
+  it "should raise for an invalid associated object class when multiple objects are used" do
+    proc{@Album.filter(:tags=>[@Tag.load(:id=>3), @Artist.load(:id=>3)]).sql}.should raise_error(Sequel::Error)
+  end
+
+  it "should correctly handle case when a multiple value association is used" do
+    proc{@Album.filter(:tags=>[@Tag.load(:id=>3), @Artist.load(:id=>3)]).sql}.should raise_error(Sequel::Error)
+  end
+
+  it "should not affect non-association IN/NOT IN filtering with an empty array" do
+    @Album.filter(:tag_id=>[]).sql.should == 'SELECT * FROM albums WHERE (tag_id != tag_id)'
+    @Album.exclude(:tag_id=>[]).sql.should == 'SELECT * FROM albums WHERE (1 = 1)'
   end
 
   it "should work correctly in subclasses" do

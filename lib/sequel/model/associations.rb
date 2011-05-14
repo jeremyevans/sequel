@@ -1434,6 +1434,8 @@ module Sequel
               else
                 raise Sequel::Error, "invalid association type #{ar[:type].inspect} for association #{l.inspect} used in dataset filter for model #{model.inspect}"
               end
+            elsif multiple && r.empty?
+              super
             else
               raise Sequel::Error, "invalid association #{l.inspect} used in dataset filter for model #{model.inspect}"
             end
