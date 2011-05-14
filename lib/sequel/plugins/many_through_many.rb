@@ -238,8 +238,13 @@ module Sequel
             last_join = ds.opts[:join].last
             last_join.table_alias || last_join.table
           end
-          ds = ds.where(Array(ref[:final_edge][:left]).map{|x| ::Sequel::SQL::QualifiedIdentifier.new(last_alias, x)}.zip(ref.right_primary_keys.map{|k| obj.send(k)})).exclude(SQL::BooleanExpression.from_value_pairs(ds.opts[:select].zip([]), :OR))
-          association_filter_handle_inversion(op, SQL::BooleanExpression.from_value_pairs(lpks=>ds), Array(lpks))
+          exp = association_filter_key_expression(Array(ref[:final_edge][:left]).map{|x| ::Sequel::SQL::QualifiedIdentifier.new(last_alias, x)}, ref.right_primary_keys, obj)
+          if exp == SQL::Constants::FALSE
+            association_filter_handle_inversion(op, exp, Array(lpks))
+          else
+            ds = ds.where(exp).exclude(SQL::BooleanExpression.from_value_pairs(ds.opts[:select].zip([]), :OR))
+            association_filter_handle_inversion(op, SQL::BooleanExpression.from_value_pairs(lpks=>ds), Array(lpks))
+          end
         end
       end
     end
