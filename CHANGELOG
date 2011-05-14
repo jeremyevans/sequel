@@ -1,5 +1,7 @@
 === HEAD
 
+* Fix literalization of boolean values in filters on SQLite (jeremyevans)
+
 * Add support for filtering and excluding by multiple associations (jeremyevans)
 
 * Add support for inverting some SQL::Constant instances such as TRUE, FALSE, NULL, and NOTNULL (jeremyevans)

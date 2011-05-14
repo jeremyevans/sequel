@@ -339,7 +339,25 @@ module Sequel
       SELECT_CLAUSE_METHODS = Dataset.clause_methods(:select, %w'distinct columns from join where group having compounds order limit')
       COMMA_SEPARATOR = ', '.freeze
       CONSTANT_MAP = {:CURRENT_DATE=>"date(CURRENT_TIMESTAMP, 'localtime')".freeze, :CURRENT_TIMESTAMP=>"datetime(CURRENT_TIMESTAMP, 'localtime')".freeze, :CURRENT_TIME=>"time(CURRENT_TIMESTAMP, 'localtime')".freeze}
-    
+
+      # Ugly hack.  Really, SQLite uses 0 for false and 1 for true
+      # but then you can't differentiate between integers and booleans.
+      # In filters, SQL::BooleanConstants are used more, while in other places
+      # the ruby true/false values are used more, so use 1/0 for SQL::BooleanConstants.
+      # The correct fix for this would require separate literalization paths for
+      # filters compared to other values, but doing that just to work around shortcomings
+      # in SQLite doesn't appeal to me.
+      def boolean_constant_sql(constant)
+        case constant
+        when true
+          '1'
+        when false
+          '0'
+        else
+          super
+        end
+      end
+
       # SQLite does not support pattern matching via regular expressions.
       # SQLite is case insensitive (depending on pragma), so use LIKE for
       # ILIKE.
@@ -414,6 +432,22 @@ module Sequel
         "#{expression} AS #{literal(aliaz.to_s)}"
       end
       
+      # Special case when true or false is provided directly to filter.
+      def filter_expr(expr)
+        if block_given?
+          super
+        else
+          case expr
+          when true
+            1
+          when false
+            0
+          else
+            super
+          end
+        end
+      end
+      
       # SQL fragment specifying a list of identifiers
       def identifier_list(columns)
         columns.map{|i| quote_identifier(i)}.join(COMMA_SEPARATOR)
@@ -425,7 +459,7 @@ module Sequel
         v.each_byte{|x| blob << sprintf('%02x', x)}
         "X'#{blob}'"
       end
-      
+
       # SQLite does not support the SQL WITH clause
       def select_clause_methods
         SELECT_CLAUSE_METHODS

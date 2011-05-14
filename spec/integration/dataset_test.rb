@@ -86,6 +86,13 @@ describe "Simple Dataset operations" do
   specify "should alias columns correctly" do
     @ds.select(:id___x, :number___n).first.should == {:x=>1, :n=>10}
   end
+
+  specify "should handle true/false properly" do
+    @ds.filter(Sequel::TRUE).select_map(:number).should == [10]
+    @ds.filter(Sequel::FALSE).select_map(:number).should == []
+    @ds.filter(true).select_map(:number).should == [10]
+    @ds.filter(false).select_map(:number).should == []
+  end
 end
 
 describe Sequel::Dataset do
