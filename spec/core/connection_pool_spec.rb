@@ -234,6 +234,17 @@ describe "A connection pool with a max size of 1" do
 end
 
 shared_examples_for "A threaded connection pool" do  
+  specify "should raise a PoolTimeout error if a connection couldn't be acquired before timeout" do
+    x = nil
+    q, q1 = Queue.new, Queue.new
+    pool = Sequel::ConnectionPool.get_pool(@cp_opts.merge(:max_connections=>1, :pool_timeout=>0)) {@invoked_count += 1}
+    t = Thread.new{pool.hold{|c| q1.push nil; q.pop}}
+    q1.pop
+    proc{pool.hold{|c|}}.should raise_error(Sequel::PoolTimeout)
+    q.push nil
+    t.join
+  end
+  
   specify "should let five threads simultaneously access separate connections" do
     cc = {}
     threads = []
@@ -295,7 +306,8 @@ end
 describe "Threaded Unsharded Connection Pool" do
   before do
     @invoked_count = 0
-    @pool = Sequel::ConnectionPool.get_pool(CONNECTION_POOL_DEFAULTS.merge(:max_connections=>5)) {@invoked_count += 1}
+    @cp_opts = CONNECTION_POOL_DEFAULTS.merge(:max_connections=>5)
+    @pool = Sequel::ConnectionPool.get_pool(@cp_opts) {@invoked_count += 1}
   end
   
   it_should_behave_like "A threaded connection pool"
@@ -304,7 +316,8 @@ end
 describe "Threaded Sharded Connection Pool" do
   before do
     @invoked_count = 0
-    @pool = Sequel::ConnectionPool.get_pool(CONNECTION_POOL_DEFAULTS.merge(:max_connections=>5, :servers=>{})) {@invoked_count += 1}
+    @cp_opts = CONNECTION_POOL_DEFAULTS.merge(:max_connections=>5, :servers=>{})
+    @pool = Sequel::ConnectionPool.get_pool(@cp_opts) {@invoked_count += 1}
   end
 
   it_should_behave_like "A threaded connection pool"
