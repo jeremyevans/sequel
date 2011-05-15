@@ -1,5 +1,7 @@
 === HEAD
 
+* Add support for filtering and excluding by association datasets (jeremyevans)
+
 * Fix literalization of boolean values in filters on SQLite (jeremyevans)
 
 * Add support for filtering and excluding by multiple associations (jeremyevans)

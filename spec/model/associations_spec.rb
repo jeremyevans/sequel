@@ -3110,4 +3110,75 @@ describe "Filtering by associations" do
     @Album.exclude(:ctags=>[@Tag.load(:tid1=>3, :tid2=>4), @Tag.new]).sql.should == 'SELECT * FROM albums WHERE (((id1, id2) NOT IN (SELECT album_id1, album_id2 FROM albums_tags WHERE (((tag_id1, tag_id2) IN ((3, 4))) AND (album_id1 IS NOT NULL) AND (album_id2 IS NOT NULL)))) OR (id1 IS NULL) OR (id2 IS NULL))'
   end
 
+  it "should be able to filter on many_to_one association datasets" do
+    @Album.filter(:artist=>@Artist.filter(:x=>1)).sql.should == 'SELECT * FROM albums WHERE (artist_id IN (SELECT id FROM artists WHERE ((x = 1) AND (id IS NOT NULL))))'
+  end
+
+  it "should be able to filter on one_to_many association datasets" do
+    @Album.filter(:tracks=>@Track.filter(:x=>1)).sql.should == 'SELECT * FROM albums WHERE (id IN (SELECT album_id FROM tracks WHERE ((x = 1) AND (album_id IS NOT NULL))))'
+  end
+
+  it "should be able to filter on one_to_one association datasets" do
+    @Album.filter(:album_info=>@AlbumInfo.filter(:x=>1)).sql.should == 'SELECT * FROM albums WHERE (id IN (SELECT album_id FROM album_infos WHERE ((x = 1) AND (album_id IS NOT NULL))))'
+  end
+
+  it "should be able to filter on many_to_many association datasets" do
+    @Album.filter(:tags=>@Tag.filter(:x=>1)).sql.should == 'SELECT * FROM albums WHERE (id IN (SELECT album_id FROM albums_tags WHERE ((tag_id IN (SELECT id FROM tags WHERE ((x = 1) AND (id IS NOT NULL)))) AND (album_id IS NOT NULL))))'
+  end
+
+  it "should be able to filter on many_to_one association datasets with composite keys" do
+    @Album.filter(:cartist=>@Artist.filter(:x=>1)).sql.should == 'SELECT * FROM albums WHERE ((artist_id1, artist_id2) IN (SELECT id1, id2 FROM artists WHERE ((x = 1) AND (id1 IS NOT NULL) AND (id2 IS NOT NULL))))'
+  end
+
+  it "should be able to filter on one_to_many association datasets with composite keys" do
+    @Album.filter(:ctracks=>@Track.filter(:x=>1)).sql.should == 'SELECT * FROM albums WHERE ((id1, id2) IN (SELECT album_id1, album_id2 FROM tracks WHERE ((x = 1) AND (album_id1 IS NOT NULL) AND (album_id2 IS NOT NULL))))'
+  end
+
+  it "should be able to filter on one_to_one association datasets with composite keys" do
+    @Album.filter(:calbum_info=>@AlbumInfo.filter(:x=>1)).sql.should == 'SELECT * FROM albums WHERE ((id1, id2) IN (SELECT album_id1, album_id2 FROM album_infos WHERE ((x = 1) AND (album_id1 IS NOT NULL) AND (album_id2 IS NOT NULL))))'
+  end
+
+  it "should be able to filter on many_to_many association datasets with composite keys" do
+    @Album.filter(:ctags=>@Tag.filter(:x=>1)).sql.should == 'SELECT * FROM albums WHERE ((id1, id2) IN (SELECT album_id1, album_id2 FROM albums_tags WHERE (((tag_id1, tag_id2) IN (SELECT tid1, tid2 FROM tags WHERE ((x = 1) AND (tid1 IS NOT NULL) AND (tid2 IS NOT NULL)))) AND (album_id1 IS NOT NULL) AND (album_id2 IS NOT NULL))))'
+  end
+
+  it "should be able to exclude on many_to_one association datasets" do
+    @Album.exclude(:artist=>@Artist.filter(:x=>1)).sql.should == 'SELECT * FROM albums WHERE ((artist_id NOT IN (SELECT id FROM artists WHERE ((x = 1) AND (id IS NOT NULL)))) OR (artist_id IS NULL))'
+  end
+
+  it "should be able to exclude on one_to_many association datasets" do
+    @Album.exclude(:tracks=>@Track.filter(:x=>1)).sql.should == 'SELECT * FROM albums WHERE ((id NOT IN (SELECT album_id FROM tracks WHERE ((x = 1) AND (album_id IS NOT NULL)))) OR (id IS NULL))'
+  end
+
+  it "should be able to exclude on one_to_one association datasets" do
+    @Album.exclude(:album_info=>@AlbumInfo.filter(:x=>1)).sql.should == 'SELECT * FROM albums WHERE ((id NOT IN (SELECT album_id FROM album_infos WHERE ((x = 1) AND (album_id IS NOT NULL)))) OR (id IS NULL))'
+  end
+
+  it "should be able to exclude on many_to_many association datasets" do
+    @Album.exclude(:tags=>@Tag.filter(:x=>1)).sql.should == 'SELECT * FROM albums WHERE ((id NOT IN (SELECT album_id FROM albums_tags WHERE ((tag_id IN (SELECT id FROM tags WHERE ((x = 1) AND (id IS NOT NULL)))) AND (album_id IS NOT NULL)))) OR (id IS NULL))'
+  end
+
+  it "should be able to exclude on many_to_one association datasets with composite keys" do
+    @Album.exclude(:cartist=>@Artist.filter(:x=>1)).sql.should == 'SELECT * FROM albums WHERE (((artist_id1, artist_id2) NOT IN (SELECT id1, id2 FROM artists WHERE ((x = 1) AND (id1 IS NOT NULL) AND (id2 IS NOT NULL)))) OR (artist_id1 IS NULL) OR (artist_id2 IS NULL))'
+  end
+
+  it "should be able to exclude on one_to_many association datasets with composite keys" do
+    @Album.exclude(:ctracks=>@Track.filter(:x=>1)).sql.should == 'SELECT * FROM albums WHERE (((id1, id2) NOT IN (SELECT album_id1, album_id2 FROM tracks WHERE ((x = 1) AND (album_id1 IS NOT NULL) AND (album_id2 IS NOT NULL)))) OR (id1 IS NULL) OR (id2 IS NULL))'
+  end
+
+  it "should be able to exclude on one_to_one association datasets with composite keys" do
+    @Album.exclude(:calbum_info=>@AlbumInfo.filter(:x=>1)).sql.should == 'SELECT * FROM albums WHERE (((id1, id2) NOT IN (SELECT album_id1, album_id2 FROM album_infos WHERE ((x = 1) AND (album_id1 IS NOT NULL) AND (album_id2 IS NOT NULL)))) OR (id1 IS NULL) OR (id2 IS NULL))'
+  end
+
+  it "should be able to exclude on many_to_many association datasets with composite keys" do
+    @Album.exclude(:ctags=>@Tag.filter(:x=>1)).sql.should == 'SELECT * FROM albums WHERE (((id1, id2) NOT IN (SELECT album_id1, album_id2 FROM albums_tags WHERE (((tag_id1, tag_id2) IN (SELECT tid1, tid2 FROM tags WHERE ((x = 1) AND (tid1 IS NOT NULL) AND (tid2 IS NOT NULL)))) AND (album_id1 IS NOT NULL) AND (album_id2 IS NOT NULL)))) OR (id1 IS NULL) OR (id2 IS NULL))'
+  end
+
+  it "should do a regular IN query if the dataset for a different model is used" do
+    @Album.filter(:artist=>@Album.select(:x)).sql.should == 'SELECT * FROM albums WHERE (artist IN (SELECT x FROM albums))'
+  end
+
+  it "should do a regular IN query if a non-model dataset is used" do
+    @Album.filter(:artist=>@Album.db.from(:albums).select(:x)).sql.should == 'SELECT * FROM albums WHERE (artist IN (SELECT x FROM albums))'
+  end
 end

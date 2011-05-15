@@ -131,6 +131,48 @@ shared_examples_for "regular and composite key associations" do
     Album.exclude(:tags=>tag).all.sort_by{|x| x.pk}.should == [@album, album]
   end
 
+  specify "should work correctly when filtering by association datasets" do
+    album, artist, tag = @pr.call
+    @album.update(:artist => @artist)
+    @album.add_tag(@tag)
+    album.add_tag(tag)
+    album.update(:artist => artist)
+
+    Artist.filter(:albums=>Album.dataset).all.sort_by{|x| x.pk}.should == [@artist, artist]
+    Artist.filter(:albums=>Album.dataset.filter(Array(Album.primary_key).zip(Array(album.pk)))).all.sort_by{|x| x.pk}.should == [artist]
+    Artist.filter(:albums=>Album.dataset.filter(1=>0)).all.sort_by{|x| x.pk}.should == []
+    Album.filter(:artist=>Artist.dataset).all.sort_by{|x| x.pk}.should == [@album, album]
+    Album.filter(:artist=>Artist.dataset.filter(Array(Artist.primary_key).zip(Array(artist.pk)))).all.sort_by{|x| x.pk}.should == [album]
+    Album.filter(:artist=>Artist.dataset.filter(1=>0)).all.sort_by{|x| x.pk}.should == []
+    Album.filter(:tags=>Tag.dataset).all.sort_by{|x| x.pk}.should == [@album, album]
+    Album.filter(:tags=>Tag.dataset.filter(Array(Tag.primary_key).zip(Array(tag.pk)))).all.sort_by{|x| x.pk}.should == [album]
+    Album.filter(:tags=>Tag.dataset.filter(1=>0)).all.sort_by{|x| x.pk}.should == []
+    Tag.filter(:albums=>Album.dataset).all.sort_by{|x| x.pk}.should == [@tag, tag]
+    Tag.filter(:albums=>Album.dataset.filter(Array(Album.primary_key).zip(Array(album.pk)))).all.sort_by{|x| x.pk}.should == [tag]
+    Tag.filter(:albums=>Album.dataset.filter(1=>0)).all.sort_by{|x| x.pk}.should == []
+  end
+
+  specify "should work correctly when excluding by association datasets" do
+    album, artist, tag = @pr.call
+    @album.update(:artist => @artist)
+    @album.add_tag(@tag)
+    album.add_tag(tag)
+    album.update(:artist => artist)
+
+    Artist.exclude(:albums=>Album.dataset).all.sort_by{|x| x.pk}.should == []
+    Artist.exclude(:albums=>Album.dataset.filter(Array(Album.primary_key).zip(Array(album.pk)))).all.sort_by{|x| x.pk}.should == [@artist]
+    Artist.exclude(:albums=>Album.dataset.filter(1=>0)).all.sort_by{|x| x.pk}.should == [@artist, artist]
+    Album.exclude(:artist=>Artist.dataset).all.sort_by{|x| x.pk}.should == []
+    Album.exclude(:artist=>Artist.dataset.filter(Array(Artist.primary_key).zip(Array(artist.pk)))).all.sort_by{|x| x.pk}.should == [@album]
+    Album.exclude(:artist=>Artist.dataset.filter(1=>0)).all.sort_by{|x| x.pk}.should == [@album, album]
+    Album.exclude(:tags=>Tag.dataset).all.sort_by{|x| x.pk}.should == []
+    Album.exclude(:tags=>Tag.dataset.filter(Array(Tag.primary_key).zip(Array(tag.pk)))).all.sort_by{|x| x.pk}.should == [@album]
+    Album.exclude(:tags=>Tag.dataset.filter(1=>0)).all.sort_by{|x| x.pk}.should == [@album, album]
+    Tag.exclude(:albums=>Album.dataset).all.sort_by{|x| x.pk}.should == []
+    Tag.exclude(:albums=>Album.dataset.filter(Array(Album.primary_key).zip(Array(album.pk)))).all.sort_by{|x| x.pk}.should == [@tag]
+    Tag.exclude(:albums=>Album.dataset.filter(1=>0)).all.sort_by{|x| x.pk}.should == [@tag, tag]
+  end
+
   specify "should have remove methods work" do
     @album.update(:artist => @artist)
     @album.add_tag(@tag)

@@ -1417,13 +1417,25 @@ module Sequel
         def complex_expression_sql(op, args)
           r = args.at(1)
           if (((op == :'=' || op == :'!=') and r.is_a?(Sequel::Model)) ||
-              (multiple = ((op == :IN || op == :'NOT IN') and !r.is_a?(Sequel::Dataset) and r.all?{|x| x.is_a?(Sequel::Model)})))
+              (multiple = ((op == :IN || op == :'NOT IN') and ((is_ds = r.is_a?(Sequel::Dataset)) or r.all?{|x| x.is_a?(Sequel::Model)}))))
             l = args.at(0)
             if ar = model.association_reflections[l]
               if multiple
                 klass = ar.associated_class
-                unless r.all?{|x| x.is_a?(klass)}
-                  raise Sequel::Error, "invalid association class for one object for association #{l.inspect} used in dataset filter for model #{model.inspect}, expected class #{klass.inspect}"
+                if is_ds
+                  if r.respond_to?(:model)
+                    unless r.model <= klass
+                      # A dataset for a different model class, could be a valid regular query
+                      return super
+                    end
+                  else
+                    # Not a model dataset, could be a valid regular query
+                    return super
+                  end
+                else
+                  unless r.all?{|x| x.is_a?(klass)}
+                    raise Sequel::Error, "invalid association class for one object for association #{l.inspect} used in dataset filter for model #{model.inspect}, expected class #{klass.inspect}"
+                  end
                 end
               elsif !r.is_a?(ar.associated_class)
                 raise Sequel::Error, "invalid association class #{r.class.inspect} for association #{l.inspect} used in dataset filter for model #{model.inspect}, expected class #{ar.associated_class.inspect}"
@@ -1434,7 +1446,8 @@ module Sequel
               else
                 raise Sequel::Error, "invalid association type #{ar[:type].inspect} for association #{l.inspect} used in dataset filter for model #{model.inspect}"
               end
-            elsif multiple && r.empty?
+            elsif multiple && (is_ds || r.empty?)
+              # Not a query designed for this support, could be a valid regular query
               super
             else
               raise Sequel::Error, "invalid association #{l.inspect} used in dataset filter for model #{model.inspect}"
@@ -1609,17 +1622,21 @@ module Sequel
         # the given methods for either the single object given or for any of the objects
         # given if +obj+ is an array.
         def association_filter_key_expression(keys, meths, obj)
-          vals = Array(obj).reject{|o| !meths.all?{|m| o.send(m)}}
-          return SQL::Constants::FALSE if vals.empty?
-          vals = if obj.is_a?(Array)
-            if keys.length == 1
-              meth = meths.first
-              {keys.first=>vals.map{|o| o.send(meth)}}
-            else
-              {keys=>vals.map{|o| meths.map{|m| o.send(m)}}}
-            end  
+          vals = if obj.is_a?(Sequel::Dataset)
+            {(keys.length == 1 ? keys.first : keys)=>obj.select(*meths).exclude(Sequel::SQL::BooleanExpression.from_value_pairs(meths.zip([]), :OR))}
           else
-            keys.zip(meths.map{|k| obj.send(k)})
+            vals = Array(obj).reject{|o| !meths.all?{|m| o.send(m)}}
+            return SQL::Constants::FALSE if vals.empty?
+            if obj.is_a?(Array)
+              if keys.length == 1
+                meth = meths.first
+                {keys.first=>vals.map{|o| o.send(meth)}}
+              else
+                {keys=>vals.map{|o| meths.map{|m| o.send(m)}}}
+              end  
+            else
+              keys.zip(meths.map{|k| obj.send(k)})
+            end
           end
           SQL::BooleanExpression.from_value_pairs(vals)
         end

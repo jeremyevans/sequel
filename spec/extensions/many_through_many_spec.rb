@@ -168,6 +168,26 @@ describe Sequel::Model, "many_through_many" do
     @c1.exclude(:tags=>@c2.new).sql.should == 'SELECT * FROM artists WHERE \'t\''
   end
 
+  it "should allowing filtering by many_through_many association datasets" do
+    @c1.many_through_many :tags, [[:albums_artists, :artist_id, :album_id], [:albums, :id, :id], [:albums_tags, :album_id, :tag_id]]
+    @c1.filter(:tags=>@c2.filter(:x=>1)).sql.should == 'SELECT * FROM artists WHERE (id IN (SELECT albums_artists.artist_id FROM albums_artists INNER JOIN albums ON (albums.id = albums_artists.album_id) INNER JOIN albums_tags ON (albums_tags.album_id = albums.id) WHERE ((albums_tags.tag_id IN (SELECT id FROM tags WHERE ((x = 1) AND (id IS NOT NULL)))) AND (albums_artists.artist_id IS NOT NULL))))'
+  end
+
+  it "should allowing filtering by many_through_many association datasets with composite keys" do
+    @c1.many_through_many :tags, [[:albums_artists, [:b1, :b2], [:c1, :c2]], [:albums, [:d1, :d2], [:e1, :e2]], [:albums_tags, [:f1, :f2], [:g1, :g2]]], :right_primary_key=>[:h1, :h2], :left_primary_key=>[:id, :yyy]
+    @c1.filter(:tags=>@c2.filter(:x=>1)).sql.should == 'SELECT * FROM artists WHERE ((id, yyy) IN (SELECT albums_artists.b1, albums_artists.b2 FROM albums_artists INNER JOIN albums ON ((albums.d1 = albums_artists.c1) AND (albums.d2 = albums_artists.c2)) INNER JOIN albums_tags ON ((albums_tags.f1 = albums.e1) AND (albums_tags.f2 = albums.e2)) WHERE (((albums_tags.g1, albums_tags.g2) IN (SELECT h1, h2 FROM tags WHERE ((x = 1) AND (h1 IS NOT NULL) AND (h2 IS NOT NULL)))) AND (albums_artists.b1 IS NOT NULL) AND (albums_artists.b2 IS NOT NULL))))'
+  end
+
+  it "should allowing excluding by many_through_many association datasets" do
+    @c1.many_through_many :tags, [[:albums_artists, :artist_id, :album_id], [:albums, :id, :id], [:albums_tags, :album_id, :tag_id]]
+    @c1.exclude(:tags=>@c2.filter(:x=>1)).sql.should == 'SELECT * FROM artists WHERE ((id NOT IN (SELECT albums_artists.artist_id FROM albums_artists INNER JOIN albums ON (albums.id = albums_artists.album_id) INNER JOIN albums_tags ON (albums_tags.album_id = albums.id) WHERE ((albums_tags.tag_id IN (SELECT id FROM tags WHERE ((x = 1) AND (id IS NOT NULL)))) AND (albums_artists.artist_id IS NOT NULL)))) OR (id IS NULL))'
+  end
+
+  it "should allowing excluding by many_through_many association datasets with composite keys" do
+    @c1.many_through_many :tags, [[:albums_artists, [:b1, :b2], [:c1, :c2]], [:albums, [:d1, :d2], [:e1, :e2]], [:albums_tags, [:f1, :f2], [:g1, :g2]]], :right_primary_key=>[:h1, :h2], :left_primary_key=>[:id, :yyy]
+    @c1.exclude(:tags=>@c2.filter(:x=>1)).sql.should == 'SELECT * FROM artists WHERE (((id, yyy) NOT IN (SELECT albums_artists.b1, albums_artists.b2 FROM albums_artists INNER JOIN albums ON ((albums.d1 = albums_artists.c1) AND (albums.d2 = albums_artists.c2)) INNER JOIN albums_tags ON ((albums_tags.f1 = albums.e1) AND (albums_tags.f2 = albums.e2)) WHERE (((albums_tags.g1, albums_tags.g2) IN (SELECT h1, h2 FROM tags WHERE ((x = 1) AND (h1 IS NOT NULL) AND (h2 IS NOT NULL)))) AND (albums_artists.b1 IS NOT NULL) AND (albums_artists.b2 IS NOT NULL)))) OR (id IS NULL) OR (yyy IS NULL))'
+  end
+
   it "should support a :conditions option" do
     @c1.many_through_many :tags, [[:albums_artists, :artist_id, :album_id], [:albums, :id, :id], [:albums_tags, :album_id, :tag_id]], :conditions=>{:a=>32}
     n = @c1.load(:id => 1234)

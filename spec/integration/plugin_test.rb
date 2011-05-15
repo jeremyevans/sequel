@@ -221,6 +221,9 @@ describe "Many Through Many Plugin" do
 
     Artist.exclude(:albums=>[@album1, @album3]).all.map{|a| a.name}.sort.should == %w'4'
     Artist.exclude(:albums=>[@album2, @album4]).all.map{|a| a.name}.sort.should == %w'2'
+
+    Artist.filter(:albums=>Album.filter(:id=>[@album1.id, @album3.id])).all.map{|a| a.name}.sort.should == %w'1 2 3'
+    Artist.exclude(:albums=>Album.filter(:id=>[@album1.id, @album3.id])).all.map{|a| a.name}.sort.should == %w'4'
   end
 
   specify "should handle typical case with 3 join tables" do
@@ -252,6 +255,9 @@ describe "Many Through Many Plugin" do
 
     Artist.filter(:related_artists=>[@artist1, @artist4]).all.map{|a| a.name}.sort.should == %w'1 2 3 4'
     Artist.exclude(:related_artists=>[@artist1, @artist4]).all.map{|a| a.name}.sort.should == %w''
+
+    Artist.filter(:related_artists=>Artist.filter(:id=>@artist1.id)).all.map{|a| a.name}.sort.should == %w'1 2 4'
+    Artist.exclude(:related_artists=>Artist.filter(:id=>@artist1.id)).all.map{|a| a.name}.sort.should == %w'3'
   end
 
   specify "should handle extreme case with 5 join tables" do
@@ -295,6 +301,9 @@ describe "Many Through Many Plugin" do
 
     Artist.exclude(:related_albums=>[@album1, @album3]).all.map{|a| a.name}.sort.should == %w'4'
     Artist.exclude(:related_albums=>[@album2, @album4]).all.map{|a| a.name}.sort.should == %w''
+
+    Artist.filter(:related_albums=>Album.filter(:id=>[@album1.id, @album3.id])).all.map{|a| a.name}.sort.should == %w'1 2 3'
+    Artist.exclude(:related_albums=>Album.filter(:id=>[@album1.id, @album3.id])).all.map{|a| a.name}.sort.should == %w'4'
   end
 end
 
