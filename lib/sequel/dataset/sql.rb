@@ -269,6 +269,7 @@ module Sequel
               literal(op == :IN ? expr : ~expr)
             else
               old_vals = vals
+              vals = vals.naked if vals.is_a?(Sequel::Dataset)
               vals = vals.to_a
               val_cols = old_vals.columns
               complex_expression_sql(op, [cols, vals.map!{|x| x.values_at(*val_cols)}])

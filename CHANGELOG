@@ -1,5 +1,7 @@
 === HEAD
 
+* Fix bug in multiple column IN/NOT IN emulation when a model dataset is used (jeremyevans)
+
 * Add support for filtering and excluding by association datasets (jeremyevans)
 
 * Fix literalization of boolean values in filters on SQLite (jeremyevans)

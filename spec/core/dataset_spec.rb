@@ -538,34 +538,55 @@ describe "Dataset#where" do
 
   specify "should handle IN/NOT IN queries with multiple columns and a dataset where the database doesn't support it" do
     @dataset.meta_def(:supports_multiple_column_in?){false}
-    d1 = @d1.select(:id1, :id2)
+    db = MockDatabase.new()
+    d1 = db[:test].select(:id1, :id2).filter(:region=>'Asia')
+    d1.instance_variable_set(:@columns, [:id1, :id2])
     def d1.fetch_rows(sql)
-      @sql_used = sql
+      db << sql
       @columns = [:id1, :id2]
       yield(:id1=>1, :id2=>2)
       yield(:id1=>3, :id2=>4)
     end
-    d1.instance_variable_get(:@sql_used).should == nil
     @dataset.filter([:id1, :id2] => d1).sql.should == "SELECT * FROM test WHERE (((id1 = 1) AND (id2 = 2)) OR ((id1 = 3) AND (id2 = 4)))"
-    d1.instance_variable_get(:@sql_used).should == "SELECT id1, id2 FROM test WHERE (region = 'Asia')"
-    d1.instance_variable_set(:@sql_used, nil)
+    db.sqls.should == ["SELECT id1, id2 FROM test WHERE (region = 'Asia')"]
+    db.sqls.clear
     @dataset.exclude([:id1, :id2] => d1).sql.should == "SELECT * FROM test WHERE (((id1 != 1) OR (id2 != 2)) AND ((id1 != 3) OR (id2 != 4)))"
-    d1.instance_variable_get(:@sql_used).should == "SELECT id1, id2 FROM test WHERE (region = 'Asia')"
+    db.sqls.should == ["SELECT id1, id2 FROM test WHERE (region = 'Asia')"]
   end
   
   specify "should handle IN/NOT IN queries with multiple columns and an empty dataset where the database doesn't support it" do
     @dataset.meta_def(:supports_multiple_column_in?){false}
-    d1 = @d1.select(:id1, :id2)
+    db = MockDatabase.new()
+    d1 = db[:test].select(:id1, :id2).filter(:region=>'Asia')
+    d1.instance_variable_set(:@columns, [:id1, :id2])
     def d1.fetch_rows(sql)
-      @sql_used = sql
+      db << sql
       @columns = [:id1, :id2]
     end
-    d1.instance_variable_get(:@sql_used).should == nil
     @dataset.filter([:id1, :id2] => d1).sql.should == "SELECT * FROM test WHERE ((id1 != id1) AND (id2 != id2))"
-    d1.instance_variable_get(:@sql_used).should == "SELECT id1, id2 FROM test WHERE (region = 'Asia')"
-    d1.instance_variable_set(:@sql_used, nil)
+    db.sqls.should == ["SELECT id1, id2 FROM test WHERE (region = 'Asia')"]
+    db.sqls.clear
     @dataset.exclude([:id1, :id2] => d1).sql.should == "SELECT * FROM test WHERE (1 = 1)"
-    d1.instance_variable_get(:@sql_used).should == "SELECT id1, id2 FROM test WHERE (region = 'Asia')"
+    db.sqls.should == ["SELECT id1, id2 FROM test WHERE (region = 'Asia')"]
+  end
+  
+  specify "should handle IN/NOT IN queries for datasets with row_procs" do
+    @dataset.meta_def(:supports_multiple_column_in?){false}
+    db = MockDatabase.new()
+    d1 = db[:test].select(:id1, :id2).filter(:region=>'Asia')
+    d1.row_proc = proc{|h| Object.new}
+    d1.instance_variable_set(:@columns, [:id1, :id2])
+    def d1.fetch_rows(sql)
+      db << sql
+      @columns = [:id1, :id2]
+      yield(:id1=>1, :id2=>2)
+      yield(:id1=>3, :id2=>4)
+    end
+    @dataset.filter([:id1, :id2] => d1).sql.should == "SELECT * FROM test WHERE (((id1 = 1) AND (id2 = 2)) OR ((id1 = 3) AND (id2 = 4)))"
+    db.sqls.should == ["SELECT id1, id2 FROM test WHERE (region = 'Asia')"]
+    db.sqls.clear
+    @dataset.exclude([:id1, :id2] => d1).sql.should == "SELECT * FROM test WHERE (((id1 != 1) OR (id2 != 2)) AND ((id1 != 3) OR (id2 != 4)))"
+    db.sqls.should == ["SELECT id1, id2 FROM test WHERE (region = 'Asia')"]
   end
   
   specify "should accept a subquery for an EXISTS clause" do
