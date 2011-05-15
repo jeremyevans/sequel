@@ -269,3 +269,107 @@ describe "Model#before_validation && Model#after_validation" do
     MODEL_DB.sqls.should == []
   end
 end
+
+describe "Model around filters" do
+  before do
+    MODEL_DB.reset
+
+    @c = Class.new(Sequel::Model(:items))
+    @c.class_eval do
+      columns :id, :x
+      def _save_refresh(*a) end
+    end
+  end
+  
+  specify "around_create should be called around new record creation" do
+    @c.class_eval do
+      def around_create
+        MODEL_DB << 'ac_before'
+        super
+        MODEL_DB << 'ac_after'
+      end
+    end
+    @c.create(:x => 2)
+    MODEL_DB.sqls.should == [ 'ac_before', 'INSERT INTO items (x) VALUES (2)', 'ac_after' ]
+  end
+  
+  specify "around_delete should be called around record destruction" do
+    @c.class_eval do
+      def around_destroy
+        MODEL_DB << 'ad_before'
+        super
+        MODEL_DB << 'ad_after'
+      end
+    end
+    @c.load(:id=>1, :x => 2).destroy
+    MODEL_DB.sqls.should == [ 'ad_before', 'DELETE FROM items WHERE (id = 1)', 'ad_after' ]
+  end
+  
+  specify "around_update should be called around updating existing records" do
+    @c.class_eval do
+      def around_update
+        MODEL_DB << 'au_before'
+        super
+        MODEL_DB << 'au_after'
+      end
+    end
+    @c.load(:id=>1, :x => 2).save
+    MODEL_DB.sqls.should == [ 'au_before', 'UPDATE items SET x = 2 WHERE (id = 1)', 'au_after' ]
+  end
+
+  specify "around_update should be called around saving both new and existing records, around either after_create and after_update" do
+    @c.class_eval do
+      def around_update
+        MODEL_DB << 'au_before'
+        super
+        MODEL_DB << 'au_after'
+      end
+      def around_create
+        MODEL_DB << 'ac_before'
+        super
+        MODEL_DB << 'ac_after'
+      end
+      def around_save
+        MODEL_DB << 'as_before'
+        super
+        MODEL_DB << 'as_after'
+      end
+    end
+    @c.create(:x => 2)
+    MODEL_DB.sqls.should == [ 'as_before', 'ac_before', 'INSERT INTO items (x) VALUES (2)', 'ac_after', 'as_after' ]
+    MODEL_DB.sqls.clear
+    @c.load(:id=>1, :x => 2).save
+    MODEL_DB.sqls.should == [ 'as_before', 'au_before', 'UPDATE items SET x = 2 WHERE (id = 1)', 'au_after', 'as_after' ]
+  end
+
+  specify "around_validation should be called around validating records" do
+    @c.class_eval do
+      def around_validation
+        MODEL_DB << 'av_before'
+        super
+        MODEL_DB << 'av_after'
+      end
+      def validate
+        MODEL_DB << 'validate'
+      end
+    end
+    @c.new(:x => 2).valid?.should == true
+    MODEL_DB.sqls.should == [ 'av_before', 'validate', 'av_after' ]
+  end
+
+  specify "around_validation should be able to catch validation errors and modify them" do
+    @c.class_eval do
+      def validate
+        errors.add(:x, 'foo')
+      end
+    end
+    @c.new(:x => 2).valid?.should == false
+    @c.class_eval do
+      def around_validation
+        super
+        errors.clear
+      end
+    end
+    @c.new(:x => 2).valid?.should == true
+  end
+end

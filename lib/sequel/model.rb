@@ -80,6 +80,11 @@ module Sequel
     # +super+ on the first line of your method, so later hooks are called after earlier hooks.
     AFTER_HOOKS = [:after_initialize, :after_create, :after_update, :after_save, :after_destroy, :after_validation]
 
+    # Hooks that are called around an action.  If overridden, these methods must call super
+    # exactly once if the behavior they wrap is desired.  The can be used to rescue exceptions
+    # raised by the code they wrap or ensure that some behavior is executed no matter what.
+    AROUND_HOOKS = [:around_create, :around_update, :around_save, :around_destroy, :around_validation]
+
     # Empty instance methods to create that the user can override to get hook/callback behavior.
     # Just like any other method defined by Sequel, if you override one of these, you should
     # call +super+ to get the default behavior (while empty by default, they can also be defined

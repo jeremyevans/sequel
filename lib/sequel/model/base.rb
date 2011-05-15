@@ -687,10 +687,10 @@ module Sequel
 
     # Sequel::Model instance methods that implement basic model functionality.
     #
-    # * All of the methods in +HOOKS+ create instance methods that are called
+    # * All of the methods in +HOOKS+ and +AROUND_HOOKS+ create instance methods that are called
     #   by Sequel when the appropriate action occurs.  For example, when destroying
-    #   a model object, Sequel will call +before_destroy+, do the destroy,
-    #   and then call +after_destroy+.
+    #   a model object, Sequel will call +around_destory+, which will call +before_destroy+, do
+    #   the destroy, and then call +after_destroy+.
     # * The following instance_methods all call the class method of the same
     #   name: columns, dataset, db, primary_key, db_schema.
     # * All of the methods in +BOOLEAN_SETTINGS+ create attr_writers allowing you
@@ -699,6 +699,7 @@ module Sequel
     #   gets the default value from the class by calling the class method of the same name.
     module InstanceMethods
       HOOKS.each{|h| class_eval("def #{h}; end", __FILE__, __LINE__)}
+      AROUND_HOOKS.each{|h| class_eval("def #{h}; yield end", __FILE__, __LINE__)}
 
       # Define instance method(s) that calls class method(s) of the
       # same name, caching the result in an instance variable.  Define
@@ -1187,12 +1188,14 @@ module Sequel
       #   artist.errors.full_messages # => ['name cannot be Invalid']
       def valid?(opts = {})
         errors.clear
-        if before_validation == false
-          raise_hook_failure(:validation) if raise_on_failure?(opts)
-          return false
+        around_validation do
+          if before_validation == false
+            raise_hook_failure(:validation) if raise_on_failure?(opts)
+            return false
+          end
+          validate
+          after_validation
         end
-        validate
-        after_validation
         errors.empty?
       end
 
@@ -1214,9 +1217,11 @@ module Sequel
       # Internal destroy method, separted from destroy to
       # allow running inside a transaction
       def _destroy(opts)
-        raise_hook_failure(:destroy) if before_destroy == false
-        _destroy_delete
-        after_destroy
+        around_destroy do
+          raise_hook_failure(:destroy) if before_destroy == false
+          _destroy_delete
+          after_destroy
+        end
         self
       end
       
@@ -1262,34 +1267,45 @@ module Sequel
       # Internal version of save, split from save to allow running inside
       # it's own transaction.
       def _save(columns, opts)
-        raise_hook_failure(:save) if before_save == false
-        if new?
-          raise_hook_failure(:create) if before_create == false
-          pk = _insert
-          @this = nil
-          @new = false
-          @was_new = true
-          after_create
+        was_new = false
+        pk = nil
+        around_save do
+          raise_hook_failure(:save) if before_save == false
+          if new?
+            was_new = true
+            around_create do
+              raise_hook_failure(:create) if before_create == false
+              pk = _insert
+              @this = nil
+              @new = false
+              @was_new = true
+              after_create
+            end
+          else
+            around_update do
+              raise_hook_failure(:update) if before_update == false
+              if columns.empty?
+                @columns_updated = if opts[:changed]
+                  @values.reject{|k,v| !changed_columns.include?(k)}
+                else
+                  _save_update_all_columns_hash
+                end
+                changed_columns.clear
+              else # update only the specified columns
+                @columns_updated = @values.reject{|k, v| !columns.include?(k)}
+                changed_columns.reject!{|c| columns.include?(c)}
+              end
+              _update_columns(@columns_updated)
+              @this = nil
+              after_update
+            end
+          end
           after_save
+        end
+        if was_new
           @was_new = nil
           pk ? _save_refresh : changed_columns.clear
         else
-          raise_hook_failure(:update) if before_update == false
-          if columns.empty?
-            @columns_updated = if opts[:changed]
-              @values.reject{|k,v| !changed_columns.include?(k)}
-            else
-              _save_update_all_columns_hash
-            end
-            changed_columns.clear
-          else # update only the specified columns
-            @columns_updated = @values.reject{|k, v| !columns.include?(k)}
-            changed_columns.reject!{|c| columns.include?(c)}
-          end
-          _update_columns(@columns_updated)
-          @this = nil
-          after_update
-          after_save
           @columns_updated = nil
         end
         @modified = false
