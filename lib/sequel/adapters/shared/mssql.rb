@@ -242,6 +242,29 @@ module Sequel
         @mssql_unicode_strings = db.mssql_unicode_strings
       end
 
+      # Ugly hack.  While MSSQL supports TRUE and FALSE values, you can't
+      # actually specify them directly in SQL.  Unfortunately, you also cannot
+      # use an integer value when a boolean is required.  Also unforunately, you
+      # cannot use an expression that yields a boolean type in cases where in an
+      # integer type is needed, such as inserting into a bit field (the closest thing
+      # MSSQL has to a boolean).
+      #
+      # In filters, SQL::BooleanConstants are used more, while in other places
+      # the ruby true/false values are used more, so use expressions that return booleans
+      # for SQL::BooleanConstants, and 1/0 for other places.
+      # The correct fix for this would require separate literalization paths for
+      # filters compared to other values, but that's more work than I want to do right now.
+      def boolean_constant_sql(constant)
+        case constant
+        when true
+          '(1 = 1)'
+        when false
+          '(1 = 0)'
+        else
+          super
+        end
+      end
+
       # MSSQL uses + for string concatenation, and LIKE is case insensitive by default.
       def complex_expression_sql(op, args)
         case op
@@ -451,6 +474,22 @@ module Sequel
       end
       alias insert_with_sql delete_with_sql
       alias update_with_sql delete_with_sql
+      
+      # Special case when true or false is provided directly to filter.
+      def filter_expr(expr)
+        if block_given?
+          super
+        else
+          case expr
+          when true
+            Sequel::TRUE
+          when false
+            Sequel::FALSE
+          else
+            super
+          end
+        end
+      end
       
       # MSSQL raises an error if you try to provide more than 3 decimal places
       # for a fractional timestamp.  This probably doesn't work for smalldatetime

@@ -345,8 +345,7 @@ module Sequel
       # In filters, SQL::BooleanConstants are used more, while in other places
       # the ruby true/false values are used more, so use 1/0 for SQL::BooleanConstants.
       # The correct fix for this would require separate literalization paths for
-      # filters compared to other values, but doing that just to work around shortcomings
-      # in SQLite doesn't appeal to me.
+      # filters compared to other values, but that's more work than I want to do right now.
       def boolean_constant_sql(constant)
         case constant
         when true
