@@ -4,7 +4,7 @@ This guide is based on http://guides.rubyonrails.org/activerecord_validations_ca
 
 == Overview
 
-Model hooks, also known as model callbacks, are used to specify actions that occur at a given point in a model instance's lifecycle, such as before or after the model object is saved, created, updated, destroyed, or validated.
+Model hooks, also known as model callbacks, are used to specify actions that occur at a given point in a model instance's lifecycle, such as before or after the model object is saved, created, updated, destroyed, or validated.  There are also around hooks for all types, which wrap the before hooks, the behavior, and the after hooks.
 
 == Basic Usage
 
@@ -19,45 +19,57 @@ Model hooks, also known as model callbacks, are used to specify actions that occ
 
 The one important thing to note here is the call to +super+ inside the hook.  Whenever you override one of Sequel::Model's methods, you should be calling +super+ to get the default behavior.  Many of Sequel's built in plugins work by overriding the hook methods and calling +super+.  If you use these plugins and override the hook methods but do not call +super+, it's likely the plugins will not work correctly.
 
+For around hooks, the call to +super+ is even more important, because if you forget to add it, the behavior (such as a database +INSERT+/+UPDATE+) would be skipped.  Note that in Sequel around hooks, you should call +super+, not +yield+, in order for previously defined around hooks to be called.
+
 == Available Hooks
 
 Sequel calls hooks in the following order when saving/creating a new object (one that does not already exist in the database):
 
-* +before_validation+
-* +after_validation+
-* +before_save+
-* +before_create+
-* INSERT QUERY
-* +after_create+
-* +after_save+
+* +around_validation+
+  * +before_validation+
+  * +validate+ method called
+  * +after_validation+
+* +around_save+
+  * +before_save+
+  * +around_create+
+    * +before_create+
+    * INSERT QUERY
+    * +after_create+
+  * +after_save+
 
 Sequel calls hooks in the following order when saving an existing object:
 
-* +before_validation+
-* +after_validation+
-* +before_save+
-* +before_update+
-* UPDATE QUERY
-* +after_update+
-* +after_save+
+* +around_validation+
+  * +before_validation+
+  * +validate+ method called
+  * +after_validation+
+* +around_save+
+  * +before_save+
+  * +around_update+
+    * +before_update+
+    * INSERT QUERY
+    * +after_update+
+  * +after_save+
 
-Note that all of the hook calls are the same, except that +before_create+ and +after_create+ are used for a new object, and +before_update+ and +after_update+ are used for an existing object.  Note that +before_save+ is called in both cases, before either +before_create+ or +before_update+, and that +after_save+ is also called in both cases, after either +after_create+ or +after_update+.
+Note that all of the hook calls are the same, except that +around_create+, +before_create+ and +after_create+ are used for a new object, and +around_update+, +before_update+ and +after_update+ are used for an existing object.  Note that +around_save+, +before_save+, and +after_save+ are calle din both cases.
 
 Also note that the validation hooks are not called if the <tt>:validate => false</tt> option is passed to save.  However, the validation hooks are called if you call <tt>Model#valid?</tt> manually:
 
-* +before_validation+
-* VALIDATION HAPPENS
-* +after_validation+
+* +around_validation+
+  * +before_validation+
+  * +validate+ method called
+  * +after_validation+
 
 Sequel calls hooks in the following order when destroying an existing object:
 
-* +before_destroy+
-* DELETE QUERY
-* +after_destroy+
+* +around_destroy+
+  * +before_destroy+
+  * DELETE QUERY
+  * +after_destroy+
 
 Note that these hooks are only called when using <tt>Model#destroy</tt>, they are not called if you use <tt>Model#delete</tt>.
 
-<tt>Sequel::Model</tt> does support one additional hook, +after_intialize+, which is called after the model object has been initalized.  It can be used to set default attribute values for new objects, since by default new <tt>Sequel::Model</tt> objects have no attributes, and the attributes are not filled in until the model object is saved.  You should be careful when you are using +after_initialize+, since it is called for every created record.  So if you run a query that returns 1000 model objects, it will be called 1000 times.
+<tt>Sequel::Model</tt> does support one additional hook, +after_intialize+, which is called after the model object has been initalized.  It can be used to set default attribute values for new objects, since by default new <tt>Sequel::Model</tt> objects have no attributes, and the attributes are not filled in until the model object is saved.  You should be careful when you are using +after_initialize+, since it is called for every created record.  So if you run a query that returns 1000 model objects, it will be called 1000 times.  If you only want to change the behavior for new records, you can override the +initialize_set+ private method, which is called with the hash passed to +initialize+. 
 
 == Running Hooks
 
@@ -193,6 +205,28 @@ So if you define the same before hook in both a model and a plugin that the mode
 
 Again, Sequel does not enforce that, and you are free to call +super+ in an order other than the recommended one (just make sure that you call it).
 
+== Around Hooks
+
+Around hooks should only be used if you cannot accomplish the same results with before and after hooks.  For example, if you want to catch database errors caused by the +INSERT+ or +UPDATE+ query when saving a model object and raise them as validation errors, you cannot use a before or after hook.  You have use an +around_save+ hook:
+
+  class Album < Sequel::Model
+    def around_save
+      super
+    rescue Sequel::DatabaseError => e
+      # parse database error, set error on self, and reraise a Sequel::ValidationFailed
+    end
+  end
+ 
+Likewise, let's say that upon retrieval, you associate an object with a file descriptor, and you want to ensure that the file descriptor is closed after the object is saved to the database.  Let's assume you are always saving the object and you are not using validations.  You could not use an +after_save+ hook safely, since if the database raises an error, the +after_save+ method will not be called.  In this case, an +around_save+ hook is also the correct choice:
+
+  class Album < Sequel::Model
+    def around_save
+      super
+    ensure
+      @file_descriptor.close
+    end
+  end
+
 == +hook_class_methods+
 
-While it's recommended to write your hooks as instance methods, Sequel ships with a +hook_class_methods+ plugin that allows you to define hooks via class methods. It exists mostly for legacy compatibility, but is still supported. 
+While it's recommended to write your hooks as instance methods, Sequel ships with a +hook_class_methods+ plugin that allows you to define hooks via class methods. It exists mostly for legacy compatibility, but is still supported.  However, it does not implement around hooks.
