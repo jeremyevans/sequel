@@ -248,6 +248,9 @@ describe "Many Through Many Plugin" do
     Artist.filter(:related_artists=>@artist3).all.map{|a| a.name}.sort.should == %w'2 3 4'
     Artist.filter(:related_artists=>@artist4).all.map{|a| a.name}.sort.should == %w'1 3 4'
 
+    # Work around bug in swift's mysql support
+    Artist.exclude(:related_artists=>@artist1).all
+
     Artist.exclude(:related_artists=>@artist1).all.map{|a| a.name}.sort.should == %w'3'
     Artist.exclude(:related_artists=>@artist2).all.map{|a| a.name}.sort.should == %w'4'
     Artist.exclude(:related_artists=>@artist3).all.map{|a| a.name}.sort.should == %w'1'
