@@ -421,13 +421,51 @@ This doesn't just work for +many_to_one+ associations, it also works for
 
 Note that for +one_to_many+ and +many_to_many+ associations, you still
 use the plural form even though only a single model object is given.
-You cannot use an array of model objects as the value, only a single model
-object.  To use separate model objects for the same association, you can
-use the array form of condition specifiers:
 
-  Album.filter([[:tags, Tag[1]], [:tags, Tag[2]]])
+You can also exclude by associations:
 
-That will return albums associated with both tag 1 and tag 2.
+  Album.exclude(:artist=>@artist).all
+  
+This will return all albums not by that artist.
+
+You can also provide an array with multiple model objects:
+
+  Album.filter(:artist=>[@artist1, @artist2]).all
+
+Similar to using an array of integers or strings, this will return
+all albums whose artist is one of those two artists.  You can also
+use +exclude+ if you want all albums not by either of those artists:
+
+  Album.exclude(:artist=>[@artist1, @artist2]).all
+
+If you are using a +one_to_many+ or +many_to_many+ association, you
+may want to return records where the records matches all of multiple
+records, instead of matching any of them.  For example:
+
+  Album.filter(:tags=>[@tag1, @tag2])
+  
+This matches albums that are associated with either @tag1 or @tag2 or
+both.  If you only want ones that you are associated with both, you can
+use separate filter calls:
+
+  Album.filter(:tags=>@tag1).filter(:tags=>@tag2)
+
+Or the the array form of condition specifiers:
+
+  Album.filter([[:tags, @tag1], [:tags, @tag2]])
+
+These will return albums associated with both @tag1 and @tag2.
+
+You can also provide a dataset value when filtering by associations:
+
+  Album.filter(:artist=>Artist.filter(:name.like('A%'))).all
+
+This will return all albums whose artist starts with 'A'. Like
+the other forms, this can be inverted:
+
+  Album.exclude(:artist=>Artist.filter(:name.like('A%'))).all
+ 
+This will return all albums whose artist does not start with 'A'.
 
 Note that filtering by associations only works correctly for simple
 associations (ones without conditions).
