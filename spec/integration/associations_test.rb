@@ -159,10 +159,6 @@ shared_examples_for "regular and composite key associations" do
     album.add_tag(tag)
     album.update(:artist => artist)
 
-
-    # Work around bug in swift's mysql support
-    Artist.exclude(:albums=>Album.dataset).all
-
     Artist.exclude(:albums=>Album.dataset).all.sort_by{|x| x.pk}.should == []
     Artist.exclude(:albums=>Album.dataset.filter(Array(Album.primary_key).zip(Array(album.pk)))).all.sort_by{|x| x.pk}.should == [@artist]
     Artist.exclude(:albums=>Album.dataset.filter(1=>0)).all.sort_by{|x| x.pk}.should == [@artist, artist]
