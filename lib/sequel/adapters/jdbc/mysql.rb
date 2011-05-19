@@ -56,6 +56,15 @@ module Sequel
         def schema_column_type(db_type)
           db_type == 'tinyint(1)' ? :boolean : super
         end
+      
+        # By default, MySQL 'where id is null' selects the last inserted id.
+        # Turn that off unless explicitly enabled.
+        def setup_connection(conn)
+          super
+          sql = "SET SQL_AUTO_IS_NULL=0"
+          log_yield(sql){conn.execute(sql)} unless opts[:auto_is_null]
+          conn
+        end
       end
       
       # Dataset class for MySQL datasets accessed via JDBC.

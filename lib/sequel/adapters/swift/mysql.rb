@@ -29,6 +29,7 @@ module Sequel
         # By default, MySQL 'where id is null' selects the last inserted id.
         # Turn that off unless explicitly enabled.
         def setup_connection(conn)
+          super
           sql = "SET SQL_AUTO_IS_NULL=0"
           log_yield(sql){conn.execute(sql)} unless opts[:auto_is_null]
           conn

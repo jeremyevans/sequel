@@ -1,5 +1,7 @@
 === HEAD
 
+* Set SQL_AUTO_IS_NULL=0 by default when connecting to MySQL via the swift and jdbc adapters (jeremyevans)
+
 * Fix bug in multiple column IN/NOT IN emulation when a model dataset is used (jeremyevans)
 
 * Add support for filtering and excluding by association datasets (jeremyevans)
