@@ -62,7 +62,7 @@ module Sequel
         def setup_connection(conn)
           super
           sql = "SET SQL_AUTO_IS_NULL=0"
-          log_yield(sql){conn.execute(sql)} unless opts[:auto_is_null]
+          statement(conn){|s| log_yield(sql){s.execute(sql)}} unless opts[:auto_is_null]
           conn
         end
       end
