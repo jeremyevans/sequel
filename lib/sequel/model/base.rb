@@ -271,7 +271,8 @@ module Sequel
           db
           begin
             if self == Model || !@dataset
-              subclass.set_dataset(subclass.implicit_table_name) unless subclass.name.empty?
+              n = subclass.name
+              subclass.set_dataset(subclass.implicit_table_name) unless n.nil? || n.empty?
             elsif @dataset
               subclass.set_dataset(@dataset.clone, :inherited=>true)
             end
