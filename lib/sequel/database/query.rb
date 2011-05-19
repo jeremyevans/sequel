@@ -464,7 +464,7 @@ module Sequel
         :datetime
       when /\Atime( with(out)? time zone)?\z/io
         :time
-      when /\A(bool(ean)?|bit)\z/io
+      when /\A(bool(ean)?)\z/io
         :boolean
       when /\A(real|float|double( precision)?)\z/io
         :float

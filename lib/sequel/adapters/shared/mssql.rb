@@ -156,6 +156,16 @@ module Sequel
         SQL_ROLLBACK
       end
       
+      # The closest MSSQL equivalent of a boolean datatype is the bit type.
+      def schema_column_type(db_type)
+        case db_type
+        when /\A(bit)\z/io
+          :boolean
+        else
+          super
+        end
+      end
+
       # MSSQL uses the INFORMATION_SCHEMA to hold column information.  This method does
       # not support the parsing of primary key information.
       def schema_parse_table(table_name, opts)

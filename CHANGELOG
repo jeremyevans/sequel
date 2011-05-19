@@ -1,5 +1,7 @@
 === HEAD
 
+* Only typecast bit fields to booleans on MSSQL, the MySQL bit type is a bitfield, not a boolean (jeremyevans)
+
 * Set SQL_AUTO_IS_NULL=0 by default when connecting to MySQL via the swift and jdbc adapters (jeremyevans)
 
 * Fix bug in multiple column IN/NOT IN emulation when a model dataset is used (jeremyevans)

@@ -842,7 +842,6 @@ describe "Schema Parser" do
     @db.schema(:"time with time zone").first.last[:type].should == :time
     @db.schema(:"time without time zone").first.last[:type].should == :time
     @db.schema(:boolean).first.last[:type].should == :boolean
-    @db.schema(:bit).first.last[:type].should == :boolean
     @db.schema(:real).first.last[:type].should == :float
     @db.schema(:float).first.last[:type].should == :float
     @db.schema(:double).first.last[:type].should == :float
