@@ -478,7 +478,7 @@ describe Sequel::SQL::Constants do
     @c2 = proc{|v| v.is_a?(Date) ? v : Date.parse(v) }
   end
   after do
-    @db.drop_table(:constants)
+    @db.drop_table(:constants) if @db.table_exists?(:constants)
   end
   
   cspecify "should have working CURRENT_DATE", [:odbc, :mssql], [:jdbc, :sqlite] do
