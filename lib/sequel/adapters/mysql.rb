@@ -30,7 +30,8 @@ module Sequel
       [0, 246]  => tt.method(:decimal),
       [2, 3, 8, 9, 13, 247, 248]  => tt.method(:integer),
       [4, 5]  => tt.method(:float),
-      [249, 250, 251, 252]  => tt.method(:blob)
+      [249, 250, 251, 252]  => tt.method(:blob),
+      [16] => tt.method(:boolean)
     }.each do |k,v|
       k.each{|n| MYSQL_TYPES[n] = v}
     end
