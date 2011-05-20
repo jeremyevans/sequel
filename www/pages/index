@@ -1,5 +1,9 @@
 <h2>Sequel: The Database Toolkit for Ruby (v<%= Sequel::VERSION %>)</h2>
 
+<p>&quot;Sequel has restored my faith in Ruby. It's really amazing. The O/RM I've been hoping for for years.&quot; -- Sam Smoot, creator of DataMapper</p>
+
+<h3 id='features'>Features:</h3>
+
 <ul>
 <li>Sequel provides thread safety, connection pooling and a concise DSL for constructing SQL queries and table schemas.</li>
 <li>Sequel includes a comprehensive ORM layer for mapping records to Ruby objects and handling associated records.</li>
