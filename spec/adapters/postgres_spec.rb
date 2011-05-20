@@ -909,7 +909,7 @@ describe "Postgres::Database functions, languages, and triggers" do
   after do
     @d.drop_function('tf', :if_exists=>true, :cascade=>true)
     @d.drop_function('tf', :if_exists=>true, :cascade=>true, :args=>%w'integer integer')
-    @d.drop_language(:plpgsql, :if_exists=>true, :cascade=>true)
+    @d.drop_language(:plpgsql, :if_exists=>true, :cascade=>true) if @d.server_version < 90000
     @d.drop_table(:test) rescue nil
   end
 
@@ -940,19 +940,19 @@ describe "Postgres::Database functions, languages, and triggers" do
   
   specify "#create_language and #drop_language should create and drop languages" do
     @d.send(:create_language_sql, :plpgsql).should == 'CREATE LANGUAGE plpgsql'
-    @d.create_language(:plpgsql, :replace=>true)
+    @d.create_language(:plpgsql, :replace=>true) if @d.server_version < 90000
     proc{@d.create_language(:plpgsql)}.should raise_error(Sequel::DatabaseError)
     @d.send(:drop_language_sql, :plpgsql).should == 'DROP LANGUAGE plpgsql'
-    @d.drop_language(:plpgsql)
-    proc{@d.drop_language(:plpgsql)}.should raise_error(Sequel::DatabaseError)
+    @d.drop_language(:plpgsql) if @d.server_version < 90000
+    proc{@d.drop_language(:plpgsql)}.should raise_error(Sequel::DatabaseError) if @d.server_version < 90000
     @d.send(:create_language_sql, :plpgsql, :replace=>true, :trusted=>true, :handler=>:a, :validator=>:b).should == (@d.server_version >= 90000 ? 'CREATE OR REPLACE TRUSTED LANGUAGE plpgsql HANDLER a VALIDATOR b' : 'CREATE TRUSTED LANGUAGE plpgsql HANDLER a VALIDATOR b')
     @d.send(:drop_language_sql, :plpgsql, :if_exists=>true, :cascade=>true).should == 'DROP LANGUAGE IF EXISTS plpgsql CASCADE'
     # Make sure if exists works
-    @d.drop_language(:plpgsql, :if_exists=>true, :cascade=>true)
+    @d.drop_language(:plpgsql, :if_exists=>true, :cascade=>true) if @d.server_version < 90000
   end
   
   specify "#create_trigger and #drop_trigger should create and drop triggers" do
-    @d.create_language(:plpgsql)
+    @d.create_language(:plpgsql) if @d.server_version < 90000
     @d.create_function(:tf, 'BEGIN IF NEW.value IS NULL THEN RAISE EXCEPTION \'Blah\'; END IF; RETURN NEW; END;', :language=>:plpgsql, :returns=>:trigger)
     @d.send(:create_trigger_sql, :test, :identity, :tf, :each_row=>true).should == 'CREATE TRIGGER identity BEFORE INSERT OR UPDATE OR DELETE ON test FOR EACH ROW EXECUTE PROCEDURE tf()'
     @d.create_table(:test){String :name; Integer :value}
