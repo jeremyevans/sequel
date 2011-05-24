@@ -1,5 +1,11 @@
 === HEAD
 
+* Add defaults_setter plugin for setting default values when initializing model instances (jeremyevans)
+
+* Add around hooks (e.g. around_save) to Sequel::Model (jeremyevans)
+
+* Add Model#initialize_set private method to ease extension writing (jeremyevans)
+
 * Only typecast bit fields to booleans on MSSQL, the MySQL bit type is a bitfield, not a boolean (jeremyevans)
 
 * Set SQL_AUTO_IS_NULL=0 by default when connecting to MySQL via the swift and jdbc adapters (jeremyevans)
