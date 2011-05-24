@@ -14,6 +14,7 @@
 <li><a href="rdoc-plugins/classes/Sequel/Plugins/Caching.html">caching</a>: Supports caching primary key lookups of model objects to any object that supports the Ruby-Memcache API.</li>
 <li><a href="rdoc-plugins/classes/Sequel/Plugins/ClassTableInheritance.html">class_table_inheritance</a>: Supports inheritance in the database by using a single database table for each class in a class hierarchy.</li>
 <li><a href="rdoc-plugins/classes/Sequel/Plugins/Composition.html">composition</a>: Supports defining getters/setters for objects with data backed by the model's columns.</li>
+<li><a href="rdoc-plugins/classes/Sequel/Plugins/DefaultsSetter.html">defaults_setter</a>: Set default values when initializing models.</li>
 <li><a href="rdoc-plugins/classes/Sequel/Plugins/ForceEncoding.html">force_encoding</a>: Forces the all model column string values to a given encoding.</li>
 <li><a href="rdoc-plugins/classes/Sequel/Plugins/HookClassMethods.html">hook_class_methods</a>: Adds backwards compatiblity for the legacy class-level hook methods (e.g. before_save :do_something).</li>
 <li><a href="rdoc-plugins/classes/Sequel/Plugins/IdentityMap.html">identity_map</a>: Allows you to create temporary identity maps which ensure a 1-1 correspondence of model objects to database rows.</li>
