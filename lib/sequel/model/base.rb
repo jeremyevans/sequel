@@ -1485,6 +1485,18 @@ module Sequel
       #   Artist.dataset.model # => Artist
       attr_accessor :model
 
+      # Assume if a single integer is given that it is a lookup by primary
+      # key, and call with_pk with the argument.
+      #
+      #   Artist.dataset[1] # SELECT * FROM artists WHERE (id = 1) LIMIT 1
+      def [](*args)
+        if args.length == 1 && (i = args.at(0)) && i.is_a?(Integer)
+          with_pk(i)
+        else
+          super
+        end
+      end
+
       # Destroy each row in the dataset by instantiating it and then calling
       # destroy on the resulting model object.  This isn't as fast as deleting
       # the dataset, which does a single SQL call, but this runs any destroy
@@ -1513,6 +1525,27 @@ module Sequel
         else
           raise(Sequel::Error, "No primary key for model") unless model and pk = model.primary_key
           super(pk, value_column) 
+        end
+      end
+
+      # Given a primary key value, return the first record in the dataset with that primary key
+      # value.
+      #
+      #   # Single primary key
+      #   Artist.dataset.with_pk(1) # SELECT * FROM artists WHERE (id = 1) LIMIT 1
+      #
+      #   # Composite primary key
+      #   Artist.dataset.with_pk([1, 2]) # SELECT * FROM artists
+      #                                  # WHERE ((id1 = 1) AND (id2 = 2)) LIMIT 1
+      def with_pk(pk)
+        case primary_key = model.primary_key
+        when Array
+          raise(Error, "single primary key given (#{pk.inspect}) when a composite primary key is expected (#{primary_key.inspect})") unless pk.is_a?(Array)
+          raise(Error, "composite primary key given (#{pk.inspect}) does not match composite primary key length (#{primary_key.inspect})") if pk.length != primary_key.length
+          first(primary_key.zip(pk))
+        else
+          raise(Error, "composite primary key given (#{pk.inspect}) when a single primary key is expected (#{primary_key.inspect})") if pk.is_a?(Array)
+          first(primary_key=>pk)
         end
       end
     end

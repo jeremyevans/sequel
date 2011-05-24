@@ -485,3 +485,62 @@ describe Sequel::Model, ".[] optimization" do
     @c[1]
   end
 end
+
+describe "Model datasets #with_pk" do
+  before do
+    @c = Class.new(Sequel::Model(:a))
+    @ds = @c.dataset
+    def @ds.fetch_rows(sql)
+      db << sql
+      yield(:id=>1)
+    end
+    @sqls = MODEL_DB.sqls
+    @sqls.clear
+  end
+
+  it "should return the first record where the primary key matches" do
+    @ds.with_pk(1).should == @c.load(:id=>1)
+    @sqls.should == ["SELECT * FROM a WHERE (id = 1) LIMIT 1"]
+  end
+
+  it "should handle existing filters" do
+    @ds.filter(:a=>2).with_pk(1)
+    @sqls.should == ["SELECT * FROM a WHERE ((a = 2) AND (id = 1)) LIMIT 1"]
+  end
+
+  it "should work with string values" do
+    @ds.with_pk("foo")
+    @sqls.should == ["SELECT * FROM a WHERE (id = 'foo') LIMIT 1"]
+  end
+
+  it "should handle an array for composite primary keys" do
+    @c.set_primary_key :id1, :id2
+    @ds.with_pk([1, 2])
+    @sqls.should == ["SELECT * FROM a WHERE ((id1 = 1) AND (id2 = 2)) LIMIT 1"]
+  end
+
+  it "should raise an error if a single primary key is given when a composite primary key should be used" do
+    @c.set_primary_key :id1, :id2
+    proc{@ds.with_pk(1)}.should raise_error(Sequel::Error)
+  end
+
+  it "should raise an error if a composite primary key is given when a single primary key should be used" do
+    proc{@ds.with_pk([1, 2])}.should raise_error(Sequel::Error)
+  end
+
+  it "should raise an error if the wrong number of composite keys is given" do
+    @c.set_primary_key :id1, :id2
+    proc{@ds.with_pk([1, 2, 3])}.should raise_error(Sequel::Error)
+  end
+
+  it "should have #[] consider an integer as a primary key lookup" do
+    @ds[1].should == @c.load(:id=>1)
+    @sqls.should == ["SELECT * FROM a WHERE (id = 1) LIMIT 1"]
+  end
+
+  it "should not have #[] consider a string as a primary key lookup" do
+    @ds['foo'].should == @c.load(:id=>1)
+    @sqls.should == ["SELECT * FROM a WHERE (foo) LIMIT 1"]
+  end
+
+end

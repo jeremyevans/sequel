@@ -1,5 +1,9 @@
 === HEAD
 
+* Make Dataset#[] for model datasets consider a single integer argument as a lookup by primary key (jeremyevans)
+
+* Add Dataset#with_pk for model datasets, for finding first record with matching primary key value (jeremyevans)
+
 * Add defaults_setter plugin for setting default values when initializing model instances (jeremyevans)
 
 * Add around hooks (e.g. around_save) to Sequel::Model (jeremyevans)
