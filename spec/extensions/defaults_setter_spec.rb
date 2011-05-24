@@ -7,7 +7,7 @@ describe "Sequel::Plugins::DefaultsSetter" do
     @c.instance_variable_set(:@db_schema, {:a=>{}})
     @c.plugin :defaults_setter
     @c.columns :a
-    @pr = proc{|x| db.meta_def(:schema){[[:a, {:ruby_default => x}]]}; c.dataset = c.dataset; c}
+    @pr = proc{|x| db.meta_def(:schema){|*| [[:a, {:ruby_default => x}]]}; c.dataset = c.dataset; c}
   end
 
   it "should set default value upon initialization" do

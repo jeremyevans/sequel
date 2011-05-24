@@ -1174,7 +1174,7 @@ describe Sequel::Model, "#initialize_set" do
   end
 
   specify "should be called by initialize to set the column values" do
-    @c.send(:define_method, :initialize_set){set(:y => 3)}
+    @c.send(:define_method, :initialize_set){|h| set(:y => 3)}
     @c.new(:x => 2).values.should == {:y => 3}
   end
 
@@ -1186,7 +1186,7 @@ describe Sequel::Model, "#initialize_set" do
   end
 
   specify "should not cause columns modified by the method to be considered as changed" do
-    @c.send(:define_method, :initialize_set){set(:y => 3)}
+    @c.send(:define_method, :initialize_set){|h| set(:y => 3)}
     @c.new(:x => 2).changed_columns.should == []
   end
 end
