@@ -1379,52 +1379,42 @@ describe "Sequel::Plugins::PreparedStatements" do
   end
 
   it "should work with looking up using Model.[]" do 
-    log do
     @c[@foo.id].should == @foo
     @c[@bar.id].should == @bar
     @c[0].should == nil
-    end
   end
 
   it "should work with looking up using Dataset#with_pk" do 
-    log do
     @c.dataset.with_pk(@foo.id).should == @foo
     @c.dataset.with_pk(@bar.id).should == @bar
     @c.dataset.with_pk(0).should == nil
 
     @c.dataset.filter(:i=>0).with_pk(@foo.id).should == nil
     @c.dataset.filter(:name=>'foo').with_pk(@foo.id).should == @foo
-    end
   end
 
   it "should work with Model#destroy" do 
-    log do
     @foo.destroy
     @bar.destroy
     @c[@foo.id].should == nil
     @c[@bar.id].should == nil
-    end
   end
 
   it "should work with Model#update" do 
-    log do
     @foo.update(:name=>'foo2', :i=>30)
     @c[@foo.id].should == @c.load(:id=>@foo.id, :name=>'foo2', :i=>30)
     @foo.update(:name=>'foo3')
     @c[@foo.id].should == @c.load(:id=>@foo.id, :name=>'foo3', :i=>30)
     @foo.update(:i=>40)
     @c[@foo.id].should == @c.load(:id=>@foo.id, :name=>'foo3', :i=>40)
-    end
   end
 
   it "should work with Model#create" do 
-    log do
     o = @c.create(:name=>'foo2', :i=>30)
     @c[o.id].should == @c.load(:id=>o.id, :name=>'foo2', :i=>30)
     o = @c.create(:name=>'foo2')
     @c[o.id].should == @c.load(:id=>o.id, :name=>'foo2', :i=>nil)
     o = @c.create(:i=>30)
     @c[o.id].should == @c.load(:id=>o.id, :name=>nil, :i=>30)
-    end
   end
 end
