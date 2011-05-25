@@ -4,109 +4,111 @@
 # of the dataset's abstract syntax tree.
 
 module Sequel
-  class Dataset
+  class ToDot
     # The option keys that should be included in the dot output.
     TO_DOT_OPTIONS = [:with, :distinct, :select, :from, :join, :where, :group, :having, :compounds, :order, :limit, :offset, :lock].freeze
 
-    # Return a string that can be processed by the +dot+ program (included
-    # with graphviz) in order to see a visualization of the dataset's
-    # abstract syntax tree.
-    def to_dot
-      i = 0
-      dot = ["digraph G {", "#{i} [label=\"self\"];"]
-      _to_dot(dot, "", i, self, i)
-      dot << "}"
-      dot.join("\n")
+    # Given a +Dataset+, return a string in +dot+ format that will
+    # generate a visualization of the dataset.
+    def self.output(ds)
+      new(ds).output
+    end
+
+    # Given a +Dataset+, parse the internal structure to generate
+    # a dataset visualization.
+    def initialize(ds)
+      @i = 0
+      @stack = [@i]
+      @dot = ["digraph G {", "0 [label=\"self\"];"]
+      v(ds, "")
+      @dot << "}"
+    end
+
+    # Output the dataset visualization as a string in +dot+ format.
+    def output
+      @dot.join("\n")
     end
 
     private
 
-    # Internal recursive version that handles all object types understood
-    # by Sequel.  Arguments:
-    # * dot :: An array of strings representing the lines in the returned
-    #          output.  This function just pushes strings onto this array.
-    # * l :: The transition label from the parent node of the AST to the
-    #        current node.
-    # * c :: An integer representing the parent node of the AST.
-    # * e :: The current node of the AST.
-    # * i :: The integer representing the last created node of the AST.
-    #
-    # The basic algorithm is that the +i+ is incremented to get the current
-    # node's integer.  Then the transition from the parent node to the
-    # current node is added to the +dot+ array.  Finally, the current node
-    # is added to the +dot+ array, and if it is a compound node with children,
-    # its children are then added by recursively calling this method. The
-    # return value is the integer representing the last created node.
-    def _to_dot(dot, l, c, e, i)
-      i += 1
-      dot << "#{c} -> #{i} [label=\"#{l}\"];" if l
-      c = i
+    # Add an entry to the +dot+ output with the given label.  If +j+
+    # is given, it is used directly as the node or transition.  Otherwise
+    # a node is created for the current object.
+    def dot(label, j=nil)
+      @dot << "#{j||@i} [label=#{label.to_s.inspect}];"
+    end
+
+    # Recursive method that parses all of Sequel's internal datastructures,
+    # adding the appropriate nodes and transitions to the internal +dot+
+    # structure.
+    def v(e, l)
+      @i += 1
+      dot(l, "#{@stack.last} -> #{@i}") if l
+      @stack.push(i)
       case e
       when LiteralString
-        dot << "#{i} [label=\"#{e.inspect.gsub('"', '\\"')}.lit\"];"
-        i
+        dot "#{e.inspect}.lit"
       when Symbol, Numeric, String, Class, TrueClass, FalseClass, NilClass
-        dot << "#{i} [label=\"#{e.inspect.gsub('"', '\\"')}\"];"
-        i
+        dot e.inspect
       when Array
-        dot << "#{i} [label=\"Array\"];"
-        e.each_with_index do |v, j|
-          i = _to_dot(dot, j, c, v, i)
+        dot "Array"
+        e.each_with_index do |val, j|
+          v(val, j)
         end
       when Hash
-        dot << "#{i} [label=\"Hash\"];"
-        e.each do |k, v|
-          i = _to_dot(dot, k, c, v, i)
+        dot "Hash"
+        e.each do |k, val|
+          v(val, k)
         end
       when SQL::ComplexExpression 
-        dot << "#{i} [label=\"ComplexExpression: #{e.op}\"];"
-        e.args.each_with_index do |v, j|
-          i = _to_dot(dot, j, c, v, i)
+        dot "ComplexExpression: #{e.op}"
+        e.args.each_with_index do |val, j|
+          v(val, j)
         end
       when SQL::Identifier
-        dot << "#{i} [label=\"Identifier\"];"
-        i = _to_dot(dot, :value, c, e.value, i)
+        dot "Identifier"
+        v(e.value, :value)
       when SQL::QualifiedIdentifier
-        dot << "#{i} [label=\"QualifiedIdentifier\"];"
-        i = _to_dot(dot, :table, c, e.table, i)
-        i = _to_dot(dot, :column, c, e.column, i)
+        dot "QualifiedIdentifier"
+        v(e.table, :table)
+        v(e.column, :column)
       when SQL::OrderedExpression
-        dot << "#{i} [label=\"OrderedExpression: #{e.descending ? :DESC : :ASC}#{" NULLS #{e.nulls.to_s.upcase}" if e.nulls}\"];"
-        i = _to_dot(dot, :expression, c, e.expression, i)
+        dot "OrderedExpression: #{e.descending ? :DESC : :ASC}#{" NULLS #{e.nulls.to_s.upcase}" if e.nulls}"
+        v(e.expression, :expression)
       when SQL::AliasedExpression
-        dot << "#{i} [label=\"AliasedExpression\"];"
-        i = _to_dot(dot, :expression, c, e.expression, i)
-        i = _to_dot(dot, :alias, c, e.aliaz, i)
+        dot "AliasedExpression"
+        v(e.expression, :expression)
+        v(e.aliaz, :alias)
       when SQL::CaseExpression
-        dot << "#{i} [label=\"CaseExpression\"];"
-        i = _to_dot(dot, :expression, c, e.expression, i) if e.expression
-        i = _to_dot(dot, :conditions, c, e.conditions, i)
-        i = _to_dot(dot, :default, c, e.default, i)
+        dot "CaseExpression"
+        v(e.expression, :expression) if e.expression
+        v(e.conditions, :conditions)
+        v(e.default, :default)
       when SQL::Cast
-        dot << "#{i} [label=\"Cast\"];"
-        i = _to_dot(dot, :expr, c, e.expr, i)
-        i = _to_dot(dot, :type, c, e.type, i)
+        dot "Cast"
+        v(e.expr, :expr)
+        v(e.type, :type)
       when SQL::Function
-        dot << "#{i} [label=\"Function: #{e.f}\"];"
-        e.args.each_with_index do |v, j|
-          i = _to_dot(dot, j, c, v, i)
+        dot "Function: #{e.f}"
+        e.args.each_with_index do |val, j|
+          v(val, j)
         end
       when SQL::Subscript 
-        dot << "#{i} [label=\"Subscript: #{e.f}\"];"
-        i = _to_dot(dot, :f, c, e.f, i)
-        i = _to_dot(dot, :sub, c, e.sub, i)
+        dot "Subscript"
+        v(e.f, :f)
+        v(e.sub, :sub)
       when SQL::WindowFunction
-        dot << "#{i} [label=\"WindowFunction\"];"
-        i = _to_dot(dot, :function, c, e.function, i)
-        i = _to_dot(dot, :window, c, e.window, i)
+        dot "WindowFunction"
+        v(e.function, :function)
+        v(e.window, :window)
       when SQL::Window
-        dot << "#{i} [label=\"Window\"];"
-        i = _to_dot(dot, :opts, c, e.opts, i)
+        dot "Window"
+        v(e.opts, :opts)
       when SQL::PlaceholderLiteralString
         str = e.str
         str = "(#{str})" if e.parens
-        dot << "#{i} [label=\"PlaceholderLiteralString: #{str.inspect.gsub('"', '\\"')}\"];"
-        i = _to_dot(dot, :args, c, e.args, i)
+        dot "PlaceholderLiteralString: #{str.inspect}"
+        v(e.args, :args)
       when SQL::JoinClause
         str = "#{e.join_type.to_s.upcase} JOIN"
         if e.is_a?(SQL::JoinOnClause)
@@ -114,24 +116,34 @@ module Sequel
         elsif e.is_a?(SQL::JoinUsingClause)
           str << " USING"
         end
-        dot << "#{i} [label=\"#{str}\"];"
-        i = _to_dot(dot, :table, c, e.table, i)
-        i = _to_dot(dot, :alias, c, e.table_alias, i) if e.table_alias
+        dot str
+        v(e.table, :table)
+        v(e.table_alias, :alias) if e.table_alias
         if e.is_a?(SQL::JoinOnClause)
-          i = _to_dot(dot, :on, c, e.on, i)
+          v(e.on, :on) 
         elsif e.is_a?(SQL::JoinUsingClause)
-          i = _to_dot(dot, :using, c, e.using, i)
+          v(e.using, :using) 
         end
       when Dataset
-        dot << "#{i} [label=\"Dataset\"];"
+        dot "Dataset"
         TO_DOT_OPTIONS.each do |k|
-          next unless e.opts[k]
-          i = _to_dot(dot, k, c, e.opts[k], i)
+          if val = e.opts[k]
+            v(val, k.to_s) 
+          end
         end
       else
-        dot << "#{i} [label=\"Unhandled: #{e.inspect.gsub('"', "''")}\"];"
+        dot "Unhandled: #{e.inspect}"
       end
-      i
+      @stack.pop
+    end
+  end
+
+  class Dataset
+    # Return a string that can be processed by the +dot+ program (included
+    # with graphviz) in order to see a visualization of the dataset's
+    # abstract syntax tree.
+    def to_dot
+      ToDot.output(self)
     end
   end
 end

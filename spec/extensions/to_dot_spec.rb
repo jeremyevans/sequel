@@ -2,9 +2,7 @@ require File.join(File.dirname(File.expand_path(__FILE__)), "spec_helper")
 
 describe Sequel::Model, "to_dot extension" do
   def dot(ds)
-    a = []
-    ds.send(:_to_dot, a, "", 0, ds, 0)
-    a[2..-1]
+    Sequel::ToDot.new(ds).instance_variable_get(:@dot)[4...-1]
   end
 
   before do
@@ -123,7 +121,7 @@ END
   end
 
   it "should handle SQL::Subscript" do
-    dot(@ds.select(:a.sql_subscript(1))).should == ["1 -> 2 [label=\"select\"];", "2 [label=\"Array\"];", "2 -> 3 [label=\"0\"];", "3 [label=\"Subscript: a\"];", "3 -> 4 [label=\"f\"];", "4 [label=\":a\"];", "3 -> 5 [label=\"sub\"];", "5 [label=\"Array\"];", "5 -> 6 [label=\"0\"];", "6 [label=\"1\"];"]
+    dot(@ds.select(:a.sql_subscript(1))).should == ["1 -> 2 [label=\"select\"];", "2 [label=\"Array\"];", "2 -> 3 [label=\"0\"];", "3 [label=\"Subscript\"];", "3 -> 4 [label=\"f\"];", "4 [label=\":a\"];", "3 -> 5 [label=\"sub\"];", "5 [label=\"Array\"];", "5 -> 6 [label=\"0\"];", "6 [label=\"1\"];"]
   end
 
   it "should handle SQL::WindowFunction" do
