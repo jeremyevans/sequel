@@ -1,5 +1,7 @@
 === HEAD
 
+* Add Dataset#unbind for unbinding values from a dataset, for use with creating prepared statements (jeremyevans)
+
 * Add prepared_statements plugin for using prepared statements for updates, inserts, deletes, and lookups by primary key (jeremyevans)
 
 * Make Dataset#[] for model datasets consider a single integer argument as a lookup by primary key (jeremyevans)

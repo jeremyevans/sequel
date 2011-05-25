@@ -109,4 +109,71 @@ module Sequel
       end
     end
   end
+
+  # +Unbinder+ is used to take a dataset filter and return a modified version
+  # that unbinds already bound values and returns a dataset with bound value
+  # placeholders and a hash of bind values.  You can then prepare the dataset
+  # and use the bound variables to execute it with the same values.
+  #
+  # This class only does a limited form of unbinding where the variable names
+  # and values can be associated unambiguously.
+  class Unbinder < ASTTransformer
+    # The <tt>SQL::ComplexExpression<tt> operates that will be considered
+    # for transformation.
+    UNBIND_OPS = [:'=', :'!=', :<, :>, :<=, :>=]
+
+    # The key classes (first argument of the ComplexExpression) that will
+    # considered for transformation.
+    UNBIND_KEY_CLASSES = [Symbol, SQL::Identifier, SQL::QualifiedIdentifier]
+
+    # The value classes (second argument of the ComplexExpression) that
+    # will be considered for transformation.
+    UNBIND_VALUE_CLASSES = [Numeric, String, Date, Time]
+
+    # The hash of bind variables that were extracted from the dataset filter.
+    attr_reader :binds
+
+    # Intialize an empty +binds+ hash.
+    def initialize
+      @binds = {}
+    end
+
+    private
+
+    # Create a suitable bound variable key for the object, which should be
+    # an instance of one of the +UNBIND_KEY_CLASSES+.
+    def bind_key(obj)
+      case obj
+      when Symbol, String
+        obj
+      when SQL::Identifier
+        bind_key(obj.value)
+      when SQL::QualifiedIdentifier
+        :"#{bind_key(obj.table)}__#{bind_key(obj.column)}"
+      else
+        raise Error, "unhandled object in Sequel::Unbinder#bind_key: #{obj}"
+      end
+    end
+
+    # Handle <tt>SQL::ComplexExpression</tt> instances with suitable ops
+    # and arguments, substituting the value with a bound variable placeholder
+    # and assigning it an entry in the +binds+ hash with a matching key.
+    def v(o)
+      if o.is_a?(SQL::ComplexExpression) && UNBIND_OPS.include?(o.op)
+        l, r = o.args
+        if UNBIND_KEY_CLASSES.any?{|c| l.is_a?(c)} && UNBIND_VALUE_CLASSES.any?{|c| r.is_a?(c)} && !r.is_a?(LiteralString)
+          key = bind_key(l)
+          if (old = binds[key]) && old != r
+            raise UnbindDuplicate, "two different values for #{key.inspect}: #{[r, old].inspect}" 
+          end
+          binds[key] = r
+          SQL::ComplexExpression.new(o.op, l, :"$#{key}")
+        else
+          super
+        end
+      else
+        super
+      end
+    end
+  end
 end

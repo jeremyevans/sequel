@@ -3620,6 +3620,59 @@ describe "Sequel::Dataset#qualify_to_first_source" do
   end
 end
 
+describe "Sequel::Dataset#unbind" do
+  before do
+    @ds = MockDatabase.new[:t]
+    @u = proc{|ds| ds, bv = ds.unbind; [ds.sql, bv]}
+  end
+
+  specify "should unbind values assigned to equality and inequality statements" do
+    @ds.filter(:foo=>1).unbind.first.sql.should == "SELECT * FROM t WHERE (foo = $foo)"
+    @ds.exclude(:foo=>1).unbind.first.sql.should == "SELECT * FROM t WHERE (foo != $foo)"
+    @ds.filter{foo > 1}.unbind.first.sql.should == "SELECT * FROM t WHERE (foo > $foo)"
+    @ds.filter{foo >= 1}.unbind.first.sql.should == "SELECT * FROM t WHERE (foo >= $foo)"
+    @ds.filter{foo < 1}.unbind.first.sql.should == "SELECT * FROM t WHERE (foo < $foo)"
+    @ds.filter{foo <= 1}.unbind.first.sql.should == "SELECT * FROM t WHERE (foo <= $foo)"
+  end
+
+  specify "should return variables that could be used bound to recreate the previous query" do
+    @ds.filter(:foo=>1).unbind.last.should == {:foo=>1}
+    @ds.exclude(:foo=>1).unbind.last.should == {:foo=>1}
+  end
+
+  specify "should handle numerics, strings, dates, times, and datetimes" do
+    @u[@ds.filter(:foo=>1)].should == ["SELECT * FROM t WHERE (foo = $foo)", {:foo=>1}]
+    @u[@ds.filter(:foo=>1.0)].should == ["SELECT * FROM t WHERE (foo = $foo)", {:foo=>1.0}]
+    @u[@ds.filter(:foo=>BigDecimal.new('1.0'))].should == ["SELECT * FROM t WHERE (foo = $foo)", {:foo=>BigDecimal.new('1.0')}]
+    @u[@ds.filter(:foo=>'a')].should == ["SELECT * FROM t WHERE (foo = $foo)", {:foo=>'a'}]
+    @u[@ds.filter(:foo=>Date.today)].should == ["SELECT * FROM t WHERE (foo = $foo)", {:foo=>Date.today}]
+    t = Time.now
+    @u[@ds.filter(:foo=>t)].should == ["SELECT * FROM t WHERE (foo = $foo)", {:foo=>t}]
+    dt = DateTime.now
+    @u[@ds.filter(:foo=>dt)].should == ["SELECT * FROM t WHERE (foo = $foo)", {:foo=>dt}]
+  end
+
+  specify "should not unbind literal strings" do
+    @u[@ds.filter(:foo=>'a'.lit)].should == ["SELECT * FROM t WHERE (foo = a)", {}]
+  end
+
+  specify "should handle QualifiedIdentifiers" do
+    @u[@ds.filter{foo__bar > 1}].should == ["SELECT * FROM t WHERE (foo.bar > $foo.bar)", {:foo__bar=>1}]
+  end
+
+  specify "should handle deep nesting" do
+    @u[@ds.filter{foo > 1}.and{bar < 2}.or(:baz=>3).and({~{:x=>4}=>true}.case(false))].should == ["SELECT * FROM t WHERE ((((foo > $foo) AND (bar < $bar)) OR (baz = $baz)) AND (CASE WHEN (x != $x) THEN 't' ELSE 'f' END))", {:foo=>1, :bar=>2, :baz=>3, :x=>4}]
+  end
+
+  specify "should raise an UnbindDuplicate exception if same variable is used with multiple different values" do
+    proc{@ds.filter(:foo=>1).or(:foo=>2).unbind}.should raise_error(Sequel::UnbindDuplicate)
+  end
+
+  specify "should handle case where the same variable has the same value in multiple places " do
+    @u[@ds.filter(:foo=>1).or(:foo=>1)].should == ["SELECT * FROM t WHERE ((foo = $foo) OR (foo = $foo))", {:foo=>1}]
+  end
+end
+
 describe "Sequel::Dataset #with and #with_recursive" do
   before do
     @db = MockDatabase.new

@@ -268,3 +268,70 @@ describe "Bound Argument Types" do
   end
 end unless INTEGRATION_DB.adapter_scheme == :swift && INTEGRATION_DB.database_type == :postgres
 
+describe "Dataset#unbind" do
+  before do
+    @ds = ds = INTEGRATION_DB[:items]
+    @ct = proc do |t, v|
+      INTEGRATION_DB.create_table!(:items) do
+        column :c, t
+      end
+      ds.insert(:c=>v)
+    end
+    @u = proc{|ds| ds, bv = ds.unbind; ds.call(:first, bv)}
+  end
+  after do
+    INTEGRATION_DB.drop_table(:items)
+  end
+  
+  specify "should unbind values assigned to equality and inequality statements" do
+    @ct[Integer, 10]
+    @u[@ds.filter(:c=>10)].should == {:c=>10}
+    @u[@ds.exclude(:c=>10)].should == nil
+    @u[@ds.filter{c < 10}].should == nil
+    @u[@ds.filter{c <= 10}].should == {:c=>10}
+    @u[@ds.filter{c > 10}].should == nil
+    @u[@ds.filter{c >= 10}].should == {:c=>10}
+  end
+
+  specify "should handle numerics and strings" do
+    @ct[Integer, 10]
+    @u[@ds.filter(:c=>10)].should == {:c=>10}
+    @ct[Float, 0.0]
+    @u[@ds.filter{c < 1}].should == {:c=>0.0}
+    @ct[BigDecimal, BigDecimal.new('1.0')]
+    @u[@ds.filter{c > 0}].should == {:c=>BigDecimal.new('1.0')}
+    @ct[String, 'foo']
+    @u[@ds.filter(:c=>'foo')].should == {:c=>'foo'}
+  end
+
+  cspecify "should handle dates and times", [:sqlite] do
+    @ct[Date, Date.today]
+    @u[@ds.filter(:c=>Date.today)].should == {:c=>Date.today}
+    t = Time.now
+    @ct[Time, t]
+    @u[@ds.filter{c < t + 1}][:c].to_i.should == t.to_i
+  end
+
+  specify "should handle QualifiedIdentifiers" do
+    @ct[Integer, 10]
+    @u[@ds.filter{items__c > 1}].should == {:c=>10}
+  end
+
+  specify "should handle deep nesting" do
+    INTEGRATION_DB.create_table!(:items) do
+      Integer :a
+      Integer :b
+      Integer :c
+      Integer :d
+    end
+    @ds.insert(:a=>2, :b=>0, :c=>3, :d=>5)
+    @u[@ds.filter{a > 1}.and{b < 2}.or(:c=>3).and({~{:d=>4}=>{1 => 1}}.case(0=>1))].should == {:a=>2, :b=>0, :c=>3, :d=>5}
+    @u[@ds.filter{a > 1}.and{b < 2}.or(:c=>3).and({~{:d=>5}=>{1 => 1}}.case(0=>1))].should == nil
+  end
+
+  specify "should handle case where the same variable has the same value in multiple places " do
+    @ct[Integer, 1]
+    @u[@ds.filter{c > 1}.or{c < 1}.invert].should == {:c=>1}
+    @u[@ds.filter{c > 1}.or{c < 1}].should == nil
+  end
+end    

@@ -44,6 +44,10 @@ module Sequel
   # and won't reraise it.
   class Rollback < Error ; end
 
+  # Exception that occurs when unbinding a dataset that has multiple different values
+  # for a given variable.
+  class UnbindDuplicate < Error; end
+
   class Error
     AdapterNotFound = Sequel::AdapterNotFound
     InvalidOperation = Sequel::InvalidOperation
