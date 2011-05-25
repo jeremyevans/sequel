@@ -173,7 +173,7 @@ module Sequel
           end
         end
         unless cps
-          cps = conn.prepare(sql)
+          cps = log_yield("Preparing #{name}: #{sql}"){conn.prepare(sql)}
           conn.prepared_statements[name] = [cps, sql]
         end
         if block
