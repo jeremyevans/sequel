@@ -1201,9 +1201,10 @@ module Sequel
 
       private
       
-      # Actually do the deletion of the object's dataset.
+      # Do the deletion of the object's dataset, and check that the row
+      # was actually deleted.
       def _delete
-        n = _delete_dataset.delete
+        n = _delete_without_checking
         raise(NoExistingObject, "Attempt to delete object did not result in a single row modification (Rows Deleted: #{n}, SQL: #{_delete_dataset.delete_sql})") if require_modification && n != 1
         n
       end
@@ -1214,6 +1215,12 @@ module Sequel
         this
       end
   
+      # Actually do the deletion of the object's dataset.  Return the
+      # number of rows modified.
+      def _delete_without_checking
+        _delete_dataset.delete
+      end
+
       # Internal destroy method, separted from destroy to
       # allow running inside a transaction
       def _destroy(opts)
@@ -1236,11 +1243,11 @@ module Sequel
       # the record should be refreshed from the database.
       def _insert
         ds = _insert_dataset
-        if !ds.opts[:select] and ds.respond_to?(:insert_select) and h = ds.insert_select(@values)
+        if !ds.opts[:select] and ds.supports_insert_select? and h = _insert_select_raw(ds)
           @values = h
           nil
         else
-          iid = ds.insert(@values)
+          iid = _insert_raw(ds)
           # if we have a regular primary key and it's not set in @values,
           # we assume it's the last inserted id
           if (pk = autoincrementing_primary_key) && pk.is_a?(Symbol) && !@values[pk]
@@ -1249,19 +1256,34 @@ module Sequel
           pk
         end
       end
-      
+
       # The dataset to use when inserting a new object.   The same as the model's
       # dataset by default.
       def _insert_dataset
         model.dataset
       end
   
+      # Insert into the given dataset and return the primary key created (if any).
+      def _insert_raw(ds)
+        ds.insert(@values)
+      end
+
+      # Insert into the given dataset and return the hash of column values.
+      def _insert_select_raw(ds)
+        ds.insert_select(@values)
+      end
+      
       # Refresh using a particular dataset, used inside save to make sure the same server
       # is used for reading newly inserted values from the database
       def _refresh(dataset)
-        set_values(dataset.first || raise(Error, "Record not found"))
+        set_values(_refresh_get(dataset) || raise(Error, "Record not found"))
         changed_columns.clear
         self
+      end
+
+      # Get the row of column data from the database.
+      def _refresh_get(dataset)
+        dataset.first
       end
       
       # Internal version of save, split from save to allow running inside
@@ -1338,9 +1360,10 @@ module Sequel
         _update(columns) unless columns.empty?
       end
 
-      # Update this instance's dataset with the supplied column hash.
+      # Update this instance's dataset with the supplied column hash,
+      # checking that only a single row was modified.
       def _update(columns)
-        n = _update_dataset.update(columns)
+        n = _update_without_checking(columns)
         raise(NoExistingObject, "Attempt to update object did not result in a single row modification (SQL: #{_update_dataset.update_sql(columns)})") if require_modification && n != 1
         n
       end
@@ -1349,6 +1372,11 @@ module Sequel
       # dataset by default.
       def _update_dataset
         this
+      end
+
+      # Update this instances dataset with the supplied column hash.
+      def _update_without_checking(columns)
+        _update_dataset.update(columns)
       end
 
       # If not raising on failure, check for BeforeHookFailed

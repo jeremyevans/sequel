@@ -198,6 +198,7 @@ module Sequel
       NULL = LiteralString.new('NULL').freeze
       COMMA_SEPARATOR = ', '.freeze
       SELECT_CLAUSE_METHODS = clause_methods(:select, %w'with distinct limit columns from join where group having compounds order')
+      INSERT_CLAUSE_METHODS = clause_methods(:insert, %w'into columns values returning_select')
 
       # Yield all rows returned by executing the given SQL and converting
       # the types.
@@ -242,19 +243,13 @@ module Sequel
       def insert_select(*values)
         naked.clone(default_server_opts(:sql=>insert_returning_sql(nil, *values))).single_record
       end
-      
+
       def requires_sql_standard_datetimes?
         true
       end
 
-      # The order of clauses in the SELECT SQL statement
-      def select_clause_methods
-        SELECT_CLAUSE_METHODS
-      end
-      
-      def select_limit_sql(sql)
-        sql << " FIRST #{@opts[:limit]}" if @opts[:limit]
-        sql << " SKIP #{@opts[:offset]}" if @opts[:offset]
+      def supports_insert_select?
+        true
       end
 
       # Firebird does not support INTERSECT or EXCEPT
@@ -264,6 +259,16 @@ module Sequel
 
       private
 
+      def insert_clause_methods
+        INSERT_CLAUSE_METHODS
+      end
+
+      def insert_returning_select_sql(sql)
+        if opts.has_key?(:returning)
+          sql << " RETURNING #{column_list(Array(opts[:returning]))}"
+        end
+      end
+      
       def hash_row(stmt, row)
         @columns.inject({}) do |m, c|
           m[c] = row.shift
@@ -278,6 +283,17 @@ module Sequel
       def literal_true
         BOOL_TRUE
       end
+
+      # The order of clauses in the SELECT SQL statement
+      def select_clause_methods
+        SELECT_CLAUSE_METHODS
+      end
+      
+      def select_limit_sql(sql)
+        sql << " FIRST #{@opts[:limit]}" if @opts[:limit]
+        sql << " SKIP #{@opts[:offset]}" if @opts[:offset]
+      end
+
     end
   end
 end

@@ -13,6 +13,7 @@ describe "NestedAttributes plugin" do
         mods << [:i, first_source, h, x]
         x
       end
+      define_method(:supports_insert_select?){true}
       define_method(:insert_select) do |h|
         x = ii.call
         mods << [:is, first_source, h, x]

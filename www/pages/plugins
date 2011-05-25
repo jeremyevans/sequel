@@ -26,6 +26,7 @@
 <li><a href="rdoc-plugins/classes/Sequel/Plugins/ManyThroughMany.html">many_through_many</a>: Allows you to create an association to multiple objects through multiple join tables.</li>
 <li><a href="rdoc-plugins/classes/Sequel/Plugins/NestedAttributes.html">nested_attributes</a>: Allows you to modified associated objects directly through a model object, similar to ActiveRecord's Nested Attributes.</li>
 <li><a href="rdoc-plugins/classes/Sequel/Plugins/OptimisticLocking.html">optimistic_locking</a>: Adds a database-independent locking mechanism to models to prevent concurrent updates overwriting changes.</li>
+<li><a href="rdoc-plugins/classes/Sequel/Plugins/PreparedStatements.html">prepared_statements</a>: Makes models use prepared statements for deletes, inserts, updates, and lookups by primary key.</li>
 <li><a href="rdoc-plugins/classes/Sequel/Plugins/RcteTree.html">rcte_tree</a>: Supports retrieving all ancestors and descendants for tree structured data using recursive common table expressions.</li>
 <li><a href="rdoc-plugins/classes/Sequel/Plugins/Schema.html">schema</a>: Adds backwards compatibility for Model.set_schema and Model.create_table.</li>
 <li><a href="rdoc-plugins/classes/Sequel/Plugins/Serialization.html">serialization</a>: Supports serializing column values and storing them as either marshal, yaml, or json in the database.</li>

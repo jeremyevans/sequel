@@ -5,13 +5,17 @@ database you are using, the Sequel prepared statement/bound variable API remains
 the same.  There is native support for prepared statements/bound variables on
 the following databases:
 
-* PostgreSQL (using the pg driver, requires type specifiers)
+* PostgreSQL (using the pg driver, may require type specifiers)
 * MySQL (prepared statements only, as the ruby mysql driver doesn't support
   bound variables)
 * SQLite
 * JDBC
 
 Support on other databases is emulated via string interpolation.
+
+You can use the prepared_statements model plugin to automatically use prepared
+statements for some common model actions such as saving or deleting a model
+instance, or looking up a model based on a primary key.
 
 == Placeholders
 
@@ -74,9 +78,9 @@ and update queries, the hash to insert/update is passed to +prepare+:
 
 If you are using the ruby-postgres or postgres-pr driver, PostgreSQL uses the
 default emulated support.  If you are using ruby-pg, there is native support,
-but it requires type specifiers most of the time.  This is easy if you have
+but it may require type specifiers.  This is easy if you have
 direct control over the SQL string, but since Sequel abstracts that, the types
-have to be specified another way.  This is done by adding a __* suffix to the
+can be specified another way.  This is done by adding a __* suffix to the
 placeholder symbol (e.g. :$name__text, which will be compiled to "$1::text"
 in the SQL).  Prepared statements are always server side.
 
@@ -87,7 +91,7 @@ statements are cached per connection.
 
 === MySQL
 
-The MySQL ruby driver does not support bound variables, so the the bound
+The MySQL ruby driver does not support bound variables, so the bound
 variable methods fall back to string interpolation.  It uses server side
 prepared statements.
 

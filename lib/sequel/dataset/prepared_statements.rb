@@ -81,6 +81,8 @@ module Sequel
           select_sql
         when :first
           clone(:limit=>1).select_sql
+        when :insert_select
+          clone(:returning=>nil).insert_sql(*@prepared_modify_values)
         when :insert
           insert_sql(*@prepared_modify_values)
         when :update
@@ -118,6 +120,9 @@ module Sequel
         case @prepared_type
         when :select, :all
           all(&block)
+        when :insert_select
+          meta_def(:select_sql){prepared_sql}
+          first
         when :first
           first
         when :insert

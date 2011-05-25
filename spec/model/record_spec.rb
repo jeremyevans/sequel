@@ -52,6 +52,7 @@ describe "Model#save" do
 
   it "should use dataset's insert_select method if present" do
     ds = @c.dataset = @c.dataset.clone
+    def ds.supports_insert_select?() true end
     def ds.insert_select(hash)
       execute("INSERT INTO items (y) VALUES (2)")
       {:y=>2}

@@ -37,6 +37,12 @@ module Sequel
       false
     end
 
+    # Whether this dataset supports the +insert_select+ method for returning all columns values
+    # directly from an insert query.
+    def supports_insert_select?
+      false
+    end
+
     # Whether the dataset supports the INTERSECT and EXCEPT compound operations, true by default.
     def supports_intersect_except?
       true

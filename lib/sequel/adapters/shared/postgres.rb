@@ -646,6 +646,7 @@ module Sequel
       EXPLAIN = 'EXPLAIN '.freeze
       EXPLAIN_ANALYZE = 'EXPLAIN ANALYZE '.freeze
       FOR_SHARE = ' FOR SHARE'.freeze
+      INSERT_CLAUSE_METHODS = Dataset.clause_methods(:insert, %w'into columns values returning_select')
       LOCK = 'LOCK TABLE %s IN %s MODE'.freeze
       NULL = LiteralString.new('NULL').freeze
       PG_TIMESTAMP_FORMAT = "TIMESTAMP '%Y-%m-%d %H:%M:%S".freeze
@@ -740,7 +741,7 @@ module Sequel
 
       # Insert a record returning the record inserted
       def insert_select(*values)
-        return if opts[:disable_insert_returning] || server_version < 80200
+        return unless supports_insert_select?
         naked.clone(default_server_opts(:sql=>insert_returning_sql(nil, *values))).single_record
       end
 
@@ -771,6 +772,11 @@ module Sequel
         true
       end
       
+      # PostgreSQL support insert_select using the RETURNING clause.
+      def supports_insert_select?
+        server_version >= 80200 && !opts[:disable_insert_returning]
+      end
+
       # PostgreSQL supports modifying joined datasets
       def supports_modifying_joins?
         true
@@ -808,10 +814,23 @@ module Sequel
         join_from_sql(:USING, sql)
       end
 
+      # PostgreSQL allows a RETURNING clause.
+      def insert_clause_methods
+        INSERT_CLAUSE_METHODS
+      end
+
       # Use the RETURNING clause to return the primary key of the inserted record, if it exists
       def insert_returning_pk_sql(*values)
         pk = db.primary_key(opts[:from].first) if opts[:from] && !opts[:from].empty?
         insert_returning_sql(pk ? Sequel::SQL::Identifier.new(pk) : NULL, *values)
+      end
+
+      # Add a RETURNING clause if it is set and the database supports it and
+      # this dataset hasn't disabled it.
+      def insert_returning_select_sql(sql)
+        if supports_insert_select? && opts.has_key?(:returning)
+          sql << " RETURNING #{column_list(Array(opts[:returning]))}"
+        end
       end
       
       # For multiple table support, PostgreSQL requires at least

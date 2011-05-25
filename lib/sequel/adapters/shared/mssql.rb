@@ -321,8 +321,8 @@ module Sequel
 
       # Use the OUTPUT clause to get the value of all columns for the newly inserted record.
       def insert_select(*values)
-        return unless supports_output_clause?
-        naked.clone(default_server_opts(:sql=>output(nil, [:inserted.*]).insert_sql(*values))).single_record unless opts[:disable_insert_output]
+        return unless supports_insert_select?
+        naked.clone(default_server_opts(:sql=>output(nil, [:inserted.*]).insert_sql(*values))).single_record
       end
 
       # Specify a table for a SELECT ... INTO query.
@@ -409,6 +409,11 @@ module Sequel
       # The version of the database server.
       def server_version
         db.server_version(@opts[:server])
+      end
+
+      # MSSQL supports insert_select via the OUTPUT clause.
+      def supports_insert_select?
+        supports_output_clause? && !opts[:disable_insert_output]
       end
 
       # MSSQL 2005+ supports INTERSECT and EXCEPT
@@ -514,6 +519,16 @@ module Sequel
         INSERT_CLAUSE_METHODS
       end
 
+      # Use OUTPUT INSERTED.* to return all columns of the inserted row,
+      # for use with the prepared statement code.
+      def insert_output_sql(sql)
+        if @opts.has_key?(:returning)
+          sql << " OUTPUT INSERTED.*"
+        else
+          output_sql(sql)
+        end
+      end
+
       # MSSQL uses a literal hexidecimal number for blob strings
       def literal_blob(v)
         blob = '0x'
@@ -589,7 +604,6 @@ module Sequel
       end
       alias delete_output_sql output_sql
       alias update_output_sql output_sql
-      alias insert_output_sql output_sql
 
       # MSSQL supports the OUTPUT clause for UPDATE statements.
       # It also allows prepending a WITH clause.

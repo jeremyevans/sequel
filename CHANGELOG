@@ -1,5 +1,7 @@
 === HEAD
 
+* Add prepared_statements plugin for using prepared statements for updates, inserts, deletes, and lookups by primary key (jeremyevans)
+
 * Make Dataset#[] for model datasets consider a single integer argument as a lookup by primary key (jeremyevans)
 
 * Add Dataset#with_pk for model datasets, for finding first record with matching primary key value (jeremyevans)
