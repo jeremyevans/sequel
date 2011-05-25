@@ -97,8 +97,8 @@ module Sequel
       # and they are substituted using prepared_arg.
       def literal_symbol(v)
         if @opts[:bind_vars] and match = PLACEHOLDER_RE.match(v.to_s)
-          v2 = prepared_arg(match[1].to_sym)
-          v2 ? literal(v2) : v
+          s = match[1].to_sym
+          prepared_arg?(s) ? literal(prepared_arg(s)) : v
         else
           super
         end
@@ -141,6 +141,11 @@ module Sequel
         @opts[:bind_vars][k]
       end
 
+      # Whether there is a bound value for the given key.
+      def prepared_arg?(k)
+        @opts[:bind_vars].has_key?(k)
+      end
+
       # Use a clone of the dataset extended with prepared statement
       # support and using the same argument hash so that you can use
       # bind variables/prepared arguments in subselects.
@@ -175,6 +180,11 @@ module Sequel
       def prepared_arg(k)
         prepared_args << k
         prepared_arg_placeholder
+      end
+      
+      # Always assume there is a prepared arg in the argument mapper.
+      def prepared_arg?(k)
+        true
       end
     end
     

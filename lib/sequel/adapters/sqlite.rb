@@ -228,6 +228,11 @@ module Sequel
         def prepared_arg(k)
           LiteralString.new("#{prepared_arg_placeholder}#{k.to_s.gsub('.', '__')}")
         end
+
+        # Always assume a prepared argument.
+        def prepared_arg?(k)
+          true
+        end
       end
       
       # SQLite prepared statement uses a new prepared statement each time

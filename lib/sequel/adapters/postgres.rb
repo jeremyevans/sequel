@@ -395,6 +395,11 @@ module Sequel
             end
             LiteralString.new("#{prepared_arg_placeholder}#{i}#{"::#{type}" if type}")
           end
+
+          # Always assume a prepared argument.
+          def prepared_arg?(k)
+           true
+          end
         end
 
         # Allow use of bind arguments for PostgreSQL using the pg driver.
