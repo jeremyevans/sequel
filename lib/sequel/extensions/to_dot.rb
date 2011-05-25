@@ -44,7 +44,7 @@ module Sequel
     def v(e, l)
       @i += 1
       dot(l, "#{@stack.last} -> #{@i}") if l
-      @stack.push(i)
+      @stack.push(@i)
       case e
       when LiteralString
         dot "#{e.inspect}.lit"
