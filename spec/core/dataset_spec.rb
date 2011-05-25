@@ -3657,7 +3657,7 @@ describe "Sequel::Dataset#unbind" do
   end
 
   specify "should handle QualifiedIdentifiers" do
-    @u[@ds.filter{foo__bar > 1}].should == ["SELECT * FROM t WHERE (foo.bar > $foo.bar)", {:foo__bar=>1}]
+    @u[@ds.filter{foo__bar > 1}].should == ["SELECT * FROM t WHERE (foo.bar > $foo.bar)", {:"foo.bar"=>1}]
   end
 
   specify "should handle deep nesting" do

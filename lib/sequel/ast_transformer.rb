@@ -116,7 +116,18 @@ module Sequel
   # and use the bound variables to execute it with the same values.
   #
   # This class only does a limited form of unbinding where the variable names
-  # and values can be associated unambiguously.
+  # and values can be associated unambiguously.  The only cases it handles
+  # are <tt>SQL::ComplexExpression<tt> with an operator in +UNBIND_OPS+, a
+  # first argument that's an instance of a member of +UNBIND_KEY_CLASSES+, and
+  # a second argument that's an instance of a member of +UNBIND_VALUE_CLASSES+.
+  #
+  # So it can handle cases like:
+  #
+  #   DB.filter(:a=>1).exclude(:b=>2).where{c > 3}
+  #
+  # But it cannot handle cases like:
+  #
+  #   DB.filter(:a + 1 < 0)
   class Unbinder < ASTTransformer
     # The <tt>SQL::ComplexExpression<tt> operates that will be considered
     # for transformation.
@@ -149,7 +160,7 @@ module Sequel
       when SQL::Identifier
         bind_key(obj.value)
       when SQL::QualifiedIdentifier
-        :"#{bind_key(obj.table)}__#{bind_key(obj.column)}"
+        :"#{bind_key(obj.table)}.#{bind_key(obj.column)}"
       else
         raise Error, "unhandled object in Sequel::Unbinder#bind_key: #{obj}"
       end

@@ -217,7 +217,7 @@ module Sequel
         # but with the keys converted to strings.
         def map_to_prepared_args(hash)
           args = {}
-          hash.each{|k,v| args[k.to_s] = v}
+          hash.each{|k,v| args[k.to_s.gsub('.', '__')] = v}
           args
         end
         
