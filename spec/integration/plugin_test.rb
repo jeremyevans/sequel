@@ -1372,7 +1372,7 @@ describe "Sequel::Plugins::PreparedStatements" do
     @c = Class.new(Sequel::Model(@db[:ps_test]))
     @foo = @c.create(:name=>'foo', :i=>10)
     @bar = @c.create(:name=>'bar', :i=>20)
-    @c.plugin :prepared_statements
+    @c.plugin :prepared_statements_with_pk
   end
   after do
     @db.drop_table(:ps_test)
@@ -1390,7 +1390,11 @@ describe "Sequel::Plugins::PreparedStatements" do
     @c.dataset.with_pk(0).should == nil
 
     @c.dataset.filter(:i=>0).with_pk(@foo.id).should == nil
+    @c.dataset.filter(:i=>10).with_pk(@foo.id).should == @foo
+    @c.dataset.filter(:i=>20).with_pk(@bar.id).should == @bar
     @c.dataset.filter(:name=>'foo').with_pk(@foo.id).should == @foo
+    @c.dataset.filter(:name=>'bar').with_pk(@bar.id).should == @bar
+    @c.dataset.filter(:name=>'baz').with_pk(@bar.id).should == nil
   end
 
   it "should work with Model#destroy" do 

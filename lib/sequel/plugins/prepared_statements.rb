@@ -73,12 +73,6 @@ module Sequel
           @prepared_statements[:lookup] ||= prepare_statement(filter(prepared_statement_key_array(primary_key)), :first)
         end
 
-        # Return a prepared statement that can be used to lookup a row given a dataset for the row matching
-        # the primary key.
-        def prepared_lookup_dataset(ds)
-          @prepared_statements[:lookup_sql][ds.sql] ||= prepare_statement(ds.filter(prepared_statement_key_array(primary_key)), :first)
-        end
-
         # Return a prepared statement that can be used to refresh a row to get new column values after insertion.
         def prepared_refresh
           @prepared_statements[:refresh] ||= prepare_statement(naked.clone(:server=>dataset.opts.fetch(:server, :default)).filter(prepared_statement_key_array(primary_key)), :first)
@@ -135,14 +129,6 @@ module Sequel
         # Use a prepared statement to update this model's columns in the database.
         def _update_without_checking(columns)
           model.send(:prepared_update, columns.keys).call(columns.merge(pk_hash))
-        end
-      end
-
-      module DatasetMethods
-        # Use a prepared statement to find a row with the matching primary key
-        # inside this dataset.
-        def with_pk(pk)
-          model.send(:prepared_lookup_dataset, self).call(model.primary_key_hash(pk))
         end
       end
     end

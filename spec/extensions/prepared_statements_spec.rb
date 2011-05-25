@@ -35,11 +35,6 @@ describe "prepared_statements plugin" do
     @sqls.should == [:read_only, "SELECT * FROM people WHERE (id = 1) LIMIT 1"]
   end 
 
-  specify "should correctly lookup by primary key from dataset" do
-    @c.dataset.filter(:name=>'foo')[1].should == @p
-    @sqls.should == [:read_only, "SELECT * FROM people WHERE ((name = 'foo') AND (id = 1)) LIMIT 1"]
-  end
-
   specify "should correctly delete instance" do
     @p.destroy.should == @p
     @sqls.should == [:default, "DELETE FROM people WHERE (id = 1)"]
