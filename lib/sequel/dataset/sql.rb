@@ -775,59 +775,7 @@ module Sequel
     
     # Qualify the given expression e to the given table.
     def qualified_expression(e, table)
-      case e
-      when Symbol
-        t, column, aliaz = split_symbol(e)
-        if t
-          e
-        elsif aliaz
-          SQL::AliasedExpression.new(SQL::QualifiedIdentifier.new(table, SQL::Identifier.new(column)), aliaz)
-        else
-          SQL::QualifiedIdentifier.new(table, e)
-        end
-      when Array
-        e.map{|a| qualified_expression(a, table)}
-      when Hash
-        h = {}
-        e.each{|k,v| h[qualified_expression(k, table)] = qualified_expression(v, table)}
-        h
-      when SQL::Identifier
-        SQL::QualifiedIdentifier.new(table, e)
-      when SQL::OrderedExpression
-        SQL::OrderedExpression.new(qualified_expression(e.expression, table), e.descending, :nulls=>e.nulls)
-      when SQL::AliasedExpression
-        SQL::AliasedExpression.new(qualified_expression(e.expression, table), e.aliaz)
-      when SQL::CaseExpression
-        args = [qualified_expression(e.conditions, table), qualified_expression(e.default, table)]
-        args << qualified_expression(e.expression, table) if e.expression?
-        SQL::CaseExpression.new(*args)
-      when SQL::Cast
-        SQL::Cast.new(qualified_expression(e.expr, table), e.type)
-      when SQL::Function
-        SQL::Function.new(e.f, *qualified_expression(e.args, table))
-      when SQL::ComplexExpression 
-        SQL::ComplexExpression.new(e.op, *qualified_expression(e.args, table))
-      when SQL::Subscript 
-        SQL::Subscript.new(qualified_expression(e.f, table), qualified_expression(e.sub, table))
-      when SQL::WindowFunction
-        SQL::WindowFunction.new(qualified_expression(e.function, table), qualified_expression(e.window, table))
-      when SQL::Window
-        o = e.opts.dup
-        o[:partition] = qualified_expression(o[:partition], table) if o[:partition]
-        o[:order] = qualified_expression(o[:order], table) if o[:order]
-        SQL::Window.new(o)
-      when SQL::PlaceholderLiteralString
-        args = if e.args.is_a?(Hash)
-          h = {}
-          e.args.each{|k,v| h[k] = qualified_expression(v, table)}
-          h
-        else
-          qualified_expression(e.args, table)
-        end
-        SQL::PlaceholderLiteralString.new(e.str, args, e.parens)
-      else
-        e
-      end
+      Qualifier.new(self, table).transform(e)
     end
 
     # The order of methods to call to build the SELECT SQL statement
