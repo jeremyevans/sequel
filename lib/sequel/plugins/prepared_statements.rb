@@ -1,9 +1,16 @@
 module Sequel
   module Plugins
     # The prepared_statements plugin modifies the model to use prepared statements for
-    # instance level deletes and saves, as well as class and dataset level lookups by
+    # instance level deletes and saves, as well as class level lookups by
     # primary key.
     #
+    # Note that this plugin is unsafe in some circumstances, as it can allow up to
+    # 2^N prepared statements to be created for each type of insert and update query, where
+    # N is the number of colums in the table. It is recommended that you use the
+    # +prepared_statements_safe+ plugin in addition to this plugin to reduce the number
+    # of prepared statements that can be created, unless you tightly control how your
+    # model instances are saved.
+    # 
     # This plugin probably does not work correctly with the instance filters plugin.
     # 
     # Usage:

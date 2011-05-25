@@ -1,5 +1,9 @@
 === HEAD
 
+* Add prepared_statements_safe plugin, for making prepared statement use with models more safe (jeremyevans)
+
+* Add prepared_statements_with_pk plugin, for using prepared statements for dataset lookups by primary key (jeremyevans)
+
 * Fix bug in emulated prepared statement support not supporting nil or false as bound values (jeremyevans)
 
 * Add Dataset#unbind for unbinding values from a dataset, for use with creating prepared statements (jeremyevans)
