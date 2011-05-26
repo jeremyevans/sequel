@@ -292,7 +292,7 @@ describe "Model around filters" do
     @c.create(:x => 2)
     MODEL_DB.sqls.should == [ 'ac_before', 'INSERT INTO items (x) VALUES (2)', 'ac_after' ]
   end
-  
+
   specify "around_delete should be called around record destruction" do
     @c.class_eval do
       def around_destroy
@@ -372,4 +372,51 @@ describe "Model around filters" do
     end
     @c.new(:x => 2).valid?.should == true
   end
+
+  specify "around_create that doesn't call super should raise a HookFailed" do
+    @c.send(:define_method, :around_create){}
+    proc{@c.create(:x => 2)}.should raise_error(Sequel::HookFailed)
+  end
+  
+  specify "around_update that doesn't call super should raise a HookFailed" do
+    @c.send(:define_method, :around_update){}
+    proc{@c.load(:x => 2).save}.should raise_error(Sequel::HookFailed)
+  end
+  
+  specify "around_save that doesn't call super should raise a HookFailed" do
+    @c.send(:define_method, :around_save){}
+    proc{@c.create(:x => 2)}.should raise_error(Sequel::HookFailed)
+    proc{@c.load(:x => 2).save}.should raise_error(Sequel::HookFailed)
+  end
+  
+  specify "around_destroy that doesn't call super should raise a HookFailed" do
+    @c.send(:define_method, :around_destroy){}
+    proc{@c.load(:x => 2).destroy}.should raise_error(Sequel::HookFailed)
+  end
+  
+  specify "around_validation that doesn't call super should raise a HookFailed" do
+    @c.send(:define_method, :around_validation){}
+    proc{@c.new.valid?}.should raise_error(Sequel::HookFailed)
+  end
+
+  specify "around_* that doesn't call super should return nil if raise_on_save_failure is false" do
+    @c.raise_on_save_failure = false
+
+    o = @c.load(:id => 1)
+    o.meta_def(:around_save){}
+    o.save.should == nil
+
+    o = @c.load(:id => 1)
+    o.meta_def(:around_update){}
+    o.save.should == nil
+
+    o = @c.new
+    o.meta_def(:around_create){}
+    o.save.should == nil
+
+    o = @c.new
+    o.meta_def(:around_validation){}
+    o.save.should == nil
+  end
+
 end

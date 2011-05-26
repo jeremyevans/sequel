@@ -1018,7 +1018,7 @@ module Sequel
       #
       # If +save+ fails and either raise_on_save_failure or the
       # :raise_on_failure option is true, it raises ValidationFailed
-      # or BeforeHookFailed. Otherwise it returns nil.
+      # or HookFailed. Otherwise it returns nil.
       #
       # If it succeeds, it returns self.
       #
@@ -1190,12 +1190,15 @@ module Sequel
       #   artist.errors.full_messages # => ['name cannot be Invalid']
       def valid?(opts = {})
         errors.clear
+        called = false
         around_validation do
+          called = true
           raise_hook_failure(:validation) if before_validation == false
           validate
           after_validation
           errors.empty?
         end
+        raise_hook_failure(:validation) unless called
         errors.empty?
       end
 
@@ -1224,12 +1227,15 @@ module Sequel
       # Internal destroy method, separted from destroy to
       # allow running inside a transaction
       def _destroy(opts)
+        called = false
         around_destroy do
+          called = true
           raise_hook_failure(:destroy) if before_destroy == false
           _destroy_delete
           after_destroy
           true
         end
+        raise_hook_failure(:destroy) unless called
         self
       end
       
@@ -1292,11 +1298,15 @@ module Sequel
       def _save(columns, opts)
         was_new = false
         pk = nil
+        called_save = false
+        called_cu = false
         around_save do
+          called_save = true
           raise_hook_failure(:save) if before_save == false
           if new?
             was_new = true
             around_create do
+              called_cu = true
               raise_hook_failure(:create) if before_create == false
               pk = _insert
               @this = nil
@@ -1305,8 +1315,10 @@ module Sequel
               after_create
               true
             end
+            raise_hook_failure(:create) unless called_cu
           else
             around_update do
+              called_cu = true
               raise_hook_failure(:update) if before_update == false
               if columns.empty?
                 @columns_updated = if opts[:changed]
@@ -1324,10 +1336,12 @@ module Sequel
               after_update
               true
             end
+            raise_hook_failure(:update) unless called_cu
           end
           after_save
           true
         end
+        raise_hook_failure(:save) unless called_save
         if was_new
           @was_new = nil
           pk ? _save_refresh : changed_columns.clear
@@ -1383,7 +1397,7 @@ module Sequel
         _update_dataset.update(columns)
       end
 
-      # If not raising on failure, check for BeforeHookFailed
+      # If not raising on failure, check for HookFailed
       # being raised by yielding and swallow it.
       def checked_save_failure(opts)
         if raise_on_failure?(opts)
@@ -1391,7 +1405,7 @@ module Sequel
         else
           begin
             yield
-          rescue BeforeHookFailed 
+          rescue HookFailed 
             nil
           end
         end
@@ -1425,7 +1439,7 @@ module Sequel
       # Raise an error appropriate to the hook type. May be swallowed by
       # checked_save_failure depending on the raise_on_failure? setting.
       def raise_hook_failure(type)
-        raise BeforeHookFailed, "one of the before_#{type} hooks returned false"
+        raise HookFailed, "one of the before_#{type} hooks returned false"
       end
   
       # Set the columns, filtered by the only and except arrays.

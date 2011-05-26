@@ -19,8 +19,6 @@ Model hooks, also known as model callbacks, are used to specify actions that occ
 
 The one important thing to note here is the call to +super+ inside the hook.  Whenever you override one of Sequel::Model's methods, you should be calling +super+ to get the default behavior.  Many of Sequel's built in plugins work by overriding the hook methods and calling +super+.  If you use these plugins and override the hook methods but do not call +super+, it's likely the plugins will not work correctly.
 
-For around hooks, the call to +super+ is even more important, because if you forget to add it, the behavior (such as a database +INSERT+/+UPDATE+) would be skipped.  Note that in Sequel around hooks, you should call +super+, not +yield+, in order for previously defined around hooks to be called.
-
 == Available Hooks
 
 Sequel calls hooks in the following order when saving/creating a new object (one that does not already exist in the database):
@@ -51,7 +49,7 @@ Sequel calls hooks in the following order when saving an existing object:
     * +after_update+
   * +after_save+
 
-Note that all of the hook calls are the same, except that +around_create+, +before_create+ and +after_create+ are used for a new object, and +around_update+, +before_update+ and +after_update+ are used for an existing object.  Note that +around_save+, +before_save+, and +after_save+ are calle din both cases.
+Note that all of the hook calls are the same, except that +around_create+, +before_create+ and +after_create+ are used for a new object, and +around_update+, +before_update+ and +after_update+ are used for an existing object.  Note that +around_save+, +before_save+, and +after_save+ are called in both cases.
 
 Also note that the validation hooks are not called if the <tt>:validate => false</tt> option is passed to save.  However, the validation hooks are called if you call <tt>Model#valid?</tt> manually:
 
@@ -110,7 +108,7 @@ If you want to insert a row into the model's table without running the creation 
 
 == Halting Hook Processing
 
-Sequel uses a convention that if any <tt>before_*</tt> hook method returns false (but not nil), that the action will be canceled.  You can use this to implement validation-like behavior, that will run even if validations are skipped.  For example:
+Sequel uses a convention that if any <tt>before_*</tt> hook method returns false (but not nil), that the action will be canceled and a <tt>Sequel::HookFailed</tt> raised (or +nil+ to be returned by +save+ if +raise_on_save_failure+ is +false+).  You can use this to implement validation-like behavior, that will run even if validations are skipped.  For example:
 
   class Album < Sequel::Model
     def before_save
@@ -119,9 +117,9 @@ Sequel uses a convention that if any <tt>before_*</tt> hook method returns false
     end
   end
 
-While returning false is not really recommended, you should be aware of this behavior so that you do not inadvertently return false.
+While returning false is not really recommended, you should be aware of this behavior so that you do not inadvertently return false.  For around hooks, neglecting to call +super+ halts hook processing in the same way as returning +false+ in a before hook.  You can't halt hook processing in after hooks, since by then the main processing has already taken place.
 
-By default, Sequel runs hooks other than validation hooks inside a transaction, so if you abort the hook by returning false in a before hook or by raising an exception in the hook, Sequel will rollback the transaction.  However, note that the implicit use of transactions when saving and destroying model objects is conditional (it depends on the model instance's +use_transactions+ setting).
+By default, Sequel runs hooks other than validation hooks inside a transaction, so if you abort the hook by returning false in a before hook or by raising an exception in any hook, Sequel will rollback the transaction.  However, note that the implicit use of transactions when saving and destroying model objects is conditional (it depends on the model instance's +use_transactions+ setting and the <tt>:transaction</tt> option passed to save).
 
 == Conditional Hooks
 
@@ -195,6 +193,7 @@ This allows the following general principles to be true:
 
 * before hooks are run in reverse order of inclusion
 * after hooks are run in order of inclusion
+* returning false in any before hook will pass the false value down the hook method chain, halting the hook processing.
 
 So if you define the same before hook in both a model and a plugin that the model uses, the hooks will be called in this order:
 

@@ -1,6 +1,8 @@
 module Sequel
   # Exception class raised when +raise_on_save_failure+ is set and a before hook returns false
-  class BeforeHookFailed < Error; end
+  # or an around hook doesn't call super or yield.
+  class HookFailed < Error; end
+  BeforeHookFailed = HookFailed
   
   # Exception class raised when +require_modification+ is set and an UPDATE or DELETE statement to modify the dataset doesn't
   # modify a single row.
