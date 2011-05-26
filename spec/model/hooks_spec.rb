@@ -268,6 +268,11 @@ describe "Model#before_validation && Model#after_validation" do
     @c.load(:id => 2233).save.should == nil
     MODEL_DB.sqls.should == []
   end
+  
+  specify "#valid? should return false if before_validation returns false" do
+    @c.send(:define_method, :before_validation){false}
+    @c.load(:id => 2233).valid?.should == false
+  end
 end
 
 describe "Model around filters" do
