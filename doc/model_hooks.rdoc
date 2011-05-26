@@ -229,3 +229,7 @@ Likewise, let's say that upon retrieval, you associate an object with a file des
 == +hook_class_methods+
 
 While it's recommended to write your hooks as instance methods, Sequel ships with a +hook_class_methods+ plugin that allows you to define hooks via class methods. It exists mostly for legacy compatibility, but is still supported.  However, it does not implement around hooks.
+
+== +instance_hooks+
+
+Sequel also ships with an +instance_hooks+ plugin that allows you to define before and after hooks on a per instance basis.  It's very useful as it allows you to delay action on an instance until before or after saving.  This can be important if you want to modify a group of related objects together (which is how the +nested_attributes+ plugin uses +instance_hooks+).
