@@ -22,6 +22,21 @@ shared_examples_for "regular and composite key associations" do
     @tag.albums.should == [@album]
   end
   
+  specify "should work correctly with prepared_statements_association plugin" do
+    @album.update(:artist => @artist)
+    @album.add_tag(@tag)
+    
+    @album.reload
+    @artist.reload
+    @tag.reload
+    
+    [Tag, Album, Artist].each{|x| x.plugin :prepared_statements_associations}
+    @album.artist.should == @artist
+    @artist.albums.should == [@album]
+    @album.tags.should == [@tag]
+    @tag.albums.should == [@album]
+  end
+
   specify "should work correctly when filtering by associations" do
     @album.update(:artist => @artist)
     @album.add_tag(@tag)

@@ -196,6 +196,12 @@ describe "Many Through Many Plugin" do
     Artist[3].albums.map{|x| x.name}.sort.should == %w'B C'
     Artist[4].albums.map{|x| x.name}.sort.should == %w'B D'
     
+    Artist.plugin :prepared_statements_associations
+    Artist[1].albums.map{|x| x.name}.sort.should == %w'A D'
+    Artist[2].albums.map{|x| x.name}.sort.should == %w'A C'
+    Artist[3].albums.map{|x| x.name}.sort.should == %w'B C'
+    Artist[4].albums.map{|x| x.name}.sort.should == %w'B D'
+
     Artist.filter(:id=>1).eager(:albums).all.map{|x| x.albums.map{|a| a.name}}.flatten.sort.should == %w'A D'
     Artist.filter(:id=>2).eager(:albums).all.map{|x| x.albums.map{|a| a.name}}.flatten.sort.should == %w'A C'
     Artist.filter(:id=>3).eager(:albums).all.map{|x| x.albums.map{|a| a.name}}.flatten.sort.should == %w'B C'
@@ -228,6 +234,12 @@ describe "Many Through Many Plugin" do
 
   specify "should handle typical case with 3 join tables" do
     Artist.many_through_many :related_artists, [[:albums_artists, :artist_id, :album_id], [:albums, :id, :id], [:albums_artists, :album_id, :artist_id]], :class=>Artist, :distinct=>true
+    Artist[1].related_artists.map{|x| x.name}.sort.should == %w'1 2 4'
+    Artist[2].related_artists.map{|x| x.name}.sort.should == %w'1 2 3'
+    Artist[3].related_artists.map{|x| x.name}.sort.should == %w'2 3 4'
+    Artist[4].related_artists.map{|x| x.name}.sort.should == %w'1 3 4'
+    
+    Artist.plugin :prepared_statements_associations
     Artist[1].related_artists.map{|x| x.name}.sort.should == %w'1 2 4'
     Artist[2].related_artists.map{|x| x.name}.sort.should == %w'1 2 3'
     Artist[3].related_artists.map{|x| x.name}.sort.should == %w'2 3 4'
@@ -271,6 +283,12 @@ describe "Many Through Many Plugin" do
     @album4.add_artist(@artist3)
     @album4.add_artist(@artist4)
     
+    Artist[1].related_albums.map{|x| x.name}.sort.should == %w'A B C'
+    Artist[2].related_albums.map{|x| x.name}.sort.should == %w'A B C D'
+    Artist[3].related_albums.map{|x| x.name}.sort.should == %w'A B D'
+    Artist[4].related_albums.map{|x| x.name}.sort.should == %w'B D'
+    
+    Artist.plugin :prepared_statements_associations
     Artist[1].related_albums.map{|x| x.name}.sort.should == %w'A B C'
     Artist[2].related_albums.map{|x| x.name}.sort.should == %w'A B C D'
     Artist[3].related_albums.map{|x| x.name}.sort.should == %w'A B D'

@@ -1,5 +1,7 @@
 === HEAD
 
+* Add prepared_statements_association plugin, for using prepared statements by default for regular association loading (jeremyevans)
+
 * Add prepared_statements_safe plugin, for making prepared statement use with models more safe (jeremyevans)
 
 * Add prepared_statements_with_pk plugin, for using prepared statements for dataset lookups by primary key (jeremyevans)
