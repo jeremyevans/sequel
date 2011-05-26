@@ -29,19 +29,16 @@ module Sequel
       # lambda returns the next integer to use.
       NEXT = lambda{MUTEX.synchronize{i += 1}}
 
-      # The default hash with subhashes used to hold the prepared statements.
-      DEFAULT_PREPARED_STATEMENT_MAP = {:insert=>{}, :insert_select=>{}, :update=>{}, :lookup_sql=>{}}
-
       # Setup the datastructure used to hold the prepared statements in the model.
       def self.apply(model)
-        model.instance_variable_set(:@prepared_statements, DEFAULT_PREPARED_STATEMENT_MAP.dup)
+        model.instance_variable_set(:@prepared_statements, :insert=>{}, :insert_select=>{}, :update=>{}, :lookup_sql=>{})
       end
 
       module ClassMethods
         # Setup the datastructure used to hold the prepared statements in the subclass.
         def inherited(subclass)
           super
-          subclass.instance_variable_set(:@prepared_statements, DEFAULT_PREPARED_STATEMENT_MAP.dup)
+          subclass.instance_variable_set(:@prepared_statements, :insert=>{}, :insert_select=>{}, :update=>{}, :lookup_sql=>{})
         end
 
         private
