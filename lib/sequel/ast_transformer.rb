@@ -63,9 +63,9 @@ module Sequel
       when SQL::JoinOnClause
         SQL::JoinOnClause.new(v(o.on), o.join_type, v(o.table), v(o.table_alias))
       when SQL::JoinUsingClause
-        SQL::JoinOnClause.new(v(o.using), o.join_type, v(o.table), v(o.table_alias))
+        SQL::JoinUsingClause.new(v(o.using), o.join_type, v(o.table), v(o.table_alias))
       when SQL::JoinClause
-        SQL::JoinOnClause.new(o.join_type, v(o.table), v(o.table_alias))
+        SQL::JoinClause.new(o.join_type, v(o.table), v(o.table_alias))
       else
         o
       end

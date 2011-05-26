@@ -4051,3 +4051,17 @@ describe "Dataset#lock_style and for_update" do
     @ds.lock_style("FOR SHARE").sql.should == "SELECT * FROM t FOR SHARE"
   end
 end
+
+describe "Custom ASTTransformer" do
+  specify "should transform given objects" do
+    c = Class.new(Sequel::ASTTransformer) do
+      def v(s)
+        (s.is_a?(Symbol) || s.is_a?(String)) ? :"#{s}#{s}" : super
+      end
+    end.new
+    ds = MockDatabase.new[:t].cross_join(:a___g).join(:b___h, [:c]).join(:d___i, :e=>:f)
+    ds.sql.should == 'SELECT * FROM t CROSS JOIN a AS g INNER JOIN b AS h USING (c) INNER JOIN d AS i ON (i.e = h.f)'
+    ds.clone(:from=>c.transform(ds.opts[:from]), :join=>c.transform(ds.opts[:join])).sql.should ==
+      'SELECT * FROM tt CROSS JOIN aa AS gg INNER JOIN bb AS hh USING (cc) INNER JOIN dd AS ii ON (ii.ee = hh.ff)'
+  end
+end
