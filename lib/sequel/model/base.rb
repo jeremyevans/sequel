@@ -1035,9 +1035,11 @@ module Sequel
       #   raise_on_save_failure setting
       def save(*columns)
         opts = columns.last.is_a?(Hash) ? columns.pop : {}
-        if opts[:validate] != false and !valid?(opts)
-          raise(ValidationFailed.new(errors)) if raise_on_failure?(opts)
-          return
+        if opts[:validate] != false
+          unless checked_save_failure(opts){valid?(opts)}
+            raise(ValidationFailed.new(errors)) if raise_on_failure?(opts)
+            return
+          end
         end
         checked_save_failure(opts){checked_transaction(opts){_save(columns, opts)}}
       end
@@ -1189,12 +1191,10 @@ module Sequel
       def valid?(opts = {})
         errors.clear
         around_validation do
-          if before_validation == false
-            raise_hook_failure(:validation) if raise_on_failure?(opts)
-            return false
-          end
+          raise_hook_failure(:validation) if before_validation == false
           validate
           after_validation
+          errors.empty?
         end
         errors.empty?
       end
@@ -1228,6 +1228,7 @@ module Sequel
           raise_hook_failure(:destroy) if before_destroy == false
           _destroy_delete
           after_destroy
+          true
         end
         self
       end
@@ -1302,6 +1303,7 @@ module Sequel
               @new = false
               @was_new = true
               after_create
+              true
             end
           else
             around_update do
@@ -1320,9 +1322,11 @@ module Sequel
               _update_columns(@columns_updated)
               @this = nil
               after_update
+              true
             end
           end
           after_save
+          true
         end
         if was_new
           @was_new = nil
