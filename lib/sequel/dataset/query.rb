@@ -431,6 +431,7 @@ module Sequel
             v = qualified_column_name(v, last_alias) if v.is_a?(Symbol)
             [k,v]
           end
+          expr = SQL::BooleanExpression.from_value_pairs(expr)
         end
         if block
           expr2 = yield(table_name, last_alias, @opts[:join] || [])
@@ -714,7 +715,7 @@ module Sequel
     #   ds.call(:select, bv)
     def unbind
       u = Unbinder.new
-      ds = clone(:where=>u.transform(opts[:where]))
+      ds = clone(:where=>u.transform(opts[:where]), :join=>u.transform(opts[:join]))
       [ds, u.binds]
     end
 

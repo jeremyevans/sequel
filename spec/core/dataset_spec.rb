@@ -3678,6 +3678,10 @@ describe "Sequel::Dataset#unbind" do
     @u[@ds.filter{foo > 1}.and{bar < 2}.or(:baz=>3).and({~{:x=>4}=>true}.case(false))].should == ["SELECT * FROM t WHERE ((((foo > $foo) AND (bar < $bar)) OR (baz = $baz)) AND (CASE WHEN (x != $x) THEN 't' ELSE 'f' END))", {:foo=>1, :bar=>2, :baz=>3, :x=>4}]
   end
 
+  specify "should handle JOIN ON" do
+    @u[@ds.cross_join(:x).join(:a, [:u]).join(:b, [[:c, :d], [:e,1]])].should == ["SELECT * FROM t CROSS JOIN x INNER JOIN a USING (u) INNER JOIN b ON ((b.c = a.d) AND (b.e = $b.e))", {:"b.e"=>1}]
+  end
+
   specify "should raise an UnbindDuplicate exception if same variable is used with multiple different values" do
     proc{@ds.filter(:foo=>1).or(:foo=>2).unbind}.should raise_error(Sequel::UnbindDuplicate)
   end
