@@ -1370,7 +1370,7 @@ describe Sequel::Model, "one_to_many" do
     @c2.one_to_many :attributes, :class => @c1
     n = @c2.new(:id => 1234)
     a = @c1.new(:id => 2345)
-    def a.valid?(opts); false; end
+    def a.validate() errors.add(:id, 'foo') end
     proc{n.add_attribute(a)}.should raise_error(Sequel::Error)
     proc{n.remove_attribute(a)}.should raise_error(Sequel::Error)
   end
@@ -1379,7 +1379,7 @@ describe Sequel::Model, "one_to_many" do
     @c2.one_to_many :attributes, :class => @c1, :validate=>false
     n = @c2.new(:id => 1234)
     a = @c1.new(:id => 2345)
-    def a.valid?(opts); false; end
+    def a.validate() errors.add(:id, 'foo') end
     n.add_attribute(a).should == a
     n.remove_attribute(a).should == a
   end
@@ -2282,7 +2282,7 @@ describe Sequel::Model, "many_to_many" do
     @c2.many_to_many :attributes, :class => @c1 
     n = @c1.new
     a = @c2.load(:id=>123)
-    def n.valid?(opts); false; end
+    def n.validate() errors.add(:id, 'foo') end
     proc{a.add_attribute(n)}.should raise_error(Sequel::ValidationFailed)
   end
 
@@ -2291,7 +2291,7 @@ describe Sequel::Model, "many_to_many" do
     n = @c1.new
     n.raise_on_save_failure = false
     a = @c2.load(:id=>123)
-    def n.valid?(opts); false; end
+    def n.validate() errors.add(:id, 'foo') end
     proc{a.add_attribute(n)}.should raise_error(Sequel::Error)
   end
 
@@ -2299,7 +2299,7 @@ describe Sequel::Model, "many_to_many" do
     @c2.many_to_many :attributes, :class => @c1, :validate=>false
     n = @c1.new
     a = @c2.load(:id=>123)
-    def n.valid?(opts); false; end
+    def n.validate() errors.add(:id, 'foo') end
     a.add_attribute(n)
     n.new?.should == false
   end

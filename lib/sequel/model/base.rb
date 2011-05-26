@@ -1036,7 +1036,7 @@ module Sequel
       def save(*columns)
         opts = columns.last.is_a?(Hash) ? columns.pop : {}
         if opts[:validate] != false
-          unless checked_save_failure(opts){valid?(opts)}
+          unless checked_save_failure(opts){_valid?(true, opts)}
             raise(ValidationFailed.new(errors)) if raise_on_failure?(opts)
             return
           end
@@ -1189,17 +1189,7 @@ module Sequel
       #   artist(:name=>'Invalid').valid? # => false
       #   artist.errors.full_messages # => ['name cannot be Invalid']
       def valid?(opts = {})
-        errors.clear
-        called = false
-        around_validation do
-          called = true
-          raise_hook_failure(:validation) if before_validation == false
-          validate
-          after_validation
-          errors.empty?
-        end
-        raise_hook_failure(:validation) unless called
-        errors.empty?
+        _valid?(false, opts)
       end
 
       private
@@ -1395,6 +1385,40 @@ module Sequel
       # Update this instances dataset with the supplied column hash.
       def _update_without_checking(columns)
         _update_dataset.update(columns)
+      end
+
+      # Internal validation method.  If +raise_errors+ is +true+, hook
+      # failures will be raised as HookFailure exceptions.  If it is
+      # +false+, +false+ will be returned instead.
+      def _valid?(raise_errors, opts)
+        errors.clear
+        called = false
+        error = false
+        around_validation do
+          called = true
+          if before_validation == false
+            if raise_errors
+              raise_hook_failure(:validation)
+            else
+              error = true
+            end
+            false
+          else
+            validate
+            after_validation
+            errors.empty?
+          end
+        end
+        error = true unless called
+        if error
+          if raise_errors
+            raise_hook_failure(:validation)
+          else
+            false
+          end
+        else
+          errors.empty?
+        end
       end
 
       # If not raising on failure, check for HookFailed

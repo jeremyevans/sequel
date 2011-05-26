@@ -396,7 +396,12 @@ describe "Model around filters" do
   
   specify "around_validation that doesn't call super should raise a HookFailed" do
     @c.send(:define_method, :around_validation){}
-    proc{@c.new.valid?}.should raise_error(Sequel::HookFailed)
+    proc{@c.new.save}.should raise_error(Sequel::HookFailed)
+  end
+
+  specify "around_validation that doesn't call super should have valid? return false" do
+    @c.send(:define_method, :around_validation){}
+    @c.new.valid?.should == false
   end
 
   specify "around_* that doesn't call super should return nil if raise_on_save_failure is false" do
