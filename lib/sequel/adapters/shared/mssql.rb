@@ -322,7 +322,7 @@ module Sequel
       # Use the OUTPUT clause to get the value of all columns for the newly inserted record.
       def insert_select(*values)
         return unless supports_insert_select?
-        naked.clone(default_server_opts(:sql=>output(nil, [:inserted.*]).insert_sql(*values))).single_record
+        naked.clone(default_server_opts(:sql=>output(nil, [SQL::ColumnAll.new(:inserted)]).insert_sql(*values))).single_record
       end
 
       # Specify a table for a SELECT ... INTO query.
