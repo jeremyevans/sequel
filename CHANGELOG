@@ -1,4 +1,4 @@
-=== HEAD
+=== 3.24.0 (2011-06-01)
 
 * Add prepared_statements_association plugin, for using prepared statements by default for regular association loading (jeremyevans)
 

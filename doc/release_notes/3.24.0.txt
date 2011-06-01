@@ -1,0 +1,420 @@
+= Prepared Statement Plugins
+
+* The prepared_statements plugin makes Sequel::Model classes use
+  prepared statements for creating, updating, and destroying model
+  instances, as well as looking up model objects by primary key.
+  With this plugin, all of the following will use prepared
+  statements:
+  
+    Artist.plugin :prepared_statements
+    Artist.create(:name=>'Foo')
+    a = Artist[1]
+    a.update(:name=>'Bar')
+    a.destroy
+
+* The prepared_statements_safe plugin reduces the number of
+  prepared statements that can be created by doing two things. First,
+  it makes the INSERT statements used when creating instances to use
+  as many columns as possible, setting specific values for all
+  columns with parseable default values.  Second, it changes
+  save_changes to just use save, saving all columns instead of just
+  the changed ones.
+
+  The reason for this plugin is that Sequel's default behavior of
+  using only the values specifically set when creating instances
+  and having update only set changed columns by default can lead
+  to a large number of prepared statements being created.
+  
+  For prepared statements to be used, each set of columns in the
+  insert and update statements needs to have its own prepared
+  statement.  If you have a table with 1 primary key column and
+  4 other columns, you can have up to 2^4 = 16 prepared statements
+  created, one for each subset of the 4 columns.  If you have 1
+  primary key column and 20 other columns, there are over a million
+  subsets, and you could hit your database limit for prepared
+  statements (a denial of service attack).
+  
+  Using the prepared_statements_safe plugin mitigates this
+  issue by reducing the number of columns that may or may not be
+  present in the query, in many cases making sure that each model
+  will only have a single INSERT and a single UPDATE prepared
+  statement.
+
+* The prepared_statements_associations plugin allows normal
+  association method calls to use prepared statements if possible.
+  For example:
+  
+    Artist.plugin :prepared_statements_associations
+    Artist.many_to_one :albums
+    Artist[1].albums
+  
+  Will use a prepared statement to return the albums for that artist.
+  This plugin works for all supported association types.  There are
+  some associations (filtered and custom associations) that Sequel
+  cannot currently use a prepared statement reliably, for those
+  Sequel will use a regular query.
+
+* The prepared_statements_with_pk plugin allows the new
+  Dataset#with_pk method (explained below) to use prepared statements.
+  For example:
+  
+    Artist.plugin :prepared_statements_with_pk
+    Artist.filter(...).with_pk(1)
+  
+  Will use a prepared statement for this query.  The most benefit
+  from prepared statements come from queries that are expensive to
+  parse and plan but quick to execute, so using this plugin with
+  a complex filter can in certain cases yield significant performance
+  improvements.
+    
+  However, this plugin should be considered unsafe as it is possible
+  that it will create an unbounded number of prepared statements. It
+  extracts parameters from the dataset using Dataset#unbind
+  (explained below), so if your code has conditions that vary per
+  query but that Dataset#unbind does not handle, an unbounded number
+  of prepared statements can be created.  For example:
+  
+    Artist.filter(:a=>params[:b].to_i).with_pk[1]
+    Artist.exclude{a > params[:b].to_i}.with_pk[1]
+    
+  are safe, but:
+  
+    Artist.filter(:a=>[1, params[:b].to_i]).with_pk[1]
+    Artist.exclude{a > params[:b].to_i + 2}.with_pk[1]
+    
+  are not.  For queries that are not safe, Dataset#with_pk should
+  not be used with this plugin, you should switch to looking up by
+  primary key manually (for a regular query):
+  
+    Artist.filter(:a=>[1, params[:b].to_i])[:id=>1]
+  
+  or using the prepared statement API to create a custom prepared
+  statement:
+  
+    # PS = {}
+    PS[:name] ||= Artist.filter(:a=>[1, :$b], :id=>:$id).
+           prepare(:select, :name)
+    PS[:name].call(:b=>params[:b].to_i, :id=>1)
+    
+= Other New Features
+
+* Filtering by associations got a lot more powerful.  Sequel 3.23.0
+  introduced filtering by associations:
+  
+    Album.filter(:artist=>artist)
+    
+  This capability is much expanded in 3.24.0, allowing you to
+  exclude by associations:
+  
+    Album.exclude(:artist=>artist)
+    
+  This will match all albums not by that artist.
+    
+  You can also filter or exclude by multiple associated objects:
+  
+    Album.filter(:artist=>[artist1, artist2])
+    Album.exclude(:artist=>[artist1, artist2])
+    
+  The filtered dataset will match all albums by either of those
+  two artists, and the excluded dataset will match all albums not
+  by either of those two artists.
+  
+  You can also filter or exclude by using a model dataset:
+  
+    Album.filter(:artist=>Artist.filter(:name.like('A%'))).all
+    Album.exclude(:artist=>Artist.filter(:name.like('A%'))).all
+    
+  Here the filtered dataset will match all albums where the
+  associated artist has a name that begins with A, and the excluded
+  dataset will match all albums where the associated artist does not
+  have a name that begins with A.
+  
+  All of these types of filtering and excluding work with all of
+  association types that ship with Sequel, even the many_through_many
+  plugin.
+
+* Sequel now supports around hooks, which wrap the related before
+  hook, behavior, and after hook.  Like other Sequel hooks, these
+  are implemented as instance methods.  For example, if you wanted
+  to log DatabaseErrors raised during save:
+
+    class Artist < Sequel::Model
+      def around_save
+        super
+      rescue Sequel::DatabaseError => e
+        # log the error
+        raise
+      end
+    end
+    
+  All around hooks should call super, not yield.  If an around hook
+  doesn't call super or yield, it is treated as a hook failure,
+  similar to before hooks returning false.
+  
+  For around_validation, the return value of super should be whether
+  the object is valid.  For other around hooks, the return value of
+  super is currently true, but it's possible that will change in the
+  future.
+  
+* Dataset#with_pk has been added to model datasets that allows you
+  to find the object with the matching primary key:
+  
+    Artist.filter(:name.like('A%')).with_pk(1)
+    
+  This should make easier the common case where you want to find
+  a particular object that is associated to another object:
+  
+    Artist[1].albums_dataset.with_pk(2)
+
+  Before, there was no way to do that without manually specifying
+  the primary key:
+  
+    Artist[1].albums_dataset[:id=>2]
+    
+  To use a composite primary key with with_pk, you have to provide
+  an array:
+  
+    Artist[1].albums_dataset.with_pk([1, 2])
+    
+* Dataset#[] for model datasets will now call with_pk if given a
+  single Integer argument.  This makes the above case even easier:
+  
+    Artist[1].albums_dataset[2]
+    
+  Note that for backwards compatibility, this only works for
+  single integer primary keys.  If you have a composite primary key
+  or a string/varchar primary key, you have to use with_pk.
+
+* Dataset#unbind has been added, which allows you to take a dataset
+  that uses static bound values and convert them to placeholders.
+  Currently, the only cases handled are SQL::ComplexExpression
+  objects that use a =, !=, <, >, <=, or >= operator where the first
+  argument is a Symbol, SQL::Indentifier, or
+  SQL::QualifiedIdentifier, and the second argument is a Numeric,
+  String, Date, or Time.  Dataset#unbind returns a two element array,
+  where the first element is a modified copy of the receiver, and the
+  second element is a bound variable hash:
+  
+    ds, bv = DB[:table].filter(:a=>1).unbind
+    ds # DB[:table].filter(:a=>:$a)
+    bv # {:a=>1}
+
+  The purpose of doing this is that you can then use prepare or call
+  on the returned dataset with the returned bound variables:
+  
+    ds.call(:select, bv)
+    # SELECT * FROM table WHERE (a = ?); [1]
+    
+    ps = ds.prepare(:select, :ps_name)
+    # PREPARE ps_name AS SELECT * FROM table WHERE (a = ?)
+    ps.call(bv)
+    # EXECUTE ps_name(1)
+    
+  Basically, Dataset#unbind takes a specific statement and attempts
+  to turn it into a generic statement, along with the placeholder
+  values it extracted.
+  
+  Unfortunately, Dataset#unbind cannot handle all cases.  For
+  example:
+  
+    DB[:table].filter{a + 1 > 10}.unbind
+    
+  will not unbind any values.  Also, if you have a query with
+  multiple different values for a variable, it will raise an
+  UnbindDuplicate exception:
+  
+    DB[:table].filter(:a=>1).or(:a=>2).unbind
+
+* A defaults_setter plugin has been added that makes it easy to
+  automatically set default values when creating new objects.  This
+  plugin makes Sequel::Model behave more like ActiveRecord in that
+  new model instances (before saving) will have default values
+  parsed from the database.  Unlike ActiveRecord, only values with
+  non-NULL defaults are set.  Also, Sequel allows you to easily
+  modify the default values used:
+  
+    Album.plugin :default_values
+    Album.new.values # {:copies_sold => 0}
+    Album.default_values[:copies_sold] = 42
+    Album.new.values # {:copies_sold => 42}
+    
+  Before, this was commonly done in an after_initialize hook, but
+  that's slower as it is also called for model instances loaded from
+  the database.
+  
+* A Database#views method has been added that returns an array
+  of symbols representing view names in the database.  This works
+  just like Database#tables except it returns views.
+
+* A Sequel::ASTTransformer class was added that makes it easy to
+  write custom transformers of Sequel's internal abstract syntax
+  trees.  Dataset#qualify now uses a subclass of ASTTransformer to do
+  its transformations, as does the new Dataset#unbind.
+
+= Other Improvements
+
+* Database#create_table? now uses a single query with IF NOT EXISTS
+  if the database supports such syntax.  Previously, it issued a
+  SELECT query to determine table existence.  Sequel currently
+  supports this syntax on MySQL, H2, and SQLite 3.3.0+.
+  
+  The Database#supports_create_table_if_not_exists? method was added
+  to allow users to determine whether this syntax is supported.
+
+* Multiple column IN/NOT IN emulation now works correctly with
+  model datasets (or other datasets that use a row_proc).
+  
+* You can now correctly invert SQL::Constant instances:
+
+    Sequel::NULL # NULL
+    ~Sequel::NULL # NOT NULL
+    Sequel::TRUE # TRUE
+    ~Sequel::TRUE # FALSE
+
+* A bug in the association_pks plugin has been fixed in the case
+  where the associated table had a different primary key column name
+  than the current table.
+
+* The emulated prepared statement support now supports nil and false
+  as bound values.
+  
+* The to_dot extension was refactored for greater readability.  The
+  only change was a small fix in the display for SQL::Subscript
+  instances.
+
+* The Dataset#supports_insert_select? method is now available to let
+  you know if the dataset supports insert_select.  You should use
+  this method instead of respond_to? for checking for insert_select
+  support.
+  
+* Prepared statements/bound variable can now use a new :insert_select
+  type for preparing a statement that will insert a row and return
+  the row inserted, if the dataset supports insert_select.
+  
+* The Model#initialize_set private method now exists for easier plugin
+  writing.  It is only called for new model objects, with the hash
+  given to initialize.  By default, it just calls set.
+  
+* A small bug when creating anonymous subclasses of Sequel::Model on
+  ruby 1.9 has been fixed.
+  
+* If Thread#kill is used inside a transaction on ruby 1.8 or
+  rubinius, the transaction is rolled back.  This situation is not
+  handled correctly on JRuby or ruby 1.9, and I'm not sure it's
+  possible to handle correctly on those implementations.
+  
+* The postgres adapter now supports the
+  Sequel::Postgres::PG_NAMED_TYPES hash for associating conversion
+  procs for custom types that don't necessarily have the same type
+  oid on different databases.  This hash uses symbol keys and
+  proc values:
+  
+    Sequel::Postgres::PG_NAMED_TYPES[:interval] = proc{|v| ...}
+    
+  The conversion procs now use a separate hash per Database object
+  instead of a hash shared across all Database objects.  You
+  can now modify the types for a particular Database object, but
+  you have to use the type oid:
+  
+    DB.conversion_procs[42] = proc{|v| ...}
+
+* On SQLite and MSSQL, literalization of true and false values given
+  directly to Dataset#filter has been fixed.  So the following now
+  works correctly on those databases:
+  
+    DB[:table].filter(true)
+    DB[:table].filter(false)
+    
+  Unfortunately, because SQLite and MSSQL don't have a real boolean
+  type, these will not work:
+  
+    DB[:table].filter{a & true}
+    DB[:table].filter{a & false}
+    
+  You currently have to work around the issue by doing:
+  
+    DB[:table].filter{a & Sequel::TRUE}
+    DB[:table].filter{a & Sequel::FALSE}
+    
+  It is possible that a future version of Sequel will remove the need
+  for this workaround, but that requires having a separate
+  literalization method specific to filters.
+
+* The MySQL bit type is no longer treated as a boolean.  On MySQL, the
+  bit type is a bitfield, which is very different than the MSSQL bit
+  type, which is the closest thing to a boolean on MSSQL.
+  
+* The bool database type is now recognized as a boolean.  Some SQLite
+  databases use bool, such as the ones used in Firefox.
+  
+* SQL_AUTO_IS_NULL=0 is now set by default when connecting to MySQL
+  using the swift or jdbc adapters.  Previously, it was only set by
+  default when using the mysql or mysql2 adapters.
+
+* Dataset#limit now works correctly on Access, using the TOP syntax.
+
+* Dataset#limit now works correctly on DB2, using the FETCH FIRST
+  syntax.
+    
+* The jdbc mssql subadapter was split into separate subadapters for
+  sqlserver (using Microsoft's driver) and jtds (using the open
+  source JTDS driver).
+
+* The jdbc jtds subadapter now supports converting Java CLOB
+  objects to ruby strings.
+
+* Tables from the INFORMATION_SCHEMA are now ignored when parsing
+  schema on JDBC.
+
+* The informix adapter has been split into shared/specific parts, and
+  a jdbc informix subadapter has been added.
+
+* Dataset#insert_select now works correctly on MSSQL when the core
+  extensions are disabled.
+
+* The sqlite adapter now logs when preparing a statement.
+
+* You no longer need to be a PostgreSQL superuser to run the postgres
+  adapter specs.
+  
+* The connection pool specs are now about 10 times faster and not
+  subject to race conditions due to using Queues instead of
+  sleeping.
+
+= Backwards Compatibility
+
+* Model#save no longer calls Model#valid?.  It now calls the
+  Model#_valid? private method that Model#valid? also calls.  To mark
+  a model instance invalid, you should override the Model#validate
+  method and add validation errors to the object.
+
+* The BeforeHookFailure exception class has been renamed to
+  HookFailure since hook failures can now be raised by around hooks
+  that don't call super.  BeforeHookFailure is now an alias to
+  HookFailure, so no code should break, but you should update your
+  code to reflect the new name.
+
+* Any custom argument mappers used for prepared statements now need
+  to implement the prepared_arg? private instance method and have it
+  return true.
+
+* If your databases uses bit as a boolean type and isn't MSSQL, it's
+  possible that those columns will no longer be treated as booleans.
+  Please report such an issue on the bugtracker.
+  
+* It is possible that the filtering and excluding by association
+  datasets will break backwards compatibility in some apps.  This can
+  only occur if you are using a symbol with the same name as an
+  association with a model dataset whose model is the same as the
+  associated class.  As associations almost never have the same names
+  as columns, this would require either aliasing or joining to
+  another table.  If for some reason this does break your app, you
+  can work around it by changing the symbol to an SQL::Identifier or
+  a literal string.
+
+* The Sequel::Postgres.use_iso_date_format= method now only affects
+  future Database objects.
+
+* On MySQL, Database#tables no longer returns view names, it only
+  returns table names.  You have to use Database#views to get view
+  names now.
