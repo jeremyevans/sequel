@@ -1166,7 +1166,7 @@ when eager loading via eager_graph, but called when eager loading via eager.
   class Artist
     # Cache all album names to a single string when retrieving the
     # albums.
-    one_to_many :albums, :after_add=>:cache_album_names
+    one_to_many :albums, :after_load=>:cache_album_names
     
     attr_reader :album_names
     
