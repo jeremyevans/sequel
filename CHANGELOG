@@ -1,3 +1,7 @@
+=== 3.24.1 (2011-06-03)
+
+* Ignore index creation errors if using create_table? with the IF NOT EXISTS syntax (jeremyevans) (#362)
+
 === 3.24.0 (2011-06-01)
 
 * Add prepared_statements_association plugin, for using prepared statements by default for regular association loading (jeremyevans)

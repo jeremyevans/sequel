@@ -363,7 +363,7 @@ module Sequel
 
     # Execute the create index statements using the generator.
     def create_table_indexes_from_generator(name, generator, options)
-      e = options[:ignore_index_errors]
+      e = options[:ignore_index_errors] || options[:if_not_exists]
       generator.indexes.each do |index|
         begin
           index_sql_list(name, [index]).each{|sql| execute_ddl(sql)}

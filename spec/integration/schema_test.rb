@@ -183,6 +183,15 @@ describe "Database schema modifiers" do
     @db[:items].columns.should == [:b]
   end
 
+  specify "should have create_table? work correctly with indexes" do
+    @db.create_table!(:items){String :a, :index=>true}
+    @db.create_table?(:items){String :b, :index=>true}
+    @db[:items].columns.should == [:a]
+    @db.drop_table(:items) rescue nil
+    @db.create_table?(:items){String :b, :index=>true}
+    @db[:items].columns.should == [:b]
+  end
+
   specify "should rename tables correctly" do
     @db.drop_table(:items) rescue nil
     @db.create_table!(:items2){Integer :number}
