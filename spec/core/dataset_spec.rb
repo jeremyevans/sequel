@@ -1226,6 +1226,27 @@ describe "Dataset#select" do
   end
 end
 
+describe "Dataset#select_group" do
+  before do
+    @d = Sequel::Dataset.new(nil).from(:test)
+  end
+
+  specify "should set both SELECT and GROUP" do
+    @d.select_group(:name).sql.should == 'SELECT name FROM test GROUP BY name'
+    @d.select_group(:a, :b__c, :d___e).sql.should == 'SELECT a, b.c, d AS e FROM test GROUP BY a, b.c, d'
+  end
+
+  specify "should remove from both SELECT and GROUP if no arguments" do
+    @d.select_group(:name).select_group.sql.should == 'SELECT * FROM test'
+  end
+
+  specify "should accept virtual row blocks" do
+    @d.select_group{name}.sql.should == 'SELECT name FROM test GROUP BY name'
+    @d.select_group{[name, f(v).as(a)]}.sql.should == 'SELECT name, f(v) AS a FROM test GROUP BY name, f(v)'
+    @d.select_group(:name){f(v).as(a)}.sql.should == 'SELECT name, f(v) AS a FROM test GROUP BY name, f(v)'
+  end
+end
+  
 describe "Dataset#select_all" do
   before do
     @d = Sequel::Dataset.new(nil).from(:test)

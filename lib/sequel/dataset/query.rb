@@ -308,8 +308,7 @@ module Sequel
     #   # SELECT substr(first_name, 1, 1) AS initial, count(*) AS count FROM items GROUP BY substr(first_name, 1, 1)
     #   # => [{:initial=>'a', :count=>1}, ...]
     def group_and_count(*columns, &block)
-      virtual_row_columns(columns, block)
-      group(*columns.map{|c| unaliased_identifier(c)}).select(*(columns + [COUNT_OF_ALL_AS_COUNT]))
+      select_group(*columns, &block).select_more(COUNT_OF_ALL_AS_COUNT)
     end
 
     # Returns a copy of the dataset with the HAVING conditions changed. See #filter for argument types.
@@ -665,6 +664,20 @@ module Sequel
       cur_sel = @opts[:select]
       cur_sel = [WILDCARD] if !cur_sel || cur_sel.empty?
       select(*(cur_sel + columns), &block)
+    end
+
+    # Set both the select and group clauses with the given +columns+.
+    # Column aliases may be supplied, and will be included in the select clause.
+    # This also takes a virtual row block similar to +filter+.
+    #
+    #   DB[:items].select_group(:a, :b)
+    #   # SELECT a, b FROM items GROUP BY a, b
+    #
+    #   DB[:items].select_group(:c___a){f(c2)}
+    #   # SELECT c AS a, f(c2) FROM items GROUP BY c, f(c2)
+    def select_group(*columns, &block)
+      virtual_row_columns(columns, block)
+      select(*columns).group(*columns.map{|c| unaliased_identifier(c)})
     end
 
     # Returns a copy of the dataset with the given columns added
