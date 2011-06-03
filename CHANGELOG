@@ -1,12 +1,12 @@
 === HEAD
 
+* Add Dataset#exclude_where and Dataset#exclude_having methods, so you can force use of having or where clause (jeremyevans)
+
 * Allow Dataset#select_all to take table name arguments and select all columns from each given table (jeremyevans)
 
 * Add Dataset#select_group method, for selecting and grouping on the same columns (jeremyevans)
 
-* Allow Dataset#group_and_count to accept a virtual row block (jeremyevans)
-
-* Allow Dataset#group to accept a virtual row block (jeremyevans)
+* Allow Dataset#group and Dataset#group_and_count to accept a virtual row block (jeremyevans)
 
 === 3.24.1 (2011-06-03)
 

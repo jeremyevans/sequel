@@ -798,6 +798,28 @@ describe "Dataset#exclude" do
   end
 end
 
+describe "Dataset#exclude_where" do
+  before do
+    @dataset = Sequel::Dataset.new(nil).from(:test)
+  end
+
+  specify "should correctly negate the expression and add it to the where clause" do
+    @dataset.exclude_where(:region=>'Asia').sql.should == "SELECT * FROM test WHERE (region != 'Asia')"
+    @dataset.exclude_where(:region=>'Asia').exclude_where(:region=>'NA').sql.should == "SELECT * FROM test WHERE ((region != 'Asia') AND (region != 'NA'))"
+  end
+
+  specify "should affect the where clause even if having clause is already used" do
+    @dataset.group_and_count(:name).having{count > 2}.exclude_where(:region=>'Asia').sql.should ==
+      "SELECT name, count(*) AS count FROM test WHERE (region != 'Asia') GROUP BY name HAVING (count > 2)"
+  end
+end
+
+describe "Dataset#exclude_having" do
+  specify "should correctly negate the expression and add it to the having clause" do
+    Sequel::Dataset.new(nil).from(:test).exclude_having{count > 2}.exclude_having{count < 0}.sql.should == "SELECT * FROM test HAVING ((count <= 2) AND (count >= 0))"
+  end
+end
+
 describe "Dataset#invert" do
   before do
     @d = Sequel::Dataset.new(nil).from(:test)

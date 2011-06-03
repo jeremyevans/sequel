@@ -28,10 +28,10 @@ module Sequel
     JOIN_METHODS = (CONDITIONED_JOIN_TYPES + UNCONDITIONED_JOIN_TYPES).map{|x| "#{x}_join".to_sym} + [:join, :join_table]
     
     # Methods that return modified datasets
-    QUERY_METHODS = %w'add_graph_aliases and distinct except exclude
+    QUERY_METHODS = %w'add_graph_aliases and distinct except exclude exclude_having exclude_where
     filter for_update from from_self graph grep group group_and_count group_by having intersect invert
     limit lock_style naked or order order_append order_by order_more order_prepend paginate qualify query
-    reverse reverse_order select select_all select_append select_more server
+    reverse reverse_order select select_all select_append select_group select_more server
     set_defaults set_graph_aliases set_overrides unfiltered ungraphed ungrouped union
     unlimited unordered where with with_recursive with_sql'.collect{|x| x.to_sym} + JOIN_METHODS
 
@@ -103,12 +103,29 @@ module Sequel
     #   DB[:items].exclude(:category => 'software', :id=>3)
     #   # SELECT * FROM items WHERE ((category != 'software') OR (id != 3))
     def exclude(*cond, &block)
-      clause = (@opts[:having] ? :having : :where)
-      cond = cond.first if cond.size == 1
-      cond = filter_expr(cond, &block)
-      cond = SQL::BooleanExpression.invert(cond)
-      cond = SQL::BooleanExpression.new(:AND, @opts[clause], cond) if @opts[clause]
-      clone(clause => cond)
+      _filter_or_exclude(true, @opts[:having] ? :having : :where, *cond, &block)
+    end
+
+    # Inverts the given conditions and adds them to the HAVING clause.
+    #
+    #   DB[:items].select_group(:name).exclude_having{count(name) < 2}
+    #   # SELECT name FROM items GROUP BY name HAVING (count(name) >= 2)
+    def exclude_having(*cond, &block)
+      _filter_or_exclude(true, :having, *cond, &block)
+    end
+
+    # Inverts the given conditions and adds them to the WHERE clause.
+    #
+    #   DB[:items].select_group(:name).exclude_where(:category => 'software')
+    #   # SELECT * FROM items WHERE (category != 'software')
+    #
+    #   DB[:items].select_group(:name).
+    #     exclude_having{count(name) < 2}.
+    #     exclude_where(:category => 'software')
+    #   # SELECT name FROM items WHERE (category != 'software')
+    #   # GROUP BY name HAVING (count(name) >= 2)
+    def exclude_where(*cond, &block)
+      _filter_or_exclude(true, :where, *cond, &block)
     end
 
     # Returns a copy of the dataset with the given conditions imposed upon it.  
@@ -870,16 +887,22 @@ module Sequel
 
     private
 
-    # Internal filter method so it works on either the having or where clauses.
-    def _filter(clause, *cond, &block)
+    # Internal filter/exclude method so it works on either the having or where clauses.
+    def _filter_or_exclude(invert, clause, *cond, &block)
       cond = cond.first if cond.size == 1
       if cond.respond_to?(:empty?) && cond.empty? && !block
         clone
       else
         cond = filter_expr(cond, &block)
+        cond = SQL::BooleanExpression.invert(cond) if invert
         cond = SQL::BooleanExpression.new(:AND, @opts[clause], cond) if @opts[clause]
         clone(clause => cond)
       end
+    end
+
+    # Internal filter method so it works on either the having or where clauses.
+    def _filter(clause, *cond, &block)
+      _filter_or_exclude(false, clause, *cond, &block)
     end
 
     # Treat the +block+ as a virtual_row block if not +nil+ and
