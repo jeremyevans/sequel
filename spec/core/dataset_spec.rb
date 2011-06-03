@@ -759,6 +759,11 @@ describe "Dataset#exclude" do
       "SELECT * FROM test WHERE (region != 'Asia')"
   end
 
+  specify "should affect the having clause if having clause is already used" do
+    @dataset.group_and_count(:name).having{count > 2}.exclude{count > 5}.sql.should ==
+      "SELECT name, count(*) AS count FROM test GROUP BY name HAVING ((count > 2) AND (count <= 5))"
+  end
+
   specify "should take multiple conditions as a hash and express the logic correctly in SQL" do
     @dataset.exclude(:region => 'Asia', :name => 'Japan').select_sql.
       should match(Regexp.union(/WHERE \(\(region != 'Asia'\) OR \(name != 'Japan'\)\)/,
