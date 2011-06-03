@@ -288,6 +288,7 @@ module Sequel
     
     # Returns a dataset grouped by the given column with count by group.
     # Column aliases may be supplied, and will be included in the select clause.
+    # If a block is given, it is treated as a virtual row block, similar to +filter+.
     #
     # Examples:
     #
@@ -302,7 +303,12 @@ module Sequel
     #   DB[:items].group_and_count(:first_name___name).all
     #   # SELECT first_name AS name, count(*) AS count FROM items GROUP BY first_name
     #   # => [{:name=>'a', :count=>1}, ...]
-    def group_and_count(*columns)
+    #
+    #   DB[:items].group_and_count{substr(first_name, 1, 1).as(initial)}.all
+    #   # SELECT substr(first_name, 1, 1) AS initial, count(*) AS count FROM items GROUP BY substr(first_name, 1, 1)
+    #   # => [{:initial=>'a', :count=>1}, ...]
+    def group_and_count(*columns, &block)
+      columns += Array(Sequel.virtual_row(&block)) if block
       group(*columns.map{|c| unaliased_identifier(c)}).select(*(columns + [COUNT_OF_ALL_AS_COUNT]))
     end
 

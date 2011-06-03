@@ -1781,6 +1781,12 @@ describe "Dataset#group_and_count" do
     @ds.group_and_count(:name.identifier.as(:n)).sql.should ==
       "SELECT name AS n, count(*) AS count FROM test GROUP BY name"
   end
+
+  specify "should take a virtual row block" do
+    @ds.group_and_count{(type_id > 1).as(t)}.sql.should == "SELECT (type_id > 1) AS t, count(*) AS count FROM test GROUP BY (type_id > 1)"
+    @ds.group_and_count{[(type_id > 1).as(t), type_id < 2]}.sql.should == "SELECT (type_id > 1) AS t, (type_id < 2), count(*) AS count FROM test GROUP BY (type_id > 1), (type_id < 2)"
+    @ds.group_and_count(:foo){type_id > 1}.sql.should == "SELECT foo, (type_id > 1), count(*) AS count FROM test GROUP BY foo, (type_id > 1)"
+  end
 end
 
 describe "Dataset#empty?" do

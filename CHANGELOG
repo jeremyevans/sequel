@@ -1,5 +1,7 @@
 === HEAD
 
+* Allow Dataset#group_and_count to accept a virtual row block (jeremyevans)
+
 * Allow Dataset#group to accept a virtual row block (jeremyevans)
 
 === 3.24.1 (2011-06-03)
