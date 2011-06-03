@@ -635,7 +635,7 @@ describe "Sequel::Dataset main SQL methods" do
 
   it "#select_group should work correctly" do
     @ds.unordered!
-    @ds.group(:a).all.should == []
+    @ds.select_group(:a).all.should == []
     @ds.insert(20, 30)
     @ds.select_group(:a).all.should == [{:a=>20}]
     @ds.select_group(:b).all.should == [{:b=>30}]
