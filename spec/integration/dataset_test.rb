@@ -632,6 +632,23 @@ describe "Sequel::Dataset main SQL methods" do
     @ds.filter(:a=>20).or(:b=>15).all.should == [{:a=>20, :b=>30}]
     @ds.filter(:a=>10).or(:b=>15).all.should == []
   end
+
+  it "#select_group should work correctly" do
+    @ds.unordered!
+    @ds.group(:a).all.should == []
+    @ds.insert(20, 30)
+    @ds.select_group(:a).all.should == [{:a=>20}]
+    @ds.select_group(:b).all.should == [{:b=>30}]
+    @ds.insert(20, 40)
+    @ds.select_group(:a).all.should == [{:a=>20}]
+    @ds.order(:b).select_group(:b).all.should == [{:b=>30}, {:b=>40}]
+  end
+
+  it "#select_group should work correctly when aliasing" do
+    @ds.unordered!
+    @ds.insert(20, 30)
+    @ds.select_group(:b___c).all.should == [{:c=>30}]
+  end
   
   it "#having should work correctly" do
     @ds.unordered!
