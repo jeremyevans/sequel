@@ -277,7 +277,7 @@ module Sequel
     #   DB[:items].group(:id, :name) # SELECT * FROM items GROUP BY id, name
     #   DB[:items].group{[a, sum(b)]} # SELECT * FROM items GROUP BY a, sum(b)
     def group(*columns, &block)
-      columns += Array(Sequel.virtual_row(&block)) if block
+      virtual_row_columns(columns, block)
       clone(:group => (columns.compact.empty? ? nil : columns))
     end
 
@@ -308,7 +308,7 @@ module Sequel
     #   # SELECT substr(first_name, 1, 1) AS initial, count(*) AS count FROM items GROUP BY substr(first_name, 1, 1)
     #   # => [{:initial=>'a', :count=>1}, ...]
     def group_and_count(*columns, &block)
-      columns += Array(Sequel.virtual_row(&block)) if block
+      virtual_row_columns(columns, block)
       group(*columns.map{|c| unaliased_identifier(c)}).select(*(columns + [COUNT_OF_ALL_AS_COUNT]))
     end
 
@@ -541,7 +541,7 @@ module Sequel
     #   DB[:items].order{sum(name).desc} # SELECT * FROM items ORDER BY sum(name) DESC
     #   DB[:items].order(nil) # SELECT * FROM items
     def order(*columns, &block)
-      columns += Array(Sequel.virtual_row(&block)) if block
+      virtual_row_columns(columns, block)
       clone(:order => (columns.compact.empty?) ? nil : columns)
     end
     
@@ -639,7 +639,7 @@ module Sequel
     #   DB[:items].select(:a, :b) # SELECT a, b FROM items
     #   DB[:items].select{[a, sum(b)]} # SELECT a, sum(b) FROM items
     def select(*columns, &block)
-      columns += Array(Sequel.virtual_row(&block)) if block
+      virtual_row_columns(columns, block)
       m = []
       columns.each do |i|
         i.is_a?(Hash) ? m.concat(i.map{|k, v| SQL::AliasedExpression.new(k,v)}) : m << i
@@ -859,6 +859,12 @@ module Sequel
         cond = SQL::BooleanExpression.new(:AND, @opts[clause], cond) if @opts[clause]
         clone(clause => cond)
       end
+    end
+
+    # Treat the +block+ as a virtual_row block if not +nil+ and
+    # add the resulting columns to the +columns+ array (modifies +columns+).
+    def virtual_row_columns(columns, block)
+      columns.concat(Array(Sequel.virtual_row(&block))) if block
     end
     
     # Add the dataset to the list of compounds
