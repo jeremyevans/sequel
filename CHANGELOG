@@ -1,3 +1,7 @@
+=== HEAD
+
+* Allow Dataset#group to accept a virtual row block (jeremyevans)
+
 === 3.24.1 (2011-06-03)
 
 * Ignore index creation errors if using create_table? with the IF NOT EXISTS syntax (jeremyevans) (#362)

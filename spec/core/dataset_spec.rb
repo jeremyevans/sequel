@@ -897,7 +897,7 @@ describe "Dataset#group_by" do
       "SELECT * FROM test GROUP BY (type_id IS NULL)"
   end
 
-  specify "should ungroup when passed nil, empty, or no arguments" do
+  specify "should ungroup when passed nil or no arguments" do
     @dataset.group_by.select_sql.should ==
       "SELECT * FROM test"
     @dataset.group_by(nil).select_sql.should ==
@@ -914,6 +914,13 @@ describe "Dataset#group_by" do
   specify "should be aliased as #group" do
     @dataset.group(:type_id=>nil).select_sql.should ==
       "SELECT * FROM test GROUP BY (type_id IS NULL)"
+  end
+
+  specify "should take a virtual row block" do
+    @dataset.group{type_id > 1}.sql.should == "SELECT * FROM test GROUP BY (type_id > 1)"
+    @dataset.group_by{type_id > 1}.sql.should == "SELECT * FROM test GROUP BY (type_id > 1)"
+    @dataset.group{[type_id > 1, type_id < 2]}.sql.should == "SELECT * FROM test GROUP BY (type_id > 1), (type_id < 2)"
+    @dataset.group(:foo){type_id > 1}.sql.should == "SELECT * FROM test GROUP BY foo, (type_id > 1)"
   end
 end
 

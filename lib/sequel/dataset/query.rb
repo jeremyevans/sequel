@@ -270,17 +270,20 @@ module Sequel
     end
 
     # Returns a copy of the dataset with the results grouped by the value of 
-    # the given columns.
+    # the given columns.  If a block is given, it is treated
+    # as a virtual row block, similar to +filter+.
     #
     #   DB[:items].group(:id) # SELECT * FROM items GROUP BY id
     #   DB[:items].group(:id, :name) # SELECT * FROM items GROUP BY id, name
-    def group(*columns)
+    #   DB[:items].group{[a, sum(b)]} # SELECT * FROM items GROUP BY a, sum(b)
+    def group(*columns, &block)
+      columns += Array(Sequel.virtual_row(&block)) if block
       clone(:group => (columns.compact.empty? ? nil : columns))
     end
 
     # Alias of group
-    def group_by(*columns)
-      group(*columns)
+    def group_by(*columns, &block)
+      group(*columns, &block)
     end
     
     # Returns a dataset grouped by the given column with count by group.
