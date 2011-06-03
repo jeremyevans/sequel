@@ -646,11 +646,19 @@ module Sequel
       clone(:select => m)
     end
     
-    # Returns a copy of the dataset selecting the wildcard.
+    # Returns a copy of the dataset selecting the wildcard if no arguments
+    # are given.  If arguments are given, treat them as tables and select
+    # all columns (using the wildcard) from each table.
     #
     #   DB[:items].select(:a).select_all # SELECT * FROM items
-    def select_all
-      clone(:select => nil)
+    #   DB[:items].select_all(:items) # SELECT items.* FROM items
+    #   DB[:items].select_all(:items, :foo) # SELECT items.*, foo.* FROM items
+    def select_all(*tables)
+      if tables.empty?
+        clone(:select => nil)
+      else
+        select(*tables.map{|t| SQL::ColumnAll.new(t)})
+      end
     end
     
     # Returns a copy of the dataset with the given columns added

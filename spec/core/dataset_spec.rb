@@ -1259,6 +1259,14 @@ describe "Dataset#select_all" do
   specify "should overrun the previous select option" do
     @d.select!(:a, :b, :c).select_all.sql.should == 'SELECT * FROM test'
   end
+
+  specify "should select all columns in a table if given an argument" do
+    @d.select_all(:test).sql.should == 'SELECT test.* FROM test'
+  end
+  
+  specify "should select all columns all tables if given a multiple arguments" do
+    @d.select_all(:test, :foo).sql.should == 'SELECT test.*, foo.* FROM test'
+  end
 end
 
 describe "Dataset#select_more" do
