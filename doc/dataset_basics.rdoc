@@ -74,12 +74,12 @@ Most Dataset methods that users will use can be broken down into two types:
 
 Most dataset methods fall into this category, which can be further broken down by the clause they affect:
 
-SELECT:: select, select_all, select_append, select_more
+SELECT:: select, select_all, select_append, select_group, select_more
 FROM:: from, from_self
 JOIN:: join, left_join, right_join, full_join, natural_join, natural_left_join, natural_right_join, natural_full_join, cross_join, inner_join, left_outer_join, right_outer_join, full_outer_join, join_table
-WHERE:: where, filter, exclude, and, or, grep, invert, unfiltered
-GROUP:: group, group_by, group_and_count, ungrouped
-HAVING:: having, filter, exclude, and, or, grep, invert, unfiltered
+WHERE:: where, filter, exclude, exclude_where, and, or, grep, invert, unfiltered
+GROUP:: group, group_by, group_and_count, select_group, ungrouped
+HAVING:: having, filter, exclude, exclude_having, and, or, grep, invert, unfiltered
 ORDER:: order, order_by, order_append, order_prepend, order_more, reverse, reverse_order, unordered
 LIMIT:: limit, unlimited
 compounds:: union, intersect, except
