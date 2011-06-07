@@ -594,6 +594,16 @@ describe "DB#drop_table" do
     @db.drop_table :cats
     @db.sqls.should == ['DROP TABLE cats']
   end
+
+  specify "should drop multiple tables at once" do
+    @db.drop_table :cats, :dogs
+    @db.sqls.should == ['DROP TABLE cats', 'DROP TABLE dogs']
+  end
+
+  specify "should take an options hash and support the :cascade option" do
+    @db.drop_table :cats, :dogs, :cascade=>true
+    @db.sqls.should == ['DROP TABLE cats CASCADE', 'DROP TABLE dogs CASCADE']
+  end
 end
 
 describe "DB#alter_table" do
@@ -773,6 +783,84 @@ describe "DB#alter_table" do
     @db.sqls.should == ["ALTER TABLE cats ALTER COLUMN score TYPE integer UNSIGNED",
       "ALTER TABLE cats ALTER COLUMN score TYPE varchar(30)",
       "ALTER TABLE cats ALTER COLUMN score TYPE enum('a', 'b')"]
+  end
+end
+
+describe "Database#create_view" do
+  before do
+    @db = DummyDatabase.new
+  end
+  
+  specify "should construct proper SQL with raw SQL" do
+    @db.create_view :test, "SELECT * FROM xyz"
+    @db.sqls.should == ['CREATE VIEW test AS SELECT * FROM xyz']
+    @db.sqls.clear
+    @db.create_view :test.identifier, "SELECT * FROM xyz"
+    @db.sqls.should == ['CREATE VIEW test AS SELECT * FROM xyz']
+  end
+  
+  specify "should construct proper SQL with dataset" do
+    @db.create_view :test, @db[:items].select(:a, :b).order(:c)
+    @db.sqls.should == ['CREATE VIEW test AS SELECT a, b FROM items ORDER BY c']
+    @db.sqls.clear
+    @db.create_view :test.qualify(:sch), @db[:items].select(:a, :b).order(:c)
+    @db.sqls.should == ['CREATE VIEW sch.test AS SELECT a, b FROM items ORDER BY c']
+  end
+end
+
+describe "Database#create_or_replace_view" do
+  before do
+    @db = DummyDatabase.new
+  end
+  
+  specify "should construct proper SQL with raw SQL" do
+    @db.create_or_replace_view :test, "SELECT * FROM xyz"
+    @db.sqls.should == ['CREATE OR REPLACE VIEW test AS SELECT * FROM xyz']
+    @db.sqls.clear
+    @db.create_or_replace_view :sch__test, "SELECT * FROM xyz"
+    @db.sqls.should == ['CREATE OR REPLACE VIEW sch.test AS SELECT * FROM xyz']
+  end
+
+  specify "should construct proper SQL with dataset" do
+    @db.create_or_replace_view :test, @db[:items].select(:a, :b).order(:c)
+    @db.sqls.should == ['CREATE OR REPLACE VIEW test AS SELECT a, b FROM items ORDER BY c']
+    @db.sqls.clear
+    @db.create_or_replace_view :test.identifier, @db[:items].select(:a, :b).order(:c)
+    @db.sqls.should == ['CREATE OR REPLACE VIEW test AS SELECT a, b FROM items ORDER BY c']
+  end
+end
+
+describe "Database#drop_view" do
+  before do
+    @db = DummyDatabase.new
+  end
+  
+  specify "should construct proper SQL" do
+    @db.drop_view :test
+    @db.drop_view :test.identifier
+    @db.drop_view :sch__test
+    @db.drop_view :test.qualify(:sch)
+    @db.sqls.should == ['DROP VIEW test', 'DROP VIEW test', 'DROP VIEW sch.test', 'DROP VIEW sch.test']
+  end
+
+  specify "should drop multiple views at once" do
+    @db.drop_view :cats, :dogs
+    @db.sqls.should == ['DROP VIEW cats', 'DROP VIEW dogs']
+  end
+
+  specify "should take an options hash and support the :cascade option" do
+    @db.drop_view :cats, :dogs, :cascade=>true
+    @db.sqls.should == ['DROP VIEW cats CASCADE', 'DROP VIEW dogs CASCADE']
+  end
+end
+
+describe "Database#alter_table_sql" do
+  before do
+    @db = DummyDatabase.new
+  end
+  
+  specify "should raise error for an invalid op" do
+    proc {@db.send(:alter_table_sql, :mau, :op => :blah)}.should raise_error(Sequel::Error)
   end
 end
 

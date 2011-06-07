@@ -159,10 +159,13 @@ module Sequel
     
     # Drops one or more tables corresponding to the given names:
     #
+    #   DB.drop_table(:posts)
     #   DB.drop_table(:posts, :comments)
+    #   DB.drop_table(:posts, :comments, :cascade=>true)
     def drop_table(*names)
+      options = names.last.is_a?(Hash) ? names.pop : {}
       names.each do |n|
-        execute_ddl(drop_table_sql(n))
+        execute_ddl(drop_table_sql(n, options))
         remove_cached_schema(n)
       end
       nil
@@ -171,9 +174,12 @@ module Sequel
     # Drops one or more views corresponding to the given names:
     #
     #   DB.drop_view(:cheap_items)
+    #   DB.drop_view(:cheap_items, :pricey_items)
+    #   DB.drop_view(:cheap_items, :pricey_items, :cascade=>true)
     def drop_view(*names)
+      options = names.last.is_a?(Hash) ? names.pop : {}
       names.each do |n|
-        execute_ddl("DROP VIEW #{quote_schema_table(n)}")
+        execute_ddl(drop_view_sql(n, options))
         remove_cached_schema(n)
       end
       nil
@@ -391,10 +397,15 @@ module Sequel
     end
 
     # SQL DDL statement to drop the table with the given name.
-    def drop_table_sql(name)
-      "DROP TABLE #{quote_schema_table(name)}"
+    def drop_table_sql(name, options)
+      "DROP TABLE #{quote_schema_table(name)}#{' CASCADE' if options[:cascade]}"
     end
     
+    # SQL DDL statement to drop a view with the given name.
+    def drop_view_sql(name, options)
+      "DROP VIEW #{quote_schema_table(name)}#{' CASCADE' if options[:cascade]}"
+    end
+
     # Proxy the filter_expr call to the dataset, used for creating constraints.
     def filter_expr(*args, &block)
       schema_utility_dataset.literal(schema_utility_dataset.send(:filter_expr, *args, &block))

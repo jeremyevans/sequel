@@ -460,11 +460,6 @@ module Sequel
         "DROP LANGUAGE#{' IF EXISTS' if opts[:if_exists]} #{name}#{' CASCADE' if opts[:cascade]}"
       end
 
-      # Always CASCADE the table drop
-      def drop_table_sql(name)
-        "DROP TABLE #{quote_schema_table(name)} CASCADE"
-      end
-      
       # SQL for dropping a trigger from the database.
       def drop_trigger_sql(table, name, opts={})
         "DROP TRIGGER#{' IF EXISTS' if opts[:if_exists]} #{name} ON #{quote_schema_table(table)}#{' CASCADE' if opts[:cascade]}"

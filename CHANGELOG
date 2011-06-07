@@ -1,5 +1,9 @@
 === HEAD
 
+* No longer use CASCADE by default when dropping tables on PostgreSQL (jeremyevans)
+
+* Support :cascade option to Database#drop_table and #drop_view for using CASCADE (jeremyevans)
+
 * If validation error messages are LiteralStrings, don't add the column name to them in Errors#full_messages (jeremyevans)
 
 * Fix bug loading plugins on 1.9 where ::ClassMethods, ::InstanceMethods, or ::DatasetMethods is defined (jeremyevans)
