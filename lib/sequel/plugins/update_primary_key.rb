@@ -1,6 +1,6 @@
 module Sequel
   module Plugins
-    # The update_primary_key plugin allows you to modify an objects
+    # The update_primary_key plugin allows you to modify an object's
     # primary key and then save the record.  Sequel does not work
     # correctly with primary key modifications by default.  Sequel
     # is designed to work with surrogate primary keys that never need to be
