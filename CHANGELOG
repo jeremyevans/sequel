@@ -1,5 +1,7 @@
 === HEAD
 
+* If validation error messages are LiteralStrings, don't add the column name to them in Errors#full_messages (jeremyevans)
+
 * Fix bug loading plugins on 1.9 where ::ClassMethods, ::InstanceMethods, or ::DatasetMethods is defined (jeremyevans)
 
 * Add Dataset#exclude_where and Dataset#exclude_having methods, so you can force use of having or where clause (jeremyevans)

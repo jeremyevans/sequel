@@ -61,6 +61,17 @@ describe Sequel::Model::Errors do
     msgs.should include('blow blieuh', 'blow blich', 'blay bliu')
   end
 
+  specify "should not add column names for LiteralStrings" do
+    @errors.full_messages.should == []
+    
+    @errors[:blow] << 'blieuh'
+    @errors[:blow] << 'blich'.lit
+    @errors[:blay] << 'bliu'
+    msgs = @errors.full_messages
+    msgs.size.should == 3
+    msgs.should include('blow blieuh', 'blich', 'blay bliu')
+  end
+
   specify "should return the number of error messages using #count" do
     @errors.count.should == 0
     @errors.add(:a, 'b')

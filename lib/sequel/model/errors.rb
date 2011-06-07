@@ -40,7 +40,7 @@ module Sequel
       def full_messages
         inject([]) do |m, kv| 
           att, errors = *kv
-          errors.each {|e| m << "#{Array(att).join(ATTRIBUTE_JOINER)} #{e}"}
+          errors.each {|e| m << (e.is_a?(LiteralString) ? e : "#{Array(att).join(ATTRIBUTE_JOINER)} #{e}")}
           m
         end
       end
