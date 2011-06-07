@@ -60,3 +60,32 @@ class SchemaDummyDatabase < Sequel::Database
     @sqls << sql
   end
 end
+
+class DummyDataset < Sequel::Dataset
+  def first
+    raise if @opts[:from] == [:a]
+    true
+  end
+end
+
+class DummyDatabase < Sequel::Database
+  attr_reader :sqls
+  
+  def execute(sql, opts={})
+    @sqls ||= []
+    @sqls << sql
+  end
+  
+  def transaction; yield; end
+
+  def dataset
+    DummyDataset.new(self)
+  end
+end
+
+class Dummy2Database < Sequel::Database
+  attr_reader :sql
+  def execute(sql); @sql = sql; end
+  def transaction; yield; end
+end
+
