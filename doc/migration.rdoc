@@ -117,7 +117,8 @@ This looks a little weird, but you need to be aware that inside an up or +down+ 
 self always refers to the <tt>Sequel::Database</tt> object that the migration is being applied to.
 Since <tt>Database#[]</tt> creates datasets, using <tt>self[:artists]</tt> inside the +up+ block creates
 a dataset on the database representing all columns in the +artists+ table, and updates it to set the
-+location+ column to <tt>'Sacramento'</tt>.
++location+ column to <tt>'Sacramento'</tt>.  You should avoid referencing the <tt>Sequel::Database</tt>
+object directly in your migration, and always use self to reference it, otherwise you may run into problems.
 
 It is possible to use model classes inside migrations, as long as they are loaded into the ruby interpreter,
 but it's a bad habit as changes to your model classes can then break old migrations, and this breakage is
