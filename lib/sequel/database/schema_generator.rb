@@ -329,15 +329,17 @@ module Sequel
       # Remove a column from the DDL for the table.
       #
       #   drop_column(:artist_id) # DROP COLUMN artist_id
-      def drop_column(name)
-        @operations << {:op => :drop_column, :name => name}
+      #   drop_column(:artist_id, :cascade=>true) # DROP COLUMN artist_id CASCADE
+      def drop_column(name, opts={})
+        @operations << {:op => :drop_column, :name => name}.merge(opts)
       end
       
       # Remove a constraint from the DDL for the table.
       #
       #   drop_constraint(:unique_name) # DROP CONSTRAINT unique_name
-      def drop_constraint(name)
-        @operations << {:op => :drop_constraint, :name => name}
+      #   drop_constraint(:unique_name, :cascade=>true) # DROP CONSTRAINT unique_name CASCADE
+      def drop_constraint(name, opts={})
+        @operations << {:op => :drop_constraint, :name => name}.merge(opts)
       end
       
       # Remove an index from the DDL for the table.

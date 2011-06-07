@@ -732,11 +732,25 @@ describe "DB#alter_table" do
     @db.sqls.should == ["ALTER TABLE cats DROP COLUMN score"]
   end
 
+  specify "should support drop_column with :cascade=>true option" do
+    @db.alter_table(:cats) do
+      drop_column :score, :cascade=>true
+    end
+    @db.sqls.should == ["ALTER TABLE cats DROP COLUMN score CASCADE"]
+  end
+
   specify "should support drop_constraint" do
     @db.alter_table(:cats) do
       drop_constraint :valid_score
     end
     @db.sqls.should == ["ALTER TABLE cats DROP CONSTRAINT valid_score"]
+  end
+
+  specify "should support drop_constraint with :cascade=>true option" do
+    @db.alter_table(:cats) do
+      drop_constraint :valid_score, :cascade=>true
+    end
+    @db.sqls.should == ["ALTER TABLE cats DROP CONSTRAINT valid_score CASCADE"]
   end
 
   specify "should support drop_index" do

@@ -234,7 +234,7 @@ module Sequel
       when :add_column
         "ADD COLUMN #{column_definition_sql(op)}"
       when :drop_column
-        "DROP COLUMN #{quoted_name}"
+        "DROP COLUMN #{quoted_name}#{' CASCADE' if op[:cascade]}"
       when :rename_column
         "RENAME COLUMN #{quoted_name} TO #{quote_identifier(op[:new_name])}"
       when :set_column_type
@@ -250,7 +250,7 @@ module Sequel
       when :add_constraint
         "ADD #{constraint_definition_sql(op)}"
       when :drop_constraint
-        "DROP CONSTRAINT #{quoted_name}"
+        "DROP CONSTRAINT #{quoted_name}#{' CASCADE' if op[:cascade]}"
       else
         raise Error, "Unsupported ALTER TABLE operation"
       end

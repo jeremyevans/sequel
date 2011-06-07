@@ -2,7 +2,7 @@
 
 * No longer use CASCADE by default when dropping tables on PostgreSQL (jeremyevans)
 
-* Support :cascade option to Database#drop_table and #drop_view for using CASCADE (jeremyevans)
+* Support :cascade option to #drop_table, #drop_view, #drop_column, and #drop_constraint for using CASCADE (jeremyevans)
 
 * If validation error messages are LiteralStrings, don't add the column name to them in Errors#full_messages (jeremyevans)
 
