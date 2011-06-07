@@ -233,4 +233,21 @@ describe Sequel::Model, ".plugin" do
     end
     lambda{@c.plugin m}.should_not raise_error
   end
+
+  it "should not raise an error if plugin submodule names exist higher up in the namespace hierarchy" do
+    class ::ClassMethods; end
+    @c.plugin(m = Module.new)
+    Object.send(:remove_const, :ClassMethods)
+    @c.plugins.should include(m)
+
+    class ::InstanceMethods; end
+    @c.plugin(m = Module.new)
+    Object.send(:remove_const, :InstanceMethods)
+    @c.plugins.should include(m)
+
+    class ::DatasetMethods; end
+    @c.plugin(m = Module.new)
+    Object.send(:remove_const, :DatasetMethods)
+    @c.plugins.should include(m)
+  end
 end

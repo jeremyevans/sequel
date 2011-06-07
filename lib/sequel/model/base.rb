@@ -326,9 +326,9 @@ module Sequel
         unless @plugins.include?(m)
           @plugins << m
           m.apply(self, *args, &blk) if m.respond_to?(:apply)
-          include(m::InstanceMethods) if m.const_defined?("InstanceMethods")
-          extend(m::ClassMethods)if m.const_defined?("ClassMethods")
-          if m.const_defined?("DatasetMethods")
+          include(m::InstanceMethods) if plugin_module_defined?(m, :InstanceMethods)
+          extend(m::ClassMethods)if plugin_module_defined?(m, :ClassMethods)
+          if plugin_module_defined?(m, :DatasetMethods)
             dataset.extend(m::DatasetMethods) if @dataset
             dataset_method_modules << m::DatasetMethods
             meths = m::DatasetMethods.public_instance_methods.reject{|x| NORMAL_METHOD_NAME_REGEXP !~ x.to_s}
@@ -337,7 +337,7 @@ module Sequel
         end
         m.configure(self, *args, &blk) if m.respond_to?(:configure)
       end
-  
+
       # Returns primary key attribute hash.  If using a composite primary key
       # value such be an array with values for each primary key in the correct
       # order.  For a standard primary key, value should be an object with a
@@ -658,6 +658,15 @@ module Sequel
         Sequel::Plugins.const_get(module_name)
       end
 
+      # Check if the plugin module +plugin+ defines the constant named by +submod+.
+      def plugin_module_defined?(plugin, submod)
+        if RUBY_VERSION >= '1.9'
+          plugin.const_defined?(submod, false)
+        else
+          plugin.const_defined?(submod)
+        end
+      end
+  
       # Find the row in the dataset that matches the primary key.  Uses
       # a static SQL optimization if the table and primary key are simple.
       def primary_key_lookup(pk)
