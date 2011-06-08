@@ -1,5 +1,7 @@
 === HEAD
 
+* Allow treating Datasets as Expressions, e.g. DB[:table1].select(:column1) > DB[:table2].select(:column2) (jeremyevans)
+
 * No longer use CASCADE by default when dropping tables on PostgreSQL (jeremyevans)
 
 * Support :cascade option to #drop_table, #drop_view, #drop_column, and #drop_constraint for using CASCADE (jeremyevans)

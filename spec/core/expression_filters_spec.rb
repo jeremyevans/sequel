@@ -452,6 +452,45 @@ describe "Blockless Ruby Filters" do
     e2 = ~:comment.like('%:hidden:%')
     e1.should == e2
   end
+
+  it "should support expression filter methods on Datasets" do
+    d = @d.select(:a)
+
+    @d.lit(d + 1).should == '((SELECT a FROM items) + 1)'
+    @d.lit(d - 1).should == '((SELECT a FROM items) - 1)'
+    @d.lit(d * 1).should == '((SELECT a FROM items) * 1)'
+    @d.lit(d / 1).should == '((SELECT a FROM items) / 1)'
+
+    @d.lit(d => 1).should == '((SELECT a FROM items) = 1)'
+    @d.lit(~{d => 1}).should == '((SELECT a FROM items) != 1)'
+    @d.lit(d > 1).should == '((SELECT a FROM items) > 1)'
+    @d.lit(d < 1).should == '((SELECT a FROM items) < 1)'
+    @d.lit(d >= 1).should == '((SELECT a FROM items) >= 1)'
+    @d.lit(d <= 1).should == '((SELECT a FROM items) <= 1)'
+
+    @d.lit(d.as(:b)).should == '(SELECT a FROM items) AS b'
+
+    @d.lit(d & :b).should == '((SELECT a FROM items) AND b)'
+    @d.lit(d | :b).should == '((SELECT a FROM items) OR b)'
+    @d.lit(~d).should == 'NOT (SELECT a FROM items)'
+
+    @d.lit(d.cast(Integer)).should == 'CAST((SELECT a FROM items) AS integer)'
+    @d.lit(d.cast_numeric).should == 'CAST((SELECT a FROM items) AS integer)'
+    @d.lit(d.cast_string).should == 'CAST((SELECT a FROM items) AS varchar(255))'
+    @d.lit(d.cast_numeric << :b).should == '(CAST((SELECT a FROM items) AS integer) << b)'
+    @d.lit(d.cast_string + :b).should == '(CAST((SELECT a FROM items) AS varchar(255)) || b)'
+
+    @d.lit(d.extract(:year)).should == 'extract(year FROM (SELECT a FROM items))'
+    @d.lit(d.sql_boolean & :b).should == '((SELECT a FROM items) AND b)'
+    @d.lit(d.sql_number << :b).should == '((SELECT a FROM items) << b)'
+    @d.lit(d.sql_string + :b).should == '((SELECT a FROM items) || b)'
+
+    @d.lit(d.asc).should == '(SELECT a FROM items) ASC'
+    @d.lit(d.desc).should == '(SELECT a FROM items) DESC'
+
+    @d.lit(d.like(:b)).should == '((SELECT a FROM items) LIKE b)'
+    @d.lit(d.ilike(:b)).should == '((SELECT a FROM items) ILIKE b)'
+  end
   
   if RUBY_VERSION < '1.9.0'
     it "should not allow inequality operations on true, false, or nil" do

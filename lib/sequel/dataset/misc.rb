@@ -45,15 +45,6 @@ module Sequel
       self == o
     end
     
-    # Return the dataset as an aliased expression with the given alias. You can
-    # use this as a FROM or JOIN dataset, or as a column if this dataset
-    # returns a single row and column.
-    #
-    #   DB.from(DB[:table].as(:b)) # SELECT * FROM (SELECT * FROM table) AS b
-    def as(aliaz)
-      ::Sequel::SQL::AliasedExpression.new(self, aliaz)
-    end
-    
     # Yield a dataset for each server in the connection pool that is tied to that server.
     # Intended for use in sharded environments where all servers need to be modified
     # with the same data:
