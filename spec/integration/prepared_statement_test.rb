@@ -95,6 +95,13 @@ describe "Prepared Statements and Bound Arguments" do
     @ds.order(:id).map(:number).should == [10, 20]
   end
 
+  specify "should support bound variables with NULL values" do
+    @ds.delete
+    @ds.call(:insert, {:n=>nil}, :number=>@ds.ba(:$n))
+    @ds.count.should == 1
+    @ds.map(:number).should == [nil]
+  end
+
   specify "should have insert return primary key value when using bound arguments" do
     @ds.call(:insert, {:n=>20}, :number=>@ds.ba(:$n)).should == 2
     @ds.filter(:id=>2).first[:number].should == 20
@@ -170,6 +177,14 @@ describe "Prepared Statements and Bound Arguments" do
     INTEGRATION_DB.call(:insert_n, :n=>20)
     @ds.count.should == 2
     @ds.order(:id).map(:number).should == [10, 20]
+  end
+
+  specify "should support prepared statements with NULL values" do
+    @ds.delete
+    @ds.prepare(:insert, :insert_n, :number=>@ds.ba(:$n))
+    INTEGRATION_DB.call(:insert_n, :n=>nil)
+    @ds.count.should == 1
+    @ds.map(:number).should == [nil]
   end
 
   specify "should have insert return primary key value when using prepared statements" do

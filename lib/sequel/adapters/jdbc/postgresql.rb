@@ -60,6 +60,12 @@ module Sequel
         
         private
         
+        # Use setNull for nil arguments as the default behavior of setString
+        # with nil doesn't appear to work correctly on PostgreSQL.
+        def set_ps_arg(cps, arg, i)
+          arg.nil? ? cps.setNull(i, JavaSQL::Types::NULL) : super
+        end
+
         # Extend the adapter with the JDBC PostgreSQL AdapterMethods
         def setup_connection(conn)
           conn = super(conn)
