@@ -1,5 +1,7 @@
 === HEAD
 
+* Fix handling of nil values in stored procedure arguments in the jdbc adapter (wei)
+
 * Allow treating Datasets as Expressions, e.g. DB[:table1].select(:column1) > DB[:table2].select(:column2) (jeremyevans)
 
 * No longer use CASCADE by default when dropping tables on PostgreSQL (jeremyevans)

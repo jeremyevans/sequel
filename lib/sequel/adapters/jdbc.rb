@@ -422,8 +422,8 @@ module Sequel
           cps.setDouble(i, arg)
         when TrueClass, FalseClass
           cps.setBoolean(i, arg)
-        when nil
-          cps.setNull(i, JavaSQL::Types::NULL)
+        when NilClass
+          cps.setString(i, nil)
         when DateTime
           cps.setTimestamp(i, java_sql_datetime(arg))
         when Date

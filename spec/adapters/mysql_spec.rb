@@ -998,6 +998,13 @@ if MYSQL_DB.adapter_scheme == :mysql or MYSQL_DB.adapter_scheme == :jdbc
       @d.row_proc = proc{|r| r.keys.each{|k| r[k] *= 2 if r[k].is_a?(Integer)}; r}
       @d.call_sproc(:select, :test_sproc, 3, 4).should == [{:id=>nil, :value=>2, :b=>6, :d => 8}]
     end
+
+    specify "should deal with nil values" do
+      MYSQL_DB.execute_ddl('CREATE PROCEDURE test_sproc(i INTEGER, v INTEGER) BEGIN INSERT INTO items VALUES (i, v); END')
+      MYSQL_DB[:items].delete
+      MYSQL_DB.call_sproc(:test_sproc, :args=>[1, nil])
+      MYSQL_DB[:items].all.should == [{:id=>1, :value=>nil}]
+    end
   end
 end
 
