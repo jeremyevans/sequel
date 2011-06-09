@@ -419,7 +419,7 @@ module Sequel
       def set_dataset(ds, opts={})
         inherited = opts[:inherited]
         @dataset = case ds
-        when Symbol
+        when Symbol, SQL::Identifier, SQL::QualifiedIdentifier, SQL::AliasedExpression
           @simple_table = db.literal(ds)
           db[ds]
         when Dataset
@@ -427,7 +427,7 @@ module Sequel
           @db = ds.db
           ds
         else
-          raise(Error, "Model.set_dataset takes a Symbol or a Sequel::Dataset")
+          raise(Error, "Model.set_dataset takes one of the following classes as an argument: Symbol, SQL::Identifier, SQL::QualifiedIdentifier, SQL::AliasedExpression, Dataset")
         end
         @dataset.row_proc = Proc.new{|r| load(r)}
         @require_modification = Sequel::Model.require_modification.nil? ? @dataset.provides_accurate_rows_matched? : Sequel::Model.require_modification

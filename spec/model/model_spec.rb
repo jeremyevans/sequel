@@ -19,6 +19,27 @@ describe "Sequel::Model()" do
     c.table_name.should == :blah
   end
 
+  it "should return a model subclass with a dataset with the default database and given table name if given an SQL::Identifier" do
+    c = Sequel::Model(:blah.identifier)
+    c.superclass.should == Sequel::Model
+    c.db.should == @db
+    c.table_name.should == :blah.identifier
+  end
+
+  it "should return a model subclass with a dataset with the default database and given table name if given an SQL::QualifiedIdentifier" do
+    c = Sequel::Model(:blah.qualify(:boo))
+    c.superclass.should == Sequel::Model
+    c.db.should == @db
+    c.table_name.should == :blah.qualify(:boo)
+  end
+
+  it "should return a model subclass with a dataset with the default database and given table name if given an SQL::AliasedExpression" do
+    c = Sequel::Model(:blah.as(:boo))
+    c.superclass.should == Sequel::Model
+    c.db.should == @db
+    c.table_name.should == :boo
+  end
+
   it "should return a model subclass associated to the given database if given a database" do
     db = Sequel::Database.new
     c = Sequel::Model(db)
@@ -40,6 +61,27 @@ describe "Sequel::Model()" do
       proc do
         class ::Album < Sequel::Model(:table); end
         class ::Album < Sequel::Model(:table); end
+      end.should_not raise_error
+    end
+
+    it "should work without raising an exception with an SQL::Identifier " do
+      proc do
+        class ::Album < Sequel::Model(:table.identifier); end
+        class ::Album < Sequel::Model(:table.identifier); end
+      end.should_not raise_error
+    end
+
+    it "should work without raising an exception with an SQL::QualifiedIdentifier " do
+      proc do
+        class ::Album < Sequel::Model(:table.qualify(:schema)); end
+        class ::Album < Sequel::Model(:table.qualify(:schema)); end
+      end.should_not raise_error
+    end
+
+    it "should work without raising an exception with an SQL::AliasedExpression" do
+      proc do
+        class ::Album < Sequel::Model(:table.as(:alias)); end
+        class ::Album < Sequel::Model(:table.as(:alias)); end
       end.should_not raise_error
     end
 
@@ -110,6 +152,24 @@ describe Sequel::Model, "dataset & schema" do
     @model.db = MODEL_DB
     @model.set_dataset(:foo)
     @model.table_name.should == :foo
+  end
+
+  it "set_dataset should take an SQL::Identifier" do
+    @model.db = MODEL_DB
+    @model.set_dataset(:foo.identifier)
+    @model.table_name.should == :foo.identifier
+  end
+
+  it "set_dataset should take an SQL::QualifiedIdentifier" do
+    @model.db = MODEL_DB
+    @model.set_dataset(:foo.qualify(:bar))
+    @model.table_name.should == :foo.qualify(:bar)
+  end
+
+  it "set_dataset should take an SQL::AliasedExpression" do
+    @model.db = MODEL_DB
+    @model.set_dataset(:foo.as(:bar))
+    @model.table_name.should == :bar
   end
 
   it "table_name should respect table aliases" do

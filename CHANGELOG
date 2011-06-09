@@ -1,5 +1,7 @@
 === HEAD
 
+* Model.set_dataset now accepts Identifier, QualifiedIdentifier, and AliasedExpression arguments (jeremyevans)
+
 * Fix handling of nil values in bound variables and prepared statement and stored procedure arguments in the jdbc adapter (jeremyevans, wei)
 
 * Allow treating Datasets as Expressions, e.g. DB[:table1].select(:column1) > DB[:table2].select(:column2) (jeremyevans)
