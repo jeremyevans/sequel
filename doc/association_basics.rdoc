@@ -381,7 +381,7 @@ method, you have to pass a proc as an argument:
 == Filtering By Associations
 
 In addition to using the association method to get associated objects, you
-can also use associated objects in filters.  For example, while to get
+can also use associated objects in filters.  For example, to get
 all albums for a given artist, you would usually do:
 
   @artist.albums
@@ -479,7 +479,7 @@ would be bad association names.
 
 == Database Schema
 
-Creating an association, doesn't modify the database schema.  Sequel
+Creating an association doesn't modify the database schema.  Sequel
 assumes your associations reflect the existing database schema.  If not,
 you should modify your schema before creating the associations.
 
