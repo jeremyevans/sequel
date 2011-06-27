@@ -424,7 +424,7 @@ module Sequel
       @current = opts[:current] || current_migration_version
 
       raise(Error, "No current version available") unless current
-      raise(Error, "No target version available") unless target
+      raise(Error, "No target version available, probably because no migration files found or filenames don't follow the migration filename convention") unless target
 
       @direction = current < target ? :up : :down
       @migrations = get_migrations
