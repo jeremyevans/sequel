@@ -89,4 +89,35 @@ describe "Sequel::Plugins::AssociationPks" do
     @db.sqls[3].should == "COMMIT"
   end
 
+  specify "should automatically convert keys to numbers if the primary key is an integer for one_to_many associations" do
+    @Album.db_schema[:id][:type] = :integer
+    @Artist.load(:id=>1).album_pks = %w'1 2'
+    @db.sqls.should == ["UPDATE albums SET artist_id = 1 WHERE (id IN (1, 2))",
+      "UPDATE albums SET artist_id = NULL WHERE ((albums.artist_id = 1) AND (id NOT IN (1, 2)))"]
+  end
+
+  specify "should not automatically convert keys if the primary key is not an integer for many_to_many associations" do
+    @Album.db_schema[:id][:type] = :string
+    @Artist.load(:id=>1).album_pks = %w'1 2'
+    @db.sqls.should == ["UPDATE albums SET artist_id = 1 WHERE (id IN ('1', '2'))",
+      "UPDATE albums SET artist_id = NULL WHERE ((albums.artist_id = 1) AND (id NOT IN ('1', '2')))"]
+  end
+
+  specify "should automatically convert keys to numbers if the primary key is an integer for one_to_many associations" do
+    @Tag.db_schema[:id][:type] = :integer
+    @Album.load(:id=>2).tag_pks = %w'1 3'
+    @db.sqls[0].should == "DELETE FROM albums_tags WHERE ((album_id = 2) AND (tag_id NOT IN (1, 3)))"
+    @db.sqls[1].should =~ /INSERT INTO albums_tags \((album_id, tag_id|tag_id, album_id)\) VALUES \((2, 1|1, 2)\)/
+    @db.sqls.length.should == 2
+  end
+
+  specify "should not automatically convert keys to numbers if the primary key is an integer for many_to_many associations" do
+    @Tag.db_schema[:id][:type] = :string
+    @Album.load(:id=>2).tag_pks = %w'1 3'
+    @db.sqls[0].should == "DELETE FROM albums_tags WHERE ((album_id = 2) AND (tag_id NOT IN ('1', '3')))"
+    @db.sqls[1].should =~ /INSERT INTO albums_tags \((album_id, tag_id|tag_id, album_id)\) VALUES \((2, '1'|'1', 2)\)/
+    @db.sqls[2].should =~ /INSERT INTO albums_tags \((album_id, tag_id|tag_id, album_id)\) VALUES \((2, '3'|'3', 2)\)/
+    @db.sqls.length.should == 3
+  end
+
 end

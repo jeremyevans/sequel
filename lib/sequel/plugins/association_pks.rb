@@ -56,6 +56,7 @@ module Sequel
             _join_table_dataset(opts).filter(opts[:left_key]=>send(opts[:left_primary_key])).select_map(opts[:right_key])
           end
           def_association_pks_setter(opts) do |pks|
+            pks = convert_pk_array(opts, pks)
             checked_transaction do
               ds = _join_table_dataset(opts).filter(opts[:left_key]=>send(opts[:left_primary_key]))
               ds.exclude(opts[:right_key]=>pks).delete
@@ -74,6 +75,7 @@ module Sequel
             send(opts.dataset_method).select_map(opts.associated_class.primary_key)
           end
           def_association_pks_setter(opts) do |pks|
+            pks = convert_pk_array(opts, pks)
             checked_transaction do
               ds = send(opts.dataset_method)
               primary_key = opts.associated_class.primary_key
@@ -81,6 +83,20 @@ module Sequel
               ds.unfiltered.filter(primary_key=>pks).update(key=>pk)
               ds.exclude(primary_key=>pks).update(key=>nil)
             end
+          end
+        end
+      end
+
+      module InstanceMethods
+        private
+
+        # If the associated class's primary key column type is integer,
+        # typecast all provided values to integer before using them.
+        def convert_pk_array(opts, pks)
+          if klass = opts.associated_class and sch = klass.db_schema and col = sch[klass.primary_key] and col[:type] == :integer
+            pks.map{|pk| model.db.typecast_value(:integer, pk)}
+          else
+            pks
           end
         end
       end

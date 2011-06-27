@@ -1,5 +1,7 @@
 === HEAD
 
+* Make association_pks plugin typecast provided values to integer if the primary key column type is integer (jeremyevans)
+ 
 * Model.set_dataset now accepts Identifier, QualifiedIdentifier, and AliasedExpression arguments (jeremyevans)
 
 * Fix handling of nil values in bound variables and prepared statement and stored procedure arguments in the jdbc adapter (jeremyevans, wei)
