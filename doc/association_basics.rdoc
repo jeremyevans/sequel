@@ -247,7 +247,7 @@ example is a tree structure:
   
   class Node
     many_to_one :parent, :class=>self
-    one_to_many :children :key=>:parent_id, :class=>self
+    one_to_many :children, :key=>:parent_id, :class=>self
   end
 
 For many_to_many self_referential associations, it's fairly similar.  Here's
