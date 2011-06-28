@@ -11,7 +11,6 @@ module Sequel
       # :dataserver and :username options.
       def connect(server)
         opts = server_opts(server)
-        opts[:dataserver] = opts[:host]
         opts[:username] = opts[:user]
         set_mssql_unicode_strings
         TinyTds::Client.new(opts)
@@ -39,7 +38,7 @@ module Sequel
             end
             yield(r) if block_given?
           rescue TinyTds::Error => e
-            raise_error(e, :disconnect=>(c.closed? || (c.respond_to?(:dead?) && c.dead?)))
+            raise_error(e, :disconnect=>!c.active?)
           ensure
            r.cancel if r && c.sqlsent?
           end

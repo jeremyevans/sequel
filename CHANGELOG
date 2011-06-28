@@ -1,5 +1,7 @@
 === HEAD
 
+* Work with tiny_tds-0.4.5 in the tinytds adapter, older versions are no longer supported (jeremyevans)
+
 * Make association_pks plugin typecast provided values to integer if the primary key column type is integer (jeremyevans)
  
 * Model.set_dataset now accepts Identifier, QualifiedIdentifier, and AliasedExpression arguments (jeremyevans)
