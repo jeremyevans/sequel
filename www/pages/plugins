@@ -53,6 +53,7 @@
 <h3>External Plugins</h3>
 
 <ul>
+<li><a href='http://github.com/jeremyevans/forme'>forme</a>: HTML forms library for ruby that integrates with Sequel::Model for easy form creation.</li>
 <li><a href='http://github.com/gucki/sequel_bulk_attributes'>sequel_bulk_attributes</a>: Provides bulk assignment functionality for one_to_many associations.</li>
 <li><a href='http://github.com/sbfaulkner/sequel_container'>sequel_container</a>: Contained documents (i.e. attachments) for models.</li>
 <li><a href='http://github.com/mig-hub/sequel-crushyform'>sequel_crushyform</a>: Builds forms for you</li>
