@@ -1,0 +1,88 @@
+= New Features
+
+* drop_table, drop_view, drop_column, and drop_constraint all now
+  support a :cascade option for using CASCADE.
+  
+    DB.drop_table(:tab, :cascade=>true)
+    # DROP TABLE tab CASCADE
+    
+    DB.drop_column(:tab, :col, :cascade=>true)
+    # ALTER TABLE tab DROP COLUMN col CASCADE
+    
+  A few databases support CASCADE for dropping tables and views,
+  but only PostgreSQL appears to support it for columns and
+  constraints.  Using the :cascade option when the underlying
+  database doesn't support it will probably result in a
+  DatabaseError being raised.
+
+* You can now use datasets as expressions, allowing things such as:
+  
+    DB[:table1].select(:column1) > DB[:table2].select(:column2)
+    # (SELECT column1 FROM table1) > (SELECT column2 FROM table2)
+
+    DB[:table1].select(:column1).cast(Integer)
+    # CAST((SELECT column1 FROM table1) AS integer)
+
+* Dataset#select_group has been added for grouping and selecting on
+  the same columns.
+  
+    DB[:a].select_group(:b, :c)
+    # SELECT b, c FROM a GROUP BY b, c
+
+* Dataset#exclude_where and #exclude_having methods have been added,
+  allowing you to specify which clause to affect.  #exclude's
+  behavior is still to add to the HAVING clause if one is present,
+  and use the WHERE clause otherwise.
+  
+* Dataset#select_all now accepts optional arguments and will select
+  all columns from those arguments if present:
+  
+    DB[:a].select_all(:a)
+    # SELECT a.* FROM a
+    
+    DB.from(:a, :b).select_all(:a, :b)
+    # SELECT a.*, b.* FROM a, b
+
+* Dataset#group and #group_and_count now both accept virtual row
+  blocks:
+  
+    DB[:a].select(:b).group{c(d)}
+    # SELECT b FROM a GROUP BY c(d)
+
+* If you use a LiteralString as a validation error message, 
+  Errors#full_messages will now not add the related column name to
+  the start of the error message.
+
+* Model.set_dataset now accepts SQL::Identifier,
+  SQL::QualifiedIdentifier, and SQL::AliasedExpression instances,
+  treating them like Symbols.
+  
+= Other Improvements
+
+* The association_pks plugin's setter method will now automatically
+  convert a given array of strings to an array of integers if the
+  primary key field is an integer field, which should make it easier
+  to use in web applications.
+  
+* nil bound variable, prepared statement, and stored procedure
+  arguments are now handled correctly in the JDBC adapter.
+
+* On 1.9, you can now load plugins even when ::ClassMethods,
+  ::InstanceMethods, or ::DatasetMethods is defined.
+
+= Backwards Compatibility
+
+* The tinytds adapter now only works with tiny_tds 0.4.5 and greater.
+  Also, if you were using the tinytds adapter with FreeTDS 0.91rc1,
+  you need to upgrade to FreeTDS 0.91rc2 for it to work.  Also, if
+  you were referencing an entry in the freetds.conf file, you now
+  need to specify it directly using the :dataserver option when
+  connecting, the adapter no longer copies the :host option to the
+  :dataserver option.
+
+* On postgresql, Sequel now no longer drops tables with CASCADE by
+  default.  You now have to use the :cascade option to drop_table if
+  you want to use CASCADE.
+
+* The Database#drop_table_sql private method now takes an additional
+  options hash argument.

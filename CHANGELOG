@@ -1,4 +1,4 @@
-=== HEAD
+=== 3.25.0 (2011-07-01)
 
 * Work with tiny_tds-0.4.5 in the tinytds adapter, older versions are no longer supported (jeremyevans)
 
