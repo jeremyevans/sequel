@@ -94,7 +94,7 @@ module Sequel
             yield conn
           end
         rescue ::Mysql2::Error => e
-          raise_error(e, :disconnect=>MYSQL_DATABASE_DISCONNECT_ERRORS.match(e.message))
+          raise_error(e)
         end
       end
 
@@ -106,6 +106,10 @@ module Sequel
       # The MySQL adapter main error class is Mysql2::Error
       def database_error_classes
         [::Mysql2::Error]
+      end
+
+      def disconnect_error?(e, opts)
+        super || (e.is_a?(::Mysql2::Error) && MYSQL_DATABASE_DISCONNECT_ERRORS.match(e.message))
       end
 
       # The database name when using the native adapter is always stored in

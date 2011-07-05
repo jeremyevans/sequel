@@ -78,6 +78,10 @@ module Sequel
       def disconnect_connection(c)
         c.close
       end
+
+      def disconnect_error(e, opts)
+        super || (opts[:conn] && !opts[:conn].active?)
+      end
     end
     
     class Dataset < Sequel::Dataset

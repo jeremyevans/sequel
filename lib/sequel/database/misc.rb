@@ -181,12 +181,17 @@ module Sequel
     def database_error_classes
       []
     end
+
+    # Return true if exception represents a disconnect error, false otherwise.
+    def disconnect_error?(exception, opts)
+      opts[:disconnect]
+    end
     
     # Convert the given exception to a DatabaseError, keeping message
     # and traceback.
     def raise_error(exception, opts={})
       if !opts[:classes] || Array(opts[:classes]).any?{|c| exception.is_a?(c)}
-        raise Sequel.convert_exception_class(exception, opts[:disconnect] ? DatabaseDisconnectError : DatabaseError)
+        raise Sequel.convert_exception_class(exception, disconnect_error?(exception, opts) ? DatabaseDisconnectError : DatabaseError)
       else
         raise exception
       end

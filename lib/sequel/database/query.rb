@@ -230,12 +230,12 @@ module Sequel
         yield(conn)
       rescue Exception => e
         rollback_transaction(t, opts) if t
-        transaction_error(e)
+        transaction_error(e, :conn=>conn)
       ensure
         begin
           commit_or_rollback_transaction(e, t, opts)
         rescue Exception => e
-          raise_error(e, :classes=>database_error_classes)
+          raise_error(e, :classes=>database_error_classes, :conn=>conn)
         ensure
           remove_transaction(t)
         end
@@ -490,8 +490,8 @@ module Sequel
     end
 
     # Raise a database error unless the exception is an Rollback.
-    def transaction_error(e)
-      raise_error(e, :classes=>database_error_classes) unless e.is_a?(Rollback)
+    def transaction_error(e, opts={})
+      raise_error(e, opts.merge(:classes=>database_error_classes)) unless e.is_a?(Rollback)
     end
   end
 end

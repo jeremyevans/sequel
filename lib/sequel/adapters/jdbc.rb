@@ -285,6 +285,12 @@ module Sequel
         c.close
       end
       
+      # Raise a disconnect error if the SQL state of the cause of the exception indicates so.
+      def disconnect_error?(exception, opts)
+        cause = exception.respond_to?(:cause) ? exception.cause : exception
+        super || (cause.respond_to?(:getSQLState) && cause.getSQLState =~ /^08/)
+      end
+
       # Execute the prepared statement.  If the provided name is a
       # dataset, use that as the prepared statement, otherwise use
       # it as a key to look it up in the prepared_statements hash.
@@ -398,12 +404,6 @@ module Sequel
             result.close
           end
         end
-      end
-
-      # Treat SQLExceptions with a "Connection Error" SQLState as disconnects
-      def raise_error(exception, opts={})
-        cause = exception.respond_to?(:cause) ? exception.cause : exception
-        super(exception, {:disconnect => cause.respond_to?(:getSQLState) && cause.getSQLState =~ /^08/}.merge(opts))
       end
 
       # Java being java, you need to specify the type of each argument

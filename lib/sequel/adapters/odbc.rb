@@ -52,7 +52,7 @@ module Sequel
             r = log_yield(sql){conn.run(sql)}
             yield(r) if block_given?
           rescue ::ODBC::Error, ArgumentError => e
-            raise_error(e, :disconnect=>DISCONNECT_ERRORS.match(e.message))
+            raise_error(e)
           ensure
             r.drop if r
           end
@@ -65,7 +65,7 @@ module Sequel
           begin
             log_yield(sql){conn.do(sql)}
           rescue ::ODBC::Error, ArgumentError => e
-            raise_error(e, :disconnect=>DISCONNECT_ERRORS.match(e.message))
+            raise_error(e)
           end
         end
       end
@@ -79,6 +79,10 @@ module Sequel
 
       def disconnect_connection(c)
         c.disconnect
+      end
+
+      def disconnect_error?(e, opts)
+        super || (e.is_a?(::ODBC::Error) && DISCONNECT_ERRORS.match(e.message))
       end
     end
     

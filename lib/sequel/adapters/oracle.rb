@@ -78,7 +78,7 @@ module Sequel
             yield(r) if block_given?
             r
           rescue OCIException => e
-            raise_error(e, :disconnect=>CONNECTION_ERROR_CODES.include?(e.code))
+            raise_error(e)
           end
         end
       end
@@ -99,6 +99,10 @@ module Sequel
         c.logoff
       rescue OCIInvalidHandle
         nil
+      end
+
+      def disconnect_error?(e, opts)
+        super || (e.is_a?(::OCIException) && CONNECTION_ERROR_CODES.include?(e.code))
       end
       
       def remove_transaction(conn)
